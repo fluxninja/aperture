@@ -1,11 +1,10 @@
 package components
 
 import (
-	"encoding/json"
-
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/rate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/promql"
@@ -102,12 +101,12 @@ func prepareConfiguredComponent(
 	component runtime.Component,
 	config any,
 ) (runtime.ConfiguredComponent, error) {
-	mapStruct, err := encodeMapStruct(config)
+	mapStruct, err := mapstruct.EncodeObject(config)
 	if err != nil {
 		return runtime.ConfiguredComponent{}, err
 	}
 
-	ports, err := runtime.PortsFromMapStruct(mapStruct)
+	ports, err := runtime.PortsFromComponentConfig(mapStruct)
 	if err != nil {
 		return runtime.ConfiguredComponent{}, err
 	}
@@ -117,18 +116,4 @@ func prepareConfiguredComponent(
 		Config:      mapStruct,
 		PortMapping: ports,
 	}, nil
-}
-
-func encodeMapStruct(obj any) (map[string]any, error) {
-	// TODO: mapstruct functionality needs to be moved to a common package
-	var mapStruct map[string]interface{}
-	b, err := json.Marshal(obj)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &mapStruct)
-	if err != nil {
-		return nil, err
-	}
-	return mapStruct, nil
 }

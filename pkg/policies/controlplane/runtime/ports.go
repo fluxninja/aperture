@@ -1,11 +1,14 @@
 package runtime
 
-import "github.com/mitchellh/mapstructure"
+import (
+	"github.com/fluxninja/aperture/pkg/mapstruct"
+	"github.com/mitchellh/mapstructure"
+)
 
 // PortMapping is description of a component's ports mapping.
 //
-// This struct is meant to be deserializable from map-struct serialized
-// representation of _any_ of the components. Eg. EMA component defines:
+// This struct is meant to be decodable from Mapstruct representation of _any_
+// of the components's config. Eg. EMA component defines:
 //
 // ```proto
 //
@@ -17,7 +20,8 @@ import "github.com/mitchellh/mapstructure"
 // ...
 // ```
 //
-// And such EMA component could be serialized and deserialized into PortMapping as:
+// And such EMA component's config could be encoded and then decoded into
+// PortMapping as:
 //
 // ```go
 //
@@ -38,12 +42,8 @@ type PortMapping struct {
 	Outs map[string][]Port `mapstructure:"out_ports"`
 }
 
-// PortsFromMapStruct extracts Ports from component serialized previously to
-// MapStruct via encodeMapStruct.
-//
-// Note: This relies on every proto structure providing Marshal/UnmarshalJSON
-// (via protojson with protojson.MarshalOptions.UseProtoNames).
-func PortsFromMapStruct(componentMapStruct map[string]any) (PortMapping, error) {
+// PortsFromComponentConfig extracts Ports from component's config.
+func PortsFromComponentConfig(componentConfig mapstruct.Object) (PortMapping, error) {
 	var ports PortMapping
 
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
@@ -54,7 +54,7 @@ func PortsFromMapStruct(componentMapStruct map[string]any) (PortMapping, error) 
 		return PortMapping{}, err
 	}
 
-	err = decoder.Decode(componentMapStruct)
+	err = decoder.Decode(componentConfig)
 	return ports, err
 }
 
