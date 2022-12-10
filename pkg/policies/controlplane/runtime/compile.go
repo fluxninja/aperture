@@ -1,132 +1,36 @@
-package circuitcompiler
+package runtime
 
 import (
 	"errors"
 	"fmt"
-	"strconv"
-	"strings"
 
 	"github.com/looplab/tarjan"
-	"go.uber.org/fx"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/mapstruct"
 )
 
-// Module for circuit compiler run via the main app.
-func Module() fx.Option {
-	return fx.Options(
-		runtime.CircuitModule(),
-	)
+// ConfiguredComponent consists of a Component, its PortMapping and its Config.
+type ConfiguredComponent struct {
+	Component
+	// Which signals this component wants to have connected on its ports.
+	PortMapping PortMapping
+	// Mapstruct representation of proto config that was used to create this
+	// component.  This Config is used only for observability purposes.
+	//
+	// Note: PortMapping is also part of Config.
+	Config mapstruct.Object
 }
 
-// Component is runtime.CompiledComponent annotated with IDs.
-type Component struct {
-	runtime.CompiledComponent
-	ComponentID       string
-	ParentComponentID string
-}
-
-// Circuit is a compiled Circuit
-//
-// Circuit can also be converted to its graph view.
-type Circuit struct {
-	components   []runtime.CompiledComponent
-	configs      []runtime.ConfiguredComponent
-	componentIDs []ComponentID
-}
-
-// Components returns a list of CompiledComponents, ready to create runtime.Circuit.
-func (circuit *Circuit) Components() []runtime.CompiledComponent { return circuit.components }
-
-// CompileFromProto compiles a protobuf circuit definition into a Circuit.
-//
-// This is helper for CreateComponents + Compile.
-func CompileFromProto(
-	circuitProto []*policylangv1.Component,
-	policyReadAPI iface.Policy,
-) (*Circuit, fx.Option, error) {
-	configuredComponents, componentIDs, option, err := CreateComponents(circuitProto, policyReadAPI)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	compiledComponents, err := Compile(
-		configuredComponents,
-		policyReadAPI.GetStatusRegistry().GetLogger(),
-	)
-	if err != nil {
-		return nil, option, err
-	}
-
-	return &Circuit{
-		configs:      configuredComponents,
-		components:   compiledComponents,
-		componentIDs: componentIDs,
-	}, option, nil
-}
-
-// ComponentID is a component identifier based on position in original proto list of components.
-type ComponentID string
-
-func subcomponentID(parentID ComponentID, subcomponent runtime.Component) ComponentID {
-	return ComponentID(string(parentID) + "." + subcomponent.Name())
-}
-
-// ParentID returns ID of parent component.
-func (id ComponentID) ParentID() ComponentID {
-	parentID, _, _ := strings.Cut(string(id), ".")
-	return ComponentID(parentID)
-}
-
-// CreateComponents creates circuit components along with their identifiers and fx options.
-//
-// Note that number of returned components might be greater than number of
-// components in circuitProto, as some components may have their subcomponents.
-func CreateComponents(
-	circuitProto []*policylangv1.Component,
-	policyReadAPI iface.Policy,
-) ([]runtime.ConfiguredComponent, []ComponentID, fx.Option, error) {
-	var configuredComponents []runtime.ConfiguredComponent
-	var ids []ComponentID
-	var options []fx.Option
-
-	for compIndex, componentProto := range circuitProto {
-		// Create component
-		component, subcomponents, compOption, err := components.NewComponentAndOptions(
-			componentProto,
-			compIndex,
-			policyReadAPI,
-		)
-		if err != nil {
-			return nil, nil, nil, err
-		}
-		options = append(options, compOption)
-
-		compID := ComponentID(strconv.Itoa(compIndex))
-		// Add Component to compiledCircuit
-		configuredComponents = append(configuredComponents, component)
-		ids = append(ids, compID)
-
-		// Add SubComponents to compiledCircuit
-		for _, subComp := range subcomponents {
-			configuredComponents = append(configuredComponents, subComp)
-			ids = append(ids, subcomponentID(compID, subComp))
-		}
-	}
-
-	return configuredComponents, ids, fx.Options(options...), nil
-}
-
-// Compile compiles list of prepared components into a circuit and validates it.
-func Compile(configuredComponents []runtime.ConfiguredComponent, logger *log.Logger) ([]runtime.CompiledComponent, error) {
+// Compile compiles list of configured components into a circuit and validates it.
+func Compile(
+	configuredComponents []ConfiguredComponent,
+	logger *log.Logger,
+) ([]CompiledComponent, error) {
 	// A list of compiled components. The index of Component in the list is
 	// referred as componentIndex. Order of components is the same as in
 	// configuredComponents.
-	compiledCircuit := make([]runtime.CompiledComponent, 0, len(configuredComponents))
+	compiledCircuit := make([]CompiledComponent, 0, len(configuredComponents))
 
 	// Map from signal name to a list of componentIndex(es) which accept the signal as input.
 	inSignals := make(map[string][]int)
@@ -146,7 +50,7 @@ func Compile(configuredComponents []runtime.ConfiguredComponent, logger *log.Log
 		}
 		logger.Trace().Interface("outPortToSignals", outPortToSignals).Send()
 
-		compiledCircuit = append(compiledCircuit, runtime.CompiledComponent{
+		compiledCircuit = append(compiledCircuit, CompiledComponent{
 			Component:        comp.Component,
 			InPortToSignals:  inPortToSignals,
 			OutPortToSignals: outPortToSignals,
@@ -229,7 +133,7 @@ func Compile(configuredComponents []runtime.ConfiguredComponent, logger *log.Log
 			// Mark looped signals in InPortToSignalsMap
 			for _, signals := range removeToComp.InPortToSignals {
 				for idx, signal := range signals {
-					if signal.SignalType == runtime.SignalTypeNamed {
+					if signal.SignalType == SignalTypeNamed {
 						outFromCompID, ok := outSignals[signal.Name]
 						if !ok {
 							return nil, fmt.Errorf("unexpected state: signal %s is not defined in outSignals", signal.Name)
@@ -266,15 +170,15 @@ func Compile(configuredComponents []runtime.ConfiguredComponent, logger *log.Log
 }
 
 func getInPortSignals(
-	portMapping map[string][]runtime.Port,
+	portMapping map[string][]Port,
 	signalConsumers map[string][]int,
 	componentIndex int,
-) runtime.PortToSignal {
+) PortToSignal {
 	portToSignal := getPortSignals(portMapping, componentIndex)
 
 	for _, signals := range portToSignal {
 		for _, signal := range signals {
-			if signal.SignalType == runtime.SignalTypeNamed {
+			if signal.SignalType == SignalTypeNamed {
 				signalConsumers[signal.Name] = append(signalConsumers[signal.Name], componentIndex)
 			}
 		}
@@ -284,15 +188,15 @@ func getInPortSignals(
 }
 
 func getOutPortSignals(
-	portMapping map[string][]runtime.Port,
+	portMapping map[string][]Port,
 	signalProducers map[string]int,
 	componentIndex int,
-) (runtime.PortToSignal, error) {
+) (PortToSignal, error) {
 	portToSignal := getPortSignals(portMapping, componentIndex)
 
 	for _, signals := range portToSignal {
 		for _, signal := range signals {
-			if signal.SignalType == runtime.SignalTypeNamed {
+			if signal.SignalType == SignalTypeNamed {
 				if _, ok := signalProducers[signal.Name]; !ok {
 					signalProducers[signal.Name] = componentIndex
 				} else {
@@ -306,21 +210,21 @@ func getOutPortSignals(
 }
 
 // getPortSignals takes a port mapping and returns a PortToSignal map and signals list.
-func getPortSignals(portMapping map[string][]runtime.Port, componentIndex int) runtime.PortToSignal {
-	portToSignalMapping := make(runtime.PortToSignal)
+func getPortSignals(portMapping map[string][]Port, componentIndex int) PortToSignal {
+	portToSignalMapping := make(PortToSignal)
 
 	for port, portList := range portMapping {
-		portSignals := make([]runtime.Signal, 0, len(portList))
+		portSignals := make([]Signal, 0, len(portList))
 		for _, portSpec := range portList {
 			if portSpec.SignalName != nil {
 				portSignals = append(
 					portSignals,
-					runtime.MakeNamedSignal(*portSpec.SignalName, false),
+					MakeNamedSignal(*portSpec.SignalName, false),
 				)
 			} else if portSpec.ConstantValue != nil {
 				portSignals = append(
 					portSignals,
-					runtime.MakeConstantSignal(*portSpec.ConstantValue),
+					MakeConstantSignal(*portSpec.ConstantValue),
 				)
 			}
 		}

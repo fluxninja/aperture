@@ -12,7 +12,6 @@ import (
 
 	policymonitoringv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/monitoring/v1"
 	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -97,34 +96,6 @@ func MakeConstantSignal(value float64) Signal {
 
 // PortToSignal is a map from port name to a slice of Signals.
 type PortToSignal map[string][]Signal
-
-// ComponentType describes the type of a component based on its connectivity in the circuit.
-type ComponentType string
-
-const (
-	// ComponentTypeStandAlone is a component that does not accept or emit any signals.
-	ComponentTypeStandAlone ComponentType = "StandAlone"
-	// ComponentTypeSource is a component that emits output signal(s) but does not accept an input signal.
-	ComponentTypeSource ComponentType = "Source"
-	// ComponentTypeSink is a component that accepts input signal(s) but does not emit an output signal.
-	ComponentTypeSink ComponentType = "Sink"
-	// ComponentTypeSignalProcessor is a component that accepts input signal(s) and emits output signal(s).
-	ComponentTypeSignalProcessor ComponentType = "SignalProcessor"
-)
-
-// ConfiguredComponent consists of a Component, its PortMapping and its Config.
-//
-// This struct is not directly used by the runtime.
-type ConfiguredComponent struct {
-	Component
-	// Which signals this component wants to have connected on its ports.
-	PortMapping PortMapping
-	// Mapstruct representation of proto config that was used to create this
-	// component.  This Config is used only for observability purposes.
-	//
-	// Note: PortMapping is also part of Config.
-	Config mapstruct.Object
-}
 
 // CompiledComponent consists of a Component and its In and Out ports.
 //
