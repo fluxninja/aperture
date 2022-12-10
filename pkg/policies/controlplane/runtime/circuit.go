@@ -12,6 +12,7 @@ import (
 
 	policymonitoringv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/monitoring/v1"
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -118,11 +119,11 @@ type ConfiguredComponent struct {
 	Component
 	// Which signals this component wants to have connected on its ports.
 	PortMapping PortMapping
-	// MapStruct representation of proto config that was used to create this
+	// Mapstruct representation of proto config that was used to create this
 	// component.  This Config is used only for observability purposes.
 	//
 	// Note: PortMapping is also part of Config.
-	Config map[string]any
+	Config mapstruct.Object
 }
 
 // CompiledComponent consists of a Component and its In and Out ports.
