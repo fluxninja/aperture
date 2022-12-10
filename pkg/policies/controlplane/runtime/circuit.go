@@ -102,10 +102,6 @@ type PortToSignal map[string][]Signal
 // This representation of component is ready to be used by a circuit.
 type CompiledComponent struct {
 	Component
-	// Note: These maps may seem to repeat information from
-	// ConfiguredComponent.Ports, but the most important difference (apart from
-	// different map value types), is that the following maps have the looped
-	// signals resolved.
 	InPortToSignals  PortToSignal
 	OutPortToSignals PortToSignal
 }
