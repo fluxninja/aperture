@@ -200,7 +200,7 @@ func (la *LoadActuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplie
 func (la *LoadActuator) createAlert() *alerts.Alert {
 	newAlert := alerts.NewAlert(
 		alerts.WithName("Load Shed Event"),
-		alerts.WithSeverity(la.alerterConfig.Severity),
+		alerts.WithSeverity(alerts.ParseSeverity(la.alerterConfig.Severity)),
 		alerts.WithAlertChannels(la.alerterConfig.AlertChannels),
 		alerts.WithLabel("policy_name", la.policyReadAPI.GetPolicyName()),
 		alerts.WithLabel("type", "concurrency_limiter"),

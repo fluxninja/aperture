@@ -74,7 +74,7 @@ func (a *Alerter) DynamicConfigUpdate(event notifiers.Event, unmarshaller config
 func (a *Alerter) createAlert() *alerts.Alert {
 	newAlert := alerts.NewAlert(
 		alerts.WithName(a.name),
-		alerts.WithSeverity(a.severity),
+		alerts.WithSeverity(alerts.ParseSeverity(a.severity)),
 		alerts.WithAlertChannels(a.alertChannels),
 		alerts.WithLabel("policy_name", a.policyReadAPI.GetPolicyName()),
 		alerts.WithLabel("type", "alerter"),
