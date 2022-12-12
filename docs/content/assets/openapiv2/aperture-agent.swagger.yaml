@@ -300,13 +300,11 @@ definitions:
         type: string
     additionalProperties: false
   statusv1Status:
-    description: |-
-      Status holds details about a status that can be reported to the registry. The
-      details can either be a message (Any) or error (ErrorDetails).
+    description: Status holds details about a status that can be reported to the registry.
     type: object
     properties:
       error:
-        $ref: '#/definitions/v1ErrorDetails'
+        $ref: '#/definitions/v1StatusError'
       message:
         $ref: '#/definitions/protobufAny'
       timestamp:
@@ -337,12 +335,6 @@ definitions:
         $ref: '#/definitions/EntityCacheEntities'
       entities_by_name:
         $ref: '#/definitions/EntityCacheEntities'
-  v1ErrorDetails:
-    description: ErrorDetails holds raw error message and its cause in a nested field.
-    type: object
-    properties:
-      message:
-        type: string
   v1GroupStatus:
     description: |-
       Groups is nested structure that holds status information about the node and a
@@ -394,6 +386,12 @@ definitions:
         type: string
         format: date-time
       uptime:
+        type: string
+  v1StatusError:
+    description: Error holds raw error message and its cause in a nested field.
+    type: object
+    properties:
+      message:
         type: string
   v1VersionInfo:
     type: object
