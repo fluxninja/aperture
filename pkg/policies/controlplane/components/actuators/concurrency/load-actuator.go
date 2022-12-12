@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"path"
 	"strconv"
-	"strings"
 	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -202,11 +201,11 @@ func (la *LoadActuator) createAlert() *alerts.Alert {
 	newAlert := alerts.NewAlert(
 		alerts.WithName("Load Shed Event"),
 		alerts.WithSeverity(la.alerterConfig.Severity),
+		alerts.WithAlertChannels(la.alerterConfig.AlertChannels),
 		alerts.WithLabel("policy_name", la.policyReadAPI.GetPolicyName()),
 		alerts.WithLabel("type", "concurrency_limiter"),
 		alerts.WithLabel("agent_group", la.agentGroupName),
 		alerts.WithLabel("component_index", strconv.Itoa(la.componentIndex)),
-		alerts.WithAnnotation("alert_channels", strings.Join(la.alerterConfig.AlertChannels, ",")),
 		alerts.WithGeneratorURL(
 			fmt.Sprintf("http://%s/%s/%d", info.GetHostInfo().Hostname, la.policyReadAPI.GetPolicyName(), la.componentIndex),
 		),

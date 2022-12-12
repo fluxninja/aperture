@@ -1,6 +1,7 @@
 package alerts
 
 import (
+	"strings"
 	"time"
 
 	"github.com/go-openapi/strfmt"
@@ -17,6 +18,7 @@ var specialLabels = map[string]struct{}{
 	otelcollector.AlertNameLabel:         {},
 	otelcollector.AlertSeverityLabel:     {},
 	otelcollector.AlertGeneratorURLLabel: {},
+	otelcollector.AlertChannelsLabel:     {},
 }
 
 // AlertOption is a type for constructor options.
@@ -65,7 +67,7 @@ func (a *Alert) SetName(name string) {
 // WithName is an option function for constructor.
 func WithName(name string) AlertOption {
 	return func(a *Alert) {
-		a.postableAlert.Labels[otelcollector.AlertNameLabel] = name
+		a.SetName(name)
 	}
 }
 
@@ -79,16 +81,37 @@ func (a *Alert) SetSeverity(severity string) {
 	a.postableAlert.Labels[otelcollector.AlertSeverityLabel] = severity
 }
 
-// PostableAlert returns the underlying PostableAlert struct.
-func (a *Alert) PostableAlert() models.PostableAlert {
-	return a.postableAlert
-}
-
 // WithSeverity is an option function for constructor.
 func WithSeverity(severity string) AlertOption {
 	return func(a *Alert) {
-		a.postableAlert.Labels[otelcollector.AlertSeverityLabel] = severity
+		a.SetSeverity(severity)
 	}
+}
+
+// AlertChannels gets the alert channels from labels. Returns empty slice if label not found.
+func (a *Alert) AlertChannels() []string {
+	channels, ok := a.postableAlert.Labels[otelcollector.AlertChannelsLabel]
+	if !ok {
+		return []string{}
+	}
+	return strings.Split(channels, ",")
+}
+
+// SetAlertChannels sets the alert channels in labels. Overwrites previous value if exists.
+func (a *Alert) SetAlertChannels(alertChannels []string) {
+	a.postableAlert.Labels[otelcollector.AlertChannelsLabel] = strings.Join(alertChannels, ",")
+}
+
+// WithAlertChannels is an option function for constructor.
+func WithAlertChannels(alertChannels []string) AlertOption {
+	return func(a *Alert) {
+		a.SetAlertChannels(alertChannels)
+	}
+}
+
+// PostableAlert returns the underlying PostableAlert struct.
+func (a *Alert) PostableAlert() models.PostableAlert {
+	return a.postableAlert
 }
 
 // SetAnnotation sets a single annotation. It overwrites the previous value if exists.
@@ -99,7 +122,7 @@ func (a *Alert) SetAnnotation(key, value string) {
 // WithAnnotation is an option function for constructor.
 func WithAnnotation(key, value string) AlertOption {
 	return func(a *Alert) {
-		a.postableAlert.Annotations[key] = value
+		a.SetAnnotation(key, value)
 	}
 }
 
@@ -111,7 +134,7 @@ func (a *Alert) SetLabel(key, value string) {
 // WithLabel is an option function for constructor.
 func WithLabel(key, value string) AlertOption {
 	return func(a *Alert) {
-		a.postableAlert.Labels[key] = value
+		a.SetLabel(key, value)
 	}
 }
 
@@ -123,7 +146,7 @@ func (a *Alert) SetGeneratorURL(value string) {
 // WithGeneratorURL is an option function for constructor.
 func WithGeneratorURL(value string) AlertOption {
 	return func(a *Alert) {
-		a.postableAlert.GeneratorURL = strfmt.URI(value)
+		a.SetGeneratorURL(value)
 	}
 }
 

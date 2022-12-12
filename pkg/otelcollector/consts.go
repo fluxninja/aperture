@@ -165,6 +165,8 @@ const (
 	AlertNameLabel = "alertname"
 	// AlertSeverityLabel also known as log level. Human readable string.
 	AlertSeverityLabel = "severity"
+	// AlertChannelsLabel is a comma-separated list of channels to which alert is assigned.
+	AlertChannelsLabel = "alert_channels"
 	// IsAlertLabel helps to differentiate normal logs from alert logs.
 	IsAlertLabel = "is_alert"
 )
