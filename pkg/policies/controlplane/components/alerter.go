@@ -2,7 +2,6 @@ package components
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"go.uber.org/fx"
@@ -75,10 +74,10 @@ func (a *Alerter) DynamicConfigUpdate(event notifiers.Event, unmarshaller config
 func (a *Alerter) createAlert() *alerts.Alert {
 	newAlert := alerts.NewAlert(
 		alerts.WithName(a.name),
-		alerts.WithSeverity(a.severity),
+		alerts.WithSeverity(alerts.ParseSeverity(a.severity)),
+		alerts.WithAlertChannels(a.alertChannels),
 		alerts.WithLabel("policy_name", a.policyReadAPI.GetPolicyName()),
 		alerts.WithLabel("type", "alerter"),
-		alerts.WithAnnotation("alert_channels", strings.Join(a.alertChannels, ",")),
 		alerts.WithAnnotation("resolve_timeout", a.resolveTimeout.String()),
 		alerts.WithGeneratorURL(
 			fmt.Sprintf("http://%s/%s/%s", info.GetHostInfo().Hostname, a.policyReadAPI.GetPolicyName(), a.name),
