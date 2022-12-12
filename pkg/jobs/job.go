@@ -3,6 +3,7 @@ package jobs
 
 import (
 	"context"
+	"errors"
 	"math"
 	"sync"
 	"time"
@@ -153,7 +154,7 @@ func (executor *jobExecutor) doJob() {
 	for {
 		select {
 		case <-timerCh:
-			s := status.NewStatus(wrapperspb.String("Timeout"), nil)
+			s := status.NewStatus(wrapperspb.String("Timeout"), errors.New("job execution timeout"))
 			executor.livenessRegistry.SetStatus(s)
 			timer.Reset(time.Second * 1)
 		case <-jobCh:
