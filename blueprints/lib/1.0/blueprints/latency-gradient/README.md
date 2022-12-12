@@ -14,7 +14,7 @@
 
 | Parameter Name                      | Parameter Type                  | Default      | Description                            |
 | ----------------------------------- | ------------------------------- | ------------ | -------------------------------------- |
-| `policy.fluxMeter`                  | `aperture.v1.FluxMeter`         | `(required)` | Flux Meter selector.                   |
+| `policy.fluxMeter`                  | `aperture.spec.v1.FluxMeter`    | `(required)` | Flux Meter selector.                   |
 | `policy.concurrencyLimiterSelector` | `aperture.spec.v1.Selector`     | `(required)` | Concurrency Limiter selector.          |
 | `policy.classifiers`                | `[]aperture.spec.v1.Classifier` | `[]`         | List of classification rules.          |
 | `policy.components`                 | `[]aperture.spec.v1.Component`  | `[]`         | List of additional circuit components. |
