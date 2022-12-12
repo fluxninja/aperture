@@ -25,6 +25,10 @@ definitions:
         type: string
         x-go-name: Address
         x-go-validate: hostname_port|url|fqdn
+      base_path:
+        type: string
+        x-go-default: /
+        x-go-name: BasePath
       http_client:
         $ref: '#/definitions/HTTPClientConfig'
       name:
