@@ -392,13 +392,11 @@ definitions:
         type: string
     additionalProperties: false
   statusv1Status:
-    description: |-
-      Status holds details about a status that can be reported to the registry. The
-      details can either be a message (Any) or error (ErrorDetails).
+    description: Status holds details about a status that can be reported to the registry.
     type: object
     properties:
       error:
-        $ref: '#/definitions/v1ErrorDetails'
+        $ref: '#/definitions/v1StatusError'
       message:
         $ref: '#/definitions/protobufAny'
       timestamp:
@@ -902,12 +900,6 @@ definitions:
         x-go-validate: required
       value:
         description: Exact value that the label should be equal to.
-        type: string
-  v1ErrorDetails:
-    description: ErrorDetails holds raw error message and its cause in a nested field.
-    type: object
-    properties:
-      message:
         type: string
   v1Extractor:
     description: There are multiple variants of extractor, specify exactly one.
@@ -1970,6 +1962,12 @@ definitions:
       output:
         description: Output signal.
         $ref: '#/definitions/v1OutPort'
+  v1StatusError:
+    description: Error holds raw error message and its cause in a nested field.
+    type: object
+    properties:
+      message:
+        type: string
   v1Switcher:
     description: |-
       `on_true` will be returned if switch input is valid and not equal to 0.0 ,

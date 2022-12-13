@@ -182,7 +182,7 @@ func (r *registry) Key() string {
 func (r *registry) HasError() bool {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	if r.status.GetError().GetMessage() != "" {
+	if r.status.GetError() != nil {
 		return true
 	}
 	for _, child := range r.children {

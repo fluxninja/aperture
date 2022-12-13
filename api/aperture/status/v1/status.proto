@@ -43,17 +43,14 @@ message GroupStatus {
   map<string, GroupStatus> groups = 2;
 }
 
-// Status holds details about a status that can be reported to the registry. The
-// details can either be a message (Any) or error (ErrorDetails).
+// Status holds details about a status that can be reported to the registry.
 message Status {
-  oneof details {
-    google.protobuf.Any message = 1;
-    ErrorDetails error = 2;
+  // Error holds raw error message and its cause in a nested field.
+  message Error {
+    string message = 1;
   }
-  google.protobuf.Timestamp timestamp = 3;
-}
 
-// ErrorDetails holds raw error message and its cause in a nested field.
-message ErrorDetails {
-  string message = 1;
+  google.protobuf.Any message = 1;
+  Error error = 2;
+  google.protobuf.Timestamp timestamp = 3;
 }

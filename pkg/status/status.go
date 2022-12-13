@@ -9,7 +9,6 @@ import (
 )
 
 // NewStatus creates a new instance of Status to be pushed into status registry. Use this function for creating status instead of by hand.
-// It can either have a detail message or a detail error but not both. This is enforced by first checking for detail message to not be nil.
 func NewStatus(d proto.Message, e error) *statusv1.Status {
 	s := &statusv1.Status{
 		Timestamp: timestamppb.Now(),
@@ -20,32 +19,14 @@ func NewStatus(d proto.Message, e error) *statusv1.Status {
 		if err != nil {
 			return nil
 		}
-		s.Details = &statusv1.Status_Message{
-			Message: messageAny,
-		}
-		return s
+		s.Message = messageAny
 	}
 
-	errorDetails := NewErrorDetails(e)
-	s.Details = &statusv1.Status_Error{
-		Error: errorDetails,
+	if e != nil {
+		s.Error = &statusv1.Status_Error{
+			Message: e.Error(),
+		}
 	}
 
 	return s
-}
-
-// NewErrorDetails is a helper function to create a new instance of ErrorDetails.
-func NewErrorDetails(e error) *statusv1.ErrorDetails {
-	errorDetails := &statusv1.ErrorDetails{}
-
-	if e != nil {
-		msg := e.Error()
-		if msg != "" {
-			errorDetails.Message = e.Error()
-		} else {
-			errorDetails.Message = "Unknown error"
-		}
-	}
-
-	return errorDetails
 }

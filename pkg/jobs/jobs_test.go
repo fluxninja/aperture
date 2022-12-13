@@ -91,19 +91,21 @@ func runTest(t *testing.T, groupConfig *groupConfig) {
 			Child(registry.Key()).
 			Child(job.Name())
 
-		checkStatusMessage(t, livenessReg, groupConfig.jobRunConfig.expectedStatusMsg)
 		if groupConfig.jobRunConfig.expectedStatusMsg == "Timeout" {
+			checkStatusMessage(t, livenessReg, groupConfig.jobRunConfig.expectedStatusMsg, true)
 			jobGroup.TriggerJob(job.Name())
+		} else {
+			checkStatusMessage(t, livenessReg, groupConfig.jobRunConfig.expectedStatusMsg, false)
 		}
 
 		groupConfig.OnJobCompleted(nil, JobStats{})
 
-		groupConfigExpectdScheduling := groupConfig.expectedScheduling
+		groupConfigExpectedScheduling := groupConfig.expectedScheduling
 		_, val := jobGroup.Results()
-		if val != groupConfigExpectdScheduling {
-			t.Errorf("Expected scheduling to be %v, got %v", groupConfigExpectdScheduling, val)
+		if val != groupConfigExpectedScheduling {
+			t.Errorf("Expected scheduling to be %v, got %v", groupConfigExpectedScheduling, val)
 		}
-		checkStatusBeforeDeregister(t, []string{job.Name()}, groupConfigExpectdScheduling)
+		checkStatusBeforeDeregister(t, []string{job.Name()}, groupConfigExpectedScheduling)
 	}
 	if len(groupConfig.jobs) > 1 {
 		jobGroup.DeregisterAll()
@@ -113,17 +115,21 @@ func runTest(t *testing.T, groupConfig *groupConfig) {
 	}
 }
 
-func checkStatusMessage(t *testing.T, registry status.Registry, protoMsg string) {
-	var gotStatusMsg, expectuedStatusMsg *anypb.Any
-	require.False(t, registry.HasError())
+func checkStatusMessage(t *testing.T, registry status.Registry, protoMsg string, hasError bool) {
+	var gotStatusMsg, expectedStatusMsg *anypb.Any
+	if hasError {
+		require.True(t, registry.HasError())
+	} else {
+		require.False(t, registry.HasError())
+	}
 	gotStatusMsg = registry.GetStatus().GetMessage()
 	if protoMsg == "" {
-		expectuedStatusMsg, _ = anypb.New(&emptypb.Empty{})
+		expectedStatusMsg, _ = anypb.New(&emptypb.Empty{})
 	} else {
-		expectuedStatusMsg, _ = anypb.New(wrapperspb.String(protoMsg))
+		expectedStatusMsg, _ = anypb.New(wrapperspb.String(protoMsg))
 	}
-	if !proto.Equal(gotStatusMsg, expectuedStatusMsg) {
-		t.Errorf("Expected status message to be %v, got %v", expectuedStatusMsg, gotStatusMsg)
+	if !proto.Equal(gotStatusMsg, expectedStatusMsg) {
+		t.Errorf("Expected status message to be %v, got %v", expectedStatusMsg, gotStatusMsg)
 	}
 }
 
@@ -134,11 +140,11 @@ func checkStatusBeforeDeregister(t *testing.T, names []string, expectedSchedulin
 		require.Equal(t, jobRegistry.Key(), name)
 
 		if strings.Split(name, "-")[0] == "multi" {
-			checkStatusMessage(t, jobRegistry, "MultiJob")
+			checkStatusMessage(t, jobRegistry, "MultiJob", false)
 			continue
 		}
 		if expectedScheduling {
-			checkStatusMessage(t, jobRegistry, "")
+			checkStatusMessage(t, jobRegistry, "", false)
 		} else {
 			require.True(t, jobRegistry.HasError())
 		}

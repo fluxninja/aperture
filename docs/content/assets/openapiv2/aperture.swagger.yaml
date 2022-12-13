@@ -232,17 +232,6 @@ definitions:
       - REJECT_REASON_CONCURRENCY_LIMITED
     default: REJECT_REASON_NONE
     description: RejectReason contains fields that give further information about rejection.
-  ClassifierInfoError:
-    type: string
-    enum:
-      - ERROR_NONE
-      - ERROR_EVAL_FAILED
-      - ERROR_EMPTY_RESULTSET
-      - ERROR_AMBIGUOUS_RESULTSET
-      - ERROR_MULTI_EXPRESSION
-      - ERROR_EXPRESSION_NOT_MAP
-    default: ERROR_NONE
-    description: Error information.
   EntityCacheEntities:
     type: object
     properties:
@@ -571,15 +560,13 @@ definitions:
     type: object
     properties:
       error:
-        $ref: '#/definitions/v1ErrorDetails'
+        $ref: '#/definitions/v1StatusError'
       message:
         $ref: '#/definitions/protobufAny'
       timestamp:
         type: string
         format: date-time
-    description: |-
-      Status holds details about a status that can be reported to the registry. The
-      details can either be a message (Any) or error (ErrorDetails).
+    description: Status holds details about a status that can be reported to the registry.
   v1AddressExtractor:
     type: object
     properties:
@@ -806,7 +793,7 @@ definitions:
         type: string
         format: int64
       error:
-        $ref: '#/definitions/ClassifierInfoError'
+        $ref: '#/definitions/v1ClassifierInfoError'
       label_key:
         type: string
       policy_hash:
@@ -814,6 +801,17 @@ definitions:
       policy_name:
         type: string
     description: ClassifierInfo describes details for each ClassifierInfo.
+  v1ClassifierInfoError:
+    type: string
+    enum:
+      - ERROR_NONE
+      - ERROR_EVAL_FAILED
+      - ERROR_EMPTY_RESULTSET
+      - ERROR_AMBIGUOUS_RESULTSET
+      - ERROR_MULTI_EXPRESSION
+      - ERROR_EXPRESSION_NOT_MAP
+    default: ERROR_NONE
+    description: Error information.
   v1CommonAttributes:
     type: object
     properties:
@@ -1176,12 +1174,6 @@ definitions:
         type: string
         description: Exact value that the label should be equal to.
     description: Label selector expression of the equal form "label == value".
-  v1ErrorDetails:
-    type: object
-    properties:
-      message:
-        type: string
-    description: ErrorDetails holds raw error message and its cause in a nested field.
   v1Extractor:
     type: object
     properties:
@@ -2350,6 +2342,12 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Output signal.
     description: Outputs for the Sqrt component.
+  v1StatusError:
+    type: object
+    properties:
+      message:
+        type: string
+    description: Error holds raw error message and its cause in a nested field.
   v1Switcher:
     type: object
     properties:
