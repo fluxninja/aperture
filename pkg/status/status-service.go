@@ -2,7 +2,6 @@ package status
 
 import (
 	"context"
-	"errors"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -43,10 +42,8 @@ func (svc *StatusService) GetGroupStatus(ctx context.Context, req *statusv1.Grou
 			return &statusv1.GroupStatus{}, nil
 		}
 	}
-	var err error
 	if registry.HasError() {
-		err = errors.New("status registry has an error")
 		_ = grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "503"))
 	}
-	return registry.GetGroupStatus(), err
+	return registry.GetGroupStatus(), nil
 }
