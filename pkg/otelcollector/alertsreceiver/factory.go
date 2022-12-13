@@ -39,7 +39,7 @@ func createLogsReceiver(
 	consumer consumer.Logs,
 ) (component.LogsReceiver, error) {
 	cfg := rConf.(*Config)
-	p, err := newProcessor(cfg)
+	p, err := newReceiver(cfg)
 	if err != nil {
 		return nil, err
 	}
