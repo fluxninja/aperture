@@ -1,11 +1,11 @@
-package components
+package circuitfactory
 
 import (
-	"encoding/json"
-
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/mapstruct"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/rate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/promql"
@@ -33,7 +33,7 @@ func NewComponentAndOptions(
 	componentProto *policylangv1.Component,
 	componentIndex int,
 	policyReadAPI iface.Policy,
-) (runtime.CompiledComponent, []runtime.CompiledComponent, fx.Option, error) {
+) (runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
 	var ctor componentConstructor
 	switch config := componentProto.Component.(type) {
 	case *policylangv1.Component_GradientController:
@@ -41,43 +41,43 @@ func NewComponentAndOptions(
 	case *policylangv1.Component_RateLimiter:
 		ctor = mkCtor(config.RateLimiter, rate.NewRateLimiterAndOptions)
 	case *policylangv1.Component_Ema:
-		ctor = mkCtor(config.Ema, NewEMAAndOptions)
+		ctor = mkCtor(config.Ema, components.NewEMAAndOptions)
 	case *policylangv1.Component_ArithmeticCombinator:
-		ctor = mkCtor(config.ArithmeticCombinator, NewArithmeticCombinatorAndOptions)
+		ctor = mkCtor(config.ArithmeticCombinator, components.NewArithmeticCombinatorAndOptions)
 	case *policylangv1.Component_Promql:
 		ctor = mkCtor(config.Promql, promql.NewPromQLAndOptions)
 	case *policylangv1.Component_Constant:
-		ctor = mkCtor(config.Constant, NewConstantAndOptions)
+		ctor = mkCtor(config.Constant, components.NewConstantAndOptions)
 	case *policylangv1.Component_Decider:
-		ctor = mkCtor(config.Decider, NewDeciderAndOptions)
+		ctor = mkCtor(config.Decider, components.NewDeciderAndOptions)
 	case *policylangv1.Component_Switcher:
-		ctor = mkCtor(config.Switcher, NewSwitcherAndOptions)
+		ctor = mkCtor(config.Switcher, components.NewSwitcherAndOptions)
 	case *policylangv1.Component_Sqrt:
-		ctor = mkCtor(config.Sqrt, NewSqrtAndOptions)
+		ctor = mkCtor(config.Sqrt, components.NewSqrtAndOptions)
 	case *policylangv1.Component_Max:
-		ctor = mkCtor(config.Max, NewMaxAndOptions)
+		ctor = mkCtor(config.Max, components.NewMaxAndOptions)
 	case *policylangv1.Component_Min:
-		ctor = mkCtor(config.Min, NewMinAndOptions)
+		ctor = mkCtor(config.Min, components.NewMinAndOptions)
 	case *policylangv1.Component_Extrapolator:
-		ctor = mkCtor(config.Extrapolator, NewExtrapolatorAndOptions)
+		ctor = mkCtor(config.Extrapolator, components.NewExtrapolatorAndOptions)
 	case *policylangv1.Component_FirstValid:
-		ctor = mkCtor(config.FirstValid, NewFirstValidAndOptions)
+		ctor = mkCtor(config.FirstValid, components.NewFirstValidAndOptions)
 	case *policylangv1.Component_Sink:
-		ctor = mkCtor(config.Sink, NewSinkAndOptions)
+		ctor = mkCtor(config.Sink, components.NewSinkAndOptions)
 	case *policylangv1.Component_Alerter:
-		ctor = mkCtor(config.Alerter, NewAlerterAndOptions)
+		ctor = mkCtor(config.Alerter, components.NewAlerterAndOptions)
 	default:
 		return newComponentStackAndOptions(componentProto, componentIndex, policyReadAPI)
 	}
 
 	component, config, option, err := ctor(componentIndex, policyReadAPI)
 	if err != nil {
-		return runtime.CompiledComponent{}, nil, nil, err
+		return runtime.ConfiguredComponent{}, nil, nil, err
 	}
 
-	compiledComponent, err := prepareCompiledComponent(component, config)
+	compiledComponent, err := prepareConfiguredComponent(component, config)
 	if err != nil {
-		return runtime.CompiledComponent{}, nil, nil, err
+		return runtime.ConfiguredComponent{}, nil, nil, err
 	}
 
 	return compiledComponent, nil, option, nil
@@ -98,37 +98,23 @@ func mkCtor[Config any, Comp runtime.Component](
 	}
 }
 
-func prepareCompiledComponent(
+func prepareConfiguredComponent(
 	component runtime.Component,
 	config any,
-) (runtime.CompiledComponent, error) {
-	mapStruct, err := encodeMapStruct(config)
+) (runtime.ConfiguredComponent, error) {
+	mapStruct, err := mapstruct.EncodeObject(config)
 	if err != nil {
-		return runtime.CompiledComponent{}, err
+		return runtime.ConfiguredComponent{}, err
 	}
 
-	ports, err := runtime.PortsFromMapStruct(mapStruct)
+	ports, err := runtime.PortsFromComponentConfig(mapStruct)
 	if err != nil {
-		return runtime.CompiledComponent{}, err
+		return runtime.ConfiguredComponent{}, err
 	}
 
-	return runtime.CompiledComponent{
-		Component: component,
-		MapStruct: mapStruct,
-		Ports:     ports,
+	return runtime.ConfiguredComponent{
+		Component:   component,
+		Config:      mapStruct,
+		PortMapping: ports,
 	}, nil
-}
-
-func encodeMapStruct(obj any) (map[string]any, error) {
-	// TODO: mapstruct functionality needs to be moved to a common package
-	var mapStruct map[string]interface{}
-	b, err := json.Marshal(obj)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &mapStruct)
-	if err != nil {
-		return nil, err
-	}
-	return mapStruct, nil
 }

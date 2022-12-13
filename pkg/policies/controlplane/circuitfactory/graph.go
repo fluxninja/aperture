@@ -1,4 +1,4 @@
-package circuitcompiler
+package circuitfactory
 
 import (
 	"fmt"
@@ -12,19 +12,19 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
-// ComponentDTO takes a Circuit and returns its graph representation.
-func ComponentDTO(circuit Circuit) ([]*policymonitoringv1.ComponentView, []*policymonitoringv1.Link) {
+// ToGraphView creates a graph representation of a Circuit.
+func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*policymonitoringv1.Link) {
 	var componentsDTO []*policymonitoringv1.ComponentView
 	var links []*policymonitoringv1.Link
 	type componentData struct {
-		componentID string
+		componentID ComponentID
 		portName    string
 	}
 	outSignalsIndex := make(map[string][]componentData)
 	inSignalsIndex := make(map[string][]componentData)
-	for _, c := range circuit {
+	for componentIndex, c := range circuit.components {
 		var inPorts, outPorts []*policymonitoringv1.PortView
-		for name, signals := range c.InPortToSignalsMap {
+		for name, signals := range c.InPortToSignals {
 			for _, signal := range signals {
 				if signal.SignalType == runtime.SignalTypeNamed {
 					signalName := signal.Name
@@ -34,7 +34,7 @@ func ComponentDTO(circuit Circuit) ([]*policymonitoringv1.ComponentView, []*poli
 						Looped:   signal.Looped,
 					})
 					inSignalsIndex[signalName] = append(inSignalsIndex[signalName], componentData{
-						componentID: c.ComponentID,
+						componentID: circuit.componentIDs[componentIndex],
 						portName:    name,
 					})
 				} else if signal.SignalType == runtime.SignalTypeConstant {
@@ -45,7 +45,7 @@ func ComponentDTO(circuit Circuit) ([]*policymonitoringv1.ComponentView, []*poli
 				}
 			}
 		}
-		for name, signals := range c.OutPortToSignalsMap {
+		for name, signals := range c.OutPortToSignals {
 			for _, signal := range signals {
 				signalName := signal.Name
 				outPorts = append(outPorts, &policymonitoringv1.PortView{
@@ -54,12 +54,13 @@ func ComponentDTO(circuit Circuit) ([]*policymonitoringv1.ComponentView, []*poli
 					Looped:   signal.Looped,
 				})
 				outSignalsIndex[signalName] = append(outSignalsIndex[signalName], componentData{
-					componentID: c.ComponentID,
+					componentID: circuit.componentIDs[componentIndex],
 					portName:    name,
 				})
 			}
 		}
-		componentMap, err := structpb.NewStruct(c.CompiledComponent.MapStruct)
+		componentConfig := circuit.configs[componentIndex].Config
+		componentMap, err := structpb.NewStruct(componentConfig)
 		if err != nil {
 			log.Error().Err(err).Msg("converting component map")
 		}
@@ -91,37 +92,36 @@ func ComponentDTO(circuit Circuit) ([]*policymonitoringv1.ComponentView, []*poli
 			return fmt.Sprintf("%s/%s", agentGroup, service)
 		}
 
-		componentName := c.Component.Name()
-		mapStruct := c.MapStruct
+		componentName := c.Name()
 		componentDescription := ""
 		switch componentName {
 		case "Constant":
-			componentDescription = fmt.Sprintf("%0.2f", mapStruct["value"])
+			componentDescription = fmt.Sprintf("%0.2f", componentConfig["value"])
 		case "ArithmeticCombinator":
-			componentDescription = fmt.Sprintf("%s", mapStruct["operator"])
+			componentDescription = fmt.Sprintf("%s", componentConfig["operator"])
 		case "Decider":
-			componentDescription = fmt.Sprintf("%s for %s", mapStruct["operator"], mapStruct["true_for"])
+			componentDescription = fmt.Sprintf("%s for %s", componentConfig["operator"], componentConfig["true_for"])
 		case "EMA":
-			componentDescription = fmt.Sprintf("win: %s", mapStruct["ema_window"])
+			componentDescription = fmt.Sprintf("win: %s", componentConfig["ema_window"])
 		case "GradientController":
-			componentDescription = fmt.Sprintf("slope: %0.2f", mapStruct["slope"])
+			componentDescription = fmt.Sprintf("slope: %0.2f", componentConfig["slope"])
 		case "Extrapolator":
-			componentDescription = fmt.Sprintf("for: %s", mapStruct["max_extrapolation_interval"])
+			componentDescription = fmt.Sprintf("for: %s", componentConfig["max_extrapolation_interval"])
 		case "ConcurrencyLimiter":
-			componentDescription = getServiceSelector(mapStruct["selector"])
+			componentDescription = getServiceSelector(componentConfig["selector"])
 		case "RateLimiter":
-			componentDescription = getServiceSelector(mapStruct["selector"])
+			componentDescription = getServiceSelector(componentConfig["selector"])
 		}
 
 		componentsDTO = append(componentsDTO, &policymonitoringv1.ComponentView{
-			ComponentId:          c.ComponentID,
+			ComponentId:          string(circuit.componentIDs[componentIndex]),
 			ComponentName:        componentName,
 			ComponentDescription: componentDescription,
-			ComponentType:        string(c.Component.Type()),
+			ComponentType:        string(c.Type()),
 			Component:            componentMap,
 			InPorts:              convertPortViews(inPorts),
 			OutPorts:             convertPortViews(outPorts),
-			ParentComponentId:    c.ParentComponentID,
+			ParentComponentId:    string(circuit.componentIDs[componentIndex].ParentID()),
 		})
 	}
 	// compute links
@@ -130,11 +130,11 @@ func ComponentDTO(circuit Circuit) ([]*policymonitoringv1.ComponentView, []*poli
 			for _, inComponent := range inSignalsIndex[signalName] {
 				links = append(links, &policymonitoringv1.Link{
 					Source: &policymonitoringv1.SourceTarget{
-						ComponentId: outComponent.componentID,
+						ComponentId: string(outComponent.componentID),
 						PortName:    outComponent.portName,
 					},
 					Target: &policymonitoringv1.SourceTarget{
-						ComponentId: inComponent.componentID,
+						ComponentId: string(inComponent.componentID),
 						PortName:    inComponent.portName,
 					},
 					SignalName: signalName,

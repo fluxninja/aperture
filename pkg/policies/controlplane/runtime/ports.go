@@ -1,11 +1,14 @@
 package runtime
 
-import "github.com/mitchellh/mapstructure"
+import (
+	"github.com/fluxninja/aperture/pkg/mapstruct"
+	"github.com/mitchellh/mapstructure"
+)
 
-// Ports is description of a component's ports mapping.
+// PortMapping is description of a component's ports mapping.
 //
-// This struct is meant to be deserializable from map-struct serialized
-// representation of _any_ of the components. Eg. EMA component defines:
+// This struct is meant to be decodable from Mapstruct representation of _any_
+// of the components's config. Eg. EMA component defines:
 //
 // ```proto
 //
@@ -17,11 +20,12 @@ import "github.com/mitchellh/mapstructure"
 // ...
 // ```
 //
-// And such EMA component could be serialized and deserialized into Ports as:
+// And such EMA component's config could be encoded and then decoded into
+// PortMapping as:
 //
 // ```go
 //
-//	Ports {
+//	PortMapping {
 //	  InPorts: map[string]InPort {
 //	    "input": []InPort {{ ... }},
 //	  },
@@ -30,31 +34,27 @@ import "github.com/mitchellh/mapstructure"
 // ```
 //
 // Note how "input" is a concrete field in EMA definition, but a dynamic map
-// key in Ports.
-type Ports struct {
+// key in PortMapping.
+type PortMapping struct {
 	// Note: Not using policylangv1.InPort and OutPort directly to avoid
 	// runtime depending on proto.
-	InPorts  map[string][]Port `mapstructure:"in_ports"`
-	OutPorts map[string][]Port `mapstructure:"out_ports"`
+	Ins  map[string][]Port `mapstructure:"in_ports"`
+	Outs map[string][]Port `mapstructure:"out_ports"`
 }
 
-// PortsFromMapStruct extracts Ports from component serialized previously to
-// MapStruct via encodeMapStruct.
-//
-// Note: This relies on every proto structure providing Marshal/UnmarshalJSON
-// (via protojson with protojson.MarshalOptions.UseProtoNames).
-func PortsFromMapStruct(componentMapStruct map[string]any) (Ports, error) {
-	var ports Ports
+// PortsFromComponentConfig extracts Ports from component's config.
+func PortsFromComponentConfig(componentConfig mapstruct.Object) (PortMapping, error) {
+	var ports PortMapping
 
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		WeaklyTypedInput: true, // So that singular ports will transparently be converted to lists.
 		Result:           &ports,
 	})
 	if err != nil {
-		return Ports{}, err
+		return PortMapping{}, err
 	}
 
-	err = decoder.Decode(componentMapStruct)
+	err = decoder.Decode(componentConfig)
 	return ports, err
 }
 

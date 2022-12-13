@@ -8,7 +8,7 @@ import (
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitcompiler"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier/compiler"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/webhooks/policyvalidator"
@@ -53,7 +53,7 @@ func (v *PolicySpecValidator) ValidateSpec(
 }
 
 // ValidateAndCompile checks the validity of a single Policy and compiles it.
-func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (circuitcompiler.Circuit, bool, string, error) {
+func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circuitfactory.Circuit, bool, string, error) {
 	if len(yamlSrc) == 0 {
 		return nil, false, "Empty yaml", nil
 	}
