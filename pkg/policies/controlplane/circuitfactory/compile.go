@@ -67,7 +67,10 @@ func subcomponentID(parentID ComponentID, subcomponent runtime.Component) Compon
 
 // ParentID returns ID of parent component.
 func (id ComponentID) ParentID() ComponentID {
-	parentID, _, _ := strings.Cut(string(id), ".")
+	parentID, _, hasParent := strings.Cut(string(id), ".")
+	if !hasParent {
+		return ComponentID("")
+	}
 	return ComponentID(parentID)
 }
 
