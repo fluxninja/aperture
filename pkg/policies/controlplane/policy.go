@@ -64,11 +64,7 @@ func newPolicyOptions(
 	))
 
 	// Create circuit
-	circuit, circuitOption := runtime.NewCircuitAndOptions(
-		compiledCircuit.Components(),
-		policy,
-		registry,
-	)
+	circuit, circuitOption := runtime.NewCircuitAndOptions(compiledCircuit.Components(), policy)
 	policyOptions = append(policyOptions, circuitOption)
 
 	policyOptions = append(policyOptions, circuitfactory.FactoryModuleForPolicyApp(circuit))

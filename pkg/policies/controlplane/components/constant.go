@@ -22,12 +22,12 @@ func (*Constant) Name() string { return "Constant" }
 // Type implements runtime.Component.
 func (*Constant) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
 
-// NewConstantAndOptions creates constant setpoint and its fx options.
+// NewConstant creates a constant component with a given value.
+func NewConstant(value float64) runtime.Component { return &Constant{value: value} }
+
+// NewConstantAndOptions creates a constant components and its fx options.
 func NewConstantAndOptions(constant *policylangv1.Constant, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
-	con := Constant{
-		value: constant.Value,
-	}
-	return &con, fx.Options(), nil
+	return NewConstant(constant.Value), fx.Options(), nil
 }
 
 // Execute implements runtime.Component.Execute.

@@ -30,16 +30,36 @@ type CircuitMetrics struct {
 	SignalSummaryVec *prometheus.SummaryVec
 }
 
-var circuitMetrics = &CircuitMetrics{}
+var circuitMetrics = newCircuitMetrics()
+
+func newCircuitMetrics() *CircuitMetrics {
+	circuitMetricsLabels := []string{
+		metrics.SignalNameLabel,
+		metrics.PolicyNameLabel,
+		metrics.ValidLabel,
+	}
+	circuitMetrics := CircuitMetrics{
+		SignalSummaryVec: prometheus.NewSummaryVec(
+			prometheus.SummaryOpts{
+				Name: metrics.SignalReadingMetricName,
+				Help: "The reading from a signal",
+				Objectives: map[float64]float64{
+					0:    0,
+					0.01: 0.001,
+					0.05: 0.01,
+					0.5:  0.05,
+					0.9:  0.01,
+					0.99: 0.001,
+					1:    0,
+				},
+			},
+			circuitMetricsLabels,
+		),
+	}
+	return &circuitMetrics
+}
 
 func setupCircuitMetrics(prometheusRegistry *prometheus.Registry, lifecycle fx.Lifecycle) {
-	circuitMetricsLabels := []string{metrics.SignalNameLabel, metrics.PolicyNameLabel, metrics.ValidLabel}
-	circuitMetrics.SignalSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
-		Name:       metrics.SignalReadingMetricName,
-		Help:       "The reading from a signal",
-		Objectives: map[float64]float64{0: 0, 0.01: 0.001, 0.05: 0.01, 0.5: 0.05, 0.9: 0.01, 0.99: 0.001, 1: 0},
-	}, circuitMetricsLabels)
-
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			err := prometheusRegistry.Register(circuitMetrics.SignalSummaryVec)
@@ -133,40 +153,24 @@ var _ CircuitAPI = &Circuit{}
 func NewCircuitAndOptions(
 	compiledComponents []CompiledComponent,
 	policyReadAPI iface.Policy,
-	registry status.Registry,
 ) (*Circuit, fx.Option) {
-	reg := registry.Child("circuit_signals")
+	reg := policyReadAPI.GetStatusRegistry().Child("circuit_signals")
 	circuit := &Circuit{
 		Policy:         policyReadAPI,
 		loopedSignals:  make(signalToReading),
-		components:     make([]CompiledComponent, 0),
+		components:     compiledComponents,
 		statusRegistry: reg,
 	}
 
-	// setComponents sets the Components for a Circuit
-	setComponents := func(components []CompiledComponent) error {
-		if len(circuit.components) > 0 {
-			return errors.New("circuit already has components")
-		}
-		circuit.components = components
-		// Populate loopedSignals
-		for _, component := range components {
-			for _, outPort := range component.OutPortToSignals {
-				for _, signal := range outPort {
-					if signal.Looped {
-						circuit.loopedSignals[signal] = InvalidReading()
-					}
+	// Populate loopedSignals
+	for _, component := range circuit.components {
+		for _, outPort := range component.OutPortToSignals {
+			for _, signal := range outPort {
+				if signal.Looped {
+					circuit.loopedSignals[signal] = InvalidReading()
 				}
 			}
 		}
-		return nil
-	}
-
-	// Set components in circuit
-	err := setComponents(compiledComponents)
-	if err != nil {
-		// FIXME don't hide this error contents
-		return nil, fx.Options()
 	}
 
 	return circuit, fx.Options(
