@@ -4,18 +4,8 @@ import (
 	"errors"
 	"strings"
 
-	rt "github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/lithammer/dedent"
 )
-
-// NewReadings creates a slice of readings from a slice of floats.
-func NewReadings(values []float64) []rt.Reading {
-	readings := make([]rt.Reading, 0, len(values))
-	for _, value := range values {
-		readings = append(readings, rt.NewReading(value))
-	}
-	return readings
-}
 
 // SanitizeYaml cleans up indentation of multiline string literal with yaml.
 //
