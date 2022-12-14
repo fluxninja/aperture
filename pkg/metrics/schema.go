@@ -78,6 +78,11 @@ const (
 	// FlowControlRejectReasonsMetricName - metric for reject reason on FCS Check requests.
 	FlowControlRejectReasonsMetricName = "flowcontrol_reject_reasons_total"
 
+	// OTEL metrics.
+
+	// RollupMetricName - logs rollup histogram.
+	RollupMetricName = "rollup"
+
 	// PROMETHEUS LABELS.
 
 	// InstanceLabel used to identify the host name on which an Aperture process is running.

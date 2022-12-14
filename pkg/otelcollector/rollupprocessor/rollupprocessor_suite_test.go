@@ -1,4 +1,4 @@
-package rollupprocessor_test
+package rollupprocessor
 
 import (
 	"testing"

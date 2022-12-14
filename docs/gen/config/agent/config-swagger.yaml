@@ -192,7 +192,7 @@ definitions:
           of size.
         format: string
         type: string
-        x-go-default: 1s
+        x-go-default: 10s
         x-go-name: Timeout
         x-go-validate: gt=0
     title: BatchPrerollupConfig defines configuration for OTEL batch processor.
