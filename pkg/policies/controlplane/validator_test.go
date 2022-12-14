@@ -86,16 +86,16 @@ spec:
   resources:
     flux_meters:
       "service_latency":
-        selector:
+        flow_selector:
           service_selector:
             service: "service1-demo-app.demoapp.svc.cluster.local"
-          flow_selector:
+          flow_matcher:
             control_point: "ingress"
     classifiers:
-      - selector:
+      - flow_selector:
           service_selector:
             service: service1-demo-app.demoapp.svc.cluster.local
-          flow_selector:
+          flow_matcher:
             control_point: ingress
         rules:
           # An example rule using extractor.
@@ -194,10 +194,10 @@ spec:
             output:
               signal_name: "LOAD_MULTIPLIER"
       - concurrency_limiter:
-          selector:
+          flow_selector:
             service_selector:
               service: "service1-demo-app.demoapp.svc.cluster.local"
-            flow_selector:
+            flow_matcher:
               control_point: "ingress"
           scheduler:
             auto_tokens: true
@@ -328,10 +328,10 @@ metadata:
 spec:
   resources:
     classifiers:
-      - selector:
+      - flow_selector:
           service_selector:
             service: productpage.bookinfo.svc.cluster.local
-          flow_selector:
+          flow_matcher:
             control_point: ingress
         rules:
           ua:
@@ -374,10 +374,10 @@ spec:
           in_ports:
             limit:
               signal_name: "RATE_LIMIT"
-          selector:
+          flow_selector:
             service_selector:
               service: "service1-demo-app.demoapp.svc.cluster.local"
-            flow_selector:
+            flow_matcher:
               control_point: "ingress"
           label_key: "http.request.header.user_type"
           limit_reset_interval: "1s"
