@@ -85,7 +85,7 @@ type rollupProcessor struct {
 }
 
 const (
-	defaultAttributeCardinalityLimit = 250
+	defaultAttributeCardinalityLimit = 10
 	// RedactedAttributeValue is a value that replaces actual attribute value
 	// in case it exceeds cardinality limit.
 	RedactedAttributeValue = "REDACTED_VIA_CARDINALITY_LIMIT"
