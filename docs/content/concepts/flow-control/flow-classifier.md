@@ -140,7 +140,7 @@ See [full example in reference][reference]
 [extractor]: /references/configuration/policy.md#v1-extractor
 [rego-rule]: /references/configuration/policy.md#rule-rego
 [plugin]: /cloud/plugin.md
-[label-matcher]: /concepts/flow-control/selector.md#label-matcher
+[label-matcher]: /concepts/flow-control/flow-selector.md#label-matcher
 [policies]: /concepts/policy/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:

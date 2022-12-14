@@ -8,6 +8,13 @@ spec:
   circuit:
     components:
       - rate_limiter:
+          flow_selector:
+            flow_matcher:
+              control_point:
+                traffic: ingress
+            service_selector:
+              agent_group: default
+              service: service-graphql-demo-app.demoapp.svc.cluster.local
           in_ports:
             limit:
               constant_value: 10
@@ -16,17 +23,17 @@ spec:
             enabled: false
             num_sync: 5
           limit_reset_interval: 1s
-          selector:
-            flow_selector:
-              control_point:
-                traffic: ingress
-            service_selector:
-              agent_group: default
-              service: service-graphql-demo-app.demoapp.svc.cluster.local
     evaluation_interval: 300s
   resources:
     classifiers:
-      - rules:
+      - flow_selector:
+          flow_matcher:
+            control_point:
+              traffic: ingress
+          service_selector:
+            agent_group: default
+            service: service-graphql-demo-app.demoapp.svc.cluster.local
+        rules:
           user_id:
             rego:
               query: data.graphql_example.userID
@@ -55,10 +62,3 @@ spec:
 
                 userID := createTodoByUserIds.userId
             telemetry: true
-        selector:
-          flow_selector:
-            control_point:
-              traffic: ingress
-          service_selector:
-            agent_group: default
-            service: service-graphql-demo-app.demoapp.svc.cluster.local

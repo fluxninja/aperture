@@ -66,7 +66,7 @@ var _ = Describe("Authorization handler", func() {
 			entities := entitycache.NewEntityCache()
 			entities.Put(&entitycachev1.Entity{
 				IpAddress: "1.2.3.4",
-				Services:  []string{service1Selector.ServiceSelector.Service},
+				Services:  []string{service1FlowSelector.ServiceSelector.Service},
 			})
 			handler = envoy.NewHandler(
 				classifier,
@@ -98,18 +98,18 @@ var _ = Describe("Authorization handler", func() {
 	})
 })
 
-var service1Selector = policylangv1.Selector{
+var service1FlowSelector = policylangv1.FlowSelector{
 	ServiceSelector: &policylangv1.ServiceSelector{
 		Service: "service1-demo-app.demoapp.svc.cluster.local",
 	},
-	FlowSelector: &policylangv1.FlowSelector{
+	FlowMatcher: &policylangv1.FlowMatcher{
 		ControlPoint: "ingress",
 	},
 }
 
 var hardcodedRegoRules = policysyncv1.ClassifierWrapper{
 	Classifier: &policylangv1.Classifier{
-		Selector: &service1Selector,
+		FlowSelector: &service1FlowSelector,
 		Rules: map[string]*policylangv1.Rule{
 			"destination": {
 				Source: &policylangv1.Rule_Rego_{

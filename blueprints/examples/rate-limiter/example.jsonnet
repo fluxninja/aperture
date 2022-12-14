@@ -4,21 +4,21 @@ local bundle = aperture.blueprints.RateLimiter.bundle;
 local Override = aperture.spec.v1.RateLimiterOverride;
 local LazySync = aperture.spec.v1.RateLimiterLazySync;
 
-local selector = aperture.spec.v1.Selector;
-local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowSelector = aperture.spec.v1.FlowSelector;
+local serviceSelector = aperture.spec.v1.ServiceSelector;
+local flowMatcher = aperture.spec.v1.FlowMatcher;
 local controlPoint = aperture.spec.v1.ControlPoint;
 
 
-local svcSelector = selector.new()
-                    + selector.withServiceSelector(
+local svcSelector = flowSelector.new()
+                    + flowSelector.withServiceSelector(
                       serviceSelector.new()
                       + serviceSelector.withAgentGroup('default')
                       + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
                     )
-                    + selector.withFlowSelector(
-                      flowSelector.new()
-                      + flowSelector.withControlPoint('ingress')
+                    + flowSelector.withFlowMatcher(
+                      flowMatcher.new()
+                      + flowMatcher.withControlPoint('ingress')
                     );
 
 local config = {
@@ -26,7 +26,7 @@ local config = {
     policyName: 'example',
   },
   policy+: {
-    rateLimiterSelector: svcSelector,
+    rateLimiterFlowSelector: svcSelector,
     rateLimit: '50.0',
     labelKey: 'http.request.header.user_type',
     limitResetInterval: '1s',

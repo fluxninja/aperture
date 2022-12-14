@@ -665,7 +665,7 @@ message RateLimiter {
   }]; // @gotags: validate:"required"
 
   // Which control point to apply this ratelimiter to.
-  Selector selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  FlowSelector flow_selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {string_value: "required"}
@@ -715,8 +715,8 @@ message RateLimiter {
 // ConcurrencyLimiter configuration is split into two parts: An actuation
 // strategy and a scheduler. Right now, only `load_actuator` strategy is available.
 message ConcurrencyLimiter {
-  // Selector decides the service and flows at which the concurrency limiter is applied.
-  Selector selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  // Flow Selector decides the service and flows at which the concurrency limiter is applied.
+  FlowSelector flow_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {string_value: "required"}

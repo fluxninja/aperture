@@ -1,16 +1,16 @@
 {
   new():: {
   },
-  withControlPoint(control_point):: {
-    control_point: control_point,
+  withFlowMatcher(flow_matcher):: {
+    flow_matcher: flow_matcher,
   },
-  withControlPointMixin(control_point):: {
-    control_point+: control_point,
+  withFlowMatcherMixin(flow_matcher):: {
+    flow_matcher+: flow_matcher,
   },
-  withLabelMatcher(label_matcher):: {
-    label_matcher: label_matcher,
+  withServiceSelector(service_selector):: {
+    service_selector: service_selector,
   },
-  withLabelMatcherMixin(label_matcher):: {
-    label_matcher+: label_matcher,
+  withServiceSelectorMixin(service_selector):: {
+    service_selector+: service_selector,
   },
 }

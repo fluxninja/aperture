@@ -14,8 +14,8 @@ See also [Flux Meter reference][reference]
 
 ## Purpose
 
-Flux Meter provides a way to translate a Flux of [Flows][flow] matching a
-[Selector][selector] to a Prometheus [Histogram Metric][histogram-metric].
+Flux Meter provides a way to translate a Flux of [Flows][flow] matching a [Flow
+Selector][flow-selector] to a Prometheus [Histogram Metric][histogram-metric].
 
 ## Naming
 
@@ -102,7 +102,7 @@ down to fine-grained APIs.
 
 [reference]: /references/configuration/policy.md#v1-flux-meter
 [flow]: /concepts/flow-control/flow-control.md#flow
-[selector]: /concepts/flow-control/selector.md
+[flow-selector]: /concepts/flow-control/flow-selector.md
 [flow-control-integration]: /concepts/flow-control/flow-control.md#integrations
 [histogram-metric]: https://prometheus.io/docs/practices/histograms/
 [quantiles]: https://prometheus.io/docs/practices/histograms/#quantiles

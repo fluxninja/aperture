@@ -38,6 +38,20 @@ func (m *MockLimiter) EXPECT() *MockLimiterMockRecorder {
 	return m.recorder
 }
 
+// GetFlowSelector mocks base method.
+func (m *MockLimiter) GetFlowSelector() *languagev1.FlowSelector {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFlowSelector")
+	ret0, _ := ret[0].(*languagev1.FlowSelector)
+	return ret0
+}
+
+// GetFlowSelector indicates an expected call of GetFlowSelector.
+func (mr *MockLimiterMockRecorder) GetFlowSelector() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFlowSelector", reflect.TypeOf((*MockLimiter)(nil).GetFlowSelector))
+}
+
 // GetLimiterID mocks base method.
 func (m *MockLimiter) GetLimiterID() iface.LimiterID {
 	m.ctrl.T.Helper()
@@ -64,20 +78,6 @@ func (m *MockLimiter) GetPolicyName() string {
 func (mr *MockLimiterMockRecorder) GetPolicyName() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockLimiter)(nil).GetPolicyName))
-}
-
-// GetSelector mocks base method.
-func (m *MockLimiter) GetSelector() *languagev1.Selector {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSelector")
-	ret0, _ := ret[0].(*languagev1.Selector)
-	return ret0
-}
-
-// GetSelector indicates an expected call of GetSelector.
-func (mr *MockLimiterMockRecorder) GetSelector() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSelector", reflect.TypeOf((*MockLimiter)(nil).GetSelector))
 }
 
 // RunLimiter mocks base method.
@@ -115,6 +115,20 @@ func NewMockRateLimiter(ctrl *gomock.Controller) *MockRateLimiter {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockRateLimiter) EXPECT() *MockRateLimiterMockRecorder {
 	return m.recorder
+}
+
+// GetFlowSelector mocks base method.
+func (m *MockRateLimiter) GetFlowSelector() *languagev1.FlowSelector {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFlowSelector")
+	ret0, _ := ret[0].(*languagev1.FlowSelector)
+	return ret0
+}
+
+// GetFlowSelector indicates an expected call of GetFlowSelector.
+func (mr *MockRateLimiterMockRecorder) GetFlowSelector() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFlowSelector", reflect.TypeOf((*MockRateLimiter)(nil).GetFlowSelector))
 }
 
 // GetLimiterID mocks base method.
@@ -157,20 +171,6 @@ func (m *MockRateLimiter) GetRequestCounter(labels map[string]string) prometheus
 func (mr *MockRateLimiterMockRecorder) GetRequestCounter(labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestCounter", reflect.TypeOf((*MockRateLimiter)(nil).GetRequestCounter), labels)
-}
-
-// GetSelector mocks base method.
-func (m *MockRateLimiter) GetSelector() *languagev1.Selector {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSelector")
-	ret0, _ := ret[0].(*languagev1.Selector)
-	return ret0
-}
-
-// GetSelector indicates an expected call of GetSelector.
-func (mr *MockRateLimiterMockRecorder) GetSelector() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSelector", reflect.TypeOf((*MockRateLimiter)(nil).GetSelector))
 }
 
 // RunLimiter mocks base method.
@@ -227,6 +227,20 @@ func (m *MockConcurrencyLimiter) EXPECT() *MockConcurrencyLimiterMockRecorder {
 	return m.recorder
 }
 
+// GetFlowSelector mocks base method.
+func (m *MockConcurrencyLimiter) GetFlowSelector() *languagev1.FlowSelector {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFlowSelector")
+	ret0, _ := ret[0].(*languagev1.FlowSelector)
+	return ret0
+}
+
+// GetFlowSelector indicates an expected call of GetFlowSelector.
+func (mr *MockConcurrencyLimiterMockRecorder) GetFlowSelector() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFlowSelector", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetFlowSelector))
+}
+
 // GetLatencyObserver mocks base method.
 func (m *MockConcurrencyLimiter) GetLatencyObserver(labels map[string]string) prometheus.Observer {
 	m.ctrl.T.Helper()
@@ -281,20 +295,6 @@ func (m *MockConcurrencyLimiter) GetRequestCounter(labels map[string]string) pro
 func (mr *MockConcurrencyLimiterMockRecorder) GetRequestCounter(labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestCounter", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetRequestCounter), labels)
-}
-
-// GetSelector mocks base method.
-func (m *MockConcurrencyLimiter) GetSelector() *languagev1.Selector {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSelector")
-	ret0, _ := ret[0].(*languagev1.Selector)
-	return ret0
-}
-
-// GetSelector indicates an expected call of GetSelector.
-func (mr *MockConcurrencyLimiterMockRecorder) GetSelector() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSelector", reflect.TypeOf((*MockConcurrencyLimiter)(nil).GetSelector))
 }
 
 // RunLimiter mocks base method.

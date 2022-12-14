@@ -451,26 +451,26 @@ var _ = Describe("Duration", func() {
 
 var _ = Describe("ProtobufUnmarshaller", func() {
 	Context("when unmarshalling a protobuf", func() {
-		selector := &policylangv1.Selector{
+		flowSelector := &policylangv1.FlowSelector{
 			ServiceSelector: &policylangv1.ServiceSelector{
 				AgentGroup: "ag",
 				Service:    "s.n.svc.cluster.local",
 			},
-			FlowSelector: &policylangv1.FlowSelector{
+			FlowMatcher: &policylangv1.FlowMatcher{
 				ControlPoint: "egress",
 			},
 		}
-		selectorBytes, err := proto.Marshal(selector)
+		selectorBytes, err := proto.Marshal(flowSelector)
 		Expect(err).NotTo(HaveOccurred())
 
 		unmarshaller, err := NewProtobufUnmarshaller(selectorBytes)
 		Expect(err).NotTo(HaveOccurred())
 
 		It("parses selectorBytes content into newSel and matches both contents", func() {
-			var newSel policylangv1.Selector
+			var newSel policylangv1.FlowSelector
 			err := unmarshaller.Unmarshal(&newSel)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(newSel.String()).To(Equal(selector.String()))
+			Expect(newSel.String()).To(Equal(flowSelector.String()))
 		})
 
 		It("should return an error when unmarshalling a non-protobuf message", func() {

@@ -2,10 +2,10 @@ local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.l
 
 local latencyGradientPolicy = aperture.blueprints.LatencyGradient.policy;
 
-local selector = aperture.spec.v1.Selector;
+local flowSelector = aperture.spec.v1.FlowSelector;
 local fluxMeter = aperture.spec.v1.FluxMeter;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
-local flowSelector = aperture.spec.v1.FlowSelector;
+local flowMatcher = aperture.spec.v1.FlowMatcher;
 local controlPoint = aperture.spec.v1.ControlPoint;
 local classifier = aperture.spec.v1.Classifier;
 local extractor = aperture.spec.v1.Extractor;
@@ -21,42 +21,42 @@ local port = aperture.spec.v1.Port;
 
 
 local svcSelector =
-  selector.new()
-  + selector.withServiceSelector(
+  flowSelector.new()
+  + flowSelector.withServiceSelector(
     serviceSelector.new()
     + serviceSelector.withAgentGroup('default')
     + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
   )
-  + selector.withFlowSelector(
-    flowSelector.new()
-    + flowSelector.withControlPoint('ingress')
+  + flowSelector.withFlowMatcher(
+    flowMatcher.new()
+    + flowMatcher.withControlPoint('ingress')
   );
 
 // Restrict this selector to only bot traffic
-local rateLimiterSelector = selector.new()
-                            + selector.withServiceSelector(
+local rateLimiterSelector = flowSelector.new()
+                            + flowSelector.withServiceSelector(
                               serviceSelector.new()
                               + serviceSelector.withAgentGroup('default')
                               + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
                             )
-                            + selector.withFlowSelector(
-                              flowSelector.new()
-                              + flowSelector.withControlPoint('ingress')
-                              + flowSelector.withLabelMatcher(
+                            + flowSelector.withFlowMatcher(
+                              flowMatcher.new()
+                              + flowMatcher.withControlPoint('ingress')
+                              + flowMatcher.withLabelMatcher(
                                 labelMatcher.withMatchLabels({ 'http.request.header.user_type': 'bot' })
                               )
                             );
 
 local policyResource = latencyGradientPolicy({
   policyName: 'service1-demo-app',
-  fluxMeter: fluxMeter.new() + fluxMeter.withSelector(svcSelector),
-  concurrencyLimiterSelector: svcSelector,
+  fluxMeter: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector),
+  concurrencyLimiterFlowSelector: svcSelector,
   dynamicConfig: {
     dryRun: false,
   },
   classifiers: [
     classifier.new()
-    + classifier.withSelector(svcSelector)
+    + classifier.withFlowSelector(svcSelector)
     + classifier.withRules({
       user_type: rule.new()
                  + rule.withExtractor(extractor.new()
@@ -102,7 +102,7 @@ local policyResource = latencyGradientPolicy({
     component.new()
     + component.withRateLimiter(
       rateLimiter.new()
-      + rateLimiter.withSelector(rateLimiterSelector)
+      + rateLimiter.withFlowSelector(rateLimiterSelector)
       + rateLimiter.withInPorts({ limit: port.withSignalName('RATE_LIMIT') })
       + rateLimiter.withLimitResetInterval('1s')
       + rateLimiter.withLabelKey('http.request.header.user_id')

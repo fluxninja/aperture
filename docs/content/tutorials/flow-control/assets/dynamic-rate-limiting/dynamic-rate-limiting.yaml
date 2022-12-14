@@ -142,6 +142,12 @@ spec:
             output:
               signal_name: LOAD_MULTIPLIER
       - concurrency_limiter:
+          flow_selector:
+            flow_matcher:
+              control_point: ingress
+            service_selector:
+              agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
           load_actuator:
             dynamic_config_key: concurrency_limiter
             in_ports:
@@ -168,12 +174,6 @@ spec:
                     http.request.header.user_type: subscriber
                 workload_parameters:
                   priority: 200
-          selector:
-            flow_selector:
-              control_point: ingress
-            service_selector:
-              agent_group: default
-              service: service1-demo-app.demoapp.svc.cluster.local
       - decider:
           in_ports:
             lhs:
@@ -219,13 +219,8 @@ spec:
               signal_name: RATE_LIMIT
       - rate_limiter:
           dynamic_config_key: rate_limiter
-          in_ports:
-            limit:
-              signal_name: RATE_LIMIT
-          label_key: http.request.header.user_id
-          limit_reset_interval: 1s
-          selector:
-            flow_selector:
+          flow_selector:
+            flow_matcher:
               control_point: ingress
               label_matcher:
                 match_labels:
@@ -233,23 +228,28 @@ spec:
             service_selector:
               agent_group: default
               service: service1-demo-app.demoapp.svc.cluster.local
+          in_ports:
+            limit:
+              signal_name: RATE_LIMIT
+          label_key: http.request.header.user_id
+          limit_reset_interval: 1s
     evaluation_interval: 0.5s
   resources:
     classifiers:
-      - rules:
-          user_type:
-            extractor:
-              from: request.http.headers.user-type
-        selector:
-          flow_selector:
+      - flow_selector:
+          flow_matcher:
             control_point: ingress
           service_selector:
             agent_group: default
             service: service1-demo-app.demoapp.svc.cluster.local
+        rules:
+          user_type:
+            extractor:
+              from: request.http.headers.user-type
     flux_meters:
       service1-demo-app:
-        selector:
-          flow_selector:
+        flow_selector:
+          flow_matcher:
             control_point: ingress
           service_selector:
             agent_group: default

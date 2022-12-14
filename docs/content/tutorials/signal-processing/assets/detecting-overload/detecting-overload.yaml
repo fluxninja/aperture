@@ -54,8 +54,8 @@ spec:
   resources:
     flux_meters:
       test:
-        selector:
-          flow_selector:
+        flow_selector:
+          flow_matcher:
             control_point:
               traffic: ingress
           service_selector:

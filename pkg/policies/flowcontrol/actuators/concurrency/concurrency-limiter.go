@@ -465,9 +465,9 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	return nil
 }
 
-// GetSelector returns selector.
-func (conLimiter *concurrencyLimiter) GetSelector() *policylangv1.Selector {
-	return conLimiter.concurrencyLimiterMsg.GetSelector()
+// GetFlowSelector returns selector.
+func (conLimiter *concurrencyLimiter) GetFlowSelector() *policylangv1.FlowSelector {
+	return conLimiter.concurrencyLimiterMsg.GetFlowSelector()
 }
 
 // RunLimiter processes a single flow by concurrency limiter in a blocking manner.

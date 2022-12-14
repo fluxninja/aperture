@@ -1,6 +1,12 @@
 {
   new():: {
   },
+  withFlowSelector(flow_selector):: {
+    flow_selector: flow_selector,
+  },
+  withFlowSelectorMixin(flow_selector):: {
+    flow_selector+: flow_selector,
+  },
   withLoadActuator(load_actuator):: {
     load_actuator: load_actuator,
   },
@@ -12,11 +18,5 @@
   },
   withSchedulerMixin(scheduler):: {
     scheduler+: scheduler,
-  },
-  withSelector(selector):: {
-    selector: selector,
-  },
-  withSelectorMixin(selector):: {
-    selector+: selector,
   },
 }

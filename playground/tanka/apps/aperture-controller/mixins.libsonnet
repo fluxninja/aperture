@@ -12,9 +12,9 @@ local classifier = aperture.spec.v1.Classifier;
 local fluxMeter = aperture.spec.v1.FluxMeter;
 local extractor = aperture.spec.v1.Extractor;
 local rule = aperture.spec.v1.Rule;
-local selector = aperture.spec.v1.Selector;
-local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowSelector = aperture.spec.v1.FlowSelector;
+local serviceSelector = aperture.spec.v1.ServiceSelector;
+local flowMatcher = aperture.spec.v1.FlowMatcher;
 local controlPoint = aperture.spec.v1.ControlPoint;
 local component = aperture.spec.v1.Component;
 local rateLimiter = aperture.spec.v1.RateLimiter;
@@ -23,39 +23,39 @@ local switcher = aperture.spec.v1.Switcher;
 local port = aperture.spec.v1.Port;
 local alerter = aperture.spec.v1.Alerter;
 
-local fluxMeterSelector = selector.new()
-                          + selector.withServiceSelector(
+local fluxMeterSelector = flowSelector.new()
+                          + flowSelector.withServiceSelector(
                             serviceSelector.new()
                             + serviceSelector.withAgentGroup('default')
                             + serviceSelector.withService('service3-demo-app.demoapp.svc.cluster.local')
                           )
-                          + selector.withFlowSelector(
-                            flowSelector.new()
-                            + flowSelector.withControlPoint('ingress')
+                          + flowSelector.withFlowMatcher(
+                            flowMatcher.new()
+                            + flowMatcher.withControlPoint('ingress')
                           );
 
-local concurrencyLimiterSelector = selector.new()
-                                   + selector.withServiceSelector(
-                                     serviceSelector.new()
-                                     + serviceSelector.withAgentGroup('default')
-                                     + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
-                                   )
-                                   + selector.withFlowSelector(
-                                     flowSelector.new()
-                                     + flowSelector.withControlPoint('ingress')
-                                   );
+local concurrencyLimiterFlowSelector = flowSelector.new()
+                                       + flowSelector.withServiceSelector(
+                                         serviceSelector.new()
+                                         + serviceSelector.withAgentGroup('default')
+                                         + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
+                                       )
+                                       + flowSelector.withFlowMatcher(
+                                         flowMatcher.new()
+                                         + flowMatcher.withControlPoint('ingress')
+                                       );
 
 // Restrict this selector to only bot traffic
-local rateLimiterSelector = selector.new()
-                            + selector.withServiceSelector(
+local rateLimiterSelector = flowSelector.new()
+                            + flowSelector.withServiceSelector(
                               serviceSelector.new()
                               + serviceSelector.withAgentGroup('default')
                               + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
                             )
-                            + selector.withFlowSelector(
-                              flowSelector.new()
-                              + flowSelector.withControlPoint('ingress')
-                              + flowSelector.withLabelMatcher(
+                            + flowSelector.withFlowMatcher(
+                              flowMatcher.new()
+                              + flowMatcher.withControlPoint('ingress')
+                              + flowMatcher.withLabelMatcher(
                                 labelMatcher.withMatchLabels({ 'http.request.header.user_type': 'bot' })
                               )
                             );
@@ -103,11 +103,11 @@ local apertureControllerMixin =
 
 local policyResource = latencyGradientPolicy({
   policyName: 'service1-demo-app',
-  fluxMeter: fluxMeter.new() + fluxMeter.withSelector(fluxMeterSelector),
-  concurrencyLimiterSelector: concurrencyLimiterSelector,
+  fluxMeter: fluxMeter.new() + fluxMeter.withFlowSelector(fluxMeterSelector),
+  concurrencyLimiterFlowSelector: concurrencyLimiterFlowSelector,
   classifiers: [
     classifier.new()
-    + classifier.withSelector(concurrencyLimiterSelector)
+    + classifier.withFlowSelector(concurrencyLimiterFlowSelector)
     + classifier.withRules({
       user_type: rule.new()
                  + rule.withExtractor(extractor.new()
@@ -152,7 +152,7 @@ local policyResource = latencyGradientPolicy({
     component.new()
     + component.withRateLimiter(
       rateLimiter.new()
-      + rateLimiter.withSelector(rateLimiterSelector)
+      + rateLimiter.withFlowSelector(rateLimiterSelector)
       + rateLimiter.withInPorts({ limit: port.withSignalName('RATE_LIMIT') })
       + rateLimiter.withLimitResetInterval('1s')
       + rateLimiter.withLabelKey('http.request.header.user_id')

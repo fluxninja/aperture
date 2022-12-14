@@ -107,4 +107,4 @@ graph TB
 
 [dist-counters]: /concepts/flow-control/rate-limiter.md#distributed-counters
 [components]: /concepts/flow-control/flow-control.md#components
-[catch-all-service]: /concepts/flow-control/selector.md#service
+[catch-all-service]: /concepts/flow-control/flow-selector.md#serviceselector

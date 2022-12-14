@@ -98,7 +98,7 @@ func setupFluxMeterModule(
 // FluxMeter describes single fluxmeter.
 type FluxMeter struct {
 	registry      status.Registry
-	selector      *policylangv1.Selector
+	flowSelector  *policylangv1.FlowSelector
 	histMetricVec *prometheus.HistogramVec
 	fluxMeterName string
 	attributeKey  string
@@ -151,7 +151,7 @@ func (fluxMeterFactory *fluxMeterFactory) newFluxMeterOptions(
 	fluxMeter := &FluxMeter{
 		fluxMeterName: wrapperMessage.FluxMeterName,
 		attributeKey:  fluxMeterProto.AttributeKey,
-		selector:      fluxMeterProto.GetSelector(),
+		flowSelector:  fluxMeterProto.GetFlowSelector(),
 		buckets:       buckets,
 		registry:      reg,
 	}
@@ -215,9 +215,9 @@ func (fluxMeter *FluxMeter) setup(lc fx.Lifecycle, prometheusRegistry *prometheu
 	})
 }
 
-// GetSelector returns the selector.
-func (fluxMeter *FluxMeter) GetSelector() *policylangv1.Selector {
-	return fluxMeter.selector
+// GetFlowSelector returns the selector.
+func (fluxMeter *FluxMeter) GetFlowSelector() *policylangv1.FlowSelector {
+	return fluxMeter.flowSelector
 }
 
 // GetFluxMeterName returns the metric name.

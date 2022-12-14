@@ -41,11 +41,11 @@ var _ = Describe("Classifier", func() {
 	Context("configured with some classification rules", func() {
 		// Classifier with a simple extractor-based rule
 		rs1 := &policylangv1.Classifier{
-			Selector: &policylangv1.Selector{
+			FlowSelector: &policylangv1.FlowSelector{
 				ServiceSelector: &policylangv1.ServiceSelector{
 					Service: "my-service.default.svc.cluster.local",
 				},
-				FlowSelector: &policylangv1.FlowSelector{
+				FlowMatcher: &policylangv1.FlowMatcher{
 					ControlPoint: "ingress",
 				},
 			},
@@ -59,11 +59,11 @@ var _ = Describe("Classifier", func() {
 
 		// Classifier with Raw-rego rule, additionally gated for just "version one"
 		rs2 := &policylangv1.Classifier{
-			Selector: &policylangv1.Selector{
+			FlowSelector: &policylangv1.FlowSelector{
 				ServiceSelector: &policylangv1.ServiceSelector{
 					Service: "my-service.default.svc.cluster.local",
 				},
-				FlowSelector: &policylangv1.FlowSelector{
+				FlowMatcher: &policylangv1.FlowMatcher{
 					LabelMatcher: &policylangv1.LabelMatcher{
 						MatchLabels: map[string]string{"version": "one"},
 					},
@@ -88,8 +88,8 @@ var _ = Describe("Classifier", func() {
 
 		// Classifier with a no service populated
 		rs3 := &policylangv1.Classifier{
-			Selector: &policylangv1.Selector{
-				FlowSelector: &policylangv1.FlowSelector{
+			FlowSelector: &policylangv1.FlowSelector{
+				FlowMatcher: &policylangv1.FlowMatcher{
 					ControlPoint: "ingress",
 				},
 			},
@@ -124,22 +124,22 @@ var _ = Describe("Classifier", func() {
 		It("returns active rules", func() {
 			Expect(classifier.ActiveRules()).To(ConsistOf(
 				compiler.ReportedRule{
-					RulesetName: "one",
-					LabelName:   "foo",
-					Rule:        rs1.Rules["foo"],
-					Selector:    rs1.Selector,
+					RulesetName:  "one",
+					LabelName:    "foo",
+					Rule:         rs1.Rules["foo"],
+					FlowSelector: rs1.FlowSelector,
 				},
 				compiler.ReportedRule{
-					RulesetName: "two",
-					LabelName:   "bar-twice",
-					Rule:        rs2.Rules["bar-twice"],
-					Selector:    rs2.Selector,
+					RulesetName:  "two",
+					LabelName:    "bar-twice",
+					Rule:         rs2.Rules["bar-twice"],
+					FlowSelector: rs2.FlowSelector,
 				},
 				compiler.ReportedRule{
-					RulesetName: "three",
-					LabelName:   "fuu",
-					Rule:        rs3.Rules["fuu"],
-					Selector:    rs3.Selector,
+					RulesetName:  "three",
+					LabelName:    "fuu",
+					Rule:         rs3.Rules["fuu"],
+					FlowSelector: rs3.FlowSelector,
 				},
 			))
 		})
@@ -228,11 +228,11 @@ var _ = Describe("Classifier", func() {
 	setRulesForMyService := func(labelRules map[string]*policylangv1.Rule) error {
 		_, err := classifier.AddRules(context.TODO(), "test", &policysyncv1.ClassifierWrapper{
 			Classifier: &policylangv1.Classifier{
-				Selector: &policylangv1.Selector{
+				FlowSelector: &policylangv1.FlowSelector{
 					ServiceSelector: &policylangv1.ServiceSelector{
 						Service: "my-service.default.svc.cluster.local",
 					},
-					FlowSelector: &policylangv1.FlowSelector{
+					FlowMatcher: &policylangv1.FlowMatcher{
 						ControlPoint: "ingress",
 					},
 				},
@@ -447,11 +447,11 @@ var _ = Describe("Classifier", func() {
 	Context("configured with invalid label name", func() {
 		// Classifier with a simple extractor-based rule
 		rs := &policylangv1.Classifier{
-			Selector: &policylangv1.Selector{
+			FlowSelector: &policylangv1.FlowSelector{
 				ServiceSelector: &policylangv1.ServiceSelector{
 					Service: "my-service.default.svc.cluster.local",
 				},
-				FlowSelector: &policylangv1.FlowSelector{
+				FlowMatcher: &policylangv1.FlowMatcher{
 					ControlPoint: "ingress",
 				},
 			},

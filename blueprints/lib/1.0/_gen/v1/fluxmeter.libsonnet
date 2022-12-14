@@ -19,17 +19,17 @@
   withExponentialBucketsRangeMixin(exponential_buckets_range):: {
     exponential_buckets_range+: exponential_buckets_range,
   },
+  withFlowSelector(flow_selector):: {
+    flow_selector: flow_selector,
+  },
+  withFlowSelectorMixin(flow_selector):: {
+    flow_selector+: flow_selector,
+  },
   withLinearBuckets(linear_buckets):: {
     linear_buckets: linear_buckets,
   },
   withLinearBucketsMixin(linear_buckets):: {
     linear_buckets+: linear_buckets,
-  },
-  withSelector(selector):: {
-    selector: selector,
-  },
-  withSelectorMixin(selector):: {
-    selector+: selector,
   },
   withStaticBuckets(static_buckets):: {
     static_buckets: static_buckets,

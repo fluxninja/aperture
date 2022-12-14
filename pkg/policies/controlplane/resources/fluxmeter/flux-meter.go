@@ -31,11 +31,11 @@ func NewFluxMeterOptions(
 	policyBaseAPI iface.Policy,
 ) (fx.Option, error) {
 	// Get Agent Group Name from FluxMeter.Selector.AgentGroup
-	selectorProto := fluxMeterProto.GetSelector()
-	if selectorProto == nil {
+	flowSelectorProto := fluxMeterProto.GetFlowSelector()
+	if flowSelectorProto == nil {
 		return nil, errors.New("FluxMeter.Selector is nil")
 	}
-	agentGroup := selectorProto.ServiceSelector.GetAgentGroup()
+	agentGroup := flowSelectorProto.ServiceSelector.GetAgentGroup()
 
 	etcdPath := path.Join(paths.FluxMeterConfigPath,
 		paths.FluxMeterKey(agentGroup, name))

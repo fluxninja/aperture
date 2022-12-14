@@ -9,9 +9,9 @@ is a key:value pair. If a Flow is annotated with `user_tier:gold` label, then
 
 Flow Labels are used in different ways in Aperture:
 
-- [Flow Selector][selector] can select flows based on Flow Labels, thus flow
-  labels can be used to narrow the scope of [Classifiers][classifier], Limiters
-  or [_Flux Meters_][flux-meter]
+- [Flow Selector][flow-selector] can select flows based on Flow Labels, thus
+  flow labels can be used to narrow the scope of [Classifiers][classifier],
+  Limiters or [_Flux Meters_][flux-meter]
 - Flow Labels are used to classify a flow to a [_workload_][workload]
 - Fairness within a scheduler's workload and [rate-limiting][ratelimiter] keys
   are also based on Flow Labels
@@ -98,8 +98,8 @@ high-cardinality label is detected, some of its values may be replaced with
 #### Default labels
 
 These are protocol-level labels (e.g. http, network) extracted by the configured
-service mesh/middleware and are available to be referenced in
-[Selectors][selector], except for a few high-cardinality ones.
+service mesh/middleware and are available to be referenced in [Label
+Matchers][label-matchers], except for a few high-cardinality ones.
 
 #### Labels extracted from baggage
 
@@ -148,7 +148,8 @@ select which labels to include in telemetry.
 :::
 
 [flow]: /concepts/flow-control/flow-control.md#flow
-[selector]: /concepts/flow-control/selector.md
+[flow-selector]: /concepts/flow-control/flow-selector.md
+[label-matcher]: /concepts/flow-control/flow-selector.md#label-matcher
 [classifier]: /concepts/flow-control/flow-classifier.md
 [workload]: /concepts/flow-control/concurrency-limiter.md#workload
 [ratelimiter]: /concepts/flow-control/rate-limiter.md

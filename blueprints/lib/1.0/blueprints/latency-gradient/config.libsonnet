@@ -10,14 +10,14 @@
   /**
   * @section Policy
   *
-  * @param (policy.fluxMeter: aperture.spec.v1.FluxMeter required) Flux Meter selector.
-  * @param (policy.concurrencyLimiterSelector: aperture.spec.v1.Selector required) Concurrency Limiter selector.
+  * @param (policy.fluxMeter: aperture.spec.v1.FluxMeter required) Flux Meter.
+  * @param (policy.concurrencyLimiterFlowSelector: aperture.spec.v1.FlowSelector required) Concurrency Limiter flow selector.
   * @param (policy.classifiers: []aperture.spec.v1.Classifier) List of classification rules.
   * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
   */
   policy: {
     fluxMeter: error 'fluxMeter is not set',
-    concurrencyLimiterSelector: error 'concurrencyLimiterSelector is not set',
+    concurrencyLimiterFlowSelector: error 'concurrencyLimiterFlowSelector is not set',
     classifiers: [],
     components: [],
     /**

@@ -4,9 +4,9 @@ local policy = aperture.spec.v1.Policy;
 local resources = aperture.spec.v1.Resources;
 local component = aperture.spec.v1.Component;
 local rateLimiter = aperture.spec.v1.RateLimiter;
-local selector = aperture.spec.v1.Selector;
-local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowSelector = aperture.spec.v1.FlowSelector;
+local serviceSelector = aperture.spec.v1.ServiceSelector;
+local flowMatcher = aperture.spec.v1.FlowMatcher;
 local circuit = aperture.spec.v1.Circuit;
 local port = aperture.spec.v1.Port;
 local classifier = aperture.spec.v1.Classifier;
@@ -14,15 +14,15 @@ local rule = aperture.spec.v1.Rule;
 local rego = aperture.spec.v1.RuleRego;
 
 local svcSelector =
-  selector.new()
-  + selector.withServiceSelector(
+  flowSelector.new()
+  + flowSelector.withServiceSelector(
     serviceSelector.new()
     + serviceSelector.withAgentGroup('default')
     + serviceSelector.withService('service-graphql-demo-app.demoapp.svc.cluster.local')
   )
-  + selector.withFlowSelector(
-    flowSelector.new()
-    + flowSelector.withControlPoint({ traffic: 'ingress' })
+  + flowSelector.withFlowMatcher(
+    flowMatcher.new()
+    + flowMatcher.withControlPoint({ traffic: 'ingress' })
   );
 
 local policyDef =
@@ -31,7 +31,7 @@ local policyDef =
     resources.new()
     + resources.withClassifiers(
       classifier.new()
-      + classifier.withSelector(svcSelector)
+      + classifier.withFlowSelector(svcSelector)
       + classifier.withRules({
         user_id: rule.new()
                  + rule.withTelemetry(true)
@@ -75,7 +75,7 @@ local policyDef =
       component.withRateLimiter(
         rateLimiter.new()
         + rateLimiter.withInPorts({ limit: port.withConstantValue(10) })
-        + rateLimiter.withSelector(svcSelector)
+        + rateLimiter.withFlowSelector(svcSelector)
         + rateLimiter.withLimitResetInterval('1s')
         + rateLimiter.withLabelKey('user_id')
         + rateLimiter.withLazySync({ enabled: false, num_sync: 5 })

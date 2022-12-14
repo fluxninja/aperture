@@ -31,11 +31,11 @@ func NewConcurrencyLimiterOptions(
 	policyReadAPI iface.Policy,
 ) (fx.Option, string, error) {
 	// Get Agent Group Name from ConcurrencyLimiter.Scheduler.Selector.AgentGroup
-	selectorProto := concurrencyLimiterProto.GetSelector()
-	if selectorProto == nil {
+	flowSelectorProto := concurrencyLimiterProto.GetFlowSelector()
+	if flowSelectorProto == nil {
 		return fx.Options(), "", errors.New("concurrencyLimiter.Selector is nil")
 	}
-	agentGroupName := selectorProto.ServiceSelector.GetAgentGroup()
+	agentGroupName := flowSelectorProto.ServiceSelector.GetAgentGroup()
 	etcdPath := path.Join(paths.ConcurrencyLimiterConfigPath,
 		paths.FlowControlComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentStackIndex)))
 	configSync := &concurrencyLimiterConfigSync{

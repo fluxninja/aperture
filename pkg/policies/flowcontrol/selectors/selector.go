@@ -24,8 +24,8 @@ type selector struct {
 // FromProto creates a Selector from a "raw" proto-based Selector
 //
 // The selector is assumed to be already validated and non-nil.
-func FromProto(selectorMsg *policylangv1.Selector) (selector, error) {
-	labelMatcher, err := MMExprFromLabelMatcher(selectorMsg.FlowSelector.GetLabelMatcher())
+func FromProto(selectorMsg *policylangv1.FlowSelector) (selector, error) {
+	labelMatcher, err := MMExprFromLabelMatcher(selectorMsg.FlowMatcher.GetLabelMatcher())
 	if err != nil {
 		return selector{}, fmt.Errorf("invalid label matcher: %w", err)
 	}

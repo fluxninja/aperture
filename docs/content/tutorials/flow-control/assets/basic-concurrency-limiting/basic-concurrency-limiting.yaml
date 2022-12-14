@@ -142,6 +142,12 @@ spec:
             output:
               signal_name: LOAD_MULTIPLIER
       - concurrency_limiter:
+          flow_selector:
+            flow_matcher:
+              control_point: ingress
+            service_selector:
+              agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
           load_actuator:
             dynamic_config_key: concurrency_limiter
             in_ports:
@@ -158,12 +164,6 @@ spec:
                 signal_name: INCOMING_CONCURRENCY
             timeout_factor: "0.5"
             workloads: []
-          selector:
-            flow_selector:
-              control_point: ingress
-            service_selector:
-              agent_group: default
-              service: service1-demo-app.demoapp.svc.cluster.local
       - decider:
           in_ports:
             lhs:
@@ -190,8 +190,8 @@ spec:
     classifiers: []
     flux_meters:
       service1-demo-app:
-        selector:
-          flow_selector:
+        flow_selector:
+          flow_matcher:
             control_point: ingress
           service_selector:
             agent_group: default

@@ -2,28 +2,28 @@ local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.l
 
 local latencyGradientPolicy = aperture.blueprints.LatencyGradient.policy;
 
-local selector = aperture.spec.v1.Selector;
+local flowSelector = aperture.spec.v1.FlowSelector;
 local fluxMeter = aperture.spec.v1.FluxMeter;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
-local flowSelector = aperture.spec.v1.FlowSelector;
+local flowMatcher = aperture.spec.v1.FlowMatcher;
 local controlPoint = aperture.spec.v1.ControlPoint;
 
 local svcSelector =
-  selector.new()
-  + selector.withServiceSelector(
+  flowSelector.new()
+  + flowSelector.withServiceSelector(
     serviceSelector.new()
     + serviceSelector.withAgentGroup('default')
     + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
   )
-  + selector.withFlowSelector(
-    flowSelector.new()
-    + flowSelector.withControlPoint('ingress')
+  + flowSelector.withFlowMatcher(
+    flowMatcher.new()
+    + flowMatcher.withControlPoint('ingress')
   );
 
 local policyResource = latencyGradientPolicy({
   policyName: 'service1-demo-app',
-  fluxMeter: fluxMeter.new() + fluxMeter.withSelector(svcSelector),
-  concurrencyLimiterSelector: svcSelector,
+  fluxMeter: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector),
+  concurrencyLimiterFlowSelector: svcSelector,
   dynamicConfig: {
     dryRun: false,
   },

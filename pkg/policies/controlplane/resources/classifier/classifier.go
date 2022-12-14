@@ -30,11 +30,11 @@ func NewClassifierOptions(
 	policyBaseAPI iface.Policy,
 ) (fx.Option, error) {
 	// Get Agent Group Name for Classifier.Selector.AgentGroup
-	selectorProto := classifierProto.GetSelector()
-	if selectorProto == nil {
+	flowSelectorProto := classifierProto.GetFlowSelector()
+	if flowSelectorProto == nil {
 		return nil, errors.New("Classifier.Selector is nil")
 	}
-	agentGroup := selectorProto.ServiceSelector.GetAgentGroup()
+	agentGroup := flowSelectorProto.ServiceSelector.GetAgentGroup()
 
 	etcdPath := path.Join(paths.ClassifiersPath,
 		paths.ClassifierKey(agentGroup, policyBaseAPI.GetPolicyName(), index))

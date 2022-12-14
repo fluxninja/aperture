@@ -2,9 +2,9 @@ local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.l
 
 local policy = aperture.spec.v1.Policy;
 local component = aperture.spec.v1.Component;
-local selector = aperture.spec.v1.Selector;
-local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowSelector = aperture.spec.v1.FlowSelector;
+local serviceSelector = aperture.spec.v1.ServiceSelector;
+local flowMatcher = aperture.spec.v1.FlowMatcher;
 local circuit = aperture.spec.v1.Circuit;
 local port = aperture.spec.v1.Port;
 local resources = aperture.spec.v1.Resources;
@@ -16,21 +16,21 @@ local decider = aperture.spec.v1.Decider;
 local sink = aperture.spec.v1.Sink;
 
 local svcSelector =
-  selector.new()
-  + selector.withServiceSelector(
+  flowSelector.new()
+  + flowSelector.withServiceSelector(
     serviceSelector.new()
     + serviceSelector.withAgentGroup('default')
     + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
   )
-  + selector.withFlowSelector(
-    flowSelector.new()
-    + flowSelector.withControlPoint({ traffic: 'ingress' })
+  + flowSelector.withFlowMatcher(
+    flowMatcher.new()
+    + flowMatcher.withControlPoint({ traffic: 'ingress' })
   );
 
 local policyDef =
   policy.new()
   + policy.withResources(resources.new()
-                         + resources.withFluxMetersMixin({ test: fluxMeter.new() + fluxMeter.withSelector(svcSelector) }))
+                         + resources.withFluxMetersMixin({ test: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector) }))
   + policy.withCircuit(
     circuit.new()
     + circuit.withEvaluationInterval('0.5s')
