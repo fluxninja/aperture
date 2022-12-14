@@ -13,7 +13,7 @@ type Input []rt.Reading
 
 // NewInput creates an input from an array of floats.
 func NewInput(values []float64) *Input {
-	input := Input(NewReadings(values))
+	input := Input(ToRtReadings(NewReadings(values)))
 	return &input
 }
 

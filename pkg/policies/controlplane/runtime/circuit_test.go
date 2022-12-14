@@ -4,7 +4,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	rt "github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/sim"
 )
 
@@ -33,7 +32,7 @@ var _ = Describe("Circuit", func() {
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Run(3)).To(Equal(
-			map[string][]rt.Reading{
+			sim.Outputs{
 				"SUM": sim.NewReadings([]float64{1.0, 2.0, 3.0}),
 			},
 		))

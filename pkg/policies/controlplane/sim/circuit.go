@@ -24,6 +24,9 @@ type Inputs map[string]rt.Component
 // OutputSignals is a list of signal names that comprise test output.
 type OutputSignals []string
 
+// Outputs map signal names to captured output readings.
+type Outputs map[string][]Reading
+
 // Circuit is a simulated circuit intended to be used in tests.
 type Circuit struct {
 	meta    *simPolicyMeta
@@ -113,29 +116,29 @@ func newCircuit(
 }
 
 // Step runs one tick of circuit execution and returns values of output signals.
-func (s *Circuit) Step() map[string]rt.Reading {
+func (s *Circuit) Step() map[string]Reading {
 	s.execStep()
 
-	outputs := make(map[string]rt.Reading, len(s.outputs))
+	outputs := make(map[string]Reading, len(s.outputs))
 	for outputSignal, output := range s.outputs {
 		readings := output.TakeReadings()
 		if len(readings) != 1 {
 			panic("unexpected output readings len")
 		}
-		outputs[outputSignal] = readings[0]
+		outputs[outputSignal] = ReadingFromRt(readings[0])
 	}
 	return outputs
 }
 
 // Run runs given number of tick of circuit execution and returns values of output signals.
-func (s *Circuit) Run(steps int) map[string][]rt.Reading {
+func (s *Circuit) Run(steps int) Outputs {
 	for iStep := 0; iStep < steps; iStep++ {
 		s.execStep()
 	}
 
-	outputs := make(map[string][]rt.Reading, len(s.outputs))
+	outputs := make(map[string][]Reading, len(s.outputs))
 	for outputSignal, output := range s.outputs {
-		outputs[outputSignal] = output.TakeReadings()
+		outputs[outputSignal] = ReadingsFromRt(output.TakeReadings())
 	}
 	return outputs
 }
@@ -145,7 +148,7 @@ func (s *Circuit) Run(steps int) map[string][]rt.Reading {
 // Returns values of output signals.
 // There must be at least one input of type Input defined and all of them must
 // have same lengths.
-func (s *Circuit) RunDrainInputs() map[string][]rt.Reading {
+func (s *Circuit) RunDrainInputs() Outputs {
 	return s.Run(s.inputLen())
 }
 
