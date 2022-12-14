@@ -1,6 +1,8 @@
 package rollupprocessor
 
 import (
+	"fmt"
+
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 )
@@ -9,11 +11,55 @@ import (
 // done on all `FromField`s from logs/traces. Result of operation is stored in
 // `ToField`.
 type Rollup struct {
-	FromField      string     `mapstructure:"from"`
-	ToField        string     `mapstructure:"to"`
-	Type           RollupType `mapstructure:"type"`
-	TreatAsMissing []string   `mapstructure:"treat_as_missing"`
-	Datasketch     bool       `mapstructure:"datasketch"`
+	FromField      string
+	ToField        string
+	Type           RollupType
+	TreatAsMissing []string
+}
+
+// RollupGroup represents a group of rollup operations of different types that
+// all use the same FromField.
+//
+// By default all basic rollup types will be used (sum, max, min, sum of
+// squares). WithDatasketch enables also the Datasketch rollup type.
+//
+// The name of ToField of Rollup will be inferred from the type of the rollup.
+type RollupGroup struct {
+	FromField      string
+	WithDatasketch bool
+	TreatAsMissing []string
+}
+
+var allRollupTypes = []RollupType{
+	RollupSum,
+	RollupDatasketch,
+	RollupMax,
+	RollupMin,
+	RollupSumOfSquares,
+}
+
+// NewRollups creates individual rollups based on rollup groups.
+func NewRollups(groups []RollupGroup) []*Rollup {
+	var rollups []*Rollup
+	fromFields := make(map[string]struct{})
+
+	for _, group := range groups {
+		for _, rollupType := range allRollupTypes {
+			if rollupType == RollupDatasketch && !group.WithDatasketch {
+				continue
+			}
+
+			fromFields[group.FromField] = struct{}{}
+			rollups = append(rollups, &Rollup{
+				FromField:      group.FromField,
+				ToField:        AggregateField(group.FromField, rollupType),
+				Type:           rollupType,
+				TreatAsMissing: group.TreatAsMissing,
+			})
+		}
+	}
+
+	return rollups
 }
 
 // GetFromFieldValue returns value of `FromField` from attributes as float64.
@@ -41,6 +87,11 @@ const (
 	// RollupDatasketch rolls up fields by creating datasketch from them.
 	RollupDatasketch RollupType = "datasketch"
 )
+
+// AggregateField returns the aggregate field name for the given field and rollup type.
+func AggregateField(field string, rollupType RollupType) string {
+	return fmt.Sprintf("%s_%s", field, rollupType)
+}
 
 const (
 	// RollupCountKey is the key used to store the count of the rollup.

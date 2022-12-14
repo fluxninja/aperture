@@ -19,66 +19,35 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var rollupTypes = []RollupType{
-	RollupSum,
-	RollupDatasketch,
-	RollupMax,
-	RollupMin,
-	RollupSumOfSquares,
-}
+var enabledRollups = NewRollups([]RollupGroup{
+	{
+		FromField:      otelcollector.WorkloadDurationLabel,
+		WithDatasketch: true,
+	},
+	{
+		FromField:      otelcollector.FlowDurationLabel,
+		WithDatasketch: true,
+	},
+	{
+		FromField:      otelcollector.ApertureProcessingDurationLabel,
+		WithDatasketch: true,
+	},
+	{
+		FromField: otelcollector.HTTPRequestContentLength,
+	},
+	{
+		FromField: otelcollector.HTTPResponseContentLength,
+	},
+})
 
-func initRollupsLog() []*Rollup {
-	rollupsInit := []*Rollup{
-		{
-			FromField:      otelcollector.WorkloadDurationLabel,
-			TreatAsMissing: []string{},
-			Datasketch:     true,
-		},
-		{
-			FromField:      otelcollector.FlowDurationLabel,
-			TreatAsMissing: []string{},
-			Datasketch:     true,
-		},
-		{
-			FromField:      otelcollector.ApertureProcessingDurationLabel,
-			TreatAsMissing: []string{},
-			Datasketch:     true,
-		},
-		{
-			FromField: otelcollector.HTTPRequestContentLength,
-		},
-		{
-			FromField: otelcollector.HTTPResponseContentLength,
-		},
+// Set of all FromField names.
+var rollupFromFields = func() map[string]struct{} {
+	fields := map[string]struct{}{}
+	for _, rollup := range enabledRollups {
+		fields[rollup.FromField] = struct{}{}
 	}
-
-	return _initRollupsPerType(rollupsInit, rollupTypes)
-}
-
-// AggregateField returns the aggregate field name for the given field and rollup type.
-func AggregateField(field string, rollupType RollupType) string {
-	return fmt.Sprintf("%s_%s", field, rollupType)
-}
-
-func _initRollupsPerType(rollupsInit []*Rollup, rollupTypes []RollupType) []*Rollup {
-	var rollups []*Rollup
-	for _, rollupInit := range rollupsInit {
-		for _, rollupType := range rollupTypes {
-
-			if rollupType == RollupDatasketch && !rollupInit.Datasketch {
-				continue
-			}
-
-			rollups = append(rollups, &Rollup{
-				FromField:      rollupInit.FromField,
-				ToField:        AggregateField(rollupInit.FromField, rollupType),
-				Type:           rollupType,
-				TreatAsMissing: rollupInit.TreatAsMissing,
-			})
-		}
-	}
-	return rollups
-}
+	return fields
+}()
 
 type rollupProcessor struct {
 	cfg *Config
@@ -94,18 +63,7 @@ const (
 	RedactedAttributeValue = "REDACTED_VIA_CARDINALITY_LIMIT"
 )
 
-var (
-	_ consumer.Logs = (*rollupProcessor)(nil)
-
-	rollupsLog       = initRollupsLog()
-	rollupFromFields = func() map[string]struct{} {
-		fields := map[string]struct{}{}
-		for _, rollup := range rollupsLog {
-			fields[rollup.FromField] = struct{}{}
-		}
-		return fields
-	}()
-)
+var _ consumer.Logs = (*rollupProcessor)(nil)
 
 func newRollupProcessor(set component.ProcessorCreateSettings, cfg *Config) (*rollupProcessor, error) {
 	rollupHistogram := prometheus.NewHistogramVec(prometheus.HistogramOpts{
@@ -152,7 +110,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 	log.Trace().Int("count", ld.LogRecordCount()).Msg("Before rollup")
 	otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) otelcollector.IterAction {
 		attributes := logRecord.Attributes()
-		key := rp.key(attributes, rollupsLog)
+		key := rp.key(attributes, enabledRollups)
 		_, exists := rollupData[key]
 		if !exists {
 			rollupData[key] = attributes
@@ -164,7 +122,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 		}
 		rawCount, _ := rollupData[key].Get(RollupCountKey)
 		rollupData[key].PutInt(RollupCountKey, rawCount.Int()+1)
-		rp.rollupAttributes(datasketches[key], rollupData[key], attributes, rollupsLog)
+		rp.rollupAttributes(datasketches[key], rollupData[key], attributes, enabledRollups)
 		return otelcollector.Keep
 	})
 	for k, v := range datasketches {
