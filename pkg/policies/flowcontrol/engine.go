@@ -3,6 +3,7 @@ package flowcontrol
 import (
 	"context"
 	"fmt"
+	"sort"
 	"sync"
 
 	"golang.org/x/exp/maps"
@@ -65,9 +66,11 @@ func (e *Engine) ProcessRequest(
 	serviceIDs []string,
 	labels map[string]string,
 ) (response *flowcontrolv1.CheckResponse) {
+	labelKeys := maps.Keys(labels)
+	sort.Strings(labelKeys)
 	response = &flowcontrolv1.CheckResponse{
 		DecisionType:  flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
-		FlowLabelKeys: maps.Keys(labels),
+		FlowLabelKeys: labelKeys,
 		Services:      serviceIDs,
 		ControlPoint:  controlPoint,
 	}
