@@ -383,6 +383,15 @@ func AddControllerMetricsPipeline(cfg *OtelParams) {
 func AddAlertsPipeline(cfg *OtelParams, extraProcessors ...string) {
 	config := cfg.Config
 	config.AddReceiver(ReceiverAlerts, map[string]any{})
+	config.AddProcessor(ProcessorAlertsNamespace, map[string]interface{}{
+		"actions": []map[string]interface{}{
+			{
+				"key":    AlertNamespaceLabel,
+				"action": "insert",
+				"value":  info.Hostname,
+			},
+		},
+	})
 	config.AddBatchProcessor(
 		ProcessorBatchAlerts,
 		cfg.BatchAlerts.Timeout.AsDuration(),
@@ -391,7 +400,10 @@ func AddAlertsPipeline(cfg *OtelParams, extraProcessors ...string) {
 	)
 	config.AddExporter(ExporterAlerts, nil)
 
-	processors := []string{ProcessorBatchAlerts}
+	processors := []string{
+		ProcessorBatchAlerts,
+		ProcessorAlertsNamespace,
+	}
 	processors = append(processors, extraProcessors...)
 	config.Service.AddPipeline("logs/alerts", Pipeline{
 		Receivers:  []string{ReceiverAlerts},
