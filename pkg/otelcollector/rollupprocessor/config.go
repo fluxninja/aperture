@@ -15,4 +15,4 @@ type Config struct {
 	promRegistry *prometheus.Registry
 }
 
-var _ component.ProcessorConfig = (*Config)(nil)
+var _ component.Config = (*Config)(nil)

@@ -37,8 +37,8 @@ func createDefaultConfig(
 	engine iface.Engine,
 	clasEng iface.ClassificationEngine,
 	controlPointCache *controlpointcache.ControlPointCache,
-) component.ProcessorCreateDefaultConfigFunc {
-	return func() component.ProcessorConfig {
+) component.CreateDefaultConfigFunc {
+	return func() component.Config {
 		return &Config{
 			ProcessorSettings:    config.NewProcessorSettings(component.NewID(typeStr)),
 			promRegistry:         promRegistry,
@@ -52,7 +52,7 @@ func createDefaultConfig(
 func createLogsProcessor(
 	ctx context.Context,
 	params component.ProcessorCreateSettings,
-	cfg component.ProcessorConfig,
+	cfg component.Config,
 	nextLogsConsumer consumer.Logs,
 ) (component.LogsProcessor, error) {
 	cfgTyped := cfg.(*Config)

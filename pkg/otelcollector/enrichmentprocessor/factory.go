@@ -25,8 +25,8 @@ func NewFactory(cache *entitycache.EntityCache) component.ProcessorFactory {
 	)
 }
 
-func createDefaultConfig(cache *entitycache.EntityCache) component.ProcessorCreateDefaultConfigFunc {
-	return func() component.ProcessorConfig {
+func createDefaultConfig(cache *entitycache.EntityCache) component.CreateDefaultConfigFunc {
+	return func() component.Config {
 		return &Config{
 			ProcessorSettings: config.NewProcessorSettings(component.NewID(typeStr)),
 			entityCache:       cache,
@@ -37,7 +37,7 @@ func createDefaultConfig(cache *entitycache.EntityCache) component.ProcessorCrea
 func createMetricsProcessor(
 	ctx context.Context,
 	params component.ProcessorCreateSettings,
-	cfg component.ProcessorConfig,
+	cfg component.Config,
 	nextMetricsConsumer consumer.Metrics,
 ) (component.MetricsProcessor, error) {
 	cfgTyped := cfg.(*Config)

@@ -15,4 +15,4 @@ type Config struct {
 	alertMgr                       *alertmanager.AlertManager
 }
 
-var _ component.ExporterConfig = (*Config)(nil)
+var _ component.Config = (*Config)(nil)
