@@ -637,7 +637,7 @@ into smaller units.
 <dt>timeout</dt>
 <dd>
 
-(string, `gt=0`, default: `1s`) Timeout sets the time after which a batch will be sent regardless of size.
+(string, `gt=0`, default: `10s`) Timeout sets the time after which a batch will be sent regardless of size.
 
 </dd>
 </dl>

@@ -1,4 +1,4 @@
-package rollupprocessor_test
+package rollupprocessor
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"github.com/fluxninja/datasketches-go/sketches"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -16,7 +17,6 @@ import (
 	"go.opentelemetry.io/collector/pdata/ptrace"
 
 	"github.com/fluxninja/aperture/pkg/otelcollector"
-	. "github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
 )
 
 var _ = Describe("Rollup processor", func() {
@@ -28,6 +28,8 @@ var _ = Describe("Rollup processor", func() {
 	BeforeEach(func() {
 		config = &Config{
 			AttributeCardinalityLimit: 10,
+			RollupBuckets:             []float64{10, 20, 30},
+			promRegistry:              prometheus.NewRegistry(),
 		}
 		testConsumer = &fakeConsumer{
 			receivedLogs:    []plog.Logs{},

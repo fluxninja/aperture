@@ -110,7 +110,7 @@ func AgentOTELComponents(
 		batchprocessor.NewFactory(),
 		memorylimiterprocessor.NewFactory(),
 		enrichmentprocessor.NewFactory(cache),
-		rollupprocessor.NewFactory(),
+		rollupprocessor.NewFactory(promRegistry),
 		metricsprocessor.NewFactory(promRegistry, engine, clasEng, controlPointCache),
 		attributesprocessor.NewFactory(),
 		tracestologsprocessor.NewFactory(),

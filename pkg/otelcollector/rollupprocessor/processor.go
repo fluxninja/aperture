@@ -13,8 +13,10 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/datasketches-go/sketches"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 var rollupTypes = []RollupType{
@@ -82,10 +84,11 @@ type rollupProcessor struct {
 	cfg *Config
 
 	logsNextConsumer consumer.Logs
+	rollupHistogram  *prometheus.HistogramVec
 }
 
 const (
-	defaultAttributeCardinalityLimit = 250
+	defaultAttributeCardinalityLimit = 10
 	// RedactedAttributeValue is a value that replaces actual attribute value
 	// in case it exceeds cardinality limit.
 	RedactedAttributeValue = "REDACTED_VIA_CARDINALITY_LIMIT"
@@ -105,8 +108,22 @@ var (
 )
 
 func newRollupProcessor(set component.ProcessorCreateSettings, cfg *Config) (*rollupProcessor, error) {
+	rollupHistogram := prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Name:    metrics.RollupMetricName,
+		Help:    "Latency of the requests processed by the server",
+		Buckets: cfg.RollupBuckets,
+	}, []string{})
+	err := cfg.promRegistry.Register(rollupHistogram)
+	if err != nil {
+		// Ignore already registered error, as this is not harmful. Metrics may
+		// be registered by other running processor.
+		if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
+			return nil, fmt.Errorf("couldn't register prometheus metrics: %w", err)
+		}
+	}
 	return &rollupProcessor{
-		cfg: cfg,
+		cfg:             cfg,
+		rollupHistogram: rollupHistogram,
 	}, nil
 }
 
@@ -132,6 +149,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 	rollupData := make(map[string]pcommon.Map)
 	datasketches := make(map[string]map[string]*sketches.HeapDoublesSketch)
 
+	log.Trace().Int("count", ld.LogRecordCount()).Msg("Before rollup")
 	otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) otelcollector.IterAction {
 		attributes := logRecord.Attributes()
 		key := rp.key(attributes, rollupsLog)
@@ -290,7 +308,15 @@ func (rp *rollupProcessor) exportLogs(ctx context.Context, rollupData map[string
 		// TODO tgill: need to get timestamp from v
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(time.Now().UTC()))
 		v.CopyTo(logRecord.Attributes())
+		rawCount, _ := v.Get(RollupCountKey)
+		hist, err := rp.rollupHistogram.GetMetricWith(nil)
+		if err != nil {
+			log.Debug().Msgf("Could not extract rollup histogram metric from registry: %v", err)
+		} else {
+			hist.Observe(float64(rawCount.Int()))
+		}
 	}
+	log.Trace().Int("count", ld.LogRecordCount()).Msg("After rollup")
 	return rp.logsNextConsumer.ConsumeLogs(ctx, ld)
 }
 

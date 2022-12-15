@@ -267,7 +267,7 @@ type PortsConfig struct {
 // +kubebuilder:object:generate=true
 type BatchPrerollupConfig struct {
 	// Timeout sets the time after which a batch will be sent regardless of size.
-	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`
+	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"10s"`
 
 	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
 	SendBatchSize uint32 `json:"send_batch_size" validate:"gt=0" default:"10000"`

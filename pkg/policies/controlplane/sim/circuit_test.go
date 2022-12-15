@@ -7,7 +7,6 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
-	rt "github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/sim"
 )
 
@@ -28,8 +27,8 @@ var _ = Describe("Circuit", func() {
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Step()).To(Equal(
-			map[string]rt.Reading{
-				"X": rt.NewReading(42.0),
+			map[string]sim.Reading{
+				"X": sim.NewReading(42.0),
 			},
 		))
 	})
@@ -44,7 +43,7 @@ var _ = Describe("Circuit", func() {
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
-			map[string][]rt.Reading{
+			sim.Outputs{
 				"XX": sim.NewReadings([]float64{42.0, 43.0}),
 			},
 		))
@@ -68,7 +67,7 @@ var _ = Describe("Circuit", func() {
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
-			map[string][]rt.Reading{
+			sim.Outputs{
 				// FIXME: Add some helpers to handle floating-point inaccuracies.
 				// (Here we are lucky to have an exactly-representable answer)
 				"SQRT": sim.NewReadings([]float64{2.0, 3.0}),
@@ -102,14 +101,13 @@ var _ = Describe("Circuit", func() {
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
-			map[string][]rt.Reading{
+			sim.Outputs{
 				"SQRT-CAPPED": sim.NewReadings([]float64{2.0, 2.5}),
 			},
 		))
 	})
 
 	It("can handle invalid readings in tests", func() {
-		Skip("FIXME: Figure out how to nicely compare equality of invalid readings, especially in arrays")
 		circuit, err := sim.NewCircuit(
 			nil,
 			sim.Inputs{"NAN": sim.NewConstantInput(math.NaN())},
@@ -117,8 +115,8 @@ var _ = Describe("Circuit", func() {
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Step()).To(Equal(
-			map[string]rt.Reading{
-				"NAN": rt.InvalidReading(),
+			map[string]sim.Reading{
+				"NAN": sim.InvalidReading(),
 			},
 		))
 	})
