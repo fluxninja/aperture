@@ -366,7 +366,7 @@ type PromQL struct {
 func (*PromQL) Name() string { return "PromQL" }
 
 // Type implements runtime.Component.
-func (*PromQL) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+func (*PromQL) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
 
 var _ runtime.Component = (*PromQL)(nil)
 
