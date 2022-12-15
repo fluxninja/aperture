@@ -347,7 +347,7 @@ AlerterConfig is a common config for separate alerter components and alerters em
 <dt>resolve_timeout</dt>
 <dd>
 
-(string, default: `5m`) Duration of alert resolver.
+(string, default: `300s`) Duration of alert resolver.
 
 </dd>
 <dt>severity</dt>
