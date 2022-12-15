@@ -15,6 +15,7 @@ var _ = Describe("Alert", func() {
 			alerts.WithAnnotation("two", "twelve"),
 			alerts.WithName("buzz"),
 			alerts.WithSeverity(alerts.SeverityCrit),
+			alerts.WithAlertChannels([]string{"one", "two", "three"}),
 		)
 		finalAlert := alert
 		finalAlert.SetLabel("is_alert", "true")

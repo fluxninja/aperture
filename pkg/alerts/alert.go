@@ -48,7 +48,6 @@ var specialLabels = map[string]struct{}{
 	otelcollector.AlertNameLabel:         {},
 	otelcollector.AlertSeverityLabel:     {},
 	otelcollector.AlertGeneratorURLLabel: {},
-	otelcollector.AlertChannelsLabel:     {},
 }
 
 // AlertOption is a type for constructor options.
