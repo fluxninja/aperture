@@ -149,6 +149,9 @@ spec:
               agent_group: default
               service: service1-demo-app.demoapp.svc.cluster.local
           load_actuator:
+            alerter_config:
+              alert_channels:
+                - example
             dynamic_config_key: concurrency_limiter
             in_ports:
               load_multiplier:
