@@ -28,6 +28,7 @@ var _ = Describe("Rollup processor", func() {
 	BeforeEach(func() {
 		config = &Config{
 			AttributeCardinalityLimit: 10,
+			Stage:                     InitialStage,
 			RollupBuckets:             []float64{10, 20, 30},
 			promRegistry:              prometheus.NewRegistry(),
 		}

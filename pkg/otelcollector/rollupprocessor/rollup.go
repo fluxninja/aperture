@@ -3,8 +3,10 @@ package rollupprocessor
 import (
 	"fmt"
 
-	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"go.opentelemetry.io/collector/pdata/pcommon"
+
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
 // Rollup represents single rollup operation. It describes Type of operation to be
@@ -30,9 +32,8 @@ type RollupGroup struct {
 	TreatAsMissing []string
 }
 
-var allRollupTypes = []RollupType{
+var basicRollupTypes = []RollupType{
 	RollupSum,
-	RollupDatasketch,
 	RollupMax,
 	RollupMin,
 	RollupSumOfSquares,
@@ -41,15 +42,16 @@ var allRollupTypes = []RollupType{
 // NewRollups creates individual rollups based on rollup groups.
 func NewRollups(groups []RollupGroup) []*Rollup {
 	var rollups []*Rollup
-	fromFields := make(map[string]struct{})
 
 	for _, group := range groups {
-		for _, rollupType := range allRollupTypes {
-			if rollupType == RollupDatasketch && !group.WithDatasketch {
-				continue
-			}
+		var rollupTypes []RollupType
+		rollupTypes = append(rollupTypes, basicRollupTypes...) // copy the slice to avoid modifying original
 
-			fromFields[group.FromField] = struct{}{}
+		if group.WithDatasketch {
+			rollupTypes = append(rollupTypes, RollupDatasketch)
+		}
+
+		for _, rollupType := range rollupTypes {
 			rollups = append(rollups, &Rollup{
 				FromField:      group.FromField,
 				ToField:        AggregateField(group.FromField, rollupType),
@@ -72,6 +74,15 @@ func (rollup *Rollup) GetToFieldValue(attributes pcommon.Map) (float64, bool) {
 	return otelcollector.GetFloat64(attributes, rollup.ToField, rollup.TreatAsMissing)
 }
 
+// AggregationRollup returns a rollup to aggregate results of a given rollup.
+func (rollup Rollup) AggregationRollup() Rollup {
+	return Rollup{
+		FromField: rollup.ToField,
+		ToField:   rollup.ToField,
+		Type:      rollup.Type.aggregationRollupType(),
+	}
+}
+
 // RollupType represents rollup type available in the processor.
 type RollupType string
 
@@ -86,7 +97,30 @@ const (
 	RollupSumOfSquares RollupType = "sumOfSquares"
 	// RollupDatasketch rolls up fields by creating datasketch from them.
 	RollupDatasketch RollupType = "datasketch"
+	// RollupDatasketchMerge rolls up fields by aggregating existing datasketches.
+	RollupDatasketchMerge RollupType = "datasketchMerge"
+	// RollupCount aggregates records by calculating their count. The FromField is not used.
+	RollupCount RollupType = "count"
 )
+
+// returns which type of rollup to use at aggregation stage – how to rollup results of a rollup.
+func (rt RollupType) aggregationRollupType() RollupType {
+	switch rt {
+	case RollupSum:
+	case RollupCount:
+	case RollupSumOfSquares:
+		// TODO: Not sure if rollup of counts should be made by RollupSum, as
+		// this will result in DoubleValue, instead of IntValue.
+		return RollupSum
+	case RollupDatasketch:
+		return RollupDatasketchMerge
+	case RollupMin:
+	case RollupMax:
+		return rt
+	}
+	log.Panic().Msg("invalid rollup type")
+	return ""
+}
 
 // AggregateField returns the aggregate field name for the given field and rollup type.
 func AggregateField(field string, rollupType RollupType) string {

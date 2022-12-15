@@ -66,9 +66,22 @@ func newRollupProcessor(set component.ProcessorCreateSettings, cfg *Config) (*ro
 	}, []string{})
 
 	rollups := NewRollups(defaultRollupGroups)
+	rollups = append(rollups, &Rollup{
+		ToField: RollupCountKey,
+		Type:    RollupCount,
+	})
+
+	if cfg.Stage == Aggregation {
+		for _, rollup := range rollups {
+			*rollup = rollup.AggregationRollup()
+		}
+	}
+
 	rollupFromFields := map[string]struct{}{}
 	for _, rollup := range rollups {
-		rollupFromFields[rollup.FromField] = struct{}{}
+		if rollup.FromField != "" {
+			rollupFromFields[rollup.FromField] = struct{}{}
+		}
 	}
 
 	err := cfg.promRegistry.Register(rollupHistogram)
@@ -117,14 +130,11 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 		_, exists := rollupData[key]
 		if !exists {
 			rollupData[key] = attributes
-			rollupData[key].PutInt(RollupCountKey, 0)
 		}
 		_, exists = datasketches[key]
 		if !exists {
 			datasketches[key] = make(map[string]*sketches.HeapDoublesSketch)
 		}
-		rawCount, _ := rollupData[key].Get(RollupCountKey)
-		rollupData[key].PutInt(RollupCountKey, rawCount.Int()+1)
 		rp.rollupAttributes(datasketches[key], rollupData[key], attributes)
 		return otelcollector.Keep
 	})
@@ -183,6 +193,14 @@ func (rp *rollupProcessor) rollupAttributes(
 	// TODO tgill: need to track latest timestamp from attributes as the timestamp in baseAttributes
 	for _, rollup := range rp.rollups {
 		switch rollup.Type {
+		case RollupCount:
+			// TODO this should operate on ints
+			rollupCount, exists := rollup.GetToFieldValue(baseAttributes)
+			if !exists {
+				rollupCount = 0
+				baseAttributes.PutDouble(rollup.ToField, rollupCount)
+			}
+			baseAttributes.PutDouble(rollup.ToField, rollupCount+1)
 		case RollupSum:
 			newValue, found := rollup.GetFromFieldValue(attributes)
 			if !found {
@@ -248,11 +266,15 @@ func (rp *rollupProcessor) rollupAttributes(
 			if err != nil {
 				log.Warn().Float64("value", newValue).Msg("Failed updating datasketch with value")
 			}
+		case RollupDatasketchMerge:
+			log.Bug().Msg("Merging datasketches is not implemented, ignoring field")
 		}
 	}
 	// Exclude list
-	for fromField := range rp.rollupFromFields {
-		baseAttributes.Remove(fromField)
+	if rp.cfg.Stage == InitialStage {
+		for fromField := range rp.rollupFromFields {
+			baseAttributes.Remove(fromField)
+		}
 	}
 }
 
@@ -284,10 +306,10 @@ func (rp *rollupProcessor) exportLogs(ctx context.Context, rollupData map[string
 // the map to JSON. This might be suboptimal.
 func (rp *rollupProcessor) key(am pcommon.Map) string {
 	raw := am.AsRaw()
-	for _, rollup := range rp.rollups {
+	for fromField := range rp.rollupFromFields {
 		// Removing all fields from which we will get rolled up values, as those
 		// are dimensions not to be considered as "key".
-		delete(raw, rollup.FromField)
+		delete(raw, fromField)
 	}
 	key, err := json.Marshal(raw)
 	if err != nil {

@@ -29,6 +29,7 @@ func createDefaultConfig(promRegistry *prometheus.Registry) func() component.Pro
 		return &Config{
 			ProcessorSettings:         config.NewProcessorSettings(component.NewID(typeStr)),
 			AttributeCardinalityLimit: defaultAttributeCardinalityLimit,
+			Stage:                     InitialStage,
 			RollupBuckets:             defaultRollupBuckets,
 			promRegistry:              promRegistry,
 		}
