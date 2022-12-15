@@ -1146,9 +1146,9 @@ message AlerterConfig {
   google.protobuf.Duration resolve_timeout = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {string_value: "5m"}
+      value: {string_value: "300s"}
     }
-  }]; // @gotags: default:"5m"
+  }]; // @gotags: default:"300s"
 
   // A list of alert channel strings.
   repeated string alert_channels = 4;
