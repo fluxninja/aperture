@@ -12,14 +12,14 @@
   *
   * @param (policy.evaluationInterval: string) How often should the policy be re-evaluated
   * @param (policy.rateLimit: float64 required) How many requests per `policy.limitResetInterval` to accept
-  * @param (policy.rateLimiterSelector: aperture.spec.v1.Selector required) A selector to match requests against
+  * @param (policy.rateLimiterFlowSelector: aperture.spec.v1.FlowSelector required) A flow selector to match requests against
   * @param (policy.limitResetInterval: string) The window for `policy.rateLimit`
   * @param (policy.labelKey: string required) What flow label to use for rate limiting
   */
   policy: {
     evaluationInterval: '300s',
     rateLimit: error 'policy.rateLimit must be set',
-    rateLimiterSelector: error 'rateLimiterSelector must be set',
+    rateLimiterFlowSelector: error 'rateLimiterFlowSelector must be set',
     limitResetInterval: '1s',
     labelKey: error 'policy.labelKey is required',
     classifiers: [],

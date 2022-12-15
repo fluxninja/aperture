@@ -47,11 +47,11 @@ func NewRateLimiterAndOptions(
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
 	// Get the agent group name.
-	selectorProto := rateLimiterProto.GetSelector()
-	if selectorProto == nil {
+	flowSelectorProto := rateLimiterProto.GetFlowSelector()
+	if flowSelectorProto == nil {
 		return nil, fx.Options(), errors.New("selector is nil")
 	}
-	agentGroupName := selectorProto.ServiceSelector.GetAgentGroup()
+	agentGroupName := flowSelectorProto.ServiceSelector.GetAgentGroup()
 	componentID := paths.FlowControlComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex))
 	configEtcdPath := path.Join(paths.RateLimiterConfigPath, componentID)
 	decisionsEtcdPath := path.Join(paths.RateLimiterDecisionsPath, componentID)

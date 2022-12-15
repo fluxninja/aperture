@@ -18,6 +18,12 @@ local ratelimiterins = import './ratelimiterins.libsonnet';
   withDynamicConfigKeyMixin(dynamic_config_key):: {
     dynamic_config_key+: dynamic_config_key,
   },
+  withFlowSelector(flow_selector):: {
+    flow_selector: flow_selector,
+  },
+  withFlowSelectorMixin(flow_selector):: {
+    flow_selector+: flow_selector,
+  },
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },
@@ -41,11 +47,5 @@ local ratelimiterins = import './ratelimiterins.libsonnet';
   },
   withLimitResetIntervalMixin(limit_reset_interval):: {
     limit_reset_interval+: limit_reset_interval,
-  },
-  withSelector(selector):: {
-    selector: selector,
-  },
-  withSelectorMixin(selector):: {
-    selector+: selector,
   },
 }

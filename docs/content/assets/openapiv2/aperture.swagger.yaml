@@ -754,6 +754,10 @@ definitions:
   v1Classifier:
     type: object
     properties:
+      flow_selector:
+        $ref: '#/definitions/v1FlowSelector'
+        description: Defines where to apply the flow classification rule.
+        x-go-validate: required
       rules:
         type: object
         additionalProperties:
@@ -763,10 +767,6 @@ definitions:
           [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
           how to extract and propagate flow labels with that key.
         x-go-validate: required,gt=0,dive,keys,required,endkeys,required
-      selector:
-        $ref: '#/definitions/v1Selector'
-        description: Defines where to apply the flow classification rule.
-        x-go-validate: required
     description: |-
       :::info
       See also [Classifier overview](/concepts/flow-control/flow-classifier.md).
@@ -920,6 +920,10 @@ definitions:
   v1ConcurrencyLimiter:
     type: object
     properties:
+      flow_selector:
+        $ref: '#/definitions/v1FlowSelector'
+        description: Flow Selector decides the service and flows at which the concurrency limiter is applied.
+        x-go-validate: required
       load_actuator:
         $ref: '#/definitions/v1LoadActuator'
         description: |-
@@ -933,10 +937,6 @@ definitions:
 
           Contains configuration of per-agent scheduler, and also defines some
           output signals.
-        x-go-validate: required
-      selector:
-        $ref: '#/definitions/v1Selector'
-        description: Selector decides the service and flows at which the concurrency limiter is applied.
         x-go-validate: required
     description: |-
       :::info
@@ -1265,7 +1265,7 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: First valid input signal as an output signal.
     description: Outputs for the FirstValid component.
-  v1FlowSelector:
+  v1FlowMatcher:
     type: object
     properties:
       control_point:
@@ -1280,7 +1280,7 @@ definitions:
         $ref: '#/definitions/v1LabelMatcher'
         description: |-
           :::info
-          See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+          See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
           :::
 
           :::note
@@ -1299,7 +1299,7 @@ definitions:
           must also be satisfied (in addition to service+control point matching)
     description: |-
       :::info
-      See also [Selector overview](/concepts/flow-control/selector.md).
+      See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
       :::
 
       Example:
@@ -1321,6 +1321,23 @@ definitions:
       Describes which flows a [flow control
       component](/concepts/flow-control/flow-control.md#components) should apply
       to
+  v1FlowSelector:
+    type: object
+    properties:
+      flow_matcher:
+        $ref: '#/definitions/v1FlowMatcher'
+        x-go-validate: required
+      service_selector:
+        $ref: '#/definitions/v1ServiceSelector'
+        x-go-validate: required
+    description: |-
+      :::info
+      See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+      :::
+    title: |-
+      Describes which flow in which service a [flow control
+      component](/concepts/flow-control/flow-control.md#components) should apply
+      to
   v1FluxMeter:
     type: object
     properties:
@@ -1338,11 +1355,11 @@ definitions:
         $ref: '#/definitions/FluxMeterExponentialBuckets'
       exponential_buckets_range:
         $ref: '#/definitions/FluxMeterExponentialBucketsRange'
+      flow_selector:
+        $ref: '#/definitions/v1FlowSelector'
+        description: The selection criteria for the traffic that will be measured.
       linear_buckets:
         $ref: '#/definitions/FluxMeterLinearBuckets'
-      selector:
-        $ref: '#/definitions/v1Selector'
-        description: The selection criteria for the traffic that will be measured.
       static_buckets:
         $ref: '#/definitions/FluxMeterStaticBuckets'
     description: |-
@@ -1946,6 +1963,10 @@ definitions:
       dynamic_config_key:
         type: string
         title: Configuration key for DynamicConfig
+      flow_selector:
+        $ref: '#/definitions/v1FlowSelector'
+        description: Which control point to apply this ratelimiter to.
+        x-go-validate: required
       in_ports:
         $ref: '#/definitions/v1RateLimiterIns'
         x-go-validate: required
@@ -1966,10 +1987,6 @@ definitions:
         type: string
         description: Time after which the limit for a given label value will be reset.
         x-go-default: 60s
-      selector:
-        $ref: '#/definitions/v1Selector'
-        description: Which control point to apply this ratelimiter to.
-        x-go-validate: required
     description: |-
       :::info
       See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
@@ -2224,23 +2241,6 @@ definitions:
           This is the same as `accepted_concurrency`, but across all the flows
           entering scheduler, including rejected ones.
     description: Output for the Scheduler component.
-  v1Selector:
-    type: object
-    properties:
-      flow_selector:
-        $ref: '#/definitions/v1FlowSelector'
-        x-go-validate: required
-      service_selector:
-        $ref: '#/definitions/v1ServiceSelector'
-        x-go-validate: required
-    description: |-
-      :::info
-      See also [Selector overview](/concepts/flow-control/selector.md).
-      :::
-    title: |-
-      Describes which flow in which service a [flow control
-      component](/concepts/flow-control/flow-control.md#components) should apply
-      to
   v1Service:
     type: object
     properties:
@@ -2276,10 +2276,10 @@ definitions:
           :::
     description: |-
       :::info
-      See also [Selector overview](/concepts/flow-control/selector.md).
+      See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
       :::
     title: |-
-      Describes which service a [flow control
+      Describes which service a [flow control or observability
       component](/concepts/flow-control/flow-control.md#components) should apply
       to
   v1ServicesList:

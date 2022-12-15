@@ -24,7 +24,7 @@ func (cID ClassifierID) String() string {
 // Classifier interface.
 type Classifier interface {
 	// GetSelector returns the selector.
-	GetSelector() *policylangv1.Selector
+	GetFlowSelector() *policylangv1.FlowSelector
 
 	// GetClassifierID returns ClassifierID object that should uniquely identify classifier.
 	GetClassifierID() ClassifierID

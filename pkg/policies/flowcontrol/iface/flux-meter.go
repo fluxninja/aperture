@@ -21,7 +21,7 @@ func (fmID FluxMeterID) String() string {
 // FluxMeter in an interface for interacting with fluxmeters.
 type FluxMeter interface {
 	// GetSelector returns the selector
-	GetSelector() *policylangv1.Selector
+	GetFlowSelector() *policylangv1.FlowSelector
 
 	// GetAttributeKey returns the attribute key
 	GetAttributeKey() string

@@ -10,16 +10,16 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 // to
 //
 // :::info
-// See also [Selector overview](/concepts/flow-control/selector.md).
+// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 // :::
-message Selector {
+message FlowSelector {
   ServiceSelector service_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {string_value: "required"}
     }
   }]; // @gotags: validate:"required"
-  FlowSelector flow_selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  FlowMatcher flow_matcher = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {string_value: "required"}
@@ -27,12 +27,12 @@ message Selector {
   }]; // @gotags: validate:"required"
 }
 
-// Describes which service a [flow control
+// Describes which service a [flow control or observability
 // component](/concepts/flow-control/flow-control.md#components) should apply
 // to
 //
 // :::info
-// See also [Selector overview](/concepts/flow-control/selector.md).
+// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 // :::
 message ServiceSelector {
   // Which [agent-group](/concepts/service.md#agent-group) this
@@ -62,7 +62,7 @@ message ServiceSelector {
 // to
 //
 // :::info
-// See also [Selector overview](/concepts/flow-control/selector.md).
+// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 // :::
 //
 // Example:
@@ -80,7 +80,7 @@ message ServiceSelector {
 //     - label: user_agent
 //       regex: ^(?!.*Chrome).*Safari
 // ```
-message FlowSelector {
+message FlowMatcher {
   // [Control Point](/concepts/flow-control/flow-control.md#control-point)
   // identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
   // block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
@@ -97,7 +97,7 @@ message FlowSelector {
   // must also be satisfied (in addition to service+control point matching)
   //
   // :::info
-  // See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+  // See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
   // :::
   //
   // :::note
@@ -111,4 +111,41 @@ message FlowSelector {
   // control point.
   // :::
   LabelMatcher label_matcher = 2;
+}
+
+// Describes which pods a control or observability
+// component should apply to.
+message KubernetesSelector {
+  // Which [agent-group](/concepts/service.md#agent-group) this
+  // selector applies to.
+  string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {string_value: "default"}
+    }
+  }]; // @gotags: default:"default"
+
+  // Kubernetes namespace that the resource belongs to.
+  string namespace = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
+
+  // Kubernetes resource type.
+  string kind = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
+
+  // Kubernetes resource name.
+  string name = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
 }

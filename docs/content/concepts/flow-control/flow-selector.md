@@ -1,6 +1,6 @@
 ---
 title: Flow Selector
-sidebar_label: Selector
+sidebar_label: Flow Selector
 sidebar_position: 2
 keywords:
   - flows
@@ -11,27 +11,29 @@ keywords:
 
 :::info
 
-See also [Selector reference](/references/configuration/policy.md#v1-selector)
+See also
+[FlowSelector reference](/references/configuration/policy.md#v1-flow-selector)
 
 :::
 
-Selectors are used by all flow observability and control components instantiated
-on Aperture Agents ([Classifiers][classifier], [Flux Meters][flux-meter] and
-Limiters). Flow Selectors define scoping rules – how these components should
-select [Flows][flow] for their operations.
+Flow Selectors are used by flow control and observability components
+instantiated by Aperture Agents like [Classifiers][classifier], [Flux
+Meters][flux-meter] and [Concurrency Limiters][concurrency-limiter]. Flow
+Selectors define scoping rules – how these components should select
+[Flows][flow] for their operations.
 
-A Selector consists of:
+A Flow Selector consists of:
 
-- ServiceSelector, containing
+- Service Selector, containing
 
   - [agent group][agent-group] name,
   - [service][service] name,
 
-- FlowSelector, containing
+- FlowMatcher, containing
   - [control point][control-point], and
   - optional [flow label matcher](#label-matcher).
 
-### ServiceSelector
+### Service Selector
 
 :::info
 
@@ -57,12 +59,12 @@ select all services within the agent group, you can skip the service name.
 
 :::
 
-### FlowSelector
+### Flow Matcher
 
 :::info
 
 See also
-[FlowSelector reference](/references/configuration/policy.md#v1-flow-selector)
+[FlowMatcher reference](/references/configuration/policy.md#v1-flow-matcher)
 
 :::
 
@@ -109,5 +111,6 @@ flow_selector:
 [service]: /concepts/service.md
 [agent-group]: /concepts/service.md#agent-group
 [flux-meter]: /concepts/flow-control/flux-meter.md
+[concurrency-limiter]: /concepts/flow-control/concurrency-limiter.md
 [classifier]: /concepts/flow-control/flow-classifier.md
 [label-matcher]: /references/configuration/policy.md#v1-label-matcher

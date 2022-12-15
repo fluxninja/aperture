@@ -511,18 +511,18 @@ rules:
 #### Properties
 
 <dl>
+<dt>flow_selector</dt>
+<dd>
+
+([V1FlowSelector](#v1-flow-selector), `required`) Defines where to apply the flow classification rule.
+
+</dd>
 <dt>rules</dt>
 <dd>
 
 (map of [V1Rule](#v1-rule), `required,gt=0,dive,keys,required,endkeys,required`) A map of {key, value} pairs mapping from
 [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
 how to extract and propagate flow labels with that key.
-
-</dd>
-<dt>selector</dt>
-<dd>
-
-([V1Selector](#v1-selector), `required`) Defines where to apply the flow classification rule.
 
 </dd>
 </dl>
@@ -689,6 +689,12 @@ strategy and a scheduler. Right now, only `load_actuator` strategy is available.
 #### Properties
 
 <dl>
+<dt>flow_selector</dt>
+<dd>
+
+([V1FlowSelector](#v1-flow-selector), `required`) Flow Selector decides the service and flows at which the concurrency limiter is applied.
+
+</dd>
 <dt>load_actuator</dt>
 <dd>
 
@@ -704,12 +710,6 @@ Actuation strategy defines the input signal that will drive the scheduler.
 
 Contains configuration of per-agent scheduler, and also defines some
 output signals.
-
-</dd>
-<dt>selector</dt>
-<dd>
-
-([V1Selector](#v1-selector), `required`) Selector decides the service and flows at which the concurrency limiter is applied.
 
 </dd>
 </dl>
@@ -1177,14 +1177,14 @@ Outputs for the FirstValid component.
 </dd>
 </dl>
 
-### v1FlowSelector {#v1-flow-selector}
+### v1FlowMatcher {#v1-flow-matcher}
 
 Describes which flows a [flow control
 component](/concepts/flow-control/flow-control.md#components) should apply
 to
 
 :::info
-See also [Selector overview](/concepts/flow-control/selector.md).
+See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 :::
 
 Example:
@@ -1224,7 +1224,7 @@ or filter chains.
 must also be satisfied (in addition to service+control point matching)
 
 :::info
-See also [Label Matcher overview](/concepts/flow-control/selector.md#label-matcher).
+See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
 :::
 
 :::note
@@ -1237,6 +1237,33 @@ Flux Meters or Actuators. It's valid to create a flow label on a control
 point using classifier, and immediately use it for matching on the same
 control point.
 :::
+
+</dd>
+</dl>
+
+### v1FlowSelector {#v1-flow-selector}
+
+Describes which flow in which service a [flow control
+component](/concepts/flow-control/flow-control.md#components) should apply
+to
+
+:::info
+See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+:::
+
+#### Properties
+
+<dl>
+<dt>flow_matcher</dt>
+<dd>
+
+([V1FlowMatcher](#v1-flow-matcher), `required`)
+
+</dd>
+<dt>service_selector</dt>
+<dd>
+
+([V1ServiceSelector](#v1-service-selector), `required`)
 
 </dd>
 </dl>
@@ -1287,16 +1314,16 @@ For list of available attributes in Envoy access logs, refer
 ([FluxMeterExponentialBucketsRange](#flux-meter-exponential-buckets-range))
 
 </dd>
+<dt>flow_selector</dt>
+<dd>
+
+([V1FlowSelector](#v1-flow-selector)) The selection criteria for the traffic that will be measured.
+
+</dd>
 <dt>linear_buckets</dt>
 <dd>
 
 ([FluxMeterLinearBuckets](#flux-meter-linear-buckets))
-
-</dd>
-<dt>selector</dt>
-<dd>
-
-([V1Selector](#v1-selector)) The selection criteria for the traffic that will be measured.
 
 </dd>
 <dt>static_buckets</dt>
@@ -2046,6 +2073,12 @@ to select which label should be used as key.
 (string) Configuration key for DynamicConfig
 
 </dd>
+<dt>flow_selector</dt>
+<dd>
+
+([V1FlowSelector](#v1-flow-selector), `required`) Which control point to apply this ratelimiter to.
+
+</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -2073,12 +2106,6 @@ label set up, set `label_key: "user"`.
 <dd>
 
 (string, default: `60s`) Time after which the limit for a given label value will be reset.
-
-</dd>
-<dt>selector</dt>
-<dd>
-
-([V1Selector](#v1-selector), `required`) Which control point to apply this ratelimiter to.
 
 </dd>
 </dl>
@@ -2358,41 +2385,14 @@ entering scheduler, including rejected ones.
 </dd>
 </dl>
 
-### v1Selector {#v1-selector}
-
-Describes which flow in which service a [flow control
-component](/concepts/flow-control/flow-control.md#components) should apply
-to
-
-:::info
-See also [Selector overview](/concepts/flow-control/selector.md).
-:::
-
-#### Properties
-
-<dl>
-<dt>flow_selector</dt>
-<dd>
-
-([V1FlowSelector](#v1-flow-selector), `required`)
-
-</dd>
-<dt>service_selector</dt>
-<dd>
-
-([V1ServiceSelector](#v1-service-selector), `required`)
-
-</dd>
-</dl>
-
 ### v1ServiceSelector {#v1-service-selector}
 
-Describes which service a [flow control
+Describes which service a [flow control or observability
 component](/concepts/flow-control/flow-control.md#components) should apply
 to
 
 :::info
-See also [Selector overview](/concepts/flow-control/selector.md).
+See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 :::
 
 #### Properties

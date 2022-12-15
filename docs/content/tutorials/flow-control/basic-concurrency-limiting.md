@@ -35,10 +35,10 @@ policy are described separately in the Signal Processing tutorials.
 At a high-level, this policy consists of:
 
 - Latency EMA based overload detection: A Flux Meter is used to gather latency
-  metrics from a [service control point](/concepts/flow-control/selector.md).
-  The latency signal is then fed into EMA component to help establish a
-  long-term trend that we can compare current latency against to detect
-  overloads. See tutorial on
+  metrics from a
+  [service control point](/concepts/flow-control/flow-selector.md). The latency
+  signal is then fed into EMA component to help establish a long-term trend that
+  we can compare current latency against to detect overloads. See tutorial on
   [Detecting Overload](/tutorials/signal-processing/detecting-overload.md) to
   learn more about how this is achieved.
 - Gradient Controller: Setpoint Latency and current Latency signals are fed to

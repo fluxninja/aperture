@@ -12,12 +12,12 @@
 
 ### Policy
 
-| Parameter Name                      | Parameter Type                  | Default      | Description                            |
-| ----------------------------------- | ------------------------------- | ------------ | -------------------------------------- |
-| `policy.fluxMeter`                  | `aperture.spec.v1.FluxMeter`    | `(required)` | Flux Meter selector.                   |
-| `policy.concurrencyLimiterSelector` | `aperture.spec.v1.Selector`     | `(required)` | Concurrency Limiter selector.          |
-| `policy.classifiers`                | `[]aperture.spec.v1.Classifier` | `[]`         | List of classification rules.          |
-| `policy.components`                 | `[]aperture.spec.v1.Component`  | `[]`         | List of additional circuit components. |
+| Parameter Name                          | Parameter Type                  | Default      | Description                            |
+| --------------------------------------- | ------------------------------- | ------------ | -------------------------------------- |
+| `policy.fluxMeter`                      | `aperture.spec.v1.FluxMeter`    | `(required)` | Flux Meter.                            |
+| `policy.concurrencyLimiterFlowSelector` | `aperture.spec.v1.FlowSelector` | `(required)` | Concurrency Limiter flow selector.     |
+| `policy.classifiers`                    | `[]aperture.spec.v1.Classifier` | `[]`         | List of classification rules.          |
+| `policy.components`                     | `[]aperture.spec.v1.Component`  | `[]`         | List of additional circuit components. |
 
 #### Concurrency Limiter
 

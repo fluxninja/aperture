@@ -26,10 +26,10 @@ func NewControlPointID(service string, controlPoint string) ControlPointID {
 	}
 }
 
-func controlPointIDFromSelectorProto(selectorMsg *policylangv1.Selector) (ControlPointID, error) {
-	ctrlPt := selectorMsg.FlowSelector.GetControlPoint()
+func controlPointIDFromSelectorProto(flowSelectorMsg *policylangv1.FlowSelector) (ControlPointID, error) {
+	ctrlPt := flowSelectorMsg.FlowMatcher.GetControlPoint()
 	return controlPointID{
-		service:      selectorMsg.ServiceSelector.GetService(),
+		service:      flowSelectorMsg.ServiceSelector.GetService(),
 		controlPoint: ctrlPt,
 	}, nil
 }

@@ -25,7 +25,7 @@ function(params) {
         component.withRateLimiter(
           rateLimiter.new()
           + rateLimiter.withInPorts({ limit: port.withConstantValue($._config.rateLimit) })
-          + rateLimiter.withSelector($._config.rateLimiterSelector)
+          + rateLimiter.withFlowSelector($._config.rateLimiterFlowSelector)
           + rateLimiter.withLimitResetInterval($._config.limitResetInterval)
           + rateLimiter.withLabelKey($._config.labelKey)
           + rateLimiter.withDefaultConfig(

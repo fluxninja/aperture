@@ -5,7 +5,7 @@ local policy = spec.v1.Policy;
 local resources = spec.v1.Resources;
 local circuit = spec.v1.Circuit;
 local classifier = spec.v1.Classifier;
-local selector = spec.v1.Selector;
+local flowSelector = spec.v1.FlowSelector;
 local component = spec.v1.Component;
 local promQL = spec.v1.PromQL;
 local port = spec.v1.Port;
@@ -121,7 +121,7 @@ function(params) {
           component.withConcurrencyLimiter(
             local c = $._config.concurrencyLimiter;
             concurrencyLimiter.new()
-            + concurrencyLimiter.withSelector($._config.concurrencyLimiterSelector)
+            + concurrencyLimiter.withFlowSelector($._config.concurrencyLimiterFlowSelector)
             + concurrencyLimiter.withScheduler(
               scheduler.new()
               + scheduler.withAutoTokens(c.autoTokens)

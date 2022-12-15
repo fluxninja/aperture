@@ -49,20 +49,20 @@ type Labeler struct {
 
 // ReportedRule is a rule along with its selector and label name.
 type ReportedRule struct {
-	Selector    *policylangv1.Selector
-	Rule        *policylangv1.Rule
-	RulesetName string
-	LabelName   string
+	FlowSelector *policylangv1.FlowSelector
+	Rule         *policylangv1.Rule
+	RulesetName  string
+	LabelName    string
 }
 
 func rulesetToReportedRules(rs *policylangv1.Classifier, rulesetName string) []ReportedRule {
 	out := make([]ReportedRule, 0, len(rs.Rules))
 	for label, rule := range rs.Rules {
 		out = append(out, ReportedRule{
-			RulesetName: rulesetName,
-			LabelName:   label,
-			Rule:        rule,
-			Selector:    rs.Selector,
+			RulesetName:  rulesetName,
+			LabelName:    label,
+			Rule:         rule,
+			FlowSelector: rs.FlowSelector,
 		})
 	}
 	return out
@@ -91,11 +91,11 @@ var BadLabelName = extractors.BadLabelName
 // CompileRuleset parses ruleset's selector and compiles its rules.
 func CompileRuleset(ctx context.Context, name string, classifierWrapper *policysyncv1.ClassifierWrapper) (CompiledRuleset, error) {
 	classifierMsg := classifierWrapper.GetClassifier()
-	if classifierMsg.Selector == nil {
+	if classifierMsg.FlowSelector == nil {
 		return CompiledRuleset{}, fmt.Errorf("%w: missing selector", BadSelector)
 	}
 
-	selector, err := selectors.FromProto(classifierMsg.Selector)
+	selector, err := selectors.FromProto(classifierMsg.FlowSelector)
 	if err != nil {
 		return CompiledRuleset{}, fmt.Errorf("%w: %v", BadSelector, err)
 	}

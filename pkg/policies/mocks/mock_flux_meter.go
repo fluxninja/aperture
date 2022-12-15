@@ -50,6 +50,20 @@ func (mr *MockFluxMeterMockRecorder) GetAttributeKey() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAttributeKey", reflect.TypeOf((*MockFluxMeter)(nil).GetAttributeKey))
 }
 
+// GetFlowSelector mocks base method.
+func (m *MockFluxMeter) GetFlowSelector() *languagev1.FlowSelector {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFlowSelector")
+	ret0, _ := ret[0].(*languagev1.FlowSelector)
+	return ret0
+}
+
+// GetFlowSelector indicates an expected call of GetFlowSelector.
+func (mr *MockFluxMeterMockRecorder) GetFlowSelector() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFlowSelector", reflect.TypeOf((*MockFluxMeter)(nil).GetFlowSelector))
+}
+
 // GetFluxMeterID mocks base method.
 func (m *MockFluxMeter) GetFluxMeterID() iface.FluxMeterID {
 	m.ctrl.T.Helper()
@@ -90,18 +104,4 @@ func (m *MockFluxMeter) GetHistogram(labels map[string]string) prometheus.Observ
 func (mr *MockFluxMeterMockRecorder) GetHistogram(labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHistogram", reflect.TypeOf((*MockFluxMeter)(nil).GetHistogram), labels)
-}
-
-// GetSelector mocks base method.
-func (m *MockFluxMeter) GetSelector() *languagev1.Selector {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSelector")
-	ret0, _ := ret[0].(*languagev1.Selector)
-	return ret0
-}
-
-// GetSelector indicates an expected call of GetSelector.
-func (mr *MockFluxMeterMockRecorder) GetSelector() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSelector", reflect.TypeOf((*MockFluxMeter)(nil).GetSelector))
 }

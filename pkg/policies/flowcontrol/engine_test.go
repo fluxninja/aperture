@@ -22,10 +22,10 @@ var _ = Describe("Dataplane Engine", func() {
 		mockConLimiter *mocks.MockConcurrencyLimiter
 		mockFluxmeter  *mocks.MockFluxMeter
 
-		selector    *policylangv1.Selector
-		histogram   goprom.Histogram
-		fluxMeterID iface.FluxMeterID
-		limiterID   iface.LimiterID
+		flowSelector *policylangv1.FlowSelector
+		histogram    goprom.Histogram
+		fluxMeterID  iface.FluxMeterID
+		limiterID    iface.LimiterID
 	)
 
 	BeforeEach(func() {
@@ -35,12 +35,12 @@ var _ = Describe("Dataplane Engine", func() {
 		mockFluxmeter = mocks.NewMockFluxMeter(mockCtrl)
 
 		engine = NewEngine()
-		selector = &policylangv1.Selector{
+		flowSelector = &policylangv1.FlowSelector{
 			ServiceSelector: &policylangv1.ServiceSelector{
 				AgentGroup: metrics.DefaultAgentGroup,
 				Service:    "testService.testNamespace.svc.cluster.local",
 			},
-			FlowSelector: &policylangv1.FlowSelector{
+			FlowMatcher: &policylangv1.FlowMatcher{
 				ControlPoint: "ingress",
 			},
 		}
@@ -66,7 +66,7 @@ var _ = Describe("Dataplane Engine", func() {
 	Context("Scheduler actuator", func() {
 		BeforeEach(func() {
 			mockConLimiter.EXPECT().GetPolicyName().AnyTimes()
-			mockConLimiter.EXPECT().GetSelector().Return(selector).AnyTimes()
+			mockConLimiter.EXPECT().GetFlowSelector().Return(flowSelector).AnyTimes()
 			mockConLimiter.EXPECT().GetLimiterID().Return(limiterID).AnyTimes()
 		})
 
@@ -100,7 +100,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 		BeforeEach(func() {
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
-			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
+			mockFluxmeter.EXPECT().GetFlowSelector().Return(flowSelector).AnyTimes()
 			labels = map[string]string{
 				metrics.FlowStatusLabel:   metrics.FlowStatusOK,
 				metrics.StatusCodeLabel:   "200",
@@ -151,11 +151,11 @@ var _ = Describe("Dataplane Engine", func() {
 	Context("Multimatch", func() {
 		BeforeEach(func() {
 			mockConLimiter.EXPECT().GetPolicyName().AnyTimes()
-			mockConLimiter.EXPECT().GetSelector().Return(selector).AnyTimes()
+			mockConLimiter.EXPECT().GetFlowSelector().Return(flowSelector).AnyTimes()
 			mockConLimiter.EXPECT().GetLimiterID().Return(limiterID).AnyTimes()
 
 			mockFluxmeter.EXPECT().GetFluxMeterName().Return("test").AnyTimes()
-			mockFluxmeter.EXPECT().GetSelector().Return(selector).AnyTimes()
+			mockFluxmeter.EXPECT().GetFlowSelector().Return(flowSelector).AnyTimes()
 			mockFluxmeter.EXPECT().GetFluxMeterID().Return(fluxMeterID).AnyTimes()
 		})
 

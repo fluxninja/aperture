@@ -50,6 +50,20 @@ func (mr *MockClassifierMockRecorder) GetClassifierID() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClassifierID", reflect.TypeOf((*MockClassifier)(nil).GetClassifierID))
 }
 
+// GetFlowSelector mocks base method.
+func (m *MockClassifier) GetFlowSelector() *languagev1.FlowSelector {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFlowSelector")
+	ret0, _ := ret[0].(*languagev1.FlowSelector)
+	return ret0
+}
+
+// GetFlowSelector indicates an expected call of GetFlowSelector.
+func (mr *MockClassifierMockRecorder) GetFlowSelector() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFlowSelector", reflect.TypeOf((*MockClassifier)(nil).GetFlowSelector))
+}
+
 // GetRequestCounter mocks base method.
 func (m *MockClassifier) GetRequestCounter() prometheus.Counter {
 	m.ctrl.T.Helper()
@@ -62,18 +76,4 @@ func (m *MockClassifier) GetRequestCounter() prometheus.Counter {
 func (mr *MockClassifierMockRecorder) GetRequestCounter() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestCounter", reflect.TypeOf((*MockClassifier)(nil).GetRequestCounter))
-}
-
-// GetSelector mocks base method.
-func (m *MockClassifier) GetSelector() *languagev1.Selector {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSelector")
-	ret0, _ := ret[0].(*languagev1.Selector)
-	return ret0
-}
-
-// GetSelector indicates an expected call of GetSelector.
-func (mr *MockClassifierMockRecorder) GetSelector() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSelector", reflect.TypeOf((*MockClassifier)(nil).GetSelector))
 }
