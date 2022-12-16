@@ -5,6 +5,7 @@ import (
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/config"
+	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/exporter/exporterhelper"
 
 	"github.com/fluxninja/aperture/pkg/alertmanager"
@@ -16,15 +17,15 @@ const (
 )
 
 // NewFactory creates a factory for alerts exporter.
-func NewFactory(alertMgr *alertmanager.AlertManager) component.ExporterFactory {
-	return component.NewExporterFactory(
+func NewFactory(alertMgr *alertmanager.AlertManager) exporter.Factory {
+	return exporter.NewFactory(
 		typeStr,
 		createDefaultConfig(alertMgr),
-		component.WithLogsExporter(createLogsExporter, stability))
+		exporter.WithLogs(createLogsExporter, stability))
 }
 
-func createDefaultConfig(alertMgr *alertmanager.AlertManager) func() component.ExporterConfig {
-	return func() component.ExporterConfig {
+func createDefaultConfig(alertMgr *alertmanager.AlertManager) func() component.Config {
+	return func() component.Config {
 		return &Config{
 			ExporterSettings: config.NewExporterSettings(component.NewID(typeStr)),
 			TimeoutSettings:  exporterhelper.NewDefaultTimeoutSettings(),
@@ -35,9 +36,9 @@ func createDefaultConfig(alertMgr *alertmanager.AlertManager) func() component.E
 
 func createLogsExporter(
 	_ context.Context,
-	_ component.ExporterCreateSettings,
-	eConf component.ExporterConfig,
-) (component.LogsExporter, error) {
+	_ exporter.CreateSettings,
+	eConf component.Config,
+) (exporter.Logs, error) {
 	cfg := eConf.(*Config)
 	ex, err := newExporter(cfg)
 	if err != nil {

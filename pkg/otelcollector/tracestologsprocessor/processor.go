@@ -7,6 +7,7 @@ import (
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/pdata/ptrace"
 	"go.uber.org/multierr"
@@ -18,11 +19,11 @@ import (
 type tracesToLogsProcessor struct {
 	lock         sync.Mutex
 	config       Config
-	logsExporter component.LogsExporter
+	logsExporter exporter.Logs
 	nextConsumer consumer.Traces
 }
 
-func newProcessor(config component.ProcessorConfig, nextConsumer consumer.Traces) (*tracesToLogsProcessor, error) {
+func newProcessor(config component.Config, nextConsumer consumer.Traces) (*tracesToLogsProcessor, error) {
 	log.Info().Msg("Building tracestologsprocessor")
 
 	pConfig := config.(*Config)
@@ -43,7 +44,7 @@ func (p *tracesToLogsProcessor) Start(ctx context.Context, host component.Host) 
 
 	// The available list of exporters come from any configured metrics pipelines' exporters.
 	for k, exp := range exporters[component.DataTypeLogs] {
-		logsExp, ok := exp.(component.LogsExporter)
+		logsExp, ok := exp.(exporter.Logs)
 		if !ok {
 			return fmt.Errorf("the exporter %q isn't a metrics exporter", k.String())
 		}

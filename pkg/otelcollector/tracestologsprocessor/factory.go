@@ -19,7 +19,7 @@ func NewFactory() component.ProcessorFactory {
 	)
 }
 
-func createDefaultConfig() component.ProcessorConfig {
+func createDefaultConfig() component.Config {
 	return &Config{
 		ProcessorSettings: config.NewProcessorSettings(component.NewID(typeStr)),
 	}
@@ -28,7 +28,7 @@ func createDefaultConfig() component.ProcessorConfig {
 func createTracesProcessor(
 	_ context.Context,
 	params component.ProcessorCreateSettings,
-	cfg component.ProcessorConfig,
+	cfg component.Config,
 	nextConsumer consumer.Traces,
 ) (component.TracesProcessor, error) {
 	return newProcessor(cfg, nextConsumer)

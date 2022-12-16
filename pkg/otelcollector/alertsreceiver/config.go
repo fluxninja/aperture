@@ -14,4 +14,4 @@ type Config struct {
 	alerter alerts.Alerter
 }
 
-var _ component.ReceiverConfig = (*Config)(nil)
+var _ component.Config = (*Config)(nil)

@@ -13,12 +13,15 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/exporter/loggingexporter"
 	"go.opentelemetry.io/collector/exporter/otlpexporter"
 	"go.opentelemetry.io/collector/exporter/otlphttpexporter"
+	"go.opentelemetry.io/collector/extension"
 	"go.opentelemetry.io/collector/extension/ballastextension"
 	"go.opentelemetry.io/collector/extension/zpagesextension"
 	"go.opentelemetry.io/collector/processor/batchprocessor"
+	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 )
@@ -47,7 +50,7 @@ func ControllerOTELComponents(
 ) (component.Factories, error) {
 	var errs error
 
-	extensions, err := component.MakeExtensionFactoryMap(
+	extensions, err := extension.MakeFactoryMap(
 		zpagesextension.NewFactory(),
 		ballastextension.NewFactory(),
 		healthcheckextension.NewFactory(),
@@ -55,13 +58,13 @@ func ControllerOTELComponents(
 	)
 	errs = multierr.Append(errs, err)
 
-	receivers, err := component.MakeReceiverFactoryMap(
+	receivers, err := receiver.MakeFactoryMap(
 		prometheusreceiver.NewFactory(),
 		alertsreceiver.NewFactory(alerter),
 	)
 	errs = multierr.Append(errs, err)
 
-	exporters, err := component.MakeExporterFactoryMap(
+	exporters, err := exporter.MakeFactoryMap(
 		otlpexporter.NewFactory(),
 		otlphttpexporter.NewFactory(),
 		prometheusremotewriteexporter.NewFactory(),

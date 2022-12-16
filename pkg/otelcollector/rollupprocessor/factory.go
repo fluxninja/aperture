@@ -24,8 +24,8 @@ func NewFactory(promRegistry *prometheus.Registry) component.ProcessorFactory {
 		component.WithLogsProcessor(CreateLogsProcessor, component.StabilityLevelDevelopment))
 }
 
-func createDefaultConfig(promRegistry *prometheus.Registry) func() component.ProcessorConfig {
-	return func() component.ProcessorConfig {
+func createDefaultConfig(promRegistry *prometheus.Registry) func() component.Config {
+	return func() component.Config {
 		return &Config{
 			ProcessorSettings:         config.NewProcessorSettings(component.NewID(typeStr)),
 			AttributeCardinalityLimit: defaultAttributeCardinalityLimit,
@@ -39,7 +39,7 @@ func createDefaultConfig(promRegistry *prometheus.Registry) func() component.Pro
 func CreateLogsProcessor(
 	_ context.Context,
 	set component.ProcessorCreateSettings,
-	cfg component.ProcessorConfig,
+	cfg component.Config,
 	nextConsumer consumer.Logs,
 ) (component.LogsProcessor, error) {
 	return newRollupLogsProcessor(set, nextConsumer, cfg.(*Config))

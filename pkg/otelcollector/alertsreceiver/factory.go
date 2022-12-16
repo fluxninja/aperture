@@ -6,6 +6,7 @@ import (
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/config"
 	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/receiver"
 
 	"github.com/fluxninja/aperture/pkg/alerts"
 )
@@ -16,15 +17,15 @@ const (
 )
 
 // NewFactory creates a factory for alerts receiver.
-func NewFactory(alerter alerts.Alerter) component.ReceiverFactory {
-	return component.NewReceiverFactory(
+func NewFactory(alerter alerts.Alerter) receiver.Factory {
+	return receiver.NewFactory(
 		typeStr,
 		createDefaultConfig(alerter),
-		component.WithLogsReceiver(createLogsReceiver, stability))
+		receiver.WithLogs(createLogsReceiver, stability))
 }
 
-func createDefaultConfig(alerter alerts.Alerter) func() component.ReceiverConfig {
-	return func() component.ReceiverConfig {
+func createDefaultConfig(alerter alerts.Alerter) func() component.Config {
+	return func() component.Config {
 		return &Config{
 			ReceiverSettings: config.NewReceiverSettings(component.NewID(typeStr)),
 			alerter:          alerter,
@@ -34,10 +35,10 @@ func createDefaultConfig(alerter alerts.Alerter) func() component.ReceiverConfig
 
 func createLogsReceiver(
 	_ context.Context,
-	_ component.ReceiverCreateSettings,
-	rConf component.ReceiverConfig,
+	_ receiver.CreateSettings,
+	rConf component.Config,
 	consumer consumer.Logs,
-) (component.LogsReceiver, error) {
+) (receiver.Logs, error) {
 	cfg := rConf.(*Config)
 	p, err := newReceiver(cfg)
 	if err != nil {
