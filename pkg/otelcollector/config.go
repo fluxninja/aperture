@@ -416,6 +416,7 @@ func addPrometheusReceiver(cfg *OtelParams) {
 	config := cfg.Config
 	scrapeConfigs := []map[string]any{
 		buildApertureSelfScrapeConfig("aperture-self", cfg),
+		buildOtelScrapeConfig("aperture-otel", cfg),
 	}
 
 	_, err := rest.InClusterConfig()
@@ -445,6 +446,7 @@ func addPrometheusReceiver(cfg *OtelParams) {
 func addControllerPrometheusReceiver(config *OTELConfig, cfg *OtelParams) {
 	scrapeConfigs := []map[string]any{
 		buildApertureSelfScrapeConfig("aperture-controller-self", cfg),
+		buildOtelScrapeConfig("aperture-controller-otel", cfg),
 	}
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
 	// tags, so they are not properly read by OTEL. Need to use bare maps instead.
@@ -484,6 +486,27 @@ func buildApertureSelfScrapeConfig(name string, cfg *OtelParams) map[string]any 
 		"static_configs": []map[string]any{
 			{
 				"targets": []string{cfg.Listener.GetAddr()},
+				"labels": map[string]any{
+					metrics.InstanceLabel:    info.Hostname,
+					metrics.ProcessUUIDLabel: info.UUID,
+				},
+			},
+		},
+	}
+}
+
+func buildOtelScrapeConfig(name string, cfg *OtelParams) map[string]any {
+	otelDebugTarget := fmt.Sprintf(":%d", cfg.Ports.DebugPort)
+	return map[string]any{
+		"job_name": name,
+		"scheme":   "http",
+		"tls_config": map[string]any{
+			"insecure_skip_verify": true,
+		},
+		"metrics_path": "/metrics",
+		"static_configs": []map[string]any{
+			{
+				"targets": []string{otelDebugTarget},
 				"labels": map[string]any{
 					metrics.InstanceLabel:    info.Hostname,
 					metrics.ProcessUUIDLabel: info.UUID,
