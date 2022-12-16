@@ -66,6 +66,8 @@ func (e *Engine) ProcessRequest(
 	serviceIDs []string,
 	labels map[string]string,
 ) (response *flowcontrolv1.CheckResponse) {
+	// Sorting labels keys, so that they're in predictable order, which is
+	// needed by rollupprocessor.
 	labelKeys := maps.Keys(labels)
 	sort.Strings(labelKeys)
 	response = &flowcontrolv1.CheckResponse{
