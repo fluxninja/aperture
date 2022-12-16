@@ -612,7 +612,7 @@ definitions:
       resolve_timeout:
         type: string
         description: Duration of alert resolver.
-        x-go-default: 5m
+        x-go-default: 300s
       severity:
         type: string
         description: Severity of the alert, one of 'info', 'warn' or 'crit'.

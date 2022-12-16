@@ -19,65 +19,25 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var rollupTypes = []RollupType{
-	RollupSum,
-	RollupDatasketch,
-	RollupMax,
-	RollupMin,
-	RollupSumOfSquares,
-}
-
-func initRollupsLog() []*Rollup {
-	rollupsInit := []*Rollup{
-		{
-			FromField:      otelcollector.WorkloadDurationLabel,
-			TreatAsMissing: []string{},
-			Datasketch:     true,
-		},
-		{
-			FromField:      otelcollector.FlowDurationLabel,
-			TreatAsMissing: []string{},
-			Datasketch:     true,
-		},
-		{
-			FromField:      otelcollector.ApertureProcessingDurationLabel,
-			TreatAsMissing: []string{},
-			Datasketch:     true,
-		},
-		{
-			FromField: otelcollector.HTTPRequestContentLength,
-		},
-		{
-			FromField: otelcollector.HTTPResponseContentLength,
-		},
-	}
-
-	return _initRollupsPerType(rollupsInit, rollupTypes)
-}
-
-// AggregateField returns the aggregate field name for the given field and rollup type.
-func AggregateField(field string, rollupType RollupType) string {
-	return fmt.Sprintf("%s_%s", field, rollupType)
-}
-
-func _initRollupsPerType(rollupsInit []*Rollup, rollupTypes []RollupType) []*Rollup {
-	var rollups []*Rollup
-	for _, rollupInit := range rollupsInit {
-		for _, rollupType := range rollupTypes {
-
-			if rollupType == RollupDatasketch && !rollupInit.Datasketch {
-				continue
-			}
-
-			rollups = append(rollups, &Rollup{
-				FromField:      rollupInit.FromField,
-				ToField:        AggregateField(rollupInit.FromField, rollupType),
-				Type:           rollupType,
-				TreatAsMissing: rollupInit.TreatAsMissing,
-			})
-		}
-	}
-	return rollups
+var defaultRollupGroups = []RollupGroup{
+	{
+		FromField:      otelcollector.WorkloadDurationLabel,
+		WithDatasketch: true,
+	},
+	{
+		FromField:      otelcollector.FlowDurationLabel,
+		WithDatasketch: true,
+	},
+	{
+		FromField:      otelcollector.ApertureProcessingDurationLabel,
+		WithDatasketch: true,
+	},
+	{
+		FromField: otelcollector.HTTPRequestContentLength,
+	},
+	{
+		FromField: otelcollector.HTTPResponseContentLength,
+	},
 }
 
 type rollupProcessor struct {
@@ -85,6 +45,8 @@ type rollupProcessor struct {
 
 	logsNextConsumer consumer.Logs
 	rollupHistogram  *prometheus.HistogramVec
+	rollups          []*Rollup
+	rollupFromFields map[string]struct{} // Set of all all FromField names.
 }
 
 const (
@@ -94,18 +56,7 @@ const (
 	RedactedAttributeValue = "REDACTED_VIA_CARDINALITY_LIMIT"
 )
 
-var (
-	_ consumer.Logs = (*rollupProcessor)(nil)
-
-	rollupsLog       = initRollupsLog()
-	rollupFromFields = func() map[string]struct{} {
-		fields := map[string]struct{}{}
-		for _, rollup := range rollupsLog {
-			fields[rollup.FromField] = struct{}{}
-		}
-		return fields
-	}()
-)
+var _ consumer.Logs = (*rollupProcessor)(nil)
 
 func newRollupProcessor(set component.ProcessorCreateSettings, cfg *Config) (*rollupProcessor, error) {
 	rollupHistogram := prometheus.NewHistogramVec(prometheus.HistogramOpts{
@@ -113,6 +64,13 @@ func newRollupProcessor(set component.ProcessorCreateSettings, cfg *Config) (*ro
 		Help:    "Latency of the requests processed by the server",
 		Buckets: cfg.RollupBuckets,
 	}, []string{})
+
+	rollups := NewRollups(defaultRollupGroups)
+	rollupFromFields := map[string]struct{}{}
+	for _, rollup := range rollups {
+		rollupFromFields[rollup.FromField] = struct{}{}
+	}
+
 	err := cfg.promRegistry.Register(rollupHistogram)
 	if err != nil {
 		// Ignore already registered error, as this is not harmful. Metrics may
@@ -121,9 +79,12 @@ func newRollupProcessor(set component.ProcessorCreateSettings, cfg *Config) (*ro
 			return nil, fmt.Errorf("couldn't register prometheus metrics: %w", err)
 		}
 	}
+
 	return &rollupProcessor{
-		cfg:             cfg,
-		rollupHistogram: rollupHistogram,
+		cfg:              cfg,
+		rollupHistogram:  rollupHistogram,
+		rollups:          rollups,
+		rollupFromFields: rollupFromFields,
 	}, nil
 }
 
@@ -144,7 +105,7 @@ func (rp *rollupProcessor) Shutdown(context.Context) error {
 
 // ConsumeLogs implements LogsProcessor.
 func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
-	applyCardinalityLimits(ld, rp.cfg.AttributeCardinalityLimit)
+	rp.applyCardinalityLimits(ld, rp.cfg.AttributeCardinalityLimit)
 
 	rollupData := make(map[string]pcommon.Map)
 	datasketches := make(map[string]map[string]*sketches.HeapDoublesSketch)
@@ -152,7 +113,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 	log.Trace().Int("count", ld.LogRecordCount()).Msg("Before rollup")
 	otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) otelcollector.IterAction {
 		attributes := logRecord.Attributes()
-		key := rp.key(attributes, rollupsLog)
+		key := rp.key(attributes)
 		_, exists := rollupData[key]
 		if !exists {
 			rollupData[key] = attributes
@@ -164,7 +125,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 		}
 		rawCount, _ := rollupData[key].Get(RollupCountKey)
 		rollupData[key].PutInt(RollupCountKey, rawCount.Int()+1)
-		rp.rollupAttributes(datasketches[key], rollupData[key], attributes, rollupsLog)
+		rp.rollupAttributes(datasketches[key], rollupData[key], attributes)
 		return otelcollector.Keep
 	})
 	for k, v := range datasketches {
@@ -182,7 +143,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 	return rp.exportLogs(ctx, rollupData)
 }
 
-func applyCardinalityLimits(ld plog.Logs, limit int) {
+func (rp *rollupProcessor) applyCardinalityLimits(ld plog.Logs, limit int) {
 	attributeValues := map[string]map[string]struct{}{}
 	otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) otelcollector.IterAction {
 		logRecord.Attributes().Range(func(k string, v pcommon.Value) bool {
@@ -192,7 +153,7 @@ func applyCardinalityLimits(ld plog.Logs, limit int) {
 			if v.Type() != pcommon.ValueTypeStr {
 				return true
 			}
-			if _, toRollup := rollupFromFields[k]; toRollup {
+			if _, toRollup := rp.rollupFromFields[k]; toRollup {
 				return true
 			}
 			value := v.Str()
@@ -218,10 +179,9 @@ func (rp *rollupProcessor) rollupAttributes(
 	datasketches map[string]*sketches.HeapDoublesSketch,
 	baseAttributes,
 	attributes pcommon.Map,
-	rollups []*Rollup,
 ) {
 	// TODO tgill: need to track latest timestamp from attributes as the timestamp in baseAttributes
-	for _, rollup := range rollups {
+	for _, rollup := range rp.rollups {
 		switch rollup.Type {
 		case RollupSum:
 			newValue, found := rollup.GetFromFieldValue(attributes)
@@ -291,8 +251,8 @@ func (rp *rollupProcessor) rollupAttributes(
 		}
 	}
 	// Exclude list
-	for _, rollup := range rollups {
-		baseAttributes.Remove(rollup.FromField)
+	for fromField := range rp.rollupFromFields {
+		baseAttributes.Remove(fromField)
 	}
 }
 
@@ -322,9 +282,9 @@ func (rp *rollupProcessor) exportLogs(ctx context.Context, rollupData map[string
 
 // key returns string key used in the hashmap. Current implementations marshals
 // the map to JSON. This might be suboptimal.
-func (rp *rollupProcessor) key(am pcommon.Map, rollups []*Rollup) string {
+func (rp *rollupProcessor) key(am pcommon.Map) string {
 	raw := am.AsRaw()
-	for _, rollup := range rollups {
+	for _, rollup := range rp.rollups {
 		// Removing all fields from which we will get rolled up values, as those
 		// are dimensions not to be considered as "key".
 		delete(raw, rollup.FromField)

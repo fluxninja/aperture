@@ -52,9 +52,11 @@ func (p *alertsReceiver) run(ctx context.Context) {
 		select {
 		case alert := <-p.cfg.alerter.AlertsChan():
 			err := p.logsConsumer.ConsumeLogs(ctx, alert.AsLogs())
-			// We do not care much about those errors. Alerts can be dropped sometimes,
-			// they are sent all the time anyway.
-			log.Autosample().Debug().Err(err).Msg("ConsumeLogs failed")
+			if err != nil {
+				// We do not care much about those errors. Alerts can be dropped sometimes,
+				// they are sent all the time anyway.
+				log.Autosample().Debug().Err(err).Msg("ConsumeLogs failed")
+			}
 		case <-ctx.Done():
 			return
 		}
