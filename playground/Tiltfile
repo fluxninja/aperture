@@ -802,7 +802,14 @@ def render_jsonnet(manifests_path, jsonnet_args=None):
     )
 
 def process_aperture_scenario(scenario_path):
-    app_manifest = read_json(scenario_path + "/metadata.json")
+    # If this is a relative path, it's relative to Tiltfile (PLAYGROUND_ROOT_PATH)
+    if scenario_path[0] != "/":
+        scenario_path = PLAYGROUND_ROOT + "/" + scenario_path
+
+    app_manifest = read_json(scenario_path + "/metadata.json", default='')
+    if app_manifest == '':
+        fail("Unable to find or parse metadata.json, will not continue.")
+
     app_manifest["manifests_path"] = scenario_path + "/" + "manifests"
     app_manifest["labels"] = "TestScenarioApplication"
     images = app_manifest.get("images", [])
@@ -1063,6 +1070,8 @@ if cfg.get("manual", False):
 
 
 scenario = cfg.get("scenario", None)
+# If we are running specific test scenario, we don't want to run all workloads but only what's needed
+# to execute scenarios.
 if scenario:
     to_run = ["agent", "controller", "aperture-grafana", "istio", "scenario-app", "scenario-policies", "scenario-wavepool"]
     process_aperture_scenario(scenario)
