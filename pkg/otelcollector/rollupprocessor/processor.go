@@ -3,7 +3,6 @@ package rollupprocessor
 import (
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -113,7 +112,7 @@ func (rp *rollupProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 	log.Trace().Int("count", ld.LogRecordCount()).Msg("Before rollup")
 	otelcollector.IterateLogRecords(ld, func(logRecord plog.LogRecord) otelcollector.IterAction {
 		attributes := logRecord.Attributes()
-		key := rp.key(attributes)
+		key := key(attributes, rp.rollupFromFields)
 		_, exists := rollupData[key]
 		if !exists {
 			rollupData[key] = attributes
@@ -278,23 +277,6 @@ func (rp *rollupProcessor) exportLogs(ctx context.Context, rollupData map[string
 	}
 	log.Trace().Int("count", ld.LogRecordCount()).Msg("After rollup")
 	return rp.logsNextConsumer.ConsumeLogs(ctx, ld)
-}
-
-// key returns string key used in the hashmap. Current implementations marshals
-// the map to JSON. This might be suboptimal.
-func (rp *rollupProcessor) key(am pcommon.Map) string {
-	raw := am.AsRaw()
-	for _, rollup := range rp.rollups {
-		// Removing all fields from which we will get rolled up values, as those
-		// are dimensions not to be considered as "key".
-		delete(raw, rollup.FromField)
-	}
-	key, err := json.Marshal(raw)
-	if err != nil {
-		log.Bug().Err(err).Msg("key: Failed marshaling map to JSON")
-		return ""
-	}
-	return string(key)
 }
 
 // newRollupLogsProcessor creates a new rollup processor that rollupes logs.
