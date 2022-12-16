@@ -1,5 +1,6 @@
 {
-  "renderer": "yaml",
+  "renderer": "tanka",
+  "tkenv": "manifests/",
   "images": [
     {
       "ref": "graphql-demo-app",

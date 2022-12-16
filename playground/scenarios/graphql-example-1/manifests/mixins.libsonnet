@@ -1,4 +1,4 @@
-local graphqlDemoApp = import 'apps/graphql-demoapp/main.libsonnet';
+local graphqlDemoApp = import './main.libsonnet';
 
 local k = import 'github.com/jsonnet-libs/k8s-libsonnet/1.22/main.libsonnet';
 
