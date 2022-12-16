@@ -1,6 +1,8 @@
 package alerts_test
 
 import (
+	"time"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -15,6 +17,8 @@ var _ = Describe("Alert", func() {
 			alerts.WithAnnotation("two", "twelve"),
 			alerts.WithName("buzz"),
 			alerts.WithSeverity(alerts.SeverityCrit),
+			alerts.WithAlertChannels([]string{"one", "two", "three"}),
+			alerts.WithResolveTimeout(50*time.Second),
 		)
 		finalAlert := alert
 		finalAlert.SetLabel("is_alert", "true")

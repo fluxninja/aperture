@@ -45,6 +45,7 @@ func (ex *alertsExporter) ConsumeLogs(ctx context.Context, ld plog.Logs) error {
 	alerts := alerts.AlertsFromLogs(ld)
 
 	for _, amClient := range ex.cfg.alertMgr.Clients {
+		log.Trace().Int("alerts", ld.LogRecordCount()).Str("client", amClient.GetName()).Msg("Exporting alerts")
 		err := amClient.SendAlerts(ctx, alerts)
 		if err != nil {
 			log.Warn().Err(err).Msgf("could not send alerts for client: %+v", amClient.GetName())

@@ -12,7 +12,6 @@ local flowSelector = aperture.spec.v1.FlowSelector;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowMatcher = aperture.spec.v1.FlowMatcher;
 local controlPoint = aperture.spec.v1.ControlPoint;
-local staticBuckets = aperture.spec.v1.FluxMeterStaticBuckets;
 
 local svcSelector = flowSelector.new()
                     + flowSelector.withServiceSelector(

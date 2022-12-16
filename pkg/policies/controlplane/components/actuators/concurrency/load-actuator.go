@@ -216,7 +216,7 @@ func (la *LoadActuator) createAlert() *alerts.Alert {
 	if evalTimeout > timeout {
 		timeout = evalTimeout
 	}
-	newAlert.SetAnnotation("resolve_timeout", timeout.String())
+	newAlert.SetResolveTimeout(timeout)
 
 	return newAlert
 }
