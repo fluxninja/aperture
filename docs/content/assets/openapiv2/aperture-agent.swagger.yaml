@@ -62,6 +62,77 @@ paths:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
+  /v1/flowcontrol/preview/labels/{control_point}:
+    get:
+      tags:
+      - aperture-agent
+      operationId: FlowPreviewService_PreviewFlowLabels2
+      parameters:
+      - type: string
+        description: Control point to preview. Required field.
+        name: control_point
+        in: path
+        required: true
+      - type: string
+        format: int64
+        description: Number of samples to collect. Defaults to 10.
+        name: samples
+        in: query
+      - type: boolean
+        description: Preview values in addition to key. Default is false. In order
+          to enable value previews, please enable value previews in agent configuration
+          as well.
+        name: preview_label_values
+        in: query
+      - type: string
+        description: Service to preview. Empty value implies catch all service.
+        name: service
+        in: query
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1PreviewFlowLabelsResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+  /v1/flowcontrol/preview/labels/{service}/{control_point}:
+    get:
+      tags:
+      - aperture-agent
+      operationId: FlowPreviewService_PreviewFlowLabels
+      parameters:
+      - type: string
+        description: Service to preview. Empty value implies catch all service.
+        name: service
+        in: path
+        required: true
+      - type: string
+        description: Control point to preview. Required field.
+        name: control_point
+        in: path
+        required: true
+      - type: string
+        format: int64
+        description: Number of samples to collect. Defaults to 10.
+        name: samples
+        in: query
+      - type: boolean
+        description: Preview values in addition to key. Default is false. In order
+          to enable value previews, please enable value previews in agent configuration
+          as well.
+        name: preview_label_values
+        in: query
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1PreviewFlowLabelsResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
   /v1/info/host:
     get:
       tags:
@@ -170,6 +241,16 @@ definitions:
         type: object
         additionalProperties:
           $ref: '#/definitions/v1Entity'
+  PreviewFlowLabelsResponseFlowLabel:
+    type: object
+    properties:
+      count:
+        type: string
+        format: int64
+      key:
+        type: string
+      value:
+        type: string
   googlerpcStatus:
     type: object
     properties:
@@ -379,6 +460,16 @@ definitions:
           $ref: '#/definitions/v1Peer'
       self_peer:
         $ref: '#/definitions/v1Peer'
+  v1PreviewFlowLabelsResponse:
+    type: object
+    properties:
+      labels:
+        type: array
+        items:
+          $ref: '#/definitions/PreviewFlowLabelsResponseFlowLabel'
+      total_samples:
+        type: string
+        format: int64
   v1ProcessInfo:
     type: object
     properties:

@@ -5,6 +5,7 @@ info:
 tags:
   - name: EntityCacheService
   - name: FlowControlService
+  - name: FlowPreviewService
   - name: InfoService
   - name: PeerDiscoveryService
   - name: PolicyService
@@ -101,6 +102,78 @@ paths:
           in: path
           required: true
           type: string
+      tags:
+        - aperture-agent
+  /v1/flowcontrol/preview/labels/{control_point}:
+    get:
+      operationId: FlowPreviewService_PreviewFlowLabels2
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1PreviewFlowLabelsResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: control_point
+          description: Control point to preview. Required field.
+          in: path
+          required: true
+          type: string
+        - name: samples
+          description: Number of samples to collect. Defaults to 10.
+          in: query
+          required: false
+          type: string
+          format: int64
+        - name: preview_label_values
+          description: Preview values in addition to key. Default is false. In order to enable value previews, please enable value previews in agent configuration as well.
+          in: query
+          required: false
+          type: boolean
+        - name: service
+          description: Service to preview. Empty value implies catch all service.
+          in: query
+          required: false
+          type: string
+      tags:
+        - aperture-agent
+  /v1/flowcontrol/preview/labels/{service}/{control_point}:
+    get:
+      operationId: FlowPreviewService_PreviewFlowLabels
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1PreviewFlowLabelsResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: service
+          description: Service to preview. Empty value implies catch all service.
+          in: path
+          required: true
+          type: string
+        - name: control_point
+          description: Control point to preview. Required field.
+          in: path
+          required: true
+          type: string
+        - name: samples
+          description: Number of samples to collect. Defaults to 10.
+          in: query
+          required: false
+          type: string
+          format: int64
+        - name: preview_label_values
+          description: Preview values in addition to key. Default is false. In order to enable value previews, please enable value previews in agent configuration as well.
+          in: query
+          required: false
+          type: boolean
       tags:
         - aperture-agent
   /v1/info/host:
@@ -343,6 +416,16 @@ definitions:
         description: List of subexpressions of the match expression.
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     title: List of MatchExpressions that is used for all/any matching
+  PreviewFlowLabelsResponseFlowLabel:
+    type: object
+    properties:
+      count:
+        type: string
+        format: int64
+      key:
+        type: string
+      value:
+        type: string
   RateLimiterLazySync:
     type: object
     properties:
@@ -1919,6 +2002,16 @@ definitions:
         type: object
         additionalProperties:
           $ref: '#/definitions/v1PolicyWrapper'
+  v1PreviewFlowLabelsResponse:
+    type: object
+    properties:
+      labels:
+        type: array
+        items:
+          $ref: '#/definitions/PreviewFlowLabelsResponseFlowLabel'
+      total_samples:
+        type: string
+        format: int64
   v1ProcessInfo:
     type: object
     properties:

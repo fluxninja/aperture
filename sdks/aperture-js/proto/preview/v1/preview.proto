@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package aperture.flowcontrol.preview.v1;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+service FlowPreviewService {
+  rpc PreviewFlowLabels(PreviewFlowLabelsRequest) returns (PreviewFlowLabelsResponse) {
+    option (google.api.http) = {
+      get: "/v1/flowcontrol/preview/labels/{service}/{control_point}"
+      additional_bindings {get: "/v1/flowcontrol/preview/labels/{control_point}"}
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-agent"];
+    };
+  }
+}
+
+message PreviewFlowLabelsRequest {
+  // Number of samples to collect. Defaults to 10.
+  int64 samples = 1;
+  // Preview values in addition to key. Default is false. In order to enable value previews, please enable value previews in agent configuration as well.
+  bool preview_label_values = 2;
+  // Control point to preview. Required field.
+  string control_point = 3 [(google.api.field_behavior) = REQUIRED];
+  // Service to preview. Empty value implies catch all service.
+  string service = 4;
+}
+
+message PreviewFlowLabelsResponse {
+  message FlowLabel {
+    string key = 1;
+    string value = 2;
+    int64 count = 3;
+  }
+  int64 total_samples = 1;
+  repeated FlowLabel labels = 2;
+}
