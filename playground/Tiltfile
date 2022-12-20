@@ -181,13 +181,6 @@ DEP_TREE = {
                         ("^controller-kube-state-metrics", "Service|Deployment", APERTURE_CONTROLLER_NS),
                     ]
                 },
-                {
-                    "new_name": "policies",
-                    "resource_deps": ["cluster-bootstrap", "controller-service"],
-                    "extra_objects": [
-                        ("service1-demo-app$", "policy", APERTURE_CONTROLLER_NS),
-                    ]
-                },
             ]
         }
     },
