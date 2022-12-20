@@ -5,6 +5,7 @@ import (
 	"context"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
+	concurrencyv3 "go.etcd.io/etcd/client/v3/concurrency"
 	namespacev3 "go.etcd.io/etcd/client/v3/namespace"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -40,13 +41,13 @@ const (
 type EtcdConfig struct {
 	// Lease time-to-live
 	LeaseTTL config.Duration `json:"lease_ttl" validate:"gte=1s" default:"60s"`
-	// List of Etcd server endpoints
-	Endpoints []string `json:"endpoints" validate:"gt=0,dive,hostname_port|url|fqdn"`
-	// Client TLS configuration
-	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
 	// Authentication
 	Username string `json:"username"`
 	Password string `json:"password"`
+	// Client TLS configuration
+	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
+	// List of Etcd server endpoints
+	Endpoints []string `json:"endpoints" validate:"gt=0,dive,hostname_port|url|fqdn"`
 }
 
 // ClientIn holds parameters for ProvideClient.
@@ -59,14 +60,13 @@ type ClientIn struct {
 	Logger       *log.Logger
 }
 
-// Client is a wrapper around etcd client v3.
+// Client is a wrapper around etcd client v3. It provides interfaces rooted by a namespace in etcd.
 type Client struct {
-	// raw client
-	Client *clientv3.Client
-	// interfaces rooted by namespace -- use these for all operations instead of the raw client
 	KV      clientv3.KV
 	Watcher clientv3.Watcher
 	Lease   clientv3.Lease
+	Client  *clientv3.Client
+	Session *concurrencyv3.Session
 	LeaseID clientv3.LeaseID
 }
 
@@ -115,42 +115,35 @@ func ProvideClient(in ClientIn) (*Client, error) {
 			}
 			etcdClient.Client = cli
 
-			etcdClient.Lease = namespacev3.NewLease(etcdClient.Client, namespace)
-			etcdClient.KV = namespacev3.NewKV(etcdClient.Client, namespace)
-			etcdClient.Watcher = namespacev3.NewWatcher(etcdClient.Client, namespace)
+			// namespace the client
+			cli.Lease = namespacev3.NewLease(cli.Lease, namespace)
+			etcdClient.Lease = cli.Lease
+			cli.KV = namespacev3.NewKV(cli.KV, namespace)
+			etcdClient.KV = cli.KV
+			cli.Watcher = namespacev3.NewWatcher(cli.Watcher, namespace)
+			etcdClient.Watcher = cli.Watcher
 
-			// Create a lease with etcd for this client, exit app if lease maintenance fails
-			resp, err := etcdClient.Lease.Grant(ctx, (int64)(config.LeaseTTL.AsDuration().Seconds()))
+			// Create a new Session
+			session, err := concurrencyv3.NewSession(etcdClient.Client, concurrencyv3.WithTTL((int)(config.LeaseTTL.AsDuration().Seconds())))
 			if err != nil {
-				log.Error().Err(err).Msg("Unable to grant a lease")
+				log.Error().Err(err).Msg("Unable to create a new session")
 				cancel()
 				return err
 			}
+			etcdClient.Session = session
 			// save the lease id
-			etcdClient.LeaseID = resp.ID
-
-			// try to keep the lease alive
-			keepAlive, err := etcdClient.Lease.KeepAlive(ctx, etcdClient.LeaseID)
-			if err != nil || keepAlive == nil {
-				log.Error().Err(err).Msg("Unable to keep alive the lease")
-			}
-
+			etcdClient.LeaseID = session.Lease()
+			// A goroutine to check if the session is expired
 			panichandler.Go(func() {
-				for ka := range keepAlive {
-					if ka != nil {
-						continue
-					}
-					log.Error().Msg("Lease failed, TTL is null")
-					break
-				}
+				// wait for the context to be done or session to be closed
 				select {
 				case <-ctx.Done():
 					// regular shutdown
-				default:
-					log.Error().Msg("Request shutdown on lease failure")
-					err := in.Shutdowner.Shutdown()
-					if err != nil {
-						log.Error().Err(err).Msg("Error on invoking shutdown")
+				case <-session.Done():
+					log.Error().Msg("Etcd session is done, request shutdown")
+					shutdownErr := in.Shutdowner.Shutdown()
+					if shutdownErr != nil {
+						log.Error().Err(shutdownErr).Msg("Error on invoking shutdown")
 					}
 				}
 			})
@@ -160,16 +153,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 		OnStop: func(_ context.Context) error {
 			log.Info().Msg("Closing etcd connections")
 			cancel()
-			// revoke the lease
-			_, err := etcdClient.Lease.Revoke(context.Background(), etcdClient.LeaseID)
-			if err != nil {
-				log.Error().Err(err).Msg("Unable to revoke lease")
-			}
-			err = etcdClient.Client.Close()
-			if err != nil {
-				return err
-			}
-			return nil
+			return etcdClient.Client.Close()
 		},
 	})
 
