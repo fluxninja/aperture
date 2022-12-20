@@ -41,8 +41,8 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 			election.Election = concurrencyv3.NewElection(in.Client.Session, "/election/"+in.AgentInfo.GetAgentGroup())
 			// A goroutine to do leader election
 			panichandler.Go(func() {
-				// try to elect a leader
-				err := election.Election.Campaign(ctx, info.GetHostInfo().Hostname)
+				// Campaign for leadership
+				err := election.Election.Campaign(ctx, info.GetHostInfo().Uuid)
 				if err != nil {
 					log.Error().Err(err).Msg("Unable to elect a leader")
 					shutdownErr := in.Shutdowner.Shutdown()
@@ -50,13 +50,19 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 						log.Error().Err(shutdownErr).Msg("Error on invoking shutdown")
 					}
 				}
+				// Check if canceled
+				if ctx.Err() != nil {
+					return
+				}
+				// This is the leader
+				election.isLeader = true
 			})
 
 			return nil
 		},
 		OnStop: func(_ context.Context) error {
 			cancel()
-			// resign from the election if are the leader
+			// resign from the election if we are the leader
 			if election.IsLeader() {
 				stopCtx, stopCancel := context.WithTimeout(context.Background(), time.Duration(time.Second*5))
 				err := election.Election.Resign(stopCtx)
@@ -76,9 +82,10 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 // Election is a wrapper around etcd election.
 type Election struct {
 	Election *concurrencyv3.Election
+	isLeader bool
 }
 
 // IsLeader returns true if the current node is the leader.
 func (e *Election) IsLeader() bool {
-	return e.Election.Key() != ""
+	return e.isLeader
 }
