@@ -20,7 +20,6 @@ Generated File Starts
 
 | Key          | Reference                          |
 | ------------ | ---------------------------------- |
-| `agent_info` | [AgentInfo](#agent-info)           |
 | `client`     | [Client](#client)                  |
 | `etcd`       | [Etcd](#etcd)                      |
 | `liveness`   | [Liveness](#liveness)              |
@@ -43,23 +42,6 @@ Generated File Starts
 | `sentry_plugin`    | [SentryPlugin](#sentry-plugin)        |
 
 ## Reference
-
-### _AgentInfo_ {#agent-info}
-
-Key: `agent_info`
-
-#### Members
-
-<dl>
-
-<dt></dt>
-<dd>
-
-Type: [AgentInfoConfig](#agent-info-config)
-
-</dd>
-
-</dl>
 
 ### _Client_ {#client}
 
@@ -436,23 +418,6 @@ AdaptivePolicy creates a policy that forces GC when the usage surpasses the conf
 <dd>
 
 (float64, `gte=0,lte=1`, default: `0.50`) Factor sets user-configured limit of available memory
-
-</dd>
-</dl>
-
-### AgentInfoConfig {#agent-info-config}
-
-AgentInfoConfig is the configuration for the agent group and other agent attributes.
-
-#### Properties
-
-<dl>
-<dt>agent_group</dt>
-<dd>
-
-(string, default: `default`) All agents within an agent_group receive the same data-plane configuration (e.g. Flux Meters, Rate Limiters etc).
-
-[Read more about agent groups here](/concepts/service.md#agent-group).
 
 </dd>
 </dl>

@@ -10,7 +10,6 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
@@ -59,7 +58,6 @@ type ClientIn struct {
 	Lifecycle    fx.Lifecycle
 	Shutdowner   fx.Shutdowner
 	Logger       *log.Logger
-	AgentInfo    *agentinfo.AgentInfo
 }
 
 // Client is a wrapper around etcd client v3. It provides interfaces rooted by a namespace in etcd.
