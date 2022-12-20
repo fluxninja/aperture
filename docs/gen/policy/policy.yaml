@@ -490,36 +490,40 @@ definitions:
           This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
         x-order: 8
         $ref: '#/definitions/v1GradientController'
+      integrator:
+        description: Accumulates sum of signal every tick.
+        x-order: 9
+        $ref: '#/definitions/v1Integrator'
       max:
         description: Emits the maximum of the input signals.
-        x-order: 9
+        x-order: 10
         $ref: '#/definitions/v1Max'
       min:
         description: Emits the minimum of the input signals.
-        x-order: 10
+        x-order: 11
         $ref: '#/definitions/v1Min'
       promql:
         description: Periodically runs a Prometheus query in the background and emits
           the result.
-        x-order: 11
+        x-order: 12
         $ref: '#/definitions/v1PromQL'
       rate_limiter:
         description: Rate Limiter provides service protection by applying rate limiter.
-        x-order: 12
+        x-order: 13
         $ref: '#/definitions/v1RateLimiter'
       sink:
         description: Sink is a sink component that does nothing.
-        x-order: 13
+        x-order: 14
         $ref: '#/definitions/v1Sink'
       sqrt:
         description: Takes an input signal and emits the square root of the input
           signal.
-        x-order: 14
+        x-order: 15
         $ref: '#/definitions/v1Sqrt'
       switcher:
         description: Switcher acts as a switch that emits one of the two signals based
           on third signal.
-        x-order: 15
+        x-order: 16
         $ref: '#/definitions/v1Switcher'
   v1ConcurrencyLimiter:
     description: |-
@@ -1164,6 +1168,46 @@ definitions:
         description: Name of the incoming Signal on the InPort.
         type: string
         x-order: 1
+  v1Integrator:
+    description: Accumulates sum of signal every tick.
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the Integrator component.
+        x-order: 0
+        $ref: '#/definitions/v1IntegratorIns'
+      out_ports:
+        description: Output ports for the Integrator component.
+        x-order: 1
+        $ref: '#/definitions/v1IntegratorOuts'
+  v1IntegratorIns:
+    description: Inputs for the Integrator component.
+    type: object
+    properties:
+      input:
+        description: The input signal.
+        x-order: 0
+        $ref: '#/definitions/v1InPort'
+      max:
+        description: The maximum output when reset is not set.
+        x-order: 1
+        $ref: '#/definitions/v1InPort'
+      min:
+        description: The minimum output when reset is not set.
+        x-order: 2
+        $ref: '#/definitions/v1InPort'
+      reset:
+        description: Resets the integrator output to zero when reset signal is valid
+          and non-zero.
+        x-order: 3
+        $ref: '#/definitions/v1InPort'
+  v1IntegratorOuts:
+    description: Outputs for the Integrator component.
+    type: object
+    properties:
+      output:
+        x-order: 0
+        $ref: '#/definitions/v1OutPort'
   v1JSONExtractor:
     description: |-
       Example:

@@ -649,6 +649,9 @@ definitions:
           Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
           This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
         $ref: '#/definitions/v1GradientController'
+      integrator:
+        description: Accumulates sum of signal every tick.
+        $ref: '#/definitions/v1Integrator'
       max:
         description: Emits the maximum of the input signals.
         $ref: '#/definitions/v1Max'
@@ -1274,6 +1277,39 @@ definitions:
       signal_name:
         description: Name of the incoming Signal on the InPort.
         type: string
+  v1Integrator:
+    description: Accumulates sum of signal every tick.
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the Integrator component.
+        $ref: '#/definitions/v1IntegratorIns'
+      out_ports:
+        description: Output ports for the Integrator component.
+        $ref: '#/definitions/v1IntegratorOuts'
+  v1IntegratorIns:
+    description: Inputs for the Integrator component.
+    type: object
+    properties:
+      input:
+        description: The input signal.
+        $ref: '#/definitions/v1InPort'
+      max:
+        description: The maximum output when reset is not set.
+        $ref: '#/definitions/v1InPort'
+      min:
+        description: The minimum output when reset is not set.
+        $ref: '#/definitions/v1InPort'
+      reset:
+        description: Resets the integrator output to zero when reset signal is valid
+          and non-zero.
+        $ref: '#/definitions/v1InPort'
+  v1IntegratorOuts:
+    description: Outputs for the Integrator component.
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
   v1JSONExtractor:
     description: |-
       Example:

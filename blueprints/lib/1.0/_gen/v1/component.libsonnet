@@ -55,6 +55,12 @@
   withGradientControllerMixin(gradient_controller):: {
     gradient_controller+: gradient_controller,
   },
+  withIntegrator(integrator):: {
+    integrator: integrator,
+  },
+  withIntegratorMixin(integrator):: {
+    integrator+: integrator,
+  },
   withMax(max):: {
     max: max,
   },

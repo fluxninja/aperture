@@ -188,6 +188,9 @@ message Component {
 
     // Alerter reacts to a signal and generates alert to send to alert manager.
     Alerter alerter = 16;
+
+    // Accumulates sum of signal every tick.
+    Integrator integrator = 17;
   }
 }
 
@@ -1167,4 +1170,30 @@ message Alerter {
 
   // Alerter configuration
   AlerterConfig alerter_config = 2;
+}
+
+// Accumulates sum of signal every tick.
+message Integrator {
+  // Inputs for the Integrator component.
+  message Ins {
+    // The input signal.
+    InPort input = 1;
+    // Resets the integrator output to zero when reset signal is valid and non-zero.
+    InPort reset = 2;
+    // The minimum output when reset is not set.
+    InPort min = 3;
+    //The maximum output when reset is not set.
+    InPort max = 4;
+  }
+
+  // Outputs for the Integrator component.
+  message Outs {
+    OutPort output = 1;
+  }
+
+  // Input ports for the Integrator component.
+  Ins in_ports = 1;
+
+  // Output ports for the Integrator component.
+  Outs out_ports = 2;
 }
