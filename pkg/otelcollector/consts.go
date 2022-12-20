@@ -146,6 +146,8 @@ const (
 	// ProcessorTracesToLogs converts received tracess to logs and passes them to configured
 	// log exporter.
 	ProcessorTracesToLogs = "tracestologs"
+	// ProcessorAlertsNamespace adds host info as `namespace` attribute.
+	ProcessorAlertsNamespace = "attributes/alerts"
 
 	// ExporterLogging exports telemetry using Aperture logger.
 	ExporterLogging = "logging"
@@ -169,4 +171,6 @@ const (
 	AlertChannelsLabel = "alert_channels"
 	// IsAlertLabel helps to differentiate normal logs from alert logs.
 	IsAlertLabel = "is_alert"
+	// AlertNamespaceLabel which required by Alertmanager. Set to host name.
+	AlertNamespaceLabel = "namespace"
 )

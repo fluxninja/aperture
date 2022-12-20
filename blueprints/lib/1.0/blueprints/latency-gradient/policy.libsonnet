@@ -18,6 +18,7 @@ local decider = spec.v1.Decider;
 local switcher = spec.v1.Switcher;
 local loadActuator = spec.v1.LoadActuator;
 local loadActuatorDynamicConfig = spec.v1.LoadActuatorDynamicConfig;
+local alerterConfig = spec.v1.AlerterConfig;
 local max = spec.v1.Max;
 local min = spec.v1.Min;
 local sqrt = spec.v1.Sqrt;
@@ -136,6 +137,10 @@ function(params) {
             + concurrencyLimiter.withLoadActuator(
               loadActuator.withInPortsMixin({ load_multiplier: port.withSignalName('LOAD_MULTIPLIER') })
               + loadActuator.withDynamicConfigKey('concurrency_limiter')
+              + loadActuator.withAlerterConfig(
+                alerterConfig.new()
+                + alerterConfig.withAlertChannels($._config.policyName)
+              )
             )
           ),
           component.withDecider(

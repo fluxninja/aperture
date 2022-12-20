@@ -48,7 +48,6 @@ var specialLabels = map[string]struct{}{
 	otelcollector.AlertNameLabel:         {},
 	otelcollector.AlertSeverityLabel:     {},
 	otelcollector.AlertGeneratorURLLabel: {},
-	otelcollector.AlertChannelsLabel:     {},
 }
 
 // AlertOption is a type for constructor options.
@@ -184,6 +183,18 @@ func WithGeneratorURL(value string) AlertOption {
 	}
 }
 
+// SetResolveTimeout sets a resolve timeout which says when given alert becomes resolved.
+func (a *Alert) SetResolveTimeout(t time.Duration) {
+	a.postableAlert.EndsAt = strfmt.DateTime(time.Time(a.postableAlert.StartsAt).Add(t))
+}
+
+// WithResolveTimeout is an option function for constructor.
+func WithResolveTimeout(t time.Duration) AlertOption {
+	return func(a *Alert) {
+		a.SetResolveTimeout(t)
+	}
+}
+
 // AlertsFromLogs gets slice of alerts from OTEL Logs.
 func AlertsFromLogs(ld plog.Logs) []*Alert {
 	// We can't preallocate size, as we don't know how many of those log records
@@ -207,6 +218,7 @@ func AlertsFromLogs(ld plog.Logs) []*Alert {
 				logRecord := logsSlice.At(logsIt)
 				a := &Alert{}
 				a.postableAlert.StartsAt = strfmt.DateTime(logRecord.Timestamp().AsTime())
+				a.postableAlert.EndsAt = strfmt.DateTime(logRecord.ObservedTimestamp().AsTime())
 				a.postableAlert.GeneratorURL = strfmt.URI(generatorURL.AsString())
 				a.postableAlert.Labels = models.LabelSet(mapFromAttributes(resourceAttributes, specialLabels))
 				a.SetSeverity(ParseSeverity(logRecord.SeverityText()))
@@ -233,6 +245,7 @@ func (a *Alert) AsLogs() plog.Logs {
 
 	logRecord := resource.ScopeLogs().AppendEmpty().LogRecords().AppendEmpty()
 	logRecord.SetTimestamp(pcommon.NewTimestampFromTime(time.Time(a.postableAlert.StartsAt)))
+	logRecord.SetObservedTimestamp(pcommon.NewTimestampFromTime(time.Time(a.postableAlert.EndsAt)))
 	logRecord.SetSeverityText(a.Severity().String())
 	pcommon.NewValueStr(a.Name()).CopyTo(logRecord.Body())
 

@@ -19,7 +19,9 @@ func TestEnrichmentprocessor(t *testing.T) {
 
 func assertAttributesEqual(act, exp pcommon.Map) {
 	Expect(act.Len()).To(Equal(exp.Len()))
-	Expect(act.Sort()).To(Equal(exp.Sort()))
+	act.Sort()
+	exp.Sort()
+	Expect(act).To(Equal(exp))
 }
 
 func populateAttrsFromLabels(attr pcommon.Map, labels map[string]interface{}) {

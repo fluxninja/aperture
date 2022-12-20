@@ -78,7 +78,7 @@ func (a *Alerter) createAlert() *alerts.Alert {
 		alerts.WithAlertChannels(a.alertChannels),
 		alerts.WithLabel("policy_name", a.policyReadAPI.GetPolicyName()),
 		alerts.WithLabel("type", "alerter"),
-		alerts.WithAnnotation("resolve_timeout", a.resolveTimeout.String()),
+		alerts.WithResolveTimeout(a.resolveTimeout),
 		alerts.WithGeneratorURL(
 			fmt.Sprintf("http://%s/%s/%s", info.GetHostInfo().Hostname, a.policyReadAPI.GetPolicyName(), a.name),
 		),
