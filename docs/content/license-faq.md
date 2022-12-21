@@ -16,10 +16,10 @@ import Zoom from 'react-medium-image-zoom';
 Aperture is free and open-source software that is dually licensed:
 
 - [GNU Affero General Public License](https://www.gnu.org/licenses/agpl-3.0.en.html)
-  (GNU AGPLv3): TLDR; it requires enhancements (modifications) made to Aperture
-  be release to the community. If you are not making modifications (99% users)
-  to Aperture, there is nothing more to be done to meet the terms of this
-  license.
+  (GNU AGPLv3): In simple terms, it requires enhancements (modifications) made
+  to Aperture be release to the community. If you are not making modifications
+  (99% users) to Aperture, there is nothing more to be done to meet the
+  obligation of this license.
 
 - Enterprise License: Customers of FluxNinja are provided Aperture under
   commercial license terms that bypass obligations of GNU AGPLv3. Please contact
