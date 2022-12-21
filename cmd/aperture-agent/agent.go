@@ -52,7 +52,10 @@ func main() {
 	)
 
 	if err := app.Err(); err != nil {
-		visualize, _ := fx.VisualizeError(err)
+		visualize, viserr := fx.VisualizeError(err)
+		if viserr != nil {
+			log.Panic().Err(viserr).Msgf("Failed to visualize fx error: %s", viserr)
+		}
 		log.Panic().Err(err).Msg("fx.New failed: " + visualize)
 	}
 
