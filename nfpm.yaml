@@ -32,7 +32,7 @@ contents:
   - <<: *conf_dir
     dst: /etc/aperture/aperture-agent/config
   - src: ./packaging/aperture-agent.yaml
-    dst: /etc/aperture/aperture-agent/config/aperture-agent.yaml
+    dst: /etc/aperture/aperture-agent/config/aperture-agent.yaml.example
   - src: ./packaging/aperture-agent.service
     # TODO: Should we install it in system or user subdir?
     dst: /usr/lib/systemd/system/aperture-agent.service

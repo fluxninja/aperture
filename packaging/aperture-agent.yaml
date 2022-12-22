@@ -9,7 +9,8 @@
 
 log:
   level: info
-  file: stderr
+  non_blocking: false
+  pretty_console: true
 
 plugins:
   disable_plugins: false
