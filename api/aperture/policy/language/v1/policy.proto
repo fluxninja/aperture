@@ -191,6 +191,9 @@ message Component {
 
     // Accumulates sum of signal every tick.
     Integrator integrator = 17;
+
+    // Differentiator calculates rate of change per tick.
+    Differentiator differentiator = 18;
   }
 }
 
@@ -1196,4 +1199,31 @@ message Integrator {
 
   // Output ports for the Integrator component.
   Outs out_ports = 2;
+}
+
+// Differentiator calculates rate of change per tick.
+message Differentiator {
+  // Inputs for the Differentiator component.
+  message Ins {
+    InPort input = 1;
+  }
+
+  // Outputs for the Differentiator component.
+  message Outs {
+    OutPort output = 1;
+  }
+
+  // Input ports for the Differentiator component.
+  Ins in_ports = 1;
+
+  // Output ports for the Differentiator component.
+  Outs out_ports = 2;
+
+  // The window of time over which differentiator operates.
+  google.protobuf.Duration window = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {string_value: "5s"}
+    }
+  }]; // @gotags: default:"5s"
 }
