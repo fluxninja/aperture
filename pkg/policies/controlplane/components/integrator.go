@@ -6,13 +6,15 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/constraints"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
 // Integrator is a component that accumulates sum of signal every tick.
 type Integrator struct {
-	sum float64
+	sum    float64
+	minMax *constraints.MinMaxConstraints
 }
 
 // Name implements runtime.Component.
@@ -24,7 +26,8 @@ func (*Integrator) Type() runtime.ComponentType { return runtime.ComponentTypeSi
 // NewIntegrator creates an integrator component.
 func NewIntegrator() runtime.Component {
 	integrator := &Integrator{
-		sum: 0,
+		sum:    0,
+		minMax: constraints.NewMinMaxConstraints(),
 	}
 	return integrator
 }
@@ -44,14 +47,13 @@ func (in *Integrator) Execute(inPortReadings runtime.PortToValue, tickInfo runti
 		minVal := inPortReadings.ReadSingleValuePort("min")
 		maxVal := inPortReadings.ReadSingleValuePort("max")
 
-		value := inputVal.Value()
-		if value < minVal.Value() {
-			value = minVal.Value()
-		} else if value > maxVal.Value() {
-			value = maxVal.Value()
-		}
+		if minVal.Valid() && maxVal.Valid() {
+			in.minMax.Max = maxVal.Value()
+			in.minMax.Min = minVal.Value()
 
-		in.sum += value
+			value, _ := in.minMax.Constrain(inputVal.Value())
+			in.sum += value
+		}
 	}
 
 	return runtime.PortToValue{
