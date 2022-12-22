@@ -31,6 +31,12 @@
   withDeciderMixin(decider):: {
     decider+: decider,
   },
+  withDifferentiator(differentiator):: {
+    differentiator: differentiator,
+  },
+  withDifferentiatorMixin(differentiator):: {
+    differentiator+: differentiator,
+  },
   withEma(ema):: {
     ema: ema,
   },
