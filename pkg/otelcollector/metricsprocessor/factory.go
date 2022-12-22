@@ -9,8 +9,9 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/processor/processorhelper"
 
-	"github.com/fluxninja/aperture/pkg/controlpointcache"
+	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
 
 const (
@@ -23,7 +24,7 @@ func NewFactory(
 	promRegistry *prometheus.Registry,
 	engine iface.Engine,
 	clasEng iface.ClassificationEngine,
-	controlPointCache *controlpointcache.ControlPointCache,
+	controlPointCache *cache.Cache[selectors.ControlPointID],
 ) component.ProcessorFactory {
 	return component.NewProcessorFactory(
 		typeStr,
@@ -36,7 +37,7 @@ func createDefaultConfig(
 	promRegistry *prometheus.Registry,
 	engine iface.Engine,
 	clasEng iface.ClassificationEngine,
-	controlPointCache *controlpointcache.ControlPointCache,
+	controlPointCache *cache.Cache[selectors.ControlPointID],
 ) component.CreateDefaultConfigFunc {
 	return func() component.Config {
 		return &Config{

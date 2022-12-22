@@ -16,7 +16,6 @@ import (
 	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/alerts"
-	"github.com/fluxninja/aperture/pkg/controlpointcache"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
@@ -156,7 +155,6 @@ var _ = BeforeSuite(func() {
 			servicegetter.NewEmpty,
 			agentinfo.ProvideAgentInfo,
 			flowcontrol.NewEngine,
-			controlpointcache.Provide,
 		),
 		otelcollector.Module(),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),

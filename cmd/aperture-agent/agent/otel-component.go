@@ -31,7 +31,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/alertmanager"
 	"github.com/fluxninja/aperture/pkg/alerts"
-	"github.com/fluxninja/aperture/pkg/controlpointcache"
+	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
@@ -41,6 +41,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/tracestologsprocessor"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
 
 // ModuleForAgentOTEL provides fx options for AgentOTELComponent.
@@ -52,6 +53,7 @@ func ModuleForAgentOTEL() fx.Option {
 				provideAgent,
 				fx.ResultTags(otelcollector.BaseFxTag),
 			),
+			cache.NewCache[selectors.ControlPointID],
 			fx.Annotate(
 				AgentOTELComponents,
 				fx.ParamTags(alerts.AlertsFxTag),
@@ -68,7 +70,7 @@ func AgentOTELComponents(
 	engine iface.Engine,
 	clasEng iface.ClassificationEngine,
 	serverGRPC *grpc.Server,
-	controlPointCache *controlpointcache.ControlPointCache,
+	controlPointCache *cache.Cache[selectors.ControlPointID],
 	alertMgr *alertmanager.AlertManager,
 ) (component.Factories, error) {
 	var errs error
