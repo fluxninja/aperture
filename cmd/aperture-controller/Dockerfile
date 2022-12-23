@@ -46,5 +46,5 @@ RUN apk add --no-cache libc6-compat
 RUN apk add --no-cache curl
 RUN mkdir -p /etc/aperture/aperture-controller/classifiers /etc/aperture/aperture-controller/policies /etc/aperture/aperture-controller/plugins
 COPY --link --from=builder /aperture-controller /aperture-controller
-COPY --link --from=plugins-builder /plugins /var/lib/aperture/aperture-controller/plugins
+COPY --link --from=plugins-builder /plugins /opt/aperture/aperture-controller/plugins
 CMD ["/aperture-controller"]
