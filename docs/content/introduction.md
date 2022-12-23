@@ -16,7 +16,7 @@ keywords:
 ---
 
 ```mdx-code-block
-export const apertureVersion = "0.15.0";
+export const apertureVersion = "0.16.0";
 ```
 
 ```mdx-code-block
