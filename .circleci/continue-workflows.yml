@@ -22,9 +22,15 @@ executors:
     machine:
       image: ubuntu-2204:2022.10.2
       docker_layer_caching: true
+  ubuntu-18-executor:
+    docker:
+      - image: cimg/base:2022.12-18.04
 
 parameters:
   updated-aperture:
+    type: boolean
+    default: false
+  updated-aperture-agent-packaging:
     type: boolean
     default: false
   updated-aperture-operator:
@@ -588,8 +594,150 @@ jobs:
             cd <<parameters.path>>
             gradle test
 
+  package-agent:
+    parameters:
+      executor:
+        type: executor
+        description: executor to use for this job
+        default: ubuntu-18-executor
+      workspace-name:
+        type: string
+        description:
+          the name of the workspace to which built packages should be added
+        default: packages
+      goarch:
+        type: string
+        description: the GOARCH to use for the build
+        default: amd64
+      upload-to-gcp:
+        type: boolean
+        default: false
+        description: Whether to push artifacts to GCP
+    executor: <<parameters.executor>>
+    environment:
+      PACKAGES_DIR: "/tmp/packages"
+      GOARCH: <<parameters.goarch>>
+    steps:
+      - checkout
+      - asdf_install: # We need to install python before gcloud
+          cache_name: aperture-agent-deb-packages
+          tools: |-
+            python
+            gcloud
+            golang
+      - run:
+          name: "Set build vars"
+          command: |
+            GIT_BRANCH="$(git branch --show-current)"
+            GIT_COMMIT_HASH="$(git log -n1 --format=%H)"
+            GOOS="$(go env GOOS)"
+            component=aperture-controller
+            tag_matcher="releases/${component}/*"
+            current_branch="$(git branch --show-current)"
+            tag="$(git tag -l --sort="-version:refname" "${tag_matcher}" | head -n1 | cut -d/ -f 3)"
+            commits="$(git rev-list "${tag}"..HEAD --count)"
+            VERSION="${tag##*/}-b.${commits}"
+            mkdir -p $HOME/go
+            GOPATH=$HOME/go
+            PATH=$PATH:$GOPATH/bin
+            if which dpkg; then
+              PACKAGER=deb
+            elif which rpm; then
+              PACKAGER=rpm
+            elif which apk; then
+              PACKAGER=apk
+            else
+              echo "Unable to determine proper packager for current OS"
+              exit 1
+            fi
+
+            export GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION PACKAGER GOPATH PATH
+            declare -p GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION PACKAGER GOPATH PATH >> "${BASH_ENV}"
+          environment:
+            RELEASE_TAG: <<pipeline.git.tag>>
+      - restore_cache:
+          name: Restore go cache
+          keys:
+            - aperture-agent-deb-packages-go-cache-{{ checksum "~/day" }}
+      - run:
+          name: "Compile agent and plugins"
+          command: |
+            SOURCE="./cmd/aperture-agent" TARGET="./dist/aperture-agent" ./pkg/info/build.sh
+            for plugin_dir in ./plugins/*/aperture-plugin-*; do
+              plugin="$(basename "${plugin_dir}")"
+              echo "Building plugin ${plugin}"
+              SOURCE="${plugin_dir}" TARGET="./dist/plugins/${plugin}.so" ./pkg/plugins/build.sh
+            done
+          environment:
+            CGO_ENABLED: "1"
+            PREFIX: "aperture"
+            LDFLAGS: "-s -w -extldflags \"-Wl,--allow-multiple-definition\""
+      - run:
+          name: Install nFPM
+          command: |
+            filename="nfpm_amd64.${PACKAGER}"
+            file="/tmp/${filename}"
+            curl --silent --show-error --location https://github.com/goreleaser/nfpm/releases/latest/download/${filename} -o "${file}"
+            case "${PACKAGER}" in
+              deb) sudo dpkg -i "${file}";;
+              rpm) sudo rpm -i "${file}";;
+              apk) sudo apk add --allow-untrusted "${file}";;
+              *) echo "Unknown packager ${PACKAGER}"; exit 1;;
+            esac
+            which nfpm
+      - run:
+          name: Package
+          command: |
+            mkdir -p dist/packages/
+            nfpm package --packager "${PACKAGER}" --target dist/packages/
+            ls -l dist/packages/
+      - when:
+          condition: <<parameters.upload-to-gcp>>
+          steps:
+            - run:
+                name: GCloud SOPS Auth
+                command: .circleci/scripts/setup_gcloud.sh
+            - run:
+                name: Upload package to GCP
+                command: |
+                  gcloud config set artifacts/repository aperture-deb-packages
+                  gcloud config set artifacts/location us-central1
+                  gcloud artifacts apt upload aperture-deb-packages --source=dist/packages/$(ls dist/packages) --project=${GOOGLE_PROJECT_ID}
+      - save_cache:
+          name: Save go cache
+          key: aperture-agent-deb-packages-go-cache-{{ checksum "~/day" }}
+          paths:
+            - ../.cache/go-build
+          when: on_success
+      - asdf_save_cache:
+          cache_name: aperture-agent-deb-packages
+
 workflows:
   version: 2
+
+  build-aperture-agent-deb-package:
+    when:
+      and:
+        - not:
+            equal: [main, << pipeline.git.branch >>]
+        - or:
+          - << pipeline.parameters.updated-aperture-agent-packaging >>
+          - << pipeline.parameters.updated-aperture >>
+    jobs:
+      - package-agent:
+          name: build-aperture-agent-deb-package
+
+  publish-aperture-agent-deb-package:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - or:
+          - << pipeline.parameters.updated-aperture-agent-packaging >>
+          - << pipeline.parameters.updated-aperture >>
+    jobs:
+      - package-agent:
+          name: publish-aperture-agent-deb-package
+          upload-to-gcp: true
 
   aperture:
     when:
