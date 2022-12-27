@@ -29,15 +29,22 @@ To install agent, first download package for your manager from [Releases Page](h
 
 Alternatively download it using following script:
 
+```mdx-code-block
+export const DownloadScript = ({children, packager}) => (
 <CodeBlock language="bash">
 {`VERSION="${apertureVersion}"
 ARCH="amd64"
-PACKAGER="$(which dpkg && echo "deb" || which rpm && echo "rpm")"
+PACKAGER="${packager}"
 url="https://github.com/fluxninja/aperture/releases/download/v\${VERSION}/aperture-agent_\${VERSION}_\${ARCH}.\${PACKAGER}"
 echo "Will download \${PACKAGER} package version \${VERSION} compiled for \${ARCH} machine"
 curl --fail --location --remote-name "\${url}"
 `}</CodeBlock>
+);
+```
 
+<Tabs groupId="packageManager" queryString>
+  <TabItem value="dpkg" label="dpkg"><DownloadScript packager="deb"/></TabItem>
+</Tabs>
 
 ## Installation {#agent-installation}
 
