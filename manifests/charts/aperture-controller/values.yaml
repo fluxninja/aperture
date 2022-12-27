@@ -529,10 +529,20 @@ controller:
     prometheus:
       address: ~
 
+## @section Ingress
+##
+ingress:
+  ## @param ingress.enabled Enables Ingress for Etcd and Prometheus
+  enabled: false
+  ## @param ingress.domain_name Domain Name to use for configuring the Paths
+  domain_name: ~
+
 ## @section etcd
 ## @param etcd.enabled Whether to deploy a small etcd cluster as part of this chart
 ## @param etcd.auth.rbac.create specifies whether to create the RBAC resources for Etcd
 ## @param etcd.auth.token.type specifies the type of token to use
+## @param etcd.autoCompactionMode Auto compaction mode, by default periodic. Valid values: "periodic", "revision".
+## @param etcd.autoCompactionRetention Auto compaction retention for mvcc key value store in hour, by default 0, means disabled.
 ## @param etcd.initContainer.enabled Create init container to check the health of Etcd before starting Aperture Controller.
 ## @param etcd.initContainer.image.registry Init container image registry.
 ## @param etcd.initContainer.image.repository Init container image repository.
