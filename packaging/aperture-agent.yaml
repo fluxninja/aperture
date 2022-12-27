@@ -1,15 +1,16 @@
-## The address to promethus instance connected to the controller
+## The address of promethus instance connected with the Aperture Controller
 # prometheus:
 #   address: http://myprometheus:9090
 
-## The endpoints to etcd connected to the controller
+## The endpoints of etcd connected with the Aperture Controller
 # etcd:
 #   endpoints:
 #     - http://myetcd:2379
 
 log:
   level: info
-  file: stderr
+  non_blocking: false
+  pretty_console: true
 
 plugins:
   disable_plugins: false

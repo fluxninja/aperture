@@ -17,7 +17,7 @@ scripts:
   postinstall: ./packaging/post-install.sh
 contents:
   - src: ./dist/aperture-agent
-    dst: /usr/local/bin/aperture-agent
+    dst: /opt/aperture/bin/aperture-agent
   - &conf_dir
     dst: /etc/aperture/aperture-agent/flowcontrol
     type: dir
@@ -26,13 +26,12 @@ contents:
   - <<: *conf_dir
     dst: /etc/aperture/aperture-agent/classifiers
   - <<: *conf_dir
-    dst: /etc/aperture/aperture-agent/plugins
+    dst: /opt/aperture/aperture-agent/plugins
   - src: ./dist/plugins/*.so
-    dst: /etc/aperture/aperture-agent/plugins
+    dst: /opt/aperture/aperture-agent/plugins
   - <<: *conf_dir
     dst: /etc/aperture/aperture-agent/config
   - src: ./packaging/aperture-agent.yaml
-    dst: /etc/aperture/aperture-agent/config/aperture-agent.yaml
+    dst: /etc/aperture/aperture-agent/config/aperture-agent.yaml.example
   - src: ./packaging/aperture-agent.service
-    # TODO: Should we install it in system or user subdir?
     dst: /usr/lib/systemd/system/aperture-agent.service
