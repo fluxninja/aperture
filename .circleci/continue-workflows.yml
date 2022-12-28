@@ -686,7 +686,7 @@ jobs:
                   for package in "deb" "rpm"
                   do
                     gcloud config set artifacts/repository aperture-${package}-packages
-                    gcloud artifacts apt upload aperture-${package}-packages --source=dist/packages/$(ls dist/packages/*.${package}) --project=${GOOGLE_PROJECT_ID}
+                    gcloud artifacts apt upload aperture-${package}-packages --source="$(ls dist/packages/*.${package})" --project=${GOOGLE_PROJECT_ID}
                   done
       - save_cache:
           name: Save go cache
