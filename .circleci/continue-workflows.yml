@@ -596,10 +596,6 @@ jobs:
 
   package-agent:
     parameters:
-      executor:
-        type: executor
-        description: executor to use for this job
-        default: ubuntu-18-executor
       workspace-name:
         type: string
         description:
@@ -613,14 +609,14 @@ jobs:
         type: boolean
         default: false
         description: Whether to push artifacts to GCP
-    executor: <<parameters.executor>>
+    executor: ubuntu-18-executor
     environment:
       PACKAGES_DIR: "/tmp/packages"
       GOARCH: <<parameters.goarch>>
     steps:
       - checkout
       - asdf_install: # We need to install python before gcloud
-          cache_name: aperture-agent-deb-packages
+          cache_name: aperture-agent-bare-metal-packages
           tools: |-
             python
             gcloud
@@ -640,25 +636,15 @@ jobs:
             mkdir -p $HOME/go
             GOPATH=$HOME/go
             PATH=$PATH:$GOPATH/bin
-            if which dpkg; then
-              PACKAGER=deb
-            elif which rpm; then
-              PACKAGER=rpm
-            elif which apk; then
-              PACKAGER=apk
-            else
-              echo "Unable to determine proper packager for current OS"
-              exit 1
-            fi
 
-            export GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION PACKAGER GOPATH PATH
-            declare -p GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION PACKAGER GOPATH PATH >> "${BASH_ENV}"
+            export GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION GOPATH PATH
+            declare -p GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION GOPATH PATH >> "${BASH_ENV}"
           environment:
             RELEASE_TAG: <<pipeline.git.tag>>
       - restore_cache:
           name: Restore go cache
           keys:
-            - aperture-agent-deb-packages-go-cache-{{ checksum "~/day" }}
+            - aperture-agent-bare-metal-packages-go-cache-{{ checksum "~/day" }}
       - run:
           name: "Compile agent and plugins"
           command: |
@@ -675,21 +661,17 @@ jobs:
       - run:
           name: Install nFPM
           command: |
-            filename="nfpm_amd64.${PACKAGER}"
+            filename="nfpm_amd64.deb"
             file="/tmp/${filename}"
             curl --silent --show-error --location https://github.com/goreleaser/nfpm/releases/latest/download/${filename} -o "${file}"
-            case "${PACKAGER}" in
-              deb) sudo dpkg -i "${file}";;
-              rpm) sudo rpm -i "${file}";;
-              apk) sudo apk add --allow-untrusted "${file}";;
-              *) echo "Unknown packager ${PACKAGER}"; exit 1;;
-            esac
+            sudo dpkg -i "${file}"
             which nfpm
       - run:
           name: Package
           command: |
             mkdir -p dist/packages/
-            nfpm package --packager "${PACKAGER}" --target dist/packages/
+            nfpm package --packager deb --target dist/packages/
+            nfpm package --packager rpm --target dist/packages/
             ls -l dist/packages/
       - when:
           condition: <<parameters.upload-to-gcp>>
@@ -700,22 +682,25 @@ jobs:
             - run:
                 name: Upload package to GCP
                 command: |
-                  gcloud config set artifacts/repository aperture-deb-packages
                   gcloud config set artifacts/location us-central1
-                  gcloud artifacts apt upload aperture-deb-packages --source=dist/packages/$(ls dist/packages) --project=${GOOGLE_PROJECT_ID}
+                  for package in "deb" "rpm"
+                  do
+                    gcloud config set artifacts/repository aperture-${package}-packages
+                    gcloud artifacts apt upload aperture-${package}-packages --source=dist/packages/$(ls dist/packages/*.${package}) --project=${GOOGLE_PROJECT_ID}
+                  done
       - save_cache:
           name: Save go cache
-          key: aperture-agent-deb-packages-go-cache-{{ checksum "~/day" }}
+          key: aperture-agent-bare-metal-packages-go-cache-{{ checksum "~/day" }}
           paths:
             - ../.cache/go-build
           when: on_success
       - asdf_save_cache:
-          cache_name: aperture-agent-deb-packages
+          cache_name: aperture-agent-bare-metal-packages
 
 workflows:
   version: 2
 
-  build-aperture-agent-deb-package:
+  build-aperture-agent-bare-metal-package:
     when:
       and:
         - not:
@@ -725,9 +710,9 @@ workflows:
           - << pipeline.parameters.updated-aperture >>
     jobs:
       - package-agent:
-          name: build-aperture-agent-deb-package
+          name: build-aperture-agent-bare-metal-package
 
-  publish-aperture-agent-deb-package:
+  publish-aperture-agent-bare-metal-package:
     when:
       and:
         - equal: [main, << pipeline.git.branch >>]
@@ -736,7 +721,7 @@ workflows:
           - << pipeline.parameters.updated-aperture >>
     jobs:
       - package-agent:
-          name: publish-aperture-agent-deb-package
+          name: publish-aperture-agent-bare-metal-package
           upload-to-gcp: true
 
   aperture:
