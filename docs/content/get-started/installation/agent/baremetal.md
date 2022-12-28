@@ -25,7 +25,8 @@ The Aperture Agent can be installed as a system service.
 The Aperture Agent can be installed using packages made for your system's
 package manager like `dpkg`<!-- or `rpm` -->.
 
-To install agent, first download package for your manager from [Releases Page](https://github.com/fluxninja/aperture/releases/latest).
+To install agent, first download package for your manager from
+[Releases Page](https://github.com/fluxninja/aperture/releases/latest).
 
 Alternatively download it using following script:
 
@@ -51,9 +52,9 @@ curl --fail --location --remote-name "\${url}"
 <Tabs groupId="packageManager" queryString>
   <TabItem value="dpkg" label="dpkg">
 
-  ```bash
-  sudo dpkg -i "aperture-agent_${VERSION}_${ARCH}.${PACKAGER}"
-  ```
+```bash
+sudo dpkg -i "aperture-agent_${VERSION}_${ARCH}.${PACKAGER}"
+```
 
   </TabItem>
 </Tabs>
@@ -64,12 +65,13 @@ by editing `/etc/aperture/aperture-agent/config/aperture-agent.yaml`.
 :::info
 
 The default config disables the FluxNinja Cloud Plugin for the Aperture Agent.
-If you want to keep it enabled, add parameters provided [here](/cloud/plugin.md#configuration).
+If you want to keep it enabled, add parameters provided
+[here](/cloud/plugin.md#configuration).
 
 :::
 
-After installing, you should enable the `aperture-agent` systemd service,
-and make it start after system boot:
+After installing, you should enable the `aperture-agent` systemd service, and
+make it start after system boot:
 
 ```bash
 sudo systemctl enable --now aperture-agent
@@ -77,8 +79,8 @@ sudo systemctl enable --now aperture-agent
 
 :::caution
 
-Currently configuration watcher and automatic reload doesn't work.
-If you modify the configuration file, make sure to restart the service:
+Currently configuration watcher and automatic reload doesn't work. If you modify
+the configuration file, make sure to restart the service:
 
 ```bash
 sudo systemctl restart aperture-agent
@@ -92,18 +94,18 @@ You can then view service status:
 systemctl status aperture-service
 ```
 
-To view the logs, when default log configuration is used, you can use `journalctl`:
+To view the logs, when default log configuration is used, you can use
+`journalctl`:
 
 ```bash
 journalctl -u aperture-agent --since "15 minutes ago"
 ```
 
-
 ## Upgrade
 
-[Download](#agent-download) updated package
-and follow [installation](#agent-installation) steps.
-Remember to restart the service after installation is complete.
+[Download](#agent-download) updated package and follow
+[installation](#agent-installation) steps. Remember to restart the service after
+installation is complete.
 
 ## Uninstall
 
@@ -123,5 +125,5 @@ Remember to restart the service after installation is complete.
     ```
 
     </TabItem>
-  </Tabs>
 
+  </Tabs>
