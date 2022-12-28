@@ -670,6 +670,8 @@ jobs:
           name: Package
           command: |
             mkdir -p dist/packages/
+            vless_version="${VERSION##v}"
+            export VERSION=${vless_version//[-]/\~}
             nfpm package --packager deb --target dist/packages/
             nfpm package --packager rpm --target dist/packages/
             ls -l dist/packages/
@@ -686,7 +688,10 @@ jobs:
                   for package in "deb" "rpm"
                   do
                     gcloud config set artifacts/repository aperture-${package}-packages
-                    gcloud artifacts apt upload aperture-${package}-packages --source="$(ls dist/packages/*.${package})" --project=${GOOGLE_PROJECT_ID}
+                    case "${package}" in
+                      deb) gcloud artifacts apt upload aperture-${package}-packages --source="$(ls dist/packages/*.${package})" --project=${GOOGLE_PROJECT_ID};;
+                      rpm) gcloud artifacts yum upload aperture-${package}-packages --source="$(ls dist/packages/*.${package})" --project=${GOOGLE_PROJECT_ID};;
+                    esac
                   done
       - save_cache:
           name: Save go cache
