@@ -1,7 +1,6 @@
 # check https://nfpm.goreleaser.com/configuration for detailed usage
 name: "aperture-agent"
 arch: "${GOARCH}"
-platform: "${GOOS}"
 version: "${VERSION}"
 section: "default"
 priority: "extra"
