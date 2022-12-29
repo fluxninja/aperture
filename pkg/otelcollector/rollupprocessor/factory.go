@@ -5,8 +5,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/component"
-	"go.opentelemetry.io/collector/config"
 	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/processor"
 )
 
 const (
@@ -17,17 +17,16 @@ const (
 var defaultRollupBuckets = []float64{10, 25, 100, 250, 1000, 2500, 10000}
 
 // NewFactory returns a new factory for the Rollup processor.
-func NewFactory(promRegistry *prometheus.Registry) component.ProcessorFactory {
-	return component.NewProcessorFactory(
+func NewFactory(promRegistry *prometheus.Registry) processor.Factory {
+	return processor.NewFactory(
 		typeStr,
 		createDefaultConfig(promRegistry),
-		component.WithLogsProcessor(CreateLogsProcessor, component.StabilityLevelDevelopment))
+		processor.WithLogs(CreateLogsProcessor, component.StabilityLevelDevelopment))
 }
 
 func createDefaultConfig(promRegistry *prometheus.Registry) func() component.Config {
 	return func() component.Config {
 		return &Config{
-			ProcessorSettings:         config.NewProcessorSettings(component.NewID(typeStr)),
 			AttributeCardinalityLimit: defaultAttributeCardinalityLimit,
 			RollupBuckets:             defaultRollupBuckets,
 			promRegistry:              promRegistry,
@@ -38,9 +37,9 @@ func createDefaultConfig(promRegistry *prometheus.Registry) func() component.Con
 // CreateLogsProcessor returns rollupProcessor handling logs.
 func CreateLogsProcessor(
 	_ context.Context,
-	set component.ProcessorCreateSettings,
+	set processor.CreateSettings,
 	cfg component.Config,
 	nextConsumer consumer.Logs,
-) (component.LogsProcessor, error) {
+) (processor.Logs, error) {
 	return newRollupLogsProcessor(set, nextConsumer, cfg.(*Config))
 }
