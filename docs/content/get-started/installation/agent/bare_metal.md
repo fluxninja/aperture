@@ -1,6 +1,6 @@
 ---
-title: Baremetal/VM
-description: Install Aperture Agent on Baremetal or VM
+title: Bare Metal/VM
+description: Install Aperture Agent on Bare Metal or VM
 keywords:
   - install
   - setup
@@ -18,25 +18,27 @@ import CodeBlock from '@theme/CodeBlock';
 import {apertureVersion} from '../../../introduction.md';
 ```
 
-The Aperture Agent can be installed as a system service.
+The Aperture Agent can be installed as a system service on any Linux system
+that's [supported](supported-platforms.md).
 
 ## Download {#agent-download}
 
 The Aperture Agent can be installed using packages made for your system's
-package manager like `dpkg`<!-- or `rpm` -->.
+package manager like `dpkg` or `rpm`.
 
-To install agent, first download package for your manager from
+To install Aperture Agent, first download package for your manager from
 [Releases Page](https://github.com/fluxninja/aperture/releases/latest).
 
 Alternatively download it using following script:
 
 ```mdx-code-block
-export const DownloadScript = ({children, packager}) => (
+export const DownloadScript = ({children, packager, arch, separator}) => (
 <CodeBlock language="bash">
 {`VERSION="${apertureVersion}"
-ARCH="amd64"
+ARCH="${arch}"
 PACKAGER="${packager}"
-url="https://github.com/fluxninja/aperture/releases/download/v\${VERSION}/aperture-agent_\${VERSION}_\${ARCH}.\${PACKAGER}"
+SEPARATOR="${separator}"
+url="https://github.com/fluxninja/aperture/releases/download/v\${VERSION}/aperture-agent_\${VERSION}\${SEPARATOR}\${ARCH}.\${PACKAGER}"
 echo "Will download \${PACKAGER} package version \${VERSION} compiled for \${ARCH} machine"
 curl --fail --location --remote-name "\${url}"
 `}</CodeBlock>
@@ -44,23 +46,31 @@ curl --fail --location --remote-name "\${url}"
 ```
 
 <Tabs groupId="packageManager" queryString>
-  <TabItem value="dpkg" label="dpkg"><DownloadScript packager="deb"/></TabItem>
+  <TabItem value="dpkg" label="dpkg">
+    <DownloadScript packager="deb" arch="amd64" separator="_" />
+  </TabItem>
+  <TabItem value="rpm" label="rpm">
+    <DownloadScript packager="rpm" arch="x86_64" separator="." />
+  </TabItem>
 </Tabs>
 
 ## Installation {#agent-installation}
 
 <Tabs groupId="packageManager" queryString>
   <TabItem value="dpkg" label="dpkg">
-
-```bash
-sudo dpkg -i "aperture-agent_${VERSION}_${ARCH}.${PACKAGER}"
-```
-
+    <CodeBlock language="bash">{`sudo dpkg -i aperture-agent_${apertureVersion}*.deb`}</CodeBlock>
+  </TabItem>
+  <TabItem value="rpm" label="rpm">
+    <CodeBlock language="bash">{`sudo rpm -i aperture-agent_${apertureVersion}*.rpm`}</CodeBlock>
   </TabItem>
 </Tabs>
 
-You should then point agent at etcd and prometheus deployed by the Controller,
-by editing `/etc/aperture/aperture-agent/config/aperture-agent.yaml`.
+You should then point Aperture Agent at etcd and prometheus deployed by the
+Aperture Controller, by editing
+`/etc/aperture/aperture-agent/config/aperture-agent.yaml`.
+
+All the config parameters for the Aperture Agent are available
+[here](/references/configuration/agent.md).
 
 :::info
 
@@ -79,8 +89,8 @@ sudo systemctl enable --now aperture-agent
 
 :::caution
 
-Currently configuration watcher and automatic reload doesn't work. If you modify
-the configuration file, make sure to restart the service:
+Currently configuration watcher and automatic reload aren't supported. If you
+modify the configuration file, make sure to restart the service:
 
 ```bash
 sudo systemctl restart aperture-agent
@@ -91,7 +101,7 @@ sudo systemctl restart aperture-agent
 You can then view service status:
 
 ```bash
-systemctl status aperture-service
+sudo systemctl status aperture-agent
 ```
 
 To view the logs, when default log configuration is used, you can use
@@ -109,19 +119,33 @@ installation is complete.
 
 ## Uninstall
 
-1. **Optional**: Remove the agent configuration:
+1. Stop the Aperture Agent service:
 
-   ```bash
-   sudo rm /etc/aperture/aperture-agent/config/aperture-agent.yaml
-   ```
+```bash
+sudo systemctl stop aperture-agent
+```
 
-2. Uninstall the package:
+2. **Optional**: Remove the agent configuration:
+
+```bash
+sudo rm /etc/aperture/aperture-agent/config/aperture-agent.yaml
+```
+
+3. Uninstall the package:
 
   <Tabs groupId="packageManager" queryString>
     <TabItem value="dpkg" label="dpkg">
 
     ```bash
     sudo dpkg -r aperture-agent
+    ```
+
+    </TabItem>
+
+    <TabItem value="rpm" label="rpm">
+
+    ```bash
+    sudo rpm -e aperture-agent
     ```
 
     </TabItem>
