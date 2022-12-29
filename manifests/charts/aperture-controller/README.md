@@ -165,18 +165,28 @@
 | `controller.config.prometheus.address`                       | specifies the address of the Prometheus server. Example, "http://prometheus-server:80". This must not be empty when prometheus.enabled is set to false. | `nil`    |
 
 
+### Ingress
+
+| Name                  | Description                                  | Value   |
+| --------------------- | -------------------------------------------- | ------- |
+| `ingress.enabled`     | Enables Ingress for Etcd and Prometheus      | `false` |
+| `ingress.domain_name` | Domain Name to use for configuring the Paths | `nil`   |
+
+
 ### etcd
 
-| Name                                  | Description                                                                            | Value               |
-| ------------------------------------- | -------------------------------------------------------------------------------------- | ------------------- |
-| `etcd.enabled`                        | Whether to deploy a small etcd cluster as part of this chart                           | `true`              |
-| `etcd.auth.rbac.create`               | specifies whether to create the RBAC resources for Etcd                                | `false`             |
-| `etcd.auth.token.type`                | specifies the type of token to use                                                     | `simple`            |
-| `etcd.initContainer.enabled`          | Create init container to check the health of Etcd before starting Aperture Controller. | `true`              |
-| `etcd.initContainer.image.registry`   | Init container image registry.                                                         | `docker.io/bitnami` |
-| `etcd.initContainer.image.repository` | Init container image repository.                                                       | `etcd`              |
-| `etcd.initContainer.image.tag`        | Init container image tag.                                                              | `3.5`               |
-| `etcd.initContainer.image.pullPolicy` | Init container image pull policy.                                                      | `IfNotPresent`      |
+| Name                                  | Description                                                                               | Value               |
+| ------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------- |
+| `etcd.enabled`                        | Whether to deploy a small etcd cluster as part of this chart                              | `true`              |
+| `etcd.auth.rbac.create`               | specifies whether to create the RBAC resources for Etcd                                   | `false`             |
+| `etcd.auth.token.type`                | specifies the type of token to use                                                        | `simple`            |
+| `etcd.autoCompactionMode`             | Auto compaction mode, by default periodic. Valid values: "periodic", "revision".          | `periodic`          |
+| `etcd.autoCompactionRetention`        | Auto compaction retention for mvcc key value store in hour, by default 0, means disabled. | `24`                |
+| `etcd.initContainer.enabled`          | Create init container to check the health of Etcd before starting Aperture Controller.    | `true`              |
+| `etcd.initContainer.image.registry`   | Init container image registry.                                                            | `docker.io/bitnami` |
+| `etcd.initContainer.image.repository` | Init container image repository.                                                          | `etcd`              |
+| `etcd.initContainer.image.tag`        | Init container image tag.                                                                 | `3.5`               |
+| `etcd.initContainer.image.pullPolicy` | Init container image pull policy.                                                         | `IfNotPresent`      |
 
 
 ### prometheus

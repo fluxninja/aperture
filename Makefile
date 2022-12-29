@@ -24,7 +24,12 @@ go-test:
 	@echo Running go tests
 	@{ \
 		export KUBEBUILDER_ASSETS=$(shell make operator-setup_envtest -s); \
-		gotestsum --format=pkgname; \
+		PKGS=$$(go list ./...); \
+		gotestsum \
+			--format=pkgname \
+			--packages="$${PKGS}" \
+			-- \
+				-ldflags='-extldflags "-Wl,--allow-multiple-definition"'; \
 	}
 
 go-lint:
