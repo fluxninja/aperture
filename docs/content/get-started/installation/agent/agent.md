@@ -47,4 +47,4 @@ The Aperture Agent can be installed in below listed modes:
 2. [**Bare Metal/VM**](bare_metal.md)
 
    The Aperture Agent can be installed as a system service on any Linux system
-   that's [supported](/get-started/installation/agent/supported-platforms.md).
+   that's [supported](supported-platforms.md).

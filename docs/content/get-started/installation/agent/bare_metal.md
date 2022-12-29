@@ -19,7 +19,7 @@ import {apertureVersion} from '../../../introduction.md';
 ```
 
 The Aperture Agent can be installed as a system service on any Linux system
-that's [supported](/get-started/installation/agent/supported-platforms.md).
+that's [supported](supported-platforms.md).
 
 ## Download {#agent-download}
 
@@ -56,24 +56,12 @@ curl --fail --location --remote-name "\${url}"
 
 ## Installation {#agent-installation}
 
-```mdx-code-block
-export const InstallTab = ({children, packager, arch, separator}) => (
-<CodeBlock language="bash">
-{`
-VERSION="${apertureVersion}"
-ARCH="${arch}"
-PACKAGER="${packager}"
-SEPARATOR="${separator}"
-sudo \${PACKAGER} -i aperture-agent_\${VERSION}\${SEPARATOR}\${ARCH}.\${PACKAGER}
-`}</CodeBlock>
-);
-```
-
 <Tabs groupId="packageManager" queryString>
   <TabItem value="dpkg" label="dpkg">
-    <InstallTab packager="deb" arch="amd64" separator="_" /></TabItem>
+    <CodeBlock language="bash">{`sudo dpkg -i aperture-agent_${apertureVersion}*.deb`}</CodeBlock>
+  </TabItem>
   <TabItem value="rpm" label="rpm">
-    <InstallTab packager="rpm" arch="x86_64" separator="." />
+    <CodeBlock language="bash">{`sudo rpm -i aperture-agent_${apertureVersion}*.rpm`}</CodeBlock>
   </TabItem>
 </Tabs>
 
@@ -113,7 +101,7 @@ sudo systemctl restart aperture-agent
 You can then view service status:
 
 ```bash
-systemctl status aperture-agent
+sudo systemctl status aperture-agent
 ```
 
 To view the logs, when default log configuration is used, you can use
@@ -131,7 +119,19 @@ installation is complete.
 
 ## Uninstall
 
-1. Uninstall the package:
+1. Stop the Aperture Agent service:
+
+```bash
+sudo systemctl stop aperture-agent
+```
+
+2. **Optional**: Remove the agent configuration:
+
+```bash
+sudo rm /etc/aperture/aperture-agent/config/aperture-agent.yaml
+```
+
+3. Uninstall the package:
 
   <Tabs groupId="packageManager" queryString>
     <TabItem value="dpkg" label="dpkg">
@@ -145,15 +145,9 @@ installation is complete.
     <TabItem value="rpm" label="rpm">
 
     ```bash
-    $ sudo rpm -e aperture-agent
+    sudo rpm -e aperture-agent
     ```
 
     </TabItem>
 
   </Tabs>
-
-2. **Optional**: Remove the agent configuration:
-
-```bash
-sudo rm /etc/aperture/aperture-agent/config/aperture-agent.yaml
-```
