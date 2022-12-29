@@ -627,10 +627,10 @@ jobs:
             GIT_BRANCH="$(git branch --show-current)"
             GIT_COMMIT_HASH="$(git log -n1 --format=%H)"
             GOOS="$(go env GOOS)"
-            component=aperture-controller
+            component=aperture-agent
             tag_matcher="releases/${component}/*"
             current_branch="$(git branch --show-current)"
-            tag="$(git tag -l --sort="-version:refname" "${tag_matcher}" | head -n1 | cut -d/ -f 3)"
+            tag="$(git tag -l --sort="-version:refname" "${tag_matcher}" | head -n1)"
             commits="$(git rev-list "${tag}"..HEAD --count)"
             VERSION="${tag##*/}-b.${commits}"
             mkdir -p $HOME/go
