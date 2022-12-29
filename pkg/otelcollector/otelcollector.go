@@ -7,7 +7,7 @@ import (
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
 	"go.opentelemetry.io/collector/confmap/converter/expandconverter"
-	"go.opentelemetry.io/collector/service"
+	"go.opentelemetry.io/collector/otelcol"
 	logsv1 "go.opentelemetry.io/proto/otlp/collector/logs/v1"
 	metricsv1 "go.opentelemetry.io/proto/otlp/collector/metrics/v1"
 	tracev1 "go.opentelemetry.io/proto/otlp/collector/trace/v1"
@@ -37,7 +37,7 @@ func Module() fx.Option {
 // ConstructorIn describes parameters passed to create OTEL Collector, server providing the OpenTelemetry Collector service.
 type ConstructorIn struct {
 	fx.In
-	Factories     component.Factories
+	Factories     otelcol.Factories
 	Lifecycle     fx.Lifecycle
 	Shutdowner    fx.Shutdowner
 	Unmarshaller  config.Unmarshaller
@@ -49,7 +49,7 @@ type ConstructorIn struct {
 // setup creates and runs a new instance of OTEL Collector with the passed configuration.
 func setup(in ConstructorIn) error {
 	uris := []string{"file:main"}
-	var otelService *service.Collector
+	var otelService *otelcol.Collector
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			providers := map[string]confmap.Provider{
@@ -61,7 +61,7 @@ func setup(in ConstructorIn) error {
 				providers[scheme] = NewOTELConfigUnmarshaler(pluginConfig.AsMap())
 			}
 
-			configProvider, err := service.NewConfigProvider(service.ConfigProviderSettings{
+			configProvider, err := otelcol.NewConfigProvider(otelcol.ConfigProviderSettings{
 				ResolverSettings: confmap.ResolverSettings{
 					URIs:      uris,
 					Providers: providers,
@@ -73,8 +73,8 @@ func setup(in ConstructorIn) error {
 			if err != nil {
 				return fmt.Errorf("creating OTEL config provider: %w", err)
 			}
-			otelService, err = service.New(
-				service.CollectorSettings{
+			otelService, err = otelcol.NewCollector(
+				otelcol.CollectorSettings{
 					BuildInfo:               component.NewDefaultBuildInfo(),
 					Factories:               in.Factories,
 					ConfigProvider:          configProvider,
