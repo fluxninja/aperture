@@ -1,7 +1,10 @@
 ---
 title: Introduction
 sidebar_position: 1
-description: Aperture Introduction
+description:
+  Introduction to FluxNinja Aperture, an open-source flow control and
+  reliability management platform for modern web applications.
+image: ./assets/img/aperture_logo.png
 keywords:
   - reliability
   - overload
@@ -13,7 +16,7 @@ keywords:
 ---
 
 ```mdx-code-block
-export const apertureVersion = "0.15.0";
+export const apertureVersion = "0.17.0";
 ```
 
 ```mdx-code-block

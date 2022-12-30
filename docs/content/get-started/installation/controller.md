@@ -219,6 +219,89 @@ into your cluster.
    helm install controller aperture/aperture-controller -n aperture-controller --create-namespace
    ```
 
+## Exposing Etcd and Prometheus services {#expose-etcd-prometheus}
+
+If the Aperture Controller is installed with the packaged Etcd and Prometheus,
+follow below steps to expose them outside of the Kubernetes cluster so that the
+Aperture Agent running on Linux can access them.
+
+:::info
+
+[Contour](https://projectcontour.io/) is used as a
+[Kubernetes Ingress Controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
+in below steps to expose the Etcd and Prometheus services out of Kubernetes
+cluster using Load Balancer.
+
+Any other tools can also be used to expose the Etcd and Prometheus services out
+of the Kubernetes cluster based on your infrastructure.
+
+:::
+
+1. Add the Helm chart repo for Contour in your environment:
+
+   ```bash
+   helm repo add bitnami https://charts.bitnami.com/bitnami
+   ```
+
+2. Install the Contour chart by running the following command:
+
+   ```bash
+   helm install aperture bitnami/contour --namespace projectcontour --create-namespace
+   ```
+
+3. It may take a few minutes for the Contour Load Balancer's IP to become
+   available. You can watch the status by running:
+
+   ```bash
+   kubectl get svc aperture-contour-envoy --namespace projectcontour -w
+   ```
+
+4. Once `EXTERNAL-IP` is no longer `<pending>`, run below command to get the
+   External IP for the Load Balancer:
+
+   ```bash
+   kubectl describe svc aperture-contour-envoy --namespace projectcontour | grep Ingress | awk '{print $3}'
+   ```
+
+5. Add an entry for the above IP in the Cloud provider's DNS configuration. For
+   example, follow steps on
+   [Cloud DNS on GKE](https://cloud.google.com/dns/docs/records) for Google
+   Kubernetes Engine.
+
+6. Configure the below parameters to install the
+   [Kubernetes Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
+   with the Aperture Controller by updating the `values.yaml` created during
+   installation and pass it with `helm upgrade`:
+
+   ```yaml
+   ingress:
+     enabled: true
+     domain_name: YOUR_DOMAIN_HERE
+
+   etcd:
+     service:
+       annotations:
+         projectcontour.io/upstream-protocol.h2c: "2379"
+   ```
+
+   Replace the values of `YOUR_DOMAIN_HERE` with the actual value the domain
+   name under with the External IP is exposed.
+
+   ```bash
+   helm upgrade --install controller aperture/aperture-controller -f values.yaml
+   ```
+
+7. It may take a few minutes for the Ingress resource to get the `ADDRESS`. You
+   can watch the status by running:
+
+   ```bash
+   kubectl get ingress controller-ingress -w
+   ```
+
+8. Once the `ADDRESS` matches the External IP, the Etcd will be accessible on
+   `http://etcd.YOUR_DOMAIN_HERE:80` and the Prometheus will be accessible on
+   `http://prometheus.YOUR_DOMAIN_HERE:80`.
+
 ## Verifying the Installation
 
 Once you have successfully deployed the resources, confirm that the Aperture
@@ -279,8 +362,17 @@ the chart installed above:
    > Note: By design, deleting a chart via Helm doesn’t delete the Custom
    > Resource Definitions (CRDs) installed via the chart.
 
-4. **Optional**: Delete the CRD installed by the chart:
+4. If you have installed the Contour chart for exposing the Etcd and Prometheus
+   service, execute the below command:
+
+   ```bash
+   helm uninstall aperture -n projectcontour
+   kubectl delete namespace projectcontour
+   ```
+
+5. **Optional**: Delete the CRD installed by the chart:
 
    ```bash
    kubectl delete crd controllers.fluxninja.com
+   kubectl delete crd policies.fluxninja.com
    ```

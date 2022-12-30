@@ -4,6 +4,9 @@ executors:
   base-cimg-executor:
     docker:
       - image: cimg/base:2021.07
+  ubuntu-18-executor:
+    docker:
+      - image: cimg/base:2022.12-18.04
 
 jobs:
   publish-protobuf-files:
@@ -103,6 +106,91 @@ jobs:
             cd /home/circleci/project
             git push origin --tags
 
+  publish-aperture-agent-bare-metal-packages:
+    parameters:
+      workspace-name:
+        type: string
+        description:
+          the name of the workspace to which built packages should be added
+        default: packages
+      goarch:
+        type: string
+        description: the GOARCH to use for the build
+        default: amd64
+      tag:
+        type: string
+        description: The release tag
+    executor: ubuntu-18-executor
+    environment:
+      PACKAGES_DIR: "/tmp/packages"
+      GOARCH: <<parameters.goarch>>
+    steps:
+      - checkout
+      - asdf_install:
+          cache_name: aperture-agent-bare-metal-packages
+          tools: |-
+            golang
+      - run:
+          name: "Set build vars"
+          command: |
+            GIT_BRANCH="$(git branch --show-current)"
+            GIT_COMMIT_HASH="$(git log -n1 --format=%H)"
+            GOOS="$(go env GOOS)"
+            VERSION="${RELEASE_TAG}"
+            mkdir -p $HOME/go
+            GOPATH=$HOME/go
+            PATH=$PATH:$GOPATH/bin
+
+            export GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION GOPATH PATH
+            declare -p GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION GOPATH PATH >> "${BASH_ENV}"
+          environment:
+            RELEASE_TAG: <<parameters.tag>>
+      - restore_cache:
+          name: Restore go cache
+          keys:
+            - aperture-agent-bare-metal-packages-go-cache-{{ checksum "~/day" }}
+      - run:
+          name: "Compile agent and plugins"
+          command: |
+            SOURCE="./cmd/aperture-agent" TARGET="./dist/aperture-agent" ./pkg/info/build.sh
+            for plugin_dir in ./plugins/*/aperture-plugin-*; do
+              plugin="$(basename "${plugin_dir}")"
+              echo "Building plugin ${plugin}"
+              SOURCE="${plugin_dir}" TARGET="./dist/plugins/${plugin}.so" ./pkg/plugins/build.sh
+            done
+          environment:
+            CGO_ENABLED: "1"
+            PREFIX: "aperture"
+            LDFLAGS: "-s -w -extldflags \"-Wl,--allow-multiple-definition\""
+      - run:
+          name: Install nFPM
+          command: |
+            filename="nfpm_amd64.deb"
+            file="/tmp/${filename}"
+            curl --silent --show-error --location https://github.com/goreleaser/nfpm/releases/latest/download/${filename} -o "${file}"
+            sudo dpkg -i "${file}"
+            which nfpm
+      - run:
+          name: Package
+          command: |
+            mkdir -p dist/packages/
+            nfpm package --packager deb --target dist/packages/
+            nfpm package --packager rpm --target dist/packages/
+            ls -l dist/packages/
+      - run:
+          name: Attach packages to release
+          command: |
+            go install github.com/tcnksm/ghr@latest
+            echo ghr "${VERSION}" ./dist/packages/
+      - save_cache:
+          name: Save go cache
+          key: aperture-agent-bare-metal-packages-go-cache-{{ checksum "~/day" }}
+          paths:
+            - ../.cache/go-build
+          when: on_success
+      - asdf_save_cache:
+          cache_name: aperture-agent-bare-metal-packages
+
 workflows:
   version: 2
 
@@ -127,6 +215,14 @@ workflows:
               ignore: /.+/
             tags:
               only: /^v.*$/
+
+      - publish-aperture-agent-bare-metal-packages:
+          filters:
+            branches:
+              ignore: /.+/
+            tags:
+              only: /^v.*/
+          tag: << pipeline.git.tag >>
 
 commands:
   asdf_install:

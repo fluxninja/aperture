@@ -1,0 +1,38 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-ingress
+  namespace: {{ template "common.names.namespace" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: aperture-controller-ingress
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  rules:
+  - host: {{ include "controller.ingress-endpoint" (dict "component" "etcd" "context" . $) | quote }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ .Release.Name }}-etcd
+            port:
+              number: {{ coalesce .Values.etcd.service.ports.client .Values.etcd.service.port 2379 }}
+        path: /
+        pathType: Prefix
+  - host: {{ include "controller.ingress-endpoint" (dict "component" "prometheus" "context" . $) | quote }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ .Release.Name }}-prometheus-server
+            port:
+              number: {{ coalesce .Values.prometheus.server.service.servicePort 80 }}
+        path: /
+        pathType: Prefix
+{{- end }}

@@ -628,6 +628,12 @@ See also [Policy](#v1-policy) for a higher-level explanation of circuits.
 This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
 
 </dd>
+<dt>integrator</dt>
+<dd>
+
+([V1Integrator](#v1-integrator)) Accumulates sum of signal every tick.
+
+</dd>
 <dt>max</dt>
 <dd>
 
@@ -1526,6 +1532,75 @@ Components receive input from other components via InPorts
 <dd>
 
 (string) Name of the incoming Signal on the InPort.
+
+</dd>
+</dl>
+
+### v1Integrator {#v1-integrator}
+
+Accumulates sum of signal every tick.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1IntegratorIns](#v1-integrator-ins)) Input ports for the Integrator component.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([V1IntegratorOuts](#v1-integrator-outs)) Output ports for the Integrator component.
+
+</dd>
+</dl>
+
+### v1IntegratorIns {#v1-integrator-ins}
+
+Inputs for the Integrator component.
+
+#### Properties
+
+<dl>
+<dt>input</dt>
+<dd>
+
+([V1InPort](#v1-in-port)) The input signal.
+
+</dd>
+<dt>max</dt>
+<dd>
+
+([V1InPort](#v1-in-port)) The maximum output when reset is not set.
+
+</dd>
+<dt>min</dt>
+<dd>
+
+([V1InPort](#v1-in-port)) The minimum output when reset is not set.
+
+</dd>
+<dt>reset</dt>
+<dd>
+
+([V1InPort](#v1-in-port)) Resets the integrator output to zero when reset signal is valid and non-zero.
+
+</dd>
+</dl>
+
+### v1IntegratorOuts {#v1-integrator-outs}
+
+Outputs for the Integrator component.
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
 
 </dd>
 </dl>
