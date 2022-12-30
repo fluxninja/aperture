@@ -5,7 +5,7 @@ version: "${VERSION}"
 section: "default"
 priority: "extra"
 provides: [aperture-agent]
-maintainer: "FluxNinja <help@fluxninja.com>"
+maintainer: "FluxNinja Ops <ops@fluxninja.com>"
 description: |
   Flow control and reliability management for modern web applications
 vendor: "FluxNinja"
