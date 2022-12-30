@@ -61,9 +61,10 @@ type serviceDataCache struct {
 	kd    *KubernetesDiscovery
 }
 
-func newServiceDataCache() *serviceDataCache {
+func newServiceDataCache(kd *KubernetesDiscovery) *serviceDataCache {
 	return &serviceDataCache{
 		cache: make(map[string][]podInfo),
+		kd:    kd,
 	}
 }
 
@@ -179,9 +180,9 @@ func newKubernetesServiceDiscovery(
 		cli:          k8sClient.GetClientSet(),
 		nodeName:     nodeName,
 		mapping:      newServicePodMapping(),
-		serviceCache: newServiceDataCache(),
 		entityEvents: entityEvents,
 	}
+	kd.serviceCache = newServiceDataCache(kd)
 	return kd, nil
 }
 
@@ -336,7 +337,6 @@ func (kd *KubernetesDiscovery) getFQDN(endpoints *v1.Endpoints) string {
 	name := endpoints.Name
 	namespace := endpoints.Namespace
 
-	// we assume that FQDN of all kubernetes services is the default one
 	serviceFQDN := fmt.Sprintf("%s.%s.svc.%s", name, namespace, kd.clusterDomain)
 	return serviceFQDN
 }
@@ -380,7 +380,7 @@ func getClusterDomain() (string, error) {
 		return "", err
 	}
 
-	clusterDomain := strings.TrimPrefix(cname, apiSvc)
+	clusterDomain := strings.TrimPrefix(cname, apiSvc+".")
 	clusterDomain = strings.TrimSuffix(clusterDomain, ".")
 
 	return clusterDomain, nil
