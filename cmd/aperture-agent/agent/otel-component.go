@@ -54,7 +54,6 @@ func ModuleForAgentOTEL() fx.Option {
 				provideAgent,
 				fx.ResultTags(otelcollector.BaseFxTag),
 			),
-			cache.NewCache[selectors.ControlPointID],
 			fx.Annotate(
 				AgentOTELComponents,
 				fx.ParamTags(alerts.AlertsFxTag),

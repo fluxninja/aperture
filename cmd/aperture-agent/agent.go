@@ -15,6 +15,7 @@ import (
 
 	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
+	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/discovery"
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/entitycache"
@@ -24,6 +25,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 )
 
@@ -37,6 +39,7 @@ func main() {
 			agentinfo.ProvideAgentInfo,
 			clockwork.NewRealClock,
 			agent.ProvidePeersPrefix,
+			cache.Provide[selectors.ControlPointID],
 		),
 		fx.Invoke(
 			agent.AddAgentInfoAttribute,
