@@ -10,6 +10,7 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
+	"go.opentelemetry.io/collector/processor"
 
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
@@ -57,7 +58,7 @@ const (
 
 var _ consumer.Logs = (*rollupProcessor)(nil)
 
-func newRollupProcessor(set component.ProcessorCreateSettings, cfg *Config) (*rollupProcessor, error) {
+func newRollupProcessor(set processor.CreateSettings, cfg *Config) (*rollupProcessor, error) {
 	rollupHistogram := prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    metrics.RollupMetricName,
 		Help:    "Latency of the requests processed by the server",
@@ -280,7 +281,7 @@ func (rp *rollupProcessor) exportLogs(ctx context.Context, rollupData map[string
 }
 
 // newRollupLogsProcessor creates a new rollup processor that rollupes logs.
-func newRollupLogsProcessor(set component.ProcessorCreateSettings, next consumer.Logs, cfg *Config) (*rollupProcessor, error) {
+func newRollupLogsProcessor(set processor.CreateSettings, next consumer.Logs, cfg *Config) (*rollupProcessor, error) {
 	rp, err := newRollupProcessor(set, cfg)
 	if err != nil {
 		return nil, err

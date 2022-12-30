@@ -32,13 +32,12 @@ To install Aperture Agent, first download package for your manager from
 Alternatively download it using following script:
 
 ```mdx-code-block
-export const DownloadScript = ({children, packager, arch, separator}) => (
+export const DownloadScript = ({children, packager, arch, archSeparator, versionSeparator}) => (
 <CodeBlock language="bash">
 {`VERSION="${apertureVersion}"
 ARCH="${arch}"
 PACKAGER="${packager}"
-SEPARATOR="${separator}"
-url="https://github.com/fluxninja/aperture/releases/download/v\${VERSION}/aperture-agent_\${VERSION}\${SEPARATOR}\${ARCH}.\${PACKAGER}"
+url="https://github.com/fluxninja/aperture/releases/download/v\${VERSION}/aperture-agent${versionSeparator}\${VERSION}${archSeparator}\${ARCH}.\${PACKAGER}"
 echo "Will download \${PACKAGER} package version \${VERSION} compiled for \${ARCH} machine"
 curl --fail --location --remote-name "\${url}"
 `}</CodeBlock>
@@ -47,10 +46,10 @@ curl --fail --location --remote-name "\${url}"
 
 <Tabs groupId="packageManager" queryString>
   <TabItem value="dpkg" label="dpkg">
-    <DownloadScript packager="deb" arch="amd64" separator="_" />
+    <DownloadScript packager="deb" arch="amd64" archSeparator="_" versionSeparator="_" />
   </TabItem>
   <TabItem value="rpm" label="rpm">
-    <DownloadScript packager="rpm" arch="x86_64" separator="." />
+    <DownloadScript packager="rpm" arch="x86_64" archSeparator="." versionSeparator="-" />
   </TabItem>
 </Tabs>
 
@@ -61,7 +60,7 @@ curl --fail --location --remote-name "\${url}"
     <CodeBlock language="bash">{`sudo dpkg -i aperture-agent_${apertureVersion}*.deb`}</CodeBlock>
   </TabItem>
   <TabItem value="rpm" label="rpm">
-    <CodeBlock language="bash">{`sudo rpm -i aperture-agent_${apertureVersion}*.rpm`}</CodeBlock>
+    <CodeBlock language="bash">{`sudo rpm -i aperture-agent-${apertureVersion}*.rpm`}</CodeBlock>
   </TabItem>
 </Tabs>
 

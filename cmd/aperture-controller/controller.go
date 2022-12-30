@@ -14,7 +14,6 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/cmd/aperture-controller/controller"
-	"github.com/fluxninja/aperture/pkg/controlpointcache"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/platform"
@@ -29,7 +28,6 @@ func main() {
 		controller.ModuleForControllerOTEL(),
 		fx.Provide(
 			clockwork.NewRealClock,
-			controlpointcache.Provide,
 		),
 		otelcollector.Module(),
 		controlplane.Module(),

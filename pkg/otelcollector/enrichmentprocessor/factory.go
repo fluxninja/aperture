@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"go.opentelemetry.io/collector/component"
-	"go.opentelemetry.io/collector/config"
 	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/processor"
 	"go.opentelemetry.io/collector/processor/processorhelper"
 
 	"github.com/fluxninja/aperture/pkg/entitycache"
@@ -17,29 +17,28 @@ const (
 )
 
 // NewFactory returns a new factory for the enrichment processor.
-func NewFactory(cache *entitycache.EntityCache) component.ProcessorFactory {
-	return component.NewProcessorFactory(
+func NewFactory(cache *entitycache.EntityCache) processor.Factory {
+	return processor.NewFactory(
 		typeStr,
 		createDefaultConfig(cache),
-		component.WithMetricsProcessor(createMetricsProcessor, component.StabilityLevelDevelopment),
+		processor.WithMetrics(createMetricsProcessor, component.StabilityLevelDevelopment),
 	)
 }
 
 func createDefaultConfig(cache *entitycache.EntityCache) component.CreateDefaultConfigFunc {
 	return func() component.Config {
 		return &Config{
-			ProcessorSettings: config.NewProcessorSettings(component.NewID(typeStr)),
-			entityCache:       cache,
+			entityCache: cache,
 		}
 	}
 }
 
 func createMetricsProcessor(
 	ctx context.Context,
-	params component.ProcessorCreateSettings,
+	params processor.CreateSettings,
 	cfg component.Config,
 	nextMetricsConsumer consumer.Metrics,
-) (component.MetricsProcessor, error) {
+) (processor.Metrics, error) {
 	cfgTyped := cfg.(*Config)
 	proc := newProcessor(cfgTyped.entityCache)
 	return processorhelper.NewMetricsProcessor(

@@ -5,12 +5,13 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/component"
-	"go.opentelemetry.io/collector/config"
 	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/processor"
 	"go.opentelemetry.io/collector/processor/processorhelper"
 
-	"github.com/fluxninja/aperture/pkg/controlpointcache"
+	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
 
 const (
@@ -23,12 +24,12 @@ func NewFactory(
 	promRegistry *prometheus.Registry,
 	engine iface.Engine,
 	clasEng iface.ClassificationEngine,
-	controlPointCache *controlpointcache.ControlPointCache,
-) component.ProcessorFactory {
-	return component.NewProcessorFactory(
+	controlPointCache *cache.Cache[selectors.ControlPointID],
+) processor.Factory {
+	return processor.NewFactory(
 		typeStr,
 		createDefaultConfig(promRegistry, engine, clasEng, controlPointCache),
-		component.WithLogsProcessor(createLogsProcessor, component.StabilityLevelDevelopment),
+		processor.WithLogs(createLogsProcessor, component.StabilityLevelDevelopment),
 	)
 }
 
@@ -36,11 +37,10 @@ func createDefaultConfig(
 	promRegistry *prometheus.Registry,
 	engine iface.Engine,
 	clasEng iface.ClassificationEngine,
-	controlPointCache *controlpointcache.ControlPointCache,
+	controlPointCache *cache.Cache[selectors.ControlPointID],
 ) component.CreateDefaultConfigFunc {
 	return func() component.Config {
 		return &Config{
-			ProcessorSettings:    config.NewProcessorSettings(component.NewID(typeStr)),
 			promRegistry:         promRegistry,
 			engine:               engine,
 			classificationEngine: clasEng,
@@ -51,10 +51,10 @@ func createDefaultConfig(
 
 func createLogsProcessor(
 	ctx context.Context,
-	params component.ProcessorCreateSettings,
+	params processor.CreateSettings,
 	cfg component.Config,
 	nextLogsConsumer consumer.Logs,
-) (component.LogsProcessor, error) {
+) (processor.Logs, error) {
 	cfgTyped := cfg.(*Config)
 	proc, err := newProcessor(cfgTyped)
 	if err != nil {

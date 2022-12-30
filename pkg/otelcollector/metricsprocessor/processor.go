@@ -15,6 +15,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor/internal"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
 
 type metricsProcessor struct {
@@ -280,7 +281,7 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 
 func (p *metricsProcessor) populateControlPointCache(checkResponse *flowcontrolv1.CheckResponse) {
 	for _, service := range checkResponse.GetServices() {
-		p.cfg.controlPointCache.Put(checkResponse.GetControlPoint(), service)
+		p.cfg.controlPointCache.Put(selectors.NewControlPointID(service, checkResponse.GetControlPoint()))
 	}
 }
 
