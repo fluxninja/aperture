@@ -12,7 +12,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
-// Differentiator is a component that accumulates sum of signal every tick.
+// Differentiator is a component that calculates rate of change per tick.
 type Differentiator struct {
 	window time.Duration
 	// readings are saved in ring buffer
@@ -47,7 +47,7 @@ func NewDifferentiator(diffProto *policylangv1.Differentiator) runtime.Component
 	return diff
 }
 
-// NewDifferentiatorAndOptions creates an integrator component and its fx options.
+// NewDifferentiatorAndOptions creates a differentiator component and its fx options.
 func NewDifferentiatorAndOptions(diffProto *policylangv1.Differentiator, _ int, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	return NewDifferentiator(diffProto), fx.Options(), nil
 }
