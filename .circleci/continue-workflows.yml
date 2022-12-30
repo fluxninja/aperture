@@ -669,7 +669,7 @@ jobs:
           name: Attach packages to release
           command: |
             go install github.com/tcnksm/ghr@latest
-            ghr --replace "${VERSION}" ./dist/packages/
+            gh release upload "${VERSION}" $(ls dist/packages/*) --repo=fluxninja/aperture --clobber
       - save_cache:
           name: Save go cache
           key: aperture-agent-bare-metal-packages-go-cache-{{ checksum "~/day" }}
