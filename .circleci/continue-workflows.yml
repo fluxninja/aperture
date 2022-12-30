@@ -669,7 +669,7 @@ jobs:
           name: Attach packages to release
           command: |
             go install github.com/tcnksm/ghr@latest
-            echo ghr --replace "${VERSION}" ./dist/packages/
+            ghr --replace "${VERSION}" ./dist/packages/
       - save_cache:
           name: Save go cache
           key: aperture-agent-bare-metal-packages-go-cache-{{ checksum "~/day" }}
