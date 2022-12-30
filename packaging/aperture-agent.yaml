@@ -1,4 +1,4 @@
-## The address of promethus instance connected with the Aperture Controller
+## The address of prometheus instance connected with the Aperture Controller
 # prometheus:
 #   address: http://myprometheus:9090
 

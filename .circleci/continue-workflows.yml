@@ -22,9 +22,15 @@ executors:
     machine:
       image: ubuntu-2204:2022.10.2
       docker_layer_caching: true
+  ubuntu-18-executor:
+    docker:
+      - image: cimg/base:2022.12-18.04
 
 parameters:
   updated-aperture:
+    type: boolean
+    default: false
+  updated-aperture-agent-packaging:
     type: boolean
     default: false
   updated-aperture-operator:
@@ -588,8 +594,140 @@ jobs:
             cd <<parameters.path>>
             gradle test
 
+  package-agent:
+    parameters:
+      workspace-name:
+        type: string
+        description:
+          the name of the workspace to which built packages should be added
+        default: packages
+      goarch:
+        type: string
+        description: the GOARCH to use for the build
+        default: amd64
+      upload-to-gcp:
+        type: boolean
+        default: false
+        description: Whether to push artifacts to GCP
+    executor: ubuntu-18-executor
+    environment:
+      PACKAGES_DIR: "/tmp/packages"
+      GOARCH: <<parameters.goarch>>
+    steps:
+      - checkout
+      - asdf_install: # We need to install python before gcloud
+          cache_name: aperture-agent-bare-metal-packages
+          tools: |-
+            python
+            gcloud
+            golang
+      - run:
+          name: "Set build vars"
+          command: |
+            GIT_BRANCH="$(git branch --show-current)"
+            GIT_COMMIT_HASH="$(git log -n1 --format=%H)"
+            GOOS="$(go env GOOS)"
+            component=aperture-agent
+            tag_matcher="releases/${component}/*"
+            current_branch="$(git branch --show-current)"
+            tag="$(git tag -l --sort="-version:refname" "${tag_matcher}" | head -n1)"
+            commits="$(git rev-list "${tag}"..HEAD --count)"
+            VERSION="${tag##*/}-b.${commits}"
+            mkdir -p $HOME/go
+            GOPATH=$HOME/go
+            PATH=$PATH:$GOPATH/bin
+
+            export GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION GOPATH PATH
+            declare -p GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION GOPATH PATH >> "${BASH_ENV}"
+          environment:
+            RELEASE_TAG: <<pipeline.git.tag>>
+      - restore_cache:
+          name: Restore go cache
+          keys:
+            - aperture-agent-bare-metal-packages-go-cache-{{ checksum "~/day" }}
+      - run:
+          name: "Compile agent and plugins"
+          command: |
+            SOURCE="./cmd/aperture-agent" TARGET="./dist/aperture-agent" ./pkg/info/build.sh
+            for plugin_dir in ./plugins/*/aperture-plugin-*; do
+              plugin="$(basename "${plugin_dir}")"
+              echo "Building plugin ${plugin}"
+              SOURCE="${plugin_dir}" TARGET="./dist/plugins/${plugin}.so" ./pkg/plugins/build.sh
+            done
+          environment:
+            CGO_ENABLED: "1"
+            PREFIX: "aperture"
+            LDFLAGS: "-s -w -extldflags \"-Wl,--allow-multiple-definition\""
+      - run:
+          name: Install nFPM
+          command: |
+            filename="nfpm_amd64.deb"
+            file="/tmp/${filename}"
+            curl --silent --show-error --location https://github.com/goreleaser/nfpm/releases/latest/download/${filename} -o "${file}"
+            sudo dpkg -i "${file}"
+            which nfpm
+      - run:
+          name: Package
+          command: |
+            mkdir -p dist/packages/
+            vless_version="${VERSION##v}"
+            export VERSION=${vless_version//[-]/\~}
+            nfpm package --packager deb --target dist/packages/
+            nfpm package --packager rpm --target dist/packages/
+            ls -l dist/packages/
+      - when:
+          condition: <<parameters.upload-to-gcp>>
+          steps:
+            - run:
+                name: GCloud SOPS Auth
+                command: .circleci/scripts/setup_gcloud.sh
+            - run:
+                name: Upload package to GCP
+                command: |
+                  gcloud config set artifacts/location us-central1
+                  for package in "deb" "rpm"
+                  do
+                    gcloud config set artifacts/repository aperture-${package}-packages
+                    case "${package}" in
+                      deb) gcloud artifacts apt upload aperture-${package}-packages --source="$(ls dist/packages/*.${package})" --project=${GOOGLE_PROJECT_ID};;
+                      rpm) gcloud artifacts yum upload aperture-${package}-packages --source="$(ls dist/packages/*.${package})" --project=${GOOGLE_PROJECT_ID};;
+                    esac
+                  done
+      - save_cache:
+          name: Save go cache
+          key: aperture-agent-bare-metal-packages-go-cache-{{ checksum "~/day" }}
+          paths:
+            - ../.cache/go-build
+          when: on_success
+      - asdf_save_cache:
+          cache_name: aperture-agent-bare-metal-packages
+
 workflows:
   version: 2
+
+  build-aperture-agent-bare-metal-package:
+    when:
+      and:
+        - not:
+            equal: [main, << pipeline.git.branch >>]
+        - or:
+          - << pipeline.parameters.updated-aperture-agent-packaging >>
+          - << pipeline.parameters.updated-aperture >>
+    jobs:
+      - package-agent:
+          name: build-aperture-agent-bare-metal-package
+
+  publish-aperture-agent-bare-metal-package:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - or:
+          - << pipeline.parameters.updated-aperture-agent-packaging >>
+          - << pipeline.parameters.updated-aperture >>
+    jobs:
+      - package-agent:
+          name: publish-aperture-agent-bare-metal-package
+          upload-to-gcp: true
 
   aperture:
     when:
