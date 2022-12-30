@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -56,16 +58,18 @@ type serviceData struct {
 // serviceDataCache maps service UID to its data - the name of the service and pods handled by the service.
 type serviceDataCache struct {
 	cache map[string][]podInfo
+	kd    *KubernetesDiscovery
 }
 
-func newServiceDataCache() *serviceDataCache {
+func newServiceDataCache(kd *KubernetesDiscovery) *serviceDataCache {
 	return &serviceDataCache{
 		cache: make(map[string][]podInfo),
+		kd:    kd,
 	}
 }
 
-func createServiceData(endpoints *v1.Endpoints, nodeName string) *serviceData {
-	fqdn := getFQDN(endpoints)
+func createServiceData(kd *KubernetesDiscovery, endpoints *v1.Endpoints, nodeName string) *serviceData {
+	fqdn := kd.getFQDN(endpoints)
 	pods := getServicePods(endpoints, nodeName)
 	sort.Slice(pods, func(i, j int) bool {
 		return podInfoOrder(pods[i], pods[j])
@@ -78,12 +82,12 @@ func createServiceData(endpoints *v1.Endpoints, nodeName string) *serviceData {
 }
 
 func (sc *serviceDataCache) updateServiceData(endpoints *v1.Endpoints, nodeName string) {
-	serviceData := createServiceData(endpoints, nodeName)
+	serviceData := createServiceData(sc.kd, endpoints, nodeName)
 	sc.cache[serviceData.fqdn] = serviceData.pods
 }
 
 func (sc *serviceDataCache) removeService(endpoints *v1.Endpoints) {
-	fqdn := getFQDN(endpoints)
+	fqdn := sc.kd.getFQDN(endpoints)
 	delete(sc.cache, fqdn)
 }
 
@@ -150,6 +154,7 @@ type KubernetesDiscovery struct {
 	serviceCache           *serviceDataCache
 	nodeName               string
 	revisionEndpointsWatch string
+	clusterDomain          string
 }
 
 func newKubernetesServiceDiscovery(
@@ -175,9 +180,9 @@ func newKubernetesServiceDiscovery(
 		cli:          k8sClient.GetClientSet(),
 		nodeName:     nodeName,
 		mapping:      newServicePodMapping(),
-		serviceCache: newServiceDataCache(),
 		entityEvents: entityEvents,
 	}
+	kd.serviceCache = newServiceDataCache(kd)
 	return kd, nil
 }
 
@@ -190,6 +195,14 @@ func (kd *KubernetesDiscovery) start() {
 		defer kd.waitGroup.Done()
 
 		operation := func() error {
+			// get cluster domain
+			clusterDomain, err := getClusterDomain()
+			if err != nil {
+				log.Error().Err(err).Msg("Could not get cluster domain, will retry")
+				return err
+			}
+			kd.clusterDomain = clusterDomain
+
 			// purge notifiers
 			kd.entityEvents.Purge("")
 
@@ -237,7 +250,7 @@ func (kd *KubernetesDiscovery) start() {
 						kd.updateMappingFromEndpoints(endpoints, add)
 					case apiWatch.Modified:
 						endpoints := endpointEvent.Object.(*v1.Endpoints)
-						fqdn := getFQDN(endpoints)
+						fqdn := kd.getFQDN(endpoints)
 						cachedPods, ok := kd.serviceCache.cache[fqdn]
 						if ok {
 							for _, cachedPod := range cachedPods {
@@ -302,7 +315,7 @@ func (kd *KubernetesDiscovery) removeEntityFromTracker(podInfo podInfo) {
 }
 
 func (kd *KubernetesDiscovery) updateMappingFromEndpoints(endpoints *v1.Endpoints, operation serviceCacheOperation) {
-	fqdn := getFQDN(endpoints)
+	fqdn := kd.getFQDN(endpoints)
 	pods := getServicePods(endpoints, kd.nodeName)
 
 	for _, pod := range pods {
@@ -320,13 +333,12 @@ func (kd *KubernetesDiscovery) updateMappingFromEndpoints(endpoints *v1.Endpoint
 }
 
 // getFQDN return the full qualified domain name of a given service.
-func getFQDN(endpoints *v1.Endpoints) string {
+func (kd *KubernetesDiscovery) getFQDN(endpoints *v1.Endpoints) string {
 	name := endpoints.Name
 	namespace := endpoints.Namespace
 
-	// we assume that FQDN of all kubernetes services is the default one
-	defaultFQDN := fmt.Sprintf("%s.%s.svc.cluster.local", name, namespace)
-	return defaultFQDN
+	serviceFQDN := fmt.Sprintf("%s.%s.svc.%s", name, namespace, kd.clusterDomain)
+	return serviceFQDN
 }
 
 // getServicePods retrieves a list of pods handled by a given service that are located on a given node.
@@ -356,4 +368,20 @@ func getServicePods(endpoints *v1.Endpoints, nodeName string) []podInfo {
 	}
 
 	return pods
+}
+
+// Retrieve cluster domain of Kubernetes cluster we are installed on. It can be retrieved by looking up CNAME of
+// kubernetes.default.svc and extracting its suffix.
+func getClusterDomain() (string, error) {
+	apiSvc := "kubernetes.default.svc"
+
+	cname, err := net.LookupCNAME(apiSvc)
+	if err != nil {
+		return "", err
+	}
+
+	clusterDomain := strings.TrimPrefix(cname, apiSvc+".")
+	clusterDomain = strings.TrimSuffix(clusterDomain, ".")
+
+	return clusterDomain, nil
 }
