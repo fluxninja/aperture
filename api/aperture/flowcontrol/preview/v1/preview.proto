@@ -30,5 +30,5 @@ message PreviewFlowLabelsResponse {
   message FlowLabels {
     map<string, string> labels = 1;
   }
-  repeated FlowLabels labels = 1;
+  repeated FlowLabels samples = 1;
 }

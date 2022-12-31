@@ -54,13 +54,15 @@ func (r *labelPreviewRequest) GetFlowSelector() *policylangv1.FlowSelector {
 func (r *labelPreviewRequest) AddLabelPreview(labels map[string]string) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
-	r.previewResponse.Labels = append(r.previewResponse.Labels,
-		&flowpreviewv1.PreviewFlowLabelsResponse_FlowLabels{
-			Labels: labels,
-		})
-	r.samples--
-	if r.samples == 0 {
-		r.previewDone()
+	if r.samples > 0 {
+		r.previewResponse.Samples = append(r.previewResponse.Samples,
+			&flowpreviewv1.PreviewFlowLabelsResponse_FlowLabels{
+				Labels: labels,
+			})
+		r.samples--
+		if r.samples == 0 {
+			r.previewDone()
+		}
 	}
 }
 
@@ -111,7 +113,7 @@ func (h *Handler) PreviewFlowLabels(ctx context.Context, req *flowpreviewv1.Prev
 		log.Errorf("failed to unregister label preview request: %v", err)
 	}
 
-	log.Info().Msgf("Generated preview. Samples: %d", len(lr.previewResponse.Labels))
+	log.Info().Msgf("Generated preview. Samples: %d", len(lr.previewResponse.Samples))
 
 	// return the preview response
 	return lr.previewResponse, nil

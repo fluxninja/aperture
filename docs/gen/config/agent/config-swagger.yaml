@@ -303,11 +303,11 @@ definitions:
     x-go-package: github.com/fluxninja/aperture/pkg/etcd/client
   FlowControlPreviewConfig:
     properties:
-      enable:
+      enabled:
         description: Enables the flow preview service.
         type: boolean
         x-go-default: "true"
-        x-go-name: Enable
+        x-go-name: Enabled
     title: FlowControlPreviewConfig is the configuration for the flow control preview
       service.
     type: object

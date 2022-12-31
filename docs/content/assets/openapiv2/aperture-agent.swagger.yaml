@@ -448,7 +448,7 @@ definitions:
   v1PreviewFlowLabelsResponse:
     type: object
     properties:
-      labels:
+      samples:
         type: array
         items:
           $ref: '#/definitions/PreviewFlowLabelsResponseFlowLabels'

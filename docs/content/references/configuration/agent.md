@@ -829,7 +829,7 @@ FlowControlPreviewConfig is the configuration for the flow control preview servi
 #### Properties
 
 <dl>
-<dt>enable</dt>
+<dt>enabled</dt>
 <dd>
 
 (bool, default: `true`) Enables the flow preview service.

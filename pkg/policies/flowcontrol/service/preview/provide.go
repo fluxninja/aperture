@@ -24,7 +24,7 @@ func Module() fx.Option {
 // swagger:model
 type FlowControlPreviewConfig struct {
 	// Enables the flow preview service.
-	Enable bool `json:"enable" default:"true"`
+	Enabled bool `json:"enabled" default:"true"`
 }
 
 // Register registers the handler on grpc.Server.
@@ -38,7 +38,7 @@ func Register(handler *Handler,
 		return err
 	}
 
-	if !config.Enable {
+	if !config.Enabled {
 		log.Info().Msg("flow preview service disabled")
 		return nil
 	}
