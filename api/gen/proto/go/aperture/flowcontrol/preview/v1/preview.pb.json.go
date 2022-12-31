@@ -40,7 +40,7 @@ func (msg *PreviewFlowLabelsResponse) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *PreviewFlowLabelsResponse_FlowLabel) MarshalJSON() ([]byte, error) {
+func (msg *PreviewFlowLabelsResponse_FlowLabels) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -49,7 +49,7 @@ func (msg *PreviewFlowLabelsResponse_FlowLabel) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *PreviewFlowLabelsResponse_FlowLabel) UnmarshalJSON(b []byte) error {
+func (msg *PreviewFlowLabelsResponse_FlowLabels) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

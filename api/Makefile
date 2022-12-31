@@ -29,7 +29,7 @@ buf-generate:
 	@cp -R gen/proto/java/com/fluxninja/generated/aperture/flowcontrol/check ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/check
 	@rm -rf gen/proto/java
 	@#javascript
-	@cp -R aperture/flowcontrol/* ../sdks/aperture-js/proto/
+	@cp -R aperture/flowcontrol/check ../sdks/aperture-js/proto/flowcontrol/check
 	@#generate api docs
 	@rm -rfd $(DOCS_OPENAPI)
 	@mv gen/openapiv2 $(DOCS_OPENAPI)

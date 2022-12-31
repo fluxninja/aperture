@@ -118,7 +118,7 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: control_point
-          description: Control point to preview. Required field.
+          description: Control point to preview.
           in: path
           required: true
           type: string
@@ -128,11 +128,6 @@ paths:
           required: false
           type: string
           format: int64
-        - name: preview_label_values
-          description: Preview values in addition to key. Default is false. In order to enable value previews, please enable value previews in agent configuration as well.
-          in: query
-          required: false
-          type: boolean
         - name: service
           description: Service to preview. Empty value implies catch all service.
           in: query
@@ -159,7 +154,7 @@ paths:
           required: true
           type: string
         - name: control_point
-          description: Control point to preview. Required field.
+          description: Control point to preview.
           in: path
           required: true
           type: string
@@ -169,11 +164,6 @@ paths:
           required: false
           type: string
           format: int64
-        - name: preview_label_values
-          description: Preview values in addition to key. Default is false. In order to enable value previews, please enable value previews in agent configuration as well.
-          in: query
-          required: false
-          type: boolean
       tags:
         - aperture-agent
   /v1/info/host:
@@ -416,16 +406,13 @@ definitions:
         description: List of subexpressions of the match expression.
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     title: List of MatchExpressions that is used for all/any matching
-  PreviewFlowLabelsResponseFlowLabel:
+  PreviewFlowLabelsResponseFlowLabels:
     type: object
     properties:
-      count:
-        type: string
-        format: int64
-      key:
-        type: string
-      value:
-        type: string
+      labels:
+        type: object
+        additionalProperties:
+          type: string
   RateLimiterLazySync:
     type: object
     properties:
@@ -2043,10 +2030,7 @@ definitions:
       labels:
         type: array
         items:
-          $ref: '#/definitions/PreviewFlowLabelsResponseFlowLabel'
-      total_samples:
-        type: string
-        format: int64
+          $ref: '#/definitions/PreviewFlowLabelsResponseFlowLabels'
   v1ProcessInfo:
     type: object
     properties:
