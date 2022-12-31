@@ -24,6 +24,7 @@ Generated File Starts
 | `client`            | [Client](#client)                      |
 | `dist_cache`        | [DistCache](#dist-cache)               |
 | `etcd`              | [Etcd](#etcd)                          |
+| `flow_control`      | [FlowControl](#flow-control)           |
 | `kubernetes_client` | [KubernetesClient](#kubernetes-client) |
 | `liveness`          | [Liveness](#liveness)                  |
 | `log`               | [Log](#log)                            |
@@ -119,6 +120,26 @@ Env-Var Prefix: `APERTURE_AGENT_ETCD_`
 
 Env-Var Prefix: `APERTURE_AGENT_ETCD_`
 Type: [EtcdConfig](#etcd-config)
+
+</dd>
+
+</dl>
+
+### _FlowControl_ {#flow-control}
+
+Key: `flow_control`
+
+Env-Var Prefix: `APERTURE_AGENT_FLOW_CONTROL_`
+
+#### Members
+
+<dl>
+
+<dt>preview_service</dt>
+<dd>
+
+Env-Var Prefix: `APERTURE_AGENT_FLOW_CONTROL_PREVIEW_SERVICE_`
+Type: [FlowPreviewConfig](#flow-preview-config)
 
 </dd>
 
@@ -797,6 +818,21 @@ EtcdConfig holds configuration for etcd client.
 <dd>
 
 ([ClientTLSConfig](#client-tls-config))
+
+</dd>
+</dl>
+
+### FlowPreviewConfig {#flow-preview-config}
+
+FlowPreviewConfig is the configuration for the flow control preview service.
+
+#### Properties
+
+<dl>
+<dt>enabled</dt>
+<dd>
+
+(bool, default: `true`) Enables the flow preview service.
 
 </dd>
 </dl>

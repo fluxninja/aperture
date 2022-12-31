@@ -1066,6 +1066,17 @@ spec:
                         description: Authentication
                         type: string
                     type: object
+                  flow_control:
+                    description: FlowControl configuration.
+                    properties:
+                      preview_service:
+                        description: FlowPreviewConfig holds flow preview configuration.
+                        properties:
+                          enabled:
+                            description: Enables the flow preview service.
+                            type: boolean
+                        type: object
+                    type: object
                   fluxninja_plugin:
                     description: FluxNinja Cloud plugin configuration.
                     properties:
