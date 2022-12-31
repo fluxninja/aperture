@@ -139,7 +139,7 @@ Env-Var Prefix: `APERTURE_AGENT_FLOW_CONTROL_`
 <dd>
 
 Env-Var Prefix: `APERTURE_AGENT_FLOW_CONTROL_PREVIEW_SERVICE_`
-Type: [FlowControlPreviewConfig](#flow-control-preview-config)
+Type: [FlowPreviewConfig](#flow-preview-config)
 
 </dd>
 
@@ -822,9 +822,9 @@ EtcdConfig holds configuration for etcd client.
 </dd>
 </dl>
 
-### FlowControlPreviewConfig {#flow-control-preview-config}
+### FlowPreviewConfig {#flow-preview-config}
 
-FlowControlPreviewConfig is the configuration for the flow control preview service.
+FlowPreviewConfig is the configuration for the flow control preview service.
 
 #### Properties
 

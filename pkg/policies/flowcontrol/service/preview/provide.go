@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package preview
 
 import (
@@ -20,9 +21,10 @@ func Module() fx.Option {
 	)
 }
 
-// FlowControlPreviewConfig is the configuration for the flow control preview service.
+// FlowPreviewConfig is the configuration for the flow control preview service.
 // swagger:model
-type FlowControlPreviewConfig struct {
+// +kubebuilder:object:generate=true
+type FlowPreviewConfig struct {
 	// Enables the flow preview service.
 	Enabled bool `json:"enabled" default:"true"`
 }
@@ -33,7 +35,7 @@ func Register(handler *Handler,
 	healthsrv *health.Server,
 	unmarshaller cfg.Unmarshaller,
 ) error {
-	var config FlowControlPreviewConfig
+	var config FlowPreviewConfig
 	if err := unmarshaller.UnmarshalKey("flow_control.preview_service", &config); err != nil {
 		return err
 	}

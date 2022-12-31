@@ -301,15 +301,14 @@ definitions:
     title: EtcdConfig holds configuration for etcd client.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/etcd/client
-  FlowControlPreviewConfig:
+  FlowPreviewConfig:
     properties:
       enabled:
         description: Enables the flow preview service.
         type: boolean
         x-go-default: "true"
         x-go-name: Enabled
-    title: FlowControlPreviewConfig is the configuration for the flow control preview
-      service.
+    title: FlowPreviewConfig is the configuration for the flow control preview service.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview
   GRPCClientConfig:
@@ -1133,7 +1132,7 @@ paths:
       - in: body
         name: preview_service
         schema:
-          $ref: '#/definitions/FlowControlPreviewConfig'
+          $ref: '#/definitions/FlowPreviewConfig'
       tags:
       - common-configuration
       x-fn-config-env: true

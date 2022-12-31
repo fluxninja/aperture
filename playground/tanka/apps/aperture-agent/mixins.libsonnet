@@ -31,7 +31,7 @@ local apertureAgentMixin =
           },
           flow_control+: {
             preview_service+: {
-              enabled: false,
+              enabled: true,
             },
           },
         },

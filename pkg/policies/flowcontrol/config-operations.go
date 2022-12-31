@@ -7,4 +7,4 @@ package flowcontrol
 // - name: preview_service
 //   in: body
 //   schema:
-//     "$ref": "#/definitions/FlowControlPreviewConfig"
+//     "$ref": "#/definitions/FlowPreviewConfig"
