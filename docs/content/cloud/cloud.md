@@ -15,10 +15,10 @@ FluxNinja Cloud is inviting beta users. Please sign in
 
 :::
 
-FluxNinja Cloud provides:
+FluxNinja Cloud has the following capabilities:
 
-- Visualize your control policies
-- Get alerts when policies take action
+- Visualizing Aperture Policies.
+- Notifications when Policies trigger alerts or take action.
 - High-cardinality analytics on user experience and application reliability
-  metrics
-- Monitor your Aperture installation
+  metrics.
+- Monitor health of Aperture installation(s).

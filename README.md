@@ -99,7 +99,7 @@ To learn how to write Aperture policies, please read the
 ## 📄 Licensing FAQ
 
 If you have questions regarding GNU GPLv3 and commercial licensing options,
-please read the [Licensing FAQ](https://docs.fluxninja.com/docs/license-faq)
+please read the [Licensing FAQ](https://docs.fluxninja.com/docs/licensing-faq)
 
 ## 👷 Contributing
 
