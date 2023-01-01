@@ -41,8 +41,8 @@ require (
 	github.com/natefinch/atomic v1.0.1
 	github.com/onsi/ginkgo/v2 v2.6.0
 	github.com/onsi/gomega v1.24.1
-	github.com/open-policy-agent/opa v0.46.1
-	github.com/open-policy-agent/opa-envoy-plugin v0.45.0-envoy-10
+	github.com/open-policy-agent/opa v0.47.4
+	github.com/open-policy-agent/opa-envoy-plugin v0.47.4-envoy
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.68.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter v0.68.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.68.0
@@ -103,7 +103,6 @@ require (
 	github.com/antonmedv/expr v1.9.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/bmatcuk/doublestar/v4 v4.4.0 // indirect
-	github.com/containerd/containerd v1.6.10 // indirect
 	github.com/docker/cli v20.10.21+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.7.0 // indirect
 	github.com/emicklei/go-restful/v3 v3.10.1 // indirect
@@ -139,7 +138,7 @@ require (
 	go.mongodb.org/mongo-driver v1.11.0 // indirect
 	go.opentelemetry.io/collector/featuregate v0.68.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.12.0 // indirect
-	golang.org/x/tools v0.3.0 // indirect
+	golang.org/x/tools v0.4.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
 	gonum.org/v1/gonum v0.12.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
