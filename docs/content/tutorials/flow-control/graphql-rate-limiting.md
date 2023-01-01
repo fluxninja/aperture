@@ -14,9 +14,8 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 In this tutorial, we will use [Flow Classifier Rego Rules][rego-rules] to rate
-limit a GraphQL query. We will build upon what we've seen in
-[Static Rate Limiting](static-rate-limiting.md) and
-[Workload Prioritization](workload-prioritization.md) tutorials.
+limit a GraphQL query. We will build upon what we've seen in the
+[Static Rate Limiting](static-rate-limiting.md) tutorial.
 
 ## Policy
 
