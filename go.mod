@@ -21,7 +21,7 @@ require (
 	github.com/getsentry/sentry-go v0.15.0
 	github.com/go-co-op/gocron v1.18.0
 	github.com/go-logr/zerologr v1.2.2
-	github.com/go-openapi/runtime v0.23.3
+	github.com/go-openapi/runtime v0.25.0
 	github.com/go-openapi/strfmt v0.21.3
 	github.com/go-playground/validator/v10 v10.11.1
 	github.com/golang/mock v1.6.0
