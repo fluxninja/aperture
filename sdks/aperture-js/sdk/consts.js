@@ -5,7 +5,7 @@ const __filename = fileURLToPath(import.meta.url);
 
 export const PROTO_PATH = path.resolve(
   path.dirname(__filename),
-  "../proto/check/v1/check.proto",
+  "../proto/flowcontrol/check/v1/check.proto",
 );
 
 const fn_host = process.env.FN_AGENT_HOST

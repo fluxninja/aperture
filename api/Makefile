@@ -22,14 +22,15 @@ buf-generate:
 	@find . -name \*.pb.go -exec protoc-go-inject-tag -input={} \;
 	@#generate sdk flowcontrol stubs and copy them over
 	@#golang
-	@rm -rf ../sdks/aperture-go/gen/proto/flowcontrol/check
-	@cp -R gen/proto/go/aperture/flowcontrol/check ../sdks/aperture-go/gen/proto/flowcontrol/check
+	@rm -rf ../sdks/aperture-go/gen/proto/flowcontrol/*
+	@cp -R gen/proto/go/aperture/flowcontrol/check ../sdks/aperture-go/gen/proto/flowcontrol/
 	@#java
 	@rm -rf ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/*
-	@cp -R gen/proto/java/com/fluxninja/generated/aperture/flowcontrol/check ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/check
+	@cp -R gen/proto/java/com/fluxninja/generated/aperture/flowcontrol/check ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/
 	@rm -rf gen/proto/java
 	@#javascript
-	@cp -R aperture/flowcontrol/* ../sdks/aperture-js/proto/
+	@rm -rf ../sdks/aperture-js/src/generated/aperture/flowcontrol/*
+	@cp -R aperture/flowcontrol/check ../sdks/aperture-js/proto/flowcontrol/
 	@#generate api docs
 	@rm -rfd $(DOCS_OPENAPI)
 	@mv gen/openapiv2 $(DOCS_OPENAPI)

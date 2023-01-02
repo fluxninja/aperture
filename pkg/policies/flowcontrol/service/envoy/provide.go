@@ -7,7 +7,6 @@ import (
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
-	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
@@ -17,15 +16,10 @@ import (
 // Authz uses envoy's external authorization grpc API.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Provide(ProvideHandler),
+		fx.Provide(NewHandler),
 		fx.Invoke(Register),
 	)
 }
-
-// ProvideHandler provides an authz handler
-//
-// See NewHandler for more docs.
-var ProvideHandler = NewHandler
 
 // Register registers the handler on grpc.Server
 //
@@ -36,24 +30,4 @@ func Register(handler *Handler, server *grpc.Server, healthsrv *health.Server) {
 
 	healthsrv.SetServingStatus("envoy.service.auth.v3.Authorization", grpc_health_v1.HealthCheckResponse_SERVING)
 	log.Info().Msg("Authz handler registered")
-}
-
-// OnNamedServer returns a register function that will register authz handler on
-// *named* grpc.Server
-//
-// Usage:
-//
-//	fx.Invoke(authz.OnNamedServer("foo").Register)
-func OnNamedServer(serverName string) Invocations {
-	return Invocations{
-		Register: fx.Annotate(
-			Register,
-			fx.ParamTags(``, config.NameTag(serverName)),
-		),
-	}
-}
-
-// Invocations is a set of register functions to be used in fx.Invoke.
-type Invocations struct {
-	Register interface{}
 }
