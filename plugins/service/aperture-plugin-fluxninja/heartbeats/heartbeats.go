@@ -53,20 +53,20 @@ const (
 type Heartbeats struct {
 	heartbeatv1.UnimplementedControllerInfoServiceServer
 	heartbeatsClient  heartbeatv1.FluxNinjaServiceClient
-	peersWatcher      *peers.PeerDiscovery
-	clientHTTP        *http.Client
+	statusRegistry    status.Registry
 	agentInfo         *agentinfo.AgentInfo
+	clientHTTP        *http.Client
 	interval          config.Duration
 	jobGroup          *jobs.JobGroup
 	clientConn        *grpc.ClientConn
-	statusRegistry    status.Registry
+	peersWatcher      *peers.PeerDiscovery
 	entityCache       *entitycache.EntityCache
 	policyFactory     *controlplane.PolicyFactory
 	ControllerInfo    *heartbeatv1.ControllerInfo
+	controlPointCache *cache.Cache[selectors.ControlPointID]
 	heartbeatsAddr    string
 	APIKey            string
 	jobName           string
-	controlPointCache *cache.Cache[selectors.ControlPointID]
 }
 
 func newHeartbeats(
@@ -222,11 +222,11 @@ func (h *Heartbeats) newHeartbeat(
 		policies.PolicyWrappers = h.policyFactory.GetPolicyWrappers()
 	}
 
-	controlPoints := make([]*heartbeatv1.ControlPoint, 0)
+	serviceControlPoints := make([]*heartbeatv1.ServiceControlPoint, 0)
 	if h.controlPointCache != nil {
 		rawControlPoints := h.controlPointCache.GetAllAndClear()
 		for cp := range rawControlPoints {
-			controlPoints = append(controlPoints, &heartbeatv1.ControlPoint{
+			serviceControlPoints = append(serviceControlPoints, &heartbeatv1.ServiceControlPoint{
 				Name:        cp.ControlPoint,
 				ServiceName: cp.Service,
 			})
@@ -234,16 +234,16 @@ func (h *Heartbeats) newHeartbeat(
 	}
 
 	return &heartbeatv1.ReportRequest{
-		VersionInfo:    info.GetVersionInfo(),
-		ProcessInfo:    info.GetProcessInfo(),
-		HostInfo:       info.GetHostInfo(),
-		AgentGroup:     agentGroup,
-		ControllerInfo: h.ControllerInfo,
-		Peers:          peers,
-		ServicesList:   servicesList,
-		AllStatuses:    h.statusRegistry.GetGroupStatus(),
-		Policies:       policies,
-		ControlPoints:  controlPoints,
+		VersionInfo:          info.GetVersionInfo(),
+		ProcessInfo:          info.GetProcessInfo(),
+		HostInfo:             info.GetHostInfo(),
+		AgentGroup:           agentGroup,
+		ControllerInfo:       h.ControllerInfo,
+		Peers:                peers,
+		ServicesList:         servicesList,
+		AllStatuses:          h.statusRegistry.GetGroupStatus(),
+		Policies:             policies,
+		ServiceControlPoints: serviceControlPoints,
 	}
 }
 
