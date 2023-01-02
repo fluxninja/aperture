@@ -104,7 +104,7 @@ func (msg *OverlappingService) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *ControlPoint) MarshalJSON() ([]byte, error) {
+func (msg *ServiceControlPoint) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -113,7 +113,7 @@ func (msg *ControlPoint) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *ControlPoint) UnmarshalJSON(b []byte) error {
+func (msg *ServiceControlPoint) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
