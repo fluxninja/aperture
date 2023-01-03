@@ -22,12 +22,16 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/fluxninja/aperture/operator/controllers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	v1 "k8s.io/api/admission/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
+
+//go:embed old_hook_test.tpl
+var oldAgentSampleYAML string
 
 //go:embed hook_test.tpl
 var agentSampleYAML string
@@ -48,6 +52,29 @@ var _ = Describe("Agent Hook Tests", Ordered, func() {
 
 			Expect(res.Allowed).To(Equal(true))
 			Expect(len(res.Patches) > 0).To(Equal(true))
+		})
+
+		It("should add annotation when valid instance is provided and installation mode is changed", func() {
+			agentHook := AgentHooks{}
+
+			res := agentHook.Handle(context.Background(), admission.Request{
+				AdmissionRequest: v1.AdmissionRequest{
+					Object:    runtime.RawExtension{Raw: []byte(agentSampleYAML)},
+					OldObject: runtime.RawExtension{Raw: []byte(oldAgentSampleYAML)},
+				},
+			})
+
+			Expect(res.Allowed).To(Equal(true))
+			Expect(len(res.Patches) > 0).To(Equal(true))
+			patchFound := false
+			for _, patch := range res.Patches {
+				if patch.Operation == "add" && patch.Path == "/metadata/annotations" {
+					changes := patch.Value.(map[string]interface{})
+					patchFound = changes[controllers.AgentModeChangeAnnotationKey] == "true"
+				}
+			}
+
+			Expect(patchFound).To(Equal(true))
 		})
 
 		It("should not add defaults in spec when invalid instance is provided", func() {
