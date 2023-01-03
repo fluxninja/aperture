@@ -28,51 +28,6 @@ import (
 var (
 	rules = []rbacv1.PolicyRule{
 		{
-			APIGroups: []string{""},
-			Resources: []string{"services", "events", "endpoints", "pods", "nodes", "namespaces", "componentstatuses"},
-			Verbs:     []string{"get", "list", "watch"},
-		},
-		{
-			APIGroups: []string{"quota.openshift.io"},
-			Resources: []string{"clusterresourcequotas"},
-			Verbs:     []string{"get"},
-		},
-		{
-			NonResourceURLs: []string{"/version", "/healthz"},
-			Verbs:           []string{"get"},
-		},
-		{
-			NonResourceURLs: []string{"/metrics"},
-			Verbs:           []string{"get"},
-		},
-		{
-			APIGroups: []string{""},
-			Resources: []string{"nodes/metrics", "nodes/spec", "nodes/proxy", "nodes/stats"},
-			Verbs:     []string{"get"},
-		},
-		{
-			APIGroups:     []string{"policy"},
-			Resources:     []string{"podsecuritypolicies"},
-			Verbs:         []string{"use"},
-			ResourceNames: []string{controllers.AppName},
-		},
-		{
-			APIGroups:     []string{"security.openshift.io"},
-			Resources:     []string{"securitycontextconstraints"},
-			Verbs:         []string{"use"},
-			ResourceNames: []string{controllers.AppName},
-		},
-		{
-			APIGroups: []string{"coordination.k8s.io"},
-			Resources: []string{"leases"},
-			Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-		},
-		{
-			APIGroups: []string{"admissionregistration.k8s.io"},
-			Resources: []string{"mutatingwebhookconfigurations"},
-			Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-		},
-		{
 			APIGroups: []string{"fluxninja.com"},
 			Resources: []string{"policies"},
 			Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
@@ -97,7 +52,7 @@ var (
 	roleRef = rbacv1.RoleRef{
 		APIGroup: "rbac.authorization.k8s.io",
 		Kind:     "ClusterRole",
-		Name:     controllers.AppName,
+		Name:     controllers.ControllerServiceName,
 	}
 )
 
@@ -105,7 +60,7 @@ var (
 func clusterRoleForController(instance *controllerv1alpha1.Controller) *rbacv1.ClusterRole {
 	clusterRole := &rbacv1.ClusterRole{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.AppName,
+			Name:        controllers.ControllerServiceName,
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.OperatorName),
 			Annotations: controllers.ControllerAnnotationsWithOwnerRef(instance),
 		},

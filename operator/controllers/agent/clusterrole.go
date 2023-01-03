@@ -33,16 +33,7 @@ var (
 			Verbs:     []string{"get", "list", "watch"},
 		},
 		{
-			APIGroups: []string{"quota.openshift.io"},
-			Resources: []string{"clusterresourcequotas"},
-			Verbs:     []string{"get"},
-		},
-		{
-			NonResourceURLs: []string{"/version", "/healthz"},
-			Verbs:           []string{"get"},
-		},
-		{
-			NonResourceURLs: []string{"/metrics"},
+			NonResourceURLs: []string{"/version", "/healthz", "/metrics"},
 			Verbs:           []string{"get"},
 		},
 		{
@@ -51,53 +42,16 @@ var (
 			Verbs:     []string{"get"},
 		},
 		{
-			APIGroups:     []string{"policy"},
-			Resources:     []string{"podsecuritypolicies"},
-			Verbs:         []string{"use"},
-			ResourceNames: []string{controllers.AppName},
-		},
-		{
-			APIGroups:     []string{"security.openshift.io"},
-			Resources:     []string{"securitycontextconstraints"},
-			Verbs:         []string{"use"},
-			ResourceNames: []string{controllers.AppName},
-		},
-		{
-			APIGroups: []string{"coordination.k8s.io"},
-			Resources: []string{"leases"},
-			Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-		},
-		{
-			APIGroups: []string{"admissionregistration.k8s.io"},
-			Resources: []string{"mutatingwebhookconfigurations"},
-			Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-		},
-		{
-			APIGroups: []string{"fluxninja.com"},
-			Resources: []string{"policies"},
-			Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-		},
-		{
 			APIGroups: []string{""},
 			Resources: []string{"events"},
 			Verbs:     []string{"create", "patch"},
-		},
-		{
-			APIGroups: []string{"fluxninja.com"},
-			Resources: []string{"policies/finalizers"},
-			Verbs:     []string{"update"},
-		},
-		{
-			APIGroups: []string{"fluxninja.com"},
-			Resources: []string{"policies/status"},
-			Verbs:     []string{"get", "patch", "update"},
 		},
 	}
 
 	roleRef = rbacv1.RoleRef{
 		APIGroup: "rbac.authorization.k8s.io",
 		Kind:     "ClusterRole",
-		Name:     controllers.AppName,
+		Name:     controllers.AgentServiceName,
 	}
 )
 
@@ -105,7 +59,7 @@ var (
 func clusterRoleForAgent(instance *agentv1alpha1.Agent) *rbacv1.ClusterRole {
 	clusterRole := &rbacv1.ClusterRole{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.AppName,
+			Name:        controllers.AgentServiceName,
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.OperatorName),
 			Annotations: controllers.AgentAnnotationsWithOwnerRef(instance),
 		},

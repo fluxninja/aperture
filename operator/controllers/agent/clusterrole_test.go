@@ -46,7 +46,7 @@ var _ = Describe("clusterRoleForAgent", func() {
 
 			expected := &rbacv1.ClusterRole{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: AppName,
+					Name: AgentServiceName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
 						"app.kubernetes.io/instance":   AppName,
@@ -65,16 +65,7 @@ var _ = Describe("clusterRoleForAgent", func() {
 						Verbs:     []string{"get", "list", "watch"},
 					},
 					{
-						APIGroups: []string{"quota.openshift.io"},
-						Resources: []string{"clusterresourcequotas"},
-						Verbs:     []string{"get"},
-					},
-					{
-						NonResourceURLs: []string{"/version", "/healthz"},
-						Verbs:           []string{"get"},
-					},
-					{
-						NonResourceURLs: []string{"/metrics"},
+						NonResourceURLs: []string{"/version", "/healthz", "/metrics"},
 						Verbs:           []string{"get"},
 					},
 					{
@@ -83,46 +74,9 @@ var _ = Describe("clusterRoleForAgent", func() {
 						Verbs:     []string{"get"},
 					},
 					{
-						APIGroups:     []string{"policy"},
-						Resources:     []string{"podsecuritypolicies"},
-						Verbs:         []string{"use"},
-						ResourceNames: []string{AppName},
-					},
-					{
-						APIGroups:     []string{"security.openshift.io"},
-						Resources:     []string{"securitycontextconstraints"},
-						Verbs:         []string{"use"},
-						ResourceNames: []string{AppName},
-					},
-					{
-						APIGroups: []string{"coordination.k8s.io"},
-						Resources: []string{"leases"},
-						Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-					},
-					{
-						APIGroups: []string{"admissionregistration.k8s.io"},
-						Resources: []string{"mutatingwebhookconfigurations"},
-						Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-					},
-					{
-						APIGroups: []string{"fluxninja.com"},
-						Resources: []string{"policies"},
-						Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-					},
-					{
 						APIGroups: []string{""},
 						Resources: []string{"events"},
 						Verbs:     []string{"create", "patch"},
-					},
-					{
-						APIGroups: []string{"fluxninja.com"},
-						Resources: []string{"policies/finalizers"},
-						Verbs:     []string{"update"},
-					},
-					{
-						APIGroups: []string{"fluxninja.com"},
-						Resources: []string{"policies/status"},
-						Verbs:     []string{"get", "patch", "update"},
 					},
 				},
 			}
@@ -153,7 +107,7 @@ var _ = Describe("clusterRoleForAgent", func() {
 
 			expected := &rbacv1.ClusterRole{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: AppName,
+					Name: AgentServiceName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
 						"app.kubernetes.io/instance":   AppName,
@@ -174,16 +128,7 @@ var _ = Describe("clusterRoleForAgent", func() {
 						Verbs:     []string{"get", "list", "watch"},
 					},
 					{
-						APIGroups: []string{"quota.openshift.io"},
-						Resources: []string{"clusterresourcequotas"},
-						Verbs:     []string{"get"},
-					},
-					{
-						NonResourceURLs: []string{"/version", "/healthz"},
-						Verbs:           []string{"get"},
-					},
-					{
-						NonResourceURLs: []string{"/metrics"},
+						NonResourceURLs: []string{"/version", "/healthz", "/metrics"},
 						Verbs:           []string{"get"},
 					},
 					{
@@ -192,46 +137,9 @@ var _ = Describe("clusterRoleForAgent", func() {
 						Verbs:     []string{"get"},
 					},
 					{
-						APIGroups:     []string{"policy"},
-						Resources:     []string{"podsecuritypolicies"},
-						Verbs:         []string{"use"},
-						ResourceNames: []string{AppName},
-					},
-					{
-						APIGroups:     []string{"security.openshift.io"},
-						Resources:     []string{"securitycontextconstraints"},
-						Verbs:         []string{"use"},
-						ResourceNames: []string{AppName},
-					},
-					{
-						APIGroups: []string{"coordination.k8s.io"},
-						Resources: []string{"leases"},
-						Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-					},
-					{
-						APIGroups: []string{"admissionregistration.k8s.io"},
-						Resources: []string{"mutatingwebhookconfigurations"},
-						Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-					},
-					{
-						APIGroups: []string{"fluxninja.com"},
-						Resources: []string{"policies"},
-						Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-					},
-					{
 						APIGroups: []string{""},
 						Resources: []string{"events"},
 						Verbs:     []string{"create", "patch"},
-					},
-					{
-						APIGroups: []string{"fluxninja.com"},
-						Resources: []string{"policies/finalizers"},
-						Verbs:     []string{"update"},
-					},
-					{
-						APIGroups: []string{"fluxninja.com"},
-						Resources: []string{"policies/status"},
-						Verbs:     []string{"get", "patch", "update"},
 					},
 				},
 			}
@@ -280,7 +188,7 @@ var _ = Describe("clusterRoleBindingForAgent", func() {
 			RoleRef: rbacv1.RoleRef{
 				APIGroup: "rbac.authorization.k8s.io",
 				Kind:     "ClusterRole",
-				Name:     AppName,
+				Name:     AgentServiceName,
 			},
 			Subjects: []rbacv1.Subject{
 				{
