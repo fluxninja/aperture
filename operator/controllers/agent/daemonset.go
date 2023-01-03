@@ -35,7 +35,7 @@ import (
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 )
 
-// daemonsetForAgent prepares the Daemonset object for the Agent.
+// daemonsetForAgent prepares the DaemonSet object for the Agent.
 func daemonsetForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *runtime.Scheme) (*appsv1.DaemonSet, error) {
 	spec := instance.Spec
 

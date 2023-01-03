@@ -523,6 +523,222 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			Expect(K8sClient.Delete(Ctx, ns)).To(BeNil())
 		})
 
+		It("should create required resources when Agent is updated to use sidecar mode", func() {
+			namespace := Test + "22"
+			namespace1 := Test + "23"
+			ns := &corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: namespace,
+				},
+			}
+			Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+
+			instance.Namespace = namespace
+			instance.Spec.Sidecar.Enabled = false
+			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
+			instance.Spec.Secrets.FluxNinjaPlugin.Value = Test
+			Expect(K8sClient.Create(Ctx, instance)).To(BeNil())
+
+			ns1 := &corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: namespace1,
+				},
+			}
+			Expect(K8sClient.Create(Ctx, ns1)).To(BeNil())
+
+			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      Test,
+					Namespace: namespace,
+				},
+			})
+
+			createdAgentService := &corev1.Service{}
+			agentServiceKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
+
+			createdAgentDaemonset := &appsv1.DaemonSet{}
+			agentDaemonsetKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
+
+			createdMWC := &admissionregistrationv1.MutatingWebhookConfiguration{}
+			mwcKey := types.NamespacedName{Name: PodMutatingWebhookName}
+
+			Expect(reflect.DeepEqual(res, ctrl.Result{})).To(Equal(true))
+			Expect(err).ToNot(HaveOccurred())
+
+			Eventually(func() bool {
+				err1 := K8sClient.Get(Ctx, agentServiceKey, createdAgentService)
+				err2 := K8sClient.Get(Ctx, agentDaemonsetKey, createdAgentDaemonset)
+				err3 := K8sClient.Get(Ctx, mwcKey, createdMWC)
+				return err1 == nil && err2 == nil && err3 != nil
+			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
+
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(BeNil())
+			Expect(instance.Status.Resources).To(Equal("created"))
+
+			instance.Spec.Sidecar.Enabled = true
+			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace1}
+			instance.Spec.CommonSpec.ServiceAccountSpec.Create = false
+			encodedString := fmt.Sprintf("enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(Test)))
+			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
+			instance.Spec.Secrets.FluxNinjaPlugin.Value = encodedString
+			instance.Annotations = map[string]string{}
+			instance.ObjectMeta.Annotations[AgentModeChangeAnnotationKey] = "true"
+			Expect(K8sClient.Update(Ctx, instance)).To(BeNil())
+
+			os.Setenv("APERTURE_OPERATOR_CERT_DIR", CertDir)
+			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls7.crt")
+			os.Setenv("APERTURE_OPERATOR_NAMESPACE", AppName)
+			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", AppName)
+			certPath := fmt.Sprintf("%s/%s", os.Getenv("APERTURE_OPERATOR_CERT_DIR"), WebhookClientCertName)
+			serverCertPEM := new(bytes.Buffer)
+			_ = pem.Encode(serverCertPEM, &pem.Block{
+				Type:  "CERTIFICATE",
+				Bytes: []byte(Test),
+			})
+			err = WriteFile(certPath, serverCertPEM)
+			Expect(err).NotTo(HaveOccurred())
+
+			res, err = reconciler.Reconcile(Ctx, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      Test,
+					Namespace: namespace,
+				},
+			})
+
+			createdAgentService = &corev1.Service{}
+			agentServiceKey = types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
+
+			createdAgentDaemonset = &appsv1.DaemonSet{}
+			agentDaemonsetKey = types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
+
+			createdMWC = &admissionregistrationv1.MutatingWebhookConfiguration{}
+			mwcKey = types.NamespacedName{Name: PodMutatingWebhookName}
+
+			Expect(reflect.DeepEqual(res, ctrl.Result{})).To(Equal(true))
+			Expect(err).ToNot(HaveOccurred())
+
+			Eventually(func() bool {
+				err1 := K8sClient.Get(Ctx, agentServiceKey, createdAgentService)
+				err2 := K8sClient.Get(Ctx, agentDaemonsetKey, createdAgentDaemonset)
+				err3 := K8sClient.Get(Ctx, mwcKey, createdMWC)
+				return err1 != nil && err2 != nil && err3 == nil
+			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
+
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(BeNil())
+			Expect(instance.Status.Resources).To(Equal("created"))
+
+			Expect(K8sClient.Delete(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, ns1)).To(BeNil())
+		})
+
+		It("should create required resources when Agent is updated to use DaemonSet mode", func() {
+			namespace := Test + "24"
+			namespace1 := Test + "25"
+			ns := &corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: namespace,
+				},
+			}
+			Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+
+			instance.Namespace = namespace
+			instance.Spec.Sidecar.Enabled = true
+			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace1}
+			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
+			instance.Spec.Secrets.FluxNinjaPlugin.Value = Test
+			Expect(K8sClient.Create(Ctx, instance)).To(BeNil())
+
+			ns1 := &corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: namespace1,
+				},
+			}
+			Expect(K8sClient.Create(Ctx, ns1)).To(BeNil())
+
+			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      Test,
+					Namespace: namespace,
+				},
+			})
+
+			createdAgentService := &corev1.Service{}
+			agentServiceKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
+
+			createdAgentDaemonset := &appsv1.DaemonSet{}
+			agentDaemonsetKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
+
+			createdMWC := &admissionregistrationv1.MutatingWebhookConfiguration{}
+			mwcKey := types.NamespacedName{Name: PodMutatingWebhookName}
+
+			Expect(reflect.DeepEqual(res, ctrl.Result{})).To(Equal(true))
+			Expect(err).ToNot(HaveOccurred())
+
+			Eventually(func() bool {
+				err1 := K8sClient.Get(Ctx, agentServiceKey, createdAgentService)
+				err2 := K8sClient.Get(Ctx, agentDaemonsetKey, createdAgentDaemonset)
+				err3 := K8sClient.Get(Ctx, mwcKey, createdMWC)
+				return err1 != nil && err2 != nil && err3 == nil
+			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
+
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(BeNil())
+			Expect(instance.Status.Resources).To(Equal("created"))
+
+			instance.Spec.Sidecar.Enabled = false
+			instance.Spec.CommonSpec.ServiceAccountSpec.Create = false
+			encodedString := fmt.Sprintf("enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(Test)))
+			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
+			instance.Spec.Secrets.FluxNinjaPlugin.Value = encodedString
+			instance.Annotations = map[string]string{}
+			instance.ObjectMeta.Annotations[AgentModeChangeAnnotationKey] = "true"
+			Expect(K8sClient.Update(Ctx, instance)).To(BeNil())
+
+			os.Setenv("APERTURE_OPERATOR_CERT_DIR", CertDir)
+			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls7.crt")
+			os.Setenv("APERTURE_OPERATOR_NAMESPACE", AppName)
+			os.Setenv("APERTURE_OPERATOR_SERVICE_NAME", AppName)
+			certPath := fmt.Sprintf("%s/%s", os.Getenv("APERTURE_OPERATOR_CERT_DIR"), WebhookClientCertName)
+			serverCertPEM := new(bytes.Buffer)
+			_ = pem.Encode(serverCertPEM, &pem.Block{
+				Type:  "CERTIFICATE",
+				Bytes: []byte(Test),
+			})
+			err = WriteFile(certPath, serverCertPEM)
+			Expect(err).NotTo(HaveOccurred())
+
+			res, err = reconciler.Reconcile(Ctx, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      Test,
+					Namespace: namespace,
+				},
+			})
+
+			createdAgentService = &corev1.Service{}
+			agentServiceKey = types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
+
+			createdAgentDaemonset = &appsv1.DaemonSet{}
+			agentDaemonsetKey = types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
+
+			createdMWC = &admissionregistrationv1.MutatingWebhookConfiguration{}
+			mwcKey = types.NamespacedName{Name: PodMutatingWebhookName}
+
+			Expect(reflect.DeepEqual(res, ctrl.Result{})).To(Equal(true))
+			Expect(err).ToNot(HaveOccurred())
+
+			Eventually(func() bool {
+				err1 := K8sClient.Get(Ctx, agentServiceKey, createdAgentService)
+				err2 := K8sClient.Get(Ctx, agentDaemonsetKey, createdAgentDaemonset)
+				err3 := K8sClient.Get(Ctx, mwcKey, createdMWC)
+				return err1 == nil && err2 == nil && err3 != nil
+			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
+
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(BeNil())
+			Expect(instance.Status.Resources).To(Equal("created"))
+
+			Expect(K8sClient.Delete(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, ns1)).To(BeNil())
+		})
+
 		AfterEach(func() {
 			_ = K8sClient.Delete(Ctx, instance)
 			_, err := reconciler.Reconcile(Ctx, reconcile.Request{
