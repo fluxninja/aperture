@@ -4,32 +4,30 @@ import (
 	"context"
 
 	"go.opentelemetry.io/collector/component"
-	"go.opentelemetry.io/collector/config"
 	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/processor"
 )
 
 const typeStr = "tracestologs" // The value of "type" key in configuration.
 
 // NewFactory returns a new factory for the tracestologsprocessor.
-func NewFactory() component.ProcessorFactory {
-	return component.NewProcessorFactory(
+func NewFactory() processor.Factory {
+	return processor.NewFactory(
 		typeStr,
 		createDefaultConfig,
-		component.WithTracesProcessor(createTracesProcessor, component.StabilityLevelDevelopment),
+		processor.WithTraces(createTracesProcessor, component.StabilityLevelDevelopment),
 	)
 }
 
 func createDefaultConfig() component.Config {
-	return &Config{
-		ProcessorSettings: config.NewProcessorSettings(component.NewID(typeStr)),
-	}
+	return &Config{}
 }
 
 func createTracesProcessor(
 	_ context.Context,
-	params component.ProcessorCreateSettings,
+	params processor.CreateSettings,
 	cfg component.Config,
 	nextConsumer consumer.Traces,
-) (component.TracesProcessor, error) {
+) (processor.Traces, error) {
 	return newProcessor(cfg, nextConsumer)
 }

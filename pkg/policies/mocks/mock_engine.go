@@ -120,6 +120,20 @@ func (mr *MockEngineMockRecorder) RegisterFluxMeter(fm interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterFluxMeter", reflect.TypeOf((*MockEngine)(nil).RegisterFluxMeter), fm)
 }
 
+// RegisterLabelPreview mocks base method.
+func (m *MockEngine) RegisterLabelPreview(l iface.LabelPreview) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RegisterLabelPreview", l)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RegisterLabelPreview indicates an expected call of RegisterLabelPreview.
+func (mr *MockEngineMockRecorder) RegisterLabelPreview(l interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterLabelPreview", reflect.TypeOf((*MockEngine)(nil).RegisterLabelPreview), l)
+}
+
 // RegisterRateLimiter mocks base method.
 func (m *MockEngine) RegisterRateLimiter(l iface.RateLimiter) error {
 	m.ctrl.T.Helper()
@@ -160,6 +174,20 @@ func (m *MockEngine) UnregisterFluxMeter(fm iface.FluxMeter) error {
 func (mr *MockEngineMockRecorder) UnregisterFluxMeter(fm interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnregisterFluxMeter", reflect.TypeOf((*MockEngine)(nil).UnregisterFluxMeter), fm)
+}
+
+// UnregisterLabelPreview mocks base method.
+func (m *MockEngine) UnregisterLabelPreview(l iface.LabelPreview) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UnregisterLabelPreview", l)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UnregisterLabelPreview indicates an expected call of UnregisterLabelPreview.
+func (mr *MockEngineMockRecorder) UnregisterLabelPreview(l interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnregisterLabelPreview", reflect.TypeOf((*MockEngine)(nil).UnregisterLabelPreview), l)
 }
 
 // UnregisterRateLimiter mocks base method.

@@ -25,6 +25,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/net/http"
 	"github.com/fluxninja/aperture/pkg/peers"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -69,6 +70,17 @@ type AgentConfigSpec struct {
 	// Peer discovery configuration.
 	//+kubebuilder:validation:Optional
 	PeerDiscovery peers.PeerDiscoveryConfig `json:"peer_discovery"`
+
+	// FlowControl configuration.
+	//+kubebuilder:validation:Optional
+	FlowControl FlowControlConfigSpec `json:"flow_control"`
+}
+
+// FlowControlConfigSpec holds flow control configuration.
+type FlowControlConfigSpec struct {
+	// FlowPreviewConfig holds flow preview configuration.
+	//+kubebuilder:validation:Optional
+	FlowPreviewConfig preview.FlowPreviewConfig `json:"preview_service"`
 }
 
 // AgentStatus defines the observed state of Agent.
