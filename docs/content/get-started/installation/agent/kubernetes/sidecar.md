@@ -380,7 +380,7 @@ chart installed above:
    kubectl rollout restart deployment <DEPLOYMENT_NAME> -n <NAMESPACE>
    ```
 
-6. If pods are running as part of a Kubernetes Daemonset:
+6. If pods are running as part of a Kubernetes DaemonSet:
 
    ```bash
    kubectl rollout restart daemonset <DAEMONSET_NAME> -n <NAMESPACE>
