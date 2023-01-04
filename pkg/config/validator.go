@@ -88,7 +88,6 @@ func timestamppbCustomTypeFunc(field reflect.Value) interface{} {
 	iface := field.Interface()
 	switch iface.(type) {
 	case timestamppb.Timestamp:
-		log.Debug().Msg("timestamppbCustomTypeFunc")
 		ptr := field.Addr().Interface()
 		return ptr.(*timestamppb.Timestamp).AsTime()
 	}
