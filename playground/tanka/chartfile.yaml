@@ -4,6 +4,8 @@ repositories:
     url: https://charts.bitnami.com/bitnami
   - name: istio
     url: https://istio-release.storage.googleapis.com/charts
+  - name: consul
+    url: https://helm.releases.hashicorp.com
 requires:
   - chart: bitnami/grafana-operator
     version: 2.6.2

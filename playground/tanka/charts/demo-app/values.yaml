@@ -29,7 +29,9 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-podAnnotations: {}
+podAnnotations:
+  consul.hashicorp.com/connect-inject: "true"
+  sidecar.istio.io/inject: "false"
 
 podSecurityContext: {}
   # fsGroup: 2000
@@ -45,7 +47,6 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 80
-
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
