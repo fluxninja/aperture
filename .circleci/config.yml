@@ -6,7 +6,7 @@ setup: true
 executors:
   base-cimg-executor:
     docker:
-      - image: cimg/base:2021.07
+      - image: cimg/base:2022.07
 
 orbs:
   path-filtering: circleci/path-filtering@0.1.3
