@@ -38,8 +38,18 @@ local policyDef =
                  + rule.withRego(
                    local source = |||
                      package graphql_example
+                     import future.keywords.if
                      query_ast := graphql.parse_query(input.parsed_body.query)
-                     createTodoByUserIds[name] := value {
+                     claims := payload if {
+                       io.jwt.verify_hs256(bearer_token, "secret")
+                       [_, payload, _] := io.jwt.decode(bearer_token)
+                     }
+                     bearer_token := t if {
+                       v := input.attributes.request.http.headers.authorization
+                       startswith(v, "Bearer ")
+                       t := substring(v, count("Bearer "), -1)
+                     }
+                     queryIsCreateTodo if {
                        some operation
                        walk(query_ast, [_, operation])
                        operation.Name == "createTodo"
@@ -47,16 +57,11 @@ local policyDef =
                        some selection
                        walk(operation.SelectionSet, [_, selection])
                        selection.Name == "createTodo"
-                       count(selection.Arguments) > 0
-                       argument := selection.Arguments[_]
-                       argument.Name == "input"
-                       count(argument.Value.Children) > 0
-                       child := argument.Value.Children[_]
-                       child.Name == "userId"
-                       name := child.Name
-                       value := child.Value.Raw
                      }
-                     userID := createTodoByUserIds.userId
+                     userID := u if {
+                       queryIsCreateTodo
+                       u := claims.userID
+                     }
                    |||;
                    rego.new()
                    + rego.withQuery('data.graphql_example.userID')
@@ -67,7 +72,7 @@ local policyDef =
   )
   + policy.withCircuit(
     circuit.new()
-    + circuit.withEvaluationInterval('300s')
+    + circuit.withEvaluationInterval('0.5s')
     + circuit.withComponents([
       component.withRateLimiter(
         rateLimiter.new()
