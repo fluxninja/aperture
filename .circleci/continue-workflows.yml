@@ -104,7 +104,7 @@ jobs:
       remote-docker-version:
         type: string
         description: Specify the remote docker version
-        default: 20.10.6
+        default: 20.10.18
       setup-remote-docker:
         type: boolean
         description: Setup and use CircleCI's remote Docker environment
