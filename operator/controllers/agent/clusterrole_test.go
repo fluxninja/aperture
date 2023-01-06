@@ -78,6 +78,17 @@ var _ = Describe("clusterRoleForAgent", func() {
 						Resources: []string{"events"},
 						Verbs:     []string{"create", "patch"},
 					},
+					// auto scale permissions
+					{
+						APIGroups: []string{"*"},
+						Resources: []string{"*"},
+						Verbs:     []string{"get", "list", "watch"},
+					},
+					{
+						APIGroups: []string{"*"},
+						Resources: []string{"*/scale"},
+						Verbs:     []string{"get", "update", "patch"},
+					},
 				},
 			}
 
@@ -140,6 +151,17 @@ var _ = Describe("clusterRoleForAgent", func() {
 						APIGroups: []string{""},
 						Resources: []string{"events"},
 						Verbs:     []string{"create", "patch"},
+					},
+					// auto scale permissions
+					{
+						APIGroups: []string{"*"},
+						Resources: []string{"*"},
+						Verbs:     []string{"get", "list", "watch"},
+					},
+					{
+						APIGroups: []string{"*"},
+						Resources: []string{"*/scale"},
+						Verbs:     []string{"get", "update", "patch"},
 					},
 				},
 			}

@@ -46,6 +46,17 @@ var (
 			Resources: []string{"events"},
 			Verbs:     []string{"create", "patch"},
 		},
+		// auto scale permissions
+		{
+			APIGroups: []string{"*"},
+			Resources: []string{"*"},
+			Verbs:     []string{"get", "list", "watch"},
+		},
+		{
+			APIGroups: []string{"*"},
+			Resources: []string{"*/scale"},
+			Verbs:     []string{"get", "update", "patch"},
+		},
 	}
 
 	roleRef = rbacv1.RoleRef{

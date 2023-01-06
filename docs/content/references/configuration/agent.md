@@ -1222,6 +1222,12 @@ KubernetesDiscoveryConfig for Kubernetes service discovery.
 #### Properties
 
 <dl>
+<dt>autoscale_enabled</dt>
+<dd>
+
+(bool, default: `true`)
+
+</dd>
 <dt>discovery_enabled</dt>
 <dd>
 

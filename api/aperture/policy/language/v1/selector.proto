@@ -133,6 +133,7 @@ message KubernetesSelector {
     }
   }]; // @gotags: validate:"required"
 
+  // API version of Kubernetes resource
   string api_version = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
