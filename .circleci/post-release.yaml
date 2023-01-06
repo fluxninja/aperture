@@ -26,7 +26,7 @@ jobs:
       - run:
           name: Login to buf.build
           command: |
-            echo ${BUF_BUILD_TOKEN} | buf registry login --username kklimonda-fn --token-stdin
+            echo ${BUF_BUILD_TOKEN} | buf registry login --username ${BUF_BUILD_USERNAME} --token-stdin
       - run:
           name: Publish protobuf to buf.build
           command: |
