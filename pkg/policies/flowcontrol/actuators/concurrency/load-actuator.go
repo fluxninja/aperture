@@ -153,7 +153,7 @@ func (lsaFactory *loadActuatorFactory) newLoadActuator(
 		statusRegistry: reg,
 	}
 
-	etcdKey := paths.FlowControlComponentKey(lsaFactory.agentGroupName, la.conLimiter.GetPolicyName(), la.conLimiter.GetComponentIndex())
+	etcdKey := paths.AgentComponentKey(lsaFactory.agentGroupName, la.conLimiter.GetPolicyName(), la.conLimiter.GetComponentIndex())
 
 	decisionUnmarshaller, protoErr := config.NewProtobufUnmarshaller(nil)
 	if protoErr != nil {

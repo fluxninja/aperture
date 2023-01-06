@@ -236,7 +236,7 @@ var _ iface.RateLimiter = (*rateLimiter)(nil)
 
 func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	logger := rateLimiter.registry.GetLogger()
-	etcdKey := paths.FlowControlComponentKey(rateLimiter.rateLimiterFactory.agentGroupName,
+	etcdKey := paths.AgentComponentKey(rateLimiter.rateLimiterFactory.agentGroupName,
 		rateLimiter.GetPolicyName(),
 		rateLimiter.GetComponentIndex())
 	// decision notifier

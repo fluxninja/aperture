@@ -117,9 +117,8 @@ func (cpd *controlPointDiscovery) start() {
 				}
 			}
 
-			// Cache Store for each scalable resource
+			// Track each scalable resource
 			for groupVersionResource := range groupVersionResourceSet {
-				store := cache.NewStore(cache.MetaNamespaceKeyFunc)
 				log.Info().Msgf("Starting watch for Group: %s, Version: %s, Resource: %s", groupVersionResource.Group, groupVersionResource.Version, groupVersionResource.Resource)
 				resourceInterface := cpd.dynClient.Resource(groupVersionResource)
 
@@ -135,7 +134,7 @@ func (cpd *controlPointDiscovery) start() {
 					},
 					&unstructured.Unstructured{},
 					0,
-					cpd.createResourceEventHandlerFuncs(groupVersionResource, store),
+					cpd.createResourceEventHandlerFuncs(groupVersionResource),
 				)
 
 				// start controller
@@ -155,36 +154,32 @@ func (cpd *controlPointDiscovery) start() {
 	})
 }
 
-func (cpd *controlPointDiscovery) createResourceEventHandlerFuncs(groupVersionResource schema.GroupVersionResource, store cache.Store) cache.ResourceEventHandlerFuncs {
+func (cpd *controlPointDiscovery) createResourceEventHandlerFuncs(groupVersionResource schema.GroupVersionResource) cache.ResourceEventHandlerFuncs {
+	controlPointFromObject := func(obj interface{}) ControlPoint {
+		// read the name of the resource
+		name := obj.(*unstructured.Unstructured).GetName()
+		namespace := obj.(*unstructured.Unstructured).GetNamespace()
+		return ControlPoint{
+			Group:     groupVersionResource.Group,
+			Version:   groupVersionResource.Version,
+			Type:      groupVersionResource.Resource,
+			Name:      name,
+			Namespace: namespace,
+		}
+	}
+
 	return cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
-			// read the name of the resource
-			name := obj.(*unstructured.Unstructured).GetName()
-			namespace := obj.(*unstructured.Unstructured).GetNamespace()
-			cpd.autoScaler.Add(ControlPoint{
-				Group:     groupVersionResource.Group,
-				Version:   groupVersionResource.Version,
-				Type:      groupVersionResource.Resource,
-				Name:      name,
-				Namespace: namespace,
-			})
-
-			err := store.Add(obj)
-			if err != nil {
-				log.Error().Err(err).Msg("Error when adding to cache store")
-			}
+			controlPoint := controlPointFromObject(obj)
+			cpd.autoScaler.Add(controlPoint)
 		},
-		UpdateFunc: func(_, newObj interface{}) {
-			err := store.Update(newObj)
-			if err != nil {
-				log.Error().Err(err).Msg("Error when updating cache store")
-			}
+		UpdateFunc: func(_, obj interface{}) {
+			controlPoint := controlPointFromObject(obj)
+			cpd.autoScaler.Update(controlPoint)
 		},
 		DeleteFunc: func(obj interface{}) {
-			err := store.Delete(obj)
-			if err != nil {
-				log.Error().Err(err).Msg("Error when deleting from cache store")
-			}
+			controlPoint := controlPointFromObject(obj)
+			cpd.autoScaler.Delete(controlPoint)
 		},
 	}
 }

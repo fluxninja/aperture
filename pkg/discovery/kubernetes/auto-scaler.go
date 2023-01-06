@@ -2,11 +2,14 @@ package kubernetes
 
 import (
 	"context"
+	"encoding/json"
 	"sync"
 
+	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/panichandler"
-	autoscalingv1 "k8s.io/api/autoscaling/v1"
+	"google.golang.org/protobuf/proto"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/scale"
@@ -36,21 +39,24 @@ type autoScaler struct {
 	scaleClient scale.ScalesGetter
 	// Set of unique controlPoints
 	controlPoints map[ControlPoint]*controlPointState
+	eventWriter   notifiers.EventWriter
 }
 
 // autoScaler implements the AutoScaler interface.
 var _ AutoScaler = &autoScaler{}
 
 // newAutoScaler returns a new ControlPointCache.
-func newAutoScaler(scaleClient scale.ScalesGetter) AutoScaler {
+func newAutoScaler(scaleClient scale.ScalesGetter, eventWriter notifiers.EventWriter) AutoScaler {
 	return &autoScaler{
 		controlPoints: make(map[ControlPoint]*controlPointState),
 		scaleClient:   scaleClient,
+		eventWriter:   eventWriter,
 	}
 }
 
 // Add adds a ControlPoint to the cache.
 func (as *autoScaler) Add(cp ControlPoint) {
+	log.Info().Msgf("Add called for %v", cp)
 	// take write mutex before modifying map
 	as.mutex.Lock()
 	defer as.mutex.Unlock()
@@ -69,6 +75,7 @@ func (as *autoScaler) Add(cp ControlPoint) {
 
 // Update updates a ControlPoint in the cache.
 func (as *autoScaler) Update(cp ControlPoint) {
+	log.Info().Msgf("Update called for %v", cp)
 	// take write mutex before modifying map
 	as.mutex.Lock()
 	defer as.mutex.Unlock()
@@ -95,6 +102,7 @@ func (as *autoScaler) Update(cp ControlPoint) {
 
 // Delete deletes a ControlPoint from the cache.
 func (as *autoScaler) Delete(cp ControlPoint) {
+	log.Info().Msgf("Delete called for %v", cp)
 	// take write mutex before modifying map
 	as.mutex.Lock()
 	defer as.mutex.Unlock()
@@ -114,9 +122,26 @@ func (as *autoScaler) fetchScale(cp ControlPoint, cps *controlPointState) {
 		return
 	}
 	log.Info().Msgf("Scale subresource for %s/%s: %v", cp.Type, cp.Name, scale)
-	as.mutex.Lock()
-	defer as.mutex.Unlock()
-	cps.scale = scale
+
+	// Write event to eventWriter
+	reported := policysyncv1.KubernetesScaleReported{
+		ReplicasInSpec:   scale.Spec.Replicas,
+		ReplicasInStatus: scale.Status.Replicas,
+	}
+
+	key, keyErr := json.Marshal(cp)
+	if keyErr != nil {
+		log.Error().Err(keyErr).Msgf("Unable to marshal key: %v", cp)
+		return
+	}
+
+	value, valErr := proto.Marshal(&reported)
+	if valErr != nil {
+		log.Error().Err(valErr).Msg("Unable to marshal value")
+		return
+	}
+
+	as.eventWriter.WriteEvent(notifiers.Key(key), value)
 }
 
 // Keys returns the list of ControlPoints in the cache.
@@ -132,7 +157,6 @@ func (as *autoScaler) Keys() []ControlPoint {
 }
 
 type controlPointState struct {
-	scale *autoscalingv1.Scale
 	// cancel is the function to cancel the context for getting the scale
 	cancel context.CancelFunc
 }

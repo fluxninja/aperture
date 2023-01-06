@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package aperture.policy.sync.v1;
+
+import "aperture/policy/sync/v1/common_attributes.proto";
+
+/*message AutoScalerWrapper {
+     // CommonAttributes
+     CommonAttributes common_attributes = 1;
+     policy.language.v1.AutoScaler auto_scaler = 2;
+   }*/
+
+message KubernetesScaleReported {
+  CommonAttributes common_attributes = 1;
+  int32 replicas_in_spec = 2;
+  int32 replicas_in_status = 3;
+}
+
+message KubernetesScaleDesired {
+  CommonAttributes common_attributes = 1;
+  int32 replicas = 2;
+}
