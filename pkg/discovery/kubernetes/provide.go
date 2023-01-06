@@ -5,6 +5,11 @@ import (
 	"context"
 
 	"go.uber.org/fx"
+	cacheddiscovery "k8s.io/client-go/discovery/cached/memory"
+	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/restmapper"
+	"k8s.io/client-go/scale"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/common"
@@ -25,24 +30,19 @@ type KubernetesDiscoveryConfig struct {
 	NodeName         string `json:"node_name"`
 	PodName          string `json:"pod_name"`
 	DiscoveryEnabled bool   `json:"discovery_enabled" default:"true"`
+	AutoscaleEnabled bool   `json:"autoscale_enabled" default:"true"`
 }
 
 // Module returns an fx.Option that provides the Kubernetes discovery module.
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(
-			ProvideKubernetesControlPointsCache,
+			ProvideAutoscaler,
 		),
 		fx.Invoke(
-			InvokeKubernetesServiceDiscovery,
-			InvokeKubernetesControlPointDiscovery,
+			InvokeServiceDiscovery,
 		),
 	)
-}
-
-// ProvideKubernetesControlPointsCache creates a Kubernetes control points cache.
-func ProvideKubernetesControlPointsCache() (*ControlPointCache, error) {
-	return newControlPointCache(), nil
 }
 
 // FxInCtrlPt is the input for the ProvideKuberetesControlPointsCache function.
@@ -55,28 +55,48 @@ type FxInCtrlPt struct {
 	Election         *election.Election
 }
 
-// InvokeKubernetesControlPointDiscovery creates a Kubernetes control point discovery.
-func InvokeKubernetesControlPointDiscovery(in FxInCtrlPt) error {
+// ProvideAutoscaler provides Kubernetes AutoScaler and starts Kubernetes control point discovery if enabled.
+func ProvideAutoscaler(in FxInCtrlPt) (AutoScaler, error) {
 	var cfg KubernetesDiscoveryConfig
 	if err := in.Unmarshaller.UnmarshalKey(configKey, &cfg); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize K8S discovery configuration!")
-		return err
+		return nil, err
 	}
 
+	discoveryClient := in.KubernetesClient.GetClientSet().DiscoveryClient
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		return nil, err
+	}
+	dynClient, err := dynamic.NewForConfig(config)
+	if err != nil {
+		return nil, err
+	}
+	cachedDiscoveryClient := cacheddiscovery.NewMemCacheClient(discoveryClient)
+	mapper := restmapper.NewDeferredDiscoveryRESTMapper(cachedDiscoveryClient)
+	scaleKindResolver := scale.NewDiscoveryScaleKindResolver(discoveryClient)
+	scaleClient, err := scale.NewForConfig(config, mapper, dynamic.LegacyAPIPathResolverFunc, scaleKindResolver)
+	if err != nil {
+		log.Error().Err(err).Msg("Unable to create scale client")
+		return nil, err
+	}
+
+	autoScaler := newAutoScaler(scaleClient)
+
 	if cfg.DiscoveryEnabled {
-		kcpd, err := newControlPointDiscovery(in.Election, in.KubernetesClient)
+		cpd, err := newControlPointDiscovery(in.Election, in.KubernetesClient, discoveryClient, dynClient, autoScaler)
 		if err != nil {
 			log.Info().Err(err).Msg("Failed to create Kubernetes control point discovery")
-			return nil
+			return nil, err
 		}
 
 		in.Lifecycle.Append(fx.Hook{
 			OnStart: func(_ context.Context) error {
-				kcpd.start()
+				cpd.start()
 				return nil
 			},
 			OnStop: func(_ context.Context) error {
-				kcpd.stop()
+				cpd.stop()
 				return nil
 			},
 		})
@@ -84,7 +104,7 @@ func InvokeKubernetesControlPointDiscovery(in FxInCtrlPt) error {
 		log.Info().Msg("Skipping Kubernetes discovery service creation")
 	}
 
-	return nil
+	return autoScaler, nil
 }
 
 // FxInSvc describes parameters passed to k8s discovery constructor.
@@ -97,8 +117,8 @@ type FxInSvc struct {
 	EntityTrackers   *entitycache.EntityTrackers
 }
 
-// InvokeKubernetesServiceDiscovery creates a Kubernetes service discovery.
-func InvokeKubernetesServiceDiscovery(in FxInSvc) error {
+// InvokeServiceDiscovery creates a Kubernetes service discovery.
+func InvokeServiceDiscovery(in FxInSvc) error {
 	var cfg KubernetesDiscoveryConfig
 	if err := in.Unmarshaller.UnmarshalKey(configKey, &cfg); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize K8S discovery configuration!")

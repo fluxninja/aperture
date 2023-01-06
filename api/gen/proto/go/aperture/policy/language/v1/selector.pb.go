@@ -268,7 +268,8 @@ type KubernetesSelector struct {
 	// selector applies to.
 	AgentGroup string `protobuf:"bytes,1,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"default"` // @gotags: default:"default"
 	// Kubernetes namespace that the resource belongs to.
-	Namespace  string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty" validate:"required"`                     // @gotags: validate:"required"
+	Namespace string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty" validate:"required"` // @gotags: validate:"required"
+	// API version of Kubernetes resource
 	ApiVersion string `protobuf:"bytes,3,opt,name=api_version,json=apiVersion,proto3" json:"api_version,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Kubernetes resource type.
 	Kind string `protobuf:"bytes,4,opt,name=kind,proto3" json:"kind,omitempty" validate:"required"` // @gotags: validate:"required"
