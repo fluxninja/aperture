@@ -22,7 +22,7 @@ local svcSelector =
   )
   + flowSelector.withFlowMatcher(
     flowMatcher.new()
-    + flowMatcher.withControlPoint({ traffic: 'ingress' })
+    + flowMatcher.withControlPoint('ingress')
   );
 
 local policyDef =
@@ -38,9 +38,7 @@ local policyDef =
                  + rule.withRego(
                    local source = |||
                      package graphql_example
-
                      query_ast := graphql.parse_query(input.parsed_body.query)
-
                      createTodoByUserIds[name] := value {
                        some operation
                        walk(query_ast, [_, operation])
@@ -58,7 +56,6 @@ local policyDef =
                        name := child.Name
                        value := child.Value.Raw
                      }
-
                      userID := createTodoByUserIds.userId
                    |||;
                    rego.new()

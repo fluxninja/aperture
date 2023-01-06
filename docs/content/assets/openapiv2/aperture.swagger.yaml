@@ -5,6 +5,7 @@ info:
 tags:
   - name: EntityCacheService
   - name: FlowControlService
+  - name: FlowPreviewService
   - name: InfoService
   - name: PeerDiscoveryService
   - name: PolicyService
@@ -101,6 +102,68 @@ paths:
           in: path
           required: true
           type: string
+      tags:
+        - aperture-agent
+  /v1/flowcontrol/preview/labels/{control_point}:
+    get:
+      operationId: FlowPreviewService_PreviewFlowLabels2
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1PreviewFlowLabelsResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: control_point
+          description: Control point to preview.
+          in: path
+          required: true
+          type: string
+        - name: samples
+          description: Number of samples to collect. Defaults to 10.
+          in: query
+          required: false
+          type: string
+          format: int64
+        - name: service
+          description: Service to preview. Empty value implies catch all service.
+          in: query
+          required: false
+          type: string
+      tags:
+        - aperture-agent
+  /v1/flowcontrol/preview/labels/{service}/{control_point}:
+    get:
+      operationId: FlowPreviewService_PreviewFlowLabels
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1PreviewFlowLabelsResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: service
+          description: Service to preview. Empty value implies catch all service.
+          in: path
+          required: true
+          type: string
+        - name: control_point
+          description: Control point to preview.
+          in: path
+          required: true
+          type: string
+        - name: samples
+          description: Number of samples to collect. Defaults to 10.
+          in: query
+          required: false
+          type: string
+          format: int64
       tags:
         - aperture-agent
   /v1/info/host:
@@ -343,6 +406,13 @@ definitions:
         description: List of subexpressions of the match expression.
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     title: List of MatchExpressions that is used for all/any matching
+  PreviewFlowLabelsResponseFlowLabels:
+    type: object
+    properties:
+      labels:
+        type: object
+        additionalProperties:
+          type: string
   RateLimiterLazySync:
     type: object
     properties:
@@ -1954,6 +2024,13 @@ definitions:
         type: object
         additionalProperties:
           $ref: '#/definitions/v1PolicyWrapper'
+  v1PreviewFlowLabelsResponse:
+    type: object
+    properties:
+      samples:
+        type: array
+        items:
+          $ref: '#/definitions/PreviewFlowLabelsResponseFlowLabels'
   v1ProcessInfo:
     type: object
     properties:

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"go.opentelemetry.io/collector/component"
-	"go.opentelemetry.io/collector/config"
 	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/exporter/exporterhelper"
 
@@ -27,9 +26,8 @@ func NewFactory(alertMgr *alertmanager.AlertManager) exporter.Factory {
 func createDefaultConfig(alertMgr *alertmanager.AlertManager) func() component.Config {
 	return func() component.Config {
 		return &Config{
-			ExporterSettings: config.NewExporterSettings(component.NewID(typeStr)),
-			TimeoutSettings:  exporterhelper.NewDefaultTimeoutSettings(),
-			alertMgr:         alertMgr,
+			TimeoutSettings: exporterhelper.NewDefaultTimeoutSettings(),
+			alertMgr:        alertMgr,
 		}
 	}
 }

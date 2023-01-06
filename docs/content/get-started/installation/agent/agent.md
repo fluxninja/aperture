@@ -23,9 +23,6 @@ One Agent is deployed per node.
 
 ## Configuration
 
-The Aperture Agent related configurations are stored in a configmap which is
-created during the installation using Helm.
-
 All the configuration parameters for Aperture Agent are listed
 [here](/references/configuration/agent.md).
 
@@ -46,3 +43,8 @@ The Aperture Agent can be installed in below listed modes:
       The Aperture Agent can also be installed as a Sidecar. In this mode,
       whenever a new pod is started with required labels and annotations, the
       Agent container will be attached with the pod.
+
+2. [**Bare Metal/VM**](bare_metal.md)
+
+   The Aperture Agent can be installed as a system service on any Linux system
+   that's [supported](supported-platforms.md).

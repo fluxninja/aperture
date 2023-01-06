@@ -29,6 +29,11 @@ local apertureAgentMixin =
           prometheus+: {
             address: 'http://controller-prometheus-server.aperture-controller.svc.cluster.local:80',
           },
+          flow_control+: {
+            preview_service+: {
+              enabled: true,
+            },
+          },
         },
         image: {
           registry: '',

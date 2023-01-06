@@ -10,8 +10,7 @@ spec:
       - rate_limiter:
           flow_selector:
             flow_matcher:
-              control_point:
-                traffic: ingress
+              control_point: ingress
             service_selector:
               agent_group: default
               service: service-graphql-demo-app.demoapp.svc.cluster.local
@@ -28,8 +27,7 @@ spec:
     classifiers:
       - flow_selector:
           flow_matcher:
-            control_point:
-              traffic: ingress
+            control_point: ingress
           service_selector:
             agent_group: default
             service: service-graphql-demo-app.demoapp.svc.cluster.local
@@ -39,9 +37,7 @@ spec:
               query: data.graphql_example.userID
               source: |
                 package graphql_example
-
                 query_ast := graphql.parse_query(input.parsed_body.query)
-
                 createTodoByUserIds[name] := value {
                   some operation
                   walk(query_ast, [_, operation])
@@ -59,6 +55,5 @@ spec:
                   name := child.Name
                   value := child.Value.Raw
                 }
-
                 userID := createTodoByUserIds.userId
             telemetry: true

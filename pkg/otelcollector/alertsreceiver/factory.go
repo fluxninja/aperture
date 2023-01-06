@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"go.opentelemetry.io/collector/component"
-	"go.opentelemetry.io/collector/config"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
 
@@ -27,8 +26,7 @@ func NewFactory(alerter alerts.Alerter) receiver.Factory {
 func createDefaultConfig(alerter alerts.Alerter) func() component.Config {
 	return func() component.Config {
 		return &Config{
-			ReceiverSettings: config.NewReceiverSettings(component.NewID(typeStr)),
-			alerter:          alerter,
+			alerter: alerter,
 		}
 	}
 }

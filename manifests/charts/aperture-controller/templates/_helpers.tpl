@@ -96,3 +96,15 @@ Fetch the value of the API Key secret for Aperture Controller
     {{ print "" }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Prepare the Host for configuring in the Ingress
+{{ include "controller.ingress-endpoint" ( dict "component" "component_name" "context" $.context $) }}
+*/}}
+{{- define "controller.ingress-endpoint" -}}
+{{- if .context.Values.ingress.domain_name -}}
+    {{- printf "%s.%s" .component .context.Values.ingress.domain_name -}}
+{{- else -}}
+    {{- fail "Value of .Values.ingress.domain_name cannot be empty when .Values.ingress.enabled is set to true." -}}
+{{- end -}}
+{{- end -}}

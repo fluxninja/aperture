@@ -53,11 +53,11 @@ become label values (properties are ignored).
 Read more about baggage propagation on:
 [Baggage | OpenTelemetry](https://opentelemetry.io/docs/concepts/signals/baggage/).
 
-### Flow classifiers
+### Flow Classifiers
 
 When the labels you need are not already present in baggage, nor as request
 labels, you can create a [classifier][classifier] to inject new labels into the
-system. Since the classifier also injects the label into baggage by default,
+system. Since the Classifier also injects the label into baggage by default,
 this means you can set or extract the label in a different place than where it
 is consumed (assuming you have baggage propagation configured throughout your
 system).
@@ -66,6 +66,46 @@ system).
 
 The Aperture SDK, in addition to automatically pulling baggage from context,
 also takes an explicit `labels` map in the `Check()` call.
+
+## Live Previewing Flow Labels
+
+You can discover the labels flowing through services and control points using
+the Introspection API on an `aperture-agent` local to the service instances
+(pods).
+
+For example:
+
+```sh
+$ curl localhost:8080/v1/flowcontrol/preview/labels/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
+```
+
+Returns:
+
+```json
+{
+  "samples": [
+    {
+      "labels": {
+        "http.flavor": "1.1",
+        "http.host": "service1-demo-app.demoapp.svc.cluster.local",
+        "http.method": "POST",
+        "http.request.header.content_length": "201",
+        "http.request.header.content_type": "application/json",
+        "http.request.header.cookie": "session=eyJ1c2VyIjoia2Vub2JpIn0.YbsY4Q.kTaKRTyOIfVlIbNB48d9YH6Q0wo",
+        "http.request.header.user_agent": "k6/0.42.0 (https://k6.io/)",
+        "http.request.header.user_id": "14",
+        "http.request.header.user_type": "bot",
+        "http.request.header.x_forwarded_proto": "http",
+        "http.request.header.x_request_id": "3958dad8-eb71-47f0-a9f6-500cccb097d2",
+        "http.request_content_length": "0",
+        "http.scheme": "http",
+        "http.target": "/request",
+        "user_type": "bot"
+      }
+    }
+  ]
+}
+```
 
 ## Telemetry
 
@@ -107,7 +147,7 @@ These are Flow Labels mapped from [baggage](#baggage).
 
 #### Labels defined by user
 
-These are labels provided via classifiers in case of service mesh/middleware
+These are labels provided via Classifiers in case of service mesh/middleware
 integration, or explicitly at [Flow][flow] creation in [Aperture
 SDK][aperture-go].
 
@@ -132,9 +172,9 @@ up and sent to the analytics database in the cloud. This allows:
 
 :::note
 
-For classifier-created labels, you can disable this behaviour by setting
+For Classifier-created labels, you can disable this behaviour by setting
 `hidden: true` in
-[the classification rule](/references/configuration/policy.md#v1-rule).
+[the Classification rule](/references/configuration/policy.md#v1-rule).
 
 :::
 

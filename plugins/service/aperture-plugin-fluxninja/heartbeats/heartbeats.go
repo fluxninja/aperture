@@ -22,8 +22,8 @@ import (
 	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
+	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/controlpointcache"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/info"
@@ -33,6 +33,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/utils"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
@@ -65,7 +66,7 @@ type Heartbeats struct {
 	heartbeatsAddr    string
 	APIKey            string
 	jobName           string
-	controlPointCache *controlpointcache.ControlPointCache
+	controlPointCache *cache.Cache[selectors.ControlPointID]
 }
 
 func newHeartbeats(
@@ -76,7 +77,7 @@ func newHeartbeats(
 	agentInfo *agentinfo.AgentInfo,
 	peersWatcher *peers.PeerDiscovery,
 	policyFactory *controlplane.PolicyFactory,
-	controlPointCache *controlpointcache.ControlPointCache,
+	controlPointCache *cache.Cache[selectors.ControlPointID],
 ) *Heartbeats {
 	return &Heartbeats{
 		heartbeatsAddr:    p.FluxNinjaEndpoint,
@@ -225,7 +226,7 @@ func (h *Heartbeats) newHeartbeat(
 	controlPoints := make([]*heartbeatv1.ControlPoint, 0, len(rawControlPoints))
 	for cp := range rawControlPoints {
 		controlPoints = append(controlPoints, &heartbeatv1.ControlPoint{
-			Name:        cp.Name,
+			Name:        cp.ControlPoint,
 			ServiceName: cp.Service,
 		})
 	}

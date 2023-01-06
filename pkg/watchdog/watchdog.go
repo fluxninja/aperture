@@ -3,7 +3,6 @@ package watchdog
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"math"
 	"runtime"
@@ -311,10 +310,10 @@ func newHeapPolicy(config HeapConfig) *heapPolicy {
 func (hp *heapPolicy) checkHeap() (proto.Message, error) {
 	log.Debug().Msg("Heap check triggered")
 	if hp.Limit == 0 {
-		return nil, fmt.Errorf("cannot use zero limit for heap-driven watchdog")
+		log.Warn().Msg("Heap limit is 0, skipping check")
+		return nil, nil
 	}
 
-	var err error
 	var threshold uint64
 	var memstats runtime.MemStats
 	runtime.ReadMemStats(&memstats)
@@ -339,7 +338,7 @@ func (hp *heapPolicy) checkHeap() (proto.Message, error) {
 	if hp.currGoGC >= hp.originalGoGC {
 		hp.currGoGC = hp.originalGoGC
 	} else if hp.currGoGC < hp.MinGoGC {
-		err = errors.New("heap driven watchdog reached minimum threshold for GoGC value")
+		log.Warn().Msg("heap driven watchdog reached minimum threshold for GoGC value")
 		// cap GoGC to avoid overscheduling.
 		hp.currGoGC = hp.MinGoGC
 	}
@@ -380,5 +379,5 @@ func (hp *heapPolicy) checkHeap() (proto.Message, error) {
 		NumForcedGc:  memstats.NumForcedGC,
 	}
 
-	return result, err
+	return result, nil
 }
