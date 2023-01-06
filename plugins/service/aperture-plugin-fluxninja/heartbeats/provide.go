@@ -9,6 +9,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/jobs"
@@ -53,8 +54,9 @@ type ConstructorIn struct {
 	AgentInfo                  *agentinfo.AgentInfo     `optional:"true"`
 	PeersWatcher               *peers.PeerDiscovery     `name:"fluxninja-peers-watcher" optional:"true"`
 	EtcdClient                 *etcdclient.Client
-	PolicyFactory              *controlplane.PolicyFactory            `optional:"true"`
+	PolicyFactory              *controlplane.PolicyFactory `optional:"true"`
 	ControlPointCache          *cache.Cache[selectors.ControlPointID] `optional:"true"`
+	KubernetesAutoScaler       kubernetes.AutoScaler
 }
 
 // Provide provides a new instance of Heartbeats.
@@ -73,6 +75,7 @@ func Provide(in ConstructorIn) (*Heartbeats, error) {
 		in.PeersWatcher,
 		in.PolicyFactory,
 		in.ControlPointCache,
+		in.KubernetesAutoScaler,
 	)
 
 	runCtx, cancel := context.WithCancel(context.Background())

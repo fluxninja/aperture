@@ -36,7 +36,6 @@ func newControlPointDiscovery(election *election.Election, k8sClient k8s.K8sClie
 	cpd := &controlPointDiscovery{
 		cli:             k8sClient.GetClientSet(),
 		election:        election,
-		cacheStores:     make(map[string]cache.Store),
 		autoScaler:      autoScaler,
 		discoveryClient: discoveryClient,
 		dynClient:       dynClient,
@@ -48,11 +47,9 @@ func newControlPointDiscovery(election *election.Election, k8sClient k8s.K8sClie
 // controlPointDiscovery is a struct that helps with Kubernetes control point discovery.
 type controlPointDiscovery struct {
 	waitGroup       sync.WaitGroup
-	mutex           sync.RWMutex
 	ctx             context.Context
 	cancel          context.CancelFunc
 	cli             *kubernetes.Clientset
-	cacheStores     map[string]cache.Store
 	autoScaler      AutoScaler
 	discoveryClient discovery.DiscoveryInterface
 	dynClient       dynamic.Interface
@@ -140,11 +137,6 @@ func (cpd *controlPointDiscovery) start() {
 					0,
 					cpd.createResourceEventHandlerFuncs(groupVersionResource, store),
 				)
-
-				cpd.mutex.Lock()
-				// save store to map
-				cpd.cacheStores[groupVersionResource.Resource] = store
-				cpd.mutex.Unlock()
 
 				// start controller
 				panichandler.Go(func() {
