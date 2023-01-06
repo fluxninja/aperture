@@ -38,8 +38,8 @@ func PolicyPrefix(agentGroupName, policyName string) string {
 	return AgentGroupPrefix(agentGroupName) + "-policy-" + policyName
 }
 
-// FlowControlComponentKey returns the identifier for a Component in etcd.
-func FlowControlComponentKey(agentGroupName, policyName string, componentIndex int64) string {
+// AgentComponentKey returns the identifier for a Component in etcd.
+func AgentComponentKey(agentGroupName, policyName string, componentIndex int64) string {
 	return PolicyPrefix(agentGroupName, policyName) + "-component_index-" + strconv.FormatInt(componentIndex, 10)
 }
 

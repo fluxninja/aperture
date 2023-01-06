@@ -37,7 +37,7 @@ func NewConcurrencyLimiterOptions(
 	}
 	agentGroupName := flowSelectorProto.ServiceSelector.GetAgentGroup()
 	etcdPath := path.Join(paths.ConcurrencyLimiterConfigPath,
-		paths.FlowControlComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentStackIndex)))
+		paths.AgentComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentStackIndex)))
 	configSync := &concurrencyLimiterConfigSync{
 		concurrencyLimiterProto: concurrencyLimiterProto,
 		policyBaseAPI:           policyReadAPI,

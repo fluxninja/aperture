@@ -52,7 +52,7 @@ func NewRateLimiterAndOptions(
 		return nil, fx.Options(), errors.New("selector is nil")
 	}
 	agentGroupName := flowSelectorProto.ServiceSelector.GetAgentGroup()
-	componentID := paths.FlowControlComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex))
+	componentID := paths.AgentComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex))
 	configEtcdPath := path.Join(paths.RateLimiterConfigPath, componentID)
 	decisionsEtcdPath := path.Join(paths.RateLimiterDecisionsPath, componentID)
 	dynamicConfigEtcdPath := path.Join(paths.RateLimiterDynamicConfigPath, componentID)

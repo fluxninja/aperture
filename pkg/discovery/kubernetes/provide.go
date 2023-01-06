@@ -17,6 +17,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/etcd/election"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -36,27 +37,27 @@ type KubernetesDiscoveryConfig struct {
 // Module returns an fx.Option that provides the Kubernetes discovery module.
 func Module() fx.Option {
 	return fx.Options(
-		fx.Provide(
-			ProvideAutoscaler,
-		),
+		notifiers.TrackersConstructor{Name: "kubernetes_control_points"}.Annotate(),
 		fx.Invoke(
+			ProvideAutoscaler,
 			InvokeServiceDiscovery,
 		),
 	)
 }
 
-// FxInCtrlPt is the input for the ProvideKuberetesControlPointsCache function.
-type FxInCtrlPt struct {
+// FxInAutoScaler is the input for the ProvideKuberetesControlPointsCache function.
+type FxInAutoScaler struct {
 	fx.In
 	Unmarshaller     config.Unmarshaller
 	Lifecycle        fx.Lifecycle
 	StatusRegistry   status.Registry
 	KubernetesClient k8s.K8sClient
 	Election         *election.Election
+	Trackers         notifiers.Trackers `name:"kubernetes_control_points"`
 }
 
 // ProvideAutoscaler provides Kubernetes AutoScaler and starts Kubernetes control point discovery if enabled.
-func ProvideAutoscaler(in FxInCtrlPt) (AutoScaler, error) {
+func ProvideAutoscaler(in FxInAutoScaler) (AutoScaler, error) {
 	var cfg KubernetesDiscoveryConfig
 	if err := in.Unmarshaller.UnmarshalKey(configKey, &cfg); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize K8S discovery configuration!")
@@ -81,7 +82,7 @@ func ProvideAutoscaler(in FxInCtrlPt) (AutoScaler, error) {
 		return nil, err
 	}
 
-	autoScaler := newAutoScaler(scaleClient)
+	autoScaler := newAutoScaler(scaleClient, in.Trackers)
 
 	if cfg.DiscoveryEnabled {
 		cpd, err := newControlPointDiscovery(in.Election, in.KubernetesClient, discoveryClient, dynClient, autoScaler)
