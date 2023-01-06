@@ -26,6 +26,7 @@ type AutoScaler interface {
 	Add(cp ControlPoint)
 	Update(cp ControlPoint)
 	Delete(cp ControlPoint)
+	Keys() []ControlPoint
 }
 
 // AutoScaler is a cache of discovered Kubernetes control points and provides APIs to do CRUD on Scale type resources.
@@ -116,6 +117,18 @@ func (as *autoScaler) fetchScale(cp ControlPoint, cps *controlPointState) {
 	as.mutex.Lock()
 	defer as.mutex.Unlock()
 	cps.scale = scale
+}
+
+// Keys returns the list of ControlPoints in the cache.
+func (as *autoScaler) Keys() []ControlPoint {
+	// take read mutex before reading map
+	as.mutex.RLock()
+	defer as.mutex.RUnlock()
+	var cps []ControlPoint
+	for cp := range as.controlPoints {
+		cps = append(cps, cp)
+	}
+	return cps
 }
 
 type controlPointState struct {

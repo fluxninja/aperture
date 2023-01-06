@@ -1741,6 +1741,19 @@ definitions:
           If the operator is In or NotIn, the values array must be non-empty.
           If the operator is Exists or DoesNotExist, the values array must be empty.
     description: Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values.
+  v1KubernetesControlPoint:
+    type: object
+    properties:
+      group:
+        type: string
+      name:
+        type: string
+      namespace:
+        type: string
+      type:
+        type: string
+      version:
+        type: string
   v1LabelMatcher:
     type: object
     properties:
@@ -2163,6 +2176,10 @@ definitions:
         $ref: '#/definitions/v1ControllerInfo'
       host_info:
         $ref: '#/definitions/v1HostInfo'
+      kubernetes_control_points:
+        type: array
+        items:
+          $ref: '#/definitions/v1KubernetesControlPoint'
       peers:
         $ref: '#/definitions/v1Peers'
       policies:
