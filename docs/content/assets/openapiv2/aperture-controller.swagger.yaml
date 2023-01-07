@@ -655,6 +655,10 @@ definitions:
       integrator:
         description: Accumulates sum of signal every tick.
         $ref: '#/definitions/v1Integrator'
+      kubernetes_pod_autoscaler:
+        description: KubernetesPodAutoscaler provides pod auto-scale functionality
+          for scalable Kubernetes resources.
+        $ref: '#/definitions/v1KubernetesPodAutoscaler'
       max:
         description: Emits the maximum of the input signals.
         $ref: '#/definitions/v1Max'
@@ -1410,6 +1414,40 @@ definitions:
         type: array
         items:
           type: string
+  v1KubernetesPodAutoscaler:
+    type: object
+    properties:
+      kubernetes_selector:
+        description: Which control point to apply the autoscaling to.
+        $ref: '#/definitions/v1KubernetesSelector'
+  v1KubernetesSelector:
+    description: |-
+      Describes which pods a control or observability
+      component should apply to.
+    type: object
+    properties:
+      agent_group:
+        description: |-
+          Which [agent-group](/concepts/service.md#agent-group) this
+          selector applies to.
+        type: string
+        x-go-default: default
+      api_version:
+        type: string
+        title: API version of Kubernetes resource
+        x-go-validate: required
+      kind:
+        description: Kubernetes resource type.
+        type: string
+        x-go-validate: required
+      name:
+        description: Kubernetes resource name.
+        type: string
+        x-go-validate: required
+      namespace:
+        description: Kubernetes namespace that the resource belongs to.
+        type: string
+        x-go-validate: required
   v1LabelMatcher:
     description: |-
       It provides three ways to define requirements:

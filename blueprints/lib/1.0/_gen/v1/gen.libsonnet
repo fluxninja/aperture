@@ -53,6 +53,8 @@
   JSONExtractor: import 'jsonextractor.libsonnet',
   JWTExtractor: import 'jwtextractor.libsonnet',
   K8sLabelMatcherRequirement: import 'k8slabelmatcherrequirement.libsonnet',
+  KubernetesPodAutoscaler: import 'kubernetespodautoscaler.libsonnet',
+  KubernetesSelector: import 'kubernetesselector.libsonnet',
   LabelMatcher: import 'labelmatcher.libsonnet',
   LoadActuator: import 'loadactuator.libsonnet',
   LoadActuatorDynamicConfig: import 'loadactuatordynamicconfig.libsonnet',

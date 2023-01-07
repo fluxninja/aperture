@@ -16,13 +16,17 @@ message FlowSelector {
   ServiceSelector service_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {string_value: "required"}
+      value: {
+        string_value: "required"
+      }
     }
   }]; // @gotags: validate:"required"
   FlowMatcher flow_matcher = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {string_value: "required"}
+      value: {
+        string_value: "required"
+      }
     }
   }]; // @gotags: validate:"required"
 }
@@ -40,7 +44,9 @@ message ServiceSelector {
   string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {string_value: "default"}
+      value: {
+        string_value: "default"
+      }
     }
   }]; // @gotags: default:"default"
 
@@ -88,7 +94,9 @@ message FlowMatcher {
   string control_point = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {string_value: "required"}
+      value: {
+        string_value: "required"
+      }
     }
   }]; // @gotags: validate:"required"
 
@@ -121,7 +129,9 @@ message KubernetesSelector {
   string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {string_value: "default"}
+      value: {
+        string_value: "default"
+      }
     }
   }]; // @gotags: default:"default"
 
@@ -129,7 +139,9 @@ message KubernetesSelector {
   string namespace = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {string_value: "required"}
+      value: {
+        string_value: "required"
+      }
     }
   }]; // @gotags: validate:"required"
 
@@ -137,7 +149,9 @@ message KubernetesSelector {
   string api_version = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {string_value: "required"}
+      value: {
+        string_value: "required"
+      }
     }
   }]; // @gotags: validate:"required"
 
@@ -145,7 +159,9 @@ message KubernetesSelector {
   string kind = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {string_value: "required"}
+      value: {
+        string_value: "required"
+      }
     }
   }]; // @gotags: validate:"required"
 
@@ -153,7 +169,9 @@ message KubernetesSelector {
   string name = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {string_value: "required"}
+      value: {
+        string_value: "required"
+      }
     }
   }]; // @gotags: validate:"required"
 }

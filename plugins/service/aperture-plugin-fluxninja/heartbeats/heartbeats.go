@@ -53,22 +53,22 @@ const (
 
 type Heartbeats struct {
 	heartbeatv1.UnimplementedControllerInfoServiceServer
-	heartbeatsClient         heartbeatv1.FluxNinjaServiceClient
-	statusRegistry           status.Registry
-	agentInfo                *agentinfo.AgentInfo
-	clientHTTP               *http.Client
-	interval                 config.Duration
-	jobGroup                 *jobs.JobGroup
-	clientConn               *grpc.ClientConn
-	peersWatcher             *peers.PeerDiscovery
-	entityCache              *entitycache.EntityCache
-	policyFactory            *controlplane.PolicyFactory
-	ControllerInfo           *heartbeatv1.ControllerInfo
-	serviceControlPointCache *cache.Cache[selectors.ControlPointID]
-	kubernetesAutoScaler     kubernetes.AutoScaler
-	heartbeatsAddr           string
-	APIKey                   string
-	jobName                  string
+	heartbeatsClient            heartbeatv1.FluxNinjaServiceClient
+	statusRegistry              status.Registry
+	agentInfo                   *agentinfo.AgentInfo
+	clientHTTP                  *http.Client
+	interval                    config.Duration
+	jobGroup                    *jobs.JobGroup
+	clientConn                  *grpc.ClientConn
+	peersWatcher                *peers.PeerDiscovery
+	entityCache                 *entitycache.EntityCache
+	policyFactory               *controlplane.PolicyFactory
+	ControllerInfo              *heartbeatv1.ControllerInfo
+	serviceControlPointCache    *cache.Cache[selectors.ControlPointID]
+	kubernetesControlPointCache kubernetes.ControlPointCache
+	heartbeatsAddr              string
+	APIKey                      string
+	jobName                     string
 }
 
 func newHeartbeats(
@@ -80,20 +80,20 @@ func newHeartbeats(
 	peersWatcher *peers.PeerDiscovery,
 	policyFactory *controlplane.PolicyFactory,
 	serviceControlPointCache *cache.Cache[selectors.ControlPointID],
-	KubernetesAutoScaler kubernetes.AutoScaler,
+	kubernetesControlPointCache kubernetes.ControlPointCache,
 ) *Heartbeats {
 	return &Heartbeats{
-		heartbeatsAddr:           p.FluxNinjaEndpoint,
-		interval:                 p.HeartbeatInterval,
-		APIKey:                   p.APIKey,
-		jobGroup:                 jobGroup,
-		statusRegistry:           statusRegistry,
-		entityCache:              entityCache,
-		agentInfo:                agentInfo,
-		peersWatcher:             peersWatcher,
-		policyFactory:            policyFactory,
-		serviceControlPointCache: serviceControlPointCache,
-		kubernetesAutoScaler:     KubernetesAutoScaler,
+		heartbeatsAddr:              p.FluxNinjaEndpoint,
+		interval:                    p.HeartbeatInterval,
+		APIKey:                      p.APIKey,
+		jobGroup:                    jobGroup,
+		statusRegistry:              statusRegistry,
+		entityCache:                 entityCache,
+		agentInfo:                   agentInfo,
+		peersWatcher:                peersWatcher,
+		policyFactory:               policyFactory,
+		serviceControlPointCache:    serviceControlPointCache,
+		kubernetesControlPointCache: kubernetesControlPointCache,
 	}
 }
 
@@ -239,7 +239,7 @@ func (h *Heartbeats) newHeartbeat(
 		})
 	}
 
-	kubernetesControlPointStructs := h.kubernetesAutoScaler.Keys()
+	kubernetesControlPointStructs := h.kubernetesControlPointCache.Keys()
 	kubernetesControlPoints := make([]*heartbeatv1.KubernetesControlPoint, 0, len(serviceControlPointStructs))
 	for _, cp := range kubernetesControlPointStructs {
 		kubernetesControlPoints = append(kubernetesControlPoints, &heartbeatv1.KubernetesControlPoint{

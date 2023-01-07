@@ -67,6 +67,12 @@
   withIntegratorMixin(integrator):: {
     integrator+: integrator,
   },
+  withKubernetesPodAutoscaler(kubernetes_pod_autoscaler):: {
+    kubernetes_pod_autoscaler: kubernetes_pod_autoscaler,
+  },
+  withKubernetesPodAutoscalerMixin(kubernetes_pod_autoscaler):: {
+    kubernetes_pod_autoscaler+: kubernetes_pod_autoscaler,
+  },
   withMax(max):: {
     max: max,
   },

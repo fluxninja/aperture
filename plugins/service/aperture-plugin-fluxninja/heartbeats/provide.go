@@ -44,6 +44,7 @@ func Module() fx.Option {
 type ConstructorIn struct {
 	fx.In
 
+<<<<<<< HEAD
 	Lifecycle                  fx.Lifecycle
 	Unmarshaller               config.Unmarshaller
 	JobGroup                   *jobs.JobGroup                     `name:"heartbeats-job-group"`
@@ -57,6 +58,35 @@ type ConstructorIn struct {
 	PolicyFactory              *controlplane.PolicyFactory `optional:"true"`
 	ControlPointCache          *cache.Cache[selectors.ControlPointID] `optional:"true"`
 	KubernetesAutoScaler       kubernetes.AutoScaler
+||||||| parent of 84cc3b87 (Checkpoint Autoscaler interfaces)
+	Lifecycle                  fx.Lifecycle
+	Unmarshaller               config.Unmarshaller
+	JobGroup                   *jobs.JobGroup                     `name:"heartbeats-job-group"`
+	GRPClientConnectionBuilder grpcclient.ClientConnectionBuilder `name:"heartbeats-grpc-client"`
+	HTTPClient                 *http.Client                       `name:"heartbeats-http-client"`
+	StatusRegistry             status.Registry
+	EntityCache                *entitycache.EntityCache `optional:"true"`
+	AgentInfo                  *agentinfo.AgentInfo     `optional:"true"`
+	PeersWatcher               *peers.PeerDiscovery     `name:"fluxninja-peers-watcher" optional:"true"`
+	EtcdClient                 *etcdclient.Client
+	PolicyFactory              *controlplane.PolicyFactory `optional:"true"`
+	ControlPointCache          *cache.Cache[selectors.ControlPointID]
+	KubernetesAutoScaler       kubernetes.AutoScaler
+=======
+	Lifecycle                   fx.Lifecycle
+	Unmarshaller                config.Unmarshaller
+	JobGroup                    *jobs.JobGroup                     `name:"heartbeats-job-group"`
+	GRPClientConnectionBuilder  grpcclient.ClientConnectionBuilder `name:"heartbeats-grpc-client"`
+	HTTPClient                  *http.Client                       `name:"heartbeats-http-client"`
+	StatusRegistry              status.Registry
+	EntityCache                 *entitycache.EntityCache `optional:"true"`
+	AgentInfo                   *agentinfo.AgentInfo     `optional:"true"`
+	PeersWatcher                *peers.PeerDiscovery     `name:"fluxninja-peers-watcher" optional:"true"`
+	EtcdClient                  *etcdclient.Client
+	PolicyFactory               *controlplane.PolicyFactory `optional:"true"`
+	ServiceControlPointCache    *cache.Cache[selectors.ControlPointID]
+	KubernetesControlPointCache kubernetes.ControlPointCache
+>>>>>>> 84cc3b87 (Checkpoint Autoscaler interfaces)
 }
 
 // Provide provides a new instance of Heartbeats.
@@ -74,8 +104,8 @@ func Provide(in ConstructorIn) (*Heartbeats, error) {
 		in.AgentInfo,
 		in.PeersWatcher,
 		in.PolicyFactory,
-		in.ControlPointCache,
-		in.KubernetesAutoScaler,
+		in.ServiceControlPointCache,
+		in.KubernetesControlPointCache,
 	)
 
 	runCtx, cancel := context.WithCancel(context.Background())
