@@ -38,8 +38,10 @@ type KubernetesDiscoveryConfig struct {
 func Module() fx.Option {
 	return fx.Options(
 		notifiers.TrackersConstructor{Name: "kubernetes_control_points"}.Annotate(),
-		fx.Invoke(
+		fx.Provide(
 			ProvideAutoscaler,
+		),
+		fx.Invoke(
 			InvokeServiceDiscovery,
 		),
 	)
@@ -57,21 +59,21 @@ type FxInAutoScaler struct {
 }
 
 // ProvideAutoscaler provides Kubernetes AutoScaler and starts Kubernetes control point discovery if enabled.
-func ProvideAutoscaler(in FxInAutoScaler) (AutoScaler, error) {
+func ProvideAutoscaler(in FxInAutoScaler) (ControlPointCache, AutoScaler, error) {
 	var cfg KubernetesDiscoveryConfig
 	if err := in.Unmarshaller.UnmarshalKey(configKey, &cfg); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize K8S discovery configuration!")
-		return nil, err
+		return nil, nil, err
 	}
 
 	discoveryClient := in.KubernetesClient.GetClientSet().DiscoveryClient
 	config, err := rest.InClusterConfig()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	dynClient, err := dynamic.NewForConfig(config)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	cachedDiscoveryClient := cacheddiscovery.NewMemCacheClient(discoveryClient)
 	mapper := restmapper.NewDeferredDiscoveryRESTMapper(cachedDiscoveryClient)
@@ -79,7 +81,7 @@ func ProvideAutoscaler(in FxInAutoScaler) (AutoScaler, error) {
 	scaleClient, err := scale.NewForConfig(config, mapper, dynamic.LegacyAPIPathResolverFunc, scaleKindResolver)
 	if err != nil {
 		log.Error().Err(err).Msg("Unable to create scale client")
-		return nil, err
+		return nil, nil, err
 	}
 
 	autoScaler := newAutoScaler(scaleClient, in.Trackers)
@@ -88,16 +90,18 @@ func ProvideAutoscaler(in FxInAutoScaler) (AutoScaler, error) {
 		cpd, err := newControlPointDiscovery(in.Election, in.KubernetesClient, discoveryClient, dynClient, autoScaler)
 		if err != nil {
 			log.Info().Err(err).Msg("Failed to create Kubernetes control point discovery")
-			return nil, err
+			return nil, nil, err
 		}
 
 		in.Lifecycle.Append(fx.Hook{
 			OnStart: func(_ context.Context) error {
+				autoScaler.start()
 				cpd.start()
 				return nil
 			},
 			OnStop: func(_ context.Context) error {
 				cpd.stop()
+				autoScaler.stop()
 				return nil
 			},
 		})
@@ -105,7 +109,7 @@ func ProvideAutoscaler(in FxInAutoScaler) (AutoScaler, error) {
 		log.Info().Msg("Skipping Kubernetes discovery service creation")
 	}
 
-	return autoScaler, nil
+	return autoScaler, autoScaler, nil
 }
 
 // FxInSvc describes parameters passed to k8s discovery constructor.

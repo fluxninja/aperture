@@ -640,6 +640,12 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([V1Integrator](#v1-integrator)) Accumulates sum of signal every tick.
 
 </dd>
+<dt>kubernetes_pod_autoscaler</dt>
+<dd>
+
+([V1KubernetesPodAutoscaler](#v1-kubernetes-pod-autoscaler)) KubernetesPodAutoscaler provides pod auto-scale functionality for scalable Kubernetes resources.
+
+</dd>
 <dt>max</dt>
 <dd>
 
@@ -1761,6 +1767,60 @@ Valid operators are In, NotIn, Exists and DoesNotExist.
 ([]string) An array of string values that relates to the key by an operator.
 If the operator is In or NotIn, the values array must be non-empty.
 If the operator is Exists or DoesNotExist, the values array must be empty.
+
+</dd>
+</dl>
+
+### v1KubernetesPodAutoscaler {#v1-kubernetes-pod-autoscaler}
+
+#### Properties
+
+<dl>
+<dt>kubernetes_selector</dt>
+<dd>
+
+([V1KubernetesSelector](#v1-kubernetes-selector)) Which control point to apply the autoscaling to.
+
+</dd>
+</dl>
+
+### v1KubernetesSelector {#v1-kubernetes-selector}
+
+Describes which pods a control or observability
+component should apply to.
+
+#### Properties
+
+<dl>
+<dt>agent_group</dt>
+<dd>
+
+(string, default: `default`) Which [agent-group](/concepts/service.md#agent-group) this
+selector applies to.
+
+</dd>
+<dt>api_version</dt>
+<dd>
+
+(string, `required`) API version of Kubernetes resource
+
+</dd>
+<dt>kind</dt>
+<dd>
+
+(string, `required`) Kubernetes resource type.
+
+</dd>
+<dt>name</dt>
+<dd>
+
+(string, `required`) Kubernetes resource name.
+
+</dd>
+<dt>namespace</dt>
+<dd>
+
+(string, `required`) Kubernetes namespace that the resource belongs to.
 
 </dd>
 </dl>

@@ -9,10 +9,14 @@ service FlowPreviewService {
   rpc PreviewFlowLabels(PreviewFlowLabelsRequest) returns (PreviewFlowLabelsResponse) {
     option (google.api.http) = {
       get: "/v1/flowcontrol/preview/labels/{service}/{control_point}"
-      additional_bindings {get: "/v1/flowcontrol/preview/labels/{control_point}"}
+      additional_bindings {
+        get: "/v1/flowcontrol/preview/labels/{control_point}"
+      }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["aperture-agent"];
+      tags: [
+        "aperture-agent"
+      ];
     };
   }
 }

@@ -23,7 +23,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-func newControlPointDiscovery(election *election.Election, k8sClient k8s.K8sClient, discoveryClient discovery.DiscoveryInterface, dynClient dynamic.Interface, autoScaler AutoScaler) (*controlPointDiscovery, error) {
+func newControlPointDiscovery(election *election.Election, k8sClient k8s.K8sClient, discoveryClient discovery.DiscoveryInterface, dynClient dynamic.Interface, controlPointStore ControlPointStore) (*controlPointDiscovery, error) {
 	if k8sClient.GetErrNotInCluster() {
 		log.Info().Msg("Not in Kubernetes cluster, could not create Kubernetes service discovery")
 		return nil, k8sClient.GetErr()
@@ -34,11 +34,11 @@ func newControlPointDiscovery(election *election.Election, k8sClient k8s.K8sClie
 	}
 
 	cpd := &controlPointDiscovery{
-		cli:             k8sClient.GetClientSet(),
-		election:        election,
-		autoScaler:      autoScaler,
-		discoveryClient: discoveryClient,
-		dynClient:       dynClient,
+		cli:               k8sClient.GetClientSet(),
+		election:          election,
+		controlPointStore: controlPointStore,
+		discoveryClient:   discoveryClient,
+		dynClient:         dynClient,
 	}
 
 	return cpd, nil
@@ -46,14 +46,14 @@ func newControlPointDiscovery(election *election.Election, k8sClient k8s.K8sClie
 
 // controlPointDiscovery is a struct that helps with Kubernetes control point discovery.
 type controlPointDiscovery struct {
-	waitGroup       sync.WaitGroup
-	ctx             context.Context
-	cancel          context.CancelFunc
-	cli             *kubernetes.Clientset
-	autoScaler      AutoScaler
-	discoveryClient discovery.DiscoveryInterface
-	dynClient       dynamic.Interface
-	election        *election.Election
+	waitGroup         sync.WaitGroup
+	ctx               context.Context
+	cancel            context.CancelFunc
+	cli               *kubernetes.Clientset
+	controlPointStore ControlPointStore
+	discoveryClient   discovery.DiscoveryInterface
+	dynClient         dynamic.Interface
+	election          *election.Election
 }
 
 // Start starts the Kubernetes control point discovery.
@@ -171,15 +171,15 @@ func (cpd *controlPointDiscovery) createResourceEventHandlerFuncs(groupVersionRe
 	return cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			controlPoint := controlPointFromObject(obj)
-			cpd.autoScaler.Add(controlPoint)
+			cpd.controlPointStore.Add(controlPoint)
 		},
 		UpdateFunc: func(_, obj interface{}) {
 			controlPoint := controlPointFromObject(obj)
-			cpd.autoScaler.Update(controlPoint)
+			cpd.controlPointStore.Update(controlPoint)
 		},
 		DeleteFunc: func(obj interface{}) {
 			controlPoint := controlPointFromObject(obj)
-			cpd.autoScaler.Delete(controlPoint)
+			cpd.controlPointStore.Delete(controlPoint)
 		},
 	}
 }

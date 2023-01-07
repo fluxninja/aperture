@@ -253,7 +253,6 @@ func (s *Scheduler) DynamicConfigUpdate(event notifiers.Event, unmarshaller conf
 
 func (s *Scheduler) publishQueryTokens(tokens *policysyncv1.TokensDecision) error {
 	logger := s.policyReadAPI.GetStatusRegistry().GetLogger()
-	// TODO: publish only on change
 	s.tokensByWorkload = tokens
 	policyName := s.policyReadAPI.GetPolicyName()
 	policyHash := s.policyReadAPI.GetPolicyHash()

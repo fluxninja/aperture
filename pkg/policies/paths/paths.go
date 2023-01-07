@@ -10,6 +10,8 @@ var (
 	ConfigPrefix = path.Join("/config")
 	// DecisionsPrefix is key prefix in etcd for decisions.
 	DecisionsPrefix = path.Join("/decisions")
+	// StatusPrefix is key prefix in etcd for status.
+	StatusPrefix = path.Join("/status")
 	// ClassifiersPath is config path in etcd for classifiers.
 	ClassifiersPath = path.Join(ConfigPrefix, "classifiers")
 	// LoadActuatorDecisionsPath is decision path in etcd for load decisions.
@@ -18,7 +20,7 @@ var (
 	AutoTokenResultsPath = path.Join(ConfigPrefix, "tokens")
 	// ConcurrencyLimiterConfigPath is config path in etcd for concurrency limiter.
 	ConcurrencyLimiterConfigPath = path.Join(ConfigPrefix, "concurrency_limiter")
-	// RateLimiterConfigPath is config path in etcd for concurrency limiter.
+	// RateLimiterConfigPath is config path in etcd for rate limiter.
 	RateLimiterConfigPath = path.Join(ConfigPrefix, "rate_limiter")
 	// RateLimiterDecisionsPath is decision path in etcd for rate limiter decisions.
 	RateLimiterDecisionsPath = path.Join(DecisionsPrefix, "rate_limiter")
@@ -26,6 +28,14 @@ var (
 	RateLimiterDynamicConfigPath = path.Join(ConfigPrefix, "rate_limiter_dynamic_config")
 	// FluxMeterConfigPath is config path in etcd for flux meters.
 	FluxMeterConfigPath = path.Join(ConfigPrefix, "flux_meter")
+	// KubernetesAutoScalerConfigPath is config path in etcd for kubernetes auto scaler.
+	KubernetesAutoScalerConfigPath = path.Join(ConfigPrefix, "kubernetes_auto_scaler")
+	// KubernetesAutoScalerDecisionsPath is decision path in etcd for kubernetes auto scaler decisions.
+	KubernetesAutoScalerDecisionsPath = path.Join(DecisionsPrefix, "kubernetes_auto_scaler")
+	// KubernetesAutoScalerStatusPath is decision path in etcd for kubernetes auto scaler status.
+	KubernetesAutoScalerStatusPath = path.Join(StatusPrefix, "kubernetes_auto_scaler")
+	// KubernetesAutoScalerDynamicConfigPath is config path in etcd for dynamic config of kubernetes auto scaler.
+	KubernetesAutoScalerDynamicConfigPath = path.Join(ConfigPrefix, "kubernetes_auto_scaler_dynamic_config")
 )
 
 // AgentGroupPrefix returns the prefix for an agent group.
