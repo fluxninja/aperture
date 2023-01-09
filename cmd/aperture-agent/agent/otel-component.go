@@ -49,6 +49,7 @@ import (
 func ModuleForAgentOTEL() fx.Option {
 	return fx.Options(
 		fx.Provide(
+			cache.Provide[selectors.ControlPointID],
 			otelcollector.NewOtelConfig,
 			fx.Annotate(
 				provideAgent,
