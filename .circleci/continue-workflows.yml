@@ -263,8 +263,7 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
-            - "75:2f:7a:fe:d3:a1:5e:81:a8:d2:cc:3a:21:59:b7:2c" # fluxninja/aperture-libsonnet R/O
+            - "10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8" # fluxninja/cloud R/O
       - checkout
       - asdf_install:
           cache_name: pre-commit
@@ -298,7 +297,7 @@ jobs:
             # We need R/O access to cloud repository to be able to fetch opsninja library
             # FIXME: make "releases" of opsninja library somehow, even as a separate repository
             # to limit exposure.
-            export CLOUD_RO_KEY_FINGERPRINT="8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"
+            export CLOUD_RO_KEY_FINGERPRINT="10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8"
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
             export SSH_AUTH_SOCK=""
             pip3 install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
@@ -429,7 +428,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
+            - "10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8" # fluxninja/cloud R/O
             - << parameters.remote-repo-fingerprint >> # fluxninja/<sdk> R/W
       - run: *install_opsninja
       - run:
@@ -486,8 +485,8 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
-            - "f1:bc:3e:8b:50:f3:f3:81:f2:12:41:2c:78:60:70:ff" # fluxninja/aperture-tech-docs R/W
+            - "10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8" # fluxninja/cloud R/O
+            - "2e:ea:3a:1e:2c:59:2d:40:aa:6a:a8:f5:1d:e2:91:f0" # fluxninja/aperture-tech-docs R/W
       - run: *install_opsninja
       - asdf_install:
           cache_name: publish-docs
@@ -530,8 +529,8 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
-            - "2d:5d:fd:00:b3:67:c4:32:2d:9f:80:60:58:b0:d6:b2" # fluxninja/deployment R/W
+            - "10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8" # fluxninja/cloud R/O
+            - "2a:af:6f:d5:b9:d4:dd:95:df:18:47:e9:0b:4a:c7:82" # fluxninja/deployment R/W
       - checkout
       - run: *install_opsninja
       - run:
@@ -545,7 +544,7 @@ jobs:
               --color=always
               --dest-repo-url "<< parameters.deployment-repo >>"
               --target-branch "main"
-              --ssh-identity "~/.ssh/id_rsa_$(echo "2d:5d:fd:00:b3:67:c4:32:2d:9f:80:60:58:b0:d6:b2" | tr -d ':')"
+              --ssh-identity "~/.ssh/id_rsa_$(echo "2a:af:6f:d5:b9:d4:dd:95:df:18:47:e9:0b:4a:c7:82" | tr -d ':')"
             )
             if [[ "<< parameters.dry-run >>" == "true" ]]; then
               args+=( --dry-run )
@@ -764,7 +763,7 @@ workflows:
           dockerfile: Dockerfile
           docker-image: aperture-go-example
           remote-repo: fluxninja/aperture-go
-          remote-repo-fingerprint: "c5:d8:c4:22:7e:ff:b5:c3:c3:32:c2:b7:54:c7:99:1b"
+          remote-repo-fingerprint: "eb:80:c9:44:c7:53:0f:ae:b7:4e:86:0f:62:60:6f:76"
 
   aperture-js:
     when: << pipeline.parameters.updated-aperture-js >>
@@ -776,7 +775,7 @@ workflows:
           dockerfile: Dockerfile
           docker-image: aperture-js-example
           remote-repo: fluxninja/aperture-js
-          remote-repo-fingerprint: "2b:10:dc:0b:ba:45:2e:6c:6d:d0:f4:b9:c3:e9:38:37"
+          remote-repo-fingerprint: "00:5e:cf:81:48:2d:e9:b8:34:74:8b:46:cc:ad:2f:ce"
 
   aperture-java:
     when: << pipeline.parameters.updated-aperture-java >>
@@ -812,7 +811,7 @@ workflows:
           dockerfile: Dockerfile
           docker-image: aperture-java-example
           remote-repo: fluxninja/aperture-java
-          remote-repo-fingerprint: "14:8a:b9:90:ba:48:a4:f0:27:b0:70:d7:95:17:16:1e"
+          remote-repo-fingerprint: "79:0e:fb:cd:d3:3e:14:dd:52:de:b7:1c:ac:1e:ea:84"
 
   aperture-operator:
     when: << pipeline.parameters.updated-aperture-operator >>
