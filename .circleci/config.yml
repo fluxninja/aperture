@@ -68,14 +68,14 @@ commands:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
+            - "10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8" # fluxninja/cloud R/O
       - run:
           name: Install opsninja and its dependencies
           command: |
             # We need R/O access to cloud repository to be able to fetch opsninja library
             # FIXME: make "releases" of opsninja library somehow, even as a separate repository
             # to limit exposure.
-            export CLOUD_RO_KEY_FINGERPRINT="8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"
+            export CLOUD_RO_KEY_FINGERPRINT="10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8"
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
             export SSH_AUTH_SOCK=""
             # Bust asdf cache as our opsninja version is always 0.0.0
@@ -106,12 +106,12 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "e1:10:c4:c4:f6:4e:fd:9e:e3:f6:21:5c:02:e2:ad:37" # fluxninja/aperture R/W
+            - "44:8f:25:14:ad:f5:55:a5:a9:37:b2:21:7e:15:8a:ab" # fluxninja/aperture R/W
       - checkout
       - run:
           name: "Package and release Helm Chart"
           command: |
-            export APERTURE_RW_KEY_FINGERPRINT="e1:10:c4:c4:f6:4e:fd:9e:e3:f6:21:5c:02:e2:ad:37"
+            export APERTURE_RW_KEY_FINGERPRINT="44:8f:25:14:ad:f5:55:a5:a9:37:b2:21:7e:15:8a:ab"
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${APERTURE_RW_KEY_FINGERPRINT}" | tr -d ':')"
             export SSH_AUTH_SOCK=""
             .circleci/scripts/helm_release.sh
