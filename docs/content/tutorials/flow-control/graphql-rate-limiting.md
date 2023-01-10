@@ -26,20 +26,20 @@ Classifier][flow-classifier] and is mapped from the `userId` argument of
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="Jsonnet">
-```
-
-```jsonnet
-{@include: ./assets/graphql-rate-limiting/graphql-rate-limiting.jsonnet}
-```
-
-```mdx-code-block
-</TabItem>
 <TabItem value="YAML">
 ```
 
 ```yaml
 {@include: ./assets/graphql-rate-limiting/graphql-rate-limiting.yaml}
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Jsonnet">
+```
+
+```jsonnet
+{@include: ./assets/graphql-rate-limiting/graphql-rate-limiting.jsonnet}
 ```
 
 ```mdx-code-block

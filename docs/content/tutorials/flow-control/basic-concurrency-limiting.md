@@ -61,20 +61,20 @@ At a high-level, this policy consists of:
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="Jsonnet">
-```
-
-```jsonnet
-{@include: ./assets/basic-concurrency-limiting/basic-concurrency-limiting.jsonnet}
-```
-
-```mdx-code-block
-</TabItem>
 <TabItem value="YAML">
 ```
 
 ```yaml
 {@include: ./assets/basic-concurrency-limiting/basic-concurrency-limiting.yaml}
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Jsonnet">
+```
+
+```jsonnet
+{@include: ./assets/basic-concurrency-limiting/basic-concurrency-limiting.jsonnet}
 ```
 
 ```mdx-code-block
