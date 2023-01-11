@@ -13,12 +13,6 @@ metadata:
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
 rules:
-- nonResourceURLs:
-  - /healthz
-  - /metrics
-  - /version
-  verbs:
-  - get
 - apiGroups:
   - admissionregistration.k8s.io
   resources:
@@ -35,7 +29,6 @@ rules:
 - apiGroups:
   - apps
   resources:
-  - daemonsets
   - deployments
   verbs:
   - create
@@ -44,14 +37,6 @@ rules:
   - list
   - patch
   - update
-  - watch
-- apiGroups:
-  - fluxninja.com
-  resources:
-  - agents
-  verbs:
-  - get
-  - list
   - watch
 - apiGroups:
   - fluxninja.com
@@ -83,79 +68,15 @@ rules:
   - patch
   - update
 - apiGroups:
-  - coordination.k8s.io
-  resources:
-  - leases
-  verbs:
-  - get
-- apiGroups:
   - ""
   resources:
-  - componentstatuses
   - configmaps
   - secrets
   - serviceaccounts
   - services
-  - namespaces
   verbs:
   - create
   - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - namespaces/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - namespaces/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - nodes
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - nodes/metrics
-  verbs:
-  - get
-- apiGroups:
-  - ""
-  resources:
-  - nodes/proxy
-  verbs:
-  - get
-- apiGroups:
-  - ""
-  resources:
-  - nodes/spec
-  verbs:
-  - get
-- apiGroups:
-  - ""
-  resources:
-  - nodes/stats
-  verbs:
-  - get
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  verbs:
   - get
   - list
   - patch
@@ -184,14 +105,6 @@ rules:
   - patch
   - delete
 - apiGroups:
-  - ""
-  resources:
-  - endpoints
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
   - rbac.authorization.k8s.io
   resources:
   - clusterrolebindings
@@ -204,25 +117,6 @@ rules:
   - patch
   - update
   - watch
-- apiGroups:
-  - policy
-  resources:
-  - podsecuritypolicies
-  verbs:
-  - use
-- apiGroups:
-  - quota.openshift.io
-  resources:
-  - clusterresourcequotas
-  verbs:
-  - get
-  - list
-- apiGroups:
-  - security.openshift.io
-  resources:
-  - securitycontextconstraints
-  verbs:
-  - use
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1

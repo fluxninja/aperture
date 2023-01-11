@@ -44,7 +44,6 @@ import (
 
 	"github.com/fluxninja/aperture/operator/api"
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
-	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/go-logr/logr"
 )
@@ -62,17 +61,16 @@ type AgentReconciler struct {
 
 //+kubebuilder:rbac:groups=admissionregistration.k8s.io,resources=mutatingwebhookconfigurations,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=apps,resources=daemonsets,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=fluxninja.com,resources=agents,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=fluxninja.com,resources=agents/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=fluxninja.com,resources=agents/finalizers,verbs=update
-//+kubebuilder:rbac:groups=coordination.k8s.io,resources=leases,verbs=get
+//+kubebuilder:rbac:groups=coordination.k8s.io,resources=leases,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=configmaps,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=core,resources=componentstatuses,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=componentstatuses,verbs=get;list;watch
 //+kubebuilder:rbac:groups=core,resources=events,verbs=get;list;watch;create;patch
 //+kubebuilder:rbac:groups=core,resources=endpoints,verbs=get;list;watch
-//+kubebuilder:rbac:groups=core,resources=namespaces,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=core,resources=namespaces/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=core,resources=namespaces/finalizers,verbs=update
+//+kubebuilder:rbac:groups=core,resources=namespaces,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=core,resources=nodes,verbs=get;list;watch
 //+kubebuilder:rbac:groups=core,resources=nodes/metrics,verbs=get
 //+kubebuilder:rbac:groups=core,resources=nodes/spec,verbs=get
@@ -82,11 +80,8 @@ type AgentReconciler struct {
 //+kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=secrets,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=serviceaccounts,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=policy,resources=podsecuritypolicies,verbs=use
-//+kubebuilder:rbac:groups=quota.openshift.io,resources=clusterresourcequotas,verbs=get;list
 //+kubebuilder:rbac:groups=rbac.authorization.k8s.io,resources=clusterroles,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=rbac.authorization.k8s.io,resources=clusterrolebindings,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=security.openshift.io,resources=securitycontextconstraints,verbs=use
 //+kubebuilder:rbac:urls=/version;/healthz;/metrics,verbs=get
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
@@ -229,22 +224,15 @@ func (r *AgentReconciler) updateStatus(ctx context.Context, instance *agentv1alp
 
 // deleteResources deletes cluster-scoped resources for which owner-reference is not added.
 func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) {
-	deleteClusterRole := true
-	instances := &controllerv1alpha1.ControllerList{}
-	err := r.List(ctx, instances)
-	if err != nil {
-		log.Error(err, "failed to list Controller")
-	} else if instances.Items != nil && len(instances.Items) != 0 {
-		for _, ins := range instances.Items {
-			if ins.Status.Resources == "created" {
-				deleteClusterRole = false
-			}
-		}
+	// Deleting old ClusterRole
+	cr := clusterRoleForAgent(instance)
+	cr.Name = controllers.AppName
+	if err := r.Delete(ctx, cr); err != nil && !errors.IsNotFound(err) {
+		log.Error(err, "failed to delete object of ClusterRole")
 	}
-	if deleteClusterRole {
-		if err := r.Delete(ctx, clusterRoleForAgent(instance)); err != nil {
-			log.Error(err, "failed to delete object of ClusterRole")
-		}
+
+	if err := r.Delete(ctx, clusterRoleForAgent(instance)); err != nil {
+		log.Error(err, "failed to delete object of ClusterRole")
 	}
 
 	if err := r.Delete(ctx, clusterRoleBindingForAgent(instance)); err != nil {

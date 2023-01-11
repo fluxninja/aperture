@@ -64,18 +64,20 @@ rules:
   resources:
   - leases
   verbs:
-  - get
-- apiGroups:
-  - ""
-  resources:
-  - componentstatuses
-  verbs:
   - create
   - delete
   - get
   - list
   - patch
   - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - componentstatuses
+  verbs:
+  - get
+  - list
   - watch
 - apiGroups:
   - ""
@@ -112,27 +114,11 @@ rules:
   resources:
   - namespaces
   verbs:
-  - create
-  - delete
   - get
   - list
   - patch
   - update
   - watch
-- apiGroups:
-  - ""
-  resources:
-  - namespaces/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - namespaces/status
-  verbs:
-  - get
-  - patch
-  - update
 - apiGroups:
   - ""
   resources:
@@ -290,19 +276,6 @@ rules:
   - patch
   - update
 - apiGroups:
-  - policy
-  resources:
-  - podsecuritypolicies
-  verbs:
-  - use
-- apiGroups:
-  - quota.openshift.io
-  resources:
-  - clusterresourcequotas
-  verbs:
-  - get
-  - list
-- apiGroups:
   - rbac.authorization.k8s.io
   resources:
   - clusterrolebindings
@@ -326,9 +299,3 @@ rules:
   - patch
   - update
   - watch
-- apiGroups:
-  - security.openshift.io
-  resources:
-  - securitycontextconstraints
-  verbs:
-  - use

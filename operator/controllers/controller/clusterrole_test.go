@@ -46,7 +46,7 @@ var _ = Describe("clusterRoleForController", func() {
 
 			expected := &rbacv1.ClusterRole{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: AppName,
+					Name: ControllerServiceName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
 						"app.kubernetes.io/instance":   AppName,
@@ -59,51 +59,6 @@ var _ = Describe("clusterRoleForController", func() {
 					},
 				},
 				Rules: []rbacv1.PolicyRule{
-					{
-						APIGroups: []string{""},
-						Resources: []string{"services", "events", "endpoints", "pods", "nodes", "namespaces", "componentstatuses"},
-						Verbs:     []string{"get", "list", "watch"},
-					},
-					{
-						APIGroups: []string{"quota.openshift.io"},
-						Resources: []string{"clusterresourcequotas"},
-						Verbs:     []string{"get"},
-					},
-					{
-						NonResourceURLs: []string{"/version", "/healthz"},
-						Verbs:           []string{"get"},
-					},
-					{
-						NonResourceURLs: []string{"/metrics"},
-						Verbs:           []string{"get"},
-					},
-					{
-						APIGroups: []string{""},
-						Resources: []string{"nodes/metrics", "nodes/spec", "nodes/proxy", "nodes/stats"},
-						Verbs:     []string{"get"},
-					},
-					{
-						APIGroups:     []string{"policy"},
-						Resources:     []string{"podsecuritypolicies"},
-						Verbs:         []string{"use"},
-						ResourceNames: []string{AppName},
-					},
-					{
-						APIGroups:     []string{"security.openshift.io"},
-						Resources:     []string{"securitycontextconstraints"},
-						Verbs:         []string{"use"},
-						ResourceNames: []string{AppName},
-					},
-					{
-						APIGroups: []string{"coordination.k8s.io"},
-						Resources: []string{"leases"},
-						Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-					},
-					{
-						APIGroups: []string{"admissionregistration.k8s.io"},
-						Resources: []string{"mutatingwebhookconfigurations"},
-						Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-					},
 					{
 						APIGroups: []string{"fluxninja.com"},
 						Resources: []string{"policies"},
@@ -153,7 +108,7 @@ var _ = Describe("clusterRoleForController", func() {
 
 			expected := &rbacv1.ClusterRole{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: AppName,
+					Name: ControllerServiceName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
 						"app.kubernetes.io/instance":   AppName,
@@ -168,51 +123,6 @@ var _ = Describe("clusterRoleForController", func() {
 					},
 				},
 				Rules: []rbacv1.PolicyRule{
-					{
-						APIGroups: []string{""},
-						Resources: []string{"services", "events", "endpoints", "pods", "nodes", "namespaces", "componentstatuses"},
-						Verbs:     []string{"get", "list", "watch"},
-					},
-					{
-						APIGroups: []string{"quota.openshift.io"},
-						Resources: []string{"clusterresourcequotas"},
-						Verbs:     []string{"get"},
-					},
-					{
-						NonResourceURLs: []string{"/version", "/healthz"},
-						Verbs:           []string{"get"},
-					},
-					{
-						NonResourceURLs: []string{"/metrics"},
-						Verbs:           []string{"get"},
-					},
-					{
-						APIGroups: []string{""},
-						Resources: []string{"nodes/metrics", "nodes/spec", "nodes/proxy", "nodes/stats"},
-						Verbs:     []string{"get"},
-					},
-					{
-						APIGroups:     []string{"policy"},
-						Resources:     []string{"podsecuritypolicies"},
-						Verbs:         []string{"use"},
-						ResourceNames: []string{AppName},
-					},
-					{
-						APIGroups:     []string{"security.openshift.io"},
-						Resources:     []string{"securitycontextconstraints"},
-						Verbs:         []string{"use"},
-						ResourceNames: []string{AppName},
-					},
-					{
-						APIGroups: []string{"coordination.k8s.io"},
-						Resources: []string{"leases"},
-						Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-					},
-					{
-						APIGroups: []string{"admissionregistration.k8s.io"},
-						Resources: []string{"mutatingwebhookconfigurations"},
-						Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-					},
 					{
 						APIGroups: []string{"fluxninja.com"},
 						Resources: []string{"policies"},
@@ -280,7 +190,7 @@ var _ = Describe("clusterRoleBindingForController", func() {
 			RoleRef: rbacv1.RoleRef{
 				APIGroup: "rbac.authorization.k8s.io",
 				Kind:     "ClusterRole",
-				Name:     AppName,
+				Name:     ControllerServiceName,
 			},
 			Subjects: []rbacv1.Subject{
 				{

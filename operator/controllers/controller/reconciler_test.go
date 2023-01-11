@@ -97,7 +97,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			controllerServiceKey := types.NamespacedName{Name: ControllerServiceName, Namespace: namespace}
 
 			createdClusterRole := &rbacv1.ClusterRole{}
-			clusterRoleKey := types.NamespacedName{Name: AppName}
+			clusterRoleKey := types.NamespacedName{Name: ControllerServiceName}
 
 			createdClusterRoleBinding := &rbacv1.ClusterRoleBinding{}
 			clusterRoleBindingKey := types.NamespacedName{Name: ControllerServiceName}
@@ -168,7 +168,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			controllerServiceKey := types.NamespacedName{Name: ControllerServiceName, Namespace: namespace}
 
 			createdClusterRole := &rbacv1.ClusterRole{}
-			clusterRoleKey := types.NamespacedName{Name: AppName}
+			clusterRoleKey := types.NamespacedName{Name: ControllerServiceName}
 
 			createdClusterRoleBinding := &rbacv1.ClusterRoleBinding{}
 			clusterRoleBindingKey := types.NamespacedName{Name: ControllerServiceName}
