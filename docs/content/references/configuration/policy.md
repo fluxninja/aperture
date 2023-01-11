@@ -603,6 +603,12 @@ See also [Policy](#v1-policy) for a higher-level explanation of circuits.
 ([V1Decider](#v1-decider)) Decider emits the binary result of comparison operator on two operands.
 
 </dd>
+<dt>differentiator</dt>
+<dd>
+
+([V1Differentiator](#v1-differentiator)) Differentiator calculates rate of change per tick.
+
+</dd>
 <dt>ema</dt>
 <dd>
 
@@ -853,6 +859,63 @@ Outputs for the Decider component.
 <dd>
 
 ([V1OutPort](#v1-out-port)) Selected signal (1.0 or 0.0).
+
+</dd>
+</dl>
+
+### v1Differentiator {#v1-differentiator}
+
+Differentiator calculates rate of change per tick.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1DifferentiatorIns](#v1-differentiator-ins)) Input ports for the Differentiator component.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([V1DifferentiatorOuts](#v1-differentiator-outs)) Output ports for the Differentiator component.
+
+</dd>
+<dt>window</dt>
+<dd>
+
+(string, default: `5s`) The window of time over which differentiator operates.
+
+</dd>
+</dl>
+
+### v1DifferentiatorIns {#v1-differentiator-ins}
+
+Inputs for the Differentiator component.
+
+#### Properties
+
+<dl>
+<dt>input</dt>
+<dd>
+
+([V1InPort](#v1-in-port))
+
+</dd>
+</dl>
+
+### v1DifferentiatorOuts {#v1-differentiator-outs}
+
+Outputs for the Differentiator component.
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
 
 </dd>
 </dl>

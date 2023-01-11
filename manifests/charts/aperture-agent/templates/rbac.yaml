@@ -22,7 +22,6 @@ rules:
 - apiGroups:
   - admissionregistration.k8s.io
   resources:
-  - validatingwebhookconfigurations
   - mutatingwebhookconfigurations
   verbs:
   - create
@@ -48,16 +47,7 @@ rules:
 - apiGroups:
   - fluxninja.com
   resources:
-  - controllers
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - fluxninja.com
-  resources:
   - agents
-  - policies
   verbs:
   - create
   - delete
@@ -70,33 +60,23 @@ rules:
   - fluxninja.com
   resources:
   - agents/finalizers
-  - policies/finalizers
   verbs:
   - update
 - apiGroups:
   - fluxninja.com
   resources:
   - agents/status
-  - policies/status
   verbs:
   - get
   - patch
   - update
 - apiGroups:
-  - coordination.k8s.io
-  resources:
-  - leases
-  verbs:
-  - get
-- apiGroups:
   - ""
   resources:
-  - componentstatuses
   - configmaps
   - secrets
   - serviceaccounts
   - services
-  - namespaces
   verbs:
   - create
   - delete
@@ -108,21 +88,9 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - namespaces/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - namespaces/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - ""
-  resources:
   - nodes
+  - endpoints
+  - componentstatuses
   verbs:
   - get
   - list
@@ -155,6 +123,7 @@ rules:
   - ""
   resources:
   - pods
+  - namespaces
   verbs:
   - get
   - list
@@ -184,14 +153,6 @@ rules:
   - patch
   - delete
 - apiGroups:
-  - ""
-  resources:
-  - endpoints
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
   - rbac.authorization.k8s.io
   resources:
   - clusterrolebindings
@@ -204,25 +165,6 @@ rules:
   - patch
   - update
   - watch
-- apiGroups:
-  - policy
-  resources:
-  - podsecuritypolicies
-  verbs:
-  - use
-- apiGroups:
-  - quota.openshift.io
-  resources:
-  - clusterresourcequotas
-  verbs:
-  - get
-  - list
-- apiGroups:
-  - security.openshift.io
-  resources:
-  - securitycontextconstraints
-  verbs:
-  - use
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1

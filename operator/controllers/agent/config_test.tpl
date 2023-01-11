@@ -21,6 +21,9 @@ etcd:
     key_file: ""
     key_log_file: ""
   username: ""
+flow_control:
+  preview_service:
+    enabled: true
 fluxninja_plugin:
   api_key: ""
   client:
