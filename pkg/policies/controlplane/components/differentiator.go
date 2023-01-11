@@ -1,6 +1,7 @@
 package components
 
 import (
+	"math"
 	"time"
 
 	"go.uber.org/fx"
@@ -10,23 +11,19 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 // Differentiator is a component that calculates rate of change per tick.
 type Differentiator struct {
 	window time.Duration
 	// readings are saved in ring buffer
-	readings  []point
+	readings  []runtime.Reading
 	oldestIdx int
 	newestIdx int
 	// capacity is calculated from window duration divided by tick interval
 	capacity    int
 	initialized bool
-}
-
-type point struct {
-	reading   runtime.Reading
-	timestamp time.Time
 }
 
 // Name implements runtime.Component.
@@ -59,40 +56,42 @@ func (d *Differentiator) Execute(inPortReadings runtime.PortToValue, tickInfo ru
 	}
 
 	inputVal := inPortReadings.ReadSingleValuePort("input")
-	outputVal := runtime.NewReading(0)
+	outputVal := runtime.InvalidReading()
 
 	// add input to readings array
-	d.readings[d.newestIdx] = point{reading: inputVal, timestamp: tickInfo.Timestamp()}
+	d.readings[d.newestIdx] = inputVal
 
 	if d.oldestIdx != d.newestIdx {
 		oldest := d.readings[d.oldestIdx]
 		newest := d.readings[d.newestIdx]
+		oldestIdx := d.oldestIdx
+		newestIdx := d.newestIdx
 
-		if !oldest.reading.Valid() {
-			oldest = d.firstValid(d.oldestIdx, true)
+		if !oldest.Valid() {
+			oldest, oldestIdx = d.firstValid(d.oldestIdx, true)
 		}
 
 		// find the newest valid reading for extrapolation
-		if !newest.reading.Valid() {
-			found := d.firstValid(d.newestIdx, false)
-			if found.reading.Valid() && oldest.reading.Valid() {
-				extrapolatedValue := d.extrapolate(oldest, found, tickInfo.Timestamp())
-				newest = point{reading: runtime.NewReading(extrapolatedValue), timestamp: tickInfo.Timestamp()}
+		if !newest.Valid() {
+			found, foundIdx := d.firstValid(d.newestIdx, false)
+			if found.Valid() && oldest.Valid() && foundIdx != oldestIdx {
+				extrapolatedValue := d.extrapolate(oldest, found, oldestIdx, foundIdx)
+				newest = runtime.NewReading(extrapolatedValue)
+				newestIdx = foundIdx
 			}
 		}
 
 		// calculate the derivative
-		if oldest.reading.Valid() && newest.reading.Valid() {
-			diff := (newest.reading.Value() - oldest.reading.Value()) /
-				float64(newest.timestamp.UnixMilli()-oldest.timestamp.UnixMilli())
+		if oldest.Valid() && newest.Valid() && newestIdx != oldestIdx {
+			diff := (newest.Value() - oldest.Value()) / float64(d.capacity)
 			outputVal = runtime.NewReading(diff)
 		}
 	}
 
 	// shift pointers for newest and oldest
-	d.newestIdx = (d.newestIdx + 1) % d.capacity
+	d.newestIdx = utils.Mod((d.newestIdx + 1), d.capacity)
 	if d.newestIdx == d.oldestIdx {
-		d.oldestIdx = (d.oldestIdx + 1) % d.capacity
+		d.oldestIdx = utils.Mod((d.oldestIdx + 1), d.capacity)
 	}
 
 	return runtime.PortToValue{
@@ -104,44 +103,35 @@ func (d *Differentiator) Execute(inPortReadings runtime.PortToValue, tickInfo ru
 func (d *Differentiator) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 }
 
-func (d *Differentiator) extrapolate(firstVal, secondVal point, currentTime time.Time) float64 {
-	extValue := firstVal.reading.Value() + float64(currentTime.UnixMilli()-firstVal.timestamp.UnixMilli())/
-		float64(secondVal.timestamp.UnixMilli()-firstVal.timestamp.UnixMilli())*
-		(secondVal.reading.Value()-firstVal.reading.Value())
+func (d *Differentiator) extrapolate(firstVal, secondVal runtime.Reading, firstIdx, secondIdx int) float64 {
+	extrapolatedIdx := utils.Mod(secondIdx+1, d.capacity)
+	extValue := firstVal.Value() + float64(extrapolatedIdx-firstIdx)/
+		float64(secondIdx-firstIdx)*
+		(secondVal.Value()-firstVal.Value())
 	return extValue
 }
 
 func (d *Differentiator) init(tickInfo runtime.TickInfo) {
-	d.capacity = int(d.window / tickInfo.Interval())
-	d.readings = make([]point, d.capacity)
+	d.capacity = int(math.Ceil(float64(d.window) / float64(tickInfo.Interval())))
+	d.readings = make([]runtime.Reading, d.capacity)
 	for i := 0; i < d.capacity; i++ {
-		d.readings[i].reading = runtime.InvalidReading()
-		d.readings[i].timestamp = time.Now()
+		d.readings[i] = runtime.InvalidReading()
 	}
 	d.initialized = true
 }
 
-func (d *Differentiator) firstValid(fromIdx int, addition bool) point {
+func (d *Differentiator) firstValid(fromIdx int, addition bool) (runtime.Reading, int) {
 	step := 1
 	if !addition {
 		step = -1
 	}
 
-	idx := (fromIdx + step) % d.capacity
-	if (fromIdx + step) < 0 {
-		// ring buffer wrap up
-		idx = d.capacity - 1
-	}
-
-	for idx != fromIdx {
-		if d.readings[idx].reading.Valid() {
-			return d.readings[idx]
+	idx := utils.Mod((fromIdx + step), d.capacity)
+	for i := 0; i < d.capacity; i++ {
+		if d.readings[idx].Valid() {
+			return d.readings[idx], idx
 		}
-		idx = (idx + step) % d.capacity
-		if (idx + step) < 0 {
-			// ring buffer wrap up
-			idx = d.capacity - 1
-		}
+		idx = utils.Mod((idx + step), d.capacity)
 	}
-	return point{reading: runtime.InvalidReading(), timestamp: time.Now()}
+	return runtime.InvalidReading(), idx
 }
