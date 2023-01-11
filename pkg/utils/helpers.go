@@ -40,3 +40,8 @@ func IsHTTPUrl(url string) bool {
 	matched, _ := regexp.MatchString(prefixHTTPRegex, url)
 	return matched
 }
+
+// Mod is a normal modulo operation which does not produce negative values.
+func Mod(a, b int) int {
+	return (a%b + b) % b
+}

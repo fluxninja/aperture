@@ -913,6 +913,9 @@ definitions:
       decider:
         $ref: '#/definitions/v1Decider'
         description: Decider emits the binary result of comparison operator on two operands.
+      differentiator:
+        $ref: '#/definitions/v1Differentiator'
+        description: Differentiator calculates rate of change per tick.
       ema:
         $ref: '#/definitions/v1EMA'
         description: Exponential Moving Average filter.
@@ -1114,6 +1117,32 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Selected signal (1.0 or 0.0).
     description: Outputs for the Decider component.
+  v1Differentiator:
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/v1DifferentiatorIns'
+        description: Input ports for the Differentiator component.
+      out_ports:
+        $ref: '#/definitions/v1DifferentiatorOuts'
+        description: Output ports for the Differentiator component.
+      window:
+        type: string
+        description: The window of time over which differentiator operates.
+        x-go-default: 5s
+    description: Differentiator calculates rate of change per tick.
+  v1DifferentiatorIns:
+    type: object
+    properties:
+      input:
+        $ref: '#/definitions/v1InPort'
+    description: Inputs for the Differentiator component.
+  v1DifferentiatorOuts:
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
+    description: Outputs for the Differentiator component.
   v1EMA:
     type: object
     properties:
