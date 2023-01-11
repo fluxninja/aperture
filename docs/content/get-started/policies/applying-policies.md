@@ -49,3 +49,17 @@ Aperture Controller is running.
 ```bash
 kubectl get policies
 ```
+
+3. The Policy runtime can be visualized in a Grafana dashboard. Refer to the
+   metrics available from [Controller][controller-metrics] and
+   [Agent][agent-metrics]. Some of the Policy Blueprints come with recommended
+   Grafana dashboards.
+
+4. Run the following to delete the above policy:
+
+```bash
+kubectl delete policy static-rate-limiting
+```
+
+[controller-metrics]: /references/prometheus-metrics/controller.md
+[agent-metrics]: /references/prometheus-metrics/agent.md
