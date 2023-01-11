@@ -34,20 +34,20 @@ In addition, we will be configuring our rate limiter to apply these limits to
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="Jsonnet">
-```
-
-```jsonnet
-{@include: ./assets/static-rate-limiting/static-rate-limiting.jsonnet}
-```
-
-```mdx-code-block
-</TabItem>
 <TabItem value="YAML">
 ```
 
 ```yaml
 {@include: ./assets/static-rate-limiting/static-rate-limiting.yaml}
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Jsonnet">
+```
+
+```jsonnet
+{@include: ./assets/static-rate-limiting/static-rate-limiting.jsonnet}
 ```
 
 ```mdx-code-block
