@@ -1,8 +1,8 @@
-label: SDKs
+label: SDK
 position: 2
 collapsible: true
 collapsed: true
 link:
   type: "generated-index"
-  title: "SDKs"
+  title: "SDK"
   keywords: ["flow control", "sdk"]
