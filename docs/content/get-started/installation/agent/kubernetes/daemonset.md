@@ -194,8 +194,8 @@ your cluster.
    ```
 
 6. Refer steps on the
-   [Istio Configuration](/get-started/installation/agent/envoy/istio.md) if you
-   don't have the
+   [Istio Configuration](/get-started/flow-control/envoy/istio.md) if you don't
+   have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.
 

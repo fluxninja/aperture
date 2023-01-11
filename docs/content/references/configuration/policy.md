@@ -1304,7 +1304,7 @@ selector:
 
 :::info
 For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/get-started/installation/agent/envoy/istio.md#envoy-filter)
+[Envoy Filter](/get-started/flow-control/envoy/istio.md#envoy-filter)
 :::
 
 </dd>
