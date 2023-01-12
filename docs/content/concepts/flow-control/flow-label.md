@@ -76,7 +76,7 @@ the Introspection API on an `aperture-agent` local to the service instances
 For example:
 
 ```sh
-$ curl localhost:8080/v1/flowcontrol/preview/labels/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
+curl localhost:8080/v1/flowcontrol/preview/labels/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
 ```
 
 Returns:
@@ -189,7 +189,6 @@ select which labels to include in telemetry.
 
 [flow]: /concepts/flow-control/flow-control.md#flow
 [flow-selector]: /concepts/flow-control/flow-selector.md
-[label-matcher]: /concepts/flow-control/flow-selector.md#label-matcher
 [classifier]: /concepts/flow-control/flow-classifier.md
 [workload]: /concepts/flow-control/concurrency-limiter.md#workload
 [ratelimiter]: /concepts/flow-control/rate-limiter.md
@@ -201,4 +200,4 @@ select which labels to include in telemetry.
 [otel-conventions]:
   https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
 [aperture-go]: https://github.com/FluxNinja/aperture-go
-[istio]: /get-started/installation/agent/envoy/istio.md
+[istio]: /get-started/flow-control/envoy/istio.md
