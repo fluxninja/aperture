@@ -125,20 +125,20 @@ func (cpd *controlPointDiscovery) start() {
 					cpd.createResourceEventHandlerFuncs(groupVersionResource, kind),
 				)
 
-				// start controller
-				panichandler.Go(func() {
-					controller.Run(cpd.ctx.Done())
-				})
+				resourceWatcher := resourceWatcher{
+					controller:           controller,
+					groupVersionResource: groupVersionResource,
+					ctx:                  cpd.ctx,
+				}
+
+				resourceWatcher.goRun()
 			}
 
-			<-cpd.ctx.Done()
 			return nil
 		}
 
 		boff := backoff.NewConstantBackOff(5 * time.Second)
 		_ = backoff.Retry(operation, backoff.WithContext(boff, cpd.ctx))
-
-		log.Info().Msg("Stopped kubernetes control point watcher")
 	})
 }
 
@@ -175,4 +175,18 @@ func (cpd *controlPointDiscovery) createResourceEventHandlerFuncs(groupVersionRe
 func (cpd *controlPointDiscovery) stop() {
 	cpd.cancel()
 	cpd.waitGroup.Wait()
+}
+
+type resourceWatcher struct {
+	controller           cache.Controller
+	ctx                  context.Context
+	groupVersionResource schema.GroupVersionResource
+}
+
+func (rw *resourceWatcher) goRun() {
+	panichandler.Go(func() {
+		// Run controller
+		rw.controller.Run(rw.ctx.Done())
+		log.Info().Msg("Stopped kubernetes control point watcher for resource " + rw.groupVersionResource.String())
+	})
 }
