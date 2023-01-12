@@ -29,6 +29,8 @@ Here's an example of the Aperture Policy configuration file:
 {@include: ../../tutorials/flow-control/assets/static-rate-limiting/static-rate-limiting.yaml}
 ```
 
+## Create Policy
+
 Follow the steps given below to create the above Aperture Policy:
 
 :::info
@@ -50,12 +52,24 @@ Aperture Controller is running.
 kubectl get policies
 ```
 
-3. The Policy runtime can be visualized in a Grafana dashboard. Refer to the
-   metrics available from [Controller][controller-metrics] and
+3. The Aperture Policy runtime can be visualized in a Grafana dashboard. Refer
+   to the metrics available from [Controller][controller-metrics] and
    [Agent][agent-metrics]. Some of the Policy Blueprints come with recommended
    Grafana dashboards.
 
-4. Run the following to delete the above policy:
+## Blueprints
+
+Follow the information on [Policy](/concepts/policy/policy.md) to understand and
+design the Aperture Policy circuits.
+
+Once the design is ready, follow the steps on the
+[Blueprints](/get-started/policies/blueprints.md) to generate the Policy Custom
+Resource and apply it on a Kubernetes cluster.
+
+## Delete Policy
+
+1. Run the following command to delete the Aperture Policy created using above
+   steps:
 
 ```bash
 kubectl delete policy static-rate-limiting
