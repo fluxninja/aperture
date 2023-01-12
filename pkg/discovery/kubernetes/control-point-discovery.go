@@ -19,26 +19,15 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 )
 
-func newControlPointDiscovery(election *election.Election, k8sClient k8s.K8sClient, discoveryClient discovery.DiscoveryInterface, dynClient dynamic.Interface, controlPointStore ControlPointStore) (*controlPointDiscovery, error) {
-	if k8sClient.GetErrNotInCluster() {
-		log.Info().Msg("Not in Kubernetes cluster, could not create Kubernetes service discovery")
-		return nil, k8sClient.GetErr()
-	}
-	if k8sClient.GetErr() != nil {
-		log.Error().Err(k8sClient.GetErr()).Msg("Error when creating Kubernetes client, could not create Kubernetes service discovery")
-		return nil, k8sClient.GetErr()
-	}
-
+func newControlPointDiscovery(election *election.Election, k8sClient k8s.K8sClient, controlPointStore ControlPointStore) (*controlPointDiscovery, error) {
 	cpd := &controlPointDiscovery{
-		cli:               k8sClient.GetClientSet(),
 		election:          election,
 		controlPointStore: controlPointStore,
-		discoveryClient:   discoveryClient,
-		dynClient:         dynClient,
+		discoveryClient:   k8sClient.GetClientSet().DiscoveryClient,
+		dynamicClient:     k8sClient.GetDynamicClient(),
 	}
 
 	return cpd, nil
@@ -49,10 +38,9 @@ type controlPointDiscovery struct {
 	waitGroup         sync.WaitGroup
 	ctx               context.Context
 	cancel            context.CancelFunc
-	cli               *kubernetes.Clientset
 	controlPointStore ControlPointStore
 	discoveryClient   discovery.DiscoveryInterface
-	dynClient         dynamic.Interface
+	dynamicClient     dynamic.Interface
 	election          *election.Election
 }
 
@@ -95,7 +83,7 @@ func (cpd *controlPointDiscovery) start() {
 				}
 			}
 
-			groupVersionResourceSet := make(map[schema.GroupVersionResource]interface{})
+			groupVersionResourceSet := make(map[schema.GroupVersionResource]string)
 			log.Info().Msgf("Scalable resources: %v", scalableResources)
 			for _, apiResourceList := range apiResourceListList {
 				for _, apiResource := range apiResourceList.APIResources {
@@ -112,29 +100,29 @@ func (cpd *controlPointDiscovery) start() {
 							Resource: apiResource.Name,
 						}
 						// Add to groupVersionResourceSet
-						groupVersionResourceSet[groupVersionResource] = nil
+						groupVersionResourceSet[groupVersionResource] = apiResource.Kind
 					}
 				}
 			}
 
 			// Track each scalable resource
-			for groupVersionResource := range groupVersionResourceSet {
+			for groupVersionResource, kind := range groupVersionResourceSet {
 				log.Info().Msgf("Starting watch for Group: %s, Version: %s, Resource: %s", groupVersionResource.Group, groupVersionResource.Version, groupVersionResource.Resource)
-				resourceInterface := cpd.dynClient.Resource(groupVersionResource)
+				resourceInterface := cpd.dynamicClient.Resource(groupVersionResource)
 
 				// watch for changes
 				_, controller := cache.NewInformer(
 					&cache.ListWatch{
 						ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-							return resourceInterface.List(context.Background(), options)
+							return resourceInterface.List(cpd.ctx, options)
 						},
 						WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-							return resourceInterface.Watch(context.Background(), options)
+							return resourceInterface.Watch(cpd.ctx, options)
 						},
 					},
 					&unstructured.Unstructured{},
 					0,
-					cpd.createResourceEventHandlerFuncs(groupVersionResource),
+					cpd.createResourceEventHandlerFuncs(groupVersionResource, kind),
 				)
 
 				// start controller
@@ -154,7 +142,7 @@ func (cpd *controlPointDiscovery) start() {
 	})
 }
 
-func (cpd *controlPointDiscovery) createResourceEventHandlerFuncs(groupVersionResource schema.GroupVersionResource) cache.ResourceEventHandlerFuncs {
+func (cpd *controlPointDiscovery) createResourceEventHandlerFuncs(groupVersionResource schema.GroupVersionResource, kind string) cache.ResourceEventHandlerFuncs {
 	controlPointFromObject := func(obj interface{}) ControlPoint {
 		// read the name of the resource
 		name := obj.(*unstructured.Unstructured).GetName()
@@ -162,7 +150,7 @@ func (cpd *controlPointDiscovery) createResourceEventHandlerFuncs(groupVersionRe
 		return ControlPoint{
 			Group:     groupVersionResource.Group,
 			Version:   groupVersionResource.Version,
-			Type:      groupVersionResource.Resource,
+			Kind:      kind,
 			Name:      name,
 			Namespace: namespace,
 		}

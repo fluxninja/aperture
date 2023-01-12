@@ -18,6 +18,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	controlpointcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/controlpointcache/v1"
 	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/peers/v1"
 	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
@@ -226,6 +227,7 @@ func (h *Heartbeats) newHeartbeat(
 		policies.PolicyWrappers = h.policyFactory.GetPolicyWrappers()
 	}
 
+<<<<<<< HEAD
 	serviceControlPointStructs := make(map[selectors.ControlPointID]struct{})
 	if h.serviceControlPointCache != nil {
 		serviceControlPointStructs = h.serviceControlPointCache.GetAllAndClear()
@@ -233,22 +235,25 @@ func (h *Heartbeats) newHeartbeat(
 
 	serviceControlPoints := make([]*heartbeatv1.ServiceControlPoint, 0, len(serviceControlPointStructs))
 	for cp := range serviceControlPointStructs {
+||||||| parent of 562dfc0d (PodAutoscaler code complete)
+	serviceControlPointStructs := h.serviceControlPointCache.GetAllAndClear()
+	serviceControlPoints := make([]*heartbeatv1.ServiceControlPoint, 0, len(serviceControlPointStructs))
+	for cp := range serviceControlPointStructs {
+=======
+	serviceControlPointObjects := h.serviceControlPointCache.GetAllAndClear()
+	serviceControlPoints := make([]*heartbeatv1.ServiceControlPoint, 0, len(serviceControlPointObjects))
+	for cp := range serviceControlPointObjects {
+>>>>>>> 562dfc0d (PodAutoscaler code complete)
 		serviceControlPoints = append(serviceControlPoints, &heartbeatv1.ServiceControlPoint{
 			Name:        cp.ControlPoint,
 			ServiceName: cp.Service,
 		})
 	}
 
-	kubernetesControlPointStructs := h.kubernetesControlPointCache.Keys()
-	kubernetesControlPoints := make([]*heartbeatv1.KubernetesControlPoint, 0, len(serviceControlPointStructs))
-	for _, cp := range kubernetesControlPointStructs {
-		kubernetesControlPoints = append(kubernetesControlPoints, &heartbeatv1.KubernetesControlPoint{
-			Group:     cp.Group,
-			Version:   cp.Version,
-			Type:      cp.Type,
-			Namespace: cp.Namespace,
-			Name:      cp.Name,
-		})
+	kubernetesControlPointObjects := h.kubernetesControlPointCache.Keys()
+	kubernetesControlPoints := make([]*controlpointcachev1.KubernetesControlPoint, 0, len(serviceControlPointObjects))
+	for _, cp := range kubernetesControlPointObjects {
+		kubernetesControlPoints = append(kubernetesControlPoints, cp.ToProto())
 	}
 
 	return &heartbeatv1.ReportRequest{

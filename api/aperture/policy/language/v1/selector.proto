@@ -123,7 +123,7 @@ message FlowMatcher {
 
 // Describes which pods a control or observability
 // component should apply to.
-message KubernetesSelector {
+message KubernetesObjectSelector {
   // Which [agent-group](/concepts/service.md#agent-group) this
   // selector applies to.
   string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

@@ -117,6 +117,54 @@ definitions:
         items:
           $ref: '#/definitions/v1MatchExpression'
         x-order: 0
+  PodAutoscalerScaleActuator:
+    type: object
+    properties:
+      default_config:
+        description: Default configuration.
+        x-order: 0
+        $ref: '#/definitions/PodAutoscalerScaleActuatorDynamicConfig'
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
+        x-order: 1
+      in_ports:
+        x-order: 2
+        $ref: '#/definitions/PodAutoscalerScaleActuatorIns'
+  PodAutoscalerScaleActuatorDynamicConfig:
+    type: object
+    title: Dynamic Configuration for ScaleActuator
+    properties:
+      dry_run:
+        description: |-
+          Decides whether to run the pod autoscaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this autoscaler.
+          Useful for observing the behavior of Auto Scaler without disrupting any real traffic.
+        type: boolean
+        x-go-default: false
+        x-order: 0
+  PodAutoscalerScaleActuatorIns:
+    description: Inputs for the PodAutoscaler component.
+    type: object
+    properties:
+      desired_replicas:
+        x-order: 0
+        $ref: '#/definitions/v1InPort'
+  PodAutoscalerScaleReporter:
+    type: object
+    properties:
+      out_ports:
+        x-order: 0
+        $ref: '#/definitions/PodAutoscalerScaleReporterOuts'
+  PodAutoscalerScaleReporterOuts:
+    description: Outputs for the PodAutoscaler component.
+    type: object
+    properties:
+      actual_replicas:
+        x-order: 0
+        $ref: '#/definitions/v1OutPort'
+      configured_replicas:
+        x-order: 1
+        $ref: '#/definitions/v1OutPort'
   RateLimiterLazySync:
     type: object
     properties:
@@ -498,19 +546,19 @@ definitions:
         description: Accumulates sum of signal every tick.
         x-order: 10
         $ref: '#/definitions/v1Integrator'
-      kubernetes_pod_autoscaler:
-        description: KubernetesPodAutoscaler provides pod auto-scale functionality
-          for scalable Kubernetes resources.
-        x-order: 10
-        $ref: '#/definitions/v1KubernetesPodAutoscaler'
       max:
         description: Emits the maximum of the input signals.
-        x-order: 11
+        x-order: 10
         $ref: '#/definitions/v1Max'
       min:
         description: Emits the minimum of the input signals.
-        x-order: 12
+        x-order: 11
         $ref: '#/definitions/v1Min'
+      pod_autoscaler:
+        description: PodAutoscaler provides pod auto-scale functionality for scalable
+          Kubernetes resources.
+        x-order: 12
+        $ref: '#/definitions/v1PodAutoscaler'
       promql:
         description: Periodically runs a Prometheus query in the background and emits
           the result.
@@ -1326,14 +1374,7 @@ definitions:
         items:
           type: string
         x-order: 2
-  v1KubernetesPodAutoscaler:
-    type: object
-    properties:
-      kubernetes_selector:
-        description: Which control point to apply the autoscaling to.
-        x-order: 0
-        $ref: '#/definitions/v1KubernetesSelector'
-  v1KubernetesSelector:
+  v1KubernetesObjectSelector:
     description: |-
       Describes which pods a control or observability
       component should apply to.
@@ -1607,6 +1648,20 @@ definitions:
           type: string
         x-go-validate: required
         x-order: 0
+  v1PodAutoscaler:
+    type: object
+    properties:
+      kubernetes_object_selector:
+        description: Which Kubernetes object to apply the autoscaling to.
+        x-go-validate: required
+        x-order: 0
+        $ref: '#/definitions/v1KubernetesObjectSelector'
+      scale_actuator:
+        x-order: 1
+        $ref: '#/definitions/PodAutoscalerScaleActuator'
+      scale_reporter:
+        x-order: 2
+        $ref: '#/definitions/PodAutoscalerScaleReporter'
   v1Policy:
     description: |-
       :::info

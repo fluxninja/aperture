@@ -67,12 +67,6 @@
   withIntegratorMixin(integrator):: {
     integrator+: integrator,
   },
-  withKubernetesPodAutoscaler(kubernetes_pod_autoscaler):: {
-    kubernetes_pod_autoscaler: kubernetes_pod_autoscaler,
-  },
-  withKubernetesPodAutoscalerMixin(kubernetes_pod_autoscaler):: {
-    kubernetes_pod_autoscaler+: kubernetes_pod_autoscaler,
-  },
   withMax(max):: {
     max: max,
   },
@@ -84,6 +78,12 @@
   },
   withMinMixin(min):: {
     min+: min,
+  },
+  withPodAutoscaler(pod_autoscaler):: {
+    pod_autoscaler: pod_autoscaler,
+  },
+  withPodAutoscalerMixin(pod_autoscaler):: {
+    pod_autoscaler+: pod_autoscaler,
   },
   withPromql(promql):: {
     promql: promql,
