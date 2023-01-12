@@ -12,7 +12,7 @@ const (
 	PluginConfigKey = "fluxninja_plugin"
 )
 
-// FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration plugin.
+// FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
 // swagger:model
 // +kubebuilder:object:generate=true
 type FluxNinjaPluginConfig struct {

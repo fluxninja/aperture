@@ -1,21 +1,21 @@
 ---
-title: FluxNinja Cloud
+title: FluxNinja ARC
 sidebar_position: 1
 keywords:
   - cloud
   - enterprise
 ---
 
-# FluxNinja Cloud
+# FluxNinja Application Reliability Center (ARC)
 
-:::info Join the FluxNinja Cloud Beta
+:::info Join the FluxNinja ARC Beta
 
-FluxNinja Cloud is inviting beta users. Please sign in
+FluxNinja ARC is inviting beta users. Please sign in
 [here](https://app.fluxninja.com/sign-in)
 
 :::
 
-FluxNinja Cloud has the following capabilities:
+FluxNinja ARC has the following capabilities:
 
 - Visualizing Aperture Policies.
 - Notifications when Policies trigger alerts or take action.

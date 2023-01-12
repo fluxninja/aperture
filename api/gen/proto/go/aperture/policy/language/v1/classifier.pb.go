@@ -153,8 +153,8 @@ type Rule struct {
 	// :::
 	//
 	// :::caution
-	// When using [FluxNinja Cloud plugin](cloud/plugin.md), telemetry enabled
-	// labels are sent to FluxNinha Cloud for observability. Telemetry should be disabled for
+	// When using [FluxNinja ARC plugin](arc/plugin.md), telemetry enabled
+	// labels are sent to FluxNinja ARC for observability. Telemetry should be disabled for
 	// sensitive labels.
 	// :::
 	Telemetry bool `protobuf:"varint,3,opt,name=telemetry,proto3" json:"telemetry,omitempty" default:"true"` // @gotags: default:"true"

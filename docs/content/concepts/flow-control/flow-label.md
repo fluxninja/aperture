@@ -162,10 +162,10 @@ precedence over:
 
 :::
 
-## Interaction with FluxNinja Cloud plugin {#plugin}
+## Interaction with FluxNinja ARC plugin {#plugin}
 
 All the Flow Labels are used as labels of flow events. These events are rolled
-up and sent to the analytics database in the cloud. This allows:
+up and sent to the analytics database in the FluxNinja ARC. This allows:
 
 - For the Flow Labels to be used as filters or group bys
 - To see analytics for each Flow Label, eg. distribution of its values

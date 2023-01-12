@@ -1,8 +1,8 @@
-label: FluxNinja Cloud
+label: FluxNinja ARC
 position: 5
 collapsible: true
 collapsed: true
 link:
   type: "generated-index"
-  title: "FluxNinja Cloud"
+  title: "FluxNinja ARC"
   keywords: ["cloud"]
