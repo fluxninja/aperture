@@ -73,7 +73,7 @@ var _ = Describe("MutatingWebhookConfiguration controller", Ordered, func() {
 						FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 						MatchPolicy:             &[]admissionregistrationv1.MatchPolicyType{admissionregistrationv1.Equivalent}[0],
 						SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-						TimeoutSeconds:          pointer.Int32Ptr(10),
+						TimeoutSeconds:          pointer.Int32(10),
 					},
 				},
 			}
