@@ -2,7 +2,6 @@ package rate
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"path"
 	"strconv"
@@ -319,7 +318,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 			var merr, err error
 			deleted := rateCounterVec.DeletePartialMatch(metricLabels)
 			if deleted == 0 {
-				merr = multierr.Append(merr, errors.New("failed to delete rate limiter counter from its metric vector"))
+				logger.Warn().Msg("Could not delete rate limiter counter from its metric vector. No traffic to generate metrics?")
 			}
 			// remove from data engine
 			err = rateLimiter.rateLimiterFactory.engineAPI.UnregisterRateLimiter(rateLimiter)
