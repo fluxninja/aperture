@@ -77,7 +77,7 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 							Service: &admissionregistrationv1.ServiceReference{
 								Name:      ControllerServiceName,
 								Namespace: instance.GetNamespace(),
-								Path:      pointer.StringPtr(PolicyValidatingWebhookURI),
+								Path:      pointer.String(PolicyValidatingWebhookURI),
 								Port:      pointer.Int32(8080),
 							},
 							CABundle: []byte(Test),
@@ -101,7 +101,7 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 						AdmissionReviewVersions: []string{V1Version},
 						FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 						SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-						TimeoutSeconds:          pointer.Int32Ptr(10),
+						TimeoutSeconds:          pointer.Int32(10),
 					},
 				},
 			}
@@ -163,7 +163,7 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 							Service: &admissionregistrationv1.ServiceReference{
 								Name:      ControllerServiceName,
 								Namespace: instance.GetNamespace(),
-								Path:      pointer.StringPtr(PolicyValidatingWebhookURI),
+								Path:      pointer.String(PolicyValidatingWebhookURI),
 								Port:      pointer.Int32(80),
 							},
 							CABundle: []byte(Test),
@@ -187,7 +187,7 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 						AdmissionReviewVersions: []string{V1Version},
 						FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 						SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-						TimeoutSeconds:          pointer.Int32Ptr(10),
+						TimeoutSeconds:          pointer.Int32(10),
 					},
 				},
 			}
@@ -224,7 +224,7 @@ var _ = Describe("Test ValidatingWebhookConfiguration Mutate", func() {
 					},
 					FailurePolicy:  &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Ignore}[0],
 					SideEffects:    &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassSome}[0],
-					TimeoutSeconds: pointer.Int32Ptr(10),
+					TimeoutSeconds: pointer.Int32(10),
 				},
 			},
 		}

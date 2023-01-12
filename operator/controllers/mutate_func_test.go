@@ -104,7 +104,7 @@ var _ = Describe("Test MutatingWebhookConfiguration Mutate", func() {
 					},
 					FailurePolicy:  &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Ignore}[0],
 					SideEffects:    &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassSome}[0],
-					TimeoutSeconds: pointer.Int32Ptr(10),
+					TimeoutSeconds: pointer.Int32(10),
 				},
 			},
 		}
@@ -144,7 +144,7 @@ var _ = Describe("Test ServiceAccount Mutate", func() {
 	It("Mutate should update required fields only", func() {
 		expected := &corev1.ServiceAccount{
 			ObjectMeta:                   metav1.ObjectMeta{},
-			AutomountServiceAccountToken: pointer.BoolPtr(true),
+			AutomountServiceAccountToken: pointer.Bool(true),
 		}
 
 		sa := &corev1.ServiceAccount{}
@@ -204,7 +204,7 @@ var _ = Describe("Test ValidatingWebhookConfiguration Mutate", func() {
 					},
 					FailurePolicy:  &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Ignore}[0],
 					SideEffects:    &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassSome}[0],
-					TimeoutSeconds: pointer.Int32Ptr(10),
+					TimeoutSeconds: pointer.Int32(10),
 				},
 			},
 		}
