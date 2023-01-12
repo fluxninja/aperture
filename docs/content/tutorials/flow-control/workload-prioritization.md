@@ -63,20 +63,20 @@ highlighted in the Jsonnet spec below.
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="Jsonnet">
-```
-
-```jsonnet
-{@include: ./assets/workload-prioritization/workload-prioritization.jsonnet}
-```
-
-```mdx-code-block
-</TabItem>
 <TabItem value="YAML">
 ```
 
 ```yaml
 {@include: ./assets/workload-prioritization/workload-prioritization.yaml}
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Jsonnet">
+```
+
+```jsonnet
+{@include: ./assets/workload-prioritization/workload-prioritization.jsonnet}
 ```
 
 ```mdx-code-block

@@ -145,8 +145,8 @@ var _ = Describe("Agent Daemonset", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Agent",
-							Controller:         pointer.BoolPtr(true),
-							BlockOwnerDeletion: pointer.BoolPtr(true),
+							Controller:         pointer.Bool(true),
+							BlockOwnerDeletion: pointer.Bool(true),
 						},
 					},
 					Annotations: nil,
@@ -262,7 +262,7 @@ var _ = Describe("Agent Daemonset", func() {
 									Name: "aperture-agent-config",
 									VolumeSource: corev1.VolumeSource{
 										ConfigMap: &corev1.ConfigMapVolumeSource{
-											DefaultMode: pointer.Int32Ptr(420),
+											DefaultMode: pointer.Int32(420),
 											LocalObjectReference: corev1.LocalObjectReference{
 												Name: AgentServiceName,
 											},
@@ -406,8 +406,8 @@ var _ = Describe("Agent Daemonset", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Agent",
-							Controller:         pointer.BoolPtr(true),
-							BlockOwnerDeletion: pointer.BoolPtr(true),
+							Controller:         pointer.Bool(true),
+							BlockOwnerDeletion: pointer.Bool(true),
 						},
 					},
 					Annotations: TestMap,
@@ -440,9 +440,9 @@ var _ = Describe("Agent Daemonset", func() {
 							Affinity:     affinity,
 							Tolerations:  tolerations,
 							SecurityContext: &corev1.PodSecurityContext{
-								FSGroup: pointer.Int64Ptr(1001),
+								FSGroup: pointer.Int64(1001),
 							},
-							TerminationGracePeriodSeconds: pointer.Int64Ptr(10),
+							TerminationGracePeriodSeconds: pointer.Int64(10),
 							InitContainers: []corev1.Container{
 								{
 									Name: Test,
@@ -454,9 +454,9 @@ var _ = Describe("Agent Daemonset", func() {
 									Image:           "docker.io/fluxninja/aperture-agent:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									SecurityContext: &corev1.SecurityContext{
-										RunAsUser:              pointer.Int64Ptr(0),
-										RunAsNonRoot:           pointer.BoolPtr(false),
-										ReadOnlyRootFilesystem: pointer.BoolPtr(false),
+										RunAsUser:              pointer.Int64(0),
+										RunAsNonRoot:           pointer.Bool(false),
+										ReadOnlyRootFilesystem: pointer.Bool(false),
 									},
 									Command: TestArray,
 									Args:    TestArray,
@@ -599,7 +599,7 @@ var _ = Describe("Agent Daemonset", func() {
 									Name: "aperture-agent-config",
 									VolumeSource: corev1.VolumeSource{
 										ConfigMap: &corev1.ConfigMapVolumeSource{
-											DefaultMode: pointer.Int32Ptr(420),
+											DefaultMode: pointer.Int32(420),
 											LocalObjectReference: corev1.LocalObjectReference{
 												Name: AgentServiceName,
 											},
@@ -639,7 +639,7 @@ var _ = Describe("Test Daemonset Mutate", func() {
 						NodeSelector:       map[string]string{},
 						Tolerations:        []corev1.Toleration{},
 						SecurityContext: &corev1.PodSecurityContext{
-							FSGroup: pointer.Int64Ptr(1001),
+							FSGroup: pointer.Int64(1001),
 						},
 						InitContainers: []corev1.Container{},
 						Containers: []corev1.Container{

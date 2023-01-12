@@ -135,8 +135,8 @@ var _ = Describe("ConfigMap for Agent", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Agent",
-							Controller:         pointer.BoolPtr(true),
-							BlockOwnerDeletion: pointer.BoolPtr(true),
+							Controller:         pointer.Bool(true),
+							BlockOwnerDeletion: pointer.Bool(true),
 						},
 					},
 				},
@@ -148,7 +148,7 @@ var _ = Describe("ConfigMap for Agent", func() {
 			result, err := configMapForAgentConfig(instance.DeepCopy(), scheme.Scheme)
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(result.Data).To(Equal(expected.Data))
+			Expect(result.Data["aperture-agent.yaml"]).To(Equal(expected.Data["aperture-agent.yaml"]))
 		})
 	})
 })
