@@ -470,10 +470,19 @@ func (r *AgentReconciler) reconcileClusterRole(ctx context.Context, instance *ag
 // reconcileClusterRoleBinding prepares the desired states for Agent ClusterRoleBinding and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileClusterRoleBinding(ctx context.Context, instance *agentv1alpha1.Agent) error {
+	log := log.FromContext(ctx)
 	crb := clusterRoleBindingForAgent(instance.DeepCopy())
 	res, err := controllerutil.CreateOrUpdate(ctx, r.Client, crb, controllers.ClusterRoleBindingMutate(crb, crb.RoleRef, crb.Subjects))
 	if err != nil {
 		if errors.IsConflict(err) {
+			return r.reconcileClusterRoleBinding(ctx, instance)
+		}
+
+		// Checking invalid as Kubernetes doesn't allow updating RoleRef
+		if errors.IsInvalid(err) && strings.Contains(err.Error(), "cannot change roleRef") {
+			if err = r.Delete(ctx, clusterRoleBindingForAgent(instance)); err != nil {
+				log.Error(err, "failed to delete object of ClusterRoleBinding")
+			}
 			return r.reconcileClusterRoleBinding(ctx, instance)
 		}
 
