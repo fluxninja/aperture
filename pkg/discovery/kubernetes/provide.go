@@ -16,7 +16,13 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-var configKey = common.DiscoveryConfigKey + ".kubernetes"
+var (
+	configKey = common.DiscoveryConfigKey + ".kubernetes"
+	// FxTagBase is the tag's base used to identify the Kubernetes Control Points Tracker.
+	FxTagBase = "kubernetes_control_points"
+	// FxTag is the tag used to identify the Kubernetes Control Points Tracker.
+	FxTag = config.NameTag(FxTagBase)
+)
 
 // KubernetesDiscoveryConfig for Kubernetes service discovery.
 // swagger:model
@@ -32,7 +38,7 @@ type KubernetesDiscoveryConfig struct {
 // Module returns an fx.Option that provides the Kubernetes discovery module.
 func Module() fx.Option {
 	return fx.Options(
-		notifiers.TrackersConstructor{Name: "kubernetes_control_points"}.Annotate(),
+		notifiers.TrackersConstructor{Name: FxTag}.Annotate(),
 		fx.Provide(
 			ProvideControlPointCache,
 		),
@@ -42,8 +48,8 @@ func Module() fx.Option {
 	)
 }
 
-// FxInAutoScaler is the input for the ProvideKuberetesControlPointsCache function.
-type FxInAutoScaler struct {
+// FxInK8sScale is the input for the ProvideKuberetesControlPointsCache function.
+type FxInK8sScale struct {
 	fx.In
 	Unmarshaller     config.Unmarshaller
 	Lifecycle        fx.Lifecycle
@@ -54,7 +60,7 @@ type FxInAutoScaler struct {
 }
 
 // ProvideControlPointCache provides Kubernetes AutoScaler and starts Kubernetes control point discovery if enabled.
-func ProvideControlPointCache(in FxInAutoScaler) (ControlPointCache, error) {
+func ProvideControlPointCache(in FxInK8sScale) (ControlPointCache, error) {
 	var cfg KubernetesDiscoveryConfig
 	if err := in.Unmarshaller.UnmarshalKey(configKey, &cfg); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize K8S discovery configuration!")
@@ -63,8 +69,8 @@ func ProvideControlPointCache(in FxInAutoScaler) (ControlPointCache, error) {
 
 	controlPointCache := newControlPointCache(in.Trackers, in.KubernetesClient)
 
-	if !cfg.DiscoveryEnabled {
-		log.Info().Msg("Skipping Kubernetes Control Point Discovery since it is disabled")
+	if !cfg.AutoscaleEnabled {
+		log.Info().Msg("Skipping Kubernetes Control Point Discovery since Autoscale is disabled")
 		return controlPointCache, nil
 	}
 	if in.KubernetesClient == nil {

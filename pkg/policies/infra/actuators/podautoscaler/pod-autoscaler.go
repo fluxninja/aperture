@@ -49,7 +49,7 @@ func Module() fx.Option {
 				setupPodAutoscalerFactory,
 				fx.ParamTags(
 					fxNameTag,
-					config.NameTag("kubernetes_control_points"),
+					discoverykubernetes.FxTag,
 				),
 			),
 		),
@@ -189,10 +189,7 @@ func (paFactory *podAutoscalerFactory) newPodAutoscalerOptions(
 
 	return fx.Options(
 		fx.Invoke(
-			fx.Annotate(
-				podAutoscaler.setup,
-				fx.ParamTags("kubernetes_control_points"),
-			),
+			podAutoscaler.setup,
 		),
 		fx.Supply(
 			paFactory.etcdClient,

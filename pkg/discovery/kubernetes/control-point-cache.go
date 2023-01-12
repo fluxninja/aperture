@@ -92,10 +92,10 @@ type controlPointCache struct {
 }
 
 // controlPointCache implements the ControlPointStore interface.
-var _ ControlPointStore = &controlPointCache{}
+var _ ControlPointStore = (*controlPointCache)(nil)
 
 // controlPointCache implements the ControlPointCache interface.
-var _ ControlPointCache = &controlPointCache{}
+var _ ControlPointCache = (*controlPointCache)(nil)
 
 // newControlPointCache returns a new ControlPointCache.
 func newControlPointCache(trackers notifiers.Trackers, k8sClient k8s.K8sClient) *controlPointCache {
