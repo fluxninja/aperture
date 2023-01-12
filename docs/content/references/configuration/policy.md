@@ -156,6 +156,96 @@ eg. {any: {of: [expr1, expr2]}}.
 </dd>
 </dl>
 
+### PodAutoscalerScaleActuator {#pod-autoscaler-scale-actuator}
+
+#### Properties
+
+<dl>
+<dt>default_config</dt>
+<dd>
+
+([PodAutoscalerScaleActuatorDynamicConfig](#pod-autoscaler-scale-actuator-dynamic-config)) Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+([PodAutoscalerScaleActuatorIns](#pod-autoscaler-scale-actuator-ins))
+
+</dd>
+</dl>
+
+### PodAutoscalerScaleActuatorDynamicConfig {#pod-autoscaler-scale-actuator-dynamic-config}
+
+Dynamic Configuration for ScaleActuator
+
+#### Properties
+
+<dl>
+<dt>dry_run</dt>
+<dd>
+
+(bool) Decides whether to run the pod autoscaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this autoscaler.
+Useful for observing the behavior of Auto Scaler without disrupting any real traffic.
+
+</dd>
+</dl>
+
+### PodAutoscalerScaleActuatorIns {#pod-autoscaler-scale-actuator-ins}
+
+Inputs for the PodAutoscaler component.
+
+#### Properties
+
+<dl>
+<dt>desired_replicas</dt>
+<dd>
+
+([V1InPort](#v1-in-port))
+
+</dd>
+</dl>
+
+### PodAutoscalerScaleReporter {#pod-autoscaler-scale-reporter}
+
+#### Properties
+
+<dl>
+<dt>out_ports</dt>
+<dd>
+
+([PodAutoscalerScaleReporterOuts](#pod-autoscaler-scale-reporter-outs))
+
+</dd>
+</dl>
+
+### PodAutoscalerScaleReporterOuts {#pod-autoscaler-scale-reporter-outs}
+
+Outputs for the PodAutoscaler component.
+
+#### Properties
+
+<dl>
+<dt>actual_replicas</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
+
+</dd>
+<dt>configured_replicas</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
+
+</dd>
+</dl>
+
 ### RateLimiterLazySync {#rate-limiter-lazy-sync}
 
 #### Properties
@@ -640,12 +730,6 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([V1Integrator](#v1-integrator)) Accumulates sum of signal every tick.
 
 </dd>
-<dt>kubernetes_pod_autoscaler</dt>
-<dd>
-
-([V1KubernetesPodAutoscaler](#v1-kubernetes-pod-autoscaler)) KubernetesPodAutoscaler provides pod auto-scale functionality for scalable Kubernetes resources.
-
-</dd>
 <dt>max</dt>
 <dd>
 
@@ -656,6 +740,12 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 <dd>
 
 ([V1Min](#v1-min)) Emits the minimum of the input signals.
+
+</dd>
+<dt>pod_autoscaler</dt>
+<dd>
+
+([V1PodAutoscaler](#v1-pod-autoscaler)) PodAutoscaler provides pod auto-scale functionality for scalable Kubernetes resources.
 
 </dd>
 <dt>promql</dt>
@@ -1771,20 +1861,7 @@ If the operator is Exists or DoesNotExist, the values array must be empty.
 </dd>
 </dl>
 
-### v1KubernetesPodAutoscaler {#v1-kubernetes-pod-autoscaler}
-
-#### Properties
-
-<dl>
-<dt>kubernetes_selector</dt>
-<dd>
-
-([V1KubernetesSelector](#v1-kubernetes-selector)) Which control point to apply the autoscaling to.
-
-</dd>
-</dl>
-
-### v1KubernetesSelector {#v1-kubernetes-selector}
+### v1KubernetesObjectSelector {#v1-kubernetes-object-selector}
 
 Describes which pods a control or observability
 component should apply to.
@@ -2167,6 +2244,31 @@ Example:
 "/user/{userId}": user
 /static/*: other
 ```
+
+</dd>
+</dl>
+
+### v1PodAutoscaler {#v1-pod-autoscaler}
+
+#### Properties
+
+<dl>
+<dt>kubernetes_object_selector</dt>
+<dd>
+
+([V1KubernetesObjectSelector](#v1-kubernetes-object-selector), `required`) Which Kubernetes object to apply the autoscaling to.
+
+</dd>
+<dt>scale_actuator</dt>
+<dd>
+
+([PodAutoscalerScaleActuator](#pod-autoscaler-scale-actuator))
+
+</dd>
+<dt>scale_reporter</dt>
+<dd>
+
+([PodAutoscalerScaleReporter](#pod-autoscaler-scale-reporter))
 
 </dd>
 </dl>

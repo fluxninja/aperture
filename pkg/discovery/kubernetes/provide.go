@@ -5,11 +5,6 @@ import (
 	"context"
 
 	"go.uber.org/fx"
-	cacheddiscovery "k8s.io/client-go/discovery/cached/memory"
-	"k8s.io/client-go/dynamic"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/restmapper"
-	"k8s.io/client-go/scale"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/common"
@@ -39,7 +34,7 @@ func Module() fx.Option {
 	return fx.Options(
 		notifiers.TrackersConstructor{Name: "kubernetes_control_points"}.Annotate(),
 		fx.Provide(
-			ProvideAutoscaler,
+			ProvideControlPointCache,
 		),
 		fx.Invoke(
 			InvokeServiceDiscovery,
@@ -53,63 +48,49 @@ type FxInAutoScaler struct {
 	Unmarshaller     config.Unmarshaller
 	Lifecycle        fx.Lifecycle
 	StatusRegistry   status.Registry
-	KubernetesClient k8s.K8sClient
+	KubernetesClient k8s.K8sClient `optional:"true"`
 	Election         *election.Election
 	Trackers         notifiers.Trackers `name:"kubernetes_control_points"`
 }
 
-// ProvideAutoscaler provides Kubernetes AutoScaler and starts Kubernetes control point discovery if enabled.
-func ProvideAutoscaler(in FxInAutoScaler) (ControlPointCache, AutoScaler, error) {
+// ProvideControlPointCache provides Kubernetes AutoScaler and starts Kubernetes control point discovery if enabled.
+func ProvideControlPointCache(in FxInAutoScaler) (ControlPointCache, error) {
 	var cfg KubernetesDiscoveryConfig
 	if err := in.Unmarshaller.UnmarshalKey(configKey, &cfg); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize K8S discovery configuration!")
-		return nil, nil, err
+		return nil, err
 	}
 
-	discoveryClient := in.KubernetesClient.GetClientSet().DiscoveryClient
-	config, err := rest.InClusterConfig()
+	controlPointCache := newControlPointCache(in.Trackers, in.KubernetesClient)
+
+	if !cfg.DiscoveryEnabled {
+		log.Info().Msg("Skipping Kubernetes Control Point Discovery since it is disabled")
+		return controlPointCache, nil
+	}
+	if in.KubernetesClient == nil {
+		log.Error().Msg("Kubernetes client is not available, skipping Kubernetes Control Point Discovery")
+		return controlPointCache, nil
+	}
+	cpd, err := newControlPointDiscovery(in.Election, in.KubernetesClient, controlPointCache)
 	if err != nil {
-		return nil, nil, err
-	}
-	dynClient, err := dynamic.NewForConfig(config)
-	if err != nil {
-		return nil, nil, err
-	}
-	cachedDiscoveryClient := cacheddiscovery.NewMemCacheClient(discoveryClient)
-	mapper := restmapper.NewDeferredDiscoveryRESTMapper(cachedDiscoveryClient)
-	scaleKindResolver := scale.NewDiscoveryScaleKindResolver(discoveryClient)
-	scaleClient, err := scale.NewForConfig(config, mapper, dynamic.LegacyAPIPathResolverFunc, scaleKindResolver)
-	if err != nil {
-		log.Error().Err(err).Msg("Unable to create scale client")
-		return nil, nil, err
+		log.Info().Err(err).Msg("Failed to create Kubernetes Control Point Discovery")
+		return nil, err
 	}
 
-	autoScaler := newAutoScaler(scaleClient, in.Trackers)
+	in.Lifecycle.Append(fx.Hook{
+		OnStart: func(_ context.Context) error {
+			controlPointCache.start()
+			cpd.start()
+			return nil
+		},
+		OnStop: func(_ context.Context) error {
+			cpd.stop()
+			controlPointCache.stop()
+			return nil
+		},
+	})
 
-	if cfg.DiscoveryEnabled {
-		cpd, err := newControlPointDiscovery(in.Election, in.KubernetesClient, discoveryClient, dynClient, autoScaler)
-		if err != nil {
-			log.Info().Err(err).Msg("Failed to create Kubernetes control point discovery")
-			return nil, nil, err
-		}
-
-		in.Lifecycle.Append(fx.Hook{
-			OnStart: func(_ context.Context) error {
-				autoScaler.start()
-				cpd.start()
-				return nil
-			},
-			OnStop: func(_ context.Context) error {
-				cpd.stop()
-				autoScaler.stop()
-				return nil
-			},
-		})
-	} else {
-		log.Info().Msg("Skipping Kubernetes discovery service creation")
-	}
-
-	return autoScaler, autoScaler, nil
+	return controlPointCache, nil
 }
 
 // FxInSvc describes parameters passed to k8s discovery constructor.
@@ -130,27 +111,32 @@ func InvokeServiceDiscovery(in FxInSvc) error {
 		return err
 	}
 
-	if cfg.DiscoveryEnabled {
-		entityEvents := in.EntityTrackers.RegisterServiceDiscovery(podTrackerPrefix)
-		ksd, err := newServiceDiscovery(entityEvents, cfg.NodeName, in.KubernetesClient)
-		if err != nil {
-			log.Info().Err(err).Msg("Failed to create Kubernetes service discovery")
-			return nil
-		}
-
-		in.Lifecycle.Append(fx.Hook{
-			OnStart: func(_ context.Context) error {
-				ksd.start()
-				return nil
-			},
-			OnStop: func(_ context.Context) error {
-				ksd.stop()
-				return nil
-			},
-		})
-	} else {
-		log.Info().Msg("Skipping Kubernetes discovery service creation")
+	if !cfg.DiscoveryEnabled {
+		log.Info().Msg("Skipping Kubernetes discovery since it is disabled")
+		return nil
 	}
+	if in.KubernetesClient == nil {
+		// No error, but Genuinely nil, example not in Kubernetes cluster
+		log.Info().Msg("Kubernetes client is nil, skipping Kubernetes discovery")
+		return nil
+	}
+	entityEvents := in.EntityTrackers.RegisterServiceDiscovery(podTrackerPrefix)
+	ksd, err := newServiceDiscovery(entityEvents, cfg.NodeName, in.KubernetesClient)
+	if err != nil {
+		log.Info().Err(err).Msg("Failed to create Kubernetes service discovery")
+		return err
+	}
+
+	in.Lifecycle.Append(fx.Hook{
+		OnStart: func(_ context.Context) error {
+			ksd.start()
+			return nil
+		},
+		OnStop: func(_ context.Context) error {
+			ksd.stop()
+			return nil
+		},
+	})
 
 	return nil
 }

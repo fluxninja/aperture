@@ -201,8 +201,8 @@ message Component {
     // Differentiator calculates rate of change per tick.
     Differentiator differentiator = 18;
 
-    // KubernetesPodAutoscaler provides pod auto-scale functionality for scalable Kubernetes resources.
-    KubernetesPodAutoscaler kubernetes_pod_autoscaler = 19;
+    // PodAutoscaler provides pod auto-scale functionality for scalable Kubernetes resources.
+    PodAutoscaler pod_autoscaler = 19;
   }
 }
 
@@ -1325,18 +1325,57 @@ message Differentiator {
   }]; // @gotags: default:"5s"
 }
 
-message KubernetesPodAutoscaler {
-  // Inputs for the KubernetesPodAutoscaler component.
-  message Ins {
-    InPort desired_replicas = 1;
+message PodAutoscaler {
+  message ScaleReporter {
+    // Outputs for the PodAutoscaler component.
+    message Outs {
+      OutPort actual_replicas = 1;
+      OutPort configured_replicas = 2;
+    }
+
+    Outs out_ports = 1;
   }
 
-  // Outputs for the KubernetesPodAutoscaler component.
-  message Outs {
-    OutPort actual_replicas = 1;
-    OutPort configured_replicas = 2;
+  message ScaleActuator {
+    // Dynamic Configuration for ScaleActuator
+    message DynamicConfig {
+      // Decides whether to run the pod autoscaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this autoscaler.
+      // Useful for observing the behavior of Auto Scaler without disrupting any real traffic.
+      bool dry_run = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        extensions: {
+          key: "x-go-default"
+          value: {
+            bool_value: false
+          }
+        }
+      }]; // @gotags: default:"false"
+    }
+
+    // Inputs for the PodAutoscaler component.
+    message Ins {
+      InPort desired_replicas = 1;
+    }
+
+    Ins in_ports = 1;
+
+    // Configuration key for DynamicConfig
+    string dynamic_config_key = 2;
+
+    // Default configuration.
+    DynamicConfig default_config = 3;
   }
 
-  // Which control point to apply the autoscaling to.
-  KubernetesSelector kubernetes_selector = 3;
+  // Which Kubernetes object to apply the autoscaling to.
+  KubernetesObjectSelector kubernetes_object_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {
+        string_value: "required"
+      }
+    }
+  }]; // @gotags: validate:"required"
+
+  ScaleReporter scale_reporter = 2;
+
+  ScaleActuator scale_actuator = 3;
 }

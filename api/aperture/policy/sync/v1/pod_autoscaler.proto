@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package aperture.policy.sync.v1;
+
+import "aperture/policy/language/v1/policy.proto";
+import "aperture/policy/sync/v1/common_attributes.proto";
+
+message PodAutoscalerWrapper {
+  // CommonAttributes
+  CommonAttributes common_attributes = 1;
+  policy.language.v1.PodAutoscaler pod_autoscaler = 2;
+}
+
+message PodAutoscalerDynamicConfigWrapper {
+  // CommonAttributes
+  CommonAttributes common_attributes = 1;
+  // PodAutoscalerDynamicConfig is the dynamic configuration for the pod autoscaler.
+  policy.language.v1.PodAutoscaler.ScaleActuator.DynamicConfig pod_autoscaler_dynamic_config = 2;
+}
+
+message ScaleStatusWrapper {
+  // CommonAttributes
+  CommonAttributes common_attributes = 1;
+  ScaleStatus scale_status = 2;
+}
+
+message ScaleStatus {
+  int32 configured_replicas = 1;
+  int32 actual_replicas = 2;
+}
+
+message ScaleDecisionWrapper {
+  CommonAttributes common_attributes = 1;
+  ScaleDecision scale_decision = 2;
+}
+
+message ScaleDecision {
+  int32 desired_replicas = 1;
+}

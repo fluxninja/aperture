@@ -162,17 +162,8 @@ func newServiceDiscovery(
 	nodeName string,
 	k8sClient k8s.K8sClient,
 ) (*serviceDiscovery, error) {
-	if k8sClient.GetErrNotInCluster() {
-		log.Info().Msg("Not in Kubernetes cluster, could not create Kubernetes service discovery")
-		return nil, k8sClient.GetErr()
-	}
-	if k8sClient.GetErr() != nil {
-		log.Error().Err(k8sClient.GetErr()).Msg("Error when creating Kubernetes client, could not create Kubernetes service discovery")
-		return nil, k8sClient.GetErr()
-	}
-
 	if nodeName == "" {
-		log.Error().Err(k8sClient.GetErr()).Msg("Node name not set, could not create Kubernetes service discovery")
+		log.Error().Msg("Node name not set, could not create Kubernetes service discovery")
 		return nil, fmt.Errorf("node name not set")
 	}
 

@@ -29,14 +29,14 @@ import (
 // LoadActuator struct.
 type LoadActuator struct {
 	policyReadAPI     iface.Policy
+	alerterIface      alerts.Alerter
 	decisionWriter    *etcdwriter.Writer
 	loadActuatorProto *policylangv1.LoadActuator
+	alerterConfig     *policylangv1.AlerterConfig
 	decisionsEtcdPath string
 	agentGroupName    string
 	componentIndex    int
 	dryRun            bool
-	alerterIface      alerts.Alerter
-	alerterConfig     *policylangv1.AlerterConfig
 }
 
 // Name implements runtime.Component.

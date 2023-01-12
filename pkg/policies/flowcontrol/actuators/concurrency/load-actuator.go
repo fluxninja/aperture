@@ -272,7 +272,7 @@ func (la *loadActuator) decisionUpdateCallback(event notifiers.Event, unmarshall
 	}
 	commonAttributes := wrapperMessage.GetCommonAttributes()
 	if commonAttributes == nil {
-		statusMsg := "Failed to get common attributes from config wrapperShedFactor"
+		statusMsg := "Failed to get common attributes from LoadDecisionWrapper"
 		logger.Error().Err(err).Msg(statusMsg)
 		la.statusRegistry.SetStatus(status.NewStatus(nil, err))
 		return
