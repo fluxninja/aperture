@@ -90,7 +90,7 @@ var _ = Describe("MutatingWebhookConfiguration for Pods", func() {
 							Service: &admissionregistrationv1.ServiceReference{
 								Name:      AppName,
 								Namespace: AppName,
-								Path:      pointer.StringPtr(MutatingWebhookURI),
+								Path:      pointer.String(MutatingWebhookURI),
 								Port:      pointer.Int32(443),
 							},
 							CABundle: serverCertPEM.Bytes(),
@@ -118,7 +118,7 @@ var _ = Describe("MutatingWebhookConfiguration for Pods", func() {
 						AdmissionReviewVersions: []string{V1Version},
 						FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 						SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-						TimeoutSeconds:          pointer.Int32Ptr(10),
+						TimeoutSeconds:          pointer.Int32(10),
 					},
 				},
 			}
