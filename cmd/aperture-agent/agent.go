@@ -25,13 +25,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
-<<<<<<< HEAD
-||||||| parent of 562dfc0d (PodAutoscaler code complete)
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
-=======
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/infra"
->>>>>>> 562dfc0d (PodAutoscaler code complete)
 	"github.com/fluxninja/aperture/pkg/prometheus"
 )
 

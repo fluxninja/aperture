@@ -43,14 +43,11 @@ func IsHTTPUrl(url string) bool {
 	matched, _ := regexp.MatchString(prefixHTTPRegex, url)
 	return matched
 }
-<<<<<<< HEAD
 
 // Mod is a normal modulo operation which does not produce negative values.
 func Mod(a, b int) int {
 	return (a%b + b) % b
 }
-||||||| parent of 562dfc0d (PodAutoscaler code complete)
-=======
 
 // Shutdown invokes fx.Shutdowner and logs error if any.
 func Shutdown(shutdowner fx.Shutdowner) {
@@ -58,4 +55,3 @@ func Shutdown(shutdowner fx.Shutdowner) {
 		log.Error().Err(err).Msg("Unable to shutdown!")
 	}
 }
->>>>>>> 562dfc0d (PodAutoscaler code complete)

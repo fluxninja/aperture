@@ -227,23 +227,13 @@ func (h *Heartbeats) newHeartbeat(
 		policies.PolicyWrappers = h.policyFactory.GetPolicyWrappers()
 	}
 
-<<<<<<< HEAD
-	serviceControlPointStructs := make(map[selectors.ControlPointID]struct{})
+	serviceControlPointObjects := make(map[selectors.ControlPointID]struct{})
 	if h.serviceControlPointCache != nil {
-		serviceControlPointStructs = h.serviceControlPointCache.GetAllAndClear()
+		serviceControlPointObjects = h.serviceControlPointCache.GetAllAndClear()
 	}
 
-	serviceControlPoints := make([]*heartbeatv1.ServiceControlPoint, 0, len(serviceControlPointStructs))
-	for cp := range serviceControlPointStructs {
-||||||| parent of 562dfc0d (PodAutoscaler code complete)
-	serviceControlPointStructs := h.serviceControlPointCache.GetAllAndClear()
-	serviceControlPoints := make([]*heartbeatv1.ServiceControlPoint, 0, len(serviceControlPointStructs))
-	for cp := range serviceControlPointStructs {
-=======
-	serviceControlPointObjects := h.serviceControlPointCache.GetAllAndClear()
 	serviceControlPoints := make([]*heartbeatv1.ServiceControlPoint, 0, len(serviceControlPointObjects))
 	for cp := range serviceControlPointObjects {
->>>>>>> 562dfc0d (PodAutoscaler code complete)
 		serviceControlPoints = append(serviceControlPoints, &heartbeatv1.ServiceControlPoint{
 			Name:        cp.ControlPoint,
 			ServiceName: cp.Service,

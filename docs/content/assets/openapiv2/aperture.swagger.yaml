@@ -1789,8 +1789,6 @@ definitions:
     properties:
       api_version:
         type: string
-      group:
-        type: string
       kind:
         type: string
       name:

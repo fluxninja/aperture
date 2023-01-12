@@ -201,9 +201,7 @@ message HeaderValueOption {
   }
 
   // Header name/value pair that this option applies to.
-  HeaderValue header = 1 [(validate.rules).message = {
-    required: true
-  }];
+  HeaderValue header = 1 [(validate.rules).message = {required: true}];
 
   // Should the value be appended? If true (default), the value is appended to
   // existing values. Otherwise it replaces any existing values.
@@ -223,9 +221,7 @@ message HeaderValueOption {
   // or to only add this header if it's absent.
   // Value defaults to :ref:`APPEND_IF_EXISTS_OR_ADD
   // <envoy_v3_api_enum_value_config.core.v3.HeaderValueOption.HeaderAppendAction.APPEND_IF_EXISTS_OR_ADD>`.
-  HeaderAppendAction append_action = 3 [(validate.rules).enum = {
-    defined_only: true
-  }];
+  HeaderAppendAction append_action = 3 [(validate.rules).enum = {defined_only: true}];
 
   // Is the header value allowed to be empty? If false (default), custom headers with empty values are dropped,
   // otherwise they are added.
@@ -235,9 +231,7 @@ message HeaderValueOption {
 // Query parameter name/value pair.
 message QueryParameter {
   // The key of the query parameter. Case sensitive.
-  string key = 1 [(validate.rules).string = {
-    min_len: 1
-  }];
+  string key = 1 [(validate.rules).string = {min_len: 1}];
 
   // The value of the query parameter.
   string value = 2;
@@ -409,14 +403,10 @@ message Pipe {
   // abstract namespace. The starting '@' is replaced by a null byte by Envoy.
   // Paths starting with '@' will result in an error in environments other than
   // Linux.
-  string path = 1 [(validate.rules).string = {
-    min_len: 1
-  }];
+  string path = 1 [(validate.rules).string = {min_len: 1}];
 
   // The mode for the Pipe. Not applicable for abstract sockets.
-  uint32 mode = 2 [(validate.rules).uint32 = {
-    lte: 511
-  }];
+  uint32 mode = 2 [(validate.rules).uint32 = {lte: 511}];
 }
 
 // The address represents an envoy internal listener.
@@ -445,9 +435,7 @@ message SocketAddress {
     UDP = 1;
   }
 
-  Protocol protocol = 1 [(validate.rules).enum = {
-    defined_only: true
-  }];
+  Protocol protocol = 1 [(validate.rules).enum = {defined_only: true}];
 
   // The address for this socket. :ref:`Listeners <config_listeners>` will bind
   // to the address. An empty address is not allowed. Specify ``0.0.0.0`` or ``::``
@@ -460,16 +448,12 @@ message SocketAddress {
   // address must be an IP (``STATIC`` or ``EDS`` clusters) or a hostname resolved by DNS
   // (``STRICT_DNS`` or ``LOGICAL_DNS`` clusters). Address resolution can be customized
   // via :ref:`resolver_name <envoy_v3_api_field_config.core.v3.SocketAddress.resolver_name>`.
-  string address = 2 [(validate.rules).string = {
-    min_len: 1
-  }];
+  string address = 2 [(validate.rules).string = {min_len: 1}];
 
   oneof port_specifier {
     option (validate.required) = true;
 
-    uint32 port_value = 3 [(validate.rules).uint32 = {
-      lte: 65535
-    }];
+    uint32 port_value = 3 [(validate.rules).uint32 = {lte: 65535}];
 
     // This is only valid if :ref:`resolver_name
     // <envoy_v3_api_field_config.core.v3.SocketAddress.resolver_name>` is specified below and the

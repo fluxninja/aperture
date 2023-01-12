@@ -13,33 +13,21 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 // EntityCacheService is used to query EntityCache.
 service EntityCacheService {
   rpc GetEntityCache(google.protobuf.Empty) returns (EntityCache) {
-    option (google.api.http) = {
-      get: "/v1/entities"
-    };
+    option (google.api.http) = {get: "/v1/entities"};
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: [
-        "aperture-agent"
-      ];
+      tags: ["aperture-agent"];
     };
   }
   rpc GetEntityByIPAddress(GetEntityByIPAddressRequest) returns (Entity) {
-    option (google.api.http) = {
-      get: "/v1/entities/ip-address/{ip_address}"
-    };
+    option (google.api.http) = {get: "/v1/entities/ip-address/{ip_address}"};
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: [
-        "aperture-agent"
-      ];
+      tags: ["aperture-agent"];
     };
   }
   rpc GetEntityByName(GetEntityByNameRequest) returns (Entity) {
-    option (google.api.http) = {
-      get: "/v1/entities/name/{name}"
-    };
+    option (google.api.http) = {get: "/v1/entities/name/{name}"};
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: [
-        "aperture-agent"
-      ];
+      tags: ["aperture-agent"];
     };
   }
 }

@@ -29,9 +29,7 @@ message Classifier {
   FlowSelector flow_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
+      value: {string_value: "required"}
     }
   }]; // @gotags: validate:"required"
 
@@ -41,9 +39,7 @@ message Classifier {
   map<string, Rule> rules = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required,gt=0,dive,keys,required,endkeys,required"
-      }
+      value: {string_value: "required,gt=0,dive,keys,required,endkeys,required"}
     }
   }]; // @gotags: validate:"required,gt=0,dive,keys,required,endkeys,required"
 }
@@ -96,9 +92,7 @@ message Rule {
     string source = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
-        value: {
-          string_value: "required"
-        }
+        value: {string_value: "required"}
       }
     }]; // @gotags: validate:"required"
 
@@ -108,9 +102,7 @@ message Rule {
     string query = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
-        value: {
-          string_value: "required"
-        }
+        value: {string_value: "required"}
       }
     }]; // @gotags: validate:"required"
   }
@@ -138,9 +130,7 @@ message Rule {
   bool telemetry = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
+      value: {string_value: "required"}
     }
   }]; // @gotags: default:"true"
 }
@@ -195,9 +185,7 @@ message JSONExtractor {
   string from = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
+      value: {string_value: "required"}
     }
   }]; //@gotags: validate:"required"
 
@@ -226,9 +214,7 @@ message AddressExtractor {
   string from = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
+      value: {string_value: "required"}
     }
   }]; //@gotags: validate:"required"
 }
@@ -250,9 +236,7 @@ message JWTExtractor {
   string from = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
+      value: {string_value: "required"}
     }
   }]; //@gotags: validate:"required"
 
@@ -293,9 +277,7 @@ message PathTemplateMatcher {
   map<string, string> template_values = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
-      value: {
-        string_value: "required"
-      }
+      value: {string_value: "required"}
     }
   }]; // @gotags: validate:"gt=0,dive,keys,required,endkeys,required"
 }
