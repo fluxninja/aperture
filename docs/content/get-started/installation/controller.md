@@ -318,12 +318,9 @@ state and `Controller` Custom Resource in `created` state.
 
 ## Applying Policies
 
-Follow the information on [Policy](/concepts/policy/policy.md) to understand and
-design the policy circuits.
-
-Once the design is ready, follow the steps on the
-[Blueprints](/get-started/policies/blueprints.md) to generate the Policy Custom
-Resource and apply it on a Kubernetes cluster.
+Follow the steps on the
+[Create Policy](/get-started/policies/applying-policies.md#create-policy) to
+create the Aperture Policy in a Kubernetes cluster.
 
 ## Uninstall
 
