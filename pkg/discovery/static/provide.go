@@ -36,7 +36,7 @@ type ServiceConfig struct {
 	// Name of the service.
 	Name string `json:"name" validate:"required"`
 	// Entities of the service.
-	Entities []*EntityConfig `json:"entities"`
+	Entities []*EntityConfig `json:"entities,omitempty"`
 }
 
 // StaticDiscoveryConfig for pre-determined list of services.
@@ -44,7 +44,7 @@ type ServiceConfig struct {
 // +kubebuilder:object:generate=true
 type StaticDiscoveryConfig struct {
 	// Services list.
-	Services []*ServiceConfig `json:"services"`
+	Services []*ServiceConfig `json:"services,omitempty"`
 }
 
 // InvokeStaticServiceDiscovery causes statically configured services to be uploaded to the tracker.
