@@ -10,6 +10,8 @@ local dynamicConfig = spec.v1.RateLimiterDynamicConfig;
 local override = spec.v1.RateLimiterOverride;
 local lazySync = spec.v1.RateLimiterLazySync;
 local port = spec.v1.Port;
+local variable = spec.v1.Variable;
+local constantValue = spec.v1.ConstantValue;
 
 function(params) {
   _config:: config.common + config.policy + params,
@@ -24,7 +26,11 @@ function(params) {
       + circuit.withComponents([
         component.withRateLimiter(
           rateLimiter.new()
-          + rateLimiter.withInPorts({ limit: port.withConstantValue($._config.rateLimit) })
+          + rateLimiter.withInPorts({ limit: port.withConstantValue(
+            constantValue.new()
+            + constantValue.withValue($._config.rateLimit)
+            + constantValue.withValid(true)
+          ) })
           + rateLimiter.withFlowSelector($._config.rateLimiterFlowSelector)
           + rateLimiter.withLimitResetInterval($._config.limitResetInterval)
           + rateLimiter.withLabelKey($._config.labelKey)
