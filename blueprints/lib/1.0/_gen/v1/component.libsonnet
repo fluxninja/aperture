@@ -25,12 +25,6 @@
   withConcurrencyLimiterMixin(concurrency_limiter):: {
     concurrency_limiter+: concurrency_limiter,
   },
-  withConstant(constant):: {
-    constant: constant,
-  },
-  withConstantMixin(constant):: {
-    constant+: constant,
-  },
   withDecider(decider):: {
     decider: decider,
   },
@@ -132,5 +126,11 @@
   },
   withSwitcherMixin(switcher):: {
     switcher+: switcher,
+  },
+  withVariable(variable):: {
+    variable: variable,
+  },
+  withVariableMixin(variable):: {
+    variable+: variable,
   },
 }

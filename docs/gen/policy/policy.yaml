@@ -605,7 +605,7 @@ definitions:
       You can create an input port containing the constant value instead of being connected to a signal.
       To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
       If You need to provide the same constant signal to multiple components,
-      You can use the [Constant](#v1-constant) component.
+      You can use the [Variable](#v1-variable) component.
       :::
 
       See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -679,11 +679,11 @@ definitions:
         $ref: '#/definitions/v1Inverter'
       max:
         description: Emits the maximum of the input signals.
-        x-order: 11
+        x-order: 10
         $ref: '#/definitions/v1Max'
       min:
         description: Emits the minimum of the input signals.
-        x-order: 12
+        x-order: 11
         $ref: '#/definitions/v1Min'
       or:
         description: Logical OR.
@@ -712,6 +712,10 @@ definitions:
           on third signal.
         x-order: 4
         $ref: '#/definitions/v1Switcher'
+      variable:
+        description: Emits a variable signal which can be set to invalid.
+        x-order: 17
+        $ref: '#/definitions/v1Variable'
   v1ConcurrencyLimiter:
     description: |-
       :::info
@@ -753,27 +757,18 @@ definitions:
         x-go-validate: required
         x-order: 1
         $ref: '#/definitions/v1Scheduler'
-  v1Constant:
+  v1ConstantValue:
+    description: Constant value that can be used instead of a signal in ports. Can
+      be set to be invalid.
     type: object
-    title: Component that emits a constant value as an output signal
     properties:
-      out_ports:
-        description: Output ports for the Constant component.
+      valid:
+        type: boolean
         x-order: 0
-        $ref: '#/definitions/v1ConstantOuts'
       value:
-        description: The constant value to be emitted.
         type: number
         format: double
         x-order: 1
-  v1ConstantOuts:
-    description: Outputs for the Constant component.
-    type: object
-    properties:
-      output:
-        description: The constant value is emitted to the output port.
-        x-order: 0
-        $ref: '#/definitions/v1OutPort'
   v1ControllerDynamicConfig:
     type: object
     title: Dynamic Configuration for a Controller
@@ -2466,5 +2461,36 @@ definitions:
     properties:
       output:
         description: Selected signal (on_true or on_false).
+        x-order: 0
+        $ref: '#/definitions/v1OutPort'
+  v1Variable:
+    description: Component that emits a variable value as an output signal, can be
+      defined in dynamic configuration.
+    type: object
+    properties:
+      default_config:
+        description: Default configuration.
+        x-order: 0
+        $ref: '#/definitions/v1VariableDynamicConfig'
+      dynamic_config_key:
+        description: Configuration key for DynamicConfig.
+        type: string
+        x-order: 1
+      out_ports:
+        description: Output ports for the Variable component.
+        x-order: 2
+        $ref: '#/definitions/v1VariableOuts'
+  v1VariableDynamicConfig:
+    type: object
+    properties:
+      constant_value:
+        x-order: 0
+        $ref: '#/definitions/v1ConstantValue'
+  v1VariableOuts:
+    description: Outputs for the Variable component.
+    type: object
+    properties:
+      output:
+        description: The value is emitted to the output port.
         x-order: 0
         $ref: '#/definitions/v1OutPort'

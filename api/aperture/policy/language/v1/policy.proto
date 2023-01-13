@@ -134,7 +134,7 @@ message Resources {
 // You can create an input port containing the constant value instead of being connected to a signal.
 // To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
 // If You need to provide the same constant signal to multiple components,
-// You can use the [Constant](#v1-constant) component.
+// You can use the [Variable](#v1-variable) component.
 // :::
 //
 // See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -165,8 +165,8 @@ message Component {
     // Periodically runs a Prometheus query in the background and emits the result.
     PromQL promql = 8;
 
-    // Emits a constant signal.
-    Constant constant = 9;
+    // Emits a variable signal which can be set to invalid.
+    Variable variable = 9;
 
     // Takes an input signal and emits the square root of the input signal.
     Sqrt sqrt = 10;
@@ -215,7 +215,7 @@ message InPort {
     // Name of the incoming Signal on the InPort.
     string signal_name = 1;
     // Constant value to be used for this InPort instead of a signal.
-    double constant_value = 2;
+    ConstantValue constant_value = 2;
   }
 }
 
@@ -981,19 +981,31 @@ message PromQL {
   }]; // @gotags: default:"10s"
 }
 
-// Component that emits a constant value as an output signal
-message Constant {
-  // Outputs for the Constant component.
+// Constant value that can be used instead of a signal in ports. Can be set to be invalid.
+message ConstantValue {
+  bool valid = 1;
+  double value = 2;
+}
+
+// Component that emits a variable value as an output signal, can be defined in dynamic configuration.
+message Variable {
+  message DynamicConfig {
+    ConstantValue constant_value = 1;
+  }
+  // Outputs for the Variable component.
   message Outs {
-    // The constant value is emitted to the output port.
+    // The value is emitted to the output port.
     OutPort output = 1;
   }
 
-  // Output ports for the Constant component.
+  // Output ports for the Variable component.
   Outs out_ports = 1;
 
-  // The constant value to be emitted.
-  double value = 2;
+  // Configuration key for DynamicConfig.
+  string dynamic_config_key = 2;
+
+  // Default configuration.
+  DynamicConfig default_config = 3;
 }
 
 // Takes an input signal and emits the square root of it multiplied by scale as an output

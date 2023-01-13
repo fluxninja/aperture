@@ -1292,7 +1292,7 @@ definitions:
       You can create an input port containing the constant value instead of being connected to a signal.
       To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
       If You need to provide the same constant signal to multiple components,
-      You can use the [Constant](#v1-constant) component.
+      You can use the [Variable](#v1-variable) component.
       :::
 
       See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -1334,12 +1334,11 @@ definitions:
       ConcurrencyLimiter configuration is split into two parts: An actuation
       strategy and a scheduler. Right now, only `load_actuator` strategy is available.
     title: Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
-  v1Constant:
+  v1ConstantValue:
     type: object
     properties:
-      out_ports:
-        $ref: '#/definitions/v1ConstantOuts'
-        description: Output ports for the Constant component.
+      valid:
+        type: boolean
       value:
         type: number
         format: double
@@ -2050,8 +2049,7 @@ definitions:
         type: string
         description: Name of the incoming Signal on the InPort.
       constant_value:
-        type: number
-        format: double
+        $ref: '#/definitions/v1ConstantValue'
         description: Constant value to be used for this InPort instead of a signal.
     title: Components receive input from other components via InPorts
   v1Integrator:
@@ -3237,6 +3235,31 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Selected signal (on_true or on_false).
     description: Outputs for the Switcher component.
+  v1Variable:
+    type: object
+    properties:
+      default_config:
+        $ref: '#/definitions/v1VariableDynamicConfig'
+        description: Default configuration.
+      dynamic_config_key:
+        type: string
+        description: Configuration key for DynamicConfig.
+      out_ports:
+        $ref: '#/definitions/v1VariableOuts'
+        description: Output ports for the Variable component.
+    description: Component that emits a variable value as an output signal, can be defined in dynamic configuration.
+  v1VariableDynamicConfig:
+    type: object
+    properties:
+      constant_value:
+        $ref: '#/definitions/v1ConstantValue'
+  v1VariableOuts:
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
+        description: The value is emitted to the output port.
+    description: Outputs for the Variable component.
   v1VersionInfo:
     type: object
     properties:
