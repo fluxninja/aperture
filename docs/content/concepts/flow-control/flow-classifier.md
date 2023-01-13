@@ -32,7 +32,7 @@ Flow Labels created via Classifier are immediately available for use in other
 components at the same [Control Point][control-point]. The Flow Label is also
 injected as baggage, so it will be available on every subsequent control point
 too (assuming you have [baggage propagation][baggage] configured in your
-system). If you're a [FluxNinja Cloud plugin][plugin] user, such flow label will
+system). If you're a [FluxNinja ARC plugin][plugin] user, such flow label will
 also be available in the Cloud for analytics.
 
 :::note
@@ -139,11 +139,11 @@ See [full example in reference][reference]
 [rule]: /references/configuration/policy.md#v1-rule
 [extractor]: /references/configuration/policy.md#v1-extractor
 [rego-rule]: /references/configuration/policy.md#rule-rego
-[plugin]: /cloud/plugin.md
+[plugin]: /arc/plugin.md
 [label-matcher]: /concepts/flow-control/flow-selector.md#label-matcher
 [policies]: /concepts/policy/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
 [control-point]: /concepts/flow-control/flow-control.md#control-point
-[install-istio]: /get-started/installation/agent/envoy/istio.md
+[install-istio]: /get-started/flow-control/envoy/istio.md

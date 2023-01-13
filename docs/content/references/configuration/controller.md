@@ -640,7 +640,7 @@ EtcdConfig holds configuration for etcd client.
 
 ### FluxNinjaPluginConfig {#flux-ninja-plugin-config}
 
-FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration plugin.
+FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
 
 #### Properties
 

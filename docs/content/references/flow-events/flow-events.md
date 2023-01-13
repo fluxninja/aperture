@@ -5,7 +5,7 @@ sidebar_label: Flow OLAP
 ---
 
 Aperture Agents emit an Opentelemetry stream that can be mapped to an OLAP
-database like Druid. This data can be visualized in FluxNinja Cloud.
+database like Druid. This data can be visualized in FluxNinja ARC.
 
 ## Dimension Columns
 

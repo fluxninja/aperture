@@ -68,6 +68,8 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.Alerter, components.NewAlerterAndOptions)
 	case *policylangv1.Component_Integrator:
 		ctor = mkCtor(config.Integrator, components.NewIntegratorAndOptions)
+	case *policylangv1.Component_Differentiator:
+		ctor = mkCtor(config.Differentiator, components.NewDifferentiatorAndOptions)
 	default:
 		return newComponentStackAndOptions(componentProto, componentIndex, policyReadAPI)
 	}

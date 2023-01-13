@@ -14,12 +14,10 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/cmd/aperture-controller/controller"
-	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/webhooks"
 	"github.com/fluxninja/aperture/pkg/webhooks/policyvalidator"
 )
@@ -30,7 +28,6 @@ func main() {
 		controller.ModuleForControllerOTEL(),
 		fx.Provide(
 			clockwork.NewRealClock,
-			cache.Provide[selectors.ControlPointID],
 		),
 		otelcollector.Module(),
 		controlplane.Module(),

@@ -222,13 +222,15 @@ func (h *Heartbeats) newHeartbeat(
 		policies.PolicyWrappers = h.policyFactory.GetPolicyWrappers()
 	}
 
-	rawControlPoints := h.controlPointCache.GetAllAndClear()
-	controlPoints := make([]*heartbeatv1.ControlPoint, 0, len(rawControlPoints))
-	for cp := range rawControlPoints {
-		controlPoints = append(controlPoints, &heartbeatv1.ControlPoint{
-			Name:        cp.ControlPoint,
-			ServiceName: cp.Service,
-		})
+	controlPoints := make([]*heartbeatv1.ControlPoint, 0)
+	if h.controlPointCache != nil {
+		rawControlPoints := h.controlPointCache.GetAllAndClear()
+		for cp := range rawControlPoints {
+			controlPoints = append(controlPoints, &heartbeatv1.ControlPoint{
+				Name:        cp.ControlPoint,
+				ServiceName: cp.Service,
+			})
+		}
 	}
 
 	return &heartbeatv1.ReportRequest{

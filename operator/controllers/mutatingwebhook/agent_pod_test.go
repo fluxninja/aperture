@@ -242,7 +242,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 				Image:           "auto",
 				ImagePullPolicy: corev1.PullAlways,
 				SecurityContext: &corev1.SecurityContext{
-					RunAsUser: pointer.Int64Ptr(1001),
+					RunAsUser: pointer.Int64(1001),
 				},
 				Command: TestArray,
 				Args:    TestArray,
@@ -271,7 +271,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 				Image:           "docker.io/fluxninja/aperture-agent:latest",
 				ImagePullPolicy: corev1.PullAlways,
 				SecurityContext: &corev1.SecurityContext{
-					RunAsUser: pointer.Int64Ptr(1001),
+					RunAsUser: pointer.Int64(1001),
 				},
 				Command: TestArray,
 				Args:    TestArray,
@@ -468,9 +468,9 @@ var _ = Describe("Sidecar container for Agent", func() {
 				Image:           "docker.io/fluxninja/aperture-agent:latest",
 				ImagePullPolicy: corev1.PullIfNotPresent,
 				SecurityContext: &corev1.SecurityContext{
-					RunAsUser:              pointer.Int64Ptr(0),
-					RunAsNonRoot:           pointer.BoolPtr(false),
-					ReadOnlyRootFilesystem: pointer.BoolPtr(false),
+					RunAsUser:              pointer.Int64(0),
+					RunAsNonRoot:           pointer.Bool(false),
+					ReadOnlyRootFilesystem: pointer.Bool(false),
 				},
 				Command:   TestArray,
 				Args:      TestArray,
@@ -759,7 +759,7 @@ var _ = Describe("Pod modification for Agent", func() {
 							Name: "aperture-agent-config",
 							VolumeSource: corev1.VolumeSource{
 								ConfigMap: &corev1.ConfigMapVolumeSource{
-									DefaultMode: pointer.Int32Ptr(420),
+									DefaultMode: pointer.Int32(420),
 									LocalObjectReference: corev1.LocalObjectReference{
 										Name: AgentServiceName,
 									},
@@ -978,7 +978,7 @@ var _ = Describe("Pod modification for Agent", func() {
 							Name: "aperture-agent-config",
 							VolumeSource: corev1.VolumeSource{
 								ConfigMap: &corev1.ConfigMapVolumeSource{
-									DefaultMode: pointer.Int32Ptr(420),
+									DefaultMode: pointer.Int32(420),
 									LocalObjectReference: corev1.LocalObjectReference{
 										Name: AgentServiceName,
 									},

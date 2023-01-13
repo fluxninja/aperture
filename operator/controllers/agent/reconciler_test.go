@@ -100,7 +100,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			agentServiceKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
 
 			createdClusterRole := &rbacv1.ClusterRole{}
-			clusterRoleKey := types.NamespacedName{Name: AppName}
+			clusterRoleKey := types.NamespacedName{Name: AgentServiceName}
 
 			createdClusterRoleBinding := &rbacv1.ClusterRoleBinding{}
 			clusterRoleBindingKey := types.NamespacedName{Name: AgentServiceName}
@@ -188,7 +188,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			agentServiceKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
 
 			createdClusterRole := &rbacv1.ClusterRole{}
-			clusterRoleKey := types.NamespacedName{Name: AppName}
+			clusterRoleKey := types.NamespacedName{Name: AgentServiceName}
 
 			createdClusterRoleBinding := &rbacv1.ClusterRoleBinding{}
 			clusterRoleBindingKey := types.NamespacedName{Name: AgentServiceName}
@@ -313,7 +313,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			agentServiceKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
 
 			createdClusterRole := &rbacv1.ClusterRole{}
-			clusterRoleKey := types.NamespacedName{Name: AppName}
+			clusterRoleKey := types.NamespacedName{Name: AgentServiceName}
 
 			createdClusterRoleBinding := &rbacv1.ClusterRoleBinding{}
 			clusterRoleBindingKey := types.NamespacedName{Name: AgentServiceName}

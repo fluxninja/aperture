@@ -154,7 +154,7 @@ we recommend to start with concepts like [services][service] and
 [flux-meter]: /concepts/flow-control/flux-meter.md
 [classifier]: /concepts/flow-control/flow-classifier.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
-[istio]: /get-started/installation/agent/envoy/istio.md
+[istio]: /get-started/flow-control/envoy/istio.md
 [ext-authz]:
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto#authorization-service-proto
 [aperture-go]: https://github.com/FluxNinja/aperture-go

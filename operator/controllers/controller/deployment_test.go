@@ -147,8 +147,8 @@ var _ = Describe("Controller Deployment", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Controller",
-							Controller:         pointer.BoolPtr(true),
-							BlockOwnerDeletion: pointer.BoolPtr(true),
+							Controller:         pointer.Bool(true),
+							BlockOwnerDeletion: pointer.Bool(true),
 						},
 					},
 					Annotations: nil,
@@ -266,7 +266,7 @@ var _ = Describe("Controller Deployment", func() {
 									Name: "aperture-controller-config",
 									VolumeSource: corev1.VolumeSource{
 										ConfigMap: &corev1.ConfigMapVolumeSource{
-											DefaultMode: pointer.Int32Ptr(420),
+											DefaultMode: pointer.Int32(420),
 											LocalObjectReference: corev1.LocalObjectReference{
 												Name: ControllerServiceName,
 											},
@@ -283,11 +283,11 @@ var _ = Describe("Controller Deployment", func() {
 									Name: "etc-aperture-classification",
 									VolumeSource: corev1.VolumeSource{
 										ConfigMap: &corev1.ConfigMapVolumeSource{
-											DefaultMode: pointer.Int32Ptr(420),
+											DefaultMode: pointer.Int32(420),
 											LocalObjectReference: corev1.LocalObjectReference{
 												Name: "classification",
 											},
-											Optional: pointer.BoolPtr(true),
+											Optional: pointer.Bool(true),
 										},
 									},
 								},
@@ -295,7 +295,7 @@ var _ = Describe("Controller Deployment", func() {
 									Name: "server-cert",
 									VolumeSource: corev1.VolumeSource{
 										Secret: &corev1.SecretVolumeSource{
-											DefaultMode: pointer.Int32Ptr(420),
+											DefaultMode: pointer.Int32(420),
 											SecretName:  fmt.Sprintf("%s-controller-cert", instance.GetName()),
 										},
 									},
@@ -434,8 +434,8 @@ var _ = Describe("Controller Deployment", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Controller",
-							Controller:         pointer.BoolPtr(true),
-							BlockOwnerDeletion: pointer.BoolPtr(true),
+							Controller:         pointer.Bool(true),
+							BlockOwnerDeletion: pointer.Bool(true),
 						},
 					},
 					Annotations: TestMap,
@@ -473,9 +473,9 @@ var _ = Describe("Controller Deployment", func() {
 							Affinity:     affinity,
 							Tolerations:  tolerations,
 							SecurityContext: &corev1.PodSecurityContext{
-								FSGroup: pointer.Int64Ptr(1001),
+								FSGroup: pointer.Int64(1001),
 							},
-							TerminationGracePeriodSeconds: pointer.Int64Ptr(10),
+							TerminationGracePeriodSeconds: pointer.Int64(10),
 							InitContainers: []corev1.Container{
 								{
 									Name: Test,
@@ -487,9 +487,9 @@ var _ = Describe("Controller Deployment", func() {
 									Image:           "docker.io/fluxninja/aperture-controller:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									SecurityContext: &corev1.SecurityContext{
-										RunAsUser:              pointer.Int64Ptr(0),
-										RunAsNonRoot:           pointer.BoolPtr(false),
-										ReadOnlyRootFilesystem: pointer.BoolPtr(false),
+										RunAsUser:              pointer.Int64(0),
+										RunAsNonRoot:           pointer.Bool(false),
+										ReadOnlyRootFilesystem: pointer.Bool(false),
 									},
 									Command: TestArray,
 									Args:    TestArray,
@@ -628,7 +628,7 @@ var _ = Describe("Controller Deployment", func() {
 									Name: "aperture-controller-config",
 									VolumeSource: corev1.VolumeSource{
 										ConfigMap: &corev1.ConfigMapVolumeSource{
-											DefaultMode: pointer.Int32Ptr(420),
+											DefaultMode: pointer.Int32(420),
 											LocalObjectReference: corev1.LocalObjectReference{
 												Name: ControllerServiceName,
 											},
@@ -645,11 +645,11 @@ var _ = Describe("Controller Deployment", func() {
 									Name: "etc-aperture-classification",
 									VolumeSource: corev1.VolumeSource{
 										ConfigMap: &corev1.ConfigMapVolumeSource{
-											DefaultMode: pointer.Int32Ptr(420),
+											DefaultMode: pointer.Int32(420),
 											LocalObjectReference: corev1.LocalObjectReference{
 												Name: "classification",
 											},
-											Optional: pointer.BoolPtr(true),
+											Optional: pointer.Bool(true),
 										},
 									},
 								},
@@ -657,7 +657,7 @@ var _ = Describe("Controller Deployment", func() {
 									Name: "server-cert",
 									VolumeSource: corev1.VolumeSource{
 										Secret: &corev1.SecretVolumeSource{
-											DefaultMode: pointer.Int32Ptr(420),
+											DefaultMode: pointer.Int32(420),
 											SecretName:  fmt.Sprintf("%s-controller-cert", instance.GetName()),
 										},
 									},
@@ -699,7 +699,7 @@ var _ = Describe("Test Deployment Mutate", func() {
 						PriorityClassName:         Test,
 						TopologySpreadConstraints: []corev1.TopologySpreadConstraint{},
 						SecurityContext: &corev1.PodSecurityContext{
-							FSGroup: pointer.Int64Ptr(1001),
+							FSGroup: pointer.Int64(1001),
 						},
 						InitContainers: []corev1.Container{},
 						Containers: []corev1.Container{

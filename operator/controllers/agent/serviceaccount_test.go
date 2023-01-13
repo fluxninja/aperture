@@ -63,12 +63,12 @@ var _ = Describe("ServiceAccount for Agent", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Agent",
-							Controller:         pointer.BoolPtr(true),
-							BlockOwnerDeletion: pointer.BoolPtr(true),
+							Controller:         pointer.Bool(true),
+							BlockOwnerDeletion: pointer.Bool(true),
 						},
 					},
 				},
-				AutomountServiceAccountToken: pointer.BoolPtr(true),
+				AutomountServiceAccountToken: pointer.Bool(true),
 			}
 
 			result, err := serviceAccountForAgent(instance.DeepCopy(), scheme.Scheme)
@@ -118,12 +118,12 @@ var _ = Describe("ServiceAccount for Agent", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Agent",
-							Controller:         pointer.BoolPtr(true),
-							BlockOwnerDeletion: pointer.BoolPtr(true),
+							Controller:         pointer.Bool(true),
+							BlockOwnerDeletion: pointer.Bool(true),
 						},
 					},
 				},
-				AutomountServiceAccountToken: pointer.BoolPtr(false),
+				AutomountServiceAccountToken: pointer.Bool(false),
 			}
 
 			result, err := serviceAccountForAgent(instance.DeepCopy(), scheme.Scheme)

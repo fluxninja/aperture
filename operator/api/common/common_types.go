@@ -394,7 +394,7 @@ type ClientConfigSpec struct {
 
 // BundledPluginsSpec defines configuration for bundled plugins.
 type BundledPluginsSpec struct {
-	// FluxNinja Cloud plugin configuration.
+	// FluxNinja ARC plugin configuration.
 	//+kubebuilder:validation:Optional
 	FluxNinjaPlugin pluginconfig.FluxNinjaPluginConfig `json:"fluxninja_plugin"`
 

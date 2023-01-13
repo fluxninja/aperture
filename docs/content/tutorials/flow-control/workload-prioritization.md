@@ -47,6 +47,14 @@ value to the scheduler:
   using the `user_type` label key in the scheduler to match the request against
   `guest` value to identify the workload.
 
+:::tip
+
+You can
+[discover flow labels](/concepts/flow-control/flow-label.md#live-previewing-flow-labels)
+by live previewing them via introspection API .
+
+:::
+
 In addition, we will be configuring the scheduler to automatically assign the
 tokens that need to be obtained in order to accept requests matching a given
 workload. This continuous estimation (auto-tokens) helps with fair scheduling
@@ -55,20 +63,20 @@ highlighted in the Jsonnet spec below.
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="Jsonnet">
-```
-
-```jsonnet
-{@include: ./assets/workload-prioritization/workload-prioritization.jsonnet}
-```
-
-```mdx-code-block
-</TabItem>
 <TabItem value="YAML">
 ```
 
 ```yaml
 {@include: ./assets/workload-prioritization/workload-prioritization.yaml}
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Jsonnet">
+```
+
+```jsonnet
+{@include: ./assets/workload-prioritization/workload-prioritization.jsonnet}
 ```
 
 ```mdx-code-block
