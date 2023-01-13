@@ -52,8 +52,9 @@ To generate files, the script <a
 href={`https://github.com/fluxninja/aperture/tree/v${apertureVersion}/blueprints/scripts/generate-bundle.py`}>`blueprints/scripts/generate-bundle.py`</a>
 can be used. This script takes arguments for the output directory path where
 files will be saved and a path to a config libsonnet file containing blueprint
-customization and configuration. The full command using an example config looks
-like this:
+customization and configuration. Assuming you are at <a
+href={`https://github.com/fluxninja/aperture/tree/v${apertureVersion}/`}>`Aperture root`</a>,
+run the following commands to generate an example config:
 
 ```sh
 cd blueprints/

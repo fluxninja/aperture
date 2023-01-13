@@ -11,9 +11,9 @@ import {apertureVersion} from '../../introduction.md';
 import CodeBlock from '@theme/CodeBlock';
 ```
 
-Aperture Policies are applied at the Kubernetes cluster where the Aperture
-Controller is running. Aperture Policies are represented as Kubernetes objects
-of kind Policy, which is a
+Aperture [Policies][policy-concept] are applied at the Kubernetes cluster where
+the Aperture Controller is running. Aperture Policies are represented as
+Kubernetes objects of kind Policy, which is a
 [Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/).
 
 Once the Aperture Policy spec is defined, it can be applied like any other
@@ -52,24 +52,15 @@ Aperture Controller is running.
 kubectl get policies
 ```
 
-3. The Aperture Policy runtime can be visualized in a Grafana dashboard. Refer
-   to the metrics available from [Controller][controller-metrics] and
-   [Agent][agent-metrics]. Some of the Policy Blueprints come with recommended
-   Grafana dashboards.
-
-## Blueprints
-
-Follow the information on [Policy](/concepts/policy/policy.md) to understand and
-design the Aperture Policy circuits.
-
-Once the design is ready, follow the steps on the
-[Blueprints](/get-started/policies/blueprints.md) to generate the Policy Custom
-Resource and apply it on a Kubernetes cluster.
+3. The Aperture Policy runtime can be visualized in Grafana or any other
+   Prometheus compatible analytics tool. Refer to the Prometheus compatible
+   metrics available from [Controller][controller-metrics] and
+   [Agent][agent-metrics]. Some of the Policy [Blueprints][blueprints] come with
+   recommended Grafana dashboards.
 
 ## Delete Policy
 
-1. Run the following command to delete the Aperture Policy created using above
-   steps:
+Run the following command to delete the above Aperture Policy:
 
 ```bash
 kubectl delete policy static-rate-limiting
@@ -77,3 +68,5 @@ kubectl delete policy static-rate-limiting
 
 [controller-metrics]: /references/prometheus-metrics/controller.md
 [agent-metrics]: /references/prometheus-metrics/agent.md
+[policy-concept]: /concepts/policy/policy.md
+[blueprints]: /get-started/policies/blueprints.md
