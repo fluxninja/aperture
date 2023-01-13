@@ -38,7 +38,7 @@ type KubernetesDiscoveryConfig struct {
 // Module returns an fx.Option that provides the Kubernetes discovery module.
 func Module() fx.Option {
 	return fx.Options(
-		notifiers.TrackersConstructor{Name: FxTag}.Annotate(),
+		notifiers.TrackersConstructor{Name: FxTagBase}.Annotate(),
 		fx.Provide(
 			ProvideControlPointCache,
 		),

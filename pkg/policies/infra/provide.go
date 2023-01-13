@@ -3,7 +3,7 @@ package infra
 import (
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/actuators"
+	"github.com/fluxninja/aperture/pkg/policies/infra/actuators"
 )
 
 // Module returns the fx options for infra integrations of policy.

@@ -45,7 +45,7 @@ var (
 // K8sClientConstructorIn holds parameter for Providek8sClient and Providek8sDynamicClient.
 type K8sClientConstructorIn struct {
 	fx.In
-	httpClient *http.Client `name:"k8s-http-client"`
+	HTTPClient *http.Client `name:"k8s-http-client"`
 	Shutdowner fx.Shutdowner
 }
 
@@ -166,7 +166,7 @@ func (r *RealK8sClient) ScaleForGroupKind(ctx context.Context, namespace, name s
 
 // Providek8sClient provides a new kubernetes client and sets logger.
 func Providek8sClient(in K8sClientConstructorIn) (K8sClient, error) {
-	return NewK8sClient(in.httpClient, in.Shutdowner)
+	return NewK8sClient(in.HTTPClient, in.Shutdowner)
 }
 
 func newK8sClientSet(client *http.Client, shutdowner fx.Shutdowner) (*kubernetes.Clientset, *rest.Config, error) {
