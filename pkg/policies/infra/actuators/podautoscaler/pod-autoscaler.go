@@ -423,6 +423,7 @@ func (pa *podAutoscaler) scale(replicas int32) {
 		}
 
 		if scale.Spec.Replicas != replicas {
+			scale.Spec.Replicas = replicas
 			_, err = pa.k8sClient.GetScaleClient().Scales(cp.Namespace).Update(ctx, targetGR, scale, metav1.UpdateOptions{})
 			if err != nil {
 				// TODO: update status
