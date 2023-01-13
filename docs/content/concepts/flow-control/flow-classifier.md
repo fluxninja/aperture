@@ -146,4 +146,4 @@ See [full example in reference][reference]
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
 [control-point]: /concepts/flow-control/flow-control.md#control-point
-[install-istio]: /get-started/installation/agent/envoy/istio.md
+[install-istio]: /get-started/flow-control/envoy/istio.md

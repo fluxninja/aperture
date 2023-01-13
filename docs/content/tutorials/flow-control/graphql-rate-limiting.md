@@ -21,8 +21,8 @@ limit a GraphQL query. We will build upon what we've seen in the
 
 We will use a policy that will rate limit unique users based on `user_id` [Flow
 Label][flow-label]. This label is extracted using [Flow
-Classifier][flow-classifier] and is mapped from the `userId` argument of
-`createTodo` GraphQL mutation query.
+Classifier][flow-classifier] and is mapped from the `userID` claim in the JWT
+token sent as Authorization header in the request.
 
 ```mdx-code-block
 <Tabs>
@@ -30,7 +30,7 @@ Classifier][flow-classifier] and is mapped from the `userId` argument of
 ```
 
 ```yaml
-{@include: ./assets/graphql-rate-limiting/graphql-rate-limiting.yaml}
+{@include: ./assets/graphql-rate-limiting/graphql-rate-limiting-jwt.yaml}
 ```
 
 ```mdx-code-block
@@ -39,7 +39,7 @@ Classifier][flow-classifier] and is mapped from the `userId` argument of
 ```
 
 ```jsonnet
-{@include: ./assets/graphql-rate-limiting/graphql-rate-limiting.jsonnet}
+{@include: ./assets/graphql-rate-limiting/graphql-rate-limiting-jwt.jsonnet}
 ```
 
 ```mdx-code-block
@@ -51,7 +51,7 @@ For example, if the mutation query is as follows
 
 ```graphql
 mutation createTodo {
-  createTodo(input: { text: "todo", userId: 1 }) {
+  createTodo(input: { text: "todo" }) {
     user {
       id
     }
@@ -66,28 +66,28 @@ tutorial does the following:
 
 1. Parse the query
 2. Check if the mutation query is `createTodo`
-3. Find the argument to the mutation query that matches `userId`
-4. Assign the value of `userId` to variable `userID`
+3. Verify the JWT token with a very secretive secret key `secret` (only for
+   demonstration purposes)
+4. Decode the JWT token and extract the `userID` from the claims
+5. Assign the value of `userID` to the exported variable `userID` in Rego source
 
 From there on, the classifier rule assigns the value of the exported variable
 `userID` in Rego source to `user_id` flow label, effectively creating a label
-`user_id:1`. This label is used by the [Rate Limiter][rate-limiter] component in
-the policy to limit the `createTodo` mutation query to 10 requests/second for
-each `userId`.
+`user_id:1`. This label is used by the Rate Limiter component in the policy to
+limit the `createTodo` mutation query to 10 requests/second for each userID.
 
 ### Circuit Diagram
 
 ```mermaid
-{@include: ./assets/graphql-rate-limiting/graphql-rate-limiting.mmd}
+{@include: ./assets/graphql-rate-limiting/graphql-rate-limiting-jwt.mmd}
 ```
 
 ### Playground
 
-The traffic generator for this example in the
-[playground](/get-started/playground.md) is configured to generate 50
+The traffic generator for this example is configured to generate 50
 requests/second for 2 minutes. When the above policy is loaded in the
 playground, we see that no more than 10 requests are accepted at any given time
-and that 40 out of the 50 requests are rejected.
+and rest of the requests are rejected.
 
 <Zoom>
 
@@ -98,4 +98,3 @@ and that 40 out of the 50 requests are rejected.
 [rego-rules]: ../../concepts/flow-control/flow-classifier#rego
 [flow-label]: ../../concepts/flow-control/flow-label.md
 [flow-classifier]: ../../concepts/flow-control/flow-classifier.md
-[rate-limiter]: ../../concepts/flow-control/rate-limiter
