@@ -56,8 +56,7 @@ spec:
       test:
         flow_selector:
           flow_matcher:
-            control_point:
-              traffic: ingress
+            control_point: ingress
           service_selector:
             agent_group: default
             service: service1-demo-app.demoapp.svc.cluster.local
