@@ -42,18 +42,34 @@ function(params) {
       + circuit.withComponents(
         [
           component.withArithmeticCombinator(combinator.mul(port.withSignalName('LATENCY'),
-                                                            port.withConstantValue(c.latencyEMALimitMultiplier),
+                                                            port.withConstantValue(
+                                                              constantValue.new()
+                                                              + constantValue.withValue(c.latencyEMALimitMultiplier)
+                                                              + constantValue.withValid(true)
+                                                            ),
                                                             output=port.withSignalName('MAX_EMA'))),
           component.withArithmeticCombinator(combinator.mul(port.withSignalName('LATENCY_EMA'),
-                                                            port.withConstantValue(c.latencyToleranceMultiplier),
+                                                            port.withConstantValue(
+                                                              constantValue.new()
+                                                              + constantValue.withValue(c.latencyToleranceMultiplier)
+                                                              + constantValue.withValid(true)
+                                                            ),
                                                             output=port.withSignalName('LATENCY_SETPOINT'))),
           component.withArithmeticCombinator(combinator.div(port.withSignalName('DESIRED_CONCURRENCY'),
                                                             port.withSignalName('INCOMING_CONCURRENCY'),
                                                             output=port.withSignalName('DESIRED_CONCURRENCY_RATIO'))),
-          component.withArithmeticCombinator(combinator.mul(port.withConstantValue(c.concurrencyLimitMultiplier),
+          component.withArithmeticCombinator(combinator.mul(port.withConstantValue(
+                                                              constantValue.new()
+                                                              + constantValue.withValue(c.concurrencyLimitMultiplier)
+                                                              + constantValue.withValid(true)
+                                                            ),
                                                             port.withSignalName('ACCEPTED_CONCURRENCY'),
                                                             output=port.withSignalName('NORMAL_CONCURRENCY_LIMIT'))),
-          component.withArithmeticCombinator(combinator.add(port.withConstantValue(c.concurrencyLinearIncrement),
+          component.withArithmeticCombinator(combinator.add(port.withConstantValue(
+                                                              constantValue.new()
+                                                              + constantValue.withValue(c.concurrencyLinearIncrement)
+                                                              + constantValue.withValid(true)
+                                                            ),
                                                             port.withSignalName('SQRT_CONCURRENCY_INCREMENT'),
                                                             output=port.withSignalName('CONCURRENCY_INCREMENT_SINGLE_TICK'))),
           component.withIntegrator(
