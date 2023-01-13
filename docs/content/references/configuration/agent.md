@@ -839,7 +839,7 @@ FlowPreviewConfig is the configuration for the flow control preview service.
 
 ### FluxNinjaPluginConfig {#flux-ninja-plugin-config}
 
-FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration plugin.
+FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
 
 #### Properties
 

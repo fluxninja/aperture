@@ -81,9 +81,9 @@ into your cluster.
 
    :::info
 
-   The below parameters disable the FluxNinja Cloud Plugin for the Aperture
+   The below parameters disable the FluxNinja ARC Plugin for the Aperture
    Controller. If you want to keep it enabled, add parameters provided
-   [here](/cloud/plugin.md#configuration) under the `controller.config` section.
+   [here](/arc/plugin.md#configuration) under the `controller.config` section.
 
    :::
 

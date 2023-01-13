@@ -946,7 +946,7 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
             },
         )
 
-    if "demo-app" in resources:
+    if "controller" in resources:
         readiness_probe=probe(initial_delay_secs=5, exec=exec_action(['kubectl', 'get', "svc", "aperture-controller", "-n", APERTURE_CONTROLLER_NS])) # Treat as success if service is available
         local_resource(
             name="controller-service",
