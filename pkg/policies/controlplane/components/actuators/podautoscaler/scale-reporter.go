@@ -2,7 +2,6 @@ package podautoscaler
 
 import (
 	"context"
-	"path"
 	"sync"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
@@ -66,9 +65,9 @@ type ScaleReporter struct {
 	lock          sync.RWMutex
 	policyReadAPI iface.Policy
 	// statusRegistry status.Registry
-	scaleStatus    *policysyncv1.ScaleStatus
-	statusEtcdPath string
-	agentGroup     string
+	scaleStatus *policysyncv1.ScaleStatus
+	componentID string
+	agentGroup  string
 }
 
 // Make sure ScaleReporter implements runtime.Component.
@@ -88,11 +87,10 @@ func NewScaleReporterAndOptions(
 	agentGroup string,
 ) (runtime.Component, fx.Option, error) {
 	componentID := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), int64(componentIndex))
-	statusEtcdPath := path.Join(paths.PodAutoscalerStatusPath, componentID)
 	sr := &ScaleReporter{
-		policyReadAPI:  policyReadAPI,
-		statusEtcdPath: statusEtcdPath,
-		agentGroup:     agentGroup,
+		policyReadAPI: policyReadAPI,
+		componentID:   componentID,
+		agentGroup:    agentGroup,
 	}
 
 	return sr, fx.Options(
@@ -116,7 +114,7 @@ func (sr *ScaleReporter) setupWatch(
 
 	// status notifier
 	statusNotifier := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(sr.statusEtcdPath),
+		notifiers.Key(sr.componentID),
 		statusUnmarshaller,
 		sr.statusUpdateCallback,
 	)

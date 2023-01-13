@@ -20,7 +20,7 @@ Once the Aperture Policy spec is defined, it can be applied like any other
 Kubernetes resource:
 
 ```bash
-kubectl apply -f <aperture-policy-file>
+kubectl --namespace=aperture-controller apply -f <aperture-policy-file>
 ```
 
 Here's an example of the Aperture Policy configuration file:
@@ -43,13 +43,13 @@ Aperture Controller is running.
 1. Create the Aperture Policy by running the following command:
 
 <CodeBlock language="bash">
-{`kubectl apply -f https://raw.githubusercontent.com/fluxninja/aperture/v${apertureVersion}/docs/content/tutorials/flow-control/assets/static-rate-limiting/static-rate-limiting.yaml`}
+{`kubectl --namespace=aperture-controller apply -f https://raw.githubusercontent.com/fluxninja/aperture/v${apertureVersion}/docs/content/tutorials/flow-control/assets/static-rate-limiting/static-rate-limiting.yaml`}
 </CodeBlock>
 
 2. Run the following command to check if the Aperture Policy was created.
 
 ```bash
-kubectl get policies
+kubectl --namespace=aperture-controller get policies
 ```
 
 3. The Aperture Policy runtime can be visualized in Grafana or any other
@@ -63,7 +63,7 @@ kubectl get policies
 Run the following command to delete the above Aperture Policy:
 
 ```bash
-kubectl delete policy static-rate-limiting
+kubectl --namespace=aperture-controller delete policy static-rate-limiting
 ```
 
 [controller-metrics]: /references/prometheus-metrics/controller.md
