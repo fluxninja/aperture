@@ -21,9 +21,6 @@ local rateLimiter = aperture.spec.v1.RateLimiter;
 local decider = aperture.spec.v1.Decider;
 local switcher = aperture.spec.v1.Switcher;
 local port = aperture.spec.v1.Port;
-local alerter = aperture.spec.v1.Alerter;
-local integrator = aperture.spec.v1.Integrator;
-local differentiator = aperture.spec.v1.Differentiator;
 
 local fluxMeterSelector = flowSelector.new()
                           + flowSelector.withServiceSelector(

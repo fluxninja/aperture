@@ -33,7 +33,7 @@ import (
 
 const podAutoscalerStatusRoot = "pod_autoscalers"
 
-var fxNameTag = config.NameTag(podAutoscalerStatusRoot)
+var fxTag = config.NameTag(podAutoscalerStatusRoot)
 
 // Module returns the fx module for the pod autoscaler.
 func Module() fx.Option {
@@ -41,14 +41,14 @@ func Module() fx.Option {
 		fx.Provide(
 			fx.Annotate(
 				provideWatcher,
-				fx.ResultTags(fxNameTag),
+				fx.ResultTags(fxTag),
 			),
 		),
 		fx.Invoke(
 			fx.Annotate(
 				setupPodAutoscalerFactory,
 				fx.ParamTags(
-					fxNameTag,
+					fxTag,
 					discoverykubernetes.FxTag,
 				),
 			),
@@ -193,7 +193,7 @@ func (paFactory *podAutoscalerFactory) newPodAutoscalerOptions(
 		),
 		fx.Supply(
 			paFactory.etcdClient,
-			paFactory.k8sClient,
+			fx.Annotate(paFactory.k8sClient, fx.As(new(k8s.K8sClient))),
 		),
 	), nil
 }

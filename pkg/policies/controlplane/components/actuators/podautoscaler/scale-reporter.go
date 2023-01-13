@@ -20,10 +20,7 @@ import (
 )
 
 // fxTag is Autoscaler Status Watcher's Fx Tag.
-var (
-	fxTag     = "scale_status_watcher"
-	fxNameTag = config.NameTag(fxTag)
-)
+var fxTag = config.NameTag("scale_status_watcher")
 
 // scaleReporterModule returns the fx options for pod autoscaler in the main app.
 func scaleReporterModule() fx.Option {
@@ -31,49 +28,36 @@ func scaleReporterModule() fx.Option {
 		fx.Provide(
 			fx.Annotate(
 				provideWatcher,
-				fx.ResultTags(fxNameTag),
+				fx.ResultTags(fxTag),
 			),
-		),
-		fx.Invoke(
 			fx.Annotate(
-				setupWatcher,
-				fx.ParamTags(
-					fxNameTag,
-				),
+				provideFxOptionsFunc,
+				fx.ParamTags(fxTag),
+				fx.ResultTags(iface.FxOptionsFuncTag),
 			),
 		),
-
-		fx.Provide(fx.Annotate(
-			provideFxOptionsFunc,
-
-			fx.ParamTags(fxNameTag),
-			fx.ResultTags(iface.FxOptionsFuncTag),
-		)),
 	)
 }
 
 func provideWatcher(
 	etcdClient *etcdclient.Client,
+	lc fx.Lifecycle,
 ) (notifiers.Watcher, error) {
 	etcdPath := paths.PodAutoscalerStatusPath
 	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return nil, err
 	}
+	notifiers.WatcherLifecycle(lc, watcher, nil)
 
 	return watcher, nil
 }
 
-func setupWatcher(
-	watcher notifiers.Watcher,
-	lifecycle fx.Lifecycle,
-) {
-	notifiers.WatcherLifecycle(lifecycle, watcher, []notifiers.PrefixNotifier{})
-}
-
 func provideFxOptionsFunc(watcher notifiers.Watcher) notifiers.FxOptionsFunc {
 	return func(key notifiers.Key, _ config.Unmarshaller, _ status.Registry) (fx.Option, error) {
-		return fx.Supply(fx.Annotated{Name: fxTag, Target: watcher}), nil
+		return fx.Supply(fx.Annotate(
+			watcher, fx.ResultTags(fxTag),
+		)), nil
 	}
 }
 
@@ -115,7 +99,7 @@ func NewScaleReporterAndOptions(
 		fx.Invoke(
 			fx.Annotate(
 				sr.setupWatch,
-				fx.ParamTags(fxNameTag),
+				fx.ParamTags(fxTag),
 			),
 		),
 	), nil

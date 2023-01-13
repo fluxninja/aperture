@@ -14,7 +14,9 @@ import (
 
 // componentStackFactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
 func componentStackFactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
-	return fx.Options()
+	return fx.Options(
+		podautoscaler.Module(),
+	)
 }
 
 // newComponentStackAndOptions creates components for component stack, sub components and their fx options.
