@@ -10,6 +10,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policymonitoringv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/monitoring/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/metrics"
@@ -107,10 +108,10 @@ func MakeNamedSignal(name string, looped bool) Signal {
 }
 
 // MakeConstantSignal creates a new constant Signal.
-func MakeConstantSignal(value float64) Signal {
+func MakeConstantSignal(constValue *policylangv1.ConstantValue) Signal {
 	return Signal{
 		SignalType: SignalTypeConstant,
-		Value:      value,
+		Value:      constValue.Value,
 	}
 }
 

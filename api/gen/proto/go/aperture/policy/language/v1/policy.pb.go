@@ -368,7 +368,7 @@ func (x *Resources) GetClassifiers() []*Classifier {
 // You can create an input port containing the constant value instead of being connected to a signal.
 // To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
 // If You need to provide the same constant signal to multiple components,
-// You can use the [Constant](#v1-constant) component.
+// You can use the [Variable](#v1-variable) component.
 // :::
 //
 // See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -386,7 +386,7 @@ type Component struct {
 	//	*Component_ConcurrencyLimiter
 	//	*Component_RateLimiter
 	//	*Component_Promql
-	//	*Component_Constant
+	//	*Component_Variable
 	//	*Component_Sqrt
 	//	*Component_Extrapolator
 	//	*Component_Max
@@ -497,9 +497,9 @@ func (x *Component) GetPromql() *PromQL {
 	return nil
 }
 
-func (x *Component) GetConstant() *Constant {
-	if x, ok := x.GetComponent().(*Component_Constant); ok {
-		return x.Constant
+func (x *Component) GetVariable() *Variable {
+	if x, ok := x.GetComponent().(*Component_Variable); ok {
+		return x.Variable
 	}
 	return nil
 }
@@ -633,9 +633,9 @@ type Component_Promql struct {
 	Promql *PromQL `protobuf:"bytes,8,opt,name=promql,proto3,oneof"`
 }
 
-type Component_Constant struct {
-	// Emits a constant signal.
-	Constant *Constant `protobuf:"bytes,9,opt,name=constant,proto3,oneof"`
+type Component_Variable struct {
+	// Emits a variable signal which can be set to invalid.
+	Variable *Variable `protobuf:"bytes,9,opt,name=variable,proto3,oneof"`
 }
 
 type Component_Sqrt struct {
@@ -714,7 +714,7 @@ func (*Component_RateLimiter) isComponent_Component() {}
 
 func (*Component_Promql) isComponent_Component() {}
 
-func (*Component_Constant) isComponent_Component() {}
+func (*Component_Variable) isComponent_Component() {}
 
 func (*Component_Sqrt) isComponent_Component() {}
 
@@ -798,11 +798,11 @@ func (x *InPort) GetSignalName() string {
 	return ""
 }
 
-func (x *InPort) GetConstantValue() float64 {
+func (x *InPort) GetConstantValue() *ConstantValue {
 	if x, ok := x.GetValue().(*InPort_ConstantValue); ok {
 		return x.ConstantValue
 	}
-	return 0
+	return nil
 }
 
 type isInPort_Value interface {
@@ -816,7 +816,7 @@ type InPort_SignalName struct {
 
 type InPort_ConstantValue struct {
 	// Constant value to be used for this InPort instead of a signal.
-	ConstantValue float64 `protobuf:"fixed64,2,opt,name=constant_value,json=constantValue,proto3,oneof"`
+	ConstantValue *ConstantValue `protobuf:"bytes,2,opt,name=constant_value,json=constantValue,proto3,oneof"`
 }
 
 func (*InPort_SignalName) isInPort_Value() {}
@@ -1947,20 +1947,18 @@ func (x *PromQL) GetEvaluationInterval() *durationpb.Duration {
 	return nil
 }
 
-// Component that emits a constant value as an output signal
-type Constant struct {
+// Constant value that can be used instead of a signal in ports. Can be set to be invalid.
+type ConstantValue struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Output ports for the Constant component.
-	OutPorts *Constant_Outs `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
-	// The constant value to be emitted.
+	Valid bool    `protobuf:"varint,1,opt,name=valid,proto3" json:"valid,omitempty"`
 	Value float64 `protobuf:"fixed64,2,opt,name=value,proto3" json:"value,omitempty"`
 }
 
-func (x *Constant) Reset() {
-	*x = Constant{}
+func (x *ConstantValue) Reset() {
+	*x = ConstantValue{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1968,13 +1966,13 @@ func (x *Constant) Reset() {
 	}
 }
 
-func (x *Constant) String() string {
+func (x *ConstantValue) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Constant) ProtoMessage() {}
+func (*ConstantValue) ProtoMessage() {}
 
-func (x *Constant) ProtoReflect() protoreflect.Message {
+func (x *ConstantValue) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1986,23 +1984,90 @@ func (x *Constant) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Constant.ProtoReflect.Descriptor instead.
-func (*Constant) Descriptor() ([]byte, []int) {
+// Deprecated: Use ConstantValue.ProtoReflect.Descriptor instead.
+func (*ConstantValue) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{19}
 }
 
-func (x *Constant) GetOutPorts() *Constant_Outs {
+func (x *ConstantValue) GetValid() bool {
+	if x != nil {
+		return x.Valid
+	}
+	return false
+}
+
+func (x *ConstantValue) GetValue() float64 {
+	if x != nil {
+		return x.Value
+	}
+	return 0
+}
+
+// Component that emits a variable value as an output signal, can be defined in dynamic configuration.
+type Variable struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Output ports for the Variable component.
+	OutPorts *Variable_Outs `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
+	// Configuration key for DynamicConfig.
+	DynamicConfigKey string `protobuf:"bytes,2,opt,name=dynamic_config_key,json=dynamicConfigKey,proto3" json:"dynamic_config_key,omitempty"`
+	// Default configuration.
+	DefaultConfig *Variable_DynamicConfig `protobuf:"bytes,3,opt,name=default_config,json=defaultConfig,proto3" json:"default_config,omitempty"`
+}
+
+func (x *Variable) Reset() {
+	*x = Variable{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Variable) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Variable) ProtoMessage() {}
+
+func (x *Variable) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Variable.ProtoReflect.Descriptor instead.
+func (*Variable) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *Variable) GetOutPorts() *Variable_Outs {
 	if x != nil {
 		return x.OutPorts
 	}
 	return nil
 }
 
-func (x *Constant) GetValue() float64 {
+func (x *Variable) GetDynamicConfigKey() string {
 	if x != nil {
-		return x.Value
+		return x.DynamicConfigKey
 	}
-	return 0
+	return ""
+}
+
+func (x *Variable) GetDefaultConfig() *Variable_DynamicConfig {
+	if x != nil {
+		return x.DefaultConfig
+	}
+	return nil
 }
 
 // Takes an input signal and emits the square root of it multiplied by scale as an output
@@ -2026,7 +2091,7 @@ type Sqrt struct {
 func (x *Sqrt) Reset() {
 	*x = Sqrt{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[20]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2039,7 +2104,7 @@ func (x *Sqrt) String() string {
 func (*Sqrt) ProtoMessage() {}
 
 func (x *Sqrt) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[20]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2052,7 +2117,7 @@ func (x *Sqrt) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Sqrt.ProtoReflect.Descriptor instead.
 func (*Sqrt) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{20}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *Sqrt) GetInPorts() *Sqrt_Ins {
@@ -2095,7 +2160,7 @@ type Extrapolator struct {
 func (x *Extrapolator) Reset() {
 	*x = Extrapolator{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[21]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2108,7 +2173,7 @@ func (x *Extrapolator) String() string {
 func (*Extrapolator) ProtoMessage() {}
 
 func (x *Extrapolator) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[21]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2121,7 +2186,7 @@ func (x *Extrapolator) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Extrapolator.ProtoReflect.Descriptor instead.
 func (*Extrapolator) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{21}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *Extrapolator) GetInPorts() *Extrapolator_Ins {
@@ -2162,7 +2227,7 @@ type Max struct {
 func (x *Max) Reset() {
 	*x = Max{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[22]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2175,7 +2240,7 @@ func (x *Max) String() string {
 func (*Max) ProtoMessage() {}
 
 func (x *Max) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[22]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2188,7 +2253,7 @@ func (x *Max) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Max.ProtoReflect.Descriptor instead.
 func (*Max) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{22}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *Max) GetInPorts() *Max_Ins {
@@ -2221,7 +2286,7 @@ type Min struct {
 func (x *Min) Reset() {
 	*x = Min{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[23]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2234,7 +2299,7 @@ func (x *Min) String() string {
 func (*Min) ProtoMessage() {}
 
 func (x *Min) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[23]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2247,7 +2312,7 @@ func (x *Min) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Min.ProtoReflect.Descriptor instead.
 func (*Min) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{23}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *Min) GetInPorts() *Min_Ins {
@@ -4010,18 +4075,16 @@ func (x *PromQL_Outs) GetOutput() *OutPort {
 	return nil
 }
 
-// Outputs for the Constant component.
-type Constant_Outs struct {
+type Variable_DynamicConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The constant value is emitted to the output port.
-	Output *OutPort `protobuf:"bytes,1,opt,name=output,proto3" json:"output,omitempty"`
+	ConstantValue *ConstantValue `protobuf:"bytes,1,opt,name=constant_value,json=constantValue,proto3" json:"constant_value,omitempty"`
 }
 
-func (x *Constant_Outs) Reset() {
-	*x = Constant_Outs{}
+func (x *Variable_DynamicConfig) Reset() {
+	*x = Variable_DynamicConfig{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[55]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -4029,11 +4092,11 @@ func (x *Constant_Outs) Reset() {
 	}
 }
 
-func (x *Constant_Outs) String() string {
+func (x *Variable_DynamicConfig) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Constant_Outs) ProtoMessage() {}
+func (*Variable_DynamicConfig) ProtoMessage() {}
 
 func (x *Constant_Outs) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[55]
@@ -4047,12 +4110,61 @@ func (x *Constant_Outs) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Constant_Outs.ProtoReflect.Descriptor instead.
-func (*Constant_Outs) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{19, 0}
+// Deprecated: Use Variable_DynamicConfig.ProtoReflect.Descriptor instead.
+func (*Variable_DynamicConfig) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{20, 0}
 }
 
-func (x *Constant_Outs) GetOutput() *OutPort {
+func (x *Variable_DynamicConfig) GetConstantValue() *ConstantValue {
+	if x != nil {
+		return x.ConstantValue
+	}
+	return nil
+}
+
+// Outputs for the Variable component.
+type Variable_Outs struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The value is emitted to the output port.
+	Output *OutPort `protobuf:"bytes,1,opt,name=output,proto3" json:"output,omitempty"`
+}
+
+func (x *Variable_Outs) Reset() {
+	*x = Variable_Outs{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[54]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Variable_Outs) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Variable_Outs) ProtoMessage() {}
+
+func (x *Variable_Outs) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[54]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Variable_Outs.ProtoReflect.Descriptor instead.
+func (*Variable_Outs) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{20, 1}
+}
+
+func (x *Variable_Outs) GetOutput() *OutPort {
 	if x != nil {
 		return x.Output
 	}
@@ -4098,7 +4210,7 @@ func (x *Sqrt_Ins) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Sqrt_Ins.ProtoReflect.Descriptor instead.
 func (*Sqrt_Ins) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{20, 0}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{21, 0}
 }
 
 func (x *Sqrt_Ins) GetInput() *InPort {
@@ -4147,7 +4259,7 @@ func (x *Sqrt_Outs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Sqrt_Outs.ProtoReflect.Descriptor instead.
 func (*Sqrt_Outs) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{20, 1}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{21, 1}
 }
 
 func (x *Sqrt_Outs) GetOutput() *OutPort {
@@ -4196,7 +4308,7 @@ func (x *Extrapolator_Ins) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Extrapolator_Ins.ProtoReflect.Descriptor instead.
 func (*Extrapolator_Ins) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{21, 0}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{22, 0}
 }
 
 func (x *Extrapolator_Ins) GetInput() *InPort {
@@ -4245,7 +4357,7 @@ func (x *Extrapolator_Outs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Extrapolator_Outs.ProtoReflect.Descriptor instead.
 func (*Extrapolator_Outs) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{21, 1}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{22, 1}
 }
 
 func (x *Extrapolator_Outs) GetOutput() *OutPort {
@@ -4294,7 +4406,7 @@ func (x *Max_Ins) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Max_Ins.ProtoReflect.Descriptor instead.
 func (*Max_Ins) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{22, 0}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{23, 0}
 }
 
 func (x *Max_Ins) GetInputs() []*InPort {
@@ -4343,7 +4455,7 @@ func (x *Max_Outs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Max_Outs.ProtoReflect.Descriptor instead.
 func (*Max_Outs) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{22, 1}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{23, 1}
 }
 
 func (x *Max_Outs) GetOutput() *OutPort {
@@ -4392,7 +4504,7 @@ func (x *Min_Ins) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Min_Ins.ProtoReflect.Descriptor instead.
 func (*Min_Ins) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{23, 0}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{24, 0}
 }
 
 func (x *Min_Ins) GetInputs() []*InPort {
@@ -4441,7 +4553,7 @@ func (x *Min_Outs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Min_Outs.ProtoReflect.Descriptor instead.
 func (*Min_Outs) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{23, 1}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{24, 1}
 }
 
 func (x *Min_Outs) GetOutput() *OutPort {
@@ -5508,11 +5620,11 @@ var file_aperture_policy_language_v1_policy_proto_rawDesc = []byte{
 	0x71, 0x6c, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74,
 	0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75,
 	0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x72, 0x6f, 0x6d, 0x51, 0x4c, 0x48, 0x00, 0x52,
-	0x06, 0x70, 0x72, 0x6f, 0x6d, 0x71, 0x6c, 0x12, 0x43, 0x0a, 0x08, 0x63, 0x6f, 0x6e, 0x73, 0x74,
-	0x61, 0x6e, 0x74, 0x18, 0x09, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x25, 0x2e, 0x61, 0x70, 0x65, 0x72,
+	0x06, 0x70, 0x72, 0x6f, 0x6d, 0x71, 0x6c, 0x12, 0x43, 0x0a, 0x08, 0x76, 0x61, 0x72, 0x69, 0x61,
+	0x62, 0x6c, 0x65, 0x18, 0x09, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x25, 0x2e, 0x61, 0x70, 0x65, 0x72,
 	0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67,
-	0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e, 0x73, 0x74, 0x61, 0x6e, 0x74,
-	0x48, 0x00, 0x52, 0x08, 0x63, 0x6f, 0x6e, 0x73, 0x74, 0x61, 0x6e, 0x74, 0x12, 0x37, 0x0a, 0x04,
+	0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x56, 0x61, 0x72, 0x69, 0x61, 0x62, 0x6c, 0x65,
+	0x48, 0x00, 0x52, 0x08, 0x76, 0x61, 0x72, 0x69, 0x61, 0x62, 0x6c, 0x65, 0x12, 0x37, 0x0a, 0x04,
 	0x73, 0x71, 0x72, 0x74, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x21, 0x2e, 0x61, 0x70, 0x65,
 	0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e,
 	0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x71, 0x72, 0x74, 0x48, 0x00, 0x52,
@@ -6871,7 +6983,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Constant); i {
+			switch v := v.(*ConstantValue); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6883,7 +6995,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Sqrt); i {
+			switch v := v.(*Variable); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6895,7 +7007,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Extrapolator); i {
+			switch v := v.(*Sqrt); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6907,7 +7019,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Max); i {
+			switch v := v.(*Extrapolator); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6919,7 +7031,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Min); i {
+			switch v := v.(*Max); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7612,7 +7724,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 		(*Component_ConcurrencyLimiter)(nil),
 		(*Component_RateLimiter)(nil),
 		(*Component_Promql)(nil),
-		(*Component_Constant)(nil),
+		(*Component_Variable)(nil),
 		(*Component_Sqrt)(nil),
 		(*Component_Extrapolator)(nil),
 		(*Component_Max)(nil),

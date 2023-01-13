@@ -10,33 +10,67 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
-// Constant is a constant signal.
-type Constant struct {
-	// The value of the constant signal to be emitted.
-	value float64
+// Variable is a dynamically configurable variable signal.
+type Variable struct {
+	constantValue *policylangv1.ConstantValue
+	policyReadAPI iface.Policy
+	variableProto *policylangv1.Variable
 }
 
 // Name implements runtime.Component.
-func (*Constant) Name() string { return "Constant" }
+func (*Variable) Name() string { return "Variable" }
 
 // Type implements runtime.Component.
-func (*Constant) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
+func (*Variable) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
 
-// NewConstant creates a constant component with a given value.
-func NewConstant(value float64) runtime.Component { return &Constant{value: value} }
+// NewVariable creates a variable component.
+func NewVariable(value float64) runtime.Component {
+	return &Variable{
+		constantValue: &policylangv1.ConstantValue{
+			Valid: true,
+			Value: value,
+		},
+	}
+}
 
-// NewConstantAndOptions creates a constant components and its fx options.
-func NewConstantAndOptions(constant *policylangv1.Constant, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
-	return NewConstant(constant.Value), fx.Options(), nil
+// NewVariableAndOptions creates a variable components and its fx options.
+func NewVariableAndOptions(variableProto *policylangv1.Variable, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+	variable := &Variable{
+		policyReadAPI: policyReadAPI,
+		constantValue: variableProto.DefaultConfig.ConstantValue,
+		variableProto: variableProto,
+	}
+
+	return variable, fx.Options(), nil
 }
 
 // Execute implements runtime.Component.Execute.
-func (con *Constant) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (v *Variable) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	// Always emit the value.
+	if !v.constantValue.Valid {
+		return runtime.PortToValue{
+			"output": []runtime.Reading{runtime.InvalidReading()},
+		}, nil
+	}
+
 	return runtime.PortToValue{
-		"output": []runtime.Reading{runtime.NewReading(con.value)},
+		"output": []runtime.Reading{runtime.NewReading(v.constantValue.Value)},
 	}, nil
 }
 
-// DynamicConfigUpdate is a no-op for Constant.
-func (con *Constant) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}
+// DynamicConfigUpdate finds the dynamic config and syncs the constant value.
+func (v *Variable) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	logger := v.policyReadAPI.GetStatusRegistry().GetLogger()
+	key := v.variableProto.GetDynamicConfigKey()
+	// read dynamic config
+	if unmarshaller.IsSet(key) {
+		dynamicConfig := &policylangv1.Variable_DynamicConfig{}
+		if err := unmarshaller.UnmarshalKey(key, dynamicConfig); err != nil {
+			logger.Error().Err(err).Msg("Failed to unmarshal dynamic config")
+			return
+		}
+		v.constantValue = dynamicConfig.ConstantValue
+	} else {
+		v.constantValue = v.variableProto.GetDefaultConfig().ConstantValue
+	}
+}
