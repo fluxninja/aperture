@@ -500,7 +500,7 @@ controller:
   ##    command: ['sh', '-c', 'echo "hello world"']
   ##
   initContainers: []
-  ## Controller API secret for FluxNinja cloud connection
+  ## Controller API secret for FluxNinja ARC connection
   ## @param controller.secrets.fluxNinjaPlugin.create Whether to create Kubernetes Secret with provided Controller API Key.
   ## @param controller.secrets.fluxNinjaPlugin.secretKeyRef.name specifies a name of the Secret for Controller API Key to be used. This defaults to {{ .Release.Name }}-controller-apikey
   ## @param controller.secrets.fluxNinjaPlugin.secretKeyRef.key specifies which key from the Secret for Controller API Key to use

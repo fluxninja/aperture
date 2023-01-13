@@ -2385,8 +2385,8 @@ The flow label is always accessible in Aperture Policies regardless of this sett
 :::
 
 :::caution
-When using [FluxNinja Cloud plugin](cloud/plugin.md), telemetry enabled
-labels are sent to FluxNinha Cloud for observability. Telemetry should be disabled for
+When using [FluxNinja ARC plugin](arc/plugin.md), telemetry enabled
+labels are sent to FluxNinja ARC for observability. Telemetry should be disabled for
 sensitive labels.
 :::
 
