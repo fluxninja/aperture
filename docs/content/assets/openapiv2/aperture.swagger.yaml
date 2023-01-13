@@ -907,9 +907,6 @@ definitions:
       concurrency_limiter:
         $ref: '#/definitions/v1ConcurrencyLimiter'
         description: Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
-      constant:
-        $ref: '#/definitions/v1Constant'
-        description: Emits a constant signal.
       decider:
         $ref: '#/definitions/v1Decider'
         description: Decider emits the binary result of comparison operator on two operands.
@@ -954,6 +951,9 @@ definitions:
       switcher:
         $ref: '#/definitions/v1Switcher'
         description: Switcher acts as a switch that emits one of the two signals based on third signal.
+      variable:
+        $ref: '#/definitions/v1Variable'
+        description: Emits a variable signal which can be set to invalid.
     description: |-
       :::info
       See also [Components overview](/concepts/policy/circuit.md#components).
@@ -988,7 +988,7 @@ definitions:
       You can create an input port containing the constant value instead of being connected to a signal.
       To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
       If You need to provide the same constant signal to multiple components,
-      You can use the [Constant](#v1-constant) component.
+      You can use the [Variable](#v1-variable) component.
       :::
 
       See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -1025,24 +1025,15 @@ definitions:
       ConcurrencyLimiter configuration is split into two parts: An actuation
       strategy and a scheduler. Right now, only `load_actuator` strategy is available.
     title: Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
-  v1Constant:
+  v1ConstantValue:
     type: object
     properties:
-      out_ports:
-        $ref: '#/definitions/v1ConstantOuts'
-        description: Output ports for the Constant component.
+      valid:
+        type: boolean
       value:
         type: number
         format: double
-        description: The constant value to be emitted.
-    title: Component that emits a constant value as an output signal
-  v1ConstantOuts:
-    type: object
-    properties:
-      output:
-        $ref: '#/definitions/v1OutPort'
-        description: The constant value is emitted to the output port.
-    description: Outputs for the Constant component.
+    description: Constant value that can be used instead of a signal in ports. Can be set to be invalid.
   v1ControlPoint:
     type: object
     properties:
@@ -1641,8 +1632,7 @@ definitions:
     type: object
     properties:
       constant_value:
-        type: number
-        format: double
+        $ref: '#/definitions/v1ConstantValue'
         description: Constant value to be used for this InPort instead of a signal.
       signal_name:
         type: string
@@ -2522,6 +2512,31 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Selected signal (on_true or on_false).
     description: Outputs for the Switcher component.
+  v1Variable:
+    type: object
+    properties:
+      default_config:
+        $ref: '#/definitions/v1VariableDynamicConfig'
+        description: Default configuration.
+      dynamic_config_key:
+        type: string
+        description: Configuration key for DynamicConfig.
+      out_ports:
+        $ref: '#/definitions/v1VariableOuts'
+        description: Output ports for the Variable component.
+    description: Component that emits a variable value as an output signal, can be defined in dynamic configuration.
+  v1VariableDynamicConfig:
+    type: object
+    properties:
+      constant_value:
+        $ref: '#/definitions/v1ConstantValue'
+  v1VariableOuts:
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
+        description: The value is emitted to the output port.
+    description: Outputs for the Variable component.
   v1VersionInfo:
     type: object
     properties:
