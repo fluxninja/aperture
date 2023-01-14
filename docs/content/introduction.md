@@ -34,39 +34,7 @@ modern web applications.
 <Zoom>
 
 ```mermaid
-%% name: architecture_simple
-flowchart TD
-    blueprints[/"Blueprints"/]
-    policies[/"Policies"/]
-    subgraph controller["Aperture Controller"]
-        circuit["Control Circuit"]
-    end
-    subgraph databases["Aperture Databases"]
-      prometheus[("Prometheus")]
-      etcd[("etcd")]
-    end
-    subgraph worker["Worker Node (Kubernetes/VM/Bare-metal)"]
-      subgraph agent["Aperture Agent"]
-          servicediscovery["Service Discovery"]
-          telemetry["Telemetry Collector"]
-          flowcontrol["Flow Control"]
-      end
-      subgraph serviceinstance["Service Instance"]
-        servicelogic["Service Logic"]
-        servicemesh["Service Mesh"]
-      end
-    end
-    subgraph platforms["Discovery Databases"]
-      kubernetes["Kubernetes"]
-      consul["Consul"]
-    end
-    blueprints --> |Jsonnet Generator| policies
-    policies --> |Kubernetes Custom Resource| controller
-    controller<--> |Configuration/Telemetry/Decisions| databases
-    databases<-->|Configuration/Telemetry/Decisions|agent
-    agent <-->|SDK: Telemetry/Decisions| servicelogic
-    agent <-->|Mesh: Telemetry/Decisions| servicemesh
-    platforms <-->|Service Discovery| agent
+{@include: ./assets/diagrams/architecture/architecture_simple.mmd}
 ```
 
 </Zoom>

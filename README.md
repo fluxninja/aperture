@@ -71,7 +71,7 @@ analyzing, and actuating, facilitated by agents and a controller.
 
 ## 🏗️ Architecture
 
-![Aperture Architecture Overview](./docs/content/assets/gen/introduction/architecture_simple.mmd.svg)
+![Aperture Architecture Overview](./docs/content/assets/diagrams/architecture/architecture_simple.mmd.svg)
 
 ## 🏁 Getting Started
 
