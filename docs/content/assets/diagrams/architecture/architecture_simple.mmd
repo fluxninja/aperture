@@ -11,24 +11,28 @@ flowchart TD
     end
     subgraph worker["Worker Node (Kubernetes/VM/Bare-metal)"]
       subgraph agent["Aperture Agent"]
-          servicediscovery["Service Discovery"]
+          discovery["Discovery"]
           telemetry["Telemetry Collector"]
-          flowcontrol["Flow Control"]
+          flowcontrol["Flow Controller"]
+          autoscaler["Auto Scaler"]
       end
       subgraph serviceinstance["Service Instance"]
         servicelogic["Service Logic"]
         servicemesh["Service Mesh"]
       end
     end
-    subgraph platforms["Discovery Databases"]
-      kubernetes["Kubernetes"]
+    subgraph discoverydb["Discovery Databases"]
+      k8sdiscovery["Kubernetes"]
       consul["Consul"]
+    end
+    subgraph orchestrators["Orchestrators"]
+      k8s["Kubernetes"]
     end
     blueprints --> |Jsonnet Generator| policies
     policies --> |Kubernetes Custom Resource| controller
-    controller<--> |Configuration/Telemetry/Decisions| databases
-    databases<-->|Configuration/Telemetry/Decisions|agent
-    agent <-->|SDK: Telemetry/Decisions| servicelogic
-    agent <-->|Mesh: Telemetry/Decisions| servicemesh
-    platforms <-->|Service Discovery| agent
-
+    controller<--> |Configuration/Telemetry/Flow Control| databases
+    databases<-->|Configuration/Telemetry/Flow Control|agent
+    agent <-->|SDK: Telemetry/Flow Control| servicelogic
+    agent <-->|Mesh: Telemetry/Flow Control| servicemesh
+    orchestrators <-->|Auto Scale| agent
+    discoverydb <-->|Discovery| agent
