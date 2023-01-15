@@ -115,7 +115,7 @@ message FlowMatcher {
 
 // Describes which pods a control or observability
 // component should apply to.
-message KubernetesSelector {
+message KubernetesObjectSelector {
   // Which [agent-group](/concepts/service.md#agent-group) this
   // selector applies to.
   string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -133,8 +133,16 @@ message KubernetesSelector {
     }
   }]; // @gotags: validate:"required"
 
+  // API version of Kubernetes resource
+  string api_version = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
+
   // Kubernetes resource type.
-  string kind = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  string kind = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {string_value: "required"}
@@ -142,7 +150,7 @@ message KubernetesSelector {
   }]; // @gotags: validate:"required"
 
   // Kubernetes resource name.
-  string name = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  string name = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {string_value: "required"}

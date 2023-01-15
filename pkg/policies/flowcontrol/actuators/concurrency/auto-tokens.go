@@ -86,7 +86,7 @@ func (atFactory *autoTokensFactory) newAutoTokens(
 	}
 
 	tokensNotifier := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(paths.FlowControlComponentKey(atFactory.agentGroup, at.policyName, at.componentIdx)),
+		notifiers.Key(paths.AgentComponentKey(atFactory.agentGroup, at.policyName, at.componentIdx)),
 		unmarshaller,
 		at.tokenUpdateCallback,
 	)

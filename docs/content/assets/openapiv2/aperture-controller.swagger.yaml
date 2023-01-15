@@ -164,6 +164,46 @@ definitions:
           type: number
           format: double
         x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
+  HorizontalPodScalerScaleActuator:
+    type: object
+    properties:
+      default_config:
+        description: Default configuration.
+        $ref: '#/definitions/HorizontalPodScalerScaleActuatorDynamicConfig'
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
+      in_ports:
+        $ref: '#/definitions/HorizontalPodScalerScaleActuatorIns'
+  HorizontalPodScalerScaleActuatorDynamicConfig:
+    type: object
+    title: Dynamic Configuration for ScaleActuator
+    properties:
+      dry_run:
+        description: |-
+          Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+          Useful for observing the behavior of Scaler without disrupting any real traffic.
+        type: boolean
+        x-go-default: false
+  HorizontalPodScalerScaleActuatorIns:
+    description: Inputs for the HorizontalPodScaler component.
+    type: object
+    properties:
+      desired_replicas:
+        $ref: '#/definitions/v1InPort'
+  HorizontalPodScalerScaleReporter:
+    type: object
+    properties:
+      out_ports:
+        $ref: '#/definitions/HorizontalPodScalerScaleReporterOuts'
+  HorizontalPodScalerScaleReporterOuts:
+    description: Outputs for the HorizontalPodScaler component.
+    type: object
+    properties:
+      actual_replicas:
+        $ref: '#/definitions/v1OutPort'
+      configured_replicas:
+        $ref: '#/definitions/v1OutPort'
   MatchExpressionList:
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     type: object
@@ -652,6 +692,10 @@ definitions:
           Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
           This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
         $ref: '#/definitions/v1GradientController'
+      horizontal_pod_scaler:
+        description: HorizontalPodScaler provides pod horizontal scaling functionality
+          for scalable Kubernetes resources.
+        $ref: '#/definitions/v1HorizontalPodScaler'
       integrator:
         description: Accumulates sum of signal every tick.
         $ref: '#/definitions/v1Integrator'
@@ -1286,6 +1330,17 @@ definitions:
           $ref: '#/definitions/v1GroupStatus'
       status:
         $ref: '#/definitions/statusv1Status'
+  v1HorizontalPodScaler:
+    type: object
+    properties:
+      kubernetes_object_selector:
+        description: The Kubernetes object on which horizontal scaling is applied.
+        x-go-validate: required
+        $ref: '#/definitions/v1KubernetesObjectSelector'
+      scale_actuator:
+        $ref: '#/definitions/HorizontalPodScalerScaleActuator'
+      scale_reporter:
+        $ref: '#/definitions/HorizontalPodScalerScaleReporter'
   v1HostInfo:
     type: object
     properties:
@@ -1410,6 +1465,34 @@ definitions:
         type: array
         items:
           type: string
+  v1KubernetesObjectSelector:
+    description: |-
+      Describes which pods a control or observability
+      component should apply to.
+    type: object
+    properties:
+      agent_group:
+        description: |-
+          Which [agent-group](/concepts/service.md#agent-group) this
+          selector applies to.
+        type: string
+        x-go-default: default
+      api_version:
+        type: string
+        title: API version of Kubernetes resource
+        x-go-validate: required
+      kind:
+        description: Kubernetes resource type.
+        type: string
+        x-go-validate: required
+      name:
+        description: Kubernetes resource name.
+        type: string
+        x-go-validate: required
+      namespace:
+        description: Kubernetes namespace that the resource belongs to.
+        type: string
+        x-go-validate: required
   v1LabelMatcher:
     description: |-
       It provides three ways to define requirements:

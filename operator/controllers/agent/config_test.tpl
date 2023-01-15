@@ -195,6 +195,13 @@ server:
     client_ca_file: ""
     enabled: false
     key_file: ""
+service_discovery:
+  kubernetes:
+    autoscale_enabled: true
+    discovery_enabled: true
+    node_name: ""
+    pod_name: ""
+  static: {}
 watchdog:
   cgroup:
     adaptive_policy:

@@ -58,17 +58,17 @@ type serviceData struct {
 // serviceDataCache maps service UID to its data - the name of the service and pods handled by the service.
 type serviceDataCache struct {
 	cache map[string][]podInfo
-	kd    *KubernetesDiscovery
+	kd    *serviceDiscovery
 }
 
-func newServiceDataCache(kd *KubernetesDiscovery) *serviceDataCache {
+func newServiceDataCache(kd *serviceDiscovery) *serviceDataCache {
 	return &serviceDataCache{
 		cache: make(map[string][]podInfo),
 		kd:    kd,
 	}
 }
 
-func createServiceData(kd *KubernetesDiscovery, endpoints *v1.Endpoints, nodeName string) *serviceData {
+func createServiceData(kd *serviceDiscovery, endpoints *v1.Endpoints, nodeName string) *serviceData {
 	fqdn := kd.getFQDN(endpoints)
 	pods := getServicePods(endpoints, nodeName)
 	sort.Slice(pods, func(i, j int) bool {
@@ -143,8 +143,8 @@ func (m *servicePodMapping) removeService(namespace, podName, fqdn string) {
 	}
 }
 
-// KubernetesDiscovery is a collector that collects Kubernetes information periodically.
-type KubernetesDiscovery struct {
+// serviceDiscovery is a collector that collects Kubernetes information periodically.
+type serviceDiscovery struct {
 	waitGroup              sync.WaitGroup
 	cli                    kubernetes.Interface
 	ctx                    context.Context
@@ -157,26 +157,17 @@ type KubernetesDiscovery struct {
 	clusterDomain          string
 }
 
-func newKubernetesServiceDiscovery(
+func newServiceDiscovery(
 	entityEvents notifiers.EventWriter,
 	nodeName string,
 	k8sClient k8s.K8sClient,
-) (*KubernetesDiscovery, error) {
-	if k8sClient.GetErrNotInCluster() {
-		log.Info().Msg("Not in Kubernetes cluster, could not create Kubernetes service discovery")
-		return nil, k8sClient.GetErr()
-	}
-	if k8sClient.GetErr() != nil {
-		log.Error().Err(k8sClient.GetErr()).Msg("Error when creating Kubernetes client, could not create Kubernetes service discovery")
-		return nil, k8sClient.GetErr()
-	}
-
+) (*serviceDiscovery, error) {
 	if nodeName == "" {
-		log.Error().Err(k8sClient.GetErr()).Msg("Node name not set, could not create Kubernetes service discovery")
+		log.Error().Msg("Node name not set, could not create Kubernetes service discovery")
 		return nil, fmt.Errorf("node name not set")
 	}
 
-	kd := &KubernetesDiscovery{
+	kd := &serviceDiscovery{
 		cli:          k8sClient.GetClientSet(),
 		nodeName:     nodeName,
 		mapping:      newServicePodMapping(),
@@ -186,7 +177,7 @@ func newKubernetesServiceDiscovery(
 	return kd, nil
 }
 
-func (kd *KubernetesDiscovery) start() {
+func (kd *serviceDiscovery) start() {
 	kd.ctx, kd.cancel = context.WithCancel(context.Background())
 
 	kd.waitGroup.Add(1)
@@ -278,18 +269,18 @@ func (kd *KubernetesDiscovery) start() {
 		boff := backoff.NewConstantBackOff(5 * time.Second)
 		_ = backoff.Retry(operation, backoff.WithContext(boff, kd.ctx))
 
-		log.Info().Msg("Stopping kubernetes watcher")
+		log.Info().Msg("Stopping kubernetes service watcher")
 	})
 }
 
-func (kd *KubernetesDiscovery) stop() {
+func (kd *serviceDiscovery) stop() {
 	kd.cancel()
 	kd.waitGroup.Wait()
 	kd.entityEvents.Purge("")
 }
 
 // updatePodInTracker retrieves stored pod data from tracker, enriches it with new info and send the updated version.
-func (kd *KubernetesDiscovery) writeEntityInTracker(podInfo podInfo) error {
+func (kd *serviceDiscovery) writeEntityInTracker(podInfo podInfo) error {
 	services := kd.mapping.getFQDNs(podInfo.Namespace, podInfo.Name)
 	entity := &entitycachev1.Entity{
 		Services:  services,
@@ -310,11 +301,11 @@ func (kd *KubernetesDiscovery) writeEntityInTracker(podInfo podInfo) error {
 }
 
 // updatePodInTracker retrieves stored pod data from tracker, enriches it with new info and send the updated version.
-func (kd *KubernetesDiscovery) removeEntityFromTracker(podInfo podInfo) {
+func (kd *serviceDiscovery) removeEntityFromTracker(podInfo podInfo) {
 	kd.entityEvents.RemoveEvent(notifiers.Key(podInfo.UID))
 }
 
-func (kd *KubernetesDiscovery) updateMappingFromEndpoints(endpoints *v1.Endpoints, operation serviceCacheOperation) {
+func (kd *serviceDiscovery) updateMappingFromEndpoints(endpoints *v1.Endpoints, operation serviceCacheOperation) {
 	fqdn := kd.getFQDN(endpoints)
 	pods := getServicePods(endpoints, kd.nodeName)
 
@@ -333,7 +324,7 @@ func (kd *KubernetesDiscovery) updateMappingFromEndpoints(endpoints *v1.Endpoint
 }
 
 // getFQDN return the full qualified domain name of a given service.
-func (kd *KubernetesDiscovery) getFQDN(endpoints *v1.Endpoints) string {
+func (kd *serviceDiscovery) getFQDN(endpoints *v1.Endpoints) string {
 	name := endpoints.Name
 	namespace := endpoints.Namespace
 

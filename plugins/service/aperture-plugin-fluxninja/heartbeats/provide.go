@@ -9,6 +9,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/jobs"
@@ -43,18 +44,19 @@ func Module() fx.Option {
 type ConstructorIn struct {
 	fx.In
 
-	Lifecycle                  fx.Lifecycle
-	Unmarshaller               config.Unmarshaller
-	JobGroup                   *jobs.JobGroup                     `name:"heartbeats-job-group"`
-	GRPClientConnectionBuilder grpcclient.ClientConnectionBuilder `name:"heartbeats-grpc-client"`
-	HTTPClient                 *http.Client                       `name:"heartbeats-http-client"`
-	StatusRegistry             status.Registry
-	EntityCache                *entitycache.EntityCache `optional:"true"`
-	AgentInfo                  *agentinfo.AgentInfo     `optional:"true"`
-	PeersWatcher               *peers.PeerDiscovery     `name:"fluxninja-peers-watcher" optional:"true"`
-	EtcdClient                 *etcdclient.Client
-	PolicyFactory              *controlplane.PolicyFactory            `optional:"true"`
-	ControlPointCache          *cache.Cache[selectors.ControlPointID] `optional:"true"`
+	Lifecycle                   fx.Lifecycle
+	Unmarshaller                config.Unmarshaller
+	JobGroup                    *jobs.JobGroup                     `name:"heartbeats-job-group"`
+	GRPClientConnectionBuilder  grpcclient.ClientConnectionBuilder `name:"heartbeats-grpc-client"`
+	HTTPClient                  *http.Client                       `name:"heartbeats-http-client"`
+	StatusRegistry              status.Registry
+	EntityCache                 *entitycache.EntityCache `optional:"true"`
+	AgentInfo                   *agentinfo.AgentInfo     `optional:"true"`
+	PeersWatcher                *peers.PeerDiscovery     `name:"fluxninja-peers-watcher" optional:"true"`
+	EtcdClient                  *etcdclient.Client
+	PolicyFactory               *controlplane.PolicyFactory            `optional:"true"`
+	ServiceControlPointCache    *cache.Cache[selectors.ControlPointID] `optional:"true"`
+	KubernetesControlPointCache kubernetes.ControlPointCache
 }
 
 // Provide provides a new instance of Heartbeats.
@@ -72,7 +74,8 @@ func Provide(in ConstructorIn) (*Heartbeats, error) {
 		in.AgentInfo,
 		in.PeersWatcher,
 		in.PolicyFactory,
-		in.ControlPointCache,
+		in.ServiceControlPointCache,
+		in.KubernetesControlPointCache,
 	)
 
 	runCtx, cancel := context.WithCancel(context.Background())

@@ -189,13 +189,13 @@ func setupRateLimiterFactory(
 	return nil
 }
 
-// per policy component.
-func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
+// per component fx app.
+func (rlFactory *rateLimiterFactory) newRateLimiterOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
 	reg status.Registry,
 ) (fx.Option, error) {
-	logger := rateLimiterFactory.registry.GetLogger()
+	logger := rlFactory.registry.GetLogger()
 	wrapperMessage := &policysyncv1.RateLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.RateLimiter == nil {
@@ -208,7 +208,7 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 	rateLimiter := &rateLimiter{
 		Component:          wrapperMessage.GetCommonAttributes(),
 		rateLimiterProto:   rateLimiterProto,
-		rateLimiterFactory: rateLimiterFactory,
+		rateLimiterFactory: rlFactory,
 		registry:           reg,
 	}
 	rateLimiter.name = iface.ComponentID(rateLimiter)
@@ -236,7 +236,7 @@ var _ iface.RateLimiter = (*rateLimiter)(nil)
 
 func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	logger := rateLimiter.registry.GetLogger()
-	etcdKey := paths.FlowControlComponentKey(rateLimiter.rateLimiterFactory.agentGroupName,
+	etcdKey := paths.AgentComponentKey(rateLimiter.rateLimiterFactory.agentGroupName,
 		rateLimiter.GetPolicyName(),
 		rateLimiter.GetComponentIndex())
 	// decision notifier
