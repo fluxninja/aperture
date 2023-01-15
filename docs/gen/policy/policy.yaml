@@ -106,6 +106,54 @@ definitions:
           format: double
         x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
         x-order: 0
+  HorizontalPodScalerScaleActuator:
+    type: object
+    properties:
+      default_config:
+        description: Default configuration.
+        x-order: 0
+        $ref: '#/definitions/HorizontalPodScalerScaleActuatorDynamicConfig'
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
+        x-order: 1
+      in_ports:
+        x-order: 2
+        $ref: '#/definitions/HorizontalPodScalerScaleActuatorIns'
+  HorizontalPodScalerScaleActuatorDynamicConfig:
+    type: object
+    title: Dynamic Configuration for ScaleActuator
+    properties:
+      dry_run:
+        description: |-
+          Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+          Useful for observing the behavior of Scaler without disrupting any real traffic.
+        type: boolean
+        x-go-default: false
+        x-order: 0
+  HorizontalPodScalerScaleActuatorIns:
+    description: Inputs for the HorizontalPodScaler component.
+    type: object
+    properties:
+      desired_replicas:
+        x-order: 0
+        $ref: '#/definitions/v1InPort'
+  HorizontalPodScalerScaleReporter:
+    type: object
+    properties:
+      out_ports:
+        x-order: 0
+        $ref: '#/definitions/HorizontalPodScalerScaleReporterOuts'
+  HorizontalPodScalerScaleReporterOuts:
+    description: Outputs for the HorizontalPodScaler component.
+    type: object
+    properties:
+      actual_replicas:
+        x-order: 0
+        $ref: '#/definitions/v1OutPort'
+      configured_replicas:
+        x-order: 1
+        $ref: '#/definitions/v1OutPort'
   MatchExpressionList:
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     type: object
@@ -494,40 +542,45 @@ definitions:
           This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
         x-order: 9
         $ref: '#/definitions/v1GradientController'
+      horizontal_pod_scaler:
+        description: HorizontalPodScaler provides pod horizontal scaling functionality
+          for scalable Kubernetes resources.
+        x-order: 10
+        $ref: '#/definitions/v1HorizontalPodScaler'
       integrator:
         description: Accumulates sum of signal every tick.
-        x-order: 10
+        x-order: 11
         $ref: '#/definitions/v1Integrator'
       max:
         description: Emits the maximum of the input signals.
-        x-order: 11
+        x-order: 12
         $ref: '#/definitions/v1Max'
       min:
         description: Emits the minimum of the input signals.
-        x-order: 12
+        x-order: 13
         $ref: '#/definitions/v1Min'
       promql:
         description: Periodically runs a Prometheus query in the background and emits
           the result.
-        x-order: 13
+        x-order: 14
         $ref: '#/definitions/v1PromQL'
       rate_limiter:
         description: Rate Limiter provides service protection by applying rate limiter.
-        x-order: 14
+        x-order: 15
         $ref: '#/definitions/v1RateLimiter'
       sink:
         description: Sink is a sink component that does nothing.
-        x-order: 15
+        x-order: 16
         $ref: '#/definitions/v1Sink'
       sqrt:
         description: Takes an input signal and emits the square root of the input
           signal.
-        x-order: 16
+        x-order: 17
         $ref: '#/definitions/v1Sqrt'
       switcher:
         description: Switcher acts as a switch that emits one of the two signals based
           on third signal.
-        x-order: 17
+        x-order: 18
         $ref: '#/definitions/v1Switcher'
   v1ConcurrencyLimiter:
     description: |-
@@ -1190,6 +1243,20 @@ definitions:
         description: Computed desired value of the control variable.
         x-order: 0
         $ref: '#/definitions/v1OutPort'
+  v1HorizontalPodScaler:
+    type: object
+    properties:
+      kubernetes_object_selector:
+        description: The Kubernetes object on which horizontal scaling is applied.
+        x-go-validate: required
+        x-order: 0
+        $ref: '#/definitions/v1KubernetesObjectSelector'
+      scale_actuator:
+        x-order: 1
+        $ref: '#/definitions/HorizontalPodScalerScaleActuator'
+      scale_reporter:
+        x-order: 2
+        $ref: '#/definitions/HorizontalPodScalerScaleReporter'
   v1InPort:
     type: object
     title: Components receive input from other components via InPorts
@@ -1321,6 +1388,39 @@ definitions:
         items:
           type: string
         x-order: 2
+  v1KubernetesObjectSelector:
+    description: |-
+      Describes which pods a control or observability
+      component should apply to.
+    type: object
+    properties:
+      agent_group:
+        description: |-
+          Which [agent-group](/concepts/service.md#agent-group) this
+          selector applies to.
+        type: string
+        x-go-default: default
+        x-order: 0
+      api_version:
+        type: string
+        title: API version of Kubernetes resource
+        x-go-validate: required
+        x-order: 1
+      kind:
+        description: Kubernetes resource type.
+        type: string
+        x-go-validate: required
+        x-order: 2
+      name:
+        description: Kubernetes resource name.
+        type: string
+        x-go-validate: required
+        x-order: 3
+      namespace:
+        description: Kubernetes namespace that the resource belongs to.
+        type: string
+        x-go-validate: required
+        x-order: 4
   v1LabelMatcher:
     description: |-
       It provides three ways to define requirements:

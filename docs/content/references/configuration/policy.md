@@ -139,6 +139,96 @@ StaticBuckets holds the static value of the buckets where latency histogram will
 </dd>
 </dl>
 
+### HorizontalPodScalerScaleActuator {#horizontal-pod-scaler-scale-actuator}
+
+#### Properties
+
+<dl>
+<dt>default_config</dt>
+<dd>
+
+([HorizontalPodScalerScaleActuatorDynamicConfig](#horizontal-pod-scaler-scale-actuator-dynamic-config)) Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+([HorizontalPodScalerScaleActuatorIns](#horizontal-pod-scaler-scale-actuator-ins))
+
+</dd>
+</dl>
+
+### HorizontalPodScalerScaleActuatorDynamicConfig {#horizontal-pod-scaler-scale-actuator-dynamic-config}
+
+Dynamic Configuration for ScaleActuator
+
+#### Properties
+
+<dl>
+<dt>dry_run</dt>
+<dd>
+
+(bool) Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+Useful for observing the behavior of Scaler without disrupting any real traffic.
+
+</dd>
+</dl>
+
+### HorizontalPodScalerScaleActuatorIns {#horizontal-pod-scaler-scale-actuator-ins}
+
+Inputs for the HorizontalPodScaler component.
+
+#### Properties
+
+<dl>
+<dt>desired_replicas</dt>
+<dd>
+
+([V1InPort](#v1-in-port))
+
+</dd>
+</dl>
+
+### HorizontalPodScalerScaleReporter {#horizontal-pod-scaler-scale-reporter}
+
+#### Properties
+
+<dl>
+<dt>out_ports</dt>
+<dd>
+
+([HorizontalPodScalerScaleReporterOuts](#horizontal-pod-scaler-scale-reporter-outs))
+
+</dd>
+</dl>
+
+### HorizontalPodScalerScaleReporterOuts {#horizontal-pod-scaler-scale-reporter-outs}
+
+Outputs for the HorizontalPodScaler component.
+
+#### Properties
+
+<dl>
+<dt>actual_replicas</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
+
+</dd>
+<dt>configured_replicas</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
+
+</dd>
+</dl>
+
 ### MatchExpressionList {#match-expression-list}
 
 List of MatchExpressions that is used for all/any matching
@@ -632,6 +722,12 @@ See also [Policy](#v1-policy) for a higher-level explanation of circuits.
 
 ([V1GradientController](#v1-gradient-controller)) Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
 This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
+
+</dd>
+<dt>horizontal_pod_scaler</dt>
+<dd>
+
+([V1HorizontalPodScaler](#v1-horizontal-pod-scaler)) HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
 
 </dd>
 <dt>integrator</dt>
@@ -1578,6 +1674,31 @@ Outputs for the Gradient Controller component.
 </dd>
 </dl>
 
+### v1HorizontalPodScaler {#v1-horizontal-pod-scaler}
+
+#### Properties
+
+<dl>
+<dt>kubernetes_object_selector</dt>
+<dd>
+
+([V1KubernetesObjectSelector](#v1-kubernetes-object-selector), `required`) The Kubernetes object on which horizontal scaling is applied.
+
+</dd>
+<dt>scale_actuator</dt>
+<dd>
+
+([HorizontalPodScalerScaleActuator](#horizontal-pod-scaler-scale-actuator))
+
+</dd>
+<dt>scale_reporter</dt>
+<dd>
+
+([HorizontalPodScalerScaleReporter](#horizontal-pod-scaler-scale-reporter))
+
+</dd>
+</dl>
+
 ### v1InPort {#v1-in-port}
 
 Components receive input from other components via InPorts
@@ -1761,6 +1882,47 @@ Valid operators are In, NotIn, Exists and DoesNotExist.
 ([]string) An array of string values that relates to the key by an operator.
 If the operator is In or NotIn, the values array must be non-empty.
 If the operator is Exists or DoesNotExist, the values array must be empty.
+
+</dd>
+</dl>
+
+### v1KubernetesObjectSelector {#v1-kubernetes-object-selector}
+
+Describes which pods a control or observability
+component should apply to.
+
+#### Properties
+
+<dl>
+<dt>agent_group</dt>
+<dd>
+
+(string, default: `default`) Which [agent-group](/concepts/service.md#agent-group) this
+selector applies to.
+
+</dd>
+<dt>api_version</dt>
+<dd>
+
+(string, `required`) API version of Kubernetes resource
+
+</dd>
+<dt>kind</dt>
+<dd>
+
+(string, `required`) Kubernetes resource type.
+
+</dd>
+<dt>name</dt>
+<dd>
+
+(string, `required`) Kubernetes resource name.
+
+</dd>
+<dt>namespace</dt>
+<dd>
+
+(string, `required`) Kubernetes namespace that the resource belongs to.
 
 </dd>
 </dl>

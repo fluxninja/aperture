@@ -194,6 +194,9 @@ message Component {
 
     // Differentiator calculates rate of change per tick.
     Differentiator differentiator = 18;
+
+    // HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+    HorizontalPodScaler horizontal_pod_scaler = 19;
   }
 }
 
@@ -1226,4 +1229,55 @@ message Differentiator {
       value: {string_value: "5s"}
     }
   }]; // @gotags: default:"5s"
+}
+
+message HorizontalPodScaler {
+  message ScaleReporter {
+    // Outputs for the HorizontalPodScaler component.
+    message Outs {
+      OutPort actual_replicas = 1;
+      OutPort configured_replicas = 2;
+    }
+
+    Outs out_ports = 1;
+  }
+
+  message ScaleActuator {
+    // Dynamic Configuration for ScaleActuator
+    message DynamicConfig {
+      // Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+      // Useful for observing the behavior of Scaler without disrupting any real traffic.
+      bool dry_run = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        extensions: {
+          key: "x-go-default"
+          value: {bool_value: false}
+        }
+      }]; // @gotags: default:"false"
+    }
+
+    // Inputs for the HorizontalPodScaler component.
+    message Ins {
+      InPort desired_replicas = 1;
+    }
+
+    Ins in_ports = 1;
+
+    // Configuration key for DynamicConfig
+    string dynamic_config_key = 2;
+
+    // Default configuration.
+    DynamicConfig default_config = 3;
+  }
+
+  // The Kubernetes object on which horizontal scaling is applied.
+  KubernetesObjectSelector kubernetes_object_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
+
+  ScaleReporter scale_reporter = 2;
+
+  ScaleActuator scale_actuator = 3;
 }

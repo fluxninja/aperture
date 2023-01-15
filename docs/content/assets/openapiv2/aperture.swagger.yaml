@@ -374,6 +374,46 @@ definitions:
           format: double
         x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
     description: StaticBuckets holds the static value of the buckets where latency histogram will be stored.
+  HorizontalPodScalerScaleActuator:
+    type: object
+    properties:
+      default_config:
+        $ref: '#/definitions/HorizontalPodScalerScaleActuatorDynamicConfig'
+        description: Default configuration.
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
+      in_ports:
+        $ref: '#/definitions/HorizontalPodScalerScaleActuatorIns'
+  HorizontalPodScalerScaleActuatorDynamicConfig:
+    type: object
+    properties:
+      dry_run:
+        type: boolean
+        description: |-
+          Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+          Useful for observing the behavior of Scaler without disrupting any real traffic.
+        x-go-default: false
+    title: Dynamic Configuration for ScaleActuator
+  HorizontalPodScalerScaleActuatorIns:
+    type: object
+    properties:
+      desired_replicas:
+        $ref: '#/definitions/v1InPort'
+    description: Inputs for the HorizontalPodScaler component.
+  HorizontalPodScalerScaleReporter:
+    type: object
+    properties:
+      out_ports:
+        $ref: '#/definitions/HorizontalPodScalerScaleReporterOuts'
+  HorizontalPodScalerScaleReporterOuts:
+    type: object
+    properties:
+      actual_replicas:
+        $ref: '#/definitions/v1OutPort'
+      configured_replicas:
+        $ref: '#/definitions/v1OutPort'
+    description: Outputs for the HorizontalPodScaler component.
   LimiterDecisionConcurrencyLimiterInfo:
     type: object
     properties:
@@ -930,6 +970,9 @@ definitions:
         description: |-
           Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
           This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
+      horizontal_pod_scaler:
+        $ref: '#/definitions/v1HorizontalPodScaler'
+        description: HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
       integrator:
         $ref: '#/definitions/v1Integrator'
         description: Accumulates sum of signal every tick.
@@ -1043,14 +1086,6 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: The constant value is emitted to the output port.
     description: Outputs for the Constant component.
-  v1ControlPoint:
-    type: object
-    properties:
-      name:
-        type: string
-      service_name:
-        type: string
-    description: ControlPoint contains info about a control point on a given service.
   v1ControllerDynamicConfig:
     type: object
     properties:
@@ -1628,6 +1663,17 @@ definitions:
     description: |-
       Groups is nested structure that holds status information about the node and a
       pointer to the next node.
+  v1HorizontalPodScaler:
+    type: object
+    properties:
+      kubernetes_object_selector:
+        $ref: '#/definitions/v1KubernetesObjectSelector'
+        description: The Kubernetes object on which horizontal scaling is applied.
+        x-go-validate: required
+      scale_actuator:
+        $ref: '#/definitions/HorizontalPodScalerScaleActuator'
+      scale_reporter:
+        $ref: '#/definitions/HorizontalPodScalerScaleReporter'
   v1HostInfo:
     type: object
     properties:
@@ -1749,6 +1795,45 @@ definitions:
           If the operator is In or NotIn, the values array must be non-empty.
           If the operator is Exists or DoesNotExist, the values array must be empty.
     description: Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values.
+  v1KubernetesControlPoint:
+    type: object
+    properties:
+      api_version:
+        type: string
+      kind:
+        type: string
+      name:
+        type: string
+      namespace:
+        type: string
+  v1KubernetesObjectSelector:
+    type: object
+    properties:
+      agent_group:
+        type: string
+        description: |-
+          Which [agent-group](/concepts/service.md#agent-group) this
+          selector applies to.
+        x-go-default: default
+      api_version:
+        type: string
+        title: API version of Kubernetes resource
+        x-go-validate: required
+      kind:
+        type: string
+        description: Kubernetes resource type.
+        x-go-validate: required
+      name:
+        type: string
+        description: Kubernetes resource name.
+        x-go-validate: required
+      namespace:
+        type: string
+        description: Kubernetes namespace that the resource belongs to.
+        x-go-validate: required
+    description: |-
+      Describes which pods a control or observability
+      component should apply to.
   v1LabelMatcher:
     type: object
     properties:
@@ -2167,20 +2252,24 @@ definitions:
         type: string
       all_statuses:
         $ref: '#/definitions/v1GroupStatus'
-      control_points:
-        type: array
-        items:
-          $ref: '#/definitions/v1ControlPoint'
       controller_info:
         $ref: '#/definitions/v1ControllerInfo'
       host_info:
         $ref: '#/definitions/v1HostInfo'
+      kubernetes_control_points:
+        type: array
+        items:
+          $ref: '#/definitions/v1KubernetesControlPoint'
       peers:
         $ref: '#/definitions/v1Peers'
       policies:
         $ref: '#/definitions/v1PolicyWrappers'
       process_info:
         $ref: '#/definitions/v1ProcessInfo'
+      service_control_points:
+        type: array
+        items:
+          $ref: '#/definitions/v1ServiceControlPoint'
       services_list:
         $ref: '#/definitions/v1ServicesList'
       version_info:
@@ -2393,6 +2482,14 @@ definitions:
     description: |-
       Service contains information about single service discovered in agent group by a
       particular agent.
+  v1ServiceControlPoint:
+    type: object
+    properties:
+      name:
+        type: string
+      service_name:
+        type: string
+    description: ServiceControlPoint contains info about a control point on a given service.
   v1ServiceSelector:
     type: object
     properties:

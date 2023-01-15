@@ -74,6 +74,10 @@ type AgentConfigSpec struct {
 	// FlowControl configuration.
 	//+kubebuilder:validation:Optional
 	FlowControl FlowControlConfigSpec `json:"flow_control"`
+
+	// Service Discovery configuration.
+	//+kubebuilder:validation:Optional
+	ServiceDiscoverySpec common.ServiceDiscoverySpec `json:"service_discovery"`
 }
 
 // FlowControlConfigSpec holds flow control configuration.

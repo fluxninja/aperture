@@ -56,7 +56,7 @@ func (msg *FlowMatcher) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *KubernetesSelector) MarshalJSON() ([]byte, error) {
+func (msg *KubernetesObjectSelector) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -65,7 +65,7 @@ func (msg *KubernetesSelector) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *KubernetesSelector) UnmarshalJSON(b []byte) error {
+func (msg *KubernetesObjectSelector) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
