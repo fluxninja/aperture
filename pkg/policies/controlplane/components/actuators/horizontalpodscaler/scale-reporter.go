@@ -18,7 +18,7 @@ import (
 	"go.uber.org/fx"
 )
 
-// fxTag is Autoscaler Status Watcher's Fx Tag.
+// fxTag is HorizontalPodScaler's Status Watcher's Fx Tag.
 var fxTag = config.NameTag("scale_status_watcher")
 
 // scaleReporterModule returns the fx options for horizontal pod scaler in the main app.

@@ -2,6 +2,7 @@ package election
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/fluxninja/aperture/pkg/agentinfo"
@@ -48,12 +49,16 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 
 	election := &Election{}
 
+	var waitGroup sync.WaitGroup
+
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			// Create an election for this client
 			election.Election = concurrencyv3.NewElection(in.Client.Session, "/election/"+in.AgentInfo.GetAgentGroup())
+			waitGroup.Add(1)
 			// A goroutine to do leader election
 			panichandler.Go(func() {
+				defer waitGroup.Done()
 				// Campaign for leadership
 				err := election.Election.Campaign(ctx, info.GetHostInfo().Uuid)
 				if err != nil {
@@ -77,18 +82,20 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 			return nil
 		},
 		OnStop: func(_ context.Context) error {
+			var err error
 			cancel()
 			// resign from the election if we are the leader
 			if election.IsLeader() {
 				stopCtx, stopCancel := context.WithTimeout(context.Background(), time.Duration(time.Second*5))
-				err := election.Election.Resign(stopCtx)
+				err = election.Election.Resign(stopCtx)
 				stopCancel()
 				if err != nil {
 					log.Error().Err(err).Msg("Unable to resign from the election")
 				}
-				return err
 			}
-			return nil
+			// Wait for the election goroutine to finish
+			waitGroup.Wait()
+			return err
 		},
 	})
 
