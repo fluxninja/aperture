@@ -62,6 +62,65 @@ paths:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
+  /v1/flowcontrol/preview/http_requests/{control_point}:
+    get:
+      tags:
+      - aperture-agent
+      operationId: FlowPreviewService_PreviewHTTPRequests2
+      parameters:
+      - type: string
+        description: Control point to preview.
+        name: control_point
+        in: path
+        required: true
+      - type: string
+        format: int64
+        description: Number of samples to collect. Defaults to 10.
+        name: samples
+        in: query
+      - type: string
+        description: Service to preview. Empty value implies catch all service.
+        name: service
+        in: query
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1PreviewHTTPRequestsResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+  /v1/flowcontrol/preview/http_requests/{service}/{control_point}:
+    get:
+      tags:
+      - aperture-agent
+      operationId: FlowPreviewService_PreviewHTTPRequests
+      parameters:
+      - type: string
+        description: Service to preview. Empty value implies catch all service.
+        name: service
+        in: path
+        required: true
+      - type: string
+        description: Control point to preview.
+        name: control_point
+        in: path
+        required: true
+      - type: string
+        format: int64
+        description: Number of samples to collect. Defaults to 10.
+        name: samples
+        in: query
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1PreviewHTTPRequestsResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
   /v1/flowcontrol/preview/labels/{control_point}:
     get:
       tags:
@@ -452,6 +511,13 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/PreviewFlowLabelsResponseFlowLabels'
+  v1PreviewHTTPRequestsResponse:
+    type: object
+    properties:
+      samples:
+        type: array
+        items:
+          type: object
   v1ProcessInfo:
     type: object
     properties:
