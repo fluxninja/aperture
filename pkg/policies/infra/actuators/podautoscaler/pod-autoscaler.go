@@ -12,6 +12,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	discoverykubernetes "github.com/fluxninja/aperture/pkg/discovery/kubernetes"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
+	"github.com/fluxninja/aperture/pkg/etcd/election"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/pkg/k8s"
@@ -40,7 +41,7 @@ func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			fx.Annotate(
-				provideWatcher,
+				provideConfigWatcher,
 				fx.ResultTags(fxTag),
 			),
 		),
@@ -50,13 +51,14 @@ func Module() fx.Option {
 				fx.ParamTags(
 					fxTag,
 					discoverykubernetes.FxTag,
+					election.FxTag,
 				),
 			),
 		),
 	)
 }
 
-func provideWatcher(
+func provideConfigWatcher(
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
 ) (notifiers.Watcher, error) {
@@ -77,8 +79,9 @@ type podAutoscalerFactory struct {
 	decisionsWatcher     notifiers.Watcher
 	dynamicConfigWatcher notifiers.Watcher
 	controlPointTrackers notifiers.Trackers
-	etcdClient           *etcdclient.Client
+	electionTrackers     notifiers.Trackers
 	k8sClient            k8s.K8sClient
+	etcdClient           *etcdclient.Client
 	agentGroup           string
 }
 
@@ -86,6 +89,7 @@ type podAutoscalerFactory struct {
 func setupPodAutoscalerFactory(
 	watcher notifiers.Watcher,
 	controlPointTrackers notifiers.Trackers,
+	electionTrackers notifiers.Trackers,
 	lifecycle fx.Lifecycle,
 	statusRegistry status.Registry,
 	prometheusRegistry *prometheus.Registry,
@@ -117,6 +121,7 @@ func setupPodAutoscalerFactory(
 		registry:             reg,
 		etcdClient:           etcdClient,
 		k8sClient:            k8sClient,
+		electionTrackers:     electionTrackers,
 	}
 
 	fxDriver := &notifiers.FxDriver{
@@ -200,20 +205,25 @@ func (paFactory *podAutoscalerFactory) newPodAutoscalerOptions(
 
 // podAutoscaler implement pod auto scaler on the agent side.
 type podAutoscaler struct {
-	scaleMutex sync.Mutex
-	ctx        context.Context
-	k8sClient  k8s.K8sClient
-	registry   status.Registry
+	scaleMutex  sync.Mutex
+	statusMutex sync.Mutex
+	ctx         context.Context
+	k8sClient   k8s.K8sClient
+	registry    status.Registry
 	iface.Component
-	podAutoscalerProto   *policylangv1.PodAutoscaler
-	podAutoscalerFactory *podAutoscalerFactory
-	etcdClient           *etcdclient.Client
+	lastStatusErr        error
 	scaleCancel          context.CancelFunc
+	etcdClient           *etcdclient.Client
 	cancel               context.CancelFunc
 	statusWriter         *etcdwriter.Writer
+	podAutoscalerFactory *podAutoscalerFactory
+	podAutoscalerProto   *policylangv1.PodAutoscaler
+	lastScaleDecision    *policysyncv1.ScaleDecision
 	controlPoint         discoverykubernetes.ControlPoint
 	statusEtcdPath       string
+	lastStatus           []byte
 	dryRun               bool
+	isLeader             bool
 }
 
 func (pa *podAutoscaler) setup(
@@ -227,6 +237,10 @@ func (pa *podAutoscaler) setup(
 	etcdKey := paths.AgentComponentKey(pa.podAutoscalerFactory.agentGroup,
 		pa.GetPolicyName(),
 		pa.GetComponentIndex())
+
+	// election notifier
+	electionNotifier := notifiers.NewBasicKeyNotifier(election.ElectionResultKey, pa.electionResultCallback)
+
 	// decision notifier
 	decisionUnmarshaler, err := config.NewProtobufUnmarshaller(nil)
 	if err != nil {
@@ -279,6 +293,12 @@ func (pa *podAutoscaler) setup(
 			if scaleActuatorProto != nil {
 				pa.updateDynamicConfig(scaleActuatorProto.GetDefaultConfig())
 			}
+			// add election notifier
+			err = pa.podAutoscalerFactory.electionTrackers.AddKeyNotifier(electionNotifier)
+			if err != nil {
+				logger.Error().Err(err).Msg("Failed to add election notifier")
+				return err
+			}
 			// add decisions notifier
 			err = pa.podAutoscalerFactory.decisionsWatcher.AddKeyNotifier(decisionNotifier)
 			if err != nil {
@@ -300,6 +320,12 @@ func (pa *podAutoscaler) setup(
 		},
 		OnStop: func(ctx context.Context) error {
 			var merr, err error
+			// remove election notifier
+			err = pa.podAutoscalerFactory.electionTrackers.RemoveKeyNotifier(electionNotifier)
+			if err != nil {
+				logger.Error().Err(err).Msg("Failed to remove election notifier")
+				merr = multierror.Append(merr, err)
+			}
 			// remove dynamic config notifier
 			err = pa.podAutoscalerFactory.dynamicConfigWatcher.RemoveKeyNotifier(dynamicConfigNotifier)
 			if err != nil {
@@ -331,6 +357,28 @@ func (pa *podAutoscaler) setup(
 		},
 	})
 	return nil
+}
+
+func (pa *podAutoscaler) electionResultCallback(_ notifiers.Event) {
+	log.Info().Msg("Election result callback")
+	// write the lastStatus
+	pa.statusMutex.Lock()
+	defer pa.statusMutex.Unlock()
+	if pa.lastStatusErr != nil {
+		if pa.lastStatus == nil {
+			pa.statusWriter.Delete(pa.statusEtcdPath)
+		} else {
+			pa.statusWriter.Write(pa.statusEtcdPath, pa.lastStatus)
+		}
+	}
+
+	// invoke the lastScaleDecision
+	pa.scaleMutex.Lock()
+	defer pa.scaleMutex.Unlock()
+	if pa.lastScaleDecision != nil {
+		pa.scale(pa.lastScaleDecision)
+	}
+	pa.isLeader = true
 }
 
 func (pa *podAutoscaler) dynamicConfigUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
@@ -371,10 +419,11 @@ func (pa *podAutoscaler) updateDynamicConfig(dynamicConfig *policylangv1.PodAuto
 }
 
 func (pa *podAutoscaler) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	pa.scaleMutex.Lock()
+	defer pa.scaleMutex.Unlock()
 	logger := pa.registry.GetLogger()
-	if pa.dryRun {
-		return
-	}
+	pa.lastScaleDecision = nil
+
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Decision removed")
 		return
@@ -394,14 +443,19 @@ func (pa *podAutoscaler) decisionUpdateCallback(event notifiers.Event, unmarshal
 		return
 	}
 	scaleDecision := wrapperMessage.ScaleDecision
-	pa.scale(scaleDecision.DesiredReplicas)
+	if !pa.dryRun {
+		pa.lastScaleDecision = scaleDecision
+		if pa.isLeader {
+			pa.scale(scaleDecision)
+		}
+	}
 }
 
-// scale scales the associated Kubernetes object.
-func (pa *podAutoscaler) scale(replicas int32) {
+// scale scales the associated Kubernetes object. NOTE: not thread safe, needs to be called under podAutoscaler.scaleMutex.
+func (pa *podAutoscaler) scale(scaleDecision *policysyncv1.ScaleDecision) {
 	// Take mutex to prevent concurrent scale operations
-	pa.scaleMutex.Lock()
-	defer pa.scaleMutex.Unlock()
+	replicas := scaleDecision.GetDesiredReplicas()
+
 	// Cancel any existing scale operation
 	if pa.scaleCancel != nil {
 		pa.scaleCancel()
@@ -435,10 +489,17 @@ func (pa *podAutoscaler) scale(replicas int32) {
 }
 
 func (pa *podAutoscaler) controlPointUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	pa.statusMutex.Lock()
+	defer pa.statusMutex.Unlock()
 	logger := pa.registry.GetLogger()
+	pa.lastStatus = nil
+	pa.lastStatusErr = nil
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Control point removed")
-		pa.statusWriter.Delete(pa.statusEtcdPath)
+		pa.lastStatus = nil
+		if pa.isLeader {
+			pa.statusWriter.Delete(pa.statusEtcdPath)
+		}
 		return
 	}
 
@@ -447,6 +508,7 @@ func (pa *podAutoscaler) controlPointUpdateCallback(event notifiers.Event, unmar
 	if err != nil {
 		// TODO: update status
 		log.Error().Err(err).Msg("Unable to unmarshal scale status")
+		pa.lastStatusErr = err
 		return
 	}
 
@@ -465,7 +527,11 @@ func (pa *podAutoscaler) controlPointUpdateCallback(event notifiers.Event, unmar
 	if err != nil {
 		// TODO: update status
 		log.Error().Err(err).Msg("Unable to marshal scale status")
+		pa.lastStatusErr = err
 		return
 	}
-	pa.statusWriter.Write(pa.statusEtcdPath, data)
+	pa.lastStatus = data
+	if pa.isLeader {
+		pa.statusWriter.Write(pa.statusEtcdPath, data)
+	}
 }

@@ -5,17 +5,29 @@ import (
 	"time"
 
 	"github.com/fluxninja/aperture/pkg/agentinfo"
+	"github.com/fluxninja/aperture/pkg/config"
 	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	concurrencyv3 "go.etcd.io/etcd/client/v3/concurrency"
 	"go.uber.org/fx"
 )
 
+var (
+	// FxTagBase is the tag's base used to identify the election result Tracker.
+	FxTagBase = "etcd_election"
+	// FxTag is the tag used to identify the election result Tracker.
+	FxTag = config.NameTag(FxTagBase)
+	// ElectionResultKey is the key used to identify the election result in the election Tracker.
+	ElectionResultKey = notifiers.Key("election_result")
+)
+
 // Module is a fx module that provides etcd based leader election per agent group.
 func Module() fx.Option {
 	return fx.Options(
+		notifiers.TrackersConstructor{Name: FxTagBase}.Annotate(),
 		fx.Provide(ProvideElection),
 	)
 }
@@ -27,6 +39,7 @@ type ElectionIn struct {
 	Shutdowner fx.Shutdowner
 	Client     *etcd.Client
 	AgentInfo  *agentinfo.AgentInfo
+	Trackers   notifiers.Trackers `name:"etcd_election"`
 }
 
 // ProvideElection provides a wrapper around etcd based leader election.
@@ -48,6 +61,7 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 					shutdownErr := in.Shutdowner.Shutdown()
 					if shutdownErr != nil {
 						log.Error().Err(shutdownErr).Msg("Error on invoking shutdown")
+						return
 					}
 				}
 				// Check if canceled
@@ -56,6 +70,8 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 				}
 				// This is the leader
 				election.isLeader = true
+				log.Info().Msg("Propagate Election result")
+				in.Trackers.WriteEvent(ElectionResultKey, []byte("true"))
 			})
 
 			return nil
