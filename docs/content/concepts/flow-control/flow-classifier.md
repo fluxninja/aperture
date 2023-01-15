@@ -66,6 +66,81 @@ selector:
 You can be more precise by adding a [label matcher][label-matcher] and e.g. gate
 the classifier to particular paths.
 
+## Live Previewing Requests
+
+You can discover the request attributes flowing through services and control
+points using the Introspection API on an `aperture-agent` local to the service
+instances (pods).
+
+For example:
+
+```sh
+curl localhost:8080/v1/flowcontrol/preview/http_requests/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
+```
+
+Returns:
+
+```json
+{
+  "samples": [
+    {
+      "attributes": {
+        "destination": {
+          "address": {
+            "socketAddress": {
+              "address": "10.244.1.20",
+              "portValue": 8099
+            }
+          }
+        },
+        "metadataContext": {},
+        "request": {
+          "http": {
+            "headers": {
+              ":authority": "service1-demo-app.demoapp.svc.cluster.local",
+              ":method": "POST",
+              ":path": "/request",
+              ":scheme": "http",
+              "content-length": "201",
+              "content-type": "application/json",
+              "cookie": "session=eyJ1c2VyIjoia2Vub2JpIn0.YbsY4Q.kTaKRTyOIfVlIbNB48d9YH6Q0wo",
+              "user-agent": "k6/0.42.0 (https://k6.io/)",
+              "user-id": "19",
+              "user-type": "guest",
+              "x-forwarded-proto": "http",
+              "x-request-id": "26f01736-ec45-4b07-a202-bdec8930c7f8"
+            },
+            "host": "service1-demo-app.demoapp.svc.cluster.local",
+            "id": "14553976531353216255",
+            "method": "POST",
+            "path": "/request",
+            "protocol": "HTTP/1.1",
+            "scheme": "http"
+          },
+          "time": "2023-01-15T07:07:48.693035Z"
+        },
+        "source": {
+          "address": {
+            "socketAddress": {
+              "address": "10.244.2.36",
+              "portValue": 35388
+            }
+          }
+        }
+      },
+      "parsed_body": null,
+      "parsed_path": ["request"],
+      "parsed_query": {},
+      "truncated_body": false,
+      "version": {
+        "encoding": "protojson",
+        "ext_authz": "v3"
+      }
+    }
+  ]
+}
+```
+
 ## Rules ([reference][rule]) {#rules}
 
 In addition to the selector, a classifier needs to specify classification rules.

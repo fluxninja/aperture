@@ -18,7 +18,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FlowPreviewServiceClient interface {
-	PreviewFlowLabels(ctx context.Context, in *PreviewFlowLabelsRequest, opts ...grpc.CallOption) (*PreviewFlowLabelsResponse, error)
+	PreviewFlowLabels(ctx context.Context, in *PreviewRequest, opts ...grpc.CallOption) (*PreviewFlowLabelsResponse, error)
+	PreviewHTTPRequests(ctx context.Context, in *PreviewRequest, opts ...grpc.CallOption) (*PreviewHTTPRequestsResponse, error)
 }
 
 type flowPreviewServiceClient struct {
@@ -29,9 +30,18 @@ func NewFlowPreviewServiceClient(cc grpc.ClientConnInterface) FlowPreviewService
 	return &flowPreviewServiceClient{cc}
 }
 
-func (c *flowPreviewServiceClient) PreviewFlowLabels(ctx context.Context, in *PreviewFlowLabelsRequest, opts ...grpc.CallOption) (*PreviewFlowLabelsResponse, error) {
+func (c *flowPreviewServiceClient) PreviewFlowLabels(ctx context.Context, in *PreviewRequest, opts ...grpc.CallOption) (*PreviewFlowLabelsResponse, error) {
 	out := new(PreviewFlowLabelsResponse)
 	err := c.cc.Invoke(ctx, "/aperture.flowcontrol.preview.v1.FlowPreviewService/PreviewFlowLabels", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowPreviewServiceClient) PreviewHTTPRequests(ctx context.Context, in *PreviewRequest, opts ...grpc.CallOption) (*PreviewHTTPRequestsResponse, error) {
+	out := new(PreviewHTTPRequestsResponse)
+	err := c.cc.Invoke(ctx, "/aperture.flowcontrol.preview.v1.FlowPreviewService/PreviewHTTPRequests", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -42,15 +52,19 @@ func (c *flowPreviewServiceClient) PreviewFlowLabels(ctx context.Context, in *Pr
 // All implementations should embed UnimplementedFlowPreviewServiceServer
 // for forward compatibility
 type FlowPreviewServiceServer interface {
-	PreviewFlowLabels(context.Context, *PreviewFlowLabelsRequest) (*PreviewFlowLabelsResponse, error)
+	PreviewFlowLabels(context.Context, *PreviewRequest) (*PreviewFlowLabelsResponse, error)
+	PreviewHTTPRequests(context.Context, *PreviewRequest) (*PreviewHTTPRequestsResponse, error)
 }
 
 // UnimplementedFlowPreviewServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedFlowPreviewServiceServer struct {
 }
 
-func (UnimplementedFlowPreviewServiceServer) PreviewFlowLabels(context.Context, *PreviewFlowLabelsRequest) (*PreviewFlowLabelsResponse, error) {
+func (UnimplementedFlowPreviewServiceServer) PreviewFlowLabels(context.Context, *PreviewRequest) (*PreviewFlowLabelsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PreviewFlowLabels not implemented")
+}
+func (UnimplementedFlowPreviewServiceServer) PreviewHTTPRequests(context.Context, *PreviewRequest) (*PreviewHTTPRequestsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PreviewHTTPRequests not implemented")
 }
 
 // UnsafeFlowPreviewServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -65,7 +79,7 @@ func RegisterFlowPreviewServiceServer(s grpc.ServiceRegistrar, srv FlowPreviewSe
 }
 
 func _FlowPreviewService_PreviewFlowLabels_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PreviewFlowLabelsRequest)
+	in := new(PreviewRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -77,7 +91,25 @@ func _FlowPreviewService_PreviewFlowLabels_Handler(srv interface{}, ctx context.
 		FullMethod: "/aperture.flowcontrol.preview.v1.FlowPreviewService/PreviewFlowLabels",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FlowPreviewServiceServer).PreviewFlowLabels(ctx, req.(*PreviewFlowLabelsRequest))
+		return srv.(FlowPreviewServiceServer).PreviewFlowLabels(ctx, req.(*PreviewRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowPreviewService_PreviewHTTPRequests_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PreviewRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowPreviewServiceServer).PreviewHTTPRequests(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/aperture.flowcontrol.preview.v1.FlowPreviewService/PreviewHTTPRequests",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowPreviewServiceServer).PreviewHTTPRequests(ctx, req.(*PreviewRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -92,6 +124,10 @@ var FlowPreviewService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PreviewFlowLabels",
 			Handler:    _FlowPreviewService_PreviewFlowLabels_Handler,
+		},
+		{
+			MethodName: "PreviewHTTPRequests",
+			Handler:    _FlowPreviewService_PreviewHTTPRequests_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

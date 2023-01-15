@@ -43,7 +43,7 @@ func NewEngine() iface.Engine {
 		fluxMetersMap:   make(map[iface.FluxMeterID]iface.FluxMeter),
 		conLimiterMap:   make(map[iface.LimiterID]iface.ConcurrencyLimiter),
 		rateLimiterMap:  make(map[iface.LimiterID]iface.RateLimiter),
-		labelPreviewMap: make(map[iface.LabelPreviewID]iface.LabelPreview),
+		labelPreviewMap: make(map[iface.PreviewID]iface.LabelPreview),
 	}
 	return e
 }
@@ -59,7 +59,7 @@ type Engine struct {
 	rateLimiterMapMutex  sync.RWMutex
 	rateLimiterMap       map[iface.LimiterID]iface.RateLimiter
 	labelPreviewMapMutex sync.RWMutex
-	labelPreviewMap      map[iface.LabelPreviewID]iface.LabelPreview
+	labelPreviewMap      map[iface.PreviewID]iface.LabelPreview
 	multiMatchersMutex   sync.RWMutex
 	multiMatchers        map[selectors.ControlPointID]*multiMatcher
 }
@@ -307,8 +307,8 @@ func (e *Engine) GetRateLimiter(limiterID iface.LimiterID) iface.RateLimiter {
 func (e *Engine) RegisterLabelPreview(lp iface.LabelPreview) error {
 	e.labelPreviewMapMutex.Lock()
 	defer e.labelPreviewMapMutex.Unlock()
-	if _, ok := e.labelPreviewMap[lp.GetLabelPreviewID()]; !ok {
-		e.labelPreviewMap[lp.GetLabelPreviewID()] = lp
+	if _, ok := e.labelPreviewMap[lp.GetPreviewID()]; !ok {
+		e.labelPreviewMap[lp.GetPreviewID()] = lp
 	} else {
 		return fmt.Errorf("label preview already registered")
 	}
@@ -317,16 +317,16 @@ func (e *Engine) RegisterLabelPreview(lp iface.LabelPreview) error {
 		mmr.labelPreviews = append(mmr.labelPreviews, lp)
 		return mmr
 	}
-	return e.register("LabelPreview:"+lp.GetLabelPreviewID().String(), lp.GetFlowSelector(), labelPreviewMatchedCB)
+	return e.register("LabelPreview:"+lp.GetPreviewID().String(), lp.GetFlowSelector(), labelPreviewMatchedCB)
 }
 
 // UnregisterLabelPreview removes label preview from multimatcher.
 func (e *Engine) UnregisterLabelPreview(lp iface.LabelPreview) error {
 	e.labelPreviewMapMutex.Lock()
 	defer e.labelPreviewMapMutex.Unlock()
-	delete(e.labelPreviewMap, lp.GetLabelPreviewID())
+	delete(e.labelPreviewMap, lp.GetPreviewID())
 
-	return e.unregister("LabelPreview:"+lp.GetLabelPreviewID().String(), lp.GetFlowSelector())
+	return e.unregister("LabelPreview:"+lp.GetPreviewID().String(), lp.GetFlowSelector())
 }
 
 // getMatches returns schedulers and fluxmeters for given labels.

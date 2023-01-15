@@ -3,10 +3,11 @@ syntax = "proto3";
 package aperture.flowcontrol.preview.v1;
 
 import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 service FlowPreviewService {
-  rpc PreviewFlowLabels(PreviewFlowLabelsRequest) returns (PreviewFlowLabelsResponse) {
+  rpc PreviewFlowLabels(PreviewRequest) returns (PreviewFlowLabelsResponse) {
     option (google.api.http) = {
       get: "/v1/flowcontrol/preview/labels/{service}/{control_point}"
       additional_bindings {get: "/v1/flowcontrol/preview/labels/{control_point}"}
@@ -15,9 +16,18 @@ service FlowPreviewService {
       tags: ["aperture-agent"];
     };
   }
+  rpc PreviewHTTPRequests(PreviewRequest) returns (PreviewHTTPRequestsResponse) {
+    option (google.api.http) = {
+      get: "/v1/flowcontrol/preview/http_requests/{service}/{control_point}"
+      additional_bindings {get: "/v1/flowcontrol/preview/http_requests/{control_point}"}
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-agent"];
+    };
+  }
 }
 
-message PreviewFlowLabelsRequest {
+message PreviewRequest {
   // Number of samples to collect. Defaults to 10.
   int64 samples = 1; // @gotags: validate:"min=1" default:"10"
   // Control point to preview.
@@ -31,4 +41,8 @@ message PreviewFlowLabelsResponse {
     map<string, string> labels = 1;
   }
   repeated FlowLabels samples = 1;
+}
+
+message PreviewHTTPRequestsResponse {
+  repeated google.protobuf.Struct samples = 1;
 }

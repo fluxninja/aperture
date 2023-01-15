@@ -104,6 +104,68 @@ paths:
           type: string
       tags:
         - aperture-agent
+  /v1/flowcontrol/preview/http_requests/{control_point}:
+    get:
+      operationId: FlowPreviewService_PreviewHTTPRequests2
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1PreviewHTTPRequestsResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: control_point
+          description: Control point to preview.
+          in: path
+          required: true
+          type: string
+        - name: samples
+          description: Number of samples to collect. Defaults to 10.
+          in: query
+          required: false
+          type: string
+          format: int64
+        - name: service
+          description: Service to preview. Empty value implies catch all service.
+          in: query
+          required: false
+          type: string
+      tags:
+        - aperture-agent
+  /v1/flowcontrol/preview/http_requests/{service}/{control_point}:
+    get:
+      operationId: FlowPreviewService_PreviewHTTPRequests
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1PreviewHTTPRequestsResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: service
+          description: Service to preview. Empty value implies catch all service.
+          in: path
+          required: true
+          type: string
+        - name: control_point
+          description: Control point to preview.
+          in: path
+          required: true
+          type: string
+        - name: samples
+          description: Number of samples to collect. Defaults to 10.
+          in: query
+          required: false
+          type: string
+          format: int64
+      tags:
+        - aperture-agent
   /v1/flowcontrol/preview/labels/{control_point}:
     get:
       operationId: FlowPreviewService_PreviewFlowLabels2
@@ -666,6 +728,18 @@ definitions:
             "@type": "type.googleapis.com/google.protobuf.Duration",
             "value": "1.212s"
           }
+  protobufNullValue:
+    type: string
+    enum:
+      - NULL_VALUE
+    default: NULL_VALUE
+    description: |-
+      `NullValue` is a singleton enumeration to represent the null value for the
+      `Value` type union.
+
+       The JSON representation for `NullValue` is JSON `null`.
+
+       - NULL_VALUE: Null value.
   statusv1Status:
     type: object
     properties:
@@ -2145,6 +2219,13 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/PreviewFlowLabelsResponseFlowLabels'
+  v1PreviewHTTPRequestsResponse:
+    type: object
+    properties:
+      samples:
+        type: array
+        items:
+          type: object
   v1ProcessInfo:
     type: object
     properties:

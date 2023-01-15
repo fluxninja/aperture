@@ -7,28 +7,10 @@ import (
 
 	flowpreviewv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/preview/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/google/uuid"
 )
-
-// Handler implements flowpreview.v1 service.
-type Handler struct {
-	flowpreviewv1.UnimplementedFlowPreviewServiceServer
-	engine     iface.Engine
-	agentGroup string
-}
-
-// NewHandler returns a new Handler.
-func NewHandler(engine iface.Engine,
-	agentInfo *agentinfo.AgentInfo,
-) *Handler {
-	return &Handler{
-		engine:     engine,
-		agentGroup: agentInfo.GetAgentGroup(),
-	}
-}
 
 type labelPreviewRequest struct {
 	mutex           sync.Mutex
@@ -36,12 +18,12 @@ type labelPreviewRequest struct {
 	previewResponse *flowpreviewv1.PreviewFlowLabelsResponse
 	previewDoneCtx  context.Context
 	previewDone     context.CancelFunc
-	previewID       iface.LabelPreviewID
+	previewID       iface.PreviewID
 	samples         int64
 }
 
-// GetLabelPreviewID returns the preview ID for this request.
-func (r *labelPreviewRequest) GetLabelPreviewID() iface.LabelPreviewID {
+// GetPreviewID returns the preview ID for this request.
+func (r *labelPreviewRequest) GetPreviewID() iface.PreviewID {
 	return r.previewID
 }
 
@@ -67,17 +49,17 @@ func (r *labelPreviewRequest) AddLabelPreview(labels map[string]string) {
 }
 
 // PreviewFlowLabels implements flowpreview.v1.PreviewFlowLabels.
-func (h *Handler) PreviewFlowLabels(ctx context.Context, req *flowpreviewv1.PreviewFlowLabelsRequest) (*flowpreviewv1.PreviewFlowLabelsResponse, error) {
+func (h *Handler) PreviewFlowLabels(ctx context.Context, req *flowpreviewv1.PreviewRequest) (*flowpreviewv1.PreviewFlowLabelsResponse, error) {
 	if req.Samples < 1 {
 		return nil, fmt.Errorf("invalid number of samples: %d", req.Samples)
 	}
 
 	// generate a unique ID for this request
-	previewID := iface.LabelPreviewID{
+	previewID := iface.PreviewID{
 		RequestID: uuid.New().String(),
 	}
 
-	flowSelector := policylangv1.FlowSelector{
+	flowSelector := &policylangv1.FlowSelector{
 		ServiceSelector: &policylangv1.ServiceSelector{
 			AgentGroup: h.agentGroup,
 			Service:    req.Service,
@@ -89,20 +71,20 @@ func (h *Handler) PreviewFlowLabels(ctx context.Context, req *flowpreviewv1.Prev
 
 	lr := &labelPreviewRequest{
 		previewID:       previewID,
-		flowSelector:    &flowSelector,
+		flowSelector:    flowSelector,
 		previewResponse: &flowpreviewv1.PreviewFlowLabelsResponse{},
 		samples:         req.Samples,
 	}
+
+	// make a child context that will be canceled when the preview is done
+	lr.previewDoneCtx, lr.previewDone = context.WithCancel(ctx)
+	defer lr.previewDone()
 
 	// register the label preview request
 	err := h.engine.RegisterLabelPreview(lr)
 	if err != nil {
 		return nil, err
 	}
-
-	// make a child context that will be canceled when the preview is done
-	lr.previewDoneCtx, lr.previewDone = context.WithCancel(ctx)
-	defer lr.previewDone()
 
 	// wait for the preview to be done
 	<-lr.previewDoneCtx.Done()
