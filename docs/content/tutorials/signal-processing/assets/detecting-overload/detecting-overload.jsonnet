@@ -24,7 +24,7 @@ local svcSelector =
   )
   + flowSelector.withFlowMatcher(
     flowMatcher.new()
-    + flowMatcher.withControlPoint({ traffic: 'ingress' })
+    + flowMatcher.withControlPoint('ingress')
   );
 
 local policyDef =
