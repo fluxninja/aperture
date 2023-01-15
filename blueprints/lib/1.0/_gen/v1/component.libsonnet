@@ -61,6 +61,12 @@
   withGradientControllerMixin(gradient_controller):: {
     gradient_controller+: gradient_controller,
   },
+  withHorizontalPodScaler(horizontal_pod_scaler):: {
+    horizontal_pod_scaler: horizontal_pod_scaler,
+  },
+  withHorizontalPodScalerMixin(horizontal_pod_scaler):: {
+    horizontal_pod_scaler+: horizontal_pod_scaler,
+  },
   withIntegrator(integrator):: {
     integrator: integrator,
   },
@@ -78,12 +84,6 @@
   },
   withMinMixin(min):: {
     min+: min,
-  },
-  withPodAutoscaler(pod_autoscaler):: {
-    pod_autoscaler: pod_autoscaler,
-  },
-  withPodAutoscalerMixin(pod_autoscaler):: {
-    pod_autoscaler+: pod_autoscaler,
   },
   withPromql(promql):: {
     promql: promql,

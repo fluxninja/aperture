@@ -28,14 +28,14 @@ var (
 	RateLimiterDynamicConfigPath = path.Join(ConfigPrefix, "rate_limiter_dynamic_config")
 	// FluxMeterConfigPath is config path in etcd for flux meters.
 	FluxMeterConfigPath = path.Join(ConfigPrefix, "flux_meter")
-	// PodAutoscalerConfigPath is config path in etcd for kubernetes auto scaler.
-	PodAutoscalerConfigPath = path.Join(ConfigPrefix, "pod_autoscaler")
-	// PodAutoscalerDecisionsPath is decision path in etcd for kubernetes auto scaler decisions.
-	PodAutoscalerDecisionsPath = path.Join(DecisionsPrefix, "pod_autoscaler")
-	// PodAutoscalerStatusPath is decision path in etcd for kubernetes auto scaler status.
-	PodAutoscalerStatusPath = path.Join(StatusPrefix, "pod_autoscaler")
-	// PodAutoscalerDynamicConfigPath is config path in etcd for dynamic config of kubernetes auto scaler.
-	PodAutoscalerDynamicConfigPath = path.Join(ConfigPrefix, "pod_autoscaler_dynamic_config")
+	// HorizontalPodScalerConfigPath is config path in etcd for kubernetes horizontal pod scaler.
+	HorizontalPodScalerConfigPath = path.Join(ConfigPrefix, "horizontal_pod_scaler")
+	// HorizontalPodScalerDecisionsPath is decision path in etcd for kubernetes horizontal pod scaler decisions.
+	HorizontalPodScalerDecisionsPath = path.Join(DecisionsPrefix, "horizontal_pod_scaler")
+	// HorizontalPodScalerStatusPath is decision path in etcd for kubernetes horizontal pod scaler status.
+	HorizontalPodScalerStatusPath = path.Join(StatusPrefix, "horizontal_pod_scaler")
+	// HorizontalPodScalerDynamicConfigPath is config path in etcd for dynamic config of kubernetes horizontal pod scaler.
+	HorizontalPodScalerDynamicConfigPath = path.Join(ConfigPrefix, "horizontal_pod_scaler_dynamic_config")
 )
 
 // AgentGroupPrefix returns the prefix for an agent group.

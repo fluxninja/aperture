@@ -1,4 +1,4 @@
-package podautoscaler
+package horizontalpodscaler
 
 import (
 	"context"
@@ -15,40 +15,40 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// Module returns the fx options for pod autoscaler in the main app.
+// Module returns the fx options for horizontal pod scaler in the main app.
 func Module() fx.Option {
 	return fx.Options(
 		scaleReporterModule(),
 	)
 }
 
-// PodAutoscaler struct.
-type podAutoscalerConfigSync struct {
-	policyReadAPI      iface.Policy
-	podAutoscalerProto *policylangv1.PodAutoscaler
-	etcdPath           string
-	componentIndex     int
+// HorizontalPodScaler struct.
+type horizontalPodScalerConfigSync struct {
+	policyReadAPI            iface.Policy
+	horizontalPodScalerProto *policylangv1.HorizontalPodScaler
+	etcdPath                 string
+	componentIndex           int
 }
 
-// NewPodAutoscalerOptions creates fx options for PodAutoscaler and also returns the agent group name associated with it.
-func NewPodAutoscalerOptions(
-	podAutoscalerProto *policylangv1.PodAutoscaler,
+// NewHorizontalPodScalerOptions creates fx options for HorizontalPodScaler and also returns the agent group name associated with it.
+func NewHorizontalPodScalerOptions(
+	horizontalPodScalerProto *policylangv1.HorizontalPodScaler,
 	componentStackIndex int,
 	policyReadAPI iface.Policy,
 ) (fx.Option, string, error) {
-	// Get Agent Group Name from PodAutoscaler.KubernetesObjectSelector.AgentGroup
-	k8sObjectSelectorProto := podAutoscalerProto.GetKubernetesObjectSelector()
+	// Get Agent Group Name from HorizontalPodScaler.KubernetesObjectSelector.AgentGroup
+	k8sObjectSelectorProto := horizontalPodScalerProto.GetKubernetesObjectSelector()
 	if k8sObjectSelectorProto == nil {
-		return fx.Options(), "", errors.New("podAutoscaler.Selector is nil")
+		return fx.Options(), "", errors.New("horizontalPodScaler.Selector is nil")
 	}
 	agentGroup := k8sObjectSelectorProto.GetAgentGroup()
-	etcdPath := path.Join(paths.PodAutoscalerConfigPath,
+	etcdPath := path.Join(paths.HorizontalPodScalerConfigPath,
 		paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), int64(componentStackIndex)))
-	configSync := &podAutoscalerConfigSync{
-		podAutoscalerProto: podAutoscalerProto,
-		policyReadAPI:      policyReadAPI,
-		etcdPath:           etcdPath,
-		componentIndex:     componentStackIndex,
+	configSync := &horizontalPodScalerConfigSync{
+		horizontalPodScalerProto: horizontalPodScalerProto,
+		policyReadAPI:            policyReadAPI,
+		etcdPath:                 etcdPath,
+		componentIndex:           componentStackIndex,
 	}
 
 	return fx.Options(
@@ -58,13 +58,13 @@ func NewPodAutoscalerOptions(
 	), agentGroup, nil
 }
 
-func (configSync *podAutoscalerConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+func (configSync *horizontalPodScalerConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	logger := configSync.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Add/remove file in lifecycle hooks in order to sync with etcd.
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper := &policysyncv1.PodAutoscalerWrapper{
-				PodAutoscaler: configSync.podAutoscalerProto,
+			wrapper := &policysyncv1.HorizontalPodScalerWrapper{
+				HorizontalPodScaler: configSync.horizontalPodScalerProto,
 				CommonAttributes: &policysyncv1.CommonAttributes{
 					PolicyName:     configSync.policyReadAPI.GetPolicyName(),
 					PolicyHash:     configSync.policyReadAPI.GetPolicyHash(),

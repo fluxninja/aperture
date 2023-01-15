@@ -1,4 +1,4 @@
-local podautoscalerscalereporterouts = import './podautoscalerscalereporterouts.libsonnet';
+local horizontalpodscalerscalereporterouts = import './horizontalpodscalerscalereporterouts.libsonnet';
 {
   new():: {
     out_ports: {
@@ -6,7 +6,7 @@ local podautoscalerscalereporterouts = import './podautoscalerscalereporterouts.
       configured_replicas: error 'Port configured_replicas is missing',
     },
   },
-  outPorts:: podautoscalerscalereporterouts,
+  outPorts:: horizontalpodscalerscalereporterouts,
   withOutPorts(out_ports):: {
     out_ports: out_ports,
   },

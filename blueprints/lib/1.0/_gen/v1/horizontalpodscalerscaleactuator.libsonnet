@@ -1,11 +1,11 @@
-local podautoscalerscaleactuatorins = import './podautoscalerscaleactuatorins.libsonnet';
+local horizontalpodscalerscaleactuatorins = import './horizontalpodscalerscaleactuatorins.libsonnet';
 {
   new():: {
     in_ports: {
       desired_replicas: error 'Port desired_replicas is missing',
     },
   },
-  inPorts:: podautoscalerscaleactuatorins,
+  inPorts:: horizontalpodscalerscaleactuatorins,
   withDefaultConfig(default_config):: {
     default_config: default_config,
   },

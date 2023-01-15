@@ -1,4 +1,4 @@
-package podautoscaler
+package horizontalpodscaler
 
 import (
 	"context"
@@ -32,11 +32,11 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
-const podAutoscalerStatusRoot = "pod_autoscalers"
+const horizontalPodScalerStatusRoot = "pod_scalers"
 
-var fxTag = config.NameTag(podAutoscalerStatusRoot)
+var fxTag = config.NameTag(horizontalPodScalerStatusRoot)
 
-// Module returns the fx module for the pod autoscaler.
+// Module returns the fx module for the horizontal pod scaler.
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(
@@ -47,7 +47,7 @@ func Module() fx.Option {
 		),
 		fx.Invoke(
 			fx.Annotate(
-				setupPodAutoscalerFactory,
+				setupHorizontalPodScalerFactory,
 				fx.ParamTags(
 					fxTag,
 					discoverykubernetes.FxTag,
@@ -64,7 +64,7 @@ func provideConfigWatcher(
 ) (notifiers.Watcher, error) {
 	agentGroup := ai.GetAgentGroup()
 
-	etcdPath := path.Join(paths.PodAutoscalerConfigPath,
+	etcdPath := path.Join(paths.HorizontalPodScalerConfigPath,
 		paths.AgentGroupPrefix(agentGroup))
 	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
@@ -74,7 +74,7 @@ func provideConfigWatcher(
 	return watcher, nil
 }
 
-type podAutoscalerFactory struct {
+type horizontalPodScalerFactory struct {
 	registry             status.Registry
 	decisionsWatcher     notifiers.Watcher
 	dynamicConfigWatcher notifiers.Watcher
@@ -86,7 +86,7 @@ type podAutoscalerFactory struct {
 }
 
 // main fx app.
-func setupPodAutoscalerFactory(
+func setupHorizontalPodScalerFactory(
 	watcher notifiers.Watcher,
 	controlPointTrackers notifiers.Trackers,
 	electionTrackers notifiers.Trackers,
@@ -98,22 +98,22 @@ func setupPodAutoscalerFactory(
 	ai *agentinfo.AgentInfo,
 ) error {
 	agentGroup := ai.GetAgentGroup()
-	etcdPath := path.Join(paths.PodAutoscalerDecisionsPath)
+	etcdPath := path.Join(paths.HorizontalPodScalerDecisionsPath)
 	decisionsWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return err
 	}
 
 	dynamicConfigWatcher, err := etcdwatcher.NewWatcher(etcdClient,
-		paths.PodAutoscalerDynamicConfigPath)
+		paths.HorizontalPodScalerDynamicConfigPath)
 	if err != nil {
 		return err
 	}
 
-	reg := statusRegistry.Child(podAutoscalerStatusRoot)
+	reg := statusRegistry.Child(horizontalPodScalerStatusRoot)
 	// logger := reg.GetLogger()
 
-	paFactory := &podAutoscalerFactory{
+	paFactory := &horizontalPodScalerFactory{
 		controlPointTrackers: controlPointTrackers,
 		decisionsWatcher:     decisionsWatcher,
 		dynamicConfigWatcher: dynamicConfigWatcher,
@@ -126,7 +126,7 @@ func setupPodAutoscalerFactory(
 
 	fxDriver := &notifiers.FxDriver{
 		FxOptionsFuncs: []notifiers.FxOptionsFunc{
-			paFactory.newPodAutoscalerOptions,
+			paFactory.newHorizontalPodScalerOptions,
 		},
 		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
 			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
@@ -167,34 +167,34 @@ func setupPodAutoscalerFactory(
 }
 
 // per component fx app.
-func (paFactory *podAutoscalerFactory) newPodAutoscalerOptions(
+func (paFactory *horizontalPodScalerFactory) newHorizontalPodScalerOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
 	reg status.Registry,
 ) (fx.Option, error) {
 	logger := paFactory.registry.GetLogger()
-	wrapperMessage := &policysyncv1.PodAutoscalerWrapper{}
+	wrapperMessage := &policysyncv1.HorizontalPodScalerWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
-	if err != nil || wrapperMessage.PodAutoscaler == nil {
+	if err != nil || wrapperMessage.HorizontalPodScaler == nil {
 		reg.SetStatus(status.NewStatus(nil, err))
-		logger.Warn().Err(err).Msg("Failed to unmarshal pod autoscaler")
+		logger.Warn().Err(err).Msg("Failed to unmarshal horizontal pod scaler")
 		return fx.Options(), err
 	}
 
-	podAutoscalerProto := wrapperMessage.PodAutoscaler
-	podAutoscaler := &podAutoscaler{
-		Component:            wrapperMessage.GetCommonAttributes(),
-		podAutoscalerProto:   podAutoscalerProto,
-		registry:             reg,
-		podAutoscalerFactory: paFactory,
+	horizontalPodScalerProto := wrapperMessage.HorizontalPodScaler
+	horizontalPodScaler := &horizontalPodScaler{
+		Component:                  wrapperMessage.GetCommonAttributes(),
+		horizontalPodScalerProto:   horizontalPodScalerProto,
+		registry:                   reg,
+		horizontalPodScalerFactory: paFactory,
 	}
-	componentKey := paths.AgentComponentKey(paFactory.agentGroup, podAutoscaler.GetPolicyName(), int64(podAutoscaler.GetComponentIndex()))
-	statusEtcdPath := path.Join(paths.PodAutoscalerStatusPath, componentKey)
-	podAutoscaler.statusEtcdPath = statusEtcdPath
+	componentKey := paths.AgentComponentKey(paFactory.agentGroup, horizontalPodScaler.GetPolicyName(), int64(horizontalPodScaler.GetComponentIndex()))
+	statusEtcdPath := path.Join(paths.HorizontalPodScalerStatusPath, componentKey)
+	horizontalPodScaler.statusEtcdPath = statusEtcdPath
 
 	return fx.Options(
 		fx.Invoke(
-			podAutoscaler.setup,
+			horizontalPodScaler.setup,
 		),
 		fx.Supply(
 			paFactory.etcdClient,
@@ -203,30 +203,30 @@ func (paFactory *podAutoscalerFactory) newPodAutoscalerOptions(
 	), nil
 }
 
-// podAutoscaler implement pod auto scaler on the agent side.
-type podAutoscaler struct {
+// horizontalPodScaler implement horizontal pod scaler on the agent side.
+type horizontalPodScaler struct {
 	scaleMutex  sync.Mutex
 	statusMutex sync.Mutex
 	ctx         context.Context
 	k8sClient   k8s.K8sClient
 	registry    status.Registry
 	iface.Component
-	lastStatusErr        error
-	scaleCancel          context.CancelFunc
-	etcdClient           *etcdclient.Client
-	cancel               context.CancelFunc
-	statusWriter         *etcdwriter.Writer
-	podAutoscalerFactory *podAutoscalerFactory
-	podAutoscalerProto   *policylangv1.PodAutoscaler
-	lastScaleDecision    *policysyncv1.ScaleDecision
-	controlPoint         discoverykubernetes.ControlPoint
-	statusEtcdPath       string
-	lastStatus           []byte
-	dryRun               bool
-	isLeader             bool
+	lastStatusErr              error
+	scaleCancel                context.CancelFunc
+	etcdClient                 *etcdclient.Client
+	cancel                     context.CancelFunc
+	statusWriter               *etcdwriter.Writer
+	horizontalPodScalerFactory *horizontalPodScalerFactory
+	horizontalPodScalerProto   *policylangv1.HorizontalPodScaler
+	lastScaleDecision          *policysyncv1.ScaleDecision
+	controlPoint               discoverykubernetes.ControlPoint
+	statusEtcdPath             string
+	lastStatus                 []byte
+	dryRun                     bool
+	isLeader                   bool
 }
 
-func (pa *podAutoscaler) setup(
+func (pa *horizontalPodScaler) setup(
 	lifecycle fx.Lifecycle,
 	etcdClient *etcdclient.Client,
 	k8sClient k8s.K8sClient,
@@ -234,7 +234,7 @@ func (pa *podAutoscaler) setup(
 	logger := pa.registry.GetLogger()
 	pa.etcdClient = etcdClient
 	pa.k8sClient = k8sClient
-	etcdKey := paths.AgentComponentKey(pa.podAutoscalerFactory.agentGroup,
+	etcdKey := paths.AgentComponentKey(pa.horizontalPodScalerFactory.agentGroup,
 		pa.GetPolicyName(),
 		pa.GetComponentIndex())
 
@@ -262,8 +262,8 @@ func (pa *podAutoscaler) setup(
 		pa.dynamicConfigUpdateCallback,
 	)
 	// control point notifier
-	// read the configured control point from the pod autoscaler proto
-	controlPointSelector := pa.podAutoscalerProto.KubernetesObjectSelector
+	// read the configured control point from the horizontal pod scaler proto
+	controlPointSelector := pa.horizontalPodScalerProto.KubernetesObjectSelector
 	controlPoint, err := discoverykubernetes.ControlPointFromSelector(controlPointSelector)
 	if err != nil {
 		return err
@@ -289,29 +289,29 @@ func (pa *podAutoscaler) setup(
 			var err error
 			pa.statusWriter = etcdwriter.NewWriter(pa.etcdClient, true)
 			pa.ctx, pa.cancel = context.WithCancel(context.Background())
-			scaleActuatorProto := pa.podAutoscalerProto.GetScaleActuator()
+			scaleActuatorProto := pa.horizontalPodScalerProto.GetScaleActuator()
 			if scaleActuatorProto != nil {
 				pa.updateDynamicConfig(scaleActuatorProto.GetDefaultConfig())
 			}
 			// add election notifier
-			err = pa.podAutoscalerFactory.electionTrackers.AddKeyNotifier(electionNotifier)
+			err = pa.horizontalPodScalerFactory.electionTrackers.AddKeyNotifier(electionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to add election notifier")
 				return err
 			}
 			// add decisions notifier
-			err = pa.podAutoscalerFactory.decisionsWatcher.AddKeyNotifier(decisionNotifier)
+			err = pa.horizontalPodScalerFactory.decisionsWatcher.AddKeyNotifier(decisionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to add decision notifier")
 				return err
 			}
 			// add dynamic config notifier
-			err = pa.podAutoscalerFactory.dynamicConfigWatcher.AddKeyNotifier(dynamicConfigNotifier)
+			err = pa.horizontalPodScalerFactory.dynamicConfigWatcher.AddKeyNotifier(dynamicConfigNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to add dynamic config notifier")
 			}
 			// add control point notifier
-			err = pa.podAutoscalerFactory.controlPointTrackers.AddKeyNotifier(controlPointNotifier)
+			err = pa.horizontalPodScalerFactory.controlPointTrackers.AddKeyNotifier(controlPointNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to add control point notifier")
 			}
@@ -321,25 +321,25 @@ func (pa *podAutoscaler) setup(
 		OnStop: func(ctx context.Context) error {
 			var merr, err error
 			// remove election notifier
-			err = pa.podAutoscalerFactory.electionTrackers.RemoveKeyNotifier(electionNotifier)
+			err = pa.horizontalPodScalerFactory.electionTrackers.RemoveKeyNotifier(electionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to remove election notifier")
 				merr = multierror.Append(merr, err)
 			}
 			// remove dynamic config notifier
-			err = pa.podAutoscalerFactory.dynamicConfigWatcher.RemoveKeyNotifier(dynamicConfigNotifier)
+			err = pa.horizontalPodScalerFactory.dynamicConfigWatcher.RemoveKeyNotifier(dynamicConfigNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to remove dynamic config notifier")
 				merr = multierror.Append(merr, err)
 			}
 			// remove decisions notifier
-			err = pa.podAutoscalerFactory.decisionsWatcher.RemoveKeyNotifier(decisionNotifier)
+			err = pa.horizontalPodScalerFactory.decisionsWatcher.RemoveKeyNotifier(decisionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to remove decision notifier")
 				merr = multierror.Append(merr, err)
 			}
 			// remove control point notifier
-			err = pa.podAutoscalerFactory.controlPointTrackers.RemoveKeyNotifier(controlPointNotifier)
+			err = pa.horizontalPodScalerFactory.controlPointTrackers.RemoveKeyNotifier(controlPointNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to remove control point notifier")
 				merr = multierror.Append(merr, err)
@@ -359,7 +359,7 @@ func (pa *podAutoscaler) setup(
 	return nil
 }
 
-func (pa *podAutoscaler) electionResultCallback(_ notifiers.Event) {
+func (pa *horizontalPodScaler) electionResultCallback(_ notifiers.Event) {
 	log.Info().Msg("Election result callback")
 	// write the lastStatus
 	pa.statusMutex.Lock()
@@ -381,21 +381,21 @@ func (pa *podAutoscaler) electionResultCallback(_ notifiers.Event) {
 	pa.isLeader = true
 }
 
-func (pa *podAutoscaler) dynamicConfigUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+func (pa *horizontalPodScaler) dynamicConfigUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	logger := pa.registry.GetLogger()
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Dynamic config removed")
 		// revert to default config
-		scaleActuatorProto := pa.podAutoscalerProto.GetScaleActuator()
+		scaleActuatorProto := pa.horizontalPodScalerProto.GetScaleActuator()
 		if scaleActuatorProto != nil {
 			pa.updateDynamicConfig(scaleActuatorProto.GetDefaultConfig())
 		}
 		return
 	}
 
-	var wrapperMessage policysyncv1.PodAutoscalerDynamicConfigWrapper
+	var wrapperMessage policysyncv1.HorizontalPodScalerDynamicConfigWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
-	if err != nil || wrapperMessage.PodAutoscalerDynamicConfig == nil {
+	if err != nil || wrapperMessage.HorizontalPodScalerDynamicConfig == nil {
 		return
 	}
 	commonAttributes := wrapperMessage.GetCommonAttributes()
@@ -406,11 +406,11 @@ func (pa *podAutoscaler) dynamicConfigUpdateCallback(event notifiers.Event, unma
 	if commonAttributes.PolicyHash != pa.GetPolicyHash() {
 		return
 	}
-	dynamicConfig := wrapperMessage.PodAutoscalerDynamicConfig
+	dynamicConfig := wrapperMessage.HorizontalPodScalerDynamicConfig
 	pa.updateDynamicConfig(dynamicConfig)
 }
 
-func (pa *podAutoscaler) updateDynamicConfig(dynamicConfig *policylangv1.PodAutoscaler_ScaleActuator_DynamicConfig) {
+func (pa *horizontalPodScaler) updateDynamicConfig(dynamicConfig *policylangv1.HorizontalPodScaler_ScaleActuator_DynamicConfig) {
 	if dynamicConfig == nil {
 		pa.dryRun = false
 		return
@@ -418,7 +418,7 @@ func (pa *podAutoscaler) updateDynamicConfig(dynamicConfig *policylangv1.PodAuto
 	pa.dryRun = dynamicConfig.GetDryRun()
 }
 
-func (pa *podAutoscaler) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+func (pa *horizontalPodScaler) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	pa.scaleMutex.Lock()
 	defer pa.scaleMutex.Unlock()
 	logger := pa.registry.GetLogger()
@@ -451,8 +451,8 @@ func (pa *podAutoscaler) decisionUpdateCallback(event notifiers.Event, unmarshal
 	}
 }
 
-// scale scales the associated Kubernetes object. NOTE: not thread safe, needs to be called under podAutoscaler.scaleMutex.
-func (pa *podAutoscaler) scale(scaleDecision *policysyncv1.ScaleDecision) {
+// scale scales the associated Kubernetes object. NOTE: not thread safe, needs to be called under horizontalPodScaler.scaleMutex.
+func (pa *horizontalPodScaler) scale(scaleDecision *policysyncv1.ScaleDecision) {
 	// Take mutex to prevent concurrent scale operations
 	replicas := scaleDecision.GetDesiredReplicas()
 
@@ -488,7 +488,7 @@ func (pa *podAutoscaler) scale(scaleDecision *policysyncv1.ScaleDecision) {
 	})
 }
 
-func (pa *podAutoscaler) controlPointUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+func (pa *horizontalPodScaler) controlPointUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	pa.statusMutex.Lock()
 	defer pa.statusMutex.Unlock()
 	logger := pa.registry.GetLogger()

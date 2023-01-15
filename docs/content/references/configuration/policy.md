@@ -139,24 +139,7 @@ StaticBuckets holds the static value of the buckets where latency histogram will
 </dd>
 </dl>
 
-### MatchExpressionList {#match-expression-list}
-
-List of MatchExpressions that is used for all/any matching
-
-eg. {any: {of: [expr1, expr2]}}.
-
-#### Properties
-
-<dl>
-<dt>of</dt>
-<dd>
-
-([[]V1MatchExpression](#v1-match-expression)) List of subexpressions of the match expression.
-
-</dd>
-</dl>
-
-### PodAutoscalerScaleActuator {#pod-autoscaler-scale-actuator}
+### HorizontalPodScalerScaleActuator {#horizontal-pod-scaler-scale-actuator}
 
 #### Properties
 
@@ -164,7 +147,7 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>default_config</dt>
 <dd>
 
-([PodAutoscalerScaleActuatorDynamicConfig](#pod-autoscaler-scale-actuator-dynamic-config)) Default configuration.
+([HorizontalPodScalerScaleActuatorDynamicConfig](#horizontal-pod-scaler-scale-actuator-dynamic-config)) Default configuration.
 
 </dd>
 <dt>dynamic_config_key</dt>
@@ -176,12 +159,12 @@ eg. {any: {of: [expr1, expr2]}}.
 <dt>in_ports</dt>
 <dd>
 
-([PodAutoscalerScaleActuatorIns](#pod-autoscaler-scale-actuator-ins))
+([HorizontalPodScalerScaleActuatorIns](#horizontal-pod-scaler-scale-actuator-ins))
 
 </dd>
 </dl>
 
-### PodAutoscalerScaleActuatorDynamicConfig {#pod-autoscaler-scale-actuator-dynamic-config}
+### HorizontalPodScalerScaleActuatorDynamicConfig {#horizontal-pod-scaler-scale-actuator-dynamic-config}
 
 Dynamic Configuration for ScaleActuator
 
@@ -191,15 +174,15 @@ Dynamic Configuration for ScaleActuator
 <dt>dry_run</dt>
 <dd>
 
-(bool) Decides whether to run the pod autoscaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this autoscaler.
-Useful for observing the behavior of Auto Scaler without disrupting any real traffic.
+(bool) Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+Useful for observing the behavior of Scaler without disrupting any real traffic.
 
 </dd>
 </dl>
 
-### PodAutoscalerScaleActuatorIns {#pod-autoscaler-scale-actuator-ins}
+### HorizontalPodScalerScaleActuatorIns {#horizontal-pod-scaler-scale-actuator-ins}
 
-Inputs for the PodAutoscaler component.
+Inputs for the HorizontalPodScaler component.
 
 #### Properties
 
@@ -212,7 +195,7 @@ Inputs for the PodAutoscaler component.
 </dd>
 </dl>
 
-### PodAutoscalerScaleReporter {#pod-autoscaler-scale-reporter}
+### HorizontalPodScalerScaleReporter {#horizontal-pod-scaler-scale-reporter}
 
 #### Properties
 
@@ -220,14 +203,14 @@ Inputs for the PodAutoscaler component.
 <dt>out_ports</dt>
 <dd>
 
-([PodAutoscalerScaleReporterOuts](#pod-autoscaler-scale-reporter-outs))
+([HorizontalPodScalerScaleReporterOuts](#horizontal-pod-scaler-scale-reporter-outs))
 
 </dd>
 </dl>
 
-### PodAutoscalerScaleReporterOuts {#pod-autoscaler-scale-reporter-outs}
+### HorizontalPodScalerScaleReporterOuts {#horizontal-pod-scaler-scale-reporter-outs}
 
-Outputs for the PodAutoscaler component.
+Outputs for the HorizontalPodScaler component.
 
 #### Properties
 
@@ -242,6 +225,23 @@ Outputs for the PodAutoscaler component.
 <dd>
 
 ([V1OutPort](#v1-out-port))
+
+</dd>
+</dl>
+
+### MatchExpressionList {#match-expression-list}
+
+List of MatchExpressions that is used for all/any matching
+
+eg. {any: {of: [expr1, expr2]}}.
+
+#### Properties
+
+<dl>
+<dt>of</dt>
+<dd>
+
+([[]V1MatchExpression](#v1-match-expression)) List of subexpressions of the match expression.
 
 </dd>
 </dl>
@@ -724,6 +724,12 @@ See also [Policy](#v1-policy) for a higher-level explanation of circuits.
 This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
 
 </dd>
+<dt>horizontal_pod_scaler</dt>
+<dd>
+
+([V1HorizontalPodScaler](#v1-horizontal-pod-scaler)) HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+
+</dd>
 <dt>integrator</dt>
 <dd>
 
@@ -740,12 +746,6 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 <dd>
 
 ([V1Min](#v1-min)) Emits the minimum of the input signals.
-
-</dd>
-<dt>pod_autoscaler</dt>
-<dd>
-
-([V1PodAutoscaler](#v1-pod-autoscaler)) PodAutoscaler provides pod auto-scale functionality for scalable Kubernetes resources.
 
 </dd>
 <dt>promql</dt>
@@ -1674,6 +1674,31 @@ Outputs for the Gradient Controller component.
 </dd>
 </dl>
 
+### v1HorizontalPodScaler {#v1-horizontal-pod-scaler}
+
+#### Properties
+
+<dl>
+<dt>kubernetes_object_selector</dt>
+<dd>
+
+([V1KubernetesObjectSelector](#v1-kubernetes-object-selector), `required`) The Kubernetes object on which horizontal scaling is applied.
+
+</dd>
+<dt>scale_actuator</dt>
+<dd>
+
+([HorizontalPodScalerScaleActuator](#horizontal-pod-scaler-scale-actuator))
+
+</dd>
+<dt>scale_reporter</dt>
+<dd>
+
+([HorizontalPodScalerScaleReporter](#horizontal-pod-scaler-scale-reporter))
+
+</dd>
+</dl>
+
 ### v1InPort {#v1-in-port}
 
 Components receive input from other components via InPorts
@@ -2244,31 +2269,6 @@ Example:
 "/user/{userId}": user
 /static/*: other
 ```
-
-</dd>
-</dl>
-
-### v1PodAutoscaler {#v1-pod-autoscaler}
-
-#### Properties
-
-<dl>
-<dt>kubernetes_object_selector</dt>
-<dd>
-
-([V1KubernetesObjectSelector](#v1-kubernetes-object-selector), `required`) Which Kubernetes object to apply the autoscaling to.
-
-</dd>
-<dt>scale_actuator</dt>
-<dd>
-
-([PodAutoscalerScaleActuator](#pod-autoscaler-scale-actuator))
-
-</dd>
-<dt>scale_reporter</dt>
-<dd>
-
-([PodAutoscalerScaleReporter](#pod-autoscaler-scale-reporter))
 
 </dd>
 </dl>

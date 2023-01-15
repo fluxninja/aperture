@@ -1080,7 +1080,7 @@ func (msg *Differentiator_Outs) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *PodAutoscaler) MarshalJSON() ([]byte, error) {
+func (msg *HorizontalPodScaler) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -1089,14 +1089,14 @@ func (msg *PodAutoscaler) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *PodAutoscaler) UnmarshalJSON(b []byte) error {
+func (msg *HorizontalPodScaler) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *PodAutoscaler_ScaleReporter) MarshalJSON() ([]byte, error) {
+func (msg *HorizontalPodScaler_ScaleReporter) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -1105,14 +1105,14 @@ func (msg *PodAutoscaler_ScaleReporter) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *PodAutoscaler_ScaleReporter) UnmarshalJSON(b []byte) error {
+func (msg *HorizontalPodScaler_ScaleReporter) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *PodAutoscaler_ScaleReporter_Outs) MarshalJSON() ([]byte, error) {
+func (msg *HorizontalPodScaler_ScaleReporter_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -1121,14 +1121,14 @@ func (msg *PodAutoscaler_ScaleReporter_Outs) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *PodAutoscaler_ScaleReporter_Outs) UnmarshalJSON(b []byte) error {
+func (msg *HorizontalPodScaler_ScaleReporter_Outs) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *PodAutoscaler_ScaleActuator) MarshalJSON() ([]byte, error) {
+func (msg *HorizontalPodScaler_ScaleActuator) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -1137,14 +1137,14 @@ func (msg *PodAutoscaler_ScaleActuator) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *PodAutoscaler_ScaleActuator) UnmarshalJSON(b []byte) error {
+func (msg *HorizontalPodScaler_ScaleActuator) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *PodAutoscaler_ScaleActuator_DynamicConfig) MarshalJSON() ([]byte, error) {
+func (msg *HorizontalPodScaler_ScaleActuator_DynamicConfig) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -1153,14 +1153,14 @@ func (msg *PodAutoscaler_ScaleActuator_DynamicConfig) MarshalJSON() ([]byte, err
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *PodAutoscaler_ScaleActuator_DynamicConfig) UnmarshalJSON(b []byte) error {
+func (msg *HorizontalPodScaler_ScaleActuator_DynamicConfig) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *PodAutoscaler_ScaleActuator_Ins) MarshalJSON() ([]byte, error) {
+func (msg *HorizontalPodScaler_ScaleActuator_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -1169,7 +1169,7 @@ func (msg *PodAutoscaler_ScaleActuator_Ins) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *PodAutoscaler_ScaleActuator_Ins) UnmarshalJSON(b []byte) error {
+func (msg *HorizontalPodScaler_ScaleActuator_Ins) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

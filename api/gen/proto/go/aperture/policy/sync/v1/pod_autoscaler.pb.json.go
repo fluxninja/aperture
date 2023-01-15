@@ -8,7 +8,7 @@ import (
 )
 
 // MarshalJSON implements json.Marshaler
-func (msg *PodAutoscalerWrapper) MarshalJSON() ([]byte, error) {
+func (msg *HorizontalPodScalerWrapper) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -17,14 +17,14 @@ func (msg *PodAutoscalerWrapper) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *PodAutoscalerWrapper) UnmarshalJSON(b []byte) error {
+func (msg *HorizontalPodScalerWrapper) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *PodAutoscalerDynamicConfigWrapper) MarshalJSON() ([]byte, error) {
+func (msg *HorizontalPodScalerDynamicConfigWrapper) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -33,7 +33,7 @@ func (msg *PodAutoscalerDynamicConfigWrapper) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *PodAutoscalerDynamicConfigWrapper) UnmarshalJSON(b []byte) error {
+func (msg *HorizontalPodScalerDynamicConfigWrapper) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

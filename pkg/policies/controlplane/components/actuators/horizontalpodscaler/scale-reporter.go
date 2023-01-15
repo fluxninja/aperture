@@ -1,4 +1,4 @@
-package podautoscaler
+package horizontalpodscaler
 
 import (
 	"context"
@@ -21,7 +21,7 @@ import (
 // fxTag is Autoscaler Status Watcher's Fx Tag.
 var fxTag = config.NameTag("scale_status_watcher")
 
-// scaleReporterModule returns the fx options for pod autoscaler in the main app.
+// scaleReporterModule returns the fx options for horizontal pod scaler in the main app.
 func scaleReporterModule() fx.Option {
 	return fx.Options(
 		fx.Provide(
@@ -42,7 +42,7 @@ func provideWatcher(
 	etcdClient *etcdclient.Client,
 	lc fx.Lifecycle,
 ) (notifiers.Watcher, error) {
-	etcdPath := paths.PodAutoscalerStatusPath
+	etcdPath := paths.HorizontalPodScalerStatusPath
 	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func (sr *ScaleReporter) Type() runtime.ComponentType { return runtime.Component
 
 // NewScaleReporterAndOptions returns a new ScaleReporter and its fx options.
 func NewScaleReporterAndOptions(
-	_ *policylangv1.PodAutoscaler_ScaleReporter,
+	_ *policylangv1.HorizontalPodScaler_ScaleReporter,
 	componentIndex int,
 	policyReadAPI iface.Policy,
 	agentGroup string,

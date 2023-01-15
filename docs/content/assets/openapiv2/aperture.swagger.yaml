@@ -374,6 +374,46 @@ definitions:
           format: double
         x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
     description: StaticBuckets holds the static value of the buckets where latency histogram will be stored.
+  HorizontalPodScalerScaleActuator:
+    type: object
+    properties:
+      default_config:
+        $ref: '#/definitions/HorizontalPodScalerScaleActuatorDynamicConfig'
+        description: Default configuration.
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
+      in_ports:
+        $ref: '#/definitions/HorizontalPodScalerScaleActuatorIns'
+  HorizontalPodScalerScaleActuatorDynamicConfig:
+    type: object
+    properties:
+      dry_run:
+        type: boolean
+        description: |-
+          Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+          Useful for observing the behavior of Scaler without disrupting any real traffic.
+        x-go-default: false
+    title: Dynamic Configuration for ScaleActuator
+  HorizontalPodScalerScaleActuatorIns:
+    type: object
+    properties:
+      desired_replicas:
+        $ref: '#/definitions/v1InPort'
+    description: Inputs for the HorizontalPodScaler component.
+  HorizontalPodScalerScaleReporter:
+    type: object
+    properties:
+      out_ports:
+        $ref: '#/definitions/HorizontalPodScalerScaleReporterOuts'
+  HorizontalPodScalerScaleReporterOuts:
+    type: object
+    properties:
+      actual_replicas:
+        $ref: '#/definitions/v1OutPort'
+      configured_replicas:
+        $ref: '#/definitions/v1OutPort'
+    description: Outputs for the HorizontalPodScaler component.
   LimiterDecisionConcurrencyLimiterInfo:
     type: object
     properties:
@@ -406,46 +446,6 @@ definitions:
         description: List of subexpressions of the match expression.
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     title: List of MatchExpressions that is used for all/any matching
-  PodAutoscalerScaleActuator:
-    type: object
-    properties:
-      default_config:
-        $ref: '#/definitions/PodAutoscalerScaleActuatorDynamicConfig'
-        description: Default configuration.
-      dynamic_config_key:
-        type: string
-        title: Configuration key for DynamicConfig
-      in_ports:
-        $ref: '#/definitions/PodAutoscalerScaleActuatorIns'
-  PodAutoscalerScaleActuatorDynamicConfig:
-    type: object
-    properties:
-      dry_run:
-        type: boolean
-        description: |-
-          Decides whether to run the pod autoscaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this autoscaler.
-          Useful for observing the behavior of Auto Scaler without disrupting any real traffic.
-        x-go-default: false
-    title: Dynamic Configuration for ScaleActuator
-  PodAutoscalerScaleActuatorIns:
-    type: object
-    properties:
-      desired_replicas:
-        $ref: '#/definitions/v1InPort'
-    description: Inputs for the PodAutoscaler component.
-  PodAutoscalerScaleReporter:
-    type: object
-    properties:
-      out_ports:
-        $ref: '#/definitions/PodAutoscalerScaleReporterOuts'
-  PodAutoscalerScaleReporterOuts:
-    type: object
-    properties:
-      actual_replicas:
-        $ref: '#/definitions/v1OutPort'
-      configured_replicas:
-        $ref: '#/definitions/v1OutPort'
-    description: Outputs for the PodAutoscaler component.
   PreviewFlowLabelsResponseFlowLabels:
     type: object
     properties:
@@ -970,6 +970,9 @@ definitions:
         description: |-
           Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
           This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
+      horizontal_pod_scaler:
+        $ref: '#/definitions/v1HorizontalPodScaler'
+        description: HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
       integrator:
         $ref: '#/definitions/v1Integrator'
         description: Accumulates sum of signal every tick.
@@ -979,9 +982,6 @@ definitions:
       min:
         $ref: '#/definitions/v1Min'
         description: Emits the minimum of the input signals.
-      pod_autoscaler:
-        $ref: '#/definitions/v1PodAutoscaler'
-        description: PodAutoscaler provides pod auto-scale functionality for scalable Kubernetes resources.
       promql:
         $ref: '#/definitions/v1PromQL'
         description: Periodically runs a Prometheus query in the background and emits the result.
@@ -1663,6 +1663,17 @@ definitions:
     description: |-
       Groups is nested structure that holds status information about the node and a
       pointer to the next node.
+  v1HorizontalPodScaler:
+    type: object
+    properties:
+      kubernetes_object_selector:
+        $ref: '#/definitions/v1KubernetesObjectSelector'
+        description: The Kubernetes object on which horizontal scaling is applied.
+        x-go-validate: required
+      scale_actuator:
+        $ref: '#/definitions/HorizontalPodScalerScaleActuator'
+      scale_reporter:
+        $ref: '#/definitions/HorizontalPodScalerScaleReporter'
   v1HostInfo:
     type: object
     properties:
@@ -2088,17 +2099,6 @@ definitions:
       self_peer:
         $ref: '#/definitions/v1Peer'
     description: Peers holds the peer info of this peer and a mapping of address to other peers.
-  v1PodAutoscaler:
-    type: object
-    properties:
-      kubernetes_object_selector:
-        $ref: '#/definitions/v1KubernetesObjectSelector'
-        description: Which Kubernetes object to apply the autoscaling to.
-        x-go-validate: required
-      scale_actuator:
-        $ref: '#/definitions/PodAutoscalerScaleActuator'
-      scale_reporter:
-        $ref: '#/definitions/PodAutoscalerScaleReporter'
   v1Policies:
     type: object
     properties:
