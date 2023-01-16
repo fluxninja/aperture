@@ -240,10 +240,13 @@ func (h *Heartbeats) newHeartbeat(
 		})
 	}
 
-	kubernetesControlPointObjects := h.kubernetesControlPointCache.Keys()
-	kubernetesControlPoints := make([]*controlpointcachev1.KubernetesControlPoint, 0, len(serviceControlPointObjects))
-	for _, cp := range kubernetesControlPointObjects {
-		kubernetesControlPoints = append(kubernetesControlPoints, cp.ToProto())
+	var kubernetesControlPoints []*controlpointcachev1.KubernetesControlPoint
+	if h.kubernetesControlPointCache != nil {
+		kubernetesControlPointObjects := h.kubernetesControlPointCache.Keys()
+		kubernetesControlPoints = make([]*controlpointcachev1.KubernetesControlPoint, 0, len(kubernetesControlPointObjects))
+		for _, cp := range kubernetesControlPointObjects {
+			kubernetesControlPoints = append(kubernetesControlPoints, cp.ToProto())
+		}
 	}
 
 	return &heartbeatv1.ReportRequest{

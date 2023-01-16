@@ -56,7 +56,7 @@ type ConstructorIn struct {
 	EtcdClient                  *etcdclient.Client
 	PolicyFactory               *controlplane.PolicyFactory            `optional:"true"`
 	ServiceControlPointCache    *cache.Cache[selectors.ControlPointID] `optional:"true"`
-	KubernetesControlPointCache kubernetes.ControlPointCache
+	KubernetesControlPointCache kubernetes.ControlPointCache           `optional:"true"`
 }
 
 // Provide provides a new instance of Heartbeats.
