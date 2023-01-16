@@ -446,7 +446,9 @@ Alerter reacts to a signal and generates alert to send to alert manager.
 <dt>alerter_config</dt>
 <dd>
 
-([V1AlerterConfig](#v1-alerter-config)) Alerter configuration
+([V1AlerterConfig](#v1-alerter-config), `required`) Alerter configuration
+
+@gotags: validate:"required"
 
 </dd>
 </dl>
@@ -497,10 +499,10 @@ Inputs for the Alerter component.
 #### Properties
 
 <dl>
-<dt>alert</dt>
+<dt>signal</dt>
 <dd>
 
-([V1InPort](#v1-in-port)) Signal which Alerter is monitoring.
+([V1InPort](#v1-in-port)) Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.
 
 </dd>
 </dl>
@@ -798,12 +800,6 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 <dd>
 
 ([V1FirstValid](#v1-first-valid)) Picks the first valid input signal and emits it.
-
-</dd>
-<dt>sink</dt>
-<dd>
-
-([V1Sink](#v1-sink)) Sink is a sink component that does nothing.
 
 </dd>
 <dt>alerter</dt>
@@ -2872,38 +2868,6 @@ Empty string means all services within an agent group (catch-all).
 :::note
 One entity may belong to multiple services.
 :::
-
-</dd>
-</dl>
-
-### v1Sink {#v1-sink}
-
-Sink is a component that consumes input signals and does nothing with them
-
-#### Properties
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-([V1SinkIns](#v1-sink-ins)) Input ports for the Sink component.
-
-</dd>
-</dl>
-
-### v1SinkIns {#v1-sink-ins}
-
-Inputs for the Sink component.
-
-#### Properties
-
-<dl>
-<dt>inputs</dt>
-<dd>
-
-([[]V1InPort](#v1-in-port)) Array of input signals.
-
-@gotags: validate:"dive"
 
 </dd>
 </dl>

@@ -63,6 +63,7 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circ
 	if err != nil {
 		return nil, false, err.Error(), nil
 	}
+
 	registry := status.NewRegistry(log.GetGlobalLogger())
 	circuit, err := CompilePolicy(policy, registry)
 	if err != nil {

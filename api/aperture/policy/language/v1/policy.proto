@@ -183,20 +183,17 @@ message Component {
     // Picks the first valid input signal and emits it.
     FirstValid first_valid = 14;
 
-    // Sink is a sink component that does nothing.
-    Sink sink = 15;
-
     // Alerter reacts to a signal and generates alert to send to alert manager.
-    Alerter alerter = 16;
+    Alerter alerter = 15;
 
     // Accumulates sum of signal every tick.
-    Integrator integrator = 17;
+    Integrator integrator = 16;
 
     // Differentiator calculates rate of change per tick.
-    Differentiator differentiator = 18;
+    Differentiator differentiator = 17;
 
     // HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
-    HorizontalPodScaler horizontal_pod_scaler = 19;
+    HorizontalPodScaler horizontal_pod_scaler = 18;
   }
 }
 
@@ -1117,18 +1114,6 @@ message FirstValid {
   Outs out_ports = 2;
 }
 
-// Sink is a component that consumes input signals and does nothing with them
-message Sink {
-  // Inputs for the Sink component.
-  message Ins {
-    // Array of input signals.
-    repeated InPort inputs = 1; // @gotags: validate:"dive"
-  }
-
-  // Input ports for the Sink component.
-  Ins in_ports = 1;
-}
-
 // AlerterConfig is a common config for separate alerter components and alerters embedded in other components.
 message AlerterConfig {
   // Name of the alert.
@@ -1167,15 +1152,20 @@ message AlerterConfig {
 message Alerter {
   // Inputs for the Alerter component.
   message Ins {
-    // Signal which Alerter is monitoring.
-    InPort alert = 1;
+    // Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.
+    InPort signal = 1;
   }
 
   // Input ports for the Alerter component.
   Ins in_ports = 1;
 
   // Alerter configuration
-  AlerterConfig alerter_config = 2;
+  AlerterConfig alerter_config = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
 }
 
 // Accumulates sum of signal every tick.

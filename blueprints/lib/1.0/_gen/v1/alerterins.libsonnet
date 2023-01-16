@@ -1,10 +1,10 @@
 {
   new():: {
   },
-  withAlert(alert):: {
-    alert: alert,
+  withSignal(signal):: {
+    signal: signal,
   },
-  withAlertMixin(alert):: {
-    alert+: alert,
+  withSignalMixin(signal):: {
+    signal+: signal,
   },
 }

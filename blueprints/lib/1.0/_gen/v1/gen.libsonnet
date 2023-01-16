@@ -85,8 +85,6 @@
   Scheduler: import 'scheduler.libsonnet',
   SchedulerOuts: import 'schedulerouts.libsonnet',
   ServiceSelector: import 'serviceselector.libsonnet',
-  Sink: import 'sink.libsonnet',
-  SinkIns: import 'sinkins.libsonnet',
   Sqrt: import 'sqrt.libsonnet',
   SqrtIns: import 'sqrtins.libsonnet',
   SqrtOuts: import 'sqrtouts.libsonnet',

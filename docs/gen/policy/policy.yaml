@@ -335,7 +335,9 @@ definitions:
     type: object
     properties:
       alerter_config:
+        description: '@gotags: validate:"required"'
         title: Alerter configuration
+        x-go-validate: required
         x-order: 1
         $ref: '#/definitions/v1AlerterConfig'
       in_ports:
@@ -382,8 +384,9 @@ definitions:
     description: Inputs for the Alerter component.
     type: object
     properties:
-      alert:
-        description: Signal which Alerter is monitoring.
+      signal:
+        description: Signal which Alerter is monitoring. If the signal greater than
+          0, Alerter generates an alert.
         x-order: 0
         $ref: '#/definitions/v1InPort'
   v1ArithmeticCombinator:
@@ -563,7 +566,7 @@ definitions:
       alerter:
         description: Alerter reacts to a signal and generates alert to send to alert
           manager.
-        x-order: 15
+        x-order: 14
         $ref: '#/definitions/v1Alerter'
       arithmetic_combinator:
         description: Applies the given operator on input operands (signals) and emits
@@ -586,7 +589,7 @@ definitions:
         $ref: '#/definitions/v1Decider'
       differentiator:
         description: Differentiator calculates rate of change per tick.
-        x-order: 17
+        x-order: 16
         $ref: '#/definitions/v1Differentiator'
       ema:
         description: Exponential Moving Average filter.
@@ -611,11 +614,11 @@ definitions:
       horizontal_pod_scaler:
         description: HorizontalPodScaler provides pod horizontal scaling functionality
           for scalable Kubernetes resources.
-        x-order: 18
+        x-order: 17
         $ref: '#/definitions/v1HorizontalPodScaler'
       integrator:
         description: Accumulates sum of signal every tick.
-        x-order: 16
+        x-order: 15
         $ref: '#/definitions/v1Integrator'
       max:
         description: Emits the maximum of the input signals.
@@ -634,10 +637,6 @@ definitions:
         description: Rate Limiter provides service protection by applying rate limiter.
         x-order: 6
         $ref: '#/definitions/v1RateLimiter'
-      sink:
-        description: Sink is a sink component that does nothing.
-        x-order: 14
-        $ref: '#/definitions/v1Sink'
       sqrt:
         description: Takes an input signal and emits the square root of the input
           signal.
@@ -2215,27 +2214,6 @@ definitions:
           :::
         type: string
         x-order: 1
-  v1Sink:
-    type: object
-    title: Sink is a component that consumes input signals and does nothing with them
-    properties:
-      in_ports:
-        description: Input ports for the Sink component.
-        x-order: 0
-        $ref: '#/definitions/v1SinkIns'
-  v1SinkIns:
-    description: Inputs for the Sink component.
-    type: object
-    properties:
-      inputs:
-        description: |-
-          Array of input signals.
-
-          @gotags: validate:"dive"
-        type: array
-        items:
-          $ref: '#/definitions/v1InPort'
-        x-order: 0
   v1Sqrt:
     description: |-
       $$

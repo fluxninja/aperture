@@ -13,7 +13,8 @@ local promQL = aperture.spec.v1.PromQL;
 local ema = aperture.spec.v1.EMA;
 local combinator = aperture.spec.v1.ArithmeticCombinator;
 local decider = aperture.spec.v1.Decider;
-local sink = aperture.spec.v1.Sink;
+local alerter = aperture.spec.v1.Alerter;
+local alerterConfig = aperture.spec.v1.AlerterConfig;
 
 local svcSelector =
   flowSelector.new()
@@ -60,9 +61,14 @@ local policyDef =
         )
         + decider.withOutPortsMixin(decider.outPorts.withOutput(port.withSignalName('IS_OVERLOAD_SWITCH')))
       ),
-      component.withSink(
-        sink.new()
-        + sink.withInPorts({ inputs: [port.withSignalName('IS_OVERLOAD_SWITCH')] })
+      component.withAlerter(
+        alerter.new()
+        + alerter.withInPorts({ signal: port.withSignalName('IS_OVERLOAD_SWITCH') })
+        + alerter.withAlerterConfig(
+          alerterConfig.new()
+          + alerterConfig.withAlertName('overload')
+          + alerterConfig.withSeverity('crit')
+        )
       ),
     ]),
   );

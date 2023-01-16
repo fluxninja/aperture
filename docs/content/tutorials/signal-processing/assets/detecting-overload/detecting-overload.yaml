@@ -46,10 +46,13 @@ spec:
           out_ports:
             output:
               signal_name: IS_OVERLOAD_SWITCH
-      - sink:
+      - alerter:
+          alerter_config:
+            alert_name: overload
+            severity: crit
           in_ports:
-            inputs:
-              - signal_name: IS_OVERLOAD_SWITCH
+            signal:
+              signal_name: IS_OVERLOAD_SWITCH
     evaluation_interval: 0.5s
   resources:
     flux_meters:

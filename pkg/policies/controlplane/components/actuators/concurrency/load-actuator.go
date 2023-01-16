@@ -199,7 +199,7 @@ func (la *LoadActuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplie
 
 func (la *LoadActuator) createAlert() *alerts.Alert {
 	newAlert := alerts.NewAlert(
-		alerts.WithName("Load Shed Event"),
+		alerts.WithName(la.alerterConfig.AlertName),
 		alerts.WithSeverity(alerts.ParseSeverity(la.alerterConfig.Severity)),
 		alerts.WithAlertChannels(la.alerterConfig.AlertChannels),
 		alerts.WithLabel("policy_name", la.policyReadAPI.GetPolicyName()),
