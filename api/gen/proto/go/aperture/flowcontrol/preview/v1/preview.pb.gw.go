@@ -32,12 +32,20 @@ var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
 var (
-	filter_FlowPreviewService_PreviewFlowLabels_0 = &utilities.DoubleArray{Encoding: map[string]int{"service": 0, "control_point": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_FlowPreviewService_PreviewFlowLabels_0 = &utilities.DoubleArray{Encoding: map[string]int{"label_matcher": 0, "labelMatcher": 1, "service": 2, "control_point": 3, "controlPoint": 4}, Base: []int{1, 1, 2, 4, 5, 6, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 2, 3, 4, 4, 5, 6}}
 )
 
 func request_FlowPreviewService_PreviewFlowLabels_0(ctx context.Context, marshaler runtime.Marshaler, client FlowPreviewServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq PreviewRequest
 	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq.LabelMatcher); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
 
 	var (
 		val string
@@ -82,6 +90,14 @@ func local_request_FlowPreviewService_PreviewFlowLabels_0(ctx context.Context, m
 	var protoReq PreviewRequest
 	var metadata runtime.ServerMetadata
 
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq.LabelMatcher); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
 	var (
 		val string
 		ok  bool
@@ -122,12 +138,20 @@ func local_request_FlowPreviewService_PreviewFlowLabels_0(ctx context.Context, m
 }
 
 var (
-	filter_FlowPreviewService_PreviewFlowLabels_1 = &utilities.DoubleArray{Encoding: map[string]int{"control_point": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_FlowPreviewService_PreviewFlowLabels_1 = &utilities.DoubleArray{Encoding: map[string]int{"label_matcher": 0, "labelMatcher": 1, "control_point": 2, "controlPoint": 3}, Base: []int{1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 2, 3, 4, 5}}
 )
 
 func request_FlowPreviewService_PreviewFlowLabels_1(ctx context.Context, marshaler runtime.Marshaler, client FlowPreviewServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq PreviewRequest
 	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq.LabelMatcher); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
 
 	var (
 		val string
@@ -162,6 +186,14 @@ func local_request_FlowPreviewService_PreviewFlowLabels_1(ctx context.Context, m
 	var protoReq PreviewRequest
 	var metadata runtime.ServerMetadata
 
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq.LabelMatcher); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
 	var (
 		val string
 		ok  bool
@@ -192,12 +224,20 @@ func local_request_FlowPreviewService_PreviewFlowLabels_1(ctx context.Context, m
 }
 
 var (
-	filter_FlowPreviewService_PreviewHTTPRequests_0 = &utilities.DoubleArray{Encoding: map[string]int{"service": 0, "control_point": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_FlowPreviewService_PreviewHTTPRequests_0 = &utilities.DoubleArray{Encoding: map[string]int{"label_matcher": 0, "labelMatcher": 1, "service": 2, "control_point": 3, "controlPoint": 4}, Base: []int{1, 1, 2, 4, 5, 6, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 2, 3, 4, 4, 5, 6}}
 )
 
 func request_FlowPreviewService_PreviewHTTPRequests_0(ctx context.Context, marshaler runtime.Marshaler, client FlowPreviewServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq PreviewRequest
 	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq.LabelMatcher); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
 
 	var (
 		val string
@@ -242,6 +282,14 @@ func local_request_FlowPreviewService_PreviewHTTPRequests_0(ctx context.Context,
 	var protoReq PreviewRequest
 	var metadata runtime.ServerMetadata
 
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq.LabelMatcher); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
 	var (
 		val string
 		ok  bool
@@ -282,12 +330,20 @@ func local_request_FlowPreviewService_PreviewHTTPRequests_0(ctx context.Context,
 }
 
 var (
-	filter_FlowPreviewService_PreviewHTTPRequests_1 = &utilities.DoubleArray{Encoding: map[string]int{"control_point": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_FlowPreviewService_PreviewHTTPRequests_1 = &utilities.DoubleArray{Encoding: map[string]int{"label_matcher": 0, "labelMatcher": 1, "control_point": 2, "controlPoint": 3}, Base: []int{1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 2, 3, 4, 5}}
 )
 
 func request_FlowPreviewService_PreviewHTTPRequests_1(ctx context.Context, marshaler runtime.Marshaler, client FlowPreviewServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq PreviewRequest
 	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq.LabelMatcher); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
 
 	var (
 		val string
@@ -321,6 +377,14 @@ func request_FlowPreviewService_PreviewHTTPRequests_1(ctx context.Context, marsh
 func local_request_FlowPreviewService_PreviewHTTPRequests_1(ctx context.Context, marshaler runtime.Marshaler, server FlowPreviewServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq PreviewRequest
 	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq.LabelMatcher); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
 
 	var (
 		val string
@@ -357,7 +421,7 @@ func local_request_FlowPreviewService_PreviewHTTPRequests_1(ctx context.Context,
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterFlowPreviewServiceHandlerFromEndpoint instead.
 func RegisterFlowPreviewServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server FlowPreviewServiceServer) error {
 
-	mux.Handle("GET", pattern_FlowPreviewService_PreviewFlowLabels_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_FlowPreviewService_PreviewFlowLabels_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -382,7 +446,7 @@ func RegisterFlowPreviewServiceHandlerServer(ctx context.Context, mux *runtime.S
 
 	})
 
-	mux.Handle("GET", pattern_FlowPreviewService_PreviewFlowLabels_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_FlowPreviewService_PreviewFlowLabels_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -407,7 +471,7 @@ func RegisterFlowPreviewServiceHandlerServer(ctx context.Context, mux *runtime.S
 
 	})
 
-	mux.Handle("GET", pattern_FlowPreviewService_PreviewHTTPRequests_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_FlowPreviewService_PreviewHTTPRequests_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -432,7 +496,7 @@ func RegisterFlowPreviewServiceHandlerServer(ctx context.Context, mux *runtime.S
 
 	})
 
-	mux.Handle("GET", pattern_FlowPreviewService_PreviewHTTPRequests_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_FlowPreviewService_PreviewHTTPRequests_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -498,7 +562,7 @@ func RegisterFlowPreviewServiceHandler(ctx context.Context, mux *runtime.ServeMu
 // "FlowPreviewServiceClient" to call the correct interceptors.
 func RegisterFlowPreviewServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client FlowPreviewServiceClient) error {
 
-	mux.Handle("GET", pattern_FlowPreviewService_PreviewFlowLabels_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_FlowPreviewService_PreviewFlowLabels_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -520,7 +584,7 @@ func RegisterFlowPreviewServiceHandlerClient(ctx context.Context, mux *runtime.S
 
 	})
 
-	mux.Handle("GET", pattern_FlowPreviewService_PreviewFlowLabels_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_FlowPreviewService_PreviewFlowLabels_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -542,7 +606,7 @@ func RegisterFlowPreviewServiceHandlerClient(ctx context.Context, mux *runtime.S
 
 	})
 
-	mux.Handle("GET", pattern_FlowPreviewService_PreviewHTTPRequests_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_FlowPreviewService_PreviewHTTPRequests_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -564,7 +628,7 @@ func RegisterFlowPreviewServiceHandlerClient(ctx context.Context, mux *runtime.S
 
 	})
 
-	mux.Handle("GET", pattern_FlowPreviewService_PreviewHTTPRequests_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_FlowPreviewService_PreviewHTTPRequests_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)

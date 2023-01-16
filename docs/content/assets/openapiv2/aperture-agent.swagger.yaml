@@ -63,19 +63,31 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
   /v1/flowcontrol/preview/http_requests/{control_point}:
-    get:
+    post:
       tags:
       - aperture-agent
       operationId: FlowPreviewService_PreviewHTTPRequests2
       parameters:
       - type: string
-        description: Control point to preview.
+        description: |-
+          Control point to preview.
+
+          @gotags: validate:"required"
         name: control_point
         in: path
         required: true
+      - description: Flow labels to match. Optional parameter for advanced filtering.
+        name: label_matcher
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/v1LabelMatcher'
       - type: string
         format: int64
-        description: Number of samples to collect. Defaults to 10.
+        description: |-
+          Number of samples to collect. Defaults to 10.
+
+          @gotags: validate:"min=1" default:"10"
         name: samples
         in: query
       - type: string
@@ -92,7 +104,7 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
   /v1/flowcontrol/preview/http_requests/{service}/{control_point}:
-    get:
+    post:
       tags:
       - aperture-agent
       operationId: FlowPreviewService_PreviewHTTPRequests
@@ -103,13 +115,25 @@ paths:
         in: path
         required: true
       - type: string
-        description: Control point to preview.
+        description: |-
+          Control point to preview.
+
+          @gotags: validate:"required"
         name: control_point
         in: path
         required: true
+      - description: Flow labels to match. Optional parameter for advanced filtering.
+        name: label_matcher
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/v1LabelMatcher'
       - type: string
         format: int64
-        description: Number of samples to collect. Defaults to 10.
+        description: |-
+          Number of samples to collect. Defaults to 10.
+
+          @gotags: validate:"min=1" default:"10"
         name: samples
         in: query
       responses:
@@ -122,19 +146,31 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
   /v1/flowcontrol/preview/labels/{control_point}:
-    get:
+    post:
       tags:
       - aperture-agent
       operationId: FlowPreviewService_PreviewFlowLabels2
       parameters:
       - type: string
-        description: Control point to preview.
+        description: |-
+          Control point to preview.
+
+          @gotags: validate:"required"
         name: control_point
         in: path
         required: true
+      - description: Flow labels to match. Optional parameter for advanced filtering.
+        name: label_matcher
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/v1LabelMatcher'
       - type: string
         format: int64
-        description: Number of samples to collect. Defaults to 10.
+        description: |-
+          Number of samples to collect. Defaults to 10.
+
+          @gotags: validate:"min=1" default:"10"
         name: samples
         in: query
       - type: string
@@ -151,7 +187,7 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
   /v1/flowcontrol/preview/labels/{service}/{control_point}:
-    get:
+    post:
       tags:
       - aperture-agent
       operationId: FlowPreviewService_PreviewFlowLabels
@@ -162,13 +198,25 @@ paths:
         in: path
         required: true
       - type: string
-        description: Control point to preview.
+        description: |-
+          Control point to preview.
+
+          @gotags: validate:"required"
         name: control_point
         in: path
         required: true
+      - description: Flow labels to match. Optional parameter for advanced filtering.
+        name: label_matcher
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/v1LabelMatcher'
       - type: string
         format: int64
-        description: Number of samples to collect. Defaults to 10.
+        description: |-
+          Number of samples to collect. Defaults to 10.
+
+          @gotags: validate:"min=1" default:"10"
         name: samples
         in: query
       responses:
@@ -288,6 +336,16 @@ definitions:
         type: object
         additionalProperties:
           $ref: '#/definitions/v1Entity'
+  MatchExpressionList:
+    description: 'eg. {any: {of: [expr1, expr2]}}.'
+    type: object
+    title: List of MatchExpressions that is used for all/any matching
+    properties:
+      of:
+        description: List of subexpressions of the match expression.
+        type: array
+        items:
+          $ref: '#/definitions/v1MatchExpression'
   PreviewFlowLabelsResponseFlowLabels:
     type: object
     properties:
@@ -460,6 +518,20 @@ definitions:
         $ref: '#/definitions/EntityCacheEntities'
       entities_by_name:
         $ref: '#/definitions/EntityCacheEntities'
+  v1EqualsMatchExpression:
+    description: Label selector expression of the equal form "label == value".
+    type: object
+    properties:
+      label:
+        description: |-
+          Name of the label to equal match the value.
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
+      value:
+        description: Exact value that the label should be equal to.
+        type: string
   v1GroupStatus:
     description: |-
       Groups is nested structure that holds status information about the node and a
@@ -481,6 +553,124 @@ definitions:
         type: string
       uuid:
         type: string
+  v1K8sLabelMatcherRequirement:
+    description: Label selector requirement which is a selector that contains values,
+      a key, and an operator that relates the key and values.
+    type: object
+    properties:
+      key:
+        description: |-
+          Label key that the selector applies to.
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
+      operator:
+        description: |-
+          Logical operator which represents a key's relationship to a set of values.
+          Valid operators are In, NotIn, Exists and DoesNotExist.
+
+          @gotags: validate:"oneof=In NotIn Exists DoesNotExists"
+        type: string
+        x-go-validate: oneof=In NotIn Exists DoesNotExists
+      values:
+        description: |-
+          An array of string values that relates to the key by an operator.
+          If the operator is In or NotIn, the values array must be non-empty.
+          If the operator is Exists or DoesNotExist, the values array must be empty.
+        type: array
+        items:
+          type: string
+  v1LabelMatcher:
+    description: |-
+      It provides three ways to define requirements:
+      - matchLabels
+      - matchExpressions
+      - arbitrary expression
+
+      If multiple requirements are set, they are all ANDed.
+      An empty label matcher always matches.
+    type: object
+    title: |-
+      Allows to define rules whether a map of
+      [labels](/concepts/flow-control/flow-label.md)
+      should be considered a match or not
+    properties:
+      expression:
+        description: An arbitrary expression to be evaluated on the labels.
+        $ref: '#/definitions/v1MatchExpression'
+      match_expressions:
+        description: |-
+          List of k8s-style label matcher requirements.
+
+          Note: The requirements are ANDed.
+        type: array
+        items:
+          $ref: '#/definitions/v1K8sLabelMatcherRequirement'
+      match_labels:
+        description: |-
+          A map of {key,value} pairs representing labels to be matched.
+          A single {key,value} in the matchLabels requires that the label "key" is present and equal to "value".
+
+          Note: The requirements are ANDed.
+        type: object
+        additionalProperties:
+          type: string
+  v1MatchExpression:
+    description: |-
+      MatchExpression has multiple variants, exactly one should be set.
+
+      Example:
+      ```yaml
+      all:
+        of:
+          - label_exists: foo
+          - label_equals: { label = app, value = frobnicator }
+      ```
+    type: object
+    title: Defines a [map<string, string> → bool] expression to be evaluated on labels
+    properties:
+      all:
+        description: The expression is true when all subexpressions are true.
+        $ref: '#/definitions/MatchExpressionList'
+      any:
+        description: The expression is true when any subexpression is true.
+        $ref: '#/definitions/MatchExpressionList'
+      label_equals:
+        description: The expression is true when label value equals given value.
+        $ref: '#/definitions/v1EqualsMatchExpression'
+      label_exists:
+        description: |-
+          The expression is true when label with given name exists.
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
+      label_matches:
+        description: The expression is true when label matches given regex.
+        $ref: '#/definitions/v1MatchesMatchExpression'
+      not:
+        description: The expression negates the result of subexpression.
+        $ref: '#/definitions/v1MatchExpression'
+  v1MatchesMatchExpression:
+    description: Label selector expression of the matches form "label matches regex".
+    type: object
+    properties:
+      label:
+        description: |-
+          Name of the label to match the regular expression.
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
+      regex:
+        description: |-
+          Regular expression that should match the label value.
+          It uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
   v1Peer:
     description: Peer holds peer info and services.
     type: object
