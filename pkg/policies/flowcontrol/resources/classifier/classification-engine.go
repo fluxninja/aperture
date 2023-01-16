@@ -22,7 +22,14 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-type multiMatcherByControlPoint map[selectors.ControlPointID]*multimatcher.MultiMatcher[int, []*compiler.LabelerWithSelector]
+type multiMatcherResult struct {
+	labelers []*compiler.LabelerWithSelector
+	previews []iface.HTTPRequestPreview
+}
+
+type (
+	multiMatcherByControlPoint map[selectors.ControlPointID]*multimatcher.MultiMatcher[int, multiMatcherResult]
+)
 
 // rules is a helper struct to keep both compiled and uncompiled sets of rules in sync.
 type rules struct {
@@ -34,10 +41,11 @@ type rules struct {
 
 // ClassificationEngine receives classification policies and provides Classify method.
 type ClassificationEngine struct {
-	mu                 sync.Mutex
+	rulesMutex         sync.Mutex
 	activeRules        atomic.Value
 	classifierMapMutex sync.RWMutex
 	registry           status.Registry
+	activePreviews     map[iface.PreviewID]iface.HTTPRequestPreview
 	activeRulesets     map[rulesetID]compiler.CompiledRuleset
 	classifierMap      map[iface.ClassifierID]iface.Classifier
 	counterVec         *prometheus.CounterVec
@@ -61,6 +69,7 @@ func NewClassificationEngine(registry status.Registry) *ClassificationEngine {
 		activeRulesets: make(map[rulesetID]compiler.CompiledRuleset),
 		registry:       registry,
 		classifierMap:  make(map[iface.ClassifierID]iface.Classifier),
+		activePreviews: make(map[iface.PreviewID]iface.HTTPRequestPreview),
 		counterVec:     counterVector,
 	}
 }
@@ -74,10 +83,18 @@ var (
 
 func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 	flowLabels flowlabel.FlowLabels,
-	mm *multimatcher.MultiMatcher[int, []*compiler.LabelerWithSelector],
+	mm *multimatcher.MultiMatcher[int, multiMatcherResult],
 	labelsForMatching map[string]string,
-	input ast.Value,
+	inputValue map[string]interface{},
 ) (classifierMsgs []*flowcontrolv1.ClassifierInfo) {
+	input, err := ast.InterfaceToValue(inputValue)
+	if err != nil {
+		// RequestToInput should never produce anything that's not convertible
+		// to ast.Value, so in theory it shouldn't happen.
+		// TODO(krdln) metrics
+		return
+	}
+
 	logger := c.registry.GetLogger()
 	appendNewClassifier := func(labelerWithSelector *compiler.LabelerWithSelector, error flowcontrolv1.ClassifierInfo_Error) {
 		classifierMsgs = append(classifierMsgs, &flowcontrolv1.ClassifierInfo{
@@ -89,7 +106,16 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 		})
 	}
 
-	for _, labelerWithSelector := range mm.Match(labelsForMatching) {
+	mmResult := mm.Match(labelsForMatching)
+
+	previews := mmResult.previews
+	for _, preview := range previews {
+		preview.AddHTTPRequestPreview(inputValue)
+	}
+
+	labelers := mmResult.labelers
+
+	for _, labelerWithSelector := range labelers {
 		labeler := labelerWithSelector.Labeler
 		resultSet, err := labeler.Query.Eval(ctx, rego.EvalParsedInput(input))
 		if err != nil {
@@ -149,7 +175,7 @@ func (c *ClassificationEngine) Classify(
 	svcs []string,
 	ctrlPt string,
 	labelsForMatching map[string]string,
-	input ast.Value,
+	input map[string]interface{},
 ) ([]*flowcontrolv1.ClassifierInfo, flowlabel.FlowLabels) {
 	flowLabels := make(flowlabel.FlowLabels)
 
@@ -204,8 +230,8 @@ func (c *ClassificationEngine) AddRules(
 		return ActiveRuleset{}, err
 	}
 
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.rulesMutex.Lock()
+	defer c.rulesMutex.Unlock()
 	// Why index activeRulesets via ID instead of provided name?
 	// * more robust if caller provides non-unique names
 	// * when modifying file, one approach would be to first unload old ruleset
@@ -231,8 +257,8 @@ func (rs ActiveRuleset) Drop() {
 		return
 	}
 	c := rs.classificationEngine
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.rulesMutex.Lock()
+	defer c.rulesMutex.Unlock()
 	delete(c.activeRulesets, rs.id)
 	c.activateRulesets()
 }
@@ -253,20 +279,31 @@ func (c *ClassificationEngine) combineRulesets() rules {
 	// to have unique keys to AddEntry
 	controlPointKeys := make(map[selectors.ControlPointID]int)
 
+	// function to add rules and previews to multimatcher
+	addToMatcher := func(controlPointID selectors.ControlPointID, labelSelector multimatcher.Expr, callback multimatcher.MatchCallback[multiMatcherResult]) error {
+		mm, ok := combined.MultiMatcherByControlPointID[controlPointID]
+		if !ok {
+			mm = multimatcher.New[int, multiMatcherResult]()
+			combined.MultiMatcherByControlPointID[controlPointID] = mm
+		}
+		matcherID := controlPointKeys[controlPointID]
+		controlPointKeys[controlPointID]++
+		err := mm.AddEntry(matcherID, labelSelector, callback)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to add entry to catchall multimatcher")
+			return err
+		}
+		return nil
+	}
+
 	for _, ruleset := range c.activeRulesets {
 		combined.ReportedRules = append(combined.ReportedRules, ruleset.ReportedRules...)
 		for i := range ruleset.Labelers {
 			labelerWithSelector := &ruleset.Labelers[i]
-			mm, ok := combined.MultiMatcherByControlPointID[ruleset.ControlPointID]
-			if !ok {
-				mm = multimatcher.New[int, []*compiler.LabelerWithSelector]()
-				combined.MultiMatcherByControlPointID[ruleset.ControlPointID] = mm
-			}
-
-			matcherID := controlPointKeys[ruleset.ControlPointID]
-			controlPointKeys[ruleset.ControlPointID]++
-
-			err := mm.AddEntry(matcherID, labelerWithSelector.LabelSelector, multimatcher.Appender(labelerWithSelector))
+			err := addToMatcher(ruleset.ControlPointID, labelerWithSelector.LabelSelector, func(mmr multiMatcherResult) multiMatcherResult {
+				mmr.labelers = append(mmr.labelers, labelerWithSelector)
+				return mmr
+			})
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to add entry to catchall multimatcher")
 				return rules{}
@@ -274,6 +311,23 @@ func (c *ClassificationEngine) combineRulesets() rules {
 		}
 	}
 
+	// add activePreviews
+	for _, preview := range c.activePreviews {
+		selector, err := selectors.FromProto(preview.GetFlowSelector())
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to parse selector")
+			continue
+		}
+		controlPointID := selector.ControlPointID()
+		err = addToMatcher(controlPointID, selector.LabelMatcher(), func(mmr multiMatcherResult) multiMatcherResult {
+			mmr.previews = append(mmr.previews, preview)
+			return mmr
+		})
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to add preview entry to multimatcher")
+			continue
+		}
+	}
 	return combined
 }
 
@@ -288,6 +342,22 @@ func (c *ClassificationEngine) RegisterClassifier(classifier iface.Classifier) e
 	}
 
 	return nil
+}
+
+// AddPreview adds a preview to the active previews.
+func (c *ClassificationEngine) AddPreview(preview iface.HTTPRequestPreview) {
+	c.rulesMutex.Lock()
+	defer c.rulesMutex.Unlock()
+	c.activePreviews[preview.GetPreviewID()] = preview
+	c.activateRulesets()
+}
+
+// DropPreview removes a preview from the active previews.
+func (c *ClassificationEngine) DropPreview(preview iface.HTTPRequestPreview) {
+	c.rulesMutex.Lock()
+	defer c.rulesMutex.Unlock()
+	delete(c.activePreviews, preview.GetPreviewID())
+	c.activateRulesets()
 }
 
 // UnregisterClassifier removes classifier from map.

@@ -10,8 +10,8 @@ import (
 // Module returns an fx.Option that provides the discovery module.
 func Module() fx.Option {
 	return fx.Options(
+		kubernetes.Module(),
 		fx.Invoke(
-			kubernetes.InvokeKubernetesServiceDiscovery,
 			static.InvokeStaticServiceDiscovery,
 		),
 	)

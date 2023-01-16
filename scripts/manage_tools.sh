@@ -47,7 +47,7 @@ add_plugins() {
 		if ! array_contains "${plugin}" "${added_plugins[@]}"; then
 			printf 'Adding asdf plugin: "%s"\n' "${plugin}"
 			if [[ $plugin == "circleci" ]]; then
-				asdf plugin add circleci ${plugin_repo_list[circleci_plugin]}
+				asdf plugin add circleci "${plugin_repo_list[circleci_plugin]}"
 			else
 				asdf plugin add "${plugin}"
 			fi

@@ -5,7 +5,6 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/open-policy-agent/opa/ast"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
@@ -480,18 +479,16 @@ func fl(s string) flowlabel.FlowLabelValue {
 	}
 }
 
-func attributesWithHeaders(headers object) ast.Value {
-	return ast.MustInterfaceToValue(
-		object{
-			"attributes": object{
-				"request": object{
-					"http": object{
-						"headers": headers,
-					},
+func attributesWithHeaders(headers object) object {
+	return object{
+		"attributes": object{
+			"request": object{
+				"http": object{
+					"headers": headers,
 				},
 			},
 		},
-	)
+	}
 }
 
 func headerExtractor(headerName string) *policylangv1.Rule_Extractor {

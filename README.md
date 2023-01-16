@@ -23,8 +23,9 @@
 
 ## 🥷 What is FluxNinja Aperture?
 
-Aperture is the first open-source flow control and reliability management
-platform for modern cloud applications.
+Aperture is a reliability automation platform for cloud native applications.
+Aperture adaptively protects and recovers applications from outages by
+techniques such as concurrency limiting, rate limiting and auto-scaling.
 
 <p align="center">
   <picture>
@@ -71,7 +72,7 @@ analyzing, and actuating, facilitated by agents and a controller.
 
 ## 🏗️ Architecture
 
-![Aperture Architecture Overview](./docs/content/assets/gen/introduction/architecture_simple.mmd.svg)
+![Aperture Architecture Overview](./docs/content/assets/diagrams/architecture/architecture_simple.mmd.svg)
 
 ## 🏁 Getting Started
 
