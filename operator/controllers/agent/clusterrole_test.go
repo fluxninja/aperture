@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	. "github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -61,7 +62,12 @@ var _ = Describe("clusterRoleForAgent", func() {
 				Rules: []rbacv1.PolicyRule{
 					{
 						APIGroups: []string{""},
-						Resources: []string{"services", "events", "endpoints", "pods", "nodes", "namespaces", "componentstatuses"},
+						Resources: []string{"pods", "nodes"},
+						Verbs:     []string{"get", "list", "watch"},
+					},
+					{
+						APIGroups: []string{""},
+						Resources: []string{"services", "events", "endpoints", "namespaces", "componentstatuses"},
 						Verbs:     []string{"get", "list", "watch"},
 					},
 					{
@@ -72,11 +78,6 @@ var _ = Describe("clusterRoleForAgent", func() {
 						APIGroups: []string{""},
 						Resources: []string{"nodes/metrics", "nodes/spec", "nodes/proxy", "nodes/stats"},
 						Verbs:     []string{"get"},
-					},
-					{
-						APIGroups: []string{""},
-						Resources: []string{"events"},
-						Verbs:     []string{"create", "patch"},
 					},
 				},
 			}
@@ -102,6 +103,13 @@ var _ = Describe("clusterRoleForAgent", func() {
 						Labels:      TestMap,
 						Annotations: TestMap,
 					},
+					ConfigSpec: agentv1alpha1.AgentConfigSpec{
+						ServiceDiscoverySpec: common.ServiceDiscoverySpec{
+							KubernetesDiscoveryConfig: kubernetes.KubernetesDiscoveryConfig{
+								AutoscaleEnabled: true,
+							},
+						},
+					},
 				},
 			}
 
@@ -124,7 +132,12 @@ var _ = Describe("clusterRoleForAgent", func() {
 				Rules: []rbacv1.PolicyRule{
 					{
 						APIGroups: []string{""},
-						Resources: []string{"services", "events", "endpoints", "pods", "nodes", "namespaces", "componentstatuses"},
+						Resources: []string{"pods", "nodes"},
+						Verbs:     []string{"get", "list", "watch"},
+					},
+					{
+						APIGroups: []string{""},
+						Resources: []string{"services", "events", "endpoints", "namespaces", "componentstatuses"},
 						Verbs:     []string{"get", "list", "watch"},
 					},
 					{
@@ -137,9 +150,135 @@ var _ = Describe("clusterRoleForAgent", func() {
 						Verbs:     []string{"get"},
 					},
 					{
+						APIGroups: []string{"*"},
+						Resources: []string{"*"},
+						Verbs:     []string{"get", "list", "watch"},
+					},
+					{
+						APIGroups: []string{"*"},
+						Resources: []string{"*/scale"},
+						Verbs:     []string{"get", "update", "patch"},
+					},
+				},
+			}
+
+			result := clusterRoleForAgent(instance.DeepCopy())
+			Expect(result).To(Equal(expected))
+		})
+	})
+
+	Context("Instance with sidecar mode enabled", func() {
+		It("returns correct ClusterRole", func() {
+			instance := &agentv1alpha1.Agent{
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Agent",
+					APIVersion: "fluxninja.com/v1alpha1",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      AppName,
+					Namespace: AppName,
+				},
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						Labels:      TestMap,
+						Annotations: TestMap,
+					},
+					Sidecar: agentv1alpha1.SidecarSpec{
+						Enabled: true,
+					},
+				},
+			}
+
+			expected := &rbacv1.ClusterRole{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: AgentServiceName,
+					Labels: map[string]string{
+						"app.kubernetes.io/name":       AppName,
+						"app.kubernetes.io/instance":   AppName,
+						"app.kubernetes.io/managed-by": OperatorName,
+						"app.kubernetes.io/component":  OperatorName,
+						Test:                           Test,
+					},
+					Annotations: map[string]string{
+						"fluxninja.com/primary-resource-type": "Agent.fluxninja.com",
+						"fluxninja.com/primary-resource":      fmt.Sprintf("%s/%s", AppName, AppName),
+						Test:                                  Test,
+					},
+				},
+				Rules: []rbacv1.PolicyRule{
+					{
 						APIGroups: []string{""},
-						Resources: []string{"events"},
-						Verbs:     []string{"create", "patch"},
+						Resources: []string{"pods", "nodes"},
+						Verbs:     []string{"get", "list", "watch"},
+					},
+				},
+			}
+
+			result := clusterRoleForAgent(instance.DeepCopy())
+			Expect(result).To(Equal(expected))
+		})
+	})
+
+	Context("Instance with auto scale and sidecar mode enabled", func() {
+		It("returns correct ClusterRole", func() {
+			instance := &agentv1alpha1.Agent{
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Agent",
+					APIVersion: "fluxninja.com/v1alpha1",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      AppName,
+					Namespace: AppName,
+				},
+				Spec: agentv1alpha1.AgentSpec{
+					CommonSpec: common.CommonSpec{
+						Labels:      TestMap,
+						Annotations: TestMap,
+					},
+					ConfigSpec: agentv1alpha1.AgentConfigSpec{
+						ServiceDiscoverySpec: common.ServiceDiscoverySpec{
+							KubernetesDiscoveryConfig: kubernetes.KubernetesDiscoveryConfig{
+								AutoscaleEnabled: true,
+							},
+						},
+					},
+					Sidecar: agentv1alpha1.SidecarSpec{
+						Enabled: true,
+					},
+				},
+			}
+
+			expected := &rbacv1.ClusterRole{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: AgentServiceName,
+					Labels: map[string]string{
+						"app.kubernetes.io/name":       AppName,
+						"app.kubernetes.io/instance":   AppName,
+						"app.kubernetes.io/managed-by": OperatorName,
+						"app.kubernetes.io/component":  OperatorName,
+						Test:                           Test,
+					},
+					Annotations: map[string]string{
+						"fluxninja.com/primary-resource-type": "Agent.fluxninja.com",
+						"fluxninja.com/primary-resource":      fmt.Sprintf("%s/%s", AppName, AppName),
+						Test:                                  Test,
+					},
+				},
+				Rules: []rbacv1.PolicyRule{
+					{
+						APIGroups: []string{""},
+						Resources: []string{"pods", "nodes"},
+						Verbs:     []string{"get", "list", "watch"},
+					},
+					{
+						APIGroups: []string{"*"},
+						Resources: []string{"*"},
+						Verbs:     []string{"get", "list", "watch"},
+					},
+					{
+						APIGroups: []string{"*"},
+						Resources: []string{"*/scale"},
+						Verbs:     []string{"get", "update", "patch"},
 					},
 				},
 			}

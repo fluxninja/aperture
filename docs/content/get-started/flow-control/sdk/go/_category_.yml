@@ -1,0 +1,8 @@
+label: Go
+position: 2
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Go"
+  keywords: ["go", "control", "points"]

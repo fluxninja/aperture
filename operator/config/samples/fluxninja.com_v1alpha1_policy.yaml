@@ -150,8 +150,8 @@ spec:
               service: service1-demo-app.demoapp.svc.cluster.local
           load_actuator:
             alerter_config:
-              alert_channels:
-                - example
+              alert_channels: []
+              alert_name: Load Shed Event
             dynamic_config_key: concurrency_limiter
             in_ports:
               load_multiplier:

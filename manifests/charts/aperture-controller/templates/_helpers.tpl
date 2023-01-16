@@ -66,7 +66,7 @@ Create the address of the Prometheus for Aperture Controller
 {{- end -}}
 
 {{/*
-Fetch the endpoint of the FluxNinja cloud instance
+Fetch the endpoint of the FluxNinja ARC instance
 {{ include "controller.fluxNinjaPlugin.endpoint" ( dict "controller" .Values.path.to.the.controller $) }}
 */}}
 {{- define "controller.fluxNinjaPlugin.endpoint" -}}

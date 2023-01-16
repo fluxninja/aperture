@@ -36,6 +36,8 @@
         priority: 20,
       },
       workloads: [],
+      alerterName: 'Load Shed Event',
+      alerterChannels: [],
     },
     /**
     * @section Policy

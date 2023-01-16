@@ -1040,7 +1040,7 @@ spec:
                         type: string
                     type: object
                   fluxninja_plugin:
-                    description: FluxNinja Cloud plugin configuration.
+                    description: FluxNinja ARC plugin configuration.
                     properties:
                       api_key:
                         description: API Key for this agent.

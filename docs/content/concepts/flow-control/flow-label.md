@@ -70,13 +70,14 @@ also takes an explicit `labels` map in the `Check()` call.
 ## Live Previewing Flow Labels
 
 You can discover the labels flowing through services and control points using
-the Introspection API on an `aperture-agent` local to the service instances
-(pods).
+the
+[Introspection API](references/api/agent/flow-preview-service-preview-flow-labels.api.mdx)
+on an `aperture-agent` local to the service instances (pods).
 
 For example:
 
 ```sh
-curl localhost:8080/v1/flowcontrol/preview/labels/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
+curl -X POST localhost:8080/v1/flowcontrol/preview/labels/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
 ```
 
 Returns:
@@ -162,10 +163,10 @@ precedence over:
 
 :::
 
-## Interaction with FluxNinja Cloud plugin {#plugin}
+## Interaction with FluxNinja ARC plugin {#plugin}
 
 All the Flow Labels are used as labels of flow events. These events are rolled
-up and sent to the analytics database in the cloud. This allows:
+up and sent to the analytics database in the FluxNinja ARC. This allows:
 
 - For the Flow Labels to be used as filters or group bys
 - To see analytics for each Flow Label, eg. distribution of its values

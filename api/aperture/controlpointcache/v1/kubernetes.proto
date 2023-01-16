@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package aperture.controlpointcache.v1;
+
+message KubernetesControlPoint {
+  string api_version = 1;
+  string kind = 2;
+  string namespace = 3;
+  string name = 4;
+}

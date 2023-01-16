@@ -58,7 +58,7 @@ Create the address of the Prometheus for Aperture Agent
 {{- end -}}
 
 {{/*
-Fetch the endpoint of the FluxNinja cloud instance
+Fetch the endpoint of the FluxNinja ARC instance
 {{ include "agent.fluxNinjaPlugin.endpoint" ( dict "agent" .Values.path.to.the.agent $) }}
 */}}
 {{- define "agent.fluxNinjaPlugin.endpoint" -}}
