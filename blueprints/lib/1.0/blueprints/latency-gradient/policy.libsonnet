@@ -140,7 +140,9 @@ function(params) {
               + loadActuator.withAlerterConfig(
                 alerterConfig.new()
                 + alerterConfig.withAlertName(c.alerterName)
-                + alerterConfig.withAlertChannels(c.alerterChannels)
+                + alerterConfig.withAlertChannels(
+                  if std.length(c.alerterChannels) != 0 then c.alerterChannels else $._config.policyName
+                )
               )
             )
           ),
