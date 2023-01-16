@@ -874,7 +874,9 @@ definitions:
         description: Input ports for the Alerter component.
       alerter_config:
         $ref: '#/definitions/v1AlerterConfig'
+        description: '@gotags: validate:"required"'
         title: Alerter configuration
+        x-go-validate: required
     description: Alerter reacts to a signal and generates alert to send to alert manager.
   v1AlerterConfig:
     type: object
@@ -910,9 +912,9 @@ definitions:
   v1AlerterIns:
     type: object
     properties:
-      alert:
+      signal:
         $ref: '#/definitions/v1InPort'
-        description: Signal which Alerter is monitoring.
+        description: Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.
     description: Inputs for the Alerter component.
   v1ArithmeticCombinator:
     type: object
@@ -1172,9 +1174,6 @@ definitions:
       first_valid:
         $ref: '#/definitions/v1FirstValid'
         description: Picks the first valid input signal and emits it.
-      sink:
-        $ref: '#/definitions/v1Sink'
-        description: Sink is a sink component that does nothing.
       alerter:
         $ref: '#/definitions/v1Alerter'
         description: Alerter reacts to a signal and generates alert to send to alert manager.
@@ -2858,25 +2857,6 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/v1OverlappingService'
-  v1Sink:
-    type: object
-    properties:
-      in_ports:
-        $ref: '#/definitions/v1SinkIns'
-        description: Input ports for the Sink component.
-    title: Sink is a component that consumes input signals and does nothing with them
-  v1SinkIns:
-    type: object
-    properties:
-      inputs:
-        type: array
-        items:
-          $ref: '#/definitions/v1InPort'
-        description: |-
-          Array of input signals.
-
-          @gotags: validate:"dive"
-    description: Inputs for the Sink component.
   v1Sqrt:
     type: object
     properties:

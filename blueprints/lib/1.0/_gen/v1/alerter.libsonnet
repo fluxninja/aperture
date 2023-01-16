@@ -2,7 +2,7 @@ local alerterins = import './alerterins.libsonnet';
 {
   new():: {
     in_ports: {
-      alert: error 'Port alert is missing',
+      signal: error 'Port signal is missing',
     },
   },
   inPorts:: alerterins,

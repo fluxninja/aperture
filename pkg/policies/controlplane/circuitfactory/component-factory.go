@@ -62,8 +62,6 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.Extrapolator, components.NewExtrapolatorAndOptions)
 	case *policylangv1.Component_FirstValid:
 		ctor = mkCtor(config.FirstValid, components.NewFirstValidAndOptions)
-	case *policylangv1.Component_Sink:
-		ctor = mkCtor(config.Sink, components.NewSinkAndOptions)
 	case *policylangv1.Component_Alerter:
 		ctor = mkCtor(config.Alerter, components.NewAlerterAndOptions)
 	case *policylangv1.Component_Integrator:

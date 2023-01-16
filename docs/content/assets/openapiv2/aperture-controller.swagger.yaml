@@ -512,7 +512,9 @@ definitions:
     type: object
     properties:
       alerter_config:
+        description: '@gotags: validate:"required"'
         title: Alerter configuration
+        x-go-validate: required
         $ref: '#/definitions/v1AlerterConfig'
       in_ports:
         description: Input ports for the Alerter component.
@@ -553,8 +555,9 @@ definitions:
     description: Inputs for the Alerter component.
     type: object
     properties:
-      alert:
-        description: Signal which Alerter is monitoring.
+      signal:
+        description: Signal which Alerter is monitoring. If the signal greater than
+          0, Alerter generates an alert.
         $ref: '#/definitions/v1InPort'
   v1ArithmeticCombinator:
     type: object
@@ -778,9 +781,6 @@ definitions:
       rate_limiter:
         description: Rate Limiter provides service protection by applying rate limiter.
         $ref: '#/definitions/v1RateLimiter'
-      sink:
-        description: Sink is a sink component that does nothing.
-        $ref: '#/definitions/v1Sink'
       sqrt:
         description: Takes an input signal and emits the square root of the input
           signal.
@@ -2245,25 +2245,6 @@ definitions:
           One entity may belong to multiple services.
           :::
         type: string
-  v1Sink:
-    type: object
-    title: Sink is a component that consumes input signals and does nothing with them
-    properties:
-      in_ports:
-        description: Input ports for the Sink component.
-        $ref: '#/definitions/v1SinkIns'
-  v1SinkIns:
-    description: Inputs for the Sink component.
-    type: object
-    properties:
-      inputs:
-        description: |-
-          Array of input signals.
-
-          @gotags: validate:"dive"
-        type: array
-        items:
-          $ref: '#/definitions/v1InPort'
   v1Sqrt:
     description: |-
       $$

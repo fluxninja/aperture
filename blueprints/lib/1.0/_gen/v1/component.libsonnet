@@ -97,12 +97,6 @@
   withRateLimiterMixin(rate_limiter):: {
     rate_limiter+: rate_limiter,
   },
-  withSink(sink):: {
-    sink: sink,
-  },
-  withSinkMixin(sink):: {
-    sink+: sink,
-  },
   withSqrt(sqrt):: {
     sqrt: sqrt,
   },
