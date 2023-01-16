@@ -937,7 +937,7 @@ message LoadActuator {
   // Default configuration.
   DynamicConfig default_config = 3;
 
-  // Configuration for embedded alerter.
+  // Configuration for embedded alerter. No alerts are generated if this configuration is not provided.
   AlerterConfig alerter_config = 4;
 }
 
@@ -1119,10 +1119,10 @@ message AlerterConfig {
   // Name of the alert.
   string alert_name = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
-      key: "x-go-default"
-      value: {string_value: "alert"}
+      key: "x-go-validate"
+      value: {string_value: "required"}
     }
-  }]; // @gotags: default:"alert"
+  }]; // @gotags: validate:"required"
 
   // Severity of the alert, one of 'info', 'warn' or 'crit'.
   string severity = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

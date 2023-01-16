@@ -463,9 +463,9 @@ AlerterConfig is a common config for separate alerter components and alerters em
 <dt>alert_name</dt>
 <dd>
 
-(string, default: `alert`) Name of the alert.
+(string, `required`) Name of the alert.
 
-@gotags: default:"alert"
+@gotags: validate:"required"
 
 </dd>
 <dt>severity</dt>
@@ -2106,7 +2106,7 @@ Takes the load multiplier input signal and publishes it to the schedulers in the
 <dt>alerter_config</dt>
 <dd>
 
-([V1AlerterConfig](#v1-alerter-config)) Configuration for embedded alerter.
+([V1AlerterConfig](#v1-alerter-config)) Configuration for embedded alerter. No alerts are generated if this configuration is not provided.
 
 </dd>
 </dl>

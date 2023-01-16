@@ -533,9 +533,9 @@ definitions:
         description: |-
           Name of the alert.
 
-          @gotags: default:"alert"
+          @gotags: validate:"required"
         type: string
-        x-go-default: alert
+        x-go-validate: required
       resolve_timeout:
         description: |-
           Duration of alert resolver.
@@ -1670,7 +1670,8 @@ definitions:
       in the data-plane
     properties:
       alerter_config:
-        description: Configuration for embedded alerter.
+        description: Configuration for embedded alerter. No alerts are generated if
+          this configuration is not provided.
         $ref: '#/definitions/v1AlerterConfig'
       default_config:
         description: Default configuration.
