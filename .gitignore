@@ -1,3 +1,6 @@
+### ignore api docs (all mdx files) located at docs/content/references/api
+docs/content/references/api/**/*.mdx
+
 dist/
 build/
 .gradle/
