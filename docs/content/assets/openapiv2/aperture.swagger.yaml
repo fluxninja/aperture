@@ -886,8 +886,8 @@ definitions:
         description: |-
           Name of the alert.
 
-          @gotags: default:"alert"
-        x-go-default: alert
+          @gotags: validate:"required"
+        x-go-validate: required
       severity:
         type: string
         description: |-
@@ -2169,7 +2169,7 @@ definitions:
         description: Default configuration.
       alerter_config:
         $ref: '#/definitions/v1AlerterConfig'
-        description: Configuration for embedded alerter.
+        description: Configuration for embedded alerter. No alerts are generated if this configuration is not provided.
     title: Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
   v1LoadActuatorDynamicConfig:
     type: object

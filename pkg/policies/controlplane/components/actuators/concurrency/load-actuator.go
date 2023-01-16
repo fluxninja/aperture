@@ -5,13 +5,11 @@ import (
 	"fmt"
 	"path"
 	"strconv"
-	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/durationpb"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
@@ -67,16 +65,7 @@ func NewLoadActuatorAndOptions(
 		dryRun:            dryRun,
 	}
 
-	alerterConfig := loadActuatorProto.GetAlerterConfig()
-	if alerterConfig == nil {
-		alerterConfig = &policylangv1.AlerterConfig{
-			AlertName:      "Load Shed Event",
-			Severity:       "info",
-			ResolveTimeout: durationpb.New(5 * time.Second),
-			AlertChannels:  make([]string, 0),
-		}
-	}
-	lsa.alerterConfig = alerterConfig
+	lsa.alerterConfig = loadActuatorProto.GetAlerterConfig()
 
 	return lsa, fx.Options(
 		fx.Invoke(lsa.setupWriter),
@@ -123,7 +112,7 @@ func (la *LoadActuator) Execute(inPortReadings runtime.PortToValue, tickInfo run
 				}
 
 				if lmReading.Value() < 1 {
-					la.alerterIface.AddAlert(la.createAlert())
+					la.addAlert()
 				}
 				return nil, la.publishDecision(tickInfo, lmValue, false)
 			} else {
@@ -197,11 +186,16 @@ func (la *LoadActuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplie
 	return nil
 }
 
-func (la *LoadActuator) createAlert() *alerts.Alert {
-	newAlert := alerts.NewAlert(
+func (la *LoadActuator) addAlert() {
+	// do not generate alerts if config was not provided
+	if la.alerterConfig == nil {
+		return
+	}
+	alert := alerts.NewAlert(
 		alerts.WithName(la.alerterConfig.AlertName),
 		alerts.WithSeverity(alerts.ParseSeverity(la.alerterConfig.Severity)),
 		alerts.WithAlertChannels(la.alerterConfig.AlertChannels),
+		alerts.WithResolveTimeout(la.alerterConfig.ResolveTimeout.AsDuration()),
 		alerts.WithLabel("policy_name", la.policyReadAPI.GetPolicyName()),
 		alerts.WithLabel("type", "concurrency_limiter"),
 		alerts.WithLabel("agent_group", la.agentGroupName),
@@ -211,12 +205,5 @@ func (la *LoadActuator) createAlert() *alerts.Alert {
 		),
 	)
 
-	evalTimeout := time.Duration(2 * la.alerterConfig.ResolveTimeout.AsDuration().Milliseconds())
-	timeout, _ := time.ParseDuration("5s")
-	if evalTimeout > timeout {
-		timeout = evalTimeout
-	}
-	newAlert.SetResolveTimeout(timeout)
-
-	return newAlert
+	la.alerterIface.AddAlert(alert)
 }
