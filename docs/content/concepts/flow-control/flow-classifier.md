@@ -69,8 +69,9 @@ the classifier to particular paths.
 ## Live Previewing Requests
 
 You can discover the request attributes flowing through services and control
-points using the Introspection API on an `aperture-agent` local to the service
-instances (pods).
+points using the
+[Introspection API](references/api/agent/flow-preview-service-preview-http-requests.api.mdx)
+on an `aperture-agent` local to the service instances (pods).
 
 For example:
 

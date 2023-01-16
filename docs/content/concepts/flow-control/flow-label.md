@@ -70,8 +70,9 @@ also takes an explicit `labels` map in the `Check()` call.
 ## Live Previewing Flow Labels
 
 You can discover the labels flowing through services and control points using
-the Introspection API on an `aperture-agent` local to the service instances
-(pods).
+the
+[Introspection API](references/api/agent/flow-preview-service-preview-flow-labels.api.mdx)
+on an `aperture-agent` local to the service instances (pods).
 
 For example:
 
