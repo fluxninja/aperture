@@ -76,7 +76,7 @@ the Introspection API on an `aperture-agent` local to the service instances
 For example:
 
 ```sh
-curl localhost:8080/v1/flowcontrol/preview/labels/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
+curl -X POST localhost:8080/v1/flowcontrol/preview/labels/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
 ```
 
 Returns:

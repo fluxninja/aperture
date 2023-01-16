@@ -86,6 +86,7 @@ func (h *Handler) PreviewHTTPRequests(ctx context.Context, req *flowpreviewv1.Pr
 		},
 		FlowMatcher: &policylangv1.FlowMatcher{
 			ControlPoint: req.ControlPoint,
+			LabelMatcher: req.LabelMatcher,
 		},
 	}
 
