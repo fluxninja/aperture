@@ -39,9 +39,11 @@ type KubernetesDiscoveryConfig struct {
 func Module() fx.Option {
 	return fx.Options(
 		notifiers.TrackersConstructor{Name: FxTagBase}.Annotate(),
+		fx.Provide(
+			ProvideControlPointCache,
+		),
 		fx.Invoke(
 			InvokeServiceDiscovery,
-			ProvideControlPointCache,
 		),
 	)
 }
