@@ -655,6 +655,10 @@ definitions:
     x-go-package: github.com/fluxninja/aperture/pkg/jobs
   KubernetesDiscoveryConfig:
     properties:
+      autoscale_enabled:
+        type: boolean
+        x-go-default: "true"
+        x-go-name: AutoscaleEnabled
       discovery_enabled:
         type: boolean
         x-go-default: "true"

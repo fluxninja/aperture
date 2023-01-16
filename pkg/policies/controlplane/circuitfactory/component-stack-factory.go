@@ -7,13 +7,16 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/concurrency"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/horizontalpodscaler"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
 // componentStackFactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
 func componentStackFactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
-	return fx.Options()
+	return fx.Options(
+		horizontalpodscaler.Module(),
+	)
 }
 
 // newComponentStackAndOptions creates components for component stack, sub components and their fx options.
@@ -81,6 +84,64 @@ func newComponentStackAndOptions(
 		}
 
 		return compiledConcurrencyLimiter, compiledComponents, fx.Options(options...), nil
+	} else if horizontalPodScalerProto := componentStackProto.GetHorizontalPodScaler(); horizontalPodScalerProto != nil {
+		var (
+			compiledComponents []runtime.ConfiguredComponent
+			options            []fx.Option
+		)
+		horizontalPodScalerOptions, agentGroupName, horizontalPodScalerErr := horizontalpodscaler.NewHorizontalPodScalerOptions(horizontalPodScalerProto, componentStackIndex, policyReadAPI)
+		if horizontalPodScalerErr != nil {
+			return runtime.ConfiguredComponent{}, nil, nil, horizontalPodScalerErr
+		}
+		// Append horizontalPodScaler options
+		options = append(options, horizontalPodScalerOptions)
+
+		// Scale Reporter
+		if scaleReporterProto := horizontalPodScalerProto.GetScaleReporter(); scaleReporterProto != nil {
+			scaleReporter, scaleReporterOptions, err := horizontalpodscaler.NewScaleReporterAndOptions(scaleReporterProto, componentStackIndex, policyReadAPI, agentGroupName)
+			if err != nil {
+				return runtime.ConfiguredComponent{}, nil, nil, err
+			}
+
+			compiledScaleReporter, err := prepareConfiguredComponent(scaleReporter, scaleReporterProto)
+			if err != nil {
+				return runtime.ConfiguredComponent{}, nil, nil, err
+			}
+
+			// Append scaleReporter as a runtime.ConfiguredComponent
+			compiledComponents = append(compiledComponents, compiledScaleReporter)
+
+			// Append scaleReporter options
+			options = append(options, scaleReporterOptions)
+		}
+
+		// Scale Actuator
+		if scaleActuatorProto := horizontalPodScalerProto.GetScaleActuator(); scaleActuatorProto != nil {
+			scaleActuator, scaleActuatorOptions, err := horizontalpodscaler.NewScaleActuatorAndOptions(scaleActuatorProto, componentStackIndex, policyReadAPI, agentGroupName)
+			if err != nil {
+				return runtime.ConfiguredComponent{}, nil, nil, err
+			}
+
+			compiledScaleActuator, err := prepareConfiguredComponent(scaleActuator, scaleActuatorProto)
+			if err != nil {
+				return runtime.ConfiguredComponent{}, nil, nil, err
+			}
+			// Append scaleActuator as a runtime.ConfiguredComponent
+			compiledComponents = append(compiledComponents, compiledScaleActuator)
+
+			// Append scaleActuator options
+			options = append(options, scaleActuatorOptions)
+		}
+
+		compiledHorizontalPodScaler, err := prepareConfiguredComponent(
+			runtime.NewDummyComponent("HorizontalPodScaler"),
+			horizontalPodScalerProto,
+		)
+		if err != nil {
+			return runtime.ConfiguredComponent{}, nil, nil, err
+		}
+
+		return compiledHorizontalPodScaler, compiledComponents, fx.Options(options...), nil
 	}
 	return runtime.ConfiguredComponent{}, nil, nil, fmt.Errorf("unsupported/missing component type")
 }

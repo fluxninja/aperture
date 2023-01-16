@@ -1,20 +1,29 @@
 package k8s
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/go-logr/zerologr"
 	"go.uber.org/fx"
+	autoscalingv1 "k8s.io/api/autoscaling/v1"
+	apimeta "k8s.io/apimachinery/pkg/api/meta"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	cacheddiscovery "k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/restmapper"
+	"k8s.io/client-go/scale"
 	"k8s.io/client-go/transport"
 	"k8s.io/klog/v2"
 
 	"github.com/fluxninja/aperture/pkg/log"
 	commonhttp "github.com/fluxninja/aperture/pkg/net/http"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 var (
@@ -36,7 +45,8 @@ var (
 // K8sClientConstructorIn holds parameter for Providek8sClient and Providek8sDynamicClient.
 type K8sClientConstructorIn struct {
 	fx.In
-	K8sClient *http.Client `name:"k8s-http-client"`
+	HTTPClient *http.Client `name:"k8s-http-client"`
+	Shutdowner fx.Shutdowner
 }
 
 // Module provides a K8sClient.
@@ -47,65 +57,58 @@ func Module() fx.Option {
 	)
 }
 
-// Providek8sDynamicClient provides a dynamic kubernetes client.
-func Providek8sDynamicClient(in K8sClientConstructorIn) (dynamic.Interface, error) {
-	dynamicClient, err := newk8sDynamicClient(in.K8sClient)
-	if err != nil {
-		log.Error().Err(err).Msg("Unable to create new dynamic client!")
-		return nil, err
-	}
-
-	return dynamicClient, nil
-}
-
-func newk8sDynamicClient(client *http.Client) (dynamic.Interface, error) {
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	// client-go does not allow custom Transport when TLS is enabled.
-	// We need to extract TLS settings from inClusterConfig and put them in our
-	// custom transport.
-	transportConfig, err := config.TransportConfig()
-	if err != nil {
-		return nil, fmt.Errorf("creating transport config: %v", err)
-	}
-	tlsConfig, err := transport.TLSConfigFor(transportConfig)
-	if err != nil {
-		return nil, fmt.Errorf("creating TLS Config: %v", err)
-	}
-	transport := client.Transport.(*http.Transport)
-	transport.TLSClientConfig = tlsConfig
-
-	// as TLS config is provided inside our custom transport, we need to erase
-	// TLS settings here.
-	config.TLSClientConfig = rest.TLSClientConfig{}
-	config.Transport = transport
-	config.Timeout = client.Timeout
-
-	return dynamic.NewForConfig(config)
-}
-
 // K8sClient provides an interface for kubernetes client.
 type K8sClient interface {
 	GetClientSet() *kubernetes.Clientset
-	GetErr() error
-	GetErrNotInCluster() bool
+	GetScaleClient() scale.ScalesGetter
+	GetDynamicClient() dynamic.Interface
+	GetRESTMapper() apimeta.RESTMapper
+	ScaleForGroupKind(context.Context, string, string, schema.GroupKind) (*autoscalingv1.Scale, schema.GroupResource, error)
 }
 
-// RealK8sClient implements kubernetes client set.
+// RealK8sClient provides access to Kubernetes Clients.
 type RealK8sClient struct {
-	clientSet *kubernetes.Clientset
-	err       error
+	clientSet     *kubernetes.Clientset
+	scaleClient   scale.ScalesGetter
+	dynamicClient dynamic.Interface
+	mapper        apimeta.RESTMapper
 }
+
+// RealK8sClient implements K8sClient.
+var _ K8sClient = &RealK8sClient{}
 
 // NewK8sClient returns a new kubernetes client.
-func NewK8sClient(clientSet *kubernetes.Clientset, err error) *RealK8sClient {
-	return &RealK8sClient{
-		clientSet: clientSet,
-		err:       err,
+func NewK8sClient(httpClient *http.Client, shutdowner fx.Shutdowner) (*RealK8sClient, error) {
+	clientSet, config, err := newK8sClientSet(httpClient, shutdowner)
+	if err != nil {
+		return nil, err
 	}
+	zerolog := log.WithComponent("k8s-client").GetZerolog()
+	klog.SetLogger(zerologr.New(zerolog))
+
+	discoveryClient := clientSet.DiscoveryClient
+	cachedDiscoveryClient := cacheddiscovery.NewMemCacheClient(discoveryClient)
+	mapper := restmapper.NewDeferredDiscoveryRESTMapper(cachedDiscoveryClient)
+	scaleKindResolver := scale.NewDiscoveryScaleKindResolver(discoveryClient)
+	scaleClient, err := scale.NewForConfig(config, mapper, dynamic.LegacyAPIPathResolverFunc, scaleKindResolver)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Unexpected error, unable to create Kubernetes Scale Client")
+		utils.Shutdown(shutdowner)
+		return nil, err
+	}
+	dynamicClient, err := dynamic.NewForConfig(config)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Unexpected error, unable to create Kubernetes Dynamic Client")
+		utils.Shutdown(shutdowner)
+		return nil, err
+	}
+
+	return &RealK8sClient{
+		clientSet:     clientSet,
+		scaleClient:   scaleClient,
+		dynamicClient: dynamicClient,
+		mapper:        mapper,
+	}, nil
 }
 
 // GetClientSet returns the kubernetes client set.
@@ -113,40 +116,78 @@ func (r *RealK8sClient) GetClientSet() *kubernetes.Clientset {
 	return r.clientSet
 }
 
-// GetErr returns the error of the client.
-func (r *RealK8sClient) GetErr() error {
-	return r.err
+// GetScaleClient returns the kubernetes scale client.
+func (r *RealK8sClient) GetScaleClient() scale.ScalesGetter {
+	return r.scaleClient
 }
 
-// GetErrNotInCluster returns true if client's error equals to ErrNotInCluster, unable to load in-cluster configuration.
-func (r *RealK8sClient) GetErrNotInCluster() bool {
-	return r.err == rest.ErrNotInCluster
+// GetDynamicClient returns the kubernetes dynamic client.
+func (r *RealK8sClient) GetDynamicClient() dynamic.Interface {
+	return r.dynamicClient
+}
+
+// GetRESTMapper returns the rest mapper.
+func (r *RealK8sClient) GetRESTMapper() apimeta.RESTMapper {
+	return r.mapper
+}
+
+// ScaleForGroupKind attempts to fetch the scale for the given Group and Kind.
+// The possible Resources for the group and kind are retrieved. Scale is fetched
+// for each Resource in the RESTMapping with the given name and namespace, until
+// a working one is found.  If none work, the first error is returned.  It returns
+// both the scale, as well as the group-resource from the working mapping.
+func (r *RealK8sClient) ScaleForGroupKind(ctx context.Context, namespace, name string, groupKind schema.GroupKind) (*autoscalingv1.Scale, schema.GroupResource, error) {
+	mappings, err := r.mapper.RESTMappings(groupKind)
+	if err != nil {
+		return nil, schema.GroupResource{}, err
+	}
+	var firstErr error
+	for i, mapping := range mappings {
+		targetGR := mapping.Resource.GroupResource()
+		scale, err := r.scaleClient.Scales(namespace).Get(ctx, targetGR, name, metav1.GetOptions{})
+		if err == nil {
+			return scale, targetGR, nil
+		}
+
+		// if this is the first error, remember it,
+		// then go on and try other mappings until we find a good one
+		if i == 0 {
+			firstErr = err
+		}
+	}
+
+	// make sure we handle an empty set of mappings
+	if firstErr == nil {
+		firstErr = fmt.Errorf("unrecognized resource")
+	}
+
+	return nil, schema.GroupResource{}, firstErr
 }
 
 // Providek8sClient provides a new kubernetes client and sets logger.
-func Providek8sClient(in K8sClientConstructorIn) K8sClient {
-	k8sClientSet, err := newk8sClientSetAndErr(in.K8sClient)
-	if err != nil {
-		log.Debug().Err(err).Msg("K8s clientset could not be created")
-	}
-	zerolog := log.WithComponent("k8s-client").GetZerolog()
-	klog.SetLogger(zerologr.New(zerolog))
-	return NewK8sClient(k8sClientSet, err)
+func Providek8sClient(in K8sClientConstructorIn) (K8sClient, error) {
+	return NewK8sClient(in.HTTPClient, in.Shutdowner)
 }
 
-func newk8sClientSetAndErr(client *http.Client) (*kubernetes.Clientset, error) {
+func newK8sClientSet(client *http.Client, shutdowner fx.Shutdowner) (*kubernetes.Clientset, *rest.Config, error) {
 	config, err := rest.InClusterConfig()
 	if err != nil {
-		return nil, err
+		log.Info().Msg("Not in Kubernetes cluster, could not create Kubernetes client")
+		return nil, nil, err
 	}
 
 	transportConfig, err := config.TransportConfig()
 	if err != nil {
-		return nil, fmt.Errorf("creating transport config: %v", err)
+		// Call shutdowner to catch this issue early since Kubernetes Client is marked as optional downstream.
+		log.Fatal().Err(err).Msg("Unexpected error creating Kubernetes Client's transport config")
+		utils.Shutdown(shutdowner)
+		return nil, nil, err
 	}
 	tlsConfig, err := transport.TLSConfigFor(transportConfig)
 	if err != nil {
-		return nil, fmt.Errorf("creating TLS Config: %v", err)
+		log.Fatal().Err(err).Msg("Unexpected error creating Kubernetes Client's TLS Config")
+		utils.Shutdown(shutdowner)
+		return nil, nil, err
 	}
 	transport := client.Transport.(*http.Transport)
 	transport.TLSClientConfig = tlsConfig
@@ -154,5 +195,11 @@ func newk8sClientSetAndErr(client *http.Client) (*kubernetes.Clientset, error) {
 	config.TLSClientConfig = rest.TLSClientConfig{}
 	config.Transport = transport
 	config.Timeout = client.Timeout
-	return kubernetes.NewForConfig(config)
+	clientSet, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Unexpected error creating Kubernetes Client")
+		utils.Shutdown(shutdowner)
+		return nil, nil, err
+	}
+	return clientSet, config, nil
 }

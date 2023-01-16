@@ -49,9 +49,11 @@ value to the scheduler:
 
 :::tip
 
-You can
-[discover flow labels](/concepts/flow-control/flow-label.md#live-previewing-flow-labels)
-by live previewing them via introspection API .
+You can quickly write classification rules on
+[HTTP requests](concepts/flow-control/flow-classifier.md#live-previewing-requests)
+and define scheduler priorities on
+[flow labels](concepts/flow-control/flow-label.md#live-previewing-flow-labels)
+by live previewing them first via introspection APIs.
 
 :::
 

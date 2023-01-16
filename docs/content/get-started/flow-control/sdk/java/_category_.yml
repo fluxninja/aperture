@@ -1,0 +1,8 @@
+label: Java
+position: 3
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Java"
+  keywords: ["java", "control", "points"]

@@ -450,11 +450,11 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 			}
 			deletedCount := conLimiter.concurrencyLimiterFactory.workloadLatencySummaryVec.DeletePartialMatch(metricLabels)
 			if deletedCount == 0 {
-				errMulti = multierr.Append(errMulti, errors.New("failed to delete workload_latency_ms summary from its metric vector"))
+				log.Warn().Msg("Could not delete workload_latency_ms summary from its metric vector. No traffic to generate metrics?")
 			}
 			deletedCount = conLimiter.concurrencyLimiterFactory.workloadCounterVec.DeletePartialMatch(metricLabels)
 			if deletedCount == 0 {
-				errMulti = multierr.Append(errMulti, errors.New("failed to delete workload_requests_total counter from its metric vector"))
+				log.Warn().Msg("Could not delete workload_requests_total counter from its metric vector. No traffic to generate metrics?")
 			}
 
 			conLimiter.registry.SetStatus(status.NewStatus(nil, errMulti))

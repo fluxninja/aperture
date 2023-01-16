@@ -2,7 +2,6 @@ package rate
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"path"
 	"strconv"
@@ -189,13 +188,13 @@ func setupRateLimiterFactory(
 	return nil
 }
 
-// per policy component.
-func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
+// per component fx app.
+func (rlFactory *rateLimiterFactory) newRateLimiterOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
 	reg status.Registry,
 ) (fx.Option, error) {
-	logger := rateLimiterFactory.registry.GetLogger()
+	logger := rlFactory.registry.GetLogger()
 	wrapperMessage := &policysyncv1.RateLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.RateLimiter == nil {
@@ -208,7 +207,7 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 	rateLimiter := &rateLimiter{
 		Component:          wrapperMessage.GetCommonAttributes(),
 		rateLimiterProto:   rateLimiterProto,
-		rateLimiterFactory: rateLimiterFactory,
+		rateLimiterFactory: rlFactory,
 		registry:           reg,
 	}
 	rateLimiter.name = iface.ComponentID(rateLimiter)
@@ -236,7 +235,7 @@ var _ iface.RateLimiter = (*rateLimiter)(nil)
 
 func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	logger := rateLimiter.registry.GetLogger()
-	etcdKey := paths.FlowControlComponentKey(rateLimiter.rateLimiterFactory.agentGroupName,
+	etcdKey := paths.AgentComponentKey(rateLimiter.rateLimiterFactory.agentGroupName,
 		rateLimiter.GetPolicyName(),
 		rateLimiter.GetComponentIndex())
 	// decision notifier
@@ -319,7 +318,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 			var merr, err error
 			deleted := rateCounterVec.DeletePartialMatch(metricLabels)
 			if deleted == 0 {
-				merr = multierr.Append(merr, errors.New("failed to delete rate limiter counter from its metric vector"))
+				logger.Warn().Msg("Could not delete rate limiter counter from its metric vector. No traffic to generate metrics?")
 			}
 			// remove from data engine
 			err = rateLimiter.rateLimiterFactory.engineAPI.UnregisterRateLimiter(rateLimiter)

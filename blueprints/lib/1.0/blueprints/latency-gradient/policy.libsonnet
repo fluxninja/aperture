@@ -139,7 +139,8 @@ function(params) {
               + loadActuator.withDynamicConfigKey('concurrency_limiter')
               + loadActuator.withAlerterConfig(
                 alerterConfig.new()
-                + alerterConfig.withAlertChannels($._config.policyName)
+                + alerterConfig.withAlertName(c.alerterName)
+                + alerterConfig.withAlertChannels(c.alerterChannels)
               )
             )
           ),

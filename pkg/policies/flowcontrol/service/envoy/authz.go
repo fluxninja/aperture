@@ -9,7 +9,6 @@ import (
 	ext_authz "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	envoy_type "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	"github.com/open-policy-agent/opa-envoy-plugin/envoyauth"
-	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/logging"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
@@ -138,14 +137,6 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 			Err(err).Code(codes.InvalidArgument).Msg("converting raw input into rego input failed")
 	}
 
-	inputValue, err := ast.InterfaceToValue(input)
-	if err != nil {
-		// RequestToInput should never produce anything that's not convertible
-		// to ast.Value, so in theory it shouldn't happen.
-		// TODO(krdln) metrics
-		return nil, grpc.Bug().Err(err).Msg("converting rego input to value failed")
-	}
-
 	// Default flow labels from Authz request
 	requestFlowLabels := AuthzRequestToFlowLabels(req.GetAttributes().GetRequest())
 	// Extract flow labels from baggage headers
@@ -157,7 +148,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	// Baggage can overwrite request flow labels
 	flowlabel.Merge(mergedFlowLabels, baggageFlowLabels)
 
-	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), inputValue)
+	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
 
 	for key, fl := range newFlowLabels {
 		cleanValue := sanitizeBaggageHeaderValue(fl.Value)

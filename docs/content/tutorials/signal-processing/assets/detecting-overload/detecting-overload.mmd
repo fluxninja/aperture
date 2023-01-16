@@ -39,14 +39,14 @@ style 3_outports fill:none,stroke:none
 3output[output]
 end
 end
-subgraph 4[Sink]
+subgraph 4[Alerter]
 subgraph 4_inports[ ]
 style 4_inports fill:none,stroke:none
-4inputs[inputs]
+4signal[signal]
 end
 end
 0output --> |LATENCY| 1input
 0output --> |LATENCY| 3lhs
 1output --> |LATENCY_EMA| 2lhs
 2output --> |LATENCY_SETPOINT| 3rhs
-3output --> |IS_OVERLOAD_SWITCH| 4inputs
+3output --> |IS_OVERLOAD_SWITCH| 4signal

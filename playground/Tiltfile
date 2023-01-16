@@ -101,6 +101,7 @@ DEP_TREE = {
                     "context": GIT_ROOT,
                     "dockerfile": GIT_ROOT + "/cmd/aperture-controller/Dockerfile",
                     "ssh": "default",
+                    "build_args":{'RACE': ""},
                 },
                 {
                     "ref": "aperture-operator",
@@ -200,6 +201,7 @@ DEP_TREE = {
                     "context": GIT_ROOT,
                     "dockerfile": GIT_ROOT + "/cmd/aperture-agent/Dockerfile",
                     "ssh": "default",
+                    "build_args":{'RACE':""},
                 }
             ],
             "kinds": [
@@ -821,7 +823,7 @@ def forward_port_delayed(workload, labels, resource_deps, namespace, service, lo
     )
 
 
-def declare_resources(resources, dep_tree, inv_dep_tree):
+def declare_resources(resources, dep_tree, inv_dep_tree,race_arg):
     """
     Declares resource-specific actions (images, ports, etc)
     Generating manifests with tanka is done separately, in order to speed up builds
@@ -829,6 +831,12 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
     for resource in resources:
         resource_info = inv_dep_tree[resource]
         labels = resource_info.get("labels", [])
+        if race_arg:
+            images = resource_info.get("images",{})
+            if resource == "controller":
+                images[0]["build_args"]["RACE"] = "Yes"
+            if resource == "agent":
+                images[0]["build_args"]["RACE"] = "Yes"
         for image in resource_info.get("images", []):
             if 'tag' in image.keys():
                 # We will be pulling existing image
@@ -984,6 +992,7 @@ config.define_bool("manual", usage="Set trigger mode to manual")
 config.define_bool("only", usage="Only deploy explicitly resources, without handling dependencies")
 config.define_bool("verbose", usage="Enable verbose logging")
 config.define_bool("trace", usage="Enable trace logging")
+config.define_bool("race",usage="Enable race detector for agent and controller")
 cfg = config.parse()
 # Enable all resources, as calling `config.parse()` by default disables all
 config.set_enabled_resources([])
@@ -995,6 +1004,7 @@ if cfg.get("list-resources", False):
 if cfg.get("manual", False):
     trigger_mode(TRIGGER_MODE_MANUAL)
 
+get_race = cfg.get("race",False)
 
 cfg_trace = cfg.get("trace", os.getenv("NINJA_TILT_TRACE", "false"))
 TRACE = cfg_trace == True
@@ -1096,5 +1106,4 @@ cmd_button('aperture-java-trigger',
         icon_name='ads_click',
         text='Trigger library example',
 )
-
-declare_resources(resources, DEP_TREE, inverted_dep_tree)
+declare_resources(resources, DEP_TREE, inverted_dep_tree,get_race)
