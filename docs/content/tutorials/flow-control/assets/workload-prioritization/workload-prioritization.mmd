@@ -2,8 +2,8 @@ flowchart LR
 subgraph 0[<center>ArithmeticCombinator<br/>mul</center>]
 subgraph 0_inports[ ]
 style 0_inports fill:none,stroke:none
-0rhs[rhs]
 0lhs[lhs]
+0rhs[rhs]
 end
 subgraph 0_outports[ ]
 style 0_outports fill:none,stroke:none
@@ -15,8 +15,8 @@ FakeConstant0 --> 0rhs
 subgraph 1[<center>ArithmeticCombinator<br/>mul</center>]
 subgraph 1_inports[ ]
 style 1_inports fill:none,stroke:none
-1lhs[lhs]
 1rhs[rhs]
+1lhs[lhs]
 end
 subgraph 1_outports[ ]
 style 1_outports fill:none,stroke:none
@@ -62,44 +62,39 @@ end
 end
 FakeConstant3((5.00))
 FakeConstant3 --> 4lhs
-subgraph 5[<center>ArithmeticCombinator<br/>add</center>]
+subgraph 5[Integrator]
 subgraph 5_inports[ ]
 style 5_inports fill:none,stroke:none
-5lhs[lhs]
-5rhs[rhs]
+5input[input]
+5reset[reset]
+5min[min]
+5max[max]
 end
 subgraph 5_outports[ ]
 style 5_outports fill:none,stroke:none
 5output[output]
 end
 end
-subgraph 6[Min]
+subgraph 6[Sqrt]
 subgraph 6_inports[ ]
 style 6_inports fill:none,stroke:none
-6inputs[inputs]
-6inputs[inputs]
+6input[input]
 end
 subgraph 6_outports[ ]
 style 6_outports fill:none,stroke:none
 6output[output]
 end
 end
-subgraph 7[FirstValid]
-subgraph 7_inports[ ]
-style 7_inports fill:none,stroke:none
-7inputs[inputs]
-7inputs[inputs]
-end
+subgraph 7[PromQL]
 subgraph 7_outports[ ]
 style 7_outports fill:none,stroke:none
 7output[output]
 end
 end
-FakeConstant4((0.00))
-FakeConstant4 --> 7inputs
-subgraph 8[Sqrt]
+subgraph 8[<center>EMA<br/>win: 1500s</center>]
 subgraph 8_inports[ ]
 style 8_inports fill:none,stroke:none
+8max_envelope[max_envelope]
 8input[input]
 end
 subgraph 8_outports[ ]
@@ -107,17 +102,24 @@ style 8_outports fill:none,stroke:none
 8output[output]
 end
 end
-subgraph 9[PromQL]
+subgraph 9[Gradient]
+subgraph 9_inports[ ]
+style 9_inports fill:none,stroke:none
+9optimize[optimize]
+9max[max]
+9control_variable[control_variable]
+9signal[signal]
+9setpoint[setpoint]
+end
 subgraph 9_outports[ ]
 style 9_outports fill:none,stroke:none
 9output[output]
 end
 end
-subgraph 10[<center>EMA<br/>win: 1500s</center>]
+subgraph 10[<center>Extrapolator<br/>for: 5s</center>]
 subgraph 10_inports[ ]
 style 10_inports fill:none,stroke:none
 10input[input]
-10max_envelope[max_envelope]
 end
 subgraph 10_outports[ ]
 style 10_outports fill:none,stroke:none
@@ -138,10 +140,17 @@ style 11_outports fill:none,stroke:none
 11output[output]
 end
 end
-subgraph 12[<center>Extrapolator<br/>for: 5s</center>]
+subgraph 11.LoadActuator[ConcurrencyLimiter/LoadActuator]
+subgraph 11.LoadActuator_inports[ ]
+style 11.LoadActuator_inports fill:none,stroke:none
+11.LoadActuatorload_multiplier[load_multiplier]
+end
+end
+subgraph 12[<center>Decider<br/>gt for 0s</center>]
 subgraph 12_inports[ ]
 style 12_inports fill:none,stroke:none
-12input[input]
+12lhs[lhs]
+12rhs[rhs]
 end
 subgraph 12_outports[ ]
 style 12_outports fill:none,stroke:none
