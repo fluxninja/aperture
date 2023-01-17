@@ -49,9 +49,11 @@ value to the scheduler:
 
 :::tip
 
-You can
-[discover flow labels](/concepts/flow-control/flow-label.md#live-previewing-flow-labels)
-by live previewing them via introspection API .
+You can quickly write classification rules on
+[HTTP requests](concepts/flow-control/flow-classifier.md#live-previewing-requests)
+and define scheduler priorities on
+[flow labels](concepts/flow-control/flow-label.md#live-previewing-flow-labels)
+by live previewing them first via introspection APIs.
 
 :::
 
@@ -63,20 +65,20 @@ highlighted in the Jsonnet spec below.
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="Jsonnet">
-```
-
-```jsonnet
-{@include: ./assets/workload-prioritization/workload-prioritization.jsonnet}
-```
-
-```mdx-code-block
-</TabItem>
 <TabItem value="YAML">
 ```
 
 ```yaml
 {@include: ./assets/workload-prioritization/workload-prioritization.yaml}
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Jsonnet">
+```
+
+```jsonnet
+{@include: ./assets/workload-prioritization/workload-prioritization.jsonnet}
 ```
 
 ```mdx-code-block

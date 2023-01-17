@@ -839,7 +839,7 @@ FlowPreviewConfig is the configuration for the flow control preview service.
 
 ### FluxNinjaPluginConfig {#flux-ninja-plugin-config}
 
-FluxNinjaPluginConfig is the configuration for FluxNinja cloud integration plugin.
+FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
 
 #### Properties
 
@@ -1222,6 +1222,12 @@ KubernetesDiscoveryConfig for Kubernetes service discovery.
 #### Properties
 
 <dl>
+<dt>autoscale_enabled</dt>
+<dd>
+
+(bool, default: `true`)
+
+</dd>
 <dt>discovery_enabled</dt>
 <dd>
 

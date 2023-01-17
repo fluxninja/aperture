@@ -64,9 +64,9 @@ your cluster.
 
    :::info
 
-   The below parameters disable the FluxNinja Cloud Plugin for the Aperture
-   Agent. If you want to keep it enabled, add parameters provided
-   [here](/cloud/plugin.md#configuration) under the `agent.config` section.
+   The below parameters disable the FluxNinja ARC Plugin for the Aperture Agent.
+   If you want to keep it enabled, add parameters provided
+   [here](/arc/plugin.md#configuration) under the `agent.config` section.
 
    :::
 
@@ -194,8 +194,8 @@ your cluster.
    ```
 
 6. Refer steps on the
-   [Istio Configuration](/get-started/installation/agent/envoy/istio.md) if you
-   don't have the
+   [Istio Configuration](/get-started/flow-control/envoy/istio.md) if you don't
+   have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.
 

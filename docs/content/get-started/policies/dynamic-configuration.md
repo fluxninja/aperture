@@ -4,7 +4,7 @@ description: Dynamically configuration of policy
 keywords:
   - policy
   - configuration
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 Aperture's policies can be thought of as "Reliability Applications" running on

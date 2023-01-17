@@ -25,91 +25,64 @@ import (
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 )
 
-var (
-	rules = []rbacv1.PolicyRule{
+func genRules(instance *agentv1alpha1.Agent) []rbacv1.PolicyRule {
+	rules := []rbacv1.PolicyRule{
 		{
 			APIGroups: []string{""},
-			Resources: []string{"services", "events", "endpoints", "pods", "nodes", "namespaces", "componentstatuses"},
+			Resources: []string{"pods", "nodes"},
 			Verbs:     []string{"get", "list", "watch"},
-		},
-		{
-			APIGroups: []string{"quota.openshift.io"},
-			Resources: []string{"clusterresourcequotas"},
-			Verbs:     []string{"get"},
-		},
-		{
-			NonResourceURLs: []string{"/version", "/healthz"},
-			Verbs:           []string{"get"},
-		},
-		{
-			NonResourceURLs: []string{"/metrics"},
-			Verbs:           []string{"get"},
-		},
-		{
-			APIGroups: []string{""},
-			Resources: []string{"nodes/metrics", "nodes/spec", "nodes/proxy", "nodes/stats"},
-			Verbs:     []string{"get"},
-		},
-		{
-			APIGroups:     []string{"policy"},
-			Resources:     []string{"podsecuritypolicies"},
-			Verbs:         []string{"use"},
-			ResourceNames: []string{controllers.AppName},
-		},
-		{
-			APIGroups:     []string{"security.openshift.io"},
-			Resources:     []string{"securitycontextconstraints"},
-			Verbs:         []string{"use"},
-			ResourceNames: []string{controllers.AppName},
-		},
-		{
-			APIGroups: []string{"coordination.k8s.io"},
-			Resources: []string{"leases"},
-			Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-		},
-		{
-			APIGroups: []string{"admissionregistration.k8s.io"},
-			Resources: []string{"mutatingwebhookconfigurations"},
-			Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-		},
-		{
-			APIGroups: []string{"fluxninja.com"},
-			Resources: []string{"policies"},
-			Verbs:     []string{"create", "delete", "get", "list", "patch", "update", "watch"},
-		},
-		{
-			APIGroups: []string{""},
-			Resources: []string{"events"},
-			Verbs:     []string{"create", "patch"},
-		},
-		{
-			APIGroups: []string{"fluxninja.com"},
-			Resources: []string{"policies/finalizers"},
-			Verbs:     []string{"update"},
-		},
-		{
-			APIGroups: []string{"fluxninja.com"},
-			Resources: []string{"policies/status"},
-			Verbs:     []string{"get", "patch", "update"},
 		},
 	}
 
-	roleRef = rbacv1.RoleRef{
-		APIGroup: "rbac.authorization.k8s.io",
-		Kind:     "ClusterRole",
-		Name:     controllers.AppName,
+	if !instance.Spec.Sidecar.Enabled {
+		newRules := []rbacv1.PolicyRule{
+			{
+				APIGroups: []string{""},
+				Resources: []string{"services", "events", "endpoints", "namespaces", "componentstatuses"},
+				Verbs:     []string{"get", "list", "watch"},
+			},
+			{
+				NonResourceURLs: []string{"/version", "/healthz", "/metrics"},
+				Verbs:           []string{"get"},
+			},
+			{
+				APIGroups: []string{""},
+				Resources: []string{"nodes/metrics", "nodes/spec", "nodes/proxy", "nodes/stats"},
+				Verbs:     []string{"get"},
+			},
+		}
+		rules = append(rules, newRules...)
 	}
-)
+
+	if instance.Spec.ConfigSpec.ServiceDiscoverySpec.KubernetesDiscoveryConfig.AutoscaleEnabled {
+		newRules := []rbacv1.PolicyRule{
+			{
+				APIGroups: []string{"*"},
+				Resources: []string{"*"},
+				Verbs:     []string{"get", "list", "watch"},
+			},
+			{
+				APIGroups: []string{"*"},
+				Resources: []string{"*/scale"},
+				Verbs:     []string{"get", "update", "patch"},
+			},
+		}
+
+		rules = append(rules, newRules...)
+	}
+
+	return rules
+}
 
 // clusterRoleForAgent prepares the ClusterRole object for the Agent based on the provided parameter.
 func clusterRoleForAgent(instance *agentv1alpha1.Agent) *rbacv1.ClusterRole {
 	clusterRole := &rbacv1.ClusterRole{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.AppName,
+			Name:        controllers.AgentServiceName,
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.OperatorName),
 			Annotations: controllers.AgentAnnotationsWithOwnerRef(instance),
 		},
-		Rules: rules,
+		Rules: genRules(instance),
 	}
 
 	return clusterRole
@@ -123,7 +96,11 @@ func clusterRoleBindingForAgent(instance *agentv1alpha1.Agent) *rbacv1.ClusterRo
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.AgentServiceName),
 			Annotations: controllers.AgentAnnotationsWithOwnerRef(instance),
 		},
-		RoleRef: roleRef,
+		RoleRef: rbacv1.RoleRef{
+			APIGroup: "rbac.authorization.k8s.io",
+			Kind:     "ClusterRole",
+			Name:     controllers.AgentServiceName,
+		},
 		Subjects: []rbacv1.Subject{
 			{
 				Kind:      "ServiceAccount",

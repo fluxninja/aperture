@@ -63,7 +63,7 @@ var _ = Describe("MutatingWebhookConfiguration for Agent CR", func() {
 							Service: &admissionregistrationv1.ServiceReference{
 								Name:      AppName,
 								Namespace: AppName,
-								Path:      pointer.StringPtr("/agent-defaulter"),
+								Path:      pointer.String("/agent-defaulter"),
 								Port:      pointer.Int32(443),
 							},
 							CABundle: serverCertPEM.Bytes(),
@@ -83,7 +83,7 @@ var _ = Describe("MutatingWebhookConfiguration for Agent CR", func() {
 						AdmissionReviewVersions: []string{V1Version},
 						FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 						SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-						TimeoutSeconds:          pointer.Int32Ptr(10),
+						TimeoutSeconds:          pointer.Int32(10),
 					},
 				},
 			}
@@ -131,7 +131,7 @@ var _ = Describe("MutatingWebhookConfiguration for Controller CR", func() {
 							Service: &admissionregistrationv1.ServiceReference{
 								Name:      AppName,
 								Namespace: AppName,
-								Path:      pointer.StringPtr("/controller-defaulter"),
+								Path:      pointer.String("/controller-defaulter"),
 								Port:      pointer.Int32(443),
 							},
 							CABundle: serverCertPEM.Bytes(),
@@ -151,7 +151,7 @@ var _ = Describe("MutatingWebhookConfiguration for Controller CR", func() {
 						AdmissionReviewVersions: []string{V1Version},
 						FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 						SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-						TimeoutSeconds:          pointer.Int32Ptr(10),
+						TimeoutSeconds:          pointer.Int32(10),
 					},
 				},
 			}

@@ -183,14 +183,17 @@ message Component {
     // Picks the first valid input signal and emits it.
     FirstValid first_valid = 14;
 
-    // Sink is a sink component that does nothing.
-    Sink sink = 15;
-
     // Alerter reacts to a signal and generates alert to send to alert manager.
-    Alerter alerter = 16;
+    Alerter alerter = 15;
 
     // Accumulates sum of signal every tick.
-    Integrator integrator = 17;
+    Integrator integrator = 16;
+
+    // Differentiator calculates rate of change per tick.
+    Differentiator differentiator = 17;
+
+    // HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+    HorizontalPodScaler horizontal_pod_scaler = 18;
   }
 }
 
@@ -934,7 +937,7 @@ message LoadActuator {
   // Default configuration.
   DynamicConfig default_config = 3;
 
-  // Configuration for embedded alerter.
+  // Configuration for embedded alerter. No alerts are generated if this configuration is not provided.
   AlerterConfig alerter_config = 4;
 }
 
@@ -1111,27 +1114,15 @@ message FirstValid {
   Outs out_ports = 2;
 }
 
-// Sink is a component that consumes input signals and does nothing with them
-message Sink {
-  // Inputs for the Sink component.
-  message Ins {
-    // Array of input signals.
-    repeated InPort inputs = 1; // @gotags: validate:"dive"
-  }
-
-  // Input ports for the Sink component.
-  Ins in_ports = 1;
-}
-
 // AlerterConfig is a common config for separate alerter components and alerters embedded in other components.
 message AlerterConfig {
   // Name of the alert.
   string alert_name = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
-      key: "x-go-default"
-      value: {string_value: "alert"}
+      key: "x-go-validate"
+      value: {string_value: "required"}
     }
-  }]; // @gotags: default:"alert"
+  }]; // @gotags: validate:"required"
 
   // Severity of the alert, one of 'info', 'warn' or 'crit'.
   string severity = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1161,15 +1152,20 @@ message AlerterConfig {
 message Alerter {
   // Inputs for the Alerter component.
   message Ins {
-    // Signal which Alerter is monitoring.
-    InPort alert = 1;
+    // Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.
+    InPort signal = 1;
   }
 
   // Input ports for the Alerter component.
   Ins in_ports = 1;
 
   // Alerter configuration
-  AlerterConfig alerter_config = 2;
+  AlerterConfig alerter_config = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
 }
 
 // Accumulates sum of signal every tick.
@@ -1196,4 +1192,82 @@ message Integrator {
 
   // Output ports for the Integrator component.
   Outs out_ports = 2;
+}
+
+// Differentiator calculates rate of change per tick.
+message Differentiator {
+  // Inputs for the Differentiator component.
+  message Ins {
+    InPort input = 1;
+  }
+
+  // Outputs for the Differentiator component.
+  message Outs {
+    OutPort output = 1;
+  }
+
+  // Input ports for the Differentiator component.
+  Ins in_ports = 1;
+
+  // Output ports for the Differentiator component.
+  Outs out_ports = 2;
+
+  // The window of time over which differentiator operates.
+  google.protobuf.Duration window = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {string_value: "5s"}
+    }
+  }]; // @gotags: default:"5s"
+}
+
+message HorizontalPodScaler {
+  message ScaleReporter {
+    // Outputs for the HorizontalPodScaler component.
+    message Outs {
+      OutPort actual_replicas = 1;
+      OutPort configured_replicas = 2;
+    }
+
+    Outs out_ports = 1;
+  }
+
+  message ScaleActuator {
+    // Dynamic Configuration for ScaleActuator
+    message DynamicConfig {
+      // Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+      // Useful for observing the behavior of Scaler without disrupting any real traffic.
+      bool dry_run = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        extensions: {
+          key: "x-go-default"
+          value: {bool_value: false}
+        }
+      }]; // @gotags: default:"false"
+    }
+
+    // Inputs for the HorizontalPodScaler component.
+    message Ins {
+      InPort desired_replicas = 1;
+    }
+
+    Ins in_ports = 1;
+
+    // Configuration key for DynamicConfig
+    string dynamic_config_key = 2;
+
+    // Default configuration.
+    DynamicConfig default_config = 3;
+  }
+
+  // The Kubernetes object on which horizontal scaling is applied.
+  KubernetesObjectSelector kubernetes_object_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
+
+  ScaleReporter scale_reporter = 2;
+
+  ScaleActuator scale_actuator = 3;
 }

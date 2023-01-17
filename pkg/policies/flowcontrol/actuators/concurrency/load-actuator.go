@@ -153,7 +153,7 @@ func (lsaFactory *loadActuatorFactory) newLoadActuator(
 		statusRegistry: reg,
 	}
 
-	etcdKey := paths.FlowControlComponentKey(lsaFactory.agentGroupName, la.conLimiter.GetPolicyName(), la.conLimiter.GetComponentIndex())
+	etcdKey := paths.AgentComponentKey(lsaFactory.agentGroupName, la.conLimiter.GetPolicyName(), la.conLimiter.GetComponentIndex())
 
 	decisionUnmarshaller, protoErr := config.NewProtobufUnmarshaller(nil)
 	if protoErr != nil {
@@ -272,7 +272,7 @@ func (la *loadActuator) decisionUpdateCallback(event notifiers.Event, unmarshall
 	}
 	commonAttributes := wrapperMessage.GetCommonAttributes()
 	if commonAttributes == nil {
-		statusMsg := "Failed to get common attributes from config wrapperShedFactor"
+		statusMsg := "Failed to get common attributes from LoadDecisionWrapper"
 		logger.Error().Err(err).Msg(statusMsg)
 		la.statusRegistry.SetStatus(status.NewStatus(nil, err))
 		return

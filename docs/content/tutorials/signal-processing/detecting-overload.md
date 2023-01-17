@@ -51,20 +51,20 @@ service to be overloaded at that time.
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="Jsonnet">
-```
-
-```jsonnet
-{@include: ./assets/detecting-overload/detecting-overload.jsonnet}
-```
-
-```mdx-code-block
-</TabItem>
 <TabItem value="YAML">
 ```
 
 ```yaml
 {@include: ./assets/detecting-overload/detecting-overload.yaml}
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Jsonnet">
+```
+
+```jsonnet
+{@include: ./assets/detecting-overload/detecting-overload.jsonnet}
 ```
 
 ```mdx-code-block

@@ -63,7 +63,7 @@ func NewSchedulerAndOptions(
 	agentGroupName string,
 ) (runtime.Component, fx.Option, error) {
 	etcdPath := path.Join(paths.AutoTokenResultsPath,
-		paths.FlowControlComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex)))
+		paths.AgentComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex)))
 
 	scheduler := &Scheduler{
 		policyReadAPI: policyReadAPI,
@@ -253,7 +253,6 @@ func (s *Scheduler) DynamicConfigUpdate(event notifiers.Event, unmarshaller conf
 
 func (s *Scheduler) publishQueryTokens(tokens *policysyncv1.TokensDecision) error {
 	logger := s.policyReadAPI.GetStatusRegistry().GetLogger()
-	// TODO: publish only on change
 	s.tokensByWorkload = tokens
 	policyName := s.policyReadAPI.GetPolicyName()
 	policyHash := s.policyReadAPI.GetPolicyHash()

@@ -31,6 +31,12 @@
   withDeciderMixin(decider):: {
     decider+: decider,
   },
+  withDifferentiator(differentiator):: {
+    differentiator: differentiator,
+  },
+  withDifferentiatorMixin(differentiator):: {
+    differentiator+: differentiator,
+  },
   withEma(ema):: {
     ema: ema,
   },
@@ -54,6 +60,12 @@
   },
   withGradientControllerMixin(gradient_controller):: {
     gradient_controller+: gradient_controller,
+  },
+  withHorizontalPodScaler(horizontal_pod_scaler):: {
+    horizontal_pod_scaler: horizontal_pod_scaler,
+  },
+  withHorizontalPodScalerMixin(horizontal_pod_scaler):: {
+    horizontal_pod_scaler+: horizontal_pod_scaler,
   },
   withIntegrator(integrator):: {
     integrator: integrator,
@@ -84,12 +96,6 @@
   },
   withRateLimiterMixin(rate_limiter):: {
     rate_limiter+: rate_limiter,
-  },
-  withSink(sink):: {
-    sink: sink,
-  },
-  withSinkMixin(sink):: {
-    sink+: sink,
   },
   withSqrt(sqrt):: {
     sqrt: sqrt,

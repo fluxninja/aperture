@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 set -eux
 
 # This script builds a Go binary and injects build-time variables.
@@ -23,4 +23,8 @@ LDFLAGS="\
     -X 'github.com/fluxninja/aperture/pkg/info.GitCommitHash=${GIT_COMMIT_HASH}' \
     -X 'github.com/fluxninja/aperture/pkg/info.Prefix=${PREFIX}' \
 "
-go build --ldflags "${LDFLAGS}" -o "${TARGET}" "${SOURCE}"
+if [[ -z "${RACE}" ]]; then
+    go build --ldflags "${LDFLAGS}" -o "${TARGET}" "${SOURCE}"
+else
+    go build --race --ldflags "${LDFLAGS}" -o "${TARGET}" "${SOURCE}"
+fi

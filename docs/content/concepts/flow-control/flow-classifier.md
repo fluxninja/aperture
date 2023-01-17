@@ -32,7 +32,7 @@ Flow Labels created via Classifier are immediately available for use in other
 components at the same [Control Point][control-point]. The Flow Label is also
 injected as baggage, so it will be available on every subsequent control point
 too (assuming you have [baggage propagation][baggage] configured in your
-system). If you're a [FluxNinja Cloud plugin][plugin] user, such flow label will
+system). If you're a [FluxNinja ARC plugin][plugin] user, such flow label will
 also be available in the Cloud for analytics.
 
 :::note
@@ -65,6 +65,82 @@ selector:
 
 You can be more precise by adding a [label matcher][label-matcher] and e.g. gate
 the classifier to particular paths.
+
+## Live Previewing Requests
+
+You can discover the request attributes flowing through services and control
+points using the
+[Introspection API](references/api/agent/flow-preview-service-preview-http-requests.api.mdx)
+on an `aperture-agent` local to the service instances (pods).
+
+For example:
+
+```sh
+curl -X POST localhost:8080/v1/flowcontrol/preview/http_requests/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
+```
+
+Returns:
+
+```json
+{
+  "samples": [
+    {
+      "attributes": {
+        "destination": {
+          "address": {
+            "socketAddress": {
+              "address": "10.244.1.20",
+              "portValue": 8099
+            }
+          }
+        },
+        "metadataContext": {},
+        "request": {
+          "http": {
+            "headers": {
+              ":authority": "service1-demo-app.demoapp.svc.cluster.local",
+              ":method": "POST",
+              ":path": "/request",
+              ":scheme": "http",
+              "content-length": "201",
+              "content-type": "application/json",
+              "cookie": "session=eyJ1c2VyIjoia2Vub2JpIn0.YbsY4Q.kTaKRTyOIfVlIbNB48d9YH6Q0wo",
+              "user-agent": "k6/0.42.0 (https://k6.io/)",
+              "user-id": "19",
+              "user-type": "guest",
+              "x-forwarded-proto": "http",
+              "x-request-id": "26f01736-ec45-4b07-a202-bdec8930c7f8"
+            },
+            "host": "service1-demo-app.demoapp.svc.cluster.local",
+            "id": "14553976531353216255",
+            "method": "POST",
+            "path": "/request",
+            "protocol": "HTTP/1.1",
+            "scheme": "http"
+          },
+          "time": "2023-01-15T07:07:48.693035Z"
+        },
+        "source": {
+          "address": {
+            "socketAddress": {
+              "address": "10.244.2.36",
+              "portValue": 35388
+            }
+          }
+        }
+      },
+      "parsed_body": null,
+      "parsed_path": ["request"],
+      "parsed_query": {},
+      "truncated_body": false,
+      "version": {
+        "encoding": "protojson",
+        "ext_authz": "v3"
+      }
+    }
+  ]
+}
+```
 
 ## Rules ([reference][rule]) {#rules}
 
@@ -139,11 +215,11 @@ See [full example in reference][reference]
 [rule]: /references/configuration/policy.md#v1-rule
 [extractor]: /references/configuration/policy.md#v1-extractor
 [rego-rule]: /references/configuration/policy.md#rule-rego
-[plugin]: /cloud/plugin.md
+[plugin]: /arc/plugin.md
 [label-matcher]: /concepts/flow-control/flow-selector.md#label-matcher
 [policies]: /concepts/policy/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
 [control-point]: /concepts/flow-control/flow-control.md#control-point
-[install-istio]: /get-started/installation/agent/envoy/istio.md
+[install-istio]: /get-started/flow-control/envoy/istio.md

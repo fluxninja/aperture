@@ -1,0 +1,8 @@
+label: Javascript
+position: 4
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Javascript"
+  keywords: ["javascript", "control", "points"]

@@ -45,15 +45,6 @@ Jsonnet spec below.
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="Jsonnet">
-```
-
-```jsonnet
-{@include: ./assets/dynamic-rate-limiting/dynamic-rate-limiting.jsonnet}
-```
-
-```mdx-code-block
-</TabItem>
 <TabItem value="YAML">
 ```
 
@@ -63,6 +54,16 @@ Jsonnet spec below.
 
 ```mdx-code-block
 </TabItem>
+<TabItem value="Jsonnet">
+```
+
+```jsonnet
+{@include: ./assets/dynamic-rate-limiting/dynamic-rate-limiting.jsonnet}
+```
+
+```mdx-code-block
+</TabItem>
+
 </Tabs>
 ```
 

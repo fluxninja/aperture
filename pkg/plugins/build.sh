@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 set -eux
 
 # This script builds a Go plugin and injects build-time variables.
@@ -19,4 +19,8 @@ LDFLAGS="\
     -X 'main.GitBranch=${GIT_BRANCH}' \
     -X 'main.GitCommitHash=${GIT_COMMIT_HASH}' \
 "
-go build -buildmode=plugin --ldflags "${LDFLAGS}" -o "${TARGET}" "${SOURCE}"
+if [[ -z "${RACE}" ]]; then
+    go build -buildmode=plugin --ldflags "${LDFLAGS}" -o "${TARGET}" "${SOURCE}"
+else
+    go build -buildmode=plugin --race --ldflags "${LDFLAGS}" -o "${TARGET}" "${SOURCE}"
+fi

@@ -12,6 +12,17 @@ type BasicKeyNotifier struct {
 // Make sure BasicKeyNotifier implements KeyNotifier.
 var _ KeyNotifier = (*BasicKeyNotifier)(nil)
 
+// NewBasicKeyNotifier returns a new basic key notifier.
+func NewBasicKeyNotifier(key Key, notifyFunc NotifyFunc) *BasicKeyNotifier {
+	notifier := &BasicKeyNotifier{
+		KeyNotifierBase: KeyNotifierBase{
+			key: key,
+		},
+		NotifyFunc: notifyFunc,
+	}
+	return notifier
+}
+
 // Notify calls the registered notifier function with the given event.
 func (bfn *BasicKeyNotifier) Notify(event Event) {
 	if bfn.NotifyFunc != nil {
