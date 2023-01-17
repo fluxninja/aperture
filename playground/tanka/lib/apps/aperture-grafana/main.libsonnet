@@ -3,6 +3,7 @@ local kubernetesMixin = import 'github.com/kubernetes-monitoring/kubernetes-mixi
 
 local aperture = import '../../../../../blueprints/lib/1.0/main.libsonnet';
 local policyDashboard = aperture.blueprints.LatencyGradient.dashboard;
+local rateLimitpolicyDashboard = aperture.blueprints.RateLimiter.dashboard;
 local signalsDashboard = aperture.blueprints.SignalsDashboard.dashboard;
 
 local grafana = grafanaOperator.integreatly.v1alpha1.grafana;
@@ -41,13 +42,21 @@ local kubeDashboards =
      },
    }).grafanaDashboards;
 
+local policyDashBoardMixin =
+  policyDashboard({
+      policyName: 'service1-demo-app',
+    }).dashboard
+  + {
+    'panels'+: rateLimitpolicyDashboard({
+      policyName: 'service1-demo-app',
+    }).dashboard['panels']
+  };
+
 local dashboards =
   [
     dashboard.new('example-dashboard') +
     dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' }) +
-    dashboard.spec.withJson(std.manifestJsonEx(policyDashboard({
-      policyName: 'service1-demo-app',
-    }).dashboard, indent='  ')) +
+    dashboard.spec.withJson(std.manifestJsonEx(policyDashBoardMixin, indent='  ')) +
     dashboard.spec.withDatasources({
       inputName: 'DS_CONTROLLER-PROMETHEUS',
       datasourceName: 'controller-prometheus',

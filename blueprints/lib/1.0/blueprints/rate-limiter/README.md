@@ -32,3 +32,16 @@
 | ------------------------- | -------------- | ------- | -------------------------------------------------------------------- |
 | `policy.lazySync.enabled` | `boolean`      | `true`  | Enable lazy syncing.                                                 |
 | `policy.lazySync.numSync` | `integer`      | `5`     | Number of times to lazy sync within the `policy.limitResetInterval`. |
+
+### Dashboard
+
+| Parameter Name              | Parameter Type | Default | Description                            |
+| --------------------------- | -------------- | ------- | -------------------------------------- |
+| `dashboard.refreshInterval` | `string`       | `"10s"` | Refresh interval for dashboard panels. |
+
+#### Datasource
+
+| Parameter Name                     | Parameter Type | Default         | Description              |
+| ---------------------------------- | -------------- | --------------- | ------------------------ |
+| `dashboard.datasource.name`        | `string`       | `"$datasource"` | Datasource name.         |
+| `dashboard.datasource.filterRegex` | `string`       | `""`            | Datasource filter regex. |
