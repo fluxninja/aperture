@@ -174,12 +174,14 @@ spec:
                         "name": "envoy.filters.http.ext_authz",
                         "typed_config": {
                           "@type": "type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz",
+                          "transport_api_version": "V3"
+                          "failure_mode_allow": true,
                           "grpc_service": {
                             "google_grpc": {
                               "target_uri": "aperture-agent.aperture-agent.svc.cluster.local:8080",
                               "stat_prefix": "ext_authz"
                             },
-                            "timeout": "0.500s",
+                            "timeout": "0.5s",
                             "initial_metadata": [
                               {
                                 "key": "control-point",
@@ -187,8 +189,6 @@ spec:
                               }
                             ]
                           },
-                          "failure_mode_allow": true,
-                          "transport_api_version": "V3"
                         }
                       },
                       {
@@ -236,9 +236,9 @@ spec:
                               },
                               "route": {
                                 "cluster": "inbound|8099||"
-                                "timeout": "0s"
+                                "timeout": "0.5s"
                                 "max_stream_duration": {
-                                  "grpc_timeout_header_max": "0s"
+                                  "grpc_timeout_header_max": "0.5s"
                                   "max_stream_duration": "0s"
                                 }
                               },
@@ -344,21 +344,21 @@ spec:
                         "name": "envoy.filters.http.ext_authz",
                         "typed_config": {
                           "@type": "type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz",
+                          "transport_api_version": "V3",
+                          "failure_mode_allow": true,
                           "grpc_service": {
                             "google_grpc": {
                               "target_uri": "aperture-agent.aperture-agent.svc.cluster.local:8080",
                               "stat_prefix": "ext_authz"
                             },
-                            "timeout": "10s",
+                            "timeout": "0.5s",
                             "initial_metadata": [
                               {
                                 "key": "control-point",
                                 "value": "ingress"
                               }
                             ]
-                          },
-                          "failure_mode_allow": true,
-                          "transport_api_version": "V3"
+                          }
                         }
                       },
                       {
