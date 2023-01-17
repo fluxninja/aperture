@@ -35,23 +35,36 @@ type AgentHooks struct {
 
 // Handle receives incoming requests from MutatingWebhook for newly created Agents, set defaults and validates them.
 func (agentHooks *AgentHooks) Handle(ctx context.Context, req admission.Request) admission.Response {
-	agent := &v1alpha1.Agent{}
+	newAgent := &v1alpha1.Agent{}
+	oldAgent := &v1alpha1.Agent{}
 
-	err := config.UnmarshalYAML([]byte(req.Object.Raw), agent)
+	err := config.UnmarshalYAML([]byte(req.Object.Raw), newAgent)
 	if err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
-	if agent.Spec.Secrets.FluxNinjaPlugin.Create && agent.Spec.Secrets.FluxNinjaPlugin.Value == "" {
+	if newAgent.Spec.Secrets.FluxNinjaPlugin.Create && newAgent.Spec.Secrets.FluxNinjaPlugin.Value == "" {
 		return admission.Denied("The value for 'spec.secrets.fluxNinjaPlugin.value' can not be empty when 'spec.secrets.fluxNinjaPlugin.create' is set to true")
 	}
 
-	if agent.ObjectMeta.Annotations == nil {
-		agent.ObjectMeta.Annotations = map[string]string{}
+	if newAgent.ObjectMeta.Annotations == nil {
+		newAgent.ObjectMeta.Annotations = map[string]string{}
 	}
 
-	agent.ObjectMeta.Annotations[controllers.DefaulterAnnotationKey] = "true"
-	updatedAgent, err := json.Marshal(agent)
+	newAgent.ObjectMeta.Annotations[controllers.DefaulterAnnotationKey] = "true"
+
+	if len(req.OldObject.Raw) != 0 {
+		err = config.UnmarshalYAML([]byte(req.OldObject.Raw), oldAgent)
+		if err != nil {
+			return admission.Errored(http.StatusBadRequest, err)
+		}
+
+		if oldAgent.Spec.Sidecar.Enabled != newAgent.Spec.Sidecar.Enabled {
+			newAgent.ObjectMeta.Annotations[controllers.AgentModeChangeAnnotationKey] = "true"
+		}
+	}
+
+	updatedAgent, err := json.Marshal(newAgent)
 	if err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)
 	}

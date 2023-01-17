@@ -171,6 +171,20 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 			fmt.Sprintf("Kubernetes version %v is not supported. Please use a kubernetes cluster with version %v or above.", controllers.CurrentKubernetesVersion.String(), controllers.MinimumKubernetesVersion))
 	}
 
+	if instance.Annotations != nil && instance.Annotations[controllers.AgentModeChangeAnnotationKey] == "true" {
+		if instance.Spec.Sidecar.Enabled {
+			r.deleteDaemonSetModeResources(ctx, logger, instance)
+			r.Recorder.Event(instance, corev1.EventTypeWarning, "InstallationModeChanged",
+				"The Aperture Agent installation mode is changed to Sidecar. Restart pods in which the Aperture Agent needs to be injected.")
+		} else {
+			r.deleteSidecarModeResources(ctx, logger, instance)
+			r.Recorder.Event(instance, corev1.EventTypeWarning, "InstallationModeChanged",
+				"The Aperture Agent installation mode is changed to DaemonSet. Restart pods in which the Aperture Agent is already injected to remove it.")
+		}
+
+		delete(instance.Annotations, controllers.AgentModeChangeAnnotationKey)
+	}
+
 	instance.Status.Resources = "creating"
 	if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
 		return ctrl.Result{}, err
@@ -222,6 +236,90 @@ func (r *AgentReconciler) updateStatus(ctx context.Context, instance *agentv1alp
 	return nil
 }
 
+// deleteDaemonSetModeResources deletes resources installed for DaemonSet mode of Agent.
+func (r *AgentReconciler) deleteDaemonSetModeResources(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) {
+	cm, err := configMapForAgentConfig(instance.DeepCopy(), r.Scheme)
+	if err == nil {
+		if err = r.Delete(ctx, cm); err != nil {
+			log.Error(err, "failed to delete object of ConfigMap")
+		}
+	}
+
+	svc, err := serviceForAgent(instance.DeepCopy(), log, r.Scheme)
+	if err == nil {
+		if err = r.Delete(ctx, svc); err != nil {
+			log.Error(err, "failed to delete object of Service")
+		}
+	}
+
+	sa, err := serviceAccountForAgent(instance.DeepCopy(), r.Scheme)
+	if err == nil {
+		if err = r.Delete(ctx, sa); err != nil {
+			log.Error(err, "failed to delete object of ServiceAccount")
+		}
+	}
+
+	ds, err := daemonsetForAgent(instance.DeepCopy(), log, r.Scheme)
+	if err == nil {
+		if err = r.Delete(ctx, ds); err != nil {
+			log.Error(err, "failed to delete object of DaemonSet")
+		}
+	}
+
+	secret, err := secretForAgentAPIKey(instance.DeepCopy(), r.Scheme)
+	if err == nil {
+		if err = r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
+			log.Error(err, "failed to delete object of Secret")
+		}
+	}
+}
+
+// deleteSidecarModeResources deletes resources installed for Sidecar mode of Agent.
+func (r *AgentReconciler) deleteSidecarModeResources(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) {
+	mwc, err := podMutatingWebhookConfiguration(instance)
+	if err != nil {
+		log.Error(err, "failed to create object of MutatingWebhookConfiguration")
+	} else {
+		if err = r.Delete(ctx, mwc); err != nil {
+			log.Error(err, "failed to delete object of MutatingWebhookConfiguration")
+		}
+	}
+
+	nsList := &corev1.NamespaceList{}
+	err = r.List(ctx, nsList)
+	if err != nil {
+		log.Error(err, "failed to list Namespaces")
+	} else if nsList.Items != nil && len(nsList.Items) != 0 {
+		for _, ns := range nsList.Items {
+			if ns.Labels == nil || ns.Labels[controllers.SidecarLabelKey] != controllers.Enabled {
+				continue
+			}
+
+			configMap, err := configMapForAgentConfig(instance, nil)
+			if err != nil {
+				log.Error(err, fmt.Sprintf("failed to create object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+			}
+
+			configMap.Namespace = ns.GetName()
+			configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
+			if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+			}
+
+			secret, err := secretForAgentAPIKey(instance, nil)
+			if err != nil {
+				log.Error(err, fmt.Sprintf("failed to create object of Secret '%s' in namespace %s", secret.GetName(), ns.GetName()))
+			}
+
+			secret.Namespace = ns.GetName()
+			secret.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
+			if err := r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, fmt.Sprintf("failed to delete object of Secret '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+			}
+		}
+	}
+}
+
 // deleteResources deletes cluster-scoped resources for which owner-reference is not added.
 func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) {
 	// Deleting old ClusterRole
@@ -240,48 +338,7 @@ func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, 
 	}
 
 	if instance.Spec.Sidecar.Enabled {
-		mwc, err := podMutatingWebhookConfiguration(instance)
-		if err != nil {
-			log.Error(err, "failed to create object of MutatingWebhookConfiguration")
-		} else {
-			if err = r.Delete(ctx, mwc); err != nil {
-				log.Error(err, "failed to delete object of MutatingWebhookConfiguration")
-			}
-		}
-
-		nsList := &corev1.NamespaceList{}
-		err = r.List(ctx, nsList)
-		if err != nil {
-			log.Error(err, "failed to list Namespaces")
-		} else if nsList.Items != nil && len(nsList.Items) != 0 {
-			for _, ns := range nsList.Items {
-				if ns.Labels == nil || ns.Labels[controllers.SidecarLabelKey] != controllers.Enabled {
-					continue
-				}
-
-				configMap, err := configMapForAgentConfig(instance, nil)
-				if err != nil {
-					log.Error(err, fmt.Sprintf("failed to create object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
-				}
-
-				configMap.Namespace = ns.GetName()
-				configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
-				if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
-					log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
-				}
-
-				secret, err := secretForAgentAPIKey(instance, nil)
-				if err != nil {
-					log.Error(err, fmt.Sprintf("failed to create object of Secret '%s' in namespace %s", secret.GetName(), ns.GetName()))
-				}
-
-				secret.Namespace = ns.GetName()
-				secret.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
-				if err := r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
-					log.Error(err, fmt.Sprintf("failed to delete object of Secret '%s' in namespace %s", configMap.GetName(), ns.GetName()))
-				}
-			}
-		}
+		r.deleteSidecarModeResources(ctx, log, instance)
 	}
 }
 
@@ -520,7 +577,7 @@ func (r *AgentReconciler) reconcileServiceAccount(ctx context.Context, log logr.
 	return nil
 }
 
-// reconcileDaemonset prepares the desired states for Agent Daemonset and
+// reconcileDaemonset prepares the desired states for Agent DaemonSet and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileDaemonset(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) error {
 	if instance.Spec.Sidecar.Enabled {
@@ -538,17 +595,17 @@ func (r *AgentReconciler) reconcileDaemonset(ctx context.Context, log logr.Logge
 			return r.reconcileDaemonset(ctx, log, instance)
 		}
 
-		msg := fmt.Sprintf("failed to create Daemonset '%s' for Instance '%s' in Namespace '%s'. Response='%v', Error='%s'",
+		msg := fmt.Sprintf("failed to create DaemonSet '%s' for Instance '%s' in Namespace '%s'. Response='%v', Error='%s'",
 			dms.GetName(), instance.GetName(), instance.GetNamespace(), res, err.Error())
-		r.Recorder.Event(instance, corev1.EventTypeNormal, "DaemonsetCreationFailed", msg)
+		r.Recorder.Event(instance, corev1.EventTypeNormal, "DaemonSetCreationFailed", msg)
 		return fmt.Errorf(msg)
 	}
 
 	switch res {
 	case controllerutil.OperationResultCreated:
-		r.Recorder.Eventf(instance, corev1.EventTypeNormal, "DaemonsetCreationSuccessful", "Created Daemonset '%s'", dms.GetName())
+		r.Recorder.Eventf(instance, corev1.EventTypeNormal, "DaemonSetCreationSuccessful", "Created DaemonSet '%s'", dms.GetName())
 	case controllerutil.OperationResultUpdated:
-		r.Recorder.Eventf(instance, corev1.EventTypeNormal, "DaemonsetUpdationSuccessful", "Updated Daemonset '%s'", dms.GetName())
+		r.Recorder.Eventf(instance, corev1.EventTypeNormal, "DaemonSetUpdationSuccessful", "Updated DaemonSet '%s'", dms.GetName())
 	case controllerutil.OperationResultNone:
 	default:
 	}
