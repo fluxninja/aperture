@@ -21,12 +21,15 @@
 
 #### Concurrency Limiter
 
-| Parameter Name                                                 | Parameter Type                         | Default | Description                                                                                    |
-| -------------------------------------------------------------- | -------------------------------------- | ------- | ---------------------------------------------------------------------------------------------- |
-| `policy.concurrencyLimiter.autoTokens`                         | `bool`                                 | `true`  | Whether tokens for workloads are computed dynamically or set statically by the user.           |
-| `policy.concurrencyLimiter.timeoutFactor`                      | `float64`                              | `0.5`   | The maximum time a request can wait for tokens as a factor of tokens for a flow in a workload. |
-| `policy.concurrencyLimiter.defaultWorkloadParameters.priority` | `int`                                  | `20`    | Workload parameters to use in case none of the configured workloads match.                     |
-| `policy.concurrencyLimiter.workloads`                          | `[]aperture.spec.v1.SchedulerWorkload` | `[]`    | A list of additional workloads for the scheduler.                                              |
+| Parameter Name                                                 | Parameter Type                         | Default             | Description                                                                                    |
+| -------------------------------------------------------------- | -------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------- |
+| `policy.concurrencyLimiter.autoTokens`                         | `bool`                                 | `true`              | Whether tokens for workloads are computed dynamically or set statically by the user.           |
+| `policy.concurrencyLimiter.timeoutFactor`                      | `float64`                              | `0.5`               | The maximum time a request can wait for tokens as a factor of tokens for a flow in a workload. |
+| `policy.concurrencyLimiter.defaultWorkloadParameters.priority` | `int`                                  | `20`                | Workload parameters to use in case none of the configured workloads match.                     |
+| `policy.concurrencyLimiter.workloads`                          | `[]aperture.spec.v1.SchedulerWorkload` | `[]`                | A list of additional workloads for the scheduler.                                              |
+| `policy.concurrencyLimiter.alerterName`                        | `string`                               | `"Load Shed Event"` | Name of the alert sent on Load Shed Event.                                                     |
+| `policy.concurrencyLimiter.alerterChannels`                    | `[]string`                             | `[]`                | A list of alert channels to which the alert will be sent.                                      |
+| `policy.concurrencyLimiter.alerterResolveTimeout`              | `string`                               | `"5s"`              | A timeout after which alert is marked as resolved if alert is not repeated.                    |
 
 #### Dynamic Config
 

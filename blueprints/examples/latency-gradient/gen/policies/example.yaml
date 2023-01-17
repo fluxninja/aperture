@@ -152,6 +152,7 @@ spec:
             alerter_config:
               alert_channels: []
               alert_name: Load Shed Event
+              resolve_timeout: 5s
             dynamic_config_key: concurrency_limiter
             in_ports:
               load_multiplier:
