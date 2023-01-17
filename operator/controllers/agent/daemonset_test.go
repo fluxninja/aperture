@@ -36,7 +36,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
-var _ = Describe("Agent Daemonset", func() {
+var _ = Describe("Agent DaemonSet", func() {
 	var (
 		probe = common.Probe{
 			Enabled:             true,
@@ -620,7 +620,7 @@ var _ = Describe("Agent Daemonset", func() {
 	})
 })
 
-var _ = Describe("Test Daemonset Mutate", func() {
+var _ = Describe("Test DaemonSet Mutate", func() {
 	It("Mutate should update required fields only", func() {
 		expected := &appsv1.DaemonSet{
 			ObjectMeta: metav1.ObjectMeta{},
