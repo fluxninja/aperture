@@ -28,6 +28,9 @@
     * @param (policy.concurrencyLimiter.timeoutFactor: float64) The maximum time a request can wait for tokens as a factor of tokens for a flow in a workload.
     * @param (policy.concurrencyLimiter.defaultWorkloadParameters.priority: int) Workload parameters to use in case none of the configured workloads match.
     * @param (policy.concurrencyLimiter.workloads: []aperture.spec.v1.SchedulerWorkload) A list of additional workloads for the scheduler.
+    * @param (policy.concurrencyLimiter.alerterName: string) Name of the alert sent on Load Shed Event.
+    * @param (policy.concurrencyLimiter.alerterChannels: []string) A list of alert channels to which the alert will be sent.
+    * @param (policy.concurrencyLimiter.alerterResolveTimeout: string) A timeout after which alert is marked as resolved if alert is not repeated.
     */
     concurrencyLimiter: {
       autoTokens: true,
@@ -38,6 +41,7 @@
       workloads: [],
       alerterName: 'Load Shed Event',
       alerterChannels: [],
+      alerterResolveTimeout: '5s',
     },
     /**
     * @section Policy

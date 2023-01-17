@@ -141,6 +141,7 @@ function(params) {
                 alerterConfig.new()
                 + alerterConfig.withAlertName(c.alerterName)
                 + alerterConfig.withAlertChannels(c.alerterChannels)
+                + alerterConfig.withResolveTimeout(c.alerterResolveTimeout)
               )
             )
           ),
