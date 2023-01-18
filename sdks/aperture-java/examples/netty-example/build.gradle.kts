@@ -5,11 +5,10 @@ plugins {
 }
 
 application {
-    mainClass.set("com.fluxninja.example.ArmeriaServer")
+    mainClass.set("com.fluxninja.example.NettyServer")
 }
 
 dependencies {
-    implementation("com.linecorp.armeria:armeria:1.15.0")
     implementation(project(":lib:core"))
-    implementation(project(":lib:armeria"))
+    implementation(project(":lib:netty"))
 }
