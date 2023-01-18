@@ -16,10 +16,6 @@ keywords:
 ---
 
 ```mdx-code-block
-export const apertureVersion = "0.19.0";
-```
-
-```mdx-code-block
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
