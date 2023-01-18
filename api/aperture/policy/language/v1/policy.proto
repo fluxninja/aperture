@@ -194,6 +194,15 @@ message Component {
 
     // HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
     HorizontalPodScaler horizontal_pod_scaler = 18;
+
+    // Logical AND.
+    And and = 19;
+
+    // Logical OR.
+    Or or = 20;
+
+    // Logical NOT.
+    Inverter inverter = 21;
   }
 }
 
@@ -1090,6 +1099,92 @@ message Min {
   Ins in_ports = 1;
 
   // Output ports for the Min component.
+  Outs out_ports = 2;
+}
+
+// Logical AND.
+//
+// Signals are mapped to boolean values as follows:
+// * Zero is treated as false.
+// * Any non-zero is treated as true.
+// * Invalid inputs are considered unknown.
+//
+//   :::note
+//   Treating invalid inputs as "unknowns" has a consequence that the result
+//   might end up being valid even when some inputs are invalid. Eg. `unknown
+//   && false == false`, because the result would end up false no matter if
+//   first signal was true or false. On the other hand, `unknown && true ==
+//   unknown`.
+//   :::
+message And {
+  // Inputs for the And component.
+  message Ins {
+    // Array of input signals.
+    repeated InPort inputs = 1; // @gotags: validate:"dive"
+  }
+
+  // Output ports for the And component.
+  message Outs {
+    // Result of logical AND of all the input signals.
+    //
+    // Will always be 0 (false), 1 (true) or invalid (unknown).
+    OutPort output = 1;
+  }
+
+  // Input ports for the And component.
+  Ins in_ports = 1;
+
+  // Output ports for the And component.
+  Outs out_ports = 2;
+}
+
+// Logical OR.
+//
+// See [And component](#v1-and) on how signals are mapped onto boolean values.
+message Or {
+  // Inputs for the Or component.
+  message Ins {
+    // Array of input signals.
+    repeated InPort inputs = 1; // @gotags: validate:"dive"
+  }
+
+  // Output ports for the Or component.
+  message Outs {
+    // Result of logical OR of all the input signals.
+    //
+    // Will always be 0 (false), 1 (true) or invalid (unknown).
+    OutPort output = 1;
+  }
+
+  // Input ports for the Or component.
+  Ins in_ports = 1;
+
+  // Output ports for the Or component.
+  Outs out_ports = 2;
+}
+
+// Logical NOT.
+//
+// See [And component](#v1-and) on how signals are mapped onto boolean values.
+message Inverter {
+  // Inputs for the Inverter component.
+  message Ins {
+    // Signal to be negated.
+    InPort input = 1; // @gotags: validate:"dive"
+  }
+
+  // Output ports for the Inverter component.
+  message Outs {
+    // Logical negation of the input signal.
+    //
+    // Will always be 0 (false), 1 (true) or invalid (unknown).
+    OutPort output = 1;
+  }
+
+  // Input ports for the Inverter component.
+  Ins in_ports = 1;
+
+  // Output ports for the Inverter component.
   Outs out_ports = 2;
 }
 

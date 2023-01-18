@@ -389,6 +389,56 @@ definitions:
           0, Alerter generates an alert.
         x-order: 0
         $ref: '#/definitions/v1InPort'
+  v1And:
+    description: |-
+      Logical AND.
+
+      Signals are mapped to boolean values as follows:
+      * Zero is treated as false.
+      * Any non-zero is treated as true.
+      * Invalid inputs are considered unknown.
+
+        :::note
+        Treating invalid inputs as "unknowns" has a consequence that the result
+        might end up being valid even when some inputs are invalid. Eg. `unknown
+        && false == false`, because the result would end up false no matter if
+        first signal was true or false. On the other hand, `unknown && true ==
+        unknown`.
+        :::
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the And component.
+        x-order: 0
+        $ref: '#/definitions/v1AndIns'
+      out_ports:
+        description: Output ports for the And component.
+        x-order: 1
+        $ref: '#/definitions/v1AndOuts'
+  v1AndIns:
+    description: Inputs for the And component.
+    type: object
+    properties:
+      inputs:
+        description: |-
+          Array of input signals.
+
+          @gotags: validate:"dive"
+        type: array
+        items:
+          $ref: '#/definitions/v1InPort'
+        x-order: 0
+  v1AndOuts:
+    description: Output ports for the And component.
+    type: object
+    properties:
+      output:
+        description: |-
+          Result of logical AND of all the input signals.
+
+          Will always be 0 (false), 1 (true) or invalid (unknown).
+        x-order: 0
+        $ref: '#/definitions/v1OutPort'
   v1ArithmeticCombinator:
     type: object
     title: Type of combinator that computes the arithmetic operation on the operand
@@ -568,6 +618,10 @@ definitions:
           manager.
         x-order: 14
         $ref: '#/definitions/v1Alerter'
+      and:
+        description: Logical AND.
+        x-order: 18
+        $ref: '#/definitions/v1And'
       arithmetic_combinator:
         description: Applies the given operator on input operands (signals) and emits
           the result.
@@ -620,6 +674,10 @@ definitions:
         description: Accumulates sum of signal every tick.
         x-order: 15
         $ref: '#/definitions/v1Integrator'
+      inverter:
+        description: Logical NOT.
+        x-order: 20
+        $ref: '#/definitions/v1Inverter'
       max:
         description: Emits the maximum of the input signals.
         x-order: 11
@@ -628,6 +686,10 @@ definitions:
         description: Emits the minimum of the input signals.
         x-order: 12
         $ref: '#/definitions/v1Min'
+      or:
+        description: Logical OR.
+        x-order: 19
+        $ref: '#/definitions/v1Or'
       promql:
         description: Periodically runs a Prometheus query in the background and emits
           the result.
@@ -1423,6 +1485,43 @@ definitions:
       output:
         x-order: 0
         $ref: '#/definitions/v1OutPort'
+  v1Inverter:
+    description: |-
+      Logical NOT.
+
+      See [And component](#v1-and) on how signals are mapped onto boolean values.
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the Inverter component.
+        x-order: 0
+        $ref: '#/definitions/v1InverterIns'
+      out_ports:
+        description: Output ports for the Inverter component.
+        x-order: 1
+        $ref: '#/definitions/v1InverterOuts'
+  v1InverterIns:
+    description: Inputs for the Inverter component.
+    type: object
+    properties:
+      input:
+        description: |-
+          Signal to be negated.
+
+          @gotags: validate:"dive"
+        x-order: 0
+        $ref: '#/definitions/v1InPort'
+  v1InverterOuts:
+    description: Output ports for the Inverter component.
+    type: object
+    properties:
+      output:
+        description: |-
+          Logical negation of the input signal.
+
+          Will always be 0 (false), 1 (true) or invalid (unknown).
+        x-order: 0
+        $ref: '#/definitions/v1OutPort'
   v1JSONExtractor:
     description: |-
       Example:
@@ -1766,6 +1865,45 @@ definitions:
     properties:
       output:
         description: Signal with minimum value as an output signal.
+        x-order: 0
+        $ref: '#/definitions/v1OutPort'
+  v1Or:
+    description: |-
+      Logical OR.
+
+      See [And component](#v1-and) on how signals are mapped onto boolean values.
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the Or component.
+        x-order: 0
+        $ref: '#/definitions/v1OrIns'
+      out_ports:
+        description: Output ports for the Or component.
+        x-order: 1
+        $ref: '#/definitions/v1OrOuts'
+  v1OrIns:
+    description: Inputs for the Or component.
+    type: object
+    properties:
+      inputs:
+        description: |-
+          Array of input signals.
+
+          @gotags: validate:"dive"
+        type: array
+        items:
+          $ref: '#/definitions/v1InPort'
+        x-order: 0
+  v1OrOuts:
+    description: Output ports for the Or component.
+    type: object
+    properties:
+      output:
+        description: |-
+          Result of logical OR of all the input signals.
+
+          Will always be 0 (false), 1 (true) or invalid (unknown).
         x-order: 0
         $ref: '#/definitions/v1OutPort'
   v1OutPort:
