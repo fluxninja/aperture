@@ -44,4 +44,23 @@
       numSync: 5,
     },
   },
+  /**
+  * @section Dashboard
+  *
+  * @param (dashboard.refreshInterval: string) Refresh interval for dashboard panels.
+  */
+  dashboard: {
+    refreshInterval: '10s',
+    /**
+    * @section Dashboard
+    * @subsection Datasource
+    *
+    * @param (dashboard.datasource.name: string) Datasource name.
+    * @param (dashboard.datasource.filterRegex: string) Datasource filter regex.
+    */
+    datasource: {
+      name: '$datasource',
+      filterRegex: '',
+    },
+  },
 }
