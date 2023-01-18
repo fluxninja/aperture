@@ -1,0 +1,8 @@
+label: Bundled Blueprints
+position: 2
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Bundled Blueprints"
+  keywords: ["blueprints"]

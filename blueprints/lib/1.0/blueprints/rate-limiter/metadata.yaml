@@ -1,8 +1,0 @@
-blueprint: Rate Limiter Blueprint
-sources:
-  Dashboard:
-    prefix: dashboard
-    path: lib/1.0/blueprints/rate-limiter/dashboard.libsonnet
-  Policy:
-    prefix: policy
-    path: lib/1.0/blueprints/rate-limiter/policy.libsonnet

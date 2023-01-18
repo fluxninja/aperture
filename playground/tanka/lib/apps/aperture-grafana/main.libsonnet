@@ -2,8 +2,8 @@ local grafanaOperator = import 'github.com/jsonnet-libs/grafana-operator-libsonn
 local kubernetesMixin = import 'github.com/kubernetes-monitoring/kubernetes-mixin/mixin.libsonnet';
 
 local aperture = import '../../../../../blueprints/lib/1.0/main.libsonnet';
-local policyDashboard = aperture.blueprints.LatencyGradient.dashboard;
-local rateLimitpolicyDashboard = aperture.blueprints.RateLimiter.dashboard;
+local policyDashboard = aperture.blueprints.LatencyGradientConcurrencyLimiting.dashboard;
+local rateLimitpolicyDashboard = aperture.blueprints.StaticRateLimiting.dashboard;
 local signalsDashboard = aperture.blueprints.SignalsDashboard.dashboard;
 
 local grafana = grafanaOperator.integreatly.v1alpha1.grafana;
@@ -44,12 +44,12 @@ local kubeDashboards =
 
 local policyDashBoardMixin =
   policyDashboard({
+    policyName: 'service1-demo-app',
+  }).dashboard
+  {
+    panels+: rateLimitpolicyDashboard({
       policyName: 'service1-demo-app',
-    }).dashboard
-  + {
-    'panels'+: rateLimitpolicyDashboard({
-      policyName: 'service1-demo-app',
-    }).dashboard['panels']
+    }).dashboard.panels,
   };
 
 local dashboards =
