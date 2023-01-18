@@ -30,8 +30,9 @@ serviceAccount:
   name: ""
 
 podAnnotations:
-  consul.hashicorp.com/connect-inject: "true"
-  sidecar.istio.io/inject: "false"
+  consul.hashicorp.com/transparent-proxy: "true"
+  # consul.hashicorp.com/connect-inject: "true"
+  # sidecar.istio.io/inject: "false"
 
 podSecurityContext: {}
   # fsGroup: 2000

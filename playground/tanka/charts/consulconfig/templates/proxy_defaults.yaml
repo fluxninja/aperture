@@ -4,9 +4,7 @@ metadata:
   name: global
 spec:
   config:
-    protocol: "tcp"
-    bind_port: 15000
-    bind_address: "0.0.0.0"
+    protocol: "http"
     envoy_extra_static_clusters_json: |
       [
         {
@@ -56,7 +54,7 @@ spec:
                   "name": "envoy.filters.network.http_connection_manager",
                   "typed_config": {
                     "@type": "type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager",
-                    "stat_prefix": "outbound_10.96.121.146_8080",
+                    "stat_prefix": "egress",
                     "route_config": {
                       "name": "local_route",
                       "virtual_hosts": [
@@ -174,14 +172,12 @@ spec:
                         "name": "envoy.filters.http.ext_authz",
                         "typed_config": {
                           "@type": "type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz",
-                          "transport_api_version": "V3"
-                          "failure_mode_allow": true,
                           "grpc_service": {
                             "google_grpc": {
                               "target_uri": "aperture-agent.aperture-agent.svc.cluster.local:8080",
                               "stat_prefix": "ext_authz"
                             },
-                            "timeout": "0.5s",
+                            "timeout": "10s",
                             "initial_metadata": [
                               {
                                 "key": "control-point",
@@ -189,6 +185,8 @@ spec:
                               }
                             ]
                           },
+                          "failure_mode_allow": true,
+                          "transport_api_version": "V3"
                         }
                       },
                       {
@@ -220,12 +218,12 @@ spec:
                   "name": "envoy.filters.network.http_connection_manager",
                   "typed_config": {
                     "@type": "type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager",
-                    "stat_prefix": "inbound_0.0.0.0_8099",
+                    "stat_prefix": "ingress",
                     "route_config": {
-                      "name": "inbound|8099||",
+                      "name": "local_route",
                       "virtual_hosts": [
                         {
-                          "name": "inbound|http|80",
+                          "name": "backend",
                           "domains": [
                             "*"
                           ],
@@ -235,14 +233,8 @@ spec:
                                 "prefix": "/"
                               },
                               "route": {
-                                "cluster": "inbound|8099||"
-                                "timeout": "0.5s"
-                                "max_stream_duration": {
-                                  "grpc_timeout_header_max": "0.5s"
-                                  "max_stream_duration": "0s"
-                                }
-                              },
-                              "name": "default"
+                                "cluster": "service"
+                              }
                             }
                           ]
                         }
@@ -344,21 +336,21 @@ spec:
                         "name": "envoy.filters.http.ext_authz",
                         "typed_config": {
                           "@type": "type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz",
-                          "transport_api_version": "V3",
-                          "failure_mode_allow": true,
                           "grpc_service": {
                             "google_grpc": {
                               "target_uri": "aperture-agent.aperture-agent.svc.cluster.local:8080",
                               "stat_prefix": "ext_authz"
                             },
-                            "timeout": "0.5s",
+                            "timeout": "10s",
                             "initial_metadata": [
                               {
                                 "key": "control-point",
                                 "value": "ingress"
                               }
                             ]
-                          }
+                          },
+                          "failure_mode_allow": true,
+                          "transport_api_version": "V3"
                         }
                       },
                       {

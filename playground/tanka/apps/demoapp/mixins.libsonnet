@@ -28,6 +28,17 @@ local demoappMixin =
     },
   };
 
+local wavepoolServiceMixin =
+  k.core.v1.service.new(wavePoolGenerator, { 'app.kubernetes.io/component': wavePoolGenerator }, 80)
+  + k.core.v1.service.spec.withType('ClusterIP')
+  + k.core.v1.service.spec.withPorts([
+    {
+      name: 'http',
+      port: 80,
+      targetPort: 80,
+    },
+  ]);
+
 local wavePoolConfigMixin =
   k.core.v1.configMap.new(wavepoolConfigName)
   + k.core.v1.configMap.withData({
@@ -64,6 +75,7 @@ local wavePoolGeneratorMixin =
 
 {
   demoapp: demoappMixin,
+  wavepoolService: wavepoolServiceMixin,
   wavePoolconfigMap: wavePoolConfigMixin,
   wavepoolDeployment: wavePoolGeneratorMixin,
 }

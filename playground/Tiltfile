@@ -238,52 +238,52 @@ DEP_TREE = {
             ]
         }
     },
-    APERTURE_ISTIO_NS: {
-        "istio": {
-            "labels": ["Istio"],
-            "needs": ["controller", "agent"],
-            "tkenv": TANKA_ROOT + "/apps/istio",
-            "child_resources": [
-                {
-                    "new_name": "istio-bootstrap",
-                    "extra_objects": [
-                        "istio:configmap",
-                        "aperture-envoy-filter:envoyfilter",
-                        "istiod-default-validator:validatingwebhookconfiguration",
-                        ("istio.io$", "customresourcedefinition"),
-                        (None, "EnvoyFilter", "istio-system"),
-                        ("^istio-reader", None),
-                        ("^istio-sidecar", None),
-                    ]
-                },
-                {
-                    "workload": "istiod",
-                    "resource_deps": ["istio-bootstrap"],
-                    "extra_objects": [
-                        ("^istiod", None),
-                    ],
-                    "ignored_objects": [
-                        ("^istiod", "Service|Deployment")
-                    ]
-                },
-                {
-                    "workload": "gateway",
-                    "resource_deps": ["istio-bootstrap", "istiod"],
-                    "extra_objects": [
-                        ("^gateway", None),
-                    ],
-                    "ignored_objects": [
-                        ("^gateway", "Service|Deployment"),
-                    ]
-                },
-            ]
-        },
-    },
+    # APERTURE_ISTIO_NS: {
+    #     "istio": {
+    #         "labels": ["Istio"],
+    #         "needs": ["controller", "agent"],
+    #         "tkenv": TANKA_ROOT + "/apps/istio",
+    #         "child_resources": [
+    #             {
+    #                 "new_name": "istio-bootstrap",
+    #                 "extra_objects": [
+    #                     "istio:configmap",
+    #                     # "aperture-envoy-filter:envoyfilter",
+    #                     "istiod-default-validator:validatingwebhookconfiguration",
+    #                     ("istio.io$", "customresourcedefinition"),
+    #                     # (None, "EnvoyFilter", "istio-system"),
+    #                     ("^istio-reader", None),
+    #                     ("^istio-sidecar", None),
+    #                 ]
+    #             },
+    #             {
+    #                 "workload": "istiod",
+    #                 "resource_deps": ["istio-bootstrap"],
+    #                 "extra_objects": [
+    #                     ("^istiod", None),
+    #                 ],
+    #                 "ignored_objects": [
+    #                     ("^istiod", "Service|Deployment")
+    #                 ]
+    #             },
+    #             {
+    #                 "workload": "gateway",
+    #                 "resource_deps": ["istio-bootstrap", "istiod"],
+    #                 "extra_objects": [
+    #                     ("^gateway", None),
+    #                 ],
+    #                 "ignored_objects": [
+    #                     ("^gateway", "Service|Deployment"),
+    #                 ]
+    #             },
+    #         ]
+    #     },
+    # },
     APERTURE_DEMOAPP_NS: {
         "graphql-demo-app": {
             "labels": ["GraphQLDemoApplications"],
             "tkenv": TANKA_ROOT + "/apps/graphql-demoapp",
-            "needs": ["istio"],
+            # "needs": ["istio"],
             "images": [
                 {
                     "ref": "graphql-demo-app",
@@ -294,7 +294,7 @@ DEP_TREE = {
             "child_resources": [
                 {
                     "workload": "service-graphql-demo-app",
-                    "resource_deps": ["cluster-bootstrap", "istiod"],
+                    "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
                         "service-graphql-demo-app:serviceaccount"
                     ]
@@ -314,7 +314,7 @@ DEP_TREE = {
         "demo-app": {
             "labels": ["DemoApplications"],
             "tkenv": TANKA_ROOT + "/apps/demoapp",
-            "needs": ["istio"],
+            # "needs": ["istio"],
             "images": [
                 {
                     "ref": "demo-app",
@@ -325,21 +325,21 @@ DEP_TREE = {
             "child_resources": [
                 {
                     "workload": "service1-demo-app",
-                    "resource_deps": ["cluster-bootstrap", "istiod"],
+                    "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
                         "service1-demo-app:serviceaccount"
                     ]
                 },
                 {
                     "workload": "service2-demo-app",
-                    "resource_deps": ["cluster-bootstrap", "istiod"],
+                    "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
                         "service2-demo-app:serviceaccount"
                     ]
                 },
                 {
                     "workload": "service3-demo-app",
-                    "resource_deps": ["cluster-bootstrap", "istiod"],
+                    "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
                         "service3-demo-app:serviceaccount"
                     ]
@@ -418,7 +418,7 @@ DEP_TREE = {
 
 NS_CONFIG = {
     APERTURE_DEMOAPP_NS: {
-        "labels": ["istio-injection: enabled"],
+        "labels": ["connect-inject: enabled"],
     },
 }
 
