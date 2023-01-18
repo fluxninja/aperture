@@ -3,6 +3,7 @@ info:
   title: Aperture API
   version: "1.0"
 tags:
+  - name: DistCacheService
   - name: EntityCacheService
   - name: FlowControlService
   - name: FlowPreviewService
@@ -52,6 +53,20 @@ paths:
             $ref: '#/definitions/v1ReportRequest'
       tags:
         - FluxNinjaService
+  /v1/distcache/stats:
+    get:
+      operationId: DistCacheService_GetStats
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1Stats'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      tags:
+        - aperture-agent
   /v1/entities:
     get:
       operationId: EntityCacheService_GetEntityCache
@@ -577,6 +592,18 @@ definitions:
         description: List of subexpressions of the match expression.
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     title: List of MatchExpressions that is used for all/any matching
+  MemStatsBySize:
+    type: object
+    properties:
+      size:
+        type: integer
+        format: int64
+      mallocs:
+        type: string
+        format: uint64
+      frees:
+        type: string
+        format: uint64
   PreviewFlowLabelsResponseFlowLabels:
     type: object
     properties:
@@ -1297,6 +1324,50 @@ definitions:
     properties:
       id:
         type: string
+  v1DMap:
+    type: object
+    properties:
+      length:
+        type: string
+        format: int64
+      slab_info:
+        $ref: '#/definitions/v1SlabInfo'
+      num_tables:
+        type: string
+        format: int64
+  v1DMaps:
+    type: object
+    properties:
+      entries_total:
+        type: string
+        format: int64
+      delete_hits:
+        type: string
+        format: int64
+      delete_misses:
+        type: string
+        format: int64
+      get_misses:
+        type: string
+        format: int64
+      get_hits:
+        type: string
+        format: int64
+      evicted_total:
+        type: string
+        format: int64
+  v1DTopics:
+    type: object
+    properties:
+      published_total:
+        type: string
+        format: int64
+      current_listeners:
+        type: string
+        format: int64
+      listeners_total:
+        type: string
+        format: int64
   v1Decider:
     type: object
     properties:
@@ -2274,6 +2345,113 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Signal with maximum value as an output signal.
     description: Output for the Max component.
+  v1MemStats:
+    type: object
+    properties:
+      alloc:
+        type: string
+        format: uint64
+      total_alloc:
+        type: string
+        format: uint64
+      sys:
+        type: string
+        format: uint64
+      lookups:
+        type: string
+        format: uint64
+      mallocs:
+        type: string
+        format: uint64
+      frees:
+        type: string
+        format: uint64
+      heap_alloc:
+        type: string
+        format: uint64
+      heap_sys:
+        type: string
+        format: uint64
+      heap_idle:
+        type: string
+        format: uint64
+      heap_inuse:
+        type: string
+        format: uint64
+      heap_released:
+        type: string
+        format: uint64
+      heap_objects:
+        type: string
+        format: uint64
+      stack_inuse:
+        type: string
+        format: uint64
+      stack_sys:
+        type: string
+        format: uint64
+      m_span_inuse:
+        type: string
+        format: uint64
+      m_span_sys:
+        type: string
+        format: uint64
+      m_cache_inuse:
+        type: string
+        format: uint64
+      m_cache_sys:
+        type: string
+        format: uint64
+      buck_hash_sys:
+        type: string
+        format: uint64
+      gc_sys:
+        type: string
+        format: uint64
+      other_sys:
+        type: string
+        format: uint64
+      next_gc:
+        type: string
+        format: uint64
+      last_gc:
+        type: string
+        format: uint64
+      pause_total_ns:
+        type: string
+        format: uint64
+      pause_ns:
+        type: string
+        format: uint64
+      pause_end:
+        type: string
+        format: uint64
+      num_gc:
+        type: integer
+        format: int64
+      num_forced_gc:
+        type: integer
+        format: int64
+      gc_cpu_fraction:
+        type: number
+        format: double
+      enable_gc:
+        type: boolean
+      debug_gc:
+        type: boolean
+      by_size:
+        $ref: '#/definitions/MemStatsBySize'
+  v1Member:
+    type: object
+    properties:
+      name:
+        type: string
+      id:
+        type: string
+        format: uint64
+      birthdate:
+        type: string
+        format: int64
   v1Min:
     type: object
     properties:
@@ -2305,6 +2483,24 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Signal with minimum value as an output signal.
     description: Output ports for the Min component.
+  v1Network:
+    type: object
+    properties:
+      connections_total:
+        type: string
+        format: int64
+      current_connections:
+        type: string
+        format: int64
+      written_bytes_total:
+        type: string
+        format: int64
+      read_bytes_total:
+        type: string
+        format: int64
+      commands_total:
+        type: string
+        format: int64
   v1OutPort:
     type: object
     properties:
@@ -2323,6 +2519,24 @@ definitions:
         type: integer
         format: int32
     description: OverlappingService contains info about a service that overlaps with another one.
+  v1Partition:
+    type: object
+    properties:
+      previous_owners:
+        type: array
+        items:
+          $ref: '#/definitions/v1Member'
+      backups:
+        type: array
+        items:
+          $ref: '#/definitions/v1Member'
+      length:
+        type: string
+        format: int64
+      d_maps:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1DMap'
   v1PathTemplateMatcher:
     type: object
     properties:
@@ -2678,6 +2892,23 @@ definitions:
       ```
       [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
     title: Rule describes a single Flow Classification Rule
+  v1Runtime:
+    type: object
+    properties:
+      go_os:
+        type: string
+      go_arch:
+        type: string
+      version:
+        type: string
+      num_cpu:
+        type: string
+        format: int64
+      num_goroutine:
+        type: string
+        format: int64
+      mem_stats:
+        $ref: '#/definitions/v1MemStats'
   v1Scheduler:
     type: object
     properties:
@@ -2857,6 +3088,18 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/v1OverlappingService'
+  v1SlabInfo:
+    type: object
+    properties:
+      allocated:
+        type: string
+        format: int64
+      inuse:
+        type: string
+        format: int64
+      garbage:
+        type: string
+        format: int64
   v1Sqrt:
     type: object
     properties:
@@ -2893,6 +3136,42 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Output signal.
     description: Outputs for the Sqrt component.
+  v1Stats:
+    type: object
+    properties:
+      cmdline:
+        type: array
+        items:
+          type: string
+      release_version:
+        type: string
+      uptime_seconds:
+        type: string
+        format: int64
+      runtime:
+        $ref: '#/definitions/v1Runtime'
+      cluster_coordinator:
+        $ref: '#/definitions/v1Member'
+      member:
+        $ref: '#/definitions/v1Member'
+      partitions:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Partition'
+      backups:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Partition'
+      cluster_members:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Member'
+      network:
+        $ref: '#/definitions/v1Network'
+      d_maps:
+        $ref: '#/definitions/v1DMaps'
+      d_topics:
+        $ref: '#/definitions/v1DTopics'
   v1StatusError:
     type: object
     properties:

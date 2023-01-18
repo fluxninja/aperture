@@ -11,8 +11,12 @@ import (
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
+	distcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/distcache/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/fluxninja/aperture/pkg/config"
@@ -20,6 +24,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
+	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/peers"
 )
@@ -34,6 +39,9 @@ const (
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(DistCacheConstructor{ConfigKey: defaultKey}.ProvideDistCache),
+		fx.Provide(RegisterDistCacheService),
+		grpcgateway.RegisterHandler{Handler: distcachev1.RegisterDistCacheServiceHandlerFromEndpoint}.Annotate(),
+		fx.Invoke(Register),
 	)
 }
 
@@ -294,4 +302,16 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	})
 
 	return dc, nil
+}
+
+// Register registers the handler on grpc.Server.
+func Register(handler *DistCacheService,
+	server *grpc.Server,
+	healthsrv *health.Server,
+) error {
+	distcachev1.RegisterDistCacheServiceServer(server, handler)
+
+	healthsrv.SetServingStatus("aperture.distcache.v1.DistCacheService", grpc_health_v1.HealthCheckResponse_SERVING)
+	log.Info().Msg("DistCache Stats handler registered")
+	return nil
 }

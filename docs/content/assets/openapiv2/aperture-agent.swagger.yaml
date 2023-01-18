@@ -10,6 +10,20 @@ info:
   version: "1.0"
 host: aperture-agent
 paths:
+  /v1/distcache/stats:
+    get:
+      tags:
+      - aperture-agent
+      operationId: DistCacheService_GetStats
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1Stats'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
   /v1/entities:
     get:
       tags:
@@ -346,6 +360,18 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/v1MatchExpression'
+  MemStatsBySize:
+    type: object
+    properties:
+      frees:
+        type: string
+        format: uint64
+      mallocs:
+        type: string
+        format: uint64
+      size:
+        type: integer
+        format: int64
   PreviewFlowLabelsResponseFlowLabels:
     type: object
     properties:
@@ -493,6 +519,50 @@ definitions:
       timestamp:
         type: string
         format: date-time
+  v1DMap:
+    type: object
+    properties:
+      length:
+        type: string
+        format: int64
+      num_tables:
+        type: string
+        format: int64
+      slab_info:
+        $ref: '#/definitions/v1SlabInfo'
+  v1DMaps:
+    type: object
+    properties:
+      delete_hits:
+        type: string
+        format: int64
+      delete_misses:
+        type: string
+        format: int64
+      entries_total:
+        type: string
+        format: int64
+      evicted_total:
+        type: string
+        format: int64
+      get_hits:
+        type: string
+        format: int64
+      get_misses:
+        type: string
+        format: int64
+  v1DTopics:
+    type: object
+    properties:
+      current_listeners:
+        type: string
+        format: int64
+      listeners_total:
+        type: string
+        format: int64
+      published_total:
+        type: string
+        format: int64
   v1Entity:
     description: Entity represents a pod, vm, etc.
     type: object
@@ -671,6 +741,149 @@ definitions:
           @gotags: validate:"required"
         type: string
         x-go-validate: required
+  v1MemStats:
+    type: object
+    properties:
+      alloc:
+        type: string
+        format: uint64
+      buck_hash_sys:
+        type: string
+        format: uint64
+      by_size:
+        $ref: '#/definitions/MemStatsBySize'
+      debug_gc:
+        type: boolean
+      enable_gc:
+        type: boolean
+      frees:
+        type: string
+        format: uint64
+      gc_cpu_fraction:
+        type: number
+        format: double
+      gc_sys:
+        type: string
+        format: uint64
+      heap_alloc:
+        type: string
+        format: uint64
+      heap_idle:
+        type: string
+        format: uint64
+      heap_inuse:
+        type: string
+        format: uint64
+      heap_objects:
+        type: string
+        format: uint64
+      heap_released:
+        type: string
+        format: uint64
+      heap_sys:
+        type: string
+        format: uint64
+      last_gc:
+        type: string
+        format: uint64
+      lookups:
+        type: string
+        format: uint64
+      m_cache_inuse:
+        type: string
+        format: uint64
+      m_cache_sys:
+        type: string
+        format: uint64
+      m_span_inuse:
+        type: string
+        format: uint64
+      m_span_sys:
+        type: string
+        format: uint64
+      mallocs:
+        type: string
+        format: uint64
+      next_gc:
+        type: string
+        format: uint64
+      num_forced_gc:
+        type: integer
+        format: int64
+      num_gc:
+        type: integer
+        format: int64
+      other_sys:
+        type: string
+        format: uint64
+      pause_end:
+        type: string
+        format: uint64
+      pause_ns:
+        type: string
+        format: uint64
+      pause_total_ns:
+        type: string
+        format: uint64
+      stack_inuse:
+        type: string
+        format: uint64
+      stack_sys:
+        type: string
+        format: uint64
+      sys:
+        type: string
+        format: uint64
+      total_alloc:
+        type: string
+        format: uint64
+  v1Member:
+    type: object
+    properties:
+      birthdate:
+        type: string
+        format: int64
+      id:
+        type: string
+        format: uint64
+      name:
+        type: string
+  v1Network:
+    type: object
+    properties:
+      commands_total:
+        type: string
+        format: int64
+      connections_total:
+        type: string
+        format: int64
+      current_connections:
+        type: string
+        format: int64
+      read_bytes_total:
+        type: string
+        format: int64
+      written_bytes_total:
+        type: string
+        format: int64
+  v1Partition:
+    type: object
+    properties:
+      backups:
+        type: array
+        items:
+          $ref: '#/definitions/v1Member'
+      d_maps:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1DMap'
+      length:
+        type: string
+        format: int64
+      previous_owners:
+        type: array
+        items:
+          $ref: '#/definitions/v1Member'
   v1Peer:
     description: Peer holds peer info and services.
     type: object
@@ -716,6 +929,71 @@ definitions:
         format: date-time
       uptime:
         type: string
+  v1Runtime:
+    type: object
+    properties:
+      go_arch:
+        type: string
+      go_os:
+        type: string
+      mem_stats:
+        $ref: '#/definitions/v1MemStats'
+      num_cpu:
+        type: string
+        format: int64
+      num_goroutine:
+        type: string
+        format: int64
+      version:
+        type: string
+  v1SlabInfo:
+    type: object
+    properties:
+      allocated:
+        type: string
+        format: int64
+      garbage:
+        type: string
+        format: int64
+      inuse:
+        type: string
+        format: int64
+  v1Stats:
+    type: object
+    properties:
+      backups:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Partition'
+      cluster_coordinator:
+        $ref: '#/definitions/v1Member'
+      cluster_members:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Member'
+      cmdline:
+        type: array
+        items:
+          type: string
+      d_maps:
+        $ref: '#/definitions/v1DMaps'
+      d_topics:
+        $ref: '#/definitions/v1DTopics'
+      member:
+        $ref: '#/definitions/v1Member'
+      network:
+        $ref: '#/definitions/v1Network'
+      partitions:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Partition'
+      release_version:
+        type: string
+      runtime:
+        $ref: '#/definitions/v1Runtime'
+      uptime_seconds:
+        type: string
+        format: int64
   v1StatusError:
     description: Error holds raw error message and its cause in a nested field.
     type: object
