@@ -50,4 +50,5 @@ java -javaagent:path/to/javaagent.jar \
 -jar path/to/application.jar
 ```
 
-[download_link]: http://localhost:8080
+[download_link]:
+  https://repo1.maven.org/maven2/com/fluxninja/aperture/aperture-javaagent/0.19.0/aperture-javaagent-0.19.0.jar
