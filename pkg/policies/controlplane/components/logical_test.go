@@ -20,14 +20,14 @@ var _ = Describe("Not component", func() {
 					output: { signal_name: NOT }
 			`,
 			sim.Inputs{
-				"INPUT": sim.NewInput([]float64{nan, 0.0, 1.0, 2.0}),
+				"INPUT": sim.NewInput([]float64{nan, 0.0, 1.0, 2.0, -1.}),
 			},
 			sim.OutputSignals{"NOT"},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
 			sim.Outputs{
-				"NOT": sim.NewReadings([]float64{nan, 1.0, 0.0, 0.0}),
+				"NOT": sim.NewReadings([]float64{nan, 1.0, 0.0, 0.0, 0.0}),
 			},
 		))
 	})
@@ -56,17 +56,17 @@ var _ = Describe("And and Or component", func() {
 					output: { signal_name: OR }
 			`,
 			sim.Inputs{
-				"INPUTX": sim.NewInput([]float64{nan, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0}),
-				"INPUTY": sim.NewInput([]float64{nan, nan, nan, 0.0, 0.0, 1.0, 2.0}),
-				"INPUTZ": sim.NewInput([]float64{nan, 0.0, 1.0, 0.0, 1.0, 1.0, 3.0}),
+				"INPUTX": sim.NewInput([]float64{nan, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, -1.}),
+				"INPUTY": sim.NewInput([]float64{nan, nan, nan, 0.0, 0.0, 1.0, 2.0, -2.}),
+				"INPUTZ": sim.NewInput([]float64{nan, 0.0, 1.0, 0.0, 1.0, 1.0, 3.0, 3.0}),
 			},
 			sim.OutputSignals{"AND", "OR"},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
 			sim.Outputs{
-				"AND": sim.NewReadings([]float64{nan, 0.0, nan, 0.0, 0.0, 1.0, 1.0}),
-				"OR":  sim.NewReadings([]float64{nan, nan, 1.0, 0.0, 1.0, 1.0, 1.0}),
+				"AND": sim.NewReadings([]float64{nan, 0.0, nan, 0.0, 0.0, 1.0, 1.0, 1.0}),
+				"OR":  sim.NewReadings([]float64{nan, nan, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0}),
 			},
 		))
 	})
