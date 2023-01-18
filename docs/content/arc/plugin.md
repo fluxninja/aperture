@@ -65,7 +65,7 @@ installation of the Aperture Controller or Agent:
 Replace the values of `ORGANIZATION_NAME` and `API_KEY` with the actual values
 of the organization on FluxNinja ARC and API Key generated on it.
 
-All the config parameters for the FluxNinja ARC Plugin are available:
+Configuration parameters for the FluxNinja ARC Plugin are available below:
 
 - [Aperture Controller](/references/configuration/controller.md/#flux-ninja-plugin)
 - [Aperture Agent](/references/configuration/agent.md#flux-ninja-plugin)

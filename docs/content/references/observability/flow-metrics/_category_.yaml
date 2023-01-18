@@ -1,0 +1,8 @@
+label: Flow Metrics
+position: 2
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Flow Metrics"
+  keywords: ["flow", "olap", "metrics"]

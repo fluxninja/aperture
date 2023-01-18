@@ -1,0 +1,8 @@
+label: Observability
+position: 3
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Observability"
+  keywords: ["observability", "metrics", "logs", "traces"]
