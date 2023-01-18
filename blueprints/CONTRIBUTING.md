@@ -11,14 +11,14 @@ auto generate README.md configuration section.
 An example metadata looks like this:
 
 ```yaml
-blueprint: Latency Gradient Blueprint
+blueprint: Latency Gradient Concurrency Limiting Policy
 sources:
-  FluxMeter Dashboard:
+  Dashboard:
     prefix: dashboard
-    path: lib/1.0/dashboards/latency-gradient.libsonnet
-  Latency Gradient Policy:
+    path: lib/1.0/blueprints/latency-gradient-concurrency-limiting/dashboard.libsonnet
+  Policy:
     prefix: policy
-    path: lib/1.0/policies/latency-gradient.libsonnet
+    path: lib/1.0/blueprints/latency-gradient-concurrency-limiting/policy.libsonnet
 ```
 
 - `blueprint` key is currently unused, but it names this specific bundle
@@ -41,8 +41,8 @@ which policy or dashboard configuration is available in `config.libsonnet` and
 An example:
 
 ```yaml
-local dashboard = import '../../lib/1.0/dashboards/latency-gradient.libsonnet';
-local policyResource = import '../../lib/1.0/policies/latency-gradient.libsonnet';
+local dashboard = import '../../lib/1.0/dashboards/latency-gradient-concurrency-limiting.libsonnet';
+local policyResource = import '../../lib/1.0/policies/latency-gradient-concurrency-limiting.libsonnet';
 
 local config = import './config.libsonnet';
 
@@ -74,7 +74,7 @@ An example (partial):
 ```jsonnet
 {
   /**
-  * @section Latency Gradient Policy
+  * @section Latency Gradient Concurrency Limiting Policy
   *
   * @param (policy.policyName: string required) A name of the policy, used within PromQL queries for fluxmeter metrics.
   * @param (policy.evaluationInterval: string) How often should policy be re-evaluated.
@@ -144,7 +144,7 @@ To update README.md from blueprint configuration, use
 `scripts/blueprint-readme-generator.py`:
 
 ```sh
-$ ./scripts/blueprint-readme-generator.py blueprints/latency-gradient
+$ ./scripts/blueprint-readme-generator.py blueprints/latency-gradient-concurrency-limiting
 $
 ```
 
@@ -159,8 +159,8 @@ Blueprints can be visualized. A blueprint is saved as a
 into an image with GraphViz:
 
 ```sh
-go run -mod=mod scripts/circuit-compiler/main.go -cr blueprints/latency-gradient/example/gen/policies/example.yaml -dot blueprints/latency-gradient/example/gen/graph/graph.dot
-dot -Tsvg  blueprints/latency-gradient/example/gen/graph/graph.dot > blueprints/latency-gradient/example/gen/graph/graph.svg
+go run -mod=mod scripts/circuit-compiler/main.go -cr blueprints/latency-gradient-concurrency-limiting/example/gen/policies/example.yaml -dot blueprints/latency-gradient-concurrency-limiting/example/gen/graph/graph.dot
+dot -Tsvg  blueprints/latency-gradient-concurrency-limiting/example/gen/graph/graph.dot > blueprints/latency-gradient-concurrency-limiting/example/gen/graph/graph.svg
 ```
 
 Before doing so make sure that generated yamls are up-to-date.

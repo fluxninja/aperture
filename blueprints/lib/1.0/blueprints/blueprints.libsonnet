@@ -1,5 +1,5 @@
 {
-  LatencyGradient: import 'latency-gradient/latency-gradient.libsonnet',
-  RateLimiter: import 'rate-limiter/rate-limiter.libsonnet',
+  LatencyGradientConcurrencyLimiting: import 'latency-gradient-concurrency-limiting/latency-gradient-concurrency-limiting.libsonnet',
+  StaticRateLimiting: import 'static-rate-limiting/static-rate-limiting.libsonnet',
   SignalsDashboard: import 'signals-dashboard/signals-dashboard.libsonnet',
 }

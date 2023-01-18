@@ -916,6 +916,52 @@ definitions:
         $ref: '#/definitions/v1InPort'
         description: Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.
     description: Inputs for the Alerter component.
+  v1And:
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/v1AndIns'
+        description: Input ports for the And component.
+      out_ports:
+        $ref: '#/definitions/v1AndOuts'
+        description: Output ports for the And component.
+    description: |-
+      Logical AND.
+
+      Signals are mapped to boolean values as follows:
+      * Zero is treated as false.
+      * Any non-zero is treated as true.
+      * Invalid inputs are considered unknown.
+
+        :::note
+        Treating invalid inputs as "unknowns" has a consequence that the result
+        might end up being valid even when some inputs are invalid. Eg. `unknown
+        && false == false`, because the result would end up false no matter if
+        first signal was true or false. On the other hand, `unknown && true ==
+        unknown`.
+        :::
+  v1AndIns:
+    type: object
+    properties:
+      inputs:
+        type: array
+        items:
+          $ref: '#/definitions/v1InPort'
+        description: |-
+          Array of input signals.
+
+          @gotags: validate:"dive"
+    description: Inputs for the And component.
+  v1AndOuts:
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
+        description: |-
+          Result of logical AND of all the input signals.
+
+          Will always be 0 (false), 1 (true) or invalid (unknown).
+    description: Output ports for the And component.
   v1ArithmeticCombinator:
     type: object
     properties:
@@ -1186,6 +1232,15 @@ definitions:
       horizontal_pod_scaler:
         $ref: '#/definitions/v1HorizontalPodScaler'
         description: HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+      and:
+        $ref: '#/definitions/v1And'
+        description: Logical AND.
+      or:
+        $ref: '#/definitions/v1Or'
+        description: Logical OR.
+      inverter:
+        $ref: '#/definitions/v1Inverter'
+        description: Logical NOT.
     description: |-
       :::info
       See also [Components overview](/concepts/policy/circuit.md#components).
@@ -1970,6 +2025,39 @@ definitions:
       output:
         $ref: '#/definitions/v1OutPort'
     description: Outputs for the Integrator component.
+  v1Inverter:
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/v1InverterIns'
+        description: Input ports for the Inverter component.
+      out_ports:
+        $ref: '#/definitions/v1InverterOuts'
+        description: Output ports for the Inverter component.
+    description: |-
+      Logical NOT.
+
+      See [And component](#v1-and) on how signals are mapped onto boolean values.
+  v1InverterIns:
+    type: object
+    properties:
+      input:
+        $ref: '#/definitions/v1InPort'
+        description: |-
+          Signal to be negated.
+
+          @gotags: validate:"dive"
+    description: Inputs for the Inverter component.
+  v1InverterOuts:
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
+        description: |-
+          Logical negation of the input signal.
+
+          Will always be 0 (false), 1 (true) or invalid (unknown).
+    description: Output ports for the Inverter component.
   v1JSONExtractor:
     type: object
     properties:
@@ -2305,6 +2393,41 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Signal with minimum value as an output signal.
     description: Output ports for the Min component.
+  v1Or:
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/v1OrIns'
+        description: Input ports for the Or component.
+      out_ports:
+        $ref: '#/definitions/v1OrOuts'
+        description: Output ports for the Or component.
+    description: |-
+      Logical OR.
+
+      See [And component](#v1-and) on how signals are mapped onto boolean values.
+  v1OrIns:
+    type: object
+    properties:
+      inputs:
+        type: array
+        items:
+          $ref: '#/definitions/v1InPort'
+        description: |-
+          Array of input signals.
+
+          @gotags: validate:"dive"
+    description: Inputs for the Or component.
+  v1OrOuts:
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
+        description: |-
+          Result of logical OR of all the input signals.
+
+          Will always be 0 (false), 1 (true) or invalid (unknown).
+    description: Output ports for the Or component.
   v1OutPort:
     type: object
     properties:

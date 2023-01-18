@@ -1,6 +1,7 @@
 plugins {
     id("java")
     id("application")
+    id("com.github.johnrengelman.shadow")
 }
 
 application {

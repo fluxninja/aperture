@@ -1,0 +1,8 @@
+blueprint: Latency Gradient Concurrency Limiting Policy
+sources:
+  Dashboard:
+    prefix: dashboard
+    path: lib/1.0/blueprints/latency-gradient-concurrency-limiting/dashboard.libsonnet
+  Policy:
+    prefix: policy
+    path: lib/1.0/blueprints/latency-gradient-concurrency-limiting/policy.libsonnet

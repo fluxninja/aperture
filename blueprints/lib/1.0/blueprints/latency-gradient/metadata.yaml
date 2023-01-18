@@ -1,8 +1,0 @@
-blueprint: Latency Gradient Blueprint
-sources:
-  Dashboard:
-    prefix: dashboard
-    path: lib/1.0/blueprints/latency-gradient/dashboard.libsonnet
-  Policy:
-    prefix: policy
-    path: lib/1.0/blueprints/latency-gradient/policy.libsonnet

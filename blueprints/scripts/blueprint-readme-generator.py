@@ -276,7 +276,7 @@ def update_readme_markdown(readme_path, blocks: List[DocBlock]):
     readme_data = readme_path.read_text()
     readme_copied = ""
     for line in readme_data.split("\n"):
-        if line == "[configuration]: # Configuration Marker":
+        if line == "<!-- Configuration Marker -->":
             readme_copied += line + "\n"
             break
         readme_copied += line + "\n"

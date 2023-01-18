@@ -7,6 +7,12 @@
   withAlerterMixin(alerter):: {
     alerter+: alerter,
   },
+  withAnd(and):: {
+    and: and,
+  },
+  withAndMixin(and):: {
+    and+: and,
+  },
   withArithmeticCombinator(arithmetic_combinator):: {
     arithmetic_combinator: arithmetic_combinator,
   },
@@ -73,6 +79,12 @@
   withIntegratorMixin(integrator):: {
     integrator+: integrator,
   },
+  withInverter(inverter):: {
+    inverter: inverter,
+  },
+  withInverterMixin(inverter):: {
+    inverter+: inverter,
+  },
   withMax(max):: {
     max: max,
   },
@@ -84,6 +96,12 @@
   },
   withMinMixin(min):: {
     min+: min,
+  },
+  withOr(or):: {
+    or: or,
+  },
+  withOrMixin(or):: {
+    or+: or,
   },
   withPromql(promql):: {
     promql: promql,

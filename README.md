@@ -97,11 +97,6 @@ To learn how to write Aperture policies, please read the
 
 [![How Concurrency Limits Help Protect Against Cascading Failures](https://img.youtube.com/vi/m070bAvrDHM/0.jpg)](https://youtu.be/m070bAvrDHM)
 
-## 📄 Licensing FAQ
-
-If you have questions regarding GNU GPLv3 and commercial licensing options,
-please read the [Licensing FAQ](https://docs.fluxninja.com/docs/licensing-faq)
-
 ## 👷 Contributing
 
 [Reporting bugs](https://github.com/fluxninja/aperture/issues/new?assignees=&labels=bug&template=bug_report.md&title=)
