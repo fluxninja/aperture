@@ -3,6 +3,7 @@ info:
   title: Aperture API
   version: "1.0"
 tags:
+  - name: DistCacheService
   - name: EntityCacheService
   - name: FlowControlService
   - name: FlowPreviewService
@@ -52,6 +53,20 @@ paths:
             $ref: '#/definitions/v1ReportRequest'
       tags:
         - FluxNinjaService
+  /v1/distcache/stats:
+    get:
+      operationId: DistCacheService_GetStats
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1Stats'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      tags:
+        - aperture-agent
   /v1/entities:
     get:
       operationId: EntityCacheService_GetEntityCache
@@ -1352,6 +1367,50 @@ definitions:
     properties:
       id:
         type: string
+  v1DMap:
+    type: object
+    properties:
+      length:
+        type: string
+        format: int64
+      slab_info:
+        $ref: '#/definitions/v1SlabInfo'
+      num_tables:
+        type: string
+        format: int64
+  v1DMaps:
+    type: object
+    properties:
+      entries_total:
+        type: string
+        format: int64
+      delete_hits:
+        type: string
+        format: int64
+      delete_misses:
+        type: string
+        format: int64
+      get_misses:
+        type: string
+        format: int64
+      get_hits:
+        type: string
+        format: int64
+      evicted_total:
+        type: string
+        format: int64
+  v1DTopics:
+    type: object
+    properties:
+      published_total:
+        type: string
+        format: int64
+      current_listeners:
+        type: string
+        format: int64
+      listeners_total:
+        type: string
+        format: int64
   v1Decider:
     type: object
     properties:
@@ -2362,6 +2421,17 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Signal with maximum value as an output signal.
     description: Output for the Max component.
+  v1Member:
+    type: object
+    properties:
+      name:
+        type: string
+      id:
+        type: string
+        format: uint64
+      birthdate:
+        type: string
+        format: int64
   v1Min:
     type: object
     properties:
@@ -2393,6 +2463,24 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Signal with minimum value as an output signal.
     description: Output ports for the Min component.
+  v1Network:
+    type: object
+    properties:
+      connections_total:
+        type: string
+        format: int64
+      current_connections:
+        type: string
+        format: int64
+      written_bytes_total:
+        type: string
+        format: int64
+      read_bytes_total:
+        type: string
+        format: int64
+      commands_total:
+        type: string
+        format: int64
   v1Or:
     type: object
     properties:
@@ -2446,6 +2534,24 @@ definitions:
         type: integer
         format: int32
     description: OverlappingService contains info about a service that overlaps with another one.
+  v1Partition:
+    type: object
+    properties:
+      previous_owners:
+        type: array
+        items:
+          $ref: '#/definitions/v1Member'
+      backups:
+        type: array
+        items:
+          $ref: '#/definitions/v1Member'
+      length:
+        type: string
+        format: int64
+      d_maps:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1DMap'
   v1PathTemplateMatcher:
     type: object
     properties:
@@ -2980,6 +3086,18 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/v1OverlappingService'
+  v1SlabInfo:
+    type: object
+    properties:
+      allocated:
+        type: string
+        format: int64
+      inuse:
+        type: string
+        format: int64
+      garbage:
+        type: string
+        format: int64
   v1Sqrt:
     type: object
     properties:
@@ -3016,6 +3134,42 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Output signal.
     description: Outputs for the Sqrt component.
+  v1Stats:
+    type: object
+    properties:
+      cmdline:
+        type: array
+        items:
+          type: string
+      release_version:
+        type: string
+      uptime_seconds:
+        type: string
+        format: int64
+      runtime:
+        type: object
+      cluster_coordinator:
+        $ref: '#/definitions/v1Member'
+      member:
+        $ref: '#/definitions/v1Member'
+      partitions:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Partition'
+      backups:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Partition'
+      cluster_members:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Member'
+      network:
+        $ref: '#/definitions/v1Network'
+      d_maps:
+        $ref: '#/definitions/v1DMaps'
+      d_topics:
+        $ref: '#/definitions/v1DTopics'
   v1StatusError:
     type: object
     properties:
