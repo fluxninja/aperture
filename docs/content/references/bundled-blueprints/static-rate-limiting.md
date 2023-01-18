@@ -1,8 +1,23 @@
-# Rate Limiter Blueprint
+---
+title: Static Rate Limiting Policy
+---
+
+```mdx-code-block
+import {apertureVersion} from '../../introduction.md';
+```
+
+## Blueprint Location
+
+GitHub: <a
+href={`https://github.com/fluxninja/aperture/tree/v${apertureVersion}/blueprints/lib/1.0/blueprints/static-rate-limiting`}>static-rate-limiting</a>
+
+## Introduction
+
+This blueprint provides a simple static rate limiting policy and a dashboard.
 
 ## Configuration
 
-[configuration]: # Configuration Marker
+<!-- Configuration Marker -->
 
 ### Common
 

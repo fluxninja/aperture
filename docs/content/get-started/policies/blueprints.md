@@ -59,7 +59,7 @@ run the following commands to generate an example config:
 ```sh
 cd blueprints/
 jb install
-./scripts/generate-bundle.py --output _gen --config examples/latency-gradient/example.jsonnet
+./scripts/generate-bundle.py --output _gen --config examples/latency-gradient-concurrency-limiting/example.jsonnet
 ```
 
 ## Using Aperture Blueprints as a jsonnet mixins library
@@ -118,7 +118,7 @@ in observation only mode. The decisions are still evaluated which helps
 understand how the policy would behave as the input signals change.
 
 For instance, setting `dynamicConfig.dryRun` option to `true` in the
-latency-gradient blueprint would generate a Dry Run policy.
+latency-gradient-concurrency-limiting blueprint would generate a Dry Run policy.
 
 :::note
 

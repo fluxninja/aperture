@@ -1,8 +1,22 @@
-# Latency Gradient Policy
+# Latency Gradient Concurrency Limiting Policy
+
+This policy detect overloads/cascading failures by comparing the real-time
+latency with it's exponential moving average. Gradient controller is then used
+to calculate a proportional response that limits the accepted concurrency.
+
+:::info
+
+See tutorials on
+[Basic Concurrency Limiting](/tutorials/flow-control/basic-concurrency-limiting.md)
+and
+[Workload Prioritization](/tutorials/flow-control/workload-prioritization.md) to
+see this blueprint in use.
+
+:::
 
 ## Configuration
 
-[configuration]: # Configuration Marker
+<!-- Configuration Marker -->
 
 ### Common
 

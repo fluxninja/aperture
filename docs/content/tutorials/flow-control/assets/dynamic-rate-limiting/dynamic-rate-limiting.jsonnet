@@ -1,6 +1,6 @@
 local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.libsonnet';
 
-local latencyGradientPolicy = aperture.blueprints.LatencyGradient.policy;
+local latencyGradientPolicy = aperture.blueprints.LatencyGradientConcurrencyLimiting.policy;
 
 local flowSelector = aperture.spec.v1.FlowSelector;
 local fluxMeter = aperture.spec.v1.FluxMeter;

@@ -1,4 +1,4 @@
-blueprint: Signals Dashboard Blueprint
+blueprint: Signals Dashboard
 sources:
   Dashboard:
     prefix: dashboard

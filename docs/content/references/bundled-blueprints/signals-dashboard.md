@@ -1,4 +1,17 @@
-# Signals Dashboard
+---
+title: Signals Dashboard
+---
+
+```mdx-code-block
+import {apertureVersion} from '../../introduction.md';
+```
+
+## Blueprint Location
+
+GitHub: <a
+href={`https://github.com/fluxninja/aperture/tree/v${apertureVersion}/blueprints/lib/1.0/blueprints/signals-dashboard`}>signals-dashboard</a>
+
+## Introduction
 
 This blueprint provides a
 [policy monitoring](/get-started/policies/monitoring.md) dashboard that

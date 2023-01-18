@@ -28,7 +28,7 @@ latency from historically normal values.
 ## Policy
 
 In this policy we will be using the
-[Latency Gradient Blueprint](https://github.com/fluxninja/aperture/tree/main/blueprints/lib/1.0/blueprints/latency-gradient)
+[Latency Gradient Concurrency Limiting Blueprint](references/bundled-blueprints/latency-gradient-concurrency-limiting.md)
 to instantiate the policy via Jsonnet. Various building blocks used in the
 policy are described separately in the Signal Processing tutorials.
 

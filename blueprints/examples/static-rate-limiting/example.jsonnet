@@ -1,5 +1,5 @@
 local aperture = import '../../lib/1.0/main.libsonnet';
-local bundle = aperture.blueprints.RateLimiter.bundle;
+local bundle = aperture.blueprints.StaticRateLimiting.bundle;
 
 local Override = aperture.spec.v1.RateLimiterOverride;
 local LazySync = aperture.spec.v1.RateLimiterLazySync;
