@@ -7,6 +7,12 @@
   withAlerterMixin(alerter):: {
     alerter+: alerter,
   },
+  withAnd(and):: {
+    and: and,
+  },
+  withAndMixin(and):: {
+    and+: and,
+  },
   withArithmeticCombinator(arithmetic_combinator):: {
     arithmetic_combinator: arithmetic_combinator,
   },
@@ -84,6 +90,18 @@
   },
   withMinMixin(min):: {
     min+: min,
+  },
+  withNot(not):: {
+    not: not,
+  },
+  withNotMixin(not):: {
+    not+: not,
+  },
+  withOr(or):: {
+    or: or,
+  },
+  withOrMixin(or):: {
+    or+: or,
   },
   withPromql(promql):: {
     promql: promql,

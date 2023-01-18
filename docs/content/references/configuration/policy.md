@@ -507,6 +507,75 @@ Inputs for the Alerter component.
 </dd>
 </dl>
 
+### v1And {#v1-and}
+
+Logical AND.
+
+Signals are mapped to boolean values as follows:
+
+- Zero is treated as false.
+- Any non-zero is treated as true.
+- Invalid inputs are considered unknown.
+
+  :::note
+  Treating invalid inputs as "unknowns" has a consequence that the result
+  might end up being valid even when some inputs are invalid. Eg. `unknown
+&& false == false`, because the result would end up false no matter if
+  first signal was true or false. On the other hand, `unknown && true ==
+unknown`.
+  :::
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1AndIns](#v1-and-ins)) Input ports for the And component.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([V1AndOuts](#v1-and-outs)) Output ports for the And component.
+
+</dd>
+</dl>
+
+### v1AndIns {#v1-and-ins}
+
+Inputs for the And component.
+
+#### Properties
+
+<dl>
+<dt>inputs</dt>
+<dd>
+
+([[]V1InPort](#v1-in-port)) Array of input signals.
+
+@gotags: validate:"dive"
+
+</dd>
+</dl>
+
+### v1AndOuts {#v1-and-outs}
+
+Output ports for the And component.
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([V1OutPort](#v1-out-port)) Result of logical AND of all the input signals.
+
+Will always be 0 (false), 1 (true) or invalid (unknown).
+
+</dd>
+</dl>
+
 ### v1ArithmeticCombinator {#v1-arithmetic-combinator}
 
 Type of combinator that computes the arithmetic operation on the operand signals
@@ -824,6 +893,24 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 <dd>
 
 ([V1HorizontalPodScaler](#v1-horizontal-pod-scaler)) HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+
+</dd>
+<dt>and</dt>
+<dd>
+
+([V1And](#v1-and)) Logical AND.
+
+</dd>
+<dt>or</dt>
+<dd>
+
+([V1Or](#v1-or)) Logical OR.
+
+</dd>
+<dt>not</dt>
+<dd>
+
+([V1Not](#v1-not)) Logical NOT.
 
 </dd>
 </dl>
@@ -2332,6 +2419,120 @@ Output ports for the Min component.
 <dd>
 
 ([V1OutPort](#v1-out-port)) Signal with minimum value as an output signal.
+
+</dd>
+</dl>
+
+### v1Not {#v1-not}
+
+Logical NOT.
+
+See [And component](#v1-and) on how signals are mapped onto boolean values.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1NotIns](#v1-not-ins)) Input ports for the Not component.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([V1NotOuts](#v1-not-outs)) Output ports for the Not component.
+
+</dd>
+</dl>
+
+### v1NotIns {#v1-not-ins}
+
+Inputs for the Not component.
+
+#### Properties
+
+<dl>
+<dt>input</dt>
+<dd>
+
+([V1InPort](#v1-in-port)) Signal to be negated.
+
+@gotags: validate:"dive"
+
+</dd>
+</dl>
+
+### v1NotOuts {#v1-not-outs}
+
+Output ports for the Not component.
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([V1OutPort](#v1-out-port)) Logical negation of the input signal.
+
+Will always be 0 (false), 1 (true) or invalid (unknown).
+
+</dd>
+</dl>
+
+### v1Or {#v1-or}
+
+Logical OR.
+
+See [And component](#v1-and) on how signals are mapped onto boolean values.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1OrIns](#v1-or-ins)) Input ports for the Or component.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([V1OrOuts](#v1-or-outs)) Output ports for the Or component.
+
+</dd>
+</dl>
+
+### v1OrIns {#v1-or-ins}
+
+Inputs for the Or component.
+
+#### Properties
+
+<dl>
+<dt>inputs</dt>
+<dd>
+
+([[]V1InPort](#v1-in-port)) Array of input signals.
+
+@gotags: validate:"dive"
+
+</dd>
+</dl>
+
+### v1OrOuts {#v1-or-outs}
+
+Output ports for the Or component.
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([V1OutPort](#v1-out-port)) Result of logical OR of all the input signals.
+
+Will always be 0 (false), 1 (true) or invalid (unknown).
 
 </dd>
 </dl>
