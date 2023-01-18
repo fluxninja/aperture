@@ -10,7 +10,6 @@ local dynamicConfig = spec.v1.RateLimiterDynamicConfig;
 local override = spec.v1.RateLimiterOverride;
 local lazySync = spec.v1.RateLimiterLazySync;
 local port = spec.v1.Port;
-local variable = spec.v1.Variable;
 local constantValue = spec.v1.ConstantValue;
 
 function(params) {

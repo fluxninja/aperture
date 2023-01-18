@@ -2371,7 +2371,7 @@ type And struct {
 func (x *And) Reset() {
 	*x = And{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[24]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2384,7 +2384,7 @@ func (x *And) String() string {
 func (*And) ProtoMessage() {}
 
 func (x *And) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[24]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2397,7 +2397,7 @@ func (x *And) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use And.ProtoReflect.Descriptor instead.
 func (*And) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{24}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *And) GetInPorts() *And_Ins {
@@ -2431,7 +2431,7 @@ type Or struct {
 func (x *Or) Reset() {
 	*x = Or{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[25]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2444,7 +2444,7 @@ func (x *Or) String() string {
 func (*Or) ProtoMessage() {}
 
 func (x *Or) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[25]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2457,7 +2457,7 @@ func (x *Or) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Or.ProtoReflect.Descriptor instead.
 func (*Or) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{25}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *Or) GetInPorts() *Or_Ins {
@@ -2491,7 +2491,7 @@ type Inverter struct {
 func (x *Inverter) Reset() {
 	*x = Inverter{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[26]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2504,7 +2504,7 @@ func (x *Inverter) String() string {
 func (*Inverter) ProtoMessage() {}
 
 func (x *Inverter) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[26]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2517,7 +2517,7 @@ func (x *Inverter) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Inverter.ProtoReflect.Descriptor instead.
 func (*Inverter) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{26}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *Inverter) GetInPorts() *Inverter_Ins {
@@ -2549,7 +2549,7 @@ type FirstValid struct {
 func (x *FirstValid) Reset() {
 	*x = FirstValid{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[27]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2562,7 +2562,7 @@ func (x *FirstValid) String() string {
 func (*FirstValid) ProtoMessage() {}
 
 func (x *FirstValid) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[27]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2575,7 +2575,7 @@ func (x *FirstValid) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FirstValid.ProtoReflect.Descriptor instead.
 func (*FirstValid) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{27}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *FirstValid) GetInPorts() *FirstValid_Ins {
@@ -2611,7 +2611,7 @@ type AlerterConfig struct {
 func (x *AlerterConfig) Reset() {
 	*x = AlerterConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[28]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2624,7 +2624,7 @@ func (x *AlerterConfig) String() string {
 func (*AlerterConfig) ProtoMessage() {}
 
 func (x *AlerterConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[28]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2637,7 +2637,7 @@ func (x *AlerterConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AlerterConfig.ProtoReflect.Descriptor instead.
 func (*AlerterConfig) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{28}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *AlerterConfig) GetAlertName() string {
@@ -2683,7 +2683,7 @@ type Alerter struct {
 func (x *Alerter) Reset() {
 	*x = Alerter{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[29]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[30]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2696,7 +2696,7 @@ func (x *Alerter) String() string {
 func (*Alerter) ProtoMessage() {}
 
 func (x *Alerter) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[29]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[30]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2709,7 +2709,7 @@ func (x *Alerter) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Alerter.ProtoReflect.Descriptor instead.
 func (*Alerter) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{29}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *Alerter) GetInPorts() *Alerter_Ins {
@@ -2741,7 +2741,7 @@ type Integrator struct {
 func (x *Integrator) Reset() {
 	*x = Integrator{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[30]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[31]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2754,7 +2754,7 @@ func (x *Integrator) String() string {
 func (*Integrator) ProtoMessage() {}
 
 func (x *Integrator) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[30]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[31]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2767,7 +2767,7 @@ func (x *Integrator) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Integrator.ProtoReflect.Descriptor instead.
 func (*Integrator) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{30}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *Integrator) GetInPorts() *Integrator_Ins {
@@ -2801,7 +2801,7 @@ type Differentiator struct {
 func (x *Differentiator) Reset() {
 	*x = Differentiator{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[31]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[32]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2814,7 +2814,7 @@ func (x *Differentiator) String() string {
 func (*Differentiator) ProtoMessage() {}
 
 func (x *Differentiator) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[31]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[32]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2827,7 +2827,7 @@ func (x *Differentiator) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Differentiator.ProtoReflect.Descriptor instead.
 func (*Differentiator) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{31}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *Differentiator) GetInPorts() *Differentiator_Ins {
@@ -2865,7 +2865,7 @@ type HorizontalPodScaler struct {
 func (x *HorizontalPodScaler) Reset() {
 	*x = HorizontalPodScaler{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[32]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[33]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2878,7 +2878,7 @@ func (x *HorizontalPodScaler) String() string {
 func (*HorizontalPodScaler) ProtoMessage() {}
 
 func (x *HorizontalPodScaler) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[32]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[33]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2891,7 +2891,7 @@ func (x *HorizontalPodScaler) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HorizontalPodScaler.ProtoReflect.Descriptor instead.
 func (*HorizontalPodScaler) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{32}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *HorizontalPodScaler) GetKubernetesObjectSelector() *KubernetesObjectSelector {
@@ -4215,7 +4215,7 @@ type Variable_Outs struct {
 func (x *Variable_Outs) Reset() {
 	*x = Variable_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[54]
+		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[57]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4228,7 +4228,7 @@ func (x *Variable_Outs) String() string {
 func (*Variable_Outs) ProtoMessage() {}
 
 func (x *Variable_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[54]
+	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[57]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4682,7 +4682,7 @@ func (x *And_Ins) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use And_Ins.ProtoReflect.Descriptor instead.
 func (*And_Ins) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{24, 0}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{25, 0}
 }
 
 func (x *And_Ins) GetInputs() []*InPort {
@@ -4733,7 +4733,7 @@ func (x *And_Outs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use And_Outs.ProtoReflect.Descriptor instead.
 func (*And_Outs) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{24, 1}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{25, 1}
 }
 
 func (x *And_Outs) GetOutput() *OutPort {
@@ -4782,7 +4782,7 @@ func (x *Or_Ins) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Or_Ins.ProtoReflect.Descriptor instead.
 func (*Or_Ins) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{25, 0}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{26, 0}
 }
 
 func (x *Or_Ins) GetInputs() []*InPort {
@@ -4833,7 +4833,7 @@ func (x *Or_Outs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Or_Outs.ProtoReflect.Descriptor instead.
 func (*Or_Outs) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{25, 1}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{26, 1}
 }
 
 func (x *Or_Outs) GetOutput() *OutPort {
@@ -4882,7 +4882,7 @@ func (x *Inverter_Ins) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Inverter_Ins.ProtoReflect.Descriptor instead.
 func (*Inverter_Ins) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{26, 0}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{27, 0}
 }
 
 func (x *Inverter_Ins) GetInput() *InPort {
@@ -4933,7 +4933,7 @@ func (x *Inverter_Outs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Inverter_Outs.ProtoReflect.Descriptor instead.
 func (*Inverter_Outs) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{26, 1}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{27, 1}
 }
 
 func (x *Inverter_Outs) GetOutput() *OutPort {
@@ -4982,7 +4982,7 @@ func (x *FirstValid_Ins) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FirstValid_Ins.ProtoReflect.Descriptor instead.
 func (*FirstValid_Ins) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{27, 0}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{28, 0}
 }
 
 func (x *FirstValid_Ins) GetInputs() []*InPort {
@@ -5031,7 +5031,7 @@ func (x *FirstValid_Outs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FirstValid_Outs.ProtoReflect.Descriptor instead.
 func (*FirstValid_Outs) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{27, 1}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{28, 1}
 }
 
 func (x *FirstValid_Outs) GetOutput() *OutPort {
@@ -5080,7 +5080,7 @@ func (x *Alerter_Ins) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Alerter_Ins.ProtoReflect.Descriptor instead.
 func (*Alerter_Ins) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{29, 0}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{30, 0}
 }
 
 func (x *Alerter_Ins) GetSignal() *InPort {
@@ -5135,7 +5135,7 @@ func (x *Integrator_Ins) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Integrator_Ins.ProtoReflect.Descriptor instead.
 func (*Integrator_Ins) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{30, 0}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{31, 0}
 }
 
 func (x *Integrator_Ins) GetInput() *InPort {
@@ -5204,7 +5204,7 @@ func (x *Integrator_Outs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Integrator_Outs.ProtoReflect.Descriptor instead.
 func (*Integrator_Outs) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{30, 1}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{31, 1}
 }
 
 func (x *Integrator_Outs) GetOutput() *OutPort {
@@ -5252,7 +5252,7 @@ func (x *Differentiator_Ins) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Differentiator_Ins.ProtoReflect.Descriptor instead.
 func (*Differentiator_Ins) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{31, 0}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{32, 0}
 }
 
 func (x *Differentiator_Ins) GetInput() *InPort {
@@ -5300,7 +5300,7 @@ func (x *Differentiator_Outs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Differentiator_Outs.ProtoReflect.Descriptor instead.
 func (*Differentiator_Outs) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{31, 1}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{32, 1}
 }
 
 func (x *Differentiator_Outs) GetOutput() *OutPort {
@@ -5347,7 +5347,7 @@ func (x *HorizontalPodScaler_ScaleReporter) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use HorizontalPodScaler_ScaleReporter.ProtoReflect.Descriptor instead.
 func (*HorizontalPodScaler_ScaleReporter) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{32, 0}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{33, 0}
 }
 
 func (x *HorizontalPodScaler_ScaleReporter) GetOutPorts() *HorizontalPodScaler_ScaleReporter_Outs {
@@ -5398,7 +5398,7 @@ func (x *HorizontalPodScaler_ScaleActuator) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use HorizontalPodScaler_ScaleActuator.ProtoReflect.Descriptor instead.
 func (*HorizontalPodScaler_ScaleActuator) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{32, 1}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{33, 1}
 }
 
 func (x *HorizontalPodScaler_ScaleActuator) GetInPorts() *HorizontalPodScaler_ScaleActuator_Ins {
@@ -5461,7 +5461,7 @@ func (x *HorizontalPodScaler_ScaleReporter_Outs) ProtoReflect() protoreflect.Mes
 
 // Deprecated: Use HorizontalPodScaler_ScaleReporter_Outs.ProtoReflect.Descriptor instead.
 func (*HorizontalPodScaler_ScaleReporter_Outs) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{32, 0, 0}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{33, 0, 0}
 }
 
 func (x *HorizontalPodScaler_ScaleReporter_Outs) GetActualReplicas() *OutPort {
@@ -5518,7 +5518,7 @@ func (x *HorizontalPodScaler_ScaleActuator_DynamicConfig) ProtoReflect() protore
 
 // Deprecated: Use HorizontalPodScaler_ScaleActuator_DynamicConfig.ProtoReflect.Descriptor instead.
 func (*HorizontalPodScaler_ScaleActuator_DynamicConfig) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{32, 1, 0}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{33, 1, 0}
 }
 
 func (x *HorizontalPodScaler_ScaleActuator_DynamicConfig) GetDryRun() bool {
@@ -5566,7 +5566,7 @@ func (x *HorizontalPodScaler_ScaleActuator_Ins) ProtoReflect() protoreflect.Mess
 
 // Deprecated: Use HorizontalPodScaler_ScaleActuator_Ins.ProtoReflect.Descriptor instead.
 func (*HorizontalPodScaler_ScaleActuator_Ins) Descriptor() ([]byte, []int) {
-	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{32, 1, 1}
+	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{33, 1, 1}
 }
 
 func (x *HorizontalPodScaler_ScaleActuator_Ins) GetDesiredReplicas() *InPort {
@@ -7204,7 +7204,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*And); i {
+			switch v := v.(*Min); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7216,7 +7216,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Or); i {
+			switch v := v.(*And); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7228,7 +7228,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Inverter); i {
+			switch v := v.(*Or); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7240,7 +7240,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*FirstValid); i {
+			switch v := v.(*Inverter); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7252,7 +7252,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AlerterConfig); i {
+			switch v := v.(*FirstValid); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7264,7 +7264,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Alerter); i {
+			switch v := v.(*AlerterConfig); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7276,7 +7276,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Integrator); i {
+			switch v := v.(*Alerter); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7288,7 +7288,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Differentiator); i {
+			switch v := v.(*Integrator); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7300,6 +7300,18 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Differentiator); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_policy_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*HorizontalPodScaler); i {
 			case 0:
 				return &v.state

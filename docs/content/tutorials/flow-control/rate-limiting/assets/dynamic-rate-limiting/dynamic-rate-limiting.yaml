@@ -188,7 +188,9 @@ spec:
             lhs:
               signal_name: LOAD_MULTIPLIER
             rhs:
-              constant_value: 1
+              constant_value:
+                valid: true
+                value: 1
           operator: lt
           out_ports:
             output:
@@ -197,9 +199,13 @@ spec:
       - switcher:
           in_ports:
             on_false:
-              constant_value: 10
+              constant_value:
+                valid: true
+                value: 10
             on_true:
-              constant_value: 0
+              constant_value:
+                valid: true
+                value: 0
             switch:
               signal_name: IS_BOT_ESCALATION
           out_ports:

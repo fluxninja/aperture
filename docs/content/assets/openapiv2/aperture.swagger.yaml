@@ -1216,9 +1216,9 @@ definitions:
       promql:
         $ref: '#/definitions/v1PromQL'
         description: Periodically runs a Prometheus query in the background and emits the result.
-      constant:
-        $ref: '#/definitions/v1Constant'
-        description: Emits a constant signal.
+      variable:
+        $ref: '#/definitions/v1Variable'
+        description: Emits a variable signal which can be set to invalid.
       sqrt:
         $ref: '#/definitions/v1Sqrt'
         description: Takes an input signal and emits the square root of the input signal.
@@ -1342,15 +1342,7 @@ definitions:
       value:
         type: number
         format: double
-        description: The constant value to be emitted.
-    title: Component that emits a constant value as an output signal
-  v1ConstantOuts:
-    type: object
-    properties:
-      output:
-        $ref: '#/definitions/v1OutPort'
-        description: The constant value is emitted to the output port.
-    description: Outputs for the Constant component.
+    description: Constant value that can be used instead of a signal in ports. Can be set to be invalid.
   v1ControllerDynamicConfig:
     type: object
     properties:
@@ -3238,15 +3230,15 @@ definitions:
   v1Variable:
     type: object
     properties:
-      default_config:
-        $ref: '#/definitions/v1VariableDynamicConfig'
-        description: Default configuration.
-      dynamic_config_key:
-        type: string
-        description: Configuration key for DynamicConfig.
       out_ports:
         $ref: '#/definitions/v1VariableOuts'
         description: Output ports for the Variable component.
+      dynamic_config_key:
+        type: string
+        description: Configuration key for DynamicConfig.
+      default_config:
+        $ref: '#/definitions/v1VariableDynamicConfig'
+        description: Default configuration.
     description: Component that emits a variable value as an output signal, can be defined in dynamic configuration.
   v1VariableDynamicConfig:
     type: object

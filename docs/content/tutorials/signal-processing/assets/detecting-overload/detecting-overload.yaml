@@ -31,7 +31,9 @@ spec:
             lhs:
               signal_name: LATENCY_EMA
             rhs:
-              constant_value: "1.1"
+              constant_value:
+                valid: true
+                value: "1.1"
           operator: mul
           out_ports:
             output:

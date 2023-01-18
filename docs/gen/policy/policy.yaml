@@ -631,10 +631,6 @@ definitions:
           load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
         x-order: 5
         $ref: '#/definitions/v1ConcurrencyLimiter'
-      constant:
-        description: Emits a constant signal.
-        x-order: 8
-        $ref: '#/definitions/v1Constant'
       decider:
         description: Decider emits the binary result of comparison operator on two
           operands.
@@ -679,11 +675,11 @@ definitions:
         $ref: '#/definitions/v1Inverter'
       max:
         description: Emits the maximum of the input signals.
-        x-order: 10
+        x-order: 11
         $ref: '#/definitions/v1Max'
       min:
         description: Emits the minimum of the input signals.
-        x-order: 11
+        x-order: 12
         $ref: '#/definitions/v1Min'
       or:
         description: Logical OR.
@@ -714,7 +710,7 @@ definitions:
         $ref: '#/definitions/v1Switcher'
       variable:
         description: Emits a variable signal which can be set to invalid.
-        x-order: 17
+        x-order: 8
         $ref: '#/definitions/v1Variable'
   v1ConcurrencyLimiter:
     description: |-
@@ -1436,9 +1432,8 @@ definitions:
     properties:
       constant_value:
         description: Constant value to be used for this InPort instead of a signal.
-        type: number
-        format: double
         x-order: 1
+        $ref: '#/definitions/v1ConstantValue'
       signal_name:
         description: Name of the incoming Signal on the InPort.
         type: string
@@ -2470,7 +2465,7 @@ definitions:
     properties:
       default_config:
         description: Default configuration.
-        x-order: 0
+        x-order: 2
         $ref: '#/definitions/v1VariableDynamicConfig'
       dynamic_config_key:
         description: Configuration key for DynamicConfig.
@@ -2478,7 +2473,7 @@ definitions:
         x-order: 1
       out_ports:
         description: Output ports for the Variable component.
-        x-order: 2
+        x-order: 0
         $ref: '#/definitions/v1VariableOuts'
   v1VariableDynamicConfig:
     type: object
