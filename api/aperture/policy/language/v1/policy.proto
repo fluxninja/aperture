@@ -202,7 +202,7 @@ message Component {
     Or or = 20;
 
     // Logical NOT.
-    Not not = 21;
+    Inverter inverter = 21;
   }
 }
 
@@ -1166,14 +1166,14 @@ message Or {
 // Logical NOT.
 //
 // See [And component](#v1-and) on how signals are mapped onto boolean values.
-message Not {
-  // Inputs for the Not component.
+message Inverter {
+  // Inputs for the Inverter component.
   message Ins {
     // Signal to be negated.
     InPort input = 1; // @gotags: validate:"dive"
   }
 
-  // Output ports for the Not component.
+  // Output ports for the Inverter component.
   message Outs {
     // Logical negation of the input signal.
     //
@@ -1181,10 +1181,10 @@ message Not {
     OutPort output = 1;
   }
 
-  // Input ports for the Not component.
+  // Input ports for the Inverter component.
   Ins in_ports = 1;
 
-  // Output ports for the Not component.
+  // Output ports for the Inverter component.
   Outs out_ports = 2;
 }
 

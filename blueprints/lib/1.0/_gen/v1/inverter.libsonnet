@@ -1,5 +1,5 @@
-local notins = import './notins.libsonnet';
-local notouts = import './notouts.libsonnet';
+local inverterins = import './inverterins.libsonnet';
+local inverterouts = import './inverterouts.libsonnet';
 {
   new():: {
     in_ports: {
@@ -9,8 +9,8 @@ local notouts = import './notouts.libsonnet';
       output: error 'Port output is missing',
     },
   },
-  inPorts:: notins,
-  outPorts:: notouts,
+  inPorts:: inverterins,
+  outPorts:: inverterouts,
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },

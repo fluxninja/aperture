@@ -79,6 +79,12 @@
   withIntegratorMixin(integrator):: {
     integrator+: integrator,
   },
+  withInverter(inverter):: {
+    inverter: inverter,
+  },
+  withInverterMixin(inverter):: {
+    inverter+: inverter,
+  },
   withMax(max):: {
     max: max,
   },
@@ -90,12 +96,6 @@
   },
   withMinMixin(min):: {
     min+: min,
-  },
-  withNot(not):: {
-    not: not,
-  },
-  withNotMixin(not):: {
-    not+: not,
   },
   withOr(or):: {
     or: or,

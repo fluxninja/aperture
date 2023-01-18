@@ -69,16 +69,16 @@ func NewOrAndOptions(
 	}, fx.Options(), nil
 }
 
-type not struct{}
+type inverter struct{}
 
 // Name implements runtime.Component.
-func (c *not) Name() string { return "Not" }
+func (c *inverter) Name() string { return "Inverter" }
 
 // Type implements runtime.Component.
-func (c *not) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+func (c *inverter) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
 // Execute implements runtime.Component.
-func (c *not) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (c *inverter) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
 	input := inPortReadings.ReadSingleValuePort("input")
 
 	return runtime.PortToValue{
@@ -89,13 +89,13 @@ func (c *not) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickI
 }
 
 // DynamicConfigUpdate is a no-op for not component.
-func (*not) DynamicConfigUpdate(notifiers.Event, config.Unmarshaller) {}
+func (*inverter) DynamicConfigUpdate(notifiers.Event, config.Unmarshaller) {}
 
-// NewNotAndOptions creates a new Not Component.
-func NewNotAndOptions(
-	maxProto *policylangv1.Not,
+// NewInverterAndOptions creates a new Inverter Component.
+func NewInverterAndOptions(
+	maxProto *policylangv1.Inverter,
 	componentIndex int,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
-	return &not{}, fx.Options(), nil
+	return &inverter{}, fx.Options(), nil
 }

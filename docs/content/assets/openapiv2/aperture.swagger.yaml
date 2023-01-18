@@ -1238,8 +1238,8 @@ definitions:
       or:
         $ref: '#/definitions/v1Or'
         description: Logical OR.
-      not:
-        $ref: '#/definitions/v1Not'
+      inverter:
+        $ref: '#/definitions/v1Inverter'
         description: Logical NOT.
     description: |-
       :::info
@@ -2025,6 +2025,39 @@ definitions:
       output:
         $ref: '#/definitions/v1OutPort'
     description: Outputs for the Integrator component.
+  v1Inverter:
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/v1InverterIns'
+        description: Input ports for the Inverter component.
+      out_ports:
+        $ref: '#/definitions/v1InverterOuts'
+        description: Output ports for the Inverter component.
+    description: |-
+      Logical NOT.
+
+      See [And component](#v1-and) on how signals are mapped onto boolean values.
+  v1InverterIns:
+    type: object
+    properties:
+      input:
+        $ref: '#/definitions/v1InPort'
+        description: |-
+          Signal to be negated.
+
+          @gotags: validate:"dive"
+    description: Inputs for the Inverter component.
+  v1InverterOuts:
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
+        description: |-
+          Logical negation of the input signal.
+
+          Will always be 0 (false), 1 (true) or invalid (unknown).
+    description: Output ports for the Inverter component.
   v1JSONExtractor:
     type: object
     properties:
@@ -2360,39 +2393,6 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Signal with minimum value as an output signal.
     description: Output ports for the Min component.
-  v1Not:
-    type: object
-    properties:
-      in_ports:
-        $ref: '#/definitions/v1NotIns'
-        description: Input ports for the Not component.
-      out_ports:
-        $ref: '#/definitions/v1NotOuts'
-        description: Output ports for the Not component.
-    description: |-
-      Logical NOT.
-
-      See [And component](#v1-and) on how signals are mapped onto boolean values.
-  v1NotIns:
-    type: object
-    properties:
-      input:
-        $ref: '#/definitions/v1InPort'
-        description: |-
-          Signal to be negated.
-
-          @gotags: validate:"dive"
-    description: Inputs for the Not component.
-  v1NotOuts:
-    type: object
-    properties:
-      output:
-        $ref: '#/definitions/v1OutPort'
-        description: |-
-          Logical negation of the input signal.
-
-          Will always be 0 (false), 1 (true) or invalid (unknown).
-    description: Output ports for the Not component.
   v1Or:
     type: object
     properties:

@@ -907,10 +907,10 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([V1Or](#v1-or)) Logical OR.
 
 </dd>
-<dt>not</dt>
+<dt>inverter</dt>
 <dd>
 
-([V1Not](#v1-not)) Logical NOT.
+([V1Inverter](#v1-inverter)) Logical NOT.
 
 </dd>
 </dl>
@@ -1966,6 +1966,63 @@ Outputs for the Integrator component.
 </dd>
 </dl>
 
+### v1Inverter {#v1-inverter}
+
+Logical NOT.
+
+See [And component](#v1-and) on how signals are mapped onto boolean values.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1InverterIns](#v1-inverter-ins)) Input ports for the Inverter component.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([V1InverterOuts](#v1-inverter-outs)) Output ports for the Inverter component.
+
+</dd>
+</dl>
+
+### v1InverterIns {#v1-inverter-ins}
+
+Inputs for the Inverter component.
+
+#### Properties
+
+<dl>
+<dt>input</dt>
+<dd>
+
+([V1InPort](#v1-in-port)) Signal to be negated.
+
+@gotags: validate:"dive"
+
+</dd>
+</dl>
+
+### v1InverterOuts {#v1-inverter-outs}
+
+Output ports for the Inverter component.
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([V1OutPort](#v1-out-port)) Logical negation of the input signal.
+
+Will always be 0 (false), 1 (true) or invalid (unknown).
+
+</dd>
+</dl>
+
 ### v1JSONExtractor {#v1-json-extractor}
 
 Deserialize a json, and extract one of the fields
@@ -2419,63 +2476,6 @@ Output ports for the Min component.
 <dd>
 
 ([V1OutPort](#v1-out-port)) Signal with minimum value as an output signal.
-
-</dd>
-</dl>
-
-### v1Not {#v1-not}
-
-Logical NOT.
-
-See [And component](#v1-and) on how signals are mapped onto boolean values.
-
-#### Properties
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-([V1NotIns](#v1-not-ins)) Input ports for the Not component.
-
-</dd>
-<dt>out_ports</dt>
-<dd>
-
-([V1NotOuts](#v1-not-outs)) Output ports for the Not component.
-
-</dd>
-</dl>
-
-### v1NotIns {#v1-not-ins}
-
-Inputs for the Not component.
-
-#### Properties
-
-<dl>
-<dt>input</dt>
-<dd>
-
-([V1InPort](#v1-in-port)) Signal to be negated.
-
-@gotags: validate:"dive"
-
-</dd>
-</dl>
-
-### v1NotOuts {#v1-not-outs}
-
-Output ports for the Not component.
-
-#### Properties
-
-<dl>
-<dt>output</dt>
-<dd>
-
-([V1OutPort](#v1-out-port)) Logical negation of the input signal.
-
-Will always be 0 (false), 1 (true) or invalid (unknown).
 
 </dd>
 </dl>

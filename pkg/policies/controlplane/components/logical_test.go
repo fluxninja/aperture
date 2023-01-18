@@ -13,7 +13,7 @@ var _ = Describe("Not component", func() {
 		circuit, err := sim.NewCircuitFromYaml(
 			`
 			components:
-			- not:
+			- inverter:
 				in_ports:
 					input: { signal_name: INPUT }
 				out_ports:
