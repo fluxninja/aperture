@@ -1,11 +1,15 @@
 ---
-title: Flow OLAP
+title: Flow Metrics
 sidebar_position: 1
-sidebar_label: Flow OLAP
+sidebar_label: Flow Metrics
 ---
 
-Aperture Agents emit an Opentelemetry stream that can be mapped to an OLAP
-database like Druid. This data can be visualized in FluxNinja ARC.
+Aperture Agents emit an OpenTelemetry stream that can be stored and visualized
+in [FluxNinja ARC](/arc/arc.md). Alternatively, the telemetry stream can be
+ingested into an OLAP database like [Apache Druid](https://druid.apache.org/).
+This metric stream contains high-cardinality attributes and it's not advisable
+to store it a time-series database such as [Prometheus](https://prometheus.io/)
+and it's variants.
 
 ## Dimension Columns
 
@@ -80,4 +84,4 @@ database like Druid. This data can be visualized in FluxNinja ARC.
 
 [quantilesdoublesketch]:
   https://druid.apache.org/docs/latest/development/extensions-core/datasketches-quantiles.html
-[flowclassifiers]: ../../concepts/flow-control/flow-classifier.md
+[flowclassifiers]: /concepts/flow-control/flow-classifier.md
