@@ -18,6 +18,7 @@ local rateLimiter = aperture.spec.v1.RateLimiter;
 local decider = aperture.spec.v1.Decider;
 local switcher = aperture.spec.v1.Switcher;
 local port = aperture.spec.v1.Port;
+local constantValue = aperture.spec.v1.ConstantValue;
 
 
 local svcSelector =
@@ -85,7 +86,14 @@ local policyResource = latencyGradientPolicy({
     + component.withDecider(
       decider.new()
       + decider.withOperator('lt')
-      + decider.withInPorts({ lhs: port.withSignalName('LOAD_MULTIPLIER'), rhs: port.withConstantValue(1.0) })
+      + decider.withInPorts({
+        lhs: port.withSignalName('LOAD_MULTIPLIER'),
+        rhs: port.withConstantValue(
+          constantValue.new()
+          + constantValue.withValue(1.0)
+          + constantValue.withValid(true)
+        ),
+      })
       + decider.withOutPorts({ output: port.withSignalName('IS_BOT_ESCALATION') })
       + decider.withTrueFor('30s')
     ),
@@ -94,8 +102,16 @@ local policyResource = latencyGradientPolicy({
       switcher.new()
       + switcher.withInPorts({
         switch: port.withSignalName('IS_BOT_ESCALATION'),
-        on_true: port.withConstantValue(0.0),
-        on_false: port.withConstantValue(10),
+        on_true: port.withConstantValue(
+          constantValue.new()
+          + constantValue.withValue(0.0)
+          + constantValue.withValid(true)
+        ),
+        on_false: port.withConstantValue(
+          constantValue.new()
+          + constantValue.withValue(10.0)
+          + constantValue.withValid(true)
+        ),
       })
       + switcher.withOutPorts({ output: port.withSignalName('RATE_LIMIT') })
     ),

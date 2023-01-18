@@ -21,6 +21,7 @@ local rateLimiter = aperture.spec.v1.RateLimiter;
 local decider = aperture.spec.v1.Decider;
 local switcher = aperture.spec.v1.Switcher;
 local port = aperture.spec.v1.Port;
+local constantValue = aperture.spec.v1.ConstantValue;
 
 local fluxMeterSelector = flowSelector.new()
                           + flowSelector.withServiceSelector(

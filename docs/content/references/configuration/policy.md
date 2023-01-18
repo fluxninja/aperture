@@ -835,10 +835,10 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([V1PromQL](#v1-prom-q-l)) Periodically runs a Prometheus query in the background and emits the result.
 
 </dd>
-<dt>constant</dt>
+<dt>variable</dt>
 <dd>
 
-([V1Constant](#v1-constant)) Emits a constant signal.
+([V1Variable](#v1-variable)) Emits a variable signal which can be set to invalid.
 
 </dd>
 <dt>sqrt</dt>
@@ -1877,7 +1877,7 @@ Components receive input from other components via InPorts
 <dt>constant_value</dt>
 <dd>
 
-(float64) Constant value to be used for this InPort instead of a signal.
+([V1ConstantValue](#v1-constant-value)) Constant value to be used for this InPort instead of a signal.
 
 </dd>
 </dl>
@@ -3194,10 +3194,10 @@ Component that emits a variable value as an output signal, can be defined in dyn
 #### Properties
 
 <dl>
-<dt>default_config</dt>
+<dt>out_ports</dt>
 <dd>
 
-([V1VariableDynamicConfig](#v1-variable-dynamic-config)) Default configuration.
+([V1VariableOuts](#v1-variable-outs)) Output ports for the Variable component.
 
 </dd>
 <dt>dynamic_config_key</dt>
@@ -3206,10 +3206,10 @@ Component that emits a variable value as an output signal, can be defined in dyn
 (string) Configuration key for DynamicConfig.
 
 </dd>
-<dt>out_ports</dt>
+<dt>default_config</dt>
 <dd>
 
-([V1VariableOuts](#v1-variable-outs)) Output ports for the Variable component.
+([V1VariableDynamicConfig](#v1-variable-dynamic-config)) Default configuration.
 
 </dd>
 </dl>

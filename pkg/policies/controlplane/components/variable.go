@@ -23,8 +23,8 @@ func (*Variable) Name() string { return "Variable" }
 // Type implements runtime.Component.
 func (*Variable) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
 
-// NewVariable creates a variable component.
-func NewVariable(value float64) runtime.Component {
+// NewConstant creates a variable component with a value that's always valid.
+func NewConstant(value float64) runtime.Component {
 	return &Variable{
 		constantValue: &policylangv1.ConstantValue{
 			Valid: true,

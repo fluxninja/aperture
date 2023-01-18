@@ -19,7 +19,7 @@ func NewInput(values []float64) *Input {
 
 // NewConstantInput creates a constant-value input.
 func NewConstantInput(value float64) rt.Component {
-	return components.NewVariable(value)
+	return components.NewConstant(value)
 }
 
 // Name implements runtime.Component.
