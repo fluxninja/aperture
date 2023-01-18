@@ -102,7 +102,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(rate_limiter_counter{policy_name=\"example\"}[$__rate_interval])",
+          "expr": "sum by(decision_type) (rate(rate_limiter_counter{policy_name=\"example\"}[$__rate_interval]))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "",
