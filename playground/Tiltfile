@@ -180,6 +180,12 @@ DEP_TREE = {
                         ("^controller-kube-state-metrics", "Service|Deployment", APERTURE_CONTROLLER_NS),
                     ]
                 },
+            ]
+        },
+        "policies": {
+            "labels": ["ApertureController"],
+            "tkenv": TANKA_ROOT + "/apps/policy",
+            "child_resources": [
                 {
                     "new_name": "policies",
                     "resource_deps": ["cluster-bootstrap", "controller-service"],
