@@ -3,7 +3,7 @@ title: Latency Gradient Concurrency Limiting Policy
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../aperture_version.md';
+import {apertureVersion} from '../../apertureVersion.js';
 ```
 
 ## Blueprint Location

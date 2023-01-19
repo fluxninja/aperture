@@ -3,7 +3,7 @@ title: Signals Dashboard
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../aperture_version.md';
+import {apertureVersion} from '../../apertureVersion.js';
 ```
 
 ## Blueprint Location
