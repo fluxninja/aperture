@@ -14,7 +14,7 @@ keywords:
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
-import {apertureVersion} from '../../introduction.md';
+import {apertureVersion} from '../../apertureVersion.js';
 ```
 
 Reliable operations at web-scale are impossible without effective flow control.

@@ -11,7 +11,7 @@ sidebar_position: 1
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../../introduction.md';
+import {apertureVersion} from '../../../apertureVersion.js';
 ```
 
 For services to communicate with Aperture Agent, [Control Points][flow-control]
