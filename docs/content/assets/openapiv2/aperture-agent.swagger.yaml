@@ -10,6 +10,20 @@ info:
   version: "1.0"
 host: aperture-agent
 paths:
+  /v1/distcache/stats:
+    get:
+      tags:
+      - aperture-agent
+      operationId: DistCacheService_GetStats
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1Stats'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
   /v1/entities:
     get:
       tags:
@@ -493,6 +507,50 @@ definitions:
       timestamp:
         type: string
         format: date-time
+  v1DMap:
+    type: object
+    properties:
+      length:
+        type: string
+        format: int64
+      num_tables:
+        type: string
+        format: int64
+      slab_info:
+        $ref: '#/definitions/v1SlabInfo'
+  v1DMaps:
+    type: object
+    properties:
+      delete_hits:
+        type: string
+        format: int64
+      delete_misses:
+        type: string
+        format: int64
+      entries_total:
+        type: string
+        format: int64
+      evicted_total:
+        type: string
+        format: int64
+      get_hits:
+        type: string
+        format: int64
+      get_misses:
+        type: string
+        format: int64
+  v1DTopics:
+    type: object
+    properties:
+      current_listeners:
+        type: string
+        format: int64
+      listeners_total:
+        type: string
+        format: int64
+      published_total:
+        type: string
+        format: int64
   v1Entity:
     description: Entity represents a pod, vm, etc.
     type: object
@@ -671,6 +729,53 @@ definitions:
           @gotags: validate:"required"
         type: string
         x-go-validate: required
+  v1Member:
+    type: object
+    properties:
+      birthdate:
+        type: string
+        format: int64
+      id:
+        type: string
+        format: uint64
+      name:
+        type: string
+  v1Network:
+    type: object
+    properties:
+      commands_total:
+        type: string
+        format: int64
+      connections_total:
+        type: string
+        format: int64
+      current_connections:
+        type: string
+        format: int64
+      read_bytes_total:
+        type: string
+        format: int64
+      written_bytes_total:
+        type: string
+        format: int64
+  v1Partition:
+    type: object
+    properties:
+      backups:
+        type: array
+        items:
+          $ref: '#/definitions/v1Member'
+      d_maps:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1DMap'
+      length:
+        type: string
+        format: int64
+      previous_owners:
+        type: array
+        items:
+          $ref: '#/definitions/v1Member'
   v1Peer:
     description: Peer holds peer info and services.
     type: object
@@ -716,6 +821,54 @@ definitions:
         format: date-time
       uptime:
         type: string
+  v1SlabInfo:
+    type: object
+    properties:
+      allocated:
+        type: string
+        format: int64
+      garbage:
+        type: string
+        format: int64
+      inuse:
+        type: string
+        format: int64
+  v1Stats:
+    type: object
+    properties:
+      backups:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Partition'
+      cluster_coordinator:
+        $ref: '#/definitions/v1Member'
+      cluster_members:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Member'
+      cmdline:
+        type: array
+        items:
+          type: string
+      d_maps:
+        $ref: '#/definitions/v1DMaps'
+      d_topics:
+        $ref: '#/definitions/v1DTopics'
+      member:
+        $ref: '#/definitions/v1Member'
+      network:
+        $ref: '#/definitions/v1Network'
+      partitions:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Partition'
+      release_version:
+        type: string
+      runtime:
+        type: object
+      uptime_seconds:
+        type: string
+        format: int64
   v1StatusError:
     description: Error holds raw error message and its cause in a nested field.
     type: object
