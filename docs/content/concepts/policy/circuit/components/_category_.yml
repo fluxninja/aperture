@@ -1,0 +1,9 @@
+label: Components
+position: 1
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Components"
+  description: "Aperture Policy Components"
+  keywords: ["components"]

@@ -1,5 +1,5 @@
 ---
-title: Applying Policies
+title: Get Started with First Policy
 description: How to apply Policies in Aperture
 keywords:
   - policy

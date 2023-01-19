@@ -1666,7 +1666,7 @@ selector:
 
 :::info
 For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/get-started/flow-control/envoy/istio.md#envoy-filter)
+[Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)
 :::
 
 @gotags: default:"workload_duration_ms"
@@ -2145,7 +2145,7 @@ component should apply to.
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Which [agent-group](/concepts/service.md#agent-group) this
+(string, default: `default`) Which [agent-group](/concepts/flow-control/service.md#agent-group) this
 selector applies to.
 
 @gotags: default:"default"
@@ -3102,7 +3102,7 @@ See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Which [agent-group](/concepts/service.md#agent-group) this
+(string, default: `default`) Which [agent-group](/concepts/flow-control/service.md#agent-group) this
 selector applies to.
 
 @gotags: default:"default"
@@ -3112,7 +3112,7 @@ selector applies to.
 <dd>
 
 (string) The Fully Qualified Domain Name of the
-[service](/concepts/service.md) to select.
+[service](/concepts/flow-control/service.md) to select.
 
 In kubernetes, this is the FQDN of the Service object.
 

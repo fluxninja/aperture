@@ -1,6 +1,6 @@
 ---
 title: Flow Label
-sidebar_position: 3
+sidebar_position: 1
 ---
 
 Every [Flow][flow] is annotated with a set of **Flow Labels**. Each Flow Label
@@ -201,4 +201,4 @@ select which labels to include in telemetry.
 [otel-conventions]:
   https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
 [aperture-go]: https://github.com/FluxNinja/aperture-go
-[istio]: /get-started/flow-control/envoy/istio.md
+[istio]: /get-started/integrations/flow-control/envoy/istio.md

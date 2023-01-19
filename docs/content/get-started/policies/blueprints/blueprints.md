@@ -1,15 +1,15 @@
 ---
-title: Blueprints
+title: What are Blueprints?
 description: Policies and Dashboards pre-packaged as reusable Blueprints
 keywords:
   - jsonnet
   - grafana
   - policy
-sidebar_position: 2
+sidebar_position: 1
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../apertureVersion.js';
+import {apertureVersion} from '../../../apertureVersion.js';
 ```
 
 ## Introduction
@@ -137,4 +137,4 @@ tutorial.
 [jsonnet]: https://github.com/google/go-jsonnet
 [tk]: https://grafana.com/oss/tanka/
 [policies]: /concepts/policy/policy.md
-[service]: /concepts/service.md
+[service]: /concepts/flow-control/service.md

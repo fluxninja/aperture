@@ -1,7 +1,7 @@
 ---
 title: Flow Selector
 sidebar_label: Flow Selector
-sidebar_position: 2
+sidebar_position: 3
 keywords:
   - flows
   - services
@@ -108,8 +108,8 @@ flow_selector:
 [flow]: /concepts/flow-control/flow-control.md#flow
 [label]: /concepts/flow-control/flow-label.md
 [control-point]: /concepts/flow-control/flow-control.md#control-point
-[service]: /concepts/service.md
-[agent-group]: /concepts/service.md#agent-group
+[service]: /concepts/flow-control/service.md
+[agent-group]: /concepts/flow-control/service.md#agent-group
 [flux-meter]: /concepts/flow-control/flux-meter.md
 [concurrency-limiter]: /concepts/flow-control/concurrency-limiter.md
 [classifier]: /concepts/flow-control/flow-classifier.md

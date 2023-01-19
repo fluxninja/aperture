@@ -85,8 +85,8 @@ service to be overloaded at that time.
 ### Playground
 
 When the above policy is loaded in Aperture's
-[Playground](/get-started/playground.md), we will see the various signal metrics
-collected from the execution of the policy:
+[Playground](/get-started/playground/playground.md), we will see the various
+signal metrics collected from the execution of the policy:
 
 <Zoom>
 
