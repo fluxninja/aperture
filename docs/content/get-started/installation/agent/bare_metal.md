@@ -15,7 +15,7 @@ sidebar_position: 3
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
-import {apertureVersion} from '../../../introduction.md';
+import {apertureVersion} from '../../../apertureVersion.js';
 ```
 
 The Aperture Agent can be installed as a system service on any Linux system

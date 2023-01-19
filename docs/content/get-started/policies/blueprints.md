@@ -9,7 +9,7 @@ sidebar_position: 2
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../introduction.md';
+import {apertureVersion} from '../../apertureVersion.js';
 ```
 
 ## Introduction

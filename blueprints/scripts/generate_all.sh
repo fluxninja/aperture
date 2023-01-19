@@ -40,7 +40,7 @@ $FIND "$blueprints_root"/lib -type f -name config.libsonnet | while read -r file
 	echo -e "\n" >>"$docs_file"
 	# add mdx code block
 	echo -e "\`\`\`mdx-code-block" >>"$docs_file"
-	echo -e "import {apertureVersion} from '../../introduction.md';" >>"$docs_file"
+	echo -e "import {apertureVersion} from '../../apertureVersion.js';" >>"$docs_file"
 	echo -e "\`\`\`" >>"$docs_file"
 	echo "## Blueprint Location" >>"$docs_file"
 	echo -e "\n" >>"$docs_file"
