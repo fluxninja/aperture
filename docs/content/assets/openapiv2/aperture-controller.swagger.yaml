@@ -1688,7 +1688,7 @@ definitions:
     properties:
       agent_group:
         description: |-
-          Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+          Which [agent-group](/concepts/service.md#agent-group) this
           selector applies to.
 
           @gotags: default:"default"
@@ -2379,7 +2379,7 @@ definitions:
     properties:
       agent_group:
         description: |-
-          Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+          Which [agent-group](/concepts/service.md#agent-group) this
           selector applies to.
 
           @gotags: default:"default"
@@ -2388,7 +2388,7 @@ definitions:
       service:
         description: |-
           The Fully Qualified Domain Name of the
-          [service](/concepts/flow-control/service.md) to select.
+          [service](/concepts/service.md) to select.
 
           In kubernetes, this is the FQDN of the Service object.
 

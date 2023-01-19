@@ -5,7 +5,7 @@ sidebar_label: Controller
 ---
 
 :::info
-See also [Aperture Controller installation](/get-started/installation/controller.md).
+See also [Aperture Controller installation](/get-started/installation/controller/controller.md).
 :::
 
 List of all config parameters for Aperture Controller.
