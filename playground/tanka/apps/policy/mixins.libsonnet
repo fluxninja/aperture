@@ -74,6 +74,7 @@ local policyResource = latencyGradientPolicy({
     }),
   ],
   concurrencyLimiter+: {
+    alerterChannels: ['service1-demo-app'],
     timeoutFactor: 0.5,
     defaultWorkloadParameters: {
       priority: 20,
