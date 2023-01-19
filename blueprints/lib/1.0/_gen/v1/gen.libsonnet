@@ -86,6 +86,8 @@
   Policy: import 'policy.libsonnet',
   PromQL: import 'promql.libsonnet',
   PromQLOuts: import 'promqlouts.libsonnet',
+  PulseGenerator: import 'pulsegenerator.libsonnet',
+  PulseGeneratorOuts: import 'pulsegeneratorouts.libsonnet',
   RateLimiter: import 'ratelimiter.libsonnet',
   RateLimiterDynamicConfig: import 'ratelimiterdynamicconfig.libsonnet',
   RateLimiterIns: import 'ratelimiterins.libsonnet',

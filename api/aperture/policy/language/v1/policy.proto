@@ -203,6 +203,9 @@ message Component {
 
     // Logical NOT.
     Inverter inverter = 21;
+
+    // Generates 0 and 1 in turns.
+    PulseGenerator pulse_generator = 22;
   }
 }
 
@@ -1365,4 +1368,30 @@ message HorizontalPodScaler {
   ScaleReporter scale_reporter = 2;
 
   ScaleActuator scale_actuator = 3;
+}
+
+// Generates 0 and 1 in turns.
+message PulseGenerator {
+  // Outputs for the PulseGenerator component.
+  message Outs {
+    OutPort output = 1;
+  }
+
+  Outs out_ports = 1;
+
+  // Emitting 1 for the true_for duration.
+  google.protobuf.Duration true_for = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {string_value: "5s"}
+    }
+  }]; // @gotags: default:"5s"
+
+  // Emitting 0 for the false_for duration.
+  google.protobuf.Duration false_for = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {string_value: "5s"}
+    }
+  }]; // @gotags: default:"5s"
 }

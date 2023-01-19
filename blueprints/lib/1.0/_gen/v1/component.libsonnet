@@ -109,6 +109,12 @@
   withPromqlMixin(promql):: {
     promql+: promql,
   },
+  withPulseGenerator(pulse_generator):: {
+    pulse_generator: pulse_generator,
+  },
+  withPulseGeneratorMixin(pulse_generator):: {
+    pulse_generator+: pulse_generator,
+  },
   withRateLimiter(rate_limiter):: {
     rate_limiter: rate_limiter,
   },

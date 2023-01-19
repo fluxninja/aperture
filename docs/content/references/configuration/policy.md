@@ -913,6 +913,12 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([V1Inverter](#v1-inverter)) Logical NOT.
 
 </dd>
+<dt>pulse_generator</dt>
+<dd>
+
+([V1PulseGenerator](#v1-pulse-generator)) Generates 0 and 1 in turns.
+
+</dd>
 </dl>
 
 ### v1ConcurrencyLimiter {#v1-concurrency-limiter}
@@ -2666,6 +2672,52 @@ Output for the PromQL component.
 <dd>
 
 ([V1OutPort](#v1-out-port)) The result of the Prometheus query as an output signal.
+
+</dd>
+</dl>
+
+### v1PulseGenerator {#v1-pulse-generator}
+
+Generates 0 and 1 in turns.
+
+#### Properties
+
+<dl>
+<dt>out_ports</dt>
+<dd>
+
+([V1PulseGeneratorOuts](#v1-pulse-generator-outs))
+
+</dd>
+<dt>true_for</dt>
+<dd>
+
+(string, default: `5s`) Emitting 1 for the true_for duration.
+
+@gotags: default:"5s"
+
+</dd>
+<dt>false_for</dt>
+<dd>
+
+(string, default: `5s`) Emitting 0 for the false_for duration.
+
+@gotags: default:"5s"
+
+</dd>
+</dl>
+
+### v1PulseGeneratorOuts {#v1-pulse-generator-outs}
+
+Outputs for the PulseGenerator component.
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
 
 </dd>
 </dl>

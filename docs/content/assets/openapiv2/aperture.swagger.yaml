@@ -1256,6 +1256,9 @@ definitions:
       inverter:
         $ref: '#/definitions/v1Inverter'
         description: Logical NOT.
+      pulse_generator:
+        $ref: '#/definitions/v1PulseGenerator'
+        description: Generates 0 and 1 in turns.
     description: |-
       :::info
       See also [Components overview](/concepts/policy/circuit.md#components).
@@ -2702,6 +2705,32 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: The result of the Prometheus query as an output signal.
     description: Output for the PromQL component.
+  v1PulseGenerator:
+    type: object
+    properties:
+      out_ports:
+        $ref: '#/definitions/v1PulseGeneratorOuts'
+      true_for:
+        type: string
+        description: |-
+          Emitting 1 for the true_for duration.
+
+          @gotags: default:"5s"
+        x-go-default: 5s
+      false_for:
+        type: string
+        description: |-
+          Emitting 0 for the false_for duration.
+
+          @gotags: default:"5s"
+        x-go-default: 5s
+    description: Generates 0 and 1 in turns.
+  v1PulseGeneratorOuts:
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
+    description: Outputs for the PulseGenerator component.
   v1RateLimiter:
     type: object
     properties:

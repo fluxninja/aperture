@@ -695,6 +695,10 @@ definitions:
           the result.
         x-order: 7
         $ref: '#/definitions/v1PromQL'
+      pulse_generator:
+        description: Generates 0 and 1 in turns.
+        x-order: 21
+        $ref: '#/definitions/v1PulseGenerator'
       rate_limiter:
         description: Rate Limiter provides service protection by applying rate limiter.
         x-order: 6
@@ -2004,6 +2008,36 @@ definitions:
     properties:
       output:
         description: The result of the Prometheus query as an output signal.
+        x-order: 0
+        $ref: '#/definitions/v1OutPort'
+  v1PulseGenerator:
+    description: Generates 0 and 1 in turns.
+    type: object
+    properties:
+      false_for:
+        description: |-
+          Emitting 0 for the false_for duration.
+
+          @gotags: default:"5s"
+        type: string
+        x-go-default: 5s
+        x-order: 2
+      out_ports:
+        x-order: 0
+        $ref: '#/definitions/v1PulseGeneratorOuts'
+      true_for:
+        description: |-
+          Emitting 1 for the true_for duration.
+
+          @gotags: default:"5s"
+        type: string
+        x-go-default: 5s
+        x-order: 1
+  v1PulseGeneratorOuts:
+    description: Outputs for the PulseGenerator component.
+    type: object
+    properties:
+      output:
         x-order: 0
         $ref: '#/definitions/v1OutPort'
   v1RateLimiter:
