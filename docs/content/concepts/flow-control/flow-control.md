@@ -107,12 +107,12 @@ integrations that will communicate with the Aperture Agent.
   We provide integration instructions for [Istio/Envoy][istio]. The user can
   name the Control Point to identify a particular filter chain in Envoy. In case
   of insertion via Istio, the <a
-  href={`https://github.com/fluxninja/aperture/tree/v${apertureVersion}/manifests/charts/istioconfig/templates/envoy_filter.yaml`}>default
+  href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/manifests/charts/istioconfig/templates/envoy_filter.yaml`}>default
   filter config</a>, assigns _ingress_ and _egress_ Control Points as
   [identified by Istio][istio-patch-context].
 
 - _Feature_ Control Points: We provide <a
-  href={`https://github.com/fluxninja/aperture/tree/v${apertureVersion}/sdks/`}>Aperture
+  href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/sdks/`}>Aperture
   SDKs</a>[][aperture-go] for popular languages. Aperture SDK wraps any function
   call or code snippet inside the Service code as a Feature Control Point. Every
   invocation of the Feature is a Flow from the perspective of Aperture.

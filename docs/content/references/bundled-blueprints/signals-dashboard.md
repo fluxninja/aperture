@@ -9,7 +9,7 @@ import {apertureVersion} from '../../apertureVersion.js';
 ## Blueprint Location
 
 GitHub: <a
-href={`https://github.com/fluxninja/aperture/tree/v${apertureVersion}/blueprints/lib/1.0/blueprints/signals-dashboard`}>signals-dashboard</a>
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/lib/1.0/blueprints/signals-dashboard`}>signals-dashboard</a>
 
 ## Introduction
 

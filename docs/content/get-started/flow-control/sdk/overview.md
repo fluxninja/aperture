@@ -23,7 +23,7 @@ A second way, one that allows for more customization, is to use Aperture SDK to
 set feature or traffic Control Points within services.
 
 We provide <a
-href={`https://github.com/fluxninja/aperture/tree/v${apertureVersion}/sdks/`}>Aperture
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/sdks/`}>Aperture
 SDKs</a> for popular languages. Aperture SDK allows you to manually wrap any
 function call or code snippet inside the Service code as a Feature Control
 Point. Every invocation of the Feature is a Flow from the perspective of
