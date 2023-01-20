@@ -16,7 +16,10 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
 import {apertureVersion} from '../../../apertureVersion.js';
-export const apertureVersionWithOutV = apertureVersion.slice(1)
+var apertureVersionWithOutV = apertureVersion;
+if (apertureVersionWithOutV != "main"){
+  var apertureVersionWithOutV = apertureVersionWithOutV.slice(1);
+}
 ```
 
 The Aperture Agent can be installed as a system service on any Linux system
