@@ -36,7 +36,7 @@ In order to generate Blueprints please install the pre-requisites [`jb`][jb] and
 ## Generating Aperture Policies and Grafana Dashboards
 
 The available Aperture Blueprints can be found under <a
-href={`https://github.com/fluxninja/aperture/tree/v${apertureVersion}/blueprints/lib/1.0/blueprints/`}>`blueprints/lib/1.0/blueprints`</a>.
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/lib/1.0/blueprints/`}>`blueprints/lib/1.0/blueprints`</a>.
 In each blueprint, `bundle.libsonnet` can be used to generate the actual
 artifacts, and `config.libsonnet` comes with the default configuration for the
 given blueprint. This can be overridden by the `--config` option passed to the
@@ -49,11 +49,11 @@ objects can be merged by using `+:` operator. Check the `example` directory for
 more information.
 
 To generate files, the script <a
-href={`https://github.com/fluxninja/aperture/tree/v${apertureVersion}/blueprints/scripts/generate-bundle.py`}>`blueprints/scripts/generate-bundle.py`</a>
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/scripts/generate-bundle.py`}>`blueprints/scripts/generate-bundle.py`</a>
 can be used. This script takes arguments for the output directory path where
 files will be saved and a path to a config libsonnet file containing blueprint
 customization and configuration. Assuming you are at <a
-href={`https://github.com/fluxninja/aperture/tree/v${apertureVersion}/`}>`Aperture root`</a>,
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/`}>`Aperture root`</a>,
 run the following commands to generate an example config:
 
 ```sh

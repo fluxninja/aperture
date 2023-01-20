@@ -15,7 +15,8 @@ sidebar_position: 3
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
-import {apertureVersion} from '../../../apertureVersion.js';
+import {apertureVersion,apertureVersionWithOutV} from '../../../apertureVersion.js';
+
 ```
 
 The Aperture Agent can be installed as a system service on any Linux system
@@ -34,7 +35,7 @@ Alternatively download it using following script:
 ```mdx-code-block
 export const DownloadScript = ({children, packager, arch, archSeparator, versionSeparator}) => (
 <CodeBlock language="bash">
-{`VERSION="${apertureVersion}"
+{`VERSION="${apertureVersionWithOutV}"
 ARCH="${arch}"
 PACKAGER="${packager}"
 url="https://github.com/fluxninja/aperture/releases/download/v\${VERSION}/aperture-agent${versionSeparator}\${VERSION}${archSeparator}\${ARCH}.\${PACKAGER}"
@@ -57,10 +58,10 @@ curl --fail --location --remote-name "\${url}"
 
 <Tabs groupId="packageManager" queryString>
   <TabItem value="dpkg" label="dpkg">
-    <CodeBlock language="bash">{`sudo dpkg -i aperture-agent_${apertureVersion}*.deb`}</CodeBlock>
+    <CodeBlock language="bash">{`sudo dpkg -i aperture-agent_${apertureVersionWithOutV}*.deb`}</CodeBlock>
   </TabItem>
   <TabItem value="rpm" label="rpm">
-    <CodeBlock language="bash">{`sudo rpm -i aperture-agent-${apertureVersion}*.rpm`}</CodeBlock>
+    <CodeBlock language="bash">{`sudo rpm -i aperture-agent-${apertureVersionWithOutV}*.rpm`}</CodeBlock>
   </TabItem>
 </Tabs>
 

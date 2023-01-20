@@ -44,7 +44,7 @@ $FIND "$blueprints_root"/lib -type f -name config.libsonnet | while read -r file
 	echo -e "\`\`\`" >>"$docs_file"
 	echo "## Blueprint Location" >>"$docs_file"
 	echo -e "\n" >>"$docs_file"
-	echo "GitHub: <a href={\`https://github.com/fluxninja/aperture/tree/v\${apertureVersion}/blueprints/lib/1.0/blueprints/$blueprint_name\`}>$blueprint_name</a>" >>"$docs_file"
+	echo "GitHub: <a href={\`https://github.com/fluxninja/aperture/tree/\${apertureVersion}/blueprints/lib/1.0/blueprints/$blueprint_name\`}>$blueprint_name</a>" >>"$docs_file"
 	echo -e "\n" >>"$docs_file"
 	echo "## Introduction" >>"$docs_file"
 	echo -e "\n" >>"$docs_file"

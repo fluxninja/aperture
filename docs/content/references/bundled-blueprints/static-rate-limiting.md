@@ -9,7 +9,7 @@ import {apertureVersion} from '../../apertureVersion.js';
 ## Blueprint Location
 
 GitHub: <a
-href={`https://github.com/fluxninja/aperture/tree/v${apertureVersion}/blueprints/lib/1.0/blueprints/static-rate-limiting`}>static-rate-limiting</a>
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/lib/1.0/blueprints/static-rate-limiting`}>static-rate-limiting</a>
 
 ## Introduction
 
