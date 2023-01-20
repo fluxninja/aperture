@@ -1086,7 +1086,7 @@ definitions:
           @gotags: validate:"dive"
     description: |-
       :::info
-      See also [Circuit overview](/concepts/policy/circuit.md).
+      See also [Circuit overview](/concepts/policy/circuit/circuit.md).
       :::
 
       Signals flow between components via ports.
@@ -1261,7 +1261,7 @@ definitions:
         description: Generates 0 and 1 in turns.
     description: |-
       :::info
-      See also [Components overview](/concepts/policy/circuit.md#components).
+      See also [Components overview](/concepts/policy/circuit/circuit.md#components).
       :::
 
       Signals flow into the components via input ports and results are emitted on output ports.

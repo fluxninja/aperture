@@ -574,7 +574,7 @@ definitions:
   v1Component:
     description: |-
       :::info
-      See also [Components overview](/concepts/policy/circuit.md#components).
+      See also [Components overview](/concepts/policy/circuit/circuit.md#components).
       :::
 
       Signals flow into the components via input ports and results are emitted on output ports.
