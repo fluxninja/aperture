@@ -146,6 +146,19 @@ func basePluginOTELConfigWithMetrics(pipelineName string) *otelcollector.OTELCon
 			"scrape_configs": []string{"foo", "bar"},
 		},
 	})
+	if pipelineName == "metrics/slow" {
+		cfg.AddReceiver("kubeletstats/fluxninja", map[string]any{
+			"collection_interval": "10s",
+			"metric_groups": []any{
+				"node",
+				"pod",
+			},
+		})
+	}
+	receivers := []string{"prometheus/fluxninja"}
+	if pipelineName == "metrics/slow" {
+		receivers = append(receivers, "kubeletstats/fluxninja")
+	}
 	cfg.AddProcessor("batch/metrics-slow", batchprocessor.Config{
 		SendBatchSize:    10000,
 		SendBatchMaxSize: 10000,
@@ -159,7 +172,7 @@ func basePluginOTELConfigWithMetrics(pipelineName string) *otelcollector.OTELCon
 		processors = append([]string{"enrichment"}, processors...)
 	}
 	cfg.Service.AddPipeline(pipelineName, otelcollector.Pipeline{
-		Receivers:  []string{"prometheus/fluxninja"},
+		Receivers:  receivers,
 		Processors: processors,
 		Exporters:  []string{"otlp/fluxninja"},
 	})
@@ -175,6 +188,13 @@ func baseOTELConfig() *otelcollector.OTELConfig {
 			},
 			// Put some scrape configs to be sure they are not overwritten.
 			"scrape_configs": []string{"foo", "bar"},
+		},
+	})
+	cfg.AddReceiver("kubeletstats", map[string]any{
+		"collection_interval": "1s",
+		"metric_groups": []any{
+			"node",
+			"pod",
 		},
 	})
 	return cfg

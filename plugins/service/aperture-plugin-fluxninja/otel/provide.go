@@ -23,7 +23,8 @@ import (
 )
 
 const (
-	receiverPrometheus = "prometheus/fluxninja"
+	receiverPrometheus   = "prometheus/fluxninja"
+	receiverKubeletStats = "kubeletstats/fluxninja"
 
 	processorBatchMetricsSlow   = "batch/metrics-slow"
 	processorRollup             = "rollup"
@@ -128,9 +129,13 @@ func addFNToPipeline(
 
 func addMetricsSlowPipeline(baseConfig, config *otelcollector.OTELConfig) {
 	addFluxninjaPrometheusReceiver(baseConfig, config)
+	addFluxninjaKubeletStatsReceiver(baseConfig, config)
 	config.AddBatchProcessor(processorBatchMetricsSlow, 10*time.Second, 10000, 10000)
 	config.Service.AddPipeline("metrics/slow", otelcollector.Pipeline{
-		Receivers: []string{receiverPrometheus},
+		Receivers: []string{
+			receiverPrometheus,
+			receiverKubeletStats,
+		},
 		Processors: []string{
 			otelcollector.ProcessorEnrichment,
 			processorBatchMetricsSlow,
@@ -173,6 +178,24 @@ func addFluxninjaPrometheusReceiver(baseConfig, config *otelcollector.OTELConfig
 		log.Fatal().Err(err).Msg("failed to merge configs")
 	}
 	config.AddReceiver(receiverPrometheus, duplicatedReceiverConfig)
+}
+
+func addFluxninjaKubeletStatsReceiver(baseConfig, config *otelcollector.OTELConfig) {
+	rawReceiverConfig, _ := baseConfig.Receivers[otelcollector.ReceiverKubeletStats].(map[string]any)
+	duplicatedReceiverConfig, err := duplicateMap(rawReceiverConfig)
+	if err != nil {
+		// It should not happen, unless the original config is messed up.
+		log.Fatal().Err(err).Msg("failed to duplicate config")
+	}
+	configPatch := map[string]any{
+		"collection_interval": "10s",
+	}
+	err = mergo.MergeWithOverwrite(&duplicatedReceiverConfig, configPatch)
+	if err != nil {
+		// It should not happen, unless the original config is messed up.
+		log.Fatal().Err(err).Msg("failed to merge configs")
+	}
+	config.AddReceiver(receiverKubeletStats, duplicatedReceiverConfig)
 }
 
 func duplicateMap(in map[string]any) (map[string]any, error) {

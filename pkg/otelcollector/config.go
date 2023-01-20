@@ -358,18 +358,11 @@ func AddMetricsPipeline(cfg *OtelParams) {
 	addKubeletStatsReceiver(cfg)
 	config.AddProcessor(ProcessorEnrichment, nil)
 	addPrometheusRemoteWriteExporter(config, cfg.promClient)
-	receivers := []string{ReceiverPrometheus}
-	_, err := rest.InClusterConfig()
-	if err == rest.ErrNotInCluster {
-		log.Debug().Msg("K8s environment not detected. Skipping kubelestats configurations.")
-	} else if err != nil {
-		log.Warn().Err(err).Msg("Error when discovering k8s environment")
-	} else {
-		log.Debug().Msg("K8s environment detected. Adding kubeletstats configurations.")
-		receivers = append(receivers, ReceiverKubeletStats)
-	}
 	config.Service.AddPipeline("metrics/fast", Pipeline{
-		Receivers: receivers,
+		Receivers: []string{
+			ReceiverPrometheus,
+			ReceiverKubeletStats,
+		},
 		Processors: []string{
 			ProcessorEnrichment,
 			ProcessorAgentGroup,
