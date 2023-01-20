@@ -3,6 +3,7 @@ package enrichmentprocessor
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
@@ -55,39 +56,13 @@ func (ep *enrichmentProcessor) ConsumeMetrics(ctx context.Context, origMd pmetri
 	}
 	md := pmetric.NewMetrics()
 	origMd.CopyTo(md)
+	// Enrich common attributes in resource
+	otelcollector.IterateResourceMetrics(md, func(resourceMetrics pmetric.ResourceMetrics) {
+		ep.enrichMetrics(resourceMetrics.Resource().Attributes())
+	})
+	// Enrich attributes in each of the metric
 	otelcollector.IterateMetrics(md, func(metric pmetric.Metric) {
-		switch metric.Type() {
-		case pmetric.MetricTypeGauge:
-			dataPoints := metric.Gauge().DataPoints()
-			for dpIt := 0; dpIt < dataPoints.Len(); dpIt++ {
-				dp := dataPoints.At(dpIt)
-				ep.enrichMetrics(dp.Attributes())
-			}
-		case pmetric.MetricTypeSum:
-			dataPoints := metric.Sum().DataPoints()
-			for dpIt := 0; dpIt < dataPoints.Len(); dpIt++ {
-				dp := dataPoints.At(dpIt)
-				ep.enrichMetrics(dp.Attributes())
-			}
-		case pmetric.MetricTypeSummary:
-			dataPoints := metric.Summary().DataPoints()
-			for dpIt := 0; dpIt < dataPoints.Len(); dpIt++ {
-				dp := dataPoints.At(dpIt)
-				ep.enrichMetrics(dp.Attributes())
-			}
-		case pmetric.MetricTypeHistogram:
-			dataPoints := metric.Histogram().DataPoints()
-			for dpIt := 0; dpIt < dataPoints.Len(); dpIt++ {
-				dp := dataPoints.At(dpIt)
-				ep.enrichMetrics(dp.Attributes())
-			}
-		case pmetric.MetricTypeExponentialHistogram:
-			dataPoints := metric.ExponentialHistogram().DataPoints()
-			for dpIt := 0; dpIt < dataPoints.Len(); dpIt++ {
-				dp := dataPoints.At(dpIt)
-				ep.enrichMetrics(dp.Attributes())
-			}
-		}
+		otelcollector.IterateDataPoints(metric, ep.enrichMetrics)
 	})
 	return md, nil
 }
@@ -105,10 +80,7 @@ func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
 			log.Trace().Str("label", label).Str("name", hostName).Msg("Skipping because entity not found in cache")
 			continue
 		}
-		servicesValue := pcommon.NewValueSlice()
-		for _, service := range hostEntity.Services {
-			servicesValue.Slice().AppendEmpty().SetStr(service)
-		}
-		servicesValue.CopyTo(attributes.PutEmpty(otelcollector.ApertureServicesLabel))
+		// We don't want this to be OTLP slice, as it is weirdly formatten when written to prometheus.
+		attributes.PutStr(otelcollector.ApertureServicesLabel, strings.Join(hostEntity.Services, ","))
 	}
 }
