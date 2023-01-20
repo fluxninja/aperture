@@ -8,6 +8,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/exporter"
@@ -99,6 +100,7 @@ func AgentOTELComponents(
 		prometheusreceiver.NewFactory(),
 		filelogreceiver.NewFactory(),
 		alertsreceiver.NewFactory(alerter),
+		kubeletstatsreceiver.NewFactory(),
 	)
 	errs = multierr.Append(errs, err)
 
