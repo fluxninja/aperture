@@ -108,7 +108,7 @@ your cluster.
    Aperture Controller you want these Agents to connect with.
 
    If you have installed the
-   [Aperture Controller](/get-started/installation/controller.md) on the same
+   [Aperture Controller](/get-started/installation/controller/controller.md) on the same
    cluster in `default` namespace, with Etcd and Prometheus using `controller`
    as release name, the values for the values for `ETCD_ENDPOINT_HERE` and
    `PROMETHEUS_ADDRESS_HERE` would be as below:
@@ -247,7 +247,7 @@ your cluster.
    ```
 
 7. Refer steps on the
-   [Istio Configuration](/get-started/flow-control/envoy/istio.md) if you don't
+   [Istio Configuration](/get-started/integrations/flow-control/envoy/istio.md) if you don't
    have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.
