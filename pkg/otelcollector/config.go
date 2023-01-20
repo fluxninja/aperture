@@ -358,11 +358,18 @@ func AddMetricsPipeline(cfg *OtelParams) {
 	addKubeletStatsReceiver(cfg)
 	config.AddProcessor(ProcessorEnrichment, nil)
 	addPrometheusRemoteWriteExporter(config, cfg.promClient)
+	receivers := []string{ReceiverPrometheus}
+	_, err := rest.InClusterConfig()
+	if err == rest.ErrNotInCluster {
+		log.Debug().Msg("K8s environment not detected. Skipping kubelestats configurations.")
+	} else if err != nil {
+		log.Warn().Err(err).Msg("Error when discovering k8s environment")
+	} else {
+		log.Debug().Msg("K8s environment detected. Adding kubeletstats configurations.")
+		receivers = append(receivers, ReceiverKubeletStats)
+	}
 	config.Service.AddPipeline("metrics/fast", Pipeline{
-		Receivers: []string{
-			ReceiverPrometheus,
-			ReceiverKubeletStats,
-		},
+		Receivers: receivers,
 		Processors: []string{
 			ProcessorEnrichment,
 			ProcessorAgentGroup,
@@ -445,7 +452,7 @@ func addPrometheusReceiver(cfg *OtelParams) {
 		log.Warn().Err(err).Msg("Error when discovering k8s environment")
 	} else {
 		log.Debug().Msg("K8s environment detected. Adding K8s scrape configurations.")
-		scrapeConfigs = append(scrapeConfigs, buildKubernetesNodesScrapeConfig(cfg), buildKubernetesPodsScrapeConfig(cfg))
+		scrapeConfigs = append(scrapeConfigs, buildKubernetesPodsScrapeConfig(cfg))
 	}
 
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
@@ -530,43 +537,6 @@ func buildOtelScrapeConfig(name string, cfg *OtelParams) map[string]any {
 					metrics.InstanceLabel:    info.Hostname,
 					metrics.ProcessUUIDLabel: info.UUID,
 				},
-			},
-		},
-	}
-}
-
-func buildKubernetesNodesScrapeConfig(cfg *OtelParams) map[string]any {
-	return map[string]any{
-		"job_name":     "kubernetes-nodes",
-		"scheme":       "https",
-		"metrics_path": "/metrics/cadvisor",
-		"authorization": map[string]any{
-			"credentials_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
-		},
-		"tls_config": map[string]any{
-			"insecure_skip_verify": true,
-		},
-		"kubernetes_sd_configs": []map[string]any{
-			{"role": "node"},
-		},
-		"relabel_configs": []map[string]any{
-			// Scrape only the node on which this agent is running.
-			{
-				"source_labels": []string{"__meta_kubernetes_node_name"},
-				"action":        "keep",
-				"regex":         info.Hostname,
-			},
-		},
-		"metric_relabel_configs": []map[string]any{
-			{
-				"source_labels": []string{"__name__"},
-				"action":        "keep",
-				"regex":         "container_memory_working_set_bytes|container_spec_memory_limit_bytes|container_spec_cpu_(?:quota|period)|container_cpu_usage_seconds_total",
-			},
-			{
-				"source_labels": []string{"pod"},
-				"action":        "replace",
-				"target_label":  "entity_name",
 			},
 		},
 	}
