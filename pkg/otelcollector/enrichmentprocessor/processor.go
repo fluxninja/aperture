@@ -14,6 +14,11 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
+// entityNameLabels is a slice of labels using which this processor will try
+// to enrich i.e. it will try using all those labels one by one as keys
+// in the entity cache.
+var entityNameLabels = []string{otelcollector.PodNameLabel}
+
 type enrichmentProcessor struct {
 	cache *entitycache.EntityCache
 }
@@ -88,20 +93,22 @@ func (ep *enrichmentProcessor) ConsumeMetrics(ctx context.Context, origMd pmetri
 }
 
 func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
-	hostNamex, ok := attributes.Get(otelcollector.EntityNameLabel)
-	if !ok {
-		return
+	for _, label := range entityNameLabels {
+		hostNamex, ok := attributes.Get(label)
+		if !ok {
+			continue
+		}
+		hostName := hostNamex.Str()
+		hostEntity, err := ep.cache.GetByName(hostName)
+		attributes.Remove(label)
+		if err != nil {
+			log.Trace().Str("label", label).Str("name", hostName).Msg("Skipping because entity not found in cache")
+			continue
+		}
+		servicesValue := pcommon.NewValueSlice()
+		for _, service := range hostEntity.Services {
+			servicesValue.Slice().AppendEmpty().SetStr(service)
+		}
+		servicesValue.CopyTo(attributes.PutEmpty(otelcollector.ApertureServicesLabel))
 	}
-	hostName := hostNamex.Str()
-	hostEntity, err := ep.cache.GetByName(hostName)
-	attributes.Remove(otelcollector.EntityNameLabel)
-	if err != nil {
-		log.Trace().Str("name", hostName).Msg("Skipping because entity not found in cache")
-		return
-	}
-	servicesValue := pcommon.NewValueSlice()
-	for _, service := range hostEntity.Services {
-		servicesValue.Slice().AppendEmpty().SetStr(service)
-	}
-	servicesValue.CopyTo(attributes.PutEmpty(otelcollector.ApertureServicesLabel))
 }

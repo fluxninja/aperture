@@ -104,8 +104,8 @@ const (
 
 	/* Specific to infra metrics pipeline. */
 
-	// EntityNameLabel describes entity name e.g. pod name.
-	EntityNameLabel = "entity_name"
+	// PodNameLabel describes pod name. Used in kubeletstatreceiver.
+	PodNameLabel = "k8s.pod.name"
 
 	/* Aperture specific enrichment labels. */
 
@@ -122,6 +122,8 @@ const (
 	ReceiverPrometheus = "prometheus"
 	// ReceiverAlerts collects alerts from alerter.
 	ReceiverAlerts = "alerts"
+	// ReceiverKubeletStats collects metrics from kubelet.
+	ReceiverKubeletStats = "kubeletstats"
 
 	// ProcessorEnrichment enriches metrics with discovery data.
 	ProcessorEnrichment = "enrichment"

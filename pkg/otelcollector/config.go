@@ -355,10 +355,14 @@ func NewDefaultOtelConfig() *OtelConfig {
 func AddMetricsPipeline(cfg *OtelParams) {
 	config := cfg.Config
 	addPrometheusReceiver(cfg)
+	addKubeletStatsReceiver(cfg)
 	config.AddProcessor(ProcessorEnrichment, nil)
 	addPrometheusRemoteWriteExporter(config, cfg.promClient)
 	config.Service.AddPipeline("metrics/fast", Pipeline{
-		Receivers: []string{ReceiverPrometheus},
+		Receivers: []string{
+			ReceiverPrometheus,
+			ReceiverKubeletStats,
+		},
 		Processors: []string{
 			ProcessorEnrichment,
 			ProcessorAgentGroup,
@@ -409,6 +413,21 @@ func AddAlertsPipeline(cfg *OtelParams, extraProcessors ...string) {
 		Receivers:  []string{ReceiverAlerts},
 		Processors: processors,
 		Exporters:  []string{ExporterLogging, ExporterAlerts},
+	})
+}
+
+func addKubeletStatsReceiver(cfg *OtelParams) {
+	config := cfg.Config
+	config.AddReceiver(ReceiverKubeletStats, map[string]any{
+		// TODO TLS support?
+		"collection_interval":  "1s",
+		"auth_type":            "serviceAccount",
+		"endpoint":             "https://${NODE_NAME}:10250",
+		"insecure_skip_verify": true,
+		"metric_groups": []any{
+			"node",
+			"pod",
+		},
 	})
 }
 
