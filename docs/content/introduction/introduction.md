@@ -1,5 +1,6 @@
 ---
 title: Introduction
+slug: /introduction/introduction
 sidebar_position: 1
 description:
   Introduction to FluxNinja Aperture, an open-source flow control and
