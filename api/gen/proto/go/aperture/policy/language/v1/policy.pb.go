@@ -2288,10 +2288,9 @@ func (x *Min) GetOutPorts() *Min_Outs {
 //
 //   :::note
 //   Treating invalid inputs as "unknowns" has a consequence that the result
-//   might end up being valid even when some inputs are invalid. Eg. `unknown
-//   && false == false`, because the result would end up false no matter if
-//   first signal was true or false. On the other hand, `unknown && true ==
-//   unknown`.
+//   might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,
+//   because the result would end up false no matter if
+//   first signal was true or false. On the other hand, `unknown && true == unknown`.
 //   :::
 type And struct {
 	state         protoimpl.MessageState
