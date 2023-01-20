@@ -2775,7 +2775,7 @@ definitions:
         title: Default configuration
     description: |-
       :::info
-      See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
+      See also [Rate Limiter overview](/concepts/policy/circuit/components/rate-limiter.md).
       :::
 
       Ratelimiting is done separately on per-label-value basis. Use _label\_key_

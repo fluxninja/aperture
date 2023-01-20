@@ -2043,7 +2043,7 @@ definitions:
   v1RateLimiter:
     description: |-
       :::info
-      See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
+      See also [Rate Limiter overview](/concepts/policy/circuit/components/rate-limiter.md).
       :::
 
       Ratelimiting is done separately on per-label-value basis. Use _label\_key_
@@ -2319,7 +2319,7 @@ definitions:
 
           :::info
           See also [workload definition in the concepts
-          section](/concepts/flow-control/concurrency-limiter.md#workload).
+          section](/concepts/policy/circuit/components/concurrency-limiter.md#workload).
           :::
 
           @gotags: validate:"dive"
