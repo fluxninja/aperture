@@ -7,8 +7,6 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/exporter/loggingexporter"
@@ -94,12 +92,14 @@ func AgentOTELComponents(
 	pmetricotlp.RegisterGRPCServer(serverGRPC, msw)
 	plogotlp.RegisterGRPCServer(serverGRPC, lsw)
 
-	receivers, err := receiver.MakeFactoryMap(
+	receiverFactory := []receiver.Factory{
 		otlpreceiver.NewFactory(tsw, msw, lsw),
-		prometheusreceiver.NewFactory(),
-		filelogreceiver.NewFactory(),
 		alertsreceiver.NewFactory(alerter),
-	)
+	}
+
+	receiverFactory = append(receiverFactory, otelReceivers()...)
+
+	receivers, err := receiver.MakeFactoryMap(receiverFactory...)
 	errs = multierr.Append(errs, err)
 
 	exporters, err := exporter.MakeFactoryMap(
