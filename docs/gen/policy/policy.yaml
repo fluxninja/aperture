@@ -716,7 +716,7 @@ definitions:
   v1ConcurrencyLimiter:
     description: |-
       :::info
-      See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
+      See also [Concurrency Limiter overview](/concepts/policy/circuit/components/concurrency-limiter.md).
       :::
 
       It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -1250,7 +1250,7 @@ definitions:
 
           :::info
           For list of available attributes in Envoy access logs, refer
-          [Envoy Filter](/get-started/flow-control/envoy/istio.md#envoy-filter)
+          [Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)
           :::
 
           @gotags: default:"workload_duration_ms"

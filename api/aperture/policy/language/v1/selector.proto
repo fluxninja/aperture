@@ -30,7 +30,7 @@ message FlowSelector {
 // See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 // :::
 message ServiceSelector {
-  // Which [agent-group](/concepts/service.md#agent-group) this
+  // Which [agent-group](/concepts/flow-control/service.md#agent-group) this
   // selector applies to.
   string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
@@ -40,7 +40,7 @@ message ServiceSelector {
   }]; // @gotags: default:"default"
 
   // The Fully Qualified Domain Name of the
-  // [service](/concepts/service.md) to select.
+  // [service](/concepts/flow-control/service.md) to select.
   //
   // In kubernetes, this is the FQDN of the Service object.
   //
@@ -111,7 +111,7 @@ message FlowMatcher {
 // Describes which pods a control or observability
 // component should apply to.
 message KubernetesObjectSelector {
-  // Which [agent-group](/concepts/service.md#agent-group) this
+  // Which [agent-group](/concepts/flow-control/service.md#agent-group) this
   // selector applies to.
   string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {

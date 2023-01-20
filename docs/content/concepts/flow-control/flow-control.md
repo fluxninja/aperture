@@ -149,7 +149,8 @@ we recommend to start with concepts like [services][service] and
 [labels][flow-label] first.
 
 [policies]: /concepts/policy/policy.md
-[concurrency-limiter]: /concepts/policy/circuit/components/concurrency-limiter.md
+[concurrency-limiter]:
+  /concepts/policy/circuit/components/concurrency-limiter.md
 [rate-limiter]: /concepts/policy/circuit/components/rate-limiter.md
 [flux-meter]: /concepts/flow-control/flux-meter.md
 [classifier]: /concepts/flow-control/flow-classifier.md

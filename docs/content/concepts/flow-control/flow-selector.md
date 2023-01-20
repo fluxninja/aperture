@@ -111,6 +111,7 @@ flow_selector:
 [service]: /concepts/flow-control/service.md
 [agent-group]: /concepts/flow-control/service.md#agent-group
 [flux-meter]: /concepts/flow-control/flux-meter.md
-[concurrency-limiter]: /concepts/policy/circuit/components/concurrency-limiter.md
+[concurrency-limiter]:
+  /concepts/policy/circuit/components/concurrency-limiter.md
 [classifier]: /concepts/flow-control/flow-classifier.md
 [label-matcher]: /references/configuration/policy.md#v1-label-matcher

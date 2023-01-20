@@ -105,6 +105,7 @@ graph TB
 
 </Zoom>
 
-[dist-counters]: /concepts/policy/circuit/components/rate-limiter.md#distributed-counters
+[dist-counters]:
+  /concepts/policy/circuit/components/rate-limiter.md#distributed-counters
 [components]: /concepts/flow-control/flow-control.md#components
 [catch-all-service]: /concepts/flow-control/flow-selector.md#serviceselector
