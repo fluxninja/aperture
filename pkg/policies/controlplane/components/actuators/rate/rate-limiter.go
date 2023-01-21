@@ -127,7 +127,7 @@ func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lif
 }
 
 // Execute implements runtime.Component.Execute.
-func (limiterSync *rateLimiterSync) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (limiterSync *rateLimiterSync) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	limit, ok := inPortReadings["limit"]
 	if !ok {
 		return nil, nil

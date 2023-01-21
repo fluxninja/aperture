@@ -27,15 +27,15 @@ func (c *logicalCombinator) Type() runtime.ComponentType {
 }
 
 // Execute implements runtime.Component.
-func (c *logicalCombinator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	inputs := inPortReadings.ReadRepeatedValuePort("inputs")
+func (c *logicalCombinator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	inputs := inPortReadings.ReadRepeatedReadingPort("inputs")
 
 	output := c.neutralElement
 	for _, input := range inputs {
 		output = c.op(output, tristate.FromReading(input))
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output.ToReading()},
 	}, nil
 }
@@ -78,10 +78,10 @@ func (c *inverter) Name() string { return "Inverter" }
 func (c *inverter) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
 // Execute implements runtime.Component.
-func (c *inverter) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	input := inPortReadings.ReadSingleValuePort("input")
+func (c *inverter) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	input := inPortReadings.ReadSingleReadingPort("input")
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{
 			tristate.FromReading(input).Not().ToReading(),
 		},

@@ -1,12 +1,10 @@
 package circuitfactory
 
 import (
-	"strconv"
-	"strings"
-
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -19,17 +17,27 @@ func Module() fx.Option {
 	)
 }
 
+// GraphNode is a node in the circuit graph. It is used for representing the outermost components in the circuit.
+type GraphNode struct {
+	// Which signals this component wants to have connected on its ports.
+	PortMapping runtime.PortMapping
+	// Mapstruct representation of proto config that was used to create this
+	// component.  This Config is used only for observability purposes.
+	//
+	// Note: PortMapping is also part of Config.
+	Config mapstruct.Object
+}
+
 // Circuit is a compiled Circuit
 //
 // Circuit can also be converted to its graph view.
 type Circuit struct {
-	components   []runtime.CompiledComponent
-	configs      []runtime.ConfiguredComponent
-	componentIDs []ComponentID
+	components []runtime.ConfiguredComponent
+	graphNodes []GraphNode
 }
 
 // Components returns a list of CompiledComponents, ready to create runtime.Circuit.
-func (circuit *Circuit) Components() []runtime.CompiledComponent { return circuit.components }
+func (circuit *Circuit) Components() []runtime.ConfiguredComponent { return circuit.components }
 
 // CompileFromProto compiles a protobuf circuit definition into a Circuit.
 //
@@ -38,12 +46,12 @@ func CompileFromProto(
 	circuitProto []*policylangv1.Component,
 	policyReadAPI iface.Policy,
 ) (*Circuit, fx.Option, error) {
-	configuredComponents, componentIDs, option, err := CreateComponents(circuitProto, policyReadAPI)
+	configuredComponents, graphNodes, option, err := CreateComponents(circuitProto, policyReadAPI)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	compiledComponents, err := runtime.Compile(
+	err = runtime.Compile(
 		configuredComponents,
 		policyReadAPI.GetStatusRegistry().GetLogger(),
 	)
@@ -52,26 +60,9 @@ func CompileFromProto(
 	}
 
 	return &Circuit{
-		configs:      configuredComponents,
-		components:   compiledComponents,
-		componentIDs: componentIDs,
+		components: configuredComponents,
+		graphNodes: graphNodes,
 	}, option, nil
-}
-
-// ComponentID is a component identifier based on position in original proto list of components.
-type ComponentID string
-
-func subcomponentID(parentID ComponentID, subcomponent runtime.Component) ComponentID {
-	return ComponentID(string(parentID) + "." + subcomponent.Name())
-}
-
-// ParentID returns ID of parent component.
-func (id ComponentID) ParentID() ComponentID {
-	parentID, _, hasParent := strings.Cut(string(id), ".")
-	if !hasParent {
-		return ComponentID("")
-	}
-	return ComponentID(parentID)
 }
 
 // CreateComponents creates circuit components along with their identifiers and fx options.
@@ -81,14 +72,16 @@ func (id ComponentID) ParentID() ComponentID {
 func CreateComponents(
 	circuitProto []*policylangv1.Component,
 	policyReadAPI iface.Policy,
-) ([]runtime.ConfiguredComponent, []ComponentID, fx.Option, error) {
-	var configuredComponents []runtime.ConfiguredComponent
-	var ids []ComponentID
-	var options []fx.Option
+) ([]runtime.ConfiguredComponent, []GraphNode, fx.Option, error) {
+	var (
+		configuredComponents []runtime.ConfiguredComponent
+		graphNodes           []GraphNode
+		options              []fx.Option
+	)
 
 	for compIndex, componentProto := range circuitProto {
-		// Create component
-		component, subcomponents, compOption, err := NewComponentAndOptions(
+		// Create graphNode
+		graphNode, subComponents, compOption, err := NewComponentAndOptions(
 			componentProto,
 			compIndex,
 			policyReadAPI,
@@ -98,17 +91,12 @@ func CreateComponents(
 		}
 		options = append(options, compOption)
 
-		compID := ComponentID(strconv.Itoa(compIndex))
-		// Add Component to compiledCircuit
-		configuredComponents = append(configuredComponents, component)
-		ids = append(ids, compID)
+		// Add graphNode to graphNodes
+		graphNodes = append(graphNodes, graphNode)
 
-		// Add SubComponents to compiledCircuit
-		for _, subComp := range subcomponents {
-			configuredComponents = append(configuredComponents, subComp)
-			ids = append(ids, subcomponentID(compID, subComp))
-		}
+		// Add subComponents to configuredComponents
+		configuredComponents = append(configuredComponents, subComponents...)
 	}
 
-	return configuredComponents, ids, fx.Options(options...), nil
+	return configuredComponents, graphNodes, fx.Options(options...), nil
 }

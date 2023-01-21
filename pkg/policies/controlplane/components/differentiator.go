@@ -50,12 +50,12 @@ func NewDifferentiatorAndOptions(diffProto *policylangv1.Differentiator, _ int, 
 }
 
 // Execute implements runtime.Component.Execute.
-func (d *Differentiator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (d *Differentiator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	if !d.initialized {
 		d.init(tickInfo)
 	}
 
-	inputVal := inPortReadings.ReadSingleValuePort("input")
+	inputVal := inPortReadings.ReadSingleReadingPort("input")
 	outputVal := runtime.InvalidReading()
 
 	// add input to readings array
@@ -94,7 +94,7 @@ func (d *Differentiator) Execute(inPortReadings runtime.PortToValue, tickInfo ru
 		d.oldestIdx = utils.Mod((d.oldestIdx + 1), d.capacity)
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{outputVal},
 	}, nil
 }

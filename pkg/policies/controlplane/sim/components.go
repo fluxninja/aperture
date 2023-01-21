@@ -29,8 +29,8 @@ func (i *Input) Name() string { return "TestInput" }
 func (i *Input) Type() rt.ComponentType { return rt.ComponentTypeSource }
 
 // Execute implements runtime.Component.
-func (i *Input) Execute(_ rt.PortToValue, _ rt.TickInfo) (rt.PortToValue, error) {
-	return rt.PortToValue{
+func (i *Input) Execute(_ rt.PortToReading, _ rt.TickInfo) (rt.PortToReading, error) {
+	return rt.PortToReading{
 		"output": []rt.Reading{i.execute()},
 	}, nil
 }
@@ -67,8 +67,8 @@ func (o *output) TakeReadings() []rt.Reading {
 }
 
 // Execute implements runtime.Component.
-func (o *output) Execute(ins rt.PortToValue, _ rt.TickInfo) (rt.PortToValue, error) {
-	o.Readings = append(o.Readings, ins.ReadSingleValuePort("input"))
+func (o *output) Execute(ins rt.PortToReading, _ rt.TickInfo) (rt.PortToReading, error) {
+	o.Readings = append(o.Readings, ins.ReadSingleReadingPort("input"))
 	return nil, nil
 }
 
@@ -78,28 +78,28 @@ func (o *output) DynamicConfigUpdate(_ notifiers.Event, _ config.Unmarshaller) {
 /******** helpers ***********/
 
 // ConfigureInputComponent takes an input component and creates a
-// ConfiguredComponent which outputs signal with given name on its "output"
+// Component which outputs signal with given name on its "output"
 // port.
 func ConfigureInputComponent(comp rt.Component, signal string) rt.ConfiguredComponent {
 	return rt.ConfiguredComponent{
 		Component: comp,
 		PortMapping: rt.PortMapping{
-			Outs: map[string][]rt.Port{
-				"output": {{SignalName: &signal}},
+			Outs: map[string][]rt.Signal{
+				"output": {{SignalName: signal}},
 			},
 		},
 	}
 }
 
 // ConfigureOutputComponent takes an output component and creates a
-// ConfiguredComponent which reads signal with a given name on its "input"
+// Component which reads signal with a given name on its "input"
 // port.
 func ConfigureOutputComponent(signal string, comp rt.Component) rt.ConfiguredComponent {
 	return rt.ConfiguredComponent{
 		Component: comp,
 		PortMapping: rt.PortMapping{
-			Ins: map[string][]rt.Port{
-				"input": {{SignalName: &signal}},
+			Ins: map[string][]rt.Signal{
+				"input": {{SignalName: signal}},
 			},
 		},
 	}

@@ -87,17 +87,17 @@ func (ema *EMA) resetStages() {
 }
 
 // Execute implements runtime.Component.Execute.
-func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (ema *EMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	logger := ema.policyReadAPI.GetStatusRegistry().GetLogger()
-	retErr := func(err error) (runtime.PortToValue, error) {
-		return runtime.PortToValue{
+	retErr := func(err error) (runtime.PortToReading, error) {
+		return runtime.PortToReading{
 			"output": []runtime.Reading{runtime.InvalidReading()},
 		}, err
 	}
 
-	input := inPortReadings.ReadSingleValuePort("input")
-	maxEnvelope := inPortReadings.ReadSingleValuePort("max_envelope")
-	minEnvelope := inPortReadings.ReadSingleValuePort("min_envelope")
+	input := inPortReadings.ReadSingleReadingPort("input")
+	maxEnvelope := inPortReadings.ReadSingleReadingPort("max_envelope")
+	minEnvelope := inPortReadings.ReadSingleReadingPort("min_envelope")
 	output := runtime.InvalidReading()
 
 	switch ema.currentStage {
@@ -159,7 +159,7 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 		ema.lastGoodOutput = output
 	}
 	// Returns Exponential Moving Average of a series of readings.
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
 }

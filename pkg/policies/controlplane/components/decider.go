@@ -81,11 +81,11 @@ func NewDeciderAndOptions(deciderProto *policylangv1.Decider, _ int, policyReadA
 }
 
 // Execute implements runtime.Component.Execute.
-func (dec *Decider) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (dec *Decider) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	onTrue := runtime.NewReading(1.0)
 	onFalse := runtime.NewReading(0.0)
-	lhs := inPortReadings.ReadSingleValuePort("lhs")
-	rhs := inPortReadings.ReadSingleValuePort("rhs")
+	lhs := inPortReadings.ReadSingleReadingPort("lhs")
+	rhs := inPortReadings.ReadSingleReadingPort("rhs")
 
 	// Default currentDecision to False
 	currentDecision := false
@@ -129,7 +129,7 @@ func (dec *Decider) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 		output = onFalse
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
 }

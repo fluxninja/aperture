@@ -31,15 +31,15 @@ func NewMaxAndOptions(maxProto *policylangv1.Max, componentIndex int, policyRead
 }
 
 // Execute implements runtime.Component.Execute.
-func (max *Max) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (max *Max) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	maxValue := -math.MaxFloat64
-	inputs := inPortReadings.ReadRepeatedValuePort("inputs")
+	inputs := inPortReadings.ReadRepeatedReadingPort("inputs")
 	output := runtime.InvalidReading()
 
 	if len(inputs) > 0 {
 		for _, singleInput := range inputs {
 			if !singleInput.Valid() {
-				return runtime.PortToValue{
+				return runtime.PortToReading{
 					"output": []runtime.Reading{output},
 				}, nil
 			}
@@ -52,7 +52,7 @@ func (max *Max) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 		output = runtime.InvalidReading()
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
 }

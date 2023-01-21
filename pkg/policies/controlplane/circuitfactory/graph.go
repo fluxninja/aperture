@@ -2,6 +2,7 @@ package circuitfactory
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/emicklei/dot"
@@ -17,49 +18,49 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 	var componentsDTO []*policymonitoringv1.ComponentView
 	var links []*policymonitoringv1.Link
 	type componentData struct {
-		componentID ComponentID
+		componentID string
 		portName    string
 	}
 	outSignalsIndex := make(map[string][]componentData)
 	inSignalsIndex := make(map[string][]componentData)
 	for componentIndex, c := range circuit.components {
 		var inPorts, outPorts []*policymonitoringv1.PortView
-		for name, signals := range c.InPortToSignals {
+		for name, signals := range c.PortMapping.Ins {
 			for _, signal := range signals {
-				if signal.SignalType == runtime.SignalTypeNamed {
-					signalName := signal.Name
+				if signal.SignalType() == runtime.SignalTypeNamed {
+					signalName := signal.SignalName
 					inPorts = append(inPorts, &policymonitoringv1.PortView{
 						PortName: name,
 						Value:    &policymonitoringv1.PortView_SignalName{SignalName: signalName},
 						Looped:   signal.Looped,
 					})
 					inSignalsIndex[signalName] = append(inSignalsIndex[signalName], componentData{
-						componentID: circuit.componentIDs[componentIndex],
+						componentID: strconv.Itoa(componentIndex),
 						portName:    name,
 					})
-				} else if signal.SignalType == runtime.SignalTypeConstant {
+				} else if signal.SignalType() == runtime.SignalTypeConstant {
 					inPorts = append(inPorts, &policymonitoringv1.PortView{
 						PortName: name,
-						Value:    &policymonitoringv1.PortView_ConstantValue{ConstantValue: signal.Value},
+						Value:    &policymonitoringv1.PortView_ConstantValue{ConstantValue: signal.ConstantValue},
 					})
 				}
 			}
 		}
-		for name, signals := range c.OutPortToSignals {
+		for name, signals := range c.PortMapping.Outs {
 			for _, signal := range signals {
-				signalName := signal.Name
+				signalName := signal.SignalName
 				outPorts = append(outPorts, &policymonitoringv1.PortView{
 					PortName: name,
 					Value:    &policymonitoringv1.PortView_SignalName{SignalName: signalName},
 					Looped:   signal.Looped,
 				})
 				outSignalsIndex[signalName] = append(outSignalsIndex[signalName], componentData{
-					componentID: circuit.componentIDs[componentIndex],
+					componentID: strconv.Itoa(componentIndex),
 					portName:    name,
 				})
 			}
 		}
-		componentConfig := circuit.configs[componentIndex].Config
+		componentConfig := circuit.graphNodes[componentIndex].Config
 		componentMap, err := structpb.NewStruct(componentConfig)
 		if err != nil {
 			log.Error().Err(err).Msg("converting component map")
@@ -114,14 +115,14 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 		}
 
 		componentsDTO = append(componentsDTO, &policymonitoringv1.ComponentView{
-			ComponentId:          string(circuit.componentIDs[componentIndex]),
+			ComponentId:          strconv.Itoa(componentIndex),
 			ComponentName:        componentName,
 			ComponentDescription: componentDescription,
 			ComponentType:        string(c.Type()),
 			Component:            componentMap,
 			InPorts:              convertPortViews(inPorts),
 			OutPorts:             convertPortViews(outPorts),
-			ParentComponentId:    string(circuit.componentIDs[componentIndex].ParentID()),
+			ParentComponentId:    "",
 		})
 	}
 	// compute links
@@ -157,17 +158,6 @@ func convertPortViews(ports []*policymonitoringv1.PortView) []*policymonitoringv
 func Mermaid(components []*policymonitoringv1.ComponentView, links []*policymonitoringv1.Link) string {
 	var sb strings.Builder
 	sb.WriteString("flowchart LR\n")
-
-	parentComponents := make(map[string][]*policymonitoringv1.ComponentView)
-	for i, c := range components {
-		if c.ParentComponentId == "" {
-			continue
-		}
-		parentComponents[c.ParentComponentId] = append(parentComponents[c.ParentComponentId], c)
-		// remove this element from the slice
-		components[i] = components[len(components)-1]
-		components = components[:len(components)-1]
-	}
 
 	renderComponentSubGraph := func(component *policymonitoringv1.ComponentView) string {
 		var s strings.Builder
@@ -224,22 +214,8 @@ func Mermaid(components []*policymonitoringv1.ComponentView, links []*policymoni
 	var constantID int
 	// subgraph for each component
 	for _, c := range components {
-		// if it's a parent component then render the subgraph for each component
-		if _, ok := parentComponents[c.ComponentId]; ok {
-			for _, childComponent := range parentComponents[c.ComponentId] {
-				childComponent.ComponentName = c.ComponentName + "/" + childComponent.ComponentName
-				if c.ComponentDescription != "" {
-					if childComponent.ComponentDescription != "" {
-						childComponent.ComponentDescription = "<center>" + c.ComponentDescription + "<br/>" + childComponent.ComponentDescription + "</center>"
-					} else {
-						childComponent.ComponentDescription = c.ComponentDescription
-					}
-				}
-				sb.WriteString(renderComponentSubGraph(childComponent))
-			}
-		} else {
-			sb.WriteString(renderComponentSubGraph(c))
-		}
+
+		sb.WriteString(renderComponentSubGraph(c))
 		// fake nodes for constant value ports
 		for _, inPort := range c.InPorts {
 			if constValue, ok := inPort.GetValue().(*policymonitoringv1.PortView_ConstantValue); ok {
@@ -270,14 +246,8 @@ func DOT(components []*policymonitoringv1.ComponentView, links []*policymonitori
 	// indexed by component id
 	clusters := make(map[string]*dot.Graph)
 	for i := range components {
-		var sg *dot.Graph
-		if components[i].ParentComponentId == "" {
-			sg = g
-		} else {
-			sg = clusters[components[i].ParentComponentId]
-		}
 		name := fmt.Sprintf("%s[%s]", components[i].ComponentName, strings.SplitN(components[i].ComponentId, ".", 1)[0])
-		cluster := sg.Subgraph(name, dot.ClusterOption{})
+		cluster := g.Subgraph(name, dot.ClusterOption{})
 		cluster.AttributesMap.Attr("margin", "50.0")
 		clusters[components[i].ComponentId] = cluster
 		var anyIn, anyOut dot.Node

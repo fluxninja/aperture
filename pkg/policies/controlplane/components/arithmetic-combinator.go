@@ -45,7 +45,7 @@ func (*ArithmeticCombinator) Type() runtime.ComponentType {
 var _ runtime.Component = (*ArithmeticCombinator)(nil)
 
 // NewArithmeticCombinatorAndOptions returns a new ArithmeticCombinator and its Fx options.
-func NewArithmeticCombinatorAndOptions(arithmeticCombinatorProto *policylangv1.ArithmeticCombinator, _ int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewArithmeticCombinatorAndOptions(arithmeticCombinatorProto *policylangv1.ArithmeticCombinator, _ int, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	operator, err := arithmeticOperatorString(arithmeticCombinatorProto.Operator)
 	if err != nil {
 		return nil, fx.Options(), err
@@ -61,9 +61,9 @@ func NewArithmeticCombinatorAndOptions(arithmeticCombinatorProto *policylangv1.A
 }
 
 // Execute implements runtime.Component.Execute.
-func (arith *ArithmeticCombinator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	lhs := inPortReadings.ReadSingleValuePort("lhs")
-	rhs := inPortReadings.ReadSingleValuePort("rhs")
+func (arith *ArithmeticCombinator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	lhs := inPortReadings.ReadSingleReadingPort("lhs")
+	rhs := inPortReadings.ReadSingleReadingPort("rhs")
 	output := runtime.InvalidReading()
 	var err error
 
@@ -91,7 +91,7 @@ func (arith *ArithmeticCombinator) Execute(inPortReadings runtime.PortToValue, t
 		}
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, err
 }

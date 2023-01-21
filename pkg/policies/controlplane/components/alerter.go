@@ -56,8 +56,8 @@ func (a *Alerter) setup(alerterIface *alerts.SimpleAlerter) {
 }
 
 // Execute implements runtime.Component.Execute.
-func (a *Alerter) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	signalValue := inPortReadings.ReadSingleValuePort("signal")
+func (a *Alerter) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	signalValue := inPortReadings.ReadSingleReadingPort("signal")
 	if !signalValue.Valid() {
 		return nil, nil
 	}

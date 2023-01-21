@@ -173,7 +173,7 @@ func (s *Scheduler) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Life
 }
 
 // Execute implements runtime.Component.Execute.
-func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (s *Scheduler) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	logger := s.policyReadAPI.GetStatusRegistry().GetLogger()
 	var errMulti error
 
@@ -219,7 +219,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 
 	var acceptedReading, incomingReading runtime.Reading
 
-	outPortReadings := make(runtime.PortToValue)
+	outPortReadings := make(runtime.PortToReading)
 
 	acceptedScalarResult, err := s.acceptedQuery.ExecuteScalarQuery(tickInfo)
 	acceptedValue := acceptedScalarResult.Value

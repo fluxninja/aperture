@@ -168,8 +168,8 @@ func (sr *ScaleReporter) statusUpdateCallback(event notifiers.Event, unmarshalle
 }
 
 // Execute implements runtime.Component.
-func (sr *ScaleReporter) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	outPortReadings := make(runtime.PortToValue)
+func (sr *ScaleReporter) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	outPortReadings := make(runtime.PortToReading)
 	configuredReplicasReading := runtime.InvalidReading()
 	actualReplicasReading := runtime.InvalidReading()
 

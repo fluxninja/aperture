@@ -31,9 +31,9 @@ func NewConstantAndOptions(constant *policylangv1.Constant, componentIndex int, 
 }
 
 // Execute implements runtime.Component.Execute.
-func (con *Constant) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (con *Constant) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	// Always emit the value.
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{runtime.NewReading(con.value)},
 	}, nil
 }

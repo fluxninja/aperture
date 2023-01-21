@@ -43,8 +43,8 @@ func NewExtrapolatorAndOptions(extrapolatorProto *policylangv1.Extrapolator, com
 }
 
 // Execute implements runtime.Component.Execute.
-func (exp *Extrapolator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	input := inPortReadings.ReadSingleValuePort("input")
+func (exp *Extrapolator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	input := inPortReadings.ReadSingleReadingPort("input")
 	output := runtime.InvalidReading()
 
 	if input.Valid() {
@@ -63,7 +63,7 @@ func (exp *Extrapolator) Execute(inPortReadings runtime.PortToValue, tickInfo ru
 	}
 
 	// If the signal returns, it resumes mirroring the input signal as output signal.
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
 }

@@ -413,7 +413,7 @@ func (promQL *PromQL) setup(pje *promJobsExecutor, promAPI prometheusv1.API) err
 }
 
 // Execute implements runtime.Component.Execute.
-func (promQL *PromQL) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (outPortReadings runtime.PortToValue, err error) {
+func (promQL *PromQL) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (outPortReadings runtime.PortToReading, err error) {
 	// Re-run query if evaluationInterval elapsed since last query
 	if tickInfo.Timestamp().Sub(promQL.lastQueryTimestamp()) >= promQL.evaluationInterval {
 		// Run query
@@ -434,7 +434,7 @@ func (promQL *PromQL) Execute(inPortReadings runtime.PortToValue, tickInfo runti
 		currentReading = runtime.NewReading(promQL.value)
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{currentReading},
 	}, nil
 }
@@ -497,7 +497,7 @@ func NewScalarQueryAndOptions(
 
 // ExecuteScalarQuery runs a ScalarQueryJob and returns the current results: value and err. This function is supposed to be run under Circuit Execution Lock (Execution of Circuit Components is protected by this lock).
 func (scalarQuery *ScalarQuery) ExecuteScalarQuery(tickInfo runtime.TickInfo) (ScalarResult, error) {
-	inPortReadings := runtime.PortToValue{}
+	inPortReadings := runtime.PortToReading{}
 	_, _ = scalarQuery.promQL.Execute(inPortReadings, tickInfo)
 	// FYI: promQL ensures that initial runs return err when no queries have returned yet.
 	return ScalarResult{Value: scalarQuery.promQL.value, TickInfo: scalarQuery.promQL.tickInfo}, scalarQuery.promQL.err

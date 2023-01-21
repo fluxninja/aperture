@@ -3,6 +3,7 @@ package runtime
 import (
 	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
 )
 
 // PortMapping is description of a component's ports mapping.
@@ -38,8 +39,30 @@ import (
 type PortMapping struct {
 	// Note: Not using policylangv1.InPort and OutPort directly to avoid
 	// runtime depending on proto.
-	Ins  map[string][]Port `mapstructure:"in_ports"`
-	Outs map[string][]Port `mapstructure:"out_ports"`
+	Ins  PortToSignals `mapstructure:"in_ports"`
+	Outs PortToSignals `mapstructure:"out_ports"`
+}
+
+// PortToSignals is a map from port name to a list of ports.
+type PortToSignals map[string][]Signal
+
+func (p PortToSignals) merge(other PortToSignals) error {
+	for portName, signals := range other {
+		if _, ok := p[portName]; !ok {
+			p[portName] = signals
+		} else {
+			return errors.New("duplicate port definition")
+		}
+	}
+	return nil
+}
+
+// NewPortMapping creates a new PortMapping.
+func NewPortMapping() PortMapping {
+	return PortMapping{
+		Ins:  make(PortToSignals),
+		Outs: make(PortToSignals),
+	}
 }
 
 // PortsFromComponentConfig extracts Ports from component's config.
@@ -58,11 +81,55 @@ func PortsFromComponentConfig(componentConfig mapstruct.Object) (PortMapping, er
 	return ports, err
 }
 
-// Port describes an input or output port of a component
+// Merge merges two PortMappings.
+func (p *PortMapping) Merge(other PortMapping) error {
+	err := p.Ins.merge(other.Ins)
+	if err != nil {
+		return err
+	}
+	err = p.Outs.merge(other.Outs)
+	return err
+}
+
+// SignalType enum.
+type SignalType int
+
+const (
+	// SignalTypeNamed is a named signal.
+	SignalTypeNamed = iota
+	// SignalTypeConstant is a constant signal.
+	SignalTypeConstant
+)
+
+// Signal describes an input or output port of a component
 //
 // Only one field should be set.
-type Port struct {
+type Signal struct {
 	// Note: pointers are used to detect fields being not set.
-	SignalName    *string  `mapstructure:"signal_name"`
-	ConstantValue *float64 `mapstructure:"constant_value"`
+	SignalName    string  `mapstructure:"signal_name"`
+	ConstantValue float64 `mapstructure:"constant_value"`
+	Looped        bool
+}
+
+// SignalType returns the Signal type of the port.
+func (p *Signal) SignalType() SignalType {
+	if p.SignalName != "" {
+		return SignalTypeNamed
+	}
+	return SignalTypeConstant
+}
+
+// MakeNamedSignal creates a new named Signal.
+func MakeNamedSignal(name string, looped bool) Signal {
+	return Signal{
+		SignalName: name,
+		Looped:     looped,
+	}
+}
+
+// MakeConstantSignal creates a new constant Signal.
+func MakeConstantSignal(value float64) Signal {
+	return Signal{
+		ConstantValue: value,
+	}
 }

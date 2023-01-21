@@ -95,12 +95,12 @@ func newCircuit(
 		outputs[outputSignal] = output
 	}
 
-	compiledCircuit, err := rt.Compile(components, policyMeta.Registry.GetLogger())
+	err := rt.Compile(components, policyMeta.Registry.GetLogger())
 	if err != nil {
 		return nil, err
 	}
 
-	runtimeCircuit, _ := rt.NewCircuitAndOptions(compiledCircuit, policyMeta)
+	runtimeCircuit, _ := rt.NewCircuitAndOptions(components, policyMeta)
 	if runtimeCircuit == nil {
 		return nil, errors.New("cannot create circuit")
 	}

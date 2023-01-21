@@ -96,7 +96,7 @@ func (la *LoadActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.
 }
 
 // Execute implements runtime.Component.Execute.
-func (la *LoadActuator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (la *LoadActuator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Get the decision from the port
 	lm, ok := inPortReadings["load_multiplier"]

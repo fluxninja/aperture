@@ -33,7 +33,7 @@ func NewComponentAndOptions(
 	componentProto *policylangv1.Component,
 	componentIndex int,
 	policyReadAPI iface.Policy,
-) (runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
+) (GraphNode, []runtime.ConfiguredComponent, fx.Option, error) {
 	var ctor componentConstructor
 	switch config := componentProto.Component.(type) {
 	case *policylangv1.Component_GradientController:
@@ -82,15 +82,15 @@ func NewComponentAndOptions(
 
 	component, config, option, err := ctor(componentIndex, policyReadAPI)
 	if err != nil {
-		return runtime.ConfiguredComponent{}, nil, nil, err
+		return GraphNode{}, nil, nil, err
 	}
 
-	compiledComponent, err := prepareConfiguredComponent(component, config)
+	configuredComponent, graphNode, err := prepareComponent(component, config)
 	if err != nil {
-		return runtime.ConfiguredComponent{}, nil, nil, err
+		return GraphNode{}, nil, nil, err
 	}
 
-	return compiledComponent, nil, option, nil
+	return graphNode, []runtime.ConfiguredComponent{configuredComponent}, option, nil
 }
 
 type componentConstructor func(
@@ -108,23 +108,25 @@ func mkCtor[Config any, Comp runtime.Component](
 	}
 }
 
-func prepareConfiguredComponent(
+func prepareComponent(
 	component runtime.Component,
 	config any,
-) (runtime.ConfiguredComponent, error) {
+) (runtime.ConfiguredComponent, GraphNode, error) {
 	mapStruct, err := mapstruct.EncodeObject(config)
 	if err != nil {
-		return runtime.ConfiguredComponent{}, err
+		return runtime.ConfiguredComponent{}, GraphNode{}, err
 	}
 
 	ports, err := runtime.PortsFromComponentConfig(mapStruct)
 	if err != nil {
-		return runtime.ConfiguredComponent{}, err
+		return runtime.ConfiguredComponent{}, GraphNode{}, err
 	}
 
 	return runtime.ConfiguredComponent{
-		Component:   component,
-		Config:      mapStruct,
-		PortMapping: ports,
-	}, nil
+			Component:   component,
+			PortMapping: ports,
+		}, GraphNode{
+			Config:      mapStruct,
+			PortMapping: ports,
+		}, nil
 }

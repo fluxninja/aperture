@@ -42,7 +42,7 @@ func NewPulseGeneratorAndOptions(generatorProto *policylangv1.PulseGenerator, _ 
 }
 
 // Execute implements runtime.Component.Execute.
-func (pg *PulseGenerator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (pg *PulseGenerator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	outputValue := 1.0
 	pg.windowCount++
 
@@ -59,7 +59,7 @@ func (pg *PulseGenerator) Execute(inPortReadings runtime.PortToValue, tickInfo r
 		outputValue = 0.0
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{runtime.NewReading(outputValue)},
 	}, nil
 }

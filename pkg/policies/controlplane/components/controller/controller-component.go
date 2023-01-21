@@ -62,19 +62,19 @@ func (cc *ControllerComponent) Type() runtime.ComponentType {
 }
 
 // Execute implements runtime.Component.Execute.
-func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (outPortReadings runtime.PortToValue, err error) {
-	retErr := func(err error) (runtime.PortToValue, error) {
-		return runtime.PortToValue{
+func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (outPortReadings runtime.PortToReading, err error) {
+	retErr := func(err error) (runtime.PortToReading, error) {
+		return runtime.PortToReading{
 			"output": []runtime.Reading{runtime.InvalidReading()},
 		}, err
 	}
 
-	signal := inPortReadings.ReadSingleValuePort("signal")
-	setpoint := inPortReadings.ReadSingleValuePort("setpoint")
-	optimize := inPortReadings.ReadSingleValuePort("optimize")
-	max := inPortReadings.ReadSingleValuePort("max")
-	min := inPortReadings.ReadSingleValuePort("min")
-	controlVariable := inPortReadings.ReadSingleValuePort("control_variable")
+	signal := inPortReadings.ReadSingleReadingPort("signal")
+	setpoint := inPortReadings.ReadSingleReadingPort("setpoint")
+	optimize := inPortReadings.ReadSingleReadingPort("optimize")
+	max := inPortReadings.ReadSingleReadingPort("max")
+	min := inPortReadings.ReadSingleReadingPort("min")
+	controlVariable := inPortReadings.ReadSingleReadingPort("control_variable")
 	output := runtime.InvalidReading()
 
 	prevSetpoint := cc.setpoint
@@ -157,7 +157,7 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToValue, tickI
 	// Save readings for the next tick so that Controller may access them via ControllerStateReadAPI
 	cc.output = output
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
 }

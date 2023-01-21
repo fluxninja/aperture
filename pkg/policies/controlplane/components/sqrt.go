@@ -35,8 +35,8 @@ func NewSqrtAndOptions(sqrtProto *policylangv1.Sqrt, componentIndex int, policyR
 }
 
 // Execute implements runtime.Component.Execute.
-func (sqrt *Sqrt) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	input := inPortReadings.ReadSingleValuePort("input")
+func (sqrt *Sqrt) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	input := inPortReadings.ReadSingleReadingPort("input")
 	output := runtime.InvalidReading()
 
 	if input.Valid() {
@@ -47,7 +47,7 @@ func (sqrt *Sqrt) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.T
 		}
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
 }
