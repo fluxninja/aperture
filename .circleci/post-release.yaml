@@ -140,9 +140,10 @@ jobs:
             mkdir -p $HOME/go
             GOPATH=$HOME/go
             PATH=$PATH:$GOPATH/bin
+            RACE=""
 
-            export GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION GOPATH PATH
-            declare -p GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION GOPATH PATH >> "${BASH_ENV}"
+            export GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION GOPATH PATH RACE
+            declare -p GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION GOPATH PATH RACE >> "${BASH_ENV}"
           environment:
             RELEASE_TAG: <<parameters.tag>>
       - restore_cache:
