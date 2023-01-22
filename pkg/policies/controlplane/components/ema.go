@@ -62,13 +62,13 @@ func NewEMAAndOptions(emaProto *policylangv1.EMA,
 	emaWindow := math.Ceil(float64(emaProto.EmaWindow.AsDuration()) / float64(evaluationPeriod))
 
 	alpha := 2.0 / (emaWindow + 1)
-	warmUpWindow := uint32(math.Ceil(float64(emaProto.WarmUpWindow.AsDuration()) / float64(evaluationPeriod)))
+	warmupWindow := uint32(math.Ceil(float64(emaProto.WarmupWindow.AsDuration()) / float64(evaluationPeriod)))
 
 	ema := &EMA{
 		correctionFactorOnMinViolation: emaProto.CorrectionFactorOnMinEnvelopeViolation,
 		correctionFactorOnMaxViolation: emaProto.CorrectionFactorOnMaxEnvelopeViolation,
 		alpha:                          alpha,
-		warmupWindow:                   warmUpWindow,
+		warmupWindow:                   warmupWindow,
 		emaWindow:                      uint32(emaWindow),
 		policyReadAPI:                  policyReadAPI,
 		validDuringWarmup:              emaProto.ValidDuringWarmup,

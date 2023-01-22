@@ -115,7 +115,10 @@ func NewSchedulerAndOptions(
 
 	// add decision_type filter to the params
 	autoTokensPolicyParams := policyParams + ",decision_type!=\"DECISION_TYPE_REJECTED\""
-	if schedulerProto.AutoTokens {
+	if schedulerProto.SchedulerParameters == nil {
+		return nil, nil, fmt.Errorf("scheduler parameters are nil")
+	}
+	if schedulerProto.SchedulerParameters.AutoTokens {
 		tokensQuery, tokensQueryOptions, tokensQueryErr := promql.NewTaggedQueryAndOptions(
 			fmt.Sprintf("sum by (%s) (increase(%s{%s}[30m])) / sum by (%s) (increase(%s{%s}[30m]))",
 				metrics.WorkloadIndexLabel,

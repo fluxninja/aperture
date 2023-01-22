@@ -23,7 +23,7 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 	}
 	outSignalsIndex := make(map[string][]componentData)
 	inSignalsIndex := make(map[string][]componentData)
-	for componentIndex, c := range circuit.components {
+	for componentIndex, c := range circuit.outerComponents {
 		var inPorts, outPorts []*policymonitoringv1.PortView
 		for name, signals := range c.PortMapping.Ins {
 			for _, signal := range signals {
@@ -60,7 +60,8 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 				})
 			}
 		}
-		componentConfig := circuit.graphNodes[componentIndex].Config
+		componentConfig := c.Config
+		log.Info().Msgf("component index: %v", componentIndex)
 		componentMap, err := structpb.NewStruct(componentConfig)
 		if err != nil {
 			log.Error().Err(err).Msg("converting component map")

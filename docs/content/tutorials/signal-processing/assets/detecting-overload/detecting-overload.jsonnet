@@ -45,7 +45,7 @@ local policyDef =
       ),
       component.withEma(
         ema.withEmaWindow('1500s')
-        + ema.withWarmUpWindow('10s')
+        + ema.withWarmupWindow('10s')
         + ema.withInPortsMixin(ema.inPorts.withInput(port.withSignalName('LATENCY')))
         + ema.withOutPortsMixin(ema.outPorts.withOutput(port.withSignalName('LATENCY_EMA')))
       ),

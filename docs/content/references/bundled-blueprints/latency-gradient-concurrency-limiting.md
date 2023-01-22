@@ -48,15 +48,15 @@ see this blueprint in use.
 
 #### Concurrency Limiter
 
-| Parameter Name                                                 | Parameter Type                         | Default             | Description                                                                                    |
-| -------------------------------------------------------------- | -------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------- |
-| `policy.concurrencyLimiter.autoTokens`                         | `bool`                                 | `true`              | Whether tokens for workloads are computed dynamically or set statically by the user.           |
-| `policy.concurrencyLimiter.timeoutFactor`                      | `float64`                              | `0.5`               | The maximum time a request can wait for tokens as a factor of tokens for a flow in a workload. |
-| `policy.concurrencyLimiter.defaultWorkloadParameters.priority` | `int`                                  | `20`                | Workload parameters to use in case none of the configured workloads match.                     |
-| `policy.concurrencyLimiter.workloads`                          | `[]aperture.spec.v1.SchedulerWorkload` | `[]`                | A list of additional workloads for the scheduler.                                              |
-| `policy.concurrencyLimiter.alerterName`                        | `string`                               | `"Load Shed Event"` | Name of the alert sent on Load Shed Event.                                                     |
-| `policy.concurrencyLimiter.alerterChannels`                    | `[]string`                             | `[]`                | A list of alert channels to which the alert will be sent.                                      |
-| `policy.concurrencyLimiter.alerterResolveTimeout`              | `string`                               | `"5s"`              | A timeout after which alert is marked as resolved if alert is not repeated.                    |
+| Parameter Name                                                 | Parameter Type                                   | Default             | Description                                                                                    |
+| -------------------------------------------------------------- | ------------------------------------------------ | ------------------- | ---------------------------------------------------------------------------------------------- |
+| `policy.concurrencyLimiter.autoTokens`                         | `bool`                                           | `true`              | Whether tokens for workloads are computed dynamically or set statically by the user.           |
+| `policy.concurrencyLimiter.timeoutFactor`                      | `float64`                                        | `0.5`               | The maximum time a request can wait for tokens as a factor of tokens for a flow in a workload. |
+| `policy.concurrencyLimiter.defaultWorkloadParameters.priority` | `int`                                            | `20`                | Workload parameters to use in case none of the configured workloads match.                     |
+| `policy.concurrencyLimiter.workloads`                          | `[]aperture.spec.v1.SchedulerParametersWorkload` | `[]`                | A list of additional workloads for the scheduler.                                              |
+| `policy.concurrencyLimiter.alerterName`                        | `string`                                         | `"Load Shed Event"` | Name of the alert sent on Load Shed Event.                                                     |
+| `policy.concurrencyLimiter.alerterChannels`                    | `[]string`                                       | `[]`                | A list of alert channels to which the alert will be sent.                                      |
+| `policy.concurrencyLimiter.alerterResolveTimeout`              | `string`                                         | `"5s"`              | A timeout after which alert is marked as resolved if alert is not repeated.                    |
 
 #### Dynamic Config
 
@@ -79,7 +79,7 @@ see this blueprint in use.
 | Parameter Name                | Parameter Type | Default   | Description                                                                                   |
 | ----------------------------- | -------------- | --------- | --------------------------------------------------------------------------------------------- |
 | `policy.ema.window`           | `string`       | `"1500s"` | How far back to look when calculating moving average.                                         |
-| `policy.ema.warmUpWindow`     | `string`       | `"60s"`   | How much time to give circuit to learn the average value before we start emitting EMA values. |
+| `policy.ema.warmupWindow`     | `string`       | `"60s"`   | How much time to give circuit to learn the average value before we start emitting EMA values. |
 | `policy.ema.correctionFactor` | `string`       | `0.95`    | Factor that is applied to the EMA value when it's above the maximum envelope.                 |
 
 #### Gradient Controller

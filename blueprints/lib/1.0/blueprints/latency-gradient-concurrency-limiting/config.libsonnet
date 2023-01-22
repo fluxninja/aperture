@@ -27,7 +27,7 @@
     * @param (policy.concurrencyLimiter.autoTokens: bool) Whether tokens for workloads are computed dynamically or set statically by the user.
     * @param (policy.concurrencyLimiter.timeoutFactor: float64) The maximum time a request can wait for tokens as a factor of tokens for a flow in a workload.
     * @param (policy.concurrencyLimiter.defaultWorkloadParameters.priority: int) Workload parameters to use in case none of the configured workloads match.
-    * @param (policy.concurrencyLimiter.workloads: []aperture.spec.v1.SchedulerWorkload) A list of additional workloads for the scheduler.
+    * @param (policy.concurrencyLimiter.workloads: []aperture.spec.v1.SchedulerParametersWorkload) A list of additional workloads for the scheduler.
     * @param (policy.concurrencyLimiter.alerterName: string) Name of the alert sent on Load Shed Event.
     * @param (policy.concurrencyLimiter.alerterChannels: []string) A list of alert channels to which the alert will be sent.
     * @param (policy.concurrencyLimiter.alerterResolveTimeout: string) A timeout after which alert is marked as resolved if alert is not repeated.
@@ -74,12 +74,12 @@
     * @subsection EMA
     *
     * @param (policy.ema.window: string) How far back to look when calculating moving average.
-    * @param (policy.ema.warmUpWindow: string) How much time to give circuit to learn the average value before we start emitting EMA values.
+    * @param (policy.ema.warmupWindow: string) How much time to give circuit to learn the average value before we start emitting EMA values.
     * @param (policy.ema.correctionFactor: string) Factor that is applied to the EMA value when it's above the maximum envelope.
     */
     ema: {
       window: '1500s',
-      warmUpWindow: '60s',
+      warmupWindow: '60s',
       correctionFactor: '0.95',
     },
     /**

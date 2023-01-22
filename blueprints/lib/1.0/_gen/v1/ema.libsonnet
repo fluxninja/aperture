@@ -49,10 +49,10 @@ local emaouts = import './emaouts.libsonnet';
   withValidDuringWarmupMixin(valid_during_warmup):: {
     valid_during_warmup+: valid_during_warmup,
   },
-  withWarmUpWindow(warm_up_window):: {
-    warm_up_window: warm_up_window,
+  withWarmupWindow(warmup_window):: {
+    warmup_window: warmup_window,
   },
-  withWarmUpWindowMixin(warm_up_window):: {
-    warm_up_window+: warm_up_window,
+  withWarmupWindowMixin(warmup_window):: {
+    warmup_window+: warmup_window,
   },
 }

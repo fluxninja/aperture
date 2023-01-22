@@ -10,9 +10,9 @@ local controlPoint = aperture.spec.v1.ControlPoint;
 local classifier = aperture.spec.v1.Classifier;
 local extractor = aperture.spec.v1.Extractor;
 local rule = aperture.spec.v1.Rule;
-local workloadParameters = aperture.spec.v1.SchedulerWorkloadParameters;
+local workloadParameters = aperture.spec.v1.SchedulerParametersWorkloadParameters;
 local labelMatcher = aperture.spec.v1.LabelMatcher;
-local workload = aperture.spec.v1.SchedulerWorkload;
+local workload = aperture.spec.v1.SchedulerParametersWorkload;
 
 
 local svcSelector =

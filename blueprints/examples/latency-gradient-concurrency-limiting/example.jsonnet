@@ -1,9 +1,9 @@
 local aperture = import '../../lib/1.0/main.libsonnet';
 local bundle = aperture.blueprints.LatencyGradientConcurrencyLimiting.bundle;
 
-local WorkloadParameters = aperture.spec.v1.SchedulerWorkloadParameters;
+local WorkloadParameters = aperture.spec.v1.SchedulerParametersWorkloadParameters;
 local LabelMatcher = aperture.spec.v1.LabelMatcher;
-local Workload = aperture.spec.v1.SchedulerWorkload;
+local Workload = aperture.spec.v1.SchedulerParametersWorkload;
 local classifier = aperture.spec.v1.Classifier;
 local fluxMeter = aperture.spec.v1.FluxMeter;
 local extractor = aperture.spec.v1.Extractor;

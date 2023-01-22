@@ -28,34 +28,22 @@ local gradientcontrollerouts = import './gradientcontrollerouts.libsonnet';
   withDynamicConfigKeyMixin(dynamic_config_key):: {
     dynamic_config_key+: dynamic_config_key,
   },
+  withGradientParameters(gradient_parameters):: {
+    gradient_parameters: gradient_parameters,
+  },
+  withGradientParametersMixin(gradient_parameters):: {
+    gradient_parameters+: gradient_parameters,
+  },
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },
   withInPortsMixin(in_ports):: {
     in_ports+: in_ports,
   },
-  withMaxGradient(max_gradient):: {
-    max_gradient: max_gradient,
-  },
-  withMaxGradientMixin(max_gradient):: {
-    max_gradient+: max_gradient,
-  },
-  withMinGradient(min_gradient):: {
-    min_gradient: min_gradient,
-  },
-  withMinGradientMixin(min_gradient):: {
-    min_gradient+: min_gradient,
-  },
   withOutPorts(out_ports):: {
     out_ports: out_ports,
   },
   withOutPortsMixin(out_ports):: {
     out_ports+: out_ports,
-  },
-  withSlope(slope):: {
-    slope: slope,
-  },
-  withSlopeMixin(slope):: {
-    slope+: slope,
   },
 }

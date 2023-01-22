@@ -12,8 +12,10 @@ local port = spec.v1.Port;
 local combinator = spec.v1.ArithmeticCombinator;
 local ema = spec.v1.EMA;
 local gradient = spec.v1.GradientController;
+local gradientParameters = spec.v1.GradientParameters;
 local concurrencyLimiter = spec.v1.ConcurrencyLimiter;
 local scheduler = spec.v1.Scheduler;
+local schedulerParameters = spec.v1.SchedulerParameters;
 local decider = spec.v1.Decider;
 local switcher = spec.v1.Switcher;
 local loadActuator = spec.v1.LoadActuator;
@@ -82,7 +84,7 @@ function(params) {
           component.withEma(
             local e = $._config.ema;
             ema.withEmaWindow(e.window)
-            + ema.withWarmUpWindow(e.warmUpWindow)
+            + ema.withWarmupWindow(e.warmupWindow)
             + ema.withCorrectionFactorOnMaxEnvelopeViolation(e.correctionFactor)
             + ema.withInPortsMixin(
               ema.inPorts.withInput(port.withSignalName('LATENCY'))
@@ -93,9 +95,12 @@ function(params) {
           component.withGradientController(
             local g = $._config.gradient;
             gradient.new()
-            + gradient.withSlope(g.slope)
-            + gradient.withMinGradient(g.minGradient)
-            + gradient.withMaxGradient(g.maxGradient)
+            + gradient.withGradientParameters(
+              gradientParameters.new()
+              + gradientParameters.withSlope(g.slope)
+              + gradientParameters.withMinGradient(g.minGradient)
+              + gradientParameters.withMaxGradient(g.maxGradient)
+            )
             + gradient.withInPorts({
               signal: port.withSignalName('LATENCY'),
               setpoint: port.withSignalName('LATENCY_SETPOINT'),
@@ -123,10 +128,13 @@ function(params) {
             + concurrencyLimiter.withFlowSelector($._config.concurrencyLimiterFlowSelector)
             + concurrencyLimiter.withScheduler(
               scheduler.new()
-              + scheduler.withAutoTokens(c.autoTokens)
-              + scheduler.withTimeoutFactor(c.timeoutFactor)
-              + scheduler.withDefaultWorkloadParameters(c.defaultWorkloadParameters)
-              + scheduler.withWorkloads(c.workloads)
+              + scheduler.withSchedulerParameters(
+                schedulerParameters.new()
+                + schedulerParameters.withAutoTokens(c.autoTokens)
+                + schedulerParameters.withTimeoutFactor(c.timeoutFactor)
+                + schedulerParameters.withDefaultWorkloadParameters(c.defaultWorkloadParameters)
+                + schedulerParameters.withWorkloads(c.workloads)
+              )
               + scheduler.withOutPortsMixin({
                 accepted_concurrency: port.withSignalName('ACCEPTED_CONCURRENCY'),
                 incoming_concurrency: port.withSignalName('INCOMING_CONCURRENCY'),

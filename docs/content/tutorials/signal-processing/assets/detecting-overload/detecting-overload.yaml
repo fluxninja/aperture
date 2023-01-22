@@ -25,7 +25,7 @@ spec:
           out_ports:
             output:
               signal_name: LATENCY_EMA
-          warm_up_window: 10s
+          warmup_window: 10s
       - arithmetic_combinator:
           in_ports:
             lhs:

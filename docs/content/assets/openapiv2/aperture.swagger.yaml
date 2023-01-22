@@ -657,11 +657,11 @@ definitions:
         x-go-validate: required
     description: High-level extractor-based rules are compiled into a single rego query.
     title: Raw rego rules are compiled 1:1 to rego queries
-  SchedulerWorkload:
+  SchedulerParametersWorkload:
     type: object
     properties:
       workload_parameters:
-        $ref: '#/definitions/SchedulerWorkloadParameters'
+        $ref: '#/definitions/SchedulerParametersWorkloadParameters'
         description: |-
           WorkloadParameters associated with flows matching the label matcher.
 
@@ -676,7 +676,7 @@ definitions:
           @gotags: validate:"required"
         x-go-validate: required
     description: Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
-  SchedulerWorkloadParameters:
+  SchedulerParametersWorkloadParameters:
     type: object
     properties:
       priority:
@@ -1259,6 +1259,9 @@ definitions:
       pulse_generator:
         $ref: '#/definitions/v1PulseGenerator'
         description: Generates 0 and 1 in turns.
+      concurrency_controller:
+        $ref: '#/definitions/v1ConcurrencyController'
+        description: High level concurrency control component. Baselines a signal and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of signal from the baseline. Internally implemented as a nested circuit.
     description: |-
       :::info
       See also [Components overview](/concepts/policy/circuit.md#components).
@@ -1298,6 +1301,85 @@ definitions:
 
       See also [Policy](#v1-policy) for a higher-level explanation of circuits.
     title: Computational block that form the circuit
+  v1ConcurrencyController:
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/v1ConcurrencyControllerIns'
+        description: Input ports for the ConcurrencyController component.
+      out_ports:
+        $ref: '#/definitions/v1ConcurrencyControllerOuts'
+        description: Output ports for the ConcurrencyController component.
+      flow_selector:
+        $ref: '#/definitions/v1FlowSelector'
+        description: |-
+          Flow Selector decides the service and flows at which the concurrency limiter is applied.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+      scheduler_parameters:
+        $ref: '#/definitions/v1SchedulerParameters'
+        description: |-
+          Scheduler parameters.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+      gradient_parameters:
+        $ref: '#/definitions/v1GradientParameters'
+        title: |-
+          Gradient parameters for the controller. Defaults to:
+          * slope = -1
+          * min_gradient = 0.1
+          * max_gradient = 1
+      concurrency_limit_multiplier:
+        type: number
+        format: double
+        description: |-
+          Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+
+          @gotags: default:"2.0"
+        x-go-default: 2
+      concurrency_linear_increment:
+        type: number
+        format: double
+        description: |-
+          Linear increment to concurrency in each execution tick when the system is not in overloaded state.
+
+          @gotags: default:"5.0"
+        x-go-default: 5
+      concurrency_square_root_increment_multiplier:
+        type: number
+        format: double
+        description: |-
+          Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
+
+          @gotags: default:"1.0"
+        x-go-default: 1
+      alerter_config:
+        $ref: '#/definitions/v1AlerterConfig'
+        description: Configuration for embedded alerter.
+    description: High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
+  v1ConcurrencyControllerIns:
+    type: object
+    properties:
+      signal:
+        $ref: '#/definitions/v1InPort'
+        description: The signal to the controller.
+    description: Inputs for the ConcurrencyController component.
+  v1ConcurrencyControllerOuts:
+    type: object
+    properties:
+      accepted_concurrency:
+        $ref: '#/definitions/v1OutPort'
+      incoming_concurrency:
+        $ref: '#/definitions/v1OutPort'
+      desired_concurrency:
+        $ref: '#/definitions/v1OutPort'
+      is_overload:
+        $ref: '#/definitions/v1OutPort'
+      load_multiplier:
+        $ref: '#/definitions/v1OutPort'
+    description: Outputs for the ConcurrencyController component.
   v1ConcurrencyLimiter:
     type: object
     properties:
@@ -1517,12 +1599,12 @@ definitions:
 
           @gotags: default:"5s"
         x-go-default: 5s
-      warm_up_window:
+      warmup_window:
         type: string
         description: |-
           Duration of EMA warming up window.
 
-          The initial value of the EMA is the average of signal readings received during the warm up window.
+          The initial value of the EMA is the average of signal readings received during the warm-up window.
 
           @gotags: default:"0s"
         x-go-default: 0s
@@ -1547,7 +1629,7 @@ definitions:
       valid_during_warmup:
         type: boolean
         description: |-
-          Whether the output is valid during the warm up stage.
+          Whether the output is valid during the warm-up stage.
 
           @gotags: default:"false"
         x-go-default: false
@@ -1886,67 +1968,13 @@ definitions:
       out_ports:
         $ref: '#/definitions/v1GradientControllerOuts'
         description: Output ports of the Gradient Controller.
-      slope:
-        type: number
-        format: double
+      gradient_parameters:
+        $ref: '#/definitions/v1GradientParameters'
         description: |-
-          Slope controls the aggressiveness and direction of the Gradient Controller.
-
-          Slope is used as exponent on the signal to setpoint ratio in computation
-          of the gradient (see the [main description](#v1-gradient-controller) for
-          exact equation). Good intuition for this parameter is "What should the
-          Gradient Controller do to the control variable when signal is too high",
-          eg.:
-          * $\text{slope} = 1$: when signal is too high, increase control variable,
-          * $\text{slope} = -1$: when signal is too high, decrease control variable,
-          * $\text{slope} = -0.5$: when signal is to high, decrease control variable more slowly.
-
-          The sign of slope depends on correlation between the signal and control variable:
-          * Use $\text{slope} < 0$ if signal and control variable are _positively_
-          correlated (eg. Per-pod CPU usage and total concurrency).
-          * Use $\text{slope} > 0$ if signal and control variable are _negatively_
-          correlated (eg. Per-pod CPU usage and number of pods).
-
-          :::note
-          You need to set _negative_ slope for a _positive_ correlation, as you're
-          describing the _action_ which controller should make when the signal
-          increases.
-          :::
-
-          The magnitude of slope describes how aggressively should the controller
-          react to a deviation of signal.
-          With $|\text{slope}| = 1$, the controller will aim to bring the signal to
-          the setpoint in one tick (assuming linear correlation with signal and setpoint).
-          Smaller magnitudes of slope will make the controller adjust the control
-          variable more slowly.
-
-          We recommend setting $|\text{slope}| < 1$ (eg. $\pm0.8$).
-          If you experience overshooting, consider lowering the magnitude even more.
-          Values of $|\text{slope}| > 1$ are not recommended.
-
-          :::note
-          Remember that the gradient and output signal can be (optionally) clamped,
-          so the _slope_ might not fully describe aggressiveness of the controller.
-          :::
+          Gradient Parameters.
 
           @gotags: validate:"required"
         x-go-validate: required
-      min_gradient:
-        type: number
-        format: double
-        description: |-
-          Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
-
-          @gotags: default:"-1.79769313486231570814527423731704356798070e+308"
-        x-go-default: -1.7976931348623157e+308
-      max_gradient:
-        type: number
-        format: double
-        description: |-
-          Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
-
-          @gotags: default:"1.79769313486231570814527423731704356798070e+308"
-        x-go-default: 1.7976931348623157e+308
       dynamic_config_key:
         type: string
         title: Configuration key for DynamicConfig
@@ -2009,6 +2037,70 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Computed desired value of the control variable.
     description: Outputs for the Gradient Controller component.
+  v1GradientParameters:
+    type: object
+    properties:
+      slope:
+        type: number
+        format: double
+        description: |-
+          Slope controls the aggressiveness and direction of the Gradient Controller.
+
+          Slope is used as exponent on the signal to setpoint ratio in computation
+          of the gradient (see the [main description](#v1-gradient-controller) for
+          exact equation). Good intuition for this parameter is "What should the
+          Gradient Controller do to the control variable when signal is too high",
+          eg.:
+          * $\text{slope} = 1$: when signal is too high, increase control variable,
+          * $\text{slope} = -1$: when signal is too high, decrease control variable,
+          * $\text{slope} = -0.5$: when signal is to high, decrease control variable more slowly.
+
+          The sign of slope depends on correlation between the signal and control variable:
+          * Use $\text{slope} < 0$ if signal and control variable are _positively_
+          correlated (eg. Per-pod CPU usage and total concurrency).
+          * Use $\text{slope} > 0$ if signal and control variable are _negatively_
+          correlated (eg. Per-pod CPU usage and number of pods).
+
+          :::note
+          You need to set _negative_ slope for a _positive_ correlation, as you're
+          describing the _action_ which controller should make when the signal
+          increases.
+          :::
+
+          The magnitude of slope describes how aggressively should the controller
+          react to a deviation of signal.
+          With $|\text{slope}| = 1$, the controller will aim to bring the signal to
+          the setpoint in one tick (assuming linear correlation with signal and setpoint).
+          Smaller magnitudes of slope will make the controller adjust the control
+          variable more slowly.
+
+          We recommend setting $|\text{slope}| < 1$ (eg. $\pm0.8$).
+          If you experience overshooting, consider lowering the magnitude even more.
+          Values of $|\text{slope}| > 1$ are not recommended.
+
+          :::note
+          Remember that the gradient and output signal can be (optionally) clamped,
+          so the _slope_ might not fully describe aggressiveness of the controller.
+          :::
+
+          @gotags: validate:"required"
+        x-go-validate: required
+      min_gradient:
+        type: number
+        format: double
+        description: |-
+          Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
+
+          @gotags: default:"-1.79769313486231570814527423731704356798070e+308"
+        x-go-default: -1.7976931348623157e+308
+      max_gradient:
+        type: number
+        format: double
+        description: |-
+          Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
+
+          @gotags: default:"1.79769313486231570814527423731704356798070e+308"
+        x-go-default: 1.7976931348623157e+308
   v1GroupStatus:
     type: object
     properties:
@@ -2319,7 +2411,7 @@ definitions:
         description: Default configuration.
       alerter_config:
         $ref: '#/definitions/v1AlerterConfig'
-        description: Configuration for embedded alerter. No alerts are generated if this configuration is not provided.
+        description: Configuration for embedded alerter.
     title: Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
   v1LoadActuatorDynamicConfig:
     type: object
@@ -2942,10 +3034,52 @@ definitions:
       out_ports:
         $ref: '#/definitions/v1SchedulerOuts'
         description: Output ports for the Scheduler component.
+      scheduler_parameters:
+        $ref: '#/definitions/v1SchedulerParameters'
+        description: |-
+          Scheduler parameters.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+    description: |-
+      :::note
+      Each Agent instantiates an independent copy of the scheduler, but output
+      signals for accepted and incoming concurrency are aggregated across all agents.
+      :::
+
+      See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
+    title: Weighted Fair Queuing-based workload scheduler
+  v1SchedulerOuts:
+    type: object
+    properties:
+      accepted_concurrency:
+        $ref: '#/definitions/v1OutPort'
+        description: |-
+          Accepted concurrency is the number of accepted tokens per second.
+
+          :::info
+          **Accepted tokens** are tokens associated with
+          [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
+          this scheduler. Number of tokens for a flow is determined by a
+          [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
+          via `auto_tokens` or explicitly by `Workload.tokens`).
+          :::
+
+          Value of this signal is the sum across all the relevant schedulers.
+      incoming_concurrency:
+        $ref: '#/definitions/v1OutPort'
+        description: |-
+          Incoming concurrency is the number of incoming tokens/sec.
+          This is the same as `accepted_concurrency`, but across all the flows
+          entering scheduler, including rejected ones.
+    description: Output for the Scheduler component.
+  v1SchedulerParameters:
+    type: object
+    properties:
       workloads:
         type: array
         items:
-          $ref: '#/definitions/SchedulerWorkload'
+          $ref: '#/definitions/SchedulerParametersWorkload'
         description: |-
           List of workloads to be used in scheduler.
 
@@ -2970,7 +3104,7 @@ definitions:
 
           @gotags: validate:"dive"
       default_workload_parameters:
-        $ref: '#/definitions/SchedulerWorkloadParameters'
+        $ref: '#/definitions/SchedulerParametersWorkloadParameters'
         description: |-
           WorkloadParameters to be used if none of workloads specified in `workloads` match.
 
@@ -3021,38 +3155,6 @@ definitions:
           @gotags: default:"0.49s"
         title: Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
         x-go-default: 0.49s
-    description: |-
-      :::note
-      Each Agent instantiates an independent copy of the scheduler, but output
-      signals for accepted and incoming concurrency are aggregated across all agents.
-      :::
-
-      See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
-    title: Weighted Fair Queuing-based workload scheduler
-  v1SchedulerOuts:
-    type: object
-    properties:
-      accepted_concurrency:
-        $ref: '#/definitions/v1OutPort'
-        description: |-
-          Accepted concurrency is the number of accepted tokens per second.
-
-          :::info
-          **Accepted tokens** are tokens associated with
-          [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
-          this scheduler. Number of tokens for a flow is determined by a
-          [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
-          via `auto_tokens` or explicitly by `Workload.tokens`).
-          :::
-
-          Value of this signal is the sum across all the relevant schedulers.
-      incoming_concurrency:
-        $ref: '#/definitions/v1OutPort'
-        description: |-
-          Incoming concurrency is the number of incoming tokens/sec.
-          This is the same as `accepted_concurrency`, but across all the flows
-          entering scheduler, including rejected ones.
-    description: Output for the Scheduler component.
   v1Service:
     type: object
     properties:

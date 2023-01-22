@@ -4,7 +4,6 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -17,23 +16,12 @@ func Module() fx.Option {
 	)
 }
 
-// GraphNode is a node in the circuit graph. It is used for representing the outermost components in the circuit.
-type GraphNode struct {
-	// Which signals this component wants to have connected on its ports.
-	PortMapping runtime.PortMapping
-	// Mapstruct representation of proto config that was used to create this
-	// component.  This Config is used only for observability purposes.
-	//
-	// Note: PortMapping is also part of Config.
-	Config mapstruct.Object
-}
-
 // Circuit is a compiled Circuit
 //
 // Circuit can also be converted to its graph view.
 type Circuit struct {
-	components []runtime.ConfiguredComponent
-	graphNodes []GraphNode
+	components      []runtime.ConfiguredComponent
+	outerComponents []runtime.ConfiguredComponent
 }
 
 // Components returns a list of CompiledComponents, ready to create runtime.Circuit.
@@ -43,10 +31,10 @@ func (circuit *Circuit) Components() []runtime.ConfiguredComponent { return circ
 //
 // This is helper for CreateComponents + runtime.Compile.
 func CompileFromProto(
-	circuitProto []*policylangv1.Component,
+	componentsProto []*policylangv1.Component,
 	policyReadAPI iface.Policy,
 ) (*Circuit, fx.Option, error) {
-	configuredComponents, graphNodes, option, err := CreateComponents(circuitProto, policyReadAPI)
+	configuredComponents, graphNodes, option, err := CreateComponents(componentsProto, policyReadAPI)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -60,26 +48,26 @@ func CompileFromProto(
 	}
 
 	return &Circuit{
-		components: configuredComponents,
-		graphNodes: graphNodes,
+		components:      configuredComponents,
+		outerComponents: graphNodes,
 	}, option, nil
 }
 
 // CreateComponents creates circuit components along with their identifiers and fx options.
 //
 // Note that number of returned components might be greater than number of
-// components in circuitProto, as some components may have their subcomponents.
+// components in componentsProto, as some components may have their subcomponents.
 func CreateComponents(
-	circuitProto []*policylangv1.Component,
+	componentsProto []*policylangv1.Component,
 	policyReadAPI iface.Policy,
-) ([]runtime.ConfiguredComponent, []GraphNode, fx.Option, error) {
+) ([]runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
 	var (
 		configuredComponents []runtime.ConfiguredComponent
-		graphNodes           []GraphNode
+		outerComponents      []runtime.ConfiguredComponent
 		options              []fx.Option
 	)
 
-	for compIndex, componentProto := range circuitProto {
+	for compIndex, componentProto := range componentsProto {
 		// Create graphNode
 		graphNode, subComponents, compOption, err := NewComponentAndOptions(
 			componentProto,
@@ -92,11 +80,11 @@ func CreateComponents(
 		options = append(options, compOption)
 
 		// Add graphNode to graphNodes
-		graphNodes = append(graphNodes, graphNode)
+		outerComponents = append(outerComponents, graphNode)
 
 		// Add subComponents to configuredComponents
 		configuredComponents = append(configuredComponents, subComponents...)
 	}
 
-	return configuredComponents, graphNodes, fx.Options(options...), nil
+	return configuredComponents, outerComponents, fx.Options(options...), nil
 }

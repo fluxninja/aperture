@@ -32,10 +32,18 @@ const (
 	ComponentTypeSignalProcessor ComponentType = "SignalProcessor"
 )
 
-// NewDummyComponent creates a standalone component which won't accept or emit any signals.
-func NewDummyComponent(name string) Component { return dummyComponent{name: name} }
+// NewDummyComponent creates a component with provided name and type.
+func NewDummyComponent(name string, componentType ComponentType) Component {
+	return dummyComponent{
+		name:          name,
+		componentType: componentType,
+	}
+}
 
-type dummyComponent struct{ name string }
+type dummyComponent struct {
+	name          string
+	componentType ComponentType
+}
 
 // Execute implements runtime.Component.
 func (c dummyComponent) Execute(inPortReadings PortToReading, tickInfo TickInfo) (outPortReadings PortToReading, err error) {

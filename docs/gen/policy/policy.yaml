@@ -250,7 +250,7 @@ definitions:
         type: string
         x-go-validate: required
         x-order: 0
-  SchedulerWorkload:
+  SchedulerParametersWorkload:
     description: Workload defines a class of requests that preferably have similar
       properties such as response latency or desired priority.
     type: object
@@ -271,8 +271,8 @@ definitions:
           @gotags: validate:"required"
         x-go-validate: required
         x-order: 0
-        $ref: '#/definitions/SchedulerWorkloadParameters'
-  SchedulerWorkloadParameters:
+        $ref: '#/definitions/SchedulerParametersWorkloadParameters'
+  SchedulerParametersWorkloadParameters:
     description: WorkloadParameters defines parameters such as priority, tokens and
       fairness key that are applicable to flows within a workload.
     type: object
@@ -627,6 +627,13 @@ definitions:
           the result.
         x-order: 2
         $ref: '#/definitions/v1ArithmeticCombinator'
+      concurrency_controller:
+        description: High level concurrency control component. Baselines a signal
+          and reduces concurrency limits proportionally (or any arbitrary power) based
+          on deviation of signal from the baseline. Internally implemented as a nested
+          circuit.
+        x-order: 22
+        $ref: '#/definitions/v1ConcurrencyController'
       concurrency_limiter:
         description: Concurrency Limiter provides service protection by applying prioritized
           load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
@@ -713,6 +720,102 @@ definitions:
           on third signal.
         x-order: 4
         $ref: '#/definitions/v1Switcher'
+  v1ConcurrencyController:
+    description: High level concurrency control component. Baselines a signal via
+      exponential moving average and applies concurrency limits based on deviation
+      of signal from the baseline. Internally implemented as a nested circuit.
+    type: object
+    properties:
+      alerter_config:
+        description: Configuration for embedded alerter.
+        x-order: 8
+        $ref: '#/definitions/v1AlerterConfig'
+      concurrency_limit_multiplier:
+        description: |-
+          Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+
+          @gotags: default:"2.0"
+        type: number
+        format: double
+        x-go-default: 2
+        x-order: 5
+      concurrency_linear_increment:
+        description: |-
+          Linear increment to concurrency in each execution tick when the system is not in overloaded state.
+
+          @gotags: default:"5.0"
+        type: number
+        format: double
+        x-go-default: 5
+        x-order: 6
+      concurrency_square_root_increment_multiplier:
+        description: |-
+          Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
+
+          @gotags: default:"1.0"
+        type: number
+        format: double
+        x-go-default: 1
+        x-order: 7
+      flow_selector:
+        description: |-
+          Flow Selector decides the service and flows at which the concurrency limiter is applied.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+        x-order: 2
+        $ref: '#/definitions/v1FlowSelector'
+      gradient_parameters:
+        title: |-
+          Gradient parameters for the controller. Defaults to:
+          * slope = -1
+          * min_gradient = 0.1
+          * max_gradient = 1
+        x-order: 4
+        $ref: '#/definitions/v1GradientParameters'
+      in_ports:
+        description: Input ports for the ConcurrencyController component.
+        x-order: 0
+        $ref: '#/definitions/v1ConcurrencyControllerIns'
+      out_ports:
+        description: Output ports for the ConcurrencyController component.
+        x-order: 1
+        $ref: '#/definitions/v1ConcurrencyControllerOuts'
+      scheduler_parameters:
+        description: |-
+          Scheduler parameters.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+        x-order: 3
+        $ref: '#/definitions/v1SchedulerParameters'
+  v1ConcurrencyControllerIns:
+    description: Inputs for the ConcurrencyController component.
+    type: object
+    properties:
+      signal:
+        description: The signal to the controller.
+        x-order: 0
+        $ref: '#/definitions/v1InPort'
+  v1ConcurrencyControllerOuts:
+    description: Outputs for the ConcurrencyController component.
+    type: object
+    properties:
+      accepted_concurrency:
+        x-order: 0
+        $ref: '#/definitions/v1OutPort'
+      desired_concurrency:
+        x-order: 2
+        $ref: '#/definitions/v1OutPort'
+      incoming_concurrency:
+        x-order: 1
+        $ref: '#/definitions/v1OutPort'
+      is_overload:
+        x-order: 3
+        $ref: '#/definitions/v1OutPort'
+      load_multiplier:
+        x-order: 4
+        $ref: '#/definitions/v1OutPort'
   v1ConcurrencyLimiter:
     description: |-
       :::info
@@ -957,17 +1060,17 @@ definitions:
         $ref: '#/definitions/v1EMAOuts'
       valid_during_warmup:
         description: |-
-          Whether the output is valid during the warm up stage.
+          Whether the output is valid during the warm-up stage.
 
           @gotags: default:"false"
         type: boolean
         x-go-default: false
         x-order: 6
-      warm_up_window:
+      warmup_window:
         description: |-
           Duration of EMA warming up window.
 
-          The initial value of the EMA is the average of signal readings received during the warm up window.
+          The initial value of the EMA is the average of signal readings received during the warm-up window.
 
           @gotags: default:"0s"
         type: string
@@ -1302,16 +1405,70 @@ definitions:
     properties:
       default_config:
         description: Default configuration.
-        x-order: 6
+        x-order: 4
         $ref: '#/definitions/v1ControllerDynamicConfig'
       dynamic_config_key:
         type: string
         title: Configuration key for DynamicConfig
-        x-order: 5
+        x-order: 3
+      gradient_parameters:
+        description: |-
+          Gradient Parameters.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+        x-order: 2
+        $ref: '#/definitions/v1GradientParameters'
       in_ports:
         description: Input ports of the Gradient Controller.
         x-order: 0
         $ref: '#/definitions/v1GradientControllerIns'
+      out_ports:
+        description: Output ports of the Gradient Controller.
+        x-order: 1
+        $ref: '#/definitions/v1GradientControllerOuts'
+  v1GradientControllerIns:
+    description: Inputs for the Gradient Controller component.
+    type: object
+    properties:
+      control_variable:
+        description: |-
+          Actual current value of the control variable.
+
+          This signal is multiplied by the gradient to produce the output.
+        x-order: 5
+        $ref: '#/definitions/v1InPort'
+      max:
+        description: Maximum value to limit the output signal.
+        x-order: 3
+        $ref: '#/definitions/v1InPort'
+      min:
+        description: Minimum value to limit the output signal.
+        x-order: 4
+        $ref: '#/definitions/v1InPort'
+      optimize:
+        description: Optimize signal is added to the output of the gradient calculation.
+        x-order: 2
+        $ref: '#/definitions/v1InPort'
+      setpoint:
+        description: Setpoint to be used for the gradient computation.
+        x-order: 1
+        $ref: '#/definitions/v1InPort'
+      signal:
+        description: Signal to be used for the gradient computation.
+        x-order: 0
+        $ref: '#/definitions/v1InPort'
+  v1GradientControllerOuts:
+    description: Outputs for the Gradient Controller component.
+    type: object
+    properties:
+      output:
+        description: Computed desired value of the control variable.
+        x-order: 0
+        $ref: '#/definitions/v1OutPort'
+  v1GradientParameters:
+    type: object
+    properties:
       max_gradient:
         description: |-
           Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
@@ -1320,7 +1477,7 @@ definitions:
         type: number
         format: double
         x-go-default: 1.7976931348623157e+308
-        x-order: 4
+        x-order: 2
       min_gradient:
         description: |-
           Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
@@ -1329,11 +1486,7 @@ definitions:
         type: number
         format: double
         x-go-default: -1.7976931348623157e+308
-        x-order: 3
-      out_ports:
-        description: Output ports of the Gradient Controller.
         x-order: 1
-        $ref: '#/definitions/v1GradientControllerOuts'
       slope:
         description: |-
           Slope controls the aggressiveness and direction of the Gradient Controller.
@@ -1379,46 +1532,7 @@ definitions:
         type: number
         format: double
         x-go-validate: required
-        x-order: 2
-  v1GradientControllerIns:
-    description: Inputs for the Gradient Controller component.
-    type: object
-    properties:
-      control_variable:
-        description: |-
-          Actual current value of the control variable.
-
-          This signal is multiplied by the gradient to produce the output.
-        x-order: 5
-        $ref: '#/definitions/v1InPort'
-      max:
-        description: Maximum value to limit the output signal.
-        x-order: 3
-        $ref: '#/definitions/v1InPort'
-      min:
-        description: Minimum value to limit the output signal.
-        x-order: 4
-        $ref: '#/definitions/v1InPort'
-      optimize:
-        description: Optimize signal is added to the output of the gradient calculation.
-        x-order: 2
-        $ref: '#/definitions/v1InPort'
-      setpoint:
-        description: Setpoint to be used for the gradient computation.
-        x-order: 1
-        $ref: '#/definitions/v1InPort'
-      signal:
-        description: Signal to be used for the gradient computation.
         x-order: 0
-        $ref: '#/definitions/v1InPort'
-  v1GradientControllerOuts:
-    description: Outputs for the Gradient Controller component.
-    type: object
-    properties:
-      output:
-        description: Computed desired value of the control variable.
-        x-order: 0
-        $ref: '#/definitions/v1OutPort'
   v1HorizontalPodScaler:
     type: object
     properties:
@@ -1703,8 +1817,7 @@ definitions:
       in the data-plane
     properties:
       alerter_config:
-        description: Configuration for embedded alerter. No alerts are generated if
-          this configuration is not provided.
+        description: Configuration for embedded alerter.
         x-order: 3
         $ref: '#/definitions/v1AlerterConfig'
       default_config:
@@ -2238,95 +2351,18 @@ definitions:
     type: object
     title: Weighted Fair Queuing-based workload scheduler
     properties:
-      auto_tokens:
-        description: |-
-          Automatically estimate the size of a request in each workload, based on
-          historical latency. Each workload's `tokens` will be set to average
-          latency of flows in that workload during last few seconds (exact duration
-          of this average can change).
-
-          @gotags: default:"true"
-        type: boolean
-        x-go-default: "true"
-        x-order: 3
-      default_workload_parameters:
-        description: |-
-          WorkloadParameters to be used if none of workloads specified in `workloads` match.
-
-          @gotags: validate:"required"
-        x-go-validate: required
-        x-order: 2
-        $ref: '#/definitions/SchedulerWorkloadParameters'
-      max_timeout:
-        description: |-
-          :::caution
-          This timeout needs to be strictly less than the timeout set on the
-          client for the whole GRPC call:
-          * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
-          * in case of libraries, timeout configured... TODO.
-
-          We're using fail-open logic in integrations, so if the GRPC timeout
-          fires first, the flow will end up being unconditionally allowed while
-          it're still waiting on the scheduler.
-
-          To avoid such cases, the end-to-end GRPC timeout should also contain
-          some headroom for constant overhead like serialization, etc. Default
-          value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
-          tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
-          :::
-
-          @gotags: default:"0.49s"
-        type: string
-        title: Max Timeout is the value with which the flow timeout calculated by
-          `timeout_factor` is capped
-        x-go-default: 0.49s
-        x-order: 5
       out_ports:
         description: Output ports for the Scheduler component.
         x-order: 0
         $ref: '#/definitions/v1SchedulerOuts'
-      timeout_factor:
+      scheduler_parameters:
         description: |-
-          If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,
-          it will be rejected.
+          Scheduler parameters.
 
-          This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
-
-          @gotags: validate:"gte=0.0" default:"0.5"
-        type: number
-        format: double
-        title: Timeout as a factor of tokens for a flow in a workload
-        x-go-default: 0.5
-        x-go-validate: gte=0.0
-        x-order: 4
-      workloads:
-        description: |-
-          List of workloads to be used in scheduler.
-
-          Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
-          allows for load-shedding to be "smarter" than just "randomly deny 50% of
-          requests". There are two aspects of this "smartness":
-          * Scheduler can more precisely calculate concurrency if it understands
-            that flows belonging to different classes have different weights (eg.
-            inserts vs lookups).
-          * Setting different priorities to different workloads lets the scheduler
-            avoid dropping important traffic during overload.
-
-          Each workload in this list specifies also a matcher that's used to
-          determine which flow will be categorized into which workload.
-          In case of multiple matching workloads, the first matching one will be used.
-          If none of workloads match, `default_workload` will be used.
-
-          :::info
-          See also [workload definition in the concepts
-          section](/concepts/flow-control/concurrency-limiter.md#workload).
-          :::
-
-          @gotags: validate:"dive"
-        type: array
-        items:
-          $ref: '#/definitions/SchedulerWorkload'
+          @gotags: validate:"required"
+        x-go-validate: required
         x-order: 1
+        $ref: '#/definitions/v1SchedulerParameters'
   v1SchedulerOuts:
     description: Output for the Scheduler component.
     type: object
@@ -2353,6 +2389,94 @@ definitions:
           entering scheduler, including rejected ones.
         x-order: 1
         $ref: '#/definitions/v1OutPort'
+  v1SchedulerParameters:
+    type: object
+    properties:
+      auto_tokens:
+        description: |-
+          Automatically estimate the size of a request in each workload, based on
+          historical latency. Each workload's `tokens` will be set to average
+          latency of flows in that workload during last few seconds (exact duration
+          of this average can change).
+
+          @gotags: default:"true"
+        type: boolean
+        x-go-default: "true"
+        x-order: 2
+      default_workload_parameters:
+        description: |-
+          WorkloadParameters to be used if none of workloads specified in `workloads` match.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+        x-order: 1
+        $ref: '#/definitions/SchedulerParametersWorkloadParameters'
+      max_timeout:
+        description: |-
+          :::caution
+          This timeout needs to be strictly less than the timeout set on the
+          client for the whole GRPC call:
+          * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
+          * in case of libraries, timeout configured... TODO.
+
+          We're using fail-open logic in integrations, so if the GRPC timeout
+          fires first, the flow will end up being unconditionally allowed while
+          it're still waiting on the scheduler.
+
+          To avoid such cases, the end-to-end GRPC timeout should also contain
+          some headroom for constant overhead like serialization, etc. Default
+          value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
+          tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+          :::
+
+          @gotags: default:"0.49s"
+        type: string
+        title: Max Timeout is the value with which the flow timeout calculated by
+          `timeout_factor` is capped
+        x-go-default: 0.49s
+        x-order: 4
+      timeout_factor:
+        description: |-
+          If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,
+          it will be rejected.
+
+          This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
+
+          @gotags: validate:"gte=0.0" default:"0.5"
+        type: number
+        format: double
+        title: Timeout as a factor of tokens for a flow in a workload
+        x-go-default: 0.5
+        x-go-validate: gte=0.0
+        x-order: 3
+      workloads:
+        description: |-
+          List of workloads to be used in scheduler.
+
+          Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
+          allows for load-shedding to be "smarter" than just "randomly deny 50% of
+          requests". There are two aspects of this "smartness":
+          * Scheduler can more precisely calculate concurrency if it understands
+            that flows belonging to different classes have different weights (eg.
+            inserts vs lookups).
+          * Setting different priorities to different workloads lets the scheduler
+            avoid dropping important traffic during overload.
+
+          Each workload in this list specifies also a matcher that's used to
+          determine which flow will be categorized into which workload.
+          In case of multiple matching workloads, the first matching one will be used.
+          If none of workloads match, `default_workload` will be used.
+
+          :::info
+          See also [workload definition in the concepts
+          section](/concepts/flow-control/concurrency-limiter.md#workload).
+          :::
+
+          @gotags: validate:"dive"
+        type: array
+        items:
+          $ref: '#/definitions/SchedulerParametersWorkload'
+        x-order: 0
   v1ServiceSelector:
     description: |-
       :::info

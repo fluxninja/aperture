@@ -24,7 +24,7 @@ func newComponentStackAndOptions(
 	componentStackProto *policylangv1.Component,
 	componentStackIndex int,
 	policyReadAPI iface.Policy,
-) (GraphNode, []runtime.ConfiguredComponent, fx.Option, error) {
+) (runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
 	// Factory parser to determine what kind of component stack to create
 	if concurrencyLimiterProto := componentStackProto.GetConcurrencyLimiter(); concurrencyLimiterProto != nil {
 		var (
@@ -34,7 +34,7 @@ func newComponentStackAndOptions(
 		portMapping := runtime.NewPortMapping()
 		concurrencyLimiterOptions, agentGroupName, concurrencyLimiterErr := concurrency.NewConcurrencyLimiterOptions(concurrencyLimiterProto, componentStackIndex, policyReadAPI)
 		if concurrencyLimiterErr != nil {
-			return GraphNode{}, nil, nil, concurrencyLimiterErr
+			return runtime.ConfiguredComponent{}, nil, nil, concurrencyLimiterErr
 		}
 		// Append concurrencyLimiter options
 		options = append(options, concurrencyLimiterOptions)
@@ -43,24 +43,24 @@ func newComponentStackAndOptions(
 		if schedulerProto := concurrencyLimiterProto.GetScheduler(); schedulerProto != nil {
 			scheduler, schedulerOptions, err := concurrency.NewSchedulerAndOptions(schedulerProto, componentStackIndex, policyReadAPI, agentGroupName)
 			if err != nil {
-				return GraphNode{}, nil, nil, err
+				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
 
-			configuredScheduler, graphNodeScheduler, err := prepareComponent(scheduler, schedulerProto)
+			schedulerConfComp, err := prepareComponent(scheduler, schedulerProto)
 			if err != nil {
-				return GraphNode{}, nil, nil, err
+				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
 
 			// Append scheduler as a runtime.ConfiguredComponent
-			configuredComponents = append(configuredComponents, configuredScheduler)
+			configuredComponents = append(configuredComponents, schedulerConfComp)
 
 			// Append scheduler options
 			options = append(options, schedulerOptions)
 
 			// Merge port mapping for graph node
-			err = portMapping.Merge(graphNodeScheduler.PortMapping)
+			err = portMapping.Merge(schedulerConfComp.PortMapping)
 			if err != nil {
-				return GraphNode{}, nil, nil, err
+				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
 		}
 
@@ -68,37 +68,38 @@ func newComponentStackAndOptions(
 		if loadActuatorProto := concurrencyLimiterProto.GetLoadActuator(); loadActuatorProto != nil {
 			loadActuator, loadActuatorOptions, err := concurrency.NewLoadActuatorAndOptions(loadActuatorProto, componentStackIndex, policyReadAPI, agentGroupName)
 			if err != nil {
-				return GraphNode{}, nil, nil, err
+				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
 
-			configuredLoadActuator, graphNodeLoadActuator, err := prepareComponent(loadActuator, loadActuatorProto)
+			loadActuatorConfComp, err := prepareComponent(loadActuator, loadActuatorProto)
 			if err != nil {
-				return GraphNode{}, nil, nil, err
+				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
 			// Append loadActuator as a runtime.ConfiguredComponent
-			configuredComponents = append(configuredComponents, configuredLoadActuator)
+			configuredComponents = append(configuredComponents, loadActuatorConfComp)
 
 			// Append loadActuator options
 			options = append(options, loadActuatorOptions)
 
 			// Merge port mapping for graph node
-			err = portMapping.Merge(graphNodeLoadActuator.PortMapping)
+			err = portMapping.Merge(loadActuatorConfComp.PortMapping)
 			if err != nil {
-				return GraphNode{}, nil, nil, err
+				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
 		}
 
-		_, graphNodeConcurrencyLimiter, err := prepareComponent(
-			runtime.NewDummyComponent("ConcurrencyLimiter"),
+		concurrencyLimiterConfComp, err := prepareComponent(
+			runtime.NewDummyComponent("ConcurrencyLimiter", runtime.ComponentTypeSignalProcessor),
 			concurrencyLimiterProto,
 		)
 		if err != nil {
-			return GraphNode{}, nil, nil, err
+			return runtime.ConfiguredComponent{}, nil, nil, err
 		}
 
-		return GraphNode{
+		return runtime.ConfiguredComponent{
+			Component:   concurrencyLimiterConfComp.Component,
 			PortMapping: portMapping,
-			Config:      graphNodeConcurrencyLimiter.Config,
+			Config:      concurrencyLimiterConfComp.Config,
 		}, configuredComponents, fx.Options(options...), nil
 	} else if horizontalPodScalerProto := componentStackProto.GetHorizontalPodScaler(); horizontalPodScalerProto != nil {
 		var (
@@ -108,7 +109,7 @@ func newComponentStackAndOptions(
 		portMapping := runtime.NewPortMapping()
 		horizontalPodScalerOptions, agentGroupName, horizontalPodScalerErr := horizontalpodscaler.NewHorizontalPodScalerOptions(horizontalPodScalerProto, componentStackIndex, policyReadAPI)
 		if horizontalPodScalerErr != nil {
-			return GraphNode{}, nil, nil, horizontalPodScalerErr
+			return runtime.ConfiguredComponent{}, nil, nil, horizontalPodScalerErr
 		}
 		// Append horizontalPodScaler options
 		options = append(options, horizontalPodScalerOptions)
@@ -117,24 +118,24 @@ func newComponentStackAndOptions(
 		if scaleReporterProto := horizontalPodScalerProto.GetScaleReporter(); scaleReporterProto != nil {
 			scaleReporter, scaleReporterOptions, err := horizontalpodscaler.NewScaleReporterAndOptions(scaleReporterProto, componentStackIndex, policyReadAPI, agentGroupName)
 			if err != nil {
-				return GraphNode{}, nil, nil, err
+				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
 
-			configuredScaleReporter, graphNodeScaleReporter, err := prepareComponent(scaleReporter, scaleReporterProto)
+			scaleReporterConfComp, err := prepareComponent(scaleReporter, scaleReporterProto)
 			if err != nil {
-				return GraphNode{}, nil, nil, err
+				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
 
 			// Append scaleReporter as a runtime.ConfiguredComponent
-			configuredComponents = append(configuredComponents, configuredScaleReporter)
+			configuredComponents = append(configuredComponents, scaleReporterConfComp)
 
 			// Append scaleReporter options
 			options = append(options, scaleReporterOptions)
 
 			// Merge port mapping for graph node
-			err = portMapping.Merge(graphNodeScaleReporter.PortMapping)
+			err = portMapping.Merge(scaleReporterConfComp.PortMapping)
 			if err != nil {
-				return GraphNode{}, nil, nil, err
+				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
 		}
 
@@ -142,38 +143,39 @@ func newComponentStackAndOptions(
 		if scaleActuatorProto := horizontalPodScalerProto.GetScaleActuator(); scaleActuatorProto != nil {
 			scaleActuator, scaleActuatorOptions, err := horizontalpodscaler.NewScaleActuatorAndOptions(scaleActuatorProto, componentStackIndex, policyReadAPI, agentGroupName)
 			if err != nil {
-				return GraphNode{}, nil, nil, err
+				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
 
-			configuredScaleActuator, graphNodeScaleActuator, err := prepareComponent(scaleActuator, scaleActuatorProto)
+			scaleActuatorConfComp, err := prepareComponent(scaleActuator, scaleActuatorProto)
 			if err != nil {
-				return GraphNode{}, nil, nil, err
+				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
 			// Append scaleActuator as a runtime.ConfiguredComponent
-			configuredComponents = append(configuredComponents, configuredScaleActuator)
+			configuredComponents = append(configuredComponents, scaleActuatorConfComp)
 
 			// Append scaleActuator options
 			options = append(options, scaleActuatorOptions)
 
 			// Merge port mapping for graph node
-			err = portMapping.Merge(graphNodeScaleActuator.PortMapping)
+			err = portMapping.Merge(scaleActuatorConfComp.PortMapping)
 			if err != nil {
-				return GraphNode{}, nil, nil, err
+				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
 		}
 
-		_, graphNodeHorizontalPodScaler, err := prepareComponent(
-			runtime.NewDummyComponent("HorizontalPodScaler"),
+		horizontalPodScalerConfComp, err := prepareComponent(
+			runtime.NewDummyComponent("HorizontalPodScaler", runtime.ComponentTypeSignalProcessor),
 			horizontalPodScalerProto,
 		)
 		if err != nil {
-			return GraphNode{}, nil, nil, err
+			return runtime.ConfiguredComponent{}, nil, nil, err
 		}
 
-		return GraphNode{
+		return runtime.ConfiguredComponent{
+			Component:   horizontalPodScalerConfComp.Component,
 			PortMapping: portMapping,
-			Config:      graphNodeHorizontalPodScaler.Config,
+			Config:      horizontalPodScalerConfComp.Config,
 		}, configuredComponents, fx.Options(options...), nil
 	}
-	return GraphNode{}, nil, nil, fmt.Errorf("unsupported/missing component type")
+	return runtime.ConfiguredComponent{}, nil, nil, fmt.Errorf("unsupported/missing component type")
 }

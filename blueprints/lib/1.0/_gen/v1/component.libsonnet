@@ -19,6 +19,12 @@
   withArithmeticCombinatorMixin(arithmetic_combinator):: {
     arithmetic_combinator+: arithmetic_combinator,
   },
+  withConcurrencyController(concurrency_controller):: {
+    concurrency_controller: concurrency_controller,
+  },
+  withConcurrencyControllerMixin(concurrency_controller):: {
+    concurrency_controller+: concurrency_controller,
+  },
   withConcurrencyLimiter(concurrency_limiter):: {
     concurrency_limiter: concurrency_limiter,
   },

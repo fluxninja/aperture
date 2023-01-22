@@ -88,7 +88,7 @@ func CompilePolicy(policyMessage *policylangv1.Policy, registry status.Registry)
 	return circuit, nil
 }
 
-// compilePolicyWrapper takes policyProto and returns a compiled policy. TODO nested components: return list of graph nodes.
+// compilePolicyWrapper takes policyProto and returns a compiled policy.
 func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry status.Registry) (*Policy, *circuitfactory.Circuit, fx.Option, error) {
 	if wrapperMessage == nil {
 		return nil, nil, nil, fmt.Errorf("nil policy wrapper message")

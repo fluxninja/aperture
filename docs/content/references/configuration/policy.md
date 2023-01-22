@@ -337,7 +337,7 @@ Note: The module name must match the package name from the "source".
 </dd>
 </dl>
 
-### SchedulerWorkload {#scheduler-workload}
+### SchedulerParametersWorkload {#scheduler-parameters-workload}
 
 Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
 
@@ -347,7 +347,7 @@ Workload defines a class of requests that preferably have similar properties suc
 <dt>workload_parameters</dt>
 <dd>
 
-([SchedulerWorkloadParameters](#scheduler-workload-parameters), `required`) WorkloadParameters associated with flows matching the label matcher.
+([SchedulerParametersWorkloadParameters](#scheduler-parameters-workload-parameters), `required`) WorkloadParameters associated with flows matching the label matcher.
 
 @gotags: validate:"required"
 
@@ -363,7 +363,7 @@ Workload defines a class of requests that preferably have similar properties suc
 </dd>
 </dl>
 
-### SchedulerWorkloadParameters {#scheduler-workload-parameters}
+### SchedulerParametersWorkloadParameters {#scheduler-parameters-workload-parameters}
 
 WorkloadParameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
 
@@ -917,6 +917,143 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([V1PulseGenerator](#v1-pulse-generator)) Generates 0 and 1 in turns.
 
 </dd>
+<dt>concurrency_controller</dt>
+<dd>
+
+([V1ConcurrencyController](#v1-concurrency-controller)) High level concurrency control component. Baselines a signal and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of signal from the baseline. Internally implemented as a nested circuit.
+
+</dd>
+</dl>
+
+### v1ConcurrencyController {#v1-concurrency-controller}
+
+High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1ConcurrencyControllerIns](#v1-concurrency-controller-ins)) Input ports for the ConcurrencyController component.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([V1ConcurrencyControllerOuts](#v1-concurrency-controller-outs)) Output ports for the ConcurrencyController component.
+
+</dd>
+<dt>flow_selector</dt>
+<dd>
+
+([V1FlowSelector](#v1-flow-selector), `required`) Flow Selector decides the service and flows at which the concurrency limiter is applied.
+
+@gotags: validate:"required"
+
+</dd>
+<dt>scheduler_parameters</dt>
+<dd>
+
+([V1SchedulerParameters](#v1-scheduler-parameters), `required`) Scheduler parameters.
+
+@gotags: validate:"required"
+
+</dd>
+<dt>gradient_parameters</dt>
+<dd>
+
+([V1GradientParameters](#v1-gradient-parameters)) Gradient parameters for the controller. Defaults to:
+
+- slope = -1
+- min_gradient = 0.1
+- max_gradient = 1
+
+</dd>
+<dt>concurrency_limit_multiplier</dt>
+<dd>
+
+(float64, default: `2`) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+
+@gotags: default:"2.0"
+
+</dd>
+<dt>concurrency_linear_increment</dt>
+<dd>
+
+(float64, default: `5`) Linear increment to concurrency in each execution tick when the system is not in overloaded state.
+
+@gotags: default:"5.0"
+
+</dd>
+<dt>concurrency_square_root_increment_multiplier</dt>
+<dd>
+
+(float64, default: `1`) Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
+
+@gotags: default:"1.0"
+
+</dd>
+<dt>alerter_config</dt>
+<dd>
+
+([V1AlerterConfig](#v1-alerter-config)) Configuration for embedded alerter.
+
+</dd>
+</dl>
+
+### v1ConcurrencyControllerIns {#v1-concurrency-controller-ins}
+
+Inputs for the ConcurrencyController component.
+
+#### Properties
+
+<dl>
+<dt>signal</dt>
+<dd>
+
+([V1InPort](#v1-in-port)) The signal to the controller.
+
+</dd>
+</dl>
+
+### v1ConcurrencyControllerOuts {#v1-concurrency-controller-outs}
+
+Outputs for the ConcurrencyController component.
+
+#### Properties
+
+<dl>
+<dt>accepted_concurrency</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
+
+</dd>
+<dt>incoming_concurrency</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
+
+</dd>
+<dt>desired_concurrency</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
+
+</dd>
+<dt>is_overload</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
+
+</dd>
+<dt>load_multiplier</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
+
+</dd>
 </dl>
 
 ### v1ConcurrencyLimiter {#v1-concurrency-limiter}
@@ -1222,12 +1359,12 @@ The EMA filter also employs a min-max-envelope logic during warm up stage, expla
 @gotags: default:"5s"
 
 </dd>
-<dt>warm_up_window</dt>
+<dt>warmup_window</dt>
 <dd>
 
 (string, default: `0s`) Duration of EMA warming up window.
 
-The initial value of the EMA is the average of signal readings received during the warm up window.
+The initial value of the EMA is the average of signal readings received during the warm-up window.
 
 @gotags: default:"0s"
 
@@ -1251,7 +1388,7 @@ The initial value of the EMA is the average of signal readings received during t
 <dt>valid_during_warmup</dt>
 <dd>
 
-(bool) Whether the output is valid during the warm up stage.
+(bool) Whether the output is valid during the warm-up stage.
 
 @gotags: default:"false"
 
@@ -1714,67 +1851,12 @@ The output can be _optionally_ clamped to desired range using `max` and
 ([V1GradientControllerOuts](#v1-gradient-controller-outs)) Output ports of the Gradient Controller.
 
 </dd>
-<dt>slope</dt>
+<dt>gradient_parameters</dt>
 <dd>
 
-(float64, `required`) Slope controls the aggressiveness and direction of the Gradient Controller.
-
-Slope is used as exponent on the signal to setpoint ratio in computation
-of the gradient (see the [main description](#v1-gradient-controller) for
-exact equation). Good intuition for this parameter is "What should the
-Gradient Controller do to the control variable when signal is too high",
-eg.:
-
-- $\text{slope} = 1$: when signal is too high, increase control variable,
-- $\text{slope} = -1$: when signal is too high, decrease control variable,
-- $\text{slope} = -0.5$: when signal is to high, decrease control variable more slowly.
-
-The sign of slope depends on correlation between the signal and control variable:
-
-- Use $\text{slope} < 0$ if signal and control variable are _positively_
-  correlated (eg. Per-pod CPU usage and total concurrency).
-- Use $\text{slope} > 0$ if signal and control variable are _negatively_
-  correlated (eg. Per-pod CPU usage and number of pods).
-
-:::note
-You need to set _negative_ slope for a _positive_ correlation, as you're
-describing the _action_ which controller should make when the signal
-increases.
-:::
-
-The magnitude of slope describes how aggressively should the controller
-react to a deviation of signal.
-With $|\text{slope}| = 1$, the controller will aim to bring the signal to
-the setpoint in one tick (assuming linear correlation with signal and setpoint).
-Smaller magnitudes of slope will make the controller adjust the control
-variable more slowly.
-
-We recommend setting $|\text{slope}| < 1$ (eg. $\pm0.8$).
-If you experience overshooting, consider lowering the magnitude even more.
-Values of $|\text{slope}| > 1$ are not recommended.
-
-:::note
-Remember that the gradient and output signal can be (optionally) clamped,
-so the _slope_ might not fully describe aggressiveness of the controller.
-:::
+([V1GradientParameters](#v1-gradient-parameters), `required`) Gradient Parameters.
 
 @gotags: validate:"required"
-
-</dd>
-<dt>min_gradient</dt>
-<dd>
-
-(float64, default: `-1.7976931348623157e+308`) Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
-
-@gotags: default:"-1.79769313486231570814527423731704356798070e+308"
-
-</dd>
-<dt>max_gradient</dt>
-<dd>
-
-(float64, default: `1.7976931348623157e+308`) Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
-
-@gotags: default:"1.79769313486231570814527423731704356798070e+308"
 
 </dd>
 <dt>dynamic_config_key</dt>
@@ -1849,6 +1931,76 @@ Outputs for the Gradient Controller component.
 <dd>
 
 ([V1OutPort](#v1-out-port)) Computed desired value of the control variable.
+
+</dd>
+</dl>
+
+### v1GradientParameters {#v1-gradient-parameters}
+
+#### Properties
+
+<dl>
+<dt>slope</dt>
+<dd>
+
+(float64, `required`) Slope controls the aggressiveness and direction of the Gradient Controller.
+
+Slope is used as exponent on the signal to setpoint ratio in computation
+of the gradient (see the [main description](#v1-gradient-controller) for
+exact equation). Good intuition for this parameter is "What should the
+Gradient Controller do to the control variable when signal is too high",
+eg.:
+
+- $\text{slope} = 1$: when signal is too high, increase control variable,
+- $\text{slope} = -1$: when signal is too high, decrease control variable,
+- $\text{slope} = -0.5$: when signal is to high, decrease control variable more slowly.
+
+The sign of slope depends on correlation between the signal and control variable:
+
+- Use $\text{slope} < 0$ if signal and control variable are _positively_
+  correlated (eg. Per-pod CPU usage and total concurrency).
+- Use $\text{slope} > 0$ if signal and control variable are _negatively_
+  correlated (eg. Per-pod CPU usage and number of pods).
+
+:::note
+You need to set _negative_ slope for a _positive_ correlation, as you're
+describing the _action_ which controller should make when the signal
+increases.
+:::
+
+The magnitude of slope describes how aggressively should the controller
+react to a deviation of signal.
+With $|\text{slope}| = 1$, the controller will aim to bring the signal to
+the setpoint in one tick (assuming linear correlation with signal and setpoint).
+Smaller magnitudes of slope will make the controller adjust the control
+variable more slowly.
+
+We recommend setting $|\text{slope}| < 1$ (eg. $\pm0.8$).
+If you experience overshooting, consider lowering the magnitude even more.
+Values of $|\text{slope}| > 1$ are not recommended.
+
+:::note
+Remember that the gradient and output signal can be (optionally) clamped,
+so the _slope_ might not fully describe aggressiveness of the controller.
+:::
+
+@gotags: validate:"required"
+
+</dd>
+<dt>min_gradient</dt>
+<dd>
+
+(float64, default: `-1.7976931348623157e+308`) Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
+
+@gotags: default:"-1.79769313486231570814527423731704356798070e+308"
+
+</dd>
+<dt>max_gradient</dt>
+<dd>
+
+(float64, default: `1.7976931348623157e+308`) Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
+
+@gotags: default:"1.79769313486231570814527423731704356798070e+308"
 
 </dd>
 </dl>
@@ -2254,7 +2406,7 @@ Takes the load multiplier input signal and publishes it to the schedulers in the
 <dt>alerter_config</dt>
 <dd>
 
-([V1AlerterConfig](#v1-alerter-config)) Configuration for embedded alerter. No alerts are generated if this configuration is not provided.
+([V1AlerterConfig](#v1-alerter-config)) Configuration for embedded alerter.
 
 </dd>
 </dl>
@@ -2964,10 +3116,58 @@ See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
 ([V1SchedulerOuts](#v1-scheduler-outs)) Output ports for the Scheduler component.
 
 </dd>
+<dt>scheduler_parameters</dt>
+<dd>
+
+([V1SchedulerParameters](#v1-scheduler-parameters), `required`) Scheduler parameters.
+
+@gotags: validate:"required"
+
+</dd>
+</dl>
+
+### v1SchedulerOuts {#v1-scheduler-outs}
+
+Output for the Scheduler component.
+
+#### Properties
+
+<dl>
+<dt>accepted_concurrency</dt>
+<dd>
+
+([V1OutPort](#v1-out-port)) Accepted concurrency is the number of accepted tokens per second.
+
+:::info
+**Accepted tokens** are tokens associated with
+[flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
+this scheduler. Number of tokens for a flow is determined by a
+[workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
+via `auto_tokens` or explicitly by `Workload.tokens`).
+:::
+
+Value of this signal is the sum across all the relevant schedulers.
+
+</dd>
+<dt>incoming_concurrency</dt>
+<dd>
+
+([V1OutPort](#v1-out-port)) Incoming concurrency is the number of incoming tokens/sec.
+This is the same as `accepted_concurrency`, but across all the flows
+entering scheduler, including rejected ones.
+
+</dd>
+</dl>
+
+### v1SchedulerParameters {#v1-scheduler-parameters}
+
+#### Properties
+
+<dl>
 <dt>workloads</dt>
 <dd>
 
-([[]SchedulerWorkload](#scheduler-workload)) List of workloads to be used in scheduler.
+([[]SchedulerParametersWorkload](#scheduler-parameters-workload)) List of workloads to be used in scheduler.
 
 Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
 allows for load-shedding to be "smarter" than just "randomly deny 50% of
@@ -2995,7 +3195,7 @@ section](/concepts/flow-control/concurrency-limiter.md#workload).
 <dt>default_workload_parameters</dt>
 <dd>
 
-([SchedulerWorkloadParameters](#scheduler-workload-parameters), `required`) WorkloadParameters to be used if none of workloads specified in `workloads` match.
+([SchedulerParametersWorkloadParameters](#scheduler-parameters-workload-parameters), `required`) WorkloadParameters to be used if none of workloads specified in `workloads` match.
 
 @gotags: validate:"required"
 
@@ -3047,39 +3247,6 @@ tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 :::
 
 @gotags: default:"0.49s"
-
-</dd>
-</dl>
-
-### v1SchedulerOuts {#v1-scheduler-outs}
-
-Output for the Scheduler component.
-
-#### Properties
-
-<dl>
-<dt>accepted_concurrency</dt>
-<dd>
-
-([V1OutPort](#v1-out-port)) Accepted concurrency is the number of accepted tokens per second.
-
-:::info
-**Accepted tokens** are tokens associated with
-[flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
-this scheduler. Number of tokens for a flow is determined by a
-[workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
-via `auto_tokens` or explicitly by `Workload.tokens`).
-:::
-
-Value of this signal is the sum across all the relevant schedulers.
-
-</dd>
-<dt>incoming_concurrency</dt>
-<dd>
-
-([V1OutPort](#v1-out-port)) Incoming concurrency is the number of incoming tokens/sec.
-This is the same as `accepted_concurrency`, but across all the flows
-entering scheduler, including rejected ones.
 
 </dd>
 </dl>

@@ -206,6 +206,9 @@ message Component {
 
     // Generates 0 and 1 in turns.
     PulseGenerator pulse_generator = 22;
+
+    // High level concurrency control component. Baselines a signal and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of signal from the baseline. Internally implemented as a nested circuit.
+    ConcurrencyController concurrency_controller = 23;
   }
 }
 
@@ -284,6 +287,22 @@ message GradientController {
   // Output ports of the Gradient Controller.
   Outs out_ports = 2;
 
+  // Gradient Parameters.
+  GradientParameters gradient_parameters = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
+
+  // Configuration key for DynamicConfig
+  string dynamic_config_key = 4;
+
+  // Default configuration.
+  ControllerDynamicConfig default_config = 5;
+}
+
+message GradientParameters {
   // Slope controls the aggressiveness and direction of the Gradient Controller.
   //
   // Slope is used as exponent on the signal to setpoint ratio in computation
@@ -322,7 +341,7 @@ message GradientController {
   // Remember that the gradient and output signal can be (optionally) clamped,
   // so the _slope_ might not fully describe aggressiveness of the controller.
   // :::
-  double slope = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  double slope = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {string_value: "required"}
@@ -330,7 +349,7 @@ message GradientController {
   }]; // @gotags: validate:"required"
 
   // Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
-  double min_gradient = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  double min_gradient = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {number_value: -1.7976931348623157e+308}
@@ -338,18 +357,12 @@ message GradientController {
   }]; // @gotags: default:"-1.79769313486231570814527423731704356798070e+308"
 
   // Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
-  double max_gradient = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  double max_gradient = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {number_value: 1.7976931348623157e+308}
     }
   }]; // @gotags: default:"1.79769313486231570814527423731704356798070e+308"
-
-  // Configuration key for DynamicConfig
-  string dynamic_config_key = 6;
-
-  // Default configuration.
-  ControllerDynamicConfig default_config = 7;
 }
 
 // Dynamic Configuration for a Controller
@@ -439,8 +452,8 @@ message EMA {
 
   // Duration of EMA warming up window.
   //
-  // The initial value of the EMA is the average of signal readings received during the warm up window.
-  google.protobuf.Duration warm_up_window = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  // The initial value of the EMA is the average of signal readings received during the warm-up window.
+  google.protobuf.Duration warmup_window = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {string_value: "0s"}
@@ -471,7 +484,7 @@ message EMA {
     }
   }]; // @gotags: validate:"gte=0,lte=1.0" default:"1.0"
 
-  // Whether the output is valid during the warm up stage.
+  // Whether the output is valid during the warm-up stage.
   bool valid_during_warmup = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
@@ -769,6 +782,40 @@ message ConcurrencyLimiter {
 //
 // See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
 message Scheduler {
+  // Output for the Scheduler component.
+  message Outs {
+    // Accepted concurrency is the number of accepted tokens per second.
+    //
+    // :::info
+    // **Accepted tokens** are tokens associated with
+    // [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
+    // this scheduler. Number of tokens for a flow is determined by a
+    // [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
+    // via `auto_tokens` or explicitly by `Workload.tokens`).
+    // :::
+    //
+    // Value of this signal is the sum across all the relevant schedulers.
+    OutPort accepted_concurrency = 1;
+
+    // Incoming concurrency is the number of incoming tokens/sec.
+    // This is the same as `accepted_concurrency`, but across all the flows
+    // entering scheduler, including rejected ones.
+    OutPort incoming_concurrency = 2;
+  }
+
+  // Output ports for the Scheduler component.
+  Outs out_ports = 1;
+
+  // Scheduler parameters.
+  SchedulerParameters scheduler_parameters = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
+}
+
+message SchedulerParameters {
   // WorkloadParameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
   message WorkloadParameters {
     // Describes priority level of the requests within the workload.
@@ -817,30 +864,6 @@ message Scheduler {
     }]; // @gotags: validate:"required"
   }
 
-  // Output for the Scheduler component.
-  message Outs {
-    // Accepted concurrency is the number of accepted tokens per second.
-    //
-    // :::info
-    // **Accepted tokens** are tokens associated with
-    // [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
-    // this scheduler. Number of tokens for a flow is determined by a
-    // [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
-    // via `auto_tokens` or explicitly by `Workload.tokens`).
-    // :::
-    //
-    // Value of this signal is the sum across all the relevant schedulers.
-    OutPort accepted_concurrency = 1;
-
-    // Incoming concurrency is the number of incoming tokens/sec.
-    // This is the same as `accepted_concurrency`, but across all the flows
-    // entering scheduler, including rejected ones.
-    OutPort incoming_concurrency = 2;
-  }
-
-  // Output ports for the Scheduler component.
-  Outs out_ports = 1;
-
   // List of workloads to be used in scheduler.
   //
   // Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
@@ -861,10 +884,10 @@ message Scheduler {
   // See also [workload definition in the concepts
   // section](/concepts/flow-control/concurrency-limiter.md#workload).
   // :::
-  repeated Workload workloads = 2; // @gotags: validate:"dive"
+  repeated Workload workloads = 1; // @gotags: validate:"dive"
 
   // WorkloadParameters to be used if none of workloads specified in `workloads` match.
-  WorkloadParameters default_workload_parameters = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  WorkloadParameters default_workload_parameters = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {string_value: "required"}
@@ -875,7 +898,7 @@ message Scheduler {
   // historical latency. Each workload's `tokens` will be set to average
   // latency of flows in that workload during last few seconds (exact duration
   // of this average can change).
-  bool auto_tokens = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  bool auto_tokens = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {string_value: "true"}
@@ -888,7 +911,7 @@ message Scheduler {
   // it will be rejected.
   //
   // This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
-  double timeout_factor = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  double timeout_factor = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {number_value: 0.5}
@@ -916,7 +939,7 @@ message Scheduler {
   // value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
   // tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
   // :::
-  google.protobuf.Duration max_timeout = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  google.protobuf.Duration max_timeout = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {string_value: "0.49s"}
@@ -949,7 +972,7 @@ message LoadActuator {
   // Default configuration.
   DynamicConfig default_config = 3;
 
-  // Configuration for embedded alerter. No alerts are generated if this configuration is not provided.
+  // Configuration for embedded alerter.
   AlerterConfig alerter_config = 4;
 }
 
@@ -1394,4 +1417,77 @@ message PulseGenerator {
       value: {string_value: "5s"}
     }
   }]; // @gotags: default:"5s"
+}
+
+// High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
+message ConcurrencyController {
+  // Inputs for the ConcurrencyController component.
+  message Ins {
+    // The signal to the controller.
+    InPort signal = 1;
+  }
+
+  // Outputs for the ConcurrencyController component.
+  message Outs {
+    OutPort accepted_concurrency = 1;
+    OutPort incoming_concurrency = 2;
+    OutPort desired_concurrency = 3;
+    OutPort is_overload = 4;
+    OutPort load_multiplier = 5;
+  }
+
+  // Input ports for the ConcurrencyController component.
+  Ins in_ports = 1;
+
+  // Output ports for the ConcurrencyController component.
+  Outs out_ports = 2;
+
+  // Flow Selector decides the service and flows at which the concurrency limiter is applied.
+  FlowSelector flow_selector = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
+
+  // Scheduler parameters.
+  SchedulerParameters scheduler_parameters = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
+
+  // Gradient parameters for the controller. Defaults to:
+  // * slope = -1
+  // * min_gradient = 0.1
+  // * max_gradient = 1
+  GradientParameters gradient_parameters = 5;
+
+  // Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+  double concurrency_limit_multiplier = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {number_value: 2.0}
+    }
+  }]; // @gotags: default:"2.0"
+
+  // Linear increment to concurrency in each execution tick when the system is not in overloaded state.
+  double concurrency_linear_increment = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {number_value: 5.0}
+    }
+  }]; // @gotags: default:"5.0"
+
+  // Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
+  double concurrency_square_root_increment_multiplier = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {number_value: 1.0}
+    }
+  }]; // @gotags: default:"1.0"
+
+  // Configuration for embedded alerter.
+  AlerterConfig alerter_config = 9;
 }
