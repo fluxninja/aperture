@@ -56,7 +56,7 @@ local policyResource = latencyGradientPolicy({
       + workload.withLabelMatcher(labelMatcher.withMatchLabels({ user_type: 'guest' })),
       workload.new()
       + workload.withWorkloadParameters(workloadParameters.withPriority(200))
-      // match the http header directly
+      // alternatively, match the http header directly
       + workload.withLabelMatcher(labelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
     ],
   },

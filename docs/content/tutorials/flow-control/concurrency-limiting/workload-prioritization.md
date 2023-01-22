@@ -3,7 +3,7 @@ title: Workload Prioritization
 keywords:
   - policies
   - scheduler
-sidebar_position: 4
+sidebar_position: 2
 ---
 
 ```mdx-code-block
@@ -29,8 +29,8 @@ maximizes user-experience or revenue.
 ## Policy
 
 We will be extending the policy we used in
-[Basic Concurrency Limiting](./workload-prioritization.md) to classify requests
-into workloads and prioritize them.
+[Basic Concurrency Limiting](../concurrency-limiting/basic-concurrency-limiting.md)
+to classify requests into workloads and prioritize them.
 
 In this example policy, we will be prioritizing traffic of different types of
 users - `subscriber` users will get higher priority over `guest` users. That is,
@@ -52,7 +52,7 @@ value to the scheduler:
 You can quickly write classification rules on
 [HTTP requests](concepts/flow-control/flow-classifier.md#live-previewing-requests)
 and define scheduler priorities on
-[flow labels](concepts/flow-control/flow-label.md#live-previewing-flow-labels)
+[Flow Labels](concepts/flow-control/flow-label.md#live-previewing-flow-labels)
 by live previewing them first via introspection APIs.
 
 :::

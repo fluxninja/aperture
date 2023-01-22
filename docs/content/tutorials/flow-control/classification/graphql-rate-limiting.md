@@ -4,7 +4,7 @@ keywords:
   - policies
   - ratelimit
   - graphql
-sidebar_position: 2
+sidebar_position: 1
 ---
 
 ```mdx-code-block
@@ -13,9 +13,8 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-In this tutorial, we will use [Flow Classifier Rego Rules][rego-rules] to rate
-limit a GraphQL query. We will build upon what we've seen in the
-[Static Rate Limiting](static-rate-limiting.md) tutorial.
+In this tutorial, we will use [Flow Classifier Rego Rules][rego-rules] to
+statically rate limit a GraphQL query.
 
 ## Policy
 
@@ -23,6 +22,16 @@ We will use a policy that will rate limit unique users based on `user_id` [Flow
 Label][flow-label]. This label is extracted using [Flow
 Classifier][flow-classifier] and is mapped from the `userID` claim in the JWT
 token sent as Authorization header in the request.
+
+:::tip
+
+You can quickly write classification rules on
+[HTTP requests](concepts/flow-control/flow-classifier.md#live-previewing-requests)
+and define scheduler priorities on
+[Flow Labels](concepts/flow-control/flow-label.md#live-previewing-flow-labels)
+by live previewing them first via introspection APIs.
+
+:::
 
 ```mdx-code-block
 <Tabs>
@@ -95,6 +104,6 @@ and rest of the requests are rejected.
 
 </Zoom>
 
-[rego-rules]: ../../concepts/flow-control/flow-classifier#rego
-[flow-label]: ../../concepts/flow-control/flow-label.md
-[flow-classifier]: ../../concepts/flow-control/flow-classifier.md
+[rego-rules]: /concepts/flow-control/flow-classifier.md#rego
+[flow-label]: /concepts/flow-control/flow-label.md
+[flow-classifier]: /concepts/flow-control/flow-classifier.md
