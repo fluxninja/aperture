@@ -632,7 +632,7 @@ func (msg *PromQL_Outs) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *ConstantValue) MarshalJSON() ([]byte, error) {
+func (msg *ConstantSignal) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -641,7 +641,7 @@ func (msg *ConstantValue) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *ConstantValue) UnmarshalJSON(b []byte) error {
+func (msg *ConstantSignal) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

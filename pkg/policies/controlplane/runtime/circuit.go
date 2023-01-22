@@ -108,10 +108,10 @@ func MakeNamedSignal(name string, looped bool) Signal {
 }
 
 // MakeConstantSignal creates a new constant Signal.
-func MakeConstantSignal(constValue *policylangv1.ConstantValue) Signal {
+func MakeConstantSignal(constSignal *policylangv1.ConstantSignal) Signal {
 	return Signal{
 		SignalType: SignalTypeConstant,
-		Value:      constValue.Value,
+		Value:      constSignal.GetValue(),
 	}
 }
 

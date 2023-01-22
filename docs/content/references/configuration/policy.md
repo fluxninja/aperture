@@ -775,7 +775,8 @@ There are three categories of components:
 :::tip
 Sometimes you may want to use a constant value as one of component's inputs.
 You can create an input port containing the constant value instead of being connected to a signal.
-To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
+To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
+You can also use it to provide special math values such as NaN and +- Inf.
 If You need to provide the same constant signal to multiple components,
 You can use the [Variable](#v1-variable) component.
 :::
@@ -966,17 +967,17 @@ Actuation strategy defines the input signal that will drive the scheduler.
 </dd>
 </dl>
 
-### v1ConstantValue {#v1-constant-value}
+### v1ConstantSignal {#v1-constant-signal}
 
-Constant value that can be used instead of a signal in ports. Can be set to be invalid.
+Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
 
 #### Properties
 
 <dl>
-<dt>valid</dt>
+<dt>special_value</dt>
 <dd>
 
-(bool)
+(string) @gotags: validate:"oneof=NaN +Inf -Inf"
 
 </dd>
 <dt>value</dt>
@@ -1879,10 +1880,10 @@ Components receive input from other components via InPorts
 (string) Name of the incoming Signal on the InPort.
 
 </dd>
-<dt>constant_value</dt>
+<dt>constant_signal</dt>
 <dd>
 
-([V1ConstantValue](#v1-constant-value)) Constant value to be used for this InPort instead of a signal.
+([V1ConstantSignal](#v1-constant-signal)) Constant value to be used for this InPort instead of a signal.
 
 </dd>
 </dl>
@@ -3270,10 +3271,10 @@ Component that emits a variable value as an output signal, can be defined in dyn
 #### Properties
 
 <dl>
-<dt>constant_value</dt>
+<dt>constant_signal</dt>
 <dd>
 
-([V1ConstantValue](#v1-constant-value))
+([V1ConstantSignal](#v1-constant-signal))
 
 </dd>
 </dl>

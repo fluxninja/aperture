@@ -366,7 +366,8 @@ func (x *Resources) GetClassifiers() []*Classifier {
 // :::tip
 // Sometimes you may want to use a constant value as one of component's inputs.
 // You can create an input port containing the constant value instead of being connected to a signal.
-// To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
+// To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
+// You can also use it to provide special math values such as NaN and +- Inf.
 // If You need to provide the same constant signal to multiple components,
 // You can use the [Variable](#v1-variable) component.
 // :::
@@ -763,7 +764,7 @@ type InPort struct {
 
 	// Types that are assignable to Value:
 	//	*InPort_SignalName
-	//	*InPort_ConstantValue
+	//	*InPort_ConstantSignal
 	Value isInPort_Value `protobuf_oneof:"value"`
 }
 
@@ -813,9 +814,9 @@ func (x *InPort) GetSignalName() string {
 	return ""
 }
 
-func (x *InPort) GetConstantValue() *ConstantValue {
-	if x, ok := x.GetValue().(*InPort_ConstantValue); ok {
-		return x.ConstantValue
+func (x *InPort) GetConstantSignal() *ConstantSignal {
+	if x, ok := x.GetValue().(*InPort_ConstantSignal); ok {
+		return x.ConstantSignal
 	}
 	return nil
 }
@@ -829,14 +830,14 @@ type InPort_SignalName struct {
 	SignalName string `protobuf:"bytes,1,opt,name=signal_name,json=signalName,proto3,oneof"`
 }
 
-type InPort_ConstantValue struct {
+type InPort_ConstantSignal struct {
 	// Constant value to be used for this InPort instead of a signal.
-	ConstantValue *ConstantValue `protobuf:"bytes,2,opt,name=constant_value,json=constantValue,proto3,oneof"`
+	ConstantSignal *ConstantSignal `protobuf:"bytes,2,opt,name=constant_signal,json=constantSignal,proto3,oneof"`
 }
 
 func (*InPort_SignalName) isInPort_Value() {}
 
-func (*InPort_ConstantValue) isInPort_Value() {}
+func (*InPort_ConstantSignal) isInPort_Value() {}
 
 // Components produce output for other components via OutPorts
 type OutPort struct {
@@ -1962,18 +1963,20 @@ func (x *PromQL) GetEvaluationInterval() *durationpb.Duration {
 	return nil
 }
 
-// Constant value that can be used instead of a signal in ports. Can be set to be invalid.
-type ConstantValue struct {
+// Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
+type ConstantSignal struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Valid bool    `protobuf:"varint,1,opt,name=valid,proto3" json:"valid,omitempty"`
-	Value float64 `protobuf:"fixed64,2,opt,name=value,proto3" json:"value,omitempty"`
+	// Types that are assignable to Const:
+	//	*ConstantSignal_SpecialValue
+	//	*ConstantSignal_Value
+	Const isConstantSignal_Const `protobuf_oneof:"const"`
 }
 
-func (x *ConstantValue) Reset() {
-	*x = ConstantValue{}
+func (x *ConstantSignal) Reset() {
+	*x = ConstantSignal{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1981,13 +1984,13 @@ func (x *ConstantValue) Reset() {
 	}
 }
 
-func (x *ConstantValue) String() string {
+func (x *ConstantSignal) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ConstantValue) ProtoMessage() {}
+func (*ConstantSignal) ProtoMessage() {}
 
-func (x *ConstantValue) ProtoReflect() protoreflect.Message {
+func (x *ConstantSignal) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1999,24 +2002,47 @@ func (x *ConstantValue) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ConstantValue.ProtoReflect.Descriptor instead.
-func (*ConstantValue) Descriptor() ([]byte, []int) {
+// Deprecated: Use ConstantSignal.ProtoReflect.Descriptor instead.
+func (*ConstantSignal) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{19}
 }
 
-func (x *ConstantValue) GetValid() bool {
-	if x != nil {
-		return x.Valid
+func (m *ConstantSignal) GetConst() isConstantSignal_Const {
+	if m != nil {
+		return m.Const
 	}
-	return false
+	return nil
 }
 
-func (x *ConstantValue) GetValue() float64 {
-	if x != nil {
+func (x *ConstantSignal) GetSpecialValue() string {
+	if x, ok := x.GetConst().(*ConstantSignal_SpecialValue); ok {
+		return x.SpecialValue
+	}
+	return ""
+}
+
+func (x *ConstantSignal) GetValue() float64 {
+	if x, ok := x.GetConst().(*ConstantSignal_Value); ok {
 		return x.Value
 	}
 	return 0
 }
+
+type isConstantSignal_Const interface {
+	isConstantSignal_Const()
+}
+
+type ConstantSignal_SpecialValue struct {
+	SpecialValue string `protobuf:"bytes,1,opt,name=special_value,json=specialValue,proto3,oneof" validate:"oneof=NaN +Inf -Inf"` // @gotags: validate:"oneof=NaN +Inf -Inf"
+}
+
+type ConstantSignal_Value struct {
+	Value float64 `protobuf:"fixed64,2,opt,name=value,proto3,oneof"`
+}
+
+func (*ConstantSignal_SpecialValue) isConstantSignal_Const() {}
+
+func (*ConstantSignal_Value) isConstantSignal_Const() {}
 
 // Component that emits a variable value as an output signal, can be defined in dynamic configuration.
 type Variable struct {
@@ -4160,7 +4186,7 @@ type Variable_DynamicConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ConstantValue *ConstantValue `protobuf:"bytes,1,opt,name=constant_value,json=constantValue,proto3" json:"constant_value,omitempty"`
+	ConstantSignal *ConstantSignal `protobuf:"bytes,1,opt,name=constant_signal,json=constantSignal,proto3" json:"constant_signal,omitempty"`
 }
 
 func (x *Variable_DynamicConfig) Reset() {
@@ -4195,9 +4221,9 @@ func (*Variable_DynamicConfig) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{20, 0}
 }
 
-func (x *Variable_DynamicConfig) GetConstantValue() *ConstantValue {
+func (x *Variable_DynamicConfig) GetConstantSignal() *ConstantSignal {
 	if x != nil {
-		return x.ConstantValue
+		return x.ConstantSignal
 	}
 	return nil
 }
@@ -7144,7 +7170,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConstantValue); i {
+			switch v := v.(*ConstantSignal); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7938,10 +7964,14 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 	}
 	file_aperture_policy_language_v1_policy_proto_msgTypes[6].OneofWrappers = []interface{}{
 		(*InPort_SignalName)(nil),
-		(*InPort_ConstantValue)(nil),
+		(*InPort_ConstantSignal)(nil),
 	}
 	file_aperture_policy_language_v1_policy_proto_msgTypes[15].OneofWrappers = []interface{}{
 		(*ConcurrencyLimiter_LoadActuator)(nil),
+	}
+	file_aperture_policy_language_v1_policy_proto_msgTypes[19].OneofWrappers = []interface{}{
+		(*ConstantSignal_SpecialValue)(nil),
+		(*ConstantSignal_Value)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

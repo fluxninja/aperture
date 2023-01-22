@@ -12,7 +12,6 @@ local port = aperture.spec.v1.Port;
 local classifier = aperture.spec.v1.Classifier;
 local rule = aperture.spec.v1.Rule;
 local rego = aperture.spec.v1.RuleRego;
-local constantValue = aperture.spec.v1.ConstantValue;
 
 local svcSelector =
   flowSelector.new()
@@ -78,11 +77,7 @@ local policyDef =
       component.withRateLimiter(
         rateLimiter.new()
         + rateLimiter.withInPorts({
-          limit: port.withConstantValue(
-            constantValue.new()
-            + constantValue.withValue(10.0)
-            + constantValue.withValid(true)
-          ),
+          limit: port.withConstantSignal(10.0),
         })
         + rateLimiter.withFlowSelector(svcSelector)
         + rateLimiter.withLimitResetInterval('1s')

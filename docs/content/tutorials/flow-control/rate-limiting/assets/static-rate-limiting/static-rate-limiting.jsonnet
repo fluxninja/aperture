@@ -8,7 +8,6 @@ local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowMatcher = aperture.spec.v1.FlowMatcher;
 local circuit = aperture.spec.v1.Circuit;
 local port = aperture.spec.v1.Port;
-local constantValue = aperture.spec.v1.ConstantValue;
 
 local rateLimitPort = port.new() + port.withSignalName('RATE_LIMIT');
 
@@ -33,11 +32,7 @@ local policyDef =
       component.withRateLimiter(
         rateLimiter.new()
         + rateLimiter.withInPorts({
-          limit: port.withConstantValue(
-            constantValue.new()
-            + constantValue.withValue(120.0)
-            + constantValue.withValid(true)
-          ),
+          limit: port.withConstantSignal(120.0),
         })
         + rateLimiter.withFlowSelector(svcSelector)
         + rateLimiter.withLimitResetInterval('60s')

@@ -603,7 +603,8 @@ definitions:
       :::tip
       Sometimes you may want to use a constant value as one of component's inputs.
       You can create an input port containing the constant value instead of being connected to a signal.
-      To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
+      To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
+      You can also use it to provide special math values such as NaN and +- Inf.
       If You need to provide the same constant signal to multiple components,
       You can use the [Variable](#v1-variable) component.
       :::
@@ -753,13 +754,14 @@ definitions:
         x-go-validate: required
         x-order: 1
         $ref: '#/definitions/v1Scheduler'
-  v1ConstantValue:
-    description: Constant value that can be used instead of a signal in ports. Can
-      be set to be invalid.
+  v1ConstantSignal:
+    description: Special constant input for ports and Variable component. Can provide
+      either a constant value or special Nan/+-Inf value.
     type: object
     properties:
-      valid:
-        type: boolean
+      special_value:
+        type: string
+        title: '@gotags: validate:"oneof=NaN +Inf -Inf"'
         x-order: 0
       value:
         type: number
@@ -1430,10 +1432,10 @@ definitions:
     type: object
     title: Components receive input from other components via InPorts
     properties:
-      constant_value:
+      constant_signal:
         description: Constant value to be used for this InPort instead of a signal.
         x-order: 1
-        $ref: '#/definitions/v1ConstantValue'
+        $ref: '#/definitions/v1ConstantSignal'
       signal_name:
         description: Name of the incoming Signal on the InPort.
         type: string
@@ -2478,9 +2480,9 @@ definitions:
   v1VariableDynamicConfig:
     type: object
     properties:
-      constant_value:
+      constant_signal:
         x-order: 0
-        $ref: '#/definitions/v1ConstantValue'
+        $ref: '#/definitions/v1ConstantSignal'
   v1VariableOuts:
     description: Outputs for the Variable component.
     type: object

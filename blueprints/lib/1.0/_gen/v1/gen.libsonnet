@@ -28,7 +28,7 @@
   Classifier: import 'classifier.libsonnet',
   Component: import 'component.libsonnet',
   ConcurrencyLimiter: import 'concurrencylimiter.libsonnet',
-  ConstantValue: import 'constantvalue.libsonnet',
+  ConstantSignal: import 'constantsignal.libsonnet',
   ControllerDynamicConfig: import 'controllerdynamicconfig.libsonnet',
   Decider: import 'decider.libsonnet',
   DeciderIns: import 'deciderins.libsonnet',

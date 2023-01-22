@@ -1290,7 +1290,8 @@ definitions:
       :::tip
       Sometimes you may want to use a constant value as one of component's inputs.
       You can create an input port containing the constant value instead of being connected to a signal.
-      To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
+      To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
+      You can also use it to provide special math values such as NaN and +- Inf.
       If You need to provide the same constant signal to multiple components,
       You can use the [Variable](#v1-variable) component.
       :::
@@ -1334,15 +1335,16 @@ definitions:
       ConcurrencyLimiter configuration is split into two parts: An actuation
       strategy and a scheduler. Right now, only `load_actuator` strategy is available.
     title: Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
-  v1ConstantValue:
+  v1ConstantSignal:
     type: object
     properties:
-      valid:
-        type: boolean
+      special_value:
+        type: string
+        title: '@gotags: validate:"oneof=NaN +Inf -Inf"'
       value:
         type: number
         format: double
-    description: Constant value that can be used instead of a signal in ports. Can be set to be invalid.
+    description: Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
   v1ControllerDynamicConfig:
     type: object
     properties:
@@ -2040,8 +2042,8 @@ definitions:
       signal_name:
         type: string
         description: Name of the incoming Signal on the InPort.
-      constant_value:
-        $ref: '#/definitions/v1ConstantValue'
+      constant_signal:
+        $ref: '#/definitions/v1ConstantSignal'
         description: Constant value to be used for this InPort instead of a signal.
     title: Components receive input from other components via InPorts
   v1Integrator:
@@ -3243,8 +3245,8 @@ definitions:
   v1VariableDynamicConfig:
     type: object
     properties:
-      constant_value:
-        $ref: '#/definitions/v1ConstantValue'
+      constant_signal:
+        $ref: '#/definitions/v1ConstantSignal'
   v1VariableOuts:
     type: object
     properties:
