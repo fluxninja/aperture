@@ -26,9 +26,9 @@ token sent as Authorization header in the request.
 :::tip
 
 You can quickly write classification rules on
-[HTTP requests](concepts/flow-control/flow-classifier.md#live-previewing-requests)
+[HTTP requests](/concepts/flow-control/flow-classifier.md#live-previewing-requests)
 and define scheduler priorities on
-[flow labels](concepts/flow-control/flow-label.md#live-previewing-flow-labels)
+[flow labels](/concepts/flow-control/flow-label.md#live-previewing-flow-labels)
 by live previewing them first via introspection APIs.
 
 :::
@@ -104,6 +104,6 @@ and rest of the requests are rejected.
 
 </Zoom>
 
-[rego-rules]: concepts/flow-control/flow-classifier#rego
-[flow-label]: concepts/flow-control/flow-label.md
-[flow-classifier]: concepts/flow-control/flow-classifier.md
+[rego-rules]: /concepts/flow-control/flow-classifier#rego
+[flow-label]: /concepts/flow-control/flow-label.md
+[flow-classifier]: /concepts/flow-control/flow-classifier.md
