@@ -1,8 +1,8 @@
-label: Signal Processing
+label: Classification
 position: 1
 collapsible: true
 collapsed: true
 link:
   type: "generated-index"
-  title: "Signal Processing"
+  title: "Classification"
   keywords: ["tutorial"]

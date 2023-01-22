@@ -3,7 +3,7 @@ title: Basic Concurrency Limiting
 keywords:
   - policies
   - concurrency
-sidebar_position: 3
+sidebar_position: 1
 ---
 
 ```mdx-code-block

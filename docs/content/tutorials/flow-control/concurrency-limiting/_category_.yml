@@ -1,8 +1,8 @@
-label: Signal Processing
-position: 1
+label: Concurrency Limiting
+position: 3
 collapsible: true
 collapsed: true
 link:
   type: "generated-index"
-  title: "Signal Processing"
+  title: "Concurrency Limiting"
   keywords: ["tutorial"]

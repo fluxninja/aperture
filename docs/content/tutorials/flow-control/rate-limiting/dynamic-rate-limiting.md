@@ -29,8 +29,9 @@ can be made to work together as we will see in the below example.
 ## Policy
 
 We will be extending the policy we used in
-[Workload Prioritization](./dynamic-rate-limiting.md) to dynamically adjust the
-limits we apply to `bot` traffic coming from web-crawlers etc.
+[Workload Prioritization](../concurrency-limiting/workload-prioritization.md) to
+dynamically adjust the limits we apply to `bot` traffic coming from web-crawlers
+etc.
 
 In this example, we will make an assumption that `bot` users have been
 classified with `User-Type: bot` HTTP header and `User-Id: <id>` HTTP header
