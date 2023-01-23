@@ -2,9 +2,13 @@ package check
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"time"
 
+	"github.com/aws/aws-lambda-go/events"
 	"google.golang.org/genproto/googleapis/api/httpbody"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
@@ -81,8 +85,35 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 func (h *Handler) GatewayCheck(ctx context.Context, req *flowcontrolv1.GatewayCheckRequest) (*httpbody.HttpBody, error) {
 	log.Info().Str("payload", req.Payload).Msg("Received FlowControl Gateway Check request")
 
+	event := &events.APIGatewayV2CustomAuthorizerV2Request{}
+	err := json.Unmarshal([]byte(req.Payload), event)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to unmarshal payload in request")
+		return nil, err
+	}
+
+	svcs := []string{event.RequestContext.DomainName}
+
+	// record the start time of the request
+	start := time.Now()
+
+	// TODO: extract fields from the request payload into input.
+	input := map[string]string{}
+	checkResponse := h.CheckWithValues(ctx, svcs, "gateway", input)
+
+	end := time.Now()
+	checkResponse.Start = timestamppb.New(start)
+	checkResponse.End = timestamppb.New(end)
+
+	marshalledCheckResponse, err := proto.Marshal(checkResponse)
+	if err != nil {
+		log.Bug().Err(err).Msg("bug: Failed to marshal check response")
+		return nil, err
+	}
+	checkResponseBase64 := base64.StdEncoding.EncodeToString(marshalledCheckResponse)
+
 	return &httpbody.HttpBody{
-		ContentType: "text/html",
-		Data:        []byte("Hello World"),
+		ContentType: "application/json",
+		Data:        []byte(checkResponseBase64),
 	}, nil
 }

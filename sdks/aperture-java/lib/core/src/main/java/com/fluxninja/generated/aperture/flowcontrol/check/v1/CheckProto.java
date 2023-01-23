@@ -140,22 +140,22 @@ public final class CheckProto {
       "imiterReason\022\036\n\032LIMITER_REASON_UNSPECIFI" +
       "ED\020\000\022 \n\034LIMITER_REASON_KEY_NOT_FOUND\020\001B\t" +
       "\n\007details\"7\n\rFluxMeterInfo\022&\n\017flux_meter" +
-      "_name\030\001 \001(\tR\rfluxMeterName2\203\002\n\022FlowContr" +
+      "_name\030\001 \001(\tR\rfluxMeterName2\206\002\n\022FlowContr" +
       "olService\022d\n\005Check\022+.aperture.flowcontro" +
       "l.check.v1.CheckRequest\032,.aperture.flowc" +
-      "ontrol.check.v1.CheckResponse\"\000\022\206\001\n\014Gate" +
+      "ontrol.check.v1.CheckResponse\"\000\022\211\001\n\014Gate" +
       "wayCheck\0222.aperture.flowcontrol.check.v1" +
       ".GatewayCheckRequest\032\024.google.api.HttpBo" +
-      "dy\",\222A\020\n\016aperture-agent\202\323\344\223\002\023\"\021/v1/gatew" +
-      "ay_checkB\260\002\n5com.fluxninja.generated.ape" +
-      "rture.flowcontrol.check.v1B\nCheckProtoP\001" +
-      "ZTgithub.com/fluxninja/aperture/api/gen/" +
-      "proto/go/aperture/flowcontrol/check/v1;c" +
-      "heckv1\242\002\003AFC\252\002\035Aperture.Flowcontrol.Chec" +
-      "k.V1\312\002\035Aperture\\Flowcontrol\\Check\\V1\342\002)A" +
-      "perture\\Flowcontrol\\Check\\V1\\GPBMetadata" +
-      "\352\002 Aperture::Flowcontrol::Check::V1b\006pro" +
-      "to3"
+      "dy\"/\222A\020\n\016aperture-agent\202\323\344\223\002\026:\001*\"\021/v1/ga" +
+      "teway_checkB\260\002\n5com.fluxninja.generated." +
+      "aperture.flowcontrol.check.v1B\nCheckProt" +
+      "oP\001ZTgithub.com/fluxninja/aperture/api/g" +
+      "en/proto/go/aperture/flowcontrol/check/v" +
+      "1;checkv1\242\002\003AFC\252\002\035Aperture.Flowcontrol.C" +
+      "heck.V1\312\002\035Aperture\\Flowcontrol\\Check\\V1\342" +
+      "\002)Aperture\\Flowcontrol\\Check\\V1\\GPBMetad" +
+      "ata\352\002 Aperture::Flowcontrol::Check::V1b\006" +
+      "proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

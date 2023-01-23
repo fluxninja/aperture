@@ -249,9 +249,11 @@ paths:
       summary: GatewatCheck .
       operationId: FlowControlService_GatewayCheck
       parameters:
-      - type: string
-        name: payload
-        in: query
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/v1GatewayCheckRequest'
       responses:
         "200":
           description: A successful response.
@@ -670,6 +672,11 @@ definitions:
         x-go-validate: required
       value:
         description: Exact value that the label should be equal to.
+        type: string
+  v1GatewayCheckRequest:
+    type: object
+    properties:
+      payload:
         type: string
   v1GroupStatus:
     description: |-

@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/Henry-Sarabia/sliceconv v1.0.2
+	github.com/aws/aws-lambda-go v1.37.0
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
 	github.com/buger/jsonparser v1.1.1
 	github.com/buraksezer/olric v0.4.9

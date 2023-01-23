@@ -305,10 +305,11 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
-        - name: payload
-          in: query
-          required: false
-          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1GatewayCheckRequest'
       tags:
         - aperture-agent
   /v1/info/host:
@@ -1953,6 +1954,11 @@ definitions:
       flux_meter_name:
         type: string
     description: FluxMeterInfo describes detail for each FluxMeterInfo.
+  v1GatewayCheckRequest:
+    type: object
+    properties:
+      payload:
+        type: string
   v1GetPoliciesResponse:
     type: object
     properties:

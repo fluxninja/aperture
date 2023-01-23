@@ -55,7 +55,6 @@ func (sg *ecServiceGetter) servicesFromContext(ctx context.Context) (svcs []stri
 			log.Bug().Msg("client addr is not TCP")
 		}
 		return nil, false
-
 	}
 
 	clientIP := tcpAddr.IP.String()

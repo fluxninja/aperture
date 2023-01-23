@@ -13,7 +13,10 @@ service FlowControlService {
   rpc Check(CheckRequest) returns (CheckResponse) {}
   // GatewatCheck .
   rpc GatewayCheck(GatewayCheckRequest) returns (google.api.HttpBody) {
-    option (google.api.http) = {post: "/v1/gateway_check"};
+    option (google.api.http) = {
+      post: "/v1/gateway_check"
+      body: "*"
+    };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["aperture-agent"];
     };
