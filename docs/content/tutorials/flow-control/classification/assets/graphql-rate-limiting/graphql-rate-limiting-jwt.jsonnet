@@ -76,9 +76,7 @@ local policyDef =
     + circuit.withComponents([
       component.withRateLimiter(
         rateLimiter.new()
-        + rateLimiter.withInPorts({
-          limit: port.withConstantSignal('10.0'),
-        })
+        + rateLimiter.withInPorts({ limit: port.withConstantSignal(10.0) })
         + rateLimiter.withFlowSelector(svcSelector)
         + rateLimiter.withLimitResetInterval('1s')
         + rateLimiter.withLabelKey('user_id')

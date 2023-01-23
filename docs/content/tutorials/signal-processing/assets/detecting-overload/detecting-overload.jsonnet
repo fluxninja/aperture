@@ -51,7 +51,7 @@ local policyDef =
         + ema.withOutPortsMixin(ema.outPorts.withOutput(port.withSignalName('LATENCY_EMA')))
       ),
       component.withArithmeticCombinator(combinator.mul(port.withSignalName('LATENCY_EMA'),
-                                                        port.withConstantSignal('1.1'),
+                                                        port.withConstantSignal(1.1),
                                                         output=port.withSignalName('LATENCY_SETPOINT'))),
       component.withDecider(
         decider.new()

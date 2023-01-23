@@ -1341,6 +1341,7 @@ definitions:
       special_value:
         type: string
         title: '@gotags: validate:"oneof=NaN +Inf -Inf"'
+        x-go-validate: oneof=NaN +Inf -Inf
       value:
         type: number
         format: double

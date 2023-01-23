@@ -985,7 +985,12 @@ message PromQL {
 // Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
 message ConstantSignal {
   oneof const {
-    string special_value = 1; // @gotags: validate:"oneof=NaN +Inf -Inf"
+    string special_value = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {string_value: "oneof=NaN +Inf -Inf"}
+      }
+    }]; // @gotags: validate:"oneof=NaN +Inf -Inf"
     double value = 2;
   }
 }
