@@ -21,7 +21,7 @@ is more critical than personalized recommendations and should be prioritized
 when resources are constrained.
 
 Aperture's
-[weighted fair queueing scheduler](/concepts/flow-control/concurrency-limiter.md#scheduler)
+[weighted fair queueing scheduler](/concepts/policy/circuit/components/concurrency-limiter.md#scheduler)
 allows fairly prioriting certain flows over others based on their flow labels.
 This enables graceful degradation in face of overloads and other failures, and
 maximizes user-experience or revenue.
@@ -98,9 +98,9 @@ highlighted in the Jsonnet spec below.
 
 ### Playground
 
-The traffic generator in the [playground](/get-started/playground.md) is
-configured to generate similar traffic pattern (number of concurrent users) for
-2 types of users - subscribers and guests.
+The traffic generator in the [playground](/get-started/playground/playground.md)
+is configured to generate similar traffic pattern (number of concurrent users)
+for 2 types of users - subscribers and guests.
 
 When we load the above policy in the playground, we will see the that during the
 overload period, `subscriber` users have higher acceptance rate of their

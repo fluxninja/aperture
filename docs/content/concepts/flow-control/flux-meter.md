@@ -1,6 +1,6 @@
 ---
 title: Flux Meter
-sidebar_position: 7
+sidebar_position: 4
 keywords:
   - fluxmeter
   - histograms
@@ -109,5 +109,5 @@ down to fine-grained APIs.
 [envoy-access-log-spec]:
   https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#command-operators
 [promql-reference]: /references/configuration/policy.md#v1-prom-q-l
-[signal]: /concepts/policy/circuit.md#signal
+[signal]: /concepts/policy/circuit/circuit.md#signal
 [google-sre-slo]: https://sre.google/workbook/implementing-slos/

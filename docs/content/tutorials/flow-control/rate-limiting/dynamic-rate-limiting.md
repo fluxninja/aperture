@@ -4,7 +4,7 @@ keywords:
   - policies
   - scheduler
   - ratelimiting
-sidebar_position: 5
+sidebar_position: 3
 ---
 
 ```mdx-code-block
@@ -18,13 +18,14 @@ to flow labels. For instance, when a service is overloaded, one of the
 escalation strategies beyond concurrency limits could be to more aggressively
 restrict traffic of each user by dynamically adjusting their rate limits.
 
-To recap, [concurrency limiter](/concepts/flow-control/concurrency-limiter.md)
+To recap,
+[concurrency limiter](/concepts/policy/circuit/components/concurrency-limiter.md)
 relies on weighted-fair queueing scheduler to make flow-control decisions at the
 workload level. On the other hand, the
-[rate limiter](/concepts/flow-control/rate-limiter.md) uses a distributed cache
-to maintain global counters for each flow label (e.g. unique users) and
-restricts traffic when they exceed their allocated quota. These 2 technologies
-can be made to work together as we will see in the below example.
+[rate limiter](/concepts/policy/circuit/components/rate-limiter.md) uses a
+distributed cache to maintain global counters for each flow label (e.g. unique
+users) and restricts traffic when they exceed their allocated quota. These 2
+technologies can be made to work together as we will see in the below example.
 
 ## Policy
 
@@ -40,9 +41,9 @@ user to `10 rps` and during the overload scenario, we will completely restrict
 bot traffic (`0 rps` limit) after `30s` to further relieve the service.
 
 To accomplish this, we will be adding additional
-[components](/concepts/policy/circuit.md#component) to extend the base policy
-with this escalation logic. The additional components are highlighted in the
-Jsonnet spec below.
+[components](/concepts/policy/circuit/circuit.md#component) to extend the base
+policy with this escalation logic. The additional components are highlighted in
+the Jsonnet spec below.
 
 ```mdx-code-block
 <Tabs>
@@ -80,9 +81,9 @@ Jsonnet spec below.
 
 ### Playground
 
-The traffic generator in the [playground](/get-started/playground.md) is
-configured to generate similar traffic pattern (number of concurrent users) for
-bots as the other 2 types of users - subscribers and guests.
+The traffic generator in the [playground](/get-started/playground/playground.md)
+is configured to generate similar traffic pattern (number of concurrent users)
+for bots as the other 2 types of users - subscribers and guests.
 
 When the above policy is loaded in the playground, we see that the `bot` traffic
 is dynamically rate limited based on whether or not the service is overloaded.

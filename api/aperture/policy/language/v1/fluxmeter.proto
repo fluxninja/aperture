@@ -117,7 +117,7 @@ message FluxMeter {
   //
   // :::info
   // For list of available attributes in Envoy access logs, refer
-  // [Envoy Filter](/get-started/flow-control/envoy/istio.md#envoy-filter)
+  // [Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)
   // :::
   //
   string attribute_key = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

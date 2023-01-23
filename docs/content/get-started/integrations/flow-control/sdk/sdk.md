@@ -1,5 +1,5 @@
 ---
-title: Aperture SDK overview
+title: SDKs
 description: Setup Control Points using SDK libraries
 keywords:
   - setup
@@ -7,11 +7,11 @@ keywords:
   - control
   - points
   - sdk
-sidebar_position: 1
+sidebar_position: 3
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../../apertureVersion.js';
+import {apertureVersion} from '../../../../apertureVersion.js';
 ```
 
 For services to communicate with Aperture Agent, [Control Points][flow-control]
@@ -33,4 +33,4 @@ It also provides middlewares for popular frameworks, allowing you to easily set
 traffic Control Points within your service.
 
 [flow-control]: /concepts/flow-control/flow-control.md
-[istio]: /get-started/flow-control/envoy/istio.md
+[istio]: /get-started/integrations/flow-control/envoy/istio.md

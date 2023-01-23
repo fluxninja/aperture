@@ -185,7 +185,7 @@ func (x *Policy) GetResources() *Resources {
 // Circuit is defined as a dataflow graph of inter-connected components
 //
 // :::info
-// See also [Circuit overview](/concepts/policy/circuit.md).
+// See also [Circuit overview](/concepts/policy/circuit/circuit.md).
 // :::
 //
 // Signals flow between components via ports.
@@ -336,7 +336,7 @@ func (x *Resources) GetClassifiers() []*Classifier {
 // Computational block that form the circuit
 //
 // :::info
-// See also [Components overview](/concepts/policy/circuit.md#components).
+// See also [Components overview](/concepts/policy/circuit/circuit.md#components).
 // :::
 //
 // Signals flow into the components via input ports and results are emitted on output ports.
@@ -1458,7 +1458,7 @@ func (x *Switcher) GetOutPorts() *Switcher_Outs {
 // Limits the traffic on a control point to specified rate
 //
 // :::info
-// See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
+// See also [Rate Limiter overview](/concepts/policy/circuit/components/rate-limiter.md).
 // :::
 //
 // Ratelimiting is done separately on per-label-value basis. Use _label\_key_
@@ -1572,7 +1572,7 @@ func (x *RateLimiter) GetDefaultConfig() *RateLimiter_DynamicConfig {
 // Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 //
 // :::info
-// See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
+// See also [Concurrency Limiter overview](/concepts/policy/circuit/components/concurrency-limiter.md).
 // :::
 //
 // It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -1703,7 +1703,7 @@ type Scheduler struct {
 	//
 	// :::info
 	// See also [workload definition in the concepts
-	// section](/concepts/flow-control/concurrency-limiter.md#workload).
+	// section](/concepts/policy/circuit/components/concurrency-limiter.md#workload).
 	// :::
 	Workloads []*Scheduler_Workload `protobuf:"bytes,2,rep,name=workloads,proto3" json:"workloads,omitempty" validate:"dive"` // @gotags: validate:"dive"
 	// WorkloadParameters to be used if none of workloads specified in `workloads` match.
@@ -2288,10 +2288,9 @@ func (x *Min) GetOutPorts() *Min_Outs {
 //
 //   :::note
 //   Treating invalid inputs as "unknowns" has a consequence that the result
-//   might end up being valid even when some inputs are invalid. Eg. `unknown
-//   && false == false`, because the result would end up false no matter if
-//   first signal was true or false. On the other hand, `unknown && true ==
-//   unknown`.
+//   might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,
+//   because the result would end up false no matter if
+//   first signal was true or false. On the other hand, `unknown && true == unknown`.
 //   :::
 type And struct {
 	state         protoimpl.MessageState

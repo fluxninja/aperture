@@ -1,6 +1,6 @@
 ---
 title: Circuit
-sidebar_position: 2
+sidebar_position: 1
 ---
 
 :::info
@@ -127,4 +127,5 @@ Components are divided into following functional categories to aid exploration:
 [circuit-reference]: /references/configuration/policy.md#v1-circuit
 [promql-reference]: /references/configuration/policy.md#v1-prom-q-l
 [scheduler-reference]: /references/configuration/policy.md#v1-scheduler
-[flow-control-scheduler]: ../flow-control/concurrency-limiter.md#scheduler
+
+[flow-control-scheduler]: /components/ concurrency-limiter.md#scheduler

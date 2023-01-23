@@ -519,10 +519,9 @@ Signals are mapped to boolean values as follows:
 
   :::note
   Treating invalid inputs as "unknowns" has a consequence that the result
-  might end up being valid even when some inputs are invalid. Eg. `unknown
-&& false == false`, because the result would end up false no matter if
-  first signal was true or false. On the other hand, `unknown && true ==
-unknown`.
+  might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,
+  because the result would end up false no matter if
+  first signal was true or false. On the other hand, `unknown && true == unknown`.
   :::
 
 #### Properties
@@ -649,7 +648,7 @@ Outputs for the Arithmetic Combinator component.
 Circuit is defined as a dataflow graph of inter-connected components
 
 :::info
-See also [Circuit overview](/concepts/policy/circuit.md).
+See also [Circuit overview](/concepts/policy/circuit/circuit.md).
 :::
 
 Signals flow between components via ports.
@@ -745,7 +744,7 @@ how to extract and propagate flow labels with that key.
 Computational block that form the circuit
 
 :::info
-See also [Components overview](/concepts/policy/circuit.md#components).
+See also [Components overview](/concepts/policy/circuit/circuit.md#components).
 :::
 
 Signals flow into the components via input ports and results are emitted on output ports.
@@ -926,7 +925,7 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 
 :::info
-See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
+See also [Concurrency Limiter overview](/concepts/policy/circuit/components/concurrency-limiter.md).
 :::
 
 It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -1666,7 +1665,7 @@ selector:
 
 :::info
 For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/get-started/flow-control/envoy/istio.md#envoy-filter)
+[Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)
 :::
 
 @gotags: default:"workload_duration_ms"
@@ -2145,7 +2144,7 @@ component should apply to.
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Which [agent-group](/concepts/service.md#agent-group) this
+(string, default: `default`) Which [agent-group](/concepts/flow-control/service.md#agent-group) this
 selector applies to.
 
 @gotags: default:"default"
@@ -2727,7 +2726,7 @@ Outputs for the PulseGenerator component.
 Limits the traffic on a control point to specified rate
 
 :::info
-See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
+See also [Rate Limiter overview](/concepts/policy/circuit/components/rate-limiter.md).
 :::
 
 Ratelimiting is done separately on per-label-value basis. Use _label_key_
@@ -2988,7 +2987,7 @@ If none of workloads match, `default_workload` will be used.
 
 :::info
 See also [workload definition in the concepts
-section](/concepts/flow-control/concurrency-limiter.md#workload).
+section](/concepts/policy/circuit/components/concurrency-limiter.md#workload).
 :::
 
 @gotags: validate:"dive"
@@ -3102,7 +3101,7 @@ See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Which [agent-group](/concepts/service.md#agent-group) this
+(string, default: `default`) Which [agent-group](/concepts/flow-control/service.md#agent-group) this
 selector applies to.
 
 @gotags: default:"default"
@@ -3112,7 +3111,7 @@ selector applies to.
 <dd>
 
 (string) The Fully Qualified Domain Name of the
-[service](/concepts/service.md) to select.
+[service](/concepts/flow-control/service.md) to select.
 
 In kubernetes, this is the FQDN of the Service object.
 

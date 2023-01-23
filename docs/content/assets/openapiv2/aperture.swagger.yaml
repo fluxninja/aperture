@@ -950,10 +950,9 @@ definitions:
 
         :::note
         Treating invalid inputs as "unknowns" has a consequence that the result
-        might end up being valid even when some inputs are invalid. Eg. `unknown
-        && false == false`, because the result would end up false no matter if
-        first signal was true or false. On the other hand, `unknown && true ==
-        unknown`.
+        might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,
+        because the result would end up false no matter if
+        first signal was true or false. On the other hand, `unknown && true == unknown`.
         :::
   v1AndIns:
     type: object
@@ -1086,7 +1085,7 @@ definitions:
           @gotags: validate:"dive"
     description: |-
       :::info
-      See also [Circuit overview](/concepts/policy/circuit.md).
+      See also [Circuit overview](/concepts/policy/circuit/circuit.md).
       :::
 
       Signals flow between components via ports.
@@ -1261,7 +1260,7 @@ definitions:
         description: Generates 0 and 1 in turns.
     description: |-
       :::info
-      See also [Components overview](/concepts/policy/circuit.md#components).
+      See also [Components overview](/concepts/policy/circuit/circuit.md#components).
       :::
 
       Signals flow into the components via input ports and results are emitted on output ports.
@@ -1326,7 +1325,7 @@ definitions:
           Actuation strategy defines the input signal that will drive the scheduler.
     description: |-
       :::info
-      See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
+      See also [Concurrency Limiter overview](/concepts/policy/circuit/components/concurrency-limiter.md).
       :::
 
       It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -1844,7 +1843,7 @@ definitions:
 
           :::info
           For list of available attributes in Envoy access logs, refer
-          [Envoy Filter](/get-started/flow-control/envoy/istio.md#envoy-filter)
+          [Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)
           :::
 
           @gotags: default:"workload_duration_ms"
@@ -2217,7 +2216,7 @@ definitions:
       agent_group:
         type: string
         description: |-
-          Which [agent-group](/concepts/service.md#agent-group) this
+          Which [agent-group](/concepts/flow-control/service.md#agent-group) this
           selector applies to.
 
           @gotags: default:"default"
@@ -2775,7 +2774,7 @@ definitions:
         title: Default configuration
     description: |-
       :::info
-      See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
+      See also [Rate Limiter overview](/concepts/policy/circuit/components/rate-limiter.md).
       :::
 
       Ratelimiting is done separately on per-label-value basis. Use _label\_key_
@@ -2965,7 +2964,7 @@ definitions:
 
           :::info
           See also [workload definition in the concepts
-          section](/concepts/flow-control/concurrency-limiter.md#workload).
+          section](/concepts/policy/circuit/components/concurrency-limiter.md#workload).
           :::
 
           @gotags: validate:"dive"
@@ -3078,7 +3077,7 @@ definitions:
       agent_group:
         type: string
         description: |-
-          Which [agent-group](/concepts/service.md#agent-group) this
+          Which [agent-group](/concepts/flow-control/service.md#agent-group) this
           selector applies to.
 
           @gotags: default:"default"
@@ -3087,7 +3086,7 @@ definitions:
         type: string
         description: |-
           The Fully Qualified Domain Name of the
-          [service](/concepts/service.md) to select.
+          [service](/concepts/flow-control/service.md) to select.
 
           In kubernetes, this is the FQDN of the Service object.
 

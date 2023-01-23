@@ -96,7 +96,7 @@ service3-demo-app-788857c7cc-vlchn   2/2     Running   0          7m13s
 <Zoom>
 
 ```mermaid
-{@include: ./assets/playground/playground-app.mmd}
+{@include: ../assets/playground/playground-app.mmd}
 ```
 
 </Zoom>
@@ -137,7 +137,7 @@ reach Grafana. You can open the pre-loaded "FluxNinja" dashboard under
 
 <Zoom>
 
-![Grafana Dashboard](../tutorials/flow-control/rate-limiting/assets/dynamic-rate-limiting/dynamic-rate-limiting-playground.png)
+![Grafana Dashboard](../../tutorials/flow-control/rate-limiting/assets/dynamic-rate-limiting/dynamic-rate-limiting-playground.png)
 
 </Zoom>
 
@@ -151,7 +151,7 @@ Grafana dashboards url is
 To stop the traffic at any point of time, press the `Stop Wavepool Generator`
 button in the `DemoApplications` resource.
 
-![Stop Wavepool Generator](../assets/img/stop-traffic.png)
+![Stop Wavepool Generator](../../assets/img/stop-traffic.png)
 
 To re-start the traffic, press the `Start Wavepool Generator` button in the
 `DemoApplications` resource.

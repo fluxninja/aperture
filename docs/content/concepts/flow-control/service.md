@@ -63,8 +63,8 @@ of DaemonSet deployment or it can be a service name for sidecar deployments.
 In addition to providing scoping of services, Agent Group also defines the scope
 of **Agent-to-Agent synchronization**. Agents within their Group form a
 peer-to-peer network to synchronize fine-grained state such as per-label global
-counters that are used for [rate limiting purposes][dist-counters]. Also, all
-the agents within an Agent Group instantiate the same set of [dataplane
+counters that are used for [rate limiting purposes][dc]. Also, all the agents
+within an Agent Group instantiate the same set of [dataplane
 components][components], as published by Aperture Controller.
 
 :::
@@ -105,6 +105,6 @@ graph TB
 
 </Zoom>
 
-[dist-counters]: /concepts/flow-control/rate-limiter.md#distributed-counters
+[dc]: /concepts/policy/circuit/components/rate-limiter.md#distributed-counters
 [components]: /concepts/flow-control/flow-control.md#components
 [catch-all-service]: /concepts/flow-control/flow-selector.md#serviceselector

@@ -52,7 +52,7 @@ At a high-level, this policy consists of:
   service in each execution cycle of circuit based on the observed incoming
   concurrency.
 - Concurrency Limiting Actuator: The concurrency limits are actuated via
-  [weighted-fair queueing scheduler](/concepts/flow-control/concurrency-limiter.md).
+  [weighted-fair queueing scheduler](/concepts/policy/circuit/components/concurrency-limiter.md).
   The output of the adjustments to accepted concurrency made by gradient
   controller and optimizer logic are translated to a load multiplier that is
   synchronized with Aperture Agents via etcd. The load multiplier adjusts
@@ -95,11 +95,12 @@ At a high-level, this policy consists of:
 ### Playground
 
 When the above policy is loaded in Aperture's
-[Playground](/get-started/playground.md), we will see that as the traffic spikes
-above the concurrency limit of `service1-demo-app.demoapp.svc.cluster.local`,
-controller triggers load-shed for a proportion of requests matching the
-Selector. This helps protect the service from becoming unresponsive and keeps
-the latency within the tolerance limit (`1.1`) configured in the circuit.
+[Playground](/get-started/playground/playground.md), we will see that as the
+traffic spikes above the concurrency limit of
+`service1-demo-app.demoapp.svc.cluster.local`, controller triggers load-shed for
+a proportion of requests matching the Selector. This helps protect the service
+from becoming unresponsive and keeps the latency within the tolerance limit
+(`1.1`) configured in the circuit.
 
 <Zoom>
 
