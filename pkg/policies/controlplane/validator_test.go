@@ -126,7 +126,7 @@ spec:
       - variable:
           default_config:
             constant_signal:
-              const: 2.0
+              value: 2.0
           out_ports:
             output:
               signal_name: "EMA_LIMIT_MULTIPLIER"
@@ -154,7 +154,8 @@ spec:
               signal_name: "LATENCY_EMA"
       - variable:
           default_config:
-            constant_signal: 1.1
+            constant_signal:
+              value: 1.1
           out_ports:
             output:
               signal_name: "EMA_SETPOINT_MULTIPLIER"
@@ -228,19 +229,22 @@ spec:
                 signal_name: "LOAD_MULTIPLIER"
       - variable:
           default_config:
-            constant_signal: 2.0
+            constant_signal:
+              value: 2.0
           out_ports:
             output:
               signal_name: "CONCURRENCY_LIMIT_MULTIPLIER"
       - variable:
           default_config:
-            constant_signal: 10.0
+            constant_signal:
+              value: 10.0
           out_ports:
             output:
               signal_name: "MIN_CONCURRENCY"
       - variable:
           default_config:
-            constant_signal: 5.0
+            constant_signal:
+              value: 5.0
           out_ports:
             output:
               signal_name: "LINEAR_CONCURRENCY_INCREMENT"
@@ -282,7 +286,8 @@ spec:
               signal_name: "CONCURRENCY_INCREMENT_NORMAL"
       - variable:
           default_config:
-            constant_signal: 1.2
+            constant_signal:
+              value: 1.2
           out_ports:
             output:
               signal_name: "OVERLOAD_MULTIPLIER"
@@ -298,7 +303,8 @@ spec:
               signal_name: "LATENCY_OVERLOAD"
       - variable:
           default_config:
-            constant_signal: 10.0
+            constant_signal:
+              value: 10.0
           out_ports:
             output:
               signal_name: "CONCURRENCY_INCREMENT_OVERLOAD"
@@ -375,7 +381,8 @@ spec:
     components:
       - variable:
           default_config:
-            constant_signal: 250.0
+            constant_signal:
+              value: 250.0
           out_ports:
             output:
               signal_name: "RATE_LIMIT"
