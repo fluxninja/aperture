@@ -3,8 +3,6 @@ package runtime
 import (
 	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/mitchellh/mapstructure"
-
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 )
 
 // PortMapping is description of a component's ports mapping.
@@ -44,6 +42,12 @@ type PortMapping struct {
 	Outs map[string][]Port `mapstructure:"out_ports"`
 }
 
+// ConstantSignal is a mirror struct to same proto message.
+type ConstantSignal struct {
+	SpecialValue *string  `mapstructure:"special_value"`
+	Value        *float64 `mapstructure:"value"`
+}
+
 // PortsFromComponentConfig extracts Ports from component's config.
 func PortsFromComponentConfig(componentConfig mapstruct.Object) (PortMapping, error) {
 	var ports PortMapping
@@ -65,6 +69,6 @@ func PortsFromComponentConfig(componentConfig mapstruct.Object) (PortMapping, er
 // Only one field should be set.
 type Port struct {
 	// Note: pointers are used to detect fields being not set.
-	SignalName     *string                      `mapstructure:"signal_name"`
-	ConstantSignal *policylangv1.ConstantSignal `mapstructure:"constant_signal"`
+	SignalName     *string         `mapstructure:"signal_name"`
+	ConstantSignal *ConstantSignal `mapstructure:"constant_signal"`
 }

@@ -762,6 +762,7 @@ definitions:
       special_value:
         type: string
         title: '@gotags: validate:"oneof=NaN +Inf -Inf"'
+        x-go-validate: oneof=NaN +Inf -Inf
         x-order: 0
       value:
         type: number

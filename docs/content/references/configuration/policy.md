@@ -977,7 +977,7 @@ Special constant input for ports and Variable component. Can provide either a co
 <dt>special_value</dt>
 <dd>
 
-(string) @gotags: validate:"oneof=NaN +Inf -Inf"
+(string, `oneof=NaN +Inf -Inf`) @gotags: validate:"oneof=NaN +Inf -Inf"
 
 </dd>
 <dt>value</dt>

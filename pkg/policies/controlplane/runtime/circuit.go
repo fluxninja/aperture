@@ -3,6 +3,7 @@ package runtime
 import (
 	"context"
 	"fmt"
+	"math"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -10,7 +11,6 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policymonitoringv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/monitoring/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/metrics"
@@ -108,10 +108,25 @@ func MakeNamedSignal(name string, looped bool) Signal {
 }
 
 // MakeConstantSignal creates a new constant Signal.
-func MakeConstantSignal(constSignal *policylangv1.ConstantSignal) Signal {
+func MakeConstantSignal(constSignal *ConstantSignal) Signal {
+	value := 0.0
+	specialValue := constSignal.SpecialValue
+	if specialValue != nil && *specialValue != "" {
+		switch *specialValue {
+		case "NaN":
+			value = math.NaN()
+		case "+Inf":
+			value = math.Inf(1)
+		case "-Inf":
+			value = math.Inf(-1)
+		}
+	} else if floatValue := constSignal.Value; floatValue != nil {
+		value = *floatValue
+	}
+
 	return Signal{
 		SignalType: SignalTypeConstant,
-		Value:      constSignal.GetValue(),
+		Value:      value,
 	}
 }
 
