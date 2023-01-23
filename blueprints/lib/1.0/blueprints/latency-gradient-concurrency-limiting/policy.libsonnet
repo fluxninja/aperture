@@ -25,6 +25,7 @@ local sqrt = spec.v1.Sqrt;
 local firstValid = spec.v1.FirstValid;
 local extrapolator = spec.v1.Extrapolator;
 local integrator = spec.v1.Integrator;
+local constantSignal = spec.v1.ConstantSignal;
 
 function(params) {
   _config:: config.common + config.policy + params,

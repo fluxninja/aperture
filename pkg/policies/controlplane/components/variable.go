@@ -29,7 +29,7 @@ func (*Variable) Type() runtime.ComponentType { return runtime.ComponentTypeSour
 func NewConstantSignal(value float64) runtime.Component {
 	return &Variable{
 		constantSignal: &policylangv1.ConstantSignal{
-			Const: &policylangv1.ConstantSignal_Value{value},
+			Const: &policylangv1.ConstantSignal_Value{Value: value},
 		},
 	}
 }
@@ -64,7 +64,7 @@ func (v *Variable) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.
 	}
 
 	return runtime.PortToValue{
-		"output": []runtime.Reading{runtime.NewReading(v.constantSignal.Value)},
+		"output": []runtime.Reading{runtime.NewReading(v.constantSignal.GetValue())},
 	}, nil
 }
 

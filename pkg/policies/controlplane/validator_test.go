@@ -125,7 +125,7 @@ spec:
               signal_name: "LATENCY"
       - variable:
           default_config:
-            constant_value:
+            constant_signal:
               valid: true
               value: "2.0"
           out_ports:
@@ -155,7 +155,7 @@ spec:
               signal_name: "LATENCY_EMA"
       - variable:
           default_config:
-            constant_value:
+            constant_signal:
               valid: true
               value: "1.1"
           out_ports:
@@ -231,7 +231,7 @@ spec:
                 signal_name: "LOAD_MULTIPLIER"
       - variable:
           default_config:
-            constant_value:
+            constant_signal:
               valid: true
               value: "2.0"
           out_ports:
@@ -239,7 +239,7 @@ spec:
               signal_name: "CONCURRENCY_LIMIT_MULTIPLIER"
       - variable:
           default_config:
-            constant_value:
+            constant_signal:
               valid: true
               value: "10.0"
           out_ports:
@@ -247,7 +247,7 @@ spec:
               signal_name: "MIN_CONCURRENCY"
       - variable:
           default_config:
-            constant_value:
+            constant_signal:
               valid: true
               value: "5.0"
           out_ports:
@@ -291,7 +291,7 @@ spec:
               signal_name: "CONCURRENCY_INCREMENT_NORMAL"
       - variable:
           default_config:
-            constant_value:
+            constant_signal:
               valid: true
               value: "1.2"
           out_ports:
@@ -309,7 +309,7 @@ spec:
               signal_name: "LATENCY_OVERLOAD"
       - variable:
           default_config:
-            constant_value:
+            constant_signal:
               valid: true
               value: "10.0"
           out_ports:
@@ -388,7 +388,7 @@ spec:
     components:
       - variable:
           default_config:
-            constant_value:
+            constant_signal:
               valid: true
               value: "250.0"
           out_ports:

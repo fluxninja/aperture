@@ -15,9 +15,7 @@ spec:
             lhs:
               signal_name: LATENCY
             rhs:
-              constant_value:
-                valid: true
-                value: "2.0"
+              constant_signal: 2.0
           operator: mul
           out_ports:
             output:
@@ -27,9 +25,7 @@ spec:
             lhs:
               signal_name: LATENCY_EMA
             rhs:
-              constant_value:
-                valid: true
-                value: "1.1"
+              constant_signal: 1.1
           operator: mul
           out_ports:
             output:
@@ -47,9 +43,7 @@ spec:
       - arithmetic_combinator:
           in_ports:
             lhs:
-              constant_value:
-                valid: true
-                value: "2.0"
+              constant_signal: 2.0
             rhs:
               signal_name: ACCEPTED_CONCURRENCY
           operator: mul
@@ -59,9 +53,7 @@ spec:
       - arithmetic_combinator:
           in_ports:
             lhs:
-              constant_value:
-                valid: true
-                value: "5.0"
+              constant_signal: 5.0
             rhs:
               signal_name: SQRT_CONCURRENCY_INCREMENT
           operator: add
@@ -188,9 +180,7 @@ spec:
             lhs:
               signal_name: LOAD_MULTIPLIER
             rhs:
-              constant_value:
-                valid: true
-                value: 1
+              constant_signal: 1.0
           operator: lt
           out_ports:
             output:
@@ -199,13 +189,9 @@ spec:
       - switcher:
           in_ports:
             on_false:
-              constant_value:
-                valid: true
-                value: 10
+              constant_signal: 10.0
             on_true:
-              constant_value:
-                valid: true
-                value: 0
+              constant_signal: 0.0
             switch:
               signal_name: IS_BOT_ESCALATION
           out_ports:

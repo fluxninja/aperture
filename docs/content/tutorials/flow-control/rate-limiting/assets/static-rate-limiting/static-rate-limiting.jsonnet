@@ -32,7 +32,7 @@ local policyDef =
       component.withRateLimiter(
         rateLimiter.new()
         + rateLimiter.withInPorts({
-          limit: port.withConstantSignal(120.0),
+          limit: port.withConstantSignal('120.0'),
         })
         + rateLimiter.withFlowSelector(svcSelector)
         + rateLimiter.withLimitResetInterval('60s')

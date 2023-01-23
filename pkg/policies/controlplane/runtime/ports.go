@@ -65,6 +65,6 @@ func PortsFromComponentConfig(componentConfig mapstruct.Object) (PortMapping, er
 // Only one field should be set.
 type Port struct {
 	// Note: pointers are used to detect fields being not set.
-	SignalName    *string                      `mapstructure:"signal_name"`
-	ConstantValue *policylangv1.ConstantSignal `mapstructure:"constant_value"`
+	SignalName     *string                      `mapstructure:"signal_name"`
+	ConstantSignal *policylangv1.ConstantSignal `mapstructure:"constant_signal"`
 }

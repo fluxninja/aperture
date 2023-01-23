@@ -1,8 +1,8 @@
 local patch =
   {
     Port: {
-      withConstantSignal(constant_value):: {
-        constant_value: constant_value,
+      withConstantSignal(constant_signal):: {
+        constant_signal: constant_signal,
       },
       withSignalName(signal_name):: {
         signal_name: signal_name,

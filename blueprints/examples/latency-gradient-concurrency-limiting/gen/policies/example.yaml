@@ -15,7 +15,7 @@ spec:
             lhs:
               signal_name: LATENCY
             rhs:
-              constant_value: "2.0"
+              constant_signal: "2.0"
           operator: mul
           out_ports:
             output:
@@ -25,7 +25,7 @@ spec:
             lhs:
               signal_name: LATENCY_EMA
             rhs:
-              constant_value: "1.1"
+              constant_signal: "1.1"
           operator: mul
           out_ports:
             output:
@@ -43,7 +43,7 @@ spec:
       - arithmetic_combinator:
           in_ports:
             lhs:
-              constant_value: "2.0"
+              constant_signal: "2.0"
             rhs:
               signal_name: ACCEPTED_CONCURRENCY
           operator: mul
@@ -53,7 +53,7 @@ spec:
       - arithmetic_combinator:
           in_ports:
             lhs:
-              constant_value: "5.0"
+              constant_signal: "5.0"
             rhs:
               signal_name: SQRT_CONCURRENCY_INCREMENT
           operator: add

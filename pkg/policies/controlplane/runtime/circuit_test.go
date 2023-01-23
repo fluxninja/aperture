@@ -16,14 +16,14 @@ var _ = Describe("Circuit", func() {
 				in_ports:
 					inputs:
 						- { signal_name: SUM }
-						- { constant_value: {value: 0.0, valid: true }}
+						- { constant_signal: {value: 0.0, valid: true }}
 				out_ports:
 					output: { signal_name: SUM_OR_ZERO }
 			- arithmetic_combinator:
 				operator: add
 				in_ports:
 					lhs: { signal_name: SUM_OR_ZERO }
-					rhs: { constant_value: {value: 1.0, valid: true }}
+					rhs: { constant_signal: {value: 1.0, valid: true }}
 				out_ports:
 					output: { signal_name: SUM }
 			`,

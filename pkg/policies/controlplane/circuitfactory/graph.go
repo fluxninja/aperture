@@ -40,7 +40,7 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 				} else if signal.SignalType == runtime.SignalTypeConstant {
 					inPorts = append(inPorts, &policymonitoringv1.PortView{
 						PortName: name,
-						Value:    &policymonitoringv1.PortView_ConstantValue{ConstantValue: signal.Value},
+						Value:    &policymonitoringv1.PortView_ConstantSignal{ConstantSignal: signal.Value},
 					})
 				}
 			}
@@ -96,7 +96,7 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 		componentDescription := ""
 		switch componentName {
 		case "Variable":
-			componentDescription = fmt.Sprintf("%0.2f", componentConfig["constantValue"])
+			componentDescription = fmt.Sprintf("%0.2f", componentConfig["constantSignal"])
 		case "ArithmeticCombinator":
 			componentDescription = fmt.Sprintf("%s", componentConfig["operator"])
 		case "Decider":
@@ -173,7 +173,7 @@ func Mermaid(components []*policymonitoringv1.ComponentView, links []*policymoni
 		var s strings.Builder
 		if component.ComponentName == "Variable" {
 			// lookup value in component.Component struct
-			value := component.Component.Fields["constantValue"].GetNumberValue()
+			value := component.Component.Fields["constantSignal"].GetNumberValue()
 			outPort := component.OutPorts[0].PortName
 			// render constant as a circle with value
 			s.WriteString(fmt.Sprintf("%s((%0.2f))\n", component.ComponentId+outPort, value))
@@ -242,11 +242,11 @@ func Mermaid(components []*policymonitoringv1.ComponentView, links []*policymoni
 		}
 		// fake nodes for constant value ports
 		for _, inPort := range c.InPorts {
-			if constValue, ok := inPort.GetValue().(*policymonitoringv1.PortView_ConstantValue); ok {
+			if constValue, ok := inPort.GetValue().(*policymonitoringv1.PortView_ConstantSignal); ok {
 				// Concatenate fakeConstant prefix to constantComponentID to avoid collision with real component IDs
 				constantComponentID := fmt.Sprintf("%s%d", fakeConstantPrefix, constantID)
 				constantID++
-				sb.WriteString(fmt.Sprintf("%s((%0.2f))\n", constantComponentID, constValue.ConstantValue))
+				sb.WriteString(fmt.Sprintf("%s((%0.2f))\n", constantComponentID, constValue.ConstantSignal))
 				// link constant to component
 				sb.WriteString(fmt.Sprintf("%s --> %s\n", constantComponentID, c.ComponentId+inPort.PortName))
 			}
@@ -285,9 +285,9 @@ func DOT(components []*policymonitoringv1.ComponentView, links []*policymonitori
 			anyIn = cluster.Node(inPort.PortName)
 			cluster.AddToSameRank("input", anyIn)
 			// fake nodes for constant value ports
-			if constValue, ok := inPort.GetValue().(*policymonitoringv1.PortView_ConstantValue); ok {
+			if constValue, ok := inPort.GetValue().(*policymonitoringv1.PortView_ConstantSignal); ok {
 				// Concatenate fakeConstant prefix to constantComponentID to avoid collision with real component IDs
-				fromNode := cluster.Node(fmt.Sprintf("%0.2f", constValue.ConstantValue))
+				fromNode := cluster.Node(fmt.Sprintf("%0.2f", constValue.ConstantSignal))
 				// link constant to component
 				cluster.Edge(fromNode, anyIn)
 			}

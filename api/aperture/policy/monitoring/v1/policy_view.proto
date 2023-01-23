@@ -12,7 +12,7 @@ message PortView {
     // Name of the Signal on the Port.
     string signal_name = 2;
     // Constant value at an incoming Port
-    double constant_value = 3;
+    double constant_signal = 3;
   }
   // True if port is looped.
   bool looped = 4;
