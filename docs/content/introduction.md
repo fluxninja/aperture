@@ -123,9 +123,8 @@ adaptive cruise control in some automobiles.
 Aperture can be inserted into service instances with either _Service Meshes_ or
 _SDKs_:
 
-- [Service Meshes](./get-started/integrations/flow-control/envoy): Aperture can
-  be deployed with no changes to application code, using
-  [Envoy](https://www.envoyproxy.io/). It latches onto Envoy’s
+- Service Meshes: Aperture can be deployed with no changes to application code,
+  using [Envoy](https://www.envoyproxy.io/). It latches onto Envoy’s
   [External Authorization API](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter)
   for control purposes and collects access logs for telemetry purposes. On each
   request, Envoy sends request metadata to the Aperture Agent for a flow control
@@ -135,11 +134,10 @@ _SDKs_:
   [OpenTelemetry](https://opentelemetry.io/) tracing protocol as it inserts flow
   classification labels into requests, enabling visualization in tracing tools
   such as [Jaeger](https://www.jaegertracing.io/).
-- [Aperture SDKs](./get-started/integrations/flow-control/sdk/sdk.md): In
-  addition to service mesh insertion, Aperture provides SDKs that can be used by
-  developers to achieve fine-grained flow control at the feature level inside
-  service code. For example, an e-commerce app may prioritize users in the
-  checkout flow over new sessions when the application is experiencing an
-  overload. The Aperture Controller can be programmed to degrade features as an
-  escalated recovery action when basic load shedding is triggered for several
-  minutes.
+- Aperture SDKs: In addition to service mesh insertion, Aperture provides SDKs
+  that can be used by developers to achieve fine-grained flow control at the
+  feature level inside service code. For example, an e-commerce app may
+  prioritize users in the checkout flow over new sessions when the application
+  is experiencing an overload. The Aperture Controller can be programmed to
+  degrade features as an escalated recovery action when basic load shedding is
+  triggered for several minutes.
