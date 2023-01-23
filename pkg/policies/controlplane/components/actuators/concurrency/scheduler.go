@@ -46,7 +46,7 @@ type Scheduler struct {
 	writer           *etcdwriter.Writer
 	agentGroupName   string
 	etcdPath         string
-	componentIndex   int
+	componentID      string
 }
 
 // Name implements runtime.Component.
@@ -58,12 +58,12 @@ func (*Scheduler) Type() runtime.ComponentType { return runtime.ComponentTypeSou
 // NewSchedulerAndOptions creates scheduler and its fx options.
 func NewSchedulerAndOptions(
 	schedulerProto *policylangv1.Scheduler,
-	componentIndex int,
+	componentID string,
 	policyReadAPI iface.Policy,
 	agentGroupName string,
 ) (runtime.Component, fx.Option, error) {
 	etcdPath := path.Join(paths.AutoTokenResultsPath,
-		paths.AgentComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex)))
+		paths.AgentComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), componentID))
 
 	scheduler := &Scheduler{
 		policyReadAPI: policyReadAPI,
@@ -71,18 +71,18 @@ func NewSchedulerAndOptions(
 			TokensByWorkloadIndex: make(map[string]uint64),
 		},
 		agentGroupName: agentGroupName,
-		componentIndex: componentIndex,
+		componentID:    componentID,
 		etcdPath:       etcdPath,
 	}
 
 	// Prepare parameters for prometheus queries
-	policyParams := fmt.Sprintf("%s=\"%s\",%s=\"%s\",%s=\"%d\"",
+	policyParams := fmt.Sprintf("%s=\"%s\",%s=\"%s\",%s=\"%s\"",
 		metrics.PolicyNameLabel,
 		policyReadAPI.GetPolicyName(),
 		metrics.PolicyHashLabel,
 		policyReadAPI.GetPolicyHash(),
-		metrics.ComponentIndexLabel,
-		componentIndex,
+		metrics.ComponentIDLabel,
+		componentID,
 	)
 
 	acceptedQuery, acceptedQueryOptions, acceptedQueryErr := promql.NewScalarQueryAndOptions(
@@ -90,7 +90,7 @@ func NewSchedulerAndOptions(
 			metrics.AcceptedConcurrencyMetricName,
 			policyParams),
 		concurrencyQueryInterval,
-		componentIndex,
+		componentID,
 		policyReadAPI,
 		"AcceptedConcurrency",
 	)
@@ -104,7 +104,7 @@ func NewSchedulerAndOptions(
 			metrics.IncomingConcurrencyMetricName,
 			policyParams),
 		concurrencyQueryInterval,
-		componentIndex,
+		componentID,
 		policyReadAPI,
 		"IncomingConcurrency",
 	)
@@ -128,7 +128,7 @@ func NewSchedulerAndOptions(
 				metrics.WorkloadLatencyCountMetricName,
 				autoTokensPolicyParams),
 			tokensQueryInterval,
-			componentIndex,
+			componentID,
 			policyReadAPI,
 			"Tokens",
 		)
@@ -263,9 +263,9 @@ func (s *Scheduler) publishQueryTokens(tokens *policysyncv1.TokensDecision) erro
 	wrapper := &policysyncv1.TokensDecisionWrapper{
 		TokensDecision: tokens,
 		CommonAttributes: &policysyncv1.CommonAttributes{
-			PolicyName:     policyName,
-			PolicyHash:     policyHash,
-			ComponentIndex: int64(s.componentIndex),
+			PolicyName:  policyName,
+			PolicyHash:  policyHash,
+			ComponentId: s.componentID,
 		},
 	}
 	dat, err := proto.Marshal(wrapper)

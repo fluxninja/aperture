@@ -23,7 +23,7 @@ func (*Switcher) Type() runtime.ComponentType { return runtime.ComponentTypeSign
 var _ runtime.Component = (*Switcher)(nil)
 
 // NewSwitcherAndOptions creates a new Switcher Component.
-func NewSwitcherAndOptions(switcherProto *policylangv1.Switcher, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewSwitcherAndOptions(_ *policylangv1.Switcher, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	switcher := Switcher{}
 	return &switcher, fx.Options(), nil
 }

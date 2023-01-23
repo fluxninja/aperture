@@ -31,7 +31,7 @@ func FactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 // NewComponentAndOptions creates component and its fx options.
 func NewComponentAndOptions(
 	componentProto *policylangv1.Component,
-	componentIndex int,
+	componentID string,
 	policyReadAPI iface.Policy,
 ) (runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
 	var ctor componentConstructor
@@ -77,15 +77,15 @@ func NewComponentAndOptions(
 	case *policylangv1.Component_PulseGenerator:
 		ctor = mkCtor(config.PulseGenerator, components.NewPulseGeneratorAndOptions)
 	default:
-		return newComponentStackAndOptions(componentProto, componentIndex, policyReadAPI)
+		return newComponentStackAndOptions(componentProto, componentID, policyReadAPI)
 	}
 
-	component, config, option, err := ctor(componentIndex, policyReadAPI)
+	component, config, option, err := ctor(componentID, policyReadAPI)
 	if err != nil {
 		return runtime.ConfiguredComponent{}, nil, nil, err
 	}
 
-	configuredComponent, err := prepareComponent(component, config)
+	configuredComponent, err := prepareComponent(component, config, componentID)
 	if err != nil {
 		return runtime.ConfiguredComponent{}, nil, nil, err
 	}
@@ -94,16 +94,16 @@ func NewComponentAndOptions(
 }
 
 type componentConstructor func(
-	componentIdx int,
+	componentID string,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, any, fx.Option, error)
 
 func mkCtor[Config any, Comp runtime.Component](
 	config *Config,
-	origCtor func(*Config, int, iface.Policy) (Comp, fx.Option, error),
+	origCtor func(*Config, string, iface.Policy) (Comp, fx.Option, error),
 ) componentConstructor {
-	return func(idx int, policy iface.Policy) (runtime.Component, any, fx.Option, error) {
-		comp, opt, err := origCtor(config, idx, policy)
+	return func(componentID string, policy iface.Policy) (runtime.Component, any, fx.Option, error) {
+		comp, opt, err := origCtor(config, componentID, policy)
 		return comp, config, opt, err
 	}
 }
@@ -111,6 +111,7 @@ func mkCtor[Config any, Comp runtime.Component](
 func prepareComponent(
 	component runtime.Component,
 	config any,
+	componentID string,
 ) (runtime.ConfiguredComponent, error) {
 	mapStruct, err := mapstruct.EncodeObject(config)
 	if err != nil {
@@ -126,5 +127,6 @@ func prepareComponent(
 		Component:   component,
 		PortMapping: ports,
 		Config:      mapStruct,
+		ComponentID: componentID,
 	}, nil
 }

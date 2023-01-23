@@ -98,9 +98,9 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 	logger := c.registry.GetLogger()
 	appendNewClassifier := func(labelerWithSelector *compiler.LabelerWithSelector, error flowcontrolv1.ClassifierInfo_Error) {
 		classifierMsgs = append(classifierMsgs, &flowcontrolv1.ClassifierInfo{
-			PolicyName:      labelerWithSelector.CommonAttributes.PolicyName,
-			PolicyHash:      labelerWithSelector.CommonAttributes.PolicyHash,
-			ClassifierIndex: labelerWithSelector.CommonAttributes.ComponentIndex,
+			PolicyName:      labelerWithSelector.ClassifierAttributes.PolicyName,
+			PolicyHash:      labelerWithSelector.ClassifierAttributes.PolicyHash,
+			ClassifierIndex: labelerWithSelector.ClassifierAttributes.ClassifierIndex,
 			LabelKey:        labelerWithSelector.Labeler.LabelName,
 			Error:           error,
 		})

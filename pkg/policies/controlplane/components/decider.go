@@ -61,7 +61,7 @@ func (*Decider) Type() runtime.ComponentType { return runtime.ComponentTypeSigna
 var _ runtime.Component = (*Decider)(nil)
 
 // NewDeciderAndOptions creates timed controller and its fx options.
-func NewDeciderAndOptions(deciderProto *policylangv1.Decider, _ int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewDeciderAndOptions(deciderProto *policylangv1.Decider, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	operator, err := comparisonOperatorString(deciderProto.Operator)
 	if err != nil {
 		return nil, fx.Options(), err

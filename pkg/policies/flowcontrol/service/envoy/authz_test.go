@@ -139,10 +139,10 @@ var hardcodedRegoRules = policysyncv1.ClassifierWrapper{
 			},
 		},
 	},
-	CommonAttributes: &policysyncv1.CommonAttributes{
-		PolicyName:     "test",
-		PolicyHash:     "test",
-		ComponentIndex: 0,
+	ClassifierAttributes: &policysyncv1.ClassifierAttributes{
+		PolicyName:      "test",
+		PolicyHash:      "test",
+		ClassifierIndex: 0,
 	},
 }
 

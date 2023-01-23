@@ -2,7 +2,6 @@ package circuitfactory
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/emicklei/dot"
@@ -23,7 +22,7 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 	}
 	outSignalsIndex := make(map[string][]componentData)
 	inSignalsIndex := make(map[string][]componentData)
-	for componentIndex, c := range circuit.outerComponents {
+	for _, c := range circuit.outerComponents {
 		var inPorts, outPorts []*policymonitoringv1.PortView
 		for name, signals := range c.PortMapping.Ins {
 			for _, signal := range signals {
@@ -35,7 +34,7 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 						Looped:   signal.Looped,
 					})
 					inSignalsIndex[signalName] = append(inSignalsIndex[signalName], componentData{
-						componentID: strconv.Itoa(componentIndex),
+						componentID: c.ComponentID,
 						portName:    name,
 					})
 				} else if signal.SignalType() == runtime.SignalTypeConstant {
@@ -55,7 +54,7 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 					Looped:   signal.Looped,
 				})
 				outSignalsIndex[signalName] = append(outSignalsIndex[signalName], componentData{
-					componentID: strconv.Itoa(componentIndex),
+					componentID: c.ComponentID,
 					portName:    name,
 				})
 			}
@@ -115,7 +114,7 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 		}
 
 		componentsDTO = append(componentsDTO, &policymonitoringv1.ComponentView{
-			ComponentId:          strconv.Itoa(componentIndex),
+			ComponentId:          c.ComponentID,
 			ComponentName:        componentName,
 			ComponentDescription: componentDescription,
 			ComponentType:        string(c.Type()),

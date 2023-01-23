@@ -37,7 +37,7 @@ var (
 	fxNameTag = config.NameTag("concurrency_limiter_watcher")
 
 	// Array of Label Keys for WFQ and Token Bucket Metrics.
-	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel}
+	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel}
 )
 
 // concurrencyLimiterModule returns the fx options for flowcontrol side pieces of concurrency limiter in the main fx app.
@@ -160,7 +160,7 @@ func setupConcurrencyLimiterFactory(
 		Name: metrics.WorkloadLatencyMetricName,
 		Help: "Latency summary of workload",
 	}, []string{
-		metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel,
+		metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel,
 		metrics.WorkloadIndexLabel,
 	})
 
@@ -168,7 +168,7 @@ func setupConcurrencyLimiterFactory(
 		Name: metrics.WorkloadCounterMetricName,
 		Help: "Counter of workload requests",
 	}, []string{
-		metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel,
+		metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel,
 		metrics.DecisionTypeLabel,
 		metrics.WorkloadIndexLabel,
 	})
@@ -362,7 +362,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	metricLabels := make(prometheus.Labels)
 	metricLabels[metrics.PolicyNameLabel] = conLimiter.GetPolicyName()
 	metricLabels[metrics.PolicyHashLabel] = conLimiter.GetPolicyHash()
-	metricLabels[metrics.ComponentIndexLabel] = strconv.FormatInt(conLimiter.GetComponentIndex(), 10)
+	metricLabels[metrics.ComponentIDLabel] = conLimiter.GetComponentId()
 	// Create sub components.
 	clock := clockwork.NewRealClock()
 	loadActuator, err := loadActuatorFactory.newLoadActuator(conLimiter.concurrencyLimiterMsg.GetLoadActuator(), conLimiter, conLimiter.registry, clock, lifecycle, metricLabels)
@@ -372,7 +372,7 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	if conLimiter.schedulerParameters.AutoTokens {
 		autoTokens, err := autoTokensFactory.newAutoTokens(
 			conLimiter.GetPolicyName(), conLimiter.GetPolicyHash(),
-			lifecycle, conLimiter.GetComponentIndex(), conLimiter.registry)
+			lifecycle, conLimiter.GetComponentId(), conLimiter.registry)
 		if err != nil {
 			return err
 		}
@@ -565,10 +565,10 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 	}
 
 	return &flowcontrolv1.LimiterDecision{
-		PolicyName:     conLimiter.GetPolicyName(),
-		PolicyHash:     conLimiter.GetPolicyHash(),
-		ComponentIndex: conLimiter.GetComponentIndex(),
-		Dropped:        !accepted,
+		PolicyName:  conLimiter.GetPolicyName(),
+		PolicyHash:  conLimiter.GetPolicyHash(),
+		ComponentId: conLimiter.GetComponentId(),
+		Dropped:     !accepted,
 		Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
 			ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 				WorkloadIndex: matchedWorkloadIndex,
@@ -581,9 +581,9 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 func (conLimiter *concurrencyLimiter) GetLimiterID() iface.LimiterID {
 	// TODO: move this to limiter base.
 	return iface.LimiterID{
-		PolicyName:     conLimiter.GetPolicyName(),
-		PolicyHash:     conLimiter.GetPolicyHash(),
-		ComponentIndex: conLimiter.GetComponentIndex(),
+		PolicyName:  conLimiter.GetPolicyName(),
+		PolicyHash:  conLimiter.GetPolicyHash(),
+		ComponentID: conLimiter.GetComponentId(),
 	}
 }
 

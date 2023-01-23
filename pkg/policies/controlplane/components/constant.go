@@ -26,7 +26,7 @@ func (*Constant) Type() runtime.ComponentType { return runtime.ComponentTypeSour
 func NewConstant(value float64) runtime.Component { return &Constant{value: value} }
 
 // NewConstantAndOptions creates a constant components and its fx options.
-func NewConstantAndOptions(constant *policylangv1.Constant, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewConstantAndOptions(constant *policylangv1.Constant, _ string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	return NewConstant(constant.Value), fx.Options(), nil
 }
 

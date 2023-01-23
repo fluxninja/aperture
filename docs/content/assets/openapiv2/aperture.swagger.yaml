@@ -1198,10 +1198,9 @@ definitions:
       policy_hash:
         type: string
         description: Hash of the entire Policy spec.
-      component_index:
+      component_id:
         type: string
-        format: int64
-        description: The index of Component of within the circuit or classifier index.
+        description: The id of Component within the circuit.
   v1Component:
     type: object
     properties:
@@ -2408,9 +2407,8 @@ definitions:
         type: string
       policy_hash:
         type: string
-      component_index:
+      component_id:
         type: string
-        format: int64
       dropped:
         type: boolean
       reason:

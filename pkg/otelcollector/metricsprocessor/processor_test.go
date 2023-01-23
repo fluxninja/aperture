@@ -68,23 +68,23 @@ var _ = Describe("Metrics Processor", func() {
 			Name: m.WorkloadLatencyMetricName,
 			Help: "dummy",
 		}, []string{
-			m.PolicyNameLabel, m.PolicyHashLabel, m.ComponentIndexLabel,
+			m.PolicyNameLabel, m.PolicyHashLabel, m.ComponentIDLabel,
 			m.WorkloadIndexLabel,
 		})
 		counterVec = prometheus.NewCounterVec(prometheus.CounterOpts{
 			Name: m.WorkloadCounterMetricName,
 			Help: "dummy",
 		}, []string{
-			m.PolicyNameLabel, m.PolicyHashLabel, m.ComponentIndexLabel,
+			m.PolicyNameLabel, m.PolicyHashLabel, m.ComponentIDLabel,
 			m.WorkloadIndexLabel, m.DecisionTypeLabel,
 		})
 		rateCounter = prometheus.NewCounter(prometheus.CounterOpts{
 			Name: m.RateLimiterCounterMetricName,
 			Help: "dummy",
 			ConstLabels: prometheus.Labels{
-				m.PolicyNameLabel:     "foo",
-				m.PolicyHashLabel:     "foo-hash",
-				m.ComponentIndexLabel: "2",
+				m.PolicyNameLabel:  "foo",
+				m.PolicyHashLabel:  "foo-hash",
+				m.ComponentIDLabel: "2",
 			},
 		})
 		classifierCounter = prometheus.NewCounter(prometheus.CounterOpts{
@@ -110,10 +110,10 @@ var _ = Describe("Metrics Processor", func() {
 			DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED,
 			LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 				{
-					PolicyName:     "foo",
-					PolicyHash:     "foo-hash",
-					ComponentIndex: 1,
-					Dropped:        true,
+					PolicyName:  "foo",
+					PolicyHash:  "foo-hash",
+					ComponentId: "1",
+					Dropped:     true,
 					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
 						ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 							WorkloadIndex: "0",
@@ -123,22 +123,22 @@ var _ = Describe("Metrics Processor", func() {
 			},
 		}
 		labelsFoo1 = map[string]string{
-			m.PolicyNameLabel:     "foo",
-			m.PolicyHashLabel:     "foo-hash",
-			m.ComponentIndexLabel: "1",
-			m.WorkloadIndexLabel:  "0",
+			m.PolicyNameLabel:    "foo",
+			m.PolicyHashLabel:    "foo-hash",
+			m.ComponentIDLabel:   "1",
+			m.WorkloadIndexLabel: "0",
 		}
 		labelsFizz1 = map[string]string{
-			m.PolicyNameLabel:     "fizz",
-			m.PolicyHashLabel:     "fizz-hash",
-			m.ComponentIndexLabel: "1",
-			m.WorkloadIndexLabel:  "1",
+			m.PolicyNameLabel:    "fizz",
+			m.PolicyHashLabel:    "fizz-hash",
+			m.ComponentIDLabel:   "1",
+			m.WorkloadIndexLabel: "1",
 		}
 		labelsFizz2 = map[string]string{
-			m.PolicyNameLabel:     "fizz",
-			m.PolicyHashLabel:     "fizz-hash",
-			m.ComponentIndexLabel: "2",
-			m.WorkloadIndexLabel:  "2",
+			m.PolicyNameLabel:    "fizz",
+			m.PolicyHashLabel:    "fizz-hash",
+			m.ComponentIDLabel:   "2",
+			m.WorkloadIndexLabel: "2",
 		}
 		engine.EXPECT().GetConcurrencyLimiter(gomock.Any()).Return(conLimiter).AnyTimes()
 		engine.EXPECT().GetRateLimiter(gomock.Any()).Return(rateLimiter).AnyTimes()
@@ -185,10 +185,10 @@ var _ = Describe("Metrics Processor", func() {
 
 	It("Processes logs for single policy - ingress", func() {
 		rateLimiterDecision := &flowcontrolv1.LimiterDecision{
-			PolicyName:     "foo",
-			PolicyHash:     "foo-hash",
-			ComponentIndex: 2,
-			Dropped:        true,
+			PolicyName:  "foo",
+			PolicyHash:  "foo-hash",
+			ComponentId: "2",
+			Dropped:     true,
 			Details: &flowcontrolv1.LimiterDecision_RateLimiterInfo_{
 				RateLimiterInfo: &flowcontrolv1.LimiterDecision_RateLimiterInfo{
 					Remaining: 1,
@@ -212,14 +212,14 @@ var _ = Describe("Metrics Processor", func() {
 		// <split> is a workaround until PR https://github.com/prometheus/client_golang/pull/1143 is released
 		expectedMetrics = `# HELP classifier_counter dummy
 # TYPE classifier_counter counter
-classifier_counter{component_index="1",policy_hash="foo-hash",policy_name="foo"} 1
+classifier_counter{component_id="1",policy_hash="foo-hash",policy_name="foo"} 1
 <split># HELP rate_limiter_counter dummy
 # TYPE rate_limiter_counter counter
-rate_limiter_counter{component_index="2",policy_hash="foo-hash",policy_name="foo"} 1
+rate_limiter_counter{component_id="2",policy_hash="foo-hash",policy_name="foo"} 1
 <split># HELP workload_latency_ms dummy
 # TYPE workload_latency_ms summary
-workload_latency_ms_sum{component_index="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+workload_latency_ms_sum{component_id="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+workload_latency_ms_count{component_id="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 `
 
 		expectedLabels = map[string]interface{}{
@@ -233,12 +233,12 @@ workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name
 
 			oc.ApertureFluxMetersLabel:                  []interface{}{"bar"},
 			oc.ApertureFlowLabelKeysLabel:               []interface{}{"someLabel"},
-			oc.ApertureRateLimitersLabel:                []interface{}{"policy_name:foo,component_index:2,policy_hash:foo-hash"},
-			oc.ApertureDroppingRateLimitersLabel:        []interface{}{"policy_name:foo,component_index:2,policy_hash:foo-hash"},
-			oc.ApertureConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
-			oc.ApertureDroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
-			oc.ApertureWorkloadsLabel:                   []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
-			oc.ApertureDroppingWorkloadsLabel:           []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
+			oc.ApertureRateLimitersLabel:                []interface{}{"policy_name:foo,component_id:2,policy_hash:foo-hash"},
+			oc.ApertureDroppingRateLimitersLabel:        []interface{}{"policy_name:foo,component_id:2,policy_hash:foo-hash"},
+			oc.ApertureConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
+			oc.ApertureDroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
+			oc.ApertureWorkloadsLabel:                   []interface{}{"policy_name:foo,component_id:1,workload_index:0,policy_hash:foo-hash"},
+			oc.ApertureDroppingWorkloadsLabel:           []interface{}{"policy_name:foo,component_id:1,workload_index:0,policy_hash:foo-hash"},
 
 			oc.ApertureProcessingDurationLabel: float64(1000),
 			oc.ApertureServicesLabel:           []interface{}{"svc1", "svc2"},
@@ -255,10 +255,10 @@ workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name
 		conLimiter.EXPECT().GetRequestCounter(insertRejectLabel(labelsFoo1)).Return(counter).Times(1)
 
 		labels := map[string]string{
-			m.PolicyNameLabel:     "foo",
-			m.PolicyHashLabel:     "foo-hash",
-			m.ComponentIndexLabel: "2",
-			m.DecisionTypeLabel:   "DECISION_TYPE_REJECTED",
+			m.PolicyNameLabel:   "foo",
+			m.PolicyHashLabel:   "foo-hash",
+			m.ComponentIDLabel:  "2",
+			m.DecisionTypeLabel: "DECISION_TYPE_REJECTED",
 		}
 
 		rateLimiter.EXPECT().GetRequestCounter(labels).Return(rateCounter).Times(1)
@@ -271,8 +271,8 @@ workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name
 
 		expectedMetrics = `# HELP workload_latency_ms dummy
 # TYPE workload_latency_ms summary
-workload_latency_ms_sum{component_index="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+workload_latency_ms_sum{component_id="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+workload_latency_ms_count{component_id="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
 `
 
 		expectedLabels = map[string]interface{}{
@@ -280,10 +280,10 @@ workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name
 			oc.ApertureRejectReasonLabel:                "REJECT_REASON_RATE_LIMITED",
 			oc.ApertureRateLimitersLabel:                []interface{}{},
 			oc.ApertureDroppingRateLimitersLabel:        []interface{}{},
-			oc.ApertureConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
-			oc.ApertureDroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
-			oc.ApertureWorkloadsLabel:                   []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
-			oc.ApertureDroppingWorkloadsLabel:           []interface{}{"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash"},
+			oc.ApertureConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
+			oc.ApertureDroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
+			oc.ApertureWorkloadsLabel:                   []interface{}{"policy_name:foo,component_id:1,workload_index:0,policy_hash:foo-hash"},
+			oc.ApertureDroppingWorkloadsLabel:           []interface{}{"policy_name:foo,component_id:1,workload_index:0,policy_hash:foo-hash"},
 		}
 		source = oc.ApertureSourceSDK
 
@@ -298,10 +298,10 @@ workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name
 	It("Processes logs for two policies - ingress", func() {
 		baseCheckResp.LimiterDecisions = append(baseCheckResp.LimiterDecisions,
 			&flowcontrolv1.LimiterDecision{
-				PolicyName:     "fizz",
-				PolicyHash:     "fizz-hash",
-				ComponentIndex: 1,
-				Dropped:        true,
+				PolicyName:  "fizz",
+				PolicyHash:  "fizz-hash",
+				ComponentId: "1",
+				Dropped:     true,
 				Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
 					ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 						WorkloadIndex: "1",
@@ -309,10 +309,10 @@ workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name
 				},
 			},
 			&flowcontrolv1.LimiterDecision{
-				PolicyName:     "fizz",
-				PolicyHash:     "fizz-hash",
-				ComponentIndex: 2,
-				Dropped:        false,
+				PolicyName:  "fizz",
+				PolicyHash:  "fizz-hash",
+				ComponentId: "2",
+				Dropped:     false,
 				Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
 					ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 						WorkloadIndex: "2",
@@ -322,12 +322,12 @@ workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name
 
 		expectedMetrics = `# HELP workload_latency_ms dummy
 # TYPE workload_latency_ms summary
-workload_latency_ms_sum{component_index="1",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 5
-workload_latency_ms_count{component_index="1",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 1
-workload_latency_ms_sum{component_index="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
-workload_latency_ms_count{component_index="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
-workload_latency_ms_sum{component_index="2",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 5
-workload_latency_ms_count{component_index="2",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
+workload_latency_ms_sum{component_id="1",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 5
+workload_latency_ms_count{component_id="1",policy_hash="fizz-hash",policy_name="fizz",workload_index="1"} 1
+workload_latency_ms_sum{component_id="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 5
+workload_latency_ms_count{component_id="1",policy_hash="foo-hash",policy_name="foo",workload_index="0"} 1
+workload_latency_ms_sum{component_id="2",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 5
+workload_latency_ms_count{component_id="2",policy_hash="fizz-hash",policy_name="fizz",workload_index="2"} 1
 `
 
 		expectedLabels = map[string]interface{}{
@@ -335,22 +335,22 @@ workload_latency_ms_count{component_index="2",policy_hash="fizz-hash",policy_nam
 			oc.ApertureRateLimitersLabel:         []interface{}{},
 			oc.ApertureDroppingRateLimitersLabel: []interface{}{},
 			oc.ApertureConcurrencyLimitersLabel: []interface{}{
-				"policy_name:foo,component_index:1,policy_hash:foo-hash",
-				"policy_name:fizz,component_index:1,policy_hash:fizz-hash",
-				"policy_name:fizz,component_index:2,policy_hash:fizz-hash",
+				"policy_name:foo,component_id:1,policy_hash:foo-hash",
+				"policy_name:fizz,component_id:1,policy_hash:fizz-hash",
+				"policy_name:fizz,component_id:2,policy_hash:fizz-hash",
 			},
 			oc.ApertureDroppingConcurrencyLimitersLabel: []interface{}{
-				"policy_name:foo,component_index:1,policy_hash:foo-hash",
-				"policy_name:fizz,component_index:1,policy_hash:fizz-hash",
+				"policy_name:foo,component_id:1,policy_hash:foo-hash",
+				"policy_name:fizz,component_id:1,policy_hash:fizz-hash",
 			},
 			oc.ApertureWorkloadsLabel: []interface{}{
-				"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash",
-				"policy_name:fizz,component_index:1,workload_index:1,policy_hash:fizz-hash",
-				"policy_name:fizz,component_index:2,workload_index:2,policy_hash:fizz-hash",
+				"policy_name:foo,component_id:1,workload_index:0,policy_hash:foo-hash",
+				"policy_name:fizz,component_id:1,workload_index:1,policy_hash:fizz-hash",
+				"policy_name:fizz,component_id:2,workload_index:2,policy_hash:fizz-hash",
 			},
 			oc.ApertureDroppingWorkloadsLabel: []interface{}{
-				"policy_name:foo,component_index:1,workload_index:0,policy_hash:foo-hash",
-				"policy_name:fizz,component_index:1,workload_index:1,policy_hash:fizz-hash",
+				"policy_name:foo,component_id:1,workload_index:0,policy_hash:foo-hash",
+				"policy_name:fizz,component_id:1,workload_index:1,policy_hash:fizz-hash",
 			},
 		}
 		source = oc.ApertureSourceEnvoy

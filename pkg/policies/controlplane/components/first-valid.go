@@ -22,7 +22,7 @@ func (*FirstValid) Type() runtime.ComponentType { return runtime.ComponentTypeSi
 var _ runtime.Component = (*FirstValid)(nil)
 
 // NewFirstValidAndOptions creates a new FirstValid component and its Fx option.
-func NewFirstValidAndOptions(firstValidProto *policylangv1.FirstValid, componentIndex int, policyReadAPI iface.Policy) (*FirstValid, fx.Option, error) {
+func NewFirstValidAndOptions(firstValidProto *policylangv1.FirstValid, _ string, policyReadAPI iface.Policy) (*FirstValid, fx.Option, error) {
 	return &FirstValid{}, fx.Options(), nil
 }
 

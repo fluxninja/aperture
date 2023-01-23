@@ -139,16 +139,16 @@ func (c *ClassificationEngine) invokeMiniApp(
 	classifier := Classifier{
 		classifierProto: wrapperMessage.GetClassifier(),
 		classifierID: iface.ClassifierID{
-			PolicyName:      wrapperMessage.CommonAttributes.PolicyName,
-			PolicyHash:      wrapperMessage.CommonAttributes.PolicyHash,
-			ClassifierIndex: wrapperMessage.CommonAttributes.ComponentIndex,
+			PolicyName:      wrapperMessage.ClassifierAttributes.PolicyName,
+			PolicyHash:      wrapperMessage.ClassifierAttributes.PolicyHash,
+			ClassifierIndex: wrapperMessage.ClassifierAttributes.ClassifierIndex,
 		},
 	}
 
 	metricLabels := make(prometheus.Labels)
-	metricLabels[metrics.PolicyNameLabel] = wrapperMessage.CommonAttributes.GetPolicyName()
-	metricLabels[metrics.PolicyHashLabel] = wrapperMessage.CommonAttributes.GetPolicyHash()
-	metricLabels[metrics.ClassifierIndexLabel] = strconv.FormatInt(wrapperMessage.CommonAttributes.GetComponentIndex(), 10)
+	metricLabels[metrics.PolicyNameLabel] = wrapperMessage.ClassifierAttributes.GetPolicyName()
+	metricLabels[metrics.PolicyHashLabel] = wrapperMessage.ClassifierAttributes.GetPolicyHash()
+	metricLabels[metrics.ClassifierIndexLabel] = strconv.FormatInt(wrapperMessage.ClassifierAttributes.GetClassifierIndex(), 10)
 
 	lc.Append(
 		fx.Hook{

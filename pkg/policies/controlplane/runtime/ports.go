@@ -106,7 +106,8 @@ const (
 // Only one field should be set.
 type Signal struct {
 	// Note: pointers are used to detect fields being not set.
-	SignalName    string  `mapstructure:"signal_name"`
+	SignalName    string `mapstructure:"signal_name"`
+	CircuitID     string
 	ConstantValue float64 `mapstructure:"constant_value"`
 	Looped        bool
 }

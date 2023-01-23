@@ -22,7 +22,7 @@ func componentStackFactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.O
 // newComponentStackAndOptions creates components for component stack, sub components and their fx options.
 func newComponentStackAndOptions(
 	componentStackProto *policylangv1.Component,
-	componentStackIndex int,
+	componentStackID string,
 	policyReadAPI iface.Policy,
 ) (runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
 	// Factory parser to determine what kind of component stack to create
@@ -32,7 +32,7 @@ func newComponentStackAndOptions(
 			options              []fx.Option
 		)
 		portMapping := runtime.NewPortMapping()
-		concurrencyLimiterOptions, agentGroupName, concurrencyLimiterErr := concurrency.NewConcurrencyLimiterOptions(concurrencyLimiterProto, componentStackIndex, policyReadAPI)
+		concurrencyLimiterOptions, agentGroupName, concurrencyLimiterErr := concurrency.NewConcurrencyLimiterOptions(concurrencyLimiterProto, componentStackID, policyReadAPI)
 		if concurrencyLimiterErr != nil {
 			return runtime.ConfiguredComponent{}, nil, nil, concurrencyLimiterErr
 		}
@@ -41,12 +41,14 @@ func newComponentStackAndOptions(
 
 		// Scheduler
 		if schedulerProto := concurrencyLimiterProto.GetScheduler(); schedulerProto != nil {
-			scheduler, schedulerOptions, err := concurrency.NewSchedulerAndOptions(schedulerProto, componentStackIndex, policyReadAPI, agentGroupName)
+			// Use the same id as the component stack since agent sees only the component stack and generates metrics tagged with the component stack id
+			scheduler, schedulerOptions, err := concurrency.NewSchedulerAndOptions(schedulerProto, componentStackID, policyReadAPI, agentGroupName)
 			if err != nil {
 				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
 
-			schedulerConfComp, err := prepareComponent(scheduler, schedulerProto)
+			// Need a unique ID for sub component since it's used for graph generation
+			schedulerConfComp, err := prepareComponent(scheduler, schedulerProto, componentStackID+".Scheduler")
 			if err != nil {
 				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
@@ -66,12 +68,12 @@ func newComponentStackAndOptions(
 
 		// Actuation Strategy
 		if loadActuatorProto := concurrencyLimiterProto.GetLoadActuator(); loadActuatorProto != nil {
-			loadActuator, loadActuatorOptions, err := concurrency.NewLoadActuatorAndOptions(loadActuatorProto, componentStackIndex, policyReadAPI, agentGroupName)
+			loadActuator, loadActuatorOptions, err := concurrency.NewLoadActuatorAndOptions(loadActuatorProto, componentStackID, policyReadAPI, agentGroupName)
 			if err != nil {
 				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
 
-			loadActuatorConfComp, err := prepareComponent(loadActuator, loadActuatorProto)
+			loadActuatorConfComp, err := prepareComponent(loadActuator, loadActuatorProto, componentStackID+".LoadActuator")
 			if err != nil {
 				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
@@ -91,23 +93,22 @@ func newComponentStackAndOptions(
 		concurrencyLimiterConfComp, err := prepareComponent(
 			runtime.NewDummyComponent("ConcurrencyLimiter", runtime.ComponentTypeSignalProcessor),
 			concurrencyLimiterProto,
+			componentStackID,
 		)
 		if err != nil {
 			return runtime.ConfiguredComponent{}, nil, nil, err
 		}
 
-		return runtime.ConfiguredComponent{
-			Component:   concurrencyLimiterConfComp.Component,
-			PortMapping: portMapping,
-			Config:      concurrencyLimiterConfComp.Config,
-		}, configuredComponents, fx.Options(options...), nil
+		concurrencyLimiterConfComp.PortMapping = portMapping
+
+		return concurrencyLimiterConfComp, configuredComponents, fx.Options(options...), nil
 	} else if horizontalPodScalerProto := componentStackProto.GetHorizontalPodScaler(); horizontalPodScalerProto != nil {
 		var (
 			configuredComponents []runtime.ConfiguredComponent
 			options              []fx.Option
 		)
 		portMapping := runtime.NewPortMapping()
-		horizontalPodScalerOptions, agentGroupName, horizontalPodScalerErr := horizontalpodscaler.NewHorizontalPodScalerOptions(horizontalPodScalerProto, componentStackIndex, policyReadAPI)
+		horizontalPodScalerOptions, agentGroupName, horizontalPodScalerErr := horizontalpodscaler.NewHorizontalPodScalerOptions(horizontalPodScalerProto, componentStackID, policyReadAPI)
 		if horizontalPodScalerErr != nil {
 			return runtime.ConfiguredComponent{}, nil, nil, horizontalPodScalerErr
 		}
@@ -116,12 +117,12 @@ func newComponentStackAndOptions(
 
 		// Scale Reporter
 		if scaleReporterProto := horizontalPodScalerProto.GetScaleReporter(); scaleReporterProto != nil {
-			scaleReporter, scaleReporterOptions, err := horizontalpodscaler.NewScaleReporterAndOptions(scaleReporterProto, componentStackIndex, policyReadAPI, agentGroupName)
+			scaleReporter, scaleReporterOptions, err := horizontalpodscaler.NewScaleReporterAndOptions(scaleReporterProto, componentStackID, policyReadAPI, agentGroupName)
 			if err != nil {
 				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
 
-			scaleReporterConfComp, err := prepareComponent(scaleReporter, scaleReporterProto)
+			scaleReporterConfComp, err := prepareComponent(scaleReporter, scaleReporterProto, componentStackID+".ScaleReporter")
 			if err != nil {
 				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
@@ -141,12 +142,12 @@ func newComponentStackAndOptions(
 
 		// Scale Actuator
 		if scaleActuatorProto := horizontalPodScalerProto.GetScaleActuator(); scaleActuatorProto != nil {
-			scaleActuator, scaleActuatorOptions, err := horizontalpodscaler.NewScaleActuatorAndOptions(scaleActuatorProto, componentStackIndex, policyReadAPI, agentGroupName)
+			scaleActuator, scaleActuatorOptions, err := horizontalpodscaler.NewScaleActuatorAndOptions(scaleActuatorProto, componentStackID, policyReadAPI, agentGroupName)
 			if err != nil {
 				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
 
-			scaleActuatorConfComp, err := prepareComponent(scaleActuator, scaleActuatorProto)
+			scaleActuatorConfComp, err := prepareComponent(scaleActuator, scaleActuatorProto, componentStackID+".ScaleActuator")
 			if err != nil {
 				return runtime.ConfiguredComponent{}, nil, nil, err
 			}
@@ -166,6 +167,7 @@ func newComponentStackAndOptions(
 		horizontalPodScalerConfComp, err := prepareComponent(
 			runtime.NewDummyComponent("HorizontalPodScaler", runtime.ComponentTypeSignalProcessor),
 			horizontalPodScalerProto,
+			componentStackID,
 		)
 		if err != nil {
 			return runtime.ConfiguredComponent{}, nil, nil, err
@@ -176,6 +178,14 @@ func newComponentStackAndOptions(
 			PortMapping: portMapping,
 			Config:      horizontalPodScalerConfComp.Config,
 		}, configuredComponents, fx.Options(options...), nil
-	}
+	} /* else if nestedCircuitProto := componentStackProto.GetNestedCircuit(); nestedCircuitProto != nil {
+			var (
+				configuredComponents []runtime.ConfiguredComponent
+				options              []fx.Option
+			)
+			portMapping := runtime.NewPortMapping()
+
+
+	  }*/
 	return runtime.ConfiguredComponent{}, nil, nil, fmt.Errorf("unsupported/missing component type")
 }

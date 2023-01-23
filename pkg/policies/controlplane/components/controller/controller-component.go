@@ -24,7 +24,7 @@ type ControllerComponent struct {
 	defaultConfig    *policylangv1.ControllerDynamicConfig
 	dynamicConfigKey string
 	componentName    string
-	componentIndex   int
+	componentID      string
 	manualMode       bool
 }
 
@@ -32,7 +32,7 @@ type ControllerComponent struct {
 func NewControllerComponent(
 	controller Controller,
 	componentName string,
-	componentIndex int,
+	componentID string,
 	policyReadAPI iface.Policy,
 	dynamicConfigKey string,
 	defaultConfig *policylangv1.ControllerDynamicConfig,
@@ -44,7 +44,7 @@ func NewControllerComponent(
 		output:           runtime.InvalidReading(),
 		controller:       controller,
 		componentName:    componentName,
-		componentIndex:   componentIndex,
+		componentID:      componentID,
 		policyReadAPI:    policyReadAPI,
 		dynamicConfigKey: dynamicConfigKey,
 		defaultConfig:    defaultConfig,

@@ -29,12 +29,12 @@ type Outputs map[string][]Reading
 
 // Circuit is a simulated circuit intended to be used in tests.
 type Circuit struct {
+	time    time.Time // virtual time of next tick
 	meta    *simPolicyMeta
 	circuit *rt.Circuit
 	inputs  Inputs
 	outputs map[string]*output
 	tickNo  int
-	time    time.Time // virtual time of next tick
 }
 
 // NewCircuitFromYaml creates a new simulated Circuit based on yaml circuit description.
@@ -60,7 +60,7 @@ func NewCircuitFromYaml(
 
 	policyMeta := newSimPolicyMeta(circuitProto.EvaluationInterval.AsDuration())
 
-	components, _, _, err := circuitfactory.CreateComponents(circuitProto.Components, policyMeta)
+	components, _, _, err := circuitfactory.CreateComponents(circuitProto.Components, "root", policyMeta)
 	if err != nil {
 		return nil, err
 	}

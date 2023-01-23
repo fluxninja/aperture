@@ -35,7 +35,7 @@ func (*Alerter) Type() runtime.ComponentType { return runtime.ComponentTypeSink 
 var _ runtime.Component = (*Alerter)(nil)
 
 // NewAlerterAndOptions creates alerter and its fx options.
-func NewAlerterAndOptions(alerterProto *policylangv1.Alerter, _ int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewAlerterAndOptions(alerterProto *policylangv1.Alerter, _ string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	alerter := &Alerter{
 		name:           alerterProto.AlerterConfig.AlertName,
 		severity:       alerterProto.AlerterConfig.Severity,

@@ -97,8 +97,8 @@ const (
 	PolicyNameLabel = "policy_name"
 	// PolicyHashLabel - label used in prometheus.
 	PolicyHashLabel = "policy_hash"
-	// ComponentIndexLabel - index of component in circuit label.
-	ComponentIndexLabel = "component_index"
+	// ComponentIDLabel - index of component in circuit label.
+	ComponentIDLabel = "component_id"
 	// DecisionTypeLabel - label for decision type dropped or accepted.
 	DecisionTypeLabel = "decision_type"
 	// WorkloadIndexLabel - label for choosing correct workload.

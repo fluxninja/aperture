@@ -24,7 +24,7 @@ var _ Controller = (*GradientController)(nil)
 // NewGradientControllerAndOptions creates a Gradient Controller Component and its fx options.
 func NewGradientControllerAndOptions(
 	gradientControllerProto *policylangv1.GradientController,
-	componentIndex int,
+	componentID string,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
 	gradientParameters := gradientControllerProto.GetGradientParameters()
@@ -42,7 +42,7 @@ func NewGradientControllerAndOptions(
 	controller := NewControllerComponent(
 		gradient,
 		"Gradient",
-		componentIndex,
+		componentID,
 		policyReadAPI,
 		gradientControllerProto.DynamicConfigKey,
 		gradientControllerProto.DefaultConfig,

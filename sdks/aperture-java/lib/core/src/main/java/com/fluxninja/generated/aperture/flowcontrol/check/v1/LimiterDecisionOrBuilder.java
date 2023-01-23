@@ -32,10 +32,16 @@ public interface LimiterDecisionOrBuilder extends
       getPolicyHashBytes();
 
   /**
-   * <code>int64 component_index = 3 [json_name = "componentIndex"];</code>
-   * @return The componentIndex.
+   * <code>string component_id = 3 [json_name = "componentId"];</code>
+   * @return The componentId.
    */
-  long getComponentIndex();
+  java.lang.String getComponentId();
+  /**
+   * <code>string component_id = 3 [json_name = "componentId"];</code>
+   * @return The bytes for componentId.
+   */
+  com.google.protobuf.ByteString
+      getComponentIdBytes();
 
   /**
    * <code>bool dropped = 4 [json_name = "dropped"];</code>

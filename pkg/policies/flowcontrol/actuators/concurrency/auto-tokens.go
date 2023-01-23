@@ -64,7 +64,7 @@ func (atFactory *autoTokensFactory) newAutoTokens(
 	policyName,
 	policyHash string,
 	lc fx.Lifecycle,
-	componentIdx int64,
+	componentID string,
 	registry status.Registry,
 ) (*autoTokens, error) {
 	at := &autoTokens{
@@ -74,7 +74,7 @@ func (atFactory *autoTokensFactory) newAutoTokens(
 		policyName:            policyName,
 		policyHash:            policyHash,
 		tokensDecisionWatcher: atFactory.tokensDecisionWatcher,
-		componentIdx:          componentIdx,
+		componentID:           componentID,
 		registry:              registry,
 	}
 	logger := at.registry.GetLogger()
@@ -86,7 +86,7 @@ func (atFactory *autoTokensFactory) newAutoTokens(
 	}
 
 	tokensNotifier := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(paths.AgentComponentKey(atFactory.agentGroup, at.policyName, at.componentIdx)),
+		notifiers.Key(paths.AgentComponentKey(atFactory.agentGroup, at.policyName, at.componentID)),
 		unmarshaller,
 		at.tokenUpdateCallback,
 	)
@@ -113,7 +113,7 @@ type autoTokens struct {
 	tokensDecision        *policysyncv1.TokensDecision
 	policyName            string
 	policyHash            string
-	componentIdx          int64
+	componentID           string
 }
 
 func (at *autoTokens) tokenUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
