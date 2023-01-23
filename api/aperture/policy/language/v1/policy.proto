@@ -207,8 +207,17 @@ message Component {
     // Generates 0 and 1 in turns.
     PulseGenerator pulse_generator = 22;
 
+    // Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
+    NestedCircuit nested_circuit = 23;
+
+    // Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
+    NestedSignalIngress nested_signal_ingress = 24;
+
+    // Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
+    NestedSignalEgress nested_signal_egress = 25;
+
     // High level concurrency control component. Baselines a signal and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of signal from the baseline. Internally implemented as a nested circuit.
-    ConcurrencyController concurrency_controller = 23;
+    ConcurrencyController concurrency_controller = 26;
   }
 }
 
@@ -380,8 +389,8 @@ message ControllerDynamicConfig {
 // Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings
 //
 // At any time EMA component operates in one of the following states:
-// 1. Warm up state: The first warm_up_window samples are used to compute the initial EMA.
-//    If an invalid reading is received during the warm_up_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
+// 1. Warm up state: The first warmup_window samples are used to compute the initial EMA.
+//    If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
 // 2. Normal state: The EMA is computed using following formula.
 //
 // The EMA for a series $Y$ is calculated recursively as:
@@ -1417,6 +1426,48 @@ message PulseGenerator {
       value: {string_value: "5s"}
     }
   }]; // @gotags: default:"5s"
+}
+
+// Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
+message NestedCircuit {
+  message InPorts {
+    repeated InPort in_ports_list = 1;
+  }
+
+  message OutPorts {
+    repeated OutPort out_ports_list = 1;
+  }
+
+  map<string, InPorts> in_ports_map = 1;
+  map<string, OutPorts> out_ports_map = 2;
+
+  repeated Component components = 3; // @gotags: validate:"dive"
+}
+
+// Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
+message NestedSignalIngress {
+  // Outputs for the NestedSignalIngress component.
+  message Outs {
+    // The signal to be ingressed.
+    OutPort signal = 1;
+  }
+
+  // Output ports for the NestedSignalIngress component.
+  Outs out_ports = 1;
+  string port_name = 2;
+}
+
+// Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
+message NestedSignalEgress {
+  // Inputs for the NestedSignalEgress component.
+  message Ins {
+    // The signal to be egressed.
+    InPort signal = 1;
+  }
+
+  // Input ports for the NestedSignalEgress component.
+  Ins in_ports = 1;
+  string port_name = 2;
 }
 
 // High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.

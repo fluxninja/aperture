@@ -61,7 +61,6 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 			}
 		}
 		componentConfig := c.Config
-		log.Info().Msgf("component index: %v", componentIndex)
 		componentMap, err := structpb.NewStruct(componentConfig)
 		if err != nil {
 			log.Error().Err(err).Msg("converting component map")

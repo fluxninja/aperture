@@ -140,7 +140,7 @@ spec:
               signal_name: "MAX_EMA"
       - ema:
           ema_window: "300s"
-          warm_up_window: "10s"
+          warmup_window: "10s"
           correction_factor_on_max_envelope_violation: "0.95"
           in_ports:
             input:
@@ -166,9 +166,10 @@ spec:
             output:
               signal_name: "LATENCY_SETPOINT"
       - gradient_controller:
-          slope: -1
-          min_gradient: "0.1"
-          max_gradient: "1.0"
+          gradient_parameters:
+            slope: -1
+            min_gradient: "0.1"
+            max_gradient: "1.0"
           in_ports:
             signal:
               signal_name: "LATENCY"
@@ -200,20 +201,21 @@ spec:
             flow_matcher:
               control_point: "ingress"
           scheduler:
-            auto_tokens: true
-            default_workload_parameters:
-              priority: 20
-            workloads:
-              - workload_parameters:
-                  priority: 50
-                label_matcher:
-                  match_labels:
-                    user_type: "guest"
-              - workload_parameters:
-                  priority: 200
-                label_matcher:
-                  match_labels:
-                    http.request.header.user_type: "subscriber"
+            scheduler_parameters:
+              auto_tokens: true
+              default_workload_parameters:
+                priority: 20
+              workloads:
+                - workload_parameters:
+                    priority: 50
+                  label_matcher:
+                    match_labels:
+                      user_type: "guest"
+                - workload_parameters:
+                    priority: 200
+                  label_matcher:
+                    match_labels:
+                      http.request.header.user_type: "subscriber"
             out_ports:
               accepted_concurrency:
                 signal_name: "ACCEPTED_CONCURRENCY"

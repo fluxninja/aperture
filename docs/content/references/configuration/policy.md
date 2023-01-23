@@ -260,6 +260,32 @@ eg. {any: {of: [expr1, expr2]}}.
 </dd>
 </dl>
 
+### NestedCircuitInPorts {#nested-circuit-in-ports}
+
+#### Properties
+
+<dl>
+<dt>in_ports_list</dt>
+<dd>
+
+([[]V1InPort](#v1-in-port))
+
+</dd>
+</dl>
+
+### NestedCircuitOutPorts {#nested-circuit-out-ports}
+
+#### Properties
+
+<dl>
+<dt>out_ports_list</dt>
+<dd>
+
+([[]V1OutPort](#v1-out-port))
+
+</dd>
+</dl>
+
 ### RateLimiterLazySync {#rate-limiter-lazy-sync}
 
 #### Properties
@@ -917,6 +943,24 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([V1PulseGenerator](#v1-pulse-generator)) Generates 0 and 1 in turns.
 
 </dd>
+<dt>nested_circuit</dt>
+<dd>
+
+([V1NestedCircuit](#v1-nested-circuit)) Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
+
+</dd>
+<dt>nested_signal_ingress</dt>
+<dd>
+
+([V1NestedSignalIngress](#v1-nested-signal-ingress)) Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
+
+</dd>
+<dt>nested_signal_egress</dt>
+<dd>
+
+([V1NestedSignalEgress](#v1-nested-signal-egress)) Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
+
+</dd>
 <dt>concurrency_controller</dt>
 <dd>
 
@@ -1312,8 +1356,8 @@ Exponential Moving Average (EMA) is a type of moving average that applies expone
 
 At any time EMA component operates in one of the following states:
 
-1. Warm up state: The first warm_up_window samples are used to compute the initial EMA.
-   If an invalid reading is received during the warm_up_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
+1. Warm up state: The first warmup_window samples are used to compute the initial EMA.
+   If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
 2. Normal state: The EMA is computed using following formula.
 
 The EMA for a series $Y$ is calculated recursively as:
@@ -2632,6 +2676,105 @@ Output ports for the Min component.
 <dd>
 
 ([V1OutPort](#v1-out-port)) Signal with minimum value as an output signal.
+
+</dd>
+</dl>
+
+### v1NestedCircuit {#v1-nested-circuit}
+
+Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
+
+#### Properties
+
+<dl>
+<dt>in_ports_map</dt>
+<dd>
+
+(map of [NestedCircuitInPorts](#nested-circuit-in-ports))
+
+</dd>
+<dt>out_ports_map</dt>
+<dd>
+
+(map of [NestedCircuitOutPorts](#nested-circuit-out-ports))
+
+</dd>
+<dt>components</dt>
+<dd>
+
+([[]V1Component](#v1-component)) @gotags: validate:"dive"
+
+</dd>
+</dl>
+
+### v1NestedSignalEgress {#v1-nested-signal-egress}
+
+Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1NestedSignalEgressIns](#v1-nested-signal-egress-ins)) Input ports for the NestedSignalEgress component.
+
+</dd>
+<dt>port_name</dt>
+<dd>
+
+(string)
+
+</dd>
+</dl>
+
+### v1NestedSignalEgressIns {#v1-nested-signal-egress-ins}
+
+Inputs for the NestedSignalEgress component.
+
+#### Properties
+
+<dl>
+<dt>signal</dt>
+<dd>
+
+([V1InPort](#v1-in-port)) The signal to be egressed.
+
+</dd>
+</dl>
+
+### v1NestedSignalIngress {#v1-nested-signal-ingress}
+
+Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
+
+#### Properties
+
+<dl>
+<dt>out_ports</dt>
+<dd>
+
+([V1NestedSignalIngressOuts](#v1-nested-signal-ingress-outs)) Output ports for the NestedSignalIngress component.
+
+</dd>
+<dt>port_name</dt>
+<dd>
+
+(string)
+
+</dd>
+</dl>
+
+### v1NestedSignalIngressOuts {#v1-nested-signal-ingress-outs}
+
+Outputs for the NestedSignalIngress component.
+
+#### Properties
+
+<dl>
+<dt>signal</dt>
+<dd>
+
+([V1OutPort](#v1-out-port)) The signal to be ingressed.
 
 </dd>
 </dl>

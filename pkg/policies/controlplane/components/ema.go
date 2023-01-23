@@ -34,7 +34,7 @@ type EMA struct {
 	// The correction factor on the minimum relative to the signal
 	correctionFactorOnMinViolation float64
 	currentStage                   stage
-	// The initial value of EMA is the average of the first warm_up_window number of observations.
+	// The initial value of EMA is the average of the first warmup_window number of observations.
 	warmupWindow      uint32
 	emaWindow         uint32
 	warmupCount       uint32

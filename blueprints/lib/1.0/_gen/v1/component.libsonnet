@@ -103,6 +103,24 @@
   withMinMixin(min):: {
     min+: min,
   },
+  withNestedCircuit(nested_circuit):: {
+    nested_circuit: nested_circuit,
+  },
+  withNestedCircuitMixin(nested_circuit):: {
+    nested_circuit+: nested_circuit,
+  },
+  withNestedSignalEgress(nested_signal_egress):: {
+    nested_signal_egress: nested_signal_egress,
+  },
+  withNestedSignalEgressMixin(nested_signal_egress):: {
+    nested_signal_egress+: nested_signal_egress,
+  },
+  withNestedSignalIngress(nested_signal_ingress):: {
+    nested_signal_ingress: nested_signal_ingress,
+  },
+  withNestedSignalIngressMixin(nested_signal_ingress):: {
+    nested_signal_ingress+: nested_signal_ingress,
+  },
   withOr(or):: {
     or: or,
   },

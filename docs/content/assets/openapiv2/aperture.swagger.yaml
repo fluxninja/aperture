@@ -592,6 +592,20 @@ definitions:
         description: List of subexpressions of the match expression.
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     title: List of MatchExpressions that is used for all/any matching
+  NestedCircuitInPorts:
+    type: object
+    properties:
+      in_ports_list:
+        type: array
+        items:
+          $ref: '#/definitions/v1InPort'
+  NestedCircuitOutPorts:
+    type: object
+    properties:
+      out_ports_list:
+        type: array
+        items:
+          $ref: '#/definitions/v1OutPort'
   PreviewFlowLabelsResponseFlowLabels:
     type: object
     properties:
@@ -1259,6 +1273,15 @@ definitions:
       pulse_generator:
         $ref: '#/definitions/v1PulseGenerator'
         description: Generates 0 and 1 in turns.
+      nested_circuit:
+        $ref: '#/definitions/v1NestedCircuit'
+        description: Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
+      nested_signal_ingress:
+        $ref: '#/definitions/v1NestedSignalIngress'
+        description: Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
+      nested_signal_egress:
+        $ref: '#/definitions/v1NestedSignalEgress'
+        description: Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
       concurrency_controller:
         $ref: '#/definitions/v1ConcurrencyController'
         description: High level concurrency control component. Baselines a signal and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of signal from the baseline. Internally implemented as a nested circuit.
@@ -1635,8 +1658,8 @@ definitions:
         x-go-default: false
     description: |-
       At any time EMA component operates in one of the following states:
-      1. Warm up state: The first warm_up_window samples are used to compute the initial EMA.
-         If an invalid reading is received during the warm_up_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
+      1. Warm up state: The first warmup_window samples are used to compute the initial EMA.
+         If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
       2. Normal state: The EMA is computed using following formula.
 
       The EMA for a series $Y$ is calculated recursively as:
@@ -2558,6 +2581,55 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Signal with minimum value as an output signal.
     description: Output ports for the Min component.
+  v1NestedCircuit:
+    type: object
+    properties:
+      in_ports_map:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/NestedCircuitInPorts'
+      out_ports_map:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/NestedCircuitOutPorts'
+      components:
+        type: array
+        items:
+          $ref: '#/definitions/v1Component'
+        title: '@gotags: validate:"dive"'
+    description: Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
+  v1NestedSignalEgress:
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/v1NestedSignalEgressIns'
+        description: Input ports for the NestedSignalEgress component.
+      port_name:
+        type: string
+    description: Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
+  v1NestedSignalEgressIns:
+    type: object
+    properties:
+      signal:
+        $ref: '#/definitions/v1InPort'
+        description: The signal to be egressed.
+    description: Inputs for the NestedSignalEgress component.
+  v1NestedSignalIngress:
+    type: object
+    properties:
+      out_ports:
+        $ref: '#/definitions/v1NestedSignalIngressOuts'
+        description: Output ports for the NestedSignalIngress component.
+      port_name:
+        type: string
+    description: Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
+  v1NestedSignalIngressOuts:
+    type: object
+    properties:
+      signal:
+        $ref: '#/definitions/v1OutPort'
+        description: The signal to be ingressed.
+    description: Outputs for the NestedSignalIngress component.
   v1Network:
     type: object
     properties:

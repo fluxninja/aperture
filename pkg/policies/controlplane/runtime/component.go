@@ -58,4 +58,4 @@ func (c dummyComponent) DynamicConfigUpdate(event notifiers.Event, unmarshaller 
 func (c dummyComponent) Name() string { return c.name }
 
 // Type implements runtime.Component.
-func (c dummyComponent) Type() ComponentType { return ComponentTypeStandAlone }
+func (c dummyComponent) Type() ComponentType { return c.componentType }

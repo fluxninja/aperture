@@ -34,7 +34,7 @@ func CompileFromProto(
 	componentsProto []*policylangv1.Component,
 	policyReadAPI iface.Policy,
 ) (*Circuit, fx.Option, error) {
-	configuredComponents, graphNodes, option, err := CreateComponents(componentsProto, policyReadAPI)
+	configuredComponents, outerComponents, option, err := CreateComponents(componentsProto, policyReadAPI)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -49,7 +49,7 @@ func CompileFromProto(
 
 	return &Circuit{
 		components:      configuredComponents,
-		outerComponents: graphNodes,
+		outerComponents: outerComponents,
 	}, option, nil
 }
 
@@ -68,8 +68,7 @@ func CreateComponents(
 	)
 
 	for compIndex, componentProto := range componentsProto {
-		// Create graphNode
-		graphNode, subComponents, compOption, err := NewComponentAndOptions(
+		outerComponent, subComponents, compOption, err := NewComponentAndOptions(
 			componentProto,
 			compIndex,
 			policyReadAPI,
@@ -79,8 +78,8 @@ func CreateComponents(
 		}
 		options = append(options, compOption)
 
-		// Add graphNode to graphNodes
-		outerComponents = append(outerComponents, graphNode)
+		// Add outerComponent to outerComponents
+		outerComponents = append(outerComponents, outerComponent)
 
 		// Add subComponents to configuredComponents
 		configuredComponents = append(configuredComponents, subComponents...)
