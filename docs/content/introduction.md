@@ -1,11 +1,11 @@
 ---
 title: Introduction
-slug: /introduction/introduction
 sidebar_position: 1
+sidebar_class_name: introduction
 description:
   Introduction to FluxNinja Aperture, an open-source flow control and
   reliability management platform for modern web applications.
-image: ../assets/img/aperture_logo.png
+image: /assets/img/aperture_logo.png
 keywords:
   - reliability
   - overload
@@ -14,6 +14,7 @@ keywords:
   - fluxninja
   - microservices
   - cloud
+  - flow control
 ---
 
 ```mdx-code-block
@@ -31,7 +32,7 @@ modern web applications.
 <Zoom>
 
 ```mermaid
-{@include: ../assets/diagrams/architecture/architecture_simple.mmd}
+{@include: assets/diagrams/architecture/architecture_simple.mmd}
 ```
 
 </Zoom>
@@ -47,8 +48,8 @@ service, kick-starting a positive feedback loop and causing
 The application stops serving responses in a timely manner and critical end-user
 transactions are interrupted.
 
-![Absence of flow control](../assets/img/no-flow-control.png#gh-light-mode-only)
-![Absence of flow control](../assets/img/no-flow-control-dark.png#gh-dark-mode-only)
+![Absence of flow control](assets/img/no-flow-control.png#gh-light-mode-only)
+![Absence of flow control](assets/img/no-flow-control-dark.png#gh-dark-mode-only)
 
 Applications are governed by
 [Little’s Law](https://en.wikipedia.org/wiki/Little%27s_law), which describes
@@ -61,8 +62,8 @@ users are insufficient in protecting services. Autoscaling is slow to respond
 and can be cost-prohibitive. As the number of services scales, these techniques
 get harder to deploy.
 
-![Reliability with flow control](../assets/img/active-flow-control.png#gh-light-mode-only)
-![Reliability with flow control](../assets/img/active-flow-control-dark.png#gh-dark-mode-only)
+![Reliability with flow control](assets/img/active-flow-control.png#gh-light-mode-only)
+![Reliability with flow control](assets/img/active-flow-control-dark.png#gh-dark-mode-only)
 
 This is where flow control comes in. Applications can degrade gracefully in
 real-time when using flow control techniques with Aperture, by prioritizing
@@ -73,8 +74,8 @@ high-importance features over others.
 At the fundamental level, Aperture enables flow control through observing,
 analyzing, and actuating, facilitated by agents and a controller.
 
-![Aperture Control Loop](../assets/img/oaalight.png#gh-light-mode-only)
-![Aperture Control Loop](../assets/img/oaadark.png#gh-dark-mode-only)
+![Aperture Control Loop](assets/img/oaalight.png#gh-light-mode-only)
+![Aperture Control Loop](assets/img/oaadark.png#gh-dark-mode-only)
 
 ### Aperture Agents
 
@@ -119,11 +120,12 @@ adaptive cruise control in some automobiles.
 
 ### Deploying Aperture
 
-Aperture can be inserted into service instances with either Service Meshes or
-SDKs:
+Aperture can be inserted into service instances with either _Service Meshes_ or
+_SDKs_:
 
-- Service Mesh: Aperture can be deployed with no changes to application code,
-  using [Envoy](https://www.envoyproxy.io/). It latches onto Envoy’s
+- [Service Meshes](./get-started/integrations/flow-control/envoy): Aperture can
+  be deployed with no changes to application code, using
+  [Envoy](https://www.envoyproxy.io/). It latches onto Envoy’s
   [External Authorization API](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter)
   for control purposes and collects access logs for telemetry purposes. On each
   request, Envoy sends request metadata to the Aperture Agent for a flow control
@@ -133,10 +135,11 @@ SDKs:
   [OpenTelemetry](https://opentelemetry.io/) tracing protocol as it inserts flow
   classification labels into requests, enabling visualization in tracing tools
   such as [Jaeger](https://www.jaegertracing.io/).
-- Aperture SDKs: In addition to service mesh insertion, Aperture provides SDKs
-  that can be used by developers to achieve fine-grained flow control at the
-  feature level inside service code. For example, an e-commerce app may
-  prioritize users in the checkout flow over new sessions when the application
-  is experiencing an overload. The Aperture Controller can be programmed to
-  degrade features as an escalated recovery action when basic load shedding is
-  triggered for several minutes.
+- [Aperture SDKs](./get-started/integrations/flow-control/sdk/sdk.md): In
+  addition to service mesh insertion, Aperture provides SDKs that can be used by
+  developers to achieve fine-grained flow control at the feature level inside
+  service code. For example, an e-commerce app may prioritize users in the
+  checkout flow over new sessions when the application is experiencing an
+  overload. The Aperture Controller can be programmed to degrade features as an
+  escalated recovery action when basic load shedding is triggered for several
+  minutes.
