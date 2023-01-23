@@ -49,6 +49,37 @@ public final class FlowControlServiceGrpc {
     return getCheckMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest,
+      com.fluxninja.generated.google.api.HttpBody> getGatewayCheckMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "GatewayCheck",
+      requestType = com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest.class,
+      responseType = com.fluxninja.generated.google.api.HttpBody.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest,
+      com.fluxninja.generated.google.api.HttpBody> getGatewayCheckMethod() {
+    io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest, com.fluxninja.generated.google.api.HttpBody> getGatewayCheckMethod;
+    if ((getGatewayCheckMethod = FlowControlServiceGrpc.getGatewayCheckMethod) == null) {
+      synchronized (FlowControlServiceGrpc.class) {
+        if ((getGatewayCheckMethod = FlowControlServiceGrpc.getGatewayCheckMethod) == null) {
+          FlowControlServiceGrpc.getGatewayCheckMethod = getGatewayCheckMethod =
+              io.grpc.MethodDescriptor.<com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest, com.fluxninja.generated.google.api.HttpBody>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "GatewayCheck"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.fluxninja.generated.google.api.HttpBody.getDefaultInstance()))
+              .setSchemaDescriptor(new FlowControlServiceMethodDescriptorSupplier("GatewayCheck"))
+              .build();
+        }
+      }
+    }
+    return getGatewayCheckMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -110,6 +141,16 @@ public final class FlowControlServiceGrpc {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getCheckMethod(), responseObserver);
     }
 
+    /**
+     * <pre>
+     * GatewatCheck .
+     * </pre>
+     */
+    public void gatewayCheck(com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest request,
+        io.grpc.stub.StreamObserver<com.fluxninja.generated.google.api.HttpBody> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getGatewayCheckMethod(), responseObserver);
+    }
+
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
@@ -119,6 +160,13 @@ public final class FlowControlServiceGrpc {
                 com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest,
                 com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse>(
                   this, METHODID_CHECK)))
+          .addMethod(
+            getGatewayCheckMethod(),
+            io.grpc.stub.ServerCalls.asyncUnaryCall(
+              new MethodHandlers<
+                com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest,
+                com.fluxninja.generated.google.api.HttpBody>(
+                  this, METHODID_GATEWAY_CHECK)))
           .build();
     }
   }
@@ -150,6 +198,17 @@ public final class FlowControlServiceGrpc {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getCheckMethod(), getCallOptions()), request, responseObserver);
     }
+
+    /**
+     * <pre>
+     * GatewatCheck .
+     * </pre>
+     */
+    public void gatewayCheck(com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest request,
+        io.grpc.stub.StreamObserver<com.fluxninja.generated.google.api.HttpBody> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getGatewayCheckMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -177,6 +236,16 @@ public final class FlowControlServiceGrpc {
     public com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse check(com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getCheckMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
+     * GatewatCheck .
+     * </pre>
+     */
+    public com.fluxninja.generated.google.api.HttpBody gatewayCheck(com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getGatewayCheckMethod(), getCallOptions(), request);
     }
   }
 
@@ -207,9 +276,21 @@ public final class FlowControlServiceGrpc {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getCheckMethod(), getCallOptions()), request);
     }
+
+    /**
+     * <pre>
+     * GatewatCheck .
+     * </pre>
+     */
+    public com.google.common.util.concurrent.ListenableFuture<com.fluxninja.generated.google.api.HttpBody> gatewayCheck(
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getGatewayCheckMethod(), getCallOptions()), request);
+    }
   }
 
   private static final int METHODID_CHECK = 0;
+  private static final int METHODID_GATEWAY_CHECK = 1;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -231,6 +312,10 @@ public final class FlowControlServiceGrpc {
         case METHODID_CHECK:
           serviceImpl.check((com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest) request,
               (io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse>) responseObserver);
+          break;
+        case METHODID_GATEWAY_CHECK:
+          serviceImpl.gatewayCheck((com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest) request,
+              (io.grpc.stub.StreamObserver<com.fluxninja.generated.google.api.HttpBody>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -294,6 +379,7 @@ public final class FlowControlServiceGrpc {
           serviceDescriptor = result = io.grpc.ServiceDescriptor.newBuilder(SERVICE_NAME)
               .setSchemaDescriptor(new FlowControlServiceFileDescriptorSupplier())
               .addMethod(getCheckMethod())
+              .addMethod(getGatewayCheckMethod())
               .build();
         }
       }

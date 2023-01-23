@@ -11,6 +11,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
 )
@@ -25,6 +26,7 @@ func Module() fx.Option {
 			ProvideMetrics,
 			ProvideHandler,
 		),
+		grpcgateway.RegisterHandler{Handler: flowcontrolv1.RegisterFlowControlServiceHandlerFromEndpoint}.Annotate(),
 		fx.Invoke(Register),
 	)
 }
