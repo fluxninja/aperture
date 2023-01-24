@@ -19,6 +19,4 @@ application {
 
 dependencies {
     implementation("com.linecorp.armeria:armeria:1.15.0")
-    implementation(project(":lib:core"))
-    implementation(project(":lib:armeria"))
 }
