@@ -4,18 +4,18 @@
 package com.fluxninja.generated.aperture.flowcontrol.check.v1;
 
 /**
- * Protobuf type {@code aperture.flowcontrol.check.v1.GatewayCheckRequest}
+ * Protobuf type {@code aperture.flowcontrol.check.v1.AWSGatewayCheckRequest}
  */
-public final class GatewayCheckRequest extends
+public final class AWSGatewayCheckRequest extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:aperture.flowcontrol.check.v1.GatewayCheckRequest)
-    GatewayCheckRequestOrBuilder {
+    // @@protoc_insertion_point(message_implements:aperture.flowcontrol.check.v1.AWSGatewayCheckRequest)
+    AWSGatewayCheckRequestOrBuilder {
 private static final long serialVersionUID = 0L;
-  // Use GatewayCheckRequest.newBuilder() to construct.
-  private GatewayCheckRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+  // Use AWSGatewayCheckRequest.newBuilder() to construct.
+  private AWSGatewayCheckRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
-  private GatewayCheckRequest() {
+  private AWSGatewayCheckRequest() {
     payload_ = "";
   }
 
@@ -23,7 +23,7 @@ private static final long serialVersionUID = 0L;
   @SuppressWarnings({"unused"})
   protected java.lang.Object newInstance(
       UnusedPrivateParameter unused) {
-    return new GatewayCheckRequest();
+    return new AWSGatewayCheckRequest();
   }
 
   @java.lang.Override
@@ -31,7 +31,7 @@ private static final long serialVersionUID = 0L;
   getUnknownFields() {
     return this.unknownFields;
   }
-  private GatewayCheckRequest(
+  private AWSGatewayCheckRequest(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -78,15 +78,15 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_GatewayCheckRequest_descriptor;
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_AWSGatewayCheckRequest_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_GatewayCheckRequest_fieldAccessorTable
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_AWSGatewayCheckRequest_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest.Builder.class);
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest.Builder.class);
   }
 
   public static final int PAYLOAD_FIELD_NUMBER = 1;
@@ -166,10 +166,10 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest)) {
+    if (!(obj instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest)) {
       return super.equals(obj);
     }
-    com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest other = (com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest) obj;
+    com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest other = (com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest) obj;
 
     if (!getPayload()
         .equals(other.getPayload())) return false;
@@ -191,69 +191,69 @@ private static final long serialVersionUID = 0L;
     return hash;
   }
 
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest parseFrom(byte[] data)
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest parseFrom(java.io.InputStream input)
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest parseDelimitedFrom(java.io.InputStream input)
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest parseDelimitedFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -266,7 +266,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest prototype) {
+  public static Builder newBuilder(com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -282,26 +282,26 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * Protobuf type {@code aperture.flowcontrol.check.v1.GatewayCheckRequest}
+   * Protobuf type {@code aperture.flowcontrol.check.v1.AWSGatewayCheckRequest}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:aperture.flowcontrol.check.v1.GatewayCheckRequest)
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequestOrBuilder {
+      // @@protoc_insertion_point(builder_implements:aperture.flowcontrol.check.v1.AWSGatewayCheckRequest)
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_GatewayCheckRequest_descriptor;
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_AWSGatewayCheckRequest_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_GatewayCheckRequest_fieldAccessorTable
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_AWSGatewayCheckRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest.Builder.class);
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest.Builder.class);
     }
 
-    // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest.newBuilder()
+    // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest.newBuilder()
     private Builder() {
       maybeForceBuilderInitialization();
     }
@@ -327,17 +327,17 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_GatewayCheckRequest_descriptor;
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_AWSGatewayCheckRequest_descriptor;
     }
 
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest getDefaultInstanceForType() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest.getDefaultInstance();
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest getDefaultInstanceForType() {
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest.getDefaultInstance();
     }
 
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest build() {
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest result = buildPartial();
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest build() {
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -345,8 +345,8 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest buildPartial() {
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest result = new com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest(this);
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest buildPartial() {
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest result = new com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest(this);
       result.payload_ = payload_;
       onBuilt();
       return result;
@@ -386,16 +386,16 @@ private static final long serialVersionUID = 0L;
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest) {
-        return mergeFrom((com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest)other);
+      if (other instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest) {
+        return mergeFrom((com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest other) {
-      if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest.getDefaultInstance()) return this;
+    public Builder mergeFrom(com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest other) {
+      if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest.getDefaultInstance()) return this;
       if (!other.getPayload().isEmpty()) {
         payload_ = other.payload_;
         onChanged();
@@ -415,11 +415,11 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest parsedMessage = null;
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest parsedMessage = null;
       try {
         parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest) e.getUnfinishedMessage();
+        parsedMessage = (com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
         if (parsedMessage != null) {
@@ -517,41 +517,41 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:aperture.flowcontrol.check.v1.GatewayCheckRequest)
+    // @@protoc_insertion_point(builder_scope:aperture.flowcontrol.check.v1.AWSGatewayCheckRequest)
   }
 
-  // @@protoc_insertion_point(class_scope:aperture.flowcontrol.check.v1.GatewayCheckRequest)
-  private static final com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest DEFAULT_INSTANCE;
+  // @@protoc_insertion_point(class_scope:aperture.flowcontrol.check.v1.AWSGatewayCheckRequest)
+  private static final com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest();
+    DEFAULT_INSTANCE = new com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest();
   }
 
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest getDefaultInstance() {
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<GatewayCheckRequest>
-      PARSER = new com.google.protobuf.AbstractParser<GatewayCheckRequest>() {
+  private static final com.google.protobuf.Parser<AWSGatewayCheckRequest>
+      PARSER = new com.google.protobuf.AbstractParser<AWSGatewayCheckRequest>() {
     @java.lang.Override
-    public GatewayCheckRequest parsePartialFrom(
+    public AWSGatewayCheckRequest parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return new GatewayCheckRequest(input, extensionRegistry);
+      return new AWSGatewayCheckRequest(input, extensionRegistry);
     }
   };
 
-  public static com.google.protobuf.Parser<GatewayCheckRequest> parser() {
+  public static com.google.protobuf.Parser<AWSGatewayCheckRequest> parser() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<GatewayCheckRequest> getParserForType() {
+  public com.google.protobuf.Parser<AWSGatewayCheckRequest> getParserForType() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.fluxninja.generated.aperture.flowcontrol.check.v1.GatewayCheckRequest getDefaultInstanceForType() {
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.AWSGatewayCheckRequest getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 

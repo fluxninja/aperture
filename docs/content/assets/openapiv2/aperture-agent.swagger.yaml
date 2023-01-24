@@ -10,6 +10,27 @@ info:
   version: "1.0"
 host: aperture-agent
 paths:
+  /v1/aws_gateway_check:
+    post:
+      tags:
+      - aperture-agent
+      summary: AWSGatewayCheck .
+      operationId: AWSGatewayFlowControlService_AWSGatewayCheck
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/v1AWSGatewayCheckRequest'
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/apiHttpBody'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
   /v1/distcache/stats:
     get:
       tags:
@@ -238,27 +259,6 @@ paths:
           description: A successful response.
           schema:
             $ref: '#/definitions/v1PreviewFlowLabelsResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/gateway_check:
-    post:
-      tags:
-      - aperture-agent
-      summary: GatewatCheck .
-      operationId: FlowControlService_GatewayCheck
-      parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/v1GatewayCheckRequest'
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/apiHttpBody'
         default:
           description: An unexpected error response.
           schema:
@@ -590,6 +590,11 @@ definitions:
       timestamp:
         type: string
         format: date-time
+  v1AWSGatewayCheckRequest:
+    type: object
+    properties:
+      payload:
+        type: string
   v1DMap:
     type: object
     properties:
@@ -672,11 +677,6 @@ definitions:
         x-go-validate: required
       value:
         description: Exact value that the label should be equal to.
-        type: string
-  v1GatewayCheckRequest:
-    type: object
-    properties:
-      payload:
         type: string
   v1GroupStatus:
     description: |-

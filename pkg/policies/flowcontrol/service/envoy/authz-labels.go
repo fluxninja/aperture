@@ -5,7 +5,9 @@ import (
 	"strings"
 
 	ext_authz "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
+
 	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 const (
@@ -43,7 +45,7 @@ func AuthzRequestToFlowLabels(request *ext_authz.AttributeContext_Request) flowl
 				Telemetry: false,
 			}
 			flowLabels[requestLabelPrefix+"flavor"] = flowlabel.FlowLabelValue{
-				Value:     canonicalizeOtelHTTPFlavor(http.Protocol),
+				Value:     utils.CanonicalizeOtelHTTPFlavor(http.Protocol),
 				Telemetry: true,
 			}
 		}
@@ -55,7 +57,7 @@ func AuthzRequestToFlowLabels(request *ext_authz.AttributeContext_Request) flowl
 				// Request.Http.
 				continue
 			}
-			flowLabels[requestLabelHeaderPrefix+canonicalizeOtelHeaderKey(k)] = flowlabel.FlowLabelValue{
+			flowLabels[requestLabelHeaderPrefix+utils.CanonicalizeOtelHeaderKey(k)] = flowlabel.FlowLabelValue{
 				Value:     v,
 				Telemetry: false,
 			}
@@ -63,25 +65,4 @@ func AuthzRequestToFlowLabels(request *ext_authz.AttributeContext_Request) flowl
 	}
 
 	return flowLabels
-}
-
-// canonicalizeOtelHeaderKey converts header naming convention to Otel's one.
-func canonicalizeOtelHeaderKey(key string) string {
-	return strings.ReplaceAll(strings.ToLower(key), "-", "_")
-}
-
-// canonicalizeOtelHTTPFlavor converts protocol to Otel kind of HTTP protocol.
-func canonicalizeOtelHTTPFlavor(protocolName string) string {
-	switch protocolName {
-	case "HTTP/1.0":
-		return "1.0"
-	case "HTTP/1.1":
-		return "1.1"
-	case "HTTP/2":
-		return "2.0"
-	case "HTTP/3":
-		return "3.0"
-	default:
-		return protocolName
-	}
 }

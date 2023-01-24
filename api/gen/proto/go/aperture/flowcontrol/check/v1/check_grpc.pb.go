@@ -15,14 +15,98 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
+// AWSGatewayFlowControlServiceClient is the client API for AWSGatewayFlowControlService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type AWSGatewayFlowControlServiceClient interface {
+	// AWSGatewayCheck .
+	AWSGatewayCheck(ctx context.Context, in *AWSGatewayCheckRequest, opts ...grpc.CallOption) (*httpbody.HttpBody, error)
+}
+
+type aWSGatewayFlowControlServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewAWSGatewayFlowControlServiceClient(cc grpc.ClientConnInterface) AWSGatewayFlowControlServiceClient {
+	return &aWSGatewayFlowControlServiceClient{cc}
+}
+
+func (c *aWSGatewayFlowControlServiceClient) AWSGatewayCheck(ctx context.Context, in *AWSGatewayCheckRequest, opts ...grpc.CallOption) (*httpbody.HttpBody, error) {
+	out := new(httpbody.HttpBody)
+	err := c.cc.Invoke(ctx, "/aperture.flowcontrol.check.v1.AWSGatewayFlowControlService/AWSGatewayCheck", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// AWSGatewayFlowControlServiceServer is the server API for AWSGatewayFlowControlService service.
+// All implementations should embed UnimplementedAWSGatewayFlowControlServiceServer
+// for forward compatibility
+type AWSGatewayFlowControlServiceServer interface {
+	// AWSGatewayCheck .
+	AWSGatewayCheck(context.Context, *AWSGatewayCheckRequest) (*httpbody.HttpBody, error)
+}
+
+// UnimplementedAWSGatewayFlowControlServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedAWSGatewayFlowControlServiceServer struct {
+}
+
+func (UnimplementedAWSGatewayFlowControlServiceServer) AWSGatewayCheck(context.Context, *AWSGatewayCheckRequest) (*httpbody.HttpBody, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AWSGatewayCheck not implemented")
+}
+
+// UnsafeAWSGatewayFlowControlServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AWSGatewayFlowControlServiceServer will
+// result in compilation errors.
+type UnsafeAWSGatewayFlowControlServiceServer interface {
+	mustEmbedUnimplementedAWSGatewayFlowControlServiceServer()
+}
+
+func RegisterAWSGatewayFlowControlServiceServer(s grpc.ServiceRegistrar, srv AWSGatewayFlowControlServiceServer) {
+	s.RegisterService(&AWSGatewayFlowControlService_ServiceDesc, srv)
+}
+
+func _AWSGatewayFlowControlService_AWSGatewayCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AWSGatewayCheckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AWSGatewayFlowControlServiceServer).AWSGatewayCheck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/aperture.flowcontrol.check.v1.AWSGatewayFlowControlService/AWSGatewayCheck",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AWSGatewayFlowControlServiceServer).AWSGatewayCheck(ctx, req.(*AWSGatewayCheckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// AWSGatewayFlowControlService_ServiceDesc is the grpc.ServiceDesc for AWSGatewayFlowControlService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var AWSGatewayFlowControlService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "aperture.flowcontrol.check.v1.AWSGatewayFlowControlService",
+	HandlerType: (*AWSGatewayFlowControlServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "AWSGatewayCheck",
+			Handler:    _AWSGatewayFlowControlService_AWSGatewayCheck_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "aperture/flowcontrol/check/v1/check.proto",
+}
+
 // FlowControlServiceClient is the client API for FlowControlService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FlowControlServiceClient interface {
 	// Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
 	Check(ctx context.Context, in *CheckRequest, opts ...grpc.CallOption) (*CheckResponse, error)
-	// GatewatCheck .
-	GatewayCheck(ctx context.Context, in *GatewayCheckRequest, opts ...grpc.CallOption) (*httpbody.HttpBody, error)
 }
 
 type flowControlServiceClient struct {
@@ -42,23 +126,12 @@ func (c *flowControlServiceClient) Check(ctx context.Context, in *CheckRequest, 
 	return out, nil
 }
 
-func (c *flowControlServiceClient) GatewayCheck(ctx context.Context, in *GatewayCheckRequest, opts ...grpc.CallOption) (*httpbody.HttpBody, error) {
-	out := new(httpbody.HttpBody)
-	err := c.cc.Invoke(ctx, "/aperture.flowcontrol.check.v1.FlowControlService/GatewayCheck", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // FlowControlServiceServer is the server API for FlowControlService service.
 // All implementations should embed UnimplementedFlowControlServiceServer
 // for forward compatibility
 type FlowControlServiceServer interface {
 	// Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
 	Check(context.Context, *CheckRequest) (*CheckResponse, error)
-	// GatewatCheck .
-	GatewayCheck(context.Context, *GatewayCheckRequest) (*httpbody.HttpBody, error)
 }
 
 // UnimplementedFlowControlServiceServer should be embedded to have forward compatible implementations.
@@ -67,9 +140,6 @@ type UnimplementedFlowControlServiceServer struct {
 
 func (UnimplementedFlowControlServiceServer) Check(context.Context, *CheckRequest) (*CheckResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Check not implemented")
-}
-func (UnimplementedFlowControlServiceServer) GatewayCheck(context.Context, *GatewayCheckRequest) (*httpbody.HttpBody, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GatewayCheck not implemented")
 }
 
 // UnsafeFlowControlServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -101,24 +171,6 @@ func _FlowControlService_Check_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _FlowControlService_GatewayCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GatewayCheckRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(FlowControlServiceServer).GatewayCheck(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/aperture.flowcontrol.check.v1.FlowControlService/GatewayCheck",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FlowControlServiceServer).GatewayCheck(ctx, req.(*GatewayCheckRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // FlowControlService_ServiceDesc is the grpc.ServiceDesc for FlowControlService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -129,10 +181,6 @@ var FlowControlService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Check",
 			Handler:    _FlowControlService_Check_Handler,
-		},
-		{
-			MethodName: "GatewayCheck",
-			Handler:    _FlowControlService_GatewayCheck_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

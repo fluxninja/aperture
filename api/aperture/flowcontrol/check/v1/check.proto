@@ -7,14 +7,11 @@ import "google/api/httpbody.proto";
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-// FlowControlService is used to perform Flow Control operations.
-service FlowControlService {
-  // Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
-  rpc Check(CheckRequest) returns (CheckResponse) {}
-  // GatewatCheck .
-  rpc GatewayCheck(GatewayCheckRequest) returns (google.api.HttpBody) {
+service AWSGatewayFlowControlService {
+  // AWSGatewayCheck .
+  rpc AWSGatewayCheck(AWSGatewayCheckRequest) returns (google.api.HttpBody) {
     option (google.api.http) = {
-      post: "/v1/gateway_check"
+      post: "/v1/aws_gateway_check"
       body: "*"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -23,8 +20,14 @@ service FlowControlService {
   }
 }
 
-message GatewayCheckRequest {
+message AWSGatewayCheckRequest {
   string payload = 1;
+}
+
+// FlowControlService is used to perform Flow Control operations.
+service FlowControlService {
+  // Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
+  rpc Check(CheckRequest) returns (CheckResponse) {}
 }
 
 // CheckRequest contains fields required to perform Check call.

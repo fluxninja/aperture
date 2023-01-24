@@ -3,8 +3,8 @@
 
 package com.fluxninja.generated.aperture.flowcontrol.check.v1;
 
-public interface GatewayCheckRequestOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:aperture.flowcontrol.check.v1.GatewayCheckRequest)
+public interface AWSGatewayCheckRequestOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:aperture.flowcontrol.check.v1.AWSGatewayCheckRequest)
     com.google.protobuf.MessageOrBuilder {
 
   /**

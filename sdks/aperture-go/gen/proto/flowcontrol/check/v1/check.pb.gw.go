@@ -31,8 +31,8 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
-func request_FlowControlService_GatewayCheck_0(ctx context.Context, marshaler runtime.Marshaler, client FlowControlServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GatewayCheckRequest
+func request_AWSGatewayFlowControlService_AWSGatewayCheck_0(ctx context.Context, marshaler runtime.Marshaler, client AWSGatewayFlowControlServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq AWSGatewayCheckRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -43,13 +43,13 @@ func request_FlowControlService_GatewayCheck_0(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.GatewayCheck(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.AWSGatewayCheck(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_FlowControlService_GatewayCheck_0(ctx context.Context, marshaler runtime.Marshaler, server FlowControlServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GatewayCheckRequest
+func local_request_AWSGatewayFlowControlService_AWSGatewayCheck_0(ctx context.Context, marshaler runtime.Marshaler, server AWSGatewayFlowControlServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq AWSGatewayCheckRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -60,18 +60,18 @@ func local_request_FlowControlService_GatewayCheck_0(ctx context.Context, marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.GatewayCheck(ctx, &protoReq)
+	msg, err := server.AWSGatewayCheck(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-// RegisterFlowControlServiceHandlerServer registers the http handlers for service FlowControlService to "mux".
-// UnaryRPC     :call FlowControlServiceServer directly.
+// RegisterAWSGatewayFlowControlServiceHandlerServer registers the http handlers for service AWSGatewayFlowControlService to "mux".
+// UnaryRPC     :call AWSGatewayFlowControlServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterFlowControlServiceHandlerFromEndpoint instead.
-func RegisterFlowControlServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server FlowControlServiceServer) error {
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterAWSGatewayFlowControlServiceHandlerFromEndpoint instead.
+func RegisterAWSGatewayFlowControlServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server AWSGatewayFlowControlServiceServer) error {
 
-	mux.Handle("POST", pattern_FlowControlService_GatewayCheck_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_AWSGatewayFlowControlService_AWSGatewayCheck_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -79,12 +79,12 @@ func RegisterFlowControlServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.flowcontrol.check.v1.FlowControlService/GatewayCheck", runtime.WithHTTPPathPattern("/v1/gateway_check"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.flowcontrol.check.v1.AWSGatewayFlowControlService/AWSGatewayCheck", runtime.WithHTTPPathPattern("/v1/aws_gateway_check"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_FlowControlService_GatewayCheck_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_AWSGatewayFlowControlService_AWSGatewayCheck_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -92,16 +92,16 @@ func RegisterFlowControlServiceHandlerServer(ctx context.Context, mux *runtime.S
 			return
 		}
 
-		forward_FlowControlService_GatewayCheck_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AWSGatewayFlowControlService_AWSGatewayCheck_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
 }
 
-// RegisterFlowControlServiceHandlerFromEndpoint is same as RegisterFlowControlServiceHandler but
+// RegisterAWSGatewayFlowControlServiceHandlerFromEndpoint is same as RegisterAWSGatewayFlowControlServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterFlowControlServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterAWSGatewayFlowControlServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -121,41 +121,41 @@ func RegisterFlowControlServiceHandlerFromEndpoint(ctx context.Context, mux *run
 		}()
 	}()
 
-	return RegisterFlowControlServiceHandler(ctx, mux, conn)
+	return RegisterAWSGatewayFlowControlServiceHandler(ctx, mux, conn)
 }
 
-// RegisterFlowControlServiceHandler registers the http handlers for service FlowControlService to "mux".
+// RegisterAWSGatewayFlowControlServiceHandler registers the http handlers for service AWSGatewayFlowControlService to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterFlowControlServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterFlowControlServiceHandlerClient(ctx, mux, NewFlowControlServiceClient(conn))
+func RegisterAWSGatewayFlowControlServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterAWSGatewayFlowControlServiceHandlerClient(ctx, mux, NewAWSGatewayFlowControlServiceClient(conn))
 }
 
-// RegisterFlowControlServiceHandlerClient registers the http handlers for service FlowControlService
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "FlowControlServiceClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "FlowControlServiceClient"
+// RegisterAWSGatewayFlowControlServiceHandlerClient registers the http handlers for service AWSGatewayFlowControlService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "AWSGatewayFlowControlServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "AWSGatewayFlowControlServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "FlowControlServiceClient" to call the correct interceptors.
-func RegisterFlowControlServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client FlowControlServiceClient) error {
+// "AWSGatewayFlowControlServiceClient" to call the correct interceptors.
+func RegisterAWSGatewayFlowControlServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client AWSGatewayFlowControlServiceClient) error {
 
-	mux.Handle("POST", pattern_FlowControlService_GatewayCheck_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_AWSGatewayFlowControlService_AWSGatewayCheck_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.flowcontrol.check.v1.FlowControlService/GatewayCheck", runtime.WithHTTPPathPattern("/v1/gateway_check"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.flowcontrol.check.v1.AWSGatewayFlowControlService/AWSGatewayCheck", runtime.WithHTTPPathPattern("/v1/aws_gateway_check"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_FlowControlService_GatewayCheck_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AWSGatewayFlowControlService_AWSGatewayCheck_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_FlowControlService_GatewayCheck_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AWSGatewayFlowControlService_AWSGatewayCheck_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -163,9 +163,9 @@ func RegisterFlowControlServiceHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_FlowControlService_GatewayCheck_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "gateway_check"}, ""))
+	pattern_AWSGatewayFlowControlService_AWSGatewayCheck_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "aws_gateway_check"}, ""))
 )
 
 var (
-	forward_FlowControlService_GatewayCheck_0 = runtime.ForwardResponseMessage
+	forward_AWSGatewayFlowControlService_AWSGatewayCheck_0 = runtime.ForwardResponseMessage
 )

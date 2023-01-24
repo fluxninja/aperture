@@ -5,6 +5,7 @@ info:
 tags:
   - name: DistCacheService
   - name: EntityCacheService
+  - name: AWSGatewayFlowControlService
   - name: FlowControlService
   - name: FlowPreviewService
   - name: InfoService
@@ -53,6 +54,27 @@ paths:
             $ref: '#/definitions/v1ReportRequest'
       tags:
         - FluxNinjaService
+  /v1/aws_gateway_check:
+    post:
+      summary: AWSGatewayCheck .
+      operationId: AWSGatewayFlowControlService_AWSGatewayCheck
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/apiHttpBody'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1AWSGatewayCheckRequest'
+      tags:
+        - aperture-agent
   /v1/distcache/stats:
     get:
       operationId: DistCacheService_GetStats
@@ -289,27 +311,6 @@ paths:
           required: false
           type: string
           format: int64
-      tags:
-        - aperture-agent
-  /v1/gateway_check:
-    post:
-      summary: GatewatCheck .
-      operationId: FlowControlService_GatewayCheck
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/apiHttpBody'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/v1GatewayCheckRequest'
       tags:
         - aperture-agent
   /v1/info/host:
@@ -940,6 +941,11 @@ definitions:
         type: string
         format: date-time
     description: Status holds details about a status that can be reported to the registry.
+  v1AWSGatewayCheckRequest:
+    type: object
+    properties:
+      payload:
+        type: string
   v1AddressExtractor:
     type: object
     properties:
@@ -1954,11 +1960,6 @@ definitions:
       flux_meter_name:
         type: string
     description: FluxMeterInfo describes detail for each FluxMeterInfo.
-  v1GatewayCheckRequest:
-    type: object
-    properties:
-      payload:
-        type: string
   v1GetPoliciesResponse:
     type: object
     properties:
