@@ -207,6 +207,9 @@ message Component {
 
     // Generates 0 and 1 in turns.
     PulseGenerator pulse_generator = 22;
+
+    // Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+    Holder holder = 23;
   }
 }
 
@@ -1408,6 +1411,31 @@ message PulseGenerator {
 
   // Emitting 0 for the false_for duration.
   google.protobuf.Duration false_for = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {string_value: "5s"}
+    }
+  }]; // @gotags: default:"5s"
+}
+
+// Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+// If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
+message Holder {
+  // Inputs for the Holder component.
+  message Ins {
+    InPort input = 1;
+  }
+
+  // Outputs for the Holder component.
+  message Outs {
+    OutPort output = 1;
+  }
+
+  Ins in_ports = 1;
+  Outs out_ports = 2;
+
+  // Holding the last valid signal value for the hold_for duration.
+  google.protobuf.Duration hold_for = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {string_value: "5s"}

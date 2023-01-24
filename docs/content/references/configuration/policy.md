@@ -919,6 +919,12 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([V1PulseGenerator](#v1-pulse-generator)) Generates 0 and 1 in turns.
 
 </dd>
+<dt>holder</dt>
+<dd>
+
+([V1Holder](#v1-holder)) Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+
+</dd>
 </dl>
 
 ### v1ConcurrencyLimiter {#v1-concurrency-limiter}
@@ -1836,6 +1842,66 @@ Outputs for the Gradient Controller component.
 <dd>
 
 ([V1OutPort](#v1-out-port)) Computed desired value of the control variable.
+
+</dd>
+</dl>
+
+### v1Holder {#v1-holder}
+
+Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1HolderIns](#v1-holder-ins))
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([V1HolderOuts](#v1-holder-outs))
+
+</dd>
+<dt>hold_for</dt>
+<dd>
+
+(string, default: `5s`) Holding the last valid signal value for the hold_for duration.
+
+@gotags: default:"5s"
+
+</dd>
+</dl>
+
+### v1HolderIns {#v1-holder-ins}
+
+Inputs for the Holder component.
+
+#### Properties
+
+<dl>
+<dt>input</dt>
+<dd>
+
+([V1InPort](#v1-in-port))
+
+</dd>
+</dl>
+
+### v1HolderOuts {#v1-holder-outs}
+
+Outputs for the Holder component.
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
 
 </dd>
 </dl>

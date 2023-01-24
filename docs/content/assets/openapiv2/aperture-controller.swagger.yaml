@@ -807,6 +807,10 @@ definitions:
           Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
           This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
         $ref: '#/definitions/v1GradientController'
+      holder:
+        description: Holds the last valid signal value for the specified duration
+          then waits for next valid value to hold.
+        $ref: '#/definitions/v1Holder'
       horizontal_pod_scaler:
         description: HorizontalPodScaler provides pod horizontal scaling functionality
           for scalable Kubernetes resources.
@@ -1493,6 +1497,35 @@ definitions:
           $ref: '#/definitions/v1GroupStatus'
       status:
         $ref: '#/definitions/statusv1Status'
+  v1Holder:
+    description: |-
+      Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+      If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
+    type: object
+    properties:
+      hold_for:
+        description: |-
+          Holding the last valid signal value for the hold_for duration.
+
+          @gotags: default:"5s"
+        type: string
+        x-go-default: 5s
+      in_ports:
+        $ref: '#/definitions/v1HolderIns'
+      out_ports:
+        $ref: '#/definitions/v1HolderOuts'
+  v1HolderIns:
+    description: Inputs for the Holder component.
+    type: object
+    properties:
+      input:
+        $ref: '#/definitions/v1InPort'
+  v1HolderOuts:
+    description: Outputs for the Holder component.
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
   v1HorizontalPodScaler:
     type: object
     properties:

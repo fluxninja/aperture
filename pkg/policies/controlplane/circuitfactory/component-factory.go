@@ -76,6 +76,8 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.Inverter, components.NewInverterAndOptions)
 	case *policylangv1.Component_PulseGenerator:
 		ctor = mkCtor(config.PulseGenerator, components.NewPulseGeneratorAndOptions)
+	case *policylangv1.Component_Holder:
+		ctor = mkCtor(config.Holder, components.NewHolderAndOptions)
 	default:
 		return newComponentStackAndOptions(componentProto, componentIndex, policyReadAPI)
 	}

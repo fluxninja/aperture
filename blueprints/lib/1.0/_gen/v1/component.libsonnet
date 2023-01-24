@@ -61,6 +61,12 @@
   withGradientControllerMixin(gradient_controller):: {
     gradient_controller+: gradient_controller,
   },
+  withHolder(holder):: {
+    holder: holder,
+  },
+  withHolderMixin(holder):: {
+    holder+: holder,
+  },
   withHorizontalPodScaler(horizontal_pod_scaler):: {
     horizontal_pod_scaler: horizontal_pod_scaler,
   },

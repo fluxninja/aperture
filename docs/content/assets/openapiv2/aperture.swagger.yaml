@@ -1258,6 +1258,9 @@ definitions:
       pulse_generator:
         $ref: '#/definitions/v1PulseGenerator'
         description: Generates 0 and 1 in turns.
+      holder:
+        $ref: '#/definitions/v1Holder'
+        description: Holds the last valid signal value for the specified duration then waits for next valid value to hold.
     description: |-
       :::info
       See also [Components overview](/concepts/policy/circuit/circuit.md#components).
@@ -2014,6 +2017,35 @@ definitions:
     description: |-
       Groups is nested structure that holds status information about the node and a
       pointer to the next node.
+  v1Holder:
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/v1HolderIns'
+      out_ports:
+        $ref: '#/definitions/v1HolderOuts'
+      hold_for:
+        type: string
+        description: |-
+          Holding the last valid signal value for the hold_for duration.
+
+          @gotags: default:"5s"
+        x-go-default: 5s
+    description: |-
+      Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+      If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
+  v1HolderIns:
+    type: object
+    properties:
+      input:
+        $ref: '#/definitions/v1InPort'
+    description: Inputs for the Holder component.
+  v1HolderOuts:
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
+    description: Outputs for the Holder component.
   v1HorizontalPodScaler:
     type: object
     properties:
