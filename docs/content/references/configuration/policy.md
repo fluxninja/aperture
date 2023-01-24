@@ -1849,6 +1849,7 @@ Outputs for the Gradient Controller component.
 ### v1Holder {#v1-holder}
 
 Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
 
 #### Properties
 

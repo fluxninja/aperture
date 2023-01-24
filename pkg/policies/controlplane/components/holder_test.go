@@ -20,14 +20,14 @@ var _ = Describe("Holder", func() {
 					output: { signal_name: HOLDER }
 			`,
 			sim.Inputs{
-				"INPUT": sim.NewInput([]float64{1, 2, 3, 4, nan, nan, nan}),
+				"INPUT": sim.NewInput([]float64{1, nan, 3, nan, nan}),
 			},
 			sim.OutputSignals{"HOLDER"},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
 			sim.Outputs{
-				"HOLDER": sim.NewReadings([]float64{1, 1, 1, 1, nan, nan, nan}),
+				"HOLDER": sim.NewReadings([]float64{1, 1, 1, 1, nan}),
 			},
 		))
 	})

@@ -3023,6 +3023,7 @@ func (x *PulseGenerator) GetFalseFor() *durationpb.Duration {
 }
 
 // Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+// If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
 type Holder struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

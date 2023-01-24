@@ -45,38 +45,29 @@ func (h *Holder) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Ti
 	input := inPortReadings.ReadSingleValuePort("input")
 	output := runtime.InvalidReading()
 
-	// starting with holdPhase = false
-	if !h.holdPhase {
-		if input.Valid() {
-			h.holdNewValue(input)
-			output = input
-		}
-	} else {
+	if h.holdPhase {
 		h.windowCount++
 		// hold_for is finished
 		if h.windowCount >= h.holdWindow {
-			// immediately hold new value
-			if input.Valid() {
-				h.holdNewValue(input)
-				output = input
-			} else {
-				h.holdPhase = false
-				h.windowCount = 0
-			}
+			h.holdPhase = false
+			h.windowCount = 0
 		} else {
 			output = h.currentReading
+		}
+	}
+
+	if !h.holdPhase {
+		if input.Valid() {
+			h.currentReading = input
+			h.holdPhase = true
+			h.windowCount = 0
+			output = input
 		}
 	}
 
 	return runtime.PortToValue{
 		"output": []runtime.Reading{output},
 	}, nil
-}
-
-func (h *Holder) holdNewValue(newValue runtime.Reading) {
-	h.currentReading = newValue
-	h.holdPhase = true
-	h.windowCount = 0
 }
 
 // DynamicConfigUpdate is a no-op for Holder.

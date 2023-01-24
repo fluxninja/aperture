@@ -1419,6 +1419,7 @@ message PulseGenerator {
 }
 
 // Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+// If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
 message Holder {
   // Inputs for the Holder component.
   message Ins {

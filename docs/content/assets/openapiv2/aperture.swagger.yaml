@@ -2031,7 +2031,9 @@ definitions:
 
           @gotags: default:"5s"
         x-go-default: 5s
-    description: Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+    description: |-
+      Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+      If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
   v1HolderIns:
     type: object
     properties:
