@@ -65,10 +65,10 @@ FakeConstant3 --> 4lhs
 subgraph 5[Integrator]
 subgraph 5_inports[ ]
 style 5_inports fill:none,stroke:none
-5reset[reset]
 5min[min]
 5max[max]
 5input[input]
+5reset[reset]
 end
 subgraph 5_outports[ ]
 style 5_outports fill:none,stroke:none
@@ -94,8 +94,8 @@ end
 subgraph 8[<center>EMA<br/>win: 1500s</center>]
 subgraph 8_inports[ ]
 style 8_inports fill:none,stroke:none
-8input[input]
 8max_envelope[max_envelope]
+8input[input]
 end
 subgraph 8_outports[ ]
 style 8_outports fill:none,stroke:none
@@ -105,11 +105,11 @@ end
 subgraph 9[Gradient]
 subgraph 9_inports[ ]
 style 9_inports fill:none,stroke:none
-9setpoint[setpoint]
 9optimize[optimize]
 9max[max]
 9control_variable[control_variable]
 9signal[signal]
+9setpoint[setpoint]
 end
 subgraph 9_outports[ ]
 style 9_outports fill:none,stroke:none
@@ -126,18 +126,11 @@ style 10_outports fill:none,stroke:none
 10output[output]
 end
 end
-subgraph 11[Gradient]
-subgraph 11_inports[ ]
-style 11_inports fill:none,stroke:none
-11setpoint[setpoint]
-11optimize[optimize]
-11max[max]
-11control_variable[control_variable]
-11signal[signal]
-end
-subgraph 11_outports[ ]
-style 11_outports fill:none,stroke:none
-11output[output]
+subgraph 11.Scheduler[ConcurrencyLimiter/Scheduler]
+subgraph 11.Scheduler_outports[ ]
+style 11.Scheduler_outports fill:none,stroke:none
+11.Scheduleraccepted_concurrency[accepted_concurrency]
+11.Schedulerincoming_concurrency[incoming_concurrency]
 end
 end
 subgraph 11.LoadActuator[ConcurrencyLimiter/LoadActuator]
@@ -179,46 +172,41 @@ style 12_outports fill:none,stroke:none
 12output[output]
 end
 end
-FakeConstant7((0.00))
-FakeConstant7 --> 15on_true
-subgraph 16[<center>Decider<br/>lt for 30s</center>]
-subgraph 16_inports[ ]
-style 16_inports fill:none,stroke:none
-16rhs[rhs]
-16lhs[lhs]
+subgraph 13[<center>Decider<br/>lt for 30s</center>]
+subgraph 13_inports[ ]
+style 13_inports fill:none,stroke:none
+13lhs[lhs]
+13rhs[rhs]
 end
 subgraph 13_outports[ ]
 style 13_outports fill:none,stroke:none
 13output[output]
 end
 end
-FakeConstant8((1.00))
-FakeConstant8 --> 16rhs
-7output --> |CONCURRENCY_INCREMENT_NORMAL| 15on_false
-9output --> |LATENCY| 0lhs
-9output --> |LATENCY| 10input
-9output --> |LATENCY| 11signal
-9output --> |LATENCY| 14lhs
-11output --> |DESIRED_CONCURRENCY| 2lhs
-13.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 3rhs
-13.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 6inputs
-13.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 8input
-13.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 11control_variable
-13.Schedulerincoming_concurrency --> |INCOMING_CONCURRENCY| 2rhs
-2output --> |DESIRED_CONCURRENCY_RATIO| 12input
-3output --> |NORMAL_CONCURRENCY_LIMIT| 11max
-0output --> |MAX_EMA| 10max_envelope
-1output --> |LATENCY_SETPOINT| 11setpoint
-1output --> |LATENCY_SETPOINT| 14rhs
-6output --> |CONCURRENCY_INCREMENT_INTEGRAL_CAPPED| 7inputs
-10output --> |LATENCY_EMA| 1lhs
-16output --> |IS_BOT_ESCALATION| 17switch
-17output --> |RATE_LIMIT| 18limit
-4output --> |CONCURRENCY_INCREMENT_SINGLE_TICK| 5lhs
-5output --> |CONCURRENCY_INCREMENT_INTEGRAL| 6inputs
-8output --> |SQRT_CONCURRENCY_INCREMENT| 4rhs
-12output --> |LOAD_MULTIPLIER| 13.LoadActuatorload_multiplier
-12output --> |LOAD_MULTIPLIER| 16lhs
-14output --> |IS_OVERLOAD| 15switch
-15output --> |CONCURRENCY_INCREMENT| 5rhs
-15output --> |CONCURRENCY_INCREMENT| 11optimize
+FakeConstant6((1.00))
+FakeConstant6 --> 13rhs
+7output --> |LATENCY| 0lhs
+7output --> |LATENCY| 8input
+7output --> |LATENCY| 9signal
+7output --> |LATENCY| 12lhs
+9output --> |DESIRED_CONCURRENCY| 2lhs
+11.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 3rhs
+11.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 5min
+11.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 6input
+11.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 9control_variable
+11.Schedulerincoming_concurrency --> |INCOMING_CONCURRENCY| 2rhs
+2output --> |DESIRED_CONCURRENCY_RATIO| 10input
+4output --> |CONCURRENCY_INCREMENT_SINGLE_TICK| 5input
+14output --> |RATE_LIMIT| 15limit
+1output --> |LATENCY_SETPOINT| 9setpoint
+1output --> |LATENCY_SETPOINT| 12rhs
+6output --> |SQRT_CONCURRENCY_INCREMENT| 4rhs
+5output --> |CONCURRENCY_INCREMENT| 9optimize
+8output --> |LATENCY_EMA| 1lhs
+12output --> |IS_OVERLOAD| 5reset
+13output --> |IS_BOT_ESCALATION| 14switch
+0output --> |MAX_EMA| 8max_envelope
+3output --> |NORMAL_CONCURRENCY_LIMIT| 5max
+3output --> |NORMAL_CONCURRENCY_LIMIT| 9max
+10output --> |LOAD_MULTIPLIER| 11.LoadActuatorload_multiplier
+10output --> |LOAD_MULTIPLIER| 13lhs
