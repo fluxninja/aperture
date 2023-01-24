@@ -42,6 +42,12 @@ type PortMapping struct {
 	Outs map[string][]Port `mapstructure:"out_ports"`
 }
 
+// ConstantSignal is a mirror struct to same proto message.
+type ConstantSignal struct {
+	SpecialValue *string  `mapstructure:"special_value"`
+	Value        *float64 `mapstructure:"value"`
+}
+
 // PortsFromComponentConfig extracts Ports from component's config.
 func PortsFromComponentConfig(componentConfig mapstruct.Object) (PortMapping, error) {
 	var ports PortMapping
@@ -63,6 +69,6 @@ func PortsFromComponentConfig(componentConfig mapstruct.Object) (PortMapping, er
 // Only one field should be set.
 type Port struct {
 	// Note: pointers are used to detect fields being not set.
-	SignalName    *string  `mapstructure:"signal_name"`
-	ConstantValue *float64 `mapstructure:"constant_value"`
+	SignalName     *string         `mapstructure:"signal_name"`
+	ConstantSignal *ConstantSignal `mapstructure:"constant_signal"`
 }

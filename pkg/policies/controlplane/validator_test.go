@@ -123,8 +123,10 @@ spec:
           out_ports:
             output:
               signal_name: "LATENCY"
-      - constant:
-          value: "2.0"
+      - variable:
+          default_config:
+            constant_signal:
+              value: 2.0
           out_ports:
             output:
               signal_name: "EMA_LIMIT_MULTIPLIER"
@@ -150,8 +152,10 @@ spec:
           out_ports:
             output:
               signal_name: "LATENCY_EMA"
-      - constant:
-          value: "1.1"
+      - variable:
+          default_config:
+            constant_signal:
+              value: 1.1
           out_ports:
             output:
               signal_name: "EMA_SETPOINT_MULTIPLIER"
@@ -223,18 +227,24 @@ spec:
             in_ports:
               load_multiplier:
                 signal_name: "LOAD_MULTIPLIER"
-      - constant:
-          value: "2.0"
+      - variable:
+          default_config:
+            constant_signal:
+              value: 2.0
           out_ports:
             output:
               signal_name: "CONCURRENCY_LIMIT_MULTIPLIER"
-      - constant:
-          value: "10.0"
+      - variable:
+          default_config:
+            constant_signal:
+              value: 10.0
           out_ports:
             output:
               signal_name: "MIN_CONCURRENCY"
-      - constant:
-          value: "5.0"
+      - variable:
+          default_config:
+            constant_signal:
+              value: 5.0
           out_ports:
             output:
               signal_name: "LINEAR_CONCURRENCY_INCREMENT"
@@ -274,8 +284,10 @@ spec:
           out_ports:
             output:
               signal_name: "CONCURRENCY_INCREMENT_NORMAL"
-      - constant:
-          value: "1.2"
+      - variable:
+          default_config:
+            constant_signal:
+              value: 1.2
           out_ports:
             output:
               signal_name: "OVERLOAD_MULTIPLIER"
@@ -289,8 +301,10 @@ spec:
           out_ports:
             output:
               signal_name: "LATENCY_OVERLOAD"
-      - constant:
-          value: "10.0"
+      - variable:
+          default_config:
+            constant_signal:
+              value: 10.0
           out_ports:
             output:
               signal_name: "CONCURRENCY_INCREMENT_OVERLOAD"
@@ -365,8 +379,10 @@ spec:
   circuit:
     evaluation_interval: "0.5s"
     components:
-      - constant:
-          value: "250.0"
+      - variable:
+          default_config:
+            constant_signal:
+              value: 250.0
           out_ports:
             output:
               signal_name: "RATE_LIMIT"

@@ -28,8 +28,7 @@
   Classifier: import 'classifier.libsonnet',
   Component: import 'component.libsonnet',
   ConcurrencyLimiter: import 'concurrencylimiter.libsonnet',
-  Constant: import 'constant.libsonnet',
-  ConstantOuts: import 'constantouts.libsonnet',
+  ConstantSignal: import 'constantsignal.libsonnet',
   ControllerDynamicConfig: import 'controllerdynamicconfig.libsonnet',
   Decider: import 'decider.libsonnet',
   DeciderIns: import 'deciderins.libsonnet',
@@ -102,4 +101,7 @@
   Switcher: import 'switcher.libsonnet',
   SwitcherIns: import 'switcherins.libsonnet',
   SwitcherOuts: import 'switcherouts.libsonnet',
+  Variable: import 'variable.libsonnet',
+  VariableDynamicConfig: import 'variabledynamicconfig.libsonnet',
+  VariableOuts: import 'variableouts.libsonnet',
 }

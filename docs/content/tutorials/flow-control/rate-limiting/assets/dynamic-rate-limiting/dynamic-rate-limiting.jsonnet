@@ -85,7 +85,7 @@ local policyResource = latencyGradientPolicy({
     + component.withDecider(
       decider.new()
       + decider.withOperator('lt')
-      + decider.withInPorts({ lhs: port.withSignalName('LOAD_MULTIPLIER'), rhs: port.withConstantValue(1.0) })
+      + decider.withInPorts({ lhs: port.withSignalName('LOAD_MULTIPLIER'), rhs: port.withConstantSignal(1.0) })
       + decider.withOutPorts({ output: port.withSignalName('IS_BOT_ESCALATION') })
       + decider.withTrueFor('30s')
     ),
@@ -94,8 +94,8 @@ local policyResource = latencyGradientPolicy({
       switcher.new()
       + switcher.withInPorts({
         switch: port.withSignalName('IS_BOT_ESCALATION'),
-        on_true: port.withConstantValue(0.0),
-        on_false: port.withConstantValue(10),
+        on_true: port.withConstantSignal(0.0),
+        on_false: port.withConstantSignal(10.0),
       })
       + switcher.withOutPorts({ output: port.withSignalName('RATE_LIMIT') })
     ),

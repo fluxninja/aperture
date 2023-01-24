@@ -16,7 +16,8 @@ spec:
               service: service1-demo-app.demoapp.svc.cluster.local
           in_ports:
             limit:
-              constant_value: 120
+              constant_signal:
+                value: 120
           label_key: http.request.header.user_id
           limit_reset_interval: 60s
     evaluation_interval: 300s

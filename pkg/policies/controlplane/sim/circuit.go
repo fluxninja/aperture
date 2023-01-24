@@ -18,7 +18,7 @@ import (
 
 // Inputs map signal names to components that will emit test input.
 // Input components are required to emit an "output" signal, such as Input or
-// components.Constant. These can be created with NewInput and NewConstantInput.
+// components.Variable. These can be created with NewInput and NewConstantInput.
 type Inputs map[string]rt.Component
 
 // OutputSignals is a list of signal names that comprise test output.

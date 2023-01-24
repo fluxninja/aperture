@@ -775,9 +775,10 @@ There are three categories of components:
 :::tip
 Sometimes you may want to use a constant value as one of component's inputs.
 You can create an input port containing the constant value instead of being connected to a signal.
-To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
+To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
+You can also use it to provide special math values such as NaN and +- Inf.
 If You need to provide the same constant signal to multiple components,
-You can use the [Constant](#v1-constant) component.
+You can use the [Variable](#v1-variable) component.
 :::
 
 See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -834,10 +835,10 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([V1PromQL](#v1-prom-q-l)) Periodically runs a Prometheus query in the background and emits the result.
 
 </dd>
-<dt>constant</dt>
+<dt>variable</dt>
 <dd>
 
-([V1Constant](#v1-constant)) Emits a constant signal.
+([V1Variable](#v1-variable)) Emits a variable signal which can be set to invalid.
 
 </dd>
 <dt>sqrt</dt>
@@ -966,38 +967,23 @@ Actuation strategy defines the input signal that will drive the scheduler.
 </dd>
 </dl>
 
-### v1Constant {#v1-constant}
+### v1ConstantSignal {#v1-constant-signal}
 
-Component that emits a constant value as an output signal
+Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
 
 #### Properties
 
 <dl>
-<dt>out_ports</dt>
+<dt>special_value</dt>
 <dd>
 
-([V1ConstantOuts](#v1-constant-outs)) Output ports for the Constant component.
+(string, `oneof=NaN +Inf -Inf`) @gotags: validate:"oneof=NaN +Inf -Inf"
 
 </dd>
 <dt>value</dt>
 <dd>
 
-(float64) The constant value to be emitted.
-
-</dd>
-</dl>
-
-### v1ConstantOuts {#v1-constant-outs}
-
-Outputs for the Constant component.
-
-#### Properties
-
-<dl>
-<dt>output</dt>
-<dd>
-
-([V1OutPort](#v1-out-port)) The constant value is emitted to the output port.
+(float64)
 
 </dd>
 </dl>
@@ -1894,10 +1880,10 @@ Components receive input from other components via InPorts
 (string) Name of the incoming Signal on the InPort.
 
 </dd>
-<dt>constant_value</dt>
+<dt>constant_signal</dt>
 <dd>
 
-(float64) Constant value to be used for this InPort instead of a signal.
+([V1ConstantSignal](#v1-constant-signal)) Constant value to be used for this InPort instead of a signal.
 
 </dd>
 </dl>
@@ -3249,6 +3235,61 @@ Outputs for the Switcher component.
 <dd>
 
 ([V1OutPort](#v1-out-port)) Selected signal (on_true or on_false).
+
+</dd>
+</dl>
+
+### v1Variable {#v1-variable}
+
+Component that emits a variable value as an output signal, can be defined in dynamic configuration.
+
+#### Properties
+
+<dl>
+<dt>out_ports</dt>
+<dd>
+
+([V1VariableOuts](#v1-variable-outs)) Output ports for the Variable component.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig.
+
+</dd>
+<dt>default_config</dt>
+<dd>
+
+([V1VariableDynamicConfig](#v1-variable-dynamic-config)) Default configuration.
+
+</dd>
+</dl>
+
+### v1VariableDynamicConfig {#v1-variable-dynamic-config}
+
+#### Properties
+
+<dl>
+<dt>constant_signal</dt>
+<dd>
+
+([V1ConstantSignal](#v1-constant-signal))
+
+</dd>
+</dl>
+
+### v1VariableOuts {#v1-variable-outs}
+
+Outputs for the Variable component.
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([V1OutPort](#v1-out-port)) The value is emitted to the output port.
 
 </dd>
 </dl>
