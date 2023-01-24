@@ -95,12 +95,6 @@ func (h *Handler) AWSGatewayCheck(ctx context.Context, req *flowcontrolv1.AWSGat
 
 func inputFromPayload(event *events.APIGatewayV2CustomAuthorizerV2Request) map[string]interface{} {
 	input := map[string]interface{}{}
-
-	input["httpMethod"] = event.RequestContext.HTTP.Method
-	input["path"] = event.RequestContext.HTTP.Path
-	input["queryStringParameters"] = event.QueryStringParameters
-	input["headers"] = event.Headers
-
 	return input
 }
 
