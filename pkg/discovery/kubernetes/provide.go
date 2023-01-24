@@ -17,7 +17,8 @@ import (
 )
 
 var (
-	configKey = common.DiscoveryConfigKey + ".kubernetes"
+	// ConfigKey is the configuration key for Kubernetes Discovery.
+	ConfigKey = common.DiscoveryConfigKey + ".kubernetes"
 	// FxTagBase is the tag's base used to identify the Kubernetes Control Points Tracker.
 	FxTagBase = "kubernetes_control_points"
 	// FxTag is the tag used to identify the Kubernetes Control Points Tracker.
@@ -62,7 +63,7 @@ type FxInK8sScale struct {
 // ProvideControlPointCache provides Kubernetes AutoScaler and starts Kubernetes control point discovery if enabled.
 func ProvideControlPointCache(in FxInK8sScale) (ControlPointCache, error) {
 	var cfg KubernetesDiscoveryConfig
-	if err := in.Unmarshaller.UnmarshalKey(configKey, &cfg); err != nil {
+	if err := in.Unmarshaller.UnmarshalKey(ConfigKey, &cfg); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize K8S discovery configuration!")
 		return nil, err
 	}
@@ -112,7 +113,7 @@ type FxInSvc struct {
 // InvokeServiceDiscovery creates a Kubernetes service discovery.
 func InvokeServiceDiscovery(in FxInSvc) error {
 	var cfg KubernetesDiscoveryConfig
-	if err := in.Unmarshaller.UnmarshalKey(configKey, &cfg); err != nil {
+	if err := in.Unmarshaller.UnmarshalKey(ConfigKey, &cfg); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize K8S discovery configuration!")
 		return err
 	}

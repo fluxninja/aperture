@@ -2863,6 +2863,8 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/v1KubernetesControlPoint'
+      installation_mode:
+        type: string
   v1ReportResponse:
     type: object
     description: ReportResponse is empty for now.

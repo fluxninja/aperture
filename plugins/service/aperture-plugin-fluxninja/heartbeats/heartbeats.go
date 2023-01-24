@@ -70,6 +70,7 @@ type Heartbeats struct {
 	heartbeatsAddr              string
 	APIKey                      string
 	jobName                     string
+	installationMode            string
 }
 
 func newHeartbeats(
@@ -82,6 +83,7 @@ func newHeartbeats(
 	policyFactory *controlplane.PolicyFactory,
 	serviceControlPointCache *cache.Cache[selectors.ControlPointID],
 	kubernetesControlPointCache kubernetes.ControlPointCache,
+	installationMode string,
 ) *Heartbeats {
 	return &Heartbeats{
 		heartbeatsAddr:              p.FluxNinjaEndpoint,
@@ -95,6 +97,7 @@ func newHeartbeats(
 		policyFactory:               policyFactory,
 		serviceControlPointCache:    serviceControlPointCache,
 		kubernetesControlPointCache: kubernetesControlPointCache,
+		installationMode:            installationMode,
 	}
 }
 
@@ -261,6 +264,7 @@ func (h *Heartbeats) newHeartbeat(
 		Policies:                policies,
 		ServiceControlPoints:    serviceControlPoints,
 		KubernetesControlPoints: kubernetesControlPoints,
+		InstallationMode:        h.installationMode,
 	}
 }
 
