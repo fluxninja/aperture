@@ -9,6 +9,8 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpServerCodec;
 import net.bytebuddy.asm.Advice;
 
+import java.time.Duration;
+
 public class NettyServerAdvice {
     public static ApertureSDK apertureSDK = apertureSDKFromConfig();
 
@@ -41,7 +43,11 @@ public class NettyServerAdvice {
         }
         ApertureSDK sdk;
         try {
-            sdk = ApertureSDK.builder().setHost(host).setPort(Integer.parseInt(port)).build();
+            sdk = ApertureSDK.builder()
+                    .setHost(host)
+                    .setPort(Integer.parseInt(port))
+                    .setDuration(Duration.ofMillis(1000))
+                    .build();
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("fail");

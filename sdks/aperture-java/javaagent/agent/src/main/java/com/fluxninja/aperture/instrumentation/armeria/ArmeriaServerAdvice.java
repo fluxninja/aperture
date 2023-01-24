@@ -1,16 +1,18 @@
 package com.fluxninja.aperture.instrumentation.armeria;
 
-import com.fluxninja.aperture.armeria.ApertureHTTPClient;
+import com.fluxninja.aperture.armeria.ApertureHTTPService;
 import com.fluxninja.aperture.sdk.ApertureSDK;
-import com.linecorp.armeria.client.WebClientBuilder;
+import com.linecorp.armeria.server.ServerBuilder;
 import net.bytebuddy.asm.Advice;
 
-public class ArmeriaClientAdvice {
+import java.time.Duration;
+
+public class ArmeriaServerAdvice {
     public static ApertureSDK apertureSDK = apertureSDKFromConfig();
 
     @Advice.OnMethodEnter
-    public static void onEnter(@Advice.This WebClientBuilder builder) {
-        builder.decorator(ApertureHTTPClient.newDecorator(apertureSDK));
+    public static void onEnter(@Advice.This ServerBuilder builder) {
+        builder.decorator(ApertureHTTPService.newDecorator(apertureSDK));
     }
 
     private static ApertureSDK apertureSDKFromConfig() {
@@ -24,7 +26,11 @@ public class ArmeriaClientAdvice {
         }
         ApertureSDK sdk;
         try {
-            sdk = ApertureSDK.builder().setHost(host).setPort(Integer.parseInt(port)).build();
+            sdk = ApertureSDK.builder()
+                    .setHost(host)
+                    .setPort(Integer.parseInt(port))
+                    .setDuration(Duration.ofMillis(1000))
+                    .build();
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("fail");
