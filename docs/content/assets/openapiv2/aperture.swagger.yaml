@@ -1216,9 +1216,9 @@ definitions:
       promql:
         $ref: '#/definitions/v1PromQL'
         description: Periodically runs a Prometheus query in the background and emits the result.
-      constant:
-        $ref: '#/definitions/v1Constant'
-        description: Emits a constant signal.
+      variable:
+        $ref: '#/definitions/v1Variable'
+        description: Emits a variable signal which can be set to invalid.
       sqrt:
         $ref: '#/definitions/v1Sqrt'
         description: Takes an input signal and emits the square root of the input signal.
@@ -1290,9 +1290,10 @@ definitions:
       :::tip
       Sometimes you may want to use a constant value as one of component's inputs.
       You can create an input port containing the constant value instead of being connected to a signal.
-      To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
+      To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
+      You can also use it to provide special math values such as NaN and +- Inf.
       If You need to provide the same constant signal to multiple components,
-      You can use the [Constant](#v1-constant) component.
+      You can use the [Variable](#v1-variable) component.
       :::
 
       See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -1334,24 +1335,17 @@ definitions:
       ConcurrencyLimiter configuration is split into two parts: An actuation
       strategy and a scheduler. Right now, only `load_actuator` strategy is available.
     title: Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
-  v1Constant:
+  v1ConstantSignal:
     type: object
     properties:
-      out_ports:
-        $ref: '#/definitions/v1ConstantOuts'
-        description: Output ports for the Constant component.
+      special_value:
+        type: string
+        title: '@gotags: validate:"oneof=NaN +Inf -Inf"'
+        x-go-validate: oneof=NaN +Inf -Inf
       value:
         type: number
         format: double
-        description: The constant value to be emitted.
-    title: Component that emits a constant value as an output signal
-  v1ConstantOuts:
-    type: object
-    properties:
-      output:
-        $ref: '#/definitions/v1OutPort'
-        description: The constant value is emitted to the output port.
-    description: Outputs for the Constant component.
+    description: Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
   v1ControllerDynamicConfig:
     type: object
     properties:
@@ -2049,9 +2043,8 @@ definitions:
       signal_name:
         type: string
         description: Name of the incoming Signal on the InPort.
-      constant_value:
-        type: number
-        format: double
+      constant_signal:
+        $ref: '#/definitions/v1ConstantSignal'
         description: Constant value to be used for this InPort instead of a signal.
     title: Components receive input from other components via InPorts
   v1Integrator:
@@ -3237,6 +3230,31 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Selected signal (on_true or on_false).
     description: Outputs for the Switcher component.
+  v1Variable:
+    type: object
+    properties:
+      out_ports:
+        $ref: '#/definitions/v1VariableOuts'
+        description: Output ports for the Variable component.
+      dynamic_config_key:
+        type: string
+        description: Configuration key for DynamicConfig.
+      default_config:
+        $ref: '#/definitions/v1VariableDynamicConfig'
+        description: Default configuration.
+    description: Component that emits a variable value as an output signal, can be defined in dynamic configuration.
+  v1VariableDynamicConfig:
+    type: object
+    properties:
+      constant_signal:
+        $ref: '#/definitions/v1ConstantSignal'
+  v1VariableOuts:
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
+        description: The value is emitted to the output port.
+    description: Outputs for the Variable component.
   v1VersionInfo:
     type: object
     properties:

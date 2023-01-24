@@ -95,8 +95,8 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 		componentName := c.Name()
 		componentDescription := ""
 		switch componentName {
-		case "Constant":
-			componentDescription = fmt.Sprintf("%0.2f", componentConfig["value"])
+		case "Variable":
+			componentDescription = fmt.Sprintf("%s", componentConfig["default_config"])
 		case "ArithmeticCombinator":
 			componentDescription = fmt.Sprintf("%s", componentConfig["operator"])
 		case "Decider":
@@ -171,12 +171,19 @@ func Mermaid(components []*policymonitoringv1.ComponentView, links []*policymoni
 
 	renderComponentSubGraph := func(component *policymonitoringv1.ComponentView) string {
 		var s strings.Builder
-		if component.ComponentName == "Constant" {
+		if component.ComponentName == "Variable" {
 			// lookup value in component.Component struct
-			value := component.Component.Fields["value"].GetNumberValue()
+			constSignalObj := component.Component.Fields["constant_signal"].GetStructValue()
+			specialValue := constSignalObj.Fields["special_value"].GetStringValue()
+			value := constSignalObj.Fields["value"].GetNumberValue()
 			outPort := component.OutPorts[0].PortName
 			// render constant as a circle with value
-			s.WriteString(fmt.Sprintf("%s((%0.2f))\n", component.ComponentId+outPort, value))
+			if specialValue != "" {
+				s.WriteString(fmt.Sprintf("%s((%s))\n", component.ComponentId+outPort, specialValue))
+			} else {
+				s.WriteString(fmt.Sprintf("%s((%0.2f))\n", component.ComponentId+outPort, value))
+			}
+
 			return s.String()
 		}
 		name := component.ComponentName

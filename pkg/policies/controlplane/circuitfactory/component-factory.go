@@ -46,8 +46,8 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.ArithmeticCombinator, components.NewArithmeticCombinatorAndOptions)
 	case *policylangv1.Component_Promql:
 		ctor = mkCtor(config.Promql, promql.NewPromQLAndOptions)
-	case *policylangv1.Component_Constant:
-		ctor = mkCtor(config.Constant, components.NewConstantAndOptions)
+	case *policylangv1.Component_Variable:
+		ctor = mkCtor(config.Variable, components.NewVariableAndOptions)
 	case *policylangv1.Component_Decider:
 		ctor = mkCtor(config.Decider, components.NewDeciderAndOptions)
 	case *policylangv1.Component_Switcher:

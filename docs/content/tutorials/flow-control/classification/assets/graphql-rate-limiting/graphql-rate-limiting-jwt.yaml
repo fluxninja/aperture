@@ -16,7 +16,8 @@ spec:
               service: service-graphql-demo-app.demoapp.svc.cluster.local
           in_ports:
             limit:
-              constant_value: 10
+              constant_signal:
+                value: 10
           label_key: user_id
           lazy_sync:
             enabled: false

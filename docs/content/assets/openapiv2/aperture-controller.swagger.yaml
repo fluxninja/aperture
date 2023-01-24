@@ -759,9 +759,10 @@ definitions:
       :::tip
       Sometimes you may want to use a constant value as one of component's inputs.
       You can create an input port containing the constant value instead of being connected to a signal.
-      To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
+      To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
+      You can also use it to provide special math values such as NaN and +- Inf.
       If You need to provide the same constant signal to multiple components,
-      You can use the [Constant](#v1-constant) component.
+      You can use the [Variable](#v1-variable) component.
       :::
 
       See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -783,9 +784,6 @@ definitions:
         description: Concurrency Limiter provides service protection by applying prioritized
           load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
         $ref: '#/definitions/v1ConcurrencyLimiter'
-      constant:
-        description: Emits a constant signal.
-        $ref: '#/definitions/v1Constant'
       decider:
         description: Decider emits the binary result of comparison operator on two
           operands.
@@ -846,6 +844,9 @@ definitions:
         description: Switcher acts as a switch that emits one of the two signals based
           on third signal.
         $ref: '#/definitions/v1Switcher'
+      variable:
+        description: Emits a variable signal which can be set to invalid.
+        $ref: '#/definitions/v1Variable'
   v1ConcurrencyLimiter:
     description: |-
       :::info
@@ -884,24 +885,18 @@ definitions:
           @gotags: validate:"required"
         x-go-validate: required
         $ref: '#/definitions/v1Scheduler'
-  v1Constant:
+  v1ConstantSignal:
+    description: Special constant input for ports and Variable component. Can provide
+      either a constant value or special Nan/+-Inf value.
     type: object
-    title: Component that emits a constant value as an output signal
     properties:
-      out_ports:
-        description: Output ports for the Constant component.
-        $ref: '#/definitions/v1ConstantOuts'
+      special_value:
+        type: string
+        title: '@gotags: validate:"oneof=NaN +Inf -Inf"'
+        x-go-validate: oneof=NaN +Inf -Inf
       value:
-        description: The constant value to be emitted.
         type: number
         format: double
-  v1ConstantOuts:
-    description: Outputs for the Constant component.
-    type: object
-    properties:
-      output:
-        description: The constant value is emitted to the output port.
-        $ref: '#/definitions/v1OutPort'
   v1ControllerDynamicConfig:
     type: object
     title: Dynamic Configuration for a Controller
@@ -1525,10 +1520,9 @@ definitions:
     type: object
     title: Components receive input from other components via InPorts
     properties:
-      constant_value:
+      constant_signal:
         description: Constant value to be used for this InPort instead of a signal.
-        type: number
-        format: double
+        $ref: '#/definitions/v1ConstantSignal'
       signal_name:
         description: Name of the incoming Signal on the InPort.
         type: string
@@ -2473,6 +2467,32 @@ definitions:
     properties:
       output:
         description: Selected signal (on_true or on_false).
+        $ref: '#/definitions/v1OutPort'
+  v1Variable:
+    description: Component that emits a variable value as an output signal, can be
+      defined in dynamic configuration.
+    type: object
+    properties:
+      default_config:
+        description: Default configuration.
+        $ref: '#/definitions/v1VariableDynamicConfig'
+      dynamic_config_key:
+        description: Configuration key for DynamicConfig.
+        type: string
+      out_ports:
+        description: Output ports for the Variable component.
+        $ref: '#/definitions/v1VariableOuts'
+  v1VariableDynamicConfig:
+    type: object
+    properties:
+      constant_signal:
+        $ref: '#/definitions/v1ConstantSignal'
+  v1VariableOuts:
+    description: Outputs for the Variable component.
+    type: object
+    properties:
+      output:
+        description: The value is emitted to the output port.
         $ref: '#/definitions/v1OutPort'
   v1VersionInfo:
     type: object
