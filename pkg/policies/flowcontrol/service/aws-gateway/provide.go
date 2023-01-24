@@ -26,7 +26,7 @@ func Module() fx.Option {
 // Register registers the handler on grpc.Server
 //
 // To be used in fx.Invoke.
-func Register(server *grpc.Server, handler flowcontrolv1.AWSGatewayFlowControlServiceServer, healthsrv *health.Server) {
+func Register(server *grpc.Server, handler *Handler, healthsrv *health.Server) {
 	// If changing params to this function, keep RegisterAnnotated in sync.
 	flowcontrolv1.RegisterAWSGatewayFlowControlServiceServer(server, handler)
 
