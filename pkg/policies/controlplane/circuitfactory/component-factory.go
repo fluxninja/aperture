@@ -28,12 +28,12 @@ func FactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 	)
 }
 
-// NewComponentAndOptions creates component and its fx options.
+// NewComponentAndOptions creates parent and leaf components and their fx options for a component spec.
 func NewComponentAndOptions(
 	componentProto *policylangv1.Component,
 	componentID string,
 	policyReadAPI iface.Policy,
-) (runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
+) ([]runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
 	var ctor componentConstructor
 	switch config := componentProto.Component.(type) {
 	case *policylangv1.Component_GradientController:
@@ -82,15 +82,15 @@ func NewComponentAndOptions(
 
 	component, config, option, err := ctor(componentID, policyReadAPI)
 	if err != nil {
-		return runtime.ConfiguredComponent{}, nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	configuredComponent, err := prepareComponent(component, config, componentID)
 	if err != nil {
-		return runtime.ConfiguredComponent{}, nil, nil, err
+		return nil, nil, nil, err
 	}
 
-	return runtime.ConfiguredComponent{}, []runtime.ConfiguredComponent{configuredComponent}, option, nil
+	return nil, []runtime.ConfiguredComponent{configuredComponent}, option, nil
 }
 
 type componentConstructor func(
@@ -118,7 +118,8 @@ func prepareComponent(
 		return runtime.ConfiguredComponent{}, err
 	}
 
-	ports, err := runtime.PortsFromComponentConfig(mapStruct)
+	parentCircuitID := ParentCircuitID(componentID)
+	ports, err := runtime.PortsFromComponentConfig(mapStruct, parentCircuitID)
 	if err != nil {
 		return runtime.ConfiguredComponent{}, err
 	}

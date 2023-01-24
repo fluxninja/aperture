@@ -2031,6 +2031,11 @@ definitions:
         additionalProperties:
           $ref: '#/definitions/NestedCircuitInPorts'
         x-order: 0
+      name:
+        description: Name of the nested circuit component. This name is displayed
+          by graph visualization tools.
+        type: string
+        x-order: 3
       out_ports_map:
         type: object
         additionalProperties:

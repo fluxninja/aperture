@@ -2043,6 +2043,10 @@ definitions:
         type: object
         additionalProperties:
           $ref: '#/definitions/NestedCircuitInPorts'
+      name:
+        description: Name of the nested circuit component. This name is displayed
+          by graph visualization tools.
+        type: string
       out_ports_map:
         type: object
         additionalProperties:

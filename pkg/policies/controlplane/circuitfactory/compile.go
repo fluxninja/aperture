@@ -22,12 +22,12 @@ func Module() fx.Option {
 //
 // Circuit can also be converted to its graph view.
 type Circuit struct {
-	components      []runtime.ConfiguredComponent
-	outerComponents []runtime.ConfiguredComponent
+	leafComponents   []runtime.ConfiguredComponent
+	parentComponents []runtime.ConfiguredComponent
 }
 
 // Components returns a list of CompiledComponents, ready to create runtime.Circuit.
-func (circuit *Circuit) Components() []runtime.ConfiguredComponent { return circuit.components }
+func (circuit *Circuit) Components() []runtime.ConfiguredComponent { return circuit.leafComponents }
 
 // CompileFromProto compiles a protobuf circuit definition into a Circuit.
 //
@@ -36,13 +36,13 @@ func CompileFromProto(
 	componentsProto []*policylangv1.Component,
 	policyReadAPI iface.Policy,
 ) (*Circuit, fx.Option, error) {
-	configuredComponents, outerComponents, option, err := CreateComponents(componentsProto, "root", policyReadAPI)
+	parentComponents, leafComponents, option, err := CreateComponents(componentsProto, "root", policyReadAPI)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	err = runtime.Compile(
-		configuredComponents,
+		leafComponents,
 		policyReadAPI.GetStatusRegistry().GetLogger(),
 	)
 	if err != nil {
@@ -50,28 +50,28 @@ func CompileFromProto(
 	}
 
 	return &Circuit{
-		components:      configuredComponents,
-		outerComponents: outerComponents,
+		parentComponents: parentComponents,
+		leafComponents:   leafComponents,
 	}, option, nil
 }
 
 // CreateComponents creates circuit components along with their identifiers and fx options.
 //
 // Note that number of returned components might be greater than number of
-// components in componentsProto, as some components may have their subcomponents.
+// components in componentsProto, as some components may be composite multi-component stacks or nested circuits.
 func CreateComponents(
 	componentsProto []*policylangv1.Component,
 	circuitID string,
 	policyReadAPI iface.Policy,
 ) ([]runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
 	var (
-		configuredComponents []runtime.ConfiguredComponent
-		outerComponents      []runtime.ConfiguredComponent
-		options              []fx.Option
+		leafComponents   []runtime.ConfiguredComponent
+		parentComponents []runtime.ConfiguredComponent
+		options          []fx.Option
 	)
 
 	for compIndex, componentProto := range componentsProto {
-		outerComponent, subComponents, compOption, err := NewComponentAndOptions(
+		parentComps, leafComps, compOption, err := NewComponentAndOptions(
 			componentProto,
 			ComponentID(circuitID, compIndex),
 			policyReadAPI,
@@ -82,16 +82,16 @@ func CreateComponents(
 		options = append(options, compOption)
 
 		// Add outerComponent to outerComponents
-		outerComponents = append(outerComponents, outerComponent)
+		parentComponents = append(parentComponents, parentComps...)
 
 		// Add subComponents to configuredComponents
-		configuredComponents = append(configuredComponents, subComponents...)
+		leafComponents = append(leafComponents, leafComps...)
 	}
 
-	return configuredComponents, outerComponents, fx.Options(options...), nil
+	return parentComponents, leafComponents, fx.Options(options...), nil
 }
 
 // ComponentID returns the ID for a component within a circuit at componentIndex.
 func ComponentID(circuitID string, componentIndex int) string {
-	return circuitID + "." + strconv.Itoa(componentIndex)
+	return circuitID + NestedCircuitDelimiter + strconv.Itoa(componentIndex)
 }

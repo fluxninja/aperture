@@ -2705,6 +2705,12 @@ Nested circuit defines a sub-circuit as a high-level component. It consists of a
 ([[]V1Component](#v1-component)) @gotags: validate:"dive"
 
 </dd>
+<dt>name</dt>
+<dd>
+
+(string) Name of the nested circuit component. This name is displayed by graph visualization tools.
+
+</dd>
 </dl>
 
 ### v1NestedSignalEgress {#v1-nested-signal-egress}

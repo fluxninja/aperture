@@ -1442,6 +1442,8 @@ message NestedCircuit {
   map<string, OutPorts> out_ports_map = 2;
 
   repeated Component components = 3; // @gotags: validate:"dive"
+  // Name of the nested circuit component. This name is displayed by graph visualization tools.
+  string name = 4;
 }
 
 // Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.

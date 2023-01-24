@@ -43,6 +43,34 @@ type PortMapping struct {
 	Outs PortToSignals `mapstructure:"out_ports"`
 }
 
+// AddInPort adds an input port to the PortMapping.
+func (p *PortMapping) AddInPort(portName string, signals []Signal) {
+	p.Ins[portName] = signals
+}
+
+// AddOutPort adds an output port to the PortMapping.
+func (p *PortMapping) AddOutPort(portName string, signals []Signal) {
+	p.Outs[portName] = signals
+}
+
+// NewPortMapping creates a new PortMapping.
+func NewPortMapping() PortMapping {
+	return PortMapping{
+		Ins:  make(PortToSignals),
+		Outs: make(PortToSignals),
+	}
+}
+
+// Merge merges two PortMappings.
+func (p *PortMapping) Merge(other PortMapping) error {
+	err := p.Ins.merge(other.Ins)
+	if err != nil {
+		return err
+	}
+	err = p.Outs.merge(other.Outs)
+	return err
+}
+
 // PortToSignals is a map from port name to a list of ports.
 type PortToSignals map[string][]Signal
 
@@ -57,16 +85,8 @@ func (p PortToSignals) merge(other PortToSignals) error {
 	return nil
 }
 
-// NewPortMapping creates a new PortMapping.
-func NewPortMapping() PortMapping {
-	return PortMapping{
-		Ins:  make(PortToSignals),
-		Outs: make(PortToSignals),
-	}
-}
-
 // PortsFromComponentConfig extracts Ports from component's config.
-func PortsFromComponentConfig(componentConfig mapstruct.Object) (PortMapping, error) {
+func PortsFromComponentConfig(componentConfig mapstruct.Object, circuitID string) (PortMapping, error) {
 	var ports PortMapping
 
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
@@ -78,17 +98,18 @@ func PortsFromComponentConfig(componentConfig mapstruct.Object) (PortMapping, er
 	}
 
 	err = decoder.Decode(componentConfig)
-	return ports, err
-}
-
-// Merge merges two PortMappings.
-func (p *PortMapping) Merge(other PortMapping) error {
-	err := p.Ins.merge(other.Ins)
-	if err != nil {
-		return err
+	// Add circuitID to all signals.
+	for _, signals := range ports.Ins {
+		for i := range signals {
+			signals[i].CircuitID = circuitID
+		}
 	}
-	err = p.Outs.merge(other.Outs)
-	return err
+	for _, signals := range ports.Outs {
+		for i := range signals {
+			signals[i].CircuitID = circuitID
+		}
+	}
+	return ports, err
 }
 
 // SignalType enum.
