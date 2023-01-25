@@ -21,6 +21,15 @@ var ignoreFuncs = []string{
 	"google.golang.org/grpc.(*addrConn).resetTransport",
 	"go.opentelemetry.io/collector/service/internal/telemetry.(*ProcessMetricsViews).StartCollection.func1",
 	"time.Sleep",
+	// https://github.com/kubernetes/klog/issues/188
+	"k8s.io/klog.(*loggingT).flushDaemon",
+	// https://github.com/DataDog/dd-trace-go/issues/1469
+	"github.com/golang/glog.(*loggingT).flushDaemon",
+	// https://github.com/census-instrumentation/opencensus-go/issues/1191
+	"go.opencensus.io/stats/view.(*worker).start",
+	"github.com/DataDog/datadog-agent/pkg/trace/metrics/timing.(*Set).Autoreport.func1",
+	"github.com/SAP/go-hdb/driver.(*metrics).collect",
+	"internal/poll.runtime_pollWait",
 }
 
 // GoLeakDetector holds options for the goleak detector.
