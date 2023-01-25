@@ -42,11 +42,13 @@ below.
 
 ### Aperture Controller
 
-The controller is powered by always-on, dataflow-driven policies that
+The Aperture Controller is powered by always-on, dataflow-driven policies that
 continuously track deviations from service-level objectives (SLOs) and calculate
-recovery or escalation actions. The policies running in the controller are
-expressed as circuits, much like circuit networks in the game
-[Factorio](https://wiki.factorio.com/Circuit_network).
+recovery or escalation actions. The policies running in the Aperture Controller
+are expressed as circuits, much like circuit networks in the game
+[Factorio](https://wiki.factorio.com/Circuit_network). Aperture Controller store
+certain list of metrics in Prometheus and Etcd store information about decision
+it took.
 
 For example, a gradient control circuit component can be used to implement
 [AIMD](https://en.wikipedia.org/wiki/Additive_increase/multiplicative_decrease)
@@ -54,9 +56,6 @@ For example, a gradient control circuit component can be used to implement
 the concurrency on a service when response times deteriorate. Advanced control
 components like [PID](https://en.wikipedia.org/wiki/PID_controller) can be used
 to further tune the concurrency limits.
-
-Controller store certain list of metrics in Prometheus and Etcd store
-information about decision it took.
 
 Aperture’s Controller is comparable in capabilities to autopilot in aircraft or
 adaptive cruise control in some automobiles.
@@ -83,3 +82,6 @@ Aperture Agents monitor golden signals using an in-built telemetry system and a
 programmable, high-fidelity flow classifier used to label requests based on
 attributes such as customer tier or request type. These metrics are analyzed by
 the controller.
+
+Aperture also includes an integration for auto-scaling, which can help you scale
+your infrastructure as needed by countermeasures.
