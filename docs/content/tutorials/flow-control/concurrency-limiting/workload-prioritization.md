@@ -21,7 +21,7 @@ is more critical than personalized recommendations and should be prioritized
 when resources are constrained.
 
 Aperture's
-[weighted fair queueing scheduler](/concepts/policy/circuit/components/concurrency-limiter.md#scheduler)
+[weighted fair queueing scheduler](/concepts/flow-control/components/concurrency-limiter.md#scheduler)
 allows fairly prioriting certain flows over others based on their flow labels.
 This enables graceful degradation in face of overloads and other failures, and
 maximizes user-experience or revenue.

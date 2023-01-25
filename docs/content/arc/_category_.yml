@@ -3,6 +3,5 @@ position: 5
 collapsible: true
 collapsed: true
 link:
-  type: "generated-index"
-  title: "FluxNinja ARC"
-  keywords: ["cloud"]
+  type: "doc"
+  id: "arc"

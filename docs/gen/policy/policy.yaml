@@ -485,7 +485,7 @@ definitions:
   v1Circuit:
     description: |-
       :::info
-      See also [Circuit overview](/concepts/policy/circuit/circuit.md).
+      See also [Circuit overview](/concepts/policy/circuit.md).
       :::
 
       Signals flow between components via ports.
@@ -573,7 +573,7 @@ definitions:
   v1Component:
     description: |-
       :::info
-      See also [Components overview](/concepts/policy/circuit/circuit.md#components).
+      See also [Components overview](/concepts/policy/circuit.md#components).
       :::
 
       Signals flow into the components via input ports and results are emitted on output ports.
@@ -721,7 +721,7 @@ definitions:
   v1ConcurrencyLimiter:
     description: |-
       :::info
-      See also [Concurrency Limiter overview](/concepts/policy/circuit/components/concurrency-limiter.md).
+      See also [Concurrency Limiter overview](/concepts/flow-control/components/concurrency-limiter.md).
       :::
 
       It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -2074,7 +2074,7 @@ definitions:
   v1RateLimiter:
     description: |-
       :::info
-      See also [Rate Limiter overview](/concepts/policy/circuit/components/rate-limiter.md).
+      See also [Rate Limiter overview](/concepts/flow-control/components/rate-limiter.md).
       :::
 
       Ratelimiting is done separately on per-label-value basis. Use _label\_key_
@@ -2350,7 +2350,7 @@ definitions:
 
           :::info
           See also [workload definition in the concepts
-          section](/concepts/policy/circuit/components/concurrency-limiter.md#workload).
+          section](/concepts/flow-control/components/concurrency-limiter.md#workload).
           :::
 
           @gotags: validate:"dive"

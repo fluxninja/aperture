@@ -10,8 +10,8 @@ keywords:
 
 :::info Join the FluxNinja ARC Beta
 
-FluxNinja ARC is inviting beta users. Please sign in
-[here](https://app.fluxninja.com/sign-in)
+FluxNinja ARC is inviting beta users. Please sign up
+[here](https://app.fluxninja.com/sign-up)
 
 :::
 

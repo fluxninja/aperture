@@ -648,7 +648,7 @@ Outputs for the Arithmetic Combinator component.
 Circuit is defined as a dataflow graph of inter-connected components
 
 :::info
-See also [Circuit overview](/concepts/policy/circuit/circuit.md).
+See also [Circuit overview](/concepts/policy/circuit.md).
 :::
 
 Signals flow between components via ports.
@@ -744,7 +744,7 @@ how to extract and propagate flow labels with that key.
 Computational block that form the circuit
 
 :::info
-See also [Components overview](/concepts/policy/circuit/circuit.md#components).
+See also [Components overview](/concepts/policy/circuit.md#components).
 :::
 
 Signals flow into the components via input ports and results are emitted on output ports.
@@ -932,7 +932,7 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 
 :::info
-See also [Concurrency Limiter overview](/concepts/policy/circuit/components/concurrency-limiter.md).
+See also [Concurrency Limiter overview](/concepts/flow-control/components/concurrency-limiter.md).
 :::
 
 It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -2778,7 +2778,7 @@ Outputs for the PulseGenerator component.
 Limits the traffic on a control point to specified rate
 
 :::info
-See also [Rate Limiter overview](/concepts/policy/circuit/components/rate-limiter.md).
+See also [Rate Limiter overview](/concepts/flow-control/components/rate-limiter.md).
 :::
 
 Ratelimiting is done separately on per-label-value basis. Use _label_key_
@@ -3039,7 +3039,7 @@ If none of workloads match, `default_workload` will be used.
 
 :::info
 See also [workload definition in the concepts
-section](/concepts/policy/circuit/components/concurrency-limiter.md#workload).
+section](/concepts/flow-control/components/concurrency-limiter.md#workload).
 :::
 
 @gotags: validate:"dive"

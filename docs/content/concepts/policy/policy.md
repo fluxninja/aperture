@@ -29,7 +29,7 @@ reliability context, it codifies the capability of the application to modify its
 operational state to achieve the best possible mode of operation despite
 overload and failures.
 
-[circuit]: /concepts/policy/circuit/circuit.md
+[circuit]: /concepts/policy/circuit.md
 [resources]: /concepts/policy/resources.md
 [blueprints]: /get-started/policies/blueprints/blueprints.md
 [control-system]: https://en.wikipedia.org/wiki/Control_system
