@@ -68,17 +68,16 @@ Component with the smallest index (in list of Components). The un-linked
 Component Ports consume Looping Signals. A Looping Signal has the value of the
 un-linked Signal from the previous Tick.
 
-## Exploring Components {#components}
+## Example Components {#components}
 
-Components are divided into following functional categories to aid exploration:
+The exhaustive list of the built-in components can be found in the
+[Policy reference](references/configuration/policy.md#v1-component).
+
+Examples of built-in components include:
 
 - **Sources**: These Components emit Signals into the Circuit from outside.
   - [PromQL][promql-reference]: Converts results from a PromQL query into a
     Signal.
-  - [ConcurrencyLimiter.Scheduler][scheduler-reference]: Emits Signals
-    representing incoming and accepted Flow concurrencies observed by the
-    specified [Flow Control Scheduler][flow-control-scheduler] at Aperture
-    Agents.
 - **Signal Processors**: These Components transform input Signal(s) into output
   Signal(s).
   - **Arithmetic**: These Components perform basic Arithmetic operations on
@@ -92,14 +91,10 @@ Components are divided into following functional categories to aid exploration:
       Signals.
     - [Sqrt](/references/configuration/policy.md#v1-sqrt): This Component square
       roots a Signal.
-    - [Constant](/references/configuration/policy.md#v1-constant): A constant
-      Signal value.
   - **Transformers**: These Components statefully transform an input Signal in
     an output Signal.
     - [EMA](/references/configuration/policy.md#v1-e-m-a): Exponential Moving
       Average.
-    - [Extrapolator](/references/configuration/policy.md#v1-extrapolator):
-      Extrapolate a Signal based on past values.
   - [Decider and Switcher](/references/configuration/policy.md#v1-decider):
     These Components work in tandem to make the Circuit adapt based on
     conditions.
@@ -127,5 +122,3 @@ Components are divided into following functional categories to aid exploration:
 [circuit-reference]: /references/configuration/policy.md#v1-circuit
 [promql-reference]: /references/configuration/policy.md#v1-prom-q-l
 [scheduler-reference]: /references/configuration/policy.md#v1-scheduler
-
-[flow-control-scheduler]: /components/ concurrency-limiter.md#scheduler
