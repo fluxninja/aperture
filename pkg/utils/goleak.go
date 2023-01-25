@@ -48,7 +48,19 @@ func (l *GoLeakDetector) AddIgnoreTopFunctions(fs ...string) {
 
 // FindLeaks finds memory leaks in the current process.
 func (l *GoLeakDetector) FindLeaks() error {
-	time.Sleep(time.Second * 5)
+	if err := goleak.Find(l.goleakOptions...); err == nil {
+		return nil
+	}
+
+	// Give them a chance to stop.
+	time.Sleep(100 * time.Millisecond)
+	if err := goleak.Find(l.goleakOptions...); err == nil {
+		return nil
+	}
+
+	// Last chance.
+	time.Sleep(5 * time.Second)
+	// FIXME(krdln/harjotgill) Is this necessary? Can GC affect goroutines?
 	runtime.GC()
 	return goleak.Find(l.goleakOptions...)
 }
