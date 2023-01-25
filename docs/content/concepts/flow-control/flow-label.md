@@ -1,6 +1,6 @@
 ---
 title: Flow Label
-sidebar_position: 3
+sidebar_position: 1
 ---
 
 Every [Flow][flow] is annotated with a set of **Flow Labels**. Each Flow Label
@@ -191,8 +191,8 @@ select which labels to include in telemetry.
 [flow]: /concepts/flow-control/flow-control.md#flow
 [flow-selector]: /concepts/flow-control/flow-selector.md
 [classifier]: /concepts/flow-control/flow-classifier.md
-[workload]: /concepts/flow-control/concurrency-limiter.md#workload
-[ratelimiter]: /concepts/flow-control/rate-limiter.md
+[workload]: /concepts/policy/circuit/components/concurrency-limiter.md#workload
+[ratelimiter]: /concepts/policy/circuit/components/rate-limiter.md
 [flux-meter]: /concepts/flow-control/flux-meter.md
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:
@@ -201,4 +201,4 @@ select which labels to include in telemetry.
 [otel-conventions]:
   https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
 [aperture-go]: https://github.com/FluxNinja/aperture-go
-[istio]: /get-started/flow-control/envoy/istio.md
+[istio]: /get-started/integrations/flow-control/envoy/istio.md

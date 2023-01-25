@@ -95,11 +95,11 @@ type ServiceSelector struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Which [agent-group](/concepts/service.md#agent-group) this
+	// Which [agent-group](/concepts/flow-control/service.md#agent-group) this
 	// selector applies to.
 	AgentGroup string `protobuf:"bytes,1,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"default"` // @gotags: default:"default"
 	// The Fully Qualified Domain Name of the
-	// [service](/concepts/service.md) to select.
+	// [service](/concepts/flow-control/service.md) to select.
 	//
 	// In kubernetes, this is the FQDN of the Service object.
 	//
@@ -264,7 +264,7 @@ type KubernetesObjectSelector struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Which [agent-group](/concepts/service.md#agent-group) this
+	// Which [agent-group](/concepts/flow-control/service.md#agent-group) this
 	// selector applies to.
 	AgentGroup string `protobuf:"bytes,1,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"default"` // @gotags: default:"default"
 	// Kubernetes namespace that the resource belongs to.

@@ -1,6 +1,8 @@
 package runtime
 
 import (
+	"math"
+
 	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
@@ -97,6 +99,12 @@ func (p PortToSignals) merge(other PortToSignals) error {
 	return nil
 }
 
+// ConstantSignal is a mirror struct to same proto message.
+type ConstantSignal struct {
+	SpecialValue string  `mapstructure:"special_value"`
+	Value        float64 `mapstructure:"value"`
+}
+
 // PortsFromComponentConfig extracts Ports from component's config.
 func PortsFromComponentConfig(componentConfig mapstruct.Object, circuitID string) (PortMapping, error) {
 	var ports PortMapping
@@ -139,31 +147,37 @@ const (
 // Only one field should be set.
 type Signal struct {
 	// Note: pointers are used to detect fields being not set.
-	SignalName    string `mapstructure:"signal_name"`
-	CircuitID     string
-	ConstantValue float64 `mapstructure:"constant_value"`
-	Looped        bool
+	SignalName     string `mapstructure:"signal_name"`
+	CircuitID      string
+	ConstantSignal ConstantSignal `mapstructure:"constant_signal"`
+	Looped         bool
 }
 
 // SignalType returns the Signal type of the port.
-func (p *Signal) SignalType() SignalType {
-	if p.SignalName != "" {
+func (s *Signal) SignalType() SignalType {
+	if s.SignalName != "" {
 		return SignalTypeNamed
 	}
 	return SignalTypeConstant
 }
 
-// MakeNamedSignal creates a new named Signal.
-func MakeNamedSignal(name string, looped bool) Signal {
-	return Signal{
-		SignalName: name,
-		Looped:     looped,
+// GetConstantSignalValue returns the value of the constant signal.
+func (s *Signal) GetConstantSignalValue() float64 {
+	constantSignal := s.ConstantSignal
+	value := 0.0
+	specialValue := constantSignal.SpecialValue
+	if specialValue != "" {
+		switch specialValue {
+		case "NaN":
+			value = math.NaN()
+		case "+Inf":
+			value = math.Inf(1)
+		case "-Inf":
+			value = math.Inf(-1)
+		}
+	} else {
+		value = constantSignal.Value
 	}
-}
 
-// MakeConstantSignal creates a new constant Signal.
-func MakeConstantSignal(value float64) Signal {
-	return Signal{
-		ConstantValue: value,
-	}
+	return value
 }

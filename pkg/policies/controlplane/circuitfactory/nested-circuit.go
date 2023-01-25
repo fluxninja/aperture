@@ -4,9 +4,11 @@ import (
 	"strings"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"go.uber.org/fx"
 )
@@ -24,33 +26,19 @@ func ParseNestedCircuit(
 	parentCircuitID := ParentCircuitID(nestedCircuitID)
 
 	inPortsMap := nestedCircuitProto.GetInPortsMap()
-	for portName, inPort := range inPortsMap {
-		signals := []runtime.Signal{
-			{
-				SignalName:    inPort.GetSignalName(),
-				ConstantValue: inPort.GetConstantValue(),
-				CircuitID:     parentCircuitID,
-			},
-		}
-		if portMapping.ExistsInPort(portName) {
-			return nil, nil, nil, errors.Errorf("redefinition of port %s in nested circuit %s", portName, nestedCircuitProto.Name)
-		}
-		portMapping.AddInPort(portName, signals)
+	ins, err := DecodePortMap(inPortsMap, parentCircuitID)
+	if err != nil {
+		return nil, nil, nil, err
 	}
 
 	outPortsMap := nestedCircuitProto.GetOutPortsMap()
-	for portName, outPort := range outPortsMap {
-		signals := []runtime.Signal{
-			{
-				SignalName: outPort.GetSignalName(),
-				CircuitID:  parentCircuitID,
-			},
-		}
-		if portMapping.ExistsOutPort(portName) {
-			return nil, nil, nil, errors.Errorf("redefinition of port %s in nested circuit %s", portName, nestedCircuitProto.Name)
-		}
-		portMapping.AddOutPort(portName, signals)
+	outs, err := DecodePortMap(outPortsMap, parentCircuitID)
+	if err != nil {
+		return nil, nil, nil, err
 	}
+
+	portMapping.Ins = ins
+	portMapping.Outs = outs
 
 	parentComponents, leafComponents, options, err := CreateComponents(
 		nestedCircuitProto.GetComponents(),
@@ -71,7 +59,10 @@ func ParseNestedCircuit(
 		// dynamic cast to signal ingress or egress
 		if nestedSignalIngress, ok := component.(*components.NestedSignalIngress); ok {
 			portName := nestedSignalIngress.PortName()
-			// for tracking the port names in the nested circuit
+			// tracking the port names in the nested circuit
+			if _, ok := ingressPorts[portName]; ok {
+				return nil, nil, nil, errors.Errorf("duplicate ingress port %s in nested circuit %s", portName, nestedCircuitProto.Name)
+			}
 			ingressPorts[portName] = nil
 			signals, ok := portMapping.Ins[portName]
 			if ok {
@@ -80,7 +71,10 @@ func ParseNestedCircuit(
 			}
 		} else if nestedSignalEgress, ok := component.(*components.NestedSignalEgress); ok {
 			portName := nestedSignalEgress.PortName()
-			// for tracking the port names in the nested circuit
+			// tracking the port names in the nested circuit
+			if _, ok := egressPorts[portName]; ok {
+				return nil, nil, nil, errors.Errorf("duplicate egress port %s in nested circuit %s", portName, nestedCircuitProto.Name)
+			}
 			egressPorts[portName] = nil
 			signals, ok := portMapping.Outs[portName]
 			if ok {
@@ -122,4 +116,34 @@ func ParentCircuitID(childCircuitID string) string {
 	// Parent Child are delimited by dots. So, we split the child circuit ID by dots and return the first part.
 	// For example, if the child circuit ID is "foo.bar.baz", then the parent circuit ID is "foo.bar".
 	return childCircuitID[:strings.LastIndex(childCircuitID, NestedCircuitDelimiter)]
+}
+
+// DecodePortMap decodes a proto port map into a PortToSignals map.
+func DecodePortMap(config any, circuitID string) (runtime.PortToSignals, error) {
+	var ports runtime.PortToSignals
+
+	mapStruct, err := mapstruct.EncodeObject(config)
+	if err != nil {
+		return nil, err
+	}
+	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+		WeaklyTypedInput: true, // So that singular ports will transparently be converted to lists.
+		Result:           &ports,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	err = decoder.Decode(mapStruct)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, signals := range ports {
+		for i := range signals {
+			signals[i].CircuitID = circuitID
+		}
+	}
+
+	return ports, nil
 }

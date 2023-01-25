@@ -15,6 +15,7 @@ local combinator = aperture.spec.v1.ArithmeticCombinator;
 local decider = aperture.spec.v1.Decider;
 local alerter = aperture.spec.v1.Alerter;
 local alerterConfig = aperture.spec.v1.AlerterConfig;
+local constantSignal = aperture.spec.v1.ConstantSignal;
 
 local svcSelector =
   flowSelector.new()
@@ -50,7 +51,7 @@ local policyDef =
         + ema.withOutPortsMixin(ema.outPorts.withOutput(port.withSignalName('LATENCY_EMA')))
       ),
       component.withArithmeticCombinator(combinator.mul(port.withSignalName('LATENCY_EMA'),
-                                                        port.withConstantValue('1.1'),
+                                                        port.withConstantSignal(1.1),
                                                         output=port.withSignalName('LATENCY_SETPOINT'))),
       component.withDecider(
         decider.new()

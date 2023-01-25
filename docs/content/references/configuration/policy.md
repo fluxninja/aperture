@@ -662,7 +662,8 @@ Signals are mapped to boolean values as follows:
 
   :::note
   Treating invalid inputs as "unknowns" has a consequence that the result
-  might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`, because the result would end up false no matter if
+  might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,
+  because the result would end up false no matter if
   first signal was true or false. On the other hand, `unknown && true == unknown`.
   :::
 
@@ -790,7 +791,7 @@ Outputs for the Arithmetic Combinator component.
 Circuit is defined as a dataflow graph of inter-connected components
 
 :::info
-See also [Circuit overview](/concepts/policy/circuit.md).
+See also [Circuit overview](/concepts/policy/circuit/circuit.md).
 :::
 
 Signals flow between components via ports.
@@ -886,7 +887,7 @@ how to extract and propagate flow labels with that key.
 Computational block that form the circuit
 
 :::info
-See also [Components overview](/concepts/policy/circuit.md#components).
+See also [Components overview](/concepts/policy/circuit/circuit.md#components).
 :::
 
 Signals flow into the components via input ports and results are emitted on output ports.
@@ -917,9 +918,10 @@ There are three categories of components:
 :::tip
 Sometimes you may want to use a constant value as one of component's inputs.
 You can create an input port containing the constant value instead of being connected to a signal.
-To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
+To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
+You can also use it to provide special math values such as NaN and +- Inf.
 If You need to provide the same constant signal to multiple components,
-You can use the [Constant](#v1-constant) component.
+You can use the [Variable](#v1-variable) component.
 :::
 
 See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -976,10 +978,10 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([V1PromQL](#v1-prom-q-l)) Periodically runs a Prometheus query in the background and emits the result.
 
 </dd>
-<dt>constant</dt>
+<dt>variable</dt>
 <dd>
 
-([V1Constant](#v1-constant)) Emits a constant signal.
+([V1Variable](#v1-variable)) Emits a variable signal which can be set to invalid.
 
 </dd>
 <dt>sqrt</dt>
@@ -1060,6 +1062,12 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([V1PulseGenerator](#v1-pulse-generator)) Generates 0 and 1 in turns.
 
 </dd>
+<dt>holder</dt>
+<dd>
+
+([V1Holder](#v1-holder)) Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+
+</dd>
 <dt>nested_circuit</dt>
 <dd>
 
@@ -1091,7 +1099,7 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 
 :::info
-See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
+See also [Concurrency Limiter overview](/concepts/policy/circuit/components/concurrency-limiter.md).
 :::
 
 It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -1132,38 +1140,23 @@ Actuation strategy defines the input signal that will drive the scheduler.
 </dd>
 </dl>
 
-### v1Constant {#v1-constant}
+### v1ConstantSignal {#v1-constant-signal}
 
-Component that emits a constant value as an output signal
+Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
 
 #### Properties
 
 <dl>
-<dt>out_ports</dt>
+<dt>special_value</dt>
 <dd>
 
-([V1ConstantOuts](#v1-constant-outs)) Output ports for the Constant component.
+(string, `oneof=NaN +Inf -Inf`) @gotags: validate:"oneof=NaN +Inf -Inf"
 
 </dd>
 <dt>value</dt>
 <dd>
 
-(float64) The constant value to be emitted.
-
-</dd>
-</dl>
-
-### v1ConstantOuts {#v1-constant-outs}
-
-Outputs for the Constant component.
-
-#### Properties
-
-<dl>
-<dt>output</dt>
-<dd>
-
-([V1OutPort](#v1-out-port)) The constant value is emitted to the output port.
+(float64)
 
 </dd>
 </dl>
@@ -1831,7 +1824,7 @@ selector:
 
 :::info
 For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/get-started/flow-control/envoy/istio.md#envoy-filter)
+[Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)
 :::
 
 @gotags: default:"workload_duration_ms"
@@ -2035,6 +2028,66 @@ so the _slope_ might not fully describe aggressiveness of the controller.
 </dd>
 </dl>
 
+### v1Holder {#v1-holder}
+
+Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1HolderIns](#v1-holder-ins))
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([V1HolderOuts](#v1-holder-outs))
+
+</dd>
+<dt>hold_for</dt>
+<dd>
+
+(string, default: `5s`) Holding the last valid signal value for the hold_for duration.
+
+@gotags: default:"5s"
+
+</dd>
+</dl>
+
+### v1HolderIns {#v1-holder-ins}
+
+Inputs for the Holder component.
+
+#### Properties
+
+<dl>
+<dt>input</dt>
+<dd>
+
+([V1InPort](#v1-in-port))
+
+</dd>
+</dl>
+
+### v1HolderOuts {#v1-holder-outs}
+
+Outputs for the Holder component.
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
+
+</dd>
+</dl>
+
 ### v1HorizontalPodScaler {#v1-horizontal-pod-scaler}
 
 #### Properties
@@ -2075,10 +2128,10 @@ Components receive input from other components via InPorts
 (string) Name of the incoming Signal on the InPort.
 
 </dd>
-<dt>constant_value</dt>
+<dt>constant_signal</dt>
 <dd>
 
-(float64) Constant value to be used for this InPort instead of a signal.
+([V1ConstantSignal](#v1-constant-signal)) Constant value to be used for this InPort instead of a signal.
 
 </dd>
 </dl>
@@ -2325,7 +2378,7 @@ component should apply to.
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Which [agent-group](/concepts/service.md#agent-group) this
+(string, default: `default`) Which [agent-group](/concepts/flow-control/service.md#agent-group) this
 selector applies to.
 
 @gotags: default:"default"
@@ -3012,7 +3065,7 @@ Outputs for the PulseGenerator component.
 Limits the traffic on a control point to specified rate
 
 :::info
-See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
+See also [Rate Limiter overview](/concepts/policy/circuit/components/rate-limiter.md).
 :::
 
 Ratelimiting is done separately on per-label-value basis. Use _label_key_
@@ -3321,7 +3374,7 @@ If none of workloads match, `default_workload` will be used.
 
 :::info
 See also [workload definition in the concepts
-section](/concepts/flow-control/concurrency-limiter.md#workload).
+section](/concepts/policy/circuit/components/concurrency-limiter.md#workload).
 :::
 
 @gotags: validate:"dive"
@@ -3402,7 +3455,7 @@ See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Which [agent-group](/concepts/service.md#agent-group) this
+(string, default: `default`) Which [agent-group](/concepts/flow-control/service.md#agent-group) this
 selector applies to.
 
 @gotags: default:"default"
@@ -3412,7 +3465,7 @@ selector applies to.
 <dd>
 
 (string) The Fully Qualified Domain Name of the
-[service](/concepts/service.md) to select.
+[service](/concepts/flow-control/service.md) to select.
 
 In kubernetes, this is the FQDN of the Service object.
 
@@ -3550,6 +3603,61 @@ Outputs for the Switcher component.
 <dd>
 
 ([V1OutPort](#v1-out-port)) Selected signal (on_true or on_false).
+
+</dd>
+</dl>
+
+### v1Variable {#v1-variable}
+
+Component that emits a variable value as an output signal, can be defined in dynamic configuration.
+
+#### Properties
+
+<dl>
+<dt>out_ports</dt>
+<dd>
+
+([V1VariableOuts](#v1-variable-outs)) Output ports for the Variable component.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig.
+
+</dd>
+<dt>default_config</dt>
+<dd>
+
+([V1VariableDynamicConfig](#v1-variable-dynamic-config)) Default configuration.
+
+</dd>
+</dl>
+
+### v1VariableDynamicConfig {#v1-variable-dynamic-config}
+
+#### Properties
+
+<dl>
+<dt>constant_signal</dt>
+<dd>
+
+([V1ConstantSignal](#v1-constant-signal))
+
+</dd>
+</dl>
+
+### v1VariableOuts {#v1-variable-outs}
+
+Outputs for the Variable component.
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([V1OutPort](#v1-out-port)) The value is emitted to the output port.
 
 </dd>
 </dl>

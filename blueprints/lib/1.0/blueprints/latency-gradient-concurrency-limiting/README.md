@@ -7,10 +7,10 @@ to calculate a proportional response that limits the accepted concurrency.
 :::info
 
 See tutorials on
-[Basic Concurrency Limiting](/tutorials/flow-control/basic-concurrency-limiting.md)
+[Basic Concurrency Limiting](/tutorials/flow-control/concurrency-limiting/basic-concurrency-limiting.md)
 and
-[Workload Prioritization](/tutorials/flow-control/workload-prioritization.md) to
-see this blueprint in use.
+[Workload Prioritization](/tutorials/flow-control/concurrency-limiting/workload-prioritization.md)
+to see this blueprint in use.
 
 :::
 

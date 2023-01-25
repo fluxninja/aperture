@@ -24,9 +24,9 @@ Aperture splits the process of flow control in two layers:
   done by Aperture Controller through _policies_. You can read more about
   policies in [Policies chapter][policies].
 - Actual execution of flow control is performed by Aperture Agent via
-  [Concurrency Limiters][concurrency-limiter] or [Rate Limiters][rate-limiter].
-  Additionally the Agent handles other flow-control related tasks, like
-  gathering metrics via [Flux Meters][flux-meter] and classifying traffic via
+  [Concurrency Limiters][cl] or [Rate Limiters][rate-limiter]. Additionally the
+  Agent handles other flow-control related tasks, like gathering metrics via
+  [Flux Meters][flux-meter] and classifying traffic via
   [Classifiers][classifier]. This chapter describes flow control capabilities at
   the Agent.
 
@@ -138,7 +138,7 @@ execution):
 
 - [Classifiers][classifier]
 - [Rate Limiter][rate-limiter]
-- [Concurrency Limiter][concurrency-limiter]
+- [Concurrency Limiter][cl]
 - [Flux Meters][flux-meter]
 
 [Flux Meters][flux-meter] enrich the telemetry stream and can be thought to
@@ -149,16 +149,16 @@ we recommend to start with concepts like [services][service] and
 [labels][flow-label] first.
 
 [policies]: /concepts/policy/policy.md
-[concurrency-limiter]: /concepts/flow-control/concurrency-limiter.md
-[rate-limiter]: /concepts/flow-control/rate-limiter.md
+[cl]: /concepts/policy/circuit/components/concurrency-limiter.md
+[rate-limiter]: /concepts/policy/circuit/components/rate-limiter.md
 [flux-meter]: /concepts/flow-control/flux-meter.md
 [classifier]: /concepts/flow-control/flow-classifier.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
-[istio]: /get-started/flow-control/envoy/istio.md
+[istio]: /get-started/integrations/flow-control/envoy/istio.md
 [ext-authz]:
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto#authorization-service-proto
 [aperture-go]: https://github.com/FluxNinja/aperture-go
-[service]: /concepts/service.md
+[service]: /concepts/flow-control/service.md
 [flow-label]: /concepts/flow-control/flow-label.md
 [flowcontrol-proto]:
   https://buf.build/fluxninja/aperture/docs/main:aperture.flowcontrol.v1

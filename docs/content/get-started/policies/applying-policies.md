@@ -1,5 +1,5 @@
 ---
-title: Applying Policies
+title: Get Started with First Policy
 description: How to apply Policies in Aperture
 keywords:
   - policy
@@ -69,4 +69,4 @@ kubectl --namespace=aperture-controller delete policy static-rate-limiting
 [controller-metrics]: /references/observability/prometheus-metrics/controller.md
 [agent-metrics]: /references/observability/prometheus-metrics/agent.md
 [policy-concept]: /concepts/policy/policy.md
-[blueprints]: /get-started/policies/blueprints.md
+[blueprints]: /get-started/policies/blueprints/blueprints.md

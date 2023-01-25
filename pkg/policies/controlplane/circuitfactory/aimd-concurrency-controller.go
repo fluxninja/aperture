@@ -100,8 +100,12 @@ func ParseAIMDConcurrencyController(
 						Operator: components.Mul.String(),
 						InPorts: &policylangv1.ArithmeticCombinator_Ins{
 							Lhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_ConstantValue{
-									ConstantValue: aimdConcurrencyController.ConcurrencyLimitMultiplier,
+								Value: &policylangv1.InPort_ConstantSignal{
+									ConstantSignal: &policylangv1.ConstantSignal{
+										Const: &policylangv1.ConstantSignal_Value{
+											Value: aimdConcurrencyController.ConcurrencyLimitMultiplier,
+										},
+									},
 								},
 							},
 							Rhs: &policylangv1.InPort{
@@ -124,8 +128,12 @@ func ParseAIMDConcurrencyController(
 						Operator: components.Add.String(),
 						InPorts: &policylangv1.ArithmeticCombinator_Ins{
 							Lhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_ConstantValue{
-									ConstantValue: aimdConcurrencyController.ConcurrencyLinearIncrement,
+								Value: &policylangv1.InPort_ConstantSignal{
+									ConstantSignal: &policylangv1.ConstantSignal{
+										Const: &policylangv1.ConstantSignal_Value{
+											Value: aimdConcurrencyController.ConcurrencyLinearIncrement,
+										},
+									},
 								},
 							},
 							Rhs: &policylangv1.InPort{
@@ -272,6 +280,100 @@ func ParseAIMDConcurrencyController(
 											SignalName: "LOAD_MULTIPLIER",
 										},
 									},
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_NestedSignalIngress{
+					NestedSignalIngress: &policylangv1.NestedSignalIngress{
+						PortName: aimdSignalPortName,
+						OutPorts: &policylangv1.NestedSignalIngress_Outs{
+							Signal: &policylangv1.OutPort{
+								SignalName: "SIGNAL",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_NestedSignalIngress{
+					NestedSignalIngress: &policylangv1.NestedSignalIngress{
+						PortName: aimdSetpointPortName,
+						OutPorts: &policylangv1.NestedSignalIngress_Outs{
+							Signal: &policylangv1.OutPort{
+								SignalName: "SETPOINT",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_NestedSignalEgress{
+					NestedSignalEgress: &policylangv1.NestedSignalEgress{
+						PortName: aimdAcceptedConcurrencyPortName,
+						InPorts: &policylangv1.NestedSignalEgress_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "ACCEPTED_CONCURRENCY",
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_NestedSignalEgress{
+					NestedSignalEgress: &policylangv1.NestedSignalEgress{
+						PortName: aimdIncomingConcurrencyPortName,
+						InPorts: &policylangv1.NestedSignalEgress_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "INCOMING_CONCURRENCY",
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_NestedSignalEgress{
+					NestedSignalEgress: &policylangv1.NestedSignalEgress{
+						PortName: aimdDesiredConcurrencyPortName,
+						InPorts: &policylangv1.NestedSignalEgress_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "DESIRED_CONCURRENCY",
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_NestedSignalEgress{
+					NestedSignalEgress: &policylangv1.NestedSignalEgress{
+						PortName: aimdIsOverloadPortName,
+						InPorts: &policylangv1.NestedSignalEgress_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "IS_OVERLOAD",
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_NestedSignalEgress{
+					NestedSignalEgress: &policylangv1.NestedSignalEgress{
+						PortName: aimdLoadMultiplierPortName,
+						InPorts: &policylangv1.NestedSignalEgress_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "LOAD_MULTIPLIER",
 								},
 							},
 						},

@@ -263,7 +263,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				// Check if all the sig(s) in sigs are ready
 				for index, sig := range sigs {
 					if sig.SignalType() == SignalTypeConstant {
-						readingList[index] = NewReading(sig.ConstantValue)
+						readingList[index] = NewReading(sig.GetConstantSignalValue())
 					} else if sigReading, ok := circuitSignalReadings[sig]; ok {
 						// Set sigReading in readingList at index
 						readingList[index] = sigReading
@@ -337,7 +337,9 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 						// Looped signals are stored in circuit.loopedSignals for the next round
 						circuit.loopedSignals[sig] = readings[index]
 						// Store the reading in circuitSignalReadings under the same signal name without the looped flag
-						circuitSignalReadings[MakeNamedSignal(sig.SignalName, false)] = readings[index]
+						sigNoLoop := sig
+						sigNoLoop.Looped = false
+						circuitSignalReadings[sigNoLoop] = readings[index]
 					} else {
 						// Store the reading in circuitSignalReadings
 						circuitSignalReadings[sig] = readings[index]

@@ -21,7 +21,7 @@ var _ = Describe("Circuit", func() {
 		circuit, err := sim.NewCircuit(
 			nil,
 			sim.Inputs{
-				"X": components.NewConstant(42.0),
+				"X": components.NewConstantSignal(42.0),
 			},
 			sim.OutputSignals{"X"},
 		)

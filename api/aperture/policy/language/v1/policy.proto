@@ -45,7 +45,7 @@ message Policy {
 // Circuit is defined as a dataflow graph of inter-connected components
 //
 // :::info
-// See also [Circuit overview](/concepts/policy/circuit.md).
+// See also [Circuit overview](/concepts/policy/circuit/circuit.md).
 // :::
 //
 // Signals flow between components via ports.
@@ -102,7 +102,7 @@ message Resources {
 // Computational block that form the circuit
 //
 // :::info
-// See also [Components overview](/concepts/policy/circuit.md#components).
+// See also [Components overview](/concepts/policy/circuit/circuit.md#components).
 // :::
 //
 // Signals flow into the components via input ports and results are emitted on output ports.
@@ -132,9 +132,10 @@ message Resources {
 // :::tip
 // Sometimes you may want to use a constant value as one of component's inputs.
 // You can create an input port containing the constant value instead of being connected to a signal.
-// To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
+// To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
+// You can also use it to provide special math values such as NaN and +- Inf.
 // If You need to provide the same constant signal to multiple components,
-// You can use the [Constant](#v1-constant) component.
+// You can use the [Variable](#v1-variable) component.
 // :::
 //
 // See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -165,8 +166,8 @@ message Component {
     // Periodically runs a Prometheus query in the background and emits the result.
     PromQL promql = 8;
 
-    // Emits a constant signal.
-    Constant constant = 9;
+    // Emits a variable signal which can be set to invalid.
+    Variable variable = 9;
 
     // Takes an input signal and emits the square root of the input signal.
     Sqrt sqrt = 10;
@@ -207,17 +208,20 @@ message Component {
     // Generates 0 and 1 in turns.
     PulseGenerator pulse_generator = 22;
 
+    // Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+    Holder holder = 23;
+
     // Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
-    NestedCircuit nested_circuit = 23;
+    NestedCircuit nested_circuit = 24;
 
     // Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
-    NestedSignalIngress nested_signal_ingress = 24;
+    NestedSignalIngress nested_signal_ingress = 25;
 
     // Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
-    NestedSignalEgress nested_signal_egress = 25;
+    NestedSignalEgress nested_signal_egress = 26;
 
     // AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
-    AIMDConcurrencyController aimd_concurrency_controller = 26;
+    AIMDConcurrencyController aimd_concurrency_controller = 27;
   }
 }
 
@@ -227,7 +231,7 @@ message InPort {
     // Name of the incoming Signal on the InPort.
     string signal_name = 1;
     // Constant value to be used for this InPort instead of a signal.
-    double constant_value = 2;
+    ConstantSignal constant_signal = 2;
   }
 }
 
@@ -628,7 +632,7 @@ message Switcher {
 // Limits the traffic on a control point to specified rate
 //
 // :::info
-// See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
+// See also [Rate Limiter overview](/concepts/policy/circuit/components/rate-limiter.md).
 // :::
 //
 // Ratelimiting is done separately on per-label-value basis. Use _label\_key_
@@ -746,7 +750,7 @@ message RateLimiter {
 // Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 //
 // :::info
-// See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
+// See also [Concurrency Limiter overview](/concepts/policy/circuit/components/concurrency-limiter.md).
 // :::
 //
 // It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -891,7 +895,7 @@ message SchedulerParameters {
   //
   // :::info
   // See also [workload definition in the concepts
-  // section](/concepts/flow-control/concurrency-limiter.md#workload).
+  // section](/concepts/policy/circuit/components/concurrency-limiter.md#workload).
   // :::
   repeated Workload workloads = 1; // @gotags: validate:"dive"
 
@@ -1013,19 +1017,38 @@ message PromQL {
   }]; // @gotags: default:"10s"
 }
 
-// Component that emits a constant value as an output signal
-message Constant {
-  // Outputs for the Constant component.
+// Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
+message ConstantSignal {
+  oneof const {
+    string special_value = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {string_value: "oneof=NaN +Inf -Inf"}
+      }
+    }]; // @gotags: validate:"oneof=NaN +Inf -Inf"
+    double value = 2;
+  }
+}
+
+// Component that emits a variable value as an output signal, can be defined in dynamic configuration.
+message Variable {
+  message DynamicConfig {
+    ConstantSignal constant_signal = 1;
+  }
+  // Outputs for the Variable component.
   message Outs {
-    // The constant value is emitted to the output port.
+    // The value is emitted to the output port.
     OutPort output = 1;
   }
 
-  // Output ports for the Constant component.
+  // Output ports for the Variable component.
   Outs out_ports = 1;
 
-  // The constant value to be emitted.
-  double value = 2;
+  // Configuration key for DynamicConfig.
+  string dynamic_config_key = 2;
+
+  // Default configuration.
+  DynamicConfig default_config = 3;
 }
 
 // Takes an input signal and emits the square root of it multiplied by scale as an output
@@ -1146,10 +1169,9 @@ message Min {
 //
 //   :::note
 //   Treating invalid inputs as "unknowns" has a consequence that the result
-//   might end up being valid even when some inputs are invalid. Eg. `unknown
-//   && false == false`, because the result would end up false no matter if
-//   first signal was true or false. On the other hand, `unknown && true ==
-//   unknown`.
+//   might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,
+//   because the result would end up false no matter if
+//   first signal was true or false. On the other hand, `unknown && true == unknown`.
 //   :::
 message And {
   // Inputs for the And component.
@@ -1421,6 +1443,31 @@ message PulseGenerator {
 
   // Emitting 0 for the false_for duration.
   google.protobuf.Duration false_for = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {string_value: "5s"}
+    }
+  }]; // @gotags: default:"5s"
+}
+
+// Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+// If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
+message Holder {
+  // Inputs for the Holder component.
+  message Ins {
+    InPort input = 1;
+  }
+
+  // Outputs for the Holder component.
+  message Outs {
+    OutPort output = 1;
+  }
+
+  Ins in_ports = 1;
+  Outs out_ports = 2;
+
+  // Holding the last valid signal value for the hold_for duration.
+  google.protobuf.Duration hold_for = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {string_value: "5s"}

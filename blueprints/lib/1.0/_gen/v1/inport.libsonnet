@@ -1,11 +1,11 @@
 {
   new():: {
   },
-  withConstantValue(constant_value):: {
-    constant_value: constant_value,
+  withConstantSignal(constant_signal):: {
+    constant_signal: constant_signal,
   },
-  withConstantValueMixin(constant_value):: {
-    constant_value+: constant_value,
+  withConstantSignalMixin(constant_signal):: {
+    constant_signal+: constant_signal,
   },
   withSignalName(signal_name):: {
     signal_name: signal_name,
