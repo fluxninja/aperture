@@ -167,12 +167,14 @@ Every time you wish to manually run the traffic, make sure to press the
 
 ## Tools
 
-Described hereafter, deployment methods assume usage of specific deployment and
-configuration/management tools (which must be installed beforehand).
+As Described hereafter, deployment methods assume usage of specific deployment
+and configuration/management tools (which must be installed beforehand).
 
-To install other required tools, you can use [ASDF](https://asdf-vm.com/) OR
-install manually (check
-[Tools required for Kubernetes deployment](#tools-required-for-kubernetes-deployment)).
+To install the required tools, you have two options:
+
+- Use the tool [ASDF](#install-via-asdf)
+- Manually install the tools
+  [mentioned here](#tools-required-for-kubernetes-deployment).
 
 ### Install via asdf
 
@@ -195,29 +197,20 @@ Please skip this section in case you already installed the required tools using
 
 :::
 
-#### Helm
+Tools required are listed below
 
-Helm is a package manager for Kubernetes. To install manually, follow
-instructions [here](https://helm.sh/docs/intro/install/).
-
-#### Tanka and Jsonnet Bundler
-
-Grafana Tanka is a robust configuration utility for your Kubernetes cluster,
-powered by the unique Jsonnet language. Jsonnet Bundler is used to manage
-Jsonnet dependencies. To install manually, follow instructions
-[here](https://tanka.dev/install).
-
-#### Kind
-
-Kind allows you to run local Kubernetes clusters. To install manually, follow
-instructions
-[here](https://kind.sigs.k8s.io/docs/user/quick-start/#installation).
-
-#### Kubectl
-
-Kubectl is the command-line tool to interact with Kubernetes clusters. To
-install manually, follow instructions
-[here](https://kubernetes.io/docs/tasks/tools/#kubectl).
+- **Helm**: It is a package manager for Kubernetes. To install manually, follow
+  instructions [here](https://helm.sh/docs/intro/install/).
+- **Tanks and Jsonnet Bundler**: Grafana Tanka is a robust configuration utility
+  for your Kubernetes cluster, powered by the unique Jsonnet language. Jsonnet
+  Bundler is used to manage Jsonnet dependencies. To install manually, follow
+  instructions [here](https://tanka.dev/install).
+- **Kind**: This allows you to run local Kubernetes clusters. To install
+  manually, follow instructions
+  [here](https://kind.sigs.k8s.io/docs/user/quick-start/#installation).
+- **Kubectl**: It is the command-line tool to interact with Kubernetes clusters.
+  To install manually, follow instructions
+  [here](https://kubernetes.io/docs/tasks/tools/#kubectl).
 
 ## Deploying with Tilt
 

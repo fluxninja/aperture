@@ -1,11 +1,11 @@
 ---
-title: What are Blueprints?
+title: Blueprints
 description: Policies and Dashboards pre-packaged as reusable Blueprints
 keywords:
   - jsonnet
   - grafana
   - policy
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 ```mdx-code-block

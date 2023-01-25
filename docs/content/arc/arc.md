@@ -1,9 +1,11 @@
 ---
 title: FluxNinja ARC
-sidebar_position: 1
+sidebar_position: 5
 keywords:
   - cloud
   - enterprise
+  - fluxninja arc
+  - reliability center
 ---
 
 # FluxNinja Application Reliability Center (ARC)

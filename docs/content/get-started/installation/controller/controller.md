@@ -35,32 +35,6 @@ Controller CRD under the `controller.config` section. All the configuration
 parameters for Aperture Controller are listed
 [here](/references/configuration/controller.md).
 
-## Upgrade Procedure {#controller-upgrade-procedure}
-
-By following these instructions, you will have deployed the upgraded version of
-Aperture Controller into your cluster.
-
-1. Update the Helm chart repo in your environment:
-
-   ```bash
-   helm repo update
-   ```
-
-2. Use the same `values.yaml` file created as part of
-   [Installation Steps](#controller-installation) and pass it with below
-   command:
-
-   ```bash
-   helm template --include-crds --no-hooks controller aperture/aperture-controller -f values.yaml | kubectl apply -f -
-   ```
-
-3. If you have deployed the Aperture Controller into a namespace other than
-   `default`, use the `-n` flag:
-
-   ```bash
-   helm template --include-crds --no-hooks controller aperture/aperture-controller -f values.yaml -n aperture-controller | kubectl apply -f -
-   ```
-
 ## Installation {#controller-installation}
 
 Below are the steps to install the Aperture Controller into your setup using the
@@ -302,6 +276,32 @@ of the Kubernetes cluster based on your infrastructure.
    `http://etcd.YOUR_DOMAIN_HERE:80` and the Prometheus will be accessible on
    `http://prometheus.YOUR_DOMAIN_HERE:80`.
 
+## Upgrade Procedure {#controller-upgrade-procedure}
+
+By following these instructions, you will have deployed the upgraded version of
+Aperture Controller into your cluster.
+
+1. Update the Helm chart repo in your environment:
+
+   ```bash
+   helm repo update
+   ```
+
+2. Use the same `values.yaml` file created as part of
+   [Installation Steps](#controller-installation) and pass it with below
+   command:
+
+   ```bash
+   helm template --include-crds --no-hooks controller aperture/aperture-controller -f values.yaml | kubectl apply -f -
+   ```
+
+3. If you have deployed the Aperture Controller into a namespace other than
+   `default`, use the `-n` flag:
+
+   ```bash
+   helm template --include-crds --no-hooks controller aperture/aperture-controller -f values.yaml -n aperture-controller | kubectl apply -f -
+   ```
+
 ## Verifying the Installation
 
 Once you have successfully deployed the resources, confirm that the Aperture
@@ -318,9 +318,13 @@ state and `Controller` Custom Resource in `created` state.
 
 ## Applying Policies
 
-Follow the steps on the
-[Create Policy](/get-started/policies/applying-policies.md#create-policy) to
-create the Aperture Policy in a Kubernetes cluster.
+The process of creating policies for Aperture can be done either after the
+installation of the controller or after the installation of the agent, depending
+on your preference.
+[Create Policy](/get-started/policies/get-started-with-policy.md#create-policy)
+guide includes step-by-step instructions on how to create policies for Aperture
+in a Kubernetes cluster, which you can follow to create policies according to
+your needs.
 
 ## Uninstall
 

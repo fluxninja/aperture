@@ -1,9 +1,0 @@
-label: Integrations
-position: 3
-collapsible: true
-collapsed: true
-link:
-  type: "generated-index"
-  title: "Integrations"
-  description: Integrations provided by Aperture
-  keywords: ["flow control", "integrations", "sdk","envoy"]

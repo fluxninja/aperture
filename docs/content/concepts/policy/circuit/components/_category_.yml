@@ -5,5 +5,5 @@ collapsed: true
 link:
   type: "generated-index"
   title: "Components"
-  description: "Aperture Policy Components"
+  description: "Learn about the building blocks of a circuit - Components. Understand the role of different types of components and how they are chained to one another to form a circuit."
   keywords: ["components"]
