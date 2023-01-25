@@ -1,0 +1,9 @@
+label: Integrations
+position: 1
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Integrations"
+  description: "Learn about different integrations and their concepts."
+  keywords: ["concepts"]

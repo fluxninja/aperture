@@ -21,7 +21,7 @@ is more critical than personalized recommendations and should be prioritized
 when resources are constrained.
 
 Aperture's
-[weighted fair queueing scheduler](/concepts/flow-control/components/concurrency-limiter.md#scheduler)
+[weighted fair queueing scheduler](/concepts/integrations/flow-control/components/concurrency-limiter.md#scheduler)
 allows fairly prioriting certain flows over others based on their flow labels.
 This enables graceful degradation in face of overloads and other failures, and
 maximizes user-experience or revenue.
@@ -42,17 +42,18 @@ value to the scheduler:
   `subscriber` since all HTTP headers are directly available as flow labels
   within the scheduler.
 - Guests: To identify guest users, we will first use a classification rule that
-  uses an [extractor](concepts/flow-control/flow-classifier.md#extractors) to
-  assign the header value to `user-type` flow label key. Ultimately, we will be
-  using the `user_type` label key in the scheduler to match the request against
-  `guest` value to identify the workload.
+  uses an
+  [extractor](concepts/integrations/flow-control/flow-classifier.md#extractors)
+  to assign the header value to `user-type` flow label key. Ultimately, we will
+  be using the `user_type` label key in the scheduler to match the request
+  against `guest` value to identify the workload.
 
 :::tip
 
 You can quickly write classification rules on
-[HTTP requests](concepts/flow-control/flow-classifier.md#live-previewing-requests)
+[HTTP requests](concepts/integrations/flow-control/flow-classifier.md#live-previewing-requests)
 and define scheduler priorities on
-[Flow Labels](concepts/flow-control/flow-label.md#live-previewing-flow-labels)
+[Flow Labels](concepts/integrations/flow-control/flow-label.md#live-previewing-flow-labels)
 by live previewing them first via introspection APIs.
 
 :::
