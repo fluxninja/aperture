@@ -20,6 +20,8 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
+FluxNinja Aperture architecture in detail
+
 <Zoom>
 
 ```mermaid
@@ -27,6 +29,16 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 </Zoom>
+
+FluxNinja Aperture consists of multiple components that build up the
+architecture (As shown in above diagram). Some of the core components are list
+below.
+
+- [Aperture Controller](#aperture-controller)
+  - Controller Circuit
+- [Aperture Agent](#aperture-agents)
+  - Flow Controller
+  - Auto Scaler
 
 ### Aperture Controller
 
@@ -42,6 +54,9 @@ For example, a gradient control circuit component can be used to implement
 the concurrency on a service when response times deteriorate. Advanced control
 components like [PID](https://en.wikipedia.org/wiki/PID_controller) can be used
 to further tune the concurrency limits.
+
+Controller store certain list of metrics in Prometheus and Etcd store
+information about decision it took.
 
 Aperture’s Controller is comparable in capabilities to autopilot in aircraft or
 adaptive cruise control in some automobiles.
