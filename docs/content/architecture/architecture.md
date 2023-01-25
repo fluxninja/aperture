@@ -57,7 +57,7 @@ the concurrency on a service when response times deteriorate. Advanced control
 components like [PID](https://en.wikipedia.org/wiki/PID_controller) can be used
 to further tune the concurrency limits.
 
-Aperture’s Controller is comparable in capabilities to autopilot in aircraft or
+Aperture Controller is comparable in capabilities to autopilot in aircraft or
 adaptive cruise control in some automobiles.
 
 ### Aperture Agents
