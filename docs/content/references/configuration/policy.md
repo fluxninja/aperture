@@ -356,7 +356,7 @@ Workload defines a class of requests that preferably have similar properties suc
 <dd>
 
 ([V1LabelMatcher](#v1-label-matcher), `required`) Label Matcher to select a Workload based on
-[flow labels](/concepts/flow-control/flow-label.md).
+[flow labels](/concepts/integrations/flow-control/flow-label.md).
 
 @gotags: validate:"required"
 
@@ -393,7 +393,7 @@ This override is applicable only if `auto_tokens` is set to false.
 <dd>
 
 (string) Fairness key is a label key that can be used to provide fairness within a workload.
-Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
+Any [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if
 you have a classifier that sets `user` flow label, you might want to set
 `fairness_key = "user"`.
 
@@ -698,7 +698,7 @@ This interval is typically aligned with how often the corrective action (actuati
 Set of classification rules sharing a common selector
 
 :::info
-See also [Classifier overview](/concepts/flow-control/flow-classifier.md).
+See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
 :::
 
 Example:
@@ -731,7 +731,7 @@ rules:
 <dd>
 
 (map of [V1Rule](#v1-rule), `required,gt=0,dive,keys,required,endkeys,required`) A map of {key, value} pairs mapping from
-[flow label](/concepts/flow-control/flow-label.md) keys to rules that define
+[flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
 how to extract and propagate flow labels with that key.
 
 @gotags: validate:"required,gt=0,dive,keys,required,endkeys,required"
@@ -932,7 +932,7 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 
 :::info
-See also [Concurrency Limiter overview](/concepts/flow-control/components/concurrency-limiter.md).
+See also [Concurrency Limiter overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).
 :::
 
 It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -1507,11 +1507,11 @@ Outputs for the FirstValid component.
 ### v1FlowMatcher {#v1-flow-matcher}
 
 Describes which flows a [flow control
-component](/concepts/flow-control/flow-control.md#components) should apply
+component](/concepts/integrations/flow-control/flow-control.md#components) should apply
 to
 
 :::info
-See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 :::
 
 Example:
@@ -1537,7 +1537,7 @@ label_matcher:
 <dt>control_point</dt>
 <dd>
 
-(string, `required`) [Control Point](/concepts/flow-control/flow-control.md#control-point)
+(string, `required`) [Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)
 identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
 block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
 or filter chains.
@@ -1549,11 +1549,11 @@ or filter chains.
 <dd>
 
 ([V1LabelMatcher](#v1-label-matcher)) Label matcher allows to add _additional_ condition on
-[flow labels](/concepts/flow-control/flow-label.md)
+[flow labels](/concepts/integrations/flow-control/flow-label.md)
 must also be satisfied (in addition to service+control point matching)
 
 :::info
-See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
+See also [Label Matcher overview](/concepts/integrations/flow-control/flow-selector.md#label-matcher).
 :::
 
 :::note
@@ -1573,11 +1573,11 @@ control point.
 ### v1FlowSelector {#v1-flow-selector}
 
 Describes which flow in which service a [flow control
-component](/concepts/flow-control/flow-control.md#components) should apply
+component](/concepts/integrations/flow-control/flow-control.md#components) should apply
 to
 
 :::info
-See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 :::
 
 #### Properties
@@ -1603,7 +1603,7 @@ Flux Meter gathers metrics for the traffic that matches its selector.
 The histogram created by Flux Meter measures the workload latency by default.
 
 :::info
-See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
+See also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).
 :::
 
 Example of a selector that creates a histogram metric for all HTTP requests
@@ -2196,7 +2196,7 @@ component should apply to.
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+(string, default: `default`) Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
 selector applies to.
 
 @gotags: default:"default"
@@ -2239,7 +2239,7 @@ selector applies to.
 ### v1LabelMatcher {#v1-label-matcher}
 
 Allows to define rules whether a map of
-[labels](/concepts/flow-control/flow-label.md)
+[labels](/concepts/integrations/flow-control/flow-label.md)
 should be considered a match or not
 
 It provides three ways to define requirements:
@@ -2778,7 +2778,7 @@ Outputs for the PulseGenerator component.
 Limits the traffic on a control point to specified rate
 
 :::info
-See also [Rate Limiter overview](/concepts/flow-control/components/rate-limiter.md).
+See also [Rate Limiter overview](/concepts/integrations/flow-control/components/rate-limiter.md).
 :::
 
 Ratelimiting is done separately on per-label-value basis. Use _label_key_
@@ -2815,7 +2815,7 @@ to select which label should be used as key.
 (string, `required`) Specifies which label the ratelimiter should be keyed by.
 
 Rate limiting is done independently for each value of the
-[label](/concepts/flow-control/flow-label.md) with given key.
+[label](/concepts/integrations/flow-control/flow-label.md) with given key.
 Eg., to give each user a separate limit, assuming you have a _user_ flow
 label set up, set `label_key: "user"`.
 
@@ -2980,7 +2980,7 @@ telemetry: false
 <dd>
 
 (bool, `required`) Decides if the created flow label should be available as an attribute in OLAP telemetry and
-propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
+propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
 
 :::note
 The flow label is always accessible in Aperture Policies regardless of this setting.
@@ -3022,7 +3022,7 @@ See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
 
 ([[]SchedulerWorkload](#scheduler-workload)) List of workloads to be used in scheduler.
 
-Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
+Categorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads
 allows for load-shedding to be "smarter" than just "randomly deny 50% of
 requests". There are two aspects of this "smartness":
 
@@ -3039,7 +3039,7 @@ If none of workloads match, `default_workload` will be used.
 
 :::info
 See also [workload definition in the concepts
-section](/concepts/flow-control/components/concurrency-limiter.md#workload).
+section](/concepts/integrations/flow-control/components/concurrency-limiter.md#workload).
 :::
 
 @gotags: validate:"dive"
@@ -3118,7 +3118,7 @@ Output for the Scheduler component.
 
 :::info
 **Accepted tokens** are tokens associated with
-[flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
+[flows](/concepts/integrations/flow-control/flow-control.md#flow) that were accepted by
 this scheduler. Number of tokens for a flow is determined by a
 [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
 via `auto_tokens` or explicitly by `Workload.tokens`).
@@ -3140,11 +3140,11 @@ entering scheduler, including rejected ones.
 ### v1ServiceSelector {#v1-service-selector}
 
 Describes which service a [flow control or observability
-component](/concepts/flow-control/flow-control.md#components) should apply
+component](/concepts/integrations/flow-control/flow-control.md#components) should apply
 to
 
 :::info
-See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 :::
 
 #### Properties
@@ -3153,7 +3153,7 @@ See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+(string, default: `default`) Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
 selector applies to.
 
 @gotags: default:"default"
@@ -3163,7 +3163,7 @@ selector applies to.
 <dd>
 
 (string) The Fully Qualified Domain Name of the
-[service](/concepts/flow-control/service.md) to select.
+[service](/concepts/integrations/flow-control/service.md) to select.
 
 In kubernetes, this is the FQDN of the Service object.
 

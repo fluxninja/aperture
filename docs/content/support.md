@@ -15,7 +15,7 @@ keywords:
   - fluxninja-support
 ---
 
-"Reach out to us through the listed mediums in case you have any queries.
+Reach out to us through the listed mediums in case you have any queries.
 
 - [Slack](https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1ewkfjfy9-~wF4EryoDyJ6kaPRTNZPyA)
 - [Contact Us](https://contact.fluxninja.com/)

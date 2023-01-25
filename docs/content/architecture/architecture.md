@@ -28,6 +28,24 @@ import Zoom from 'react-medium-image-zoom';
 
 </Zoom>
 
+### Aperture Controller
+
+The controller is powered by always-on, dataflow-driven policies that
+continuously track deviations from service-level objectives (SLOs) and calculate
+recovery or escalation actions. The policies running in the controller are
+expressed as circuits, much like circuit networks in the game
+[Factorio](https://wiki.factorio.com/Circuit_network).
+
+For example, a gradient control circuit component can be used to implement
+[AIMD](https://en.wikipedia.org/wiki/Additive_increase/multiplicative_decrease)
+(Additive Increase, Multiplicative Decrease) style counter-measure that limits
+the concurrency on a service when response times deteriorate. Advanced control
+components like [PID](https://en.wikipedia.org/wiki/PID_controller) can be used
+to further tune the concurrency limits.
+
+Aperture’s Controller is comparable in capabilities to autopilot in aircraft or
+adaptive cruise control in some automobiles.
+
 ### Aperture Agents
 
 Aperture Agents live next to your service instances as a sidecar and provide
@@ -50,21 +68,3 @@ Aperture Agents monitor golden signals using an in-built telemetry system and a
 programmable, high-fidelity flow classifier used to label requests based on
 attributes such as customer tier or request type. These metrics are analyzed by
 the controller.
-
-### Aperture Controller
-
-The controller is powered by always-on, dataflow-driven policies that
-continuously track deviations from service-level objectives (SLOs) and calculate
-recovery or escalation actions. The policies running in the controller are
-expressed as circuits, much like circuit networks in the game
-[Factorio](https://wiki.factorio.com/Circuit_network).
-
-For example, a gradient control circuit component can be used to implement
-[AIMD](https://en.wikipedia.org/wiki/Additive_increase/multiplicative_decrease)
-(Additive Increase, Multiplicative Decrease) style counter-measure that limits
-the concurrency on a service when response times deteriorate. Advanced control
-components like [PID](https://en.wikipedia.org/wiki/PID_controller) can be used
-to further tune the concurrency limits.
-
-Aperture’s Controller is comparable in capabilities to autopilot in aircraft or
-adaptive cruise control in some automobiles.

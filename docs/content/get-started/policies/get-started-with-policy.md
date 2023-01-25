@@ -26,7 +26,7 @@ kubectl --namespace=aperture-controller apply -f <aperture-policy-file>
 Here's an example of the Aperture Policy configuration file:
 
 ```yaml
-{@include: ../../tutorials/flow-control/assets/static-rate-limiting/static-rate-limiting.yaml}
+{@include: ../../tutorials/integrations/flow-control/assets/static-rate-limiting/static-rate-limiting.yaml}
 ```
 
 ## Create Policy
@@ -43,7 +43,7 @@ Aperture Controller is running.
 1. Create the Aperture Policy by running the following command:
 
 <CodeBlock language="bash">
-{`kubectl --namespace=aperture-controller apply -f https://raw.githubusercontent.com/fluxninja/aperture/${apertureVersion}/docs/content/tutorials/flow-control/assets/static-rate-limiting/static-rate-limiting.yaml`}
+{`kubectl --namespace=aperture-controller apply -f https://raw.githubusercontent.com/fluxninja/aperture/${apertureVersion}/docs/content/tutorials/integrations/flow-control/assets/static-rate-limiting/static-rate-limiting.yaml`}
 </CodeBlock>
 
 2. Run the following command to check if the Aperture Policy was created.
