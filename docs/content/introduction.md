@@ -24,7 +24,7 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 Welcome to the official documentation for
-[Aperture](https://github.com/fluxninja/aperture)!
+[FluxNinja Aperture](https://github.com/fluxninja/aperture)!
 
 Aperture is an open-source platform that helps manage the flow of traffic and
 improve the reliability of modern web applications. It enables the
@@ -34,8 +34,12 @@ of the application is stable and reliable.
 
 ## Why is flow control needed?
 
-:::info Learn more about what is
-[flow control](<https://en.wikipedia.org/wiki/Flow_control_(data)>) here. :::
+:::info
+
+Learn more about what is
+[flow control](<https://en.wikipedia.org/wiki/Flow_control_(data)>) here.
+
+:::
 
 Modern web-scale apps are a complex network of inter-connected microservices
 that implement features such as account management, search, payments & more.

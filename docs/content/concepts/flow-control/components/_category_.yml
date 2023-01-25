@@ -5,5 +5,5 @@ collapsed: true
 link:
   type: "generated-index"
   title: "Components"
-  description: "Flow Control Components"
+  description: "Learn about the flow control components of Aperture and how they regulate the flow of requests for improved reliability and stability."
   keywords: ["components"]

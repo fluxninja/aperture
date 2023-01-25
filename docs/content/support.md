@@ -15,9 +15,7 @@ keywords:
   - fluxninja-support
 ---
 
-Get the help you need with our support page. Find answers to FAQs, access
-documentation, and reach out to us through various mediums listed below.
+"Reach out to us through the listed mediums in case you have any queries.
 
 - [Slack](https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1ewkfjfy9-~wF4EryoDyJ6kaPRTNZPyA)
-- [support@fluxninja.com](mailto:support@fluxninja.com)
-- [Contact Us page](https://contact.fluxninja.com/)
+- [Contact Us](https://contact.fluxninja.com/)
