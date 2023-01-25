@@ -191,8 +191,8 @@ select which labels to include in telemetry.
 [flow]: /concepts/flow-control/flow-control.md#flow
 [flow-selector]: /concepts/flow-control/flow-selector.md
 [classifier]: /concepts/flow-control/flow-classifier.md
-[workload]: /concepts/policy/circuit/components/concurrency-limiter.md#workload
-[ratelimiter]: /concepts/policy/circuit/components/rate-limiter.md
+[workload]: components/concurrency-limiter.md#workload
+[ratelimiter]: components/rate-limiter.md
 [flux-meter]: /concepts/flow-control/flux-meter.md
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:
