@@ -610,7 +610,7 @@ message Switcher {
 // Limits the traffic on a control point to specified rate
 //
 // :::info
-// See also [Rate Limiter overview](/concepts/flow-control/components/rate-limiter.md).
+// See also [Rate Limiter overview](/concepts/integrations/flow-control/components/rate-limiter.md).
 // :::
 //
 // Ratelimiting is done separately on per-label-value basis. Use _label\_key_
@@ -705,7 +705,7 @@ message RateLimiter {
   // Specifies which label the ratelimiter should be keyed by.
   //
   // Rate limiting is done independently for each value of the
-  // [label](/concepts/flow-control/flow-label.md) with given key.
+  // [label](/concepts/integrations/flow-control/flow-label.md) with given key.
   // Eg., to give each user a separate limit, assuming you have a _user_ flow
   // label set up, set `label_key: "user"`.
   string label_key = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -728,7 +728,7 @@ message RateLimiter {
 // Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 //
 // :::info
-// See also [Concurrency Limiter overview](/concepts/flow-control/components/concurrency-limiter.md).
+// See also [Concurrency Limiter overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).
 // :::
 //
 // It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -795,7 +795,7 @@ message Scheduler {
     }]; // @gotags: default:"1"
 
     // Fairness key is a label key that can be used to provide fairness within a workload.
-    // Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
+    // Any [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if
     // you have a classifier that sets `user` flow label, you might want to set
     // `fairness_key = "user"`.
     string fairness_key = 3;
@@ -812,7 +812,7 @@ message Scheduler {
     }]; // @gotags: validate:"required"
 
     // Label Matcher to select a Workload based on
-    // [flow labels](/concepts/flow-control/flow-label.md).
+    // [flow labels](/concepts/integrations/flow-control/flow-label.md).
     LabelMatcher label_matcher = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
@@ -827,7 +827,7 @@ message Scheduler {
     //
     // :::info
     // **Accepted tokens** are tokens associated with
-    // [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
+    // [flows](/concepts/integrations/flow-control/flow-control.md#flow) that were accepted by
     // this scheduler. Number of tokens for a flow is determined by a
     // [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
     // via `auto_tokens` or explicitly by `Workload.tokens`).
@@ -847,7 +847,7 @@ message Scheduler {
 
   // List of workloads to be used in scheduler.
   //
-  // Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
+  // Categorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads
   // allows for load-shedding to be "smarter" than just "randomly deny 50% of
   // requests". There are two aspects of this "smartness":
   // * Scheduler can more precisely calculate concurrency if it understands
@@ -863,7 +863,7 @@ message Scheduler {
   //
   // :::info
   // See also [workload definition in the concepts
-  // section](/concepts/flow-control/components/concurrency-limiter.md#workload).
+  // section](/concepts/integrations/flow-control/components/concurrency-limiter.md#workload).
   // :::
   repeated Workload workloads = 2; // @gotags: validate:"dive"
 

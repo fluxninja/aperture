@@ -101,9 +101,9 @@ Flux Meters are a great way to measure [SLOs][google-sre-slo] of your Service
 down to fine-grained APIs.
 
 [reference]: /references/configuration/policy.md#v1-flux-meter
-[flow]: /concepts/flow-control/flow-control.md#flow
-[flow-selector]: /concepts/flow-control/flow-selector.md
-[flow-control-integration]: /concepts/flow-control/flow-control.md#integrations
+[flow]: /concepts/integrations/flow-control/flow-control.md#flow
+[flow-selector]: /concepts/integrations/flow-control/flow-selector.md
+[flow-control-integration]: ./flow-control.md#integrations
 [histogram-metric]: https://prometheus.io/docs/practices/histograms/
 [quantiles]: https://prometheus.io/docs/practices/histograms/#quantiles
 [envoy-access-log-spec]:

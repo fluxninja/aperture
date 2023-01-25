@@ -1474,7 +1474,7 @@ func (x *Switcher) GetOutPorts() *Switcher_Outs {
 // Limits the traffic on a control point to specified rate
 //
 // :::info
-// See also [Rate Limiter overview](/concepts/flow-control/components/rate-limiter.md).
+// See also [Rate Limiter overview](/concepts/integrations/flow-control/components/rate-limiter.md).
 // :::
 //
 // Ratelimiting is done separately on per-label-value basis. Use _label\_key_
@@ -1492,7 +1492,7 @@ type RateLimiter struct {
 	// Specifies which label the ratelimiter should be keyed by.
 	//
 	// Rate limiting is done independently for each value of the
-	// [label](/concepts/flow-control/flow-label.md) with given key.
+	// [label](/concepts/integrations/flow-control/flow-label.md) with given key.
 	// Eg., to give each user a separate limit, assuming you have a _user_ flow
 	// label set up, set `label_key: "user"`.
 	LabelKey string `protobuf:"bytes,4,opt,name=label_key,json=labelKey,proto3" json:"label_key,omitempty" validate:"required"` // @gotags: validate:"required"
@@ -1588,7 +1588,7 @@ func (x *RateLimiter) GetDefaultConfig() *RateLimiter_DynamicConfig {
 // Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 //
 // :::info
-// See also [Concurrency Limiter overview](/concepts/flow-control/components/concurrency-limiter.md).
+// See also [Concurrency Limiter overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).
 // :::
 //
 // It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -1703,7 +1703,7 @@ type Scheduler struct {
 	OutPorts *Scheduler_Outs `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// List of workloads to be used in scheduler.
 	//
-	// Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
+	// Categorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads
 	// allows for load-shedding to be "smarter" than just "randomly deny 50% of
 	// requests". There are two aspects of this "smartness":
 	// * Scheduler can more precisely calculate concurrency if it understands
@@ -1719,7 +1719,7 @@ type Scheduler struct {
 	//
 	// :::info
 	// See also [workload definition in the concepts
-	// section](/concepts/flow-control/components/concurrency-limiter.md#workload).
+	// section](/concepts/integrations/flow-control/components/concurrency-limiter.md#workload).
 	// :::
 	Workloads []*Scheduler_Workload `protobuf:"bytes,2,rep,name=workloads,proto3" json:"workloads,omitempty" validate:"dive"` // @gotags: validate:"dive"
 	// WorkloadParameters to be used if none of workloads specified in `workloads` match.
@@ -3925,7 +3925,7 @@ type Scheduler_WorkloadParameters struct {
 	// This override is applicable only if `auto_tokens` is set to false.
 	Tokens uint64 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" default:"1"` // @gotags: default:"1"
 	// Fairness key is a label key that can be used to provide fairness within a workload.
-	// Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
+	// Any [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if
 	// you have a classifier that sets `user` flow label, you might want to set
 	// `fairness_key = "user"`.
 	FairnessKey string `protobuf:"bytes,3,opt,name=fairness_key,json=fairnessKey,proto3" json:"fairness_key,omitempty"`
@@ -3993,7 +3993,7 @@ type Scheduler_Workload struct {
 	// WorkloadParameters associated with flows matching the label matcher.
 	WorkloadParameters *Scheduler_WorkloadParameters `protobuf:"bytes,1,opt,name=workload_parameters,json=workloadParameters,proto3" json:"workload_parameters,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Label Matcher to select a Workload based on
-	// [flow labels](/concepts/flow-control/flow-label.md).
+	// [flow labels](/concepts/integrations/flow-control/flow-label.md).
 	LabelMatcher *LabelMatcher `protobuf:"bytes,2,opt,name=label_matcher,json=labelMatcher,proto3" json:"label_matcher,omitempty" validate:"required"` // @gotags: validate:"required"
 }
 
@@ -4053,7 +4053,7 @@ type Scheduler_Outs struct {
 	//
 	// :::info
 	// **Accepted tokens** are tokens associated with
-	// [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
+	// [flows](/concepts/integrations/flow-control/flow-control.md#flow) that were accepted by
 	// this scheduler. Number of tokens for a flow is determined by a
 	// [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
 	// via `auto_tokens` or explicitly by `Workload.tokens`).

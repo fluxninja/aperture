@@ -188,16 +188,16 @@ select which labels to include in telemetry.
 
 :::
 
-[flow]: /concepts/flow-control/flow-control.md#flow
-[flow-selector]: /concepts/flow-control/flow-selector.md
-[classifier]: /concepts/flow-control/flow-classifier.md
+[flow]: ./flow-control.md#flow
+[flow-selector]: /concepts/integrations/flow-control/flow-selector.md
+[classifier]: /concepts/integrations/flow-control/flow-classifier.md
 [workload]: components/concurrency-limiter.md#workload
 [ratelimiter]: components/rate-limiter.md
-[flux-meter]: /concepts/flow-control/flux-meter.md
+[flux-meter]: /concepts/integrations/flow-control/flux-meter.md
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:
   https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces
-[control-point]: /concepts/flow-control/flow-control.md#control-point
+[control-point]: ./flow-control.md#control-point
 [otel-conventions]:
   https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
 [aperture-go]: https://github.com/FluxNinja/aperture-go

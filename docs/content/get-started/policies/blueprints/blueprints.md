@@ -1,11 +1,11 @@
 ---
-title: What are Blueprints?
+title: Blueprints
 description: Policies and Dashboards pre-packaged as reusable Blueprints
 keywords:
   - jsonnet
   - grafana
   - policy
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 ```mdx-code-block
@@ -87,7 +87,7 @@ even a specific release tag e.g. _v0.2.2_
 You can then create a Policy resource using Jsonnet definitions:
 
 ```jsonnet
-{@include: ../../tutorials/flow-control/concurrency-limiting/assets/basic-concurrency-limiting/basic-concurrency-limiting.jsonnet}
+{@include: ../../tutorials/integrations/flow-control/concurrency-limiting/assets/basic-concurrency-limiting/basic-concurrency-limiting.jsonnet}
 ```
 
 And then, render it with [jsonnet][jsonnet]:
@@ -100,7 +100,7 @@ After running this command you should see the following contents in the YAML
 file:
 
 ```yaml
-{@include: ../../tutorials/flow-control/concurrency-limiting/assets/basic-concurrency-limiting/basic-concurrency-limiting.yaml}
+{@include: ../../tutorials/integrations/flow-control/concurrency-limiting/assets/basic-concurrency-limiting/basic-concurrency-limiting.yaml}
 ```
 
 The generated policy can be applied to the running instance of
@@ -131,10 +131,10 @@ decisions made in each _execution cycle_.
 :::
 
 To understand what the above policy does, please see the
-[Basic Concurrency Limiting](/tutorials/flow-control/concurrency-limiting/basic-concurrency-limiting.md)
+[Basic Concurrency Limiting](/tutorials/integrations/flow-control/concurrency-limiting/basic-concurrency-limiting.md)
 tutorial.
 
 [jsonnet]: https://github.com/google/go-jsonnet
 [tk]: https://grafana.com/oss/tanka/
 [policies]: /concepts/policy/policy.md
-[service]: /concepts/flow-control/service.md
+[service]: /concepts/integrations/flow-control/service.md

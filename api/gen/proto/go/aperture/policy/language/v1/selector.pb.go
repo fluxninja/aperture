@@ -22,11 +22,11 @@ const (
 )
 
 // Describes which flow in which service a [flow control
-// component](/concepts/flow-control/flow-control.md#components) should apply
+// component](/concepts/integrations/flow-control/flow-control.md#components) should apply
 // to
 //
 // :::info
-// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+// See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 // :::
 type FlowSelector struct {
 	state         protoimpl.MessageState
@@ -84,22 +84,22 @@ func (x *FlowSelector) GetFlowMatcher() *FlowMatcher {
 }
 
 // Describes which service a [flow control or observability
-// component](/concepts/flow-control/flow-control.md#components) should apply
+// component](/concepts/integrations/flow-control/flow-control.md#components) should apply
 // to
 //
 // :::info
-// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+// See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 // :::
 type ServiceSelector struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+	// Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
 	// selector applies to.
 	AgentGroup string `protobuf:"bytes,1,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"default"` // @gotags: default:"default"
 	// The Fully Qualified Domain Name of the
-	// [service](/concepts/flow-control/service.md) to select.
+	// [service](/concepts/integrations/flow-control/service.md) to select.
 	//
 	// In kubernetes, this is the FQDN of the Service object.
 	//
@@ -158,11 +158,11 @@ func (x *ServiceSelector) GetService() string {
 }
 
 // Describes which flows a [flow control
-// component](/concepts/flow-control/flow-control.md#components) should apply
+// component](/concepts/integrations/flow-control/flow-control.md#components) should apply
 // to
 //
 // :::info
-// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+// See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 // :::
 //
 // Example:
@@ -185,17 +185,17 @@ type FlowMatcher struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// [Control Point](/concepts/flow-control/flow-control.md#control-point)
+	// [Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)
 	// identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
 	// block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
 	// or filter chains.
 	ControlPoint string `protobuf:"bytes,1,opt,name=control_point,json=controlPoint,proto3" json:"control_point,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Label matcher allows to add _additional_ condition on
-	// [flow labels](/concepts/flow-control/flow-label.md)
+	// [flow labels](/concepts/integrations/flow-control/flow-label.md)
 	// must also be satisfied (in addition to service+control point matching)
 	//
 	// :::info
-	// See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
+	// See also [Label Matcher overview](/concepts/integrations/flow-control/flow-selector.md#label-matcher).
 	// :::
 	//
 	// :::note
@@ -264,7 +264,7 @@ type KubernetesObjectSelector struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+	// Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
 	// selector applies to.
 	AgentGroup string `protobuf:"bytes,1,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"default"` // @gotags: default:"default"
 	// Kubernetes namespace that the resource belongs to.

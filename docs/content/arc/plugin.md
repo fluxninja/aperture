@@ -74,4 +74,4 @@ Configuration parameters for the FluxNinja ARC Plugin are available below:
 
 How various components interact with the plugin:
 
-- [Flow labels](/concepts/flow-control/flow-label.md#plugin)
+- [Flow labels](/concepts/integrations/flow-control/flow-label.md#plugin)

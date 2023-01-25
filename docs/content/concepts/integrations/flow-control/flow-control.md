@@ -14,7 +14,7 @@ keywords:
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
-import {apertureVersion} from '../../apertureVersion.js';
+import {apertureVersion} from '../../../apertureVersion.js';
 ```
 
 Reliable operations at web-scale are impossible without effective flow control.
@@ -149,17 +149,17 @@ we recommend to start with concepts like [services][service] and
 [labels][flow-label] first.
 
 [policies]: /concepts/policy/policy.md
-[cl]: components/concurrency-limiter.md
+[cl]: ./components/concurrency-limiter.md
 [rate-limiter]: components/rate-limiter.md
-[flux-meter]: /concepts/flow-control/flux-meter.md
-[classifier]: /concepts/flow-control/flow-classifier.md
+[flux-meter]: /concepts/integrations/flow-control/flux-meter.md
+[classifier]: /concepts/integrations/flow-control/flow-classifier.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
 [istio]: /get-started/integrations/flow-control/envoy/istio.md
 [ext-authz]:
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto#authorization-service-proto
 [aperture-go]: https://github.com/FluxNinja/aperture-go
-[service]: /concepts/flow-control/service.md
-[flow-label]: /concepts/flow-control/flow-label.md
+[service]: /concepts/integrations/flow-control/service.md
+[flow-label]: /concepts/integrations/flow-control/flow-label.md
 [flowcontrol-proto]:
   https://buf.build/fluxninja/aperture/docs/main:aperture.flowcontrol.v1
 [istio-patch-context]:

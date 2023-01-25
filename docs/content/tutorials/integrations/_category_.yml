@@ -1,0 +1,8 @@
+position: 2
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Integrations"
+  description: "Learn by implementing tutorials and explore different usecases."
+  keywords: ["tutorial","flow-control","integrations"]

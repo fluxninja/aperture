@@ -19,13 +19,14 @@ escalation strategies beyond concurrency limits could be to more aggressively
 restrict traffic of each user by dynamically adjusting their rate limits.
 
 To recap,
-[concurrency limiter](/concepts/flow-control/components/concurrency-limiter.md)
+[concurrency limiter](/concepts/integrations/flow-control/components/concurrency-limiter.md)
 relies on weighted-fair queueing scheduler to make flow-control decisions at the
 workload level. On the other hand, the
-[rate limiter](/concepts/flow-control/components/rate-limiter.md) uses a
-distributed cache to maintain global counters for each flow label (e.g. unique
-users) and restricts traffic when they exceed their allocated quota. These 2
-technologies can be made to work together as we will see in the below example.
+[rate limiter](/concepts/integrations/flow-control/components/rate-limiter.md)
+uses a distributed cache to maintain global counters for each flow label (e.g.
+unique users) and restricts traffic when they exceed their allocated quota.
+These 2 technologies can be made to work together as we will see in the below
+example.
 
 ## Policy
 

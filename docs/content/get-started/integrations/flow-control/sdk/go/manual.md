@@ -1,6 +1,7 @@
 ---
 title: Manually setting feature control points
 sidebar_position: 1
+slug: manually-setting-feature-control-points-using-golang-sdk
 keywords:
   - go
   - sdk

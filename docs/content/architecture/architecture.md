@@ -20,6 +20,8 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
+FluxNinja Aperture architecture in detail
+
 <Zoom>
 
 ```mermaid
@@ -28,57 +30,58 @@ import Zoom from 'react-medium-image-zoom';
 
 </Zoom>
 
-## Aperture Agent
+FluxNinja Aperture consists of multiple components that build up the
+architecture (As shown in above diagram). Some of the core components are list
+below.
 
-Aperture Agent is a component that is deployed as a sidecar next to your service
-instances to provide flow control capabilities. It uses a weighted fair queuing
-scheduler to prioritize workloads based on their importance, ensuring that
-critical application features are not affected during overload scenarios. The
-agent also includes a distributed rate-limiter, which is used to prevent abuse
-and protect the service from malicious requests.
+- [Aperture Controller](#aperture-controller)
+  - Controller Circuit
+- [Aperture Agent](#aperture-agents)
+  - Flow Controller
+  - Auto Scaler
 
-The agent uses an in-built telemetry system to collect metrics on service
-performance and request attributes, such as customer tier or request type. These
-metrics are then analyzed by the agent's high-fidelity flow classifier, which
-labels requests based on their attributes. This allows the agent to make more
-informed decisions about how to handle requests and prioritize workloads.
+### Aperture Controller
 
-The agent continuously monitors service performance and adjusts its flow control
-strategies accordingly. For example, it can shed load from non-critical
-workloads to ensure that critical application features are not affected during
-periods of high traffic. Additionally, the agent can use the data it collects to
-identify and block malicious requests, ensuring the security and stability of
-the service.
+The Aperture Controller is powered by always-on, dataflow-driven policies that
+continuously track deviations from service-level objectives (SLOs) and calculate
+recovery or escalation actions. The policies running in the Aperture Controller
+are expressed as circuits, much like circuit networks in the game
+[Factorio](https://wiki.factorio.com/Circuit_network). Aperture Controller store
+certain list of metrics in Prometheus and Etcd store information about decision
+it took.
 
-Overall, Aperture Agent works by continuously monitoring, analyzing and
-actuating the flow of requests, prioritizing the important ones and shedding
-load on non-important ones to ensure the performance and reliability of the
-service in web-scale apps.
+For example, a gradient control circuit component can be used to implement
+[AIMD](https://en.wikipedia.org/wiki/Additive_increase/multiplicative_decrease)
+(Additive Increase, Multiplicative Decrease) style counter-measure that limits
+the concurrency on a service when response times deteriorate. Advanced control
+components like [PID](https://en.wikipedia.org/wiki/PID_controller) can be used
+to further tune the concurrency limits.
 
-## Aperture Controller
+Aperture Controller is comparable in capabilities to autopilot in aircraft or
+adaptive cruise control in some automobiles.
 
-Aperture Controller is the component of Aperture that manages the flow control
-policies for the entire system. It uses dataflow-driven policies to continuously
-monitor and adjust service-level objectives (SLOs) for all services in the
-system. These policies are expressed as circuits, much like circuit networks in
-the game Factorio, and can be customized to meet the specific needs of the
-application.
+### Aperture Agents
 
-The controller receives metrics from the agents deployed next to each service
-instance, and uses these metrics to calculate recovery or escalation actions.
-For example, it can use a gradient control circuit component to implement an
-Additive Increase, Multiplicative Decrease (AIMD) style counter-measure that
-limits the concurrency on a service when response times deteriorate. More
-advanced control components like PID can be used to further tune the concurrency
-limits.
+Aperture Agents live next to your service instances as a sidecar and provide
+powerful flow control components such as a weighted fair queuing scheduler for
+prioritized load-shedding and a distributed rate-limiter for abuse prevention. A
+flow is the fundamental unit of work from the perspective of an Aperture Agent.
+It could be an API call, a feature, or even a database query.
 
-The controller also has the capability to make decisions based on the priority
-of requests and workloads. For example, it can prioritize high-importance
-features over others, ensuring that critical application features are not
-affected during periods of high traffic.
+Graceful degradation of services is achieved by prioritizing critical
+application features over background workloads. Much like when boarding an
+aircraft, business class passengers get priority over other passengers; every
+application has workloads with varying priorities. A video streaming service
+might view a request to play a movie by a customer as a higher priority than
+running an internal machine learning workload. A SaaS product might prioritize
+features used by paid users over those being used by free users. Aperture Agents
+schedule workloads based on their priorities helping maximize user experience or
+revenue even during overload scenarios.
 
-Overall, the Aperture Controller works by continuously monitoring the entire
-system and adjusting the flow control policies to ensure that the service-level
-objectives are met, and the application remains stable and reliable. It ensures
-that the correct decisions are made for prioritizing requests and workloads and
-taking action to prevent failures.
+Aperture Agents monitor golden signals using an in-built telemetry system and a
+programmable, high-fidelity flow classifier used to label requests based on
+attributes such as customer tier or request type. These metrics are analyzed by
+the controller.
+
+Aperture also includes an integration for auto-scaling, which can help you scale
+your infrastructure as needed by countermeasures.

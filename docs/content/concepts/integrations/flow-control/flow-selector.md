@@ -105,12 +105,12 @@ flow_selector:
       user_tier: gold
 ```
 
-[flow]: /concepts/flow-control/flow-control.md#flow
-[label]: /concepts/flow-control/flow-label.md
-[control-point]: /concepts/flow-control/flow-control.md#control-point
-[service]: /concepts/flow-control/service.md
-[agent-group]: /concepts/flow-control/service.md#agent-group
-[flux-meter]: /concepts/flow-control/flux-meter.md
+[flow]: /concepts/integrations/flow-control/flow-control.md#flow
+[label]: /concepts/integrations/flow-control/flow-label.md
+[control-point]: ./flow-control.md#control-point
+[service]: /concepts/integrations/flow-control/service.md
+[agent-group]: /concepts/integrations/flow-control/service.md#agent-group
+[flux-meter]: /concepts/integrations/flow-control/flux-meter.md
 [cl]: components/concurrency-limiter.md
-[classifier]: /concepts/flow-control/flow-classifier.md
+[classifier]: /concepts/integrations/flow-control/flow-classifier.md
 [label-matcher]: /references/configuration/policy.md#v1-label-matcher

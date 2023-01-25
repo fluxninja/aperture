@@ -208,18 +208,18 @@ See [full example in reference][reference]
 [attr-context]:
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 [rego-playground]: https://play.openpolicyagent.org/p/mG0sXxCNdQ
-[label]: /concepts/flow-control/flow-label.md
-[baggage]: /concepts/flow-control/flow-label.md#baggage
-[request-labels]: /concepts/flow-control/flow-label.md#request-labels
+[label]: /concepts/integrations/flow-control/flow-label.md
+[baggage]: /concepts/integrations/flow-control/flow-label.md#baggage
+[request-labels]: ./flow-label.md#request-labels
 [reference]: /references/configuration/policy.md#v1-classifier
 [rule]: /references/configuration/policy.md#v1-rule
 [extractor]: /references/configuration/policy.md#v1-extractor
 [rego-rule]: /references/configuration/policy.md#rule-rego
 [plugin]: /arc/plugin.md
-[label-matcher]: /concepts/flow-control/flow-selector.md#label-matcher
+[label-matcher]: ./flow-selector.md#label-matcher
 [policies]: /concepts/policy/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
-[control-point]: /concepts/flow-control/flow-control.md#control-point
+[control-point]: ./flow-control.md#control-point
 [install-istio]: /get-started/integrations/flow-control/envoy/istio.md

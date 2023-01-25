@@ -24,20 +24,22 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 Welcome to the official documentation for
-[Aperture](https://github.com/fluxninja/aperture)!
+[FluxNinja Aperture](https://github.com/fluxninja/aperture)!
 
-Aperture is an open-source flow control and reliability management platform for
-modern web applications.
-
-<Zoom>
-
-```mermaid
-{@include: assets/diagrams/architecture/architecture_simple.mmd}
-```
-
-</Zoom>
+Aperture is an open-source platform that helps manage the flow of traffic and
+improve the reliability of modern web applications. It enables the
+prioritization of critical functions and prevent issues such as cascading
+failures during periods of high traffic, ensuring that the overall performance
+of the application is stable and reliable.
 
 ## Why is flow control needed?
+
+:::info
+
+Learn more about what is
+[flow control](<https://en.wikipedia.org/wiki/Flow_control_(data)>) here.
+
+:::
 
 Modern web-scale apps are a complex network of inter-connected microservices
 that implement features such as account management, search, payments & more.
@@ -77,67 +79,35 @@ analyzing, and actuating, facilitated by agents and a controller.
 ![Aperture Control Loop](assets/img/oaalight.png#gh-light-mode-only)
 ![Aperture Control Loop](assets/img/oaadark.png#gh-dark-mode-only)
 
-### Aperture Agents
+- Observe: Aperture continuously monitors the system and collects metrics on
+  service performance and request attributes.
+- Analyze: Aperture's agent and controller use the metrics collected to identify
+  patterns and trends in the system and make decisions on how to handle requests
+  and workloads.
+- Actuate: Aperture takes appropriate actions, such as prioritizing critical
+  workloads and shedding load on non-critical workloads to ensure the stability
+  and reliability of the service in web-scale apps.
 
-Aperture Agents live next to your service instances as a sidecar and provide
-powerful flow control components such as a weighted fair queuing scheduler for
-prioritized load-shedding and a distributed rate-limiter for abuse prevention. A
-flow is the fundamental unit of work from the perspective of an Aperture Agent.
-It could be an API call, a feature, or even a database query.
+## What features does Aperture bring in?
 
-Graceful degradation of services is achieved by prioritizing critical
-application features over background workloads. Much like when boarding an
-aircraft, business class passengers get priority over other passengers; every
-application has workloads with varying priorities. A video streaming service
-might view a request to play a movie by a customer as a higher priority than
-running an internal machine learning workload. A SaaS product might prioritize
-features used by paid users over those being used by free users. Aperture Agents
-schedule workloads based on their priorities helping maximize user experience or
-revenue even during overload scenarios.
+Aperture is a flow control platform that offers several features to help
+maintain the stability and reliability of modern web-scale applications:
 
-Aperture Agents monitor golden signals using an in-built telemetry system and a
-programmable, high-fidelity flow classifier used to label requests based on
-attributes such as customer tier or request type. These metrics are analyzed by
-the controller.
-
-### Aperture Controller
-
-The controller is powered by always-on, dataflow-driven policies that
-continuously track deviations from service-level objectives (SLOs) and calculate
-recovery or escalation actions. The policies running in the controller are
-expressed as circuits, much like circuit networks in the game
-[Factorio](https://wiki.factorio.com/Circuit_network).
-
-For example, a gradient control circuit component can be used to implement
-[AIMD](https://en.wikipedia.org/wiki/Additive_increase/multiplicative_decrease)
-(Additive Increase, Multiplicative Decrease) style counter-measure that limits
-the concurrency on a service when response times deteriorate. Advanced control
-components like [PID](https://en.wikipedia.org/wiki/PID_controller) can be used
-to further tune the concurrency limits.
-
-Aperture’s Controller is comparable in capabilities to autopilot in aircraft or
-adaptive cruise control in some automobiles.
-
-### Deploying Aperture
-
-Aperture can be inserted into service instances with either _Service Meshes_ or
-_SDKs_:
-
-- Service Meshes: Aperture can be deployed with no changes to application code,
-  using [Envoy](https://www.envoyproxy.io/). It latches onto Envoy’s
-  [External Authorization API](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter)
-  for control purposes and collects access logs for telemetry purposes. On each
-  request, Envoy sends request metadata to the Aperture Agent for a flow control
-  decision. Inside the Aperture Agent, the request traverses classifiers,
-  rate-limiters, and schedulers, before the decision to accept or drop the
-  request is sent back to Envoy. Aperture participates in the
-  [OpenTelemetry](https://opentelemetry.io/) tracing protocol as it inserts flow
-  classification labels into requests, enabling visualization in tracing tools
-  such as [Jaeger](https://www.jaegertracing.io/).
-- Aperture SDKs: In addition to service mesh insertion, Aperture provides SDKs
-  that can be used by developers to achieve fine-grained flow control at the
-  feature level inside service code. For example, an e-commerce app may
-  prioritize users in the checkout flow over new sessions when the application
-  is experiencing an overload. The Aperture Controller can be programmed to
-  degrade features as an escalated recovery action when basic load shedding is
-  triggered for several minutes.
+- **Weighted fair queuing**: Aperture uses a weighted fair queuing scheduler to
+  prioritize workloads based on their importance, ensuring that critical
+  application features are not affected during overload scenarios.
+- **Distributed rate-limiting**: Aperture includes a distributed rate-limiter to
+  prevent abuse and protect the service from malicious requests.
+- **Prioritization of critical features**: Aperture prioritizes critical
+  application features over background workloads to ensure a graceful
+  degradation of services during overload scenarios
+- **Monitoring and telemetry**: Aperture continuously monitors service
+  performance and request attributes using an in-built telemetry system, which
+  enables the agent and controller to make informed decisions about how to
+  handle requests and prioritize workloads.
+- **Dataflow-driven policies**: Aperture's controller uses dataflow-driven
+  policies to continuously monitor and adjust service-level objectives, ensuring
+  that the application remains stable and reliable.
+- **Flexibility**: Aperture can be deployed with either Service Meshes or SDKs,
+  depending on your infrastructure and requirements, and allows you to customize
+  the flow control policies to meet the specific needs of your application
