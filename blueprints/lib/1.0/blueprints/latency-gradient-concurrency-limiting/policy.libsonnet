@@ -62,7 +62,6 @@ function(params) {
             + integrator.withInPorts({
               input: port.withSignalName('CONCURRENCY_INCREMENT_SINGLE_TICK'),
               max: port.withSignalName('NORMAL_CONCURRENCY_LIMIT'),
-              min: port.withSignalName('ACCEPTED_CONCURRENCY'),
               reset: port.withSignalName('IS_OVERLOAD'),
             })
             + integrator.withOutPorts({ output: port.withSignalName('CONCURRENCY_INCREMENT') })

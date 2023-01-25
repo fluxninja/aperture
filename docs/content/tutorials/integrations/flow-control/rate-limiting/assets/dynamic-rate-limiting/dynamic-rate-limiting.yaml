@@ -70,8 +70,6 @@ spec:
               signal_name: CONCURRENCY_INCREMENT_SINGLE_TICK
             max:
               signal_name: NORMAL_CONCURRENCY_LIMIT
-            min:
-              signal_name: ACCEPTED_CONCURRENCY
             reset:
               signal_name: IS_OVERLOAD
           out_ports:
