@@ -223,6 +223,5 @@ See [full example in reference][reference]
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
-[control-point]:
-  /concepts/integrations/flow-control/flow-control.md#control-point
+[control-point]: ./flow-control.md#control-point
 [install-istio]: /get-started/integrations/flow-control/envoy/istio.md

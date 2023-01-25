@@ -107,8 +107,7 @@ flow_selector:
 
 [flow]: /concepts/integrations/flow-control/flow-control.md#flow
 [label]: /concepts/integrations/flow-control/flow-label.md
-[control-point]:
-  /concepts/integrations/flow-control/flow-control.md#control-point
+[control-point]: ./flow-control.md#control-point
 [service]: /concepts/integrations/flow-control/service.md
 [agent-group]: /concepts/integrations/flow-control/service.md#agent-group
 [flux-meter]: /concepts/integrations/flow-control/flux-meter.md
