@@ -1,6 +1,25 @@
 package agent
 
 import (
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/cumulativetodeltaprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/datadogprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/deltatorateprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/groupbyattrsprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/groupbytraceprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8sattributesprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/metricsgenerationprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/metricstransformprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/routingprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/servicegraphprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/spanmetricsprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/spanprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/tailsamplingprocessor"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/activedirectorydsreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/aerospikereceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/apachereceiver"
@@ -78,10 +97,13 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/windowsperfcountersreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zipkinreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zookeeperreceiver"
+	"go.opentelemetry.io/collector/processor"
+	"go.opentelemetry.io/collector/processor/batchprocessor"
+	"go.opentelemetry.io/collector/processor/memorylimiterprocessor"
 	"go.opentelemetry.io/collector/receiver"
 )
 
-func otelReceivers() []receiver.Factory {
+func otelContribReceivers() []receiver.Factory {
 	return []receiver.Factory{
 		activedirectorydsreceiver.NewFactory(),
 		aerospikereceiver.NewFactory(),
@@ -160,5 +182,31 @@ func otelReceivers() []receiver.Factory {
 		windowsperfcountersreceiver.NewFactory(),
 		zipkinreceiver.NewFactory(),
 		zookeeperreceiver.NewFactory(),
+	}
+}
+
+func otelContribProcessors() []processor.Factory {
+	return []processor.Factory{
+		attributesprocessor.NewFactory(),
+		batchprocessor.NewFactory(),
+		filterprocessor.NewFactory(),
+		groupbyattrsprocessor.NewFactory(),
+		groupbytraceprocessor.NewFactory(),
+		k8sattributesprocessor.NewFactory(),
+		memorylimiterprocessor.NewFactory(),
+		metricstransformprocessor.NewFactory(),
+		metricsgenerationprocessor.NewFactory(),
+		probabilisticsamplerprocessor.NewFactory(),
+		resourcedetectionprocessor.NewFactory(),
+		resourceprocessor.NewFactory(),
+		routingprocessor.NewFactory(),
+		tailsamplingprocessor.NewFactory(),
+		servicegraphprocessor.NewFactory(),
+		spanmetricsprocessor.NewFactory(),
+		spanprocessor.NewFactory(),
+		cumulativetodeltaprocessor.NewFactory(),
+		datadogprocessor.NewFactory(),
+		deltatorateprocessor.NewFactory(),
+		transformprocessor.NewFactory(),
 	}
 }
