@@ -15,8 +15,7 @@ href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/
 
 This blueprint provides a
 [policy monitoring](/get-started/policies/monitoring.md) dashboard that
-visualizes Signals flowing through the
-[Circuit](/concepts/policy/circuit/circuit.md).
+visualizes Signals flowing through the [Circuit](/concepts/policy/circuit.md).
 
 ## Configuration
 
