@@ -210,15 +210,13 @@ See [full example in reference][reference]
 [rego-playground]: https://play.openpolicyagent.org/p/mG0sXxCNdQ
 [label]: /concepts/integrations/flow-control/flow-label.md
 [baggage]: /concepts/integrations/flow-control/flow-label.md#baggage
-[request-labels]:
-  /concepts/integrations/flow-control/flow-label.md#request-labels
+[request-labels]: ./flow-label.md#request-labels
 [reference]: /references/configuration/policy.md#v1-classifier
 [rule]: /references/configuration/policy.md#v1-rule
 [extractor]: /references/configuration/policy.md#v1-extractor
 [rego-rule]: /references/configuration/policy.md#rule-rego
 [plugin]: /arc/plugin.md
-[label-matcher]:
-  /concepts/integrations/flow-control/flow-selector.md#label-matcher
+[label-matcher]: ./flow-selector.md#label-matcher
 [policies]: /concepts/policy/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:
