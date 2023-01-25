@@ -5,8 +5,6 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/exporter/loggingexporter"
@@ -92,14 +90,14 @@ func AgentOTELComponents(
 	pmetricotlp.RegisterGRPCServer(serverGRPC, msw)
 	plogotlp.RegisterGRPCServer(serverGRPC, lsw)
 
-	receiverFactory := []receiver.Factory{
+	receiversFactory := []receiver.Factory{
 		otlpreceiver.NewFactory(tsw, msw, lsw),
 		alertsreceiver.NewFactory(alerter),
 	}
 
-	receiverFactory = append(receiverFactory, otelReceivers()...)
+	receiversFactory = append(receiversFactory, otelContribReceivers()...)
 
-	receivers, err := receiver.MakeFactoryMap(receiverFactory...)
+	receivers, err := receiver.MakeFactoryMap(receiversFactory...)
 	errs = multierr.Append(errs, err)
 
 	exporters, err := exporter.MakeFactoryMap(
@@ -112,16 +110,16 @@ func AgentOTELComponents(
 	)
 	errs = multierr.Append(errs, err)
 
-	processors, err := processor.MakeFactoryMap(
+	processorsFactory := []processor.Factory{
 		batchprocessor.NewFactory(),
 		memorylimiterprocessor.NewFactory(),
 		enrichmentprocessor.NewFactory(cache),
 		rollupprocessor.NewFactory(promRegistry),
 		metricsprocessor.NewFactory(promRegistry, engine, clasEng, controlPointCache),
-		attributesprocessor.NewFactory(),
 		tracestologsprocessor.NewFactory(),
-		transformprocessor.NewFactory(),
-	)
+	}
+	processorsFactory = append(processorsFactory, otelContribProcessors()...)
+	processors, err := processor.MakeFactoryMap(processorsFactory...)
 	errs = multierr.Append(errs, err)
 
 	factories := otelcol.Factories{
