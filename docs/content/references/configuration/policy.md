@@ -3408,25 +3408,31 @@ Output for the Scheduler component.
 <dt>accepted_concurrency</dt>
 <dd>
 
-([V1OutPort](#v1-out-port)) Accepted concurrency is the number of accepted tokens per second.
+([V1OutPort](#v1-out-port)) Accepted concurrency is actual concurrency on a control point that this
+scheduler is applied on.
 
 :::info
-**Accepted tokens** are tokens associated with
-[flows](/concepts/integrations/flow-control/flow-control.md#flow) that were accepted by
-this scheduler. Number of tokens for a flow is determined by a
-[workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
-via `auto_tokens` or explicitly by `Workload.tokens`).
+Concurrency is a unitless number describing mean number of
+[flows](/concepts/integrations/flow-control/flow-control.md#flow) being
+concurrently processed by the system (system = control point).
+Concurrency is calculated as _work_ done per unit of time (so
+work-seconds per world-seconds). Work-seconds are computed based on
+token-weights of of flows (which are either estimated via `auto_tokens`
+or specified by `Workload.tokens`).
 :::
 
-Value of this signal is the sum across all the relevant schedulers.
+Value of this signal is aggregated from all the relevant schedulers.
 
 </dd>
 <dt>incoming_concurrency</dt>
 <dd>
 
-([V1OutPort](#v1-out-port)) Incoming concurrency is the number of incoming tokens/sec.
-This is the same as `accepted_concurrency`, but across all the flows
-entering scheduler, including rejected ones.
+([V1OutPort](#v1-out-port)) Incoming concurrency is concurrency that'd be needed to accept all the
+flows entering the scheduler.
+
+This is computed in the same way as `accepted_concurrency`, but summing
+up work-seconds from all the flows entering scheduler, including
+rejected ones.
 
 </dd>
 </dl>

@@ -7,7 +7,7 @@ import (
 // RequestContext is metadata for request in a flow that is to be allowed or dropped based on controlled delay and queue limits.
 type RequestContext struct {
 	FairnessLabel string // for enforcing fairness
-	Tokens        uint64 // expected latency for this request
+	WorkMillis    uint64 // expected latency for this request
 	Priority      uint8  // larger values represent higher priority
 	Timeout       time.Duration
 }
