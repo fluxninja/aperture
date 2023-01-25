@@ -26,7 +26,7 @@ kubectl --namespace=aperture-controller apply -f <aperture-policy-file>
 Here's an example of the Aperture Policy configuration file:
 
 ```yaml
-{@include: ../../tutorials/integrations/flow-control/assets/static-rate-limiting/static-rate-limiting.yaml}
+{@include: ../../tutorials/integrations/flow-control/rate-limiting/assets/static-rate-limiting/static-rate-limiting.yaml}
 ```
 
 ## Create Policy
