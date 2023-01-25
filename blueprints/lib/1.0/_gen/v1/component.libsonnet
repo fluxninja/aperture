@@ -1,6 +1,12 @@
 {
   new():: {
   },
+  withAimdConcurrencyController(aimd_concurrency_controller):: {
+    aimd_concurrency_controller: aimd_concurrency_controller,
+  },
+  withAimdConcurrencyControllerMixin(aimd_concurrency_controller):: {
+    aimd_concurrency_controller+: aimd_concurrency_controller,
+  },
   withAlerter(alerter):: {
     alerter: alerter,
   },
@@ -18,12 +24,6 @@
   },
   withArithmeticCombinatorMixin(arithmetic_combinator):: {
     arithmetic_combinator+: arithmetic_combinator,
-  },
-  withConcurrencyController(concurrency_controller):: {
-    concurrency_controller: concurrency_controller,
-  },
-  withConcurrencyControllerMixin(concurrency_controller):: {
-    concurrency_controller+: concurrency_controller,
   },
   withConcurrencyLimiter(concurrency_limiter):: {
     concurrency_limiter: concurrency_limiter,

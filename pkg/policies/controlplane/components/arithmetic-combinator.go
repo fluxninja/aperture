@@ -13,24 +13,25 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
-type arithmeticOperator int8
+// ArithmeticOperator is the type of arithmetic operation.
+type ArithmeticOperator int8
 
-//go:generate enumer -type=arithmeticOperator -output=arithmetic-operator-string.go
+//go:generate enumer -type=ArithmeticOperator -output=arithmetic-operator-string.go
 const (
-	unknownArithmetic arithmeticOperator = iota
-	add
-	sub
-	mul
-	div
-	xor
-	lshift
-	rshift
+	UnknownArithmetic ArithmeticOperator = iota
+	Add
+	Sub
+	Mul
+	Div
+	Xor
+	LShift
+	RShift
 )
 
 // ArithmeticCombinator takes lhs, rhs input signals and emits computed output via arithmetic operation.
 type ArithmeticCombinator struct {
 	// The arithmetic operation can be addition, subtraction, multiplication, division, XOR, left bit shift or right bit shift.
-	operator arithmeticOperator
+	operator ArithmeticOperator
 }
 
 // Name implements runtime.Component.
@@ -46,11 +47,11 @@ var _ runtime.Component = (*ArithmeticCombinator)(nil)
 
 // NewArithmeticCombinatorAndOptions returns a new ArithmeticCombinator and its Fx options.
 func NewArithmeticCombinatorAndOptions(arithmeticCombinatorProto *policylangv1.ArithmeticCombinator, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
-	operator, err := arithmeticOperatorString(arithmeticCombinatorProto.Operator)
+	operator, err := ArithmeticOperatorString(arithmeticCombinatorProto.Operator)
 	if err != nil {
 		return nil, fx.Options(), err
 	}
-	if operator == unknownArithmetic {
+	if operator == UnknownArithmetic {
 		return nil, fx.Options(), errors.New("unknown arithmetic operator")
 	}
 
@@ -70,23 +71,23 @@ func (arith *ArithmeticCombinator) Execute(inPortReadings runtime.PortToReading,
 	if lhs.Valid() && rhs.Valid() {
 		lhsVal, rhsVal := lhs.Value(), rhs.Value()
 		switch arith.operator {
-		case add:
+		case Add:
 			output = runtime.NewReading(lhsVal + rhsVal)
-		case sub:
+		case Sub:
 			output = runtime.NewReading(lhsVal - rhsVal)
-		case mul:
+		case Mul:
 			output = runtime.NewReading(lhsVal * rhsVal)
-		case div:
+		case Div:
 			if rhsVal == 0 {
 				err = fmt.Errorf("divide by zero")
 			} else {
 				output = runtime.NewReading(lhsVal / rhsVal)
 			}
-		case xor:
+		case Xor:
 			output = runtime.NewReading(float64(int(lhsVal) ^ int(rhsVal)))
-		case lshift:
+		case LShift:
 			output = runtime.NewReading(float64(int(lhsVal) << int(rhsVal)))
-		case rshift:
+		case RShift:
 			output = runtime.NewReading(float64(int(lhsVal) >> int(rhsVal)))
 		}
 	}

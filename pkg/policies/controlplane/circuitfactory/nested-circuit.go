@@ -14,7 +14,7 @@ import (
 // NestedCircuitDelimiter is the delimiter used to separate the parent circuit ID and the nested circuit ID.
 const NestedCircuitDelimiter = "."
 
-// ParseNestedCircuit parses a nested circuit and returns the parent, leaf component, and options.
+// ParseNestedCircuit parses a nested circuit and returns the parent, leaf components, and options.
 func ParseNestedCircuit(
 	nestedCircuitID string,
 	nestedCircuitProto *policylangv1.NestedCircuit,
@@ -24,26 +24,30 @@ func ParseNestedCircuit(
 	parentCircuitID := ParentCircuitID(nestedCircuitID)
 
 	inPortsMap := nestedCircuitProto.GetInPortsMap()
-	for portName, inPorts := range inPortsMap {
-		var signals []runtime.Signal
-		for _, inPort := range inPorts.InPortsList {
-			signals = append(signals, runtime.Signal{
+	for portName, inPort := range inPortsMap {
+		signals := []runtime.Signal{
+			{
 				SignalName:    inPort.GetSignalName(),
 				ConstantValue: inPort.GetConstantValue(),
 				CircuitID:     parentCircuitID,
-			})
+			},
+		}
+		if portMapping.ExistsInPort(portName) {
+			return nil, nil, nil, errors.Errorf("redefinition of port %s in nested circuit %s", portName, nestedCircuitProto.Name)
 		}
 		portMapping.AddInPort(portName, signals)
 	}
 
 	outPortsMap := nestedCircuitProto.GetOutPortsMap()
-	for portName, outPorts := range outPortsMap {
-		var signals []runtime.Signal
-		for _, outPort := range outPorts.OutPortsList {
-			signals = append(signals, runtime.Signal{
+	for portName, outPort := range outPortsMap {
+		signals := []runtime.Signal{
+			{
 				SignalName: outPort.GetSignalName(),
 				CircuitID:  parentCircuitID,
-			})
+			},
+		}
+		if portMapping.ExistsOutPort(portName) {
+			return nil, nil, nil, errors.Errorf("redefinition of port %s in nested circuit %s", portName, nestedCircuitProto.Name)
 		}
 		portMapping.AddOutPort(portName, signals)
 	}

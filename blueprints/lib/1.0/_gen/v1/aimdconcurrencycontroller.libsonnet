@@ -1,8 +1,9 @@
-local concurrencycontrollerins = import './concurrencycontrollerins.libsonnet';
-local concurrencycontrollerouts = import './concurrencycontrollerouts.libsonnet';
+local aimdconcurrencycontrollerins = import './aimdconcurrencycontrollerins.libsonnet';
+local aimdconcurrencycontrollerouts = import './aimdconcurrencycontrollerouts.libsonnet';
 {
   new():: {
     in_ports: {
+      setpoint: error 'Port setpoint is missing',
       signal: error 'Port signal is missing',
     },
     out_ports: {
@@ -13,8 +14,8 @@ local concurrencycontrollerouts = import './concurrencycontrollerouts.libsonnet'
       load_multiplier: error 'Port load_multiplier is missing',
     },
   },
-  inPorts:: concurrencycontrollerins,
-  outPorts:: concurrencycontrollerouts,
+  inPorts:: aimdconcurrencycontrollerins,
+  outPorts:: aimdconcurrencycontrollerouts,
   withAlerterConfig(alerter_config):: {
     alerter_config: alerter_config,
   },
@@ -33,11 +34,17 @@ local concurrencycontrollerouts = import './concurrencycontrollerouts.libsonnet'
   withConcurrencyLinearIncrementMixin(concurrency_linear_increment):: {
     concurrency_linear_increment+: concurrency_linear_increment,
   },
-  withConcurrencySquareRootIncrementMultiplier(concurrency_square_root_increment_multiplier):: {
-    concurrency_square_root_increment_multiplier: concurrency_square_root_increment_multiplier,
+  withConcurrencySqrtIncrementMultiplier(concurrency_sqrt_increment_multiplier):: {
+    concurrency_sqrt_increment_multiplier: concurrency_sqrt_increment_multiplier,
   },
-  withConcurrencySquareRootIncrementMultiplierMixin(concurrency_square_root_increment_multiplier):: {
-    concurrency_square_root_increment_multiplier+: concurrency_square_root_increment_multiplier,
+  withConcurrencySqrtIncrementMultiplierMixin(concurrency_sqrt_increment_multiplier):: {
+    concurrency_sqrt_increment_multiplier+: concurrency_sqrt_increment_multiplier,
+  },
+  withDryRunDynamicConfigKey(dry_run_dynamic_config_key):: {
+    dry_run_dynamic_config_key: dry_run_dynamic_config_key,
+  },
+  withDryRunDynamicConfigKeyMixin(dry_run_dynamic_config_key):: {
+    dry_run_dynamic_config_key+: dry_run_dynamic_config_key,
   },
   withFlowSelector(flow_selector):: {
     flow_selector: flow_selector,

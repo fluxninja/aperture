@@ -53,6 +53,18 @@ func (p *PortMapping) AddOutPort(portName string, signals []Signal) {
 	p.Outs[portName] = signals
 }
 
+// ExistsInPort returns true if the port exists in the PortMapping.
+func (p *PortMapping) ExistsInPort(portName string) bool {
+	_, ok := p.Ins[portName]
+	return ok
+}
+
+// ExistsOutPort returns true if the port exists in the PortMapping.
+func (p *PortMapping) ExistsOutPort(portName string) bool {
+	_, ok := p.Outs[portName]
+	return ok
+}
+
 // NewPortMapping creates a new PortMapping.
 func NewPortMapping() PortMapping {
 	return PortMapping{

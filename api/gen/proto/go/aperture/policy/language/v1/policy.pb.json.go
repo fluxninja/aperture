@@ -1368,38 +1368,6 @@ func (msg *NestedCircuit) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *NestedCircuit_InPorts) MarshalJSON() ([]byte, error) {
-	return protojson.MarshalOptions{
-		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
-		UseProtoNames:   true,
-	}.Marshal(msg)
-}
-
-// UnmarshalJSON implements json.Unmarshaler
-func (msg *NestedCircuit_InPorts) UnmarshalJSON(b []byte) error {
-	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
-	}.Unmarshal(b, msg)
-}
-
-// MarshalJSON implements json.Marshaler
-func (msg *NestedCircuit_OutPorts) MarshalJSON() ([]byte, error) {
-	return protojson.MarshalOptions{
-		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
-		UseProtoNames:   true,
-	}.Marshal(msg)
-}
-
-// UnmarshalJSON implements json.Unmarshaler
-func (msg *NestedCircuit_OutPorts) UnmarshalJSON(b []byte) error {
-	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
-	}.Unmarshal(b, msg)
-}
-
-// MarshalJSON implements json.Marshaler
 func (msg *NestedSignalIngress) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
@@ -1464,7 +1432,7 @@ func (msg *NestedSignalEgress_Ins) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *ConcurrencyController) MarshalJSON() ([]byte, error) {
+func (msg *AIMDConcurrencyController) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -1473,14 +1441,14 @@ func (msg *ConcurrencyController) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *ConcurrencyController) UnmarshalJSON(b []byte) error {
+func (msg *AIMDConcurrencyController) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *ConcurrencyController_Ins) MarshalJSON() ([]byte, error) {
+func (msg *AIMDConcurrencyController_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -1489,14 +1457,14 @@ func (msg *ConcurrencyController_Ins) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *ConcurrencyController_Ins) UnmarshalJSON(b []byte) error {
+func (msg *AIMDConcurrencyController_Ins) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *ConcurrencyController_Outs) MarshalJSON() ([]byte, error) {
+func (msg *AIMDConcurrencyController_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -1505,7 +1473,7 @@ func (msg *ConcurrencyController_Outs) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *ConcurrencyController_Outs) UnmarshalJSON(b []byte) error {
+func (msg *AIMDConcurrencyController_Outs) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

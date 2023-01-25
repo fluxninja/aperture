@@ -185,22 +185,6 @@ definitions:
         items:
           $ref: '#/definitions/v1MatchExpression'
         x-order: 0
-  NestedCircuitInPorts:
-    type: object
-    properties:
-      in_ports_list:
-        type: array
-        items:
-          $ref: '#/definitions/v1InPort'
-        x-order: 0
-  NestedCircuitOutPorts:
-    type: object
-    properties:
-      out_ports_list:
-        type: array
-        items:
-          $ref: '#/definitions/v1OutPort'
-        x-order: 0
   RateLimiterLazySync:
     type: object
     properties:
@@ -322,6 +306,110 @@ definitions:
         format: uint64
         x-go-default: 1
         x-order: 1
+  v1AIMDConcurrencyController:
+    description: High level concurrency control component. Baselines a signal via
+      exponential moving average and applies concurrency limits based on deviation
+      of signal from the baseline. Internally implemented as a nested circuit.
+    type: object
+    properties:
+      alerter_config:
+        description: Configuration for embedded alerter.
+        x-order: 8
+        $ref: '#/definitions/v1AlerterConfig'
+      concurrency_limit_multiplier:
+        description: |-
+          Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+
+          @gotags: default:"2.0"
+        type: number
+        format: double
+        x-go-default: 2
+        x-order: 5
+      concurrency_linear_increment:
+        description: |-
+          Linear increment to concurrency in each execution tick when the system is not in overloaded state.
+
+          @gotags: default:"5.0"
+        type: number
+        format: double
+        x-go-default: 5
+        x-order: 6
+      concurrency_sqrt_increment_multiplier:
+        description: |-
+          Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
+
+          @gotags: default:"1.0"
+        type: number
+        format: double
+        x-go-default: 1
+        x-order: 7
+      dry_run_dynamic_config_key:
+        description: Configuration key for load actuation dry run.
+        type: string
+        x-order: 9
+      flow_selector:
+        description: |-
+          Flow Selector decides the service and flows at which the concurrency limiter is applied.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+        x-order: 2
+        $ref: '#/definitions/v1FlowSelector'
+      gradient_parameters:
+        title: |-
+          Gradient parameters for the controller. Defaults to:
+          * slope = -1
+          * min_gradient = 0.1
+          * max_gradient = 1
+        x-order: 4
+        $ref: '#/definitions/v1GradientParameters'
+      in_ports:
+        description: Input ports for the AIMDConcurrencyController component.
+        x-order: 0
+        $ref: '#/definitions/v1AIMDConcurrencyControllerIns'
+      out_ports:
+        description: Output ports for the AIMDConcurrencyController component.
+        x-order: 1
+        $ref: '#/definitions/v1AIMDConcurrencyControllerOuts'
+      scheduler_parameters:
+        description: |-
+          Scheduler parameters.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+        x-order: 3
+        $ref: '#/definitions/v1SchedulerParameters'
+  v1AIMDConcurrencyControllerIns:
+    description: Inputs for the AIMDConcurrencyController component.
+    type: object
+    properties:
+      setpoint:
+        description: The setpoint to the controller.
+        x-order: 1
+        $ref: '#/definitions/v1InPort'
+      signal:
+        description: The signal to the controller.
+        x-order: 0
+        $ref: '#/definitions/v1InPort'
+  v1AIMDConcurrencyControllerOuts:
+    description: Outputs for the AIMDConcurrencyController component.
+    type: object
+    properties:
+      accepted_concurrency:
+        x-order: 0
+        $ref: '#/definitions/v1OutPort'
+      desired_concurrency:
+        x-order: 2
+        $ref: '#/definitions/v1OutPort'
+      incoming_concurrency:
+        x-order: 1
+        $ref: '#/definitions/v1OutPort'
+      is_overload:
+        x-order: 3
+        $ref: '#/definitions/v1OutPort'
+      load_multiplier:
+        x-order: 4
+        $ref: '#/definitions/v1OutPort'
   v1AddressExtractor:
     description: |-
       IP addresses in attribute context are defined as objects with separate ip and port fields.
@@ -629,6 +717,14 @@ definitions:
     type: object
     title: Computational block that form the circuit
     properties:
+      aimd_concurrency_controller:
+        description: AIMD Concurrency control component is based on Additive Increase
+          and Multiplicative Decrease of Concurrency. It takes a signal and setpoint
+          as inputs and reduces concurrency limits proportionally (or any arbitrary
+          power) based on deviation of the signal from setpoint. Internally implemented
+          as a nested circuit.
+        x-order: 25
+        $ref: '#/definitions/v1AIMDConcurrencyController'
       alerter:
         description: Alerter reacts to a signal and generates alert to send to alert
           manager.
@@ -643,13 +739,6 @@ definitions:
           the result.
         x-order: 2
         $ref: '#/definitions/v1ArithmeticCombinator'
-      concurrency_controller:
-        description: High level concurrency control component. Baselines a signal
-          and reduces concurrency limits proportionally (or any arbitrary power) based
-          on deviation of signal from the baseline. Internally implemented as a nested
-          circuit.
-        x-order: 25
-        $ref: '#/definitions/v1ConcurrencyController'
       concurrency_limiter:
         description: Concurrency Limiter provides service protection by applying prioritized
           load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
@@ -751,102 +840,6 @@ definitions:
           on third signal.
         x-order: 4
         $ref: '#/definitions/v1Switcher'
-  v1ConcurrencyController:
-    description: High level concurrency control component. Baselines a signal via
-      exponential moving average and applies concurrency limits based on deviation
-      of signal from the baseline. Internally implemented as a nested circuit.
-    type: object
-    properties:
-      alerter_config:
-        description: Configuration for embedded alerter.
-        x-order: 8
-        $ref: '#/definitions/v1AlerterConfig'
-      concurrency_limit_multiplier:
-        description: |-
-          Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
-
-          @gotags: default:"2.0"
-        type: number
-        format: double
-        x-go-default: 2
-        x-order: 5
-      concurrency_linear_increment:
-        description: |-
-          Linear increment to concurrency in each execution tick when the system is not in overloaded state.
-
-          @gotags: default:"5.0"
-        type: number
-        format: double
-        x-go-default: 5
-        x-order: 6
-      concurrency_square_root_increment_multiplier:
-        description: |-
-          Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
-
-          @gotags: default:"1.0"
-        type: number
-        format: double
-        x-go-default: 1
-        x-order: 7
-      flow_selector:
-        description: |-
-          Flow Selector decides the service and flows at which the concurrency limiter is applied.
-
-          @gotags: validate:"required"
-        x-go-validate: required
-        x-order: 2
-        $ref: '#/definitions/v1FlowSelector'
-      gradient_parameters:
-        title: |-
-          Gradient parameters for the controller. Defaults to:
-          * slope = -1
-          * min_gradient = 0.1
-          * max_gradient = 1
-        x-order: 4
-        $ref: '#/definitions/v1GradientParameters'
-      in_ports:
-        description: Input ports for the ConcurrencyController component.
-        x-order: 0
-        $ref: '#/definitions/v1ConcurrencyControllerIns'
-      out_ports:
-        description: Output ports for the ConcurrencyController component.
-        x-order: 1
-        $ref: '#/definitions/v1ConcurrencyControllerOuts'
-      scheduler_parameters:
-        description: |-
-          Scheduler parameters.
-
-          @gotags: validate:"required"
-        x-go-validate: required
-        x-order: 3
-        $ref: '#/definitions/v1SchedulerParameters'
-  v1ConcurrencyControllerIns:
-    description: Inputs for the ConcurrencyController component.
-    type: object
-    properties:
-      signal:
-        description: The signal to the controller.
-        x-order: 0
-        $ref: '#/definitions/v1InPort'
-  v1ConcurrencyControllerOuts:
-    description: Outputs for the ConcurrencyController component.
-    type: object
-    properties:
-      accepted_concurrency:
-        x-order: 0
-        $ref: '#/definitions/v1OutPort'
-      desired_concurrency:
-        x-order: 2
-        $ref: '#/definitions/v1OutPort'
-      incoming_concurrency:
-        x-order: 1
-        $ref: '#/definitions/v1OutPort'
-      is_overload:
-        x-order: 3
-        $ref: '#/definitions/v1OutPort'
-      load_multiplier:
-        x-order: 4
-        $ref: '#/definitions/v1OutPort'
   v1ConcurrencyLimiter:
     description: |-
       :::info
@@ -2029,7 +2022,7 @@ definitions:
       in_ports_map:
         type: object
         additionalProperties:
-          $ref: '#/definitions/NestedCircuitInPorts'
+          $ref: '#/definitions/v1InPort'
         x-order: 0
       name:
         description: Name of the nested circuit component. This name is displayed
@@ -2039,7 +2032,7 @@ definitions:
       out_ports_map:
         type: object
         additionalProperties:
-          $ref: '#/definitions/NestedCircuitOutPorts'
+          $ref: '#/definitions/v1OutPort'
         x-order: 1
   v1NestedSignalEgress:
     description: Nested signal egress is a special type of component that allows to

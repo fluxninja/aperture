@@ -41,7 +41,7 @@ func NewIntegratorAndOptions(_ *policylangv1.Integrator, _ string, _ iface.Polic
 func (in *Integrator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	inputVal := inPortReadings.ReadSingleReadingPort("input")
 	resetVal := inPortReadings.ReadSingleReadingPort("reset")
-	if resetVal.Valid() && resetVal.Value() > 0 {
+	if resetVal.Valid() && resetVal.Value() != 0 {
 		in.sum = 0
 	} else if inputVal.Valid() {
 		minVal := inPortReadings.ReadSingleReadingPort("min")

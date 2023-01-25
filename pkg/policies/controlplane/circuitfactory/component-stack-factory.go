@@ -168,6 +168,8 @@ func newComponentStackAndOptions(
 		return []runtime.ConfiguredComponent{horizontalPodScalerConfComp}, configuredComponents, fx.Options(options...), nil
 	} else if nestedCircuitProto := componentStackProto.GetNestedCircuit(); nestedCircuitProto != nil {
 		return ParseNestedCircuit(componentStackID, nestedCircuitProto, policyReadAPI)
+	} else if aimdConcurrencyController := componentStackProto.GetAimdConcurrencyController(); aimdConcurrencyController != nil {
+		return ParseAIMDConcurrencyController(componentStackID, aimdConcurrencyController, policyReadAPI)
 	}
 	return nil, nil, nil, fmt.Errorf("unsupported/missing component type")
 }

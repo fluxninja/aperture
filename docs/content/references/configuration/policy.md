@@ -260,32 +260,6 @@ eg. {any: {of: [expr1, expr2]}}.
 </dd>
 </dl>
 
-### NestedCircuitInPorts {#nested-circuit-in-ports}
-
-#### Properties
-
-<dl>
-<dt>in_ports_list</dt>
-<dd>
-
-([[]V1InPort](#v1-in-port))
-
-</dd>
-</dl>
-
-### NestedCircuitOutPorts {#nested-circuit-out-ports}
-
-#### Properties
-
-<dl>
-<dt>out_ports_list</dt>
-<dd>
-
-([[]V1OutPort](#v1-out-port))
-
-</dd>
-</dl>
-
 ### RateLimiterLazySync {#rate-limiter-lazy-sync}
 
 #### Properties
@@ -422,6 +396,149 @@ This override is applicable only if `auto_tokens` is set to false.
 Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
 you have a classifier that sets `user` flow label, you might want to set
 `fairness_key = "user"`.
+
+</dd>
+</dl>
+
+### v1AIMDConcurrencyController {#v1-a-i-m-d-concurrency-controller}
+
+High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1AIMDConcurrencyControllerIns](#v1-a-i-m-d-concurrency-controller-ins)) Input ports for the AIMDConcurrencyController component.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([V1AIMDConcurrencyControllerOuts](#v1-a-i-m-d-concurrency-controller-outs)) Output ports for the AIMDConcurrencyController component.
+
+</dd>
+<dt>flow_selector</dt>
+<dd>
+
+([V1FlowSelector](#v1-flow-selector), `required`) Flow Selector decides the service and flows at which the concurrency limiter is applied.
+
+@gotags: validate:"required"
+
+</dd>
+<dt>scheduler_parameters</dt>
+<dd>
+
+([V1SchedulerParameters](#v1-scheduler-parameters), `required`) Scheduler parameters.
+
+@gotags: validate:"required"
+
+</dd>
+<dt>gradient_parameters</dt>
+<dd>
+
+([V1GradientParameters](#v1-gradient-parameters)) Gradient parameters for the controller. Defaults to:
+
+- slope = -1
+- min_gradient = 0.1
+- max_gradient = 1
+
+</dd>
+<dt>concurrency_limit_multiplier</dt>
+<dd>
+
+(float64, default: `2`) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+
+@gotags: default:"2.0"
+
+</dd>
+<dt>concurrency_linear_increment</dt>
+<dd>
+
+(float64, default: `5`) Linear increment to concurrency in each execution tick when the system is not in overloaded state.
+
+@gotags: default:"5.0"
+
+</dd>
+<dt>concurrency_sqrt_increment_multiplier</dt>
+<dd>
+
+(float64, default: `1`) Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
+
+@gotags: default:"1.0"
+
+</dd>
+<dt>alerter_config</dt>
+<dd>
+
+([V1AlerterConfig](#v1-alerter-config)) Configuration for embedded alerter.
+
+</dd>
+<dt>dry_run_dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for load actuation dry run.
+
+</dd>
+</dl>
+
+### v1AIMDConcurrencyControllerIns {#v1-a-i-m-d-concurrency-controller-ins}
+
+Inputs for the AIMDConcurrencyController component.
+
+#### Properties
+
+<dl>
+<dt>signal</dt>
+<dd>
+
+([V1InPort](#v1-in-port)) The signal to the controller.
+
+</dd>
+<dt>setpoint</dt>
+<dd>
+
+([V1InPort](#v1-in-port)) The setpoint to the controller.
+
+</dd>
+</dl>
+
+### v1AIMDConcurrencyControllerOuts {#v1-a-i-m-d-concurrency-controller-outs}
+
+Outputs for the AIMDConcurrencyController component.
+
+#### Properties
+
+<dl>
+<dt>accepted_concurrency</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
+
+</dd>
+<dt>incoming_concurrency</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
+
+</dd>
+<dt>desired_concurrency</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
+
+</dd>
+<dt>is_overload</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
+
+</dd>
+<dt>load_multiplier</dt>
+<dd>
+
+([V1OutPort](#v1-out-port))
 
 </dd>
 </dl>
@@ -961,141 +1078,10 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([V1NestedSignalEgress](#v1-nested-signal-egress)) Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
 
 </dd>
-<dt>concurrency_controller</dt>
+<dt>aimd_concurrency_controller</dt>
 <dd>
 
-([V1ConcurrencyController](#v1-concurrency-controller)) High level concurrency control component. Baselines a signal and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of signal from the baseline. Internally implemented as a nested circuit.
-
-</dd>
-</dl>
-
-### v1ConcurrencyController {#v1-concurrency-controller}
-
-High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
-
-#### Properties
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-([V1ConcurrencyControllerIns](#v1-concurrency-controller-ins)) Input ports for the ConcurrencyController component.
-
-</dd>
-<dt>out_ports</dt>
-<dd>
-
-([V1ConcurrencyControllerOuts](#v1-concurrency-controller-outs)) Output ports for the ConcurrencyController component.
-
-</dd>
-<dt>flow_selector</dt>
-<dd>
-
-([V1FlowSelector](#v1-flow-selector), `required`) Flow Selector decides the service and flows at which the concurrency limiter is applied.
-
-@gotags: validate:"required"
-
-</dd>
-<dt>scheduler_parameters</dt>
-<dd>
-
-([V1SchedulerParameters](#v1-scheduler-parameters), `required`) Scheduler parameters.
-
-@gotags: validate:"required"
-
-</dd>
-<dt>gradient_parameters</dt>
-<dd>
-
-([V1GradientParameters](#v1-gradient-parameters)) Gradient parameters for the controller. Defaults to:
-
-- slope = -1
-- min_gradient = 0.1
-- max_gradient = 1
-
-</dd>
-<dt>concurrency_limit_multiplier</dt>
-<dd>
-
-(float64, default: `2`) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
-
-@gotags: default:"2.0"
-
-</dd>
-<dt>concurrency_linear_increment</dt>
-<dd>
-
-(float64, default: `5`) Linear increment to concurrency in each execution tick when the system is not in overloaded state.
-
-@gotags: default:"5.0"
-
-</dd>
-<dt>concurrency_square_root_increment_multiplier</dt>
-<dd>
-
-(float64, default: `1`) Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
-
-@gotags: default:"1.0"
-
-</dd>
-<dt>alerter_config</dt>
-<dd>
-
-([V1AlerterConfig](#v1-alerter-config)) Configuration for embedded alerter.
-
-</dd>
-</dl>
-
-### v1ConcurrencyControllerIns {#v1-concurrency-controller-ins}
-
-Inputs for the ConcurrencyController component.
-
-#### Properties
-
-<dl>
-<dt>signal</dt>
-<dd>
-
-([V1InPort](#v1-in-port)) The signal to the controller.
-
-</dd>
-</dl>
-
-### v1ConcurrencyControllerOuts {#v1-concurrency-controller-outs}
-
-Outputs for the ConcurrencyController component.
-
-#### Properties
-
-<dl>
-<dt>accepted_concurrency</dt>
-<dd>
-
-([V1OutPort](#v1-out-port))
-
-</dd>
-<dt>incoming_concurrency</dt>
-<dd>
-
-([V1OutPort](#v1-out-port))
-
-</dd>
-<dt>desired_concurrency</dt>
-<dd>
-
-([V1OutPort](#v1-out-port))
-
-</dd>
-<dt>is_overload</dt>
-<dd>
-
-([V1OutPort](#v1-out-port))
-
-</dd>
-<dt>load_multiplier</dt>
-<dd>
-
-([V1OutPort](#v1-out-port))
+([V1AIMDConcurrencyController](#v1-a-i-m-d-concurrency-controller)) AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
 
 </dd>
 </dl>
@@ -2690,13 +2676,13 @@ Nested circuit defines a sub-circuit as a high-level component. It consists of a
 <dt>in_ports_map</dt>
 <dd>
 
-(map of [NestedCircuitInPorts](#nested-circuit-in-ports))
+(map of [V1InPort](#v1-in-port))
 
 </dd>
 <dt>out_ports_map</dt>
 <dd>
 
-(map of [NestedCircuitOutPorts](#nested-circuit-out-ports))
+(map of [V1OutPort](#v1-out-port))
 
 </dd>
 <dt>components</dt>
