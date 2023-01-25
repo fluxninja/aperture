@@ -66,6 +66,20 @@ func Provide(in ConstructorIn) (*Heartbeats, error) {
 		return nil, err
 	}
 
+	var discoveryConfig kubernetes.KubernetesDiscoveryConfig
+	if err := in.Unmarshaller.UnmarshalKey(kubernetes.ConfigKey, &discoveryConfig); err != nil {
+		return nil, err
+	}
+
+	var installationMode string
+	if discoveryConfig.DiscoveryEnabled {
+		installationMode = "DAEMONSET"
+	} else if discoveryConfig.PodName != "" {
+		installationMode = "SIDECAR"
+	} else {
+		installationMode = "BAREMETAL"
+	}
+
 	heartbeats := newHeartbeats(
 		in.JobGroup,
 		config,
@@ -76,6 +90,7 @@ func Provide(in ConstructorIn) (*Heartbeats, error) {
 		in.PolicyFactory,
 		in.ServiceControlPointCache,
 		in.KubernetesControlPointCache,
+		installationMode,
 	)
 
 	runCtx, cancel := context.WithCancel(context.Background())
