@@ -98,6 +98,5 @@ during overload scenarios.
 
 :::
 
-[label-matcher]:
-  /concepts/integrations/flow-control/flow-selector.md#label-matcher
+[label-matcher]: ../flow-selector.md#label-matcher
 [policies]: /concepts/policy/policy.md
