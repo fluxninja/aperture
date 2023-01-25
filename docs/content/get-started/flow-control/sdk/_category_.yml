@@ -1,8 +1,0 @@
-label: SDK
-position: 2
-collapsible: true
-collapsed: true
-link:
-  type: "generated-index"
-  title: "SDK"
-  keywords: ["flow", "control", "points", "sdk"]

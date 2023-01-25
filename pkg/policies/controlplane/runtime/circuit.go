@@ -3,6 +3,7 @@ package runtime
 import (
 	"context"
 	"fmt"
+	"math"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -107,7 +108,22 @@ func MakeNamedSignal(name string, looped bool) Signal {
 }
 
 // MakeConstantSignal creates a new constant Signal.
-func MakeConstantSignal(value float64) Signal {
+func MakeConstantSignal(constSignal *ConstantSignal) Signal {
+	value := 0.0
+	specialValue := constSignal.SpecialValue
+	if specialValue != nil && *specialValue != "" {
+		switch *specialValue {
+		case "NaN":
+			value = math.NaN()
+		case "+Inf":
+			value = math.Inf(1)
+		case "-Inf":
+			value = math.Inf(-1)
+		}
+	} else if floatValue := constSignal.Value; floatValue != nil {
+		value = *floatValue
+	}
+
 	return Signal{
 		SignalType: SignalTypeConstant,
 		Value:      value,

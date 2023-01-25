@@ -693,7 +693,7 @@ definitions:
         $ref: '#/definitions/v1LabelMatcher'
         description: |-
           Label Matcher to select a Workload based on
-          [flow labels](/concepts/flow-control/flow-label.md).
+          [flow labels](/concepts/integrations/flow-control/flow-label.md).
 
           @gotags: validate:"required"
         x-go-validate: required
@@ -724,7 +724,7 @@ definitions:
         type: string
         description: |-
           Fairness key is a label key that can be used to provide fairness within a workload.
-          Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
+          Any [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if
           you have a classifier that sets `user` flow label, you might want to set
           `fairness_key = "user"`.
     description: WorkloadParameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
@@ -1038,10 +1038,9 @@ definitions:
 
         :::note
         Treating invalid inputs as "unknowns" has a consequence that the result
-        might end up being valid even when some inputs are invalid. Eg. `unknown
-        && false == false`, because the result would end up false no matter if
-        first signal was true or false. On the other hand, `unknown && true ==
-        unknown`.
+        might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,
+        because the result would end up false no matter if
+        first signal was true or false. On the other hand, `unknown && true == unknown`.
         :::
   v1AndIns:
     type: object
@@ -1213,14 +1212,14 @@ definitions:
           $ref: '#/definitions/v1Rule'
         description: |-
           A map of {key, value} pairs mapping from
-          [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
+          [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
           how to extract and propagate flow labels with that key.
 
           @gotags: validate:"required,gt=0,dive,keys,required,endkeys,required"
         x-go-validate: required,gt=0,dive,keys,required,endkeys,required
     description: |-
       :::info
-      See also [Classifier overview](/concepts/flow-control/flow-classifier.md).
+      See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
       :::
 
       Example:
@@ -1305,9 +1304,9 @@ definitions:
       promql:
         $ref: '#/definitions/v1PromQL'
         description: Periodically runs a Prometheus query in the background and emits the result.
-      constant:
-        $ref: '#/definitions/v1Constant'
-        description: Emits a constant signal.
+      variable:
+        $ref: '#/definitions/v1Variable'
+        description: Emits a variable signal which can be set to invalid.
       sqrt:
         $ref: '#/definitions/v1Sqrt'
         description: Takes an input signal and emits the square root of the input signal.
@@ -1347,6 +1346,9 @@ definitions:
       pulse_generator:
         $ref: '#/definitions/v1PulseGenerator'
         description: Generates 0 and 1 in turns.
+      holder:
+        $ref: '#/definitions/v1Holder'
+        description: Holds the last valid signal value for the specified duration then waits for next valid value to hold.
     description: |-
       :::info
       See also [Components overview](/concepts/policy/circuit.md#components).
@@ -1379,9 +1381,10 @@ definitions:
       :::tip
       Sometimes you may want to use a constant value as one of component's inputs.
       You can create an input port containing the constant value instead of being connected to a signal.
-      To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
+      To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
+      You can also use it to provide special math values such as NaN and +- Inf.
       If You need to provide the same constant signal to multiple components,
-      You can use the [Constant](#v1-constant) component.
+      You can use the [Variable](#v1-variable) component.
       :::
 
       See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -1414,7 +1417,7 @@ definitions:
           Actuation strategy defines the input signal that will drive the scheduler.
     description: |-
       :::info
-      See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
+      See also [Concurrency Limiter overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).
       :::
 
       It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -1423,24 +1426,17 @@ definitions:
       ConcurrencyLimiter configuration is split into two parts: An actuation
       strategy and a scheduler. Right now, only `load_actuator` strategy is available.
     title: Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
-  v1Constant:
+  v1ConstantSignal:
     type: object
     properties:
-      out_ports:
-        $ref: '#/definitions/v1ConstantOuts'
-        description: Output ports for the Constant component.
+      special_value:
+        type: string
+        title: '@gotags: validate:"oneof=NaN +Inf -Inf"'
+        x-go-validate: oneof=NaN +Inf -Inf
       value:
         type: number
         format: double
-        description: The constant value to be emitted.
-    title: Component that emits a constant value as an output signal
-  v1ConstantOuts:
-    type: object
-    properties:
-      output:
-        $ref: '#/definitions/v1OutPort'
-        description: The constant value is emitted to the output port.
-    description: Outputs for the Constant component.
+    description: Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
   v1ControllerDynamicConfig:
     type: object
     properties:
@@ -1842,7 +1838,7 @@ definitions:
       control_point:
         type: string
         description: |-
-          [Control Point](/concepts/flow-control/flow-control.md#control-point)
+          [Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)
           identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
           block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
           or filter chains.
@@ -1853,7 +1849,7 @@ definitions:
         $ref: '#/definitions/v1LabelMatcher'
         description: |-
           :::info
-          See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
+          See also [Label Matcher overview](/concepts/integrations/flow-control/flow-selector.md#label-matcher).
           :::
 
           :::note
@@ -1868,11 +1864,11 @@ definitions:
           :::
         title: |-
           Label matcher allows to add _additional_ condition on
-          [flow labels](/concepts/flow-control/flow-label.md)
+          [flow labels](/concepts/integrations/flow-control/flow-label.md)
           must also be satisfied (in addition to service+control point matching)
     description: |-
       :::info
-      See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+      See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
       :::
 
       Example:
@@ -1892,7 +1888,7 @@ definitions:
       ```
     title: |-
       Describes which flows a [flow control
-      component](/concepts/flow-control/flow-control.md#components) should apply
+      component](/concepts/integrations/flow-control/flow-control.md#components) should apply
       to
   v1FlowSelector:
     type: object
@@ -1905,11 +1901,11 @@ definitions:
         x-go-validate: required
     description: |-
       :::info
-      See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+      See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
       :::
     title: |-
       Describes which flow in which service a [flow control
-      component](/concepts/flow-control/flow-control.md#components) should apply
+      component](/concepts/integrations/flow-control/flow-control.md#components) should apply
       to
   v1FluxMeter:
     type: object
@@ -1932,7 +1928,7 @@ definitions:
 
           :::info
           For list of available attributes in Envoy access logs, refer
-          [Envoy Filter](/get-started/flow-control/envoy/istio.md#envoy-filter)
+          [Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)
           :::
 
           @gotags: default:"workload_duration_ms"
@@ -1942,7 +1938,7 @@ definitions:
       The histogram created by Flux Meter measures the workload latency by default.
 
       :::info
-      See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
+      See also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).
       :::
 
       Example of a selector that creates a histogram metric for all HTTP requests
@@ -2109,6 +2105,35 @@ definitions:
     description: |-
       Groups is nested structure that holds status information about the node and a
       pointer to the next node.
+  v1Holder:
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/v1HolderIns'
+      out_ports:
+        $ref: '#/definitions/v1HolderOuts'
+      hold_for:
+        type: string
+        description: |-
+          Holding the last valid signal value for the hold_for duration.
+
+          @gotags: default:"5s"
+        x-go-default: 5s
+    description: |-
+      Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+      If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
+  v1HolderIns:
+    type: object
+    properties:
+      input:
+        $ref: '#/definitions/v1InPort'
+    description: Inputs for the Holder component.
+  v1HolderOuts:
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
+    description: Outputs for the Holder component.
   v1HorizontalPodScaler:
     type: object
     properties:
@@ -2138,9 +2163,8 @@ definitions:
       signal_name:
         type: string
         description: Name of the incoming Signal on the InPort.
-      constant_value:
-        type: number
-        format: double
+      constant_signal:
+        $ref: '#/definitions/v1ConstantSignal'
         description: Constant value to be used for this InPort instead of a signal.
     title: Components receive input from other components via InPorts
   v1Integrator:
@@ -2305,7 +2329,7 @@ definitions:
       agent_group:
         type: string
         description: |-
-          Which [agent-group](/concepts/service.md#agent-group) this
+          Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
           selector applies to.
 
           @gotags: default:"default"
@@ -2372,7 +2396,7 @@ definitions:
       An empty label matcher always matches.
     title: |-
       Allows to define rules whether a map of
-      [labels](/concepts/flow-control/flow-label.md)
+      [labels](/concepts/integrations/flow-control/flow-label.md)
       should be considered a match or not
   v1LimiterDecision:
     type: object
@@ -2846,7 +2870,7 @@ definitions:
           Specifies which label the ratelimiter should be keyed by.
 
           Rate limiting is done independently for each value of the
-          [label](/concepts/flow-control/flow-label.md) with given key.
+          [label](/concepts/integrations/flow-control/flow-label.md) with given key.
           Eg., to give each user a separate limit, assuming you have a _user_ flow
           label set up, set `label_key: "user"`.
 
@@ -2863,7 +2887,7 @@ definitions:
         title: Default configuration
     description: |-
       :::info
-      See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
+      See also [Rate Limiter overview](/concepts/integrations/flow-control/components/rate-limiter.md).
       :::
 
       Ratelimiting is done separately on per-label-value basis. Use _label\_key_
@@ -2927,6 +2951,8 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/v1KubernetesControlPoint'
+      installation_mode:
+        type: string
   v1ReportResponse:
     type: object
     description: ReportResponse is empty for now.
@@ -2985,7 +3011,7 @@ definitions:
           @gotags: default:"true"
         title: |-
           Decides if the created flow label should be available as an attribute in OLAP telemetry and
-          propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
+          propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
         x-go-validate: required
     description: |-
       Flow classification rule extracts a value from request metadata.
@@ -3037,7 +3063,7 @@ definitions:
         description: |-
           List of workloads to be used in scheduler.
 
-          Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
+          Categorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads
           allows for load-shedding to be "smarter" than just "randomly deny 50% of
           requests". There are two aspects of this "smartness":
           * Scheduler can more precisely calculate concurrency if it understands
@@ -3053,7 +3079,7 @@ definitions:
 
           :::info
           See also [workload definition in the concepts
-          section](/concepts/flow-control/concurrency-limiter.md#workload).
+          section](/concepts/integrations/flow-control/components/concurrency-limiter.md#workload).
           :::
 
           @gotags: validate:"dive"
@@ -3127,7 +3153,7 @@ definitions:
 
           :::info
           **Accepted tokens** are tokens associated with
-          [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
+          [flows](/concepts/integrations/flow-control/flow-control.md#flow) that were accepted by
           this scheduler. Number of tokens for a flow is determined by a
           [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
           via `auto_tokens` or explicitly by `Workload.tokens`).
@@ -3166,7 +3192,7 @@ definitions:
       agent_group:
         type: string
         description: |-
-          Which [agent-group](/concepts/service.md#agent-group) this
+          Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
           selector applies to.
 
           @gotags: default:"default"
@@ -3175,7 +3201,7 @@ definitions:
         type: string
         description: |-
           The Fully Qualified Domain Name of the
-          [service](/concepts/service.md) to select.
+          [service](/concepts/integrations/flow-control/service.md) to select.
 
           In kubernetes, this is the FQDN of the Service object.
 
@@ -3186,11 +3212,11 @@ definitions:
           :::
     description: |-
       :::info
-      See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+      See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
       :::
     title: |-
       Describes which service a [flow control or observability
-      component](/concepts/flow-control/flow-control.md#components) should apply
+      component](/concepts/integrations/flow-control/flow-control.md#components) should apply
       to
   v1ServicesList:
     type: object
@@ -3326,6 +3352,31 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Selected signal (on_true or on_false).
     description: Outputs for the Switcher component.
+  v1Variable:
+    type: object
+    properties:
+      out_ports:
+        $ref: '#/definitions/v1VariableOuts'
+        description: Output ports for the Variable component.
+      dynamic_config_key:
+        type: string
+        description: Configuration key for DynamicConfig.
+      default_config:
+        $ref: '#/definitions/v1VariableDynamicConfig'
+        description: Default configuration.
+    description: Component that emits a variable value as an output signal, can be defined in dynamic configuration.
+  v1VariableDynamicConfig:
+    type: object
+    properties:
+      constant_signal:
+        $ref: '#/definitions/v1ConstantSignal'
+  v1VariableOuts:
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
+        description: The value is emitted to the output port.
+    description: Outputs for the Variable component.
   v1VersionInfo:
     type: object
     properties:

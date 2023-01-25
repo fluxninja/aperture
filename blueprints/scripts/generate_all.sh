@@ -10,6 +10,14 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 	FIND="gfind"
 fi
 
+# accept a --force flag to force the regeneration of all graphs
+# check if $1 is bounded and equal to --force
+if [[ -n "${1:-}" ]] && [[ "$1" == "--force" ]]; then
+	force=true
+else
+	force=false
+fi
+
 # run jb install in the blueprints_root
 pushd "${blueprints_root}" >/dev/null
 jb install
@@ -68,7 +76,7 @@ $FIND "$blueprints_root"/examples -mindepth 1 -maxdepth 1 -type d | while read -
 
 	new_example_yaml=$(cat "$dir"/gen/policies/example.yaml)
 
-	if [[ "$old_example_yaml" != "$new_example_yaml" ]]; then
+	if [[ "$old_example_yaml" != "$new_example_yaml" || "$force" == true ]]; then
 		mkdir -p "$dir"/gen/graph
 		# fail if commands below fails
 		go run -mod=mod "${blueprints_root}"/../cmd/circuit-compiler/main.go \

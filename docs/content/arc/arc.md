@@ -1,17 +1,19 @@
 ---
 title: FluxNinja ARC
-sidebar_position: 1
+sidebar_position: 5
 keywords:
   - cloud
   - enterprise
+  - fluxninja arc
+  - reliability center
 ---
 
 # FluxNinja Application Reliability Center (ARC)
 
 :::info Join the FluxNinja ARC Beta
 
-FluxNinja ARC is inviting beta users. Please sign in
-[here](https://app.fluxninja.com/sign-in)
+FluxNinja ARC is inviting beta users. Please sign up
+[here](https://app.fluxninja.com/sign-up)
 
 :::
 

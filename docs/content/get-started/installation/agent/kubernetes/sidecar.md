@@ -32,32 +32,6 @@ The injector is configured with the following logic:
   is listed under `.spec.sidecar.enableNamespacesByDefault`. This is not enabled
   by default, so generally this means the pod is not injected.
 
-## Upgrade Procedure {#agent-sidecar-upgrade-procedure}
-
-By following these instructions, you will have deployed the upgraded version of
-Aperture Agent into your cluster.
-
-1. Update the Helm chart repo in your environment:
-
-   ```bash
-   helm repo update
-   ```
-
-2. Use the same `values.yaml` file created as part of
-   [Installation Steps](#agent-sidecar-installation) and pass it with below
-   command:
-
-   ```bash
-   helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml | kubectl apply -f -
-   ```
-
-3. If you have deployed the Aperture Agent into a namespace other than
-   `default`, use the `-n` flag:
-
-   ```bash
-   helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml -n aperture-agent | kubectl apply -f -
-   ```
-
 ## Installation {#agent-sidecar-installation}
 
 The Aperture Agent in the Sidecar mode will be installed using the
@@ -108,10 +82,10 @@ your cluster.
    Aperture Controller you want these Agents to connect with.
 
    If you have installed the
-   [Aperture Controller](/get-started/installation/controller.md) on the same
-   cluster in `default` namespace, with Etcd and Prometheus using `controller`
-   as release name, the values for the values for `ETCD_ENDPOINT_HERE` and
-   `PROMETHEUS_ADDRESS_HERE` would be as below:
+   [Aperture Controller](/get-started/installation/controller/controller.md) on
+   the same cluster in `default` namespace, with Etcd and Prometheus using
+   `controller` as release name, the values for the values for
+   `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` would be as below:
 
    ```yaml
    agent:
@@ -247,10 +221,36 @@ your cluster.
    ```
 
 7. Refer steps on the
-   [Istio Configuration](/get-started/flow-control/envoy/istio.md) if you don't
-   have the
+   [Istio Configuration](/get-started/integrations/flow-control/envoy/istio.md)
+   if you don't have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.
+
+## Upgrade Procedure {#agent-sidecar-upgrade-procedure}
+
+By following these instructions, you will have deployed the upgraded version of
+Aperture Agent into your cluster.
+
+1. Update the Helm chart repo in your environment:
+
+   ```bash
+   helm repo update
+   ```
+
+2. Use the same `values.yaml` file created as part of
+   [Installation Steps](#agent-sidecar-installation) and pass it with below
+   command:
+
+   ```bash
+   helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml | kubectl apply -f -
+   ```
+
+3. If you have deployed the Aperture Agent into a namespace other than
+   `default`, use the `-n` flag:
+
+   ```bash
+   helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml -n aperture-agent | kubectl apply -f -
+   ```
 
 ## Verifying the Installation
 

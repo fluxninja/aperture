@@ -5,10 +5,6 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/exporter/loggingexporter"
@@ -22,8 +18,6 @@ import (
 	"go.opentelemetry.io/collector/pdata/pmetric/pmetricotlp"
 	"go.opentelemetry.io/collector/pdata/ptrace/ptraceotlp"
 	"go.opentelemetry.io/collector/processor"
-	"go.opentelemetry.io/collector/processor/batchprocessor"
-	"go.opentelemetry.io/collector/processor/memorylimiterprocessor"
 	"go.opentelemetry.io/collector/receiver"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
 	"go.uber.org/fx"
@@ -94,12 +88,14 @@ func AgentOTELComponents(
 	pmetricotlp.RegisterGRPCServer(serverGRPC, msw)
 	plogotlp.RegisterGRPCServer(serverGRPC, lsw)
 
-	receivers, err := receiver.MakeFactoryMap(
+	receiversFactory := []receiver.Factory{
 		otlpreceiver.NewFactory(tsw, msw, lsw),
-		prometheusreceiver.NewFactory(),
-		filelogreceiver.NewFactory(),
 		alertsreceiver.NewFactory(alerter),
-	)
+	}
+
+	receiversFactory = append(receiversFactory, otelContribReceivers()...)
+
+	receivers, err := receiver.MakeFactoryMap(receiversFactory...)
 	errs = multierr.Append(errs, err)
 
 	exporters, err := exporter.MakeFactoryMap(
@@ -112,16 +108,14 @@ func AgentOTELComponents(
 	)
 	errs = multierr.Append(errs, err)
 
-	processors, err := processor.MakeFactoryMap(
-		batchprocessor.NewFactory(),
-		memorylimiterprocessor.NewFactory(),
+	processorsFactory := []processor.Factory{
 		enrichmentprocessor.NewFactory(cache),
 		rollupprocessor.NewFactory(promRegistry),
 		metricsprocessor.NewFactory(promRegistry, engine, clasEng, controlPointCache),
-		attributesprocessor.NewFactory(),
 		tracestologsprocessor.NewFactory(),
-		transformprocessor.NewFactory(),
-	)
+	}
+	processorsFactory = append(processorsFactory, otelContribProcessors()...)
+	processors, err := processor.MakeFactoryMap(processorsFactory...)
 	errs = multierr.Append(errs, err)
 
 	factories := otelcol.Factories{

@@ -25,7 +25,7 @@ const (
 // The histogram created by Flux Meter measures the workload latency by default.
 //
 // :::info
-// See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
+// See also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).
 // :::
 //
 // Example of a selector that creates a histogram metric for all HTTP requests
@@ -56,7 +56,7 @@ type FluxMeter struct {
 	//
 	// :::info
 	// For list of available attributes in Envoy access logs, refer
-	// [Envoy Filter](/get-started/flow-control/envoy/istio.md#envoy-filter)
+	// [Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)
 	// :::
 	//
 	AttributeKey string `protobuf:"bytes,6,opt,name=attribute_key,json=attributeKey,proto3" json:"attribute_key,omitempty" default:"workload_duration_ms"` // @gotags: default:"workload_duration_ms"

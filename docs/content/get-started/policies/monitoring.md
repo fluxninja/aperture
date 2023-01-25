@@ -1,5 +1,5 @@
 ---
-title: Monitoring
+title: Monitoring Signals
 description: Monitoring signals in the policy
 keywords:
   - jsonnet

@@ -132,9 +132,10 @@ message Resources {
 // :::tip
 // Sometimes you may want to use a constant value as one of component's inputs.
 // You can create an input port containing the constant value instead of being connected to a signal.
-// To do so, use the [InPort](#v1-in_port)'s .withConstantValue(constant_value) method.
+// To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
+// You can also use it to provide special math values such as NaN and +- Inf.
 // If You need to provide the same constant signal to multiple components,
-// You can use the [Constant](#v1-constant) component.
+// You can use the [Variable](#v1-variable) component.
 // :::
 //
 // See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -165,8 +166,8 @@ message Component {
     // Periodically runs a Prometheus query in the background and emits the result.
     PromQL promql = 8;
 
-    // Emits a constant signal.
-    Constant constant = 9;
+    // Emits a variable signal which can be set to invalid.
+    Variable variable = 9;
 
     // Takes an input signal and emits the square root of the input signal.
     Sqrt sqrt = 10;
@@ -206,6 +207,9 @@ message Component {
 
     // Generates 0 and 1 in turns.
     PulseGenerator pulse_generator = 22;
+
+    // Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+    Holder holder = 23;
   }
 }
 
@@ -215,7 +219,7 @@ message InPort {
     // Name of the incoming Signal on the InPort.
     string signal_name = 1;
     // Constant value to be used for this InPort instead of a signal.
-    double constant_value = 2;
+    ConstantSignal constant_signal = 2;
   }
 }
 
@@ -606,7 +610,7 @@ message Switcher {
 // Limits the traffic on a control point to specified rate
 //
 // :::info
-// See also [Rate Limiter overview](/concepts/flow-control/rate-limiter.md).
+// See also [Rate Limiter overview](/concepts/integrations/flow-control/components/rate-limiter.md).
 // :::
 //
 // Ratelimiting is done separately on per-label-value basis. Use _label\_key_
@@ -701,7 +705,7 @@ message RateLimiter {
   // Specifies which label the ratelimiter should be keyed by.
   //
   // Rate limiting is done independently for each value of the
-  // [label](/concepts/flow-control/flow-label.md) with given key.
+  // [label](/concepts/integrations/flow-control/flow-label.md) with given key.
   // Eg., to give each user a separate limit, assuming you have a _user_ flow
   // label set up, set `label_key: "user"`.
   string label_key = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -724,7 +728,7 @@ message RateLimiter {
 // Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 //
 // :::info
-// See also [Concurrency Limiter overview](/concepts/flow-control/concurrency-limiter.md).
+// See also [Concurrency Limiter overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).
 // :::
 //
 // It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -791,7 +795,7 @@ message Scheduler {
     }]; // @gotags: default:"1"
 
     // Fairness key is a label key that can be used to provide fairness within a workload.
-    // Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
+    // Any [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if
     // you have a classifier that sets `user` flow label, you might want to set
     // `fairness_key = "user"`.
     string fairness_key = 3;
@@ -808,7 +812,7 @@ message Scheduler {
     }]; // @gotags: validate:"required"
 
     // Label Matcher to select a Workload based on
-    // [flow labels](/concepts/flow-control/flow-label.md).
+    // [flow labels](/concepts/integrations/flow-control/flow-label.md).
     LabelMatcher label_matcher = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-validate"
@@ -823,7 +827,7 @@ message Scheduler {
     //
     // :::info
     // **Accepted tokens** are tokens associated with
-    // [flows](/concepts/flow-control/flow-control.md#flow) that were accepted by
+    // [flows](/concepts/integrations/flow-control/flow-control.md#flow) that were accepted by
     // this scheduler. Number of tokens for a flow is determined by a
     // [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
     // via `auto_tokens` or explicitly by `Workload.tokens`).
@@ -843,7 +847,7 @@ message Scheduler {
 
   // List of workloads to be used in scheduler.
   //
-  // Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
+  // Categorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads
   // allows for load-shedding to be "smarter" than just "randomly deny 50% of
   // requests". There are two aspects of this "smartness":
   // * Scheduler can more precisely calculate concurrency if it understands
@@ -859,7 +863,7 @@ message Scheduler {
   //
   // :::info
   // See also [workload definition in the concepts
-  // section](/concepts/flow-control/concurrency-limiter.md#workload).
+  // section](/concepts/integrations/flow-control/components/concurrency-limiter.md#workload).
   // :::
   repeated Workload workloads = 2; // @gotags: validate:"dive"
 
@@ -981,19 +985,38 @@ message PromQL {
   }]; // @gotags: default:"10s"
 }
 
-// Component that emits a constant value as an output signal
-message Constant {
-  // Outputs for the Constant component.
+// Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
+message ConstantSignal {
+  oneof const {
+    string special_value = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      extensions: {
+        key: "x-go-validate"
+        value: {string_value: "oneof=NaN +Inf -Inf"}
+      }
+    }]; // @gotags: validate:"oneof=NaN +Inf -Inf"
+    double value = 2;
+  }
+}
+
+// Component that emits a variable value as an output signal, can be defined in dynamic configuration.
+message Variable {
+  message DynamicConfig {
+    ConstantSignal constant_signal = 1;
+  }
+  // Outputs for the Variable component.
   message Outs {
-    // The constant value is emitted to the output port.
+    // The value is emitted to the output port.
     OutPort output = 1;
   }
 
-  // Output ports for the Constant component.
+  // Output ports for the Variable component.
   Outs out_ports = 1;
 
-  // The constant value to be emitted.
-  double value = 2;
+  // Configuration key for DynamicConfig.
+  string dynamic_config_key = 2;
+
+  // Default configuration.
+  DynamicConfig default_config = 3;
 }
 
 // Takes an input signal and emits the square root of it multiplied by scale as an output
@@ -1114,10 +1137,9 @@ message Min {
 //
 //   :::note
 //   Treating invalid inputs as "unknowns" has a consequence that the result
-//   might end up being valid even when some inputs are invalid. Eg. `unknown
-//   && false == false`, because the result would end up false no matter if
-//   first signal was true or false. On the other hand, `unknown && true ==
-//   unknown`.
+//   might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,
+//   because the result would end up false no matter if
+//   first signal was true or false. On the other hand, `unknown && true == unknown`.
 //   :::
 message And {
   // Inputs for the And component.
@@ -1389,6 +1411,31 @@ message PulseGenerator {
 
   // Emitting 0 for the false_for duration.
   google.protobuf.Duration false_for = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-default"
+      value: {string_value: "5s"}
+    }
+  }]; // @gotags: default:"5s"
+}
+
+// Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+// If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
+message Holder {
+  // Inputs for the Holder component.
+  message Ins {
+    InPort input = 1;
+  }
+
+  // Outputs for the Holder component.
+  message Outs {
+    OutPort output = 1;
+  }
+
+  Ins in_ports = 1;
+  Outs out_ports = 2;
+
+  // Holding the last valid signal value for the hold_for duration.
+  google.protobuf.Duration hold_for = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
       value: {string_value: "5s"}

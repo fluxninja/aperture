@@ -20,7 +20,8 @@ spec:
               service: service1-demo-app.demoapp.svc.cluster.local
           in_ports:
             limit:
-              constant_value: "50.0"
+              constant_signal:
+                value: "50.0"
           label_key: http.request.header.user_type
           lazy_sync:
             enabled: true

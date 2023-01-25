@@ -221,10 +221,10 @@ func getPortSignals(portMapping map[string][]Port, componentIndex int) PortToSig
 					portSignals,
 					MakeNamedSignal(*portSpec.SignalName, false),
 				)
-			} else if portSpec.ConstantValue != nil {
+			} else if portSpec.ConstantSignal != nil {
 				portSignals = append(
 					portSignals,
-					MakeConstantSignal(*portSpec.ConstantValue),
+					MakeConstantSignal(portSpec.ConstantSignal),
 				)
 			}
 		}

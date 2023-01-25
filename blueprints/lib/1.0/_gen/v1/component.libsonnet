@@ -25,12 +25,6 @@
   withConcurrencyLimiterMixin(concurrency_limiter):: {
     concurrency_limiter+: concurrency_limiter,
   },
-  withConstant(constant):: {
-    constant: constant,
-  },
-  withConstantMixin(constant):: {
-    constant+: constant,
-  },
   withDecider(decider):: {
     decider: decider,
   },
@@ -66,6 +60,12 @@
   },
   withGradientControllerMixin(gradient_controller):: {
     gradient_controller+: gradient_controller,
+  },
+  withHolder(holder):: {
+    holder: holder,
+  },
+  withHolderMixin(holder):: {
+    holder+: holder,
   },
   withHorizontalPodScaler(horizontal_pod_scaler):: {
     horizontal_pod_scaler: horizontal_pod_scaler,
@@ -132,5 +132,11 @@
   },
   withSwitcherMixin(switcher):: {
     switcher+: switcher,
+  },
+  withVariable(variable):: {
+    variable: variable,
+  },
+  withVariableMixin(variable):: {
+    variable+: variable,
   },
 }
