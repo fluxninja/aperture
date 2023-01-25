@@ -19,10 +19,10 @@ escalation strategies beyond concurrency limits could be to more aggressively
 restrict traffic of each user by dynamically adjusting their rate limits.
 
 To recap,
-[concurrency limiter](/concepts/policy/circuit/components/concurrency-limiter.md)
+[concurrency limiter](/concepts/flow-control/components/concurrency-limiter.md)
 relies on weighted-fair queueing scheduler to make flow-control decisions at the
 workload level. On the other hand, the
-[rate limiter](/concepts/policy/circuit/components/rate-limiter.md) uses a
+[rate limiter](/concepts/flow-control/components/rate-limiter.md) uses a
 distributed cache to maintain global counters for each flow label (e.g. unique
 users) and restricts traffic when they exceed their allocated quota. These 2
 technologies can be made to work together as we will see in the below example.
@@ -41,9 +41,9 @@ user to `10 rps` and during the overload scenario, we will completely restrict
 bot traffic (`0 rps` limit) after `30s` to further relieve the service.
 
 To accomplish this, we will be adding additional
-[components](/concepts/policy/circuit/circuit.md#component) to extend the base
-policy with this escalation logic. The additional components are highlighted in
-the Jsonnet spec below.
+[components](/concepts/policy/circuit.md#components) to extend the base policy
+with this escalation logic. The additional components are highlighted in the
+Jsonnet spec below.
 
 ```mdx-code-block
 <Tabs>

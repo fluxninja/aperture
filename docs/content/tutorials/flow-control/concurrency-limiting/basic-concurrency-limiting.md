@@ -52,7 +52,7 @@ At a high-level, this policy consists of:
   service in each execution cycle of circuit based on the observed incoming
   concurrency.
 - Concurrency Limiting Actuator: The concurrency limits are actuated via
-  [weighted-fair queueing scheduler](/concepts/policy/circuit/components/concurrency-limiter.md).
+  [weighted-fair queueing scheduler](/concepts/flow-control/components/concurrency-limiter.md).
   The output of the adjustments to accepted concurrency made by gradient
   controller and optimizer logic are translated to a load multiplier that is
   synchronized with Aperture Agents via etcd. The load multiplier adjusts

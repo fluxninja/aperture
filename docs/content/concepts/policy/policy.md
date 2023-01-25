@@ -26,10 +26,10 @@ Policies provide a framework for defining and managing reliability criteria, and
 conditions as code. It's a way of enforcing reliability policies
 programmatically, running in a continuous control loop. In an application
 reliability context, it codifies the capability of the application to modify its
-operation to achieve the best possible mode of operation despite overload and
-failures.
+operational state to achieve the best possible mode of operation despite
+overload and failures.
 
-[circuit]: /concepts/policy/circuit/circuit.md
+[circuit]: /concepts/policy/circuit.md
 [resources]: /concepts/policy/resources.md
 [blueprints]: /get-started/policies/blueprints/blueprints.md
 [control-system]: https://en.wikipedia.org/wiki/Control_system

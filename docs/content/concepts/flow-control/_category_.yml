@@ -1,7 +1,7 @@
-label: FluxNinja ARC
-position: 5
+label: Flow Control
+position: 2
 collapsible: true
 collapsed: true
 link:
   type: "doc"
-  id: "arc"
+  id: "flow-control"
