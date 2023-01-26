@@ -28,9 +28,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/entitycache"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
@@ -45,10 +45,10 @@ func ModuleForAgentOTEL() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			cache.Provide[selectors.ControlPointID],
-			otelcollector.NewOTELParams,
+			otelconfig.NewOTELParams,
 			fx.Annotate(
 				provideAgent,
-				fx.ResultTags(otelcollector.BaseFxTag),
+				fx.ResultTags(otelconfig.BaseFxTag),
 			),
 			fx.Annotate(
 				AgentOTELComponents,
@@ -129,15 +129,15 @@ func AgentOTELComponents(
 	return factories, errs
 }
 
-func provideAgent(cfg *otelcollector.OTELParams) *otelcollector.OTELConfig {
+func provideAgent(cfg *otelconfig.OTELParams) *otelconfig.OTELConfig {
 	addLogsPipeline(cfg)
 	addTracesPipeline(cfg)
-	otelcollector.AddMetricsPipeline(cfg)
-	otelcollector.AddAlertsPipeline(cfg, otelconsts.ProcessorAgentResourceLabels)
+	otelconfig.AddMetricsPipeline(cfg)
+	otelconfig.AddAlertsPipeline(cfg, otelconsts.ProcessorAgentResourceLabels)
 	return cfg.Config
 }
 
-func addLogsPipeline(cfg *otelcollector.OTELParams) {
+func addLogsPipeline(cfg *otelconfig.OTELParams) {
 	config := cfg.Config
 	// Common dependencies for pipelines
 	config.AddReceiver(otelconsts.ReceiverOTLP, otlpreceiver.Config{})
@@ -167,14 +167,14 @@ func addLogsPipeline(cfg *otelcollector.OTELParams) {
 		otelconsts.ProcessorAgentGroup,
 	}
 
-	config.Service.AddPipeline("logs", otelcollector.Pipeline{
+	config.Service.AddPipeline("logs", otelconfig.Pipeline{
 		Receivers:  []string{otelconsts.ReceiverOTLP},
 		Processors: processors,
 		Exporters:  []string{otelconsts.ExporterLogging},
 	})
 }
 
-func addTracesPipeline(cfg *otelcollector.OTELParams) {
+func addTracesPipeline(cfg *otelconfig.OTELParams) {
 	config := cfg.Config
 	config.AddExporter(otelconsts.ExporterOTLPLoopback, map[string]any{
 		"endpoint": cfg.Listener.GetAddr(),
@@ -186,7 +186,7 @@ func addTracesPipeline(cfg *otelcollector.OTELParams) {
 		LogsExporter: otelconsts.ExporterOTLPLoopback,
 	})
 
-	config.Service.AddPipeline("traces", otelcollector.Pipeline{
+	config.Service.AddPipeline("traces", otelconfig.Pipeline{
 		Receivers:  []string{otelconsts.ReceiverOTLP},
 		Processors: []string{otelconsts.ProcessorTracesToLogs},
 		// We need some exporter configured to make this pipeline correct. Actual
@@ -201,7 +201,7 @@ func addTracesPipeline(cfg *otelcollector.OTELParams) {
 	})
 	// We need a fake log pipeline which will initialize the ExporterOTLPLoopback
 	// for logs type.
-	config.Service.AddPipeline("logs/fake", otelcollector.Pipeline{
+	config.Service.AddPipeline("logs/fake", otelconfig.Pipeline{
 		Receivers: []string{"filelog"},
 		Exporters: []string{otelconsts.ExporterOTLPLoopback},
 	})

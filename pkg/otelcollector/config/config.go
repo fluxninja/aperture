@@ -1,5 +1,5 @@
 // +kubebuilder:validation:Optional
-package otelcollector
+package config
 
 import (
 	"context"
@@ -22,6 +22,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
+
+const schemeName = "file"
 
 // OTELConfigUnmarshaller can be used as an OTEL config map provider.
 type OTELConfigUnmarshaller struct {

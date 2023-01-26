@@ -23,9 +23,9 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/alertmanager"
 	"github.com/fluxninja/aperture/pkg/alerts"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
@@ -33,10 +33,10 @@ import (
 func ModuleForControllerOTEL() fx.Option {
 	return fx.Options(
 		fx.Provide(
-			otelcollector.NewOTELParams,
+			otelconfig.NewOTELParams,
 			fx.Annotate(
 				provideController,
-				fx.ResultTags(otelcollector.BaseFxTag),
+				fx.ResultTags(otelconfig.BaseFxTag),
 			),
 			fx.Annotate(
 				ControllerOTELComponents,
@@ -93,9 +93,9 @@ func ControllerOTELComponents(
 	return factories, errs
 }
 
-func provideController(cfg *otelcollector.OTELParams) *otelcollector.OTELConfig {
-	otelcollector.AddControllerMetricsPipeline(cfg)
+func provideController(cfg *otelconfig.OTELParams) *otelconfig.OTELConfig {
+	otelconfig.AddControllerMetricsPipeline(cfg)
 	cfg.Config.AddExporter(otelconsts.ExporterLogging, nil)
-	otelcollector.AddAlertsPipeline(cfg)
+	otelconfig.AddAlertsPipeline(cfg)
 	return cfg.Config
 }

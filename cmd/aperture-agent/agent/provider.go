@@ -6,7 +6,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/peers"
 	"go.uber.org/fx"
@@ -21,7 +21,7 @@ func ProvidePeersPrefix(agentInfo *agentinfo.AgentInfo) (peers.PeerDiscoveryPref
 
 type FxIn struct {
 	fx.In
-	BaseConfig *otelcollector.OTELConfig `name:"base"`
+	BaseConfig *otelconfig.OTELConfig `name:"base"`
 	AgentInfo  *agentinfo.AgentInfo
 }
 
