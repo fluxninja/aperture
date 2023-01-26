@@ -23,6 +23,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/cmd/sdk-validator/validator"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy"
@@ -89,7 +90,8 @@ func main() {
 	}
 	flowcontrolv1.RegisterFlowControlServiceServer(grpcServer, flowcontrolHandler)
 
-	reg := status.NewRegistry(log.GetGlobalLogger())
+	alerter := alerts.NewSimpleAlerter(100)
+	reg := status.NewRegistry(log.GetGlobalLogger(), alerter)
 	authzHandler := envoy.NewHandler(
 		classifier.NewClassificationEngine(reg),
 		servicegetter.NewEmpty(),

@@ -14,6 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/status/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -29,7 +30,8 @@ var (
 		ExecutionTimeout: config.MakeDuration(time.Millisecond * 200),
 		InitiallyHealthy: false,
 	}
-	registry = status.NewRegistry(log.GetGlobalLogger()).Child("jobs")
+	alerter  = alerts.NewSimpleAlerter(100)
+	registry = status.NewRegistry(log.GetGlobalLogger(), alerter).Child("jobs")
 )
 
 var _ JobWatcher = (*groupConfig)(nil)

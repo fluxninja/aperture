@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/status/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
+	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
@@ -26,9 +29,18 @@ type Registry interface {
 	Value() string
 	HasError() bool
 	GetLogger() *log.Logger
+	GetAlerter() alerts.Alerter
 }
 
 var _ Registry = &registry{}
+
+const (
+	uriKey       = "uri"
+	alertChannel = "status_registry"
+
+	// Resolve timeout in seconds.
+	alertResolveTimeout = 300
+)
 
 // registry implements Registry.
 // Note: Please take locks from parent to child and not the other way around to avoid deadlocks.
@@ -41,17 +53,24 @@ type registry struct {
 	logger   *log.Logger
 	key      string
 	value    string
+	uri      string
+	alerter  alerts.Alerter
 }
 
 // NewRegistry creates a new Registry.
-func NewRegistry(logger *log.Logger) Registry {
+func NewRegistry(logger *log.Logger, alerter alerts.Alerter) Registry {
+	rootKey := "root"
+	uri := fmt.Sprintf("/%s/%s", rootKey, rootKey)
+	newAlerter := alerter.GetAlerter(map[string]string{uriKey: uri, rootKey: rootKey})
 	r := &registry{
-		key:      "root",
-		value:    "root",
+		key:      rootKey,
+		value:    rootKey,
+		uri:      uri,
 		parent:   nil,
 		status:   &statusv1.Status{},
 		children: make(map[string]*registry),
 		logger:   logger,
+		alerter:  newAlerter,
 	}
 	r.root = r
 	return r
@@ -66,19 +85,22 @@ func (r *registry) Child(key string) Registry {
 func (r *registry) ChildKV(key, value string) Registry {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	var child *registry
-	var ok bool
+
 	hash := fmt.Sprintf("%s:%s", key, value)
-	child, ok = r.children[hash]
+	uri := fmt.Sprintf("%s/%s/%s", r.uri, key, value)
+	newAlerter := r.alerter.GetAlerter(map[string]string{uriKey: uri, key: value})
+	child, ok := r.children[hash]
 	if !ok {
 		child = &registry{
 			key:      key,
 			value:    value,
+			uri:      uri,
 			parent:   r,
 			root:     r.root,
 			status:   &statusv1.Status{},
 			children: make(map[string]*registry),
 			logger:   r.logger.WithStr(r.key, key),
+			alerter:  newAlerter,
 		}
 		r.children[hash] = child
 	}
@@ -157,6 +179,25 @@ func (r *registry) SetStatus(status *statusv1.Status) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.status = status
+
+	if r.status != nil && r.status.Error != nil {
+		r.alerter.AddAlert(r.createAlert(r.status.Error))
+	}
+}
+
+func (r *registry) createAlert(err *statusv1.Status_Error) *alerts.Alert {
+	resolve := time.Duration(time.Second * alertResolveTimeout)
+	newAlert := alerts.NewAlert(
+		alerts.WithName(err.String()),
+		alerts.WithSeverity(alerts.ParseSeverity("info")),
+		alerts.WithAlertChannels([]string{alertChannel}),
+		alerts.WithResolveTimeout(resolve),
+		alerts.WithGeneratorURL(
+			fmt.Sprintf("http://%s/%s", info.GetHostInfo().Hostname, r.uri),
+		),
+	)
+
+	return newAlert
 }
 
 // SetGroupStatus sets the status of the Registry.
@@ -227,4 +268,11 @@ func (r *registry) GetLogger() *log.Logger {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return r.logger
+}
+
+// GetAlerter returns the alerter of the Registry.
+func (r *registry) GetAlerter() alerts.Alerter {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.alerter
 }

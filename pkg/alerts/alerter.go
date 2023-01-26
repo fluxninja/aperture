@@ -66,7 +66,15 @@ func (aw *alerterWrapper) AlertsChan() <-chan *Alert {
 	return aw.parentAlerter.AlertsChan()
 }
 
-// GetAlerter returns the alerter wrapper with specified labels.
+// GetAlerter returns the alerter with new labels added to parent labels.
 func (aw *alerterWrapper) GetAlerter(labels map[string]string) Alerter {
-	return aw.parentAlerter.GetAlerter(labels)
+	mergedLabels := make(map[string]string)
+	for k, v := range aw.labels {
+		mergedLabels[k] = v
+	}
+	// overwrite older values with new ones
+	for k, v := range labels {
+		mergedLabels[k] = v
+	}
+	return newAlerterWrapper(aw, mergedLabels)
 }
