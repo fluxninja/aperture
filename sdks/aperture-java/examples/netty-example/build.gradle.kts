@@ -4,6 +4,10 @@ plugins {
     id("com.github.johnrengelman.shadow")
 }
 
+tasks.shadowJar {
+    mergeServiceFiles()
+}
+
 application {
     mainClass.set("com.fluxninja.example.NettyServer")
 }
