@@ -1,4 +1,4 @@
-package otelcollector
+package consts
 
 const (
 	/* Common labels available on all flow control integrations. */

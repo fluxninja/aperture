@@ -15,28 +15,29 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/datasketches-go/sketches"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 var defaultRollupGroups = []RollupGroup{
 	{
-		FromField:      otelcollector.WorkloadDurationLabel,
+		FromField:      otelconsts.WorkloadDurationLabel,
 		WithDatasketch: true,
 	},
 	{
-		FromField:      otelcollector.FlowDurationLabel,
+		FromField:      otelconsts.FlowDurationLabel,
 		WithDatasketch: true,
 	},
 	{
-		FromField:      otelcollector.ApertureProcessingDurationLabel,
+		FromField:      otelconsts.ApertureProcessingDurationLabel,
 		WithDatasketch: true,
 	},
 	{
-		FromField: otelcollector.HTTPRequestContentLength,
+		FromField: otelconsts.HTTPRequestContentLength,
 	},
 	{
-		FromField: otelcollector.HTTPResponseContentLength,
+		FromField: otelconsts.HTTPResponseContentLength,
 	},
 }
 

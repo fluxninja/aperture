@@ -1,11 +1,6 @@
 package controller
 
 import (
-	"github.com/fluxninja/aperture/pkg/alertmanager"
-	"github.com/fluxninja/aperture/pkg/alerts"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
-	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
-	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension"
@@ -25,6 +20,13 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
+
+	"github.com/fluxninja/aperture/pkg/alertmanager"
+	"github.com/fluxninja/aperture/pkg/alerts"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
+	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
 // ModuleForControllerOTEL provides fx options for ControllerOTELComponents.
@@ -93,7 +95,7 @@ func ControllerOTELComponents(
 
 func provideController(cfg *otelcollector.OTELParams) *otelcollector.OTELConfig {
 	otelcollector.AddControllerMetricsPipeline(cfg)
-	cfg.Config.AddExporter(otelcollector.ExporterLogging, nil)
+	cfg.Config.AddExporter(otelconsts.ExporterLogging, nil)
 	otelcollector.AddAlertsPipeline(cfg)
 	return cfg.Config
 }

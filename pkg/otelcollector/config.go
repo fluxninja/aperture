@@ -8,18 +8,19 @@ import (
 	"sort"
 	"time"
 
+	promapi "github.com/prometheus/client_golang/api"
+	"go.opentelemetry.io/collector/confmap"
+	"go.opentelemetry.io/collector/processor/batchprocessor"
+	"go.uber.org/fx"
+	"k8s.io/client-go/rest"
+
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
-
-	promapi "github.com/prometheus/client_golang/api"
-	"go.opentelemetry.io/collector/confmap"
-	"go.opentelemetry.io/collector/processor/batchprocessor"
-	"go.uber.org/fx"
-	"k8s.io/client-go/rest"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
 // OTELConfigUnmarshaller can be used as an OTEL config map provider.
@@ -355,15 +356,15 @@ func NewDefaultUserOTELConfig() *UserOTELConfig {
 func AddMetricsPipeline(cfg *OTELParams) {
 	config := cfg.Config
 	addPrometheusReceiver(cfg)
-	config.AddProcessor(ProcessorEnrichment, nil)
+	config.AddProcessor(otelconsts.ProcessorEnrichment, nil)
 	addPrometheusRemoteWriteExporter(config, cfg.promClient)
 	config.Service.AddPipeline("metrics/fast", Pipeline{
-		Receivers: []string{ReceiverPrometheus},
+		Receivers: []string{otelconsts.ReceiverPrometheus},
 		Processors: []string{
-			ProcessorEnrichment,
-			ProcessorAgentGroup,
+			otelconsts.ProcessorEnrichment,
+			otelconsts.ProcessorAgentGroup,
 		},
-		Exporters: []string{ExporterPrometheusRemoteWrite},
+		Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
 	})
 }
 
@@ -373,42 +374,42 @@ func AddControllerMetricsPipeline(cfg *OTELParams) {
 	addControllerPrometheusReceiver(config, cfg)
 	addPrometheusRemoteWriteExporter(config, cfg.promClient)
 	config.Service.AddPipeline("metrics/controller-fast", Pipeline{
-		Receivers:  []string{ReceiverPrometheus},
+		Receivers:  []string{otelconsts.ReceiverPrometheus},
 		Processors: []string{},
-		Exporters:  []string{ExporterPrometheusRemoteWrite},
+		Exporters:  []string{otelconsts.ExporterPrometheusRemoteWrite},
 	})
 }
 
 // AddAlertsPipeline adds reusable alerts pipeline.
 func AddAlertsPipeline(cfg *OTELParams, extraProcessors ...string) {
 	config := cfg.Config
-	config.AddReceiver(ReceiverAlerts, map[string]any{})
-	config.AddProcessor(ProcessorAlertsNamespace, map[string]interface{}{
+	config.AddReceiver(otelconsts.ReceiverAlerts, map[string]any{})
+	config.AddProcessor(otelconsts.ProcessorAlertsNamespace, map[string]interface{}{
 		"actions": []map[string]interface{}{
 			{
-				"key":    AlertNamespaceLabel,
+				"key":    otelconsts.AlertNamespaceLabel,
 				"action": "insert",
 				"value":  info.Hostname,
 			},
 		},
 	})
 	config.AddBatchProcessor(
-		ProcessorBatchAlerts,
+		otelconsts.ProcessorBatchAlerts,
 		cfg.BatchAlerts.Timeout.AsDuration(),
 		cfg.BatchAlerts.SendBatchSize,
 		cfg.BatchAlerts.SendBatchMaxSize,
 	)
-	config.AddExporter(ExporterAlerts, nil)
+	config.AddExporter(otelconsts.ExporterAlerts, nil)
 
 	processors := []string{
-		ProcessorBatchAlerts,
-		ProcessorAlertsNamespace,
+		otelconsts.ProcessorBatchAlerts,
+		otelconsts.ProcessorAlertsNamespace,
 	}
 	processors = append(processors, extraProcessors...)
 	config.Service.AddPipeline("logs/alerts", Pipeline{
-		Receivers:  []string{ReceiverAlerts},
+		Receivers:  []string{otelconsts.ReceiverAlerts},
 		Processors: processors,
-		Exporters:  []string{ExporterLogging, ExporterAlerts},
+		Exporters:  []string{otelconsts.ExporterLogging, otelconsts.ExporterAlerts},
 	})
 }
 
@@ -431,7 +432,7 @@ func addPrometheusReceiver(cfg *OTELParams) {
 
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
 	// tags, so they are not properly read by OTEL. Need to use bare maps instead.
-	config.AddReceiver(ReceiverPrometheus, map[string]any{
+	config.AddReceiver(otelconsts.ReceiverPrometheus, map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
 				"scrape_interval":     "1s",
@@ -450,7 +451,7 @@ func addControllerPrometheusReceiver(config *OTELConfig, cfg *OTELParams) {
 	}
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
 	// tags, so they are not properly read by OTEL. Need to use bare maps instead.
-	config.AddReceiver(ReceiverPrometheus, map[string]any{
+	config.AddReceiver(otelconsts.ReceiverPrometheus, map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
 				"scrape_interval":     "1s",
@@ -466,7 +467,7 @@ func addPrometheusRemoteWriteExporter(config *OTELConfig, promClient promapi.Cli
 	endpoint := promClient.URL("api/v1/write", nil)
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
 	// tags, so they are not properly read by OTEL. Need to use bare maps instead.
-	config.AddExporter(ExporterPrometheusRemoteWrite, map[string]any{
+	config.AddExporter(otelconsts.ExporterPrometheusRemoteWrite, map[string]any{
 		"endpoint": endpoint.String(),
 	})
 }
