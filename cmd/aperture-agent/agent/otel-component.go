@@ -44,7 +44,7 @@ func ModuleForAgentOTEL() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			cache.Provide[selectors.ControlPointID],
-			otelcollector.NewOtelConfig,
+			otelcollector.NewOTELParams,
 			fx.Annotate(
 				provideAgent,
 				fx.ResultTags(otelcollector.BaseFxTag),
@@ -128,7 +128,7 @@ func AgentOTELComponents(
 	return factories, errs
 }
 
-func provideAgent(cfg *otelcollector.OtelParams) *otelcollector.OTELConfig {
+func provideAgent(cfg *otelcollector.OTELParams) *otelcollector.OTELConfig {
 	addLogsPipeline(cfg)
 	addTracesPipeline(cfg)
 	otelcollector.AddMetricsPipeline(cfg)
@@ -136,7 +136,7 @@ func provideAgent(cfg *otelcollector.OtelParams) *otelcollector.OTELConfig {
 	return cfg.Config
 }
 
-func addLogsPipeline(cfg *otelcollector.OtelParams) {
+func addLogsPipeline(cfg *otelcollector.OTELParams) {
 	config := cfg.Config
 	// Common dependencies for pipelines
 	config.AddReceiver(otelcollector.ReceiverOTLP, otlpreceiver.Config{})
@@ -173,7 +173,7 @@ func addLogsPipeline(cfg *otelcollector.OtelParams) {
 	})
 }
 
-func addTracesPipeline(cfg *otelcollector.OtelParams) {
+func addTracesPipeline(cfg *otelcollector.OTELParams) {
 	config := cfg.Config
 	config.AddExporter(otelcollector.ExporterOTLPLoopback, map[string]any{
 		"endpoint": cfg.Listener.GetAddr(),

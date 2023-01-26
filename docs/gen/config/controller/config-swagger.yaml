@@ -726,19 +726,6 @@ definitions:
     title: MultiJobConfig holds configuration for MultiJob.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/jobs
-  OtelConfig:
-    properties:
-      batch_alerts:
-        $ref: '#/definitions/BatchAlertsConfig'
-      batch_postrollup:
-        $ref: '#/definitions/BatchPostrollupConfig'
-      batch_prerollup:
-        $ref: '#/definitions/BatchPrerollupConfig'
-      ports:
-        $ref: '#/definitions/PortsConfig'
-    title: OtelConfig is the configuration for the OTEL collector.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
   PluginsConfig:
     properties:
       disable_plugins:
@@ -907,6 +894,19 @@ definitions:
     title: ServerTLSConfig holds configuration for setting up server TLS support.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
+  UserOTELConfig:
+    properties:
+      batch_alerts:
+        $ref: '#/definitions/BatchAlertsConfig'
+      batch_postrollup:
+        $ref: '#/definitions/BatchPostrollupConfig'
+      batch_prerollup:
+        $ref: '#/definitions/BatchPrerollupConfig'
+      ports:
+        $ref: '#/definitions/PortsConfig'
+    title: UserOTELConfig is the configuration for the OTEL collector.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
   WatchdogConfig:
     properties:
       cgroup:
@@ -1015,12 +1015,12 @@ paths:
       x-fn-config-env: true
   /otel:
     post:
-      operationId: Otel
+      operationId: OTEL
       parameters:
       - in: body
         name: proxy
         schema:
-          $ref: '#/definitions/OtelConfig'
+          $ref: '#/definitions/UserOTELConfig'
       tags:
       - common-configuration
       x-fn-config-env: true

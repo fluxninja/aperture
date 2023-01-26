@@ -322,7 +322,7 @@ type CommonConfigSpec struct {
 
 	// OTEL configuration.
 	//+kubebuilder:validation:Optional
-	Otel otelcollector.OtelConfig `json:"otel"`
+	Otel otelcollector.UserOTELConfig `json:"otel"`
 
 	// Plugins configuration.
 	//+kubebuilder:validation:Optional

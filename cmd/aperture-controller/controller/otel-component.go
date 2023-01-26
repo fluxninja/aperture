@@ -31,7 +31,7 @@ import (
 func ModuleForControllerOTEL() fx.Option {
 	return fx.Options(
 		fx.Provide(
-			otelcollector.NewOtelConfig,
+			otelcollector.NewOTELParams,
 			fx.Annotate(
 				provideController,
 				fx.ResultTags(otelcollector.BaseFxTag),
@@ -91,7 +91,7 @@ func ControllerOTELComponents(
 	return factories, errs
 }
 
-func provideController(cfg *otelcollector.OtelParams) *otelcollector.OTELConfig {
+func provideController(cfg *otelcollector.OTELParams) *otelcollector.OTELConfig {
 	otelcollector.AddControllerMetricsPipeline(cfg)
 	cfg.Config.AddExporter(otelcollector.ExporterLogging, nil)
 	otelcollector.AddAlertsPipeline(cfg)

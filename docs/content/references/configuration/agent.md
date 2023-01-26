@@ -29,7 +29,7 @@ Generated File Starts
 | `liveness`          | [Liveness](#liveness)                  |
 | `log`               | [Log](#log)                            |
 | `metrics`           | [Metrics](#metrics)                    |
-| `otel`              | [Otel](#otel)                          |
+| `otel`              | [OTEL](#o-t-e-l)                       |
 | `peer_discovery`    | [PeerDiscovery](#peer-discovery)       |
 | `plugins`           | [Plugins](#plugins)                    |
 | `profilers`         | [Profilers](#profilers)                |
@@ -253,7 +253,7 @@ Type: [MetricsConfig](#metrics-config)
 
 </dl>
 
-### _Otel_ {#otel}
+### _OTEL_ {#o-t-e-l}
 
 Key: `otel`
 
@@ -267,7 +267,7 @@ Env-Var Prefix: `APERTURE_AGENT_OTEL_`
 <dd>
 
 Env-Var Prefix: `APERTURE_AGENT_OTEL_PROXY_`
-Type: [OtelConfig](#otel-config)
+Type: [UserOTELConfig](#user-o-t-e-l-config)
 
 </dd>
 
@@ -1374,39 +1374,6 @@ MetricsConfig holds configuration for service metrics.
 </dd>
 </dl>
 
-### OtelConfig {#otel-config}
-
-OtelConfig is the configuration for the OTEL collector.
-
-#### Properties
-
-<dl>
-<dt>batch_alerts</dt>
-<dd>
-
-([BatchAlertsConfig](#batch-alerts-config))
-
-</dd>
-<dt>batch_postrollup</dt>
-<dd>
-
-([BatchPostrollupConfig](#batch-postrollup-config))
-
-</dd>
-<dt>batch_prerollup</dt>
-<dd>
-
-([BatchPrerollupConfig](#batch-prerollup-config))
-
-</dd>
-<dt>ports</dt>
-<dd>
-
-([PortsConfig](#ports-config))
-
-</dd>
-</dl>
-
 ### PeerDiscoveryConfig {#peer-discovery-config}
 
 PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
@@ -1683,6 +1650,39 @@ StaticDiscoveryConfig for pre-determined list of services.
 <dd>
 
 ([[]ServiceConfig](#service-config)) Services list.
+
+</dd>
+</dl>
+
+### UserOTELConfig {#user-o-t-e-l-config}
+
+UserOTELConfig is the configuration for the OTEL collector.
+
+#### Properties
+
+<dl>
+<dt>batch_alerts</dt>
+<dd>
+
+([BatchAlertsConfig](#batch-alerts-config))
+
+</dd>
+<dt>batch_postrollup</dt>
+<dd>
+
+([BatchPostrollupConfig](#batch-postrollup-config))
+
+</dd>
+<dt>batch_prerollup</dt>
+<dd>
+
+([BatchPrerollupConfig](#batch-prerollup-config))
+
+</dd>
+<dt>ports</dt>
+<dd>
+
+([PortsConfig](#ports-config))
 
 </dd>
 </dl>

@@ -110,7 +110,7 @@ func (o *OTELConfig) AddExporter(name string, value interface{}) {
 }
 
 // SetDebugPort configures debug port on which OTEL server /metrics as specified by user.
-func (o *OTELConfig) SetDebugPort(userCfg *OtelConfig) {
+func (o *OTELConfig) SetDebugPort(userCfg *UserOTELConfig) {
 	portInput := fmt.Sprintf(":%d", userCfg.Ports.DebugPort)
 	if val, ok := o.Service.Telemetry["metrics"]; ok {
 		if val, ok := val.(map[string]interface{}); ok {
@@ -125,7 +125,7 @@ func (o *OTELConfig) SetDebugPort(userCfg *OtelConfig) {
 }
 
 // AddDebugExtensions adds common debug extensions and enables them.
-func (o *OTELConfig) AddDebugExtensions(userCfg *OtelConfig) {
+func (o *OTELConfig) AddDebugExtensions(userCfg *UserOTELConfig) {
 	o.AddExtension("health_check", map[string]interface{}{
 		"endpoint": fmt.Sprintf("localhost:%d", userCfg.Ports.HealthCheckPort),
 	})
@@ -216,28 +216,28 @@ func (p *Pipeline) AsMap() map[string]interface{} {
 // BaseFxTag is the base name tag for otel components.
 var BaseFxTag = config.NameTag("base")
 
-// OtelParams contains parameters for otel collector factories for agent and controller.
-type OtelParams struct {
+// OTELParams contains parameters for otel collector factories for agent and controller.
+type OTELParams struct {
 	promClient promapi.Client
 	Config     *OTELConfig
 	Listener   *listener.Listener
 	tlsConfig  *tls.Config
-	OtelConfig
+	UserOTELConfig
 }
 
-// swagger:operation POST /otel common-configuration Otel
+// swagger:operation POST /otel common-configuration OTEL
 // ---
 // x-fn-config-env: true
 // parameters:
 // - name: proxy
 //   in: body
 //   schema:
-//     "$ref": "#/definitions/OtelConfig"
+//     "$ref": "#/definitions/UserOTELConfig"
 
-// OtelConfig is the configuration for the OTEL collector.
+// UserOTELConfig is the configuration for the OTEL collector.
 // swagger:model
 // +kubebuilder:object:generate=true
-type OtelConfig struct {
+type UserOTELConfig struct {
 	// BatchPrerollup configures batch prerollup processor.
 	BatchPrerollup BatchPrerollupConfig `json:"batch_prerollup"`
 	// BatchPostrollup configures batch postrollup processor.
@@ -317,11 +317,11 @@ type FxIn struct {
 	ServerTLSConfig tlsconfig.ServerTLSConfig
 }
 
-// NewOtelConfig returns OTEL parameters for OTEL collectors.
-func NewOtelConfig(in FxIn) (*OtelParams, error) {
+// NewOTELParams returns OTEL parameters for OTEL collectors.
+func NewOTELParams(in FxIn) (*OTELParams, error) {
 	config := NewOTELConfig()
 
-	var userCfg OtelConfig
+	var userCfg UserOTELConfig
 	if err := in.Unmarshaller.UnmarshalKey("otel", &userCfg); err != nil {
 		return nil, err
 	}
@@ -329,19 +329,19 @@ func NewOtelConfig(in FxIn) (*OtelParams, error) {
 	config.SetDebugPort(&userCfg)
 	config.AddDebugExtensions(&userCfg)
 
-	cfg := &OtelParams{
-		OtelConfig: userCfg,
-		Listener:   in.Listener,
-		promClient: in.PromClient,
-		tlsConfig:  in.TLSConfig,
-		Config:     config,
+	cfg := &OTELParams{
+		UserOTELConfig: userCfg,
+		Listener:       in.Listener,
+		promClient:     in.PromClient,
+		tlsConfig:      in.TLSConfig,
+		Config:         config,
 	}
 	return cfg, nil
 }
 
-// NewDefaultOtelConfig creates OtelConfig with all the default values set.
-func NewDefaultOtelConfig() *OtelConfig {
-	return &OtelConfig{
+// NewDefaultUserOTELConfig creates UserOTELConfig with all the default values set.
+func NewDefaultUserOTELConfig() *UserOTELConfig {
+	return &UserOTELConfig{
 		Ports: PortsConfig{
 			DebugPort:       8888,
 			HealthCheckPort: 13133,
@@ -352,7 +352,7 @@ func NewDefaultOtelConfig() *OtelConfig {
 }
 
 // AddMetricsPipeline adds metrics to pipeline for agent OTEL collector.
-func AddMetricsPipeline(cfg *OtelParams) {
+func AddMetricsPipeline(cfg *OTELParams) {
 	config := cfg.Config
 	addPrometheusReceiver(cfg)
 	config.AddProcessor(ProcessorEnrichment, nil)
@@ -368,7 +368,7 @@ func AddMetricsPipeline(cfg *OtelParams) {
 }
 
 // AddControllerMetricsPipeline adds metrics to pipeline for controller OTEL collector.
-func AddControllerMetricsPipeline(cfg *OtelParams) {
+func AddControllerMetricsPipeline(cfg *OTELParams) {
 	config := cfg.Config
 	addControllerPrometheusReceiver(config, cfg)
 	addPrometheusRemoteWriteExporter(config, cfg.promClient)
@@ -380,7 +380,7 @@ func AddControllerMetricsPipeline(cfg *OtelParams) {
 }
 
 // AddAlertsPipeline adds reusable alerts pipeline.
-func AddAlertsPipeline(cfg *OtelParams, extraProcessors ...string) {
+func AddAlertsPipeline(cfg *OTELParams, extraProcessors ...string) {
 	config := cfg.Config
 	config.AddReceiver(ReceiverAlerts, map[string]any{})
 	config.AddProcessor(ProcessorAlertsNamespace, map[string]interface{}{
@@ -412,11 +412,11 @@ func AddAlertsPipeline(cfg *OtelParams, extraProcessors ...string) {
 	})
 }
 
-func addPrometheusReceiver(cfg *OtelParams) {
+func addPrometheusReceiver(cfg *OTELParams) {
 	config := cfg.Config
 	scrapeConfigs := []map[string]any{
 		buildApertureSelfScrapeConfig("aperture-self", cfg),
-		buildOtelScrapeConfig("aperture-otel", cfg),
+		buildOTELScrapeConfig("aperture-otel", cfg),
 	}
 
 	_, err := rest.InClusterConfig()
@@ -443,10 +443,10 @@ func addPrometheusReceiver(cfg *OtelParams) {
 	})
 }
 
-func addControllerPrometheusReceiver(config *OTELConfig, cfg *OtelParams) {
+func addControllerPrometheusReceiver(config *OTELConfig, cfg *OTELParams) {
 	scrapeConfigs := []map[string]any{
 		buildApertureSelfScrapeConfig("aperture-controller-self", cfg),
-		buildOtelScrapeConfig("aperture-controller-otel", cfg),
+		buildOTELScrapeConfig("aperture-controller-otel", cfg),
 	}
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
 	// tags, so they are not properly read by OTEL. Need to use bare maps instead.
@@ -471,7 +471,7 @@ func addPrometheusRemoteWriteExporter(config *OTELConfig, promClient promapi.Cli
 	})
 }
 
-func buildApertureSelfScrapeConfig(name string, cfg *OtelParams) map[string]any {
+func buildApertureSelfScrapeConfig(name string, cfg *OTELParams) map[string]any {
 	scheme := "http"
 	if cfg.tlsConfig != nil {
 		scheme = "https"
@@ -495,7 +495,7 @@ func buildApertureSelfScrapeConfig(name string, cfg *OtelParams) map[string]any 
 	}
 }
 
-func buildOtelScrapeConfig(name string, cfg *OtelParams) map[string]any {
+func buildOTELScrapeConfig(name string, cfg *OTELParams) map[string]any {
 	otelDebugTarget := fmt.Sprintf(":%d", cfg.Ports.DebugPort)
 	return map[string]any{
 		"job_name": name,
@@ -516,7 +516,7 @@ func buildOtelScrapeConfig(name string, cfg *OtelParams) map[string]any {
 	}
 }
 
-func buildKubernetesNodesScrapeConfig(cfg *OtelParams) map[string]any {
+func buildKubernetesNodesScrapeConfig(cfg *OTELParams) map[string]any {
 	return map[string]any{
 		"job_name":     "kubernetes-nodes",
 		"scheme":       "https",
@@ -553,7 +553,7 @@ func buildKubernetesNodesScrapeConfig(cfg *OtelParams) map[string]any {
 	}
 }
 
-func buildKubernetesPodsScrapeConfig(cfg *OtelParams) map[string]any {
+func buildKubernetesPodsScrapeConfig(cfg *OTELParams) map[string]any {
 	return map[string]any{
 		"job_name":     "kubernetes-pods",
 		"scheme":       "http",
