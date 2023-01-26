@@ -2,7 +2,6 @@ package status
 
 import (
 	"fmt"
-	"strings"
 	"sync"
 	"time"
 
@@ -205,9 +204,8 @@ func (r *registry) SetGroupStatus(groupStatus *statusv1.GroupStatus) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.status = groupStatus.Status
-	for hash, gs := range groupStatus.Groups {
-		splitHash := strings.Split(hash, ":")
-		r.ChildKV(splitHash[0], splitHash[1]).SetGroupStatus(gs)
+	for key, gs := range groupStatus.Groups {
+		r.Child(key).SetGroupStatus(gs)
 	}
 }
 
@@ -221,8 +219,8 @@ func (r *registry) GetGroupStatus() *statusv1.GroupStatus {
 		Groups: make(map[string]*statusv1.GroupStatus),
 	}
 
-	for hash, child := range r.children {
-		groupStatus.Groups[hash] = child.GetGroupStatus()
+	for _, child := range r.children {
+		groupStatus.Groups[child.key] = child.GetGroupStatus()
 	}
 	return groupStatus
 }

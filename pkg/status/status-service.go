@@ -33,13 +33,11 @@ func (svc *StatusService) GetGroupStatus(ctx context.Context, req *statusv1.Grou
 	keys := strings.Split(req.Path, "/")
 
 	registry := svc.registry
-	for i := 0; i < len(keys); i += 2 {
-		key := keys[i]
-		val := keys[i+1]
-		if key == "" && val == "" {
+	for _, key := range keys {
+		if key == "" {
 			continue
 		}
-		registry = registry.ChildIfExistsKV(key, val)
+		registry = registry.ChildIfExists(key)
 		if registry == nil {
 			return &statusv1.GroupStatus{}, nil
 		}
