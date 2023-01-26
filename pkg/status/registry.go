@@ -1,6 +1,8 @@
 package status
 
 import (
+	"fmt"
+	"strings"
 	"sync"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/status/v1"
@@ -14,11 +16,14 @@ type Registry interface {
 	SetGroupStatus(*statusv1.GroupStatus)
 	GetGroupStatus() *statusv1.GroupStatus
 	Child(key string) Registry
+	ChildKV(key, value string) Registry
 	ChildIfExists(key string) Registry
+	ChildIfExistsKV(key, value string) Registry
 	Parent() Registry
 	Root() Registry
 	Detach()
 	Key() string
+	Value() string
 	HasError() bool
 	GetLogger() *log.Logger
 }
@@ -35,12 +40,14 @@ type registry struct {
 	children map[string]*registry
 	logger   *log.Logger
 	key      string
+	value    string
 }
 
 // NewRegistry creates a new Registry.
 func NewRegistry(logger *log.Logger) Registry {
 	r := &registry{
 		key:      "root",
+		value:    "root",
 		parent:   nil,
 		status:   &statusv1.Status{},
 		children: make(map[string]*registry),
@@ -50,32 +57,45 @@ func NewRegistry(logger *log.Logger) Registry {
 	return r
 }
 
-// Child creates a new Registry with the given key.
+// Child creates a new Registry with the given key and empty value.
 func (r *registry) Child(key string) Registry {
+	return r.ChildKV(key, "")
+}
+
+// ChildKV creates a new Registry with the given key and value.
+func (r *registry) ChildKV(key, value string) Registry {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	var child *registry
 	var ok bool
-	child, ok = r.children[key]
+	hash := fmt.Sprintf("%s:%s", key, value)
+	child, ok = r.children[hash]
 	if !ok {
 		child = &registry{
 			key:      key,
+			value:    value,
 			parent:   r,
 			root:     r.root,
 			status:   &statusv1.Status{},
 			children: make(map[string]*registry),
 			logger:   r.logger.WithStr(r.key, key),
 		}
-		r.children[key] = child
+		r.children[hash] = child
 	}
 	return child
 }
 
-// ChildIfExists returns the child Registry with the given key if it exists.
+// ChildIfExists returns the child Registry with the given key and empty value if it exists.
 func (r *registry) ChildIfExists(key string) Registry {
+	return r.ChildIfExistsKV(key, "")
+}
+
+// ChildIfExistsKV returns the child Registry with the given key and value if it exists.
+func (r *registry) ChildIfExistsKV(key, value string) Registry {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	child, ok := r.children[key]
+	hash := fmt.Sprintf("%s:%s", key, value)
+	child, ok := r.children[hash]
 	if !ok {
 		return nil
 	}
@@ -110,8 +130,9 @@ func (r *registry) Detach() {
 	// We don't have Attach() so parent can't change to other than nil.
 	if r.parent != nil {
 		// remove child from parent
-		if r.parent.children[r.key] == r {
-			delete(r.parent.children, r.key)
+		hash := fmt.Sprintf("%s:%s", r.key, r.value)
+		if r.parent.children[hash] == r {
+			delete(r.parent.children, hash)
 		}
 		// set parent to nil
 		r.parent = nil
@@ -143,8 +164,9 @@ func (r *registry) SetGroupStatus(groupStatus *statusv1.GroupStatus) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.status = groupStatus.Status
-	for key, gs := range groupStatus.Groups {
-		r.Child(key).SetGroupStatus(gs)
+	for hash, gs := range groupStatus.Groups {
+		splitHash := strings.Split(hash, ":")
+		r.ChildKV(splitHash[0], splitHash[1]).SetGroupStatus(gs)
 	}
 }
 
@@ -158,8 +180,8 @@ func (r *registry) GetGroupStatus() *statusv1.GroupStatus {
 		Groups: make(map[string]*statusv1.GroupStatus),
 	}
 
-	for _, child := range r.children {
-		groupStatus.Groups[child.key] = child.GetGroupStatus()
+	for hash, child := range r.children {
+		groupStatus.Groups[hash] = child.GetGroupStatus()
 	}
 	return groupStatus
 }
@@ -176,6 +198,13 @@ func (r *registry) Key() string {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return r.key
+}
+
+// Value returns the value of the Registry that is registered with the parent.
+func (r *registry) Value() string {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.value
 }
 
 // HasError returns true if the Registry has an error.
