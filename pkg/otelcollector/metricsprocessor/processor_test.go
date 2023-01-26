@@ -18,7 +18,7 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/cache"
 	m "github.com/fluxninja/aperture/pkg/metrics"
-	oc "github.com/fluxninja/aperture/pkg/otelcollector"
+	oc "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/mocks"
 )
