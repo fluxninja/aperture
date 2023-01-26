@@ -193,9 +193,12 @@ func basePluginOTELConfig() *otelcollector.OTELConfig {
 		},
 	})
 	cfg.AddProcessor("transform/fluxninja", map[string]interface{}{
-		"logs": map[string]interface{}{
-			"statements": []string{
-				`set(resource.attributes["controller_id"], "controllero")`,
+		"log_statements": []map[string]interface{}{
+			{
+				"context": "resource",
+				"statements": []string{
+					`set(attributes["controller_id"], "controllero")`,
+				},
 			},
 		},
 	})

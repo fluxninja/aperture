@@ -105,9 +105,12 @@ func addAttributesProcessor(config *otelcollector.OTELConfig, controllerID strin
 
 func addResourceAttributesProcessor(config *otelcollector.OTELConfig, controllerID string) {
 	config.AddProcessor(processorResourceAttributes, map[string]interface{}{
-		"logs": map[string]interface{}{
-			"statements": []string{
-				fmt.Sprintf(`set(resource.attributes["%v"], "%v")`, "controller_id", controllerID),
+		"log_statements": []map[string]interface{}{
+			{
+				"context": "resource",
+				"statements": []string{
+					fmt.Sprintf(`set(attributes["%v"], "%v")`, "controller_id", controllerID),
+				},
 			},
 		},
 	})
