@@ -9,12 +9,12 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/prometheus/client_golang/prometheus"
-	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 	"go.opentelemetry.io/collector/pdata/ptrace"
+	"go.opentelemetry.io/collector/processor"
 
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
@@ -39,12 +39,12 @@ var _ = Describe("Rollup processor", func() {
 	})
 
 	Describe("Logs", func() {
-		var logsProcessor component.LogsProcessor
+		var logsProcessor processor.Logs
 
 		JustBeforeEach(func() {
 			var err error
 			logsProcessor, err = CreateLogsProcessor(
-				context.TODO(), component.ProcessorCreateSettings{}, config, testConsumer)
+				context.TODO(), processor.CreateSettings{}, config, testConsumer)
 			Expect(err).NotTo(HaveOccurred())
 		})
 
