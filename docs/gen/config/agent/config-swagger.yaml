@@ -137,7 +137,7 @@ definitions:
         x-go-validate: gt=0
     title: BatchAlertsConfig defines configuration for OTEL batch processor.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
   BatchPostrollupConfig:
     properties:
       send_batch_max_size:
@@ -167,7 +167,7 @@ definitions:
         x-go-validate: gt=0
     title: BatchPostrollupConfig defines configuration for OTEL batch processor.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
   BatchPrerollupConfig:
     properties:
       send_batch_max_size:
@@ -197,7 +197,7 @@ definitions:
         x-go-validate: gt=0
     title: BatchPrerollupConfig defines configuration for OTEL batch processor.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
   ClientTLSConfig:
     properties:
       ca_file:
@@ -819,19 +819,6 @@ definitions:
     title: MultiJobConfig holds configuration for MultiJob.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/jobs
-  OtelConfig:
-    properties:
-      batch_alerts:
-        $ref: '#/definitions/BatchAlertsConfig'
-      batch_postrollup:
-        $ref: '#/definitions/BatchPostrollupConfig'
-      batch_prerollup:
-        $ref: '#/definitions/BatchPrerollupConfig'
-      ports:
-        $ref: '#/definitions/PortsConfig'
-    title: OtelConfig is the configuration for the OTEL collector.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
   PeerDiscoveryConfig:
     properties:
       advertisement_addr:
@@ -916,7 +903,7 @@ definitions:
         x-go-validate: gte=0
     title: PortsConfig defines configuration for OTEL debug and extension ports.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
   ProfilersConfig:
     properties:
       cpu_profiler:
@@ -1039,6 +1026,19 @@ definitions:
     title: StaticDiscoveryConfig for pre-determined list of services.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/discovery/static
+  UserOTELConfig:
+    properties:
+      batch_alerts:
+        $ref: '#/definitions/BatchAlertsConfig'
+      batch_postrollup:
+        $ref: '#/definitions/BatchPostrollupConfig'
+      batch_prerollup:
+        $ref: '#/definitions/BatchPrerollupConfig'
+      ports:
+        $ref: '#/definitions/PortsConfig'
+    title: UserOTELConfig is the configuration for the OTEL collector.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
   WatchdogConfig:
     properties:
       cgroup:
@@ -1188,12 +1188,12 @@ paths:
       x-fn-config-env: true
   /otel:
     post:
-      operationId: Otel
+      operationId: OTEL
       parameters:
       - in: body
         name: proxy
         schema:
-          $ref: '#/definitions/OtelConfig'
+          $ref: '#/definitions/UserOTELConfig'
       tags:
       - common-configuration
       x-fn-config-env: true

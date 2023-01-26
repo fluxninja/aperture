@@ -16,7 +16,8 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/utils"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/heartbeats"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
@@ -47,19 +48,19 @@ func Module() fx.Option {
 	)
 }
 
-func provideOtelConfig(baseConfig *otelcollector.OTELConfig,
+func provideOtelConfig(baseConfig *otelconfig.OTELConfig,
 	grpcClientConfig *grpcclient.GRPCClientConfig,
 	httpClientConfig *httpclient.HTTPClientConfig,
 	lifecycle fx.Lifecycle,
 	heartbeats *heartbeats.Heartbeats,
 	unmarshaller config.Unmarshaller,
-) (*otelcollector.OTELConfig, error) {
+) (*otelconfig.OTELConfig, error) {
 	var pluginConfig pluginconfig.FluxNinjaPluginConfig
 	if err := unmarshaller.UnmarshalKey(pluginconfig.PluginConfigKey, &pluginConfig); err != nil {
 		return nil, err
 	}
 
-	config := otelcollector.NewOTELConfig()
+	config := otelconfig.NewOTELConfig()
 	addFluxninjaExporter(config, &pluginConfig, grpcClientConfig, httpClientConfig)
 
 	lifecycle.Append(fx.Hook{
@@ -91,7 +92,7 @@ func provideOtelConfig(baseConfig *otelcollector.OTELConfig,
 	return config, nil
 }
 
-func addAttributesProcessor(config *otelcollector.OTELConfig, controllerID string) {
+func addAttributesProcessor(config *otelconfig.OTELConfig, controllerID string) {
 	config.AddProcessor(processorAttributes, map[string]interface{}{
 		"actions": []map[string]interface{}{
 			{
@@ -103,7 +104,7 @@ func addAttributesProcessor(config *otelcollector.OTELConfig, controllerID strin
 	})
 }
 
-func addResourceAttributesProcessor(config *otelcollector.OTELConfig, controllerID string) {
+func addResourceAttributesProcessor(config *otelconfig.OTELConfig, controllerID string) {
 	config.AddProcessor(processorResourceAttributes, map[string]interface{}{
 		"log_statements": []map[string]interface{}{
 			{
@@ -118,8 +119,8 @@ func addResourceAttributesProcessor(config *otelcollector.OTELConfig, controller
 
 func addFNToPipeline(
 	name string,
-	config *otelcollector.OTELConfig,
-	pipeline otelcollector.Pipeline,
+	config *otelconfig.OTELConfig,
+	pipeline otelconfig.Pipeline,
 ) {
 	// TODO this duplication of `controller_id` insertion should be cleaned up
 	// when telemetry logs pipeline is update to follow the same rules as alerts
@@ -129,13 +130,13 @@ func addFNToPipeline(
 	config.Service.AddPipeline(name, pipeline)
 }
 
-func addMetricsSlowPipeline(baseConfig, config *otelcollector.OTELConfig) {
+func addMetricsSlowPipeline(baseConfig, config *otelconfig.OTELConfig) {
 	addFluxninjaPrometheusReceiver(baseConfig, config)
 	config.AddBatchProcessor(processorBatchMetricsSlow, 10*time.Second, 10000, 10000)
-	config.Service.AddPipeline("metrics/slow", otelcollector.Pipeline{
+	config.Service.AddPipeline("metrics/slow", otelconfig.Pipeline{
 		Receivers: []string{receiverPrometheus},
 		Processors: []string{
-			otelcollector.ProcessorEnrichment,
+			otelconsts.ProcessorEnrichment,
 			processorBatchMetricsSlow,
 			processorAttributes,
 		},
@@ -143,10 +144,10 @@ func addMetricsSlowPipeline(baseConfig, config *otelcollector.OTELConfig) {
 	})
 }
 
-func addMetricsControllerSlowPipeline(baseConfig, config *otelcollector.OTELConfig) {
+func addMetricsControllerSlowPipeline(baseConfig, config *otelconfig.OTELConfig) {
 	addFluxninjaPrometheusReceiver(baseConfig, config)
 	config.AddBatchProcessor(processorBatchMetricsSlow, 10*time.Second, 10000, 10000)
-	config.Service.AddPipeline("metrics/controller-slow", otelcollector.Pipeline{
+	config.Service.AddPipeline("metrics/controller-slow", otelconfig.Pipeline{
 		Receivers: []string{receiverPrometheus},
 		Processors: []string{
 			processorBatchMetricsSlow,
@@ -156,8 +157,8 @@ func addMetricsControllerSlowPipeline(baseConfig, config *otelcollector.OTELConf
 	})
 }
 
-func addFluxninjaPrometheusReceiver(baseConfig, config *otelcollector.OTELConfig) {
-	rawReceiverConfig, _ := baseConfig.Receivers[otelcollector.ReceiverPrometheus].(map[string]any)
+func addFluxninjaPrometheusReceiver(baseConfig, config *otelconfig.OTELConfig) {
+	rawReceiverConfig, _ := baseConfig.Receivers[otelconsts.ReceiverPrometheus].(map[string]any)
 	duplicatedReceiverConfig, err := duplicateMap(rawReceiverConfig)
 	if err != nil {
 		// It should not happen, unless the original config is messed up.
@@ -190,7 +191,7 @@ func duplicateMap(in map[string]any) (map[string]any, error) {
 	return duplicatedMap, nil
 }
 
-func addFluxninjaExporter(config *otelcollector.OTELConfig,
+func addFluxninjaExporter(config *otelconfig.OTELConfig,
 	pluginConfig *pluginconfig.FluxNinjaPluginConfig,
 	grpcClientConfig *grpcclient.GRPCClientConfig,
 	httpClientConfig *httpclient.HTTPClientConfig,

@@ -23,23 +23,23 @@ import (
 	"text/template"
 	"time"
 
-	. "github.com/fluxninja/aperture/operator/controllers"
-
-	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
-	"github.com/fluxninja/aperture/operator/api/common"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/distcache"
-	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
-	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
-	"github.com/fluxninja/aperture/pkg/plugins"
-	"github.com/fluxninja/aperture/pkg/prometheus"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/pointer"
+
+	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/common"
+	. "github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/distcache"
+	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
+	"github.com/fluxninja/aperture/pkg/net/listener"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	"github.com/fluxninja/aperture/pkg/plugins"
+	"github.com/fluxninja/aperture/pkg/prometheus"
 )
 
 //go:embed config_test.tpl
@@ -75,18 +75,18 @@ var _ = Describe("ConfigMap for Agent", func() {
 								DisablePlugins:  false,
 								DisabledPlugins: []string{"aperture-plugin-fluxninja"},
 							},
-							Otel: otelcollector.OtelConfig{
-								BatchPrerollup: otelcollector.BatchPrerollupConfig{
+							Otel: otelconfig.UserOTELConfig{
+								BatchPrerollup: otelconfig.BatchPrerollupConfig{
 									Timeout:          config.MakeDuration(1 * time.Second),
 									SendBatchSize:    10000,
 									SendBatchMaxSize: 20000,
 								},
-								BatchPostrollup: otelcollector.BatchPostrollupConfig{
+								BatchPostrollup: otelconfig.BatchPostrollupConfig{
 									Timeout:          config.MakeDuration(1 * time.Second),
 									SendBatchSize:    100,
 									SendBatchMaxSize: 200,
 								},
-								Ports: otelcollector.PortsConfig{
+								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
 									PprofPort:       1777,

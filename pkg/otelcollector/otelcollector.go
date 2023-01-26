@@ -19,10 +19,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 )
-
-const schemeName = "file"
 
 // Module is a fx module that invokes OTEL Collector.
 func Module() fx.Option {
@@ -41,9 +40,9 @@ type ConstructorIn struct {
 	Lifecycle     fx.Lifecycle
 	Shutdowner    fx.Shutdowner
 	Unmarshaller  config.Unmarshaller
-	BaseConfig    *OTELConfig `name:"base"`
+	BaseConfig    *otelconfig.OTELConfig `name:"base"`
 	Logger        *log.Logger
-	PluginConfigs []*OTELConfig `group:"plugin-config"`
+	PluginConfigs []*otelconfig.OTELConfig `group:"plugin-config"`
 }
 
 // setup creates and runs a new instance of OTEL Collector with the passed configuration.
@@ -53,12 +52,12 @@ func setup(in ConstructorIn) error {
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			providers := map[string]confmap.Provider{
-				"file": NewOTELConfigUnmarshaler(in.BaseConfig.AsMap()),
+				"file": otelconfig.NewOTELConfigUnmarshaler(in.BaseConfig.AsMap()),
 			}
 			for i, pluginConfig := range in.PluginConfigs {
 				scheme := fmt.Sprintf("plugin-%v", i)
 				uris = append(uris, fmt.Sprintf("%v:%v", scheme, scheme))
-				providers[scheme] = NewOTELConfigUnmarshaler(pluginConfig.AsMap())
+				providers[scheme] = otelconfig.NewOTELConfigUnmarshaler(pluginConfig.AsMap())
 			}
 
 			configProvider, err := otelcol.NewConfigProvider(otelcol.ConfigProviderSettings{
