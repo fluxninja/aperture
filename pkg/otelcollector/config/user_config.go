@@ -1,10 +1,24 @@
 package config
 
 import (
+	"fmt"
+
+	"go.uber.org/fx"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/fluxninja/aperture/pkg/config"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
+
+// ProvideUserConfig provides annotated user config.
+func ProvideUserConfig(cfg *OTELParams) fx.Option {
+	return fx.Provide(
+		fx.Annotate(
+			cfg.CustomMetricsAsOTELConfig,
+			fx.ResultTags(config.GroupTag("plugin-config")),
+		),
+	)
+}
 
 // NewDefaultUserOTELConfig creates UserOTELConfig with all the default values set.
 func NewDefaultUserOTELConfig() *UserOTELConfig {
@@ -42,6 +56,34 @@ type UserOTELConfig struct {
 	// CustomMetrics configures custom metrics pipelines, which will send data to
 	// the controller prometheus.
 	CustomMetrics map[string]CustomMetricsConfig `json:"custom_metrics"`
+}
+
+// CustomMetricsAsOTELConfig returns CustomMetrics fields as *OTELConfig which
+// is ready to be ingested by the OTEL provider.
+func (u *UserOTELConfig) CustomMetricsAsOTELConfig() *OTELConfig {
+	c := NewOTELConfig()
+	for metricName, config := range u.CustomMetrics {
+		for receiverName, receiverConfig := range config.Receivers {
+			c.AddReceiver(makeCustomComponentName(metricName, receiverName), receiverConfig)
+		}
+		for processorName, processorConfig := range config.Processors {
+			c.AddProcessor(makeCustomComponentName(metricName, processorName), processorConfig)
+		}
+		c.Service.AddPipeline(makeCustomMetricsName(metricName), Pipeline{
+			Receivers:  config.Pipeline.Receivers,
+			Processors: config.Pipeline.Processors,
+			Exporters:  []string{otelconsts.ExporterPrometheusRemoteWrite},
+		})
+	}
+	return c
+}
+
+func makeCustomMetricsName(name string) string {
+	return fmt.Sprintf("metrics/user-defined-%s", name)
+}
+
+func makeCustomComponentName(metricName, name string) string {
+	return fmt.Sprintf("%s/user-defined-%s", name, metricName)
 }
 
 // BatchPrerollupConfig defines configuration for OTEL batch processor.

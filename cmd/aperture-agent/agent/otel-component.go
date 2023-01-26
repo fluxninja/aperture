@@ -54,6 +54,7 @@ func ModuleForAgentOTEL() fx.Option {
 				AgentOTELComponents,
 				fx.ParamTags(alerts.AlertsFxTag),
 			),
+			otelconfig.ProvideUserConfig,
 		),
 	)
 }
