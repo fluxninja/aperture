@@ -1,5 +1,5 @@
 ---
-title: Try In Local Playground
+title: Try Local Playground
 keywords:
   - playground
   - policies
