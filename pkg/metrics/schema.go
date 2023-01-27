@@ -105,6 +105,8 @@ const (
 	WorkloadIndexLabel = "workload_index"
 	// SignalNameLabel - label for saving circuit signal metrics.
 	SignalNameLabel = "signal_name"
+	// SubCircuitIDLabel - label for saving circuit id in signal metrics.
+	SubCircuitIDLabel = "sub_circuit_id"
 	// FluxMeterNameLabel - specifying flux meter's name.
 	FluxMeterNameLabel = "flux_meter_name"
 	// ValidLabel - label for specifying if metric is valid.

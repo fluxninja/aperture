@@ -6,6 +6,7 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/concurrency"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/horizontalpodscaler"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -25,6 +26,7 @@ func newComponentStackAndOptions(
 	componentStackID string,
 	policyReadAPI iface.Policy,
 ) ([]runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
+	parentCircuitID := ParentCircuitID(componentStackID)
 	// Factory parser to determine what kind of component stack to create
 	if concurrencyLimiterProto := componentStackProto.GetConcurrencyLimiter(); concurrencyLimiterProto != nil {
 		var (
@@ -47,7 +49,7 @@ func newComponentStackAndOptions(
 			}
 
 			// Need a unique ID for sub component since it's used for graph generation
-			schedulerConfComp, err := prepareComponent(scheduler, schedulerProto, componentStackID+".Scheduler")
+			schedulerConfComp, err := prepareComponentInCircuit(scheduler, schedulerProto, componentStackID+".Scheduler", parentCircuitID)
 			if err != nil {
 				return nil, nil, nil, err
 			}
@@ -70,10 +72,11 @@ func newComponentStackAndOptions(
 				return nil, nil, nil, err
 			}
 
-			loadActuatorConfComp, err := prepareComponent(loadActuator, loadActuatorProto, componentStackID+".LoadActuator")
+			loadActuatorConfComp, err := prepareComponentInCircuit(loadActuator, loadActuatorProto, componentStackID+".LoadActuator", parentCircuitID)
 			if err != nil {
 				return nil, nil, nil, err
 			}
+			log.Info().Msgf("loadActuatorConfComp: %+v", loadActuatorConfComp)
 			configuredComponents = append(configuredComponents, loadActuatorConfComp)
 
 			options = append(options, loadActuatorOptions)
@@ -116,7 +119,7 @@ func newComponentStackAndOptions(
 				return nil, nil, nil, err
 			}
 
-			scaleReporterConfComp, err := prepareComponent(scaleReporter, scaleReporterProto, componentStackID+".ScaleReporter")
+			scaleReporterConfComp, err := prepareComponentInCircuit(scaleReporter, scaleReporterProto, componentStackID+".ScaleReporter", parentCircuitID)
 			if err != nil {
 				return nil, nil, nil, err
 			}
@@ -139,7 +142,7 @@ func newComponentStackAndOptions(
 				return nil, nil, nil, err
 			}
 
-			scaleActuatorConfComp, err := prepareComponent(scaleActuator, scaleActuatorProto, componentStackID+".ScaleActuator")
+			scaleActuatorConfComp, err := prepareComponentInCircuit(scaleActuator, scaleActuatorProto, componentStackID+".ScaleActuator", parentCircuitID)
 			if err != nil {
 				return nil, nil, nil, err
 			}
@@ -171,5 +174,5 @@ func newComponentStackAndOptions(
 	} else if aimdConcurrencyController := componentStackProto.GetAimdConcurrencyController(); aimdConcurrencyController != nil {
 		return ParseAIMDConcurrencyController(componentStackID, aimdConcurrencyController, policyReadAPI)
 	}
-	return nil, nil, nil, fmt.Errorf("unsupported/missing component type")
+	return nil, nil, nil, fmt.Errorf("unsupported/missing component type, proto: %+v", componentStackProto)
 }

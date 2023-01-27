@@ -1,7 +1,7 @@
-label: FluxNinja ARC
-position: 5
+label: Policy
+position: 1
 collapsible: true
 collapsed: true
 link:
   type: "doc"
-  id: "arc"
+  id: "policy"

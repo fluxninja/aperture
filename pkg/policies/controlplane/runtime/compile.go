@@ -29,9 +29,9 @@ func Compile(
 	logger *log.Logger,
 ) error {
 	// Map from signal name to a list of componentIndex(es) which accept the signal as input.
-	inSignals := make(map[string][]int)
+	inSignals := make(map[SignalID][]int)
 	// Map from signal name to the componentIndex which emits the signal as output.
-	outSignals := make(map[string]int)
+	outSignals := make(map[SignalID]int)
 
 	for componentIndex, comp := range configuredComponents {
 		logger.Trace().Str("componentName", comp.Name()).Interface("ports", comp.PortMapping).Send()
@@ -45,9 +45,9 @@ func Compile(
 	}
 
 	// Sanitization of inSignals i.e. all inSignals should be defined in outSignals
-	for signal := range inSignals {
-		if _, ok := outSignals[signal]; !ok {
-			return errors.New("undefined signal: " + signal)
+	for signalID := range inSignals {
+		if _, ok := outSignals[signalID]; !ok {
+			return fmt.Errorf("undefined signal: %+v", signalID)
 		}
 	}
 
@@ -60,7 +60,7 @@ func Compile(
 		for _, signals := range comp.PortMapping.Outs {
 			for _, signal := range signals {
 				// Lookup signal in inSignals
-				componentIndexes, ok := inSignals[signal.SignalName]
+				componentIndexes, ok := inSignals[signal.SignalID()]
 				// Convert componentIndexes to []interface{}
 				componentIndexesIfc := make([]interface{}, len(componentIndexes))
 				for i, componentIndex := range componentIndexes {
@@ -121,7 +121,7 @@ func Compile(
 			for _, signals := range removeToComp.PortMapping.Ins {
 				for idx, signal := range signals {
 					if signal.SignalType() == SignalTypeNamed {
-						outFromCompID, ok := outSignals[signal.SignalName]
+						outFromCompID, ok := outSignals[signal.SignalID()]
 						if !ok {
 							return fmt.Errorf("unexpected state: signal %s is not defined in outSignals", signal.SignalName)
 						}
@@ -158,13 +158,13 @@ func Compile(
 
 func updateSignalConsumers(
 	portMapping map[string][]Signal,
-	signalConsumers map[string][]int,
+	signalConsumers map[SignalID][]int,
 	componentIndex int,
 ) {
 	for _, signals := range portMapping {
 		for _, signal := range signals {
 			if signal.SignalType() == SignalTypeNamed {
-				signalConsumers[signal.SignalName] = append(signalConsumers[signal.SignalName], componentIndex)
+				signalConsumers[signal.SignalID()] = append(signalConsumers[signal.SignalID()], componentIndex)
 			}
 		}
 	}
@@ -172,14 +172,14 @@ func updateSignalConsumers(
 
 func updateSignalProducers(
 	portMapping map[string][]Signal,
-	signalProducers map[string]int,
+	signalProducers map[SignalID]int,
 	componentIndex int,
 ) error {
 	for _, signals := range portMapping {
 		for _, signal := range signals {
 			if signal.SignalType() == SignalTypeNamed {
-				if _, ok := signalProducers[signal.SignalName]; !ok {
-					signalProducers[signal.SignalName] = componentIndex
+				if _, ok := signalProducers[signal.SignalID()]; !ok {
+					signalProducers[signal.SignalID()] = componentIndex
 				} else {
 					return errors.New("duplicate signal definition for signal name: " + signal.SignalName)
 				}

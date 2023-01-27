@@ -47,24 +47,36 @@ type PortMapping struct {
 
 // AddInPort adds an input port to the PortMapping.
 func (p *PortMapping) AddInPort(portName string, signals []Signal) {
+	if p.Ins == nil {
+		p.Ins = make(PortToSignals)
+	}
 	p.Ins[portName] = signals
 }
 
 // AddOutPort adds an output port to the PortMapping.
 func (p *PortMapping) AddOutPort(portName string, signals []Signal) {
+	if p.Outs == nil {
+		p.Outs = make(PortToSignals)
+	}
 	p.Outs[portName] = signals
 }
 
-// ExistsInPort returns true if the port exists in the PortMapping.
-func (p *PortMapping) ExistsInPort(portName string) bool {
-	_, ok := p.Ins[portName]
-	return ok
+// GetInPort returns true if the port exists in the PortMapping.
+func (p *PortMapping) GetInPort(portName string) ([]Signal, bool) {
+	if p.Ins == nil {
+		return nil, false
+	}
+	signals, ok := p.Ins[portName]
+	return signals, ok
 }
 
-// ExistsOutPort returns true if the port exists in the PortMapping.
-func (p *PortMapping) ExistsOutPort(portName string) bool {
-	_, ok := p.Outs[portName]
-	return ok
+// GetOutPort returns true if the port exists in the PortMapping.
+func (p *PortMapping) GetOutPort(portName string) ([]Signal, bool) {
+	if p.Outs == nil {
+		return nil, false
+	}
+	signals, ok := p.Outs[portName]
+	return signals, ok
 }
 
 // NewPortMapping creates a new PortMapping.
@@ -106,7 +118,7 @@ type ConstantSignal struct {
 }
 
 // PortsFromComponentConfig extracts Ports from component's config.
-func PortsFromComponentConfig(componentConfig mapstruct.Object, circuitID string) (PortMapping, error) {
+func PortsFromComponentConfig(componentConfig mapstruct.Object, subCircuitID string) (PortMapping, error) {
 	var ports PortMapping
 
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
@@ -121,12 +133,12 @@ func PortsFromComponentConfig(componentConfig mapstruct.Object, circuitID string
 	// Add circuitID to all signals.
 	for _, signals := range ports.Ins {
 		for i := range signals {
-			signals[i].CircuitID = circuitID
+			signals[i].SubCircuitID = subCircuitID
 		}
 	}
 	for _, signals := range ports.Outs {
 		for i := range signals {
-			signals[i].CircuitID = circuitID
+			signals[i].SubCircuitID = subCircuitID
 		}
 	}
 	return ports, err
@@ -134,6 +146,12 @@ func PortsFromComponentConfig(componentConfig mapstruct.Object, circuitID string
 
 // SignalType enum.
 type SignalType int
+
+// SignalID is a unique identifier for a signal.
+type SignalID struct {
+	SubCircuitID string
+	SignalName   string
+}
 
 const (
 	// SignalTypeNamed is a named signal.
@@ -146,11 +164,18 @@ const (
 //
 // Only one field should be set.
 type Signal struct {
-	// Note: pointers are used to detect fields being not set.
-	SignalName     string `mapstructure:"signal_name"`
-	CircuitID      string
+	SubCircuitID   string
+	SignalName     string         `mapstructure:"signal_name"`
 	ConstantSignal ConstantSignal `mapstructure:"constant_signal"`
 	Looped         bool
+}
+
+// SignalID returns the Signal ID.
+func (s *Signal) SignalID() SignalID {
+	return SignalID{
+		SubCircuitID: s.SubCircuitID,
+		SignalName:   s.SignalName,
+	}
 }
 
 // SignalType returns the Signal type of the port.
@@ -161,8 +186,8 @@ func (s *Signal) SignalType() SignalType {
 	return SignalTypeConstant
 }
 
-// GetConstantSignalValue returns the value of the constant signal.
-func (s *Signal) GetConstantSignalValue() float64 {
+// ConstantSignalValue returns the value of the constant signal.
+func (s *Signal) ConstantSignalValue() float64 {
 	constantSignal := s.ConstantSignal
 	value := 0.0
 	specialValue := constantSignal.SpecialValue

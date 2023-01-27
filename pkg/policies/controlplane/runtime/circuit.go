@@ -35,6 +35,7 @@ var circuitMetrics = newCircuitMetrics()
 func newCircuitMetrics() *CircuitMetrics {
 	circuitMetricsLabels := []string{
 		metrics.SignalNameLabel,
+		metrics.SubCircuitIDLabel,
 		metrics.PolicyNameLabel,
 		metrics.ValidLabel,
 	}
@@ -140,14 +141,16 @@ func (circuit *Circuit) setup(lifecycle fx.Lifecycle) {
 			for _, signal := range outPort {
 				circuitMetricsLabels = append(circuitMetricsLabels,
 					prometheus.Labels{
-						metrics.SignalNameLabel: signal.SignalName,
-						metrics.PolicyNameLabel: circuit.GetPolicyName(),
-						metrics.ValidLabel:      metrics.ValidFalse,
+						metrics.SignalNameLabel:   signal.SignalName,
+						metrics.SubCircuitIDLabel: signal.SubCircuitID,
+						metrics.PolicyNameLabel:   circuit.GetPolicyName(),
+						metrics.ValidLabel:        metrics.ValidFalse,
 					},
 					prometheus.Labels{
-						metrics.SignalNameLabel: signal.SignalName,
-						metrics.PolicyNameLabel: circuit.GetPolicyName(),
-						metrics.ValidLabel:      metrics.ValidTrue,
+						metrics.SignalNameLabel:   signal.SignalName,
+						metrics.SubCircuitIDLabel: signal.SubCircuitID,
+						metrics.PolicyNameLabel:   circuit.GetPolicyName(),
+						metrics.ValidLabel:        metrics.ValidTrue,
 					},
 				)
 			}
@@ -215,8 +218,9 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 			signalInfo.SignalReading = append(signalInfo.SignalReading, signalReadingProto)
 
 			circuitMetricsLabels := prometheus.Labels{
-				metrics.SignalNameLabel: signal.SignalName,
-				metrics.PolicyNameLabel: circuit.Policy.GetPolicyName(),
+				metrics.SignalNameLabel:   signal.SignalName,
+				metrics.SubCircuitIDLabel: signal.SubCircuitID,
+				metrics.PolicyNameLabel:   circuit.Policy.GetPolicyName(),
 			}
 			if reading.Valid() {
 				circuitMetricsLabels[metrics.ValidLabel] = metrics.ValidTrue
@@ -263,7 +267,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				// Check if all the sig(s) in sigs are ready
 				for index, sig := range sigs {
 					if sig.SignalType() == SignalTypeConstant {
-						readingList[index] = NewReading(sig.GetConstantSignalValue())
+						readingList[index] = NewReading(sig.ConstantSignalValue())
 					} else if sigReading, ok := circuitSignalReadings[sig]; ok {
 						// Set sigReading in readingList at index
 						readingList[index] = sigReading

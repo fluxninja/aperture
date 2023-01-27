@@ -257,9 +257,9 @@ jobs:
 
   pre-commit:
     executor: python-cimg-executor
-    resource_class: large
+    resource_class: xlarge
     environment:
-      GOMAXPROCS: 4
+      GOMAXPROCS: 8
     steps:
       - add_ssh_keys:
           fingerprints:
@@ -598,7 +598,8 @@ jobs:
       job-root:
         type: string
         default: "/home/circleci"
-        description: The root folder of the job where all repositories will be cloned to
+        description:
+          The root folder of the job where all repositories will be cloned to
       manifests-repo:
         type: string
         default: git@github.com:fluxninja/argo-manifests.git
@@ -613,18 +614,20 @@ jobs:
       component:
         type: string
         default: ""
-        description: Application component to update image and deployment code for
+        description:
+          Application component to update image and deployment code for
       update:
         type: string
         default: everything
-        description: Whether to update 'images', 'deployment-code' or 'everything'
+        description:
+          Whether to update 'images', 'deployment-code' or 'everything'
     executor: python-cimg-executor
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "f9:49:04:10:b1:77:16:b0:0e:c0:ba:21:0e:9d:fd:40"  # argo-manifests R/W
-            - "2a:af:6f:d5:b9:d4:dd:95:df:18:47:e9:0b:4a:c7:82"  # deployment R/W
-            - "10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8"   #cloud keys
+            - "f9:49:04:10:b1:77:16:b0:0e:c0:ba:21:0e:9d:fd:40" # argo-manifests R/W
+            - "2a:af:6f:d5:b9:d4:dd:95:df:18:47:e9:0b:4a:c7:82" # deployment R/W
+            - "10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8" #cloud keys
       - checkout
       - gcp-gcr/gcr-auth
       - run: *install_opsninja
@@ -703,7 +706,7 @@ jobs:
           environment:
             CGO_ENABLED: "1"
             PREFIX: "aperture"
-            LDFLAGS: "-s -w -extldflags \"-Wl,--allow-multiple-definition\""
+            LDFLAGS: '-s -w -extldflags "-Wl,--allow-multiple-definition"'
       - run:
           name: Install nFPM
           command: |
@@ -741,7 +744,8 @@ jobs:
                   done
       - save_cache:
           name: Save go cache
-          key: aperture-agent-bare-metal-packages-go-cache-{{ checksum "~/day" }}
+          key:
+            aperture-agent-bare-metal-packages-go-cache-{{ checksum "~/day" }}
           paths:
             - ../.cache/go-build
           when: on_success
@@ -757,8 +761,8 @@ workflows:
         - not:
             equal: [main, << pipeline.git.branch >>]
         - or:
-          - << pipeline.parameters.updated-aperture-agent-packaging >>
-          - << pipeline.parameters.updated-aperture >>
+            - << pipeline.parameters.updated-aperture-agent-packaging >>
+            - << pipeline.parameters.updated-aperture >>
     jobs:
       - package-agent:
           name: build-aperture-agent-bare-metal-package
@@ -768,8 +772,8 @@ workflows:
       and:
         - equal: [main, << pipeline.git.branch >>]
         - or:
-          - << pipeline.parameters.updated-aperture-agent-packaging >>
-          - << pipeline.parameters.updated-aperture >>
+            - << pipeline.parameters.updated-aperture-agent-packaging >>
+            - << pipeline.parameters.updated-aperture >>
     jobs:
       - package-agent:
           name: publish-aperture-agent-bare-metal-package

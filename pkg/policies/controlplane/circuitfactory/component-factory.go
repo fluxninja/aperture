@@ -78,6 +78,10 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.PulseGenerator, components.NewPulseGeneratorAndOptions)
 	case *policylangv1.Component_Holder:
 		ctor = mkCtor(config.Holder, components.NewHolderAndOptions)
+	case *policylangv1.Component_NestedSignalIngress:
+		ctor = mkCtor(config.NestedSignalIngress, components.NewNestedSignalIngressAndOptions)
+	case *policylangv1.Component_NestedSignalEgress:
+		ctor = mkCtor(config.NestedSignalEgress, components.NewNestedSignalEgressAndOptions)
 	default:
 		return newComponentStackAndOptions(componentProto, componentID, policyReadAPI)
 	}
@@ -115,12 +119,22 @@ func prepareComponent(
 	config any,
 	componentID string,
 ) (runtime.ConfiguredComponent, error) {
+	parentCircuitID := ParentCircuitID(componentID)
+
+	return prepareComponentInCircuit(component, config, componentID, parentCircuitID)
+}
+
+func prepareComponentInCircuit(
+	component runtime.Component,
+	config any,
+	componentID string,
+	parentCircuitID string,
+) (runtime.ConfiguredComponent, error) {
 	mapStruct, err := mapstruct.EncodeObject(config)
 	if err != nil {
 		return runtime.ConfiguredComponent{}, err
 	}
 
-	parentCircuitID := ParentCircuitID(componentID)
 	ports, err := runtime.PortsFromComponentConfig(mapStruct, parentCircuitID)
 	if err != nil {
 		return runtime.ConfiguredComponent{}, err

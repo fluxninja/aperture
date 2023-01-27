@@ -54,7 +54,7 @@ func ParseNestedCircuit(
 	egressPorts := make(map[string]interface{})
 
 	// Set in and out ports at signal ingress and egress components based on the port mapping
-	for _, configuredComponent := range leafComponents {
+	for i, configuredComponent := range leafComponents {
 		component := configuredComponent.Component
 		// dynamic cast to signal ingress or egress
 		if nestedSignalIngress, ok := component.(*components.NestedSignalIngress); ok {
@@ -64,10 +64,10 @@ func ParseNestedCircuit(
 				return nil, nil, nil, errors.Errorf("duplicate ingress port %s in nested circuit %s", portName, nestedCircuitProto.Name)
 			}
 			ingressPorts[portName] = nil
-			signals, ok := portMapping.Ins[portName]
+			signals, ok := portMapping.GetInPort(portName)
 			if ok {
 				// set the port mapping for the signal ingress component
-				configuredComponent.PortMapping.Ins[portName] = signals
+				leafComponents[i].PortMapping.AddInPort(portName, signals)
 			}
 		} else if nestedSignalEgress, ok := component.(*components.NestedSignalEgress); ok {
 			portName := nestedSignalEgress.PortName()
@@ -76,10 +76,10 @@ func ParseNestedCircuit(
 				return nil, nil, nil, errors.Errorf("duplicate egress port %s in nested circuit %s", portName, nestedCircuitProto.Name)
 			}
 			egressPorts[portName] = nil
-			signals, ok := portMapping.Outs[portName]
+			signals, ok := portMapping.GetOutPort(portName)
 			if ok {
 				// set the port mapping for the signal egress component
-				configuredComponent.PortMapping.Outs[portName] = signals
+				leafComponents[i].PortMapping.AddOutPort(portName, signals)
 			}
 		}
 
@@ -120,7 +120,7 @@ func ParentCircuitID(childCircuitID string) string {
 
 // DecodePortMap decodes a proto port map into a PortToSignals map.
 func DecodePortMap(config any, circuitID string) (runtime.PortToSignals, error) {
-	var ports runtime.PortToSignals
+	ports := make(runtime.PortToSignals)
 
 	mapStruct, err := mapstruct.EncodeObject(config)
 	if err != nil {
@@ -141,7 +141,7 @@ func DecodePortMap(config any, circuitID string) (runtime.PortToSignals, error) 
 
 	for _, signals := range ports {
 		for i := range signals {
-			signals[i].CircuitID = circuitID
+			signals[i].SubCircuitID = circuitID
 		}
 	}
 

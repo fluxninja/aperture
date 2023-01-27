@@ -287,6 +287,30 @@ func ParseAIMDConcurrencyController(
 				},
 			},
 			{
+				Component: &policylangv1.Component_Decider{
+					Decider: &policylangv1.Decider{
+						Operator: components.GT.String(),
+						InPorts: &policylangv1.Decider_Ins{
+							Lhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "SIGNAL",
+								},
+							},
+							Rhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "SETPOINT",
+								},
+							},
+						},
+						OutPorts: &policylangv1.Decider_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "IS_OVERLOAD",
+							},
+						},
+					},
+				},
+			},
+			{
 				Component: &policylangv1.Component_NestedSignalIngress{
 					NestedSignalIngress: &policylangv1.NestedSignalIngress{
 						PortName: aimdSignalPortName,

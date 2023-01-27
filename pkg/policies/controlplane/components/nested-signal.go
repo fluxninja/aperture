@@ -2,6 +2,7 @@ package components
 
 import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"go.uber.org/fx"
 )
@@ -26,10 +27,10 @@ type NestedSignalIngress struct {
 }
 
 // NewNestedSignalIngressAndOptions creates a new NestedSignalIngress and its options.
-func NewNestedSignalIngressAndOptions(nestedSignalIngress *policylangv1.NestedSignalIngress) (*nestedSignal, fx.Option) {
-	return &nestedSignal{
-		portName: nestedSignalIngress.PortName,
-	}, fx.Options()
+func NewNestedSignalIngressAndOptions(nestedSignalIngressProto *policylangv1.NestedSignalIngress, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
+	comp := NestedSignalIngress{}
+	comp.portName = nestedSignalIngressProto.PortName
+	return &comp, fx.Options(), nil
 }
 
 // Name returns the name of the component.
@@ -43,10 +44,10 @@ type NestedSignalEgress struct {
 }
 
 // NewNestedSignalEgressAndOptions creates a new NestedSignalEgress and its options.
-func NewNestedSignalEgressAndOptions(nestedSignalEgress *policylangv1.NestedSignalEgress) (*nestedSignal, fx.Option) {
-	return &nestedSignal{
-		portName: nestedSignalEgress.PortName,
-	}, fx.Options()
+func NewNestedSignalEgressAndOptions(nestedSignalEgressProto *policylangv1.NestedSignalEgress, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
+	comp := NestedSignalEgress{}
+	comp.portName = nestedSignalEgressProto.PortName
+	return &comp, fx.Options(), nil
 }
 
 // Name returns the name of the component.
