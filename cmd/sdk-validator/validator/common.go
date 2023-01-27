@@ -2,6 +2,7 @@ package validator
 
 import (
 	"context"
+	"strings"
 	"sync/atomic"
 
 	"golang.org/x/exp/maps"
@@ -21,6 +22,14 @@ type CommonHandler struct {
 
 // CheckWithValues is a dummy function for creating *flowcontrolv1.CheckResponse from given parameters.
 func (c *CommonHandler) CheckWithValues(ctx context.Context, services []string, controlPoint string, labels map[string]string) *flowcontrolv1.CheckResponse {
+	var path string
+	var found bool
+	if path, found = labels["http.target"]; !found {
+		log.Warn().Msg("Missing request path label")
+		path = "UNKNOWN"
+	}
+	log.Trace().Msgf("Received FlowControl Check request from path %v", path)
+
 	resp := &flowcontrolv1.CheckResponse{
 		DecisionType:  flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
 		FlowLabelKeys: maps.Keys(labels),
@@ -29,7 +38,7 @@ func (c *CommonHandler) CheckWithValues(ctx context.Context, services []string, 
 		RejectReason:  flowcontrolv1.CheckResponse_REJECT_REASON_NONE,
 	}
 
-	if c.Rejected != c.Rejects {
+	if c.Rejected != c.Rejects && shouldBeTested(path) {
 		log.Trace().Msg("Rejecting call")
 		resp.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
 		resp.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED
@@ -37,4 +46,8 @@ func (c *CommonHandler) CheckWithValues(ctx context.Context, services []string, 
 	}
 
 	return resp
+}
+
+func shouldBeTested(path string) bool {
+	return strings.Contains(path, "super")
 }
