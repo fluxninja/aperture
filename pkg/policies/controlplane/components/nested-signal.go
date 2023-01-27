@@ -7,6 +7,9 @@ import (
 	"go.uber.org/fx"
 )
 
+// NestedSignalPortName is the port name for nested signal ingress and egress components.
+const NestedSignalPortName = "signal"
+
 // nestedSignal is the base component for signal ingress and egress.
 type nestedSignal struct {
 	NoOp

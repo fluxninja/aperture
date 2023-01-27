@@ -67,7 +67,7 @@ func ParseNestedCircuit(
 			signals, ok := portMapping.GetInPort(portName)
 			if ok {
 				// set the port mapping for the signal ingress component
-				leafComponents[i].PortMapping.AddInPort(portName, signals)
+				leafComponents[i].PortMapping.AddInPort(components.NestedSignalPortName, signals)
 			}
 		} else if nestedSignalEgress, ok := component.(*components.NestedSignalEgress); ok {
 			portName := nestedSignalEgress.PortName()
@@ -79,7 +79,7 @@ func ParseNestedCircuit(
 			signals, ok := portMapping.GetOutPort(portName)
 			if ok {
 				// set the port mapping for the signal egress component
-				leafComponents[i].PortMapping.AddOutPort(portName, signals)
+				leafComponents[i].PortMapping.AddOutPort(components.NestedSignalPortName, signals)
 			}
 		}
 
