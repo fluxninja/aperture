@@ -6,7 +6,6 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/concurrency"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/horizontalpodscaler"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -76,7 +75,6 @@ func newComponentStackAndOptions(
 			if err != nil {
 				return nil, nil, nil, err
 			}
-			log.Info().Msgf("loadActuatorConfComp: %+v", loadActuatorConfComp)
 			configuredComponents = append(configuredComponents, loadActuatorConfComp)
 
 			options = append(options, loadActuatorOptions)

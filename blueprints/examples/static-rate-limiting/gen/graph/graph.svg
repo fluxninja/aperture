@@ -11,7 +11,7 @@
 <g id="clust1" class="cluster">
 <title>cluster_s1</title>
 <polygon fill="none" stroke="black" points="8,-8 8,-167 283.09,-167 283.09,-8 8,-8"/>
-<text text-anchor="middle" x="145.54" y="-151.8" font-family="Times,serif" font-size="14.00">RateLimiter[0]</text>
+<text text-anchor="middle" x="145.54" y="-151.8" font-family="Times,serif" font-size="14.00">RateLimiter[root.0]</text>
 </g>
 <!-- n3 -->
 <g id="node1" class="node">

@@ -290,6 +290,8 @@ func ParseAIMDConcurrencyController(
 				Component: &policylangv1.Component_Decider{
 					Decider: &policylangv1.Decider{
 						Operator: components.GT.String(),
+						TrueFor:  durationpb.New(0),
+						FalseFor: durationpb.New(0),
 						InPorts: &policylangv1.Decider_Ins{
 							Lhs: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
