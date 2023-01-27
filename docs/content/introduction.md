@@ -1,5 +1,6 @@
 ---
 title: Introduction
+slug: /
 sidebar_position: 1
 sidebar_class_name: introduction
 description:
