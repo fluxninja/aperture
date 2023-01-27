@@ -1,12 +1,12 @@
 ---
-title: Playground
+title: Try In Local Playground
 keywords:
   - playground
   - policies
   - poc
   - ratelimit
   - concurrencylimit
-sidebar_position: 1
+sidebar_position: 4
 ---
 
 ```mdx-code-block
