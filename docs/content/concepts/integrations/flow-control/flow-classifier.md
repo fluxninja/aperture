@@ -49,7 +49,7 @@ Labels are not namespaced in any way.
 
 :::
 
-## Selector
+## Selector {#selector}
 
 Each classifier needs to specify which control point it will be run at. For
 instance, the following selector is for the "ingress" control point at a
@@ -66,7 +66,7 @@ selector:
 You can be more precise by adding a [label matcher][label-matcher] and e.g. gate
 the classifier to particular paths.
 
-## Live Previewing Requests
+## Live Previewing Requests {#live-previewing-requests}
 
 You can discover the request attributes flowing through services and control
 points using the

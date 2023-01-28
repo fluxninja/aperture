@@ -33,7 +33,7 @@ In order to generate Blueprints please install the pre-requisites [`jb`][jb] and
 [jb]: https://github.com/jsonnet-bundler/jsonnet-bundler
 [jsonnet]: https://github.com/google/jsonnet
 
-## Generating Aperture Policies and Grafana Dashboards
+## Generating Aperture Policies and Grafana Dashboards {#generating-aperture-policies-and-grafana-dashboards}
 
 The available Aperture Blueprints can be found under <a
 href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/lib/1.0/blueprints/`}>`blueprints/lib/1.0/blueprints`</a>.
