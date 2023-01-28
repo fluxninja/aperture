@@ -25,7 +25,7 @@ define workloads of different priorities and weights, it allows to shed some
 
 Concurrency Limiter is configured as a [policy][policies] component.
 
-## Scheduler
+## Scheduler {#scheduler}
 
 Each Aperture Agent instantiates a
 [Weighted Fair Queueing](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
@@ -38,14 +38,14 @@ If rate of tokens in flows entering the scheduler exceeds the desired rate,
 flows are queued in the scheduler. If a flow can't be scheduled within its
 specified timeout, it will be rejected.
 
-### Workload
+### Workload {#workload}
 
 Workloads are groups of flows based on common attributes. Workloads are
 expressed by [label matcher][label-matcher] rules in Aperture. Aperture Agents
 schedule workloads based on their priorities and by estimating their
 [tokens](#tokens).
 
-### Priority
+### Priority {#priority}
 
 Priority represents the importance of a flow with respect to other flows in the
 queue.
@@ -57,7 +57,7 @@ Priority levels are in the range `0 to 255`. `0` is the lowest priority and
 
 :::
 
-### Tokens
+### Tokens {#tokens}
 
 Tokens represent the cost of admitting a flow in the system. Most commonly,
 tokens are estimated based on milliseconds of response time observed when a flow
@@ -75,14 +75,14 @@ Aperture can be configured to automatically estimate the tokens for each
 workload. See `auto-tokens`
 [configuration](/references/configuration/policy.md#v1-scheduler).
 
-### Token bucket
+### Token bucket {#token-bucket}
 
 Aperture Agents use a variant of a
 [token bucket algorithm](https://en.wikipedia.org/wiki/Token_bucket) to control
 the flows entering the system. Each flow has to acquire tokens from the bucket
 within a deadline period in order to be admitted.
 
-### Timeout Factor
+### Timeout Factor {#timeout-factor}
 
 The timeout factor parameter decides how long a request in the workload can wait
 for tokens. This value impacts fairness because the larger the timeout the
