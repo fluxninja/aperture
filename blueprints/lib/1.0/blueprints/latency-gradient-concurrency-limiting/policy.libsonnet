@@ -24,7 +24,6 @@ local min = spec.v1.Min;
 local sqrt = spec.v1.Sqrt;
 local firstValid = spec.v1.FirstValid;
 local extrapolator = spec.v1.Extrapolator;
-local integrator = spec.v1.Integrator;
 local constantSignal = spec.v1.ConstantSignal;
 
 function(params) {
@@ -57,14 +56,18 @@ function(params) {
           component.withArithmeticCombinator(combinator.add(port.withConstantSignal(c.concurrencyLinearIncrement),
                                                             port.withSignalName('SQRT_CONCURRENCY_INCREMENT'),
                                                             output=port.withSignalName('CONCURRENCY_INCREMENT_SINGLE_TICK'))),
-          component.withIntegrator(
-            integrator.new()
-            + integrator.withInPorts({
-              input: port.withSignalName('CONCURRENCY_INCREMENT_SINGLE_TICK'),
-              max: port.withSignalName('NORMAL_CONCURRENCY_LIMIT'),
-              reset: port.withSignalName('IS_OVERLOAD'),
-            })
-            + integrator.withOutPorts({ output: port.withSignalName('CONCURRENCY_INCREMENT') })
+          component.withArithmeticCombinator(combinator.add(port.withSignalName('CONCURRENCY_INCREMENT_SINGLE_TICK'),
+                                                            port.withSignalName('CONCURRENCY_INCREMENT'),
+                                                            output=port.withSignalName('CONCURRENCY_INCREMENT_INTEGRAL'))),
+          component.withMin(
+            min.new()
+            + min.withInPorts({ inputs: [port.withSignalName('CONCURRENCY_INCREMENT_INTEGRAL'), port.withSignalName('ACCEPTED_CONCURRENCY')] })
+            + min.withOutPorts({ output: port.withSignalName('CONCURRENCY_INCREMENT_INTEGRAL_CAPPED') }),
+          ),
+          component.withFirstValid(
+            firstValid.new()
+            + firstValid.withInPorts({ inputs: [port.withSignalName('CONCURRENCY_INCREMENT_INTEGRAL_CAPPED'), port.withConstantSignal(0)] })
+            + firstValid.withOutPorts({ output: port.withSignalName('CONCURRENCY_INCREMENT_NORMAL') }),
           ),
           component.withSqrt(
             sqrt.new()
@@ -151,6 +154,15 @@ function(params) {
               + decider.inPorts.withRhs(port.withSignalName('LATENCY_SETPOINT'))
             )
             + decider.withOutPortsMixin(decider.outPorts.withOutput(port.withSignalName('IS_OVERLOAD')))
+          ),
+          component.withSwitcher(
+            switcher.new()
+            + switcher.withInPortsMixin(
+              switcher.inPorts.withOnTrue(port.withConstantSignal(0))
+              + switcher.inPorts.withOnFalse(port.withSignalName('CONCURRENCY_INCREMENT_NORMAL'))
+              + switcher.inPorts.withSwitch(port.withSignalName('IS_OVERLOAD'))
+            )
+            + switcher.withOutPortsMixin(switcher.outPorts.withOutput(port.withSignalName('CONCURRENCY_INCREMENT')))
           ),
         ] + $._config.components,
       ),
