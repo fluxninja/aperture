@@ -1,7 +1,7 @@
 ## Playground
 
 To try aperture in local K8s environment, refer to
-[Playground docs](https://docs.fluxninja.com/docs/get-started/playground).
+[Playground docs](https://docs.fluxninja.com/get-started/playground).
 
 ## Resources
 

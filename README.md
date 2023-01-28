@@ -52,18 +52,18 @@ analyzing, and actuating, facilitated by agents and a controller.
 
 - 🚦 Aperture Agents live next to your service instances as a sidecar and
   provide powerful
-  [flow control](https://docs.fluxninja.com/docs/concepts/integrations/flow-control/)
+  [flow control](https://docs.fluxninja.com/concepts/integrations/flow-control/)
   components such as a
-  [weighted fair queuing scheduler](https://docs.fluxninja.com/docs/concepts/integrations/flow-control/concurrency-limiter)
+  [weighted fair queuing scheduler](https://docs.fluxninja.com/concepts/integrations/flow-control/components/concurrency-limiter)
   for prioritized load-shedding and a
-  [distributed rate-limiter](https://docs.fluxninja.com/docs/concepts/integrations/flow-control/rate-limiter).
+  [distributed rate-limiter](https://docs.fluxninja.com/concepts/integrations/flow-control/components/rate-limiter).
   A
-  [flow](https://docs.fluxninja.com/docs/concepts/integrations/flow-control/flow-label)
+  [flow](https://docs.fluxninja.com/concepts/integrations/flow-control/flow-label)
   is the fundamental unit of work from the perspective of an Aperture Agent. It
   could be an API call, a feature, or even a database query.
 
 - 🤖 Aperture Controller is the "brain" of system. It is powered by always-on,
-  [circuit graph driven policies](https://docs.fluxninja.com/docs/concepts/policy/)
+  [circuit graph driven policies](https://docs.fluxninja.com/concepts/policy/)
   that continuously track deviations from service-level objectives (SLOs) and
   calculate recovery or escalation actions.
 
@@ -80,19 +80,19 @@ analyzing, and actuating, facilitated by agents and a controller.
 ### 🎮 Playground
 
 To try Aperture in a local Kubernetes environment, refer to
-[Playground docs](https://docs.fluxninja.com/docs/get-started/playground/).
+[Playground docs](https://docs.fluxninja.com/get-started/playground/).
 
 ![Latency Gradient Policy Dashboard](./docs/content/assets/img/grafana_dashboard.png)
 
 ### 🏎️ Installation
 
 To install Aperture system, please follow the
-[Installation](https://docs.fluxninja.com/docs/category/installation) guide.
+[Installation](https://docs.fluxninja.com/category/install-aperture) guide.
 
 ### 📖 Tutorials
 
 To learn how to write Aperture policies, please read the
-[Tutorials](https://docs.fluxninja.com/docs/category/tutorials).
+[Tutorials](https://docs.fluxninja.com/category/tutorials).
 
 ### 🎥 Demo Video
 
