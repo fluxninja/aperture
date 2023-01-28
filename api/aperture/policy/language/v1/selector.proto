@@ -6,11 +6,11 @@ import "aperture/policy/language/v1/label_matcher.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 // Describes which flow in which service a [flow control
-// component](/concepts/flow-control/flow-control.md#components) should apply
+// component](/concepts/integrations/flow-control/flow-control.md#components) should apply
 // to
 //
 // :::info
-// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+// See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 // :::
 message FlowSelector {
   ServiceSelector service_selector = 1;
@@ -23,14 +23,14 @@ message FlowSelector {
 }
 
 // Describes which service a [flow control or observability
-// component](/concepts/flow-control/flow-control.md#components) should apply
+// component](/concepts/integrations/flow-control/flow-control.md#components) should apply
 // to
 //
 // :::info
-// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+// See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 // :::
 message ServiceSelector {
-  // Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+  // Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
   // selector applies to.
   string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
@@ -40,7 +40,7 @@ message ServiceSelector {
   }]; // @gotags: default:"default"
 
   // The Fully Qualified Domain Name of the
-  // [service](/concepts/flow-control/service.md) to select.
+  // [service](/concepts/integrations/flow-control/service.md) to select.
   //
   // In kubernetes, this is the FQDN of the Service object.
   //
@@ -53,11 +53,11 @@ message ServiceSelector {
 }
 
 // Describes which flows a [flow control
-// component](/concepts/flow-control/flow-control.md#components) should apply
+// component](/concepts/integrations/flow-control/flow-control.md#components) should apply
 // to
 //
 // :::info
-// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+// See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 // :::
 //
 // Example:
@@ -76,7 +76,7 @@ message ServiceSelector {
 //       regex: ^(?!.*Chrome).*Safari
 // ```
 message FlowMatcher {
-  // [Control Point](/concepts/flow-control/flow-control.md#control-point)
+  // [Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)
   // identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
   // block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
   // or filter chains.
@@ -88,11 +88,11 @@ message FlowMatcher {
   }]; // @gotags: validate:"required"
 
   // Label matcher allows to add _additional_ condition on
-  // [flow labels](/concepts/flow-control/flow-label.md)
+  // [flow labels](/concepts/integrations/flow-control/flow-label.md)
   // must also be satisfied (in addition to service+control point matching)
   //
   // :::info
-  // See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
+  // See also [Label Matcher overview](/concepts/integrations/flow-control/flow-selector.md#label-matcher).
   // :::
   //
   // :::note
@@ -111,7 +111,7 @@ message FlowMatcher {
 // Describes which pods a control or observability
 // component should apply to.
 message KubernetesObjectSelector {
-  // Which [agent-group](/concepts/flow-control/service.md#agent-group) this
+  // Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
   // selector applies to.
   string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {

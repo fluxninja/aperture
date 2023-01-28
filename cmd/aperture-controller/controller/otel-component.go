@@ -1,11 +1,6 @@
 package controller
 
 import (
-	"github.com/fluxninja/aperture/pkg/alertmanager"
-	"github.com/fluxninja/aperture/pkg/alerts"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
-	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
-	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension"
@@ -25,16 +20,23 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
+
+	"github.com/fluxninja/aperture/pkg/alertmanager"
+	"github.com/fluxninja/aperture/pkg/alerts"
+	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
+	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
 // ModuleForControllerOTEL provides fx options for ControllerOTELComponents.
 func ModuleForControllerOTEL() fx.Option {
 	return fx.Options(
 		fx.Provide(
-			otelcollector.NewOtelConfig,
+			otelconfig.NewOTELParams,
 			fx.Annotate(
 				provideController,
-				fx.ResultTags(otelcollector.BaseFxTag),
+				fx.ResultTags(otelconfig.BaseFxTag),
 			),
 			fx.Annotate(
 				ControllerOTELComponents,
@@ -91,9 +93,9 @@ func ControllerOTELComponents(
 	return factories, errs
 }
 
-func provideController(cfg *otelcollector.OtelParams) *otelcollector.OTELConfig {
-	otelcollector.AddControllerMetricsPipeline(cfg)
-	cfg.Config.AddExporter(otelcollector.ExporterLogging, nil)
-	otelcollector.AddAlertsPipeline(cfg)
+func provideController(cfg *otelconfig.OTELParams) *otelconfig.OTELConfig {
+	otelconfig.AddControllerMetricsPipeline(cfg)
+	cfg.Config.AddExporter(otelconsts.ExporterLogging, nil)
+	otelconfig.AddAlertsPipeline(cfg)
 	return cfg.Config
 }

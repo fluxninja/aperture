@@ -24,7 +24,7 @@ const (
 // Set of classification rules sharing a common selector
 //
 // :::info
-// See also [Classifier overview](/concepts/flow-control/flow-classifier.md).
+// See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
 // :::
 //
 // Example:
@@ -48,7 +48,7 @@ type Classifier struct {
 	// Defines where to apply the flow classification rule.
 	FlowSelector *FlowSelector `protobuf:"bytes,1,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required"` // @gotags: validate:"required"
 	// A map of {key, value} pairs mapping from
-	// [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
+	// [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
 	// how to extract and propagate flow labels with that key.
 	Rules map[string]*Rule `protobuf:"bytes,2,rep,name=rules,proto3" json:"rules,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"required,gt=0,dive,keys,required,endkeys,required"` // @gotags: validate:"required,gt=0,dive,keys,required,endkeys,required"
 }
@@ -146,7 +146,7 @@ type Rule struct {
 	//	*Rule_Rego_
 	Source isRule_Source `protobuf_oneof:"source"`
 	// Decides if the created flow label should be available as an attribute in OLAP telemetry and
-	// propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
+	// propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
 	//
 	// :::note
 	// The flow label is always accessible in Aperture Policies regardless of this setting.

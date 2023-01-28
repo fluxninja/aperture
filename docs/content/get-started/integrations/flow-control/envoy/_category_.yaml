@@ -6,3 +6,6 @@ link:
   type: "generated-index"
   title: "Envoy"
   keywords: ["flow control", "envoy"]
+  description:
+    Aperture uses Envoy's External Authorization API for control and access logs
+    are collected for telemetry.

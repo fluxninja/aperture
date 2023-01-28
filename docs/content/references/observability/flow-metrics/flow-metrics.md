@@ -84,4 +84,4 @@ and it's variants.
 
 [quantilesdoublesketch]:
   https://druid.apache.org/docs/latest/development/extensions-core/datasketches-quantiles.html
-[flowclassifiers]: /concepts/flow-control/flow-classifier.md
+[flowclassifiers]: /concepts/integrations/flow-control/flow-classifier.md

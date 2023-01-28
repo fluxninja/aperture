@@ -1,6 +1,7 @@
 ---
 title: Manually setting feature control points
 sidebar_position: 1
+slug: manually-setting-feature-control-points-using-java-sdk
 keywords:
   - java
   - sdk
@@ -9,6 +10,10 @@ keywords:
   - control
   - points
   - manual
+description:
+  Learn how to use Aperture's Java SDK to manually set feature control points
+  and improve the reliability and stability of your web-scale applications. This
+  guide covers best practices and provides examples for implementation.
 ---
 
 <a

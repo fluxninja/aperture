@@ -518,7 +518,7 @@ agent:
     ## @param agent.sidecar.enableNamespacesByDefault List of namespaces in which sidecar injection will be enabled when Sidecar mode is enabled.
     ##
     enableNamespacesByDefault: []
-  ## Agent Configuration: All the available configuration parameters can be found at https://docs.fluxninja.com/docs/references/configuration/agent.
+  ## Agent Configuration: All the available configuration parameters can be found at https://docs.fluxninja.com/references/configuration/agent.
   ##
   config:
     ## Etcd parameters for Agent

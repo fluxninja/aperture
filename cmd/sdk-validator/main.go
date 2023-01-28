@@ -134,6 +134,9 @@ func main() {
 	if *sdkDockerImage != "" {
 		wg.Add(1)
 		go func() {
+			// give the grpc server some time to initialize
+			time.Sleep(2 * time.Second)
+
 			rejected := confirmConnectedAndStartTraffic(sdkURL, *requests)
 			l := log.With().Int("total requests", *requests).Int64("expected rejections", *rejects).Int("got rejections", rejected).Logger()
 			if rejected != int(*rejects) {

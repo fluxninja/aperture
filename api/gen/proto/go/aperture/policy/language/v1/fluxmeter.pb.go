@@ -25,7 +25,7 @@ const (
 // The histogram created by Flux Meter measures the workload latency by default.
 //
 // :::info
-// See also [Flux Meter overview](/concepts/flow-control/flux-meter.md).
+// See also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).
 // :::
 //
 // Example of a selector that creates a histogram metric for all HTTP requests

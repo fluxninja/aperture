@@ -32,32 +32,6 @@ The injector is configured with the following logic:
   is listed under `.spec.sidecar.enableNamespacesByDefault`. This is not enabled
   by default, so generally this means the pod is not injected.
 
-## Upgrade Procedure {#agent-sidecar-upgrade-procedure}
-
-By following these instructions, you will have deployed the upgraded version of
-Aperture Agent into your cluster.
-
-1. Update the Helm chart repo in your environment:
-
-   ```bash
-   helm repo update
-   ```
-
-2. Use the same `values.yaml` file created as part of
-   [Installation Steps](#agent-sidecar-installation) and pass it with below
-   command:
-
-   ```bash
-   helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml | kubectl apply -f -
-   ```
-
-3. If you have deployed the Aperture Agent into a namespace other than
-   `default`, use the `-n` flag:
-
-   ```bash
-   helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml -n aperture-agent | kubectl apply -f -
-   ```
-
 ## Installation {#agent-sidecar-installation}
 
 The Aperture Agent in the Sidecar mode will be installed using the
@@ -251,6 +225,32 @@ your cluster.
    if you don't have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.
+
+## Upgrade Procedure {#agent-sidecar-upgrade-procedure}
+
+By following these instructions, you will have deployed the upgraded version of
+Aperture Agent into your cluster.
+
+1. Update the Helm chart repo in your environment:
+
+   ```bash
+   helm repo update
+   ```
+
+2. Use the same `values.yaml` file created as part of
+   [Installation Steps](#agent-sidecar-installation) and pass it with below
+   command:
+
+   ```bash
+   helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml | kubectl apply -f -
+   ```
+
+3. If you have deployed the Aperture Agent into a namespace other than
+   `default`, use the `-n` flag:
+
+   ```bash
+   helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml -n aperture-agent | kubectl apply -f -
+   ```
 
 ## Verifying the Installation
 

@@ -1,6 +1,7 @@
 ---
 title: Setting traffic control points using middleware
 sidebar_position: 2
+slug: setting-traffic-control-points-using-middleware-using-java-sdk
 keywords:
   - java
   - sdk

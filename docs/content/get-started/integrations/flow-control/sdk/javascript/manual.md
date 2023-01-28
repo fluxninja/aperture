@@ -1,5 +1,6 @@
 ---
 title: Manually setting feature control points
+slug: manually-setting-feature-control-points-using-javascript-sdk
 sidebar_position: 1
 keywords:
   - js

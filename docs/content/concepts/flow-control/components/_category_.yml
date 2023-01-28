@@ -1,9 +1,0 @@
-label: Circuit Components
-position: 5
-collapsible: true
-collapsed: true
-link:
-  type: "generated-index"
-  title: "Components"
-  description: "Flow Control Components"
-  keywords: ["components"]
