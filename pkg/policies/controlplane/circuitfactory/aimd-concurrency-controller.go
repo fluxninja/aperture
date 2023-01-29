@@ -164,6 +164,11 @@ func ParseAIMDConcurrencyController(
 									SignalName: "NORMAL_CONCURRENCY_LIMIT",
 								},
 							},
+							Min: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "ACCEPTED_CONCURRENCY",
+								},
+							},
 							Reset_: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
 									SignalName: "IS_OVERLOAD",

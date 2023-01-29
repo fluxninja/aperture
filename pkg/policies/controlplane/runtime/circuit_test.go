@@ -6,6 +6,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/sim"
 )
 
@@ -30,12 +31,12 @@ var _ = Describe("Circuit", func() {
 					output: { signal_name: SUM }
 			`,
 			sim.Inputs(nil),
-			sim.OutputSignals{"SUM"},
+			sim.OutputSignals{runtime.SignalID{SignalName: "SUM"}},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Run(3)).To(Equal(
 			sim.Outputs{
-				"SUM": sim.NewReadings([]float64{1.0, 2.0, 3.0}),
+				runtime.SignalID{SignalName: "SUM"}: sim.NewReadings([]float64{1.0, 2.0, 3.0}),
 			},
 		))
 	})
@@ -70,15 +71,15 @@ var _ = Describe("Circuit", func() {
 					output: { signal_name: VAR4 }
 			`,
 			sim.Inputs(nil),
-			sim.OutputSignals{"VAR", "VAR2", "VAR3", "VAR4"},
+			sim.OutputSignals{runtime.SignalID{SignalName: "VAR"}, runtime.SignalID{SignalName: "VAR2"}, runtime.SignalID{SignalName: "VAR3"}, runtime.SignalID{SignalName: "VAR4"}},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Step()).To(Equal(
-			map[string]sim.Reading{
-				"VAR":  sim.NewReading(42),
-				"VAR2": sim.NewReading(math.NaN()),
-				"VAR3": sim.NewReading(math.Inf(1)),
-				"VAR4": sim.NewReading(math.Inf(-1)),
+			map[runtime.SignalID]sim.Reading{
+				{SignalName: "VAR"}:  sim.NewReading(42),
+				{SignalName: "VAR2"}: sim.NewReading(math.NaN()),
+				{SignalName: "VAR3"}: sim.NewReading(math.Inf(1)),
+				{SignalName: "VAR4"}: sim.NewReading(math.Inf(-1)),
 			},
 		))
 	})
