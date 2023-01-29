@@ -157,15 +157,6 @@ message Component {
     // Switcher acts as a switch that emits one of the two signals based on third signal.
     Switcher switcher = 5;
 
-    // Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
-    ConcurrencyLimiter concurrency_limiter = 6;
-
-    // Rate Limiter provides service protection by applying rate limiter.
-    RateLimiter rate_limiter = 7;
-
-    // Periodically runs a Prometheus query in the background and emits the result.
-    PromQL promql = 8;
-
     // Emits a variable signal which can be set to invalid.
     Variable variable = 9;
 
@@ -193,9 +184,6 @@ message Component {
     // Differentiator calculates rate of change per tick.
     Differentiator differentiator = 17;
 
-    // HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
-    HorizontalPodScaler horizontal_pod_scaler = 18;
-
     // Logical AND.
     And and = 19;
 
@@ -220,8 +208,28 @@ message Component {
     // Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
     NestedSignalEgress nested_signal_egress = 26;
 
+    // Integration are components that are used to integrate with external systems.
+    Integration integration = 100;
+  }
+}
+
+// Integration are components that are used to integrate with external systems.
+message Integration {
+  oneof component {
+    // Periodically runs a Prometheus query in the background and emits the result.
+    PromQL promql = 1;
+
+    // Rate Limiter provides service protection by applying rate limiter.
+    RateLimiter rate_limiter = 2;
+
+    // Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
+    ConcurrencyLimiter concurrency_limiter = 3;
+
     // AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
-    AIMDConcurrencyController aimd_concurrency_controller = 100;
+    AIMDConcurrencyController aimd_concurrency_controller = 4;
+
+    // HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+    HorizontalPodScaler horizontal_pod_scaler = 5;
   }
 }
 

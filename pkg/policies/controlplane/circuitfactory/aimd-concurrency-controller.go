@@ -305,28 +305,32 @@ func ParseAIMDConcurrencyController(
 				},
 			},
 			{
-				Component: &policylangv1.Component_ConcurrencyLimiter{
-					ConcurrencyLimiter: &policylangv1.ConcurrencyLimiter{
-						FlowSelector: aimdConcurrencyController.FlowSelector,
-						Scheduler: &policylangv1.Scheduler{
-							SchedulerParameters: aimdConcurrencyController.SchedulerParameters,
-							OutPorts: &policylangv1.Scheduler_Outs{
-								AcceptedConcurrency: &policylangv1.OutPort{
-									SignalName: "ACCEPTED_CONCURRENCY",
+				Component: &policylangv1.Component_Integration{
+					Integration: &policylangv1.Integration{
+						Component: &policylangv1.Integration_ConcurrencyLimiter{
+							ConcurrencyLimiter: &policylangv1.ConcurrencyLimiter{
+								FlowSelector: aimdConcurrencyController.FlowSelector,
+								Scheduler: &policylangv1.Scheduler{
+									SchedulerParameters: aimdConcurrencyController.SchedulerParameters,
+									OutPorts: &policylangv1.Scheduler_Outs{
+										AcceptedConcurrency: &policylangv1.OutPort{
+											SignalName: "ACCEPTED_CONCURRENCY",
+										},
+										IncomingConcurrency: &policylangv1.OutPort{
+											SignalName: "INCOMING_CONCURRENCY",
+										},
+									},
 								},
-								IncomingConcurrency: &policylangv1.OutPort{
-									SignalName: "INCOMING_CONCURRENCY",
-								},
-							},
-						},
-						ActuationStrategy: &policylangv1.ConcurrencyLimiter_LoadActuator{
-							LoadActuator: &policylangv1.LoadActuator{
-								AlerterConfig:    aimdConcurrencyController.AlerterConfig,
-								DynamicConfigKey: aimdConcurrencyController.DryRunDynamicConfigKey,
-								InPorts: &policylangv1.LoadActuator_Ins{
-									LoadMultiplier: &policylangv1.InPort{
-										Value: &policylangv1.InPort_SignalName{
-											SignalName: "LOAD_MULTIPLIER",
+								ActuationStrategy: &policylangv1.ConcurrencyLimiter_LoadActuator{
+									LoadActuator: &policylangv1.LoadActuator{
+										AlerterConfig:    aimdConcurrencyController.AlerterConfig,
+										DynamicConfigKey: aimdConcurrencyController.DryRunDynamicConfigKey,
+										InPorts: &policylangv1.LoadActuator_Ins{
+											LoadMultiplier: &policylangv1.InPort{
+												Value: &policylangv1.InPort_SignalName{
+													SignalName: "LOAD_MULTIPLIER",
+												},
+											},
 										},
 									},
 								},

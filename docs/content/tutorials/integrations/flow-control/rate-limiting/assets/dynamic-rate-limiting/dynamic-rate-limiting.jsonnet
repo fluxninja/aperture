@@ -14,6 +14,7 @@ local workloadParameters = aperture.spec.v1.SchedulerParametersWorkloadParameter
 local labelMatcher = aperture.spec.v1.LabelMatcher;
 local workload = aperture.spec.v1.SchedulerParametersWorkload;
 local component = aperture.spec.v1.Component;
+local integration = aperture.spec.v1.Integration;
 local rateLimiter = aperture.spec.v1.RateLimiter;
 local decider = aperture.spec.v1.Decider;
 local switcher = aperture.spec.v1.Switcher;
@@ -100,13 +101,16 @@ local policyResource = latencyAIMDPolicy({
       + switcher.withOutPorts({ output: port.withSignalName('RATE_LIMIT') })
     ),
     component.new()
-    + component.withRateLimiter(
-      rateLimiter.new()
-      + rateLimiter.withFlowSelector(rateLimiterSelector)
-      + rateLimiter.withInPorts({ limit: port.withSignalName('RATE_LIMIT') })
-      + rateLimiter.withLimitResetInterval('1s')
-      + rateLimiter.withLabelKey('http.request.header.user_id')
-      + rateLimiter.withDynamicConfigKey('rate_limiter'),
+    + component.withIntegration(
+      integration.new()
+      + integration.withRateLimiter(
+        rateLimiter.new()
+        + rateLimiter.withFlowSelector(rateLimiterSelector)
+        + rateLimiter.withInPorts({ limit: port.withSignalName('RATE_LIMIT') })
+        + rateLimiter.withLimitResetInterval('1s')
+        + rateLimiter.withLabelKey('http.request.header.user_id')
+        + rateLimiter.withDynamicConfigKey('rate_limiter'),
+      ),
     ),
   ],
   // highlight-end

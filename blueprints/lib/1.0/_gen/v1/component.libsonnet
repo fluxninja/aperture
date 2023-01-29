@@ -1,12 +1,6 @@
 {
   new():: {
   },
-  withAimdConcurrencyController(aimd_concurrency_controller):: {
-    aimd_concurrency_controller: aimd_concurrency_controller,
-  },
-  withAimdConcurrencyControllerMixin(aimd_concurrency_controller):: {
-    aimd_concurrency_controller+: aimd_concurrency_controller,
-  },
   withAlerter(alerter):: {
     alerter: alerter,
   },
@@ -24,12 +18,6 @@
   },
   withArithmeticCombinatorMixin(arithmetic_combinator):: {
     arithmetic_combinator+: arithmetic_combinator,
-  },
-  withConcurrencyLimiter(concurrency_limiter):: {
-    concurrency_limiter: concurrency_limiter,
-  },
-  withConcurrencyLimiterMixin(concurrency_limiter):: {
-    concurrency_limiter+: concurrency_limiter,
   },
   withDecider(decider):: {
     decider: decider,
@@ -73,11 +61,11 @@
   withHolderMixin(holder):: {
     holder+: holder,
   },
-  withHorizontalPodScaler(horizontal_pod_scaler):: {
-    horizontal_pod_scaler: horizontal_pod_scaler,
+  withIntegration(integration):: {
+    integration: integration,
   },
-  withHorizontalPodScalerMixin(horizontal_pod_scaler):: {
-    horizontal_pod_scaler+: horizontal_pod_scaler,
+  withIntegrationMixin(integration):: {
+    integration+: integration,
   },
   withIntegrator(integrator):: {
     integrator: integrator,
@@ -127,23 +115,11 @@
   withOrMixin(or):: {
     or+: or,
   },
-  withPromql(promql):: {
-    promql: promql,
-  },
-  withPromqlMixin(promql):: {
-    promql+: promql,
-  },
   withPulseGenerator(pulse_generator):: {
     pulse_generator: pulse_generator,
   },
   withPulseGeneratorMixin(pulse_generator):: {
     pulse_generator+: pulse_generator,
-  },
-  withRateLimiter(rate_limiter):: {
-    rate_limiter: rate_limiter,
-  },
-  withRateLimiterMixin(rate_limiter):: {
-    rate_limiter+: rate_limiter,
   },
   withSqrt(sqrt):: {
     sqrt: sqrt,

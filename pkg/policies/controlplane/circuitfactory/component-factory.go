@@ -1,6 +1,8 @@
 package circuitfactory
 
 import (
+	"fmt"
+
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
@@ -23,7 +25,7 @@ func FactoryModule() fx.Option {
 // FactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
 func FactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 	return fx.Options(
-		componentStackFactoryModuleForPolicyApp(circuitAPI),
+		compositeComponentFactoryModuleForPolicyApp(circuitAPI),
 		promql.ModuleForPolicyApp(circuitAPI),
 	)
 }
@@ -38,14 +40,10 @@ func NewComponentAndOptions(
 	switch config := componentProto.Component.(type) {
 	case *policylangv1.Component_GradientController:
 		ctor = mkCtor(config.GradientController, controller.NewGradientControllerAndOptions)
-	case *policylangv1.Component_RateLimiter:
-		ctor = mkCtor(config.RateLimiter, rate.NewRateLimiterAndOptions)
 	case *policylangv1.Component_Ema:
 		ctor = mkCtor(config.Ema, components.NewEMAAndOptions)
 	case *policylangv1.Component_ArithmeticCombinator:
 		ctor = mkCtor(config.ArithmeticCombinator, components.NewArithmeticCombinatorAndOptions)
-	case *policylangv1.Component_Promql:
-		ctor = mkCtor(config.Promql, promql.NewPromQLAndOptions)
 	case *policylangv1.Component_Variable:
 		ctor = mkCtor(config.Variable, components.NewVariableAndOptions)
 	case *policylangv1.Component_Decider:
@@ -82,8 +80,20 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.NestedSignalIngress, components.NewNestedSignalIngressAndOptions)
 	case *policylangv1.Component_NestedSignalEgress:
 		ctor = mkCtor(config.NestedSignalEgress, components.NewNestedSignalEgressAndOptions)
+	case *policylangv1.Component_NestedCircuit:
+		return ParseNestedCircuit(componentID, config.NestedCircuit, policyReadAPI)
+	case *policylangv1.Component_Integration:
+		integration := componentProto.GetIntegration()
+		switch integrationConfig := integration.Component.(type) {
+		case *policylangv1.Integration_Promql:
+			ctor = mkCtor(integrationConfig.Promql, promql.NewPromQLAndOptions)
+		case *policylangv1.Integration_RateLimiter:
+			ctor = mkCtor(integrationConfig.RateLimiter, rate.NewRateLimiterAndOptions)
+		default:
+			return newIntegrationCompositeAndOptions(integration, componentID, policyReadAPI)
+		}
 	default:
-		return newComponentStackAndOptions(componentProto, componentID, policyReadAPI)
+		return nil, nil, nil, fmt.Errorf("unknown component type: %T", config)
 	}
 
 	component, config, option, err := ctor(componentID, policyReadAPI)

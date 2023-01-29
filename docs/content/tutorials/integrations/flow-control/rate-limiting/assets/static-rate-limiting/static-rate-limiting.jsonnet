@@ -2,6 +2,7 @@ local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.l
 
 local policy = aperture.spec.v1.Policy;
 local component = aperture.spec.v1.Component;
+local integration = aperture.spec.v1.Integration;
 local rateLimiter = aperture.spec.v1.RateLimiter;
 local flowSelector = aperture.spec.v1.FlowSelector;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
@@ -29,12 +30,15 @@ local policyDef =
     circuit.new()
     + circuit.withEvaluationInterval('300s')
     + circuit.withComponents([
-      component.withRateLimiter(
-        rateLimiter.new()
-        + rateLimiter.withInPorts({ limit: port.withConstantSignal(120.0) })
-        + rateLimiter.withFlowSelector(svcSelector)
-        + rateLimiter.withLimitResetInterval('60s')
-        + rateLimiter.withLabelKey('http.request.header.user_id')
+      component.withIntegration(
+        integration.new()
+        + integration.withRateLimiter(
+          rateLimiter.new()
+          + rateLimiter.withInPorts({ limit: port.withConstantSignal(120.0) })
+          + rateLimiter.withFlowSelector(svcSelector)
+          + rateLimiter.withLimitResetInterval('60s')
+          + rateLimiter.withLabelKey('http.request.header.user_id')
+        ),
       ),
     ]),
   );

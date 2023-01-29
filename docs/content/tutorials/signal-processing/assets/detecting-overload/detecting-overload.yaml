@@ -7,16 +7,17 @@ metadata:
 spec:
   circuit:
     components:
-      - promql:
-          evaluation_interval: 1s
-          out_ports:
-            output:
-              signal_name: LATENCY
-          query_string:
-            sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED",
-            flow_status="OK",
-            flux_meter_name="test"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED",
-            flow_status="OK", flux_meter_name="test"}[5s]))
+      - integration:
+          promql:
+            evaluation_interval: 1s
+            out_ports:
+              output:
+                signal_name: LATENCY
+            query_string:
+              sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED",
+              flow_status="OK",
+              flux_meter_name="test"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED",
+              flow_status="OK", flux_meter_name="test"}[5s]))
       - ema:
           ema_window: 1500s
           in_ports:

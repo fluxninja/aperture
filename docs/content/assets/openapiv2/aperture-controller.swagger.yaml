@@ -856,13 +856,6 @@ definitions:
     type: object
     title: Computational block that form the circuit
     properties:
-      aimd_concurrency_controller:
-        description: AIMD Concurrency control component is based on Additive Increase
-          and Multiplicative Decrease of Concurrency. It takes a signal and setpoint
-          as inputs and reduces concurrency limits proportionally (or any arbitrary
-          power) based on deviation of the signal from setpoint. Internally implemented
-          as a nested circuit.
-        $ref: '#/definitions/v1AIMDConcurrencyController'
       alerter:
         description: Alerter reacts to a signal and generates alert to send to alert
           manager.
@@ -874,10 +867,6 @@ definitions:
         description: Applies the given operator on input operands (signals) and emits
           the result.
         $ref: '#/definitions/v1ArithmeticCombinator'
-      concurrency_limiter:
-        description: Concurrency Limiter provides service protection by applying prioritized
-          load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
-        $ref: '#/definitions/v1ConcurrencyLimiter'
       decider:
         description: Decider emits the binary result of comparison operator on two
           operands.
@@ -905,10 +894,10 @@ definitions:
         description: Holds the last valid signal value for the specified duration
           then waits for next valid value to hold.
         $ref: '#/definitions/v1Holder'
-      horizontal_pod_scaler:
-        description: HorizontalPodScaler provides pod horizontal scaling functionality
-          for scalable Kubernetes resources.
-        $ref: '#/definitions/v1HorizontalPodScaler'
+      integration:
+        description: Integration are components that are used to integrate with external
+          systems.
+        $ref: '#/definitions/v1Integration'
       integrator:
         description: Accumulates sum of signal every tick.
         $ref: '#/definitions/v1Integrator'
@@ -936,16 +925,9 @@ definitions:
       or:
         description: Logical OR.
         $ref: '#/definitions/v1Or'
-      promql:
-        description: Periodically runs a Prometheus query in the background and emits
-          the result.
-        $ref: '#/definitions/v1PromQL'
       pulse_generator:
         description: Generates 0 and 1 in turns.
         $ref: '#/definitions/v1PulseGenerator'
-      rate_limiter:
-        description: Rate Limiter provides service protection by applying rate limiter.
-        $ref: '#/definitions/v1RateLimiter'
       sqrt:
         description: Takes an input signal and emits the square root of the input
           signal.
@@ -1675,6 +1657,33 @@ definitions:
       signal_name:
         description: Name of the incoming Signal on the InPort.
         type: string
+  v1Integration:
+    description: Integration are components that are used to integrate with external
+      systems.
+    type: object
+    properties:
+      aimd_concurrency_controller:
+        description: AIMD Concurrency control component is based on Additive Increase
+          and Multiplicative Decrease of Concurrency. It takes a signal and setpoint
+          as inputs and reduces concurrency limits proportionally (or any arbitrary
+          power) based on deviation of the signal from setpoint. Internally implemented
+          as a nested circuit.
+        $ref: '#/definitions/v1AIMDConcurrencyController'
+      concurrency_limiter:
+        description: Concurrency Limiter provides service protection by applying prioritized
+          load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
+        $ref: '#/definitions/v1ConcurrencyLimiter'
+      horizontal_pod_scaler:
+        description: HorizontalPodScaler provides pod horizontal scaling functionality
+          for scalable Kubernetes resources.
+        $ref: '#/definitions/v1HorizontalPodScaler'
+      promql:
+        description: Periodically runs a Prometheus query in the background and emits
+          the result.
+        $ref: '#/definitions/v1PromQL'
+      rate_limiter:
+        description: Rate Limiter provides service protection by applying rate limiter.
+        $ref: '#/definitions/v1RateLimiter'
   v1Integrator:
     description: Accumulates sum of signal every tick.
     type: object

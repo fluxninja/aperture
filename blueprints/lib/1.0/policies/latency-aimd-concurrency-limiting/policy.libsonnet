@@ -7,6 +7,7 @@ local circuit = spec.v1.Circuit;
 local classifier = spec.v1.Classifier;
 local flowSelector = spec.v1.FlowSelector;
 local component = spec.v1.Component;
+local integration = spec.v1.Integration;
 local promQL = spec.v1.PromQL;
 local port = spec.v1.Port;
 local combinator = spec.v1.ArithmeticCombinator;
@@ -44,12 +45,15 @@ function(params) {
       + circuit.withEvaluationInterval(evaluation_interval='0.5s')
       + circuit.withComponents(
         [
-          component.withPromql(
-            local q = 'sum(increase(flux_meter_sum{valid="true", flow_status="OK", flux_meter_name="%(policyName)s"}[5s]))/sum(increase(flux_meter_count{valid="true", flow_status="OK", flux_meter_name="%(policyName)s"}[5s]))' % { policyName: $._config.policyName };
-            promQL.new()
-            + promQL.withQueryString(q)
-            + promQL.withEvaluationInterval('1s')
-            + promQL.withOutPorts({ output: port.withSignalName('LATENCY') }),
+          component.withIntegration(
+            integration.new()
+            + integration.withPromql(
+              local q = 'sum(increase(flux_meter_sum{valid="true", flow_status="OK", flux_meter_name="%(policyName)s"}[5s]))/sum(increase(flux_meter_count{valid="true", flow_status="OK", flux_meter_name="%(policyName)s"}[5s]))' % { policyName: $._config.policyName };
+              promQL.new()
+              + promQL.withQueryString(q)
+              + promQL.withEvaluationInterval('1s')
+              + promQL.withOutPorts({ output: port.withSignalName('LATENCY') }),
+            ),
           ),
           component.withArithmeticCombinator(combinator.mul(port.withSignalName('LATENCY'),
                                                             port.withConstantSignal(c.latencyEMALimitMultiplier),
@@ -68,44 +72,47 @@ function(params) {
             )
             + ema.withOutPortsMixin(ema.outPorts.withOutput(port.withSignalName('LATENCY_EMA')))
           ),
-          component.withAimdConcurrencyController(
-            aimdConcurrencyController.new()
-            + aimdConcurrencyController.withFlowSelector($._config.concurrencyLimiterFlowSelector)
-            + aimdConcurrencyController.withSchedulerParameters(
-              schedulerParameters.new()
-              + schedulerParameters.withAutoTokens($._config.concurrencyLimiter.autoTokens)
-              + schedulerParameters.withTimeoutFactor($._config.concurrencyLimiter.timeoutFactor)
-              + schedulerParameters.withDefaultWorkloadParameters($._config.concurrencyLimiter.defaultWorkloadParameters)
-              + schedulerParameters.withWorkloads($._config.concurrencyLimiter.workloads)
-            )
-            + aimdConcurrencyController.withGradientParameters(
-              local g = $._config.gradient;
-              gradientParameters.new()
-              + gradientParameters.withSlope(g.slope)
-              + gradientParameters.withMinGradient(g.minGradient)
-              + gradientParameters.withMaxGradient(g.maxGradient)
-            )
-            + aimdConcurrencyController.withConcurrencyLimitMultiplier(c.concurrencyLimitMultiplier)
-            + aimdConcurrencyController.withConcurrencyLinearIncrement(c.concurrencyLinearIncrement)
-            + aimdConcurrencyController.withConcurrencySqrtIncrementMultiplier(c.concurrencySQRTIncrementMultiplier)
-            + aimdConcurrencyController.withAlerterConfig(
-              alerterConfig.new()
-              + alerterConfig.withAlertName($._config.concurrencyLimiter.alerterName)
-              + alerterConfig.withAlertChannels($._config.concurrencyLimiter.alerterChannels)
-              + alerterConfig.withResolveTimeout($._config.concurrencyLimiter.alerterResolveTimeout)
-            )
-            + aimdConcurrencyController.withDryRunDynamicConfigKey('concurrency_limiter')
-            + aimdConcurrencyController.withInPorts({
-              signal: port.withSignalName('LATENCY'),
-              setpoint: port.withSignalName('LATENCY_SETPOINT'),
-            })
-            + aimdConcurrencyController.withOutPorts({
-              accepted_concurrency: port.withSignalName('ACCEPTED_CONCURRENCY'),
-              incoming_concurrency: port.withSignalName('INCOMING_CONCURRENCY'),
-              desired_concurrency: port.withSignalName('DESIRED_CONCURRENCY'),
-              is_overload: port.withSignalName('IS_OVERLOAD'),
-              load_multiplier: port.withSignalName('LOAD_MULTIPLIER'),
-            }),
+          component.withIntegration(
+            integration.new()
+            + integration.withAimdConcurrencyController(
+              aimdConcurrencyController.new()
+              + aimdConcurrencyController.withFlowSelector($._config.concurrencyLimiterFlowSelector)
+              + aimdConcurrencyController.withSchedulerParameters(
+                schedulerParameters.new()
+                + schedulerParameters.withAutoTokens($._config.concurrencyLimiter.autoTokens)
+                + schedulerParameters.withTimeoutFactor($._config.concurrencyLimiter.timeoutFactor)
+                + schedulerParameters.withDefaultWorkloadParameters($._config.concurrencyLimiter.defaultWorkloadParameters)
+                + schedulerParameters.withWorkloads($._config.concurrencyLimiter.workloads)
+              )
+              + aimdConcurrencyController.withGradientParameters(
+                local g = $._config.gradient;
+                gradientParameters.new()
+                + gradientParameters.withSlope(g.slope)
+                + gradientParameters.withMinGradient(g.minGradient)
+                + gradientParameters.withMaxGradient(g.maxGradient)
+              )
+              + aimdConcurrencyController.withConcurrencyLimitMultiplier(c.concurrencyLimitMultiplier)
+              + aimdConcurrencyController.withConcurrencyLinearIncrement(c.concurrencyLinearIncrement)
+              + aimdConcurrencyController.withConcurrencySqrtIncrementMultiplier(c.concurrencySQRTIncrementMultiplier)
+              + aimdConcurrencyController.withAlerterConfig(
+                alerterConfig.new()
+                + alerterConfig.withAlertName($._config.concurrencyLimiter.alerterName)
+                + alerterConfig.withAlertChannels($._config.concurrencyLimiter.alerterChannels)
+                + alerterConfig.withResolveTimeout($._config.concurrencyLimiter.alerterResolveTimeout)
+              )
+              + aimdConcurrencyController.withDryRunDynamicConfigKey('concurrency_limiter')
+              + aimdConcurrencyController.withInPorts({
+                signal: port.withSignalName('LATENCY'),
+                setpoint: port.withSignalName('LATENCY_SETPOINT'),
+              })
+              + aimdConcurrencyController.withOutPorts({
+                accepted_concurrency: port.withSignalName('ACCEPTED_CONCURRENCY'),
+                incoming_concurrency: port.withSignalName('INCOMING_CONCURRENCY'),
+                desired_concurrency: port.withSignalName('DESIRED_CONCURRENCY'),
+                is_overload: port.withSignalName('IS_OVERLOAD'),
+                load_multiplier: port.withSignalName('LOAD_MULTIPLIER'),
+              }),
+            ),
           ),
         ] + $._config.components,
       ),

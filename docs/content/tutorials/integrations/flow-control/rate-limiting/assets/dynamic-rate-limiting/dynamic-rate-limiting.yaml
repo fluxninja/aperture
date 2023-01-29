@@ -10,15 +10,16 @@ metadata:
 spec:
   circuit:
     components:
-      - promql:
-          evaluation_interval: 1s
-          out_ports:
-            output:
-              signal_name: LATENCY
-          query_string:
-            sum(increase(flux_meter_sum{valid="true", flow_status="OK",
-            flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{valid="true",
-            flow_status="OK", flux_meter_name="service1-demo-app"}[5s]))
+      - integration:
+          promql:
+            evaluation_interval: 1s
+            out_ports:
+              output:
+                signal_name: LATENCY
+            query_string:
+              sum(increase(flux_meter_sum{valid="true", flow_status="OK",
+              flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{valid="true",
+              flow_status="OK", flux_meter_name="service1-demo-app"}[5s]))
       - arithmetic_combinator:
           in_ports:
             lhs:
@@ -53,57 +54,58 @@ spec:
             output:
               signal_name: LATENCY_EMA
           warmup_window: 60s
-      - aimd_concurrency_controller:
-          alerter_config:
-            alert_channels: []
-            alert_name: Load Shed Event
-            resolve_timeout: 5s
-          concurrency_limit_multiplier: "2.0"
-          concurrency_linear_increment: "5.0"
-          concurrency_sqrt_increment_multiplier: "1"
-          dry_run_dynamic_config_key: concurrency_limiter
-          flow_selector:
-            flow_matcher:
-              control_point: ingress
-            service_selector:
-              agent_group: default
-              service: service1-demo-app.demoapp.svc.cluster.local
-          gradient_parameters:
-            max_gradient: "1.0"
-            min_gradient: "0.1"
-            slope: "-1"
-          in_ports:
-            setpoint:
-              signal_name: LATENCY_SETPOINT
-            signal:
-              signal_name: LATENCY
-          out_ports:
-            accepted_concurrency:
-              signal_name: ACCEPTED_CONCURRENCY
-            desired_concurrency:
-              signal_name: DESIRED_CONCURRENCY
-            incoming_concurrency:
-              signal_name: INCOMING_CONCURRENCY
-            is_overload:
-              signal_name: IS_OVERLOAD
-            load_multiplier:
-              signal_name: LOAD_MULTIPLIER
-          scheduler_parameters:
-            auto_tokens: true
-            default_workload_parameters:
-              priority: 20
-            timeout_factor: 0.5
-            workloads:
-              - label_matcher:
-                  match_labels:
-                    user_type: guest
-                workload_parameters:
-                  priority: 50
-              - label_matcher:
-                  match_labels:
-                    http.request.header.user_type: subscriber
-                workload_parameters:
-                  priority: 200
+      - integration:
+          aimd_concurrency_controller:
+            alerter_config:
+              alert_channels: []
+              alert_name: Load Shed Event
+              resolve_timeout: 5s
+            concurrency_limit_multiplier: "2.0"
+            concurrency_linear_increment: "5.0"
+            concurrency_sqrt_increment_multiplier: "1"
+            dry_run_dynamic_config_key: concurrency_limiter
+            flow_selector:
+              flow_matcher:
+                control_point: ingress
+              service_selector:
+                agent_group: default
+                service: service1-demo-app.demoapp.svc.cluster.local
+            gradient_parameters:
+              max_gradient: "1.0"
+              min_gradient: "0.1"
+              slope: "-1"
+            in_ports:
+              setpoint:
+                signal_name: LATENCY_SETPOINT
+              signal:
+                signal_name: LATENCY
+            out_ports:
+              accepted_concurrency:
+                signal_name: ACCEPTED_CONCURRENCY
+              desired_concurrency:
+                signal_name: DESIRED_CONCURRENCY
+              incoming_concurrency:
+                signal_name: INCOMING_CONCURRENCY
+              is_overload:
+                signal_name: IS_OVERLOAD
+              load_multiplier:
+                signal_name: LOAD_MULTIPLIER
+            scheduler_parameters:
+              auto_tokens: true
+              default_workload_parameters:
+                priority: 20
+              timeout_factor: 0.5
+              workloads:
+                - label_matcher:
+                    match_labels:
+                      user_type: guest
+                  workload_parameters:
+                    priority: 50
+                - label_matcher:
+                    match_labels:
+                      http.request.header.user_type: subscriber
+                  workload_parameters:
+                    priority: 200
       - decider:
           in_ports:
             lhs:
@@ -129,22 +131,23 @@ spec:
           out_ports:
             output:
               signal_name: RATE_LIMIT
-      - rate_limiter:
-          dynamic_config_key: rate_limiter
-          flow_selector:
-            flow_matcher:
-              control_point: ingress
-              label_matcher:
-                match_labels:
-                  http.request.header.user_type: bot
-            service_selector:
-              agent_group: default
-              service: service1-demo-app.demoapp.svc.cluster.local
-          in_ports:
-            limit:
-              signal_name: RATE_LIMIT
-          label_key: http.request.header.user_id
-          limit_reset_interval: 1s
+      - integration:
+          rate_limiter:
+            dynamic_config_key: rate_limiter
+            flow_selector:
+              flow_matcher:
+                control_point: ingress
+                label_matcher:
+                  match_labels:
+                    http.request.header.user_type: bot
+              service_selector:
+                agent_group: default
+                service: service1-demo-app.demoapp.svc.cluster.local
+            in_ports:
+              limit:
+                signal_name: RATE_LIMIT
+            label_key: http.request.header.user_id
+            limit_reset_interval: 1s
     evaluation_interval: 0.5s
   resources:
     classifiers:

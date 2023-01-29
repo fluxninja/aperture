@@ -2,6 +2,7 @@ local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.l
 
 local policy = aperture.spec.v1.Policy;
 local component = aperture.spec.v1.Component;
+local integration = aperture.spec.v1.Integration;
 local flowSelector = aperture.spec.v1.FlowSelector;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowMatcher = aperture.spec.v1.FlowMatcher;
@@ -37,12 +38,15 @@ local policyDef =
     circuit.new()
     + circuit.withEvaluationInterval('0.5s')
     + circuit.withComponents([
-      component.withPromql(
-        local q = 'sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED", flow_status="OK", flux_meter_name="test"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED", flow_status="OK", flux_meter_name="test"}[5s]))';
-        promQL.new()
-        + promQL.withQueryString(q)
-        + promQL.withEvaluationInterval('1s')
-        + promQL.withOutPorts({ output: port.withSignalName('LATENCY') }),
+      component.withIntegration(
+        integration.new()
+        + integration.withPromql(
+          local q = 'sum(increase(flux_meter_sum{decision_type!="DECISION_TYPE_REJECTED", flow_status="OK", flux_meter_name="test"}[5s]))/sum(increase(flux_meter_count{decision_type!="DECISION_TYPE_REJECTED", flow_status="OK", flux_meter_name="test"}[5s]))';
+          promQL.new()
+          + promQL.withQueryString(q)
+          + promQL.withEvaluationInterval('1s')
+          + promQL.withOutPorts({ output: port.withSignalName('LATENCY') }),
+        ),
       ),
       component.withEma(
         ema.withEmaWindow('1500s')

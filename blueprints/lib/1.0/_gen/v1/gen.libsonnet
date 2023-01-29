@@ -62,6 +62,7 @@
   HolderOuts: import 'holderouts.libsonnet',
   HorizontalPodScaler: import 'horizontalpodscaler.libsonnet',
   InPort: import 'inport.libsonnet',
+  Integration: import 'integration.libsonnet',
   Integrator: import 'integrator.libsonnet',
   IntegratorIns: import 'integratorins.libsonnet',
   IntegratorOuts: import 'integratorouts.libsonnet',
