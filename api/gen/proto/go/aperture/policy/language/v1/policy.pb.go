@@ -6533,11 +6533,28 @@ type AIMDConcurrencyController_Outs struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Accepted concurrency is the number of accepted tokens per second.
+	//
+	// :::info
+	// **Accepted tokens** are tokens associated with
+	// [flows](/concepts/integrations/flow-control/flow-control.md#flow) that were accepted by
+	// this scheduler. Number of tokens for a flow is determined by a
+	// [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
+	// via `auto_tokens` or explicitly by `Workload.tokens`).
+	// :::
+	//
+	// Value of this signal is the sum across all the relevant schedulers.
 	AcceptedConcurrency *OutPort `protobuf:"bytes,1,opt,name=accepted_concurrency,json=acceptedConcurrency,proto3" json:"accepted_concurrency,omitempty"`
+	// Incoming concurrency is the number of incoming tokens/sec.
+	// This is the same as `accepted_concurrency`, but across all the flows
+	// entering scheduler, including rejected ones.
 	IncomingConcurrency *OutPort `protobuf:"bytes,2,opt,name=incoming_concurrency,json=incomingConcurrency,proto3" json:"incoming_concurrency,omitempty"`
-	DesiredConcurrency  *OutPort `protobuf:"bytes,3,opt,name=desired_concurrency,json=desiredConcurrency,proto3" json:"desired_concurrency,omitempty"`
-	IsOverload          *OutPort `protobuf:"bytes,4,opt,name=is_overload,json=isOverload,proto3" json:"is_overload,omitempty"`
-	LoadMultiplier      *OutPort `protobuf:"bytes,5,opt,name=load_multiplier,json=loadMultiplier,proto3" json:"load_multiplier,omitempty"`
+	// Desired concurrency is the number of tokens per second that the should be accepted.
+	DesiredConcurrency *OutPort `protobuf:"bytes,3,opt,name=desired_concurrency,json=desiredConcurrency,proto3" json:"desired_concurrency,omitempty"`
+	// Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
+	IsOverload *OutPort `protobuf:"bytes,4,opt,name=is_overload,json=isOverload,proto3" json:"is_overload,omitempty"`
+	// Load multiplier is the ratio of desired concurrency to the incoming concurrency.
+	LoadMultiplier *OutPort `protobuf:"bytes,5,opt,name=load_multiplier,json=loadMultiplier,proto3" json:"load_multiplier,omitempty"`
 }
 
 func (x *AIMDConcurrencyController_Outs) Reset() {

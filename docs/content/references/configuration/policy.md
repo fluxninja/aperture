@@ -514,31 +514,43 @@ Outputs for the AIMDConcurrencyController component.
 <dt>accepted_concurrency</dt>
 <dd>
 
-([V1OutPort](#v1-out-port))
+([V1OutPort](#v1-out-port)) Accepted concurrency is the number of accepted tokens per second.
+
+:::info
+**Accepted tokens** are tokens associated with
+[flows](/concepts/integrations/flow-control/flow-control.md#flow) that were accepted by
+this scheduler. Number of tokens for a flow is determined by a
+[workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
+via `auto_tokens` or explicitly by `Workload.tokens`).
+:::
+
+Value of this signal is the sum across all the relevant schedulers.
 
 </dd>
 <dt>incoming_concurrency</dt>
 <dd>
 
-([V1OutPort](#v1-out-port))
+([V1OutPort](#v1-out-port)) Incoming concurrency is the number of incoming tokens/sec.
+This is the same as `accepted_concurrency`, but across all the flows
+entering scheduler, including rejected ones.
 
 </dd>
 <dt>desired_concurrency</dt>
 <dd>
 
-([V1OutPort](#v1-out-port))
+([V1OutPort](#v1-out-port)) Desired concurrency is the number of tokens per second that the should be accepted.
 
 </dd>
 <dt>is_overload</dt>
 <dd>
 
-([V1OutPort](#v1-out-port))
+([V1OutPort](#v1-out-port)) Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
 
 </dd>
 <dt>load_multiplier</dt>
 <dd>
 
-([V1OutPort](#v1-out-port))
+([V1OutPort](#v1-out-port)) Load multiplier is the ratio of desired concurrency to the incoming concurrency.
 
 </dd>
 </dl>
