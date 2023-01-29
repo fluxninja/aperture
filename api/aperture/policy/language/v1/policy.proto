@@ -221,7 +221,7 @@ message Component {
     NestedSignalEgress nested_signal_egress = 26;
 
     // AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
-    AIMDConcurrencyController aimd_concurrency_controller = 27;
+    AIMDConcurrencyController aimd_concurrency_controller = 100;
   }
 }
 

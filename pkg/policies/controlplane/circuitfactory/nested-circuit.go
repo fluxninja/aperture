@@ -1,9 +1,11 @@
 package circuitfactory
 
 import (
+	"encoding/json"
 	"strings"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
@@ -19,9 +21,21 @@ const NestedCircuitDelimiter = "."
 // ParseNestedCircuit parses a nested circuit and returns the parent, leaf components, and options.
 func ParseNestedCircuit(
 	nestedCircuitID string,
-	nestedCircuitProto *policylangv1.NestedCircuit,
+	nestedCircuit *policylangv1.NestedCircuit,
 	policyReadAPI iface.Policy,
 ) ([]runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
+	// serialize to jsonBytes
+	jsonBytes, err := json.Marshal(nestedCircuit)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	// unmarshal using our config layer to make sure defaults and validates happen
+	nestedCircuitProto := &policylangv1.NestedCircuit{}
+	err = config.UnmarshalJSON(jsonBytes, nestedCircuitProto)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
 	portMapping := runtime.NewPortMapping()
 	parentCircuitID := ParentCircuitID(nestedCircuitID)
 
