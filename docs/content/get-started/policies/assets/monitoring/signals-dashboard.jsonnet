@@ -1,6 +1,6 @@
 local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.libsonnet';
 
-local signalsDashboard = aperture.blueprints.SignalsDashboard.dashboard({
+local signalsDashboard = aperture.dashboards.SignalsDashboard.dashboard({
   policyName: 'signal-processing',
   datasource+: {
     name: 'controller-prometheus',

@@ -1,6 +1,6 @@
 local aperture = import 'blueprints/lib/1.0/main.libsonnet';
 
-local latencyGradientPolicy = aperture.blueprints.LatencyGradientConcurrencyLimiting.policy;
+local latencyAIMDPolicy = aperture.policies.LatencyAIMDConcurrencyLimiting.policy;
 
 local workloadParameters = aperture.spec.v1.SchedulerParametersWorkloadParameters;
 local labelMatcher = aperture.spec.v1.LabelMatcher;
@@ -60,7 +60,7 @@ local rateLimiterSelector =
     )
   );
 
-local policyResource = latencyGradientPolicy({
+local policyResource = latencyAIMDPolicy({
   policyName: 'service1-demo-app',
   fluxMeter: fluxMeter.new() + fluxMeter.withFlowSelector(fluxMeterSelector),
   concurrencyLimiterFlowSelector: concurrencyLimiterFlowSelector,
@@ -122,5 +122,5 @@ local policyResource = latencyGradientPolicy({
 }).policyResource;
 
 {
-  latencyGradientPolicy: policyResource,
+  latencyAIMDPolicy: policyResource,
 }

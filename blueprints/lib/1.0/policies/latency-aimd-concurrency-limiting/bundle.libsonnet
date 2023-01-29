@@ -1,4 +1,4 @@
-local blueprint = import './latency-gradient-concurrency-limiting.libsonnet';
+local blueprint = import './latency-aimd-concurrency-limiting.libsonnet';
 
 local policy = blueprint.policy;
 local dashboard = blueprint.dashboard;

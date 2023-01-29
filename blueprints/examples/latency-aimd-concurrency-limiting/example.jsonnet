@@ -1,5 +1,5 @@
 local aperture = import '../../lib/1.0/main.libsonnet';
-local bundle = aperture.blueprints.LatencyGradientConcurrencyLimiting.bundle;
+local bundle = aperture.policies.LatencyAIMDConcurrencyLimiting.bundle;
 
 local WorkloadParameters = aperture.spec.v1.SchedulerParametersWorkloadParameters;
 local LabelMatcher = aperture.spec.v1.LabelMatcher;

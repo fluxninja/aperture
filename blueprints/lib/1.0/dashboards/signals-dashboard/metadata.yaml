@@ -2,4 +2,4 @@ blueprint: Signals Dashboard
 sources:
   Dashboard:
     prefix: dashboard
-    path: lib/1.0/blueprints/signals-dashboard/dashboard.libsonnet
+    path: lib/1.0/dashboards/signals-dashboard/dashboard.libsonnet

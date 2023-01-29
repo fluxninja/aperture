@@ -59,7 +59,7 @@ run the following commands to generate an example config:
 ```sh
 cd blueprints/
 jb install
-./scripts/generate-bundle.py --output _gen --config examples/latency-gradient-concurrency-limiting/example.jsonnet
+./scripts/generate-bundle.py --output _gen --config examples/latency-aimd-concurrency-limiting/example.jsonnet
 ```
 
 ## Using Aperture Blueprints as a jsonnet mixins library
@@ -69,9 +69,9 @@ jsonnet project and render Aperture Policies or Grafana Dashboards directly in
 jsonnet. This can be also integrated with other Kubernetes deployment tools like
 [tanka][tk].
 
-For example, to create a Latency Gradient Policy that can be loaded by the
-controller, you need to install Aperture Blueprints library with jsonnet
-bundler:
+For example, to create a Latency based AIMD Concurrency Limiting Policy that can
+be loaded by the controller, you need to install Aperture Blueprints library
+with jsonnet bundler:
 
 ```sh
 jb install github.com/fluxninja/aperture/blueprints@main
@@ -118,7 +118,7 @@ in observation only mode. The decisions are still evaluated which helps
 understand how the policy would behave as the input signals change.
 
 For instance, setting `dynamicConfig.dryRun` option to `true` in the
-latency-gradient-concurrency-limiting blueprint would generate a Dry Run policy.
+latency-aimd-concurrency-limiting blueprint would generate a Dry Run policy.
 
 :::note
 

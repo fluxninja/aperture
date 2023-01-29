@@ -1,21 +1,9 @@
----
-title: Latency Gradient Concurrency Limiting Policy
----
-
-```mdx-code-block
-import {apertureVersion} from '../../apertureVersion.js';
-```
-
-## Blueprint Location
-
-GitHub: <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/lib/1.0/blueprints/latency-gradient-concurrency-limiting`}>latency-gradient-concurrency-limiting</a>
-
-## Introduction
+# Latency Gradient Concurrency Limiting Policy
 
 This policy detect overloads/cascading failures by comparing the real-time
 latency with it's exponential moving average. Gradient controller is then used
 to calculate a proportional response that limits the accepted concurrency.
+Concurrency is increased additively when the overload is no longer detected.
 
 :::info
 
