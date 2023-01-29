@@ -117,12 +117,13 @@ spec:
   circuit:
     evaluation_interval: "0.5s"
     components:
-      - promql:
-          query_string: "sum(increase(flux_meter_sum{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))/sum(increase(flux_meter_count{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))"
-          evaluation_interval: "1s"
-          out_ports:
-            output:
-              signal_name: "LATENCY"
+      - integration:
+          promql:
+            query_string: "sum(increase(flux_meter_sum{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))/sum(increase(flux_meter_count{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))"
+            evaluation_interval: "1s"
+            out_ports:
+              output:
+                signal_name: "LATENCY"
       - variable:
           default_config:
             constant_signal:
@@ -198,37 +199,38 @@ spec:
           out_ports:
             output:
               signal_name: "LOAD_MULTIPLIER"
-      - concurrency_limiter:
-          flow_selector:
-            service_selector:
-              service: "service1-demo-app.demoapp.svc.cluster.local"
-            flow_matcher:
-              control_point: "ingress"
-          scheduler:
-            scheduler_parameters:
-              auto_tokens: true
-              default_workload_parameters:
-                priority: 20
-              workloads:
-                - workload_parameters:
-                    priority: 50
-                  label_matcher:
-                    match_labels:
-                      user_type: "guest"
-                - workload_parameters:
-                    priority: 200
-                  label_matcher:
-                    match_labels:
-                      http.request.header.user_type: "subscriber"
-            out_ports:
-              accepted_concurrency:
-                signal_name: "ACCEPTED_CONCURRENCY"
-              incoming_concurrency:
-                signal_name: "INCOMING_CONCURRENCY"
-          load_actuator:
-            in_ports:
-              load_multiplier:
-                signal_name: "LOAD_MULTIPLIER"
+      - integration:
+          concurrency_limiter:
+            flow_selector:
+              service_selector:
+                service: "service1-demo-app.demoapp.svc.cluster.local"
+              flow_matcher:
+                control_point: "ingress"
+            scheduler:
+              scheduler_parameters:
+                auto_tokens: true
+                default_workload_parameters:
+                  priority: 20
+                workloads:
+                  - workload_parameters:
+                      priority: 50
+                    label_matcher:
+                      match_labels:
+                        user_type: "guest"
+                  - workload_parameters:
+                      priority: 200
+                    label_matcher:
+                      match_labels:
+                        http.request.header.user_type: "subscriber"
+              out_ports:
+                accepted_concurrency:
+                  signal_name: "ACCEPTED_CONCURRENCY"
+                incoming_concurrency:
+                  signal_name: "INCOMING_CONCURRENCY"
+            load_actuator:
+              in_ports:
+                load_multiplier:
+                  signal_name: "LOAD_MULTIPLIER"
       - variable:
           default_config:
             constant_signal:
@@ -388,15 +390,16 @@ spec:
           out_ports:
             output:
               signal_name: "RATE_LIMIT"
-      - rate_limiter:
-          in_ports:
-            limit:
-              signal_name: "RATE_LIMIT"
-          flow_selector:
-            service_selector:
-              service: "service1-demo-app.demoapp.svc.cluster.local"
-            flow_matcher:
-              control_point: "ingress"
-          label_key: "http.request.header.user_type"
-          limit_reset_interval: "1s"
+      - integration:
+          rate_limiter:
+            in_ports:
+              limit:
+                signal_name: "RATE_LIMIT"
+            flow_selector:
+              service_selector:
+                service: "service1-demo-app.demoapp.svc.cluster.local"
+              flow_matcher:
+                control_point: "ingress"
+            label_key: "http.request.header.user_type"
+            limit_reset_interval: "1s"
 `
