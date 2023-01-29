@@ -1,0 +1,8 @@
+label: Dashboards
+position: 2
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Dashboards"
+  keywords: ["blueprints"]

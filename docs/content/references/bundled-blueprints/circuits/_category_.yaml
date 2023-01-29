@@ -1,0 +1,8 @@
+label: Circuits
+position: 3
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Circuits"
+  keywords: ["blueprints"]

@@ -1,0 +1,5 @@
+blueprint: AIMD Concurrency Limiter
+sources:
+  Circuit:
+    prefix: circuit
+    path: lib/1.0/circuits/aimd-concurrency-controller/circuit.libsonnet

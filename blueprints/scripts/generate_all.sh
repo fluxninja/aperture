@@ -23,18 +23,24 @@ pushd "${blueprints_root}" >/dev/null
 jb install
 popd >/dev/null
 
-# remove md files in docs
-rm "${blueprints_root}"/../docs/content/references/bundled-blueprints/*.md || true
+# remove md files in "${blueprints_root}"/../docs/content/references/bundled-blueprints and subdirectories
+$FIND "${blueprints_root}"/../docs/content/references/bundled-blueprints -type f -name '*.md' -delete
 
 # for all subdirectories within "$blueprints_root"/lib containing config.libsonnet, generate README
-$FIND "$blueprints_root"/lib -type f -name config.libsonnet | while read -r files; do
+$FIND "$blueprints_root"/lib/1.0 -type f -name config.libsonnet | while read -r files; do
 	dir=$(dirname "$files")
 	echo "Generating README for $dir"
 	python "${blueprints_root}"/scripts/blueprint-readme-generator.py "$dir"
 	npx prettier --write "$dir"/README.md
 	# extract the name of the blueprint from the path
 	blueprint_name=$(basename "$dir")
-	docs_file="${blueprints_root}"/../docs/content/references/bundled-blueprints/"$blueprint_name".md
+	# extract the relative path from the "$blueprints_root"/lib/1.0
+	# shellcheck disable=SC2001
+	relative_path=$(echo "$dir" | sed "s|$blueprints_root/lib/1.0/||")
+	blueprint_dir=$(dirname "$relative_path")
+	docs_dir="${blueprints_root}"/../docs/content/references/bundled-blueprints/"$blueprint_dir"
+	mkdir -p "$docs_dir"
+	docs_file="$docs_dir"/"$blueprint_name".md
 	# generate docs
 	echo "Generating $blueprint_name.md"
 	# generate docusaurus frontmatter
@@ -48,11 +54,11 @@ $FIND "$blueprints_root"/lib -type f -name config.libsonnet | while read -r file
 	echo -e "\n" >>"$docs_file"
 	# add mdx code block
 	echo -e "\`\`\`mdx-code-block" >>"$docs_file"
-	echo -e "import {apertureVersion} from '../../apertureVersion.js';" >>"$docs_file"
+	echo -e "import {apertureVersion} from '../../../apertureVersion.js';" >>"$docs_file"
 	echo -e "\`\`\`" >>"$docs_file"
 	echo "## Blueprint Location" >>"$docs_file"
 	echo -e "\n" >>"$docs_file"
-	echo "GitHub: <a href={\`https://github.com/fluxninja/aperture/tree/\${apertureVersion}/blueprints/lib/1.0/blueprints/$blueprint_name\`}>$blueprint_name</a>" >>"$docs_file"
+	echo "GitHub: <a href={\`https://github.com/fluxninja/aperture/tree/\${apertureVersion}/blueprints/lib/1.0/$blueprint_dir/$blueprint_name\`}>$blueprint_name</a>" >>"$docs_file"
 	echo -e "\n" >>"$docs_file"
 	echo "## Introduction" >>"$docs_file"
 	echo -e "\n" >>"$docs_file"
