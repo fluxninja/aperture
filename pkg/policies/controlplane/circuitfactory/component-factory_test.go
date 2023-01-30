@@ -12,13 +12,14 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
 var _ = Describe("Component factory", func() {
 	Context("With unimplemented component type", func() {
 		compProto := &policylangv1.Component{}
 		It("Returns error if component type is not one of specified", func() {
-			_, _, _, err := circuitfactory.NewComponentAndOptions(compProto, "root.0", nil)
+			_, _, _, err := circuitfactory.NewComponentAndOptions(compProto, runtime.NewComponentID("root.0"), nil)
 			Expect(err).To(HaveOccurred())
 		})
 	})

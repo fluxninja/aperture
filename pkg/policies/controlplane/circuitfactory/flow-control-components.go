@@ -14,10 +14,13 @@ import (
 // newFlowControlCompositeAndOptions creates parent and leaf components and their fx options for a component stack spec.
 func newFlowControlCompositeAndOptions(
 	flowControlComponentProto *policylangv1.FlowControl,
-	componentID string,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) ([]runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
-	parentCircuitID := ParentCircuitID(componentID)
+	parentCircuitID, ok := componentID.ParentID()
+	if !ok {
+		return nil, nil, nil, fmt.Errorf("parent circuit ID not found for component %s", componentID)
+	}
 	// Factory parser to determine what kind of composite component to create
 	if concurrencyLimiterProto := flowControlComponentProto.GetConcurrencyLimiter(); concurrencyLimiterProto != nil {
 		var (
@@ -25,7 +28,7 @@ func newFlowControlCompositeAndOptions(
 			options              []fx.Option
 		)
 		portMapping := runtime.NewPortMapping()
-		concurrencyLimiterOptions, agentGroupName, concurrencyLimiterErr := concurrency.NewConcurrencyLimiterOptions(concurrencyLimiterProto, componentID, policyReadAPI)
+		concurrencyLimiterOptions, agentGroupName, concurrencyLimiterErr := concurrency.NewConcurrencyLimiterOptions(concurrencyLimiterProto, componentID.String(), policyReadAPI)
 		if concurrencyLimiterErr != nil {
 			return nil, nil, nil, concurrencyLimiterErr
 		}
@@ -34,13 +37,13 @@ func newFlowControlCompositeAndOptions(
 		// Scheduler
 		if schedulerProto := concurrencyLimiterProto.GetScheduler(); schedulerProto != nil {
 			// Use the same id as the component stack since agent sees only the component stack and generates metrics tagged with the component stack id
-			scheduler, schedulerOptions, err := concurrency.NewSchedulerAndOptions(schedulerProto, componentID, policyReadAPI, agentGroupName)
+			scheduler, schedulerOptions, err := concurrency.NewSchedulerAndOptions(schedulerProto, componentID.String(), policyReadAPI, agentGroupName)
 			if err != nil {
 				return nil, nil, nil, err
 			}
 
 			// Need a unique ID for sub component since it's used for graph generation
-			schedulerConfComp, err := prepareComponentInCircuit(scheduler, schedulerProto, componentID+".Scheduler", parentCircuitID)
+			schedulerConfComp, err := prepareComponentInCircuit(scheduler, schedulerProto, componentID.ChildID("Scheduler"), parentCircuitID)
 			if err != nil {
 				return nil, nil, nil, err
 			}
@@ -58,12 +61,12 @@ func newFlowControlCompositeAndOptions(
 
 		// Actuation Strategy
 		if loadActuatorProto := concurrencyLimiterProto.GetLoadActuator(); loadActuatorProto != nil {
-			loadActuator, loadActuatorOptions, err := concurrency.NewLoadActuatorAndOptions(loadActuatorProto, componentID, policyReadAPI, agentGroupName)
+			loadActuator, loadActuatorOptions, err := concurrency.NewLoadActuatorAndOptions(loadActuatorProto, componentID.String(), policyReadAPI, agentGroupName)
 			if err != nil {
 				return nil, nil, nil, err
 			}
 
-			loadActuatorConfComp, err := prepareComponentInCircuit(loadActuator, loadActuatorProto, componentID+".LoadActuator", parentCircuitID)
+			loadActuatorConfComp, err := prepareComponentInCircuit(loadActuator, loadActuatorProto, componentID.ChildID(".LoadActuator"), parentCircuitID)
 			if err != nil {
 				return nil, nil, nil, err
 			}

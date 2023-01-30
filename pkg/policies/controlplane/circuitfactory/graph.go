@@ -34,7 +34,7 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 						Looped:   signal.Looped,
 					})
 					inSignalsIndex[signalName] = append(inSignalsIndex[signalName], componentData{
-						componentID: c.ComponentID,
+						componentID: c.ComponentID.String(),
 						portName:    name,
 					})
 				} else if signal.SignalType() == runtime.SignalTypeConstant {
@@ -54,7 +54,7 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 					Looped:   signal.Looped,
 				})
 				outSignalsIndex[signalName] = append(outSignalsIndex[signalName], componentData{
-					componentID: c.ComponentID,
+					componentID: c.ComponentID.String(),
 					portName:    name,
 				})
 			}
@@ -114,7 +114,7 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 		}
 
 		componentsDTO = append(componentsDTO, &policymonitoringv1.ComponentView{
-			ComponentId:          c.ComponentID,
+			ComponentId:          c.ComponentID.String(),
 			ComponentName:        componentName,
 			ComponentDescription: componentDescription,
 			ComponentType:        string(c.Type()),

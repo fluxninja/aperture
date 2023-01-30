@@ -36,7 +36,7 @@ func CompileFromProto(
 	componentsProto []*policylangv1.Component,
 	policyReadAPI iface.Policy,
 ) (*Circuit, fx.Option, error) {
-	parentComponents, leafComponents, option, err := CreateComponents(componentsProto, "root", policyReadAPI)
+	parentComponents, leafComponents, option, err := CreateComponents(componentsProto, runtime.NewComponentID("root"), policyReadAPI)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -61,7 +61,7 @@ func CompileFromProto(
 // components in componentsProto, as some components may be composite multi-component stacks or nested circuits.
 func CreateComponents(
 	componentsProto []*policylangv1.Component,
-	circuitID string,
+	circuitID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) ([]runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
 	var (
@@ -73,7 +73,7 @@ func CreateComponents(
 	for compIndex, componentProto := range componentsProto {
 		parentComps, leafComps, compOption, err := NewComponentAndOptions(
 			componentProto,
-			ComponentID(circuitID, compIndex),
+			circuitID.ChildID(strconv.Itoa(compIndex)),
 			policyReadAPI,
 		)
 		if err != nil {
@@ -89,9 +89,4 @@ func CreateComponents(
 	}
 
 	return parentComponents, leafComponents, fx.Options(options...), nil
-}
-
-// ComponentID returns the ID for a component within a circuit at componentIndex.
-func ComponentID(circuitID string, componentIndex int) string {
-	return circuitID + NestedCircuitDelimiter + strconv.Itoa(componentIndex)
 }

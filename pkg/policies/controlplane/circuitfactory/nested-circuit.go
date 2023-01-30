@@ -2,7 +2,6 @@ package circuitfactory
 
 import (
 	"encoding/json"
-	"strings"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -15,12 +14,9 @@ import (
 	"go.uber.org/fx"
 )
 
-// NestedCircuitDelimiter is the delimiter used to separate the parent circuit ID and the nested circuit ID.
-const NestedCircuitDelimiter = "."
-
 // ParseNestedCircuit parses a nested circuit and returns the parent, leaf components, and options.
 func ParseNestedCircuit(
-	nestedCircuitID string,
+	nestedCircuitID runtime.ComponentID,
 	nestedCircuit *policylangv1.NestedCircuit,
 	policyReadAPI iface.Policy,
 ) ([]runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
@@ -37,16 +33,19 @@ func ParseNestedCircuit(
 	}
 
 	portMapping := runtime.NewPortMapping()
-	parentCircuitID := ParentCircuitID(nestedCircuitID)
+	parentCircuitID, ok := nestedCircuitID.ParentID()
+	if !ok {
+		return nil, nil, nil, errors.Errorf("nested circuit %s does not have a parent circuit", nestedCircuitID)
+	}
 
 	inPortsMap := nestedCircuitProto.GetInPortsMap()
-	ins, err := DecodePortMap(inPortsMap, parentCircuitID)
+	ins, err := DecodePortMap(inPortsMap, parentCircuitID.String())
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
 	outPortsMap := nestedCircuitProto.GetOutPortsMap()
-	outs, err := DecodePortMap(outPortsMap, parentCircuitID)
+	outs, err := DecodePortMap(outPortsMap, parentCircuitID.String())
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -123,13 +122,6 @@ func ParseNestedCircuit(
 	parentComponents = append(parentComponents, nestedCircConfComp)
 
 	return parentComponents, leafComponents, options, err
-}
-
-// ParentCircuitID returns the parent circuit ID of the given child circuit ID assuming nested circuits are delimited by dots (".").
-func ParentCircuitID(childCircuitID string) string {
-	// Parent Child are delimited by dots. So, we split the child circuit ID by dots and return the first part.
-	// For example, if the child circuit ID is "foo.bar.baz", then the parent circuit ID is "foo.bar".
-	return childCircuitID[:strings.LastIndex(childCircuitID, NestedCircuitDelimiter)]
 }
 
 // DecodePortMap decodes a proto port map into a PortToSignals map.

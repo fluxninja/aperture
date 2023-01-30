@@ -209,7 +209,7 @@ func (rlFactory *rateLimiterFactory) newRateLimiterOptions(
 		rateLimiterFactory: rlFactory,
 		registry:           reg,
 	}
-	rateLimiter.name = iface.ComponentID(rateLimiter)
+	rateLimiter.name = iface.ComponentKey(rateLimiter)
 
 	return fx.Options(
 		fx.Invoke(

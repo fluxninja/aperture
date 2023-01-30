@@ -19,8 +19,9 @@ type ConfiguredComponent struct {
 	// component.  This Config is used only for observability purposes.
 	//
 	// Note: PortMapping is also part of Config.
-	Config      mapstruct.Object
-	ComponentID string
+	Config mapstruct.Object
+	// ComponentID is the unique ID of this component within the circuit.
+	ComponentID ComponentID
 }
 
 // Compile compiles list of configured components into a circuit and validates it.

@@ -33,7 +33,7 @@ func FactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 // NewComponentAndOptions creates parent and leaf components and their fx options for a component spec.
 func NewComponentAndOptions(
 	componentProto *policylangv1.Component,
-	componentID string,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) ([]runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
 	var ctor componentConstructor
@@ -103,7 +103,7 @@ func NewComponentAndOptions(
 		return nil, nil, nil, fmt.Errorf("unknown component type: %T", config)
 	}
 
-	component, config, option, err := ctor(componentID, policyReadAPI)
+	component, config, option, err := ctor(componentID.String(), policyReadAPI)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -134,25 +134,28 @@ func mkCtor[Config any, Comp runtime.Component](
 func prepareComponent(
 	component runtime.Component,
 	config any,
-	componentID string,
+	componentID runtime.ComponentID,
 ) (runtime.ConfiguredComponent, error) {
-	parentCircuitID := ParentCircuitID(componentID)
+	subCircuitID, ok := componentID.ParentID()
+	if !ok {
+		return runtime.ConfiguredComponent{}, fmt.Errorf("component %s is not in a circuit", componentID.String())
+	}
 
-	return prepareComponentInCircuit(component, config, componentID, parentCircuitID)
+	return prepareComponentInCircuit(component, config, componentID, subCircuitID)
 }
 
 func prepareComponentInCircuit(
 	component runtime.Component,
 	config any,
-	componentID string,
-	parentCircuitID string,
+	componentID runtime.ComponentID,
+	subCircuitID runtime.ComponentID,
 ) (runtime.ConfiguredComponent, error) {
 	mapStruct, err := mapstruct.EncodeObject(config)
 	if err != nil {
 		return runtime.ConfiguredComponent{}, err
 	}
 
-	ports, err := runtime.PortsFromComponentConfig(mapStruct, parentCircuitID)
+	ports, err := runtime.PortsFromComponentConfig(mapStruct, subCircuitID.String())
 	if err != nil {
 		return runtime.ConfiguredComponent{}, err
 	}

@@ -22,7 +22,7 @@ const (
 
 // ParseAIMDConcurrencyController parses an AIMD concurrency controller and returns the parent, leaf components, and options.
 func ParseAIMDConcurrencyController(
-	nestedCircuitID string,
+	nestedCircuitID runtime.ComponentID,
 	aimdConcurrencyController *policylangv1.AIMDConcurrencyController,
 	policyReadAPI iface.Policy,
 ) ([]runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {

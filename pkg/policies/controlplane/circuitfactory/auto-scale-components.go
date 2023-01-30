@@ -20,10 +20,13 @@ func autoScaleModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 // newIntegrationCompositeAndOptions creates parent and leaf components and their fx options for a component stack spec.
 func newAutoScaleCompositeAndOptions(
 	autoScaleComponentProto *policylangv1.AutoScale,
-	componentID string,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) ([]runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
-	parentCircuitID := ParentCircuitID(componentID)
+	parentCircuitID, ok := componentID.ParentID()
+	if !ok {
+		return nil, nil, nil, fmt.Errorf("parent circuit ID not found for component %s", componentID)
+	}
 
 	if horizontalPodScalerProto := autoScaleComponentProto.GetHorizontalPodScaler(); horizontalPodScalerProto != nil {
 		var (
@@ -31,7 +34,7 @@ func newAutoScaleCompositeAndOptions(
 			options              []fx.Option
 		)
 		portMapping := runtime.NewPortMapping()
-		horizontalPodScalerOptions, agentGroupName, horizontalPodScalerErr := horizontalpodscaler.NewHorizontalPodScalerOptions(horizontalPodScalerProto, componentID, policyReadAPI)
+		horizontalPodScalerOptions, agentGroupName, horizontalPodScalerErr := horizontalpodscaler.NewHorizontalPodScalerOptions(horizontalPodScalerProto, componentID.String(), policyReadAPI)
 		if horizontalPodScalerErr != nil {
 			return nil, nil, nil, horizontalPodScalerErr
 		}
@@ -39,12 +42,12 @@ func newAutoScaleCompositeAndOptions(
 
 		// Scale Reporter
 		if scaleReporterProto := horizontalPodScalerProto.GetScaleReporter(); scaleReporterProto != nil {
-			scaleReporter, scaleReporterOptions, err := horizontalpodscaler.NewScaleReporterAndOptions(scaleReporterProto, componentID, policyReadAPI, agentGroupName)
+			scaleReporter, scaleReporterOptions, err := horizontalpodscaler.NewScaleReporterAndOptions(scaleReporterProto, componentID.String(), policyReadAPI, agentGroupName)
 			if err != nil {
 				return nil, nil, nil, err
 			}
 
-			scaleReporterConfComp, err := prepareComponentInCircuit(scaleReporter, scaleReporterProto, componentID+".ScaleReporter", parentCircuitID)
+			scaleReporterConfComp, err := prepareComponentInCircuit(scaleReporter, scaleReporterProto, componentID.ChildID("ScaleReporter"), parentCircuitID)
 			if err != nil {
 				return nil, nil, nil, err
 			}
@@ -62,12 +65,12 @@ func newAutoScaleCompositeAndOptions(
 
 		// Scale Actuator
 		if scaleActuatorProto := horizontalPodScalerProto.GetScaleActuator(); scaleActuatorProto != nil {
-			scaleActuator, scaleActuatorOptions, err := horizontalpodscaler.NewScaleActuatorAndOptions(scaleActuatorProto, componentID, policyReadAPI, agentGroupName)
+			scaleActuator, scaleActuatorOptions, err := horizontalpodscaler.NewScaleActuatorAndOptions(scaleActuatorProto, componentID.String(), policyReadAPI, agentGroupName)
 			if err != nil {
 				return nil, nil, nil, err
 			}
 
-			scaleActuatorConfComp, err := prepareComponentInCircuit(scaleActuator, scaleActuatorProto, componentID+".ScaleActuator", parentCircuitID)
+			scaleActuatorConfComp, err := prepareComponentInCircuit(scaleActuator, scaleActuatorProto, componentID.ChildID("ScaleActuator"), parentCircuitID)
 			if err != nil {
 				return nil, nil, nil, err
 			}
