@@ -12,15 +12,11 @@ keywords:
 
 :::info Join the FluxNinja ARC Beta
 
-FluxNinja ARC is inviting beta users. Please sign up
-[here](https://app.fluxninja.com/sign-up)
+[FluxNinja ARC](https://www.fluxninja.com/platform) is a cloud-native
+application reliability center that extends open-source Aperture installation
+with advanced analytics, monitoring and alerting capabilities.
+
+We are inviting beta users. Please sign up
+[here](https://app.fluxninja.com/sign-up).
 
 :::
-
-FluxNinja ARC has the following capabilities:
-
-- Visualizing Aperture Policies.
-- Notifications when Policies trigger alerts or take action.
-- High-cardinality analytics on user experience and application reliability
-  metrics.
-- Monitor health of Aperture installation(s).

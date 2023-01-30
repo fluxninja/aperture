@@ -6,35 +6,35 @@ import (
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
 // AddSDKSpecificLabels adds labels specific to SDK data source.
 func AddSDKSpecificLabels(attributes pcommon.Map) {
 	// Compute durations
-	flowStart, flowStartExists := getSDKLabelTimestampValue(attributes, otelcollector.ApertureFlowStartTimestampLabel)
-	workloadStart, workloadStartExists := getSDKLabelTimestampValue(attributes, otelcollector.ApertureWorkloadStartTimestampLabel)
-	flowEnd, flowEndExists := getSDKLabelTimestampValue(attributes, otelcollector.ApertureFlowEndTimestampLabel)
+	flowStart, flowStartExists := getSDKLabelTimestampValue(attributes, otelconsts.ApertureFlowStartTimestampLabel)
+	workloadStart, workloadStartExists := getSDKLabelTimestampValue(attributes, otelconsts.ApertureWorkloadStartTimestampLabel)
+	flowEnd, flowEndExists := getSDKLabelTimestampValue(attributes, otelconsts.ApertureFlowEndTimestampLabel)
 
 	// Add ResponseReceivedLabel based on whether flowEnd is present
 	if flowEndExists {
-		attributes.PutStr(otelcollector.ResponseReceivedLabel, otelcollector.ResponseReceivedTrue)
+		attributes.PutStr(otelconsts.ResponseReceivedLabel, otelconsts.ResponseReceivedTrue)
 	} else {
-		attributes.PutStr(otelcollector.ResponseReceivedLabel, otelcollector.ResponseReceivedFalse)
+		attributes.PutStr(otelconsts.ResponseReceivedLabel, otelconsts.ResponseReceivedFalse)
 	}
 
 	if flowStartExists && flowEndExists {
 		flowDuration := flowEnd.Sub(flowStart)
-		attributes.PutDouble(otelcollector.FlowDurationLabel, float64(flowDuration.Milliseconds()))
+		attributes.PutDouble(otelconsts.FlowDurationLabel, float64(flowDuration.Milliseconds()))
 	}
 	if workloadStartExists && flowEndExists {
 		workloadDuration := flowEnd.Sub(workloadStart)
-		attributes.PutDouble(otelcollector.WorkloadDurationLabel, float64(workloadDuration.Milliseconds()))
+		attributes.PutDouble(otelconsts.WorkloadDurationLabel, float64(workloadDuration.Milliseconds()))
 	}
 }
 
 func getSDKLabelTimestampValue(attributes pcommon.Map, labelKey string) (time.Time, bool) {
-	return getLabelTimestampValue(attributes, labelKey, otelcollector.ApertureSourceSDK)
+	return getLabelTimestampValue(attributes, labelKey, otelconsts.ApertureSourceSDK)
 }
 
 func getLabelTimestampValue(attributes pcommon.Map, labelKey, source string) (time.Time, bool) {

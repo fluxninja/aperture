@@ -13,6 +13,7 @@ sidebar_position: 3
 
 ```mdx-code-block
 import {apertureVersion} from '../../../../apertureVersion.js';
+import DocCardList from '@theme/DocCardList';
 ```
 
 For services to communicate with Aperture Agent, [Control Points][flow-control]
@@ -37,6 +38,8 @@ Feature is a Flow from the perspective of Aperture.
 
 It also provides middlewares for popular frameworks, allowing you to easily set
 traffic Control Points within your service.
+
+<DocCardList />
 
 [flow-control]: /concepts/integrations/flow-control/flow-control.md
 [istio]: /get-started/integrations/flow-control/envoy/istio.md

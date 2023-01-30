@@ -19,7 +19,7 @@ Some potential usecases are:
 
 Rate Limiter is configured as a [policy][policies] component.
 
-## Distributed Counters
+## Distributed Counters {#distributed-counters}
 
 For each configured [Rate Limiter Component][reference], every matching Aperture
 Agent instantiates a copy of Rate Limiter. They're all sharing counters though,
@@ -27,14 +27,14 @@ so conceptually they work as a single Rate Limiter. That's possible thanks to
 distributed counters, powered by [Agent-to-Agent peer-to-peer
 network][agent-group].
 
-### Lazy Syncing
+### Lazy Syncing {#lazy-syncing}
 
 If lazy syncing is enabled, rate-limiting counters are stored in-memory and
 lazily-syced between Agent instances. Thanks to this, rate-limiting decisions
 can be made without latency overhead at the slight cost of accuracy in
 edge-cases.
 
-## Limits
+## Limits {#limits}
 
 Rate-limiter accepts or rejects incoming flow based on per-label limits
 (configured as number of requests per given period of time). Rate limiting label
@@ -48,7 +48,7 @@ even disabled) on runtime.
 
 :::
 
-### Overrides
+### Overrides {#overrides}
 
 A limit for particular value of a label can be increased via the override
 mechanisms. Eg. you might want to increase the limit for the admin user. See

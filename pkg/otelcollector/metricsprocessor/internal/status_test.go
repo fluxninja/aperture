@@ -7,7 +7,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/metrics"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor/internal"
 )
 
@@ -15,11 +15,11 @@ var _ = Describe("Status", func() {
 	Context("StatusesFromAttributes", func() {
 		It("Read both statuses if exist", func() {
 			attributes := pcommon.NewMap()
-			attributes.PutStr(otelcollector.HTTPStatusCodeLabel, "201")
-			attributes.PutStr(otelcollector.ApertureFlowStatusLabel, otelcollector.ApertureFlowStatusOK)
+			attributes.PutStr(otelconsts.HTTPStatusCodeLabel, "201")
+			attributes.PutStr(otelconsts.ApertureFlowStatusLabel, otelconsts.ApertureFlowStatusOK)
 			statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
 			Expect(statusCode).To(Equal("201"))
-			Expect(flowStatus).To(Equal(otelcollector.ApertureFlowStatusOK))
+			Expect(flowStatus).To(Equal(otelconsts.ApertureFlowStatusOK))
 		})
 
 		It("Defaults to empty if not exist", func() {

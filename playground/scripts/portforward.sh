@@ -36,7 +36,7 @@ curl_args=(
 )
 
 while sleep 1; do
-	kubectl port-forward "${port_forward_args[@]}" &
+	kubectl port-forward --address 0.0.0.0 "${port_forward_args[@]}" &
 	process_id="${!}"
 	trap 'kill "${process_id}"' EXIT
 	sleep "${INITIAL_DELAY}" || break

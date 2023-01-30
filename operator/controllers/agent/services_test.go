@@ -17,7 +17,6 @@ limitations under the License.
 package agent
 
 import (
-	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -29,9 +28,10 @@ import (
 
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
+	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 )
 
 var _ = Describe("Service for Agent", func() {
@@ -50,7 +50,7 @@ var _ = Describe("Service for Agent", func() {
 									Addr: ":8080",
 								},
 							},
-							Otel: otelcollector.OtelConfig{},
+							Otel: otelconfig.UserOTELConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							BindAddr:           ":3320",
@@ -141,7 +141,7 @@ var _ = Describe("Service for Agent", func() {
 									Addr: ":8080",
 								},
 							},
-							Otel: otelcollector.OtelConfig{},
+							Otel: otelconfig.UserOTELConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							BindAddr:           ":3320",

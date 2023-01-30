@@ -12,6 +12,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
 type enrichmentProcessor struct {
@@ -88,13 +89,13 @@ func (ep *enrichmentProcessor) ConsumeMetrics(ctx context.Context, origMd pmetri
 }
 
 func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
-	hostNamex, ok := attributes.Get(otelcollector.EntityNameLabel)
+	hostNamex, ok := attributes.Get(otelconsts.EntityNameLabel)
 	if !ok {
 		return
 	}
 	hostName := hostNamex.Str()
 	hostEntity, err := ep.cache.GetByName(hostName)
-	attributes.Remove(otelcollector.EntityNameLabel)
+	attributes.Remove(otelconsts.EntityNameLabel)
 	if err != nil {
 		log.Trace().Str("name", hostName).Msg("Skipping because entity not found in cache")
 		return
@@ -103,5 +104,5 @@ func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
 	for _, service := range hostEntity.Services {
 		servicesValue.Slice().AppendEmpty().SetStr(service)
 	}
-	servicesValue.CopyTo(attributes.PutEmpty(otelcollector.ApertureServicesLabel))
+	servicesValue.CopyTo(attributes.PutEmpty(otelconsts.ApertureServicesLabel))
 }

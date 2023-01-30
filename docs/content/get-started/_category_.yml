@@ -5,5 +5,8 @@ collapsed: true
 link:
   type: "generated-index"
   title: "Get Started"
-  keywords: ["get started","getting started","start"]
-  description: "A comprehensive guide on running a Playground and deploying and setting up Aperture. Reach out to us on the community channel or support page in case of troubleshooting any issues."
+  keywords: ["get started", "getting started", "start"]
+  description:
+    "A comprehensive guide on deploying and setting up Aperture. Please reach
+    out to us on the community channel or support page in case of
+    troubleshooting any issues."

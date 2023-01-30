@@ -1,9 +1,13 @@
-label: Installation
-position: 2
+label: Install Aperture
+position: 1
 collapsible: true
 collapsed: true
 link:
   type: "generated-index"
-  title: "Installation"
-  description: "To deploy Aperture, the first step is to install the Controller. Once the Controller is installed, you can then proceed to install the Agent. The installation page provides detailed instructions for both the Controller and Agent installation."
+  title: "Install Aperture"
+  description:
+    "To deploy Aperture, the first step is to install the Controller. Once the
+    Controller is installed, you can then proceed to install the Agent. The
+    installation page provides detailed instructions for both the Controller and
+    Agent installation."
   keywords: ["install"]

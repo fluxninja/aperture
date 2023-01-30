@@ -9,7 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor/internal"
 )
 
@@ -25,21 +25,21 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 			Start: timestamppb.New(time.Date(1969, time.Month(7), 20, 17, 0, 0, 0, time.UTC)),
 			End:   timestamppb.New(time.Date(1969, time.Month(7), 20, 17, 0, 1, 0, time.UTC)),
 		},
-		map[string]interface{}{otelcollector.ApertureProcessingDurationLabel: float64(1000)},
+		map[string]interface{}{otelconsts.ApertureProcessingDurationLabel: float64(1000)},
 	),
 
 	Entry("Sets services",
 		&flowcontrolv1.CheckResponse{
 			Services: []string{"svc1", "svc2"},
 		},
-		map[string]interface{}{otelcollector.ApertureServicesLabel: []interface{}{"svc1", "svc2"}},
+		map[string]interface{}{otelconsts.ApertureServicesLabel: []interface{}{"svc1", "svc2"}},
 	),
 
 	Entry("Sets control point",
 		&flowcontrolv1.CheckResponse{
 			ControlPoint: "ingress",
 		},
-		map[string]interface{}{otelcollector.ApertureControlPointLabel: "ingress"},
+		map[string]interface{}{otelconsts.ApertureControlPointLabel: "ingress"},
 	),
 
 	Entry("Sets rate limiters",
@@ -61,8 +61,8 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 			},
 		},
 		map[string]interface{}{
-			otelcollector.ApertureRateLimitersLabel:         []interface{}{"policy_name:foo,component_index:2,policy_hash:foo-hash"},
-			otelcollector.ApertureDroppingRateLimitersLabel: []interface{}{"policy_name:foo,component_index:2,policy_hash:foo-hash"},
+			otelconsts.ApertureRateLimitersLabel:         []interface{}{"policy_name:foo,component_index:2,policy_hash:foo-hash"},
+			otelconsts.ApertureDroppingRateLimitersLabel: []interface{}{"policy_name:foo,component_index:2,policy_hash:foo-hash"},
 		},
 	),
 
@@ -83,8 +83,8 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 			},
 		},
 		map[string]interface{}{
-			otelcollector.ApertureConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
-			otelcollector.ApertureDroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
+			otelconsts.ApertureConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
+			otelconsts.ApertureDroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
 		},
 	),
 
@@ -95,14 +95,14 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 				{FluxMeterName: "bar"},
 			},
 		},
-		map[string]interface{}{otelcollector.ApertureFluxMetersLabel: []interface{}{"foo", "bar"}},
+		map[string]interface{}{otelconsts.ApertureFluxMetersLabel: []interface{}{"foo", "bar"}},
 	),
 
 	Entry("Sets flow labels",
 		&flowcontrolv1.CheckResponse{
 			FlowLabelKeys: []string{"someLabel", "otherLabel"},
 		},
-		map[string]interface{}{otelcollector.ApertureFlowLabelKeysLabel: []interface{}{"someLabel", "otherLabel"}},
+		map[string]interface{}{otelconsts.ApertureFlowLabelKeysLabel: []interface{}{"someLabel", "otherLabel"}},
 	),
 
 	Entry("Sets classifiers",
@@ -118,8 +118,8 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 			},
 		},
 		map[string]interface{}{
-			otelcollector.ApertureClassifiersLabel:      []interface{}{"policy_name:foo,classifier_index:42"},
-			otelcollector.ApertureClassifierErrorsLabel: []interface{}{"ERROR_MULTI_EXPRESSION,policy_name:foo,classifier_index:42,policy_hash:bar"},
+			otelconsts.ApertureClassifiersLabel:      []interface{}{"policy_name:foo,classifier_index:42"},
+			otelconsts.ApertureClassifierErrorsLabel: []interface{}{"ERROR_MULTI_EXPRESSION,policy_name:foo,classifier_index:42,policy_hash:bar"},
 		},
 	),
 )
