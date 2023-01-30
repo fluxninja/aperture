@@ -2923,7 +2923,7 @@ Rule describes a single Flow Classification Rule
 
 Flow classification rule extracts a value from request metadata.
 More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
-See <https://play.openpolicyagent.org/p/gU7vcLkc70> for an example input.
+See https://play.openpolicyagent.org/p/gU7vcLkc70 for an example input.
 There are two ways to define a flow classification rule:
 
 - Using a declarative extractor – suitable from simple cases, such as directly reading a value from header or a field from json body.
@@ -2959,6 +2959,7 @@ rego:
 telemetry: false
 ```
 
+[attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 
 #### Properties
 

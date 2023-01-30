@@ -11,10 +11,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 )
 
-// Module provides authz handler
-//
-// Authz handler is one of the APIs to classification and flowcontrol modules.
-// Authz uses envoy's external authorization grpc API.
+// Module provides awsgateway flowcontrol handler.
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(NewHandler),
@@ -31,5 +28,5 @@ func Register(server *grpc.Server, handler *Handler, healthsrv *health.Server) {
 	flowcontrolv1.RegisterAWSGatewayFlowControlServiceServer(server, handler)
 
 	healthsrv.SetServingStatus("aperture.flowcontrol.v1.AWSGatewayFlowControlService", grpc_health_v1.HealthCheckResponse_SERVING)
-	log.Info().Msg("Authz handler registered")
+	log.Info().Msg("Flowcontrol handler for AWS Gateway registered")
 }
