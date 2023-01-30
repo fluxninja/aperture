@@ -160,8 +160,8 @@ Blueprints can be visualized. A blueprint is saved as a
 into an image with GraphViz:
 
 ```sh
-go run -mod=mod scripts/circuit-compiler/main.go -cr policies/latency-aimd-concurrency-limiting/example/gen/policies/example.yaml -dot policies/latency-aimd-concurrency-limiting/example/gen/graph/graph.dot
-dot -Tsvg  policies/latency-aimd-concurrency-limiting/example/gen/graph/graph.dot > policies/latency-aimd-concurrency-limiting/example/gen/graph/graph.svg
+go run -mod=mod cmd/aperturectl/main.go compile --cr blueprints/examples/latency-aimd-concurrency-limiting/gen/policies/example.yaml --dot blueprints/examples/latency-aimd-concurrency-limiting/gen/graph/graph.dot
+dot -Tsvg  blueprints/examples/latency-aimd-concurrency-limiting/gen/graph/graph.dot > blueprints/examples/latency-aimd-concurrency-limiting/gen/graph/graph.svg
 ```
 
 Before doing so make sure that generated yamls are up-to-date.
