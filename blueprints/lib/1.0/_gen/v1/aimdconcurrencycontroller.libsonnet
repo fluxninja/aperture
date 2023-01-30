@@ -7,9 +7,6 @@ local aimdconcurrencycontrollerouts = import './aimdconcurrencycontrollerouts.li
       signal: error 'Port signal is missing',
     },
     out_ports: {
-      accepted_concurrency: error 'Port accepted_concurrency is missing',
-      desired_concurrency: error 'Port desired_concurrency is missing',
-      incoming_concurrency: error 'Port incoming_concurrency is missing',
       is_overload: error 'Port is_overload is missing',
       load_multiplier: error 'Port load_multiplier is missing',
     },
