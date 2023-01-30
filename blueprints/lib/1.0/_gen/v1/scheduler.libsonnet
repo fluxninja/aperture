@@ -13,10 +13,10 @@ local schedulerouts = import './schedulerouts.libsonnet';
   withOutPortsMixin(out_ports):: {
     out_ports+: out_ports,
   },
-  withSchedulerParameters(scheduler_parameters):: {
-    scheduler_parameters: scheduler_parameters,
+  withParameters(parameters):: {
+    parameters: parameters,
   },
-  withSchedulerParametersMixin(scheduler_parameters):: {
-    scheduler_parameters+: scheduler_parameters,
+  withParametersMixin(parameters):: {
+    parameters+: parameters,
   },
 }

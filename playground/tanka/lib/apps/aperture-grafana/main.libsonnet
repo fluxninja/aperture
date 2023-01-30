@@ -44,11 +44,11 @@ local kubeDashboards =
 
 local policyDashBoardMixin =
   policyDashboard({
-    policyName: 'service1-demo-app',
+    policy_name: 'service1-demo-app',
   }).dashboard
   {
     panels+: rateLimitpolicyDashboard({
-      policyName: 'service1-demo-app',
+      policy_name: 'service1-demo-app',
     }).dashboard.panels,
   };
 
@@ -73,7 +73,7 @@ local dashboards =
     dashboard.new('aperture-signals')
     + dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' })
     + dashboard.spec.withJson(std.manifestJsonEx(signalsDashboard({
-      policyName: 'service1-demo-app',
+      policy_name: 'service1-demo-app',
       datasource+: {
         name: 'controller-prometheus',
       },

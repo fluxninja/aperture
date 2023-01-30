@@ -2,32 +2,32 @@
   /**
   * @section Common
   *
-  * @param (common.policyName: string required) Name of the policy.
+  * @param (common.policy_name: string required) Name of the policy.
   */
   common: {
-    policyName: error 'policyName must be set',
+    policy_name: error 'policy_name must be set',
   },
   /**
   * @section Dashboard
   *
-  * @param (dashboard.refreshInterval: string) Refresh interval for dashboard panels.
-  * @param (dashboard.timeFrom: string) From time of dashboard.
-  * @param (dashboard.timeTo: string) To time of dashboard.
+  * @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
+  * @param (dashboard.time_from: string) From time of dashboard.
+  * @param (dashboard.time_to: string) To time of dashboard.
   */
   dashboard: {
-    refreshInterval: '10s',
-    timeFrom: 'now-30m',
-    timeTo: 'now',
+    refresh_interval: '10s',
+    time_from: 'now-30m',
+    time_to: 'now',
     /**
     * @section Dashboard
     * @subsection Datasource
     *
     * @param (dashboard.datasource.name: string) Datasource name.
-    * @param (dashboard.datasource.filterRegex: string) Datasource filter regex.
+    * @param (dashboard.datasource.filter_regex: string) Datasource filter regex.
     */
     datasource: {
       name: '$datasource',
-      filterRegex: '',
+      filter_regex: '',
     },
   },
 }

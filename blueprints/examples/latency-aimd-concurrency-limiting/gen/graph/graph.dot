@@ -25,9 +25,9 @@ digraph  {
 	}
 	subgraph cluster_s17 {
 		label="ArithmeticCombinator[root.4.0]";margin="50.0";
-		n19[label="lhs"];
+		n18[label="lhs"];
 		n20[label="output"];
-		n18[label="rhs"];
+		n19[label="rhs"];
 		n19->n20[style="invis"];
 		{rank=same; n18;n19;};
 		{rank=same; n20;};
@@ -47,13 +47,13 @@ digraph  {
 	}
 	subgraph cluster_s26 {
 		label="ArithmeticCombinator[root.4.2]";margin="50.0";
-		n28[label="5.00"];
-		n27[label="lhs"];
+		n29[label="5.00"];
+		n28[label="lhs"];
 		n30[label="output"];
-		n29[label="rhs"];
-		n28->n27;
-		n29->n30[style="invis"];
-		{rank=same; n27;n29;};
+		n27[label="rhs"];
+		n29->n28;
+		n28->n30[style="invis"];
+		{rank=same; n27;n28;};
 		{rank=same; n30;};
 		
 	}
@@ -73,8 +73,8 @@ digraph  {
 		n63[label="output"];
 		n62[label="rhs"];
 		n62->n63[style="invis"];
-		{rank=same; n63;};
 		{rank=same; n61;n62;};
+		{rank=same; n63;};
 		
 	}
 	subgraph cluster_s13 {
@@ -199,8 +199,8 @@ digraph  {
 	}
 	subgraph cluster_s55 {
 		label="Scheduler[root.4.9.Scheduler]";margin="50.0";
-		n56[label="accepted_concurrency"];
-		n57[label="incoming_concurrency"];
+		n57[label="accepted_concurrency"];
+		n56[label="incoming_concurrency"];
 		{rank=same; n56;n57;};
 		
 	}
@@ -222,54 +222,54 @@ digraph  {
 		n68[label="switch"];
 		n66->n65;
 		n68->n69[style="invis"];
-		{rank=same; n69;};
 		{rank=same; n65;n67;n68;};
+		{rank=same; n69;};
 		
 	}
 	rankdir="LR";splines="ortho";
-	n56->n24[label="ACCEPTED_CONCURRENCY"];
-	n56->n36[label="ACCEPTED_CONCURRENCY"];
-	n56->n43[label="ACCEPTED_CONCURRENCY"];
-	n56->n50[label="ACCEPTED_CONCURRENCY"];
-	n56->n75[label="ACCEPTED_CONCURRENCY"];
-	n57->n18[label="INCOMING_CONCURRENCY"];
-	n57->n77[label="INCOMING_CONCURRENCY"];
-	n51->n19[label="DESIRED_CONCURRENCY"];
+	n57->n24[label="ACCEPTED_CONCURRENCY"];
+	n57->n36[label="ACCEPTED_CONCURRENCY"];
+	n57->n43[label="ACCEPTED_CONCURRENCY"];
+	n57->n50[label="ACCEPTED_CONCURRENCY"];
+	n57->n75[label="ACCEPTED_CONCURRENCY"];
+	n56->n19[label="INCOMING_CONCURRENCY"];
+	n56->n77[label="INCOMING_CONCURRENCY"];
+	n12->n73[label="LATENCY_SETPOINT"];
+	n16->n9[label="LATENCY_EMA"];
+	n30->n32[label="CONCURRENCY_INCREMENT_SINGLE_TICK"];
+	n41->n67[label="CONCURRENCY_INCREMENT_NORMAL"];
+	n51->n18[label="DESIRED_CONCURRENCY"];
 	n51->n79[label="DESIRED_CONCURRENCY"];
+	n69->n33[label="CONCURRENCY_INCREMENT"];
+	n69->n48[label="CONCURRENCY_INCREMENT"];
+	n7->n15[label="MAX_EMA"];
+	n20->n53[label="DESIRED_CONCURRENCY_RATIO"];
+	n54->n59[label="LOAD_MULTIPLIER"];
+	n54->n83[label="LOAD_MULTIPLIER"];
+	n63->n68[label="IS_OVERLOAD"];
+	n63->n81[label="IS_OVERLOAD"];
+	n25->n49[label="NORMAL_CONCURRENCY_LIMIT"];
+	n34->n36[label="CONCURRENCY_INCREMENT_INTEGRAL"];
+	n44->n27[label="SQRT_CONCURRENCY_INCREMENT"];
 	n2->n4[label="LATENCY"];
 	n2->n14[label="LATENCY"];
 	n2->n71[label="LATENCY"];
-	n20->n53[label="DESIRED_CONCURRENCY_RATIO"];
 	n37->n39[label="CONCURRENCY_INCREMENT_INTEGRAL_CAPPED"];
-	n44->n29[label="SQRT_CONCURRENCY_INCREMENT"];
-	n12->n73[label="LATENCY_SETPOINT"];
-	n63->n68[label="IS_OVERLOAD"];
-	n63->n81[label="IS_OVERLOAD"];
-	n54->n59[label="LOAD_MULTIPLIER"];
-	n54->n83[label="LOAD_MULTIPLIER"];
-	n25->n49[label="NORMAL_CONCURRENCY_LIMIT"];
-	n30->n32[label="CONCURRENCY_INCREMENT_SINGLE_TICK"];
-	n34->n36[label="CONCURRENCY_INCREMENT_INTEGRAL"];
-	n41->n67[label="CONCURRENCY_INCREMENT_NORMAL"];
-	n7->n15[label="MAX_EMA"];
-	n16->n9[label="LATENCY_EMA"];
-	n69->n33[label="CONCURRENCY_INCREMENT"];
-	n69->n48[label="CONCURRENCY_INCREMENT"];
-	n79->n19[label="DESIRED_CONCURRENCY"];
+	n79->n18[label="DESIRED_CONCURRENCY"];
 	n79->n79[label="DESIRED_CONCURRENCY"];
-	n73->n47[label="SETPOINT"];
-	n73->n62[label="SETPOINT"];
 	n75->n24[label="ACCEPTED_CONCURRENCY"];
 	n75->n36[label="ACCEPTED_CONCURRENCY"];
 	n75->n43[label="ACCEPTED_CONCURRENCY"];
 	n75->n50[label="ACCEPTED_CONCURRENCY"];
 	n75->n75[label="ACCEPTED_CONCURRENCY"];
-	n77->n18[label="INCOMING_CONCURRENCY"];
+	n73->n47[label="SETPOINT"];
+	n73->n62[label="SETPOINT"];
+	n83->n59[label="LOAD_MULTIPLIER"];
+	n83->n83[label="LOAD_MULTIPLIER"];
+	n77->n19[label="INCOMING_CONCURRENCY"];
 	n77->n77[label="INCOMING_CONCURRENCY"];
 	n81->n68[label="IS_OVERLOAD"];
 	n81->n81[label="IS_OVERLOAD"];
-	n83->n59[label="LOAD_MULTIPLIER"];
-	n83->n83[label="LOAD_MULTIPLIER"];
 	n71->n46[label="SIGNAL"];
 	n71->n61[label="SIGNAL"];
 	

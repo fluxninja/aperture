@@ -234,7 +234,7 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/v1MatchExpression'
-  RateLimiterLazySync:
+  ParametersLazySync:
     type: object
     properties:
       enabled:
@@ -293,7 +293,7 @@ definitions:
           @gotags: validate:"required"
         type: string
         x-go-validate: required
-  SchedulerParametersWorkload:
+  SchedulerWorkload:
     description: Workload defines a class of requests that preferably have similar
       properties such as response latency or desired priority.
     type: object
@@ -306,16 +306,16 @@ definitions:
           @gotags: validate:"required"
         x-go-validate: required
         $ref: '#/definitions/v1LabelMatcher'
-      workload_parameters:
+      parameters:
         description: |-
-          WorkloadParameters associated with flows matching the label matcher.
+          Parameters associated with flows matching the label matcher.
 
           @gotags: validate:"required"
         x-go-validate: required
-        $ref: '#/definitions/SchedulerParametersWorkloadParameters'
-  SchedulerParametersWorkloadParameters:
-    description: WorkloadParameters defines parameters such as priority, tokens and
-      fairness key that are applicable to flows within a workload.
+        $ref: '#/definitions/SchedulerWorkloadParameters'
+  SchedulerWorkloadParameters:
+    description: Parameters defines parameters such as priority, tokens and fairness
+      key that are applicable to flows within a workload.
     type: object
     properties:
       fairness_key:
@@ -490,9 +490,9 @@ definitions:
       of signal from the baseline. Internally implemented as a nested circuit.
     type: object
     properties:
-      alerter_config:
+      alerter_parameters:
         description: Configuration for embedded alerter.
-        $ref: '#/definitions/v1AlerterConfig'
+        $ref: '#/definitions/v1AlerterParameters'
       concurrency_limit_multiplier:
         description: |-
           Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
@@ -533,7 +533,7 @@ definitions:
           * slope = -1
           * min_gradient = 0.1
           * max_gradient = 1
-        $ref: '#/definitions/v1GradientParameters'
+        $ref: '#/definitions/v1GradientControllerParameters'
       in_ports:
         description: Input ports for the AIMDConcurrencyController component.
         $ref: '#/definitions/v1AIMDConcurrencyControllerIns'
@@ -621,16 +621,24 @@ definitions:
     description: Alerter reacts to a signal and generates alert to send to alert manager.
     type: object
     properties:
-      alerter_config:
-        description: '@gotags: validate:"required"'
-        title: Alerter configuration
-        x-go-validate: required
-        $ref: '#/definitions/v1AlerterConfig'
       in_ports:
         description: Input ports for the Alerter component.
         $ref: '#/definitions/v1AlerterIns'
-  v1AlerterConfig:
-    description: AlerterConfig is a common config for separate alerter components
+      parameters:
+        description: '@gotags: validate:"required"'
+        title: Alerter configuration
+        x-go-validate: required
+        $ref: '#/definitions/v1AlerterParameters'
+  v1AlerterIns:
+    description: Inputs for the Alerter component.
+    type: object
+    properties:
+      signal:
+        description: Signal which Alerter is monitoring. If the signal greater than
+          0, Alerter generates an alert.
+        $ref: '#/definitions/v1InPort'
+  v1AlerterParameters:
+    description: Alerter Parameters is a common config for separate alerter components
       and alerters embedded in other components.
     type: object
     properties:
@@ -661,14 +669,6 @@ definitions:
         type: string
         x-go-default: info
         x-go-validate: oneof=info warn crit
-  v1AlerterIns:
-    description: Inputs for the Alerter component.
-    type: object
-    properties:
-      signal:
-        description: Signal which Alerter is monitoring. If the signal greater than
-          0, Alerter generates an alert.
-        $ref: '#/definitions/v1InPort'
   v1And:
     description: |-
       Logical AND.
@@ -1025,18 +1025,6 @@ definitions:
       value:
         type: number
         format: double
-  v1ControllerDynamicConfig:
-    type: object
-    title: Dynamic Configuration for a Controller
-    properties:
-      manual_mode:
-        description: |-
-          Decides whether the controller runs in "manual_mode".
-          In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
-
-          @gotags: default:"false"
-        type: boolean
-        x-go-default: false
   v1Decider:
     description: |-
       The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
@@ -1155,53 +1143,19 @@ definitions:
     title: Exponential Moving Average (EMA) is a type of moving average that applies
       exponentially more weight to recent signal readings
     properties:
-      correction_factor_on_max_envelope_violation:
-        description: |-
-          Correction factor to apply on the output value if its in violation of the max envelope.
-
-          @gotags: validate:"gte=0,lte=1.0" default:"1.0"
-        type: number
-        format: double
-        x-go-default: 1
-        x-go-validate: gte=0,lte=1.0
-      correction_factor_on_min_envelope_violation:
-        description: |-
-          Correction factor to apply on the output value if its in violation of the min envelope.
-
-          @gotags: validate:"gte=1.0" default:"1.0"
-        type: number
-        format: double
-        x-go-default: 1
-        x-go-validate: gte=1.0
-      ema_window:
-        description: |-
-          Duration of EMA sampling window.
-
-          @gotags: default:"5s"
-        type: string
-        x-go-default: 5s
       in_ports:
         description: Input ports for the EMA component.
         $ref: '#/definitions/v1EMAIns'
       out_ports:
         description: Output ports for the EMA component.
         $ref: '#/definitions/v1EMAOuts'
-      valid_during_warmup:
+      parameters:
         description: |-
-          Whether the output is valid during the warm-up stage.
+          Parameters for the EMA component.
 
-          @gotags: default:"false"
-        type: boolean
-        x-go-default: false
-      warmup_window:
-        description: |-
-          Duration of EMA warming up window.
-
-          The initial value of the EMA is the average of signal readings received during the warm-up window.
-
-          @gotags: default:"0s"
-        type: string
-        x-go-default: 0s
+          @gotags: validate:"required"
+        x-go-validate: required
+        $ref: '#/definitions/v1EMAParameters'
   v1EMAIns:
     description: Inputs for the EMA component.
     type: object
@@ -1239,6 +1193,51 @@ definitions:
         description: Exponential moving average of the series of reading as an output
           signal.
         $ref: '#/definitions/v1OutPort'
+  v1EMAParameters:
+    description: Parameters for the EMA component.
+    type: object
+    properties:
+      correction_factor_on_max_envelope_violation:
+        description: |-
+          Correction factor to apply on the output value if its in violation of the max envelope.
+
+          @gotags: validate:"gte=0,lte=1.0" default:"1.0"
+        type: number
+        format: double
+        x-go-default: 1
+        x-go-validate: gte=0,lte=1.0
+      correction_factor_on_min_envelope_violation:
+        description: |-
+          Correction factor to apply on the output value if its in violation of the min envelope.
+
+          @gotags: validate:"gte=1.0" default:"1.0"
+        type: number
+        format: double
+        x-go-default: 1
+        x-go-validate: gte=1.0
+      ema_window:
+        description: |-
+          Duration of EMA sampling window.
+
+          @gotags: default:"5s"
+        type: string
+        x-go-default: 5s
+      valid_during_warmup:
+        description: |-
+          Whether the output is valid during the warm-up stage.
+
+          @gotags: default:"false"
+        type: boolean
+        x-go-default: false
+      warmup_window:
+        description: |-
+          Duration of EMA warming up window.
+
+          The initial value of the EMA is the average of signal readings received during the warm-up window.
+
+          @gotags: default:"0s"
+        type: string
+        x-go-default: 0s
   v1EqualsMatchExpression:
     description: Label selector expression of the equal form "label == value".
     type: object
@@ -1300,16 +1299,16 @@ definitions:
       in_ports:
         description: Input ports for the Extrapolator component.
         $ref: '#/definitions/v1ExtrapolatorIns'
-      max_extrapolation_interval:
-        description: |-
-          Maximum time interval to repeat the last valid value of input signal.
-
-          @gotags: default:"10s"
-        type: string
-        x-go-default: 10s
       out_ports:
         description: Output ports for the Extrapolator component.
         $ref: '#/definitions/v1ExtrapolatorOuts'
+      parameters:
+        description: |-
+          Parameters for the Extrapolator component.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+        $ref: '#/definitions/v1ExtrapolatorParameters'
   v1ExtrapolatorIns:
     description: Inputs for the Extrapolator component.
     type: object
@@ -1324,6 +1323,17 @@ definitions:
       output:
         description: Extrapolated signal.
         $ref: '#/definitions/v1OutPort'
+  v1ExtrapolatorParameters:
+    description: Parameters for the Extrapolator component.
+    type: object
+    properties:
+      max_extrapolation_interval:
+        description: |-
+          Maximum time interval to repeat the last valid value of input signal.
+
+          @gotags: default:"10s"
+        type: string
+        x-go-default: 10s
   v1FirstValid:
     type: object
     title: Picks the first valid input signal from the array of input signals and
@@ -1524,23 +1534,35 @@ definitions:
     properties:
       default_config:
         description: Default configuration.
-        $ref: '#/definitions/v1ControllerDynamicConfig'
+        $ref: '#/definitions/v1GradientControllerDynamicConfig'
       dynamic_config_key:
         type: string
         title: Configuration key for DynamicConfig
-      gradient_parameters:
-        description: |-
-          Gradient Parameters.
-
-          @gotags: validate:"required"
-        x-go-validate: required
-        $ref: '#/definitions/v1GradientParameters'
       in_ports:
         description: Input ports of the Gradient Controller.
         $ref: '#/definitions/v1GradientControllerIns'
       out_ports:
         description: Output ports of the Gradient Controller.
         $ref: '#/definitions/v1GradientControllerOuts'
+      parameters:
+        description: |-
+          Gradient Parameters.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+        $ref: '#/definitions/v1GradientControllerParameters'
+  v1GradientControllerDynamicConfig:
+    type: object
+    title: Dynamic Configuration for a Controller
+    properties:
+      manual_mode:
+        description: |-
+          Decides whether the controller runs in "manual_mode".
+          In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
+
+          @gotags: default:"false"
+        type: boolean
+        x-go-default: false
   v1GradientControllerIns:
     description: Inputs for the Gradient Controller component.
     type: object
@@ -1573,7 +1595,8 @@ definitions:
       output:
         description: Computed desired value of the control variable.
         $ref: '#/definitions/v1OutPort'
-  v1GradientParameters:
+  v1GradientControllerParameters:
+    description: Gradient Parameters.
     type: object
     properties:
       max_gradient:
@@ -1938,9 +1961,9 @@ definitions:
     title: Takes the load multiplier input signal and publishes it to the schedulers
       in the data-plane
     properties:
-      alerter_config:
+      alerter_parameters:
         description: Configuration for embedded alerter.
-        $ref: '#/definitions/v1AlerterConfig'
+        $ref: '#/definitions/v1AlerterParameters'
       default_config:
         description: Default configuration.
         $ref: '#/definitions/v1LoadActuatorDynamicConfig'
@@ -2344,28 +2367,11 @@ definitions:
         title: '@gotags: validate:"required"'
         x-go-validate: required
         $ref: '#/definitions/v1RateLimiterIns'
-      label_key:
-        description: |-
-          Specifies which label the ratelimiter should be keyed by.
-
-          Rate limiting is done independently for each value of the
-          [label](/concepts/integrations/flow-control/flow-label.md) with given key.
-          Eg., to give each user a separate limit, assuming you have a _user_ flow
-          label set up, set `label_key: "user"`.
-
-          @gotags: validate:"required"
-        type: string
+      parameters:
+        description: '@gotags: validate:"required"'
+        title: Parameters for the RateLimiter component
         x-go-validate: required
-      lazy_sync:
-        title: Configuration of lazy-syncing behaviour of ratelimiter
-        $ref: '#/definitions/RateLimiterLazySync'
-      limit_reset_interval:
-        description: |-
-          Time after which the limit for a given label value will be reset.
-
-          @gotags: default:"60s"
-        type: string
-        x-go-default: 60s
+        $ref: '#/definitions/v1RateLimiterParameters'
   v1RateLimiterDynamicConfig:
     type: object
     title: Dynamic Configuration for the rate limiter
@@ -2395,6 +2401,31 @@ definitions:
           @gotags: validate:"required"
         x-go-validate: required
         $ref: '#/definitions/v1InPort'
+  v1RateLimiterParameters:
+    type: object
+    properties:
+      label_key:
+        description: |-
+          Specifies which label the ratelimiter should be keyed by.
+
+          Rate limiting is done independently for each value of the
+          [label](/concepts/integrations/flow-control/flow-label.md) with given key.
+          Eg., to give each user a separate limit, assuming you have a _user_ flow
+          label set up, set `label_key: "user"`.
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
+      lazy_sync:
+        title: Configuration of lazy-syncing behaviour of ratelimiter
+        $ref: '#/definitions/ParametersLazySync'
+      limit_reset_interval:
+        description: |-
+          Time after which the limit for a given label value will be reset.
+
+          @gotags: default:"60s"
+        type: string
+        x-go-default: 60s
   v1Resources:
     description: |-
       :::info
@@ -2503,7 +2534,7 @@ definitions:
       out_ports:
         description: Output ports for the Scheduler component.
         $ref: '#/definitions/v1SchedulerOuts'
-      scheduler_parameters:
+      parameters:
         description: |-
           Scheduler parameters.
 
@@ -2536,6 +2567,7 @@ definitions:
         $ref: '#/definitions/v1OutPort'
   v1SchedulerParameters:
     type: object
+    title: Scheduler parameters
     properties:
       auto_tokens:
         description: |-
@@ -2549,11 +2581,11 @@ definitions:
         x-go-default: "true"
       default_workload_parameters:
         description: |-
-          WorkloadParameters to be used if none of workloads specified in `workloads` match.
+          Parameters to be used if none of workloads specified in `workloads` match.
 
           @gotags: validate:"required"
         x-go-validate: required
-        $ref: '#/definitions/SchedulerParametersWorkloadParameters'
+        $ref: '#/definitions/SchedulerWorkloadParameters'
       max_timeout:
         description: |-
           :::caution
@@ -2616,7 +2648,7 @@ definitions:
           @gotags: validate:"dive"
         type: array
         items:
-          $ref: '#/definitions/SchedulerParametersWorkload'
+          $ref: '#/definitions/SchedulerWorkload'
   v1ServiceSelector:
     description: |-
       :::info

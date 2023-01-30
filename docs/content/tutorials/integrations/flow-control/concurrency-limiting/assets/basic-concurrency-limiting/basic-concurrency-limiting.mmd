@@ -69,8 +69,8 @@ FakeConstant2 --> root.4.1lhs
 subgraph root.4.2[<center>ArithmeticCombinator<br/>add</center>]
 subgraph root.4.2_inports[ ]
 style root.4.2_inports fill:none,stroke:none
-root.4.2lhs[lhs]
 root.4.2rhs[rhs]
+root.4.2lhs[lhs]
 end
 subgraph root.4.2_outports[ ]
 style root.4.2_outports fill:none,stroke:none
@@ -82,8 +82,8 @@ FakeConstant3 --> root.4.2lhs
 subgraph root.4.3[<center>ArithmeticCombinator<br/>add</center>]
 subgraph root.4.3_inports[ ]
 style root.4.3_inports fill:none,stroke:none
-root.4.3rhs[rhs]
 root.4.3lhs[lhs]
+root.4.3rhs[rhs]
 end
 subgraph root.4.3_outports[ ]
 style root.4.3_outports fill:none,stroke:none
@@ -124,14 +124,14 @@ style root.4.6_outports fill:none,stroke:none
 root.4.6output[output]
 end
 end
-subgraph root.4.7[Gradient]
+subgraph root.4.7[<center>GradientController<br/>slope: -1.00</center>]
 subgraph root.4.7_inports[ ]
 style root.4.7_inports fill:none,stroke:none
-root.4.7max[max]
-root.4.7control_variable[control_variable]
 root.4.7signal[signal]
 root.4.7setpoint[setpoint]
 root.4.7optimize[optimize]
+root.4.7max[max]
+root.4.7control_variable[control_variable]
 end
 subgraph root.4.7_outports[ ]
 style root.4.7_outports fill:none,stroke:none
@@ -151,8 +151,8 @@ end
 subgraph root.4.9.Scheduler[Scheduler]
 subgraph root.4.9.Scheduler_outports[ ]
 style root.4.9.Scheduler_outports fill:none,stroke:none
-root.4.9.Schedulerincoming_concurrency[incoming_concurrency]
 root.4.9.Scheduleraccepted_concurrency[accepted_concurrency]
+root.4.9.Schedulerincoming_concurrency[incoming_concurrency]
 end
 end
 subgraph root.4.9.LoadActuator[LoadActuator]
@@ -256,24 +256,37 @@ style root.4.18_outports fill:none,stroke:none
 root.4.18signal[signal]
 end
 end
-root.1output --> |MAX_EMA| root.3max_envelope
-root.4.4output --> |CONCURRENCY_INCREMENT_INTEGRAL_CAPPED| root.4.5inputs
-root.4.6output --> |SQRT_CONCURRENCY_INCREMENT| root.4.2rhs
-root.4.10output --> |IS_OVERLOAD| root.4.11switch
-root.4.10output --> |IS_OVERLOAD| root.4.17signal
-root.4.17signal --> |IS_OVERLOAD| root.4.11switch
-root.4.17signal --> |IS_OVERLOAD| root.4.17signal
 root.0output --> |LATENCY| root.1lhs
 root.0output --> |LATENCY| root.3input
 root.0output --> |LATENCY| root.4.12signal
+root.2output --> |LATENCY_SETPOINT| root.4.13signal
+root.3output --> |LATENCY_EMA| root.2lhs
+root.4.0output --> |DESIRED_CONCURRENCY_RATIO| root.4.8input
+root.4.1output --> |NORMAL_CONCURRENCY_LIMIT| root.4.7max
+root.4.3output --> |CONCURRENCY_INCREMENT_INTEGRAL| root.4.4inputs
 root.4.5output --> |CONCURRENCY_INCREMENT_NORMAL| root.4.11on_false
+root.4.6output --> |SQRT_CONCURRENCY_INCREMENT| root.4.2rhs
 root.4.8output --> |LOAD_MULTIPLIER| root.4.9.LoadActuatorload_multiplier
 root.4.8output --> |LOAD_MULTIPLIER| root.4.18signal
 root.4.18signal --> |LOAD_MULTIPLIER| root.4.9.LoadActuatorload_multiplier
 root.4.18signal --> |LOAD_MULTIPLIER| root.4.18signal
+root.4.11output --> |CONCURRENCY_INCREMENT| root.4.3rhs
+root.4.11output --> |CONCURRENCY_INCREMENT| root.4.7optimize
 root.4.13signal --> |SETPOINT| root.4.7setpoint
 root.4.13signal --> |SETPOINT| root.4.10rhs
-root.2output --> |LATENCY_SETPOINT| root.4.13signal
+root.4.10output --> |IS_OVERLOAD| root.4.11switch
+root.4.10output --> |IS_OVERLOAD| root.4.17signal
+root.4.17signal --> |IS_OVERLOAD| root.4.11switch
+root.4.17signal --> |IS_OVERLOAD| root.4.17signal
+root.4.12signal --> |SIGNAL| root.4.7signal
+root.4.12signal --> |SIGNAL| root.4.10lhs
+root.1output --> |MAX_EMA| root.3max_envelope
+root.4.2output --> |CONCURRENCY_INCREMENT_SINGLE_TICK| root.4.3lhs
+root.4.4output --> |CONCURRENCY_INCREMENT_INTEGRAL_CAPPED| root.4.5inputs
+root.4.7output --> |DESIRED_CONCURRENCY| root.4.0lhs
+root.4.7output --> |DESIRED_CONCURRENCY| root.4.16signal
+root.4.16signal --> |DESIRED_CONCURRENCY| root.4.0lhs
+root.4.16signal --> |DESIRED_CONCURRENCY| root.4.16signal
 root.4.9.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| root.4.1rhs
 root.4.9.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| root.4.4inputs
 root.4.9.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| root.4.6input
@@ -288,16 +301,3 @@ root.4.9.Schedulerincoming_concurrency --> |INCOMING_CONCURRENCY| root.4.0rhs
 root.4.9.Schedulerincoming_concurrency --> |INCOMING_CONCURRENCY| root.4.15signal
 root.4.15signal --> |INCOMING_CONCURRENCY| root.4.0rhs
 root.4.15signal --> |INCOMING_CONCURRENCY| root.4.15signal
-root.4.0output --> |DESIRED_CONCURRENCY_RATIO| root.4.8input
-root.4.1output --> |NORMAL_CONCURRENCY_LIMIT| root.4.7max
-root.4.2output --> |CONCURRENCY_INCREMENT_SINGLE_TICK| root.4.3lhs
-root.4.3output --> |CONCURRENCY_INCREMENT_INTEGRAL| root.4.4inputs
-root.4.7output --> |DESIRED_CONCURRENCY| root.4.0lhs
-root.4.7output --> |DESIRED_CONCURRENCY| root.4.16signal
-root.4.16signal --> |DESIRED_CONCURRENCY| root.4.0lhs
-root.4.16signal --> |DESIRED_CONCURRENCY| root.4.16signal
-root.4.11output --> |CONCURRENCY_INCREMENT| root.4.3rhs
-root.4.11output --> |CONCURRENCY_INCREMENT| root.4.7optimize
-root.4.12signal --> |SIGNAL| root.4.7signal
-root.4.12signal --> |SIGNAL| root.4.10lhs
-root.3output --> |LATENCY_EMA| root.2lhs

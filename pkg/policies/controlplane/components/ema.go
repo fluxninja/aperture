@@ -58,20 +58,21 @@ func NewEMAAndOptions(emaProto *policylangv1.EMA,
 ) (*EMA, fx.Option, error) {
 	// period of tick
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()
+	params := emaProto.GetParameters()
 	// number of ticks in emaWindow
-	emaWindow := math.Ceil(float64(emaProto.EmaWindow.AsDuration()) / float64(evaluationPeriod))
+	emaWindow := math.Ceil(float64(params.EmaWindow.AsDuration()) / float64(evaluationPeriod))
 
 	alpha := 2.0 / (emaWindow + 1)
-	warmupWindow := uint32(math.Ceil(float64(emaProto.WarmupWindow.AsDuration()) / float64(evaluationPeriod)))
+	warmupWindow := uint32(math.Ceil(float64(params.WarmupWindow.AsDuration()) / float64(evaluationPeriod)))
 
 	ema := &EMA{
-		correctionFactorOnMinViolation: emaProto.CorrectionFactorOnMinEnvelopeViolation,
-		correctionFactorOnMaxViolation: emaProto.CorrectionFactorOnMaxEnvelopeViolation,
+		correctionFactorOnMinViolation: params.CorrectionFactorOnMinEnvelopeViolation,
+		correctionFactorOnMaxViolation: params.CorrectionFactorOnMaxEnvelopeViolation,
 		alpha:                          alpha,
 		warmupWindow:                   warmupWindow,
 		emaWindow:                      uint32(emaWindow),
 		policyReadAPI:                  policyReadAPI,
-		validDuringWarmup:              emaProto.ValidDuringWarmup,
+		validDuringWarmup:              params.ValidDuringWarmup,
 	}
 	ema.resetStages()
 	return ema, fx.Options(), nil

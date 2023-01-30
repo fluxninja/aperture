@@ -27,7 +27,7 @@ func NewGradientControllerAndOptions(
 	componentID string,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
-	gradientParameters := gradientControllerProto.GetGradientParameters()
+	gradientParameters := gradientControllerProto.GetParameters()
 	// Make sure max is greater than min
 	if gradientParameters.MaxGradient < gradientParameters.MinGradient {
 		return nil, nil, fmt.Errorf("max_gradient must be greater than min_gradient")
@@ -41,7 +41,7 @@ func NewGradientControllerAndOptions(
 
 	controller := NewControllerComponent(
 		gradient,
-		"Gradient",
+		"GradientController",
 		componentID,
 		policyReadAPI,
 		gradientControllerProto.DynamicConfigKey,

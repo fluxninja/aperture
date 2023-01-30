@@ -17,16 +17,16 @@ local extrapolatorouts = import './extrapolatorouts.libsonnet';
   withInPortsMixin(in_ports):: {
     in_ports+: in_ports,
   },
-  withMaxExtrapolationInterval(max_extrapolation_interval):: {
-    max_extrapolation_interval: max_extrapolation_interval,
-  },
-  withMaxExtrapolationIntervalMixin(max_extrapolation_interval):: {
-    max_extrapolation_interval+: max_extrapolation_interval,
-  },
   withOutPorts(out_ports):: {
     out_ports: out_ports,
   },
   withOutPortsMixin(out_ports):: {
     out_ports+: out_ports,
+  },
+  withParameters(parameters):: {
+    parameters: parameters,
+  },
+  withParametersMixin(parameters):: {
+    parameters+: parameters,
   },
 }

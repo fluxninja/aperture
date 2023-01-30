@@ -42,7 +42,7 @@ var _ = Describe("Component factory", func() {
 
 	Context("Alerter", func() {
 		alerterProto := &policylangv1.Alerter{
-			AlerterConfig: &policylangv1.AlerterConfig{
+			Parameters: &policylangv1.Alerter_Parameters{
 				AlertName: "testName",
 				Severity:  "crit",
 			},
@@ -70,7 +70,7 @@ var _ = Describe("Component factory", func() {
 	Context("Gradient", func() {
 		Context("With correct gradient", func() {
 			gradientControllerProto := &policylangv1.GradientController{
-				GradientParameters: &policylangv1.GradientParameters{
+				Parameters: &policylangv1.GradientController_Parameters{
 					Slope: -0.5,
 				},
 			}

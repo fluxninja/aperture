@@ -134,22 +134,22 @@ function(params) {
     newTimeSeriesPanel('FluxMeter',
                        ds,
                        |||
-                         sum(increase(flux_meter_sum{valid="true", flow_status="OK", flux_meter_name="%(policyName)s"}[$__rate_interval]))
-                         / sum(increase(flux_meter_count{valid="true", flow_status="OK", flux_meter_name="%(policyName)s"}[$__rate_interval]))
-                       ||| % { policyName: $._config.policyName },
+                         sum(increase(flux_meter_sum{valid="true", flow_status="OK", flux_meter_name="%(policy_name)s"}[$__rate_interval]))
+                         / sum(increase(flux_meter_count{valid="true", flow_status="OK", flux_meter_name="%(policy_name)s"}[$__rate_interval]))
+                       ||| % { policy_name: $._config.policy_name },
                        'Latency (ms)',
                        'ms'),
   local WFQSchedulerFlows =
-    newBarGaugePanel('WFQ Scheduler Flows', ds, 'avg(wfq_flows_total{policy_name="%(policyName)s"})' % { policyName: $._config.policyName }),
+    newBarGaugePanel('WFQ Scheduler Flows', ds, 'avg(wfq_flows_total{policy_name="%(policy_name)s"})' % { policy_name: $._config.policy_name }),
 
   local WFQSchedulerHeapRequests =
-    newBarGaugePanel('WFQ Scheduler Heap Requests', ds, 'avg(wfq_requests_total{policy_name="%(policyName)s"})' % { policyName: $._config.policyName }),
+    newBarGaugePanel('WFQ Scheduler Heap Requests', ds, 'avg(wfq_requests_total{policy_name="%(policy_name)s"})' % { policy_name: $._config.policy_name }),
 
   local TotalBucketLoadSchedFactor =
-    newStatPanel('Average Load Multiplier', ds, 'avg(token_bucket_lm_ratio{policy_name="%(policyName)s"})' % { policyName: $._config.policyName }),
+    newStatPanel('Average Load Multiplier', ds, 'avg(token_bucket_lm_ratio{policy_name="%(policy_name)s"})' % { policy_name: $._config.policy_name }),
 
   local TokenBucketBucketCapacity =
-    newStatPanel('Token Bucket Bucket Capacity', ds, 'avg(token_bucket_capacity_total{policy_name="%(policyName)s"})' % { policyName: $._config.policyName })
+    newStatPanel('Token Bucket Bucket Capacity', ds, 'avg(token_bucket_capacity_total{policy_name="%(policy_name)s"})' % { policy_name: $._config.policy_name })
     + {
       options+: {
         orientation: 'auto',
@@ -157,7 +157,7 @@ function(params) {
     },
 
   local TokenBucketBucketFillRate =
-    newStatPanel('Token Bucket Bucket FillRate', ds, 'avg(token_bucket_fill_rate{policy_name="%(policyName)s"})' % { policyName: $._config.policyName }) +
+    newStatPanel('Token Bucket Bucket FillRate', ds, 'avg(token_bucket_fill_rate{policy_name="%(policy_name)s"})' % { policy_name: $._config.policy_name }) +
     {
       options+: {
         orientation: 'auto',
@@ -165,7 +165,7 @@ function(params) {
     },
 
   local TokenBucketAvailableTokens =
-    newStatPanel('Token Bucket Available Tokens', ds, 'avg(token_bucket_available_tokens_total{policy_name="%(policyName)s"})' % { policyName: $._config.policyName }) +
+    newStatPanel('Token Bucket Available Tokens', ds, 'avg(token_bucket_available_tokens_total{policy_name="%(policy_name)s"})' % { policy_name: $._config.policy_name }) +
     {
       options+: {
         orientation: 'auto',
@@ -173,16 +173,16 @@ function(params) {
     },
 
   local IncomingConcurrency =
-    newTimeSeriesPanel('Incoming Concurrency', ds, 'sum(rate(incoming_concurrency_ms{policy_name="%(policyName)s"}[$__rate_interval]))' % { policyName: $._config.policyName }, 'Concurrency', 'ms'),
+    newTimeSeriesPanel('Incoming Concurrency', ds, 'sum(rate(incoming_concurrency_ms{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: $._config.policy_name }, 'Concurrency', 'ms'),
 
   local AcceptedConcurrency =
-    newTimeSeriesPanel('Accepted Concurrency', ds, 'sum(rate(accepted_concurrency_ms{policy_name="%(policyName)s"}[$__rate_interval]))' % { policyName: $._config.policyName }, 'Concurrency', 'ms'),
+    newTimeSeriesPanel('Accepted Concurrency', ds, 'sum(rate(accepted_concurrency_ms{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: $._config.policy_name }, 'Concurrency', 'ms'),
 
   local WorkloadDecisions =
-    newTimeSeriesPanel('Workload Decisions', ds, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policyName)s"}[$__rate_interval]))' % { policyName: $._config.policyName }, 'Decisions', 'reqps'),
+    newTimeSeriesPanel('Workload Decisions', ds, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: $._config.policy_name }, 'Decisions', 'reqps'),
 
   local WorkloadLatency =
-    newTimeSeriesPanel('Workload Latency (Auto Tokens)', ds, '(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name="%(policyName)s"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name="%(policyName)s"}[$__rate_interval])))' % { policyName: $._config.policyName }, 'Latency', 'ms'),
+    newTimeSeriesPanel('Workload Latency (Auto Tokens)', ds, '(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name="%(policy_name)s"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name="%(policy_name)s"}[$__rate_interval])))' % { policy_name: $._config.policy_name }, 'Latency', 'ms'),
 
 
   local dashboardDef =
@@ -190,7 +190,7 @@ function(params) {
       title='Jsonnet / FluxNinja',
       editable=true,
       schemaVersion=18,
-      refresh=$._config.refreshInterval,
+      refresh=$._config.refresh_interval,
       time_from='now-5m',
       time_to='now'
     )
@@ -206,7 +206,7 @@ function(params) {
         options: [],
         query: 'prometheus',
         refres: 1,
-        regex: $._config.datasource.filterRegex,
+        regex: $._config.datasource.filter_regex,
         type: 'datasource',
       }
     )

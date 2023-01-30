@@ -252,7 +252,7 @@ func setupConcurrencyLimiterFactory(
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
 type multiMatchResult struct {
-	matchedWorkloads map[int]*policylangv1.SchedulerParameters_WorkloadParameters
+	matchedWorkloads map[int]*policylangv1.Scheduler_Workload_Parameters
 }
 
 // multiMatcher is MultiMatcher instantiation used in this package.
@@ -281,7 +281,7 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 		reg.SetStatus(status.NewStatus(nil, err))
 		return fx.Options(), err
 	}
-	schedulerParams := schedulerMsg.SchedulerParameters
+	schedulerParams := schedulerMsg.Parameters
 	if schedulerParams == nil {
 		err = fmt.Errorf("no scheduler parameters specified")
 		reg.SetStatus(status.NewStatus(nil, err))
@@ -322,16 +322,16 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 }
 
 type workloadMatcher struct {
-	workloadProto *policylangv1.SchedulerParameters_Workload
+	workloadProto *policylangv1.Scheduler_Workload
 	workloadIndex int
 }
 
 func (wm *workloadMatcher) matchCallback(mmr multiMatchResult) multiMatchResult {
 	// mmr.matchedWorkloads is nil on first match.
 	if mmr.matchedWorkloads == nil {
-		mmr.matchedWorkloads = make(map[int]*policylangv1.SchedulerParameters_WorkloadParameters)
+		mmr.matchedWorkloads = make(map[int]*policylangv1.Scheduler_Workload_Parameters)
 	}
-	mmr.matchedWorkloads[wm.workloadIndex] = wm.workloadProto.GetWorkloadParameters()
+	mmr.matchedWorkloads[wm.workloadIndex] = wm.workloadProto.GetParameters()
 	return mmr
 }
 
@@ -346,8 +346,8 @@ type concurrencyLimiter struct {
 	concurrencyLimiterFactory    *concurrencyLimiterFactory
 	autoTokens                   *autoTokens
 	workloadMultiMatcher         *multiMatcher
-	defaultWorkloadParametersMsg *policylangv1.SchedulerParameters_WorkloadParameters
-	schedulerParameters          *policylangv1.SchedulerParameters
+	defaultWorkloadParametersMsg *policylangv1.Scheduler_Workload_Parameters
+	schedulerParameters          *policylangv1.Scheduler_Parameters
 }
 
 // Make sure ConcurrencyLimiter implements the iface.ConcurrencyLimiter.
@@ -479,7 +479,7 @@ func (conLimiter *concurrencyLimiter) GetFlowSelector() *policylangv1.FlowSelect
 //
 // Context is used to ensure that requests are not scheduled for longer than its deadline allows.
 func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
-	var matchedWorkloadProto *policylangv1.SchedulerParameters_WorkloadParameters
+	var matchedWorkloadProto *policylangv1.Scheduler_Workload_Parameters
 	var matchedWorkloadIndex string
 	// match labels against conLimiter.workloadMultiMatcher
 	mmr := conLimiter.workloadMultiMatcher.Match(multimatcher.Labels(labels))

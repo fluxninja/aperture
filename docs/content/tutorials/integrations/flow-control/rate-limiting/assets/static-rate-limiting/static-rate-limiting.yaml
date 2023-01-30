@@ -19,6 +19,7 @@ spec:
               limit:
                 constant_signal:
                   value: 120
-            label_key: http.request.header.user_id
-            limit_reset_interval: 60s
+            parameters:
+              label_key: http.request.header.user_id
+              limit_reset_interval: 60s
     evaluation_interval: 300s

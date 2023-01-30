@@ -273,15 +273,15 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 				rateLimiter.rateLimitChecker,
 				rateLimiter.rateLimiterFactory.distCache,
 				rateLimiter.name,
-				rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration())
+				rateLimiter.rateLimiterProto.Parameters.GetLimitResetInterval().AsDuration())
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to create limiter")
 				return err
 			}
 			// check whether lazy limiter is enabled
-			if lazySyncConfig := rateLimiter.rateLimiterProto.GetLazySync(); lazySyncConfig != nil {
+			if lazySyncConfig := rateLimiter.rateLimiterProto.Parameters.GetLazySync(); lazySyncConfig != nil {
 				if lazySyncConfig.GetEnabled() {
-					lazySyncInterval := time.Duration(int64(rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration()) / int64(lazySyncConfig.GetNumSync()))
+					lazySyncInterval := time.Duration(int64(rateLimiter.rateLimiterProto.Parameters.GetLimitResetInterval().AsDuration()) / int64(lazySyncConfig.GetNumSync()))
 					rateLimiter.rateTracker, err = ratetracker.NewLazySyncRateTracker(rateLimiter.rateTracker,
 						lazySyncInterval,
 						rateLimiter.rateLimiterFactory.lazySyncJobGroup)
@@ -355,7 +355,7 @@ func (rateLimiter *rateLimiter) updateDynamicConfig(dynamicConfig *policylangv1.
 	overrides := ratetracker.Overrides{}
 	// loop through overrides
 	for _, override := range dynamicConfig.GetOverrides() {
-		label := rateLimiter.rateLimiterProto.GetLabelKey() + ":" + override.GetLabelValue()
+		label := rateLimiter.rateLimiterProto.Parameters.GetLabelKey() + ":" + override.GetLabelValue()
 		overrides[label] = override.GetLimitScaleFactor()
 	}
 
@@ -397,7 +397,7 @@ func (rateLimiter *rateLimiter) RunLimiter(ctx context.Context, labels map[strin
 
 // TakeN takes n tokens from the limiter.
 func (rateLimiter *rateLimiter) TakeN(labels map[string]string, n int) (label string, ok bool, remaining int, current int) {
-	labelKey := rateLimiter.rateLimiterProto.GetLabelKey()
+	labelKey := rateLimiter.rateLimiterProto.Parameters.GetLabelKey()
 	var labelValue string
 	if val, found := labels[labelKey]; found {
 		labelValue = val

@@ -1,6 +1,6 @@
 apiVersion: fluxninja.com/v1alpha1
 dynamicConfig:
-  concurrency_limiter:
+  concurrency_controller:
     dry_run: false
 kind: Policy
 metadata:
@@ -43,8 +43,6 @@ spec:
             output:
               signal_name: LATENCY_SETPOINT
       - ema:
-          correction_factor_on_max_envelope_violation: "0.95"
-          ema_window: 1500s
           in_ports:
             input:
               signal_name: LATENCY
@@ -53,17 +51,20 @@ spec:
           out_ports:
             output:
               signal_name: LATENCY_EMA
-          warmup_window: 60s
+          parameters:
+            correction_factor_on_max_envelope_violation: "0.95"
+            ema_window: 1500s
+            warmup_window: 60s
       - flow_control:
           aimd_concurrency_controller:
-            alerter_config:
+            alerter_parameters:
               alert_channels: []
               alert_name: Load Shed Event
               resolve_timeout: 5s
             concurrency_limit_multiplier: "2.0"
             concurrency_linear_increment: "5.0"
             concurrency_sqrt_increment_multiplier: "1"
-            dry_run_dynamic_config_key: concurrency_limiter
+            dry_run_dynamic_config_key: concurrency_controller
             flow_selector:
               flow_matcher:
                 control_point: ingress

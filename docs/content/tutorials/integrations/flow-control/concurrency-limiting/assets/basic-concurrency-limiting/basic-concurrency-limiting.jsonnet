@@ -21,11 +21,13 @@ local svcSelector =
   );
 
 local policyResource = latencyAIMDPolicy({
-  policyName: 'service1-demo-app',
-  fluxMeter: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector),
-  concurrencyLimiterFlowSelector: svcSelector,
-  dynamicConfig: {
-    dryRun: false,
+  policy_name: 'service1-demo-app',
+  flux_meter: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector),
+  concurrency_controller+: {
+    flow_selector: svcSelector,
+    dynamic_config: {
+      dry_run: false,
+    },
   },
 }).policyResource;
 
