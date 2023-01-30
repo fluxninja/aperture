@@ -20,13 +20,13 @@
     components: [],
     /**
     * @section Policy
-    * @subsection Overload Detection
+    * @subsection Latency Baseliner
     *
-    * @param (policy.overload_detection.ema: aperture.spec.v1.EMAParameters) EMA parameters.
-    * @param (policy.overload_detection.latency_tolerance_multiplier: float64) Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.
-    * @param (policy.overload_detection.latency_ema_limit_multiplier: float64) Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.
+    * @param (policy.latency_baseliner.ema: aperture.spec.v1.EMAParameters) EMA parameters.
+    * @param (policy.latency_baseliner.latency_tolerance_multiplier: float64) Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.
+    * @param (policy.latency_baseliner.latency_ema_limit_multiplier: float64) Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.
     */
-    overload_detection: {
+    latency_baseliner: {
       ema: {
         ema_window: '1500s',
         warmup_window: '60s',
