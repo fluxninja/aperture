@@ -4,11 +4,9 @@ import (
 	"crypto/tls"
 
 	promapi "github.com/prometheus/client_golang/api"
-	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
@@ -28,19 +26,14 @@ type ControllerOTELConfig struct {
 	otelconfig.CommonOTELConfig `json:",inline"`
 }
 
-// OTELFxIn consumes parameters via Fx.
-type OTELFxIn struct {
-	fx.In
-	Unmarshaller    config.Unmarshaller
-	Listener        *listener.Listener
-	PromClient      promapi.Client
-	TLSConfig       *tls.Config
-	ServerTLSConfig tlsconfig.ServerTLSConfig
-}
-
-func provideController(in OTELFxIn) (*otelconfig.OTELConfig, error) {
+func provideController(
+	unmarshaller config.Unmarshaller,
+	lis *listener.Listener,
+	promClient promapi.Client,
+	tlsConfig *tls.Config,
+) (*otelconfig.OTELConfig, error) {
 	var controllerCfg ControllerOTELConfig
-	if err := in.Unmarshaller.UnmarshalKey("otel", &controllerCfg); err != nil {
+	if err := unmarshaller.UnmarshalKey("otel", &controllerCfg); err != nil {
 		return nil, err
 	}
 
@@ -48,7 +41,7 @@ func provideController(in OTELFxIn) (*otelconfig.OTELConfig, error) {
 	otelCfg.SetDebugPort(&controllerCfg.CommonOTELConfig)
 	otelCfg.AddDebugExtensions(&controllerCfg.CommonOTELConfig)
 
-	addMetricsPipeline(otelCfg, &controllerCfg, in.TLSConfig, in.Listener, in.PromClient)
+	addMetricsPipeline(otelCfg, &controllerCfg, tlsConfig, lis, promClient)
 	otelCfg.AddExporter(otelconsts.ExporterLogging, nil)
 	otelconfig.AddAlertsPipeline(otelCfg, controllerCfg.CommonOTELConfig)
 	return otelCfg, nil

@@ -5,14 +5,12 @@ import (
 
 	promapi "github.com/prometheus/client_golang/api"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
-	"go.uber.org/fx"
 	"k8s.io/client-go/rest"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/otelcollector/tracestologsprocessor"
@@ -67,19 +65,14 @@ type BatchPostrollupConfig struct {
 	SendBatchMaxSize uint32 `json:"send_batch_max_size" validate:"gte=0" default:"100"`
 }
 
-// OTELFxIn consumes parameters via Fx.
-type OTELFxIn struct {
-	fx.In
-	Unmarshaller    config.Unmarshaller
-	Listener        *listener.Listener
-	PromClient      promapi.Client
-	TLSConfig       *tls.Config
-	ServerTLSConfig tlsconfig.ServerTLSConfig
-}
-
-func provideAgent(in OTELFxIn) (*otelconfig.OTELConfig, error) {
+func provideAgent(
+	unmarshaller config.Unmarshaller,
+	lis *listener.Listener,
+	promClient promapi.Client,
+	tlsConfig *tls.Config,
+) (*otelconfig.OTELConfig, error) {
 	var agentCfg AgentOTELConfig
-	if err := in.Unmarshaller.UnmarshalKey("otel", &agentCfg); err != nil {
+	if err := unmarshaller.UnmarshalKey("otel", &agentCfg); err != nil {
 		return nil, err
 	}
 
@@ -88,8 +81,8 @@ func provideAgent(in OTELFxIn) (*otelconfig.OTELConfig, error) {
 	otelCfg.AddDebugExtensions(&agentCfg.CommonOTELConfig)
 
 	addLogsPipeline(otelCfg, &agentCfg)
-	addTracesPipeline(otelCfg, in.Listener)
-	addMetricsPipeline(otelCfg, &agentCfg, in.TLSConfig, in.Listener, in.PromClient)
+	addTracesPipeline(otelCfg, lis)
+	addMetricsPipeline(otelCfg, &agentCfg, tlsConfig, lis, promClient)
 	otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTELConfig, otelconsts.ProcessorAgentResourceLabels)
 	return otelCfg, nil
 }
