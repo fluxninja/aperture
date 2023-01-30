@@ -32,7 +32,6 @@ import (
 func ModuleForControllerOTEL() fx.Option {
 	return fx.Options(
 		fx.Provide(
-			otelconfig.NewOTELParams,
 			fx.Annotate(
 				provideController,
 				fx.ResultTags(otelconfig.BaseFxTag),

@@ -1,6 +1,14 @@
 package controller
 
 import (
+	"crypto/tls"
+
+	promapi "github.com/prometheus/client_golang/api"
+	"go.uber.org/fx"
+
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
@@ -20,18 +28,42 @@ type ControllerOTELConfig struct {
 	otelconfig.CommonOTELConfig `json:",inline"`
 }
 
-func provideController(cfg *otelconfig.OTELParams) *otelconfig.OTELConfig {
-	addMetricsPipeline(cfg)
-	cfg.Config.AddExporter(otelconsts.ExporterLogging, nil)
-	otelconfig.AddAlertsPipeline(cfg)
-	return cfg.Config
+// OTELFxIn consumes parameters via Fx.
+type OTELFxIn struct {
+	fx.In
+	Unmarshaller    config.Unmarshaller
+	Listener        *listener.Listener
+	PromClient      promapi.Client
+	TLSConfig       *tls.Config
+	ServerTLSConfig tlsconfig.ServerTLSConfig
+}
+
+func provideController(in OTELFxIn) (*otelconfig.OTELConfig, error) {
+	var controllerCfg ControllerOTELConfig
+	if err := in.Unmarshaller.UnmarshalKey("otel", &controllerCfg); err != nil {
+		return nil, err
+	}
+
+	otelCfg := otelconfig.NewOTELConfig()
+	otelCfg.SetDebugPort(&controllerCfg.CommonOTELConfig)
+	otelCfg.AddDebugExtensions(&controllerCfg.CommonOTELConfig)
+
+	addMetricsPipeline(otelCfg, &controllerCfg, in.TLSConfig, in.Listener, in.PromClient)
+	otelCfg.AddExporter(otelconsts.ExporterLogging, nil)
+	otelconfig.AddAlertsPipeline(otelCfg, controllerCfg.CommonOTELConfig)
+	return otelCfg, nil
 }
 
 // addMetricsPipeline adds metrics to pipeline for controller OTEL collector.
-func addMetricsPipeline(cfg *otelconfig.OTELParams) {
-	config := cfg.Config
-	addPrometheusReceiver(config, cfg)
-	otelconfig.AddPrometheusRemoteWriteExporter(config, cfg.PromClient)
+func addMetricsPipeline(
+	config *otelconfig.OTELConfig,
+	controllerConfig *ControllerOTELConfig,
+	tlsConfig *tls.Config,
+	lis *listener.Listener,
+	promClient promapi.Client,
+) {
+	addPrometheusReceiver(config, controllerConfig, tlsConfig, lis)
+	otelconfig.AddPrometheusRemoteWriteExporter(config, promClient)
 	config.Service.AddPipeline("metrics/controller-fast", otelconfig.Pipeline{
 		Receivers:  []string{otelconsts.ReceiverPrometheus},
 		Processors: []string{},
@@ -39,10 +71,15 @@ func addMetricsPipeline(cfg *otelconfig.OTELParams) {
 	})
 }
 
-func addPrometheusReceiver(config *otelconfig.OTELConfig, cfg *otelconfig.OTELParams) {
+func addPrometheusReceiver(
+	config *otelconfig.OTELConfig,
+	controllerConfig *ControllerOTELConfig,
+	tlsConfig *tls.Config,
+	lis *listener.Listener,
+) {
 	scrapeConfigs := []map[string]any{
-		otelconfig.BuildApertureSelfScrapeConfig("aperture-controller-self", cfg),
-		otelconfig.BuildOTELScrapeConfig("aperture-controller-otel", cfg),
+		otelconfig.BuildApertureSelfScrapeConfig("aperture-controller-self", tlsConfig, lis),
+		otelconfig.BuildOTELScrapeConfig("aperture-controller-otel", controllerConfig.CommonOTELConfig),
 	}
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
 	// tags, so they are not properly read by OTEL. Need to use bare maps instead.

@@ -1,11 +1,18 @@
 package agent
 
 import (
+	"crypto/tls"
+
+	promapi "github.com/prometheus/client_golang/api"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
+	"go.uber.org/fx"
 	"k8s.io/client-go/rest"
 
+	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/otelcollector/tracestologsprocessor"
@@ -26,16 +33,34 @@ type AgentOTELConfig struct {
 	otelconfig.CommonOTELConfig `json:",inline"`
 }
 
-func provideAgent(cfg *otelconfig.OTELParams) *otelconfig.OTELConfig {
-	addLogsPipeline(cfg)
-	addTracesPipeline(cfg)
-	addMetricsPipeline(cfg)
-	otelconfig.AddAlertsPipeline(cfg, otelconsts.ProcessorAgentResourceLabels)
-	return cfg.Config
+// OTELFxIn consumes parameters via Fx.
+type OTELFxIn struct {
+	fx.In
+	Unmarshaller    config.Unmarshaller
+	Listener        *listener.Listener
+	PromClient      promapi.Client
+	TLSConfig       *tls.Config
+	ServerTLSConfig tlsconfig.ServerTLSConfig
 }
 
-func addLogsPipeline(cfg *otelconfig.OTELParams) {
-	config := cfg.Config
+func provideAgent(in OTELFxIn) (*otelconfig.OTELConfig, error) {
+	var agentCfg AgentOTELConfig
+	if err := in.Unmarshaller.UnmarshalKey("otel", &agentCfg); err != nil {
+		return nil, err
+	}
+
+	otelCfg := otelconfig.NewOTELConfig()
+	otelCfg.SetDebugPort(&agentCfg.CommonOTELConfig)
+	otelCfg.AddDebugExtensions(&agentCfg.CommonOTELConfig)
+
+	addLogsPipeline(otelCfg, &agentCfg)
+	addTracesPipeline(otelCfg, in.Listener)
+	addMetricsPipeline(otelCfg, &agentCfg, in.TLSConfig, in.Listener, in.PromClient)
+	otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTELConfig, otelconsts.ProcessorAgentResourceLabels)
+	return otelCfg, nil
+}
+
+func addLogsPipeline(config *otelconfig.OTELConfig, userConfig *AgentOTELConfig) {
 	// Common dependencies for pipelines
 	config.AddReceiver(otelconsts.ReceiverOTLP, otlpreceiver.Config{})
 	// Note: Passing map[string]interface{}{} instead of real config, so that
@@ -43,16 +68,16 @@ func addLogsPipeline(cfg *otelconfig.OTELParams) {
 	config.AddProcessor(otelconsts.ProcessorMetrics, map[string]interface{}{})
 	config.AddBatchProcessor(
 		otelconsts.ProcessorBatchPrerollup,
-		cfg.BatchPrerollup.Timeout.AsDuration(),
-		cfg.BatchPrerollup.SendBatchSize,
-		cfg.BatchPrerollup.SendBatchMaxSize,
+		userConfig.BatchPrerollup.Timeout.AsDuration(),
+		userConfig.BatchPrerollup.SendBatchSize,
+		userConfig.BatchPrerollup.SendBatchMaxSize,
 	)
 	config.AddProcessor(otelconsts.ProcessorRollup, map[string]interface{}{})
 	config.AddBatchProcessor(
 		otelconsts.ProcessorBatchPostrollup,
-		cfg.BatchPostrollup.Timeout.AsDuration(),
-		cfg.BatchPostrollup.SendBatchSize,
-		cfg.BatchPostrollup.SendBatchMaxSize,
+		userConfig.BatchPostrollup.Timeout.AsDuration(),
+		userConfig.BatchPostrollup.SendBatchSize,
+		userConfig.BatchPostrollup.SendBatchMaxSize,
 	)
 	config.AddExporter(otelconsts.ExporterLogging, nil)
 
@@ -71,10 +96,9 @@ func addLogsPipeline(cfg *otelconfig.OTELParams) {
 	})
 }
 
-func addTracesPipeline(cfg *otelconfig.OTELParams) {
-	config := cfg.Config
+func addTracesPipeline(config *otelconfig.OTELConfig, lis *listener.Listener) {
 	config.AddExporter(otelconsts.ExporterOTLPLoopback, map[string]any{
-		"endpoint": cfg.Listener.GetAddr(),
+		"endpoint": lis.GetAddr(),
 		"tls": map[string]any{
 			"insecure": true,
 		},
@@ -104,11 +128,16 @@ func addTracesPipeline(cfg *otelconfig.OTELParams) {
 	})
 }
 
-func addMetricsPipeline(cfg *otelconfig.OTELParams) {
-	config := cfg.Config
-	addPrometheusReceiver(cfg)
+func addMetricsPipeline(
+	config *otelconfig.OTELConfig,
+	agentConfig *AgentOTELConfig,
+	tlsConfig *tls.Config,
+	lis *listener.Listener,
+	promClient promapi.Client,
+) {
+	addPrometheusReceiver(config, agentConfig, tlsConfig, lis)
 	config.AddProcessor(otelconsts.ProcessorEnrichment, nil)
-	otelconfig.AddPrometheusRemoteWriteExporter(config, cfg.PromClient)
+	otelconfig.AddPrometheusRemoteWriteExporter(config, promClient)
 	config.Service.AddPipeline("metrics/fast", otelconfig.Pipeline{
 		Receivers: []string{otelconsts.ReceiverPrometheus},
 		Processors: []string{
@@ -119,11 +148,15 @@ func addMetricsPipeline(cfg *otelconfig.OTELParams) {
 	})
 }
 
-func addPrometheusReceiver(cfg *otelconfig.OTELParams) {
-	config := cfg.Config
+func addPrometheusReceiver(
+	config *otelconfig.OTELConfig,
+	agentConfig *AgentOTELConfig,
+	tlsConfig *tls.Config,
+	lis *listener.Listener,
+) {
 	scrapeConfigs := []map[string]any{
-		otelconfig.BuildApertureSelfScrapeConfig("aperture-self", cfg),
-		otelconfig.BuildOTELScrapeConfig("aperture-otel", cfg),
+		otelconfig.BuildApertureSelfScrapeConfig("aperture-self", tlsConfig, lis),
+		otelconfig.BuildOTELScrapeConfig("aperture-otel", agentConfig.CommonOTELConfig),
 	}
 
 	_, err := rest.InClusterConfig()
@@ -133,7 +166,7 @@ func addPrometheusReceiver(cfg *otelconfig.OTELParams) {
 		log.Warn().Err(err).Msg("Error when discovering k8s environment")
 	} else {
 		log.Debug().Msg("K8s environment detected. Adding K8s scrape configurations.")
-		scrapeConfigs = append(scrapeConfigs, buildKubernetesNodesScrapeConfig(cfg), buildKubernetesPodsScrapeConfig(cfg))
+		scrapeConfigs = append(scrapeConfigs, buildKubernetesNodesScrapeConfig(), buildKubernetesPodsScrapeConfig())
 	}
 
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
@@ -150,7 +183,7 @@ func addPrometheusReceiver(cfg *otelconfig.OTELParams) {
 	})
 }
 
-func buildKubernetesNodesScrapeConfig(cfg *otelconfig.OTELParams) map[string]any {
+func buildKubernetesNodesScrapeConfig() map[string]any {
 	return map[string]any{
 		"job_name":     "kubernetes-nodes",
 		"scheme":       "https",
@@ -187,7 +220,7 @@ func buildKubernetesNodesScrapeConfig(cfg *otelconfig.OTELParams) map[string]any
 	}
 }
 
-func buildKubernetesPodsScrapeConfig(cfg *otelconfig.OTELParams) map[string]any {
+func buildKubernetesPodsScrapeConfig() map[string]any {
 	return map[string]any{
 		"job_name":     "kubernetes-pods",
 		"scheme":       "http",

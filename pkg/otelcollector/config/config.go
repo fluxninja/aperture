@@ -183,15 +183,6 @@ func (p *Pipeline) AsMap() map[string]interface{} {
 // BaseFxTag is the base name tag for otel components.
 var BaseFxTag = config.NameTag("base")
 
-// OTELParams contains parameters for otel collector factories for agent and controller.
-type OTELParams struct {
-	PromClient promapi.Client
-	Config     *OTELConfig
-	Listener   *listener.Listener
-	tlsConfig  *tls.Config
-	CommonOTELConfig
-}
-
 // FxIn consumes parameters via Fx.
 type FxIn struct {
 	fx.In
@@ -200,26 +191,4 @@ type FxIn struct {
 	PromClient      promapi.Client
 	TLSConfig       *tls.Config
 	ServerTLSConfig tlsconfig.ServerTLSConfig
-}
-
-// NewOTELParams returns OTEL parameters for OTEL collectors.
-func NewOTELParams(in FxIn) (*OTELParams, error) {
-	config := NewOTELConfig()
-
-	var userCfg CommonOTELConfig
-	if err := in.Unmarshaller.UnmarshalKey("otel", &userCfg); err != nil {
-		return nil, err
-	}
-
-	config.SetDebugPort(&userCfg)
-	config.AddDebugExtensions(&userCfg)
-
-	cfg := &OTELParams{
-		CommonOTELConfig: userCfg,
-		Listener:         in.Listener,
-		PromClient:       in.PromClient,
-		tlsConfig:        in.TLSConfig,
-		Config:           config,
-	}
-	return cfg, nil
 }
