@@ -50,7 +50,7 @@ var _ = Describe("Service for Agent", func() {
 									Addr: ":8080",
 								},
 							},
-							Otel: otelconfig.UserOTELConfig{},
+							Otel: otelconfig.CommonOTELConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							BindAddr:           ":3320",
@@ -141,7 +141,7 @@ var _ = Describe("Service for Agent", func() {
 									Addr: ":8080",
 								},
 							},
-							Otel: otelconfig.UserOTELConfig{},
+							Otel: otelconfig.CommonOTELConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							BindAddr:           ":3320",

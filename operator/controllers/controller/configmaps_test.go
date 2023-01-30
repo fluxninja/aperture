@@ -81,7 +81,7 @@ var _ = Describe("ConfigMap for Controller", func() {
 								DisablePlugins:  false,
 								DisabledPlugins: []string{"aperture-plugin-fluxninja"},
 							},
-							Otel: otelconfig.UserOTELConfig{
+							Otel: otelconfig.CommonOTELConfig{
 								BatchPrerollup: otelconfig.BatchPrerollupConfig{
 									Timeout:          config.MakeDuration(1 * time.Second),
 									SendBatchSize:    10000,

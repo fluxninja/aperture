@@ -112,7 +112,7 @@ var _ = Describe("Controller Deployment", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelconfig.UserOTELConfig{
+							Otel: otelconfig.CommonOTELConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -335,7 +335,7 @@ var _ = Describe("Controller Deployment", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelconfig.UserOTELConfig{
+							Otel: otelconfig.CommonOTELConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,

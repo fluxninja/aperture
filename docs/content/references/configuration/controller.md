@@ -185,7 +185,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_`
 <dd>
 
 Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_PROXY_`
-Type: [UserOTELConfig](#user-o-t-e-l-config)
+Type: [CommonOTELConfig](#common-o-t-e-l-config)
 
 </dd>
 
@@ -595,6 +595,39 @@ ClientTLSConfig is the config for client TLS.
 <dd>
 
 (string)
+
+</dd>
+</dl>
+
+### CommonOTELConfig {#common-o-t-e-l-config}
+
+CommonOTELConfig is the configuration for the OTEL collector.
+
+#### Properties
+
+<dl>
+<dt>batch_alerts</dt>
+<dd>
+
+([BatchAlertsConfig](#batch-alerts-config))
+
+</dd>
+<dt>batch_postrollup</dt>
+<dd>
+
+([BatchPostrollupConfig](#batch-postrollup-config))
+
+</dd>
+<dt>batch_prerollup</dt>
+<dd>
+
+([BatchPrerollupConfig](#batch-prerollup-config))
+
+</dd>
+<dt>ports</dt>
+<dd>
+
+([PortsConfig](#ports-config))
 
 </dd>
 </dl>
@@ -1367,39 +1400,6 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 <dd>
 
 (string) Server Key file path
-
-</dd>
-</dl>
-
-### UserOTELConfig {#user-o-t-e-l-config}
-
-UserOTELConfig is the configuration for the OTEL collector.
-
-#### Properties
-
-<dl>
-<dt>batch_alerts</dt>
-<dd>
-
-([BatchAlertsConfig](#batch-alerts-config))
-
-</dd>
-<dt>batch_postrollup</dt>
-<dd>
-
-([BatchPostrollupConfig](#batch-postrollup-config))
-
-</dd>
-<dt>batch_prerollup</dt>
-<dd>
-
-([BatchPrerollupConfig](#batch-prerollup-config))
-
-</dd>
-<dt>ports</dt>
-<dd>
-
-([PortsConfig](#ports-config))
 
 </dd>
 </dl>

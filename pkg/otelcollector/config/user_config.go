@@ -2,9 +2,9 @@ package config
 
 import "github.com/fluxninja/aperture/pkg/config"
 
-// NewDefaultUserOTELConfig creates UserOTELConfig with all the default values set.
-func NewDefaultUserOTELConfig() *UserOTELConfig {
-	return &UserOTELConfig{
+// NewDefaultCommonOTELConfig creates CommonOTELConfig with all the default values set.
+func NewDefaultCommonOTELConfig() *CommonOTELConfig {
+	return &CommonOTELConfig{
 		Ports: PortsConfig{
 			DebugPort:       8888,
 			HealthCheckPort: 13133,
@@ -21,12 +21,12 @@ func NewDefaultUserOTELConfig() *UserOTELConfig {
 // - name: proxy
 //   in: body
 //   schema:
-//     "$ref": "#/definitions/UserOTELConfig"
+//     "$ref": "#/definitions/CommonOTELConfig"
 
-// UserOTELConfig is the configuration for the OTEL collector.
+// CommonOTELConfig is the configuration for the OTEL collector.
 // swagger:model
 // +kubebuilder:object:generate=true
-type UserOTELConfig struct {
+type CommonOTELConfig struct {
 	// BatchPrerollup configures batch prerollup processor.
 	BatchPrerollup BatchPrerollupConfig `json:"batch_prerollup"`
 	// BatchPostrollup configures batch postrollup processor.
