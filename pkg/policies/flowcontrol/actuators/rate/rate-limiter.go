@@ -33,7 +33,7 @@ const rateLimiterStatusRoot = "rate_limiters"
 
 var (
 	fxNameTag       = config.NameTag(rateLimiterStatusRoot)
-	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel, metrics.DecisionTypeLabel}
+	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel, metrics.DecisionTypeLabel, metrics.LimiterDroppedLabel}
 )
 
 func rateLimiterModule() fx.Option {
