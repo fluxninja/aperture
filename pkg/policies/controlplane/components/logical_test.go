@@ -21,14 +21,14 @@ var _ = Describe("Not component", func() {
 					output: { signal_name: NOT }
 			`,
 			sim.Inputs{
-				runtime.SignalID{SignalName: "INPUT"}: sim.NewInput([]float64{nan, 0.0, 1.0, 2.0, -1.}),
+				runtime.MakeRootSignalID("INPUT"): sim.NewInput([]float64{nan, 0.0, 1.0, 2.0, -1.}),
 			},
-			sim.OutputSignals{runtime.SignalID{SignalName: "NOT"}},
+			sim.OutputSignals{runtime.MakeRootSignalID("NOT")},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
 			sim.Outputs{
-				runtime.SignalID{SignalName: "NOT"}: sim.NewReadings([]float64{nan, 1.0, 0.0, 0.0, 0.0}),
+				runtime.MakeRootSignalID("NOT"): sim.NewReadings([]float64{nan, 1.0, 0.0, 0.0, 0.0}),
 			},
 		))
 	})
@@ -57,17 +57,17 @@ var _ = Describe("And and Or component", func() {
 					output: { signal_name: OR }
 			`,
 			sim.Inputs{
-				runtime.SignalID{SignalName: "INPUTX"}: sim.NewInput([]float64{nan, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, -1.}),
-				runtime.SignalID{SignalName: "INPUTY"}: sim.NewInput([]float64{nan, nan, nan, 0.0, 0.0, 1.0, 2.0, -2.}),
-				runtime.SignalID{SignalName: "INPUTZ"}: sim.NewInput([]float64{nan, 0.0, 1.0, 0.0, 1.0, 1.0, 3.0, 3.0}),
+				runtime.MakeRootSignalID("INPUTX"): sim.NewInput([]float64{nan, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, -1.}),
+				runtime.MakeRootSignalID("INPUTY"): sim.NewInput([]float64{nan, nan, nan, 0.0, 0.0, 1.0, 2.0, -2.}),
+				runtime.MakeRootSignalID("INPUTZ"): sim.NewInput([]float64{nan, 0.0, 1.0, 0.0, 1.0, 1.0, 3.0, 3.0}),
 			},
-			sim.OutputSignals{runtime.SignalID{SignalName: "AND"}, runtime.SignalID{SignalName: "OR"}},
+			sim.OutputSignals{runtime.MakeRootSignalID("AND"), runtime.MakeRootSignalID("OR")},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
 			sim.Outputs{
-				runtime.SignalID{SignalName: "AND"}: sim.NewReadings([]float64{nan, 0.0, nan, 0.0, 0.0, 1.0, 1.0, 1.0}),
-				runtime.SignalID{SignalName: "OR"}:  sim.NewReadings([]float64{nan, nan, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0}),
+				runtime.MakeRootSignalID("AND"): sim.NewReadings([]float64{nan, 0.0, nan, 0.0, 0.0, 1.0, 1.0, 1.0}),
+				runtime.MakeRootSignalID("OR"):  sim.NewReadings([]float64{nan, nan, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0}),
 			},
 		))
 	})
@@ -81,12 +81,12 @@ var _ = Describe("And and Or component", func() {
 					output: { signal_name: AND }
 			`,
 			nil,
-			sim.OutputSignals{runtime.SignalID{SignalName: "AND"}},
+			sim.OutputSignals{runtime.MakeRootSignalID("AND")},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Step()).To(Equal(
 			map[runtime.SignalID]sim.Reading{
-				{SignalName: "AND"}: sim.NewReading(1.0),
+				runtime.MakeRootSignalID("AND"): sim.NewReading(1.0),
 			},
 		))
 	})
@@ -100,12 +100,12 @@ var _ = Describe("And and Or component", func() {
 					output: { signal_name: OR }
 			`,
 			nil,
-			sim.OutputSignals{runtime.SignalID{SignalName: "OR"}},
+			sim.OutputSignals{runtime.MakeRootSignalID("OR")},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Step()).To(Equal(
 			map[runtime.SignalID]sim.Reading{
-				{SignalName: "OR"}: sim.NewReading(0.0),
+				runtime.MakeRootSignalID("OR"): sim.NewReading(0.0),
 			},
 		))
 	})

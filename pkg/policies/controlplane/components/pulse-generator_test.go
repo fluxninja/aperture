@@ -20,12 +20,12 @@ var _ = Describe("PulseGenerator", func() {
 					output: { signal_name: PULSE }
 			`,
 			nil,
-			sim.OutputSignals{runtime.SignalID{SignalName: "PULSE"}},
+			sim.OutputSignals{runtime.MakeRootSignalID("PULSE")},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Run(10)).To(Equal(
 			sim.Outputs{
-				runtime.SignalID{SignalName: "PULSE"}: sim.NewReadings([]float64{1, 1, 1, 0, 0, 1, 1, 1, 0, 0}),
+				runtime.MakeRootSignalID("PULSE"): sim.NewReadings([]float64{1, 1, 1, 0, 0, 1, 1, 1, 0, 0}),
 			},
 		))
 	})
@@ -42,12 +42,12 @@ var _ = Describe("PulseGenerator", func() {
 					output: { signal_name: PULSE }
 			`,
 			nil,
-			sim.OutputSignals{runtime.SignalID{SignalName: "PULSE"}},
+			sim.OutputSignals{runtime.MakeRootSignalID("PULSE")},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Run(4)).To(Equal(
 			sim.Outputs{
-				runtime.SignalID{SignalName: "PULSE"}: sim.NewReadings([]float64{1, 0, 1, 0}),
+				runtime.MakeRootSignalID("PULSE"): sim.NewReadings([]float64{1, 0, 1, 0}),
 			},
 		))
 	})
@@ -62,12 +62,12 @@ var _ = Describe("PulseGenerator", func() {
 					output: { signal_name: PULSE }
 			`,
 			nil,
-			sim.OutputSignals{runtime.SignalID{SignalName: "PULSE"}},
+			sim.OutputSignals{runtime.MakeRootSignalID("PULSE")},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Run(11)).To(Equal(
 			sim.Outputs{
-				runtime.SignalID{SignalName: "PULSE"}: sim.NewReadings([]float64{1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1}),
+				runtime.MakeRootSignalID("PULSE"): sim.NewReadings([]float64{1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1}),
 			},
 		))
 	})

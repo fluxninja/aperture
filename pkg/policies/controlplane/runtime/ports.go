@@ -147,6 +147,14 @@ func PortsFromComponentConfig(componentConfig mapstruct.Object, subCircuitID str
 // SignalType enum.
 type SignalType int
 
+// MakeRootSignalID creates SignalID with "root" SubCircuitID.
+func MakeRootSignalID(signalName string) SignalID {
+	return SignalID{
+		SubCircuitID: "root",
+		SignalName:   signalName,
+	}
+}
+
 // SignalID is a unique identifier for a signal.
 type SignalID struct {
 	SubCircuitID string
