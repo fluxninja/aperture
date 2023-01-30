@@ -21,8 +21,8 @@ FakeConstant0 --> root.1rhs
 subgraph root.2[<center>ArithmeticCombinator<br/>mul</center>]
 subgraph root.2_inports[ ]
 style root.2_inports fill:none,stroke:none
-root.2lhs[lhs]
 root.2rhs[rhs]
+root.2lhs[lhs]
 end
 subgraph root.2_outports[ ]
 style root.2_outports fill:none,stroke:none
@@ -34,8 +34,8 @@ FakeConstant1 --> root.2rhs
 subgraph root.3[<center>EMA<br/>win: 1500s</center>]
 subgraph root.3_inports[ ]
 style root.3_inports fill:none,stroke:none
-root.3max_envelope[max_envelope]
 root.3input[input]
+root.3max_envelope[max_envelope]
 end
 subgraph root.3_outports[ ]
 style root.3_outports fill:none,stroke:none
@@ -50,16 +50,13 @@ root.4signal[signal]
 end
 subgraph root.4_outports[ ]
 style root.4_outports fill:none,stroke:none
-root.4desired_concurrency[desired_concurrency]
-root.4incoming_concurrency[incoming_concurrency]
 root.4is_overload[is_overload]
 root.4load_multiplier[load_multiplier]
-root.4accepted_concurrency[accepted_concurrency]
 end
 end
+root.2output --> |LATENCY_SETPOINT| root.4setpoint
+root.3output --> |LATENCY_EMA| root.2lhs
 root.0output --> |LATENCY| root.1lhs
 root.0output --> |LATENCY| root.3input
 root.0output --> |LATENCY| root.4signal
 root.1output --> |MAX_EMA| root.3max_envelope
-root.2output --> |LATENCY_SETPOINT| root.4setpoint
-root.3output --> |LATENCY_EMA| root.2lhs
