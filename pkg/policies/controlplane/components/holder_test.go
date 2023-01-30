@@ -21,14 +21,14 @@ var _ = Describe("Holder", func() {
 					output: { signal_name: HOLDER }
 			`,
 			sim.Inputs{
-				runtime.SignalID{SignalName: "INPUT"}: sim.NewInput([]float64{1, nan, 3, nan, nan}),
+				runtime.MakeRootSignalID("INPUT"): sim.NewInput([]float64{1, nan, 3, nan, nan}),
 			},
-			sim.OutputSignals{runtime.SignalID{SignalName: "HOLDER"}},
+			sim.OutputSignals{runtime.MakeRootSignalID("HOLDER")},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
 			sim.Outputs{
-				runtime.SignalID{SignalName: "HOLDER"}: sim.NewReadings([]float64{1, 1, 1, 1, nan}),
+				runtime.MakeRootSignalID("HOLDER"): sim.NewReadings([]float64{1, 1, 1, 1, nan}),
 			},
 		))
 	})
@@ -46,14 +46,14 @@ var _ = Describe("Holder", func() {
 					output: { signal_name: HOLDER }
 			`,
 			sim.Inputs{
-				runtime.SignalID{SignalName: "INPUT"}: sim.NewInput([]float64{1, 2, 3, 4, 6, 7, 8}),
+				runtime.MakeRootSignalID("INPUT"): sim.NewInput([]float64{1, 2, 3, 4, 6, 7, 8}),
 			},
-			sim.OutputSignals{runtime.SignalID{SignalName: "HOLDER"}},
+			sim.OutputSignals{runtime.MakeRootSignalID("HOLDER")},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
 			sim.Outputs{
-				runtime.SignalID{SignalName: "HOLDER"}: sim.NewReadings([]float64{1, 1, 1, 1, 6, 6, 6}),
+				runtime.MakeRootSignalID("HOLDER"): sim.NewReadings([]float64{1, 1, 1, 1, 6, 6, 6}),
 			},
 		))
 	})

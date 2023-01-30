@@ -31,12 +31,12 @@ var _ = Describe("Circuit", func() {
 					output: { signal_name: SUM }
 			`,
 			sim.Inputs(nil),
-			sim.OutputSignals{runtime.SignalID{SignalName: "SUM"}},
+			sim.OutputSignals{runtime.MakeRootSignalID("SUM")},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Run(3)).To(Equal(
 			sim.Outputs{
-				runtime.SignalID{SignalName: "SUM"}: sim.NewReadings([]float64{1.0, 2.0, 3.0}),
+				runtime.MakeRootSignalID("SUM"): sim.NewReadings([]float64{1.0, 2.0, 3.0}),
 			},
 		))
 	})
@@ -71,15 +71,20 @@ var _ = Describe("Circuit", func() {
 					output: { signal_name: VAR4 }
 			`,
 			sim.Inputs(nil),
-			sim.OutputSignals{runtime.SignalID{SignalName: "VAR"}, runtime.SignalID{SignalName: "VAR2"}, runtime.SignalID{SignalName: "VAR3"}, runtime.SignalID{SignalName: "VAR4"}},
+			sim.OutputSignals{
+				runtime.MakeRootSignalID("VAR"),
+				runtime.MakeRootSignalID("VAR2"),
+				runtime.MakeRootSignalID("VAR3"),
+				runtime.MakeRootSignalID("VAR4"),
+			},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Step()).To(Equal(
 			map[runtime.SignalID]sim.Reading{
-				{SignalName: "VAR"}:  sim.NewReading(42),
-				{SignalName: "VAR2"}: sim.NewReading(math.NaN()),
-				{SignalName: "VAR3"}: sim.NewReading(math.Inf(1)),
-				{SignalName: "VAR4"}: sim.NewReading(math.Inf(-1)),
+				runtime.MakeRootSignalID("VAR"):  sim.NewReading(42),
+				runtime.MakeRootSignalID("VAR2"): sim.NewReading(math.NaN()),
+				runtime.MakeRootSignalID("VAR3"): sim.NewReading(math.Inf(1)),
+				runtime.MakeRootSignalID("VAR4"): sim.NewReading(math.Inf(-1)),
 			},
 		))
 	})
