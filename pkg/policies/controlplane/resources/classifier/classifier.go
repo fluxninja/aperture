@@ -25,7 +25,7 @@ type classifierConfigSync struct {
 
 // NewClassifierOptions creates fx options for classifier.
 func NewClassifierOptions(
-	index int64,
+	classifierIndex int64,
 	classifierProto *policylangv1.Classifier,
 	policyBaseAPI iface.Policy,
 ) (fx.Option, error) {
@@ -37,13 +37,13 @@ func NewClassifierOptions(
 	agentGroup := flowSelectorProto.ServiceSelector.GetAgentGroup()
 
 	etcdPath := path.Join(paths.ClassifiersPath,
-		paths.ClassifierKey(agentGroup, policyBaseAPI.GetPolicyName(), index))
+		paths.ClassifierKey(agentGroup, policyBaseAPI.GetPolicyName(), classifierIndex))
 	configSync := &classifierConfigSync{
 		classifierProto: classifierProto,
 		policyReadAPI:   policyBaseAPI,
 		agentGroupName:  agentGroup,
 		etcdPath:        etcdPath,
-		classifierIndex: index,
+		classifierIndex: classifierIndex,
 	}
 
 	return fx.Options(
@@ -59,10 +59,10 @@ func (configSync *classifierConfigSync) doSync(etcdClient *etcdclient.Client, li
 		OnStart: func(ctx context.Context) error {
 			wrapper := &policysyncv1.ClassifierWrapper{
 				Classifier: configSync.classifierProto,
-				CommonAttributes: &policysyncv1.CommonAttributes{
-					PolicyName:     configSync.policyReadAPI.GetPolicyName(),
-					PolicyHash:     configSync.policyReadAPI.GetPolicyHash(),
-					ComponentIndex: configSync.classifierIndex,
+				ClassifierAttributes: &policysyncv1.ClassifierAttributes{
+					PolicyName:      configSync.policyReadAPI.GetPolicyName(),
+					PolicyHash:      configSync.policyReadAPI.GetPolicyHash(),
+					ClassifierIndex: configSync.classifierIndex,
 				},
 			}
 			dat, err := proto.Marshal(wrapper)

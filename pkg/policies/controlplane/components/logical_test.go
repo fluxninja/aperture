@@ -84,7 +84,7 @@ var _ = Describe("And and Or component", func() {
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Step()).To(Equal(
-			map[string]sim.Reading{
+			sim.StepOutputs{
 				"AND": sim.NewReading(1.0),
 			},
 		))
@@ -103,7 +103,7 @@ var _ = Describe("And and Or component", func() {
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Step()).To(Equal(
-			map[string]sim.Reading{
+			sim.StepOutputs{
 				"OR": sim.NewReading(0.0),
 			},
 		))

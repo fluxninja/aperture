@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"path"
-	"strconv"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
@@ -30,10 +29,10 @@ type LoadActuator struct {
 	alerterIface      alerts.Alerter
 	decisionWriter    *etcdwriter.Writer
 	loadActuatorProto *policylangv1.LoadActuator
-	alerterConfig     *policylangv1.AlerterConfig
+	alerterParameters *policylangv1.Alerter_Parameters
 	decisionsEtcdPath string
 	agentGroupName    string
-	componentIndex    int
+	componentID       string
 	dryRun            bool
 }
 
@@ -46,12 +45,12 @@ func (*LoadActuator) Type() runtime.ComponentType { return runtime.ComponentType
 // NewLoadActuatorAndOptions creates load actuator and its fx options.
 func NewLoadActuatorAndOptions(
 	loadActuatorProto *policylangv1.LoadActuator,
-	componentIndex int,
+	componentID string,
 	policyReadAPI iface.Policy,
 	agentGroup string,
 ) (runtime.Component, fx.Option, error) {
-	componentID := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), int64(componentIndex))
-	decisionsEtcdPath := path.Join(paths.LoadActuatorDecisionsPath, componentID)
+	etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
+	decisionsEtcdPath := path.Join(paths.LoadActuatorDecisionsPath, etcdKey)
 	dryRun := false
 	if loadActuatorProto.GetDefaultConfig() != nil {
 		dryRun = loadActuatorProto.GetDefaultConfig().GetDryRun()
@@ -59,13 +58,13 @@ func NewLoadActuatorAndOptions(
 	lsa := &LoadActuator{
 		policyReadAPI:     policyReadAPI,
 		agentGroupName:    agentGroup,
-		componentIndex:    componentIndex,
+		componentID:       componentID,
 		decisionsEtcdPath: decisionsEtcdPath,
 		loadActuatorProto: loadActuatorProto,
 		dryRun:            dryRun,
 	}
 
-	lsa.alerterConfig = loadActuatorProto.GetAlerterConfig()
+	lsa.alerterParameters = loadActuatorProto.GetAlerterParameters()
 
 	return lsa, fx.Options(
 		fx.Invoke(lsa.setupWriter),
@@ -96,7 +95,7 @@ func (la *LoadActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.
 }
 
 // Execute implements runtime.Component.Execute.
-func (la *LoadActuator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (la *LoadActuator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Get the decision from the port
 	lm, ok := inPortReadings["load_multiplier"]
@@ -172,9 +171,9 @@ func (la *LoadActuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplie
 	wrapper := &policysyncv1.LoadDecisionWrapper{
 		LoadDecision: decision,
 		CommonAttributes: &policysyncv1.CommonAttributes{
-			PolicyName:     la.policyReadAPI.GetPolicyName(),
-			PolicyHash:     la.policyReadAPI.GetPolicyHash(),
-			ComponentIndex: int64(la.componentIndex),
+			PolicyName:  la.policyReadAPI.GetPolicyName(),
+			PolicyHash:  la.policyReadAPI.GetPolicyHash(),
+			ComponentId: la.componentID,
 		},
 	}
 	dat, err := proto.Marshal(wrapper)
@@ -188,20 +187,20 @@ func (la *LoadActuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplie
 
 func (la *LoadActuator) addAlert() {
 	// do not generate alerts if config was not provided
-	if la.alerterConfig == nil {
+	if la.alerterParameters == nil {
 		return
 	}
 	alert := alerts.NewAlert(
-		alerts.WithName(la.alerterConfig.AlertName),
-		alerts.WithSeverity(alerts.ParseSeverity(la.alerterConfig.Severity)),
-		alerts.WithAlertChannels(la.alerterConfig.AlertChannels),
-		alerts.WithResolveTimeout(la.alerterConfig.ResolveTimeout.AsDuration()),
+		alerts.WithName(la.alerterParameters.AlertName),
+		alerts.WithSeverity(alerts.ParseSeverity(la.alerterParameters.Severity)),
+		alerts.WithAlertChannels(la.alerterParameters.AlertChannels),
+		alerts.WithResolveTimeout(la.alerterParameters.ResolveTimeout.AsDuration()),
 		alerts.WithLabel("policy_name", la.policyReadAPI.GetPolicyName()),
 		alerts.WithLabel("type", "concurrency_limiter"),
 		alerts.WithLabel("agent_group", la.agentGroupName),
-		alerts.WithLabel("component_index", strconv.Itoa(la.componentIndex)),
+		alerts.WithLabel("component_id", la.componentID),
 		alerts.WithGeneratorURL(
-			fmt.Sprintf("http://%s/%s/%d", info.GetHostInfo().Hostname, la.policyReadAPI.GetPolicyName(), la.componentIndex),
+			fmt.Sprintf("http://%s/%s/%s", info.GetHostInfo().Hostname, la.policyReadAPI.GetPolicyName(), la.componentID),
 		),
 	)
 

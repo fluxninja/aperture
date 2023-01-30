@@ -1,52 +1,52 @@
 flowchart LR
-subgraph 0[PromQL]
-subgraph 0_outports[ ]
-style 0_outports fill:none,stroke:none
-0output[output]
+subgraph root.0[PromQL]
+subgraph root.0_outports[ ]
+style root.0_outports fill:none,stroke:none
+root.0output[output]
 end
 end
-subgraph 1[<center>EMA<br/>win: 1500s</center>]
-subgraph 1_inports[ ]
-style 1_inports fill:none,stroke:none
-1input[input]
+subgraph root.1[<center>EMA<br/>win: 1500s</center>]
+subgraph root.1_inports[ ]
+style root.1_inports fill:none,stroke:none
+root.1input[input]
 end
-subgraph 1_outports[ ]
-style 1_outports fill:none,stroke:none
-1output[output]
+subgraph root.1_outports[ ]
+style root.1_outports fill:none,stroke:none
+root.1output[output]
 end
 end
-subgraph 2[<center>ArithmeticCombinator<br/>mul</center>]
-subgraph 2_inports[ ]
-style 2_inports fill:none,stroke:none
-2rhs[rhs]
-2lhs[lhs]
+subgraph root.2[<center>ArithmeticCombinator<br/>mul</center>]
+subgraph root.2_inports[ ]
+style root.2_inports fill:none,stroke:none
+root.2lhs[lhs]
+root.2rhs[rhs]
 end
-subgraph 2_outports[ ]
-style 2_outports fill:none,stroke:none
-2output[output]
+subgraph root.2_outports[ ]
+style root.2_outports fill:none,stroke:none
+root.2output[output]
 end
 end
 FakeConstant0((1.10))
-FakeConstant0 --> 2rhs
-subgraph 3[<center>Decider<br/>gt for 0s</center>]
-subgraph 3_inports[ ]
-style 3_inports fill:none,stroke:none
-3lhs[lhs]
-3rhs[rhs]
+FakeConstant0 --> root.2rhs
+subgraph root.3[<center>Decider<br/>gt for 0s</center>]
+subgraph root.3_inports[ ]
+style root.3_inports fill:none,stroke:none
+root.3rhs[rhs]
+root.3lhs[lhs]
 end
-subgraph 3_outports[ ]
-style 3_outports fill:none,stroke:none
-3output[output]
-end
-end
-subgraph 4[Alerter]
-subgraph 4_inports[ ]
-style 4_inports fill:none,stroke:none
-4signal[signal]
+subgraph root.3_outports[ ]
+style root.3_outports fill:none,stroke:none
+root.3output[output]
 end
 end
-2output --> |LATENCY_SETPOINT| 3rhs
-3output --> |IS_OVERLOAD_SWITCH| 4signal
-0output --> |LATENCY| 1input
-0output --> |LATENCY| 3lhs
-1output --> |LATENCY_EMA| 2lhs
+subgraph root.4[Alerter]
+subgraph root.4_inports[ ]
+style root.4_inports fill:none,stroke:none
+root.4signal[signal]
+end
+end
+root.0output --> |LATENCY| root.1input
+root.0output --> |LATENCY| root.3lhs
+root.1output --> |LATENCY_EMA| root.2lhs
+root.2output --> |LATENCY_SETPOINT| root.3rhs
+root.3output --> |IS_OVERLOAD_SWITCH| root.4signal

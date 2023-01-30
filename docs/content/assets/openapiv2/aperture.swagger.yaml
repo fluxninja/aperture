@@ -592,14 +592,7 @@ definitions:
         description: List of subexpressions of the match expression.
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     title: List of MatchExpressions that is used for all/any matching
-  PreviewFlowLabelsResponseFlowLabels:
-    type: object
-    properties:
-      labels:
-        type: object
-        additionalProperties:
-          type: string
-  RateLimiterLazySync:
+  ParametersLazySync:
     type: object
     properties:
       enabled:
@@ -616,6 +609,13 @@ definitions:
           @gotags: default:"5" validate:"gt=0"
         x-go-default: 5
         x-go-validate: gt=0
+  PreviewFlowLabelsResponseFlowLabels:
+    type: object
+    properties:
+      labels:
+        type: object
+        additionalProperties:
+          type: string
   RateLimiterOverride:
     type: object
     properties:
@@ -660,10 +660,10 @@ definitions:
   SchedulerWorkload:
     type: object
     properties:
-      workload_parameters:
+      parameters:
         $ref: '#/definitions/SchedulerWorkloadParameters'
         description: |-
-          WorkloadParameters associated with flows matching the label matcher.
+          Parameters associated with flows matching the label matcher.
 
           @gotags: validate:"required"
         x-go-validate: required
@@ -705,7 +705,7 @@ definitions:
           Any [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if
           you have a classifier that sets `user` flow label, you might want to set
           `fairness_key = "user"`.
-    description: WorkloadParameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
+    description: Parameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
   googlerpcStatus:
     type: object
     properties:
@@ -858,6 +858,110 @@ definitions:
         type: string
         format: date-time
     description: Status holds details about a status that can be reported to the registry.
+  v1AIMDConcurrencyController:
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/v1AIMDConcurrencyControllerIns'
+        description: Input ports for the AIMDConcurrencyController component.
+      out_ports:
+        $ref: '#/definitions/v1AIMDConcurrencyControllerOuts'
+        description: Output ports for the AIMDConcurrencyController component.
+      flow_selector:
+        $ref: '#/definitions/v1FlowSelector'
+        description: |-
+          Flow Selector decides the service and flows at which the concurrency limiter is applied.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+      scheduler_parameters:
+        $ref: '#/definitions/v1SchedulerParameters'
+        description: |-
+          Scheduler parameters.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+      gradient_parameters:
+        $ref: '#/definitions/v1GradientControllerParameters'
+        title: |-
+          Gradient parameters for the controller. Defaults to:
+          * slope = -1
+          * min_gradient = 0.1
+          * max_gradient = 1
+      concurrency_limit_multiplier:
+        type: number
+        format: double
+        description: |-
+          Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+
+          @gotags: default:"2.0"
+        x-go-default: 2
+      concurrency_linear_increment:
+        type: number
+        format: double
+        description: |-
+          Linear increment to concurrency in each execution tick when the system is not in overloaded state.
+
+          @gotags: default:"5.0"
+        x-go-default: 5
+      concurrency_sqrt_increment_multiplier:
+        type: number
+        format: double
+        description: |-
+          Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
+
+          @gotags: default:"1.0"
+        x-go-default: 1
+      alerter_parameters:
+        $ref: '#/definitions/v1AlerterParameters'
+        description: Configuration for embedded alerter.
+      dry_run_dynamic_config_key:
+        type: string
+        description: Configuration key for load actuation dry run.
+    description: High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
+  v1AIMDConcurrencyControllerIns:
+    type: object
+    properties:
+      signal:
+        $ref: '#/definitions/v1InPort'
+        description: The signal to the controller.
+      setpoint:
+        $ref: '#/definitions/v1InPort'
+        description: The setpoint to the controller.
+    description: Inputs for the AIMDConcurrencyController component.
+  v1AIMDConcurrencyControllerOuts:
+    type: object
+    properties:
+      accepted_concurrency:
+        $ref: '#/definitions/v1OutPort'
+        description: |-
+          Accepted concurrency is the number of accepted tokens per second.
+
+          :::info
+          **Accepted tokens** are tokens associated with
+          [flows](/concepts/integrations/flow-control/flow-control.md#flow) that were accepted by
+          this scheduler. Number of tokens for a flow is determined by a
+          [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
+          via `auto_tokens` or explicitly by `Workload.tokens`).
+          :::
+
+          Value of this signal is the sum across all the relevant schedulers.
+      incoming_concurrency:
+        $ref: '#/definitions/v1OutPort'
+        description: |-
+          Incoming concurrency is the number of incoming tokens/sec.
+          This is the same as `accepted_concurrency`, but across all the flows
+          entering scheduler, including rejected ones.
+      desired_concurrency:
+        $ref: '#/definitions/v1OutPort'
+        description: Desired concurrency is the number of tokens per second that the should be accepted.
+      is_overload:
+        $ref: '#/definitions/v1OutPort'
+        description: Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
+      load_multiplier:
+        $ref: '#/definitions/v1OutPort'
+        description: Load multiplier is the ratio of desired concurrency to the incoming concurrency.
+    description: Outputs for the AIMDConcurrencyController component.
   v1AddressExtractor:
     type: object
     properties:
@@ -887,13 +991,20 @@ definitions:
       in_ports:
         $ref: '#/definitions/v1AlerterIns'
         description: Input ports for the Alerter component.
-      alerter_config:
-        $ref: '#/definitions/v1AlerterConfig'
+      parameters:
+        $ref: '#/definitions/v1AlerterParameters'
         description: '@gotags: validate:"required"'
         title: Alerter configuration
         x-go-validate: required
     description: Alerter reacts to a signal and generates alert to send to alert manager.
-  v1AlerterConfig:
+  v1AlerterIns:
+    type: object
+    properties:
+      signal:
+        $ref: '#/definitions/v1InPort'
+        description: Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.
+    description: Inputs for the Alerter component.
+  v1AlerterParameters:
     type: object
     properties:
       alert_name:
@@ -923,14 +1034,7 @@ definitions:
         items:
           type: string
         description: A list of alert channel strings.
-    description: AlerterConfig is a common config for separate alerter components and alerters embedded in other components.
-  v1AlerterIns:
-    type: object
-    properties:
-      signal:
-        $ref: '#/definitions/v1InPort'
-        description: Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.
-    description: Inputs for the Alerter component.
+    description: Alerter Parameters is a common config for separate alerter components and alerters embedded in other components.
   v1And:
     type: object
     properties:
@@ -1013,6 +1117,13 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Result of arithmetic operation.
     description: Outputs for the Arithmetic Combinator component.
+  v1AutoScale:
+    type: object
+    properties:
+      horizontal_pod_scaler:
+        $ref: '#/definitions/v1HorizontalPodScaler'
+        description: HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+    description: AutoScale components are used to scale a service.
   v1CheckResponse:
     type: object
     properties:
@@ -1183,10 +1294,9 @@ definitions:
       policy_hash:
         type: string
         description: Hash of the entire Policy spec.
-      component_index:
+      component_id:
         type: string
-        format: int64
-        description: The index of Component of within the circuit or classifier index.
+        description: The id of Component within the circuit.
   v1Component:
     type: object
     properties:
@@ -1207,15 +1317,6 @@ definitions:
       switcher:
         $ref: '#/definitions/v1Switcher'
         description: Switcher acts as a switch that emits one of the two signals based on third signal.
-      concurrency_limiter:
-        $ref: '#/definitions/v1ConcurrencyLimiter'
-        description: Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
-      rate_limiter:
-        $ref: '#/definitions/v1RateLimiter'
-        description: Rate Limiter provides service protection by applying rate limiter.
-      promql:
-        $ref: '#/definitions/v1PromQL'
-        description: Periodically runs a Prometheus query in the background and emits the result.
       variable:
         $ref: '#/definitions/v1Variable'
         description: Emits a variable signal which can be set to invalid.
@@ -1243,9 +1344,6 @@ definitions:
       differentiator:
         $ref: '#/definitions/v1Differentiator'
         description: Differentiator calculates rate of change per tick.
-      horizontal_pod_scaler:
-        $ref: '#/definitions/v1HorizontalPodScaler'
-        description: HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
       and:
         $ref: '#/definitions/v1And'
         description: Logical AND.
@@ -1261,6 +1359,24 @@ definitions:
       holder:
         $ref: '#/definitions/v1Holder'
         description: Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+      nested_circuit:
+        $ref: '#/definitions/v1NestedCircuit'
+        description: Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
+      nested_signal_ingress:
+        $ref: '#/definitions/v1NestedSignalIngress'
+        description: Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
+      nested_signal_egress:
+        $ref: '#/definitions/v1NestedSignalEgress'
+        description: Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
+      query:
+        $ref: '#/definitions/v1Query'
+        description: Query components that are query databases such as Prometheus.
+      flow_control:
+        $ref: '#/definitions/v1FlowControl'
+        description: FlowControl components are used to regulate requests flow.
+      auto_scale:
+        $ref: '#/definitions/v1AutoScale'
+        description: AutoScale components are used to scale the service.
     description: |-
       :::info
       See also [Components overview](/concepts/policy/circuit.md#components).
@@ -1349,18 +1465,6 @@ definitions:
         type: number
         format: double
     description: Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
-  v1ControllerDynamicConfig:
-    type: object
-    properties:
-      manual_mode:
-        type: boolean
-        description: |-
-          Decides whether the controller runs in "manual_mode".
-          In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
-
-          @gotags: default:"false"
-        x-go-default: false
-    title: Dynamic Configuration for a Controller
   v1ControllerInfo:
     type: object
     properties:
@@ -1506,51 +1610,17 @@ definitions:
       out_ports:
         $ref: '#/definitions/v1EMAOuts'
         description: Output ports for the EMA component.
-      ema_window:
-        type: string
+      parameters:
+        $ref: '#/definitions/v1EMAParameters'
         description: |-
-          Duration of EMA sampling window.
+          Parameters for the EMA component.
 
-          @gotags: default:"5s"
-        x-go-default: 5s
-      warm_up_window:
-        type: string
-        description: |-
-          Duration of EMA warming up window.
-
-          The initial value of the EMA is the average of signal readings received during the warm up window.
-
-          @gotags: default:"0s"
-        x-go-default: 0s
-      correction_factor_on_min_envelope_violation:
-        type: number
-        format: double
-        description: |-
-          Correction factor to apply on the output value if its in violation of the min envelope.
-
-          @gotags: validate:"gte=1.0" default:"1.0"
-        x-go-default: 1
-        x-go-validate: gte=1.0
-      correction_factor_on_max_envelope_violation:
-        type: number
-        format: double
-        description: |-
-          Correction factor to apply on the output value if its in violation of the max envelope.
-
-          @gotags: validate:"gte=0,lte=1.0" default:"1.0"
-        x-go-default: 1
-        x-go-validate: gte=0,lte=1.0
-      valid_during_warmup:
-        type: boolean
-        description: |-
-          Whether the output is valid during the warm up stage.
-
-          @gotags: default:"false"
-        x-go-default: false
+          @gotags: validate:"required"
+        x-go-validate: required
     description: |-
       At any time EMA component operates in one of the following states:
-      1. Warm up state: The first warm_up_window samples are used to compute the initial EMA.
-         If an invalid reading is received during the warm_up_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
+      1. Warm up state: The first warmup_window samples are used to compute the initial EMA.
+         If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
       2. Normal state: The EMA is computed using following formula.
 
       The EMA for a series $Y$ is calculated recursively as:
@@ -1609,6 +1679,51 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Exponential moving average of the series of reading as an output signal.
     description: Outputs for the EMA component.
+  v1EMAParameters:
+    type: object
+    properties:
+      ema_window:
+        type: string
+        description: |-
+          Duration of EMA sampling window.
+
+          @gotags: default:"5s"
+        x-go-default: 5s
+      warmup_window:
+        type: string
+        description: |-
+          Duration of EMA warming up window.
+
+          The initial value of the EMA is the average of signal readings received during the warm-up window.
+
+          @gotags: default:"0s"
+        x-go-default: 0s
+      correction_factor_on_min_envelope_violation:
+        type: number
+        format: double
+        description: |-
+          Correction factor to apply on the output value if its in violation of the min envelope.
+
+          @gotags: validate:"gte=1.0" default:"1.0"
+        x-go-default: 1
+        x-go-validate: gte=1.0
+      correction_factor_on_max_envelope_violation:
+        type: number
+        format: double
+        description: |-
+          Correction factor to apply on the output value if its in violation of the max envelope.
+
+          @gotags: validate:"gte=0,lte=1.0" default:"1.0"
+        x-go-default: 1
+        x-go-validate: gte=0,lte=1.0
+      valid_during_warmup:
+        type: boolean
+        description: |-
+          Whether the output is valid during the warm-up stage.
+
+          @gotags: default:"false"
+        x-go-default: false
+    description: Parameters for the EMA component.
   v1Entity:
     type: object
     properties:
@@ -1692,13 +1807,13 @@ definitions:
       out_ports:
         $ref: '#/definitions/v1ExtrapolatorOuts'
         description: Output ports for the Extrapolator component.
-      max_extrapolation_interval:
-        type: string
+      parameters:
+        $ref: '#/definitions/v1ExtrapolatorParameters'
         description: |-
-          Maximum time interval to repeat the last valid value of input signal.
+          Parameters for the Extrapolator component.
 
-          @gotags: default:"10s"
-        x-go-default: 10s
+          @gotags: validate:"required"
+        x-go-validate: required
     description: It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
     title: Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
   v1ExtrapolatorIns:
@@ -1715,6 +1830,17 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Extrapolated signal.
     description: Outputs for the Extrapolator component.
+  v1ExtrapolatorParameters:
+    type: object
+    properties:
+      max_extrapolation_interval:
+        type: string
+        description: |-
+          Maximum time interval to repeat the last valid value of input signal.
+
+          @gotags: default:"10s"
+        x-go-default: 10s
+    description: Parameters for the Extrapolator component.
   v1FirstValid:
     type: object
     properties:
@@ -1744,6 +1870,19 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: First valid input signal as an output signal.
     description: Outputs for the FirstValid component.
+  v1FlowControl:
+    type: object
+    properties:
+      rate_limiter:
+        $ref: '#/definitions/v1RateLimiter'
+        description: Rate Limiter provides service protection by applying rate limiter.
+      concurrency_limiter:
+        $ref: '#/definitions/v1ConcurrencyLimiter'
+        description: Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
+      aimd_concurrency_controller:
+        $ref: '#/definitions/v1AIMDConcurrencyController'
+        description: AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
+    description: FlowControl components are used to regulate requests flow.
   v1FlowMatcher:
     type: object
     properties:
@@ -1882,6 +2021,90 @@ definitions:
       out_ports:
         $ref: '#/definitions/v1GradientControllerOuts'
         description: Output ports of the Gradient Controller.
+      parameters:
+        $ref: '#/definitions/v1GradientControllerParameters'
+        description: |-
+          Gradient Parameters.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
+      default_config:
+        $ref: '#/definitions/v1GradientControllerDynamicConfig'
+        description: Default configuration.
+    description: |-
+      The `gradient` describes a corrective factor that should be applied to the
+      control variable to get the signal closer to the setpoint. It is computed as follows:
+
+      $$
+      \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
+      $$
+
+      `gradient` is then clamped to [min_gradient, max_gradient] range.
+
+      The output of gradient controller is computed as follows:
+      $$
+      \text{output} = \text{gradient}_{\text{clamped}} \cdot \text{control\_variable} + \text{optimize}.
+      $$
+
+      Note the additional `optimize` signal, that can be used to "nudge" the
+      controller into desired idle state.
+
+      The output can be _optionally_ clamped to desired range using `max` and
+      `min` input.
+    title: |-
+      Gradient controller is a type of controller which tries to adjust the
+      control variable proportionally to the relative difference between setpoint
+      and actual value of the signal
+  v1GradientControllerDynamicConfig:
+    type: object
+    properties:
+      manual_mode:
+        type: boolean
+        description: |-
+          Decides whether the controller runs in "manual_mode".
+          In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
+
+          @gotags: default:"false"
+        x-go-default: false
+    title: Dynamic Configuration for a Controller
+  v1GradientControllerIns:
+    type: object
+    properties:
+      signal:
+        $ref: '#/definitions/v1InPort'
+        description: Signal to be used for the gradient computation.
+      setpoint:
+        $ref: '#/definitions/v1InPort'
+        description: Setpoint to be used for the gradient computation.
+      optimize:
+        $ref: '#/definitions/v1InPort'
+        description: Optimize signal is added to the output of the gradient calculation.
+      max:
+        $ref: '#/definitions/v1InPort'
+        description: Maximum value to limit the output signal.
+      min:
+        $ref: '#/definitions/v1InPort'
+        description: Minimum value to limit the output signal.
+      control_variable:
+        $ref: '#/definitions/v1InPort'
+        description: |-
+          Actual current value of the control variable.
+
+          This signal is multiplied by the gradient to produce the output.
+    description: Inputs for the Gradient Controller component.
+  v1GradientControllerOuts:
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
+        description: Computed desired value of the control variable.
+    description: Outputs for the Gradient Controller component.
+  v1GradientControllerParameters:
+    type: object
+    properties:
       slope:
         type: number
         format: double
@@ -1943,68 +2166,7 @@ definitions:
 
           @gotags: default:"1.79769313486231570814527423731704356798070e+308"
         x-go-default: 1.7976931348623157e+308
-      dynamic_config_key:
-        type: string
-        title: Configuration key for DynamicConfig
-      default_config:
-        $ref: '#/definitions/v1ControllerDynamicConfig'
-        description: Default configuration.
-    description: |-
-      The `gradient` describes a corrective factor that should be applied to the
-      control variable to get the signal closer to the setpoint. It is computed as follows:
-
-      $$
-      \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
-      $$
-
-      `gradient` is then clamped to [min_gradient, max_gradient] range.
-
-      The output of gradient controller is computed as follows:
-      $$
-      \text{output} = \text{gradient}_{\text{clamped}} \cdot \text{control\_variable} + \text{optimize}.
-      $$
-
-      Note the additional `optimize` signal, that can be used to "nudge" the
-      controller into desired idle state.
-
-      The output can be _optionally_ clamped to desired range using `max` and
-      `min` input.
-    title: |-
-      Gradient controller is a type of controller which tries to adjust the
-      control variable proportionally to the relative difference between setpoint
-      and actual value of the signal
-  v1GradientControllerIns:
-    type: object
-    properties:
-      signal:
-        $ref: '#/definitions/v1InPort'
-        description: Signal to be used for the gradient computation.
-      setpoint:
-        $ref: '#/definitions/v1InPort'
-        description: Setpoint to be used for the gradient computation.
-      optimize:
-        $ref: '#/definitions/v1InPort'
-        description: Optimize signal is added to the output of the gradient calculation.
-      max:
-        $ref: '#/definitions/v1InPort'
-        description: Maximum value to limit the output signal.
-      min:
-        $ref: '#/definitions/v1InPort'
-        description: Minimum value to limit the output signal.
-      control_variable:
-        $ref: '#/definitions/v1InPort'
-        description: |-
-          Actual current value of the control variable.
-
-          This signal is multiplied by the gradient to produce the output.
-    description: Inputs for the Gradient Controller component.
-  v1GradientControllerOuts:
-    type: object
-    properties:
-      output:
-        $ref: '#/definitions/v1OutPort'
-        description: Computed desired value of the control variable.
-    description: Outputs for the Gradient Controller component.
+    description: Gradient Parameters.
   v1GroupStatus:
     type: object
     properties:
@@ -2317,9 +2479,8 @@ definitions:
         type: string
       policy_hash:
         type: string
-      component_index:
+      component_id:
         type: string
-        format: int64
       dropped:
         type: boolean
       reason:
@@ -2341,9 +2502,9 @@ definitions:
       default_config:
         $ref: '#/definitions/v1LoadActuatorDynamicConfig'
         description: Default configuration.
-      alerter_config:
-        $ref: '#/definitions/v1AlerterConfig'
-        description: Configuration for embedded alerter. No alerts are generated if this configuration is not provided.
+      alerter_parameters:
+        $ref: '#/definitions/v1AlerterParameters'
+        description: Configuration for embedded alerter.
     title: Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
   v1LoadActuatorDynamicConfig:
     type: object
@@ -2490,6 +2651,58 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Signal with minimum value as an output signal.
     description: Output ports for the Min component.
+  v1NestedCircuit:
+    type: object
+    properties:
+      in_ports_map:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1InPort'
+      out_ports_map:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1OutPort'
+      components:
+        type: array
+        items:
+          $ref: '#/definitions/v1Component'
+        title: '@gotags: validate:"dive"'
+      name:
+        type: string
+        description: Name of the nested circuit component. This name is displayed by graph visualization tools.
+    description: Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
+  v1NestedSignalEgress:
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/v1NestedSignalEgressIns'
+        description: Input ports for the NestedSignalEgress component.
+      port_name:
+        type: string
+    description: Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
+  v1NestedSignalEgressIns:
+    type: object
+    properties:
+      signal:
+        $ref: '#/definitions/v1InPort'
+        description: The signal to be egressed.
+    description: Inputs for the NestedSignalEgress component.
+  v1NestedSignalIngress:
+    type: object
+    properties:
+      out_ports:
+        $ref: '#/definitions/v1NestedSignalIngressOuts'
+        description: Output ports for the NestedSignalIngress component.
+      port_name:
+        type: string
+    description: Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
+  v1NestedSignalIngressOuts:
+    type: object
+    properties:
+      signal:
+        $ref: '#/definitions/v1OutPort'
+        description: The signal to be ingressed.
+    description: Outputs for the NestedSignalIngress component.
   v1Network:
     type: object
     properties:
@@ -2755,6 +2968,13 @@ definitions:
       output:
         $ref: '#/definitions/v1OutPort'
     description: Outputs for the PulseGenerator component.
+  v1Query:
+    type: object
+    properties:
+      promql:
+        $ref: '#/definitions/v1PromQL'
+        description: Periodically runs a Prometheus query in the background and emits the result.
+    description: Query components that are query databases such as Prometheus.
   v1RateLimiter:
     type: object
     properties:
@@ -2769,28 +2989,11 @@ definitions:
 
           @gotags: validate:"required"
         x-go-validate: required
-      limit_reset_interval:
-        type: string
-        description: |-
-          Time after which the limit for a given label value will be reset.
-
-          @gotags: default:"60s"
-        x-go-default: 60s
-      label_key:
-        type: string
-        description: |-
-          Specifies which label the ratelimiter should be keyed by.
-
-          Rate limiting is done independently for each value of the
-          [label](/concepts/integrations/flow-control/flow-label.md) with given key.
-          Eg., to give each user a separate limit, assuming you have a _user_ flow
-          label set up, set `label_key: "user"`.
-
-          @gotags: validate:"required"
+      parameters:
+        $ref: '#/definitions/v1RateLimiterParameters'
+        description: '@gotags: validate:"required"'
+        title: Parameters for the RateLimiter component
         x-go-validate: required
-      lazy_sync:
-        $ref: '#/definitions/RateLimiterLazySync'
-        title: Configuration of lazy-syncing behaviour of ratelimiter
       dynamic_config_key:
         type: string
         title: Configuration key for DynamicConfig
@@ -2834,6 +3037,31 @@ definitions:
           @gotags: validate:"required"
         x-go-validate: required
     title: Inputs for the RateLimiter component
+  v1RateLimiterParameters:
+    type: object
+    properties:
+      limit_reset_interval:
+        type: string
+        description: |-
+          Time after which the limit for a given label value will be reset.
+
+          @gotags: default:"60s"
+        x-go-default: 60s
+      label_key:
+        type: string
+        description: |-
+          Specifies which label the ratelimiter should be keyed by.
+
+          Rate limiting is done independently for each value of the
+          [label](/concepts/integrations/flow-control/flow-label.md) with given key.
+          Eg., to give each user a separate limit, assuming you have a _user_ flow
+          label set up, set `label_key: "user"`.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+      lazy_sync:
+        $ref: '#/definitions/ParametersLazySync'
+        title: Configuration of lazy-syncing behaviour of ratelimiter
   v1ReportRequest:
     type: object
     properties:
@@ -2968,6 +3196,48 @@ definitions:
       out_ports:
         $ref: '#/definitions/v1SchedulerOuts'
         description: Output ports for the Scheduler component.
+      parameters:
+        $ref: '#/definitions/v1SchedulerParameters'
+        description: |-
+          Scheduler parameters.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+    description: |-
+      :::note
+      Each Agent instantiates an independent copy of the scheduler, but output
+      signals for accepted and incoming concurrency are aggregated across all agents.
+      :::
+
+      See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
+    title: Weighted Fair Queuing-based workload scheduler
+  v1SchedulerOuts:
+    type: object
+    properties:
+      accepted_concurrency:
+        $ref: '#/definitions/v1OutPort'
+        description: |-
+          Accepted concurrency is the number of accepted tokens per second.
+
+          :::info
+          **Accepted tokens** are tokens associated with
+          [flows](/concepts/integrations/flow-control/flow-control.md#flow) that were accepted by
+          this scheduler. Number of tokens for a flow is determined by a
+          [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
+          via `auto_tokens` or explicitly by `Workload.tokens`).
+          :::
+
+          Value of this signal is the sum across all the relevant schedulers.
+      incoming_concurrency:
+        $ref: '#/definitions/v1OutPort'
+        description: |-
+          Incoming concurrency is the number of incoming tokens/sec.
+          This is the same as `accepted_concurrency`, but across all the flows
+          entering scheduler, including rejected ones.
+    description: Output for the Scheduler component.
+  v1SchedulerParameters:
+    type: object
+    properties:
       workloads:
         type: array
         items:
@@ -2998,7 +3268,7 @@ definitions:
       default_workload_parameters:
         $ref: '#/definitions/SchedulerWorkloadParameters'
         description: |-
-          WorkloadParameters to be used if none of workloads specified in `workloads` match.
+          Parameters to be used if none of workloads specified in `workloads` match.
 
           @gotags: validate:"required"
         x-go-validate: required
@@ -3047,38 +3317,7 @@ definitions:
           @gotags: default:"0.49s"
         title: Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
         x-go-default: 0.49s
-    description: |-
-      :::note
-      Each Agent instantiates an independent copy of the scheduler, but output
-      signals for accepted and incoming concurrency are aggregated across all agents.
-      :::
-
-      See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
-    title: Weighted Fair Queuing-based workload scheduler
-  v1SchedulerOuts:
-    type: object
-    properties:
-      accepted_concurrency:
-        $ref: '#/definitions/v1OutPort'
-        description: |-
-          Accepted concurrency is the number of accepted tokens per second.
-
-          :::info
-          **Accepted tokens** are tokens associated with
-          [flows](/concepts/integrations/flow-control/flow-control.md#flow) that were accepted by
-          this scheduler. Number of tokens for a flow is determined by a
-          [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
-          via `auto_tokens` or explicitly by `Workload.tokens`).
-          :::
-
-          Value of this signal is the sum across all the relevant schedulers.
-      incoming_concurrency:
-        $ref: '#/definitions/v1OutPort'
-        description: |-
-          Incoming concurrency is the number of incoming tokens/sec.
-          This is the same as `accepted_concurrency`, but across all the flows
-          entering scheduler, including rejected ones.
-    description: Output for the Scheduler component.
+    title: Scheduler parameters
   v1Service:
     type: object
     properties:

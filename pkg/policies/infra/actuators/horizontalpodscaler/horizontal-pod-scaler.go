@@ -188,7 +188,7 @@ func (paFactory *horizontalPodScalerFactory) newHorizontalPodScalerOptions(
 		registry:                   reg,
 		horizontalPodScalerFactory: paFactory,
 	}
-	componentKey := paths.AgentComponentKey(paFactory.agentGroup, horizontalPodScaler.GetPolicyName(), int64(horizontalPodScaler.GetComponentIndex()))
+	componentKey := paths.AgentComponentKey(paFactory.agentGroup, horizontalPodScaler.GetPolicyName(), horizontalPodScaler.GetComponentId())
 	statusEtcdPath := path.Join(paths.HorizontalPodScalerStatusPath, componentKey)
 	horizontalPodScaler.statusEtcdPath = statusEtcdPath
 
@@ -236,7 +236,7 @@ func (pa *horizontalPodScaler) setup(
 	pa.k8sClient = k8sClient
 	etcdKey := paths.AgentComponentKey(pa.horizontalPodScalerFactory.agentGroup,
 		pa.GetPolicyName(),
-		pa.GetComponentIndex())
+		pa.GetComponentId())
 
 	// election notifier
 	electionNotifier := notifiers.NewBasicKeyNotifier(election.ElectionResultKey, pa.electionResultCallback)
@@ -515,9 +515,9 @@ func (pa *horizontalPodScaler) controlPointUpdateCallback(event notifiers.Event,
 	// create a wrapper message
 	wrapperMessage := policysyncv1.ScaleStatusWrapper{
 		CommonAttributes: &policysyncv1.CommonAttributes{
-			PolicyName:     pa.GetPolicyName(),
-			PolicyHash:     pa.GetPolicyHash(),
-			ComponentIndex: pa.GetComponentIndex(),
+			PolicyName:  pa.GetPolicyName(),
+			PolicyHash:  pa.GetPolicyHash(),
+			ComponentId: pa.GetComponentId(),
 		},
 		ScaleStatus: &scaleStatus,
 	}

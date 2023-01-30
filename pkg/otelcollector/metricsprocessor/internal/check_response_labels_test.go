@@ -46,10 +46,10 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 		&flowcontrolv1.CheckResponse{
 			LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 				{
-					PolicyName:     "foo",
-					PolicyHash:     "foo-hash",
-					ComponentIndex: 2,
-					Dropped:        true,
+					PolicyName:  "foo",
+					PolicyHash:  "foo-hash",
+					ComponentId: "2",
+					Dropped:     true,
 					Details: &flowcontrolv1.LimiterDecision_RateLimiterInfo_{
 						RateLimiterInfo: &flowcontrolv1.LimiterDecision_RateLimiterInfo{
 							Remaining: 1,
@@ -61,8 +61,8 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 			},
 		},
 		map[string]interface{}{
-			otelconsts.ApertureRateLimitersLabel:         []interface{}{"policy_name:foo,component_index:2,policy_hash:foo-hash"},
-			otelconsts.ApertureDroppingRateLimitersLabel: []interface{}{"policy_name:foo,component_index:2,policy_hash:foo-hash"},
+			otelconsts.ApertureRateLimitersLabel:         []interface{}{"policy_name:foo,component_id:2,policy_hash:foo-hash"},
+			otelconsts.ApertureDroppingRateLimitersLabel: []interface{}{"policy_name:foo,component_id:2,policy_hash:foo-hash"},
 		},
 	),
 
@@ -70,10 +70,10 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 		&flowcontrolv1.CheckResponse{
 			LimiterDecisions: []*flowcontrolv1.LimiterDecision{
 				{
-					PolicyName:     "foo",
-					PolicyHash:     "foo-hash",
-					ComponentIndex: 1,
-					Dropped:        true,
+					PolicyName:  "foo",
+					PolicyHash:  "foo-hash",
+					ComponentId: "1",
+					Dropped:     true,
 					Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
 						ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 							WorkloadIndex: "0",
@@ -83,8 +83,8 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 			},
 		},
 		map[string]interface{}{
-			otelconsts.ApertureConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
-			otelconsts.ApertureDroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_index:1,policy_hash:foo-hash"},
+			otelconsts.ApertureConcurrencyLimitersLabel:         []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
+			otelconsts.ApertureDroppingConcurrencyLimitersLabel: []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
 		},
 	),
 

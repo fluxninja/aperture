@@ -1,6 +1,6 @@
 apiVersion: fluxninja.com/v1alpha1
 dynamicConfig:
-  concurrency_limiter:
+  concurrency_controller:
     dry_run: false
 kind: Policy
 metadata:
@@ -10,6 +10,16 @@ metadata:
 spec:
   circuit:
     components:
+      - query:
+          promql:
+            evaluation_interval: 1s
+            out_ports:
+              output:
+                signal_name: LATENCY
+            query_string:
+              sum(increase(flux_meter_sum{valid="true", flow_status="OK",
+              flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{valid="true",
+              flow_status="OK", flux_meter_name="service1-demo-app"}[5s]))
       - arithmetic_combinator:
           in_ports:
             lhs:
@@ -32,85 +42,7 @@ spec:
           out_ports:
             output:
               signal_name: LATENCY_SETPOINT
-      - arithmetic_combinator:
-          in_ports:
-            lhs:
-              signal_name: DESIRED_CONCURRENCY
-            rhs:
-              signal_name: INCOMING_CONCURRENCY
-          operator: div
-          out_ports:
-            output:
-              signal_name: DESIRED_CONCURRENCY_RATIO
-      - arithmetic_combinator:
-          in_ports:
-            lhs:
-              constant_signal:
-                value: "2.0"
-            rhs:
-              signal_name: ACCEPTED_CONCURRENCY
-          operator: mul
-          out_ports:
-            output:
-              signal_name: NORMAL_CONCURRENCY_LIMIT
-      - arithmetic_combinator:
-          in_ports:
-            lhs:
-              constant_signal:
-                value: "5.0"
-            rhs:
-              signal_name: SQRT_CONCURRENCY_INCREMENT
-          operator: add
-          out_ports:
-            output:
-              signal_name: CONCURRENCY_INCREMENT_SINGLE_TICK
-      - arithmetic_combinator:
-          in_ports:
-            lhs:
-              signal_name: CONCURRENCY_INCREMENT_SINGLE_TICK
-            rhs:
-              signal_name: CONCURRENCY_INCREMENT
-          operator: add
-          out_ports:
-            output:
-              signal_name: CONCURRENCY_INCREMENT_INTEGRAL
-      - min:
-          in_ports:
-            inputs:
-              - signal_name: CONCURRENCY_INCREMENT_INTEGRAL
-              - signal_name: ACCEPTED_CONCURRENCY
-          out_ports:
-            output:
-              signal_name: CONCURRENCY_INCREMENT_INTEGRAL_CAPPED
-      - first_valid:
-          in_ports:
-            inputs:
-              - signal_name: CONCURRENCY_INCREMENT_INTEGRAL_CAPPED
-              - constant_signal:
-                  value: 0
-          out_ports:
-            output:
-              signal_name: CONCURRENCY_INCREMENT_NORMAL
-      - sqrt:
-          in_ports:
-            input:
-              signal_name: ACCEPTED_CONCURRENCY
-          out_ports:
-            output:
-              signal_name: SQRT_CONCURRENCY_INCREMENT
-          scale: "1"
-      - promql:
-          evaluation_interval: 1s
-          out_ports:
-            output:
-              signal_name: LATENCY
-          query_string:
-            sum(increase(flux_meter_sum{valid="true", flow_status="OK",
-            flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{valid="true",
-            flow_status="OK", flux_meter_name="service1-demo-app"}[5s]))
       - ema:
-          correction_factor_on_max_envelope_violation: "0.95"
-          ema_window: 1500s
           in_ports:
             input:
               signal_name: LATENCY
@@ -119,82 +51,52 @@ spec:
           out_ports:
             output:
               signal_name: LATENCY_EMA
-          warm_up_window: 60s
-      - gradient_controller:
-          in_ports:
-            control_variable:
-              signal_name: ACCEPTED_CONCURRENCY
-            max:
-              signal_name: NORMAL_CONCURRENCY_LIMIT
-            optimize:
-              signal_name: CONCURRENCY_INCREMENT
-            setpoint:
-              signal_name: LATENCY_SETPOINT
-            signal:
-              signal_name: LATENCY
-          max_gradient: "1.0"
-          min_gradient: "0.1"
-          out_ports:
-            output:
-              signal_name: DESIRED_CONCURRENCY
-          slope: "-1"
-      - extrapolator:
-          in_ports:
-            input:
-              signal_name: DESIRED_CONCURRENCY_RATIO
-          max_extrapolation_interval: 5s
-          out_ports:
-            output:
-              signal_name: LOAD_MULTIPLIER
-      - concurrency_limiter:
-          flow_selector:
-            flow_matcher:
-              control_point: ingress
-            service_selector:
-              agent_group: default
-              service: service1-demo-app.demoapp.svc.cluster.local
-          load_actuator:
-            alerter_config:
+          parameters:
+            correction_factor_on_max_envelope_violation: "0.95"
+            ema_window: 1500s
+            warmup_window: 60s
+      - flow_control:
+          aimd_concurrency_controller:
+            alerter_parameters:
               alert_channels: []
               alert_name: Load Shed Event
               resolve_timeout: 5s
-            dynamic_config_key: concurrency_limiter
+            concurrency_limit_multiplier: "2.0"
+            concurrency_linear_increment: "5.0"
+            concurrency_sqrt_increment_multiplier: "1"
+            dry_run_dynamic_config_key: concurrency_controller
+            flow_selector:
+              flow_matcher:
+                control_point: ingress
+              service_selector:
+                agent_group: default
+                service: service1-demo-app.demoapp.svc.cluster.local
+            gradient_parameters:
+              max_gradient: "1.0"
+              min_gradient: "0.1"
+              slope: "-1"
             in_ports:
-              load_multiplier:
-                signal_name: LOAD_MULTIPLIER
-          scheduler:
-            auto_tokens: true
-            default_workload_parameters:
-              priority: 20
+              setpoint:
+                signal_name: LATENCY_SETPOINT
+              signal:
+                signal_name: LATENCY
             out_ports:
               accepted_concurrency:
                 signal_name: ACCEPTED_CONCURRENCY
+              desired_concurrency:
+                signal_name: DESIRED_CONCURRENCY
               incoming_concurrency:
                 signal_name: INCOMING_CONCURRENCY
-            timeout_factor: "0.5"
-            workloads: []
-      - decider:
-          in_ports:
-            lhs:
-              signal_name: LATENCY
-            rhs:
-              signal_name: LATENCY_SETPOINT
-          operator: gt
-          out_ports:
-            output:
-              signal_name: IS_OVERLOAD
-      - switcher:
-          in_ports:
-            on_false:
-              signal_name: CONCURRENCY_INCREMENT_NORMAL
-            on_true:
-              constant_signal:
-                value: 0
-            switch:
-              signal_name: IS_OVERLOAD
-          out_ports:
-            output:
-              signal_name: CONCURRENCY_INCREMENT
+              is_overload:
+                signal_name: IS_OVERLOAD
+              load_multiplier:
+                signal_name: LOAD_MULTIPLIER
+            scheduler_parameters:
+              auto_tokens: true
+              default_workload_parameters:
+                priority: 20
+              timeout_factor: "0.5"
+              workloads: []
     evaluation_interval: 0.5s
   resources:
     classifiers: []

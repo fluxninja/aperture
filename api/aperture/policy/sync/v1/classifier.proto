@@ -3,11 +3,19 @@ syntax = "proto3";
 package aperture.policy.sync.v1;
 
 import "aperture/policy/language/v1/classifier.proto";
-import "aperture/policy/sync/v1/common_attributes.proto";
 
 message ClassifierWrapper {
   // CommonAttributes
-  CommonAttributes common_attributes = 1;
+  ClassifierAttributes classifier_attributes = 1;
   // Classifier
   policy.language.v1.Classifier classifier = 2;
+}
+
+message ClassifierAttributes {
+  // Name of the Policy.
+  string policy_name = 1;
+  // Hash of the entire Policy spec.
+  string policy_hash = 2;
+  // The id within the Classifiers list.
+  int64 classifier_index = 3;
 }

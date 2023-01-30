@@ -35,7 +35,7 @@ func NewConstantSignal(value float64) runtime.Component {
 }
 
 // NewVariableAndOptions creates a variable components and its fx options.
-func NewVariableAndOptions(variableProto *policylangv1.Variable, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewVariableAndOptions(variableProto *policylangv1.Variable, _ string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	variable := &Variable{
 		policyReadAPI:  policyReadAPI,
 		constantSignal: variableProto.DefaultConfig.ConstantSignal,
@@ -46,7 +46,7 @@ func NewVariableAndOptions(variableProto *policylangv1.Variable, componentIndex 
 }
 
 // Execute implements runtime.Component.Execute.
-func (v *Variable) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (v *Variable) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	// Always emit the value.
 	if specialValue := v.constantSignal.GetSpecialValue(); specialValue != "" {
 		output := runtime.InvalidReading()
@@ -58,12 +58,12 @@ func (v *Variable) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.
 		case "-Inf":
 			output = runtime.NewReading(math.Inf(-1))
 		}
-		return runtime.PortToValue{
+		return runtime.PortToReading{
 			"output": []runtime.Reading{output},
 		}, nil
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{runtime.NewReading(v.constantSignal.GetValue())},
 	}, nil
 }

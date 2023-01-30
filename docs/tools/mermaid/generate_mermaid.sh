@@ -14,6 +14,13 @@ if [ "$(uname)" == "Darwin" ]; then
 	AWK="gawk"
 fi
 
+# accept a --force flag to force generation of all mermaid files
+if [[ -n "${1:-}" ]] && [[ "$1" == "--force" ]]; then
+	force=true
+else
+	force=false
+fi
+
 # script that parses all markdown (md) files recursively in a directory
 # and extracts content for the mermaid sections that begin with ```mermaid and end with ```
 # and generates mmd files for each mermaid section
@@ -76,13 +83,14 @@ for mmd_file in $mmd_files; do
 	md5sum=$(md5sum "$mmd_file" | $AWK '{print $1}')
 	#shellcheck disable=SC2016
 	md5sum_file=$(cat "$mmd_file".md5sum 2>/dev/null)
-	if [ "$md5sum" != "$md5sum_file" ]; then
+	if [ "$md5sum" != "$md5sum_file" ] || [ "$force" == true ]; then
 		echo "generating svg and png files for $mmd_file"
 		# generate svg and png files
 		# loop formats svg and png
-		for fmt in svg png; do
+		# shellcheck disable=SC2043
+		for fmt in svg; do #png; do
 			npx -p @mermaid-js/mermaid-cli mmdc \
-				--quiet --input "$mmd_file" --configFile "$docsdir"/tools/mermaid/mermaid-theme.json --cssFile ./tools/mermaid/mermaid.css --scale 2 --output "$mmd_file"."$fmt" --backgroundColor transparent
+				--quiet --input "$mmd_file" --configFile "$docsdir"/tools/mermaid/mermaid-theme.json --cssFile "$docsdir"/tools/mermaid/mermaid.css --scale 2 --output "$mmd_file"."$fmt" --backgroundColor transparent
 			git add "$mmd_file"."$fmt"
 		done
 		# update md5sum

@@ -355,7 +355,7 @@ type PromQL struct {
 	// The query to run
 	queryString string
 	// Component index
-	componentIndex int
+	componentID string
 	// Current value
 	value float64
 	// Interval of time between evaluations
@@ -376,13 +376,13 @@ var _ jobRegistererIfc = (*PromQL)(nil)
 // NewPromQLAndOptions creates PromQL and its fx options.
 func NewPromQLAndOptions(
 	promQLProto *policylangv1.PromQL,
-	componentIndex int,
+	componentID string,
 	policyReadAPI iface.Policy,
 ) (*PromQL, fx.Option, error) {
 	promQL := &PromQL{
 		evaluationInterval: promQLProto.EvaluationInterval.AsDuration(),
 		policyReadAPI:      policyReadAPI,
-		componentIndex:     componentIndex,
+		componentID:        componentID,
 		// Set err to make sure the initial runs of Execute return Invalid readings.
 		err: ErrNoQueriesReturned,
 	}
@@ -391,7 +391,7 @@ func NewPromQLAndOptions(
 	promQL.jobRegisterer = promQL
 
 	// Job name
-	promQL.jobName = fmt.Sprintf("Component-%d", promQL.componentIndex)
+	promQL.jobName = fmt.Sprintf("Component-%s", promQL.componentID)
 
 	// Resolve metric names in PromQL to get the query string
 	promQL.queryString = promQLProto.GetQueryString()
@@ -413,7 +413,7 @@ func (promQL *PromQL) setup(pje *promJobsExecutor, promAPI prometheusv1.API) err
 }
 
 // Execute implements runtime.Component.Execute.
-func (promQL *PromQL) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (outPortReadings runtime.PortToValue, err error) {
+func (promQL *PromQL) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (outPortReadings runtime.PortToReading, err error) {
 	// Re-run query if evaluationInterval elapsed since last query
 	if tickInfo.Timestamp().Sub(promQL.lastQueryTimestamp()) >= promQL.evaluationInterval {
 		// Run query
@@ -434,7 +434,7 @@ func (promQL *PromQL) Execute(inPortReadings runtime.PortToValue, tickInfo runti
 		currentReading = runtime.NewReading(promQL.value)
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{currentReading},
 	}, nil
 }
@@ -474,7 +474,7 @@ type ScalarQuery struct {
 func NewScalarQueryAndOptions(
 	queryString string,
 	evaluationInterval time.Duration,
-	componentIndex int,
+	componentID string,
 	policyReadAPI iface.Policy,
 	jobPostFix string,
 ) (*ScalarQuery, fx.Option, error) {
@@ -484,11 +484,11 @@ func NewScalarQueryAndOptions(
 		EvaluationInterval: durationpb.New(evaluationInterval),
 	}
 	// Create promQL
-	promQL, options, err := NewPromQLAndOptions(promQLProto, componentIndex, policyReadAPI)
+	promQL, options, err := NewPromQLAndOptions(promQLProto, componentID, policyReadAPI)
 	if err != nil {
 		return nil, fx.Options(), err
 	}
-	promQL.jobName = fmt.Sprintf("Component-%d.%s", promQL.componentIndex, jobPostFix)
+	promQL.jobName = fmt.Sprintf("Component-%s.%s", promQL.componentID, jobPostFix)
 	scalarQuery := &ScalarQuery{
 		promQL: promQL,
 	}
@@ -497,7 +497,7 @@ func NewScalarQueryAndOptions(
 
 // ExecuteScalarQuery runs a ScalarQueryJob and returns the current results: value and err. This function is supposed to be run under Circuit Execution Lock (Execution of Circuit Components is protected by this lock).
 func (scalarQuery *ScalarQuery) ExecuteScalarQuery(tickInfo runtime.TickInfo) (ScalarResult, error) {
-	inPortReadings := runtime.PortToValue{}
+	inPortReadings := runtime.PortToReading{}
 	_, _ = scalarQuery.promQL.Execute(inPortReadings, tickInfo)
 	// FYI: promQL ensures that initial runs return err when no queries have returned yet.
 	return ScalarResult{Value: scalarQuery.promQL.value, TickInfo: scalarQuery.promQL.tickInfo}, scalarQuery.promQL.err
@@ -523,11 +523,11 @@ var _ jobRegistererIfc = (*TaggedQuery)(nil)
 func NewTaggedQueryAndOptions(
 	queryString string,
 	evaluationInterval time.Duration,
-	componentIndex int,
+	componentID string,
 	policyReadAPI iface.Policy,
 	jobPostFix string,
 ) (*TaggedQuery, fx.Option, error) {
-	scalarQuery, options, err := NewScalarQueryAndOptions(queryString, evaluationInterval, componentIndex, policyReadAPI, jobPostFix)
+	scalarQuery, options, err := NewScalarQueryAndOptions(queryString, evaluationInterval, componentID, policyReadAPI, jobPostFix)
 	if err != nil {
 		return nil, fx.Options(), err
 	}

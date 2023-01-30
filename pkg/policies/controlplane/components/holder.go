@@ -28,7 +28,7 @@ func (*Holder) Name() string { return "Holder" }
 func (*Holder) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
 // NewHolderAndOptions creates a holder component and its fx options.
-func NewHolderAndOptions(holderProto *policylangv1.Holder, _ int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewHolderAndOptions(holderProto *policylangv1.Holder, _ string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()
 	holdFor := math.Ceil(float64(holderProto.HoldFor.AsDuration()) / float64(evaluationPeriod))
 
@@ -41,8 +41,8 @@ func NewHolderAndOptions(holderProto *policylangv1.Holder, _ int, policyReadAPI 
 }
 
 // Execute implements runtime.Component.Execute.
-func (h *Holder) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	input := inPortReadings.ReadSingleValuePort("input")
+func (h *Holder) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	input := inPortReadings.ReadSingleReadingPort("input")
 	output := runtime.InvalidReading()
 
 	if h.holdPhase {
@@ -65,7 +65,7 @@ func (h *Holder) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Ti
 		}
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
 }

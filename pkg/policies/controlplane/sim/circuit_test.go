@@ -27,7 +27,7 @@ var _ = Describe("Circuit", func() {
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Step()).To(Equal(
-			map[string]sim.Reading{
+			sim.StepOutputs{
 				"X": sim.NewReading(42.0),
 			},
 		))
@@ -115,7 +115,7 @@ var _ = Describe("Circuit", func() {
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Step()).To(Equal(
-			map[string]sim.Reading{
+			sim.StepOutputs{
 				"NAN": sim.InvalidReading(),
 			},
 		))

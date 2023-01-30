@@ -1,9 +1,9 @@
 flowchart LR
-subgraph 0[RateLimiter]
-subgraph 0_inports[ ]
-style 0_inports fill:none,stroke:none
-0limit[limit]
+subgraph root.0[<center>RateLimiter<br/>service1-demo-ap...</center>]
+subgraph root.0_inports[ ]
+style root.0_inports fill:none,stroke:none
+root.0limit[limit]
 end
 end
 FakeConstant0((120.00))
-FakeConstant0 --> 0limit
+FakeConstant0 --> root.0limit

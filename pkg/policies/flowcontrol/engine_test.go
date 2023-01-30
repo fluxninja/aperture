@@ -57,9 +57,9 @@ var _ = Describe("Dataplane Engine", func() {
 			FluxMeterName: "test",
 		}
 		limiterID = iface.LimiterID{
-			PolicyName:     "test",
-			ComponentIndex: 0,
-			PolicyHash:     "test",
+			PolicyName:  "test",
+			ComponentID: "0",
+			PolicyHash:  "test",
 		}
 	})
 

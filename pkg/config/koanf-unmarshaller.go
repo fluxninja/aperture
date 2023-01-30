@@ -35,6 +35,16 @@ func UnmarshalYAML(bytes []byte, output interface{}) error {
 	return un.Unmarshal(output)
 }
 
+// UnmarshalJSON unmarshals using _just_ bytes as source of truth (no env, no
+// flags, no other overrides).
+func UnmarshalJSON(bytes []byte, output interface{}) error {
+	un, err := KoanfUnmarshallerConstructor{ConfigFormat: JSON}.NewKoanfUnmarshaller(bytes)
+	if err != nil {
+		return err
+	}
+	return un.Unmarshal(output)
+}
+
 // ConfigFormat specifies the type of the configuration format in string.
 type ConfigFormat string
 

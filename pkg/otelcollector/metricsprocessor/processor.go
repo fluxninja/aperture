@@ -2,7 +2,6 @@ package metricsprocessor
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"go.opentelemetry.io/collector/component"
@@ -128,18 +127,18 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 		latency, latencyFound := otelcollector.GetFloat64(attributes, otelconsts.WorkloadDurationLabel, []string{})
 		for _, decision := range checkResponse.LimiterDecisions {
 			limiterID := iface.LimiterID{
-				PolicyName:     decision.PolicyName,
-				PolicyHash:     decision.PolicyHash,
-				ComponentIndex: decision.ComponentIndex,
+				PolicyName:  decision.PolicyName,
+				PolicyHash:  decision.PolicyHash,
+				ComponentID: decision.ComponentId,
 			}
 
 			// Update concurrency limiter metrics.
 			if cl := decision.GetConcurrencyLimiterInfo(); cl != nil {
 				labels := map[string]string{
-					metrics.PolicyNameLabel:     decision.PolicyName,
-					metrics.PolicyHashLabel:     decision.PolicyHash,
-					metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
-					metrics.WorkloadIndexLabel:  cl.GetWorkloadIndex(),
+					metrics.PolicyNameLabel:    decision.PolicyName,
+					metrics.PolicyHashLabel:    decision.PolicyHash,
+					metrics.ComponentIDLabel:   decision.ComponentId,
+					metrics.WorkloadIndexLabel: cl.GetWorkloadIndex(),
 				}
 
 				p.updateMetricsForWorkload(limiterID, labels, decision.Dropped, checkResponse.DecisionType, latency, latencyFound)
@@ -148,9 +147,9 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 			// Update rate limiter metrics.
 			if rl := decision.GetRateLimiterInfo(); rl != nil {
 				labels := map[string]string{
-					metrics.PolicyNameLabel:     decision.PolicyName,
-					metrics.PolicyHashLabel:     decision.PolicyHash,
-					metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
+					metrics.PolicyNameLabel:  decision.PolicyName,
+					metrics.PolicyHashLabel:  decision.PolicyHash,
+					metrics.ComponentIDLabel: decision.ComponentId,
 				}
 				p.updateMetricsForRateLimiter(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
 			}
@@ -189,7 +188,7 @@ func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, l
 		log.Sample(noConcurrencyLimiterSampler).Warn().
 			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
 			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
-			Int64(metrics.ComponentIndexLabel, limiterID.ComponentIndex).
+			Str(metrics.ComponentIDLabel, limiterID.ComponentID).
 			Msg("ConcurrencyLimiter not found")
 		return
 	}
@@ -215,7 +214,7 @@ func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID
 		log.Sample(noRateLimiterSampler).Warn().
 			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
 			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
-			Int64(metrics.ComponentIndexLabel, limiterID.ComponentIndex).
+			Str(metrics.ComponentIDLabel, limiterID.ComponentID).
 			Msg("RateLimiter not found")
 		return
 	}

@@ -10,7 +10,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/mapstruct"
 )
 
-// ConfiguredComponent consists of a Component, its PortMapping and its Config.
+// ConfiguredComponent consists of a Component and its PortMapping.
 type ConfiguredComponent struct {
 	Component
 	// Which signals this component wants to have connected on its ports.
@@ -20,47 +20,35 @@ type ConfiguredComponent struct {
 	//
 	// Note: PortMapping is also part of Config.
 	Config mapstruct.Object
+	// ComponentID is the unique ID of this component within the circuit.
+	ComponentID ComponentID
 }
 
 // Compile compiles list of configured components into a circuit and validates it.
 func Compile(
 	configuredComponents []ConfiguredComponent,
 	logger *log.Logger,
-) ([]CompiledComponent, error) {
-	// A list of compiled components. The index of Component in the list is
-	// referred as componentIndex. Order of components is the same as in
-	// configuredComponents.
-	compiledCircuit := make([]CompiledComponent, 0, len(configuredComponents))
-
+) error {
 	// Map from signal name to a list of componentIndex(es) which accept the signal as input.
-	inSignals := make(map[string][]int)
+	inSignals := make(map[SignalID][]int)
 	// Map from signal name to the componentIndex which emits the signal as output.
-	outSignals := make(map[string]int)
+	outSignals := make(map[SignalID]int)
 
 	for componentIndex, comp := range configuredComponents {
 		logger.Trace().Str("componentName", comp.Name()).Interface("ports", comp.PortMapping).Send()
 
-		inPortToSignals := getInPortSignals(comp.PortMapping.Ins, inSignals, componentIndex)
-		logger.Trace().Interface("inPortToSignals", inPortToSignals).Send()
+		updateSignalConsumers(comp.PortMapping.Ins, inSignals, componentIndex)
 
-		var err error
-		outPortToSignals, err := getOutPortSignals(comp.PortMapping.Outs, outSignals, componentIndex)
+		err := updateSignalProducers(comp.PortMapping.Outs, outSignals, componentIndex)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		logger.Trace().Interface("outPortToSignals", outPortToSignals).Send()
-
-		compiledCircuit = append(compiledCircuit, CompiledComponent{
-			Component:        comp.Component,
-			InPortToSignals:  inPortToSignals,
-			OutPortToSignals: outPortToSignals,
-		})
 	}
 
 	// Sanitization of inSignals i.e. all inSignals should be defined in outSignals
-	for signal := range inSignals {
-		if _, ok := outSignals[signal]; !ok {
-			return nil, errors.New("undefined signal: " + signal)
+	for signalID := range inSignals {
+		if _, ok := outSignals[signalID]; !ok {
+			return fmt.Errorf("undefined signal: %+v", signalID)
 		}
 	}
 
@@ -68,12 +56,12 @@ func Compile(
 	// Create a graph for Tarjan's algorithm
 	graph := make(map[interface{}][]interface{})
 
-	for componentIndex, comp := range compiledCircuit {
+	for componentIndex, comp := range configuredComponents {
 		destCompIndexes := make([]interface{}, 0)
-		for _, signals := range comp.OutPortToSignals {
+		for _, signals := range comp.PortMapping.Outs {
 			for _, signal := range signals {
 				// Lookup signal in inSignals
-				componentIndexes, ok := inSignals[signal.Name]
+				componentIndexes, ok := inSignals[signal.SignalID()]
 				// Convert componentIndexes to []interface{}
 				componentIndexesIfc := make([]interface{}, len(componentIndexes))
 				for i, componentIndex := range componentIndexes {
@@ -102,13 +90,13 @@ func Compile(
 		if len(loop) > 0 {
 			smallestCompIndex, ok := loop[0].(int)
 			if !ok {
-				return nil, errors.New("loop contains non-int component id")
+				return errors.New("loop contains non-int component id")
 			}
 			smallestCompIndexLoopIdx := 0
 			for loopIdx, compIndexIfc := range loop {
 				componentIndex, ok := compIndexIfc.(int)
 				if !ok {
-					return nil, errors.New("loop contains non-int component id")
+					return errors.New("loop contains non-int component id")
 				}
 				if componentIndex < smallestCompIndex {
 					smallestCompIndex = componentIndex
@@ -121,35 +109,35 @@ func Compile(
 			removeFromCompIndexLoopIdx := (smallestCompIndexLoopIdx + 1) % len(loop)
 			removeFromCompIndex := loop[removeFromCompIndexLoopIdx].(int)
 			// Remove connections from components at removeFromCompIndex to removeToCompIndex
-			if removeToCompIndex >= len(compiledCircuit) {
-				return nil, errors.New("removeToCompId is out of range")
+			if removeToCompIndex >= len(configuredComponents) {
+				return errors.New("removeToCompId is out of range")
 			}
-			removeToComp := compiledCircuit[removeToCompIndex]
-			if removeFromCompIndex >= len(compiledCircuit) {
-				return nil, errors.New("removeFromCompId is out of range")
+			removeToComp := configuredComponents[removeToCompIndex]
+			if removeFromCompIndex >= len(configuredComponents) {
+				return errors.New("removeFromCompId is out of range")
 			}
-			removeFromComp := compiledCircuit[removeFromCompIndex]
+			removeFromComp := configuredComponents[removeFromCompIndex]
 			loopedSignals := make(map[string]bool)
-			// Mark looped signals in InPortToSignalsMap
-			for _, signals := range removeToComp.InPortToSignals {
+			// Mark looped signals in Ins
+			for _, signals := range removeToComp.PortMapping.Ins {
 				for idx, signal := range signals {
-					if signal.SignalType == SignalTypeNamed {
-						outFromCompID, ok := outSignals[signal.Name]
+					if signal.SignalType() == SignalTypeNamed {
+						outFromCompID, ok := outSignals[signal.SignalID()]
 						if !ok {
-							return nil, fmt.Errorf("unexpected state: signal %s is not defined in outSignals", signal.Name)
+							return fmt.Errorf("unexpected state: signal %s is not defined in outSignals", signal.SignalName)
 						}
 						if outFromCompID == removeFromCompIndex {
 							// Mark signal as looped
 							signals[idx].Looped = true
-							loopedSignals[signal.Name] = true
+							loopedSignals[signal.SignalName] = true
 						}
 					}
 				}
 			}
-			// Mark looped signals in OutPortToSignalsMap
-			for _, signals := range removeFromComp.OutPortToSignals {
+			// Mark looped signals in Outs
+			for _, signals := range removeFromComp.PortMapping.Outs {
 				for idx, signal := range signals {
-					if _, ok := loopedSignals[signal.Name]; ok {
+					if _, ok := loopedSignals[signal.SignalName]; ok {
 						// Mark signal as looped
 						signals[idx].Looped = true
 					}
@@ -157,79 +145,48 @@ func Compile(
 			}
 		} else {
 			// Loop is empty
-			return nil, errors.New("got an empty loop from tarjan.Connections")
+			return errors.New("got an empty loop from tarjan.Connections")
 		}
 	}
 
-	// Log compiledCircuit
-	for compIndex, compiledComp := range compiledCircuit {
-		logger.Trace().Msgf("compIndex: %d, compiledComp: %+v", compIndex, compiledComp)
+	// Log components
+	for compIndex, comp := range configuredComponents {
+		logger.Trace().Msgf("compIndex: %d, comp: %+v", compIndex, comp)
 	}
 
-	return compiledCircuit, nil
+	return nil
 }
 
-func getInPortSignals(
-	portMapping map[string][]Port,
-	signalConsumers map[string][]int,
+func updateSignalConsumers(
+	portMapping map[string][]Signal,
+	signalConsumers map[SignalID][]int,
 	componentIndex int,
-) PortToSignal {
-	portToSignal := getPortSignals(portMapping, componentIndex)
-
-	for _, signals := range portToSignal {
+) {
+	for _, signals := range portMapping {
 		for _, signal := range signals {
-			if signal.SignalType == SignalTypeNamed {
-				signalConsumers[signal.Name] = append(signalConsumers[signal.Name], componentIndex)
+			if signal.SignalType() == SignalTypeNamed {
+				signalConsumers[signal.SignalID()] = append(signalConsumers[signal.SignalID()], componentIndex)
 			}
 		}
 	}
-
-	return portToSignal
 }
 
-func getOutPortSignals(
-	portMapping map[string][]Port,
-	signalProducers map[string]int,
+func updateSignalProducers(
+	portMapping map[string][]Signal,
+	signalProducers map[SignalID]int,
 	componentIndex int,
-) (PortToSignal, error) {
-	portToSignal := getPortSignals(portMapping, componentIndex)
-
-	for _, signals := range portToSignal {
+) error {
+	for _, signals := range portMapping {
 		for _, signal := range signals {
-			if signal.SignalType == SignalTypeNamed {
-				if _, ok := signalProducers[signal.Name]; !ok {
-					signalProducers[signal.Name] = componentIndex
+			if signal.SignalType() == SignalTypeNamed {
+				if _, ok := signalProducers[signal.SignalID()]; !ok {
+					signalProducers[signal.SignalID()] = componentIndex
 				} else {
-					return nil, errors.New("duplicate signal definition for signal name: " + signal.Name)
+					return errors.New("duplicate signal definition for signal name: " + signal.SignalName)
 				}
 			}
 		}
 	}
 
-	return portToSignal, nil
-}
-
-// getPortSignals takes a port mapping and returns a PortToSignal map and signals list.
-func getPortSignals(portMapping map[string][]Port, componentIndex int) PortToSignal {
-	portToSignalMapping := make(PortToSignal)
-
-	for port, portList := range portMapping {
-		portSignals := make([]Signal, 0, len(portList))
-		for _, portSpec := range portList {
-			if portSpec.SignalName != nil {
-				portSignals = append(
-					portSignals,
-					MakeNamedSignal(*portSpec.SignalName, false),
-				)
-			} else if portSpec.ConstantSignal != nil {
-				portSignals = append(
-					portSignals,
-					MakeConstantSignal(portSpec.ConstantSignal),
-				)
-			}
-		}
-		portToSignalMapping[port] = portSignals
-	}
-
-	return portToSignalMapping
+	return nil
 }

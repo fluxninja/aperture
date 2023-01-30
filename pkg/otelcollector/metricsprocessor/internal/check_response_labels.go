@@ -67,7 +67,7 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 		if decision.GetRateLimiterInfo() != nil {
 			rawValue := []string{
 				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIndexLabel, decision.GetComponentIndex()),
+				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
 				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
 			}
 			value := strings.Join(rawValue, ",")
@@ -79,7 +79,7 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 		if cl := decision.GetConcurrencyLimiterInfo(); cl != nil {
 			rawValue := []string{
 				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIndexLabel, decision.GetComponentIndex()),
+				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
 				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
 			}
 			value := strings.Join(rawValue, ",")
@@ -90,7 +90,7 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 
 			workloadsRawValue := []string{
 				fmt.Sprintf("%s:%v", metrics.PolicyNameLabel, decision.GetPolicyName()),
-				fmt.Sprintf("%s:%v", metrics.ComponentIndexLabel, decision.GetComponentIndex()),
+				fmt.Sprintf("%s:%v", metrics.ComponentIDLabel, decision.GetComponentId()),
 				fmt.Sprintf("%s:%v", metrics.WorkloadIndexLabel, cl.GetWorkloadIndex()),
 				fmt.Sprintf("%s:%v", metrics.PolicyHashLabel, decision.GetPolicyHash()),
 			}

@@ -7,7 +7,7 @@ import (
 
 // Component is the interface that all components must implement.
 type Component interface {
-	Execute(inPortReadings PortToValue, tickInfo TickInfo) (outPortReadings PortToValue, err error)
+	Execute(inPortReadings PortToReading, tickInfo TickInfo) (outPortReadings PortToReading, err error)
 	DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller)
 	// Generic name of the component, eg. "Gradient"
 	Name() string
@@ -32,13 +32,21 @@ const (
 	ComponentTypeSignalProcessor ComponentType = "SignalProcessor"
 )
 
-// NewDummyComponent creates a standalone component which won't accept or emit any signals.
-func NewDummyComponent(name string) Component { return dummyComponent{name: name} }
+// NewDummyComponent creates a component with provided name and type.
+func NewDummyComponent(name string, componentType ComponentType) Component {
+	return dummyComponent{
+		name:          name,
+		componentType: componentType,
+	}
+}
 
-type dummyComponent struct{ name string }
+type dummyComponent struct {
+	name          string
+	componentType ComponentType
+}
 
 // Execute implements runtime.Component.
-func (c dummyComponent) Execute(inPortReadings PortToValue, tickInfo TickInfo) (outPortReadings PortToValue, err error) {
+func (c dummyComponent) Execute(inPortReadings PortToReading, tickInfo TickInfo) (outPortReadings PortToReading, err error) {
 	return nil, nil
 }
 
@@ -50,4 +58,4 @@ func (c dummyComponent) DynamicConfigUpdate(event notifiers.Event, unmarshaller 
 func (c dummyComponent) Name() string { return c.name }
 
 // Type implements runtime.Component.
-func (c dummyComponent) Type() ComponentType { return ComponentTypeStandAlone }
+func (c dummyComponent) Type() ComponentType { return c.componentType }

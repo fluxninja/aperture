@@ -18,10 +18,10 @@ import (
 
 type object = map[string]interface{}
 
-var commonAttributes = &policysyncv1.CommonAttributes{
-	PolicyName:     "test",
-	PolicyHash:     "test",
-	ComponentIndex: 0,
+var classifierAttributes = &policysyncv1.ClassifierAttributes{
+	PolicyName:      "test",
+	PolicyHash:      "test",
+	ClassifierIndex: 0,
 }
 
 var _ = Describe("Classifier", func() {
@@ -104,18 +104,18 @@ var _ = Describe("Classifier", func() {
 		BeforeEach(func() {
 			var err error
 			ars1, err = classifier.AddRules(context.TODO(), "one", &policysyncv1.ClassifierWrapper{
-				Classifier:       rs1,
-				CommonAttributes: commonAttributes,
+				Classifier:           rs1,
+				ClassifierAttributes: classifierAttributes,
 			})
 			Expect(err).NotTo(HaveOccurred())
 			ars2, err = classifier.AddRules(context.TODO(), "two", &policysyncv1.ClassifierWrapper{
-				Classifier:       rs2,
-				CommonAttributes: commonAttributes,
+				Classifier:           rs2,
+				ClassifierAttributes: classifierAttributes,
 			})
 			Expect(err).NotTo(HaveOccurred())
 			ars3, err = classifier.AddRules(context.TODO(), "three", &policysyncv1.ClassifierWrapper{
-				Classifier:       rs3,
-				CommonAttributes: commonAttributes,
+				Classifier:           rs3,
+				ClassifierAttributes: classifierAttributes,
 			})
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -237,7 +237,7 @@ var _ = Describe("Classifier", func() {
 				},
 				Rules: labelRules,
 			},
-			CommonAttributes: commonAttributes,
+			ClassifierAttributes: classifierAttributes,
 		})
 		return err
 	}
@@ -464,8 +464,8 @@ var _ = Describe("Classifier", func() {
 
 		It("should reject the ruleset", func() {
 			_, err := classifier.AddRules(context.TODO(), "one", &policysyncv1.ClassifierWrapper{
-				Classifier:       rs,
-				CommonAttributes: commonAttributes,
+				Classifier:           rs,
+				ClassifierAttributes: classifierAttributes,
 			})
 			Expect(err).To(HaveOccurred())
 		})
