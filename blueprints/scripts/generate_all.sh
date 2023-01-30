@@ -85,9 +85,9 @@ $FIND "$blueprints_root"/examples -mindepth 1 -maxdepth 1 -type d | while read -
 	if [[ "$old_example_yaml" != "$new_example_yaml" || "$force" == true ]]; then
 		mkdir -p "$dir"/gen/graph
 		# fail if commands below fails
-		go run -mod=mod "${blueprints_root}"/../cmd/circuit-compiler/main.go \
-			-cr "$dir"/gen/policies/example.yaml \
-			-dot "$dir"/gen/graph/graph.dot
+		go run -mod=mod "${blueprints_root}"/../cmd/aperturectl/main.go compile \
+			--cr "$dir"/gen/policies/example.yaml \
+			--dot "$dir"/gen/graph/graph.dot
 		# if exit code is not 0 then remove example.yaml
 		# shellcheck disable=SC2181
 		if [[ $? -ne 0 ]]; then
