@@ -1579,28 +1579,10 @@ message AIMDConcurrencyController {
 
   // Outputs for the AIMDConcurrencyController component.
   message Outs {
-    // Accepted concurrency is the number of accepted tokens per second.
-    //
-    // :::info
-    // **Accepted tokens** are tokens associated with
-    // [flows](/concepts/integrations/flow-control/flow-control.md#flow) that were accepted by
-    // this scheduler. Number of tokens for a flow is determined by a
-    // [workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
-    // via `auto_tokens` or explicitly by `Workload.tokens`).
-    // :::
-    //
-    // Value of this signal is the sum across all the relevant schedulers.
-    OutPort accepted_concurrency = 1;
-    // Incoming concurrency is the number of incoming tokens/sec.
-    // This is the same as `accepted_concurrency`, but across all the flows
-    // entering scheduler, including rejected ones.
-    OutPort incoming_concurrency = 2;
-    // Desired concurrency is the number of tokens per second that the should be accepted.
-    OutPort desired_concurrency = 3;
     // Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
-    OutPort is_overload = 4;
+    OutPort is_overload = 1;
     // Load multiplier is the ratio of desired concurrency to the incoming concurrency.
-    OutPort load_multiplier = 5;
+    OutPort load_multiplier = 2;
   }
 
   // Input ports for the AIMDConcurrencyController component.

@@ -11,13 +11,10 @@ import (
 )
 
 const (
-	aimdSignalPortName              = "signal"
-	aimdSetpointPortName            = "setpoint"
-	aimdAcceptedConcurrencyPortName = "accepted_concurrency"
-	aimdIncomingConcurrencyPortName = "incoming_concurrency"
-	aimdDesiredConcurrencyPortName  = "desired_concurrency"
-	aimdIsOverloadPortName          = "is_overload"
-	aimdLoadMultiplierPortName      = "load_multiplier"
+	aimdSignalPortName         = "signal"
+	aimdSetpointPortName       = "setpoint"
+	aimdIsOverloadPortName     = "is_overload"
+	aimdLoadMultiplierPortName = "load_multiplier"
 )
 
 // ParseAIMDConcurrencyController parses an AIMD concurrency controller and returns the parent, leaf components, and options.
@@ -42,18 +39,6 @@ func ParseAIMDConcurrencyController(
 	nestedOutPortsMap := make(map[string]*policylangv1.OutPort)
 	outPorts := aimdConcurrencyController.OutPorts
 	if outPorts != nil {
-		acceptedConcurrencyPort := outPorts.AcceptedConcurrency
-		if acceptedConcurrencyPort != nil {
-			nestedOutPortsMap[aimdAcceptedConcurrencyPortName] = acceptedConcurrencyPort
-		}
-		incomingConcurrencyPort := outPorts.IncomingConcurrency
-		if incomingConcurrencyPort != nil {
-			nestedOutPortsMap[aimdIncomingConcurrencyPortName] = incomingConcurrencyPort
-		}
-		desiredConcurrencyPort := outPorts.DesiredConcurrency
-		if desiredConcurrencyPort != nil {
-			nestedOutPortsMap[aimdDesiredConcurrencyPortName] = desiredConcurrencyPort
-		}
 		isOverloadPort := outPorts.IsOverload
 		if isOverloadPort != nil {
 			nestedOutPortsMap[aimdIsOverloadPortName] = isOverloadPort
@@ -418,48 +403,6 @@ func ParseAIMDConcurrencyController(
 						OutPorts: &policylangv1.NestedSignalIngress_Outs{
 							Signal: &policylangv1.OutPort{
 								SignalName: "SETPOINT",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_NestedSignalEgress{
-					NestedSignalEgress: &policylangv1.NestedSignalEgress{
-						PortName: aimdAcceptedConcurrencyPortName,
-						InPorts: &policylangv1.NestedSignalEgress_Ins{
-							Signal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "ACCEPTED_CONCURRENCY",
-								},
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_NestedSignalEgress{
-					NestedSignalEgress: &policylangv1.NestedSignalEgress{
-						PortName: aimdIncomingConcurrencyPortName,
-						InPorts: &policylangv1.NestedSignalEgress_Ins{
-							Signal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "INCOMING_CONCURRENCY",
-								},
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_NestedSignalEgress{
-					NestedSignalEgress: &policylangv1.NestedSignalEgress{
-						PortName: aimdDesiredConcurrencyPortName,
-						InPorts: &policylangv1.NestedSignalEgress_Ins{
-							Signal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "DESIRED_CONCURRENCY",
-								},
 							},
 						},
 					},
