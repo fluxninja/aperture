@@ -33,6 +33,19 @@ definitions:
       attributes.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/agentinfo
+  AgentOTELConfig:
+    properties:
+      batch_alerts:
+        $ref: '#/definitions/BatchAlertsConfig'
+      batch_postrollup:
+        $ref: '#/definitions/BatchPostrollupConfig'
+      batch_prerollup:
+        $ref: '#/definitions/BatchPrerollupConfig'
+      ports:
+        $ref: '#/definitions/PortsConfig'
+    title: AgentOTELConfig is the configuration for Agent's OTEL collector.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/agent
   AlertManagerClientConfig:
     properties:
       address:
@@ -1191,11 +1204,10 @@ paths:
       operationId: OTEL
       parameters:
       - in: body
-        name: proxy
         schema:
-          $ref: '#/definitions/CommonOTELConfig'
+          $ref: '#/definitions/AgentOTELConfig'
       tags:
-      - common-configuration
+      - agent-configuration
       x-fn-config-env: true
   /peer_discovery:
     post:

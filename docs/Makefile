@@ -32,6 +32,8 @@ generate-config-markdown:
 				--with-flatten=remove-unused \
 				--tags=common-configuration \
 				--tags=plugin-configuration \
+				--tags=agent-configuration \
+				--tags=controller-configuration \
 				--allow-template-override \
 				--template-dir ./tools/swagger/swagger-templates \
 				--config-file ./tools/swagger/markdown-config.yaml \

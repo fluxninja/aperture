@@ -11,6 +11,21 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector/tracestologsprocessor"
 )
 
+// swagger:operation POST /otel agent-configuration OTEL
+// ---
+// x-fn-config-env: true
+// parameters:
+// - in: body
+//   schema:
+//     "$ref": "#/definitions/AgentOTELConfig"
+
+// AgentOTELConfig is the configuration for Agent's OTEL collector.
+// swagger:model
+// +kubebuilder:object:generate=true
+type AgentOTELConfig struct {
+	otelconfig.CommonOTELConfig `json:",inline"`
+}
+
 func provideAgent(cfg *otelconfig.OTELParams) *otelconfig.OTELConfig {
 	addLogsPipeline(cfg)
 	addTracesPipeline(cfg)

@@ -217,6 +217,19 @@ definitions:
     title: CommonOTELConfig is the configuration for the OTEL collector.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
+  ControllerOTELConfig:
+    properties:
+      batch_alerts:
+        $ref: '#/definitions/BatchAlertsConfig'
+      batch_postrollup:
+        $ref: '#/definitions/BatchPostrollupConfig'
+      batch_prerollup:
+        $ref: '#/definitions/BatchPrerollupConfig'
+      ports:
+        $ref: '#/definitions/PortsConfig'
+    title: ControllerOTELConfig is the configuration for Agent's OTEL collector.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-controller/controller
   Duration:
     description: It holds *durationpb.Duration which is generated type for google/protobuf/duration.proto.
     title: Duration is encoded as a string message which represents a signed span
@@ -1018,11 +1031,10 @@ paths:
       operationId: OTEL
       parameters:
       - in: body
-        name: proxy
         schema:
-          $ref: '#/definitions/CommonOTELConfig'
+          $ref: '#/definitions/ControllerOTELConfig'
       tags:
-      - common-configuration
+      - controller-configuration
       x-fn-config-env: true
   /plugins:
     post:

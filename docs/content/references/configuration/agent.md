@@ -16,6 +16,12 @@ Generated File Starts
 
 ## Table of contents
 
+### AGENT CONFIGURATION
+
+| Key    | Reference        |
+| ------ | ---------------- |
+| `otel` | [OTEL](#o-t-e-l) |
+
 ### COMMON CONFIGURATION
 
 | Key                 | Reference                              |
@@ -29,7 +35,6 @@ Generated File Starts
 | `liveness`          | [Liveness](#liveness)                  |
 | `log`               | [Log](#log)                            |
 | `metrics`           | [Metrics](#metrics)                    |
-| `otel`              | [OTEL](#o-t-e-l)                       |
 | `peer_discovery`    | [PeerDiscovery](#peer-discovery)       |
 | `plugins`           | [Plugins](#plugins)                    |
 | `profilers`         | [Profilers](#profilers)                |
@@ -263,11 +268,11 @@ Env-Var Prefix: `APERTURE_AGENT_OTEL_`
 
 <dl>
 
-<dt>proxy</dt>
+<dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_OTEL_PROXY_`
-Type: [CommonOTELConfig](#common-o-t-e-l-config)
+Env-Var Prefix: `APERTURE_AGENT_OTEL_`
+Type: [AgentOTELConfig](#agent-o-t-e-l-config)
 
 </dd>
 
@@ -546,6 +551,39 @@ AgentInfoConfig is the configuration for the agent group and other agent attribu
 </dd>
 </dl>
 
+### AgentOTELConfig {#agent-o-t-e-l-config}
+
+AgentOTELConfig is the configuration for Agent's OTEL collector.
+
+#### Properties
+
+<dl>
+<dt>batch_alerts</dt>
+<dd>
+
+([BatchAlertsConfig](#batch-alerts-config))
+
+</dd>
+<dt>batch_postrollup</dt>
+<dd>
+
+([BatchPostrollupConfig](#batch-postrollup-config))
+
+</dd>
+<dt>batch_prerollup</dt>
+<dd>
+
+([BatchPrerollupConfig](#batch-prerollup-config))
+
+</dd>
+<dt>ports</dt>
+<dd>
+
+([PortsConfig](#ports-config))
+
+</dd>
+</dl>
+
 ### BackoffConfig {#backoff-config}
 
 BackoffConfig holds configuration for GRPC Client Backoff.
@@ -719,39 +757,6 @@ ClientTLSConfig is the config for client TLS.
 <dd>
 
 (string)
-
-</dd>
-</dl>
-
-### CommonOTELConfig {#common-o-t-e-l-config}
-
-CommonOTELConfig is the configuration for the OTEL collector.
-
-#### Properties
-
-<dl>
-<dt>batch_alerts</dt>
-<dd>
-
-([BatchAlertsConfig](#batch-alerts-config))
-
-</dd>
-<dt>batch_postrollup</dt>
-<dd>
-
-([BatchPostrollupConfig](#batch-postrollup-config))
-
-</dd>
-<dt>batch_prerollup</dt>
-<dd>
-
-([BatchPrerollupConfig](#batch-prerollup-config))
-
-</dd>
-<dt>ports</dt>
-<dd>
-
-([PortsConfig](#ports-config))
 
 </dd>
 </dl>

@@ -5,6 +5,21 @@ import (
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
+// swagger:operation POST /otel controller-configuration OTEL
+// ---
+// x-fn-config-env: true
+// parameters:
+// - in: body
+//   schema:
+//     "$ref": "#/definitions/ControllerOTELConfig"
+
+// ControllerOTELConfig is the configuration for Agent's OTEL collector.
+// swagger:model
+// +kubebuilder:object:generate=true
+type ControllerOTELConfig struct {
+	otelconfig.CommonOTELConfig `json:",inline"`
+}
+
 func provideController(cfg *otelconfig.OTELParams) *otelconfig.OTELConfig {
 	addMetricsPipeline(cfg)
 	cfg.Config.AddExporter(otelconsts.ExporterLogging, nil)

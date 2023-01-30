@@ -14,15 +14,6 @@ func NewDefaultCommonOTELConfig() *CommonOTELConfig {
 	}
 }
 
-// swagger:operation POST /otel common-configuration OTEL
-// ---
-// x-fn-config-env: true
-// parameters:
-// - name: proxy
-//   in: body
-//   schema:
-//     "$ref": "#/definitions/CommonOTELConfig"
-
 // CommonOTELConfig is the configuration for the OTEL collector.
 // swagger:model
 // +kubebuilder:object:generate=true

@@ -25,7 +25,6 @@ Generated File Starts
 | `liveness`   | [Liveness](#liveness)              |
 | `log`        | [Log](#log)                        |
 | `metrics`    | [Metrics](#metrics)                |
-| `otel`       | [OTEL](#o-t-e-l)                   |
 | `plugins`    | [Plugins](#plugins)                |
 | `policies`   | [PoliciesConfig](#policies-config) |
 | `profilers`  | [Profilers](#profilers)            |
@@ -33,6 +32,12 @@ Generated File Starts
 | `readiness`  | [Readiness](#readiness)            |
 | `server`     | [Server](#server)                  |
 | `watchdog`   | [Watchdog](#watchdog)              |
+
+### CONTROLLER CONFIGURATION
+
+| Key    | Reference        |
+| ------ | ---------------- |
+| `otel` | [OTEL](#o-t-e-l) |
 
 ### PLUGIN CONFIGURATION
 
@@ -181,11 +186,11 @@ Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_`
 
 <dl>
 
-<dt>proxy</dt>
+<dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_PROXY_`
-Type: [CommonOTELConfig](#common-o-t-e-l-config)
+Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_`
+Type: [ControllerOTELConfig](#controller-o-t-e-l-config)
 
 </dd>
 
@@ -599,9 +604,9 @@ ClientTLSConfig is the config for client TLS.
 </dd>
 </dl>
 
-### CommonOTELConfig {#common-o-t-e-l-config}
+### ControllerOTELConfig {#controller-o-t-e-l-config}
 
-CommonOTELConfig is the configuration for the OTEL collector.
+ControllerOTELConfig is the configuration for Agent's OTEL collector.
 
 #### Properties
 
