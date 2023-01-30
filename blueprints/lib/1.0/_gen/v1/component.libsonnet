@@ -19,11 +19,11 @@
   withArithmeticCombinatorMixin(arithmetic_combinator):: {
     arithmetic_combinator+: arithmetic_combinator,
   },
-  withConcurrencyLimiter(concurrency_limiter):: {
-    concurrency_limiter: concurrency_limiter,
+  withAutoScale(auto_scale):: {
+    auto_scale: auto_scale,
   },
-  withConcurrencyLimiterMixin(concurrency_limiter):: {
-    concurrency_limiter+: concurrency_limiter,
+  withAutoScaleMixin(auto_scale):: {
+    auto_scale+: auto_scale,
   },
   withDecider(decider):: {
     decider: decider,
@@ -55,6 +55,12 @@
   withFirstValidMixin(first_valid):: {
     first_valid+: first_valid,
   },
+  withFlowControl(flow_control):: {
+    flow_control: flow_control,
+  },
+  withFlowControlMixin(flow_control):: {
+    flow_control+: flow_control,
+  },
   withGradientController(gradient_controller):: {
     gradient_controller: gradient_controller,
   },
@@ -66,12 +72,6 @@
   },
   withHolderMixin(holder):: {
     holder+: holder,
-  },
-  withHorizontalPodScaler(horizontal_pod_scaler):: {
-    horizontal_pod_scaler: horizontal_pod_scaler,
-  },
-  withHorizontalPodScalerMixin(horizontal_pod_scaler):: {
-    horizontal_pod_scaler+: horizontal_pod_scaler,
   },
   withIntegrator(integrator):: {
     integrator: integrator,
@@ -97,17 +97,29 @@
   withMinMixin(min):: {
     min+: min,
   },
+  withNestedCircuit(nested_circuit):: {
+    nested_circuit: nested_circuit,
+  },
+  withNestedCircuitMixin(nested_circuit):: {
+    nested_circuit+: nested_circuit,
+  },
+  withNestedSignalEgress(nested_signal_egress):: {
+    nested_signal_egress: nested_signal_egress,
+  },
+  withNestedSignalEgressMixin(nested_signal_egress):: {
+    nested_signal_egress+: nested_signal_egress,
+  },
+  withNestedSignalIngress(nested_signal_ingress):: {
+    nested_signal_ingress: nested_signal_ingress,
+  },
+  withNestedSignalIngressMixin(nested_signal_ingress):: {
+    nested_signal_ingress+: nested_signal_ingress,
+  },
   withOr(or):: {
     or: or,
   },
   withOrMixin(or):: {
     or+: or,
-  },
-  withPromql(promql):: {
-    promql: promql,
-  },
-  withPromqlMixin(promql):: {
-    promql+: promql,
   },
   withPulseGenerator(pulse_generator):: {
     pulse_generator: pulse_generator,
@@ -115,11 +127,11 @@
   withPulseGeneratorMixin(pulse_generator):: {
     pulse_generator+: pulse_generator,
   },
-  withRateLimiter(rate_limiter):: {
-    rate_limiter: rate_limiter,
+  withQuery(query):: {
+    query: query,
   },
-  withRateLimiterMixin(rate_limiter):: {
-    rate_limiter+: rate_limiter,
+  withQueryMixin(query):: {
+    query+: query,
   },
   withSqrt(sqrt):: {
     sqrt: sqrt,

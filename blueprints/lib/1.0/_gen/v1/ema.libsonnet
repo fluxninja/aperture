@@ -13,24 +13,6 @@ local emaouts = import './emaouts.libsonnet';
   },
   inPorts:: emains,
   outPorts:: emaouts,
-  withCorrectionFactorOnMaxEnvelopeViolation(correction_factor_on_max_envelope_violation):: {
-    correction_factor_on_max_envelope_violation: correction_factor_on_max_envelope_violation,
-  },
-  withCorrectionFactorOnMaxEnvelopeViolationMixin(correction_factor_on_max_envelope_violation):: {
-    correction_factor_on_max_envelope_violation+: correction_factor_on_max_envelope_violation,
-  },
-  withCorrectionFactorOnMinEnvelopeViolation(correction_factor_on_min_envelope_violation):: {
-    correction_factor_on_min_envelope_violation: correction_factor_on_min_envelope_violation,
-  },
-  withCorrectionFactorOnMinEnvelopeViolationMixin(correction_factor_on_min_envelope_violation):: {
-    correction_factor_on_min_envelope_violation+: correction_factor_on_min_envelope_violation,
-  },
-  withEmaWindow(ema_window):: {
-    ema_window: ema_window,
-  },
-  withEmaWindowMixin(ema_window):: {
-    ema_window+: ema_window,
-  },
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },
@@ -43,16 +25,10 @@ local emaouts = import './emaouts.libsonnet';
   withOutPortsMixin(out_ports):: {
     out_ports+: out_ports,
   },
-  withValidDuringWarmup(valid_during_warmup):: {
-    valid_during_warmup: valid_during_warmup,
+  withParameters(parameters):: {
+    parameters: parameters,
   },
-  withValidDuringWarmupMixin(valid_during_warmup):: {
-    valid_during_warmup+: valid_during_warmup,
-  },
-  withWarmUpWindow(warm_up_window):: {
-    warm_up_window: warm_up_window,
-  },
-  withWarmUpWindowMixin(warm_up_window):: {
-    warm_up_window+: warm_up_window,
+  withParametersMixin(parameters):: {
+    parameters+: parameters,
   },
 }

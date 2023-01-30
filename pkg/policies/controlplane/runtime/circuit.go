@@ -3,7 +3,6 @@ package runtime
 import (
 	"context"
 	"fmt"
-	"math"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -36,6 +35,7 @@ var circuitMetrics = newCircuitMetrics()
 func newCircuitMetrics() *CircuitMetrics {
 	circuitMetricsLabels := []string{
 		metrics.SignalNameLabel,
+		metrics.SubCircuitIDLabel,
 		metrics.PolicyNameLabel,
 		metrics.ValidLabel,
 	}
@@ -80,68 +80,6 @@ func setupCircuitMetrics(prometheusRegistry *prometheus.Registry, lifecycle fx.L
 	})
 }
 
-// SignalType enum.
-type SignalType int
-
-const (
-	// SignalTypeNamed is a named signal.
-	SignalTypeNamed = iota
-	// SignalTypeConstant is a constant signal.
-	SignalTypeConstant
-)
-
-// Signal represents a logical flow of Readings in a circuit and determines the linkage between Components.
-type Signal struct {
-	Name       string
-	Value      float64
-	Looped     bool
-	SignalType SignalType
-}
-
-// MakeNamedSignal creates a new named Signal.
-func MakeNamedSignal(name string, looped bool) Signal {
-	return Signal{
-		SignalType: SignalTypeNamed,
-		Name:       name,
-		Looped:     looped,
-	}
-}
-
-// MakeConstantSignal creates a new constant Signal.
-func MakeConstantSignal(constSignal *ConstantSignal) Signal {
-	value := 0.0
-	specialValue := constSignal.SpecialValue
-	if specialValue != nil && *specialValue != "" {
-		switch *specialValue {
-		case "NaN":
-			value = math.NaN()
-		case "+Inf":
-			value = math.Inf(1)
-		case "-Inf":
-			value = math.Inf(-1)
-		}
-	} else if floatValue := constSignal.Value; floatValue != nil {
-		value = *floatValue
-	}
-
-	return Signal{
-		SignalType: SignalTypeConstant,
-		Value:      value,
-	}
-}
-
-// PortToSignal is a map from port name to a slice of Signals.
-type PortToSignal map[string][]Signal
-
-// CompiledComponent consists of a Component and its In and Out ports.
-//
-// This representation of component is ready to be used by a circuit.
-type CompiledComponent struct {
-	Component
-	InPortToSignals  PortToSignal
-	OutPortToSignals PortToSignal
-}
-
 type signalToReading map[Signal]Reading
 
 // Circuit manages the runtime state of a set of components and their inter linkages via signals.
@@ -155,7 +93,7 @@ type Circuit struct {
 	// Looped signals persistence across ticks
 	loopedSignals signalToReading
 	// Components
-	components []CompiledComponent
+	components []ConfiguredComponent
 	// Tick end callbacks
 	tickEndCallbacks []TickEndCallback
 	// Tick start callbacks
@@ -167,20 +105,20 @@ var _ CircuitAPI = &Circuit{}
 
 // NewCircuitAndOptions create a new Circuit struct along with fx options.
 func NewCircuitAndOptions(
-	compiledComponents []CompiledComponent,
+	configuredComponents []ConfiguredComponent,
 	policyReadAPI iface.Policy,
 ) (*Circuit, fx.Option) {
 	reg := policyReadAPI.GetStatusRegistry().Child("circuit_signals")
 	circuit := &Circuit{
 		Policy:         policyReadAPI,
 		loopedSignals:  make(signalToReading),
-		components:     compiledComponents,
+		components:     configuredComponents,
 		statusRegistry: reg,
 	}
 
 	// Populate loopedSignals
 	for _, component := range circuit.components {
-		for _, outPort := range component.OutPortToSignals {
+		for _, outPort := range component.PortMapping.Outs {
 			for _, signal := range outPort {
 				if signal.Looped {
 					circuit.loopedSignals[signal] = InvalidReading()
@@ -199,18 +137,20 @@ func (circuit *Circuit) setup(lifecycle fx.Lifecycle) {
 	var circuitMetricsLabels []prometheus.Labels
 
 	for _, component := range circuit.components {
-		for _, outPort := range component.OutPortToSignals {
+		for _, outPort := range component.PortMapping.Outs {
 			for _, signal := range outPort {
 				circuitMetricsLabels = append(circuitMetricsLabels,
 					prometheus.Labels{
-						metrics.SignalNameLabel: signal.Name,
-						metrics.PolicyNameLabel: circuit.GetPolicyName(),
-						metrics.ValidLabel:      metrics.ValidFalse,
+						metrics.SignalNameLabel:   signal.SignalName,
+						metrics.SubCircuitIDLabel: signal.SubCircuitID,
+						metrics.PolicyNameLabel:   circuit.GetPolicyName(),
+						metrics.ValidLabel:        metrics.ValidFalse,
 					},
 					prometheus.Labels{
-						metrics.SignalNameLabel: signal.Name,
-						metrics.PolicyNameLabel: circuit.GetPolicyName(),
-						metrics.ValidLabel:      metrics.ValidTrue,
+						metrics.SignalNameLabel:   signal.SignalName,
+						metrics.SubCircuitIDLabel: signal.SubCircuitID,
+						metrics.PolicyNameLabel:   circuit.GetPolicyName(),
+						metrics.ValidLabel:        metrics.ValidTrue,
 					},
 				)
 			}
@@ -271,15 +211,16 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 		// log all circuitSignalReadings
 		for signal, reading := range circuitSignalReadings {
 			signalReadingProto := &policymonitoringv1.SignalReading{
-				SignalName: signal.Name,
+				SignalName: signal.SignalName,
 				Valid:      reading.Valid(),
 				Value:      reading.Value(),
 			}
 			signalInfo.SignalReading = append(signalInfo.SignalReading, signalReadingProto)
 
 			circuitMetricsLabels := prometheus.Labels{
-				metrics.SignalNameLabel: signal.Name,
-				metrics.PolicyNameLabel: circuit.Policy.GetPolicyName(),
+				metrics.SignalNameLabel:   signal.SignalName,
+				metrics.SubCircuitIDLabel: signal.SubCircuitID,
+				metrics.PolicyNameLabel:   circuit.Policy.GetPolicyName(),
 			}
 			if reading.Valid() {
 				circuitMetricsLabels[metrics.ValidLabel] = metrics.ValidTrue
@@ -314,19 +255,19 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 	OUTER:
 		// Check readiness by component and execute if ready
 		for cmpIdx, cmp := range circuit.components {
-			componentInPortReadings := make(PortToValue)
+			componentInPortReadings := make(PortToReading)
 			// Skip if already executed
 			if executedComponents[cmpIdx] {
 				continue
 			}
 			// Check readiness of cmp by checking in_ports
-			for port, sigs := range cmp.InPortToSignals {
+			for port, sigs := range cmp.PortMapping.Ins {
 				// Reading list for this port
 				readingList := make([]Reading, len(sigs))
 				// Check if all the sig(s) in sigs are ready
 				for index, sig := range sigs {
-					if sig.SignalType == SignalTypeConstant {
-						readingList[index] = NewReading(sig.Value)
+					if sig.SignalType() == SignalTypeConstant {
+						readingList[index] = NewReading(sig.ConstantSignalValue())
 					} else if sigReading, ok := circuitSignalReadings[sig]; ok {
 						// Set sigReading in readingList at index
 						readingList[index] = sigReading
@@ -342,7 +283,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 			logger.Trace().Str("component", cmp.Name()).
 				Int("tick", tickInfo.Tick()).
 				Interface("in_ports", componentInPortReadings).
-				Interface("InPortToSignalsMap", cmp.InPortToSignals).
+				Interface("InPortToSignalsMap", cmp.PortMapping.Ins).
 				Msg("Executing component")
 			// If control reaches this point, the component is ready to execute
 			componentOutPortReadings, err := cmp.Execute(
@@ -352,7 +293,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				tickInfo,
 			)
 			if componentOutPortReadings == nil {
-				componentOutPortReadings = make(PortToValue)
+				componentOutPortReadings = make(PortToReading)
 			}
 			// Update executedComponents
 			executedComponents[cmpIdx] = true
@@ -362,7 +303,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				errMulti = multierr.Append(errMulti, err)
 			}
 			// Fill any missing values from cmp.outPortsMapping in componentOutPortReadings with invalid readings
-			for port, signals := range cmp.OutPortToSignals {
+			for port, signals := range cmp.PortMapping.Outs {
 				if _, ok := componentOutPortReadings[port]; !ok {
 					// Fill with invalid readings
 					componentOutPortReadings[port] = make([]Reading, len(signals))
@@ -378,7 +319,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 				}
 			}
 			// Update circuitSignalReadings with componentOutPortReadings while iterating through outPortsMapping
-			for port, signals := range cmp.OutPortToSignals {
+			for port, signals := range cmp.PortMapping.Outs {
 				for index, sig := range signals {
 					readings, ok := componentOutPortReadings[port]
 					if !ok {
@@ -400,7 +341,9 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 						// Looped signals are stored in circuit.loopedSignals for the next round
 						circuit.loopedSignals[sig] = readings[index]
 						// Store the reading in circuitSignalReadings under the same signal name without the looped flag
-						circuitSignalReadings[MakeNamedSignal(sig.Name, false)] = readings[index]
+						sigNoLoop := sig
+						sigNoLoop.Looped = false
+						circuitSignalReadings[sigNoLoop] = readings[index]
 					} else {
 						// Store the reading in circuitSignalReadings
 						circuitSignalReadings[sig] = readings[index]

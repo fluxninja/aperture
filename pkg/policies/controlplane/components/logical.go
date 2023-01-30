@@ -13,9 +13,9 @@ import (
 
 // logicalCombinator is n-ary logical combinator used to implement And.
 type logicalCombinator struct {
-	neutralElement tristate.Bool
 	op             func(tristate.Bool, tristate.Bool) tristate.Bool
 	name           string
+	neutralElement tristate.Bool
 }
 
 // Name implements runtime.Component.
@@ -27,15 +27,15 @@ func (c *logicalCombinator) Type() runtime.ComponentType {
 }
 
 // Execute implements runtime.Component.
-func (c *logicalCombinator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	inputs := inPortReadings.ReadRepeatedValuePort("inputs")
+func (c *logicalCombinator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	inputs := inPortReadings.ReadRepeatedReadingPort("inputs")
 
 	output := c.neutralElement
 	for _, input := range inputs {
 		output = c.op(output, tristate.FromReading(input))
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output.ToReading()},
 	}, nil
 }
@@ -45,9 +45,9 @@ func (*logicalCombinator) DynamicConfigUpdate(notifiers.Event, config.Unmarshall
 
 // NewAndAndOptions creates a new And Component.
 func NewAndAndOptions(
-	maxProto *policylangv1.And,
-	componentIndex int,
-	policyReadAPI iface.Policy,
+	_ *policylangv1.And,
+	_ string,
+	_ iface.Policy,
 ) (runtime.Component, fx.Option, error) {
 	return &logicalCombinator{
 		neutralElement: tristate.True,
@@ -58,9 +58,9 @@ func NewAndAndOptions(
 
 // NewOrAndOptions creates a new Or Component.
 func NewOrAndOptions(
-	maxProto *policylangv1.Or,
-	componentIndex int,
-	policyReadAPI iface.Policy,
+	_ *policylangv1.Or,
+	_ string,
+	_ iface.Policy,
 ) (runtime.Component, fx.Option, error) {
 	return &logicalCombinator{
 		neutralElement: tristate.False,
@@ -78,10 +78,10 @@ func (c *inverter) Name() string { return "Inverter" }
 func (c *inverter) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
 // Execute implements runtime.Component.
-func (c *inverter) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	input := inPortReadings.ReadSingleValuePort("input")
+func (c *inverter) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	input := inPortReadings.ReadSingleReadingPort("input")
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{
 			tristate.FromReading(input).Not().ToReading(),
 		},
@@ -93,9 +93,9 @@ func (*inverter) DynamicConfigUpdate(notifiers.Event, config.Unmarshaller) {}
 
 // NewInverterAndOptions creates a new Inverter Component.
 func NewInverterAndOptions(
-	maxProto *policylangv1.Inverter,
-	componentIndex int,
-	policyReadAPI iface.Policy,
+	_ *policylangv1.Inverter,
+	_ string,
+	_ iface.Policy,
 ) (runtime.Component, fx.Option, error) {
 	return &inverter{}, fx.Options(), nil
 }

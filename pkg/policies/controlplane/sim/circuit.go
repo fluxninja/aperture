@@ -10,7 +10,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
-	rt "github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -19,22 +19,22 @@ import (
 // Inputs map signal names to components that will emit test input.
 // Input components are required to emit an "output" signal, such as Input or
 // components.Variable. These can be created with NewInput and NewConstantInput.
-type Inputs map[string]rt.Component
+type Inputs map[runtime.SignalID]runtime.Component
 
 // OutputSignals is a list of signal names that comprise test output.
-type OutputSignals []string
+type OutputSignals []runtime.SignalID
 
 // Outputs map signal names to captured output readings.
-type Outputs map[string][]Reading
+type Outputs map[runtime.SignalID][]Reading
 
 // Circuit is a simulated circuit intended to be used in tests.
 type Circuit struct {
-	meta    *simPolicyMeta
-	circuit *rt.Circuit
-	inputs  Inputs
-	outputs map[string]*output
-	tickNo  int
 	time    time.Time // virtual time of next tick
+	meta    *simPolicyMeta
+	circuit *runtime.Circuit
+	inputs  Inputs
+	outputs map[runtime.SignalID]*output
+	tickNo  int
 }
 
 // NewCircuitFromYaml creates a new simulated Circuit based on yaml circuit description.
@@ -60,7 +60,7 @@ func NewCircuitFromYaml(
 
 	policyMeta := newSimPolicyMeta(circuitProto.EvaluationInterval.AsDuration())
 
-	components, _, _, err := circuitfactory.CreateComponents(circuitProto.Components, policyMeta)
+	_, components, _, err := circuitfactory.CreateComponents(circuitProto.Components, runtime.NewComponentID("root"), policyMeta)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func NewCircuitFromYaml(
 
 // NewCircuit creates a new simulated Circuit.
 func NewCircuit(
-	components []rt.ConfiguredComponent,
+	components []runtime.ConfiguredComponent,
 	inputs Inputs,
 	outputSignals OutputSignals,
 ) (*Circuit, error) {
@@ -78,7 +78,7 @@ func NewCircuit(
 }
 
 func newCircuit(
-	components []rt.ConfiguredComponent,
+	components []runtime.ConfiguredComponent,
 	inputs Inputs,
 	outputSignals OutputSignals,
 	policyMeta *simPolicyMeta,
@@ -87,7 +87,7 @@ func newCircuit(
 		components = append(components, ConfigureInputComponent(input, inputSignal))
 	}
 
-	outputs := make(map[string]*output, len(outputSignals))
+	outputs := make(map[runtime.SignalID]*output, len(outputSignals))
 
 	for _, outputSignal := range outputSignals {
 		output := &output{}
@@ -95,12 +95,12 @@ func newCircuit(
 		outputs[outputSignal] = output
 	}
 
-	compiledCircuit, err := rt.Compile(components, policyMeta.Registry.GetLogger())
+	err := runtime.Compile(components, policyMeta.Registry.GetLogger())
 	if err != nil {
 		return nil, err
 	}
 
-	runtimeCircuit, _ := rt.NewCircuitAndOptions(compiledCircuit, policyMeta)
+	runtimeCircuit, _ := runtime.NewCircuitAndOptions(components, policyMeta)
 	if runtimeCircuit == nil {
 		return nil, errors.New("cannot create circuit")
 	}
@@ -116,10 +116,10 @@ func newCircuit(
 }
 
 // Step runs one tick of circuit execution and returns values of output signals.
-func (s *Circuit) Step() map[string]Reading {
+func (s *Circuit) Step() map[runtime.SignalID]Reading {
 	s.execStep()
 
-	outputs := make(map[string]Reading, len(s.outputs))
+	outputs := make(map[runtime.SignalID]Reading, len(s.outputs))
 	for outputSignal, output := range s.outputs {
 		readings := output.TakeReadings()
 		if len(readings) != 1 {
@@ -136,7 +136,7 @@ func (s *Circuit) Run(steps int) Outputs {
 		s.execStep()
 	}
 
-	outputs := make(map[string][]Reading, len(s.outputs))
+	outputs := make(map[runtime.SignalID][]Reading, len(s.outputs))
 	for outputSignal, output := range s.outputs {
 		outputs[outputSignal] = ReadingsFromRt(output.TakeReadings())
 	}
@@ -170,7 +170,7 @@ func (s *Circuit) inputLen() int {
 
 func (s *Circuit) execStep() {
 	err := s.circuit.Execute(
-		rt.NewTickInfo(
+		runtime.NewTickInfo(
 			s.time,
 			s.time.Add(s.meta.EvaluationInterval),
 			s.tickNo,
@@ -190,8 +190,8 @@ func (s *Circuit) execStep() {
 
 // simPolicyMeta implements Policy interface for usage in simulated circuits.
 type simPolicyMeta struct {
-	EvaluationInterval time.Duration
 	Registry           status.Registry
+	EvaluationInterval time.Duration
 }
 
 func newSimPolicyMeta(evaluationInternal time.Duration) *simPolicyMeta {

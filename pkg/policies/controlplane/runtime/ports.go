@@ -1,8 +1,11 @@
 package runtime
 
 import (
+	"math"
+
 	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
 )
 
 // PortMapping is description of a component's ports mapping.
@@ -38,18 +41,84 @@ import (
 type PortMapping struct {
 	// Note: Not using policylangv1.InPort and OutPort directly to avoid
 	// runtime depending on proto.
-	Ins  map[string][]Port `mapstructure:"in_ports"`
-	Outs map[string][]Port `mapstructure:"out_ports"`
+	Ins  PortToSignals `mapstructure:"in_ports"`
+	Outs PortToSignals `mapstructure:"out_ports"`
+}
+
+// AddInPort adds an input port to the PortMapping.
+func (p *PortMapping) AddInPort(portName string, signals []Signal) {
+	if p.Ins == nil {
+		p.Ins = make(PortToSignals)
+	}
+	p.Ins[portName] = signals
+}
+
+// AddOutPort adds an output port to the PortMapping.
+func (p *PortMapping) AddOutPort(portName string, signals []Signal) {
+	if p.Outs == nil {
+		p.Outs = make(PortToSignals)
+	}
+	p.Outs[portName] = signals
+}
+
+// GetInPort returns true if the port exists in the PortMapping.
+func (p *PortMapping) GetInPort(portName string) ([]Signal, bool) {
+	if p.Ins == nil {
+		return nil, false
+	}
+	signals, ok := p.Ins[portName]
+	return signals, ok
+}
+
+// GetOutPort returns true if the port exists in the PortMapping.
+func (p *PortMapping) GetOutPort(portName string) ([]Signal, bool) {
+	if p.Outs == nil {
+		return nil, false
+	}
+	signals, ok := p.Outs[portName]
+	return signals, ok
+}
+
+// NewPortMapping creates a new PortMapping.
+func NewPortMapping() PortMapping {
+	return PortMapping{
+		Ins:  make(PortToSignals),
+		Outs: make(PortToSignals),
+	}
+}
+
+// Merge merges two PortMappings.
+func (p *PortMapping) Merge(other PortMapping) error {
+	err := p.Ins.merge(other.Ins)
+	if err != nil {
+		return err
+	}
+	err = p.Outs.merge(other.Outs)
+	return err
+}
+
+// PortToSignals is a map from port name to a list of ports.
+type PortToSignals map[string][]Signal
+
+func (p PortToSignals) merge(other PortToSignals) error {
+	for portName, signals := range other {
+		if _, ok := p[portName]; !ok {
+			p[portName] = signals
+		} else {
+			return errors.New("duplicate port definition")
+		}
+	}
+	return nil
 }
 
 // ConstantSignal is a mirror struct to same proto message.
 type ConstantSignal struct {
-	SpecialValue *string  `mapstructure:"special_value"`
-	Value        *float64 `mapstructure:"value"`
+	SpecialValue string  `mapstructure:"special_value"`
+	Value        float64 `mapstructure:"value"`
 }
 
 // PortsFromComponentConfig extracts Ports from component's config.
-func PortsFromComponentConfig(componentConfig mapstruct.Object) (PortMapping, error) {
+func PortsFromComponentConfig(componentConfig mapstruct.Object, subCircuitID string) (PortMapping, error) {
 	var ports PortMapping
 
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
@@ -61,14 +130,79 @@ func PortsFromComponentConfig(componentConfig mapstruct.Object) (PortMapping, er
 	}
 
 	err = decoder.Decode(componentConfig)
+	// Add circuitID to all signals.
+	for _, signals := range ports.Ins {
+		for i := range signals {
+			signals[i].SubCircuitID = subCircuitID
+		}
+	}
+	for _, signals := range ports.Outs {
+		for i := range signals {
+			signals[i].SubCircuitID = subCircuitID
+		}
+	}
 	return ports, err
 }
 
-// Port describes an input or output port of a component
+// SignalType enum.
+type SignalType int
+
+// SignalID is a unique identifier for a signal.
+type SignalID struct {
+	SubCircuitID string
+	SignalName   string
+}
+
+const (
+	// SignalTypeNamed is a named signal.
+	SignalTypeNamed = iota
+	// SignalTypeConstant is a constant signal.
+	SignalTypeConstant
+)
+
+// Signal describes an input or output port of a component
 //
 // Only one field should be set.
-type Port struct {
-	// Note: pointers are used to detect fields being not set.
-	SignalName     *string         `mapstructure:"signal_name"`
-	ConstantSignal *ConstantSignal `mapstructure:"constant_signal"`
+type Signal struct {
+	SubCircuitID   string
+	SignalName     string         `mapstructure:"signal_name"`
+	ConstantSignal ConstantSignal `mapstructure:"constant_signal"`
+	Looped         bool
+}
+
+// SignalID returns the Signal ID.
+func (s *Signal) SignalID() SignalID {
+	return SignalID{
+		SubCircuitID: s.SubCircuitID,
+		SignalName:   s.SignalName,
+	}
+}
+
+// SignalType returns the Signal type of the port.
+func (s *Signal) SignalType() SignalType {
+	if s.SignalName != "" {
+		return SignalTypeNamed
+	}
+	return SignalTypeConstant
+}
+
+// ConstantSignalValue returns the value of the constant signal.
+func (s *Signal) ConstantSignalValue() float64 {
+	constantSignal := s.ConstantSignal
+	value := 0.0
+	specialValue := constantSignal.SpecialValue
+	if specialValue != "" {
+		switch specialValue {
+		case "NaN":
+			value = math.NaN()
+		case "+Inf":
+			value = math.Inf(1)
+		case "-Inf":
+			value = math.Inf(-1)
+		}
+	} else {
+		value = constantSignal.Value
+	}
+
+	return value
 }

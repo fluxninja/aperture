@@ -1,6 +1,8 @@
 package circuitfactory
 
 import (
+	"fmt"
+
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
@@ -23,29 +25,25 @@ func FactoryModule() fx.Option {
 // FactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
 func FactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 	return fx.Options(
-		componentStackFactoryModuleForPolicyApp(circuitAPI),
+		autoScaleModuleForPolicyApp(circuitAPI),
 		promql.ModuleForPolicyApp(circuitAPI),
 	)
 }
 
-// NewComponentAndOptions creates component and its fx options.
+// NewComponentAndOptions creates parent and leaf components and their fx options for a component spec.
 func NewComponentAndOptions(
 	componentProto *policylangv1.Component,
-	componentIndex int,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
-) (runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
+) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
 	var ctor componentConstructor
 	switch config := componentProto.Component.(type) {
 	case *policylangv1.Component_GradientController:
 		ctor = mkCtor(config.GradientController, controller.NewGradientControllerAndOptions)
-	case *policylangv1.Component_RateLimiter:
-		ctor = mkCtor(config.RateLimiter, rate.NewRateLimiterAndOptions)
 	case *policylangv1.Component_Ema:
 		ctor = mkCtor(config.Ema, components.NewEMAAndOptions)
 	case *policylangv1.Component_ArithmeticCombinator:
 		ctor = mkCtor(config.ArithmeticCombinator, components.NewArithmeticCombinatorAndOptions)
-	case *policylangv1.Component_Promql:
-		ctor = mkCtor(config.Promql, promql.NewPromQLAndOptions)
 	case *policylangv1.Component_Variable:
 		ctor = mkCtor(config.Variable, components.NewVariableAndOptions)
 	case *policylangv1.Component_Decider:
@@ -78,55 +76,94 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.PulseGenerator, components.NewPulseGeneratorAndOptions)
 	case *policylangv1.Component_Holder:
 		ctor = mkCtor(config.Holder, components.NewHolderAndOptions)
+	case *policylangv1.Component_NestedSignalIngress:
+		ctor = mkCtor(config.NestedSignalIngress, components.NewNestedSignalIngressAndOptions)
+	case *policylangv1.Component_NestedSignalEgress:
+		ctor = mkCtor(config.NestedSignalEgress, components.NewNestedSignalEgressAndOptions)
+	case *policylangv1.Component_NestedCircuit:
+		return ParseNestedCircuit(componentID, config.NestedCircuit, policyReadAPI)
+	case *policylangv1.Component_Query:
+		query := componentProto.GetQuery()
+		switch queryConfig := query.Component.(type) {
+		case *policylangv1.Query_Promql:
+			ctor = mkCtor(queryConfig.Promql, promql.NewPromQLAndOptions)
+		}
+	case *policylangv1.Component_FlowControl:
+		flowControl := componentProto.GetFlowControl()
+		switch flowControlConfig := flowControl.Component.(type) {
+		case *policylangv1.FlowControl_RateLimiter:
+			ctor = mkCtor(flowControlConfig.RateLimiter, rate.NewRateLimiterAndOptions)
+		default:
+			return newFlowControlCompositeAndOptions(flowControl, componentID, policyReadAPI)
+		}
+	case *policylangv1.Component_AutoScale:
+		autoScale := componentProto.GetAutoScale()
+		return newAutoScaleCompositeAndOptions(autoScale, componentID, policyReadAPI)
 	default:
-		return newComponentStackAndOptions(componentProto, componentIndex, policyReadAPI)
+		return Tree{}, nil, nil, fmt.Errorf("unknown component type: %T", config)
 	}
 
-	component, config, option, err := ctor(componentIndex, policyReadAPI)
+	component, config, option, err := ctor(componentID.String(), policyReadAPI)
 	if err != nil {
-		return runtime.ConfiguredComponent{}, nil, nil, err
+		return Tree{}, nil, nil, err
 	}
 
-	compiledComponent, err := prepareConfiguredComponent(component, config)
+	configuredComponent, err := prepareComponent(component, config, componentID)
 	if err != nil {
-		return runtime.ConfiguredComponent{}, nil, nil, err
+		return Tree{}, nil, nil, err
 	}
 
-	return compiledComponent, nil, option, nil
+	return Tree{Root: configuredComponent}, []runtime.ConfiguredComponent{configuredComponent}, option, nil
 }
 
 type componentConstructor func(
-	componentIdx int,
+	componentID string,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, any, fx.Option, error)
 
 func mkCtor[Config any, Comp runtime.Component](
 	config *Config,
-	origCtor func(*Config, int, iface.Policy) (Comp, fx.Option, error),
+	origCtor func(*Config, string, iface.Policy) (Comp, fx.Option, error),
 ) componentConstructor {
-	return func(idx int, policy iface.Policy) (runtime.Component, any, fx.Option, error) {
-		comp, opt, err := origCtor(config, idx, policy)
+	return func(componentID string, policy iface.Policy) (runtime.Component, any, fx.Option, error) {
+		comp, opt, err := origCtor(config, componentID, policy)
 		return comp, config, opt, err
 	}
 }
 
-func prepareConfiguredComponent(
+func prepareComponent(
 	component runtime.Component,
 	config any,
+	componentID runtime.ComponentID,
+) (runtime.ConfiguredComponent, error) {
+	subCircuitID, ok := componentID.ParentID()
+	if !ok {
+		return runtime.ConfiguredComponent{}, fmt.Errorf("component %s is not in a circuit", componentID.String())
+	}
+
+	return prepareComponentInCircuit(component, config, componentID, subCircuitID)
+}
+
+func prepareComponentInCircuit(
+	component runtime.Component,
+	config any,
+	componentID runtime.ComponentID,
+	subCircuitID runtime.ComponentID,
 ) (runtime.ConfiguredComponent, error) {
 	mapStruct, err := mapstruct.EncodeObject(config)
 	if err != nil {
 		return runtime.ConfiguredComponent{}, err
 	}
 
-	ports, err := runtime.PortsFromComponentConfig(mapStruct)
+	ports, err := runtime.PortsFromComponentConfig(mapStruct, subCircuitID.String())
 	if err != nil {
 		return runtime.ConfiguredComponent{}, err
 	}
 
 	return runtime.ConfiguredComponent{
 		Component:   component,
-		Config:      mapStruct,
 		PortMapping: ports,
+		Config:      mapStruct,
+		ComponentID: componentID,
 	}, nil
 }

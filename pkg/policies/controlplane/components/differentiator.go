@@ -16,9 +16,9 @@ import (
 
 // Differentiator is a component that calculates rate of change per tick.
 type Differentiator struct {
-	window time.Duration
 	// readings are saved in ring buffer
 	readings  []runtime.Reading
+	window    time.Duration
 	oldestIdx int
 	newestIdx int
 	// capacity is calculated from window duration divided by tick interval
@@ -45,17 +45,17 @@ func NewDifferentiator(diffProto *policylangv1.Differentiator) runtime.Component
 }
 
 // NewDifferentiatorAndOptions creates a differentiator component and its fx options.
-func NewDifferentiatorAndOptions(diffProto *policylangv1.Differentiator, _ int, _ iface.Policy) (runtime.Component, fx.Option, error) {
+func NewDifferentiatorAndOptions(diffProto *policylangv1.Differentiator, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	return NewDifferentiator(diffProto), fx.Options(), nil
 }
 
 // Execute implements runtime.Component.Execute.
-func (d *Differentiator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (d *Differentiator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	if !d.initialized {
 		d.init(tickInfo)
 	}
 
-	inputVal := inPortReadings.ReadSingleValuePort("input")
+	inputVal := inPortReadings.ReadSingleReadingPort("input")
 	outputVal := runtime.InvalidReading()
 
 	// add input to readings array
@@ -94,7 +94,7 @@ func (d *Differentiator) Execute(inPortReadings runtime.PortToValue, tickInfo ru
 		d.oldestIdx = utils.Mod((d.oldestIdx + 1), d.capacity)
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{outputVal},
 	}, nil
 }

@@ -22,17 +22,18 @@ const (
 	pendingTrue
 )
 
-type comparisonOperator int8
+// ComparisonOperator is the type of comparison operator.
+type ComparisonOperator int8
 
-//go:generate enumer -type=comparisonOperator -output=decider-comparison-operator-string.go
+//go:generate enumer -type=ComparisonOperator -output=decider-comparison-operator-string.go
 const (
-	unknownComparison comparisonOperator = iota
-	gt
-	lt
-	gte
-	lte
-	eq
-	neq
+	UnknownComparison ComparisonOperator = iota
+	GT
+	LT
+	GTE
+	LTE
+	EQ
+	NEQ
 )
 
 // Decider controller for testing.
@@ -48,7 +49,7 @@ type Decider struct {
 	// The current error correction state
 	state deciderState
 	// The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
-	operator comparisonOperator
+	operator ComparisonOperator
 }
 
 // Name implements runtime.Component.
@@ -61,12 +62,12 @@ func (*Decider) Type() runtime.ComponentType { return runtime.ComponentTypeSigna
 var _ runtime.Component = (*Decider)(nil)
 
 // NewDeciderAndOptions creates timed controller and its fx options.
-func NewDeciderAndOptions(deciderProto *policylangv1.Decider, _ int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
-	operator, err := comparisonOperatorString(deciderProto.Operator)
+func NewDeciderAndOptions(deciderProto *policylangv1.Decider, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
+	operator, err := ComparisonOperatorString(deciderProto.Operator)
 	if err != nil {
 		return nil, fx.Options(), err
 	}
-	if operator == unknownComparison {
+	if operator == UnknownComparison {
 		return nil, fx.Options(), fmt.Errorf("unknown operator")
 	}
 	timed := &Decider{
@@ -81,11 +82,11 @@ func NewDeciderAndOptions(deciderProto *policylangv1.Decider, _ int, policyReadA
 }
 
 // Execute implements runtime.Component.Execute.
-func (dec *Decider) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (dec *Decider) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	onTrue := runtime.NewReading(1.0)
 	onFalse := runtime.NewReading(0.0)
-	lhs := inPortReadings.ReadSingleValuePort("lhs")
-	rhs := inPortReadings.ReadSingleValuePort("rhs")
+	lhs := inPortReadings.ReadSingleReadingPort("lhs")
+	rhs := inPortReadings.ReadSingleReadingPort("rhs")
 
 	// Default currentDecision to False
 	currentDecision := false
@@ -93,17 +94,17 @@ func (dec *Decider) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 	if lhs.Valid() && rhs.Valid() {
 		lhsVal, rhsVal := lhs.Value(), rhs.Value()
 		switch dec.operator {
-		case gt:
+		case GT:
 			currentDecision = (lhsVal > rhsVal)
-		case lt:
+		case LT:
 			currentDecision = (lhsVal < rhsVal)
-		case gte:
+		case GTE:
 			currentDecision = (lhsVal >= rhsVal)
-		case lte:
+		case LTE:
 			currentDecision = (lhsVal <= rhsVal)
-		case eq:
+		case EQ:
 			currentDecision = (lhsVal == rhsVal)
-		case neq:
+		case NEQ:
 			currentDecision = (lhsVal != rhsVal)
 		}
 	}
@@ -129,7 +130,7 @@ func (dec *Decider) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 		output = onFalse
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
 }

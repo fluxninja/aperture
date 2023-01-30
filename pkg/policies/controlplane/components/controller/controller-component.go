@@ -21,10 +21,10 @@ type ControllerComponent struct {
 	// Controller output's last reading
 	output           runtime.Reading
 	policyReadAPI    iface.Policy
-	defaultConfig    *policylangv1.ControllerDynamicConfig
+	defaultConfig    *policylangv1.GradientController_DynamicConfig
 	dynamicConfigKey string
 	componentName    string
-	componentIndex   int
+	componentID      string
 	manualMode       bool
 }
 
@@ -32,10 +32,10 @@ type ControllerComponent struct {
 func NewControllerComponent(
 	controller Controller,
 	componentName string,
-	componentIndex int,
+	componentID string,
 	policyReadAPI iface.Policy,
 	dynamicConfigKey string,
-	defaultConfig *policylangv1.ControllerDynamicConfig,
+	defaultConfig *policylangv1.GradientController_DynamicConfig,
 ) *ControllerComponent {
 	cc := &ControllerComponent{
 		signal:           runtime.InvalidReading(),
@@ -44,7 +44,7 @@ func NewControllerComponent(
 		output:           runtime.InvalidReading(),
 		controller:       controller,
 		componentName:    componentName,
-		componentIndex:   componentIndex,
+		componentID:      componentID,
 		policyReadAPI:    policyReadAPI,
 		dynamicConfigKey: dynamicConfigKey,
 		defaultConfig:    defaultConfig,
@@ -62,19 +62,19 @@ func (cc *ControllerComponent) Type() runtime.ComponentType {
 }
 
 // Execute implements runtime.Component.Execute.
-func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (outPortReadings runtime.PortToValue, err error) {
-	retErr := func(err error) (runtime.PortToValue, error) {
-		return runtime.PortToValue{
+func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (outPortReadings runtime.PortToReading, err error) {
+	retErr := func(err error) (runtime.PortToReading, error) {
+		return runtime.PortToReading{
 			"output": []runtime.Reading{runtime.InvalidReading()},
 		}, err
 	}
 
-	signal := inPortReadings.ReadSingleValuePort("signal")
-	setpoint := inPortReadings.ReadSingleValuePort("setpoint")
-	optimize := inPortReadings.ReadSingleValuePort("optimize")
-	max := inPortReadings.ReadSingleValuePort("max")
-	min := inPortReadings.ReadSingleValuePort("min")
-	controlVariable := inPortReadings.ReadSingleValuePort("control_variable")
+	signal := inPortReadings.ReadSingleReadingPort("signal")
+	setpoint := inPortReadings.ReadSingleReadingPort("setpoint")
+	optimize := inPortReadings.ReadSingleReadingPort("optimize")
+	max := inPortReadings.ReadSingleReadingPort("max")
+	min := inPortReadings.ReadSingleReadingPort("min")
+	controlVariable := inPortReadings.ReadSingleReadingPort("control_variable")
 	output := runtime.InvalidReading()
 
 	prevSetpoint := cc.setpoint
@@ -157,7 +157,7 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToValue, tickI
 	// Save readings for the next tick so that Controller may access them via ControllerStateReadAPI
 	cc.output = output
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
 }
@@ -165,7 +165,7 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToValue, tickI
 // DynamicConfigUpdate handles setting of controller.ControllerMode.
 func (cc *ControllerComponent) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	logger := cc.policyReadAPI.GetStatusRegistry().GetLogger()
-	dynamicConfig := &policylangv1.ControllerDynamicConfig{}
+	dynamicConfig := &policylangv1.GradientController_DynamicConfig{}
 	if unmarshaller.IsSet(cc.dynamicConfigKey) {
 		err := unmarshaller.UnmarshalKey(cc.dynamicConfigKey, dynamicConfig)
 		if err != nil {
@@ -178,7 +178,7 @@ func (cc *ControllerComponent) DynamicConfigUpdate(event notifiers.Event, unmars
 	}
 }
 
-func (cc *ControllerComponent) setConfig(config *policylangv1.ControllerDynamicConfig) {
+func (cc *ControllerComponent) setConfig(config *policylangv1.GradientController_DynamicConfig) {
 	if config != nil {
 		cc.manualMode = config.ManualMode
 	} else {

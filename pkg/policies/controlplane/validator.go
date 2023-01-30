@@ -74,10 +74,10 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circ
 		for _, c := range policy.GetResources().Classifiers {
 			_, err = compiler.CompileRuleset(ctx, name, &policysyncv1.ClassifierWrapper{
 				Classifier: c,
-				CommonAttributes: &policysyncv1.CommonAttributes{
-					PolicyName:     "dummy",
-					PolicyHash:     "dummy",
-					ComponentIndex: 0,
+				ClassifierAttributes: &policysyncv1.ClassifierAttributes{
+					PolicyName:      "dummy",
+					PolicyHash:      "dummy",
+					ClassifierIndex: 0,
 				},
 			})
 			if err != nil {

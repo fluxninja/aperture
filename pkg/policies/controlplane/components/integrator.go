@@ -33,19 +33,19 @@ func NewIntegrator() runtime.Component {
 }
 
 // NewIntegratorAndOptions creates an integrator component and its fx options.
-func NewIntegratorAndOptions(_ *policylangv1.Integrator, _ int, _ iface.Policy) (runtime.Component, fx.Option, error) {
+func NewIntegratorAndOptions(_ *policylangv1.Integrator, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	return NewIntegrator(), fx.Options(), nil
 }
 
 // Execute implements runtime.Component.Execute.
-func (in *Integrator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	inputVal := inPortReadings.ReadSingleValuePort("input")
-	resetVal := inPortReadings.ReadSingleValuePort("reset")
-	if resetVal.Valid() && resetVal.Value() > 0 {
+func (in *Integrator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	inputVal := inPortReadings.ReadSingleReadingPort("input")
+	resetVal := inPortReadings.ReadSingleReadingPort("reset")
+	if resetVal.Valid() && resetVal.Value() != 0 {
 		in.sum = 0
 	} else if inputVal.Valid() {
-		minVal := inPortReadings.ReadSingleValuePort("min")
-		maxVal := inPortReadings.ReadSingleValuePort("max")
+		minVal := inPortReadings.ReadSingleReadingPort("min")
+		maxVal := inPortReadings.ReadSingleReadingPort("max")
 
 		if minVal.Valid() && maxVal.Valid() {
 			in.minMax.Max = maxVal.Value()
@@ -56,7 +56,7 @@ func (in *Integrator) Execute(inPortReadings runtime.PortToValue, tickInfo runti
 		}
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{runtime.NewReading(in.sum)},
 	}, nil
 }

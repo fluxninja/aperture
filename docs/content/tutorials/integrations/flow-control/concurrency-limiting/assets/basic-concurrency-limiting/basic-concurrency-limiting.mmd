@@ -1,213 +1,65 @@
 flowchart LR
-subgraph 0[<center>ArithmeticCombinator<br/>mul</center>]
-subgraph 0_inports[ ]
-style 0_inports fill:none,stroke:none
-0lhs[lhs]
-0rhs[rhs]
+subgraph root.0[PromQL]
+subgraph root.0_outports[ ]
+style root.0_outports fill:none,stroke:none
+root.0output[output]
 end
-subgraph 0_outports[ ]
-style 0_outports fill:none,stroke:none
-0output[output]
+end
+subgraph root.1[<center>ArithmeticCombinator<br/>mul</center>]
+subgraph root.1_inports[ ]
+style root.1_inports fill:none,stroke:none
+root.1lhs[lhs]
+root.1rhs[rhs]
+end
+subgraph root.1_outports[ ]
+style root.1_outports fill:none,stroke:none
+root.1output[output]
 end
 end
 FakeConstant0((2.00))
-FakeConstant0 --> 0rhs
-subgraph 1[<center>ArithmeticCombinator<br/>mul</center>]
-subgraph 1_inports[ ]
-style 1_inports fill:none,stroke:none
-1rhs[rhs]
-1lhs[lhs]
+FakeConstant0 --> root.1rhs
+subgraph root.2[<center>ArithmeticCombinator<br/>mul</center>]
+subgraph root.2_inports[ ]
+style root.2_inports fill:none,stroke:none
+root.2lhs[lhs]
+root.2rhs[rhs]
 end
-subgraph 1_outports[ ]
-style 1_outports fill:none,stroke:none
-1output[output]
+subgraph root.2_outports[ ]
+style root.2_outports fill:none,stroke:none
+root.2output[output]
 end
 end
 FakeConstant1((1.10))
-FakeConstant1 --> 1rhs
-subgraph 2[<center>ArithmeticCombinator<br/>div</center>]
-subgraph 2_inports[ ]
-style 2_inports fill:none,stroke:none
-2lhs[lhs]
-2rhs[rhs]
+FakeConstant1 --> root.2rhs
+subgraph root.3[<center>EMA<br/>win: 1500s</center>]
+subgraph root.3_inports[ ]
+style root.3_inports fill:none,stroke:none
+root.3max_envelope[max_envelope]
+root.3input[input]
 end
-subgraph 2_outports[ ]
-style 2_outports fill:none,stroke:none
-2output[output]
-end
-end
-subgraph 3[<center>ArithmeticCombinator<br/>mul</center>]
-subgraph 3_inports[ ]
-style 3_inports fill:none,stroke:none
-3lhs[lhs]
-3rhs[rhs]
-end
-subgraph 3_outports[ ]
-style 3_outports fill:none,stroke:none
-3output[output]
+subgraph root.3_outports[ ]
+style root.3_outports fill:none,stroke:none
+root.3output[output]
 end
 end
-FakeConstant2((2.00))
-FakeConstant2 --> 3lhs
-subgraph 4[<center>ArithmeticCombinator<br/>add</center>]
-subgraph 4_inports[ ]
-style 4_inports fill:none,stroke:none
-4lhs[lhs]
-4rhs[rhs]
+subgraph root.4[AIMDConcurrencyController]
+subgraph root.4_inports[ ]
+style root.4_inports fill:none,stroke:none
+root.4setpoint[setpoint]
+root.4signal[signal]
 end
-subgraph 4_outports[ ]
-style 4_outports fill:none,stroke:none
-4output[output]
-end
-end
-FakeConstant3((5.00))
-FakeConstant3 --> 4lhs
-subgraph 5[<center>ArithmeticCombinator<br/>add</center>]
-subgraph 5_inports[ ]
-style 5_inports fill:none,stroke:none
-5lhs[lhs]
-5rhs[rhs]
-end
-subgraph 5_outports[ ]
-style 5_outports fill:none,stroke:none
-5output[output]
+subgraph root.4_outports[ ]
+style root.4_outports fill:none,stroke:none
+root.4desired_concurrency[desired_concurrency]
+root.4incoming_concurrency[incoming_concurrency]
+root.4is_overload[is_overload]
+root.4load_multiplier[load_multiplier]
+root.4accepted_concurrency[accepted_concurrency]
 end
 end
-subgraph 6[Min]
-subgraph 6_inports[ ]
-style 6_inports fill:none,stroke:none
-6inputs[inputs]
-6inputs[inputs]
-end
-subgraph 6_outports[ ]
-style 6_outports fill:none,stroke:none
-6output[output]
-end
-end
-subgraph 7[FirstValid]
-subgraph 7_inports[ ]
-style 7_inports fill:none,stroke:none
-7inputs[inputs]
-7inputs[inputs]
-end
-subgraph 7_outports[ ]
-style 7_outports fill:none,stroke:none
-7output[output]
-end
-end
-FakeConstant4((0.00))
-FakeConstant4 --> 7inputs
-subgraph 8[Sqrt]
-subgraph 8_inports[ ]
-style 8_inports fill:none,stroke:none
-8input[input]
-end
-subgraph 8_outports[ ]
-style 8_outports fill:none,stroke:none
-8output[output]
-end
-end
-subgraph 9[PromQL]
-subgraph 9_outports[ ]
-style 9_outports fill:none,stroke:none
-9output[output]
-end
-end
-subgraph 10[<center>EMA<br/>win: 1500s</center>]
-subgraph 10_inports[ ]
-style 10_inports fill:none,stroke:none
-10input[input]
-10max_envelope[max_envelope]
-end
-subgraph 10_outports[ ]
-style 10_outports fill:none,stroke:none
-10output[output]
-end
-end
-subgraph 11[Gradient]
-subgraph 11_inports[ ]
-style 11_inports fill:none,stroke:none
-11max[max]
-11control_variable[control_variable]
-11signal[signal]
-11setpoint[setpoint]
-11optimize[optimize]
-end
-subgraph 11_outports[ ]
-style 11_outports fill:none,stroke:none
-11output[output]
-end
-end
-subgraph 12[<center>Extrapolator<br/>for: 5s</center>]
-subgraph 12_inports[ ]
-style 12_inports fill:none,stroke:none
-12input[input]
-end
-subgraph 12_outports[ ]
-style 12_outports fill:none,stroke:none
-12output[output]
-end
-end
-subgraph 13.Scheduler[ConcurrencyLimiter/Scheduler]
-subgraph 13.Scheduler_outports[ ]
-style 13.Scheduler_outports fill:none,stroke:none
-13.Schedulerincoming_concurrency[incoming_concurrency]
-13.Scheduleraccepted_concurrency[accepted_concurrency]
-end
-end
-subgraph 13.LoadActuator[ConcurrencyLimiter/LoadActuator]
-subgraph 13.LoadActuator_inports[ ]
-style 13.LoadActuator_inports fill:none,stroke:none
-13.LoadActuatorload_multiplier[load_multiplier]
-end
-end
-subgraph 15[Switcher]
-subgraph 15_inports[ ]
-style 15_inports fill:none,stroke:none
-15on_false[on_false]
-15switch[switch]
-15on_true[on_true]
-end
-subgraph 15_outports[ ]
-style 15_outports fill:none,stroke:none
-15output[output]
-end
-end
-FakeConstant5((0.00))
-FakeConstant5 --> 15on_true
-subgraph 14[<center>Decider<br/>gt for 0s</center>]
-subgraph 14_inports[ ]
-style 14_inports fill:none,stroke:none
-14lhs[lhs]
-14rhs[rhs]
-end
-subgraph 14_outports[ ]
-style 14_outports fill:none,stroke:none
-14output[output]
-end
-end
-7output --> |CONCURRENCY_INCREMENT_NORMAL| 15on_false
-8output --> |SQRT_CONCURRENCY_INCREMENT| 4rhs
-14output --> |IS_OVERLOAD| 15switch
-1output --> |LATENCY_SETPOINT| 11setpoint
-1output --> |LATENCY_SETPOINT| 14rhs
-5output --> |CONCURRENCY_INCREMENT_INTEGRAL| 6inputs
-9output --> |LATENCY| 0lhs
-9output --> |LATENCY| 10input
-9output --> |LATENCY| 11signal
-9output --> |LATENCY| 14lhs
-11output --> |DESIRED_CONCURRENCY| 2lhs
-12output --> |LOAD_MULTIPLIER| 13.LoadActuatorload_multiplier
-0output --> |MAX_EMA| 10max_envelope
-3output --> |NORMAL_CONCURRENCY_LIMIT| 11max
-4output --> |CONCURRENCY_INCREMENT_SINGLE_TICK| 5lhs
-6output --> |CONCURRENCY_INCREMENT_INTEGRAL_CAPPED| 7inputs
-15output --> |CONCURRENCY_INCREMENT| 5rhs
-15output --> |CONCURRENCY_INCREMENT| 11optimize
-2output --> |DESIRED_CONCURRENCY_RATIO| 12input
-10output --> |LATENCY_EMA| 1lhs
-13.Schedulerincoming_concurrency --> |INCOMING_CONCURRENCY| 2rhs
-13.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 3rhs
-13.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 6inputs
-13.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 8input
-13.Scheduleraccepted_concurrency --> |ACCEPTED_CONCURRENCY| 11control_variable
+root.0output --> |LATENCY| root.1lhs
+root.0output --> |LATENCY| root.3input
+root.0output --> |LATENCY| root.4signal
+root.1output --> |MAX_EMA| root.3max_envelope
+root.2output --> |LATENCY_SETPOINT| root.4setpoint
+root.3output --> |LATENCY_EMA| root.2lhs

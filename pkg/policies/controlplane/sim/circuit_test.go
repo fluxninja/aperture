@@ -7,6 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/sim"
 )
 
@@ -21,14 +22,14 @@ var _ = Describe("Circuit", func() {
 		circuit, err := sim.NewCircuit(
 			nil,
 			sim.Inputs{
-				"X": components.NewConstantSignal(42.0),
+				runtime.SignalID{SignalName: "X"}: components.NewConstantSignal(42.0),
 			},
-			sim.OutputSignals{"X"},
+			sim.OutputSignals{runtime.SignalID{SignalName: "X"}},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Step()).To(Equal(
-			map[string]sim.Reading{
-				"X": sim.NewReading(42.0),
+			map[runtime.SignalID]sim.Reading{
+				{SignalName: "X"}: sim.NewReading(42.0),
 			},
 		))
 	})
@@ -37,14 +38,14 @@ var _ = Describe("Circuit", func() {
 		circuit, err := sim.NewCircuit(
 			nil,
 			sim.Inputs{
-				"XX": sim.NewInput([]float64{42.0, 43.0}),
+				runtime.SignalID{SignalName: "XX"}: sim.NewInput([]float64{42.0, 43.0}),
 			},
-			sim.OutputSignals{"XX"},
+			sim.OutputSignals{runtime.SignalID{SignalName: "XX"}},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
 			sim.Outputs{
-				"XX": sim.NewReadings([]float64{42.0, 43.0}),
+				runtime.SignalID{SignalName: "XX"}: sim.NewReadings([]float64{42.0, 43.0}),
 			},
 		))
 	})
@@ -61,16 +62,16 @@ var _ = Describe("Circuit", func() {
 					output: { signal_name: SQRT }
 			`,
 			sim.Inputs{
-				"INPUT": sim.NewInput([]float64{4.0, 9.0}),
+				runtime.SignalID{SignalName: "INPUT"}: sim.NewInput([]float64{4.0, 9.0}),
 			},
-			sim.OutputSignals{"SQRT"},
+			sim.OutputSignals{runtime.SignalID{SignalName: "SQRT"}},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
 			sim.Outputs{
 				// FIXME: Add some helpers to handle floating-point inaccuracies.
 				// (Here we are lucky to have an exactly-representable answer)
-				"SQRT": sim.NewReadings([]float64{2.0, 3.0}),
+				runtime.SignalID{SignalName: "SQRT"}: sim.NewReadings([]float64{2.0, 3.0}),
 			},
 		))
 	})
@@ -94,15 +95,15 @@ var _ = Describe("Circuit", func() {
 					output: { signal_name: SQRT-CAPPED }
 			`,
 			sim.Inputs{
-				"INPUT": sim.NewInput([]float64{4.0, 9.0}),
-				"CAP":   sim.NewConstantInput(2.5),
+				runtime.SignalID{SignalName: "INPUT"}: sim.NewInput([]float64{4.0, 9.0}),
+				runtime.SignalID{SignalName: "CAP"}:   sim.NewConstantInput(2.5),
 			},
-			sim.OutputSignals{"SQRT-CAPPED"},
+			sim.OutputSignals{runtime.SignalID{SignalName: "SQRT-CAPPED"}},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
 			sim.Outputs{
-				"SQRT-CAPPED": sim.NewReadings([]float64{2.0, 2.5}),
+				runtime.SignalID{SignalName: "SQRT-CAPPED"}: sim.NewReadings([]float64{2.0, 2.5}),
 			},
 		))
 	})
@@ -110,13 +111,13 @@ var _ = Describe("Circuit", func() {
 	It("can handle invalid readings in tests", func() {
 		circuit, err := sim.NewCircuit(
 			nil,
-			sim.Inputs{"NAN": sim.NewConstantInput(math.NaN())},
-			sim.OutputSignals{"NAN"},
+			sim.Inputs{runtime.SignalID{SignalName: "NAN"}: sim.NewConstantInput(math.NaN())},
+			sim.OutputSignals{runtime.SignalID{SignalName: "NAN"}},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Step()).To(Equal(
-			map[string]sim.Reading{
-				"NAN": sim.InvalidReading(),
+			map[runtime.SignalID]sim.Reading{
+				{SignalName: "NAN"}: sim.InvalidReading(),
 			},
 		))
 	})

@@ -27,7 +27,7 @@ type ScaleActuator struct {
 	scaleActuatorProto *policylangv1.HorizontalPodScaler_ScaleActuator
 	decisionsEtcdPath  string
 	agentGroupName     string
-	componentIndex     int
+	componentID        string
 	dryRun             bool
 }
 
@@ -40,12 +40,12 @@ func (*ScaleActuator) Type() runtime.ComponentType { return runtime.ComponentTyp
 // NewScaleActuatorAndOptions creates scale actuator and its fx options.
 func NewScaleActuatorAndOptions(
 	scaleActuatorProto *policylangv1.HorizontalPodScaler_ScaleActuator,
-	componentIndex int,
+	componentID string,
 	policyReadAPI iface.Policy,
 	agentGroup string,
 ) (runtime.Component, fx.Option, error) {
-	componentID := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), int64(componentIndex))
-	decisionsEtcdPath := path.Join(paths.HorizontalPodScalerDecisionsPath, componentID)
+	etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
+	decisionsEtcdPath := path.Join(paths.HorizontalPodScalerDecisionsPath, etcdKey)
 	dryRun := false
 	if scaleActuatorProto.GetDefaultConfig() != nil {
 		dryRun = scaleActuatorProto.GetDefaultConfig().GetDryRun()
@@ -53,7 +53,7 @@ func NewScaleActuatorAndOptions(
 	sa := &ScaleActuator{
 		policyReadAPI:      policyReadAPI,
 		agentGroupName:     agentGroup,
-		componentIndex:     componentIndex,
+		componentID:        componentID,
 		decisionsEtcdPath:  decisionsEtcdPath,
 		scaleActuatorProto: scaleActuatorProto,
 		dryRun:             dryRun,
@@ -87,9 +87,9 @@ func (sa *ScaleActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx
 }
 
 // Execute implements runtime.Component.Execute.
-func (sa *ScaleActuator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (sa *ScaleActuator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	// Get the decision from the port
-	replicasReading := inPortReadings.ReadSingleValuePort("desired_replicas")
+	replicasReading := inPortReadings.ReadSingleReadingPort("desired_replicas")
 	var replicasValue float64
 	if replicasReading.Valid() {
 		if replicasReading.Value() <= 0 {
@@ -149,9 +149,9 @@ func (sa *ScaleActuator) publishDecision(desiredReplicas float64) error {
 	wrapper := &policysyncv1.ScaleDecisionWrapper{
 		ScaleDecision: decision,
 		CommonAttributes: &policysyncv1.CommonAttributes{
-			PolicyName:     sa.policyReadAPI.GetPolicyName(),
-			PolicyHash:     sa.policyReadAPI.GetPolicyHash(),
-			ComponentIndex: int64(sa.componentIndex),
+			PolicyName:  sa.policyReadAPI.GetPolicyName(),
+			PolicyHash:  sa.policyReadAPI.GetPolicyHash(),
+			ComponentId: sa.componentID,
 		},
 	}
 	dat, err := proto.Marshal(wrapper)

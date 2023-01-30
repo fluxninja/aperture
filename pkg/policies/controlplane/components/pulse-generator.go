@@ -27,7 +27,7 @@ func (*PulseGenerator) Name() string { return "PulseGenerator" }
 func (*PulseGenerator) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
 
 // NewPulseGeneratorAndOptions creates an pulse generator component and its fx options.
-func NewPulseGeneratorAndOptions(generatorProto *policylangv1.PulseGenerator, _ int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewPulseGeneratorAndOptions(generatorProto *policylangv1.PulseGenerator, _ string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()
 	trueFor := math.Ceil(float64(generatorProto.TrueFor.AsDuration()) / float64(evaluationPeriod))
 	falseFor := math.Ceil(float64(generatorProto.FalseFor.AsDuration()) / float64(evaluationPeriod))
@@ -42,7 +42,7 @@ func NewPulseGeneratorAndOptions(generatorProto *policylangv1.PulseGenerator, _ 
 }
 
 // Execute implements runtime.Component.Execute.
-func (pg *PulseGenerator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (pg *PulseGenerator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	outputValue := 1.0
 	pg.windowCount++
 
@@ -59,7 +59,7 @@ func (pg *PulseGenerator) Execute(inPortReadings runtime.PortToValue, tickInfo r
 		outputValue = 0.0
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{runtime.NewReading(outputValue)},
 	}, nil
 }

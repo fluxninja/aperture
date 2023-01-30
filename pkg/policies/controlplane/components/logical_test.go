@@ -3,6 +3,7 @@ package components_test
 import (
 	"math"
 
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/sim"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -20,14 +21,14 @@ var _ = Describe("Not component", func() {
 					output: { signal_name: NOT }
 			`,
 			sim.Inputs{
-				"INPUT": sim.NewInput([]float64{nan, 0.0, 1.0, 2.0, -1.}),
+				runtime.SignalID{SignalName: "INPUT"}: sim.NewInput([]float64{nan, 0.0, 1.0, 2.0, -1.}),
 			},
-			sim.OutputSignals{"NOT"},
+			sim.OutputSignals{runtime.SignalID{SignalName: "NOT"}},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
 			sim.Outputs{
-				"NOT": sim.NewReadings([]float64{nan, 1.0, 0.0, 0.0, 0.0}),
+				runtime.SignalID{SignalName: "NOT"}: sim.NewReadings([]float64{nan, 1.0, 0.0, 0.0, 0.0}),
 			},
 		))
 	})
@@ -56,17 +57,17 @@ var _ = Describe("And and Or component", func() {
 					output: { signal_name: OR }
 			`,
 			sim.Inputs{
-				"INPUTX": sim.NewInput([]float64{nan, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, -1.}),
-				"INPUTY": sim.NewInput([]float64{nan, nan, nan, 0.0, 0.0, 1.0, 2.0, -2.}),
-				"INPUTZ": sim.NewInput([]float64{nan, 0.0, 1.0, 0.0, 1.0, 1.0, 3.0, 3.0}),
+				runtime.SignalID{SignalName: "INPUTX"}: sim.NewInput([]float64{nan, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, -1.}),
+				runtime.SignalID{SignalName: "INPUTY"}: sim.NewInput([]float64{nan, nan, nan, 0.0, 0.0, 1.0, 2.0, -2.}),
+				runtime.SignalID{SignalName: "INPUTZ"}: sim.NewInput([]float64{nan, 0.0, 1.0, 0.0, 1.0, 1.0, 3.0, 3.0}),
 			},
-			sim.OutputSignals{"AND", "OR"},
+			sim.OutputSignals{runtime.SignalID{SignalName: "AND"}, runtime.SignalID{SignalName: "OR"}},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
 			sim.Outputs{
-				"AND": sim.NewReadings([]float64{nan, 0.0, nan, 0.0, 0.0, 1.0, 1.0, 1.0}),
-				"OR":  sim.NewReadings([]float64{nan, nan, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0}),
+				runtime.SignalID{SignalName: "AND"}: sim.NewReadings([]float64{nan, 0.0, nan, 0.0, 0.0, 1.0, 1.0, 1.0}),
+				runtime.SignalID{SignalName: "OR"}:  sim.NewReadings([]float64{nan, nan, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0}),
 			},
 		))
 	})
@@ -80,12 +81,12 @@ var _ = Describe("And and Or component", func() {
 					output: { signal_name: AND }
 			`,
 			nil,
-			sim.OutputSignals{"AND"},
+			sim.OutputSignals{runtime.SignalID{SignalName: "AND"}},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Step()).To(Equal(
-			map[string]sim.Reading{
-				"AND": sim.NewReading(1.0),
+			map[runtime.SignalID]sim.Reading{
+				{SignalName: "AND"}: sim.NewReading(1.0),
 			},
 		))
 	})
@@ -99,12 +100,12 @@ var _ = Describe("And and Or component", func() {
 					output: { signal_name: OR }
 			`,
 			nil,
-			sim.OutputSignals{"OR"},
+			sim.OutputSignals{runtime.SignalID{SignalName: "OR"}},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Step()).To(Equal(
-			map[string]sim.Reading{
-				"OR": sim.NewReading(0.0),
+			map[runtime.SignalID]sim.Reading{
+				{SignalName: "OR"}: sim.NewReading(0.0),
 			},
 		))
 	})

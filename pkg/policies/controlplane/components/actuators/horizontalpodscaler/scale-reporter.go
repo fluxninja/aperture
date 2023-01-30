@@ -66,7 +66,7 @@ type ScaleReporter struct {
 	policyReadAPI iface.Policy
 	// statusRegistry status.Registry
 	scaleStatus *policysyncv1.ScaleStatus
-	componentID string
+	etcdKey     string
 	agentGroup  string
 }
 
@@ -82,14 +82,14 @@ func (sr *ScaleReporter) Type() runtime.ComponentType { return runtime.Component
 // NewScaleReporterAndOptions returns a new ScaleReporter and its fx options.
 func NewScaleReporterAndOptions(
 	_ *policylangv1.HorizontalPodScaler_ScaleReporter,
-	componentIndex int,
+	componentID string,
 	policyReadAPI iface.Policy,
 	agentGroup string,
 ) (runtime.Component, fx.Option, error) {
-	componentID := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), int64(componentIndex))
+	etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
 	sr := &ScaleReporter{
 		policyReadAPI: policyReadAPI,
-		componentID:   componentID,
+		etcdKey:       etcdKey,
 		agentGroup:    agentGroup,
 	}
 
@@ -114,7 +114,7 @@ func (sr *ScaleReporter) setupWatch(
 
 	// status notifier
 	statusNotifier := notifiers.NewUnmarshalKeyNotifier(
-		notifiers.Key(sr.componentID),
+		notifiers.Key(sr.etcdKey),
 		statusUnmarshaller,
 		sr.statusUpdateCallback,
 	)
@@ -168,8 +168,8 @@ func (sr *ScaleReporter) statusUpdateCallback(event notifiers.Event, unmarshalle
 }
 
 // Execute implements runtime.Component.
-func (sr *ScaleReporter) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	outPortReadings := make(runtime.PortToValue)
+func (sr *ScaleReporter) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	outPortReadings := make(runtime.PortToReading)
 	configuredReplicasReading := runtime.InvalidReading()
 	actualReplicasReading := runtime.InvalidReading()
 

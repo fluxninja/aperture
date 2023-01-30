@@ -37,7 +37,7 @@ var (
 	fxNameTag = config.NameTag("concurrency_limiter_watcher")
 
 	// Array of Label Keys for WFQ and Token Bucket Metrics.
-	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel}
+	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel}
 )
 
 // concurrencyLimiterModule returns the fx options for flowcontrol side pieces of concurrency limiter in the main fx app.
@@ -160,7 +160,7 @@ func setupConcurrencyLimiterFactory(
 		Name: metrics.WorkloadLatencyMetricName,
 		Help: "Latency summary of workload",
 	}, []string{
-		metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel,
+		metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel,
 		metrics.WorkloadIndexLabel,
 	})
 
@@ -168,7 +168,7 @@ func setupConcurrencyLimiterFactory(
 		Name: metrics.WorkloadCounterMetricName,
 		Help: "Counter of workload requests",
 	}, []string{
-		metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel,
+		metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel,
 		metrics.DecisionTypeLabel,
 		metrics.WorkloadIndexLabel,
 	})
@@ -252,7 +252,7 @@ func setupConcurrencyLimiterFactory(
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
 type multiMatchResult struct {
-	matchedWorkloads map[int]*policylangv1.Scheduler_WorkloadParameters
+	matchedWorkloads map[int]*policylangv1.Scheduler_Workload_Parameters
 }
 
 // multiMatcher is MultiMatcher instantiation used in this package.
@@ -279,12 +279,17 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 	if schedulerMsg == nil {
 		err = fmt.Errorf("no scheduler specified")
 		reg.SetStatus(status.NewStatus(nil, err))
-		logger.Warn().Err(err).Msg("Failed to unmarshal scheduler")
+		return fx.Options(), err
+	}
+	schedulerParams := schedulerMsg.Parameters
+	if schedulerParams == nil {
+		err = fmt.Errorf("no scheduler parameters specified")
+		reg.SetStatus(status.NewStatus(nil, err))
 		return fx.Options(), err
 	}
 	mm := multimatcher.New[int, multiMatchResult]()
 	// Loop through the workloads
-	for workloadIndex, workloadProto := range schedulerMsg.Workloads {
+	for workloadIndex, workloadProto := range schedulerParams.Workloads {
 		labelMatcher, err := selectors.MMExprFromLabelMatcher(workloadProto.GetLabelMatcher())
 		if err != nil {
 			return fx.Options(), err
@@ -305,8 +310,8 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 		registry:                     reg,
 		concurrencyLimiterFactory:    conLimiterFactory,
 		workloadMultiMatcher:         mm,
-		defaultWorkloadParametersMsg: schedulerMsg.DefaultWorkloadParameters,
-		schedulerMsg:                 schedulerMsg,
+		defaultWorkloadParametersMsg: schedulerParams.DefaultWorkloadParameters,
+		schedulerParameters:          schedulerParams,
 	}
 
 	return fx.Options(
@@ -324,9 +329,9 @@ type workloadMatcher struct {
 func (wm *workloadMatcher) matchCallback(mmr multiMatchResult) multiMatchResult {
 	// mmr.matchedWorkloads is nil on first match.
 	if mmr.matchedWorkloads == nil {
-		mmr.matchedWorkloads = make(map[int]*policylangv1.Scheduler_WorkloadParameters)
+		mmr.matchedWorkloads = make(map[int]*policylangv1.Scheduler_Workload_Parameters)
 	}
-	mmr.matchedWorkloads[wm.workloadIndex] = wm.workloadProto.GetWorkloadParameters()
+	mmr.matchedWorkloads[wm.workloadIndex] = wm.workloadProto.GetParameters()
 	return mmr
 }
 
@@ -341,8 +346,8 @@ type concurrencyLimiter struct {
 	concurrencyLimiterFactory    *concurrencyLimiterFactory
 	autoTokens                   *autoTokens
 	workloadMultiMatcher         *multiMatcher
-	defaultWorkloadParametersMsg *policylangv1.Scheduler_WorkloadParameters
-	schedulerMsg                 *policylangv1.Scheduler
+	defaultWorkloadParametersMsg *policylangv1.Scheduler_Workload_Parameters
+	schedulerParameters          *policylangv1.Scheduler_Parameters
 }
 
 // Make sure ConcurrencyLimiter implements the iface.ConcurrencyLimiter.
@@ -357,17 +362,17 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	metricLabels := make(prometheus.Labels)
 	metricLabels[metrics.PolicyNameLabel] = conLimiter.GetPolicyName()
 	metricLabels[metrics.PolicyHashLabel] = conLimiter.GetPolicyHash()
-	metricLabels[metrics.ComponentIndexLabel] = strconv.FormatInt(conLimiter.GetComponentIndex(), 10)
+	metricLabels[metrics.ComponentIDLabel] = conLimiter.GetComponentId()
 	// Create sub components.
 	clock := clockwork.NewRealClock()
 	loadActuator, err := loadActuatorFactory.newLoadActuator(conLimiter.concurrencyLimiterMsg.GetLoadActuator(), conLimiter, conLimiter.registry, clock, lifecycle, metricLabels)
 	if err != nil {
 		return err
 	}
-	if conLimiter.schedulerMsg.AutoTokens {
+	if conLimiter.schedulerParameters.AutoTokens {
 		autoTokens, err := autoTokensFactory.newAutoTokens(
 			conLimiter.GetPolicyName(), conLimiter.GetPolicyHash(),
-			lifecycle, conLimiter.GetComponentIndex(), conLimiter.registry)
+			lifecycle, conLimiter.GetComponentId(), conLimiter.registry)
 		if err != nil {
 			return err
 		}
@@ -474,7 +479,7 @@ func (conLimiter *concurrencyLimiter) GetFlowSelector() *policylangv1.FlowSelect
 //
 // Context is used to ensure that requests are not scheduled for longer than its deadline allows.
 func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
-	var matchedWorkloadProto *policylangv1.Scheduler_WorkloadParameters
+	var matchedWorkloadProto *policylangv1.Scheduler_Workload_Parameters
 	var matchedWorkloadIndex string
 	// match labels against conLimiter.workloadMultiMatcher
 	mmr := conLimiter.workloadMultiMatcher.Match(multimatcher.Labels(labels))
@@ -502,7 +507,7 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 	}
 	// Lookup tokens for the workload
 	var tokens uint64
-	if conLimiter.schedulerMsg.AutoTokens {
+	if conLimiter.schedulerParameters.AutoTokens {
 		tokensAuto, ok := conLimiter.autoTokens.GetTokensForWorkload(matchedWorkloadIndex)
 		if !ok {
 			// default to 1 if auto tokens not found
@@ -515,10 +520,10 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 	}
 
 	// timeout is tokens(which is in milliseconds) * conLimiter.schedulerProto.TimeoutFactor(float64)
-	timeout := time.Duration(float64(tokens)*conLimiter.schedulerMsg.TimeoutFactor) * time.Millisecond
+	timeout := time.Duration(float64(tokens)*conLimiter.schedulerParameters.TimeoutFactor) * time.Millisecond
 
-	if timeout > conLimiter.schedulerMsg.MaxTimeout.AsDuration() {
-		timeout = conLimiter.schedulerMsg.MaxTimeout.AsDuration()
+	if timeout > conLimiter.schedulerParameters.MaxTimeout.AsDuration() {
+		timeout = conLimiter.schedulerParameters.MaxTimeout.AsDuration()
 	}
 
 	if clientDeadline, hasDeadline := ctx.Deadline(); hasDeadline {
@@ -560,10 +565,10 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 	}
 
 	return &flowcontrolv1.LimiterDecision{
-		PolicyName:     conLimiter.GetPolicyName(),
-		PolicyHash:     conLimiter.GetPolicyHash(),
-		ComponentIndex: conLimiter.GetComponentIndex(),
-		Dropped:        !accepted,
+		PolicyName:  conLimiter.GetPolicyName(),
+		PolicyHash:  conLimiter.GetPolicyHash(),
+		ComponentId: conLimiter.GetComponentId(),
+		Dropped:     !accepted,
 		Details: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo_{
 			ConcurrencyLimiterInfo: &flowcontrolv1.LimiterDecision_ConcurrencyLimiterInfo{
 				WorkloadIndex: matchedWorkloadIndex,
@@ -576,9 +581,9 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 func (conLimiter *concurrencyLimiter) GetLimiterID() iface.LimiterID {
 	// TODO: move this to limiter base.
 	return iface.LimiterID{
-		PolicyName:     conLimiter.GetPolicyName(),
-		PolicyHash:     conLimiter.GetPolicyHash(),
-		ComponentIndex: conLimiter.GetComponentIndex(),
+		PolicyName:  conLimiter.GetPolicyName(),
+		PolicyHash:  conLimiter.GetPolicyHash(),
+		ComponentID: conLimiter.GetComponentId(),
 	}
 }
 

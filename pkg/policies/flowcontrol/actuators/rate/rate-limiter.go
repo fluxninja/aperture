@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"path"
-	"strconv"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -33,7 +32,7 @@ const rateLimiterStatusRoot = "rate_limiters"
 
 var (
 	fxNameTag       = config.NameTag(rateLimiterStatusRoot)
-	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel, metrics.DecisionTypeLabel}
+	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel, metrics.DecisionTypeLabel}
 )
 
 func rateLimiterModule() fx.Option {
@@ -210,7 +209,7 @@ func (rlFactory *rateLimiterFactory) newRateLimiterOptions(
 		rateLimiterFactory: rlFactory,
 		registry:           reg,
 	}
-	rateLimiter.name = iface.ComponentID(rateLimiter)
+	rateLimiter.name = iface.ComponentKey(rateLimiter)
 
 	return fx.Options(
 		fx.Invoke(
@@ -237,7 +236,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	logger := rateLimiter.registry.GetLogger()
 	etcdKey := paths.AgentComponentKey(rateLimiter.rateLimiterFactory.agentGroupName,
 		rateLimiter.GetPolicyName(),
-		rateLimiter.GetComponentIndex())
+		rateLimiter.GetComponentId())
 	// decision notifier
 	decisionUnmarshaller, err := config.NewProtobufUnmarshaller(nil)
 	if err != nil {
@@ -262,7 +261,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	metricLabels := make(prometheus.Labels)
 	metricLabels[metrics.PolicyNameLabel] = rateLimiter.GetPolicyName()
 	metricLabels[metrics.PolicyHashLabel] = rateLimiter.GetPolicyHash()
-	metricLabels[metrics.ComponentIndexLabel] = strconv.FormatInt(rateLimiter.GetComponentIndex(), 10)
+	metricLabels[metrics.ComponentIDLabel] = rateLimiter.GetComponentId()
 	rateCounterVec := rateLimiter.rateLimiterFactory.counterVector
 
 	lifecycle.Append(fx.Hook{
@@ -274,15 +273,15 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 				rateLimiter.rateLimitChecker,
 				rateLimiter.rateLimiterFactory.distCache,
 				rateLimiter.name,
-				rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration())
+				rateLimiter.rateLimiterProto.Parameters.GetLimitResetInterval().AsDuration())
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to create limiter")
 				return err
 			}
 			// check whether lazy limiter is enabled
-			if lazySyncConfig := rateLimiter.rateLimiterProto.GetLazySync(); lazySyncConfig != nil {
+			if lazySyncConfig := rateLimiter.rateLimiterProto.Parameters.GetLazySync(); lazySyncConfig != nil {
 				if lazySyncConfig.GetEnabled() {
-					lazySyncInterval := time.Duration(int64(rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration()) / int64(lazySyncConfig.GetNumSync()))
+					lazySyncInterval := time.Duration(int64(rateLimiter.rateLimiterProto.Parameters.GetLimitResetInterval().AsDuration()) / int64(lazySyncConfig.GetNumSync()))
 					rateLimiter.rateTracker, err = ratetracker.NewLazySyncRateTracker(rateLimiter.rateTracker,
 						lazySyncInterval,
 						rateLimiter.rateLimiterFactory.lazySyncJobGroup)
@@ -356,7 +355,7 @@ func (rateLimiter *rateLimiter) updateDynamicConfig(dynamicConfig *policylangv1.
 	overrides := ratetracker.Overrides{}
 	// loop through overrides
 	for _, override := range dynamicConfig.GetOverrides() {
-		label := rateLimiter.rateLimiterProto.GetLabelKey() + ":" + override.GetLabelValue()
+		label := rateLimiter.rateLimiterProto.Parameters.GetLabelKey() + ":" + override.GetLabelValue()
 		overrides[label] = override.GetLimitScaleFactor()
 	}
 
@@ -381,11 +380,11 @@ func (rateLimiter *rateLimiter) RunLimiter(ctx context.Context, labels map[strin
 	}
 
 	return &flowcontrolv1.LimiterDecision{
-		PolicyName:     rateLimiter.GetPolicyName(),
-		PolicyHash:     rateLimiter.GetPolicyHash(),
-		ComponentIndex: rateLimiter.GetComponentIndex(),
-		Dropped:        !ok,
-		Reason:         reason,
+		PolicyName:  rateLimiter.GetPolicyName(),
+		PolicyHash:  rateLimiter.GetPolicyHash(),
+		ComponentId: rateLimiter.GetComponentId(),
+		Dropped:     !ok,
+		Reason:      reason,
 		Details: &flowcontrolv1.LimiterDecision_RateLimiterInfo_{
 			RateLimiterInfo: &flowcontrolv1.LimiterDecision_RateLimiterInfo{
 				Label:     label,
@@ -398,7 +397,7 @@ func (rateLimiter *rateLimiter) RunLimiter(ctx context.Context, labels map[strin
 
 // TakeN takes n tokens from the limiter.
 func (rateLimiter *rateLimiter) TakeN(labels map[string]string, n int) (label string, ok bool, remaining int, current int) {
-	labelKey := rateLimiter.rateLimiterProto.GetLabelKey()
+	labelKey := rateLimiter.rateLimiterProto.Parameters.GetLabelKey()
 	var labelValue string
 	if val, found := labels[labelKey]; found {
 		labelValue = val
@@ -465,9 +464,9 @@ func (rateLimiter *rateLimiter) dynamicConfigUpdateCallback(event notifiers.Even
 // GetLimiterID returns the limiter ID.
 func (rateLimiter *rateLimiter) GetLimiterID() iface.LimiterID {
 	return iface.LimiterID{
-		PolicyName:     rateLimiter.GetPolicyName(),
-		PolicyHash:     rateLimiter.GetPolicyHash(),
-		ComponentIndex: rateLimiter.GetComponentIndex(),
+		PolicyName:  rateLimiter.GetPolicyName(),
+		PolicyHash:  rateLimiter.GetPolicyHash(),
+		ComponentID: rateLimiter.GetComponentId(),
 	}
 }
 

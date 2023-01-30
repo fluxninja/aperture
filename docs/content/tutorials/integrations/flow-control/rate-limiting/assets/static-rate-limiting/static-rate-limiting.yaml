@@ -7,17 +7,19 @@ metadata:
 spec:
   circuit:
     components:
-      - rate_limiter:
-          flow_selector:
-            flow_matcher:
-              control_point: ingress
-            service_selector:
-              agent_group: default
-              service: service1-demo-app.demoapp.svc.cluster.local
-          in_ports:
-            limit:
-              constant_signal:
-                value: 120
-          label_key: http.request.header.user_id
-          limit_reset_interval: 60s
+      - flow_control:
+          rate_limiter:
+            flow_selector:
+              flow_matcher:
+                control_point: ingress
+              service_selector:
+                agent_group: default
+                service: service1-demo-app.demoapp.svc.cluster.local
+            in_ports:
+              limit:
+                constant_signal:
+                  value: 120
+            parameters:
+              label_key: http.request.header.user_id
+              limit_reset_interval: 60s
     evaluation_interval: 300s

@@ -157,7 +157,7 @@ def update_docblock_param_defaults(repository_root: Path, jsonnet_path: Path, bl
     required_config = _generate_required_configuration(blocks)
     jsonnet_data += f"local cfg = {required_config};\n"
     jsonnet_data += f"fn(cfg)\n"
-    jsonnet_data += "+ { _config::: super._config, policy:: super.policy }\n"
+    jsonnet_data += "+ { _config::: super._config, policy:: super.policy, circuit:: super.circuit }\n"
 
     rendered_config = None
     with tempfile.NamedTemporaryFile(suffix=".libsonnet") as tmp:
