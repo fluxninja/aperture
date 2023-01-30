@@ -21,7 +21,7 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
@@ -104,7 +104,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		return &ext_authz.CheckResponse{
 			DynamicMetadata: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
-					otelcollector.ApertureCheckResponseLabel: structpb.NewStringValue(checkResponseBase64),
+					otelconsts.ApertureCheckResponseLabel: structpb.NewStringValue(checkResponseBase64),
 				},
 			},
 		}

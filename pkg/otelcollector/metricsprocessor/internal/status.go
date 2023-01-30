@@ -7,16 +7,16 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/metrics"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
 // StatusesFromAttributes gets HTTP status code and Flow status from attributes.
 func StatusesFromAttributes(attributes pcommon.Map) (statusCode string, flowStatus string) {
-	rawStatusCode, exists := attributes.Get(otelcollector.HTTPStatusCodeLabel)
+	rawStatusCode, exists := attributes.Get(otelconsts.HTTPStatusCodeLabel)
 	if exists {
 		statusCode = rawStatusCode.Str()
 	}
-	rawFlowStatus, exists := attributes.Get(otelcollector.ApertureFlowStatusLabel)
+	rawFlowStatus, exists := attributes.Get(otelconsts.ApertureFlowStatusLabel)
 	if exists {
 		flowStatus = rawFlowStatus.Str()
 	}
@@ -50,8 +50,8 @@ func FlowStatusForTelemetry(statusCode, flowStatusStr string) string {
 	return flowStatus(
 		statusCode,
 		flowStatusStr,
-		otelcollector.ApertureFlowStatusOK,
-		otelcollector.ApertureFlowStatusError)
+		otelconsts.ApertureFlowStatusOK,
+		otelconsts.ApertureFlowStatusError)
 }
 
 func flowStatus(statusCode, flowStatusStr, okStatus, errorStatus string) string {

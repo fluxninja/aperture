@@ -149,6 +149,7 @@ workflows:
             sdks/aperture-go/.* updated-aperture-go true
             sdks/aperture-js/.* updated-aperture-js true
             sdks/aperture-java/.* updated-aperture-java true
+            cmd/sdk-validator/.* updated-sdk-validator true
 
   filter-paths-pr:
     when:

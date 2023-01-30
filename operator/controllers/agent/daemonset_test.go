@@ -17,7 +17,6 @@ limitations under the License.
 package agent
 
 import (
-	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -31,9 +30,10 @@ import (
 
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
+	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 )
 
 var _ = Describe("Agent DaemonSet", func() {
@@ -106,8 +106,8 @@ var _ = Describe("Agent DaemonSet", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{
-								Ports: otelcollector.PortsConfig{
+							Otel: otelconfig.UserOTELConfig{
+								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
 									PprofPort:       1777,
@@ -304,8 +304,8 @@ var _ = Describe("Agent DaemonSet", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{
-								Ports: otelcollector.PortsConfig{
+							Otel: otelconfig.UserOTELConfig{
+								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
 									PprofPort:       1777,

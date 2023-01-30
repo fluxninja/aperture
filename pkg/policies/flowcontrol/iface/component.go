@@ -1,19 +1,12 @@
 package iface
 
-import "strconv"
-
-// Component is the interface that wraps the GetPolicyName, GetPolicyHash, and GetComponentIndex methods.
+// Component is the interface that wraps the GetPolicyName, GetPolicyHash, and GetComponentID methods.
 type Component interface {
 	Policy
-	GetComponentIndex() int64
+	GetComponentId() string
 }
 
-// ComponentID returns the ID for a component.
-func ComponentID(component Component) string {
-	return ComponentIDExpanded(component.GetPolicyName(), component.GetComponentIndex(), component.GetPolicyHash())
-}
-
-// ComponentIDExpanded returns the ID for a component.
-func ComponentIDExpanded(policyName string, componentIndex int64, policyHash string) string {
-	return "policy-" + policyName + "-component_index-" + strconv.FormatInt(componentIndex, 10) + "-policy_hash-" + policyHash
+// ComponentKey returns a unique Key for a component.
+func ComponentKey(component Component) string {
+	return "policy-" + component.GetPolicyName() + "-component_id-" + component.GetComponentId() + "-policy_hash-" + component.GetPolicyHash()
 }

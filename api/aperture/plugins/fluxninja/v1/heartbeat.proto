@@ -40,6 +40,7 @@ message ReportRequest {
   aperture.policy.sync.v1.PolicyWrappers policies = 10;
   repeated ServiceControlPoint service_control_points = 11;
   repeated aperture.controlpointcache.v1.KubernetesControlPoint kubernetes_control_points = 12;
+  string installation_mode = 13;
 }
 
 // ReportResponse is empty for now.

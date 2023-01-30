@@ -2,9 +2,9 @@ local grafanaOperator = import 'github.com/jsonnet-libs/grafana-operator-libsonn
 local kubernetesMixin = import 'github.com/kubernetes-monitoring/kubernetes-mixin/mixin.libsonnet';
 
 local aperture = import '../../../../../blueprints/lib/1.0/main.libsonnet';
-local policyDashboard = aperture.blueprints.LatencyGradientConcurrencyLimiting.dashboard;
-local rateLimitpolicyDashboard = aperture.blueprints.StaticRateLimiting.dashboard;
-local signalsDashboard = aperture.blueprints.SignalsDashboard.dashboard;
+local policyDashboard = aperture.policies.LatencyAIMDConcurrencyLimiting.dashboard;
+local rateLimitpolicyDashboard = aperture.policies.StaticRateLimiting.dashboard;
+local signalsDashboard = aperture.dashboards.SignalsDashboard.dashboard;
 
 local grafana = grafanaOperator.integreatly.v1alpha1.grafana;
 local dashboard = grafanaOperator.integreatly.v1alpha1.grafanaDashboard;
@@ -44,11 +44,11 @@ local kubeDashboards =
 
 local policyDashBoardMixin =
   policyDashboard({
-    policyName: 'service1-demo-app',
+    policy_name: 'service1-demo-app',
   }).dashboard
   {
     panels+: rateLimitpolicyDashboard({
-      policyName: 'service1-demo-app',
+      policy_name: 'service1-demo-app',
     }).dashboard.panels,
   };
 
@@ -73,7 +73,7 @@ local dashboards =
     dashboard.new('aperture-signals')
     + dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' })
     + dashboard.spec.withJson(std.manifestJsonEx(signalsDashboard({
-      policyName: 'service1-demo-app',
+      policy_name: 'service1-demo-app',
       datasource+: {
         name: 'controller-prometheus',
       },

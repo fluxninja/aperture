@@ -34,7 +34,7 @@ import (
 	"github.com/fluxninja/aperture/operator/api/common"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 )
 
 var _ = Describe("Controller Deployment", func() {
@@ -112,8 +112,8 @@ var _ = Describe("Controller Deployment", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{
-								Ports: otelcollector.PortsConfig{
+							Otel: otelconfig.UserOTELConfig{
+								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
 									PprofPort:       1777,
@@ -335,8 +335,8 @@ var _ = Describe("Controller Deployment", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{
-								Ports: otelcollector.PortsConfig{
+							Otel: otelconfig.UserOTELConfig{
+								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
 									PprofPort:       1777,

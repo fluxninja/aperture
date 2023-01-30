@@ -2,7 +2,6 @@ package metricsprocessor
 
 import (
 	"context"
-	"fmt"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
@@ -13,6 +12,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor/internal"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
@@ -59,14 +59,14 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		checkResponse := &flowcontrolv1.CheckResponse{}
 
 		// Source specific processing
-		source, exists := attributes.Get(otelcollector.ApertureSourceLabel)
+		source, exists := attributes.Get(otelconsts.ApertureSourceLabel)
 		if !exists {
 			log.Sample(noSourceLabelSampler).Warn().Msg("aperture source label not found")
 			return otelcollector.Discard
 		}
 		sourceStr := source.Str()
-		if sourceStr == otelcollector.ApertureSourceSDK {
-			success := otelcollector.GetStruct(attributes, otelcollector.ApertureCheckResponseLabel, checkResponse, []string{})
+		if sourceStr == otelconsts.ApertureSourceSDK {
+			success := otelcollector.GetStruct(attributes, otelconsts.ApertureCheckResponseLabel, checkResponse, []string{})
 			if !success {
 				log.Sample(noSDKCheckResponseSampler).Warn().
 					Msg("aperture check response label not found in SDK access logs")
@@ -74,8 +74,8 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 			}
 
 			internal.AddSDKSpecificLabels(attributes)
-		} else if sourceStr == otelcollector.ApertureSourceEnvoy {
-			success := otelcollector.GetStruct(attributes, otelcollector.ApertureCheckResponseLabel, checkResponse, []string{otelcollector.EnvoyMissingAttributeValue})
+		} else if sourceStr == otelconsts.ApertureSourceEnvoy {
+			success := otelcollector.GetStruct(attributes, otelconsts.ApertureCheckResponseLabel, checkResponse, []string{otelconsts.EnvoyMissingAttributeValue})
 			if !success {
 				log.Sample(noEnvoyCheckResponseSampler).Warn().
 					Msg("aperture check response label not found in Envoy access logs")
@@ -90,16 +90,16 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		}
 
 		statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
-		attributes.PutStr(otelcollector.ApertureFlowStatusLabel, internal.FlowStatusForTelemetry(statusCode, flowStatus))
+		attributes.PutStr(otelconsts.ApertureFlowStatusLabel, internal.FlowStatusForTelemetry(statusCode, flowStatus))
 		internal.AddCheckResponseBasedLabels(attributes, checkResponse, sourceStr)
 		p.populateControlPointCache(checkResponse)
 
 		// Update metrics and enforce include list to eliminate any excess attributes
-		if sourceStr == otelcollector.ApertureSourceSDK {
+		if sourceStr == otelconsts.ApertureSourceSDK {
 			p.updateMetrics(attributes, checkResponse, []string{})
 			internal.EnforceIncludeListSDK(attributes)
-		} else if sourceStr == otelcollector.ApertureSourceEnvoy {
-			p.updateMetrics(attributes, checkResponse, []string{otelcollector.EnvoyMissingAttributeValue})
+		} else if sourceStr == otelconsts.ApertureSourceEnvoy {
+			p.updateMetrics(attributes, checkResponse, []string{otelconsts.EnvoyMissingAttributeValue})
 			internal.EnforceIncludeListHTTP(attributes)
 		}
 
@@ -127,20 +127,20 @@ func (p *metricsProcessor) updateMetrics(
 	}
 	if len(checkResponse.LimiterDecisions) > 0 {
 		// Update workload metrics
-		latency, latencyFound := otelcollector.GetFloat64(attributes, otelcollector.WorkloadDurationLabel, []string{})
+		latency, latencyFound := otelcollector.GetFloat64(attributes, otelconsts.WorkloadDurationLabel, []string{})
 		for _, decision := range checkResponse.LimiterDecisions {
 			limiterID := iface.LimiterID{
-				PolicyName:     decision.PolicyName,
-				PolicyHash:     decision.PolicyHash,
-				ComponentIndex: decision.ComponentIndex,
+				PolicyName:  decision.PolicyName,
+				PolicyHash:  decision.PolicyHash,
+				ComponentID: decision.ComponentId,
 			}
 
 			if cl := decision.GetConcurrencyLimiterInfo(); cl != nil {
 				labels := map[string]string{
-					metrics.PolicyNameLabel:     decision.PolicyName,
-					metrics.PolicyHashLabel:     decision.PolicyHash,
-					metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
-					metrics.WorkloadIndexLabel:  cl.GetWorkloadIndex(),
+					metrics.PolicyNameLabel:    decision.PolicyName,
+					metrics.PolicyHashLabel:    decision.PolicyHash,
+					metrics.ComponentIDLabel:   decision.ComponentId,
+					metrics.WorkloadIndexLabel: cl.GetWorkloadIndex(),
 				}
 
 				p.updateMetricsForWorkload(limiterID, labels, checkResponse.DecisionType, latency, latencyFound)
@@ -149,9 +149,9 @@ func (p *metricsProcessor) updateMetrics(
 			// Update rate limiter metrics
 			if rl := decision.GetRateLimiterInfo(); rl != nil {
 				labels := map[string]string{
-					metrics.PolicyNameLabel:     decision.PolicyName,
-					metrics.PolicyHashLabel:     decision.PolicyHash,
-					metrics.ComponentIndexLabel: fmt.Sprintf("%d", decision.ComponentIndex),
+					metrics.PolicyNameLabel:  decision.PolicyName,
+					metrics.PolicyHashLabel:  decision.PolicyHash,
+					metrics.ComponentIDLabel: decision.ComponentId,
 				}
 				p.updateMetricsForRateLimiter(limiterID, labels, checkResponse.DecisionType)
 			}
@@ -190,7 +190,7 @@ func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, l
 		log.Sample(noConcurrencyLimiterSampler).Warn().
 			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
 			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
-			Int64(metrics.ComponentIndexLabel, limiterID.ComponentIndex).
+			Str(metrics.ComponentIDLabel, limiterID.ComponentID).
 			Msg("ConcurrencyLimiter not found")
 		return
 	}
@@ -215,7 +215,7 @@ func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID
 		log.Sample(noRateLimiterSampler).Warn().
 			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
 			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
-			Int64(metrics.ComponentIndexLabel, limiterID.ComponentIndex).
+			Str(metrics.ComponentIDLabel, limiterID.ComponentID).
 			Msg("RateLimiter not found")
 		return
 	}

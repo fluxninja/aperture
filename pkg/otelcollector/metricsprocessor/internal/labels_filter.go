@@ -4,6 +4,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
 /*
@@ -11,36 +12,36 @@ import (
  */
 var (
 	_includeAttributesCommon = []string{
-		otelcollector.ApertureSourceLabel,
-		otelcollector.WorkloadDurationLabel,
-		otelcollector.FlowDurationLabel,
-		otelcollector.ApertureProcessingDurationLabel,
-		otelcollector.ApertureDecisionTypeLabel,
-		otelcollector.ApertureRejectReasonLabel,
-		otelcollector.ApertureRateLimitersLabel,
-		otelcollector.ApertureDroppingRateLimitersLabel,
-		otelcollector.ApertureConcurrencyLimitersLabel,
-		otelcollector.ApertureDroppingConcurrencyLimitersLabel,
-		otelcollector.ApertureWorkloadsLabel,
-		otelcollector.ApertureDroppingWorkloadsLabel,
-		otelcollector.ApertureFluxMetersLabel,
-		otelcollector.ApertureFlowLabelKeysLabel,
-		otelcollector.ApertureClassifiersLabel,
-		otelcollector.ApertureClassifierErrorsLabel,
-		otelcollector.ApertureServicesLabel,
-		otelcollector.ApertureControlPointLabel,
-		otelcollector.ApertureFlowStatusLabel,
-		otelcollector.ResponseReceivedLabel,
+		otelconsts.ApertureSourceLabel,
+		otelconsts.WorkloadDurationLabel,
+		otelconsts.FlowDurationLabel,
+		otelconsts.ApertureProcessingDurationLabel,
+		otelconsts.ApertureDecisionTypeLabel,
+		otelconsts.ApertureRejectReasonLabel,
+		otelconsts.ApertureRateLimitersLabel,
+		otelconsts.ApertureDroppingRateLimitersLabel,
+		otelconsts.ApertureConcurrencyLimitersLabel,
+		otelconsts.ApertureDroppingConcurrencyLimitersLabel,
+		otelconsts.ApertureWorkloadsLabel,
+		otelconsts.ApertureDroppingWorkloadsLabel,
+		otelconsts.ApertureFluxMetersLabel,
+		otelconsts.ApertureFlowLabelKeysLabel,
+		otelconsts.ApertureClassifiersLabel,
+		otelconsts.ApertureClassifierErrorsLabel,
+		otelconsts.ApertureServicesLabel,
+		otelconsts.ApertureControlPointLabel,
+		otelconsts.ApertureFlowStatusLabel,
+		otelconsts.ResponseReceivedLabel,
 	}
 
 	_includeAttributesHTTP = []string{
-		otelcollector.HTTPStatusCodeLabel,
-		otelcollector.HTTPRequestContentLength,
-		otelcollector.HTTPResponseContentLength,
+		otelconsts.HTTPStatusCodeLabel,
+		otelconsts.HTTPRequestContentLength,
+		otelconsts.HTTPResponseContentLength,
 	}
 
 	_includeAttributesSDK = []string{
-		otelcollector.ApertureFlowStatusLabel,
+		otelconsts.ApertureFlowStatusLabel,
 	}
 
 	includeListHTTP = otelcollector.FormIncludeList(append(_includeAttributesCommon, _includeAttributesHTTP...))

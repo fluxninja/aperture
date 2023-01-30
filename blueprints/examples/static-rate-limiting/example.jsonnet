@@ -1,8 +1,7 @@
 local aperture = import '../../lib/1.0/main.libsonnet';
-local bundle = aperture.blueprints.StaticRateLimiting.bundle;
+local bundle = aperture.policies.StaticRateLimiting.bundle;
 
-local Override = aperture.spec.v1.RateLimiterOverride;
-local LazySync = aperture.spec.v1.RateLimiterLazySync;
+local override = aperture.spec.v1.RateLimiterOverride;
 
 local flowSelector = aperture.spec.v1.FlowSelector;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
@@ -23,18 +22,24 @@ local svcSelector = flowSelector.new()
 
 local config = {
   common+: {
-    policyName: 'example',
+    policy_name: 'example',
   },
   policy+: {
-    rateLimiterFlowSelector: svcSelector,
-    rateLimit: '50.0',
-    labelKey: 'http.request.header.user_type',
-    limitResetInterval: '1s',
-    overrides: [
-      Override.new()
-      + Override.withLabelValue('gold')
-      + Override.withLimitScaleFactor(1),
-    ],
+    rate_limiter+: {
+      flow_selector: svcSelector,
+      rate_limit: '50.0',
+      parameters+: {
+        label_key: 'http.request.header.user_type',
+        limit_reset_interval: '1s',
+      },
+      dynamic_config: {
+        overrides: [
+          override.new()
+          + override.withLabelValue('gold')
+          + override.withLimitScaleFactor(1),
+        ],
+      },
+    },
   },
 };
 

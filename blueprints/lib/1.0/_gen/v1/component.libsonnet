@@ -19,17 +19,11 @@
   withArithmeticCombinatorMixin(arithmetic_combinator):: {
     arithmetic_combinator+: arithmetic_combinator,
   },
-  withConcurrencyLimiter(concurrency_limiter):: {
-    concurrency_limiter: concurrency_limiter,
+  withAutoScale(auto_scale):: {
+    auto_scale: auto_scale,
   },
-  withConcurrencyLimiterMixin(concurrency_limiter):: {
-    concurrency_limiter+: concurrency_limiter,
-  },
-  withConstant(constant):: {
-    constant: constant,
-  },
-  withConstantMixin(constant):: {
-    constant+: constant,
+  withAutoScaleMixin(auto_scale):: {
+    auto_scale+: auto_scale,
   },
   withDecider(decider):: {
     decider: decider,
@@ -61,17 +55,23 @@
   withFirstValidMixin(first_valid):: {
     first_valid+: first_valid,
   },
+  withFlowControl(flow_control):: {
+    flow_control: flow_control,
+  },
+  withFlowControlMixin(flow_control):: {
+    flow_control+: flow_control,
+  },
   withGradientController(gradient_controller):: {
     gradient_controller: gradient_controller,
   },
   withGradientControllerMixin(gradient_controller):: {
     gradient_controller+: gradient_controller,
   },
-  withHorizontalPodScaler(horizontal_pod_scaler):: {
-    horizontal_pod_scaler: horizontal_pod_scaler,
+  withHolder(holder):: {
+    holder: holder,
   },
-  withHorizontalPodScalerMixin(horizontal_pod_scaler):: {
-    horizontal_pod_scaler+: horizontal_pod_scaler,
+  withHolderMixin(holder):: {
+    holder+: holder,
   },
   withIntegrator(integrator):: {
     integrator: integrator,
@@ -97,23 +97,41 @@
   withMinMixin(min):: {
     min+: min,
   },
+  withNestedCircuit(nested_circuit):: {
+    nested_circuit: nested_circuit,
+  },
+  withNestedCircuitMixin(nested_circuit):: {
+    nested_circuit+: nested_circuit,
+  },
+  withNestedSignalEgress(nested_signal_egress):: {
+    nested_signal_egress: nested_signal_egress,
+  },
+  withNestedSignalEgressMixin(nested_signal_egress):: {
+    nested_signal_egress+: nested_signal_egress,
+  },
+  withNestedSignalIngress(nested_signal_ingress):: {
+    nested_signal_ingress: nested_signal_ingress,
+  },
+  withNestedSignalIngressMixin(nested_signal_ingress):: {
+    nested_signal_ingress+: nested_signal_ingress,
+  },
   withOr(or):: {
     or: or,
   },
   withOrMixin(or):: {
     or+: or,
   },
-  withPromql(promql):: {
-    promql: promql,
+  withPulseGenerator(pulse_generator):: {
+    pulse_generator: pulse_generator,
   },
-  withPromqlMixin(promql):: {
-    promql+: promql,
+  withPulseGeneratorMixin(pulse_generator):: {
+    pulse_generator+: pulse_generator,
   },
-  withRateLimiter(rate_limiter):: {
-    rate_limiter: rate_limiter,
+  withQuery(query):: {
+    query: query,
   },
-  withRateLimiterMixin(rate_limiter):: {
-    rate_limiter+: rate_limiter,
+  withQueryMixin(query):: {
+    query+: query,
   },
   withSqrt(sqrt):: {
     sqrt: sqrt,
@@ -126,5 +144,11 @@
   },
   withSwitcherMixin(switcher):: {
     switcher+: switcher,
+  },
+  withVariable(variable):: {
+    variable: variable,
+  },
+  withVariableMixin(variable):: {
+    variable+: variable,
   },
 }

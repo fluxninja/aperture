@@ -97,14 +97,16 @@ const (
 	PolicyNameLabel = "policy_name"
 	// PolicyHashLabel - label used in prometheus.
 	PolicyHashLabel = "policy_hash"
-	// ComponentIndexLabel - index of component in circuit label.
-	ComponentIndexLabel = "component_index"
+	// ComponentIDLabel - index of component in circuit label.
+	ComponentIDLabel = "component_id"
 	// DecisionTypeLabel - label for decision type dropped or accepted.
 	DecisionTypeLabel = "decision_type"
 	// WorkloadIndexLabel - label for choosing correct workload.
 	WorkloadIndexLabel = "workload_index"
 	// SignalNameLabel - label for saving circuit signal metrics.
 	SignalNameLabel = "signal_name"
+	// SubCircuitIDLabel - label for saving circuit id in signal metrics.
+	SubCircuitIDLabel = "sub_circuit_id"
 	// FluxMeterNameLabel - specifying flux meter's name.
 	FluxMeterNameLabel = "flux_meter_name"
 	// ValidLabel - label for specifying if metric is valid.

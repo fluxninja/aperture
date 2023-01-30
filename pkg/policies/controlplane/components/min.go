@@ -25,21 +25,21 @@ func (*Min) Type() runtime.ComponentType { return runtime.ComponentTypeSignalPro
 var _ runtime.Component = (*Min)(nil)
 
 // NewMinAndOptions creates a new Min Component.
-func NewMinAndOptions(minProto *policylangv1.Min, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewMinAndOptions(_ *policylangv1.Min, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	min := Min{}
 	return &min, fx.Options(), nil
 }
 
 // Execute implements runtime.Component.Execute.
-func (min *Min) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (min *Min) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	minValue := math.MaxFloat64
-	inputs := inPortReadings.ReadRepeatedValuePort("inputs")
+	inputs := inPortReadings.ReadRepeatedReadingPort("inputs")
 	output := runtime.InvalidReading()
 
 	if len(inputs) > 0 {
 		for _, singleInput := range inputs {
 			if !singleInput.Valid() {
-				return runtime.PortToValue{
+				return runtime.PortToReading{
 					"output": []runtime.Reading{output},
 				}, nil
 			}
@@ -52,7 +52,7 @@ func (min *Min) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 		output = runtime.InvalidReading()
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
 }

@@ -17,12 +17,12 @@ import (
 
 // Alerter is a component that monitors signal value and creates alert on true value.
 type Alerter struct {
-	name           string
-	severity       string
-	resolveTimeout time.Duration
-	alertChannels  []string
 	alerterIface   alerts.Alerter
 	policyReadAPI  iface.Policy
+	name           string
+	severity       string
+	alertChannels  []string
+	resolveTimeout time.Duration
 }
 
 // Name implements runtime.Component.
@@ -35,15 +35,16 @@ func (*Alerter) Type() runtime.ComponentType { return runtime.ComponentTypeSink 
 var _ runtime.Component = (*Alerter)(nil)
 
 // NewAlerterAndOptions creates alerter and its fx options.
-func NewAlerterAndOptions(alerterProto *policylangv1.Alerter, _ int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewAlerterAndOptions(alerterProto *policylangv1.Alerter, _ string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+	parameters := alerterProto.Parameters
 	alerter := &Alerter{
-		name:           alerterProto.AlerterConfig.AlertName,
-		severity:       alerterProto.AlerterConfig.Severity,
-		resolveTimeout: alerterProto.AlerterConfig.ResolveTimeout.AsDuration(),
+		name:           parameters.AlertName,
+		severity:       parameters.Severity,
+		resolveTimeout: parameters.ResolveTimeout.AsDuration(),
 		alertChannels:  make([]string, 0),
 		policyReadAPI:  policyReadAPI,
 	}
-	alerter.alertChannels = append(alerter.alertChannels, alerterProto.AlerterConfig.AlertChannels...)
+	alerter.alertChannels = append(alerter.alertChannels, parameters.AlertChannels...)
 
 	return alerter, fx.Options(
 		fx.Invoke(
@@ -56,8 +57,8 @@ func (a *Alerter) setup(alerterIface *alerts.SimpleAlerter) {
 }
 
 // Execute implements runtime.Component.Execute.
-func (a *Alerter) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	signalValue := inPortReadings.ReadSingleValuePort("signal")
+func (a *Alerter) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	signalValue := inPortReadings.ReadSingleReadingPort("signal")
 	if !signalValue.Valid() {
 		return nil, nil
 	}

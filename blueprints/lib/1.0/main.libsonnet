@@ -1,4 +1,6 @@
 {
   spec: import 'spec.libsonnet',
-  blueprints: import 'blueprints/blueprints.libsonnet',
+  policies: import 'policies/policies.libsonnet',
+  dashboards: import 'dashboards/dashboards.libsonnet',
+  circuits: import 'circuits/circuits.libsonnet',
 }

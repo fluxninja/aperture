@@ -6,8 +6,13 @@
     },
     {
       "type": "link",
-      "label": "GitHub Issues",
-      "href": "https://github.com/fluxninja/aperture/issues/new/choose"
+      "label": "Join Slack Community",
+      "href": "https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1ewkfjfy9-~wF4EryoDyJ6kaPRTNZPyA"
+    },
+    {
+      "type": "link",
+      "label": "Aperture @ GitHub",
+      "href": "https://github.com/fluxninja/aperture"
     }
   ]
 }

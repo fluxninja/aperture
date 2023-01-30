@@ -25,6 +25,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
@@ -227,8 +228,8 @@ var _ = AfterSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 })
 
-func provideOTELConfig() *otelcollector.OTELConfig {
-	cfg := otelcollector.NewOTELConfig()
+func provideOTELConfig() *otelconfig.OTELConfig {
+	cfg := otelconfig.NewOTELConfig()
 	cfg.AddReceiver("prometheus", map[string]interface{}{
 		"config": map[string]interface{}{
 			"scrape_configs": []map[string]interface{}{
@@ -247,7 +248,7 @@ func provideOTELConfig() *otelcollector.OTELConfig {
 	cfg.AddExporter("prometheusremotewrite", map[string]interface{}{
 		"endpoint": ph.Endpoint + "/api/v1/write",
 	})
-	cfg.Service.AddPipeline("metrics", otelcollector.Pipeline{
+	cfg.Service.AddPipeline("metrics", otelconfig.Pipeline{
 		Receivers: []string{"prometheus"},
 		Exporters: []string{"prometheusremotewrite"},
 	})

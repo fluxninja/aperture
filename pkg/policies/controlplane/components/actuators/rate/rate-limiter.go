@@ -31,7 +31,7 @@ type rateLimiterSync struct {
 	decisionWriter        *etcdwriter.Writer
 	dynamicConfigWriter   *etcdwriter.Writer
 	agentGroupName        string
-	componentIndex        int
+	componentID           string
 }
 
 // Name implements runtime.Component.
@@ -43,7 +43,7 @@ func (*rateLimiterSync) Type() runtime.ComponentType { return runtime.ComponentT
 // NewRateLimiterAndOptions creates fx options for RateLimiter and also returns agent group name associated with it.
 func NewRateLimiterAndOptions(
 	rateLimiterProto *policylangv1.RateLimiter,
-	componentIndex int,
+	componentID string,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
 	// Get the agent group name.
@@ -52,10 +52,10 @@ func NewRateLimiterAndOptions(
 		return nil, fx.Options(), errors.New("selector is nil")
 	}
 	agentGroupName := flowSelectorProto.ServiceSelector.GetAgentGroup()
-	componentID := paths.AgentComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex))
-	configEtcdPath := path.Join(paths.RateLimiterConfigPath, componentID)
-	decisionsEtcdPath := path.Join(paths.RateLimiterDecisionsPath, componentID)
-	dynamicConfigEtcdPath := path.Join(paths.RateLimiterDynamicConfigPath, componentID)
+	etcdKey := paths.AgentComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), componentID)
+	configEtcdPath := path.Join(paths.RateLimiterConfigPath, etcdKey)
+	decisionsEtcdPath := path.Join(paths.RateLimiterDecisionsPath, etcdKey)
+	dynamicConfigEtcdPath := path.Join(paths.RateLimiterDynamicConfigPath, etcdKey)
 
 	limiterSync := &rateLimiterSync{
 		rateLimiterProto:      rateLimiterProto,
@@ -64,7 +64,7 @@ func NewRateLimiterAndOptions(
 		configEtcdPath:        configEtcdPath,
 		decisionsEtcdPath:     decisionsEtcdPath,
 		dynamicConfigEtcdPath: dynamicConfigEtcdPath,
-		componentIndex:        componentIndex,
+		componentID:           componentID,
 		agentGroupName:        agentGroupName,
 	}
 	return limiterSync, fx.Options(
@@ -81,9 +81,9 @@ func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lif
 			wrapper := &policysyncv1.RateLimiterWrapper{
 				RateLimiter: limiterSync.rateLimiterProto,
 				CommonAttributes: &policysyncv1.CommonAttributes{
-					PolicyName:     limiterSync.policyReadAPI.GetPolicyName(),
-					PolicyHash:     limiterSync.policyReadAPI.GetPolicyHash(),
-					ComponentIndex: int64(limiterSync.componentIndex),
+					PolicyName:  limiterSync.policyReadAPI.GetPolicyName(),
+					PolicyHash:  limiterSync.policyReadAPI.GetPolicyHash(),
+					ComponentId: limiterSync.componentID,
 				},
 			}
 			dat, err := proto.Marshal(wrapper)
@@ -127,7 +127,7 @@ func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lif
 }
 
 // Execute implements runtime.Component.Execute.
-func (limiterSync *rateLimiterSync) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (limiterSync *rateLimiterSync) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	limit, ok := inPortReadings["limit"]
 	if !ok {
 		return nil, nil
@@ -158,9 +158,9 @@ func (limiterSync *rateLimiterSync) publishLimit(limitValue float64) error {
 		wrapper := &policysyncv1.RateLimiterDecisionWrapper{
 			RateLimiterDecision: limiterSync.decision,
 			CommonAttributes: &policysyncv1.CommonAttributes{
-				PolicyName:     limiterSync.policyReadAPI.GetPolicyName(),
-				PolicyHash:     limiterSync.policyReadAPI.GetPolicyHash(),
-				ComponentIndex: int64(limiterSync.componentIndex),
+				PolicyName:  limiterSync.policyReadAPI.GetPolicyName(),
+				PolicyHash:  limiterSync.policyReadAPI.GetPolicyHash(),
+				ComponentId: limiterSync.componentID,
 			},
 		}
 		dat, err := proto.Marshal(wrapper)
@@ -183,9 +183,9 @@ func (limiterSync *rateLimiterSync) DynamicConfigUpdate(event notifiers.Event, u
 		wrapper := &policysyncv1.RateLimiterDynamicConfigWrapper{
 			RateLimiterDynamicConfig: dynamicConfig,
 			CommonAttributes: &policysyncv1.CommonAttributes{
-				PolicyName:     limiterSync.policyReadAPI.GetPolicyName(),
-				PolicyHash:     limiterSync.policyReadAPI.GetPolicyHash(),
-				ComponentIndex: int64(limiterSync.componentIndex),
+				PolicyName:  limiterSync.policyReadAPI.GetPolicyName(),
+				PolicyHash:  limiterSync.policyReadAPI.GetPolicyHash(),
+				ComponentId: limiterSync.componentID,
 			},
 		}
 		dat, err := proto.Marshal(wrapper)

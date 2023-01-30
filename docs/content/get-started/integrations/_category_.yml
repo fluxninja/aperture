@@ -1,0 +1,12 @@
+label: Setup Integrations
+position: 2
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Setup Integrations"
+  keywords: ["flow-control", "service-mesh", "envoy", "middleware", "sdk"]
+  description:
+    Aperture comes with several built-in integrations for reliability
+    automation. This section has steps on how to set them up and how they
+    interface with Aperture system.

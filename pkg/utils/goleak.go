@@ -21,6 +21,15 @@ var ignoreFuncs = []string{
 	"google.golang.org/grpc.(*addrConn).resetTransport",
 	"go.opentelemetry.io/collector/service/internal/telemetry.(*ProcessMetricsViews).StartCollection.func1",
 	"time.Sleep",
+	// https://github.com/kubernetes/klog/issues/188
+	"k8s.io/klog.(*loggingT).flushDaemon",
+	// https://github.com/DataDog/dd-trace-go/issues/1469
+	"github.com/golang/glog.(*loggingT).flushDaemon",
+	// https://github.com/census-instrumentation/opencensus-go/issues/1191
+	"go.opencensus.io/stats/view.(*worker).start",
+	"github.com/DataDog/datadog-agent/pkg/trace/metrics/timing.(*Set).Autoreport.func1",
+	"github.com/SAP/go-hdb/driver.(*metrics).collect",
+	"internal/poll.runtime_pollWait",
 }
 
 // GoLeakDetector holds options for the goleak detector.
@@ -48,7 +57,19 @@ func (l *GoLeakDetector) AddIgnoreTopFunctions(fs ...string) {
 
 // FindLeaks finds memory leaks in the current process.
 func (l *GoLeakDetector) FindLeaks() error {
-	time.Sleep(time.Second * 5)
+	if err := goleak.Find(l.goleakOptions...); err == nil {
+		return nil
+	}
+
+	// Give them a chance to stop.
+	time.Sleep(100 * time.Millisecond)
+	if err := goleak.Find(l.goleakOptions...); err == nil {
+		return nil
+	}
+
+	// Last chance.
+	time.Sleep(5 * time.Second)
+	// FIXME(krdln/harjotgill) Is this necessary? Can GC affect goroutines?
 	runtime.GC()
 	return goleak.Find(l.goleakOptions...)
 }

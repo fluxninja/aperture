@@ -49,8 +49,8 @@ func PolicyPrefix(agentGroupName, policyName string) string {
 }
 
 // AgentComponentKey returns the identifier for a Component in etcd.
-func AgentComponentKey(agentGroupName, policyName string, componentIndex int64) string {
-	return PolicyPrefix(agentGroupName, policyName) + "-component_index-" + strconv.FormatInt(componentIndex, 10)
+func AgentComponentKey(agentGroupName, policyName string, componentID string) string {
+	return PolicyPrefix(agentGroupName, policyName) + "-component_id-" + componentID
 }
 
 // FluxMeterKey returns the identifier for FluxMeter in etcd.

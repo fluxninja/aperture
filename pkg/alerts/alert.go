@@ -10,7 +10,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
 type alertSeverity string
@@ -45,9 +45,9 @@ func ParseSeverity(rawSeverity string) alertSeverity {
 
 // specialLabels are alert labels which are propagated in dedicated fields in OTEL logs.
 var specialLabels = map[string]struct{}{
-	otelcollector.AlertNameLabel:         {},
-	otelcollector.AlertSeverityLabel:     {},
-	otelcollector.AlertGeneratorURLLabel: {},
+	otelconsts.AlertNameLabel:         {},
+	otelconsts.AlertSeverityLabel:     {},
+	otelconsts.AlertGeneratorURLLabel: {},
 }
 
 // AlertOption is a type for constructor options.
@@ -85,12 +85,12 @@ type Alert struct {
 
 // Name gets the alert name from labels. Returns empty string if label not found.
 func (a *Alert) Name() string {
-	return a.postableAlert.Labels[otelcollector.AlertNameLabel]
+	return a.postableAlert.Labels[otelconsts.AlertNameLabel]
 }
 
 // SetName sets the alert name in labels. Overwrites previous value if exists.
 func (a *Alert) SetName(name string) {
-	a.postableAlert.Labels[otelcollector.AlertNameLabel] = name
+	a.postableAlert.Labels[otelconsts.AlertNameLabel] = name
 }
 
 // WithName is an option function for constructor.
@@ -102,7 +102,7 @@ func WithName(name string) AlertOption {
 
 // Severity gets the alert severity from labels. Returns empty string if label not found.
 func (a *Alert) Severity() alertSeverity {
-	raw, ok := a.postableAlert.Labels[otelcollector.AlertSeverityLabel]
+	raw, ok := a.postableAlert.Labels[otelconsts.AlertSeverityLabel]
 	if !ok {
 		return SeverityUnknown
 	}
@@ -111,7 +111,7 @@ func (a *Alert) Severity() alertSeverity {
 
 // SetSeverity sets the alert severity in labels. Overwrites previous value if exists.
 func (a *Alert) SetSeverity(severity alertSeverity) {
-	a.postableAlert.Labels[otelcollector.AlertSeverityLabel] = severity.String()
+	a.postableAlert.Labels[otelconsts.AlertSeverityLabel] = severity.String()
 }
 
 // WithSeverity is an option function for constructor.
@@ -123,7 +123,7 @@ func WithSeverity(severity alertSeverity) AlertOption {
 
 // AlertChannels gets the alert channels from labels. Returns empty slice if label not found.
 func (a *Alert) AlertChannels() []string {
-	channels, ok := a.postableAlert.Labels[otelcollector.AlertChannelsLabel]
+	channels, ok := a.postableAlert.Labels[otelconsts.AlertChannelsLabel]
 	if !ok {
 		return []string{}
 	}
@@ -132,7 +132,7 @@ func (a *Alert) AlertChannels() []string {
 
 // SetAlertChannels sets the alert channels in labels. Overwrites previous value if exists.
 func (a *Alert) SetAlertChannels(alertChannels []string) {
-	a.postableAlert.Labels[otelcollector.AlertChannelsLabel] = strings.Join(alertChannels, ",")
+	a.postableAlert.Labels[otelconsts.AlertChannelsLabel] = strings.Join(alertChannels, ",")
 }
 
 // WithAlertChannels is an option function for constructor.
@@ -204,10 +204,10 @@ func AlertsFromLogs(ld plog.Logs) []*Alert {
 	for resourceLogsIt := 0; resourceLogsIt < resourceLogsSlice.Len(); resourceLogsIt++ {
 		resourceLogs := resourceLogsSlice.At(resourceLogsIt)
 		resourceAttributes := resourceLogs.Resource().Attributes()
-		generatorURL, exists := resourceAttributes.Get(otelcollector.AlertGeneratorURLLabel)
+		generatorURL, exists := resourceAttributes.Get(otelconsts.AlertGeneratorURLLabel)
 		if !exists {
 			log.Trace().
-				Str("key", otelcollector.AlertGeneratorURLLabel).Msg("Key not found")
+				Str("key", otelconsts.AlertGeneratorURLLabel).Msg("Key not found")
 			return nil
 		}
 		scopeLogsSlice := resourceLogs.ScopeLogs()
@@ -240,8 +240,8 @@ func (a *Alert) AsLogs() plog.Logs {
 	// Labels in AM are used to identify identical instances of an alert. This corresponds
 	// with the resource notion in OTLP protocol, which describes the source of a log.
 	populateAttributesFromMap(resourceAttributes, a.postableAlert.Labels, specialLabels)
-	resourceAttributes.PutStr(otelcollector.AlertGeneratorURLLabel, string(a.postableAlert.GeneratorURL))
-	resourceAttributes.PutBool(otelcollector.IsAlertLabel, true)
+	resourceAttributes.PutStr(otelconsts.AlertGeneratorURLLabel, string(a.postableAlert.GeneratorURL))
+	resourceAttributes.PutBool(otelconsts.IsAlertLabel, true)
 
 	logRecord := resource.ScopeLogs().AppendEmpty().LogRecords().AppendEmpty()
 	logRecord.SetTimestamp(pcommon.NewTimestampFromTime(time.Time(a.postableAlert.StartsAt)))

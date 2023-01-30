@@ -1,0 +1,61 @@
+digraph  {
+	subgraph cluster_s17 {
+		label="AIMDConcurrencyController[root.4]";margin="50.0";
+		n20[label="is_overload"];
+		n21[label="load_multiplier"];
+		n18[label="setpoint"];
+		n19[label="signal"];
+		n19->n21[style="invis"];
+		{rank=same; n18;n19;};
+		{rank=same; n20;n21;};
+		
+	}
+	subgraph cluster_s3 {
+		label="ArithmeticCombinator[root.1]";margin="50.0";
+		n5[label="2.00"];
+		n6[label="lhs"];
+		n7[label="output"];
+		n4[label="rhs"];
+		n5->n4;
+		n6->n7[style="invis"];
+		{rank=same; n4;n6;};
+		{rank=same; n7;};
+		
+	}
+	subgraph cluster_s8 {
+		label="ArithmeticCombinator[root.2]";margin="50.0";
+		n10[label="1.10"];
+		n11[label="lhs"];
+		n12[label="output"];
+		n9[label="rhs"];
+		n10->n9;
+		n11->n12[style="invis"];
+		{rank=same; n9;n11;};
+		{rank=same; n12;};
+		
+	}
+	subgraph cluster_s13 {
+		label="EMA[root.3]";margin="50.0";
+		n15[label="input"];
+		n14[label="max_envelope"];
+		n16[label="output"];
+		n15->n16[style="invis"];
+		{rank=same; n14;n15;};
+		{rank=same; n16;};
+		
+	}
+	subgraph cluster_s1 {
+		label="PromQL[root.0]";margin="50.0";
+		n2[label="output"];
+		{rank=same; n2;};
+		
+	}
+	rankdir="LR";splines="ortho";
+	n2->n6[label="LATENCY"];
+	n2->n15[label="LATENCY"];
+	n2->n19[label="LATENCY"];
+	n7->n14[label="MAX_EMA"];
+	n12->n18[label="LATENCY_SETPOINT"];
+	n16->n11[label="LATENCY_EMA"];
+	
+}

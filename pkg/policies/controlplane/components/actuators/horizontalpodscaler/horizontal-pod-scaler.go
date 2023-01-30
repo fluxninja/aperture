@@ -27,13 +27,13 @@ type horizontalPodScalerConfigSync struct {
 	policyReadAPI            iface.Policy
 	horizontalPodScalerProto *policylangv1.HorizontalPodScaler
 	etcdPath                 string
-	componentIndex           int
+	componentID              string
 }
 
 // NewHorizontalPodScalerOptions creates fx options for HorizontalPodScaler and also returns the agent group name associated with it.
 func NewHorizontalPodScalerOptions(
 	horizontalPodScalerProto *policylangv1.HorizontalPodScaler,
-	componentStackIndex int,
+	componentStackID string,
 	policyReadAPI iface.Policy,
 ) (fx.Option, string, error) {
 	// Get Agent Group Name from HorizontalPodScaler.KubernetesObjectSelector.AgentGroup
@@ -43,12 +43,12 @@ func NewHorizontalPodScalerOptions(
 	}
 	agentGroup := k8sObjectSelectorProto.GetAgentGroup()
 	etcdPath := path.Join(paths.HorizontalPodScalerConfigPath,
-		paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), int64(componentStackIndex)))
+		paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentStackID))
 	configSync := &horizontalPodScalerConfigSync{
 		horizontalPodScalerProto: horizontalPodScalerProto,
 		policyReadAPI:            policyReadAPI,
 		etcdPath:                 etcdPath,
-		componentIndex:           componentStackIndex,
+		componentID:              componentStackID,
 	}
 
 	return fx.Options(
@@ -66,9 +66,9 @@ func (configSync *horizontalPodScalerConfigSync) doSync(etcdClient *etcdclient.C
 			wrapper := &policysyncv1.HorizontalPodScalerWrapper{
 				HorizontalPodScaler: configSync.horizontalPodScalerProto,
 				CommonAttributes: &policysyncv1.CommonAttributes{
-					PolicyName:     configSync.policyReadAPI.GetPolicyName(),
-					PolicyHash:     configSync.policyReadAPI.GetPolicyHash(),
-					ComponentIndex: int64(configSync.componentIndex),
+					PolicyName:  configSync.policyReadAPI.GetPolicyName(),
+					PolicyHash:  configSync.policyReadAPI.GetPolicyHash(),
+					ComponentId: configSync.componentID,
 				},
 			}
 			dat, err := proto.Marshal(wrapper)

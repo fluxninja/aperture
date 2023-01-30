@@ -5,7 +5,7 @@ import (
 	. "github.com/onsi/gomega"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor/internal"
 )
 
@@ -23,16 +23,16 @@ var _ = DescribeTable("SDK labels", func(before map[string]int64, after map[stri
 },
 	Entry("Sets flow duration",
 		map[string]int64{
-			otelcollector.ApertureFlowStartTimestampLabel: 123e6,
-			otelcollector.ApertureFlowEndTimestampLabel:   246e6,
+			otelconsts.ApertureFlowStartTimestampLabel: 123e6,
+			otelconsts.ApertureFlowEndTimestampLabel:   246e6,
 		},
-		map[string]float64{otelcollector.FlowDurationLabel: 123},
+		map[string]float64{otelconsts.FlowDurationLabel: 123},
 	),
 	Entry("Sets workload duration",
 		map[string]int64{
-			otelcollector.ApertureWorkloadStartTimestampLabel: 123e6,
-			otelcollector.ApertureFlowEndTimestampLabel:       246e6,
+			otelconsts.ApertureWorkloadStartTimestampLabel: 123e6,
+			otelconsts.ApertureFlowEndTimestampLabel:       246e6,
 		},
-		map[string]float64{otelcollector.WorkloadDurationLabel: 123},
+		map[string]float64{otelconsts.WorkloadDurationLabel: 123},
 	),
 )

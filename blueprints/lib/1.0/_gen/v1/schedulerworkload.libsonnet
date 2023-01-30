@@ -7,10 +7,10 @@
   withLabelMatcherMixin(label_matcher):: {
     label_matcher+: label_matcher,
   },
-  withWorkloadParameters(workload_parameters):: {
-    workload_parameters: workload_parameters,
+  withParameters(parameters):: {
+    parameters: parameters,
   },
-  withWorkloadParametersMixin(workload_parameters):: {
-    workload_parameters+: workload_parameters,
+  withParametersMixin(parameters):: {
+    parameters+: parameters,
   },
 }

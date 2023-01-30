@@ -1,8 +1,0 @@
-label: Envoy
-position: 1
-collapsible: true
-collapsed: true
-link:
-  type: "generated-index"
-  title: "Envoy"
-  keywords: ["flow control", "envoy"]

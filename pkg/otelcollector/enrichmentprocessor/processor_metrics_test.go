@@ -9,7 +9,7 @@ import (
 
 	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/entitycache/v1"
 	"github.com/fluxninja/aperture/pkg/entitycache"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
 var _ = Describe("Enrichment Processor - Metrics", func() {
@@ -34,8 +34,8 @@ var _ = Describe("Enrichment Processor - Metrics", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		assertMetricsEqual(md, metricsFromLabels(map[string]interface{}{
-			"preserve":                          "this",
-			otelcollector.ApertureServicesLabel: []string{"fooSvc1", "fooSvc2"},
+			"preserve":                       "this",
+			otelconsts.ApertureServicesLabel: []string{"fooSvc1", "fooSvc2"},
 		}))
 	})
 

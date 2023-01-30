@@ -23,16 +23,16 @@ func (*Switcher) Type() runtime.ComponentType { return runtime.ComponentTypeSign
 var _ runtime.Component = (*Switcher)(nil)
 
 // NewSwitcherAndOptions creates a new Switcher Component.
-func NewSwitcherAndOptions(switcherProto *policylangv1.Switcher, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewSwitcherAndOptions(_ *policylangv1.Switcher, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	switcher := Switcher{}
 	return &switcher, fx.Options(), nil
 }
 
 // Execute implements runtime.Component.Execute.
-func (dec *Switcher) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	onTrue := inPortReadings.ReadSingleValuePort("on_true")
-	onFalse := inPortReadings.ReadSingleValuePort("on_false")
-	switchValue := inPortReadings.ReadSingleValuePort("switch")
+func (dec *Switcher) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	onTrue := inPortReadings.ReadSingleReadingPort("on_true")
+	onFalse := inPortReadings.ReadSingleReadingPort("on_false")
+	switchValue := inPortReadings.ReadSingleReadingPort("switch")
 
 	var output runtime.Reading
 
@@ -42,7 +42,7 @@ func (dec *Switcher) Execute(inPortReadings runtime.PortToValue, tickInfo runtim
 		output = onFalse
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
 }

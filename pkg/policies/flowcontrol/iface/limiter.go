@@ -2,7 +2,6 @@ package iface
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -14,14 +13,14 @@ import (
 
 // LimiterID is the ID of the Limiter.
 type LimiterID struct {
-	PolicyName     string
-	PolicyHash     string
-	ComponentIndex int64
+	PolicyName  string
+	PolicyHash  string
+	ComponentID string
 }
 
 // String function returns the LimiterID as a string.
 func (limiterID LimiterID) String() string {
-	return "policy_name-" + limiterID.PolicyName + "-component_index-" + strconv.FormatInt(limiterID.ComponentIndex, 10) + "-policy_hash-" + limiterID.PolicyHash
+	return "policy_name-" + limiterID.PolicyName + "-component_id-" + limiterID.ComponentID + "-policy_hash-" + limiterID.PolicyHash
 }
 
 // Limiter interface.

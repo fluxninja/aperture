@@ -6,16 +6,16 @@ local alerterins = import './alerterins.libsonnet';
     },
   },
   inPorts:: alerterins,
-  withAlerterConfig(alerter_config):: {
-    alerter_config: alerter_config,
-  },
-  withAlerterConfigMixin(alerter_config):: {
-    alerter_config+: alerter_config,
-  },
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },
   withInPortsMixin(in_ports):: {
     in_ports+: in_ports,
+  },
+  withParameters(parameters):: {
+    parameters: parameters,
+  },
+  withParametersMixin(parameters):: {
+    parameters+: parameters,
   },
 }

@@ -8,7 +8,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 // Set of classification rules sharing a common selector
 //
 // :::info
-// See also [Classifier overview](/concepts/flow-control/flow-classifier.md).
+// See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
 // :::
 //
 // Example:
@@ -34,7 +34,7 @@ message Classifier {
   }]; // @gotags: validate:"required"
 
   // A map of {key, value} pairs mapping from
-  // [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
+  // [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
   // how to extract and propagate flow labels with that key.
   map<string, Rule> rules = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
@@ -116,7 +116,7 @@ message Rule {
   } // @gotags: validate:"required"
 
   // Decides if the created flow label should be available as an attribute in OLAP telemetry and
-  // propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
+  // propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
   //
   // :::note
   // The flow label is always accessible in Aperture Policies regardless of this setting.

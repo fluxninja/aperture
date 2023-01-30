@@ -1,11 +1,18 @@
+local is_nan(val) =
+  if val == 'NaN' || val == '-Inf' || val == '+Inf' then true else false;
+
 local patch =
   {
     Port: {
-      withConstantValue(constant_value):: {
-        constant_value: constant_value,
+      withConstantSignal(constant_signal):: {
+        constant_signal: {
+          [if is_nan(constant_signal) then 'special_value' else 'value']: constant_signal,
+        },
       },
-      withConstantValueMixin(constant_value):: {
-        constant_value+: constant_value,
+      withConstantSignalMixin(constant_signal):: {
+        constant_signal: {
+          [if is_nan(constant_signal) then 'special_value' else 'value']+: constant_signal,
+        },
       },
       withSignalName(signal_name):: {
         signal_name: signal_name,

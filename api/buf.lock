@@ -8,7 +8,7 @@ deps:
   - remote: buf.build
     owner: envoyproxy
     repository: envoy
-    commit: b19db04c0fad41cfb9af65354235baba
+    commit: d71f8ec35f4443f591a2983cb9bb9ba9
   - remote: buf.build
     owner: envoyproxy
     repository: protoc-gen-validate
@@ -28,7 +28,7 @@ deps:
   - remote: buf.build
     owner: opentelemetry
     repository: opentelemetry
-    commit: 4496a3de8b6948afa9d0f3eb3e06708d
+    commit: 43554dfbbfbd4873bde8993d32ea8332
   - remote: buf.build
     owner: prometheus
     repository: client-model
