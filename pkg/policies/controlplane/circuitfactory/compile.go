@@ -28,8 +28,8 @@ type Circuit struct {
 
 // Tree is a graph view of a Circuit.
 type Tree struct {
-	Children []Tree
 	Root     runtime.ConfiguredComponent
+	Children []Tree
 }
 
 // Components returns a list of CompiledComponents, ready to create runtime.Circuit.

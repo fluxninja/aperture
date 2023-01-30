@@ -12,7 +12,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
-// ToGraphView creates a graph representation of a Circuit.
+// ToGraphView creates a graph (Currently showing depth=1) representation of a Circuit.
 func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*policymonitoringv1.Link) {
 	var componentsDTO []*policymonitoringv1.ComponentView
 	var links []*policymonitoringv1.Link
@@ -22,7 +22,8 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 	}
 	outSignalsIndex := make(map[string][]componentData)
 	inSignalsIndex := make(map[string][]componentData)
-	for _, c := range circuit.LeafComponents {
+	for _, ch := range circuit.Tree.Children {
+		c := ch.Root
 		var inPorts, outPorts []*policymonitoringv1.PortView
 		for name, signals := range c.PortMapping.Ins {
 			for _, signal := range signals {
@@ -108,9 +109,11 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 		case "Extrapolator":
 			componentDescription = fmt.Sprintf("for: %s", componentConfig["parameters"].(map[string]interface{})["max_extrapolation_interval"])
 		case "ConcurrencyLimiter":
-			componentDescription = getServiceSelector(componentConfig["selector"])
+			componentDescription = getServiceSelector(componentConfig["flow_selector"])
 		case "RateLimiter":
-			componentDescription = getServiceSelector(componentConfig["selector"])
+			componentDescription = getServiceSelector(componentConfig["flow_selector"])
+		case "AIMDConcurrencyController":
+			componentDescription = getServiceSelector(componentConfig["flow_selector"])
 		}
 
 		componentsDTO = append(componentsDTO, &policymonitoringv1.ComponentView{
@@ -121,7 +124,6 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 			Component:            componentMap,
 			InPorts:              convertPortViews(inPorts),
 			OutPorts:             convertPortViews(outPorts),
-			ParentComponentId:    "",
 		})
 	}
 	// compute links
