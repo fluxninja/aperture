@@ -1,5 +1,14 @@
 package consts
 
+type controlPointType int
+
+const (
+	// FEATURE is a default control point type added on Check call.
+	FEATURE controlPointType = iota
+	// HTTP is a control point type for envoy authz calls.
+	HTTP
+)
+
 const (
 	/* Common labels available on all flow control integrations. */
 
@@ -26,6 +35,8 @@ const (
 	ApertureServicesLabel = "aperture.services"
 	// ApertureControlPointLabel describes control point to which metrics refer.
 	ApertureControlPointLabel = "aperture.control_point"
+	// ApertureControlPointTypeLabel describes the type of control point.
+	ApertureControlPointTypeLabel = "aperture.control_point_type"
 	// WorkloadDurationLabel describes duration of the workload in milliseconds.
 	WorkloadDurationLabel = "workload_duration_ms"
 	// FlowDurationLabel describes duration of the flow in milliseconds.
