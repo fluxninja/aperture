@@ -95,8 +95,7 @@ func ConfigureInputComponent(comp runtime.Component, signal runtime.SignalID) ru
 }
 
 // ConfigureOutputComponent takes an output component and creates a
-// Component which reads signal with a given name on its "input"
-// poruntime.
+// Component which reads signal with a given name on its "input" port.
 func ConfigureOutputComponent(signal runtime.SignalID, comp runtime.Component) runtime.ConfiguredComponent {
 	return runtime.ConfiguredComponent{
 		Component: comp,

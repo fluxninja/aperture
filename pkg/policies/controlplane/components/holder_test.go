@@ -1,7 +1,6 @@
 package components_test
 
 import (
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/sim"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -21,14 +20,14 @@ var _ = Describe("Holder", func() {
 					output: { signal_name: HOLDER }
 			`,
 			sim.Inputs{
-				runtime.MakeRootSignalID("INPUT"): sim.NewInput([]float64{1, nan, 3, nan, nan}),
+				"INPUT": sim.NewInput([]float64{1, nan, 3, nan, nan}),
 			},
-			sim.OutputSignals{runtime.MakeRootSignalID("HOLDER")},
+			sim.OutputSignals{"HOLDER"},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
 			sim.Outputs{
-				runtime.MakeRootSignalID("HOLDER"): sim.NewReadings([]float64{1, 1, 1, 1, nan}),
+				"HOLDER": sim.NewReadings([]float64{1, 1, 1, 1, nan}),
 			},
 		))
 	})
@@ -46,14 +45,14 @@ var _ = Describe("Holder", func() {
 					output: { signal_name: HOLDER }
 			`,
 			sim.Inputs{
-				runtime.MakeRootSignalID("INPUT"): sim.NewInput([]float64{1, 2, 3, 4, 6, 7, 8}),
+				"INPUT": sim.NewInput([]float64{1, 2, 3, 4, 6, 7, 8}),
 			},
-			sim.OutputSignals{runtime.MakeRootSignalID("HOLDER")},
+			sim.OutputSignals{"HOLDER"},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
 			sim.Outputs{
-				runtime.MakeRootSignalID("HOLDER"): sim.NewReadings([]float64{1, 1, 1, 1, 6, 6, 6}),
+				"HOLDER": sim.NewReadings([]float64{1, 1, 1, 1, 6, 6, 6}),
 			},
 		))
 	})

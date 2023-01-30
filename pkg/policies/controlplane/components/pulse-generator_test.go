@@ -1,7 +1,6 @@
 package components_test
 
 import (
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/sim"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -20,12 +19,12 @@ var _ = Describe("PulseGenerator", func() {
 					output: { signal_name: PULSE }
 			`,
 			nil,
-			sim.OutputSignals{runtime.MakeRootSignalID("PULSE")},
+			sim.OutputSignals{"PULSE"},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Run(10)).To(Equal(
 			sim.Outputs{
-				runtime.MakeRootSignalID("PULSE"): sim.NewReadings([]float64{1, 1, 1, 0, 0, 1, 1, 1, 0, 0}),
+				"PULSE": sim.NewReadings([]float64{1, 1, 1, 0, 0, 1, 1, 1, 0, 0}),
 			},
 		))
 	})
@@ -42,12 +41,12 @@ var _ = Describe("PulseGenerator", func() {
 					output: { signal_name: PULSE }
 			`,
 			nil,
-			sim.OutputSignals{runtime.MakeRootSignalID("PULSE")},
+			sim.OutputSignals{"PULSE"},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Run(4)).To(Equal(
 			sim.Outputs{
-				runtime.MakeRootSignalID("PULSE"): sim.NewReadings([]float64{1, 0, 1, 0}),
+				"PULSE": sim.NewReadings([]float64{1, 0, 1, 0}),
 			},
 		))
 	})
@@ -62,12 +61,12 @@ var _ = Describe("PulseGenerator", func() {
 					output: { signal_name: PULSE }
 			`,
 			nil,
-			sim.OutputSignals{runtime.MakeRootSignalID("PULSE")},
+			sim.OutputSignals{"PULSE"},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Run(11)).To(Equal(
 			sim.Outputs{
-				runtime.MakeRootSignalID("PULSE"): sim.NewReadings([]float64{1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1}),
+				"PULSE": sim.NewReadings([]float64{1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1}),
 			},
 		))
 	})
