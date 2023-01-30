@@ -10,7 +10,10 @@ keywords:
   - tutorial
 ---
 
-We also have some tutorials that you can follow to solve different use-cases.
+Explore our step-by-step tutorials on Aperture to learn how to set up,
+configure, and use the platform to improve the reliability and stability of your
+web-scale applications. From detecting overload to concurrency limiting,
+tutorials cover a wide range of topics to help you get started with Aperture.
 
 ## Signal Processing
 
