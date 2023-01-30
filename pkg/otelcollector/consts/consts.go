@@ -1,14 +1,5 @@
 package consts
 
-type controlPointType int
-
-const (
-	// FEATURE is a default control point type added on Check call.
-	FEATURE controlPointType = iota
-	// HTTP is a control point type for envoy authz calls.
-	HTTP
-)
-
 const (
 	/* Common labels available on all flow control integrations. */
 
@@ -18,6 +9,10 @@ const (
 	ApertureSourceSDK = "sdk"
 	// ApertureSourceEnvoy const for Envoy source.
 	ApertureSourceEnvoy = "envoy"
+	// FeatureControlPoint const for feature control point.
+	FeatureControlPoint = "feature"
+	// HTTPControlPoint for envoy control point.
+	HTTPControlPoint = "http"
 
 	// ApertureCheckResponseLabel contains JSON encoded check response struct.
 	ApertureCheckResponseLabel = "aperture.check_response"

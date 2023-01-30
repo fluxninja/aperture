@@ -2,7 +2,6 @@ package check
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -69,7 +68,7 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	if labels == nil {
 		labels = make(map[string]string)
 	}
-	labels[otelconsts.ApertureControlPointTypeLabel] = fmt.Sprint(otelconsts.FEATURE)
+	labels[otelconsts.ApertureControlPointTypeLabel] = otelconsts.FeatureControlPoint
 
 	// CheckWithValues already pushes result to metrics
 	resp := h.CheckWithValues(
@@ -81,5 +80,6 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	end := time.Now()
 	resp.Start = timestamppb.New(start)
 	resp.End = timestamppb.New(end)
+	resp.TelemetryFlowLabels = labels
 	return resp, nil
 }

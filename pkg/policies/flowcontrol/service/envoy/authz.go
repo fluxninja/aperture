@@ -3,7 +3,6 @@ package envoy
 import (
 	"context"
 	"encoding/base64"
-	"fmt"
 	"regexp"
 	"time"
 
@@ -171,7 +170,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	flowLabels := mergedFlowLabels.ToPlainMap()
 
 	// add control point type
-	flowLabels[otelconsts.ApertureControlPointTypeLabel] = fmt.Sprint(otelconsts.HTTP)
+	flowLabels[otelconsts.ApertureControlPointTypeLabel] = otelconsts.HTTPControlPoint
 
 	// Ask flow control service for Ok/Deny
 	checkResponse := h.fcHandler.CheckWithValues(ctx, svcs, ctrlPt, flowLabels)
