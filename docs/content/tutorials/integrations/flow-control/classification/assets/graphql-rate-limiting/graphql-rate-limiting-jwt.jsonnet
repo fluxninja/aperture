@@ -5,6 +5,7 @@ local resources = aperture.spec.v1.Resources;
 local component = aperture.spec.v1.Component;
 local flowControl = aperture.spec.v1.FlowControl;
 local rateLimiter = aperture.spec.v1.RateLimiter;
+local rateLimiterParameters = aperture.spec.v1.RateLimiterParameters;
 local flowSelector = aperture.spec.v1.FlowSelector;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowMatcher = aperture.spec.v1.FlowMatcher;
@@ -81,9 +82,12 @@ local policyDef =
           rateLimiter.new()
           + rateLimiter.withInPorts({ limit: port.withConstantSignal(10.0) })
           + rateLimiter.withFlowSelector(svcSelector)
-          + rateLimiter.withLimitResetInterval('1s')
-          + rateLimiter.withLabelKey('user_id')
-          + rateLimiter.withLazySync({ enabled: false, num_sync: 5 })
+          + rateLimiter.withParameters(
+            rateLimiterParameters.new()
+            + rateLimiterParameters.withLimitResetInterval('1s')
+            + rateLimiterParameters.withLabelKey('user_id')
+            + rateLimiterParameters.withLazySync({ enabled: false, num_sync: 5 })
+          )
         ),
       ),
     ]),

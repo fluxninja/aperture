@@ -2,65 +2,63 @@
   /**
   * @section Common
   *
-  * @param (common.policyName: string required) Name of the policy.
+  * @param (common.policy_name: string required) Name of the policy.
   */
   common: {
-    policyName: error 'policyName is required',
+    policy_name: error 'policy_name is required',
   },
   /**
   * @section Policy
   *
-  * @param (policy.evaluationInterval: string) How often should the policy be re-evaluated
-  * @param (policy.rateLimit: float64 required) How many requests per `policy.limitResetInterval` to accept
-  * @param (policy.rateLimiterFlowSelector: aperture.spec.v1.FlowSelector required) A flow selector to match requests against
-  * @param (policy.limitResetInterval: string) The window for `policy.rateLimit`
-  * @param (policy.labelKey: string required) What flow label to use for rate limiting
+  * @param (policy.evaluation_interval: string) How often should the policy be re-evaluated
+  * @param (policy.classifiers: []aperture.spec.v1.Classifier) List of classification rules.
   */
   policy: {
-    evaluationInterval: '300s',
-    rateLimit: error 'policy.rateLimit must be set',
-    rateLimiterFlowSelector: error 'rateLimiterFlowSelector must be set',
-    limitResetInterval: '1s',
-    labelKey: error 'policy.labelKey is required',
+    evaluation_interval: '300s',
     classifiers: [],
     /**
     * @section Policy
-    * @subsection Overrides
+    * @subsection Rate Limiter
     *
-    * @param (policy.overrides: []aperture.spec.v1.RateLimiterOverride) A list of limit overrides for the rate limiter.
-    *
+    * @param (policy.rate_limiter.rate_limit: float64 required) Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept
+    * @param (policy.rate_limiter.flow_selector: aperture.spec.v1.FlowSelector required) A flow selector to match requests against
+    * @param (policy.rate_limiter.parameters: aperture.spec.v1.RateLimiterParameters) Parameters.
+    * @param (policy.rate_limiter.parameters.label_key: string required) Flow label to use for rate limiting.
+    * @param (policy.rate_limiter.dynamic_config: aperture.spec.v1.RateLimiterDefaultConfig) Dynamic configuration for rate limiter that can be applied at the runtime.
     */
-    overrides: [],
-    /**
-    * @section Policy
-    * @subsection Lazy Sync
-    *
-    *
-    * @param (policy.lazySync.enabled: boolean) Enable lazy syncing.
-    * @param (policy.lazySync.numSync: integer) Number of times to lazy sync within the `policy.limitResetInterval`.
-    */
-    lazySync: {
-      enabled: true,
-      numSync: 5,
+    rate_limiter: {
+      rate_limit: error 'policy.rate_limiter.rate_limit must be set',
+      flow_selector: error 'policy.rate_limiter.flow_selector must be set',
+      parameters: {
+        limit_reset_interval: '1s',
+        label_key: error 'policy.rate_limiter.parameters.label_key is required',
+        lazy_sync: {
+          enabled: true,
+          num_sync: 5,
+        },
+      },
+      dynamic_config: {
+        overrides: [],
+      },
     },
   },
   /**
   * @section Dashboard
   *
-  * @param (dashboard.refreshInterval: string) Refresh interval for dashboard panels.
+  * @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
   */
   dashboard: {
-    refreshInterval: '10s',
+    refresh_interval: '10s',
     /**
     * @section Dashboard
     * @subsection Datasource
     *
     * @param (dashboard.datasource.name: string) Datasource name.
-    * @param (dashboard.datasource.filterRegex: string) Datasource filter regex.
+    * @param (dashboard.datasource.filter_regex: string) Datasource filter regex.
     */
     datasource: {
       name: '$datasource',
-      filterRegex: '',
+      filter_regex: '',
     },
   },
 }

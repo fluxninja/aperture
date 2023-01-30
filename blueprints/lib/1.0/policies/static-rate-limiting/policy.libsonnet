@@ -7,7 +7,6 @@ local circuit = spec.v1.Circuit;
 local component = spec.v1.Component;
 local flowControl = spec.v1.FlowControl;
 local rateLimiter = spec.v1.RateLimiter;
-local dynamicConfig = spec.v1.RateLimiterDynamicConfig;
 local override = spec.v1.RateLimiterOverride;
 local lazySync = spec.v1.RateLimiterLazySync;
 local port = spec.v1.Port;
@@ -22,23 +21,16 @@ function(params) {
                            + resources.withClassifiers($._config.classifiers))
     + policy.withCircuit(
       circuit.new()
-      + circuit.withEvaluationInterval($._config.evaluationInterval)
+      + circuit.withEvaluationInterval($._config.evaluation_interval)
       + circuit.withComponents([
         component.withFlowControl(
           flowControl.new()
           + flowControl.withRateLimiter(
             rateLimiter.new()
-            + rateLimiter.withInPorts({ limit: port.withConstantSignal($._config.rateLimit) })
-            + rateLimiter.withFlowSelector($._config.rateLimiterFlowSelector)
-            + rateLimiter.withLimitResetInterval($._config.limitResetInterval)
-            + rateLimiter.withLabelKey($._config.labelKey)
-            + rateLimiter.withDefaultConfig(
-              dynamicConfig.new()
-              + dynamicConfig.withOverrides($._config.overrides)
-            )
-            + rateLimiter.withLazySync(lazySync.new()
-                                       + lazySync.withEnabled($._config.lazySync.enabled)
-                                       + lazySync.withNumSync($._config.lazySync.numSync))
+            + rateLimiter.withInPorts({ limit: port.withConstantSignal($._config.rate_limiter.rate_limit) })
+            + rateLimiter.withFlowSelector($._config.rate_limiter.flow_selector)
+            + rateLimiter.withParameters($._config.rate_limiter.parameters)
+            + rateLimiter.withDynamicConfigKey('rate_limiter')
           ),
         ),
       ]),
@@ -48,12 +40,15 @@ function(params) {
     kind: 'Policy',
     apiVersion: 'fluxninja.com/v1alpha1',
     metadata: {
-      name: $._config.policyName,
+      name: $._config.policy_name,
       labels: {
         'fluxninja.com/validate': 'true',
       },
     },
     spec: policyDef,
+    dynamicConfig: {
+      rate_limiter: $._config.rate_limiter.dynamic_config,
+    },
   },
 
   policyResource: policyResource,

@@ -10,21 +10,21 @@ visualizes Signals flowing through the [Circuit](/concepts/policy/circuit.md).
 
 ### Common
 
-| Parameter Name      | Parameter Type | Default      | Description         |
-| ------------------- | -------------- | ------------ | ------------------- |
-| `common.policyName` | `string`       | `(required)` | Name of the policy. |
+| Parameter Name       | Parameter Type | Default      | Description         |
+| -------------------- | -------------- | ------------ | ------------------- |
+| `common.policy_name` | `string`       | `(required)` | Name of the policy. |
 
 ### Dashboard
 
-| Parameter Name              | Parameter Type | Default     | Description                            |
-| --------------------------- | -------------- | ----------- | -------------------------------------- |
-| `dashboard.refreshInterval` | `string`       | `"10s"`     | Refresh interval for dashboard panels. |
-| `dashboard.timeFrom`        | `string`       | `"now-30m"` | From time of dashboard.                |
-| `dashboard.timeTo`          | `string`       | `"now"`     | To time of dashboard.                  |
+| Parameter Name               | Parameter Type | Default     | Description                            |
+| ---------------------------- | -------------- | ----------- | -------------------------------------- |
+| `dashboard.refresh_interval` | `string`       | `"10s"`     | Refresh interval for dashboard panels. |
+| `dashboard.time_from`        | `string`       | `"now-30m"` | From time of dashboard.                |
+| `dashboard.time_to`          | `string`       | `"now"`     | To time of dashboard.                  |
 
 #### Datasource
 
-| Parameter Name                     | Parameter Type | Default         | Description              |
-| ---------------------------------- | -------------- | --------------- | ------------------------ |
-| `dashboard.datasource.name`        | `string`       | `"$datasource"` | Datasource name.         |
-| `dashboard.datasource.filterRegex` | `string`       | `""`            | Datasource filter regex. |
+| Parameter Name                      | Parameter Type | Default         | Description              |
+| ----------------------------------- | -------------- | --------------- | ------------------------ |
+| `dashboard.datasource.name`         | `string`       | `"$datasource"` | Datasource name.         |
+| `dashboard.datasource.filter_regex` | `string`       | `""`            | Datasource filter regex. |

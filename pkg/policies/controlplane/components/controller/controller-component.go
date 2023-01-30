@@ -21,7 +21,7 @@ type ControllerComponent struct {
 	// Controller output's last reading
 	output           runtime.Reading
 	policyReadAPI    iface.Policy
-	defaultConfig    *policylangv1.ControllerDynamicConfig
+	defaultConfig    *policylangv1.GradientController_DynamicConfig
 	dynamicConfigKey string
 	componentName    string
 	componentID      string
@@ -35,7 +35,7 @@ func NewControllerComponent(
 	componentID string,
 	policyReadAPI iface.Policy,
 	dynamicConfigKey string,
-	defaultConfig *policylangv1.ControllerDynamicConfig,
+	defaultConfig *policylangv1.GradientController_DynamicConfig,
 ) *ControllerComponent {
 	cc := &ControllerComponent{
 		signal:           runtime.InvalidReading(),
@@ -165,7 +165,7 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToReading, tic
 // DynamicConfigUpdate handles setting of controller.ControllerMode.
 func (cc *ControllerComponent) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	logger := cc.policyReadAPI.GetStatusRegistry().GetLogger()
-	dynamicConfig := &policylangv1.ControllerDynamicConfig{}
+	dynamicConfig := &policylangv1.GradientController_DynamicConfig{}
 	if unmarshaller.IsSet(cc.dynamicConfigKey) {
 		err := unmarshaller.UnmarshalKey(cc.dynamicConfigKey, dynamicConfig)
 		if err != nil {
@@ -178,7 +178,7 @@ func (cc *ControllerComponent) DynamicConfigUpdate(event notifiers.Event, unmars
 	}
 }
 
-func (cc *ControllerComponent) setConfig(config *policylangv1.ControllerDynamicConfig) {
+func (cc *ControllerComponent) setConfig(config *policylangv1.GradientController_DynamicConfig) {
 	if config != nil {
 		cc.manualMode = config.ManualMode
 	} else {

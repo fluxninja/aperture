@@ -14,14 +14,12 @@ local port = spec.v1.Port;
 local combinator = spec.v1.ArithmeticCombinator;
 local ema = spec.v1.EMA;
 local gradient = spec.v1.GradientController;
-local gradientParameters = spec.v1.GradientParameters;
-local concurrencyLimiter = spec.v1.ConcurrencyLimiter;
+local concurrency_controller = spec.v1.ConcurrencyLimiter;
 local scheduler = spec.v1.Scheduler;
 local schedulerParameters = spec.v1.SchedulerParameters;
 local decider = spec.v1.Decider;
 local switcher = spec.v1.Switcher;
 local loadActuator = spec.v1.LoadActuator;
-local loadActuatorDynamicConfig = spec.v1.LoadActuatorDynamicConfig;
 local alerterConfig = spec.v1.AlerterConfig;
 local max = spec.v1.Max;
 local min = spec.v1.Min;
@@ -34,12 +32,10 @@ local aimdConcurrencyController = spec.v1.AIMDConcurrencyController;
 function(params) {
   _config:: config.common + config.policy + params,
 
-  local c = $._config.constants,
-
   local policyDef =
     policy.new()
     + policy.withResources(resources.new()
-                           + resources.withFluxMetersMixin({ [$._config.policyName]: $._config.fluxMeter })
+                           + resources.withFluxMetersMixin({ [$._config.policy_name]: $._config.flux_meter })
                            + resources.withClassifiers($._config.classifiers))
     + policy.withCircuit(
       circuit.new()
@@ -49,7 +45,7 @@ function(params) {
           component.withQuery(
             query.new()
             + query.withPromql(
-              local q = 'sum(increase(flux_meter_sum{valid="true", flow_status="OK", flux_meter_name="%(policyName)s"}[5s]))/sum(increase(flux_meter_count{valid="true", flow_status="OK", flux_meter_name="%(policyName)s"}[5s]))' % { policyName: $._config.policyName };
+              local q = 'sum(increase(flux_meter_sum{valid="true", flow_status="OK", flux_meter_name="%(policy_name)s"}[5s]))/sum(increase(flux_meter_count{valid="true", flow_status="OK", flux_meter_name="%(policy_name)s"}[5s]))' % { policy_name: $._config.policy_name };
               promQL.new()
               + promQL.withQueryString(q)
               + promQL.withEvaluationInterval('1s')
@@ -57,16 +53,13 @@ function(params) {
             ),
           ),
           component.withArithmeticCombinator(combinator.mul(port.withSignalName('LATENCY'),
-                                                            port.withConstantSignal(c.latencyEMALimitMultiplier),
+                                                            port.withConstantSignal($._config.overload_detection.latency_ema_limit_multiplier),
                                                             output=port.withSignalName('MAX_EMA'))),
           component.withArithmeticCombinator(combinator.mul(port.withSignalName('LATENCY_EMA'),
-                                                            port.withConstantSignal(c.latencyToleranceMultiplier),
+                                                            port.withConstantSignal($._config.overload_detection.latency_tolerance_multiplier),
                                                             output=port.withSignalName('LATENCY_SETPOINT'))),
           component.withEma(
-            local e = $._config.ema;
-            ema.withEmaWindow(e.window)
-            + ema.withWarmupWindow(e.warmupWindow)
-            + ema.withCorrectionFactorOnMaxEnvelopeViolation(e.correctionFactor)
+            ema.withParameters($._config.overload_detection.ema)
             + ema.withInPortsMixin(
               ema.inPorts.withInput(port.withSignalName('LATENCY'))
               + ema.inPorts.withMaxEnvelope(port.withSignalName('MAX_EMA'))
@@ -76,32 +69,16 @@ function(params) {
           component.withFlowControl(
             flowControl.new()
             + flowControl.withAimdConcurrencyController(
+              local cc = $._config.concurrency_controller;
               aimdConcurrencyController.new()
-              + aimdConcurrencyController.withFlowSelector($._config.concurrencyLimiterFlowSelector)
-              + aimdConcurrencyController.withSchedulerParameters(
-                schedulerParameters.new()
-                + schedulerParameters.withAutoTokens($._config.concurrencyLimiter.autoTokens)
-                + schedulerParameters.withTimeoutFactor($._config.concurrencyLimiter.timeoutFactor)
-                + schedulerParameters.withDefaultWorkloadParameters($._config.concurrencyLimiter.defaultWorkloadParameters)
-                + schedulerParameters.withWorkloads($._config.concurrencyLimiter.workloads)
-              )
-              + aimdConcurrencyController.withGradientParameters(
-                local g = $._config.gradient;
-                gradientParameters.new()
-                + gradientParameters.withSlope(g.slope)
-                + gradientParameters.withMinGradient(g.minGradient)
-                + gradientParameters.withMaxGradient(g.maxGradient)
-              )
-              + aimdConcurrencyController.withConcurrencyLimitMultiplier(c.concurrencyLimitMultiplier)
-              + aimdConcurrencyController.withConcurrencyLinearIncrement(c.concurrencyLinearIncrement)
-              + aimdConcurrencyController.withConcurrencySqrtIncrementMultiplier(c.concurrencySQRTIncrementMultiplier)
-              + aimdConcurrencyController.withAlerterConfig(
-                alerterConfig.new()
-                + alerterConfig.withAlertName($._config.concurrencyLimiter.alerterName)
-                + alerterConfig.withAlertChannels($._config.concurrencyLimiter.alerterChannels)
-                + alerterConfig.withResolveTimeout($._config.concurrencyLimiter.alerterResolveTimeout)
-              )
-              + aimdConcurrencyController.withDryRunDynamicConfigKey('concurrency_limiter')
+              + aimdConcurrencyController.withFlowSelector(cc.flow_selector)
+              + aimdConcurrencyController.withSchedulerParameters(cc.scheduler)
+              + aimdConcurrencyController.withGradientParameters(cc.gradient)
+              + aimdConcurrencyController.withConcurrencyLimitMultiplier(cc.concurrency_limit_multiplier)
+              + aimdConcurrencyController.withConcurrencyLinearIncrement(cc.concurrency_linear_increment)
+              + aimdConcurrencyController.withConcurrencySqrtIncrementMultiplier(cc.concurrency_sqrt_increment_multiplier)
+              + aimdConcurrencyController.withAlerterParameters(cc.alerter)
+              + aimdConcurrencyController.withDryRunDynamicConfigKey('concurrency_controller')
               + aimdConcurrencyController.withInPorts({
                 signal: port.withSignalName('LATENCY'),
                 setpoint: port.withSignalName('LATENCY_SETPOINT'),
@@ -123,14 +100,14 @@ function(params) {
     kind: 'Policy',
     apiVersion: 'fluxninja.com/v1alpha1',
     metadata: {
-      name: $._config.policyName,
+      name: $._config.policy_name,
       labels: {
         'fluxninja.com/validate': 'true',
       },
     },
     spec: policyDef,
     dynamicConfig: {
-      concurrency_limiter: loadActuatorDynamicConfig.withDryRun($._config.dynamicConfig.dryRun),
+      concurrency_controller: $._config.concurrency_controller.dynamic_config,
     },
   },
 

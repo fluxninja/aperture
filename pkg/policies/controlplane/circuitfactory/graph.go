@@ -102,11 +102,11 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 		case "Decider":
 			componentDescription = fmt.Sprintf("%s for %s", componentConfig["operator"], componentConfig["true_for"])
 		case "EMA":
-			componentDescription = fmt.Sprintf("win: %s", componentConfig["ema_window"])
+			componentDescription = fmt.Sprintf("win: %s", componentConfig["parameters"].(map[string]interface{})["ema_window"])
 		case "GradientController":
-			componentDescription = fmt.Sprintf("slope: %0.2f", componentConfig["slope"])
+			componentDescription = fmt.Sprintf("slope: %0.2f", componentConfig["parameters"].(map[string]interface{})["slope"])
 		case "Extrapolator":
-			componentDescription = fmt.Sprintf("for: %s", componentConfig["max_extrapolation_interval"])
+			componentDescription = fmt.Sprintf("for: %s", componentConfig["parameters"].(map[string]interface{})["max_extrapolation_interval"])
 		case "ConcurrencyLimiter":
 			componentDescription = getServiceSelector(componentConfig["selector"])
 		case "RateLimiter":

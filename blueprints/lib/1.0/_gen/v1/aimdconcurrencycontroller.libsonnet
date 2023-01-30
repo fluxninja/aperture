@@ -16,11 +16,11 @@ local aimdconcurrencycontrollerouts = import './aimdconcurrencycontrollerouts.li
   },
   inPorts:: aimdconcurrencycontrollerins,
   outPorts:: aimdconcurrencycontrollerouts,
-  withAlerterConfig(alerter_config):: {
-    alerter_config: alerter_config,
+  withAlerterParameters(alerter_parameters):: {
+    alerter_parameters: alerter_parameters,
   },
-  withAlerterConfigMixin(alerter_config):: {
-    alerter_config+: alerter_config,
+  withAlerterParametersMixin(alerter_parameters):: {
+    alerter_parameters+: alerter_parameters,
   },
   withConcurrencyLimitMultiplier(concurrency_limit_multiplier):: {
     concurrency_limit_multiplier: concurrency_limit_multiplier,

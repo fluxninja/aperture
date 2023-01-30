@@ -29,7 +29,7 @@ type LoadActuator struct {
 	alerterIface      alerts.Alerter
 	decisionWriter    *etcdwriter.Writer
 	loadActuatorProto *policylangv1.LoadActuator
-	alerterConfig     *policylangv1.AlerterConfig
+	alerterParameters *policylangv1.Alerter_Parameters
 	decisionsEtcdPath string
 	agentGroupName    string
 	componentID       string
@@ -64,7 +64,7 @@ func NewLoadActuatorAndOptions(
 		dryRun:            dryRun,
 	}
 
-	lsa.alerterConfig = loadActuatorProto.GetAlerterConfig()
+	lsa.alerterParameters = loadActuatorProto.GetAlerterParameters()
 
 	return lsa, fx.Options(
 		fx.Invoke(lsa.setupWriter),
@@ -187,14 +187,14 @@ func (la *LoadActuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplie
 
 func (la *LoadActuator) addAlert() {
 	// do not generate alerts if config was not provided
-	if la.alerterConfig == nil {
+	if la.alerterParameters == nil {
 		return
 	}
 	alert := alerts.NewAlert(
-		alerts.WithName(la.alerterConfig.AlertName),
-		alerts.WithSeverity(alerts.ParseSeverity(la.alerterConfig.Severity)),
-		alerts.WithAlertChannels(la.alerterConfig.AlertChannels),
-		alerts.WithResolveTimeout(la.alerterConfig.ResolveTimeout.AsDuration()),
+		alerts.WithName(la.alerterParameters.AlertName),
+		alerts.WithSeverity(alerts.ParseSeverity(la.alerterParameters.Severity)),
+		alerts.WithAlertChannels(la.alerterParameters.AlertChannels),
+		alerts.WithResolveTimeout(la.alerterParameters.ResolveTimeout.AsDuration()),
 		alerts.WithLabel("policy_name", la.policyReadAPI.GetPolicyName()),
 		alerts.WithLabel("type", "concurrency_limiter"),
 		alerts.WithLabel("agent_group", la.agentGroupName),

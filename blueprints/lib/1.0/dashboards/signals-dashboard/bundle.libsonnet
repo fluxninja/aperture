@@ -5,7 +5,7 @@ local config = blueprint.config;
 
 {
   dashboards: {
-    [std.format('%s.json', $._config.common.policyName)]: dashboard($._config.common + $._config.dashboard).dashboard,
+    [std.format('%s.json', $._config.common.policy_name)]: dashboard($._config.common + $._config.dashboard).dashboard,
   },
 } +
 {

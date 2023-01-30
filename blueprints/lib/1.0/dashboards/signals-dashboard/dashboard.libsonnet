@@ -14,10 +14,10 @@ function(params) {
 
   local SignalAveragePanel =
     local query = |||
-      increase(signal_reading_sum{policy_name="%(policyName)s",signal_name="${signal_name}",valid="true"}[$__rate_interval])
+      increase(signal_reading_sum{policy_name="%(policy_name)s",signal_name="${signal_name}",valid="true"}[$__rate_interval])
       /
-      increase(signal_reading_count{policy_name="%(policyName)s",signal_name="${signal_name}",valid="true"}[$__rate_interval])
-    ||| % { policyName: $._config.policyName };
+      increase(signal_reading_count{policy_name="%(policy_name)s",signal_name="${signal_name}",valid="true"}[$__rate_interval])
+    ||| % { policy_name: $._config.policy_name };
     local target =
       grafana.prometheus.target(query) +
       {
@@ -46,8 +46,8 @@ function(params) {
 
   local InvalidFrequencyPanel =
     local query = |||
-      avg by (valid) (rate(signal_reading_count{policy_name="%(policyName)s",signal_name="${signal_name}"}[$__rate_interval]))
-    ||| % { policyName: $._config.policyName };
+      avg by (valid) (rate(signal_reading_count{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval]))
+    ||| % { policy_name: $._config.policy_name };
     local target =
       grafana.prometheus.target(query) +
       {
@@ -78,9 +78,9 @@ function(params) {
       title='Signals',
       editable=true,
       schemaVersion=18,
-      refresh=$._config.refreshInterval,
-      time_from=$._config.timeFrom,
-      time_to=$._config.timeTo
+      refresh=$._config.refresh_interval,
+      time_from=$._config.time_from,
+      time_to=$._config.time_to
     )
     .addTemplate(
       {
@@ -88,7 +88,7 @@ function(params) {
           text: 'default',
           value: $._config.datasource.name,
         },
-        regex: $._config.datasource.filterRegex,
+        regex: $._config.datasource.filter_regex,
         hide: 0,
         label: 'Data Source',
         name: 'datasource',
@@ -108,7 +108,7 @@ function(params) {
         type: 'prometheus',
         uid: '${datasource}',
       },
-      query: 'label_values(signal_reading{policy_name="%(policyName)s"}, signal_name)' % { policyName: $._config.policyName },
+      query: 'label_values(signal_reading{policy_name="%(policy_name)s"}, signal_name)' % { policy_name: $._config.policy_name },
       hide: 0,
       includeAll: false,
       multi: false,

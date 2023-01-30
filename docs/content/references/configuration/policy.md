@@ -260,7 +260,7 @@ eg. {any: {of: [expr1, expr2]}}.
 </dd>
 </dl>
 
-### RateLimiterLazySync {#rate-limiter-lazy-sync}
+### ParametersLazySync {#parameters-lazy-sync}
 
 #### Properties
 
@@ -337,17 +337,17 @@ Note: The module name must match the package name from the "source".
 </dd>
 </dl>
 
-### SchedulerParametersWorkload {#scheduler-parameters-workload}
+### SchedulerWorkload {#scheduler-workload}
 
 Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
 
 #### Properties
 
 <dl>
-<dt>workload_parameters</dt>
+<dt>parameters</dt>
 <dd>
 
-([SchedulerParametersWorkloadParameters](#scheduler-parameters-workload-parameters), `required`) WorkloadParameters associated with flows matching the label matcher.
+([SchedulerWorkloadParameters](#scheduler-workload-parameters), `required`) Parameters associated with flows matching the label matcher.
 
 @gotags: validate:"required"
 
@@ -363,9 +363,9 @@ Workload defines a class of requests that preferably have similar properties suc
 </dd>
 </dl>
 
-### SchedulerParametersWorkloadParameters {#scheduler-parameters-workload-parameters}
+### SchedulerWorkloadParameters {#scheduler-workload-parameters}
 
-WorkloadParameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
+Parameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
 
 #### Properties
 
@@ -438,7 +438,7 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dt>gradient_parameters</dt>
 <dd>
 
-([V1GradientParameters](#v1-gradient-parameters)) Gradient parameters for the controller. Defaults to:
+([V1GradientControllerParameters](#v1-gradient-controller-parameters)) Gradient parameters for the controller. Defaults to:
 
 - slope = -1
 - min_gradient = 0.1
@@ -469,10 +469,10 @@ High level concurrency control component. Baselines a signal via exponential mov
 @gotags: default:"1.0"
 
 </dd>
-<dt>alerter_config</dt>
+<dt>alerter_parameters</dt>
 <dd>
 
-([V1AlerterConfig](#v1-alerter-config)) Configuration for embedded alerter.
+([V1AlerterParameters](#v1-alerter-parameters)) Configuration for embedded alerter.
 
 </dd>
 <dt>dry_run_dynamic_config_key</dt>
@@ -598,19 +598,34 @@ Alerter reacts to a signal and generates alert to send to alert manager.
 ([V1AlerterIns](#v1-alerter-ins)) Input ports for the Alerter component.
 
 </dd>
-<dt>alerter_config</dt>
+<dt>parameters</dt>
 <dd>
 
-([V1AlerterConfig](#v1-alerter-config), `required`) Alerter configuration
+([V1AlerterParameters](#v1-alerter-parameters), `required`) Alerter configuration
 
 @gotags: validate:"required"
 
 </dd>
 </dl>
 
-### v1AlerterConfig {#v1-alerter-config}
+### v1AlerterIns {#v1-alerter-ins}
 
-AlerterConfig is a common config for separate alerter components and alerters embedded in other components.
+Inputs for the Alerter component.
+
+#### Properties
+
+<dl>
+<dt>signal</dt>
+<dd>
+
+([V1InPort](#v1-in-port)) Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.
+
+</dd>
+</dl>
+
+### v1AlerterParameters {#v1-alerter-parameters}
+
+Alerter Parameters is a common config for separate alerter components and alerters embedded in other components.
 
 #### Properties
 
@@ -643,21 +658,6 @@ AlerterConfig is a common config for separate alerter components and alerters em
 <dd>
 
 ([]string) A list of alert channel strings.
-
-</dd>
-</dl>
-
-### v1AlerterIns {#v1-alerter-ins}
-
-Inputs for the Alerter component.
-
-#### Properties
-
-<dl>
-<dt>signal</dt>
-<dd>
-
-([V1InPort](#v1-in-port)) Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.
 
 </dd>
 </dl>
@@ -1176,24 +1176,6 @@ Special constant input for ports and Variable component. Can provide either a co
 </dd>
 </dl>
 
-### v1ControllerDynamicConfig {#v1-controller-dynamic-config}
-
-Dynamic Configuration for a Controller
-
-#### Properties
-
-<dl>
-<dt>manual_mode</dt>
-<dd>
-
-(bool) Decides whether the controller runs in "manual_mode".
-In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
-
-@gotags: default:"false"
-
-</dd>
-</dl>
-
 ### v1Decider {#v1-decider}
 
 Type of combinator that computes the comparison operation on lhs and rhs signals
@@ -1389,46 +1371,12 @@ The EMA filter also employs a min-max-envelope logic during warm up stage, expla
 ([V1EMAOuts](#v1-e-m-a-outs)) Output ports for the EMA component.
 
 </dd>
-<dt>ema_window</dt>
+<dt>parameters</dt>
 <dd>
 
-(string, default: `5s`) Duration of EMA sampling window.
+([V1EMAParameters](#v1-e-m-a-parameters), `required`) Parameters for the EMA component.
 
-@gotags: default:"5s"
-
-</dd>
-<dt>warmup_window</dt>
-<dd>
-
-(string, default: `0s`) Duration of EMA warming up window.
-
-The initial value of the EMA is the average of signal readings received during the warm-up window.
-
-@gotags: default:"0s"
-
-</dd>
-<dt>correction_factor_on_min_envelope_violation</dt>
-<dd>
-
-(float64, `gte=1.0`, default: `1`) Correction factor to apply on the output value if its in violation of the min envelope.
-
-@gotags: validate:"gte=1.0" default:"1.0"
-
-</dd>
-<dt>correction_factor_on_max_envelope_violation</dt>
-<dd>
-
-(float64, `gte=0,lte=1.0`, default: `1`) Correction factor to apply on the output value if its in violation of the max envelope.
-
-@gotags: validate:"gte=0,lte=1.0" default:"1.0"
-
-</dd>
-<dt>valid_during_warmup</dt>
-<dd>
-
-(bool) Whether the output is valid during the warm-up stage.
-
-@gotags: default:"false"
+@gotags: validate:"required"
 
 </dd>
 </dl>
@@ -1485,6 +1433,57 @@ Outputs for the EMA component.
 <dd>
 
 ([V1OutPort](#v1-out-port)) Exponential moving average of the series of reading as an output signal.
+
+</dd>
+</dl>
+
+### v1EMAParameters {#v1-e-m-a-parameters}
+
+Parameters for the EMA component.
+
+#### Properties
+
+<dl>
+<dt>ema_window</dt>
+<dd>
+
+(string, default: `5s`) Duration of EMA sampling window.
+
+@gotags: default:"5s"
+
+</dd>
+<dt>warmup_window</dt>
+<dd>
+
+(string, default: `0s`) Duration of EMA warming up window.
+
+The initial value of the EMA is the average of signal readings received during the warm-up window.
+
+@gotags: default:"0s"
+
+</dd>
+<dt>correction_factor_on_min_envelope_violation</dt>
+<dd>
+
+(float64, `gte=1.0`, default: `1`) Correction factor to apply on the output value if its in violation of the min envelope.
+
+@gotags: validate:"gte=1.0" default:"1.0"
+
+</dd>
+<dt>correction_factor_on_max_envelope_violation</dt>
+<dd>
+
+(float64, `gte=0,lte=1.0`, default: `1`) Correction factor to apply on the output value if its in violation of the max envelope.
+
+@gotags: validate:"gte=0,lte=1.0" default:"1.0"
+
+</dd>
+<dt>valid_during_warmup</dt>
+<dd>
+
+(bool) Whether the output is valid during the warm-up stage.
+
+@gotags: default:"false"
 
 </dd>
 </dl>
@@ -1593,12 +1592,12 @@ It does so until `maximum_extrapolation_interval` is reached, beyond which it em
 ([V1ExtrapolatorOuts](#v1-extrapolator-outs)) Output ports for the Extrapolator component.
 
 </dd>
-<dt>max_extrapolation_interval</dt>
+<dt>parameters</dt>
 <dd>
 
-(string, default: `10s`) Maximum time interval to repeat the last valid value of input signal.
+([V1ExtrapolatorParameters](#v1-extrapolator-parameters), `required`) Parameters for the Extrapolator component.
 
-@gotags: default:"10s"
+@gotags: validate:"required"
 
 </dd>
 </dl>
@@ -1629,6 +1628,23 @@ Outputs for the Extrapolator component.
 <dd>
 
 ([V1OutPort](#v1-out-port)) Extrapolated signal.
+
+</dd>
+</dl>
+
+### v1ExtrapolatorParameters {#v1-extrapolator-parameters}
+
+Parameters for the Extrapolator component.
+
+#### Properties
+
+<dl>
+<dt>max_extrapolation_interval</dt>
+<dd>
+
+(string, default: `10s`) Maximum time interval to repeat the last valid value of input signal.
+
+@gotags: default:"10s"
 
 </dd>
 </dl>
@@ -1916,10 +1932,10 @@ The output can be _optionally_ clamped to desired range using `max` and
 ([V1GradientControllerOuts](#v1-gradient-controller-outs)) Output ports of the Gradient Controller.
 
 </dd>
-<dt>gradient_parameters</dt>
+<dt>parameters</dt>
 <dd>
 
-([V1GradientParameters](#v1-gradient-parameters), `required`) Gradient Parameters.
+([V1GradientControllerParameters](#v1-gradient-controller-parameters), `required`) Gradient Parameters.
 
 @gotags: validate:"required"
 
@@ -1933,7 +1949,25 @@ The output can be _optionally_ clamped to desired range using `max` and
 <dt>default_config</dt>
 <dd>
 
-([V1ControllerDynamicConfig](#v1-controller-dynamic-config)) Default configuration.
+([V1GradientControllerDynamicConfig](#v1-gradient-controller-dynamic-config)) Default configuration.
+
+</dd>
+</dl>
+
+### v1GradientControllerDynamicConfig {#v1-gradient-controller-dynamic-config}
+
+Dynamic Configuration for a Controller
+
+#### Properties
+
+<dl>
+<dt>manual_mode</dt>
+<dd>
+
+(bool) Decides whether the controller runs in "manual_mode".
+In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
+
+@gotags: default:"false"
 
 </dd>
 </dl>
@@ -2000,7 +2034,9 @@ Outputs for the Gradient Controller component.
 </dd>
 </dl>
 
-### v1GradientParameters {#v1-gradient-parameters}
+### v1GradientControllerParameters {#v1-gradient-controller-parameters}
+
+Gradient Parameters.
 
 #### Properties
 
@@ -2528,10 +2564,10 @@ Takes the load multiplier input signal and publishes it to the schedulers in the
 ([V1LoadActuatorDynamicConfig](#v1-load-actuator-dynamic-config)) Default configuration.
 
 </dd>
-<dt>alerter_config</dt>
+<dt>alerter_parameters</dt>
 <dd>
 
-([V1AlerterConfig](#v1-alerter-config)) Configuration for embedded alerter.
+([V1AlerterParameters](#v1-alerter-parameters)) Configuration for embedded alerter.
 
 </dd>
 </dl>
@@ -3145,31 +3181,12 @@ to select which label should be used as key.
 @gotags: validate:"required"
 
 </dd>
-<dt>limit_reset_interval</dt>
+<dt>parameters</dt>
 <dd>
 
-(string, default: `60s`) Time after which the limit for a given label value will be reset.
-
-@gotags: default:"60s"
-
-</dd>
-<dt>label_key</dt>
-<dd>
-
-(string, `required`) Specifies which label the ratelimiter should be keyed by.
-
-Rate limiting is done independently for each value of the
-[label](/concepts/integrations/flow-control/flow-label.md) with given key.
-Eg., to give each user a separate limit, assuming you have a _user_ flow
-label set up, set `label_key: "user"`.
+([V1RateLimiterParameters](#v1-rate-limiter-parameters), `required`) Parameters for the RateLimiter component
 
 @gotags: validate:"required"
-
-</dd>
-<dt>lazy_sync</dt>
-<dd>
-
-([RateLimiterLazySync](#rate-limiter-lazy-sync)) Configuration of lazy-syncing behaviour of ratelimiter
 
 </dd>
 <dt>dynamic_config_key</dt>
@@ -3222,6 +3239,40 @@ under certain circumstances. [Decider](#v1-decider) might be helpful.
 :::
 
 @gotags: validate:"required"
+
+</dd>
+</dl>
+
+### v1RateLimiterParameters {#v1-rate-limiter-parameters}
+
+#### Properties
+
+<dl>
+<dt>limit_reset_interval</dt>
+<dd>
+
+(string, default: `60s`) Time after which the limit for a given label value will be reset.
+
+@gotags: default:"60s"
+
+</dd>
+<dt>label_key</dt>
+<dd>
+
+(string, `required`) Specifies which label the ratelimiter should be keyed by.
+
+Rate limiting is done independently for each value of the
+[label](/concepts/integrations/flow-control/flow-label.md) with given key.
+Eg., to give each user a separate limit, assuming you have a _user_ flow
+label set up, set `label_key: "user"`.
+
+@gotags: validate:"required"
+
+</dd>
+<dt>lazy_sync</dt>
+<dd>
+
+([ParametersLazySync](#parameters-lazy-sync)) Configuration of lazy-syncing behaviour of ratelimiter
 
 </dd>
 </dl>
@@ -3361,7 +3412,7 @@ See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
 ([V1SchedulerOuts](#v1-scheduler-outs)) Output ports for the Scheduler component.
 
 </dd>
-<dt>scheduler_parameters</dt>
+<dt>parameters</dt>
 <dd>
 
 ([V1SchedulerParameters](#v1-scheduler-parameters), `required`) Scheduler parameters.
@@ -3406,13 +3457,15 @@ entering scheduler, including rejected ones.
 
 ### v1SchedulerParameters {#v1-scheduler-parameters}
 
+Scheduler parameters
+
 #### Properties
 
 <dl>
 <dt>workloads</dt>
 <dd>
 
-([[]SchedulerParametersWorkload](#scheduler-parameters-workload)) List of workloads to be used in scheduler.
+([[]SchedulerWorkload](#scheduler-workload)) List of workloads to be used in scheduler.
 
 Categorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads
 allows for load-shedding to be "smarter" than just "randomly deny 50% of
@@ -3440,7 +3493,7 @@ section](/concepts/integrations/flow-control/components/concurrency-limiter.md#w
 <dt>default_workload_parameters</dt>
 <dd>
 
-([SchedulerParametersWorkloadParameters](#scheduler-parameters-workload-parameters), `required`) WorkloadParameters to be used if none of workloads specified in `workloads` match.
+([SchedulerWorkloadParameters](#scheduler-workload-parameters), `required`) Parameters to be used if none of workloads specified in `workloads` match.
 
 @gotags: validate:"required"
 

@@ -12,10 +12,11 @@ local resources = aperture.spec.v1.Resources;
 local fluxMeter = aperture.spec.v1.FluxMeter;
 local promQL = aperture.spec.v1.PromQL;
 local ema = aperture.spec.v1.EMA;
+local emaParameters = aperture.spec.v1.EMAParameters;
 local combinator = aperture.spec.v1.ArithmeticCombinator;
 local decider = aperture.spec.v1.Decider;
 local alerter = aperture.spec.v1.Alerter;
-local alerterConfig = aperture.spec.v1.AlerterConfig;
+local alerterParameters = aperture.spec.v1.AlerterParameters;
 local constantSignal = aperture.spec.v1.ConstantSignal;
 
 local svcSelector =
@@ -49,8 +50,11 @@ local policyDef =
         ),
       ),
       component.withEma(
-        ema.withEmaWindow('1500s')
-        + ema.withWarmupWindow('10s')
+        ema.withParameters(
+          emaParameters.new()
+          + emaParameters.withEmaWindow('1500s')
+          + emaParameters.withWarmupWindow('10s')
+        )
         + ema.withInPortsMixin(ema.inPorts.withInput(port.withSignalName('LATENCY')))
         + ema.withOutPortsMixin(ema.outPorts.withOutput(port.withSignalName('LATENCY_EMA')))
       ),
@@ -69,10 +73,10 @@ local policyDef =
       component.withAlerter(
         alerter.new()
         + alerter.withInPorts({ signal: port.withSignalName('IS_OVERLOAD_SWITCH') })
-        + alerter.withAlerterConfig(
-          alerterConfig.new()
-          + alerterConfig.withAlertName('overload')
-          + alerterConfig.withSeverity('crit')
+        + alerter.withParameters(
+          alerterParameters.new()
+          + alerterParameters.withAlertName('overload')
+          + alerterParameters.withSeverity('crit')
         )
       ),
     ]),

@@ -2,9 +2,9 @@ local aperture = import 'blueprints/lib/1.0/main.libsonnet';
 
 local latencyAIMDPolicy = aperture.policies.LatencyAIMDConcurrencyLimiting.policy;
 
-local workloadParameters = aperture.spec.v1.SchedulerParametersWorkloadParameters;
+local workloadParameters = aperture.spec.v1.SchedulerWorkloadParameters;
 local labelMatcher = aperture.spec.v1.LabelMatcher;
-local workload = aperture.spec.v1.SchedulerParametersWorkload;
+local workload = aperture.spec.v1.SchedulerWorkload;
 
 local classifier = aperture.spec.v1.Classifier;
 local fluxMeter = aperture.spec.v1.FluxMeter;
@@ -17,6 +17,7 @@ local controlPoint = aperture.spec.v1.ControlPoint;
 local component = aperture.spec.v1.Component;
 local flowControl = aperture.spec.v1.FlowControl;
 local rateLimiter = aperture.spec.v1.RateLimiter;
+local rateLimiterParameters = aperture.spec.v1.RateLimiterParameters;
 local decider = aperture.spec.v1.Decider;
 local switcher = aperture.spec.v1.Switcher;
 local port = aperture.spec.v1.Port;
@@ -62,9 +63,30 @@ local rateLimiterSelector =
   );
 
 local policyResource = latencyAIMDPolicy({
-  policyName: 'service1-demo-app',
-  fluxMeter: fluxMeter.new() + fluxMeter.withFlowSelector(fluxMeterSelector),
-  concurrencyLimiterFlowSelector: concurrencyLimiterFlowSelector,
+  policy_name: 'service1-demo-app',
+  flux_meter: fluxMeter.new() + fluxMeter.withFlowSelector(fluxMeterSelector),
+  concurrency_controller+: {
+    flow_selector: concurrencyLimiterFlowSelector,
+    scheduler+: {
+      timeout_factor: 0.5,
+      workloads: [
+        workload.new()
+        + workload.withParameters(workloadParameters.withPriority(50))
+        // match the label extracted by classifier
+        + workload.withLabelMatcher(labelMatcher.withMatchLabels({ user_type: 'guest' })),
+        workload.new()
+        + workload.withParameters(workloadParameters.withPriority(200))
+        // match the http header directly
+        + workload.withLabelMatcher(labelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
+      ],
+    },
+    default_workload_parameters: {
+      priority: 20,
+    },
+    alerter+: {
+      alert_channels: ['service1-demo-app'],
+    },
+  },
   classifiers: [
     classifier.new()
     + classifier.withFlowSelector(concurrencyLimiterFlowSelector)
@@ -74,23 +96,6 @@ local policyResource = latencyAIMDPolicy({
                                       + extractor.withFrom('request.http.headers.user-type')),
     }),
   ],
-  concurrencyLimiter+: {
-    alerterChannels: ['service1-demo-app'],
-    timeoutFactor: 0.5,
-    defaultWorkloadParameters: {
-      priority: 20,
-    },
-    workloads: [
-      workload.new()
-      + workload.withWorkloadParameters(workloadParameters.withPriority(50))
-      // match the label extracted by classifier
-      + workload.withLabelMatcher(labelMatcher.withMatchLabels({ user_type: 'guest' })),
-      workload.new()
-      + workload.withWorkloadParameters(workloadParameters.withPriority(200))
-      // match the http header directly
-      + workload.withLabelMatcher(labelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
-    ],
-  },
   components: [
     component.new()
     + component.withDecider(
@@ -117,8 +122,11 @@ local policyResource = latencyAIMDPolicy({
         rateLimiter.new()
         + rateLimiter.withFlowSelector(rateLimiterSelector)
         + rateLimiter.withInPorts({ limit: port.withSignalName('RATE_LIMIT') })
-        + rateLimiter.withLimitResetInterval('1s')
-        + rateLimiter.withLabelKey('http.request.header.user_id')
+        + rateLimiter.withParameters(
+          rateLimiterParameters.new()
+          + rateLimiterParameters.withLimitResetInterval('1s')
+          + rateLimiterParameters.withLabelKey('http.request.header.user_id')
+        )
         + rateLimiter.withDynamicConfigKey('rate_limiter'),
       ),
     ),

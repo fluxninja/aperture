@@ -30,22 +30,10 @@ local ratelimiterins = import './ratelimiterins.libsonnet';
   withInPortsMixin(in_ports):: {
     in_ports+: in_ports,
   },
-  withLabelKey(label_key):: {
-    label_key: label_key,
+  withParameters(parameters):: {
+    parameters: parameters,
   },
-  withLabelKeyMixin(label_key):: {
-    label_key+: label_key,
-  },
-  withLazySync(lazy_sync):: {
-    lazy_sync: lazy_sync,
-  },
-  withLazySyncMixin(lazy_sync):: {
-    lazy_sync+: lazy_sync,
-  },
-  withLimitResetInterval(limit_reset_interval):: {
-    limit_reset_interval: limit_reset_interval,
-  },
-  withLimitResetIntervalMixin(limit_reset_interval):: {
-    limit_reset_interval+: limit_reset_interval,
+  withParametersMixin(parameters):: {
+    parameters+: parameters,
   },
 }

@@ -45,7 +45,7 @@ function(params) {
   local rateLimiterPanel =
     newTimeSeriesPanel('Rate Limiter',
                        ds,
-                       'sum by(decision_type) (rate(rate_limiter_counter{policy_name="%(policyName)s"}[$__rate_interval]))' % { policyName: $._config.policyName },
+                       'sum by(decision_type) (rate(rate_limiter_counter{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: $._config.policy_name },
                        'Decisions',
                        'reqps'),
 
@@ -54,7 +54,7 @@ function(params) {
       title='Jsonnet / FluxNinja - Rate Limiter',
       editable=true,
       schemaVersion=18,
-      refresh=$._config.refreshInterval,
+      refresh=$._config.refresh_interval,
       time_from='now-5m',
       time_to='now'
     )
@@ -70,7 +70,7 @@ function(params) {
         options: [],
         query: 'prometheus',
         refres: 1,
-        regex: $._config.datasource.filterRegex,
+        regex: $._config.datasource.filter_regex,
         type: 'datasource',
       }
     )

@@ -249,7 +249,7 @@ func ParseAIMDConcurrencyController(
 			{
 				Component: &policylangv1.Component_GradientController{
 					GradientController: &policylangv1.GradientController{
-						GradientParameters: aimdConcurrencyController.GradientParameters,
+						Parameters: aimdConcurrencyController.GradientParameters,
 						InPorts: &policylangv1.GradientController_Ins{
 							ControlVariable: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
@@ -288,7 +288,9 @@ func ParseAIMDConcurrencyController(
 			{
 				Component: &policylangv1.Component_Extrapolator{
 					Extrapolator: &policylangv1.Extrapolator{
-						MaxExtrapolationInterval: durationpb.New(time.Second * 5),
+						Parameters: &policylangv1.Extrapolator_Parameters{
+							MaxExtrapolationInterval: durationpb.New(time.Second * 5),
+						},
 						InPorts: &policylangv1.Extrapolator_Ins{
 							Input: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
@@ -311,7 +313,7 @@ func ParseAIMDConcurrencyController(
 							ConcurrencyLimiter: &policylangv1.ConcurrencyLimiter{
 								FlowSelector: aimdConcurrencyController.FlowSelector,
 								Scheduler: &policylangv1.Scheduler{
-									SchedulerParameters: aimdConcurrencyController.SchedulerParameters,
+									Parameters: aimdConcurrencyController.SchedulerParameters,
 									OutPorts: &policylangv1.Scheduler_Outs{
 										AcceptedConcurrency: &policylangv1.OutPort{
 											SignalName: "ACCEPTED_CONCURRENCY",
@@ -323,8 +325,8 @@ func ParseAIMDConcurrencyController(
 								},
 								ActuationStrategy: &policylangv1.ConcurrencyLimiter_LoadActuator{
 									LoadActuator: &policylangv1.LoadActuator{
-										AlerterConfig:    aimdConcurrencyController.AlerterConfig,
-										DynamicConfigKey: aimdConcurrencyController.DryRunDynamicConfigKey,
+										AlerterParameters: aimdConcurrencyController.AlerterParameters,
+										DynamicConfigKey:  aimdConcurrencyController.DryRunDynamicConfigKey,
 										InPorts: &policylangv1.LoadActuator_Ins{
 											LoadMultiplier: &policylangv1.InPort{
 												Value: &policylangv1.InPort_SignalName{

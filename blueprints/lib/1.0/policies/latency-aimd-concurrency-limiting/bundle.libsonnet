@@ -6,10 +6,10 @@ local config = blueprint.config;
 
 {
   policies: {
-    [std.format('%s.yaml', $._config.common.policyName)]: policy($._config.common + $._config.policy).policyResource,
+    [std.format('%s.yaml', $._config.common.policy_name)]: policy($._config.common + $._config.policy).policyResource,
   },
   dashboards: {
-    [std.format('%s.json', $._config.common.policyName)]: dashboard($._config.common + $._config.dashboard).dashboard,
+    [std.format('%s.json', $._config.common.policy_name)]: dashboard($._config.common + $._config.dashboard).dashboard,
   },
 } +
 {

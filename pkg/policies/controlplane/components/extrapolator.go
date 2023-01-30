@@ -14,12 +14,12 @@ import (
 
 // Extrapolator takes an input signal and emits an output signal.
 type Extrapolator struct {
-	// Maximum time interval for each extrapolation of signal is done; Reading becomes invalid after this interval.
-	maxExtrapolationInterval time.Duration
-	// The last output that was emitted as an output signal.
-	lastOutput runtime.Reading
 	// The last valid timestamp.
 	lastValidTimestamp time.Time
+	// The last output that was emitted as an output signal.
+	lastOutput runtime.Reading
+	// Maximum time interval for each extrapolation of signal is done; Reading becomes invalid after this interval.
+	maxExtrapolationInterval time.Duration
 }
 
 // Name implements runtime.Component.
@@ -34,7 +34,7 @@ var _ runtime.Component = (*Extrapolator)(nil)
 // NewExtrapolatorAndOptions creates a new Extrapolator Component.
 func NewExtrapolatorAndOptions(extrapolatorProto *policylangv1.Extrapolator, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	exp := Extrapolator{
-		maxExtrapolationInterval: extrapolatorProto.MaxExtrapolationInterval.AsDuration(),
+		maxExtrapolationInterval: extrapolatorProto.Parameters.MaxExtrapolationInterval.AsDuration(),
 		lastOutput:               runtime.InvalidReading(),
 		lastValidTimestamp:       time.Time{},
 	}

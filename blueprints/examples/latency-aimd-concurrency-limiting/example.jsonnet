@@ -1,9 +1,9 @@
 local aperture = import '../../lib/1.0/main.libsonnet';
 local bundle = aperture.policies.LatencyAIMDConcurrencyLimiting.bundle;
 
-local WorkloadParameters = aperture.spec.v1.SchedulerParametersWorkloadParameters;
-local LabelMatcher = aperture.spec.v1.LabelMatcher;
-local Workload = aperture.spec.v1.SchedulerParametersWorkload;
+local workloadParameters = aperture.spec.v1.SchedulerWorkloadParameters;
+local labelMatcher = aperture.spec.v1.LabelMatcher;
+local workload = aperture.spec.v1.SchedulerWorkload;
 local classifier = aperture.spec.v1.Classifier;
 local fluxMeter = aperture.spec.v1.FluxMeter;
 local extractor = aperture.spec.v1.Extractor;
@@ -27,11 +27,10 @@ local svcSelector = flowSelector.new()
 
 local config = {
   common+: {
-    policyName: 'example',
+    policy_name: 'example',
   },
   policy+: {
-    fluxMeter: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector),
-    concurrencyLimiterFlowSelector: svcSelector,
+    flux_meter: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector),
     classifiers: [
       classifier.new()
       + classifier.withFlowSelector(svcSelector)
@@ -41,20 +40,23 @@ local config = {
                                         + extractor.withFrom('request.http.headers.user-type')),
       }),
     ],
-    concurrencyLimiter+: {
-      defaultWorkloadParameters: {
+    concurrency_controller+: {
+      flow_selector: svcSelector,
+      default_workload_parameters: {
         priority: 20,
       },
-      workloads: [
-        Workload.new()
-        + Workload.withWorkloadParameters(WorkloadParameters.withPriority(50))
-        // match the label extracted by classifier
-        + Workload.withLabelMatcher(LabelMatcher.withMatchLabels({ user_type: 'guest' })),
-        Workload.new()
-        + Workload.withWorkloadParameters(WorkloadParameters.withPriority(200))
-        // match the http header directly
-        + Workload.withLabelMatcher(LabelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
-      ],
+      scheduler+: {
+        workloads: [
+          workload.new()
+          + workload.withParameters(workloadParameters.withPriority(50))
+          // match the label extracted by classifier
+          + workload.withLabelMatcher(labelMatcher.withMatchLabels({ user_type: 'guest' })),
+          workload.new()
+          + workload.withParameters(workloadParameters.withPriority(200))
+          // match the http header directly
+          + workload.withLabelMatcher(labelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
+        ],
+      },
     },
   },
 };

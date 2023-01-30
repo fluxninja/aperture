@@ -21,42 +21,36 @@ This blueprint provides a simple static rate limiting policy and a dashboard.
 
 ### Common
 
-| Parameter Name      | Parameter Type | Default      | Description         |
-| ------------------- | -------------- | ------------ | ------------------- |
-| `common.policyName` | `string`       | `(required)` | Name of the policy. |
+| Parameter Name       | Parameter Type | Default      | Description         |
+| -------------------- | -------------- | ------------ | ------------------- |
+| `common.policy_name` | `string`       | `(required)` | Name of the policy. |
 
 ### Policy
 
-| Parameter Name                   | Parameter Type                  | Default      | Description                                                 |
-| -------------------------------- | ------------------------------- | ------------ | ----------------------------------------------------------- |
-| `policy.evaluationInterval`      | `string`                        | `"300s"`     | How often should the policy be re-evaluated                 |
-| `policy.rateLimit`               | `float64`                       | `(required)` | How many requests per `policy.limitResetInterval` to accept |
-| `policy.rateLimiterFlowSelector` | `aperture.spec.v1.FlowSelector` | `(required)` | A flow selector to match requests against                   |
-| `policy.limitResetInterval`      | `string`                        | `"1s"`       | The window for `policy.rateLimit`                           |
-| `policy.labelKey`                | `string`                        | `(required)` | What flow label to use for rate limiting                    |
+| Parameter Name               | Parameter Type                  | Default  | Description                                 |
+| ---------------------------- | ------------------------------- | -------- | ------------------------------------------- |
+| `policy.evaluation_interval` | `string`                        | `"300s"` | How often should the policy be re-evaluated |
+| `policy.classifiers`         | `[]aperture.spec.v1.Classifier` | `[]`     | List of classification rules.               |
 
-#### Overrides
+#### Rate Limiter
 
-| Parameter Name     | Parameter Type                           | Default | Description                                     |
-| ------------------ | ---------------------------------------- | ------- | ----------------------------------------------- |
-| `policy.overrides` | `[]aperture.spec.v1.RateLimiterOverride` | `[]`    | A list of limit overrides for the rate limiter. |
-
-#### Lazy Sync
-
-| Parameter Name            | Parameter Type | Default | Description                                                          |
-| ------------------------- | -------------- | ------- | -------------------------------------------------------------------- |
-| `policy.lazySync.enabled` | `boolean`      | `true`  | Enable lazy syncing.                                                 |
-| `policy.lazySync.numSync` | `integer`      | `5`     | Number of times to lazy sync within the `policy.limitResetInterval`. |
+| Parameter Name                             | Parameter Type                              | Default                                                                                                    | Description                                                                            |
+| ------------------------------------------ | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `policy.rate_limiter.rate_limit`           | `float64`                                   | `(required)`                                                                                               | Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept |
+| `policy.rate_limiter.flow_selector`        | `aperture.spec.v1.FlowSelector`             | `(required)`                                                                                               | A flow selector to match requests against                                              |
+| `policy.rate_limiter.parameters`           | `aperture.spec.v1.RateLimiterParameters`    | `{'label_key': 'FAKE-VALUE', 'lazy_sync': {'enabled': True, 'num_sync': 5}, 'limit_reset_interval': '1s'}` | Parameters.                                                                            |
+| `policy.rate_limiter.parameters.label_key` | `string`                                    | `(required)`                                                                                               | Flow label to use for rate limiting.                                                   |
+| `policy.rate_limiter.dynamic_config`       | `aperture.spec.v1.RateLimiterDefaultConfig` | `{'overrides': []}`                                                                                        | Dynamic configuration for rate limiter that can be applied at the runtime.             |
 
 ### Dashboard
 
-| Parameter Name              | Parameter Type | Default | Description                            |
-| --------------------------- | -------------- | ------- | -------------------------------------- |
-| `dashboard.refreshInterval` | `string`       | `"10s"` | Refresh interval for dashboard panels. |
+| Parameter Name               | Parameter Type | Default | Description                            |
+| ---------------------------- | -------------- | ------- | -------------------------------------- |
+| `dashboard.refresh_interval` | `string`       | `"10s"` | Refresh interval for dashboard panels. |
 
 #### Datasource
 
-| Parameter Name                     | Parameter Type | Default         | Description              |
-| ---------------------------------- | -------------- | --------------- | ------------------------ |
-| `dashboard.datasource.name`        | `string`       | `"$datasource"` | Datasource name.         |
-| `dashboard.datasource.filterRegex` | `string`       | `""`            | Datasource filter regex. |
+| Parameter Name                      | Parameter Type | Default         | Description              |
+| ----------------------------------- | -------------- | --------------- | ------------------------ |
+| `dashboard.datasource.name`         | `string`       | `"$datasource"` | Datasource name.         |
+| `dashboard.datasource.filter_regex` | `string`       | `""`            | Datasource filter regex. |

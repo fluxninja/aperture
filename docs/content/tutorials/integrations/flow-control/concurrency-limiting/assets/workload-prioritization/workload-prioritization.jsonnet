@@ -10,9 +10,9 @@ local controlPoint = aperture.spec.v1.ControlPoint;
 local classifier = aperture.spec.v1.Classifier;
 local extractor = aperture.spec.v1.Extractor;
 local rule = aperture.spec.v1.Rule;
-local workloadParameters = aperture.spec.v1.SchedulerParametersWorkloadParameters;
+local workloadParameters = aperture.spec.v1.SchedulerWorkloadParameters;
 local labelMatcher = aperture.spec.v1.LabelMatcher;
-local workload = aperture.spec.v1.SchedulerParametersWorkload;
+local workload = aperture.spec.v1.SchedulerWorkload;
 
 
 local svcSelector =
@@ -28,13 +28,31 @@ local svcSelector =
   );
 
 local policyResource = latencyAIMDPolicy({
-  policyName: 'service1-demo-app',
-  fluxMeter: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector),
-  concurrencyLimiterFlowSelector: svcSelector,
-  dynamicConfig: {
-    dryRun: false,
+  policy_name: 'service1-demo-app',
+  flux_meter: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector),
+  concurrency_controller+: {
+    flow_selector: svcSelector,
+    dynamicConfig: {
+      dryRun: false,
+    },
+    // highlight-start
+    scheduler+: {
+      timeout_factor: 0.5,
+      default_workload_parameters: {
+        priority: 20,
+      },
+      workloads: [
+        workload.new()
+        + workload.withParameters(workloadParameters.withPriority(50))
+        // match the label extracted by classifier
+        + workload.withLabelMatcher(labelMatcher.withMatchLabels({ user_type: 'guest' })),
+        workload.new()
+        + workload.withParameters(workloadParameters.withPriority(200))
+        // alternatively, match the http header directly
+        + workload.withLabelMatcher(labelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
+      ],
+    },
   },
-  // highlight-start
   classifiers: [
     classifier.new()
     + classifier.withFlowSelector(svcSelector)
@@ -44,22 +62,6 @@ local policyResource = latencyAIMDPolicy({
                                       + extractor.withFrom('request.http.headers.user-type')),
     }),
   ],
-  concurrencyLimiter+: {
-    timeoutFactor: 0.5,
-    defaultWorkloadParameters: {
-      priority: 20,
-    },
-    workloads: [
-      workload.new()
-      + workload.withWorkloadParameters(workloadParameters.withPriority(50))
-      // match the label extracted by classifier
-      + workload.withLabelMatcher(labelMatcher.withMatchLabels({ user_type: 'guest' })),
-      workload.new()
-      + workload.withWorkloadParameters(workloadParameters.withPriority(200))
-      // alternatively, match the http header directly
-      + workload.withLabelMatcher(labelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
-    ],
-  },
   // highlight-end
 }).policyResource;
 

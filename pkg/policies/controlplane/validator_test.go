@@ -142,9 +142,10 @@ spec:
             output:
               signal_name: "MAX_EMA"
       - ema:
-          ema_window: "300s"
-          warmup_window: "10s"
-          correction_factor_on_max_envelope_violation: "0.95"
+          parameters:
+            ema_window: "300s"
+            warmup_window: "10s"
+            correction_factor_on_max_envelope_violation: "0.95"
           in_ports:
             input:
               signal_name: "LATENCY"
@@ -171,7 +172,7 @@ spec:
             output:
               signal_name: "LATENCY_SETPOINT"
       - gradient_controller:
-          gradient_parameters:
+          parameters:
             slope: -1
             min_gradient: "0.1"
             max_gradient: "1.0"
@@ -207,17 +208,17 @@ spec:
               flow_matcher:
                 control_point: "ingress"
             scheduler:
-              scheduler_parameters:
+              parameters:
                 auto_tokens: true
                 default_workload_parameters:
                   priority: 20
                 workloads:
-                  - workload_parameters:
+                  - parameters:
                       priority: 50
                     label_matcher:
                       match_labels:
                         user_type: "guest"
-                  - workload_parameters:
+                  - parameters:
                       priority: 200
                     label_matcher:
                       match_labels:
@@ -400,6 +401,7 @@ spec:
                 service: "service1-demo-app.demoapp.svc.cluster.local"
               flow_matcher:
                 control_point: "ingress"
-            label_key: "http.request.header.user_type"
-            limit_reset_interval: "1s"
+            parameters:
+              label_key: "http.request.header.user_type"
+              limit_reset_interval: "1s"
 `

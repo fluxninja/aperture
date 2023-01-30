@@ -77,12 +77,12 @@ An example (partial):
   /**
   * @section Latency AIMD Concurrency Limiting Policy
   *
-  * @param (policy.policyName: string required) A name of the policy, used within PromQL queries for fluxmeter metrics.
-  * @param (policy.evaluationInterval: string) How often should policy be re-evaluated.
+  * @param (policy.policy_name: string required) A name of the policy, used within PromQL queries for fluxmeter metrics.
+  * @param (policy.evaluation_interval: string) How often should policy be re-evaluated.
   */
   policy: {
-    policyName: error 'policyName is not set',
-    evaluationInterval: '0.5s',
+    policy_name: error 'policyName is not set',
+    evaluation_interval: '0.5s',
   }
 }
 ```
