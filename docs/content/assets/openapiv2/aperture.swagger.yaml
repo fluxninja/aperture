@@ -1117,6 +1117,13 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: Result of arithmetic operation.
     description: Outputs for the Arithmetic Combinator component.
+  v1AutoScale:
+    type: object
+    properties:
+      horizontal_pod_scaler:
+        $ref: '#/definitions/v1HorizontalPodScaler'
+        description: HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+    description: AutoScale components are used to scale a service.
   v1CheckResponse:
     type: object
     properties:
@@ -1361,9 +1368,15 @@ definitions:
       nested_signal_egress:
         $ref: '#/definitions/v1NestedSignalEgress'
         description: Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
-      integration:
-        $ref: '#/definitions/v1Integration'
-        description: Integration are components that are used to integrate with external systems.
+      query:
+        $ref: '#/definitions/v1Query'
+        description: Query components that are query databases such as Prometheus.
+      flow_control:
+        $ref: '#/definitions/v1FlowControl'
+        description: FlowControl components are used to regulate requests flow.
+      auto_scale:
+        $ref: '#/definitions/v1AutoScale'
+        description: AutoScale components are used to scale the service.
     description: |-
       :::info
       See also [Components overview](/concepts/policy/circuit.md#components).
@@ -1847,6 +1860,19 @@ definitions:
         $ref: '#/definitions/v1OutPort'
         description: First valid input signal as an output signal.
     description: Outputs for the FirstValid component.
+  v1FlowControl:
+    type: object
+    properties:
+      rate_limiter:
+        $ref: '#/definitions/v1RateLimiter'
+        description: Rate Limiter provides service protection by applying rate limiter.
+      concurrency_limiter:
+        $ref: '#/definitions/v1ConcurrencyLimiter'
+        description: Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
+      aimd_concurrency_controller:
+        $ref: '#/definitions/v1AIMDConcurrencyController'
+        description: AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
+    description: FlowControl components are used to regulate requests flow.
   v1FlowMatcher:
     type: object
     properties:
@@ -2192,25 +2218,6 @@ definitions:
         $ref: '#/definitions/v1ConstantSignal'
         description: Constant value to be used for this InPort instead of a signal.
     title: Components receive input from other components via InPorts
-  v1Integration:
-    type: object
-    properties:
-      promql:
-        $ref: '#/definitions/v1PromQL'
-        description: Periodically runs a Prometheus query in the background and emits the result.
-      rate_limiter:
-        $ref: '#/definitions/v1RateLimiter'
-        description: Rate Limiter provides service protection by applying rate limiter.
-      concurrency_limiter:
-        $ref: '#/definitions/v1ConcurrencyLimiter'
-        description: Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
-      aimd_concurrency_controller:
-        $ref: '#/definitions/v1AIMDConcurrencyController'
-        description: AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
-      horizontal_pod_scaler:
-        $ref: '#/definitions/v1HorizontalPodScaler'
-        description: HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
-    description: Integration are components that are used to integrate with external systems.
   v1Integrator:
     type: object
     properties:
@@ -2938,6 +2945,13 @@ definitions:
       output:
         $ref: '#/definitions/v1OutPort'
     description: Outputs for the PulseGenerator component.
+  v1Query:
+    type: object
+    properties:
+      promql:
+        $ref: '#/definitions/v1PromQL'
+        description: Periodically runs a Prometheus query in the background and emits the result.
+    description: Query components that are query databases such as Prometheus.
   v1RateLimiter:
     type: object
     properties:

@@ -305,9 +305,9 @@ func ParseAIMDConcurrencyController(
 				},
 			},
 			{
-				Component: &policylangv1.Component_Integration{
-					Integration: &policylangv1.Integration{
-						Component: &policylangv1.Integration_ConcurrencyLimiter{
+				Component: &policylangv1.Component_FlowControl{
+					FlowControl: &policylangv1.FlowControl{
+						Component: &policylangv1.FlowControl_ConcurrencyLimiter{
 							ConcurrencyLimiter: &policylangv1.ConcurrencyLimiter{
 								FlowSelector: aimdConcurrencyController.FlowSelector,
 								Scheduler: &policylangv1.Scheduler{

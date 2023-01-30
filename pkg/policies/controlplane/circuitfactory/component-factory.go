@@ -25,7 +25,7 @@ func FactoryModule() fx.Option {
 // FactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
 func FactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 	return fx.Options(
-		compositeComponentFactoryModuleForPolicyApp(circuitAPI),
+		autoScaleModuleForPolicyApp(circuitAPI),
 		promql.ModuleForPolicyApp(circuitAPI),
 	)
 }
@@ -82,16 +82,23 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.NestedSignalEgress, components.NewNestedSignalEgressAndOptions)
 	case *policylangv1.Component_NestedCircuit:
 		return ParseNestedCircuit(componentID, config.NestedCircuit, policyReadAPI)
-	case *policylangv1.Component_Integration:
-		integration := componentProto.GetIntegration()
-		switch integrationConfig := integration.Component.(type) {
-		case *policylangv1.Integration_Promql:
-			ctor = mkCtor(integrationConfig.Promql, promql.NewPromQLAndOptions)
-		case *policylangv1.Integration_RateLimiter:
-			ctor = mkCtor(integrationConfig.RateLimiter, rate.NewRateLimiterAndOptions)
-		default:
-			return newIntegrationCompositeAndOptions(integration, componentID, policyReadAPI)
+	case *policylangv1.Component_Query:
+		query := componentProto.GetQuery()
+		switch queryConfig := query.Component.(type) {
+		case *policylangv1.Query_Promql:
+			ctor = mkCtor(queryConfig.Promql, promql.NewPromQLAndOptions)
 		}
+	case *policylangv1.Component_FlowControl:
+		flowControl := componentProto.GetFlowControl()
+		switch flowControlConfig := flowControl.Component.(type) {
+		case *policylangv1.FlowControl_RateLimiter:
+			ctor = mkCtor(flowControlConfig.RateLimiter, rate.NewRateLimiterAndOptions)
+		default:
+			return newFlowControlCompositeAndOptions(flowControl, componentID, policyReadAPI)
+		}
+	case *policylangv1.Component_AutoScale:
+		autoScale := componentProto.GetAutoScale()
+		return newAutoScaleCompositeAndOptions(autoScale, componentID, policyReadAPI)
 	default:
 		return nil, nil, nil, fmt.Errorf("unknown component type: %T", config)
 	}

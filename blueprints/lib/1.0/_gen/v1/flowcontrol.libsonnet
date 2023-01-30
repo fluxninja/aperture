@@ -13,18 +13,6 @@
   withConcurrencyLimiterMixin(concurrency_limiter):: {
     concurrency_limiter+: concurrency_limiter,
   },
-  withHorizontalPodScaler(horizontal_pod_scaler):: {
-    horizontal_pod_scaler: horizontal_pod_scaler,
-  },
-  withHorizontalPodScalerMixin(horizontal_pod_scaler):: {
-    horizontal_pod_scaler+: horizontal_pod_scaler,
-  },
-  withPromql(promql):: {
-    promql: promql,
-  },
-  withPromqlMixin(promql):: {
-    promql+: promql,
-  },
   withRateLimiter(rate_limiter):: {
     rate_limiter: rate_limiter,
   },

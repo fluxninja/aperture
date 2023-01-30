@@ -798,6 +798,21 @@ Outputs for the Arithmetic Combinator component.
 </dd>
 </dl>
 
+### v1AutoScale {#v1-auto-scale}
+
+AutoScale components are used to scale a service.
+
+#### Properties
+
+<dl>
+<dt>horizontal_pod_scaler</dt>
+<dd>
+
+([V1HorizontalPodScaler](#v1-horizontal-pod-scaler)) HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+
+</dd>
+</dl>
+
 ### v1Circuit {#v1-circuit}
 
 Circuit is defined as a dataflow graph of inter-connected components
@@ -1074,10 +1089,22 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([V1NestedSignalEgress](#v1-nested-signal-egress)) Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
 
 </dd>
-<dt>integration</dt>
+<dt>query</dt>
 <dd>
 
-([V1Integration](#v1-integration)) Integration are components that are used to integrate with external systems.
+([V1Query](#v1-query)) Query components that are query databases such as Prometheus.
+
+</dd>
+<dt>flow_control</dt>
+<dd>
+
+([V1FlowControl](#v1-flow-control)) FlowControl components are used to regulate requests flow.
+
+</dd>
+<dt>auto_scale</dt>
+<dd>
+
+([V1AutoScale](#v1-auto-scale)) AutoScale components are used to scale the service.
 
 </dd>
 </dl>
@@ -1659,6 +1686,33 @@ Outputs for the FirstValid component.
 </dd>
 </dl>
 
+### v1FlowControl {#v1-flow-control}
+
+FlowControl components are used to regulate requests flow.
+
+#### Properties
+
+<dl>
+<dt>rate_limiter</dt>
+<dd>
+
+([V1RateLimiter](#v1-rate-limiter)) Rate Limiter provides service protection by applying rate limiter.
+
+</dd>
+<dt>concurrency_limiter</dt>
+<dd>
+
+([V1ConcurrencyLimiter](#v1-concurrency-limiter)) Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
+
+</dd>
+<dt>aimd_concurrency_controller</dt>
+<dd>
+
+([V1AIMDConcurrencyController](#v1-a-i-m-d-concurrency-controller)) AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
+
+</dd>
+</dl>
+
 ### v1FlowMatcher {#v1-flow-matcher}
 
 Describes which flows a [flow control
@@ -2120,45 +2174,6 @@ Components receive input from other components via InPorts
 <dd>
 
 ([V1ConstantSignal](#v1-constant-signal)) Constant value to be used for this InPort instead of a signal.
-
-</dd>
-</dl>
-
-### v1Integration {#v1-integration}
-
-Integration are components that are used to integrate with external systems.
-
-#### Properties
-
-<dl>
-<dt>promql</dt>
-<dd>
-
-([V1PromQL](#v1-prom-q-l)) Periodically runs a Prometheus query in the background and emits the result.
-
-</dd>
-<dt>rate_limiter</dt>
-<dd>
-
-([V1RateLimiter](#v1-rate-limiter)) Rate Limiter provides service protection by applying rate limiter.
-
-</dd>
-<dt>concurrency_limiter</dt>
-<dd>
-
-([V1ConcurrencyLimiter](#v1-concurrency-limiter)) Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
-
-</dd>
-<dt>aimd_concurrency_controller</dt>
-<dd>
-
-([V1AIMDConcurrencyController](#v1-a-i-m-d-concurrency-controller)) AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
-
-</dd>
-<dt>horizontal_pod_scaler</dt>
-<dd>
-
-([V1HorizontalPodScaler](#v1-horizontal-pod-scaler)) HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
 
 </dd>
 </dl>
@@ -3083,6 +3098,21 @@ Outputs for the PulseGenerator component.
 <dd>
 
 ([V1OutPort](#v1-out-port))
+
+</dd>
+</dl>
+
+### v1Query {#v1-query}
+
+Query components that are query databases such as Prometheus.
+
+#### Properties
+
+<dl>
+<dt>promql</dt>
+<dd>
+
+([V1PromQL](#v1-prom-q-l)) Periodically runs a Prometheus query in the background and emits the result.
 
 </dd>
 </dl>

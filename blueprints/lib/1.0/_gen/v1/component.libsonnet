@@ -19,6 +19,12 @@
   withArithmeticCombinatorMixin(arithmetic_combinator):: {
     arithmetic_combinator+: arithmetic_combinator,
   },
+  withAutoScale(auto_scale):: {
+    auto_scale: auto_scale,
+  },
+  withAutoScaleMixin(auto_scale):: {
+    auto_scale+: auto_scale,
+  },
   withDecider(decider):: {
     decider: decider,
   },
@@ -49,6 +55,12 @@
   withFirstValidMixin(first_valid):: {
     first_valid+: first_valid,
   },
+  withFlowControl(flow_control):: {
+    flow_control: flow_control,
+  },
+  withFlowControlMixin(flow_control):: {
+    flow_control+: flow_control,
+  },
   withGradientController(gradient_controller):: {
     gradient_controller: gradient_controller,
   },
@@ -60,12 +72,6 @@
   },
   withHolderMixin(holder):: {
     holder+: holder,
-  },
-  withIntegration(integration):: {
-    integration: integration,
-  },
-  withIntegrationMixin(integration):: {
-    integration+: integration,
   },
   withIntegrator(integrator):: {
     integrator: integrator,
@@ -120,6 +126,12 @@
   },
   withPulseGeneratorMixin(pulse_generator):: {
     pulse_generator+: pulse_generator,
+  },
+  withQuery(query):: {
+    query: query,
+  },
+  withQueryMixin(query):: {
+    query+: query,
   },
   withSqrt(sqrt):: {
     sqrt: sqrt,

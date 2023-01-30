@@ -208,28 +208,42 @@ message Component {
     // Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
     NestedSignalEgress nested_signal_egress = 26;
 
-    // Integration are components that are used to integrate with external systems.
-    Integration integration = 100;
+    // Query components that are query databases such as Prometheus.
+    Query query = 100;
+    // FlowControl components are used to regulate requests flow.
+    FlowControl flow_control = 101;
+    // AutoScale components are used to scale the service.
+    AutoScale auto_scale = 102;
   }
 }
 
-// Integration are components that are used to integrate with external systems.
-message Integration {
+// Query components that are query databases such as Prometheus.
+message Query {
   oneof component {
     // Periodically runs a Prometheus query in the background and emits the result.
     PromQL promql = 1;
+  }
+}
 
+// FlowControl components are used to regulate requests flow.
+message FlowControl {
+  oneof component {
     // Rate Limiter provides service protection by applying rate limiter.
-    RateLimiter rate_limiter = 2;
+    RateLimiter rate_limiter = 1;
 
     // Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
-    ConcurrencyLimiter concurrency_limiter = 3;
+    ConcurrencyLimiter concurrency_limiter = 2;
 
     // AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
-    AIMDConcurrencyController aimd_concurrency_controller = 4;
+    AIMDConcurrencyController aimd_concurrency_controller = 3;
+  }
+}
 
+// AutoScale components are used to scale a service.
+message AutoScale {
+  oneof component {
     // HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
-    HorizontalPodScaler horizontal_pod_scaler = 5;
+    HorizontalPodScaler horizontal_pod_scaler = 1;
   }
 }
 

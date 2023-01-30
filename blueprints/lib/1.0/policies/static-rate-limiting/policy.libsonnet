@@ -5,7 +5,7 @@ local policy = spec.v1.Policy;
 local resources = spec.v1.Resources;
 local circuit = spec.v1.Circuit;
 local component = spec.v1.Component;
-local integration = spec.v1.Integration;
+local flowControl = spec.v1.FlowControl;
 local rateLimiter = spec.v1.RateLimiter;
 local dynamicConfig = spec.v1.RateLimiterDynamicConfig;
 local override = spec.v1.RateLimiterOverride;
@@ -24,9 +24,9 @@ function(params) {
       circuit.new()
       + circuit.withEvaluationInterval($._config.evaluationInterval)
       + circuit.withComponents([
-        component.withIntegration(
-          integration.new()
-          + integration.withRateLimiter(
+        component.withFlowControl(
+          flowControl.new()
+          + flowControl.withRateLimiter(
             rateLimiter.new()
             + rateLimiter.withInPorts({ limit: port.withConstantSignal($._config.rateLimit) })
             + rateLimiter.withFlowSelector($._config.rateLimiterFlowSelector)

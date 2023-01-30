@@ -7,7 +7,7 @@ metadata:
 spec:
   circuit:
     components:
-      - integration:
+      - query:
           promql:
             evaluation_interval: 1s
             out_ports:

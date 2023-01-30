@@ -117,7 +117,7 @@ spec:
   circuit:
     evaluation_interval: "0.5s"
     components:
-      - integration:
+      - query:
           promql:
             query_string: "sum(increase(flux_meter_sum{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))/sum(increase(flux_meter_count{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))"
             evaluation_interval: "1s"
@@ -199,7 +199,7 @@ spec:
           out_ports:
             output:
               signal_name: "LOAD_MULTIPLIER"
-      - integration:
+      - flow_control:
           concurrency_limiter:
             flow_selector:
               service_selector:
@@ -390,7 +390,7 @@ spec:
           out_ports:
             output:
               signal_name: "RATE_LIMIT"
-      - integration:
+      - flow_control:
           rate_limiter:
             in_ports:
               limit:

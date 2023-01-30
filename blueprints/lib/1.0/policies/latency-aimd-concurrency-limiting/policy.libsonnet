@@ -6,8 +6,9 @@ local resources = spec.v1.Resources;
 local circuit = spec.v1.Circuit;
 local classifier = spec.v1.Classifier;
 local flowSelector = spec.v1.FlowSelector;
+local query = spec.v1.Query;
 local component = spec.v1.Component;
-local integration = spec.v1.Integration;
+local flowControl = spec.v1.FlowControl;
 local promQL = spec.v1.PromQL;
 local port = spec.v1.Port;
 local combinator = spec.v1.ArithmeticCombinator;
@@ -45,9 +46,9 @@ function(params) {
       + circuit.withEvaluationInterval(evaluation_interval='0.5s')
       + circuit.withComponents(
         [
-          component.withIntegration(
-            integration.new()
-            + integration.withPromql(
+          component.withQuery(
+            query.new()
+            + query.withPromql(
               local q = 'sum(increase(flux_meter_sum{valid="true", flow_status="OK", flux_meter_name="%(policyName)s"}[5s]))/sum(increase(flux_meter_count{valid="true", flow_status="OK", flux_meter_name="%(policyName)s"}[5s]))' % { policyName: $._config.policyName };
               promQL.new()
               + promQL.withQueryString(q)
@@ -72,9 +73,9 @@ function(params) {
             )
             + ema.withOutPortsMixin(ema.outPorts.withOutput(port.withSignalName('LATENCY_EMA')))
           ),
-          component.withIntegration(
-            integration.new()
-            + integration.withAimdConcurrencyController(
+          component.withFlowControl(
+            flowControl.new()
+            + flowControl.withAimdConcurrencyController(
               aimdConcurrencyController.new()
               + aimdConcurrencyController.withFlowSelector($._config.concurrencyLimiterFlowSelector)
               + aimdConcurrencyController.withSchedulerParameters(
