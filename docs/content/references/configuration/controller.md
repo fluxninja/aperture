@@ -488,62 +488,6 @@ into smaller units.
 </dd>
 </dl>
 
-### BatchPostrollupConfig {#batch-postrollup-config}
-
-BatchPostrollupConfig defines configuration for OTEL batch processor.
-
-#### Properties
-
-<dl>
-<dt>send_batch_max_size</dt>
-<dd>
-
-(uint32, `gte=0`, default: `100`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
-into smaller units.
-
-</dd>
-<dt>send_batch_size</dt>
-<dd>
-
-(uint32, `gt=0`, default: `100`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
-
-</dd>
-<dt>timeout</dt>
-<dd>
-
-(string, `gt=0`, default: `1s`) Timeout sets the time after which a batch will be sent regardless of size.
-
-</dd>
-</dl>
-
-### BatchPrerollupConfig {#batch-prerollup-config}
-
-BatchPrerollupConfig defines configuration for OTEL batch processor.
-
-#### Properties
-
-<dl>
-<dt>send_batch_max_size</dt>
-<dd>
-
-(uint32, `gte=0`, default: `10000`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
-into smaller units.
-
-</dd>
-<dt>send_batch_size</dt>
-<dd>
-
-(uint32, `gt=0`, default: `10000`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
-
-</dd>
-<dt>timeout</dt>
-<dd>
-
-(string, `gt=0`, default: `10s`) Timeout sets the time after which a batch will be sent regardless of size.
-
-</dd>
-</dl>
-
 ### ClientConfig {#client-config}
 
 ClientConfig is the client configuration.
@@ -615,18 +559,6 @@ ControllerOTELConfig is the configuration for Agent's OTEL collector.
 <dd>
 
 ([BatchAlertsConfig](#batch-alerts-config))
-
-</dd>
-<dt>batch_postrollup</dt>
-<dd>
-
-([BatchPostrollupConfig](#batch-postrollup-config))
-
-</dd>
-<dt>batch_prerollup</dt>
-<dd>
-
-([BatchPrerollupConfig](#batch-prerollup-config))
 
 </dd>
 <dt>ports</dt>
