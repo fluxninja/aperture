@@ -57,6 +57,9 @@ parameters:
   updated-aperture-java:
     type: boolean
     default: false
+  updated-sdk-validator:
+    type: boolean
+    default: false
 
 jobs:
   build-push-add-tag:
@@ -829,7 +832,10 @@ workflows:
           work_dir: .
 
   aperture-go:
-    when: << pipeline.parameters.updated-aperture-go >>
+    when:
+      or:
+        - << pipeline.parameters.updated-aperture-go >>
+        - << pipeline.parameters.updated-sdk-validator >>
     jobs:
       - validate-publish-sdk:
           name: validate-publish-aperture-go
@@ -841,7 +847,10 @@ workflows:
           remote-repo-fingerprint: "eb:80:c9:44:c7:53:0f:ae:b7:4e:86:0f:62:60:6f:76"
 
   aperture-js:
-    when: << pipeline.parameters.updated-aperture-js >>
+    when:
+      or:
+        - << pipeline.parameters.updated-aperture-js >>
+        - << pipeline.parameters.updated-sdk-validator >>
     jobs:
       - validate-publish-sdk:
           name: validate-publish-aperture-js
@@ -853,7 +862,10 @@ workflows:
           remote-repo-fingerprint: "00:5e:cf:81:48:2d:e9:b8:34:74:8b:46:cc:ad:2f:ce"
 
   aperture-java:
-    when: << pipeline.parameters.updated-aperture-java >>
+    when:
+      or:
+        - << pipeline.parameters.updated-aperture-java >>
+        - << pipeline.parameters.updated-sdk-validator >>
     jobs:
       - build-aperture-java:
           name: Build with OpenJDK 8

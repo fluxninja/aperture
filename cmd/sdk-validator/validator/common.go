@@ -20,13 +20,16 @@ type CommonHandler struct {
 	Rejected int64
 }
 
+const targetLabelMissing = "UNKNOWN"
+
 // CheckWithValues is a dummy function for creating *flowcontrolv1.CheckResponse from given parameters.
 func (c *CommonHandler) CheckWithValues(ctx context.Context, services []string, controlPoint string, labels map[string]string) *flowcontrolv1.CheckResponse {
 	var path string
 	var found bool
 	if path, found = labels["http.target"]; !found {
-		log.Warn().Msg("Missing request path label")
-		path = "UNKNOWN"
+		// traffic control points will have this label set
+		log.Trace().Msg("Missing request path label")
+		path = targetLabelMissing
 	}
 	log.Trace().Msgf("Received FlowControl Check request from path %v", path)
 
@@ -49,5 +52,9 @@ func (c *CommonHandler) CheckWithValues(ctx context.Context, services []string, 
 }
 
 func shouldBeTested(path string) bool {
+	if path == targetLabelMissing {
+		// handle feature control points
+		return true
+	}
 	return strings.Contains(path, "super")
 }
