@@ -16,16 +16,20 @@ import (
 
 // Introducing some newtypes so that tests themselves are more readable.
 
-// Inputs map signal names to components that will emit test input.
-// Input components are required to emit an "output" signal, such as Input or
-// components.Variable. These can be created with NewInput and NewConstantInput.
-type Inputs map[runtime.SignalID]runtime.Component
+// Inputs map root signal names to components that will emit test input.  Input
+// components are required to emit an "output" signal, such as Input or
+// components.Variable. These can be created with NewInput and
+// NewConstantInput.
+type Inputs map[string]runtime.Component
 
-// OutputSignals is a list of signal names that comprise test output.
-type OutputSignals []runtime.SignalID
+// OutputSignals is a list of root signal names that comprise test output.
+type OutputSignals []string
 
 // Outputs map signal names to captured output readings.
-type Outputs map[runtime.SignalID][]Reading
+type Outputs map[string][]Reading
+
+// StepOutputs map signal names to captured output readings for a single step.
+type StepOutputs map[string]Reading
 
 // Circuit is a simulated circuit intended to be used in tests.
 type Circuit struct {
@@ -33,7 +37,7 @@ type Circuit struct {
 	meta    *simPolicyMeta
 	circuit *runtime.Circuit
 	inputs  Inputs
-	outputs map[runtime.SignalID]*output
+	outputs map[string]*output
 	tickNo  int
 }
 
@@ -83,16 +87,18 @@ func newCircuit(
 	outputSignals OutputSignals,
 	policyMeta *simPolicyMeta,
 ) (*Circuit, error) {
-	for inputSignal, input := range inputs {
+	for inputSignalName, input := range inputs {
+		inputSignal := runtime.MakeRootSignalID(inputSignalName)
 		components = append(components, ConfigureInputComponent(input, inputSignal))
 	}
 
-	outputs := make(map[runtime.SignalID]*output, len(outputSignals))
+	outputs := make(map[string]*output, len(outputSignals))
 
-	for _, outputSignal := range outputSignals {
+	for _, outputSignalName := range outputSignals {
 		output := &output{}
+		outputSignal := runtime.MakeRootSignalID(outputSignalName)
 		components = append(components, ConfigureOutputComponent(outputSignal, output))
-		outputs[outputSignal] = output
+		outputs[outputSignalName] = output
 	}
 
 	err := runtime.Compile(components, policyMeta.Registry.GetLogger())
@@ -116,16 +122,16 @@ func newCircuit(
 }
 
 // Step runs one tick of circuit execution and returns values of output signals.
-func (s *Circuit) Step() map[runtime.SignalID]Reading {
+func (s *Circuit) Step() StepOutputs {
 	s.execStep()
 
-	outputs := make(map[runtime.SignalID]Reading, len(s.outputs))
-	for outputSignal, output := range s.outputs {
+	outputs := make(StepOutputs, len(s.outputs))
+	for outputSignalName, output := range s.outputs {
 		readings := output.TakeReadings()
 		if len(readings) != 1 {
 			panic("unexpected output readings len")
 		}
-		outputs[outputSignal] = ReadingFromRt(readings[0])
+		outputs[outputSignalName] = ReadingFromRt(readings[0])
 	}
 	return outputs
 }
@@ -136,9 +142,9 @@ func (s *Circuit) Run(steps int) Outputs {
 		s.execStep()
 	}
 
-	outputs := make(map[runtime.SignalID][]Reading, len(s.outputs))
-	for outputSignal, output := range s.outputs {
-		outputs[outputSignal] = ReadingsFromRt(output.TakeReadings())
+	outputs := make(map[string][]Reading, len(s.outputs))
+	for outputSignalName, output := range s.outputs {
+		outputs[outputSignalName] = ReadingsFromRt(output.TakeReadings())
 	}
 	return outputs
 }
