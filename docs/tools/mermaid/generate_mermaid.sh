@@ -87,7 +87,8 @@ for mmd_file in $mmd_files; do
 		echo "generating svg and png files for $mmd_file"
 		# generate svg and png files
 		# loop formats svg and png
-		for fmt in svg png; do
+		# shellcheck disable=SC2043
+		for fmt in svg; do #png; do
 			npx -p @mermaid-js/mermaid-cli mmdc \
 				--quiet --input "$mmd_file" --configFile "$docsdir"/tools/mermaid/mermaid-theme.json --cssFile "$docsdir"/tools/mermaid/mermaid.css --scale 2 --output "$mmd_file"."$fmt" --backgroundColor transparent
 			git add "$mmd_file"."$fmt"
