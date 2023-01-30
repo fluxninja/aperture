@@ -35,7 +35,7 @@ func NewComponentAndOptions(
 	componentProto *policylangv1.Component,
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
-) ([]runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
+) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
 	var ctor componentConstructor
 	switch config := componentProto.Component.(type) {
 	case *policylangv1.Component_GradientController:
@@ -100,20 +100,20 @@ func NewComponentAndOptions(
 		autoScale := componentProto.GetAutoScale()
 		return newAutoScaleCompositeAndOptions(autoScale, componentID, policyReadAPI)
 	default:
-		return nil, nil, nil, fmt.Errorf("unknown component type: %T", config)
+		return Tree{}, nil, nil, fmt.Errorf("unknown component type: %T", config)
 	}
 
 	component, config, option, err := ctor(componentID.String(), policyReadAPI)
 	if err != nil {
-		return nil, nil, nil, err
+		return Tree{}, nil, nil, err
 	}
 
 	configuredComponent, err := prepareComponent(component, config, componentID)
 	if err != nil {
-		return nil, nil, nil, err
+		return Tree{}, nil, nil, err
 	}
 
-	return nil, []runtime.ConfiguredComponent{configuredComponent}, option, nil
+	return Tree{Root: configuredComponent}, []runtime.ConfiguredComponent{configuredComponent}, option, nil
 }
 
 type componentConstructor func(

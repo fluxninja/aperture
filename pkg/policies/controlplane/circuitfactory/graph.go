@@ -22,7 +22,7 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 	}
 	outSignalsIndex := make(map[string][]componentData)
 	inSignalsIndex := make(map[string][]componentData)
-	for _, c := range circuit.leafComponents {
+	for _, c := range circuit.LeafComponents {
 		var inPorts, outPorts []*policymonitoringv1.PortView
 		for name, signals := range c.PortMapping.Ins {
 			for _, signal := range signals {

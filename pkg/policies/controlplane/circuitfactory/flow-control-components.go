@@ -16,21 +16,26 @@ func newFlowControlCompositeAndOptions(
 	flowControlComponentProto *policylangv1.FlowControl,
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
-) ([]runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
+) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
+	retErr := func(err error) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
+		return Tree{}, nil, nil, err
+	}
+
 	parentCircuitID, ok := componentID.ParentID()
 	if !ok {
-		return nil, nil, nil, fmt.Errorf("parent circuit ID not found for component %s", componentID)
+		return retErr(fmt.Errorf("parent circuit ID not found for component %s", componentID))
 	}
 	// Factory parser to determine what kind of composite component to create
 	if concurrencyLimiterProto := flowControlComponentProto.GetConcurrencyLimiter(); concurrencyLimiterProto != nil {
 		var (
 			configuredComponents []runtime.ConfiguredComponent
+			tree                 Tree
 			options              []fx.Option
 		)
 		portMapping := runtime.NewPortMapping()
 		concurrencyLimiterOptions, agentGroupName, concurrencyLimiterErr := concurrency.NewConcurrencyLimiterOptions(concurrencyLimiterProto, componentID.String(), policyReadAPI)
 		if concurrencyLimiterErr != nil {
-			return nil, nil, nil, concurrencyLimiterErr
+			return retErr(concurrencyLimiterErr)
 		}
 		options = append(options, concurrencyLimiterOptions)
 
@@ -39,23 +44,24 @@ func newFlowControlCompositeAndOptions(
 			// Use the same id as the component stack since agent sees only the component stack and generates metrics tagged with the component stack id
 			scheduler, schedulerOptions, err := concurrency.NewSchedulerAndOptions(schedulerProto, componentID.String(), policyReadAPI, agentGroupName)
 			if err != nil {
-				return nil, nil, nil, err
+				return retErr(err)
 			}
 
 			// Need a unique ID for sub component since it's used for graph generation
 			schedulerConfComp, err := prepareComponentInCircuit(scheduler, schedulerProto, componentID.ChildID("Scheduler"), parentCircuitID)
 			if err != nil {
-				return nil, nil, nil, err
+				return retErr(err)
 			}
 
 			configuredComponents = append(configuredComponents, schedulerConfComp)
+			tree.Children = append(tree.Children, Tree{Root: schedulerConfComp})
 
 			options = append(options, schedulerOptions)
 
 			// Merge port mapping for parent component
 			err = portMapping.Merge(schedulerConfComp.PortMapping)
 			if err != nil {
-				return nil, nil, nil, err
+				return retErr(err)
 			}
 		}
 
@@ -63,21 +69,22 @@ func newFlowControlCompositeAndOptions(
 		if loadActuatorProto := concurrencyLimiterProto.GetLoadActuator(); loadActuatorProto != nil {
 			loadActuator, loadActuatorOptions, err := concurrency.NewLoadActuatorAndOptions(loadActuatorProto, componentID.String(), policyReadAPI, agentGroupName)
 			if err != nil {
-				return nil, nil, nil, err
+				return retErr(err)
 			}
 
 			loadActuatorConfComp, err := prepareComponentInCircuit(loadActuator, loadActuatorProto, componentID.ChildID(".LoadActuator"), parentCircuitID)
 			if err != nil {
-				return nil, nil, nil, err
+				return retErr(err)
 			}
 			configuredComponents = append(configuredComponents, loadActuatorConfComp)
+			tree.Children = append(tree.Children, Tree{Root: loadActuatorConfComp})
 
 			options = append(options, loadActuatorOptions)
 
 			// Merge port mapping for parent component
 			err = portMapping.Merge(loadActuatorConfComp.PortMapping)
 			if err != nil {
-				return nil, nil, nil, err
+				return retErr(err)
 			}
 		}
 
@@ -87,14 +94,15 @@ func newFlowControlCompositeAndOptions(
 			componentID,
 		)
 		if err != nil {
-			return nil, nil, nil, err
+			return retErr(err)
 		}
 
 		concurrencyLimiterConfComp.PortMapping = portMapping
+		tree.Root = concurrencyLimiterConfComp
 
-		return []runtime.ConfiguredComponent{concurrencyLimiterConfComp}, configuredComponents, fx.Options(options...), nil
+		return tree, configuredComponents, fx.Options(options...), nil
 	} else if aimdConcurrencyController := flowControlComponentProto.GetAimdConcurrencyController(); aimdConcurrencyController != nil {
 		return ParseAIMDConcurrencyController(componentID, aimdConcurrencyController, policyReadAPI)
 	}
-	return nil, nil, nil, fmt.Errorf("unsupported/missing component type, proto: %+v", flowControlComponentProto)
+	return retErr(fmt.Errorf("unsupported/missing component type, proto: %+v", flowControlComponentProto))
 }

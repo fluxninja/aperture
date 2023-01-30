@@ -22,12 +22,18 @@ func Module() fx.Option {
 //
 // Circuit can also be converted to its graph view.
 type Circuit struct {
-	leafComponents   []runtime.ConfiguredComponent
-	parentComponents []runtime.ConfiguredComponent
+	Tree           Tree
+	LeafComponents []runtime.ConfiguredComponent
+}
+
+// Tree is a graph view of a Circuit.
+type Tree struct {
+	Children []Tree
+	Root     runtime.ConfiguredComponent
 }
 
 // Components returns a list of CompiledComponents, ready to create runtime.Circuit.
-func (circuit *Circuit) Components() []runtime.ConfiguredComponent { return circuit.leafComponents }
+func (circuit *Circuit) Components() []runtime.ConfiguredComponent { return circuit.LeafComponents }
 
 // CompileFromProto compiles a protobuf circuit definition into a Circuit.
 //
@@ -36,7 +42,7 @@ func CompileFromProto(
 	componentsProto []*policylangv1.Component,
 	policyReadAPI iface.Policy,
 ) (*Circuit, fx.Option, error) {
-	parentComponents, leafComponents, option, err := CreateComponents(componentsProto, runtime.NewComponentID("root"), policyReadAPI)
+	tree, leafComponents, option, err := CreateComponents(componentsProto, runtime.NewComponentID("root"), policyReadAPI)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -50,8 +56,8 @@ func CompileFromProto(
 	}
 
 	return &Circuit{
-		parentComponents: parentComponents,
-		leafComponents:   leafComponents,
+		Tree:           tree,
+		LeafComponents: leafComponents,
 	}, option, nil
 }
 
@@ -63,30 +69,30 @@ func CreateComponents(
 	componentsProto []*policylangv1.Component,
 	circuitID runtime.ComponentID,
 	policyReadAPI iface.Policy,
-) ([]runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
+) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
 	var (
-		leafComponents   []runtime.ConfiguredComponent
-		parentComponents []runtime.ConfiguredComponent
-		options          []fx.Option
+		leafComponents []runtime.ConfiguredComponent
+		tree           Tree
+		options        []fx.Option
 	)
 
 	for compIndex, componentProto := range componentsProto {
-		parentComps, leafComps, compOption, err := NewComponentAndOptions(
+		subTree, leafComps, compOption, err := NewComponentAndOptions(
 			componentProto,
 			circuitID.ChildID(strconv.Itoa(compIndex)),
 			policyReadAPI,
 		)
 		if err != nil {
-			return nil, nil, nil, err
+			return Tree{}, nil, nil, err
 		}
 		options = append(options, compOption)
 
-		// Add outerComponent to outerComponents
-		parentComponents = append(parentComponents, parentComps...)
+		// Append subTree to tree.Children
+		tree.Children = append(tree.Children, subTree)
 
 		// Add subComponents to configuredComponents
 		leafComponents = append(leafComponents, leafComps...)
 	}
 
-	return parentComponents, leafComponents, fx.Options(options...), nil
+	return tree, leafComponents, fx.Options(options...), nil
 }

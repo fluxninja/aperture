@@ -19,47 +19,51 @@ func ParseNestedCircuit(
 	nestedCircuitID runtime.ComponentID,
 	nestedCircuit *policylangv1.NestedCircuit,
 	policyReadAPI iface.Policy,
-) ([]runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
+) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
+	retErr := func(err error) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
+		return Tree{}, nil, nil, err
+	}
+
 	// serialize to jsonBytes
 	jsonBytes, err := json.Marshal(nestedCircuit)
 	if err != nil {
-		return nil, nil, nil, err
+		return retErr(err)
 	}
 	// unmarshal using our config layer to make sure defaults and validates happen
 	nestedCircuitProto := &policylangv1.NestedCircuit{}
 	err = config.UnmarshalJSON(jsonBytes, nestedCircuitProto)
 	if err != nil {
-		return nil, nil, nil, err
+		return retErr(err)
 	}
 
 	portMapping := runtime.NewPortMapping()
 	parentCircuitID, ok := nestedCircuitID.ParentID()
 	if !ok {
-		return nil, nil, nil, errors.Errorf("nested circuit %s does not have a parent circuit", nestedCircuitID)
+		return retErr(errors.Errorf("nested circuit %s does not have a parent circuit", nestedCircuitID))
 	}
 
 	inPortsMap := nestedCircuitProto.GetInPortsMap()
 	ins, err := DecodePortMap(inPortsMap, parentCircuitID.String())
 	if err != nil {
-		return nil, nil, nil, err
+		return retErr(err)
 	}
 
 	outPortsMap := nestedCircuitProto.GetOutPortsMap()
 	outs, err := DecodePortMap(outPortsMap, parentCircuitID.String())
 	if err != nil {
-		return nil, nil, nil, err
+		return retErr(err)
 	}
 
 	portMapping.Ins = ins
 	portMapping.Outs = outs
 
-	parentComponents, leafComponents, options, err := CreateComponents(
+	tree, leafComponents, options, err := CreateComponents(
 		nestedCircuitProto.GetComponents(),
 		nestedCircuitID,
 		policyReadAPI,
 	)
 	if err != nil {
-		return nil, nil, nil, err
+		return retErr(err)
 	}
 
 	// For tracking the ingress/egress port names in the nested circuit
@@ -74,7 +78,7 @@ func ParseNestedCircuit(
 			portName := nestedSignalIngress.PortName()
 			// tracking the port names in the nested circuit
 			if _, ok := ingressPorts[portName]; ok {
-				return nil, nil, nil, errors.Errorf("duplicate ingress port %s in nested circuit %s", portName, nestedCircuitProto.Name)
+				return retErr(errors.Errorf("duplicate ingress port %s in nested circuit %s", portName, nestedCircuitProto.Name))
 			}
 			ingressPorts[portName] = nil
 			signals, ok := portMapping.GetInPort(portName)
@@ -86,7 +90,7 @@ func ParseNestedCircuit(
 			portName := nestedSignalEgress.PortName()
 			// tracking the port names in the nested circuit
 			if _, ok := egressPorts[portName]; ok {
-				return nil, nil, nil, errors.Errorf("duplicate egress port %s in nested circuit %s", portName, nestedCircuitProto.Name)
+				return retErr(errors.Errorf("duplicate egress port %s in nested circuit %s", portName, nestedCircuitProto.Name))
 			}
 			egressPorts[portName] = nil
 			signals, ok := portMapping.GetOutPort(portName)
@@ -100,13 +104,13 @@ func ParseNestedCircuit(
 
 	for portName := range portMapping.Ins {
 		if _, ok := ingressPorts[portName]; !ok {
-			return nil, nil, nil, errors.Errorf("port %s not found in nested circuit %s", portName, nestedCircuitProto.Name)
+			return retErr(errors.Errorf("port %s not found in nested circuit %s", portName, nestedCircuitProto.Name))
 		}
 	}
 
 	for portName := range portMapping.Outs {
 		if _, ok := egressPorts[portName]; !ok {
-			return nil, nil, nil, errors.Errorf("port %s not found in nested circuit %s", portName, nestedCircuitProto.Name)
+			return retErr(errors.Errorf("port %s not found in nested circuit %s", portName, nestedCircuitProto.Name))
 		}
 	}
 
@@ -116,12 +120,12 @@ func ParseNestedCircuit(
 		nestedCircuitID,
 	)
 	if err != nil {
-		return nil, nil, nil, err
+		return retErr(err)
 	}
 	nestedCircConfComp.PortMapping = portMapping
-	parentComponents = append(parentComponents, nestedCircConfComp)
+	tree.Root = nestedCircConfComp
 
-	return parentComponents, leafComponents, options, err
+	return tree, leafComponents, options, err
 }
 
 // DecodePortMap decodes a proto port map into a PortToSignals map.

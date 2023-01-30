@@ -25,7 +25,7 @@ func ParseAIMDConcurrencyController(
 	nestedCircuitID runtime.ComponentID,
 	aimdConcurrencyController *policylangv1.AIMDConcurrencyController,
 	policyReadAPI iface.Policy,
-) ([]runtime.ConfiguredComponent, []runtime.ConfiguredComponent, fx.Option, error) {
+) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 	inPorts := aimdConcurrencyController.InPorts
 	if inPorts != nil {
