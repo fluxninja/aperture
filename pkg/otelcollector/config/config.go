@@ -185,7 +185,7 @@ var BaseFxTag = config.NameTag("base")
 
 // OTELParams contains parameters for otel collector factories for agent and controller.
 type OTELParams struct {
-	promClient promapi.Client
+	PromClient promapi.Client
 	Config     *OTELConfig
 	Listener   *listener.Listener
 	tlsConfig  *tls.Config
@@ -217,7 +217,7 @@ func NewOTELParams(in FxIn) (*OTELParams, error) {
 	cfg := &OTELParams{
 		UserOTELConfig: userCfg,
 		Listener:       in.Listener,
-		promClient:     in.PromClient,
+		PromClient:     in.PromClient,
 		tlsConfig:      in.TLSConfig,
 		Config:         config,
 	}
