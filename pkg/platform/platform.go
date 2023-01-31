@@ -162,7 +162,7 @@ func ServerModule(testMode bool) fx.Option {
 
 // Run is an fx helper function to gracefully start and stop an app container.
 func Run(app *fx.App) {
-	platform.statusRegistry = platform.statusRegistry.Child(platformStatusPath)
+	platform.statusRegistry = platform.statusRegistry.Child("system", platformStatusPath)
 	// Check for dotflag
 	if platform.unmarshaller != nil {
 		dotfile := config.GetStringValue(platform.unmarshaller, dotFileKey, "")
