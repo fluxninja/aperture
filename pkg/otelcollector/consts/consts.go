@@ -122,6 +122,8 @@ const (
 	ReceiverPrometheus = "prometheus"
 	// ReceiverAlerts collects alerts from alerter.
 	ReceiverAlerts = "alerts"
+	// ReceiverKubeletStats collects metrics from kubelet.
+	ReceiverKubeletStats = "kubeletstats"
 
 	// ProcessorEnrichment enriches metrics with discovery data.
 	ProcessorEnrichment = "enrichment"
@@ -148,6 +150,8 @@ const (
 	ProcessorTracesToLogs = "tracestologs"
 	// ProcessorAlertsNamespace adds host info as `namespace` attribute.
 	ProcessorAlertsNamespace = "attributes/alerts"
+	// ProcessorFilterKubeletStats filters in only metrics of interest.
+	ProcessorFilterKubeletStats = "filter/kubeletstats"
 
 	// ExporterLogging exports telemetry using Aperture logger.
 	ExporterLogging = "logging"
