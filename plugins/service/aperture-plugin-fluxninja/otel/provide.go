@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
@@ -81,6 +82,12 @@ func provideOtelConfig(baseConfig *otelconfig.OTELConfig,
 			}
 			if _, exists := baseConfig.Service.Pipeline("metrics/controller-fast"); exists {
 				addMetricsControllerSlowPipeline(baseConfig, config)
+			}
+			for pipelineName, customMetricsPipeline := range baseConfig.Service.Pipelines {
+				if !strings.HasPrefix(pipelineName, "metrics/user-defined-") {
+					continue
+				}
+				addFNToPipeline(pipelineName, config, customMetricsPipeline)
 			}
 			return nil
 		},

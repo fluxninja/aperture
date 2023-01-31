@@ -1,10 +1,13 @@
+// +kubebuilder:validation:Optional
 package agent
 
 import (
 	"crypto/tls"
+	"fmt"
 
 	promapi "github.com/prometheus/client_golang/api"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
 
 	"github.com/fluxninja/aperture/pkg/config"
@@ -33,6 +36,9 @@ type AgentOTELConfig struct {
 	BatchPrerollup BatchPrerollupConfig `json:"batch_prerollup"`
 	// BatchPostrollup configures batch postrollup processor.
 	BatchPostrollup BatchPostrollupConfig `json:"batch_postrollup"`
+	// CustomMetrics configures custom metrics pipelines, which will send data to
+	// the controller prometheus.
+	CustomMetrics map[string]CustomMetricsConfig `json:"custom_metrics,omitempty"`
 }
 
 // BatchPrerollupConfig defines configuration for OTEL batch processor.
@@ -65,6 +71,66 @@ type BatchPostrollupConfig struct {
 	SendBatchMaxSize uint32 `json:"send_batch_max_size" validate:"gte=0" default:"100"`
 }
 
+// CustomMetricsConfig defines receivers, processors and single metrics pipeline,
+// which will be exported to the controller prometheus.
+// swagger:model
+// +kubebuilder:object:generate=true
+type CustomMetricsConfig struct {
+	// Receivers define receivers to be used in custom metrics pipelines. This should
+	// be in OTEL format - https://opentelemetry.io/docs/collector/configuration/#receivers.
+	// +kubebuilder:pruning:PreserveUnknownFields
+	// +kubebuilder:validation:Schemaless
+	Receivers Components `json:"receivers"`
+	// Processors define processors to be used in custom metrics pipelines. This should
+	// be in OTEL format - https://opentelemetry.io/docs/collector/configuration/#processors.
+	// +kubebuilder:pruning:PreserveUnknownFields
+	// +kubebuilder:validation:Schemaless
+	Processors Components `json:"processors"`
+	// Pipeline is an OTEL metrics pipeline definition, which **only** uses receivers
+	// and processors defined above. Exporter would be added automatically.
+	Pipeline CustomMetricsPipelineConfig `json:"pipeline"`
+}
+
+// Components is an alias type for map[string]any. This needs to be used
+// because of the CRD requirements for the operator.
+// https://github.com/kubernetes-sigs/controller-tools/issues/636
+// https://github.com/kubernetes-sigs/kubebuilder/issues/528
+// +kubebuilder:object:generate=false
+// +kubebuilder:pruning:PreserveUnknownFields
+// +kubebuilder:validation:Schemaless
+type Components map[string]any
+
+// DeepCopyInto is an deepcopy function, copying the receiver, writing into out.
+// In must be non-nil.
+// We need to specify this manyually, as the generator does not support `any`.
+func (in *Components) DeepCopyInto(out *Components) {
+	if in == nil {
+		*out = nil
+	} else {
+		*out = runtime.DeepCopyJSON(*in)
+	}
+}
+
+// DeepCopy is an deepcopy function, copying the receiver, creating a new
+// Components.
+// We need to specify this manyually, as the generator does not support `any`.
+func (in *Components) DeepCopy() *Components {
+	if in == nil {
+		return nil
+	}
+	out := new(Components)
+	in.DeepCopyInto(out)
+	return out
+}
+
+// CustomMetricsPipelineConfig defines a custom metrics pipeline.
+// swagger:model
+// +kubebuilder:object:generate=true
+type CustomMetricsPipelineConfig struct {
+	Receivers  []string `json:"receivers"`
+	Processors []string `json:"processors"`
+}
+
 func provideAgent(
 	unmarshaller config.Unmarshaller,
 	lis *listener.Listener,
@@ -83,6 +149,7 @@ func provideAgent(
 	addLogsPipeline(otelCfg, &agentCfg)
 	addTracesPipeline(otelCfg, lis)
 	addMetricsPipeline(otelCfg, &agentCfg, tlsConfig, lis, promClient)
+	addCustomMetricsPipelines(otelCfg, &agentCfg)
 	otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTELConfig, otelconsts.ProcessorAgentResourceLabels)
 	return otelCfg, nil
 }
@@ -173,6 +240,33 @@ func addMetricsPipeline(
 		},
 		Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
 	})
+}
+
+func addCustomMetricsPipelines(
+	config *otelconfig.OTELConfig,
+	agentConfig *AgentOTELConfig,
+) {
+	for metricName, metricConfig := range agentConfig.CustomMetrics {
+		for receiverName, receiverConfig := range config.Receivers {
+			config.AddReceiver(makeCustomComponentName(metricName, receiverName), receiverConfig)
+		}
+		for processorName, processorConfig := range config.Processors {
+			config.AddProcessor(makeCustomComponentName(metricName, processorName), processorConfig)
+		}
+		config.Service.AddPipeline(makeCustomMetricsName(metricName), otelconfig.Pipeline{
+			Receivers:  metricConfig.Pipeline.Receivers,
+			Processors: metricConfig.Pipeline.Processors,
+			Exporters:  []string{otelconsts.ExporterPrometheusRemoteWrite},
+		})
+	}
+}
+
+func makeCustomMetricsName(name string) string {
+	return fmt.Sprintf("metrics/user-defined-%s", name)
+}
+
+func makeCustomComponentName(metricName, name string) string {
+	return fmt.Sprintf("%s/user-defined-%s", name, metricName)
 }
 
 func addPrometheusReceiver(
