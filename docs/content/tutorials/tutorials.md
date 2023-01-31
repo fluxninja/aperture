@@ -17,16 +17,16 @@ tutorials cover a wide range of topics to help you get started with Aperture.
 
 ## Signal Processing
 
-Let's understand how to build policies tailored to your needs. For example, in
-one of the tutorials, we'll see how to detect overload using metrics passed
-through policy components, resulting in corrective actions.
+We’ll build a circuit that baselines a latency metric in order to detect
+overloads. This basic circuit can be extended further to send an Alert or take a
+corrective action.
 
 - [Writing Policy for Detecting Overload](./signal-processing/detecting-overload.md)
 
 ## Integrations
 
-Aperture offers various integrations, with Flow Control being one of them. Let's
-see what you can do with flow control.
+Aperture offers various integrations for control and automation. Let’s see
+what’s possible with Flow Control integration.
 
 ### Flow Control
 
