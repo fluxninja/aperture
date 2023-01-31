@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package controller
 
 import (

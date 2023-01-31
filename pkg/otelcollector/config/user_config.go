@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package config
 
 import "github.com/fluxninja/aperture/pkg/config"

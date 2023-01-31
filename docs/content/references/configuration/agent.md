@@ -558,6 +558,13 @@ AgentOTELConfig is the configuration for Agent's OTEL collector.
 #### Properties
 
 <dl>
+<dt>custom_metrics</dt>
+<dd>
+
+(map of [CustomMetricsConfig](#custom-metrics-config)) CustomMetrics configures custom metrics pipelines, which will send data to
+the controller prometheus.
+
+</dd>
 <dt>batch_alerts</dt>
 <dd>
 
@@ -757,6 +764,65 @@ ClientTLSConfig is the config for client TLS.
 <dd>
 
 (string)
+
+</dd>
+</dl>
+
+### Components {#components}
+
+Components is an alias type for map[string]any. This needs to be used
+because of the CRD requirements for the operator.
+https://github.com/kubernetes-sigs/controller-tools/issues/636
+https://github.com/kubernetes-sigs/kubebuilder/issues/528
+
+[Components](#components)
+
+### CustomMetricsConfig {#custom-metrics-config}
+
+CustomMetricsConfig defines receivers, processors and single metrics pipeline,
+
+which will be exported to the controller prometheus.
+
+#### Properties
+
+<dl>
+<dt>pipeline</dt>
+<dd>
+
+([CustomMetricsPipelineConfig](#custom-metrics-pipeline-config))
+
+</dd>
+<dt>processors</dt>
+<dd>
+
+([Components](#components))
+
+</dd>
+<dt>receivers</dt>
+<dd>
+
+([Components](#components))
+
+</dd>
+</dl>
+
+### CustomMetricsPipelineConfig {#custom-metrics-pipeline-config}
+
+CustomMetricsPipelineConfig defines a custom metrics pipeline.
+
+#### Properties
+
+<dl>
+<dt>processors</dt>
+<dd>
+
+([]string)
+
+</dd>
+<dt>receivers</dt>
+<dd>
+
+([]string)
 
 </dd>
 </dl>

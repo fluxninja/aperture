@@ -1427,10 +1427,6 @@ spec:
                             description: Timeout sets the time after which a batch
                               will be sent regardless of size.
                             type: string
-                        required:
-                        - send_batch_max_size
-                        - send_batch_size
-                        - timeout
                         type: object
                       batch_prerollup:
                         description: BatchPrerollup configures batch prerollup processor.
@@ -1450,10 +1446,40 @@ spec:
                             description: Timeout sets the time after which a batch
                               will be sent regardless of size.
                             type: string
-                        required:
-                        - send_batch_max_size
-                        - send_batch_size
-                        - timeout
+                        type: object
+                      custom_metrics:
+                        additionalProperties:
+                          description: CustomMetricsConfig defines receivers, processors
+                            and single metrics pipeline, which will be exported to
+                            the controller prometheus. swagger:model
+                          properties:
+                            pipeline:
+                              description: Pipeline is an OTEL metrics pipeline definition,
+                                which **only** uses receivers and processors defined
+                                above. Exporter would be added automatically.
+                              properties:
+                                processors:
+                                  items:
+                                    type: string
+                                  type: array
+                                receivers:
+                                  items:
+                                    type: string
+                                  type: array
+                              type: object
+                            processors:
+                              description: Processors define processors to be used
+                                in custom metrics pipelines. This should be in OTEL
+                                format - https://opentelemetry.io/docs/collector/configuration/#processors.
+                              x-kubernetes-preserve-unknown-fields: true
+                            receivers:
+                              description: Receivers define receivers to be used in
+                                custom metrics pipelines. This should be in OTEL format
+                                - https://opentelemetry.io/docs/collector/configuration/#receivers.
+                              x-kubernetes-preserve-unknown-fields: true
+                          type: object
+                        description: CustomMetrics configures custom metrics pipelines,
+                          which will send data to the controller prometheus.
                         type: object
                       ports:
                         description: Ports configures debug, health and extension
@@ -1477,9 +1503,6 @@ spec:
                             format: int32
                             type: integer
                         type: object
-                    required:
-                    - batch_postrollup
-                    - batch_prerollup
                     type: object
                   peer_discovery:
                     description: Peer discovery configuration.
