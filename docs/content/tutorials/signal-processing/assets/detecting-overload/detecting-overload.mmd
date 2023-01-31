@@ -15,6 +15,8 @@ style root.1_outports fill:none,stroke:none
 root.1output[output]
 end
 end
+FakeConstant0((1.10))
+FakeConstant0 --> root.2rhs
 subgraph root.2[<center>ArithmeticCombinator<br/>mul</center>]
 subgraph root.2_inports[ ]
 style root.2_inports fill:none,stroke:none
@@ -26,13 +28,11 @@ style root.2_outports fill:none,stroke:none
 root.2output[output]
 end
 end
-FakeConstant0((1.10))
-FakeConstant0 --> root.2rhs
 subgraph root.3[<center>Decider<br/>gt for 0s</center>]
 subgraph root.3_inports[ ]
 style root.3_inports fill:none,stroke:none
-root.3rhs[rhs]
 root.3lhs[lhs]
+root.3rhs[rhs]
 end
 subgraph root.3_outports[ ]
 style root.3_outports fill:none,stroke:none

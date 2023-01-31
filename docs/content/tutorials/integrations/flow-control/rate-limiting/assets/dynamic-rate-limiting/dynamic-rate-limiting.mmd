@@ -5,19 +5,21 @@ style root.0_outports fill:none,stroke:none
 root.0output[output]
 end
 end
+FakeConstant0((2.00))
+FakeConstant0 --> root.1rhs
 subgraph root.1[<center>ArithmeticCombinator<br/>mul</center>]
 subgraph root.1_inports[ ]
 style root.1_inports fill:none,stroke:none
-root.1lhs[lhs]
 root.1rhs[rhs]
+root.1lhs[lhs]
 end
 subgraph root.1_outports[ ]
 style root.1_outports fill:none,stroke:none
 root.1output[output]
 end
 end
-FakeConstant0((2.00))
-FakeConstant0 --> root.1rhs
+FakeConstant1((1.10))
+FakeConstant1 --> root.2rhs
 subgraph root.2[<center>ArithmeticCombinator<br/>mul</center>]
 subgraph root.2_inports[ ]
 style root.2_inports fill:none,stroke:none
@@ -29,8 +31,6 @@ style root.2_outports fill:none,stroke:none
 root.2output[output]
 end
 end
-FakeConstant1((1.10))
-FakeConstant1 --> root.2rhs
 subgraph root.3[<center>EMA<br/>win: 1500s</center>]
 subgraph root.3_inports[ ]
 style root.3_inports fill:none,stroke:none
@@ -50,10 +50,11 @@ root.4signal[signal]
 end
 subgraph root.4_outports[ ]
 style root.4_outports fill:none,stroke:none
-root.4is_overload[is_overload]
 root.4load_multiplier[load_multiplier]
 end
 end
+FakeConstant2((1.00))
+FakeConstant2 --> root.5rhs
 subgraph root.5[<center>Decider<br/>lt for 30s</center>]
 subgraph root.5_inports[ ]
 style root.5_inports fill:none,stroke:none
@@ -65,8 +66,10 @@ style root.5_outports fill:none,stroke:none
 root.5output[output]
 end
 end
-FakeConstant2((1.00))
-FakeConstant2 --> root.5rhs
+FakeConstant3((0.00))
+FakeConstant3 --> root.6on_true
+FakeConstant4((10.00))
+FakeConstant4 --> root.6on_false
 subgraph root.6[Switcher]
 subgraph root.6_inports[ ]
 style root.6_inports fill:none,stroke:none
@@ -79,10 +82,6 @@ style root.6_outports fill:none,stroke:none
 root.6output[output]
 end
 end
-FakeConstant3((0.00))
-FakeConstant3 --> root.6on_true
-FakeConstant4((10.00))
-FakeConstant4 --> root.6on_false
 subgraph root.7[<center>RateLimiter<br/>service1-demo-ap...</center>]
 subgraph root.7_inports[ ]
 style root.7_inports fill:none,stroke:none
