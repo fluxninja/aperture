@@ -25,8 +25,7 @@ corrective action.
 
 ## Integrations
 
-Aperture offers various integrations for control and automation. Let’s see
-what’s possible with Flow Control integration.
+Aperture offers various integrations for control and automation. We will explore use cases leveraging Flow Control integration.
 
 ### Flow Control
 
