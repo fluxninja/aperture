@@ -12,6 +12,8 @@ type Component interface {
 	// Generic name of the component, eg. "Gradient"
 	Name() string
 	Type() ComponentType
+	// ShortDescription is used when generating mermaid or dot diagrams.
+	ShortDescription() string
 }
 
 // ComponentType describes the type of a component based on its connectivity in the circuit.
@@ -33,16 +35,18 @@ const (
 )
 
 // NewDummyComponent creates a component with provided name and type.
-func NewDummyComponent(name string, componentType ComponentType) Component {
+func NewDummyComponent(name, shortDescription string, componentType ComponentType) Component {
 	return dummyComponent{
-		name:          name,
-		componentType: componentType,
+		name:             name,
+		shortDescription: shortDescription,
+		componentType:    componentType,
 	}
 }
 
 type dummyComponent struct {
-	name          string
-	componentType ComponentType
+	name             string
+	componentType    ComponentType
+	shortDescription string
 }
 
 // Execute implements runtime.Component.
@@ -59,3 +63,6 @@ func (c dummyComponent) Name() string { return c.name }
 
 // Type implements runtime.Component.
 func (c dummyComponent) Type() ComponentType { return c.componentType }
+
+// ShortDescription implements runtime.Component.
+func (c dummyComponent) ShortDescription() string { return c.shortDescription }

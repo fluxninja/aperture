@@ -115,7 +115,9 @@ func ParseNestedCircuit(
 	}
 
 	nestedCircConfComp, err := prepareComponent(
-		runtime.NewDummyComponent(nestedCircuitProto.Name, runtime.ComponentTypeSignalProcessor),
+		runtime.NewDummyComponent(nestedCircuitProto.Name,
+			nestedCircuitProto.ShortDescription,
+			runtime.ComponentTypeSignalProcessor),
 		nestedCircuitProto,
 		nestedCircuitID,
 	)

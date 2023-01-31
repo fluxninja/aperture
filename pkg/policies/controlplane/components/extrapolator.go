@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"time"
 
 	"go.uber.org/fx"
@@ -27,6 +28,11 @@ func (*Extrapolator) Name() string { return "Extrapolator" }
 
 // Type implements runtime.Component.
 func (*Extrapolator) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
+// ShortDescription implements runtime.Component.
+func (exp *Extrapolator) ShortDescription() string {
+	return fmt.Sprintf("for: %s", exp.maxExtrapolationInterval)
+}
 
 // Make sure Extrapolator complies with Component interface.
 var _ runtime.Component = (*Extrapolator)(nil)

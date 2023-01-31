@@ -24,6 +24,7 @@ type ControllerComponent struct {
 	defaultConfig    *policylangv1.GradientController_DynamicConfig
 	dynamicConfigKey string
 	componentName    string
+	shortDescription string
 	componentID      string
 	manualMode       bool
 }
@@ -32,6 +33,7 @@ type ControllerComponent struct {
 func NewControllerComponent(
 	controller Controller,
 	componentName string,
+	shortDescription string,
 	componentID string,
 	policyReadAPI iface.Policy,
 	dynamicConfigKey string,
@@ -44,6 +46,7 @@ func NewControllerComponent(
 		output:           runtime.InvalidReading(),
 		controller:       controller,
 		componentName:    componentName,
+		shortDescription: shortDescription,
 		componentID:      componentID,
 		policyReadAPI:    policyReadAPI,
 		dynamicConfigKey: dynamicConfigKey,
@@ -59,6 +62,11 @@ func (cc *ControllerComponent) Name() string { return cc.componentName }
 // Type implements runtime.Component.
 func (cc *ControllerComponent) Type() runtime.ComponentType {
 	return runtime.ComponentTypeSignalProcessor
+}
+
+// ShortDescription implements runtime.Component.
+func (cc *ControllerComponent) ShortDescription() string {
+	return cc.shortDescription
 }
 
 // Execute implements runtime.Component.Execute.

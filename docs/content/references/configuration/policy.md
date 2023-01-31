@@ -1781,7 +1781,7 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 <dt>service_selector</dt>
 <dd>
 
-([V1ServiceSelector](#v1-service-selector))
+([V1ServiceSelector](#v1-service-selector), `required`) @gotags: validate:"required"
 
 </dd>
 <dt>flow_matcher</dt>
@@ -2796,6 +2796,12 @@ Nested circuit defines a sub-circuit as a high-level component. It consists of a
 <dd>
 
 (string) Name of the nested circuit component. This name is displayed by graph visualization tools.
+
+</dd>
+<dt>short_description</dt>
+<dd>
+
+(string) Short description of the nested circuit component. This description is displayed by graph visualization tools.
 
 </dd>
 </dl>

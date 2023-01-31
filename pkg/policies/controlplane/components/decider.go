@@ -58,6 +58,11 @@ func (*Decider) Name() string { return "Decider" }
 // Type implements runtime.Component.
 func (*Decider) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
+// ShortDescription implements runtime.Component.
+func (dec *Decider) ShortDescription() string {
+	return fmt.Sprintf("%s for %s", dec.operator.String(), dec.trueForDuration.String())
+}
+
 // Make sure Decider complies with Component interface.
 var _ runtime.Component = (*Decider)(nil)
 

@@ -55,6 +55,9 @@ func (*Scheduler) Name() string { return "Scheduler" }
 // Type implements runtime.Component.
 func (*Scheduler) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
 
+// ShortDescription implements runtime.Component.
+func (s *Scheduler) ShortDescription() string { return s.agentGroupName }
+
 // NewSchedulerAndOptions creates scheduler and its fx options.
 func NewSchedulerAndOptions(
 	schedulerProto *policylangv1.Scheduler,

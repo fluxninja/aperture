@@ -26,6 +26,9 @@ func (c *logicalCombinator) Type() runtime.ComponentType {
 	return runtime.ComponentTypeSignalProcessor
 }
 
+// ShortDescription implements runtime.Component.
+func (c *logicalCombinator) ShortDescription() string { return "" }
+
 // Execute implements runtime.Component.
 func (c *logicalCombinator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	inputs := inPortReadings.ReadRepeatedReadingPort("inputs")
@@ -76,6 +79,9 @@ func (c *inverter) Name() string { return "Inverter" }
 
 // Type implements runtime.Component.
 func (c *inverter) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
+// ShortDescription implements runtime.Component.
+func (c *inverter) ShortDescription() string { return "" }
 
 // Execute implements runtime.Component.
 func (c *inverter) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {

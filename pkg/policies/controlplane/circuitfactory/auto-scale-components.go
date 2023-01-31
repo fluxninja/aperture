@@ -92,8 +92,17 @@ func newAutoScaleCompositeAndOptions(
 			}
 		}
 
+		kos := horizontalPodScalerProto.KubernetesObjectSelector
+		sd := fmt.Sprintf("%s/%s/%s/%s/%s",
+			kos.GetAgentGroup(),
+			kos.GetNamespace(),
+			kos.GetApiVersion(),
+			kos.GetKind(),
+			kos.GetName(),
+		)
+
 		horizontalPodScalerConfComp, err := prepareComponent(
-			runtime.NewDummyComponent("HorizontalPodScaler", runtime.ComponentTypeSignalProcessor),
+			runtime.NewDummyComponent("HorizontalPodScaler", sd, runtime.ComponentTypeSignalProcessor),
 			horizontalPodScalerProto,
 			componentID,
 		)

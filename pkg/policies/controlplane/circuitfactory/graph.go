@@ -66,55 +66,8 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 			log.Error().Err(err).Msg("converting component map")
 		}
 
-		getServiceSelector := func(selector interface{}) string {
-			selectorMap, ok := selector.(map[string]interface{})
-			if !ok {
-				return ""
-			}
-			serviceSelectorInterface, ok := selectorMap["service_selector"]
-			if !ok {
-				return ""
-			}
-			serviceSelector, ok := serviceSelectorInterface.(map[string]interface{})
-			if !ok {
-				return ""
-			}
-			agentGroup, ok := serviceSelector["agent_group"]
-			if !ok {
-				return ""
-			}
-			service, ok := serviceSelector["service"]
-			if !ok {
-				return ""
-			}
-			if agentGroup == "default" {
-				return service.(string)
-			}
-			return fmt.Sprintf("%s/%s", agentGroup, service)
-		}
-
 		componentName := c.Name()
-		componentDescription := ""
-		switch componentName {
-		case "Variable":
-			componentDescription = fmt.Sprintf("%s", componentConfig["default_config"])
-		case "ArithmeticCombinator":
-			componentDescription = fmt.Sprintf("%s", componentConfig["operator"])
-		case "Decider":
-			componentDescription = fmt.Sprintf("%s for %s", componentConfig["operator"], componentConfig["true_for"])
-		case "EMA":
-			componentDescription = fmt.Sprintf("win: %s", componentConfig["parameters"].(map[string]interface{})["ema_window"])
-		case "GradientController":
-			componentDescription = fmt.Sprintf("slope: %0.2f", componentConfig["parameters"].(map[string]interface{})["slope"])
-		case "Extrapolator":
-			componentDescription = fmt.Sprintf("for: %s", componentConfig["parameters"].(map[string]interface{})["max_extrapolation_interval"])
-		case "ConcurrencyLimiter":
-			componentDescription = getServiceSelector(componentConfig["flow_selector"])
-		case "RateLimiter":
-			componentDescription = getServiceSelector(componentConfig["flow_selector"])
-		case "AIMDConcurrencyController":
-			componentDescription = getServiceSelector(componentConfig["flow_selector"])
-		}
+		componentDescription := c.ShortDescription()
 
 		componentsDTO = append(componentsDTO, &policymonitoringv1.ComponentView{
 			ComponentId:          c.ComponentID.String(),
@@ -158,9 +111,26 @@ func convertPortViews(ports []*policymonitoringv1.PortView) []*policymonitoringv
 // Mermaid returns Components and Links as a mermaid graph.
 func Mermaid(components []*policymonitoringv1.ComponentView, links []*policymonitoringv1.Link) string {
 	var sb strings.Builder
+	// prefix for fake constant components
+	fakeConstantPrefix := "FakeConstant"
+	// constantID for fake constant components
+	var constantID int
+	// subgraph for each component
+
 	sb.WriteString("flowchart LR\n")
 
 	renderComponentSubGraph := func(component *policymonitoringv1.ComponentView) string {
+		linkExists := func(componentID, portName string, links []*policymonitoringv1.Link) bool {
+			for _, link := range links {
+				if link.Source.ComponentId == componentID && link.Source.PortName == portName {
+					return true
+				} else if link.Target.ComponentId == componentID && link.Target.PortName == portName {
+					return true
+				}
+			}
+			return false
+		}
+
 		var s strings.Builder
 		if component.ComponentName == "Variable" {
 			// lookup value in component.Component struct
@@ -182,8 +152,8 @@ func Mermaid(components []*policymonitoringv1.ComponentView, links []*policymoni
 		if component.ComponentDescription != "" {
 			description := component.ComponentDescription
 			// truncate description if too long (mermaid limitation)
-			if len(description) > 16 {
-				description = description[:16] + "..."
+			if len(description) > 27 {
+				description = description[:27] + "..."
 			}
 			name = fmt.Sprintf("<center>%s<br/>%s</center>", name, description)
 		}
@@ -196,7 +166,14 @@ func Mermaid(components []*policymonitoringv1.ComponentView, links []*policymoni
 			s.WriteString(fmt.Sprintf("style %s_inports fill:none,stroke:none\n", component.ComponentId))
 			// InPorts and OutPorts are nodes in the subgraph
 			for _, inputPort := range component.InPorts {
-				s.WriteString(fmt.Sprintf("%s[%s]\n", component.ComponentId+inputPort.PortName, inputPort.PortName))
+				isConstantInput := false
+				if _, ok := inputPort.GetValue().(*policymonitoringv1.PortView_ConstantValue); ok {
+					isConstantInput = true
+				}
+				// check if link exists for this port or it's a constant input
+				if linkExists(component.ComponentId, inputPort.PortName, links) || isConstantInput {
+					s.WriteString(fmt.Sprintf("%s[%s]\n", component.ComponentId+inputPort.PortName, inputPort.PortName))
+				}
 			}
 			s.WriteString("end\n")
 		}
@@ -207,34 +184,30 @@ func Mermaid(components []*policymonitoringv1.ComponentView, links []*policymoni
 			// style to make outports invisible
 			s.WriteString(fmt.Sprintf("style %s_outports fill:none,stroke:none\n", component.ComponentId))
 			for _, outputPort := range component.OutPorts {
-				s.WriteString(fmt.Sprintf("%s[%s]\n", component.ComponentId+outputPort.PortName, outputPort.PortName))
+				if linkExists(component.ComponentId, outputPort.PortName, links) {
+					s.WriteString(fmt.Sprintf("%s[%s]\n", component.ComponentId+outputPort.PortName, outputPort.PortName))
+				}
 			}
 			s.WriteString("end\n")
 		}
 
 		s.WriteString("end\n")
-		return s.String()
-	}
-
-	// prefix for fake constant components
-	fakeConstantPrefix := "FakeConstant"
-	// constantID for fake constant components
-	var constantID int
-	// subgraph for each component
-	for _, c := range components {
-
-		sb.WriteString(renderComponentSubGraph(c))
 		// fake nodes for constant value ports
-		for _, inPort := range c.InPorts {
+		for _, inPort := range component.InPorts {
 			if constValue, ok := inPort.GetValue().(*policymonitoringv1.PortView_ConstantValue); ok {
 				// Concatenate fakeConstant prefix to constantComponentID to avoid collision with real component IDs
 				constantComponentID := fmt.Sprintf("%s%d", fakeConstantPrefix, constantID)
 				constantID++
 				sb.WriteString(fmt.Sprintf("%s((%0.2f))\n", constantComponentID, constValue.ConstantValue))
 				// link constant to component
-				sb.WriteString(fmt.Sprintf("%s --> %s\n", constantComponentID, c.ComponentId+inPort.PortName))
+				sb.WriteString(fmt.Sprintf("%s --> %s\n", constantComponentID, component.ComponentId+inPort.PortName))
 			}
 		}
+		return s.String()
+	}
+
+	for _, c := range components {
+		sb.WriteString(renderComponentSubGraph(c))
 	}
 
 	// links
