@@ -108,7 +108,6 @@ DEP_TREE = {
                     "context": GIT_ROOT,
                     "dockerfile": GIT_ROOT + "/operator/Dockerfile",
                     "ssh": "default",
-                    "ignore": ["cmd"],
                 }
             ],
             "port_forwards": {

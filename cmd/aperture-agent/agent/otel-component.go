@@ -31,7 +31,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
@@ -45,7 +44,6 @@ func ModuleForAgentOTEL() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			cache.Provide[selectors.ControlPointID],
-			otelconfig.NewOTELParams,
 			fx.Annotate(
 				provideAgent,
 				fx.ResultTags(otelconfig.BaseFxTag),
@@ -127,82 +125,4 @@ func AgentOTELComponents(
 	}
 
 	return factories, errs
-}
-
-func provideAgent(cfg *otelconfig.OTELParams) *otelconfig.OTELConfig {
-	addLogsPipeline(cfg)
-	addTracesPipeline(cfg)
-	otelconfig.AddMetricsPipeline(cfg)
-	otelconfig.AddAlertsPipeline(cfg, otelconsts.ProcessorAgentResourceLabels)
-	return cfg.Config
-}
-
-func addLogsPipeline(cfg *otelconfig.OTELParams) {
-	config := cfg.Config
-	// Common dependencies for pipelines
-	config.AddReceiver(otelconsts.ReceiverOTLP, otlpreceiver.Config{})
-	// Note: Passing map[string]interface{}{} instead of real config, so that
-	// processors' configs' default work.
-	config.AddProcessor(otelconsts.ProcessorMetrics, map[string]interface{}{})
-	config.AddBatchProcessor(
-		otelconsts.ProcessorBatchPrerollup,
-		cfg.BatchPrerollup.Timeout.AsDuration(),
-		cfg.BatchPrerollup.SendBatchSize,
-		cfg.BatchPrerollup.SendBatchMaxSize,
-	)
-	config.AddProcessor(otelconsts.ProcessorRollup, map[string]interface{}{})
-	config.AddBatchProcessor(
-		otelconsts.ProcessorBatchPostrollup,
-		cfg.BatchPostrollup.Timeout.AsDuration(),
-		cfg.BatchPostrollup.SendBatchSize,
-		cfg.BatchPostrollup.SendBatchMaxSize,
-	)
-	config.AddExporter(otelconsts.ExporterLogging, nil)
-
-	processors := []string{
-		otelconsts.ProcessorMetrics,
-		otelconsts.ProcessorBatchPrerollup,
-		otelconsts.ProcessorRollup,
-		otelconsts.ProcessorBatchPostrollup,
-		otelconsts.ProcessorAgentGroup,
-	}
-
-	config.Service.AddPipeline("logs", otelconfig.Pipeline{
-		Receivers:  []string{otelconsts.ReceiverOTLP},
-		Processors: processors,
-		Exporters:  []string{otelconsts.ExporterLogging},
-	})
-}
-
-func addTracesPipeline(cfg *otelconfig.OTELParams) {
-	config := cfg.Config
-	config.AddExporter(otelconsts.ExporterOTLPLoopback, map[string]any{
-		"endpoint": cfg.Listener.GetAddr(),
-		"tls": map[string]any{
-			"insecure": true,
-		},
-	})
-	config.AddProcessor(otelconsts.ProcessorTracesToLogs, tracestologsprocessor.Config{
-		LogsExporter: otelconsts.ExporterOTLPLoopback,
-	})
-
-	config.Service.AddPipeline("traces", otelconfig.Pipeline{
-		Receivers:  []string{otelconsts.ReceiverOTLP},
-		Processors: []string{otelconsts.ProcessorTracesToLogs},
-		// We need some exporter configured to make this pipeline correct. Actual
-		// Log exporting is done inside the processor.
-		Exporters: []string{otelconsts.ExporterLogging},
-	})
-
-	// TODO This receiver should be replaced with some receiver which really does nothing.
-	config.AddReceiver("filelog", map[string]any{
-		"include":       []string{"/var/log/myservice/*.json"},
-		"poll_interval": "1000h",
-	})
-	// We need a fake log pipeline which will initialize the ExporterOTLPLoopback
-	// for logs type.
-	config.Service.AddPipeline("logs/fake", otelconfig.Pipeline{
-		Receivers: []string{"filelog"},
-		Exporters: []string{otelconsts.ExporterOTLPLoopback},
-	})
 }

@@ -1427,6 +1427,10 @@ spec:
                             description: Timeout sets the time after which a batch
                               will be sent regardless of size.
                             type: string
+                        required:
+                        - send_batch_max_size
+                        - send_batch_size
+                        - timeout
                         type: object
                       batch_prerollup:
                         description: BatchPrerollup configures batch prerollup processor.
@@ -1446,6 +1450,10 @@ spec:
                             description: Timeout sets the time after which a batch
                               will be sent regardless of size.
                             type: string
+                        required:
+                        - send_batch_max_size
+                        - send_batch_size
+                        - timeout
                         type: object
                       ports:
                         description: Ports configures debug, health and extension
@@ -1469,6 +1477,9 @@ spec:
                             format: int32
                             type: integer
                         type: object
+                    required:
+                    - batch_postrollup
+                    - batch_prerollup
                     type: object
                   peer_discovery:
                     description: Peer discovery configuration.

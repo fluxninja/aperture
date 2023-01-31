@@ -25,6 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/pointer"
 
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
 	. "github.com/fluxninja/aperture/operator/controllers"
@@ -79,7 +80,13 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelconfig.UserOTELConfig{
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
+						},
+						OTEL: agent.AgentOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -87,10 +94,6 @@ var _ = Describe("Sidecar container for Agent", func() {
 									ZpagesPort:      55679,
 								},
 							},
-						},
-						DistCache: distcache.DistCacheConfig{
-							MemberlistBindAddr: ":3322",
-							BindAddr:           ":3320",
 						},
 					},
 					Image: common.AgentImage{
@@ -212,7 +215,13 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelconfig.UserOTELConfig{
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
+						},
+						OTEL: agent.AgentOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -220,10 +229,6 @@ var _ = Describe("Sidecar container for Agent", func() {
 									ZpagesPort:      55679,
 								},
 							},
-						},
-						DistCache: distcache.DistCacheConfig{
-							MemberlistBindAddr: ":3322",
-							BindAddr:           ":3320",
 						},
 					},
 					Image: common.AgentImage{
@@ -390,7 +395,13 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":8000",
 								},
 							},
-							Otel: otelconfig.UserOTELConfig{
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
+						},
+						OTEL: agent.AgentOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -398,10 +409,6 @@ var _ = Describe("Sidecar container for Agent", func() {
 									ZpagesPort:      55679,
 								},
 							},
-						},
-						DistCache: distcache.DistCacheConfig{
-							MemberlistBindAddr: ":3322",
-							BindAddr:           ":3320",
 						},
 					},
 					CommonSpec: common.CommonSpec{
@@ -642,7 +649,13 @@ var _ = Describe("Pod modification for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelconfig.UserOTELConfig{
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
+						},
+						OTEL: agent.AgentOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -650,10 +663,6 @@ var _ = Describe("Pod modification for Agent", func() {
 									ZpagesPort:      55679,
 								},
 							},
-						},
-						DistCache: distcache.DistCacheConfig{
-							MemberlistBindAddr: ":3322",
-							BindAddr:           ":3320",
 						},
 					},
 					Image: common.AgentImage{
@@ -795,7 +804,13 @@ var _ = Describe("Pod modification for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelconfig.UserOTELConfig{
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
+						},
+						OTEL: agent.AgentOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -803,10 +818,6 @@ var _ = Describe("Pod modification for Agent", func() {
 									ZpagesPort:      55679,
 								},
 							},
-						},
-						DistCache: distcache.DistCacheConfig{
-							MemberlistBindAddr: ":3322",
-							BindAddr:           ":3320",
 						},
 					},
 					CommonSpec: common.CommonSpec{

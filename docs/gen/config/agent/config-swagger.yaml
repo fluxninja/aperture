@@ -33,6 +33,19 @@ definitions:
       attributes.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/agentinfo
+  AgentOTELConfig:
+    properties:
+      batch_alerts:
+        $ref: '#/definitions/BatchAlertsConfig'
+      batch_postrollup:
+        $ref: '#/definitions/BatchPostrollupConfig'
+      batch_prerollup:
+        $ref: '#/definitions/BatchPrerollupConfig'
+      ports:
+        $ref: '#/definitions/PortsConfig'
+    title: AgentOTELConfig is the configuration for Agent's OTEL collector.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/agent
   AlertManagerClientConfig:
     properties:
       address:
@@ -167,7 +180,7 @@ definitions:
         x-go-validate: gt=0
     title: BatchPostrollupConfig defines configuration for OTEL batch processor.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/agent
   BatchPrerollupConfig:
     properties:
       send_batch_max_size:
@@ -197,7 +210,7 @@ definitions:
         x-go-validate: gt=0
     title: BatchPrerollupConfig defines configuration for OTEL batch processor.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/agent
   ClientTLSConfig:
     properties:
       ca_file:
@@ -218,6 +231,15 @@ definitions:
     title: ClientTLSConfig is the config for client TLS.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
+  CommonOTELConfig:
+    properties:
+      batch_alerts:
+        $ref: '#/definitions/BatchAlertsConfig'
+      ports:
+        $ref: '#/definitions/PortsConfig'
+    title: CommonOTELConfig is the configuration for the OTEL collector.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
   DistCacheConfig:
     properties:
       bind_addr:
@@ -1026,19 +1048,6 @@ definitions:
     title: StaticDiscoveryConfig for pre-determined list of services.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/discovery/static
-  UserOTELConfig:
-    properties:
-      batch_alerts:
-        $ref: '#/definitions/BatchAlertsConfig'
-      batch_postrollup:
-        $ref: '#/definitions/BatchPostrollupConfig'
-      batch_prerollup:
-        $ref: '#/definitions/BatchPrerollupConfig'
-      ports:
-        $ref: '#/definitions/PortsConfig'
-    title: UserOTELConfig is the configuration for the OTEL collector.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
   WatchdogConfig:
     properties:
       cgroup:
@@ -1191,11 +1200,10 @@ paths:
       operationId: OTEL
       parameters:
       - in: body
-        name: proxy
         schema:
-          $ref: '#/definitions/UserOTELConfig'
+          $ref: '#/definitions/AgentOTELConfig'
       tags:
-      - common-configuration
+      - agent-configuration
       x-fn-config-env: true
   /peer_discovery:
     post:

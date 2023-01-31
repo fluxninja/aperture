@@ -30,7 +30,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/http"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	"github.com/fluxninja/aperture/pkg/plugins"
 	"github.com/fluxninja/aperture/pkg/profilers"
 	"github.com/fluxninja/aperture/pkg/prometheus"
@@ -319,10 +318,6 @@ type CommonConfigSpec struct {
 	// Metrics configuration.
 	//+kubebuilder:validation:Optional
 	Metrics metrics.MetricsConfig `json:"metrics"`
-
-	// OTEL configuration.
-	//+kubebuilder:validation:Optional
-	Otel otelconfig.UserOTELConfig `json:"otel"`
 
 	// Plugins configuration.
 	//+kubebuilder:validation:Optional
