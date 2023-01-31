@@ -21,6 +21,9 @@ func (*Max) Name() string { return "Max" }
 // Type implements runtime.Component.
 func (*Max) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
+// ShortDescription implements runtime.Component.
+func (*Max) ShortDescription() string { return "" }
+
 // Make sure Max complies with Component interface.
 var _ runtime.Component = (*Max)(nil)
 

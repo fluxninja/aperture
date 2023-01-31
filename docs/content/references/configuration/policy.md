@@ -511,36 +511,6 @@ Outputs for the AIMDConcurrencyController component.
 #### Properties
 
 <dl>
-<dt>accepted_concurrency</dt>
-<dd>
-
-([V1OutPort](#v1-out-port)) Accepted concurrency is the number of accepted tokens per second.
-
-:::info
-**Accepted tokens** are tokens associated with
-[flows](/concepts/integrations/flow-control/flow-control.md#flow) that were accepted by
-this scheduler. Number of tokens for a flow is determined by a
-[workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
-via `auto_tokens` or explicitly by `Workload.tokens`).
-:::
-
-Value of this signal is the sum across all the relevant schedulers.
-
-</dd>
-<dt>incoming_concurrency</dt>
-<dd>
-
-([V1OutPort](#v1-out-port)) Incoming concurrency is the number of incoming tokens/sec.
-This is the same as `accepted_concurrency`, but across all the flows
-entering scheduler, including rejected ones.
-
-</dd>
-<dt>desired_concurrency</dt>
-<dd>
-
-([V1OutPort](#v1-out-port)) Desired concurrency is the number of tokens per second that the should be accepted.
-
-</dd>
 <dt>is_overload</dt>
 <dd>
 
@@ -1811,7 +1781,7 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 <dt>service_selector</dt>
 <dd>
 
-([V1ServiceSelector](#v1-service-selector))
+([V1ServiceSelector](#v1-service-selector), `required`) @gotags: validate:"required"
 
 </dd>
 <dt>flow_matcher</dt>
@@ -2826,6 +2796,12 @@ Nested circuit defines a sub-circuit as a high-level component. It consists of a
 <dd>
 
 (string) Name of the nested circuit component. This name is displayed by graph visualization tools.
+
+</dd>
+<dt>short_description</dt>
+<dd>
+
+(string) Short description of the nested circuit component. This description is displayed by graph visualization tools.
 
 </dd>
 </dl>

@@ -2,6 +2,7 @@ package metricsprocessor
 
 import (
 	"context"
+	"strconv"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
@@ -117,11 +118,7 @@ var (
 	unrecognizedSourceLabelSampler = log.NewRatelimitingSampler()
 )
 
-func (p *metricsProcessor) updateMetrics(
-	attributes pcommon.Map,
-	checkResponse *flowcontrolv1.CheckResponse,
-	treatAsMissing []string,
-) {
+func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse, treatAsMissing []string) {
 	if checkResponse == nil {
 		return
 	}
@@ -135,6 +132,7 @@ func (p *metricsProcessor) updateMetrics(
 				ComponentID: decision.ComponentId,
 			}
 
+			// Update concurrency limiter metrics.
 			if cl := decision.GetConcurrencyLimiterInfo(); cl != nil {
 				labels := map[string]string{
 					metrics.PolicyNameLabel:    decision.PolicyName,
@@ -143,17 +141,17 @@ func (p *metricsProcessor) updateMetrics(
 					metrics.WorkloadIndexLabel: cl.GetWorkloadIndex(),
 				}
 
-				p.updateMetricsForWorkload(limiterID, labels, checkResponse.DecisionType, latency, latencyFound)
+				p.updateMetricsForWorkload(limiterID, labels, decision.Dropped, checkResponse.DecisionType, latency, latencyFound)
 			}
 
-			// Update rate limiter metrics
+			// Update rate limiter metrics.
 			if rl := decision.GetRateLimiterInfo(); rl != nil {
 				labels := map[string]string{
 					metrics.PolicyNameLabel:  decision.PolicyName,
 					metrics.PolicyHashLabel:  decision.PolicyHash,
 					metrics.ComponentIDLabel: decision.ComponentId,
 				}
-				p.updateMetricsForRateLimiter(limiterID, labels, checkResponse.DecisionType)
+				p.updateMetricsForRateLimiter(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
 			}
 		}
 	}
@@ -184,7 +182,7 @@ func (p *metricsProcessor) updateMetrics(
 	}
 }
 
-func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, labels map[string]string, decisionType flowcontrolv1.CheckResponse_DecisionType, latency float64, latencyFound bool) {
+func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, labels map[string]string, dropped bool, decisionType flowcontrolv1.CheckResponse_DecisionType, latency float64, latencyFound bool) {
 	concurrencyLimiter := p.cfg.engine.GetConcurrencyLimiter(limiterID)
 	if concurrencyLimiter == nil {
 		log.Sample(noConcurrencyLimiterSampler).Warn().
@@ -203,13 +201,14 @@ func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, l
 	}
 	// Add decision type label to the request counter metric
 	labels[metrics.DecisionTypeLabel] = decisionType.String()
+	labels[metrics.LimiterDroppedLabel] = strconv.FormatBool(dropped)
 	requestCounter := concurrencyLimiter.GetRequestCounter(labels)
 	if requestCounter != nil {
 		requestCounter.Inc()
 	}
 }
 
-func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID, labels map[string]string, decisionType flowcontrolv1.CheckResponse_DecisionType) {
+func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID, labels map[string]string, dropped bool, decisionType flowcontrolv1.CheckResponse_DecisionType) {
 	rateLimiter := p.cfg.engine.GetRateLimiter(limiterID)
 	if rateLimiter == nil {
 		log.Sample(noRateLimiterSampler).Warn().
@@ -221,6 +220,7 @@ func (p *metricsProcessor) updateMetricsForRateLimiter(limiterID iface.LimiterID
 	}
 	// Add decision type label to the request counter metric
 	labels[metrics.DecisionTypeLabel] = decisionType.String()
+	labels[metrics.LimiterDroppedLabel] = strconv.FormatBool(dropped)
 	requestCounter := rateLimiter.GetRequestCounter(labels)
 	if requestCounter != nil {
 		requestCounter.Inc()

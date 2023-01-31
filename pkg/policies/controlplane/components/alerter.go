@@ -31,6 +31,9 @@ func (*Alerter) Name() string { return "Alerter" }
 // Type implements runtime.Component.
 func (*Alerter) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
 
+// ShortDescription implements runtime.Component.
+func (a *Alerter) ShortDescription() string { return fmt.Sprintf("%s/%s", a.name, a.severity) }
+
 // Make sure Alerter complies with Component interface.
 var _ runtime.Component = (*Alerter)(nil)
 

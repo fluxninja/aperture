@@ -18,6 +18,9 @@ func (*NoOp) Name() string { return "NoOp" }
 // Type implements runtime.Component.
 func (*NoOp) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
+// ShortDescription implements runtime.Component.
+func (*NoOp) ShortDescription() string { return "" }
+
 // Execute implements runtime.Component.Execute.
 func (noOp *NoOp) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	return inPortReadings, nil

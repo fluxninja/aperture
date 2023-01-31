@@ -25,11 +25,12 @@ type rateLimiterSync struct {
 	policyReadAPI         iface.Policy
 	rateLimiterProto      *policylangv1.RateLimiter
 	decision              *policysyncv1.RateLimiterDecision
+	decisionWriter        *etcdwriter.Writer
+	dynamicConfigWriter   *etcdwriter.Writer
+	flowSelectorProto     *policylangv1.FlowSelector
 	configEtcdPath        string
 	decisionsEtcdPath     string
 	dynamicConfigEtcdPath string
-	decisionWriter        *etcdwriter.Writer
-	dynamicConfigWriter   *etcdwriter.Writer
 	agentGroupName        string
 	componentID           string
 }
@@ -39,6 +40,11 @@ func (*rateLimiterSync) Name() string { return "RateLimiter" }
 
 // Type implements runtime.Component.
 func (*rateLimiterSync) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
+
+// ShortDescription implements runtime.Component.
+func (limiterSync *rateLimiterSync) ShortDescription() string {
+	return iface.GetServiceShortDescription(limiterSync.flowSelectorProto.ServiceSelector)
+}
 
 // NewRateLimiterAndOptions creates fx options for RateLimiter and also returns agent group name associated with it.
 func NewRateLimiterAndOptions(
@@ -51,7 +57,7 @@ func NewRateLimiterAndOptions(
 	if flowSelectorProto == nil {
 		return nil, fx.Options(), errors.New("selector is nil")
 	}
-	agentGroupName := flowSelectorProto.ServiceSelector.GetAgentGroup()
+	agentGroupName := flowSelectorProto.ServiceSelector.AgentGroup
 	etcdKey := paths.AgentComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), componentID)
 	configEtcdPath := path.Join(paths.RateLimiterConfigPath, etcdKey)
 	decisionsEtcdPath := path.Join(paths.RateLimiterDecisionsPath, etcdKey)
@@ -66,6 +72,7 @@ func NewRateLimiterAndOptions(
 		dynamicConfigEtcdPath: dynamicConfigEtcdPath,
 		componentID:           componentID,
 		agentGroupName:        agentGroupName,
+		flowSelectorProto:     flowSelectorProto,
 	}
 	return limiterSync, fx.Options(
 		fx.Invoke(

@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"math"
 
 	"go.uber.org/fx"
@@ -24,6 +25,11 @@ func (*Variable) Name() string { return "Variable" }
 
 // Type implements runtime.Component.
 func (*Variable) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
+
+// ShortDescription implements runtime.Component.
+func (v *Variable) ShortDescription() string {
+	return fmt.Sprintf("default: %v", v.constantSignal.String())
+}
 
 // NewConstantSignal creates a variable component with a value that's always valid.
 func NewConstantSignal(value float64) runtime.Component {

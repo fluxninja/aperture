@@ -1,7 +1,9 @@
 package components
 
 import (
+	"fmt"
 	"math"
+	"time"
 
 	"go.uber.org/fx"
 
@@ -15,6 +17,7 @@ import (
 // Holder is a component that holds the last valid signal value
 // for the specified duration then waits for next valid value to hold.
 type Holder struct {
+	holdFor        time.Duration
 	holdWindow     uint32
 	windowCount    uint32
 	holdPhase      bool
@@ -27,12 +30,16 @@ func (*Holder) Name() string { return "Holder" }
 // Type implements runtime.Component.
 func (*Holder) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
+// ShortDescription implements runtime.Component.
+func (h *Holder) ShortDescription() string { return fmt.Sprintf("for: %s", h.holdFor) }
+
 // NewHolderAndOptions creates a holder component and its fx options.
 func NewHolderAndOptions(holderProto *policylangv1.Holder, _ string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()
 	holdFor := math.Ceil(float64(holderProto.HoldFor.AsDuration()) / float64(evaluationPeriod))
 
 	holder := &Holder{
+		holdFor:     holderProto.HoldFor.AsDuration(),
 		holdWindow:  uint32(holdFor),
 		windowCount: 0,
 		holdPhase:   false,
