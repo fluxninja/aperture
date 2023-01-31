@@ -103,6 +103,8 @@ const (
 	DecisionTypeLabel = "decision_type"
 	// WorkloadIndexLabel - label for choosing correct workload.
 	WorkloadIndexLabel = "workload_index"
+	// LimiterDroppedLabel - label to indicate that the particular limiter has dropped the request.
+	LimiterDroppedLabel = "limiter_dropped"
 	// SignalNameLabel - label for saving circuit signal metrics.
 	SignalNameLabel = "signal_name"
 	// SubCircuitIDLabel - label for saving circuit id in signal metrics.
