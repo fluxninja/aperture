@@ -1479,7 +1479,8 @@ spec:
                               x-kubernetes-preserve-unknown-fields: true
                           type: object
                         description: CustomMetrics configures custom metrics pipelines,
-                          which will send data to the controller prometheus.
+                          which will send data to the controller prometheus. By default
+                          `kubeletstats` custom metrics is added, which can be overwritten.
                         type: object
                       ports:
                         description: Ports configures debug, health and extension
