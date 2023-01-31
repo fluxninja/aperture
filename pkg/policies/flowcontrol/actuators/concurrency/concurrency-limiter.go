@@ -160,7 +160,9 @@ func setupConcurrencyLimiterFactory(
 		Name: metrics.WorkloadLatencyMetricName,
 		Help: "Latency summary of workload",
 	}, []string{
-		metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel,
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
 		metrics.WorkloadIndexLabel,
 	})
 
@@ -168,9 +170,12 @@ func setupConcurrencyLimiterFactory(
 		Name: metrics.WorkloadCounterMetricName,
 		Help: "Counter of workload requests",
 	}, []string{
-		metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel,
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
 		metrics.DecisionTypeLabel,
 		metrics.WorkloadIndexLabel,
+		metrics.LimiterDroppedLabel,
 	})
 
 	fxDriver := &notifiers.FxDriver{

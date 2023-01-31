@@ -53,13 +53,13 @@ function(params) {
             ),
           ),
           component.withArithmeticCombinator(combinator.mul(port.withSignalName('LATENCY'),
-                                                            port.withConstantSignal($._config.overload_detection.latency_ema_limit_multiplier),
+                                                            port.withConstantSignal($._config.latency_baseliner.latency_ema_limit_multiplier),
                                                             output=port.withSignalName('MAX_EMA'))),
           component.withArithmeticCombinator(combinator.mul(port.withSignalName('LATENCY_EMA'),
-                                                            port.withConstantSignal($._config.overload_detection.latency_tolerance_multiplier),
+                                                            port.withConstantSignal($._config.latency_baseliner.latency_tolerance_multiplier),
                                                             output=port.withSignalName('LATENCY_SETPOINT'))),
           component.withEma(
-            ema.withParameters($._config.overload_detection.ema)
+            ema.withParameters($._config.latency_baseliner.ema)
             + ema.withInPortsMixin(
               ema.inPorts.withInput(port.withSignalName('LATENCY'))
               + ema.inPorts.withMaxEnvelope(port.withSignalName('MAX_EMA'))
@@ -84,9 +84,6 @@ function(params) {
                 setpoint: port.withSignalName('LATENCY_SETPOINT'),
               })
               + aimdConcurrencyController.withOutPorts({
-                accepted_concurrency: port.withSignalName('ACCEPTED_CONCURRENCY'),
-                incoming_concurrency: port.withSignalName('INCOMING_CONCURRENCY'),
-                desired_concurrency: port.withSignalName('DESIRED_CONCURRENCY'),
                 is_overload: port.withSignalName('IS_OVERLOAD'),
                 load_multiplier: port.withSignalName('LOAD_MULTIPLIER'),
               }),

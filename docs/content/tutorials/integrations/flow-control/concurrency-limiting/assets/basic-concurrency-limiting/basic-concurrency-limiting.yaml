@@ -81,12 +81,6 @@ spec:
               signal:
                 signal_name: LATENCY
             out_ports:
-              accepted_concurrency:
-                signal_name: ACCEPTED_CONCURRENCY
-              desired_concurrency:
-                signal_name: DESIRED_CONCURRENCY
-              incoming_concurrency:
-                signal_name: INCOMING_CONCURRENCY
               is_overload:
                 signal_name: IS_OVERLOAD
               load_multiplier:
