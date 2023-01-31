@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"math"
 
 	"go.uber.org/fx"
@@ -22,6 +23,9 @@ func (*Sqrt) Name() string { return "Sqrt" }
 
 // Type implements runtime.Component.
 func (*Sqrt) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
+// ShortDescription implements runtime.Component.
+func (sqrt *Sqrt) ShortDescription() string { return fmt.Sprintf("scale: %f", sqrt.scale) }
 
 // Make sure Sqrt complies with Component interface.
 var _ runtime.Component = (*Sqrt)(nil)

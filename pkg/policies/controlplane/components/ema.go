@@ -2,6 +2,7 @@ package components
 
 import (
 	"errors"
+	"fmt"
 	"math"
 
 	"go.uber.org/fx"
@@ -47,6 +48,9 @@ func (*EMA) Name() string { return "EMA" }
 
 // Type implements runtime.Component.
 func (*EMA) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
+// ShortDescription implements runtime.Component.
+func (ema *EMA) ShortDescription() string { return fmt.Sprintf("win: %v", ema.emaWindow) }
 
 // Make sure EMA complies with Component interface.
 var _ runtime.Component = (*EMA)(nil)

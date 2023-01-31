@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"math"
 	"time"
 
@@ -31,6 +32,9 @@ func (*Differentiator) Name() string { return "Differentiator" }
 
 // Type implements runtime.Component.
 func (*Differentiator) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
+// ShortDescription implements runtime.Component.
+func (d *Differentiator) ShortDescription() string { return fmt.Sprintf("win: %s", d.window) }
 
 // NewDifferentiator creates a differentiator component.
 func NewDifferentiator(diffProto *policylangv1.Differentiator) runtime.Component {

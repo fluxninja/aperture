@@ -28,4 +28,10 @@
   withOutPortsMapMixin(out_ports_map):: {
     out_ports_map+: out_ports_map,
   },
+  withShortDescription(short_description):: {
+    short_description: short_description,
+  },
+  withShortDescriptionMixin(short_description):: {
+    short_description+: short_description,
+  },
 }

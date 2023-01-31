@@ -19,6 +19,9 @@ func (*Switcher) Name() string { return "Switcher" }
 // Type implements runtime.Component.
 func (*Switcher) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
+// ShortDescription implements runtime.Component.
+func (*Switcher) ShortDescription() string { return "" }
+
 // Make sure Switcher complies with Component interface.
 var _ runtime.Component = (*Switcher)(nil)
 
