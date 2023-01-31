@@ -159,6 +159,7 @@ operator-manifests: ## Generate WebhookConfiguration, ClusterRole and CustomReso
 
 .PHONY: operator-generate
 operator-generate: ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
+	$(CONTROLLER_GEN) object:headerFile="operator/hack/boilerplate.go.txt" paths="./cmd/..."
 	$(CONTROLLER_GEN) object:headerFile="operator/hack/boilerplate.go.txt" paths="./pkg/..."
 	$(CONTROLLER_GEN) object:headerFile="operator/hack/boilerplate.go.txt" paths="./operator/..."
 
