@@ -10,6 +10,7 @@ var AlertsFxTag = config.NameTag("AlertsFx")
 type Alerter interface {
 	AddAlert(*Alert)
 	AlertsChan() <-chan *Alert
+	WithLabels(map[string]string) Alerter
 }
 
 // SimpleAlerter implements Alerter interface. It just simple propagates alerts
@@ -33,4 +34,47 @@ func (a *SimpleAlerter) AddAlert(alert *Alert) {
 // AlertsChan returns the alerts channel.
 func (a *SimpleAlerter) AlertsChan() <-chan *Alert {
 	return a.alertsCh
+}
+
+// WithLabels returns the alerter wrapper with specified labels.
+func (a *SimpleAlerter) WithLabels(labels map[string]string) Alerter {
+	return newAlerterWrapper(a, labels)
+}
+
+type alerterWrapper struct {
+	parentAlerter Alerter
+	labels        map[string]string
+}
+
+func newAlerterWrapper(parent Alerter, labels map[string]string) Alerter {
+	return &alerterWrapper{
+		parentAlerter: parent,
+		labels:        labels,
+	}
+}
+
+// AddAlert adds alert to the channel with labels specified at wrapper creation.
+func (aw *alerterWrapper) AddAlert(alert *Alert) {
+	for key, val := range aw.labels {
+		alert.SetLabel(key, val)
+	}
+	aw.parentAlerter.AddAlert(alert)
+}
+
+// AlertsChan returns the alerts channel.
+func (aw *alerterWrapper) AlertsChan() <-chan *Alert {
+	return aw.parentAlerter.AlertsChan()
+}
+
+// WithLabels returns the alerter with new labels added to parent labels.
+func (aw *alerterWrapper) WithLabels(labels map[string]string) Alerter {
+	mergedLabels := make(map[string]string)
+	for k, v := range aw.labels {
+		mergedLabels[k] = v
+	}
+	// overwrite older values with new ones
+	for k, v := range labels {
+		mergedLabels[k] = v
+	}
+	return newAlerterWrapper(aw, mergedLabels)
 }
