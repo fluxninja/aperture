@@ -1455,6 +1455,47 @@ spec:
                         - send_batch_size
                         - timeout
                         type: object
+                      custom_metrics:
+                        additionalProperties:
+                          description: CustomMetricsConfig defines receivers, processors
+                            and single metrics pipeline, which will be exported to
+                            the controller prometheus. swagger:model
+                          properties:
+                            pipeline:
+                              description: Pipeline is an OTEL metrics pipeline definition,
+                                which **only** uses receivers and processors defined
+                                above. Exporter would be added automatically.
+                              properties:
+                                processors:
+                                  items:
+                                    type: string
+                                  type: array
+                                receivers:
+                                  items:
+                                    type: string
+                                  type: array
+                              required:
+                              - processors
+                              - receivers
+                              type: object
+                            processors:
+                              description: Processors define processors to be used
+                                in custom metrics pipelines. This should be in OTEL
+                                format - https://opentelemetry.io/docs/collector/configuration/#processors.
+                              x-kubernetes-preserve-unknown-fields: true
+                            receivers:
+                              description: Receivers define receivers to be used in
+                                custom metrics pipelines. This should be in OTEL format
+                                - https://opentelemetry.io/docs/collector/configuration/#receivers.
+                              x-kubernetes-preserve-unknown-fields: true
+                          required:
+                          - pipeline
+                          - processors
+                          - receivers
+                          type: object
+                        description: CustomMetrics configures custom metrics pipelines,
+                          which will send data to the controller prometheus.
+                        type: object
                       ports:
                         description: Ports configures debug, health and extension
                           ports values.
@@ -1480,6 +1521,7 @@ spec:
                     required:
                     - batch_postrollup
                     - batch_prerollup
+                    - custom_metrics
                     type: object
                   peer_discovery:
                     description: Peer discovery configuration.
