@@ -38,6 +38,7 @@ type AgentOTELConfig struct {
 	BatchPostrollup BatchPostrollupConfig `json:"batch_postrollup"`
 	// CustomMetrics configures custom metrics pipelines, which will send data to
 	// the controller prometheus.
+	// By default `kubeletstats` custom metrics is added, which can be overwritten.
 	CustomMetrics map[string]CustomMetricsConfig `json:"custom_metrics,omitempty"`
 }
 
@@ -246,19 +247,33 @@ func addCustomMetricsPipelines(
 	config *otelconfig.OTELConfig,
 	agentConfig *AgentOTELConfig,
 ) {
+	if _, ok := agentConfig.CustomMetrics[otelconsts.ReceiverKubeletStats]; !ok {
+		if agentConfig.CustomMetrics == nil {
+			agentConfig.CustomMetrics = map[string]CustomMetricsConfig{}
+		}
+		agentConfig.CustomMetrics[otelconsts.ReceiverKubeletStats] = makeCustomMetricsConfigForKubeletStats()
+	}
 	for metricName, metricConfig := range agentConfig.CustomMetrics {
-		for receiverName, receiverConfig := range config.Receivers {
+		for receiverName, receiverConfig := range metricConfig.Receivers {
 			config.AddReceiver(makeCustomComponentName(metricName, receiverName), receiverConfig)
 		}
-		for processorName, processorConfig := range config.Processors {
+		for processorName, processorConfig := range metricConfig.Processors {
 			config.AddProcessor(makeCustomComponentName(metricName, processorName), processorConfig)
 		}
 		config.Service.AddPipeline(makeCustomMetricsName(metricName), otelconfig.Pipeline{
-			Receivers:  metricConfig.Pipeline.Receivers,
-			Processors: metricConfig.Pipeline.Processors,
+			Receivers:  renameComponents(metricName, metricConfig.Pipeline.Receivers),
+			Processors: renameComponents(metricName, metricConfig.Pipeline.Processors),
 			Exporters:  []string{otelconsts.ExporterPrometheusRemoteWrite},
 		})
 	}
+}
+
+func renameComponents(metricName string, components []string) []string {
+	renamed := make([]string, len(components))
+	for i, c := range components {
+		renamed[i] = makeCustomComponentName(metricName, c)
+	}
+	return renamed
 }
 
 func makeCustomMetricsName(name string) string {
@@ -267,6 +282,47 @@ func makeCustomMetricsName(name string) string {
 
 func makeCustomComponentName(metricName, name string) string {
 	return fmt.Sprintf("%s/user-defined-%s", name, metricName)
+}
+
+func makeCustomMetricsConfigForKubeletStats() CustomMetricsConfig {
+	receivers := map[string]any{
+		otelconsts.ReceiverKubeletStats: map[string]any{
+			"collection_interval":  "10s",
+			"auth_type":            "serviceAccount",
+			"endpoint":             "https://${NODE_NAME}:10250",
+			"insecure_skip_verify": true,
+			"metric_groups": []any{
+				"pod",
+			},
+		},
+	}
+	processors := map[string]any{
+		otelconsts.ProcessorFilterKubeletStats: map[string]any{
+			"metrics": map[string]any{
+				"include": map[string]any{
+					"match_type": "strict",
+					"metric_names": []any{
+						"k8s.pod.cpu.utilization",
+						"k8s.pod.memory.available",
+						"k8s.pod.memory.usage",
+						"k8s.pod.memory.working_set",
+					},
+				},
+			},
+		},
+	}
+	return CustomMetricsConfig{
+		Receivers:  receivers,
+		Processors: processors,
+		Pipeline: CustomMetricsPipelineConfig{
+			Receivers: []string{
+				otelconsts.ReceiverKubeletStats,
+			},
+			Processors: []string{
+				otelconsts.ProcessorFilterKubeletStats,
+			},
+		},
+	}
 }
 
 func addPrometheusReceiver(

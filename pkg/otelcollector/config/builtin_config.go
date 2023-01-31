@@ -51,6 +51,9 @@ func AddPrometheusRemoteWriteExporter(config *OTELConfig, promClient promapi.Cli
 	// tags, so they are not properly read by OTEL. Need to use bare maps instead.
 	config.AddExporter(otelconsts.ExporterPrometheusRemoteWrite, map[string]any{
 		"endpoint": endpoint.String(),
+		"resource_to_telemetry_conversion": map[string]any{
+			"enabled": true,
+		},
 	})
 }
 

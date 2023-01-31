@@ -563,6 +563,7 @@ AgentOTELConfig is the configuration for Agent's OTEL collector.
 
 (map of [CustomMetricsConfig](#custom-metrics-config)) CustomMetrics configures custom metrics pipelines, which will send data to
 the controller prometheus.
+By default `kubeletstats` custom metrics is added, which can be overwritten.
 
 </dd>
 <dt>batch_alerts</dt>
