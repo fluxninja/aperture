@@ -31,7 +31,7 @@ var (
 		InitiallyHealthy: false,
 	}
 	alerter  = alerts.NewSimpleAlerter(100)
-	registry = status.NewRegistry(log.GetGlobalLogger(), alerter).Child("jobs")
+	registry = status.NewRegistry(log.GetGlobalLogger(), alerter).Child("jobs", "jobs")
 )
 
 var _ JobWatcher = (*groupConfig)(nil)
@@ -88,10 +88,10 @@ func runTest(t *testing.T, groupConfig *groupConfig) {
 
 	for _, job := range groupConfig.jobs {
 		livenessReg := registry.Root().
-			Child("liveness").
-			Child("job_groups").
-			Child(registry.Key()).
-			Child(job.Name())
+			Child("sub_system", "liveness").
+			Child("jg", "job_groups").
+			Child(registry.Key(), registry.Value()).
+			Child(job.Name(), job.Name())
 
 		if groupConfig.jobRunConfig.expectedStatusMsg == "Timeout" {
 			checkStatusMessage(t, livenessReg, groupConfig.jobRunConfig.expectedStatusMsg, true)
@@ -137,9 +137,11 @@ func checkStatusMessage(t *testing.T, registry status.Registry, protoMsg string,
 
 func checkStatusBeforeDeregister(t *testing.T, names []string, expectedScheduling bool) {
 	for _, name := range names {
-		jobRegistry := registry.ChildIfExists(name)
+		log.Warn().Msgf("JOB NAME: %+v, registry uri: %+v", name, registry.URI())
+		jobRegistry := registry.ChildIfExists(name, name)
 		require.NotNil(t, jobRegistry)
 		require.Equal(t, jobRegistry.Key(), name)
+		require.Equal(t, jobRegistry.Value(), name)
 
 		if strings.Split(name, "-")[0] == "multi" {
 			checkStatusMessage(t, jobRegistry, "MultiJob", false)
@@ -155,7 +157,7 @@ func checkStatusBeforeDeregister(t *testing.T, names []string, expectedSchedulin
 
 func checkStatusAfterDeregister(t *testing.T, names []string) {
 	for _, name := range names {
-		jobRegistry := registry.ChildIfExists(name)
+		jobRegistry := registry.ChildIfExists(name, name)
 		require.Nil(t, jobRegistry)
 	}
 }
@@ -237,7 +239,7 @@ func TestMultiJobRun(t *testing.T) {
 	var counter int32
 	var counter2 int32
 	jobConfig.InitialDelay = config.MakeDuration(0)
-	multiJob := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job"), jws, gws)
+	multiJob := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job", "multi-job"), jws, gws)
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",
@@ -340,8 +342,8 @@ func TestMultipleMultiJobs(t *testing.T) {
 	var counter int32
 	var counter2 int32
 	var counter3 int32
-	multiJob := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job1"), jws, gws)
-	multiJob2 := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job2"), jws, gws)
+	multiJob := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job1", "multi-job1"), jws, gws)
+	multiJob2 := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job2", "multi-job2"), jws, gws)
 	job := &BasicJob{
 		JobBase: JobBase{
 			JobName: "test-job",

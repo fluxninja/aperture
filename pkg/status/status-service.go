@@ -37,7 +37,7 @@ func (svc *StatusService) GetGroupStatus(ctx context.Context, req *statusv1.Grou
 		if key == "" {
 			continue
 		}
-		registry = registry.ChildIfExists(key)
+		registry = registry.ChildIfExists(key, "")
 		if registry == nil {
 			return &statusv1.GroupStatus{}, nil
 		}

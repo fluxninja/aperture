@@ -23,7 +23,7 @@ type jobTracker struct {
 }
 
 func newJobTracker(job Job, statusRegistry status.Registry) *jobTracker {
-	reg := statusRegistry.Child(job.Name())
+	reg := statusRegistry.Child("jt", job.Name())
 	return &jobTracker{
 		job:            job,
 		statusRegistry: reg,
