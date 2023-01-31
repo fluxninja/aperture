@@ -37,7 +37,7 @@ const (
 	uriKey       = "uri"
 	alertChannel = "status_registry"
 	// Resolve timeout in seconds.
-	alertResolveTimeout = 300
+	alertResolveTimeout = 2
 )
 
 // registry implements Registry.
@@ -57,11 +57,11 @@ type registry struct {
 
 // NewRegistry creates a new Registry.
 func NewRegistry(logger *log.Logger, alerter alerts.Alerter) Registry {
-	labeledAlerter := alerter.WithLabels(map[string]string{uriKey: "/"})
+	labeledAlerter := alerter.WithLabels(map[string]string{uriKey: ""})
 	r := &registry{
 		key:      "root",
 		value:    "root",
-		uri:      "/",
+		uri:      "",
 		parent:   nil,
 		status:   &statusv1.Status{},
 		children: make(map[string]*registry),
@@ -178,7 +178,7 @@ func (r *registry) createAlert(err *statusv1.Status_Error) *alerts.Alert {
 		alerts.WithAlertChannels([]string{alertChannel}),
 		alerts.WithResolveTimeout(resolve),
 		alerts.WithGeneratorURL(
-			fmt.Sprintf("http://%s/%s", info.GetHostInfo().Hostname, r.key),
+			fmt.Sprintf("http://%s%s", info.GetHostInfo().Hostname, r.uri),
 		),
 	)
 
@@ -206,8 +206,8 @@ func (r *registry) GetGroupStatus() *statusv1.GroupStatus {
 		Groups: make(map[string]*statusv1.GroupStatus),
 	}
 
-	for _, child := range r.children {
-		groupStatus.Groups[child.key] = child.GetGroupStatus()
+	for hash, child := range r.children {
+		groupStatus.Groups[hash] = child.GetGroupStatus()
 	}
 	return groupStatus
 }
