@@ -33,6 +33,7 @@ require (
 	github.com/hashicorp/memberlist v0.5.0
 	github.com/jonboulle/clockwork v0.3.0
 	github.com/json-iterator/go v1.1.12
+	github.com/jsonnet-bundler/jsonnet-bundler v0.5.1
 	github.com/knadh/koanf v1.5.0
 	github.com/lithammer/dedent v1.1.0
 	github.com/looplab/tarjan v0.1.0

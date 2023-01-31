@@ -10,8 +10,6 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "aperturectl",
 	Short: "aperturectl - CLI tool to interact with Aperture",
-	Run: func(cmd *cobra.Command, args []string) {
-	},
 }
 
 // Execute is the entrypoint for the CLI. It is called from the main package.
