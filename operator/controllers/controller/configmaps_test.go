@@ -24,6 +24,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/fluxninja/aperture/cmd/aperture-controller/controller"
 	. "github.com/fluxninja/aperture/operator/controllers"
 
 	"github.com/fluxninja/aperture/operator/api/common"
@@ -81,30 +82,22 @@ var _ = Describe("ConfigMap for Controller", func() {
 								DisablePlugins:  false,
 								DisabledPlugins: []string{"aperture-plugin-fluxninja"},
 							},
-							Otel: otelconfig.UserOTELConfig{
-								BatchPrerollup: otelconfig.BatchPrerollupConfig{
-									Timeout:          config.MakeDuration(1 * time.Second),
-									SendBatchSize:    10000,
-									SendBatchMaxSize: 20000,
-								},
-								BatchPostrollup: otelconfig.BatchPostrollupConfig{
-									Timeout:          config.MakeDuration(1 * time.Second),
-									SendBatchSize:    100,
-									SendBatchMaxSize: 200,
-								},
-								Ports: otelconfig.PortsConfig{
-									DebugPort:       8888,
-									HealthCheckPort: 13133,
-									PprofPort:       1777,
-									ZpagesPort:      55679,
-								},
-							},
 							Etcd: etcd.EtcdConfig{
 								Endpoints: []string{"http://agent-etcd:2379"},
 								LeaseTTL:  config.MakeDuration(60 * time.Second),
 							},
 							Prometheus: prometheus.PrometheusConfig{
 								Address: "http://aperture-prometheus-server:80",
+							},
+						},
+						OTEL: controller.ControllerOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
+								Ports: otelconfig.PortsConfig{
+									DebugPort:       8888,
+									HealthCheckPort: 13133,
+									PprofPort:       1777,
+									ZpagesPort:      55679,
+								},
 							},
 						},
 					},

@@ -2,9 +2,9 @@ package config
 
 import "github.com/fluxninja/aperture/pkg/config"
 
-// NewDefaultUserOTELConfig creates UserOTELConfig with all the default values set.
-func NewDefaultUserOTELConfig() *UserOTELConfig {
-	return &UserOTELConfig{
+// NewDefaultCommonOTELConfig creates CommonOTELConfig with all the default values set.
+func NewDefaultCommonOTELConfig() *CommonOTELConfig {
+	return &CommonOTELConfig{
 		Ports: PortsConfig{
 			DebugPort:       8888,
 			HealthCheckPort: 13133,
@@ -14,23 +14,10 @@ func NewDefaultUserOTELConfig() *UserOTELConfig {
 	}
 }
 
-// swagger:operation POST /otel common-configuration OTEL
-// ---
-// x-fn-config-env: true
-// parameters:
-// - name: proxy
-//   in: body
-//   schema:
-//     "$ref": "#/definitions/UserOTELConfig"
-
-// UserOTELConfig is the configuration for the OTEL collector.
+// CommonOTELConfig is the configuration for the OTEL collector.
 // swagger:model
 // +kubebuilder:object:generate=true
-type UserOTELConfig struct {
-	// BatchPrerollup configures batch prerollup processor.
-	BatchPrerollup BatchPrerollupConfig `json:"batch_prerollup"`
-	// BatchPostrollup configures batch postrollup processor.
-	BatchPostrollup BatchPostrollupConfig `json:"batch_postrollup"`
+type CommonOTELConfig struct {
 	// BatchAlerts configures batch alerts processor.
 	BatchAlerts BatchAlertsConfig `json:"batch_alerts"`
 	// Ports configures debug, health and extension ports values.
@@ -49,36 +36,6 @@ type PortsConfig struct {
 	PprofPort uint32 `json:"pprof_port" validate:"gte=0" default:"1777"`
 	// Port on which zpages extension in exposed.
 	ZpagesPort uint32 `json:"zpages_port" validate:"gte=0" default:"55679"`
-}
-
-// BatchPrerollupConfig defines configuration for OTEL batch processor.
-// swagger:model
-// +kubebuilder:object:generate=true
-type BatchPrerollupConfig struct {
-	// Timeout sets the time after which a batch will be sent regardless of size.
-	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"10s"`
-
-	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
-	SendBatchSize uint32 `json:"send_batch_size" validate:"gt=0" default:"10000"`
-
-	// SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
-	// into smaller units.
-	SendBatchMaxSize uint32 `json:"send_batch_max_size" validate:"gte=0" default:"10000"`
-}
-
-// BatchPostrollupConfig defines configuration for OTEL batch processor.
-// swagger:model
-// +kubebuilder:object:generate=true
-type BatchPostrollupConfig struct {
-	// Timeout sets the time after which a batch will be sent regardless of size.
-	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`
-
-	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
-	SendBatchSize uint32 `json:"send_batch_size" validate:"gt=0" default:"100"`
-
-	// SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
-	// into smaller units.
-	SendBatchMaxSize uint32 `json:"send_batch_max_size" validate:"gte=0" default:"100"`
 }
 
 // BatchAlertsConfig defines configuration for OTEL batch processor.

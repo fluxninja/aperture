@@ -17,6 +17,7 @@ limitations under the License.
 package controller
 
 import (
+	"github.com/fluxninja/aperture/cmd/aperture-controller/controller"
 	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
@@ -30,7 +31,6 @@ import (
 	"github.com/fluxninja/aperture/operator/api/common"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/net/listener"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 )
 
 var _ = Describe("Service for Controller", func() {
@@ -49,8 +49,8 @@ var _ = Describe("Service for Controller", func() {
 									Addr: ":8080",
 								},
 							},
-							Otel: otelconfig.UserOTELConfig{},
 						},
+						OTEL: controller.ControllerOTELConfig{},
 					},
 				},
 			}
@@ -123,8 +123,8 @@ var _ = Describe("Service for Controller", func() {
 									Addr: ":8080",
 								},
 							},
-							Otel: otelconfig.UserOTELConfig{},
 						},
+						OTEL: controller.ControllerOTELConfig{},
 					},
 				},
 			}

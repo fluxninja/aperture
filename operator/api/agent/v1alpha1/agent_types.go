@@ -19,6 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
 	"github.com/fluxninja/aperture/operator/api"
 	"github.com/fluxninja/aperture/operator/api/common"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
@@ -78,6 +79,10 @@ type AgentConfigSpec struct {
 	// Service Discovery configuration.
 	//+kubebuilder:validation:Optional
 	ServiceDiscoverySpec common.ServiceDiscoverySpec `json:"service_discovery"`
+
+	// OTEL configuration.
+	//+kubebuilder:validation:Optional
+	OTEL agent.AgentOTELConfig `json:"otel"`
 }
 
 // FlowControlConfigSpec holds flow control configuration.
