@@ -22,6 +22,14 @@ var (
 	mermaid string
 )
 
+func init() {
+	compileCmd.Flags().StringVar(&policy, "policy", "", "path to policy file")
+	compileCmd.Flags().StringVar(&cr, "cr", "", "path to policy custom resource file")
+	compileCmd.Flags().StringVar(&dot, "dot", "", "path to dot file")
+	compileCmd.Flags().StringVar(&mermaid, "mermaid", "", "path to mermaid file")
+	rootCmd.AddCommand(compileCmd)
+}
+
 var compileCmd = &cobra.Command{
 	Use:           "compile",
 	Short:         "Compile circuit from policy file",
@@ -138,14 +146,6 @@ var compileCmd = &cobra.Command{
 		}
 		return nil
 	},
-}
-
-func init() {
-	compileCmd.Flags().StringVar(&policy, "policy", "", "path to policy file")
-	compileCmd.Flags().StringVar(&cr, "cr", "", "path to policy custom resource file")
-	compileCmd.Flags().StringVar(&dot, "dot", "", "path to dot file")
-	compileCmd.Flags().StringVar(&mermaid, "mermaid", "", "path to mermaid file")
-	rootCmd.AddCommand(compileCmd)
 }
 
 func compilePolicy(path string) (*circuitfactory.Circuit, error) {
