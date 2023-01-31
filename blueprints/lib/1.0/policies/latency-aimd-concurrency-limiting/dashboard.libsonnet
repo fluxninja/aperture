@@ -173,10 +173,10 @@ function(params) {
     },
 
   local IncomingConcurrency =
-    newTimeSeriesPanel('Incoming Concurrency', ds, 'sum(rate(incoming_concurrency_ms{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: $._config.policy_name }, 'Concurrency', 'ms'),
+    newTimeSeriesPanel('Incoming Concurrency', ds, 'sum(rate(incoming_work_seconds_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: $._config.policy_name }, 'Concurrency', 'none'),
 
   local AcceptedConcurrency =
-    newTimeSeriesPanel('Accepted Concurrency', ds, 'sum(rate(accepted_concurrency_ms{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: $._config.policy_name }, 'Concurrency', 'ms'),
+    newTimeSeriesPanel('Accepted Concurrency', ds, 'sum(rate(accepted_work_seconds_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: $._config.policy_name }, 'Concurrency', 'none'),
 
   local WorkloadDecisions =
     newTimeSeriesPanel('Workload Decisions', ds, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: $._config.policy_name }, 'Decisions', 'reqps'),
