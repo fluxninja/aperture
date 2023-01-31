@@ -1427,10 +1427,6 @@ spec:
                             description: Timeout sets the time after which a batch
                               will be sent regardless of size.
                             type: string
-                        required:
-                        - send_batch_max_size
-                        - send_batch_size
-                        - timeout
                         type: object
                       batch_prerollup:
                         description: BatchPrerollup configures batch prerollup processor.
@@ -1450,10 +1446,6 @@ spec:
                             description: Timeout sets the time after which a batch
                               will be sent regardless of size.
                             type: string
-                        required:
-                        - send_batch_max_size
-                        - send_batch_size
-                        - timeout
                         type: object
                       custom_metrics:
                         additionalProperties:
@@ -1474,9 +1466,6 @@ spec:
                                   items:
                                     type: string
                                   type: array
-                              required:
-                              - processors
-                              - receivers
                               type: object
                             processors:
                               description: Processors define processors to be used
@@ -1488,10 +1477,6 @@ spec:
                                 custom metrics pipelines. This should be in OTEL format
                                 - https://opentelemetry.io/docs/collector/configuration/#receivers.
                               x-kubernetes-preserve-unknown-fields: true
-                          required:
-                          - pipeline
-                          - processors
-                          - receivers
                           type: object
                         description: CustomMetrics configures custom metrics pipelines,
                           which will send data to the controller prometheus.
@@ -1518,10 +1503,6 @@ spec:
                             format: int32
                             type: integer
                         type: object
-                    required:
-                    - batch_postrollup
-                    - batch_prerollup
-                    - custom_metrics
                     type: object
                   peer_discovery:
                     description: Peer discovery configuration.

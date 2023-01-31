@@ -1,3 +1,4 @@
+// +kubebuilder:validation:Optional
 package agent
 
 import (
@@ -37,7 +38,7 @@ type AgentOTELConfig struct {
 	BatchPostrollup BatchPostrollupConfig `json:"batch_postrollup"`
 	// CustomMetrics configures custom metrics pipelines, which will send data to
 	// the controller prometheus.
-	CustomMetrics map[string]CustomMetricsConfig `json:"custom_metrics"`
+	CustomMetrics map[string]CustomMetricsConfig `json:"custom_metrics,omitempty"`
 }
 
 // BatchPrerollupConfig defines configuration for OTEL batch processor.
