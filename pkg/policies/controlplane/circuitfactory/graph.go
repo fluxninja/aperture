@@ -152,8 +152,8 @@ func Mermaid(components []*policymonitoringv1.ComponentView, links []*policymoni
 		if component.ComponentDescription != "" {
 			description := component.ComponentDescription
 			// truncate description if too long (mermaid limitation)
-			if len(description) > 37 {
-				description = description[:37] + "..."
+			if len(description) > 27 {
+				description = description[:27] + "..."
 			}
 			name = fmt.Sprintf("<center>%s<br/>%s</center>", name, description)
 		}
