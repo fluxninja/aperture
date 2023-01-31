@@ -552,7 +552,7 @@ var _ = Describe("Agent DaemonSet", func() {
 									LivenessProbe: &corev1.Probe{
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
-												Path:   "/v1/status/liveness",
+												Path:   "/v1/status/sub_system/liveness",
 												Port:   intstr.FromString(Server),
 												Scheme: corev1.URISchemeHTTP,
 											},
@@ -566,7 +566,7 @@ var _ = Describe("Agent DaemonSet", func() {
 									ReadinessProbe: &corev1.Probe{
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
-												Path:   "/v1/status/readiness",
+												Path:   "/v1/status/sub_system/readiness",
 												Port:   intstr.FromString(Server),
 												Scheme: corev1.URISchemeHTTP,
 											},
