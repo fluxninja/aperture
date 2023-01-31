@@ -11,7 +11,6 @@ import (
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
-	distcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/distcache/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
@@ -19,6 +18,7 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/protobuf/proto"
 
+	distcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/distcache/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/jobs"
@@ -71,6 +71,7 @@ type DistCacheConfig struct {
 type DistCache struct {
 	sync.Mutex
 	Config  *olricconfig.Config
+	Address string
 	Olric   *olric.Olric
 	Metrics *DistCacheMetrics
 }
@@ -86,8 +87,10 @@ func (dc *DistCache) RemoveDMapCustomConfig(name string) {
 	delete(dc.Config.DMaps.Custom, name)
 }
 
-func (dc *DistCache) scrapeMetrics(context.Context) (proto.Message, error) {
-	stats, err := dc.Olric.Stats()
+func (dc *DistCache) scrapeMetrics(ctx context.Context) (proto.Message, error) {
+	client := dc.Olric.NewEmbeddedClient()
+
+	stats, err := client.Stats(ctx, dc.Address)
 	if err != nil {
 		log.Error().Err(err).Msgf("Failed to scrape Olric statistics")
 		return nil, err
@@ -238,6 +241,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 
 	dc := &DistCache{
 		Config:  oc,
+		Address: oc.BindAddr + ":" + strconv.Itoa(oc.BindPort),
 		Olric:   o,
 		Metrics: newDistCacheMetrics(),
 	}

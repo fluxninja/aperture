@@ -5,27 +5,32 @@ import (
 
 	"github.com/buraksezer/olric"
 	"github.com/clarketm/json"
+	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/structpb"
+
 	distcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/distcache/v1"
 	"github.com/fluxninja/aperture/pkg/log"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // DistCacheService implements distcache.v1 service.
 type DistCacheService struct {
 	distcachev1.UnimplementedDistCacheServiceServer
-	Olric *olric.Olric
+	Address string
+	Olric   *olric.Olric
 }
 
 // RegisterDistCacheService returns a new Handler.
-func RegisterDistCacheService(distcahce *DistCache) *DistCacheService {
+func RegisterDistCacheService(distcache *DistCache) *DistCacheService {
 	return &DistCacheService{
-		Olric: distcahce.Olric,
+		Address: distcache.Address,
+		Olric:   distcache.Olric,
 	}
 }
 
 // GetStats returns stats of the current Olric member.
-func (svc *DistCacheService) GetStats(ctx context.Context, _ *emptypb.Empty) (*distcachev1.Stats, error) {
-	stats, err := svc.Olric.Stats()
+func (svc *DistCacheService) GetStats(ctx context.Context, _ *emptypb.Empty) (*structpb.Struct, error) {
+	client := svc.Olric.NewEmbeddedClient()
+	stats, err := client.Stats(ctx, svc.Address)
 	if err != nil {
 		log.Error().Err(err).Msgf("Failed to scrape Olric statistics")
 		return nil, err
@@ -37,21 +42,29 @@ func (svc *DistCacheService) GetStats(ctx context.Context, _ *emptypb.Empty) (*d
 		return nil, err
 	}
 
-	newStats := &distcachev1.Stats{}
-	err = json.Unmarshal(rawStats, newStats)
+	structpbStats := &structpb.Struct{}
+	err = json.Unmarshal(rawStats, structpbStats)
 	if err != nil {
 		log.Error().Err(err).Msgf("Failed to unmarshal Olric statistics")
 		return nil, err
 	}
+	return structpbStats, nil
 
-	// Removing empty partitions to reduce the response size
-	partitions := make(map[uint64]*distcachev1.Partition)
-	for key, partition := range newStats.Partitions {
-		if partition.Length != 0 {
-			partitions[key] = partition
-		}
-	}
+	// newStats := &distcachev1.Stats{}
+	// err = json.Unmarshal(rawStats, newStats)
+	// if err != nil {
+	// 	log.Error().Err(err).Msgf("Failed to unmarshal Olric statistics")
+	// 	return nil, err
+	// }
 
-	newStats.Partitions = partitions
-	return newStats, nil
+	// // Removing empty partitions to reduce the response size
+	// partitions := make(map[uint64]*distcachev1.Partition)
+	// for key, partition := range newStats.Partitions {
+	// 	if partition.Length != 0 {
+	// 		partitions[key] = partition
+	// 	}
+	// }
+
+	// newStats.Partitions = partitions
+	// return newStats, nil
 }

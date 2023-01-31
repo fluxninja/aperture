@@ -1,6 +1,7 @@
 package ratetracker
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -14,7 +15,7 @@ import (
 type DistCacheRateTracker struct {
 	mu         sync.RWMutex
 	limitCheck RateLimitChecker
-	dMap       *olric.DMap
+	dMap       olric.DMap
 	name       string
 }
 
@@ -27,7 +28,7 @@ func NewDistCacheRateTracker(limitCheck RateLimitChecker, dc *distcache.DistCach
 	dc.Mutex.Lock()
 	defer dc.Mutex.Unlock()
 	dc.AddDMapCustomConfig(name, dmapConfig)
-	dMap, err := dc.Olric.NewDMap(name)
+	dMap, err := dc.Olric.NewEmbeddedClient().NewDMap(name)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +52,7 @@ func (ol *DistCacheRateTracker) Name() string {
 func (ol *DistCacheRateTracker) Close() error {
 	ol.mu.Lock()
 	defer ol.mu.Unlock()
-	err := ol.dMap.Destroy()
+	err := ol.dMap.Destroy(context.Background())
 	if err != nil {
 		return err
 	}
@@ -68,7 +69,7 @@ func (ol *DistCacheRateTracker) Take(label string) (bool, int, int) {
 func (ol *DistCacheRateTracker) TakeN(label string, n int) (bool, int, int) {
 	ol.mu.RLock()
 	defer ol.mu.RUnlock()
-	newN, err := ol.dMap.Incr(label, n)
+	newN, err := ol.dMap.Incr(context.Background(), label, n)
 	if err != nil {
 		return true, 0, 0
 	}
