@@ -173,7 +173,10 @@ operator-vet: ## Run go vet against code.
 
 .PHONY: operator-test
 operator-test: operator-manifests operator-generate operator-fmt operator-vet ## Run tests.
-	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test ./operator/... -coverprofile operator/cover.out
+	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" \
+		go test ./operator/... \
+			-coverprofile operator/cover.out \
+			-ldflags='-extldflags "-Wl,--allow-multiple-definition"'
 
 .PHONY: operator-setup_envtest
 operator-setup_envtest: ## Run tests.
@@ -183,7 +186,10 @@ operator-setup_envtest: ## Run tests.
 
 .PHONY: operator-build
 operator-build: operator-generate operator-fmt operator-vet ## Build manager binary.
-	go build -o bin/manager operator/main.go
+	go build \
+		-o bin/manager \
+		--ldflags "-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
+	operator/main.go
 
 .PHONY: operator-run
 operator-run: operator-manifests operator-generate operator-fmt operator-vet ## Run a controller from your host.

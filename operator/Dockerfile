@@ -6,7 +6,11 @@ COPY --link . .
 
 RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.cache/go-build/ \
-  CGO_ENABLED=0 go build -a -o aperture-operator operator/main.go
+  CGO_ENABLED=0 go build \
+    --ldflags "-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
+    -a \
+    -o aperture-operator \
+  operator/main.go
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
