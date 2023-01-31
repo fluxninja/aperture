@@ -3,6 +3,7 @@ package enrichmentprocessor
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
@@ -14,6 +15,11 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
+
+// entityNameLabels is a slice of labels using which this processor will try
+// to enrich i.e. it will try using all those labels one by one as keys
+// in the entity cache.
+var entityNameLabels = []string{otelconsts.PodNameLabel}
 
 type enrichmentProcessor struct {
 	cache *entitycache.EntityCache
@@ -51,58 +57,31 @@ func (ep *enrichmentProcessor) ConsumeMetrics(ctx context.Context, origMd pmetri
 	}
 	md := pmetric.NewMetrics()
 	origMd.CopyTo(md)
+	// Enrich common attributes in resource
+	otelcollector.IterateResourceMetrics(md, func(resourceMetrics pmetric.ResourceMetrics) {
+		ep.enrichMetrics(resourceMetrics.Resource().Attributes())
+	})
+	// Enrich attributes in each of the metric
 	otelcollector.IterateMetrics(md, func(metric pmetric.Metric) {
-		switch metric.Type() {
-		case pmetric.MetricTypeGauge:
-			dataPoints := metric.Gauge().DataPoints()
-			for dpIt := 0; dpIt < dataPoints.Len(); dpIt++ {
-				dp := dataPoints.At(dpIt)
-				ep.enrichMetrics(dp.Attributes())
-			}
-		case pmetric.MetricTypeSum:
-			dataPoints := metric.Sum().DataPoints()
-			for dpIt := 0; dpIt < dataPoints.Len(); dpIt++ {
-				dp := dataPoints.At(dpIt)
-				ep.enrichMetrics(dp.Attributes())
-			}
-		case pmetric.MetricTypeSummary:
-			dataPoints := metric.Summary().DataPoints()
-			for dpIt := 0; dpIt < dataPoints.Len(); dpIt++ {
-				dp := dataPoints.At(dpIt)
-				ep.enrichMetrics(dp.Attributes())
-			}
-		case pmetric.MetricTypeHistogram:
-			dataPoints := metric.Histogram().DataPoints()
-			for dpIt := 0; dpIt < dataPoints.Len(); dpIt++ {
-				dp := dataPoints.At(dpIt)
-				ep.enrichMetrics(dp.Attributes())
-			}
-		case pmetric.MetricTypeExponentialHistogram:
-			dataPoints := metric.ExponentialHistogram().DataPoints()
-			for dpIt := 0; dpIt < dataPoints.Len(); dpIt++ {
-				dp := dataPoints.At(dpIt)
-				ep.enrichMetrics(dp.Attributes())
-			}
-		}
+		otelcollector.IterateDataPoints(metric, ep.enrichMetrics)
 	})
 	return md, nil
 }
 
 func (ep *enrichmentProcessor) enrichMetrics(attributes pcommon.Map) {
-	hostNamex, ok := attributes.Get(otelconsts.EntityNameLabel)
-	if !ok {
-		return
+	for _, label := range entityNameLabels {
+		hostNamex, ok := attributes.Get(label)
+		if !ok {
+			continue
+		}
+		hostName := hostNamex.Str()
+		hostEntity, err := ep.cache.GetByName(hostName)
+		attributes.Remove(label)
+		if err != nil {
+			log.Trace().Str("label", label).Str("name", hostName).Msg("Skipping because entity not found in cache")
+			continue
+		}
+		// We don't want this to be OTLP slice, as it is weirdly formatten when written to prometheus.
+		attributes.PutStr(otelconsts.ApertureServicesLabel, strings.Join(hostEntity.Services, ","))
 	}
-	hostName := hostNamex.Str()
-	hostEntity, err := ep.cache.GetByName(hostName)
-	attributes.Remove(otelconsts.EntityNameLabel)
-	if err != nil {
-		log.Trace().Str("name", hostName).Msg("Skipping because entity not found in cache")
-		return
-	}
-	servicesValue := pcommon.NewValueSlice()
-	for _, service := range hostEntity.Services {
-		servicesValue.Slice().AppendEmpty().SetStr(service)
-	}
-	servicesValue.CopyTo(attributes.PutEmpty(otelconsts.ApertureServicesLabel))
 }
