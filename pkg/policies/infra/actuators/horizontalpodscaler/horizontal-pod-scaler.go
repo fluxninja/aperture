@@ -110,7 +110,7 @@ func setupHorizontalPodScalerFactory(
 		return err
 	}
 
-	reg := statusRegistry.Child(horizontalPodScalerStatusRoot)
+	reg := statusRegistry.Child("component", horizontalPodScalerStatusRoot)
 	// logger := reg.GetLogger()
 
 	paFactory := &horizontalPodScalerFactory{

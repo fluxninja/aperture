@@ -151,12 +151,12 @@ var _ PrefixNotifier = (*FxDriver)(nil)
 
 // GetKeyNotifier returns a KeyNotifier that will notify the driver of key changes.
 func (fxDriver *FxDriver) GetKeyNotifier(key Key) KeyNotifier {
-	statusRegistry := fxDriver.StatusRegistry.Child(key.String())
+	statusRegistry := fxDriver.StatusRegistry.Child("component_id", key.String())
 	fr := &fxRunner{
 		UnmarshalKeyNotifier:   fxDriver.getUnmarshalKeyNotifier(key),
 		fxOptionsFuncs:         fxDriver.FxOptionsFuncs,
 		statusRegistry:         statusRegistry,
-		fxRunnerStatusRegistry: statusRegistry.Child("fx_runner"),
+		fxRunnerStatusRegistry: statusRegistry.Child("sub_system", "fx_runner"),
 		prometheusRegistry:     fxDriver.PrometheusRegistry,
 	}
 
