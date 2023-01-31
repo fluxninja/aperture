@@ -17,6 +17,7 @@ import (
 	olricconfig "github.com/buraksezer/olric/config"
 	"github.com/hashicorp/memberlist"
 
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -217,7 +218,8 @@ func (fr *flowRunner) runFlows(t *testing.T) {
 func createJobGroup(limiter RateTracker) *jobs.JobGroup {
 	var gws jobs.GroupWatchers
 
-	reg := status.NewRegistry(log.GetGlobalLogger()).Child("jobs")
+	alerter := alerts.NewSimpleAlerter(100)
+	reg := status.NewRegistry(log.GetGlobalLogger(), alerter).Child("jobs")
 
 	group, err := jobs.NewJobGroup(reg, 0, jobs.RescheduleMode, gws)
 	if err != nil {

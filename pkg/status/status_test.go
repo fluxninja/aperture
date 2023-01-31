@@ -8,6 +8,7 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/status/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
@@ -15,7 +16,8 @@ var rootRegistry Registry
 
 var _ = Describe("Status Registry", func() {
 	BeforeEach(func() {
-		rootRegistry = NewRegistry(log.GetGlobalLogger())
+		alerter := alerts.NewSimpleAlerter(100)
+		rootRegistry = NewRegistry(log.GetGlobalLogger(), alerter)
 	})
 
 	Context("there is a single level root registry", func() {
