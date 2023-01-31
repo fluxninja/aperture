@@ -1539,6 +1539,8 @@ message NestedCircuit {
   repeated Component components = 3; // @gotags: validate:"dive"
   // Name of the nested circuit component. This name is displayed by graph visualization tools.
   string name = 4;
+  // Short description of the nested circuit component. This description is displayed by graph visualization tools.
+  string short_description = 5;
 }
 
 // Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.

@@ -1369,6 +1369,8 @@ definitions:
         x-order: 1
         $ref: '#/definitions/v1FlowMatcher'
       service_selector:
+        title: '@gotags: validate:"required"'
+        x-go-validate: required
         x-order: 0
         $ref: '#/definitions/v1ServiceSelector'
   v1FluxMeter:
@@ -2101,6 +2103,11 @@ definitions:
         additionalProperties:
           $ref: '#/definitions/v1OutPort'
         x-order: 1
+      short_description:
+        description: Short description of the nested circuit component. This description
+          is displayed by graph visualization tools.
+        type: string
+        x-order: 4
   v1NestedSignalEgress:
     description: Nested signal egress is a special type of component that allows to
       extract a signal from a nested circuit.

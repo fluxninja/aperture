@@ -18,6 +18,9 @@ func (*FirstValid) Name() string { return "FirstValid" }
 // Type implements runtime.Component.
 func (*FirstValid) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
+// ShortDescription implements runtime.Component.
+func (*FirstValid) ShortDescription() string { return "" }
+
 // Make sure FirstValid complies with Component interface.
 var _ runtime.Component = (*FirstValid)(nil)
 

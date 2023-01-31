@@ -50,9 +50,10 @@ func ParseAIMDConcurrencyController(
 	}
 
 	nestedCircuit := &policylangv1.NestedCircuit{
-		Name:        "AIMDConcurrencyController",
-		InPortsMap:  nestedInPortsMap,
-		OutPortsMap: nestedOutPortsMap,
+		Name:             "AIMDConcurrencyController",
+		ShortDescription: iface.GetServiceShortDescription(aimdConcurrencyController.FlowSelector.ServiceSelector),
+		InPortsMap:       nestedInPortsMap,
+		OutPortsMap:      nestedOutPortsMap,
 		Components: []*policylangv1.Component{
 			{
 				Component: &policylangv1.Component_ArithmeticCombinator{

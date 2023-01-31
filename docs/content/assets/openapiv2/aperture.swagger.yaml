@@ -1923,6 +1923,8 @@ definitions:
     properties:
       service_selector:
         $ref: '#/definitions/v1ServiceSelector'
+        title: '@gotags: validate:"required"'
+        x-go-validate: required
       flow_matcher:
         $ref: '#/definitions/v1FlowMatcher'
         title: '@gotags: validate:"required"'
@@ -2647,6 +2649,9 @@ definitions:
       name:
         type: string
         description: Name of the nested circuit component. This name is displayed by graph visualization tools.
+      short_description:
+        type: string
+        description: Short description of the nested circuit component. This description is displayed by graph visualization tools.
     description: Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
   v1NestedSignalEgress:
     type: object

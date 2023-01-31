@@ -368,6 +368,11 @@ func (*PromQL) Name() string { return "PromQL" }
 // Type implements runtime.Component.
 func (*PromQL) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
 
+// ShortDescription implements runtime.Component.
+func (promQL *PromQL) ShortDescription() string {
+	return fmt.Sprintf("every %s", promQL.evaluationInterval)
+}
+
 var _ runtime.Component = (*PromQL)(nil)
 
 // Make sure PromQL implements jobRegistererIfc.

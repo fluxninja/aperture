@@ -16,7 +16,7 @@ type nestedSignal struct {
 	portName string
 }
 
-// Make sure NoOp complies with Component interface.
+// Make sure nestedSignal complies with Component interface.
 var _ runtime.Component = (*nestedSignal)(nil)
 
 // PortName returns the port name.

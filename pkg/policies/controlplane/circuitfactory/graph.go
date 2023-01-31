@@ -66,55 +66,8 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 			log.Error().Err(err).Msg("converting component map")
 		}
 
-		getServiceSelector := func(selector interface{}) string {
-			selectorMap, ok := selector.(map[string]interface{})
-			if !ok {
-				return ""
-			}
-			serviceSelectorInterface, ok := selectorMap["service_selector"]
-			if !ok {
-				return ""
-			}
-			serviceSelector, ok := serviceSelectorInterface.(map[string]interface{})
-			if !ok {
-				return ""
-			}
-			agentGroup, ok := serviceSelector["agent_group"]
-			if !ok {
-				return ""
-			}
-			service, ok := serviceSelector["service"]
-			if !ok {
-				return ""
-			}
-			if agentGroup == "default" {
-				return service.(string)
-			}
-			return fmt.Sprintf("%s/%s", agentGroup, service)
-		}
-
 		componentName := c.Name()
-		componentDescription := ""
-		switch componentName {
-		case "Variable":
-			componentDescription = fmt.Sprintf("%s", componentConfig["default_config"])
-		case "ArithmeticCombinator":
-			componentDescription = fmt.Sprintf("%s", componentConfig["operator"])
-		case "Decider":
-			componentDescription = fmt.Sprintf("%s for %s", componentConfig["operator"], componentConfig["true_for"])
-		case "EMA":
-			componentDescription = fmt.Sprintf("win: %s", componentConfig["parameters"].(map[string]interface{})["ema_window"])
-		case "GradientController":
-			componentDescription = fmt.Sprintf("slope: %0.2f", componentConfig["parameters"].(map[string]interface{})["slope"])
-		case "Extrapolator":
-			componentDescription = fmt.Sprintf("for: %s", componentConfig["parameters"].(map[string]interface{})["max_extrapolation_interval"])
-		case "ConcurrencyLimiter":
-			componentDescription = getServiceSelector(componentConfig["flow_selector"])
-		case "RateLimiter":
-			componentDescription = getServiceSelector(componentConfig["flow_selector"])
-		case "AIMDConcurrencyController":
-			componentDescription = getServiceSelector(componentConfig["flow_selector"])
-		}
+		componentDescription := c.ShortDescription()
 
 		componentsDTO = append(componentsDTO, &policymonitoringv1.ComponentView{
 			ComponentId:          c.ComponentID.String(),
@@ -199,8 +152,8 @@ func Mermaid(components []*policymonitoringv1.ComponentView, links []*policymoni
 		if component.ComponentDescription != "" {
 			description := component.ComponentDescription
 			// truncate description if too long (mermaid limitation)
-			if len(description) > 16 {
-				description = description[:16] + "..."
+			if len(description) > 37 {
+				description = description[:37] + "..."
 			}
 			name = fmt.Sprintf("<center>%s<br/>%s</center>", name, description)
 		}
