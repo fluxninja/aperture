@@ -51,9 +51,11 @@ type registry struct {
 
 // NewRegistry creates a new Registry.
 func NewRegistry(logger *log.Logger, alerter alerts.Alerter) Registry {
-	labeledAlerter := alerter.WithLabels(map[string]string{"uri": "/"})
+	rootKey := "root"
+	uri := fmt.Sprintf("/%s/%s", rootKey, rootKey)
+	labeledAlerter := alerter.WithLabels(map[string]string{"uri": uri, rootKey: rootKey})
 	r := &registry{
-		key:      "root",
+		key:      rootKey,
 		parent:   nil,
 		status:   &statusv1.Status{},
 		children: make(map[string]*registry),
