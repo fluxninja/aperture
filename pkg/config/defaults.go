@@ -175,22 +175,10 @@ func SetDefaults(variable interface{}) {
 		// Note: Perhaps we can lift this limitation.
 		panic(fmt.Sprintf("SetDefaults can be used only on structs, got %v", kind))
 	}
-	getDefaultFiller().fill(variable)
+	defaultFiller.fill(variable)
 }
 
-var defaultFiller *filler = nil
-
-func init() {
-	defaultFiller = getDefaultFiller()
-}
-
-func getDefaultFiller() *filler {
-	if defaultFiller == nil {
-		defaultFiller = newDefaultFiller()
-	}
-
-	return defaultFiller
-}
+var defaultFiller *filler = newDefaultFiller()
 
 func newDefaultFiller() *filler {
 	filler := &filler{}
@@ -202,7 +190,7 @@ func newDefaultFiller() *filler {
 			return
 		}
 		if val.Elem().Kind() == reflect.Struct {
-			SetDefaults(val.Interface())
+			filler.fill(val.Interface())
 		} else if val.Elem().Kind() == reflect.Ptr || val.Elem().Kind() == reflect.Interface {
 			setPtrDefaults(val.Elem())
 		}
