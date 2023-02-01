@@ -420,7 +420,7 @@
               }
             ]
           },
-          "unit": "ms"
+          "unit": "none"
         }
       },
       "gridPos": {
@@ -447,7 +447,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(rate(incoming_concurrency_ms{policy_name=\"example\"}[$__rate_interval]))",
+          "expr": "sum(rate(incoming_work_seconds_total{policy_name=\"example\"}[$__rate_interval]))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "",
@@ -535,7 +535,7 @@
               }
             ]
           },
-          "unit": "ms"
+          "unit": "none"
         }
       },
       "gridPos": {
@@ -562,7 +562,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(rate(accepted_concurrency_ms{policy_name=\"example\"}[$__rate_interval]))",
+          "expr": "sum(rate(accepted_work_seconds_total{policy_name=\"example\"}[$__rate_interval]))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "",

@@ -50,10 +50,10 @@ const (
 	// WorkloadCounterMetricName - metric used for counting workload requests.
 	WorkloadCounterMetricName = "workload_requests_total"
 
-	// AcceptedConcurrencyMetricName - metric for measuring latencies of accepted requests.
-	AcceptedConcurrencyMetricName = "accepted_concurrency_ms"
-	// IncomingConcurrencyMetricName - metric for measuring latencies of all incoming requests.
-	IncomingConcurrencyMetricName = "incoming_concurrency_ms"
+	// AcceptedWorkSecondsMetricName - total work measured in seconds of estimated duration of all accepted requests.
+	AcceptedWorkSecondsMetricName = "accepted_work_seconds_total"
+	// IncomingWorkSecondsMetricName - total work measured in seconds of estimated duration of all incoming requests.
+	IncomingWorkSecondsMetricName = "incoming_work_seconds_total"
 
 	// WFQFlowsMetricName - weighted fair queuing number of flows gauge.
 	WFQFlowsMetricName = "wfq_flows_total"
