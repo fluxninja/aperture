@@ -12,9 +12,9 @@ import (
 	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/google/go-jsonnet"
 	"github.com/spf13/cobra"
-	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v2"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -40,7 +40,6 @@ func init() {
 	policyCmd.Flags().BoolVar(&apply, "apply", false, "Apply policy on the Kubernetes cluster")
 	policyCmd.Flags().StringVar(&kubeConfig, "kube_config", "", "Path to the Kubernets cluster config. Defaults to '~/.kube/config'")
 	policyCmd.Flags().StringVar(&valuesFile, "values_file", "", "Path to the values file for blueprints input")
-	policyCmd.Flags().StringVar(&blueprintsVersion, "version", "main", "version of aperture to pull blueprints from")
 }
 
 var policyCmd = &cobra.Command{
@@ -51,49 +50,31 @@ var policyCmd = &cobra.Command{
 		// check if policy or cr is provided
 		if policyType == "" {
 			return fmt.Errorf("--policy_type must be provided")
-		} else if valuesFile == "" {
-			valuesFile = fmt.Sprintf("%s.yaml", policyType)
 		}
 
-		absoluteValuesFile, err := filepath.Abs(valuesFile)
-		if err != nil {
+		if err := getValuesFilePath(); err != nil {
 			return err
 		}
+		log.Info().Msgf("Using '%s' as values file\n", valuesFile)
 
-		valuesFile = absoluteValuesFile
-		if _, err = os.Stat(valuesFile); err != nil {
-			return fmt.Errorf("values_file '%s' doesn't exist", valuesFile)
-		}
-		fmt.Printf("Using '%s' as values file\n", valuesFile)
-
-		blueprintsList, err := getBlueprintsList()
-		if err != nil {
+		if err := validatePolicyType(cmd, args); err != nil {
 			return err
-		}
-
-		err = pullCmd.RunE(cmd, args)
-		if err != nil {
-			return err
-		}
-
-		policies := blueprintsList[blueprintsVersion]
-		if !slices.Contains(policies, policyType) {
-			return fmt.Errorf("invalid value '%s' for --policy_type. Available policies are: %+v", policyType, policies)
 		}
 
 		apertureBlueprintsDir := filepath.Join(blueprintsDir, blueprintsVersion)
 
 		vm := jsonnet.MakeVM()
-
-		policyPath := filepath.Join(apertureBlueprintsDir, fmt.Sprintf("github.com/fluxninja/aperture/blueprints/lib/1.0/policies/%s/policy.libsonnet", policyType))
+		vm.Importer(&jsonnet.FileImporter{
+			JPaths: []string{apertureBlueprintsDir},
+		})
 
 		jsonStr, err := vm.EvaluateAnonymousSnippet("policy.libsonnet", fmt.Sprintf(`
-		local policy = import '%s';
+		local policy = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/policies/%s/policy.libsonnet';
 		local config = std.parseYaml(importstr '%s');
 		local policyResource = policy(config.common + config.policy).policyResource;
 
 		policyResource
-		`, policyPath, valuesFile))
+		`, policyType, valuesFile))
 		if err != nil {
 			return err
 		}
@@ -110,17 +91,12 @@ var policyCmd = &cobra.Command{
 		}
 
 		if outputDir != "" {
-			outputDir = filepath.Join(outputDir, blueprintsVersion, policyType)
-			err = os.MkdirAll(outputDir, os.ModePerm)
-			if err != nil {
-				return err
+			updatedOutputDir, er := getOutputDir(outputDir)
+			if er != nil {
+				return er
 			}
 
-			outputDir, err = filepath.Abs(outputDir)
-			if err != nil {
-				return err
-			}
-			policyFilePath := filepath.Join(outputDir, "policy.yaml")
+			policyFilePath := filepath.Join(updatedOutputDir, "policy.yaml")
 			err = os.WriteFile(policyFilePath, yamlBytes, 0o600)
 			if err != nil {
 				return err
@@ -133,7 +109,7 @@ var policyCmd = &cobra.Command{
 		if apply {
 			err = applyPolicy(kubeConfig, yamlBytes)
 			if err != nil {
-				return fmt.Errorf("failed to apply policy to Kubernetes. Error: '%s'", err.Error())
+				log.Error().Msgf("failed to apply policy to Kubernetes. Error: '%s'", err.Error())
 			}
 		}
 
@@ -148,7 +124,7 @@ func applyPolicy(kubeConfig string, policyBytes []byte) error {
 			return err
 		}
 		kubeConfig = filepath.Join(homeDir, ".kube", "config")
-		fmt.Printf("Using '%s' as Kubernetes config\n", kubeConfig)
+		log.Info().Msgf("Using '%s' as Kubernetes config\n", kubeConfig)
 	}
 
 	kubeRestConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfig)
@@ -217,6 +193,6 @@ func createPolicy(kubeRestConfig *rest.Config, policyBytes []byte) error {
 		return fmt.Errorf("failed to apply policy in Kubernetes. Error: %s", err.Error())
 	}
 
-	fmt.Printf("Applied policy '%s' in '%s' namespace.\n", policy.GetName(), policy.GetNamespace())
+	log.Info().Msgf("Applied policy '%s' in '%s' namespace.\n", policy.GetName(), policy.GetNamespace())
 	return nil
 }
