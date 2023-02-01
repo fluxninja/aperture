@@ -1,5 +1,5 @@
 ---
-title: Latency Gradient Concurrency Limiting Policy
+title: Latency AIMD Concurrency Limiting Policy
 ---
 
 ```mdx-code-block
