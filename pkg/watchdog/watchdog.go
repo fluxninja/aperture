@@ -12,6 +12,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	watchdogv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/watchdog/v1"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -121,6 +122,9 @@ func (w *watchdog) start() error {
 			JobBase: jobs.JobBase{
 				JobName: "cgroup",
 			},
+			JobFunc: func(ctx context.Context) (proto.Message, error) {
+				return &emptypb.Empty{}, nil
+			},
 		}
 		if w.config.CGroup.WatermarksPolicy.Enabled {
 			cgw := &cgroupWatermarks{WatermarksPolicy: w.config.CGroup.WatermarksPolicy}
@@ -139,6 +143,9 @@ func (w *watchdog) start() error {
 		job := &jobs.BasicJob{
 			JobBase: jobs.JobBase{
 				JobName: "system",
+			},
+			JobFunc: func(ctx context.Context) (proto.Message, error) {
+				return &emptypb.Empty{}, nil
 			},
 		}
 		// System memory check
