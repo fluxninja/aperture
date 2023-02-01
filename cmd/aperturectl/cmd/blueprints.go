@@ -162,7 +162,6 @@ var blueprintsListCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
 		fmt.Fprintln(w, "Version\tPolicies")
-		w.Flush()
 
 		blueprintsContents, err := os.ReadDir(blueprintsDir)
 		if err != nil {
