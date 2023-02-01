@@ -1,4 +1,4 @@
-package cmd
+package blueprints
 
 import (
 	"encoding/json"
@@ -6,8 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"strings"
-	"text/tabwriter"
 
 	"github.com/jsonnet-bundler/jsonnet-bundler/pkg"
 	"github.com/jsonnet-bundler/jsonnet-bundler/pkg/jsonnetfile"
@@ -16,51 +14,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const apertureBlueprintsRepo = "github.com/fluxninja/aperture/blueprints"
-
-var (
-	blueprintsDir string
-
-	// Args for `blueprints`.
-	blueprintsVersion string
-
-	// Args for `blueprints clean`.
-	removeAll bool
-)
-
 func init() {
-	blueprintsCmd.PersistentFlags().StringVar(&blueprintsVersion, "version", "main", "version of aperture blueprint")
-	rootCmd.AddCommand(blueprintsCmd)
-
-	// blueprints pull
-	blueprintsCmd.AddCommand(blueprintsPullCmd)
-
-	// blueprints list
-	blueprintsCmd.AddCommand(blueprintsListCmd)
-
-	// blueprints remove
-	blueprintsRemoveCmd.Flags().BoolVar(&removeAll, "all", false, "remove all versions of aperture blueprints")
-	blueprintsCmd.AddCommand(blueprintsRemoveCmd)
+	pullCmd.Flags().StringVar(&blueprintsVersion, "version", "main", "version of aperture to pull blueprints from")
 }
 
-var blueprintsCmd = &cobra.Command{
-	Use:   "blueprints",
-	Short: "Manage blueprints",
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		userHomeDir, err := os.UserHomeDir()
-		if err != nil {
-			return err
-		}
-		blueprintsDir = filepath.Join(userHomeDir, ".aperturectl", "blueprints")
-		err = os.MkdirAll(blueprintsDir, os.ModePerm)
-		if err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var blueprintsPullCmd = &cobra.Command{
+var pullCmd = &cobra.Command{
 	Use:   "pull",
 	Short: "Pull a blueprint",
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -154,60 +112,4 @@ func writeJSONFile(name string, d interface{}) error {
 
 	// nolint: gosec
 	return os.WriteFile(name, b, 0o644)
-}
-
-var blueprintsListCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List blueprints",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
-		fmt.Fprintln(w, "Version\tPolicies")
-
-		blueprintsContents, err := os.ReadDir(blueprintsDir)
-		if err != nil {
-			return err
-		}
-		for _, content := range blueprintsContents {
-			if content.IsDir() {
-				version := content.Name()
-				policies := []string{}
-
-				blueprintsVersionContents, err := os.ReadDir(filepath.Join(blueprintsDir, version, apertureBlueprintsRepo, "lib", "1.0", "policies"))
-				if err != nil && !os.IsNotExist(err) {
-					return err
-				}
-				for _, versionContent := range blueprintsVersionContents {
-					if versionContent.IsDir() {
-						policies = append(policies, versionContent.Name())
-					}
-				}
-
-				fmt.Fprintf(w, "%s\t%s\n", version, strings.Join(policies, ", "))
-			}
-		}
-
-		w.Flush()
-		return nil
-	},
-}
-
-var blueprintsRemoveCmd = &cobra.Command{
-	Use:   "remove",
-	Short: "Remove a blueprint",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		pathToRemove := ""
-
-		if removeAll {
-			pathToRemove = blueprintsDir
-		} else {
-			pathToRemove = filepath.Join(blueprintsDir, blueprintsVersion)
-		}
-
-		err := os.RemoveAll(pathToRemove)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	},
 }
