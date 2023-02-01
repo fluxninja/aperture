@@ -494,6 +494,16 @@ jobs:
           registry: <<parameters.registry>>
           use-buildkit: true
           extra_build_args: --build-arg=IMAGE_TAG=<<parameters.tag>>
+      - aperture_docker_build:
+          step-name: Build java sdk example image
+          docker-context: <<parameters.docker-context>>
+          dockerfile: dockerfiles/example/Dockerfile
+          image: aperture-java-example
+          path: <<parameters.path>>
+          tag: <<parameters.tag>>
+          registry: <<parameters.registry>>
+          use-buildkit: true
+          extra_build_args: --build-arg=IMAGE_TAG=<<parameters.tag>>
       - asdf_install:
           cache_name: validate-sdk
           tools: |-
