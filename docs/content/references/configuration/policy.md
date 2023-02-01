@@ -1781,7 +1781,7 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 <dt>service_selector</dt>
 <dd>
 
-([V1ServiceSelector](#v1-service-selector))
+([V1ServiceSelector](#v1-service-selector), `required`) @gotags: validate:"required"
 
 </dd>
 <dt>flow_matcher</dt>
@@ -2024,7 +2024,7 @@ eg.:
 
 - $\text{slope} = 1$: when signal is too high, increase control variable,
 - $\text{slope} = -1$: when signal is too high, decrease control variable,
-- $\text{slope} = -0.5$: when signal is to high, decrease control variable more slowly.
+- $\text{slope} = -0.5$: when signal is too high, decrease control variable slowly.
 
 The sign of slope depends on correlation between the signal and control variable:
 
@@ -2798,6 +2798,12 @@ Nested circuit defines a sub-circuit as a high-level component. It consists of a
 (string) Name of the nested circuit component. This name is displayed by graph visualization tools.
 
 </dd>
+<dt>short_description</dt>
+<dd>
+
+(string) Short description of the nested circuit component. This description is displayed by graph visualization tools.
+
+</dd>
 </dl>
 
 ### v1NestedSignalEgress {#v1-nested-signal-egress}
@@ -3402,25 +3408,31 @@ Output for the Scheduler component.
 <dt>accepted_concurrency</dt>
 <dd>
 
-([V1OutPort](#v1-out-port)) Accepted concurrency is the number of accepted tokens per second.
+([V1OutPort](#v1-out-port)) Accepted concurrency is actual concurrency on a control point that this
+scheduler is applied on.
 
 :::info
-**Accepted tokens** are tokens associated with
-[flows](/concepts/integrations/flow-control/flow-control.md#flow) that were accepted by
-this scheduler. Number of tokens for a flow is determined by a
-[workload parameters](#scheduler-workload-parameters) that the flow was assigned to (either
-via `auto_tokens` or explicitly by `Workload.tokens`).
+Concurrency is a unitless number describing mean number of
+[flows](/concepts/integrations/flow-control/flow-control.md#flow) being
+concurrently processed by the system (system = control point).
+Concurrency is calculated as _work_ done per unit of time (so
+work-seconds per world-seconds). Work-seconds are computed based on
+token-weights of of flows (which are either estimated via `auto_tokens`
+or specified by `Workload.tokens`).
 :::
 
-Value of this signal is the sum across all the relevant schedulers.
+Value of this signal is aggregated from all the relevant schedulers.
 
 </dd>
 <dt>incoming_concurrency</dt>
 <dd>
 
-([V1OutPort](#v1-out-port)) Incoming concurrency is the number of incoming tokens/sec.
-This is the same as `accepted_concurrency`, but across all the flows
-entering scheduler, including rejected ones.
+([V1OutPort](#v1-out-port)) Incoming concurrency is concurrency that'd be needed to accept all the
+flows entering the scheduler.
+
+This is computed in the same way as `accepted_concurrency`, but summing
+up work-seconds from all the flows entering scheduler, including
+rejected ones.
 
 </dd>
 </dl>

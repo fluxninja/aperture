@@ -42,6 +42,9 @@ func (*LoadActuator) Name() string { return "LoadActuator" }
 // Type implements runtime.Component.
 func (*LoadActuator) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
 
+// ShortDescription implements runtime.Component.
+func (la *LoadActuator) ShortDescription() string { return la.agentGroupName }
+
 // NewLoadActuatorAndOptions creates load actuator and its fx options.
 func NewLoadActuatorAndOptions(
 	loadActuatorProto *policylangv1.LoadActuator,

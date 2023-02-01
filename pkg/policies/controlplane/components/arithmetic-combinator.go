@@ -42,6 +42,9 @@ func (*ArithmeticCombinator) Type() runtime.ComponentType {
 	return runtime.ComponentTypeSignalProcessor
 }
 
+// ShortDescription implements runtime.Component.
+func (arith *ArithmeticCombinator) ShortDescription() string { return arith.operator.String() }
+
 // Make sure ArithmeticCombinator complies with Component interface.
 var _ runtime.Component = (*ArithmeticCombinator)(nil)
 

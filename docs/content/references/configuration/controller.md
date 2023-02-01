@@ -25,7 +25,6 @@ Generated File Starts
 | `liveness`   | [Liveness](#liveness)              |
 | `log`        | [Log](#log)                        |
 | `metrics`    | [Metrics](#metrics)                |
-| `otel`       | [OTEL](#o-t-e-l)                   |
 | `plugins`    | [Plugins](#plugins)                |
 | `policies`   | [PoliciesConfig](#policies-config) |
 | `profilers`  | [Profilers](#profilers)            |
@@ -33,6 +32,12 @@ Generated File Starts
 | `readiness`  | [Readiness](#readiness)            |
 | `server`     | [Server](#server)                  |
 | `watchdog`   | [Watchdog](#watchdog)              |
+
+### CONTROLLER CONFIGURATION
+
+| Key    | Reference        |
+| ------ | ---------------- |
+| `otel` | [OTEL](#o-t-e-l) |
 
 ### PLUGIN CONFIGURATION
 
@@ -181,11 +186,11 @@ Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_`
 
 <dl>
 
-<dt>proxy</dt>
+<dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_PROXY_`
-Type: [UserOTELConfig](#user-o-t-e-l-config)
+Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_`
+Type: [ControllerOTELConfig](#controller-o-t-e-l-config)
 
 </dd>
 
@@ -483,62 +488,6 @@ into smaller units.
 </dd>
 </dl>
 
-### BatchPostrollupConfig {#batch-postrollup-config}
-
-BatchPostrollupConfig defines configuration for OTEL batch processor.
-
-#### Properties
-
-<dl>
-<dt>send_batch_max_size</dt>
-<dd>
-
-(uint32, `gte=0`, default: `100`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
-into smaller units.
-
-</dd>
-<dt>send_batch_size</dt>
-<dd>
-
-(uint32, `gt=0`, default: `100`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
-
-</dd>
-<dt>timeout</dt>
-<dd>
-
-(string, `gt=0`, default: `1s`) Timeout sets the time after which a batch will be sent regardless of size.
-
-</dd>
-</dl>
-
-### BatchPrerollupConfig {#batch-prerollup-config}
-
-BatchPrerollupConfig defines configuration for OTEL batch processor.
-
-#### Properties
-
-<dl>
-<dt>send_batch_max_size</dt>
-<dd>
-
-(uint32, `gte=0`, default: `10000`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
-into smaller units.
-
-</dd>
-<dt>send_batch_size</dt>
-<dd>
-
-(uint32, `gt=0`, default: `10000`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
-
-</dd>
-<dt>timeout</dt>
-<dd>
-
-(string, `gt=0`, default: `10s`) Timeout sets the time after which a batch will be sent regardless of size.
-
-</dd>
-</dl>
-
 ### ClientConfig {#client-config}
 
 ClientConfig is the client configuration.
@@ -595,6 +544,27 @@ ClientTLSConfig is the config for client TLS.
 <dd>
 
 (string)
+
+</dd>
+</dl>
+
+### ControllerOTELConfig {#controller-o-t-e-l-config}
+
+ControllerOTELConfig is the configuration for Agent's OTEL collector.
+
+#### Properties
+
+<dl>
+<dt>batch_alerts</dt>
+<dd>
+
+([BatchAlertsConfig](#batch-alerts-config))
+
+</dd>
+<dt>ports</dt>
+<dd>
+
+([PortsConfig](#ports-config))
 
 </dd>
 </dl>
@@ -1367,39 +1337,6 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 <dd>
 
 (string) Server Key file path
-
-</dd>
-</dl>
-
-### UserOTELConfig {#user-o-t-e-l-config}
-
-UserOTELConfig is the configuration for the OTEL collector.
-
-#### Properties
-
-<dl>
-<dt>batch_alerts</dt>
-<dd>
-
-([BatchAlertsConfig](#batch-alerts-config))
-
-</dd>
-<dt>batch_postrollup</dt>
-<dd>
-
-([BatchPostrollupConfig](#batch-postrollup-config))
-
-</dd>
-<dt>batch_prerollup</dt>
-<dd>
-
-([BatchPrerollupConfig](#batch-prerollup-config))
-
-</dd>
-<dt>ports</dt>
-<dd>
-
-([PortsConfig](#ports-config))
 
 </dd>
 </dl>

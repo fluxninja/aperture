@@ -116,7 +116,6 @@ func (in *CommonConfigSpec) DeepCopyInto(out *CommonConfigSpec) {
 	in.Readiness.DeepCopyInto(&out.Readiness)
 	in.Log.DeepCopyInto(&out.Log)
 	out.Metrics = in.Metrics
-	in.Otel.DeepCopyInto(&out.Otel)
 	in.Plugins.DeepCopyInto(&out.Plugins)
 	out.Profilers = in.Profilers
 	out.Prometheus = in.Prometheus

@@ -13,7 +13,12 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 // See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 // :::
 message FlowSelector {
-  ServiceSelector service_selector = 1;
+  ServiceSelector service_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
   FlowMatcher flow_matcher = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"

@@ -77,7 +77,7 @@ func (o *OTELConfig) AddExporter(name string, value interface{}) {
 }
 
 // SetDebugPort configures debug port on which OTEL server /metrics as specified by user.
-func (o *OTELConfig) SetDebugPort(userCfg *UserOTELConfig) {
+func (o *OTELConfig) SetDebugPort(userCfg *CommonOTELConfig) {
 	portInput := fmt.Sprintf(":%d", userCfg.Ports.DebugPort)
 	if val, ok := o.Service.Telemetry["metrics"]; ok {
 		if val, ok := val.(map[string]interface{}); ok {
@@ -92,7 +92,7 @@ func (o *OTELConfig) SetDebugPort(userCfg *UserOTELConfig) {
 }
 
 // AddDebugExtensions adds common debug extensions and enables them.
-func (o *OTELConfig) AddDebugExtensions(userCfg *UserOTELConfig) {
+func (o *OTELConfig) AddDebugExtensions(userCfg *CommonOTELConfig) {
 	o.AddExtension("health_check", map[string]interface{}{
 		"endpoint": fmt.Sprintf("localhost:%d", userCfg.Ports.HealthCheckPort),
 	})
@@ -183,15 +183,6 @@ func (p *Pipeline) AsMap() map[string]interface{} {
 // BaseFxTag is the base name tag for otel components.
 var BaseFxTag = config.NameTag("base")
 
-// OTELParams contains parameters for otel collector factories for agent and controller.
-type OTELParams struct {
-	promClient promapi.Client
-	Config     *OTELConfig
-	Listener   *listener.Listener
-	tlsConfig  *tls.Config
-	UserOTELConfig
-}
-
 // FxIn consumes parameters via Fx.
 type FxIn struct {
 	fx.In
@@ -200,26 +191,4 @@ type FxIn struct {
 	PromClient      promapi.Client
 	TLSConfig       *tls.Config
 	ServerTLSConfig tlsconfig.ServerTLSConfig
-}
-
-// NewOTELParams returns OTEL parameters for OTEL collectors.
-func NewOTELParams(in FxIn) (*OTELParams, error) {
-	config := NewOTELConfig()
-
-	var userCfg UserOTELConfig
-	if err := in.Unmarshaller.UnmarshalKey("otel", &userCfg); err != nil {
-		return nil, err
-	}
-
-	config.SetDebugPort(&userCfg)
-	config.AddDebugExtensions(&userCfg)
-
-	cfg := &OTELParams{
-		UserOTELConfig: userCfg,
-		Listener:       in.Listener,
-		promClient:     in.PromClient,
-		tlsConfig:      in.TLSConfig,
-		Config:         config,
-	}
-	return cfg, nil
 }
