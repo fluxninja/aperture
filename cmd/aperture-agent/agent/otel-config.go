@@ -4,6 +4,7 @@ package agent
 import (
 	"crypto/tls"
 	"fmt"
+	"strings"
 
 	promapi "github.com/prometheus/client_golang/api"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
@@ -36,8 +37,10 @@ type AgentOTELConfig struct {
 	BatchPrerollup BatchPrerollupConfig `json:"batch_prerollup"`
 	// BatchPostrollup configures batch postrollup processor.
 	BatchPostrollup BatchPostrollupConfig `json:"batch_postrollup"`
-	// CustomMetrics configures custom metrics pipelines, which will send data to
+	// CustomMetrics configures custom metrics OTEL pipelines, which will send data to
 	// the controller prometheus.
+	// Key in this map refers to OTEL pipeline name. Prefixing pipeline name with `metrics/`
+	// is optional, as all the components and pipeline names would be normalized.
 	// By default `kubeletstats` custom metrics is added, which can be overwritten.
 	CustomMetrics map[string]CustomMetricsConfig `json:"custom_metrics,omitempty"`
 }
@@ -253,35 +256,44 @@ func addCustomMetricsPipelines(
 		}
 		agentConfig.CustomMetrics[otelconsts.ReceiverKubeletStats] = makeCustomMetricsConfigForKubeletStats()
 	}
-	for metricName, metricConfig := range agentConfig.CustomMetrics {
+	for pipelineName, metricConfig := range agentConfig.CustomMetrics {
+		pipelineName = strings.TrimPrefix(pipelineName, "metrics/")
 		for receiverName, receiverConfig := range metricConfig.Receivers {
-			config.AddReceiver(makeCustomComponentName(metricName, receiverName), receiverConfig)
+			config.AddReceiver(normalizeComponentName(pipelineName, receiverName), receiverConfig)
 		}
 		for processorName, processorConfig := range metricConfig.Processors {
-			config.AddProcessor(makeCustomComponentName(metricName, processorName), processorConfig)
+			config.AddProcessor(normalizeComponentName(pipelineName, processorName), processorConfig)
 		}
-		config.Service.AddPipeline(makeCustomMetricsName(metricName), otelconfig.Pipeline{
-			Receivers:  renameComponents(metricName, metricConfig.Pipeline.Receivers),
-			Processors: renameComponents(metricName, metricConfig.Pipeline.Processors),
+		config.Service.AddPipeline(normalizePipelineName(pipelineName), otelconfig.Pipeline{
+			Receivers:  normalizeComponentNames(pipelineName, metricConfig.Pipeline.Receivers),
+			Processors: normalizeComponentNames(pipelineName, metricConfig.Pipeline.Processors),
 			Exporters:  []string{otelconsts.ExporterPrometheusRemoteWrite},
 		})
 	}
 }
 
-func renameComponents(metricName string, components []string) []string {
+// normalizePipelineName normalizes user defined pipeline name by adding
+// `metrics/user-defined-` prefix.
+// This ensures no builtin metrics pipeline is overwritten.
+func normalizePipelineName(pipelineName string) string {
+	return fmt.Sprintf("metrics/user-defined-%s", pipelineName)
+}
+
+// normalizeComponentNames calls `normalizeComponentName` for each element of the
+// slice. Returns new slice with modified elements.
+func normalizeComponentNames(pipelineName string, components []string) []string {
 	renamed := make([]string, len(components))
 	for i, c := range components {
-		renamed[i] = makeCustomComponentName(metricName, c)
+		renamed[i] = normalizeComponentName(pipelineName, c)
 	}
 	return renamed
 }
 
-func makeCustomMetricsName(name string) string {
-	return fmt.Sprintf("metrics/user-defined-%s", name)
-}
-
-func makeCustomComponentName(metricName, name string) string {
-	return fmt.Sprintf("%s/user-defined-%s", name, metricName)
+// normalizeComponentName normalizes user defines component name by adding
+// `user-defined-<pipeline_name>` suffix.
+// This ensures no builtin components are overwritten.
+func normalizeComponentName(pipelineName, componentName string) string {
+	return fmt.Sprintf("%s/user-defined-%s", componentName, pipelineName)
 }
 
 func makeCustomMetricsConfigForKubeletStats() CustomMetricsConfig {
