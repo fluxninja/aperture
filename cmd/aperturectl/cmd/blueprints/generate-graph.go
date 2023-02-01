@@ -4,20 +4,21 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/goccy/go-graphviz"
 	"github.com/spf13/cobra"
+
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 func init() {
-	graphCmd.Flags().StringVar(&policyType, "policy_type", "", "Type of policy to generate e.g. static-rate-limiting, latency-aimd-concurrency-limiting")
-	graphCmd.Flags().StringVar(&outputDir, "output_dir", "", "Directory path where the generated manifests will be stored. If not provided, will be printed on console")
-	graphCmd.Flags().StringVar(&valuesFile, "values_file", "", "Path to the values file for blueprints input")
+	generateGraphCmd.Flags().StringVar(&policyType, "policy_type", "", "Type of policy to generate e.g. static-rate-limiting, latency-aimd-concurrency-limiting")
+	generateGraphCmd.Flags().StringVar(&outputDir, "output_dir", "", "Directory path where the generated manifests will be stored. If not provided, will be printed on console")
+	generateGraphCmd.Flags().StringVar(&valuesFile, "values_file", "", "Path to the values file for blueprints input")
 }
 
-var graphCmd = &cobra.Command{
-	Use:           "generate-graph",
+var generateGraphCmd = &cobra.Command{
+	Use:           "graph",
 	Short:         "Generate graph",
 	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -35,7 +36,7 @@ var graphCmd = &cobra.Command{
 			return err
 		}
 
-		err = policyCmd.RunE(cmd, args)
+		err = generatePolicyCmd.RunE(cmd, args)
 		if err != nil {
 			return err
 		}

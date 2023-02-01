@@ -8,10 +8,6 @@ import (
 
 var version = "0.0.1"
 
-func init() {
-	RootCmd.AddCommand(versionCmd)
-}
-
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version number of aperturectl",

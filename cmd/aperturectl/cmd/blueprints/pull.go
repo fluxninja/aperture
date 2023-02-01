@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	pullCmd.Flags().StringVar(&blueprintsVersion, "version", "main", "version of aperture to pull blueprints from")
+	BlueprintsCmd.AddCommand(pullCmd)
 }
 
 var pullCmd = &cobra.Command{
@@ -57,7 +57,7 @@ var pullCmd = &cobra.Command{
 			return err
 		}
 
-		uri := fmt.Sprintf("%s@%s", apertureBlueprintsRepo, blueprintsVersion)
+		uri := fmt.Sprintf("%s@%s", apertureBlueprintsURI, blueprintsVersion)
 		d := deps.Parse(apertureBlueprintsDir, uri)
 		if !depEqual(spec.Dependencies[d.Name()], *d) {
 			spec.Dependencies[d.Name()] = *d

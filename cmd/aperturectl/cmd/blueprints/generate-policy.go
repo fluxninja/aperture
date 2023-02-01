@@ -9,10 +9,6 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/errors"
 
-	"github.com/fluxninja/aperture/operator/api"
-	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/google/go-jsonnet"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -24,6 +20,11 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+
+	"github.com/fluxninja/aperture/operator/api"
+	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 var (
@@ -35,15 +36,15 @@ var (
 )
 
 func init() {
-	policyCmd.Flags().StringVar(&policyType, "policy_type", "", "Type of policy to generate e.g. static-rate-limiting, latency-aimd-concurrency-limiting")
-	policyCmd.Flags().StringVar(&outputDir, "output_dir", "", "Directory path where the generated manifests will be stored. If not provided, will be printed on console")
-	policyCmd.Flags().BoolVar(&apply, "apply", false, "Apply policy on the Kubernetes cluster")
-	policyCmd.Flags().StringVar(&kubeConfig, "kube_config", "", "Path to the Kubernets cluster config. Defaults to '~/.kube/config'")
-	policyCmd.Flags().StringVar(&valuesFile, "values_file", "", "Path to the values file for blueprints input")
+	generatePolicyCmd.Flags().StringVar(&policyType, "policy_type", "", "Type of policy to generate e.g. static-rate-limiting, latency-aimd-concurrency-limiting")
+	generatePolicyCmd.Flags().StringVar(&outputDir, "output_dir", "", "Directory path where the generated manifests will be stored. If not provided, will be printed on console")
+	generatePolicyCmd.Flags().BoolVar(&apply, "apply", false, "Apply policy on the Kubernetes cluster")
+	generatePolicyCmd.Flags().StringVar(&kubeConfig, "kube_config", "", "Path to the Kubernets cluster config. Defaults to '~/.kube/config'")
+	generatePolicyCmd.Flags().StringVar(&valuesFile, "values_file", "", "Path to the values file for blueprints input")
 }
 
-var policyCmd = &cobra.Command{
-	Use:           "generate-policy",
+var generatePolicyCmd = &cobra.Command{
+	Use:           "policy",
 	Short:         "Generate policy",
 	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
