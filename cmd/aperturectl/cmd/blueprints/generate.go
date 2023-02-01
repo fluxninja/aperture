@@ -37,7 +37,7 @@ var generateCmd = &cobra.Command{
 }
 
 func validatePolicyType(cmd *cobra.Command, args []string) error {
-	blueprintsList, err := getBlueprintsList()
+	blueprintsList, err := getBlueprints()
 	if err != nil {
 		return err
 	}

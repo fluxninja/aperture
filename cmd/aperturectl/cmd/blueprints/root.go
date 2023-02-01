@@ -7,7 +7,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const apertureBlueprintsRepoDefault = "github.com/fluxninja/aperture/blueprints"
+const (
+	apertureBlueprintsRepoDefault    = "github.com/fluxninja/aperture/blueprints"
+	apertureBlueprintsVersionDefault = "main"
+)
 
 var (
 	blueprintsDir string
@@ -18,7 +21,7 @@ var (
 )
 
 func init() {
-	BlueprintsCmd.PersistentFlags().StringVar(&blueprintsVersion, "version", "main", "version of aperture blueprint")
+	BlueprintsCmd.PersistentFlags().StringVar(&blueprintsVersion, "version", apertureBlueprintsVersionDefault, "version of aperture blueprint")
 	BlueprintsCmd.PersistentFlags().StringVar(&apertureBlueprintsURI, "uri", apertureBlueprintsRepoDefault, "URI of aperture blueprints, could be a local path or a remote git repository")
 
 	BlueprintsCmd.AddCommand(pullCmd)

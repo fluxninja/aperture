@@ -11,8 +11,6 @@ var removeAll bool
 
 func init() {
 	removeCmd.Flags().BoolVar(&removeAll, "all", false, "remove all versions of aperture blueprints")
-
-	BlueprintsCmd.AddCommand(removeCmd)
 }
 
 var removeCmd = &cobra.Command{

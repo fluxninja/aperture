@@ -2,6 +2,7 @@ package blueprints
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -10,55 +11,92 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var listAll bool
+
 func init() {
-	BlueprintsCmd.AddCommand(listCmd)
+	listCmd.Flags().BoolVar(&listAll, "all", false, "list all versions of aperture blueprints")
 }
 
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List blueprints",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
-		fmt.Fprintln(w, "Version\tPolicies")
+		if listAll {
+			w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
+			fmt.Fprintln(w, "VERSION\tPOLICIES")
 
-		blueprintsList, err := getBlueprintsList()
-		if err != nil {
-			return err
+			blueprintsList, err := getBlueprints()
+			if err != nil {
+				return err
+			}
+
+			for version, policies := range blueprintsList {
+				fmt.Fprintf(w, "%s\t%s\n", version, strings.Join(policies, ", "))
+			}
+
+			w.Flush()
+		} else {
+			w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
+
+			policies, err := getBlueprintsByVersion(blueprintsVersion)
+			if err != nil {
+				return err
+			}
+
+			fmt.Printf("Blueprints: %s\n", blueprintsVersion)
+			for _, policy := range policies {
+				fmt.Fprintf(w, "%s\n", policy)
+			}
+
+			w.Flush()
 		}
 
-		for version, policies := range blueprintsList {
-			fmt.Fprintf(w, "%s\t%s\n", version, strings.Join(policies, ", "))
-		}
-
-		w.Flush()
 		return nil
 	},
 }
 
-func getBlueprintsList() (map[string][]string, error) {
-	blueprints := map[string][]string{}
-	blueprintsContents, err := os.ReadDir(blueprintsDir)
+func getBlueprintsByVersion(v string) ([]string, error) {
+	const libSubPath = "lib/1.0"
+
+	policies := []string{}
+
+	libPath := filepath.Join(blueprintsDir, v, apertureBlueprintsURI, libSubPath)
+	err := filepath.WalkDir(libPath, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !d.IsDir() && d.Name() == "config.libsonnet" {
+			strippedPath := strings.TrimPrefix(path, libPath)
+			strippedPath = strings.TrimSuffix(strippedPath, "/config.libsonnet")
+			strippedPath = strings.TrimPrefix(strippedPath, "/")
+			policies = append(policies, strippedPath)
+		}
+		return nil
+	})
 	if err != nil {
 		return nil, err
 	}
-	for _, content := range blueprintsContents {
-		if content.IsDir() {
-			version := content.Name()
-			policies := []string{}
 
-			blueprintsVersionContents, err := os.ReadDir(filepath.Join(blueprintsDir, version, apertureBlueprintsURI, "lib", "1.0", "policies"))
-			if err != nil && !os.IsNotExist(err) {
+	return policies, nil
+}
+
+func getBlueprints() (map[string][]string, error) {
+	blueprintsList := map[string][]string{}
+	blueprintsVersions, err := os.ReadDir(blueprintsDir)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, blueprintsVersion := range blueprintsVersions {
+		if blueprintsVersion.IsDir() {
+			v := blueprintsVersion.Name()
+			policies, err := getBlueprintsByVersion(v)
+			if err != nil {
 				return nil, err
 			}
-			for _, versionContent := range blueprintsVersionContents {
-				if versionContent.IsDir() {
-					policies = append(policies, versionContent.Name())
-				}
-			}
-
-			blueprints[version] = policies
+			blueprintsList[v] = policies
 		}
 	}
 
-	return blueprints, nil
+	return blueprintsList, nil
 }
