@@ -6,6 +6,7 @@ import (
 
 	policiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
@@ -64,7 +65,8 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circ
 		return nil, false, err.Error(), nil
 	}
 
-	registry := status.NewRegistry(log.GetGlobalLogger())
+	alerter := alerts.NewSimpleAlerter(100)
+	registry := status.NewRegistry(log.GetGlobalLogger(), alerter)
 	circuit, err := CompilePolicy(policy, registry)
 	if err != nil {
 		return nil, false, err.Error(), err
