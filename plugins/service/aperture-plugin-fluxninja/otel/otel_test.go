@@ -160,9 +160,6 @@ func basePluginOTELConfigWithMetrics(pipelineName string) *otelconfig.OTELConfig
 		"batch/metrics-slow",
 		"attributes/fluxninja",
 	}
-	if pipelineName == "metrics/slow" {
-		processors = append([]string{"enrichment"}, processors...)
-	}
 	cfg.Service.AddPipeline(pipelineName, otelconfig.Pipeline{
 		Receivers:  []string{"prometheus/fluxninja"},
 		Processors: processors,

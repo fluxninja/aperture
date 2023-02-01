@@ -1,9 +1,0 @@
-label: Tutorials
-position: 4
-collapsible: true
-collapsed: true
-link:
-  type: "generated-index"
-  title: "Tutorials"
-  description: "Explore our step-by-step tutorials on Aperture to learn how to set up, configure, and use the platform to improve the reliability and stability of your web-scale applications. From detecting overload to concurrency limiting, tutorials cover a wide range of topics to help you get started with Aperture."
-  keywords: ["tutorial"]

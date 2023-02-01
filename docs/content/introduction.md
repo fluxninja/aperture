@@ -35,13 +35,6 @@ of the application is stable and reliable.
 
 ## Why is flow control needed?
 
-:::info
-
-Learn more about what is
-[flow control](<https://en.wikipedia.org/wiki/Flow_control_(data)>) here.
-
-:::
-
 Modern web-scale apps are a complex network of inter-connected microservices
 that implement features such as account management, search, payments & more.
 This decoupled architecture has advantages but introduces new complex failure
