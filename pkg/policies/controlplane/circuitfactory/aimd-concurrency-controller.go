@@ -49,6 +49,12 @@ func ParseAIMDConcurrencyController(
 		}
 	}
 
+	isOverloadDeciderOperator := "gt"
+	// if slope is greater than 0 then we want to use less than operator
+	if aimdConcurrencyController.GradientParameters.Slope > 0 {
+		isOverloadDeciderOperator = "lt"
+	}
+
 	nestedCircuit := &policylangv1.NestedCircuit{
 		Name:             "AIMDConcurrencyController",
 		ShortDescription: iface.GetServiceShortDescription(aimdConcurrencyController.FlowSelector.ServiceSelector),
@@ -330,7 +336,7 @@ func ParseAIMDConcurrencyController(
 			{
 				Component: &policylangv1.Component_Decider{
 					Decider: &policylangv1.Decider{
-						Operator: "gt",
+						Operator: isOverloadDeciderOperator,
 						TrueFor:  durationpb.New(0),
 						FalseFor: durationpb.New(0),
 						InPorts: &policylangv1.Decider_Ins{

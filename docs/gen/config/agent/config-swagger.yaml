@@ -45,8 +45,11 @@ definitions:
         additionalProperties:
           $ref: '#/definitions/CustomMetricsConfig'
         description: |-
-          CustomMetrics configures custom metrics pipelines, which will send data to
+          CustomMetrics configures custom metrics OTEL pipelines, which will send data to
           the controller prometheus.
+          Key in this map refers to OTEL pipeline name. Prefixing pipeline name with `metrics/`
+          is optional, as all the components and pipeline names would be normalized.
+          By default `kubeletstats` custom metrics is added, which can be overwritten.
         type: object
         x-go-name: CustomMetrics
       ports:
