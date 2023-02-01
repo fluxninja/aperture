@@ -37,7 +37,7 @@ const (
 	uriKey       = "uri"
 	alertChannel = "status_registry"
 	// Resolve timeout in seconds.
-	alertResolveTimeout = 2
+	alertResolveTimeout = 300
 )
 
 // registry implements Registry.
@@ -57,7 +57,7 @@ type registry struct {
 
 // NewRegistry creates a new Registry.
 func NewRegistry(logger *log.Logger, alerter alerts.Alerter) Registry {
-	labeledAlerter := alerter.WithLabels(map[string]string{uriKey: ""})
+	labeledAlerter := alerter.WithLabels(map[string]string{uriKey: "/"})
 	r := &registry{
 		key:      "root",
 		value:    "root",
@@ -76,6 +76,7 @@ func NewRegistry(logger *log.Logger, alerter alerts.Alerter) Registry {
 func (r *registry) Child(key, value string) Registry {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
 	hash := fmt.Sprintf("%s:%s", key, value)
 	uri := fmt.Sprintf("%s/%s/%s", r.uri, key, value)
 	labeledAlerter := r.alerter.WithLabels(map[string]string{uriKey: uri, key: value})

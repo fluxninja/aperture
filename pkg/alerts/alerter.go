@@ -1,6 +1,8 @@
 package alerts
 
-import "github.com/fluxninja/aperture/pkg/config"
+import (
+	"github.com/fluxninja/aperture/pkg/config"
+)
 
 // AlertsFxTag - name tag for alerter in fx.
 var AlertsFxTag = config.NameTag("AlertsFx")

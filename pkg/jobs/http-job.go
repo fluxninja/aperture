@@ -74,6 +74,11 @@ func (job *HTTPJob) Name() string {
 	return job.BasicJob.Name()
 }
 
+// GetJobFunc returns the function of the job.
+func (job *HTTPJob) GetJobFunc() (JobCallback, error) {
+	return job.BasicJob.GetJobFunc()
+}
+
 // JobWatchers returns the job watchers for the job.
 func (job *HTTPJob) JobWatchers() JobWatchers {
 	return job.BasicJob.JobWatchers()
