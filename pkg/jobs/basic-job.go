@@ -7,6 +7,9 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// Make sure BasicJob complies with Job interface.
+var _ Job = (*BasicJob)(nil)
+
 // BasicJob is a basic job that every other job builds on.
 type BasicJob struct {
 	JobFunc JobCallback
@@ -16,6 +19,11 @@ type BasicJob struct {
 // Name returns the name of the job.
 func (job *BasicJob) Name() string {
 	return job.JobBase.Name()
+}
+
+// GetJobFunc returns the function of the job.
+func (job *BasicJob) GetJobFunc() (JobCallback, error) {
+	return job.JobFunc, nil
 }
 
 // JobWatchers returns the job watchers.

@@ -23,7 +23,7 @@ type jobTracker struct {
 }
 
 func newJobTracker(job Job, statusRegistry status.Registry) *jobTracker {
-	reg := statusRegistry.Child("jt", job.Name())
+	reg := statusRegistry.Child("job-tracker", job.Name())
 	return &jobTracker{
 		job:            job,
 		statusRegistry: reg,
@@ -69,8 +69,12 @@ func (gt *groupTracker) updateStatus(job Job, s *statusv1.Status) error {
 
 func (gt *groupTracker) registerJob(job Job) error {
 	if job.Name() == "" {
-		err := errInvalidJob
-		return err
+		return errInvalidJob
+	}
+
+	jobFunc, err := job.GetJobFunc()
+	if err == nil && jobFunc == nil {
+		return errInvalidJob
 	}
 
 	gt.mu.Lock()

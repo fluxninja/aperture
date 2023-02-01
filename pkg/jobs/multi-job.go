@@ -2,6 +2,7 @@ package jobs
 
 import (
 	"context"
+	"errors"
 	"sync"
 
 	"go.uber.org/fx"
@@ -71,7 +72,7 @@ func (mjc MultiJobConstructor) provideMultiJob(
 	}
 
 	// Create a new MultiJob instance
-	mj := NewMultiJob(jg.GetStatusRegistry().Child("mjc", mjc.Name), jwAll, gwAll)
+	mj := NewMultiJob(jg.GetStatusRegistry().Child("multi-job", mjc.Name), jwAll, gwAll)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
@@ -116,6 +117,11 @@ func NewMultiJob(registry status.Registry, jws JobWatchers, gws GroupWatchers) *
 // Name returns the name of the job.
 func (mj *MultiJob) Name() string {
 	return mj.JobBase.Name()
+}
+
+// GetJobFunc is noop for MultiJob.
+func (mj *MultiJob) GetJobFunc() (JobCallback, error) {
+	return nil, errors.New("GetJobFunc is not implemented for MultiJob")
 }
 
 // JobWatchers returns the list of job watchers.
