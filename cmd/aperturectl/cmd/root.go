@@ -20,7 +20,7 @@ func init() {
 // Execute is the entrypoint for the CLI. It is called from the main package.
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "Err: '%s'", err)
+		fmt.Fprintf(os.Stderr, "Err: %s\n", err)
 		os.Exit(1)
 	}
 }
