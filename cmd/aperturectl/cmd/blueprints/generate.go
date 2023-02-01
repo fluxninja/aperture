@@ -9,16 +9,24 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+var (
+	generateAll   bool
+	blueprintName string
+	outputDir     string
+	valuesFile    string
+)
+
 func init() {
-	generateCmd.Flags().StringVar(&policyType, "policy_type", "", "Type of policy to generate e.g. static-rate-limiting, latency-aimd-concurrency-limiting")
-	generateCmd.Flags().StringVar(&outputDir, "output_dir", "", "Directory path where the generated manifests will be stored. If not provided, will be printed on console")
-	generateCmd.Flags().BoolVar(&apply, "apply", false, "Apply policy on the Kubernetes cluster")
-	generateCmd.Flags().StringVar(&kubeConfig, "kube_config", "", "Path to the Kubernets cluster config. Defaults to '~/.kube/config'")
-	generateCmd.Flags().StringVar(&valuesFile, "values_file", "", "Path to the values file for blueprints input")
+	generateCmd.Flags().BoolVar(&generateAll, "all", false, "generate all the available blueprints")
+	generateCmd.PersistentFlags().StringVar(&blueprintName, "name", "", "name of blueprint to generate")
+	generateCmd.PersistentFlags().StringVar(&outputDir, "output-dir", "", "Directory path where the generated manifests will be stored. If not provided, will be printed on console")
+	generateCmd.PersistentFlags().StringVar(&valuesFile, "values-file", "", "Path to the values file for blueprints input")
+	// generateCmd.PersistentFlags().BoolVar(&apply, "apply", false, "Apply policy on the Kubernetes cluster")
+	// generateCmd.PersistentFlags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernets cluster config. Defaults to '~/.kube/config'")
 
 	generateCmd.AddCommand(generatePolicyCmd)
 	generateCmd.AddCommand(generateDashboardCmd)
-	generateCmd.AddCommand(generateGraphCmd)
+	// generateCmd.AddCommand(generateGraphCmd)
 }
 
 var generateCmd = &cobra.Command{
@@ -26,64 +34,53 @@ var generateCmd = &cobra.Command{
 	Short:         "Generate manifests for the given policy type",
 	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if err := generateGraphCmd.RunE(cmd, args); err != nil {
+		if blueprintName == "" {
+			return fmt.Errorf("--name must be provided")
+		}
+
+		fileInfo, err := os.Stat(valuesFile)
+		if err != nil {
 			return err
 		}
-		if err := generateDashboardCmd.RunE(cmd, args); err != nil {
-			return err
+		valuesFile = filepath.Clean(fileInfo.Name())
+
+		if generateAll {
+			if err := generatePolicyCmd.RunE(cmd, args); err != nil {
+				return err
+			}
+			// if err := generateGraphCmd.RunE(cmd, args); err != nil {
+			// 	return err
+			// }
+			if err := generateDashboardCmd.RunE(cmd, args); err != nil {
+				return err
+			}
+			return nil
 		}
 		return nil
 	},
 }
 
-func validatePolicyType(cmd *cobra.Command, args []string) error {
-	blueprintsList, err := getBlueprints()
+func blueprintExists(version string, name string) error {
+	blueprintsList, err := getBlueprintsByVersion(version)
 	if err != nil {
 		return err
 	}
 
-	err = pullCmd.RunE(cmd, args)
-	if err != nil {
-		return err
+	if !slices.Contains(blueprintsList, name) {
+		return fmt.Errorf("invalid blueprint name '%s'", name)
 	}
-
-	policies := blueprintsList[blueprintsVersion]
-	if !slices.Contains(policies, policyType) {
-		return fmt.Errorf("invalid value '%s' for --policy_type. Available policies are: %+v", policyType, policies)
-	}
-
 	return nil
 }
 
-func getOutputDir(oldPath string) (string, error) {
-	newPath := filepath.Join(oldPath, blueprintsVersion, policyType)
-	err := os.MkdirAll(newPath, os.ModePerm)
+func getOutputDir(outputPath string) (string, error) {
+	newOutputPath := filepath.Join(outputPath, blueprintsVersion, blueprintName)
+	err := os.MkdirAll(newOutputPath, os.ModePerm)
 	if err != nil {
 		return "", err
 	}
-
-	newPath, err = filepath.Abs(newPath)
+	newOutputPath, err = filepath.Abs(newOutputPath)
 	if err != nil {
 		return "", err
 	}
-
-	return newPath, nil
-}
-
-func getValuesFilePath() error {
-	if valuesFile == "" {
-		valuesFile = fmt.Sprintf("%s.yaml", policyType)
-	}
-
-	absoluteValuesFile, err := filepath.Abs(valuesFile)
-	if err != nil {
-		return err
-	}
-
-	valuesFile = absoluteValuesFile
-	if _, err = os.Stat(valuesFile); err != nil {
-		return fmt.Errorf("values_file '%s' doesn't exist", valuesFile)
-	}
-
-	return nil
+	return newOutputPath, nil
 }

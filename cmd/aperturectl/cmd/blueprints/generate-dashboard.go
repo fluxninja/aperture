@@ -7,32 +7,18 @@ import (
 
 	"github.com/google/go-jsonnet"
 	"github.com/spf13/cobra"
-
-	"github.com/fluxninja/aperture/pkg/log"
 )
-
-func init() {
-	generateDashboardCmd.Flags().StringVar(&policyType, "policy_type", "", "Type of policy to generate e.g. static-rate-limiting, latency-aimd-concurrency-limiting")
-	generateDashboardCmd.Flags().StringVar(&outputDir, "output_dir", "", "Directory path where the generated manifests will be stored. If not provided, will be printed on console")
-	generateDashboardCmd.Flags().StringVar(&valuesFile, "values_file", "", "Path to the values file for blueprints input")
-}
 
 var generateDashboardCmd = &cobra.Command{
 	Use:           "dashboard",
 	Short:         "Generate dashboard",
 	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// check if policy or cr is provided
-		if policyType == "" {
-			return fmt.Errorf("--policy_type must be provided")
+		if blueprintName == "" {
+			return fmt.Errorf("--name must be provided")
 		}
 
-		if err := getValuesFilePath(); err != nil {
-			return err
-		}
-		log.Info().Msgf("Using '%s' as values file\n", valuesFile)
-
-		if err := validatePolicyType(cmd, args); err != nil {
+		if err := blueprintExists(blueprintsVersion, blueprintName); err != nil {
 			return err
 		}
 
@@ -45,12 +31,12 @@ var generateDashboardCmd = &cobra.Command{
 		})
 
 		jsonStr, err := vm.EvaluateAnonymousSnippet("dashboard.libsonnet", fmt.Sprintf(`
-		local dashboard = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/policies/%s/dashboard.libsonnet';
+		local dashboard = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/%s/dashboard.libsonnet';
 		local config = std.parseYaml(importstr '%s');
 		local dashboardResource = dashboard(config.common + config.dashboard).dashboard;
 
 		dashboardResource
-		`, policyType, valuesFile))
+		`, blueprintName, valuesFile))
 		if err != nil {
 			return err
 		}
@@ -66,7 +52,6 @@ var generateDashboardCmd = &cobra.Command{
 			if err != nil {
 				return err
 			}
-			log.Info().Msgf("Stored dashbobard JSON at '%s'\n", dashboardPath)
 		} else {
 			fmt.Println(jsonStr)
 		}
