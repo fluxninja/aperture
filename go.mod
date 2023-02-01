@@ -15,7 +15,7 @@ require (
 	github.com/elastic/gmux v0.2.0
 	github.com/elastic/gosigar v0.14.2
 	github.com/emicklei/dot v1.2.0
-	github.com/envoyproxy/go-control-plane v0.10.3
+	github.com/envoyproxy/go-control-plane v0.11.0
 	github.com/fluxninja/datasketches-go v0.0.0-20220916235224-7501a2d28551
 	github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814
 	github.com/getsentry/sentry-go v0.17.0
