@@ -350,8 +350,10 @@ func makeCustomMetricsConfigForKubeletStats() CustomMetricsConfig {
 			},
 			"pod_association": []any{
 				map[string]any{
-					"from": "resource_attribute",
-					"name": "k8s.pod.uid",
+					"sources": map[string]any{
+						"from": "resource_attribute",
+						"name": "k8s.pod.uid",
+					},
 				},
 			},
 		},
