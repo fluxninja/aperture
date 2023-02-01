@@ -34,7 +34,7 @@ type Registry interface {
 var _ Registry = &registry{}
 
 const (
-	uriKey       = "uri"
+	uriKey       = "status_uri"
 	alertChannel = "status_registry"
 	// Resolve timeout in seconds.
 	alertResolveTimeout = 300
