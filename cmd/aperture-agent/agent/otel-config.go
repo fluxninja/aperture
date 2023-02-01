@@ -331,11 +331,21 @@ func makeCustomMetricsConfigForKubeletStats() CustomMetricsConfig {
 			},
 			"extract": map[string]any{
 				"metadata": []any{
-					"k8s.pod.name",
-					"k8s.pod.uid",
+					"k8s.daemonset.name",
+					"k8s.cronjob.name",
 					"k8s.deployment.name",
+					"k8s.job.name",
 					"k8s.namespace.name",
 					"k8s.node.name",
+					"k8s.pod.name",
+					"k8s.pod.uid",
+					"k8s.replicaset.name",
+					"k8s.statefulset.name",
+				},
+				"labels": []any{
+					map[string]any{
+						"key_regex": "^app.kubernetes.io/.*",
+					},
 				},
 			},
 			"pod_association": []any{
