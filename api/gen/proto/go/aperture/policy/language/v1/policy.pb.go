@@ -3375,7 +3375,7 @@ type GradientController_Parameters struct {
 	// eg.:
 	// * $\text{slope} = 1$: when signal is too high, increase control variable,
 	// * $\text{slope} = -1$: when signal is too high, decrease control variable,
-	// * $\text{slope} = -0.5$: when signal is to high, decrease control variable more slowly.
+	// * $\text{slope} = -0.5$: when signal is too high, decrease control variable slowly.
 	//
 	// The sign of slope depends on correlation between the signal and control variable:
 	// * Use $\text{slope} < 0$ if signal and control variable are _positively_
