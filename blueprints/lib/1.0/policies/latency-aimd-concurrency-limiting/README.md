@@ -1,4 +1,4 @@
-# Latency Gradient Concurrency Limiting Policy
+# Latency AIMD Concurrency Limiting Policy
 
 This policy detect overloads/cascading failures by comparing the real-time
 latency with it's exponential moving average. Gradient controller is then used

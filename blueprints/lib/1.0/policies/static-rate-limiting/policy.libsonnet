@@ -52,4 +52,5 @@ function(params) {
   },
 
   policyResource: policyResource,
+  policyDef: policyDef,
 }
