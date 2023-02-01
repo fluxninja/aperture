@@ -143,7 +143,6 @@ func addMetricsSlowPipeline(baseConfig, config *otelconfig.OTELConfig) {
 	config.Service.AddPipeline("metrics/slow", otelconfig.Pipeline{
 		Receivers: []string{receiverPrometheus},
 		Processors: []string{
-			otelconsts.ProcessorEnrichment,
 			processorBatchMetricsSlow,
 			processorAttributes,
 		},

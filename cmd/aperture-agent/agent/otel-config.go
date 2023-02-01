@@ -4,6 +4,7 @@ package agent
 import (
 	"crypto/tls"
 	"fmt"
+	"strings"
 
 	promapi "github.com/prometheus/client_golang/api"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
@@ -36,8 +37,11 @@ type AgentOTELConfig struct {
 	BatchPrerollup BatchPrerollupConfig `json:"batch_prerollup"`
 	// BatchPostrollup configures batch postrollup processor.
 	BatchPostrollup BatchPostrollupConfig `json:"batch_postrollup"`
-	// CustomMetrics configures custom metrics pipelines, which will send data to
+	// CustomMetrics configures custom metrics OTEL pipelines, which will send data to
 	// the controller prometheus.
+	// Key in this map refers to OTEL pipeline name. Prefixing pipeline name with `metrics/`
+	// is optional, as all the components and pipeline names would be normalized.
+	// By default `kubeletstats` custom metrics is added, which can be overwritten.
 	CustomMetrics map[string]CustomMetricsConfig `json:"custom_metrics,omitempty"`
 }
 
@@ -230,12 +234,10 @@ func addMetricsPipeline(
 	promClient promapi.Client,
 ) {
 	addPrometheusReceiver(config, agentConfig, tlsConfig, lis)
-	config.AddProcessor(otelconsts.ProcessorEnrichment, nil)
 	otelconfig.AddPrometheusRemoteWriteExporter(config, promClient)
 	config.Service.AddPipeline("metrics/fast", otelconfig.Pipeline{
 		Receivers: []string{otelconsts.ReceiverPrometheus},
 		Processors: []string{
-			otelconsts.ProcessorEnrichment,
 			otelconsts.ProcessorAgentGroup,
 		},
 		Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
@@ -246,27 +248,127 @@ func addCustomMetricsPipelines(
 	config *otelconfig.OTELConfig,
 	agentConfig *AgentOTELConfig,
 ) {
-	for metricName, metricConfig := range agentConfig.CustomMetrics {
-		for receiverName, receiverConfig := range config.Receivers {
-			config.AddReceiver(makeCustomComponentName(metricName, receiverName), receiverConfig)
+	if _, ok := agentConfig.CustomMetrics[otelconsts.ReceiverKubeletStats]; !ok {
+		if agentConfig.CustomMetrics == nil {
+			agentConfig.CustomMetrics = map[string]CustomMetricsConfig{}
 		}
-		for processorName, processorConfig := range config.Processors {
-			config.AddProcessor(makeCustomComponentName(metricName, processorName), processorConfig)
+		agentConfig.CustomMetrics[otelconsts.ReceiverKubeletStats] = makeCustomMetricsConfigForKubeletStats()
+	}
+	for pipelineName, metricConfig := range agentConfig.CustomMetrics {
+		pipelineName = strings.TrimPrefix(pipelineName, "metrics/")
+		for receiverName, receiverConfig := range metricConfig.Receivers {
+			config.AddReceiver(normalizeComponentName(pipelineName, receiverName), receiverConfig)
 		}
-		config.Service.AddPipeline(makeCustomMetricsName(metricName), otelconfig.Pipeline{
-			Receivers:  metricConfig.Pipeline.Receivers,
-			Processors: metricConfig.Pipeline.Processors,
-			Exporters:  []string{otelconsts.ExporterPrometheusRemoteWrite},
+		for processorName, processorConfig := range metricConfig.Processors {
+			config.AddProcessor(normalizeComponentName(pipelineName, processorName), processorConfig)
+		}
+		config.Service.AddPipeline(normalizePipelineName(pipelineName), otelconfig.Pipeline{
+			Receivers: normalizeComponentNames(pipelineName, metricConfig.Pipeline.Receivers),
+			Processors: append(
+				normalizeComponentNames(pipelineName, metricConfig.Pipeline.Processors),
+				otelconsts.ProcessorAgentGroup,
+			),
+			Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
 		})
 	}
 }
 
-func makeCustomMetricsName(name string) string {
-	return fmt.Sprintf("metrics/user-defined-%s", name)
+// normalizePipelineName normalizes user defined pipeline name by adding
+// `metrics/user-defined-` prefix.
+// This ensures no builtin metrics pipeline is overwritten.
+func normalizePipelineName(pipelineName string) string {
+	return fmt.Sprintf("metrics/user-defined-%s", pipelineName)
 }
 
-func makeCustomComponentName(metricName, name string) string {
-	return fmt.Sprintf("%s/user-defined-%s", name, metricName)
+// normalizeComponentNames calls `normalizeComponentName` for each element of the
+// slice. Returns new slice with modified elements.
+func normalizeComponentNames(pipelineName string, components []string) []string {
+	renamed := make([]string, len(components))
+	for i, c := range components {
+		renamed[i] = normalizeComponentName(pipelineName, c)
+	}
+	return renamed
+}
+
+// normalizeComponentName normalizes user defines component name by adding
+// `user-defined-<pipeline_name>` suffix.
+// This ensures no builtin components are overwritten.
+func normalizeComponentName(pipelineName, componentName string) string {
+	return fmt.Sprintf("%s/user-defined-%s", componentName, pipelineName)
+}
+
+func makeCustomMetricsConfigForKubeletStats() CustomMetricsConfig {
+	receivers := map[string]any{
+		otelconsts.ReceiverKubeletStats: map[string]any{
+			"collection_interval":  "10s",
+			"auth_type":            "serviceAccount",
+			"endpoint":             "https://${NODE_NAME}:10250",
+			"insecure_skip_verify": true,
+			"metric_groups": []any{
+				"pod",
+			},
+		},
+	}
+	processors := map[string]any{
+		otelconsts.ProcessorFilterKubeletStats: map[string]any{
+			"metrics": map[string]any{
+				"include": map[string]any{
+					"match_type": "strict",
+					"metric_names": []any{
+						"k8s.pod.cpu.utilization",
+						"k8s.pod.memory.available",
+						"k8s.pod.memory.usage",
+						"k8s.pod.memory.working_set",
+					},
+				},
+			},
+		},
+		otelconsts.ProcessorK8sAttributes: map[string]any{
+			"auth_type":   "serviceAccount",
+			"passthrough": false,
+			"filter": map[string]any{
+				"node_from_env_var": "NODE_NAME",
+			},
+			"extract": map[string]any{
+				"metadata": []any{
+					"k8s.daemonset.name",
+					"k8s.cronjob.name",
+					"k8s.deployment.name",
+					"k8s.job.name",
+					"k8s.namespace.name",
+					"k8s.node.name",
+					"k8s.pod.name",
+					"k8s.pod.uid",
+					"k8s.replicaset.name",
+					"k8s.statefulset.name",
+				},
+				"labels": []any{
+					map[string]any{
+						"key_regex": "^app.kubernetes.io/.*",
+					},
+				},
+			},
+			"pod_association": []any{
+				map[string]any{
+					"from": "resource_attribute",
+					"name": "k8s.pod.uid",
+				},
+			},
+		},
+	}
+	return CustomMetricsConfig{
+		Receivers:  receivers,
+		Processors: processors,
+		Pipeline: CustomMetricsPipelineConfig{
+			Receivers: []string{
+				otelconsts.ReceiverKubeletStats,
+			},
+			Processors: []string{
+				otelconsts.ProcessorFilterKubeletStats,
+				otelconsts.ProcessorK8sAttributes,
+			},
+		},
+	}
 }
 
 func addPrometheusReceiver(
@@ -287,7 +389,7 @@ func addPrometheusReceiver(
 		log.Warn().Err(err).Msg("Error when discovering k8s environment")
 	} else {
 		log.Debug().Msg("K8s environment detected. Adding K8s scrape configurations.")
-		scrapeConfigs = append(scrapeConfigs, buildKubernetesNodesScrapeConfig(), buildKubernetesPodsScrapeConfig())
+		scrapeConfigs = append(scrapeConfigs, buildKubernetesPodsScrapeConfig())
 	}
 
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
@@ -302,43 +404,6 @@ func addPrometheusReceiver(
 			"scrape_configs": scrapeConfigs,
 		},
 	})
-}
-
-func buildKubernetesNodesScrapeConfig() map[string]any {
-	return map[string]any{
-		"job_name":     "kubernetes-nodes",
-		"scheme":       "https",
-		"metrics_path": "/metrics/cadvisor",
-		"authorization": map[string]any{
-			"credentials_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
-		},
-		"tls_config": map[string]any{
-			"insecure_skip_verify": true,
-		},
-		"kubernetes_sd_configs": []map[string]any{
-			{"role": "node"},
-		},
-		"relabel_configs": []map[string]any{
-			// Scrape only the node on which this agent is running.
-			{
-				"source_labels": []string{"__meta_kubernetes_node_name"},
-				"action":        "keep",
-				"regex":         info.Hostname,
-			},
-		},
-		"metric_relabel_configs": []map[string]any{
-			{
-				"source_labels": []string{"__name__"},
-				"action":        "keep",
-				"regex":         "container_memory_working_set_bytes|container_spec_memory_limit_bytes|container_spec_cpu_(?:quota|period)|container_cpu_usage_seconds_total",
-			},
-			{
-				"source_labels": []string{"pod"},
-				"action":        "replace",
-				"target_label":  "entity_name",
-			},
-		},
-	}
 }
 
 func buildKubernetesPodsScrapeConfig() map[string]any {
