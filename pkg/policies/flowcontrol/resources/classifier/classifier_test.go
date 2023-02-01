@@ -8,6 +8,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/status"
 
@@ -30,7 +31,8 @@ var _ = Describe("Classifier", func() {
 	BeforeEach(func() {
 		log.SetGlobalLevel(log.WarnLevel)
 
-		classifier = NewClassificationEngine(status.NewRegistry(log.GetGlobalLogger()))
+		alerter := alerts.NewSimpleAlerter(100)
+		classifier = NewClassificationEngine(status.NewRegistry(log.GetGlobalLogger(), alerter))
 	})
 
 	It("returns empty slice, when no rules configured", func() {

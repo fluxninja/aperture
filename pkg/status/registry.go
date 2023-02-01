@@ -1,9 +1,13 @@
 package status
 
 import (
+	"fmt"
 	"sync"
+	"time"
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/status/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
+	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
@@ -21,9 +25,16 @@ type Registry interface {
 	Key() string
 	HasError() bool
 	GetLogger() *log.Logger
+	GetAlerter() alerts.Alerter
 }
 
 var _ Registry = &registry{}
+
+const (
+	alertChannel = "status_registry"
+	// Resolve timeout in seconds.
+	alertResolveTimeout = 300
+)
 
 // registry implements Registry.
 // Note: Please take locks from parent to child and not the other way around to avoid deadlocks.
@@ -35,16 +46,19 @@ type registry struct {
 	children map[string]*registry
 	logger   *log.Logger
 	key      string
+	alerter  alerts.Alerter
 }
 
 // NewRegistry creates a new Registry.
-func NewRegistry(logger *log.Logger) Registry {
+func NewRegistry(logger *log.Logger, alerter alerts.Alerter) Registry {
+	labeledAlerter := alerter.WithLabels(map[string]string{"uri": "/"})
 	r := &registry{
 		key:      "root",
 		parent:   nil,
 		status:   &statusv1.Status{},
 		children: make(map[string]*registry),
 		logger:   logger,
+		alerter:  labeledAlerter,
 	}
 	r.root = r
 	return r
@@ -65,6 +79,7 @@ func (r *registry) Child(key string) Registry {
 			status:   &statusv1.Status{},
 			children: make(map[string]*registry),
 			logger:   r.logger.WithStr(r.key, key),
+			alerter:  r.alerter,
 		}
 		r.children[key] = child
 	}
@@ -136,6 +151,25 @@ func (r *registry) SetStatus(status *statusv1.Status) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.status = status
+
+	if r.status != nil && r.status.Error != nil {
+		r.alerter.AddAlert(r.createAlert(r.status.Error))
+	}
+}
+
+func (r *registry) createAlert(err *statusv1.Status_Error) *alerts.Alert {
+	resolve := time.Duration(time.Second * alertResolveTimeout)
+	newAlert := alerts.NewAlert(
+		alerts.WithName(err.String()),
+		alerts.WithSeverity(alerts.ParseSeverity("info")),
+		alerts.WithAlertChannels([]string{alertChannel}),
+		alerts.WithResolveTimeout(resolve),
+		alerts.WithGeneratorURL(
+			fmt.Sprintf("http://%s/%s", info.GetHostInfo().Hostname, r.key),
+		),
+	)
+
+	return newAlert
 }
 
 // SetGroupStatus sets the status of the Registry.
@@ -198,4 +232,11 @@ func (r *registry) GetLogger() *log.Logger {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return r.logger
+}
+
+// GetAlerter returns the alerter of the Registry.
+func (r *registry) GetAlerter() alerts.Alerter {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.alerter
 }
