@@ -31,7 +31,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	"github.com/fluxninja/aperture/pkg/otelcollector/enrichmentprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/tracestologsprocessor"
@@ -108,7 +107,6 @@ func AgentOTELComponents(
 	errs = multierr.Append(errs, err)
 
 	processorsFactory := []processor.Factory{
-		enrichmentprocessor.NewFactory(cache),
 		rollupprocessor.NewFactory(promRegistry),
 		metricsprocessor.NewFactory(promRegistry, engine, clasEng, controlPointCache),
 		tracestologsprocessor.NewFactory(),

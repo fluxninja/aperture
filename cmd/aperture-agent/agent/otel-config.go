@@ -234,12 +234,10 @@ func addMetricsPipeline(
 	promClient promapi.Client,
 ) {
 	addPrometheusReceiver(config, agentConfig, tlsConfig, lis)
-	config.AddProcessor(otelconsts.ProcessorEnrichment, nil)
 	otelconfig.AddPrometheusRemoteWriteExporter(config, promClient)
 	config.Service.AddPipeline("metrics/fast", otelconfig.Pipeline{
 		Receivers: []string{otelconsts.ReceiverPrometheus},
 		Processors: []string{
-			otelconsts.ProcessorEnrichment,
 			otelconsts.ProcessorAgentGroup,
 		},
 		Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
@@ -265,9 +263,12 @@ func addCustomMetricsPipelines(
 			config.AddProcessor(normalizeComponentName(pipelineName, processorName), processorConfig)
 		}
 		config.Service.AddPipeline(normalizePipelineName(pipelineName), otelconfig.Pipeline{
-			Receivers:  normalizeComponentNames(pipelineName, metricConfig.Pipeline.Receivers),
-			Processors: normalizeComponentNames(pipelineName, metricConfig.Pipeline.Processors),
-			Exporters:  []string{otelconsts.ExporterPrometheusRemoteWrite},
+			Receivers: normalizeComponentNames(pipelineName, metricConfig.Pipeline.Receivers),
+			Processors: append(
+				normalizeComponentNames(pipelineName, metricConfig.Pipeline.Processors),
+				otelconsts.ProcessorAgentGroup,
+			),
+			Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
 		})
 	}
 }
@@ -322,6 +323,28 @@ func makeCustomMetricsConfigForKubeletStats() CustomMetricsConfig {
 				},
 			},
 		},
+		otelconsts.ProcessorK8sAttributes: map[string]any{
+			"auth_type":   "serviceAccount",
+			"passthrough": false,
+			"filter": map[string]any{
+				"node_from_env_var": "NODE_NAME",
+			},
+			"extract": map[string]any{
+				"metadata": []any{
+					"k8s.pod.name",
+					"k8s.pod.uid",
+					"k8s.deployment.name",
+					"k8s.namespace.name",
+					"k8s.node.name",
+				},
+			},
+			"pod_association": []any{
+				map[string]any{
+					"from": "resource_attribute",
+					"name": "k8s.pod.uid",
+				},
+			},
+		},
 	}
 	return CustomMetricsConfig{
 		Receivers:  receivers,
@@ -332,6 +355,7 @@ func makeCustomMetricsConfigForKubeletStats() CustomMetricsConfig {
 			},
 			Processors: []string{
 				otelconsts.ProcessorFilterKubeletStats,
+				otelconsts.ProcessorK8sAttributes,
 			},
 		},
 	}

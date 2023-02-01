@@ -102,11 +102,6 @@ const (
 	// ApertureWorkloadStartTimestampLabel is the start timestamp of the workload.
 	ApertureWorkloadStartTimestampLabel = "aperture.workload_start_timestamp"
 
-	/* Specific to infra metrics pipeline. */
-
-	// PodNameLabel describes pod name. Used in kubeletstatreceiver.
-	PodNameLabel = "k8s.pod.name"
-
 	/* Aperture specific enrichment labels. */
 
 	// AgentGroupLabel describes agent group to which metrics refer.
@@ -125,8 +120,6 @@ const (
 	// ReceiverKubeletStats collects metrics from kubelet.
 	ReceiverKubeletStats = "kubeletstats"
 
-	// ProcessorEnrichment enriches metrics with discovery data.
-	ProcessorEnrichment = "enrichment"
 	// ProcessorMetrics generates metrics based on logs and exposes them
 	// on application prometheus metrics endpoint.
 	ProcessorMetrics = "metrics"
@@ -152,6 +145,8 @@ const (
 	ProcessorAlertsNamespace = "attributes/alerts"
 	// ProcessorFilterKubeletStats filters in only metrics of interest.
 	ProcessorFilterKubeletStats = "filter/kubeletstats"
+	// ProcessorK8sAttributes enriches metrics with k8s metadata.
+	ProcessorK8sAttributes = "k8sattributes/kubeletstats"
 
 	// ExporterLogging exports telemetry using Aperture logger.
 	ExporterLogging = "logging"
