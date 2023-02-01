@@ -63,6 +63,8 @@ func provideOtelConfig(baseConfig *otelconfig.OTELConfig,
 
 	config := otelconfig.NewOTELConfig()
 	addFluxNinjaExporter(config, &pluginConfig, grpcClientConfig, httpClientConfig)
+	// This is to prevent overwriting extensions with empty config.
+	config.Extensions = baseConfig.Extensions
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
