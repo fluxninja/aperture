@@ -207,7 +207,8 @@ def update_docblock_sections(blocks: List[DocBlock], section: str):
         block.section = section
 
 
-SECTION_TPL = """{% for section, blocks in sections.items() %}
+SECTION_TPL = """
+{% for section, blocks in sections.items() %}
 
 ### {{ section }}
   {%- for block in blocks %}
@@ -221,12 +222,19 @@ SECTION_TPL = """{% for section, blocks in sections.items() %}
 {{ block.description }}
 {%- endif %}
 
-| Parameter Name | Parameter Type | Default | Description |
-| -------------- | -------------- | ------- | ----------- |
-    {%- for param in block.parameters.values() %}
-| `{{ param.param_name }}` | `{{ param.param_type }}` | `{% if param.default is not none %}{{ param.default | quoteValue }}{% else %}(required){% endif %}` | {{ param.description }} |
-    {%- endfor %}
-  {%- endfor %}
+{%- for param in block.parameters.values() %}
+**`{{ param.param_name }}`** (type: *`{{ param.param_type }}`*)
+{% if param.default is not none %}
+default: `{{ param.default | quoteValue }}`
+{% else %}
+required parameter
+{% endif %}
+
+{{ param.description }}
+
+{% endfor %}
+
+{%- endfor %}
 
 {%- endfor %}
 """

@@ -10,21 +10,42 @@ dashboard that visualizes Signals flowing through the
 
 ### Common
 
-| Parameter Name       | Parameter Type | Default      | Description         |
-| -------------------- | -------------- | ------------ | ------------------- |
-| `common.policy_name` | `string`       | `(required)` | Name of the policy. |
+**`common.policy_name`** (type: _`string`_)
+
+required parameter
+
+Name of the policy.
 
 ### Dashboard
 
-| Parameter Name               | Parameter Type | Default     | Description                            |
-| ---------------------------- | -------------- | ----------- | -------------------------------------- |
-| `dashboard.refresh_interval` | `string`       | `"10s"`     | Refresh interval for dashboard panels. |
-| `dashboard.time_from`        | `string`       | `"now-30m"` | From time of dashboard.                |
-| `dashboard.time_to`          | `string`       | `"now"`     | To time of dashboard.                  |
+**`dashboard.refresh_interval`** (type: _`string`_)
+
+default: `"10s"`
+
+Refresh interval for dashboard panels.
+
+**`dashboard.time_from`** (type: _`string`_)
+
+default: `"now-30m"`
+
+From time of dashboard.
+
+**`dashboard.time_to`** (type: _`string`_)
+
+default: `"now"`
+
+To time of dashboard.
 
 #### Datasource
 
-| Parameter Name                      | Parameter Type | Default         | Description              |
-| ----------------------------------- | -------------- | --------------- | ------------------------ |
-| `dashboard.datasource.name`         | `string`       | `"$datasource"` | Datasource name.         |
-| `dashboard.datasource.filter_regex` | `string`       | `""`            | Datasource filter regex. |
+**`dashboard.datasource.name`** (type: _`string`_)
+
+default: `"$datasource"`
+
+Datasource name.
+
+**`dashboard.datasource.filter_regex`** (type: _`string`_)
+
+default: `""`
+
+Datasource filter regex.
