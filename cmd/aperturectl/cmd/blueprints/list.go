@@ -10,6 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func init() {
+	BlueprintsCmd.AddCommand(listCmd)
+}
+
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List blueprints",
@@ -42,7 +46,7 @@ func getBlueprintsList() (map[string][]string, error) {
 			version := content.Name()
 			policies := []string{}
 
-			blueprintsVersionContents, err := os.ReadDir(filepath.Join(blueprintsDir, version, apertureBlueprintsRepo, "lib", "1.0", "policies"))
+			blueprintsVersionContents, err := os.ReadDir(filepath.Join(blueprintsDir, version, apertureBlueprintsURI, "lib", "1.0", "policies"))
 			if err != nil && !os.IsNotExist(err) {
 				return nil, err
 			}

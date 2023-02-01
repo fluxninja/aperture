@@ -6,10 +6,11 @@ import (
 	"os"
 	"path/filepath"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
-	"gopkg.in/yaml.v2"
 )
 
 func GenerateDotFile(circuit *circuitfactory.Circuit, dotFilePath string) error {

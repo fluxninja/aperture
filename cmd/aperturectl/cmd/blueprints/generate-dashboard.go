@@ -5,19 +5,20 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/google/go-jsonnet"
 	"github.com/spf13/cobra"
+
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 func init() {
-	dashboardCmd.Flags().StringVar(&policyType, "policy_type", "", "Type of policy to generate e.g. static-rate-limiting, latency-aimd-concurrency-limiting")
-	dashboardCmd.Flags().StringVar(&outputDir, "output_dir", "", "Directory path where the generated manifests will be stored. If not provided, will be printed on console")
-	dashboardCmd.Flags().StringVar(&valuesFile, "values_file", "", "Path to the values file for blueprints input")
+	generateDashboardCmd.Flags().StringVar(&policyType, "policy_type", "", "Type of policy to generate e.g. static-rate-limiting, latency-aimd-concurrency-limiting")
+	generateDashboardCmd.Flags().StringVar(&outputDir, "output_dir", "", "Directory path where the generated manifests will be stored. If not provided, will be printed on console")
+	generateDashboardCmd.Flags().StringVar(&valuesFile, "values_file", "", "Path to the values file for blueprints input")
 }
 
-var dashboardCmd = &cobra.Command{
-	Use:           "generate-dashboard",
+var generateDashboardCmd = &cobra.Command{
+	Use:           "dashboard",
 	Short:         "Generate dashboard",
 	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
