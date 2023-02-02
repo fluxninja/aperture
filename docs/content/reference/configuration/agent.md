@@ -4,8 +4,9 @@ sidebar_position: 11
 sidebar_label: Agent
 ---
 
-:::info See also
-[Aperture Agent installation](/get-started/installation/agent/agent.md). :::
+:::info
+See also [Aperture Agent installation](/get-started/installation/agent/agent.md).
+:::
 
 List of all config parameters for Aperture Agent.
 
@@ -82,8 +83,8 @@ Env-Var Prefix: `APERTURE_AGENT_CLIENT_`
 <dt>proxy</dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_CLIENT_PROXY_` Type:
-[ProxyConfig](#proxy-config)
+Env-Var Prefix: `APERTURE_AGENT_CLIENT_PROXY_`
+Type: [ProxyConfig](#proxy-config)
 
 </dd>
 
@@ -102,8 +103,8 @@ Env-Var Prefix: `APERTURE_AGENT_DIST_CACHE_`
 <dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_DIST_CACHE_` Type:
-[DistCacheConfig](#dist-cache-config)
+Env-Var Prefix: `APERTURE_AGENT_DIST_CACHE_`
+Type: [DistCacheConfig](#dist-cache-config)
 
 </dd>
 
@@ -122,7 +123,8 @@ Env-Var Prefix: `APERTURE_AGENT_ETCD_`
 <dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_ETCD_` Type: [EtcdConfig](#etcd-config)
+Env-Var Prefix: `APERTURE_AGENT_ETCD_`
+Type: [EtcdConfig](#etcd-config)
 
 </dd>
 
@@ -141,8 +143,8 @@ Env-Var Prefix: `APERTURE_AGENT_FLOW_CONTROL_`
 <dt>preview_service</dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_FLOW_CONTROL_PREVIEW_SERVICE_` Type:
-[FlowPreviewConfig](#flow-preview-config)
+Env-Var Prefix: `APERTURE_AGENT_FLOW_CONTROL_PREVIEW_SERVICE_`
+Type: [FlowPreviewConfig](#flow-preview-config)
 
 </dd>
 
@@ -161,8 +163,8 @@ Env-Var Prefix: `APERTURE_AGENT_FLUXNINJA_PLUGIN_`
 <dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_FLUXNINJA_PLUGIN_` Type:
-[FluxNinjaPluginConfig](#flux-ninja-plugin-config)
+Env-Var Prefix: `APERTURE_AGENT_FLUXNINJA_PLUGIN_`
+Type: [FluxNinjaPluginConfig](#flux-ninja-plugin-config)
 
 </dd>
 
@@ -181,8 +183,8 @@ Env-Var Prefix: `APERTURE_AGENT_KUBERNETES_CLIENT_`
 <dt>http_client</dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_KUBERNETES_CLIENT_HTTP_CLIENT_` Type:
-[HTTPClientConfig](#http-client-config)
+Env-Var Prefix: `APERTURE_AGENT_KUBERNETES_CLIENT_HTTP_CLIENT_`
+Type: [HTTPClientConfig](#http-client-config)
 
 </dd>
 
@@ -201,16 +203,16 @@ Env-Var Prefix: `APERTURE_AGENT_LIVENESS_`
 <dt>scheduler</dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_LIVENESS_SCHEDULER_` Type:
-[JobGroupConfig](#job-group-config)
+Env-Var Prefix: `APERTURE_AGENT_LIVENESS_SCHEDULER_`
+Type: [JobGroupConfig](#job-group-config)
 
 </dd>
 
 <dt>service</dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_LIVENESS_SERVICE_` Type:
-[JobConfig](#job-config)
+Env-Var Prefix: `APERTURE_AGENT_LIVENESS_SERVICE_`
+Type: [JobConfig](#job-config)
 
 </dd>
 
@@ -229,7 +231,8 @@ Env-Var Prefix: `APERTURE_AGENT_LOG_`
 <dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_LOG_` Type: [LogConfig](#log-config)
+Env-Var Prefix: `APERTURE_AGENT_LOG_`
+Type: [LogConfig](#log-config)
 
 </dd>
 
@@ -248,7 +251,8 @@ Env-Var Prefix: `APERTURE_AGENT_METRICS_`
 <dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_METRICS_` Type: [MetricsConfig](#metrics-config)
+Env-Var Prefix: `APERTURE_AGENT_METRICS_`
+Type: [MetricsConfig](#metrics-config)
 
 </dd>
 
@@ -267,8 +271,8 @@ Env-Var Prefix: `APERTURE_AGENT_OTEL_`
 <dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_OTEL_` Type:
-[AgentOTELConfig](#agent-o-t-e-l-config)
+Env-Var Prefix: `APERTURE_AGENT_OTEL_`
+Type: [AgentOTELConfig](#agent-o-t-e-l-config)
 
 </dd>
 
@@ -304,7 +308,8 @@ Env-Var Prefix: `APERTURE_AGENT_PLUGINS_`
 <dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_PLUGINS_` Type: [PluginsConfig](#plugins-config)
+Env-Var Prefix: `APERTURE_AGENT_PLUGINS_`
+Type: [PluginsConfig](#plugins-config)
 
 </dd>
 
@@ -323,8 +328,8 @@ Env-Var Prefix: `APERTURE_AGENT_PROFILERS_`
 <dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_PROFILERS_` Type:
-[ProfilersConfig](#profilers-config)
+Env-Var Prefix: `APERTURE_AGENT_PROFILERS_`
+Type: [ProfilersConfig](#profilers-config)
 
 </dd>
 
@@ -343,16 +348,16 @@ Env-Var Prefix: `APERTURE_AGENT_PROMETHEUS_`
 <dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_PROMETHEUS_` Type:
-[PrometheusConfig](#prometheus-config)
+Env-Var Prefix: `APERTURE_AGENT_PROMETHEUS_`
+Type: [PrometheusConfig](#prometheus-config)
 
 </dd>
 
 <dt>http_client</dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_PROMETHEUS_HTTP_CLIENT_` Type:
-[HTTPClientConfig](#http-client-config)
+Env-Var Prefix: `APERTURE_AGENT_PROMETHEUS_HTTP_CLIENT_`
+Type: [HTTPClientConfig](#http-client-config)
 
 </dd>
 
@@ -371,16 +376,16 @@ Env-Var Prefix: `APERTURE_AGENT_READINESS_`
 <dt>scheduler</dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_READINESS_SCHEDULER_` Type:
-[JobGroupConfig](#job-group-config)
+Env-Var Prefix: `APERTURE_AGENT_READINESS_SCHEDULER_`
+Type: [JobGroupConfig](#job-group-config)
 
 </dd>
 
 <dt>service</dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_READINESS_SERVICE_` Type:
-[JobConfig](#job-config)
+Env-Var Prefix: `APERTURE_AGENT_READINESS_SERVICE_`
+Type: [JobConfig](#job-config)
 
 </dd>
 
@@ -399,8 +404,8 @@ Env-Var Prefix: `APERTURE_AGENT_SENTRY_PLUGIN_`
 <dt>sentry</dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_SENTRY_PLUGIN_SENTRY_` Type:
-[SentryConfig](#sentry-config)
+Env-Var Prefix: `APERTURE_AGENT_SENTRY_PLUGIN_SENTRY_`
+Type: [SentryConfig](#sentry-config)
 
 </dd>
 
@@ -419,40 +424,40 @@ Env-Var Prefix: `APERTURE_AGENT_SERVER_`
 <dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_SERVER_` Type:
-[ListenerConfig](#listener-config)
+Env-Var Prefix: `APERTURE_AGENT_SERVER_`
+Type: [ListenerConfig](#listener-config)
 
 </dd>
 
 <dt>grpc</dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_SERVER_GRPC_` Type:
-[GRPCServerConfig](#g-rpc-server-config)
+Env-Var Prefix: `APERTURE_AGENT_SERVER_GRPC_`
+Type: [GRPCServerConfig](#g-rpc-server-config)
 
 </dd>
 
 <dt>grpc_gateway</dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_SERVER_GRPC_GATEWAY_` Type:
-[GRPCGatewayConfig](#g-rpc-gateway-config)
+Env-Var Prefix: `APERTURE_AGENT_SERVER_GRPC_GATEWAY_`
+Type: [GRPCGatewayConfig](#g-rpc-gateway-config)
 
 </dd>
 
 <dt>http</dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_SERVER_HTTP_` Type:
-[HTTPServerConfig](#http-server-config)
+Env-Var Prefix: `APERTURE_AGENT_SERVER_HTTP_`
+Type: [HTTPServerConfig](#http-server-config)
 
 </dd>
 
 <dt>tls</dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_SERVER_TLS_` Type:
-[ServerTLSConfig](#server-tls-config)
+Env-Var Prefix: `APERTURE_AGENT_SERVER_TLS_`
+Type: [ServerTLSConfig](#server-tls-config)
 
 </dd>
 
@@ -471,16 +476,16 @@ Env-Var Prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_`
 <dt>kubernetes</dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_` Type:
-[KubernetesDiscoveryConfig](#kubernetes-discovery-config)
+Env-Var Prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_`
+Type: [KubernetesDiscoveryConfig](#kubernetes-discovery-config)
 
 </dd>
 
 <dt>static</dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_STATIC_` Type:
-[StaticDiscoveryConfig](#static-discovery-config)
+Env-Var Prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_STATIC_`
+Type: [StaticDiscoveryConfig](#static-discovery-config)
 
 </dd>
 
@@ -499,8 +504,8 @@ Env-Var Prefix: `APERTURE_AGENT_WATCHDOG_`
 <dt>memory</dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_WATCHDOG_MEMORY_` Type:
-[WatchdogConfig](#watchdog-config)
+Env-Var Prefix: `APERTURE_AGENT_WATCHDOG_MEMORY_`
+Type: [WatchdogConfig](#watchdog-config)
 
 </dd>
 
@@ -510,9 +515,7 @@ Env-Var Prefix: `APERTURE_AGENT_WATCHDOG_MEMORY_` Type:
 
 ### AdaptivePolicy {#adaptive-policy}
 
-AdaptivePolicy creates a policy that forces GC when the usage surpasses the
-configured factor of the available memory. This policy calculates next target as
-usage+(limit-usage)\*factor.
+AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)\*factor.
 
 #### Properties
 
@@ -526,16 +529,14 @@ usage+(limit-usage)\*factor.
 <dt>factor</dt>
 <dd>
 
-(float64, `gte=0,lte=1`, default: `0.50`) Factor sets user-configured limit of
-available memory
+(float64, `gte=0,lte=1`, default: `0.50`) Factor sets user-configured limit of available memory
 
 </dd>
 </dl>
 
 ### AgentInfoConfig {#agent-info-config}
 
-AgentInfoConfig is the configuration for the agent group and other agent
-attributes.
+AgentInfoConfig is the configuration for the agent group and other agent attributes.
 
 #### Properties
 
@@ -543,8 +544,7 @@ attributes.
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) All agents within an agent_group receive the same
-data-plane configuration (e.g. Flux Meters, Rate Limiters etc).
+(string, default: `default`) All agents within an agent_group receive the same data-plane configuration (e.g. Flux Meters, Rate Limiters etc).
 
 [Read more about agent groups here](/concepts/integrations/flow-control/service.md#agent-group).
 
@@ -561,12 +561,11 @@ AgentOTELConfig is the configuration for Agent's OTEL collector.
 <dt>custom_metrics</dt>
 <dd>
 
-(map of [CustomMetricsConfig](#custom-metrics-config)) CustomMetrics configures
-custom metrics OTEL pipelines, which will send data to the controller
-prometheus. Key in this map refers to OTEL pipeline name. Prefixing pipeline
-name with `metrics/` is optional, as all the components and pipeline names would
-be normalized. By default `kubeletstats` custom metrics is added, which can be
-overwritten.
+(map of [CustomMetricsConfig](#custom-metrics-config)) CustomMetrics configures custom metrics OTEL pipelines, which will send data to
+the controller prometheus.
+Key in this map refers to OTEL pipeline name. Prefixing pipeline name with `metrics/`
+is optional, as all the components and pipeline names would be normalized.
+By default `kubeletstats` custom metrics is added, which can be overwritten.
 
 </dd>
 <dt>batch_alerts</dt>
@@ -638,22 +637,20 @@ BatchAlertsConfig defines configuration for OTEL batch processor.
 <dt>send_batch_max_size</dt>
 <dd>
 
-(uint32, `gte=0`, default: `100`) SendBatchMaxSize is the upper limit of the
-batch size. Bigger batches will be split into smaller units.
+(uint32, `gte=0`, default: `100`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+into smaller units.
 
 </dd>
 <dt>send_batch_size</dt>
 <dd>
 
-(uint32, `gt=0`, default: `100`) SendBatchSize is the size of a batch which
-after hit, will trigger it to be sent.
+(uint32, `gt=0`, default: `100`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
 
 </dd>
 <dt>timeout</dt>
 <dd>
 
-(string, `gt=0`, default: `1s`) Timeout sets the time after which a batch will
-be sent regardless of size.
+(string, `gt=0`, default: `1s`) Timeout sets the time after which a batch will be sent regardless of size.
 
 </dd>
 </dl>
@@ -668,22 +665,20 @@ BatchPostrollupConfig defines configuration for OTEL batch processor.
 <dt>send_batch_max_size</dt>
 <dd>
 
-(uint32, `gte=0`, default: `100`) SendBatchMaxSize is the upper limit of the
-batch size. Bigger batches will be split into smaller units.
+(uint32, `gte=0`, default: `100`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+into smaller units.
 
 </dd>
 <dt>send_batch_size</dt>
 <dd>
 
-(uint32, `gt=0`, default: `100`) SendBatchSize is the size of a batch which
-after hit, will trigger it to be sent.
+(uint32, `gt=0`, default: `100`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
 
 </dd>
 <dt>timeout</dt>
 <dd>
 
-(string, `gt=0`, default: `1s`) Timeout sets the time after which a batch will
-be sent regardless of size.
+(string, `gt=0`, default: `1s`) Timeout sets the time after which a batch will be sent regardless of size.
 
 </dd>
 </dl>
@@ -698,22 +693,20 @@ BatchPrerollupConfig defines configuration for OTEL batch processor.
 <dt>send_batch_max_size</dt>
 <dd>
 
-(uint32, `gte=0`, default: `10000`) SendBatchMaxSize is the upper limit of the
-batch size. Bigger batches will be split into smaller units.
+(uint32, `gte=0`, default: `10000`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+into smaller units.
 
 </dd>
 <dt>send_batch_size</dt>
 <dd>
 
-(uint32, `gt=0`, default: `10000`) SendBatchSize is the size of a batch which
-after hit, will trigger it to be sent.
+(uint32, `gt=0`, default: `10000`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
 
 </dd>
 <dt>timeout</dt>
 <dd>
 
-(string, `gt=0`, default: `10s`) Timeout sets the time after which a batch will
-be sent regardless of size.
+(string, `gt=0`, default: `10s`) Timeout sets the time after which a batch will be sent regardless of size.
 
 </dd>
 </dl>
@@ -780,8 +773,8 @@ ClientTLSConfig is the config for client TLS.
 
 ### Components {#components}
 
-Components is an alias type for map[string]any. This needs to be used because of
-the CRD requirements for the operator.
+Components is an alias type for map[string]any. This needs to be used
+because of the CRD requirements for the operator.
 https://github.com/kubernetes-sigs/controller-tools/issues/636
 https://github.com/kubernetes-sigs/kubebuilder/issues/528
 
@@ -839,8 +832,7 @@ CustomMetricsPipelineConfig defines a custom metrics pipeline.
 
 ### DistCacheConfig {#dist-cache-config}
 
-DistCacheConfig configures distributed cache that holds per-label counters in
-distributed rate limiters.
+DistCacheConfig configures distributed cache that holds per-label counters in distributed rate limiters.
 
 #### Properties
 
@@ -848,22 +840,19 @@ distributed rate limiters.
 <dt>bind_addr</dt>
 <dd>
 
-(string, `hostname_port`, default: `:3320`) BindAddr denotes the address that
-DistCache will bind to for communication with other peer nodes.
+(string, `hostname_port`, default: `:3320`) BindAddr denotes the address that DistCache will bind to for communication with other peer nodes.
 
 </dd>
 <dt>memberlist_advertise_addr</dt>
 <dd>
 
-(string, `omitempty,hostname_port`) Address of memberlist to advertise to other
-cluster members. Used for nat traversal if provided.
+(string, `omitempty,hostname_port`) Address of memberlist to advertise to other cluster members. Used for nat traversal if provided.
 
 </dd>
 <dt>memberlist_bind_addr</dt>
 <dd>
 
-(string, `hostname_port`, default: `:3322`) Address to bind mememberlist server
-to.
+(string, `hostname_port`, default: `:3322`) Address to bind mememberlist server to.
 
 </dd>
 <dt>replica_count</dt>
@@ -971,9 +960,7 @@ FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
 <dt>fluxninja_endpoint</dt>
 <dd>
 
-(string, `omitempty,hostname_port|url|fqdn`) Address to grpc or http(s) server
-listening in agent service. To use http protocol, the address must start with
-http(s)://.
+(string, `omitempty,hostname_port|url|fqdn`) Address to grpc or http(s) server listening in agent service. To use http protocol, the address must start with http(s)://.
 
 </dd>
 <dt>heartbeat_interval</dt>
@@ -1039,9 +1026,7 @@ GRPCGatewayConfig holds configuration for grpc-http gateway
 <dt>grpc_server_address</dt>
 <dd>
 
-(string, `hostname_port`, default: `0.0.0.0:1`) GRPC server address to connect
-to - By default it points to HTTP server port because FluxNinja stack runs GRPC
-and HTTP servers on the same port
+(string, `hostname_port`, default: `0.0.0.0:1`) GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
 
 </dd>
 </dl>
@@ -1068,8 +1053,7 @@ GRPCServerConfig holds configuration for GRPC Server.
 <dt>latency_buckets_ms</dt>
 <dd>
 
-([]float64, `gte=0`, default: `[10.0,25.0,100.0,250.0,1000.0]`) Buckets
-specification in latency histogram
+([]float64, `gte=0`, default: `[10.0,25.0,100.0,250.0,1000.0]`) Buckets specification in latency histogram
 
 </dd>
 </dl>
@@ -1168,8 +1152,7 @@ HTTPClientConfig holds configuration for HTTP Client.
 <dt>timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `60s`) HTTP client timeout - Timeouts includes
-connection time, redirects, reading the response etc. 0 = no timeout.
+(string, `gte=0s`, default: `60s`) HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
 
 </dd>
 <dt>use_proxy</dt>
@@ -1220,8 +1203,7 @@ HTTPServerConfig holds configuration for HTTP Server.
 <dt>latency_buckets_ms</dt>
 <dd>
 
-([]float64, `gte=0`, default: `[10.0,25.0,100.0,250.0,1000.0]`) Buckets
-specification in latency histogram
+([]float64, `gte=0`, default: `[10.0,25.0,100.0,250.0,1000.0]`) Buckets specification in latency histogram
 
 </dd>
 <dt>max_header_bytes</dt>
@@ -1254,7 +1236,8 @@ specification in latency histogram
 
 A Header represents the key-value pairs in an HTTP header.
 
-The keys should be in canonical form, as returned by CanonicalHeaderKey.
+The keys should be in canonical form, as returned by
+CanonicalHeaderKey.
 
 [Header](#header)
 
@@ -1268,16 +1251,13 @@ HeapConfig holds configuration for heap Watchdog.
 <dt>limit</dt>
 <dd>
 
-(uint64, `gt=0`, default: `268435456`) Maximum memory (in bytes) sets limit of
-process usage. Default = 256MB.
+(uint64, `gt=0`, default: `268435456`) Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
 
 </dd>
 <dt>min_gogc</dt>
 <dd>
 
-(int64, `gt=0,lte=100`, default: `25`) Minimum GoGC sets the minimum garbage
-collection target percentage for heap driven Watchdogs. This setting helps avoid
-overscheduling.
+(int64, `gt=0,lte=100`, default: `25`) Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
 
 </dd>
 <dt>adaptive_policy</dt>
@@ -1304,8 +1284,7 @@ JobConfig is config for Job
 <dt>execution_period</dt>
 <dd>
 
-(string, default: `10s`) Time period between job executions. Zero or negative
-value means that the job will never execute periodically.
+(string, default: `10s`) Time period between job executions. Zero or negative value means that the job will never execute periodically.
 
 </dd>
 <dt>execution_timeout</dt>
@@ -1317,8 +1296,7 @@ value means that the job will never execute periodically.
 <dt>initial_delay</dt>
 <dd>
 
-(string, default: `0s`) Initial delay to start the job. Zero value will schedule
-the job immediately. Negative value will wait for next scheduled interval.
+(string, default: `0s`) Initial delay to start the job. Zero value will schedule the job immediately. Negative value will wait for next scheduled interval.
 
 </dd>
 <dt>initially_healthy</dt>
@@ -1339,9 +1317,7 @@ JobGroupConfig holds configuration for JobGroup.
 <dt>max_concurrent_jobs</dt>
 <dd>
 
-(int64, `gte=0`, default: `0`) Limits how many jobs can be running at the same
-time. This is useful when running resource intensive jobs and a precise start
-time is not critical. 0 = no limit.
+(int64, `gte=0`, default: `0`) Limits how many jobs can be running at the same time. This is useful when running resource intensive jobs and a precise start time is not critical. 0 = no limit.
 
 </dd>
 </dl>
@@ -1389,22 +1365,19 @@ ListenerConfig holds configuration for socket listeners.
 <dt>addr</dt>
 <dd>
 
-(string, `hostname_port`, default: `:8080`) Address to bind to in the form of
-[host%zone]:port
+(string, `hostname_port`, default: `:8080`) Address to bind to in the form of [host%zone]:port
 
 </dd>
 <dt>keep_alive</dt>
 <dd>
 
-(string, `gte=0s`, default: `180s`) Keep-alive period - 0 = enabled if supported
-by protocol or OS. If negative then keep-alive is disabled.
+(string, `gte=0s`, default: `180s`) Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alive is disabled.
 
 </dd>
 <dt>network</dt>
 <dd>
 
-(string, `oneof=tcp tcp4 tcp6`, default: `tcp`) TCP networks - "tcp", "tcp4"
-(IPv4-only), "tcp6" (IPv6-only)
+(string, `oneof=tcp tcp4 tcp6`, default: `tcp`) TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
 
 </dd>
 </dl>
@@ -1419,30 +1392,25 @@ LogConfig holds configuration for a logger and log writers.
 <dt>level</dt>
 <dd>
 
-(string,
-`oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED`,
-default: `info`) Log level
+(string, `oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED`, default: `info`) Log level
 
 </dd>
 <dt>non_blocking</dt>
 <dd>
 
-(bool, default: `true`) Use non-blocking log writer (can lose logs at high
-throughput)
+(bool, default: `true`) Use non-blocking log writer (can lose logs at high throughput)
 
 </dd>
 <dt>pretty_console</dt>
 <dd>
 
-(bool, default: `false`) Additional log writer: pretty console (stdout) logging
-(not recommended for prod environments)
+(bool, default: `false`) Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
 
 </dd>
 <dt>writers</dt>
 <dd>
 
-([[]LogWriterConfig](#log-writer-config), `omitempty,dive,omitempty`) Log
-writers
+([[]LogWriterConfig](#log-writer-config), `omitempty,dive,omitempty`) Log writers
 
 </dd>
 </dl>
@@ -1463,8 +1431,7 @@ LogWriterConfig holds configuration for a log writer.
 <dt>file</dt>
 <dd>
 
-(string, default: `stderr`) Output file for logs. Keywords allowed - ["stderr",
-"default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+(string, default: `stderr`) Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
 
 </dd>
 <dt>max_age</dt>
@@ -1497,25 +1464,19 @@ MetricsConfig holds configuration for service metrics.
 <dt>enable_go_metrics</dt>
 <dd>
 
-(bool, default: `false`) EnableGoCollector controls whether the go collector is
-registered on startup. See
-<https://godoc.org/github.com/prometheus/client_golang/prometheus#NewGoCollector>
+(bool, default: `false`) EnableGoCollector controls whether the go collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewGoCollector>
 
 </dd>
 <dt>enable_process_collector</dt>
 <dd>
 
-(bool, default: `false`) EnableProcessCollector controls whether the process
-collector is registered on startup. See
-<https://godoc.org/github.com/prometheus/client_golang/prometheus#NewProcessCollector>
+(bool, default: `false`) EnableProcessCollector controls whether the process collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewProcessCollector>
 
 </dd>
 <dt>pedantic</dt>
 <dd>
 
-(bool, default: `false`) Pedantic controls whether a pedantic Registerer is used
-as the prometheus backend. See
-<https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
+(bool, default: `false`) Pedantic controls whether a pedantic Registerer is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
 
 </dd>
 </dl>
@@ -1530,9 +1491,7 @@ PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
 <dt>advertisement_addr</dt>
 <dd>
 
-(string, `omitempty,hostname_port`) Network address of aperture server to
-advertise to peers - this address should be reachable from other agents. Used
-for nat traversal when provided.
+(string, `omitempty,hostname_port`) Network address of aperture server to advertise to peers - this address should be reachable from other agents. Used for nat traversal when provided.
 
 </dd>
 </dl>
@@ -1565,8 +1524,7 @@ PluginsConfig holds configuration for plugins.
 <dt>plugins_path</dt>
 <dd>
 
-(string, default: `default`) Path to plugins directory. "default" points to
-`/var/lib/aperture/<service>/plugins`.
+(string, default: `default`) Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
 
 </dd>
 </dl>
@@ -1581,15 +1539,13 @@ PortsConfig defines configuration for OTEL debug and extension ports.
 <dt>debug_port</dt>
 <dd>
 
-(uint32, `gte=0`, default: `8888`) Port on which otel collector exposes
-prometheus metrics on /metrics path.
+(uint32, `gte=0`, default: `8888`) Port on which otel collector exposes prometheus metrics on /metrics path.
 
 </dd>
 <dt>health_check_port</dt>
 <dd>
 
-(uint32, `gte=0`, default: `13133`) Port on which health check extension in
-exposed.
+(uint32, `gte=0`, default: `13133`) Port on which health check extension in exposed.
 
 </dd>
 <dt>pprof_port</dt>
@@ -1616,23 +1572,19 @@ ProfilersConfig holds configuration for profilers.
 <dt>cpu_profiler</dt>
 <dd>
 
-(bool, default: `false`) Flag to enable cpu profiling on process start and save
-it to a file. HTTP interface will not work if this is enabled as CPU profile
-will always be running.
+(bool, default: `false`) Flag to enable cpu profiling on process start and save it to a file. HTTP interface will not work if this is enabled as CPU profile will always be running.
 
 </dd>
 <dt>profiles_path</dt>
 <dd>
 
-(string, default: `default`) Path to save performance profiles. "default" path
-is `/var/log/aperture/<service>/profiles`.
+(string, default: `default`) Path to save performance profiles. "default" path is `/var/log/aperture/<service>/profiles`.
 
 </dd>
 <dt>register_http_routes</dt>
 <dd>
 
-(bool, default: `true`) Register routes. Profile types profile, symbol and
-cmdline will be registered at /debug/pprof/{profile,symbol,cmdline}.
+(bool, default: `true`) Register routes. Profile types profile, symbol and cmdline will be registered at /debug/pprof/{profile,symbol,cmdline}.
 
 </dd>
 </dl>
@@ -1656,9 +1608,7 @@ PrometheusConfig holds configuration for Prometheus Server.
 
 ProxyConfig holds proxy configuration.
 
-This configuration has preference over environment variables HTTP_PROXY,
-HTTPS_PROXY or NO_PROXY. See
-<https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config>
+This configuration has preference over environment variables HTTP_PROXY, HTTPS_PROXY or NO_PROXY. See <https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config>
 
 #### Properties
 
@@ -1693,8 +1643,7 @@ SentryConfig holds configuration for Sentry.
 <dt>attach_stack_trace</dt>
 <dd>
 
-(bool, default: `true`) Configure to generate and attach stacktraces to
-capturing message calls
+(bool, default: `true`) Configure to generate and attach stacktraces to capturing message calls
 
 </dd>
 <dt>debug</dt>
@@ -1712,10 +1661,9 @@ capturing message calls
 <dt>dsn</dt>
 <dd>
 
-(string, default:
-`https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877`) If
-DSN is not set, the client is effectively disabled You can set test project's
-dsn to send log events. oss-aperture project dsn is set as default.
+(string, default: `https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877`) If DSN is not set, the client is effectively disabled
+You can set test project's dsn to send log events.
+oss-aperture project dsn is set as default.
 
 </dd>
 <dt>environment</dt>
@@ -1815,8 +1763,7 @@ StaticDiscoveryConfig for pre-determined list of services.
 
 ### WatchdogConfig {#watchdog-config}
 
-WatchdogConfig holds configuration for Watchdog Policy. For each policy, either
-watermark or adaptive should be configured.
+WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
 
 #### Properties
 
@@ -1849,8 +1796,7 @@ watermark or adaptive should be configured.
 
 ### WatchdogPolicyType {#watchdog-policy-type}
 
-WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both
-algorithms are configured then only watermark algorithm is used.
+WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
 
 #### Properties
 
@@ -1871,8 +1817,7 @@ algorithms are configured then only watermark algorithm is used.
 
 ### WatermarksPolicy {#watermarks-policy}
 
-WatermarksPolicy creates a Watchdog policy that schedules GC at concrete
-watermarks.
+WatermarksPolicy creates a Watchdog policy that schedules GC at concrete watermarks.
 
 #### Properties
 
@@ -1886,10 +1831,7 @@ watermarks.
 <dt>watermarks</dt>
 <dd>
 
-([]float64, `omitempty,dive,gte=0,lte=1`, default:
-`[0.50,0.75,0.80,0.85,0.90,0.95,0.99]`) Watermarks are increasing limits on
-which to trigger GC. Watchdog disarms when the last watermark is surpassed. It
-is recommended to set an extreme watermark for the last element (e.g. 0.99).
+([]float64, `omitempty,dive,gte=0,lte=1`, default: `[0.50,0.75,0.80,0.85,0.90,0.95,0.99]`) Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
 
 </dd>
 </dl>

@@ -24,7 +24,9 @@ const (
 // Set of classification rules sharing a common selector
 //
 // :::info
+//
 // See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
+//
 // :::
 //
 // Example:
@@ -149,13 +151,17 @@ type Rule struct {
 	// propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
 	//
 	// :::note
+	//
 	// The flow label is always accessible in Aperture Policies regardless of this setting.
+	//
 	// :::
 	//
 	// :::caution
+	//
 	// When using [FluxNinja ARC plugin](arc/plugin.md), telemetry enabled
 	// labels are sent to FluxNinja ARC for observability. Telemetry should be disabled for
 	// sensitive labels.
+	//
 	// :::
 	Telemetry bool `protobuf:"varint,3,opt,name=telemetry,proto3" json:"telemetry,omitempty" default:"true"` // @gotags: default:"true"
 }
