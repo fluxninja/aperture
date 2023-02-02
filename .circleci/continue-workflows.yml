@@ -13,7 +13,7 @@ executors:
       - image: cimg/base:2022.07
   go-cimg-executor:
     docker:
-      - image: cimg/go:1.19
+      - image: cimg/go:1.20
         user: root
   python-cimg-executor:
     docker:
@@ -453,7 +453,12 @@ jobs:
       - run:
           name: Run SDK Validator
           command: |
-            go run cmd/sdk-validator/main.go -sdk-docker-image=<<parameters.registry>>/<<parameters.docker-image>>:<<parameters.tag>> -port=<<parameters.port>> -requests=<<parameters.requests>> -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk-port>>
+            go run cmd/sdk-validator/main.go \
+              -sdk-docker-image=<<parameters.registry>>/<<parameters.docker-image>>:<<parameters.tag>> \
+              -port=<<parameters.port>> \
+              -requests=<<parameters.requests>> \
+              -rejects=<<parameters.rejects>> \
+              -sdk-port=<<parameters.sdk-port>>
       - when:
           condition:
             equal: [main, << pipeline.git.branch >>]

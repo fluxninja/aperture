@@ -109,11 +109,11 @@ for jsonnet_file in $jsonnet_files; do
 			# generate mermaid diagram
 			mermaidfilepath="${jsonnet_file%.*}".mmd
 			# compile the policy
-			go run "$gitroot"/cmd/circuit-compiler/main.go -cr "$yamlfilepath" --mermaid "$mermaidfilepath"
+			go run "$gitroot"/cmd/aperturectl/main.go compile --cr "$yamlfilepath" --mermaid "$mermaidfilepath"
 			git add "$mermaidfilepath"
 		else
 			# still validate the policy with compiler
-			go run "$gitroot"/cmd/circuit-compiler/main.go -cr "$yamlfilepath"
+			go run "$gitroot"/cmd/aperturectl/main.go compile --cr "$yamlfilepath"
 		fi
 	else
 		npx prettier --write "$jsonfilepath"
