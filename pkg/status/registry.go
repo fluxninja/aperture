@@ -2,6 +2,7 @@ package status
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -17,12 +18,14 @@ type Registry interface {
 	SetStatus(*statusv1.Status)
 	SetGroupStatus(*statusv1.GroupStatus)
 	GetGroupStatus() *statusv1.GroupStatus
-	Child(key string) Registry
-	ChildIfExists(key string) Registry
+	Child(key, value string) Registry
+	ChildIfExists(key, value string) Registry
 	Parent() Registry
 	Root() Registry
 	Detach()
 	Key() string
+	Value() string
+	URI() string
 	HasError() bool
 	GetLogger() *log.Logger
 	GetAlerter() alerts.Alerter
@@ -31,6 +34,7 @@ type Registry interface {
 var _ Registry = &registry{}
 
 const (
+	uriKey       = "status_uri"
 	alertChannel = "status_registry"
 	// Resolve timeout in seconds.
 	alertResolveTimeout = 300
@@ -43,20 +47,39 @@ type registry struct {
 	status   *statusv1.Status
 	root     *registry
 	parent   *registry
-	children map[string]*registry
+	children map[kv]*registry
 	logger   *log.Logger
 	key      string
+	value    string
+	uri      string
 	alerter  alerts.Alerter
+}
+
+// helper struct for key-value keys in children map.
+type kv struct {
+	Key   string
+	Value string
+}
+
+func toString(p kv) string {
+	return fmt.Sprintf("%s:%s", p.Key, p.Value)
+}
+
+func fromString(hash string) kv {
+	split := strings.Split(hash, ":")
+	return kv{Key: split[0], Value: split[1]}
 }
 
 // NewRegistry creates a new Registry.
 func NewRegistry(logger *log.Logger, alerter alerts.Alerter) Registry {
-	labeledAlerter := alerter.WithLabels(map[string]string{"uri": "/"})
+	labeledAlerter := alerter.WithLabels(map[string]string{uriKey: "/"})
 	r := &registry{
 		key:      "root",
+		value:    "root",
+		uri:      "",
 		parent:   nil,
 		status:   &statusv1.Status{},
-		children: make(map[string]*registry),
+		children: make(map[kv]*registry),
 		logger:   logger,
 		alerter:  labeledAlerter,
 	}
@@ -64,33 +87,38 @@ func NewRegistry(logger *log.Logger, alerter alerts.Alerter) Registry {
 	return r
 }
 
-// Child creates a new Registry with the given key.
-func (r *registry) Child(key string) Registry {
+// Child creates a new Registry with the given key and value.
+func (r *registry) Child(key, value string) Registry {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	var child *registry
-	var ok bool
-	child, ok = r.children[key]
+
+	childKV := kv{Key: key, Value: value}
+	uri := fmt.Sprintf("%s/%s/%s", r.uri, key, value)
+	labeledAlerter := r.alerter.WithLabels(map[string]string{uriKey: uri, key: value})
+	child, ok := r.children[childKV]
 	if !ok {
 		child = &registry{
 			key:      key,
+			value:    value,
+			uri:      uri,
 			parent:   r,
 			root:     r.root,
 			status:   &statusv1.Status{},
-			children: make(map[string]*registry),
+			children: make(map[kv]*registry),
 			logger:   r.logger.WithStr(r.key, key),
-			alerter:  r.alerter,
+			alerter:  labeledAlerter,
 		}
-		r.children[key] = child
+		r.children[childKV] = child
 	}
 	return child
 }
 
-// ChildIfExists returns the child Registry with the given key if it exists.
-func (r *registry) ChildIfExists(key string) Registry {
+// ChildIfExists returns the child Registry with the given key and value if it exists.
+func (r *registry) ChildIfExists(key, value string) Registry {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	child, ok := r.children[key]
+	childKV := kv{Key: key, Value: value}
+	child, ok := r.children[childKV]
 	if !ok {
 		return nil
 	}
@@ -125,8 +153,9 @@ func (r *registry) Detach() {
 	// We don't have Attach() so parent can't change to other than nil.
 	if r.parent != nil {
 		// remove child from parent
-		if r.parent.children[r.key] == r {
-			delete(r.parent.children, r.key)
+		childKV := kv{Key: r.key, Value: r.value}
+		if r.parent.children[childKV] == r {
+			delete(r.parent.children, childKV)
 		}
 		// set parent to nil
 		r.parent = nil
@@ -165,7 +194,7 @@ func (r *registry) createAlert(err *statusv1.Status_Error) *alerts.Alert {
 		alerts.WithAlertChannels([]string{alertChannel}),
 		alerts.WithResolveTimeout(resolve),
 		alerts.WithGeneratorURL(
-			fmt.Sprintf("http://%s/%s", info.GetHostInfo().Hostname, r.key),
+			fmt.Sprintf("http://%s%s", info.GetHostInfo().Hostname, r.uri),
 		),
 	)
 
@@ -177,8 +206,9 @@ func (r *registry) SetGroupStatus(groupStatus *statusv1.GroupStatus) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.status = groupStatus.Status
-	for key, gs := range groupStatus.Groups {
-		r.Child(key).SetGroupStatus(gs)
+	for hash, gs := range groupStatus.Groups {
+		kv := fromString(hash)
+		r.Child(kv.Key, kv.Value).SetGroupStatus(gs)
 	}
 }
 
@@ -192,8 +222,8 @@ func (r *registry) GetGroupStatus() *statusv1.GroupStatus {
 		Groups: make(map[string]*statusv1.GroupStatus),
 	}
 
-	for _, child := range r.children {
-		groupStatus.Groups[child.key] = child.GetGroupStatus()
+	for kv, child := range r.children {
+		groupStatus.Groups[toString(kv)] = child.GetGroupStatus()
 	}
 	return groupStatus
 }
@@ -210,6 +240,20 @@ func (r *registry) Key() string {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return r.key
+}
+
+// Value returns the value of the Registry that is registered with the parent.
+func (r *registry) Value() string {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.value
+}
+
+// URI returns the uri of the Registry that is registered with the parent.
+func (r *registry) URI() string {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.uri
 }
 
 // HasError returns true if the Registry has an error.

@@ -33,17 +33,17 @@ func (svc *StatusService) GetGroupStatus(ctx context.Context, req *statusv1.Grou
 	keys := strings.Split(req.Path, "/")
 
 	registry := svc.registry
-	for _, key := range keys {
-		if key == "" {
-			continue
-		}
-		registry = registry.ChildIfExists(key)
+	for i := 0; i < len(keys); i += 2 {
+		key := keys[i]
+		val := keys[i+1]
+		registry = registry.ChildIfExists(key, val)
 		if registry == nil {
 			return &statusv1.GroupStatus{}, nil
 		}
+		if registry.HasError() {
+			_ = grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "503"))
+		}
 	}
-	if registry.HasError() {
-		_ = grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "503"))
-	}
+
 	return registry.GetGroupStatus(), nil
 }

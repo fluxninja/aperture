@@ -168,10 +168,7 @@ func (policy *Policy) setupCircuitJob(
 		lifecycle.Append(fx.Hook{
 			OnStart: func(_ context.Context) error {
 				// Create a job that runs every tick i.e. evaluation_interval. Set timeout duration to half of evaluation_interval
-				job := jobs.BasicJob{
-					JobFunc: policy.executeTick,
-				}
-				job.JobName = policy.jobName
+				job := jobs.NewBasicJob(policy.jobName, policy.executeTick)
 				initialDelay := config.MakeDuration(0)
 				executionPeriod := config.MakeDuration(policy.evaluationInterval)
 				executionTimeout := config.MakeDuration(time.Millisecond * 100)
@@ -182,7 +179,7 @@ func (policy *Policy) setupCircuitJob(
 					ExecutionTimeout: executionTimeout,
 				}
 				// Register job with registry
-				err := policy.circuitJobGroup.RegisterJob(&job, jobConfig)
+				err := policy.circuitJobGroup.RegisterJob(job, jobConfig)
 				if err != nil {
 					logger.Error().Err(err).Str("job", policy.jobName).Msg("Error registering job")
 					return err

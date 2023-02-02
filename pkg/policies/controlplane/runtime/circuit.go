@@ -108,7 +108,7 @@ func NewCircuitAndOptions(
 	configuredComponents []ConfiguredComponent,
 	policyReadAPI iface.Policy,
 ) (*Circuit, fx.Option) {
-	reg := policyReadAPI.GetStatusRegistry().Child("circuit_signals")
+	reg := policyReadAPI.GetStatusRegistry().Child("circuit", "circuit_signals")
 	circuit := &Circuit{
 		Policy:         policyReadAPI,
 		loopedSignals:  make(signalToReading),
@@ -198,7 +198,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 		errMulti = multierr.Append(errMulti, err)
 	}
 	policyID := fmt.Sprintf("%s-%s", circuit.GetPolicyName(), circuit.GetPolicyHash())
-	reg := circuit.statusRegistry.Child(policyID)
+	reg := circuit.statusRegistry.Child("policy", policyID)
 
 	// Signals for this tick
 	circuitSignalReadings := make(signalToReading)

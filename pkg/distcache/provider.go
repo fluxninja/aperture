@@ -242,13 +242,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 		Metrics: newDistCacheMetrics(),
 	}
 
-	job := &jobs.BasicJob{
-		JobBase: jobs.JobBase{
-			JobName: distCacheMetricsJobName,
-		},
-		JobFunc: dc.scrapeMetrics,
-	}
-
+	job := jobs.NewBasicJob(distCacheMetricsJobName, dc.scrapeMetrics)
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			// Register metrics with Prometheus.

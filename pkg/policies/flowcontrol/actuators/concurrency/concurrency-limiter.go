@@ -118,7 +118,7 @@ func setupConcurrencyLimiterFactory(
 		return err
 	}
 
-	reg := statusRegistry.Child("concurrency_limiter")
+	reg := statusRegistry.Child("component", "concurrency_limiter")
 
 	conLimiterFactory := &concurrencyLimiterFactory{
 		engineAPI:           e,

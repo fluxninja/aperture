@@ -39,10 +39,7 @@ func NewLazySyncRateTracker(limiter RateTracker,
 		syncDuration: syncDuration,
 	}
 
-	job := &jobs.BasicJob{
-		JobFunc: lsl.sync,
-	}
-	job.JobName = lsl.name
+	job := jobs.NewBasicJob(lsl.name, lsl.sync)
 	// register job with job group
 	err := lsl.jobGroup.RegisterJob(job, jobs.JobConfig{
 		ExecutionPeriod:  config.MakeDuration(syncDuration),

@@ -219,7 +219,7 @@ func createJobGroup(limiter RateTracker) *jobs.JobGroup {
 	var gws jobs.GroupWatchers
 
 	alerter := alerts.NewSimpleAlerter(100)
-	reg := status.NewRegistry(log.GetGlobalLogger(), alerter).Child("jobs")
+	reg := status.NewRegistry(log.GetGlobalLogger(), alerter).Child("test", "jobs")
 
 	group, err := jobs.NewJobGroup(reg, 0, jobs.RescheduleMode, gws)
 	if err != nil {
