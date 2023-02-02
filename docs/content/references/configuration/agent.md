@@ -16,6 +16,12 @@ Generated File Starts
 
 ## Table of contents
 
+### AGENT CONFIGURATION
+
+| Key    | Reference        |
+| ------ | ---------------- |
+| `otel` | [OTEL](#o-t-e-l) |
+
 ### COMMON CONFIGURATION
 
 | Key                 | Reference                              |
@@ -29,7 +35,6 @@ Generated File Starts
 | `liveness`          | [Liveness](#liveness)                  |
 | `log`               | [Log](#log)                            |
 | `metrics`           | [Metrics](#metrics)                    |
-| `otel`              | [OTEL](#o-t-e-l)                       |
 | `peer_discovery`    | [PeerDiscovery](#peer-discovery)       |
 | `plugins`           | [Plugins](#plugins)                    |
 | `profilers`         | [Profilers](#profilers)                |
@@ -263,11 +268,11 @@ Env-Var Prefix: `APERTURE_AGENT_OTEL_`
 
 <dl>
 
-<dt>proxy</dt>
+<dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_AGENT_OTEL_PROXY_`
-Type: [UserOTELConfig](#user-o-t-e-l-config)
+Env-Var Prefix: `APERTURE_AGENT_OTEL_`
+Type: [AgentOTELConfig](#agent-o-t-e-l-config)
 
 </dd>
 
@@ -546,6 +551,49 @@ AgentInfoConfig is the configuration for the agent group and other agent attribu
 </dd>
 </dl>
 
+### AgentOTELConfig {#agent-o-t-e-l-config}
+
+AgentOTELConfig is the configuration for Agent's OTEL collector.
+
+#### Properties
+
+<dl>
+<dt>custom_metrics</dt>
+<dd>
+
+(map of [CustomMetricsConfig](#custom-metrics-config)) CustomMetrics configures custom metrics OTEL pipelines, which will send data to
+the controller prometheus.
+Key in this map refers to OTEL pipeline name. Prefixing pipeline name with `metrics/`
+is optional, as all the components and pipeline names would be normalized.
+By default `kubeletstats` custom metrics is added, which can be overwritten.
+
+</dd>
+<dt>batch_alerts</dt>
+<dd>
+
+([BatchAlertsConfig](#batch-alerts-config))
+
+</dd>
+<dt>batch_postrollup</dt>
+<dd>
+
+([BatchPostrollupConfig](#batch-postrollup-config))
+
+</dd>
+<dt>batch_prerollup</dt>
+<dd>
+
+([BatchPrerollupConfig](#batch-prerollup-config))
+
+</dd>
+<dt>ports</dt>
+<dd>
+
+([PortsConfig](#ports-config))
+
+</dd>
+</dl>
+
 ### BackoffConfig {#backoff-config}
 
 BackoffConfig holds configuration for GRPC Client Backoff.
@@ -719,6 +767,65 @@ ClientTLSConfig is the config for client TLS.
 <dd>
 
 (string)
+
+</dd>
+</dl>
+
+### Components {#components}
+
+Components is an alias type for map[string]any. This needs to be used
+because of the CRD requirements for the operator.
+https://github.com/kubernetes-sigs/controller-tools/issues/636
+https://github.com/kubernetes-sigs/kubebuilder/issues/528
+
+[Components](#components)
+
+### CustomMetricsConfig {#custom-metrics-config}
+
+CustomMetricsConfig defines receivers, processors and single metrics pipeline,
+
+which will be exported to the controller prometheus.
+
+#### Properties
+
+<dl>
+<dt>pipeline</dt>
+<dd>
+
+([CustomMetricsPipelineConfig](#custom-metrics-pipeline-config))
+
+</dd>
+<dt>processors</dt>
+<dd>
+
+([Components](#components))
+
+</dd>
+<dt>receivers</dt>
+<dd>
+
+([Components](#components))
+
+</dd>
+</dl>
+
+### CustomMetricsPipelineConfig {#custom-metrics-pipeline-config}
+
+CustomMetricsPipelineConfig defines a custom metrics pipeline.
+
+#### Properties
+
+<dl>
+<dt>processors</dt>
+<dd>
+
+([]string)
+
+</dd>
+<dt>receivers</dt>
+<dd>
+
+([]string)
 
 </dd>
 </dl>
@@ -1650,39 +1757,6 @@ StaticDiscoveryConfig for pre-determined list of services.
 <dd>
 
 ([[]ServiceConfig](#service-config)) Services list.
-
-</dd>
-</dl>
-
-### UserOTELConfig {#user-o-t-e-l-config}
-
-UserOTELConfig is the configuration for the OTEL collector.
-
-#### Properties
-
-<dl>
-<dt>batch_alerts</dt>
-<dd>
-
-([BatchAlertsConfig](#batch-alerts-config))
-
-</dd>
-<dt>batch_postrollup</dt>
-<dd>
-
-([BatchPostrollupConfig](#batch-postrollup-config))
-
-</dd>
-<dt>batch_prerollup</dt>
-<dd>
-
-([BatchPrerollupConfig](#batch-prerollup-config))
-
-</dd>
-<dt>ports</dt>
-<dd>
-
-([PortsConfig](#ports-config))
 
 </dd>
 </dl>

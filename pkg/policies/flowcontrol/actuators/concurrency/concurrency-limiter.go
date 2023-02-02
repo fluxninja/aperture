@@ -88,8 +88,8 @@ type concurrencyLimiterFactory struct {
 	wfqRequestsGaugeVec *prometheus.GaugeVec
 
 	// TODO: following will be moved to scheduler.
-	incomingConcurrencyCounterVec *prometheus.CounterVec
-	acceptedConcurrencyCounterVec *prometheus.CounterVec
+	incomingWorkSecondsCounterVec *prometheus.CounterVec
+	acceptedWorkSecondsCounterVec *prometheus.CounterVec
 
 	workloadLatencySummaryVec *prometheus.SummaryVec
 	workloadCounterVec        *prometheus.CounterVec
@@ -141,17 +141,17 @@ func setupConcurrencyLimiterFactory(
 		},
 		metricLabelKeys,
 	)
-	conLimiterFactory.incomingConcurrencyCounterVec = prometheus.NewCounterVec(
+	conLimiterFactory.incomingWorkSecondsCounterVec = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: metrics.IncomingConcurrencyMetricName,
-			Help: "A counter measuring incoming concurrency into Scheduler",
+			Name: metrics.IncomingWorkSecondsMetricName,
+			Help: "A counter measuring work incoming into Scheduler",
 		},
 		metricLabelKeys,
 	)
-	conLimiterFactory.acceptedConcurrencyCounterVec = prometheus.NewCounterVec(
+	conLimiterFactory.acceptedWorkSecondsCounterVec = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: metrics.AcceptedConcurrencyMetricName,
-			Help: "A counter measuring the concurrency admitted by Scheduler",
+			Name: metrics.AcceptedWorkSecondsMetricName,
+			Help: "A counter measuring work admitted by Scheduler",
 		},
 		metricLabelKeys,
 	)
@@ -199,11 +199,11 @@ func setupConcurrencyLimiterFactory(
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = prometheusRegistry.Register(conLimiterFactory.incomingConcurrencyCounterVec)
+			err = prometheusRegistry.Register(conLimiterFactory.incomingWorkSecondsCounterVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = prometheusRegistry.Register(conLimiterFactory.acceptedConcurrencyCounterVec)
+			err = prometheusRegistry.Register(conLimiterFactory.acceptedWorkSecondsCounterVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -229,11 +229,11 @@ func setupConcurrencyLimiterFactory(
 				err := fmt.Errorf("failed to unregister wfq_requests metric")
 				merr = multierr.Append(merr, err)
 			}
-			if !prometheusRegistry.Unregister(conLimiterFactory.incomingConcurrencyCounterVec) {
+			if !prometheusRegistry.Unregister(conLimiterFactory.incomingWorkSecondsCounterVec) {
 				err := fmt.Errorf("failed to unregister incoming_concurrency metric")
 				merr = multierr.Append(merr, err)
 			}
-			if !prometheusRegistry.Unregister(conLimiterFactory.acceptedConcurrencyCounterVec) {
+			if !prometheusRegistry.Unregister(conLimiterFactory.acceptedWorkSecondsCounterVec) {
 				err := fmt.Errorf("failed to unregister accepted_concurrency metric")
 				merr = multierr.Append(merr, err)
 			}
@@ -345,8 +345,8 @@ type concurrencyLimiter struct {
 	iface.Component
 	scheduler                    scheduler.Scheduler
 	registry                     status.Registry
-	incomingConcurrencyCounter   prometheus.Counter
-	acceptedConcurrencyCounter   prometheus.Counter
+	incomingWorkSecondsCounter   prometheus.Counter
+	acceptedWorkSecondsCounter   prometheus.Counter
 	concurrencyLimiterMsg        *policylangv1.ConcurrencyLimiter
 	concurrencyLimiterFactory    *concurrencyLimiterFactory
 	autoTokens                   *autoTokens
@@ -387,8 +387,8 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	engineAPI := conLimiterFactory.engineAPI
 	wfqFlowsGaugeVec := conLimiterFactory.wfqFlowsGaugeVec
 	wfqRequestsGaugeVec := conLimiterFactory.wfqRequestsGaugeVec
-	incomingConcurrencyCounterVec := conLimiterFactory.incomingConcurrencyCounterVec
-	acceptedConcurrencyCounterVec := conLimiterFactory.acceptedConcurrencyCounterVec
+	incomingWorkSecondsCounterVec := conLimiterFactory.incomingWorkSecondsCounterVec
+	acceptedWorkSecondsCounterVec := conLimiterFactory.acceptedWorkSecondsCounterVec
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -415,16 +415,14 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 			// setup scheduler
 			conLimiter.scheduler = scheduler.NewWFQScheduler(loadActuator.tokenBucketLoadMultiplier, clock, wfqMetrics)
 
-			incomingConcurrencyCounter, err := incomingConcurrencyCounterVec.GetMetricWith(metricLabels)
+			conLimiter.incomingWorkSecondsCounter, err = incomingWorkSecondsCounterVec.GetMetricWith(metricLabels)
 			if err != nil {
 				return err
 			}
-			conLimiter.incomingConcurrencyCounter = incomingConcurrencyCounter
-			acceptedConcurrencyCounter, err := acceptedConcurrencyCounterVec.GetMetricWith(metricLabels)
+			conLimiter.acceptedWorkSecondsCounter, err = acceptedWorkSecondsCounterVec.GetMetricWith(metricLabels)
 			if err != nil {
 				return err
 			}
-			conLimiter.acceptedConcurrencyCounter = acceptedConcurrencyCounter
 
 			err = engineAPI.RegisterConcurrencyLimiter(conLimiter)
 			if err != nil {
@@ -450,11 +448,11 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 			if !deleted {
 				errMulti = multierr.Append(errMulti, errors.New("failed to delete wfq_requests gauge from its metric vector"))
 			}
-			deleted = incomingConcurrencyCounterVec.Delete(metricLabels)
+			deleted = incomingWorkSecondsCounterVec.Delete(metricLabels)
 			if !deleted {
 				errMulti = multierr.Append(errMulti, errors.New("failed to delete incoming_concurrency counter from its metric vector"))
 			}
-			deleted = acceptedConcurrencyCounterVec.Delete(metricLabels)
+			deleted = acceptedWorkSecondsCounterVec.Delete(metricLabels)
 			if !deleted {
 				errMulti = multierr.Append(errMulti, errors.New("failed to delete accepted_concurrency counter from its metric vector"))
 			}
@@ -557,16 +555,16 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 		FairnessLabel: fairnessLabel,
 		Priority:      uint8(matchedWorkloadProto.Priority),
 		Timeout:       timeout,
-		Tokens:        tokens,
+		WorkMillis:    tokens,
 	}
 
 	accepted := conLimiter.scheduler.Schedule(reqContext)
 
 	// update concurrency metrics and decisionType
-	conLimiter.incomingConcurrencyCounter.Add(float64(reqContext.Tokens))
+	conLimiter.incomingWorkSecondsCounter.Add(float64(reqContext.WorkMillis) / 1000)
 
 	if accepted {
-		conLimiter.acceptedConcurrencyCounter.Add(float64(reqContext.Tokens))
+		conLimiter.acceptedWorkSecondsCounter.Add(float64(reqContext.WorkMillis) / 1000)
 	}
 
 	return &flowcontrolv1.LimiterDecision{

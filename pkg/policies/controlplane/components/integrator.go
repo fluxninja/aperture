@@ -1,6 +1,8 @@
 package components
 
 import (
+	"fmt"
+
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
@@ -22,6 +24,11 @@ func (*Integrator) Name() string { return "Integrator" }
 
 // Type implements runtime.Component.
 func (*Integrator) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
+
+// ShortDescription implements runtime.Component.
+func (in *Integrator) ShortDescription() string {
+	return fmt.Sprintf("min: %f, max: %f", in.minMax.Min, in.minMax.Max)
+}
 
 // NewIntegrator creates an integrator component.
 func NewIntegrator() runtime.Component {

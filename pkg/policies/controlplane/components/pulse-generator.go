@@ -1,7 +1,9 @@
 package components
 
 import (
+	"fmt"
 	"math"
+	"time"
 
 	"go.uber.org/fx"
 
@@ -14,6 +16,8 @@ import (
 
 // PulseGenerator is a component that accumulates sum of signal every tick.
 type PulseGenerator struct {
+	trueFor     time.Duration
+	falseFor    time.Duration
 	trueWindow  uint32
 	falseWindow uint32
 	windowCount uint32
@@ -26,6 +30,11 @@ func (*PulseGenerator) Name() string { return "PulseGenerator" }
 // Type implements runtime.Component.
 func (*PulseGenerator) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
 
+// ShortDescription implements runtime.Component.
+func (pg *PulseGenerator) ShortDescription() string {
+	return fmt.Sprintf("true for: %d, false for: %d", pg.trueFor, pg.falseFor)
+}
+
 // NewPulseGeneratorAndOptions creates an pulse generator component and its fx options.
 func NewPulseGeneratorAndOptions(generatorProto *policylangv1.PulseGenerator, _ string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()
@@ -33,6 +42,8 @@ func NewPulseGeneratorAndOptions(generatorProto *policylangv1.PulseGenerator, _ 
 	falseFor := math.Ceil(float64(generatorProto.FalseFor.AsDuration()) / float64(evaluationPeriod))
 
 	pulseGenerator := &PulseGenerator{
+		trueFor:     generatorProto.TrueFor.AsDuration(),
+		falseFor:    generatorProto.FalseFor.AsDuration(),
 		trueWindow:  uint32(trueFor),
 		falseWindow: uint32(falseFor),
 		windowCount: 0,

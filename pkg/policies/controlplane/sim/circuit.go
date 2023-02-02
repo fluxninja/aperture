@@ -7,6 +7,7 @@ import (
 	"time"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
@@ -202,7 +203,8 @@ type simPolicyMeta struct {
 
 func newSimPolicyMeta(evaluationInternal time.Duration) *simPolicyMeta {
 	logger := log.NewLogger(io.Discard, "panic")
-	registry := status.NewRegistry(logger)
+	alerter := alerts.NewSimpleAlerter(100)
+	registry := status.NewRegistry(logger, alerter)
 	return &simPolicyMeta{
 		Registry:           registry,
 		EvaluationInterval: evaluationInternal,

@@ -52,4 +52,4 @@ java -javaagent:path/to/javaagent.jar \
 ```
 
 [download_link]:
-  https://repo1.maven.org/maven2/com/fluxninja/aperture/aperture-javaagent/0.19.0/aperture-javaagent-0.19.0.jar
+  https://repo1.maven.org/maven2/com/fluxninja/aperture/aperture-javaagent/0.20.0/aperture-javaagent-0.20.0.jar

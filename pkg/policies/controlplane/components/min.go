@@ -21,6 +21,9 @@ func (*Min) Name() string { return "Min" }
 // Type implements runtime.Component.
 func (*Min) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
+// ShortDescription implements runtime.Component.
+func (*Min) ShortDescription() string { return "" }
+
 // Make sure Min complies with Component interface.
 var _ runtime.Component = (*Min)(nil)
 

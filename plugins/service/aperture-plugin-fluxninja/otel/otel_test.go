@@ -112,6 +112,11 @@ var _ = DescribeTable("FN Plugin OTEL", func(
 		basePluginOTELConfigWithPipeline("logs/alerts", testPipelineWithFN()),
 	),
 	Entry(
+		"add FN exporters to user custom metrics pipeline",
+		baseOTELConfigWithPipeline("metrics/user-defined-rabbitmq", testPipeline()),
+		basePluginOTELConfigWithPipeline("metrics/user-defined-rabbitmq", testPipelineWithFN()),
+	),
+	Entry(
 		"add metrics/slow pipeline if metrics/fast pipeline exists",
 		baseOTELConfigWithPipeline("metrics/fast", testPipeline()),
 		basePluginOTELConfigWithMetrics("metrics/slow"),
@@ -154,9 +159,6 @@ func basePluginOTELConfigWithMetrics(pipelineName string) *otelconfig.OTELConfig
 	processors := []string{
 		"batch/metrics-slow",
 		"attributes/fluxninja",
-	}
-	if pipelineName == "metrics/slow" {
-		processors = append([]string{"enrichment"}, processors...)
 	}
 	cfg.Service.AddPipeline(pipelineName, otelconfig.Pipeline{
 		Receivers:  []string{"prometheus/fluxninja"},

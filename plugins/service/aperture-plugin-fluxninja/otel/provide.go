@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
@@ -62,6 +63,8 @@ func provideOtelConfig(baseConfig *otelconfig.OTELConfig,
 
 	config := otelconfig.NewOTELConfig()
 	addFluxNinjaExporter(config, &pluginConfig, grpcClientConfig, httpClientConfig)
+	// This is to prevent overwriting extensions with empty config.
+	config.Extensions = baseConfig.Extensions
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -81,6 +84,12 @@ func provideOtelConfig(baseConfig *otelconfig.OTELConfig,
 			}
 			if _, exists := baseConfig.Service.Pipeline("metrics/controller-fast"); exists {
 				addMetricsControllerSlowPipeline(baseConfig, config)
+			}
+			for pipelineName, customMetricsPipeline := range baseConfig.Service.Pipelines {
+				if !strings.HasPrefix(pipelineName, "metrics/user-defined-") {
+					continue
+				}
+				addFNToPipeline(pipelineName, config, customMetricsPipeline)
 			}
 			return nil
 		},
@@ -136,7 +145,6 @@ func addMetricsSlowPipeline(baseConfig, config *otelconfig.OTELConfig) {
 	config.Service.AddPipeline("metrics/slow", otelconfig.Pipeline{
 		Receivers: []string{receiverPrometheus},
 		Processors: []string{
-			otelconsts.ProcessorEnrichment,
 			processorBatchMetricsSlow,
 			processorAttributes,
 		},

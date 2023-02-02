@@ -19,6 +19,7 @@ package controller
 import (
 	"fmt"
 
+	"github.com/fluxninja/aperture/cmd/aperture-controller/controller"
 	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
@@ -112,7 +113,9 @@ var _ = Describe("Controller Deployment", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelconfig.UserOTELConfig{
+						},
+						OTEL: controller.ControllerOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -335,7 +338,9 @@ var _ = Describe("Controller Deployment", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelconfig.UserOTELConfig{
+						},
+						OTEL: controller.ControllerOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,

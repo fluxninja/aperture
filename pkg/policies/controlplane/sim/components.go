@@ -28,6 +28,9 @@ func (i *Input) Name() string { return "TestInput" }
 // Type implements runtime.Component.
 func (i *Input) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
 
+// ShortDescription implements runtime.Component.
+func (i *Input) ShortDescription() string { return "" }
+
 // Execute implements runtime.Component.
 func (i *Input) Execute(_ runtime.PortToReading, _ runtime.TickInfo) (runtime.PortToReading, error) {
 	return runtime.PortToReading{
@@ -57,6 +60,9 @@ func (o *output) Name() string { return "TestOutput" }
 
 // Type implements runtime.Component.
 func (o *output) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
+
+// ShortDescription implements runtime.Component.
+func (o *output) ShortDescription() string { return "" }
 
 // TakeReadings returns the list of readings since previous TakeReadings() call
 // (or since start).

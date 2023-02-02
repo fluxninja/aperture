@@ -28,6 +28,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/pointer"
 
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
 	. "github.com/fluxninja/aperture/operator/controllers"
@@ -106,7 +107,13 @@ var _ = Describe("Agent DaemonSet", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelconfig.UserOTELConfig{
+						},
+						DistCache: distcache.DistCacheConfig{
+							BindAddr:           ":3320",
+							MemberlistBindAddr: ":3322",
+						},
+						OTEL: agent.AgentOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -114,10 +121,6 @@ var _ = Describe("Agent DaemonSet", func() {
 									ZpagesPort:      55679,
 								},
 							},
-						},
-						DistCache: distcache.DistCacheConfig{
-							BindAddr:           ":3320",
-							MemberlistBindAddr: ":3322",
 						},
 					},
 					Image: common.AgentImage{
@@ -304,7 +307,13 @@ var _ = Describe("Agent DaemonSet", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelconfig.UserOTELConfig{
+						},
+						DistCache: distcache.DistCacheConfig{
+							BindAddr:           ":3320",
+							MemberlistBindAddr: ":3322",
+						},
+						OTEL: agent.AgentOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -312,10 +321,6 @@ var _ = Describe("Agent DaemonSet", func() {
 									ZpagesPort:      55679,
 								},
 							},
-						},
-						DistCache: distcache.DistCacheConfig{
-							BindAddr:           ":3320",
-							MemberlistBindAddr: ":3322",
 						},
 					},
 					CommonSpec: common.CommonSpec{

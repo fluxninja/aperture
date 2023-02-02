@@ -79,6 +79,9 @@ func (sr *ScaleReporter) Name() string { return "ScaleReporter" }
 // Type implements runtime.Component.Type.
 func (sr *ScaleReporter) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
 
+// ShortDescription implements runtime.Component.ShortDescription.
+func (sr *ScaleReporter) ShortDescription() string { return sr.agentGroup }
+
 // NewScaleReporterAndOptions returns a new ScaleReporter and its fx options.
 func NewScaleReporterAndOptions(
 	_ *policylangv1.HorizontalPodScaler_ScaleReporter,

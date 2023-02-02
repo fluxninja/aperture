@@ -55,6 +55,9 @@ func (*Scheduler) Name() string { return "Scheduler" }
 // Type implements runtime.Component.
 func (*Scheduler) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
 
+// ShortDescription implements runtime.Component.
+func (s *Scheduler) ShortDescription() string { return s.agentGroupName }
+
 // NewSchedulerAndOptions creates scheduler and its fx options.
 func NewSchedulerAndOptions(
 	schedulerProto *policylangv1.Scheduler,
@@ -87,7 +90,7 @@ func NewSchedulerAndOptions(
 
 	acceptedQuery, acceptedQueryOptions, acceptedQueryErr := promql.NewScalarQueryAndOptions(
 		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
-			metrics.AcceptedConcurrencyMetricName,
+			metrics.AcceptedWorkSecondsMetricName,
 			policyParams),
 		concurrencyQueryInterval,
 		componentID,
@@ -101,7 +104,7 @@ func NewSchedulerAndOptions(
 
 	incomingQuery, incomingQueryOptions, incomingQueryErr := promql.NewScalarQueryAndOptions(
 		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
-			metrics.IncomingConcurrencyMetricName,
+			metrics.IncomingWorkSecondsMetricName,
 			policyParams),
 		concurrencyQueryInterval,
 		componentID,
