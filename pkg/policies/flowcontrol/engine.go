@@ -142,7 +142,8 @@ func (e *Engine) ProcessRequest(
 	return
 }
 
-func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[string]string) ([]*flowcontrolv1.LimiterDecision,
+func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[string]string) (
+	[]*flowcontrolv1.LimiterDecision,
 	flowcontrolv1.CheckResponse_DecisionType,
 ) {
 	var wg sync.WaitGroup
@@ -184,9 +185,13 @@ func returnExtraTokens(
 	rateLimiterDecisions []*flowcontrolv1.LimiterDecision,
 	labels map[string]string,
 ) {
+	labelsCopy := make(map[string]string, len(labels))
+	for k, v := range labels {
+		labelsCopy[k] = v
+	}
 	for i, l := range rateLimiterDecisions {
 		if !l.Dropped && l.Reason == flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED {
-			go rateLimiters[i].TakeN(labels, -1)
+			go rateLimiters[i].TakeN(labelsCopy, -1)
 		}
 	}
 }
