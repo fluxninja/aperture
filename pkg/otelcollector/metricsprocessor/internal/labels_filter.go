@@ -30,6 +30,7 @@ var (
 		otelconsts.ApertureClassifierErrorsLabel,
 		otelconsts.ApertureServicesLabel,
 		otelconsts.ApertureControlPointLabel,
+		otelconsts.ApertureControlPointTypeLabel,
 		otelconsts.ApertureFlowStatusLabel,
 		otelconsts.ResponseReceivedLabel,
 	}

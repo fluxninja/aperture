@@ -14,7 +14,7 @@ import (
 
 // HTTPJob wraps a basic job along with HTTPJobConfig to execute an HTTP job.
 type HTTPJob struct {
-	BasicJob
+	basicJob
 	config HTTPJobConfig
 }
 
@@ -71,17 +71,17 @@ func NewHTTPJob(config HTTPJobConfig) *HTTPJob {
 
 // Name returns the name of the job.
 func (job *HTTPJob) Name() string {
-	return job.BasicJob.Name()
+	return job.basicJob.Name()
 }
 
 // JobWatchers returns the job watchers for the job.
 func (job *HTTPJob) JobWatchers() JobWatchers {
-	return job.BasicJob.JobWatchers()
+	return job.basicJob.JobWatchers()
 }
 
 // Execute executes the job.
 func (job *HTTPJob) Execute(ctx context.Context) (proto.Message, error) {
-	return job.BasicJob.Execute(ctx)
+	return job.basicJob.Execute(ctx)
 }
 
 func fetchURL(ctx context.Context, method string, url string, client *http.Client, body io.Reader) (*http.Response, error) {
