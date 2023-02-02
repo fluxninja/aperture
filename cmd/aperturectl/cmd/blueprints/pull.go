@@ -15,8 +15,10 @@ import (
 )
 
 var pullCmd = &cobra.Command{
-	Use:   "pull",
-	Short: "Pull a blueprint",
+	Use:           "pull",
+	Short:         "Pull a blueprint",
+	SilenceErrors: true,
+	SilenceUsage:  true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		apertureBlueprintsDir := filepath.Join(blueprintsDir, blueprintsVersion)
 		err := os.MkdirAll(apertureBlueprintsDir, os.ModePerm)
@@ -62,6 +64,7 @@ var pullCmd = &cobra.Command{
 
 		locked, err := pkg.Ensure(spec, apertureBlueprintsDir, lockFile.Dependencies)
 		if err != nil {
+			_ = os.RemoveAll(apertureBlueprintsDir)
 			return err
 		}
 
