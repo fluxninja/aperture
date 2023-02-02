@@ -175,7 +175,7 @@ up and sent to the analytics database in the FluxNinja ARC. This allows:
 
 For Classifier-created labels, you can disable this behaviour by setting
 `hidden: true` in
-[the Classification rule](/references/configuration/policy.md#v1-rule).
+[the Classification rule](/references/policies/spec.md#v1-rule).
 
 :::
 

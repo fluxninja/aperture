@@ -69,7 +69,7 @@ generate-config-markdown:
 	@cat gen/policy/metadata gen/policy/policy.md > gen/policy/policy.md.tmp
 	@mv gen/policy/policy.md.tmp gen/policy/policy.md
 	@npx prettier --prose-wrap="preserve" --write gen/policy/policy.md
-	@mv gen/policy/policy.md content/references/configuration
+	@mv gen/policy/policy.md content/references/policies/spec.md
 
 generate-jsonnet:
 	@echo generate jsonnet

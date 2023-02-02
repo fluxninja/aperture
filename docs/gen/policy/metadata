@@ -1,7 +1,7 @@
 ---
-title: Policy Configuration Reference
+title: Policy Language Specification
 sidebar_position: 1
-sidebar_label: Policy
+sidebar_label: Specification
 ---
 
 Reference for all objects used in [the Policy language](/concepts/policy/policy.md).
