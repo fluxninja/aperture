@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM golang:1.19-buster AS builder
+FROM golang:1.20-bullseye AS builder
 
 WORKDIR /src
 
@@ -13,6 +13,6 @@ RUN --mount=type=cache,target=/go/pkg/ \
 EOF
 
 # Final image
-FROM alpine:3.15.0
+FROM debian:bullseye-slim
 COPY --link --from=builder /graphql_demo_app /graphql_demo_app
 ENTRYPOINT ["/graphql_demo_app"]

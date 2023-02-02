@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM golang:1.19-buster AS base
+FROM golang:1.20-bullseye AS base
 
 WORKDIR /src
 COPY --link . .
@@ -43,10 +43,8 @@ RUN --mount=type=cache,target=/go/pkg/ \
   '
 
 # Final image
-FROM alpine:3.15.0
-# Needed for linker to be compatible
-RUN apk add --no-cache libc6-compat
-RUN apk add --no-cache curl
+FROM debian:bullseye-slim
+
 # Ensure config dirs exists, even if not mounted
 RUN mkdir -p /etc/aperture/aperture-agent/flowcontrol /etc/aperture/aperture-agent/classifiers /opt/aperture/aperture-agent/plugins
 COPY --link --from=builder /aperture-agent /aperture-agent
