@@ -58,8 +58,6 @@ var pullCmd = &cobra.Command{
 		if !depEqual(spec.Dependencies[d.Name()], *d) {
 			spec.Dependencies[d.Name()] = *d
 			delete(lockFile.Dependencies, d.Name())
-			fmt.Printf("Failed to pull version %s of aperture blueprints", blueprintsVersion)
-			return os.RemoveAll(apertureBlueprintsDir)
 		}
 
 		locked, err := pkg.Ensure(spec, apertureBlueprintsDir, lockFile.Dependencies)
