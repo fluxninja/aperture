@@ -28,7 +28,6 @@ func GenerateDotFile(circuit *circuitfactory.Circuit, dotFilePath string) error 
 		log.Error().Err(err).Msg("error writing to file")
 		return err
 	}
-	log.Info().Msgf("Stored dot file at '%s'", dotFilePath)
 	return nil
 }
 
@@ -47,7 +46,6 @@ func GenerateMermaidFile(circuit *circuitfactory.Circuit, mermaidFile string) er
 		log.Error().Err(err).Msg("error writing to file")
 		return err
 	}
-	log.Info().Msgf("Stored mermaid file at '%s'", mermaidFile)
 	return nil
 }
 
