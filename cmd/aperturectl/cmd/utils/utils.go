@@ -13,6 +13,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
 )
 
+// GenerateDotFile generates a DOT file from the circuit.
 func GenerateDotFile(circuit *circuitfactory.Circuit, dotFilePath string) error {
 	d := circuitfactory.DOT(circuit.ToGraphView())
 	f, err := os.Create(dotFilePath)
@@ -31,6 +32,7 @@ func GenerateDotFile(circuit *circuitfactory.Circuit, dotFilePath string) error 
 	return nil
 }
 
+// GenerateMermaidFile generates a mermaid file from the circuit.
 func GenerateMermaidFile(circuit *circuitfactory.Circuit, mermaidFile string) error {
 	m := circuitfactory.Mermaid(circuit.ToGraphView())
 	f, err := os.Create(mermaidFile)
@@ -49,6 +51,7 @@ func GenerateMermaidFile(circuit *circuitfactory.Circuit, mermaidFile string) er
 	return nil
 }
 
+// CompilePolicy compiles the policy and returns the circuit.
 func CompilePolicy(path string) (*circuitfactory.Circuit, error) {
 	yamlFile, err := os.ReadFile(path)
 	if err != nil {
@@ -71,6 +74,7 @@ func CompilePolicy(path string) (*circuitfactory.Circuit, error) {
 	return circuit, nil
 }
 
+// FetchPolicyFromCR extracts the spec key from a CR and saves it to a temp file.
 func FetchPolicyFromCR(crPath string) (string, error) {
 	// extract spec key from CR and save it a temp file
 	// call compilePolicy with the temp file

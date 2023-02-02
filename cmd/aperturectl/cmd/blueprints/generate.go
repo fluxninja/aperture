@@ -26,7 +26,7 @@ func init() {
 
 	generateCmd.AddCommand(generatePolicyCmd)
 	generateCmd.AddCommand(generateDashboardCmd)
-	// generateCmd.AddCommand(generateGraphCmd)
+	generateCmd.AddCommand(generateGraphCmd)
 }
 
 var generateCmd = &cobra.Command{
@@ -45,12 +45,16 @@ var generateCmd = &cobra.Command{
 		valuesFile = filepath.Clean(fileInfo.Name())
 
 		if generateAll {
+			if outputDir == "" {
+				outputDir = "."
+			}
+
 			if err := generatePolicyCmd.RunE(cmd, args); err != nil {
 				return err
 			}
-			// if err := generateGraphCmd.RunE(cmd, args); err != nil {
-			// 	return err
-			// }
+			if err := generateGraphCmd.RunE(cmd, args); err != nil {
+				return err
+			}
 			if err := generateDashboardCmd.RunE(cmd, args); err != nil {
 				return err
 			}

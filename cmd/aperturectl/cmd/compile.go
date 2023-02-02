@@ -24,6 +24,7 @@ func init() {
 	compileCmd.Flags().StringVar(&mermaid, "mermaid", "", "path to mermaid file")
 }
 
+// compileCmd is the command to compile a circuit from a policy file or CR.
 var compileCmd = &cobra.Command{
 	Use:           "compile",
 	Short:         "Compile circuit from policy file",
