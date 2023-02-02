@@ -11,8 +11,11 @@ FROM debian:bullseye-slim
 
 COPY --from=builder /src/aperture-go-example /local/bin/aperture-go-example
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    ca-certificates \
     wget \
+ && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
 HEALTHCHECK --interval=5s --timeout=60s --retries=3 --start-period=5s \
