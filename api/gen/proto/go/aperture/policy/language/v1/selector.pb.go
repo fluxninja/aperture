@@ -26,7 +26,9 @@ const (
 // to
 //
 // :::info
+//
 // See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+//
 // :::
 type FlowSelector struct {
 	state         protoimpl.MessageState
@@ -88,7 +90,9 @@ func (x *FlowSelector) GetFlowMatcher() *FlowMatcher {
 // to
 //
 // :::info
+//
 // See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+//
 // :::
 type ServiceSelector struct {
 	state         protoimpl.MessageState
@@ -106,7 +110,9 @@ type ServiceSelector struct {
 	// Empty string means all services within an agent group (catch-all).
 	//
 	// :::note
+	//
 	// One entity may belong to multiple services.
+	//
 	// :::
 	Service string `protobuf:"bytes,2,opt,name=service,proto3" json:"service,omitempty"`
 }
@@ -162,7 +168,9 @@ func (x *ServiceSelector) GetService() string {
 // to
 //
 // :::info
+//
 // See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+//
 // :::
 //
 // Example:
@@ -195,10 +203,13 @@ type FlowMatcher struct {
 	// must also be satisfied (in addition to service+control point matching)
 	//
 	// :::info
+	//
 	// See also [Label Matcher overview](/concepts/integrations/flow-control/flow-selector.md#label-matcher).
+	//
 	// :::
 	//
 	// :::note
+	//
 	// [Classifiers](#v1-classifier) _can_ use flow labels created by some other
 	// classifier, but only if they were created at some previous control point
 	// (and propagated in baggage).
@@ -207,6 +218,7 @@ type FlowMatcher struct {
 	// Flux Meters or Actuators. It's valid to create a flow label on a control
 	// point using classifier, and immediately use it for matching on the same
 	// control point.
+	//
 	// :::
 	LabelMatcher *LabelMatcher `protobuf:"bytes,2,opt,name=label_matcher,json=labelMatcher,proto3" json:"label_matcher,omitempty"`
 }

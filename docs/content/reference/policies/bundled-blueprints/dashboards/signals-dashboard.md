@@ -3,7 +3,7 @@ title: Signals Dashboard
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../../apertureVersion.js';
+import {apertureVersion} from '../../../../apertureVersion.js';
 ```
 
 ## Blueprint Location
@@ -13,9 +13,9 @@ href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/
 
 ## Introduction
 
-This blueprint provides a
-[policy monitoring](/get-started/policies/monitoring.md) dashboard that
-visualizes Signals flowing through the [Circuit](/concepts/policy/circuit.md).
+This blueprint provides a [policy monitoring](/reference/policies/monitoring.md)
+dashboard that visualizes Signals flowing through the
+[Circuit](/concepts/policy/circuit.md).
 
 ## Configuration
 

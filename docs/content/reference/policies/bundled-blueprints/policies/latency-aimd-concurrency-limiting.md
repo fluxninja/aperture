@@ -3,7 +3,7 @@ title: Latency AIMD Concurrency Limiting Policy
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../../apertureVersion.js';
+import {apertureVersion} from '../../../../apertureVersion.js';
 ```
 
 ## Blueprint Location

@@ -70,7 +70,7 @@ Aperture Controller, by editing
 `/etc/aperture/aperture-agent/config/aperture-agent.yaml`.
 
 All the config parameters for the Aperture Agent are available
-[here](/references/configuration/agent.md).
+[here](/reference/configuration/agent.md).
 
 :::info
 

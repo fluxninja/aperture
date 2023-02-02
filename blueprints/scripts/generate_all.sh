@@ -5,9 +5,11 @@ script_root=$(dirname "$0")
 blueprints_root=${script_root}/..
 
 FIND="find"
+SED="sed"
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
 	FIND="gfind"
+	SED="gsed"
 fi
 
 # accept a --force flag to force the regeneration of all graphs
@@ -23,8 +25,8 @@ pushd "${blueprints_root}" >/dev/null
 jb install
 popd >/dev/null
 
-# remove md files in "${blueprints_root}"/../docs/content/references/bundled-blueprints and subdirectories
-$FIND "${blueprints_root}"/../docs/content/references/bundled-blueprints -type f -name '*.md' -delete
+# remove md files in "${blueprints_root}"/../docs/content/reference/policies/bundled-blueprints and subdirectories
+$FIND "${blueprints_root}"/../docs/content/reference/policies/bundled-blueprints -type f -name '*.md' -delete
 
 # for all subdirectories within "$blueprints_root"/lib containing config.libsonnet, generate README
 $FIND "$blueprints_root"/lib/1.0 -type f -name config.libsonnet | while read -r files; do
@@ -36,9 +38,9 @@ $FIND "$blueprints_root"/lib/1.0 -type f -name config.libsonnet | while read -r 
 	blueprint_name=$(basename "$dir")
 	# extract the relative path from the "$blueprints_root"/lib/1.0
 	# shellcheck disable=SC2001
-	relative_path=$(echo "$dir" | sed "s|$blueprints_root/lib/1.0/||")
+	relative_path=$(echo "$dir" | $SED "s|$blueprints_root/lib/1.0/||")
 	blueprint_dir=$(dirname "$relative_path")
-	docs_dir="${blueprints_root}"/../docs/content/references/bundled-blueprints/"$blueprint_dir"
+	docs_dir="${blueprints_root}"/../docs/content/reference/policies/bundled-blueprints/"$blueprint_dir"
 	mkdir -p "$docs_dir"
 	docs_file="$docs_dir"/"$blueprint_name".md
 	# generate docs
@@ -47,14 +49,25 @@ $FIND "$blueprints_root"/lib/1.0 -type f -name config.libsonnet | while read -r 
 	echo "---" >"$docs_file"
 	# title is the first line of the README.md, strip the leading '#'
 	# shellcheck disable=SC2129
-	echo "title: $(head -n 1 "$dir"/README.md | sed 's/# //')" >>"$docs_file"
+	echo "title: $(head -n 1 "$dir"/README.md | $SED 's/# //')" >>"$docs_file"
 	# end of frontmatter
 	echo "---" >>"$docs_file"
 	# new line
 	echo -e "\n" >>"$docs_file"
 	# add mdx code block
 	echo -e "\`\`\`mdx-code-block" >>"$docs_file"
-	echo -e "import {apertureVersion} from '../../../apertureVersion.js';" >>"$docs_file"
+
+	# count the number of levels in the blueprint_dir
+	num_levels=$(echo "$blueprint_dir" | $SED 's/[^/]//g' | wc -c)
+
+	# add the correct number of ../ to the import statement and additional 3 (reference/policies/bundled-blueprints) levels to find apertureVersion.js
+	import_levels="../../../"
+	for ((i = 0; i < num_levels; i++)); do
+		import_levels="../$import_levels"
+	done
+
+	# shellcheck disable=SC2129
+	echo -e "import {apertureVersion} from '${import_levels}apertureVersion.js';" >>"$docs_file"
 	echo -e "\`\`\`" >>"$docs_file"
 	echo "## Blueprint Location" >>"$docs_file"
 	echo -e "\n" >>"$docs_file"

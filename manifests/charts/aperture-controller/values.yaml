@@ -513,7 +513,7 @@ controller:
         name: ~
         key: apiKey
       value: ~
-  ## Controller Configuration: All the available configuration parameters can be found at https://docs.fluxninja.com/references/configuration/controller.
+  ## Controller Configuration: All the available configuration parameters can be found at https://docs.fluxninja.com/reference/configuration/controller.
   ##
   config:
     ## Etcd parameters for Controller

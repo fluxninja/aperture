@@ -66,7 +66,7 @@ Run the following command to delete the above Aperture Policy:
 kubectl --namespace=aperture-controller delete policy static-rate-limiting
 ```
 
-[controller-metrics]: /references/observability/prometheus-metrics/controller.md
-[agent-metrics]: /references/observability/prometheus-metrics/agent.md
+[controller-metrics]: /reference/observability/prometheus-metrics/controller.md
+[agent-metrics]: /reference/observability/prometheus-metrics/agent.md
 [policy-concept]: /concepts/policy/policy.md
 [blueprints]: /get-started/policies/blueprints/blueprints.md
