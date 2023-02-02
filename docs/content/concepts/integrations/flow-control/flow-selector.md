@@ -11,8 +11,7 @@ keywords:
 
 :::info
 
-See also
-[FlowSelector reference](/references/configuration/policy.md#v1-flow-selector)
+See also [FlowSelector reference](/reference/policies/spec.md#v1-flow-selector)
 
 :::
 
@@ -38,7 +37,7 @@ A Flow Selector consists of:
 :::info
 
 See also
-[ServiceSelector reference](/references/configuration/policy.md#v1-service-selector)
+[ServiceSelector reference](/reference/policies/spec.md#v1-service-selector)
 
 :::
 
@@ -63,8 +62,7 @@ select all services within the agent group, you can skip the service name.
 
 :::info
 
-See also
-[FlowMatcher reference](/references/configuration/policy.md#v1-flow-matcher)
+See also [FlowMatcher reference](/reference/policies/spec.md#v1-flow-matcher)
 
 :::
 
@@ -113,4 +111,4 @@ flow_selector:
 [flux-meter]: /concepts/integrations/flow-control/flux-meter.md
 [cl]: components/concurrency-limiter.md
 [classifier]: /concepts/integrations/flow-control/flow-classifier.md
-[label-matcher]: /references/configuration/policy.md#v1-label-matcher
+[label-matcher]: /reference/policies/spec.md#v1-label-matcher

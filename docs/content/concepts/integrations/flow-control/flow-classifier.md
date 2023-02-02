@@ -70,7 +70,7 @@ the classifier to particular paths.
 
 You can discover the request attributes flowing through services and control
 points using the
-[Introspection API](references/api/agent/flow-preview-service-preview-http-requests.api.mdx)
+[Introspection API](reference/api/agent/flow-preview-service-preview-http-requests.api.mdx)
 on an `aperture-agent` local to the service instances (pods).
 
 For example:
@@ -211,10 +211,10 @@ See [full example in reference][reference]
 [label]: /concepts/integrations/flow-control/flow-label.md
 [baggage]: /concepts/integrations/flow-control/flow-label.md#baggage
 [request-labels]: ./flow-label.md#request-labels
-[reference]: /references/configuration/policy.md#v1-classifier
-[rule]: /references/configuration/policy.md#v1-rule
-[extractor]: /references/configuration/policy.md#v1-extractor
-[rego-rule]: /references/configuration/policy.md#rule-rego
+[reference]: /reference/policies/spec.md#v1-classifier
+[rule]: /reference/policies/spec.md#v1-rule
+[extractor]: /reference/policies/spec.md#v1-extractor
+[rego-rule]: /reference/policies/spec.md#rule-rego
 [plugin]: /arc/plugin.md
 [label-matcher]: ./flow-selector.md#label-matcher
 [policies]: /concepts/policy/policy.md

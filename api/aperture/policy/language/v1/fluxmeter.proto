@@ -9,7 +9,9 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 // The histogram created by Flux Meter measures the workload latency by default.
 //
 // :::info
+//
 // See also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).
+//
 // :::
 //
 // Example of a selector that creates a histogram metric for all HTTP requests
@@ -116,8 +118,10 @@ message FluxMeter {
   // Key of the attribute in access log or span from which the metric for this flux meter is read.
   //
   // :::info
+  //
   // For list of available attributes in Envoy access logs, refer
   // [Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)
+  //
   // :::
   //
   string attribute_key = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

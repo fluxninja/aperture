@@ -260,7 +260,7 @@ jobs:
 
   pre-commit:
     executor: python-cimg-executor
-    resource_class: xlarge
+    resource_class: large
     environment:
       GOMAXPROCS: 8
     steps:

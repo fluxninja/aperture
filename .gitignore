@@ -1,5 +1,5 @@
-### ignore api docs (all mdx files) located at docs/content/references/api
-docs/content/references/api/**/*.mdx
+### ignore api docs (all mdx files) located at docs/content/reference/api
+docs/content/reference/api/**/*.mdx
 
 dist/
 build/

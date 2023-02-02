@@ -42,7 +42,7 @@ generate-config-markdown:
 			cat $$dir/metadata $$dir/$$basename.md > $$dir/$$basename.md.tmp; \
 			mv $$dir/$$basename.md.tmp $$dir/$$basename.md; \
 			npx prettier --prose-wrap="preserve" --write $$dir/$$basename.md; \
-			mv $$dir/$$basename.md ./content/references/configuration; \
+			mv $$dir/$$basename.md ./content/reference/configuration; \
 		done; \
 		rm merged-plugin-swagger.yaml; \
 	}
@@ -69,7 +69,7 @@ generate-config-markdown:
 	@cat gen/policy/metadata gen/policy/policy.md > gen/policy/policy.md.tmp
 	@mv gen/policy/policy.md.tmp gen/policy/policy.md
 	@npx prettier --prose-wrap="preserve" --write gen/policy/policy.md
-	@mv gen/policy/policy.md content/references/configuration
+	@mv gen/policy/policy.md content/reference/policies/spec.md
 
 generate-jsonnet:
 	@echo generate jsonnet

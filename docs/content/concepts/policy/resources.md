@@ -7,7 +7,7 @@ sidebar_position: 2
 
 :::info
 
-See also [Resources reference](/references/configuration/policy.md#v1-resources)
+See also [Resources reference](/reference/policies/spec.md#v1-resources)
 
 :::
 
@@ -25,5 +25,5 @@ Examples:
 
 [flux-meter]: /concepts/integrations/flow-control/flux-meter.md
 [flow-classifier]: /concepts/integrations/flow-control/flow-classifier.md
-[promql-reference]: /references/configuration/policy.md#v1-prom-q-l
-[selector-reference]: /references/configuration/policy.md#v1-selector
+[promql-reference]: /reference/policies/spec.md#v1-prom-q-l
+[selector-reference]: /reference/policies/spec.md#v1-selector
