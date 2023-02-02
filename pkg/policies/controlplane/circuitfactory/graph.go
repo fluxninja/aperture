@@ -102,10 +102,7 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 
 func convertPortViews(ports []*policymonitoringv1.PortView) []*policymonitoringv1.PortView {
 	var converted []*policymonitoringv1.PortView
-	for i := range ports {
-		converted = append(converted, ports[i])
-	}
-	return converted
+	return append(converted, ports...)
 }
 
 // Mermaid returns Components and Links as a mermaid graph.
