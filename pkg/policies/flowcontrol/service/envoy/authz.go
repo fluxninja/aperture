@@ -174,6 +174,8 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	checkResponse.ClassifierInfos = classifierMsgs
 	// Set telemetry_flow_labels in the CheckResponse
 	checkResponse.TelemetryFlowLabels = flowLabels
+	// add control point type
+	checkResponse.TelemetryFlowLabels[otelconsts.ApertureControlPointTypeLabel] = otelconsts.HTTPControlPoint
 
 	resp := createExtAuthzResponse(checkResponse)
 

@@ -71,7 +71,7 @@ func (mjc MultiJobConstructor) provideMultiJob(
 	}
 
 	// Create a new MultiJob instance
-	mj := NewMultiJob(jg.GetStatusRegistry().Child(mjc.Name), jwAll, gwAll)
+	mj := NewMultiJob(jg.GetStatusRegistry().Child("multi-job", mjc.Name), jwAll, gwAll)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {

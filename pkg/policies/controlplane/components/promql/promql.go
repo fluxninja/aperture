@@ -74,7 +74,7 @@ func ModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 		jws = append(jws, pje)
 
 		// Create promMultiJob for this circuit
-		promMultiJob := jobs.NewMultiJob(promQLJobGroup.GetStatusRegistry().Child(circuitAPI.GetPolicyName()), jws, nil)
+		promMultiJob := jobs.NewMultiJob(promQLJobGroup.GetStatusRegistry().Child("promql", circuitAPI.GetPolicyName()), jws, nil)
 		pje.promMultiJob = promMultiJob
 
 		initialDelay := config.MakeDuration(-1)
@@ -148,17 +148,15 @@ func (pje *promJobsExecutor) registerScalarJob(
 		cb:    cb,
 		query: query,
 	}
-	job := &jobs.BasicJob{
-		JobFunc: prometheus.NewScalarQueryJob(
+	job := jobs.NewBasicJob(jobName,
+		prometheus.NewScalarQueryJob(
 			query,
 			endTimestamp,
 			promAPI,
 			timeout,
 			scalarResBroker.handleResult,
 			scalarResBroker.handleError,
-		),
-	}
-	job.JobName = jobName
+		))
 	scalarResBroker.job = job
 	pje.pendingJobs[jobName] = scalarResBroker
 }
@@ -176,17 +174,15 @@ func (pje *promJobsExecutor) registerTaggedJob(
 		cb:    cb,
 		query: query,
 	}
-	job := &jobs.BasicJob{
-		JobFunc: prometheus.NewPromQueryJob(
+	job := jobs.NewBasicJob(jobName,
+		prometheus.NewPromQueryJob(
 			query,
 			endTimestamp,
 			promAPI,
 			timeout,
 			taggedResBroker.handleResult,
 			taggedResBroker.handleError,
-		),
-	}
-	job.JobName = jobName
+		))
 	taggedResBroker.job = job
 	pje.pendingJobs[jobName] = taggedResBroker
 }

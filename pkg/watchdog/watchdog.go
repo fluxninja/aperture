@@ -12,6 +12,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	watchdogv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/watchdog/v1"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -80,7 +81,7 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 		return err
 	}
 
-	watchdogRegistry := in.StatusRegistry.Child("liveness").Child(watchdogJobName)
+	watchdogRegistry := in.StatusRegistry.Child("subsystem", "liveness").Child("wd", watchdogJobName)
 
 	w := newWatchdog(in.JobGroup, watchdogRegistry, config)
 
@@ -97,9 +98,9 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 }
 
 func newWatchdog(jobGroup *jobs.JobGroup, registry status.Registry, config WatchdogConfig) *watchdog {
-	heapStatusRegistry := registry.Child("heap")
+	heapStatusRegistry := registry.Child("heap", "heap")
 
-	job := jobs.NewMultiJob(jobGroup.GetStatusRegistry().Child(watchdogJobName), nil, nil)
+	job := jobs.NewMultiJob(jobGroup.GetStatusRegistry().Child("wd", watchdogJobName), nil, nil)
 
 	w := &watchdog{
 		heapStatusRegistry: heapStatusRegistry,
@@ -117,17 +118,16 @@ func (w *watchdog) start() error {
 
 	// CGroup memory check
 	if runtime.GOOS == "linux" {
-		job := &jobs.BasicJob{
-			JobBase: jobs.JobBase{
-				JobName: "cgroup",
-			},
-		}
+		job := jobs.NewBasicJob("cgroup",
+			func(ctx context.Context) (proto.Message, error) {
+				return &emptypb.Empty{}, nil
+			})
 		if w.config.CGroup.WatermarksPolicy.Enabled {
 			cgw := &cgroupWatermarks{WatermarksPolicy: w.config.CGroup.WatermarksPolicy}
-			job.JobFunc = cgw.Check
+			job = jobs.NewBasicJob("cgroup", cgw.Check)
 		} else if w.config.CGroup.AdaptivePolicy.Enabled {
 			cga := &cgroupAdaptive{AdaptivePolicy: w.config.CGroup.AdaptivePolicy}
-			job.JobFunc = cga.Check
+			job = jobs.NewBasicJob("cgroup", cga.Check)
 		}
 		err = w.watchdogJob.RegisterJob(job)
 		if err != nil {
@@ -136,18 +136,17 @@ func (w *watchdog) start() error {
 	}
 
 	if w.config.System.WatermarksPolicy.Enabled || w.config.System.AdaptivePolicy.Enabled {
-		job := &jobs.BasicJob{
-			JobBase: jobs.JobBase{
-				JobName: "system",
-			},
-		}
+		job := jobs.NewBasicJob("system",
+			func(ctx context.Context) (proto.Message, error) {
+				return &emptypb.Empty{}, nil
+			})
 		// System memory check
 		if w.config.System.WatermarksPolicy.Enabled {
 			sw := &systemWatermarks{WatermarksPolicy: w.config.System.WatermarksPolicy}
-			job.JobFunc = sw.Check
+			job = jobs.NewBasicJob("system", sw.Check)
 		} else if w.config.System.AdaptivePolicy.Enabled {
 			sa := &systemAdaptive{AdaptivePolicy: w.config.System.AdaptivePolicy}
-			job.JobFunc = sa.Check
+			job = jobs.NewBasicJob("system", sa.Check)
 		}
 		err = w.watchdogJob.RegisterJob(job)
 		if err != nil {
