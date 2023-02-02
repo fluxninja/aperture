@@ -174,7 +174,7 @@ func (executor *jobExecutor) start() {
 		return
 	}
 
-	executor.livenessRegistry = executor.parentRegistry.Child(executor.Name())
+	executor.livenessRegistry = executor.parentRegistry.Child("executor", executor.Name())
 
 	var scheduler *gocron.Scheduler
 	if executor.config.ExecutionPeriod.AsDuration() > 0 {

@@ -103,10 +103,10 @@ func setupRateLimiterFactory(
 		return err
 	}
 
-	reg := statusRegistry.Child(rateLimiterStatusRoot)
+	reg := statusRegistry.Child("component", rateLimiterStatusRoot)
 	logger := reg.GetLogger()
 
-	lazySyncJobGroup, err := jobs.NewJobGroup(reg.Child("lazy_sync_jobs"), 0, jobs.RescheduleMode, nil)
+	lazySyncJobGroup, err := jobs.NewJobGroup(reg.Child("sync", "lazy_sync_jobs"), 0, jobs.RescheduleMode, nil)
 	if err != nil {
 		logger.Error().Err(err).Msg("Failed to create lazy sync job group")
 		return err

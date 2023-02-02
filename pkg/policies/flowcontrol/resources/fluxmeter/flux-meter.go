@@ -75,7 +75,7 @@ func setupFluxMeterModule(
 	// save policy config api
 	engineAPI = e
 
-	reg := sr.Child("flux_meters")
+	reg := sr.Child("resource", "flux_meters")
 
 	fmf := &fluxMeterFactory{
 		registry: reg,

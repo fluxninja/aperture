@@ -71,7 +71,7 @@ type ClassificationEngineIn struct {
 
 // ProvideClassificationEngine provides a classifier that loads the rules from config file.
 func ProvideClassificationEngine(in ClassificationEngineIn) (iface.ClassificationEngine, *ClassificationEngine) {
-	reg := in.Registry.Child("classifiers")
+	reg := in.Registry.Child("resource", "classifiers")
 
 	classificationEngine := NewClassificationEngine(reg)
 

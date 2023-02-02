@@ -145,7 +145,7 @@ func (lsaFactory *loadActuatorFactory) newLoadActuator(
 	lifecycle fx.Lifecycle,
 	metricLabels prometheus.Labels,
 ) (*loadActuator, error) {
-	reg := registry.Child("load_actuator")
+	reg := registry.Child("component", "load_actuator")
 
 	la := &loadActuator{
 		conLimiter:     conLimiter,
