@@ -33,7 +33,7 @@ which is managed by the Aperture Operator.
 The configuration for the Aperture Controller process is provided to the
 Controller CRD under the `controller.config` section. All the configuration
 parameters for Aperture Controller are listed
-[here](/references/configuration/controller.md).
+[here](/reference/configuration/controller.md).
 
 ## Installation {#controller-installation}
 
@@ -153,8 +153,8 @@ into your cluster.
    ```
 
    A list of all the configurable parameters for Etcd are available
-   [here](/references/configuration/controller.md#etcd) and Prometheus are
-   available [here](/references/configuration/controller.md#prometheus).
+   [here](/reference/configuration/controller.md#etcd) and Prometheus are
+   available [here](/reference/configuration/controller.md#prometheus).
 
    **Note**: Please make sure that the flag `web.enable-remote-write-receiver`
    is enabled on your existing Prometheus instance as it is required by the
@@ -181,7 +181,7 @@ into your cluster.
    ```
 
    All the config parameters for the Aperture Controller are available
-   [here](/references/configuration/controller.md).
+   [here](/reference/configuration/controller.md).
 
    A list of configurable parameters for the installation can be found in the
    [README](https://artifacthub.io/packages/helm/aperture/aperture-controller#parameters).

@@ -1,7 +1,7 @@
 ---
-title: Policy Configuration Reference
+title: Policy Language Specification
 sidebar_position: 1
-sidebar_label: Policy
+sidebar_label: Specification
 ---
 
 Reference for all objects used in [the Policy language](/concepts/policy/policy.md).
@@ -643,10 +643,12 @@ Signals are mapped to boolean values as follows:
 - Invalid inputs are considered unknown.
 
   :::note
+
   Treating invalid inputs as "unknowns" has a consequence that the result
   might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,
   because the result would end up false no matter if
   first signal was true or false. On the other hand, `unknown && true == unknown`.
+
   :::
 
 #### Properties
@@ -788,7 +790,9 @@ AutoScale components are used to scale a service.
 Circuit is defined as a dataflow graph of inter-connected components
 
 :::info
+
 See also [Circuit overview](/concepts/policy/circuit.md).
+
 :::
 
 Signals flow between components via ports.
@@ -796,6 +800,7 @@ As signals traverse the circuit, they get processed, stored within components or
 Circuit is evaluated periodically in order to respond to changes in signal readings.
 
 :::info
+
 **Signal**
 
 Signals are floating-point values.
@@ -809,6 +814,7 @@ output itself invalid (like eg.
 [ArithmeticCombinator](#v1-arithmetic-combinator)) or use some different
 logic, like eg. [Extrapolator](#v1-extrapolator). Refer to a component's
 docs on how exactly it handles invalid inputs.
+
 :::
 
 #### Properties
@@ -838,7 +844,9 @@ This interval is typically aligned with how often the corrective action (actuati
 Set of classification rules sharing a common selector
 
 :::info
+
 See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
+
 :::
 
 Example:
@@ -884,15 +892,19 @@ how to extract and propagate flow labels with that key.
 Computational block that form the circuit
 
 :::info
+
 See also [Components overview](/concepts/policy/circuit.md#components).
+
 :::
 
 Signals flow into the components via input ports and results are emitted on output ports.
 Components are wired to each other based on signal names forming an execution graph of the circuit.
 
 :::note
+
 Loops are broken by the runtime at the earliest component index that is part of the loop.
 The looped signals are saved in the tick they are generated and served in the subsequent tick.
+
 :::
 
 There are three categories of components:
@@ -902,10 +914,14 @@ There are three categories of components:
   they're represented by green color.
 - signal processor components – "pure" components that don't interact with the "real world".
   Examples: [GradientController](#v1-gradient-controller), [Max](#v1-max).
+
   :::note
+
   Signal processor components's output can depend on their internal state, in addition to the inputs.
   Eg. see the [Exponential Moving Average filter](#v1-e-m-a).
+
   :::
+
 - "sink" components – they affect the real world.
   [ConcurrencyLimiter.LoadActuator](#v1-concurrency-limiter) and [RateLimiter](#v1-rate-limiter).
   In the UI, represented by orange color. Sink components usually come in pairs with a
@@ -913,12 +929,14 @@ There are three categories of components:
   `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.
 
 :::tip
+
 Sometimes you may want to use a constant value as one of component's inputs.
 You can create an input port containing the constant value instead of being connected to a signal.
 To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
 You can also use it to provide special math values such as NaN and +- Inf.
 If You need to provide the same constant signal to multiple components,
 You can use the [Variable](#v1-variable) component.
+
 :::
 
 See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -1084,7 +1102,9 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 
 :::info
+
 See also [Concurrency Limiter overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).
+
 :::
 
 It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -1373,12 +1393,16 @@ Used during the warm-up stage: if the signal would exceed `max_envelope`
 it's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.
 
 :::note
+
 If the signal deviates from `max_envelope` faster than the correction
 faster, it might end up exceeding the envelope.
+
 :::
 
 :::note
+
 The envelope logic is **not** used outside the warm-up stage!
+
 :::
 
 </dd>
@@ -1706,7 +1730,9 @@ component](/concepts/integrations/flow-control/flow-control.md#components) shoul
 to
 
 :::info
+
 See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+
 :::
 
 Example:
@@ -1748,10 +1774,13 @@ or filter chains.
 must also be satisfied (in addition to service+control point matching)
 
 :::info
+
 See also [Label Matcher overview](/concepts/integrations/flow-control/flow-selector.md#label-matcher).
+
 :::
 
 :::note
+
 [Classifiers](#v1-classifier) _can_ use flow labels created by some other
 classifier, but only if they were created at some previous control point
 (and propagated in baggage).
@@ -1760,6 +1789,7 @@ This limitation doesn't apply to selectors of other entities, like
 Flux Meters or Actuators. It's valid to create a flow label on a control
 point using classifier, and immediately use it for matching on the same
 control point.
+
 :::
 
 </dd>
@@ -1772,7 +1802,9 @@ component](/concepts/integrations/flow-control/flow-control.md#components) shoul
 to
 
 :::info
+
 See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+
 :::
 
 #### Properties
@@ -1798,7 +1830,9 @@ Flux Meter gathers metrics for the traffic that matches its selector.
 The histogram created by Flux Meter measures the workload latency by default.
 
 :::info
+
 See also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).
+
 :::
 
 Example of a selector that creates a histogram metric for all HTTP requests
@@ -1851,8 +1885,10 @@ selector:
 (string, default: `workload_duration_ms`) Key of the attribute in access log or span from which the metric for this flux meter is read.
 
 :::info
+
 For list of available attributes in Envoy access logs, refer
 [Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)
+
 :::
 
 @gotags: default:"workload_duration_ms"
@@ -2034,9 +2070,11 @@ The sign of slope depends on correlation between the signal and control variable
   correlated (eg. Per-pod CPU usage and number of pods).
 
 :::note
+
 You need to set _negative_ slope for a _positive_ correlation, as you're
 describing the _action_ which controller should make when the signal
 increases.
+
 :::
 
 The magnitude of slope describes how aggressively should the controller
@@ -2051,8 +2089,10 @@ If you experience overshooting, consider lowering the magnitude even more.
 Values of $|\text{slope}| > 1$ are not recommended.
 
 :::note
+
 Remember that the gradient and output signal can be (optionally) clamped,
 so the _slope_ might not fully describe aggressiveness of the controller.
+
 :::
 
 @gotags: validate:"required"
@@ -2997,7 +3037,9 @@ Example:
 Policy expresses reliability automation workflow that automatically protects services
 
 :::info
+
 See also [Policy overview](/concepts/policy/policy.md).
+
 :::
 
 Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
@@ -3038,8 +3080,10 @@ Component that runs a Prometheus query periodically and returns the result as an
 (string) Describes the Prometheus query to be run.
 
 :::caution
+
 TODO we should describe how to construct the query, eg. how to employ the
 fluxmeters here or link to appropriate place in docs.
+
 :::
 
 </dd>
@@ -3134,7 +3178,9 @@ Query components that are query databases such as Prometheus.
 Limits the traffic on a control point to specified rate
 
 :::info
+
 See also [Rate Limiter overview](/concepts/integrations/flow-control/components/rate-limiter.md).
+
 :::
 
 Ratelimiting is done separately on per-label-value basis. Use _label_key_
@@ -3210,8 +3256,10 @@ Inputs for the RateLimiter component
 Negative values disable the ratelimiter.
 
 :::tip
+
 Negative limit can be useful to _conditionally_ enable the ratelimiter
 under certain circumstances. [Decider](#v1-decider) might be helpful.
+
 :::
 
 @gotags: validate:"required"
@@ -3258,7 +3306,9 @@ label set up, set `label_key: "user"`.
 Resources that need to be setup for the policy to function
 
 :::info
+
 See also [Resources overview](/concepts/policy/resources.md).
+
 :::
 
 Resources are typically Flux Meters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
@@ -3354,13 +3404,17 @@ telemetry: false
 propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
 
 :::note
+
 The flow label is always accessible in Aperture Policies regardless of this setting.
+
 :::
 
 :::caution
+
 When using [FluxNinja ARC plugin](arc/plugin.md), telemetry enabled
 labels are sent to FluxNinja ARC for observability. Telemetry should be disabled for
 sensitive labels.
+
 :::
 
 @gotags: default:"true"
@@ -3373,8 +3427,10 @@ sensitive labels.
 Weighted Fair Queuing-based workload scheduler
 
 :::note
+
 Each Agent instantiates an independent copy of the scheduler, but output
 signals for accepted and incoming concurrency are aggregated across all agents.
+
 :::
 
 See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
@@ -3412,6 +3468,7 @@ Output for the Scheduler component.
 scheduler is applied on.
 
 :::info
+
 Concurrency is a unitless number describing mean number of
 [flows](/concepts/integrations/flow-control/flow-control.md#flow) being
 concurrently processed by the system (system = control point).
@@ -3419,6 +3476,7 @@ Concurrency is calculated as _work_ done per unit of time (so
 work-seconds per world-seconds). Work-seconds are computed based on
 token-weights of of flows (which are either estimated via `auto_tokens`
 or specified by `Workload.tokens`).
+
 :::
 
 Value of this signal is aggregated from all the relevant schedulers.
@@ -3465,8 +3523,10 @@ In case of multiple matching workloads, the first matching one will be used.
 If none of workloads match, `default_workload` will be used.
 
 :::info
+
 See also [workload definition in the concepts
 section](/concepts/integrations/flow-control/components/concurrency-limiter.md#workload).
+
 :::
 
 @gotags: validate:"dive"
@@ -3510,6 +3570,7 @@ This value impacts the prioritization and fairness because the larger the timeou
 (string, default: `0.49s`) Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
 
 :::caution
+
 This timeout needs to be strictly less than the timeout set on the
 client for the whole GRPC call:
 
@@ -3524,6 +3585,7 @@ To avoid such cases, the end-to-end GRPC timeout should also contain
 some headroom for constant overhead like serialization, etc. Default
 value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
 tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+
 :::
 
 @gotags: default:"0.49s"
@@ -3538,7 +3600,9 @@ component](/concepts/integrations/flow-control/flow-control.md#components) shoul
 to
 
 :::info
+
 See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+
 :::
 
 #### Properties
@@ -3564,7 +3628,9 @@ In kubernetes, this is the FQDN of the Service object.
 Empty string means all services within an agent group (catch-all).
 
 :::note
+
 One entity may belong to multiple services.
+
 :::
 
 </dd>

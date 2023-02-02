@@ -71,7 +71,7 @@ also takes an explicit `labels` map in the `Check()` call.
 
 You can discover the labels flowing through services and control points using
 the
-[Introspection API](references/api/agent/flow-preview-service-preview-flow-labels.api.mdx)
+[Introspection API](reference/api/agent/flow-preview-service-preview-flow-labels.api.mdx)
 on an `aperture-agent` local to the service instances (pods).
 
 For example:
@@ -175,7 +175,7 @@ up and sent to the analytics database in the FluxNinja ARC. This allows:
 
 For Classifier-created labels, you can disable this behaviour by setting
 `hidden: true` in
-[the Classification rule](/references/configuration/policy.md#v1-rule).
+[the Classification rule](/reference/policies/spec.md#v1-rule).
 
 :::
 

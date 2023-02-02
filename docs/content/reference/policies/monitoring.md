@@ -19,7 +19,7 @@ Signals flowing through a policy's circuit are reported as Prometheus'
 can be monitored in real-time using tools such as
 [Grafana](https://github.com/grafana/grafana).
 
-Below is an example signal monitoring dashboard that can be imported into the
+Below is an example signal monitoring dashboard that can be imported into a
 Grafana instance.
 
 ```mdx-code-block

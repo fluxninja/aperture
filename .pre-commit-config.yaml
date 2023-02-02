@@ -64,7 +64,7 @@ repos:
     rev: "v2.7.1"
     hooks:
       - id: prettier
-        exclude: ^(docs/content/references/.*|manifests/charts/.*/README*|.github/.*/.*.md)
+        exclude: ^(docs/content/reference/.*|manifests/charts/.*/README*|.github/.*/.*.md)
         types_or:
           [
             sh,
@@ -167,4 +167,4 @@ repos:
       - id: codespell
         args:
           - --ignore-words=./.codespellignore
-        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*|docs/content/references/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*)$
+        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*|docs/content/reference/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*)$
