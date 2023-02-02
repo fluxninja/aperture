@@ -17,6 +17,7 @@ type basicJob struct {
 	JobBase
 }
 
+// NewBasicJob is a constructor for basicJob struct.
 func NewBasicJob(name string, jobFunc JobCallback) Job {
 	job := &basicJob{
 		JobBase: JobBase{JobName: name},

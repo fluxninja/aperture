@@ -55,7 +55,7 @@ type registry struct {
 	alerter  alerts.Alerter
 }
 
-// helper struct for key-value keys in children map
+// helper struct for key-value keys in children map.
 type kv struct {
 	Key   string
 	Value string
