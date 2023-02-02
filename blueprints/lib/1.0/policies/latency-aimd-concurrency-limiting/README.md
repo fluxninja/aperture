@@ -19,143 +19,137 @@ to see this blueprint in use.
 
 <!-- Configuration Marker -->
 
+export const ParameterHeading = ({children}) => ( <span
+style={{fontWeight: "bold"}}>{children}</span> );
+
+export const WrappedDescription = ({children}) => ( <span
+style={{wordWrap: "normal"}}>{children}</span> );
+
+export const ParameterDescription = ({name, type, value, description}) => (
+
+  <table>
+  <tr>
+    <td><ParameterHeading>Parameter</ParameterHeading></td>
+    <td><code>{name}</code></td>
+  </tr>
+  <tr>
+    <td><ParameterHeading>Type</ParameterHeading></td>
+    <td><code>{type}</code></td>
+  </tr>
+  <tr>
+    <td><ParameterHeading>Default Value</ParameterHeading></td>
+    <td><code>{value ? value : "REQUIRED VALUE"}</code></td>
+  </tr>
+  <tr>
+    <td><ParameterHeading>Description</ParameterHeading></td>
+    <td><WrappedDescription>{description}</WrappedDescription></td>
+  </tr>
+</table>
+);
+);
+
 ### Common
 
-**`common.policy_name`** (type: _`string`_)
+<ParameterDescription name="common.policy_name" type="string"
 
-required parameter
-
-Name of the policy.
+    description='Name of the policy.' />
 
 ### Policy
 
-**`policy.flux_meter`** (type: _`aperture.spec.v1.FluxMeter`_)
+<ParameterDescription name="policy.flux_meter" type="aperture.spec.v1.FluxMeter"
 
-required parameter
+    description='Flux Meter.' />
 
-Flux Meter.
+<ParameterDescription
+    name="policy.classifiers"
+    type="[]aperture.spec.v1.Classifier"
+    value="[]"
+    description='List of classification rules.' />
 
-**`policy.classifiers`** (type: _`[]aperture.spec.v1.Classifier`_)
-
-default: `[]`
-
-List of classification rules.
-
-**`policy.components`** (type: _`[]aperture.spec.v1.Component`_)
-
-default: `[]`
-
-List of additional circuit components.
+<ParameterDescription
+    name="policy.components"
+    type="[]aperture.spec.v1.Component"
+    value="[]"
+    description='List of additional circuit components.' />
 
 #### Latency Baseliner
 
-**`policy.latency_baseliner.ema`** (type: _`aperture.spec.v1.EMAParameters`_)
+<ParameterDescription
+    name="policy.latency_baseliner.ema"
+    type="aperture.spec.v1.EMAParameters"
+    value="{'correction_factor_on_max_envelope_violation': '0.95', 'ema_window': '1500s', 'warmup_window': '60s'}"
+    description='EMA parameters.' />
 
-default:
-`{'correction_factor_on_max_envelope_violation': '0.95', 'ema_window': '1500s', 'warmup_window': '60s'}`
+<ParameterDescription
+    name="policy.latency_baseliner.latency_tolerance_multiplier"
+    type="float64"
+    value="1.1"
+    description='Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.' />
 
-EMA parameters.
-
-**`policy.latency_baseliner.latency_tolerance_multiplier`** (type: _`float64`_)
-
-default: `1.1`
-
-Tolerance factor beyond which the service is considered to be in overloaded
-state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is
-considered to be in overloaded state if current latency is more than 55ms.
-
-**`policy.latency_baseliner.latency_ema_limit_multiplier`** (type: _`float64`_)
-
-default: `2.0`
-
-Current latency value is multiplied with this factor to calculate maximum
-envelope of Latency EMA.
+<ParameterDescription
+    name="policy.latency_baseliner.latency_ema_limit_multiplier"
+    type="float64"
+    value="2.0"
+    description='Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.' />
 
 #### Concurrency Controller
 
-**`policy.concurrency_controller.flow_selector`** (type:
-_`aperture.spec.v1.FlowSelector`_)
+<ParameterDescription name="policy.concurrency_controller.flow_selector"
+type="aperture.spec.v1.FlowSelector"
 
-required parameter
+    description='Concurrency Limiter flow selector.' />
 
-Concurrency Limiter flow selector.
+<ParameterDescription
+    name="policy.concurrency_controller.scheduler"
+    type="aperture.spec.v1.SchedulerParameters"
+    value="{'auto_tokens': True, 'default_workload_parameters': {'priority': 20}, 'timeout_factor': '0.5', 'workloads': []}"
+    description='Scheduler parameters.' />
 
-**`policy.concurrency_controller.scheduler`** (type:
-_`aperture.spec.v1.SchedulerParameters`_)
+<ParameterDescription
+    name="policy.concurrency_controller.gradient"
+    type="aperture.spec.v1.GradientParameters"
+    value="{'max_gradient': '1.0', 'min_gradient': '0.1', 'slope': '-1'}"
+    description='Gradient parameters.' />
 
-default:
-`{'auto_tokens': True, 'default_workload_parameters': {'priority': 20}, 'timeout_factor': '0.5', 'workloads': []}`
+<ParameterDescription
+    name="policy.concurrency_controller.alerter"
+    type="aperture.spec.v1.AlerterParameters"
+    value="{'alert_channels': [], 'alert_name': 'Load Shed Event', 'resolve_timeout': '5s'}"
+    description='Whether tokens for workloads are computed dynamically or set statically by the user.' />
 
-Scheduler parameters.
+<ParameterDescription
+    name="policy.concurrency_controller.concurrency_limit_multiplier"
+    type="float64"
+    value="2.0"
+    description='Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.' />
 
-**`policy.concurrency_controller.gradient`** (type:
-_`aperture.spec.v1.GradientParameters`_)
+<ParameterDescription
+    name="policy.concurrency_controller.concurrency_linear_increment"
+    type="float64"
+    value="5.0"
+    description='Linear increment to concurrency in each execution tick when the system is not in overloaded state.' />
 
-default: `{'max_gradient': '1.0', 'min_gradient': '0.1', 'slope': '-1'}`
+<ParameterDescription
+    name="policy.concurrency_controller.concurrency_sqrt_increment_multiplier"
+    type="float64"
+    value="1"
+    description='Scale factor to multiply square root of current accepted concurrrency. This, along with concurrency_linear_increment helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).' />
 
-Gradient parameters.
-
-**`policy.concurrency_controller.alerter`** (type:
-_`aperture.spec.v1.AlerterParameters`_)
-
-default:
-`{'alert_channels': [], 'alert_name': 'Load Shed Event', 'resolve_timeout': '5s'}`
-
-Whether tokens for workloads are computed dynamically or set statically by the
-user.
-
-**`policy.concurrency_controller.concurrency_limit_multiplier`** (type:
-_`float64`_)
-
-default: `2.0`
-
-Current accepted concurrency is multiplied with this number to dynamically
-calculate the upper concurrency limit of a Service during normal (non-overload)
-state. This protects the Service from sudden spikes.
-
-**`policy.concurrency_controller.concurrency_linear_increment`** (type:
-_`float64`_)
-
-default: `5.0`
-
-Linear increment to concurrency in each execution tick when the system is not in
-overloaded state.
-
-**`policy.concurrency_controller.concurrency_sqrt_increment_multiplier`** (type:
-_`float64`_)
-
-default: `1`
-
-Scale factor to multiply square root of current accepted concurrrency. This,
-along with concurrency_linear_increment helps calculate overall concurrency
-increment in each tick. Concurrency is rapidly ramped up in each execution cycle
-during normal (non-overload) state (integral effect).
-
-**`policy.concurrency_controller.dynamic_config`** (type:
-_`aperture.v1.LoadActuatorDynamicConfig`_)
-
-default: `{'dry_run': False}`
-
-Dynamic configuration for concurrency controller.
+<ParameterDescription
+    name="policy.concurrency_controller.dynamic_config"
+    type="aperture.v1.LoadActuatorDynamicConfig"
+    value="{'dry_run': False}"
+    description='Dynamic configuration for concurrency controller.' />
 
 ### Dashboard
 
-**`dashboard.refresh_interval`** (type: _`string`_)
-
-default: `"10s"`
-
-Refresh interval for dashboard panels.
+<ParameterDescription name="dashboard.refresh_interval" type="string"
+value=""10s"" description='Refresh interval for dashboard panels.' />
 
 #### Datasource
 
-**`dashboard.datasource.name`** (type: _`string`_)
+<ParameterDescription name="dashboard.datasource.name" type="string"
+value=""$datasource"" description='Datasource name.' />
 
-default: `"$datasource"`
-
-Datasource name.
-
-**`dashboard.datasource.filter_regex`** (type: _`string`_)
-
-default: `""`
-
-Datasource filter regex.
+<ParameterDescription name="dashboard.datasource.filter_regex" type="string"
+value="""" description='Datasource filter regex.' />

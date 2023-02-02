@@ -223,17 +223,14 @@ SECTION_TPL = """
 {%- endif %}
 
 {%- for param in block.parameters.values() %}
-**`{{ param.param_name }}`** (type: *`{{ param.param_type }}`*)
-{% if param.default is not none %}
-default: `{{ param.default | quoteValue }}`
-{% else %}
-required parameter
-{% endif %}
 
-{{ param.description }}
+<ParameterDescription
+    name="{{ param.param_name }}"
+    type="{{ param.param_type }}"
+    {% if param.default is not none %}value="{{ param.default | quoteValue }}"{% endif %}
+    description='{{ param.description }}' />
 
-{% endfor %}
-
+{%- endfor %}
 {%- endfor %}
 
 {%- endfor %}
@@ -278,6 +275,39 @@ def update_docblock_param_names(blocks: List[DocBlock], prefix: str):
             param.param_name = f"{prefix}.{param.param_name}"
 
 
+MDX_TEMPLATE = """
+export const ParameterHeading = ({children}) => (
+  <span style={{fontWeight: "bold"}}>{children}</span>
+);
+
+export const WrappedDescription = ({children}) => (
+  <span style={{wordWrap: "normal"}}>{children}</span>
+);
+
+export const ParameterDescription = ({name, type, value, description}) => (
+  <table>
+  <tr>
+    <td><ParameterHeading>Parameter</ParameterHeading></td>
+    <td><code>{name}</code></td>
+  </tr>
+  <tr>
+    <td><ParameterHeading>Type</ParameterHeading></td>
+    <td><code>{type}</code></td>
+  </tr>
+  <tr>
+    <td><ParameterHeading>Default Value</ParameterHeading></td>
+    <td><code>{value ? value : "REQUIRED VALUE"}</code></td>
+  </tr>
+  <tr>
+    <td><ParameterHeading>Description</ParameterHeading></td>
+    <td><WrappedDescription>{description}</WrappedDescription></td>
+  </tr>
+</table>
+);
+);
+"""
+
+
 def update_readme_markdown(readme_path, blocks: List[DocBlock]):
     """Find configuration marker in README.md and append all blocks after it"""
 
@@ -288,6 +318,8 @@ def update_readme_markdown(readme_path, blocks: List[DocBlock]):
             readme_copied += line + "\n"
             break
         readme_copied += line + "\n"
+
+    readme_copied += f"\n{MDX_TEMPLATE}\n"
 
     sections = {}
     for block in blocks:

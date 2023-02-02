@@ -6,83 +6,89 @@ This blueprint provides a simple static rate limiting policy and a dashboard.
 
 <!-- Configuration Marker -->
 
+export const ParameterHeading = ({children}) => ( <span
+style={{fontWeight: "bold"}}>{children}</span> );
+
+export const WrappedDescription = ({children}) => ( <span
+style={{wordWrap: "normal"}}>{children}</span> );
+
+export const ParameterDescription = ({name, type, value, description}) => (
+
+  <table>
+  <tr>
+    <td><ParameterHeading>Parameter</ParameterHeading></td>
+    <td><code>{name}</code></td>
+  </tr>
+  <tr>
+    <td><ParameterHeading>Type</ParameterHeading></td>
+    <td><code>{type}</code></td>
+  </tr>
+  <tr>
+    <td><ParameterHeading>Default Value</ParameterHeading></td>
+    <td><code>{value ? value : "REQUIRED VALUE"}</code></td>
+  </tr>
+  <tr>
+    <td><ParameterHeading>Description</ParameterHeading></td>
+    <td><WrappedDescription>{description}</WrappedDescription></td>
+  </tr>
+</table>
+);
+);
+
 ### Common
 
-**`common.policy_name`** (type: _`string`_)
+<ParameterDescription name="common.policy_name" type="string"
 
-required parameter
-
-Name of the policy.
+    description='Name of the policy.' />
 
 ### Policy
 
-**`policy.evaluation_interval`** (type: _`string`_)
+<ParameterDescription name="policy.evaluation_interval" type="string"
+value=""300s"" description='How often should the policy be re-evaluated' />
 
-default: `"300s"`
-
-How often should the policy be re-evaluated
-
-**`policy.classifiers`** (type: _`[]aperture.spec.v1.Classifier`_)
-
-default: `[]`
-
-List of classification rules.
+<ParameterDescription
+    name="policy.classifiers"
+    type="[]aperture.spec.v1.Classifier"
+    value="[]"
+    description='List of classification rules.' />
 
 #### Rate Limiter
 
-**`policy.rate_limiter.rate_limit`** (type: _`float64`_)
+<ParameterDescription name="policy.rate_limiter.rate_limit" type="float64"
 
-required parameter
+    description='Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept' />
 
-Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to
-accept
+<ParameterDescription name="policy.rate_limiter.flow_selector"
+type="aperture.spec.v1.FlowSelector"
 
-**`policy.rate_limiter.flow_selector`** (type:
-_`aperture.spec.v1.FlowSelector`_)
+    description='A flow selector to match requests against' />
 
-required parameter
+<ParameterDescription
+    name="policy.rate_limiter.parameters"
+    type="aperture.spec.v1.RateLimiterParameters"
+    value="{'label_key': 'FAKE-VALUE', 'lazy_sync': {'enabled': True, 'num_sync': 5}, 'limit_reset_interval': '1s'}"
+    description='Parameters.' />
 
-A flow selector to match requests against
+<ParameterDescription name="policy.rate_limiter.parameters.label_key"
+type="string"
 
-**`policy.rate_limiter.parameters`** (type:
-_`aperture.spec.v1.RateLimiterParameters`_)
+    description='Flow label to use for rate limiting.' />
 
-default:
-`{'label_key': 'FAKE-VALUE', 'lazy_sync': {'enabled': True, 'num_sync': 5}, 'limit_reset_interval': '1s'}`
-
-Parameters.
-
-**`policy.rate_limiter.parameters.label_key`** (type: _`string`_)
-
-required parameter
-
-Flow label to use for rate limiting.
-
-**`policy.rate_limiter.dynamic_config`** (type:
-_`aperture.spec.v1.RateLimiterDefaultConfig`_)
-
-default: `{'overrides': []}`
-
-Dynamic configuration for rate limiter that can be applied at the runtime.
+<ParameterDescription
+    name="policy.rate_limiter.dynamic_config"
+    type="aperture.spec.v1.RateLimiterDefaultConfig"
+    value="{'overrides': []}"
+    description='Dynamic configuration for rate limiter that can be applied at the runtime.' />
 
 ### Dashboard
 
-**`dashboard.refresh_interval`** (type: _`string`_)
-
-default: `"10s"`
-
-Refresh interval for dashboard panels.
+<ParameterDescription name="dashboard.refresh_interval" type="string"
+value=""10s"" description='Refresh interval for dashboard panels.' />
 
 #### Datasource
 
-**`dashboard.datasource.name`** (type: _`string`_)
+<ParameterDescription name="dashboard.datasource.name" type="string"
+value=""$datasource"" description='Datasource name.' />
 
-default: `"$datasource"`
-
-Datasource name.
-
-**`dashboard.datasource.filter_regex`** (type: _`string`_)
-
-default: `""`
-
-Datasource filter regex.
+<ParameterDescription name="dashboard.datasource.filter_regex" type="string"
+value="""" description='Datasource filter regex.' />
