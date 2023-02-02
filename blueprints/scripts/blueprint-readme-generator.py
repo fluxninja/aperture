@@ -227,7 +227,7 @@ SECTION_TPL = """
 <ParameterDescription
     name="{{ param.param_name }}"
     type="{{ param.param_type }}"
-    {% if param.default is not none %}value="{{ param.default | quoteValue }}"{% endif %}
+    value='{% if param.value %}{{ param.default | quoteValue }}{% endif %}'
     description='{{ param.description }}' />
 
 {%- endfor %}
@@ -285,7 +285,7 @@ export const WrappedDescription = ({children}) => (
 );
 
 export const ParameterDescription = ({name, type, value, description}) => (
-  <table>
+  <table class="blueprints-params">
   <tr>
     <td><ParameterHeading>Parameter</ParameterHeading></td>
     <td><code>{name}</code></td>
@@ -296,14 +296,12 @@ export const ParameterDescription = ({name, type, value, description}) => (
   </tr>
   <tr>
     <td><ParameterHeading>Default Value</ParameterHeading></td>
-    <td><code>{value ? value : "REQUIRED VALUE"}</code></td>
+    <td><code>{value != '' ? value : "REQUIRED VALUE"}</code></td>
   </tr>
   <tr>
-    <td><ParameterHeading>Description</ParameterHeading></td>
-    <td><WrappedDescription>{description}</WrappedDescription></td>
+    <td colspan="2" class="blueprints-description"><WrappedDescription>{description}</WrappedDescription></td>
   </tr>
 </table>
-);
 );
 """
 

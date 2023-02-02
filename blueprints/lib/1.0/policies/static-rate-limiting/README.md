@@ -14,7 +14,7 @@ style={{wordWrap: "normal"}}>{children}</span> );
 
 export const ParameterDescription = ({name, type, value, description}) => (
 
-  <table>
+  <table class="blueprints-params">
   <tr>
     <td><ParameterHeading>Parameter</ParameterHeading></td>
     <td><code>{name}</code></td>
@@ -25,70 +25,86 @@ export const ParameterDescription = ({name, type, value, description}) => (
   </tr>
   <tr>
     <td><ParameterHeading>Default Value</ParameterHeading></td>
-    <td><code>{value ? value : "REQUIRED VALUE"}</code></td>
+    <td><code>{value != '' ? value : "REQUIRED VALUE"}</code></td>
   </tr>
   <tr>
-    <td><ParameterHeading>Description</ParameterHeading></td>
-    <td><WrappedDescription>{description}</WrappedDescription></td>
+    <td colspan="2" class="blueprints-description"><WrappedDescription>{description}</WrappedDescription></td>
   </tr>
 </table>
-);
 );
 
 ### Common
 
-<ParameterDescription name="common.policy_name" type="string"
-
+<ParameterDescription
+    name="common.policy_name"
+    type="string"
+    value=''
     description='Name of the policy.' />
 
 ### Policy
 
-<ParameterDescription name="policy.evaluation_interval" type="string"
-value=""300s"" description='How often should the policy be re-evaluated' />
+<ParameterDescription
+    name="policy.evaluation_interval"
+    type="string"
+    value=''
+    description='How often should the policy be re-evaluated' />
 
 <ParameterDescription
     name="policy.classifiers"
     type="[]aperture.spec.v1.Classifier"
-    value="[]"
+    value=''
     description='List of classification rules.' />
 
 #### Rate Limiter
 
-<ParameterDescription name="policy.rate_limiter.rate_limit" type="float64"
-
+<ParameterDescription
+    name="policy.rate_limiter.rate_limit"
+    type="float64"
+    value=''
     description='Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept' />
 
-<ParameterDescription name="policy.rate_limiter.flow_selector"
-type="aperture.spec.v1.FlowSelector"
-
+<ParameterDescription
+    name="policy.rate_limiter.flow_selector"
+    type="aperture.spec.v1.FlowSelector"
+    value=''
     description='A flow selector to match requests against' />
 
 <ParameterDescription
     name="policy.rate_limiter.parameters"
     type="aperture.spec.v1.RateLimiterParameters"
-    value="{'label_key': 'FAKE-VALUE', 'lazy_sync': {'enabled': True, 'num_sync': 5}, 'limit_reset_interval': '1s'}"
+    value=''
     description='Parameters.' />
 
-<ParameterDescription name="policy.rate_limiter.parameters.label_key"
-type="string"
-
+<ParameterDescription
+    name="policy.rate_limiter.parameters.label_key"
+    type="string"
+    value=''
     description='Flow label to use for rate limiting.' />
 
 <ParameterDescription
     name="policy.rate_limiter.dynamic_config"
     type="aperture.spec.v1.RateLimiterDefaultConfig"
-    value="{'overrides': []}"
+    value=''
     description='Dynamic configuration for rate limiter that can be applied at the runtime.' />
 
 ### Dashboard
 
-<ParameterDescription name="dashboard.refresh_interval" type="string"
-value=""10s"" description='Refresh interval for dashboard panels.' />
+<ParameterDescription
+    name="dashboard.refresh_interval"
+    type="string"
+    value=''
+    description='Refresh interval for dashboard panels.' />
 
 #### Datasource
 
-<ParameterDescription name="dashboard.datasource.name" type="string"
-value=""$datasource"" description='Datasource name.' />
+<ParameterDescription
+    name="dashboard.datasource.name"
+    type="string"
+    value=''
+    description='Datasource name.' />
 
-<ParameterDescription name="dashboard.datasource.filter_regex" type="string"
-value="""" description='Datasource filter regex.' />
+<ParameterDescription
+    name="dashboard.datasource.filter_regex"
+    type="string"
+    value=''
+    description='Datasource filter regex.' />
