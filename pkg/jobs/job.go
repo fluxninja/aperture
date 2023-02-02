@@ -24,8 +24,6 @@ type JobCallback func(context.Context) (proto.Message, error)
 type Job interface {
 	// Returns the name
 	Name() string
-	// Returns the job function or error if it's not applicable for the implementation
-	GetJobFunc() (JobCallback, error)
 	// Executes the job
 	Execute(ctx context.Context) (proto.Message, error)
 	// JobWatchers
@@ -48,11 +46,6 @@ type JobBase struct {
 // Name returns the name of the job.
 func (job JobBase) Name() string {
 	return job.JobName
-}
-
-// GetJobFunc is noop for JobBase.
-func (job JobBase) GetJobFunc() (JobCallback, error) {
-	return nil, errors.New("GetJobFunc is not implemented for JobBase")
 }
 
 // JobWatchers returns the job watchers.
@@ -108,11 +101,6 @@ func newJobExecutor(job Job, jg *JobGroup, config JobConfig, parentRegistry stat
 // Name returns the name of the Job that the executor is associated with.
 func (executor *jobExecutor) Name() string {
 	return executor.Job.Name()
-}
-
-// GetJobFunc returns the function of the Job that the executor is associated with.
-func (executor *jobExecutor) GetJobFunc() (JobCallback, error) {
-	return executor.Job.GetJobFunc()
 }
 
 // JobWatchers returns the job watchers for the Job that the executor is associated with.

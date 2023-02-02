@@ -72,11 +72,6 @@ func (gt *groupTracker) registerJob(job Job) error {
 		return errInvalidJob
 	}
 
-	jobFunc, err := job.GetJobFunc()
-	if err == nil && jobFunc == nil {
-		return errInvalidJob
-	}
-
 	gt.mu.Lock()
 	defer gt.mu.Unlock()
 

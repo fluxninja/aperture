@@ -117,19 +117,13 @@ var _ = Describe("Jobs", func() {
 	})
 
 	It("runs instant jobs", func() {
-		job := &BasicJob{
-			JobBase: JobBase{JobName: "instant-run-job"},
-			JobFunc: addOne,
-		}
+		job := NewBasicJob("instant-run-job", addOne)
 		job.Execute(context.Background())
 		Expect(counter).To(Equal(1))
 	})
 
 	It("runs instant jobs with specified number of runs", func() {
-		job := &BasicJob{
-			JobBase: JobBase{JobName: "instant-run-job"},
-			JobFunc: addOne,
-		}
+		job := NewBasicJob("instant-run-job", addOne)
 		groupConfig := &testGroupConfig{
 			jobs: []Job{job},
 			jobRunConfig: testJobRunConfig{
@@ -146,11 +140,8 @@ var _ = Describe("Jobs", func() {
 
 	It("checks for timed out job", func() {
 		jobConfig.InitialDelay = config.MakeDuration(time.Millisecond * 100)
-		job := &BasicJob{
-			JobBase: JobBase{
-				JobName: "timeout-job",
-			},
-			JobFunc: func(ctx context.Context) (proto.Message, error) {
+		job := NewBasicJob("timeout-job",
+			func(ctx context.Context) (proto.Message, error) {
 				time.Sleep(time.Millisecond * 4000)
 				select {
 				case <-ctx.Done():
@@ -159,8 +150,7 @@ var _ = Describe("Jobs", func() {
 					counter += 1
 					return &emptypb.Empty{}, nil
 				}
-			},
-		}
+			})
 
 		groupConfig := &testGroupConfig{
 			jobs: []Job{job},
@@ -177,14 +167,8 @@ var _ = Describe("Jobs", func() {
 	})
 
 	It("runs multiple basic jobs", func() {
-		job := &BasicJob{
-			JobBase: JobBase{JobName: "test-job"},
-			JobFunc: addOne,
-		}
-		job2 := &BasicJob{
-			JobBase: JobBase{JobName: "test-job2"},
-			JobFunc: addFive,
-		}
+		job := NewBasicJob("test-job", addOne)
+		job2 := NewBasicJob("test-job2", addFive)
 
 		groupConfig := &testGroupConfig{
 			jobs: []Job{job, job2},
@@ -203,14 +187,8 @@ var _ = Describe("Jobs", func() {
 
 	It("runs multi jobs", func() {
 		multiJob := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job", "multi-job"), jobwatchers, groupWatchers)
-		job := &BasicJob{
-			JobBase: JobBase{JobName: "test-job"},
-			JobFunc: addOne,
-		}
-		job2 := &BasicJob{
-			JobBase: JobBase{JobName: "test-job2"},
-			JobFunc: addFive,
-		}
+		job := NewBasicJob("test-job", addOne)
+		job2 := NewBasicJob("test-job2", addFive)
 
 		groupConfig := &testGroupConfig{
 			jobs: []Job{multiJob},
@@ -235,18 +213,9 @@ var _ = Describe("Jobs", func() {
 	It("runs multiple multi jobs", func() {
 		multiJob := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job1", "multi-job1"), jobwatchers, groupWatchers)
 		multiJob2 := NewMultiJob(jobGroup.GetStatusRegistry().Child("multi-job2", "multi-job2"), jobwatchers, groupWatchers)
-		job := &BasicJob{
-			JobBase: JobBase{JobName: "test-job"},
-			JobFunc: addOne,
-		}
-		job2 := &BasicJob{
-			JobBase: JobBase{JobName: "test-job2"},
-			JobFunc: addFive,
-		}
-		job3 := &BasicJob{
-			JobBase: JobBase{JobName: "test-job3"},
-			JobFunc: addTen,
-		}
+		job := NewBasicJob("test-job", addOne)
+		job2 := NewBasicJob("test-job2", addFive)
+		job3 := NewBasicJob("test-job3", addTen)
 
 		groupConfig := &testGroupConfig{
 			jobs: []Job{multiJob, multiJob2},
@@ -272,29 +241,19 @@ var _ = Describe("Jobs", func() {
 	})
 
 	It("does not allow running nil jobs", func() {
-		job := &BasicJob{
-			JobBase: JobBase{JobName: "instant-run-job"},
-			JobFunc: nil,
-		}
+		job := NewBasicJob("instant-run-job", nil)
 		_, err := job.Execute(context.Background())
 		Expect(err).ToNot(BeNil())
 	})
 
-	It("does not allow registering nil jobs", func() {
-		job := &BasicJob{
-			JobBase: JobBase{JobName: "test-job"},
-			JobFunc: nil,
-		}
-
+	It("allows registering nil jobs", func() {
+		job := NewBasicJob("test-job", nil)
 		err := jobGroup.RegisterJob(job, jobConfig)
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(BeNil())
 	})
 
 	It("does not allow registering same job", func() {
-		job := &BasicJob{
-			JobBase: JobBase{JobName: "test-job"},
-			JobFunc: addOne,
-		}
+		job := NewBasicJob("test-job", addOne)
 		job2 := job
 		err := jobGroup.RegisterJob(job, jobConfig)
 		Expect(err).To(BeNil())
@@ -324,7 +283,7 @@ func runJobGroup(jobGroup *JobGroup, groupConfig *testGroupConfig, jobConfig Job
 	for _, job := range groupConfig.jobs {
 		registry := jobGroup.livenessRegistry
 		livenessReg := registry.Root().
-			Child("sub_system", "liveness").
+			Child("subsystem", "liveness").
 			Child("jg", "job_groups").
 			Child(registry.Key(), registry.Value()).
 			Child("executor", job.Name())
