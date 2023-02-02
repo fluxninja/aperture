@@ -2,11 +2,17 @@ package blueprints
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
+	"github.com/go-git/go-git/v5/storage/memory"
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 
+	"github.com/Masterminds/semver/v3"
 	"github.com/jsonnet-bundler/jsonnet-bundler/pkg"
 	"github.com/jsonnet-bundler/jsonnet-bundler/pkg/jsonnetfile"
 	specv1 "github.com/jsonnet-bundler/jsonnet-bundler/spec/v1"
@@ -14,14 +20,67 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func resolveApertureVersion(version string) (string, error) {
+	if strings.HasPrefix(version, "v") {
+		return version, nil
+	}
+
+	remote := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
+		Name: "origin",
+		URLs: []string{apertureRepo},
+	})
+
+	refs, err := remote.List(&git.ListOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	var latestRelease *semver.Version
+
+	tagsRefPrefix := "refs/tags/v"
+
+	for _, ref := range refs {
+		reference := ref.Name().String()
+		if ref.Name().IsTag() && strings.HasPrefix(reference, tagsRefPrefix) {
+			version, found := strings.CutPrefix(reference, tagsRefPrefix)
+			if !found {
+				return "", fmt.Errorf("unable to parse remote release ref: %s", reference)
+			}
+
+			release, err := semver.NewVersion(version)
+			if err != nil {
+				return "", err
+			}
+
+			if release.Prerelease() != "" {
+				continue
+			}
+
+			if latestRelease == nil || release.GreaterThan(latestRelease) {
+				latestRelease = release
+			}
+		}
+	}
+
+	if latestRelease == nil {
+		return "", errors.New("unable to resolve release tags to find latest release")
+	}
+	return fmt.Sprintf("v%s", latestRelease.String()), nil
+}
+
 var pullCmd = &cobra.Command{
 	Use:           "pull",
 	Short:         "Pull a blueprint",
 	SilenceErrors: true,
 	SilenceUsage:  true,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		blueprintsVersion, err := resolveApertureVersion(blueprintsVersion)
+		if err != nil {
+			return nil
+		}
+
 		apertureBlueprintsDir := filepath.Join(blueprintsDir, blueprintsVersion)
-		err := os.MkdirAll(apertureBlueprintsDir, os.ModePerm)
+		err = os.MkdirAll(apertureBlueprintsDir, os.ModePerm)
 		if err != nil {
 			return err
 		}
