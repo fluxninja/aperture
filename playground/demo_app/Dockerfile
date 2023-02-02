@@ -14,5 +14,11 @@ EOF
 
 # Final image
 FROM debian:bullseye-slim
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY --link --from=builder /demo_app /demo_app
 ENTRYPOINT ["/demo_app"]
