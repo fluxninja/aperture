@@ -7,6 +7,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
 )
@@ -62,15 +63,24 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	// record the start time of the request
 	start := time.Now()
 
+	// handle empty labels
+	labels := req.Labels
+	if labels == nil {
+		labels = make(map[string]string)
+	}
+
 	// CheckWithValues already pushes result to metrics
 	resp := h.CheckWithValues(
 		ctx,
 		h.serviceGetter.ServicesFromContext(ctx),
 		req.ControlPoint,
-		req.Labels,
+		labels,
 	)
 	end := time.Now()
 	resp.Start = timestamppb.New(start)
 	resp.End = timestamppb.New(end)
+	resp.TelemetryFlowLabels = labels
+	// add control point type
+	resp.TelemetryFlowLabels[otelconsts.ApertureControlPointTypeLabel] = otelconsts.FeatureControlPoint
 	return resp, nil
 }
