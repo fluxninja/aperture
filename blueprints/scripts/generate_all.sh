@@ -5,6 +5,7 @@ script_root=$(dirname "$0")
 blueprints_root=${script_root}/..
 
 FIND="find"
+SED="sed"
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
 	FIND="gfind"
