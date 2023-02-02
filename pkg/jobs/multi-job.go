@@ -2,7 +2,6 @@ package jobs
 
 import (
 	"context"
-	"errors"
 	"sync"
 
 	"go.uber.org/fx"
@@ -117,11 +116,6 @@ func NewMultiJob(registry status.Registry, jws JobWatchers, gws GroupWatchers) *
 // Name returns the name of the job.
 func (mj *MultiJob) Name() string {
 	return mj.JobBase.Name()
-}
-
-// GetJobFunc is noop for MultiJob.
-func (mj *MultiJob) GetJobFunc() (JobCallback, error) {
-	return nil, errors.New("GetJobFunc is not implemented for MultiJob")
 }
 
 // JobWatchers returns the list of job watchers.

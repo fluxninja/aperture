@@ -47,12 +47,27 @@ type registry struct {
 	status   *statusv1.Status
 	root     *registry
 	parent   *registry
-	children map[string]*registry
+	children map[kv]*registry
 	logger   *log.Logger
 	key      string
 	value    string
 	uri      string
 	alerter  alerts.Alerter
+}
+
+// helper struct for key-value keys in children map
+type kv struct {
+	Key   string
+	Value string
+}
+
+func toString(p kv) string {
+	return fmt.Sprintf("%s:%s", p.Key, p.Value)
+}
+
+func fromString(hash string) kv {
+	split := strings.Split(hash, ":")
+	return kv{Key: split[0], Value: split[1]}
 }
 
 // NewRegistry creates a new Registry.
@@ -64,7 +79,7 @@ func NewRegistry(logger *log.Logger, alerter alerts.Alerter) Registry {
 		uri:      "",
 		parent:   nil,
 		status:   &statusv1.Status{},
-		children: make(map[string]*registry),
+		children: make(map[kv]*registry),
 		logger:   logger,
 		alerter:  labeledAlerter,
 	}
@@ -77,10 +92,10 @@ func (r *registry) Child(key, value string) Registry {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	hash := fmt.Sprintf("%s:%s", key, value)
+	childKV := kv{Key: key, Value: value}
 	uri := fmt.Sprintf("%s/%s/%s", r.uri, key, value)
 	labeledAlerter := r.alerter.WithLabels(map[string]string{uriKey: uri, key: value})
-	child, ok := r.children[hash]
+	child, ok := r.children[childKV]
 	if !ok {
 		child = &registry{
 			key:      key,
@@ -89,11 +104,11 @@ func (r *registry) Child(key, value string) Registry {
 			parent:   r,
 			root:     r.root,
 			status:   &statusv1.Status{},
-			children: make(map[string]*registry),
+			children: make(map[kv]*registry),
 			logger:   r.logger.WithStr(r.key, key),
 			alerter:  labeledAlerter,
 		}
-		r.children[hash] = child
+		r.children[childKV] = child
 	}
 	return child
 }
@@ -102,8 +117,8 @@ func (r *registry) Child(key, value string) Registry {
 func (r *registry) ChildIfExists(key, value string) Registry {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	hash := fmt.Sprintf("%s:%s", key, value)
-	child, ok := r.children[hash]
+	childKV := kv{Key: key, Value: value}
+	child, ok := r.children[childKV]
 	if !ok {
 		return nil
 	}
@@ -138,9 +153,9 @@ func (r *registry) Detach() {
 	// We don't have Attach() so parent can't change to other than nil.
 	if r.parent != nil {
 		// remove child from parent
-		hash := fmt.Sprintf("%s:%s", r.key, r.value)
-		if r.parent.children[hash] == r {
-			delete(r.parent.children, hash)
+		childKV := kv{Key: r.key, Value: r.value}
+		if r.parent.children[childKV] == r {
+			delete(r.parent.children, childKV)
 		}
 		// set parent to nil
 		r.parent = nil
@@ -192,8 +207,8 @@ func (r *registry) SetGroupStatus(groupStatus *statusv1.GroupStatus) {
 	defer r.mu.Unlock()
 	r.status = groupStatus.Status
 	for hash, gs := range groupStatus.Groups {
-		splitHash := strings.Split(hash, ":")
-		r.Child(splitHash[0], splitHash[1]).SetGroupStatus(gs)
+		kv := fromString(hash)
+		r.Child(kv.Key, kv.Value).SetGroupStatus(gs)
 	}
 }
 
@@ -207,8 +222,8 @@ func (r *registry) GetGroupStatus() *statusv1.GroupStatus {
 		Groups: make(map[string]*statusv1.GroupStatus),
 	}
 
-	for hash, child := range r.children {
-		groupStatus.Groups[hash] = child.GetGroupStatus()
+	for kv, child := range r.children {
+		groupStatus.Groups[toString(kv)] = child.GetGroupStatus()
 	}
 	return groupStatus
 }
