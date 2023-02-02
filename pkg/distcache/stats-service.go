@@ -48,23 +48,25 @@ func (svc *DistCacheService) GetStats(ctx context.Context, _ *emptypb.Empty) (*s
 		log.Error().Err(err).Msgf("Failed to unmarshal Olric statistics")
 		return nil, err
 	}
+
+	partitions := map[string]interface{}{}
+
+	// get partition stats
+	structpbStatsMap := structpbStats.AsMap()
+	partitionsFromStructpbStats := structpbStatsMap["partitions"].(map[string]interface{})
+	for partitionKey, partitionStats := range partitionsFromStructpbStats {
+		partitionStatsMap := partitionStats.(map[string]interface{})
+		if partitionStatsMap["length"].(float64) != 0 {
+			partitions[partitionKey] = partitionStats
+		}
+	}
+
+	structpbStatsMap["partitions"] = partitions
+	structpbStats, err = structpb.NewStruct(structpbStatsMap)
+	if err != nil {
+		log.Error().Err(err).Msgf("Failed to create new structpb")
+		return nil, err
+	}
+
 	return structpbStats, nil
-
-	// newStats := &distcachev1.Stats{}
-	// err = json.Unmarshal(rawStats, newStats)
-	// if err != nil {
-	// 	log.Error().Err(err).Msgf("Failed to unmarshal Olric statistics")
-	// 	return nil, err
-	// }
-
-	// // Removing empty partitions to reduce the response size
-	// partitions := make(map[uint64]*distcachev1.Partition)
-	// for key, partition := range newStats.Partitions {
-	// 	if partition.Length != 0 {
-	// 		partitions[key] = partition
-	// 	}
-	// }
-
-	// newStats.Partitions = partitions
-	// return newStats, nil
 }
