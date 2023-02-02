@@ -13,7 +13,6 @@ import (
 	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/goccy/go-graphviz"
 	"github.com/google/go-jsonnet"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slices"
@@ -270,7 +269,7 @@ func generateGraphs(content []byte, contentPath string) error {
 
 	fileName := strings.TrimSuffix(filepath.Base(contentPath), filepath.Ext(contentPath))
 	dotFilePath := filepath.Join(graphDir, fmt.Sprintf("%s.dot", fileName))
-	svgFilePath := filepath.Join(graphDir, fmt.Sprintf("%s.svg", fileName))
+	mmdFilePath := filepath.Join(graphDir, fmt.Sprintf("%s.mmd", fileName))
 
 	policyFile, err := utils.FetchPolicyFromCR(contentPath)
 	if err != nil {
@@ -287,18 +286,7 @@ func generateGraphs(content []byte, contentPath string) error {
 		return err
 	}
 
-	graphBytes, err := os.ReadFile(dotFilePath)
-	if err != nil {
-		return err
-	}
-
-	g := graphviz.New()
-	graph, err := graphviz.ParseBytes(graphBytes)
-	if err != nil {
-		return err
-	}
-
-	if err := g.RenderFilename(graph, graphviz.SVG, svgFilePath); err != nil {
+	if err = utils.GenerateMermaidFile(circuit, mmdFilePath); err != nil {
 		return err
 	}
 
