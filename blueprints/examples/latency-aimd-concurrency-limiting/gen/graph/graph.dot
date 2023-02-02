@@ -12,32 +12,32 @@ digraph  {
 	}
 	subgraph cluster_s3 {
 		label="ArithmeticCombinator[root.1]";margin="50.0";
-		n5[label="2.00"];
-		n6[label="lhs"];
+		n6[label="2.00"];
+		n4[label="lhs"];
 		n7[label="output"];
-		n4[label="rhs"];
-		n5->n4;
-		n6->n7[style="invis"];
-		{rank=same; n4;n6;};
+		n5[label="rhs"];
+		n6->n5;
+		n5->n7[style="invis"];
 		{rank=same; n7;};
+		{rank=same; n4;n5;};
 		
 	}
 	subgraph cluster_s8 {
 		label="ArithmeticCombinator[root.2]";margin="50.0";
-		n10[label="1.10"];
-		n11[label="lhs"];
+		n11[label="1.10"];
+		n9[label="lhs"];
 		n12[label="output"];
-		n9[label="rhs"];
-		n10->n9;
-		n11->n12[style="invis"];
-		{rank=same; n9;n11;};
+		n10[label="rhs"];
+		n11->n10;
+		n10->n12[style="invis"];
+		{rank=same; n9;n10;};
 		{rank=same; n12;};
 		
 	}
 	subgraph cluster_s13 {
 		label="EMA[root.3]";margin="50.0";
-		n15[label="input"];
-		n14[label="max_envelope"];
+		n14[label="input"];
+		n15[label="max_envelope"];
 		n16[label="output"];
 		n15->n16[style="invis"];
 		{rank=same; n14;n15;};
@@ -51,11 +51,11 @@ digraph  {
 		
 	}
 	rankdir="LR";splines="ortho";
-	n2->n6[label="LATENCY"];
-	n2->n15[label="LATENCY"];
+	n16->n9[label="LATENCY_EMA"];
+	n2->n4[label="LATENCY"];
+	n2->n14[label="LATENCY"];
 	n2->n19[label="LATENCY"];
-	n7->n14[label="MAX_EMA"];
+	n7->n15[label="MAX_EMA"];
 	n12->n18[label="LATENCY_SETPOINT"];
-	n16->n11[label="LATENCY_EMA"];
 	
 }
