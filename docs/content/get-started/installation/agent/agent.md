@@ -24,7 +24,7 @@ One Agent is deployed per node.
 ## Configuration
 
 All the configuration parameters for Aperture Agent are listed
-[here](/references/configuration/agent.md).
+[here](/reference/configuration/agent.md).
 
 ## Installation Modes {#agent-installation-modes}
 

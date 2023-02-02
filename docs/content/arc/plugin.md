@@ -67,8 +67,8 @@ of the organization on FluxNinja ARC and API Key generated on it.
 
 Configuration parameters for the FluxNinja ARC Plugin are available below:
 
-- [Aperture Controller](/references/configuration/controller.md/#flux-ninja-plugin)
-- [Aperture Agent](/references/configuration/agent.md#flux-ninja-plugin)
+- [Aperture Controller](/reference/configuration/controller.md/#flux-ninja-plugin)
+- [Aperture Agent](/reference/configuration/agent.md#flux-ninja-plugin)
 
 ## See also
 

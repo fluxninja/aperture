@@ -1,8 +1,8 @@
 # Signals Dashboard
 
-This blueprint provides a
-[policy monitoring](/references/policies/monitoring.md) dashboard that
-visualizes Signals flowing through the [Circuit](/concepts/policy/circuit.md).
+This blueprint provides a [policy monitoring](/reference/policies/monitoring.md)
+dashboard that visualizes Signals flowing through the
+[Circuit](/concepts/policy/circuit.md).
 
 ## Configuration
 

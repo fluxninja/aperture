@@ -1,8 +1,8 @@
-label: References
+label: Reference
 position: 5
 collapsible: true
 collapsed: true
 link:
   type: "generated-index"
-  title: "References"
+  title: "Reference"
   keywords: ["references"]
