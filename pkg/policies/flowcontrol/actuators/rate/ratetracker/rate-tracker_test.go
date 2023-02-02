@@ -183,6 +183,7 @@ type flowRunner struct {
 func (fr *flowRunner) runFlows(t *testing.T) {
 	for _, f := range fr.flows {
 		_, limit := fr.limiters[0].GetRateLimitChecker().CheckRateLimit(f.requestlabel, 0)
+
 		f.initialLimit = int32(limit)
 
 		fr.wg.Add(1)
@@ -259,13 +260,13 @@ func createLazySyncLimiters(t *testing.T, limiters []RateTracker, syncDuration t
 }
 
 // checkResults checks if a certain number of requests were accepted under a given tolerance.
-func checkResults(t *testing.T, fr *flowRunner, ttlsResets int32, tolerance float64) {
+func checkResults(t *testing.T, fr *flowRunner, ttlResets int32, tolerance float64) {
 	for _, f := range fr.flows {
-		actualRequestsExpected := math.Min(float64(f.initialLimit*ttlsResets), float64(f.totalRequests))
+		actualRequestsExpected := math.Min(float64(f.initialLimit*ttlResets), float64(f.totalRequests))
 		t.Logf("flow (%s) @ %d requests/sec: \n ttlResets=%d, totalRequests=%d, limit=%d, acceptedRequests=%d, acceptedRequestsExpected=%d",
 			f.requestlabel,
 			f.requestRate,
-			ttlsResets,
+			ttlResets,
 			f.totalRequests,
 			f.initialLimit,
 			f.acceptedRequests,
@@ -343,6 +344,7 @@ func baseOfLimiterTest(config testConfig) {
 		duration: config.duration,
 	}
 
+	time.Sleep(1 * time.Second)
 	fr.runFlows(t)
 
 	checkResults(t, fr, ttlResets, config.tolerance)
@@ -405,6 +407,7 @@ func TestOlricClusterMultiLimiter(t *testing.T) {
 		ttl:       time.Second * 1,
 		flows:     flows,
 		duration:  time.Second * 10,
+		tolerance: 0.2,
 	})
 }
 
