@@ -169,14 +169,13 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	flowlabel.Merge(mergedFlowLabels, newFlowLabels)
 	flowLabels := mergedFlowLabels.ToPlainMap()
 
-	// add control point type
-	flowLabels[otelconsts.ApertureControlPointTypeLabel] = otelconsts.HTTPControlPoint
-
 	// Ask flow control service for Ok/Deny
 	checkResponse := h.fcHandler.CheckWithValues(ctx, svcs, ctrlPt, flowLabels)
 	checkResponse.ClassifierInfos = classifierMsgs
 	// Set telemetry_flow_labels in the CheckResponse
 	checkResponse.TelemetryFlowLabels = flowLabels
+	// add control point type
+	checkResponse.TelemetryFlowLabels[otelconsts.ApertureControlPointTypeLabel] = otelconsts.HTTPControlPoint
 
 	resp := createExtAuthzResponse(checkResponse)
 

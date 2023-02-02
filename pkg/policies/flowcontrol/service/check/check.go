@@ -63,12 +63,11 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	// record the start time of the request
 	start := time.Now()
 
-	// add control point type
+	// handle empty labels
 	labels := req.Labels
 	if labels == nil {
 		labels = make(map[string]string)
 	}
-	labels[otelconsts.ApertureControlPointTypeLabel] = otelconsts.FeatureControlPoint
 
 	// CheckWithValues already pushes result to metrics
 	resp := h.CheckWithValues(
@@ -81,5 +80,7 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	resp.Start = timestamppb.New(start)
 	resp.End = timestamppb.New(end)
 	resp.TelemetryFlowLabels = labels
+	// add control point type
+	resp.TelemetryFlowLabels[otelconsts.ApertureControlPointTypeLabel] = otelconsts.FeatureControlPoint
 	return resp, nil
 }
