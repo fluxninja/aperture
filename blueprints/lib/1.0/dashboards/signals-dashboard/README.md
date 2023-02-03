@@ -8,44 +8,88 @@ dashboard that visualizes Signals flowing through the
 
 <!-- Configuration Marker -->
 
-### Common
+<!-- prettier-ignore -->
+export const ParameterHeading = ({children}) => (
+  <span style={{fontWeight: "bold"}}>{children}</span>
+);
 
-**`common.policy_name`** (type: _`string`_)
+<!-- prettier-ignore -->
+export const WrappedDescription = ({children}) => (
+  <span style={{wordWrap: "normal"}}>{children}</span>
+);
 
-required parameter
+<!-- prettier-ignore -->
+export const RefType = ({type, reference}) => (
+  <a href={reference}>{type}</a>
+);
 
-Name of the policy.
+<!-- prettier-ignore -->
+export const ParameterDescription = ({name, type, reference, value, description}) => (
 
-### Dashboard
+  <table class="blueprints-params">
+  <tr>
+    <td><ParameterHeading>Parameter</ParameterHeading></td>
+    <td><code>{name}</code></td>
+  </tr>
+  <tr>
+    <td><ParameterHeading>Type</ParameterHeading></td>
+    <td><em>{reference == "" ? type : <RefType type={type} reference={reference} />}</em></td>
+  </tr>
+  <tr>
+    <td class="blueprints-default-heading"><ParameterHeading>Default Value</ParameterHeading></td>
+    <td><code>{value != '' ? value : "REQUIRED VALUE"}</code></td>
+  </tr>
+  <tr>
+    <td class="blueprints-description"><ParameterHeading>Description</ParameterHeading></td>
+    <td class="blueprints-description"><WrappedDescription>{description}</WrappedDescription></td>
+  </tr>
+</table>
+);
 
-**`dashboard.refresh_interval`** (type: _`string`_)
+<h3 class="blueprints-h3">Common</h3>
 
-default: `"10s"`
+<ParameterDescription
+    name="common.policy_name"
+    type="string"
+    reference=""
+    value=''
+    description='Name of the policy.' />
 
-Refresh interval for dashboard panels.
+<h3 class="blueprints-h3">Dashboard</h3>
 
-**`dashboard.time_from`** (type: _`string`_)
+<ParameterDescription
+    name="dashboard.refresh_interval"
+    type="string"
+    reference=""
+    value=''
+    description='Refresh interval for dashboard panels.' />
 
-default: `"now-30m"`
+<ParameterDescription
+    name="dashboard.time_from"
+    type="string"
+    reference=""
+    value=''
+    description='From time of dashboard.' />
 
-From time of dashboard.
+<ParameterDescription
+    name="dashboard.time_to"
+    type="string"
+    reference=""
+    value=''
+    description='To time of dashboard.' />
 
-**`dashboard.time_to`** (type: _`string`_)
+<h4 class="blueprints-h4">Datasource</h4>
 
-default: `"now"`
+<ParameterDescription
+    name="dashboard.datasource.name"
+    type="string"
+    reference=""
+    value=''
+    description='Datasource name.' />
 
-To time of dashboard.
-
-#### Datasource
-
-**`dashboard.datasource.name`** (type: _`string`_)
-
-default: `"$datasource"`
-
-Datasource name.
-
-**`dashboard.datasource.filter_regex`** (type: _`string`_)
-
-default: `""`
-
-Datasource filter regex.
+<ParameterDescription
+    name="dashboard.datasource.filter_regex"
+    type="string"
+    reference=""
+    value=''
+    description='Datasource filter regex.' />

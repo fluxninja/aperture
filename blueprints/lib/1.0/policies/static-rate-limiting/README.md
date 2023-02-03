@@ -6,20 +6,24 @@ This blueprint provides a simple static rate limiting policy and a dashboard.
 
 <!-- Configuration Marker -->
 
-
+<!-- prettier-ignore -->
 export const ParameterHeading = ({children}) => (
   <span style={{fontWeight: "bold"}}>{children}</span>
 );
 
+<!-- prettier-ignore -->
 export const WrappedDescription = ({children}) => (
   <span style={{wordWrap: "normal"}}>{children}</span>
 );
 
+<!-- prettier-ignore -->
 export const RefType = ({type, reference}) => (
   <a href={reference}>{type}</a>
 );
 
+<!-- prettier-ignore -->
 export const ParameterDescription = ({name, type, reference, value, description}) => (
+
   <table class="blueprints-params">
   <tr>
     <td><ParameterHeading>Parameter</ParameterHeading></td>
@@ -39,9 +43,6 @@ export const ParameterDescription = ({name, type, reference, value, description}
   </tr>
 </table>
 );
-
-
-
 
 <h3 class="blueprints-h3">Common</h3>
 

@@ -19,83 +19,127 @@ This blueprint provides a simple static rate limiting policy and a dashboard.
 
 <!-- Configuration Marker -->
 
-### Common
+<!-- prettier-ignore -->
+export const ParameterHeading = ({children}) => (
+  <span style={{fontWeight: "bold"}}>{children}</span>
+);
 
-**`common.policy_name`** (type: _`string`_)
+<!-- prettier-ignore -->
+export const WrappedDescription = ({children}) => (
+  <span style={{wordWrap: "normal"}}>{children}</span>
+);
 
-required parameter
+<!-- prettier-ignore -->
+export const RefType = ({type, reference}) => (
+  <a href={reference}>{type}</a>
+);
 
-Name of the policy.
+<!-- prettier-ignore -->
+export const ParameterDescription = ({name, type, reference, value, description}) => (
 
-### Policy
+  <table class="blueprints-params">
+  <tr>
+    <td><ParameterHeading>Parameter</ParameterHeading></td>
+    <td><code>{name}</code></td>
+  </tr>
+  <tr>
+    <td><ParameterHeading>Type</ParameterHeading></td>
+    <td><em>{reference == "" ? type : <RefType type={type} reference={reference} />}</em></td>
+  </tr>
+  <tr>
+    <td class="blueprints-default-heading"><ParameterHeading>Default Value</ParameterHeading></td>
+    <td><code>{value != '' ? value : "REQUIRED VALUE"}</code></td>
+  </tr>
+  <tr>
+    <td class="blueprints-description"><ParameterHeading>Description</ParameterHeading></td>
+    <td class="blueprints-description"><WrappedDescription>{description}</WrappedDescription></td>
+  </tr>
+</table>
+);
 
-**`policy.evaluation_interval`** (type: _`string`_)
+<h3 class="blueprints-h3">Common</h3>
 
-default: `"300s"`
+<ParameterDescription
+    name="common.policy_name"
+    type="string"
+    reference=""
+    value=''
+    description='Name of the policy.' />
 
-How often should the policy be re-evaluated
+<h3 class="blueprints-h3">Policy</h3>
 
-**`policy.classifiers`** (type: _`[]aperture.spec.v1.Classifier`_)
+<ParameterDescription
+    name="policy.evaluation_interval"
+    type="string"
+    reference=""
+    value=''
+    description='How often should the policy be re-evaluated' />
 
-default: `[]`
+<ParameterDescription
+    name="policy.classifiers"
+    type="[]aperture.spec.v1.Classifier"
+    reference="../../configuration/policy#v1-classifier"
+    value=''
+    description='List of classification rules.' />
 
-List of classification rules.
+<h4 class="blueprints-h4">Rate Limiter</h4>
 
-#### Rate Limiter
+<ParameterDescription
+    name="policy.rate_limiter.rate_limit"
+    type="float64"
+    reference=""
+    value=''
+    description='Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept' />
 
-**`policy.rate_limiter.rate_limit`** (type: _`float64`_)
+<ParameterDescription
+    name="policy.rate_limiter.flow_selector"
+    type="aperture.spec.v1.FlowSelector"
+    reference="../../configuration/policy#v1-flow-selector"
+    value=''
+    description='A flow selector to match requests against' />
 
-required parameter
+<ParameterDescription
+    name="policy.rate_limiter.parameters"
+    type="aperture.spec.v1.RateLimiterParameters"
+    reference="../../configuration/policy#v1-rate-limiter-parameters"
+    value=''
+    description='Parameters.' />
 
-Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to
-accept
+<ParameterDescription
+    name="policy.rate_limiter.parameters.label_key"
+    type="string"
+    reference=""
+    value=''
+    description='Flow label to use for rate limiting.' />
 
-**`policy.rate_limiter.flow_selector`** (type:
-_`aperture.spec.v1.FlowSelector`_)
+<ParameterDescription
+    name="policy.rate_limiter.dynamic_config"
+    type="aperture.spec.v1.RateLimiterDefaultConfig"
+    reference="../../configuration/policy#v1-rate-limiter-default-config"
+    value=''
+    description='Dynamic configuration for rate limiter that can be applied at the runtime.' />
 
-required parameter
+<h3 class="blueprints-h3">Dashboard</h3>
 
-A flow selector to match requests against
+<ParameterDescription
+    name="dashboard.refresh_interval"
+    type="string"
+    reference=""
+    value=''
+    description='Refresh interval for dashboard panels.' />
 
-**`policy.rate_limiter.parameters`** (type:
-_`aperture.spec.v1.RateLimiterParameters`_)
+<h4 class="blueprints-h4">Datasource</h4>
 
-default:
-`{'label_key': 'FAKE-VALUE', 'lazy_sync': {'enabled': True, 'num_sync': 5}, 'limit_reset_interval': '1s'}`
+<ParameterDescription
+    name="dashboard.datasource.name"
+    type="string"
+    reference=""
+    value=''
+    description='Datasource name.' />
 
-Parameters.
-
-**`policy.rate_limiter.parameters.label_key`** (type: _`string`_)
-
-required parameter
-
-Flow label to use for rate limiting.
-
-**`policy.rate_limiter.dynamic_config`** (type:
-_`aperture.spec.v1.RateLimiterDefaultConfig`_)
-
-default: `{'overrides': []}`
-
-Dynamic configuration for rate limiter that can be applied at the runtime.
-
-### Dashboard
-
-**`dashboard.refresh_interval`** (type: _`string`_)
-
-default: `"10s"`
-
-Refresh interval for dashboard panels.
-
-#### Datasource
-
-**`dashboard.datasource.name`** (type: _`string`_)
-
-default: `"$datasource"`
-
-Datasource name.
-
-**`dashboard.datasource.filter_regex`** (type: _`string`_)
-
-default: `""`
-
-Datasource filter regex.
+<ParameterDescription
+    name="dashboard.datasource.filter_regex"
+    type="string"
+    reference=""
+    value=''
+    description='Datasource filter regex.' />

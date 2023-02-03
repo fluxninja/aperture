@@ -298,18 +298,22 @@ def update_docblock_param_names(blocks: List[DocBlock], prefix: str):
 
 
 MDX_TEMPLATE = """
+<!-- prettier-ignore -->
 export const ParameterHeading = ({children}) => (
   <span style={{fontWeight: "bold"}}>{children}</span>
 );
 
+<!-- prettier-ignore -->
 export const WrappedDescription = ({children}) => (
   <span style={{wordWrap: "normal"}}>{children}</span>
 );
 
+<!-- prettier-ignore -->
 export const RefType = ({type, reference}) => (
   <a href={reference}>{type}</a>
 );
 
+<!-- prettier-ignore -->
 export const ParameterDescription = ({name, type, reference, value, description}) => (
   <table class="blueprints-params">
   <tr>
