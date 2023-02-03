@@ -30,11 +30,12 @@ export const ParameterDescription = ({name, type, reference, value, description}
     <td><em>{reference == "" ? type : <RefType type={type} reference={reference} />}</em></td>
   </tr>
   <tr>
-    <td><ParameterHeading>Default Value</ParameterHeading></td>
+    <td class="blueprints-default-heading"><ParameterHeading>Default Value</ParameterHeading></td>
     <td><code>{value != '' ? value : "REQUIRED VALUE"}</code></td>
   </tr>
   <tr>
-    <td colspan="2" class="blueprints-description"><WrappedDescription>{description}</WrappedDescription></td>
+    <td class="blueprints-description"><ParameterHeading>Description</ParameterHeading></td>
+    <td class="blueprints-description"><WrappedDescription>{description}</WrappedDescription></td>
   </tr>
 </table>
 );
