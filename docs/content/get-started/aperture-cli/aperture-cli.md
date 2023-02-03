@@ -58,7 +58,7 @@ With rpm:
 ## Enable shell autocompletion
 
 To configure your shell to load `aperturectl`
-[bash completions](/get-started/aperture-cli/aperturectl_completion.md) add to
+[bash completions](/reference/aperture-cli/aperturectl_completion.md) add to
 your profile:
 
 <Tabs>
@@ -112,4 +112,4 @@ sudo rpm -e aperturectl
 
 ---
 
-### [aperturectl](/get-started/aperture-cli/aperturectl.md)
+### [aperturectl](/reference/aperture-cli/aperturectl.md)
