@@ -2,19 +2,16 @@
 title: Latency AIMD Concurrency Limiting Policy
 ---
 
-
 ```mdx-code-block
 import {apertureVersion} from '../../../../apertureVersion.js';
 ```
+
 ## Blueprint Location
 
-
-GitHub: <a href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/lib/1.0/policies/latency-aimd-concurrency-limiting`}>latency-aimd-concurrency-limiting</a>
-
+GitHub: <a
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/lib/1.0/policies/latency-aimd-concurrency-limiting`}>latency-aimd-concurrency-limiting</a>
 
 ## Introduction
-
-
 
 This policy detect overloads/cascading failures by comparing the real-time
 latency with it's exponential moving average. Gradient controller is then used
@@ -35,7 +32,7 @@ to see this blueprint in use.
 
 <!-- Configuration Marker -->
 
-
+```mdx-code-block
 export const ParameterHeading = ({children}) => (
   <span style={{fontWeight: "bold"}}>{children}</span>
 );
@@ -48,8 +45,7 @@ export const RefType = ({type, reference}) => (
   <a href={reference}>{type}</a>
 );
 
-export const ParameterDescription = ({name, type, reference,
-  value, description}) => (
+export const ParameterDescription = ({name, type, reference, value, description}) => (
   <table class="blueprints-params">
   <tr>
     <td><ParameterHeading>Parameter</ParameterHeading></td>
@@ -69,9 +65,7 @@ export const ParameterDescription = ({name, type, reference,
   </tr>
 </table>
 );
-
-
-
+```
 
 <h3 class="blueprints-h3">Common</h3>
 

@@ -298,6 +298,7 @@ def update_docblock_param_names(blocks: List[DocBlock], prefix: str):
 
 
 MDX_TEMPLATE = """
+```mdx-code-block
 export const ParameterHeading = ({children}) => (
   <span style={{fontWeight: "bold"}}>{children}</span>
 );
@@ -310,8 +311,7 @@ export const RefType = ({type, reference}) => (
   <a href={reference}>{type}</a>
 );
 
-export const ParameterDescription = ({name, type, reference,
-  value, description}) => (
+export const ParameterDescription = ({name, type, reference, value, description}) => (
   <table class="blueprints-params">
   <tr>
     <td><ParameterHeading>Parameter</ParameterHeading></td>
@@ -331,6 +331,7 @@ export const ParameterDescription = ({name, type, reference,
   </tr>
 </table>
 );
+```
 """
 
 

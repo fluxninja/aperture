@@ -2,19 +2,16 @@
 title: Static Rate Limiting Policy
 ---
 
-
 ```mdx-code-block
 import {apertureVersion} from '../../../../apertureVersion.js';
 ```
+
 ## Blueprint Location
 
-
-GitHub: <a href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/lib/1.0/policies/static-rate-limiting`}>static-rate-limiting</a>
-
+GitHub: <a
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/lib/1.0/policies/static-rate-limiting`}>static-rate-limiting</a>
 
 ## Introduction
-
-
 
 This blueprint provides a simple static rate limiting policy and a dashboard.
 
@@ -22,7 +19,7 @@ This blueprint provides a simple static rate limiting policy and a dashboard.
 
 <!-- Configuration Marker -->
 
-
+```mdx-code-block
 export const ParameterHeading = ({children}) => (
   <span style={{fontWeight: "bold"}}>{children}</span>
 );
@@ -35,8 +32,7 @@ export const RefType = ({type, reference}) => (
   <a href={reference}>{type}</a>
 );
 
-export const ParameterDescription = ({name, type, reference,
-  value, description}) => (
+export const ParameterDescription = ({name, type, reference, value, description}) => (
   <table class="blueprints-params">
   <tr>
     <td><ParameterHeading>Parameter</ParameterHeading></td>
@@ -56,9 +52,7 @@ export const ParameterDescription = ({name, type, reference,
   </tr>
 </table>
 );
-
-
-
+```
 
 <h3 class="blueprints-h3">Common</h3>
 
