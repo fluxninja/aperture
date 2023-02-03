@@ -25,7 +25,7 @@ func main() {
 	}
 
 	position = getTotalCommandsCount(cmd.RootCmd) + 2
-	err = doc.GenMarkdownTreeCustom(cmd.RootCmd, filepath.Join(root.Path, "docs/content/get-started/aperture-cli"), filePrepender, linkHandler)
+	err = doc.GenMarkdownTreeCustom(cmd.RootCmd, filepath.Join(root.Path, "docs/content/reference/aperture-cli"), filePrepender, linkHandler)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Err: %s\n", err)
 		os.Exit(1)
