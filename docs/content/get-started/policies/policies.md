@@ -171,4 +171,3 @@ kubectl delete policies.fluxninja.com static-rate-limiting -n aperture-controlle
 [agent-metrics]: /reference/observability/prometheus-metrics/agent.md
 [blueprints]: /reference/policies/bundled-blueprints/bundled-blueprints.md
 [policies]: /concepts/policy/policy.md
-[service]: /concepts/integrations/flow-control/service.md
