@@ -33,6 +33,7 @@ class ExitException(RuntimeError):
 class DocBlockParam:
     param_name: str
     param_type: str
+    param_link: str
     description: str
     required: bool
     default: Optional[Any] = None
@@ -50,6 +51,25 @@ class DocBlock:
     subsection: Optional[str]
     description: Optional[str]
     parameters: Dict[str, DocBlockParam]
+
+    @classmethod
+    def _resolve_param_to_policy_ref(cls, param: str) -> str:
+        if not param.startswith("aperture.spec") and not param.startswith("[]aperture.spec"):
+            return ""
+
+        component = param.split(".")[-1]
+
+        # Transform CamelCase into camel-case
+        parts = [[component[0].lower()]]
+        for letter in component[1:]:
+            if letter.isupper():
+                parts.append(list(letter.lower()))
+            else:
+                parts[-1].append(letter)
+
+        component_final = "v1-" + "-".join(["".join(l) for l in parts])
+
+        return f"../../spec#{component_final}"
 
     @classmethod
     def from_comment(cls, comment: List[str]) -> DocBlock:
@@ -78,9 +98,10 @@ class DocBlock:
 
                 groups = inner.groupdict()
                 param_name, param_type = groups["param_name"], groups["param_type"]
+                param_link = cls._resolve_param_to_policy_ref(param_type)
                 param_required = groups.get("param_required", "") == "required"
                 param_description = groups["param_description"]
-                parameters[param_name] = (DocBlockParam(param_name, param_type, param_description, param_required))
+                parameters[param_name] = (DocBlockParam(param_name, param_type, param_link, param_description, param_required))
             else:
                 stripped = line.lstrip(" ")
                 stripped = stripped.removeprefix("* ")
@@ -207,26 +228,32 @@ def update_docblock_sections(blocks: List[DocBlock], section: str):
         block.section = section
 
 
-SECTION_TPL = """{% for section, blocks in sections.items() %}
+SECTION_TPL = """
+{% for section, blocks in sections.items() %}
 
-### {{ section }}
+<h3 class="blueprints-h3">{{ section }}</h3>
   {%- for block in blocks %}
 
 {%- if block.subsection %}
 
-#### {{ block.subsection }}
+<h4 class="blueprints-h4">{{ block.subsection }}</h4>
 {%- endif %}
 {%- if block.description %}
 
 {{ block.description }}
 {%- endif %}
 
-| Parameter Name | Parameter Type | Default | Description |
-| -------------- | -------------- | ------- | ----------- |
-    {%- for param in block.parameters.values() %}
-| `{{ param.param_name }}` | `{{ param.param_type }}` | `{% if param.default is not none %}{{ param.default | quoteValue }}{% else %}(required){% endif %}` | {{ param.description }} |
-    {%- endfor %}
-  {%- endfor %}
+{%- for param in block.parameters.values() %}
+
+<ParameterDescription
+    name="{{ param.param_name }}"
+    type="{{ param.param_type }}"
+    reference="{{ param.param_link }}"
+    value='{% if param.value %}{{ param.default | quoteValue }}{% endif %}'
+    description='{{ param.description }}' />
+
+{%- endfor %}
+{%- endfor %}
 
 {%- endfor %}
 """
@@ -270,6 +297,44 @@ def update_docblock_param_names(blocks: List[DocBlock], prefix: str):
             param.param_name = f"{prefix}.{param.param_name}"
 
 
+MDX_TEMPLATE = """
+```mdx-code-block
+export const ParameterHeading = ({children}) => (
+  <span style={{fontWeight: "bold"}}>{children}</span>
+);
+
+export const WrappedDescription = ({children}) => (
+  <span style={{wordWrap: "normal"}}>{children}</span>
+);
+
+export const RefType = ({type, reference}) => (
+  <a href={reference}>{type}</a>
+);
+
+export const ParameterDescription = ({name, type, reference, value, description}) => (
+  <table class="blueprints-params">
+  <tr>
+    <td><ParameterHeading>Parameter</ParameterHeading></td>
+    <td><code>{name}</code></td>
+  </tr>
+  <tr>
+    <td><ParameterHeading>Type</ParameterHeading></td>
+    <td><em>{reference == "" ? type : <RefType type={type} reference={reference} />}</em></td>
+  </tr>
+  <tr>
+    <td class="blueprints-default-heading"><ParameterHeading>Default Value</ParameterHeading></td>
+    <td><code>{value != '' ? value : "REQUIRED VALUE"}</code></td>
+  </tr>
+  <tr>
+    <td class="blueprints-description"><ParameterHeading>Description</ParameterHeading></td>
+    <td class="blueprints-description"><WrappedDescription>{description}</WrappedDescription></td>
+  </tr>
+</table>
+);
+```
+"""
+
+
 def update_readme_markdown(readme_path, blocks: List[DocBlock]):
     """Find configuration marker in README.md and append all blocks after it"""
 
@@ -280,6 +345,8 @@ def update_readme_markdown(readme_path, blocks: List[DocBlock]):
             readme_copied += line + "\n"
             break
         readme_copied += line + "\n"
+
+    readme_copied += f"\n{MDX_TEMPLATE}\n"
 
     sections = {}
     for block in blocks:

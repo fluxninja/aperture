@@ -1,0 +1,532 @@
+---
+id: dist-cache-service-get-stats
+title: DistCacheService_GetStats
+description: "DistCacheService_GetStats"
+sidebar_label: /v1/distcache/stats
+hide_title: true
+hide_table_of_contents: true
+api:
+  {
+    "tags": ["aperture-agent"],
+    "operationId": "DistCacheService_GetStats",
+    "responses":
+      {
+        "200":
+          {
+            "description": "A successful response.",
+            "content":
+              {
+                "application/json":
+                  {
+                    "schema":
+                      {
+                        "type": "object",
+                        "properties":
+                          {
+                            "backups":
+                              {
+                                "type": "object",
+                                "additionalProperties":
+                                  {
+                                    "type": "object",
+                                    "properties":
+                                      {
+                                        "backups":
+                                          {
+                                            "type": "array",
+                                            "items":
+                                              {
+                                                "type": "object",
+                                                "properties":
+                                                  {
+                                                    "birthdate":
+                                                      {
+                                                        "type": "string",
+                                                        "format": "int64",
+                                                      },
+                                                    "id":
+                                                      {
+                                                        "type": "string",
+                                                        "format": "uint64",
+                                                      },
+                                                    "name":
+                                                      { "type": "string" },
+                                                  },
+                                              },
+                                          },
+                                        "d_maps":
+                                          {
+                                            "type": "object",
+                                            "additionalProperties":
+                                              {
+                                                "type": "object",
+                                                "properties":
+                                                  {
+                                                    "length":
+                                                      {
+                                                        "type": "string",
+                                                        "format": "int64",
+                                                      },
+                                                    "num_tables":
+                                                      {
+                                                        "type": "string",
+                                                        "format": "int64",
+                                                      },
+                                                    "slab_info":
+                                                      {
+                                                        "type": "object",
+                                                        "properties":
+                                                          {
+                                                            "allocated":
+                                                              {
+                                                                "type": "string",
+                                                                "format": "int64",
+                                                              },
+                                                            "garbage":
+                                                              {
+                                                                "type": "string",
+                                                                "format": "int64",
+                                                              },
+                                                            "inuse":
+                                                              {
+                                                                "type": "string",
+                                                                "format": "int64",
+                                                              },
+                                                          },
+                                                      },
+                                                  },
+                                              },
+                                          },
+                                        "length":
+                                          {
+                                            "type": "string",
+                                            "format": "int64",
+                                          },
+                                        "previous_owners":
+                                          {
+                                            "type": "array",
+                                            "items":
+                                              {
+                                                "type": "object",
+                                                "properties":
+                                                  {
+                                                    "birthdate":
+                                                      {
+                                                        "type": "string",
+                                                        "format": "int64",
+                                                      },
+                                                    "id":
+                                                      {
+                                                        "type": "string",
+                                                        "format": "uint64",
+                                                      },
+                                                    "name":
+                                                      { "type": "string" },
+                                                  },
+                                              },
+                                          },
+                                      },
+                                  },
+                              },
+                            "cluster_coordinator":
+                              {
+                                "type": "object",
+                                "properties":
+                                  {
+                                    "birthdate":
+                                      { "type": "string", "format": "int64" },
+                                    "id":
+                                      { "type": "string", "format": "uint64" },
+                                    "name": { "type": "string" },
+                                  },
+                              },
+                            "cluster_members":
+                              {
+                                "type": "object",
+                                "additionalProperties":
+                                  {
+                                    "type": "object",
+                                    "properties":
+                                      {
+                                        "birthdate":
+                                          {
+                                            "type": "string",
+                                            "format": "int64",
+                                          },
+                                        "id":
+                                          {
+                                            "type": "string",
+                                            "format": "uint64",
+                                          },
+                                        "name": { "type": "string" },
+                                      },
+                                  },
+                              },
+                            "cmdline":
+                              {
+                                "type": "array",
+                                "items": { "type": "string" },
+                              },
+                            "d_maps":
+                              {
+                                "type": "object",
+                                "properties":
+                                  {
+                                    "delete_hits":
+                                      { "type": "string", "format": "int64" },
+                                    "delete_misses":
+                                      { "type": "string", "format": "int64" },
+                                    "entries_total":
+                                      { "type": "string", "format": "int64" },
+                                    "evicted_total":
+                                      { "type": "string", "format": "int64" },
+                                    "get_hits":
+                                      { "type": "string", "format": "int64" },
+                                    "get_misses":
+                                      { "type": "string", "format": "int64" },
+                                  },
+                              },
+                            "d_topics":
+                              {
+                                "type": "object",
+                                "properties":
+                                  {
+                                    "current_listeners":
+                                      { "type": "string", "format": "int64" },
+                                    "listeners_total":
+                                      { "type": "string", "format": "int64" },
+                                    "published_total":
+                                      { "type": "string", "format": "int64" },
+                                  },
+                              },
+                            "member":
+                              {
+                                "type": "object",
+                                "properties":
+                                  {
+                                    "birthdate":
+                                      { "type": "string", "format": "int64" },
+                                    "id":
+                                      { "type": "string", "format": "uint64" },
+                                    "name": { "type": "string" },
+                                  },
+                              },
+                            "network":
+                              {
+                                "type": "object",
+                                "properties":
+                                  {
+                                    "commands_total":
+                                      { "type": "string", "format": "int64" },
+                                    "connections_total":
+                                      { "type": "string", "format": "int64" },
+                                    "current_connections":
+                                      { "type": "string", "format": "int64" },
+                                    "read_bytes_total":
+                                      { "type": "string", "format": "int64" },
+                                    "written_bytes_total":
+                                      { "type": "string", "format": "int64" },
+                                  },
+                              },
+                            "partitions":
+                              {
+                                "type": "object",
+                                "additionalProperties":
+                                  {
+                                    "type": "object",
+                                    "properties":
+                                      {
+                                        "backups":
+                                          {
+                                            "type": "array",
+                                            "items":
+                                              {
+                                                "type": "object",
+                                                "properties":
+                                                  {
+                                                    "birthdate":
+                                                      {
+                                                        "type": "string",
+                                                        "format": "int64",
+                                                      },
+                                                    "id":
+                                                      {
+                                                        "type": "string",
+                                                        "format": "uint64",
+                                                      },
+                                                    "name":
+                                                      { "type": "string" },
+                                                  },
+                                              },
+                                          },
+                                        "d_maps":
+                                          {
+                                            "type": "object",
+                                            "additionalProperties":
+                                              {
+                                                "type": "object",
+                                                "properties":
+                                                  {
+                                                    "length":
+                                                      {
+                                                        "type": "string",
+                                                        "format": "int64",
+                                                      },
+                                                    "num_tables":
+                                                      {
+                                                        "type": "string",
+                                                        "format": "int64",
+                                                      },
+                                                    "slab_info":
+                                                      {
+                                                        "type": "object",
+                                                        "properties":
+                                                          {
+                                                            "allocated":
+                                                              {
+                                                                "type": "string",
+                                                                "format": "int64",
+                                                              },
+                                                            "garbage":
+                                                              {
+                                                                "type": "string",
+                                                                "format": "int64",
+                                                              },
+                                                            "inuse":
+                                                              {
+                                                                "type": "string",
+                                                                "format": "int64",
+                                                              },
+                                                          },
+                                                      },
+                                                  },
+                                              },
+                                          },
+                                        "length":
+                                          {
+                                            "type": "string",
+                                            "format": "int64",
+                                          },
+                                        "previous_owners":
+                                          {
+                                            "type": "array",
+                                            "items":
+                                              {
+                                                "type": "object",
+                                                "properties":
+                                                  {
+                                                    "birthdate":
+                                                      {
+                                                        "type": "string",
+                                                        "format": "int64",
+                                                      },
+                                                    "id":
+                                                      {
+                                                        "type": "string",
+                                                        "format": "uint64",
+                                                      },
+                                                    "name":
+                                                      { "type": "string" },
+                                                  },
+                                              },
+                                          },
+                                      },
+                                  },
+                              },
+                            "release_version": { "type": "string" },
+                            "runtime": { "type": "object" },
+                            "uptime_seconds":
+                              { "type": "string", "format": "int64" },
+                          },
+                      },
+                  },
+              },
+          },
+        "default":
+          {
+            "description": "An unexpected error response.",
+            "content":
+              {
+                "application/json":
+                  {
+                    "schema":
+                      {
+                        "type": "object",
+                        "properties":
+                          {
+                            "code": { "type": "integer", "format": "int32" },
+                            "details":
+                              {
+                                "type": "array",
+                                "items":
+                                  {
+                                    "description":
+                                      "`Any` contains an arbitrary serialized
+                                      protocol buffer message along with a\nURL
+                                      that describes the type of the serialized
+                                      message.\n\nProtobuf library provides
+                                      support to pack/unpack Any values in the
+                                      form\nof utility functions or additional
+                                      generated methods of the Any
+                                      type.\n\nExample 1: Pack and unpack a
+                                      message in C++.\n\n    Foo foo =
+                                      ...;\n    Any
+                                      any;\n    any.PackFrom(foo);\n    ...\n    if
+                                      (any.UnpackTo(&foo))
+                                      {\n      ...\n    }\n\nExample 2: Pack and
+                                      unpack a message in Java.\n\n    Foo foo =
+                                      ...;\n    Any any =
+                                      Any.pack(foo);\n    ...\n    if
+                                      (any.is(Foo.class)) {\n      foo =
+                                      any.unpack(Foo.class);\n    }\n\nExample
+                                      3: Pack and unpack a message in
+                                      Python.\n\n    foo = Foo(...)\n    any =
+                                      Any()\n    any.Pack(foo)\n    ...\n    if
+                                      any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\nExample
+                                      4: Pack and unpack a message in
+                                      Go\n\n     foo := &pb.Foo{...}\n     any,
+                                      err := anypb.New(foo)\n     if err != nil
+                                      {\n       ...\n     }\n     ...\n     foo
+                                      := &pb.Foo{}\n     if err :=
+                                      any.UnmarshalTo(foo); err != nil
+                                      {\n       ...\n     }\n\nThe pack methods
+                                      provided by protobuf library will by
+                                      default
+                                      use\n'type.googleapis.com/full.type.name'
+                                      as the type URL and the unpack\nmethods
+                                      only use the fully qualified type name
+                                      after the last '/'\nin the type URL, for
+                                      example \"foo.bar.com/x/y.z\" will yield
+                                      type\nname \"y.z\".\n\n\nJSON\n\nThe JSON
+                                      representation of an `Any` value uses the
+                                      regular\nrepresentation of the
+                                      deserialized, embedded message, with
+                                      an\nadditional field `@type` which
+                                      contains the type URL.
+                                      Example:\n\n    package
+                                      google.profile;\n    message Person
+                                      {\n      string first_name =
+                                      1;\n      string last_name =
+                                      2;\n    }\n\n    {\n      \"@type\":
+                                      \"type.googleapis.com/google.profile.Person\",\n      \"firstName\":
+                                      <string>,\n      \"lastName\":
+                                      <string>\n    }\n\nIf the embedded message
+                                      type is well-known and has a custom
+                                      JSON\nrepresentation, that representation
+                                      will be embedded adding a field\n`value`
+                                      which holds the custom JSON in addition to
+                                      the `@type`\nfield. Example (for message
+                                      [google.protobuf.Duration][]):\n\n    {\n      \"@type\":
+                                      \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\":
+                                      \"1.212s\"\n    }",
+                                    "type": "object",
+                                    "properties":
+                                      {
+                                        "@type":
+                                          {
+                                            "description":
+                                              "A URL/resource name that uniquely
+                                              identifies the type of the
+                                              serialized\nprotocol buffer
+                                              message. This string must contain
+                                              at least\none \"/\" character. The
+                                              last segment of the URL's path
+                                              must represent\nthe fully
+                                              qualified name of the type (as
+                                              in\n`path/google.protobuf.Duration`).
+                                              The name should be in a canonical
+                                              form\n(e.g., leading \".\" is not
+                                              accepted).\n\nIn practice, teams
+                                              usually precompile into the binary
+                                              all types that they\nexpect it to
+                                              use in the context of Any.
+                                              However, for URLs which use
+                                              the\nscheme `http`, `https`, or no
+                                              scheme, one can optionally set up
+                                              a type\nserver that maps type URLs
+                                              to message definitions as
+                                              follows:\n\n* If no scheme is
+                                              provided, `https` is assumed.\n*
+                                              An HTTP GET on the URL must yield
+                                              a
+                                              [google.protobuf.Type][]\n  value
+                                              in binary format, or produce an
+                                              error.\n* Applications are allowed
+                                              to cache lookup results based on
+                                              the\n  URL, or have them
+                                              precompiled into a binary to avoid
+                                              any\n  lookup. Therefore, binary
+                                              compatibility needs to be
+                                              preserved\n  on changes to types.
+                                              (Use versioned type names to
+                                              manage\n  breaking
+                                              changes.)\n\nNote: this
+                                              functionality is not currently
+                                              available in the
+                                              official\nprotobuf release, and it
+                                              is not used for type URLs
+                                              beginning
+                                              with\ntype.googleapis.com.\n\nSchemes
+                                              other than `http`, `https` (or the
+                                              empty scheme) might be\nused with
+                                              implementation specific semantics.",
+                                            "type": "string",
+                                          },
+                                      },
+                                    "additionalProperties": false,
+                                  },
+                              },
+                            "message": { "type": "string" },
+                          },
+                      },
+                  },
+              },
+          },
+      },
+    "description": "DistCacheService_GetStats",
+    "method": "get",
+    "path": "/v1/distcache/stats",
+    "servers": [{ "url": "https://aperture-agent" }],
+    "info": { "title": "Aperture API", "version": "1.0" },
+    "postman":
+      {
+        "name": "Dist Cache Service Get Stats",
+        "description": { "type": "text/plain" },
+        "url":
+          {
+            "path": ["v1", "distcache", "stats"],
+            "host": ["{{baseUrl}}"],
+            "query": [],
+            "variable": [],
+          },
+        "header": [{ "key": "Accept", "value": "application/json" }],
+        "method": "GET",
+      },
+  }
+sidebar_class_name: "get api-method"
+info_path: references/api/agent/aperture-api
+custom_edit_url: ""
+---
+
+import ApiTabs from "@theme/ApiTabs";
+import MimeTabs from "@theme/MimeTabs";
+import ParamsItem from "@theme/ParamsItem";
+import ResponseSamples from "@theme/ResponseSamples";
+import SchemaItem from "@theme/SchemaItem";
+import SchemaTabs from "@theme/SchemaTabs";
+import DiscriminatorTabs from "@theme/DiscriminatorTabs";
+import TabItem from "@theme/TabItem";
+
+## DistCacheService_GetStats
+
+DistCacheService_GetStats
+
+<div><ApiTabs><TabItem label={"200"} value={"200"}><div>
+
+A successful response.
+
+</div><div><MimeTabs schemaType={"response"}><TabItem label={"application/json"} value={"application/json"}><SchemaTabs><TabItem label={"Schema"} value={"Schema"}><details style={{}} data-collapsed={false} open={true}><summary style={{"textAlign":"left"}}><strong>Schema</strong></summary><div style={{"textAlign":"left","marginLeft":"1rem"}}></div><ul style={{"marginLeft":"1rem"}}><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>backups</strong><span style={{"opacity":"0.6"}}> object</span></summary><div style={{"marginLeft":"1rem"}}><li><div><code>property name*</code><span style={{"opacity":"0.6"}}> object</span></div></li></div></details></SchemaItem><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>cluster_coordinator</strong><span style={{"opacity":"0.6"}}> object</span></summary><div style={{"marginLeft":"1rem"}}><SchemaItem collapsible={false} name={"birthdate"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"id"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"uint64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"name"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"string"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem></div></details></SchemaItem><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>cluster_members</strong><span style={{"opacity":"0.6"}}> object</span></summary><div style={{"marginLeft":"1rem"}}><li><div><code>property name*</code><span style={{"opacity":"0.6"}}> object</span></div></li></div></details></SchemaItem><SchemaItem collapsible={false} name={"cmdline"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"string[]"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>d_maps</strong><span style={{"opacity":"0.6"}}> object</span></summary><div style={{"marginLeft":"1rem"}}><SchemaItem collapsible={false} name={"delete_hits"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"delete_misses"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"entries_total"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"evicted_total"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"get_hits"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"get_misses"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem></div></details></SchemaItem><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>d_topics</strong><span style={{"opacity":"0.6"}}> object</span></summary><div style={{"marginLeft":"1rem"}}><SchemaItem collapsible={false} name={"current_listeners"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"listeners_total"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"published_total"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem></div></details></SchemaItem><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>member</strong><span style={{"opacity":"0.6"}}> object</span></summary><div style={{"marginLeft":"1rem"}}><SchemaItem collapsible={false} name={"birthdate"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"id"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"uint64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"name"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"string"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem></div></details></SchemaItem><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>network</strong><span style={{"opacity":"0.6"}}> object</span></summary><div style={{"marginLeft":"1rem"}}><SchemaItem collapsible={false} name={"commands_total"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"connections_total"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"current_connections"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"read_bytes_total"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"written_bytes_total"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem></div></details></SchemaItem><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>partitions</strong><span style={{"opacity":"0.6"}}> object</span></summary><div style={{"marginLeft":"1rem"}}><li><div><code>property name*</code><span style={{"opacity":"0.6"}}> object</span></div></li></div></details></SchemaItem><SchemaItem collapsible={false} name={"release_version"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"string"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"runtime"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"object"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"uptime_seconds"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int64"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem></ul></details></TabItem><TabItem label={"Example (from schema)"} value={"Example (from schema)"}><ResponseSamples responseExample={"{\n  \"backups\": {},\n  \"cluster_coordinator\": {\n    \"birthdate\": \"string\",\n    \"id\": \"string\",\n    \"name\": \"string\"\n  },\n  \"cluster_members\": {},\n  \"cmdline\": [\n    \"string\"\n  ],\n  \"d_maps\": {\n    \"delete_hits\": \"string\",\n    \"delete_misses\": \"string\",\n    \"entries_total\": \"string\",\n    \"evicted_total\": \"string\",\n    \"get_hits\": \"string\",\n    \"get_misses\": \"string\"\n  },\n  \"d_topics\": {\n    \"current_listeners\": \"string\",\n    \"listeners_total\": \"string\",\n    \"published_total\": \"string\"\n  },\n  \"member\": {\n    \"birthdate\": \"string\",\n    \"id\": \"string\",\n    \"name\": \"string\"\n  },\n  \"network\": {\n    \"commands_total\": \"string\",\n    \"connections_total\": \"string\",\n    \"current_connections\": \"string\",\n    \"read_bytes_total\": \"string\",\n    \"written_bytes_total\": \"string\"\n  },\n  \"partitions\": {},\n  \"release_version\": \"string\",\n  \"runtime\": {},\n  \"uptime_seconds\": \"string\"\n}"} language={"json"}></ResponseSamples></TabItem></SchemaTabs></TabItem></MimeTabs></div></TabItem><TabItem label={"default"} value={"default"}><div>
+
+An unexpected error response.
+
+</div><div><MimeTabs schemaType={"response"}><TabItem label={"application/json"} value={"application/json"}><SchemaTabs><TabItem label={"Schema"} value={"Schema"}><details style={{}} data-collapsed={false} open={true}><summary style={{"textAlign":"left"}}><strong>Schema</strong></summary><div style={{"textAlign":"left","marginLeft":"1rem"}}></div><ul style={{"marginLeft":"1rem"}}><SchemaItem collapsible={false} name={"code"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int32"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>details</strong><span style={{"opacity":"0.6"}}> object[]</span></summary><div style={{"marginLeft":"1rem"}}><SchemaItem collapsible={false} name={"@type"} required={false} deprecated={undefined} schemaDescription={"A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."} schemaName={"string"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem></div></details></SchemaItem><SchemaItem collapsible={false} name={"message"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"string"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem></ul></details></TabItem><TabItem label={"Example (from schema)"} value={"Example (from schema)"}><ResponseSamples responseExample={"{\n  \"code\": 0,\n  \"details\": [\n    {\n      \"@type\": \"string\"\n    }\n  ],\n  \"message\": \"string\"\n}"} language={"json"}></ResponseSamples></TabItem></SchemaTabs></TabItem></MimeTabs></div></TabItem></ApiTabs></div>

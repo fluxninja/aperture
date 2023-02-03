@@ -1,0 +1,654 @@
+---
+id: flow-preview-service-preview-flow-labels
+title: FlowPreviewService_PreviewFlowLabels
+description: "FlowPreviewService_PreviewFlowLabels"
+sidebar_label: /v1/flowcontrol/preview/labels/{service}/{control_point}
+hide_title: true
+hide_table_of_contents: true
+api:
+  {
+    "tags": ["aperture-agent"],
+    "operationId": "FlowPreviewService_PreviewFlowLabels",
+    "parameters":
+      [
+        {
+          "description":
+            "Service to preview. Empty value implies catch all service.",
+          "name": "service",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" },
+        },
+        {
+          "description":
+            "Control point to preview.\n\n@gotags: validate:\"required\"",
+          "name": "control_point",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" },
+        },
+        {
+          "description":
+            "Number of samples to collect. Defaults to 10.\n\n@gotags:
+            validate:\"min=1\" default:\"10\"",
+          "name": "samples",
+          "in": "query",
+          "schema": { "type": "string", "format": "int64" },
+        },
+      ],
+    "requestBody":
+      {
+        "content":
+          {
+            "application/json":
+              {
+                "schema":
+                  {
+                    "description":
+                      "It provides three ways to define requirements:\n-
+                      matchLabels\n- matchExpressions\n- arbitrary
+                      expression\n\nIf multiple requirements are set, they are
+                      all ANDed.\nAn empty label matcher always matches.",
+                    "type": "object",
+                    "title":
+                      "Allows to define rules whether a map
+                      of\n[labels](/concepts/integrations/flow-control/flow-label.md)\nshould
+                      be considered a match or not",
+                    "properties":
+                      {
+                        "expression":
+                          {
+                            "description":
+                              "An arbitrary expression to be evaluated on the
+                              labels.",
+                            "type": "object",
+                            "title":
+                              "Defines a [map<string, string> → bool] expression
+                              to be evaluated on labels",
+                            "properties":
+                              {
+                                "all":
+                                  {
+                                    "description":
+                                      "The expression is true when all
+                                      subexpressions are true.",
+                                    "type": "object",
+                                    "title":
+                                      "List of MatchExpressions that is used for
+                                      all/any matching",
+                                    "properties":
+                                      {
+                                        "of":
+                                          {
+                                            "description":
+                                              "List of subexpressions of the
+                                              match expression.",
+                                            "type": "array",
+                                            "items":
+                                              {
+                                                "description":
+                                                  "MatchExpression has multiple
+                                                  variants, exactly one should
+                                                  be
+                                                  set.\n\nExample:\n```yaml\nall:\n  of:\n    -
+                                                  label_exists: foo\n    -
+                                                  label_equals: { label = app,
+                                                  value = frobnicator }\n```",
+                                                "type": "object",
+                                                "title":
+                                                  "Defines a [map<string,
+                                                  string> → bool] expression to
+                                                  be evaluated on labels",
+                                                "properties": "circular()",
+                                              },
+                                          },
+                                      },
+                                  },
+                                "any":
+                                  {
+                                    "description":
+                                      "The expression is true when any
+                                      subexpression is true.",
+                                    "type": "object",
+                                    "title":
+                                      "List of MatchExpressions that is used for
+                                      all/any matching",
+                                    "properties":
+                                      {
+                                        "of":
+                                          {
+                                            "description":
+                                              "List of subexpressions of the
+                                              match expression.",
+                                            "type": "array",
+                                            "items":
+                                              {
+                                                "description":
+                                                  "MatchExpression has multiple
+                                                  variants, exactly one should
+                                                  be
+                                                  set.\n\nExample:\n```yaml\nall:\n  of:\n    -
+                                                  label_exists: foo\n    -
+                                                  label_equals: { label = app,
+                                                  value = frobnicator }\n```",
+                                                "type": "object",
+                                                "title":
+                                                  "Defines a [map<string,
+                                                  string> → bool] expression to
+                                                  be evaluated on labels",
+                                                "properties": "circular()",
+                                              },
+                                          },
+                                      },
+                                  },
+                                "label_equals":
+                                  {
+                                    "description":
+                                      "The expression is true when label value
+                                      equals given value.",
+                                    "type": "object",
+                                    "properties":
+                                      {
+                                        "label":
+                                          {
+                                            "description":
+                                              "Name of the label to equal match
+                                              the value.\n\n@gotags:
+                                              validate:\"required\"",
+                                            "type": "string",
+                                            "x-go-validate": "required",
+                                          },
+                                        "value":
+                                          {
+                                            "description":
+                                              "Exact value that the label should
+                                              be equal to.",
+                                            "type": "string",
+                                          },
+                                      },
+                                  },
+                                "label_exists":
+                                  {
+                                    "description":
+                                      "The expression is true when label with
+                                      given name exists.\n\n@gotags:
+                                      validate:\"required\"",
+                                    "type": "string",
+                                    "x-go-validate": "required",
+                                  },
+                                "label_matches":
+                                  {
+                                    "description":
+                                      "The expression is true when label matches
+                                      given regex.",
+                                    "type": "object",
+                                    "properties":
+                                      {
+                                        "label":
+                                          {
+                                            "description":
+                                              "Name of the label to match the
+                                              regular expression.\n\n@gotags:
+                                              validate:\"required\"",
+                                            "type": "string",
+                                            "x-go-validate": "required",
+                                          },
+                                        "regex":
+                                          {
+                                            "description":
+                                              "Regular expression that should
+                                              match the label value.\nIt uses
+                                              [golang's regular expression
+                                              syntax](https://github.com/google/re2/wiki/Syntax).\n\n@gotags:
+                                              validate:\"required\"",
+                                            "type": "string",
+                                            "x-go-validate": "required",
+                                          },
+                                      },
+                                  },
+                                "not":
+                                  {
+                                    "description":
+                                      "MatchExpression has multiple variants,
+                                      exactly one should be
+                                      set.\n\nExample:\n```yaml\nall:\n  of:\n    -
+                                      label_exists: foo\n    - label_equals: {
+                                      label = app, value = frobnicator }\n```",
+                                    "type": "object",
+                                    "title":
+                                      "Defines a [map<string, string> → bool]
+                                      expression to be evaluated on labels",
+                                    "properties": "circular()",
+                                  },
+                              },
+                          },
+                        "match_expressions":
+                          {
+                            "description":
+                              "List of k8s-style label matcher
+                              requirements.\n\nNote: The requirements are ANDed.",
+                            "type": "array",
+                            "items":
+                              {
+                                "description":
+                                  "Label selector requirement which is a
+                                  selector that contains values, a key, and an
+                                  operator that relates the key and values.",
+                                "type": "object",
+                                "properties":
+                                  {
+                                    "key":
+                                      {
+                                        "description":
+                                          "Label key that the selector applies
+                                          to.\n\n@gotags: validate:\"required\"",
+                                        "type": "string",
+                                        "x-go-validate": "required",
+                                      },
+                                    "operator":
+                                      {
+                                        "description":
+                                          "Logical operator which represents a
+                                          key's relationship to a set of
+                                          values.\nValid operators are In,
+                                          NotIn, Exists and
+                                          DoesNotExist.\n\n@gotags:
+                                          validate:\"oneof=In NotIn Exists
+                                          DoesNotExists\"",
+                                        "type": "string",
+                                        "x-go-validate":
+                                          "oneof=In NotIn Exists DoesNotExists",
+                                      },
+                                    "values":
+                                      {
+                                        "description":
+                                          "An array of string values that
+                                          relates to the key by an operator.\nIf
+                                          the operator is In or NotIn, the
+                                          values array must be non-empty.\nIf
+                                          the operator is Exists or
+                                          DoesNotExist, the values array must be
+                                          empty.",
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                      },
+                                  },
+                              },
+                          },
+                        "match_labels":
+                          {
+                            "description":
+                              "A map of {key,value} pairs representing labels to
+                              be matched.\nA single {key,value} in the
+                              matchLabels requires that the label \"key\" is
+                              present and equal to \"value\".\n\nNote: The
+                              requirements are ANDed.",
+                            "type": "object",
+                            "additionalProperties": { "type": "string" },
+                          },
+                      },
+                  },
+              },
+          },
+        "description":
+          "Flow labels to match. Optional parameter for advanced filtering.",
+        "required": true,
+      },
+    "responses":
+      {
+        "200":
+          {
+            "description": "A successful response.",
+            "content":
+              {
+                "application/json":
+                  {
+                    "schema":
+                      {
+                        "type": "object",
+                        "properties":
+                          {
+                            "samples":
+                              {
+                                "type": "array",
+                                "items":
+                                  {
+                                    "type": "object",
+                                    "properties":
+                                      {
+                                        "labels":
+                                          {
+                                            "type": "object",
+                                            "additionalProperties":
+                                              { "type": "string" },
+                                          },
+                                      },
+                                  },
+                              },
+                          },
+                      },
+                  },
+              },
+          },
+        "default":
+          {
+            "description": "An unexpected error response.",
+            "content":
+              {
+                "application/json":
+                  {
+                    "schema":
+                      {
+                        "type": "object",
+                        "properties":
+                          {
+                            "code": { "type": "integer", "format": "int32" },
+                            "details":
+                              {
+                                "type": "array",
+                                "items":
+                                  {
+                                    "description":
+                                      "`Any` contains an arbitrary serialized
+                                      protocol buffer message along with a\nURL
+                                      that describes the type of the serialized
+                                      message.\n\nProtobuf library provides
+                                      support to pack/unpack Any values in the
+                                      form\nof utility functions or additional
+                                      generated methods of the Any
+                                      type.\n\nExample 1: Pack and unpack a
+                                      message in C++.\n\n    Foo foo =
+                                      ...;\n    Any
+                                      any;\n    any.PackFrom(foo);\n    ...\n    if
+                                      (any.UnpackTo(&foo))
+                                      {\n      ...\n    }\n\nExample 2: Pack and
+                                      unpack a message in Java.\n\n    Foo foo =
+                                      ...;\n    Any any =
+                                      Any.pack(foo);\n    ...\n    if
+                                      (any.is(Foo.class)) {\n      foo =
+                                      any.unpack(Foo.class);\n    }\n\nExample
+                                      3: Pack and unpack a message in
+                                      Python.\n\n    foo = Foo(...)\n    any =
+                                      Any()\n    any.Pack(foo)\n    ...\n    if
+                                      any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\nExample
+                                      4: Pack and unpack a message in
+                                      Go\n\n     foo := &pb.Foo{...}\n     any,
+                                      err := anypb.New(foo)\n     if err != nil
+                                      {\n       ...\n     }\n     ...\n     foo
+                                      := &pb.Foo{}\n     if err :=
+                                      any.UnmarshalTo(foo); err != nil
+                                      {\n       ...\n     }\n\nThe pack methods
+                                      provided by protobuf library will by
+                                      default
+                                      use\n'type.googleapis.com/full.type.name'
+                                      as the type URL and the unpack\nmethods
+                                      only use the fully qualified type name
+                                      after the last '/'\nin the type URL, for
+                                      example \"foo.bar.com/x/y.z\" will yield
+                                      type\nname \"y.z\".\n\n\nJSON\n\nThe JSON
+                                      representation of an `Any` value uses the
+                                      regular\nrepresentation of the
+                                      deserialized, embedded message, with
+                                      an\nadditional field `@type` which
+                                      contains the type URL.
+                                      Example:\n\n    package
+                                      google.profile;\n    message Person
+                                      {\n      string first_name =
+                                      1;\n      string last_name =
+                                      2;\n    }\n\n    {\n      \"@type\":
+                                      \"type.googleapis.com/google.profile.Person\",\n      \"firstName\":
+                                      <string>,\n      \"lastName\":
+                                      <string>\n    }\n\nIf the embedded message
+                                      type is well-known and has a custom
+                                      JSON\nrepresentation, that representation
+                                      will be embedded adding a field\n`value`
+                                      which holds the custom JSON in addition to
+                                      the `@type`\nfield. Example (for message
+                                      [google.protobuf.Duration][]):\n\n    {\n      \"@type\":
+                                      \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\":
+                                      \"1.212s\"\n    }",
+                                    "type": "object",
+                                    "properties":
+                                      {
+                                        "@type":
+                                          {
+                                            "description":
+                                              "A URL/resource name that uniquely
+                                              identifies the type of the
+                                              serialized\nprotocol buffer
+                                              message. This string must contain
+                                              at least\none \"/\" character. The
+                                              last segment of the URL's path
+                                              must represent\nthe fully
+                                              qualified name of the type (as
+                                              in\n`path/google.protobuf.Duration`).
+                                              The name should be in a canonical
+                                              form\n(e.g., leading \".\" is not
+                                              accepted).\n\nIn practice, teams
+                                              usually precompile into the binary
+                                              all types that they\nexpect it to
+                                              use in the context of Any.
+                                              However, for URLs which use
+                                              the\nscheme `http`, `https`, or no
+                                              scheme, one can optionally set up
+                                              a type\nserver that maps type URLs
+                                              to message definitions as
+                                              follows:\n\n* If no scheme is
+                                              provided, `https` is assumed.\n*
+                                              An HTTP GET on the URL must yield
+                                              a
+                                              [google.protobuf.Type][]\n  value
+                                              in binary format, or produce an
+                                              error.\n* Applications are allowed
+                                              to cache lookup results based on
+                                              the\n  URL, or have them
+                                              precompiled into a binary to avoid
+                                              any\n  lookup. Therefore, binary
+                                              compatibility needs to be
+                                              preserved\n  on changes to types.
+                                              (Use versioned type names to
+                                              manage\n  breaking
+                                              changes.)\n\nNote: this
+                                              functionality is not currently
+                                              available in the
+                                              official\nprotobuf release, and it
+                                              is not used for type URLs
+                                              beginning
+                                              with\ntype.googleapis.com.\n\nSchemes
+                                              other than `http`, `https` (or the
+                                              empty scheme) might be\nused with
+                                              implementation specific semantics.",
+                                            "type": "string",
+                                          },
+                                      },
+                                    "additionalProperties": false,
+                                  },
+                              },
+                            "message": { "type": "string" },
+                          },
+                      },
+                  },
+              },
+          },
+      },
+    "description": "FlowPreviewService_PreviewFlowLabels",
+    "method": "post",
+    "path": "/v1/flowcontrol/preview/labels/{service}/{control_point}",
+    "servers": [{ "url": "https://aperture-agent" }],
+    "jsonRequestBodyExample":
+      {
+        "expression":
+          {
+            "all": { "of": [{}] },
+            "any": { "of": [{}] },
+            "label_equals": { "label": "string", "value": "string" },
+            "label_exists": "string",
+            "label_matches": { "label": "string", "regex": "string" },
+            "not": {},
+          },
+        "match_expressions":
+          [{ "key": "string", "operator": "string", "values": ["string"] }],
+        "match_labels": {},
+      },
+    "info": { "title": "Aperture API", "version": "1.0" },
+    "postman":
+      {
+        "name": "Flow Preview Service Preview Flow Labels",
+        "description": { "type": "text/plain" },
+        "url":
+          {
+            "path":
+              [
+                "v1",
+                "flowcontrol",
+                "preview",
+                "labels",
+                ":service",
+                ":control_point",
+              ],
+            "host": ["{{baseUrl}}"],
+            "query":
+              [
+                {
+                  "disabled": false,
+                  "description":
+                    {
+                      "content":
+                        "Number of samples to collect. Defaults to
+                        10.\n\n@gotags: validate:\"min=1\" default:\"10\"",
+                      "type": "text/plain",
+                    },
+                  "key": "samples",
+                  "value": "",
+                },
+              ],
+            "variable":
+              [
+                {
+                  "disabled": false,
+                  "description":
+                    {
+                      "content":
+                        "(Required) Service to preview. Empty value implies
+                        catch all service.",
+                      "type": "text/plain",
+                    },
+                  "type": "any",
+                  "value": "",
+                  "key": "service",
+                },
+                {
+                  "disabled": false,
+                  "description":
+                    {
+                      "content":
+                        "(Required) Control point to preview.\n\n@gotags:
+                        validate:\"required\"",
+                      "type": "text/plain",
+                    },
+                  "type": "any",
+                  "value": "",
+                  "key": "control_point",
+                },
+              ],
+          },
+        "header":
+          [
+            { "key": "Content-Type", "value": "application/json" },
+            { "key": "Accept", "value": "application/json" },
+          ],
+        "method": "POST",
+        "body":
+          {
+            "mode": "raw",
+            "raw": '""',
+            "options": { "raw": { "language": "json" } },
+          },
+      },
+  }
+sidebar_class_name: "post api-method"
+info_path: references/api/agent/aperture-api
+custom_edit_url: ""
+---
+
+import ApiTabs from "@theme/ApiTabs";
+import MimeTabs from "@theme/MimeTabs";
+import ParamsItem from "@theme/ParamsItem";
+import ResponseSamples from "@theme/ResponseSamples";
+import SchemaItem from "@theme/SchemaItem";
+import SchemaTabs from "@theme/SchemaTabs";
+import DiscriminatorTabs from "@theme/DiscriminatorTabs";
+import TabItem from "@theme/TabItem";
+
+## FlowPreviewService_PreviewFlowLabels
+
+FlowPreviewService_PreviewFlowLabels
+
+<details style={{"marginBottom":"1rem"}} data-collapsed={false} open={true}><summary style={{}}><strong>Path Parameters</strong></summary><div><ul><ParamsItem className={"paramsItem"} param={{"description":"Service to preview. Empty value implies catch all service.","name":"service","in":"path","required":true,"schema":{"type":"string"}}}></ParamsItem><ParamsItem className={"paramsItem"} param={{"description":"Control point to preview.\n\n@gotags: validate:\"required\"","name":"control_point","in":"path","required":true,"schema":{"type":"string"}}}></ParamsItem></ul></div></details><details style={{"marginBottom":"1rem"}} data-collapsed={false} open={true}><summary style={{}}><strong>Query Parameters</strong></summary><div><ul><ParamsItem className={"paramsItem"} param={{"description":"Number of samples to collect. Defaults to 10.\n\n@gotags: validate:\"min=1\" default:\"10\"","name":"samples","in":"query","schema":{"type":"string","format":"int64"}}}></ParamsItem></ul></div></details><MimeTabs><TabItem label={"application/json"} value={"application/json-schema"}><details style={{}} data-collapsed={false} open={true}><summary style={{"textAlign":"left"}}><strong>Request Body</strong><strong style={{"fontSize":"var(--ifm-code-font-size)","color":"var(--openapi-required)"}}> required</strong></summary><div style={{"textAlign":"left","marginLeft":"1rem"}}><div style={{"marginTop":"1rem","marginBottom":"1rem"}}>
+
+Flow labels to match. Optional parameter for advanced filtering.
+
+</div></div><ul style={{"marginLeft":"1rem"}}><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>expression</strong><span style={{"opacity":"0.6"}}> object</span></summary><div style={{"marginLeft":"1rem"}}><div style={{"marginTop":".5rem","marginBottom":".5rem"}}>
+
+An arbitrary expression to be evaluated on the labels.
+
+</div><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>all</strong><span style={{"opacity":"0.6"}}> object</span></summary><div style={{"marginLeft":"1rem"}}><div style={{"marginTop":".5rem","marginBottom":".5rem"}}>
+
+The expression is true when all subexpressions are true.
+
+</div><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>of</strong><span style={{"opacity":"0.6"}}> object[]</span></summary><div style={{"marginLeft":"1rem"}}><div style={{"marginTop":".5rem","marginBottom":".5rem"}}>
+
+List of subexpressions of the match expression.
+
+</div><SchemaItem collapsible={false} name={"0"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"1"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"2"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"3"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"4"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"5"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"6"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"7"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"8"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"9"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem></div></details></SchemaItem></div></details></SchemaItem><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>any</strong><span style={{"opacity":"0.6"}}> object</span></summary><div style={{"marginLeft":"1rem"}}><div style={{"marginTop":".5rem","marginBottom":".5rem"}}>
+
+The expression is true when any subexpression is true.
+
+</div><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>of</strong><span style={{"opacity":"0.6"}}> object[]</span></summary><div style={{"marginLeft":"1rem"}}><div style={{"marginTop":".5rem","marginBottom":".5rem"}}>
+
+List of subexpressions of the match expression.
+
+</div><SchemaItem collapsible={false} name={"0"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"1"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"2"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"3"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"4"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"5"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"6"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"7"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"8"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"9"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem></div></details></SchemaItem></div></details></SchemaItem><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>label_equals</strong><span style={{"opacity":"0.6"}}> object</span></summary><div style={{"marginLeft":"1rem"}}><div style={{"marginTop":".5rem","marginBottom":".5rem"}}>
+
+The expression is true when label value equals given value.
+
+</div><SchemaItem collapsible={false} name={"label"} required={false} deprecated={undefined} schemaDescription={"Name of the label to equal match the value.\n\n@gotags: validate:\"required\""} schemaName={"string"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"value"} required={false} deprecated={undefined} schemaDescription={"Exact value that the label should be equal to."} schemaName={"string"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem></div></details></SchemaItem><SchemaItem collapsible={false} name={"label_exists"} required={false} deprecated={undefined} schemaDescription={"The expression is true when label with given name exists.\n\n@gotags: validate:\"required\""} schemaName={"string"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>label_matches</strong><span style={{"opacity":"0.6"}}> object</span></summary><div style={{"marginLeft":"1rem"}}><div style={{"marginTop":".5rem","marginBottom":".5rem"}}>
+
+The expression is true when label matches given regex.
+
+</div><SchemaItem collapsible={false} name={"label"} required={false} deprecated={undefined} schemaDescription={"Name of the label to match the regular expression.\n\n@gotags: validate:\"required\""} schemaName={"string"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"regex"} required={false} deprecated={undefined} schemaDescription={"Regular expression that should match the label value.\nIt uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).\n\n@gotags: validate:\"required\""} schemaName={"string"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem></div></details></SchemaItem><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>not</strong><span style={{"opacity":"0.6"}}> object</span></summary><div style={{"marginLeft":"1rem"}}><div style={{"marginTop":".5rem","marginBottom":".5rem"}}>
+
+MatchExpression has multiple variants, exactly one should be set.
+
+Example:
+
+```yaml
+all:
+  of:
+    - label_exists: foo
+    - label_equals: { label = app, value = frobnicator }
+```
+
+</div><SchemaItem collapsible={false} name={"0"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"1"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"2"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"3"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"4"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"5"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"6"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"7"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"8"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"9"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={""} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem></div></details></SchemaItem></div></details></SchemaItem><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>match_expressions</strong><span style={{"opacity":"0.6"}}> object[]</span></summary><div style={{"marginLeft":"1rem"}}><div style={{"marginTop":".5rem","marginBottom":".5rem"}}>
+
+List of k8s-style label matcher requirements.
+
+Note: The requirements are ANDed.
+
+</div><SchemaItem collapsible={false} name={"key"} required={false} deprecated={undefined} schemaDescription={"Label key that the selector applies to.\n\n@gotags: validate:\"required\""} schemaName={"string"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"operator"} required={false} deprecated={undefined} schemaDescription={"Logical operator which represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.\n\n@gotags: validate:\"oneof=In NotIn Exists DoesNotExists\""} schemaName={"string"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={false} name={"values"} required={false} deprecated={undefined} schemaDescription={"An array of string values that relates to the key by an operator.\nIf the operator is In or NotIn, the values array must be non-empty.\nIf the operator is Exists or DoesNotExist, the values array must be empty."} schemaName={"string[]"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem></div></details></SchemaItem><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>match_labels</strong><span style={{"opacity":"0.6"}}> object</span></summary><div style={{"marginLeft":"1rem"}}><div style={{"marginTop":".5rem","marginBottom":".5rem"}}>
+
+A map of {key,value} pairs representing labels to be matched. A single
+{key,value} in the matchLabels requires that the label "key" is present and
+equal to "value".
+
+Note: The requirements are ANDed.
+
+</div><li><div><code>property name*</code><span style={{"opacity":"0.6"}}> string</span></div></li></div></details></SchemaItem></ul></details></TabItem></MimeTabs><div><ApiTabs><TabItem label={"200"} value={"200"}><div>
+
+A successful response.
+
+</div><div><MimeTabs schemaType={"response"}><TabItem label={"application/json"} value={"application/json"}><SchemaTabs><TabItem label={"Schema"} value={"Schema"}><details style={{}} data-collapsed={false} open={true}><summary style={{"textAlign":"left"}}><strong>Schema</strong></summary><div style={{"textAlign":"left","marginLeft":"1rem"}}></div><ul style={{"marginLeft":"1rem"}}><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>samples</strong><span style={{"opacity":"0.6"}}> object[]</span></summary><div style={{"marginLeft":"1rem"}}><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>labels</strong><span style={{"opacity":"0.6"}}> object</span></summary><div style={{"marginLeft":"1rem"}}><li><div><code>property name*</code><span style={{"opacity":"0.6"}}> string</span></div></li></div></details></SchemaItem></div></details></SchemaItem></ul></details></TabItem><TabItem label={"Example (from schema)"} value={"Example (from schema)"}><ResponseSamples responseExample={"{\n  \"samples\": [\n    {\n      \"labels\": {}\n    }\n  ]\n}"} language={"json"}></ResponseSamples></TabItem></SchemaTabs></TabItem></MimeTabs></div></TabItem><TabItem label={"default"} value={"default"}><div>
+
+An unexpected error response.
+
+</div><div><MimeTabs schemaType={"response"}><TabItem label={"application/json"} value={"application/json"}><SchemaTabs><TabItem label={"Schema"} value={"Schema"}><details style={{}} data-collapsed={false} open={true}><summary style={{"textAlign":"left"}}><strong>Schema</strong></summary><div style={{"textAlign":"left","marginLeft":"1rem"}}></div><ul style={{"marginLeft":"1rem"}}><SchemaItem collapsible={false} name={"code"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"int32"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem><SchemaItem collapsible={true} className={"schemaItem"}><details style={{}}><summary style={{}}><strong>details</strong><span style={{"opacity":"0.6"}}> object[]</span></summary><div style={{"marginLeft":"1rem"}}><SchemaItem collapsible={false} name={"@type"} required={false} deprecated={undefined} schemaDescription={"A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."} schemaName={"string"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem></div></details></SchemaItem><SchemaItem collapsible={false} name={"message"} required={false} deprecated={undefined} schemaDescription={undefined} schemaName={"string"} qualifierMessage={undefined} defaultValue={undefined}></SchemaItem></ul></details></TabItem><TabItem label={"Example (from schema)"} value={"Example (from schema)"}><ResponseSamples responseExample={"{\n  \"code\": 0,\n  \"details\": [\n    {\n      \"@type\": \"string\"\n    }\n  ],\n  \"message\": \"string\"\n}"} language={"json"}></ResponseSamples></TabItem></SchemaTabs></TabItem></MimeTabs></div></TabItem></ApiTabs></div>

@@ -32,7 +32,7 @@ repos:
         args:
           - "--allow-multiple-documents"
       - id: check-added-large-files
-        exclude: ^(operator/config/crd/.*|docs/content/assets/.*)
+        exclude: ^(operator/config/crd/.*|docs/content/assets/.*|docs/content/references/api/.*)
       - id: check-executables-have-shebangs
       - id: check-shebang-scripts-are-executable
       - id: check-json
@@ -64,7 +64,7 @@ repos:
     rev: "v2.7.1"
     hooks:
       - id: prettier
-        exclude: ^(docs/content/references/.*|manifests/charts/.*/README*|.github/.*/.*.md)
+        exclude: ^(docs/content/reference/.*|docs/content/reference/aperture-cli/aperturectl*|manifests/charts/.*/README*|.github/.*/.*.md)
         types_or:
           [
             sh,
@@ -117,6 +117,13 @@ repos:
         files: '\.proto$|\.go$'
         pass_filenames: false
         description: "Generate config markdown"
+      - id: generate-cli-docs
+        name: "Config CLI docs"
+        entry: "./scripts/precommit/generate_cli_docs.sh"
+        language: script
+        files: "^cmd/aperturectl/.*"
+        pass_filenames: false
+        description: "Generate CLI docs"
       - id: generate-blueprints
         name: "Generate Blueprints"
         entry: "./scripts/precommit/generate_blueprints.sh"

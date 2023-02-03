@@ -54,7 +54,7 @@ A limit for particular value of a label can be increased via the override
 mechanisms. Eg. you might want to increase the limit for the admin user. See
 [reference][reference] for more details.
 
-[reference]: /references/configuration/policy.md#v1-rate-limiter
+[reference]: /reference/policies/spec.md#v1-rate-limiter
 [agent-group]: /concepts/integrations/flow-control/service.md#agent-group
 [policies]: /concepts/policy/policy.md
 [flow-label]: /concepts/integrations/flow-control/flow-label.md

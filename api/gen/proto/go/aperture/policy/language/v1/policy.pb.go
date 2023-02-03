@@ -121,7 +121,9 @@ func (x *Policies) GetPolicies() map[string]*Policy {
 // Policy expresses reliability automation workflow that automatically protects services
 //
 // :::info
+//
 // See also [Policy overview](/concepts/policy/policy.md).
+//
 // :::
 //
 // Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
@@ -185,7 +187,9 @@ func (x *Policy) GetResources() *Resources {
 // Circuit is defined as a dataflow graph of inter-connected components
 //
 // :::info
+//
 // See also [Circuit overview](/concepts/policy/circuit.md).
+//
 // :::
 //
 // Signals flow between components via ports.
@@ -193,6 +197,7 @@ func (x *Policy) GetResources() *Resources {
 // Circuit is evaluated periodically in order to respond to changes in signal readings.
 //
 // :::info
+//
 // **Signal**
 //
 // Signals are floating-point values.
@@ -206,6 +211,7 @@ func (x *Policy) GetResources() *Resources {
 // [ArithmeticCombinator](#v1-arithmetic-combinator)) or use some different
 // logic, like eg. [Extrapolator](#v1-extrapolator). Refer to a component's
 // docs on how exactly it handles invalid inputs.
+//
 // :::
 type Circuit struct {
 	state         protoimpl.MessageState
@@ -268,7 +274,9 @@ func (x *Circuit) GetComponents() []*Component {
 // Resources that need to be setup for the policy to function
 //
 // :::info
+//
 // See also [Resources overview](/concepts/policy/resources.md).
+//
 // :::
 //
 // Resources are typically Flux Meters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
@@ -336,15 +344,19 @@ func (x *Resources) GetClassifiers() []*Classifier {
 // Computational block that form the circuit
 //
 // :::info
+//
 // See also [Components overview](/concepts/policy/circuit.md#components).
+//
 // :::
 //
 // Signals flow into the components via input ports and results are emitted on output ports.
 // Components are wired to each other based on signal names forming an execution graph of the circuit.
 //
 // :::note
+//
 // Loops are broken by the runtime at the earliest component index that is part of the loop.
 // The looped signals are saved in the tick they are generated and served in the subsequent tick.
+//
 // :::
 //
 // There are three categories of components:
@@ -353,10 +365,14 @@ func (x *Resources) GetClassifiers() []*Classifier {
 //   they're represented by green color.
 // * signal processor components – "pure" components that don't interact with the "real world".
 //   Examples: [GradientController](#v1-gradient-controller), [Max](#v1-max).
+//
 //   :::note
+//
 //   Signal processor components's output can depend on their internal state, in addition to the inputs.
 //   Eg. see the [Exponential Moving Average filter](#v1-e-m-a).
+//
 //   :::
+//
 // * "sink" components – they affect the real world.
 //   [ConcurrencyLimiter.LoadActuator](#v1-concurrency-limiter) and [RateLimiter](#v1-rate-limiter).
 //   In the UI, represented by orange color.  Sink components usually come in pairs with a
@@ -364,12 +380,14 @@ func (x *Resources) GetClassifiers() []*Classifier {
 //   `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.
 //
 // :::tip
+//
 // Sometimes you may want to use a constant value as one of component's inputs.
 // You can create an input port containing the constant value instead of being connected to a signal.
 // To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
 // You can also use it to provide special math values such as NaN and +- Inf.
 // If You need to provide the same constant signal to multiple components,
 // You can use the [Variable](#v1-variable) component.
+//
 // :::
 //
 // See also [Policy](#v1-policy) for a higher-level explanation of circuits.
@@ -1595,7 +1613,9 @@ func (x *Switcher) GetOutPorts() *Switcher_Outs {
 // Limits the traffic on a control point to specified rate
 //
 // :::info
+//
 // See also [Rate Limiter overview](/concepts/integrations/flow-control/components/rate-limiter.md).
+//
 // :::
 //
 // Ratelimiting is done separately on per-label-value basis. Use _label\_key_
@@ -1686,7 +1706,9 @@ func (x *RateLimiter) GetDefaultConfig() *RateLimiter_DynamicConfig {
 // Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
 //
 // :::info
+//
 // See also [Concurrency Limiter overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).
+//
 // :::
 //
 // It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
@@ -1787,8 +1809,10 @@ func (*ConcurrencyLimiter_LoadActuator) isConcurrencyLimiter_ActuationStrategy()
 // Weighted Fair Queuing-based workload scheduler
 //
 // :::note
+//
 // Each Agent instantiates an independent copy of the scheduler, but output
 // signals for accepted and incoming concurrency are aggregated across all agents.
+//
 // :::
 //
 // See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
@@ -1936,8 +1960,10 @@ type PromQL struct {
 	// Describes the Prometheus query to be run.
 	//
 	// :::caution
+	//
 	// TODO we should describe how to construct the query, eg. how to employ the
 	// fluxmeters here or link to appropriate place in docs.
+	//
 	// :::
 	QueryString string `protobuf:"bytes,2,opt,name=query_string,json=queryString,proto3" json:"query_string,omitempty"`
 	// Describes the interval between successive evaluations of the Prometheus query.
@@ -2412,10 +2438,12 @@ func (x *Min) GetOutPorts() *Min_Outs {
 // * Invalid inputs are considered unknown.
 //
 //   :::note
+//
 //   Treating invalid inputs as "unknowns" has a consequence that the result
 //   might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,
 //   because the result would end up false no matter if
 //   first signal was true or false. On the other hand, `unknown && true == unknown`.
+//
 //   :::
 type And struct {
 	state         protoimpl.MessageState
@@ -3384,9 +3412,11 @@ type GradientController_Parameters struct {
 	// correlated (eg. Per-pod CPU usage and number of pods).
 	//
 	// :::note
+	//
 	// You need to set _negative_ slope for a _positive_ correlation, as you're
 	// describing the _action_ which controller should make when the signal
 	// increases.
+	//
 	// :::
 	//
 	// The magnitude of slope describes how aggressively should the controller
@@ -3401,8 +3431,10 @@ type GradientController_Parameters struct {
 	// Values of $|\text{slope}| > 1$ are not recommended.
 	//
 	// :::note
+	//
 	// Remember that the gradient and output signal can be (optionally) clamped,
 	// so the _slope_ might not fully describe aggressiveness of the controller.
+	//
 	// :::
 	Slope float64 `protobuf:"fixed64,1,opt,name=slope,proto3" json:"slope,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
@@ -3673,12 +3705,16 @@ type EMA_Ins struct {
 	// it's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.
 	//
 	// :::note
+	//
 	// If the signal deviates from `max_envelope` faster than the correction
 	// faster, it might end up exceeding the envelope.
+	//
 	// :::
 	//
 	// :::note
+	//
 	// The envelope logic is **not** used outside the warm-up stage!
+	//
 	// :::
 	MaxEnvelope *InPort `protobuf:"bytes,2,opt,name=max_envelope,json=maxEnvelope,proto3" json:"max_envelope,omitempty"`
 	// Lower bound of the moving average.
@@ -4393,8 +4429,10 @@ type RateLimiter_Ins struct {
 	// Negative values disable the ratelimiter.
 	//
 	// :::tip
+	//
 	// Negative limit can be useful to _conditionally_ enable the ratelimiter
 	// under certain circumstances. [Decider](#v1-decider) might be helpful.
+	//
 	// :::
 	Limit *InPort `protobuf:"bytes,1,opt,name=limit,proto3" json:"limit,omitempty" validate:"required"` // @gotags: validate:"required"
 }
@@ -4577,8 +4615,10 @@ type Scheduler_Parameters struct {
 	// If none of workloads match, `default_workload` will be used.
 	//
 	// :::info
+	//
 	// See also [workload definition in the concepts
 	// section](/concepts/integrations/flow-control/components/concurrency-limiter.md#workload).
+	//
 	// :::
 	Workloads []*Scheduler_Workload `protobuf:"bytes,1,rep,name=workloads,proto3" json:"workloads,omitempty" validate:"dive"` // @gotags: validate:"dive"
 	// Parameters to be used if none of workloads specified in `workloads` match.
@@ -4598,6 +4638,7 @@ type Scheduler_Parameters struct {
 	// Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
 	//
 	// :::caution
+	//
 	// This timeout needs to be strictly less than the timeout set on the
 	// client for the whole GRPC call:
 	// * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
@@ -4611,6 +4652,7 @@ type Scheduler_Parameters struct {
 	// some headroom for constant overhead like serialization, etc. Default
 	// value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
 	// tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+	//
 	// :::
 	MaxTimeout *durationpb.Duration `protobuf:"bytes,5,opt,name=max_timeout,json=maxTimeout,proto3" json:"max_timeout,omitempty" default:"0.49s"` // @gotags: default:"0.49s"
 }
@@ -4692,6 +4734,7 @@ type Scheduler_Outs struct {
 	// scheduler is applied on.
 	//
 	// :::info
+	//
 	// Concurrency is a unitless number describing mean number of
 	// [flows](/concepts/integrations/flow-control/flow-control.md#flow) being
 	// concurrently processed by the system (system = control point).
@@ -4699,6 +4742,7 @@ type Scheduler_Outs struct {
 	// work-seconds per world-seconds). Work-seconds are computed based on
 	// token-weights of of flows (which are either estimated via `auto_tokens`
 	// or specified by `Workload.tokens`).
+	//
 	// :::
 	//
 	// Value of this signal is aggregated from all the relevant schedulers.

@@ -8,8 +8,9 @@ import (
 )
 
 const (
+	apertureRepo                     = "https://github.com/fluxninja/aperture"
 	apertureBlueprintsRepoDefault    = "github.com/fluxninja/aperture/blueprints"
-	apertureBlueprintsVersionDefault = "main"
+	apertureBlueprintsVersionDefault = "latest"
 )
 
 var (
@@ -21,8 +22,8 @@ var (
 )
 
 func init() {
-	BlueprintsCmd.PersistentFlags().StringVar(&blueprintsVersion, "version", apertureBlueprintsVersionDefault, "version of aperture blueprint")
-	BlueprintsCmd.PersistentFlags().StringVar(&apertureBlueprintsURI, "uri", apertureBlueprintsRepoDefault, "URI of aperture blueprints, could be a local path or a remote git repository")
+	BlueprintsCmd.PersistentFlags().StringVar(&blueprintsVersion, "version", apertureBlueprintsVersionDefault, "Version of Aperture Blueprints")
+	BlueprintsCmd.PersistentFlags().StringVar(&apertureBlueprintsURI, "uri", apertureBlueprintsRepoDefault, "URI of Aperture Blueprints, could be a local path or a remote git repository")
 
 	BlueprintsCmd.AddCommand(pullCmd)
 	BlueprintsCmd.AddCommand(listCmd)
@@ -33,7 +34,9 @@ func init() {
 // BlueprintsCmd is the root command for blueprints.
 var BlueprintsCmd = &cobra.Command{
 	Use:   "blueprints",
-	Short: "Manage blueprints",
+	Short: "Aperture Blueprints",
+	Long: `
+Use this command to pull, list, remove and generate Aperture Policy resources using the Aperture Blueprints.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		userHomeDir, err := os.UserHomeDir()
 		if err != nil {

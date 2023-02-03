@@ -5,7 +5,6 @@ WORKDIR /src
 COPY --link . .
 
 RUN --mount=type=cache,target=/go/pkg/ \
-  --mount=type=cache,target=/root/.cache/go-build/ \
   go mod download
 
 # App build
@@ -19,8 +18,8 @@ ARG RACE
 ENV RACE=${RACE}
 
 FROM base AS builder
-RUN --mount=type=cache,target=/go/pkg/ \
-  --mount=type=cache,target=/root/.cache/go-build/ \
+RUN --mount=type=cache,target=/go/pkg/,readonly \
+  --mount=type=cache,target=/root/.cache/go-build/,sharing=private \
   CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" \
   LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
   ./pkg/info/build.sh
@@ -29,8 +28,8 @@ RUN --mount=type=cache,target=/go/pkg/ \
 # BUILD PLUGINS STAGE
 FROM base AS plugins-builder
 # Plugins build
-RUN --mount=type=cache,target=/go/pkg/ \
-  --mount=type=cache,target=/root/.cache/go-build/ \
+RUN --mount=type=cache,target=/go/pkg/,readonly \
+  --mount=type=cache,target=/root/.cache/go-build/,sharing=private \
   /bin/bash -c \
   'set -euo pipefail; \
   shopt -s nullglob; \
