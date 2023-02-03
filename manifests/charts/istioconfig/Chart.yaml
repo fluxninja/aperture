@@ -2,6 +2,6 @@ apiVersion: v2
 name: istioconfig
 description: A Helm chart that deploys Aperture Envoy Filter via Istio
 type: application
-version: v0.21.0
-appVersion: v0.21.0
+version: v0.22.0
+appVersion: v0.22.0
 icon: https://raw.githubusercontent.com/fluxninja/aperture/gh-pages/FluxNinja--main--logo--ICON.svg
