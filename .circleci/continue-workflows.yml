@@ -33,6 +33,9 @@ parameters:
   updated-aperture-agent-packaging:
     type: boolean
     default: false
+  updated-aperturectl-packaging:
+    type: boolean
+    default: false
   updated-aperture-operator:
     type: boolean
     default: false
@@ -650,7 +653,7 @@ jobs:
             ENVIRONMENT_PATH: << parameters.environment-path >>
           command: .circleci/scripts/update_environment.sh
 
-  package-agent:
+  package-binaries:
     parameters:
       workspace-name:
         type: string
@@ -661,6 +664,9 @@ jobs:
         type: string
         description: the GOARCH to use for the build
         default: amd64
+      component:
+        type: string
+        description: the component to build
       upload-to-gcp:
         type: boolean
         default: false
@@ -669,69 +675,40 @@ jobs:
     environment:
       PACKAGES_DIR: "/tmp/packages"
       GOARCH: <<parameters.goarch>>
+      COMPONENT: <<parameters.component>>
     steps:
       - checkout
       - asdf_install: # We need to install python before gcloud
-          cache_name: aperture-agent-bare-metal-packages
+          cache_name: aperture-{{ .Environment.COMPONENT }}-packages
           tools: |-
             python
             gcloud
             golang
       - run:
-          name: "Set build vars"
+          name: "Set version"
           command: |
-            GIT_BRANCH="$(git branch --show-current)"
-            GIT_COMMIT_HASH="$(git log -n1 --format=%H)"
-            GOOS="$(go env GOOS)"
             component=aperture-agent
             tag_matcher="releases/${component}/*"
             current_branch="$(git branch --show-current)"
             tag="$(git tag -l --sort="-version:refname" "${tag_matcher}" | head -n1)"
             commits="$(git rev-list "${tag}"..HEAD --count)"
             VERSION="${tag##*/}-b.${commits}"
-            mkdir -p $HOME/go
-            GOPATH=$HOME/go
-            PATH=$PATH:$GOPATH/bin
-            RACE=""
 
-            export GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION GOPATH PATH RACE
-            declare -p GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION GOPATH PATH RACE >> "${BASH_ENV}"
-          environment:
-            RELEASE_TAG: <<pipeline.git.tag>>
+            export VERSION
+            declare -p VERSION >> "${BASH_ENV}"
       - restore_cache:
           name: Restore go cache
           keys:
-            - aperture-agent-bare-metal-packages-go-cache-{{ checksum "~/day" }}
+            - aperture-{{ .Environment.COMPONENT }}-packages-go-cache
       - run:
-          name: "Compile agent and plugins"
-          command: |
-            SOURCE="./cmd/aperture-agent" TARGET="./dist/aperture-agent" ./pkg/info/build.sh
-            for plugin_dir in ./plugins/*/aperture-plugin-*; do
-              plugin="$(basename "${plugin_dir}")"
-              echo "Building plugin ${plugin}"
-              SOURCE="${plugin_dir}" TARGET="./dist/plugins/${plugin}.so" ./pkg/plugins/build.sh
-            done
-          environment:
-            CGO_ENABLED: "1"
-            PREFIX: "aperture"
-            LDFLAGS: '-s -w -extldflags "-Wl,--allow-multiple-definition"'
+          name: "Compile binaries"
+          command: ./.circleci/scripts/compile.sh "${COMPONENT}"
       - run:
           name: Install nFPM
-          command: |
-            filename="nfpm_amd64.deb"
-            file="/tmp/${filename}"
-            curl --silent --show-error --location https://github.com/goreleaser/nfpm/releases/latest/download/${filename} -o "${file}"
-            sudo dpkg -i "${file}"
-            which nfpm
+          command: ./.circleci/scripts/install_nfpm.sh
       - run:
           name: Package
-          command: |
-            mkdir -p dist/packages/
-            vless_version="${VERSION##v}"
-            export VERSION=${vless_version//[-]/\~}
-            nfpm package --packager deb --target dist/packages/
-            nfpm package --packager rpm --target dist/packages/
-            ls -l dist/packages/
+          command: ./.circleci/scripts/nfpm_package.sh
       - when:
           condition: <<parameters.upload-to-gcp>>
           steps:
@@ -752,13 +729,12 @@ jobs:
                   done
       - save_cache:
           name: Save go cache
-          key:
-            aperture-agent-bare-metal-packages-go-cache-{{ checksum "~/day" }}
+          key: aperture-{{ .Environment.COMPONENT }}-packages-go-cache
           paths:
             - ../.cache/go-build
           when: on_success
       - asdf_save_cache:
-          cache_name: aperture-agent-bare-metal-packages
+          cache_name: aperture-{{ .Environment.COMPONENT }}-packages
 
 workflows:
   version: 2
@@ -772,8 +748,9 @@ workflows:
             - << pipeline.parameters.updated-aperture-agent-packaging >>
             - << pipeline.parameters.updated-aperture >>
     jobs:
-      - package-agent:
+      - package-binaries:
           name: build-aperture-agent-bare-metal-package
+          component: agent
 
   publish-aperture-agent-bare-metal-package:
     when:
@@ -783,8 +760,35 @@ workflows:
             - << pipeline.parameters.updated-aperture-agent-packaging >>
             - << pipeline.parameters.updated-aperture >>
     jobs:
-      - package-agent:
+      - package-binaries:
           name: publish-aperture-agent-bare-metal-package
+          component: agent
+          upload-to-gcp: true
+
+  build-aperturectl-packages:
+    when:
+      and:
+        - not:
+            equal: [main, << pipeline.git.branch >>]
+        - or:
+            - << pipeline.parameters.updated-aperturectl-packaging >>
+            - << pipeline.parameters.updated-aperture >>
+    jobs:
+      - package-binaries:
+          name: build-aperturectl-packages
+          component: cli
+
+  publish-aperturectl-packages:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - or:
+            - << pipeline.parameters.updated-aperturectl-packaging >>
+            - << pipeline.parameters.updated-aperture >>
+    jobs:
+      - package-binaries:
+          name: publish-aperturectl-packages
+          component: cli
           upload-to-gcp: true
 
   aperture:
