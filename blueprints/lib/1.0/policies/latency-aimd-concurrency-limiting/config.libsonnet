@@ -41,7 +41,7 @@
     *
     * @param (policy.concurrency_controller.flow_selector: aperture.spec.v1.FlowSelector required) Concurrency Limiter flow selector.
     * @param (policy.concurrency_controller.scheduler: aperture.spec.v1.SchedulerParameters) Scheduler parameters.
-    * @param (policy.concurrency_controller.gradient: aperture.spec.v1.GradientParameters) Gradient parameters.
+    * @param (policy.concurrency_controller.gradient: aperture.spec.v1.GradientControllerParameters) Gradient Controller parameters.
     * @param (policy.concurrency_controller.alerter: aperture.spec.v1.AlerterParameters) Whether tokens for workloads are computed dynamically or set statically by the user.
     * @param (policy.concurrency_controller.concurrency_limit_multiplier: float64) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
     * @param (policy.concurrency_controller.concurrency_linear_increment: float64) Linear increment to concurrency in each execution tick when the system is not in overloaded state.
