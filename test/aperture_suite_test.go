@@ -245,9 +245,11 @@ func provideOTELConfig() *otelconfig.OTELConfig {
 			},
 		},
 	})
-	cfg.AddExporter("prometheusremotewrite", map[string]interface{}{
-		"endpoint": ph.Endpoint + "/api/v1/write",
-	})
+	if phStarted {
+		cfg.AddExporter("prometheusremotewrite", map[string]interface{}{
+			"endpoint": ph.Endpoint + "/api/v1/write",
+		})
+	}
 	cfg.Service.AddPipeline("metrics", otelconfig.Pipeline{
 		Receivers: []string{"prometheus"},
 		Exporters: []string{"prometheusremotewrite"},
