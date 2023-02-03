@@ -4,15 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/config"
-	"github.com/go-git/go-git/v5/storage/memory"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
+	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/jsonnet-bundler/jsonnet-bundler/pkg"
 	"github.com/jsonnet-bundler/jsonnet-bundler/pkg/jsonnetfile"
 	specv1 "github.com/jsonnet-bundler/jsonnet-bundler/spec/v1"
@@ -79,12 +79,12 @@ Use this command to pull the Aperture Blueprints in local system to use for gene
 
 aperturectl blueprints pull --version v0.22.0`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		blueprintsVersion, err := resolveApertureVersion(blueprintsVersion)
+		resolvedVersion, err := resolveApertureVersion(blueprintsVersion)
 		if err != nil {
 			return nil
 		}
 
-		apertureBlueprintsDir := filepath.Join(blueprintsDir, blueprintsVersion)
+		apertureBlueprintsDir := filepath.Join(blueprintsDir, resolvedVersion)
 		err = os.MkdirAll(apertureBlueprintsDir, os.ModePerm)
 		if err != nil {
 			return err
@@ -119,7 +119,7 @@ aperturectl blueprints pull --version v0.22.0`,
 			return err
 		}
 
-		uri := fmt.Sprintf("%s@%s", apertureBlueprintsURI, blueprintsVersion)
+		uri := fmt.Sprintf("%s@%s", apertureBlueprintsURI, resolvedVersion)
 		d := deps.Parse(apertureBlueprintsDir, uri)
 		if !depEqual(spec.Dependencies[d.Name()], *d) {
 			spec.Dependencies[d.Name()] = *d
