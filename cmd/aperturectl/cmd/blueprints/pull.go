@@ -15,10 +15,15 @@ import (
 )
 
 var pullCmd = &cobra.Command{
-	Use:           "pull",
-	Short:         "Pull a blueprint",
+	Use:   "pull",
+	Short: "Pull Aperture Blueprints",
+	Long: `
+Use this command to pull the Aperture Blueprints in local system to use for generating Aperture Policies and Grafana Dashboards.`,
 	SilenceErrors: true,
 	SilenceUsage:  true,
+	Example: `aperturectl blueprints pull
+
+aperturectl blueprints pull --version v0.22.0`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		apertureBlueprintsDir := filepath.Join(blueprintsDir, blueprintsVersion)
 		err := os.MkdirAll(apertureBlueprintsDir, os.ModePerm)
