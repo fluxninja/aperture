@@ -18,8 +18,8 @@ var (
 )
 
 func init() {
-	compileCmd.Flags().StringVar(&policy, "policy", "", "Path to policy file")
-	compileCmd.Flags().StringVar(&cr, "cr", "", "Path to policy custom resource file")
+	compileCmd.Flags().StringVar(&policy, "policy", "", "Path to Aperture Policy file")
+	compileCmd.Flags().StringVar(&cr, "cr", "", "Path to Aperture Policy custom resource file")
 	compileCmd.Flags().StringVar(&dot, "dot", "", "Path to store the dot file")
 	compileCmd.Flags().StringVar(&mermaid, "mermaid", "", "Path to store the mermaid file")
 }
@@ -27,10 +27,10 @@ func init() {
 // compileCmd is the command to compile a circuit from a policy file or CR.
 var compileCmd = &cobra.Command{
 	Use:   "compile",
-	Short: "Compile circuit from policy file",
+	Short: "Compile circuit from Aperture Policy file",
 	Long: `
-Use this command to compile the Aperture policy circuit from a policy file to validate the circuit.
-You can also generate the DOT and Mermaid graphs of the compiled policy circuit to visualize it.`,
+Use this command to compile the Aperture Policy circuit from a file to validate the circuit.
+You can also generate the DOT and Mermaid graphs of the compiled Aperture Policy circuit to visualize it.`,
 	SilenceErrors: true,
 	Example: `aperturectl compile --cr=policy-cr.yaml --mermaid --dot
 
