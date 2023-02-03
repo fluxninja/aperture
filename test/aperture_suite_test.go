@@ -26,6 +26,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
@@ -230,27 +231,34 @@ var _ = AfterSuite(func() {
 
 func provideOTELConfig() *otelconfig.OTELConfig {
 	cfg := otelconfig.NewOTELConfig()
-	cfg.AddReceiver("prometheus", map[string]interface{}{
-		"config": map[string]interface{}{
-			"scrape_configs": []map[string]interface{}{
-				{
-					"job_name":        "aperture-agent",
-					"scrape_interval": "5s",
-					"static_configs": []map[string]interface{}{
-						{
-							"targets": []string{addr},
+	if phStarted {
+		cfg.AddReceiver("prometheus", map[string]interface{}{
+			"config": map[string]interface{}{
+				"scrape_configs": []map[string]interface{}{
+					{
+						"job_name":        "aperture-agent",
+						"scrape_interval": "5s",
+						"static_configs": []map[string]interface{}{
+							{
+								"targets": []string{addr},
+							},
 						},
 					},
 				},
 			},
-		},
-	})
-	cfg.AddExporter("prometheusremotewrite", map[string]interface{}{
-		"endpoint": ph.Endpoint + "/api/v1/write",
-	})
-	cfg.Service.AddPipeline("metrics", otelconfig.Pipeline{
-		Receivers: []string{"prometheus"},
-		Exporters: []string{"prometheusremotewrite"},
-	})
+		})
+		cfg.AddExporter("prometheusremotewrite", map[string]interface{}{
+			"endpoint": ph.Endpoint + "/api/v1/write",
+		})
+		cfg.Service.AddPipeline("metrics", otelconfig.Pipeline{
+			Receivers: []string{"prometheus"},
+			Exporters: []string{"prometheusremotewrite"},
+		})
+	} else {
+		cfg.Service.AddPipeline("metrics", otelconfig.Pipeline{
+			Receivers: []string{otelconsts.ReceiverOTLP},
+			Exporters: []string{otelconsts.ExporterLogging},
+		})
+	}
 	return cfg
 }

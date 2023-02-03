@@ -14,8 +14,8 @@ import (
 
 // HTTPJob wraps a basic job along with HTTPJobConfig to execute an HTTP job.
 type HTTPJob struct {
-	basicJob
-	config HTTPJobConfig
+	basicJob Job
+	config   HTTPJobConfig
 }
 
 // Make sure HTTPJob complies with Job interface.
@@ -39,8 +39,7 @@ type BodyProvider func() io.Reader
 func NewHTTPJob(config HTTPJobConfig) *HTTPJob {
 	job := &HTTPJob{}
 	job.config = config
-	job.JobName = config.Name
-	job.JobFunc = func(ctx context.Context) (proto.Message, error) {
+	httpFunc := func(ctx context.Context) (proto.Message, error) {
 		resp, err := fetchURL(ctx, config.Method, config.URL, config.Client, config.Body())
 		if err != nil {
 			return nil, err
@@ -66,6 +65,8 @@ func NewHTTPJob(config HTTPJobConfig) *HTTPJob {
 		message := wrapperspb.String(fmt.Sprintf("%s is accessible", config.URL))
 		return message, nil
 	}
+	job.basicJob = NewBasicJob(config.Name, httpFunc)
+
 	return job
 }
 

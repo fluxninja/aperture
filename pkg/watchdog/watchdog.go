@@ -81,7 +81,7 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 		return err
 	}
 
-	watchdogRegistry := in.StatusRegistry.Child("subsystem", "liveness").Child("wd", watchdogJobName)
+	watchdogRegistry := in.StatusRegistry.Child("subsystem", "liveness").Child(watchdogJobName, watchdogJobName)
 
 	w := newWatchdog(in.JobGroup, watchdogRegistry, config)
 
@@ -100,7 +100,7 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 func newWatchdog(jobGroup *jobs.JobGroup, registry status.Registry, config WatchdogConfig) *watchdog {
 	heapStatusRegistry := registry.Child("heap", "heap")
 
-	job := jobs.NewMultiJob(jobGroup.GetStatusRegistry().Child("wd", watchdogJobName), nil, nil)
+	job := jobs.NewMultiJob(jobGroup.GetStatusRegistry().Child(watchdogJobName, watchdogJobName), nil, nil)
 
 	w := &watchdog{
 		heapStatusRegistry: heapStatusRegistry,
