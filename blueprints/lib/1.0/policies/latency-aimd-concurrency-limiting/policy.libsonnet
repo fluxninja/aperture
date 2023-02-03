@@ -30,6 +30,10 @@ local constantSignal = spec.v1.ConstantSignal;
 local aimdConcurrencyController = spec.v1.AIMDConcurrencyController;
 
 function(params) {
+  // make sure param object contains fields that are in either config.common or config.policy
+  local extra_keys = std.setDiff(std.objectFields(params), std.objectFields(config.common + config.policy)),
+  assert std.length(extra_keys) == 0 : 'Unknown keys in params: ' + extra_keys,
+
   _config:: config.common + config.policy + params,
 
   local policyDef =

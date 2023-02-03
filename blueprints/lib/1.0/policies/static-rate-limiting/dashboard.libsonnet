@@ -38,6 +38,10 @@ local newTimeSeriesPanel(title, datasource, query, axisLabel='', unit='') =
   };
 
 function(params) {
+  // make sure param object contains fields that are in either config.common or config.dashboard
+  local extra_keys = std.setDiff(std.objectFields(params), std.objectFields(config.common + config.dashboard)),
+  assert std.length(extra_keys) == 0 : 'Unknown keys in params: ' + extra_keys,
+
   _config:: config.common + config.dashboard + params,
 
   local ds = $._config.datasource.name,
