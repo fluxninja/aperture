@@ -33,7 +33,8 @@ $FIND "$blueprints_root"/lib/1.0 -type f -name config.libsonnet | while read -r 
 	dir=$(dirname "$files")
 	echo "Generating README for $dir"
 	python "${blueprints_root}"/scripts/blueprint-readme-generator.py "$dir"
-	npx prettier --write "$dir"/README.md
+        # FIXME: not working with embedded JSX
+	#npx prettier --write "$dir"/README.md
 	# extract the name of the blueprint from the path
 	blueprint_name=$(basename "$dir")
 	# extract the relative path from the "$blueprints_root"/lib/1.0
@@ -78,7 +79,8 @@ $FIND "$blueprints_root"/lib/1.0 -type f -name config.libsonnet | while read -r 
 	# copy README.md to the blueprint named md file, except the first line (title)
 	tail -n +2 "$dir"/README.md >>"$docs_file"
 	# run prettier on the docs file
-	npx prettier --write "$docs_file"
+        # FIXME: not working with embedded JSX
+	# npx prettier --write "$docs_file"
 done
 
 # for all directories within "$blueprints_root"/bundles, generate examples
