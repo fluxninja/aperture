@@ -19,7 +19,14 @@ func init() {
 
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "List blueprints",
+	Short: "List Aperture Blueprints",
+	Long: `
+Use this command to list the Aperture Blueprints which are already pulled and available in local system.`,
+	Example: `aperturectl blueprints list
+
+aperturectl blueprints list --version v0.22.0
+
+aperturectl blueprints list --all`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if listAll {
 			w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)

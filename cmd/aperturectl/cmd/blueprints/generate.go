@@ -40,20 +40,29 @@ var (
 )
 
 func init() {
-	generateCmd.Flags().StringVar(&blueprintName, "name", "", "Name of the blueprints to generate manifests for. Can be skipped when '--custom-blueprints-path' is provided")
-	generateCmd.Flags().StringVar(&outputDir, "output-dir", "", "Directory path where the generated manifests will be stored. If not provided, will use current directory")
-	generateCmd.Flags().StringVar(&valuesFile, "values-file", "", "Path to the values file for blueprints input")
-	generateCmd.Flags().BoolVar(&apply, "apply", false, "Apply policy on the Kubernetes cluster")
+	generateCmd.Flags().StringVar(&blueprintName, "name", "", "Name of the Aperture Blueprint to generate Aperture Policy resources for. Can be skipped when '--custom-blueprint-path' is provided")
+	generateCmd.Flags().StringVar(&outputDir, "output-dir", "", "Directory path where the generated Policy resources will be stored. If not provided, will use current directory")
+	generateCmd.Flags().StringVar(&valuesFile, "values-file", "", "Path to the values file for Blueprint's input")
+	generateCmd.Flags().BoolVar(&apply, "apply", false, "Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed")
 	generateCmd.Flags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernets cluster config. Defaults to '~/.kube/config'")
-	generateCmd.Flags().StringVar(&customBlueprintsPath, "custom-blueprints-path", "", "Path to the directory containing custom blueprints")
+	generateCmd.Flags().StringVar(&customBlueprintsPath, "custom-blueprint-path", "", "Path to the directory containing custom Blueprints which has 'config.libsonnet' and 'bundle.libsonnet' files")
 
 	validPolicies = []*policyv1alpha1.Policy{}
 }
 
 var generateCmd = &cobra.Command{
-	Use:           "generate",
-	Short:         "Generate manifests for the given blueprint",
+	Use:   "generate",
+	Short: "Generate Aperture Policy related resources from Aperture Blueprints",
+	Long: `
+Use this command to generate Aperture Policy related resources like Kubernetes Custom Resource, Grafana Dashboards and graphs in DOT and Mermaid format.`,
 	SilenceErrors: true,
+	Example: `aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml
+
+aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --version v0.22.0
+
+aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --apply
+
+aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --values-file=values.yaml`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if blueprintName == "" && customBlueprintsPath == "" {
 			return fmt.Errorf("--name must be provided")
