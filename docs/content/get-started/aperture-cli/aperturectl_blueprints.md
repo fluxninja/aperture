@@ -13,7 +13,7 @@ Aperture Blueprints
 
 ### Synopsis
 
-Use this command to pull, list, remove and generate policies using the Aperture Blueprints.
+Use this command to pull, list, remove and generate Aperture Policy resources using the Aperture Blueprints.
 
 ### Options
 

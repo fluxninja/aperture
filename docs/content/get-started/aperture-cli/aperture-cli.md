@@ -33,9 +33,13 @@ With Homebrew:
 brew install aperturectl
 </CodeBlock>
 With Apt:
-<CodeBlock language="bash"> apt-get install aperturectl </CodeBlock>
+<CodeBlock language="bash">
+apt-get install aperturectl
+</CodeBlock>
 With dnf:
-<CodeBlock language="bash"> dnf install aperturectl </CodeBlock>
+<CodeBlock language="bash">
+dnf install aperturectl
+</CodeBlock>
 </TabItem>
 </Tabs>
 
