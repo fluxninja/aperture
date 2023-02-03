@@ -1,1 +1,192 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1883pt" height="828" viewBox="0 0 1882.8 621"><g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 617)"><polygon fill="#fff" stroke="none" points="-4 4 -4 -617 1878.8 -617 1878.8 4 -4 4"/><g id="clust1" class="cluster"><title>cluster_s17</title><polygon fill="none" stroke="#000" points="1521.82 -8 1521.82 -221 1866.8 -221 1866.8 -8 1521.82 -8"/><text x="1694.31" y="-205.8" font-family="Times,serif" font-size="14" text-anchor="middle">AIMDConcurrencyController[root.4]</text></g><g id="clust4" class="cluster"><title>cluster_s3</title><polygon fill="none" stroke="#000" points="14.15 -392 14.15 -605 530.59 -605 530.59 -392 14.15 -392"/><text x="272.37" y="-589.8" font-family="Times,serif" font-size="14" text-anchor="middle">ArithmeticCombinator[root.1]</text></g><g id="clust7" class="cluster"><title>cluster_s8</title><polygon fill="none" stroke="#000" points="879.38 -117 879.38 -330 1372.82 -330 1372.82 -117 879.38 -117"/><text x="1126.1" y="-314.8" font-family="Times,serif" font-size="14" text-anchor="middle">ArithmeticCombinator[root.2]</text></g><g id="clust10" class="cluster"><title>cluster_s13</title><polygon fill="none" stroke="#000" points="616.59 -338 616.59 -551 1039.52 -551 1039.52 -338 616.59 -338"/><text x="828.06" y="-535.8" font-family="Times,serif" font-size="14" text-anchor="middle">EMA[root.3]</text></g><g id="clust13" class="cluster"><title>cluster_s1</title><polygon fill="none" stroke="#000" points="8 -225 8 -384 174.29 -384 174.29 -225 8 -225"/><text x="91.15" y="-368.8" font-family="Times,serif" font-size="14" text-anchor="middle">PromQL[root.0]</text></g><g id="node1" class="node"><title>n20</title><ellipse cx="1751.16" cy="-130" fill="none" stroke="#000" rx="51.99" ry="18"/><text x="1751.16" y="-126.3" font-family="Times,serif" font-size="14" text-anchor="middle">is_overload</text></g><g id="node2" class="node"><title>n21</title><ellipse cx="1751.16" cy="-76" fill="none" stroke="#000" rx="65.79" ry="18"/><text x="1751.16" y="-72.3" font-family="Times,serif" font-size="14" text-anchor="middle">load_multiplier</text></g><g id="node3" class="node"><title>n18</title><ellipse cx="1610.16" cy="-130" fill="none" stroke="#000" rx="38.19" ry="18"/><text x="1610.16" y="-126.3" font-family="Times,serif" font-size="14" text-anchor="middle">setpoint</text></g><g id="node4" class="node"><title>n19</title><ellipse cx="1610.16" cy="-76" fill="none" stroke="#000" rx="31.7" ry="18"/><text x="1610.16" y="-72.3" font-family="Times,serif" font-size="14" text-anchor="middle">signal</text></g><g id="node5" class="node"><title>n5</title><ellipse cx="91.15" cy="-514" fill="none" stroke="#000" rx="27" ry="18"/><text x="91.15" y="-510.3" font-family="Times,serif" font-size="14" text-anchor="middle">2.00</text></g><g id="node8" class="node"><title>n4</title><ellipse cx="289.29" cy="-514" fill="none" stroke="#000" rx="27" ry="18"/><text x="289.29" y="-510.3" font-family="Times,serif" font-size="14" text-anchor="middle">rhs</text></g><g id="edge2" class="edge"><title>n5-&gt;n4</title><path fill="none" stroke="#000" d="M118.28,-514C118.28,-514 250.34,-514 250.34,-514"/><polygon fill="#000" stroke="#000" points="250.34 -517.5 260.34 -514 250.34 -510.5 250.34 -517.5"/></g><g id="node6" class="node"><title>n6</title><ellipse cx="289.29" cy="-460" fill="none" stroke="#000" rx="27" ry="18"/><text x="289.29" y="-456.3" font-family="Times,serif" font-size="14" text-anchor="middle">lhs</text></g><g id="node7" class="node"><title>n7</title><ellipse cx="447.44" cy="-460" fill="none" stroke="#000" rx="33.29" ry="18"/><text x="447.44" y="-456.3" font-family="Times,serif" font-size="14" text-anchor="middle">output</text></g><g id="node14" class="node"><title>n14</title><ellipse cx="728.98" cy="-460" fill="none" stroke="#000" rx="62.29" ry="18"/><text x="728.98" y="-456.3" font-family="Times,serif" font-size="14" text-anchor="middle">max_envelope</text></g><g id="edge10" class="edge"><title>n7-&gt;n14</title><path fill="none" stroke="#000" d="M481.12,-460C481.12,-460 654.95,-460 654.95,-460"/><polygon fill="#000" stroke="#000" points="654.95 -463.5 664.95 -460 654.95 -456.5 654.95 -463.5"/><text x="573.59" y="-463.8" font-family="Times,serif" font-size="14" text-anchor="middle">MAX_EMA</text></g><g id="node9" class="node"><title>n10</title><ellipse cx="956.38" cy="-185" fill="none" stroke="#000" rx="27" ry="18"/><text x="956.38" y="-181.3" font-family="Times,serif" font-size="14" text-anchor="middle">1.10</text></g><g id="node12" class="node"><title>n9</title><ellipse cx="1192.52" cy="-185" fill="none" stroke="#000" rx="27" ry="18"/><text x="1192.52" y="-181.3" font-family="Times,serif" font-size="14" text-anchor="middle">rhs</text></g><g id="edge4" class="edge"><title>n10-&gt;n9</title><path fill="none" stroke="#000" d="M983.47,-185C983.47,-185 1153.87,-185 1153.87,-185"/><polygon fill="#000" stroke="#000" points="1153.87 -188.5 1163.87 -185 1153.87 -181.5 1153.87 -188.5"/></g><g id="node10" class="node"><title>n11</title><ellipse cx="1192.52" cy="-239" fill="none" stroke="#000" rx="27" ry="18"/><text x="1192.52" y="-235.3" font-family="Times,serif" font-size="14" text-anchor="middle">lhs</text></g><g id="node11" class="node"><title>n12</title><ellipse cx="1289.67" cy="-212" fill="none" stroke="#000" rx="33.29" ry="18"/><text x="1289.67" y="-208.3" font-family="Times,serif" font-size="14" text-anchor="middle">output</text></g><g id="edge11" class="edge"><title>n12-&gt;n18</title><path fill="none" stroke="#000" d="M1289.8,-193.8C1289.8,-169.64 1289.8,-130 1289.8,-130 1289.8,-130 1560.01,-130 1560.01,-130"/><polygon fill="#000" stroke="#000" points="1560.01 -133.5 1570.01 -130 1560.01 -126.5 1560.01 -133.5"/><text x="1447.32" y="-151.8" font-family="Times,serif" font-size="14" text-anchor="middle">LATENCY_SETPOINT</text></g><g id="node13" class="node"><title>n15</title><ellipse cx="728.98" cy="-406" fill="none" stroke="#000" rx="28.7" ry="18"/><text x="728.98" y="-402.3" font-family="Times,serif" font-size="14" text-anchor="middle">input</text></g><g id="node15" class="node"><title>n16</title><ellipse cx="956.38" cy="-406" fill="none" stroke="#000" rx="33.29" ry="18"/><text x="956.38" y="-402.3" font-family="Times,serif" font-size="14" text-anchor="middle">output</text></g><g id="edge12" class="edge"><title>n16-&gt;n11</title><path fill="none" stroke="#000" d="M990,-406C1055.27,-406 1192.8,-406 1192.8,-406 1192.8,-406 1192.8,-268.7 1192.8,-268.7"/><polygon fill="#000" stroke="#000" points="1196.3 -268.7 1192.8 -258.7 1189.3 -268.7 1196.3 -268.7"/><text x="1097.52" y="-325.8" font-family="Times,serif" font-size="14" text-anchor="middle">LATENCY_EMA</text></g><g id="node16" class="node"><title>n2</title><ellipse cx="91.15" cy="-293" fill="none" stroke="#000" rx="33.29" ry="18"/><text x="91.15" y="-289.3" font-family="Times,serif" font-size="14" text-anchor="middle">output</text></g><g id="edge9" class="edge"><title>n2-&gt;n19</title><path fill="none" stroke="#000" d="M91.8,-274.87C91.8,-222.72 91.8,-76 91.8,-76 91.8,-76 1566.59,-76 1566.59,-76"/><polygon fill="#000" stroke="#000" points="1566.59 -79.5 1576.59 -76 1566.59 -72.5 1566.59 -79.5"/><text x="840.38" y="-60.8" font-family="Times,serif" font-size="14" text-anchor="middle">LATENCY</text></g><g id="edge7" class="edge"><title>n2-&gt;n6</title><path fill="none" stroke="#000" d="M123.06,-299C179.22,-299 289.8,-299 289.8,-299 289.8,-299 289.8,-430.02 289.8,-430.02"/><polygon fill="#000" stroke="#000" points="286.3 -430.02 289.8 -440.02 293.3 -430.02 286.3 -430.02"/><text x="213.29" y="-396.8" font-family="Times,serif" font-size="14" text-anchor="middle">LATENCY</text></g><g id="edge8" class="edge"><title>n2-&gt;n15</title><path fill="none" stroke="#000" d="M122.82,-287C251.68,-287 729.8,-287 729.8,-287 729.8,-287 729.8,-376.15 729.8,-376.15"/><polygon fill="#000" stroke="#000" points="726.3 -376.15 729.8 -386.15 733.3 -376.15 726.3 -376.15"/><text x="365.29" y="-313.8" font-family="Times,serif" font-size="14" text-anchor="middle">LATENCY</text></g></g></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: %3 Pages: 1 -->
+<svg width="2085pt" height="567pt"
+ viewBox="0.00 0.00 2085.13 567.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 563)">
+<title>%3</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-563 2081.13,-563 2081.13,4 -4,4"/>
+<g id="clust1" class="cluster">
+<title>cluster_s17</title>
+<polygon fill="none" stroke="black" points="1673.46,-8 1673.46,-221 2069.13,-221 2069.13,-8 1673.46,-8"/>
+<text text-anchor="middle" x="1871.3" y="-205.8" font-family="Times,serif" font-size="14.00">AIMDConcurrencyController[root.4]</text>
+</g>
+<g id="clust4" class="cluster">
+<title>cluster_s3</title>
+<polygon fill="none" stroke="black" points="18.4,-338 18.4,-551 580.39,-551 580.39,-338 18.4,-338"/>
+<text text-anchor="middle" x="299.39" y="-535.8" font-family="Times,serif" font-size="14.00">ArithmeticCombinator[root.1]</text>
+</g>
+<g id="clust7" class="cluster">
+<title>cluster_s8</title>
+<polygon fill="none" stroke="black" points="970.47,-117 970.47,-330 1504.46,-330 1504.46,-117 970.47,-117"/>
+<text text-anchor="middle" x="1237.46" y="-314.8" font-family="Times,serif" font-size="14.00">ArithmeticCombinator[root.2]</text>
+</g>
+<g id="clust10" class="cluster">
+<title>cluster_s13</title>
+<polygon fill="none" stroke="black" points="672.39,-338 672.39,-551 1143.27,-551 1143.27,-338 672.39,-338"/>
+<text text-anchor="middle" x="907.83" y="-535.8" font-family="Times,serif" font-size="14.00">EMA[root.3]</text>
+</g>
+<g id="clust13" class="cluster">
+<title>cluster_s1</title>
+<polygon fill="none" stroke="black" points="8,-171 8,-330 191.19,-330 191.19,-171 8,-171"/>
+<text text-anchor="middle" x="99.6" y="-314.8" font-family="Times,serif" font-size="14.00">PromQL[root.0]</text>
+</g>
+<!-- n20 -->
+<g id="node1" class="node">
+<title>n20</title>
+<ellipse fill="none" stroke="black" cx="1938.54" cy="-130" rx="63.09" ry="18"/>
+<text text-anchor="middle" x="1938.54" y="-126.3" font-family="Times,serif" font-size="14.00">is_overload</text>
+</g>
+<!-- n21 -->
+<g id="node2" class="node">
+<title>n21</title>
+<ellipse fill="none" stroke="black" cx="1938.54" cy="-76" rx="80.69" ry="18"/>
+<text text-anchor="middle" x="1938.54" y="-72.3" font-family="Times,serif" font-size="14.00">load_multiplier</text>
+</g>
+<!-- n18 -->
+<g id="node3" class="node">
+<title>n18</title>
+<ellipse fill="none" stroke="black" cx="1772.2" cy="-130" rx="48.99" ry="18"/>
+<text text-anchor="middle" x="1772.2" y="-126.3" font-family="Times,serif" font-size="14.00">setpoint</text>
+</g>
+<!-- n19 -->
+<g id="node4" class="node">
+<title>n19</title>
+<ellipse fill="none" stroke="black" cx="1772.2" cy="-76" rx="38.19" ry="18"/>
+<text text-anchor="middle" x="1772.2" y="-72.3" font-family="Times,serif" font-size="14.00">signal</text>
+</g>
+<!-- n19&#45;&gt;n21 -->
+<!-- n6 -->
+<g id="node5" class="node">
+<title>n6</title>
+<ellipse fill="none" stroke="black" cx="99.6" cy="-460" rx="31.4" ry="18"/>
+<text text-anchor="middle" x="99.6" y="-456.3" font-family="Times,serif" font-size="14.00">2.00</text>
+</g>
+<!-- n5 -->
+<g id="node8" class="node">
+<title>n5</title>
+<ellipse fill="none" stroke="black" cx="314.19" cy="-460" rx="27" ry="18"/>
+<text text-anchor="middle" x="314.19" y="-456.3" font-family="Times,serif" font-size="14.00">rhs</text>
+</g>
+<!-- n6&#45;&gt;n5 -->
+<g id="edge2" class="edge">
+<title>n6&#45;&gt;n5</title>
+<path fill="none" stroke="black" d="M130.8,-460C130.8,-460 277.03,-460 277.03,-460"/>
+<polygon fill="black" stroke="black" points="277.03,-463.5 287.03,-460 277.03,-456.5 277.03,-463.5"/>
+</g>
+<!-- n4 -->
+<g id="node6" class="node">
+<title>n4</title>
+<ellipse fill="none" stroke="black" cx="314.19" cy="-406" rx="27" ry="18"/>
+<text text-anchor="middle" x="314.19" y="-402.3" font-family="Times,serif" font-size="14.00">lhs</text>
+</g>
+<!-- n7 -->
+<g id="node7" class="node">
+<title>n7</title>
+<ellipse fill="none" stroke="black" cx="488.79" cy="-460" rx="41.69" ry="18"/>
+<text text-anchor="middle" x="488.79" y="-456.3" font-family="Times,serif" font-size="14.00">output</text>
+</g>
+<!-- n15 -->
+<g id="node14" class="node">
+<title>n15</title>
+<ellipse fill="none" stroke="black" cx="798.43" cy="-460" rx="76.09" ry="18"/>
+<text text-anchor="middle" x="798.43" y="-456.3" font-family="Times,serif" font-size="14.00">max_envelope</text>
+</g>
+<!-- n7&#45;&gt;n15 -->
+<g id="edge11" class="edge">
+<title>n7&#45;&gt;n15</title>
+<path fill="none" stroke="black" d="M530.55,-460C530.55,-460 712.33,-460 712.33,-460"/>
+<polygon fill="black" stroke="black" points="712.33,-463.5 722.33,-460 712.33,-456.5 712.33,-463.5"/>
+<text text-anchor="middle" x="626.39" y="-463.8" font-family="Times,serif" font-size="14.00">MAX_EMA</text>
+</g>
+<!-- n5&#45;&gt;n7 -->
+<!-- n11 -->
+<g id="node9" class="node">
+<title>n11</title>
+<ellipse fill="none" stroke="black" cx="1051.67" cy="-185" rx="31.4" ry="18"/>
+<text text-anchor="middle" x="1051.67" y="-181.3" font-family="Times,serif" font-size="14.00">1.10</text>
+</g>
+<!-- n10 -->
+<g id="node12" class="node">
+<title>n10</title>
+<ellipse fill="none" stroke="black" cx="1307.27" cy="-185" rx="27" ry="18"/>
+<text text-anchor="middle" x="1307.27" y="-181.3" font-family="Times,serif" font-size="14.00">rhs</text>
+</g>
+<!-- n11&#45;&gt;n10 -->
+<g id="edge4" class="edge">
+<title>n11&#45;&gt;n10</title>
+<path fill="none" stroke="black" d="M1083.01,-185C1083.01,-185 1269.96,-185 1269.96,-185"/>
+<polygon fill="black" stroke="black" points="1269.96,-188.5 1279.96,-185 1269.96,-181.5 1269.96,-188.5"/>
+</g>
+<!-- n9 -->
+<g id="node10" class="node">
+<title>n9</title>
+<ellipse fill="none" stroke="black" cx="1307.27" cy="-239" rx="27" ry="18"/>
+<text text-anchor="middle" x="1307.27" y="-235.3" font-family="Times,serif" font-size="14.00">lhs</text>
+</g>
+<!-- n12 -->
+<g id="node11" class="node">
+<title>n12</title>
+<ellipse fill="none" stroke="black" cx="1412.86" cy="-185" rx="41.69" ry="18"/>
+<text text-anchor="middle" x="1412.86" y="-181.3" font-family="Times,serif" font-size="14.00">output</text>
+</g>
+<!-- n12&#45;&gt;n18 -->
+<g id="edge12" class="edge">
+<title>n12&#45;&gt;n18</title>
+<path fill="none" stroke="black" d="M1413.13,-166.99C1413.13,-150.95 1413.13,-130 1413.13,-130 1413.13,-130 1713.4,-130 1713.4,-130"/>
+<polygon fill="black" stroke="black" points="1713.4,-133.5 1723.4,-130 1713.4,-126.5 1713.4,-133.5"/>
+<text text-anchor="middle" x="1588.96" y="-151.8" font-family="Times,serif" font-size="14.00">LATENCY_SETPOINT</text>
+</g>
+<!-- n10&#45;&gt;n12 -->
+<!-- n14 -->
+<g id="node13" class="node">
+<title>n14</title>
+<ellipse fill="none" stroke="black" cx="798.43" cy="-406" rx="35.19" ry="18"/>
+<text text-anchor="middle" x="798.43" y="-402.3" font-family="Times,serif" font-size="14.00">input</text>
+</g>
+<!-- n16 -->
+<g id="node15" class="node">
+<title>n16</title>
+<ellipse fill="none" stroke="black" cx="1051.67" cy="-433" rx="41.69" ry="18"/>
+<text text-anchor="middle" x="1051.67" y="-429.3" font-family="Times,serif" font-size="14.00">output</text>
+</g>
+<!-- n15&#45;&gt;n16 -->
+<!-- n16&#45;&gt;n9 -->
+<g id="edge7" class="edge">
+<title>n16&#45;&gt;n9</title>
+<path fill="none" stroke="black" d="M1088.13,-424.18C1088.13,-387.02 1088.13,-245 1088.13,-245 1088.13,-245 1271.7,-245 1271.7,-245"/>
+<polygon fill="black" stroke="black" points="1271.7,-248.5 1281.7,-245 1271.7,-241.5 1271.7,-248.5"/>
+<text text-anchor="middle" x="1206.77" y="-339.8" font-family="Times,serif" font-size="14.00">LATENCY_EMA</text>
+</g>
+<!-- n2 -->
+<g id="node16" class="node">
+<title>n2</title>
+<ellipse fill="none" stroke="black" cx="99.6" cy="-239" rx="41.69" ry="18"/>
+<text text-anchor="middle" x="99.6" y="-235.3" font-family="Times,serif" font-size="14.00">output</text>
+</g>
+<!-- n2&#45;&gt;n19 -->
+<g id="edge10" class="edge">
+<title>n2&#45;&gt;n19</title>
+<path fill="none" stroke="black" d="M100.13,-220.93C100.13,-178.49 100.13,-76 100.13,-76 100.13,-76 1723.74,-76 1723.74,-76"/>
+<polygon fill="black" stroke="black" points="1723.74,-79.5 1733.74,-76 1723.74,-72.5 1723.74,-79.5"/>
+<text text-anchor="middle" x="927.47" y="-60.8" font-family="Times,serif" font-size="14.00">LATENCY</text>
+</g>
+<!-- n2&#45;&gt;n4 -->
+<g id="edge8" class="edge">
+<title>n2&#45;&gt;n4</title>
+<path fill="none" stroke="black" d="M136.13,-247.98C136.13,-282.67 136.13,-406 136.13,-406 136.13,-406 277.15,-406 277.15,-406"/>
+<polygon fill="black" stroke="black" points="277.15,-409.5 287.15,-406 277.15,-402.5 277.15,-409.5"/>
+<text text-anchor="middle" x="234.19" y="-342.8" font-family="Times,serif" font-size="14.00">LATENCY</text>
+</g>
+<!-- n2&#45;&gt;n14 -->
+<g id="edge9" class="edge">
+<title>n2&#45;&gt;n14</title>
+<path fill="none" stroke="black" d="M138.96,-233C286.61,-233 799.13,-233 799.13,-233 799.13,-233 799.13,-377.81 799.13,-377.81"/>
+<polygon fill="black" stroke="black" points="795.64,-377.81 799.13,-387.81 802.64,-377.81 795.64,-377.81"/>
+<text text-anchor="middle" x="394.19" y="-259.8" font-family="Times,serif" font-size="14.00">LATENCY</text>
+</g>
+</g>
+</svg>
