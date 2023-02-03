@@ -25,6 +25,7 @@ LDFLAGS="\
 "
 
 build_args=(
+  --trimpath
   --ldflags "${LDFLAGS}"
   -o "${TARGET}"
   "${SOURCE}"

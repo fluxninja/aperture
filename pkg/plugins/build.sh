@@ -21,6 +21,7 @@ LDFLAGS="\
 "
 
 build_args=(
+  --trimpath
   -buildmode=plugin
   --ldflags "${LDFLAGS}"
   -o "${TARGET}"
