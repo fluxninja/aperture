@@ -1,8 +1,8 @@
 digraph  {
 	subgraph cluster_s17 {
 		label="AIMDConcurrencyController[root.4]";margin="50.0";
-		n20[label="is_overload"];
-		n21[label="load_multiplier"];
+		n21[label="is_overload"];
+		n20[label="load_multiplier"];
 		n18[label="setpoint"];
 		n19[label="signal"];
 		n19->n21[style="invis"];
@@ -12,14 +12,14 @@ digraph  {
 	}
 	subgraph cluster_s3 {
 		label="ArithmeticCombinator[root.1]";margin="50.0";
-		n6[label="2.00"];
-		n4[label="lhs"];
+		n5[label="2.00"];
+		n6[label="lhs"];
 		n7[label="output"];
-		n5[label="rhs"];
-		n6->n5;
-		n5->n7[style="invis"];
+		n4[label="rhs"];
+		n5->n4;
+		n6->n7[style="invis"];
+		{rank=same; n4;n6;};
 		{rank=same; n7;};
-		{rank=same; n4;n5;};
 		
 	}
 	subgraph cluster_s8 {
@@ -51,11 +51,11 @@ digraph  {
 		
 	}
 	rankdir="LR";splines="ortho";
-	n16->n9[label="LATENCY_EMA"];
-	n2->n4[label="LATENCY"];
-	n2->n14[label="LATENCY"];
-	n2->n19[label="LATENCY"];
 	n7->n15[label="MAX_EMA"];
 	n12->n18[label="LATENCY_SETPOINT"];
+	n16->n9[label="LATENCY_EMA"];
+	n2->n6[label="LATENCY"];
+	n2->n14[label="LATENCY"];
+	n2->n19[label="LATENCY"];
 	
 }
