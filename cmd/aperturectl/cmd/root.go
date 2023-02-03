@@ -7,10 +7,11 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/blueprints"
+	"github.com/fluxninja/aperture/pkg/info"
 )
 
 // Version shows the version of ApertureCtl.
-var Version = "0.0.1"
+var Version = info.Version
 
 func init() {
 	RootCmd.AddCommand(blueprints.BlueprintsCmd)
