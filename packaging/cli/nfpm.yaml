@@ -1,0 +1,16 @@
+# check https://nfpm.goreleaser.com/configuration for detailed usage
+name: "aperturectl"
+arch: "${GOARCH}"
+version: "${VERSION}"
+section: "default"
+priority: "extra"
+provides: [aperturectl]
+maintainer: "FluxNinja <help@fluxninja.com>"
+description: |
+  CLI for flow control and reliability management for modern web applications
+vendor: "FluxNinja"
+homepage: "https://www.fluxninja.com"
+license: "GPL-3.0"
+contents:
+  - src: ./dist/aperturectl
+    dst: /usr/bin/aperturectl

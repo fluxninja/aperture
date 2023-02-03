@@ -23,8 +23,13 @@ LDFLAGS="\
     -X 'github.com/fluxninja/aperture/pkg/info.GitCommitHash=${GIT_COMMIT_HASH}' \
     -X 'github.com/fluxninja/aperture/pkg/info.Prefix=${PREFIX}' \
 "
-if [ -z "${RACE:-}" ]; then
-    go build --ldflags "${LDFLAGS}" -o "${TARGET}" "${SOURCE}"
-else
-    go build --race --ldflags "${LDFLAGS}" -o "${TARGET}" "${SOURCE}"
+
+build_args=(
+  --ldflags "${LDFLAGS}"
+  -o "${TARGET}"
+  "${SOURCE}"
+)
+if [ -n "${RACE:-}" ]; then
+  build_args+=( --race )
 fi
+go build "${build_args[@]}"

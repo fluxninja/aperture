@@ -121,7 +121,7 @@ repos:
         name: "Config CLI docs"
         entry: "./scripts/precommit/generate_cli_docs.sh"
         language: script
-        files: 'cmd/aperturectl/*'
+        files: "^cmd/aperturectl/.*"
         pass_filenames: false
         description: "Generate CLI docs"
       - id: generate-blueprints

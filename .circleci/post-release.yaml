@@ -70,7 +70,8 @@ jobs:
         description: Github repository to tag (organization/repository)
       deployment-key:
         type: string
-        description: Deployment key to use when interacting with remote repository
+        description:
+          Deployment key to use when interacting with remote repository
       tag:
         type: string
         description: What git tag to use when tagging remote repository
@@ -106,7 +107,7 @@ jobs:
             cd /home/circleci/project
             git push origin --tags
 
-  publish-aperture-agent-bare-metal-packages:
+  publish-packages:
     parameters:
       workspace-name:
         type: string
@@ -117,6 +118,9 @@ jobs:
         type: string
         description: the GOARCH to use for the build
         default: amd64
+      component:
+        type: string
+        description: the component to build
       tag:
         type: string
         description: The release tag
@@ -124,60 +128,27 @@ jobs:
     environment:
       PACKAGES_DIR: "/tmp/packages"
       GOARCH: <<parameters.goarch>>
+      COMPONENT: <<parameters.component>>
+      VERSION: <<parameters.tag>>
     steps:
       - checkout
       - asdf_install:
-          cache_name: aperture-agent-bare-metal-packages
+          cache_name: aperture-{{ .Environment.COMPONENT }}-packages
           tools: |-
             golang
-      - run:
-          name: "Set build vars"
-          command: |
-            GIT_BRANCH="$(git branch --show-current)"
-            GIT_COMMIT_HASH="$(git log -n1 --format=%H)"
-            GOOS="$(go env GOOS)"
-            VERSION="${RELEASE_TAG}"
-            mkdir -p $HOME/go
-            GOPATH=$HOME/go
-            PATH=$PATH:$GOPATH/bin
-            RACE=""
-
-            export GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION GOPATH PATH RACE
-            declare -p GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION GOPATH PATH RACE >> "${BASH_ENV}"
-          environment:
-            RELEASE_TAG: <<parameters.tag>>
       - restore_cache:
           name: Restore go cache
           keys:
-            - aperture-agent-bare-metal-packages-go-cache-{{ checksum "~/day" }}
+            - aperture-{{ .Environment.COMPONENT }}-packages-go-cache
       - run:
-          name: "Compile agent and plugins"
-          command: |
-            SOURCE="./cmd/aperture-agent" TARGET="./dist/aperture-agent" ./pkg/info/build.sh
-            for plugin_dir in ./plugins/*/aperture-plugin-*; do
-              plugin="$(basename "${plugin_dir}")"
-              echo "Building plugin ${plugin}"
-              SOURCE="${plugin_dir}" TARGET="./dist/plugins/${plugin}.so" ./pkg/plugins/build.sh
-            done
-          environment:
-            CGO_ENABLED: "1"
-            PREFIX: "aperture"
-            LDFLAGS: "-s -w -extldflags \"-Wl,--allow-multiple-definition\""
+          name: "Compile binaries"
+          command: ./.circleci/scripts/compile.sh "${COMPONENT}"
       - run:
           name: Install nFPM
-          command: |
-            filename="nfpm_amd64.deb"
-            file="/tmp/${filename}"
-            curl --silent --show-error --location https://github.com/goreleaser/nfpm/releases/latest/download/${filename} -o "${file}"
-            sudo dpkg -i "${file}"
-            which nfpm
+          command: ./.circleci/scripts/install_nfpm.sh
       - run:
           name: Package
-          command: |
-            mkdir -p dist/packages/
-            nfpm package --packager deb --target dist/packages/
-            nfpm package --packager rpm --target dist/packages/
-            ls -l dist/packages/
+          command: ./.circleci/scripts/nfpm_package.sh
       - run:
           name: Attach packages to release
           command: |
@@ -187,15 +158,18 @@ jobs:
             && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
             && sudo apt update \
             && sudo apt install gh -y
-            gh release upload "${VERSION}" $(ls dist/packages/*) --repo=fluxninja/aperture
+            to_upload=( $(ls dist/packages/*) )
+            [ "${COMPONENT}" != "cli" ] || to_upload+=("dist/aperturectl")
+            gh release upload "${VERSION}" "${to_upload[@]}" --repo=fluxninja/aperture
+
       - save_cache:
           name: Save go cache
-          key: aperture-agent-bare-metal-packages-go-cache-{{ checksum "~/day" }}
+          key: aperture-{{ .Environment.COMPONENT }}-packages-go-cache
           paths:
             - ../.cache/go-build
           when: on_success
       - asdf_save_cache:
-          cache_name: aperture-agent-bare-metal-packages
+          cache_name: aperture-{{ .Environment.COMPONENT }}-packages
 
 workflows:
   version: 2
@@ -222,13 +196,18 @@ workflows:
             tags:
               only: /^v.*$/
 
-      - publish-aperture-agent-bare-metal-packages:
+      - publish-packages:
           filters:
             branches:
               ignore: /.+/
             tags:
               only: /^v.*/
           tag: << pipeline.git.tag >>
+          matrix:
+            parameters:
+              component:
+                - agent
+                - cli
 
 commands:
   asdf_install:
@@ -257,8 +236,11 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<< parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}-{{ checksum "~/installed-tools" }}
-            - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<< parameters.cache_name >>-
+            - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
+              parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
+              checksum "go.mod" }}-{{ checksum "~/installed-tools" }}
+            - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
+              parameters.cache_name >>-
       - run:
           name: Install ASDF tools
           environment:
@@ -277,7 +259,10 @@ commands:
     steps:
       - save_cache:
           name: Save ASDF cache
-          key: aperture-asdf-cache-v7-{{ checksum "~/month" }}-<< parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum "go.mod" }}-{{ checksum "~/installed-tools" }}
+          key:
+            aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
+            parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
+            "go.mod" }}-{{ checksum "~/installed-tools" }}
           paths:
             - ~/.asdf
   opsninja_install:
