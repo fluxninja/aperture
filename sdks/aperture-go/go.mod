@@ -1,6 +1,6 @@
 module github.com/fluxninja/aperture-go
 
-go 1.20
+go 1.19
 
 require (
 	go.opentelemetry.io/otel v1.10.0

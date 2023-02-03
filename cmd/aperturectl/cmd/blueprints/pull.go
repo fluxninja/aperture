@@ -42,10 +42,7 @@ func resolveApertureVersion(version string) (string, error) {
 	for _, ref := range refs {
 		reference := ref.Name().String()
 		if ref.Name().IsTag() && strings.HasPrefix(reference, tagsRefPrefix) {
-			version, found := strings.CutPrefix(reference, tagsRefPrefix)
-			if !found {
-				return "", fmt.Errorf("unable to parse remote release ref: %s", reference)
-			}
+			version := strings.TrimPrefix(reference, tagsRefPrefix)
 
 			release, err := semver.NewVersion(version)
 			if err != nil {
