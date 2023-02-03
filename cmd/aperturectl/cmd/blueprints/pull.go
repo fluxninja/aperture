@@ -2,17 +2,71 @@ package blueprints
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 
+	"github.com/Masterminds/semver/v3"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
+	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/jsonnet-bundler/jsonnet-bundler/pkg"
 	"github.com/jsonnet-bundler/jsonnet-bundler/pkg/jsonnetfile"
 	specv1 "github.com/jsonnet-bundler/jsonnet-bundler/spec/v1"
 	"github.com/jsonnet-bundler/jsonnet-bundler/spec/v1/deps"
 	"github.com/spf13/cobra"
 )
+
+func resolveApertureVersion(version string) (string, error) {
+	if strings.HasPrefix(version, "v") {
+		return version, nil
+	}
+
+	remote := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
+		Name: "origin",
+		URLs: []string{apertureRepo},
+	})
+
+	refs, err := remote.List(&git.ListOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	var latestRelease *semver.Version
+
+	tagsRefPrefix := "refs/tags/v"
+
+	for _, ref := range refs {
+		reference := ref.Name().String()
+		if ref.Name().IsTag() && strings.HasPrefix(reference, tagsRefPrefix) {
+			version, found := strings.CutPrefix(reference, tagsRefPrefix)
+			if !found {
+				return "", fmt.Errorf("unable to parse remote release ref: %s", reference)
+			}
+
+			release, err := semver.NewVersion(version)
+			if err != nil {
+				return "", err
+			}
+
+			if release.Prerelease() != "" {
+				continue
+			}
+
+			if latestRelease == nil || release.GreaterThan(latestRelease) {
+				latestRelease = release
+			}
+		}
+	}
+
+	if latestRelease == nil {
+		return "", errors.New("unable to resolve release tags to find latest release")
+	}
+	return fmt.Sprintf("v%s", latestRelease.String()), nil
+}
 
 var pullCmd = &cobra.Command{
 	Use:   "pull",
@@ -25,8 +79,13 @@ Use this command to pull the Aperture Blueprints in local system to use for gene
 
 aperturectl blueprints pull --version v0.22.0`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		apertureBlueprintsDir := filepath.Join(blueprintsDir, blueprintsVersion)
-		err := os.MkdirAll(apertureBlueprintsDir, os.ModePerm)
+		resolvedVersion, err := resolveApertureVersion(blueprintsVersion)
+		if err != nil {
+			return nil
+		}
+
+		apertureBlueprintsDir := filepath.Join(blueprintsDir, resolvedVersion)
+		err = os.MkdirAll(apertureBlueprintsDir, os.ModePerm)
 		if err != nil {
 			return err
 		}
@@ -60,7 +119,7 @@ aperturectl blueprints pull --version v0.22.0`,
 			return err
 		}
 
-		uri := fmt.Sprintf("%s@%s", apertureBlueprintsURI, blueprintsVersion)
+		uri := fmt.Sprintf("%s@%s", apertureBlueprintsURI, resolvedVersion)
 		d := deps.Parse(apertureBlueprintsDir, uri)
 		if !depEqual(spec.Dependencies[d.Name()], *d) {
 			spec.Dependencies[d.Name()] = *d
