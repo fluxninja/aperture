@@ -158,7 +158,7 @@ func (constructor Constructor) newPluginRegistry(unmarshaller config.Unmarshalle
 			plugin, err := plugin.Open(pluginPath)
 			if err != nil {
 				log.Warn().Err(err).Str("plugin", pluginName).Msg("unable to open plugin")
-				continue
+				return nil, nil, err
 			}
 			for _, pluginSymbol := range pluginSymbols {
 				// lookup symbol
