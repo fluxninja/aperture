@@ -1,6 +1,6 @@
 ---
-title: Generate and Apply Policies
-description: How to generate and apply Policies in Aperture
+title: Generating and Applying Policies
+description: How to generate and apply policies in Aperture
 keywords:
   - policy
   - jsonnet
@@ -16,13 +16,13 @@ import CodeBlock from '@theme/CodeBlock';
 
 ## Introduction
 
-Aperture comes with a pre-packaged list of [Aperture Policies][policies] and
-Grafana Dashboards that can be used both as a guide for creating new policies,
-and as ready-to-use Aperture Blueprints for generating policies customized to a
-[Service][service] and the use-case.
+Aperture comes with a pre-packaged [Blueprints][blueprints] that can be used to
+generate [Policies][policies] and Grafana Dashboards. Blueprints can be used
+both as a guide for creating new policies, or used as-is by providing required
+parameters or customizations.
 
 In order to install Aperture Blueprints and generate policies, you can use
-`aperturectl`.
+`aperturectl` CLI tool.
 
 ## Manage Aperture Blueprints
 
@@ -176,6 +176,6 @@ $ kubectl delete policies.fluxninja.com -n aperture-controller static-rate-limit
 
 [controller-metrics]: /reference/observability/prometheus-metrics/controller.md
 [agent-metrics]: /reference/observability/prometheus-metrics/agent.md
-[blueprints]: /get-started/policies/blueprints/blueprints.md
+[blueprints]: /reference/policies/bundled-blueprints/bundled-blueprints.md
 [policies]: /concepts/policy/policy.md
 [service]: /concepts/integrations/flow-control/service.md
