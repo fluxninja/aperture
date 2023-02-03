@@ -1,6 +1,6 @@
 module github.com/fluxninja/aperture/playground/demo_app
 
-go 1.20
+go 1.19
 
 require (
 	github.com/fluxninja/aperture v0.11.0
