@@ -128,10 +128,10 @@ export const ParameterDescription = ({name, type, reference, value, description}
 
 <ParameterDescription
     name="policy.concurrency_controller.gradient"
-    type="aperture.spec.v1.GradientParameters"
-    reference="../../configuration/policy#v1-gradient-parameters"
+    type="aperture.spec.v1.GradientControllerParameters"
+    reference="../../configuration/policy#v1-gradient-controller-parameters"
     value=''
-    description='Gradient parameters.' />
+    description='Gradient Controller parameters.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.alerter"
