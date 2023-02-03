@@ -49,7 +49,7 @@ aperturectl blueprints list --version {apertureVersion}
 </CodeBlock>
 
 To learn more about `aperturectl` and the other commands it supports, visit
-[aperturectl](/get-started/aperture-cli/aperturectl.md).
+[aperturectl](/reference/aperture-cli/aperturectl.md).
 
 ## Generate Aperture Policies and Grafana Dashboards {#generating-aperture-policies-and-grafana-dashboards}
 

@@ -10,7 +10,7 @@ description: |
   Flow control and reliability management for modern web applications
 vendor: "FluxNinja"
 homepage: "https://www.fluxninja.com"
-license: "GPL-3.0"
+license: "Apache-2.0"
 scripts:
   postinstall: ./packaging/agent/post-install.sh
 contents:

@@ -8,8 +8,9 @@ import (
 )
 
 const (
+	apertureRepo                     = "https://github.com/fluxninja/aperture"
 	apertureBlueprintsRepoDefault    = "github.com/fluxninja/aperture/blueprints"
-	apertureBlueprintsVersionDefault = "main"
+	apertureBlueprintsVersionDefault = "latest"
 )
 
 var (

@@ -47,7 +47,7 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 
 ```
       --uri string       URI of Aperture Blueprints, could be a local path or a remote git repository (default "github.com/fluxninja/aperture/blueprints")
-      --version string   Version of Aperture Blueprints (default "main")
+      --version string   Version of Aperture Blueprints (default "latest")
 ```
 
 ### SEE ALSO
