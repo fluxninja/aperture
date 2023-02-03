@@ -64,7 +64,7 @@ repos:
     rev: "v2.7.1"
     hooks:
       - id: prettier
-        exclude: ^(docs/content/reference/.*|manifests/charts/.*/README*|.github/.*/.*.md)
+        exclude: ^(docs/content/reference/.*|docs/content/get-started/aperture-cli/aperturectl*|manifests/charts/.*/README*|.github/.*/.*.md)
         types_or:
           [
             sh,
@@ -117,6 +117,13 @@ repos:
         files: '\.proto$|\.go$'
         pass_filenames: false
         description: "Generate config markdown"
+      - id: generate-cli-docs
+        name: "Config CLI docs"
+        entry: "./scripts/precommit/generate_cli_docs.sh"
+        language: script
+        files: 'cmd/aperturectl/*'
+        pass_filenames: false
+        description: "Generate CLI docs"
       - id: generate-blueprints
         name: "Generate Blueprints"
         entry: "./scripts/precommit/generate_blueprints.sh"

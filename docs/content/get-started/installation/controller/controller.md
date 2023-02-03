@@ -321,10 +321,10 @@ state and `Controller` Custom Resource in `created` state.
 The process of creating policies for Aperture can be done either after the
 installation of the controller or after the installation of the agent, depending
 on your preference.
-[Create Policy](/get-started/policies/get-started-with-policy.md#create-policy)
-guide includes step-by-step instructions on how to create policies for Aperture
-in a Kubernetes cluster, which you can follow to create policies according to
-your needs.
+[Generating and applying policies](/get-started/policies/policies.md) guide
+includes step-by-step instructions on how to create policies for Aperture in a
+Kubernetes cluster, which you can follow to create policies according to your
+needs.
 
 ## Uninstall
 

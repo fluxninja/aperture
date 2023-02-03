@@ -25,8 +25,8 @@ pushd "${blueprints_root}" >/dev/null
 jb install
 popd >/dev/null
 
-# remove md files in "${blueprints_root}"/../docs/content/reference/policies/bundled-blueprints and subdirectories
-$FIND "${blueprints_root}"/../docs/content/reference/policies/bundled-blueprints -type f -name '*.md' -delete
+# remove md files in "${blueprints_root}"/../docs/content/reference/policies/bundled-blueprints' subdirectories
+$FIND "${blueprints_root}"/../docs/content/reference/policies/bundled-blueprints -mindepth 2 -type f -name '*.md' -delete
 
 # for all subdirectories within "$blueprints_root"/lib containing config.libsonnet, generate README
 $FIND "$blueprints_root"/lib/1.0 -type f -name config.libsonnet | while read -r files; do
