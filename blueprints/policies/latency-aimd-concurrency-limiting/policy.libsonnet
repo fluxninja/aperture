@@ -29,14 +29,14 @@ local extrapolator = spec.v1.Extrapolator;
 local constantSignal = spec.v1.ConstantSignal;
 local aimdConcurrencyController = spec.v1.AIMDConcurrencyController;
 
-function(params) {
-  _config:: config.common + config.policy + params,
+function(cfg) {
+  local params = std.mergePatch(config.common + config.policy, cfg),
 
   local policyDef =
     policy.new()
     + policy.withResources(resources.new()
-                           + resources.withFluxMetersMixin({ [$._config.policy_name]: $._config.flux_meter })
-                           + resources.withClassifiers($._config.classifiers))
+                           + resources.withFluxMetersMixin({ [params.policy_name]: params.flux_meter })
+                           + resources.withClassifiers(params.classifiers))
     + policy.withCircuit(
       circuit.new()
       + circuit.withEvaluationInterval(evaluation_interval='0.5s')
@@ -45,7 +45,7 @@ function(params) {
           component.withQuery(
             query.new()
             + query.withPromql(
-              local q = 'sum(increase(flux_meter_sum{valid="true", flow_status="OK", flux_meter_name="%(policy_name)s"}[5s]))/sum(increase(flux_meter_count{valid="true", flow_status="OK", flux_meter_name="%(policy_name)s"}[5s]))' % { policy_name: $._config.policy_name };
+              local q = 'sum(increase(flux_meter_sum{valid="true", flow_status="OK", flux_meter_name="%(policy_name)s"}[5s]))/sum(increase(flux_meter_count{valid="true", flow_status="OK", flux_meter_name="%(policy_name)s"}[5s]))' % { policy_name: params.policy_name };
               promQL.new()
               + promQL.withQueryString(q)
               + promQL.withEvaluationInterval('1s')
@@ -53,13 +53,13 @@ function(params) {
             ),
           ),
           component.withArithmeticCombinator(combinator.mul(port.withSignalName('LATENCY'),
-                                                            port.withConstantSignal($._config.latency_baseliner.latency_ema_limit_multiplier),
+                                                            port.withConstantSignal(params.latency_baseliner.latency_ema_limit_multiplier),
                                                             output=port.withSignalName('MAX_EMA'))),
           component.withArithmeticCombinator(combinator.mul(port.withSignalName('LATENCY_EMA'),
-                                                            port.withConstantSignal($._config.latency_baseliner.latency_tolerance_multiplier),
+                                                            port.withConstantSignal(params.latency_baseliner.latency_tolerance_multiplier),
                                                             output=port.withSignalName('LATENCY_SETPOINT'))),
           component.withEma(
-            ema.withParameters($._config.latency_baseliner.ema)
+            ema.withParameters(params.latency_baseliner.ema)
             + ema.withInPortsMixin(
               ema.inPorts.withInput(port.withSignalName('LATENCY'))
               + ema.inPorts.withMaxEnvelope(port.withSignalName('MAX_EMA'))
@@ -69,7 +69,7 @@ function(params) {
           component.withFlowControl(
             flowControl.new()
             + flowControl.withAimdConcurrencyController(
-              local cc = $._config.concurrency_controller;
+              local cc = params.concurrency_controller;
               aimdConcurrencyController.new()
               + aimdConcurrencyController.withFlowSelector(cc.flow_selector)
               + aimdConcurrencyController.withSchedulerParameters(cc.scheduler)
@@ -89,7 +89,7 @@ function(params) {
               }),
             ),
           ),
-        ] + $._config.components,
+        ] + params.components,
       ),
     ),
 
@@ -97,14 +97,14 @@ function(params) {
     kind: 'Policy',
     apiVersion: 'fluxninja.com/v1alpha1',
     metadata: {
-      name: $._config.policy_name,
+      name: params.policy_name,
       labels: {
         'fluxninja.com/validate': 'true',
       },
     },
     spec: policyDef,
     dynamicConfig: {
-      concurrency_controller: $._config.concurrency_controller.dynamic_config,
+      concurrency_controller: params.concurrency_controller.dynamic_config,
     },
   },
 

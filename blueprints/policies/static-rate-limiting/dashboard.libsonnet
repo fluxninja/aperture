@@ -37,15 +37,16 @@ local newTimeSeriesPanel(title, datasource, query, axisLabel='', unit='') =
     interval: '1s',
   };
 
-function(params) {
-  _config:: config.common + config.dashboard + params,
-
-  local ds = $._config.datasource.name,
+function(cfg) {
+  local params = std.mergePatch(config.common + config.dashboard, cfg),
+  local policyName = params.policy_name,
+  local ds = params.datasource,
+  local dsName = ds.name,
 
   local rateLimiterPanel =
     newTimeSeriesPanel('Rate Limiter',
                        ds,
-                       'sum by(decision_type) (rate(rate_limiter_counter{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: $._config.policy_name },
+                       'sum by(decision_type) (rate(rate_limiter_counter{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName },
                        'Decisions',
                        'reqps'),
 
@@ -54,7 +55,7 @@ function(params) {
       title='Jsonnet / FluxNinja - Rate Limiter',
       editable=true,
       schemaVersion=18,
-      refresh=$._config.refresh_interval,
+      refresh=params.refresh_interval,
       time_from='now-5m',
       time_to='now'
     )
@@ -62,7 +63,7 @@ function(params) {
       {
         current: {
           text: 'default',
-          value: $._config.datasource.name,
+          value: dsName,
         },
         hide: 0,
         label: 'Data Source',
@@ -70,7 +71,7 @@ function(params) {
         options: [],
         query: 'prometheus',
         refres: 1,
-        regex: $._config.datasource.filter_regex,
+        regex: ds.filter_regex,
         type: 'datasource',
       }
     )

@@ -5,7 +5,7 @@
   * @param (common.policy_name: string required) Name of the policy.
   */
   common: {
-    policy_name: error 'policy_name is required',
+    policy_name: '__REQUIRED_FIELD__',
   },
   /**
   * @section Policy
@@ -27,11 +27,11 @@
     * @param (policy.rate_limiter.dynamic_config: aperture.spec.v1.RateLimiterDefaultConfig) Dynamic configuration for rate limiter that can be applied at the runtime.
     */
     rate_limiter: {
-      rate_limit: error 'policy.rate_limiter.rate_limit must be set',
-      flow_selector: error 'policy.rate_limiter.flow_selector must be set',
+      rate_limit: '__REQUIRED_FIELD__',
+      flow_selector: '__REQUIRED_FIELD__',
       parameters: {
         limit_reset_interval: '1s',
-        label_key: error 'policy.rate_limiter.parameters.label_key is required',
+        label_key: '__REQUIRED_FIELD__',
         lazy_sync: {
           enabled: true,
           num_sync: 5,

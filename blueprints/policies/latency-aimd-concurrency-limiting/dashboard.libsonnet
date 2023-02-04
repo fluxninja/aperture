@@ -124,32 +124,33 @@ local newStatPanel(graphTitle, datasource, graphQuery) =
     },
   };
 
-function(params) {
-  _config:: config.common + config.dashboard + params,
-
+function(cfg) {
   local p = 'service_latency',
-  local ds = $._config.datasource.name,
+  local params = std.mergePatch(config.common + config.dashboard, cfg),
+  local policyName = params.policy_name,
+  local ds = params.datasource,
+  local dsName = ds.name,
 
   local fluxMeterPanel =
     newTimeSeriesPanel('FluxMeter',
-                       ds,
+                       dsName,
                        |||
                          sum(increase(flux_meter_sum{valid="true", flow_status="OK", flux_meter_name="%(policy_name)s"}[$__rate_interval]))
                          / sum(increase(flux_meter_count{valid="true", flow_status="OK", flux_meter_name="%(policy_name)s"}[$__rate_interval]))
-                       ||| % { policy_name: $._config.policy_name },
+                       ||| % { policy_name: policyName },
                        'Latency (ms)',
                        'ms'),
   local WFQSchedulerFlows =
-    newBarGaugePanel('WFQ Scheduler Flows', ds, 'avg(wfq_flows_total{policy_name="%(policy_name)s"})' % { policy_name: $._config.policy_name }),
+    newBarGaugePanel('WFQ Scheduler Flows', dsName, 'avg(wfq_flows_total{policy_name="%(policy_name)s"})' % { policy_name: policyName }),
 
   local WFQSchedulerHeapRequests =
-    newBarGaugePanel('WFQ Scheduler Heap Requests', ds, 'avg(wfq_requests_total{policy_name="%(policy_name)s"})' % { policy_name: $._config.policy_name }),
+    newBarGaugePanel('WFQ Scheduler Heap Requests', dsName, 'avg(wfq_requests_total{policy_name="%(policy_name)s"})' % { policy_name: policyName }),
 
   local TotalBucketLoadSchedFactor =
-    newStatPanel('Average Load Multiplier', ds, 'avg(token_bucket_lm_ratio{policy_name="%(policy_name)s"})' % { policy_name: $._config.policy_name }),
+    newStatPanel('Average Load Multiplier', dsName, 'avg(token_bucket_lm_ratio{policy_name="%(policy_name)s"})' % { policy_name: policyName }),
 
   local TokenBucketBucketCapacity =
-    newStatPanel('Token Bucket Bucket Capacity', ds, 'avg(token_bucket_capacity_total{policy_name="%(policy_name)s"})' % { policy_name: $._config.policy_name })
+    newStatPanel('Token Bucket Bucket Capacity', dsName, 'avg(token_bucket_capacity_total{policy_name="%(policy_name)s"})' % { policy_name: policyName })
     + {
       options+: {
         orientation: 'auto',
@@ -157,7 +158,7 @@ function(params) {
     },
 
   local TokenBucketBucketFillRate =
-    newStatPanel('Token Bucket Bucket FillRate', ds, 'avg(token_bucket_fill_rate{policy_name="%(policy_name)s"})' % { policy_name: $._config.policy_name }) +
+    newStatPanel('Token Bucket Bucket FillRate', dsName, 'avg(token_bucket_fill_rate{policy_name="%(policy_name)s"})' % { policy_name: policyName }) +
     {
       options+: {
         orientation: 'auto',
@@ -165,7 +166,7 @@ function(params) {
     },
 
   local TokenBucketAvailableTokens =
-    newStatPanel('Token Bucket Available Tokens', ds, 'avg(token_bucket_available_tokens_total{policy_name="%(policy_name)s"})' % { policy_name: $._config.policy_name }) +
+    newStatPanel('Token Bucket Available Tokens', dsName, 'avg(token_bucket_available_tokens_total{policy_name="%(policy_name)s"})' % { policy_name: policyName }) +
     {
       options+: {
         orientation: 'auto',
@@ -173,16 +174,16 @@ function(params) {
     },
 
   local IncomingConcurrency =
-    newTimeSeriesPanel('Incoming Concurrency', ds, 'sum(rate(incoming_work_seconds_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: $._config.policy_name }, 'Concurrency', 'none'),
+    newTimeSeriesPanel('Incoming Concurrency', dsName, 'sum(rate(incoming_work_seconds_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Concurrency', 'none'),
 
   local AcceptedConcurrency =
-    newTimeSeriesPanel('Accepted Concurrency', ds, 'sum(rate(accepted_work_seconds_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: $._config.policy_name }, 'Concurrency', 'none'),
+    newTimeSeriesPanel('Accepted Concurrency', dsName, 'sum(rate(accepted_work_seconds_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Concurrency', 'none'),
 
   local WorkloadDecisions =
-    newTimeSeriesPanel('Workload Decisions', ds, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: $._config.policy_name }, 'Decisions', 'reqps'),
+    newTimeSeriesPanel('Workload Decisions', dsName, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Decisions', 'reqps'),
 
   local WorkloadLatency =
-    newTimeSeriesPanel('Workload Latency (Auto Tokens)', ds, '(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name="%(policy_name)s"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name="%(policy_name)s"}[$__rate_interval])))' % { policy_name: $._config.policy_name }, 'Latency', 'ms'),
+    newTimeSeriesPanel('Workload Latency (Auto Tokens)', dsName, '(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name="%(policy_name)s"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name="%(policy_name)s"}[$__rate_interval])))' % { policy_name: policyName }, 'Latency', 'ms'),
 
 
   local dashboardDef =
@@ -190,7 +191,7 @@ function(params) {
       title='Jsonnet / FluxNinja',
       editable=true,
       schemaVersion=18,
-      refresh=$._config.refresh_interval,
+      refresh=params.refresh_interval,
       time_from='now-5m',
       time_to='now'
     )
@@ -198,7 +199,7 @@ function(params) {
       {
         current: {
           text: 'default',
-          value: $._config.datasource.name,
+          value: dsName,
         },
         hide: 0,
         label: 'Data Source',
@@ -206,7 +207,7 @@ function(params) {
         options: [],
         query: 'prometheus',
         refres: 1,
-        regex: $._config.datasource.filter_regex,
+        regex: ds.filter_regex,
         type: 'datasource',
       }
     )

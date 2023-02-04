@@ -5,7 +5,7 @@
   * @param (common.policy_name: string required) Name of the policy.
   */
   common: {
-    policy_name: error 'policy_name must be set',
+    policy_name: '__REQUIRED_FIELD__',
   },
   /**
   * @section Dashboard

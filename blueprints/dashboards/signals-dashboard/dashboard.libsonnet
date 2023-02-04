@@ -7,17 +7,18 @@ local dashboard = grafana.dashboard;
 local timeSeriesPanel = lib.TimeSeriesPanel;
 
 
-function(params) {
-  _config:: config.common + config.dashboard + params,
-
-  local ds = $._config.datasource.name,
+function(cfg) {
+  local params = std.mergePatch(config.common + config.dashboard, cfg),
+  local ds = params.datasource,
+  local dsName = ds.name,
+  local policyName = params.policy_name,
 
   local SignalAveragePanel =
     local query = |||
       increase(signal_reading_sum{policy_name="%(policy_name)s",signal_name="${signal_name}",valid="true"}[$__rate_interval])
       /
       increase(signal_reading_count{policy_name="%(policy_name)s",signal_name="${signal_name}",valid="true"}[$__rate_interval])
-    ||| % { policy_name: $._config.policy_name };
+    ||| % { policy_name: policyName };
     local target =
       grafana.prometheus.target(query) +
       {
@@ -47,7 +48,7 @@ function(params) {
   local InvalidFrequencyPanel =
     local query = |||
       avg by (valid) (rate(signal_reading_count{policy_name="%(policy_name)s",signal_name="${signal_name}"}[$__rate_interval]))
-    ||| % { policy_name: $._config.policy_name };
+    ||| % { policy_name: policyName };
     local target =
       grafana.prometheus.target(query) +
       {
@@ -78,17 +79,17 @@ function(params) {
       title='Signals',
       editable=true,
       schemaVersion=18,
-      refresh=$._config.refresh_interval,
-      time_from=$._config.time_from,
-      time_to=$._config.time_to
+      refresh=params.refresh_interval,
+      time_from=params.time_from,
+      time_to=params.time_to
     )
     .addTemplate(
       {
         current: {
           text: 'default',
-          value: $._config.datasource.name,
+          value: dsName,
         },
-        regex: $._config.datasource.filter_regex,
+        regex: ds.filter_regex,
         hide: 0,
         label: 'Data Source',
         name: 'datasource',
@@ -108,7 +109,7 @@ function(params) {
         type: 'prometheus',
         uid: '${datasource}',
       },
-      query: 'label_values(signal_reading{policy_name="%(policy_name)s"}, signal_name)' % { policy_name: $._config.policy_name },
+      query: 'label_values(signal_reading{policy_name="%(policy_name)s"}, signal_name)' % { policy_name: policyName },
       hide: 0,
       includeAll: false,
       multi: false,

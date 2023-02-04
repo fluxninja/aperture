@@ -5,7 +5,7 @@
   * @param (common.policy_name: string required) Name of the policy.
   */
   common: {
-    policy_name: error 'policyName is not set',
+    policy_name: '__REQUIRED_FIELD__',
   },
   /**
   * @section Policy
@@ -15,7 +15,7 @@
   * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
   */
   policy: {
-    flux_meter: error 'flux_meter is not set',
+    flux_meter: '__REQUIRED_FIELD__',
     classifiers: [],
     components: [],
     /**
@@ -49,7 +49,7 @@
     * @param (policy.concurrency_controller.dynamic_config: aperture.v1.LoadActuatorDynamicConfig) Dynamic configuration for concurrency controller.
     */
     concurrency_controller: {
-      flow_selector: error 'flow_selector for concurrencyController is not set',
+      flow_selector: '__REQUIRED_FIELD__',
       scheduler: {
         auto_tokens: true,
         timeout_factor: '0.5',

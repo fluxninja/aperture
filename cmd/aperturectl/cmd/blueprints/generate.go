@@ -105,7 +105,7 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 		jsonStr, err := vm.EvaluateAnonymousSnippet("bundle.libsonnet", fmt.Sprintf(`
 		local bundle = import '%s/bundle.libsonnet';
 		local config = std.parseYaml(importstr '%s');
-    bundle { _config+:: config }
+    bundle(config)
 		`, importPath, valuesFile))
 		if err != nil {
 			return err

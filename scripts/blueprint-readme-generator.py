@@ -135,7 +135,7 @@ def _get_params_for_blocks(blocks: List[DocBlock], required: bool) -> List[DocBl
 
 def _generate_required_configuration(blocks: List[DocBlock]) -> str:
     """Creates a temporary config objects and renders given policy/dashboard to extract
-       default values from resulting _config object."""
+       default values from resulting config object."""
 
     required_params = _get_params_for_blocks(blocks, required=True)
 
@@ -146,7 +146,7 @@ def _generate_required_configuration(blocks: List[DocBlock]) -> str:
         parts = param_name.split(".")[1:]
         for idx, part in enumerate(parts):
             if idx == len(parts) - 1:
-                parent[part] = "FAKE-VALUE"
+                parent[part] = "__REQUIRED_FIELD__"
             else:
                 if part not in parent:
                     parent[part] = {}
@@ -173,12 +173,15 @@ def _generate_required_configuration(blocks: List[DocBlock]) -> str:
     return jsonnet_config
 
 
-def update_docblock_param_defaults(repository_root: Path, jsonnet_path: Path, blocks: List[DocBlock]):
+def update_docblock_param_defaults(repository_root: Path, jsonnet_path: Path, config_path: Path, config_key: str, blocks: List[DocBlock]):
     jsonnet_data = f"local fn = import '{jsonnet_path}';\n"
+    jsonnet_data += f"local config = import '{config_path}';\n"
     required_config = _generate_required_configuration(blocks)
     jsonnet_data += f"local cfg = {required_config};\n"
+    jsonnet_data += "local c = std.mergePatch(config, cfg);\n"
+    jsonnet_data += f"local cfg = c.common + c.{config_key};\n"
     jsonnet_data += f"fn(cfg)\n"
-    jsonnet_data += "+ { _config::: super._config, policy:: super.policy, circuit:: super.circuit }\n"
+    jsonnet_data += "{_config::: cfg}\n"
 
     rendered_config = None
     with tempfile.NamedTemporaryFile(suffix=".libsonnet") as tmp:
@@ -288,13 +291,6 @@ def get_jinja2_environment() -> jinja2.Environment:
 
 
     return env
-
-
-def update_docblock_param_names(blocks: List[DocBlock], prefix: str):
-    """When rendering README.md, parameter names should be prefixed with blueprint prefix"""
-    for block in blocks:
-        for param in block.parameters.values():
-            param.param_name = f"{prefix}.{param.param_name}"
 
 
 MDX_TEMPLATE = """
@@ -419,9 +415,10 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
         if section == "Common":
             continue
         path = metadata["sources"][section]["path"]
+        config_key = metadata["sources"][section]["config_key"]
         # append common section to blocks
         blocks.extend(sections["Common"])
-        update_docblock_param_defaults(repository_root, path, blocks)
+        update_docblock_param_defaults(repository_root, path, config_path, config_key, blocks)
 
     update_readme_markdown(readme_path, docblocks)
 
