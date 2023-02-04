@@ -67,6 +67,10 @@ generate-docs: generate-helm-readme generate-doc-assets
 generate-config-markdown: go-generate-swagger generate-api
 	@cd ./docs && $(MAKE) generate-config-markdown
 
+generate-aperturectl-docs:
+	@echo Generating aperturectl docs
+	@cd ./docs && $(MAKE) generate-aperturectl-docs
+
 generate-helm-readme:
 	@echo Generating helm readme
 	@cd ./manifests/charts && $(MAKE) generate-helm-readme

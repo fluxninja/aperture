@@ -1,10 +1,9 @@
 ---
-title: Aperturectl Blueprints Remove
-description: Aperturectl Blueprints Remove
+sidebar_label: Remove
+hide_title: true
 keywords:
   - aperturectl
   - aperturectl_blueprints_remove
-sidebar_position: 10
 ---
 
 ## aperturectl blueprints remove
@@ -45,4 +44,4 @@ aperturectl blueprints remove --all
 
 ### SEE ALSO
 
-- [aperturectl blueprints](aperturectl_blueprints.md) - Aperture Blueprints
+- [aperturectl blueprints](/reference/aperturectl/blueprints/blueprints.md) - Aperture Blueprints

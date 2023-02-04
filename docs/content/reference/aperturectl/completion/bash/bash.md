@@ -1,10 +1,9 @@
 ---
-title: Aperturectl Completion Bash
-description: Aperturectl Completion Bash
+sidebar_label: Bash
+hide_title: true
 keywords:
   - aperturectl
   - aperturectl_completion_bash
-sidebar_position: 7
 ---
 
 ## aperturectl completion bash
@@ -47,4 +46,4 @@ aperturectl completion bash
 
 ### SEE ALSO
 
-- [aperturectl completion](aperturectl_completion.md) - Generate the autocompletion script for the specified shell
+- [aperturectl completion](/reference/aperturectl/completion/completion.md) - Generate the autocompletion script for the specified shell

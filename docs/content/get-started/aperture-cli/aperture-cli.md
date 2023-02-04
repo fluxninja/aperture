@@ -1,9 +1,9 @@
 ---
-title: Aperture CLI
+title: Install CLI (apeturectl)
 description: Aperture CLI for interacting with Aperture Seamlessly.
 keywords:
   - cli
-sidebar_position: 1
+sidebar_position: 3
 ---
 
 ```mdx-code-block
@@ -58,8 +58,8 @@ With rpm:
 ## Enable shell autocompletion
 
 To configure your shell to load `aperturectl`
-[bash completions](/reference/aperture-cli/aperturectl_completion.md) add to
-your profile:
+[bash completions](/reference/aperturectl/completion/completion.md) add to your
+profile:
 
 <Tabs>
 <TabItem value="bash" label="bash">
@@ -112,4 +112,4 @@ sudo rpm -e aperturectl
 
 ---
 
-### [aperturectl](/reference/aperture-cli/aperturectl.md)
+### [aperturectl](/reference/aperturectl/aperturectl.md)

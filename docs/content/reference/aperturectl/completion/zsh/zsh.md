@@ -1,10 +1,9 @@
 ---
-title: Aperturectl Completion Zsh
-description: Aperturectl Completion Zsh
+sidebar_label: Zsh
+hide_title: true
 keywords:
   - aperturectl
   - aperturectl_completion_zsh
-sidebar_position: 4
 ---
 
 ## aperturectl completion zsh
@@ -49,4 +48,4 @@ aperturectl completion zsh [flags]
 
 ### SEE ALSO
 
-- [aperturectl completion](aperturectl_completion.md) - Generate the autocompletion script for the specified shell
+- [aperturectl completion](/reference/aperturectl/completion/completion.md) - Generate the autocompletion script for the specified shell

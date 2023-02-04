@@ -1,10 +1,9 @@
 ---
-title: Aperturectl Blueprints List
-description: Aperturectl Blueprints List
+sidebar_label: List
+hide_title: true
 keywords:
   - aperturectl
   - aperturectl_blueprints_list
-sidebar_position: 12
 ---
 
 ## aperturectl blueprints list
@@ -45,4 +44,4 @@ aperturectl blueprints list --all
 
 ### SEE ALSO
 
-- [aperturectl blueprints](aperturectl_blueprints.md) - Aperture Blueprints
+- [aperturectl blueprints](/reference/aperturectl/blueprints/blueprints.md) - Aperture Blueprints
