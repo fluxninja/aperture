@@ -55,7 +55,6 @@ func main() {
 		if strings.HasSuffix(path, ".md") {
 			subdir := transform(path)
 			subdir = filepath.Join(docsDir, subdir)
-			log.Println("renaming", path, "to", subdir)
 			// create the subdirectory and move the file to it
 			err = os.MkdirAll(filepath.Dir(subdir), 0o755)
 			if err != nil {
