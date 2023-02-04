@@ -9,6 +9,10 @@ local config = blueprint.config;
     [std.format('%s.json', $._config.common.policy_name)]: dashboard($._config.common + $._config.dashboard).dashboard,
   },
   policies: {
-    [std.format('%s.yaml', $._config.common.policy_name)]: policy($._config.common + $._config.policy).policyResource,
+    [std.format('%s-cr.yaml', $._config.common.policy_name)]: policy($._config.common + $._config.policy).policyResource,
+    [std.format('%s.yaml', $._config.common.policy_name)]: policy($._config.common + $._config.policy).policyDef,
   },
-} + { _config:: config }
+} +
+{
+  _config:: config,
+}

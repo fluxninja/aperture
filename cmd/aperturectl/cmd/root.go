@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/apply"
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/blueprints"
 	"github.com/fluxninja/aperture/pkg/info"
 )
@@ -16,6 +17,7 @@ var Version = info.Version
 func init() {
 	RootCmd.AddCommand(blueprints.BlueprintsCmd)
 	RootCmd.AddCommand(compileCmd)
+	RootCmd.AddCommand(apply.ApplyCmd)
 
 	RootCmd.InitDefaultCompletionCmd()
 }

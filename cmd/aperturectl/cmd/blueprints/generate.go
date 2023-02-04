@@ -9,10 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
-	"github.com/fluxninja/aperture/operator/api"
-	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/google/go-jsonnet"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slices"
@@ -26,6 +22,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/yaml"
+
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
+	"github.com/fluxninja/aperture/operator/api"
+	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 var (
@@ -44,8 +45,8 @@ func init() {
 	generateCmd.Flags().StringVar(&outputDir, "output-dir", "", "Directory path where the generated Policy resources will be stored. If not provided, will use current directory")
 	generateCmd.Flags().StringVar(&valuesFile, "values-file", "", "Path to the values file for Blueprint's input")
 	generateCmd.Flags().BoolVar(&apply, "apply", false, "Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed")
-	generateCmd.Flags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernets cluster config. Defaults to '~/.kube/config'")
-	generateCmd.Flags().StringVar(&customBlueprintsPath, "custom-blueprint-path", "", "Path to the directory containing custom Blueprints which has 'config.libsonnet' and 'bundle.libsonnet' files")
+	generateCmd.Flags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
+	generateCmd.Flags().StringVar(&customBlueprintsPath, "custom-blueprints-path", "", "Path to the directory containing custom Blueprints with 'config.libsonnet' and 'bundle.libsonnet' files")
 
 	validPolicies = []*policyv1alpha1.Policy{}
 }
@@ -126,11 +127,9 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 			JPaths: []string{apertureBlueprintsDir},
 		})
 
-		var blueprintsPath string
+		blueprintsPath := fmt.Sprintf("github.com/fluxninja/aperture/blueprints/lib/1.0/%s/bundle.libsonnet", blueprintName)
 		if customBlueprintsPath != "" {
 			blueprintsPath = filepath.Join(customBlueprintsPath, "bundle.libsonnet")
-		} else {
-			blueprintsPath = fmt.Sprintf("github.com/fluxninja/aperture/blueprints/lib/1.0/%s/bundle.libsonnet", blueprintName)
 		}
 
 		jsonStr, err := vm.EvaluateAnonymousSnippet("bundle.libsonnet", fmt.Sprintf(`
@@ -161,7 +160,7 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 			return err
 		}
 
-		log.Info().Msgf("Stored all the manifests at '%s'.", updatedOutputDir)
+		log.Info().Msgf("Generated manifests at %s.", updatedOutputDir)
 
 		if apply {
 			if err = applyPolicy(); err != nil {
@@ -176,7 +175,7 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 func processContent(data map[string]interface{}, outputPath string) error {
 	for name, content := range data {
 		if strings.HasSuffix(name, ".yaml") {
-			if err := saveYamlFile(outputPath, name, content); err != nil {
+			if err := saveYAMLFile(outputPath, name, content); err != nil {
 				return err
 			}
 		} else if strings.HasSuffix(name, ".json") {
@@ -206,7 +205,7 @@ func processContent(data map[string]interface{}, outputPath string) error {
 	return nil
 }
 
-func saveYamlFile(path, filename string, content interface{}) error {
+func saveYAMLFile(path, filename string, content interface{}) error {
 	yamlBytes, err := yaml.Marshal(content)
 	if err != nil {
 		return err
