@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM golang:1.19-bullseye AS builder
+FROM golang:1.19-buster AS builder
 
 WORKDIR /src
 COPY --link . .
@@ -11,9 +11,9 @@ RUN --mount=type=cache,target=/go/pkg/ \
 RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.cache/go-build/ \
   CGO_ENABLED=0 go build \
-    --ldflags "-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
-    -a \
-    -o aperture-operator \
+  --ldflags "-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
+  -a \
+  -o aperture-operator \
   operator/main.go
 
 # Use distroless as minimal base image to package the manager binary
