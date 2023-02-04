@@ -46,11 +46,14 @@ local policyDashBoardMixin =
   policyDashboard({
     policy_name: 'service1-demo-app',
   }).dashboard
+  /* TODO: panel id is clashing. disabling for now.
   {
     panels+: rateLimitpolicyDashboard({
       policy_name: 'service1-demo-app',
     }).dashboard.panels,
-  };
+  }
+  */
+;
 
 local dashboards =
   [

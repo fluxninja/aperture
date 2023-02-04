@@ -74,6 +74,7 @@ generate-config-markdown:
 generate-jsonnet:
 	@echo generate jsonnet
 	@./tools/jsonnet/generate_jsonnet.sh
+	@./tools/aperturectl/validate_all.sh
 
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update
 generate-mermaid:
