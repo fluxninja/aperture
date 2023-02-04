@@ -5,7 +5,7 @@ set -eux
 # TODO: it should be used in every Dockerfile requiring version endpoint.
 
 VERSION=${VERSION:-0.0.1}
-BUILD_TIME=$(date --rfc-3339=seconds)
+BUILD_TIME=$(date -Iseconds)
 GOOS=$(go env GOOS)
 GOARCH=$(go env GOARCH)
 HOSTNAME=$(hostname)
