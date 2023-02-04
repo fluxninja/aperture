@@ -8,6 +8,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"github.com/facebookgo/symwalk"
 	"github.com/spf13/cobra"
 )
 
@@ -50,7 +51,7 @@ aperturectl blueprints list --all`,
 				return err
 			}
 
-			fmt.Printf("Blueprints for: %s\n", getURI(blueprintsDir))
+			fmt.Printf("Blueprints for: %s\n", getSource(blueprintsDir))
 			for _, policy := range policies {
 				fmt.Fprintf(w, "%s\n", policy)
 			}
@@ -63,21 +64,22 @@ aperturectl blueprints list --all`,
 }
 
 func getBlueprints(blueprintsDir string) ([]string, error) {
-	uri := getURI(blueprintsDir)
+	source := getSource(blueprintsDir)
 
-	if uri != "" {
-		// tokenize @ sign and take the first element
-		uri = strings.Split(uri, "@")[0]
+	if source != "" {
+		// remove the version from the URI (last @ in the URI)
+		source = strings.Split(source, "@")[0]
 	}
 
 	policies := []string{}
 
-	blueprintsPath := filepath.Join(blueprintsDir, uri)
-	err := filepath.WalkDir(blueprintsPath, func(path string, d fs.DirEntry, err error) error {
+	blueprintsPath := filepath.Join(blueprintsDir, source)
+	fmt.Println("peeking at blueprintsPath: ", blueprintsPath)
+	err := symwalk.Walk(blueprintsPath, func(path string, fi fs.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		if !d.IsDir() && d.Name() == "config.libsonnet" {
+		if !fi.IsDir() && fi.Name() == "config.libsonnet" {
 			strippedPath := strings.TrimPrefix(path, blueprintsPath)
 			strippedPath = strings.TrimSuffix(strippedPath, "/config.libsonnet")
 			strippedPath = strings.TrimPrefix(strippedPath, "/")
@@ -94,20 +96,20 @@ func getBlueprints(blueprintsDir string) ([]string, error) {
 
 func getCachedBlueprints() (map[string][]string, error) {
 	blueprintsList := map[string][]string{}
-	blueprintsURIs, err := os.ReadDir(blueprintsCacheRoot)
+	blueprintsDirs, err := os.ReadDir(blueprintsCacheRoot)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, blueprintsURI := range blueprintsURIs {
-		if blueprintsURI.IsDir() {
-			dir := filepath.Join(blueprintsCacheRoot, blueprintsURI.Name())
-			uri := getURI(dir)
+	for _, blueprintsDir := range blueprintsDirs {
+		if blueprintsDir.IsDir() {
+			dir := filepath.Join(blueprintsCacheRoot, blueprintsDir.Name())
+			source := getSource(dir)
 			policies, err := getBlueprints(dir)
 			if err != nil {
 				return nil, err
 			}
-			blueprintsList[uri] = policies
+			blueprintsList[source] = policies
 		}
 	}
 

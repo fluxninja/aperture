@@ -107,20 +107,21 @@ aperturectl blueprints pull --version v0.22.0`,
 		}
 
 		// read d and based on source write uri to uriFilename
-		cleanURI := ""
+		source := ""
+		version := d.Version
 		if d.Source.GitSource != nil {
-			cleanURI = d.Source.GitSource.Name()
+			source = d.Source.GitSource.Name()
 		} else if d.Source.LocalSource != nil {
-			// absolute path
-			cleanURI, err = filepath.Abs(d.Source.LocalSource.Directory)
-			if err != nil {
-				return err
-			}
+			source = d.Source.LocalSource.Directory
 		} else {
 			return errors.New("unable to parse blueprints URI: " + blueprintsURI)
 		}
 
-		err = os.WriteFile(filepath.Join(blueprintsDir, uriFilename), []byte(cleanURI), os.ModePerm)
+		err = os.WriteFile(filepath.Join(blueprintsDir, sourceFilename), []byte(source), os.ModePerm)
+		if err != nil {
+			return err
+		}
+		err = os.WriteFile(filepath.Join(blueprintsDir, versionFilename), []byte(version), os.ModePerm)
 		if err != nil {
 			return err
 		}
@@ -181,15 +182,15 @@ func writeJSONFile(name string, d interface{}) error {
 	return os.WriteFile(name, b, 0o644)
 }
 
-func getURI(blueprintsDir string) string {
-	uri := ""
+func getSource(blueprintsDir string) string {
+	source := ""
 	// read the uri from uriFilename if it exists
 	// if it doesn't exist, continue
-	if _, err := os.Stat(filepath.Join(blueprintsDir, uriFilename)); err == nil {
-		uriBytes, err := os.ReadFile(filepath.Join(blueprintsDir, uriFilename))
+	if _, err := os.Stat(filepath.Join(blueprintsDir, sourceFilename)); err == nil {
+		uriBytes, err := os.ReadFile(filepath.Join(blueprintsDir, sourceFilename))
 		if err == nil {
-			uri = string(uriBytes)
+			source = string(uriBytes)
 		}
 	}
-	return uri
+	return source
 }

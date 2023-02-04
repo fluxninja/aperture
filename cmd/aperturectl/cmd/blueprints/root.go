@@ -14,7 +14,8 @@ const (
 	apertureRepo             = "https://github.com/fluxninja/aperture"
 	defaultBlueprintsRepo    = "github.com/fluxninja/aperture/blueprints"
 	defaultBlueprintsVersion = "latest"
-	uriFilename              = ".aperture_uri"
+	sourceFilename           = ".source"
+	versionFilename          = ".version"
 )
 
 var (
