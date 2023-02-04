@@ -272,7 +272,7 @@ jobs:
     executor: python-cimg-executor
     resource_class: large
     environment:
-      GOMAXPROCS: 8
+      GOMAXPROCS: 4
     steps:
       - add_ssh_keys:
           fingerprints:
