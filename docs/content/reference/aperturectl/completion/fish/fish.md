@@ -1,10 +1,9 @@
 ---
-title: Aperturectl Completion Fish
-description: Aperturectl Completion Fish
+sidebar_label: Fish
+hide_title: true
 keywords:
   - aperturectl
   - aperturectl_completion_fish
-sidebar_position: 6
 ---
 
 ## aperturectl completion fish
@@ -38,4 +37,4 @@ aperturectl completion fish [flags]
 
 ### SEE ALSO
 
-- [aperturectl completion](aperturectl_completion.md) - Generate the autocompletion script for the specified shell
+- [aperturectl completion](/reference/aperturectl/completion/completion.md) - Generate the autocompletion script for the specified shell

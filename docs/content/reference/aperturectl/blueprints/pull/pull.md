@@ -1,10 +1,9 @@
 ---
-title: Aperturectl Blueprints Pull
-description: Aperturectl Blueprints Pull
+sidebar_label: Pull
+hide_title: true
 keywords:
   - aperturectl
   - aperturectl_blueprints_pull
-sidebar_position: 11
 ---
 
 ## aperturectl blueprints pull
@@ -42,4 +41,4 @@ aperturectl blueprints pull --version v0.22.0
 
 ### SEE ALSO
 
-- [aperturectl blueprints](aperturectl_blueprints.md) - Aperture Blueprints
+- [aperturectl blueprints](/reference/aperturectl/blueprints/blueprints.md) - Aperture Blueprints

@@ -2,63 +2,111 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd"
 	"github.com/integralist/go-findroot/find"
-	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
 
-var position int
-
 // GenerateDocs generated the reference docs for the CLI.
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	root, err := find.Repo()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Err: %s\n", err)
-		os.Exit(1)
+		log.Fatal(err)
+	}
+	docsDir := filepath.Join(root.Path, "docs/content/reference/aperturectl")
+
+	// remove all subdirectories within the docsDir except docsDir itself
+	err = filepath.Walk(docsDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
+		if info.IsDir() && path != docsDir {
+			err = os.RemoveAll(path)
+			if err != nil {
+				return nil
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	position = getTotalCommandsCount(cmd.RootCmd) + 2
-	err = doc.GenMarkdownTreeCustom(cmd.RootCmd, filepath.Join(root.Path, "docs/content/reference/aperture-cli"), filePrepender, linkHandler)
+	err = doc.GenMarkdownTreeCustom(cmd.RootCmd, docsDir, filePrepender, linkHandler)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Err: %s\n", err)
-		os.Exit(1)
+		log.Fatal(err)
+	}
+	// walk the generated docs and move them to subdirectories based on their filename where _ separates the subdirectory
+	err = filepath.Walk(docsDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		if strings.HasSuffix(path, ".md") {
+			subdir := transform(path)
+			subdir = filepath.Join(docsDir, subdir)
+			log.Println("renaming", path, "to", subdir)
+			// create the subdirectory and move the file to it
+			err = os.MkdirAll(filepath.Dir(subdir), 0o755)
+			if err != nil {
+				return err
+			}
+			err = os.Rename(path, subdir)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		log.Fatal(err)
 	}
 }
 
-func getTotalCommandsCount(command *cobra.Command) int {
-	count := len(command.Commands())
-	for _, subCommand := range command.Commands() {
-		if len(subCommand.Commands()) != 0 {
-			count += getTotalCommandsCount(subCommand)
-		}
-	}
-	return count
+func transform(path string) string {
+	filename := filepath.Base(path)
+	ext := filepath.Ext(filename)
+	// remove aperturectl prefix and replace _ with /
+	link := strings.ReplaceAll(strings.TrimPrefix(filename, "aperturectl"), "_", "/")
+	// remove the extension
+	link = strings.TrimSuffix(link, ext)
+
+	// tokenize filename by _ and pick up the last token
+	tokens := strings.Split(filename, "_")
+	filename = tokens[len(tokens)-1]
+
+	link = filepath.Join(link, filename)
+	return link
 }
 
 func filePrepender(filename string) string {
 	name := strings.TrimSuffix(filepath.Base(filename), filepath.Ext(filepath.Base(filename)))
-	sidebarPosition := position
-	position--
-	title := cases.Title(language.English).String(strings.ReplaceAll(name, "_", " "))
+	// sidebar label is the last token in name
+	tokens := strings.Split(name, "_")
+	sidebarLabel := tokens[len(tokens)-1]
+	sidebarLabel = cases.Title(language.English).String(sidebarLabel)
+
 	return fmt.Sprintf(`---
-title: %s
-description: %s
+sidebar_label: %s
+hide_title: true
 keywords:
 - aperturectl
 - %s
-sidebar_position: %d
 ---
 
-`, title, title, name, sidebarPosition)
+`, sidebarLabel, name)
 }
 
 func linkHandler(name string) string {
-	return name
+	return filepath.Join("/reference/aperturectl", transform(name))
 }
