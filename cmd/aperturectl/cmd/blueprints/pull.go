@@ -72,12 +72,6 @@ Use this command to pull the Aperture Blueprints in local system to use for gene
 
 aperturectl blueprints pull --version v0.22.0`,
 	RunE: func(_ *cobra.Command, _ []string) error {
-		// write the uri in blueprintsDir/uri
-		err := os.WriteFile(filepath.Join(blueprintsDir, uriFilename), []byte(blueprintsURI), os.ModePerm)
-		if err != nil {
-			return err
-		}
-
 		spec := specv1.New()
 		contents, err := json.MarshalIndent(spec, "", "  ")
 		if err != nil {
@@ -107,7 +101,30 @@ aperturectl blueprints pull --version v0.22.0`,
 			return err
 		}
 
-		d := deps.Parse(blueprintsDir, blueprintsURI)
+		d := deps.Parse("", blueprintsURI)
+		if d == nil {
+			return errors.New("unable to parse blueprints URI: " + blueprintsURI)
+		}
+
+		// read d and based on source write uri to uriFilename
+		cleanURI := ""
+		if d.Source.GitSource != nil {
+			cleanURI = d.Source.GitSource.Name()
+		} else if d.Source.LocalSource != nil {
+			// absolute path
+			cleanURI, err = filepath.Abs(d.Source.LocalSource.Directory)
+			if err != nil {
+				return err
+			}
+		} else {
+			return errors.New("unable to parse blueprints URI: " + blueprintsURI)
+		}
+
+		err = os.WriteFile(filepath.Join(blueprintsDir, uriFilename), []byte(cleanURI), os.ModePerm)
+		if err != nil {
+			return err
+		}
+
 		if !depEqual(spec.Dependencies[d.Name()], *d) {
 			spec.Dependencies[d.Name()] = *d
 			delete(lockFile.Dependencies, d.Name())
