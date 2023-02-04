@@ -345,7 +345,7 @@ def main(output_dir: Path = typer.Option(..., help="Output path for the generate
     generator = ApertureJsonnetGenerator(aperture_swagger_path)
     generator.parse()
 
-    output_gen_dir = output_dir / "_gen"
+    output_gen_dir = output_dir
     if output_gen_dir.exists():
         libsonnet_files = output_gen_dir.rglob("*.libsonnet")
         for path in libsonnet_files:
@@ -355,7 +355,7 @@ def main(output_dir: Path = typer.Option(..., help="Output path for the generate
     definitions = generator.definitions.values()
     for definition in definitions:
         rendered_jsonnet = render_jsonnet_definition(definition)
-        libsonnet_path = output_dir / "_gen" / definition.jsonnet_path
+        libsonnet_path = output_dir / definition.jsonnet_path
         if not libsonnet_path.parent.exists():
             libsonnet_path.parent.mkdir(parents=True)
         libsonnet_path.write_text(rendered_jsonnet)
@@ -368,10 +368,10 @@ def main(output_dir: Path = typer.Option(..., help="Output path for the generate
     spec_libsonnet_path.write_text(spec_libsonnet_data)
 
     gen_libsonnet_path = output_dir / "gen.libsonnet"
-    imports = [("v1", Path("_gen/v1/gen.libsonnet"))]
+    imports = [("v1", Path("v1/gen.libsonnet"))]
     render_gen_libsonnet(gen_libsonnet_path, imports)
 
-    gen_libsonnet_path = output_dir / "_gen" / "v1" / "gen.libsonnet"
+    gen_libsonnet_path = output_dir / "v1" / "gen.libsonnet"
     imports = [
         (definition.jsonnet_name, Path(definition.jsonnet_fname))
         for definition in definitions

@@ -3,13 +3,13 @@ title: Static Rate Limiting Policy
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../../../apertureVersion.js';
+import {apertureVersion} from '../../../../../apertureVersion.js';
 ```
 
 ## Blueprint Location
 
 GitHub: <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/lib/1.0/policies/static-rate-limiting`}>static-rate-limiting</a>
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints//policies/static-rate-limiting`}>static-rate-limiting</a>
 
 ## Introduction
 

@@ -1,4 +1,4 @@
-local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.libsonnet';
+local aperture = import 'github.com/fluxninja/aperture/blueprints/main.libsonnet';
 
 local policy = aperture.spec.v1.Policy;
 local resources = aperture.spec.v1.Resources;

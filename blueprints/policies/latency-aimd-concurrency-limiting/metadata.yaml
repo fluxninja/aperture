@@ -1,0 +1,8 @@
+blueprint: Latency AIMD Concurrency Limiting Policy
+sources:
+  Dashboard:
+    prefix: dashboard
+    path: policies/latency-aimd-concurrency-limiting/dashboard.libsonnet
+  Policy:
+    prefix: policy
+    path: policies/latency-aimd-concurrency-limiting/policy.libsonnet

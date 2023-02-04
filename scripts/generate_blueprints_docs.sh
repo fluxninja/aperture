@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-script_root=$(dirname "$0")
-blueprints_root=${script_root}/..
+git_root=$(git rev-parse --show-toplevel)
+blueprints_root=${git_root}/blueprints
 
 FIND="find"
 SED="sed"
@@ -21,16 +21,16 @@ popd >/dev/null
 $FIND "${blueprints_root}"/../docs/content/reference/policies/bundled-blueprints -mindepth 2 -type f -name '*.md' -delete
 
 # for all subdirectories within "$blueprints_root"/lib containing config.libsonnet, generate README
-$FIND "$blueprints_root"/lib/1.0 -type f -name config.libsonnet | while read -r files; do
+$FIND "$blueprints_root" -type f -name config.libsonnet | while read -r files; do
 	dir=$(dirname "$files")
 	echo "Generating README for $dir"
-	python "${blueprints_root}"/scripts/blueprint-readme-generator.py "$dir"
+	python "${git_root}"/scripts/blueprint-readme-generator.py "$dir"
 	npx prettier --write "$dir"/README.md
 	# extract the name of the blueprint from the path
 	blueprint_name=$(basename "$dir")
-	# extract the relative path from the "$blueprints_root"/lib/1.0
+	# extract the relative path from the "$blueprints_root"
 	# shellcheck disable=SC2001
-	relative_path=$(echo "$dir" | $SED "s|$blueprints_root/lib/1.0/||")
+	relative_path=$(echo "$dir" | $SED "s|$blueprints_root||")
 	blueprint_dir=$(dirname "$relative_path")
 	docs_dir="${blueprints_root}"/../docs/content/reference/policies/bundled-blueprints/"$blueprint_dir"
 	mkdir -p "$docs_dir"
@@ -63,7 +63,7 @@ $FIND "$blueprints_root"/lib/1.0 -type f -name config.libsonnet | while read -r 
 	echo -e "\`\`\`" >>"$docs_file"
 	echo "## Blueprint Location" >>"$docs_file"
 	echo -e "\n" >>"$docs_file"
-	echo "GitHub: <a href={\`https://github.com/fluxninja/aperture/tree/\${apertureVersion}/blueprints/lib/1.0/$blueprint_dir/$blueprint_name\`}>$blueprint_name</a>" >>"$docs_file"
+	echo "GitHub: <a href={\`https://github.com/fluxninja/aperture/tree/\${apertureVersion}/blueprints/$blueprint_dir/$blueprint_name\`}>$blueprint_name</a>" >>"$docs_file"
 	echo -e "\n" >>"$docs_file"
 	echo "## Introduction" >>"$docs_file"
 	echo -e "\n" >>"$docs_file"

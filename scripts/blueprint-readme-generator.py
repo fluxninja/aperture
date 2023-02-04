@@ -186,8 +186,8 @@ def update_docblock_param_defaults(repository_root: Path, jsonnet_path: Path, bl
         tmppath.write_text(jsonnet_data)
 
         jsonnet_jpaths = [
-            "-J", repository_root,
-            "-J", repository_root / "vendor",
+            "-J", repository_root / "blueprints",
+            "-J", repository_root / "blueprints" / "vendor",
         ]
 
         try:
