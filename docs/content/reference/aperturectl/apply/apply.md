@@ -29,10 +29,11 @@ aperturectl apply --dir=policy-dir
 ### Options
 
 ```
-      --dir string           Path to directory containing Aperture Policy files
-      --file string          Path to Aperture Policy file
-  -h, --help                 help for apply
-      --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
+      --dir string                   Path to directory containing Aperture Policy files
+      --dynamic-config-file string   Path to the dynamic config file
+      --file string                  Path to Aperture Policy file
+  -h, --help                         help for apply
+      --kube-config string           Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
 ```
 
 ### SEE ALSO

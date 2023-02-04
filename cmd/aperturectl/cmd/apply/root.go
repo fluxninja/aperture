@@ -27,15 +27,17 @@ import (
 )
 
 var (
-	file           string
-	dir            string
-	kubeConfig     string
-	kubeRestConfig *rest.Config
+	file              string
+	dir               string
+	dynamicConfigFile string
+	kubeConfig        string
+	kubeRestConfig    *rest.Config
 )
 
 func init() {
 	ApplyCmd.Flags().StringVar(&file, "file", "", "Path to Aperture Policy file")
 	ApplyCmd.Flags().StringVar(&dir, "dir", "", "Path to directory containing Aperture Policy files")
+	ApplyCmd.Flags().StringVar(&dynamicConfigFile, "dynamic-config-file", "", "Path to the dynamic config file")
 	ApplyCmd.Flags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
 }
 
@@ -65,19 +67,28 @@ aperturectl apply --dir=policy-dir`,
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dynamicConfigBytes := []byte{}
+		if dynamicConfigFile != "" {
+			// read the dynamic config file
+			var err error
+			dynamicConfigBytes, err = os.ReadFile(dynamicConfigFile)
+			if err != nil {
+				return err
+			}
+		}
+
 		if file != "" {
-			return ApplyPolicy(file)
+			return ApplyPolicy(file, dynamicConfigBytes)
 		} else if dir != "" {
-			return ApplyPolicies(dir)
+			return ApplyPolicies(dir, dynamicConfigBytes)
 		} else {
-			errStr := "either --file or --dir must be provided"
-			return errors.New(errStr)
+			return errors.New("either --file or --dir must be provided")
 		}
 	},
 }
 
 // ApplyPolicies applies all policies in a directory to the cluster.
-func ApplyPolicies(policyDir string) error {
+func ApplyPolicies(policyDir string, dynamicConfigBytes []byte) error {
 	// walk the directory and apply all policies
 	return filepath.Walk(policyDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -85,7 +96,7 @@ func ApplyPolicies(policyDir string) error {
 		}
 		fileBase := info.Name()[:len(info.Name())-len(filepath.Ext(info.Name()))]
 		if filepath.Ext(info.Name()) == ".yaml" && !strings.HasSuffix(fileBase, "-cr") {
-			err = ApplyPolicy(path)
+			err = ApplyPolicy(path, dynamicConfigBytes)
 			if err != nil {
 				return err
 			}
@@ -95,7 +106,7 @@ func ApplyPolicies(policyDir string) error {
 }
 
 // ApplyPolicy applies a policy to the cluster.
-func ApplyPolicy(policyFile string) error {
+func ApplyPolicy(policyFile string, dynamicConfigBytes []byte) error {
 	policyFileBase := filepath.Base(policyFile)
 	policyName := policyFileBase[:len(policyFileBase)-len(filepath.Ext(policyFileBase))]
 
@@ -116,6 +127,9 @@ func ApplyPolicy(policyFile string) error {
 	policyCR := &policyv1alpha1.Policy{}
 	policyCR.Spec.Raw = policyBytes
 	policyCR.Name = policyName
+	if len(dynamicConfigBytes) != 0 {
+		policyCR.DynamicConfig.Raw = dynamicConfigBytes
+	}
 	return createAndApplyPolicy(policyCR)
 }
 
