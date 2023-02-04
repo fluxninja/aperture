@@ -33,7 +33,7 @@ local policyResource = latencyAIMDPolicy({
   concurrency_controller+: {
     flow_selector: svcSelector,
     dynamic_config: {
-      dryRun: false,
+      dry_run: false,
     },
     // highlight-start
     scheduler+: {

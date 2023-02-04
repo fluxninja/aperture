@@ -55,7 +55,7 @@ local policyResource = latencyAIMDPolicy({
   concurrency_controller+: {
     flow_selector: svcSelector,
     dynamic_config: {
-      dryRun: false,
+      dry_run: false,
     },
     scheduler+: {
       timeout_factor: 0.5,

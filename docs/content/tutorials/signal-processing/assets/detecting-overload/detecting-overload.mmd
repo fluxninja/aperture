@@ -20,8 +20,8 @@ FakeConstant0 --> root.2rhs
 subgraph root.2[<center>ArithmeticCombinator<br/>Mul</center>]
 subgraph root.2_inports[ ]
 style root.2_inports fill:none,stroke:none
-root.2rhs[rhs]
 root.2lhs[lhs]
+root.2rhs[rhs]
 end
 subgraph root.2_outports[ ]
 style root.2_outports fill:none,stroke:none
@@ -31,8 +31,8 @@ end
 subgraph root.3[<center>Decider<br/>GT for 0s</center>]
 subgraph root.3_inports[ ]
 style root.3_inports fill:none,stroke:none
-root.3rhs[rhs]
 root.3lhs[lhs]
+root.3rhs[rhs]
 end
 subgraph root.3_outports[ ]
 style root.3_outports fill:none,stroke:none
@@ -45,8 +45,8 @@ style root.4_inports fill:none,stroke:none
 root.4signal[signal]
 end
 end
+root.3output --> |IS_OVERLOAD_SWITCH| root.4signal
 root.0output --> |LATENCY| root.1input
 root.0output --> |LATENCY| root.3lhs
 root.1output --> |LATENCY_EMA| root.2lhs
 root.2output --> |LATENCY_SETPOINT| root.3rhs
-root.3output --> |IS_OVERLOAD_SWITCH| root.4signal

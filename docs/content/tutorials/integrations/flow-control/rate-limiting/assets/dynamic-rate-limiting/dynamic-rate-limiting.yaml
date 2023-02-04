@@ -1,7 +1,7 @@
 apiVersion: fluxninja.com/v1alpha1
 dynamicConfig:
   concurrency_controller:
-    dryRun: false
+    dry_run: false
 kind: Policy
 metadata:
   labels:
