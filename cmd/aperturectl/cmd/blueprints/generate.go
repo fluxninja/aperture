@@ -93,10 +93,10 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 			return err
 		}
 
-		blueprintDir := filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
+		apertureDir := filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
 
 		if customBlueprintsPath == "" {
-			err = blueprintExists(blueprintDir, blueprintName)
+			err = blueprintExists(apertureDir, blueprintName)
 			if err != nil {
 				return err
 			}
@@ -118,13 +118,15 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 
 		vm := jsonnet.MakeVM()
 		vm.Importer(&jsonnet.FileImporter{
-			JPaths: []string{blueprintDir},
+			JPaths: []string{blueprintsDir},
 		})
 
-		bundlePath := fmt.Sprintf("%s/%s/bundle.libsonnet", blueprintDir, blueprintName)
+		bundlePath := fmt.Sprintf("%s/%s/bundle.libsonnet", apertureDir, blueprintName)
 		if customBlueprintsPath != "" {
 			bundlePath = filepath.Join(customBlueprintsPath, "bundle.libsonnet")
 		}
+
+		fmt.Println("bundlePath", bundlePath)
 
 		jsonStr, err := vm.EvaluateAnonymousSnippet("bundle.libsonnet", fmt.Sprintf(`
 		local bundle = import '%s';
