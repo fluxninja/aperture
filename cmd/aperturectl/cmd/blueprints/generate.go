@@ -1,7 +1,6 @@
 package blueprints
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -11,19 +10,10 @@ import (
 	"github.com/google/go-jsonnet"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slices"
-	appsv1 "k8s.io/api/apps/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/yaml"
 
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/apply"
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
-	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/log"
 )
@@ -33,7 +23,7 @@ var (
 	outputDir     string
 	valuesFile    string
 	graphDir      string
-	apply         bool
+	applyPolicy   bool
 	kubeConfig    string
 	validPolicies []*policyv1alpha1.Policy
 )
@@ -42,7 +32,7 @@ func init() {
 	generateCmd.Flags().StringVar(&blueprintName, "name", "", "Name of the Aperture Blueprint to generate Aperture Policy resources for. Can be skipped when '--custom-blueprint-path' is provided")
 	generateCmd.Flags().StringVar(&outputDir, "output-dir", "", "Directory path where the generated Policy resources will be stored. If not provided, will use current directory")
 	generateCmd.Flags().StringVar(&valuesFile, "values-file", "", "Path to the values file for Blueprint's input")
-	generateCmd.Flags().BoolVar(&apply, "apply", false, "Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed")
+	generateCmd.Flags().BoolVar(&applyPolicy, "apply", false, "Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed")
 	generateCmd.Flags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
 
 	validPolicies = []*policyv1alpha1.Policy{}
@@ -132,8 +122,19 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 
 		log.Info().Msgf("Generated manifests at %s.", updatedOutputDir)
 
-		if apply {
-			if err = applyPolicy(); err != nil {
+		if applyPolicy {
+			err = apply.ApplyCmd.Flag("dir").Value.Set(updatedOutputDir)
+			if err != nil {
+				return err
+			}
+
+			err = apply.ApplyCmd.PreRunE(cmd, args)
+			if err != nil {
+				return err
+			}
+
+			err = apply.ApplyCmd.RunE(cmd, args)
+			if err != nil {
 				return err
 			}
 		}
@@ -268,81 +269,5 @@ func generateGraphs(content []byte, contentPath string) error {
 	}
 
 	validPolicies = append(validPolicies, policy)
-	return nil
-}
-
-func applyPolicy() error {
-	if kubeConfig == "" {
-		homeDir, err := os.UserHomeDir()
-		if err != nil {
-			return err
-		}
-		kubeConfig = filepath.Join(homeDir, ".kube", "config")
-		fmt.Printf("Using '%s' as Kubernetes config\n", kubeConfig)
-	}
-
-	kubeRestConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfig)
-	if err != nil {
-		return fmt.Errorf("failed to connect to Kubernetes. Error: %s", err.Error())
-	}
-
-	return createPolicy(kubeRestConfig)
-}
-
-func getControllerDeployment(kubeRestConfig *rest.Config) (*appsv1.Deployment, error) {
-	clientSet, err := kubernetes.NewForConfig(kubeRestConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to Kubernetes. Error: %s", err.Error())
-	}
-
-	deployment, err := clientSet.AppsV1().Deployments("").List(context.Background(), metav1.ListOptions{
-		FieldSelector: "metadata.name=aperture-controller",
-	})
-	if err != nil {
-		if errors.IsNotFound(err) {
-			return nil, fmt.Errorf(
-				"no deployment with name 'aperture-controller' found on the Kubernetes cluster. The policy can be only applied in the namespace where the Aperture Controller is running")
-		}
-		return nil, fmt.Errorf("failed to fetch aperture-controller namespace in Kubernetes. Error: %s", err.Error())
-	}
-
-	if len(deployment.Items) != 1 {
-		return nil, fmt.Errorf(
-			"no deployment with name 'aperture-controller' found on the Kubernetes cluster. The policy can be only applied in the namespace where the Aperture Controller is running")
-	}
-
-	return &deployment.Items[0], nil
-}
-
-func createPolicy(kubeRestConfig *rest.Config) error {
-	deployment, err := getControllerDeployment(kubeRestConfig)
-	if err != nil {
-		return err
-	}
-
-	err = api.AddToScheme(scheme.Scheme)
-	if err != nil {
-		return fmt.Errorf("failed to connect to Kubernetes. Error: %s", err.Error())
-	}
-	client, err := client.New(kubeRestConfig, client.Options{
-		Scheme: scheme.Scheme,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to connect to Kubernetes. Error: %s", err.Error())
-	}
-
-	for _, policy := range validPolicies {
-		policy.Namespace = deployment.GetNamespace()
-		spec := policy.Spec
-		_, err = controllerutil.CreateOrUpdate(context.Background(), client, policy, func() error {
-			policy.Spec = spec
-			return nil
-		})
-		if err != nil {
-			return fmt.Errorf("failed to apply policy in Kubernetes. Error: %s", err.Error())
-		}
-
-		log.Info().Msgf("Applied policy '%s' in '%s' namespace.\n", policy.GetName(), policy.GetNamespace())
-	}
 	return nil
 }

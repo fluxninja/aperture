@@ -57,7 +57,7 @@ aperturectl apply --dir=policy-dir`,
 				return err
 			}
 			kubeConfig = filepath.Join(homeDir, ".kube", "config")
-			log.Info().Str("file", kubeConfig).Msg("Using Kubernetes config")
+			log.Info().Msgf("Using Kubernetes config '%s'", kubeConfig)
 		}
 		restConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfig)
 		if err != nil {
@@ -117,7 +117,8 @@ func ApplyPolicy(policyFile string, dynamicConfigBytes []byte) error {
 	policy := &languagev1.Policy{}
 	err = yaml.Unmarshal(content, policy)
 	if err != nil {
-		return err
+		// Returning nil as the unmarshalling could have failed due to non-policy YAML present.
+		return nil
 	}
 	policyBytes, err := policy.MarshalJSON()
 	if err != nil {
