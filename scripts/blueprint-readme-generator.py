@@ -69,7 +69,7 @@ class DocBlock:
 
         component_final = "v1-" + "-".join(["".join(l) for l in parts])
 
-        return f"../../spec#{component_final}"
+        return f"/reference/policies/spec.md#{component_final}"
 
     @classmethod
     def from_comment(cls, comment: List[str]) -> DocBlock:

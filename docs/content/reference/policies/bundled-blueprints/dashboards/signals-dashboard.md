@@ -3,13 +3,13 @@ title: Signals Dashboard
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../../../../apertureVersion.js';
+import {apertureVersion} from '../../../../apertureVersion.js';
 ```
 
 ## Blueprint Location
 
 GitHub: <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints//dashboards/signals-dashboard/signals-dashboard`}>signals-dashboard</a>
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints//dashboards/signals-dashboard`}>signals-dashboard</a>
 
 ## Introduction
 

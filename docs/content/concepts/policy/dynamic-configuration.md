@@ -30,4 +30,4 @@ The dynamic configuration can be provided in the Policy Custom Resource using
 the `dynamicConfig` key. To learn more about it's usage, please see how the
 dynamic configuration is provided in the Latency based AIMD (Additive Increase,
 Multiplicative Decrease) Concurrency Limiting
-[Blueprint](/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting/latency-aimd-concurrency-limiting.md).
+[Blueprint](/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md).

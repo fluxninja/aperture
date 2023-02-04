@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -30,14 +29,13 @@ import (
 )
 
 var (
-	blueprintName        string
-	outputDir            string
-	valuesFile           string
-	graphDir             string
-	apply                bool
-	kubeConfig           string
-	validPolicies        []*policyv1alpha1.Policy
-	customBlueprintsPath string
+	blueprintName string
+	outputDir     string
+	valuesFile    string
+	graphDir      string
+	apply         bool
+	kubeConfig    string
+	validPolicies []*policyv1alpha1.Policy
 )
 
 func init() {
@@ -46,7 +44,6 @@ func init() {
 	generateCmd.Flags().StringVar(&valuesFile, "values-file", "", "Path to the values file for Blueprint's input")
 	generateCmd.Flags().BoolVar(&apply, "apply", false, "Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed")
 	generateCmd.Flags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
-	generateCmd.Flags().StringVar(&customBlueprintsPath, "custom-blueprints-path", "", "Path to the directory containing custom Blueprints with 'config.libsonnet' and 'bundle.libsonnet' files")
 
 	validPolicies = []*policyv1alpha1.Policy{}
 }
@@ -65,10 +62,8 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 
 aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --values-file=values.yaml`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if blueprintName == "" && customBlueprintsPath == "" {
-			return fmt.Errorf("either --name or --custom-blueprints-path must be provided")
-		} else if blueprintName != "" && customBlueprintsPath != "" {
-			return fmt.Errorf("only one of --name or --custom-blueprints-path must be provided")
+		if blueprintName == "" {
+			return fmt.Errorf("--name must be provided")
 		}
 
 		if valuesFile == "" {
@@ -95,25 +90,9 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 
 		apertureDir := filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
 
-		if customBlueprintsPath == "" {
-			err = blueprintExists(apertureDir, blueprintName)
-			if err != nil {
-				return err
-			}
-		} else {
-			var fileInfo fs.FileInfo
-			fileInfo, err = os.Stat(customBlueprintsPath)
-			if err != nil {
-				return fmt.Errorf("value provided for --custom-blueprints-path '%s' doesn't exist", customBlueprintsPath)
-			}
-
-			if !fileInfo.IsDir() {
-				return fmt.Errorf("value provided for --custom-blueprints-path '%s' is not a directory", customBlueprintsPath)
-			}
-			err = blueprintExists(customBlueprintsPath, "")
-			if err != nil {
-				return err
-			}
+		err = blueprintExists(apertureDir, blueprintName)
+		if err != nil {
+			return err
 		}
 
 		vm := jsonnet.MakeVM()
@@ -121,18 +100,13 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 			JPaths: []string{blueprintsDir},
 		})
 
-		bundlePath := fmt.Sprintf("%s/%s/bundle.libsonnet", apertureDir, blueprintName)
-		if customBlueprintsPath != "" {
-			bundlePath = filepath.Join(customBlueprintsPath, "bundle.libsonnet")
-		}
-
-		fmt.Println("bundlePath", bundlePath)
+		importPath := fmt.Sprintf("%s/%s", apertureDir, blueprintName)
 
 		jsonStr, err := vm.EvaluateAnonymousSnippet("bundle.libsonnet", fmt.Sprintf(`
-		local bundle = import '%s';
+		local bundle = import '%s/bundle.libsonnet';
 		local config = std.parseYaml(importstr '%s');
-		bundle { _config+:: config }
-		`, bundlePath, valuesFile))
+    bundle { _config+:: config }
+		`, importPath, valuesFile))
 		if err != nil {
 			return err
 		}

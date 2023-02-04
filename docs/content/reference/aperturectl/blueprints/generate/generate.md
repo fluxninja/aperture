@@ -33,13 +33,12 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 ### Options
 
 ```
-      --apply                           Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed
-      --custom-blueprints-path string   Path to the directory containing custom Blueprints with 'config.libsonnet' and 'bundle.libsonnet' files
-  -h, --help                            help for generate
-      --kube-config string              Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
-      --name string                     Name of the Aperture Blueprint to generate Aperture Policy resources for. Can be skipped when '--custom-blueprint-path' is provided
-      --output-dir string               Directory path where the generated Policy resources will be stored. If not provided, will use current directory
-      --values-file string              Path to the values file for Blueprint's input
+      --apply                Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed
+  -h, --help                 help for generate
+      --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
+      --name string          Name of the Aperture Blueprint to generate Aperture Policy resources for. Can be skipped when '--custom-blueprint-path' is provided
+      --output-dir string    Directory path where the generated Policy resources will be stored. If not provided, will use current directory
+      --values-file string   Path to the values file for Blueprint's input
 ```
 
 ### Options inherited from parent commands

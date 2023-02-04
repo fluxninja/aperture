@@ -31,6 +31,8 @@ $FIND "$blueprints_root" -type f -name config.libsonnet | while read -r files; d
 	# extract the relative path from the "$blueprints_root"
 	# shellcheck disable=SC2001
 	relative_path=$(echo "$dir" | $SED "s|$blueprints_root||")
+	# remove the last dir from $relative_path
+	relative_path=$(dirname "$relative_path")
 	docs_dir="${blueprints_root}"/../docs/content/reference/policies/bundled-blueprints/"$relative_path"
 	mkdir -p "$docs_dir"
 	docs_file="$docs_dir"/"$blueprint_name".md

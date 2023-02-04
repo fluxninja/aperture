@@ -3,13 +3,13 @@ title: Static Rate Limiting Policy
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../../../../apertureVersion.js';
+import {apertureVersion} from '../../../../apertureVersion.js';
 ```
 
 ## Blueprint Location
 
 GitHub: <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints//policies/static-rate-limiting/static-rate-limiting`}>static-rate-limiting</a>
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints//policies/static-rate-limiting`}>static-rate-limiting</a>
 
 ## Introduction
 
@@ -75,7 +75,7 @@ export const ParameterDescription = ({name, type, reference, value, description}
 <ParameterDescription
     name="policy.classifiers"
     type="[]aperture.spec.v1.Classifier"
-    reference="../../spec#v1-classifier"
+    reference="/reference/policies/spec.md#v1-classifier"
     value=''
     description='List of classification rules.' />
 
@@ -91,14 +91,14 @@ export const ParameterDescription = ({name, type, reference, value, description}
 <ParameterDescription
     name="policy.rate_limiter.flow_selector"
     type="aperture.spec.v1.FlowSelector"
-    reference="../../spec#v1-flow-selector"
+    reference="/reference/policies/spec.md#v1-flow-selector"
     value=''
     description='A flow selector to match requests against' />
 
 <ParameterDescription
     name="policy.rate_limiter.parameters"
     type="aperture.spec.v1.RateLimiterParameters"
-    reference="../../spec#v1-rate-limiter-parameters"
+    reference="/reference/policies/spec.md#v1-rate-limiter-parameters"
     value=''
     description='Parameters.' />
 
@@ -112,7 +112,7 @@ export const ParameterDescription = ({name, type, reference, value, description}
 <ParameterDescription
     name="policy.rate_limiter.dynamic_config"
     type="aperture.spec.v1.RateLimiterDefaultConfig"
-    reference="../../spec#v1-rate-limiter-default-config"
+    reference="/reference/policies/spec.md#v1-rate-limiter-default-config"
     value=''
     description='Dynamic configuration for rate limiter that can be applied at the runtime.' />
 
