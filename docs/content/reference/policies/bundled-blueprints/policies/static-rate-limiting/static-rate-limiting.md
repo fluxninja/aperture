@@ -1,5 +1,5 @@
 ---
-title: Signals Dashboard
+title: Static Rate Limiting Policy
 ---
 
 ```mdx-code-block
@@ -9,13 +9,11 @@ import {apertureVersion} from '../../../../../apertureVersion.js';
 ## Blueprint Location
 
 GitHub: <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints//dashboards/signals-dashboard`}>signals-dashboard</a>
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints//policies/static-rate-limiting/static-rate-limiting`}>static-rate-limiting</a>
 
 ## Introduction
 
-This blueprint provides a [policy monitoring](/reference/policies/monitoring.md)
-dashboard that visualizes Signals flowing through the
-[Circuit](/concepts/policy/circuit.md).
+This blueprint provides a simple static rate limiting policy and a dashboard.
 
 ## Configuration
 
@@ -65,6 +63,59 @@ export const ParameterDescription = ({name, type, reference, value, description}
     value=''
     description='Name of the policy.' />
 
+<h3 class="blueprints-h3">Policy</h3>
+
+<ParameterDescription
+    name="policy.evaluation_interval"
+    type="string"
+    reference=""
+    value=''
+    description='How often should the policy be re-evaluated' />
+
+<ParameterDescription
+    name="policy.classifiers"
+    type="[]aperture.spec.v1.Classifier"
+    reference="../../spec#v1-classifier"
+    value=''
+    description='List of classification rules.' />
+
+<h4 class="blueprints-h4">Rate Limiter</h4>
+
+<ParameterDescription
+    name="policy.rate_limiter.rate_limit"
+    type="float64"
+    reference=""
+    value=''
+    description='Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept' />
+
+<ParameterDescription
+    name="policy.rate_limiter.flow_selector"
+    type="aperture.spec.v1.FlowSelector"
+    reference="../../spec#v1-flow-selector"
+    value=''
+    description='A flow selector to match requests against' />
+
+<ParameterDescription
+    name="policy.rate_limiter.parameters"
+    type="aperture.spec.v1.RateLimiterParameters"
+    reference="../../spec#v1-rate-limiter-parameters"
+    value=''
+    description='Parameters.' />
+
+<ParameterDescription
+    name="policy.rate_limiter.parameters.label_key"
+    type="string"
+    reference=""
+    value=''
+    description='Flow label to use for rate limiting.' />
+
+<ParameterDescription
+    name="policy.rate_limiter.dynamic_config"
+    type="aperture.spec.v1.RateLimiterDefaultConfig"
+    reference="../../spec#v1-rate-limiter-default-config"
+    value=''
+    description='Dynamic configuration for rate limiter that can be applied at the runtime.' />
+
 <h3 class="blueprints-h3">Dashboard</h3>
 
 <ParameterDescription
@@ -73,20 +124,6 @@ export const ParameterDescription = ({name, type, reference, value, description}
     reference=""
     value=''
     description='Refresh interval for dashboard panels.' />
-
-<ParameterDescription
-    name="dashboard.time_from"
-    type="string"
-    reference=""
-    value=''
-    description='From time of dashboard.' />
-
-<ParameterDescription
-    name="dashboard.time_to"
-    type="string"
-    reference=""
-    value=''
-    description='To time of dashboard.' />
 
 <h4 class="blueprints-h4">Datasource</h4>
 

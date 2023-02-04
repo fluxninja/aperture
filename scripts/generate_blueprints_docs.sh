@@ -31,8 +31,7 @@ $FIND "$blueprints_root" -type f -name config.libsonnet | while read -r files; d
 	# extract the relative path from the "$blueprints_root"
 	# shellcheck disable=SC2001
 	relative_path=$(echo "$dir" | $SED "s|$blueprints_root||")
-	blueprint_dir=$(dirname "$relative_path")
-	docs_dir="${blueprints_root}"/../docs/content/reference/policies/bundled-blueprints/"$blueprint_dir"
+	docs_dir="${blueprints_root}"/../docs/content/reference/policies/bundled-blueprints/"$relative_path"
 	mkdir -p "$docs_dir"
 	docs_file="$docs_dir"/"$blueprint_name".md
 	# generate docs
@@ -49,12 +48,12 @@ $FIND "$blueprints_root" -type f -name config.libsonnet | while read -r files; d
 	# add mdx code block
 	echo -e "\`\`\`mdx-code-block" >>"$docs_file"
 
-	# count the number of levels in the blueprint_dir
-	num_levels=$(echo "$blueprint_dir" | $SED 's/[^/]//g' | wc -c)
+	# count the number of levels in the relative_path (e.g. /policies/static-rate-limiting is 2 levels)
+	num_levels=$(echo "$relative_path" | $SED 's/[^/]//g' | wc -c)
 
 	# add the correct number of ../ to the import statement and additional 3 (reference/policies/bundled-blueprints) levels to find apertureVersion.js
 	import_levels="../../../"
-	for ((i = 0; i < num_levels; i++)); do
+	for ((i = 1; i < num_levels; i++)); do
 		import_levels="../$import_levels"
 	done
 
@@ -63,7 +62,7 @@ $FIND "$blueprints_root" -type f -name config.libsonnet | while read -r files; d
 	echo -e "\`\`\`" >>"$docs_file"
 	echo "## Blueprint Location" >>"$docs_file"
 	echo -e "\n" >>"$docs_file"
-	echo "GitHub: <a href={\`https://github.com/fluxninja/aperture/tree/\${apertureVersion}/blueprints/$blueprint_dir/$blueprint_name\`}>$blueprint_name</a>" >>"$docs_file"
+	echo "GitHub: <a href={\`https://github.com/fluxninja/aperture/tree/\${apertureVersion}/blueprints/$relative_path/$blueprint_name\`}>$blueprint_name</a>" >>"$docs_file"
 	echo -e "\n" >>"$docs_file"
 	echo "## Introduction" >>"$docs_file"
 	echo -e "\n" >>"$docs_file"
