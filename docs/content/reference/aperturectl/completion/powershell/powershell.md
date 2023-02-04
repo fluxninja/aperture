@@ -1,10 +1,9 @@
 ---
-title: Aperturectl Completion Powershell
-description: Aperturectl Completion Powershell
+sidebar_label: Powershell
+hide_title: true
 keywords:
   - aperturectl
   - aperturectl_completion_powershell
-sidebar_position: 5
 ---
 
 ## aperturectl completion powershell
@@ -35,4 +34,4 @@ aperturectl completion powershell [flags]
 
 ### SEE ALSO
 
-- [aperturectl completion](aperturectl_completion.md) - Generate the autocompletion script for the specified shell
+- [aperturectl completion](/reference/aperturectl/completion/completion.md) - Generate the autocompletion script for the specified shell

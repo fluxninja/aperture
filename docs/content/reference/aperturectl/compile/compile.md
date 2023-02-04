@@ -1,10 +1,9 @@
 ---
-title: Aperturectl Compile
-description: Aperturectl Compile
+sidebar_label: Compile
+hide_title: true
 keywords:
   - aperturectl
   - aperturectl_compile
-sidebar_position: 8
 ---
 
 ## aperturectl compile
@@ -40,4 +39,4 @@ aperturectl compile --policy=policy.yaml --mermaid --dot
 
 ### SEE ALSO
 
-- [aperturectl](aperturectl.md) - aperturectl - CLI tool to interact with Aperture
+- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture

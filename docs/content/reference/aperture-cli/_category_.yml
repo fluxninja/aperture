@@ -1,8 +1,0 @@
-label: Aperture CLI
-position: 3
-collapsible: true
-collapsed: true
-link:
-  type: "generated-index"
-  title: "Aperture CLI"
-  keywords: ["cli", "aperturectl"]

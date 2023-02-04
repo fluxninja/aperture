@@ -1,10 +1,9 @@
 ---
-title: Aperturectl Blueprints Generate
-description: Aperturectl Blueprints Generate
+sidebar_label: Generate
+hide_title: true
 keywords:
   - aperturectl
   - aperturectl_blueprints_generate
-sidebar_position: 13
 ---
 
 ## aperturectl blueprints generate
@@ -52,4 +51,4 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 
 ### SEE ALSO
 
-- [aperturectl blueprints](aperturectl_blueprints.md) - Aperture Blueprints
+- [aperturectl blueprints](/reference/aperturectl/blueprints/blueprints.md) - Aperture Blueprints
