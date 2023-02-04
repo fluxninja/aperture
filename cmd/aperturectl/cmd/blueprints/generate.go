@@ -66,7 +66,9 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --values-file=values.yaml`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if blueprintName == "" && customBlueprintsPath == "" {
-			return fmt.Errorf("--name must be provided")
+			return fmt.Errorf("either --name or --custom-blueprints-path must be provided")
+		} else if blueprintName != "" && customBlueprintsPath != "" {
+			return fmt.Errorf("only one of --name or --custom-blueprints-path must be provided")
 		}
 
 		if valuesFile == "" {
@@ -91,8 +93,10 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 			return err
 		}
 
+		apertureDir := filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
+
 		if customBlueprintsPath == "" {
-			err = blueprintExists(blueprintsVersion, blueprintName)
+			err = blueprintExists(apertureDir, blueprintName)
 			if err != nil {
 				return err
 			}
@@ -103,40 +107,32 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 				return fmt.Errorf("value provided for --custom-blueprints-path '%s' doesn't exist", customBlueprintsPath)
 			}
 
-			if fileInfo.IsDir() {
-				var files []string
-				files, err = filepath.Glob(filepath.Join(customBlueprintsPath, "*"))
-				if err != nil {
-					return fmt.Errorf("failed to read files in the '%s' directory", customBlueprintsPath)
-				}
-
-				if !slices.Contains(files, filepath.Join(customBlueprintsPath, "config.libsonnet")) || !slices.Contains(files, filepath.Join(customBlueprintsPath, "bundle.libsonnet")) {
-					return fmt.Errorf("value provided for --custom-blueprints-path '%s' is not valid blueprints", customBlueprintsPath)
-				}
-
-				blueprintName = filepath.Base(customBlueprintsPath)
-			} else {
+			if !fileInfo.IsDir() {
 				return fmt.Errorf("value provided for --custom-blueprints-path '%s' is not a directory", customBlueprintsPath)
+			}
+			err = blueprintExists(customBlueprintsPath, "")
+			if err != nil {
+				return err
 			}
 		}
 
-		apertureBlueprintsDir := filepath.Join(blueprintsDir, blueprintsVersion)
-
 		vm := jsonnet.MakeVM()
 		vm.Importer(&jsonnet.FileImporter{
-			JPaths: []string{apertureBlueprintsDir},
+			JPaths: []string{blueprintsDir},
 		})
 
-		blueprintsPath := fmt.Sprintf("github.com/fluxninja/aperture/blueprints/lib/1.0/%s/bundle.libsonnet", blueprintName)
+		bundlePath := fmt.Sprintf("%s/%s/bundle.libsonnet", apertureDir, blueprintName)
 		if customBlueprintsPath != "" {
-			blueprintsPath = filepath.Join(customBlueprintsPath, "bundle.libsonnet")
+			bundlePath = filepath.Join(customBlueprintsPath, "bundle.libsonnet")
 		}
+
+		fmt.Println("bundlePath", bundlePath)
 
 		jsonStr, err := vm.EvaluateAnonymousSnippet("bundle.libsonnet", fmt.Sprintf(`
 		local bundle = import '%s';
 		local config = std.parseYaml(importstr '%s');
 		bundle { _config+:: config }
-		`, blueprintsPath, valuesFile))
+		`, bundlePath, valuesFile))
 		if err != nil {
 			return err
 		}
@@ -150,7 +146,7 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 		var updatedOutputDir string
 
 		if outputDir != "" {
-			updatedOutputDir, err = getOutputDir(outputDir)
+			updatedOutputDir, err = setupOutputDir(outputDir)
 			if err != nil {
 				return err
 			}
@@ -237,8 +233,8 @@ func saveJSONFile(path, filename string, content interface{}) error {
 	return generateGraphs(jsonBytes, filePath)
 }
 
-func blueprintExists(version string, name string) error {
-	blueprintsList, err := getBlueprintsByVersion(version)
+func blueprintExists(blueprintsDir, name string) error {
+	blueprintsList, err := getBlueprints(blueprintsDir)
 	if err != nil {
 		return err
 	}
@@ -249,10 +245,9 @@ func blueprintExists(version string, name string) error {
 	return nil
 }
 
-func getOutputDir(outputPath string) (string, error) {
-	newOutputPath := filepath.Join(outputPath, blueprintsVersion, blueprintName)
-	graphDir = filepath.Join(newOutputPath, "graphs")
-	err := os.MkdirAll(newOutputPath, os.ModePerm)
+func setupOutputDir(outputPath string) (string, error) {
+	graphDir = filepath.Join(outputPath, "graphs")
+	err := os.MkdirAll(outputPath, os.ModePerm)
 	if err != nil {
 		return "", err
 	}
@@ -261,11 +256,11 @@ func getOutputDir(outputPath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	newOutputPath, err = filepath.Abs(newOutputPath)
+	outputPath, err = filepath.Abs(outputPath)
 	if err != nil {
 		return "", err
 	}
-	return newOutputPath, nil
+	return outputPath, nil
 }
 
 func generateGraphs(content []byte, contentPath string) error {

@@ -1,4 +1,4 @@
-local aperture = import 'blueprints/lib/1.0/main.libsonnet';
+local aperture = import 'blueprints/main.libsonnet';
 
 local latencyAIMDPolicy = aperture.policies.LatencyAIMDConcurrencyLimiting.policy;
 

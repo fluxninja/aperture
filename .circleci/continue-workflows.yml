@@ -147,10 +147,10 @@ jobs:
         description: |
           Pass through a default timeout if your Docker build does not output anything for more than 10 minutes.
     executor: <<parameters.executor>>
-    resource_class: medium
+    resource_class: small
     environment:
       DOCKER_BUILDKIT: 1
-      GOMAXPROCS: 2
+      GOMAXPROCS: 1
     steps:
       - checkout
       - when:

@@ -2,7 +2,6 @@ package blueprints
 
 import (
 	"os"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
@@ -27,9 +26,9 @@ aperturectl blueprints remove --all`,
 		pathToRemove := ""
 
 		if removeAll {
-			pathToRemove = blueprintsDir
+			pathToRemove = blueprintsCacheRoot
 		} else {
-			pathToRemove = filepath.Join(blueprintsDir, blueprintsVersion)
+			pathToRemove = blueprintsDir
 		}
 
 		err := os.RemoveAll(pathToRemove)

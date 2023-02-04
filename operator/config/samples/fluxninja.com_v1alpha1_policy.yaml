@@ -6,7 +6,7 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: example
+  name: service1-demo-app
 spec:
   circuit:
     components:
@@ -18,8 +18,8 @@ spec:
                 signal_name: LATENCY
             query_string:
               sum(increase(flux_meter_sum{valid="true", flow_status="OK",
-              flux_meter_name="example"}[5s]))/sum(increase(flux_meter_count{valid="true",
-              flow_status="OK", flux_meter_name="example"}[5s]))
+              flux_meter_name="service1-demo-app"}[5s]))/sum(increase(flux_meter_count{valid="true",
+              flow_status="OK", flux_meter_name="service1-demo-app"}[5s]))
       - arithmetic_combinator:
           in_ports:
             lhs:
@@ -90,32 +90,12 @@ spec:
               default_workload_parameters:
                 priority: 20
               timeout_factor: "0.5"
-              workloads:
-                - label_matcher:
-                    match_labels:
-                      user_type: guest
-                  parameters:
-                    priority: 50
-                - label_matcher:
-                    match_labels:
-                      http.request.header.user_type: subscriber
-                  parameters:
-                    priority: 200
+              workloads: []
     evaluation_interval: 0.5s
   resources:
-    classifiers:
-      - flow_selector:
-          flow_matcher:
-            control_point: ingress
-          service_selector:
-            agent_group: default
-            service: service1-demo-app.demoapp.svc.cluster.local
-        rules:
-          user_type:
-            extractor:
-              from: request.http.headers.user-type
+    classifiers: []
     flux_meters:
-      example:
+      service1-demo-app:
         flow_selector:
           flow_matcher:
             control_point: ingress

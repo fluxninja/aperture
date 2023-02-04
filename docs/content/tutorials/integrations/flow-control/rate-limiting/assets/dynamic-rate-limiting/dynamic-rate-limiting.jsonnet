@@ -1,4 +1,4 @@
-local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.libsonnet';
+local aperture = import 'github.com/fluxninja/aperture/blueprints/main.libsonnet';
 
 local latencyAIMDPolicy = aperture.policies.LatencyAIMDConcurrencyLimiting.policy;
 
