@@ -126,7 +126,7 @@ local newStatPanel(graphTitle, datasource, graphQuery) =
 
 function(cfg) {
   local p = 'service_latency',
-  local params = std.mergePatch(config.common + config.dashboard, cfg),
+  local params = config.common + config.dashboard + cfg,
   local policyName = params.policy_name,
   local ds = params.datasource,
   local dsName = ds.name,

@@ -38,7 +38,7 @@ local newTimeSeriesPanel(title, datasource, query, axisLabel='', unit='') =
   };
 
 function(cfg) {
-  local params = std.mergePatch(config.common + config.dashboard, cfg),
+  local params = config.common + config.dashboard + cfg,
   local policyName = params.policy_name,
   local ds = params.datasource,
   local dsName = ds.name,

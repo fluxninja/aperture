@@ -30,7 +30,7 @@ local constantSignal = spec.v1.ConstantSignal;
 local aimdConcurrencyController = spec.v1.AIMDConcurrencyController;
 
 function(cfg) {
-  local params = std.mergePatch(config.common + config.policy, cfg),
+  local params = config.common + config.policy + cfg,
 
   local policyDef =
     policy.new()

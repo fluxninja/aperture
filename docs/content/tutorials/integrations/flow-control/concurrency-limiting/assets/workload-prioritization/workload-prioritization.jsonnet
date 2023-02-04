@@ -30,13 +30,13 @@ local svcSelector =
 local policyResource = latencyAIMDPolicy({
   policy_name: 'service1-demo-app',
   flux_meter: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector),
-  concurrency_controller: {
+  concurrency_controller+: {
     flow_selector: svcSelector,
     dynamic_config: {
       dryRun: false,
     },
     // highlight-start
-    scheduler: {
+    scheduler+: {
       timeout_factor: 0.5,
       default_workload_parameters: {
         priority: 20,
