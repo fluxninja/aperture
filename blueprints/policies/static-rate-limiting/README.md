@@ -62,7 +62,7 @@ export const ParameterDescription = ({name, type, reference, value, description}
 <ParameterDescription
     name="policy.classifiers"
     type="[]aperture.spec.v1.Classifier"
-    reference="/reference/policies/spec.md#v1-classifier"
+    reference="../../spec#v1-classifier"
     value=''
     description='List of classification rules.' />
 
@@ -78,14 +78,14 @@ export const ParameterDescription = ({name, type, reference, value, description}
 <ParameterDescription
     name="policy.rate_limiter.flow_selector"
     type="aperture.spec.v1.FlowSelector"
-    reference="/reference/policies/spec.md#v1-flow-selector"
+    reference="../../spec#v1-flow-selector"
     value=''
     description='A flow selector to match requests against' />
 
 <ParameterDescription
     name="policy.rate_limiter.parameters"
     type="aperture.spec.v1.RateLimiterParameters"
-    reference="/reference/policies/spec.md#v1-rate-limiter-parameters"
+    reference="../../spec#v1-rate-limiter-parameters"
     value=''
     description='Parameters.' />
 
@@ -99,7 +99,7 @@ export const ParameterDescription = ({name, type, reference, value, description}
 <ParameterDescription
     name="policy.rate_limiter.dynamic_config"
     type="aperture.spec.v1.RateLimiterDefaultConfig"
-    reference="/reference/policies/spec.md#v1-rate-limiter-default-config"
+    reference="../../spec#v1-rate-limiter-default-config"
     value=''
     description='Dynamic configuration for rate limiter that can be applied at the runtime.' />
 

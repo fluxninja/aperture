@@ -53,7 +53,7 @@ class DocBlock:
     parameters: Dict[str, DocBlockParam]
 
     @classmethod
-    def _resolve_param_to_policy_ref(cls, param: str) -> str:
+    def _resolve_param_to_policy_ref(cls, prefix: str, param: str) -> str:
         if not param.startswith("aperture.spec") and not param.startswith("[]aperture.spec"):
             return ""
 
@@ -69,10 +69,10 @@ class DocBlock:
 
         component_final = "v1-" + "-".join(["".join(l) for l in parts])
 
-        return f"/reference/policies/spec.md#{component_final}"
+        return f"{prefix}/spec#{component_final}"
 
     @classmethod
-    def from_comment(cls, comment: List[str]) -> DocBlock:
+    def from_comment(cls, prefix: str, comment: List[str]) -> DocBlock:
         section = None
         subsection = None
         description = ""
@@ -98,7 +98,7 @@ class DocBlock:
 
                 groups = inner.groupdict()
                 param_name, param_type = groups["param_name"], groups["param_type"]
-                param_link = cls._resolve_param_to_policy_ref(param_type)
+                param_link = cls._resolve_param_to_policy_ref(prefix, param_type)
                 param_required = groups.get("param_required", "") == "required"
                 param_description = groups["param_description"]
                 parameters[param_name] = (DocBlockParam(param_name, param_type, param_link, param_description, param_required))
@@ -331,7 +331,7 @@ export const ParameterDescription = ({name, type, reference, value, description}
 """
 
 
-def update_readme_markdown(readme_path, blocks: List[DocBlock]):
+def update_readme_markdown(readme_path: Path, blocks: List[DocBlock]):
     """Find configuration marker in README.md and append all blocks after it"""
 
     readme_data = readme_path.read_text()
@@ -357,7 +357,7 @@ def update_readme_markdown(readme_path, blocks: List[DocBlock]):
     readme_path.write_text(readme_copied)
 
 
-def extract_docblock_comments(jsonnet_data: str) -> List[DocBlock]:
+def extract_docblock_comments(prefix: str, jsonnet_data: str) -> List[DocBlock]:
     docblock_start_re = r".*\/\*\*$"
     docblock_end_re = r".*\*\/$"
 
@@ -371,7 +371,7 @@ def extract_docblock_comments(jsonnet_data: str) -> List[DocBlock]:
         elif re.match(docblock_end_re, line):
             assert inside_docblock
             inside_docblock = False
-            docblocks.append(DocBlock.from_comment(docblock_data))
+            docblocks.append(DocBlock.from_comment(prefix, docblock_data))
             docblock_data = []
         else:
            if inside_docblock:
@@ -397,7 +397,15 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
 
     metadata = yaml.safe_load(metadata_path.read_text())
 
-    docblocks = extract_docblock_comments(config_path.read_text())
+    # calculate the path of repository_root/blueprints from the blueprint_path in terms of ../
+    blueprints_root = repository_root / "blueprints"
+    relative_blueprint_path = blueprint_path.relative_to(blueprints_root)
+    # get parts of relative_blueprint_path
+    relative_blueprint_path_parts = relative_blueprint_path.parts
+    # make a prefix of ../ for each part
+    reference_prefix = "/".join([".."] * len(relative_blueprint_path_parts))
+
+    docblocks = extract_docblock_comments(reference_prefix, config_path.read_text())
 
     sections = {section: [] for section in metadata["sources"].keys()}
     # append Common to sections

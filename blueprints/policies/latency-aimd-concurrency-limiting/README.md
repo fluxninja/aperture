@@ -68,21 +68,21 @@ export const ParameterDescription = ({name, type, reference, value, description}
 <ParameterDescription
     name="policy.flux_meter"
     type="aperture.spec.v1.FluxMeter"
-    reference="/reference/policies/spec.md#v1-flux-meter"
+    reference="../../spec#v1-flux-meter"
     value=''
     description='Flux Meter.' />
 
 <ParameterDescription
     name="policy.classifiers"
     type="[]aperture.spec.v1.Classifier"
-    reference="/reference/policies/spec.md#v1-classifier"
+    reference="../../spec#v1-classifier"
     value=''
     description='List of classification rules.' />
 
 <ParameterDescription
     name="policy.components"
     type="[]aperture.spec.v1.Component"
-    reference="/reference/policies/spec.md#v1-component"
+    reference="../../spec#v1-component"
     value=''
     description='List of additional circuit components.' />
 
@@ -91,7 +91,7 @@ export const ParameterDescription = ({name, type, reference, value, description}
 <ParameterDescription
     name="policy.latency_baseliner.ema"
     type="aperture.spec.v1.EMAParameters"
-    reference="/reference/policies/spec.md#v1-e-m-a-parameters"
+    reference="../../spec#v1-e-m-a-parameters"
     value=''
     description='EMA parameters.' />
 
@@ -114,28 +114,28 @@ export const ParameterDescription = ({name, type, reference, value, description}
 <ParameterDescription
     name="policy.concurrency_controller.flow_selector"
     type="aperture.spec.v1.FlowSelector"
-    reference="/reference/policies/spec.md#v1-flow-selector"
+    reference="../../spec#v1-flow-selector"
     value=''
     description='Concurrency Limiter flow selector.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.scheduler"
     type="aperture.spec.v1.SchedulerParameters"
-    reference="/reference/policies/spec.md#v1-scheduler-parameters"
+    reference="../../spec#v1-scheduler-parameters"
     value=''
     description='Scheduler parameters.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.gradient"
     type="aperture.spec.v1.GradientControllerParameters"
-    reference="/reference/policies/spec.md#v1-gradient-controller-parameters"
+    reference="../../spec#v1-gradient-controller-parameters"
     value=''
     description='Gradient Controller parameters.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.alerter"
     type="aperture.spec.v1.AlerterParameters"
-    reference="/reference/policies/spec.md#v1-alerter-parameters"
+    reference="../../spec#v1-alerter-parameters"
     value=''
     description='Whether tokens for workloads are computed dynamically or set statically by the user.' />
 
