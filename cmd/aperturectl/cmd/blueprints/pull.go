@@ -20,11 +20,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func resolveApertureVersion(version string) (string, error) {
-	if strings.HasPrefix(version, "v") {
-		return version, nil
-	}
-
+func resolveLatestVersion() (string, error) {
 	remote := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
 		Name: "origin",
 		URLs: []string{apertureRepo},
@@ -75,14 +71,9 @@ Use this command to pull the Aperture Blueprints in local system to use for gene
 	Example: `aperturectl blueprints pull
 
 aperturectl blueprints pull --version v0.22.0`,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		resolvedVersion, err := resolveApertureVersion(blueprintsVersion)
-		if err != nil {
-			return nil
-		}
-
-		apertureBlueprintsDir := filepath.Join(blueprintsDir, resolvedVersion)
-		err = os.MkdirAll(apertureBlueprintsDir, os.ModePerm)
+	RunE: func(_ *cobra.Command, _ []string) error {
+		// write the uri in blueprintsDir/uri
+		err := os.WriteFile(filepath.Join(blueprintsDir, uriFilename), []byte(blueprintsURI), os.ModePerm)
 		if err != nil {
 			return err
 		}
@@ -95,13 +86,13 @@ aperturectl blueprints pull --version v0.22.0`,
 		spec.LegacyImports = false
 		contents = append(contents, []byte("\n")...)
 
-		filename := filepath.Join(apertureBlueprintsDir, jsonnetfile.File)
+		filename := filepath.Join(blueprintsDir, jsonnetfile.File)
 		err = os.WriteFile(filename, contents, os.ModePerm)
 		if err != nil {
 			return err
 		}
 
-		jbLockFileBytes, err := os.ReadFile(filepath.Join(apertureBlueprintsDir, jsonnetfile.LockFile))
+		jbLockFileBytes, err := os.ReadFile(filepath.Join(blueprintsDir, jsonnetfile.LockFile))
 		if err != nil && !os.IsNotExist(err) {
 			return err
 		}
@@ -111,21 +102,20 @@ aperturectl blueprints pull --version v0.22.0`,
 			return err
 		}
 
-		err = os.MkdirAll(filepath.Join(apertureBlueprintsDir, ".tmp"), os.ModePerm)
+		err = os.MkdirAll(filepath.Join(blueprintsDir, ".tmp"), os.ModePerm)
 		if err != nil {
 			return err
 		}
 
-		uri := fmt.Sprintf("%s@%s", apertureBlueprintsURI, resolvedVersion)
-		d := deps.Parse(apertureBlueprintsDir, uri)
+		d := deps.Parse(blueprintsDir, blueprintsURI)
 		if !depEqual(spec.Dependencies[d.Name()], *d) {
 			spec.Dependencies[d.Name()] = *d
 			delete(lockFile.Dependencies, d.Name())
 		}
 
-		locked, err := pkg.Ensure(spec, apertureBlueprintsDir, lockFile.Dependencies)
+		locked, err := pkg.Ensure(spec, blueprintsDir, lockFile.Dependencies)
 		if err != nil {
-			_ = os.RemoveAll(apertureBlueprintsDir)
+			_ = os.RemoveAll(blueprintsDir)
 			return err
 		}
 
@@ -133,7 +123,7 @@ aperturectl blueprints pull --version v0.22.0`,
 		if err != nil {
 			return err
 		}
-		err = writeChangedJsonnetFile(jbLockFileBytes, &specv1.JsonnetFile{Dependencies: locked}, filepath.Join(apertureBlueprintsDir, jsonnetfile.LockFile))
+		err = writeChangedJsonnetFile(jbLockFileBytes, &specv1.JsonnetFile{Dependencies: locked}, filepath.Join(blueprintsDir, jsonnetfile.LockFile))
 		if err != nil {
 			return err
 		}
@@ -172,4 +162,17 @@ func writeJSONFile(name string, d interface{}) error {
 
 	// nolint: gosec
 	return os.WriteFile(name, b, 0o644)
+}
+
+func getURI(blueprintsDir string) string {
+	uri := ""
+	// read the uri from uriFilename if it exists
+	// if it doesn't exist, continue
+	if _, err := os.Stat(filepath.Join(blueprintsDir, uriFilename)); err == nil {
+		uriBytes, err := os.ReadFile(filepath.Join(blueprintsDir, uriFilename))
+		if err == nil {
+			uri = string(uriBytes)
+		}
+	}
+	return uri
 }

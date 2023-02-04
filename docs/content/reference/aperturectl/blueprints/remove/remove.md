@@ -38,8 +38,8 @@ aperturectl blueprints remove --all
 ### Options inherited from parent commands
 
 ```
-      --uri string       URI of Aperture Blueprints, could be a local path or a remote git repository (default "github.com/fluxninja/aperture/blueprints")
-      --version string   Version of Aperture Blueprints (default "latest")
+      --uri string       URI of Custom Blueprints, could be a local path or a remote git repository, e.g. github.com/fluxninja/aperture/blueprints@main. This field should not be provided when the Version is provided.
+      --version string   Version of official Aperture Blueprints, e.g. latest. This field should not be provided when the URI is provided (default "latest")
 ```
 
 ### SEE ALSO
