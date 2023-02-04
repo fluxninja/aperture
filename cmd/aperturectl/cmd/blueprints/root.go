@@ -16,6 +16,7 @@ const (
 	defaultBlueprintsVersion = "latest"
 	sourceFilename           = ".source"
 	versionFilename          = ".version"
+	relPathFilename          = ".relpath"
 )
 
 var (

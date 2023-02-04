@@ -51,7 +51,6 @@ aperturectl blueprints list --all`,
 				return err
 			}
 
-			fmt.Printf("Blueprints for: %s\n", getSource(blueprintsDir))
 			for _, policy := range policies {
 				fmt.Fprintf(w, "%s\n", policy)
 			}
@@ -64,17 +63,11 @@ aperturectl blueprints list --all`,
 }
 
 func getBlueprints(blueprintsDir string) ([]string, error) {
-	source := getSource(blueprintsDir)
-
-	if source != "" {
-		// remove the version from the URI (last @ in the URI)
-		source = strings.Split(source, "@")[0]
-	}
+	relPath := getRelPath(blueprintsDir)
 
 	policies := []string{}
 
-	blueprintsPath := filepath.Join(blueprintsDir, source)
-	fmt.Println("peeking at blueprintsPath: ", blueprintsPath)
+	blueprintsPath := filepath.Join(blueprintsDir, relPath)
 	err := symwalk.Walk(blueprintsPath, func(path string, fi fs.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -104,11 +97,11 @@ func getCachedBlueprints() (map[string][]string, error) {
 	for _, blueprintsDir := range blueprintsDirs {
 		if blueprintsDir.IsDir() {
 			dir := filepath.Join(blueprintsCacheRoot, blueprintsDir.Name())
-			source := getSource(dir)
 			policies, err := getBlueprints(dir)
 			if err != nil {
 				return nil, err
 			}
+			source := getSource(dir)
 			blueprintsList[source] = policies
 		}
 	}
