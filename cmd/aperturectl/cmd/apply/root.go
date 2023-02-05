@@ -66,7 +66,7 @@ aperturectl apply --dir=policy-dir`,
 		kubeRestConfig = restConfig
 		return nil
 	},
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(_ *cobra.Command, _ []string) error {
 		dynamicConfigBytes := []byte{}
 		if dynamicConfigFile != "" {
 			// read the dynamic config file
