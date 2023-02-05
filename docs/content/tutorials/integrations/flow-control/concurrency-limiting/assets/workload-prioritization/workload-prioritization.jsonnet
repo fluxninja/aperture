@@ -1,4 +1,4 @@
-local aperture = import 'github.com/fluxninja/aperture/blueprints/lib/1.0/main.libsonnet';
+local aperture = import 'github.com/fluxninja/aperture/blueprints/main.libsonnet';
 
 local latencyAIMDPolicy = aperture.policies.LatencyAIMDConcurrencyLimiting.policy;
 
@@ -32,8 +32,8 @@ local policyResource = latencyAIMDPolicy({
   flux_meter: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector),
   concurrency_controller+: {
     flow_selector: svcSelector,
-    dynamicConfig: {
-      dryRun: false,
+    dynamic_config: {
+      dry_run: false,
     },
     // highlight-start
     scheduler+: {

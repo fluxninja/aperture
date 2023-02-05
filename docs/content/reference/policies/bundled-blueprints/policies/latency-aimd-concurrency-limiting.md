@@ -9,7 +9,7 @@ import {apertureVersion} from '../../../../apertureVersion.js';
 ## Blueprint Location
 
 GitHub: <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/lib/1.0/policies/latency-aimd-concurrency-limiting`}>latency-aimd-concurrency-limiting</a>
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints//policies/latency-aimd-concurrency-limiting`}>latency-aimd-concurrency-limiting</a>
 
 ## Introduction
 

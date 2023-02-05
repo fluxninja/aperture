@@ -141,10 +141,16 @@ jobs:
         type: boolean
         description: Boolean for whether or not to push images to DockerHub
         default: true
+      no_output_timeout:
+        type: string
+        default: 10m
+        description: |
+          Pass through a default timeout if your Docker build does not output anything for more than 10 minutes.
     executor: <<parameters.executor>>
     resource_class: small
     environment:
       DOCKER_BUILDKIT: 1
+      GOMAXPROCS: 1
     steps:
       - checkout
       - when:
@@ -167,6 +173,7 @@ jobs:
           path: <<parameters.path>>
           tag: <<parameters.tag>>
           ssh: <<parameters.docker_ssh>>
+          no_output_timeout: <<parameters.no_output_timeout>>
           use-buildkit: true
       - aperture_docker_tag:
           source-registry: <<parameters.registry>>
@@ -265,7 +272,7 @@ jobs:
     executor: python-cimg-executor
     resource_class: large
     environment:
-      GOMAXPROCS: 8
+      GOMAXPROCS: 4
     steps:
       - add_ssh_keys:
           fingerprints:
@@ -919,6 +926,7 @@ workflows:
           gcr-image: cf-fn/aperture-operator
           docker-context: .
           dockerfile: ./operator/Dockerfile
+          no_output_timeout: 15m
           use-docker-layer-caching: true
       - update-environment:
           filters:

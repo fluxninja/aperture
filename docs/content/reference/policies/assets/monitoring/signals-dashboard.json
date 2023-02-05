@@ -12,7 +12,10 @@
   "links": [],
   "panels": [
     {
-      "datasource": "controller-prometheus",
+      "datasource": {
+        "filter_regex": "",
+        "name": "controller-prometheus"
+      },
       "defaults": {
         "color": {
           "mode": "palette-classic"
@@ -126,7 +129,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": "controller-prometheus",
+      "datasource": {
+        "filter_regex": "",
+        "name": "controller-prometheus"
+      },
       "defaults": {
         "color": {
           "mode": "palette-classic"

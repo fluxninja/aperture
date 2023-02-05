@@ -1,7 +1,7 @@
 local grafanaOperator = import 'github.com/jsonnet-libs/grafana-operator-libsonnet/4.3/main.libsonnet';
 local kubernetesMixin = import 'github.com/kubernetes-monitoring/kubernetes-mixin/mixin.libsonnet';
 
-local aperture = import '../../../../../blueprints/lib/1.0/main.libsonnet';
+local aperture = import '../../../../../blueprints/main.libsonnet';
 local policyDashboard = aperture.policies.LatencyAIMDConcurrencyLimiting.dashboard;
 local rateLimitpolicyDashboard = aperture.policies.StaticRateLimiting.dashboard;
 local signalsDashboard = aperture.dashboards.SignalsDashboard.dashboard;
@@ -46,11 +46,14 @@ local policyDashBoardMixin =
   policyDashboard({
     policy_name: 'service1-demo-app',
   }).dashboard
+  /* TODO: panel id is clashing. disabling for now.
   {
     panels+: rateLimitpolicyDashboard({
       policy_name: 'service1-demo-app',
     }).dashboard.panels,
-  };
+  }
+  */
+;
 
 local dashboards =
   [

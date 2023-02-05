@@ -113,7 +113,7 @@ from becoming unresponsive and keeps the latency within the tolerance limit
 ### Dry Run Mode
 
 You can run this policy in the `Dry Run` mode by setting the
-`dynamicConfig.dryRun` option to `true`. In the `Dry Run` mode, the policy
+`dynamicConfig.dry_run` option to `true`. In the `Dry Run` mode, the policy
 doesn't actuate (i.e. traffic is never dropped) while still evaluating the
 decision it would take in each cycle. This helps understand how the policy would
 behave as the input signals change.

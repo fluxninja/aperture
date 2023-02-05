@@ -34,8 +34,8 @@ end
 subgraph root.3[<center>EMA<br/>win: 3000</center>]
 subgraph root.3_inports[ ]
 style root.3_inports fill:none,stroke:none
-root.3input[input]
 root.3max_envelope[max_envelope]
+root.3input[input]
 end
 subgraph root.3_outports[ ]
 style root.3_outports fill:none,stroke:none
@@ -45,8 +45,8 @@ end
 subgraph root.4[<center>AIMDConcurrencyController<br/>service1-demo-app.demoapp.s...</center>]
 subgraph root.4_inports[ ]
 style root.4_inports fill:none,stroke:none
-root.4signal[signal]
 root.4setpoint[setpoint]
+root.4signal[signal]
 end
 subgraph root.4_outports[ ]
 style root.4_outports fill:none,stroke:none
@@ -66,16 +66,16 @@ style root.5_outports fill:none,stroke:none
 root.5output[output]
 end
 end
-FakeConstant3((0.00))
-FakeConstant3 --> root.6on_true
-FakeConstant4((10.00))
-FakeConstant4 --> root.6on_false
+FakeConstant3((10.00))
+FakeConstant3 --> root.6on_false
+FakeConstant4((0.00))
+FakeConstant4 --> root.6on_true
 subgraph root.6[Switcher]
 subgraph root.6_inports[ ]
 style root.6_inports fill:none,stroke:none
-root.6on_true[on_true]
 root.6on_false[on_false]
 root.6switch[switch]
+root.6on_true[on_true]
 end
 subgraph root.6_outports[ ]
 style root.6_outports fill:none,stroke:none
@@ -88,12 +88,12 @@ style root.7_inports fill:none,stroke:none
 root.7limit[limit]
 end
 end
+root.3output --> |LATENCY_EMA| root.2lhs
+root.4load_multiplier --> |LOAD_MULTIPLIER| root.5lhs
+root.5output --> |IS_BOT_ESCALATION| root.6switch
+root.6output --> |RATE_LIMIT| root.7limit
 root.0output --> |LATENCY| root.1lhs
 root.0output --> |LATENCY| root.3input
 root.0output --> |LATENCY| root.4signal
 root.1output --> |MAX_EMA| root.3max_envelope
 root.2output --> |LATENCY_SETPOINT| root.4setpoint
-root.3output --> |LATENCY_EMA| root.2lhs
-root.4load_multiplier --> |LOAD_MULTIPLIER| root.5lhs
-root.5output --> |IS_BOT_ESCALATION| root.6switch
-root.6output --> |RATE_LIMIT| root.7limit
