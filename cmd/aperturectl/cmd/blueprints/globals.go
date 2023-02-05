@@ -11,4 +11,5 @@ var (
 	kubeConfig    string
 	validPolicies []*policyv1alpha1.Policy
 	all           bool
+	onlyRequired  bool
 )

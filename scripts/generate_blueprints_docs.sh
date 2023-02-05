@@ -26,7 +26,14 @@ $FIND "$blueprints_root" -type f -name config.libsonnet | while read -r files; d
 	echo "Generating README and Sample Values for $dir"
 	python "${git_root}"/scripts/blueprint-readme-generator.py "$dir"
 	npx prettier --write "$dir"/README.md
-	npx prettier --write "$dir"/values.yaml
+	# if values.yaml exists, format it
+	if [ -f "$dir"/values.yaml ]; then
+		npx prettier --write "$dir"/values.yaml
+	fi
+	# if values_required.yaml exists, format it
+	if [ -f "$dir"/values_required.yaml ]; then
+		npx prettier --write "$dir"/values_required.yaml
+	fi
 	# extract the name of the blueprint from the path
 	blueprint_name=$(basename "$dir")
 	# extract the relative path from the "$blueprints_root"

@@ -58,6 +58,8 @@ class DocBlock:
     parameters: Dict[str, DocBlockParam]
     # nested dictionary of parameters
     nested_parameters: DocBlockNode
+    # nested dictionary of required parameters
+    nested_required_parameters: DocBlockNode
 
     @classmethod
     def _resolve_param_to_policy_ref(cls, prefix: str, param: str) -> str:
@@ -86,6 +88,7 @@ class DocBlock:
         description_parsed = False
         parameters = {}
         nested_parameters = DocBlockNode(DocBlockParam("", "object", "", "", False), {})
+        nested_required_parameters = DocBlockNode(DocBlockParam("", "object", "", "", False), {})
         for line in comment:
             if matched := SECTION_RE.match(line.strip()):
                 if description:
@@ -113,13 +116,20 @@ class DocBlock:
                 # tokenize param_name and create nested_parameters
                 parts = param_name.split(".")
                 parent = nested_parameters.children
+                parent_required = nested_required_parameters.children
                 for idx, part in enumerate(parts):
                     if idx == len(parts) - 1:
                         parent[part] = DocBlockNode(DocBlockParam(part, param_type, param_link, param_description, param_required), {})
+                        if param_required:
+                            parent_required[part] = DocBlockNode(DocBlockParam(part, param_type, param_link, param_description, param_required), {})
                     else:
                         if part not in parent:
                             parent[part] = DocBlockNode(DocBlockParam(part, "object", "", "", False), {})
                         parent = parent[part].children
+                        if param_required:
+                            if part not in parent_required:
+                                parent_required[part] = DocBlockNode(DocBlockParam(part, "object", "", "", False), {})
+                            parent_required = parent_required[part].children
 
             else:
                 stripped = line.lstrip(" ")
@@ -135,7 +145,7 @@ class DocBlock:
             logger.error("Unable to find section and parameters in docblock")
             raise ValueError()
 
-        return cls(section, subsection, description, parameters, nested_parameters)
+        return cls(section, subsection, description, parameters, nested_parameters, nested_required_parameters)
 
 
 def command_with_exit_code(func):
@@ -252,6 +262,8 @@ def update_docblock_param_defaults(repository_root: Path, jsonnet_path: Path, co
             update_nested_param_defaults(child, keyPrefix)
     for block in blocks:
         update_nested_param_defaults(block.nested_parameters, "")
+    for block in blocks:
+        update_nested_param_defaults(block.nested_required_parameters, "")
 
 
 def update_docblock_sections(blocks: List[DocBlock], section: str):
@@ -421,12 +433,18 @@ def update_readme_markdown(readme_path: Path, blocks: List[DocBlock]):
     readme_copied += rendered
     readme_path.write_text(readme_copied)
 
-def render_sample_config_yaml(blueprint_name: str, sample_config_path: Path, blocks: List[DocBlock]):
+def render_sample_config_yaml(blueprint_name: Path, sample_config_path: Path, only_required: bool, blocks: List[DocBlock]):
     """Render sample config YAML file from blocks"""
     # merge all nested parameters into one dict
     sample_config_data = DocBlockNode(DocBlockParam("", "object", "", "", False), {})
-    for block in blocks:
-        sample_config_data.children.update(block.nested_parameters.children)
+    if only_required is False:
+        for block in blocks:
+            sample_config_data.children.update(block.nested_parameters.children)
+    else:
+        for block in blocks:
+            sample_config_data.children.update(block.nested_required_parameters.children)
+
+
     env = get_jinja2_environment()
     template = env.get_template("values.yaml.j2")
     rendered = template.render({"sample_config_data": sample_config_data, "blueprint_name": blueprint_name})
@@ -467,8 +485,6 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
 
     config_path = blueprint_path / "config.libsonnet"
 
-    sample_config_path = blueprint_path / "values.yaml"
-
     metadata_path = blueprint_path / "metadata.yaml"
 
     metadata = yaml.safe_load(metadata_path.read_text())
@@ -505,7 +521,8 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
         update_docblock_param_defaults(repository_root, path, config_path, config_key, blocks)
 
     update_readme_markdown(readme_path, docblocks)
-    render_sample_config_yaml(blueprint_name, sample_config_path, docblocks)
+    render_sample_config_yaml(blueprint_name, blueprint_path / "values.yaml", False, docblocks)
+    render_sample_config_yaml(blueprint_name, blueprint_path / "values_required.yaml", True, docblocks)
 
 if __name__ == "__main__":
     typer.run(main)
