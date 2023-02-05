@@ -270,9 +270,9 @@ jobs:
 
   pre-commit:
     executor: python-cimg-executor
-    resource_class: large
+    resource_class: xlarge
     environment:
-      GOMAXPROCS: 4
+      GOMAXPROCS: 8
     steps:
       - add_ssh_keys:
           fingerprints:
