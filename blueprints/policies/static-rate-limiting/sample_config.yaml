@@ -1,0 +1,36 @@
+common:
+  # Description: Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: "__REQUIRED_FIELD__"
+
+policy:
+  rate_limiter:
+    # Description: Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept
+    # Type: float64
+    # Required: True
+    rate_limit: "__REQUIRED_FIELD__"
+    # Description: A flow selector to match requests against
+    # Type: aperture.spec.v1.FlowSelector
+    # Required: True
+    flow_selector: "__REQUIRED_FIELD__"
+    # Description: Parameters.
+    # Type: aperture.spec.v1.RateLimiterParameters
+    parameters:
+      # Description: Flow label to use for rate limiting.
+      # Type: string
+      # Required: True
+      label_key: "__REQUIRED_FIELD__"
+    # Description: Dynamic configuration for rate limiter that can be applied at the runtime.
+    # Type: aperture.spec.v1.RateLimiterDefaultConfig
+    dynamic_config:
+      overrides: []
+
+dashboard:
+  datasource:
+    # Description: Datasource name.
+    # Type: string
+    name: "$datasource"
+    # Description: Datasource filter regex.
+    # Type: string
+    filter_regex: ""

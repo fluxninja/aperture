@@ -1,0 +1,14 @@
+common:
+  # Description: Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: "__REQUIRED_FIELD__"
+
+dashboard:
+  datasource:
+    # Description: Datasource name.
+    # Type: string
+    name: "$datasource"
+    # Description: Datasource filter regex.
+    # Type: string
+    filter_regex: ""
