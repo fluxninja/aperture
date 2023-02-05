@@ -41,6 +41,7 @@ func init() {
 	BlueprintsCmd.AddCommand(listCmd)
 	BlueprintsCmd.AddCommand(removeCmd)
 	BlueprintsCmd.AddCommand(generateCmd)
+	BlueprintsCmd.AddCommand(valuesCmd)
 }
 
 // BlueprintsCmd is the root command for blueprints.

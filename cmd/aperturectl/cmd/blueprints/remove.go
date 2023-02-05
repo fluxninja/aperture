@@ -6,10 +6,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var removeAll bool
-
 func init() {
-	removeCmd.Flags().BoolVar(&removeAll, "all", false, "remove all versions of Aperture Blueprints")
+	removeCmd.Flags().BoolVar(&all, "all", false, "remove all versions of Aperture Blueprints")
 }
 
 var removeCmd = &cobra.Command{
@@ -25,7 +23,7 @@ aperturectl blueprints remove --all`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		pathToRemove := ""
 
-		if removeAll {
+		if all {
 			pathToRemove = blueprintsCacheRoot
 		} else {
 			pathToRemove = blueprintsDir

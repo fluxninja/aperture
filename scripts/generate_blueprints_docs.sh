@@ -23,9 +23,10 @@ $FIND "${blueprints_root}"/../docs/content/reference/policies/bundled-blueprints
 # for all subdirectories within "$blueprints_root"/lib containing config.libsonnet, generate README
 $FIND "$blueprints_root" -type f -name config.libsonnet | while read -r files; do
 	dir=$(dirname "$files")
-	echo "Generating README for $dir"
+	echo "Generating README and Sample Values for $dir"
 	python "${git_root}"/scripts/blueprint-readme-generator.py "$dir"
 	npx prettier --write "$dir"/README.md
+	npx prettier --write "$dir"/values.yaml
 	# extract the name of the blueprint from the path
 	blueprint_name=$(basename "$dir")
 	# extract the relative path from the "$blueprints_root"

@@ -1,0 +1,40 @@
+# Generated values.yaml file for policies/static-rate-limiting blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/static-rate-limiting
+
+common:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: "__REQUIRED_FIELD__"
+
+policy:
+  rate_limiter:
+    # Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept
+    # Type: float64
+    # Required: True
+    rate_limit: "__REQUIRED_FIELD__"
+    # A flow selector to match requests against
+    # Type: aperture.spec.v1.FlowSelector
+    # Required: True
+    flow_selector: "__REQUIRED_FIELD__"
+    # Parameters.
+    # Type: aperture.spec.v1.RateLimiterParameters
+    parameters:
+      # Flow label to use for rate limiting.
+      # Type: string
+      # Required: True
+      label_key: "__REQUIRED_FIELD__"
+    # Dynamic configuration for rate limiter that can be applied at the runtime.
+    # Type: aperture.spec.v1.RateLimiterDefaultConfig
+    dynamic_config:
+      overrides: []
+
+dashboard:
+  datasource:
+    # Datasource name.
+    # Type: string
+    name: "$datasource"
+    # Datasource filter regex.
+    # Type: string
+    filter_regex: ""

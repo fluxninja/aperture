@@ -1,0 +1,58 @@
+# Generated values.yaml file for policies/latency-aimd-concurrency-limiting blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting
+
+common:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: "__REQUIRED_FIELD__"
+
+policy:
+  concurrency_controller:
+    # Concurrency Limiter flow selector.
+    # Type: aperture.spec.v1.FlowSelector
+    # Required: True
+    flow_selector: "__REQUIRED_FIELD__"
+    # Scheduler parameters.
+    # Type: aperture.spec.v1.SchedulerParameters
+    scheduler:
+      auto_tokens: true
+      default_workload_parameters:
+      priority: 20
+      timeout_factor: 0.5
+      workloads: []
+    # Gradient Controller parameters.
+    # Type: aperture.spec.v1.GradientControllerParameters
+    gradient:
+      max_gradient: 1.0
+      min_gradient: 0.1
+      slope: -1
+    # Whether tokens for workloads are computed dynamically or set statically by the user.
+    # Type: aperture.spec.v1.AlerterParameters
+    alerter:
+      alert_channels: []
+      alert_name: "Load Shed Event"
+      resolve_timeout: "5s"
+    # Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+    # Type: float64
+    concurrency_limit_multiplier: 2.0
+    # Linear increment to concurrency in each execution tick when the system is not in overloaded state.
+    # Type: float64
+    concurrency_linear_increment: 5.0
+    # Scale factor to multiply square root of current accepted concurrrency. This, along with concurrency_linear_increment helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
+    # Type: float64
+    concurrency_sqrt_increment_multiplier: 1
+    # Dynamic configuration for concurrency controller.
+    # Type: aperture.v1.LoadActuatorDynamicConfig
+    dynamic_config:
+      dry_run: false
+
+dashboard:
+  datasource:
+    # Datasource name.
+    # Type: string
+    name: "$datasource"
+    # Datasource filter regex.
+    # Type: string
+    filter_regex: ""
