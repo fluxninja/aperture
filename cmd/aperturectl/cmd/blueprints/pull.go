@@ -87,7 +87,7 @@ aperturectl blueprints pull --version v0.22.0`,
 		}
 
 		jbLockFileBytes, err := os.ReadFile(filepath.Join(blueprintsDir, jsonnetfile.LockFile))
-		if err != nil && !os.IsNotExist(err) {
+		if !os.IsNotExist(err) {
 			return err
 		}
 
@@ -141,7 +141,6 @@ aperturectl blueprints pull --version v0.22.0`,
 
 		locked, err := pkg.Ensure(spec, blueprintsDir, lockFile.Dependencies)
 		if err != nil {
-			_ = os.RemoveAll(blueprintsDir)
 			return err
 		}
 

@@ -77,7 +77,6 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 		if err = pullCmd.RunE(cmd, args); err != nil {
 			return err
 		}
-
 		apertureDir := filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
 
 		err = blueprintExists(apertureDir, blueprintName)
