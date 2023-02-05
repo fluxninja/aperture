@@ -11,6 +11,12 @@ import {apertureVersion} from '../../../../apertureVersion.js';
 GitHub: <a
 href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/static-rate-limiting`}>static-rate-limiting</a>
 
+Sample values file: <a
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/static-rate-limiting/values.yaml`}>values.yaml</a>
+
+Sample values file (required fields only): <a
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/static-rate-limiting/values_required.yaml`}>values_required.yaml</a>
+
 ## Introduction
 
 This blueprint provides a simple static rate limiting policy and a dashboard.
@@ -44,7 +50,7 @@ export const ParameterDescription = ({name, type, reference, value, description}
   </tr>
   <tr>
     <td class="blueprints-default-heading"><ParameterHeading>Default Value</ParameterHeading></td>
-    <td><code>{value != '' ? value : "REQUIRED VALUE"}</code></td>
+    <td><code>{value}</code></td>
   </tr>
   <tr>
     <td class="blueprints-description"><ParameterHeading>Description</ParameterHeading></td>
@@ -60,7 +66,7 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="common.policy_name"
     type="string"
     reference=""
-    value=''
+    value="__REQUIRED_FIELD__"
     description='Name of the policy.' />
 
 <h3 class="blueprints-h3">Policy</h3>
@@ -69,14 +75,14 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="policy.evaluation_interval"
     type="string"
     reference=""
-    value=''
+    value="'300s'"
     description='How often should the policy be re-evaluated' />
 
 <ParameterDescription
     name="policy.classifiers"
     type="[]aperture.spec.v1.Classifier"
     reference="../../spec#v1-classifier"
-    value=''
+    value="[]"
     description='List of classification rules.' />
 
 <h4 class="blueprints-h4">Rate Limiter</h4>
@@ -85,35 +91,35 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="policy.rate_limiter.rate_limit"
     type="float64"
     reference=""
-    value=''
+    value="__REQUIRED_FIELD__"
     description='Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept' />
 
 <ParameterDescription
     name="policy.rate_limiter.flow_selector"
     type="aperture.spec.v1.FlowSelector"
     reference="../../spec#v1-flow-selector"
-    value=''
+    value="__REQUIRED_FIELD__"
     description='A flow selector to match requests against' />
 
 <ParameterDescription
     name="policy.rate_limiter.parameters"
     type="aperture.spec.v1.RateLimiterParameters"
     reference="../../spec#v1-rate-limiter-parameters"
-    value=''
+    value="{'label_key': '__REQUIRED_FIELD__', 'lazy_sync': {'enabled': True, 'num_sync': 5}, 'limit_reset_interval': '1s'}"
     description='Parameters.' />
 
 <ParameterDescription
     name="policy.rate_limiter.parameters.label_key"
     type="string"
     reference=""
-    value=''
+    value="__REQUIRED_FIELD__"
     description='Flow label to use for rate limiting.' />
 
 <ParameterDescription
     name="policy.rate_limiter.dynamic_config"
     type="aperture.spec.v1.RateLimiterDefaultConfig"
     reference="../../spec#v1-rate-limiter-default-config"
-    value=''
+    value="{'overrides': []}"
     description='Dynamic configuration for rate limiter that can be applied at the runtime.' />
 
 <h3 class="blueprints-h3">Dashboard</h3>
@@ -122,7 +128,7 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="dashboard.refresh_interval"
     type="string"
     reference=""
-    value=''
+    value="'10s'"
     description='Refresh interval for dashboard panels.' />
 
 <h4 class="blueprints-h4">Datasource</h4>
@@ -131,12 +137,12 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="dashboard.datasource.name"
     type="string"
     reference=""
-    value=''
+    value="'$datasource'"
     description='Datasource name.' />
 
 <ParameterDescription
     name="dashboard.datasource.filter_regex"
     type="string"
     reference=""
-    value=''
+    value="''"
     description='Datasource filter regex.' />

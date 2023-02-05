@@ -11,6 +11,12 @@ import {apertureVersion} from '../../../../apertureVersion.js';
 GitHub: <a
 href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/latency-aimd-concurrency-limiting`}>latency-aimd-concurrency-limiting</a>
 
+Sample values file: <a
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/latency-aimd-concurrency-limiting/values.yaml`}>values.yaml</a>
+
+Sample values file (required fields only): <a
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/latency-aimd-concurrency-limiting/values_required.yaml`}>values_required.yaml</a>
+
 ## Introduction
 
 This policy detect overloads/cascading failures by comparing the real-time
@@ -57,7 +63,7 @@ export const ParameterDescription = ({name, type, reference, value, description}
   </tr>
   <tr>
     <td class="blueprints-default-heading"><ParameterHeading>Default Value</ParameterHeading></td>
-    <td><code>{value != '' ? value : "REQUIRED VALUE"}</code></td>
+    <td><code>{value}</code></td>
   </tr>
   <tr>
     <td class="blueprints-description"><ParameterHeading>Description</ParameterHeading></td>
@@ -73,7 +79,7 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="common.policy_name"
     type="string"
     reference=""
-    value=''
+    value="__REQUIRED_FIELD__"
     description='Name of the policy.' />
 
 <h3 class="blueprints-h3">Policy</h3>
@@ -82,21 +88,21 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="policy.flux_meter"
     type="aperture.spec.v1.FluxMeter"
     reference="../../spec#v1-flux-meter"
-    value=''
+    value="__REQUIRED_FIELD__"
     description='Flux Meter.' />
 
 <ParameterDescription
     name="policy.classifiers"
     type="[]aperture.spec.v1.Classifier"
     reference="../../spec#v1-classifier"
-    value=''
+    value="[]"
     description='List of classification rules.' />
 
 <ParameterDescription
     name="policy.components"
     type="[]aperture.spec.v1.Component"
     reference="../../spec#v1-component"
-    value=''
+    value="[]"
     description='List of additional circuit components.' />
 
 <h4 class="blueprints-h4">Latency Baseliner</h4>
@@ -105,21 +111,21 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="policy.latency_baseliner.ema"
     type="aperture.spec.v1.EMAParameters"
     reference="../../spec#v1-e-m-a-parameters"
-    value=''
+    value="{'correction_factor_on_max_envelope_violation': '0.95', 'ema_window': '1500s', 'warmup_window': '60s'}"
     description='EMA parameters.' />
 
 <ParameterDescription
     name="policy.latency_baseliner.latency_tolerance_multiplier"
     type="float64"
     reference=""
-    value=''
+    value="1.1"
     description='Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.' />
 
 <ParameterDescription
     name="policy.latency_baseliner.latency_ema_limit_multiplier"
     type="float64"
     reference=""
-    value=''
+    value="2.0"
     description='Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.' />
 
 <h4 class="blueprints-h4">Concurrency Controller</h4>
@@ -128,56 +134,56 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="policy.concurrency_controller.flow_selector"
     type="aperture.spec.v1.FlowSelector"
     reference="../../spec#v1-flow-selector"
-    value=''
+    value="__REQUIRED_FIELD__"
     description='Concurrency Limiter flow selector.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.scheduler"
     type="aperture.spec.v1.SchedulerParameters"
     reference="../../spec#v1-scheduler-parameters"
-    value=''
+    value="{'auto_tokens': True, 'default_workload_parameters': {'priority': 20}, 'timeout_factor': '0.5', 'workloads': []}"
     description='Scheduler parameters.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.gradient"
     type="aperture.spec.v1.GradientControllerParameters"
     reference="../../spec#v1-gradient-controller-parameters"
-    value=''
+    value="{'max_gradient': '1.0', 'min_gradient': '0.1', 'slope': '-1'}"
     description='Gradient Controller parameters.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.alerter"
     type="aperture.spec.v1.AlerterParameters"
     reference="../../spec#v1-alerter-parameters"
-    value=''
+    value="{'alert_channels': [], 'alert_name': 'Load Shed Event', 'resolve_timeout': '5s'}"
     description='Whether tokens for workloads are computed dynamically or set statically by the user.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.concurrency_limit_multiplier"
     type="float64"
     reference=""
-    value=''
+    value="2.0"
     description='Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.concurrency_linear_increment"
     type="float64"
     reference=""
-    value=''
+    value="5.0"
     description='Linear increment to concurrency in each execution tick when the system is not in overloaded state.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.concurrency_sqrt_increment_multiplier"
     type="float64"
     reference=""
-    value=''
+    value="1"
     description='Scale factor to multiply square root of current accepted concurrrency. This, along with concurrency_linear_increment helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).' />
 
 <ParameterDescription
     name="policy.concurrency_controller.dynamic_config"
     type="aperture.v1.LoadActuatorDynamicConfig"
     reference=""
-    value=''
+    value="{'dry_run': False}"
     description='Dynamic configuration for concurrency controller.' />
 
 <h3 class="blueprints-h3">Dashboard</h3>
@@ -186,7 +192,7 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="dashboard.refresh_interval"
     type="string"
     reference=""
-    value=''
+    value="'10s'"
     description='Refresh interval for dashboard panels.' />
 
 <h4 class="blueprints-h4">Datasource</h4>
@@ -195,12 +201,12 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="dashboard.datasource.name"
     type="string"
     reference=""
-    value=''
+    value="'$datasource'"
     description='Datasource name.' />
 
 <ParameterDescription
     name="dashboard.datasource.filter_regex"
     type="string"
     reference=""
-    value=''
+    value="''"
     description='Datasource filter regex.' />

@@ -11,6 +11,12 @@ import {apertureVersion} from '../../../../apertureVersion.js';
 GitHub: <a
 href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/dashboards/signals-dashboard`}>signals-dashboard</a>
 
+Sample values file: <a
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/dashboards/signals-dashboard/values.yaml`}>values.yaml</a>
+
+Sample values file (required fields only): <a
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/dashboards/signals-dashboard/values_required.yaml`}>values_required.yaml</a>
+
 ## Introduction
 
 This blueprint provides a [policy monitoring](/reference/policies/monitoring.md)
@@ -46,7 +52,7 @@ export const ParameterDescription = ({name, type, reference, value, description}
   </tr>
   <tr>
     <td class="blueprints-default-heading"><ParameterHeading>Default Value</ParameterHeading></td>
-    <td><code>{value != '' ? value : "REQUIRED VALUE"}</code></td>
+    <td><code>{value}</code></td>
   </tr>
   <tr>
     <td class="blueprints-description"><ParameterHeading>Description</ParameterHeading></td>
@@ -62,7 +68,7 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="common.policy_name"
     type="string"
     reference=""
-    value=''
+    value="__REQUIRED_FIELD__"
     description='Name of the policy.' />
 
 <h3 class="blueprints-h3">Dashboard</h3>
@@ -71,21 +77,21 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="dashboard.refresh_interval"
     type="string"
     reference=""
-    value=''
+    value="'10s'"
     description='Refresh interval for dashboard panels.' />
 
 <ParameterDescription
     name="dashboard.time_from"
     type="string"
     reference=""
-    value=''
+    value="'now-30m'"
     description='From time of dashboard.' />
 
 <ParameterDescription
     name="dashboard.time_to"
     type="string"
     reference=""
-    value=''
+    value="'now'"
     description='To time of dashboard.' />
 
 <h4 class="blueprints-h4">Datasource</h4>
@@ -94,12 +100,12 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="dashboard.datasource.name"
     type="string"
     reference=""
-    value=''
+    value="'$datasource'"
     description='Datasource name.' />
 
 <ParameterDescription
     name="dashboard.datasource.filter_regex"
     type="string"
     reference=""
-    value=''
+    value="''"
     description='Datasource filter regex.' />
