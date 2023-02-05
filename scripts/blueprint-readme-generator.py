@@ -294,7 +294,7 @@ SECTION_TPL = """
     name="{{ param.param_name }}"
     type="{{ param.param_type }}"
     reference="{{ param.param_link }}"
-    value='{% if param.value %}{{ param.default | quoteValue }}{% endif %}'
+    value={% if param.required %}"__REQUIRED_FIELD__"{% else %}"{{ param.default | quoteValue }}"{% endif %}
     description='{{ param.description }}' />
 
 {%- endfor %}
@@ -359,7 +359,7 @@ def quoteValue(value: str) -> str:
     if isinstance(value, list) or isinstance(value, dict):
         return value
 
-    return f"\"{value}\""
+    return f"\'{value}\'"
 
 
 def get_jinja2_environment() -> jinja2.Environment:
@@ -396,7 +396,7 @@ export const ParameterDescription = ({name, type, reference, value, description}
   </tr>
   <tr>
     <td class="blueprints-default-heading"><ParameterHeading>Default Value</ParameterHeading></td>
-    <td><code>{value != '' ? value : "REQUIRED VALUE"}</code></td>
+    <td><code>{value}</code></td>
   </tr>
   <tr>
     <td class="blueprints-description"><ParameterHeading>Description</ParameterHeading></td>
