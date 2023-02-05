@@ -18,6 +18,7 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 
 ```
   -h, --help             help for blueprints
+      --skip-pull        Skip pulling the latest blueprints.
       --uri string       URI of Custom Blueprints, could be a local path or a remote git repository, e.g. github.com/fluxninja/aperture/blueprints@main. This field should not be provided when the Version is provided.
       --version string   Version of official Aperture Blueprints, e.g. latest. This field should not be provided when the URI is provided (default "latest")
 ```

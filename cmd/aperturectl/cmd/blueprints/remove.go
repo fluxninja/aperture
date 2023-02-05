@@ -20,7 +20,7 @@ Use this command to remove a pulled Aperture Blueprint from local system.`,
 aperturectl blueprints remove --version v0.22.0
 
 aperturectl blueprints remove --all`,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(_ *cobra.Command, _ []string) error {
 		pathToRemove := ""
 
 		if all {

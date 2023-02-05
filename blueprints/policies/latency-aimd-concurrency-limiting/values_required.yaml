@@ -1,0 +1,16 @@
+# Generated values.yaml file for policies/latency-aimd-concurrency-limiting blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting
+
+common:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: "__REQUIRED_FIELD__"
+
+policy:
+  concurrency_controller:
+    # Concurrency Limiter flow selector.
+    # Type: aperture.spec.v1.FlowSelector
+    # Required: True
+    flow_selector: "__REQUIRED_FIELD__"

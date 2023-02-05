@@ -5,17 +5,17 @@ git_root=$(git rev-parse --show-toplevel)
 
 # function takes URI, name, values-file as input
 function generate_compare() {
-	local uri=$1
-	local name=$2
-	local values_file=$3
-	local yaml1=$4
-	local yaml2=$5
+	local name=$1
+	local values_file=$2
+	local yaml1=$3
+	local yaml2=$4
 
 	go run "$git_root"/cmd/aperturectl/main.go blueprints generate \
-		--uri "$uri" \
+		--uri "$git_root"/blueprints \
 		--name "$name" \
 		--values-file "$values_file" \
-		--output-dir "tmp"
+		--output-dir "tmp" \
+		--skip-pull
 
 	# make sure yaml1 and yaml2 exist
 	if [ ! -f "$yaml1" ]; then

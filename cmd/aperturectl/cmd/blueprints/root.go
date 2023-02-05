@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/gofrs/flock"
 	"github.com/spf13/cobra"
 )
@@ -19,6 +20,7 @@ const (
 	sourceFilename           = ".source"
 	versionFilename          = ".version"
 	relPathFilename          = ".relpath"
+	lockFilename             = ".flock"
 )
 
 var (
@@ -36,6 +38,7 @@ var (
 func init() {
 	BlueprintsCmd.PersistentFlags().StringVar(&blueprintsVersion, "version", defaultBlueprintsVersion, "Version of official Aperture Blueprints, e.g. latest. This field should not be provided when the URI is provided")
 	BlueprintsCmd.PersistentFlags().StringVar(&blueprintsURI, "uri", "", "URI of Custom Blueprints, could be a local path or a remote git repository, e.g. github.com/fluxninja/aperture/blueprints@main. This field should not be provided when the Version is provided.")
+	BlueprintsCmd.PersistentFlags().BoolVar(&skipPull, "skip-pull", false, "Skip pulling the latest blueprints.")
 
 	BlueprintsCmd.AddCommand(pullCmd)
 	BlueprintsCmd.AddCommand(listCmd)
@@ -50,7 +53,7 @@ var BlueprintsCmd = &cobra.Command{
 	Short: "Aperture Blueprints",
 	Long: `
 Use this command to pull, list, remove and generate Aperture Policy resources using the Aperture Blueprints.`,
-	PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		userHomeDir, err := os.UserHomeDir()
 		if err != nil {
 			return err
@@ -84,21 +87,53 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 			return err
 		}
 		// lock blueprintsDir to prevent concurrent access using flock package
-		lock = flock.New(filepath.Join(blueprintsDir, ".flock"))
-		// use TryLockContext to try locking every 10sec
-		locked, err := lock.TryLockContext(context.Background(), 10)
-		if err != nil {
-			return err
-		}
-		if !locked {
-			return errors.New("unable to acquire lock on blueprints directory")
-		}
-		return nil
-	},
-	PersistentPostRunE: func(_ *cobra.Command, _ []string) error {
-		if lock != nil {
-			return lock.Unlock()
+		lock = flock.New(filepath.Join(blueprintsDir, lockFilename))
+
+		// pull the latest blueprints based on skipPull and whether cmd is remove
+		if !skipPull && cmd.Use != "remove" {
+			err = pullFunc(cmd, args)
+			if err != nil {
+				return err
+			}
+		} else {
+			log.Debug().Msg("skipping pulling blueprints")
 		}
 		return nil
 	},
+	PersistentPostRun: func(_ *cobra.Command, _ []string) {
+		unlock()
+	},
+}
+
+func writerLock() error {
+	// Get writer lock
+	locked, err := lock.TryLockContext(context.Background(), 10)
+	if err != nil {
+		return err
+	}
+	if !locked {
+		return errors.New("unable to acquire lock on blueprints directory")
+	}
+	return nil
+}
+
+func readerLock() error {
+	// Get reader lock
+	locked, err := lock.TryRLockContext(context.Background(), 10)
+	if err != nil {
+		return err
+	}
+	if !locked {
+		return errors.New("unable to acquire lock on blueprints directory")
+	}
+	return nil
+}
+
+func unlock() {
+	err := lock.Unlock()
+	if err != nil {
+		log.Error().Err(err).Msg("unable to release lock on blueprints directory")
+		// try resetting lock by removing lockfile
+		os.Remove(filepath.Join(blueprintsDir, lockFilename))
+	}
 }

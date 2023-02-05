@@ -7,6 +7,10 @@ if [ "$(uname)" == "Darwin" ]; then
 	FIND="gfind"
 fi
 
+# pull blueprints
+go run "$git_root"/cmd/aperturectl/main.go blueprints pull \
+	--uri "$git_root"/blueprints
+
 # find all directories with a validate.sh script and save them to dirs
 dirs=$($FIND "$git_root" -name validate.sh -exec dirname {} \;)
 
