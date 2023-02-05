@@ -292,6 +292,9 @@ SECTION_TPL = """
 """
 
 YAML_TPL = """
+# Generated values.yaml file for {{ blueprint_name }} blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/{{ blueprint_name }}
 {%- macro render_value(value, level) %}
 {%- if value is mapping %}
 {%- for key, val in value.items() %}
@@ -303,7 +306,7 @@ YAML_TPL = """
 {%- endmacro %}
 {%- macro render_node(node, level) %}
 {%- if node.parameter.param_type != 'object' %}
-{{ '  ' * level }}# Description: {{ node.parameter.description }}
+{{ '  ' * level }}# {{ node.parameter.description }}
 {{ '  ' * level }}# Type: {{ node.parameter.param_type }}
 {%- if node.parameter.required != False %}
 {{ '  ' * level }}# Required: {{ node.parameter.required }}
@@ -348,7 +351,7 @@ def quoteValue(value: str) -> str:
 
 
 def get_jinja2_environment() -> jinja2.Environment:
-    JINJA2_TEMPLATES = {"section.md.j2": SECTION_TPL, "sample_config.yaml.j2": YAML_TPL}
+    JINJA2_TEMPLATES = {"section.md.j2": SECTION_TPL, "values.yaml.j2": YAML_TPL}
     loader = jinja2.DictLoader(JINJA2_TEMPLATES)
     env = jinja2.Environment(loader=loader)
     env.filters["quoteValue"] = quoteValue
@@ -418,15 +421,15 @@ def update_readme_markdown(readme_path: Path, blocks: List[DocBlock]):
     readme_copied += rendered
     readme_path.write_text(readme_copied)
 
-def render_sample_config_yaml(sample_config_path: Path, blocks: List[DocBlock]):
+def render_sample_config_yaml(blueprint_name: str, sample_config_path: Path, blocks: List[DocBlock]):
     """Render sample config YAML file from blocks"""
     # merge all nested parameters into one dict
     sample_config_data = DocBlockNode(DocBlockParam("", "object", "", "", False), {})
     for block in blocks:
         sample_config_data.children.update(block.nested_parameters.children)
     env = get_jinja2_environment()
-    template = env.get_template("sample_config.yaml.j2")
-    rendered = template.render({"sample_config_data": sample_config_data})
+    template = env.get_template("values.yaml.j2")
+    rendered = template.render({"sample_config_data": sample_config_data, "blueprint_name": blueprint_name})
     sample_config_path.write_text(rendered)
 
 def extract_docblock_comments(prefix: str, jsonnet_data: str) -> List[DocBlock]:
@@ -464,7 +467,7 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
 
     config_path = blueprint_path / "config.libsonnet"
 
-    sample_config_path = blueprint_path / "sample_config.yaml"
+    sample_config_path = blueprint_path / "values.yaml"
 
     metadata_path = blueprint_path / "metadata.yaml"
 
@@ -472,9 +475,9 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
 
     # calculate the path of repository_root/blueprints from the blueprint_path in terms of ../
     blueprints_root = repository_root / "blueprints"
-    relative_blueprint_path = blueprint_path.relative_to(blueprints_root)
+    blueprint_name = blueprint_path.relative_to(blueprints_root)
     # get parts of relative_blueprint_path
-    relative_blueprint_path_parts = relative_blueprint_path.parts
+    relative_blueprint_path_parts = blueprint_name.parts
     # make a prefix of ../ for each part
     reference_prefix = "/".join([".."] * len(relative_blueprint_path_parts))
 
@@ -502,7 +505,7 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
         update_docblock_param_defaults(repository_root, path, config_path, config_key, blocks)
 
     update_readme_markdown(readme_path, docblocks)
-    render_sample_config_yaml(sample_config_path, docblocks)
+    render_sample_config_yaml(blueprint_name, sample_config_path, docblocks)
 
 if __name__ == "__main__":
     typer.run(main)
