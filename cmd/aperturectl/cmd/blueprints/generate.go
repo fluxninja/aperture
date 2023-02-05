@@ -56,7 +56,12 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 
 		// if outputDir is not provided, default to current directory
 		if outputDir == "" {
-			outputDir = "."
+			if applyPolicy {
+				// use temp dir
+				outputDir = os.TempDir()
+			} else {
+				return fmt.Errorf("--output-dir must be provided")
+			}
 		}
 
 		_, err = os.Stat(valuesFile)

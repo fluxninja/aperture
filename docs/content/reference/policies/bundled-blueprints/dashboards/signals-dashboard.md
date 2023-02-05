@@ -6,10 +6,13 @@ title: Signals Dashboard
 import {apertureVersion} from '../../../../apertureVersion.js';
 ```
 
-## Blueprint Location
+## Introduction
 
-GitHub: <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/dashboards/signals-dashboard`}>signals-dashboard</a>
+This blueprint provides a [policy monitoring](/reference/policies/monitoring.md)
+dashboard that visualizes Signals flowing through the
+[Circuit](/concepts/policy/circuit.md).
+
+## Links
 
 Sample values file: <a
 href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/dashboards/signals-dashboard/values.yaml`}>values.yaml</a>
@@ -17,11 +20,8 @@ href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/
 Sample values file (required fields only): <a
 href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/dashboards/signals-dashboard/values_required.yaml`}>values_required.yaml</a>
 
-## Introduction
-
-This blueprint provides a [policy monitoring](/reference/policies/monitoring.md)
-dashboard that visualizes Signals flowing through the
-[Circuit](/concepts/policy/circuit.md).
+Code: <a
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/dashboards/signals-dashboard`}>signals-dashboard</a>
 
 ## Configuration
 
