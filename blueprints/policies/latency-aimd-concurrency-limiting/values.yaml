@@ -13,7 +13,12 @@ policy:
     # Concurrency Limiter flow selector.
     # Type: aperture.spec.v1.FlowSelector
     # Required: True
-    flow_selector: "__REQUIRED_FIELD__"
+    flow_selector:
+      flow_matcher:
+      control_point: "__REQUIRED_FIELD__"
+      service_selector:
+      agent_group: "default"
+      service: "__REQUIRED_FIELD__"
     # Scheduler parameters.
     # Type: aperture.spec.v1.SchedulerParameters
     scheduler:

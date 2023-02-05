@@ -15,7 +15,17 @@
   * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
   */
   policy: {
-    flux_meter: '__REQUIRED_FIELD__',
+    flux_meter: {
+      flow_selector: {
+        service_selector: {
+          agent_group: 'default',
+          service: '__REQUIRED_FIELD__',
+        },
+        flow_matcher: {
+          control_point: '__REQUIRED_FIELD__',
+        },
+      },
+    },
     classifiers: [],
     components: [],
     /**
@@ -49,7 +59,15 @@
     * @param (policy.concurrency_controller.dynamic_config: aperture.v1.LoadActuatorDynamicConfig) Dynamic configuration for concurrency controller.
     */
     concurrency_controller: {
-      flow_selector: '__REQUIRED_FIELD__',
+      flow_selector: {
+        service_selector: {
+          agent_group: 'default',
+          service: '__REQUIRED_FIELD__',
+        },
+        flow_matcher: {
+          control_point: '__REQUIRED_FIELD__',
+        },
+      },
       scheduler: {
         auto_tokens: true,
         timeout_factor: '0.5',

@@ -28,7 +28,15 @@
     */
     rate_limiter: {
       rate_limit: '__REQUIRED_FIELD__',
-      flow_selector: '__REQUIRED_FIELD__',
+      flow_selector: {
+        service_selector: {
+          agent_group: 'default',
+          service: '__REQUIRED_FIELD__',
+        },
+        flow_matcher: {
+          control_point: '__REQUIRED_FIELD__',
+        },
+      },
       parameters: {
         limit_reset_interval: '1s',
         label_key: '__REQUIRED_FIELD__',
