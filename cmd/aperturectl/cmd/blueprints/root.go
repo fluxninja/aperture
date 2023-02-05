@@ -37,8 +37,8 @@ var (
 
 func init() {
 	BlueprintsCmd.PersistentFlags().StringVar(&blueprintsVersion, "version", defaultBlueprintsVersion, "Version of official Aperture Blueprints, e.g. latest. This field should not be provided when the URI is provided")
-	BlueprintsCmd.PersistentFlags().StringVar(&blueprintsURI, "uri", "", "URI of Custom Blueprints, could be a local path or a remote git repository, e.g. github.com/fluxninja/aperture/blueprints@main. This field should not be provided when the Version is provided.")
-	BlueprintsCmd.PersistentFlags().BoolVar(&skipPull, "skip-pull", false, "Skip pulling the latest blueprints.")
+	BlueprintsCmd.PersistentFlags().StringVar(&blueprintsURI, "uri", "", "URI of Custom Blueprints, could be a local path or a remote git repository, e.g. github.com/fluxninja/aperture/blueprints@latest. This field should not be provided when the Version is provided.")
+	BlueprintsCmd.PersistentFlags().BoolVar(&skipPull, "skip-pull", false, "Skip pulling the blueprints update.")
 
 	BlueprintsCmd.AddCommand(pullCmd)
 	BlueprintsCmd.AddCommand(listCmd)
