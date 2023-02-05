@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # This script is used to generate generate blueprint config.libsonnet based on
-# dashboards and policies that this policy include, as well as README.md with
+# dashboards and policies that this policy include, as well as README with
 # configuration documentation section.
 from __future__ import annotations
 
@@ -409,7 +409,7 @@ export const ParameterDescription = ({name, type, reference, value, description}
 
 
 def update_readme_markdown(readme_path: Path, blocks: List[DocBlock]):
-    """Find configuration marker in README.md and append all blocks after it"""
+    """Find configuration marker in README and append all blocks after it"""
 
     readme_data = readme_path.read_text()
     readme_copied = ""
@@ -478,11 +478,6 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
         logger.error(f"No such file or directory: {blueprint_path}")
         raise typer.Exit(1)
 
-    readme_path = blueprint_path / "README.md"
-    if not readme_path.exists():
-        logger.error(f"README.md not found: {readme_path}. Exiting.")
-        raise typer.Exit(1)
-
     config_path = blueprint_path / "config.libsonnet"
 
     metadata_path = blueprint_path / "metadata.yaml"
@@ -496,6 +491,13 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
     relative_blueprint_path_parts = blueprint_name.parts
     # make a prefix of ../ for each part
     reference_prefix = "/".join([".."] * len(relative_blueprint_path_parts))
+
+    readme_path = repository_root / "docs/content/reference/policies/bundled-blueprints" / "/".join(relative_blueprint_path_parts[:-1]) / f"{relative_blueprint_path_parts[-1]}.md"
+
+    if not readme_path.exists():
+        logger.error(f"README not found: {readme_path}. Exiting.")
+        raise typer.Exit(1)
+
 
     docblocks = extract_docblock_comments(reference_prefix, config_path.read_text())
 
