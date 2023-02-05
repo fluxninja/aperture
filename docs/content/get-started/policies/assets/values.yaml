@@ -1,0 +1,30 @@
+# Generated values.yaml file for policies/static-rate-limiting blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/static-rate-limiting
+
+common:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: static-rate-limiting
+
+policy:
+  rate_limiter:
+    # Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept
+    # Type: float64
+    # Required: True
+    rate_limit: 50
+    # A flow selector to match requests against
+    # Type: aperture.spec.v1.FlowSelector
+    # Required: True
+    flow_selector:
+      flow_matcher:
+        control_point: ingress
+      service_selector:
+        agent_group: default
+        service: service1-demo-app.demoapp.svc.cluster.local
+    parameters:
+      # Flow label to use for rate limiting.
+      # Type: string
+      # Required: True
+      label_key: http.request.header.user_type
