@@ -3620,18 +3620,20 @@ selector applies to.
 <dt>service</dt>
 <dd>
 
-(string) The Fully Qualified Domain Name of the
+(string, `required`) The Fully Qualified Domain Name of the
 [service](/concepts/integrations/flow-control/service.md) to select.
 
 In kubernetes, this is the FQDN of the Service object.
 
-Empty string means all services within an agent group (catch-all).
+"all" means all services within an agent group (catch-all).
 
 :::note
 
 One entity may belong to multiple services.
 
 :::
+
+@gotags: validate:"required"];
 
 </dd>
 </dl>

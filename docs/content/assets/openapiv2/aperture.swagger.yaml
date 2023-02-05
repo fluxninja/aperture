@@ -119,49 +119,6 @@ paths:
           type: string
       tags:
         - aperture-agent
-  /v1/flowcontrol/preview/http_requests/{control_point}:
-    post:
-      operationId: FlowPreviewService_PreviewHTTPRequests2
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1PreviewHTTPRequestsResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: control_point
-          description: |-
-            Control point to preview.
-
-            @gotags: validate:"required"
-          in: path
-          required: true
-          type: string
-        - name: label_matcher
-          description: Flow labels to match. Optional parameter for advanced filtering.
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/v1LabelMatcher'
-        - name: samples
-          description: |-
-            Number of samples to collect. Defaults to 10.
-
-            @gotags: validate:"min=1" default:"10"
-          in: query
-          required: false
-          type: string
-          format: int64
-        - name: service
-          description: Service to preview. Empty value implies catch all service.
-          in: query
-          required: false
-          type: string
-      tags:
-        - aperture-agent
   /v1/flowcontrol/preview/http_requests/{service}/{control_point}:
     post:
       operationId: FlowPreviewService_PreviewHTTPRequests
@@ -176,7 +133,7 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: service
-          description: Service to preview. Empty value implies catch all service.
+          description: Service to preview.
           in: path
           required: true
           type: string
@@ -203,49 +160,6 @@ paths:
           required: false
           type: string
           format: int64
-      tags:
-        - aperture-agent
-  /v1/flowcontrol/preview/labels/{control_point}:
-    post:
-      operationId: FlowPreviewService_PreviewFlowLabels2
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1PreviewFlowLabelsResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: control_point
-          description: |-
-            Control point to preview.
-
-            @gotags: validate:"required"
-          in: path
-          required: true
-          type: string
-        - name: label_matcher
-          description: Flow labels to match. Optional parameter for advanced filtering.
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/v1LabelMatcher'
-        - name: samples
-          description: |-
-            Number of samples to collect. Defaults to 10.
-
-            @gotags: validate:"min=1" default:"10"
-          in: query
-          required: false
-          type: string
-          format: int64
-        - name: service
-          description: Service to preview. Empty value implies catch all service.
-          in: query
-          required: false
-          type: string
       tags:
         - aperture-agent
   /v1/flowcontrol/preview/labels/{service}/{control_point}:
@@ -262,7 +176,7 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: service
-          description: Service to preview. Empty value implies catch all service.
+          description: Service to preview.
           in: path
           required: true
           type: string
@@ -3406,13 +3320,16 @@ definitions:
 
           In kubernetes, this is the FQDN of the Service object.
 
-          Empty string means all services within an agent group (catch-all).
+          "all" means all services within an agent group (catch-all).
 
           :::note
 
           One entity may belong to multiple services.
 
           :::
+
+          @gotags: validate:"required"];
+        x-go-validate: required
     description: |-
       :::info
 

@@ -12,6 +12,7 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/consts"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
@@ -342,7 +343,7 @@ func (e *Engine) getMatches(controlPoint string, serviceIDs []string, labels map
 	mmResult := &multiMatchResult{}
 
 	// Lookup catchall multi matchers for controlPoint
-	controlPointID := selectors.NewControlPointID("", controlPoint)
+	controlPointID := selectors.NewControlPointID(consts.CatchAllService, controlPoint)
 	camm, ok := e.multiMatchers[controlPointID]
 	if ok {
 		mmResult.populateFromMultiMatcher(camm, labels)
