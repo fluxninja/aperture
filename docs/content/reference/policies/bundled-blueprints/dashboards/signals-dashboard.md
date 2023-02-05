@@ -11,6 +11,12 @@ import {apertureVersion} from '../../../../apertureVersion.js';
 GitHub: <a
 href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/dashboards/signals-dashboard`}>signals-dashboard</a>
 
+Sample values file: <a
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/dashboards/signals-dashboard/values.yaml`}>values.yaml</a>
+
+Sample values file (required fields only): <a
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/dashboards/signals-dashboard/values_required.yaml`}>values_required.yaml</a>
+
 ## Introduction
 
 This blueprint provides a [policy monitoring](/reference/policies/monitoring.md)

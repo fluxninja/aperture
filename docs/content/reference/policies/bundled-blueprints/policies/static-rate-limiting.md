@@ -11,6 +11,12 @@ import {apertureVersion} from '../../../../apertureVersion.js';
 GitHub: <a
 href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/static-rate-limiting`}>static-rate-limiting</a>
 
+Sample values file: <a
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/static-rate-limiting/values.yaml`}>values.yaml</a>
+
+Sample values file (required fields only): <a
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/static-rate-limiting/values_required.yaml`}>values_required.yaml</a>
+
 ## Introduction
 
 This blueprint provides a simple static rate limiting policy and a dashboard.
