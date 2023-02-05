@@ -29,15 +29,12 @@ var valuesCmd = &cobra.Command{
 	Example: `aperturectl blueprints values --name=policies/static-rate-limiting --output-file=values.yaml
 
   aperturectl blueprints values --name=policies/static-rate-limiting --output-file=values.yaml --only-required`,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(_ *cobra.Command, _ []string) error {
 		if blueprintName == "" {
 			return fmt.Errorf("--name must be provided")
 		}
 		if valuesFile == "" {
 			return fmt.Errorf("--output-file must be provided")
-		}
-		if err := pullCmd.RunE(cmd, args); err != nil {
-			return err
 		}
 		blueprintDir := filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
 

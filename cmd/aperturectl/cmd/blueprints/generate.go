@@ -40,6 +40,12 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 
 aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --apply`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		err := readerLock()
+		if err != nil {
+			return err
+		}
+		defer unlock()
+
 		if blueprintName == "" {
 			return fmt.Errorf("--name must be provided")
 		}
@@ -53,7 +59,7 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 			outputDir = "."
 		}
 
-		_, err := os.Stat(valuesFile)
+		_, err = os.Stat(valuesFile)
 		if err != nil {
 			return err
 		}
@@ -62,9 +68,6 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 			return err
 		}
 
-		if err = pullCmd.RunE(cmd, args); err != nil {
-			return err
-		}
 		blueprintDir := filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
 
 		err = blueprintExists(blueprintDir, blueprintName)

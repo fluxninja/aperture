@@ -12,4 +12,5 @@ var (
 	validPolicies []*policyv1alpha1.Policy
 	all           bool
 	onlyRequired  bool
+	skipPull      bool
 )

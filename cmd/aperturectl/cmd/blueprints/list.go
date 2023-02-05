@@ -27,6 +27,11 @@ aperturectl blueprints list --version v0.22.0
 
 aperturectl blueprints list --all`,
 	RunE: func(_ *cobra.Command, _ []string) error {
+		err := readerLock()
+		if err != nil {
+			return err
+		}
+		defer unlock()
 		if all {
 			w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
 			fmt.Fprintln(w, "URI\tPOLICIES")
