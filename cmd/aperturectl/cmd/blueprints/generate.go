@@ -18,18 +18,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-var (
-	blueprintName string
-	outputDir     string
-	valuesFile    string
-	graphDir      string
-	applyPolicy   bool
-	kubeConfig    string
-	validPolicies []*policyv1alpha1.Policy
-)
-
 func init() {
-	generateCmd.Flags().StringVar(&blueprintName, "name", "", "Name of the Aperture Blueprint to generate Aperture Policy resources for. Can be skipped when '--custom-blueprint-path' is provided")
+	generateCmd.Flags().StringVar(&blueprintName, "name", "", "Name of the Aperture Blueprint to generate Aperture Policy resources for")
 	generateCmd.Flags().StringVar(&outputDir, "output-dir", "", "Directory path where the generated Policy resources will be stored. If not provided, will use current directory")
 	generateCmd.Flags().StringVar(&valuesFile, "values-file", "", "Path to the values file for Blueprint's input")
 	generateCmd.Flags().BoolVar(&applyPolicy, "apply", false, "Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed")
@@ -48,9 +38,7 @@ Use this command to generate Aperture Policy related resources like Kubernetes C
 
 aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --version v0.22.0
 
-aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --apply
-
-aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --values-file=values.yaml`,
+aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --apply`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if blueprintName == "" {
 			return fmt.Errorf("--name must be provided")
@@ -77,9 +65,9 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 		if err = pullCmd.RunE(cmd, args); err != nil {
 			return err
 		}
-		apertureDir := filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
+		blueprintDir := filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
 
-		err = blueprintExists(apertureDir, blueprintName)
+		err = blueprintExists(blueprintDir, blueprintName)
 		if err != nil {
 			return err
 		}
@@ -89,7 +77,7 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
 			JPaths: []string{blueprintsDir},
 		})
 
-		importPath := fmt.Sprintf("%s/%s", apertureDir, blueprintName)
+		importPath := fmt.Sprintf("%s/%s", blueprintDir, blueprintName)
 
 		jsonStr, err := vm.EvaluateAnonymousSnippet("bundle.libsonnet", fmt.Sprintf(`
 		local bundle = import '%s/bundle.libsonnet';

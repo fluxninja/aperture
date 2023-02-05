@@ -29,3 +29,4 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 - [aperturectl blueprints list](/reference/aperturectl/blueprints/list/list.md) - List Aperture Blueprints
 - [aperturectl blueprints pull](/reference/aperturectl/blueprints/pull/pull.md) - Pull Aperture Blueprints
 - [aperturectl blueprints remove](/reference/aperturectl/blueprints/remove/remove.md) - Remove a Blueprint
+- [aperturectl blueprints values](/reference/aperturectl/blueprints/values/values.md) - Provide values file for a given Aperture Blueprint

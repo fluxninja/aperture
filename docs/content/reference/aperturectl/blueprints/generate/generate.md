@@ -26,8 +26,6 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --version v0.22.0
 
 aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --apply
-
-aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --values-file=values.yaml
 ```
 
 ### Options
@@ -36,7 +34,7 @@ aperturectl blueprints generate --custom-blueprint-path=/path/to/blueprint/ --va
       --apply                Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed
   -h, --help                 help for generate
       --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
-      --name string          Name of the Aperture Blueprint to generate Aperture Policy resources for. Can be skipped when '--custom-blueprint-path' is provided
+      --name string          Name of the Aperture Blueprint to generate Aperture Policy resources for
       --output-dir string    Directory path where the generated Policy resources will be stored. If not provided, will use current directory
       --values-file string   Path to the values file for Blueprint's input
 ```
