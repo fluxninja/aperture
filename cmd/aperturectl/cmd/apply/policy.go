@@ -104,7 +104,7 @@ func createAndApplyPolicy(policy *policyv1alpha1.Policy) error {
 		return fmt.Errorf("failed to connect to Kubernetes: %w", err)
 	}
 
-	client, err := client.New(kubeRestConfig, client.Options{
+	c, err := client.New(kubeRestConfig, client.Options{
 		Scheme: scheme.Scheme,
 	})
 	if err != nil {
@@ -121,7 +121,7 @@ func createAndApplyPolicy(policy *policyv1alpha1.Policy) error {
 		"fluxninja.com/validate": "true",
 	}
 	spec := policy.Spec
-	_, err = controllerutil.CreateOrUpdate(context.Background(), client, policy, func() error {
+	_, err = controllerutil.CreateOrUpdate(context.Background(), c, policy, func() error {
 		policy.Spec = spec
 		return nil
 	})
