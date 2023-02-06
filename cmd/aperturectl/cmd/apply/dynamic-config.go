@@ -93,7 +93,7 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 			return fmt.Errorf("failed to update Policy '%s': %w", policyName, err)
 		}
 
-		log.Info().Str("policy", policyName).Str("namespace", deployment.Namespace).Msg("DynamicConfig applied successfully")
+		log.Info().Str("policy", policyName).Str("namespace", deployment.Namespace).Msg("Updated DynamicConfig successfully")
 
 		return nil
 	},

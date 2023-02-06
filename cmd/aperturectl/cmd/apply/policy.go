@@ -129,7 +129,7 @@ func createAndApplyPolicy(policy *policyv1alpha1.Policy) error {
 		return fmt.Errorf("failed to apply policy in Kubernetes: %w", err)
 	}
 
-	log.Info().Str("policy", policy.GetName()).Str("namespace", policy.GetNamespace()).Msg("Applied policy successfully")
+	log.Info().Str("policy", policy.GetName()).Str("namespace", policy.GetNamespace()).Msg("Applied Policy successfully")
 	return nil
 }
 

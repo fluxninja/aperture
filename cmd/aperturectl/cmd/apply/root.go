@@ -37,7 +37,7 @@ var ApplyCmd = &cobra.Command{
 				return err
 			}
 			kubeConfig = filepath.Join(homeDir, ".kube", "config")
-			log.Info().Msgf("Using Kubernetes config '%s'", kubeConfig)
+			log.Debug().Msgf("Using Kubernetes config '%s'", kubeConfig)
 		}
 		restConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfig)
 		if err != nil {
