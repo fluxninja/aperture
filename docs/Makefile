@@ -74,7 +74,6 @@ generate-config-markdown:
 generate-jsonnet:
 	@echo generate jsonnet
 	@./tools/jsonnet/generate_jsonnet.sh
-	@./tools/aperturectl/validate_all.sh
 
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update
 generate-mermaid:
@@ -86,5 +85,6 @@ generate-aperturectl-docs:
 	@go run tools/aperturectl/generate-docs.go
 	@npx prettier --prose-wrap="preserve" ./content/reference/aperturectl/ --write
 	@git add ./content/reference/aperturectl/
+	@./tools/aperturectl/validate_all.sh
 
-.PHONY: generate-config-markdown generate-mermaid generate-jsonnet generate-aperturectl
+.PHONY: generate-config-markdown generate-mermaid generate-jsonnet generate-aperturectl-docs

@@ -14,15 +14,18 @@ policy:
     # Type: float64
     # Required: True
     rate_limit: 50
-    # A flow selector to match requests against
-    # Type: aperture.spec.v1.FlowSelector
-    # Required: True
     flow_selector:
-      flow_matcher:
-        control_point: ingress
       service_selector:
+        # Service Name.
+        # Type: string
+        # Required: True
         agent_group: default
         service: service1-demo-app.demoapp.svc.cluster.local
+      flow_matcher:
+        # Control Point Name.
+        # Type: string
+        # Required: True
+        control_point: ingress
     parameters:
       # Flow label to use for rate limiting.
       # Type: string

@@ -2757,14 +2757,17 @@ definitions:
 
           In kubernetes, this is the FQDN of the Service object.
 
-          Empty string means all services within an agent group (catch-all).
+          "all" means all services within an agent group (catch-all).
 
           :::note
 
           One entity may belong to multiple services.
 
           :::
+
+          @gotags: validate:"required"];
         type: string
+        x-go-validate: required
         x-order: 1
   v1Sqrt:
     description: |-
