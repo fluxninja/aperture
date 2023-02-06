@@ -1,0 +1,13 @@
+flowchart TD
+  subgraph generation["Blueprints System"]
+    aperturectl["aperturectl"]
+    repository[("Blueprints")]
+    values[/"value.yaml"/]
+    policies[/"Policies"/]
+    controller["Controller"]
+    repository --> |pull| aperturectl
+    aperturectl --> |values| values
+    values --> |generate| policies
+    policies --> |apply| controller
+  end
+

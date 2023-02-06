@@ -14,19 +14,34 @@ import {apertureVersion} from '../../apertureVersion.js';
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import Zoom from 'react-medium-image-zoom';
 ```
 
 ## Introduction
 
-Aperture comes with a pre-packaged [blueprints][blueprints] that can be used to
-generate [Policies][policies] and Grafana Dashboards. Blueprints can be used
-both as a guide for creating new policies, or used as-is by providing required
-parameters or customizations.
+The easiest way to get started with policies in Aperture is to use the built-in
+blueprints system. Advanced users can learn about designing new policies by
+following the
+[signal processing](/tutorials/signal-processing/signal-processing.md)
+tutorials.
+
+Aperture repository contains several [blueprints][blueprints] that can be used
+to generate [policies][policies] and [Grafana dashboards][grafana]. Blueprints
+can be used both as a guide for creating new policies, or used as-is by
+providing required parameters or customizations.
 
 In order to manage blueprints and generate policies, you can use `aperturectl`
 [CLI tool](/reference/aperturectl/aperturectl.md), by following the
 [installation steps](/get-started/aperture-cli/aperture-cli.md#installation)
 first.
+
+<Zoom>
+
+```mermaid
+{@include: ./assets/blueprints.mmd}
+```
+
+</Zoom>
 
 ## Listing Available Blueprints
 
@@ -168,3 +183,4 @@ kubectl delete policies.fluxninja.com static-rate-limiting -n aperture-controlle
 [blueprints]: /reference/policies/bundled-blueprints/bundled-blueprints.md
 [policies]: /concepts/policy/policy.md
 [service]: /concepts/integrations/flow-control/service.md
+[grafana]: https://grafana.com/docs/grafana/latest/dashboards/
