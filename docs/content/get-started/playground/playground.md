@@ -137,7 +137,7 @@ reach Grafana. You can open the pre-loaded "FluxNinja" dashboard under
 
 <Zoom>
 
-![Grafana Dashboard](../../tutorials/integrations//flow-control/rate-limiting/assets/dynamic-rate-limiting/dynamic-rate-limiting-playground.png)
+![Grafana Dashboard](../../tutorials/integrations//flow-control/concurrency-limiting/assets/rate-limiting-escalation/rate-limiting-escalation-playground.png)
 
 </Zoom>
 

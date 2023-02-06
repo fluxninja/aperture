@@ -66,16 +66,16 @@ highlighted in the Jsonnet spec below.
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="YAML">
+<TabItem value="aperturectl values.yaml">
 ```
 
 ```yaml
-{@include: ./assets/workload-prioritization/workload-prioritization.yaml}
+{@include: ./assets/workload-prioritization/values.yaml}
 ```
 
 ```mdx-code-block
 </TabItem>
-<TabItem value="Jsonnet">
+<TabItem value="Jsonnet Mixin">
 ```
 
 ```jsonnet
@@ -86,6 +86,16 @@ highlighted in the Jsonnet spec below.
 </TabItem>
 </Tabs>
 ```
+
+<details><summary>Generated Policy</summary>
+<p>
+
+```yaml
+{@include: ./assets/workload-prioritization/workload-prioritization.yaml}
+```
+
+</p>
+</details>
 
 ### Circuit Diagram
 

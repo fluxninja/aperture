@@ -1,5 +1,5 @@
 ---
-title: Dynamic Rate Limiting
+title: Rate Limiting Escalation
 keywords:
   - policies
   - scheduler
@@ -48,20 +48,20 @@ Jsonnet spec below.
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="YAML">
+<TabItem value="aperturectl values.yaml">
 ```
 
 ```yaml
-{@include: ./assets/dynamic-rate-limiting/dynamic-rate-limiting.yaml}
+{@include: ./assets/rate-limiting-escalation/values.yaml}
 ```
 
 ```mdx-code-block
 </TabItem>
-<TabItem value="Jsonnet">
+<TabItem value="Jsonnet Mixins">
 ```
 
 ```jsonnet
-{@include: ./assets/dynamic-rate-limiting/dynamic-rate-limiting.jsonnet}
+{@include: ./assets/rate-limiting-escalation/rate-limiting-escalation.jsonnet}
 ```
 
 ```mdx-code-block
@@ -70,12 +70,22 @@ Jsonnet spec below.
 </Tabs>
 ```
 
+<details><summary>Generated Policy</summary>
+<p>
+
+```yaml
+{@include: ./assets/rate-limiting-escalation/rate-limiting-escalation.yaml}
+```
+
+</p>
+</details>
+
 ### Circuit Diagram
 
 <Zoom>
 
 ```mermaid
-{@include: ./assets/dynamic-rate-limiting/dynamic-rate-limiting.mmd}
+{@include: ./assets/rate-limiting-escalation/rate-limiting-escalation.mmd}
 ```
 
 </Zoom>
@@ -95,6 +105,6 @@ workload metrics stop reporting when `bot` traffic is completely restricted.
 
 <Zoom>
 
-![Dynamic Rate Limiting](./assets/dynamic-rate-limiting/dynamic-rate-limiting-playground.png)
+![Rate Limiting Escalation](./assets/rate-limiting-escalation/rate-limiting-escalation-playground.png)
 
 </Zoom>

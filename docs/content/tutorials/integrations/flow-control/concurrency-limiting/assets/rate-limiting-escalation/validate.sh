@@ -11,4 +11,4 @@ generate_compare \
 	policies/latency-aimd-concurrency-limiting \
 	values.yaml \
 	tmp/policies/service1-demo-app-cr.yaml \
-	dynamic-rate-limiting.yaml
+	rate-limiting-escalation.yaml
