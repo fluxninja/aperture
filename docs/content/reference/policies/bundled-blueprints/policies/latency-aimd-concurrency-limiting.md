@@ -6,17 +6,6 @@ title: Latency AIMD Concurrency Limiting Policy
 import {apertureVersion} from '../../../../apertureVersion.js';
 ```
 
-## Blueprint Location
-
-GitHub: <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/latency-aimd-concurrency-limiting`}>latency-aimd-concurrency-limiting</a>
-
-Sample values file: <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/latency-aimd-concurrency-limiting/values.yaml`}>values.yaml</a>
-
-Sample values file (required fields only): <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/latency-aimd-concurrency-limiting/values_required.yaml`}>values_required.yaml</a>
-
 ## Introduction
 
 This policy detect overloads/cascading failures by comparing the real-time
@@ -33,6 +22,17 @@ and
 to see this blueprint in use.
 
 :::
+
+## Links
+
+Sample values file: <a
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/latency-aimd-concurrency-limiting/values.yaml`}>values.yaml</a>
+
+Sample values file (required fields only): <a
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/latency-aimd-concurrency-limiting/values_required.yaml`}>values_required.yaml</a>
+
+Code: <a
+href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/latency-aimd-concurrency-limiting`}>latency-aimd-concurrency-limiting</a>
 
 ## Configuration
 
