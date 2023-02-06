@@ -34,4 +34,5 @@ aperturectl apply --dir=policy-dir
 ### SEE ALSO
 
 - [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture
+- [aperturectl apply dyunamic-config](/reference/aperturectl/apply/dyunamic-config/dyunamic-config.md) - Apply Aperture DynamicConfig to a Policy
 - [aperturectl apply policy](/reference/aperturectl/apply/policy/policy.md) - Apply Aperture Policy to the cluster

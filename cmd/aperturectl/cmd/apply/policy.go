@@ -24,6 +24,11 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
+var (
+	file string
+	dir  string
+)
+
 // ApplyPolicyCmd is the command to apply a policy to the cluster.
 var ApplyPolicyCmd = &cobra.Command{
 	Use:           "policy",
@@ -89,12 +94,7 @@ func ApplyPolicy(policyFile string) error {
 }
 
 func createAndApplyPolicy(policy *policyv1alpha1.Policy) error {
-	deployment, err := getControllerDeployment()
-	if err != nil {
-		return err
-	}
-
-	err = api.AddToScheme(scheme.Scheme)
+	err := api.AddToScheme(scheme.Scheme)
 	if err != nil {
 		return fmt.Errorf("failed to connect to Kubernetes: %w", err)
 	}
@@ -104,6 +104,11 @@ func createAndApplyPolicy(policy *policyv1alpha1.Policy) error {
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create Kubernetes client: %w", err)
+	}
+
+	deployment, err := getControllerDeployment()
+	if err != nil {
+		return err
 	}
 
 	policy.Namespace = deployment.GetNamespace()

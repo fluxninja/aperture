@@ -13,8 +13,6 @@ import (
 )
 
 var (
-	file           string
-	dir            string
 	kubeConfig     string
 	kubeRestConfig *rest.Config
 )
