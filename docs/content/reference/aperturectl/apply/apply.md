@@ -14,19 +14,9 @@ Apply Aperture Policy to the cluster
 
 Use this command to apply the Aperture Policy to the cluster.
 
-### Examples
-
-```
-aperturectl apply --file=policy.yaml
-
-aperturectl apply --dir=policy-dir
-```
-
 ### Options
 
 ```
-      --dir string           Path to directory containing Aperture Policy files
-      --file string          Path to Aperture Policy file
   -h, --help                 help for apply
       --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
 ```
@@ -34,5 +24,5 @@ aperturectl apply --dir=policy-dir
 ### SEE ALSO
 
 - [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture
-- [aperturectl apply dyunamic-config](/reference/aperturectl/apply/dyunamic-config/dyunamic-config.md) - Apply Aperture DynamicConfig to a Policy
+- [aperturectl apply dynamic-config](/reference/aperturectl/apply/dynamic-config/dynamic-config.md) - Apply Aperture DynamicConfig to a Policy
 - [aperturectl apply policy](/reference/aperturectl/apply/policy/policy.md) - Apply Aperture Policy to the cluster

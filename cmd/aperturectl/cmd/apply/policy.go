@@ -29,15 +29,20 @@ var (
 	dir  string
 )
 
+func init() {
+	ApplyPolicyCmd.Flags().StringVar(&file, "file", "", "Path to Aperture Policy file")
+	ApplyPolicyCmd.Flags().StringVar(&dir, "dir", "", "Path to directory containing Aperture Policy files")
+}
+
 // ApplyPolicyCmd is the command to apply a policy to the cluster.
 var ApplyPolicyCmd = &cobra.Command{
 	Use:           "policy",
 	Short:         "Apply Aperture Policy to the cluster",
 	Long:          `Use this command to apply the Aperture Policy to the cluster.`,
 	SilenceErrors: true,
-	Example: `aperturectl apply policy --file=policy.yaml
+	Example: `aperturectl apply policy --file=policies/static-rate-limiting.yaml
 
-aperturectl apply policy --dir=policy-dir`,
+aperturectl apply policy --dir=policies`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		if file != "" {
 			return ApplyPolicy(file)

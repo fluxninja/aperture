@@ -2,6 +2,7 @@ package apply
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -9,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/yaml"
 
 	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
@@ -23,18 +25,19 @@ var (
 func init() {
 	ApplyDynamicConfigCmd.Flags().StringVar(&policyName, "policy", "", "Name of the Policy to apply the DynamicConfig to")
 	ApplyDynamicConfigCmd.Flags().StringVar(&dynamicConfigFile, "file", "", "Path to the dynamic config file")
-
-	ApplyCmd.AddCommand(ApplyDynamicConfigCmd)
 }
 
 // ApplyDynamicConfigCmd is the command to apply DynamicConfig to a Policy.
 var ApplyDynamicConfigCmd = &cobra.Command{
-	Use:           "dyunamic-config",
+	Use:           "dynamic-config",
 	Short:         "Apply Aperture DynamicConfig to a Policy",
 	Long:          `Use this command to apply the Aperture DynamicConfig to a Policy.`,
 	SilenceErrors: true,
-	Example:       `aperturectl apply dynamic-config --policy=static-rate-limiting`,
+	Example:       `aperturectl apply dynamic-config --name=static-rate-limiting --file=dynamic-config.yaml`,
 	PreRunE: func(_ *cobra.Command, _ []string) error {
+		if policyName == "" {
+			return errors.New("policy name is required")
+		}
 		if dynamicConfigFile == "" {
 			return errors.New("dynamic config file is required")
 		}
@@ -71,6 +74,16 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 		}, policy)
 		if err != nil {
 			return fmt.Errorf("failed to get Policy '%s': %w", policyName, err)
+		}
+
+		dynamicConfigYAML := make(map[string]interface{})
+		err = yaml.Unmarshal(dynamicConfigBytes, &dynamicConfigYAML)
+		if err != nil {
+			return fmt.Errorf("failed to parse DynamicConfig YAML: %w", err)
+		}
+		dynamicConfigBytes, err := json.Marshal(dynamicConfigYAML)
+		if err != nil {
+			return fmt.Errorf("failed to parse DynamicConfig JSON: %w", err)
 		}
 
 		policy.DynamicConfig.Raw = dynamicConfigBytes

@@ -21,15 +21,17 @@ aperturectl apply policy [flags]
 ### Examples
 
 ```
-aperturectl apply policy --file=policy.yaml
+aperturectl apply policy --file=policies/static-rate-limiting.yaml
 
-aperturectl apply policy --dir=policy-dir
+aperturectl apply policy --dir=policies
 ```
 
 ### Options
 
 ```
-  -h, --help   help for policy
+      --dir string    Path to directory containing Aperture Policy files
+      --file string   Path to Aperture Policy file
+  -h, --help          help for policy
 ```
 
 ### SEE ALSO

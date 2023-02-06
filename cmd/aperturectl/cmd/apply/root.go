@@ -18,11 +18,10 @@ var (
 )
 
 func init() {
-	ApplyCmd.Flags().StringVar(&file, "file", "", "Path to Aperture Policy file")
-	ApplyCmd.Flags().StringVar(&dir, "dir", "", "Path to directory containing Aperture Policy files")
 	ApplyCmd.Flags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
 
 	ApplyCmd.AddCommand(ApplyPolicyCmd)
+	ApplyCmd.AddCommand(ApplyDynamicConfigCmd)
 }
 
 // ApplyCmd is the command to apply a policy to the cluster.
@@ -31,10 +30,7 @@ var ApplyCmd = &cobra.Command{
 	Short:         "Apply Aperture Policy to the cluster",
 	Long:          `Use this command to apply the Aperture Policy to the cluster.`,
 	SilenceErrors: true,
-	Example: `aperturectl apply --file=policy.yaml
-
-aperturectl apply --dir=policy-dir`,
-	PreRunE: func(cmd *cobra.Command, args []string) error {
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if kubeConfig == "" {
 			homeDir, err := os.UserHomeDir()
 			if err != nil {
