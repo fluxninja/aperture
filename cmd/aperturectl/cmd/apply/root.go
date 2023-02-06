@@ -117,7 +117,7 @@ func ApplyPolicy(policyFile string, dynamicConfigBytes []byte) error {
 	policy := &languagev1.Policy{}
 	err = yaml.Unmarshal(content, policy)
 	if err != nil {
-		// Returning nil as the unmarshalling could have failed due to non-policy YAML present.
+		log.Warn().Msgf("Skipping apply for policy '%s' due to invalid spec.", policyFile)
 		return nil
 	}
 	policyBytes, err := policy.MarshalJSON()
@@ -153,6 +153,9 @@ func createAndApplyPolicy(policy *policyv1alpha1.Policy) error {
 	}
 
 	policy.Namespace = deployment.GetNamespace()
+	policy.Annotations = map[string]string{
+		"fluxninja.com/validate": "true",
+	}
 	spec := policy.Spec
 	_, err = controllerutil.CreateOrUpdate(context.Background(), client, policy, func() error {
 		policy.Spec = spec
