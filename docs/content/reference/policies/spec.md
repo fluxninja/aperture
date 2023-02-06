@@ -3614,6 +3614,12 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 (string, default: `default`) Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
 selector applies to.
 
+:::note
+
+Agent Groups are used to scope policies to a subset of agents connected to the same controller. This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode. The agents within an agent group form a peer to peer cluster and constantly share state.
+
+:::
+
 @gotags: default:"default"
 
 </dd>
@@ -3623,13 +3629,19 @@ selector applies to.
 (string, `required`) The Fully Qualified Domain Name of the
 [service](/concepts/integrations/flow-control/service.md) to select.
 
-In kubernetes, this is the FQDN of the Service object.
+In Kubernetes, this is the FQDN of the Service object.
 
 "all" means all services within an agent group (catch-all).
 
-:::note
+::: note
 
-One entity may belong to multiple services.
+In the Kubernetes sidecar installation mode, service discovery is switched off by default. In order to scope policies to services, the `service` should be set to `all` and instead, `agent_group` name should be used.
+
+:::
+
+:::info
+
+An entity (e.g. Kubernetes pod) may belong to multiple services.
 
 :::
 

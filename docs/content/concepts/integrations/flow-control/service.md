@@ -86,7 +86,7 @@ graph TB
 
 as an other extreme, if your Agent Groups already group entities into logical
 services, you can treat the Agent Group as a service and [ignore the second
-level of hierarchy][catch-all-service]:
+level of hierarchy][catch-all-service] (useful when installing as a sidecar):
 
 <Zoom>
 
