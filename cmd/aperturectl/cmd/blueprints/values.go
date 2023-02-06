@@ -6,8 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/spf13/cobra"
+
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 const (

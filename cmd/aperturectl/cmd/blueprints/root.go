@@ -8,9 +8,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/gofrs/flock"
 	"github.com/spf13/cobra"
+
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 const (
@@ -77,6 +78,11 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 				}
 			}
 			blueprintsURI = fmt.Sprintf("%s@%s", defaultBlueprintsRepo, blueprintsVersion)
+		} else {
+			blueprintsURI, err = filepath.Abs(blueprintsURI)
+			if err != nil {
+				return err
+			}
 		}
 
 		// convert the URI to a local dir name which is disk friendly
@@ -90,7 +96,7 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 		lock = flock.New(filepath.Join(blueprintsDir, lockFilename))
 
 		// pull the latest blueprints based on skipPull and whether cmd is remove
-		if !skipPull && cmd.Use != "remove" {
+		if !skipPull && cmd.Use != "remove" && cmd.Use != "list" {
 			err = pullFunc(cmd, args)
 			if err != nil {
 				return err

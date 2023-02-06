@@ -33,8 +33,7 @@ aperturectl blueprints list --all`,
 		}
 		defer unlock()
 		if all {
-			w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
-			fmt.Fprintln(w, "URI\tPOLICIES")
+			w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
 
 			blueprintsList, err := getCachedBlueprints()
 			if err != nil {
@@ -42,7 +41,14 @@ aperturectl blueprints list --all`,
 			}
 
 			for version, policies := range blueprintsList {
-				fmt.Fprintf(w, "%s\t%s\n", version, strings.Join(policies, ", "))
+				fmt.Printf("%s\n", version)
+				for i, policy := range policies {
+					fmt.Fprintf(w, "%s\n", policy)
+					if i == len(policies)-1 {
+						fmt.Fprintf(w, "\n")
+					}
+				}
+				w.Flush()
 			}
 
 			w.Flush()
@@ -105,6 +111,10 @@ func getCachedBlueprints() (map[string][]string, error) {
 				return nil, err
 			}
 			source := getSource(dir)
+			version := getVersion(dir)
+			if version != "" {
+				source = fmt.Sprintf("%s@%s", source, version)
+			}
 			blueprintsList[source] = policies
 		}
 	}
