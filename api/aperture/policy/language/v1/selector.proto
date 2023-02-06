@@ -53,14 +53,19 @@ message ServiceSelector {
   //
   // In kubernetes, this is the FQDN of the Service object.
   //
-  // Empty string means all services within an agent group (catch-all).
+  // "all" means all services within an agent group (catch-all).
   //
   // :::note
   //
   // One entity may belong to multiple services.
   //
   // :::
-  string service = 2;
+  string service = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"];
 }
 
 // Describes which flows a [flow control
