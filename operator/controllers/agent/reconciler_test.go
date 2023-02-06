@@ -81,10 +81,10 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 					Name: namespace,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			instance.Namespace = namespace
-			Expect(K8sClient.Create(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
 				NamespacedName: types.NamespacedName{
@@ -133,10 +133,10 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 					err5 == nil && err6 == nil && err7 != nil && err8 != nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
-			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(BeNil())
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(Succeed())
 			Expect(instance.Status.Resources).To(Equal("created"))
 
-			Expect(K8sClient.Delete(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
 		})
 
 		It("should create required resources when Agent is created with all parameters and without sidecar", func() {
@@ -148,21 +148,21 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 					Name: namespace,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			instance.Namespace = namespace
 			instance.Spec.Sidecar.Enabled = false
 			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace1}
 			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
 			instance.Spec.Secrets.FluxNinjaPlugin.Value = Test
-			Expect(K8sClient.Create(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			ns1 := &corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: namespace1,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns1)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns1)).To(Succeed())
 
 			ns2 := &corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
@@ -172,7 +172,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 					},
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns2)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns2)).To(Succeed())
 
 			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
 				NamespacedName: types.NamespacedName{
@@ -238,15 +238,15 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 					err9 != nil && err10 != nil && err11 != nil && err12 != nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
-			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(BeNil())
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(Succeed())
 			Expect(instance.Status.Resources).To(Equal("created"))
 			Expect(instance.Finalizers).To(Equal([]string{FinalizerName}))
 			Expect(instance.Spec.Secrets.FluxNinjaPlugin.Create).To(BeFalse())
 			Expect(instance.Spec.Secrets.FluxNinjaPlugin.Value).To(Equal(""))
 
-			Expect(K8sClient.Delete(Ctx, ns)).To(BeNil())
-			Expect(K8sClient.Delete(Ctx, ns1)).To(BeNil())
-			Expect(K8sClient.Delete(Ctx, ns2)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
+			Expect(K8sClient.Delete(Ctx, ns1)).To(Succeed())
+			Expect(K8sClient.Delete(Ctx, ns2)).To(Succeed())
 		})
 
 		It("should create required resources when Agent is created with all parameters and sidecar", func() {
@@ -258,7 +258,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 					Name: namespace,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			instance.Namespace = namespace
 			instance.Spec.Sidecar.Enabled = true
@@ -267,14 +267,14 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			encodedString := fmt.Sprintf("enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(Test)))
 			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
 			instance.Spec.Secrets.FluxNinjaPlugin.Value = Test
-			Expect(K8sClient.Create(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			ns1 := &corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: namespace1,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns1)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns1)).To(Succeed())
 
 			ns2 := &corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
@@ -284,7 +284,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 					},
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns2)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns2)).To(Succeed())
 
 			os.Setenv("APERTURE_OPERATOR_CERT_DIR", CertDir)
 			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls6.crt")
@@ -363,14 +363,14 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 					err9 == nil && err10 == nil && err11 == nil && err12 == nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
-			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(BeNil())
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(Succeed())
 			Expect(instance.Status.Resources).To(Equal("created"))
 			Expect(instance.Finalizers).To(Equal([]string{FinalizerName}))
 			Expect(instance.Spec.Secrets.FluxNinjaPlugin.Value).To(Equal(encodedString))
 
-			Expect(K8sClient.Delete(Ctx, ns)).To(BeNil())
-			Expect(K8sClient.Delete(Ctx, ns1)).To(BeNil())
-			Expect(K8sClient.Delete(Ctx, ns2)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
+			Expect(K8sClient.Delete(Ctx, ns1)).To(Succeed())
+			Expect(K8sClient.Delete(Ctx, ns2)).To(Succeed())
 		})
 
 		It("should not create required resources when an Agent instance is already created", func() {
@@ -380,10 +380,10 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 					Name: namespace,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			instance.Namespace = namespace
-			Expect(K8sClient.Create(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
 				NamespacedName: types.NamespacedName{
@@ -401,14 +401,14 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 				return K8sClient.Get(Ctx, agentConfigKey, createdAgentConfigMap) == nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
-			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(BeNil())
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(Succeed())
 			Expect(instance.Status.Resources).To(Equal("created"))
 
 			instanceNew := DefaultAgentInstance.DeepCopy()
 			instanceNew.Name = TestTwo
 			instanceNew.Namespace = namespace
 
-			Expect(K8sClient.Create(Ctx, instanceNew)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, instanceNew)).To(Succeed())
 
 			res, err = reconciler.Reconcile(Ctx, reconcile.Request{
 				NamespacedName: types.NamespacedName{
@@ -419,10 +419,10 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			Expect(reflect.DeepEqual(res, ctrl.Result{})).To(Equal(true))
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: TestTwo, Namespace: namespace}, instanceNew)).To(BeNil())
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: TestTwo, Namespace: namespace}, instanceNew)).To(Succeed())
 			Expect(instanceNew.Status.Resources).To(Equal("skipped"))
 
-			Expect(K8sClient.Delete(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
 		})
 
 		It("should delete required resources when an Agent instance is already deleted", func() {
@@ -434,7 +434,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 					Name: namespace,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			instance.Namespace = namespace
 			instance.Spec.Sidecar.Enabled = true
@@ -448,7 +448,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 					Name: namespace1,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns1)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns1)).To(Succeed())
 
 			ns2 := &corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
@@ -458,7 +458,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 					},
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns2)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns2)).To(Succeed())
 
 			os.Setenv("APERTURE_OPERATOR_CERT_DIR", CertDir)
 			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls6.crt")
@@ -474,7 +474,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 
 			err = WriteFile(certPath, serverCertPEM)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(K8sClient.Create(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
 				NamespacedName: types.NamespacedName{
@@ -500,10 +500,10 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 					K8sClient.Get(Ctx, agentSecretKeyNs2, createdAgentSecretNs2) == nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
-			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(BeNil())
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(Succeed())
 			Expect(instance.Status.Resources).To(Equal("created"))
 
-			Expect(K8sClient.Delete(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, instance)).To(Succeed())
 
 			res, err = reconciler.Reconcile(Ctx, reconcile.Request{
 				NamespacedName: types.NamespacedName{
@@ -520,7 +520,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 					K8sClient.Get(Ctx, agentSecretKeyNs2, createdAgentSecretNs2) != nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
-			Expect(K8sClient.Delete(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
 		})
 
 		It("should create required resources when Agent is updated to use sidecar mode", func() {
@@ -531,20 +531,20 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 					Name: namespace,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			instance.Namespace = namespace
 			instance.Spec.Sidecar.Enabled = false
 			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
 			instance.Spec.Secrets.FluxNinjaPlugin.Value = Test
-			Expect(K8sClient.Create(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			ns1 := &corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: namespace1,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns1)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns1)).To(Succeed())
 
 			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
 				NamespacedName: types.NamespacedName{
@@ -572,7 +572,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 				return err1 == nil && err2 == nil && err3 != nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
-			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(BeNil())
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(Succeed())
 			Expect(instance.Status.Resources).To(Equal("created"))
 
 			instance.Spec.Sidecar.Enabled = true
@@ -583,7 +583,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			instance.Spec.Secrets.FluxNinjaPlugin.Value = encodedString
 			instance.Annotations = map[string]string{}
 			instance.ObjectMeta.Annotations[AgentModeChangeAnnotationKey] = "true"
-			Expect(K8sClient.Update(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Update(Ctx, instance)).To(Succeed())
 
 			os.Setenv("APERTURE_OPERATOR_CERT_DIR", CertDir)
 			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls7.crt")
@@ -624,11 +624,11 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 				return err1 != nil && err2 != nil && err3 == nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
-			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(BeNil())
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(Succeed())
 			Expect(instance.Status.Resources).To(Equal("created"))
 
-			Expect(K8sClient.Delete(Ctx, ns)).To(BeNil())
-			Expect(K8sClient.Delete(Ctx, ns1)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
+			Expect(K8sClient.Delete(Ctx, ns1)).To(Succeed())
 		})
 
 		It("should create required resources when Agent is updated to use DaemonSet mode", func() {
@@ -639,21 +639,21 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 					Name: namespace,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			instance.Namespace = namespace
 			instance.Spec.Sidecar.Enabled = true
 			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace1}
 			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
 			instance.Spec.Secrets.FluxNinjaPlugin.Value = Test
-			Expect(K8sClient.Create(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			ns1 := &corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: namespace1,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns1)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns1)).To(Succeed())
 
 			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
 				NamespacedName: types.NamespacedName{
@@ -681,7 +681,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 				return err1 != nil && err2 != nil && err3 == nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
-			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(BeNil())
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(Succeed())
 			Expect(instance.Status.Resources).To(Equal("created"))
 
 			instance.Spec.Sidecar.Enabled = false
@@ -691,7 +691,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			instance.Spec.Secrets.FluxNinjaPlugin.Value = encodedString
 			instance.Annotations = map[string]string{}
 			instance.ObjectMeta.Annotations[AgentModeChangeAnnotationKey] = "true"
-			Expect(K8sClient.Update(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Update(Ctx, instance)).To(Succeed())
 
 			os.Setenv("APERTURE_OPERATOR_CERT_DIR", CertDir)
 			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls7.crt")
@@ -732,11 +732,11 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 				return err1 == nil && err2 == nil && err3 != nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
-			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(BeNil())
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(Succeed())
 			Expect(instance.Status.Resources).To(Equal("created"))
 
-			Expect(K8sClient.Delete(Ctx, ns)).To(BeNil())
-			Expect(K8sClient.Delete(Ctx, ns1)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
+			Expect(K8sClient.Delete(Ctx, ns1)).To(Succeed())
 		})
 
 		AfterEach(func() {

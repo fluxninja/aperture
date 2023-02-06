@@ -53,9 +53,9 @@ var _ = Describe("Test updateClusterRoleBinding", func() {
 			Name:      TestTwo,
 			Namespace: Test,
 		}
-		Expect(updateClusterRoleBinding(K8sClient, *subject, Ctx, Test)).To(BeNil())
+		Expect(updateClusterRoleBinding(K8sClient, *subject, Ctx, Test)).To(Succeed())
 
-		Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: AgentServiceName, Namespace: Test}, crb)).To(BeNil())
+		Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: AgentServiceName, Namespace: Test}, crb)).To(Succeed())
 		Expect(len(crb.Subjects)).To(Equal(2))
 	})
 
