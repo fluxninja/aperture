@@ -42,17 +42,21 @@ local kubeDashboards =
      },
    }).grafanaDashboards;
 
-local policyDashBoardMixin =
+local latencyGradientPolicyDashboard =
   policyDashboard({
     policy_name: 'service1-demo-app',
-  }).dashboard
-  /* TODO: panel id is clashing. disabling for now.
-  {
-    panels+: rateLimitpolicyDashboard({
+  }).dashboard;
+
+local rateLimitPanel =
+  rateLimitpolicyDashboard({
       policy_name: 'service1-demo-app',
-    }).dashboard.panels,
+    }).dashboard.panels[0];
+
+local policyDashBoardMixin =
+  latencyGradientPolicyDashboard
+  {
+    panels+: [rateLimitPanel + {id: std.length(latencyGradientPolicyDashboard.panels) + 2}],
   }
-  */
 ;
 
 local dashboards =
