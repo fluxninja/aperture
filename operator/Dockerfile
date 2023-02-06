@@ -11,9 +11,9 @@ RUN --mount=type=cache,target=/go/pkg/ \
 RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.cache/go-build/ \
   CGO_ENABLED=0 go build \
-    --ldflags "-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
-    -a \
-    -o aperture-operator \
+  --ldflags "-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
+  -a \
+  -o aperture-operator \
   operator/main.go
 
 # Use distroless as minimal base image to package the manager binary

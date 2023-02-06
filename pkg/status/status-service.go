@@ -29,11 +29,17 @@ func RegisterStatusService(server *grpc.Server, reg Registry) {
 func (svc *StatusService) GetGroupStatus(ctx context.Context, req *statusv1.GroupStatusRequest) (*statusv1.GroupStatus, error) {
 	log.Trace().Interface("path", req.Path).Msg("Received request on GetGroupStatus handler")
 
-	// extract keys from the path, separated by /
+	// extract pairs of key-value from the path, separated by /
 	keys := strings.Split(req.Path, "/")
 
 	registry := svc.registry
 	for i := 0; i < len(keys); i += 2 {
+		if i >= len(keys) || i+1 >= len(keys) {
+			log.Warn().Msgf("Incorrect status path: %+v", req.Path)
+			_ = grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "404"))
+			return &statusv1.GroupStatus{}, nil
+		}
+
 		key := keys[i]
 		val := keys[i+1]
 		registry = registry.ChildIfExists(key, val)

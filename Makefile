@@ -61,7 +61,7 @@ go-generate-swagger:
 	@echo Generating swagger specs from go code
 	@./scripts/go_generate_swagger.sh
 
-generate-docs: generate-helm-readme generate-doc-assets
+generate-docs: generate-helm-readme generate-doc-assets generate-aperturectl-docs
 	@echo Generating docs
 
 generate-config-markdown: go-generate-swagger generate-api
@@ -76,11 +76,22 @@ helm-lint:
 	@cd ./manifests/charts && $(MAKE) helm-lint
 
 generate-blueprints: generate-config-markdown
-	@cd ./blueprints && $(MAKE) generate-blueprints
+	@echo Generating libsonnet library
+	@{ \
+		git_root=$$(git rev-parse --show-toplevel); \
+		python $$git_root/scripts/jsonnet-lib-gen.py --output-dir $$git_root/blueprints/gen $$git_root/docs/gen/policy/policy.yaml; \
+		tk fmt $$git_root/blueprints/gen; \
+		git add $$git_root/blueprints/gen; \
+	}
+	@scripts/generate_blueprints_docs.sh
+
 
 generate-doc-assets: generate-blueprints
 	@cd ./docs && $(MAKE) generate-jsonnet
 	@cd ./docs && $(MAKE) generate-mermaid
+
+generate-aperturectl-docs:
+	@cd ./docs && $(MAKE) generate-aperturectl-docs
 
 coverage_profile:
 	gotestsum --format=testname -- -coverpkg=./... -coverprofile=profile.coverprofile ./...
@@ -95,7 +106,7 @@ pre-commit-checks:
 all: install-asdf-tools install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs generate-helm-readme generate-blueprints helm-lint pre-commit-checks
 	@echo "Done"
 
-.PHONY: install-asdf-tools install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-doc-assets generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser generate-helm-readme helm-lint generate-blueprints pre-commit-checks
+.PHONY: install-asdf-tools install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-doc-assets generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser generate-helm-readme helm-lint generate-blueprints pre-commit-checks generate-aperturectl-docs
 
 #####################################
 ###### OPERATOR section starts ######

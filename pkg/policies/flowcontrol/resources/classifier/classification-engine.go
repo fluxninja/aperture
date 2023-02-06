@@ -15,6 +15,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/consts"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier/compiler"
@@ -187,7 +188,7 @@ func (c *ClassificationEngine) Classify(
 	var classifierMsgs []*flowcontrolv1.ClassifierInfo
 
 	// Catch all Service
-	cpID := selectors.NewControlPointID("", ctrlPt)
+	cpID := selectors.NewControlPointID(consts.CatchAllService, ctrlPt)
 	mm, ok := r.MultiMatcherByControlPointID[cpID]
 	if ok {
 		classifierMsgs = append(classifierMsgs, c.populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)...)
@@ -290,7 +291,7 @@ func (c *ClassificationEngine) combineRulesets() rules {
 		controlPointKeys[controlPointID]++
 		err := mm.AddEntry(matcherID, labelSelector, callback)
 		if err != nil {
-			log.Error().Err(err).Msg("Failed to add entry to catchall multimatcher")
+			log.Error().Err(err).Msg("Failed to add entry to multimatcher")
 			return err
 		}
 		return nil
@@ -305,7 +306,7 @@ func (c *ClassificationEngine) combineRulesets() rules {
 				return mmr
 			})
 			if err != nil {
-				log.Error().Err(err).Msg("Failed to add entry to catchall multimatcher")
+				log.Error().Err(err).Msg("Failed to add entry to multimatcher")
 				return rules{}
 			}
 		}

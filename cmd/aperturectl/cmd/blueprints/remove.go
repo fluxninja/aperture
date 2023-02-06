@@ -2,15 +2,12 @@ package blueprints
 
 import (
 	"os"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
 
-var removeAll bool
-
 func init() {
-	removeCmd.Flags().BoolVar(&removeAll, "all", false, "remove all versions of Aperture Blueprints")
+	removeCmd.Flags().BoolVar(&all, "all", false, "remove all versions of Aperture Blueprints")
 }
 
 var removeCmd = &cobra.Command{
@@ -23,13 +20,13 @@ Use this command to remove a pulled Aperture Blueprint from local system.`,
 aperturectl blueprints remove --version v0.22.0
 
 aperturectl blueprints remove --all`,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(_ *cobra.Command, _ []string) error {
 		pathToRemove := ""
 
-		if removeAll {
-			pathToRemove = blueprintsDir
+		if all {
+			pathToRemove = blueprintsCacheRoot
 		} else {
-			pathToRemove = filepath.Join(blueprintsDir, blueprintsVersion)
+			pathToRemove = blueprintsDir
 		}
 
 		err := os.RemoveAll(pathToRemove)

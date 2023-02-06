@@ -1,7 +1,7 @@
 local grafanaOperator = import 'github.com/jsonnet-libs/grafana-operator-libsonnet/4.3/main.libsonnet';
 local kubernetesMixin = import 'github.com/kubernetes-monitoring/kubernetes-mixin/mixin.libsonnet';
 
-local aperture = import '../../../../../blueprints/lib/1.0/main.libsonnet';
+local aperture = import '../../../../../blueprints/main.libsonnet';
 local policyDashboard = aperture.policies.LatencyAIMDConcurrencyLimiting.dashboard;
 local rateLimitpolicyDashboard = aperture.policies.StaticRateLimiting.dashboard;
 local signalsDashboard = aperture.dashboards.SignalsDashboard.dashboard;
@@ -42,15 +42,22 @@ local kubeDashboards =
      },
    }).grafanaDashboards;
 
-local policyDashBoardMixin =
+local latencyGradientPolicyDashboard =
   policyDashboard({
     policy_name: 'service1-demo-app',
-  }).dashboard
-  {
-    panels+: rateLimitpolicyDashboard({
+  }).dashboard;
+
+local rateLimitPanel =
+  rateLimitpolicyDashboard({
       policy_name: 'service1-demo-app',
-    }).dashboard.panels,
-  };
+    }).dashboard.panels[0];
+
+local policyDashBoardMixin =
+  latencyGradientPolicyDashboard
+  {
+    panels+: [rateLimitPanel + {id: std.length(latencyGradientPolicyDashboard.panels) + 2}],
+  }
+;
 
 local dashboards =
   [

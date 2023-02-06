@@ -3,6 +3,6 @@ set -euo pipefail
 
 gitroot="$(git rev-parse --show-toplevel)"
 
-pushd "$gitroot"/blueprints >/dev/null
+pushd "$gitroot" >/dev/null
 make generate-blueprints
 popd >/dev/null

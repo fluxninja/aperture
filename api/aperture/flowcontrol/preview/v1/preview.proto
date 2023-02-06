@@ -12,12 +12,6 @@ service FlowPreviewService {
     option (google.api.http) = {
       post: "/v1/flowcontrol/preview/labels/{service}/{control_point}"
       body: "label_matcher"
-      additional_bindings: [
-        {
-          post: "/v1/flowcontrol/preview/labels/{control_point}"
-          body: "label_matcher"
-        }
-      ]
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["aperture-agent"];
@@ -27,12 +21,6 @@ service FlowPreviewService {
     option (google.api.http) = {
       post: "/v1/flowcontrol/preview/http_requests/{service}/{control_point}"
       body: "label_matcher"
-      additional_bindings: [
-        {
-          post: "/v1/flowcontrol/preview/http_requests/{control_point}"
-          body: "label_matcher"
-        }
-      ]
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["aperture-agent"];
@@ -45,7 +33,7 @@ message PreviewRequest {
   int64 samples = 1; // @gotags: validate:"min=1" default:"10"
   // Control point to preview.
   string control_point = 2; // @gotags: validate:"required"
-  // Service to preview. Empty value implies catch all service.
+  // Service to preview.
   string service = 3;
   // Flow labels to match. Optional parameter for advanced filtering.
   policy.language.v1.LabelMatcher label_matcher = 4;

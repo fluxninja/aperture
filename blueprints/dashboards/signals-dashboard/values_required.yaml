@@ -1,0 +1,9 @@
+# Generated values.yaml file for dashboards/signals-dashboard blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/dashboards/signals-dashboard
+
+common:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: "__REQUIRED_FIELD__"

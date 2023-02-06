@@ -15,10 +15,10 @@ blueprint: Latency AIMD Concurrency Limiting Policy
 sources:
   Dashboard:
     prefix: dashboard
-    path: lib/1.0/policies/latency-aimd-concurrency-limiting/dashboard.libsonnet
+    path: policies/latency-aimd-concurrency-limiting/dashboard.libsonnet
   Policy:
     prefix: policy
-    path: lib/1.0/policies/latency-aimd-concurrency-limiting/policy.libsonnet
+    path: policies/latency-aimd-concurrency-limiting/policy.libsonnet
 ```
 
 - `blueprint` key is currently unused, but it names this specific bundle
@@ -41,7 +41,7 @@ which policy or dashboard configuration is available in `config.libsonnet` and
 An example:
 
 ```yaml
-local blueprint = import '../../lib/1.0/policies/latency-aimd-concurrency-limiting.libsonnet';
+local blueprint = import 'policies/latency-aimd-concurrency-limiting.libsonnet';
 
 local policy = blueprint.policy;
 local dashboard = blueprint.dashboard;

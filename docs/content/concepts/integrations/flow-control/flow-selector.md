@@ -54,7 +54,8 @@ skip the _agent group_ field.
 :::tip Catch-all service
 
 If the agent group is already logically a single service or you simply want to
-select all services within the agent group, you can skip the service name.
+select all services within the agent group, you can set the service name as
+`all`.
 
 :::
 
