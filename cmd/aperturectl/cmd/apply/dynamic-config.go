@@ -14,6 +14,7 @@ import (
 
 	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 var (
@@ -91,6 +92,8 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("failed to update Policy '%s': %w", policyName, err)
 		}
+
+		log.Info().Str("policy", policyName).Str("namespace", deployment.Namespace).Msg("DynamicConfig applied successfully")
 
 		return nil
 	},
