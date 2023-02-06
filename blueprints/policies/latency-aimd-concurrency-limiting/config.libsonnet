@@ -10,7 +10,9 @@
   /**
   * @section Policy
   *
-  * @param (policy.flux_meter: aperture.spec.v1.FluxMeter required) Flux Meter.
+  * @param (policy.flux_meter: aperture.spec.v1.FluxMeter) Flux Meter.
+  * @param (policy.flux_meter.flow_selector.service_selector.service: string required) Service Name.
+  * @param (policy.flux_meter.flow_selector.flow_matcher.control_point: string required) Control Point Name.
   * @param (policy.classifiers: []aperture.spec.v1.Classifier) List of classification rules.
   * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
   */
@@ -49,7 +51,9 @@
     * @section Policy
     * @subsection Concurrency Controller
     *
-    * @param (policy.concurrency_controller.flow_selector: aperture.spec.v1.FlowSelector required) Concurrency Limiter flow selector.
+    * @param (policy.concurrency_controller.flow_selector: aperture.spec.v1.FlowSelector) Concurrency Limiter flow selector.
+    * @param (policy.concurrency_controller.flow_selector.service_selector.service: string required) Service Name.
+    * @param (policy.concurrency_controller.flow_selector.flow_matcher.control_point: string required) Control Point Name.
     * @param (policy.concurrency_controller.scheduler: aperture.spec.v1.SchedulerParameters) Scheduler parameters.
     * @param (policy.concurrency_controller.gradient: aperture.spec.v1.GradientControllerParameters) Gradient Controller parameters.
     * @param (policy.concurrency_controller.alerter: aperture.spec.v1.AlerterParameters) Whether tokens for workloads are computed dynamically or set statically by the user.

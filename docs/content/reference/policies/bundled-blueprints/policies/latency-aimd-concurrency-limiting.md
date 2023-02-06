@@ -88,8 +88,22 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="policy.flux_meter"
     type="aperture.spec.v1.FluxMeter"
     reference="../../spec#v1-flux-meter"
-    value="__REQUIRED_FIELD__"
+    value="{'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'agent_group': 'default', 'service': '__REQUIRED_FIELD__'}}}"
     description='Flux Meter.' />
+
+<ParameterDescription
+    name="policy.flux_meter.flow_selector.service_selector.service"
+    type="string"
+    reference=""
+    value="__REQUIRED_FIELD__"
+    description='Service Name.' />
+
+<ParameterDescription
+    name="policy.flux_meter.flow_selector.flow_matcher.control_point"
+    type="string"
+    reference=""
+    value="__REQUIRED_FIELD__"
+    description='Control Point Name.' />
 
 <ParameterDescription
     name="policy.classifiers"
@@ -134,8 +148,22 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="policy.concurrency_controller.flow_selector"
     type="aperture.spec.v1.FlowSelector"
     reference="../../spec#v1-flow-selector"
-    value="__REQUIRED_FIELD__"
+    value="{'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'agent_group': 'default', 'service': '__REQUIRED_FIELD__'}}"
     description='Concurrency Limiter flow selector.' />
+
+<ParameterDescription
+    name="policy.concurrency_controller.flow_selector.service_selector.service"
+    type="string"
+    reference=""
+    value="__REQUIRED_FIELD__"
+    description='Service Name.' />
+
+<ParameterDescription
+    name="policy.concurrency_controller.flow_selector.flow_matcher.control_point"
+    type="string"
+    reference=""
+    value="__REQUIRED_FIELD__"
+    description='Control Point Name.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.scheduler"

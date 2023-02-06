@@ -98,8 +98,22 @@ export const ParameterDescription = ({name, type, reference, value, description}
     name="policy.rate_limiter.flow_selector"
     type="aperture.spec.v1.FlowSelector"
     reference="../../spec#v1-flow-selector"
-    value="__REQUIRED_FIELD__"
+    value="{'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'agent_group': 'default', 'service': '__REQUIRED_FIELD__'}}"
     description='A flow selector to match requests against' />
+
+<ParameterDescription
+    name="policy.rate_limiter.flow_selector.service_selector.service"
+    type="string"
+    reference=""
+    value="__REQUIRED_FIELD__"
+    description='Service Name.' />
+
+<ParameterDescription
+    name="policy.rate_limiter.flow_selector.flow_matcher.control_point"
+    type="string"
+    reference=""
+    value="__REQUIRED_FIELD__"
+    description='Control Point Name.' />
 
 <ParameterDescription
     name="policy.rate_limiter.parameters"
