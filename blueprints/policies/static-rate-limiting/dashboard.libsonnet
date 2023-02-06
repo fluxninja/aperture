@@ -45,7 +45,7 @@ function(cfg) {
 
   local rateLimiterPanel =
     newTimeSeriesPanel('Rate Limiter',
-                       ds,
+                       dsName,
                        'sum by(decision_type) (rate(rate_limiter_counter{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName },
                        'Decisions',
                        'reqps'),
