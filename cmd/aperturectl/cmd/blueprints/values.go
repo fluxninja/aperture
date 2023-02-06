@@ -28,7 +28,7 @@ var valuesCmd = &cobra.Command{
 	SilenceErrors: true,
 	Example: `aperturectl blueprints values --name=policies/static-rate-limiting --output-file=values.yaml
 
-  aperturectl blueprints values --name=policies/static-rate-limiting --output-file=values.yaml --only-required`,
+aperturectl blueprints values --name=policies/static-rate-limiting --output-file=values.yaml --only-required`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		if blueprintName == "" {
 			return fmt.Errorf("--name must be provided")
