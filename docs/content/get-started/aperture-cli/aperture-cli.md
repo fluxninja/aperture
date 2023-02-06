@@ -64,22 +64,22 @@ profile:
 <Tabs>
 <TabItem value="bash" label="bash">
 <CodeBlock language="bash">
-. &lt;(aperturectl completion bash)
+source &lt;(aperturectl completion bash)
 </CodeBlock>
 </TabItem>
 <TabItem value="zsh" label="zsh">
 <CodeBlock language="zsh">
-. &lt;(aperturectl completion zsh)
+source &lt;(aperturectl completion zsh); compdef _aperturectl aperturectl
 </CodeBlock>
 </TabItem>
 <TabItem value="fish" label="fish">
 <CodeBlock language="fish">
-. &lt;(aperturectl completion fish)
+aperturectl completion fish | source
 </CodeBlock>
 </TabItem>
 <TabItem value="powershell" label="powershell">
 <CodeBlock language="powershell">
-. &lt;(aperturectl completion powershell)
+aperturectl completion powershell | Out-String | Invoke-Expression
 </CodeBlock>
 </TabItem>
 </Tabs>
