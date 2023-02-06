@@ -117,13 +117,6 @@ repos:
         files: '\.proto$|\.go$'
         pass_filenames: false
         description: "Generate config markdown"
-      - id: generate-aperturectl-docs
-        name: "Config aperturectl docs"
-        entry: "./scripts/precommit/generate_aperturectl_docs.sh"
-        language: script
-        files: "^cmd/aperturectl/.*"
-        pass_filenames: false
-        description: "Generate CLI docs"
       - id: generate-blueprints
         name: "Generate Blueprints"
         entry: "./scripts/precommit/generate_blueprints.sh"

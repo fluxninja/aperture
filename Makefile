@@ -67,10 +67,6 @@ generate-docs: generate-helm-readme generate-doc-assets
 generate-config-markdown: go-generate-swagger generate-api
 	@cd ./docs && $(MAKE) generate-config-markdown
 
-generate-aperturectl-docs:
-	@echo Generating aperturectl docs
-	@cd ./docs && $(MAKE) generate-aperturectl-docs
-
 generate-helm-readme:
 	@echo Generating helm readme
 	@cd ./manifests/charts && $(MAKE) generate-helm-readme
@@ -93,6 +89,7 @@ generate-blueprints: generate-config-markdown
 generate-doc-assets: generate-blueprints
 	@cd ./docs && $(MAKE) generate-jsonnet
 	@cd ./docs && $(MAKE) generate-mermaid
+	@cd ./docs && $(MAKE) generate-aperturectl-docs
 
 coverage_profile:
 	gotestsum --format=testname -- -coverpkg=./... -coverprofile=profile.coverprofile ./...
