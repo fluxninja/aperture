@@ -59,6 +59,8 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 			if applyPolicy {
 				// use temp dir
 				outputDir = os.TempDir()
+				// defer remove temp dir
+				defer os.RemoveAll(outputDir)
 			} else {
 				return fmt.Errorf("--output-dir must be provided")
 			}
