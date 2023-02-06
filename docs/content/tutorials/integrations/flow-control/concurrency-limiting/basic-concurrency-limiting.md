@@ -63,16 +63,16 @@ At a high-level, this policy consists of:
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="YAML">
+<TabItem value="aperturectl values.yaml">
 ```
 
 ```yaml
-{@include: ./assets/basic-concurrency-limiting/basic-concurrency-limiting.yaml}
+{@include: ./assets/basic-concurrency-limiting/values.yaml}
 ```
 
 ```mdx-code-block
 </TabItem>
-<TabItem value="Jsonnet">
+<TabItem value="Jsonnet Mixin">
 ```
 
 ```jsonnet
@@ -83,6 +83,16 @@ At a high-level, this policy consists of:
 </TabItem>
 </Tabs>
 ```
+
+<details><summary>Generated Policy</summary>
+<p>
+
+```yaml
+{@include: ./assets/basic-concurrency-limiting/basic-concurrency-limiting.yaml}
+```
+
+</p>
+</details>
 
 ### Circuit Diagram
 

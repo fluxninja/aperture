@@ -111,9 +111,10 @@ policy-gen
 │   └── static-rate-limiting.json
 ├── graphs
 │   ├── static-rate-limiting.dot
-│   └── static-rate-limiting.svg
+│   └── static-rate-limiting.mmd
 └── policies
-    └── static-rate-limiting.yaml
+│   ├── static-rate-limiting-cr.yaml
+│   └── static-rate-limiting.yaml
 ```
 
 ## Applying Policies
@@ -147,11 +148,11 @@ You can pass the `--kube-config` flag to pass any other path.
 <TabItem value="kubectl" label="kubectl">
 ```
 
-The policy YAML generated using the above example can also be applied using
-`kubectl`.
+The policy YAML generated (Kubernetes Custom Resource) using the above example
+can also be applied using `kubectl`.
 
 ```bash
-kubectl apply -f policy-gen/policies/static-rate-limiting.yaml -n aperture-controller
+kubectl apply -f policy-gen/policies/static-rate-limiting-cr.yaml -n aperture-controller
 ```
 
 ```mdx-code-block
