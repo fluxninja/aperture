@@ -205,6 +205,20 @@ paths:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
+  /v1/k8s/controlpoints:
+    get:
+      tags:
+      - aperture-agent
+      operationId: ControlPointCache_GetControlPoint
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1KubernetesControlPoints'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
   /v1/peers:
     get:
       tags:
@@ -557,6 +571,24 @@ definitions:
         type: array
         items:
           type: string
+  v1KubernetesControlPoint:
+    type: object
+    properties:
+      api_version:
+        type: string
+      kind:
+        type: string
+      name:
+        type: string
+      namespace:
+        type: string
+  v1KubernetesControlPoints:
+    type: object
+    properties:
+      control_points:
+        type: array
+        items:
+          $ref: '#/definitions/v1KubernetesControlPoint'
   v1LabelMatcher:
     description: |-
       It provides three ways to define requirements:

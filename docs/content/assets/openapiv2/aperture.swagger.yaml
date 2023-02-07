@@ -3,6 +3,7 @@ info:
   title: Aperture API
   version: "1.0"
 tags:
+  - name: ControlPointCache
   - name: DistCacheService
   - name: EntityCacheService
   - name: FlowControlService
@@ -250,6 +251,20 @@ paths:
       tags:
         - aperture-agent
         - aperture-controller
+  /v1/k8s/controlpoints:
+    get:
+      operationId: ControlPointCache_GetControlPoint
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1KubernetesControlPoints'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      tags:
+        - aperture-agent
   /v1/peers:
     get:
       operationId: PeerDiscoveryService_GetPeers
@@ -2330,6 +2345,13 @@ definitions:
         type: string
       name:
         type: string
+  v1KubernetesControlPoints:
+    type: object
+    properties:
+      control_points:
+        type: array
+        items:
+          $ref: '#/definitions/v1KubernetesControlPoint'
   v1KubernetesObjectSelector:
     type: object
     properties:
