@@ -19,7 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"github.com/fluxninja/aperture/cmd/aperture-controller/controller"
+	controller "github.com/fluxninja/aperture/cmd/aperture-controller/config"
 	"github.com/fluxninja/aperture/operator/api"
 	"github.com/fluxninja/aperture/operator/api/common"
 	"github.com/fluxninja/aperture/pkg/jobs"

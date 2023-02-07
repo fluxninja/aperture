@@ -1,4 +1,3 @@
-// +kubebuilder:validation:Optional
 package controller
 
 import (
@@ -6,26 +5,12 @@ import (
 
 	promapi "github.com/prometheus/client_golang/api"
 
+	controllerconfig "github.com/fluxninja/aperture/cmd/aperture-controller/config"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
-
-// swagger:operation POST /otel controller-configuration OTEL
-// ---
-// x-fn-config-env: true
-// parameters:
-// - in: body
-//   schema:
-//     "$ref": "#/definitions/ControllerOTELConfig"
-
-// ControllerOTELConfig is the configuration for Agent's OTEL collector.
-// swagger:model
-// +kubebuilder:object:generate=true
-type ControllerOTELConfig struct {
-	otelconfig.CommonOTELConfig `json:",inline"`
-}
 
 func provideController(
 	unmarshaller config.Unmarshaller,
@@ -33,7 +18,7 @@ func provideController(
 	promClient promapi.Client,
 	tlsConfig *tls.Config,
 ) (*otelconfig.OTELConfig, error) {
-	var controllerCfg ControllerOTELConfig
+	var controllerCfg controllerconfig.ControllerOTELConfig
 	if err := unmarshaller.UnmarshalKey("otel", &controllerCfg); err != nil {
 		return nil, err
 	}
@@ -51,7 +36,7 @@ func provideController(
 // addMetricsPipeline adds metrics to pipeline for controller OTEL collector.
 func addMetricsPipeline(
 	config *otelconfig.OTELConfig,
-	controllerConfig *ControllerOTELConfig,
+	controllerConfig *controllerconfig.ControllerOTELConfig,
 	tlsConfig *tls.Config,
 	lis *listener.Listener,
 	promClient promapi.Client,
@@ -67,7 +52,7 @@ func addMetricsPipeline(
 
 func addPrometheusReceiver(
 	config *otelconfig.OTELConfig,
-	controllerConfig *ControllerOTELConfig,
+	controllerConfig *controllerconfig.ControllerOTELConfig,
 	tlsConfig *tls.Config,
 	lis *listener.Listener,
 ) {
