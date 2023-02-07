@@ -72,7 +72,7 @@ aperturectl uninstall controller --namespace=aperture`,
 				return err
 			}
 
-			ctx, cancel := context.WithTimeout(context.Background(), 300*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 			defer cancel()
 			if err = waitForHook(hook.Name, ctx); err != nil {
 				if errors.Is(err, context.DeadlineExceeded) {

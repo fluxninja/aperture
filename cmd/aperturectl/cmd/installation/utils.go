@@ -34,6 +34,7 @@ var (
 	latestVersion  string
 	namespace      string
 	kubeClient     client.Client
+	timeout        int
 )
 
 const (

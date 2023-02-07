@@ -16,6 +16,7 @@ func init() {
 	UnInstallCmd.PersistentFlags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
 	UnInstallCmd.PersistentFlags().StringVar(&version, "version", apertureLatestVersion, "Version of the Aperture to uninstall. Defaults to latest")
 	UnInstallCmd.PersistentFlags().StringVar(&namespace, "namespace", "", "Namespace from which the component will be uninstalled. Defaults to component name")
+	UnInstallCmd.PersistentFlags().IntVar(&timeout, "timeout", 300, "Timeout of waiting for uninstallation hooks completion. Defaults to 300")
 
 	UnInstallCmd.AddCommand(controllerUnInstallCmd)
 	UnInstallCmd.AddCommand(agentUnInstallCmd)
