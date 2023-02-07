@@ -409,6 +409,7 @@ DEP_TREE = {
                 {
                     "ref": "aperture-java-example",
                     "context": APERTURE_JAVA_REPO_PATH,
+                    "dockerfile": "dockerfiles/example/Dockerfile",
                 }
             ],
             "child_resources": [
