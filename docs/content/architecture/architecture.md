@@ -1,7 +1,9 @@
 ---
 title: Architecture
 sidebar_position: 2
-description: TODO
+description:
+  Discover the core components of Aperture Architecture and learn how they work
+  together to provide powerful and efficient reliability automation.
 image: ../assets/img/aperture_logo.png
 keywords:
   - reliability
