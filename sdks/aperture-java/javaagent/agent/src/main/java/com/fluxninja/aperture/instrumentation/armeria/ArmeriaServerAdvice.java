@@ -5,6 +5,7 @@ import com.fluxninja.aperture.sdk.ApertureSDK;
 import com.linecorp.armeria.server.ServerBuilder;
 import net.bytebuddy.asm.Advice;
 
+import java.io.File;
 import java.time.Duration;
 
 public class ArmeriaServerAdvice {
@@ -18,6 +19,12 @@ public class ArmeriaServerAdvice {
     private static ApertureSDK apertureSDKFromConfig() {
         String host = System.getProperty("aperture.agent.hostname");
         String port = System.getProperty("aperture.agent.port");
+        String configFileName = System.getProperty("aperture.javaagent.config.file");
+        if (configFileName != null) {
+            File configFile = new File(configFileName);
+            // TODO: check if file exists
+
+        }
         if (host == null) {
             host = "localhost";
         }
