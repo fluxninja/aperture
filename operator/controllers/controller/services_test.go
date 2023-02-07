@@ -17,7 +17,7 @@ limitations under the License.
 package controller
 
 import (
-	"github.com/fluxninja/aperture/cmd/aperture-controller/controller"
+	controller "github.com/fluxninja/aperture/cmd/aperture-controller/config"
 	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"

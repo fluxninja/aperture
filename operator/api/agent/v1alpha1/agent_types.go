@@ -19,7 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
+	agent "github.com/fluxninja/aperture/cmd/aperture-agent/config"
 	"github.com/fluxninja/aperture/operator/api"
 	"github.com/fluxninja/aperture/operator/api/common"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
