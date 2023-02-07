@@ -94,8 +94,11 @@ old_ifs="$IFS"
 IFS=' '
 
 set -x
+# expand env variables
+argstring="$(eval echo "${build_args[*]}")"
+
 # shellcheck disable=SC2048,SC2086
-docker build ${build_args[*]}
+docker build $argstring
 set +x
 
 IFS="$old_ifs"
