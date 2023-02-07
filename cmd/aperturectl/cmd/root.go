@@ -7,17 +7,17 @@ import (
 
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/apply"
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/blueprints"
-	"github.com/fluxninja/aperture/pkg/info"
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/installation"
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/pkg/log"
 )
-
-// Version shows the version of ApertureCtl.
-var Version = info.Version
 
 func init() {
 	RootCmd.AddCommand(blueprints.BlueprintsCmd)
 	RootCmd.AddCommand(compileCmd)
 	RootCmd.AddCommand(apply.ApplyCmd)
+	RootCmd.AddCommand(installation.InstallCmd)
+	RootCmd.AddCommand(installation.UnInstallCmd)
 
 	RootCmd.InitDefaultCompletionCmd()
 }
@@ -30,7 +30,7 @@ var RootCmd = &cobra.Command{
 	DisableSuggestions: false,
 	Long: `
 aperturectl is a CLI tool which can be used to interact with Aperture seamlessly.`,
-	Version: Version,
+	Version: utils.Version,
 }
 
 // Execute is the entrypoint for the CLI. It is called from the main package.

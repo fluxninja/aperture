@@ -7,59 +7,14 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"strings"
 
-	"github.com/Masterminds/semver/v3"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/config"
-	"github.com/go-git/go-git/v5/storage/memory"
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/jsonnet-bundler/jsonnet-bundler/pkg"
 	"github.com/jsonnet-bundler/jsonnet-bundler/pkg/jsonnetfile"
 	specv1 "github.com/jsonnet-bundler/jsonnet-bundler/spec/v1"
 	"github.com/jsonnet-bundler/jsonnet-bundler/spec/v1/deps"
 	"github.com/spf13/cobra"
 )
-
-func resolveLatestVersion() (string, error) {
-	remote := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
-		Name: "origin",
-		URLs: []string{apertureRepo},
-	})
-
-	refs, err := remote.List(&git.ListOptions{})
-	if err != nil {
-		return "", err
-	}
-
-	var latestRelease *semver.Version
-
-	tagsRefPrefix := "refs/tags/v"
-
-	for _, ref := range refs {
-		reference := ref.Name().String()
-		if ref.Name().IsTag() && strings.HasPrefix(reference, tagsRefPrefix) {
-			version := strings.TrimPrefix(reference, tagsRefPrefix)
-
-			release, err := semver.NewVersion(version)
-			if err != nil {
-				return "", err
-			}
-
-			if release.Prerelease() != "" {
-				continue
-			}
-
-			if latestRelease == nil || release.GreaterThan(latestRelease) {
-				latestRelease = release
-			}
-		}
-	}
-
-	if latestRelease == nil {
-		return "", errors.New("unable to resolve release tags to find latest release")
-	}
-	return fmt.Sprintf("v%s", latestRelease.String()), nil
-}
 
 var pullFunc = func(_ *cobra.Command, _ []string) error {
 	err := writerLock()
@@ -159,9 +114,9 @@ var pullCmd = &cobra.Command{
 Use this command to pull the Aperture Blueprints in local system to use for generating Aperture Policies and Grafana Dashboards.`,
 	SilenceErrors: true,
 	SilenceUsage:  true,
-	Example: `aperturectl blueprints pull
+	Example: fmt.Sprintf(`aperturectl blueprints pull
 
-aperturectl blueprints pull --version v0.22.0`,
+aperturectl blueprints pull --version v%s`, utils.Version),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return nil
 	},

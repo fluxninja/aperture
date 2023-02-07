@@ -24,8 +24,6 @@ func init() {
 	generateCmd.Flags().StringVar(&valuesFile, "values-file", "", "Path to the values file for Blueprint's input")
 	generateCmd.Flags().BoolVar(&applyPolicy, "apply", false, "Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed")
 	generateCmd.Flags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
-
-	validPolicies = []*policyv1alpha1.Policy{}
 }
 
 var generateCmd = &cobra.Command{
@@ -34,11 +32,11 @@ var generateCmd = &cobra.Command{
 	Long: `
 Use this command to generate Aperture Policy related resources like Kubernetes Custom Resource, Grafana Dashboards and graphs in DOT and Mermaid format.`,
 	SilenceErrors: true,
-	Example: `aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml
+	Example: fmt.Sprintf(`aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml
 
-aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --version v0.22.0
+aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --version v%s
 
-aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --apply`,
+aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --apply`, utils.Version),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		err := readerLock()
 		if err != nil {
@@ -265,6 +263,5 @@ func generateGraphs(content []byte, contentPath string) error {
 		return err
 	}
 
-	validPolicies = append(validPolicies, policy)
 	return nil
 }

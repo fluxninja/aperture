@@ -15,12 +15,12 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/yaml"
 
 	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -43,27 +43,20 @@ func init() {
 
 // ApplyCmd is the command to apply a policy to the cluster.
 var ApplyCmd = &cobra.Command{
-	Use:           "apply",
-	Short:         "Apply Aperture Policy to the cluster",
-	Long:          `Use this command to apply the Aperture Policy to the cluster.`,
+	Use:   "apply",
+	Short: "Apply Aperture Policy to the cluster",
+	Long: `
+Use this command to apply the Aperture Policy to the cluster.`,
 	SilenceErrors: true,
 	Example: `aperturectl apply --file=policy.yaml
 
 aperturectl apply --dir=policy-dir`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if kubeConfig == "" {
-			homeDir, err := os.UserHomeDir()
-			if err != nil {
-				return err
-			}
-			kubeConfig = filepath.Join(homeDir, ".kube", "config")
-			log.Info().Msgf("Using Kubernetes config '%s'", kubeConfig)
-		}
-		restConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfig)
+		var err error
+		kubeRestConfig, err = utils.GetKubeConfig(kubeConfig)
 		if err != nil {
-			return fmt.Errorf("failed to connect to Kubernetes. Error: %s", err.Error())
+			return err
 		}
-		kubeRestConfig = restConfig
 		return nil
 	},
 	RunE: func(_ *cobra.Command, _ []string) error {
