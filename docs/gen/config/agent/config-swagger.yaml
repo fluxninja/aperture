@@ -56,7 +56,7 @@ definitions:
         $ref: '#/definitions/PortsConfig'
     title: AgentOTELConfig is the configuration for Agent's OTEL collector.
     type: object
-    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/agent
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
   AlertManagerClientConfig:
     properties:
       address:
@@ -191,7 +191,7 @@ definitions:
         x-go-validate: gt=0
     title: BatchPostrollupConfig defines configuration for OTEL batch processor.
     type: object
-    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/agent
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
   BatchPrerollupConfig:
     properties:
       send_batch_max_size:
@@ -221,7 +221,7 @@ definitions:
         x-go-validate: gt=0
     title: BatchPrerollupConfig defines configuration for OTEL batch processor.
     type: object
-    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/agent
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
   ClientTLSConfig:
     properties:
       ca_file:
@@ -260,7 +260,7 @@ definitions:
       https://github.com/kubernetes-sigs/controller-tools/issues/636
       https://github.com/kubernetes-sigs/kubebuilder/issues/528
     type: object
-    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/agent
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
   CustomMetricsConfig:
     description: which will be exported to the controller prometheus.
     properties:
@@ -272,7 +272,7 @@ definitions:
         $ref: '#/definitions/Components'
     title: CustomMetricsConfig defines receivers, processors and single metrics pipeline,
     type: object
-    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/agent
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
   CustomMetricsPipelineConfig:
     properties:
       processors:
@@ -287,7 +287,7 @@ definitions:
         x-go-name: Receivers
     title: CustomMetricsPipelineConfig defines a custom metrics pipeline.
     type: object
-    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/agent
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
   DistCacheConfig:
     properties:
       bind_addr:
