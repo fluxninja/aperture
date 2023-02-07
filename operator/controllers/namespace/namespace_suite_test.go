@@ -104,7 +104,7 @@ var _ = BeforeSuite(func() {
 			Name: AppName,
 		},
 	}
-	Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+	Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 	namespaceTestReconciler = &NamespaceReconciler{
 		Client: K8sClient,

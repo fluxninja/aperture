@@ -63,7 +63,7 @@ var _ = Describe("Namespace controller", func() {
 					Name: namespace,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 			time.Sleep(5 * time.Second)
 
 			res, err := namespaceTestReconciler.Reconcile(Ctx, reconcile.Request{
@@ -77,7 +77,7 @@ var _ = Describe("Namespace controller", func() {
 
 		It("should not create resources when sidecar injection is disabled", func() {
 			namespace := Test + "2"
-			Expect(K8sClient.Create(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			createdConfigMap := &corev1.ConfigMap{}
 			configKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
@@ -87,7 +87,7 @@ var _ = Describe("Namespace controller", func() {
 					Name: namespace,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			_, err := namespaceTestReconciler.Reconcile(Ctx, reconcile.Request{
 				NamespacedName: types.NamespacedName{
@@ -101,15 +101,15 @@ var _ = Describe("Namespace controller", func() {
 				return errors.IsNotFound(err)
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
-			Expect(K8sClient.Delete(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
 		})
 
 		It("should not create resources when sidecar injection is enabled but label is not present", func() {
 			namespace := Test + "3"
 			instance.Spec.Sidecar.Enabled = true
-			Expect(K8sClient.Create(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 			instance.Status.Resources = "created"
-			Expect(K8sClient.Status().Update(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Status().Update(Ctx, instance)).To(Succeed())
 
 			createdConfigMap := &corev1.ConfigMap{}
 			configKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
@@ -119,7 +119,7 @@ var _ = Describe("Namespace controller", func() {
 					Name: namespace,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			_, err := namespaceTestReconciler.Reconcile(Ctx, reconcile.Request{
 				NamespacedName: types.NamespacedName{
@@ -133,15 +133,15 @@ var _ = Describe("Namespace controller", func() {
 				return errors.IsNotFound(err)
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
-			Expect(K8sClient.Delete(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
 		})
 
 		It("should not create resources when sidecar injection is enabled but instance is not in created state", func() {
 			namespace := Test + "4"
 			instance.Spec.Sidecar.Enabled = true
-			Expect(K8sClient.Create(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 			instance.Status.Resources = "skipped"
-			Expect(K8sClient.Status().Update(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Status().Update(Ctx, instance)).To(Succeed())
 
 			createdConfigMap := &corev1.ConfigMap{}
 			configKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
@@ -151,7 +151,7 @@ var _ = Describe("Namespace controller", func() {
 					Name: namespace,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			_, err := namespaceTestReconciler.Reconcile(Ctx, reconcile.Request{
 				NamespacedName: types.NamespacedName{
@@ -165,15 +165,15 @@ var _ = Describe("Namespace controller", func() {
 				return errors.IsNotFound(err)
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
-			Expect(K8sClient.Delete(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
 		})
 
 		It("should create ConfigMap when sidecar injection is enabled", func() {
 			namespace := Test + "5"
 			instance.Spec.Sidecar.Enabled = true
-			Expect(K8sClient.Create(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 			instance.Status.Resources = "created"
-			Expect(K8sClient.Status().Update(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Status().Update(Ctx, instance)).To(Succeed())
 
 			createdConfigMap := &corev1.ConfigMap{}
 			configKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
@@ -189,7 +189,7 @@ var _ = Describe("Namespace controller", func() {
 					},
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			_, err := namespaceTestReconciler.Reconcile(Ctx, reconcile.Request{
 				NamespacedName: types.NamespacedName{
@@ -204,7 +204,7 @@ var _ = Describe("Namespace controller", func() {
 				return err1 == nil && errors.IsNotFound(err2)
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 
-			Expect(K8sClient.Delete(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
 		})
 
 		It("should create ConfigMap and Secret when sidecar injection and FluxNinja plugin are enabled", func() {
@@ -214,9 +214,9 @@ var _ = Describe("Namespace controller", func() {
 			instance.Spec.Sidecar.EnableNamespaceByDefault = []string{namespace}
 			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
 			instance.Spec.Secrets.FluxNinjaPlugin.Value = fmt.Sprintf("enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(Test)))
-			Expect(K8sClient.Create(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 			instance.Status.Resources = "created"
-			Expect(K8sClient.Status().Update(Ctx, instance)).To(BeNil())
+			Expect(K8sClient.Status().Update(Ctx, instance)).To(Succeed())
 
 			createdConfigMap := &corev1.ConfigMap{}
 			configKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
@@ -229,7 +229,7 @@ var _ = Describe("Namespace controller", func() {
 					Name: namespace,
 				},
 			}
-			Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			_, err := namespaceTestReconciler.Reconcile(Ctx, reconcile.Request{
 				NamespacedName: types.NamespacedName{
@@ -244,10 +244,10 @@ var _ = Describe("Namespace controller", func() {
 				return err1 == nil && err2 == nil
 			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
 			Expect(createdSecret.Data["apiKey"]).To(Equal([]byte(Test)))
-			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: namespace}, ns)).To(BeNil())
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: namespace}, ns)).To(Succeed())
 			Expect(ns.Labels[SidecarLabelKey]).To(Equal(Enabled))
 
-			Expect(K8sClient.Delete(Ctx, ns)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
 		})
 
 		AfterEach(func() {
