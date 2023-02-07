@@ -100,8 +100,10 @@ maintain the stability and reliability of modern web-scale applications:
   enables the agent and controller to make informed decisions about how to
   handle requests and prioritize workloads.
 - **Dataflow-driven policies**: Aperture's controller uses dataflow-driven
-  policies to continuously monitor and adjust service-level objectives, ensuring
-  that the application remains stable and reliable.
+  policies to continuously track service-level indicators and perform recovery
+  actions whenever there is a deviation from service-level objectives. This
+  ensures that the application remains stable and reliable even in the face of
+  failures.
 - **Flexibility**: Aperture can be deployed with either Service Meshes or SDKs,
   depending on your infrastructure and requirements, and allows you to customize
   the flow control policies to meet the specific needs of your application
