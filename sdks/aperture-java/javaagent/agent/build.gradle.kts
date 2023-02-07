@@ -5,6 +5,11 @@ plugins {
     id("com.github.johnrengelman.shadow")
 }
 
+java {
+    setSourceCompatibility("1.8")
+    setTargetCompatibility("1.8")
+}
+
 tasks.jar {
     manifest {
         attributes["Premain-Class"] = "com.fluxninja.aperture.instrumentation.ApertureInstrumentationAgent"
@@ -15,7 +20,6 @@ tasks.jar {
 tasks.shadowJar {
     archiveBaseName.set("agent")
     archiveClassifier.set("")
-
 
     mergeServiceFiles()
     relocate("javassist", "com.example.javassist")

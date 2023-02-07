@@ -8,6 +8,11 @@ tasks.shadowJar {
     mergeServiceFiles()
 }
 
+java {
+    setSourceCompatibility("1.8")
+    setTargetCompatibility("1.8")
+}
+
 application {
     mainClass.set("com.fluxninja.example.NettyServer")
 }
