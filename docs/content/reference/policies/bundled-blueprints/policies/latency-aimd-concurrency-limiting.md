@@ -8,10 +8,18 @@ import {apertureVersion} from '../../../../apertureVersion.js';
 
 ## Introduction
 
-This policy detect overloads/cascading failures by comparing the real-time
+This policy detects overloads/cascading failures by comparing the real-time
 latency with it's exponential moving average. Gradient controller is then used
 to calculate a proportional response that limits the accepted concurrency.
 Concurrency is increased additively when the overload is no longer detected.
+
+:::info
+
+AIMD stands for Additive Increase, Multiplicative Decrease. That is, the
+concurrency is reduced by a multiplicative factor when the service is overloaded
+and increased by an additive factor when the service is no longer overloaded.
+
+:::
 
 :::info
 

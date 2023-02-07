@@ -4,6 +4,11 @@ plugins {
     id("com.github.johnrengelman.shadow")
 }
 
+java {
+    setSourceCompatibility("1.8")
+    setTargetCompatibility("1.8")
+}
+
 application {
     mainClass.set("com.fluxninja.example.App")
 }
@@ -15,9 +20,8 @@ tasks.jar {
 }
 
 tasks.shadowJar {
-    archiveBaseName.set("fatApp")
-    archiveClassifier.set("")
-
+    archiveBaseName.set("standalone-example")
+    archiveClassifier.set("all")
 
     mergeServiceFiles()
     relocate("javassist", "com.example.javassist")

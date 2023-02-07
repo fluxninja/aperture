@@ -383,6 +383,201 @@ jobs:
             git diff --cached --exit-code
           when: always
 
+  validate-publish-java-sdk:
+    executor: base-machine-executor
+    environment:
+      DOCKER_BUILDKIT: 1
+    parameters:
+      docker-context:
+        type: string
+        description:
+          Path to the directory containing your build context, defaults to "".
+        default: .
+      path:
+        type: string
+        description:
+          Path to the directory containing your Dockerfile, defaults to "".
+        default: .
+      tag:
+        type: string
+        description: Docker image tag.
+        default: ${CIRCLE_SHA1:0:8}
+      registry:
+        type: string
+        default: docker.io
+        description: Name of registry to use, defaults to docker.io.
+      remote-repo:
+        type: string
+        default: ""
+        description: Remote repository to mirror the SDK to.
+      remote-repo-fingerprint:
+        type: string
+        default: ""
+        description: Fingerprint of remote repository to mirror the SDK to.
+      port:
+        type: string
+        default: "8089"
+        description: Port to start sdk-validator's grpc server on.
+      requests:
+        type: integer
+        default: 10
+        description: Number of requests to make to SDK example server.
+      rejects:
+        type: integer
+        default: 5
+        description: Number of requests (out of 'requests') to reject.
+      sdk-port:
+        type: string
+        default: "8080"
+        description: Port to expose on SDK's example container.
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8" # fluxninja/cloud R/O
+            - << parameters.remote-repo-fingerprint >> # fluxninja/<sdk> R/W
+      - run: *install_opsninja
+      - run:
+          name: Workaround for old expired Heroku apt key
+          command: |
+            sudo rm -rf /etc/apt/sources.list.d/heroku.list
+      - aperture_docker_build:
+          step-name: Build base image with all aperture java SDK jars
+          docker-context: <<parameters.docker-context>>
+          dockerfile: dockerfiles/aperture-java-all/Dockerfile
+          image: aperture-java-all
+          path: <<parameters.path>>
+          tag: <<parameters.tag>>
+          registry: <<parameters.registry>>
+          use-buildkit: true
+      - run:
+          name: print images
+          command: |
+            docker image ls
+      - aperture_docker_build:
+          step-name: Build feature flow example image
+          docker-context: <<parameters.docker-context>>
+          dockerfile: dockerfiles/featureflow/Dockerfile
+          image: aperture-java-feature-flow
+          path: <<parameters.path>>
+          tag: <<parameters.tag>>
+          registry: <<parameters.registry>>
+          use-buildkit: true
+          extra_build_args: --build-arg=IMAGE_TAG=<<parameters.tag>>
+      - aperture_docker_build:
+          step-name: Build armeria example image
+          docker-context: <<parameters.docker-context>>
+          dockerfile: dockerfiles/middlewares/armeria/Dockerfile
+          image: aperture-java-armeria
+          path: <<parameters.path>>
+          tag: <<parameters.tag>>
+          registry: <<parameters.registry>>
+          use-buildkit: true
+          extra_build_args: --build-arg=IMAGE_TAG=<<parameters.tag>>
+      - aperture_docker_build:
+          step-name: Build netty example image
+          docker-context: <<parameters.docker-context>>
+          dockerfile: dockerfiles/middlewares/netty/Dockerfile
+          image: aperture-java-netty
+          path: <<parameters.path>>
+          tag: <<parameters.tag>>
+          registry: <<parameters.registry>>
+          use-buildkit: true
+          extra_build_args: --build-arg=IMAGE_TAG=<<parameters.tag>>
+      - aperture_docker_build:
+          step-name: Build javaagent armeria example image
+          docker-context: <<parameters.docker-context>>
+          dockerfile: dockerfiles/javaagent/armeria/Dockerfile
+          image: aperture-javaagent-armeria
+          path: <<parameters.path>>
+          tag: <<parameters.tag>>
+          registry: <<parameters.registry>>
+          use-buildkit: true
+          extra_build_args: --build-arg=IMAGE_TAG=<<parameters.tag>>
+      - aperture_docker_build:
+          step-name: Build javaagent netty example image
+          docker-context: <<parameters.docker-context>>
+          dockerfile: dockerfiles/javaagent/netty/Dockerfile
+          image: aperture-javaagent-netty
+          path: <<parameters.path>>
+          tag: <<parameters.tag>>
+          registry: <<parameters.registry>>
+          use-buildkit: true
+          extra_build_args: --build-arg=IMAGE_TAG=<<parameters.tag>>
+      - aperture_docker_build:
+          step-name: Build java sdk example image
+          docker-context: <<parameters.docker-context>>
+          dockerfile: dockerfiles/example/Dockerfile
+          image: aperture-java-example
+          path: <<parameters.path>>
+          tag: <<parameters.tag>>
+          registry: <<parameters.registry>>
+          use-buildkit: true
+          extra_build_args: --build-arg=IMAGE_TAG=<<parameters.tag>>
+      - asdf_install:
+          cache_name: validate-sdk
+          tools: |-
+            golang
+      - run:
+          name: Run SDK Validator against feature flow example
+          command: >
+            go run cmd/sdk-validator/main.go
+            -sdk-docker-image=<<parameters.registry>>/aperture-java-feature-flow:<<parameters.tag>>
+            -port=<<parameters.port>>
+            -requests=<<parameters.requests>>
+            -rejects=<<parameters.rejects>>
+            -sdk-port=<<parameters.sdk-port>>
+      - run:
+          name: Run SDK Validator against armeria example
+          command: >
+            go run cmd/sdk-validator/main.go
+            -sdk-docker-image=<<parameters.registry>>/aperture-java-armeria:<<parameters.tag>>
+            -port=<<parameters.port>>
+            -requests=<<parameters.requests>>
+            -rejects=<<parameters.rejects>>
+            -sdk-port=<<parameters.sdk-port>>
+      - run:
+          name: Run SDK Validator against netty example
+          command: >
+            go run cmd/sdk-validator/main.go
+            -sdk-docker-image=<<parameters.registry>>/aperture-java-netty:<<parameters.tag>>
+            -port=<<parameters.port>>
+            -requests=<<parameters.requests>>
+            -rejects=<<parameters.rejects>>
+            -sdk-port=<<parameters.sdk-port>>
+      - run:
+          name: Run SDK Validator against javaagent armeria example
+          command: >
+            go run cmd/sdk-validator/main.go
+            -sdk-docker-image=<<parameters.registry>>/aperture-javaagent-armeria:<<parameters.tag>>
+            -port=<<parameters.port>>
+            -requests=<<parameters.requests>>
+            -rejects=<<parameters.rejects>>
+            -sdk-port=<<parameters.sdk-port>>
+      - run:
+          name: Run SDK Validator against javaagent netty example
+          command: >
+            go run cmd/sdk-validator/main.go
+            -sdk-docker-image=<<parameters.registry>>/aperture-javaagent-netty:<<parameters.tag>>
+            -port=<<parameters.port>>
+            -requests=<<parameters.requests>>
+            -rejects=<<parameters.rejects>>
+            -sdk-port=<<parameters.sdk-port>>
+      - when:
+          condition:
+            equal: [ main, << pipeline.git.branch >> ]
+          steps:
+            - run:
+                name: Publish SDK to <<parameters.remote-repo>>
+                command: |
+                  export LOGURU_LEVEL=TRACE
+                  export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes -o IdentityAgent=none"
+                  args=(
+                    --remote-repo=<<parameters.remote-repo>>
+                    --source-repo-sdk-path=<<parameters.path>>
+                  )
+                  fn release publish-sdk "${args[@]}"
+
   validate-publish-sdk:
     executor: base-machine-executor
     environment:
@@ -907,12 +1102,10 @@ workflows:
           name: Build with OpenJDK 18
           docker-image: cimg/openjdk:18.0
           path: sdks/aperture-java
-      - validate-publish-sdk:
-          name: validate-publish-aperture-java
+      - validate-publish-java-sdk:
+          name: Validate and publish java SDK
           path: sdks/aperture-java
           docker-context: sdks/aperture-java
-          dockerfile: Dockerfile
-          docker-image: aperture-java-example
           remote-repo: fluxninja/aperture-java
           remote-repo-fingerprint: "79:0e:fb:cd:d3:3e:14:dd:52:de:b7:1c:ac:1e:ea:84"
 

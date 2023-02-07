@@ -9,6 +9,11 @@ repositories {
     mavenLocal()
 }
 
+java {
+    setSourceCompatibility("1.8")
+    setTargetCompatibility("1.8")
+}
+
 val tomcatVersion = "7.0.76"
 dependencies {
     tomcat("org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}")

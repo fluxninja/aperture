@@ -109,7 +109,7 @@ var _ = BeforeSuite(func() {
 			Name: AppName,
 		},
 	}
-	Expect(K8sClient.Create(Ctx, ns)).To(BeNil())
+	Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 	DefaultControllerInstance = &controllerv1alpha1.Controller{
 		ObjectMeta: metav1.ObjectMeta{

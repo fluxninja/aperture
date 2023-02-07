@@ -95,7 +95,7 @@ var _ = Describe("Authorization handler", func() {
 			)
 			resp, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
 			Expect(err).NotTo(HaveOccurred())
-			Expect(resp.GetDynamicMetadata()).ShouldNot(BeNil())
+			Expect(resp.GetDynamicMetadata()).NotTo(BeNil())
 		})
 	})
 })

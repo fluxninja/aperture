@@ -73,7 +73,7 @@ var _ = Describe("Jobs", func() {
 			InitiallyHealthy: false,
 		}
 		jobGroup, err = NewJobGroup(rootRegistry, 10, RescheduleMode, groupWatchers)
-		Expect(err).To(BeNil())
+		Expect(err).NotTo(HaveOccurred())
 
 		addOne = func(ctx context.Context) (proto.Message, error) {
 			select {
@@ -107,13 +107,13 @@ var _ = Describe("Jobs", func() {
 
 		// START JOB GROUP
 		err = jobGroup.Start()
-		Expect(err).To(BeNil())
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	AfterEach(func() {
 		// STOP JOB GROUP
 		err := jobGroup.Stop()
-		Expect(err).To(BeNil())
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	It("runs instant jobs", func() {
@@ -243,28 +243,28 @@ var _ = Describe("Jobs", func() {
 	It("does not allow running nil jobs", func() {
 		job := NewBasicJob("instant-run-job", nil)
 		_, err := job.Execute(context.Background())
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(HaveOccurred())
 	})
 
 	It("allows registering nil jobs", func() {
 		job := NewBasicJob("test-job", nil)
 		err := jobGroup.RegisterJob(job, jobConfig)
-		Expect(err).To(BeNil())
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	It("does not allow registering same job", func() {
 		job := NewBasicJob("test-job", addOne)
 		job2 := job
 		err := jobGroup.RegisterJob(job, jobConfig)
-		Expect(err).To(BeNil())
+		Expect(err).NotTo(HaveOccurred())
 
 		err = jobGroup.RegisterJob(job2, jobConfig)
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(HaveOccurred())
 
 		jobGroup.DeregisterAll()
 		// error when registering job multiple times, written here to achieve more coverage
 		err = jobGroup.DeregisterJob(job.Name())
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(HaveOccurred())
 		Expect(jobGroup.JobInfo(job.Name())).To(BeNil())
 	})
 })
@@ -273,7 +273,7 @@ func runJobGroup(jobGroup *JobGroup, groupConfig *testGroupConfig, jobConfig Job
 	// Register all jobs in group
 	for _, job := range groupConfig.jobs {
 		err := jobGroup.RegisterJob(job, jobConfig)
-		Expect(err).To(BeNil())
+		Expect(err).NotTo(HaveOccurred())
 	}
 
 	// check initially healthy status
@@ -303,7 +303,7 @@ func runJobGroup(jobGroup *JobGroup, groupConfig *testGroupConfig, jobConfig Job
 	// cleanup
 	for _, job := range groupConfig.jobs {
 		err := jobGroup.DeregisterJob(job.Name())
-		Expect(err).To(BeNil())
+		Expect(err).NotTo(HaveOccurred())
 	}
 }
 

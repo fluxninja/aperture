@@ -92,7 +92,7 @@ var _ = Describe("MutatingWebhookConfiguration controller", Ordered, func() {
 		It("should not update agent MutatingWebhookConfiguration when started for Controller manager", func() {
 			copiedInstance := instance.DeepCopy()
 			copiedInstance.Name = AgentMutatingWebhookName
-			Expect(K8sClient.Create(Ctx, copiedInstance)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, copiedInstance)).To(Succeed())
 
 			mutatingWebhookTestReconciler.AgentManager = false
 
@@ -111,13 +111,13 @@ var _ = Describe("MutatingWebhookConfiguration controller", Ordered, func() {
 			Expect(copiedInstance.Webhooks[0].SideEffects).To(Equal(instance.Webhooks[0].SideEffects))
 			Expect(copiedInstance.Webhooks[0].TimeoutSeconds).To(Equal(instance.Webhooks[0].TimeoutSeconds))
 
-			Expect(K8sClient.Delete(Ctx, copiedInstance)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, copiedInstance)).To(Succeed())
 		})
 
 		It("should not update controller MutatingWebhookConfiguration when started for Agent manager", func() {
 			copiedInstance := instance.DeepCopy()
 			copiedInstance.Name = ControllerMutatingWebhookName
-			Expect(K8sClient.Create(Ctx, copiedInstance)).To(BeNil())
+			Expect(K8sClient.Create(Ctx, copiedInstance)).To(Succeed())
 
 			mutatingWebhookTestReconciler.ControllerManager = false
 
@@ -135,7 +135,7 @@ var _ = Describe("MutatingWebhookConfiguration controller", Ordered, func() {
 			Expect(copiedInstance.Webhooks[0].FailurePolicy).To(Equal(instance.Webhooks[0].FailurePolicy))
 			Expect(copiedInstance.Webhooks[0].SideEffects).To(Equal(instance.Webhooks[0].SideEffects))
 			Expect(copiedInstance.Webhooks[0].TimeoutSeconds).To(Equal(instance.Webhooks[0].TimeoutSeconds))
-			Expect(K8sClient.Delete(Ctx, copiedInstance)).To(BeNil())
+			Expect(K8sClient.Delete(Ctx, copiedInstance)).To(Succeed())
 		})
 	})
 
