@@ -1,4 +1,3 @@
-//local aperture = import './blueprints/main.libsonnet';
 local aperture = import 'github.com/fluxninja/aperture/blueprints/main.libsonnet';
 
 
@@ -38,69 +37,9 @@ local staticParameter =
     + rateLimiterParameters.withLazySync({ enabled: true, num_sync: 5 },)
   );
 
-// local policyDef =
-//   policy.new()
-//   + policy.withCircuit(
-//     circuit.new()
-//     + circuit.withEvaluationInterval('300s')
-//     + circuit.withComponents([
-//       component.withFlowControl(
-//         flowControl.new()
-//         + flowControl.withRateLimiter(
-//           rateLimiter.new()
-//           + rateLimiter.withInPorts({ limit: port.withConstantSignal(120.0) })
-//           + rateLimiter.withFlowSelector(svcSelector)
-//           + rateLimiter.withParameters(
-//             rateLimiterParameters.new()
-//             + rateLimiterParameters.withLimitResetInterval('60s')
-//             + rateLimiterParameters.withLabelKey('http.request.header.user_id')
-//             + rateLimiterParameters.withLazySync({ enabled: true, num_sync: 5 },)
-//           ),
-//           +rateLimiter.withDynamicConfigKey('rate_limiter'),
-//         ),
-//       ),
-//     ]),
-//   );
-// + policy.withResources(
-//   resources.new()
-//   + resources.withClassifiers([],)
-// );
-
-// local policyResource = {
-//   kind: 'Policy',
-//   apiVersion: 'fluxninja.com/v1alpha1',
-//   metadata: {
-//     name: 'static-rate-limiting',
-//     labels: {
-//       'fluxninja.com/validate': 'true',
-//     },
-//   },
-//   spec: policyDef,
-// };
-
-// policyResource
-
 local policyResource = StaticRateLimiting({
   policy_name: 'static-rate-limiting',
   evaluation_interval: '300s',
-  // components: [
-  //   component.new()
-  //   + component.withFlowControl(
-  //     flowControl.new()
-  //     + flowControl.withRateLimiter(
-  //       rateLimiter.new()
-  //       + rateLimiter.withInPorts({ limit: port.withConstantSignal(120.0) })
-  //       + rateLimiter.withFlowSelector(svcSelector)
-  //       + rateLimiter.withParameters(
-  //         rateLimiterParameters.new()
-  //         + rateLimiterParameters.withLimitResetInterval('60s')
-  //         + rateLimiterParameters.withLabelKey('http.request.header.user_id')
-  //         + rateLimiterParameters.withLazySync({ enabled: true, num_sync: 5 },)
-  //       ),
-  //       +rateLimiter.withDynamicConfigKey('rate_limiter'),
-  //     ),
-  //   ),
-  // ],
   rate_limiter+: {
     flow_selector: svcSelector,
     rate_limit: 120.0,
