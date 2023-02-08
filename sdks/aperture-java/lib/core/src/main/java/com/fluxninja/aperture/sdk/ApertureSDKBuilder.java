@@ -55,6 +55,9 @@ public final class ApertureSDKBuilder {
    * @return the builder object.
    */
   public ApertureSDKBuilder addBlockedPaths(String paths) {
+    if (paths == null || paths.isEmpty()) {
+      return this;
+    }
     return this.addBlockedPaths(Arrays.asList(paths.split("\\s*,\\s*")));
   }
 
