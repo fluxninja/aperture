@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ControlPointCacheClient interface {
-	GetControlPoint(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*KubernetesControlPoints, error)
+	GetControlPoints(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*KubernetesControlPoints, error)
 }
 
 type controlPointCacheClient struct {
@@ -30,9 +30,9 @@ func NewControlPointCacheClient(cc grpc.ClientConnInterface) ControlPointCacheCl
 	return &controlPointCacheClient{cc}
 }
 
-func (c *controlPointCacheClient) GetControlPoint(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*KubernetesControlPoints, error) {
+func (c *controlPointCacheClient) GetControlPoints(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*KubernetesControlPoints, error) {
 	out := new(KubernetesControlPoints)
-	err := c.cc.Invoke(ctx, "/aperture.controlpointcache.v1.ControlPointCache/GetControlPoint", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/aperture.controlpointcache.v1.ControlPointCache/GetControlPoints", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -43,15 +43,15 @@ func (c *controlPointCacheClient) GetControlPoint(ctx context.Context, in *empty
 // All implementations should embed UnimplementedControlPointCacheServer
 // for forward compatibility
 type ControlPointCacheServer interface {
-	GetControlPoint(context.Context, *emptypb.Empty) (*KubernetesControlPoints, error)
+	GetControlPoints(context.Context, *emptypb.Empty) (*KubernetesControlPoints, error)
 }
 
 // UnimplementedControlPointCacheServer should be embedded to have forward compatible implementations.
 type UnimplementedControlPointCacheServer struct {
 }
 
-func (UnimplementedControlPointCacheServer) GetControlPoint(context.Context, *emptypb.Empty) (*KubernetesControlPoints, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetControlPoint not implemented")
+func (UnimplementedControlPointCacheServer) GetControlPoints(context.Context, *emptypb.Empty) (*KubernetesControlPoints, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetControlPoints not implemented")
 }
 
 // UnsafeControlPointCacheServer may be embedded to opt out of forward compatibility for this service.
@@ -65,20 +65,20 @@ func RegisterControlPointCacheServer(s grpc.ServiceRegistrar, srv ControlPointCa
 	s.RegisterService(&ControlPointCache_ServiceDesc, srv)
 }
 
-func _ControlPointCache_GetControlPoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ControlPointCache_GetControlPoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ControlPointCacheServer).GetControlPoint(ctx, in)
+		return srv.(ControlPointCacheServer).GetControlPoints(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/aperture.controlpointcache.v1.ControlPointCache/GetControlPoint",
+		FullMethod: "/aperture.controlpointcache.v1.ControlPointCache/GetControlPoints",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ControlPointCacheServer).GetControlPoint(ctx, req.(*emptypb.Empty))
+		return srv.(ControlPointCacheServer).GetControlPoints(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -91,8 +91,8 @@ var ControlPointCache_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ControlPointCacheServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetControlPoint",
-			Handler:    _ControlPointCache_GetControlPoint_Handler,
+			MethodName: "GetControlPoints",
+			Handler:    _ControlPointCache_GetControlPoints_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package aperture.flowcontrol.controlpoints.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// grpc service
+service FlowControlControlPointsService {
+  rpc GetControlPoints(google.protobuf.Empty) returns (FlowControlControlPoints) {
+    option (google.api.http) = {get: "/v1/flowcontrol/controlpoints"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-agent"];
+    };
+  }
+}
+
+message FlowControlControlPoints {
+  repeated FlowControlControlPoint control_points = 1;
+}
+
+message FlowControlControlPoint {
+  string service = 1;
+  string control_point = 2;
+}

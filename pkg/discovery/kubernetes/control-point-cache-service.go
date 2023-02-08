@@ -27,9 +27,9 @@ func RegisterControlPointCacheService(server *grpc.Server, cpc ControlPointCache
 func (s ControlPointCacheService) GetControlPoint(ctx context.Context, _ *emptypb.Empty) (*controlpointcachev1.KubernetesControlPoints, error) {
 	keys := s.ControlPointCache.Keys()
 	controlPoints := make([]*controlpointcachev1.KubernetesControlPoint, len(keys))
-	for i, key := range keys {
+	for _, key := range keys {
 		cp := key.ToProto()
-		controlPoints[i] = cp
+		controlPoints = append(controlPoints, cp)
 	}
 	return &controlpointcachev1.KubernetesControlPoints{
 		ControlPoints: controlPoints,

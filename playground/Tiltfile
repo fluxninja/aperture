@@ -209,6 +209,9 @@ DEP_TREE = {
                     "build_args":{'RACE':""},
                 }
             ],
+            "port_forwards": {
+                "agent": "8080:8080",
+            },
             "kinds": [
                 dict(kind="Agent", image_object={'json_path': '{.spec.image}', 'repo_field': 'repository', 'tag_field': 'tag'}, pod_readiness='wait'),
             ],

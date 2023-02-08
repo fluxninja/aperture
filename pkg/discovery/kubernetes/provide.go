@@ -42,12 +42,8 @@ type KubernetesDiscoveryConfig struct {
 func Module() fx.Option {
 	return fx.Options(
 		notifiers.TrackersConstructor{Name: FxTagBase}.Annotate(),
-		fx.Provide(
-			ProvideControlPointCache,
-		),
-		fx.Invoke(
-			InvokeServiceDiscovery,
-		),
+		fx.Provide(ProvideControlPointCache),
+		fx.Invoke(InvokeServiceDiscovery),
 		grpcgateway.RegisterHandler{Handler: controlpointcachev1.RegisterControlPointCacheHandlerFromEndpoint}.Annotate(),
 		fx.Invoke(RegisterControlPointCacheService),
 	)

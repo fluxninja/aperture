@@ -3,9 +3,10 @@ package entitycache
 import (
 	"context"
 
-	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/entitycache/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
+
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/entitycache/v1"
 )
 
 // EntityCacheService is the implementation of entitycachev1.EntityCacheService interface.
