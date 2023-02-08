@@ -22,7 +22,9 @@ type Alerter struct {
 	name           string
 	severity       string
 	alertChannels  []string
+	componentID    string
 	resolveTimeout time.Duration
+	labels         map[string]string
 }
 
 // Name implements runtime.Component.
@@ -38,7 +40,7 @@ func (a *Alerter) ShortDescription() string { return fmt.Sprintf("%s/%s", a.name
 var _ runtime.Component = (*Alerter)(nil)
 
 // NewAlerterAndOptions creates alerter and its fx options.
-func NewAlerterAndOptions(alerterProto *policylangv1.Alerter, _ string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewAlerterAndOptions(alerterProto *policylangv1.Alerter, componentID string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	parameters := alerterProto.Parameters
 	alerter := &Alerter{
 		name:           parameters.AlertName,
@@ -46,8 +48,13 @@ func NewAlerterAndOptions(alerterProto *policylangv1.Alerter, _ string, policyRe
 		resolveTimeout: parameters.ResolveTimeout.AsDuration(),
 		alertChannels:  make([]string, 0),
 		policyReadAPI:  policyReadAPI,
+		componentID:    componentID,
+		labels:         make(map[string]string),
 	}
 	alerter.alertChannels = append(alerter.alertChannels, parameters.AlertChannels...)
+	if alerterProto.Parameters.Labels != nil {
+		alerter.labels = alerterProto.Parameters.Labels
+	}
 
 	return alerter, fx.Options(
 		fx.Invoke(
@@ -84,11 +91,16 @@ func (a *Alerter) createAlert() *alerts.Alert {
 		alerts.WithAlertChannels(a.alertChannels),
 		alerts.WithLabel("policy_name", a.policyReadAPI.GetPolicyName()),
 		alerts.WithLabel("type", "alerter"),
+		alerts.WithLabel("component_id", a.componentID),
 		alerts.WithResolveTimeout(a.resolveTimeout),
 		alerts.WithGeneratorURL(
 			fmt.Sprintf("http://%s/%s/%s", info.GetHostInfo().Hostname, a.policyReadAPI.GetPolicyName(), a.name),
 		),
 	)
+
+	for key, val := range a.labels {
+		newAlert.SetLabel(key, val)
+	}
 
 	return newAlert
 }
