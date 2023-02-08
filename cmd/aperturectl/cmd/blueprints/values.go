@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/fluxninja/aperture/pkg/log"
@@ -52,6 +53,20 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 		if err := copyFile(file, valuesFile); err != nil {
 			return err
 		}
+
+		editor := os.Getenv("EDITOR")
+		if editor == "" {
+			editor = "vi"
+		}
+		cmd := exec.Command(editor, valuesFile)
+		cmd.Stdin = os.Stdin
+		cmd.Stderr = os.Stderr
+		cmd.Stdout = os.Stdout
+		err := cmd.Run()
+		if err != nil {
+			return fmt.Errorf("error opening file with editor: %s", err)
+		}
+
 		log.Info().Msgf("values file for the blueprint %s is available at: %s", blueprintName, valuesFile)
 		return nil
 	},
