@@ -1,5 +1,8 @@
+//local aperture = import '../../../../../../../../blueprints/main.libsonnet';
+//local aperture = import './blueprints/main.libsonnet';
 local aperture = import 'github.com/fluxninja/aperture/blueprints/main.libsonnet';
 
+local StaticRateLimiting = aperture.policies.StaticRateLimiting.policy;
 local policy = aperture.spec.v1.Policy;
 local resources = aperture.spec.v1.Resources;
 local component = aperture.spec.v1.Component;
@@ -27,82 +30,177 @@ local svcSelector =
     + flowMatcher.withControlPoint('ingress')
   );
 
-local policyDef =
-  policy.new()
-  + policy.withResources(
-    resources.new()
-    + resources.withClassifiers(
-      classifier.new()
-      + classifier.withFlowSelector(svcSelector)
-      + classifier.withRules({
-        user_id: rule.new()
-                 + rule.withTelemetry(true)
-                 + rule.withRego(
-                   local source = |||
-                     package graphql_example
-                     import future.keywords.if
-                     query_ast := graphql.parse_query(input.parsed_body.query)
-                     claims := payload if {
-                       io.jwt.verify_hs256(bearer_token, "secret")
-                       [_, payload, _] := io.jwt.decode(bearer_token)
-                     }
-                     bearer_token := t if {
-                       v := input.attributes.request.http.headers.authorization
-                       startswith(v, "Bearer ")
-                       t := substring(v, count("Bearer "), -1)
-                     }
-                     queryIsCreateTodo if {
-                       some operation
-                       walk(query_ast, [_, operation])
-                       operation.Name == "createTodo"
-                       count(operation.SelectionSet) > 0
-                       some selection
-                       walk(operation.SelectionSet, [_, selection])
-                       selection.Name == "createTodo"
-                     }
-                     userID := u if {
-                       queryIsCreateTodo
-                       u := claims.userID
-                     }
-                   |||;
-                   rego.new()
-                   + rego.withQuery('data.graphql_example.userID')
-                   + rego.withSource(source)
-                 ),
-      }),
-    )
-  )
-  + policy.withCircuit(
-    circuit.new()
-    + circuit.withEvaluationInterval('0.5s')
-    + circuit.withComponents([
-      component.withFlowControl(
-        flowControl.new()
-        + flowControl.withRateLimiter(
-          rateLimiter.new()
-          + rateLimiter.withInPorts({ limit: port.withConstantSignal(10.0) })
-          + rateLimiter.withFlowSelector(svcSelector)
-          + rateLimiter.withParameters(
-            rateLimiterParameters.new()
-            + rateLimiterParameters.withLimitResetInterval('1s')
-            + rateLimiterParameters.withLabelKey('user_id')
-            + rateLimiterParameters.withLazySync({ enabled: false, num_sync: 5 })
-          )
-        ),
-      ),
-    ]),
+local staticParameter =
+  rateLimiter.new()
+  + rateLimiter.withParameters(
+    rateLimiterParameters.new()
+    + rateLimiterParameters.withLimitResetInterval('1s')
+    + rateLimiterParameters.withLabelKey('user_id')
+    + rateLimiterParameters.withLazySync({ enabled: true, num_sync: 5 },)
   );
 
-local policyResource = {
-  kind: 'Policy',
-  apiVersion: 'fluxninja.com/v1alpha1',
-  metadata: {
-    name: 'graphql-static-rate-limiting',
-    labels: {
-      'fluxninja.com/validate': 'true',
+// local policyDef =
+//   policy.new()
+//   + policy.withResources(
+//     resources.new()
+//     + resources.withClassifiers(
+//       classifier.new()
+//       + classifier.withFlowSelector(svcSelector)
+//       + classifier.withRules({
+//         user_id: rule.new()
+//                  + rule.withTelemetry(true)
+//                  + rule.withRego(
+//                    local source = |||
+//                      package graphql_example
+//                      import future.keywords.if
+//                      query_ast := graphql.parse_query(input.parsed_body.query)
+//                      claims := payload if {
+//                        io.jwt.verify_hs256(bearer_token, "secret")
+//                        [_, payload, _] := io.jwt.decode(bearer_token)
+//                      }
+//                      bearer_token := t if {
+//                        v := input.attributes.request.http.headers.authorization
+//                        startswith(v, "Bearer ")
+//                        t := substring(v, count("Bearer "), -1)
+//                      }
+//                      queryIsCreateTodo if {
+//                        some operation
+//                        walk(query_ast, [_, operation])
+//                        operation.Name == "createTodo"
+//                        count(operation.SelectionSet) > 0
+//                        some selection
+//                        walk(operation.SelectionSet, [_, selection])
+//                        selection.Name == "createTodo"
+//                      }
+//                      userID := u if {
+//                        queryIsCreateTodo
+//                        u := claims.userID
+//                      }
+//                    |||;
+//                    rego.new()
+//                    + rego.withQuery('data.graphql_example.userID')
+//                    + rego.withSource(source)
+//                  ),
+//       }),
+//     )
+//   )
+// + policy.withCircuit(
+//   circuit.new()
+//   + circuit.withEvaluationInterval('0.5s')
+//   + circuit.withComponents([
+//     component.withFlowControl(
+//       flowControl.new()
+//       + flowControl.withRateLimiter(
+//         rateLimiter.new()
+//         + rateLimiter.withInPorts({ limit: port.withConstantSignal(10.0) })
+//         + rateLimiter.withFlowSelector(svcSelector)
+//         + rateLimiter.withParameters(
+//           rateLimiterParameters.new()
+//           + rateLimiterParameters.withLimitResetInterval('1s')
+//           + rateLimiterParameters.withLabelKey('user_id')
+//           + rateLimiterParameters.withLazySync({ enabled: false, num_sync: 5 })
+//         ),
+//         +rateLimiter.withDynamicConfigKey('rate_limiter'),
+//       ),
+//     ),
+//   ]),
+// );
+
+// local policyResource = {
+//   kind: 'Policy',
+//   apiVersion: 'fluxninja.com/v1alpha1',
+//   dynamicConfig: {
+//     rate_limiter: {
+//       overrides: [],
+//     },
+//   },
+//   metadata: {
+//     name: 'graphql-static-rate-limiting',
+//     labels: {
+//       'fluxninja.com/validate': 'true',
+//     },
+//   },
+//   spec: policyDef,
+// };
+
+// policyResource
+
+
+local policyResource = StaticRateLimiting({
+  policy_name: 'graphql-static-rate-limiting',
+  evaluation_interval: '0.5s',
+  rate_limiter+: {
+    flow_selector: svcSelector,
+    rate_limit: 10.0,
+    parameters+: {
+      label_key: 'user_id',
+      limit_reset_interval: '1s',
+    },
+    dynamic_config: {
+      overrides: [],
     },
   },
-  spec: policyDef,
-};
+
+  classifiers: [
+    classifier.new()
+    + classifier.withFlowSelector(svcSelector)
+    + classifier.withRules({
+      user_id: rule.new()
+               + rule.withTelemetry(true)
+               + rule.withRego(
+                 local source = |||
+                   package graphql_example
+                   import future.keywords.if
+                   query_ast := graphql.parse_query(input.parsed_body.query)
+                   claims := payload if {
+                     io.jwt.verify_hs256(bearer_token, "secret")
+                     [_, payload, _] := io.jwt.decode(bearer_token)
+                   }
+                   bearer_token := t if {
+                     v := input.attributes.request.http.headers.authorization
+                     startswith(v, "Bearer ")
+                     t := substring(v, count("Bearer "), -1)
+                   }
+                   queryIsCreateTodo if {
+                     some operation
+                     walk(query_ast, [_, operation])
+                     operation.Name == "createTodo"
+                     count(operation.SelectionSet) > 0
+                     some selection
+                     walk(operation.SelectionSet, [_, selection])
+                     selection.Name == "createTodo"
+                   }
+                   userID := u if {
+                     queryIsCreateTodo
+                     u := claims.userID
+                   }
+                 |||;
+                 rego.new()
+                 + rego.withQuery('data.graphql_example.userID')
+                 + rego.withSource(source)
+               ),
+    }),
+  ],
+  // components: [
+  //   component.new()
+  //   + component.withFlowControl(
+  //     flowControl.new()
+  //     + flowControl.withRateLimiter(
+  //       rateLimiter.new()
+  //       + rateLimiter.withInPorts({ limit: port.withConstantSignal(10.0) })
+  //       + rateLimiter.withFlowSelector(svcSelector)
+  //       + rateLimiter.withParameters(
+  //         rateLimiterParameters.new()
+  //         + rateLimiterParameters.withLimitResetInterval('1s')
+  //         + rateLimiterParameters.withLabelKey('user_id')
+  //         + rateLimiterParameters.withLazySync({ enabled: false, num_sync: 5 })
+  //       ),
+  //       +rateLimiter.withDynamicConfigKey('rate_limiter'),
+  //     ),
+  //   ),
+  // ],
+
+
+}).policyResource;
 
 policyResource

@@ -3,7 +3,7 @@ common:
 
 policy:
   rate_limiter:
-    rate_limit: "120"
+    rate_limit: 120
     flow_selector:
       service_selector:
         service: "service1-demo-app.demoapp.svc.cluster.local"
@@ -11,5 +11,4 @@ policy:
         control_point: "ingress"
     parameters:
       label_key: "http.request.header.user_id"
-    dynamic_config:
-      overrides: []
+      limit_reset_interval: 60s
