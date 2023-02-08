@@ -28,15 +28,6 @@ local svcSelector =
     + flowMatcher.withControlPoint('ingress')
   );
 
-local staticParameter =
-  rateLimiter.new()
-  + rateLimiter.withParameters(
-    rateLimiterParameters.new()
-    + rateLimiterParameters.withLimitResetInterval('60s')
-    + rateLimiterParameters.withLabelKey('http.request.header.user_id')
-    + rateLimiterParameters.withLazySync({ enabled: true, num_sync: 5 },)
-  );
-
 local policyResource = StaticRateLimiting({
   policy_name: 'static-rate-limiting',
   evaluation_interval: '300s',

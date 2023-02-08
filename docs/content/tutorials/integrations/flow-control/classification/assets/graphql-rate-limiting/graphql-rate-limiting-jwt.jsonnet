@@ -28,14 +28,6 @@ local svcSelector =
     + flowMatcher.withControlPoint('ingress')
   );
 
-local staticParameter =
-  rateLimiter.new()
-  + rateLimiter.withParameters(
-    rateLimiterParameters.new()
-    + rateLimiterParameters.withLimitResetInterval('1s')
-    + rateLimiterParameters.withLabelKey('user_id')
-    + rateLimiterParameters.withLazySync({ enabled: true, num_sync: 5 },)
-  );
 local policyResource = StaticRateLimiting({
   policy_name: 'graphql-static-rate-limiting',
   evaluation_interval: '0.5s',
