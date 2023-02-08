@@ -925,6 +925,11 @@ definitions:
         items:
           type: string
         description: A list of alert channel strings.
+      labels:
+        type: object
+        additionalProperties:
+          type: string
+        description: Additional labels to add to alert.
     description: Alerter Parameters is a common config for separate alerter components and alerters embedded in other components.
   v1And:
     type: object
@@ -2435,9 +2440,6 @@ definitions:
       default_config:
         $ref: '#/definitions/v1LoadActuatorDynamicConfig'
         description: Default configuration.
-      alerter_parameters:
-        $ref: '#/definitions/v1AlerterParameters'
-        description: Configuration for embedded alerter.
     title: Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
   v1LoadActuatorDynamicConfig:
     type: object

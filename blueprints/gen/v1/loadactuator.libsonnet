@@ -6,12 +6,6 @@ local loadactuatorins = import './loadactuatorins.libsonnet';
     },
   },
   inPorts:: loadactuatorins,
-  withAlerterParameters(alerter_parameters):: {
-    alerter_parameters: alerter_parameters,
-  },
-  withAlerterParametersMixin(alerter_parameters):: {
-    alerter_parameters+: alerter_parameters,
-  },
   withDefaultConfig(default_config):: {
     default_config: default_config,
   },

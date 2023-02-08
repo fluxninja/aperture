@@ -630,6 +630,11 @@ definitions:
           @gotags: validate:"required"
         type: string
         x-go-validate: required
+      labels:
+        description: Additional labels to add to alert.
+        type: object
+        additionalProperties:
+          type: string
       resolve_timeout:
         description: |-
           Duration of alert resolver.
@@ -1979,9 +1984,6 @@ definitions:
     title: Takes the load multiplier input signal and publishes it to the schedulers
       in the data-plane
     properties:
-      alerter_parameters:
-        description: Configuration for embedded alerter.
-        $ref: '#/definitions/v1AlerterParameters'
       default_config:
         description: Default configuration.
         $ref: '#/definitions/v1LoadActuatorDynamicConfig'

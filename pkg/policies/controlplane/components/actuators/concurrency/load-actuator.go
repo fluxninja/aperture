@@ -2,7 +2,6 @@ package concurrency
 
 import (
 	"context"
-	"fmt"
 	"path"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -12,11 +11,9 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
-	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -26,10 +23,8 @@ import (
 // LoadActuator struct.
 type LoadActuator struct {
 	policyReadAPI     iface.Policy
-	alerterIface      alerts.Alerter
 	decisionWriter    *etcdwriter.Writer
 	loadActuatorProto *policylangv1.LoadActuator
-	alerterParameters *policylangv1.Alerter_Parameters
 	decisionsEtcdPath string
 	agentGroupName    string
 	componentID       string
@@ -67,15 +62,12 @@ func NewLoadActuatorAndOptions(
 		dryRun:            dryRun,
 	}
 
-	lsa.alerterParameters = loadActuatorProto.GetAlerterParameters()
-
 	return lsa, fx.Options(
 		fx.Invoke(lsa.setupWriter),
 	), nil
 }
 
-func (la *LoadActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle, alerterIface *alerts.SimpleAlerter) error {
-	la.alerterIface = alerterIface
+func (la *LoadActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -113,9 +105,6 @@ func (la *LoadActuator) Execute(inPortReadings runtime.PortToReading, tickInfo r
 					lmValue = lmReading.Value()
 				}
 
-				if lmReading.Value() < 1 {
-					la.addAlert()
-				}
 				return nil, la.publishDecision(tickInfo, lmValue, false)
 			} else {
 				logger.Autosample().Info().Msg("Invalid load multiplier data")
@@ -186,26 +175,4 @@ func (la *LoadActuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplie
 	}
 	la.decisionWriter.Write(la.decisionsEtcdPath, dat)
 	return nil
-}
-
-func (la *LoadActuator) addAlert() {
-	// do not generate alerts if config was not provided
-	if la.alerterParameters == nil {
-		return
-	}
-	alert := alerts.NewAlert(
-		alerts.WithName(la.alerterParameters.AlertName),
-		alerts.WithSeverity(alerts.ParseSeverity(la.alerterParameters.Severity)),
-		alerts.WithAlertChannels(la.alerterParameters.AlertChannels),
-		alerts.WithResolveTimeout(la.alerterParameters.ResolveTimeout.AsDuration()),
-		alerts.WithLabel("policy_name", la.policyReadAPI.GetPolicyName()),
-		alerts.WithLabel("type", "concurrency_limiter"),
-		alerts.WithLabel("agent_group", la.agentGroupName),
-		alerts.WithLabel("component_id", la.componentID),
-		alerts.WithGeneratorURL(
-			fmt.Sprintf("http://%s/%s/%s", info.GetHostInfo().Hostname, la.policyReadAPI.GetPolicyName(), la.componentID),
-		),
-	)
-
-	la.alerterIface.AddAlert(alert)
 }
