@@ -630,6 +630,12 @@ Alerter Parameters is a common config for separate alerter components and alerte
 ([]string) A list of alert channel strings.
 
 </dd>
+<dt>labels</dt>
+<dd>
+
+(map of string) Additional labels to add to alert.
+
+</dd>
 </dl>
 
 ### v1And {#v1-and}
@@ -2572,12 +2578,6 @@ Takes the load multiplier input signal and publishes it to the schedulers in the
 <dd>
 
 ([V1LoadActuatorDynamicConfig](#v1-load-actuator-dynamic-config)) Default configuration.
-
-</dd>
-<dt>alerter_parameters</dt>
-<dd>
-
-([V1AlerterParameters](#v1-alerter-parameters)) Configuration for embedded alerter.
 
 </dd>
 </dl>
