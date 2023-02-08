@@ -23,7 +23,7 @@ aperturectl blueprints pull [flags]
 ```
 aperturectl blueprints pull
 
-aperturectl blueprints pull --version v0.22.0
+aperturectl blueprints pull --version latest
 ```
 
 ### Options

@@ -17,7 +17,7 @@ var removeCmd = &cobra.Command{
 Use this command to remove a pulled Aperture Blueprint from local system.`,
 	Example: `aperturectl blueprints remove
 
-aperturectl blueprints remove --version v0.22.0
+aperturectl blueprints remove --version latest
 
 aperturectl blueprints remove --all`,
 	RunE: func(_ *cobra.Command, _ []string) error {

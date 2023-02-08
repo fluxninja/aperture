@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/tui"
 	"github.com/spf13/cobra"
 	appsv1 "k8s.io/api/apps/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -15,12 +17,12 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/yaml"
 
 	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -43,27 +45,20 @@ func init() {
 
 // ApplyCmd is the command to apply a policy to the cluster.
 var ApplyCmd = &cobra.Command{
-	Use:           "apply",
-	Short:         "Apply Aperture Policy to the cluster",
-	Long:          `Use this command to apply the Aperture Policy to the cluster.`,
+	Use:   "apply",
+	Short: "Apply Aperture Policy to the cluster",
+	Long: `
+Use this command to apply the Aperture Policy to the cluster.`,
 	SilenceErrors: true,
 	Example: `aperturectl apply --file=policy.yaml
 
 aperturectl apply --dir=policy-dir`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if kubeConfig == "" {
-			homeDir, err := os.UserHomeDir()
-			if err != nil {
-				return err
-			}
-			kubeConfig = filepath.Join(homeDir, ".kube", "config")
-			log.Info().Msgf("Using Kubernetes config '%s'", kubeConfig)
-		}
-		restConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfig)
+		var err error
+		kubeRestConfig, err = utils.GetKubeConfig(kubeConfig)
 		if err != nil {
-			return fmt.Errorf("failed to connect to Kubernetes. Error: %s", err.Error())
+			return err
 		}
-		kubeRestConfig = restConfig
 		return nil
 	},
 	RunE: func(_ *cobra.Command, _ []string) error {
@@ -80,39 +75,52 @@ aperturectl apply --dir=policy-dir`,
 		if file != "" {
 			return ApplyPolicy(file, dynamicConfigBytes)
 		} else if dir != "" {
-			return ApplyPolicies(dir, dynamicConfigBytes)
+			policies, err := GetPolicies(dir, dynamicConfigBytes)
+			if err != nil {
+				return err
+			}
+
+			model := tui.InitialCheckboxModel(policies, "Which policies to apply?")
+			p := tea.NewProgram(model)
+			if _, err := p.Run(); err != nil {
+				return err
+			}
+
+			for policyIndex := range model.Selected {
+				fileName := policies[policyIndex]
+				if err := ApplyPolicy(fileName, dynamicConfigBytes); err != nil {
+					log.Error().Msgf("failed to apply policy '%s' on Kubernetes.", fileName)
+				}
+			}
+			return nil
 		} else {
 			return errors.New("either --file or --dir must be provided")
 		}
 	},
 }
 
-// ApplyPolicies applies all policies in a directory to the cluster.
-func ApplyPolicies(policyDir string, dynamicConfigBytes []byte) error {
+// GetPolicies applies all policies in a directory to the cluster.
+func GetPolicies(policyDir string, dynamicConfigBytes []byte) ([]string, error) {
+	policies := []string{}
 	// walk the directory and apply all policies
-	return filepath.Walk(policyDir, func(path string, info os.FileInfo, err error) error {
+	return policies, filepath.Walk(policyDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		fileBase := info.Name()[:len(info.Name())-len(filepath.Ext(info.Name()))]
 		if filepath.Ext(info.Name()) == ".yaml" && !strings.HasSuffix(fileBase, "-cr") {
-			err = ApplyPolicy(path, dynamicConfigBytes)
-			if err != nil {
-				return err
+			if policy := GetPolicy(path); policy != nil {
+				policies = append(policies, path)
 			}
 		}
 		return nil
 	})
 }
 
-// ApplyPolicy applies a policy to the cluster.
-func ApplyPolicy(policyFile string, dynamicConfigBytes []byte) error {
-	policyFileBase := filepath.Base(policyFile)
-	policyName := policyFileBase[:len(policyFileBase)-len(filepath.Ext(policyFileBase))]
-
+func GetPolicy(policyFile string) *languagev1.Policy {
 	content, err := os.ReadFile(policyFile)
 	if err != nil {
-		return err
+		return nil
 	}
 	policy := &languagev1.Policy{}
 	err = yaml.Unmarshal(content, policy)
@@ -120,6 +128,19 @@ func ApplyPolicy(policyFile string, dynamicConfigBytes []byte) error {
 		log.Warn().Msgf("Skipping apply for policy '%s' due to invalid spec.", policyFile)
 		return nil
 	}
+	return policy
+}
+
+// ApplyPolicy applies a policy to the cluster.
+func ApplyPolicy(policyFile string, dynamicConfigBytes []byte) error {
+	policyFileBase := filepath.Base(policyFile)
+	policyName := policyFileBase[:len(policyFileBase)-len(filepath.Ext(policyFileBase))]
+
+	policy := GetPolicy(policyFile)
+	if policy == nil {
+		return nil
+	}
+
 	policyBytes, err := policy.MarshalJSON()
 	if err != nil {
 		return err

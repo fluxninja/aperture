@@ -9,6 +9,13 @@ keywords:
 sidebar_position: 1
 ---
 
+```mdx-code-block
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import {apertureVersion,apertureVersionWithOutV} from '../../../../apertureVersion.js';
+```
+
 ## Envoy Filter
 
 [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
@@ -272,6 +279,28 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
 More information about the extracted values can be found on
 [this site](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log).
 
+## Prerequisites
+
+You can do the installation using `aperturectl` CLI tool or using `Helm`.
+Install the tool of your choice using below links:
+
+1.  [aperturectl](/get-started/aperture-cli/aperture-cli.md)
+
+    :::info Refer
+    [aperturectl install controller](/reference/aperturectl/install/controller/controller.md)
+    to see all the available command line arguments. :::
+
+2.  [Helm](https://helm.sh/docs/intro/install/)
+
+    1. Once the Helm CLI is installed, add the
+       [Aperture istioconfig Helm chart](https://artifacthub.io/packages/helm/aperture/istioconfig)
+       repo in your environment for installation:
+
+       ```bash
+       helm repo add aperture https://fluxninja.github.io/aperture/
+       helm repo update
+       ```
+
 ## Installation
 
 Below are the steps to install or upgrade the example Istio EnvoyFilter into
@@ -281,14 +310,7 @@ your setup using the
 By following these instructions, you will have installed the Istio EnvoyFilter
 into your cluster.
 
-1. Add the Helm chart repo in your environment:
-
-   ```bash
-   helm repo add aperture https://fluxninja.github.io/aperture/
-   helm repo update
-   ```
-
-2. Execute the below command to install or upgrade the Istio EnvoyFilter:
+1. Execute the below command to install or upgrade the Istio EnvoyFilter:
 
    :::info
 
@@ -301,16 +323,25 @@ into your cluster.
 
    :::
 
-   ```bash
-   helm upgrade --install aperture-envoy-filter aperture/istioconfig -n ISTIOD_NAMESPACE_HERE
-   ```
+   <Tabs groupId="setup" queryString>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install istioconfig --version ${apertureVersion} --namespace ISTIOD_NAMESPACE_HERE`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="Helm" label="Helm">
+   <CodeBlock language="bash">
+   {`helm upgrade --install aperture-envoy-filter aperture/istioconfig --namespace ISTIOD_NAMESPACE_HERE`}
+   </CodeBlock>
+   </TabItem>
+   </Tabs>
 
    The default values for the Aperture Agent service namespace is
    `aperture-agent`, port is `8080` and sidecar mode is `false`. This makes the
    Aperture Agent target URL
    `aperture-agent.aperture-agent.svc.cluster.local:8080`. If you have installed
    the Aperture Agent in a different namespace or different port, you can create
-   or update the `values.yaml` file and pass it with `helm upgrade`:
+   or update the `values.yaml` file and pass it with `install` command:
 
    ```yaml
    envoyFilter:
@@ -318,22 +349,40 @@ into your cluster.
      port: APERTURE_AGENT_SERVER_PORT_HERE
    ```
 
-   ```bash
-   helm upgrade --install aperture-envoy-filter aperture/istioconfig -n ISTIOD_NAMESPACE_HERE -f values.yaml
-   ```
+   <Tabs groupId="setup" queryString>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install istioconfig --version ${apertureVersion} --namespace ISTIOD_NAMESPACE_HERE --values-file values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="Helm" label="Helm">
+   <CodeBlock language="bash">
+   {`helm upgrade --install aperture-envoy-filter aperture/istioconfig --namespace ISTIOD_NAMESPACE_HERE -f values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   </Tabs>
 
-3. If you want to modify the default parameters of the chart, for example
+2. If you want to modify the default parameters of the chart, for example
    `sidecarMode`, you can create or update the `values.yaml` file and pass it
-   with `helm upgrade`:
+   with `install` command:
 
    ```yaml
    envoyFilter:
      sidecarMode: true
    ```
 
-   ```bash
-   helm upgrade --install aperture-envoy-filter aperture/istioconfig -n ISTIOD_NAMESPACE_HERE -f values.yaml
-   ```
+   <Tabs groupId="setup" queryString>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install istioconfig --version ${apertureVersion} --namespace ISTIOD_NAMESPACE_HERE --values-file values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="Helm" label="Helm">
+   <CodeBlock language="bash">
+   {`helm upgrade --install aperture-envoy-filter aperture/istioconfig --namespace ISTIOD_NAMESPACE_HERE -f values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   </Tabs>
 
    A list of configurable parameters for the installation can be found in the
    [README](https://artifacthub.io/packages/helm/aperture/istioconfig#parameters).
@@ -351,11 +400,20 @@ You should see a Kubernetes custom resource for the Istio EnvoyFilter.
 
 ## Uninstall
 
-You can uninstall the Istio EnvoyFilter by uninstalling the chart installed
-above:
+You can uninstall the Istio EnvoyFilter installed above by following below
+steps:
 
-1. Delete the Aperture istioconfig chart:
+1. Uninstall the Aperture istioconfig:
 
-   ```bash
-   helm uninstall aperture-envoy-filter -n ISTIOD_NAMESPACE_HERE
-   ```
+   <Tabs groupId="setup" queryString>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl uninstall istioconfig`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="Helm" label="Helm">
+   <CodeBlock language="bash">
+   {`helm uninstall aperture-envoy-filter`}
+   </CodeBlock>
+   </TabItem>
+   </Tabs>
