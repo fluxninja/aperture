@@ -472,6 +472,12 @@ definitions:
         type: string
         x-go-validate: required
         x-order: 0
+      labels:
+        description: Additional labels to add to alert.
+        type: object
+        additionalProperties:
+          type: string
+        x-order: 4
       resolve_timeout:
         description: |-
           Duration of alert resolver.
@@ -1949,10 +1955,6 @@ definitions:
     title: Takes the load multiplier input signal and publishes it to the schedulers
       in the data-plane
     properties:
-      alerter_parameters:
-        description: Configuration for embedded alerter.
-        x-order: 3
-        $ref: '#/definitions/v1AlerterParameters'
       default_config:
         description: Default configuration.
         x-order: 2

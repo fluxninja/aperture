@@ -16,6 +16,12 @@
   withAlertNameMixin(alert_name):: {
     alert_name+: alert_name,
   },
+  withLabels(labels):: {
+    labels: labels,
+  },
+  withLabelsMixin(labels):: {
+    labels+: labels,
+  },
   withResolveTimeout(resolve_timeout):: {
     resolve_timeout: resolve_timeout,
   },
