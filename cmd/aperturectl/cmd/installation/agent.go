@@ -29,7 +29,7 @@ aperturectl install agent --values-file=values.yaml --namespace=aperture`,
 			return fmt.Errorf("--values-file must be provided")
 		}
 
-		crds, _, manifests, err := getTemplets(agent, releaseutil.InstallOrder)
+		crds, _, manifests, err := getTemplets(apertureAgent, agent, releaseutil.InstallOrder)
 		for _, crd := range crds {
 			if err = applyManifest(string(crd.File.Data)); err != nil {
 				return err
@@ -56,7 +56,7 @@ Use this command to uninstall Aperture Agent from your Kubernetes cluster`,
 
 aperturectl uninstall agent --namespace=aperture`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		crds, hooks, manifests, err := getTemplets(agent, releaseutil.UninstallOrder)
+		crds, hooks, manifests, err := getTemplets(apertureAgent, agent, releaseutil.UninstallOrder)
 
 		for _, hook := range hooks {
 			log.Info().Msgf("Executing hook - %s", hook.Name)

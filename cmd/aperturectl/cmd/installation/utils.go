@@ -41,15 +41,19 @@ var (
 )
 
 const (
-	apertureLatestVersion = "latest"
-	defaultNS             = "default"
-	controller            = "controller"
-	agent                 = "agent"
+	apertureLatestVersion  = "latest"
+	defaultNS              = "default"
+	controller             = "controller"
+	apertureController     = "aperture-controller"
+	agent                  = "agent"
+	apertureAgent          = "aperture-agent"
+	istioConfig            = "istioconfig"
+	istioConfigReleaseName = "aperture-envoy-filter"
 )
 
 // getTemplets loads CRDs, hooks and manifests from the Helm chart.
-func getTemplets(chartName string, order releaseutil.KindSortOrder) ([]chart.CRD, []*release.Hook, []releaseutil.Manifest, error) {
-	chartURL := fmt.Sprintf("https://fluxninja.github.io/aperture/aperture-%s-%s.tgz", chartName, version)
+func getTemplets(chartName, releaseName string, order releaseutil.KindSortOrder) ([]chart.CRD, []*release.Hook, []releaseutil.Manifest, error) {
+	chartURL := fmt.Sprintf("https://fluxninja.github.io/aperture/%s-%s.tgz", chartName, version)
 
 	resp, err := http.Get(chartURL) //nolint
 	if err != nil {
@@ -68,7 +72,7 @@ func getTemplets(chartName string, order releaseutil.KindSortOrder) ([]chart.CRD
 		if err != nil {
 			return nil, nil, nil, fmt.Errorf("failed to read values: %s", err)
 		}
-	} else if chartName == agent && slices.Compare(order, releaseutil.UninstallOrder) == 0 {
+	} else if releaseName == agent && slices.Compare(order, releaseutil.UninstallOrder) == 0 {
 		values = map[string]interface{}{
 			"agent": map[string]interface{}{
 				"config": map[string]interface{}{
@@ -83,7 +87,7 @@ func getTemplets(chartName string, order releaseutil.KindSortOrder) ([]chart.CRD
 		}
 	}
 
-	renderedValues, err := chartutil.ToRenderValues(ch, values, chartutil.ReleaseOptions{Name: chartName, Namespace: namespace}, chartutil.DefaultCapabilities)
+	renderedValues, err := chartutil.ToRenderValues(ch, values, chartutil.ReleaseOptions{Name: releaseName, Namespace: namespace}, chartutil.DefaultCapabilities)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to read values: %s", err)
 	}
@@ -106,17 +110,12 @@ func getTemplets(chartName string, order releaseutil.KindSortOrder) ([]chart.CRD
 
 // applyManifest creates/updates the generated manifest to Kubernetes.
 func applyManifest(manifest string) error {
-	content := map[string]interface{}{}
-	err := yaml.Unmarshal([]byte(manifest), &content)
+	unstructuredObject, err := prepareUnstructuredObject(manifest)
 	if err != nil {
 		return err
 	}
 
-	unstructuredObject := &unstructured.Unstructured{
-		Object: content,
-	}
 	log.Info().Msgf("Applying - %s/%s", unstructuredObject.GetKind(), unstructuredObject.GetName())
-
 	attempt := 0
 	for attempt < 5 {
 		time.Sleep(time.Second * time.Duration(attempt))
@@ -171,15 +170,11 @@ func applyObjectToKubernetes(unstructuredObject *unstructured.Unstructured) erro
 
 // deleteManifest deletes the generated manifest from Kubernetes.
 func deleteManifest(manifest string) error {
-	content := map[string]interface{}{}
-	err := yaml.Unmarshal([]byte(manifest), &content)
+	unstructuredObject, err := prepareUnstructuredObject(manifest)
 	if err != nil {
 		return err
 	}
 
-	unstructuredObject := &unstructured.Unstructured{
-		Object: content,
-	}
 	log.Info().Msgf("Deleting - %s/%s", unstructuredObject.GetKind(), unstructuredObject.GetName())
 
 	err = kubeClient.Delete(context.Background(), unstructuredObject)
@@ -216,4 +211,23 @@ func waitForHook(name string, ctx context.Context) error {
 		break
 	}
 	return nil
+}
+
+// prepareUnstructuredObject prepares unstructured.Unstructured from given YAML string.
+func prepareUnstructuredObject(manifest string) (*unstructured.Unstructured, error) {
+	content := map[string]interface{}{}
+	err := yaml.Unmarshal([]byte(manifest), &content)
+	if err != nil {
+		return nil, err
+	}
+
+	unstructuredObject := &unstructured.Unstructured{
+		Object: content,
+	}
+
+	if unstructuredObject.GetNamespace() == "" {
+		unstructuredObject.SetNamespace(namespace)
+	}
+
+	return unstructuredObject, nil
 }

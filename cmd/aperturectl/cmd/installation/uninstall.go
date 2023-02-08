@@ -20,6 +20,7 @@ func init() {
 
 	UnInstallCmd.AddCommand(controllerUnInstallCmd)
 	UnInstallCmd.AddCommand(agentUnInstallCmd)
+	UnInstallCmd.AddCommand(istioConfigUnInstallCmd)
 }
 
 // UnInstallCmd is the command to uninstall Aperture Controller and Aperture Agent from Kubernetes.

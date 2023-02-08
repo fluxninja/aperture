@@ -20,6 +20,7 @@ func init() {
 
 	InstallCmd.AddCommand(controllerInstallCmd)
 	InstallCmd.AddCommand(agentInstallCmd)
+	InstallCmd.AddCommand(istioConfigInstallCmd)
 }
 
 // InstallCmd is the command to install Aperture Controller and Aperture Agent on Kubernetes.
@@ -31,14 +32,6 @@ Use this command to install Aperture Controller and Agent on your Kubernetes clu
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		var err error
-
-		if namespace == "" {
-			namespace = defaultNS
-		}
-
-		if err = manageNamespace(); err != nil {
-			return err
-		}
 
 		kubeRestConfig, err = utils.GetKubeConfig(kubeConfig)
 		if err != nil {
@@ -54,6 +47,14 @@ Use this command to install Aperture Controller and Agent on your Kubernetes clu
 		})
 		if err != nil {
 			return fmt.Errorf("failed to create Kubernetes client: %w", err)
+		}
+
+		if namespace == "" {
+			namespace = defaultNS
+		}
+
+		if err = manageNamespace(); err != nil {
+			return err
 		}
 
 		latestVersion, err = utils.ResolveLatestVersion()

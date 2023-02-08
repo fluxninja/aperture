@@ -25,7 +25,7 @@ Refer https://artifacthub.io/packages/helm/aperture/aperture-controller#paramete
 
 aperturectl install controller --values-file=values.yaml --namespace=aperture`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		crds, _, manifests, err := getTemplets(controller, releaseutil.InstallOrder)
+		crds, _, manifests, err := getTemplets(apertureController, controller, releaseutil.InstallOrder)
 		for _, crd := range crds {
 			if err = applyManifest(string(crd.File.Data)); err != nil {
 				return err
@@ -52,7 +52,7 @@ Use this command to uninstall Aperture Controller and its dependencies from your
 
 aperturectl uninstall controller --namespace=aperture`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		crds, hooks, manifests, err := getTemplets(controller, releaseutil.UninstallOrder)
+		crds, hooks, manifests, err := getTemplets(apertureController, controller, releaseutil.UninstallOrder)
 
 		for _, hook := range hooks {
 			log.Info().Msgf("Executing hook - %s", hook.Name)
