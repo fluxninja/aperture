@@ -7,6 +7,7 @@ import (
 
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/apply"
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/blueprints"
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/installation"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
 )
@@ -18,6 +19,8 @@ func init() {
 	RootCmd.AddCommand(blueprints.BlueprintsCmd)
 	RootCmd.AddCommand(compileCmd)
 	RootCmd.AddCommand(apply.ApplyCmd)
+	RootCmd.AddCommand(installation.InstallCmd)
+	RootCmd.AddCommand(installation.UnInstallCmd)
 
 	RootCmd.InitDefaultCompletionCmd()
 }

@@ -23,7 +23,7 @@ aperturectl blueprints list [flags]
 ```
 aperturectl blueprints list
 
-aperturectl blueprints list --version v0.22.0
+aperturectl blueprints list --version latest
 
 aperturectl blueprints list --all
 ```

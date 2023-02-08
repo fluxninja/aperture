@@ -22,9 +22,10 @@ func init() {
 }
 
 var valuesCmd = &cobra.Command{
-	Use:           "values",
-	Short:         "Provide values file for a given Aperture Blueprint",
-	Long:          `Provides a values file for a given Aperture Blueprint that can be then used to generate policies after customization`,
+	Use:   "values",
+	Short: "Provide values file for a given Aperture Blueprint",
+	Long: `
+Provides a values file for a given Aperture Blueprint that can be then used to generate policies after customization`,
 	SilenceErrors: true,
 	Example: `aperturectl blueprints values --name=policies/static-rate-limiting --output-file=values.yaml
 

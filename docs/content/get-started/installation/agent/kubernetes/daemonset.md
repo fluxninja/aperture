@@ -9,9 +9,38 @@ keywords:
 sidebar_position: 1
 ---
 
+```mdx-code-block
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import {apertureVersion,apertureVersionWithOutV} from '../../../../apertureVersion.js';
+```
+
 The Aperture Agent can be installed as a
 [Kubernetes DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/),
 where it will get deployed on all the nodes of the cluster.
+
+## Prerequisites
+
+You can do the installation using `aperturectl` CLI tool or using `Helm`.
+Install the tool of your choice using below links:
+
+1.  [aperturectl](/get-started/aperture-cli/aperture-cli.md)
+
+    :::info Refer
+    [aperturectl install agent](/reference/aperturectl/install/agent/agent.md)
+    to see all the available command line arguments. :::
+
+2.  [Helm](https://helm.sh/docs/intro/install/)
+
+    1. Once the Helm CLI is installed, add the
+       [Aperture Agent Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-agent)
+       repo in your environment for install/upgrade:
+
+       ```bash
+       helm repo add aperture https://fluxninja.github.io/aperture/
+       helm repo update
+       ```
 
 ## Installation {#agent-daemonset-installation}
 
@@ -19,22 +48,12 @@ The Aperture Agent in the DaemonSet mode will be installed using the
 [Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
 which will be managed by the Aperture Operator.
 
-Below are the steps to install the Aperture Agent into your setup using the
-[Aperture Agent Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-agent).
-
 By following these instructions, you will have deployed the Aperture Agent into
 your cluster.
 
-1. Add the Helm chart repo in your environment:
-
-   ```bash
-   helm repo add aperture https://fluxninja.github.io/aperture/
-   helm repo update
-   ```
-
-2. Configure the below parameters of Plugins, Etcd and Prometheus for the Agent
-   Custom Resource by creating a `values.yaml` with below parameters and pass it
-   with `helm install`:
+1. Configure the below parameters of Plugins, Etcd and Prometheus for the Agent
+   Custom Resource by creating a `values.yaml` and pass it with `install`
+   command:
 
    :::info
 
@@ -78,24 +97,97 @@ your cluster.
            - aperture-plugin-fluxninja
    ```
 
-   ```bash
-   helm install agent aperture/aperture-agent -f values.yaml
+   <Tabs groupId="setup" queryString>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="Helm" label="Helm">
+   <CodeBlock language="bash">
+   {`helm install agent aperture/aperture-agent -f values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   </Tabs>
+
+2. If you want to modify the default parameters or the Aperture Agent config,
+   for example `log`, you can create or update the `values.yaml` file and pass
+   it with `install` command:
+
+   ```yaml
+   agent:
+     config:
+       etcd:
+         endpoints: ["http://controller-etcd.default.svc.cluster.local:2379"]
+       prometheus:
+         address: "http://controller-prometheus-server.default.svc.cluster.local:80"
+       plugins:
+         disabled_plugins:
+           - aperture-plugin-fluxninja
+       log:
+         level: debug
+         pretty_console: true
+         non_blocking: false
    ```
 
-3. Alternatively, you can create the Agent Custom Resource directly on the
+   <Tabs groupId="setup" queryString>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="Helm" label="Helm">
+   <CodeBlock language="bash">
+   {`helm install agent aperture/aperture-agent -f values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   </Tabs>
+
+   All the config parameters for the Aperture Agent are available
+   [here](/reference/configuration/agent.md).
+
+   A list of configurable parameters for the installation can be found in the
+   [README](https://artifacthub.io/packages/helm/aperture/aperture-agent#parameters).
+
+3. If you want to deploy the Aperture Agent into a namespace other than
+   `default`, use the `--namespace` flag:
+
+   <Tabs groupId="setup" queryString>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml --namespace aperture-agent`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="Helm" label="Helm">
+   <CodeBlock language="bash">
+   {`helm install agent aperture/aperture-agent -f values.yaml --namespacen aperture-agent --create-namespace`}
+   </CodeBlock>
+   </TabItem>
+   </Tabs>
+
+4. Alternatively, you can create the Agent Custom Resource directly on the
    Kubernetes cluster using the below steps:
 
    1. Create a `values.yaml` for just starting the operator and disabling the
-      creation of Agent Custom Resource and pass it with `helm install`:
+      creation of Agent Custom Resource and pass it with `install` command:
 
       ```yaml
       agent:
         create: false
       ```
 
-      ```bash
-      helm install agent aperture/aperture-agent -f values.yaml
-      ```
+      <Tabs groupId="setup" queryString>
+      <TabItem value="aperturectl" label="aperturectl">
+      <CodeBlock language="bash">
+      {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
+      </CodeBlock>
+      </TabItem>
+      <TabItem value="Helm" label="Helm">
+      <CodeBlock language="bash">
+      {`helm install agent aperture/aperture-agent -f values.yaml`}
+      </CodeBlock>
+      </TabItem>
+      </Tabs>
 
    2. Create a YAML file with below specifications:
 
@@ -130,44 +222,7 @@ your cluster.
       kubectl apply -f agent.yaml
       ```
 
-4. If you want to modify the default parameters or the Aperture Agent config,
-   for example `log`, you can create or update the `values.yaml` file and pass
-   it with `helm install`:
-
-   ```yaml
-   agent:
-     config:
-       etcd:
-         endpoints: ["http://controller-etcd.default.svc.cluster.local:2379"]
-       prometheus:
-         address: "http://controller-prometheus-server.default.svc.cluster.local:80"
-       plugins:
-         disabled_plugins:
-           - aperture-plugin-fluxninja
-       log:
-         level: debug
-         pretty_console: true
-         non_blocking: false
-   ```
-
-   ```bash
-   helm install agent aperture/aperture-agent -f values.yaml
-   ```
-
-   All the config parameters for the Aperture Agent are available
-   [here](/reference/configuration/agent.md).
-
-   A list of configurable parameters for the installation can be found in the
-   [README](https://artifacthub.io/packages/helm/aperture/aperture-agent#parameters).
-
-5. If you want to deploy the Aperture Agent into a namespace other than
-   `default`, use the `-n` flag:
-
-   ```bash
-   helm install agent aperture/aperture-agent -n aperture-agent --create-namespace
-   ```
-
-6. Refer steps on the
+5. Refer steps on the
    [Istio Configuration](/get-started/integrations/flow-control/envoy/istio.md)
    if you don't have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
@@ -178,26 +233,38 @@ your cluster.
 By following these instructions, you will have deployed the upgraded version of
 Aperture Agent into your cluster.
 
-1. Update the Helm chart repo in your environment:
-
-   ```bash
-   helm repo update
-   ```
-
-2. Use the same `values.yaml` file created as part of
+1. Use the same `values.yaml` file created as part of
    [Installation Steps](#agent-daemonset-installation) and pass it with below
    command:
 
-   ```bash
-   helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml | kubectl apply -f -
-   ```
+   <Tabs groupId="setup" queryString>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="Helm" label="Helm">
+   <CodeBlock language="bash">
+   {`helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml | kubectl apply -f -`}
+   </CodeBlock>
+   </TabItem>
+   </Tabs>
 
-3. If you have deployed the Aperture Agent into a namespace other than
-   `default`, use the `-n` flag:
+2. If you have deployed the Aperture Agent into a namespace other than
+   `default`, use the `--namespace` flag:
 
-   ```bash
-   helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml -n aperture-agent | kubectl apply -f -
-   ```
+   <Tabs groupId="setup" queryString>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml --namespace aperture-agent`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="Helm" label="Helm">
+   <CodeBlock language="bash">
+   {`helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml --namespace aperture-agent | kubectl apply -f -`}
+   </CodeBlock>
+   </TabItem>
+   </Tabs>
 
 ## Verifying the Installation
 
@@ -215,14 +282,23 @@ You should see pods for Aperture Agent and Agent Manager in `RUNNING` state and
 
 ## Uninstall
 
-You can uninstall the Aperture Agent and it's components by uninstalling the
-chart installed above:
+You can uninstall the Aperture Agent and it's components installed above by
+following below steps:
 
-1. Delete the Aperture Agent chart:
+1. Uninstall the Aperture Agent:
 
-   ```bash
-   helm uninstall agent
-   ```
+   <Tabs groupId="setup" queryString>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl uninstall agent`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="Helm" label="Helm">
+   <CodeBlock language="bash">
+   {`helm uninstall agent`}
+   </CodeBlock>
+   </TabItem>
+   </Tabs>
 
 2. Alternatively, if you have installed the Aperture Agent Custom Resource
    separately, follow below steps:
@@ -233,24 +309,42 @@ chart installed above:
       kubectl delete -f agent.yaml
       ```
 
-   2. Delete the Aperture Agent chart to uninstall the Aperture Operator:
+   2. Delete the Aperture Agent to uninstall the Aperture Operator:
 
-      ```bash
-      helm uninstall agent
-      ```
+      <Tabs groupId="setup" queryString>
+      <TabItem value="aperturectl" label="aperturectl">
+      <CodeBlock language="bash">
+      {`aperturectl uninstall agent`}
+      </CodeBlock>
+      </TabItem>
+      <TabItem value="Helm" label="Helm">
+      <CodeBlock language="bash">
+      {`helm uninstall agent`}
+      </CodeBlock>
+      </TabItem>
+      </Tabs>
 
 3. If you have installed the chart in some other namespace than `default`,
    execute below commands:
 
-   ```bash
-   helm uninstall agent -n aperture-agent
-   kubectl delete namespace aperture-agent
-   ```
+   <Tabs groupId="setup" queryString>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl uninstall agent --namespace aperture-agent`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="Helm" label="Helm">
+   <CodeBlock language="bash">
+   {`helm uninstall agent --namespace aperture-agent
+   kubectl delete namespace aperture-agent`}
+   </CodeBlock>
+   </TabItem>
+   </Tabs>
 
-   > Note: By design, deleting a chart via Helm doesn’t delete the Custom
+4. **Optional**: Delete the CRD installed by the Helm chart:
+
+   > Note: By design, deleting a Helm chart via Helm doesn’t delete the Custom
    > Resource Definitions (CRDs) installed via the chart.
-
-4. **Optional**: Delete the CRD installed by the chart:
 
    ```bash
    kubectl delete crd agents.fluxninja.com

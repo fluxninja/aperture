@@ -23,7 +23,7 @@ aperturectl blueprints generate [flags]
 ```
 aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml
 
-aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --version v0.22.0
+aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --version latest
 
 aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --apply
 ```

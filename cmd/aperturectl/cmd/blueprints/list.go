@@ -23,7 +23,7 @@ var listCmd = &cobra.Command{
 Use this command to list the Aperture Blueprints which are already pulled and available in local system.`,
 	Example: `aperturectl blueprints list
 
-aperturectl blueprints list --version v0.22.0
+aperturectl blueprints list --version latest
 
 aperturectl blueprints list --all`,
 	RunE: func(_ *cobra.Command, _ []string) error {
