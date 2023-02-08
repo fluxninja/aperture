@@ -410,491 +410,487 @@ Type: [WatchdogConfig](#watchdog-config)
 
 AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)\*factor.
 
-#### Properties
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `enabled`            |
+| Type          | _bool_               |
+| Default Value | `, default: `false`` |
+| Description   | Lorem Ipsum          |
 
-<dl>
-<dt>enabled</dt>
-<dd>
-
-(bool, default: `false`) Flag to enable the policy
-
-</dd>
-<dt>factor</dt>
-<dd>
-
-(float64, `gte=0,lte=1`, default: `0.50`) Factor sets user-configured limit of available memory
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->            |
+| ------------- | ------------------- |
+| Property      | `factor`            |
+| Type          | _float64_           |
+| Default Value | `, default: `0.50`` |
+| Description   | Lorem Ipsum         |
 
 ### BackoffConfig {#backoff-config}
 
 BackoffConfig holds configuration for GRPC Client Backoff.
 
-#### Properties
+| <!-- -->      | <!-- -->          |
+| ------------- | ----------------- |
+| Property      | `base_delay`      |
+| Type          | _string_          |
+| Default Value | `, default: `1s`` |
+| Description   | Lorem Ipsum       |
 
-<dl>
-<dt>base_delay</dt>
-<dd>
+| <!-- -->      | <!-- -->           |
+| ------------- | ------------------ |
+| Property      | `jitter`           |
+| Type          | _float64_          |
+| Default Value | `, default: `0.2`` |
+| Description   | Lorem Ipsum        |
 
-(string, `gte=0`, default: `1s`) Base Delay
+| <!-- -->      | <!-- -->            |
+| ------------- | ------------------- |
+| Property      | `max_delay`         |
+| Type          | _string_            |
+| Default Value | `, default: `120s`` |
+| Description   | Lorem Ipsum         |
 
-</dd>
-<dt>jitter</dt>
-<dd>
-
-(float64, `gte=0`, default: `0.2`) Jitter
-
-</dd>
-<dt>max_delay</dt>
-<dd>
-
-(string, `gte=0`, default: `120s`) Max Delay
-
-</dd>
-<dt>multiplier</dt>
-<dd>
-
-(float64, `gte=0`, default: `1.6`) Backoff multiplier
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->           |
+| ------------- | ------------------ |
+| Property      | `multiplier`       |
+| Type          | _float64_          |
+| Default Value | `, default: `1.6`` |
+| Description   | Lorem Ipsum        |
 
 ### BatchAlertsConfig {#batch-alerts-config}
 
 BatchAlertsConfig defines configuration for OTEL batch processor.
 
-#### Properties
+| <!-- -->      | <!-- -->              |
+| ------------- | --------------------- |
+| Property      | `send_batch_max_size` |
+| Type          | _uint32_              |
+| Default Value | `, default: `100``    |
+| Description   | Lorem Ipsum           |
 
-<dl>
-<dt>send_batch_max_size</dt>
-<dd>
+| <!-- -->      | <!-- -->           |
+| ------------- | ------------------ |
+| Property      | `send_batch_size`  |
+| Type          | _uint32_           |
+| Default Value | `, default: `100`` |
+| Description   | Lorem Ipsum        |
 
-(uint32, `gte=0`, default: `100`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
-into smaller units.
-
-</dd>
-<dt>send_batch_size</dt>
-<dd>
-
-(uint32, `gt=0`, default: `100`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
-
-</dd>
-<dt>timeout</dt>
-<dd>
-
-(string, `gt=0`, default: `1s`) Timeout sets the time after which a batch will be sent regardless of size.
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->          |
+| ------------- | ----------------- |
+| Property      | `timeout`         |
+| Type          | _string_          |
+| Default Value | `, default: `1s`` |
+| Description   | Lorem Ipsum       |
 
 ### ClientConfig {#client-config}
 
 ClientConfig is the client configuration.
 
-#### Properties
+| <!-- -->      | <!-- -->                                   |
+| ------------- | ------------------------------------------ |
+| Property      | `grpc`                                     |
+| Type          | _[GRPCClientConfig](#g-rpc-client-config)_ |
+| Default Value | ``                                         |
+| Description   | Lorem Ipsum                                |
 
-<dl>
-<dt>grpc</dt>
-<dd>
-
-([GRPCClientConfig](#g-rpc-client-config))
-
-</dd>
-<dt>http</dt>
-<dd>
-
-([HTTPClientConfig](#http-client-config))
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->                                  |
+| ------------- | ----------------------------------------- |
+| Property      | `http`                                    |
+| Type          | _[HTTPClientConfig](#http-client-config)_ |
+| Default Value | ``                                        |
+| Description   | Lorem Ipsum                               |
 
 ### ClientTLSConfig {#client-tls-config}
 
 ClientTLSConfig is the config for client TLS.
 
-#### Properties
+| <!-- -->      | <!-- -->    |
+| ------------- | ----------- |
+| Property      | `ca_file`   |
+| Type          | _string_    |
+| Default Value | ``          |
+| Description   | Lorem Ipsum |
 
-<dl>
-<dt>ca_file</dt>
-<dd>
+| <!-- -->      | <!-- -->    |
+| ------------- | ----------- |
+| Property      | `cert_file` |
+| Type          | _string_    |
+| Default Value | ``          |
+| Description   | Lorem Ipsum |
 
-(string)
+| <!-- -->      | <!-- -->               |
+| ------------- | ---------------------- |
+| Property      | `insecure_skip_verify` |
+| Type          | _bool_                 |
+| Default Value | ``                     |
+| Description   | Lorem Ipsum            |
 
-</dd>
-<dt>cert_file</dt>
-<dd>
+| <!-- -->      | <!-- -->    |
+| ------------- | ----------- |
+| Property      | `key_file`  |
+| Type          | _string_    |
+| Default Value | ``          |
+| Description   | Lorem Ipsum |
 
-(string)
-
-</dd>
-<dt>insecure_skip_verify</dt>
-<dd>
-
-(bool)
-
-</dd>
-<dt>key_file</dt>
-<dd>
-
-(string)
-
-</dd>
-<dt>key_log_file</dt>
-<dd>
-
-(string)
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->       |
+| ------------- | -------------- |
+| Property      | `key_log_file` |
+| Type          | _string_       |
+| Default Value | ``             |
+| Description   | Lorem Ipsum    |
 
 ### ControllerOTELConfig {#controller-o-t-e-l-config}
 
 ControllerOTELConfig is the configuration for Agent's OTEL collector.
 
-#### Properties
+| <!-- -->      | <!-- -->                                    |
+| ------------- | ------------------------------------------- |
+| Property      | `batch_alerts`                              |
+| Type          | _[BatchAlertsConfig](#batch-alerts-config)_ |
+| Default Value | ``                                          |
+| Description   | Lorem Ipsum                                 |
 
-<dl>
-<dt>batch_alerts</dt>
-<dd>
-
-([BatchAlertsConfig](#batch-alerts-config))
-
-</dd>
-<dt>ports</dt>
-<dd>
-
-([PortsConfig](#ports-config))
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->                       |
+| ------------- | ------------------------------ |
+| Property      | `ports`                        |
+| Type          | _[PortsConfig](#ports-config)_ |
+| Default Value | ``                             |
+| Description   | Lorem Ipsum                    |
 
 ### EtcdConfig {#etcd-config}
 
 EtcdConfig holds configuration for etcd client.
 
-#### Properties
+| <!-- -->      | <!-- -->    |
+| ------------- | ----------- |
+| Property      | `endpoints` |
+| Type          | _[]string_  |
+| Default Value | ``          |
+| Description   | Lorem Ipsum |
 
-<dl>
-<dt>endpoints</dt>
-<dd>
+| <!-- -->      | <!-- -->           |
+| ------------- | ------------------ |
+| Property      | `lease_ttl`        |
+| Type          | _string_           |
+| Default Value | `, default: `60s`` |
+| Description   | Lorem Ipsum        |
 
-([]string, `gt=0,dive,hostname_port|url|fqdn`) List of Etcd server endpoints
+| <!-- -->      | <!-- -->    |
+| ------------- | ----------- |
+| Property      | `password`  |
+| Type          | _string_    |
+| Default Value | ``          |
+| Description   | Lorem Ipsum |
 
-</dd>
-<dt>lease_ttl</dt>
-<dd>
+| <!-- -->      | <!-- -->    |
+| ------------- | ----------- |
+| Property      | `username`  |
+| Type          | _string_    |
+| Default Value | ``          |
+| Description   | Lorem Ipsum |
 
-(string, `gte=1s`, default: `60s`) Lease time-to-live
-
-</dd>
-<dt>password</dt>
-<dd>
-
-(string)
-
-</dd>
-<dt>username</dt>
-<dd>
-
-(string) Authentication
-
-</dd>
-<dt>tls</dt>
-<dd>
-
-([ClientTLSConfig](#client-tls-config))
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->                                |
+| ------------- | --------------------------------------- |
+| Property      | `tls`                                   |
+| Type          | _[ClientTLSConfig](#client-tls-config)_ |
+| Default Value | ``                                      |
+| Description   | Lorem Ipsum                             |
 
 ### FluxNinjaPluginConfig {#flux-ninja-plugin-config}
 
 FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
 
-#### Properties
+| <!-- -->      | <!-- -->    |
+| ------------- | ----------- |
+| Property      | `api_key`   |
+| Type          | _string_    |
+| Default Value | ``          |
+| Description   | Lorem Ipsum |
 
-<dl>
-<dt>api_key</dt>
-<dd>
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `fluxninja_endpoint` |
+| Type          | _string_             |
+| Default Value | ``                   |
+| Description   | Lorem Ipsum          |
 
-(string) API Key for this agent.
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `heartbeat_interval` |
+| Type          | _string_             |
+| Default Value | `, default: `5s``    |
+| Description   | Lorem Ipsum          |
 
-</dd>
-<dt>fluxninja_endpoint</dt>
-<dd>
-
-(string, `omitempty,hostname_port|url|fqdn`) Address to grpc or http(s) server listening in agent service. To use http protocol, the address must start with http(s)://.
-
-</dd>
-<dt>heartbeat_interval</dt>
-<dd>
-
-(string, `gte=0s`, default: `5s`) Interval between each heartbeat.
-
-</dd>
-<dt>client</dt>
-<dd>
-
-([ClientConfig](#client-config))
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->                         |
+| ------------- | -------------------------------- |
+| Property      | `client`                         |
+| Type          | _[ClientConfig](#client-config)_ |
+| Default Value | ``                               |
+| Description   | Lorem Ipsum                      |
 
 ### GRPCClientConfig {#g-rpc-client-config}
 
 GRPCClientConfig holds configuration for GRPC Client.
 
-#### Properties
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `insecure`           |
+| Type          | _bool_               |
+| Default Value | `, default: `false`` |
+| Description   | Lorem Ipsum          |
 
-<dl>
-<dt>insecure</dt>
-<dd>
+| <!-- -->      | <!-- -->                 |
+| ------------- | ------------------------ |
+| Property      | `min_connection_timeout` |
+| Type          | _string_                 |
+| Default Value | `, default: `20s``       |
+| Description   | Lorem Ipsum              |
 
-(bool, default: `false`) Disable ClientTLS
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `use_proxy`          |
+| Type          | _bool_               |
+| Default Value | `, default: `false`` |
+| Description   | Lorem Ipsum          |
 
-</dd>
-<dt>min_connection_timeout</dt>
-<dd>
+| <!-- -->      | <!-- -->                           |
+| ------------- | ---------------------------------- |
+| Property      | `backoff`                          |
+| Type          | _[BackoffConfig](#backoff-config)_ |
+| Default Value | ``                                 |
+| Description   | Lorem Ipsum                        |
 
-(string, `gte=0`, default: `20s`) Minimum connection timeout
-
-</dd>
-<dt>use_proxy</dt>
-<dd>
-
-(bool, default: `false`) Use HTTP CONNECT Proxy
-
-</dd>
-<dt>backoff</dt>
-<dd>
-
-([BackoffConfig](#backoff-config))
-
-</dd>
-<dt>tls</dt>
-<dd>
-
-([ClientTLSConfig](#client-tls-config))
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->                                |
+| ------------- | --------------------------------------- |
+| Property      | `tls`                                   |
+| Type          | _[ClientTLSConfig](#client-tls-config)_ |
+| Default Value | ``                                      |
+| Description   | Lorem Ipsum                             |
 
 ### GRPCGatewayConfig {#g-rpc-gateway-config}
 
 GRPCGatewayConfig holds configuration for grpc-http gateway
 
-#### Properties
-
-<dl>
-<dt>grpc_server_address</dt>
-<dd>
-
-(string, `hostname_port`, default: `0.0.0.0:1`) GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->                 |
+| ------------- | ------------------------ |
+| Property      | `grpc_server_address`    |
+| Type          | _string_                 |
+| Default Value | `, default: `0.0.0.0:1`` |
+| Description   | Lorem Ipsum              |
 
 ### GRPCServerConfig {#g-rpc-server-config}
 
 GRPCServerConfig holds configuration for GRPC Server.
 
-#### Properties
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `connection_timeout` |
+| Type          | _string_             |
+| Default Value | `, default: `120s``  |
+| Description   | Lorem Ipsum          |
 
-<dl>
-<dt>connection_timeout</dt>
-<dd>
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `enable_reflection`  |
+| Type          | _bool_               |
+| Default Value | `, default: `false`` |
+| Description   | Lorem Ipsum          |
 
-(string, `gte=0s`, default: `120s`) Connection timeout
-
-</dd>
-<dt>enable_reflection</dt>
-<dd>
-
-(bool, default: `false`) Enable Reflection
-
-</dd>
-<dt>latency_buckets_ms</dt>
-<dd>
-
-([]float64, `gte=0`, default: `[10.0,25.0,100.0,250.0,1000.0]`) Buckets specification in latency histogram
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->                                      |
+| ------------- | --------------------------------------------- |
+| Property      | `latency_buckets_ms`                          |
+| Type          | _[]float64_                                   |
+| Default Value | `, default: `[10.0,25.0,100.0,250.0,1000.0]`` |
+| Description   | Lorem Ipsum                                   |
 
 ### HTTPClientConfig {#http-client-config}
 
 HTTPClientConfig holds configuration for HTTP Client.
 
-#### Properties
+| <!-- -->      | <!-- -->              |
+| ------------- | --------------------- |
+| Property      | `disable_compression` |
+| Type          | _bool_                |
+| Default Value | `, default: `false``  |
+| Description   | Lorem Ipsum           |
 
-<dl>
-<dt>disable_compression</dt>
-<dd>
+| <!-- -->      | <!-- -->              |
+| ------------- | --------------------- |
+| Property      | `disable_keep_alives` |
+| Type          | _bool_                |
+| Default Value | `, default: `false``  |
+| Description   | Lorem Ipsum           |
 
-(bool, default: `false`) Disable Compression
+| <!-- -->      | <!-- -->                  |
+| ------------- | ------------------------- |
+| Property      | `expect_continue_timeout` |
+| Type          | _string_                  |
+| Default Value | `, default: `1s``         |
+| Description   | Lorem Ipsum               |
 
-</dd>
-<dt>disable_keep_alives</dt>
-<dd>
+| <!-- -->      | <!-- -->                  |
+| ------------- | ------------------------- |
+| Property      | `idle_connection_timeout` |
+| Type          | _string_                  |
+| Default Value | `, default: `90s``        |
+| Description   | Lorem Ipsum               |
 
-(bool, default: `false`) Disable HTTP Keep Alives
+| <!-- -->      | <!-- -->       |
+| ------------- | -------------- |
+| Property      | `key_log_file` |
+| Type          | _string_       |
+| Default Value | ``             |
+| Description   | Lorem Ipsum    |
 
-</dd>
-<dt>expect_continue_timeout</dt>
-<dd>
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `max_conns_per_host` |
+| Type          | _int64_              |
+| Default Value | `, default: `0``     |
+| Description   | Lorem Ipsum          |
 
-(string, `gte=0s`, default: `1s`) Expect Continue Timeout. 0 = no timeout.
+| <!-- -->      | <!-- -->               |
+| ------------- | ---------------------- |
+| Property      | `max_idle_connections` |
+| Type          | _int64_                |
+| Default Value | `, default: `100``     |
+| Description   | Lorem Ipsum            |
 
-</dd>
-<dt>idle_connection_timeout</dt>
-<dd>
+| <!-- -->      | <!-- -->                        |
+| ------------- | ------------------------------- |
+| Property      | `max_idle_connections_per_host` |
+| Type          | _int64_                         |
+| Default Value | `, default: `5``                |
+| Description   | Lorem Ipsum                     |
 
-(string, `gte=0s`, default: `90s`) Idle Connection Timeout. 0 = no timeout.
+| <!-- -->      | <!-- -->                    |
+| ------------- | --------------------------- |
+| Property      | `max_response_header_bytes` |
+| Type          | _int64_                     |
+| Default Value | `, default: `0``            |
+| Description   | Lorem Ipsum                 |
 
-</dd>
-<dt>key_log_file</dt>
-<dd>
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `network_keep_alive` |
+| Type          | _string_             |
+| Default Value | `, default: `30s``   |
+| Description   | Lorem Ipsum          |
 
-(string) SSL key log file (useful for debugging with wireshark)
+| <!-- -->      | <!-- -->           |
+| ------------- | ------------------ |
+| Property      | `network_timeout`  |
+| Type          | _string_           |
+| Default Value | `, default: `30s`` |
+| Description   | Lorem Ipsum        |
 
-</dd>
-<dt>max_conns_per_host</dt>
-<dd>
+| <!-- -->      | <!-- -->           |
+| ------------- | ------------------ |
+| Property      | `read_buffer_size` |
+| Type          | _int64_            |
+| Default Value | `, default: `0``   |
+| Description   | Lorem Ipsum        |
 
-(int64, `gte=0`, default: `0`) Max Connections Per Host. 0 = no limit.
+| <!-- -->      | <!-- -->                  |
+| ------------- | ------------------------- |
+| Property      | `response_header_timeout` |
+| Type          | _string_                  |
+| Default Value | `, default: `0s``         |
+| Description   | Lorem Ipsum               |
 
-</dd>
-<dt>max_idle_connections</dt>
-<dd>
+| <!-- -->      | <!-- -->                |
+| ------------- | ----------------------- |
+| Property      | `tls_handshake_timeout` |
+| Type          | _string_                |
+| Default Value | `, default: `10s``      |
+| Description   | Lorem Ipsum             |
 
-(int64, `gte=0`, default: `100`) Max Idle Connections. 0 = no limit.
+| <!-- -->      | <!-- -->           |
+| ------------- | ------------------ |
+| Property      | `timeout`          |
+| Type          | _string_           |
+| Default Value | `, default: `60s`` |
+| Description   | Lorem Ipsum        |
 
-</dd>
-<dt>max_idle_connections_per_host</dt>
-<dd>
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `use_proxy`          |
+| Type          | _bool_               |
+| Default Value | `, default: `false`` |
+| Description   | Lorem Ipsum          |
 
-(int64, `gte=0`, default: `5`) Max Idle Connections per host. 0 = no limit.
+| <!-- -->      | <!-- -->            |
+| ------------- | ------------------- |
+| Property      | `write_buffer_size` |
+| Type          | _int64_             |
+| Default Value | `, default: `0``    |
+| Description   | Lorem Ipsum         |
 
-</dd>
-<dt>max_response_header_bytes</dt>
-<dd>
+| <!-- -->      | <!-- -->               |
+| ------------- | ---------------------- |
+| Property      | `proxy_connect_header` |
+| Type          | _[Header](#header)_    |
+| Default Value | ``                     |
+| Description   | Lorem Ipsum            |
 
-(int64, `gte=0`, default: `0`) Max Response Header Bytes. 0 = no limit.
-
-</dd>
-<dt>network_keep_alive</dt>
-<dd>
-
-(string, `gte=0s`, default: `30s`) Network level keep-alive duration
-
-</dd>
-<dt>network_timeout</dt>
-<dd>
-
-(string, `gte=0s`, default: `30s`) Timeout for making network connection
-
-</dd>
-<dt>read_buffer_size</dt>
-<dd>
-
-(int64, `gte=0`, default: `0`) Read Buffer Size. 0 = 4KB
-
-</dd>
-<dt>response_header_timeout</dt>
-<dd>
-
-(string, `gte=0s`, default: `0s`) Response Header Timeout. 0 = no timeout.
-
-</dd>
-<dt>tls_handshake_timeout</dt>
-<dd>
-
-(string, `gte=0s`, default: `10s`) TLS Handshake Timeout. 0 = no timeout
-
-</dd>
-<dt>timeout</dt>
-<dd>
-
-(string, `gte=0s`, default: `60s`) HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
-
-</dd>
-<dt>use_proxy</dt>
-<dd>
-
-(bool, default: `false`) Use Proxy
-
-</dd>
-<dt>write_buffer_size</dt>
-<dd>
-
-(int64, `gte=0`, default: `0`) Write Buffer Size. 0 = 4KB.
-
-</dd>
-<dt>proxy_connect_header</dt>
-<dd>
-
-([Header](#header), `omitempty`)
-
-</dd>
-<dt>tls</dt>
-<dd>
-
-([ClientTLSConfig](#client-tls-config))
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->                                |
+| ------------- | --------------------------------------- |
+| Property      | `tls`                                   |
+| Type          | _[ClientTLSConfig](#client-tls-config)_ |
+| Default Value | ``                                      |
+| Description   | Lorem Ipsum                             |
 
 ### HTTPServerConfig {#http-server-config}
 
 HTTPServerConfig holds configuration for HTTP Server.
 
-#### Properties
+| <!-- -->      | <!-- -->                   |
+| ------------- | -------------------------- |
+| Property      | `disable_http_keep_alives` |
+| Type          | _bool_                     |
+| Default Value | `, default: `false``       |
+| Description   | Lorem Ipsum                |
 
-<dl>
-<dt>disable_http_keep_alives</dt>
-<dd>
+| <!-- -->      | <!-- -->           |
+| ------------- | ------------------ |
+| Property      | `idle_timeout`     |
+| Type          | _string_           |
+| Default Value | `, default: `30s`` |
+| Description   | Lorem Ipsum        |
 
-(bool, default: `false`) Disable HTTP Keep Alives
+| <!-- -->      | <!-- -->                                      |
+| ------------- | --------------------------------------------- |
+| Property      | `latency_buckets_ms`                          |
+| Type          | _[]float64_                                   |
+| Default Value | `, default: `[10.0,25.0,100.0,250.0,1000.0]`` |
+| Description   | Lorem Ipsum                                   |
 
-</dd>
-<dt>idle_timeout</dt>
-<dd>
+| <!-- -->      | <!-- -->               |
+| ------------- | ---------------------- |
+| Property      | `max_header_bytes`     |
+| Type          | _int64_                |
+| Default Value | `, default: `1048576`` |
+| Description   | Lorem Ipsum            |
 
-(string, `gte=0s`, default: `30s`) Idle timeout
+| <!-- -->      | <!-- -->              |
+| ------------- | --------------------- |
+| Property      | `read_header_timeout` |
+| Type          | _string_              |
+| Default Value | `, default: `10s``    |
+| Description   | Lorem Ipsum           |
 
-</dd>
-<dt>latency_buckets_ms</dt>
-<dd>
+| <!-- -->      | <!-- -->           |
+| ------------- | ------------------ |
+| Property      | `read_timeout`     |
+| Type          | _string_           |
+| Default Value | `, default: `10s`` |
+| Description   | Lorem Ipsum        |
 
-([]float64, `gte=0`, default: `[10.0,25.0,100.0,250.0,1000.0]`) Buckets specification in latency histogram
-
-</dd>
-<dt>max_header_bytes</dt>
-<dd>
-
-(int64, `gte=0`, default: `1048576`) Max header size in bytes
-
-</dd>
-<dt>read_header_timeout</dt>
-<dd>
-
-(string, `gte=0s`, default: `10s`) Read header timeout
-
-</dd>
-<dt>read_timeout</dt>
-<dd>
-
-(string, `gte=0s`, default: `10s`) Read timeout
-
-</dd>
-<dt>write_timeout</dt>
-<dd>
-
-(string, `gte=0s`, default: `45s`) Write timeout
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->           |
+| ------------- | ------------------ |
+| Property      | `write_timeout`    |
+| Type          | _string_           |
+| Default Value | `, default: `45s`` |
+| Description   | Lorem Ipsum        |
 
 ### Header {#header}
 
@@ -909,316 +905,297 @@ CanonicalHeaderKey.
 
 HeapConfig holds configuration for heap Watchdog.
 
-#### Properties
+| <!-- -->      | <!-- -->                 |
+| ------------- | ------------------------ |
+| Property      | `limit`                  |
+| Type          | _uint64_                 |
+| Default Value | `, default: `268435456`` |
+| Description   | Lorem Ipsum              |
 
-<dl>
-<dt>limit</dt>
-<dd>
+| <!-- -->      | <!-- -->          |
+| ------------- | ----------------- |
+| Property      | `min_gogc`        |
+| Type          | _int64_           |
+| Default Value | `, default: `25`` |
+| Description   | Lorem Ipsum       |
 
-(uint64, `gt=0`, default: `268435456`) Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
+| <!-- -->      | <!-- -->                             |
+| ------------- | ------------------------------------ |
+| Property      | `adaptive_policy`                    |
+| Type          | _[AdaptivePolicy](#adaptive-policy)_ |
+| Default Value | ``                                   |
+| Description   | Lorem Ipsum                          |
 
-</dd>
-<dt>min_gogc</dt>
-<dd>
-
-(int64, `gt=0,lte=100`, default: `25`) Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
-
-</dd>
-<dt>adaptive_policy</dt>
-<dd>
-
-([AdaptivePolicy](#adaptive-policy))
-
-</dd>
-<dt>watermarks_policy</dt>
-<dd>
-
-([WatermarksPolicy](#watermarks-policy))
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->                                 |
+| ------------- | ---------------------------------------- |
+| Property      | `watermarks_policy`                      |
+| Type          | _[WatermarksPolicy](#watermarks-policy)_ |
+| Default Value | ``                                       |
+| Description   | Lorem Ipsum                              |
 
 ### JobConfig {#job-config}
 
 JobConfig is config for Job
 
-#### Properties
+| <!-- -->      | <!-- -->           |
+| ------------- | ------------------ |
+| Property      | `execution_period` |
+| Type          | _string_           |
+| Default Value | `, default: `10s`` |
+| Description   | Lorem Ipsum        |
 
-<dl>
-<dt>execution_period</dt>
-<dd>
+| <!-- -->      | <!-- -->            |
+| ------------- | ------------------- |
+| Property      | `execution_timeout` |
+| Type          | _string_            |
+| Default Value | `, default: `5s``   |
+| Description   | Lorem Ipsum         |
 
-(string, default: `10s`) Time period between job executions. Zero or negative value means that the job will never execute periodically.
+| <!-- -->      | <!-- -->          |
+| ------------- | ----------------- |
+| Property      | `initial_delay`   |
+| Type          | _string_          |
+| Default Value | `, default: `0s`` |
+| Description   | Lorem Ipsum       |
 
-</dd>
-<dt>execution_timeout</dt>
-<dd>
-
-(string, `gte=0s`, default: `5s`) Execution timeout
-
-</dd>
-<dt>initial_delay</dt>
-<dd>
-
-(string, default: `0s`) Initial delay to start the job. Zero value will schedule the job immediately. Negative value will wait for next scheduled interval.
-
-</dd>
-<dt>initially_healthy</dt>
-<dd>
-
-(bool, default: `false`) Sets whether the job is initially healthy
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `initially_healthy`  |
+| Type          | _bool_               |
+| Default Value | `, default: `false`` |
+| Description   | Lorem Ipsum          |
 
 ### JobGroupConfig {#job-group-config}
 
 JobGroupConfig holds configuration for JobGroup.
 
-#### Properties
-
-<dl>
-<dt>max_concurrent_jobs</dt>
-<dd>
-
-(int64, `gte=0`, default: `0`) Limits how many jobs can be running at the same time. This is useful when running resource intensive jobs and a precise start time is not critical. 0 = no limit.
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->              |
+| ------------- | --------------------- |
+| Property      | `max_concurrent_jobs` |
+| Type          | _int64_               |
+| Default Value | `, default: `0``      |
+| Description   | Lorem Ipsum           |
 
 ### ListenerConfig {#listener-config}
 
 ListenerConfig holds configuration for socket listeners.
 
-#### Properties
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `addr`               |
+| Type          | _string_             |
+| Default Value | `, default: `:8080`` |
+| Description   | Lorem Ipsum          |
 
-<dl>
-<dt>addr</dt>
-<dd>
+| <!-- -->      | <!-- -->            |
+| ------------- | ------------------- |
+| Property      | `keep_alive`        |
+| Type          | _string_            |
+| Default Value | `, default: `180s`` |
+| Description   | Lorem Ipsum         |
 
-(string, `hostname_port`, default: `:8080`) Address to bind to in the form of [host%zone]:port
-
-</dd>
-<dt>keep_alive</dt>
-<dd>
-
-(string, `gte=0s`, default: `180s`) Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alive is disabled.
-
-</dd>
-<dt>network</dt>
-<dd>
-
-(string, `oneof=tcp tcp4 tcp6`, default: `tcp`) TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->           |
+| ------------- | ------------------ |
+| Property      | `network`          |
+| Type          | _string_           |
+| Default Value | `, default: `tcp`` |
+| Description   | Lorem Ipsum        |
 
 ### LogConfig {#log-config}
 
 LogConfig holds configuration for a logger and log writers.
 
-#### Properties
+| <!-- -->      | <!-- -->            |
+| ------------- | ------------------- |
+| Property      | `level`             |
+| Type          | _string_            |
+| Default Value | `, default: `info`` |
+| Description   | Lorem Ipsum         |
 
-<dl>
-<dt>level</dt>
-<dd>
+| <!-- -->      | <!-- -->            |
+| ------------- | ------------------- |
+| Property      | `non_blocking`      |
+| Type          | _bool_              |
+| Default Value | `, default: `true`` |
+| Description   | Lorem Ipsum         |
 
-(string, `oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED`, default: `info`) Log level
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `pretty_console`     |
+| Type          | _bool_               |
+| Default Value | `, default: `false`` |
+| Description   | Lorem Ipsum          |
 
-</dd>
-<dt>non_blocking</dt>
-<dd>
-
-(bool, default: `true`) Use non-blocking log writer (can lose logs at high throughput)
-
-</dd>
-<dt>pretty_console</dt>
-<dd>
-
-(bool, default: `false`) Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
-
-</dd>
-<dt>writers</dt>
-<dd>
-
-([[]LogWriterConfig](#log-writer-config), `omitempty,dive,omitempty`) Log writers
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->                                  |
+| ------------- | ----------------------------------------- |
+| Property      | `writers`                                 |
+| Type          | _[[]LogWriterConfig](#log-writer-config)_ |
+| Default Value | ``                                        |
+| Description   | Lorem Ipsum                               |
 
 ### LogWriterConfig {#log-writer-config}
 
 LogWriterConfig holds configuration for a log writer.
 
-#### Properties
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `compress`           |
+| Type          | _bool_               |
+| Default Value | `, default: `false`` |
+| Description   | Lorem Ipsum          |
 
-<dl>
-<dt>compress</dt>
-<dd>
+| <!-- -->      | <!-- -->              |
+| ------------- | --------------------- |
+| Property      | `file`                |
+| Type          | _string_              |
+| Default Value | `, default: `stderr`` |
+| Description   | Lorem Ipsum           |
 
-(bool, default: `false`) Compress
+| <!-- -->      | <!-- -->         |
+| ------------- | ---------------- |
+| Property      | `max_age`        |
+| Type          | _int64_          |
+| Default Value | `, default: `7`` |
+| Description   | Lorem Ipsum      |
 
-</dd>
-<dt>file</dt>
-<dd>
+| <!-- -->      | <!-- -->         |
+| ------------- | ---------------- |
+| Property      | `max_backups`    |
+| Type          | _int64_          |
+| Default Value | `, default: `3`` |
+| Description   | Lorem Ipsum      |
 
-(string, default: `stderr`) Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
-
-</dd>
-<dt>max_age</dt>
-<dd>
-
-(int64, `gte=0`, default: `7`) Max age in days for log files
-
-</dd>
-<dt>max_backups</dt>
-<dd>
-
-(int64, `gte=0`, default: `3`) Max log file backups
-
-</dd>
-<dt>max_size</dt>
-<dd>
-
-(int64, `gte=0`, default: `50`) Log file max size in MB
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->          |
+| ------------- | ----------------- |
+| Property      | `max_size`        |
+| Type          | _int64_           |
+| Default Value | `, default: `50`` |
+| Description   | Lorem Ipsum       |
 
 ### MetricsConfig {#metrics-config}
 
 MetricsConfig holds configuration for service metrics.
 
-#### Properties
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `enable_go_metrics`  |
+| Type          | _bool_               |
+| Default Value | `, default: `false`` |
+| Description   | Lorem Ipsum          |
 
-<dl>
-<dt>enable_go_metrics</dt>
-<dd>
+| <!-- -->      | <!-- -->                   |
+| ------------- | -------------------------- |
+| Property      | `enable_process_collector` |
+| Type          | _bool_                     |
+| Default Value | `, default: `false``       |
+| Description   | Lorem Ipsum                |
 
-(bool, default: `false`) EnableGoCollector controls whether the go collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewGoCollector>
-
-</dd>
-<dt>enable_process_collector</dt>
-<dd>
-
-(bool, default: `false`) EnableProcessCollector controls whether the process collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewProcessCollector>
-
-</dd>
-<dt>pedantic</dt>
-<dd>
-
-(bool, default: `false`) Pedantic controls whether a pedantic Registerer is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `pedantic`           |
+| Type          | _bool_               |
+| Default Value | `, default: `false`` |
+| Description   | Lorem Ipsum          |
 
 ### PluginsConfig {#plugins-config}
 
 PluginsConfig holds configuration for plugins.
 
-#### Properties
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `disable_plugins`    |
+| Type          | _bool_               |
+| Default Value | `, default: `false`` |
+| Description   | Lorem Ipsum          |
 
-<dl>
-<dt>disable_plugins</dt>
-<dd>
+| <!-- -->      | <!-- -->           |
+| ------------- | ------------------ |
+| Property      | `disabled_plugins` |
+| Type          | _[]string_         |
+| Default Value | ``                 |
+| Description   | Lorem Ipsum        |
 
-(bool, default: `false`) Disables all plugins
+| <!-- -->      | <!-- -->           |
+| ------------- | ------------------ |
+| Property      | `disabled_symbols` |
+| Type          | _[]string_         |
+| Default Value | ``                 |
+| Description   | Lorem Ipsum        |
 
-</dd>
-<dt>disabled_plugins</dt>
-<dd>
-
-([]string, `omitempty`) Specific plugins to disable
-
-</dd>
-<dt>disabled_symbols</dt>
-<dd>
-
-([]string, `omitempty`) Specific plugin types to disable
-
-</dd>
-<dt>plugins_path</dt>
-<dd>
-
-(string, default: `default`) Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->               |
+| ------------- | ---------------------- |
+| Property      | `plugins_path`         |
+| Type          | _string_               |
+| Default Value | `, default: `default`` |
+| Description   | Lorem Ipsum            |
 
 ### PortsConfig {#ports-config}
 
 PortsConfig defines configuration for OTEL debug and extension ports.
 
-#### Properties
+| <!-- -->      | <!-- -->            |
+| ------------- | ------------------- |
+| Property      | `debug_port`        |
+| Type          | _uint32_            |
+| Default Value | `, default: `8888`` |
+| Description   | Lorem Ipsum         |
 
-<dl>
-<dt>debug_port</dt>
-<dd>
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `health_check_port`  |
+| Type          | _uint32_             |
+| Default Value | `, default: `13133`` |
+| Description   | Lorem Ipsum          |
 
-(uint32, `gte=0`, default: `8888`) Port on which otel collector exposes prometheus metrics on /metrics path.
+| <!-- -->      | <!-- -->            |
+| ------------- | ------------------- |
+| Property      | `pprof_port`        |
+| Type          | _uint32_            |
+| Default Value | `, default: `1777`` |
+| Description   | Lorem Ipsum         |
 
-</dd>
-<dt>health_check_port</dt>
-<dd>
-
-(uint32, `gte=0`, default: `13133`) Port on which health check extension in exposed.
-
-</dd>
-<dt>pprof_port</dt>
-<dd>
-
-(uint32, `gte=0`, default: `1777`) Port on which pprof extension in exposed.
-
-</dd>
-<dt>zpages_port</dt>
-<dd>
-
-(uint32, `gte=0`, default: `55679`) Port on which zpages extension in exposed.
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `zpages_port`        |
+| Type          | _uint32_             |
+| Default Value | `, default: `55679`` |
+| Description   | Lorem Ipsum          |
 
 ### ProfilersConfig {#profilers-config}
 
 ProfilersConfig holds configuration for profilers.
 
-#### Properties
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `cpu_profiler`       |
+| Type          | _bool_               |
+| Default Value | `, default: `false`` |
+| Description   | Lorem Ipsum          |
 
-<dl>
-<dt>cpu_profiler</dt>
-<dd>
+| <!-- -->      | <!-- -->               |
+| ------------- | ---------------------- |
+| Property      | `profiles_path`        |
+| Type          | _string_               |
+| Default Value | `, default: `default`` |
+| Description   | Lorem Ipsum            |
 
-(bool, default: `false`) Flag to enable cpu profiling on process start and save it to a file. HTTP interface will not work if this is enabled as CPU profile will always be running.
-
-</dd>
-<dt>profiles_path</dt>
-<dd>
-
-(string, default: `default`) Path to save performance profiles. "default" path is `/var/log/aperture/<service>/profiles`.
-
-</dd>
-<dt>register_http_routes</dt>
-<dd>
-
-(bool, default: `true`) Register routes. Profile types profile, symbol and cmdline will be registered at /debug/pprof/{profile,symbol,cmdline}.
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->               |
+| ------------- | ---------------------- |
+| Property      | `register_http_routes` |
+| Type          | _bool_                 |
+| Default Value | `, default: `true``    |
+| Description   | Lorem Ipsum            |
 
 ### PrometheusConfig {#prometheus-config}
 
 PrometheusConfig holds configuration for Prometheus Server.
 
-#### Properties
-
-<dl>
-<dt>address</dt>
-<dd>
-
-(string, `required,hostname_port|url|fqdn`) Address of the prometheus server
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->    |
+| ------------- | ----------- |
+| Property      | `address`   |
+| Type          | _string_    |
+| Default Value | ``          |
+| Description   | Lorem Ipsum |
 
 ### ProxyConfig {#proxy-config}
 
@@ -1226,195 +1203,186 @@ ProxyConfig holds proxy configuration.
 
 This configuration has preference over environment variables HTTP_PROXY, HTTPS_PROXY or NO_PROXY. See <https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config>
 
-#### Properties
+| <!-- -->      | <!-- -->    |
+| ------------- | ----------- |
+| Property      | `http`      |
+| Type          | _string_    |
+| Default Value | ``          |
+| Description   | Lorem Ipsum |
 
-<dl>
-<dt>http</dt>
-<dd>
+| <!-- -->      | <!-- -->    |
+| ------------- | ----------- |
+| Property      | `https`     |
+| Type          | _string_    |
+| Default Value | ``          |
+| Description   | Lorem Ipsum |
 
-(string, `omitempty,url|hostname_port`)
-
-</dd>
-<dt>https</dt>
-<dd>
-
-(string, `omitempty,url|hostname_port`)
-
-</dd>
-<dt>no_proxy</dt>
-<dd>
-
-([]string, `omitempty,dive,ip|cidr|fqdn|hostname_port`)
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->    |
+| ------------- | ----------- |
+| Property      | `no_proxy`  |
+| Type          | _[]string_  |
+| Default Value | ``          |
+| Description   | Lorem Ipsum |
 
 ### SentryConfig {#sentry-config}
 
 SentryConfig holds configuration for Sentry.
 
-#### Properties
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `attach_stack_trace` |
+| Type          | _bool_               |
+| Default Value | `, default: `true``  |
+| Description   | Lorem Ipsum          |
 
-<dl>
-<dt>attach_stack_trace</dt>
-<dd>
+| <!-- -->      | <!-- -->            |
+| ------------- | ------------------- |
+| Property      | `debug`             |
+| Type          | _bool_              |
+| Default Value | `, default: `true`` |
+| Description   | Lorem Ipsum         |
 
-(bool, default: `true`) Configure to generate and attach stacktraces to capturing message calls
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `disabled`           |
+| Type          | _bool_               |
+| Default Value | `, default: `false`` |
+| Description   | Lorem Ipsum          |
 
-</dd>
-<dt>debug</dt>
-<dd>
+| <!-- -->      | <!-- -->                                                                                 |
+| ------------- | ---------------------------------------------------------------------------------------- |
+| Property      | `dsn`                                                                                    |
+| Type          | _string_                                                                                 |
+| Default Value | `, default: `https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877`` |
+| Description   | Lorem Ipsum                                                                              |
 
-(bool, default: `true`) Debug enables printing of Sentry SDK debug messages
+| <!-- -->      | <!-- -->                  |
+| ------------- | ------------------------- |
+| Property      | `environment`             |
+| Type          | _string_                  |
+| Default Value | `, default: `production`` |
+| Description   | Lorem Ipsum               |
 
-</dd>
-<dt>disabled</dt>
-<dd>
+| <!-- -->      | <!-- -->           |
+| ------------- | ------------------ |
+| Property      | `sample_rate`      |
+| Type          | _float64_          |
+| Default Value | `, default: `1.0`` |
+| Description   | Lorem Ipsum        |
 
-(bool, default: `false`) Sentry crash report disabled
-
-</dd>
-<dt>dsn</dt>
-<dd>
-
-(string, default: `https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877`) If DSN is not set, the client is effectively disabled
-You can set test project's dsn to send log events.
-oss-aperture project dsn is set as default.
-
-</dd>
-<dt>environment</dt>
-<dd>
-
-(string, default: `production`) Environment
-
-</dd>
-<dt>sample_rate</dt>
-<dd>
-
-(float64, default: `1.0`) Sample rate for event submission i.e. 0.0 to 1.0
-
-</dd>
-<dt>traces_sample_rate</dt>
-<dd>
-
-(float64, default: `0.2`) Sample rate for sampling traces i.e. 0.0 to 1.0
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `traces_sample_rate` |
+| Type          | _float64_            |
+| Default Value | `, default: `0.2``   |
+| Description   | Lorem Ipsum          |
 
 ### ServerTLSConfig {#server-tls-config}
 
 ServerTLSConfig holds configuration for setting up server TLS support.
 
-#### Properties
+| <!-- -->      | <!-- -->     |
+| ------------- | ------------ |
+| Property      | `allowed_cn` |
+| Type          | _string_     |
+| Default Value | ``           |
+| Description   | Lorem Ipsum  |
 
-<dl>
-<dt>allowed_cn</dt>
-<dd>
+| <!-- -->      | <!-- -->    |
+| ------------- | ----------- |
+| Property      | `cert_file` |
+| Type          | _string_    |
+| Default Value | ``          |
+| Description   | Lorem Ipsum |
 
-(string, `omitempty,fqdn`) Allowed CN
+| <!-- -->      | <!-- -->         |
+| ------------- | ---------------- |
+| Property      | `client_ca_file` |
+| Type          | _string_         |
+| Default Value | ``               |
+| Description   | Lorem Ipsum      |
 
-</dd>
-<dt>cert_file</dt>
-<dd>
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `enabled`            |
+| Type          | _bool_               |
+| Default Value | `, default: `false`` |
+| Description   | Lorem Ipsum          |
 
-(string) Server Cert file path
-
-</dd>
-<dt>client_ca_file</dt>
-<dd>
-
-(string) Client CA file path
-
-</dd>
-<dt>enabled</dt>
-<dd>
-
-(bool, default: `false`) Enabled TLS
-
-</dd>
-<dt>key_file</dt>
-<dd>
-
-(string) Server Key file path
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->    |
+| ------------- | ----------- |
+| Property      | `key_file`  |
+| Type          | _string_    |
+| Default Value | ``          |
+| Description   | Lorem Ipsum |
 
 ### WatchdogConfig {#watchdog-config}
 
 WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
 
-#### Properties
+| <!-- -->      | <!-- -->                                      |
+| ------------- | --------------------------------------------- |
+| Property      | `cgroup`                                      |
+| Type          | _[WatchdogPolicyType](#watchdog-policy-type)_ |
+| Default Value | ``                                            |
+| Description   | Lorem Ipsum                                   |
 
-<dl>
-<dt>cgroup</dt>
-<dd>
+| <!-- -->      | <!-- -->                     |
+| ------------- | ---------------------------- |
+| Property      | `heap`                       |
+| Type          | _[HeapConfig](#heap-config)_ |
+| Default Value | ``                           |
+| Description   | Lorem Ipsum                  |
 
-([WatchdogPolicyType](#watchdog-policy-type))
+| <!-- -->      | <!-- -->                   |
+| ------------- | -------------------------- |
+| Property      | `job`                      |
+| Type          | _[JobConfig](#job-config)_ |
+| Default Value | ``                         |
+| Description   | Lorem Ipsum                |
 
-</dd>
-<dt>heap</dt>
-<dd>
-
-([HeapConfig](#heap-config))
-
-</dd>
-<dt>job</dt>
-<dd>
-
-([JobConfig](#job-config))
-
-</dd>
-<dt>system</dt>
-<dd>
-
-([WatchdogPolicyType](#watchdog-policy-type))
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->                                      |
+| ------------- | --------------------------------------------- |
+| Property      | `system`                                      |
+| Type          | _[WatchdogPolicyType](#watchdog-policy-type)_ |
+| Default Value | ``                                            |
+| Description   | Lorem Ipsum                                   |
 
 ### WatchdogPolicyType {#watchdog-policy-type}
 
 WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
 
-#### Properties
+| <!-- -->      | <!-- -->                             |
+| ------------- | ------------------------------------ |
+| Property      | `adaptive_policy`                    |
+| Type          | _[AdaptivePolicy](#adaptive-policy)_ |
+| Default Value | ``                                   |
+| Description   | Lorem Ipsum                          |
 
-<dl>
-<dt>adaptive_policy</dt>
-<dd>
-
-([AdaptivePolicy](#adaptive-policy))
-
-</dd>
-<dt>watermarks_policy</dt>
-<dd>
-
-([WatermarksPolicy](#watermarks-policy))
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->                                 |
+| ------------- | ---------------------------------------- |
+| Property      | `watermarks_policy`                      |
+| Type          | _[WatermarksPolicy](#watermarks-policy)_ |
+| Default Value | ``                                       |
+| Description   | Lorem Ipsum                              |
 
 ### WatermarksPolicy {#watermarks-policy}
 
 WatermarksPolicy creates a Watchdog policy that schedules GC at concrete watermarks.
 
-#### Properties
+| <!-- -->      | <!-- -->             |
+| ------------- | -------------------- |
+| Property      | `enabled`            |
+| Type          | _bool_               |
+| Default Value | `, default: `false`` |
+| Description   | Lorem Ipsum          |
 
-<dl>
-<dt>enabled</dt>
-<dd>
-
-(bool, default: `false`) Flag to enable the policy
-
-</dd>
-<dt>watermarks</dt>
-<dd>
-
-([]float64, `omitempty,dive,gte=0,lte=1`, default: `[0.50,0.75,0.80,0.85,0.90,0.95,0.99]`) Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
-
-</dd>
-</dl>
+| <!-- -->      | <!-- -->                                            |
+| ------------- | --------------------------------------------------- |
+| Property      | `watermarks`                                        |
+| Type          | _[]float64_                                         |
+| Default Value | `, default: `[0.50,0.75,0.80,0.85,0.90,0.95,0.99]`` |
+| Description   | Lorem Ipsum                                         |
 
 <!---
 Generated File Ends

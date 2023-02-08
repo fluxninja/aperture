@@ -157,22 +157,15 @@ any
       {{- end }}
     {{- end }}
     {{- if .Properties }}
-#### {{ if .IsTuple }}Tuple members{{ else }}Properties{{ end }}
-
-<dl>
       {{- range .Properties }}
-<dt>{{ .OriginalName }}</dt>
-<dd>{{/* blank lines inside dd are important for correct markdown rendering, don't remove */}}
 
-({{- template "fnProperty" . -}})
-{{- if or .Title .Description}} {{ end -}}
-{{- .Title -}}
-{{- if and .Title .Description }}{{ printf "\n\n" }}{{ end -}}
-{{- .Description }}
-
-</dd>
+| <!-- --> | <!-- --> |
+| ----------- | ---------- |
+| Property | `{{ .OriginalName }}` |
+| Type | *{{ template "fnSchemaSimple" . }}* |
+| Default Value | `{{ template "fnDefaultInline" . }}` |
+| Description | Lorem Ipsum
       {{- end }}
-</dl>
     {{- end }}
   {{- end -}}
 {{- end }}
