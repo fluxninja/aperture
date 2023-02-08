@@ -11,11 +11,11 @@ import (
 	"github.com/gofrs/flock"
 	"github.com/spf13/cobra"
 
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
 const (
-	apertureRepo             = "https://github.com/fluxninja/aperture"
 	defaultBlueprintsRepo    = "github.com/fluxninja/aperture/blueprints"
 	defaultBlueprintsVersion = "latest"
 	sourceFilename           = ".source"
@@ -72,7 +72,7 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 		// set the URI
 		if blueprintsURI == "" {
 			if blueprintsVersion == defaultBlueprintsVersion {
-				blueprintsVersion, err = resolveLatestVersion()
+				blueprintsVersion, err = utils.ResolveLatestVersion()
 				if err != nil {
 					return err
 				}

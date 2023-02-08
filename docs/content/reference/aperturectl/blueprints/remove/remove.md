@@ -23,7 +23,7 @@ aperturectl blueprints remove [flags]
 ```
 aperturectl blueprints remove
 
-aperturectl blueprints remove --version v0.22.0
+aperturectl blueprints remove --version latest
 
 aperturectl blueprints remove --all
 ```

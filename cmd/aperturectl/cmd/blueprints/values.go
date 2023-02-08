@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -23,9 +24,10 @@ func init() {
 }
 
 var valuesCmd = &cobra.Command{
-	Use:           "values",
-	Short:         "Provide values file for a given Aperture Blueprint",
-	Long:          `Provides a values file for a given Aperture Blueprint that can be then used to generate policies after customization`,
+	Use:   "values",
+	Short: "Provide values file for a given Aperture Blueprint",
+	Long: `
+Provides a values file for a given Aperture Blueprint that can be then used to generate policies after customization`,
 	SilenceErrors: true,
 	Example: `aperturectl blueprints values --name=policies/static-rate-limiting --output-file=values.yaml
 
@@ -52,6 +54,20 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 		if err := copyFile(file, valuesFile); err != nil {
 			return err
 		}
+
+		editor := os.Getenv("EDITOR")
+		if editor == "" {
+			editor = "vi"
+		}
+		cmd := exec.Command(editor, valuesFile)
+		cmd.Stdin = os.Stdin
+		cmd.Stderr = os.Stderr
+		cmd.Stdout = os.Stdout
+		err := cmd.Run()
+		if err != nil {
+			return fmt.Errorf("error opening file with editor: %s", err)
+		}
+
 		log.Info().Msgf("values file for the blueprint %s is available at: %s", blueprintName, valuesFile)
 		return nil
 	},

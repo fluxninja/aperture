@@ -14,6 +14,14 @@ Apply Aperture Policy to the cluster
 
 Use this command to apply the Aperture Policy to the cluster.
 
+### Examples
+
+```
+aperturectl apply --file=policy.yaml
+
+aperturectl apply --dir=policy-dir
+```
+
 ### Options
 
 ```
