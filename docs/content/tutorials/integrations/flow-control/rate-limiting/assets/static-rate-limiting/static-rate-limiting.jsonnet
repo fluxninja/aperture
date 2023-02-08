@@ -2,19 +2,9 @@ local aperture = import 'github.com/fluxninja/aperture/blueprints/main.libsonnet
 
 
 local StaticRateLimiting = aperture.policies.StaticRateLimiting.policy;
-local policy = aperture.spec.v1.Policy;
-local component = aperture.spec.v1.Component;
-local flowControl = aperture.spec.v1.FlowControl;
-local rateLimiter = aperture.spec.v1.RateLimiter;
-local rateLimiterParameters = aperture.spec.v1.RateLimiterParameters;
 local flowSelector = aperture.spec.v1.FlowSelector;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowMatcher = aperture.spec.v1.FlowMatcher;
-local circuit = aperture.spec.v1.Circuit;
-local resources = aperture.spec.v1.Resources;
-local port = aperture.spec.v1.Port;
-
-local rateLimitPort = port.new() + port.withSignalName('RATE_LIMIT');
 
 local svcSelector =
   flowSelector.new()
