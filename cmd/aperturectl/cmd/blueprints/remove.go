@@ -1,10 +1,8 @@
 package blueprints
 
 import (
-	"fmt"
 	"os"
 
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -17,11 +15,11 @@ var removeCmd = &cobra.Command{
 	Short: "Remove a Blueprint",
 	Long: `
 Use this command to remove a pulled Aperture Blueprint from local system.`,
-	Example: fmt.Sprintf(`aperturectl blueprints remove
+	Example: `aperturectl blueprints remove
 
-aperturectl blueprints remove --version v%s
+aperturectl blueprints remove --version latest
 
-aperturectl blueprints remove --all`, utils.Version),
+aperturectl blueprints remove --all`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		pathToRemove := ""
 

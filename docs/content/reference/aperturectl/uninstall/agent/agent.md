@@ -37,8 +37,8 @@ aperturectl uninstall agent --namespace=aperture
 ```
       --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
       --namespace string     Namespace from which the component will be uninstalled. Defaults to component name
-      --timeout int          Timeout of waiting for uninstallation hooks completion. Defaults to 300 (default 300)
-      --version string       Version of the Aperture to uninstall. Defaults to latest (default "latest")
+      --timeout int          Timeout of waiting for uninstallation hooks completion (default 300)
+      --version string       Version of the Aperture (default "latest")
 ```
 
 ### SEE ALSO

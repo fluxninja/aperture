@@ -21,7 +21,7 @@ Use this command to install Aperture Controller and Agent on your Kubernetes clu
       --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
       --namespace string     Namespace in which the component will be installed. Defaults to component name
       --values-file string   Values YAML file containing parameters to customize the installation
-      --version string       Version of the Aperture to uninstall. Defaults to latest (default "latest")
+      --version string       Version of the Aperture (default "latest")
 ```
 
 ### SEE ALSO

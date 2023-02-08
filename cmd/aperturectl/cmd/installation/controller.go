@@ -6,33 +6,25 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/spf13/cobra"
 	"helm.sh/helm/v3/pkg/releaseutil"
+	corev1 "k8s.io/api/core/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // controllerInstallCmd is the command to install Aperture Controller on Kubernetes.
 var controllerInstallCmd = &cobra.Command{
 	Use:   "controller",
 	Short: "Install Aperture Controller",
-	Long: fmt.Sprintf(`
+	Long: `
 Use this command to install Aperture Controller and its dependencies on your Kubernetes cluster.
-Refer https://github.com/fluxninja/aperture/blob/v%s/manifests/charts/aperture-controller/README.md for list of configurable parameters for preparing values file.`,
-		utils.Version),
+Refer https://artifacthub.io/packages/helm/aperture/aperture-controller#parameters for list of configurable parameters for preparing values file.`,
 	SilenceErrors: true,
 	Example: `aperturectl install controller --values-file=values.yaml
 
 aperturectl install controller --values-file=values.yaml --namespace=aperture`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if namespace == "" {
-			namespace = apertureControllerNS
-		}
-
-		if err := manageNamespace(); err != nil {
-			return err
-		}
-
 		crds, _, manifests, err := getTemplets(controller, releaseutil.InstallOrder)
 		for _, crd := range crds {
 			if err = applyManifest(string(crd.File.Data)); err != nil {
@@ -60,10 +52,6 @@ Use this command to uninstall Aperture Controller and its dependencies from your
 
 aperturectl uninstall controller --namespace=aperture`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if namespace == "" {
-			namespace = apertureControllerNS
-		}
-
 		crds, hooks, manifests, err := getTemplets(controller, releaseutil.UninstallOrder)
 
 		for _, hook := range hooks {
@@ -82,6 +70,11 @@ aperturectl uninstall controller --namespace=aperture`,
 			}
 
 			if err = deleteManifest(hook.Manifest); err != nil {
+				return err
+			}
+
+			if err = kubeClient.DeleteAllOf(
+				context.Background(), &corev1.Pod{}, client.InNamespace(namespace), client.MatchingLabels{"job-name": hook.Name}); err != nil {
 				return err
 			}
 		}

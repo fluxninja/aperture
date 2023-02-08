@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"reflect"
 
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/jsonnet-bundler/jsonnet-bundler/pkg"
 	"github.com/jsonnet-bundler/jsonnet-bundler/pkg/jsonnetfile"
 	specv1 "github.com/jsonnet-bundler/jsonnet-bundler/spec/v1"
@@ -114,9 +113,9 @@ var pullCmd = &cobra.Command{
 Use this command to pull the Aperture Blueprints in local system to use for generating Aperture Policies and Grafana Dashboards.`,
 	SilenceErrors: true,
 	SilenceUsage:  true,
-	Example: fmt.Sprintf(`aperturectl blueprints pull
+	Example: `aperturectl blueprints pull
 
-aperturectl blueprints pull --version v%s`, utils.Version),
+aperturectl blueprints pull --version latest`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return nil
 	},

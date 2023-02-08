@@ -15,7 +15,7 @@ import (
 func init() {
 	InstallCmd.PersistentFlags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
 	InstallCmd.PersistentFlags().StringVar(&valuesFile, "values-file", "", "Values YAML file containing parameters to customize the installation")
-	InstallCmd.PersistentFlags().StringVar(&version, "version", apertureLatestVersion, "Version of the Aperture to uninstall. Defaults to latest")
+	InstallCmd.PersistentFlags().StringVar(&version, "version", apertureLatestVersion, "Version of the Aperture")
 	InstallCmd.PersistentFlags().StringVar(&namespace, "namespace", "", "Namespace in which the component will be installed. Defaults to component name")
 
 	InstallCmd.AddCommand(controllerInstallCmd)
@@ -31,6 +31,15 @@ Use this command to install Aperture Controller and Agent on your Kubernetes clu
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		var err error
+
+		if namespace == "" {
+			namespace = defaultNS
+		}
+
+		if err = manageNamespace(); err != nil {
+			return err
+		}
+
 		kubeRestConfig, err = utils.GetKubeConfig(kubeConfig)
 		if err != nil {
 			return err

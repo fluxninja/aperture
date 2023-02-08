@@ -8,6 +8,9 @@ import (
 	"time"
 
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/imdario/mergo"
 	"golang.org/x/exp/slices"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -18,11 +21,11 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/yaml"
 )
 
@@ -39,8 +42,7 @@ var (
 
 const (
 	apertureLatestVersion = "latest"
-	apertureControllerNS  = "aperture-controller"
-	apertureAgentNS       = "aperture-agent"
+	defaultNS             = "default"
 	controller            = "controller"
 	agent                 = "agent"
 )
@@ -113,25 +115,57 @@ func applyManifest(manifest string) error {
 	unstructuredObject := &unstructured.Unstructured{
 		Object: content,
 	}
+	log.Info().Msgf("Applying - %s/%s", unstructuredObject.GetKind(), unstructuredObject.GetName())
 
-	log.Info().Msgf("Installing - %s/%s", unstructuredObject.GetKind(), unstructuredObject.GetName())
-	spec := unstructuredObject.Object["spec"]
-	_, err = controllerutil.CreateOrUpdate(context.Background(), kubeClient, unstructuredObject, func() error {
-		unstructuredObject.Object["spec"] = spec
-		return nil
-	})
-	if err != nil && strings.Contains(err.Error(), "no matches for kind") {
-		attempt := 0
-		for attempt < 5 {
-			time.Sleep(time.Second * time.Duration(attempt))
-			if _, err = controllerutil.CreateOrUpdate(context.Background(), kubeClient, unstructuredObject, func() error {
-				unstructuredObject.Object["spec"] = spec
-				return nil
-			}); err == nil {
+	attempt := 0
+	for attempt < 5 {
+		time.Sleep(time.Second * time.Duration(attempt))
+		if err = applyObjectToKubernetes(unstructuredObject); err == nil {
+			return nil
+		} else if strings.Contains(err.Error(), "no matches for kind") {
+			continue
+		}
+		break
+	}
+
+	log.Error().Msgf("Failed to apply - %s/%s, Error - '%s'", unstructuredObject.GetKind(), unstructuredObject.GetName(), err)
+
+	return err
+}
+
+// applyObjectToKubernetes applies the given object to Kubernetes.
+func applyObjectToKubernetes(unstructuredObject *unstructured.Unstructured) error {
+	key := types.NamespacedName{
+		Name:      unstructuredObject.GetName(),
+		Namespace: unstructuredObject.GetNamespace(),
+	}
+	existing := unstructuredObject.DeepCopy()
+	err := kubeClient.Get(context.Background(), key, existing)
+	if err != nil && !apierrors.IsNotFound(err) {
+		return err
+	}
+
+	if !apierrors.IsNotFound(err) {
+		opts := cmpopts.IgnoreFields(
+			metav1.ObjectMeta{},
+			"Generation", "ResourceVersion", "SelfLink", "UID",
+			"CreationTimestamp", "DeletionTimestamp", "DeletionGracePeriodSeconds",
+			"OwnerReferences", "Finalizers",
+		)
+
+		// Check if there are any differences between the existing and the new object
+		if !cmp.Equal(unstructuredObject, existing, opts) {
+			err = mergo.Map(&unstructuredObject.Object, &existing.Object)
+			if err != nil {
+				log.Error().Msgf("Error Applying - %s/%s, Error - '%s'", unstructuredObject.GetKind(), unstructuredObject.GetName(), err)
 				return nil
 			}
+			err = kubeClient.Patch(context.Background(), unstructuredObject, client.MergeFrom(existing))
 		}
+	} else {
+		err = kubeClient.Create(context.Background(), unstructuredObject)
 	}
+
 	return err
 }
 

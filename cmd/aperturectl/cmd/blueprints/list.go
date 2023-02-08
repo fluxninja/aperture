@@ -9,7 +9,6 @@ import (
 	"text/tabwriter"
 
 	"github.com/facebookgo/symwalk"
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -22,11 +21,11 @@ var listCmd = &cobra.Command{
 	Short: "List Aperture Blueprints",
 	Long: `
 Use this command to list the Aperture Blueprints which are already pulled and available in local system.`,
-	Example: fmt.Sprintf(`aperturectl blueprints list
+	Example: `aperturectl blueprints list
 
-aperturectl blueprints list --version v%s
+aperturectl blueprints list --version latest
 
-aperturectl blueprints list --all`, utils.Version),
+aperturectl blueprints list --all`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		err := readerLock()
 		if err != nil {

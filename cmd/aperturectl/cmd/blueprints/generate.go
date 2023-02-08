@@ -32,11 +32,11 @@ var generateCmd = &cobra.Command{
 	Long: `
 Use this command to generate Aperture Policy related resources like Kubernetes Custom Resource, Grafana Dashboards and graphs in DOT and Mermaid format.`,
 	SilenceErrors: true,
-	Example: fmt.Sprintf(`aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml
+	Example: `aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml
 
-aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --version v%s
+aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --version latest
 
-aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --apply`, utils.Version),
+aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --apply`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		err := readerLock()
 		if err != nil {

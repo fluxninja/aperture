@@ -13,7 +13,7 @@ Install Aperture Controller
 ### Synopsis
 
 Use this command to install Aperture Controller and its dependencies on your Kubernetes cluster.
-Refer https://github.com/fluxninja/aperture/blob/v0.0.1/manifests/charts/aperture-controller/README.md for list of configurable parameters for preparing values file.
+Refer https://artifacthub.io/packages/helm/aperture/aperture-controller#parameters for list of configurable parameters for preparing values file.
 
 ```
 aperturectl install controller [flags]
@@ -39,7 +39,7 @@ aperturectl install controller --values-file=values.yaml --namespace=aperture
       --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
       --namespace string     Namespace in which the component will be installed. Defaults to component name
       --values-file string   Values YAML file containing parameters to customize the installation
-      --version string       Version of the Aperture to uninstall. Defaults to latest (default "latest")
+      --version string       Version of the Aperture (default "latest")
 ```
 
 ### SEE ALSO
