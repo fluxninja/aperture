@@ -8,10 +8,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/gofrs/flock"
 	"github.com/spf13/cobra"
+
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 const (
@@ -77,6 +78,11 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 				}
 			}
 			blueprintsURI = fmt.Sprintf("%s@%s", defaultBlueprintsRepo, blueprintsVersion)
+		} else {
+			blueprintsURI, err = filepath.Abs(blueprintsURI)
+			if err != nil {
+				return err
+			}
 		}
 
 		// convert the URI to a local dir name which is disk friendly
