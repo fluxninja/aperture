@@ -96,7 +96,7 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 		lock = flock.New(filepath.Join(blueprintsDir, lockFilename))
 
 		// pull the latest blueprints based on skipPull and whether cmd is remove
-		if !skipPull && cmd.Use != "remove" && cmd.Use != "list" {
+		if !skipPull && cmd.Use != "remove" {
 			err = pullFunc(cmd, args)
 			if err != nil {
 				return err
