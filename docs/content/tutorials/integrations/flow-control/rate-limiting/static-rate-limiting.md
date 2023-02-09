@@ -71,3 +71,14 @@ In addition, we will be configuring our rate limiter to apply these limits to
 ```mermaid
 {@include: ./assets/static-rate-limiting/static-rate-limiting.mmd}
 ```
+
+### Playground
+
+When the above policy is loaded in the playground, we see that no more than 120
+requests are accepted at any given time and rest of the requests are rejected.
+
+<Zoom>
+
+![Static Rate Limiting](./assets/static-rate-limiting/static-rate-limiting-demo.png)
+
+</Zoom>
