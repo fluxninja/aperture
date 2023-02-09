@@ -3,4 +3,4 @@
 ARG IMAGE_TAG
 FROM aperture-java-all:$IMAGE_TAG
 
-CMD ["java", "-javaagent:/javaagent.jar", "-jar", "/armeria.jar"]
+CMD ["java", "-javaagent:/javaagent.jar", "-jar", "/netty.jar"]

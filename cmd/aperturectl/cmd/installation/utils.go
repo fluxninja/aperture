@@ -2,6 +2,7 @@ package installation
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -118,18 +119,18 @@ func applyManifest(manifest string) error {
 	log.Info().Msgf("Applying - %s/%s", unstructuredObject.GetKind(), unstructuredObject.GetName())
 	attempt := 0
 	for attempt < 5 {
-		time.Sleep(time.Second * time.Duration(attempt))
-		if err = applyObjectToKubernetes(unstructuredObject); err == nil {
-			return nil
-		} else if strings.Contains(err.Error(), "no matches for kind") {
+		attempt++
+		if err = applyObjectToKubernetes(unstructuredObject); err != nil && strings.Contains(err.Error(), "no matches for kind") {
+			time.Sleep(time.Second * time.Duration(attempt))
 			continue
 		}
 		break
 	}
 
-	log.Error().Msgf("Failed to apply - %s/%s, Error - '%s'", unstructuredObject.GetKind(), unstructuredObject.GetName(), err)
-
-	return err
+	if err != nil {
+		return fmt.Errorf("failed to apply - %s/%s, Error - '%s'", unstructuredObject.GetKind(), unstructuredObject.GetName(), err)
+	}
+	return nil
 }
 
 // applyObjectToKubernetes applies the given object to Kubernetes.
@@ -156,8 +157,7 @@ func applyObjectToKubernetes(unstructuredObject *unstructured.Unstructured) erro
 		if !cmp.Equal(unstructuredObject, existing, opts) {
 			err = mergo.Map(&unstructuredObject.Object, &existing.Object)
 			if err != nil {
-				log.Error().Msgf("Error Applying - %s/%s, Error - '%s'", unstructuredObject.GetKind(), unstructuredObject.GetName(), err)
-				return nil
+				return err
 			}
 			err = kubeClient.Patch(context.Background(), unstructuredObject, client.MergeFrom(existing))
 		}
@@ -182,7 +182,10 @@ func deleteManifest(manifest string) error {
 		return nil
 	}
 
-	return err
+	if err != nil {
+		return fmt.Errorf("failed to delete - %s/%s, Error - '%s'", unstructuredObject.GetKind(), unstructuredObject.GetName(), err)
+	}
+	return nil
 }
 
 // manageNamespace creates namespace if not present.
@@ -230,4 +233,89 @@ func prepareUnstructuredObject(manifest string) (*unstructured.Unstructured, err
 	}
 
 	return unstructuredObject, nil
+}
+
+// handleInstall handles installation for given chart using given release name.
+func handleInstall(chartName, releaseName string) error {
+	crds, _, manifests, err := getTemplets(chartName, releaseName, releaseutil.InstallOrder)
+	if err != nil {
+		return err
+	}
+
+	errs := []error{}
+	for _, crd := range crds {
+		if err = applyManifest(string(crd.File.Data)); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	for _, manifest := range manifests {
+		if err = applyManifest(manifest.Content); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	for _, err := range errs {
+		log.Error().Msg(err.Error())
+	}
+
+	if len(errs) != 0 {
+		return fmt.Errorf("failed to complete install successfully")
+	}
+	return nil
+}
+
+// handleUnInstall handles uninstallation for given chart using given release name.
+func handleUnInstall(chartName, releaseName string) error {
+	crds, hooks, manifests, err := getTemplets(chartName, releaseName, releaseutil.UninstallOrder)
+	if err != nil {
+		return err
+	}
+
+	errs := []error{}
+	for _, hook := range hooks {
+		log.Info().Msgf("Executing hook - %s", hook.Name)
+		if err = applyManifest(hook.Manifest); err != nil {
+			return err
+		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+		defer cancel()
+		if err = waitForHook(hook.Name, ctx); err != nil {
+			if errors.Is(err, context.DeadlineExceeded) {
+				return fmt.Errorf("timed out waiting for pre-delete hook completion")
+			}
+			return err
+		}
+
+		if err = deleteManifest(hook.Manifest); err != nil {
+			errs = append(errs, err)
+		}
+
+		if err = kubeClient.DeleteAllOf(
+			context.Background(), &corev1.Pod{}, client.InNamespace(namespace), client.MatchingLabels{"job-name": hook.Name}); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	for _, manifest := range manifests {
+		if err = deleteManifest(manifest.Content); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	for _, crd := range crds {
+		if err = deleteManifest(string(crd.File.Data)); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	for _, err := range errs {
+		log.Error().Msg(err.Error())
+	}
+
+	if len(errs) != 0 {
+		return fmt.Errorf("failed to complete uninstall successfully")
+	}
+	return nil
 }
