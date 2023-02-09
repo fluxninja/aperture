@@ -49,10 +49,10 @@ func ParseAIMDConcurrencyController(
 		}
 	}
 
-	isOverloadDeciderOperator := "gt"
+	isOverloadDeciderOperator := "lt"
 	// if slope is greater than 0 then we want to use less than operator
-	if aimdConcurrencyController.GradientParameters.Slope > 0 {
-		isOverloadDeciderOperator = "lt"
+	if aimdConcurrencyController.GradientParameters.Slope < 0 {
+		isOverloadDeciderOperator = "gt"
 	}
 
 	alerterLabels := aimdConcurrencyController.AlerterParameters.Labels
