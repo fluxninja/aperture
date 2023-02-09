@@ -5,8 +5,6 @@ import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse;
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowControlServiceGrpc;
 import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
 import com.fluxninja.generated.envoy.service.auth.v3.AuthorizationGrpc;
-import com.fluxninja.generated.google.rpc.Status;
-import com.google.rpc.Code;
 import io.grpc.StatusRuntimeException;
 import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageEntry;
@@ -17,8 +15,10 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import static com.fluxninja.aperture.sdk.Constants.*;
 
@@ -27,16 +27,22 @@ public final class ApertureSDK {
   private final AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient;
   private final Tracer tracer;
   private final Duration timeout;
+  private final List<String> blockedPaths;
+  private final boolean blockedPathsMatchRegex;
 
   ApertureSDK(
       FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient,
       AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient,
       Tracer tracer,
-      Duration timeout) {
+      Duration timeout,
+      List<String> blockedPaths,
+      boolean blockedPathsMatchRegex) {
     this.flowControlClient = flowControlClient;
     this.tracer = tracer;
     this.timeout = timeout;
     this.envoyAuthzClient = envoyAuthzClient;
+    this.blockedPaths = blockedPaths;
+    this.blockedPathsMatchRegex = blockedPathsMatchRegex;
   }
 
   /**
@@ -95,7 +101,11 @@ public final class ApertureSDK {
         false);
   }
 
-  public TrafficFlow startTrafficFlow(AttributeContext attributes) {
+  public TrafficFlow startTrafficFlow(String path, AttributeContext attributes) {
+    if (isBlocked(path)) {
+      return TrafficFlow.ignoredFlow();
+    }
+
     com.fluxninja.generated.envoy.service.auth.v3.CheckRequest req = com.fluxninja.generated.envoy.service.auth.v3.CheckRequest
         .newBuilder()
         .setAttributes(attributes)
@@ -112,9 +122,7 @@ public final class ApertureSDK {
           .check(req);
     } catch (StatusRuntimeException e) {
       // deadline exceeded or couldn't reach agent - request should not be blocked
-      res = com.fluxninja.generated.envoy.service.auth.v3.CheckResponse.newBuilder()
-          .setStatus(Status.newBuilder().setCode(Code.OK_VALUE).build())
-          .build();
+      res = TrafficFlow.successfulResponse();
     }
     span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
@@ -122,5 +130,23 @@ public final class ApertureSDK {
         res,
         span,
         false);
+  }
+
+  private boolean isBlocked(String path) {
+    if (path == null) {
+      return false;
+    }
+    for (String blockedPattern: blockedPaths) {
+      if (blockedPathsMatchRegex) {
+        if (Pattern.matches(blockedPattern, path)) {
+          return true;
+        }
+      } else {
+        if (blockedPattern.equals(path)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }
