@@ -150,6 +150,7 @@ workflows:
             sdks/aperture-js/.* updated-aperture-js true
             sdks/aperture-java/.* updated-aperture-java true
             cmd/sdk-validator/.* updated-sdk-validator true
+            blueprints/.*|playground/tanka/.* updated-blueprints true
 
   filter-paths-pr:
     when:
