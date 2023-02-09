@@ -28,9 +28,15 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpRequest req) {
-
         AttributeContext attributes = NettyUtils.attributesFromRequest(req);
-        TrafficFlow flow = this.apertureSDK.startTrafficFlow(attributes);
+        String path = new QueryStringDecoder(req.uri()).path();
+
+        TrafficFlow flow = this.apertureSDK.startTrafficFlow(path, attributes);
+
+        if (flow.ignored()) {
+            ctx.fireChannelRead(req);
+            return;
+        }
 
         if (flow.accepted()) {
             try {
