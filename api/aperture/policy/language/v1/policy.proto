@@ -1694,6 +1694,9 @@ message AIMDConcurrencyController {
   // Configuration for embedded alerter.
   Alerter.Parameters alerter_parameters = 9;
 
-  // Configuration key for load actuation dry run.
-  string dry_run_dynamic_config_key = 10;
+  // Configuration key for load actuation.
+  string dynamic_config_key = 10;
+
+  // Default configuration.
+  LoadActuator.DynamicConfig default_config = 11;
 }

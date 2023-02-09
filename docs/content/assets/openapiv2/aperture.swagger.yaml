@@ -829,9 +829,12 @@ definitions:
       alerter_parameters:
         $ref: '#/definitions/v1AlerterParameters'
         description: Configuration for embedded alerter.
-      dry_run_dynamic_config_key:
+      dynamic_config_key:
         type: string
-        description: Configuration key for load actuation dry run.
+        description: Configuration key for load actuation.
+      default_config:
+        $ref: '#/definitions/v1LoadActuatorDynamicConfig'
+        description: Default configuration.
     description: High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
   v1AIMDConcurrencyControllerIns:
     type: object

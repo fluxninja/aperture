@@ -46,9 +46,9 @@ func init() {
 // ApplyCmd is the command to apply a policy to the cluster.
 var ApplyCmd = &cobra.Command{
 	Use:   "apply",
-	Short: "Apply Aperture Policy to the cluster",
+	Short: "Apply Aperture Policies",
 	Long: `
-Use this command to apply the Aperture Policy to the cluster.`,
+Use this command to apply the Aperture Policies.`,
 	SilenceErrors: true,
 	Example: `aperturectl apply --file=policy.yaml
 

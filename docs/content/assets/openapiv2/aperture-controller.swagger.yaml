@@ -517,8 +517,11 @@ definitions:
         type: number
         format: double
         x-go-default: 1
-      dry_run_dynamic_config_key:
-        description: Configuration key for load actuation dry run.
+      default_config:
+        description: Default configuration.
+        $ref: '#/definitions/v1LoadActuatorDynamicConfig'
+      dynamic_config_key:
+        description: Configuration key for load actuation.
         type: string
       flow_selector:
         description: |-

@@ -78,7 +78,8 @@ function(cfg) {
               + aimdConcurrencyController.withConcurrencyLinearIncrement(cc.concurrency_linear_increment)
               + aimdConcurrencyController.withConcurrencySqrtIncrementMultiplier(cc.concurrency_sqrt_increment_multiplier)
               + aimdConcurrencyController.withAlerterParameters(cc.alerter)
-              + aimdConcurrencyController.withDryRunDynamicConfigKey('concurrency_controller')
+              + aimdConcurrencyController.withDynamicConfigKey('concurrency_controller')
+              + aimdConcurrencyController.withDefaultConfig(params.concurrency_controller.default_config)
               + aimdConcurrencyController.withInPorts({
                 signal: port.withSignalName('LATENCY'),
                 setpoint: port.withSignalName('LATENCY_SETPOINT'),
@@ -103,9 +104,6 @@ function(cfg) {
       },
     },
     spec: policyDef,
-    dynamicConfig: {
-      concurrency_controller: params.concurrency_controller.dynamic_config,
-    },
   },
 
   policyResource: policyResource,

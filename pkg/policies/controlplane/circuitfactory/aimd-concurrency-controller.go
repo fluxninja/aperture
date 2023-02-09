@@ -326,7 +326,8 @@ func ParseAIMDConcurrencyController(
 								},
 								ActuationStrategy: &policylangv1.ConcurrencyLimiter_LoadActuator{
 									LoadActuator: &policylangv1.LoadActuator{
-										DynamicConfigKey: aimdConcurrencyController.DryRunDynamicConfigKey,
+										DynamicConfigKey: aimdConcurrencyController.DynamicConfigKey,
+										DefaultConfig:    aimdConcurrencyController.DefaultConfig,
 										InPorts: &policylangv1.LoadActuator_Ins{
 											LoadMultiplier: &policylangv1.InPort{
 												Value: &policylangv1.InPort_SignalName{

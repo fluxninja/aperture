@@ -216,11 +216,11 @@ export const ParameterDescription = ({name, type, reference, value, description}
     description='Scale factor to multiply square root of current accepted concurrrency. This, along with concurrency_linear_increment helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).' />
 
 <ParameterDescription
-    name="policy.concurrency_controller.dynamic_config"
+    name="policy.concurrency_controller.default_config"
     type="aperture.v1.LoadActuatorDynamicConfig"
     reference=""
     value="{'dry_run': False}"
-    description='Dynamic configuration for concurrency controller.' />
+    description='Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.' />
 
 <h3 class="blueprints-h3">Dashboard</h3>
 

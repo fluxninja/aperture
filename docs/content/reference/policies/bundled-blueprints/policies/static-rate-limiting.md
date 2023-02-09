@@ -130,11 +130,11 @@ export const ParameterDescription = ({name, type, reference, value, description}
     description='Flow label to use for rate limiting.' />
 
 <ParameterDescription
-    name="policy.rate_limiter.dynamic_config"
-    type="aperture.spec.v1.RateLimiterDefaultConfig"
-    reference="../../spec#v1-rate-limiter-default-config"
+    name="policy.rate_limiter.default_config"
+    type="aperture.spec.v1.RateLimiterDynamicConfig"
+    reference="../../spec#v1-rate-limiter-dynamic-config"
     value="{'overrides': []}"
-    description='Dynamic configuration for rate limiter that can be applied at the runtime.' />
+    description='Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.' />
 
 <h3 class="blueprints-h3">Dashboard</h3>
 

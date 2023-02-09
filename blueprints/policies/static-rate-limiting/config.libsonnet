@@ -26,7 +26,7 @@
     * @param (policy.rate_limiter.flow_selector.flow_matcher.control_point: string required) Control Point Name.
     * @param (policy.rate_limiter.parameters: aperture.spec.v1.RateLimiterParameters) Parameters.
     * @param (policy.rate_limiter.parameters.label_key: string required) Flow label to use for rate limiting.
-    * @param (policy.rate_limiter.dynamic_config: aperture.spec.v1.RateLimiterDefaultConfig) Dynamic configuration for rate limiter that can be applied at the runtime.
+    * @param (policy.rate_limiter.default_config: aperture.spec.v1.RateLimiterDynamicConfig) Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.
     */
     rate_limiter: {
       rate_limit: '__REQUIRED_FIELD__',
@@ -47,7 +47,7 @@
           num_sync: 5,
         },
       },
-      dynamic_config: {
+      default_config: {
         overrides: [],
       },
     },
