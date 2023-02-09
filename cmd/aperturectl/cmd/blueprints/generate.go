@@ -115,7 +115,7 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 			return err
 		}
 
-		log.Info().Msgf("Generated manifests at %s.", updatedOutputDir)
+		log.Info().Msgf("Generated manifests at %s", updatedOutputDir)
 
 		if applyPolicy {
 			err = apply.ApplyCmd.Flag("dir").Value.Set(updatedOutputDir)

@@ -36,7 +36,11 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
     @Override
     public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) throws Exception {
         AttributeContext attributes = HttpUtils.attributesFromRequest(req);
-        TrafficFlow flow = this.apertureSDK.startTrafficFlow(attributes);
+        TrafficFlow flow = this.apertureSDK.startTrafficFlow(req.path(), attributes);
+
+        if (flow.ignored()) {
+            return unwrap().serve(ctx, req);
+        }
 
         if (flow.accepted()) {
             HttpResponse res;
