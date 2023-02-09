@@ -1,5 +1,5 @@
 ---
-title: Aperture CLI
+title: Install CLI (apeturectl)
 description: Aperture CLI for interacting with Aperture Seamlessly.
 keywords:
   - cli
@@ -58,28 +58,28 @@ With rpm:
 ## Enable shell autocompletion
 
 To configure your shell to load `aperturectl`
-[bash completions](/reference/aperture-cli/aperturectl_completion.md) add to
-your profile:
+[bash completions](/reference/aperturectl/completion/completion.md) add to your
+profile:
 
 <Tabs>
 <TabItem value="bash" label="bash">
 <CodeBlock language="bash">
-. &lt;(aperturectl completion bash)
+source &lt;(aperturectl completion bash)
 </CodeBlock>
 </TabItem>
 <TabItem value="zsh" label="zsh">
 <CodeBlock language="zsh">
-. &lt;(aperturectl completion zsh)
+source &lt;(aperturectl completion zsh); compdef _aperturectl aperturectl
 </CodeBlock>
 </TabItem>
 <TabItem value="fish" label="fish">
 <CodeBlock language="fish">
-. &lt;(aperturectl completion fish)
+aperturectl completion fish | source
 </CodeBlock>
 </TabItem>
 <TabItem value="powershell" label="powershell">
 <CodeBlock language="powershell">
-. &lt;(aperturectl completion powershell)
+aperturectl completion powershell | Out-String | Invoke-Expression
 </CodeBlock>
 </TabItem>
 </Tabs>
@@ -112,4 +112,4 @@ sudo rpm -e aperturectl
 
 ---
 
-### [aperturectl](/reference/aperture-cli/aperturectl.md)
+### [aperturectl](/reference/aperturectl/aperturectl.md)

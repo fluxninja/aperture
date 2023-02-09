@@ -76,47 +76,6 @@ paths:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
-  /v1/flowcontrol/preview/http_requests/{control_point}:
-    post:
-      tags:
-      - aperture-agent
-      operationId: FlowPreviewService_PreviewHTTPRequests2
-      parameters:
-      - type: string
-        description: |-
-          Control point to preview.
-
-          @gotags: validate:"required"
-        name: control_point
-        in: path
-        required: true
-      - description: Flow labels to match. Optional parameter for advanced filtering.
-        name: label_matcher
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/v1LabelMatcher'
-      - type: string
-        format: int64
-        description: |-
-          Number of samples to collect. Defaults to 10.
-
-          @gotags: validate:"min=1" default:"10"
-        name: samples
-        in: query
-      - type: string
-        description: Service to preview. Empty value implies catch all service.
-        name: service
-        in: query
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1PreviewHTTPRequestsResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
   /v1/flowcontrol/preview/http_requests/{service}/{control_point}:
     post:
       tags:
@@ -124,7 +83,7 @@ paths:
       operationId: FlowPreviewService_PreviewHTTPRequests
       parameters:
       - type: string
-        description: Service to preview. Empty value implies catch all service.
+        description: Service to preview.
         name: service
         in: path
         required: true
@@ -155,47 +114,6 @@ paths:
           description: A successful response.
           schema:
             $ref: '#/definitions/v1PreviewHTTPRequestsResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/flowcontrol/preview/labels/{control_point}:
-    post:
-      tags:
-      - aperture-agent
-      operationId: FlowPreviewService_PreviewFlowLabels2
-      parameters:
-      - type: string
-        description: |-
-          Control point to preview.
-
-          @gotags: validate:"required"
-        name: control_point
-        in: path
-        required: true
-      - description: Flow labels to match. Optional parameter for advanced filtering.
-        name: label_matcher
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/v1LabelMatcher'
-      - type: string
-        format: int64
-        description: |-
-          Number of samples to collect. Defaults to 10.
-
-          @gotags: validate:"min=1" default:"10"
-        name: samples
-        in: query
-      - type: string
-        description: Service to preview. Empty value implies catch all service.
-        name: service
-        in: query
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1PreviewFlowLabelsResponse'
         default:
           description: An unexpected error response.
           schema:
@@ -207,7 +125,7 @@ paths:
       operationId: FlowPreviewService_PreviewFlowLabels
       parameters:
       - type: string
-        description: Service to preview. Empty value implies catch all service.
+        description: Service to preview.
         name: service
         in: path
         required: true

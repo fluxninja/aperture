@@ -472,6 +472,12 @@ definitions:
         type: string
         x-go-validate: required
         x-order: 0
+      labels:
+        description: Additional labels to add to alert.
+        type: object
+        additionalProperties:
+          type: string
+        x-order: 4
       resolve_timeout:
         description: |-
           Duration of alert resolver.
@@ -1949,10 +1955,6 @@ definitions:
     title: Takes the load multiplier input signal and publishes it to the schedulers
       in the data-plane
     properties:
-      alerter_parameters:
-        description: Configuration for embedded alerter.
-        x-order: 3
-        $ref: '#/definitions/v1AlerterParameters'
       default_config:
         description: Default configuration.
         x-order: 2
@@ -2746,6 +2748,12 @@ definitions:
           Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
           selector applies to.
 
+          :::info
+
+          Agent Groups are used to scope policies to a subset of agents connected to the same controller. This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode. The agents within an agent group form a peer to peer cluster and constantly share state.
+
+          :::
+
           @gotags: default:"default"
         type: string
         x-go-default: default
@@ -2755,16 +2763,25 @@ definitions:
           The Fully Qualified Domain Name of the
           [service](/concepts/integrations/flow-control/service.md) to select.
 
-          In kubernetes, this is the FQDN of the Service object.
+          In Kubernetes, this is the FQDN of the Service object.
 
-          Empty string means all services within an agent group (catch-all).
+          "all" means all services within an agent group (catch-all).
 
-          :::note
+          :::info
 
-          One entity may belong to multiple services.
+          In the Kubernetes sidecar installation mode, service discovery is switched off by default. In order to scope policies to services, the `service` should be set to `all` and instead, `agent_group` name should be used.
 
           :::
+
+          :::info
+
+          An entity (e.g. Kubernetes pod) may belong to multiple services.
+
+          :::
+
+          @gotags: validate:"required"];
         type: string
+        x-go-validate: required
         x-order: 1
   v1Sqrt:
     description: |-

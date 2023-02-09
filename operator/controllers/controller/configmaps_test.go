@@ -24,7 +24,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/fluxninja/aperture/cmd/aperture-controller/controller"
+	controller "github.com/fluxninja/aperture/cmd/aperture-controller/config"
 	. "github.com/fluxninja/aperture/operator/controllers"
 
 	"github.com/fluxninja/aperture/operator/api/common"

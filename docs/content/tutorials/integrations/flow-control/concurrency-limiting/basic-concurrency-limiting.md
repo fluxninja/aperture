@@ -63,16 +63,16 @@ At a high-level, this policy consists of:
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="YAML">
+<TabItem value="aperturectl values.yaml">
 ```
 
 ```yaml
-{@include: ./assets/basic-concurrency-limiting/basic-concurrency-limiting.yaml}
+{@include: ./assets/basic-concurrency-limiting/values.yaml}
 ```
 
 ```mdx-code-block
 </TabItem>
-<TabItem value="Jsonnet">
+<TabItem value="Jsonnet Mixin">
 ```
 
 ```jsonnet
@@ -83,6 +83,16 @@ At a high-level, this policy consists of:
 </TabItem>
 </Tabs>
 ```
+
+<details><summary>Generated Policy</summary>
+<p>
+
+```yaml
+{@include: ./assets/basic-concurrency-limiting/basic-concurrency-limiting.yaml}
+```
+
+</p>
+</details>
 
 ### Circuit Diagram
 
@@ -113,7 +123,7 @@ from becoming unresponsive and keeps the latency within the tolerance limit
 ### Dry Run Mode
 
 You can run this policy in the `Dry Run` mode by setting the
-`dynamicConfig.dryRun` option to `true`. In the `Dry Run` mode, the policy
+`dynamicConfig.dry_run` option to `true`. In the `Dry Run` mode, the policy
 doesn't actuate (i.e. traffic is never dropped) while still evaluating the
 decision it would take in each cycle. This helps understand how the policy would
 behave as the input signals change.

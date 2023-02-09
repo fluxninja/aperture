@@ -14,154 +14,166 @@ import {apertureVersion} from '../../apertureVersion.js';
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import Zoom from 'react-medium-image-zoom';
 ```
 
 ## Introduction
 
-Aperture comes with a pre-packaged [Blueprints][blueprints] that can be used to
-generate [Policies][policies] and Grafana Dashboards. Blueprints can be used
-both as a guide for creating new policies, or used as-is by providing required
-parameters or customizations.
+The easiest way to get started with policies in Aperture is to use the built-in
+blueprints system. Advanced users can learn about designing new policies by
+following the
+[signal processing](/tutorials/signal-processing/signal-processing.md)
+tutorials.
 
-In order to install Aperture Blueprints and generate policies, you can use
-`aperturectl` CLI tool.
+Aperture repository contains several [blueprints][blueprints] that can be used
+to generate [policies][policies] and [Grafana dashboards][grafana]. Blueprints
+can be used both as a guide for creating new policies, or used as-is by
+providing required parameters or customizations.
 
-## Manage Aperture Blueprints
+In order to manage blueprints and generate policies, you can use `aperturectl`
+[CLI tool](/reference/aperturectl/aperturectl.md), by following the
+[installation steps](/get-started/aperture-cli/aperture-cli.md#installation)
+first.
 
-Follow the installation steps for `aperturectl`
-[here](/get-started/aperture-cli/aperture-cli.md#installation)
+<Zoom>
 
-Now that we have `aperturectl` installed, we can use it to manage Aperture
-Blueprints.
-
-The below command will pull the Aperture Blueprints from the Aperture repository
-and store it locally:
-
-<CodeBlock language="bash">
-aperturectl blueprints pull --version {apertureVersion}
-</CodeBlock>
-
-Run the following command to list the policies and dashboards associated with
-the installed Blueprints:
-
-<CodeBlock language="bash">
-aperturectl blueprints list --version {apertureVersion}
-</CodeBlock>
-
-To learn more about `aperturectl` and the other commands it supports, visit
-[aperturectl](/reference/aperture-cli/aperturectl.md).
-
-## Generate Aperture Policies and Grafana Dashboards {#generating-aperture-policies-and-grafana-dashboards}
-
-Once you have the Blueprints installed locally, you can use `aperturectl` to
-generate Aperture Policies and Grafana Dashboards.
-
-Suppose you want to generate the `policies/static-rate-limiting` policy with the
-following values file `rate-limiting-values.yaml`:
-
-```yaml
-common:
-  policy_name: static-rate-limiting
-dashboard:
-  datasource:
-    filter_regex: ""
-    name: $datasource
-  refresh_interval: 10s
-policy:
-  classifiers: []
-  evaluation_interval: 300s
-  rate_limiter:
-    dynamic_config:
-      overrides:
-        - label_value: gold
-          limit_scale_factor: 1
-    flow_selector:
-      flow_matcher:
-        control_point: ingress
-      service_selector:
-        agent_group: default
-        service: service1-demo-app.demoapp.svc.cluster.local
-    parameters:
-      label_key: http.request.header.user_type
-      lazy_sync:
-        enabled: true
-        num_sync: 5
-      limit_reset_interval: 1s
-    rate_limit: "50.0"
+```mermaid
+{@include: ./assets/blueprints.mmd}
 ```
 
-You can run the following command to generate the policy:
+</Zoom>
+
+## Listing Available Blueprints
+
+The following command can be used to list available blueprints:
+
+```mdx-code-block
+<CodeBlock language="bash">aperturectl blueprints list --version={apertureVersion}</CodeBlock>
+```
+
+Which will output the following:
 
 ```bash
-# Generate the policy
-aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting-values.yaml
-
-# See what was generated
-tree ${apertureVersion}/policies/static-rate-limiting
+dashboards/signals-dashboard
+policies/latency-aimd-concurrency-limiting
+policies/static-rate-limiting
 ```
 
-The output would look something like below:
+## Customizing Blueprints (values.yaml)
 
-```bash
-${apertureVersion}/policies/static-rate-limiting
-├── dashboards
-│   └── static-rate-limiting.json
-├── graphs
-│   ├── static-rate-limiting.dot
-│   └── static-rate-limiting.svg
-└── policies
-    └── static-rate-limiting.yaml
+Blueprints use `values.yaml` file to provide required fields and to customize
+the generated policy and dashboard files.
 
-3 directories, 4 files
+For example, to generate `policies/static-rate-limiting` policy, you can first
+generate a `values.yaml` file using the following command:
+
+```mdx-code-block
+<CodeBlock language="bash">aperturectl blueprints values --name=policies/static-rate-limiting --version={apertureVersion} --only-required --output-file=values.yaml</CodeBlock>
 ```
 
-## Apply Policy
+You can then edit the `values.yaml` to provide the required fields
+(`__REQUIRED_FIELD__` placeholder) as follows:
 
 <Tabs>
-<TabItem value="aperturectl" label="aperturectl">
+<TabItem value="Final/Edited Values">
 
-You can pass `--apply` flag with the `apertuectl` to directly apply the
-generated policies on the Kubernetes cluster in the namespace where the Aperture
-Controller is installed.
+```yaml
+{@include: ./assets/values.yaml}
+```
 
-<CodeBlock language="bash">
-aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting-values.yaml --version {apertureVersion} --apply
-</CodeBlock>
-
-It uses the default configuration for Kubernetes cluster under `~/.kube/config`.
-You can pass the `--kube-config` flag to pass any other path.
-
-<CodeBlock language="bash">
-aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting-values.yaml --version {apertureVersion} --kube-config=/path/to/config --apply
-</CodeBlock>
+You can then run the following command to generate the blueprint:
 
 </TabItem>
-<TabItem value="kubectl" label="kubectl">
+<TabItem value="Placeholder Values">
 
-The policy YAML generated using the above example can also be applied using
-`kubectl`.
-
-<CodeBlock language="bash">
-kubectl apply -f ${apertureVersion}/policies/static-rate-limiting/policies/static-rate-limiting.yaml -n aperture-controller
-</CodeBlock>
+```yaml
+{@include: ./assets/raw_values.yaml}
+```
 
 </TabItem>
 </Tabs>
 
-Run the following command to check if the Aperture Policy was created.
+## Generating Blueprints
+
+Once the `values.yaml` file is ready, you can generate the blueprint using the
+following command:
+
+```mdx-code-block
+<CodeBlock language="bash">aperturectl blueprints generate --name=policies/static-rate-limiting
+--values-file=values.yaml --output-dir=policy-gen --version={apertureVersion}</CodeBlock>
+```
+
+The following directory structure will be generated:
+
+```bash
+policy-gen
+├── dashboards
+│   └── static-rate-limiting.json
+├── graphs
+│   ├── static-rate-limiting.dot
+│   └── static-rate-limiting.mmd
+└── policies
+│   ├── static-rate-limiting-cr.yaml
+│   └── static-rate-limiting.yaml
+```
+
+## Applying Policies
+
+The generated policies can be applied using `aperturectl` or `kubectl`.
+
+```mdx-code-block
+<Tabs>
+<TabItem value="aperturectl" label="aperturectl">
+```
+
+You can pass `--apply` flag with the `aperturectl` to directly apply the
+generated policies on a Kubernetes cluster in the namespace where the Aperture
+Controller is installed.
+
+```mdx-code-block
+<CodeBlock language="bash">aperturectl blueprints generate --name=policies/static-rate-limiting
+--values-file=values.yaml --apply --version={apertureVersion}</CodeBlock>
+```
+
+It uses the default configuration for Kubernetes cluster under `~/.kube/config`.
+You can pass the `--kube-config` flag to pass any other path.
+
+```mdx-code-block
+<CodeBlock language="bash">aperturectl blueprints generate --name=policies/static-rate-limiting
+--values-file=values.yaml --kube-config=/path/to/config --apply --version={apertureVersion}</CodeBlock>
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="kubectl" label="kubectl">
+```
+
+The policy YAML generated (Kubernetes Custom Resource) using the above example
+can also be applied using `kubectl`.
+
+```bash
+kubectl apply -f policy-gen/policies/static-rate-limiting-cr.yaml -n aperture-controller
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
+```
+
+Run the following command to check if the policy was created.
 
 ```bash
 kubectl get policies.fluxninja.com -n aperture-controller
 ```
 
-The Aperture Policy runtime can be visualized in Grafana or any other Prometheus
+The policy runtime can be visualized in Grafana or any other Prometheus
 compatible analytics tool. Refer to the Prometheus compatible metrics available
-from [Controller][controller-metrics] and [Agent][agent-metrics]. Some of the
-Policy [Blueprints][blueprints] come with recommended Grafana dashboards.
+from [controller][controller-metrics] and [agent][agent-metrics]. Some of the
+policy [blueprints][blueprints] come with recommended Grafana dashboards.
 
-## Delete Policy
+## Deleting Policies
 
-Run the following command to delete the above Aperture Policy:
+Run the following command to delete the above policy:
 
 ```bash
 kubectl delete policies.fluxninja.com static-rate-limiting -n aperture-controller
@@ -172,3 +184,4 @@ kubectl delete policies.fluxninja.com static-rate-limiting -n aperture-controlle
 [blueprints]: /reference/policies/bundled-blueprints/bundled-blueprints.md
 [policies]: /concepts/policy/policy.md
 [service]: /concepts/integrations/flow-control/service.md
+[grafana]: https://grafana.com/docs/grafana/latest/dashboards/

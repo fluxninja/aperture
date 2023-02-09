@@ -55,6 +55,15 @@ func ParseAIMDConcurrencyController(
 		isOverloadDeciderOperator = "lt"
 	}
 
+	alerterLabels := aimdConcurrencyController.AlerterParameters.Labels
+	if alerterLabels == nil {
+		alerterLabels = make(map[string]string)
+	}
+	alerterLabels["type"] = "concurrency_limiter"
+	alerterLabels["agent_group"] = aimdConcurrencyController.FlowSelector.ServiceSelector.GetAgentGroup()
+	alerterLabels["service"] = aimdConcurrencyController.FlowSelector.ServiceSelector.GetService()
+	aimdConcurrencyController.AlerterParameters.Labels = alerterLabels
+
 	nestedCircuit := &policylangv1.NestedCircuit{
 		Name:             "AIMDConcurrencyController",
 		ShortDescription: iface.GetServiceShortDescription(aimdConcurrencyController.FlowSelector.ServiceSelector),
@@ -317,8 +326,7 @@ func ParseAIMDConcurrencyController(
 								},
 								ActuationStrategy: &policylangv1.ConcurrencyLimiter_LoadActuator{
 									LoadActuator: &policylangv1.LoadActuator{
-										AlerterParameters: aimdConcurrencyController.AlerterParameters,
-										DynamicConfigKey:  aimdConcurrencyController.DryRunDynamicConfigKey,
+										DynamicConfigKey: aimdConcurrencyController.DryRunDynamicConfigKey,
 										InPorts: &policylangv1.LoadActuator_Ins{
 											LoadMultiplier: &policylangv1.InPort{
 												Value: &policylangv1.InPort_SignalName{
@@ -327,6 +335,48 @@ func ParseAIMDConcurrencyController(
 											},
 										},
 									},
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Decider{
+					Decider: &policylangv1.Decider{
+						InPorts: &policylangv1.Decider_Ins{
+							Lhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "LOAD_MULTIPLIER",
+								},
+							},
+							Rhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_ConstantSignal{
+									ConstantSignal: &policylangv1.ConstantSignal{
+										Const: &policylangv1.ConstantSignal_Value{
+											Value: 1,
+										},
+									},
+								},
+							},
+						},
+						Operator: "lt",
+						OutPorts: &policylangv1.Decider_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "LOAD_MULTIPLIER_ALERT",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Alerter{
+					Alerter: &policylangv1.Alerter{
+						Parameters: aimdConcurrencyController.AlerterParameters,
+						InPorts: &policylangv1.Alerter_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "LOAD_MULTIPLIER_ALERT",
 								},
 							},
 						},

@@ -206,7 +206,7 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 		})
 	}
 
-	log.Info().
+	log.Debug().
 		Int("modules", len(labelers)).
 		Int("raw rego modules", rawRegoCount).
 		Int("extractors", len(labelExtractors)).

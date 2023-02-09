@@ -228,8 +228,10 @@ message Component {
 
     // Query components that are query databases such as Prometheus.
     Query query = 100;
+
     // FlowControl components are used to regulate requests flow.
     FlowControl flow_control = 101;
+
     // AutoScale components are used to scale the service.
     AutoScale auto_scale = 102;
   }
@@ -1075,9 +1077,6 @@ message LoadActuator {
 
   // Default configuration.
   DynamicConfig default_config = 3;
-
-  // Configuration for embedded alerter.
-  Alerter.Parameters alerter_parameters = 4;
 }
 
 // Component that runs a Prometheus query periodically and returns the result as an output signal
@@ -1406,6 +1405,9 @@ message Alerter {
 
     // A list of alert channel strings.
     repeated string alert_channels = 4;
+
+    // Additional labels to add to alert.
+    map<string, string> labels = 5;
   }
 
   // Inputs for the Alerter component.

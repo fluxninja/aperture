@@ -30,4 +30,4 @@ The dynamic configuration can be provided in the Policy Custom Resource using
 the `dynamicConfig` key. To learn more about it's usage, please see how the
 dynamic configuration is provided in the Latency based AIMD (Additive Increase,
 Multiplicative Decrease) Concurrency Limiting
-[Blueprint](https://github.com/fluxninja/aperture/blob/main/blueprints/lib/1.0/policies/latency-aimd-concurrency-limiting/policy.libsonnet).
+[Blueprint](/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md).

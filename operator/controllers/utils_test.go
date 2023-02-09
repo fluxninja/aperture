@@ -1385,7 +1385,7 @@ var _ = Describe("Tests for CheckAndGenerateCert", func() {
 			os.Setenv("APERTURE_OPERATOR_NAMESPACE", "")
 
 			Expect(CheckCertificate()).To(Equal(false))
-			Expect(CheckAndGenerateCertForOperator()).To(BeNil())
+			Expect(CheckAndGenerateCertForOperator()).To(Succeed())
 			Expect(CheckCertificate()).To(Equal(true))
 		})
 	})

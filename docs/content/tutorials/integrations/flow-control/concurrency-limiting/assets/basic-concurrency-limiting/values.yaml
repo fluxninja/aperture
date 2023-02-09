@@ -1,0 +1,19 @@
+common:
+  policy_name: "service1-demo-app"
+policy:
+  flux_meter:
+    flow_selector:
+      service_selector:
+        agent_group: default
+        service: service1-demo-app.demoapp.svc.cluster.local
+      flow_matcher:
+        control_point: ingress
+  concurrency_controller:
+    flow_selector:
+      service_selector:
+        agent_group: default
+        service: service1-demo-app.demoapp.svc.cluster.local
+      flow_matcher:
+        control_point: ingress
+    dynamic_config:
+      dry_run: false

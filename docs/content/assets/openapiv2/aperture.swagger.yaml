@@ -119,49 +119,6 @@ paths:
           type: string
       tags:
         - aperture-agent
-  /v1/flowcontrol/preview/http_requests/{control_point}:
-    post:
-      operationId: FlowPreviewService_PreviewHTTPRequests2
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1PreviewHTTPRequestsResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: control_point
-          description: |-
-            Control point to preview.
-
-            @gotags: validate:"required"
-          in: path
-          required: true
-          type: string
-        - name: label_matcher
-          description: Flow labels to match. Optional parameter for advanced filtering.
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/v1LabelMatcher'
-        - name: samples
-          description: |-
-            Number of samples to collect. Defaults to 10.
-
-            @gotags: validate:"min=1" default:"10"
-          in: query
-          required: false
-          type: string
-          format: int64
-        - name: service
-          description: Service to preview. Empty value implies catch all service.
-          in: query
-          required: false
-          type: string
-      tags:
-        - aperture-agent
   /v1/flowcontrol/preview/http_requests/{service}/{control_point}:
     post:
       operationId: FlowPreviewService_PreviewHTTPRequests
@@ -176,7 +133,7 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: service
-          description: Service to preview. Empty value implies catch all service.
+          description: Service to preview.
           in: path
           required: true
           type: string
@@ -203,49 +160,6 @@ paths:
           required: false
           type: string
           format: int64
-      tags:
-        - aperture-agent
-  /v1/flowcontrol/preview/labels/{control_point}:
-    post:
-      operationId: FlowPreviewService_PreviewFlowLabels2
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/v1PreviewFlowLabelsResponse'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-      parameters:
-        - name: control_point
-          description: |-
-            Control point to preview.
-
-            @gotags: validate:"required"
-          in: path
-          required: true
-          type: string
-        - name: label_matcher
-          description: Flow labels to match. Optional parameter for advanced filtering.
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/v1LabelMatcher'
-        - name: samples
-          description: |-
-            Number of samples to collect. Defaults to 10.
-
-            @gotags: validate:"min=1" default:"10"
-          in: query
-          required: false
-          type: string
-          format: int64
-        - name: service
-          description: Service to preview. Empty value implies catch all service.
-          in: query
-          required: false
-          type: string
       tags:
         - aperture-agent
   /v1/flowcontrol/preview/labels/{service}/{control_point}:
@@ -262,7 +176,7 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: service
-          description: Service to preview. Empty value implies catch all service.
+          description: Service to preview.
           in: path
           required: true
           type: string
@@ -1011,6 +925,11 @@ definitions:
         items:
           type: string
         description: A list of alert channel strings.
+      labels:
+        type: object
+        additionalProperties:
+          type: string
+        description: Additional labels to add to alert.
     description: Alerter Parameters is a common config for separate alerter components and alerters embedded in other components.
   v1And:
     type: object
@@ -2477,9 +2396,6 @@ definitions:
       default_config:
         $ref: '#/definitions/v1LoadActuatorDynamicConfig'
         description: Default configuration.
-      alerter_parameters:
-        $ref: '#/definitions/v1AlerterParameters'
-        description: Configuration for embedded alerter.
     title: Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
   v1LoadActuatorDynamicConfig:
     type: object
@@ -3305,6 +3221,12 @@ definitions:
           Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
           selector applies to.
 
+          :::info
+
+          Agent Groups are used to scope policies to a subset of agents connected to the same controller. This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode. The agents within an agent group form a peer to peer cluster and constantly share state.
+
+          :::
+
           @gotags: default:"default"
         x-go-default: default
       service:
@@ -3313,15 +3235,24 @@ definitions:
           The Fully Qualified Domain Name of the
           [service](/concepts/integrations/flow-control/service.md) to select.
 
-          In kubernetes, this is the FQDN of the Service object.
+          In Kubernetes, this is the FQDN of the Service object.
 
-          Empty string means all services within an agent group (catch-all).
+          "all" means all services within an agent group (catch-all).
 
-          :::note
+          :::info
 
-          One entity may belong to multiple services.
+          In the Kubernetes sidecar installation mode, service discovery is switched off by default. In order to scope policies to services, the `service` should be set to `all` and instead, `agent_group` name should be used.
 
           :::
+
+          :::info
+
+          An entity (e.g. Kubernetes pod) may belong to multiple services.
+
+          :::
+
+          @gotags: validate:"required"];
+        x-go-validate: required
     description: |-
       :::info
 

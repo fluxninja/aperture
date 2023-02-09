@@ -630,6 +630,12 @@ Alerter Parameters is a common config for separate alerter components and alerte
 ([]string) A list of alert channel strings.
 
 </dd>
+<dt>labels</dt>
+<dd>
+
+(map of string) Additional labels to add to alert.
+
+</dd>
 </dl>
 
 ### v1And {#v1-and}
@@ -2574,12 +2580,6 @@ Takes the load multiplier input signal and publishes it to the schedulers in the
 ([V1LoadActuatorDynamicConfig](#v1-load-actuator-dynamic-config)) Default configuration.
 
 </dd>
-<dt>alerter_parameters</dt>
-<dd>
-
-([V1AlerterParameters](#v1-alerter-parameters)) Configuration for embedded alerter.
-
-</dd>
 </dl>
 
 ### v1LoadActuatorDynamicConfig {#v1-load-actuator-dynamic-config}
@@ -3614,24 +3614,38 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 (string, default: `default`) Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
 selector applies to.
 
+:::info
+
+Agent Groups are used to scope policies to a subset of agents connected to the same controller. This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode. The agents within an agent group form a peer to peer cluster and constantly share state.
+
+:::
+
 @gotags: default:"default"
 
 </dd>
 <dt>service</dt>
 <dd>
 
-(string) The Fully Qualified Domain Name of the
+(string, `required`) The Fully Qualified Domain Name of the
 [service](/concepts/integrations/flow-control/service.md) to select.
 
-In kubernetes, this is the FQDN of the Service object.
+In Kubernetes, this is the FQDN of the Service object.
 
-Empty string means all services within an agent group (catch-all).
+"all" means all services within an agent group (catch-all).
 
-:::note
+:::info
 
-One entity may belong to multiple services.
+In the Kubernetes sidecar installation mode, service discovery is switched off by default. In order to scope policies to services, the `service` should be set to `all` and instead, `agent_group` name should be used.
 
 :::
+
+:::info
+
+An entity (e.g. Kubernetes pod) may belong to multiple services.
+
+:::
+
+@gotags: validate:"required"];
 
 </dd>
 </dl>

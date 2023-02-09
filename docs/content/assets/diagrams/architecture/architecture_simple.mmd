@@ -28,7 +28,7 @@ flowchart TD
     subgraph orchestrators["Orchestrators"]
       k8s["Kubernetes"]
     end
-    blueprints --> |Jsonnet Generator| policies
+    blueprints --> |aperturectl| policies
     policies --> |Kubernetes Custom Resource| controller
     controller<--> |Configuration/Telemetry/Flow Control| databases
     databases<-->|Configuration/Telemetry/Flow Control|agent
