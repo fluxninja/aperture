@@ -67,6 +67,7 @@ var pullFunc = func(_ *cobra.Command, _ []string) error {
 	} else if d.Source.LocalSource != nil {
 		source = d.Source.LocalSource.Directory
 		relPath = filepath.Base(source)
+		version = "local"
 	} else {
 		return errors.New("unable to parse blueprints URI: " + blueprintsURI)
 	}
@@ -163,6 +164,18 @@ func getSource(blueprintsDir string) string {
 		}
 	}
 	return source
+}
+
+func getVersion(blueprintsDir string) string {
+	version := ""
+	// if it doesn't exist, continue
+	if _, err := os.Stat(filepath.Join(blueprintsDir, versionFilename)); err == nil {
+		versionBytes, err := os.ReadFile(filepath.Join(blueprintsDir, versionFilename))
+		if err == nil {
+			version = string(versionBytes)
+		}
+	}
+	return version
 }
 
 func getRelPath(blueprintsDir string) string {
