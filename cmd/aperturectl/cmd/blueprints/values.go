@@ -14,7 +14,7 @@ import (
 
 const (
 	valuesFileName         = "values.yaml"
-	requiredValuesFileName = "values_required.yaml"
+	requiredValuesFileName = "values-required.yaml"
 )
 
 func init() {
