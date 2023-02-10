@@ -2,7 +2,7 @@
 Create the name of the service account to use
 */}}
 {{- define "agent-operator.serviceAccountName" -}}
-{{- default (include "common.names.fullname" .) .Values.operator.serviceAccount.name }}
+{{- default ( print (include "common.names.fullname" .) "-operator" ) .Values.operator.serviceAccount.name }}
 {{- end }}
 
 {{/*

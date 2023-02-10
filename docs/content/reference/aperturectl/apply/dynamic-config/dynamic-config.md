@@ -21,7 +21,7 @@ aperturectl apply dynamic-config [flags]
 ### Examples
 
 ```
-aperturectl apply dynamic-config --name=static-rate-limiting --file=dynamic-config.yaml
+aperturectl apply dynamic-config --policy=static-rate-limiting --file=dynamic-config.yaml
 ```
 
 ### Options
@@ -34,4 +34,4 @@ aperturectl apply dynamic-config --name=static-rate-limiting --file=dynamic-conf
 
 ### SEE ALSO
 
-- [aperturectl apply](/reference/aperturectl/apply/apply.md) - Apply Aperture Policy to the cluster
+- [aperturectl apply](/reference/aperturectl/apply/apply.md) - Apply Aperture Policies

@@ -41,17 +41,17 @@ func (m checkBoxModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 
 		// These keys should exit the program.
-		case "ctrl+c", "c":
+		case "ctrl+c", "c", "C", "q", "Q":
 			return m, tea.Quit
 
 		// The "d" key to de-select all
-		case "d":
+		case "d", "D":
 			for option := range m.choices {
 				delete(m.Selected, option)
 			}
 
 		// The "s" key to select all
-		case "s":
+		case "s", "S":
 			for option := range m.choices {
 				m.Selected[option] = struct{}{}
 			}
@@ -110,8 +110,8 @@ func (m checkBoxModel) View() string {
 
 	// The footer
 	s += "\nPress s to select all.\n"
-	s += "\nPress d to de-select all.\n"
-	s += "\nPress c to confirm.\n"
+	s += "Press d to de-select all.\n"
+	s += "Press c to confirm.\n"
 
 	// Send the UI for rendering
 	return s

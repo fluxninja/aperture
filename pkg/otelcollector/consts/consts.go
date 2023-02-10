@@ -142,6 +142,8 @@ const (
 	ProcessorRollup = "rollup"
 	// ProcessorAgentGroup adds `agent_group` attribute.
 	ProcessorAgentGroup = "attributes/agent_group"
+	// ProcessorCustromMetrics adds `service.name` resource attribute.
+	ProcessorCustromMetrics = "resource/custom_metrics"
 	// ProcessorAgentResourceLabels adds `instance` and `agent_group` resource attributes.
 	ProcessorAgentResourceLabels = "transform/agent_resource_labels"
 	// ProcessorTracesToLogs converts received tracess to logs and passes them to configured

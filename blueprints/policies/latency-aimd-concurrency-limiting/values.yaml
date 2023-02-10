@@ -1,4 +1,4 @@
-# Generated values.yaml file for policies/latency-aimd-concurrency-limiting blueprint
+# Generated values file for policies/latency-aimd-concurrency-limiting blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting
 
@@ -52,9 +52,9 @@ policy:
     # Scale factor to multiply square root of current accepted concurrrency. This, along with concurrency_linear_increment helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
     # Type: float64
     concurrency_sqrt_increment_multiplier: 1
-    # Dynamic configuration for concurrency controller.
+    # Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.
     # Type: aperture.v1.LoadActuatorDynamicConfig
-    dynamic_config:
+    default_config:
       dry_run: false
 
 dashboard:

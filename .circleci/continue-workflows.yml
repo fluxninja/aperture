@@ -63,6 +63,9 @@ parameters:
   updated-sdk-validator:
     type: boolean
     default: false
+  updated-blueprints:
+    type: boolean
+    default: false
 
 jobs:
   build-push-add-tag:
@@ -1179,6 +1182,21 @@ workflows:
           name: build-aperture-docs
           task-name: Build aperture documentation and verify changes
           dry-run: true
+
+  push-blueprints-changes:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - << pipeline.parameters.updated-blueprints >>
+    jobs:
+      - update-environment:
+          filters:
+            branches:
+              only:
+                - main
+          name: push-blueprints-changes-update-environment
+          update: blueprints
+          environment-path: environments/customer-demo/
 
   push-deployment-changes:
     when:

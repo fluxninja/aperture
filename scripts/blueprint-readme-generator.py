@@ -62,8 +62,11 @@ class DocBlock:
     nested_required_parameters: DocBlockNode
 
     @classmethod
-    def _resolve_param_to_policy_ref(cls, prefix: str, param: str) -> str:
+    def _resolve_param_to_policy_ref(cls, spec_path: str, param: str) -> str:
         if not param.startswith("aperture.spec") and not param.startswith("[]aperture.spec"):
+            return ""
+
+        if spec_path == "":
             return ""
 
         component = param.split(".")[-1]
@@ -78,10 +81,10 @@ class DocBlock:
 
         component_final = "v1-" + "-".join(["".join(l) for l in parts])
 
-        return f"{prefix}/spec#{component_final}"
+        return f"{spec_path}#{component_final}"
 
     @classmethod
-    def from_comment(cls, prefix: str, comment: List[str]) -> DocBlock:
+    def from_comment(cls, spec_path: str, comment: List[str]) -> DocBlock:
         section = None
         subsection = None
         description = ""
@@ -109,7 +112,7 @@ class DocBlock:
 
                 groups = inner.groupdict()
                 param_name, param_type = groups["param_name"], groups["param_type"]
-                param_link = cls._resolve_param_to_policy_ref(prefix, param_type)
+                param_link = cls._resolve_param_to_policy_ref(spec_path, param_type)
                 param_required = groups.get("param_required", "") == "required"
                 param_description = groups["param_description"]
                 parameters[param_name] = (DocBlockParam(param_name, param_type, param_link, param_description, param_required))
@@ -201,14 +204,17 @@ def _generate_required_configuration(blocks: List[DocBlock]) -> str:
     return jsonnet_config
 
 
-def update_docblock_param_defaults(repository_root: Path, jsonnet_path: Path, config_path: Path, config_key: str, blocks: List[DocBlock]):
-    jsonnet_data = f"local fn = import '{jsonnet_path}';\n"
-    jsonnet_data += f"local config = import '{config_path}';\n"
+def update_docblock_param_defaults(repository_root: Path, config_path: Path, blocks: List[DocBlock], jsonnet_path: Path = Path(), config_key: str = ""):
+    jsonnet_data = f"local config = import '{config_path}';\n"
+    if jsonnet_path != Path():
+        jsonnet_data += f"local fn = import '{jsonnet_path}';\n"
+
     required_config = _generate_required_configuration(blocks)
     jsonnet_data += f"local cfg = {required_config};\n"
     jsonnet_data += "local c = std.mergePatch(config, cfg);\n"
-    jsonnet_data += f"local cfg = c.common + c.{config_key};\n"
-    jsonnet_data += f"fn(cfg)\n"
+    if jsonnet_path != Path():
+        jsonnet_data += f"local cfg = c.common + c.{config_key};\n"
+        jsonnet_data += f"fn(cfg)\n"
     jsonnet_data += "{_config::: c}\n"
 
     rendered_config = None
@@ -304,7 +310,7 @@ SECTION_TPL = """
 """
 
 YAML_TPL = """
-# Generated values.yaml file for {{ blueprint_name }} blueprint
+# Generated values file for {{ blueprint_name }} blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/{{ blueprint_name }}
 {%- macro render_value(value, level) %}
@@ -372,6 +378,7 @@ def get_jinja2_environment() -> jinja2.Environment:
 
 MDX_TEMPLATE = """
 ```mdx-code-block
+
 export const ParameterHeading = ({children}) => (
   <span style={{fontWeight: "bold"}}>{children}</span>
 );
@@ -408,30 +415,48 @@ export const ParameterDescription = ({name, type, reference, value, description}
 """
 
 
-def update_readme_markdown(readme_path: Path, blocks: List[DocBlock]):
-    """Find configuration marker in README and append all blocks after it"""
+def update_readme_markdown(readme_path: Path, config_blocks: List[DocBlock], dynamic_config_blocks: List[DocBlock], blueprint_name: Path, aperture_version_path):
+    """Find configuration marker in README and add generated content below it."""
 
     readme_data = readme_path.read_text()
     readme_copied = ""
     for line in readme_data.split("\n"):
-        if line == "<!-- Configuration Marker -->":
-            readme_copied += line + "\n"
-            break
         readme_copied += line + "\n"
+        if line == "<!-- Configuration Marker -->":
+            break
 
     readme_copied += f"\n{MDX_TEMPLATE}\n"
 
+    readme_copied += "```mdx-code-block\n"
+    readme_copied += f"import {{apertureVersion as aver}} from '{aperture_version_path}'\n"
+    readme_copied += "```\n\n"
+
+    readme_copied += f"Code: <a href={{`https://github.com/fluxninja/aperture/tree/${{aver}}/blueprints/{blueprint_name}`}}>{blueprint_name}</a>\n"
     sections = {}
-    for block in blocks:
+    for block in config_blocks:
         if block.section not in sections:
             sections[block.section] = []
         sections[block.section].append(block)
 
     env = get_jinja2_environment()
     template = env.get_template("section.md.j2")
+
     rendered = template.render({"sections": sections})
     readme_copied += rendered
+
+    sections = {}
+    for block in dynamic_config_blocks:
+        if block.section not in sections:
+            sections[block.section] = []
+        sections[block.section].append(block)
+    if len(sections) > 0:
+        readme_copied += "## Dynamic Configuration\n"
+        readme_copied += "The following configuration parameters can be [dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md) at runtime, without reloading the policy.\n"
+        rendered = template.render({"sections": sections})
+        readme_copied += rendered
+
     readme_path.write_text(readme_copied)
+
 
 def render_sample_config_yaml(blueprint_name: Path, sample_config_path: Path, only_required: bool, blocks: List[DocBlock]):
     """Render sample config YAML file from blocks"""
@@ -450,7 +475,7 @@ def render_sample_config_yaml(blueprint_name: Path, sample_config_path: Path, on
     rendered = template.render({"sample_config_data": sample_config_data, "blueprint_name": blueprint_name})
     sample_config_path.write_text(rendered)
 
-def extract_docblock_comments(prefix: str, jsonnet_data: str) -> List[DocBlock]:
+def extract_docblock_comments(spec_path: str, jsonnet_data: str) -> List[DocBlock]:
     docblock_start_re = r".*\/\*\*$"
     docblock_end_re = r".*\*\/$"
 
@@ -464,7 +489,7 @@ def extract_docblock_comments(prefix: str, jsonnet_data: str) -> List[DocBlock]:
         elif re.match(docblock_end_re, line):
             assert inside_docblock
             inside_docblock = False
-            docblocks.append(DocBlock.from_comment(prefix, docblock_data))
+            docblocks.append(DocBlock.from_comment(spec_path, docblock_data))
             docblock_data = []
         else:
            if inside_docblock:
@@ -472,25 +497,18 @@ def extract_docblock_comments(prefix: str, jsonnet_data: str) -> List[DocBlock]:
     return docblocks
 
 def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture blueprint directory")):
-    repository_root = Path(__file__).absolute().parent.parent
-
     if not blueprint_path.exists():
         logger.error(f"No such file or directory: {blueprint_path}")
         raise typer.Exit(1)
 
-    config_path = blueprint_path / "config.libsonnet"
-
-    metadata_path = blueprint_path / "metadata.yaml"
-
-    metadata = yaml.safe_load(metadata_path.read_text())
+    repository_root = Path(__file__).absolute().parent.parent
 
     # calculate the path of repository_root/blueprints from the blueprint_path in terms of ../
     blueprints_root = repository_root / "blueprints"
     blueprint_name = blueprint_path.relative_to(blueprints_root)
+
     # get parts of relative_blueprint_path
     relative_blueprint_path_parts = blueprint_name.parts
-    # make a prefix of ../ for each part
-    reference_prefix = "/".join([".."] * len(relative_blueprint_path_parts))
 
     readme_path = repository_root / "docs/content/reference/policies/bundled-blueprints" / "/".join(relative_blueprint_path_parts[:-1]) / f"{relative_blueprint_path_parts[-1]}.md"
 
@@ -498,8 +516,37 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
         logger.error(f"README not found: {readme_path}. Exiting.")
         raise typer.Exit(1)
 
+    # make a prefix of ../ for each part
+    spec_path = "/".join([".."] * len(relative_blueprint_path_parts)) + "/spec"
+    aperture_version_path = "/".join([".."] * (len(relative_blueprint_path_parts)+2)) + "/apertureVersion.js"
 
-    docblocks = extract_docblock_comments(reference_prefix, config_path.read_text())
+
+    config_docblocks = parse_config_docblocks(repository_root, blueprint_path, spec_path)
+    render_sample_config_yaml(blueprint_name, blueprint_path / "values.yaml", False, config_docblocks)
+    render_sample_config_yaml(blueprint_name, blueprint_path / "values-required.yaml", True, config_docblocks)
+
+    dynamic_config_docblocks = parse_dynamic_config_docblocks(repository_root, blueprint_path, spec_path)
+    render_sample_config_yaml(blueprint_name, blueprint_path / "dynamic-config-values.yaml", False, dynamic_config_docblocks)
+    render_sample_config_yaml(blueprint_name, blueprint_path / "dynamic-config-values-required.yaml", True, dynamic_config_docblocks)
+
+    update_readme_markdown(readme_path, config_docblocks, dynamic_config_docblocks, blueprint_name, aperture_version_path)
+
+
+
+def parse_config_docblocks(repository_root: Path, blueprint_path: Path, spec_path: str) -> List[DocBlock]:
+
+    config_path = blueprint_path / "config.libsonnet"
+
+    if not config_path.exists():
+        logger.error(f"config.libsonnet not found: {config_path}. Exiting.")
+        raise typer.Exit(1)
+
+    metadata_path = blueprint_path / "metadata.yaml"
+
+    metadata = yaml.safe_load(metadata_path.read_text())
+
+
+    docblocks = extract_docblock_comments(spec_path, config_path.read_text())
 
     sections = {section: [] for section in metadata["sources"].keys()}
     # append Common to sections
@@ -516,15 +563,29 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
         # Skip common section
         if section == "Common":
             continue
-        path = metadata["sources"][section]["path"]
+        jsonnet_path = metadata["sources"][section]["path"]
         config_key = metadata["sources"][section]["config_key"]
         # append common section to blocks
         blocks.extend(sections["Common"])
-        update_docblock_param_defaults(repository_root, path, config_path, config_key, blocks)
+        update_docblock_param_defaults(repository_root, config_path, blocks, jsonnet_path, config_key)
+    return docblocks
 
-    update_readme_markdown(readme_path, docblocks)
-    render_sample_config_yaml(blueprint_name, blueprint_path / "values.yaml", False, docblocks)
-    render_sample_config_yaml(blueprint_name, blueprint_path / "values_required.yaml", True, docblocks)
+
+def parse_dynamic_config_docblocks(repository_root: Path, blueprint_path: Path, spec_path: str) -> List[DocBlock]:
+
+    config_path = blueprint_path / "dynamic-config.libsonnet"
+    if not config_path.exists():
+        return []
+
+    docblocks = extract_docblock_comments(spec_path, config_path.read_text())
+
+    sections = {}
+    for block in docblocks:
+        sections.setdefault(block.section, []).append(block)
+
+    for _, blocks in sections.items():
+        update_docblock_param_defaults(repository_root, config_path, blocks)
+    return docblocks
 
 if __name__ == "__main__":
     typer.run(main)

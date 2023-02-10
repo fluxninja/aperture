@@ -35,16 +35,16 @@ by live previewing them first via introspection APIs.
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="YAML">
+<TabItem value="aperturectl values.yaml">
 ```
 
 ```yaml
-{@include: ./assets/graphql-rate-limiting/graphql-rate-limiting-jwt.yaml}
+{@include: ./assets/graphql-rate-limiting/values.yaml}
 ```
 
 ```mdx-code-block
 </TabItem>
-<TabItem value="Jsonnet">
+<TabItem value="Jsonnet Mixin">
 ```
 
 ```jsonnet
@@ -55,6 +55,16 @@ by live previewing them first via introspection APIs.
 </TabItem>
 </Tabs>
 ```
+
+<details><summary>Generated Policy</summary>
+<p>
+
+```yaml
+{@include: ./assets/graphql-rate-limiting/graphql-rate-limiting-jwt.yaml}
+```
+
+</p>
+</details>
 
 For example, if the mutation query is as follows
 

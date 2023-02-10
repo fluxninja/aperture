@@ -19,16 +19,16 @@ popd >/dev/null
 $FIND "$blueprints_root" -type f -name config.libsonnet | while read -r files; do
 	dir=$(dirname "$files")
 	echo "Generating README and Sample Values for $dir"
+
 	python "${git_root}"/scripts/blueprint-readme-generator.py "$dir"
-	npx prettier --write "$dir"/README.md
-	# if values.yaml exists, format it
-	if [ -f "$dir"/values.yaml ]; then
-		npx prettier --write "$dir"/values.yaml
-	fi
-	# if values_required.yaml exists, format it
-	if [ -f "$dir"/values_required.yaml ]; then
-		npx prettier --write "$dir"/values_required.yaml
-	fi
+
+	values_files=("$dir"/values.yaml "$dir"/values-required.yaml "$dir"/dynamic-config-values.yaml "$dir"/dynamic-config-values-required.yaml)
+	for values_file in "${values_files[@]}"; do
+		if [ -f "$values_file" ]; then
+			npx prettier --write "$values_file"
+		fi
+	done
+
 done
 
 $FIND "$git_root"/docs/content/reference/policies/bundled-blueprints -type f -name '*.md' | while read -r files; do

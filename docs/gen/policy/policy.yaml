@@ -343,8 +343,12 @@ definitions:
         format: double
         x-go-default: 1
         x-order: 7
-      dry_run_dynamic_config_key:
-        description: Configuration key for load actuation dry run.
+      default_config:
+        description: Default configuration.
+        x-order: 10
+        $ref: '#/definitions/v1LoadActuatorDynamicConfig'
+      dynamic_config_key:
+        description: Configuration key for load actuation.
         type: string
         x-order: 9
       flow_selector:

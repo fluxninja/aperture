@@ -37,11 +37,17 @@ local aimdconcurrencycontrollerouts = import './aimdconcurrencycontrollerouts.li
   withConcurrencySqrtIncrementMultiplierMixin(concurrency_sqrt_increment_multiplier):: {
     concurrency_sqrt_increment_multiplier+: concurrency_sqrt_increment_multiplier,
   },
-  withDryRunDynamicConfigKey(dry_run_dynamic_config_key):: {
-    dry_run_dynamic_config_key: dry_run_dynamic_config_key,
+  withDefaultConfig(default_config):: {
+    default_config: default_config,
   },
-  withDryRunDynamicConfigKeyMixin(dry_run_dynamic_config_key):: {
-    dry_run_dynamic_config_key+: dry_run_dynamic_config_key,
+  withDefaultConfigMixin(default_config):: {
+    default_config+: default_config,
+  },
+  withDynamicConfigKey(dynamic_config_key):: {
+    dynamic_config_key: dynamic_config_key,
+  },
+  withDynamicConfigKeyMixin(dynamic_config_key):: {
+    dynamic_config_key+: dynamic_config_key,
   },
   withFlowSelector(flow_selector):: {
     flow_selector: flow_selector,

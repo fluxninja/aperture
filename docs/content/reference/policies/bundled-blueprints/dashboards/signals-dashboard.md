@@ -2,32 +2,18 @@
 title: Signals Dashboard
 ---
 
-```mdx-code-block
-import {apertureVersion} from '../../../../apertureVersion.js';
-```
-
 ## Introduction
 
 This blueprint provides a [policy monitoring](/reference/policies/monitoring.md)
 dashboard that visualizes Signals flowing through the
 [Circuit](/concepts/policy/circuit.md).
 
-## Links
-
-Sample values file: <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/dashboards/signals-dashboard/values.yaml`}>values.yaml</a>
-
-Sample values file (required fields only): <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/dashboards/signals-dashboard/values_required.yaml`}>values_required.yaml</a>
-
-Code: <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/dashboards/signals-dashboard`}>signals-dashboard</a>
-
 ## Configuration
 
 <!-- Configuration Marker -->
 
 ```mdx-code-block
+
 export const ParameterHeading = ({children}) => (
   <span style={{fontWeight: "bold"}}>{children}</span>
 );
@@ -61,6 +47,13 @@ export const ParameterDescription = ({name, type, reference, value, description}
 </table>
 );
 ```
+
+```mdx-code-block
+import {apertureVersion as aver} from '../../../../apertureVersion.js'
+```
+
+Code: <a
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals-dashboard`}>dashboards/signals-dashboard</a>
 
 <h3 class="blueprints-h3">Common</h3>
 

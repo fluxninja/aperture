@@ -69,6 +69,9 @@ Install the tool of your choice using below links:
 By following these instructions, you will have deployed the Aperture Controller
 into your cluster.
 
+:::info Refer Kubernetes Objects which will be created by following steps are
+listed [here](/reference/kubernetes-operator/controller.md). :::
+
 1. Configure the below parameters for the Controller Custom Resource by creating
    a `values.yaml` and pass it with the `install` command:
 

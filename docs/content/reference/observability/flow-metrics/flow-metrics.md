@@ -4,12 +4,13 @@ sidebar_position: 1
 sidebar_label: Flow Metrics
 ---
 
-Aperture Agents emit an OpenTelemetry stream that can be stored and visualized
-in [FluxNinja ARC](/arc/arc.md). Alternatively, the telemetry stream can be
-ingested into an OLAP database like [Apache Druid](https://druid.apache.org/).
-This metric stream contains high-cardinality attributes and it's not advisable
-to store it a time-series database such as [Prometheus](https://prometheus.io/)
-and it's variants.
+Aperture Agents emit an OpenTelemetry stream for flow data, which provides a
+comprehensive view of individual requests or features within services. This
+stream contains high-cardinality attributes that represent key attributes of the
+requests and features, allowing for a detailed analysis of system performance
+and behavior. The stream can be stored and visualized in
+[FluxNinja ARC](/arc/arc.md), or ingested into popular OLAP databases such as
+[Apache Druid](https://druid.apache.org/).
 
 ## Dimension Columns
 

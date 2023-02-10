@@ -2,10 +2,6 @@
 title: Latency AIMD Concurrency Limiting Policy
 ---
 
-```mdx-code-block
-import {apertureVersion} from '../../../../apertureVersion.js';
-```
-
 ## Introduction
 
 This policy detects overloads/cascading failures by comparing the real-time
@@ -31,22 +27,12 @@ to see this blueprint in use.
 
 :::
 
-## Links
-
-Sample values file: <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/latency-aimd-concurrency-limiting/values.yaml`}>values.yaml</a>
-
-Sample values file (required fields only): <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/latency-aimd-concurrency-limiting/values_required.yaml`}>values_required.yaml</a>
-
-Code: <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/latency-aimd-concurrency-limiting`}>latency-aimd-concurrency-limiting</a>
-
 ## Configuration
 
 <!-- Configuration Marker -->
 
 ```mdx-code-block
+
 export const ParameterHeading = ({children}) => (
   <span style={{fontWeight: "bold"}}>{children}</span>
 );
@@ -80,6 +66,13 @@ export const ParameterDescription = ({name, type, reference, value, description}
 </table>
 );
 ```
+
+```mdx-code-block
+import {apertureVersion as aver} from '../../../../apertureVersion.js'
+```
+
+Code: <a
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/latency-aimd-concurrency-limiting`}>policies/latency-aimd-concurrency-limiting</a>
 
 <h3 class="blueprints-h3">Common</h3>
 
@@ -216,11 +209,11 @@ export const ParameterDescription = ({name, type, reference, value, description}
     description='Scale factor to multiply square root of current accepted concurrrency. This, along with concurrency_linear_increment helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).' />
 
 <ParameterDescription
-    name="policy.concurrency_controller.dynamic_config"
+    name="policy.concurrency_controller.default_config"
     type="aperture.v1.LoadActuatorDynamicConfig"
     reference=""
     value="{'dry_run': False}"
-    description='Dynamic configuration for concurrency controller.' />
+    description='Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.' />
 
 <h3 class="blueprints-h3">Dashboard</h3>
 
@@ -245,4 +238,16 @@ export const ParameterDescription = ({name, type, reference, value, description}
     type="string"
     reference=""
     value="''"
-    description='Datasource filter regex.' />
+    description='Datasource filter regex.' />## Dynamic Configuration The
+following configuration parameters can be
+[dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md)
+at runtime, without reloading the policy.
+
+<h3 class="blueprints-h3">Dynamic Configuration</h3>
+
+<ParameterDescription
+    name="concurrency_controller"
+    type="aperture.v1.LoadActuatorDynamicConfig"
+    reference=""
+    value="__REQUIRED_FIELD__"
+    description='Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.' />
