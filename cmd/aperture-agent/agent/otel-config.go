@@ -135,6 +135,15 @@ func addCustomMetricsPipelines(
 	config *otelconfig.OTELConfig,
 	agentConfig *agentconfig.AgentOTELConfig,
 ) {
+	config.AddProcessor(otelconsts.ProcessorCustromMetrics, map[string]any{
+		"attributes": []map[string]interface{}{
+			{
+				"key":    "service.name",
+				"action": "upsert",
+				"value":  "aperture-custom-metrics",
+			},
+		},
+	})
 	if _, ok := agentConfig.CustomMetrics[otelconsts.ReceiverKubeletStats]; !ok {
 		if agentConfig.CustomMetrics == nil {
 			agentConfig.CustomMetrics = map[string]agentconfig.CustomMetricsConfig{}
@@ -153,6 +162,7 @@ func addCustomMetricsPipelines(
 			Receivers: normalizeComponentNames(pipelineName, metricConfig.Pipeline.Receivers),
 			Processors: append(
 				normalizeComponentNames(pipelineName, metricConfig.Pipeline.Processors),
+				otelconsts.ProcessorCustromMetrics,
 				otelconsts.ProcessorAgentGroup,
 			),
 			Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
