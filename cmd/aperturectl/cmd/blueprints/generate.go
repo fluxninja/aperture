@@ -118,17 +118,17 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 		log.Info().Msgf("Generated manifests at %s", updatedOutputDir)
 
 		if applyPolicy {
-			err = apply.ApplyCmd.Flag("dir").Value.Set(updatedOutputDir)
+			err = apply.ApplyPolicyCmd.Flag("dir").Value.Set(updatedOutputDir)
 			if err != nil {
 				return err
 			}
 
-			err = apply.ApplyCmd.PreRunE(cmd, args)
+			err = apply.ApplyCmd.PersistentPreRunE(cmd, args)
 			if err != nil {
 				return err
 			}
 
-			err = apply.ApplyCmd.RunE(cmd, args)
+			err = apply.ApplyPolicyCmd.RunE(cmd, args)
 			if err != nil {
 				return err
 			}

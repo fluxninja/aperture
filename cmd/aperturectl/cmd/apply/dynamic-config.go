@@ -34,7 +34,7 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 	Short:         "Apply Aperture DynamicConfig to a Policy",
 	Long:          `Use this command to apply the Aperture DynamicConfig to a Policy.`,
 	SilenceErrors: true,
-	Example:       `aperturectl apply dynamic-config --name=static-rate-limiting --file=dynamic-config.yaml`,
+	Example:       `aperturectl apply dynamic-config --policy=static-rate-limiting --file=dynamic-config.yaml`,
 	PreRunE: func(_ *cobra.Command, _ []string) error {
 		if policyName == "" {
 			return errors.New("policy name is required")
