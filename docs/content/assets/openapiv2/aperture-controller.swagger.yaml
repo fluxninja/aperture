@@ -966,6 +966,9 @@ definitions:
       query:
         description: Query components that are query databases such as Prometheus.
         $ref: '#/definitions/v1Query'
+      sma:
+        description: Simple Moving Average filter.
+        $ref: '#/definitions/v1SMA'
       sqrt:
         description: Takes an input signal and emits the square root of the input
           signal.
@@ -2561,6 +2564,53 @@ definitions:
           Decides if the created flow label should be available as an attribute in OLAP telemetry and
           propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
         x-go-validate: required
+  v1SMA:
+    description: Simple Moving Average (SMA) is a type of moving average that computes
+      the average of a fixed number of signal readings.
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the EMA component.
+        $ref: '#/definitions/v1SMAIns'
+      out_ports:
+        description: Output ports for the EMA component.
+        $ref: '#/definitions/v1SMAOuts'
+      parameters:
+        description: |-
+          Parameters for the EMA component.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+        $ref: '#/definitions/v1SMAParameters'
+  v1SMAIns:
+    type: object
+    properties:
+      signal:
+        description: Signal to be used for the moving average computation.
+        $ref: '#/definitions/v1InPort'
+  v1SMAOuts:
+    type: object
+    properties:
+      output:
+        description: Computed moving average.
+        $ref: '#/definitions/v1OutPort'
+  v1SMAParameters:
+    type: object
+    properties:
+      valid_during_warmup:
+        description: |-
+          Whether output is valid during warm-up stage.
+
+          @gotags: default:"false"
+        type: boolean
+        x-go-default: false
+      window:
+        description: |-
+          Window of time over which the moving average is computed.
+
+          @gotags: default:"5s"
+        type: string
+        x-go-validate: 5s
   v1Scheduler:
     description: |-
       :::note

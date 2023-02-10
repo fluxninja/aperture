@@ -133,6 +133,12 @@
   withQueryMixin(query):: {
     query+: query,
   },
+  withSma(sma):: {
+    sma: sma,
+  },
+  withSmaMixin(sma):: {
+    sma+: sma,
+  },
   withSqrt(sqrt):: {
     sqrt: sqrt,
   },

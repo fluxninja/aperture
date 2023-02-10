@@ -1254,6 +1254,9 @@ definitions:
       switcher:
         $ref: '#/definitions/v1Switcher'
         description: Switcher acts as a switch that emits one of the two signals based on third signal.
+      sma:
+        $ref: '#/definitions/v1SMA'
+        description: Simple Moving Average filter.
       variable:
         $ref: '#/definitions/v1Variable'
         description: Emits a variable signal which can be set to invalid.
@@ -3196,6 +3199,52 @@ definitions:
       ```
       [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
     title: Rule describes a single Flow Classification Rule
+  v1SMA:
+    type: object
+    properties:
+      in_ports:
+        $ref: '#/definitions/v1SMAIns'
+        description: Input ports for the EMA component.
+      out_ports:
+        $ref: '#/definitions/v1SMAOuts'
+        description: Output ports for the EMA component.
+      parameters:
+        $ref: '#/definitions/v1SMAParameters'
+        description: |-
+          Parameters for the EMA component.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+    description: Simple Moving Average (SMA) is a type of moving average that computes the average of a fixed number of signal readings.
+  v1SMAIns:
+    type: object
+    properties:
+      signal:
+        $ref: '#/definitions/v1InPort'
+        description: Signal to be used for the moving average computation.
+  v1SMAOuts:
+    type: object
+    properties:
+      output:
+        $ref: '#/definitions/v1OutPort'
+        description: Computed moving average.
+  v1SMAParameters:
+    type: object
+    properties:
+      window:
+        type: string
+        description: |-
+          Window of time over which the moving average is computed.
+
+          @gotags: default:"5s"
+        x-go-validate: 5s
+      valid_during_warmup:
+        type: boolean
+        description: |-
+          Whether output is valid during warm-up stage.
+
+          @gotags: default:"false"
+        x-go-default: false
   v1Scheduler:
     type: object
     properties:

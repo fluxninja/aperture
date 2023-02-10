@@ -987,6 +987,12 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([V1Switcher](#v1-switcher)) Switcher acts as a switch that emits one of the two signals based on third signal.
 
 </dd>
+<dt>sma</dt>
+<dd>
+
+([V1SMA](#v1-s-m-a)) Simple Moving Average filter.
+
+</dd>
 <dt>variable</dt>
 <dd>
 
@@ -3424,6 +3430,84 @@ sensitive labels.
 :::
 
 @gotags: default:"true"
+
+</dd>
+</dl>
+
+### v1SMA {#v1-s-m-a}
+
+Simple Moving Average (SMA) is a type of moving average that computes the average of a fixed number of signal readings.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([V1SMAIns](#v1-s-m-a-ins)) Input ports for the EMA component.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([V1SMAOuts](#v1-s-m-a-outs)) Output ports for the EMA component.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+([V1SMAParameters](#v1-s-m-a-parameters), `required`) Parameters for the EMA component.
+
+@gotags: validate:"required"
+
+</dd>
+</dl>
+
+### v1SMAIns {#v1-s-m-a-ins}
+
+#### Properties
+
+<dl>
+<dt>signal</dt>
+<dd>
+
+([V1InPort](#v1-in-port)) Signal to be used for the moving average computation.
+
+</dd>
+</dl>
+
+### v1SMAOuts {#v1-s-m-a-outs}
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([V1OutPort](#v1-out-port)) Computed moving average.
+
+</dd>
+</dl>
+
+### v1SMAParameters {#v1-s-m-a-parameters}
+
+#### Properties
+
+<dl>
+<dt>window</dt>
+<dd>
+
+(string, `5s`) Window of time over which the moving average is computed.
+
+@gotags: default:"5s"
+
+</dd>
+<dt>valid_during_warmup</dt>
+<dd>
+
+(bool) Whether output is valid during warm-up stage.
+
+@gotags: default:"false"
 
 </dd>
 </dl>
