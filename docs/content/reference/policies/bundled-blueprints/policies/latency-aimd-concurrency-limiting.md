@@ -249,5 +249,5 @@ at runtime, without reloading the policy.
     name="concurrency_controller"
     type="aperture.v1.LoadActuatorDynamicConfig"
     reference=""
-    value="{'dry_run': False}"
+    value="__REQUIRED_FIELD__"
     description='Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.' />

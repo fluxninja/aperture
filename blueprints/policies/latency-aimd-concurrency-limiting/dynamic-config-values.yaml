@@ -4,5 +4,5 @@
 
 # Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.
 # Type: aperture.v1.LoadActuatorDynamicConfig
-concurrency_controller:
-  dry_run: false
+# Required: True
+concurrency_controller: "__REQUIRED_FIELD__"

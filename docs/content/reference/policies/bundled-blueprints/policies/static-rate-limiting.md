@@ -163,5 +163,5 @@ at runtime, without reloading the policy.
     name="rate_limiter"
     type="aperture.spec.v1.RateLimiterDynamicConfig"
     reference="../../spec#v1-rate-limiter-dynamic-config"
-    value="{'overrides': []}"
+    value="__REQUIRED_FIELD__"
     description='Rate limiter dynamic configuration that is updated at runtime.' />

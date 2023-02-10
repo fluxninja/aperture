@@ -10,4 +10,5 @@ var (
 	all           bool
 	onlyRequired  bool
 	skipPull      bool
+	dynamicConfig bool
 )

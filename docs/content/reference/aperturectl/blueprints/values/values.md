@@ -29,6 +29,7 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 ### Options
 
 ```
+      --dynamic-config       Show dynamic config values instead
   -h, --help                 help for values
       --name string          Name of the Aperture Blueprint to provide values file for
       --only-required        Show only required values
