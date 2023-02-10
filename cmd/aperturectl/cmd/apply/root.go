@@ -34,7 +34,4 @@ Use this command to apply the Aperture Policies.`,
 		}
 		return nil
 	},
-	Example: `aperturectl apply --file=policy.yaml
-
-aperturectl apply --dir=policy-dir`,
 }

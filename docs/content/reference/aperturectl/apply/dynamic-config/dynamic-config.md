@@ -21,7 +21,7 @@ aperturectl apply dynamic-config [flags]
 ### Examples
 
 ```
-aperturectl apply dynamic-config --name=static-rate-limiting --file=dynamic-config.yaml
+aperturectl apply dynamic-config --policy=static-rate-limiting --file=dynamic-config.yaml
 ```
 
 ### Options

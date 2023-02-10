@@ -14,14 +14,6 @@ Apply Aperture Policies
 
 Use this command to apply the Aperture Policies.
 
-### Examples
-
-```
-aperturectl apply --file=policy.yaml
-
-aperturectl apply --dir=policy-dir
-```
-
 ### Options
 
 ```
