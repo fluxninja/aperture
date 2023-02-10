@@ -31,9 +31,6 @@ local policyResource = StaticRateLimiting({
       label_key: 'user_id',
       limit_reset_interval: '1s',
     },
-    dynamic_config: {
-      overrides: [],
-    },
   },
 
   classifiers: [

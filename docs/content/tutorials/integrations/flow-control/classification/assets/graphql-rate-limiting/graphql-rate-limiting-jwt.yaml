@@ -1,7 +1,4 @@
 apiVersion: fluxninja.com/v1alpha1
-dynamicConfig:
-  rate_limiter:
-    overrides: []
 kind: Policy
 metadata:
   labels:
@@ -12,6 +9,8 @@ spec:
     components:
       - flow_control:
           rate_limiter:
+            default_config:
+              overrides: []
             dynamic_config_key: rate_limiter
             flow_selector:
               flow_matcher:
