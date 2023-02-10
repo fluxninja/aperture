@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/dot"
+	"github.com/imdario/mergo"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	policymonitoringv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/monitoring/v1"
@@ -12,72 +13,41 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
-// ToGraphView creates a graph (Currently showing depth=1) representation of a Circuit.
-func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*policymonitoringv1.Link) {
-	var componentsDTO []*policymonitoringv1.ComponentView
-	var links []*policymonitoringv1.Link
-	type componentData struct {
-		componentID string
-		portName    string
+type componentData struct {
+	componentID string
+	portName    string
+}
+
+// ToGraphView creates a graph representation of a Circuit.
+func (circuit *Circuit) ToGraphView() *policymonitoringv1.CircuitView {
+	tree, _, _ := toGraphViewAux(circuit.Tree)
+	return &policymonitoringv1.CircuitView{
+		Tree: &tree,
 	}
+}
+
+func toGraphViewAux(tree Tree) (t policymonitoringv1.Tree, rootIns map[string][]componentData, rootOuts map[string][]componentData) {
+	var components []*policymonitoringv1.Tree
+	var links []*policymonitoringv1.Link
 	outSignalsIndex := make(map[string][]componentData)
 	inSignalsIndex := make(map[string][]componentData)
-	for _, ch := range circuit.Tree.Children {
-		c := ch.Root
-		var inPorts, outPorts []*policymonitoringv1.PortView
-		for name, signals := range c.PortMapping.Ins {
-			for _, signal := range signals {
-				if signal.SignalType() == runtime.SignalTypeNamed {
-					signalName := signal.SignalName
-					inPorts = append(inPorts, &policymonitoringv1.PortView{
-						PortName: name,
-						Value:    &policymonitoringv1.PortView_SignalName{SignalName: signalName},
-						Looped:   signal.Looped,
-					})
-					inSignalsIndex[signalName] = append(inSignalsIndex[signalName], componentData{
-						componentID: c.ComponentID.String(),
-						portName:    name,
-					})
-				} else if signal.SignalType() == runtime.SignalTypeConstant {
-					inPorts = append(inPorts, &policymonitoringv1.PortView{
-						PortName: name,
-						Value:    &policymonitoringv1.PortView_ConstantValue{ConstantValue: signal.ConstantSignal.Value},
-					})
-				}
-			}
-		}
-		for name, signals := range c.PortMapping.Outs {
-			for _, signal := range signals {
-				signalName := signal.SignalName
-				outPorts = append(outPorts, &policymonitoringv1.PortView{
-					PortName: name,
-					Value:    &policymonitoringv1.PortView_SignalName{SignalName: signalName},
-					Looped:   signal.Looped,
-				})
-				outSignalsIndex[signalName] = append(outSignalsIndex[signalName], componentData{
-					componentID: c.ComponentID.String(),
-					portName:    name,
-				})
-			}
-		}
-		componentConfig := c.Config
-		componentMap, err := structpb.NewStruct(componentConfig)
-		if err != nil {
-			log.Error().Err(err).Msg("converting component map")
-		}
 
-		componentName := c.Name()
-		componentDescription := c.ShortDescription()
-
-		componentsDTO = append(componentsDTO, &policymonitoringv1.ComponentView{
-			ComponentId:          c.ComponentID.String(),
-			ComponentName:        componentName,
-			ComponentDescription: componentDescription,
-			ComponentType:        string(c.Type()),
-			Component:            componentMap,
-			InPorts:              convertPortViews(inPorts),
-			OutPorts:             convertPortViews(outPorts),
-		})
+	r, rootIns, rootOuts := configuredComponentToComponentView(tree.Root)
+	for k, v := range rootIns {
+		inSignalsIndex[k] = v
+	}
+	for k, v := range rootOuts {
+		outSignalsIndex[k] = v
+	}
+	for _, ch := range tree.Children {
+		subTree, inSignalsChildIndex, outSignalsChildIndex := toGraphViewAux(ch)
+		components = append(components, &subTree)
+		if err := mergo.Merge(&inSignalsIndex, inSignalsChildIndex, mergo.WithAppendSlice); err != nil {
+			log.Error().Err(err)
+		}
+		if err := mergo.Merge(&outSignalsIndex, outSignalsChildIndex, mergo.WithAppendSlice); err != nil {
+			log.Error().Err(err)
+		}
 	}
 	// compute links
 	for signalName := range outSignalsIndex {
@@ -97,7 +67,75 @@ func (circuit *Circuit) ToGraphView() ([]*policymonitoringv1.ComponentView, []*p
 			}
 		}
 	}
-	return componentsDTO, links
+
+	t = policymonitoringv1.Tree{
+		Root:     &r,
+		Children: components,
+		Links:    links,
+	}
+	return
+}
+
+func configuredComponentToComponentView(c runtime.ConfiguredComponent) (cv policymonitoringv1.ComponentView, inSignalsIndex map[string][]componentData, outSignalsIndex map[string][]componentData) {
+	if c.Component == nil {
+		return
+	}
+	outSignalsIndex = make(map[string][]componentData)
+	inSignalsIndex = make(map[string][]componentData)
+	var inPorts, outPorts []*policymonitoringv1.PortView
+	for name, signals := range c.PortMapping.Ins {
+		for _, signal := range signals {
+			if signal.SignalType() == runtime.SignalTypeNamed {
+				signalName := signal.SignalName
+				inPorts = append(inPorts, &policymonitoringv1.PortView{
+					PortName: name,
+					Value:    &policymonitoringv1.PortView_SignalName{SignalName: signalName},
+					Looped:   signal.Looped,
+				})
+				inSignalsIndex[signalName] = append(inSignalsIndex[signalName], componentData{
+					componentID: c.ComponentID.String(),
+					portName:    name,
+				})
+			} else if signal.SignalType() == runtime.SignalTypeConstant {
+				inPorts = append(inPorts, &policymonitoringv1.PortView{
+					PortName: name,
+					Value:    &policymonitoringv1.PortView_ConstantValue{ConstantValue: signal.ConstantSignal.Value},
+				})
+			}
+		}
+	}
+	for name, signals := range c.PortMapping.Outs {
+		for _, signal := range signals {
+			signalName := signal.SignalName
+			outPorts = append(outPorts, &policymonitoringv1.PortView{
+				PortName: name,
+				Value:    &policymonitoringv1.PortView_SignalName{SignalName: signalName},
+				Looped:   signal.Looped,
+			})
+			outSignalsIndex[signalName] = append(outSignalsIndex[signalName], componentData{
+				componentID: c.ComponentID.String(),
+				portName:    name,
+			})
+		}
+	}
+	componentConfig := c.Config
+	componentMap, err := structpb.NewStruct(componentConfig)
+	if err != nil {
+		log.Error().Err(err).Msg("converting component map")
+	}
+
+	componentName := c.Name()
+	componentDescription := c.ShortDescription()
+	cv = policymonitoringv1.ComponentView{
+		ComponentId:          c.ComponentID.String(),
+		ComponentName:        componentName,
+		ComponentDescription: componentDescription,
+		ComponentType:        string(c.Type()),
+		Component:            componentMap,
+		InPorts:              convertPortViews(inPorts),
+		OutPorts:             convertPortViews(outPorts),
+	}
+	return
 }
 
 func convertPortViews(ports []*policymonitoringv1.PortView) []*policymonitoringv1.PortView {
