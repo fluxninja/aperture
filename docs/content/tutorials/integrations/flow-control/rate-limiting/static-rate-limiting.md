@@ -75,10 +75,10 @@ In addition, we will be configuring our rate limiter to apply these limits to
 ### Playground
 
 When the above policy is loaded in the playground, we see that no more than 120
-requests are accepted at any given time and rest of the requests are rejected.
+requests are accepted in 60 sec and rest of the requests are rejected.
 
 <Zoom>
 
-![Static Rate Limiting](./assets/static-rate-limiting/static-rate-limiting-demo.png)
+![Static Rate Limiting](./assets/static-rate-limiting/static-rate-limiting-02.png)
 
 </Zoom>
