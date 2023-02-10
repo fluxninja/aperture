@@ -5,6 +5,10 @@ import (
 	"encoding/json"
 	"sync"
 
+	"google.golang.org/protobuf/proto"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/scale"
+
 	controlpointcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/controlpointcache/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
@@ -12,9 +16,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/panichandler"
-	"google.golang.org/protobuf/proto"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/client-go/scale"
 )
 
 // A ControlPoint is identified by Group, Version, Kind, Namespace and Name.

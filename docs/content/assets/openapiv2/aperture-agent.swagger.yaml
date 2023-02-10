@@ -10,6 +10,20 @@ info:
   version: "1.0"
 host: aperture-agent
 paths:
+  /v1/autoscale/kubernetes/controlpoints:
+    get:
+      tags:
+      - aperture-agent
+      operationId: ControlPointCache_GetControlPoints
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1KubernetesControlPoints'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
   /v1/distcache/stats:
     get:
       tags:
@@ -24,7 +38,21 @@ paths:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
-  /v1/entities:
+  /v1/flowcontrol/controlpoints:
+    get:
+      tags:
+      - aperture-agent
+      operationId: FlowControlControlPointsService_GetControlPoints
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1FlowControlControlPoints'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+  /v1/flowcontrol/entities:
     get:
       tags:
       - aperture-agent
@@ -38,7 +66,7 @@ paths:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
-  /v1/entities/ip-address/{ip_address}:
+  /v1/flowcontrol/entities/ip-address/{ip_address}:
     get:
       tags:
       - aperture-agent
@@ -57,7 +85,7 @@ paths:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
-  /v1/entities/name/{name}:
+  /v1/flowcontrol/entities/name/{name}:
     get:
       tags:
       - aperture-agent
@@ -508,6 +536,20 @@ definitions:
       value:
         description: Exact value that the label should be equal to.
         type: string
+  v1FlowControlControlPoint:
+    type: object
+    properties:
+      control_point:
+        type: string
+      service:
+        type: string
+  v1FlowControlControlPoints:
+    type: object
+    properties:
+      control_points:
+        type: array
+        items:
+          $ref: '#/definitions/v1FlowControlControlPoint'
   v1GroupStatus:
     description: |-
       Groups is nested structure that holds status information about the node and a
@@ -557,6 +599,24 @@ definitions:
         type: array
         items:
           type: string
+  v1KubernetesControlPoint:
+    type: object
+    properties:
+      api_version:
+        type: string
+      kind:
+        type: string
+      name:
+        type: string
+      namespace:
+        type: string
+  v1KubernetesControlPoints:
+    type: object
+    properties:
+      control_points:
+        type: array
+        items:
+          $ref: '#/definitions/v1KubernetesControlPoint'
   v1LabelMatcher:
     description: |-
       It provides three ways to define requirements:

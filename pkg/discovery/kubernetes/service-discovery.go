@@ -18,7 +18,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/watch"
 
-	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/entitycache/v1"
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/entitycache/v1"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"

@@ -1,10 +1,12 @@
 package service
 
 import (
+	"go.uber.org/fx"
+
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/controlpoints"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview"
-	"go.uber.org/fx"
 )
 
 // Module is a set of default providers for flowcontrol components.
@@ -13,5 +15,6 @@ func Module() fx.Option {
 		check.Module(),
 		envoy.Module(),
 		preview.Module(),
+		controlpoints.Module(),
 	)
 }

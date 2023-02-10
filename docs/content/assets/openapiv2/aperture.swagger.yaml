@@ -3,9 +3,11 @@ info:
   title: Aperture API
   version: "1.0"
 tags:
+  - name: ControlPointCache
   - name: DistCacheService
-  - name: EntityCacheService
   - name: FlowControlService
+  - name: FlowControlControlPointsService
+  - name: EntityCacheService
   - name: FlowPreviewService
   - name: InfoService
   - name: PeerDiscoveryService
@@ -53,6 +55,20 @@ paths:
             $ref: '#/definitions/v1ReportRequest'
       tags:
         - FluxNinjaService
+  /v1/autoscale/kubernetes/controlpoints:
+    get:
+      operationId: ControlPointCache_GetControlPoints
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1KubernetesControlPoints'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      tags:
+        - aperture-agent
   /v1/distcache/stats:
     get:
       operationId: DistCacheService_GetStats
@@ -67,7 +83,21 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - aperture-agent
-  /v1/entities:
+  /v1/flowcontrol/controlpoints:
+    get:
+      operationId: FlowControlControlPointsService_GetControlPoints
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1FlowControlControlPoints'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      tags:
+        - aperture-agent
+  /v1/flowcontrol/entities:
     get:
       operationId: EntityCacheService_GetEntityCache
       responses:
@@ -81,7 +111,7 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - aperture-agent
-  /v1/entities/ip-address/{ip_address}:
+  /v1/flowcontrol/entities/ip-address/{ip_address}:
     get:
       operationId: EntityCacheService_GetEntityByIPAddress
       responses:
@@ -100,7 +130,7 @@ paths:
           type: string
       tags:
         - aperture-agent
-  /v1/entities/name/{name}:
+  /v1/flowcontrol/entities/name/{name}:
     get:
       operationId: EntityCacheService_GetEntityByName
       responses:
@@ -1806,6 +1836,20 @@ definitions:
         $ref: '#/definitions/v1AIMDConcurrencyController'
         description: AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
     description: FlowControl components are used to regulate requests flow.
+  v1FlowControlControlPoint:
+    type: object
+    properties:
+      service:
+        type: string
+      control_point:
+        type: string
+  v1FlowControlControlPoints:
+    type: object
+    properties:
+      control_points:
+        type: array
+        items:
+          $ref: '#/definitions/v1FlowControlControlPoint'
   v1FlowMatcher:
     type: object
     properties:
@@ -2338,6 +2382,13 @@ definitions:
         type: string
       name:
         type: string
+  v1KubernetesControlPoints:
+    type: object
+    properties:
+      control_points:
+        type: array
+        items:
+          $ref: '#/definitions/v1KubernetesControlPoint'
   v1KubernetesObjectSelector:
     type: object
     properties:

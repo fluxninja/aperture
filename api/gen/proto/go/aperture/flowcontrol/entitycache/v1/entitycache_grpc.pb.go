@@ -34,7 +34,7 @@ func NewEntityCacheServiceClient(cc grpc.ClientConnInterface) EntityCacheService
 
 func (c *entityCacheServiceClient) GetEntityCache(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*EntityCache, error) {
 	out := new(EntityCache)
-	err := c.cc.Invoke(ctx, "/aperture.entitycache.v1.EntityCacheService/GetEntityCache", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/aperture.flowcontrol.entitycache.v1.EntityCacheService/GetEntityCache", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (c *entityCacheServiceClient) GetEntityCache(ctx context.Context, in *empty
 
 func (c *entityCacheServiceClient) GetEntityByIPAddress(ctx context.Context, in *GetEntityByIPAddressRequest, opts ...grpc.CallOption) (*Entity, error) {
 	out := new(Entity)
-	err := c.cc.Invoke(ctx, "/aperture.entitycache.v1.EntityCacheService/GetEntityByIPAddress", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/aperture.flowcontrol.entitycache.v1.EntityCacheService/GetEntityByIPAddress", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (c *entityCacheServiceClient) GetEntityByIPAddress(ctx context.Context, in 
 
 func (c *entityCacheServiceClient) GetEntityByName(ctx context.Context, in *GetEntityByNameRequest, opts ...grpc.CallOption) (*Entity, error) {
 	out := new(Entity)
-	err := c.cc.Invoke(ctx, "/aperture.entitycache.v1.EntityCacheService/GetEntityByName", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/aperture.flowcontrol.entitycache.v1.EntityCacheService/GetEntityByName", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func _EntityCacheService_GetEntityCache_Handler(srv interface{}, ctx context.Con
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/aperture.entitycache.v1.EntityCacheService/GetEntityCache",
+		FullMethod: "/aperture.flowcontrol.entitycache.v1.EntityCacheService/GetEntityCache",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(EntityCacheServiceServer).GetEntityCache(ctx, req.(*emptypb.Empty))
@@ -121,7 +121,7 @@ func _EntityCacheService_GetEntityByIPAddress_Handler(srv interface{}, ctx conte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/aperture.entitycache.v1.EntityCacheService/GetEntityByIPAddress",
+		FullMethod: "/aperture.flowcontrol.entitycache.v1.EntityCacheService/GetEntityByIPAddress",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(EntityCacheServiceServer).GetEntityByIPAddress(ctx, req.(*GetEntityByIPAddressRequest))
@@ -139,7 +139,7 @@ func _EntityCacheService_GetEntityByName_Handler(srv interface{}, ctx context.Co
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/aperture.entitycache.v1.EntityCacheService/GetEntityByName",
+		FullMethod: "/aperture.flowcontrol.entitycache.v1.EntityCacheService/GetEntityByName",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(EntityCacheServiceServer).GetEntityByName(ctx, req.(*GetEntityByNameRequest))
@@ -151,7 +151,7 @@ func _EntityCacheService_GetEntityByName_Handler(srv interface{}, ctx context.Co
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var EntityCacheService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "aperture.entitycache.v1.EntityCacheService",
+	ServiceName: "aperture.flowcontrol.entitycache.v1.EntityCacheService",
 	HandlerType: (*EntityCacheServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -168,5 +168,5 @@ var EntityCacheService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "aperture/entitycache/v1/entitycache.proto",
+	Metadata: "aperture/flowcontrol/entitycache/v1/entitycache.proto",
 }
