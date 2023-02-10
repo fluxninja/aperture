@@ -1,4 +1,7 @@
 apiVersion: fluxninja.com/v1alpha1
+dynamicConfig:
+  rate_limiter:
+    overrides: []
 kind: Policy
 metadata:
   labels:
@@ -9,6 +12,7 @@ spec:
     components:
       - flow_control:
           rate_limiter:
+            dynamic_config_key: rate_limiter
             flow_selector:
               flow_matcher:
                 control_point: ingress
@@ -21,5 +25,10 @@ spec:
                   value: 120
             parameters:
               label_key: http.request.header.user_id
+              lazy_sync:
+                enabled: true
+                num_sync: 5
               limit_reset_interval: 60s
     evaluation_interval: 300s
+  resources:
+    classifiers: []

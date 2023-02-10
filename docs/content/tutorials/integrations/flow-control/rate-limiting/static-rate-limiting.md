@@ -34,16 +34,16 @@ In addition, we will be configuring our rate limiter to apply these limits to
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="YAML">
+<TabItem value="aperturectl values.yaml">
 ```
 
 ```yaml
-{@include: ./assets/static-rate-limiting/static-rate-limiting.yaml}
+{@include: ./assets/static-rate-limiting/values.yaml}
 ```
 
 ```mdx-code-block
 </TabItem>
-<TabItem value="Jsonnet">
+<TabItem value="Jsonnet Mixin">
 ```
 
 ```jsonnet
@@ -53,10 +53,32 @@ In addition, we will be configuring our rate limiter to apply these limits to
 ```mdx-code-block
 </TabItem>
 </Tabs>
+
 ```
+
+<details><summary>Generated Policy</summary>
+<p>
+
+```yaml
+{@include: ./assets/static-rate-limiting/static-rate-limiting.yaml}
+```
+
+</p>
+</details>
 
 ### Circuit Diagram
 
 ```mermaid
 {@include: ./assets/static-rate-limiting/static-rate-limiting.mmd}
 ```
+
+### Playground
+
+When the above policy is loaded in the playground, we see that no more than 120
+requests are accepted at any given time and rest of the requests are rejected.
+
+<Zoom>
+
+![Static Rate Limiting](./assets/static-rate-limiting/static-rate-limiting-demo.png)
+
+</Zoom>
