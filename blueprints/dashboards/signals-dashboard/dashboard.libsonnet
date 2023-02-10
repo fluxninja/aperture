@@ -34,7 +34,7 @@ function(cfg) {
           { color: 'red', value: 80 },
         ],
       };
-    aperture.timeSeriesPanel.new('Signal Average', ds)
+    aperture.timeSeriesPanel.new('Signal Average', dsName)
     + timeSeriesPanel.withTarget(target)
     + timeSeriesPanel.defaults.withThresholds(thresholds)
     + timeSeriesPanel.withFieldConfigMixin(
@@ -63,7 +63,7 @@ function(cfg) {
           { color: 'red', value: 80 },
         ],
       };
-    aperture.timeSeriesPanel.new('Signal Validity (Frequency)', ds)
+    aperture.timeSeriesPanel.new('Signal Validity (Frequency)', dsName)
     + timeSeriesPanel.withTarget(target)
     + timeSeriesPanel.defaults.withThresholds(thresholds)
     + timeSeriesPanel.withFieldConfigMixin(
