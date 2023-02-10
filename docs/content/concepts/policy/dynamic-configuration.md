@@ -26,8 +26,8 @@ overrides for specific flow label keys via dynamic configuration. This prevents
 resetting of distributed counters that would otherwise happen when a policy is
 restarted.
 
-The dynamic configuration can be provided in the Policy Custom Resource using
-the `dynamicConfig` key. To learn more about it's usage, please see how the
-dynamic configuration is provided in the Latency based AIMD (Additive Increase,
-Multiplicative Decrease) Concurrency Limiting
+The dynamic configuration can be provided to an existing policy using the
+[aperturectl CLI](/reference/aperturectl/apply/apply.md). To learn more about
+it's usage, please see how the dynamic configuration is provided in the Latency
+based AIMD (Additive Increase, Multiplicative Decrease) Concurrency Limiting
 [Blueprint](/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md).

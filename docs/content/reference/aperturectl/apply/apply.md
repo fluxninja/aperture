@@ -8,11 +8,11 @@ keywords:
 
 ## aperturectl apply
 
-Apply Aperture Policy to the cluster
+Apply Aperture Policies
 
 ### Synopsis
 
-Use this command to apply the Aperture Policy to the cluster.
+Use this command to apply the Aperture Policies.
 
 ### Examples
 

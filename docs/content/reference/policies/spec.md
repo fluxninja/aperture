@@ -475,10 +475,16 @@ High level concurrency control component. Baselines a signal via exponential mov
 ([V1AlerterParameters](#v1-alerter-parameters)) Configuration for embedded alerter.
 
 </dd>
-<dt>dry_run_dynamic_config_key</dt>
+<dt>dynamic_config_key</dt>
 <dd>
 
-(string) Configuration key for load actuation dry run.
+(string) Configuration key for load actuation.
+
+</dd>
+<dt>default_config</dt>
+<dd>
+
+([V1LoadActuatorDynamicConfig](#v1-load-actuator-dynamic-config)) Default configuration.
 
 </dd>
 </dl>

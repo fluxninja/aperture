@@ -1,7 +1,4 @@
 apiVersion: fluxninja.com/v1alpha1
-dynamicConfig:
-  concurrency_controller:
-    dry_run: false
 kind: Policy
 metadata:
   labels:
@@ -64,7 +61,9 @@ spec:
             concurrency_limit_multiplier: "2.0"
             concurrency_linear_increment: "5.0"
             concurrency_sqrt_increment_multiplier: "1"
-            dry_run_dynamic_config_key: concurrency_controller
+            default_config:
+              dry_run: false
+            dynamic_config_key: concurrency_controller
             flow_selector:
               flow_matcher:
                 control_point: ingress

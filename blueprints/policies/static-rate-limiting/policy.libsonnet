@@ -30,6 +30,7 @@ function(cfg) {
             + rateLimiter.withFlowSelector(params.rate_limiter.flow_selector)
             + rateLimiter.withParameters(params.rate_limiter.parameters)
             + rateLimiter.withDynamicConfigKey('rate_limiter')
+            + rateLimiter.withDefaultConfig(params.rate_limiter.default_config)
           ),
         ),
       ]),
@@ -45,9 +46,6 @@ function(cfg) {
       },
     },
     spec: policyDef,
-    dynamicConfig: {
-      rate_limiter: params.rate_limiter.dynamic_config,
-    },
   },
 
   policyResource: policyResource,

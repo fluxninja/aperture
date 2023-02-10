@@ -2,30 +2,16 @@
 title: Static Rate Limiting Policy
 ---
 
-```mdx-code-block
-import {apertureVersion} from '../../../../apertureVersion.js';
-```
-
 ## Introduction
 
 This blueprint provides a simple static rate limiting policy and a dashboard.
-
-## Links
-
-Sample values file: <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/static-rate-limiting/values.yaml`}>values.yaml</a>
-
-Sample values file (required fields only): <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/static-rate-limiting/values_required.yaml`}>values_required.yaml</a>
-
-Code: <a
-href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/blueprints/policies/static-rate-limiting`}>static-rate-limiting</a>
 
 ## Configuration
 
 <!-- Configuration Marker -->
 
 ```mdx-code-block
+
 export const ParameterHeading = ({children}) => (
   <span style={{fontWeight: "bold"}}>{children}</span>
 );
@@ -59,6 +45,13 @@ export const ParameterDescription = ({name, type, reference, value, description}
 </table>
 );
 ```
+
+```mdx-code-block
+import {apertureVersion as aver} from '../../../../apertureVersion.js'
+```
+
+Code: <a
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/static-rate-limiting`}>policies/static-rate-limiting</a>
 
 <h3 class="blueprints-h3">Common</h3>
 
@@ -130,11 +123,11 @@ export const ParameterDescription = ({name, type, reference, value, description}
     description='Flow label to use for rate limiting.' />
 
 <ParameterDescription
-    name="policy.rate_limiter.dynamic_config"
-    type="aperture.spec.v1.RateLimiterDefaultConfig"
-    reference="../../spec#v1-rate-limiter-default-config"
+    name="policy.rate_limiter.default_config"
+    type="aperture.spec.v1.RateLimiterDynamicConfig"
+    reference="../../spec#v1-rate-limiter-dynamic-config"
     value="{'overrides': []}"
-    description='Dynamic configuration for rate limiter that can be applied at the runtime.' />
+    description='Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.' />
 
 <h3 class="blueprints-h3">Dashboard</h3>
 
@@ -159,4 +152,16 @@ export const ParameterDescription = ({name, type, reference, value, description}
     type="string"
     reference=""
     value="''"
-    description='Datasource filter regex.' />
+    description='Datasource filter regex.' />## Dynamic Configuration The
+following configuration parameters can be
+[dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md)
+at runtime, without reloading the policy.
+
+<h3 class="blueprints-h3">Dynamic Configuration</h3>
+
+<ParameterDescription
+    name="rate_limiter"
+    type="aperture.spec.v1.RateLimiterDynamicConfig"
+    reference="../../spec#v1-rate-limiter-dynamic-config"
+    value="__REQUIRED_FIELD__"
+    description='Rate limiter dynamic configuration that is updated at runtime.' />
