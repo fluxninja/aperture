@@ -177,7 +177,7 @@ var _ = Describe("Metrics Processor", func() {
 
 		By("populating control point cache")
 
-		cp := cpCache.GetAllAndClear()
+		cp := cpCache.GetAll()
 		for _, service := range baseCheckResp.GetServices() {
 			Expect(cp).To(HaveKey(selectors.NewControlPointID(service, baseCheckResp.GetControlPoint())))
 		}

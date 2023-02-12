@@ -13,14 +13,17 @@ import (
 )
 
 const (
-	valuesFileName         = "values.yaml"
-	requiredValuesFileName = "values_required.yaml"
+	valuesFileName                      = "values.yaml"
+	requiredValuesFileName              = "values-required.yaml"
+	dynamicConfigValuesFileName         = "dynamic-config-values.yaml"
+	requiredDynamicConfigValuesFileName = "dynamic-config-values-required.yaml"
 )
 
 func init() {
 	valuesCmd.Flags().StringVar(&blueprintName, "name", "", "Name of the Aperture Blueprint to provide values file for")
 	valuesCmd.Flags().StringVar(&valuesFile, "output-file", "", "Path to the output values file")
 	valuesCmd.Flags().BoolVar(&onlyRequired, "only-required", false, "Show only required values")
+	valuesCmd.Flags().BoolVar(&dynamicConfig, "dynamic-config", false, "Show dynamic config values instead")
 }
 
 var valuesCmd = &cobra.Command{
@@ -41,7 +44,22 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 		}
 		blueprintDir := filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
 
-		valFileName := valuesFileName
+		var valFileName string
+
+		if !dynamicConfig {
+			if !onlyRequired {
+				valFileName = valuesFileName
+			} else {
+				valFileName = requiredValuesFileName
+			}
+		} else {
+			if !onlyRequired {
+				valFileName = dynamicConfigValuesFileName
+			} else {
+				valFileName = requiredDynamicConfigValuesFileName
+			}
+		}
+
 		if onlyRequired {
 			valFileName = requiredValuesFileName
 		}

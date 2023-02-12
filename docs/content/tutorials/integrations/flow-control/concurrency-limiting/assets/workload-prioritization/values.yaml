@@ -41,5 +41,5 @@ policy:
               http.request.header.user_type: subscriber
           parameters:
             priority: 200
-    dynamic_config:
+    default_config:
       dry_run: false

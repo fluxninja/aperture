@@ -1,4 +1,4 @@
-# Generated values.yaml file for policies/static-rate-limiting blueprint
+# Generated values file for policies/static-rate-limiting blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/static-rate-limiting
 
@@ -34,9 +34,9 @@ policy:
       # Type: string
       # Required: True
       label_key: "__REQUIRED_FIELD__"
-    # Dynamic configuration for rate limiter that can be applied at the runtime.
-    # Type: aperture.spec.v1.RateLimiterDefaultConfig
-    dynamic_config:
+    # Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.
+    # Type: aperture.spec.v1.RateLimiterDynamicConfig
+    default_config:
       overrides: []
 
 dashboard:

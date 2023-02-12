@@ -52,6 +52,7 @@ const (
 	heartbeatsHTTPPath = "/plugins/fluxninja/v1/report"
 )
 
+// Heartbeats is the struct that holds information about heartbeats.
 type Heartbeats struct {
 	heartbeatv1.UnimplementedControllerInfoServiceServer
 	heartbeatsClient            heartbeatv1.FluxNinjaServiceClient
@@ -225,7 +226,7 @@ func (h *Heartbeats) newHeartbeat(
 
 	serviceControlPointObjects := make(map[selectors.ControlPointID]struct{})
 	if h.serviceControlPointCache != nil {
-		serviceControlPointObjects = h.serviceControlPointCache.GetAllAndClear()
+		serviceControlPointObjects = h.serviceControlPointCache.GetAll()
 	}
 
 	serviceControlPoints := make([]*heartbeatv1.ServiceControlPoint, 0, len(serviceControlPointObjects))
@@ -299,15 +300,18 @@ func (h *Heartbeats) sendSingleHeartbeatByHTTP(jobCtxt context.Context) (proto.M
 	return &emptypb.Empty{}, nil
 }
 
+// GetControllerInfo returns the controller info.
 func (h *Heartbeats) GetControllerInfo(context.Context, *emptypb.Empty) (*heartbeatv1.ControllerInfo, error) {
 	return h.ControllerInfo, nil
 }
 
+// RegisterControllerInfoService registers the controller info service with the given gRPC server.
 func RegisterControllerInfoService(grpc *grpc.Server, handler *Heartbeats) error {
 	heartbeatv1.RegisterControllerInfoServiceServer(grpc, handler)
 	return nil
 }
 
+// RegisterControllerInfoServiceHTTP registers the controller info service with the given gRPC gateway.
 func RegisterControllerInfoServiceHTTP() fx.Option {
 	return grpcgateway.RegisterHandler{Handler: heartbeatv1.RegisterControllerInfoServiceHandlerFromEndpoint}.Annotate()
 }

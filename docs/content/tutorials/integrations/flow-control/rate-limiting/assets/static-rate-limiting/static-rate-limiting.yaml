@@ -9,6 +9,9 @@ spec:
     components:
       - flow_control:
           rate_limiter:
+            default_config:
+              overrides: []
+            dynamic_config_key: rate_limiter
             flow_selector:
               flow_matcher:
                 control_point: ingress
@@ -21,5 +24,10 @@ spec:
                   value: 120
             parameters:
               label_key: http.request.header.user_id
+              lazy_sync:
+                enabled: true
+                num_sync: 5
               limit_reset_interval: 60s
     evaluation_interval: 300s
+  resources:
+    classifiers: []

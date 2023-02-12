@@ -16,7 +16,8 @@ type Handler struct {
 }
 
 // NewHandler returns a new Handler.
-func NewHandler(engine iface.Engine,
+func NewHandler(
+	engine iface.Engine,
 	classifier *classification.ClassificationEngine,
 	agentInfo *agentinfo.AgentInfo,
 ) *Handler {

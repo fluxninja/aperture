@@ -29,11 +29,10 @@ func (c *Cache[K]) Put(k K) {
 	c.cache[k] = struct{}{}
 }
 
-// GetAllAndClear returns the current state of cache and clears the cache.
-func (c *Cache[K]) GetAllAndClear() map[K]struct{} {
+// GetAll returns the current state of cache.
+func (c *Cache[K]) GetAll() map[K]struct{} {
 	c.Lock()
 	defer c.Unlock()
 	result := c.cache
-	c.cache = map[K]struct{}{}
 	return result
 }
