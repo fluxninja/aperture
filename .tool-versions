@@ -17,5 +17,5 @@ kind 0.16.0
 jb 0.5.1
 tanka 0.23.1
 tilt 0.30.9
-jsonnet 0.18.0
+jsonnet 0.19.1
 circleci 0.1.21898

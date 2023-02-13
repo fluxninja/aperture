@@ -5,13 +5,16 @@ import (
 	"context"
 
 	"go.uber.org/fx"
+	"google.golang.org/grpc"
 
+	controlpointcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/controlpointcache/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/common"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/etcd/election"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/status"
 )
@@ -40,12 +43,11 @@ type KubernetesDiscoveryConfig struct {
 func Module() fx.Option {
 	return fx.Options(
 		notifiers.TrackersConstructor{Name: FxTagBase}.Annotate(),
-		fx.Provide(
-			ProvideControlPointCache,
-		),
-		fx.Invoke(
-			InvokeServiceDiscovery,
-		),
+		fx.Provide(ProvideControlPointCache),
+		fx.Invoke(InvokeServiceDiscovery),
+		fx.Provide(NewHandler),
+		fx.Invoke(RegisterControlPointCacheService),
+		grpcgateway.RegisterHandler{Handler: controlpointcachev1.RegisterControlPointCacheHandlerFromEndpoint}.Annotate(),
 	)
 }
 
@@ -146,4 +148,9 @@ func InvokeServiceDiscovery(in FxInSvc) error {
 	})
 
 	return nil
+}
+
+// RegisterControlPointCacheService registers the ControlPointCache service handler with the gRPC server.
+func RegisterControlPointCacheService(handler *Handler, server *grpc.Server) {
+	controlpointcachev1.RegisterControlPointCacheServer(server, handler)
 }

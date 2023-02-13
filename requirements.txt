@@ -5,3 +5,4 @@ MarkupSafe==2.1.2
 prance==0.22.11.4.0
 requests==2.28.2
 typer==0.7.0
+openapi2jsonschema==0.9.1

@@ -30,6 +30,9 @@ var (
 	// Location of blueprints in disk (e.g. within cache or custom location).
 	blueprintsDir string
 
+	// Location of specific blueprint.
+	blueprintDir string
+
 	// Args for `blueprints`.
 	blueprintsURI     string
 	blueprintsVersion string

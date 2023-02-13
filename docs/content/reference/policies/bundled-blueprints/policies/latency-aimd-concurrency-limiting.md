@@ -126,7 +126,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     name="policy.latency_baseliner.ema"
     type="aperture.spec.v1.EMAParameters"
     reference="../../spec#v1-e-m-a-parameters"
-    value="{'correction_factor_on_max_envelope_violation': '0.95', 'ema_window': '1500s', 'warmup_window': '60s'}"
+    value="{'correction_factor_on_max_envelope_violation': 0.95, 'ema_window': '1500s', 'warmup_window': '60s'}"
     description='EMA parameters.' />
 
 <ParameterDescription
@@ -140,7 +140,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     name="policy.latency_baseliner.latency_ema_limit_multiplier"
     type="float64"
     reference=""
-    value="2.0"
+    value="2"
     description='Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.' />
 
 <h4 class="blueprints-h4">Concurrency Controller</h4>
@@ -170,14 +170,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     name="policy.concurrency_controller.scheduler"
     type="aperture.spec.v1.SchedulerParameters"
     reference="../../spec#v1-scheduler-parameters"
-    value="{'auto_tokens': True, 'default_workload_parameters': {'priority': 20}, 'timeout_factor': '0.5', 'workloads': []}"
+    value="{'auto_tokens': True, 'default_workload_parameters': {'priority': 20}, 'timeout_factor': 0.5, 'workloads': []}"
     description='Scheduler parameters.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.gradient"
     type="aperture.spec.v1.GradientControllerParameters"
     reference="../../spec#v1-gradient-controller-parameters"
-    value="{'max_gradient': '1.0', 'min_gradient': '0.1', 'slope': '-1'}"
+    value="{'max_gradient': 1, 'min_gradient': 0.1, 'slope': -1}"
     description='Gradient Controller parameters.' />
 
 <ParameterDescription
@@ -191,14 +191,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     name="policy.concurrency_controller.concurrency_limit_multiplier"
     type="float64"
     reference=""
-    value="2.0"
+    value="2"
     description='Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.concurrency_linear_increment"
     type="float64"
     reference=""
-    value="5.0"
+    value="5"
     description='Linear increment to concurrency in each execution tick when the system is not in overloaded state.' />
 
 <ParameterDescription

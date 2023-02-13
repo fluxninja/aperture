@@ -316,7 +316,7 @@ YAML_TPL = """
 {%- macro render_value(value, level) %}
 {%- if value is mapping %}
 {%- for key, val in value.items() %}
-{{ '  ' * (level) }}{{ key }}: {{ render_value(val, level) }}
+{{ '  ' * (level) }}{{ key }}: {{ render_value(val, level+1) }}
 {%- endfor %}
 {%- else %}
 {{- value | quoteValue }}

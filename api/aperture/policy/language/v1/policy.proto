@@ -1671,7 +1671,7 @@ message AIMDConcurrencyController {
   double concurrency_limit_multiplier = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {number_value: 2.0}
+      value: {number_value: 2}
     }
   }]; // @gotags: default:"2.0"
 
@@ -1679,7 +1679,7 @@ message AIMDConcurrencyController {
   double concurrency_linear_increment = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {number_value: 5.0}
+      value: {number_value: 5}
     }
   }]; // @gotags: default:"5.0"
 
@@ -1687,7 +1687,7 @@ message AIMDConcurrencyController {
   double concurrency_sqrt_increment_multiplier = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {number_value: 1.0}
+      value: {number_value: 1}
     }
   }]; // @gotags: default:"1.0"
 
