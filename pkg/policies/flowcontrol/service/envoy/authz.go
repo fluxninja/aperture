@@ -124,7 +124,8 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 			Code(codes.InvalidArgument).Msg("missing control-point")
 	}
 
-	svcs := h.serviceGetter.ServicesFromContext(ctx)
+	address := req.GetAttributes().GetSource().GetAddress().GetSocketAddress()
+	svcs := h.serviceGetter.ServicesFromAddress(address)
 
 	logger := logging.New().WithFields(map[string]interface{}{"rego": "input"})
 	skipRequestBodyParse := false

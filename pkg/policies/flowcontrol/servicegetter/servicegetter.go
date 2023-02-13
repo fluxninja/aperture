@@ -4,6 +4,7 @@ import (
 	"context"
 	"net"
 
+	corev3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	"go.uber.org/fx"
 	"google.golang.org/grpc/peer"
 
@@ -14,6 +15,7 @@ import (
 // ServiceGetter can be used to query services based on client context.
 type ServiceGetter interface {
 	ServicesFromContext(ctx context.Context) []string
+	ServicesFromAddress(address *corev3.SocketAddress) []string
 }
 
 // FromEntityCache creates a new EntityCache-powered ServiceGetter.
@@ -59,6 +61,7 @@ func (sg *ecServiceGetter) servicesFromContext(ctx context.Context) (svcs []stri
 	}
 
 	clientIP := tcpAddr.IP.String()
+	log.Info().Str("address", clientIP).Msg("servicesFromContext")
 	entity, err := sg.entityCache.GetByIP(clientIP)
 	if err != nil {
 		if sg.ecHasDiscovery {
@@ -68,6 +71,24 @@ func (sg *ecServiceGetter) servicesFromContext(ctx context.Context) (svcs []stri
 		return nil, false
 	}
 
+	return entity.Services, true
+}
+
+// ServicesFromAddress returns list of services associated with IP extracted from SocketAddress.
+func (sg *ecServiceGetter) ServicesFromAddress(address *corev3.SocketAddress) []string {
+	svcs, ok := sg.servicesFromAddress(address)
+	sg.metrics.inc(ok)
+	return svcs
+}
+
+func (sg *ecServiceGetter) servicesFromAddress(address *corev3.SocketAddress) (svcs []string, ok bool) {
+	clientIP := address.GetAddress()
+	log.Info().Str("address", clientIP).Msg("servicesFromAddress")
+	entity, err := sg.entityCache.GetByIP(clientIP)
+	if err != nil {
+		log.Sample(noEntitySampler).Warn().Err(err).Str("clientIP", clientIP).Msg("cannot get services")
+		return nil, false
+	}
 	return entity.Services, true
 }
 
@@ -104,5 +125,8 @@ func ProvideFromEntityCache(in FxIn) ServiceGetter {
 
 type emptyServiceGetter struct{}
 
-// ServicesFromContext implements ServiceGetter interface.
+// ServicesFromContext implements ServiceGetter interface for emptyServiceGetter.
 func (sg emptyServiceGetter) ServicesFromContext(ctx context.Context) []string { return nil }
+
+// ServicesFromAddress implements ServiceGetter interface for emptyServiceGetter.
+func (sg emptyServiceGetter) ServicesFromAddress(address *corev3.SocketAddress) []string { return nil }
