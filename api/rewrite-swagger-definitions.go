@@ -35,6 +35,9 @@ func main() {
 			v1 := ".v1."
 			// find the first occurrence of v1 in key
 			i := strings.Index(key, v1)
+			if i == -1 {
+				panic("cannot find v1 in key: all aperture definitions must have v1 in their name")
+			}
 			// remove these characters from key including v1
 			key = key[i+len(v1):]
 		}
