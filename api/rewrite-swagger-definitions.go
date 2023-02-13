@@ -47,6 +47,10 @@ func main() {
 			continue
 		}
 		// replace this key
+		// first check if the new key already exists
+		if _, ok := definitions[key]; ok {
+			panic("please provide unique definition name as the key already exists: " + key)
+		}
 		definitions[key] = v
 		delete(definitions, k)
 		replaceRefs["#/definitions/"+k] = "#/definitions/" + key
