@@ -42,7 +42,7 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 		if valuesFile == "" {
 			return fmt.Errorf("--output-file must be provided")
 		}
-		blueprintDir := filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
+		blueprintDir = filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
 
 		var valFileName string
 

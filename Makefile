@@ -81,6 +81,7 @@ generate-blueprints: generate-config-markdown
 		git_root=$$(git rev-parse --show-toplevel); \
 		python $$git_root/scripts/jsonnet-lib-gen.py --output-dir $$git_root/blueprints/gen $$git_root/docs/gen/policy/policy.yaml; \
 		tk fmt $$git_root/blueprints/gen; \
+		npx prettier --write $$git_root/blueprints/gen/jsonschema/*.json; \
 		git add $$git_root/blueprints/gen; \
 	}
 	@scripts/generate_blueprints_docs.sh
