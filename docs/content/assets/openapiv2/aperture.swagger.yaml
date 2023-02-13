@@ -3262,7 +3262,7 @@ paths:
                   name: body
                   required: true
                   schema:
-                    $ref: '#/definitions/aperture.plugins.fluxninja.v1.ReportRequest'
+                    $ref: '#/definitions/ReportRequest'
             responses:
                 "200":
                     description: A successful response.
@@ -3391,7 +3391,7 @@ paths:
                   name: label_matcher
                   required: true
                   schema:
-                    $ref: '#/definitions/aperture.policy.language.v1.LabelMatcher'
+                    $ref: '#/definitions/LabelMatcher'
                 - description: |-
                     Number of samples to collect. Defaults to 10.
 
@@ -3434,7 +3434,7 @@ paths:
                   name: label_matcher
                   required: true
                   schema:
-                    $ref: '#/definitions/aperture.policy.language.v1.LabelMatcher'
+                    $ref: '#/definitions/LabelMatcher'
                 - description: |-
                     Number of samples to collect. Defaults to 10.
 

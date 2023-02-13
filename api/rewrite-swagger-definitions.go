@@ -82,8 +82,17 @@ func replaceRef(content map[string]interface{}, replacements map[string]string) 
 				content[k] = newRef
 			}
 		}
+		// dive into the map
 		if m, ok := v.(map[string]interface{}); ok {
 			replaceRef(m, replacements)
+		}
+		// dive into the array
+		if a, ok := v.([]interface{}); ok {
+			for _, v1 := range a {
+				if m, ok := v1.(map[string]interface{}); ok {
+					replaceRef(m, replacements)
+				}
+			}
 		}
 	}
 }
