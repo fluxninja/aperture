@@ -79,7 +79,7 @@ class DocBlock:
             else:
                 parts[-1].append(letter)
 
-        component_final = "v1-" + "-".join(["".join(l) for l in parts])
+        component_final = "-".join(["".join(l) for l in parts])
 
         return f"{spec_path}#{component_final}"
 

@@ -13,7 +13,7 @@ sidebar_position: 6
 :::info
 
 See also
-[Concurrency Limiter reference](/reference/policies/spec.md#v1-concurrency-limiter).
+[Concurrency Limiter reference](/reference/policies/spec.md#concurrency-limiter).
 
 :::
 
@@ -73,7 +73,7 @@ hard rate-limits.
 
 Aperture can be configured to automatically estimate the tokens for each
 workload. See `auto-tokens`
-[configuration](/reference/policies/spec.md#v1-scheduler).
+[configuration](/reference/policies/spec.md#scheduler).
 
 ### Token bucket {#token-bucket}
 

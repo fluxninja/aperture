@@ -195,7 +195,7 @@ func saveYAMLFile(categoryName, path, filename string, content map[string]interf
 				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintDir, "gen/jsonschema/_definitions.json#/definitions/PolicyCustomResource"))
 			} else {
 				// prepend the file with yaml-language-server modeline that points to the schema
-				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintDir, "gen/jsonschema/_definitions.json#/definitions/v1Policy"))
+				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintDir, "gen/jsonschema/_definitions.json#/definitions/Policy"))
 			}
 			yamlBytes = append([]byte(fmt.Sprintf("# yaml-language-server: $schema=%s\n", schemaURL)), yamlBytes...)
 		}

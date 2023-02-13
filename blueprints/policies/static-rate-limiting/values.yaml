@@ -28,14 +28,14 @@ policy:
         # Required: True
         control_point: "__REQUIRED_FIELD__"
     # Parameters.
-    # Type: aperture.spec.v1.RateLimiterParameters
+    # Type: aperture.spec.v1.RateLimiter.Parameters
     parameters:
       # Flow label to use for rate limiting.
       # Type: string
       # Required: True
       label_key: "__REQUIRED_FIELD__"
     # Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.
-    # Type: aperture.spec.v1.RateLimiterDynamicConfig
+    # Type: aperture.spec.v1.RateLimiter.DynamicConfig
     default_config:
       overrides: []
 
