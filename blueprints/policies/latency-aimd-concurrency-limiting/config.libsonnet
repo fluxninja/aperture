@@ -34,7 +34,7 @@
     * @section Policy
     * @subsection Latency Baseliner
     *
-    * @param (policy.latency_baseliner.ema: aperture.spec.v1.EMA.Parameters) EMA parameters.
+    * @param (policy.latency_baseliner.ema: aperture.spec.v1.EMAParameters) EMA parameters.
     * @param (policy.latency_baseliner.latency_tolerance_multiplier: float64) Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.
     * @param (policy.latency_baseliner.latency_ema_limit_multiplier: float64) Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.
     */
@@ -54,13 +54,13 @@
     * @param (policy.concurrency_controller.flow_selector: aperture.spec.v1.FlowSelector) Concurrency Limiter flow selector.
     * @param (policy.concurrency_controller.flow_selector.service_selector.service: string required) Service Name.
     * @param (policy.concurrency_controller.flow_selector.flow_matcher.control_point: string required) Control Point Name.
-    * @param (policy.concurrency_controller.scheduler: aperture.spec.v1.Scheduler.Parameters) Scheduler parameters.
-    * @param (policy.concurrency_controller.gradient: aperture.spec.v1.GradientController.Parameters) Gradient Controller parameters.
-    * @param (policy.concurrency_controller.alerter: aperture.spec.v1.Alerter.Parameters) Whether tokens for workloads are computed dynamically or set statically by the user.
+    * @param (policy.concurrency_controller.scheduler: aperture.spec.v1.SchedulerParameters) Scheduler parameters.
+    * @param (policy.concurrency_controller.gradient: aperture.spec.v1.GradientControllerParameters) Gradient Controller parameters.
+    * @param (policy.concurrency_controller.alerter: aperture.spec.v1.AlerterParameters) Whether tokens for workloads are computed dynamically or set statically by the user.
     * @param (policy.concurrency_controller.concurrency_limit_multiplier: float64) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
     * @param (policy.concurrency_controller.concurrency_linear_increment: float64) Linear increment to concurrency in each execution tick when the system is not in overloaded state.
     * @param (policy.concurrency_controller.concurrency_sqrt_increment_multiplier: float64) Scale factor to multiply square root of current accepted concurrrency. This, along with concurrency_linear_increment helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
-    * @param (policy.concurrency_controller.default_config: aperture.v1.LoadActuator.DynamicConfig) Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.
+    * @param (policy.concurrency_controller.default_config: aperture.v1.LoadActuatorDynamicConfig) Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.
     */
     concurrency_controller: {
       flow_selector: {

@@ -124,8 +124,8 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
 
 <ParameterDescription
     name="policy.latency_baseliner.ema"
-    type="aperture.spec.v1.EMA.Parameters"
-    reference="../../spec#parameters"
+    type="aperture.spec.v1.EMAParameters"
+    reference="../../spec#e-m-a-parameters"
     value="{'correction_factor_on_max_envelope_violation': 0.95, 'ema_window': '1500s', 'warmup_window': '60s'}"
     description='EMA parameters.' />
 
@@ -168,22 +168,22 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
 
 <ParameterDescription
     name="policy.concurrency_controller.scheduler"
-    type="aperture.spec.v1.Scheduler.Parameters"
-    reference="../../spec#parameters"
+    type="aperture.spec.v1.SchedulerParameters"
+    reference="../../spec#scheduler-parameters"
     value="{'auto_tokens': True, 'default_workload_parameters': {'priority': 20}, 'timeout_factor': 0.5, 'workloads': []}"
     description='Scheduler parameters.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.gradient"
-    type="aperture.spec.v1.GradientController.Parameters"
-    reference="../../spec#parameters"
+    type="aperture.spec.v1.GradientControllerParameters"
+    reference="../../spec#gradient-controller-parameters"
     value="{'max_gradient': 1, 'min_gradient': 0.1, 'slope': -1}"
     description='Gradient Controller parameters.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.alerter"
-    type="aperture.spec.v1.Alerter.Parameters"
-    reference="../../spec#parameters"
+    type="aperture.spec.v1.AlerterParameters"
+    reference="../../spec#alerter-parameters"
     value="{'alert_channels': [], 'alert_name': 'Load Shed Event', 'resolve_timeout': '5s'}"
     description='Whether tokens for workloads are computed dynamically or set statically by the user.' />
 
@@ -210,7 +210,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
 
 <ParameterDescription
     name="policy.concurrency_controller.default_config"
-    type="aperture.v1.LoadActuator.DynamicConfig"
+    type="aperture.v1.LoadActuatorDynamicConfig"
     reference=""
     value="{'dry_run': False}"
     description='Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.' />

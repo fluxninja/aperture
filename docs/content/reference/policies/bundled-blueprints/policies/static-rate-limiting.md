@@ -110,8 +110,8 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
 
 <ParameterDescription
     name="policy.rate_limiter.parameters"
-    type="aperture.spec.v1.RateLimiter.Parameters"
-    reference="../../spec#parameters"
+    type="aperture.spec.v1.RateLimiterParameters"
+    reference="../../spec#rate-limiter-parameters"
     value="{'label_key': '__REQUIRED_FIELD__', 'lazy_sync': {'enabled': True, 'num_sync': 5}, 'limit_reset_interval': '1s'}"
     description='Parameters.' />
 
@@ -124,8 +124,8 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
 
 <ParameterDescription
     name="policy.rate_limiter.default_config"
-    type="aperture.spec.v1.RateLimiter.DynamicConfig"
-    reference="../../spec#dynamic-config"
+    type="aperture.spec.v1.RateLimiterDynamicConfig"
+    reference="../../spec#rate-limiter-dynamic-config"
     value="{'overrides': []}"
     description='Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.' />
 

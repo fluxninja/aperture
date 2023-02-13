@@ -24,7 +24,7 @@ policy:
         # Required: True
         control_point: "__REQUIRED_FIELD__"
     # Scheduler parameters.
-    # Type: aperture.spec.v1.Scheduler.Parameters
+    # Type: aperture.spec.v1.SchedulerParameters
     scheduler:
       auto_tokens: true
       default_workload_parameters:
@@ -32,13 +32,13 @@ policy:
       timeout_factor: 0.5
       workloads: []
     # Gradient Controller parameters.
-    # Type: aperture.spec.v1.GradientController.Parameters
+    # Type: aperture.spec.v1.GradientControllerParameters
     gradient:
       max_gradient: 1
       min_gradient: 0.1
       slope: -1
     # Whether tokens for workloads are computed dynamically or set statically by the user.
-    # Type: aperture.spec.v1.Alerter.Parameters
+    # Type: aperture.spec.v1.AlerterParameters
     alerter:
       alert_channels: []
       alert_name: "Load Shed Event"
@@ -53,7 +53,7 @@ policy:
     # Type: float64
     concurrency_sqrt_increment_multiplier: 1
     # Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.
-    # Type: aperture.v1.LoadActuator.DynamicConfig
+    # Type: aperture.v1.LoadActuatorDynamicConfig
     default_config:
       dry_run: false
 
