@@ -163,7 +163,7 @@ func addCustomMetricsPipelines(
 			Processors: append(
 				normalizeComponentNames(pipelineName, metricConfig.Pipeline.Processors),
 				otelconsts.ProcessorCustromMetrics,
-				otelconsts.ProcessorAgentGroup,
+				otelconsts.ProcessorAgentResourceLabels,
 			),
 			Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
 		})
