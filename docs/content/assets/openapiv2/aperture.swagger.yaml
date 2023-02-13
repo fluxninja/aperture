@@ -440,6 +440,14 @@ definitions:
             - ERROR_MULTI_EXPRESSION
             - ERROR_EXPRESSION_NOT_MAP
         type: string
+    ClientToServerHello:
+        properties:
+            name:
+                type: string
+            next_id:
+                format: uint64
+                type: string
+        type: object
     CommonAttributes:
         properties:
             component_id:
@@ -1798,6 +1806,35 @@ definitions:
                 format: int64
                 type: string
         type: object
+    ListAgentsResponse:
+        properties:
+            agents:
+                items:
+                    type: string
+                type: array
+        type: object
+    ListControlPointsResponse:
+        properties:
+            control_points:
+                items:
+                    $ref: '#/definitions/ServiceControlPoint'
+                type: array
+            errors_count:
+                format: int64
+                title: only used for controller→ctl
+                type: integer
+        type: object
+    ListServicesResponse:
+        properties:
+            errors_count:
+                format: int64
+                title: only used for controller→ctl
+                type: integer
+            services:
+                items:
+                    type: string
+                type: array
+        type: object
     LoadActuator:
         properties:
             default_config:
@@ -2520,6 +2557,25 @@ definitions:
     ReportResponse:
         description: ReportResponse is empty for now.
         type: object
+    Request:
+        properties:
+            id:
+                description: |-
+                    Id of the request, this should be unique per client connection. First
+                    request id on the connection should be equal to nextID from the Hello
+                    message.
+                format: uint64
+                type: string
+            payload:
+                $ref: '#/definitions/googleprotobufAny'
+                description: Request payload. The method on the callee will be dispatched by request's type.
+            timeout:
+                description: |-
+                    Mandatory timeout for processing request. Timeout is handled on
+                    caller-side. After it passes, caller is no longer interested in a response,
+                    and callee can forget about the request.
+                type: string
+        type: object
     Resources:
         description: |-
             :::info
@@ -2551,6 +2607,18 @@ definitions:
                     @gotags: validate:"dive"
                 type: object
         title: Resources that need to be setup for the policy to function
+        type: object
+    Response:
+        properties:
+            error:
+                $ref: '#/definitions/googlerpcStatus'
+            id:
+                format: uint64
+                type: string
+            payload:
+                description: Payload is a message of a type implied by request kind.
+                format: byte
+                type: string
         type: object
     Rule:
         description: |-
@@ -2838,6 +2906,22 @@ definitions:
                 format: uint64
                 type: string
                 x-go-default: 1
+        type: object
+    ServerToClient:
+        properties:
+            cancel_id:
+                description: |-
+                    Cancels in-flight request.
+
+                    After cancellation, the response is not expected to be received, but
+                    might happen that it will be received. If so, it should be ignored.
+                format: uint64
+                type: string
+            request:
+                $ref: '#/definitions/Request'
+                description: |-
+                    Make a request to client. Expect AgentToController message in the
+                    future containing Response with the same id.
         type: object
     Service:
         description: |-
@@ -3226,15 +3310,34 @@ definitions:
             - NULL_VALUE
         type: string
     googlerpcStatus:
+        description: |-
+            The `Status` type defines a logical error model that is suitable for
+            different programming environments, including REST APIs and RPC APIs. It is
+            used by [gRPC](https://github.com/grpc). Each `Status` message contains
+            three pieces of data: error code, error message, and error details.
+
+            You can find out more about this error model and how to work with it in the
+            [API Design Guide](https://cloud.google.com/apis/design/errors).
         properties:
             code:
+                description: |-
+                    The status code, which should be an enum value of
+                    [google.rpc.Code][google.rpc.Code].
                 format: int32
                 type: integer
             details:
+                description: |-
+                    A list of messages that carry the error details.  There is a common set of
+                    message types for APIs to use.
                 items:
                     $ref: '#/definitions/googleprotobufAny'
                 type: array
             message:
+                description: |-
+                    A developer-facing error message, which should be in English. Any
+                    user-facing error message should be localized and sent in the
+                    [google.rpc.Status.details][google.rpc.Status.details] field, or localized
+                    by the client.
                 type: string
         type: object
 info:
@@ -3573,6 +3676,7 @@ produces:
     - application/json
 swagger: "2.0"
 tags:
+    - name: Controller
     - name: ControlPointCache
     - name: DistCacheService
     - name: FlowControlService
@@ -3585,3 +3689,4 @@ tags:
     - name: StatusService
     - name: FluxNinjaService
     - name: ControllerInfoService
+    - name: Coordinator

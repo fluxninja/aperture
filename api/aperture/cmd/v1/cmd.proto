@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+// Messages for aperturectl → controller and controller → agent communication.
+package aperture.cmd.v1;
+
+import "google/protobuf/empty.proto";
+
+// Controller describes APIs of the controller from the aperturectl POV
+service Controller {
+  rpc ListAgents(google.protobuf.Empty) returns (ListAgentsResponse);
+  rpc ListServices(ListServicesRequest) returns (ListServicesResponse);
+  rpc ListControlPoints(ListControlPointsRequest) returns (ListControlPointsResponse);
+}
+
+message ListServicesRequest {}
+message ListServicesResponse {
+  repeated string services = 1;
+
+  // only used for controller→ctl
+  uint32 errors_count = 2;
+}
+
+message ListControlPointsRequest {}
+message ListControlPointsResponse {
+  repeated ServiceControlPoint control_points = 1;
+
+  // only used for controller→ctl
+  uint32 errors_count = 2;
+}
+
+message ListAgentsResponse {
+  repeated string agents = 1;
+}
+
+// ServiceControlPoint contains info about a control point on a given service.
+message ServiceControlPoint {
+  string name = 1;
+  string service_name = 2;
+}
