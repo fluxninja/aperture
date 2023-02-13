@@ -76,8 +76,14 @@ func (constructor ServerConstructor) Annotate() fx.Option {
 		fx.Provide(
 			fx.Annotate(
 				constructor.provideServer,
-				fx.ParamTags(config.NameTag(constructor.ListenerName)),
-				fx.ResultTags(config.NameTag(constructor.Name), config.NameTag(constructor.Name)),
+				fx.ParamTags(
+					config.NameTag(constructor.ListenerName),
+					config.GroupTag(constructor.Name)+` optional:"true"`,
+				),
+				fx.ResultTags(
+					config.NameTag(constructor.Name),
+					config.NameTag(constructor.Name),
+				),
 			),
 		),
 	)
@@ -85,6 +91,7 @@ func (constructor ServerConstructor) Annotate() fx.Option {
 
 func (constructor ServerConstructor) provideServer(
 	listener *listener.Listener,
+	additionalOptions []grpc.ServerOption,
 	unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
 	shutdowner fx.Shutdowner,
@@ -99,6 +106,8 @@ func (constructor ServerConstructor) provideServer(
 	grpcServerMetrics.EnableHandlingTimeHistogram(
 		grpc_prometheus.WithHistogramBuckets(config.LatencyBucketsMS),
 	)
+
+	constructor.ServerOptions = append(constructor.ServerOptions, additionalOptions...)
 
 	// Connection timeout from config
 	constructor.ServerOptions = append(constructor.ServerOptions, grpc.ConnectionTimeout(config.ConnectionTimeout.AsDuration()))
