@@ -53,7 +53,7 @@ install-go-tools:
 	@./scripts/install_go_tools.sh
 
 install-python-tools:
-	@echo Installing tools from tools.py
+	@echo Installing tools from requirements.txt
 	@pip3 install -r requirements.txt
 
 go-generate-swagger:
