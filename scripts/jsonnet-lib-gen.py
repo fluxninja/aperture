@@ -409,42 +409,42 @@ def main(output_dir: Path = typer.Option(..., help="Output path for the generate
 CUSTOM_RESOURCE_DEFINITION="""
 {
   "description": "CustomResourceDefinition represents a resource that should be exposed on the API server.  Its name MUST be in the format <.spec.name>.<.spec.group>.",
+  "type": "object",
+  "title": "Policy CustomResourceDefinition",
+  "additionalProperties": false,
   "properties": {
     "apiVersion": {
       "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+      "x-order": 0,
       "type": ["string", "null"],
       "enum": ["fluxninja.com/v1alpha1"]
     },
     "kind": {
       "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+      "x-order": 1,
       "type": ["string", "null"],
       "enum": ["Policy"]
     },
     "metadata": {
+      "x-order": 2,
       "$ref": "https://kubernetesjsonschema.dev/v1.18.1/_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
     },
     "spec": {
       "description": "Aperture Policy Object",
+      "x-order": 3,
       "$ref": "#/definitions/v1Policy"
     },
     "dynamicConfig": {
         "description": "DynamicConfig provides dynamic configuration for the policy.",
+      "x-order": 4,
         "type": ["object", "null"]
     },
     "status": {
       "description": "Status indicates the actual state of the CustomResourceDefinition",
+      "x-order": 5,
       "$ref": "https://kubernetesjsonschema.dev/v1.18.1/_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDefinitionStatus"
     }
-  },
-  "x-kubernetes-group-version-kind": [
-    {
-      "group": "apiextensions.k8s.io",
-      "kind": "CustomResourceDefinition",
-      "version": "v1beta1"
-    }
-  ],
-  "$schema": "http://json-schema.org/schema#",
-  "type": "object"
+  }
 }
 """
 
