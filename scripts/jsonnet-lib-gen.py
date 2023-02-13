@@ -12,6 +12,10 @@ from jinja2.utils import import_string
 import prance
 import typer
 
+import subprocess
+
+import json
+
 from loguru import logger
 
 
@@ -377,6 +381,73 @@ def main(output_dir: Path = typer.Option(..., help="Output path for the generate
         for definition in definitions
     ]
     render_gen_libsonnet(gen_libsonnet_path, imports)
+
+    # next, generate json schema using openapi2jsonschema
+    # execute openapi2jsonschema with arguments -
+    # 1. path in aperture_swagger_path variable
+    # 2. --strict flag
+    # 3. --output flag with value as output_dir/jsonschema
+    jsonschema_dir = output_dir / "jsonschema"
+    exit_code = subprocess.call(["openapi2jsonschema", str(aperture_swagger_path), "--strict", "--output", str(jsonschema_dir)])
+    if exit_code != 0:
+        logger.error(f"openapi2jsonschema exited with non-zero exit code: {exit_code}")
+        raise typer.Exit(1)
+    # remove all files in output_dir/jsonschema except for the _definitions.json file
+    for path in jsonschema_dir.rglob("*"):
+        if path.is_file() and path.name != "_definitions.json":
+            os.remove(path)
+
+    # inject k8s custom resource definition into _definitions.json
+    jsonschema_definitions_path = jsonschema_dir / "_definitions.json"
+    with open(jsonschema_definitions_path, "r") as f:
+        jsonschema_definitions = json.load(f)
+        jsonschema_definitions["definitions"]["PolicyCustomResource"] = json.loads(CUSTOM_RESOURCE_DEFINITION)
+    with open(jsonschema_definitions_path, "w") as f:
+        json.dump(jsonschema_definitions, f, indent=2)
+
+
+CUSTOM_RESOURCE_DEFINITION="""
+{
+  "description": "CustomResourceDefinition represents a resource that should be exposed on the API server.  Its name MUST be in the format <.spec.name>.<.spec.group>.",
+  "type": "object",
+  "title": "Policy CustomResourceDefinition",
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+      "x-order": 0,
+      "type": ["string", "null"],
+      "enum": ["fluxninja.com/v1alpha1"]
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+      "x-order": 1,
+      "type": ["string", "null"],
+      "enum": ["Policy"]
+    },
+    "metadata": {
+      "x-order": 2,
+      "$ref": "https://kubernetesjsonschema.dev/v1.18.1/_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Aperture Policy Object",
+      "x-order": 3,
+      "$ref": "#/definitions/v1Policy"
+    },
+    "dynamicConfig": {
+        "description": "DynamicConfig provides dynamic configuration for the policy.",
+      "x-order": 4,
+        "type": ["object", "null"]
+    },
+    "status": {
+      "description": "Status indicates the actual state of the CustomResourceDefinition",
+      "x-order": 5,
+      "$ref": "https://kubernetesjsonschema.dev/v1.18.1/_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1beta1.CustomResourceDefinitionStatus"
+    }
+  }
+}
+"""
+
 
 if __name__ == "__main__":
     typer.run(main)

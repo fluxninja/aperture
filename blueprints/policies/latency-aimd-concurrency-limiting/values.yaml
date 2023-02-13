@@ -34,7 +34,7 @@ policy:
     # Gradient Controller parameters.
     # Type: aperture.spec.v1.GradientControllerParameters
     gradient:
-      max_gradient: 1.0
+      max_gradient: 1
       min_gradient: 0.1
       slope: -1
     # Whether tokens for workloads are computed dynamically or set statically by the user.
@@ -45,10 +45,10 @@ policy:
       resolve_timeout: "5s"
     # Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
     # Type: float64
-    concurrency_limit_multiplier: 2.0
+    concurrency_limit_multiplier: 2
     # Linear increment to concurrency in each execution tick when the system is not in overloaded state.
     # Type: float64
-    concurrency_linear_increment: 5.0
+    concurrency_linear_increment: 5
     # Scale factor to multiply square root of current accepted concurrrency. This, along with concurrency_linear_increment helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
     # Type: float64
     concurrency_sqrt_increment_multiplier: 1

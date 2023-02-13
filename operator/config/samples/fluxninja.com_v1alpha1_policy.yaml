@@ -23,7 +23,7 @@ spec:
               signal_name: LATENCY
             rhs:
               constant_signal:
-                value: "2.0"
+                value: 2
           operator: mul
           out_ports:
             output:
@@ -34,7 +34,7 @@ spec:
               signal_name: LATENCY_EMA
             rhs:
               constant_signal:
-                value: "1.1"
+                value: 1.1
           operator: mul
           out_ports:
             output:
@@ -49,7 +49,7 @@ spec:
             output:
               signal_name: LATENCY_EMA
           parameters:
-            correction_factor_on_max_envelope_violation: "0.95"
+            correction_factor_on_max_envelope_violation: 0.95
             ema_window: 1500s
             warmup_window: 60s
       - flow_control:
@@ -58,9 +58,9 @@ spec:
               alert_channels: []
               alert_name: Load Shed Event
               resolve_timeout: 5s
-            concurrency_limit_multiplier: "2.0"
-            concurrency_linear_increment: "5.0"
-            concurrency_sqrt_increment_multiplier: "1"
+            concurrency_limit_multiplier: 2
+            concurrency_linear_increment: 5
+            concurrency_sqrt_increment_multiplier: 1
             default_config:
               dry_run: false
             dynamic_config_key: concurrency_controller
@@ -71,9 +71,9 @@ spec:
                 agent_group: default
                 service: service1-demo-app.demoapp.svc.cluster.local
             gradient_parameters:
-              max_gradient: "1.0"
-              min_gradient: "0.1"
-              slope: "-1"
+              max_gradient: 1
+              min_gradient: 0.1
+              slope: -1
             in_ports:
               setpoint:
                 signal_name: LATENCY_SETPOINT
@@ -88,7 +88,7 @@ spec:
               auto_tokens: true
               default_workload_parameters:
                 priority: 20
-              timeout_factor: "0.5"
+              timeout_factor: 0.5
               workloads: []
     evaluation_interval: 0.5s
   resources:

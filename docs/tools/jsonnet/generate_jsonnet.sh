@@ -1,6 +1,7 @@
 #!/bin/bash
 
 gitroot=$(git rev-parse --show-toplevel)
+scriptroot=$(dirname "$0")
 docsdir=$gitroot/docs
 blueprints_root="${gitroot}/blueprints"
 
@@ -98,7 +99,7 @@ for jsonnet_file in $jsonnet_files; do
 			old_yaml_file_contents=$(cat "$yamlfilepath")
 		fi
 		# convert the policy to yaml
-		yq -P e . "$jsonfilepath" >"$yamlfilepath"
+		go run "$scriptroot"/json2yaml.go "$jsonfilepath" "$yamlfilepath"
 		rm -rf "$jsonfilepath"
 		# run prettier
 		npx prettier --write "$yamlfilepath"

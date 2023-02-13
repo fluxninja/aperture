@@ -10,7 +10,7 @@ import (
 	"github.com/google/go-jsonnet"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slices"
-	"sigs.k8s.io/yaml"
+	"gopkg.in/yaml.v3"
 
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/apply"
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
@@ -24,6 +24,7 @@ func init() {
 	generateCmd.Flags().StringVar(&valuesFile, "values-file", "", "Path to the values file for Blueprint's input")
 	generateCmd.Flags().BoolVar(&applyPolicy, "apply", false, "Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed")
 	generateCmd.Flags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
+	generateCmd.Flags().BoolVar(&noYAMLModeline, "no-yaml-modeline", false, "Do not add YAML language server modeline to generated YAML files")
 }
 
 var generateCmd = &cobra.Command{
@@ -73,7 +74,7 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 			return err
 		}
 
-		blueprintDir := filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
+		blueprintDir = filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
 
 		err = blueprintExists(blueprintDir, blueprintName)
 		if err != nil {
@@ -87,7 +88,7 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 
 		importPath := fmt.Sprintf("%s/%s", blueprintDir, blueprintName)
 
-		jsonStr, err := vm.EvaluateAnonymousSnippet("bundle.libsonnet", fmt.Sprintf(`
+		bundleStr, err := vm.EvaluateAnonymousSnippet("bundle.libsonnet", fmt.Sprintf(`
 		local bundle = import '%s/bundle.libsonnet';
 		local config = std.parseYaml(importstr '%s');
     bundle(config)
@@ -96,8 +97,8 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 			return err
 		}
 
-		var yamlData map[string]interface{}
-		err = json.Unmarshal([]byte(jsonStr), &yamlData)
+		var bundle map[string]interface{}
+		err = json.Unmarshal([]byte(bundleStr), &bundle)
 		if err != nil {
 			return err
 		}
@@ -111,7 +112,7 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 			}
 		}
 
-		if err = processContent(yamlData, updatedOutputDir); err != nil {
+		if err = processJsonnetOutput(bundle, updatedOutputDir); err != nil {
 			return err
 		}
 
@@ -138,43 +139,66 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 	},
 }
 
-func processContent(data map[string]interface{}, outputPath string) error {
-	for name, content := range data {
-		if strings.HasSuffix(name, ".yaml") {
-			if err := saveYAMLFile(outputPath, name, content); err != nil {
+func processJsonnetOutput(bundle map[string]interface{}, outputPath string) error {
+	for categoryName, category := range bundle {
+		categoriesMap, ok := category.(map[string]interface{})
+		if !ok {
+			log.Error().Msgf("failed to process output '%+v'", category)
+			continue
+		}
+		var updatedPath string
+		if outputPath != "" {
+			updatedPath = filepath.Join(outputPath, categoryName)
+			err := os.MkdirAll(updatedPath, os.ModePerm)
+			if err != nil {
 				return err
 			}
-		} else if strings.HasSuffix(name, ".json") {
-			if err := saveJSONFile(outputPath, name, content); err != nil {
-				return err
-			}
-		} else {
+		}
+		for fileName, content := range categoriesMap {
 			contentMap, ok := content.(map[string]interface{})
 			if !ok {
 				log.Error().Msgf("failed to process output '%+v'", content)
 				continue
 			}
-			var updatedPath string
-			if outputPath != "" {
-				updatedPath = filepath.Join(outputPath, name)
-				err := os.MkdirAll(updatedPath, os.ModePerm)
-				if err != nil {
-					return err
-				}
-			}
-			if err := processContent(contentMap, updatedPath); err != nil {
+			if err := renderOutput(categoryName, updatedPath, fileName, contentMap); err != nil {
 				return err
 			}
 		}
 	}
-
 	return nil
 }
 
-func saveYAMLFile(path, filename string, content interface{}) error {
+func renderOutput(categoryName string, outputPath string, fileName string, content map[string]interface{}) error {
+	if strings.HasSuffix(fileName, ".yaml") {
+		if err := saveYAMLFile(categoryName, outputPath, fileName, content); err != nil {
+			return err
+		}
+	} else if strings.HasSuffix(fileName, ".json") {
+		if err := saveJSONFile(categoryName, outputPath, fileName, content); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func saveYAMLFile(categoryName, path, filename string, content map[string]interface{}) error {
 	yamlBytes, err := yaml.Marshal(content)
 	if err != nil {
 		return err
+	}
+
+	if !noYAMLModeline {
+		if categoryName == "policies" {
+			var schemaURL string
+			// if content contains kind: Policy then use the policy schema
+			if kind, ok := content["kind"]; ok && kind == "Policy" {
+				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintDir, "gen/jsonschema/_definitions.json#/definitions/PolicyCustomResource"))
+			} else {
+				// prepend the file with yaml-language-server modeline that points to the schema
+				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintDir, "gen/jsonschema/_definitions.json#/definitions/v1Policy"))
+			}
+			yamlBytes = append([]byte(fmt.Sprintf("# yaml-language-server: $schema=%s\n", schemaURL)), yamlBytes...)
+		}
 	}
 
 	filePath := filepath.Join(path, filename)
@@ -187,7 +211,7 @@ func saveYAMLFile(path, filename string, content interface{}) error {
 	return generateGraphs(yamlBytes, filePath)
 }
 
-func saveJSONFile(path, filename string, content interface{}) error {
+func saveJSONFile(_, path, filename string, content map[string]interface{}) error {
 	jsonBytes, err := json.MarshalIndent(content, "", "    ")
 	if err != nil {
 		return err

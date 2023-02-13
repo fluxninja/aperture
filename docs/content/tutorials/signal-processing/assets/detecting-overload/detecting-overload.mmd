@@ -45,8 +45,8 @@ style root.4_inports fill:none,stroke:none
 root.4signal[signal]
 end
 end
-root.3output --> |IS_OVERLOAD_SWITCH| root.4signal
 root.0output --> |LATENCY| root.1input
 root.0output --> |LATENCY| root.3lhs
 root.1output --> |LATENCY_EMA| root.2lhs
 root.2output --> |LATENCY_SETPOINT| root.3rhs
+root.3output --> |IS_OVERLOAD_SWITCH| root.4signal
