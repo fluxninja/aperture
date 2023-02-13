@@ -15,6 +15,7 @@ function generate_compare() {
 		--name "$name" \
 		--values-file "$values_file" \
 		--output-dir "tmp" \
+		--no-yaml-modeline \
 		--skip-pull
 
 	# make sure yaml1 and yaml2 exist

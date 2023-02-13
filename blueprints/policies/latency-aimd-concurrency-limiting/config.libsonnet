@@ -42,10 +42,10 @@
       ema: {
         ema_window: '1500s',
         warmup_window: '60s',
-        correction_factor_on_max_envelope_violation: '0.95',
+        correction_factor_on_max_envelope_violation: 0.95,
       },
-      latency_tolerance_multiplier: '1.1',
-      latency_ema_limit_multiplier: '2.0',
+      latency_tolerance_multiplier: 1.1,
+      latency_ema_limit_multiplier: 2.0,
     },
     /**
     * @section Policy
@@ -74,25 +74,25 @@
       },
       scheduler: {
         auto_tokens: true,
-        timeout_factor: '0.5',
+        timeout_factor: 0.5,
         default_workload_parameters: {
           priority: 20,
         },
         workloads: [],
       },
       gradient: {
-        slope: '-1',
-        min_gradient: '0.1',
-        max_gradient: '1.0',
+        slope: -1,
+        min_gradient: 0.1,
+        max_gradient: 1.0,
       },
       alerter: {
         alert_name: 'Load Shed Event',
         alert_channels: [],
         resolve_timeout: '5s',
       },
-      concurrency_limit_multiplier: '2.0',
-      concurrency_linear_increment: '5.0',
-      concurrency_sqrt_increment_multiplier: '1',
+      concurrency_limit_multiplier: 2.0,
+      concurrency_linear_increment: 5.0,
+      concurrency_sqrt_increment_multiplier: 1,
       default_config: {
         dry_run: false,
       },

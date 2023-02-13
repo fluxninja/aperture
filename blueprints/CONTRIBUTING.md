@@ -135,10 +135,10 @@ of the generated README.md.
 # Updating README.md
 
 README.md generator depends on Python 3.8+ and some extra libraries that can be
-installed from `dev-requirements.txt`:
+installed from `requirements.txt`:
 
 ```sh
-pip install -r dev-requirements.txt
+pip install -r requirements.txt
 ```
 
 To update README.md from blueprint configuration, use
