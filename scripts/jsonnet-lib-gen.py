@@ -153,8 +153,6 @@ class JsonnetDefinition:
 
     @property
     def jsonnet_name(self):
-        if self.swagger_name.startswith("v1"):
-            return self.swagger_name[2:]
         return self.swagger_name
 
     def _parse_properties(self, properties: Mapping):
@@ -224,15 +222,13 @@ def portsImports(definition: JsonnetDefinition) -> str:
     in_ports = definition.properties.get("in_ports")
     if in_ports:
         ports_name = f"{definition.jsonnet_name.lower()}ins"
-        ports_v1name = ports_name.split("v1")[1] if 'v1' in ports_name else ports_name
-        ports_fname = f"{ports_v1name}.libsonnet"
+        ports_fname = f"{ports_name}.libsonnet"
         imports += f"local {ports_name} = import './{ports_fname}';\n"
 
     out_ports = definition.properties.get("out_ports")
     if out_ports:
         ports_name = f"{definition.jsonnet_name.lower()}outs"
-        ports_v1name = ports_name.split("v1")[1] if 'v1' in ports_name else ports_name
-        ports_fname = f"{ports_v1name}.libsonnet"
+        ports_fname = f"{ports_name}.libsonnet"
         imports += f"local {ports_name} = import './{ports_fname}';\n"
 
     return imports
@@ -432,7 +428,7 @@ CUSTOM_RESOURCE_DEFINITION="""
     "spec": {
       "description": "Aperture Policy Object",
       "x-order": 3,
-      "$ref": "#/definitions/v1Policy"
+      "$ref": "#/definitions/Policy"
     },
     "dynamicConfig": {
         "description": "DynamicConfig provides dynamic configuration for the policy.",

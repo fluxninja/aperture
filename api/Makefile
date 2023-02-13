@@ -34,6 +34,7 @@ buf-generate:
 	@#generate api docs
 	@rm -rfd $(DOCS_OPENAPI)
 	@mv gen/openapiv2 $(DOCS_OPENAPI)
+	@go run rewrite-swagger-definitions.go $(DOCS_OPENAPI)/aperture.swagger.yaml
 	@{ \
 		set -e; \
 		for process in aperture-agent aperture-controller; do \

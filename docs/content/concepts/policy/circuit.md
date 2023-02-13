@@ -71,7 +71,7 @@ un-linked Signal from the previous Tick.
 ## Example Components {#components}
 
 The exhaustive list of the built-in components can be found in the
-[Policy reference](reference/policies/spec.md#v1-component).
+[Policy reference](reference/policies/spec.md#component).
 
 Examples of built-in components include:
 
@@ -82,39 +82,39 @@ Examples of built-in components include:
   Signal(s).
   - **Arithmetic**: These Components perform basic Arithmetic operations on
     Signal(s).
-    - [Arithmetic Combinator](/reference/policies/spec.md#v1-arithmetic-combinator):
+    - [Arithmetic Combinator](/reference/policies/spec.md#arithmetic-combinator):
       This Component takes two input Signals and performs a basic arithmetic
       operation to generate an output Signal.
-    - [Max](/reference/policies/spec.md#v1-max) and
-      [Min](/reference/policies/spec.md#v1-min): These Components take multiple
+    - [Max](/reference/policies/spec.md#max) and
+      [Min](/reference/policies/spec.md#min): These Components take multiple
       input or output Signals and emit maximum or minimum of those Signals.
-    - [Sqrt](/reference/policies/spec.md#v1-sqrt): This Component square roots a
+    - [Sqrt](/reference/policies/spec.md#sqrt): This Component square roots a
       Signal.
   - **Transformers**: These Components statefully transform an input Signal in
     an output Signal.
-    - [EMA](/reference/policies/spec.md#v1-e-m-a): Exponential Moving Average.
-  - [Decider and Switcher](/reference/policies/spec.md#v1-decider): These
+    - [EMA](/reference/policies/spec.md#e-m-a): Exponential Moving Average.
+  - [Decider and Switcher](/reference/policies/spec.md#decider): These
     Components work in tandem to make the Circuit adapt based on conditions.
 - **Controllers**: Controllers are an essential part of a closed loop control
   system. A Controller take as input a signal, a setpoint and emits the
   suggested value of Control Variable as output. The aim of the Controller is to
   make the Signal achieve the Setpoint.
-  - [Gradient Controller](/reference/policies/spec.md#v1-gradient-controller):
-    This Controller acts on the ratio of Setpoint and Signal.
+  - [Gradient Controller](/reference/policies/spec.md#gradient-controller): This
+    Controller acts on the ratio of Setpoint and Signal.
 - **Actuators**: Actuators are Components which act on Signals to make real
   changes like shed traffic, change rate limits etc.
-  - [Concurrency Limiter](/reference/policies/spec.md#v1-concurrency-limiter):
+  - [Concurrency Limiter](/reference/policies/spec.md#concurrency-limiter):
     Takes load multiplier as a Signal which determines the proportion of Flow
     concurrency to accept.
-  - [Rate Limiter](/reference/policies/spec.md#v1-rate-limiter): Take rate limit
-    as a Signal which determines the rate of flows handled by that Rate Limiter.
+  - [Rate Limiter](/reference/policies/spec.md#rate-limiter): Take rate limit as
+    a Signal which determines the rate of flows handled by that Rate Limiter.
 
 [control-system]: https://en.wikipedia.org/wiki/Control_system
 [tick]: #runtime
 [signal]: #signal
 [looping-signals]: #looping-signals
 [components]: #components
-[policy-reference]: /reference/policies/spec.md#v1-policy
-[circuit-reference]: /reference/policies/spec.md#v1-circuit
-[promql-reference]: /reference/policies/spec.md#v1-prom-q-l
-[scheduler-reference]: /reference/policies/spec.md#v1-scheduler
+[policy-reference]: /reference/policies/spec.md#policy
+[circuit-reference]: /reference/policies/spec.md#circuit
+[promql-reference]: /reference/policies/spec.md#prom-q-l
+[scheduler-reference]: /reference/policies/spec.md#scheduler

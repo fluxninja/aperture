@@ -11,7 +11,7 @@ paths:
           required: true
           in: body
           schema:
-            $ref: "#/definitions/v1Policy"
+            $ref: "#/definitions/Policy"
       responses:
         "200":
           description: A successful response.

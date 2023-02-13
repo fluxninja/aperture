@@ -74,7 +74,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
 <ParameterDescription
     name="policy.classifiers"
     type="[]aperture.spec.v1.Classifier"
-    reference="../../spec#v1-classifier"
+    reference="../../spec#classifier"
     value="[]"
     description='List of classification rules.' />
 
@@ -90,7 +90,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
 <ParameterDescription
     name="policy.rate_limiter.flow_selector"
     type="aperture.spec.v1.FlowSelector"
-    reference="../../spec#v1-flow-selector"
+    reference="../../spec#flow-selector"
     value="{'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'agent_group': 'default', 'service': '__REQUIRED_FIELD__'}}"
     description='A flow selector to match requests against' />
 
@@ -111,7 +111,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
 <ParameterDescription
     name="policy.rate_limiter.parameters"
     type="aperture.spec.v1.RateLimiterParameters"
-    reference="../../spec#v1-rate-limiter-parameters"
+    reference="../../spec#rate-limiter-parameters"
     value="{'label_key': '__REQUIRED_FIELD__', 'lazy_sync': {'enabled': True, 'num_sync': 5}, 'limit_reset_interval': '1s'}"
     description='Parameters.' />
 
@@ -125,7 +125,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
 <ParameterDescription
     name="policy.rate_limiter.default_config"
     type="aperture.spec.v1.RateLimiterDynamicConfig"
-    reference="../../spec#v1-rate-limiter-dynamic-config"
+    reference="../../spec#rate-limiter-dynamic-config"
     value="{'overrides': []}"
     description='Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.' />
 
@@ -162,6 +162,6 @@ at runtime, without reloading the policy.
 <ParameterDescription
     name="rate_limiter"
     type="aperture.spec.v1.RateLimiterDynamicConfig"
-    reference="../../spec#v1-rate-limiter-dynamic-config"
+    reference="../../spec#rate-limiter-dynamic-config"
     value="__REQUIRED_FIELD__"
     description='Rate limiter dynamic configuration that is updated at runtime.' />

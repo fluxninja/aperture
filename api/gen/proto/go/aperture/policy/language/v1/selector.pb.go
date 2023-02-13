@@ -222,7 +222,7 @@ type FlowMatcher struct {
 	//
 	// :::note
 	//
-	// [Classifiers](#v1-classifier) _can_ use flow labels created by some other
+	// [Classifiers](#classifier) _can_ use flow labels created by some other
 	// classifier, but only if they were created at some previous control point
 	// (and propagated in baggage).
 	//

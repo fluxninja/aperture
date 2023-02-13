@@ -44,3 +44,4 @@ plugins:
       - allow_merge=true
       - output_format=yaml
       - generate_unbound_methods=false
+      - openapi_naming_strategy=fqn
