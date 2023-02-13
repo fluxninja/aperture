@@ -35,17 +35,19 @@ func AddAgentInfoAttribute(in FxIn) {
 			},
 		},
 	})
-	in.BaseConfig.AddProcessor(otelconsts.ProcessorAgentResourceLabels, map[string]interface{}{
-		"log_statements": []map[string]interface{}{
-			{
-				"context": "resource",
-				"statements": []string{
-					fmt.Sprintf(`set(attributes["%v"], "%v")`,
-						otelconsts.AgentGroupLabel, in.AgentInfo.GetAgentGroup()),
-					fmt.Sprintf(`set(attributes["%v"], "%v")`,
-						otelconsts.InstanceLabel, info.Hostname),
-				},
+	transformStatements := []map[string]interface{}{
+		{
+			"context": "resource",
+			"statements": []string{
+				fmt.Sprintf(`set(attributes["%v"], "%v")`,
+					otelconsts.AgentGroupLabel, in.AgentInfo.GetAgentGroup()),
+				fmt.Sprintf(`set(attributes["%v"], "%v")`,
+					otelconsts.InstanceLabel, info.Hostname),
 			},
 		},
+	}
+	in.BaseConfig.AddProcessor(otelconsts.ProcessorAgentResourceLabels, map[string]interface{}{
+		"log_statements":    transformStatements,
+		"metric_statements": transformStatements,
 	})
 }
