@@ -5,8 +5,10 @@ import com.fluxninja.generated.envoy.service.auth.v3.AuthorizationGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
+import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 
 import java.time.Duration;
@@ -22,6 +24,7 @@ public final class ApertureSDKBuilder {
   private Duration timeout;
   private String host;
   private int port;
+  private boolean forceHttp = false;
   private boolean useHttps = false;
   private final List<String> blockedPaths;
   private boolean blockedPathsMatchRegex = false;
@@ -42,6 +45,15 @@ public final class ApertureSDKBuilder {
 
   public ApertureSDKBuilder setDuration(Duration timeout) {
     this.timeout = timeout;
+    return this;
+  }
+
+  /** Force using http/1.1 over http/2 or grpc for connection with agent.
+   *  If not set, grpc will be used.
+   * @return the builder object.
+   */
+  public ApertureSDKBuilder forceHttp(boolean flag) {
+    this.forceHttp = flag;
     return this;
   }
 
@@ -100,25 +112,44 @@ public final class ApertureSDKBuilder {
       timeout = DEFAULT_RPC_TIMEOUT;
     }
 
-    ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
-    FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient = FlowControlServiceGrpc
-        .newBlockingStub(channel);
-    AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient = AuthorizationGrpc.newBlockingStub(channel);
 
-    OtlpGrpcSpanExporter spanExporter = OtlpGrpcSpanExporter.builder()
-        .setEndpoint(String.format("%s://%s:%d", protocol, host, port))
-        .build();
-    SdkTracerProvider traceProvider = SdkTracerProvider.builder()
-        .addSpanProcessor(SimpleSpanProcessor.create(spanExporter))
-        .build();
-    Tracer tracer = traceProvider.tracerBuilder(LIBRARY_NAME).build();
+    SdkTracerProviderBuilder tpb = SdkTracerProvider.builder();
+    if (this.forceHttp) {
+      OtlpHttpSpanExporter httpSpanExporter = OtlpHttpSpanExporter.builder()
+              .setEndpoint(String.format("%s://%s:%d", protocol, host, port))
+              .build();
+      tpb.addSpanProcessor(SimpleSpanProcessor.create(httpSpanExporter));
+    } else {
+      OtlpGrpcSpanExporter grpcSpanExporter = OtlpGrpcSpanExporter.builder()
+              .setEndpoint(String.format("%s://%s:%d", protocol, host, port))
+              .build();
+      tpb.addSpanProcessor(SimpleSpanProcessor.create(grpcSpanExporter));
+    }
+    SdkTracerProvider tracerProvider = tpb.build();
+    Tracer tracer = tracerProvider.tracerBuilder(LIBRARY_NAME).build();
 
-    return new ApertureSDK(
-        flowControlClient,
-        envoyAuthzClient,
-        tracer,
-        timeout,
-        blockedPaths,
-        blockedPathsMatchRegex);
+
+    if (this.forceHttp) {
+      System.out.println("Not yet supported");
+      return new ApertureSDK(
+              null,
+              null,
+              tracer,
+              timeout,
+              blockedPaths,
+              blockedPathsMatchRegex);
+    } else {
+      ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
+      FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient = FlowControlServiceGrpc
+              .newBlockingStub(channel);
+      AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient = AuthorizationGrpc.newBlockingStub(channel);
+      return new ApertureSDK(
+              flowControlClient,
+              envoyAuthzClient,
+              tracer,
+              timeout,
+              blockedPaths,
+              blockedPathsMatchRegex);
+    }
   }
 }

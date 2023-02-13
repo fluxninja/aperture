@@ -16,12 +16,14 @@ public class Config {
 
     public static final String AGENT_HOST_PROPERTY = "aperture.agent.hostname";
     public static final String AGENT_PORT_PROPERTY = "aperture.agent.port";
+    public static final String FORCE_AGENT_HTTP_CONNECTION_PROPERTY = "aperture.agent.force.http";
     public static final String CONNECTION_TIMEOUT_MILLIS_PROPERTY = "aperture.connection.timeout.millis";
     public static final String BLOCKED_PATHS_PROPERTY = "aperture.javaagent.blocked.paths";
     public static final String BLOCKED_PATHS_REGEX_PROPERTY = "aperture.javaagent.blocked.paths.regex";
 
     private static final String AGENT_HOST_DEFAULT_VALUE = "localhost";
     private static final String AGENT_PORT_DEFAULT_VALUE = "8089";
+    private static final String FORCE_AGENT_HTTP_CONNECTION_DEFAULT_VALUE = "false";
     private static final String CONNECTION_TIMEOUT_MILLIS_DEFAULT_VALUE = "1000";
     private static final String BLOCKED_PATHS_DEFAULT_VALUE = "";
     private static final String BLOCKED_PATHS_REGEX_DEFAULT_VALUE = "false";
@@ -30,6 +32,7 @@ public class Config {
     static private final List<String> allProperties = new ArrayList<String>() {{
         add(AGENT_HOST_PROPERTY);
         add(AGENT_PORT_PROPERTY);
+        add(FORCE_AGENT_HTTP_CONNECTION_PROPERTY);
         add(CONNECTION_TIMEOUT_MILLIS_PROPERTY);
         add(BLOCKED_PATHS_PROPERTY);
         add(BLOCKED_PATHS_REGEX_PROPERTY);
@@ -78,6 +81,7 @@ public class Config {
             sdk = builder
                     .setHost(config.getProperty(AGENT_HOST_PROPERTY, AGENT_HOST_DEFAULT_VALUE))
                     .setPort(Integer.parseInt(config.getProperty(AGENT_PORT_PROPERTY, AGENT_PORT_DEFAULT_VALUE)))
+                    .forceHttp(Boolean.parseBoolean(config.getProperty(FORCE_AGENT_HTTP_CONNECTION_PROPERTY, FORCE_AGENT_HTTP_CONNECTION_DEFAULT_VALUE)))
                     .setDuration(Duration.ofMillis(Integer.parseInt(config.getProperty(CONNECTION_TIMEOUT_MILLIS_PROPERTY, CONNECTION_TIMEOUT_MILLIS_DEFAULT_VALUE))))
                     .addBlockedPaths(config.getProperty(BLOCKED_PATHS_PROPERTY, BLOCKED_PATHS_DEFAULT_VALUE))
                     .setBlockedPathMatchRegex(Boolean.parseBoolean(config.getProperty(BLOCKED_PATHS_REGEX_PROPERTY, BLOCKED_PATHS_REGEX_DEFAULT_VALUE)))
