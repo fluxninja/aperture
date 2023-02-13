@@ -28,7 +28,7 @@ policy:
     scheduler:
       auto_tokens: true
       default_workload_parameters:
-      priority: 20
+        priority: 20
       timeout_factor: 0.5
       workloads: []
     # Gradient Controller parameters.
