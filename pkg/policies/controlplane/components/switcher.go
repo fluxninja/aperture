@@ -8,6 +8,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime/tristate"
 )
 
 // Switcher switches between two inputs based on third input.
@@ -39,7 +40,7 @@ func (dec *Switcher) Execute(inPortReadings runtime.PortToReading, tickInfo runt
 
 	var output runtime.Reading
 
-	if runtime.FromReading(switchValue) > 0 {
+	if tristate.ReadValue(switchValue) > 0 {
 		output = onTrue
 	} else {
 		output = onFalse

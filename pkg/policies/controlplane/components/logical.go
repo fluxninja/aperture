@@ -6,9 +6,9 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/tristate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime/tristate"
 )
 
 // logicalCombinator is n-ary logical combinator used to implement And.
@@ -35,7 +35,7 @@ func (c *logicalCombinator) Execute(inPortReadings runtime.PortToReading, tickIn
 
 	output := c.neutralElement
 	for _, input := range inputs {
-		output = c.op(output, tristate.FromReading(input))
+		output = c.op(output, tristate.ReadValue(input))
 	}
 
 	return runtime.PortToReading{
@@ -89,7 +89,7 @@ func (c *inverter) Execute(inPortReadings runtime.PortToReading, tickInfo runtim
 
 	return runtime.PortToReading{
 		"output": []runtime.Reading{
-			tristate.FromReading(input).Not().ToReading(),
+			tristate.ReadValue(input).Not().ToReading(),
 		},
 	}, nil
 }

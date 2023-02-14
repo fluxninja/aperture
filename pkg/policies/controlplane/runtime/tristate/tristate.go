@@ -49,11 +49,11 @@ func (b Bool) ToReading() runtime.Reading {
 	}
 }
 
-// FromReading interprets runtime.Reading as Bool, mapping 0 to False, any
+// ReadValue interprets runtime.Reading as Bool, mapping 0 to False, any
 // valid non-zero to True and Invalid to Unknown.
 //
 // (It's the same mapping as in ToReading, but allowing more truthy values).
-func FromReading(reading runtime.Reading) Bool {
+func ReadValue(reading runtime.Reading) Bool {
 	if !reading.Valid() {
 		return Unknown
 	}
