@@ -34,6 +34,17 @@ message SourceTarget {
   string port_name = 2;
 }
 
+message CircuitView {
+  Tree tree = 1;
+  repeated ComponentView leaf_components = 2;
+}
+
+message Tree {
+  ComponentView root = 1;
+  repeated Tree children = 2;
+  repeated Link links = 3;
+}
+
 // Link is a connection between Components.
 message Link {
   SourceTarget source = 1;
