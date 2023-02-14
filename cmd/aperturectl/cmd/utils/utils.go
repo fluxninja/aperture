@@ -13,6 +13,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/Masterminds/semver/v3"
+	monitoringv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/monitoring/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
@@ -23,7 +24,12 @@ import (
 
 // GenerateDotFile generates a DOT file from the circuit.
 func GenerateDotFile(circuit *circuitfactory.Circuit, dotFilePath string) error {
-	d := circuitfactory.DOT(circuit.ToGraphView())
+	c := circuit.ToGraphView()
+	comps := make([]*monitoringv1.ComponentView, len(c.Tree.Children))
+	for i, v := range c.Tree.Children {
+		comps[i] = v.Root
+	}
+	d := circuitfactory.DOT(comps, c.Tree.Links)
 	f, err := os.Create(dotFilePath)
 	if err != nil {
 		log.Error().Err(err).Msg("error creating file")
@@ -41,7 +47,12 @@ func GenerateDotFile(circuit *circuitfactory.Circuit, dotFilePath string) error 
 
 // GenerateMermaidFile generates a mermaid file from the circuit.
 func GenerateMermaidFile(circuit *circuitfactory.Circuit, mermaidFile string) error {
-	m := circuitfactory.Mermaid(circuit.ToGraphView())
+	c := circuit.ToGraphView()
+	comps := make([]*monitoringv1.ComponentView, len(c.Tree.Children))
+	for i, v := range c.Tree.Children {
+		comps[i] = v.Root
+	}
+	m := circuitfactory.Mermaid(comps, c.Tree.Links)
 	f, err := os.Create(mermaidFile)
 	if err != nil {
 		log.Error().Err(err).Msg("error creating file")
