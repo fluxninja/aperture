@@ -2,7 +2,9 @@ package aperture
 
 import (
 	"context"
+	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"go.opentelemetry.io/otel"
@@ -17,12 +19,17 @@ import (
 	"google.golang.org/grpc"
 
 	flowcontrol "github.com/fluxninja/aperture-go/gen/proto/flowcontrol/check/v1"
+	"github.com/fluxninja/aperture/pkg/log"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 )
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
 type Client interface {
 	StartFlow(ctx context.Context, controlPoint string, labels map[string]string) (Flow, error)
 	Shutdown(ctx context.Context) error
+	HTTPMiddleware(controlPoint string, labels map[string]string, timeout time.Duration) func(http.Handler) http.Handler
+	GRPCUnaryInterceptor(controlPoint string, labels map[string]string, timeout time.Duration) func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error)
 }
 
 type apertureClient struct {
@@ -132,6 +139,83 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 
 	f.checkResponse = res
 	return f, nil
+}
+
+// HTTPMiddleware takes a control point name, labels and timeout and creates a Middleware which can be used with HTTP server.
+func (client *apertureClient) HTTPMiddleware(controlPoint string, labels map[string]string, timeout time.Duration) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			for key, value := range r.Header {
+				labels[key] = strings.Join(value, ",")
+			}
+
+			flow := client.executeFlow(controlPoint, labels, timeout)
+
+			if flow.Accepted() {
+				// Simulate work being done
+				next.ServeHTTP(w, r)
+				// Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.
+				// The first argument captures whether the feature captured by the Flow was successful or resulted in an error.
+				// The second argument is error message for further diagnosis.
+				err := flow.End(OK)
+				if err != nil {
+					log.Debug().Fields(err).Msgf("Aperture flow control end got error.")
+				}
+			} else {
+				w.WriteHeader(http.StatusForbidden)
+				err := flow.End(OK)
+				if err != nil {
+					log.Debug().Fields(err).Msgf("Aperture flow control end got error.")
+				}
+			}
+		})
+	}
+}
+
+// GRPCUnaryInterceptor takes a control point name, labels and timeout and creates a UnaryInterceptor which can be used with gRPC server.
+func (client *apertureClient) GRPCUnaryInterceptor(controlPoint string, labels map[string]string, timeout time.Duration) func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		md, ok := metadata.FromIncomingContext(ctx)
+		if ok {
+			for key, value := range md {
+				labels[key] = strings.Join(value, ",")
+			}
+		}
+
+		flow := client.executeFlow(controlPoint, labels, timeout)
+
+		if flow.Accepted() {
+			// Simulate work being done
+			resp, err := handler(ctx, req)
+			// Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.
+			// The first argument captures whether the feature captured by the Flow was successful or resulted in an error.
+			// The second argument is error message for further diagnosis.
+			flowErr := flow.End(OK)
+			if flowErr != nil {
+				log.Debug().Fields(flowErr).Msgf("Aperture flow control end got error.")
+			}
+			return resp, err
+		} else {
+			err := flow.End(OK)
+			if err != nil {
+				log.Debug().Fields(err).Msgf("Aperture flow control end got error.")
+			}
+			return nil, status.Error(http.StatusForbidden, "Aperture Rejected the Request")
+		}
+	}
+}
+
+func (client *apertureClient) executeFlow(controlPoint string, labels map[string]string, timeout time.Duration) Flow {
+	context, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	// StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
+	flow, err := client.StartFlow(context, controlPoint, labels)
+	if err != nil {
+		log.Debug().Msgf("Aperture flow control got error. Returned flow defaults to Allowed. flow.Accepted(): %t", flow.Accepted())
+	}
+
+	return flow
 }
 
 // Shutdown shuts down the aperture client.
