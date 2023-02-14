@@ -20,7 +20,8 @@ import (
 	"google.golang.org/grpc"
 
 	flowcontrol "github.com/fluxninja/aperture-go/gen/proto/flowcontrol/check/v1"
-	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
@@ -45,6 +46,7 @@ type apertureClient struct {
 type Options struct {
 	ApertureAgentGRPCClientConn *grpc.ClientConn
 	CheckTimeout                time.Duration
+	Logger                      *zerolog.Logger
 }
 
 // NewClient returns a new Client that can be used to perform Check calls.
@@ -79,6 +81,13 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 		timeout = defaultRPCTimeout
 	} else {
 		timeout = opts.CheckTimeout
+	}
+
+	if opts.Logger != nil {
+		log.Logger = *opts.Logger
+	} else {
+		zerolog.TimeFieldFormat = time.RFC3339
+		zerolog.SetGlobalLevel(zerolog.TraceLevel)
 	}
 
 	c := &apertureClient{
