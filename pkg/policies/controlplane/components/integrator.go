@@ -8,6 +8,7 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/tristate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/constraints"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -48,13 +49,14 @@ func NewIntegratorAndOptions(_ *policylangv1.Integrator, _ string, _ iface.Polic
 func (in *Integrator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	inputVal := inPortReadings.ReadSingleReadingPort("input")
 	resetVal := inPortReadings.ReadSingleReadingPort("reset")
-	if resetVal.Valid() && resetVal.Value() != 0 {
+
+	if tristate.FromReading(resetVal) == tristate.True && resetVal.Value() != 0 {
 		in.sum = 0
-	} else if inputVal.Valid() {
+	} else if tristate.FromReading(inputVal) == tristate.True {
 		minVal := inPortReadings.ReadSingleReadingPort("min")
 		maxVal := inPortReadings.ReadSingleReadingPort("max")
 
-		if minVal.Valid() && maxVal.Valid() {
+		if tristate.FromReading(minVal) == tristate.True && tristate.FromReading(maxVal) == tristate.True {
 			in.minMax.Max = maxVal.Value()
 			in.minMax.Min = minVal.Value()
 

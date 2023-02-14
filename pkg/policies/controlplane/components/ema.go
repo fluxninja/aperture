@@ -10,6 +10,7 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/tristate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/constraints"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -108,7 +109,7 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.T
 	switch ema.currentStage {
 	case warmUpStage:
 		ema.warmupCount++
-		if input.Valid() {
+		if tristate.FromReading(input) == tristate.True {
 			ema.sum += input.Value()
 			ema.count++
 			// Decide to switch to EMA stage
@@ -131,8 +132,8 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.T
 			output = runtime.InvalidReading()
 		}
 	case emaStage:
-		if input.Valid() {
-			if !ema.lastGoodOutput.Valid() {
+		if tristate.FromReading(input) == tristate.True {
+			if tristate.FromReading(ema.lastGoodOutput) == tristate.False {
 				err := errors.New("ema: last good output is invalid")
 				logger.Error().Err(err).Msg("This is unexpected!")
 				return retErr(err)
@@ -154,7 +155,8 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.T
 	}
 
 	// Set the last good output
-	if output.Valid() {
+
+	if tristate.FromReading(output) == tristate.True {
 		// apply correction
 		var err error
 		output, err = ema.applyCorrection(output, minEnvelope, maxEnvelope)
@@ -163,6 +165,7 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.T
 		}
 		ema.lastGoodOutput = output
 	}
+
 	// Returns Exponential Moving Average of a series of readings.
 	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
@@ -184,13 +187,14 @@ func (ema *EMA) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.U
 func (ema *EMA) applyCorrection(output, minEnvelope, maxEnvelope runtime.Reading) (runtime.Reading, error) {
 	value := output.Value()
 	minxMaxConstraints := constraints.NewMinMaxConstraints()
-	if maxEnvelope.Valid() {
+	if tristate.FromReading(maxEnvelope) == tristate.True {
 		maxErr := minxMaxConstraints.SetMax(maxEnvelope.Value())
 		if maxErr != nil {
 			return runtime.InvalidReading(), maxErr
 		}
 	}
-	if minEnvelope.Valid() {
+
+	if tristate.FromReading(minEnvelope) == tristate.True {
 		minErr := minxMaxConstraints.SetMin(minEnvelope.Value())
 		if minErr != nil {
 			return runtime.InvalidReading(), minErr

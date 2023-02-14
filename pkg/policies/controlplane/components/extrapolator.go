@@ -9,6 +9,7 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/tristate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -53,7 +54,7 @@ func (exp *Extrapolator) Execute(inPortReadings runtime.PortToReading, tickInfo 
 	input := inPortReadings.ReadSingleReadingPort("input")
 	output := runtime.InvalidReading()
 
-	if input.Valid() {
+	if tristate.FromReading(input) == tristate.True {
 		output = input
 		exp.lastOutput = output
 		exp.lastValidTimestamp = tickInfo.Timestamp()

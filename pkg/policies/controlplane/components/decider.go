@@ -9,6 +9,7 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/tristate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -96,7 +97,7 @@ func (dec *Decider) Execute(inPortReadings runtime.PortToReading, tickInfo runti
 	// Default currentDecision to False
 	currentDecision := false
 
-	if lhs.Valid() && rhs.Valid() {
+	if tristate.FromReading(lhs) == tristate.True && tristate.FromReading(rhs) == tristate.True {
 		lhsVal, rhsVal := lhs.Value(), rhs.Value()
 		switch dec.operator {
 		case GT:
