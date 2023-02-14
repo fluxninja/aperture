@@ -204,12 +204,12 @@ func (x *Policy) GetResources() *Resources {
 //
 // A signal can also have a special **Invalid** value. It's usually used to
 // communicate that signal doesn't have a meaningful value at the moment, eg.
-// [PromQL](#v1-prom-q-l) emits such a value if it cannot execute a query.
+// [PromQL](#prom-q-l) emits such a value if it cannot execute a query.
 // Components know when their input signals are invalid and can act
 // accordingly. They can either propagate the invalidness, by making their
 // output itself invalid (like eg.
-// [ArithmeticCombinator](#v1-arithmetic-combinator)) or use some different
-// logic, like eg. [Extrapolator](#v1-extrapolator). Refer to a component's
+// [ArithmeticCombinator](#arithmetic-combinator)) or use some different
+// logic, like eg. [Extrapolator](#extrapolator). Refer to a component's
 // docs on how exactly it handles invalid inputs.
 //
 // :::
@@ -361,20 +361,20 @@ func (x *Resources) GetClassifiers() []*Classifier {
 //
 // There are three categories of components:
 // * "source" components – they take some sort of input from "the real world" and output
-//   a signal based on this input. Example: [PromQL](#v1-prom-q-l). In the UI
+//   a signal based on this input. Example: [PromQL](#prom-q-l). In the UI
 //   they're represented by green color.
 // * signal processor components – "pure" components that don't interact with the "real world".
-//   Examples: [GradientController](#v1-gradient-controller), [Max](#v1-max).
+//   Examples: [GradientController](#gradient-controller), [Max](#max).
 //
 //   :::note
 //
 //   Signal processor components's output can depend on their internal state, in addition to the inputs.
-//   Eg. see the [Exponential Moving Average filter](#v1-e-m-a).
+//   Eg. see the [Exponential Moving Average filter](#e-m-a).
 //
 //   :::
 //
 // * "sink" components – they affect the real world.
-//   [ConcurrencyLimiter.LoadActuator](#v1-concurrency-limiter) and [RateLimiter](#v1-rate-limiter).
+//   [ConcurrencyLimiter.LoadActuator](#concurrency-limiter) and [RateLimiter](#rate-limiter).
 //   In the UI, represented by orange color.  Sink components usually come in pairs with a
 //   "sources" component which emits a feedback signal, like
 //   `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.
@@ -383,14 +383,14 @@ func (x *Resources) GetClassifiers() []*Classifier {
 //
 // Sometimes you may want to use a constant value as one of component's inputs.
 // You can create an input port containing the constant value instead of being connected to a signal.
-// To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
+// To do so, use the [InPort](#in_port)'s .withConstantSignal(constant_signal) method.
 // You can also use it to provide special math values such as NaN and +- Inf.
 // If You need to provide the same constant signal to multiple components,
-// You can use the [Variable](#v1-variable) component.
+// You can use the [Variable](#variable) component.
 //
 // :::
 //
-// See also [Policy](#v1-policy) for a higher-level explanation of circuits.
+// See also [Policy](#policy) for a higher-level explanation of circuits.
 type Component struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1317,7 +1317,7 @@ func (x *GradientController) GetDefaultConfig() *GradientController_DynamicConfi
 // \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
 // $$
 //
-// The EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#v1-e-m-a-ins).
+// The EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#e-m-a-ins).
 type EMA struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1815,7 +1815,7 @@ func (*ConcurrencyLimiter_LoadActuator) isConcurrencyLimiter_ActuationStrategy()
 //
 // :::
 //
-// See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
+// See [ConcurrencyLimiter](#concurrency-limiter) for more context.
 type Scheduler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2495,7 +2495,7 @@ func (x *And) GetOutPorts() *And_Outs {
 
 // Logical OR.
 //
-// See [And component](#v1-and) on how signals are mapped onto boolean values.
+// See [And component](#and) on how signals are mapped onto boolean values.
 type Or struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2555,7 +2555,7 @@ func (x *Or) GetOutPorts() *Or_Outs {
 
 // Logical NOT.
 //
-// See [And component](#v1-and) on how signals are mapped onto boolean values.
+// See [And component](#and) on how signals are mapped onto boolean values.
 type Inverter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3397,7 +3397,7 @@ type GradientController_Parameters struct {
 	// Slope controls the aggressiveness and direction of the Gradient Controller.
 	//
 	// Slope is used as exponent on the signal to setpoint ratio in computation
-	// of the gradient (see the [main description](#v1-gradient-controller) for
+	// of the gradient (see the [main description](#gradient-controller) for
 	// exact equation). Good intuition for this parameter is "What should the
 	// Gradient Controller do to the control variable when signal is too high",
 	// eg.:
@@ -4431,7 +4431,7 @@ type RateLimiter_Ins struct {
 	// :::tip
 	//
 	// Negative limit can be useful to _conditionally_ enable the ratelimiter
-	// under certain circumstances. [Decider](#v1-decider) might be helpful.
+	// under certain circumstances. [Decider](#decider) might be helpful.
 	//
 	// :::
 	Limit *InPort `protobuf:"bytes,1,opt,name=limit,proto3" json:"limit,omitempty" validate:"required"` // @gotags: validate:"required"
@@ -4932,7 +4932,7 @@ type LoadActuator_Ins struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Load multiplier is ratio of [incoming
-	// concurrency](#v1-scheduler-outs) that needs to be accepted.
+	// concurrency](#scheduler-outs) that needs to be accepted.
 	LoadMultiplier *InPort `protobuf:"bytes,1,opt,name=load_multiplier,json=loadMultiplier,proto3" json:"load_multiplier,omitempty"`
 }
 

@@ -6,4 +6,4 @@ sidebar_label: Specification
 
 Reference for all objects used in [the Policy language](/concepts/policy/policy.md).
 
-The top-level object representing a policy is [v1Policy](#v1-policy).
+The top-level object representing a policy is [Policy](#policy).

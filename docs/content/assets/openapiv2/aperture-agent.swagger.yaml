@@ -19,7 +19,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1KubernetesControlPoints'
+            $ref: '#/definitions/KubernetesControlPoints'
         default:
           description: An unexpected error response.
           schema:
@@ -33,7 +33,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1Stats'
+            $ref: '#/definitions/Stats'
         default:
           description: An unexpected error response.
           schema:
@@ -47,7 +47,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1FlowControlControlPoints'
+            $ref: '#/definitions/FlowControlControlPoints'
         default:
           description: An unexpected error response.
           schema:
@@ -61,7 +61,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1EntityCache'
+            $ref: '#/definitions/EntityCache'
         default:
           description: An unexpected error response.
           schema:
@@ -80,7 +80,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1Entity'
+            $ref: '#/definitions/Entity'
         default:
           description: An unexpected error response.
           schema:
@@ -99,7 +99,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1Entity'
+            $ref: '#/definitions/Entity'
         default:
           description: An unexpected error response.
           schema:
@@ -128,7 +128,7 @@ paths:
         in: body
         required: true
         schema:
-          $ref: '#/definitions/v1LabelMatcher'
+          $ref: '#/definitions/LabelMatcher'
       - type: string
         format: int64
         description: |-
@@ -141,7 +141,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1PreviewHTTPRequestsResponse'
+            $ref: '#/definitions/PreviewHTTPRequestsResponse'
         default:
           description: An unexpected error response.
           schema:
@@ -170,7 +170,7 @@ paths:
         in: body
         required: true
         schema:
-          $ref: '#/definitions/v1LabelMatcher'
+          $ref: '#/definitions/LabelMatcher'
       - type: string
         format: int64
         description: |-
@@ -183,7 +183,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1PreviewFlowLabelsResponse'
+            $ref: '#/definitions/PreviewFlowLabelsResponse'
         default:
           description: An unexpected error response.
           schema:
@@ -198,7 +198,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1HostInfo'
+            $ref: '#/definitions/HostInfo'
         default:
           description: An unexpected error response.
           schema:
@@ -213,7 +213,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1ProcessInfo'
+            $ref: '#/definitions/ProcessInfo'
         default:
           description: An unexpected error response.
           schema:
@@ -228,7 +228,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1VersionInfo'
+            $ref: '#/definitions/VersionInfo'
         default:
           description: An unexpected error response.
           schema:
@@ -242,7 +242,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1Peers'
+            $ref: '#/definitions/Peers'
         default:
           description: An unexpected error response.
           schema:
@@ -261,7 +261,7 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1Peer'
+            $ref: '#/definitions/Peer'
         default:
           description: An unexpected error response.
           schema:
@@ -282,12 +282,81 @@ paths:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/v1GroupStatus'
+            $ref: '#/definitions/GroupStatus'
         default:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
 definitions:
+  DMap:
+    type: object
+    properties:
+      length:
+        type: string
+        format: int64
+      num_tables:
+        type: string
+        format: int64
+      slab_info:
+        $ref: '#/definitions/SlabInfo'
+  DMaps:
+    type: object
+    properties:
+      delete_hits:
+        type: string
+        format: int64
+      delete_misses:
+        type: string
+        format: int64
+      entries_total:
+        type: string
+        format: int64
+      evicted_total:
+        type: string
+        format: int64
+      get_hits:
+        type: string
+        format: int64
+      get_misses:
+        type: string
+        format: int64
+  DTopics:
+    type: object
+    properties:
+      current_listeners:
+        type: string
+        format: int64
+      listeners_total:
+        type: string
+        format: int64
+      published_total:
+        type: string
+        format: int64
+  Entity:
+    description: Entity represents a pod, vm, etc.
+    type: object
+    properties:
+      ip_address:
+        type: string
+      name:
+        type: string
+      prefix:
+        type: string
+      services:
+        type: array
+        items:
+          type: string
+      uid:
+        type: string
+  EntityCache:
+    description: EntityCache contains both mappings of ip address to entity and entity
+      name to entity.
+    type: object
+    properties:
+      entities_by_ip_address:
+        $ref: '#/definitions/EntityCacheEntities'
+      entities_by_name:
+        $ref: '#/definitions/EntityCacheEntities'
   EntityCacheEntities:
     description: Entities defines mapping of entities.
     type: object
@@ -295,7 +364,173 @@ definitions:
       entities:
         type: object
         additionalProperties:
-          $ref: '#/definitions/v1Entity'
+          $ref: '#/definitions/Entity'
+  EqualsMatchExpression:
+    description: Label selector expression of the equal form "label == value".
+    type: object
+    properties:
+      label:
+        description: |-
+          Name of the label to equal match the value.
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
+      value:
+        description: Exact value that the label should be equal to.
+        type: string
+  FlowControlControlPoint:
+    type: object
+    properties:
+      control_point:
+        type: string
+      service:
+        type: string
+  FlowControlControlPoints:
+    type: object
+    properties:
+      control_points:
+        type: array
+        items:
+          $ref: '#/definitions/FlowControlControlPoint'
+  GroupStatus:
+    description: |-
+      Groups is nested structure that holds status information about the node and a
+      pointer to the next node.
+    type: object
+    properties:
+      groups:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/GroupStatus'
+      status:
+        $ref: '#/definitions/Status'
+  HostInfo:
+    type: object
+    properties:
+      hostname:
+        type: string
+      local_ip:
+        type: string
+      uuid:
+        type: string
+  K8sLabelMatcherRequirement:
+    description: Label selector requirement which is a selector that contains values,
+      a key, and an operator that relates the key and values.
+    type: object
+    properties:
+      key:
+        description: |-
+          Label key that the selector applies to.
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
+      operator:
+        description: |-
+          Logical operator which represents a key's relationship to a set of values.
+          Valid operators are In, NotIn, Exists and DoesNotExist.
+
+          @gotags: validate:"oneof=In NotIn Exists DoesNotExists"
+        type: string
+        x-go-validate: oneof=In NotIn Exists DoesNotExists
+      values:
+        description: |-
+          An array of string values that relates to the key by an operator.
+          If the operator is In or NotIn, the values array must be non-empty.
+          If the operator is Exists or DoesNotExist, the values array must be empty.
+        type: array
+        items:
+          type: string
+  KubernetesControlPoint:
+    type: object
+    properties:
+      api_version:
+        type: string
+      kind:
+        type: string
+      name:
+        type: string
+      namespace:
+        type: string
+  KubernetesControlPoints:
+    type: object
+    properties:
+      control_points:
+        type: array
+        items:
+          $ref: '#/definitions/KubernetesControlPoint'
+  LabelMatcher:
+    description: |-
+      It provides three ways to define requirements:
+      - matchLabels
+      - matchExpressions
+      - arbitrary expression
+
+      If multiple requirements are set, they are all ANDed.
+      An empty label matcher always matches.
+    type: object
+    title: |-
+      Allows to define rules whether a map of
+      [labels](/concepts/integrations/flow-control/flow-label.md)
+      should be considered a match or not
+    properties:
+      expression:
+        description: An arbitrary expression to be evaluated on the labels.
+        $ref: '#/definitions/MatchExpression'
+      match_expressions:
+        description: |-
+          List of k8s-style label matcher requirements.
+
+          Note: The requirements are ANDed.
+        type: array
+        items:
+          $ref: '#/definitions/K8sLabelMatcherRequirement'
+      match_labels:
+        description: |-
+          A map of {key,value} pairs representing labels to be matched.
+          A single {key,value} in the matchLabels requires that the label "key" is present and equal to "value".
+
+          Note: The requirements are ANDed.
+        type: object
+        additionalProperties:
+          type: string
+  MatchExpression:
+    description: |-
+      MatchExpression has multiple variants, exactly one should be set.
+
+      Example:
+      ```yaml
+      all:
+        of:
+          - label_exists: foo
+          - label_equals: { label = app, value = frobnicator }
+      ```
+    type: object
+    title: Defines a [map<string, string> → bool] expression to be evaluated on labels
+    properties:
+      all:
+        description: The expression is true when all subexpressions are true.
+        $ref: '#/definitions/MatchExpressionList'
+      any:
+        description: The expression is true when any subexpression is true.
+        $ref: '#/definitions/MatchExpressionList'
+      label_equals:
+        description: The expression is true when label value equals given value.
+        $ref: '#/definitions/EqualsMatchExpression'
+      label_exists:
+        description: |-
+          The expression is true when label with given name exists.
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
+      label_matches:
+        description: The expression is true when label matches given regex.
+        $ref: '#/definitions/MatchesMatchExpression'
+      not:
+        description: The expression negates the result of subexpression.
+        $ref: '#/definitions/MatchExpression'
   MatchExpressionList:
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     type: object
@@ -305,7 +540,103 @@ definitions:
         description: List of subexpressions of the match expression.
         type: array
         items:
-          $ref: '#/definitions/v1MatchExpression'
+          $ref: '#/definitions/MatchExpression'
+  MatchesMatchExpression:
+    description: Label selector expression of the matches form "label matches regex".
+    type: object
+    properties:
+      label:
+        description: |-
+          Name of the label to match the regular expression.
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
+      regex:
+        description: |-
+          Regular expression that should match the label value.
+          It uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
+  Member:
+    type: object
+    properties:
+      birthdate:
+        type: string
+        format: int64
+      id:
+        type: string
+        format: uint64
+      name:
+        type: string
+  Network:
+    type: object
+    properties:
+      commands_total:
+        type: string
+        format: int64
+      connections_total:
+        type: string
+        format: int64
+      current_connections:
+        type: string
+        format: int64
+      read_bytes_total:
+        type: string
+        format: int64
+      written_bytes_total:
+        type: string
+        format: int64
+  Partition:
+    type: object
+    properties:
+      backups:
+        type: array
+        items:
+          $ref: '#/definitions/Member'
+      d_maps:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/DMap'
+      length:
+        type: string
+        format: int64
+      previous_owners:
+        type: array
+        items:
+          $ref: '#/definitions/Member'
+  Peer:
+    description: Peer holds peer info and services.
+    type: object
+    properties:
+      address:
+        type: string
+      hostname:
+        type: string
+      services:
+        type: object
+        additionalProperties:
+          type: string
+  Peers:
+    description: Peers holds the peer info of this peer and a mapping of address to
+      other peers.
+    type: object
+    properties:
+      peers:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/Peer'
+      self_peer:
+        $ref: '#/definitions/Peer'
+  PreviewFlowLabelsResponse:
+    type: object
+    properties:
+      samples:
+        type: array
+        items:
+          $ref: '#/definitions/PreviewFlowLabelsResponseFlowLabels'
   PreviewFlowLabelsResponseFlowLabels:
     type: object
     properties:
@@ -313,19 +644,104 @@ definitions:
         type: object
         additionalProperties:
           type: string
-  googlerpcStatus:
+  PreviewHTTPRequestsResponse:
     type: object
     properties:
-      code:
-        type: integer
-        format: int32
-      details:
+      samples:
         type: array
         items:
-          $ref: '#/definitions/protobufAny'
+          type: object
+  ProcessInfo:
+    type: object
+    properties:
+      start_time:
+        type: string
+        format: date-time
+      uptime:
+        type: string
+  SlabInfo:
+    type: object
+    properties:
+      allocated:
+        type: string
+        format: int64
+      garbage:
+        type: string
+        format: int64
+      inuse:
+        type: string
+        format: int64
+  Stats:
+    type: object
+    properties:
+      backups:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/Partition'
+      cluster_coordinator:
+        $ref: '#/definitions/Member'
+      cluster_members:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/Member'
+      cmdline:
+        type: array
+        items:
+          type: string
+      d_maps:
+        $ref: '#/definitions/DMaps'
+      d_topics:
+        $ref: '#/definitions/DTopics'
+      member:
+        $ref: '#/definitions/Member'
+      network:
+        $ref: '#/definitions/Network'
+      partitions:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/Partition'
+      release_version:
+        type: string
+      runtime:
+        type: object
+      uptime_seconds:
+        type: string
+        format: int64
+  Status:
+    description: Status holds details about a status that can be reported to the registry.
+    type: object
+    properties:
+      error:
+        $ref: '#/definitions/StatusError'
+      message:
+        $ref: '#/definitions/googleprotobufAny'
+      timestamp:
+        type: string
+        format: date-time
+  StatusError:
+    description: Error holds raw error message and its cause in a nested field.
+    type: object
+    properties:
       message:
         type: string
-  protobufAny:
+  VersionInfo:
+    type: object
+    properties:
+      build_host:
+        type: string
+      build_os:
+        type: string
+      build_time:
+        type: string
+      git_branch:
+        type: string
+      git_commit_hash:
+        type: string
+      service:
+        type: string
+      version:
+        type: string
+  googleprotobufAny:
     description: |-
       `Any` contains an arbitrary serialized protocol buffer message along with a
       URL that describes the type of the serialized message.
@@ -442,431 +858,15 @@ definitions:
           used with implementation specific semantics.
         type: string
     additionalProperties: false
-  statusv1Status:
-    description: Status holds details about a status that can be reported to the registry.
+  googlerpcStatus:
     type: object
     properties:
-      error:
-        $ref: '#/definitions/v1StatusError'
+      code:
+        type: integer
+        format: int32
+      details:
+        type: array
+        items:
+          $ref: '#/definitions/googleprotobufAny'
       message:
-        $ref: '#/definitions/protobufAny'
-      timestamp:
-        type: string
-        format: date-time
-  v1DMap:
-    type: object
-    properties:
-      length:
-        type: string
-        format: int64
-      num_tables:
-        type: string
-        format: int64
-      slab_info:
-        $ref: '#/definitions/v1SlabInfo'
-  v1DMaps:
-    type: object
-    properties:
-      delete_hits:
-        type: string
-        format: int64
-      delete_misses:
-        type: string
-        format: int64
-      entries_total:
-        type: string
-        format: int64
-      evicted_total:
-        type: string
-        format: int64
-      get_hits:
-        type: string
-        format: int64
-      get_misses:
-        type: string
-        format: int64
-  v1DTopics:
-    type: object
-    properties:
-      current_listeners:
-        type: string
-        format: int64
-      listeners_total:
-        type: string
-        format: int64
-      published_total:
-        type: string
-        format: int64
-  v1Entity:
-    description: Entity represents a pod, vm, etc.
-    type: object
-    properties:
-      ip_address:
-        type: string
-      name:
-        type: string
-      prefix:
-        type: string
-      services:
-        type: array
-        items:
-          type: string
-      uid:
-        type: string
-  v1EntityCache:
-    description: EntityCache contains both mappings of ip address to entity and entity
-      name to entity.
-    type: object
-    properties:
-      entities_by_ip_address:
-        $ref: '#/definitions/EntityCacheEntities'
-      entities_by_name:
-        $ref: '#/definitions/EntityCacheEntities'
-  v1EqualsMatchExpression:
-    description: Label selector expression of the equal form "label == value".
-    type: object
-    properties:
-      label:
-        description: |-
-          Name of the label to equal match the value.
-
-          @gotags: validate:"required"
-        type: string
-        x-go-validate: required
-      value:
-        description: Exact value that the label should be equal to.
-        type: string
-  v1FlowControlControlPoint:
-    type: object
-    properties:
-      control_point:
-        type: string
-      service:
-        type: string
-  v1FlowControlControlPoints:
-    type: object
-    properties:
-      control_points:
-        type: array
-        items:
-          $ref: '#/definitions/v1FlowControlControlPoint'
-  v1GroupStatus:
-    description: |-
-      Groups is nested structure that holds status information about the node and a
-      pointer to the next node.
-    type: object
-    properties:
-      groups:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1GroupStatus'
-      status:
-        $ref: '#/definitions/statusv1Status'
-  v1HostInfo:
-    type: object
-    properties:
-      hostname:
-        type: string
-      local_ip:
-        type: string
-      uuid:
-        type: string
-  v1K8sLabelMatcherRequirement:
-    description: Label selector requirement which is a selector that contains values,
-      a key, and an operator that relates the key and values.
-    type: object
-    properties:
-      key:
-        description: |-
-          Label key that the selector applies to.
-
-          @gotags: validate:"required"
-        type: string
-        x-go-validate: required
-      operator:
-        description: |-
-          Logical operator which represents a key's relationship to a set of values.
-          Valid operators are In, NotIn, Exists and DoesNotExist.
-
-          @gotags: validate:"oneof=In NotIn Exists DoesNotExists"
-        type: string
-        x-go-validate: oneof=In NotIn Exists DoesNotExists
-      values:
-        description: |-
-          An array of string values that relates to the key by an operator.
-          If the operator is In or NotIn, the values array must be non-empty.
-          If the operator is Exists or DoesNotExist, the values array must be empty.
-        type: array
-        items:
-          type: string
-  v1KubernetesControlPoint:
-    type: object
-    properties:
-      api_version:
-        type: string
-      kind:
-        type: string
-      name:
-        type: string
-      namespace:
-        type: string
-  v1KubernetesControlPoints:
-    type: object
-    properties:
-      control_points:
-        type: array
-        items:
-          $ref: '#/definitions/v1KubernetesControlPoint'
-  v1LabelMatcher:
-    description: |-
-      It provides three ways to define requirements:
-      - matchLabels
-      - matchExpressions
-      - arbitrary expression
-
-      If multiple requirements are set, they are all ANDed.
-      An empty label matcher always matches.
-    type: object
-    title: |-
-      Allows to define rules whether a map of
-      [labels](/concepts/integrations/flow-control/flow-label.md)
-      should be considered a match or not
-    properties:
-      expression:
-        description: An arbitrary expression to be evaluated on the labels.
-        $ref: '#/definitions/v1MatchExpression'
-      match_expressions:
-        description: |-
-          List of k8s-style label matcher requirements.
-
-          Note: The requirements are ANDed.
-        type: array
-        items:
-          $ref: '#/definitions/v1K8sLabelMatcherRequirement'
-      match_labels:
-        description: |-
-          A map of {key,value} pairs representing labels to be matched.
-          A single {key,value} in the matchLabels requires that the label "key" is present and equal to "value".
-
-          Note: The requirements are ANDed.
-        type: object
-        additionalProperties:
-          type: string
-  v1MatchExpression:
-    description: |-
-      MatchExpression has multiple variants, exactly one should be set.
-
-      Example:
-      ```yaml
-      all:
-        of:
-          - label_exists: foo
-          - label_equals: { label = app, value = frobnicator }
-      ```
-    type: object
-    title: Defines a [map<string, string> → bool] expression to be evaluated on labels
-    properties:
-      all:
-        description: The expression is true when all subexpressions are true.
-        $ref: '#/definitions/MatchExpressionList'
-      any:
-        description: The expression is true when any subexpression is true.
-        $ref: '#/definitions/MatchExpressionList'
-      label_equals:
-        description: The expression is true when label value equals given value.
-        $ref: '#/definitions/v1EqualsMatchExpression'
-      label_exists:
-        description: |-
-          The expression is true when label with given name exists.
-
-          @gotags: validate:"required"
-        type: string
-        x-go-validate: required
-      label_matches:
-        description: The expression is true when label matches given regex.
-        $ref: '#/definitions/v1MatchesMatchExpression'
-      not:
-        description: The expression negates the result of subexpression.
-        $ref: '#/definitions/v1MatchExpression'
-  v1MatchesMatchExpression:
-    description: Label selector expression of the matches form "label matches regex".
-    type: object
-    properties:
-      label:
-        description: |-
-          Name of the label to match the regular expression.
-
-          @gotags: validate:"required"
-        type: string
-        x-go-validate: required
-      regex:
-        description: |-
-          Regular expression that should match the label value.
-          It uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
-
-          @gotags: validate:"required"
-        type: string
-        x-go-validate: required
-  v1Member:
-    type: object
-    properties:
-      birthdate:
-        type: string
-        format: int64
-      id:
-        type: string
-        format: uint64
-      name:
-        type: string
-  v1Network:
-    type: object
-    properties:
-      commands_total:
-        type: string
-        format: int64
-      connections_total:
-        type: string
-        format: int64
-      current_connections:
-        type: string
-        format: int64
-      read_bytes_total:
-        type: string
-        format: int64
-      written_bytes_total:
-        type: string
-        format: int64
-  v1Partition:
-    type: object
-    properties:
-      backups:
-        type: array
-        items:
-          $ref: '#/definitions/v1Member'
-      d_maps:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1DMap'
-      length:
-        type: string
-        format: int64
-      previous_owners:
-        type: array
-        items:
-          $ref: '#/definitions/v1Member'
-  v1Peer:
-    description: Peer holds peer info and services.
-    type: object
-    properties:
-      address:
-        type: string
-      hostname:
-        type: string
-      services:
-        type: object
-        additionalProperties:
-          type: string
-  v1Peers:
-    description: Peers holds the peer info of this peer and a mapping of address to
-      other peers.
-    type: object
-    properties:
-      peers:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1Peer'
-      self_peer:
-        $ref: '#/definitions/v1Peer'
-  v1PreviewFlowLabelsResponse:
-    type: object
-    properties:
-      samples:
-        type: array
-        items:
-          $ref: '#/definitions/PreviewFlowLabelsResponseFlowLabels'
-  v1PreviewHTTPRequestsResponse:
-    type: object
-    properties:
-      samples:
-        type: array
-        items:
-          type: object
-  v1ProcessInfo:
-    type: object
-    properties:
-      start_time:
-        type: string
-        format: date-time
-      uptime:
-        type: string
-  v1SlabInfo:
-    type: object
-    properties:
-      allocated:
-        type: string
-        format: int64
-      garbage:
-        type: string
-        format: int64
-      inuse:
-        type: string
-        format: int64
-  v1Stats:
-    type: object
-    properties:
-      backups:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1Partition'
-      cluster_coordinator:
-        $ref: '#/definitions/v1Member'
-      cluster_members:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1Member'
-      cmdline:
-        type: array
-        items:
-          type: string
-      d_maps:
-        $ref: '#/definitions/v1DMaps'
-      d_topics:
-        $ref: '#/definitions/v1DTopics'
-      member:
-        $ref: '#/definitions/v1Member'
-      network:
-        $ref: '#/definitions/v1Network'
-      partitions:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/v1Partition'
-      release_version:
-        type: string
-      runtime:
-        type: object
-      uptime_seconds:
-        type: string
-        format: int64
-  v1StatusError:
-    description: Error holds raw error message and its cause in a nested field.
-    type: object
-    properties:
-      message:
-        type: string
-  v1VersionInfo:
-    type: object
-    properties:
-      build_host:
-        type: string
-      build_os:
-        type: string
-      build_time:
-        type: string
-      git_branch:
-        type: string
-      git_commit_hash:
-        type: string
-      service:
-        type: string
-      version:
         type: string

@@ -5,7 +5,7 @@ sidebar_position: 1
 
 :::info
 
-See also [Policy reference](/reference/policies/spec.md#v1-policy)
+See also [Policy reference](/reference/policies/spec.md#policy)
 
 :::
 

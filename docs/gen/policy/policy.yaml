@@ -18,295 +18,12 @@ paths:
         in: body
         required: true
         schema:
-          $ref: '#/definitions/v1Policy'
+          $ref: '#/definitions/Policy'
       responses:
         "200":
           description: A successful response.
 definitions:
-  FluxMeterExponentialBuckets:
-    description: |-
-      ExponentialBuckets creates `count` number of buckets where the lowest bucket has an upper bound of `start`
-      and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
-      bucket is not counted.
-    type: object
-    properties:
-      count:
-        description: |-
-          Number of buckets.
-
-          @gotags: validate:"gt=0"
-        type: integer
-        format: int32
-        x-go-validate: gt=0
-        x-order: 2
-      factor:
-        description: |-
-          Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
-
-          @gotags: validate:"gt=1.0"
-        type: number
-        format: double
-        x-go-validate: gt=1.0
-        x-order: 1
-      start:
-        description: |-
-          Upper bound of the lowest bucket.
-
-          @gotags: validate:"gt=0.0"
-        type: number
-        format: double
-        x-go-validate: gt=0
-        x-order: 0
-  FluxMeterExponentialBucketsRange:
-    description: |-
-      ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest
-      bucket is `max`. The final +inf bucket is not counted.
-    type: object
-    properties:
-      count:
-        description: |-
-          Number of buckets.
-
-          @gotags: validate:"gt=0"
-        type: integer
-        format: int32
-        x-go-validate: gt=0
-        x-order: 2
-      max:
-        description: Highest bucket.
-        type: number
-        format: double
-        x-order: 1
-      min:
-        description: |-
-          Lowest bucket.
-
-          @gotags: validate:"gt=0.0"
-        type: number
-        format: double
-        x-go-validate: gt=0
-        x-order: 0
-  FluxMeterLinearBuckets:
-    description: |-
-      LinearBuckets creates `count` number of buckets, each `width` wide, where the lowest bucket has an
-      upper bound of `start`. The final +inf bucket is not counted.
-    type: object
-    properties:
-      count:
-        description: |-
-          Number of buckets.
-
-          @gotags: validate:"gt=0"
-        type: integer
-        format: int32
-        x-go-validate: gt=0
-        x-order: 2
-      start:
-        description: Upper bound of the lowest bucket.
-        type: number
-        format: double
-        x-order: 0
-      width:
-        description: Width of each bucket.
-        type: number
-        format: double
-        x-order: 1
-  FluxMeterStaticBuckets:
-    description: StaticBuckets holds the static value of the buckets where latency
-      histogram will be stored.
-    type: object
-    properties:
-      buckets:
-        type: array
-        title: '@gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"'
-        items:
-          type: number
-          format: double
-        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
-        x-order: 0
-  HorizontalPodScalerScaleActuator:
-    type: object
-    properties:
-      default_config:
-        description: Default configuration.
-        x-order: 2
-        $ref: '#/definitions/HorizontalPodScalerScaleActuatorDynamicConfig'
-      dynamic_config_key:
-        type: string
-        title: Configuration key for DynamicConfig
-        x-order: 1
-      in_ports:
-        x-order: 0
-        $ref: '#/definitions/HorizontalPodScalerScaleActuatorIns'
-  HorizontalPodScalerScaleActuatorDynamicConfig:
-    type: object
-    title: Dynamic Configuration for ScaleActuator
-    properties:
-      dry_run:
-        description: |-
-          Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
-          Useful for observing the behavior of Scaler without disrupting any real traffic.
-
-          @gotags: default:"false"
-        type: boolean
-        x-go-default: false
-        x-order: 0
-  HorizontalPodScalerScaleActuatorIns:
-    description: Inputs for the HorizontalPodScaler component.
-    type: object
-    properties:
-      desired_replicas:
-        x-order: 0
-        $ref: '#/definitions/v1InPort'
-  HorizontalPodScalerScaleReporter:
-    type: object
-    properties:
-      out_ports:
-        x-order: 0
-        $ref: '#/definitions/HorizontalPodScalerScaleReporterOuts'
-  HorizontalPodScalerScaleReporterOuts:
-    description: Outputs for the HorizontalPodScaler component.
-    type: object
-    properties:
-      actual_replicas:
-        x-order: 0
-        $ref: '#/definitions/v1OutPort'
-      configured_replicas:
-        x-order: 1
-        $ref: '#/definitions/v1OutPort'
-  MatchExpressionList:
-    description: 'eg. {any: {of: [expr1, expr2]}}.'
-    type: object
-    title: List of MatchExpressions that is used for all/any matching
-    properties:
-      of:
-        description: List of subexpressions of the match expression.
-        type: array
-        items:
-          $ref: '#/definitions/v1MatchExpression'
-        x-order: 0
-  ParametersLazySync:
-    type: object
-    properties:
-      enabled:
-        description: '@gotags: default:"false"'
-        type: boolean
-        title: Enables lazy sync
-        x-go-default: false
-        x-order: 0
-      num_sync:
-        description: |-
-          Number of times to lazy sync within the _limit\_reset\_interval_.
-
-          @gotags: default:"5" validate:"gt=0"
-        type: integer
-        format: int64
-        x-go-default: 5
-        x-go-validate: gt=0
-        x-order: 1
-  RateLimiterOverride:
-    type: object
-    properties:
-      label_value:
-        description: |-
-          Value of the label for which the override should be applied.
-
-          @gotags: validate:"required"
-        type: string
-        x-go-validate: required
-        x-order: 0
-      limit_scale_factor:
-        description: |-
-          Amount by which the _in\_ports.limit_ should be multiplied for this label value.
-
-          @gotags: default:"1.0"
-        type: number
-        format: double
-        x-go-default: 1
-        x-order: 1
-  RuleRego:
-    description: High-level extractor-based rules are compiled into a single rego
-      query.
-    type: object
-    title: Raw rego rules are compiled 1:1 to rego queries
-    properties:
-      query:
-        description: |-
-          Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
-
-          Note: The module name must match the package name from the "source".
-
-          @gotags: validate:"required"
-        type: string
-        x-go-validate: required
-        x-order: 1
-      source:
-        description: |-
-          Source code of the rego module.
-
-          Note: Must include a "package" declaration.
-
-          @gotags: validate:"required"
-        type: string
-        x-go-validate: required
-        x-order: 0
-  SchedulerWorkload:
-    description: Workload defines a class of requests that preferably have similar
-      properties such as response latency or desired priority.
-    type: object
-    properties:
-      label_matcher:
-        description: |-
-          Label Matcher to select a Workload based on
-          [flow labels](/concepts/integrations/flow-control/flow-label.md).
-
-          @gotags: validate:"required"
-        x-go-validate: required
-        x-order: 1
-        $ref: '#/definitions/v1LabelMatcher'
-      parameters:
-        description: |-
-          Parameters associated with flows matching the label matcher.
-
-          @gotags: validate:"required"
-        x-go-validate: required
-        x-order: 0
-        $ref: '#/definitions/SchedulerWorkloadParameters'
-  SchedulerWorkloadParameters:
-    description: Parameters defines parameters such as priority, tokens and fairness
-      key that are applicable to flows within a workload.
-    type: object
-    properties:
-      fairness_key:
-        description: |-
-          Fairness key is a label key that can be used to provide fairness within a workload.
-          Any [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if
-          you have a classifier that sets `user` flow label, you might want to set
-          `fairness_key = "user"`.
-        type: string
-        x-order: 2
-      priority:
-        description: |-
-          Describes priority level of the requests within the workload.
-          Priority level ranges from 0 to 255.
-          Higher numbers means higher priority level.
-
-          @gotags: validate:"gte=0,lte=255"
-        type: integer
-        format: int64
-        x-go-validate: gte=0,lte=255
-        x-order: 0
-      tokens:
-        description: |-
-          Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-          This override is applicable only if `auto_tokens` is set to false.
-
-          @gotags: default:"1"
-        type: string
-        format: uint64
-        x-go-default: 1
-        x-order: 1
-  v1AIMDConcurrencyController:
+  AIMDConcurrencyController:
     description: High level concurrency control component. Baselines a signal via
       exponential moving average and applies concurrency limits based on deviation
       of signal from the baseline. Internally implemented as a nested circuit.
@@ -314,8 +31,8 @@ definitions:
     properties:
       alerter_parameters:
         description: Configuration for embedded alerter.
-        x-order: 8
-        $ref: '#/definitions/v1AlerterParameters'
+        x-order: 0
+        $ref: '#/definitions/AlerterParameters'
       concurrency_limit_multiplier:
         description: |-
           Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
@@ -324,7 +41,7 @@ definitions:
         type: number
         format: double
         x-go-default: 2
-        x-order: 5
+        x-order: 1
       concurrency_linear_increment:
         description: |-
           Linear increment to concurrency in each execution tick when the system is not in overloaded state.
@@ -333,7 +50,7 @@ definitions:
         type: number
         format: double
         x-go-default: 5
-        x-order: 6
+        x-order: 2
       concurrency_sqrt_increment_multiplier:
         description: |-
           Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
@@ -342,60 +59,60 @@ definitions:
         type: number
         format: double
         x-go-default: 1
-        x-order: 7
+        x-order: 3
       default_config:
         description: Default configuration.
-        x-order: 10
-        $ref: '#/definitions/v1LoadActuatorDynamicConfig'
+        x-order: 4
+        $ref: '#/definitions/LoadActuatorDynamicConfig'
       dynamic_config_key:
         description: Configuration key for load actuation.
         type: string
-        x-order: 9
+        x-order: 5
       flow_selector:
         description: |-
           Flow Selector decides the service and flows at which the concurrency limiter is applied.
 
           @gotags: validate:"required"
         x-go-validate: required
-        x-order: 2
-        $ref: '#/definitions/v1FlowSelector'
+        x-order: 6
+        $ref: '#/definitions/FlowSelector'
       gradient_parameters:
         title: |-
           Gradient parameters for the controller. Defaults to:
           * slope = -1
           * min_gradient = 0.1
           * max_gradient = 1
-        x-order: 4
-        $ref: '#/definitions/v1GradientControllerParameters'
+        x-order: 7
+        $ref: '#/definitions/GradientControllerParameters'
       in_ports:
         description: Input ports for the AIMDConcurrencyController component.
-        x-order: 0
-        $ref: '#/definitions/v1AIMDConcurrencyControllerIns'
+        x-order: 8
+        $ref: '#/definitions/AIMDConcurrencyControllerIns'
       out_ports:
         description: Output ports for the AIMDConcurrencyController component.
-        x-order: 1
-        $ref: '#/definitions/v1AIMDConcurrencyControllerOuts'
+        x-order: 9
+        $ref: '#/definitions/AIMDConcurrencyControllerOuts'
       scheduler_parameters:
         description: |-
           Scheduler parameters.
 
           @gotags: validate:"required"
         x-go-validate: required
-        x-order: 3
-        $ref: '#/definitions/v1SchedulerParameters'
-  v1AIMDConcurrencyControllerIns:
+        x-order: 10
+        $ref: '#/definitions/SchedulerParameters'
+  AIMDConcurrencyControllerIns:
     description: Inputs for the AIMDConcurrencyController component.
     type: object
     properties:
       setpoint:
         description: The setpoint to the controller.
-        x-order: 1
-        $ref: '#/definitions/v1InPort'
+        x-order: 0
+        $ref: '#/definitions/InPort'
       signal:
         description: The signal to the controller.
-        x-order: 0
-        $ref: '#/definitions/v1InPort'
-  v1AIMDConcurrencyControllerOuts:
+        x-order: 1
+        $ref: '#/definitions/InPort'
+  AIMDConcurrencyControllerOuts:
     description: Outputs for the AIMDConcurrencyController component.
     type: object
     properties:
@@ -404,13 +121,13 @@ definitions:
           is overloaded based on the deviation of the signal from the setpoint taking
           into account some tolerance.
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
+        $ref: '#/definitions/OutPort'
       load_multiplier:
         description: Load multiplier is the ratio of desired concurrency to the incoming
           concurrency.
         x-order: 1
-        $ref: '#/definitions/v1OutPort'
-  v1AddressExtractor:
+        $ref: '#/definitions/OutPort'
+  AddressExtractor:
     description: |-
       IP addresses in attribute context are defined as objects with separate ip and port fields.
       This is a helper to display an address as a single string.
@@ -434,21 +151,21 @@ definitions:
         type: string
         x-go-validate: required
         x-order: 0
-  v1Alerter:
+  Alerter:
     description: Alerter reacts to a signal and generates alert to send to alert manager.
     type: object
     properties:
       in_ports:
         description: Input ports for the Alerter component.
         x-order: 0
-        $ref: '#/definitions/v1AlerterIns'
+        $ref: '#/definitions/AlerterIns'
       parameters:
         description: '@gotags: validate:"required"'
         title: Alerter configuration
         x-go-validate: required
         x-order: 1
-        $ref: '#/definitions/v1AlerterParameters'
-  v1AlerterIns:
+        $ref: '#/definitions/AlerterParameters'
+  AlerterIns:
     description: Inputs for the Alerter component.
     type: object
     properties:
@@ -456,8 +173,8 @@ definitions:
         description: Signal which Alerter is monitoring. If the signal greater than
           0, Alerter generates an alert.
         x-order: 0
-        $ref: '#/definitions/v1InPort'
-  v1AlerterParameters:
+        $ref: '#/definitions/InPort'
+  AlerterParameters:
     description: Alerter Parameters is a common config for separate alerter components
       and alerters embedded in other components.
     type: object
@@ -467,7 +184,7 @@ definitions:
         type: array
         items:
           type: string
-        x-order: 3
+        x-order: 0
       alert_name:
         description: |-
           Name of the alert.
@@ -475,13 +192,13 @@ definitions:
           @gotags: validate:"required"
         type: string
         x-go-validate: required
-        x-order: 0
+        x-order: 1
       labels:
         description: Additional labels to add to alert.
         type: object
         additionalProperties:
           type: string
-        x-order: 4
+        x-order: 2
       resolve_timeout:
         description: |-
           Duration of alert resolver.
@@ -489,7 +206,7 @@ definitions:
           @gotags: default:"300s"
         type: string
         x-go-default: 300s
-        x-order: 2
+        x-order: 3
       severity:
         description: |-
           Severity of the alert, one of 'info', 'warn' or 'crit'.
@@ -498,8 +215,8 @@ definitions:
         type: string
         x-go-default: info
         x-go-validate: oneof=info warn crit
-        x-order: 1
-  v1And:
+        x-order: 4
+  And:
     description: |-
       Logical AND.
 
@@ -521,12 +238,12 @@ definitions:
       in_ports:
         description: Input ports for the And component.
         x-order: 0
-        $ref: '#/definitions/v1AndIns'
+        $ref: '#/definitions/AndIns'
       out_ports:
         description: Output ports for the And component.
         x-order: 1
-        $ref: '#/definitions/v1AndOuts'
-  v1AndIns:
+        $ref: '#/definitions/AndOuts'
+  AndIns:
     description: Inputs for the And component.
     type: object
     properties:
@@ -537,9 +254,9 @@ definitions:
           @gotags: validate:"dive"
         type: array
         items:
-          $ref: '#/definitions/v1InPort'
+          $ref: '#/definitions/InPort'
         x-order: 0
-  v1AndOuts:
+  AndOuts:
     description: Output ports for the And component.
     type: object
     properties:
@@ -549,8 +266,8 @@ definitions:
 
           Will always be 0 (false), 1 (true) or invalid (unknown).
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1ArithmeticCombinator:
+        $ref: '#/definitions/OutPort'
+  ArithmeticCombinator:
     type: object
     title: Type of combinator that computes the arithmetic operation on the operand
       signals
@@ -558,7 +275,7 @@ definitions:
       in_ports:
         description: Input ports for the Arithmetic Combinator component.
         x-order: 0
-        $ref: '#/definitions/v1ArithmeticCombinatorIns'
+        $ref: '#/definitions/ArithmeticCombinatorIns'
       operator:
         description: |-
           Operator of the arithmetic operation.
@@ -569,32 +286,32 @@ definitions:
           @gotags: validate:"oneof=add sub mul div xor lshift rshift"
         type: string
         x-go-validate: oneof=add sub mul div xor lshift rshift
-        x-order: 2
+        x-order: 1
       out_ports:
         description: Output ports for the Arithmetic Combinator component.
-        x-order: 1
-        $ref: '#/definitions/v1ArithmeticCombinatorOuts'
-  v1ArithmeticCombinatorIns:
+        x-order: 2
+        $ref: '#/definitions/ArithmeticCombinatorOuts'
+  ArithmeticCombinatorIns:
     description: Inputs for the Arithmetic Combinator component.
     type: object
     properties:
       lhs:
         description: Left hand side of the arithmetic operation.
         x-order: 0
-        $ref: '#/definitions/v1InPort'
+        $ref: '#/definitions/InPort'
       rhs:
         description: Right hand side of the arithmetic operation.
         x-order: 1
-        $ref: '#/definitions/v1InPort'
-  v1ArithmeticCombinatorOuts:
+        $ref: '#/definitions/InPort'
+  ArithmeticCombinatorOuts:
     description: Outputs for the Arithmetic Combinator component.
     type: object
     properties:
       output:
         description: Result of arithmetic operation.
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1AutoScale:
+        $ref: '#/definitions/OutPort'
+  AutoScale:
     description: AutoScale components are used to scale a service.
     type: object
     properties:
@@ -602,8 +319,8 @@ definitions:
         description: HorizontalPodScaler provides pod horizontal scaling functionality
           for scalable Kubernetes resources.
         x-order: 0
-        $ref: '#/definitions/v1HorizontalPodScaler'
-  v1Circuit:
+        $ref: '#/definitions/HorizontalPodScaler'
+  Circuit:
     description: |-
       :::info
 
@@ -623,12 +340,12 @@ definitions:
 
       A signal can also have a special **Invalid** value. It's usually used to
       communicate that signal doesn't have a meaningful value at the moment, eg.
-      [PromQL](#v1-prom-q-l) emits such a value if it cannot execute a query.
+      [PromQL](#prom-q-l) emits such a value if it cannot execute a query.
       Components know when their input signals are invalid and can act
       accordingly. They can either propagate the invalidness, by making their
       output itself invalid (like eg.
-      [ArithmeticCombinator](#v1-arithmetic-combinator)) or use some different
-      logic, like eg. [Extrapolator](#v1-extrapolator). Refer to a component's
+      [ArithmeticCombinator](#arithmetic-combinator)) or use some different
+      logic, like eg. [Extrapolator](#extrapolator). Refer to a component's
       docs on how exactly it handles invalid inputs.
 
       :::
@@ -642,8 +359,8 @@ definitions:
           @gotags: validate:"dive"
         type: array
         items:
-          $ref: '#/definitions/v1Component'
-        x-order: 1
+          $ref: '#/definitions/Component'
+        x-order: 0
       evaluation_interval:
         description: |-
           Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
@@ -652,8 +369,8 @@ definitions:
           @gotags: default:"0.5s"
         type: string
         x-go-default: 0.5s
-        x-order: 0
-  v1Classifier:
+        x-order: 1
+  Classifier:
     description: |-
       :::info
 
@@ -684,7 +401,7 @@ definitions:
           @gotags: validate:"required"
         x-go-validate: required
         x-order: 0
-        $ref: '#/definitions/v1FlowSelector'
+        $ref: '#/definitions/FlowSelector'
       rules:
         description: |-
           A map of {key, value} pairs mapping from
@@ -694,10 +411,10 @@ definitions:
           @gotags: validate:"required,gt=0,dive,keys,required,endkeys,required"
         type: object
         additionalProperties:
-          $ref: '#/definitions/v1Rule'
+          $ref: '#/definitions/Rule'
         x-go-validate: required,gt=0,dive,keys,required,endkeys,required
         x-order: 1
-  v1Component:
+  Component:
     description: |-
       :::info
 
@@ -717,20 +434,20 @@ definitions:
 
       There are three categories of components:
       * "source" components – they take some sort of input from "the real world" and output
-        a signal based on this input. Example: [PromQL](#v1-prom-q-l). In the UI
+        a signal based on this input. Example: [PromQL](#prom-q-l). In the UI
         they're represented by green color.
       * signal processor components – "pure" components that don't interact with the "real world".
-        Examples: [GradientController](#v1-gradient-controller), [Max](#v1-max).
+        Examples: [GradientController](#gradient-controller), [Max](#max).
 
         :::note
 
         Signal processor components's output can depend on their internal state, in addition to the inputs.
-        Eg. see the [Exponential Moving Average filter](#v1-e-m-a).
+        Eg. see the [Exponential Moving Average filter](#e-m-a).
 
         :::
 
       * "sink" components – they affect the real world.
-        [ConcurrencyLimiter.LoadActuator](#v1-concurrency-limiter) and [RateLimiter](#v1-rate-limiter).
+        [ConcurrencyLimiter.LoadActuator](#concurrency-limiter) and [RateLimiter](#rate-limiter).
         In the UI, represented by orange color.  Sink components usually come in pairs with a
         "sources" component which emits a feedback signal, like
         `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.
@@ -739,131 +456,131 @@ definitions:
 
       Sometimes you may want to use a constant value as one of component's inputs.
       You can create an input port containing the constant value instead of being connected to a signal.
-      To do so, use the [InPort](#v1-in_port)'s .withConstantSignal(constant_signal) method.
+      To do so, use the [InPort](#in_port)'s .withConstantSignal(constant_signal) method.
       You can also use it to provide special math values such as NaN and +- Inf.
       If You need to provide the same constant signal to multiple components,
-      You can use the [Variable](#v1-variable) component.
+      You can use the [Variable](#variable) component.
 
       :::
 
-      See also [Policy](#v1-policy) for a higher-level explanation of circuits.
+      See also [Policy](#policy) for a higher-level explanation of circuits.
     type: object
     title: Computational block that form the circuit
     properties:
       alerter:
         description: Alerter reacts to a signal and generates alert to send to alert
           manager.
-        x-order: 11
-        $ref: '#/definitions/v1Alerter'
+        x-order: 0
+        $ref: '#/definitions/Alerter'
       and:
         description: Logical AND.
-        x-order: 14
-        $ref: '#/definitions/v1And'
+        x-order: 1
+        $ref: '#/definitions/And'
       arithmetic_combinator:
         description: Applies the given operator on input operands (signals) and emits
           the result.
         x-order: 2
-        $ref: '#/definitions/v1ArithmeticCombinator'
+        $ref: '#/definitions/ArithmeticCombinator'
       auto_scale:
         description: AutoScale components are used to scale the service.
-        x-order: 24
-        $ref: '#/definitions/v1AutoScale'
+        x-order: 3
+        $ref: '#/definitions/AutoScale'
       decider:
         description: Decider emits the binary result of comparison operator on two
           operands.
-        x-order: 3
-        $ref: '#/definitions/v1Decider'
+        x-order: 4
+        $ref: '#/definitions/Decider'
       differentiator:
         description: Differentiator calculates rate of change per tick.
-        x-order: 13
-        $ref: '#/definitions/v1Differentiator'
+        x-order: 5
+        $ref: '#/definitions/Differentiator'
       ema:
         description: Exponential Moving Average filter.
-        x-order: 1
-        $ref: '#/definitions/v1EMA'
+        x-order: 6
+        $ref: '#/definitions/EMA'
       extrapolator:
         description: Takes an input signal and emits the extrapolated value; either
           mirroring the input value or repeating the last known value up to the maximum
           extrapolation interval.
         x-order: 7
-        $ref: '#/definitions/v1Extrapolator'
+        $ref: '#/definitions/Extrapolator'
       first_valid:
         description: Picks the first valid input signal and emits it.
-        x-order: 10
-        $ref: '#/definitions/v1FirstValid'
+        x-order: 8
+        $ref: '#/definitions/FirstValid'
       flow_control:
         description: FlowControl components are used to regulate requests flow.
-        x-order: 23
-        $ref: '#/definitions/v1FlowControl'
+        x-order: 9
+        $ref: '#/definitions/FlowControl'
       gradient_controller:
         description: |-
           Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
           This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
-        x-order: 0
-        $ref: '#/definitions/v1GradientController'
+        x-order: 10
+        $ref: '#/definitions/GradientController'
       holder:
         description: Holds the last valid signal value for the specified duration
           then waits for next valid value to hold.
-        x-order: 18
-        $ref: '#/definitions/v1Holder'
+        x-order: 11
+        $ref: '#/definitions/Holder'
       integrator:
         description: Accumulates sum of signal every tick.
         x-order: 12
-        $ref: '#/definitions/v1Integrator'
+        $ref: '#/definitions/Integrator'
       inverter:
         description: Logical NOT.
-        x-order: 16
-        $ref: '#/definitions/v1Inverter'
+        x-order: 13
+        $ref: '#/definitions/Inverter'
       max:
         description: Emits the maximum of the input signals.
-        x-order: 8
-        $ref: '#/definitions/v1Max'
+        x-order: 14
+        $ref: '#/definitions/Max'
       min:
         description: Emits the minimum of the input signals.
-        x-order: 9
-        $ref: '#/definitions/v1Min'
+        x-order: 15
+        $ref: '#/definitions/Min'
       nested_circuit:
         description: Nested circuit defines a sub-circuit as a high-level component.
           It consists of a list of components and a map of input and output ports.
-        x-order: 19
-        $ref: '#/definitions/v1NestedCircuit'
+        x-order: 16
+        $ref: '#/definitions/NestedCircuit'
       nested_signal_egress:
         description: Nested signal egress is a special type of component that allows
           to extract a signal from a nested circuit.
-        x-order: 21
-        $ref: '#/definitions/v1NestedSignalEgress'
+        x-order: 17
+        $ref: '#/definitions/NestedSignalEgress'
       nested_signal_ingress:
         description: Nested signal ingress is a special type of component that allows
           to inject a signal into a nested circuit.
-        x-order: 20
-        $ref: '#/definitions/v1NestedSignalIngress'
+        x-order: 18
+        $ref: '#/definitions/NestedSignalIngress'
       or:
         description: Logical OR.
-        x-order: 15
-        $ref: '#/definitions/v1Or'
+        x-order: 19
+        $ref: '#/definitions/Or'
       pulse_generator:
         description: Generates 0 and 1 in turns.
-        x-order: 17
-        $ref: '#/definitions/v1PulseGenerator'
+        x-order: 20
+        $ref: '#/definitions/PulseGenerator'
       query:
         description: Query components that are query databases such as Prometheus.
-        x-order: 22
-        $ref: '#/definitions/v1Query'
+        x-order: 21
+        $ref: '#/definitions/Query'
       sqrt:
         description: Takes an input signal and emits the square root of the input
           signal.
-        x-order: 6
-        $ref: '#/definitions/v1Sqrt'
+        x-order: 22
+        $ref: '#/definitions/Sqrt'
       switcher:
         description: Switcher acts as a switch that emits one of the two signals based
           on third signal.
-        x-order: 4
-        $ref: '#/definitions/v1Switcher'
+        x-order: 23
+        $ref: '#/definitions/Switcher'
       variable:
         description: Emits a variable signal which can be set to invalid.
-        x-order: 5
-        $ref: '#/definitions/v1Variable'
-  v1ConcurrencyLimiter:
+        x-order: 24
+        $ref: '#/definitions/Variable'
+  ConcurrencyLimiter:
     description: |-
       :::info
 
@@ -887,14 +604,14 @@ definitions:
           @gotags: validate:"required"
         x-go-validate: required
         x-order: 0
-        $ref: '#/definitions/v1FlowSelector'
+        $ref: '#/definitions/FlowSelector'
       load_actuator:
         description: |-
           Actuator based on limiting the accepted concurrency under incoming concurrency * load multiplier.
 
           Actuation strategy defines the input signal that will drive the scheduler.
-        x-order: 2
-        $ref: '#/definitions/v1LoadActuator'
+        x-order: 1
+        $ref: '#/definitions/LoadActuator'
       scheduler:
         description: |-
           Configuration of Weighted Fair Queuing-based workload scheduler.
@@ -904,9 +621,9 @@ definitions:
 
           @gotags: validate:"required"
         x-go-validate: required
-        x-order: 1
-        $ref: '#/definitions/v1Scheduler'
-  v1ConstantSignal:
+        x-order: 2
+        $ref: '#/definitions/Scheduler'
+  ConstantSignal:
     description: Special constant input for ports and Variable component. Can provide
       either a constant value or special Nan/+-Inf value.
     type: object
@@ -920,7 +637,7 @@ definitions:
         type: number
         format: double
         x-order: 1
-  v1Decider:
+  Decider:
     description: |-
       The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
 
@@ -941,11 +658,11 @@ definitions:
           @gotags: default:"0s"
         type: string
         x-go-default: 0s
-        x-order: 4
+        x-order: 0
       in_ports:
         description: Input ports for the Decider component.
-        x-order: 0
-        $ref: '#/definitions/v1DeciderIns'
+        x-order: 1
+        $ref: '#/definitions/DeciderIns'
       operator:
         description: |-
           Comparison operator that computes operation on lhs and rhs input signals.
@@ -956,8 +673,8 @@ definitions:
         x-order: 2
       out_ports:
         description: Output ports for the Decider component.
-        x-order: 1
-        $ref: '#/definitions/v1DeciderOuts'
+        x-order: 3
+        $ref: '#/definitions/DeciderOuts'
       true_for:
         description: |-
           Duration of time to wait before a transition to true state.
@@ -966,39 +683,39 @@ definitions:
           @gotags: default:"0s"
         type: string
         x-go-default: 0s
-        x-order: 3
-  v1DeciderIns:
+        x-order: 4
+  DeciderIns:
     description: Inputs for the Decider component.
     type: object
     properties:
       lhs:
         description: Left hand side input signal for the comparison operation.
         x-order: 0
-        $ref: '#/definitions/v1InPort'
+        $ref: '#/definitions/InPort'
       rhs:
         description: Right hand side input signal for the comparison operation.
         x-order: 1
-        $ref: '#/definitions/v1InPort'
-  v1DeciderOuts:
+        $ref: '#/definitions/InPort'
+  DeciderOuts:
     description: Outputs for the Decider component.
     type: object
     properties:
       output:
         description: Selected signal (1.0 or 0.0).
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1Differentiator:
+        $ref: '#/definitions/OutPort'
+  Differentiator:
     description: Differentiator calculates rate of change per tick.
     type: object
     properties:
       in_ports:
         description: Input ports for the Differentiator component.
         x-order: 0
-        $ref: '#/definitions/v1DifferentiatorIns'
+        $ref: '#/definitions/DifferentiatorIns'
       out_ports:
         description: Output ports for the Differentiator component.
         x-order: 1
-        $ref: '#/definitions/v1DifferentiatorOuts'
+        $ref: '#/definitions/DifferentiatorOuts'
       window:
         description: |-
           The window of time over which differentiator operates.
@@ -1007,21 +724,21 @@ definitions:
         type: string
         x-go-default: 5s
         x-order: 2
-  v1DifferentiatorIns:
+  DifferentiatorIns:
     description: Inputs for the Differentiator component.
     type: object
     properties:
       input:
         x-order: 0
-        $ref: '#/definitions/v1InPort'
-  v1DifferentiatorOuts:
+        $ref: '#/definitions/InPort'
+  DifferentiatorOuts:
     description: Outputs for the Differentiator component.
     type: object
     properties:
       output:
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1EMA:
+        $ref: '#/definitions/OutPort'
+  EMA:
     description: |-
       At any time EMA component operates in one of the following states:
       1. Warm up state: The first warmup_window samples are used to compute the initial EMA.
@@ -1046,7 +763,7 @@ definitions:
       \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
       $$
 
-      The EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#v1-e-m-a-ins).
+      The EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#e-m-a-ins).
     type: object
     title: Exponential Moving Average (EMA) is a type of moving average that applies
       exponentially more weight to recent signal readings
@@ -1054,11 +771,11 @@ definitions:
       in_ports:
         description: Input ports for the EMA component.
         x-order: 0
-        $ref: '#/definitions/v1EMAIns'
+        $ref: '#/definitions/EMAIns'
       out_ports:
         description: Output ports for the EMA component.
         x-order: 1
-        $ref: '#/definitions/v1EMAOuts'
+        $ref: '#/definitions/EMAOuts'
       parameters:
         description: |-
           Parameters for the EMA component.
@@ -1066,15 +783,15 @@ definitions:
           @gotags: validate:"required"
         x-go-validate: required
         x-order: 2
-        $ref: '#/definitions/v1EMAParameters'
-  v1EMAIns:
+        $ref: '#/definitions/EMAParameters'
+  EMAIns:
     description: Inputs for the EMA component.
     type: object
     properties:
       input:
         description: Input signal to be used for the EMA computation.
         x-order: 0
-        $ref: '#/definitions/v1InPort'
+        $ref: '#/definitions/InPort'
       max_envelope:
         description: |-
           Upper bound of the moving average.
@@ -1095,15 +812,15 @@ definitions:
 
           :::
         x-order: 1
-        $ref: '#/definitions/v1InPort'
+        $ref: '#/definitions/InPort'
       min_envelope:
         description: |-
           Lower bound of the moving average.
 
           Used during the warm-up stage analogously to `max_envelope`.
         x-order: 2
-        $ref: '#/definitions/v1InPort'
-  v1EMAOuts:
+        $ref: '#/definitions/InPort'
+  EMAOuts:
     description: Outputs for the EMA component.
     type: object
     properties:
@@ -1111,8 +828,8 @@ definitions:
         description: Exponential moving average of the series of reading as an output
           signal.
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1EMAParameters:
+        $ref: '#/definitions/OutPort'
+  EMAParameters:
     description: Parameters for the EMA component.
     type: object
     properties:
@@ -1125,7 +842,7 @@ definitions:
         format: double
         x-go-default: 1
         x-go-validate: gte=0,lte=1.0
-        x-order: 3
+        x-order: 0
       correction_factor_on_min_envelope_violation:
         description: |-
           Correction factor to apply on the output value if its in violation of the min envelope.
@@ -1135,7 +852,7 @@ definitions:
         format: double
         x-go-default: 1
         x-go-validate: gte=1.0
-        x-order: 2
+        x-order: 1
       ema_window:
         description: |-
           Duration of EMA sampling window.
@@ -1143,7 +860,7 @@ definitions:
           @gotags: default:"5s"
         type: string
         x-go-default: 5s
-        x-order: 0
+        x-order: 2
       valid_during_warmup:
         description: |-
           Whether the output is valid during the warm-up stage.
@@ -1151,7 +868,7 @@ definitions:
           @gotags: default:"false"
         type: boolean
         x-go-default: false
-        x-order: 4
+        x-order: 3
       warmup_window:
         description: |-
           Duration of EMA warming up window.
@@ -1161,8 +878,8 @@ definitions:
           @gotags: default:"0s"
         type: string
         x-go-default: 0s
-        x-order: 1
-  v1EqualsMatchExpression:
+        x-order: 4
+  EqualsMatchExpression:
     description: Label selector expression of the equal form "label == value".
     type: object
     properties:
@@ -1178,7 +895,7 @@ definitions:
         description: Exact value that the label should be equal to.
         type: string
         x-order: 1
-  v1Extractor:
+  Extractor:
     description: There are multiple variants of extractor, specify exactly one.
     type: object
     title: Defines a high-level way to specify how to extract a flow label value given
@@ -1186,8 +903,8 @@ definitions:
     properties:
       address:
         description: Display an address as a single string - `<ip>:<port>`.
-        x-order: 2
-        $ref: '#/definitions/v1AddressExtractor'
+        x-order: 0
+        $ref: '#/definitions/AddressExtractor'
       from:
         description: |-
           Attribute path is a dot-separated path to attribute.
@@ -1207,20 +924,20 @@ definitions:
           [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
         type: string
         title: Use an attribute with no conversion
-        x-order: 0
+        x-order: 1
       json:
         description: Deserialize a json, and extract one of the fields.
-        x-order: 1
-        $ref: '#/definitions/v1JSONExtractor'
+        x-order: 2
+        $ref: '#/definitions/JSONExtractor'
       jwt:
         description: Parse the attribute as JWT and read the payload.
         x-order: 3
-        $ref: '#/definitions/v1JWTExtractor'
+        $ref: '#/definitions/JWTExtractor'
       path_templates:
         description: Match HTTP Path to given path templates.
         x-order: 4
-        $ref: '#/definitions/v1PathTemplateMatcher'
-  v1Extrapolator:
+        $ref: '#/definitions/PathTemplateMatcher'
+  Extrapolator:
     description: It does so until `maximum_extrapolation_interval` is reached, beyond
       which it emits invalid signal unless input signal becomes valid again.
     type: object
@@ -1230,11 +947,11 @@ definitions:
       in_ports:
         description: Input ports for the Extrapolator component.
         x-order: 0
-        $ref: '#/definitions/v1ExtrapolatorIns'
+        $ref: '#/definitions/ExtrapolatorIns'
       out_ports:
         description: Output ports for the Extrapolator component.
         x-order: 1
-        $ref: '#/definitions/v1ExtrapolatorOuts'
+        $ref: '#/definitions/ExtrapolatorOuts'
       parameters:
         description: |-
           Parameters for the Extrapolator component.
@@ -1242,24 +959,24 @@ definitions:
           @gotags: validate:"required"
         x-go-validate: required
         x-order: 2
-        $ref: '#/definitions/v1ExtrapolatorParameters'
-  v1ExtrapolatorIns:
+        $ref: '#/definitions/ExtrapolatorParameters'
+  ExtrapolatorIns:
     description: Inputs for the Extrapolator component.
     type: object
     properties:
       input:
         description: Input signal for the Extrapolator component.
         x-order: 0
-        $ref: '#/definitions/v1InPort'
-  v1ExtrapolatorOuts:
+        $ref: '#/definitions/InPort'
+  ExtrapolatorOuts:
     description: Outputs for the Extrapolator component.
     type: object
     properties:
       output:
         description: Extrapolated signal.
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1ExtrapolatorParameters:
+        $ref: '#/definitions/OutPort'
+  ExtrapolatorParameters:
     description: Parameters for the Extrapolator component.
     type: object
     properties:
@@ -1271,7 +988,7 @@ definitions:
         type: string
         x-go-default: 10s
         x-order: 0
-  v1FirstValid:
+  FirstValid:
     type: object
     title: Picks the first valid input signal from the array of input signals and
       emits it as an output signal
@@ -1279,12 +996,12 @@ definitions:
       in_ports:
         description: Input ports for the FirstValid component.
         x-order: 0
-        $ref: '#/definitions/v1FirstValidIns'
+        $ref: '#/definitions/FirstValidIns'
       out_ports:
         description: Output ports for the FirstValid component.
         x-order: 1
-        $ref: '#/definitions/v1FirstValidOuts'
-  v1FirstValidIns:
+        $ref: '#/definitions/FirstValidOuts'
+  FirstValidIns:
     description: Inputs for the FirstValid component.
     type: object
     properties:
@@ -1295,17 +1012,17 @@ definitions:
           @gotags: validate:"dive"
         type: array
         items:
-          $ref: '#/definitions/v1InPort'
+          $ref: '#/definitions/InPort'
         x-order: 0
-  v1FirstValidOuts:
+  FirstValidOuts:
     description: Outputs for the FirstValid component.
     type: object
     properties:
       output:
         description: First valid input signal as an output signal.
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1FlowControl:
+        $ref: '#/definitions/OutPort'
+  FlowControl:
     description: FlowControl components are used to regulate requests flow.
     type: object
     properties:
@@ -1315,18 +1032,18 @@ definitions:
           as inputs and reduces concurrency limits proportionally (or any arbitrary
           power) based on deviation of the signal from setpoint. Internally implemented
           as a nested circuit.
-        x-order: 2
-        $ref: '#/definitions/v1AIMDConcurrencyController'
+        x-order: 0
+        $ref: '#/definitions/AIMDConcurrencyController'
       concurrency_limiter:
         description: Concurrency Limiter provides service protection by applying prioritized
           load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
         x-order: 1
-        $ref: '#/definitions/v1ConcurrencyLimiter'
+        $ref: '#/definitions/ConcurrencyLimiter'
       rate_limiter:
         description: Rate Limiter provides service protection by applying rate limiter.
-        x-order: 0
-        $ref: '#/definitions/v1RateLimiter'
-  v1FlowMatcher:
+        x-order: 2
+        $ref: '#/definitions/RateLimiter'
+  FlowMatcher:
     description: |-
       :::info
 
@@ -1376,7 +1093,7 @@ definitions:
 
           :::note
 
-          [Classifiers](#v1-classifier) _can_ use flow labels created by some other
+          [Classifiers](#classifier) _can_ use flow labels created by some other
           classifier, but only if they were created at some previous control point
           (and propagated in baggage).
 
@@ -1391,8 +1108,8 @@ definitions:
           [flow labels](/concepts/integrations/flow-control/flow-label.md)
           must also be satisfied (in addition to service+control point matching)
         x-order: 1
-        $ref: '#/definitions/v1LabelMatcher'
-  v1FlowSelector:
+        $ref: '#/definitions/LabelMatcher'
+  FlowSelector:
     description: |-
       :::info
 
@@ -1408,14 +1125,14 @@ definitions:
       flow_matcher:
         title: '@gotags: validate:"required"'
         x-go-validate: required
-        x-order: 1
-        $ref: '#/definitions/v1FlowMatcher'
+        x-order: 0
+        $ref: '#/definitions/FlowMatcher'
       service_selector:
         title: '@gotags: validate:"required"'
         x-go-validate: required
-        x-order: 0
-        $ref: '#/definitions/v1ServiceSelector'
-  v1FluxMeter:
+        x-order: 1
+        $ref: '#/definitions/ServiceSelector'
+  FluxMeter:
     description: |-
       Flux Meter gathers metrics for the traffic that matches its selector.
       The histogram created by Flux Meter measures the workload latency by default.
@@ -1451,24 +1168,125 @@ definitions:
           @gotags: default:"workload_duration_ms"
         type: string
         x-go-default: workload_duration_ms
-        x-order: 5
+        x-order: 0
       exponential_buckets:
-        x-order: 3
+        x-order: 1
         $ref: '#/definitions/FluxMeterExponentialBuckets'
       exponential_buckets_range:
-        x-order: 4
+        x-order: 2
         $ref: '#/definitions/FluxMeterExponentialBucketsRange'
       flow_selector:
         description: The selection criteria for the traffic that will be measured.
-        x-order: 0
-        $ref: '#/definitions/v1FlowSelector'
+        x-order: 3
+        $ref: '#/definitions/FlowSelector'
       linear_buckets:
-        x-order: 2
+        x-order: 4
         $ref: '#/definitions/FluxMeterLinearBuckets'
       static_buckets:
-        x-order: 1
+        x-order: 5
         $ref: '#/definitions/FluxMeterStaticBuckets'
-  v1GradientController:
+  FluxMeterExponentialBuckets:
+    description: |-
+      ExponentialBuckets creates `count` number of buckets where the lowest bucket has an upper bound of `start`
+      and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
+      bucket is not counted.
+    type: object
+    properties:
+      count:
+        description: |-
+          Number of buckets.
+
+          @gotags: validate:"gt=0"
+        type: integer
+        format: int32
+        x-go-validate: gt=0
+        x-order: 0
+      factor:
+        description: |-
+          Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
+
+          @gotags: validate:"gt=1.0"
+        type: number
+        format: double
+        x-go-validate: gt=1.0
+        x-order: 1
+      start:
+        description: |-
+          Upper bound of the lowest bucket.
+
+          @gotags: validate:"gt=0.0"
+        type: number
+        format: double
+        x-go-validate: gt=0
+        x-order: 2
+  FluxMeterExponentialBucketsRange:
+    description: |-
+      ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest
+      bucket is `max`. The final +inf bucket is not counted.
+    type: object
+    properties:
+      count:
+        description: |-
+          Number of buckets.
+
+          @gotags: validate:"gt=0"
+        type: integer
+        format: int32
+        x-go-validate: gt=0
+        x-order: 0
+      max:
+        description: Highest bucket.
+        type: number
+        format: double
+        x-order: 1
+      min:
+        description: |-
+          Lowest bucket.
+
+          @gotags: validate:"gt=0.0"
+        type: number
+        format: double
+        x-go-validate: gt=0
+        x-order: 2
+  FluxMeterLinearBuckets:
+    description: |-
+      LinearBuckets creates `count` number of buckets, each `width` wide, where the lowest bucket has an
+      upper bound of `start`. The final +inf bucket is not counted.
+    type: object
+    properties:
+      count:
+        description: |-
+          Number of buckets.
+
+          @gotags: validate:"gt=0"
+        type: integer
+        format: int32
+        x-go-validate: gt=0
+        x-order: 0
+      start:
+        description: Upper bound of the lowest bucket.
+        type: number
+        format: double
+        x-order: 1
+      width:
+        description: Width of each bucket.
+        type: number
+        format: double
+        x-order: 2
+  FluxMeterStaticBuckets:
+    description: StaticBuckets holds the static value of the buckets where latency
+      histogram will be stored.
+    type: object
+    properties:
+      buckets:
+        type: array
+        title: '@gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"'
+        items:
+          type: number
+          format: double
+        x-go-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
+        x-order: 0
+  GradientController:
     description: |-
       The `gradient` describes a corrective factor that should be applied to the
       control variable to get the signal closer to the setpoint. It is computed as follows:
@@ -1497,29 +1315,29 @@ definitions:
     properties:
       default_config:
         description: Default configuration.
-        x-order: 4
-        $ref: '#/definitions/v1GradientControllerDynamicConfig'
+        x-order: 0
+        $ref: '#/definitions/GradientControllerDynamicConfig'
       dynamic_config_key:
         type: string
         title: Configuration key for DynamicConfig
-        x-order: 3
+        x-order: 1
       in_ports:
         description: Input ports of the Gradient Controller.
-        x-order: 0
-        $ref: '#/definitions/v1GradientControllerIns'
+        x-order: 2
+        $ref: '#/definitions/GradientControllerIns'
       out_ports:
         description: Output ports of the Gradient Controller.
-        x-order: 1
-        $ref: '#/definitions/v1GradientControllerOuts'
+        x-order: 3
+        $ref: '#/definitions/GradientControllerOuts'
       parameters:
         description: |-
           Gradient Parameters.
 
           @gotags: validate:"required"
         x-go-validate: required
-        x-order: 2
-        $ref: '#/definitions/v1GradientControllerParameters'
-  v1GradientControllerDynamicConfig:
+        x-order: 4
+        $ref: '#/definitions/GradientControllerParameters'
+  GradientControllerDynamicConfig:
     type: object
     title: Dynamic Configuration for a Controller
     properties:
@@ -1532,7 +1350,7 @@ definitions:
         type: boolean
         x-go-default: false
         x-order: 0
-  v1GradientControllerIns:
+  GradientControllerIns:
     description: Inputs for the Gradient Controller component.
     type: object
     properties:
@@ -1541,37 +1359,37 @@ definitions:
           Actual current value of the control variable.
 
           This signal is multiplied by the gradient to produce the output.
-        x-order: 5
-        $ref: '#/definitions/v1InPort'
+        x-order: 0
+        $ref: '#/definitions/InPort'
       max:
         description: Maximum value to limit the output signal.
-        x-order: 3
-        $ref: '#/definitions/v1InPort'
+        x-order: 1
+        $ref: '#/definitions/InPort'
       min:
         description: Minimum value to limit the output signal.
-        x-order: 4
-        $ref: '#/definitions/v1InPort'
+        x-order: 2
+        $ref: '#/definitions/InPort'
       optimize:
         description: Optimize signal is added to the output of the gradient calculation.
-        x-order: 2
-        $ref: '#/definitions/v1InPort'
+        x-order: 3
+        $ref: '#/definitions/InPort'
       setpoint:
         description: Setpoint to be used for the gradient computation.
-        x-order: 1
-        $ref: '#/definitions/v1InPort'
+        x-order: 4
+        $ref: '#/definitions/InPort'
       signal:
         description: Signal to be used for the gradient computation.
-        x-order: 0
-        $ref: '#/definitions/v1InPort'
-  v1GradientControllerOuts:
+        x-order: 5
+        $ref: '#/definitions/InPort'
+  GradientControllerOuts:
     description: Outputs for the Gradient Controller component.
     type: object
     properties:
       output:
         description: Computed desired value of the control variable.
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1GradientControllerParameters:
+        $ref: '#/definitions/OutPort'
+  GradientControllerParameters:
     description: Gradient Parameters.
     type: object
     properties:
@@ -1583,7 +1401,7 @@ definitions:
         type: number
         format: double
         x-go-default: 1.7976931348623157e+308
-        x-order: 2
+        x-order: 0
       min_gradient:
         description: |-
           Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
@@ -1598,7 +1416,7 @@ definitions:
           Slope controls the aggressiveness and direction of the Gradient Controller.
 
           Slope is used as exponent on the signal to setpoint ratio in computation
-          of the gradient (see the [main description](#v1-gradient-controller) for
+          of the gradient (see the [main description](#gradient-controller) for
           exact equation). Good intuition for this parameter is "What should the
           Gradient Controller do to the control variable when signal is too high",
           eg.:
@@ -1642,8 +1460,8 @@ definitions:
         type: number
         format: double
         x-go-validate: required
-        x-order: 0
-  v1Holder:
+        x-order: 2
+  Holder:
     description: |-
       Holds the last valid signal value for the specified duration then waits for next valid value to hold.
       If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
@@ -1656,28 +1474,28 @@ definitions:
           @gotags: default:"5s"
         type: string
         x-go-default: 5s
-        x-order: 2
-      in_ports:
         x-order: 0
-        $ref: '#/definitions/v1HolderIns'
-      out_ports:
+      in_ports:
         x-order: 1
-        $ref: '#/definitions/v1HolderOuts'
-  v1HolderIns:
+        $ref: '#/definitions/HolderIns'
+      out_ports:
+        x-order: 2
+        $ref: '#/definitions/HolderOuts'
+  HolderIns:
     description: Inputs for the Holder component.
     type: object
     properties:
       input:
         x-order: 0
-        $ref: '#/definitions/v1InPort'
-  v1HolderOuts:
+        $ref: '#/definitions/InPort'
+  HolderOuts:
     description: Outputs for the Holder component.
     type: object
     properties:
       output:
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1HorizontalPodScaler:
+        $ref: '#/definitions/OutPort'
+  HorizontalPodScaler:
     type: object
     properties:
       kubernetes_object_selector:
@@ -1687,81 +1505,131 @@ definitions:
           @gotags: validate:"required"
         x-go-validate: required
         x-order: 0
-        $ref: '#/definitions/v1KubernetesObjectSelector'
+        $ref: '#/definitions/KubernetesObjectSelector'
       scale_actuator:
-        x-order: 2
+        x-order: 1
         $ref: '#/definitions/HorizontalPodScalerScaleActuator'
       scale_reporter:
-        x-order: 1
+        x-order: 2
         $ref: '#/definitions/HorizontalPodScalerScaleReporter'
-  v1InPort:
+  HorizontalPodScalerScaleActuator:
+    type: object
+    properties:
+      default_config:
+        description: Default configuration.
+        x-order: 0
+        $ref: '#/definitions/HorizontalPodScalerScaleActuatorDynamicConfig'
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
+        x-order: 1
+      in_ports:
+        x-order: 2
+        $ref: '#/definitions/HorizontalPodScalerScaleActuatorIns'
+  HorizontalPodScalerScaleActuatorDynamicConfig:
+    type: object
+    title: Dynamic Configuration for ScaleActuator
+    properties:
+      dry_run:
+        description: |-
+          Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+          Useful for observing the behavior of Scaler without disrupting any real traffic.
+
+          @gotags: default:"false"
+        type: boolean
+        x-go-default: false
+        x-order: 0
+  HorizontalPodScalerScaleActuatorIns:
+    description: Inputs for the HorizontalPodScaler component.
+    type: object
+    properties:
+      desired_replicas:
+        x-order: 0
+        $ref: '#/definitions/InPort'
+  HorizontalPodScalerScaleReporter:
+    type: object
+    properties:
+      out_ports:
+        x-order: 0
+        $ref: '#/definitions/HorizontalPodScalerScaleReporterOuts'
+  HorizontalPodScalerScaleReporterOuts:
+    description: Outputs for the HorizontalPodScaler component.
+    type: object
+    properties:
+      actual_replicas:
+        x-order: 0
+        $ref: '#/definitions/OutPort'
+      configured_replicas:
+        x-order: 1
+        $ref: '#/definitions/OutPort'
+  InPort:
     type: object
     title: Components receive input from other components via InPorts
     properties:
       constant_signal:
         description: Constant value to be used for this InPort instead of a signal.
-        x-order: 1
-        $ref: '#/definitions/v1ConstantSignal'
+        x-order: 0
+        $ref: '#/definitions/ConstantSignal'
       signal_name:
         description: Name of the incoming Signal on the InPort.
         type: string
-        x-order: 0
-  v1Integrator:
+        x-order: 1
+  Integrator:
     description: Accumulates sum of signal every tick.
     type: object
     properties:
       in_ports:
         description: Input ports for the Integrator component.
         x-order: 0
-        $ref: '#/definitions/v1IntegratorIns'
+        $ref: '#/definitions/IntegratorIns'
       out_ports:
         description: Output ports for the Integrator component.
         x-order: 1
-        $ref: '#/definitions/v1IntegratorOuts'
-  v1IntegratorIns:
+        $ref: '#/definitions/IntegratorOuts'
+  IntegratorIns:
     description: Inputs for the Integrator component.
     type: object
     properties:
       input:
         description: The input signal.
         x-order: 0
-        $ref: '#/definitions/v1InPort'
+        $ref: '#/definitions/InPort'
       max:
         description: The maximum output when reset is not set.
-        x-order: 3
-        $ref: '#/definitions/v1InPort'
+        x-order: 1
+        $ref: '#/definitions/InPort'
       min:
         description: The minimum output when reset is not set.
         x-order: 2
-        $ref: '#/definitions/v1InPort'
+        $ref: '#/definitions/InPort'
       reset:
         description: Resets the integrator output to zero when reset signal is valid
           and non-zero.
-        x-order: 1
-        $ref: '#/definitions/v1InPort'
-  v1IntegratorOuts:
+        x-order: 3
+        $ref: '#/definitions/InPort'
+  IntegratorOuts:
     description: Outputs for the Integrator component.
     type: object
     properties:
       output:
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1Inverter:
+        $ref: '#/definitions/OutPort'
+  Inverter:
     description: |-
       Logical NOT.
 
-      See [And component](#v1-and) on how signals are mapped onto boolean values.
+      See [And component](#and) on how signals are mapped onto boolean values.
     type: object
     properties:
       in_ports:
         description: Input ports for the Inverter component.
         x-order: 0
-        $ref: '#/definitions/v1InverterIns'
+        $ref: '#/definitions/InverterIns'
       out_ports:
         description: Output ports for the Inverter component.
         x-order: 1
-        $ref: '#/definitions/v1InverterOuts'
-  v1InverterIns:
+        $ref: '#/definitions/InverterOuts'
+  InverterIns:
     description: Inputs for the Inverter component.
     type: object
     properties:
@@ -1771,8 +1639,8 @@ definitions:
 
           @gotags: validate:"dive"
         x-order: 0
-        $ref: '#/definitions/v1InPort'
-  v1InverterOuts:
+        $ref: '#/definitions/InPort'
+  InverterOuts:
     description: Output ports for the Inverter component.
     type: object
     properties:
@@ -1782,8 +1650,8 @@ definitions:
 
           Will always be 0 (false), 1 (true) or invalid (unknown).
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1JSONExtractor:
+        $ref: '#/definitions/OutPort'
+  JSONExtractor:
     description: |-
       Example:
       ```yaml
@@ -1809,7 +1677,7 @@ definitions:
           eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
         type: string
         x-order: 1
-  v1JWTExtractor:
+  JWTExtractor:
     description: |-
       Specify a field to be extracted from payload using "json_pointer".
 
@@ -1840,7 +1708,7 @@ definitions:
           eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
         type: string
         x-order: 1
-  v1K8sLabelMatcherRequirement:
+  K8sLabelMatcherRequirement:
     description: Label selector requirement which is a selector that contains values,
       a key, and an operator that relates the key and values.
     type: object
@@ -1871,7 +1739,7 @@ definitions:
         items:
           type: string
         x-order: 2
-  v1KubernetesObjectSelector:
+  KubernetesObjectSelector:
     description: |-
       Describes which pods a control or observability
       component should apply to.
@@ -1891,7 +1759,7 @@ definitions:
         type: string
         title: API version of Kubernetes resource
         x-go-validate: required
-        x-order: 2
+        x-order: 1
       kind:
         description: |-
           Kubernetes resource type.
@@ -1899,7 +1767,7 @@ definitions:
           @gotags: validate:"required"
         type: string
         x-go-validate: required
-        x-order: 3
+        x-order: 2
       name:
         description: |-
           Kubernetes resource name.
@@ -1907,7 +1775,7 @@ definitions:
           @gotags: validate:"required"
         type: string
         x-go-validate: required
-        x-order: 4
+        x-order: 3
       namespace:
         description: |-
           Kubernetes namespace that the resource belongs to.
@@ -1915,8 +1783,8 @@ definitions:
           @gotags: validate:"required"
         type: string
         x-go-validate: required
-        x-order: 1
-  v1LabelMatcher:
+        x-order: 4
+  LabelMatcher:
     description: |-
       It provides three ways to define requirements:
       - matchLabels
@@ -1933,8 +1801,8 @@ definitions:
     properties:
       expression:
         description: An arbitrary expression to be evaluated on the labels.
-        x-order: 2
-        $ref: '#/definitions/v1MatchExpression'
+        x-order: 0
+        $ref: '#/definitions/MatchExpression'
       match_expressions:
         description: |-
           List of k8s-style label matcher requirements.
@@ -1942,7 +1810,7 @@ definitions:
           Note: The requirements are ANDed.
         type: array
         items:
-          $ref: '#/definitions/v1K8sLabelMatcherRequirement'
+          $ref: '#/definitions/K8sLabelMatcherRequirement'
         x-order: 1
       match_labels:
         description: |-
@@ -1953,25 +1821,25 @@ definitions:
         type: object
         additionalProperties:
           type: string
-        x-order: 0
-  v1LoadActuator:
+        x-order: 2
+  LoadActuator:
     type: object
     title: Takes the load multiplier input signal and publishes it to the schedulers
       in the data-plane
     properties:
       default_config:
         description: Default configuration.
-        x-order: 2
-        $ref: '#/definitions/v1LoadActuatorDynamicConfig'
+        x-order: 0
+        $ref: '#/definitions/LoadActuatorDynamicConfig'
       dynamic_config_key:
         description: Configuration key for DynamicConfig.
         type: string
         x-order: 1
       in_ports:
         description: Input ports for the Load Actuator component.
-        x-order: 0
-        $ref: '#/definitions/v1LoadActuatorIns'
-  v1LoadActuatorDynamicConfig:
+        x-order: 2
+        $ref: '#/definitions/LoadActuatorIns'
+  LoadActuatorDynamicConfig:
     type: object
     title: Dynamic Configuration for LoadActuator
     properties:
@@ -1981,17 +1849,17 @@ definitions:
           Useful for observing the behavior of Load Actuator without disrupting any real traffic.
         type: boolean
         x-order: 0
-  v1LoadActuatorIns:
+  LoadActuatorIns:
     description: Input for the Load Actuator component.
     type: object
     properties:
       load_multiplier:
         description: |-
           Load multiplier is ratio of [incoming
-          concurrency](#v1-scheduler-outs) that needs to be accepted.
+          concurrency](#scheduler-outs) that needs to be accepted.
         x-order: 0
-        $ref: '#/definitions/v1InPort'
-  v1MatchExpression:
+        $ref: '#/definitions/InPort'
+  MatchExpression:
     description: |-
       MatchExpression has multiple variants, exactly one should be set.
 
@@ -2007,16 +1875,16 @@ definitions:
     properties:
       all:
         description: The expression is true when all subexpressions are true.
-        x-order: 1
+        x-order: 0
         $ref: '#/definitions/MatchExpressionList'
       any:
         description: The expression is true when any subexpression is true.
-        x-order: 2
+        x-order: 1
         $ref: '#/definitions/MatchExpressionList'
       label_equals:
         description: The expression is true when label value equals given value.
-        x-order: 4
-        $ref: '#/definitions/v1EqualsMatchExpression'
+        x-order: 2
+        $ref: '#/definitions/EqualsMatchExpression'
       label_exists:
         description: |-
           The expression is true when label with given name exists.
@@ -2027,13 +1895,24 @@ definitions:
         x-order: 3
       label_matches:
         description: The expression is true when label matches given regex.
-        x-order: 5
-        $ref: '#/definitions/v1MatchesMatchExpression'
+        x-order: 4
+        $ref: '#/definitions/MatchesMatchExpression'
       not:
         description: The expression negates the result of subexpression.
+        x-order: 5
+        $ref: '#/definitions/MatchExpression'
+  MatchExpressionList:
+    description: 'eg. {any: {of: [expr1, expr2]}}.'
+    type: object
+    title: List of MatchExpressions that is used for all/any matching
+    properties:
+      of:
+        description: List of subexpressions of the match expression.
+        type: array
+        items:
+          $ref: '#/definitions/MatchExpression'
         x-order: 0
-        $ref: '#/definitions/v1MatchExpression'
-  v1MatchesMatchExpression:
+  MatchesMatchExpression:
     description: Label selector expression of the matches form "label matches regex".
     type: object
     properties:
@@ -2054,7 +1933,7 @@ definitions:
         type: string
         x-go-validate: required
         x-order: 1
-  v1Max:
+  Max:
     description: 'Max: output = max([]inputs).'
     type: object
     title: Takes a list of input signals and emits the signal with the maximum value
@@ -2062,12 +1941,12 @@ definitions:
       in_ports:
         description: Input ports for the Max component.
         x-order: 0
-        $ref: '#/definitions/v1MaxIns'
+        $ref: '#/definitions/MaxIns'
       out_ports:
         description: Output ports for the Max component.
         x-order: 1
-        $ref: '#/definitions/v1MaxOuts'
-  v1MaxIns:
+        $ref: '#/definitions/MaxOuts'
+  MaxIns:
     description: Inputs for the Max component.
     type: object
     properties:
@@ -2078,17 +1957,17 @@ definitions:
           @gotags: validate:"dive"
         type: array
         items:
-          $ref: '#/definitions/v1InPort'
+          $ref: '#/definitions/InPort'
         x-order: 0
-  v1MaxOuts:
+  MaxOuts:
     description: Output for the Max component.
     type: object
     properties:
       output:
         description: Signal with maximum value as an output signal.
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1Min:
+        $ref: '#/definitions/OutPort'
+  Min:
     description: |-
       Takes an array of input signals and emits the signal with the minimum value
       Min: output = min([]inputs).
@@ -2097,12 +1976,12 @@ definitions:
       in_ports:
         description: Input ports for the Min component.
         x-order: 0
-        $ref: '#/definitions/v1MinIns'
+        $ref: '#/definitions/MinIns'
       out_ports:
         description: Output ports for the Min component.
         x-order: 1
-        $ref: '#/definitions/v1MinOuts'
-  v1MinIns:
+        $ref: '#/definitions/MinOuts'
+  MinIns:
     description: Inputs for the Min component.
     type: object
     properties:
@@ -2113,17 +1992,17 @@ definitions:
           @gotags: validate:"dive"
         type: array
         items:
-          $ref: '#/definitions/v1InPort'
+          $ref: '#/definitions/InPort'
         x-order: 0
-  v1MinOuts:
+  MinOuts:
     description: Output ports for the Min component.
     type: object
     properties:
       output:
         description: Signal with minimum value as an output signal.
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1NestedCircuit:
+        $ref: '#/definitions/OutPort'
+  NestedCircuit:
     description: Nested circuit defines a sub-circuit as a high-level component. It
       consists of a list of components and a map of input and output ports.
     type: object
@@ -2132,29 +2011,29 @@ definitions:
         type: array
         title: '@gotags: validate:"dive"'
         items:
-          $ref: '#/definitions/v1Component'
-        x-order: 2
+          $ref: '#/definitions/Component'
+        x-order: 0
       in_ports_map:
         type: object
         additionalProperties:
-          $ref: '#/definitions/v1InPort'
-        x-order: 0
+          $ref: '#/definitions/InPort'
+        x-order: 1
       name:
         description: Name of the nested circuit component. This name is displayed
           by graph visualization tools.
         type: string
-        x-order: 3
+        x-order: 2
       out_ports_map:
         type: object
         additionalProperties:
-          $ref: '#/definitions/v1OutPort'
-        x-order: 1
+          $ref: '#/definitions/OutPort'
+        x-order: 3
       short_description:
         description: Short description of the nested circuit component. This description
           is displayed by graph visualization tools.
         type: string
         x-order: 4
-  v1NestedSignalEgress:
+  NestedSignalEgress:
     description: Nested signal egress is a special type of component that allows to
       extract a signal from a nested circuit.
     type: object
@@ -2162,19 +2041,19 @@ definitions:
       in_ports:
         description: Input ports for the NestedSignalEgress component.
         x-order: 0
-        $ref: '#/definitions/v1NestedSignalEgressIns'
+        $ref: '#/definitions/NestedSignalEgressIns'
       port_name:
         type: string
         x-order: 1
-  v1NestedSignalEgressIns:
+  NestedSignalEgressIns:
     description: Inputs for the NestedSignalEgress component.
     type: object
     properties:
       signal:
         description: The signal to be egressed.
         x-order: 0
-        $ref: '#/definitions/v1InPort'
-  v1NestedSignalIngress:
+        $ref: '#/definitions/InPort'
+  NestedSignalIngress:
     description: Nested signal ingress is a special type of component that allows
       to inject a signal into a nested circuit.
     type: object
@@ -2182,34 +2061,34 @@ definitions:
       out_ports:
         description: Output ports for the NestedSignalIngress component.
         x-order: 0
-        $ref: '#/definitions/v1NestedSignalIngressOuts'
+        $ref: '#/definitions/NestedSignalIngressOuts'
       port_name:
         type: string
         x-order: 1
-  v1NestedSignalIngressOuts:
+  NestedSignalIngressOuts:
     description: Outputs for the NestedSignalIngress component.
     type: object
     properties:
       signal:
         description: The signal to be ingressed.
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1Or:
+        $ref: '#/definitions/OutPort'
+  Or:
     description: |-
       Logical OR.
 
-      See [And component](#v1-and) on how signals are mapped onto boolean values.
+      See [And component](#and) on how signals are mapped onto boolean values.
     type: object
     properties:
       in_ports:
         description: Input ports for the Or component.
         x-order: 0
-        $ref: '#/definitions/v1OrIns'
+        $ref: '#/definitions/OrIns'
       out_ports:
         description: Output ports for the Or component.
         x-order: 1
-        $ref: '#/definitions/v1OrOuts'
-  v1OrIns:
+        $ref: '#/definitions/OrOuts'
+  OrIns:
     description: Inputs for the Or component.
     type: object
     properties:
@@ -2220,9 +2099,9 @@ definitions:
           @gotags: validate:"dive"
         type: array
         items:
-          $ref: '#/definitions/v1InPort'
+          $ref: '#/definitions/InPort'
         x-order: 0
-  v1OrOuts:
+  OrOuts:
     description: Output ports for the Or component.
     type: object
     properties:
@@ -2232,8 +2111,8 @@ definitions:
 
           Will always be 0 (false), 1 (true) or invalid (unknown).
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1OutPort:
+        $ref: '#/definitions/OutPort'
+  OutPort:
     type: object
     title: Components produce output for other components via OutPorts
     properties:
@@ -2241,7 +2120,7 @@ definitions:
         description: Name of the outgoing Signal on the OutPort.
         type: string
         x-order: 0
-  v1PathTemplateMatcher:
+  PathTemplateMatcher:
     description: |-
       HTTP path will be matched against given path templates.
       If a match occurs, the value associated with the path template will be treated as a result.
@@ -2279,7 +2158,7 @@ definitions:
           type: string
         x-go-validate: required
         x-order: 0
-  v1Policy:
+  Policy:
     description: |-
       :::info
 
@@ -2295,12 +2174,12 @@ definitions:
       circuit:
         description: Defines the control-loop logic of the policy.
         x-order: 0
-        $ref: '#/definitions/v1Circuit'
+        $ref: '#/definitions/Circuit'
       resources:
         description: Resources (Flux Meters, Classifiers etc.) to setup.
         x-order: 1
-        $ref: '#/definitions/v1Resources'
-  v1PromQL:
+        $ref: '#/definitions/Resources'
+  PromQL:
     type: object
     title: Component that runs a Prometheus query periodically and returns the result
       as an output signal
@@ -2312,11 +2191,11 @@ definitions:
           @gotags: default:"10s"
         type: string
         x-go-default: 10s
-        x-order: 2
+        x-order: 0
       out_ports:
         description: Output ports for the PromQL component.
-        x-order: 0
-        $ref: '#/definitions/v1PromQLOuts'
+        x-order: 1
+        $ref: '#/definitions/PromQLOuts'
       query_string:
         description: |-
           Describes the Prometheus query to be run.
@@ -2328,16 +2207,16 @@ definitions:
 
           :::
         type: string
-        x-order: 1
-  v1PromQLOuts:
+        x-order: 2
+  PromQLOuts:
     description: Output for the PromQL component.
     type: object
     properties:
       output:
         description: The result of the Prometheus query as an output signal.
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1PulseGenerator:
+        $ref: '#/definitions/OutPort'
+  PulseGenerator:
     description: Generates 0 and 1 in turns.
     type: object
     properties:
@@ -2348,10 +2227,10 @@ definitions:
           @gotags: default:"5s"
         type: string
         x-go-default: 5s
-        x-order: 2
-      out_ports:
         x-order: 0
-        $ref: '#/definitions/v1PulseGeneratorOuts'
+      out_ports:
+        x-order: 1
+        $ref: '#/definitions/PulseGeneratorOuts'
       true_for:
         description: |-
           Emitting 1 for the true_for duration.
@@ -2359,15 +2238,15 @@ definitions:
           @gotags: default:"5s"
         type: string
         x-go-default: 5s
-        x-order: 1
-  v1PulseGeneratorOuts:
+        x-order: 2
+  PulseGeneratorOuts:
     description: Outputs for the PulseGenerator component.
     type: object
     properties:
       output:
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1Query:
+        $ref: '#/definitions/OutPort'
+  Query:
     description: Query components that are query databases such as Prometheus.
     type: object
     properties:
@@ -2375,8 +2254,8 @@ definitions:
         description: Periodically runs a Prometheus query in the background and emits
           the result.
         x-order: 0
-        $ref: '#/definitions/v1PromQL'
-  v1RateLimiter:
+        $ref: '#/definitions/PromQL'
+  RateLimiter:
     description: |-
       :::info
 
@@ -2391,32 +2270,32 @@ definitions:
     properties:
       default_config:
         title: Default configuration
-        x-order: 4
-        $ref: '#/definitions/v1RateLimiterDynamicConfig'
+        x-order: 0
+        $ref: '#/definitions/RateLimiterDynamicConfig'
       dynamic_config_key:
         type: string
         title: Configuration key for DynamicConfig
-        x-order: 3
+        x-order: 1
       flow_selector:
         description: |-
           Which control point to apply this ratelimiter to.
 
           @gotags: validate:"required"
         x-go-validate: required
-        x-order: 1
-        $ref: '#/definitions/v1FlowSelector'
+        x-order: 2
+        $ref: '#/definitions/FlowSelector'
       in_ports:
         title: '@gotags: validate:"required"'
         x-go-validate: required
-        x-order: 0
-        $ref: '#/definitions/v1RateLimiterIns'
+        x-order: 3
+        $ref: '#/definitions/RateLimiterIns'
       parameters:
         description: '@gotags: validate:"required"'
         title: Parameters for the RateLimiter component
         x-go-validate: required
-        x-order: 2
-        $ref: '#/definitions/v1RateLimiterParameters'
-  v1RateLimiterDynamicConfig:
+        x-order: 4
+        $ref: '#/definitions/RateLimiterParameters'
+  RateLimiterDynamicConfig:
     type: object
     title: Dynamic Configuration for the rate limiter
     properties:
@@ -2429,7 +2308,7 @@ definitions:
         items:
           $ref: '#/definitions/RateLimiterOverride'
         x-order: 0
-  v1RateLimiterIns:
+  RateLimiterIns:
     type: object
     title: Inputs for the RateLimiter component
     properties:
@@ -2441,15 +2320,35 @@ definitions:
           :::tip
 
           Negative limit can be useful to _conditionally_ enable the ratelimiter
-          under certain circumstances. [Decider](#v1-decider) might be helpful.
+          under certain circumstances. [Decider](#decider) might be helpful.
 
           :::
 
           @gotags: validate:"required"
         x-go-validate: required
         x-order: 0
-        $ref: '#/definitions/v1InPort'
-  v1RateLimiterParameters:
+        $ref: '#/definitions/InPort'
+  RateLimiterOverride:
+    type: object
+    properties:
+      label_value:
+        description: |-
+          Value of the label for which the override should be applied.
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
+        x-order: 0
+      limit_scale_factor:
+        description: |-
+          Amount by which the _in\_ports.limit_ should be multiplied for this label value.
+
+          @gotags: default:"1.0"
+        type: number
+        format: double
+        x-go-default: 1
+        x-order: 1
+  RateLimiterParameters:
     type: object
     properties:
       label_key:
@@ -2464,11 +2363,11 @@ definitions:
           @gotags: validate:"required"
         type: string
         x-go-validate: required
-        x-order: 1
+        x-order: 0
       lazy_sync:
         title: Configuration of lazy-syncing behaviour of ratelimiter
-        x-order: 2
-        $ref: '#/definitions/ParametersLazySync'
+        x-order: 1
+        $ref: '#/definitions/RateLimiterParametersLazySync'
       limit_reset_interval:
         description: |-
           Time after which the limit for a given label value will be reset.
@@ -2476,8 +2375,27 @@ definitions:
           @gotags: default:"60s"
         type: string
         x-go-default: 60s
+        x-order: 2
+  RateLimiterParametersLazySync:
+    type: object
+    properties:
+      enabled:
+        description: '@gotags: default:"false"'
+        type: boolean
+        title: Enables lazy sync
+        x-go-default: false
         x-order: 0
-  v1Resources:
+      num_sync:
+        description: |-
+          Number of times to lazy sync within the _limit\_reset\_interval_.
+
+          @gotags: default:"5" validate:"gt=0"
+        type: integer
+        format: int64
+        x-go-default: 5
+        x-go-validate: gt=0
+        x-order: 1
+  Resources:
     description: |-
       :::info
 
@@ -2498,8 +2416,8 @@ definitions:
           @gotags: validate:"dive"
         type: array
         items:
-          $ref: '#/definitions/v1Classifier'
-        x-order: 1
+          $ref: '#/definitions/Classifier'
+        x-order: 0
       flux_meters:
         description: |-
           Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
@@ -2509,9 +2427,9 @@ definitions:
           @gotags: validate:"dive"
         type: object
         additionalProperties:
-          $ref: '#/definitions/v1FluxMeter'
-        x-order: 0
-  v1Rule:
+          $ref: '#/definitions/FluxMeter'
+        x-order: 1
+  Rule:
     description: |-
       Flow classification rule extracts a value from request metadata.
       More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
@@ -2554,7 +2472,7 @@ definitions:
       extractor:
         description: High-level declarative extractor.
         x-order: 0
-        $ref: '#/definitions/v1Extractor'
+        $ref: '#/definitions/Extractor'
       rego:
         description: Rego module to extract a value from.
         x-order: 1
@@ -2582,7 +2500,33 @@ definitions:
           propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
         x-go-validate: required
         x-order: 2
-  v1Scheduler:
+  RuleRego:
+    description: High-level extractor-based rules are compiled into a single rego
+      query.
+    type: object
+    title: Raw rego rules are compiled 1:1 to rego queries
+    properties:
+      query:
+        description: |-
+          Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
+
+          Note: The module name must match the package name from the "source".
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
+        x-order: 0
+      source:
+        description: |-
+          Source code of the rego module.
+
+          Note: Must include a "package" declaration.
+
+          @gotags: validate:"required"
+        type: string
+        x-go-validate: required
+        x-order: 1
+  Scheduler:
     description: |-
       :::note
 
@@ -2591,14 +2535,14 @@ definitions:
 
       :::
 
-      See [ConcurrencyLimiter](#v1-concurrency-limiter) for more context.
+      See [ConcurrencyLimiter](#concurrency-limiter) for more context.
     type: object
     title: Weighted Fair Queuing-based workload scheduler
     properties:
       out_ports:
         description: Output ports for the Scheduler component.
         x-order: 0
-        $ref: '#/definitions/v1SchedulerOuts'
+        $ref: '#/definitions/SchedulerOuts'
       parameters:
         description: |-
           Scheduler parameters.
@@ -2606,8 +2550,8 @@ definitions:
           @gotags: validate:"required"
         x-go-validate: required
         x-order: 1
-        $ref: '#/definitions/v1SchedulerParameters'
-  v1SchedulerOuts:
+        $ref: '#/definitions/SchedulerParameters'
+  SchedulerOuts:
     description: Output for the Scheduler component.
     type: object
     properties:
@@ -2630,7 +2574,7 @@ definitions:
 
           Value of this signal is aggregated from all the relevant schedulers.
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
+        $ref: '#/definitions/OutPort'
       incoming_concurrency:
         description: |-
           Incoming concurrency is concurrency that'd be needed to accept all the
@@ -2640,8 +2584,8 @@ definitions:
           up work-seconds from all the flows entering scheduler, including
           rejected ones.
         x-order: 1
-        $ref: '#/definitions/v1OutPort'
-  v1SchedulerParameters:
+        $ref: '#/definitions/OutPort'
+  SchedulerParameters:
     type: object
     title: Scheduler parameters
     properties:
@@ -2655,7 +2599,7 @@ definitions:
           @gotags: default:"true"
         type: boolean
         x-go-default: "true"
-        x-order: 2
+        x-order: 0
       default_workload_parameters:
         description: |-
           Parameters to be used if none of workloads specified in `workloads` match.
@@ -2689,7 +2633,7 @@ definitions:
         title: Max Timeout is the value with which the flow timeout calculated by
           `timeout_factor` is capped
         x-go-default: 0.49s
-        x-order: 4
+        x-order: 2
       timeout_factor:
         description: |-
           If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,
@@ -2733,8 +2677,64 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/SchedulerWorkload'
+        x-order: 4
+  SchedulerWorkload:
+    description: Workload defines a class of requests that preferably have similar
+      properties such as response latency or desired priority.
+    type: object
+    properties:
+      label_matcher:
+        description: |-
+          Label Matcher to select a Workload based on
+          [flow labels](/concepts/integrations/flow-control/flow-label.md).
+
+          @gotags: validate:"required"
+        x-go-validate: required
         x-order: 0
-  v1ServiceSelector:
+        $ref: '#/definitions/LabelMatcher'
+      parameters:
+        description: |-
+          Parameters associated with flows matching the label matcher.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+        x-order: 1
+        $ref: '#/definitions/SchedulerWorkloadParameters'
+  SchedulerWorkloadParameters:
+    description: Parameters defines parameters such as priority, tokens and fairness
+      key that are applicable to flows within a workload.
+    type: object
+    properties:
+      fairness_key:
+        description: |-
+          Fairness key is a label key that can be used to provide fairness within a workload.
+          Any [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if
+          you have a classifier that sets `user` flow label, you might want to set
+          `fairness_key = "user"`.
+        type: string
+        x-order: 0
+      priority:
+        description: |-
+          Describes priority level of the requests within the workload.
+          Priority level ranges from 0 to 255.
+          Higher numbers means higher priority level.
+
+          @gotags: validate:"gte=0,lte=255"
+        type: integer
+        format: int64
+        x-go-validate: gte=0,lte=255
+        x-order: 1
+      tokens:
+        description: |-
+          Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
+          This override is applicable only if `auto_tokens` is set to false.
+
+          @gotags: default:"1"
+        type: string
+        format: uint64
+        x-go-default: 1
+        x-order: 2
+  ServiceSelector:
     description: |-
       :::info
 
@@ -2787,7 +2787,7 @@ definitions:
         type: string
         x-go-validate: required
         x-order: 1
-  v1Sqrt:
+  Sqrt:
     description: |-
       $$
       \text{output} = \text{scale} \sqrt{\text{input}}
@@ -2799,11 +2799,11 @@ definitions:
       in_ports:
         description: Input ports for the Sqrt component.
         x-order: 0
-        $ref: '#/definitions/v1SqrtIns'
+        $ref: '#/definitions/SqrtIns'
       out_ports:
         description: Output ports for the Sqrt component.
         x-order: 1
-        $ref: '#/definitions/v1SqrtOuts'
+        $ref: '#/definitions/SqrtOuts'
       scale:
         description: |-
           Scaling factor to be multiplied with the square root of the input signal.
@@ -2813,23 +2813,23 @@ definitions:
         format: double
         x-go-default: 1
         x-order: 2
-  v1SqrtIns:
+  SqrtIns:
     description: Inputs for the Sqrt component.
     type: object
     properties:
       input:
         description: Input signal.
         x-order: 0
-        $ref: '#/definitions/v1InPort'
-  v1SqrtOuts:
+        $ref: '#/definitions/InPort'
+  SqrtOuts:
     description: Outputs for the Sqrt component.
     type: object
     properties:
       output:
         description: Output signal.
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1Switcher:
+        $ref: '#/definitions/OutPort'
+  Switcher:
     description: |-
       `on_true` will be returned if switch input is valid and not equal to 0.0 ,
        otherwise `on_false` will be returned.
@@ -2840,63 +2840,63 @@ definitions:
       in_ports:
         description: Input ports for the Switcher component.
         x-order: 0
-        $ref: '#/definitions/v1SwitcherIns'
+        $ref: '#/definitions/SwitcherIns'
       out_ports:
         description: Output ports for the Switcher component.
         x-order: 1
-        $ref: '#/definitions/v1SwitcherOuts'
-  v1SwitcherIns:
+        $ref: '#/definitions/SwitcherOuts'
+  SwitcherIns:
     description: Inputs for the Switcher component.
     type: object
     properties:
       on_false:
         description: Output signal when switch is invalid or 0.0.
-        x-order: 1
-        $ref: '#/definitions/v1InPort'
+        x-order: 0
+        $ref: '#/definitions/InPort'
       on_true:
         description: Output signal when switch is valid and not 0.0.
-        x-order: 0
-        $ref: '#/definitions/v1InPort'
+        x-order: 1
+        $ref: '#/definitions/InPort'
       switch:
         description: Decides whether to return on_true or on_false.
         x-order: 2
-        $ref: '#/definitions/v1InPort'
-  v1SwitcherOuts:
+        $ref: '#/definitions/InPort'
+  SwitcherOuts:
     description: Outputs for the Switcher component.
     type: object
     properties:
       output:
         description: Selected signal (on_true or on_false).
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
-  v1Variable:
+        $ref: '#/definitions/OutPort'
+  Variable:
     description: Component that emits a variable value as an output signal, can be
       defined in dynamic configuration.
     type: object
     properties:
       default_config:
         description: Default configuration.
-        x-order: 2
-        $ref: '#/definitions/v1VariableDynamicConfig'
+        x-order: 0
+        $ref: '#/definitions/VariableDynamicConfig'
       dynamic_config_key:
         description: Configuration key for DynamicConfig.
         type: string
         x-order: 1
       out_ports:
         description: Output ports for the Variable component.
-        x-order: 0
-        $ref: '#/definitions/v1VariableOuts'
-  v1VariableDynamicConfig:
+        x-order: 2
+        $ref: '#/definitions/VariableOuts'
+  VariableDynamicConfig:
     type: object
     properties:
       constant_signal:
         x-order: 0
-        $ref: '#/definitions/v1ConstantSignal'
-  v1VariableOuts:
+        $ref: '#/definitions/ConstantSignal'
+  VariableOuts:
     description: Outputs for the Variable component.
     type: object
     properties:
       output:
         description: The value is emitted to the output port.
         x-order: 0
-        $ref: '#/definitions/v1OutPort'
+        $ref: '#/definitions/OutPort'

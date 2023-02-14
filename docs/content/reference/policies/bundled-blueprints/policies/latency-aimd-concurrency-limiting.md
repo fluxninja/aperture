@@ -88,7 +88,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
 <ParameterDescription
     name="policy.flux_meter"
     type="aperture.spec.v1.FluxMeter"
-    reference="../../spec#v1-flux-meter"
+    reference="../../spec#flux-meter"
     value="{'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'agent_group': 'default', 'service': '__REQUIRED_FIELD__'}}}"
     description='Flux Meter.' />
 
@@ -109,14 +109,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
 <ParameterDescription
     name="policy.classifiers"
     type="[]aperture.spec.v1.Classifier"
-    reference="../../spec#v1-classifier"
+    reference="../../spec#classifier"
     value="[]"
     description='List of classification rules.' />
 
 <ParameterDescription
     name="policy.components"
     type="[]aperture.spec.v1.Component"
-    reference="../../spec#v1-component"
+    reference="../../spec#component"
     value="[]"
     description='List of additional circuit components.' />
 
@@ -125,7 +125,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
 <ParameterDescription
     name="policy.latency_baseliner.ema"
     type="aperture.spec.v1.EMAParameters"
-    reference="../../spec#v1-e-m-a-parameters"
+    reference="../../spec#e-m-a-parameters"
     value="{'correction_factor_on_max_envelope_violation': 0.95, 'ema_window': '1500s', 'warmup_window': '60s'}"
     description='EMA parameters.' />
 
@@ -148,7 +148,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
 <ParameterDescription
     name="policy.concurrency_controller.flow_selector"
     type="aperture.spec.v1.FlowSelector"
-    reference="../../spec#v1-flow-selector"
+    reference="../../spec#flow-selector"
     value="{'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'agent_group': 'default', 'service': '__REQUIRED_FIELD__'}}"
     description='Concurrency Limiter flow selector.' />
 
@@ -169,21 +169,21 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
 <ParameterDescription
     name="policy.concurrency_controller.scheduler"
     type="aperture.spec.v1.SchedulerParameters"
-    reference="../../spec#v1-scheduler-parameters"
+    reference="../../spec#scheduler-parameters"
     value="{'auto_tokens': True, 'default_workload_parameters': {'priority': 20}, 'timeout_factor': 0.5, 'workloads': []}"
     description='Scheduler parameters.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.gradient"
     type="aperture.spec.v1.GradientControllerParameters"
-    reference="../../spec#v1-gradient-controller-parameters"
+    reference="../../spec#gradient-controller-parameters"
     value="{'max_gradient': 1, 'min_gradient': 0.1, 'slope': -1}"
     description='Gradient Controller parameters.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.alerter"
     type="aperture.spec.v1.AlerterParameters"
-    reference="../../spec#v1-alerter-parameters"
+    reference="../../spec#alerter-parameters"
     value="{'alert_channels': [], 'alert_name': 'Load Shed Event', 'resolve_timeout': '5s'}"
     description='Whether tokens for workloads are computed dynamically or set statically by the user.' />
 

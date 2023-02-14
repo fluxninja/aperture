@@ -211,9 +211,9 @@ See [full example in reference][reference]
 [label]: /concepts/integrations/flow-control/flow-label.md
 [baggage]: /concepts/integrations/flow-control/flow-label.md#baggage
 [request-labels]: ./flow-label.md#request-labels
-[reference]: /reference/policies/spec.md#v1-classifier
-[rule]: /reference/policies/spec.md#v1-rule
-[extractor]: /reference/policies/spec.md#v1-extractor
+[reference]: /reference/policies/spec.md#classifier
+[rule]: /reference/policies/spec.md#rule
+[extractor]: /reference/policies/spec.md#extractor
 [rego-rule]: /reference/policies/spec.md#rule-rego
 [plugin]: /arc/plugin.md
 [label-matcher]: ./flow-selector.md#label-matcher
