@@ -69,11 +69,8 @@ func (a *Alerter) setup(alerterIface *alerts.SimpleAlerter) {
 // Execute implements runtime.Component.Execute.
 func (a *Alerter) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	signalValue := inPortReadings.ReadSingleReadingPort("signal")
-	if !signalValue.Valid() {
-		return nil, nil
-	}
 
-	if signalValue.Value() > 0 {
+	if runtime.FromReading(signalValue) > 0 {
 		a.alerterIface.AddAlert(a.createAlert())
 	}
 

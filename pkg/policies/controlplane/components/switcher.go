@@ -39,7 +39,7 @@ func (dec *Switcher) Execute(inPortReadings runtime.PortToReading, tickInfo runt
 
 	var output runtime.Reading
 
-	if switchValue.Valid() && switchValue.Value() != 0 {
+	if runtime.FromReading(switchValue) > 0 {
 		output = onTrue
 	} else {
 		output = onFalse
