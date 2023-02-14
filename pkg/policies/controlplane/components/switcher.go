@@ -6,7 +6,6 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/tristate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -40,7 +39,7 @@ func (dec *Switcher) Execute(inPortReadings runtime.PortToReading, tickInfo runt
 
 	var output runtime.Reading
 
-	if tristate.FromReading(switchValue) == tristate.True && switchValue.Value() != 0 {
+	if switchValue.Valid() && switchValue.Value() != 0 {
 		output = onTrue
 	} else {
 		output = onFalse

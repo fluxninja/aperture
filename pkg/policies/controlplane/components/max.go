@@ -8,7 +8,6 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/tristate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -42,7 +41,7 @@ func (max *Max) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.T
 
 	if len(inputs) > 0 {
 		for _, singleInput := range inputs {
-			if tristate.FromReading(singleInput) == tristate.False {
+			if !singleInput.Valid() {
 				return runtime.PortToReading{
 					"output": []runtime.Reading{output},
 				}, nil

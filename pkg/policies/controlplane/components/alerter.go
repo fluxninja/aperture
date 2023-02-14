@@ -11,7 +11,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/tristate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -70,7 +69,7 @@ func (a *Alerter) setup(alerterIface *alerts.SimpleAlerter) {
 // Execute implements runtime.Component.Execute.
 func (a *Alerter) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	signalValue := inPortReadings.ReadSingleReadingPort("signal")
-	if tristate.FromReading(signalValue) == tristate.False {
+	if !signalValue.Valid() {
 		return nil, nil
 	}
 

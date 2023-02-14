@@ -10,7 +10,6 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/tristate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/pkg/utils"
@@ -72,12 +71,12 @@ func (d *Differentiator) Execute(inPortReadings runtime.PortToReading, tickInfo 
 		oldestIdx := d.oldestIdx
 		newestIdx := d.newestIdx
 
-		if tristate.FromReading(oldest) == tristate.False {
+		if !oldest.Valid() {
 			oldest, oldestIdx = d.firstValid(d.oldestIdx, true)
 		}
 
 		// find the newest valid reading for extrapolation
-		if tristate.FromReading(newest) == tristate.False {
+		if !newest.Valid() {
 			found, foundIdx := d.firstValid(d.newestIdx, false)
 			if found.Valid() && oldest.Valid() && foundIdx != oldestIdx {
 				extrapolatedValue := d.extrapolate(oldest, found, oldestIdx, foundIdx)
@@ -87,7 +86,7 @@ func (d *Differentiator) Execute(inPortReadings runtime.PortToReading, tickInfo 
 		}
 
 		// calculate the derivative
-		if tristate.FromReading(oldest) == tristate.True && tristate.FromReading(newest) == tristate.True && newestIdx != oldestIdx {
+		if oldest.Valid() && newest.Valid() && newestIdx != oldestIdx {
 			diff := (newest.Value() - oldest.Value()) / float64(d.capacity)
 			outputVal = runtime.NewReading(diff)
 		}
@@ -133,12 +132,10 @@ func (d *Differentiator) firstValid(fromIdx int, addition bool) (runtime.Reading
 
 	idx := utils.Mod((fromIdx + step), d.capacity)
 	for i := 0; i < d.capacity; i++ {
-
-		if tristate.FromReading(d.readings[idx]) == tristate.True {
+		if d.readings[idx].Valid() {
 			return d.readings[idx], idx
 		}
 		idx = utils.Mod((idx + step), d.capacity)
-
 	}
 	return runtime.InvalidReading(), idx
 }

@@ -9,7 +9,6 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/tristate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -44,7 +43,7 @@ func (sqrt *Sqrt) Execute(inPortReadings runtime.PortToReading, tickInfo runtime
 	input := inPortReadings.ReadSingleReadingPort("input")
 	output := runtime.InvalidReading()
 
-	if tristate.FromReading(input) == tristate.True {
+	if input.Valid() {
 		// Square root the input and scale it.
 		sqrtIn := math.Sqrt(input.Value())
 		if !math.IsNaN(sqrtIn) {
