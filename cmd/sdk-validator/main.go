@@ -251,7 +251,7 @@ func stopDockerContainer(id string) error {
 		return err
 	}
 
-	err = cli.ContainerStop(ctx, id, nil)
+	err = cli.ContainerStop(ctx, id, container.StopOptions{})
 	if err != nil {
 		return err
 	}

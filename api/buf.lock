@@ -8,7 +8,7 @@ deps:
   - remote: buf.build
     owner: envoyproxy
     repository: envoy
-    commit: 9d94dd27a89f4801bf6d1e70bafe3d72
+    commit: c868b2efed9144f498baa4ca3a5a6d19
   - remote: buf.build
     owner: envoyproxy
     repository: protoc-gen-validate
