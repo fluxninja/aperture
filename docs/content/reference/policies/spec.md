@@ -233,7 +233,7 @@ Inputs for the Alerter component.
 <dt>signal</dt>
 <dd>
 
-([InPort](#in-port)) Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.
+([InPort](#in-port)) Signal which Alerter is monitoring. If the signal is a valid non-zero value, Alerter generates an alert.
 
 </dd>
 </dl>
@@ -2128,7 +2128,7 @@ Inputs for the Integrator component.
 <dt>reset</dt>
 <dd>
 
-([InPort](#in-port)) Resets the integrator output to zero when reset signal is valid and non-zero.
+([InPort](#in-port)) Resets the integrator output to zero when reset signal is valid and non-zero value.
 
 </dd>
 </dl>
@@ -3723,7 +3723,7 @@ Outputs for the Sqrt component.
 
 Type of combinator that switches between `on_true` and `on_false` signals based on switch input
 
-`on_true` will be returned if switch input is valid and not equal to 0.0 ,
+`on_true` will be returned if switch input is a valid non-zero value,
 otherwise `on_false` will be returned.
 
 #### Properties
