@@ -212,7 +212,7 @@ jobs:
     executor: ubuntu-18-executor
     environment:
       TAP_REPO: /home/circleci/taps
-      APERTURE_DIR: /home/circleci/project
+      APERTURE_REPO: /home/circleci/project
       VERSION: <<parameters.tag>>
     steps:
       - checkout
@@ -232,7 +232,6 @@ jobs:
             git config --global user.email "circleci-gitbot@fluxninja.com"
 
             git clone --depth=1 git@github.com:fluxninja/homebrew-aperture.git "${TAP_REPO}"
-            # TODO: Select proper branch!
           environment:
             DEPLOYMENT_KEY: << parameters.deployment-key >>
       - run:
@@ -240,23 +239,27 @@ jobs:
           command: |
             "${TAP_REPO}/scripts/update_brews.py" "${TAP_REPO}/Formulas/*.rb"
       - run: *install-gh-cli
-      - opsninja_install
       - run:
           name: "Update brew repository"
           command: |
             cd "${TAP_REPO}"
+
+            vless="${VERSION:1}"
+            rcless="${vless%%-*}"
+            formula_version="${rcless%.*}"
+            branch="update_aperture_${formula_version}"
+
+            git checkout -B "${branch}"
+            ./scripts/update_brews.py add-version "${formula_version}"
+            ./scripts/update_brews.py delete
+            ./scripts/update_brews.py update
+
+            git status
+            git diff
             git add .
             git commit -m "Update brews for release ${VERSION}"
-            release_args=(
-              --repo-path "${TAP_REPO}"
-              --version "${VERSION}"
-              --ref "<TODO>"
-              --message "Release ${VERSION}"
-              --create-branch
-              --push
-            )
-            fn release create-release "${release_args[@]]}"
-            # TODO: If release is final and "latest", make sure to update main to point to the new commit
+            git push origin "${branch}"
+            gh pr create --title "${MSG}" --body "" --label "pr-pull"
 
 workflows:
   version: 2
