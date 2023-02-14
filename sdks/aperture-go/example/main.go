@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/connectivity"
@@ -69,7 +70,7 @@ func main() {
 
 	appPort := getEnvOrDefault("FN_APP_PORT", defaultAppPort)
 	// Create a server with passing it the Aperture client.
-	mux := http.NewServeMux()
+	mux := mux.NewRouter()
 	a := &app{
 		server: &http.Server{
 			Addr:    net.JoinHostPort("localhost", appPort),
@@ -79,7 +80,17 @@ func main() {
 		grpcClient:     apertureAgentGRPCClient,
 	}
 
-	mux.HandleFunc("/super", a.SuperHandler)
+	// do some business logic to collect labels
+	labels := map[string]string{
+		"user": "kenobi",
+	}
+
+	// Adding the http middleware to be executed before the actual business logic execution.
+	mux.PathPrefix("/super").Handler(
+		a.apertureClient.HTTPMiddleware("awesomeFeature", labels, 30*time.Second)(
+			a.SuperHandler(),
+		),
+	)
 	mux.HandleFunc("/connected", a.ConnectedHandler)
 	mux.HandleFunc("/health", a.HealthHandler)
 
@@ -102,34 +113,12 @@ func main() {
 }
 
 // SuperHandler handles HTTP requests on /super endpoint.
-func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := context.Background()
-
-	// do some business logic to collect labels
-	labels := map[string]string{
-		"user": "kenobi",
-	}
-
-	// StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
-	flow, err := a.apertureClient.StartFlow(ctx, "awesomeFeature", labels)
-	if err != nil {
-		log.Printf("Aperture flow control got error. Returned flow defaults to Allowed. flow.Accepted(): %t", flow.Accepted())
-	}
-
-	// See whether flow was accepted by Aperture Agent.
-	if flow.Accepted() {
+func (a *app) SuperHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusAccepted)
 		// Simulate work being done
 		time.Sleep(2 * time.Second)
-		// Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.
-		// The first argument captures whether the feature captured by the Flow was successful or resulted in an error.
-		// The second argument is error message for further diagnosis.
-		_ = flow.End(aperture.OK)
-	} else {
-		w.WriteHeader(http.StatusForbidden)
-		// Flow has been rejected by Aperture Agent.
-		_ = flow.End(aperture.Error)
-	}
+	})
 }
 
 // ConnectedHandler handles HTTP requests on /connected endpoint.
