@@ -16,6 +16,7 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
 
 	flowcontrol "github.com/fluxninja/aperture-go/gen/proto/flowcontrol/check/v1"
@@ -145,11 +146,14 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 func (client *apertureClient) HTTPMiddleware(controlPoint string, labels map[string]string, timeout time.Duration) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			newLabels := make(map[string]string, len(labels))
+			maps.Copy(newLabels, labels)
+
 			for key, value := range r.Header {
-				labels[key] = strings.Join(value, ",")
+				newLabels[key] = strings.Join(value, ",")
 			}
 
-			flow := client.executeFlow(controlPoint, labels, timeout)
+			flow := client.executeFlow(controlPoint, newLabels, timeout)
 
 			if flow.Accepted() {
 				// Simulate work being done
@@ -175,14 +179,17 @@ func (client *apertureClient) HTTPMiddleware(controlPoint string, labels map[str
 // GRPCUnaryInterceptor takes a control point name, labels and timeout and creates a UnaryInterceptor which can be used with gRPC server.
 func (client *apertureClient) GRPCUnaryInterceptor(controlPoint string, labels map[string]string, timeout time.Duration) func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		newLabels := make(map[string]string, len(labels))
+		maps.Copy(newLabels, labels)
+
 		md, ok := metadata.FromIncomingContext(ctx)
 		if ok {
 			for key, value := range md {
-				labels[key] = strings.Join(value, ",")
+				newLabels[key] = strings.Join(value, ",")
 			}
 		}
 
-		flow := client.executeFlow(controlPoint, labels, timeout)
+		flow := client.executeFlow(controlPoint, newLabels, timeout)
 
 		if flow.Accepted() {
 			// Simulate work being done
