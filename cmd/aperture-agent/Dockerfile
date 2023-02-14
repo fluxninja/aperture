@@ -42,7 +42,7 @@ RUN --mount=type=cache,target=/go/pkg/,readonly \
   '
 
 # Final image
-FROM debian:bullseye-slim AS pluginless
+FROM debian:bullseye-slim AS agent-base
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates \
@@ -54,5 +54,5 @@ RUN mkdir -p /etc/aperture/aperture-agent/flowcontrol /etc/aperture/aperture-age
 COPY --link --from=builder /aperture-agent /aperture-agent
 CMD ["/aperture-agent"]
 
-FROM pluginless
+FROM agent-base AS agent-with-plugins
 COPY --link --from=plugins-builder /plugins /opt/aperture/aperture-agent/plugins
