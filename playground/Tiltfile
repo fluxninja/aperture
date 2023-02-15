@@ -850,7 +850,7 @@ def process_aperture_scenario(scenario_path):
         "renderer": "yaml",
         "labels": "TestScenarioApplication",
         "manifests_path": PLAYGROUND_ROOT + "/" + "scenarios/wavepool-generator",
-        "resource_deps": ["scenario-policies"],
+        "resource_deps": ["scenario-policies", "cluster-bootstrap"],
         "env_vars": {
             "NINJA_WAVEPOOL_JS": wavepool_js
         },
@@ -859,6 +859,12 @@ def process_aperture_scenario(scenario_path):
                 "workload": "wavepool-generator",
                 "extra_objects": [
                     "wavepool-config:configmap"
+                ]
+            },
+            {
+                "workload": "wavepool-graphql-generator",
+                "extra_objects": [
+                    "wavepool-graphql-config:configmap"
                 ]
             }
         ]
