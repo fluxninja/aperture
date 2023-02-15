@@ -42,7 +42,7 @@ brew install fluxninja/aperture/aperturectl
 <TabItem value="Linux" label="Linux">
 With Homebrew:
 <CodeBlock language="bash">
-brew install aperturectl
+brew install fluxninja/aperture/aperturectl
 </CodeBlock>
 With dpkg:
 <CodeBlock language="bash">
