@@ -1059,6 +1059,30 @@ def declare_resources(resources, dep_tree, inv_dep_tree,race_arg):
         fail("SKIP_LOCAL_CMDS mode enabled")
 
 
+def process_dockerhub_images(dockerhub_images):
+    for namespace, workloads in DEP_TREE.items():
+        for workload, sections in workloads.items():
+            if "images" not in sections:
+                continue
+
+            images_final = []
+            for image in sections["images"]:
+                image_ref = image["ref"]
+                if image_ref not in dockerhub_images:
+                    images_final += [image]
+
+                images_final += [{"ref": image_ref, "tag": "latest"}]
+            sections["images"] = images_final
+
+
+def process_local_settings(local_settings):
+    print("Applying local settings from ./tilt_local.json")
+    override_default_registry = local_settings.get("default_registry", None)
+    if override_default_registry:
+        print("Overriding default registry to: "+ override_default_registry)
+        default_registry(override_default_registry)
+
+
 ############
 ### MAIN ###
 ############
@@ -1071,11 +1095,16 @@ config.define_bool("only", usage="Only deploy explicitly resources, without hand
 config.define_bool("verbose", usage="Enable verbose logging")
 config.define_bool("trace", usage="Enable trace logging")
 config.define_string("scenario", usage="Demo scenario to execute")
+config.define_string_list("dockerhub-image", usage="A list of images to pull directly from docker.io/fluxninja")
 config.define_bool("race",usage="Enable race detector for agent and controller")
 config.define_bool("skip-plugins", usage="Skip plugin building")
 cfg = config.parse()
 # Enable all resources, as calling `config.parse()` by default disables all
 config.set_enabled_resources([])
+
+local_settings = read_json("tilt_local.json", None)
+if local_settings:
+    process_local_settings(local_settings)
 
 if cfg.get("list-resources", False):
     print_available_resources(DEP_TREE)
@@ -1086,6 +1115,12 @@ if cfg.get("manual", False):
     trigger_mode(TRIGGER_MODE_MANUAL)
 
 get_race = cfg.get("race",False)
+
+# Optionally, process a list of images that should be pulled from dockerhub instead of being
+# built locally. This is mostly meant for aperture-agent, aperture-controller and aperture-operator.
+dockerhub_images = cfg.get("dockerhub-image", [])
+if dockerhub_images:
+    process_dockerhub_images(dockerhub_images)
 
 scenario = cfg.get("scenario", None)
 # If we are running specific test scenario, we don't want to run all workloads but only what's needed
