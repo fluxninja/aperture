@@ -35,7 +35,7 @@ func (c *logicalCombinator) Execute(inPortReadings runtime.PortToReading, tickIn
 
 	output := c.neutralElement
 	for _, input := range inputs {
-		output = c.op(output, tristate.ReadValue(input))
+		output = c.op(output, tristate.FromReading(input))
 	}
 
 	return runtime.PortToReading{
@@ -89,7 +89,7 @@ func (c *inverter) Execute(inPortReadings runtime.PortToReading, tickInfo runtim
 
 	return runtime.PortToReading{
 		"output": []runtime.Reading{
-			tristate.ReadValue(input).Not().ToReading(),
+			tristate.FromReading(input).Not().ToReading(),
 		},
 	}, nil
 }
