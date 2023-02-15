@@ -2,9 +2,7 @@ package com.fluxninja.aperture.sdk;
 
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest;
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse;
-import com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowControlServiceGrpc;
 import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
-import com.fluxninja.generated.envoy.service.auth.v3.AuthorizationGrpc;
 import io.grpc.StatusRuntimeException;
 import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageEntry;
@@ -17,22 +15,21 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import static com.fluxninja.aperture.sdk.Constants.*;
 
 public final class ApertureSDK {
-  private final FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient;
-  private final AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient;
+  private final FlowControlClient flowControlClient;
+  private final EnvoyAuthzClient envoyAuthzClient;
   private final Tracer tracer;
   private final Duration timeout;
   private final List<String> blockedPaths;
   private final boolean blockedPathsMatchRegex;
 
   ApertureSDK(
-      FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient,
-      AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient,
+      FlowControlClient flowControlClient,
+      EnvoyAuthzClient envoyAuthzClient,
       Tracer tracer,
       Duration timeout,
       List<String> blockedPaths,
@@ -85,8 +82,7 @@ public final class ApertureSDK {
     CheckResponse res;
     try {
       res = this.flowControlClient
-          .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
-          .check(req);
+          .check(req, timeout);
     } catch (StatusRuntimeException e) {
       // deadline exceeded or couldn't reach agent - request should not be blocked
       res = CheckResponse.newBuilder()
@@ -118,8 +114,7 @@ public final class ApertureSDK {
     com.fluxninja.generated.envoy.service.auth.v3.CheckResponse res;
     try {
       res = this.envoyAuthzClient
-          .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
-          .check(req);
+          .check(req, timeout);
     } catch (StatusRuntimeException e) {
       // deadline exceeded or couldn't reach agent - request should not be blocked
       res = TrafficFlow.successfulResponse();
