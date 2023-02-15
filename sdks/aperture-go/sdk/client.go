@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -20,8 +21,9 @@ import (
 	"google.golang.org/grpc"
 
 	flowcontrol "github.com/fluxninja/aperture-go/gen/proto/flowcontrol/check/v1"
+	"github.com/go-logr/logr"
+	"github.com/go-logr/zerologr"
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
@@ -39,6 +41,7 @@ type apertureClient struct {
 	tracer            trace.Tracer
 	timeout           time.Duration
 	exporter          *otlptrace.Exporter
+	log               logr.Logger
 }
 
 // Options that the user can pass to Aperture in order to receive a new Client.
@@ -46,7 +49,7 @@ type apertureClient struct {
 type Options struct {
 	ApertureAgentGRPCClientConn *grpc.ClientConn
 	CheckTimeout                time.Duration
-	Logger                      *zerolog.Logger
+	Logger                      *logr.Logger
 }
 
 // NewClient returns a new Client that can be used to perform Check calls.
@@ -83,11 +86,13 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 		timeout = opts.CheckTimeout
 	}
 
+	var log logr.Logger
 	if opts.Logger != nil {
-		log.Logger = *opts.Logger
+		log = *opts.Logger
 	} else {
 		zerolog.TimeFieldFormat = time.RFC3339
-		zerolog.SetGlobalLevel(zerolog.TraceLevel)
+		zl := zerolog.New(os.Stderr).With().Caller().Timestamp().Logger()
+		log = zerologr.New(&zl).WithName("aperture-go-sdk").V(1)
 	}
 
 	c := &apertureClient{
@@ -95,6 +100,7 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 		tracer:            tracer,
 		timeout:           timeout,
 		exporter:          exporter,
+		log:               log,
 	}
 	return c, nil
 }
@@ -172,13 +178,13 @@ func (client *apertureClient) HTTPMiddleware(controlPoint string, labels map[str
 				// The second argument is error message for further diagnosis.
 				err := flow.End(OK)
 				if err != nil {
-					log.Debug().Fields(err).Msgf("Aperture flow control end got error.")
+					client.log.Info("Aperture flow control end got error.", "error", err)
 				}
 			} else {
 				w.WriteHeader(http.StatusForbidden)
 				err := flow.End(OK)
 				if err != nil {
-					log.Debug().Fields(err).Msgf("Aperture flow control end got error.")
+					client.log.Info("Aperture flow control end got error.", "error", err)
 				}
 			}
 		})
@@ -208,13 +214,13 @@ func (client *apertureClient) GRPCUnaryInterceptor(controlPoint string, labels m
 			// The second argument is error message for further diagnosis.
 			flowErr := flow.End(OK)
 			if flowErr != nil {
-				log.Debug().Fields(flowErr).Msgf("Aperture flow control end got error.")
+				client.log.Info("Aperture flow control end got error.", "error", err)
 			}
 			return resp, err
 		} else {
 			err := flow.End(OK)
 			if err != nil {
-				log.Debug().Fields(err).Msgf("Aperture flow control end got error.")
+				client.log.Info("Aperture flow control end got error.", "error", err)
 			}
 			return nil, status.Error(http.StatusForbidden, "Aperture Rejected the Request")
 		}
@@ -228,7 +234,7 @@ func (client *apertureClient) executeFlow(controlPoint string, labels map[string
 	// StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
 	flow, err := client.StartFlow(context, controlPoint, labels)
 	if err != nil {
-		log.Debug().Msgf("Aperture flow control got error. Returned flow defaults to Allowed. flow.Accepted(): %t", flow.Accepted())
+		client.log.Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Accepted()", flow.Accepted())
 	}
 
 	return flow
