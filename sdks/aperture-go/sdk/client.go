@@ -2,9 +2,9 @@ package aperture
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
@@ -22,8 +22,7 @@ import (
 
 	flowcontrol "github.com/fluxninja/aperture-go/gen/proto/flowcontrol/check/v1"
 	"github.com/go-logr/logr"
-	"github.com/go-logr/zerologr"
-	"github.com/rs/zerolog"
+	"github.com/go-logr/stdr"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
@@ -86,13 +85,11 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 		timeout = opts.CheckTimeout
 	}
 
-	var log logr.Logger
+	var logger logr.Logger
 	if opts.Logger != nil {
-		log = *opts.Logger
+		logger = *opts.Logger
 	} else {
-		zerolog.TimeFieldFormat = time.RFC3339
-		zl := zerolog.New(os.Stderr).With().Caller().Timestamp().Logger()
-		log = zerologr.New(&zl).WithName("aperture-go-sdk").V(1)
+		logger = stdr.New(log.Default()).WithName("aperture-go-sdk")
 	}
 
 	c := &apertureClient{
@@ -100,7 +97,7 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 		tracer:            tracer,
 		timeout:           timeout,
 		exporter:          exporter,
-		log:               log,
+		log:               logger,
 	}
 	return c, nil
 }
