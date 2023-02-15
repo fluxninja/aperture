@@ -11,6 +11,13 @@ local helm = tanka.helm.new(helpers.helmChartsRoot);
     name: 'controller',
   },
   values:: {
+    prometheus: {
+      server: {
+        persistentVolume: {
+          size: '10Gi',
+        },
+      },
+    },
   },
   'aperture-controller':
     helm.template($.environment.name, 'charts/aperture-controller', {
