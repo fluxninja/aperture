@@ -17,7 +17,6 @@ limitations under the License.
 package mutatingwebhook
 
 import (
-	. "github.com/fluxninja/aperture/operator/controllers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -26,12 +25,14 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/pointer"
 
+	agent "github.com/fluxninja/aperture/cmd/aperture-agent/config"
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
+	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 )
 
 var _ = Describe("Sidecar container for Agent", func() {
@@ -79,18 +80,20 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{
-								Ports: otelcollector.PortsConfig{
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
+						},
+						OTEL: agent.AgentOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
+								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
 									PprofPort:       1777,
 									ZpagesPort:      55679,
 								},
 							},
-						},
-						DistCache: distcache.DistCacheConfig{
-							MemberlistBindAddr: ":3322",
-							BindAddr:           ":3320",
 						},
 					},
 					Image: common.AgentImage{
@@ -212,18 +215,20 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{
-								Ports: otelcollector.PortsConfig{
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
+						},
+						OTEL: agent.AgentOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
+								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
 									PprofPort:       1777,
 									ZpagesPort:      55679,
 								},
 							},
-						},
-						DistCache: distcache.DistCacheConfig{
-							MemberlistBindAddr: ":3322",
-							BindAddr:           ":3320",
 						},
 					},
 					Image: common.AgentImage{
@@ -242,7 +247,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 				Image:           "auto",
 				ImagePullPolicy: corev1.PullAlways,
 				SecurityContext: &corev1.SecurityContext{
-					RunAsUser: pointer.Int64Ptr(1001),
+					RunAsUser: pointer.Int64(1001),
 				},
 				Command: TestArray,
 				Args:    TestArray,
@@ -271,7 +276,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 				Image:           "docker.io/fluxninja/aperture-agent:latest",
 				ImagePullPolicy: corev1.PullAlways,
 				SecurityContext: &corev1.SecurityContext{
-					RunAsUser: pointer.Int64Ptr(1001),
+					RunAsUser: pointer.Int64(1001),
 				},
 				Command: TestArray,
 				Args:    TestArray,
@@ -390,18 +395,20 @@ var _ = Describe("Sidecar container for Agent", func() {
 									Addr: ":8000",
 								},
 							},
-							Otel: otelcollector.OtelConfig{
-								Ports: otelcollector.PortsConfig{
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
+						},
+						OTEL: agent.AgentOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
+								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
 									PprofPort:       1777,
 									ZpagesPort:      55679,
 								},
 							},
-						},
-						DistCache: distcache.DistCacheConfig{
-							MemberlistBindAddr: ":3322",
-							BindAddr:           ":3320",
 						},
 					},
 					CommonSpec: common.CommonSpec{
@@ -468,9 +475,9 @@ var _ = Describe("Sidecar container for Agent", func() {
 				Image:           "docker.io/fluxninja/aperture-agent:latest",
 				ImagePullPolicy: corev1.PullIfNotPresent,
 				SecurityContext: &corev1.SecurityContext{
-					RunAsUser:              pointer.Int64Ptr(0),
-					RunAsNonRoot:           pointer.BoolPtr(false),
-					ReadOnlyRootFilesystem: pointer.BoolPtr(false),
+					RunAsUser:              pointer.Int64(0),
+					RunAsNonRoot:           pointer.Bool(false),
+					ReadOnlyRootFilesystem: pointer.Bool(false),
 				},
 				Command:   TestArray,
 				Args:      TestArray,
@@ -515,7 +522,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 				LivenessProbe: &corev1.Probe{
 					ProbeHandler: corev1.ProbeHandler{
 						HTTPGet: &corev1.HTTPGetAction{
-							Path:   "/v1/status/liveness",
+							Path:   "/v1/status/subsystem/liveness",
 							Port:   intstr.FromString(Server),
 							Scheme: corev1.URISchemeHTTP,
 						},
@@ -529,7 +536,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 				ReadinessProbe: &corev1.Probe{
 					ProbeHandler: corev1.ProbeHandler{
 						HTTPGet: &corev1.HTTPGetAction{
-							Path:   "/v1/status/readiness",
+							Path:   "/v1/status/subsystem/readiness",
 							Port:   intstr.FromString(Server),
 							Scheme: corev1.URISchemeHTTP,
 						},
@@ -642,18 +649,20 @@ var _ = Describe("Pod modification for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{
-								Ports: otelcollector.PortsConfig{
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
+						},
+						OTEL: agent.AgentOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
+								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
 									PprofPort:       1777,
 									ZpagesPort:      55679,
 								},
 							},
-						},
-						DistCache: distcache.DistCacheConfig{
-							MemberlistBindAddr: ":3322",
-							BindAddr:           ":3320",
 						},
 					},
 					Image: common.AgentImage{
@@ -759,7 +768,7 @@ var _ = Describe("Pod modification for Agent", func() {
 							Name: "aperture-agent-config",
 							VolumeSource: corev1.VolumeSource{
 								ConfigMap: &corev1.ConfigMapVolumeSource{
-									DefaultMode: pointer.Int32Ptr(420),
+									DefaultMode: pointer.Int32(420),
 									LocalObjectReference: corev1.LocalObjectReference{
 										Name: AgentServiceName,
 									},
@@ -795,18 +804,20 @@ var _ = Describe("Pod modification for Agent", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{
-								Ports: otelcollector.PortsConfig{
+						},
+						DistCache: distcache.DistCacheConfig{
+							MemberlistBindAddr: ":3322",
+							BindAddr:           ":3320",
+						},
+						OTEL: agent.AgentOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
+								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
 									PprofPort:       1777,
 									ZpagesPort:      55679,
 								},
 							},
-						},
-						DistCache: distcache.DistCacheConfig{
-							MemberlistBindAddr: ":3322",
-							BindAddr:           ":3320",
 						},
 					},
 					CommonSpec: common.CommonSpec{
@@ -978,7 +989,7 @@ var _ = Describe("Pod modification for Agent", func() {
 							Name: "aperture-agent-config",
 							VolumeSource: corev1.VolumeSource{
 								ConfigMap: &corev1.ConfigMapVolumeSource{
-									DefaultMode: pointer.Int32Ptr(420),
+									DefaultMode: pointer.Int32(420),
 									LocalObjectReference: corev1.LocalObjectReference{
 										Name: AgentServiceName,
 									},

@@ -22,6 +22,7 @@ private static final long serialVersionUID = 0L;
   private LimiterDecision() {
     policyName_ = "";
     policyHash_ = "";
+    componentId_ = "";
     reason_ = 0;
   }
 
@@ -67,9 +68,10 @@ private static final long serialVersionUID = 0L;
             policyHash_ = s;
             break;
           }
-          case 24: {
+          case 26: {
+            java.lang.String s = input.readStringRequireUtf8();
 
-            componentIndex_ = input.readInt64();
+            componentId_ = s;
             break;
           }
           case 32: {
@@ -1652,15 +1654,42 @@ private static final long serialVersionUID = 0L;
     }
   }
 
-  public static final int COMPONENT_INDEX_FIELD_NUMBER = 3;
-  private long componentIndex_;
+  public static final int COMPONENT_ID_FIELD_NUMBER = 3;
+  private volatile java.lang.Object componentId_;
   /**
-   * <code>int64 component_index = 3 [json_name = "componentIndex"];</code>
-   * @return The componentIndex.
+   * <code>string component_id = 3 [json_name = "componentId"];</code>
+   * @return The componentId.
    */
   @java.lang.Override
-  public long getComponentIndex() {
-    return componentIndex_;
+  public java.lang.String getComponentId() {
+    java.lang.Object ref = componentId_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      componentId_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string component_id = 3 [json_name = "componentId"];</code>
+   * @return The bytes for componentId.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getComponentIdBytes() {
+    java.lang.Object ref = componentId_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      componentId_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
   }
 
   public static final int DROPPED_FIELD_NUMBER = 4;
@@ -1775,8 +1804,8 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(policyHash_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 2, policyHash_);
     }
-    if (componentIndex_ != 0L) {
-      output.writeInt64(3, componentIndex_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(componentId_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 3, componentId_);
     }
     if (dropped_ != false) {
       output.writeBool(4, dropped_);
@@ -1805,9 +1834,8 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(policyHash_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, policyHash_);
     }
-    if (componentIndex_ != 0L) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeInt64Size(3, componentIndex_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(componentId_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, componentId_);
     }
     if (dropped_ != false) {
       size += com.google.protobuf.CodedOutputStream
@@ -1844,8 +1872,8 @@ private static final long serialVersionUID = 0L;
         .equals(other.getPolicyName())) return false;
     if (!getPolicyHash()
         .equals(other.getPolicyHash())) return false;
-    if (getComponentIndex()
-        != other.getComponentIndex()) return false;
+    if (!getComponentId()
+        .equals(other.getComponentId())) return false;
     if (getDropped()
         != other.getDropped()) return false;
     if (reason_ != other.reason_) return false;
@@ -1877,9 +1905,8 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getPolicyName().hashCode();
     hash = (37 * hash) + POLICY_HASH_FIELD_NUMBER;
     hash = (53 * hash) + getPolicyHash().hashCode();
-    hash = (37 * hash) + COMPONENT_INDEX_FIELD_NUMBER;
-    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-        getComponentIndex());
+    hash = (37 * hash) + COMPONENT_ID_FIELD_NUMBER;
+    hash = (53 * hash) + getComponentId().hashCode();
     hash = (37 * hash) + DROPPED_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getDropped());
@@ -2038,7 +2065,7 @@ private static final long serialVersionUID = 0L;
 
       policyHash_ = "";
 
-      componentIndex_ = 0L;
+      componentId_ = "";
 
       dropped_ = false;
 
@@ -2074,7 +2101,7 @@ private static final long serialVersionUID = 0L;
       com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision result = new com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision(this);
       result.policyName_ = policyName_;
       result.policyHash_ = policyHash_;
-      result.componentIndex_ = componentIndex_;
+      result.componentId_ = componentId_;
       result.dropped_ = dropped_;
       result.reason_ = reason_;
       if (detailsCase_ == 6) {
@@ -2148,8 +2175,9 @@ private static final long serialVersionUID = 0L;
         policyHash_ = other.policyHash_;
         onChanged();
       }
-      if (other.getComponentIndex() != 0L) {
-        setComponentIndex(other.getComponentIndex());
+      if (!other.getComponentId().isEmpty()) {
+        componentId_ = other.componentId_;
+        onChanged();
       }
       if (other.getDropped() != false) {
         setDropped(other.getDropped());
@@ -2366,33 +2394,78 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private long componentIndex_ ;
+    private java.lang.Object componentId_ = "";
     /**
-     * <code>int64 component_index = 3 [json_name = "componentIndex"];</code>
-     * @return The componentIndex.
+     * <code>string component_id = 3 [json_name = "componentId"];</code>
+     * @return The componentId.
      */
-    @java.lang.Override
-    public long getComponentIndex() {
-      return componentIndex_;
+    public java.lang.String getComponentId() {
+      java.lang.Object ref = componentId_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        componentId_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
     }
     /**
-     * <code>int64 component_index = 3 [json_name = "componentIndex"];</code>
-     * @param value The componentIndex to set.
+     * <code>string component_id = 3 [json_name = "componentId"];</code>
+     * @return The bytes for componentId.
+     */
+    public com.google.protobuf.ByteString
+        getComponentIdBytes() {
+      java.lang.Object ref = componentId_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        componentId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string component_id = 3 [json_name = "componentId"];</code>
+     * @param value The componentId to set.
      * @return This builder for chaining.
      */
-    public Builder setComponentIndex(long value) {
-      
-      componentIndex_ = value;
+    public Builder setComponentId(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      componentId_ = value;
       onChanged();
       return this;
     }
     /**
-     * <code>int64 component_index = 3 [json_name = "componentIndex"];</code>
+     * <code>string component_id = 3 [json_name = "componentId"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearComponentIndex() {
+    public Builder clearComponentId() {
       
-      componentIndex_ = 0L;
+      componentId_ = getDefaultInstance().getComponentId();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string component_id = 3 [json_name = "componentId"];</code>
+     * @param value The bytes for componentId to set.
+     * @return This builder for chaining.
+     */
+    public Builder setComponentIdBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      componentId_ = value;
       onChanged();
       return this;
     }

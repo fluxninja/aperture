@@ -17,12 +17,14 @@ import (
 
 // Alerter is a component that monitors signal value and creates alert on true value.
 type Alerter struct {
-	name           string
-	severity       string
-	resolveTimeout time.Duration
-	alertChannels  []string
 	alerterIface   alerts.Alerter
 	policyReadAPI  iface.Policy
+	name           string
+	severity       string
+	alertChannels  []string
+	componentID    string
+	resolveTimeout time.Duration
+	labels         map[string]string
 }
 
 // Name implements runtime.Component.
@@ -31,19 +33,28 @@ func (*Alerter) Name() string { return "Alerter" }
 // Type implements runtime.Component.
 func (*Alerter) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
 
+// ShortDescription implements runtime.Component.
+func (a *Alerter) ShortDescription() string { return fmt.Sprintf("%s/%s", a.name, a.severity) }
+
 // Make sure Alerter complies with Component interface.
 var _ runtime.Component = (*Alerter)(nil)
 
 // NewAlerterAndOptions creates alerter and its fx options.
-func NewAlerterAndOptions(alerterProto *policylangv1.Alerter, _ int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewAlerterAndOptions(alerterProto *policylangv1.Alerter, componentID string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+	parameters := alerterProto.Parameters
 	alerter := &Alerter{
-		name:           alerterProto.AlerterConfig.AlertName,
-		severity:       alerterProto.AlerterConfig.Severity,
-		resolveTimeout: alerterProto.AlerterConfig.ResolveTimeout.AsDuration(),
+		name:           parameters.AlertName,
+		severity:       parameters.Severity,
+		resolveTimeout: parameters.ResolveTimeout.AsDuration(),
 		alertChannels:  make([]string, 0),
 		policyReadAPI:  policyReadAPI,
+		componentID:    componentID,
+		labels:         make(map[string]string),
 	}
-	alerter.alertChannels = append(alerter.alertChannels, alerterProto.AlerterConfig.AlertChannels...)
+	alerter.alertChannels = append(alerter.alertChannels, parameters.AlertChannels...)
+	if alerterProto.Parameters.Labels != nil {
+		alerter.labels = alerterProto.Parameters.Labels
+	}
 
 	return alerter, fx.Options(
 		fx.Invoke(
@@ -56,13 +67,15 @@ func (a *Alerter) setup(alerterIface *alerts.SimpleAlerter) {
 }
 
 // Execute implements runtime.Component.Execute.
-func (a *Alerter) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	signalValue := inPortReadings.ReadSingleValuePort("alert")
+func (a *Alerter) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	signalValue := inPortReadings.ReadSingleReadingPort("signal")
 	if !signalValue.Valid() {
 		return nil, nil
 	}
 
-	a.alerterIface.AddAlert(a.createAlert())
+	if signalValue.Value() > 0 {
+		a.alerterIface.AddAlert(a.createAlert())
+	}
 
 	return nil, nil
 }
@@ -78,11 +91,16 @@ func (a *Alerter) createAlert() *alerts.Alert {
 		alerts.WithAlertChannels(a.alertChannels),
 		alerts.WithLabel("policy_name", a.policyReadAPI.GetPolicyName()),
 		alerts.WithLabel("type", "alerter"),
+		alerts.WithLabel("component_id", a.componentID),
 		alerts.WithResolveTimeout(a.resolveTimeout),
 		alerts.WithGeneratorURL(
 			fmt.Sprintf("http://%s/%s/%s", info.GetHostInfo().Hostname, a.policyReadAPI.GetPolicyName(), a.name),
 		),
 	)
+
+	for key, val := range a.labels {
+		newAlert.SetLabel(key, val)
+	}
 
 	return newAlert
 }

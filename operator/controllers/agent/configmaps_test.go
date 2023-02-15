@@ -23,23 +23,24 @@ import (
 	"text/template"
 	"time"
 
-	. "github.com/fluxninja/aperture/operator/controllers"
-
-	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
-	"github.com/fluxninja/aperture/operator/api/common"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/distcache"
-	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
-	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
-	"github.com/fluxninja/aperture/pkg/plugins"
-	"github.com/fluxninja/aperture/pkg/prometheus"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/pointer"
+
+	agent "github.com/fluxninja/aperture/cmd/aperture-agent/config"
+	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/common"
+	. "github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/distcache"
+	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
+	"github.com/fluxninja/aperture/pkg/net/listener"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	"github.com/fluxninja/aperture/pkg/plugins"
+	"github.com/fluxninja/aperture/pkg/prometheus"
 )
 
 //go:embed config_test.tpl
@@ -75,24 +76,6 @@ var _ = Describe("ConfigMap for Agent", func() {
 								DisablePlugins:  false,
 								DisabledPlugins: []string{"aperture-plugin-fluxninja"},
 							},
-							Otel: otelcollector.OtelConfig{
-								BatchPrerollup: otelcollector.BatchPrerollupConfig{
-									Timeout:          config.MakeDuration(1 * time.Second),
-									SendBatchSize:    10000,
-									SendBatchMaxSize: 20000,
-								},
-								BatchPostrollup: otelcollector.BatchPostrollupConfig{
-									Timeout:          config.MakeDuration(1 * time.Second),
-									SendBatchSize:    100,
-									SendBatchMaxSize: 200,
-								},
-								Ports: otelcollector.PortsConfig{
-									DebugPort:       8888,
-									HealthCheckPort: 13133,
-									PprofPort:       1777,
-									ZpagesPort:      55679,
-								},
-							},
 							Etcd: etcd.EtcdConfig{
 								Endpoints: []string{"http://agent-etcd:2379"},
 								LeaseTTL:  config.MakeDuration(60 * time.Second),
@@ -104,6 +87,26 @@ var _ = Describe("ConfigMap for Agent", func() {
 						DistCache: distcache.DistCacheConfig{
 							BindAddr:           ":3320",
 							MemberlistBindAddr: ":3322",
+						},
+						OTEL: agent.AgentOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
+								Ports: otelconfig.PortsConfig{
+									DebugPort:       8888,
+									HealthCheckPort: 13133,
+									PprofPort:       1777,
+									ZpagesPort:      55679,
+								},
+							},
+							BatchPrerollup: agent.BatchPrerollupConfig{
+								Timeout:          config.MakeDuration(1 * time.Second),
+								SendBatchSize:    10000,
+								SendBatchMaxSize: 20000,
+							},
+							BatchPostrollup: agent.BatchPostrollupConfig{
+								Timeout:          config.MakeDuration(1 * time.Second),
+								SendBatchSize:    100,
+								SendBatchMaxSize: 200,
+							},
 						},
 					},
 				},
@@ -135,8 +138,8 @@ var _ = Describe("ConfigMap for Agent", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Agent",
-							Controller:         pointer.BoolPtr(true),
-							BlockOwnerDeletion: pointer.BoolPtr(true),
+							Controller:         pointer.Bool(true),
+							BlockOwnerDeletion: pointer.Bool(true),
 						},
 					},
 				},

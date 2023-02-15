@@ -1,18 +1,25 @@
 # syntax=docker/dockerfile:1
-FROM golang:1.19 as builder
+FROM golang:1.19-bullseye AS builder
 
-WORKDIR /workspace
+WORKDIR /src
 COPY --link . .
 
 RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.cache/go-build/ \
-  CGO_ENABLED=0 go build -a -o aperture-operator operator/main.go
+  go mod download
+
+RUN --mount=type=cache,target=/go/pkg/ \
+  --mount=type=cache,target=/root/.cache/go-build/ \
+  CGO_ENABLED=0 go build \
+  -a \
+  -o aperture-operator \
+  operator/main.go
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
 FROM gcr.io/distroless/static:nonroot
 WORKDIR /
-COPY --from=builder /workspace/aperture-operator .
+COPY --from=builder /src/aperture-operator .
 USER 65532:65532
 
 ENTRYPOINT ["/aperture-operator"]

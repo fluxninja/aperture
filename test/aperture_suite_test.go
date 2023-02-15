@@ -16,7 +16,7 @@ import (
 	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/alerts"
-	"github.com/fluxninja/aperture/pkg/controlpointcache"
+	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
@@ -25,9 +25,12 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -156,7 +159,7 @@ var _ = BeforeSuite(func() {
 			servicegetter.NewEmpty,
 			agentinfo.ProvideAgentInfo,
 			flowcontrol.NewEngine,
-			controlpointcache.Provide,
+			cache.NewCache[selectors.ControlPointID],
 		),
 		otelcollector.Module(),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
@@ -226,29 +229,36 @@ var _ = AfterSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 })
 
-func provideOTELConfig() *otelcollector.OTELConfig {
-	cfg := otelcollector.NewOTELConfig()
-	cfg.AddReceiver("prometheus", map[string]interface{}{
-		"config": map[string]interface{}{
-			"scrape_configs": []map[string]interface{}{
-				{
-					"job_name":        "aperture-agent",
-					"scrape_interval": "5s",
-					"static_configs": []map[string]interface{}{
-						{
-							"targets": []string{addr},
+func provideOTELConfig() *otelconfig.OTELConfig {
+	cfg := otelconfig.NewOTELConfig()
+	if phStarted {
+		cfg.AddReceiver("prometheus", map[string]interface{}{
+			"config": map[string]interface{}{
+				"scrape_configs": []map[string]interface{}{
+					{
+						"job_name":        "aperture-agent",
+						"scrape_interval": "5s",
+						"static_configs": []map[string]interface{}{
+							{
+								"targets": []string{addr},
+							},
 						},
 					},
 				},
 			},
-		},
-	})
-	cfg.AddExporter("prometheusremotewrite", map[string]interface{}{
-		"endpoint": ph.Endpoint + "/api/v1/write",
-	})
-	cfg.Service.AddPipeline("metrics", otelcollector.Pipeline{
-		Receivers: []string{"prometheus"},
-		Exporters: []string{"prometheusremotewrite"},
-	})
+		})
+		cfg.AddExporter("prometheusremotewrite", map[string]interface{}{
+			"endpoint": ph.Endpoint + "/api/v1/write",
+		})
+		cfg.Service.AddPipeline("metrics", otelconfig.Pipeline{
+			Receivers: []string{"prometheus"},
+			Exporters: []string{"prometheusremotewrite"},
+		})
+	} else {
+		cfg.Service.AddPipeline("metrics", otelconfig.Pipeline{
+			Receivers: []string{otelconsts.ReceiverOTLP},
+			Exporters: []string{otelconsts.ExporterLogging},
+		})
+	}
 	return cfg
 }

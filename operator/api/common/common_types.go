@@ -20,6 +20,8 @@ package common
 import (
 	amclient "github.com/fluxninja/aperture/pkg/alertmanager/client"
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
+	"github.com/fluxninja/aperture/pkg/discovery/static"
 	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/metrics"
@@ -28,7 +30,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/http"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/plugins"
 	"github.com/fluxninja/aperture/pkg/profilers"
 	"github.com/fluxninja/aperture/pkg/prometheus"
@@ -318,10 +319,6 @@ type CommonConfigSpec struct {
 	//+kubebuilder:validation:Optional
 	Metrics metrics.MetricsConfig `json:"metrics"`
 
-	// OTEL configuration.
-	//+kubebuilder:validation:Optional
-	Otel otelcollector.OtelConfig `json:"otel"`
-
 	// Plugins configuration.
 	//+kubebuilder:validation:Optional
 	Plugins plugins.PluginsConfig `json:"plugins"`
@@ -394,11 +391,20 @@ type ClientConfigSpec struct {
 
 // BundledPluginsSpec defines configuration for bundled plugins.
 type BundledPluginsSpec struct {
-	// FluxNinja Cloud plugin configuration.
+	// FluxNinja ARC plugin configuration.
 	//+kubebuilder:validation:Optional
 	FluxNinjaPlugin pluginconfig.FluxNinjaPluginConfig `json:"fluxninja_plugin"`
 
 	// Sentry plugin configuration.
 	//+kubebuilder:validation:Optional
 	SentryPlugin sentry.SentryConfig `json:"sentry_plugin"`
+}
+
+// ServiceDiscoverySpec defines configuration for Service discoveru.
+type ServiceDiscoverySpec struct {
+	// KubernetesDiscoveryConfig for Kubernetes service discovery.
+	KubernetesDiscoveryConfig kubernetes.KubernetesDiscoveryConfig `json:"kubernetes"`
+
+	// StaticDiscoveryConfig for pre-determined list of services.
+	StaticDiscoveryConfig static.StaticDiscoveryConfig `json:"static"`
 }

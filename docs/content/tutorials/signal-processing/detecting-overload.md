@@ -27,7 +27,8 @@ service and trigger load-shedding at a downstream service.
 
 One of the most reliable metrics to detect overload state is latency of the
 service requests. In Aperture, latency of service requests can be easily
-reported using a [Flux Meter](/concepts/flow-control/flux-meter.md).
+reported using a
+[Flux Meter](/concepts/integrations/flow-control/flux-meter.md).
 
 :::tip
 
@@ -35,8 +36,8 @@ It is recommended to apply the Flux Meter to a single type of workload in order
 to avoid mixing the latency measurements across distinct workloads. For example,
 if there are Select and Insert API calls on the same service, it is recommended
 to measure the latency of only one of those workloads using a Flux Meter. Refer
-[FlowSelector](/concepts/flow-control/flow-selector.md#flowselector) on how to
-apply the Flux Meter to a subset of API calls for a service.
+[FlowSelector](/concepts/integrations/flow-control/flow-selector.md#flowselector)
+on how to apply the Flux Meter to a subset of API calls for a service.
 
 :::
 
@@ -51,20 +52,20 @@ service to be overloaded at that time.
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="Jsonnet">
-```
-
-```jsonnet
-{@include: ./assets/detecting-overload/detecting-overload.jsonnet}
-```
-
-```mdx-code-block
-</TabItem>
 <TabItem value="YAML">
 ```
 
 ```yaml
 {@include: ./assets/detecting-overload/detecting-overload.yaml}
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Jsonnet">
+```
+
+```jsonnet
+{@include: ./assets/detecting-overload/detecting-overload.jsonnet}
 ```
 
 ```mdx-code-block
@@ -85,8 +86,8 @@ service to be overloaded at that time.
 ### Playground
 
 When the above policy is loaded in Aperture's
-[Playground](/get-started/playground.md), we will see the various signal metrics
-collected from the execution of the policy:
+[Playground](/get-started/playground/playground.md), we will see the various
+signal metrics collected from the execution of the policy:
 
 <Zoom>
 

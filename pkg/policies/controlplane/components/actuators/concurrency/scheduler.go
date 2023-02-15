@@ -46,7 +46,7 @@ type Scheduler struct {
 	writer           *etcdwriter.Writer
 	agentGroupName   string
 	etcdPath         string
-	componentIndex   int
+	componentID      string
 }
 
 // Name implements runtime.Component.
@@ -55,15 +55,18 @@ func (*Scheduler) Name() string { return "Scheduler" }
 // Type implements runtime.Component.
 func (*Scheduler) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
 
+// ShortDescription implements runtime.Component.
+func (s *Scheduler) ShortDescription() string { return s.agentGroupName }
+
 // NewSchedulerAndOptions creates scheduler and its fx options.
 func NewSchedulerAndOptions(
 	schedulerProto *policylangv1.Scheduler,
-	componentIndex int,
+	componentID string,
 	policyReadAPI iface.Policy,
 	agentGroupName string,
 ) (runtime.Component, fx.Option, error) {
 	etcdPath := path.Join(paths.AutoTokenResultsPath,
-		paths.FlowControlComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentIndex)))
+		paths.AgentComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), componentID))
 
 	scheduler := &Scheduler{
 		policyReadAPI: policyReadAPI,
@@ -71,26 +74,26 @@ func NewSchedulerAndOptions(
 			TokensByWorkloadIndex: make(map[string]uint64),
 		},
 		agentGroupName: agentGroupName,
-		componentIndex: componentIndex,
+		componentID:    componentID,
 		etcdPath:       etcdPath,
 	}
 
 	// Prepare parameters for prometheus queries
-	policyParams := fmt.Sprintf("%s=\"%s\",%s=\"%s\",%s=\"%d\"",
+	policyParams := fmt.Sprintf("%s=\"%s\",%s=\"%s\",%s=\"%s\"",
 		metrics.PolicyNameLabel,
 		policyReadAPI.GetPolicyName(),
 		metrics.PolicyHashLabel,
 		policyReadAPI.GetPolicyHash(),
-		metrics.ComponentIndexLabel,
-		componentIndex,
+		metrics.ComponentIDLabel,
+		componentID,
 	)
 
 	acceptedQuery, acceptedQueryOptions, acceptedQueryErr := promql.NewScalarQueryAndOptions(
 		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
-			metrics.AcceptedConcurrencyMetricName,
+			metrics.AcceptedWorkSecondsMetricName,
 			policyParams),
 		concurrencyQueryInterval,
-		componentIndex,
+		componentID,
 		policyReadAPI,
 		"AcceptedConcurrency",
 	)
@@ -101,10 +104,10 @@ func NewSchedulerAndOptions(
 
 	incomingQuery, incomingQueryOptions, incomingQueryErr := promql.NewScalarQueryAndOptions(
 		fmt.Sprintf("sum(rate(%s{%s}[10s]))",
-			metrics.IncomingConcurrencyMetricName,
+			metrics.IncomingWorkSecondsMetricName,
 			policyParams),
 		concurrencyQueryInterval,
-		componentIndex,
+		componentID,
 		policyReadAPI,
 		"IncomingConcurrency",
 	)
@@ -115,7 +118,10 @@ func NewSchedulerAndOptions(
 
 	// add decision_type filter to the params
 	autoTokensPolicyParams := policyParams + ",decision_type!=\"DECISION_TYPE_REJECTED\""
-	if schedulerProto.AutoTokens {
+	if schedulerProto.Parameters == nil {
+		return nil, nil, fmt.Errorf("scheduler parameters are nil")
+	}
+	if schedulerProto.Parameters.AutoTokens {
 		tokensQuery, tokensQueryOptions, tokensQueryErr := promql.NewTaggedQueryAndOptions(
 			fmt.Sprintf("sum by (%s) (increase(%s{%s}[30m])) / sum by (%s) (increase(%s{%s}[30m]))",
 				metrics.WorkloadIndexLabel,
@@ -125,7 +131,7 @@ func NewSchedulerAndOptions(
 				metrics.WorkloadLatencyCountMetricName,
 				autoTokensPolicyParams),
 			tokensQueryInterval,
-			componentIndex,
+			componentID,
 			policyReadAPI,
 			"Tokens",
 		)
@@ -173,7 +179,7 @@ func (s *Scheduler) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Life
 }
 
 // Execute implements runtime.Component.Execute.
-func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (s *Scheduler) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	logger := s.policyReadAPI.GetStatusRegistry().GetLogger()
 	var errMulti error
 
@@ -219,7 +225,7 @@ func (s *Scheduler) Execute(inPortReadings runtime.PortToValue, tickInfo runtime
 
 	var acceptedReading, incomingReading runtime.Reading
 
-	outPortReadings := make(runtime.PortToValue)
+	outPortReadings := make(runtime.PortToReading)
 
 	acceptedScalarResult, err := s.acceptedQuery.ExecuteScalarQuery(tickInfo)
 	acceptedValue := acceptedScalarResult.Value
@@ -253,7 +259,6 @@ func (s *Scheduler) DynamicConfigUpdate(event notifiers.Event, unmarshaller conf
 
 func (s *Scheduler) publishQueryTokens(tokens *policysyncv1.TokensDecision) error {
 	logger := s.policyReadAPI.GetStatusRegistry().GetLogger()
-	// TODO: publish only on change
 	s.tokensByWorkload = tokens
 	policyName := s.policyReadAPI.GetPolicyName()
 	policyHash := s.policyReadAPI.GetPolicyHash()
@@ -261,9 +266,9 @@ func (s *Scheduler) publishQueryTokens(tokens *policysyncv1.TokensDecision) erro
 	wrapper := &policysyncv1.TokensDecisionWrapper{
 		TokensDecision: tokens,
 		CommonAttributes: &policysyncv1.CommonAttributes{
-			PolicyName:     policyName,
-			PolicyHash:     policyHash,
-			ComponentIndex: int64(s.componentIndex),
+			PolicyName:  policyName,
+			PolicyHash:  policyHash,
+			ComponentId: s.componentID,
 		},
 	}
 	dat, err := proto.Marshal(wrapper)

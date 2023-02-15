@@ -21,13 +21,13 @@ var _ = Describe("Circuit", func() {
 		circuit, err := sim.NewCircuit(
 			nil,
 			sim.Inputs{
-				"X": components.NewConstant(42.0),
+				"X": components.NewConstantSignal(42.0),
 			},
 			sim.OutputSignals{"X"},
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Step()).To(Equal(
-			map[string]sim.Reading{
+			sim.StepOutputs{
 				"X": sim.NewReading(42.0),
 			},
 		))
@@ -115,7 +115,7 @@ var _ = Describe("Circuit", func() {
 		)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.Step()).To(Equal(
-			map[string]sim.Reading{
+			sim.StepOutputs{
 				"NAN": sim.InvalidReading(),
 			},
 		))

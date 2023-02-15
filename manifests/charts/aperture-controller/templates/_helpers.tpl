@@ -2,7 +2,7 @@
 Create the name of the service account to use
 */}}
 {{- define "controller-operator.serviceAccountName" -}}
-{{- default (include "common.names.fullname" .) .Values.operator.serviceAccount.name }}
+{{- default ( print (include "common.names.fullname" .) "-operator" ) .Values.operator.serviceAccount.name }}
 {{- end }}
 
 {{/*
@@ -66,7 +66,7 @@ Create the address of the Prometheus for Aperture Controller
 {{- end -}}
 
 {{/*
-Fetch the endpoint of the FluxNinja cloud instance
+Fetch the endpoint of the FluxNinja ARC instance
 {{ include "controller.fluxNinjaPlugin.endpoint" ( dict "controller" .Values.path.to.the.controller $) }}
 */}}
 {{- define "controller.fluxNinjaPlugin.endpoint" -}}
@@ -94,5 +94,17 @@ Fetch the value of the API Key secret for Aperture Controller
     {{- end -}}
 {{- else -}}
     {{ print "" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Prepare the Host for configuring in the Ingress
+{{ include "controller.ingress-endpoint" ( dict "component" "component_name" "context" $.context $) }}
+*/}}
+{{- define "controller.ingress-endpoint" -}}
+{{- if .context.Values.ingress.domain_name -}}
+    {{- printf "%s.%s" .component .context.Values.ingress.domain_name -}}
+{{- else -}}
+    {{- fail "Value of .Values.ingress.domain_name cannot be empty when .Values.ingress.enabled is set to true." -}}
 {{- end -}}
 {{- end -}}

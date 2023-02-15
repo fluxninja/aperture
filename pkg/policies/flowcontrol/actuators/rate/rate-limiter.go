@@ -2,10 +2,8 @@ package rate
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"path"
-	"strconv"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -34,7 +32,7 @@ const rateLimiterStatusRoot = "rate_limiters"
 
 var (
 	fxNameTag       = config.NameTag(rateLimiterStatusRoot)
-	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIndexLabel, metrics.DecisionTypeLabel}
+	metricLabelKeys = []string{metrics.PolicyNameLabel, metrics.PolicyHashLabel, metrics.ComponentIDLabel, metrics.DecisionTypeLabel, metrics.LimiterDroppedLabel}
 )
 
 func rateLimiterModule() fx.Option {
@@ -105,10 +103,10 @@ func setupRateLimiterFactory(
 		return err
 	}
 
-	reg := statusRegistry.Child(rateLimiterStatusRoot)
+	reg := statusRegistry.Child("component", rateLimiterStatusRoot)
 	logger := reg.GetLogger()
 
-	lazySyncJobGroup, err := jobs.NewJobGroup(reg.Child("lazy_sync_jobs"), 0, jobs.RescheduleMode, nil)
+	lazySyncJobGroup, err := jobs.NewJobGroup(reg.Child("sync", "lazy_sync_jobs"), 0, jobs.RescheduleMode, nil)
 	if err != nil {
 		logger.Error().Err(err).Msg("Failed to create lazy sync job group")
 		return err
@@ -189,13 +187,13 @@ func setupRateLimiterFactory(
 	return nil
 }
 
-// per policy component.
-func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
+// per component fx app.
+func (rlFactory *rateLimiterFactory) newRateLimiterOptions(
 	key notifiers.Key,
 	unmarshaller config.Unmarshaller,
 	reg status.Registry,
 ) (fx.Option, error) {
-	logger := rateLimiterFactory.registry.GetLogger()
+	logger := rlFactory.registry.GetLogger()
 	wrapperMessage := &policysyncv1.RateLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.RateLimiter == nil {
@@ -208,10 +206,10 @@ func (rateLimiterFactory *rateLimiterFactory) newRateLimiterOptions(
 	rateLimiter := &rateLimiter{
 		Component:          wrapperMessage.GetCommonAttributes(),
 		rateLimiterProto:   rateLimiterProto,
-		rateLimiterFactory: rateLimiterFactory,
+		rateLimiterFactory: rlFactory,
 		registry:           reg,
 	}
-	rateLimiter.name = iface.ComponentID(rateLimiter)
+	rateLimiter.name = iface.ComponentKey(rateLimiter)
 
 	return fx.Options(
 		fx.Invoke(
@@ -236,9 +234,9 @@ var _ iface.RateLimiter = (*rateLimiter)(nil)
 
 func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	logger := rateLimiter.registry.GetLogger()
-	etcdKey := paths.FlowControlComponentKey(rateLimiter.rateLimiterFactory.agentGroupName,
+	etcdKey := paths.AgentComponentKey(rateLimiter.rateLimiterFactory.agentGroupName,
 		rateLimiter.GetPolicyName(),
-		rateLimiter.GetComponentIndex())
+		rateLimiter.GetComponentId())
 	// decision notifier
 	decisionUnmarshaller, err := config.NewProtobufUnmarshaller(nil)
 	if err != nil {
@@ -263,7 +261,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	metricLabels := make(prometheus.Labels)
 	metricLabels[metrics.PolicyNameLabel] = rateLimiter.GetPolicyName()
 	metricLabels[metrics.PolicyHashLabel] = rateLimiter.GetPolicyHash()
-	metricLabels[metrics.ComponentIndexLabel] = strconv.FormatInt(rateLimiter.GetComponentIndex(), 10)
+	metricLabels[metrics.ComponentIDLabel] = rateLimiter.GetComponentId()
 	rateCounterVec := rateLimiter.rateLimiterFactory.counterVector
 
 	lifecycle.Append(fx.Hook{
@@ -275,15 +273,15 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 				rateLimiter.rateLimitChecker,
 				rateLimiter.rateLimiterFactory.distCache,
 				rateLimiter.name,
-				rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration())
+				rateLimiter.rateLimiterProto.Parameters.GetLimitResetInterval().AsDuration())
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to create limiter")
 				return err
 			}
 			// check whether lazy limiter is enabled
-			if lazySyncConfig := rateLimiter.rateLimiterProto.GetLazySync(); lazySyncConfig != nil {
+			if lazySyncConfig := rateLimiter.rateLimiterProto.Parameters.GetLazySync(); lazySyncConfig != nil {
 				if lazySyncConfig.GetEnabled() {
-					lazySyncInterval := time.Duration(int64(rateLimiter.rateLimiterProto.GetLimitResetInterval().AsDuration()) / int64(lazySyncConfig.GetNumSync()))
+					lazySyncInterval := time.Duration(int64(rateLimiter.rateLimiterProto.Parameters.GetLimitResetInterval().AsDuration()) / int64(lazySyncConfig.GetNumSync()))
 					rateLimiter.rateTracker, err = ratetracker.NewLazySyncRateTracker(rateLimiter.rateTracker,
 						lazySyncInterval,
 						rateLimiter.rateLimiterFactory.lazySyncJobGroup)
@@ -319,7 +317,7 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 			var merr, err error
 			deleted := rateCounterVec.DeletePartialMatch(metricLabels)
 			if deleted == 0 {
-				merr = multierr.Append(merr, errors.New("failed to delete rate limiter counter from its metric vector"))
+				logger.Warn().Msg("Could not delete rate limiter counter from its metric vector. No traffic to generate metrics?")
 			}
 			// remove from data engine
 			err = rateLimiter.rateLimiterFactory.engineAPI.UnregisterRateLimiter(rateLimiter)
@@ -357,7 +355,7 @@ func (rateLimiter *rateLimiter) updateDynamicConfig(dynamicConfig *policylangv1.
 	overrides := ratetracker.Overrides{}
 	// loop through overrides
 	for _, override := range dynamicConfig.GetOverrides() {
-		label := rateLimiter.rateLimiterProto.GetLabelKey() + ":" + override.GetLabelValue()
+		label := rateLimiter.rateLimiterProto.Parameters.GetLabelKey() + ":" + override.GetLabelValue()
 		overrides[label] = override.GetLimitScaleFactor()
 	}
 
@@ -382,11 +380,11 @@ func (rateLimiter *rateLimiter) RunLimiter(ctx context.Context, labels map[strin
 	}
 
 	return &flowcontrolv1.LimiterDecision{
-		PolicyName:     rateLimiter.GetPolicyName(),
-		PolicyHash:     rateLimiter.GetPolicyHash(),
-		ComponentIndex: rateLimiter.GetComponentIndex(),
-		Dropped:        !ok,
-		Reason:         reason,
+		PolicyName:  rateLimiter.GetPolicyName(),
+		PolicyHash:  rateLimiter.GetPolicyHash(),
+		ComponentId: rateLimiter.GetComponentId(),
+		Dropped:     !ok,
+		Reason:      reason,
 		Details: &flowcontrolv1.LimiterDecision_RateLimiterInfo_{
 			RateLimiterInfo: &flowcontrolv1.LimiterDecision_RateLimiterInfo{
 				Label:     label,
@@ -399,7 +397,7 @@ func (rateLimiter *rateLimiter) RunLimiter(ctx context.Context, labels map[strin
 
 // TakeN takes n tokens from the limiter.
 func (rateLimiter *rateLimiter) TakeN(labels map[string]string, n int) (label string, ok bool, remaining int, current int) {
-	labelKey := rateLimiter.rateLimiterProto.GetLabelKey()
+	labelKey := rateLimiter.rateLimiterProto.Parameters.GetLabelKey()
 	var labelValue string
 	if val, found := labels[labelKey]; found {
 		labelValue = val
@@ -466,9 +464,9 @@ func (rateLimiter *rateLimiter) dynamicConfigUpdateCallback(event notifiers.Even
 // GetLimiterID returns the limiter ID.
 func (rateLimiter *rateLimiter) GetLimiterID() iface.LimiterID {
 	return iface.LimiterID{
-		PolicyName:     rateLimiter.GetPolicyName(),
-		PolicyHash:     rateLimiter.GetPolicyHash(),
-		ComponentIndex: rateLimiter.GetComponentIndex(),
+		PolicyName:  rateLimiter.GetPolicyName(),
+		PolicyHash:  rateLimiter.GetPolicyHash(),
+		ComponentID: rateLimiter.GetComponentId(),
 	}
 }
 

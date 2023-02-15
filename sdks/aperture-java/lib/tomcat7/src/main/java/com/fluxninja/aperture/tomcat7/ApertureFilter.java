@@ -23,9 +23,16 @@ public class ApertureFilter implements Filter {
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException, IOException {
         AttributeContext attributes = ServletUtils.attributesFromRequest(req);
 
-        TrafficFlow flow = this.apertureSDK.startTrafficFlow(attributes);
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
+
+        String path = request.getServletPath();
+        TrafficFlow flow = this.apertureSDK.startTrafficFlow(path, attributes);
+
+        if (flow.ignored()) {
+            chain.doFilter(request, response);
+            return;
+        }
 
         if (flow.accepted()) {
             try {

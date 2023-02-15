@@ -44,7 +44,6 @@ import (
 
 	"github.com/fluxninja/aperture/operator/api"
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
-	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/go-logr/logr"
 )
@@ -62,17 +61,16 @@ type AgentReconciler struct {
 
 //+kubebuilder:rbac:groups=admissionregistration.k8s.io,resources=mutatingwebhookconfigurations,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=apps,resources=daemonsets,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=fluxninja.com,resources=agents,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=fluxninja.com,resources=agents/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=fluxninja.com,resources=agents/finalizers,verbs=update
-//+kubebuilder:rbac:groups=coordination.k8s.io,resources=leases,verbs=get
+//+kubebuilder:rbac:groups=coordination.k8s.io,resources=leases,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=configmaps,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=core,resources=componentstatuses,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=componentstatuses,verbs=get;list;watch
 //+kubebuilder:rbac:groups=core,resources=events,verbs=get;list;watch;create;patch
 //+kubebuilder:rbac:groups=core,resources=endpoints,verbs=get;list;watch
-//+kubebuilder:rbac:groups=core,resources=namespaces,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=core,resources=namespaces/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=core,resources=namespaces/finalizers,verbs=update
+//+kubebuilder:rbac:groups=core,resources=namespaces,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=core,resources=nodes,verbs=get;list;watch
 //+kubebuilder:rbac:groups=core,resources=nodes/metrics,verbs=get
 //+kubebuilder:rbac:groups=core,resources=nodes/spec,verbs=get
@@ -82,11 +80,8 @@ type AgentReconciler struct {
 //+kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=secrets,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=serviceaccounts,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=policy,resources=podsecuritypolicies,verbs=use
-//+kubebuilder:rbac:groups=quota.openshift.io,resources=clusterresourcequotas,verbs=get;list
 //+kubebuilder:rbac:groups=rbac.authorization.k8s.io,resources=clusterroles,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=rbac.authorization.k8s.io,resources=clusterrolebindings,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=security.openshift.io,resources=securitycontextconstraints,verbs=use
 //+kubebuilder:rbac:urls=/version;/healthz;/metrics,verbs=get
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
@@ -176,6 +171,20 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 			fmt.Sprintf("Kubernetes version %v is not supported. Please use a kubernetes cluster with version %v or above.", controllers.CurrentKubernetesVersion.String(), controllers.MinimumKubernetesVersion))
 	}
 
+	if instance.Annotations != nil && instance.Annotations[controllers.AgentModeChangeAnnotationKey] == "true" {
+		if instance.Spec.Sidecar.Enabled {
+			r.deleteDaemonSetModeResources(ctx, logger, instance)
+			r.Recorder.Event(instance, corev1.EventTypeWarning, "InstallationModeChanged",
+				"The Aperture Agent installation mode is changed to Sidecar. Restart pods in which the Aperture Agent needs to be injected.")
+		} else {
+			r.deleteSidecarModeResources(ctx, logger, instance)
+			r.Recorder.Event(instance, corev1.EventTypeWarning, "InstallationModeChanged",
+				"The Aperture Agent installation mode is changed to DaemonSet. Restart pods in which the Aperture Agent is already injected to remove it.")
+		}
+
+		delete(instance.Annotations, controllers.AgentModeChangeAnnotationKey)
+	}
+
 	instance.Status.Resources = "creating"
 	if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
 		return ctrl.Result{}, err
@@ -227,24 +236,101 @@ func (r *AgentReconciler) updateStatus(ctx context.Context, instance *agentv1alp
 	return nil
 }
 
-// deleteResources deletes cluster-scoped resources for which owner-reference is not added.
-func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) {
-	deleteClusterRole := true
-	instances := &controllerv1alpha1.ControllerList{}
-	err := r.List(ctx, instances)
+// deleteDaemonSetModeResources deletes resources installed for DaemonSet mode of Agent.
+func (r *AgentReconciler) deleteDaemonSetModeResources(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) {
+	cm, err := configMapForAgentConfig(instance.DeepCopy(), r.Scheme)
+	if err == nil {
+		if err = r.Delete(ctx, cm); err != nil {
+			log.Error(err, "failed to delete object of ConfigMap")
+		}
+	}
+
+	svc, err := serviceForAgent(instance.DeepCopy(), log, r.Scheme)
+	if err == nil {
+		if err = r.Delete(ctx, svc); err != nil {
+			log.Error(err, "failed to delete object of Service")
+		}
+	}
+
+	sa, err := serviceAccountForAgent(instance.DeepCopy(), r.Scheme)
+	if err == nil {
+		if err = r.Delete(ctx, sa); err != nil {
+			log.Error(err, "failed to delete object of ServiceAccount")
+		}
+	}
+
+	ds, err := daemonsetForAgent(instance.DeepCopy(), log, r.Scheme)
+	if err == nil {
+		if err = r.Delete(ctx, ds); err != nil {
+			log.Error(err, "failed to delete object of DaemonSet")
+		}
+	}
+
+	secret, err := secretForAgentAPIKey(instance.DeepCopy(), r.Scheme)
+	if err == nil {
+		if err = r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
+			log.Error(err, "failed to delete object of Secret")
+		}
+	}
+}
+
+// deleteSidecarModeResources deletes resources installed for Sidecar mode of Agent.
+func (r *AgentReconciler) deleteSidecarModeResources(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) {
+	mwc, err := podMutatingWebhookConfiguration(instance)
 	if err != nil {
-		log.Error(err, "failed to list Controller")
-	} else if instances.Items != nil && len(instances.Items) != 0 {
-		for _, ins := range instances.Items {
-			if ins.Status.Resources == "created" {
-				deleteClusterRole = false
+		log.Error(err, "failed to create object of MutatingWebhookConfiguration")
+	} else {
+		if err = r.Delete(ctx, mwc); err != nil {
+			log.Error(err, "failed to delete object of MutatingWebhookConfiguration")
+		}
+	}
+
+	nsList := &corev1.NamespaceList{}
+	err = r.List(ctx, nsList)
+	if err != nil {
+		log.Error(err, "failed to list Namespaces")
+	} else if nsList.Items != nil && len(nsList.Items) != 0 {
+		for _, ns := range nsList.Items {
+			if ns.Labels == nil || ns.Labels[controllers.SidecarLabelKey] != controllers.Enabled {
+				continue
+			}
+
+			configMap, err := configMapForAgentConfig(instance, nil)
+			if err != nil {
+				log.Error(err, fmt.Sprintf("failed to create object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+			}
+
+			configMap.Namespace = ns.GetName()
+			configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
+			if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+			}
+
+			secret, err := secretForAgentAPIKey(instance, nil)
+			if err != nil {
+				log.Error(err, fmt.Sprintf("failed to create object of Secret '%s' in namespace %s", secret.GetName(), ns.GetName()))
+			}
+
+			secret.Namespace = ns.GetName()
+			secret.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
+			if err := r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, fmt.Sprintf("failed to delete object of Secret '%s' in namespace %s", configMap.GetName(), ns.GetName()))
 			}
 		}
 	}
-	if deleteClusterRole {
-		if err := r.Delete(ctx, clusterRoleForAgent(instance)); err != nil {
-			log.Error(err, "failed to delete object of ClusterRole")
-		}
+}
+
+// deleteResources deletes cluster-scoped resources for which owner-reference is not added.
+func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) {
+	// Deleting old ClusterRole
+	cr := clusterRoleForAgent(instance)
+	cr.Name = controllers.AppName
+	if err := r.Delete(ctx, cr); err != nil && !errors.IsNotFound(err) {
+		log.Error(err, "failed to delete object of ClusterRole")
+	}
+
+	if err := r.Delete(ctx, clusterRoleForAgent(instance)); err != nil {
+		log.Error(err, "failed to delete object of ClusterRole")
 	}
 
 	if err := r.Delete(ctx, clusterRoleBindingForAgent(instance)); err != nil {
@@ -252,48 +338,7 @@ func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, 
 	}
 
 	if instance.Spec.Sidecar.Enabled {
-		mwc, err := podMutatingWebhookConfiguration(instance)
-		if err != nil {
-			log.Error(err, "failed to create object of MutatingWebhookConfiguration")
-		} else {
-			if err = r.Delete(ctx, mwc); err != nil {
-				log.Error(err, "failed to delete object of MutatingWebhookConfiguration")
-			}
-		}
-
-		nsList := &corev1.NamespaceList{}
-		err = r.List(ctx, nsList)
-		if err != nil {
-			log.Error(err, "failed to list Namespaces")
-		} else if nsList.Items != nil && len(nsList.Items) != 0 {
-			for _, ns := range nsList.Items {
-				if ns.Labels == nil || ns.Labels[controllers.SidecarLabelKey] != controllers.Enabled {
-					continue
-				}
-
-				configMap, err := configMapForAgentConfig(instance, nil)
-				if err != nil {
-					log.Error(err, fmt.Sprintf("failed to create object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
-				}
-
-				configMap.Namespace = ns.GetName()
-				configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
-				if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
-					log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
-				}
-
-				secret, err := secretForAgentAPIKey(instance, nil)
-				if err != nil {
-					log.Error(err, fmt.Sprintf("failed to create object of Secret '%s' in namespace %s", secret.GetName(), ns.GetName()))
-				}
-
-				secret.Namespace = ns.GetName()
-				secret.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
-				if err := r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
-					log.Error(err, fmt.Sprintf("failed to delete object of Secret '%s' in namespace %s", configMap.GetName(), ns.GetName()))
-				}
-			}
-		}
+		r.deleteSidecarModeResources(ctx, log, instance)
 	}
 }
 
@@ -482,10 +527,19 @@ func (r *AgentReconciler) reconcileClusterRole(ctx context.Context, instance *ag
 // reconcileClusterRoleBinding prepares the desired states for Agent ClusterRoleBinding and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileClusterRoleBinding(ctx context.Context, instance *agentv1alpha1.Agent) error {
+	log := log.FromContext(ctx)
 	crb := clusterRoleBindingForAgent(instance.DeepCopy())
 	res, err := controllerutil.CreateOrUpdate(ctx, r.Client, crb, controllers.ClusterRoleBindingMutate(crb, crb.RoleRef, crb.Subjects))
 	if err != nil {
 		if errors.IsConflict(err) {
+			return r.reconcileClusterRoleBinding(ctx, instance)
+		}
+
+		// Checking invalid as Kubernetes doesn't allow updating RoleRef
+		if errors.IsInvalid(err) && strings.Contains(err.Error(), "cannot change roleRef") {
+			if err = r.Delete(ctx, clusterRoleBindingForAgent(instance)); err != nil {
+				log.Error(err, "failed to delete object of ClusterRoleBinding")
+			}
 			return r.reconcileClusterRoleBinding(ctx, instance)
 		}
 
@@ -523,7 +577,7 @@ func (r *AgentReconciler) reconcileServiceAccount(ctx context.Context, log logr.
 	return nil
 }
 
-// reconcileDaemonset prepares the desired states for Agent Daemonset and
+// reconcileDaemonset prepares the desired states for Agent DaemonSet and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileDaemonset(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) error {
 	if instance.Spec.Sidecar.Enabled {
@@ -541,17 +595,17 @@ func (r *AgentReconciler) reconcileDaemonset(ctx context.Context, log logr.Logge
 			return r.reconcileDaemonset(ctx, log, instance)
 		}
 
-		msg := fmt.Sprintf("failed to create Daemonset '%s' for Instance '%s' in Namespace '%s'. Response='%v', Error='%s'",
+		msg := fmt.Sprintf("failed to create DaemonSet '%s' for Instance '%s' in Namespace '%s'. Response='%v', Error='%s'",
 			dms.GetName(), instance.GetName(), instance.GetNamespace(), res, err.Error())
-		r.Recorder.Event(instance, corev1.EventTypeNormal, "DaemonsetCreationFailed", msg)
+		r.Recorder.Event(instance, corev1.EventTypeNormal, "DaemonSetCreationFailed", msg)
 		return fmt.Errorf(msg)
 	}
 
 	switch res {
 	case controllerutil.OperationResultCreated:
-		r.Recorder.Eventf(instance, corev1.EventTypeNormal, "DaemonsetCreationSuccessful", "Created Daemonset '%s'", dms.GetName())
+		r.Recorder.Eventf(instance, corev1.EventTypeNormal, "DaemonSetCreationSuccessful", "Created DaemonSet '%s'", dms.GetName())
 	case controllerutil.OperationResultUpdated:
-		r.Recorder.Eventf(instance, corev1.EventTypeNormal, "DaemonsetUpdationSuccessful", "Updated Daemonset '%s'", dms.GetName())
+		r.Recorder.Eventf(instance, corev1.EventTypeNormal, "DaemonSetUpdationSuccessful", "Updated DaemonSet '%s'", dms.GetName())
 	case controllerutil.OperationResultNone:
 	default:
 	}

@@ -10,10 +10,11 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 
-	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/entitycache/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/entitycache/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/log"
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
@@ -58,8 +59,9 @@ var _ = Describe("Authorization handler", func() {
 
 	When("it is queried with a request", func() {
 		BeforeEach(func() {
+			alerter := alerts.NewSimpleAlerter(100)
 			classifier := classification.NewClassificationEngine(
-				status.NewRegistry(log.GetGlobalLogger()),
+				status.NewRegistry(log.GetGlobalLogger(), alerter),
 			)
 			_, err := classifier.AddRules(context.TODO(), "test", &hardcodedRegoRules)
 			Expect(err).NotTo(HaveOccurred())
@@ -93,7 +95,7 @@ var _ = Describe("Authorization handler", func() {
 			)
 			resp, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
 			Expect(err).NotTo(HaveOccurred())
-			Expect(resp.GetDynamicMetadata()).ShouldNot(BeNil())
+			Expect(resp.GetDynamicMetadata()).NotTo(BeNil())
 		})
 	})
 })
@@ -139,10 +141,10 @@ var hardcodedRegoRules = policysyncv1.ClassifierWrapper{
 			},
 		},
 	},
-	CommonAttributes: &policysyncv1.CommonAttributes{
-		PolicyName:     "test",
-		PolicyHash:     "test",
-		ComponentIndex: 0,
+	ClassifierAttributes: &policysyncv1.ClassifierAttributes{
+		PolicyName:      "test",
+		PolicyHash:      "test",
+		ClassifierIndex: 0,
 	},
 }
 

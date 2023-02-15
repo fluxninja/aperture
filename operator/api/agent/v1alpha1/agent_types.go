@@ -19,12 +19,14 @@ limitations under the License.
 package v1alpha1
 
 import (
+	agent "github.com/fluxninja/aperture/cmd/aperture-agent/config"
 	"github.com/fluxninja/aperture/operator/api"
 	"github.com/fluxninja/aperture/operator/api/common"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/net/http"
 	"github.com/fluxninja/aperture/pkg/peers"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -69,6 +71,25 @@ type AgentConfigSpec struct {
 	// Peer discovery configuration.
 	//+kubebuilder:validation:Optional
 	PeerDiscovery peers.PeerDiscoveryConfig `json:"peer_discovery"`
+
+	// FlowControl configuration.
+	//+kubebuilder:validation:Optional
+	FlowControl FlowControlConfigSpec `json:"flow_control"`
+
+	// Service Discovery configuration.
+	//+kubebuilder:validation:Optional
+	ServiceDiscoverySpec common.ServiceDiscoverySpec `json:"service_discovery"`
+
+	// OTEL configuration.
+	//+kubebuilder:validation:Optional
+	OTEL agent.AgentOTELConfig `json:"otel"`
+}
+
+// FlowControlConfigSpec holds flow control configuration.
+type FlowControlConfigSpec struct {
+	// FlowPreviewConfig holds flow preview configuration.
+	//+kubebuilder:validation:Optional
+	FlowPreviewConfig preview.FlowPreviewConfig `json:"preview_service"`
 }
 
 // AgentStatus defines the observed state of Agent.

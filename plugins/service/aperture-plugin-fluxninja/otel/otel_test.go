@@ -16,7 +16,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
 	httpclient "github.com/fluxninja/aperture/pkg/net/http"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/heartbeats"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/otel"
@@ -25,12 +25,12 @@ import (
 
 type inStruct struct {
 	fx.In
-	Actual []*otelcollector.OTELConfig `group:"plugin-config"`
+	Actual []*otelconfig.OTELConfig `group:"plugin-config"`
 }
 
 var _ = DescribeTable("FN Plugin OTEL", func(
-	baseConfig *otelcollector.OTELConfig,
-	expected *otelcollector.OTELConfig,
+	baseConfig *otelconfig.OTELConfig,
+	expected *otelconfig.OTELConfig,
 ) {
 	cfg := map[string]interface{}{
 		"fluxninja_plugin": map[string]interface{}{
@@ -59,7 +59,7 @@ var _ = DescribeTable("FN Plugin OTEL", func(
 				}
 			},
 			fx.Annotate(
-				func() *otelcollector.OTELConfig {
+				func() *otelconfig.OTELConfig {
 					return baseConfig
 				},
 				fx.ResultTags(config.NameTag("base")),
@@ -98,7 +98,7 @@ var _ = DescribeTable("FN Plugin OTEL", func(
 },
 	Entry(
 		"add FN processors and exporters",
-		otelcollector.NewOTELConfig(),
+		otelconfig.NewOTELConfig(),
 		basePluginOTELConfig(),
 	),
 	Entry(
@@ -112,6 +112,11 @@ var _ = DescribeTable("FN Plugin OTEL", func(
 		basePluginOTELConfigWithPipeline("logs/alerts", testPipelineWithFN()),
 	),
 	Entry(
+		"add FN exporters to user custom metrics pipeline",
+		baseOTELConfigWithPipeline("metrics/user-defined-rabbitmq", testPipeline()),
+		basePluginOTELConfigWithPipeline("metrics/user-defined-rabbitmq", testPipelineWithFN()),
+	),
+	Entry(
 		"add metrics/slow pipeline if metrics/fast pipeline exists",
 		baseOTELConfigWithPipeline("metrics/fast", testPipeline()),
 		basePluginOTELConfigWithMetrics("metrics/slow"),
@@ -123,19 +128,19 @@ var _ = DescribeTable("FN Plugin OTEL", func(
 	),
 )
 
-func baseOTELConfigWithPipeline(name string, pipeline otelcollector.Pipeline) *otelcollector.OTELConfig {
+func baseOTELConfigWithPipeline(name string, pipeline otelconfig.Pipeline) *otelconfig.OTELConfig {
 	cfg := baseOTELConfig()
 	cfg.Service.AddPipeline(name, pipeline)
 	return cfg
 }
 
-func basePluginOTELConfigWithPipeline(name string, pipeline otelcollector.Pipeline) *otelcollector.OTELConfig {
+func basePluginOTELConfigWithPipeline(name string, pipeline otelconfig.Pipeline) *otelconfig.OTELConfig {
 	cfg := basePluginOTELConfig()
 	cfg.Service.AddPipeline(name, pipeline)
 	return cfg
 }
 
-func basePluginOTELConfigWithMetrics(pipelineName string) *otelcollector.OTELConfig {
+func basePluginOTELConfigWithMetrics(pipelineName string) *otelconfig.OTELConfig {
 	cfg := basePluginOTELConfig()
 	cfg.AddReceiver("prometheus/fluxninja", map[string]any{
 		"config": map[string]any{
@@ -155,10 +160,7 @@ func basePluginOTELConfigWithMetrics(pipelineName string) *otelcollector.OTELCon
 		"batch/metrics-slow",
 		"attributes/fluxninja",
 	}
-	if pipelineName == "metrics/slow" {
-		processors = append([]string{"enrichment"}, processors...)
-	}
-	cfg.Service.AddPipeline(pipelineName, otelcollector.Pipeline{
+	cfg.Service.AddPipeline(pipelineName, otelconfig.Pipeline{
 		Receivers:  []string{"prometheus/fluxninja"},
 		Processors: processors,
 		Exporters:  []string{"otlp/fluxninja"},
@@ -166,8 +168,8 @@ func basePluginOTELConfigWithMetrics(pipelineName string) *otelcollector.OTELCon
 	return cfg
 }
 
-func baseOTELConfig() *otelcollector.OTELConfig {
-	cfg := otelcollector.NewOTELConfig()
+func baseOTELConfig() *otelconfig.OTELConfig {
+	cfg := otelconfig.NewOTELConfig()
 	cfg.AddReceiver("prometheus", map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
@@ -181,8 +183,8 @@ func baseOTELConfig() *otelcollector.OTELConfig {
 }
 
 // basePluginOTELConfig as produced by FN plugin
-func basePluginOTELConfig() *otelcollector.OTELConfig {
-	cfg := otelcollector.NewOTELConfig()
+func basePluginOTELConfig() *otelconfig.OTELConfig {
+	cfg := otelconfig.NewOTELConfig()
 	cfg.AddProcessor("attributes/fluxninja", map[string]interface{}{
 		"actions": []map[string]interface{}{
 			{
@@ -193,9 +195,12 @@ func basePluginOTELConfig() *otelcollector.OTELConfig {
 		},
 	})
 	cfg.AddProcessor("transform/fluxninja", map[string]interface{}{
-		"logs": map[string]interface{}{
-			"statements": []string{
-				`set(resource.attributes["controller_id"], "controllero")`,
+		"log_statements": []map[string]interface{}{
+			{
+				"context": "resource",
+				"statements": []string{
+					`set(attributes["controller_id"], "controllero")`,
+				},
 			},
 		},
 	})
@@ -215,15 +220,15 @@ func basePluginOTELConfig() *otelcollector.OTELConfig {
 	return cfg
 }
 
-func testPipelineWithFN() otelcollector.Pipeline {
+func testPipelineWithFN() otelconfig.Pipeline {
 	p := testPipeline()
 	p.Processors = append(p.Processors, "attributes/fluxninja", "transform/fluxninja")
 	p.Exporters = append(p.Exporters, "otlp/fluxninja")
 	return p
 }
 
-func testPipeline() otelcollector.Pipeline {
-	return otelcollector.Pipeline{
+func testPipeline() otelconfig.Pipeline {
+	return otelconfig.Pipeline{
 		Receivers:  []string{"foo"},
 		Processors: []string{"bar"},
 		Exporters:  []string{"baz"},

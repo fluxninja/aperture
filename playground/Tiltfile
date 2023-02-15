@@ -1,5 +1,5 @@
 # vim: ft=bzl sw=4
-v1alpha1.extension_repo(name='default', url='https://github.com/tilt-dev/tilt-extensions', ref='HEAD')
+v1alpha1.extension_repo(name='default', url='https://github.com/tilt-dev/tilt-extensions', ref='v0.31.2')
 load("ext://namespace", "namespace_create", "namespace_inject")
 load('ext://uibutton', 'cmd_button', 'location')
 
@@ -103,13 +103,13 @@ DEP_TREE = {
                     "context": GIT_ROOT,
                     "dockerfile": GIT_ROOT + "/cmd/aperture-controller/Dockerfile",
                     "ssh": "default",
+                    "build_args":{'RACE': ""},
                 },
                 {
                     "ref": "aperture-operator",
                     "context": GIT_ROOT,
                     "dockerfile": GIT_ROOT + "/operator/Dockerfile",
                     "ssh": "default",
-                    "ignore": ["cmd"],
                 }
             ],
             "port_forwards": {
@@ -195,8 +195,12 @@ DEP_TREE = {
                     "context": GIT_ROOT,
                     "dockerfile": GIT_ROOT + "/cmd/aperture-agent/Dockerfile",
                     "ssh": "default",
+                    "build_args":{'RACE':""},
                 }
             ],
+            "port_forwards": {
+                "agent": "8080:8080",
+            },
             "kinds": [
                 dict(kind="Agent", image_object={'json_path': '{.spec.image}', 'repo_field': 'repository', 'tag_field': 'tag'}, pod_readiness='wait'),
             ],
@@ -366,6 +370,7 @@ DEP_TREE = {
                 {
                     "ref": "aperture-java-example",
                     "context": APERTURE_JAVA_REPO_PATH,
+                    "dockerfile": "dockerfiles/example/Dockerfile",
                 }
             ],
             "child_resources": [
@@ -887,7 +892,7 @@ def forward_port_delayed(workload, labels, resource_deps, namespace, service, lo
     )
 
 
-def declare_resources(resources, dep_tree, inv_dep_tree):
+def declare_resources(resources, dep_tree, inv_dep_tree,race_arg):
     """
     Declares resource-specific actions (images, ports, etc)
     Generating manifests with tanka is done separately, in order to speed up builds
@@ -895,6 +900,12 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
     for resource in resources:
         resource_info = inv_dep_tree[resource]
         labels = resource_info.get("labels", [])
+        if race_arg:
+            images = resource_info.get("images",{})
+            if resource == "controller":
+                images[0]["build_args"]["RACE"] = "Yes"
+            if resource == "agent":
+                images[0]["build_args"]["RACE"] = "Yes"
         for image in resource_info.get("images", []):
             if 'tag' in image.keys():
                 # We will be pulling existing image
@@ -1021,7 +1032,7 @@ def declare_resources(resources, dep_tree, inv_dep_tree):
             },
         )
 
-    if "demo-app" in resources:
+    if "controller" in resources:
         readiness_probe=probe(initial_delay_secs=5, exec=exec_action(['kubectl', 'get', "svc", "aperture-controller", "-n", APERTURE_CONTROLLER_NS])) # Treat as success if service is available
         local_resource(
             name="controller-service",
@@ -1060,6 +1071,8 @@ config.define_bool("only", usage="Only deploy explicitly resources, without hand
 config.define_bool("verbose", usage="Enable verbose logging")
 config.define_bool("trace", usage="Enable trace logging")
 config.define_string("scenario", usage="Demo scenario to execute")
+config.define_bool("race",usage="Enable race detector for agent and controller")
+config.define_bool("skip-plugins", usage="Skip plugin building")
 cfg = config.parse()
 # Enable all resources, as calling `config.parse()` by default disables all
 config.set_enabled_resources([])
@@ -1072,6 +1085,7 @@ if cfg.get("list-resources", False):
 if cfg.get("manual", False):
     trigger_mode(TRIGGER_MODE_MANUAL)
 
+get_race = cfg.get("race",False)
 
 scenario = cfg.get("scenario", None)
 # If we are running specific test scenario, we don't want to run all workloads but only what's needed
@@ -1087,6 +1101,10 @@ TRACE = cfg_trace == True
 
 cfg_verbose = cfg.get("verbose", os.getenv("NINJA_TILT_VERBOSE", cfg_trace))
 VERBOSE = cfg_verbose == True
+
+if cfg.get("skip-plugins", os.getenv("SKIP_PLUGINS", "false").lower() == "true"):
+    DEP_TREE[APERTURE_CONTROLLER_NS]["controller"]["images"][0]["target"] = "controller-base"
+    DEP_TREE[APERTURE_AGENT_NS]["agent"]["images"][0]["target"] = "agent-base"
 
 run_only_listed = cfg.get("only", False)
 
@@ -1125,7 +1143,7 @@ cmd_button('wavepool-stop',
 aperture_go_pod_exec_script = '''
 # get k8s pod name from tilt resource name
 POD_NAME="$(tilt get kubernetesdiscovery "aperture-go-example" -ojsonpath='{.status.pods[0].name}')"
-kubectl exec -n aperture-go-example "$POD_NAME" -- wget http://127.0.0.1:8080/super -O -
+kubectl exec -n aperture-go-example "$POD_NAME" -- wget http://0.0.0.0:8080/super -O -
 '''
 cmd_button('aperture-go-trigger',
         argv=['sh', '-c', aperture_go_pod_exec_script],
@@ -1137,7 +1155,7 @@ cmd_button('aperture-go-trigger',
 aperture_js_pod_exec_script = '''
 # get k8s pod name from tilt resource name
 POD_NAME="$(tilt get kubernetesdiscovery "aperture-js-example" -ojsonpath='{.status.pods[0].name}')"
-kubectl exec -n aperture-js-example "$POD_NAME" -- wget http://127.0.0.1:8080/super -O -
+kubectl exec -n aperture-js-example "$POD_NAME" -- wget http://0.0.0.0:8080/super -O -
 '''
 cmd_button('aperture-js-trigger',
         argv=['sh', '-c', aperture_js_pod_exec_script],
@@ -1149,7 +1167,7 @@ cmd_button('aperture-js-trigger',
 aperture_java_pod_exec_script = '''
 # get k8s pod name from tilt resource name
 POD_NAME="$(tilt get kubernetesdiscovery "aperture-java-example" -ojsonpath='{.status.pods[0].name}')"
-kubectl exec -n aperture-java-example "$POD_NAME" -- wget http://127.0.0.1:8080/super -O -
+kubectl exec -n aperture-java-example "$POD_NAME" -- wget http://0.0.0.0:8080/super -O -
 '''
 cmd_button('aperture-java-trigger',
         argv=['sh', '-c', aperture_java_pod_exec_script],
@@ -1157,5 +1175,4 @@ cmd_button('aperture-java-trigger',
         icon_name='ads_click',
         text='Trigger library example',
 )
-
-declare_resources(resources, DEP_TREE, inverted_dep_tree)
+declare_resources(resources, DEP_TREE, inverted_dep_tree,get_race)

@@ -2,6 +2,7 @@ package components
 
 import (
 	"errors"
+	"fmt"
 	"math"
 
 	"go.uber.org/fx"
@@ -34,7 +35,7 @@ type EMA struct {
 	// The correction factor on the minimum relative to the signal
 	correctionFactorOnMinViolation float64
 	currentStage                   stage
-	// The initial value of EMA is the average of the first warm_up_window number of observations.
+	// The initial value of EMA is the average of the first warmup_window number of observations.
 	warmupWindow      uint32
 	emaWindow         uint32
 	warmupCount       uint32
@@ -48,30 +49,34 @@ func (*EMA) Name() string { return "EMA" }
 // Type implements runtime.Component.
 func (*EMA) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
+// ShortDescription implements runtime.Component.
+func (ema *EMA) ShortDescription() string { return fmt.Sprintf("win: %v", ema.emaWindow) }
+
 // Make sure EMA complies with Component interface.
 var _ runtime.Component = (*EMA)(nil)
 
 // NewEMAAndOptions returns a new EMA filter and its Fx options.
 func NewEMAAndOptions(emaProto *policylangv1.EMA,
-	_ int,
+	_ string,
 	policyReadAPI iface.Policy,
 ) (*EMA, fx.Option, error) {
 	// period of tick
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()
+	params := emaProto.GetParameters()
 	// number of ticks in emaWindow
-	emaWindow := math.Ceil(float64(emaProto.EmaWindow.AsDuration()) / float64(evaluationPeriod))
+	emaWindow := math.Ceil(float64(params.EmaWindow.AsDuration()) / float64(evaluationPeriod))
 
 	alpha := 2.0 / (emaWindow + 1)
-	warmUpWindow := uint32(math.Ceil(float64(emaProto.WarmUpWindow.AsDuration()) / float64(evaluationPeriod)))
+	warmupWindow := uint32(math.Ceil(float64(params.WarmupWindow.AsDuration()) / float64(evaluationPeriod)))
 
 	ema := &EMA{
-		correctionFactorOnMinViolation: emaProto.CorrectionFactorOnMinEnvelopeViolation,
-		correctionFactorOnMaxViolation: emaProto.CorrectionFactorOnMaxEnvelopeViolation,
+		correctionFactorOnMinViolation: params.CorrectionFactorOnMinEnvelopeViolation,
+		correctionFactorOnMaxViolation: params.CorrectionFactorOnMaxEnvelopeViolation,
 		alpha:                          alpha,
-		warmupWindow:                   warmUpWindow,
+		warmupWindow:                   warmupWindow,
 		emaWindow:                      uint32(emaWindow),
 		policyReadAPI:                  policyReadAPI,
-		validDuringWarmup:              emaProto.ValidDuringWarmup,
+		validDuringWarmup:              params.ValidDuringWarmup,
 	}
 	ema.resetStages()
 	return ema, fx.Options(), nil
@@ -87,17 +92,17 @@ func (ema *EMA) resetStages() {
 }
 
 // Execute implements runtime.Component.Execute.
-func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (ema *EMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	logger := ema.policyReadAPI.GetStatusRegistry().GetLogger()
-	retErr := func(err error) (runtime.PortToValue, error) {
-		return runtime.PortToValue{
+	retErr := func(err error) (runtime.PortToReading, error) {
+		return runtime.PortToReading{
 			"output": []runtime.Reading{runtime.InvalidReading()},
 		}, err
 	}
 
-	input := inPortReadings.ReadSingleValuePort("input")
-	maxEnvelope := inPortReadings.ReadSingleValuePort("max_envelope")
-	minEnvelope := inPortReadings.ReadSingleValuePort("min_envelope")
+	input := inPortReadings.ReadSingleReadingPort("input")
+	maxEnvelope := inPortReadings.ReadSingleReadingPort("max_envelope")
+	minEnvelope := inPortReadings.ReadSingleReadingPort("min_envelope")
 	output := runtime.InvalidReading()
 
 	switch ema.currentStage {
@@ -159,7 +164,7 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 		ema.lastGoodOutput = output
 	}
 	// Returns Exponential Moving Average of a series of readings.
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
 }

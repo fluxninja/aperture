@@ -1,0 +1,8 @@
+blueprint: Static Rate Limiting Policy
+sources:
+  Dashboard:
+    config_key: dashboard
+    path: policies/static-rate-limiting/dashboard.libsonnet
+  Policy:
+    config_key: policy
+    path: policies/static-rate-limiting/policy.libsonnet

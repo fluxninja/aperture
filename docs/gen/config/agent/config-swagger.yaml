@@ -25,7 +25,7 @@ definitions:
         description: |-
           All agents within an agent_group receive the same data-plane configuration (e.g. Flux Meters, Rate Limiters etc).
 
-          [Read more about agent groups here](/concepts/service.md#agent-group).
+          [Read more about agent groups here](/concepts/integrations/flow-control/service.md#agent-group).
         type: string
         x-go-default: default
         x-go-name: AgentGroup
@@ -33,6 +33,30 @@ definitions:
       attributes.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/agentinfo
+  AgentOTELConfig:
+    properties:
+      batch_alerts:
+        $ref: '#/definitions/BatchAlertsConfig'
+      batch_postrollup:
+        $ref: '#/definitions/BatchPostrollupConfig'
+      batch_prerollup:
+        $ref: '#/definitions/BatchPrerollupConfig'
+      custom_metrics:
+        additionalProperties:
+          $ref: '#/definitions/CustomMetricsConfig'
+        description: |-
+          CustomMetrics configures custom metrics OTEL pipelines, which will send data to
+          the controller prometheus.
+          Key in this map refers to OTEL pipeline name. Prefixing pipeline name with `metrics/`
+          is optional, as all the components and pipeline names would be normalized.
+          By default `kubeletstats` custom metrics is added, which can be overwritten.
+        type: object
+        x-go-name: CustomMetrics
+      ports:
+        $ref: '#/definitions/PortsConfig'
+    title: AgentOTELConfig is the configuration for Agent's OTEL collector.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
   AlertManagerClientConfig:
     properties:
       address:
@@ -137,7 +161,7 @@ definitions:
         x-go-validate: gt=0
     title: BatchAlertsConfig defines configuration for OTEL batch processor.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
   BatchPostrollupConfig:
     properties:
       send_batch_max_size:
@@ -167,7 +191,7 @@ definitions:
         x-go-validate: gt=0
     title: BatchPostrollupConfig defines configuration for OTEL batch processor.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
   BatchPrerollupConfig:
     properties:
       send_batch_max_size:
@@ -197,7 +221,7 @@ definitions:
         x-go-validate: gt=0
     title: BatchPrerollupConfig defines configuration for OTEL batch processor.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
   ClientTLSConfig:
     properties:
       ca_file:
@@ -218,6 +242,52 @@ definitions:
     title: ClientTLSConfig is the config for client TLS.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
+  CommonOTELConfig:
+    properties:
+      batch_alerts:
+        $ref: '#/definitions/BatchAlertsConfig'
+      ports:
+        $ref: '#/definitions/PortsConfig'
+    title: CommonOTELConfig is the configuration for the OTEL collector.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
+  Components:
+    additionalProperties:
+      type: object
+    description: |-
+      Components is an alias type for map[string]any. This needs to be used
+      because of the CRD requirements for the operator.
+      https://github.com/kubernetes-sigs/controller-tools/issues/636
+      https://github.com/kubernetes-sigs/kubebuilder/issues/528
+    type: object
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
+  CustomMetricsConfig:
+    description: which will be exported to the controller prometheus.
+    properties:
+      pipeline:
+        $ref: '#/definitions/CustomMetricsPipelineConfig'
+      processors:
+        $ref: '#/definitions/Components'
+      receivers:
+        $ref: '#/definitions/Components'
+    title: CustomMetricsConfig defines receivers, processors and single metrics pipeline,
+    type: object
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
+  CustomMetricsPipelineConfig:
+    properties:
+      processors:
+        items:
+          type: string
+        type: array
+        x-go-name: Processors
+      receivers:
+        items:
+          type: string
+        type: array
+        x-go-name: Receivers
+    title: CustomMetricsPipelineConfig defines a custom metrics pipeline.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
   DistCacheConfig:
     properties:
       bind_addr:
@@ -301,6 +371,16 @@ definitions:
     title: EtcdConfig holds configuration for etcd client.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/etcd/client
+  FlowPreviewConfig:
+    properties:
+      enabled:
+        description: Enables the flow preview service.
+        type: boolean
+        x-go-default: "true"
+        x-go-name: Enabled
+    title: FlowPreviewConfig is the configuration for the flow control preview service.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview
   GRPCClientConfig:
     properties:
       backoff:
@@ -645,6 +725,10 @@ definitions:
     x-go-package: github.com/fluxninja/aperture/pkg/jobs
   KubernetesDiscoveryConfig:
     properties:
+      autoscale_enabled:
+        type: boolean
+        x-go-default: "true"
+        x-go-name: AutoscaleEnabled
       discovery_enabled:
         type: boolean
         x-go-default: "true"
@@ -805,19 +889,6 @@ definitions:
     title: MultiJobConfig holds configuration for MultiJob.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/jobs
-  OtelConfig:
-    properties:
-      batch_alerts:
-        $ref: '#/definitions/BatchAlertsConfig'
-      batch_postrollup:
-        $ref: '#/definitions/BatchPostrollupConfig'
-      batch_prerollup:
-        $ref: '#/definitions/BatchPrerollupConfig'
-      ports:
-        $ref: '#/definitions/PortsConfig'
-    title: OtelConfig is the configuration for the OTEL collector.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
   PeerDiscoveryConfig:
     properties:
       advertisement_addr:
@@ -902,7 +973,7 @@ definitions:
         x-go-validate: gte=0
     title: PortsConfig defines configuration for OTEL debug and extension ports.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
   ProfilersConfig:
     properties:
       cpu_profiler:
@@ -1115,6 +1186,17 @@ paths:
       tags:
       - common-configuration
       x-fn-config-env: true
+  /flow_control:
+    post:
+      operationId: FlowControl
+      parameters:
+      - in: body
+        name: preview_service
+        schema:
+          $ref: '#/definitions/FlowPreviewConfig'
+      tags:
+      - common-configuration
+      x-fn-config-env: true
   /kubernetes_client:
     post:
       operationId: KubernetesClient
@@ -1163,14 +1245,13 @@ paths:
       x-fn-config-env: true
   /otel:
     post:
-      operationId: Otel
+      operationId: OTEL
       parameters:
       - in: body
-        name: proxy
         schema:
-          $ref: '#/definitions/OtelConfig'
+          $ref: '#/definitions/AgentOTELConfig'
       tags:
-      - common-configuration
+      - agent-configuration
       x-fn-config-env: true
   /peer_discovery:
     post:

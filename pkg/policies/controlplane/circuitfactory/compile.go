@@ -2,7 +2,6 @@ package circuitfactory
 
 import (
 	"strconv"
-	"strings"
 
 	"go.uber.org/fx"
 
@@ -23,28 +22,33 @@ func Module() fx.Option {
 //
 // Circuit can also be converted to its graph view.
 type Circuit struct {
-	components   []runtime.CompiledComponent
-	configs      []runtime.ConfiguredComponent
-	componentIDs []ComponentID
+	Tree           Tree
+	LeafComponents []runtime.ConfiguredComponent
+}
+
+// Tree is a graph view of a Circuit.
+type Tree struct {
+	Root     runtime.ConfiguredComponent
+	Children []Tree
 }
 
 // Components returns a list of CompiledComponents, ready to create runtime.Circuit.
-func (circuit *Circuit) Components() []runtime.CompiledComponent { return circuit.components }
+func (circuit *Circuit) Components() []runtime.ConfiguredComponent { return circuit.LeafComponents }
 
 // CompileFromProto compiles a protobuf circuit definition into a Circuit.
 //
 // This is helper for CreateComponents + runtime.Compile.
 func CompileFromProto(
-	circuitProto []*policylangv1.Component,
+	componentsProto []*policylangv1.Component,
 	policyReadAPI iface.Policy,
 ) (*Circuit, fx.Option, error) {
-	configuredComponents, componentIDs, option, err := CreateComponents(circuitProto, policyReadAPI)
+	tree, leafComponents, option, err := CreateComponents(componentsProto, runtime.NewComponentID("root"), policyReadAPI)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	compiledComponents, err := runtime.Compile(
-		configuredComponents,
+	err = runtime.Compile(
+		leafComponents,
 		policyReadAPI.GetStatusRegistry().GetLogger(),
 	)
 	if err != nil {
@@ -52,63 +56,43 @@ func CompileFromProto(
 	}
 
 	return &Circuit{
-		configs:      configuredComponents,
-		components:   compiledComponents,
-		componentIDs: componentIDs,
+		Tree:           tree,
+		LeafComponents: leafComponents,
 	}, option, nil
-}
-
-// ComponentID is a component identifier based on position in original proto list of components.
-type ComponentID string
-
-func subcomponentID(parentID ComponentID, subcomponent runtime.Component) ComponentID {
-	return ComponentID(string(parentID) + "." + subcomponent.Name())
-}
-
-// ParentID returns ID of parent component.
-func (id ComponentID) ParentID() ComponentID {
-	parentID, _, hasParent := strings.Cut(string(id), ".")
-	if !hasParent {
-		return ComponentID("")
-	}
-	return ComponentID(parentID)
 }
 
 // CreateComponents creates circuit components along with their identifiers and fx options.
 //
 // Note that number of returned components might be greater than number of
-// components in circuitProto, as some components may have their subcomponents.
+// components in componentsProto, as some components may be composite multi-component stacks or nested circuits.
 func CreateComponents(
-	circuitProto []*policylangv1.Component,
+	componentsProto []*policylangv1.Component,
+	circuitID runtime.ComponentID,
 	policyReadAPI iface.Policy,
-) ([]runtime.ConfiguredComponent, []ComponentID, fx.Option, error) {
-	var configuredComponents []runtime.ConfiguredComponent
-	var ids []ComponentID
-	var options []fx.Option
+) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
+	var (
+		leafComponents []runtime.ConfiguredComponent
+		tree           Tree
+		options        []fx.Option
+	)
 
-	for compIndex, componentProto := range circuitProto {
-		// Create component
-		component, subcomponents, compOption, err := NewComponentAndOptions(
+	for compIndex, componentProto := range componentsProto {
+		subTree, leafComps, compOption, err := NewComponentAndOptions(
 			componentProto,
-			compIndex,
+			circuitID.ChildID(strconv.Itoa(compIndex)),
 			policyReadAPI,
 		)
 		if err != nil {
-			return nil, nil, nil, err
+			return Tree{}, nil, nil, err
 		}
 		options = append(options, compOption)
 
-		compID := ComponentID(strconv.Itoa(compIndex))
-		// Add Component to compiledCircuit
-		configuredComponents = append(configuredComponents, component)
-		ids = append(ids, compID)
+		// Append subTree to tree.Children
+		tree.Children = append(tree.Children, subTree)
 
-		// Add SubComponents to compiledCircuit
-		for _, subComp := range subcomponents {
-			configuredComponents = append(configuredComponents, subComp)
-			ids = append(ids, subcomponentID(compID, subComp))
-		}
+		// Add subComponents to configuredComponents
+		leafComponents = append(leafComponents, leafComps...)
 	}
 
-	return configuredComponents, ids, fx.Options(options...), nil
+	return tree, leafComponents, fx.Options(options...), nil
 }

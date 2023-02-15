@@ -1,4 +1,5 @@
 {
+  "fontSize": "14px",
   "logLevel": "debug",
   "deterministicIds": true,
   "deterministicIDSeed": "mermaid",

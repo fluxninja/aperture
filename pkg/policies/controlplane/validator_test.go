@@ -117,14 +117,17 @@ spec:
   circuit:
     evaluation_interval: "0.5s"
     components:
-      - promql:
-          query_string: "sum(increase(flux_meter_sum{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))/sum(increase(flux_meter_count{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))"
-          evaluation_interval: "1s"
-          out_ports:
-            output:
-              signal_name: "LATENCY"
-      - constant:
-          value: "2.0"
+      - query:
+          promql:
+            query_string: "sum(increase(flux_meter_sum{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))/sum(increase(flux_meter_count{decision_type!=\"DECISION_TYPE_REJECTED\", policy_name=\"latency-gradient\", flux_meter_name=\"service_latency\"}[5s]))"
+            evaluation_interval: "1s"
+            out_ports:
+              output:
+                signal_name: "LATENCY"
+      - variable:
+          default_config:
+            constant_signal:
+              value: 2.0
           out_ports:
             output:
               signal_name: "EMA_LIMIT_MULTIPLIER"
@@ -139,9 +142,10 @@ spec:
             output:
               signal_name: "MAX_EMA"
       - ema:
-          ema_window: "300s"
-          warm_up_window: "10s"
-          correction_factor_on_max_envelope_violation: "0.95"
+          parameters:
+            ema_window: "300s"
+            warmup_window: "10s"
+            correction_factor_on_max_envelope_violation: "0.95"
           in_ports:
             input:
               signal_name: "LATENCY"
@@ -150,8 +154,10 @@ spec:
           out_ports:
             output:
               signal_name: "LATENCY_EMA"
-      - constant:
-          value: "1.1"
+      - variable:
+          default_config:
+            constant_signal:
+              value: 1.1
           out_ports:
             output:
               signal_name: "EMA_SETPOINT_MULTIPLIER"
@@ -166,9 +172,10 @@ spec:
             output:
               signal_name: "LATENCY_SETPOINT"
       - gradient_controller:
-          slope: -1
-          min_gradient: "0.1"
-          max_gradient: "1.0"
+          parameters:
+            slope: -1
+            min_gradient: "0.1"
+            max_gradient: "1.0"
           in_ports:
             signal:
               signal_name: "LATENCY"
@@ -193,48 +200,56 @@ spec:
           out_ports:
             output:
               signal_name: "LOAD_MULTIPLIER"
-      - concurrency_limiter:
-          flow_selector:
-            service_selector:
-              service: "service1-demo-app.demoapp.svc.cluster.local"
-            flow_matcher:
-              control_point: "ingress"
-          scheduler:
-            auto_tokens: true
-            default_workload_parameters:
-              priority: 20
-            workloads:
-              - workload_parameters:
-                  priority: 50
-                label_matcher:
-                  match_labels:
-                    user_type: "guest"
-              - workload_parameters:
-                  priority: 200
-                label_matcher:
-                  match_labels:
-                    http.request.header.user_type: "subscriber"
-            out_ports:
-              accepted_concurrency:
-                signal_name: "ACCEPTED_CONCURRENCY"
-              incoming_concurrency:
-                signal_name: "INCOMING_CONCURRENCY"
-          load_actuator:
-            in_ports:
-              load_multiplier:
-                signal_name: "LOAD_MULTIPLIER"
-      - constant:
-          value: "2.0"
+      - flow_control:
+          concurrency_limiter:
+            flow_selector:
+              service_selector:
+                service: "service1-demo-app.demoapp.svc.cluster.local"
+              flow_matcher:
+                control_point: "ingress"
+            scheduler:
+              parameters:
+                auto_tokens: true
+                default_workload_parameters:
+                  priority: 20
+                workloads:
+                  - parameters:
+                      priority: 50
+                    label_matcher:
+                      match_labels:
+                        user_type: "guest"
+                  - parameters:
+                      priority: 200
+                    label_matcher:
+                      match_labels:
+                        http.request.header.user_type: "subscriber"
+              out_ports:
+                accepted_concurrency:
+                  signal_name: "ACCEPTED_CONCURRENCY"
+                incoming_concurrency:
+                  signal_name: "INCOMING_CONCURRENCY"
+            load_actuator:
+              in_ports:
+                load_multiplier:
+                  signal_name: "LOAD_MULTIPLIER"
+      - variable:
+          default_config:
+            constant_signal:
+              value: 2.0
           out_ports:
             output:
               signal_name: "CONCURRENCY_LIMIT_MULTIPLIER"
-      - constant:
-          value: "10.0"
+      - variable:
+          default_config:
+            constant_signal:
+              value: 10.0
           out_ports:
             output:
               signal_name: "MIN_CONCURRENCY"
-      - constant:
-          value: "5.0"
+      - variable:
+          default_config:
+            constant_signal:
+              value: 5.0
           out_ports:
             output:
               signal_name: "LINEAR_CONCURRENCY_INCREMENT"
@@ -274,8 +289,10 @@ spec:
           out_ports:
             output:
               signal_name: "CONCURRENCY_INCREMENT_NORMAL"
-      - constant:
-          value: "1.2"
+      - variable:
+          default_config:
+            constant_signal:
+              value: 1.2
           out_ports:
             output:
               signal_name: "OVERLOAD_MULTIPLIER"
@@ -289,8 +306,10 @@ spec:
           out_ports:
             output:
               signal_name: "LATENCY_OVERLOAD"
-      - constant:
-          value: "10.0"
+      - variable:
+          default_config:
+            constant_signal:
+              value: 10.0
           out_ports:
             output:
               signal_name: "CONCURRENCY_INCREMENT_OVERLOAD"
@@ -365,20 +384,24 @@ spec:
   circuit:
     evaluation_interval: "0.5s"
     components:
-      - constant:
-          value: "250.0"
+      - variable:
+          default_config:
+            constant_signal:
+              value: 250.0
           out_ports:
             output:
               signal_name: "RATE_LIMIT"
-      - rate_limiter:
-          in_ports:
-            limit:
-              signal_name: "RATE_LIMIT"
-          flow_selector:
-            service_selector:
-              service: "service1-demo-app.demoapp.svc.cluster.local"
-            flow_matcher:
-              control_point: "ingress"
-          label_key: "http.request.header.user_type"
-          limit_reset_interval: "1s"
+      - flow_control:
+          rate_limiter:
+            in_ports:
+              limit:
+                signal_name: "RATE_LIMIT"
+            flow_selector:
+              service_selector:
+                service: "service1-demo-app.demoapp.svc.cluster.local"
+              flow_matcher:
+                control_point: "ingress"
+            parameters:
+              label_key: "http.request.header.user_type"
+              limit_reset_interval: "1s"
 `

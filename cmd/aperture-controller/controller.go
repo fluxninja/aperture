@@ -1,4 +1,4 @@
-//go:generate swagger generate spec --scan-models --include="github.com/fluxninja*" --include-tag=common-configuration -o ../../docs/gen/config/controller/config-swagger.yaml
+//go:generate swagger generate spec --scan-models --include="github.com/fluxninja*" --include-tag=common-configuration --include-tag=controller-configuration -o ../../docs/gen/config/controller/config-swagger.yaml
 
 // Package main Controller
 //
@@ -14,7 +14,6 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/cmd/aperture-controller/controller"
-	"github.com/fluxninja/aperture/pkg/controlpointcache"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/platform"
@@ -29,7 +28,6 @@ func main() {
 		controller.ModuleForControllerOTEL(),
 		fx.Provide(
 			clockwork.NewRealClock,
-			controlpointcache.Provide,
 		),
 		otelcollector.Module(),
 		controlplane.Module(),
@@ -38,7 +36,10 @@ func main() {
 	)
 
 	if err := app.Err(); err != nil {
-		visualize, _ := fx.VisualizeError(err)
+		visualize, viserr := fx.VisualizeError(err)
+		if viserr != nil {
+			log.Panic().Err(viserr).Msgf("Failed to visualize fx error: %s", viserr)
+		}
 		log.Panic().Err(err).Msg("fx.New failed: " + visualize)
 	}
 

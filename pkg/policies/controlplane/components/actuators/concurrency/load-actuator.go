@@ -2,24 +2,18 @@ package concurrency
 
 import (
 	"context"
-	"fmt"
 	"path"
-	"strconv"
-	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/durationpb"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/pkg/etcd/writer"
-	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -33,10 +27,8 @@ type LoadActuator struct {
 	loadActuatorProto *policylangv1.LoadActuator
 	decisionsEtcdPath string
 	agentGroupName    string
-	componentIndex    int
+	componentID       string
 	dryRun            bool
-	alerterIface      alerts.Alerter
-	alerterConfig     *policylangv1.AlerterConfig
 }
 
 // Name implements runtime.Component.
@@ -45,15 +37,18 @@ func (*LoadActuator) Name() string { return "LoadActuator" }
 // Type implements runtime.Component.
 func (*LoadActuator) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
 
+// ShortDescription implements runtime.Component.
+func (la *LoadActuator) ShortDescription() string { return la.agentGroupName }
+
 // NewLoadActuatorAndOptions creates load actuator and its fx options.
 func NewLoadActuatorAndOptions(
 	loadActuatorProto *policylangv1.LoadActuator,
-	componentIndex int,
+	componentID string,
 	policyReadAPI iface.Policy,
 	agentGroup string,
 ) (runtime.Component, fx.Option, error) {
-	componentID := paths.FlowControlComponentKey(agentGroup, policyReadAPI.GetPolicyName(), int64(componentIndex))
-	decisionsEtcdPath := path.Join(paths.LoadActuatorDecisionsPath, componentID)
+	etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
+	decisionsEtcdPath := path.Join(paths.LoadActuatorDecisionsPath, etcdKey)
 	dryRun := false
 	if loadActuatorProto.GetDefaultConfig() != nil {
 		dryRun = loadActuatorProto.GetDefaultConfig().GetDryRun()
@@ -61,30 +56,18 @@ func NewLoadActuatorAndOptions(
 	lsa := &LoadActuator{
 		policyReadAPI:     policyReadAPI,
 		agentGroupName:    agentGroup,
-		componentIndex:    componentIndex,
+		componentID:       componentID,
 		decisionsEtcdPath: decisionsEtcdPath,
 		loadActuatorProto: loadActuatorProto,
 		dryRun:            dryRun,
 	}
-
-	alerterConfig := loadActuatorProto.GetAlerterConfig()
-	if alerterConfig == nil {
-		alerterConfig = &policylangv1.AlerterConfig{
-			AlertName:      "Load Shed Event",
-			Severity:       "info",
-			ResolveTimeout: durationpb.New(5 * time.Second),
-			AlertChannels:  make([]string, 0),
-		}
-	}
-	lsa.alerterConfig = alerterConfig
 
 	return lsa, fx.Options(
 		fx.Invoke(lsa.setupWriter),
 	), nil
 }
 
-func (la *LoadActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle, alerterIface *alerts.SimpleAlerter) error {
-	la.alerterIface = alerterIface
+func (la *LoadActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -107,7 +90,7 @@ func (la *LoadActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.
 }
 
 // Execute implements runtime.Component.Execute.
-func (la *LoadActuator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (la *LoadActuator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Get the decision from the port
 	lm, ok := inPortReadings["load_multiplier"]
@@ -122,9 +105,6 @@ func (la *LoadActuator) Execute(inPortReadings runtime.PortToValue, tickInfo run
 					lmValue = lmReading.Value()
 				}
 
-				if lmReading.Value() < 1 {
-					la.alerterIface.AddAlert(la.createAlert())
-				}
 				return nil, la.publishDecision(tickInfo, lmValue, false)
 			} else {
 				logger.Autosample().Info().Msg("Invalid load multiplier data")
@@ -183,9 +163,9 @@ func (la *LoadActuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplie
 	wrapper := &policysyncv1.LoadDecisionWrapper{
 		LoadDecision: decision,
 		CommonAttributes: &policysyncv1.CommonAttributes{
-			PolicyName:     la.policyReadAPI.GetPolicyName(),
-			PolicyHash:     la.policyReadAPI.GetPolicyHash(),
-			ComponentIndex: int64(la.componentIndex),
+			PolicyName:  la.policyReadAPI.GetPolicyName(),
+			PolicyHash:  la.policyReadAPI.GetPolicyHash(),
+			ComponentId: la.componentID,
 		},
 	}
 	dat, err := proto.Marshal(wrapper)
@@ -195,28 +175,4 @@ func (la *LoadActuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplie
 	}
 	la.decisionWriter.Write(la.decisionsEtcdPath, dat)
 	return nil
-}
-
-func (la *LoadActuator) createAlert() *alerts.Alert {
-	newAlert := alerts.NewAlert(
-		alerts.WithName("Load Shed Event"),
-		alerts.WithSeverity(alerts.ParseSeverity(la.alerterConfig.Severity)),
-		alerts.WithAlertChannels(la.alerterConfig.AlertChannels),
-		alerts.WithLabel("policy_name", la.policyReadAPI.GetPolicyName()),
-		alerts.WithLabel("type", "concurrency_limiter"),
-		alerts.WithLabel("agent_group", la.agentGroupName),
-		alerts.WithLabel("component_index", strconv.Itoa(la.componentIndex)),
-		alerts.WithGeneratorURL(
-			fmt.Sprintf("http://%s/%s/%d", info.GetHostInfo().Hostname, la.policyReadAPI.GetPolicyName(), la.componentIndex),
-		),
-	)
-
-	evalTimeout := time.Duration(2 * la.alerterConfig.ResolveTimeout.AsDuration().Milliseconds())
-	timeout, _ := time.ParseDuration("5s")
-	if evalTimeout > timeout {
-		timeout = evalTimeout
-	}
-	newAlert.SetResolveTimeout(timeout)
-
-	return newAlert
 }

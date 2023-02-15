@@ -123,67 +123,7 @@ definitions:
         x-go-validate: gt=0
     title: BatchAlertsConfig defines configuration for OTEL batch processor.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
-  BatchPostrollupConfig:
-    properties:
-      send_batch_max_size:
-        description: |-
-          SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
-          into smaller units.
-        format: uint32
-        type: integer
-        x-go-default: "100"
-        x-go-name: SendBatchMaxSize
-        x-go-validate: gte=0
-      send_batch_size:
-        description: SendBatchSize is the size of a batch which after hit, will trigger
-          it to be sent.
-        format: uint32
-        type: integer
-        x-go-default: "100"
-        x-go-name: SendBatchSize
-        x-go-validate: gt=0
-      timeout:
-        description: Timeout sets the time after which a batch will be sent regardless
-          of size.
-        format: string
-        type: string
-        x-go-default: 1s
-        x-go-name: Timeout
-        x-go-validate: gt=0
-    title: BatchPostrollupConfig defines configuration for OTEL batch processor.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
-  BatchPrerollupConfig:
-    properties:
-      send_batch_max_size:
-        description: |-
-          SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
-          into smaller units.
-        format: uint32
-        type: integer
-        x-go-default: "10000"
-        x-go-name: SendBatchMaxSize
-        x-go-validate: gte=0
-      send_batch_size:
-        description: SendBatchSize is the size of a batch which after hit, will trigger
-          it to be sent.
-        format: uint32
-        type: integer
-        x-go-default: "10000"
-        x-go-name: SendBatchSize
-        x-go-validate: gt=0
-      timeout:
-        description: Timeout sets the time after which a batch will be sent regardless
-          of size.
-        format: string
-        type: string
-        x-go-default: 10s
-        x-go-name: Timeout
-        x-go-validate: gt=0
-    title: BatchPrerollupConfig defines configuration for OTEL batch processor.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
   ClientTLSConfig:
     properties:
       ca_file:
@@ -204,6 +144,24 @@ definitions:
     title: ClientTLSConfig is the config for client TLS.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
+  CommonOTELConfig:
+    properties:
+      batch_alerts:
+        $ref: '#/definitions/BatchAlertsConfig'
+      ports:
+        $ref: '#/definitions/PortsConfig'
+    title: CommonOTELConfig is the configuration for the OTEL collector.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
+  ControllerOTELConfig:
+    properties:
+      batch_alerts:
+        $ref: '#/definitions/BatchAlertsConfig'
+      ports:
+        $ref: '#/definitions/PortsConfig'
+    title: ControllerOTELConfig is the configuration for Agent's OTEL collector.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/cmd/aperture-controller/config
   Duration:
     description: It holds *durationpb.Duration which is generated type for google/protobuf/duration.proto.
     title: Duration is encoded as a string message which represents a signed span
@@ -726,19 +684,6 @@ definitions:
     title: MultiJobConfig holds configuration for MultiJob.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/jobs
-  OtelConfig:
-    properties:
-      batch_alerts:
-        $ref: '#/definitions/BatchAlertsConfig'
-      batch_postrollup:
-        $ref: '#/definitions/BatchPostrollupConfig'
-      batch_prerollup:
-        $ref: '#/definitions/BatchPrerollupConfig'
-      ports:
-        $ref: '#/definitions/PortsConfig'
-    title: OtelConfig is the configuration for the OTEL collector.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
   PluginsConfig:
     properties:
       disable_plugins:
@@ -811,7 +756,7 @@ definitions:
         x-go-validate: gte=0
     title: PortsConfig defines configuration for OTEL debug and extension ports.
     type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector
+    x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
   ProfilersConfig:
     properties:
       cpu_profiler:
@@ -1015,14 +960,13 @@ paths:
       x-fn-config-env: true
   /otel:
     post:
-      operationId: Otel
+      operationId: OTEL
       parameters:
       - in: body
-        name: proxy
         schema:
-          $ref: '#/definitions/OtelConfig'
+          $ref: '#/definitions/ControllerOTELConfig'
       tags:
-      - common-configuration
+      - controller-configuration
       x-fn-config-env: true
   /plugins:
     post:

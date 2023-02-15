@@ -17,7 +17,6 @@ limitations under the License.
 package agent
 
 import (
-	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -27,11 +26,12 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/pointer"
 
+	agent "github.com/fluxninja/aperture/cmd/aperture-agent/config"
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
+	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
 var _ = Describe("Service for Agent", func() {
@@ -50,12 +50,12 @@ var _ = Describe("Service for Agent", func() {
 									Addr: ":8080",
 								},
 							},
-							Otel: otelcollector.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							BindAddr:           ":3320",
 							MemberlistBindAddr: ":3322",
 						},
+						OTEL: agent.AgentOTELConfig{},
 					},
 				},
 			}
@@ -76,8 +76,8 @@ var _ = Describe("Service for Agent", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Agent",
-							Controller:         pointer.BoolPtr(true),
-							BlockOwnerDeletion: pointer.BoolPtr(true),
+							Controller:         pointer.Bool(true),
+							BlockOwnerDeletion: pointer.Bool(true),
 						},
 					},
 				},
@@ -141,12 +141,12 @@ var _ = Describe("Service for Agent", func() {
 									Addr: ":8080",
 								},
 							},
-							Otel: otelcollector.OtelConfig{},
 						},
 						DistCache: distcache.DistCacheConfig{
 							BindAddr:           ":3320",
 							MemberlistBindAddr: ":3322",
 						},
+						OTEL: agent.AgentOTELConfig{},
 					},
 				},
 			}
@@ -171,8 +171,8 @@ var _ = Describe("Service for Agent", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Agent",
-							Controller:         pointer.BoolPtr(true),
-							BlockOwnerDeletion: pointer.BoolPtr(true),
+							Controller:         pointer.Bool(true),
+							BlockOwnerDeletion: pointer.Bool(true),
 						},
 					},
 				},

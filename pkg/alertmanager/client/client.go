@@ -32,8 +32,8 @@ type AlertManagerConfig struct {
 type AlertManagerClientConfig struct {
 	Name       string                      `json:"name"`
 	Address    string                      `json:"address" validate:"hostname_port|url|fqdn"`
-	HTTPConfig commonhttp.HTTPClientConfig `json:"http_client"`
 	BasePath   string                      `json:"base_path" default:"/"`
+	HTTPConfig commonhttp.HTTPClientConfig `json:"http_client"`
 }
 
 // ProvideNamedAlertManagerClients provides a list of alertmanager clients from configuration.
@@ -66,9 +66,9 @@ type AlertManagerClient interface {
 
 // RealAlertManagerClient implements AlertManagerClient interface.
 type RealAlertManagerClient struct {
-	Name            string
 	httpClient      *http.Client
-	promAlertClient *promclient.Alertmanager
+	promAlertClient *promclient.AlertmanagerAPI
+	Name            string
 }
 
 // CreateClient creates a new alertmanager client with provided http client.

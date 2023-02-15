@@ -3,7 +3,6 @@ package watchdog
 
 import (
 	"context"
-	"fmt"
 	"runtime"
 	"sort"
 	"time"
@@ -148,7 +147,8 @@ func forceGC() time.Duration {
 func check(policy policyInterface, _ context.Context, fn usageFn) (proto.Message, error) {
 	total, used, err := fn()
 	if err != nil {
-		return nil, err
+		log.Warn().Err(err).Msg("failed to get memory usage")
+		return nil, nil
 	}
 
 	threshold := policy.nextThreshold(total, used)
@@ -162,9 +162,9 @@ func check(policy policyInterface, _ context.Context, fn usageFn) (proto.Message
 	if used >= threshold {
 		log.Warn().Uint64("used", used).Uint64("threshold", threshold).Msg("Watchdog triggering GC")
 		result.ForceGcTook = durationpb.New(forceGC())
-		err = fmt.Errorf("usage > threshold, force gc triggered")
+		log.Warn().Msg("usage > threshold, force gc triggered")
 	}
 
 	log.Info().Uint64("used", used).Uint64("threshold", threshold).Msg("Memory utilization in bytes")
-	return result, err
+	return result, nil
 }

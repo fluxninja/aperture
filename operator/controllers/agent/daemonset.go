@@ -35,7 +35,7 @@ import (
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 )
 
-// daemonsetForAgent prepares the Daemonset object for the Agent.
+// daemonsetForAgent prepares the DaemonSet object for the Agent.
 func daemonsetForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *runtime.Scheme) (*appsv1.DaemonSet, error) {
 	spec := instance.Spec
 
@@ -122,22 +122,22 @@ func daemonsetForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *r
 								},
 								{
 									Name:          controllers.OtelDebugPort,
-									ContainerPort: int32(spec.ConfigSpec.Otel.Ports.DebugPort),
+									ContainerPort: int32(spec.ConfigSpec.OTEL.Ports.DebugPort),
 									Protocol:      corev1.ProtocolTCP,
 								},
 								{
 									Name:          controllers.OtelHealthcheckPort,
-									ContainerPort: int32(spec.ConfigSpec.Otel.Ports.HealthCheckPort),
+									ContainerPort: int32(spec.ConfigSpec.OTEL.Ports.HealthCheckPort),
 									Protocol:      corev1.ProtocolTCP,
 								},
 								{
 									Name:          controllers.OtelPprofPort,
-									ContainerPort: int32(spec.ConfigSpec.Otel.Ports.PprofPort),
+									ContainerPort: int32(spec.ConfigSpec.OTEL.Ports.PprofPort),
 									Protocol:      corev1.ProtocolTCP,
 								},
 								{
 									Name:          controllers.OtelZpagesPort,
-									ContainerPort: int32(spec.ConfigSpec.Otel.Ports.ZpagesPort),
+									ContainerPort: int32(spec.ConfigSpec.OTEL.Ports.ZpagesPort),
 									Protocol:      corev1.ProtocolTCP,
 								},
 							},

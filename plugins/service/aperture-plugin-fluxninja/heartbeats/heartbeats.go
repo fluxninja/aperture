@@ -18,12 +18,14 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	controlpointcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/controlpointcache/v1"
 	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/peers/v1"
 	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
+	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/controlpointcache"
+	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/info"
@@ -33,6 +35,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/utils"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
@@ -49,23 +52,26 @@ const (
 	heartbeatsHTTPPath = "/plugins/fluxninja/v1/report"
 )
 
+// Heartbeats is the struct that holds information about heartbeats.
 type Heartbeats struct {
 	heartbeatv1.UnimplementedControllerInfoServiceServer
-	heartbeatsClient  heartbeatv1.FluxNinjaServiceClient
-	peersWatcher      *peers.PeerDiscovery
-	clientHTTP        *http.Client
-	agentInfo         *agentinfo.AgentInfo
-	interval          config.Duration
-	jobGroup          *jobs.JobGroup
-	clientConn        *grpc.ClientConn
-	statusRegistry    status.Registry
-	entityCache       *entitycache.EntityCache
-	policyFactory     *controlplane.PolicyFactory
-	ControllerInfo    *heartbeatv1.ControllerInfo
-	heartbeatsAddr    string
-	APIKey            string
-	jobName           string
-	controlPointCache *controlpointcache.ControlPointCache
+	heartbeatsClient            heartbeatv1.FluxNinjaServiceClient
+	statusRegistry              status.Registry
+	agentInfo                   *agentinfo.AgentInfo
+	clientHTTP                  *http.Client
+	interval                    config.Duration
+	jobGroup                    *jobs.JobGroup
+	clientConn                  *grpc.ClientConn
+	peersWatcher                *peers.PeerDiscovery
+	entityCache                 *entitycache.EntityCache
+	policyFactory               *controlplane.PolicyFactory
+	ControllerInfo              *heartbeatv1.ControllerInfo
+	serviceControlPointCache    *cache.Cache[selectors.ControlPointID]
+	kubernetesControlPointCache kubernetes.ControlPointCache
+	heartbeatsAddr              string
+	APIKey                      string
+	jobName                     string
+	installationMode            string
 }
 
 func newHeartbeats(
@@ -76,19 +82,23 @@ func newHeartbeats(
 	agentInfo *agentinfo.AgentInfo,
 	peersWatcher *peers.PeerDiscovery,
 	policyFactory *controlplane.PolicyFactory,
-	controlPointCache *controlpointcache.ControlPointCache,
+	serviceControlPointCache *cache.Cache[selectors.ControlPointID],
+	kubernetesControlPointCache kubernetes.ControlPointCache,
+	installationMode string,
 ) *Heartbeats {
 	return &Heartbeats{
-		heartbeatsAddr:    p.FluxNinjaEndpoint,
-		interval:          p.HeartbeatInterval,
-		APIKey:            p.APIKey,
-		jobGroup:          jobGroup,
-		statusRegistry:    statusRegistry,
-		entityCache:       entityCache,
-		agentInfo:         agentInfo,
-		peersWatcher:      peersWatcher,
-		policyFactory:     policyFactory,
-		controlPointCache: controlPointCache,
+		heartbeatsAddr:              p.FluxNinjaEndpoint,
+		interval:                    p.HeartbeatInterval,
+		APIKey:                      p.APIKey,
+		jobGroup:                    jobGroup,
+		statusRegistry:              statusRegistry,
+		entityCache:                 entityCache,
+		agentInfo:                   agentInfo,
+		peersWatcher:                peersWatcher,
+		policyFactory:               policyFactory,
+		serviceControlPointCache:    serviceControlPointCache,
+		kubernetesControlPointCache: kubernetesControlPointCache,
+		installationMode:            installationMode,
 	}
 }
 
@@ -155,23 +165,16 @@ func (h *Heartbeats) createGRPCJob(ctx context.Context, grpcClientConnBuilder gr
 	h.clientConn = conn
 	h.heartbeatsClient = heartbeatv1.NewFluxNinjaServiceClient(conn)
 
-	job := jobs.BasicJob{
-		JobFunc: h.sendSingleHeartbeat,
-	}
-	job.JobName = jobName
-
-	return &job, nil
+	job := jobs.NewBasicJob(jobName, h.sendSingleHeartbeat)
+	return job, nil
 }
 
 func (h *Heartbeats) createHTTPJob(ctx context.Context, restapiClientConnection *http.Client) (jobs.Job, error) {
 	h.heartbeatsAddr += heartbeatsHTTPPath
 
 	h.clientHTTP = restapiClientConnection
-	job := jobs.BasicJob{
-		JobFunc: h.sendSingleHeartbeatByHTTP,
-	}
-	job.JobName = jobNameHTTP
-	return &job, nil
+	job := jobs.NewBasicJob(jobNameHTTP, h.sendSingleHeartbeatByHTTP)
+	return job, nil
 }
 
 func (h *Heartbeats) registerHearbeatsJob(job jobs.Job) {
@@ -221,26 +224,41 @@ func (h *Heartbeats) newHeartbeat(
 		policies.PolicyWrappers = h.policyFactory.GetPolicyWrappers()
 	}
 
-	rawControlPoints := h.controlPointCache.GetAllAndClear()
-	controlPoints := make([]*heartbeatv1.ControlPoint, 0, len(rawControlPoints))
-	for cp := range rawControlPoints {
-		controlPoints = append(controlPoints, &heartbeatv1.ControlPoint{
-			Name:        cp.Name,
+	serviceControlPointObjects := make(map[selectors.ControlPointID]struct{})
+	if h.serviceControlPointCache != nil {
+		serviceControlPointObjects = h.serviceControlPointCache.GetAll()
+	}
+
+	serviceControlPoints := make([]*heartbeatv1.ServiceControlPoint, 0, len(serviceControlPointObjects))
+	for cp := range serviceControlPointObjects {
+		serviceControlPoints = append(serviceControlPoints, &heartbeatv1.ServiceControlPoint{
+			Name:        cp.ControlPoint,
 			ServiceName: cp.Service,
 		})
 	}
 
+	var kubernetesControlPoints []*controlpointcachev1.KubernetesControlPoint
+	if h.kubernetesControlPointCache != nil {
+		kubernetesControlPointObjects := h.kubernetesControlPointCache.Keys()
+		kubernetesControlPoints = make([]*controlpointcachev1.KubernetesControlPoint, 0, len(kubernetesControlPointObjects))
+		for _, cp := range kubernetesControlPointObjects {
+			kubernetesControlPoints = append(kubernetesControlPoints, cp.ToProto())
+		}
+	}
+
 	return &heartbeatv1.ReportRequest{
-		VersionInfo:    info.GetVersionInfo(),
-		ProcessInfo:    info.GetProcessInfo(),
-		HostInfo:       info.GetHostInfo(),
-		AgentGroup:     agentGroup,
-		ControllerInfo: h.ControllerInfo,
-		Peers:          peers,
-		ServicesList:   servicesList,
-		AllStatuses:    h.statusRegistry.GetGroupStatus(),
-		Policies:       policies,
-		ControlPoints:  controlPoints,
+		VersionInfo:             info.GetVersionInfo(),
+		ProcessInfo:             info.GetProcessInfo(),
+		HostInfo:                info.GetHostInfo(),
+		AgentGroup:              agentGroup,
+		ControllerInfo:          h.ControllerInfo,
+		Peers:                   peers,
+		ServicesList:            servicesList,
+		AllStatuses:             h.statusRegistry.GetGroupStatus(),
+		Policies:                policies,
+		ServiceControlPoints:    serviceControlPoints,
+		KubernetesControlPoints: kubernetesControlPoints,
+		InstallationMode:        h.installationMode,
 	}
 }
 
@@ -282,15 +300,18 @@ func (h *Heartbeats) sendSingleHeartbeatByHTTP(jobCtxt context.Context) (proto.M
 	return &emptypb.Empty{}, nil
 }
 
+// GetControllerInfo returns the controller info.
 func (h *Heartbeats) GetControllerInfo(context.Context, *emptypb.Empty) (*heartbeatv1.ControllerInfo, error) {
 	return h.ControllerInfo, nil
 }
 
+// RegisterControllerInfoService registers the controller info service with the given gRPC server.
 func RegisterControllerInfoService(grpc *grpc.Server, handler *Heartbeats) error {
 	heartbeatv1.RegisterControllerInfoServiceServer(grpc, handler)
 	return nil
 }
 
+// RegisterControllerInfoServiceHTTP registers the controller info service with the given gRPC gateway.
 func RegisterControllerInfoServiceHTTP() fx.Option {
 	return grpcgateway.RegisterHandler{Handler: heartbeatv1.RegisterControllerInfoServiceHandlerFromEndpoint}.Annotate()
 }

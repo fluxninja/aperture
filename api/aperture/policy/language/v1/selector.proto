@@ -6,11 +6,13 @@ import "aperture/policy/language/v1/label_matcher.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 // Describes which flow in which service a [flow control
-// component](/concepts/flow-control/flow-control.md#components) should apply
+// component](/concepts/integrations/flow-control/flow-control.md#components) should apply
 // to
 //
 // :::info
-// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+//
+// See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+//
 // :::
 message FlowSelector {
   ServiceSelector service_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -28,15 +30,23 @@ message FlowSelector {
 }
 
 // Describes which service a [flow control or observability
-// component](/concepts/flow-control/flow-control.md#components) should apply
+// component](/concepts/integrations/flow-control/flow-control.md#components) should apply
 // to
 //
 // :::info
-// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+//
+// See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+//
 // :::
 message ServiceSelector {
-  // Which [agent-group](/concepts/service.md#agent-group) this
+  // Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
   // selector applies to.
+  //
+  // :::info
+  //
+  // Agent Groups are used to scope policies to a subset of agents connected to the same controller. This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode. The agents within an agent group form a peer to peer cluster and constantly share state.
+  //
+  // :::
   string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
@@ -45,24 +55,39 @@ message ServiceSelector {
   }]; // @gotags: default:"default"
 
   // The Fully Qualified Domain Name of the
-  // [service](/concepts/service.md) to select.
+  // [service](/concepts/integrations/flow-control/service.md) to select.
   //
-  // In kubernetes, this is the FQDN of the Service object.
+  // In Kubernetes, this is the FQDN of the Service object.
   //
-  // Empty string means all services within an agent group (catch-all).
+  // "all" means all services within an agent group (catch-all).
   //
-  // :::note
-  // One entity may belong to multiple services.
+  // :::info
+  //
+  // In the Kubernetes sidecar installation mode, service discovery is switched off by default. In order to scope policies to services, the `service` should be set to `all` and instead, `agent_group` name should be used.
+  //
   // :::
-  string service = 2;
+  //
+  // :::info
+  //
+  // An entity (e.g. Kubernetes pod) may belong to multiple services.
+  //
+  // :::
+  string service = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"];
 }
 
 // Describes which flows a [flow control
-// component](/concepts/flow-control/flow-control.md#components) should apply
+// component](/concepts/integrations/flow-control/flow-control.md#components) should apply
 // to
 //
 // :::info
-// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
+//
+// See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+//
 // :::
 //
 // Example:
@@ -81,7 +106,7 @@ message ServiceSelector {
 //       regex: ^(?!.*Chrome).*Safari
 // ```
 message FlowMatcher {
-  // [Control Point](/concepts/flow-control/flow-control.md#control-point)
+  // [Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)
   // identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
   // block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
   // or filter chains.
@@ -93,15 +118,18 @@ message FlowMatcher {
   }]; // @gotags: validate:"required"
 
   // Label matcher allows to add _additional_ condition on
-  // [flow labels](/concepts/flow-control/flow-label.md)
+  // [flow labels](/concepts/integrations/flow-control/flow-label.md)
   // must also be satisfied (in addition to service+control point matching)
   //
   // :::info
-  // See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
+  //
+  // See also [Label Matcher overview](/concepts/integrations/flow-control/flow-selector.md#label-matcher).
+  //
   // :::
   //
   // :::note
-  // [Classifiers](#v1-classifier) _can_ use flow labels created by some other
+  //
+  // [Classifiers](#classifier) _can_ use flow labels created by some other
   // classifier, but only if they were created at some previous control point
   // (and propagated in baggage).
   //
@@ -109,14 +137,15 @@ message FlowMatcher {
   // Flux Meters or Actuators. It's valid to create a flow label on a control
   // point using classifier, and immediately use it for matching on the same
   // control point.
+  //
   // :::
   LabelMatcher label_matcher = 2;
 }
 
 // Describes which pods a control or observability
 // component should apply to.
-message KubernetesSelector {
-  // Which [agent-group](/concepts/service.md#agent-group) this
+message KubernetesObjectSelector {
+  // Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
   // selector applies to.
   string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
@@ -133,8 +162,16 @@ message KubernetesSelector {
     }
   }]; // @gotags: validate:"required"
 
+  // API version of Kubernetes resource
+  string api_version = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    extensions: {
+      key: "x-go-validate"
+      value: {string_value: "required"}
+    }
+  }]; // @gotags: validate:"required"
+
   // Kubernetes resource type.
-  string kind = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  string kind = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {string_value: "required"}
@@ -142,7 +179,7 @@ message KubernetesSelector {
   }]; // @gotags: validate:"required"
 
   // Kubernetes resource name.
-  string name = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  string name = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-validate"
       value: {string_value: "required"}

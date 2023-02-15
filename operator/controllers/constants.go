@@ -91,6 +91,8 @@ const (
 	ApertureFluxNinjaPlugin = "aperture-plugin-fluxninja"
 	// DefaulterAnnotationKey defines annotation key for set defaults.
 	DefaulterAnnotationKey = "fluxninja.com/set-defaults"
+	// AgentModeChangeAnnotationKey defines annotation key for change in Agent installation mode.
+	AgentModeChangeAnnotationKey = "fluxninja.com/installation-mode-change"
 	// FailedStatus string.
 	FailedStatus = "failed"
 	// PolicyValidatingWebhookName defines Validating Webhook name for Policy.

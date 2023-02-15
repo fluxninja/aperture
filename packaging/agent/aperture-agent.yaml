@@ -1,0 +1,18 @@
+## The address of prometheus instance connected with the Aperture Controller
+# prometheus:
+#   address: http://myprometheus:9090
+
+## The endpoints of etcd connected with the Aperture Controller
+# etcd:
+#   endpoints:
+#     - http://myetcd:2379
+
+log:
+  level: info
+  non_blocking: false
+  pretty_console: true
+
+plugins:
+  disable_plugins: false
+  disabled_plugins:
+    - aperture-plugin-fluxninja

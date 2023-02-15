@@ -5,10 +5,10 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/open-policy-agent/opa/ast"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/status"
 
@@ -19,10 +19,10 @@ import (
 
 type object = map[string]interface{}
 
-var commonAttributes = &policysyncv1.CommonAttributes{
-	PolicyName:     "test",
-	PolicyHash:     "test",
-	ComponentIndex: 0,
+var classifierAttributes = &policysyncv1.ClassifierAttributes{
+	PolicyName:      "test",
+	PolicyHash:      "test",
+	ClassifierIndex: 0,
 }
 
 var _ = Describe("Classifier", func() {
@@ -31,7 +31,8 @@ var _ = Describe("Classifier", func() {
 	BeforeEach(func() {
 		log.SetGlobalLevel(log.WarnLevel)
 
-		classifier = NewClassificationEngine(status.NewRegistry(log.GetGlobalLogger()))
+		alerter := alerts.NewSimpleAlerter(100)
+		classifier = NewClassificationEngine(status.NewRegistry(log.GetGlobalLogger(), alerter))
 	})
 
 	It("returns empty slice, when no rules configured", func() {
@@ -105,18 +106,18 @@ var _ = Describe("Classifier", func() {
 		BeforeEach(func() {
 			var err error
 			ars1, err = classifier.AddRules(context.TODO(), "one", &policysyncv1.ClassifierWrapper{
-				Classifier:       rs1,
-				CommonAttributes: commonAttributes,
+				Classifier:           rs1,
+				ClassifierAttributes: classifierAttributes,
 			})
 			Expect(err).NotTo(HaveOccurred())
 			ars2, err = classifier.AddRules(context.TODO(), "two", &policysyncv1.ClassifierWrapper{
-				Classifier:       rs2,
-				CommonAttributes: commonAttributes,
+				Classifier:           rs2,
+				ClassifierAttributes: classifierAttributes,
 			})
 			Expect(err).NotTo(HaveOccurred())
 			ars3, err = classifier.AddRules(context.TODO(), "three", &policysyncv1.ClassifierWrapper{
-				Classifier:       rs3,
-				CommonAttributes: commonAttributes,
+				Classifier:           rs3,
+				ClassifierAttributes: classifierAttributes,
 			})
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -238,7 +239,7 @@ var _ = Describe("Classifier", func() {
 				},
 				Rules: labelRules,
 			},
-			CommonAttributes: commonAttributes,
+			ClassifierAttributes: classifierAttributes,
 		})
 		return err
 	}
@@ -465,8 +466,8 @@ var _ = Describe("Classifier", func() {
 
 		It("should reject the ruleset", func() {
 			_, err := classifier.AddRules(context.TODO(), "one", &policysyncv1.ClassifierWrapper{
-				Classifier:       rs,
-				CommonAttributes: commonAttributes,
+				Classifier:           rs,
+				ClassifierAttributes: classifierAttributes,
 			})
 			Expect(err).To(HaveOccurred())
 		})
@@ -480,18 +481,16 @@ func fl(s string) flowlabel.FlowLabelValue {
 	}
 }
 
-func attributesWithHeaders(headers object) ast.Value {
-	return ast.MustInterfaceToValue(
-		object{
-			"attributes": object{
-				"request": object{
-					"http": object{
-						"headers": headers,
-					},
+func attributesWithHeaders(headers object) object {
+	return object{
+		"attributes": object{
+			"request": object{
+				"http": object{
+					"headers": headers,
 				},
 			},
 		},
-	)
+	}
 }
 
 func headerExtractor(headerName string) *policylangv1.Rule_Extractor {

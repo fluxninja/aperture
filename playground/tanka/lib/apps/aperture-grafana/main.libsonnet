@@ -1,9 +1,10 @@
 local grafanaOperator = import 'github.com/jsonnet-libs/grafana-operator-libsonnet/4.3/main.libsonnet';
 local kubernetesMixin = import 'github.com/kubernetes-monitoring/kubernetes-mixin/mixin.libsonnet';
 
-local aperture = import '../../../../../blueprints/lib/1.0/main.libsonnet';
-local policyDashboard = aperture.blueprints.LatencyGradient.dashboard;
-local signalsDashboard = aperture.blueprints.SignalsDashboard.dashboard;
+local aperture = import '../../../../../blueprints/main.libsonnet';
+local policyDashboard = aperture.policies.LatencyAIMDConcurrencyLimiting.dashboard;
+local rateLimitpolicyDashboard = aperture.policies.StaticRateLimiting.dashboard;
+local signalsDashboard = aperture.dashboards.SignalsDashboard.dashboard;
 
 local grafana = grafanaOperator.integreatly.v1alpha1.grafana;
 local dashboard = grafanaOperator.integreatly.v1alpha1.grafanaDashboard;
@@ -41,13 +42,28 @@ local kubeDashboards =
      },
    }).grafanaDashboards;
 
+local latencyGradientPolicyDashboard =
+  policyDashboard({
+    policy_name: 'service1-demo-app',
+  }).dashboard;
+
+local rateLimitPanel =
+  rateLimitpolicyDashboard({
+      policy_name: 'service1-demo-app',
+    }).dashboard.panels[0];
+
+local policyDashBoardMixin =
+  latencyGradientPolicyDashboard
+  {
+    panels+: [rateLimitPanel + {id: std.length(latencyGradientPolicyDashboard.panels) + 2}],
+  }
+;
+
 local dashboards =
   [
     dashboard.new('example-dashboard') +
     dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' }) +
-    dashboard.spec.withJson(std.manifestJsonEx(policyDashboard({
-      policyName: 'service1-demo-app',
-    }).dashboard, indent='  ')) +
+    dashboard.spec.withJson(std.manifestJsonEx(policyDashBoardMixin, indent='  ')) +
     dashboard.spec.withDatasources({
       inputName: 'DS_CONTROLLER-PROMETHEUS',
       datasourceName: 'controller-prometheus',
@@ -64,7 +80,7 @@ local dashboards =
     dashboard.new('aperture-signals')
     + dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' })
     + dashboard.spec.withJson(std.manifestJsonEx(signalsDashboard({
-      policyName: 'service1-demo-app',
+      policy_name: 'service1-demo-app',
       datasource+: {
         name: 'controller-prometheus',
       },

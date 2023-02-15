@@ -17,7 +17,6 @@ limitations under the License.
 package agent
 
 import (
-	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -29,14 +28,16 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/pointer"
 
+	agent "github.com/fluxninja/aperture/cmd/aperture-agent/config"
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
+	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 )
 
-var _ = Describe("Agent Daemonset", func() {
+var _ = Describe("Agent DaemonSet", func() {
 	var (
 		probe = common.Probe{
 			Enabled:             true,
@@ -106,18 +107,20 @@ var _ = Describe("Agent Daemonset", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{
-								Ports: otelcollector.PortsConfig{
+						},
+						DistCache: distcache.DistCacheConfig{
+							BindAddr:           ":3320",
+							MemberlistBindAddr: ":3322",
+						},
+						OTEL: agent.AgentOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
+								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
 									PprofPort:       1777,
 									ZpagesPort:      55679,
 								},
 							},
-						},
-						DistCache: distcache.DistCacheConfig{
-							BindAddr:           ":3320",
-							MemberlistBindAddr: ":3322",
 						},
 					},
 					Image: common.AgentImage{
@@ -145,8 +148,8 @@ var _ = Describe("Agent Daemonset", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Agent",
-							Controller:         pointer.BoolPtr(true),
-							BlockOwnerDeletion: pointer.BoolPtr(true),
+							Controller:         pointer.Bool(true),
+							BlockOwnerDeletion: pointer.Bool(true),
 						},
 					},
 					Annotations: nil,
@@ -262,7 +265,7 @@ var _ = Describe("Agent Daemonset", func() {
 									Name: "aperture-agent-config",
 									VolumeSource: corev1.VolumeSource{
 										ConfigMap: &corev1.ConfigMapVolumeSource{
-											DefaultMode: pointer.Int32Ptr(420),
+											DefaultMode: pointer.Int32(420),
 											LocalObjectReference: corev1.LocalObjectReference{
 												Name: AgentServiceName,
 											},
@@ -304,18 +307,20 @@ var _ = Describe("Agent Daemonset", func() {
 									Addr: ":80",
 								},
 							},
-							Otel: otelcollector.OtelConfig{
-								Ports: otelcollector.PortsConfig{
+						},
+						DistCache: distcache.DistCacheConfig{
+							BindAddr:           ":3320",
+							MemberlistBindAddr: ":3322",
+						},
+						OTEL: agent.AgentOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
+								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
 									PprofPort:       1777,
 									ZpagesPort:      55679,
 								},
 							},
-						},
-						DistCache: distcache.DistCacheConfig{
-							BindAddr:           ":3320",
-							MemberlistBindAddr: ":3322",
 						},
 					},
 					CommonSpec: common.CommonSpec{
@@ -406,8 +411,8 @@ var _ = Describe("Agent Daemonset", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Agent",
-							Controller:         pointer.BoolPtr(true),
-							BlockOwnerDeletion: pointer.BoolPtr(true),
+							Controller:         pointer.Bool(true),
+							BlockOwnerDeletion: pointer.Bool(true),
 						},
 					},
 					Annotations: TestMap,
@@ -440,9 +445,9 @@ var _ = Describe("Agent Daemonset", func() {
 							Affinity:     affinity,
 							Tolerations:  tolerations,
 							SecurityContext: &corev1.PodSecurityContext{
-								FSGroup: pointer.Int64Ptr(1001),
+								FSGroup: pointer.Int64(1001),
 							},
-							TerminationGracePeriodSeconds: pointer.Int64Ptr(10),
+							TerminationGracePeriodSeconds: pointer.Int64(10),
 							InitContainers: []corev1.Container{
 								{
 									Name: Test,
@@ -454,9 +459,9 @@ var _ = Describe("Agent Daemonset", func() {
 									Image:           "docker.io/fluxninja/aperture-agent:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									SecurityContext: &corev1.SecurityContext{
-										RunAsUser:              pointer.Int64Ptr(0),
-										RunAsNonRoot:           pointer.BoolPtr(false),
-										ReadOnlyRootFilesystem: pointer.BoolPtr(false),
+										RunAsUser:              pointer.Int64(0),
+										RunAsNonRoot:           pointer.Bool(false),
+										ReadOnlyRootFilesystem: pointer.Bool(false),
 									},
 									Command: TestArray,
 									Args:    TestArray,
@@ -547,7 +552,7 @@ var _ = Describe("Agent Daemonset", func() {
 									LivenessProbe: &corev1.Probe{
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
-												Path:   "/v1/status/liveness",
+												Path:   "/v1/status/subsystem/liveness",
 												Port:   intstr.FromString(Server),
 												Scheme: corev1.URISchemeHTTP,
 											},
@@ -561,7 +566,7 @@ var _ = Describe("Agent Daemonset", func() {
 									ReadinessProbe: &corev1.Probe{
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
-												Path:   "/v1/status/readiness",
+												Path:   "/v1/status/subsystem/readiness",
 												Port:   intstr.FromString(Server),
 												Scheme: corev1.URISchemeHTTP,
 											},
@@ -599,7 +604,7 @@ var _ = Describe("Agent Daemonset", func() {
 									Name: "aperture-agent-config",
 									VolumeSource: corev1.VolumeSource{
 										ConfigMap: &corev1.ConfigMapVolumeSource{
-											DefaultMode: pointer.Int32Ptr(420),
+											DefaultMode: pointer.Int32(420),
 											LocalObjectReference: corev1.LocalObjectReference{
 												Name: AgentServiceName,
 											},
@@ -620,7 +625,7 @@ var _ = Describe("Agent Daemonset", func() {
 	})
 })
 
-var _ = Describe("Test Daemonset Mutate", func() {
+var _ = Describe("Test DaemonSet Mutate", func() {
 	It("Mutate should update required fields only", func() {
 		expected := &appsv1.DaemonSet{
 			ObjectMeta: metav1.ObjectMeta{},
@@ -639,7 +644,7 @@ var _ = Describe("Test Daemonset Mutate", func() {
 						NodeSelector:       map[string]string{},
 						Tolerations:        []corev1.Toleration{},
 						SecurityContext: &corev1.PodSecurityContext{
-							FSGroup: pointer.Int64Ptr(1001),
+							FSGroup: pointer.Int64(1001),
 						},
 						InitContainers: []corev1.Container{},
 						Containers: []corev1.Container{

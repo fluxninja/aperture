@@ -13,7 +13,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
 // TraceHandler implements ExportTraceService.
@@ -34,8 +34,8 @@ func (t TraceHandler) Export(ctx context.Context, req *tracev1.ExportTraceServic
 				var flowStartTS, flowEndTS, workloadTS int64
 				for _, attribute := range span.Attributes {
 					switch attribute.Key {
-					case otelcollector.ApertureCheckResponseLabel:
-						log.Trace().Str("attribute", otelcollector.ApertureCheckResponseLabel).Msg("Validating attribute")
+					case otelconsts.ApertureCheckResponseLabel:
+						log.Trace().Str("attribute", otelconsts.ApertureCheckResponseLabel).Msg("Validating attribute")
 						v := attribute.Value.GetStringValue()
 						checkResponse := &flowcontrolv1.CheckResponse{}
 						var wireMsg []byte
@@ -47,46 +47,46 @@ func (t TraceHandler) Export(ctx context.Context, req *tracev1.ExportTraceServic
 							perr := proto.Unmarshal(wireMsg, checkResponse)
 							if err != nil {
 								log.Error().Err(err).Msg("Failed to unmarshal as protobuf")
-								err = multierr.Append(err, fmt.Errorf("invalid %s: %w", otelcollector.ApertureCheckResponseLabel, perr))
+								err = multierr.Append(err, fmt.Errorf("invalid %s: %w", otelconsts.ApertureCheckResponseLabel, perr))
 							}
 							continue
 						}
 						perr := json.Unmarshal([]byte(v), checkResponse)
 						if perr != nil {
 							log.Error().Err(err).Msg("Failed to unmarshal as json")
-							err = multierr.Append(err, fmt.Errorf("invalid %s: %w", otelcollector.ApertureCheckResponseLabel, perr))
+							err = multierr.Append(err, fmt.Errorf("invalid %s: %w", otelconsts.ApertureCheckResponseLabel, perr))
 						}
-					case otelcollector.ApertureSourceLabel:
-						log.Trace().Str("attribute", otelcollector.ApertureSourceLabel).Msg("Validating attribute")
+					case otelconsts.ApertureSourceLabel:
+						log.Trace().Str("attribute", otelconsts.ApertureSourceLabel).Msg("Validating attribute")
 						v := attribute.Value.GetStringValue()
 						if v != "sdk" {
 							log.Error().Msg("Failed to validate source")
-							err = multierr.Append(err, fmt.Errorf("invalid %s", otelcollector.ApertureSourceLabel))
+							err = multierr.Append(err, fmt.Errorf("invalid %s", otelconsts.ApertureSourceLabel))
 						}
-					case otelcollector.ApertureFlowStatusLabel:
-						log.Trace().Str("attribute", otelcollector.ApertureFlowStatusLabel).Msg("Validating attribute")
+					case otelconsts.ApertureFlowStatusLabel:
+						log.Trace().Str("attribute", otelconsts.ApertureFlowStatusLabel).Msg("Validating attribute")
 						v := attribute.Value.GetStringValue()
-						if v != otelcollector.ApertureFlowStatusOK && v != otelcollector.ApertureFlowStatusError && v != "Unset" {
+						if v != otelconsts.ApertureFlowStatusOK && v != otelconsts.ApertureFlowStatusError && v != "Unset" {
 							log.Error().Msg("Failed to validate flow status")
-							err = multierr.Append(err, fmt.Errorf("invalid %s", otelcollector.ApertureFlowStatusLabel))
+							err = multierr.Append(err, fmt.Errorf("invalid %s", otelconsts.ApertureFlowStatusLabel))
 						}
-					case otelcollector.ApertureFlowStartTimestampLabel:
+					case otelconsts.ApertureFlowStartTimestampLabel:
 						flowStartTS = attribute.Value.GetIntValue()
-					case otelcollector.ApertureFlowEndTimestampLabel:
+					case otelconsts.ApertureFlowEndTimestampLabel:
 						flowEndTS = attribute.Value.GetIntValue()
-					case otelcollector.ApertureWorkloadStartTimestampLabel:
+					case otelconsts.ApertureWorkloadStartTimestampLabel:
 						workloadTS = attribute.Value.GetIntValue()
 					}
 				}
-				log.Trace().Str("attribute", otelcollector.ApertureFlowStartTimestampLabel).Str("attribute", otelcollector.ApertureFlowEndTimestampLabel).Msg("Validating attribute")
+				log.Trace().Str("attribute", otelconsts.ApertureFlowStartTimestampLabel).Str("attribute", otelconsts.ApertureFlowEndTimestampLabel).Msg("Validating attribute")
 				if flowStartTS > flowEndTS {
 					log.Error().Msg("Failed to validate start and end flow timestamps")
-					err = multierr.Append(err, fmt.Errorf("invalid %s and %s", otelcollector.ApertureFlowStartTimestampLabel, otelcollector.ApertureFlowEndTimestampLabel))
+					err = multierr.Append(err, fmt.Errorf("invalid %s and %s", otelconsts.ApertureFlowStartTimestampLabel, otelconsts.ApertureFlowEndTimestampLabel))
 				}
-				log.Trace().Str("attribute", otelcollector.ApertureWorkloadStartTimestampLabel).Msg("Validating attribute")
+				log.Trace().Str("attribute", otelconsts.ApertureWorkloadStartTimestampLabel).Msg("Validating attribute")
 				if workloadTS == 0 {
 					log.Error().Msg("Failed to validate workload start timestamp")
-					err = multierr.Append(err, fmt.Errorf("invalid %s", otelcollector.ApertureWorkloadStartTimestampLabel))
+					err = multierr.Append(err, fmt.Errorf("invalid %s", otelconsts.ApertureWorkloadStartTimestampLabel))
 				}
 				merr = multierr.Append(merr, err)
 				if merr != nil {

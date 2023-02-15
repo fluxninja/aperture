@@ -3,7 +3,6 @@ package watchdog
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"math"
 	"runtime"
@@ -13,6 +12,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	watchdogv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/watchdog/v1"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -81,7 +81,7 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 		return err
 	}
 
-	watchdogRegistry := in.StatusRegistry.Child("liveness").Child(watchdogJobName)
+	watchdogRegistry := in.StatusRegistry.Child("subsystem", "liveness").Child(watchdogJobName, watchdogJobName)
 
 	w := newWatchdog(in.JobGroup, watchdogRegistry, config)
 
@@ -98,9 +98,9 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 }
 
 func newWatchdog(jobGroup *jobs.JobGroup, registry status.Registry, config WatchdogConfig) *watchdog {
-	heapStatusRegistry := registry.Child("heap")
+	heapStatusRegistry := registry.Child("heap", "heap")
 
-	job := jobs.NewMultiJob(jobGroup.GetStatusRegistry().Child(watchdogJobName), nil, nil)
+	job := jobs.NewMultiJob(jobGroup.GetStatusRegistry().Child(watchdogJobName, watchdogJobName), nil, nil)
 
 	w := &watchdog{
 		heapStatusRegistry: heapStatusRegistry,
@@ -118,17 +118,16 @@ func (w *watchdog) start() error {
 
 	// CGroup memory check
 	if runtime.GOOS == "linux" {
-		job := &jobs.BasicJob{
-			JobBase: jobs.JobBase{
-				JobName: "cgroup",
-			},
-		}
+		job := jobs.NewBasicJob("cgroup",
+			func(ctx context.Context) (proto.Message, error) {
+				return &emptypb.Empty{}, nil
+			})
 		if w.config.CGroup.WatermarksPolicy.Enabled {
 			cgw := &cgroupWatermarks{WatermarksPolicy: w.config.CGroup.WatermarksPolicy}
-			job.JobFunc = cgw.Check
+			job = jobs.NewBasicJob("cgroup", cgw.Check)
 		} else if w.config.CGroup.AdaptivePolicy.Enabled {
 			cga := &cgroupAdaptive{AdaptivePolicy: w.config.CGroup.AdaptivePolicy}
-			job.JobFunc = cga.Check
+			job = jobs.NewBasicJob("cgroup", cga.Check)
 		}
 		err = w.watchdogJob.RegisterJob(job)
 		if err != nil {
@@ -137,18 +136,17 @@ func (w *watchdog) start() error {
 	}
 
 	if w.config.System.WatermarksPolicy.Enabled || w.config.System.AdaptivePolicy.Enabled {
-		job := &jobs.BasicJob{
-			JobBase: jobs.JobBase{
-				JobName: "system",
-			},
-		}
+		job := jobs.NewBasicJob("system",
+			func(ctx context.Context) (proto.Message, error) {
+				return &emptypb.Empty{}, nil
+			})
 		// System memory check
 		if w.config.System.WatermarksPolicy.Enabled {
 			sw := &systemWatermarks{WatermarksPolicy: w.config.System.WatermarksPolicy}
-			job.JobFunc = sw.Check
+			job = jobs.NewBasicJob("system", sw.Check)
 		} else if w.config.System.AdaptivePolicy.Enabled {
 			sa := &systemAdaptive{AdaptivePolicy: w.config.System.AdaptivePolicy}
-			job.JobFunc = sa.Check
+			job = jobs.NewBasicJob("system", sa.Check)
 		}
 		err = w.watchdogJob.RegisterJob(job)
 		if err != nil {
@@ -311,10 +309,10 @@ func newHeapPolicy(config HeapConfig) *heapPolicy {
 func (hp *heapPolicy) checkHeap() (proto.Message, error) {
 	log.Debug().Msg("Heap check triggered")
 	if hp.Limit == 0 {
-		return nil, fmt.Errorf("cannot use zero limit for heap-driven watchdog")
+		log.Warn().Msg("Heap limit is 0, skipping check")
+		return nil, nil
 	}
 
-	var err error
 	var threshold uint64
 	var memstats runtime.MemStats
 	runtime.ReadMemStats(&memstats)
@@ -339,7 +337,7 @@ func (hp *heapPolicy) checkHeap() (proto.Message, error) {
 	if hp.currGoGC >= hp.originalGoGC {
 		hp.currGoGC = hp.originalGoGC
 	} else if hp.currGoGC < hp.MinGoGC {
-		err = errors.New("heap driven watchdog reached minimum threshold for GoGC value")
+		log.Warn().Msg("heap driven watchdog reached minimum threshold for GoGC value")
 		// cap GoGC to avoid overscheduling.
 		hp.currGoGC = hp.MinGoGC
 	}
@@ -380,5 +378,5 @@ func (hp *heapPolicy) checkHeap() (proto.Message, error) {
 		NumForcedGc:  memstats.NumForcedGC,
 	}
 
-	return result, err
+	return result, nil
 }

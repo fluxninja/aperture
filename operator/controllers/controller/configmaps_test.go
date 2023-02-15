@@ -24,6 +24,7 @@ import (
 	"text/template"
 	"time"
 
+	controller "github.com/fluxninja/aperture/cmd/aperture-controller/config"
 	. "github.com/fluxninja/aperture/operator/controllers"
 
 	"github.com/fluxninja/aperture/operator/api/common"
@@ -32,7 +33,7 @@ import (
 	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	"github.com/fluxninja/aperture/pkg/plugins"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	. "github.com/onsi/ginkgo/v2"
@@ -81,30 +82,22 @@ var _ = Describe("ConfigMap for Controller", func() {
 								DisablePlugins:  false,
 								DisabledPlugins: []string{"aperture-plugin-fluxninja"},
 							},
-							Otel: otelcollector.OtelConfig{
-								BatchPrerollup: otelcollector.BatchPrerollupConfig{
-									Timeout:          config.MakeDuration(1 * time.Second),
-									SendBatchSize:    10000,
-									SendBatchMaxSize: 20000,
-								},
-								BatchPostrollup: otelcollector.BatchPostrollupConfig{
-									Timeout:          config.MakeDuration(1 * time.Second),
-									SendBatchSize:    100,
-									SendBatchMaxSize: 200,
-								},
-								Ports: otelcollector.PortsConfig{
-									DebugPort:       8888,
-									HealthCheckPort: 13133,
-									PprofPort:       1777,
-									ZpagesPort:      55679,
-								},
-							},
 							Etcd: etcd.EtcdConfig{
 								Endpoints: []string{"http://agent-etcd:2379"},
 								LeaseTTL:  config.MakeDuration(60 * time.Second),
 							},
 							Prometheus: prometheus.PrometheusConfig{
 								Address: "http://aperture-prometheus-server:80",
+							},
+						},
+						OTEL: controller.ControllerOTELConfig{
+							CommonOTELConfig: otelconfig.CommonOTELConfig{
+								Ports: otelconfig.PortsConfig{
+									DebugPort:       8888,
+									HealthCheckPort: 13133,
+									PprofPort:       1777,
+									ZpagesPort:      55679,
+								},
 							},
 						},
 					},
@@ -137,8 +130,8 @@ var _ = Describe("ConfigMap for Controller", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Controller",
-							Controller:         pointer.BoolPtr(true),
-							BlockOwnerDeletion: pointer.BoolPtr(true),
+							Controller:         pointer.Bool(true),
+							BlockOwnerDeletion: pointer.Bool(true),
 						},
 					},
 				},

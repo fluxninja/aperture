@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"math"
 
 	"go.uber.org/fx"
@@ -23,11 +24,14 @@ func (*Sqrt) Name() string { return "Sqrt" }
 // Type implements runtime.Component.
 func (*Sqrt) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
+// ShortDescription implements runtime.Component.
+func (sqrt *Sqrt) ShortDescription() string { return fmt.Sprintf("scale: %f", sqrt.scale) }
+
 // Make sure Sqrt complies with Component interface.
 var _ runtime.Component = (*Sqrt)(nil)
 
 // NewSqrtAndOptions creates a new Sqrt Component.
-func NewSqrtAndOptions(sqrtProto *policylangv1.Sqrt, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewSqrtAndOptions(sqrtProto *policylangv1.Sqrt, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	sqrt := Sqrt{
 		scale: sqrtProto.Scale,
 	}
@@ -35,8 +39,8 @@ func NewSqrtAndOptions(sqrtProto *policylangv1.Sqrt, componentIndex int, policyR
 }
 
 // Execute implements runtime.Component.Execute.
-func (sqrt *Sqrt) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	input := inPortReadings.ReadSingleValuePort("input")
+func (sqrt *Sqrt) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	input := inPortReadings.ReadSingleReadingPort("input")
 	output := runtime.InvalidReading()
 
 	if input.Valid() {
@@ -47,7 +51,7 @@ func (sqrt *Sqrt) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.T
 		}
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
 }

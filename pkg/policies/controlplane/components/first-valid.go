@@ -18,17 +18,20 @@ func (*FirstValid) Name() string { return "FirstValid" }
 // Type implements runtime.Component.
 func (*FirstValid) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
+// ShortDescription implements runtime.Component.
+func (*FirstValid) ShortDescription() string { return "" }
+
 // Make sure FirstValid complies with Component interface.
 var _ runtime.Component = (*FirstValid)(nil)
 
 // NewFirstValidAndOptions creates a new FirstValid component and its Fx option.
-func NewFirstValidAndOptions(firstValidProto *policylangv1.FirstValid, componentIndex int, policyReadAPI iface.Policy) (*FirstValid, fx.Option, error) {
+func NewFirstValidAndOptions(firstValidProto *policylangv1.FirstValid, _ string, policyReadAPI iface.Policy) (*FirstValid, fx.Option, error) {
 	return &FirstValid{}, fx.Options(), nil
 }
 
 // Execute implements runtime.Component.Execute.
-func (fv *FirstValid) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	inputs := inPortReadings.ReadRepeatedValuePort("inputs")
+func (fv *FirstValid) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	inputs := inPortReadings.ReadRepeatedReadingPort("inputs")
 	output := runtime.InvalidReading()
 
 	for _, input := range inputs {
@@ -38,7 +41,7 @@ func (fv *FirstValid) Execute(inPortReadings runtime.PortToValue, tickInfo runti
 		}
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
 }

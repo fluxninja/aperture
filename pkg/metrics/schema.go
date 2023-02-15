@@ -50,10 +50,10 @@ const (
 	// WorkloadCounterMetricName - metric used for counting workload requests.
 	WorkloadCounterMetricName = "workload_requests_total"
 
-	// AcceptedConcurrencyMetricName - metric for measuring latencies of accepted requests.
-	AcceptedConcurrencyMetricName = "accepted_concurrency_ms"
-	// IncomingConcurrencyMetricName - metric for measuring latencies of all incoming requests.
-	IncomingConcurrencyMetricName = "incoming_concurrency_ms"
+	// AcceptedWorkSecondsMetricName - total work measured in seconds of estimated duration of all accepted requests.
+	AcceptedWorkSecondsMetricName = "accepted_work_seconds_total"
+	// IncomingWorkSecondsMetricName - total work measured in seconds of estimated duration of all incoming requests.
+	IncomingWorkSecondsMetricName = "incoming_work_seconds_total"
 
 	// WFQFlowsMetricName - weighted fair queuing number of flows gauge.
 	WFQFlowsMetricName = "wfq_flows_total"
@@ -97,14 +97,18 @@ const (
 	PolicyNameLabel = "policy_name"
 	// PolicyHashLabel - label used in prometheus.
 	PolicyHashLabel = "policy_hash"
-	// ComponentIndexLabel - index of component in circuit label.
-	ComponentIndexLabel = "component_index"
+	// ComponentIDLabel - index of component in circuit label.
+	ComponentIDLabel = "component_id"
 	// DecisionTypeLabel - label for decision type dropped or accepted.
 	DecisionTypeLabel = "decision_type"
 	// WorkloadIndexLabel - label for choosing correct workload.
 	WorkloadIndexLabel = "workload_index"
+	// LimiterDroppedLabel - label to indicate that the particular limiter has dropped the request.
+	LimiterDroppedLabel = "limiter_dropped"
 	// SignalNameLabel - label for saving circuit signal metrics.
 	SignalNameLabel = "signal_name"
+	// SubCircuitIDLabel - label for saving circuit id in signal metrics.
+	SubCircuitIDLabel = "sub_circuit_id"
 	// FluxMeterNameLabel - specifying flux meter's name.
 	FluxMeterNameLabel = "flux_meter_name"
 	// ValidLabel - label for specifying if metric is valid.

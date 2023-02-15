@@ -1,11 +1,11 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 set -eux
 
 # This script builds a Go binary and injects build-time variables.
 # TODO: it should be used in every Dockerfile requiring version endpoint.
 
 VERSION=${VERSION:-0.0.1}
-BUILD_TIME=$(date --rfc-3339=seconds)
+BUILD_TIME=$(date -Iseconds)
 GOOS=$(go env GOOS)
 GOARCH=$(go env GOARCH)
 HOSTNAME=$(hostname)
@@ -23,4 +23,13 @@ LDFLAGS="\
     -X 'github.com/fluxninja/aperture/pkg/info.GitCommitHash=${GIT_COMMIT_HASH}' \
     -X 'github.com/fluxninja/aperture/pkg/info.Prefix=${PREFIX}' \
 "
-go build --ldflags "${LDFLAGS}" -o "${TARGET}" "${SOURCE}"
+
+build_args=(
+  --ldflags "${LDFLAGS}"
+  -o "${TARGET}"
+  "${SOURCE}"
+)
+if [ -n "${RACE:-}" ]; then
+  build_args+=( --race )
+fi
+go build "${build_args[@]}"

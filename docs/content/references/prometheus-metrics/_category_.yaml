@@ -1,8 +1,0 @@
-label: Prometheus Metrics
-position: 3
-collapsible: true
-collapsed: true
-link:
-  type: "generated-index"
-  title: "Prometheus Metrics"
-  keywords: ["prometheus", "metrics"]

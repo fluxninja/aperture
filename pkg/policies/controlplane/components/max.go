@@ -21,25 +21,28 @@ func (*Max) Name() string { return "Max" }
 // Type implements runtime.Component.
 func (*Max) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
+// ShortDescription implements runtime.Component.
+func (*Max) ShortDescription() string { return "" }
+
 // Make sure Max complies with Component interface.
 var _ runtime.Component = (*Max)(nil)
 
 // NewMaxAndOptions creates a new Max Component.
-func NewMaxAndOptions(maxProto *policylangv1.Max, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewMaxAndOptions(_ *policylangv1.Max, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	max := Max{}
 	return &max, fx.Options(), nil
 }
 
 // Execute implements runtime.Component.Execute.
-func (max *Max) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
+func (max *Max) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	maxValue := -math.MaxFloat64
-	inputs := inPortReadings.ReadRepeatedValuePort("inputs")
+	inputs := inPortReadings.ReadRepeatedReadingPort("inputs")
 	output := runtime.InvalidReading()
 
 	if len(inputs) > 0 {
 		for _, singleInput := range inputs {
 			if !singleInput.Valid() {
-				return runtime.PortToValue{
+				return runtime.PortToReading{
 					"output": []runtime.Reading{output},
 				}, nil
 			}
@@ -52,7 +55,7 @@ func (max *Max) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.Tic
 		output = runtime.InvalidReading()
 	}
 
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
 }

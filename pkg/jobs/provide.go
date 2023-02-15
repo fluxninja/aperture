@@ -89,24 +89,14 @@ type SelfChecksIn struct {
 
 // RegisterSelfChecks registers self check jobs (liveness, readiness) for internal service components.
 func registerSelfChecks(sc SelfChecksIn) {
-	liveness := &BasicJob{
-		JobBase: JobBase{
-			JobName: "job-module",
-		},
-		JobFunc: checkSelfLiveness,
-	}
+	liveness := NewBasicJob("job-module", checkSelfLiveness)
 	err := sc.Liveness.RegisterJob(liveness)
 	if err != nil {
 		log.Error().Err(err).Msg("Unable to register liveness job")
 		return
 	}
 
-	readiness := &BasicJob{
-		JobBase: JobBase{
-			JobName: "job-module",
-		},
-		JobFunc: checkSelfReadiness,
-	}
+	readiness := NewBasicJob("job-module", checkSelfReadiness)
 	err = sc.Readiness.RegisterJob(readiness)
 	if err != nil {
 		log.Error().Err(err).Msg("Unable to register readiness job")

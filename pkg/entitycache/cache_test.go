@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/entitycache/v1"
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/entitycache/v1"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 )
 
@@ -22,7 +22,7 @@ var _ = Describe("Cache", func() {
 			entity := testEntity("foo", ip, name, nil)
 			ec.Put(entity)
 			actual, err := ec.GetByIP(ip)
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(actual).To(Equal(entity))
 		})
 
@@ -60,7 +60,7 @@ var _ = Describe("Cache", func() {
 			Expect(removed).To(BeFalse())
 
 			found, err := ec.GetByIP(ip)
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(found).To(Equal(entity))
 		})
 	})
@@ -72,7 +72,7 @@ var _ = Describe("Cache", func() {
 			entity := testEntity(uid, "", name, nil)
 			ec.Put(entity)
 			actual, err := ec.GetByName(name)
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(actual).To(Equal(entity))
 		})
 
@@ -110,7 +110,7 @@ var _ = Describe("Cache", func() {
 			Expect(removed).To(BeFalse())
 
 			found, err := ec.GetByName(name)
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(found).To(Equal(entity))
 		})
 	})

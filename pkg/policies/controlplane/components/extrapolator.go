@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"time"
 
 	"go.uber.org/fx"
@@ -14,12 +15,12 @@ import (
 
 // Extrapolator takes an input signal and emits an output signal.
 type Extrapolator struct {
-	// Maximum time interval for each extrapolation of signal is done; Reading becomes invalid after this interval.
-	maxExtrapolationInterval time.Duration
-	// The last output that was emitted as an output signal.
-	lastOutput runtime.Reading
 	// The last valid timestamp.
 	lastValidTimestamp time.Time
+	// The last output that was emitted as an output signal.
+	lastOutput runtime.Reading
+	// Maximum time interval for each extrapolation of signal is done; Reading becomes invalid after this interval.
+	maxExtrapolationInterval time.Duration
 }
 
 // Name implements runtime.Component.
@@ -28,13 +29,18 @@ func (*Extrapolator) Name() string { return "Extrapolator" }
 // Type implements runtime.Component.
 func (*Extrapolator) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
 
+// ShortDescription implements runtime.Component.
+func (exp *Extrapolator) ShortDescription() string {
+	return fmt.Sprintf("for: %s", exp.maxExtrapolationInterval)
+}
+
 // Make sure Extrapolator complies with Component interface.
 var _ runtime.Component = (*Extrapolator)(nil)
 
 // NewExtrapolatorAndOptions creates a new Extrapolator Component.
-func NewExtrapolatorAndOptions(extrapolatorProto *policylangv1.Extrapolator, componentIndex int, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewExtrapolatorAndOptions(extrapolatorProto *policylangv1.Extrapolator, _ string, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	exp := Extrapolator{
-		maxExtrapolationInterval: extrapolatorProto.MaxExtrapolationInterval.AsDuration(),
+		maxExtrapolationInterval: extrapolatorProto.Parameters.MaxExtrapolationInterval.AsDuration(),
 		lastOutput:               runtime.InvalidReading(),
 		lastValidTimestamp:       time.Time{},
 	}
@@ -43,8 +49,8 @@ func NewExtrapolatorAndOptions(extrapolatorProto *policylangv1.Extrapolator, com
 }
 
 // Execute implements runtime.Component.Execute.
-func (exp *Extrapolator) Execute(inPortReadings runtime.PortToValue, tickInfo runtime.TickInfo) (runtime.PortToValue, error) {
-	input := inPortReadings.ReadSingleValuePort("input")
+func (exp *Extrapolator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	input := inPortReadings.ReadSingleReadingPort("input")
 	output := runtime.InvalidReading()
 
 	if input.Valid() {
@@ -63,7 +69,7 @@ func (exp *Extrapolator) Execute(inPortReadings runtime.PortToValue, tickInfo ru
 	}
 
 	// If the signal returns, it resumes mirroring the input signal as output signal.
-	return runtime.PortToValue{
+	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
 }

@@ -7,8 +7,9 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/agentinfo"
+	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/controlpointcache"
+	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/jobs"
@@ -17,6 +18,7 @@ import (
 	httpclient "github.com/fluxninja/aperture/pkg/net/http"
 	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
 )
@@ -42,18 +44,19 @@ func Module() fx.Option {
 type ConstructorIn struct {
 	fx.In
 
-	Lifecycle                  fx.Lifecycle
-	Unmarshaller               config.Unmarshaller
-	JobGroup                   *jobs.JobGroup                     `name:"heartbeats-job-group"`
-	GRPClientConnectionBuilder grpcclient.ClientConnectionBuilder `name:"heartbeats-grpc-client"`
-	HTTPClient                 *http.Client                       `name:"heartbeats-http-client"`
-	StatusRegistry             status.Registry
-	EntityCache                *entitycache.EntityCache `optional:"true"`
-	AgentInfo                  *agentinfo.AgentInfo     `optional:"true"`
-	PeersWatcher               *peers.PeerDiscovery     `name:"fluxninja-peers-watcher" optional:"true"`
-	EtcdClient                 *etcdclient.Client
-	PolicyFactory              *controlplane.PolicyFactory `optional:"true"`
-	ControlPointCache          *controlpointcache.ControlPointCache
+	Lifecycle                   fx.Lifecycle
+	Unmarshaller                config.Unmarshaller
+	JobGroup                    *jobs.JobGroup                     `name:"heartbeats-job-group"`
+	GRPClientConnectionBuilder  grpcclient.ClientConnectionBuilder `name:"heartbeats-grpc-client"`
+	HTTPClient                  *http.Client                       `name:"heartbeats-http-client"`
+	StatusRegistry              status.Registry
+	EntityCache                 *entitycache.EntityCache `optional:"true"`
+	AgentInfo                   *agentinfo.AgentInfo     `optional:"true"`
+	PeersWatcher                *peers.PeerDiscovery     `name:"fluxninja-peers-watcher" optional:"true"`
+	EtcdClient                  *etcdclient.Client
+	PolicyFactory               *controlplane.PolicyFactory            `optional:"true"`
+	ServiceControlPointCache    *cache.Cache[selectors.ControlPointID] `optional:"true"`
+	KubernetesControlPointCache kubernetes.ControlPointCache           `optional:"true"`
 }
 
 // Provide provides a new instance of Heartbeats.
@@ -61,6 +64,20 @@ func Provide(in ConstructorIn) (*Heartbeats, error) {
 	var config pluginconfig.FluxNinjaPluginConfig
 	if err := in.Unmarshaller.UnmarshalKey(pluginconfig.PluginConfigKey, &config); err != nil {
 		return nil, err
+	}
+
+	var discoveryConfig kubernetes.KubernetesDiscoveryConfig
+	if err := in.Unmarshaller.UnmarshalKey(kubernetes.ConfigKey, &discoveryConfig); err != nil {
+		return nil, err
+	}
+
+	var installationMode string
+	if discoveryConfig.DiscoveryEnabled {
+		installationMode = "DAEMONSET"
+	} else if discoveryConfig.PodName != "" {
+		installationMode = "SIDECAR"
+	} else {
+		installationMode = "BAREMETAL"
 	}
 
 	heartbeats := newHeartbeats(
@@ -71,7 +88,9 @@ func Provide(in ConstructorIn) (*Heartbeats, error) {
 		in.AgentInfo,
 		in.PeersWatcher,
 		in.PolicyFactory,
-		in.ControlPointCache,
+		in.ServiceControlPointCache,
+		in.KubernetesControlPointCache,
+		installationMode,
 	)
 
 	runCtx, cancel := context.WithCancel(context.Background())

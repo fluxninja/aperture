@@ -20,37 +20,35 @@ type concurrencyLimiterConfigSync struct {
 	policyBaseAPI           iface.Policy
 	concurrencyLimiterProto *policylangv1.ConcurrencyLimiter
 	etcdPath                string
-	agentGroupName          string
-	componentIndex          int
+	componentID             string
 }
 
 // NewConcurrencyLimiterOptions creates fx options for ConcurrencyLimiter and also returns the agent group name associated with it.
 func NewConcurrencyLimiterOptions(
 	concurrencyLimiterProto *policylangv1.ConcurrencyLimiter,
-	componentStackIndex int,
+	componentStackID string,
 	policyReadAPI iface.Policy,
 ) (fx.Option, string, error) {
-	// Get Agent Group Name from ConcurrencyLimiter.Scheduler.Selector.AgentGroup
+	// Get Agent Group Name from ConcurrencyLimiter.FlowSelector.ServiceSelector.AgentGroup
 	flowSelectorProto := concurrencyLimiterProto.GetFlowSelector()
 	if flowSelectorProto == nil {
 		return fx.Options(), "", errors.New("concurrencyLimiter.Selector is nil")
 	}
-	agentGroupName := flowSelectorProto.ServiceSelector.GetAgentGroup()
+	agentGroup := flowSelectorProto.ServiceSelector.GetAgentGroup()
 	etcdPath := path.Join(paths.ConcurrencyLimiterConfigPath,
-		paths.FlowControlComponentKey(agentGroupName, policyReadAPI.GetPolicyName(), int64(componentStackIndex)))
+		paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentStackID))
 	configSync := &concurrencyLimiterConfigSync{
 		concurrencyLimiterProto: concurrencyLimiterProto,
 		policyBaseAPI:           policyReadAPI,
 		etcdPath:                etcdPath,
-		componentIndex:          componentStackIndex,
-		agentGroupName:          agentGroupName,
+		componentID:             componentStackID,
 	}
 
 	return fx.Options(
 		fx.Invoke(
 			configSync.doSync,
 		),
-	), agentGroupName, nil
+	), agentGroup, nil
 }
 
 func (configSync *concurrencyLimiterConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
@@ -61,9 +59,9 @@ func (configSync *concurrencyLimiterConfigSync) doSync(etcdClient *etcdclient.Cl
 			wrapper := &policysyncv1.ConcurrencyLimiterWrapper{
 				ConcurrencyLimiter: configSync.concurrencyLimiterProto,
 				CommonAttributes: &policysyncv1.CommonAttributes{
-					PolicyName:     configSync.policyBaseAPI.GetPolicyName(),
-					PolicyHash:     configSync.policyBaseAPI.GetPolicyHash(),
-					ComponentIndex: int64(configSync.componentIndex),
+					PolicyName:  configSync.policyBaseAPI.GetPolicyName(),
+					PolicyHash:  configSync.policyBaseAPI.GetPolicyHash(),
+					ComponentId: configSync.componentID,
 				},
 			}
 			dat, err := proto.Marshal(wrapper)

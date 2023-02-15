@@ -26,13 +26,23 @@ message ComponentView {
   google.protobuf.Struct component = 5;
   repeated PortView in_ports = 6;
   repeated PortView out_ports = 7;
-  string parent_component_id = 8;
 }
 
 // SourceTarget describes a link attachment to a component.
 message SourceTarget {
   string component_id = 1;
   string port_name = 2;
+}
+
+message CircuitView {
+  Tree tree = 1;
+  repeated ComponentView leaf_components = 2;
+}
+
+message Tree {
+  ComponentView root = 1;
+  repeated Tree children = 2;
+  repeated Link links = 3;
 }
 
 // Link is a connection between Components.

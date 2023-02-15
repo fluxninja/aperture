@@ -11,14 +11,14 @@ auto generate README.md configuration section.
 An example metadata looks like this:
 
 ```yaml
-blueprint: Latency Gradient Blueprint
+blueprint: Latency AIMD Concurrency Limiting Policy
 sources:
-  FluxMeter Dashboard:
+  Dashboard:
     prefix: dashboard
-    path: lib/1.0/dashboards/latency-gradient.libsonnet
-  Latency Gradient Policy:
+    path: policies/latency-aimd-concurrency-limiting/dashboard.libsonnet
+  Policy:
     prefix: policy
-    path: lib/1.0/policies/latency-gradient.libsonnet
+    path: policies/latency-aimd-concurrency-limiting/policy.libsonnet
 ```
 
 - `blueprint` key is currently unused, but it names this specific bundle
@@ -41,21 +41,22 @@ which policy or dashboard configuration is available in `config.libsonnet` and
 An example:
 
 ```yaml
-local dashboard = import '../../lib/1.0/dashboards/latency-gradient.libsonnet';
-local policyResource = import '../../lib/1.0/policies/latency-gradient.libsonnet';
+local blueprint = import 'policies/latency-aimd-concurrency-limiting.libsonnet';
 
-local config = import './config.libsonnet';
+local policy = blueprint.policy;
+local dashboard = blueprint.dashboard;
+local config = blueprint.config;
 
 {
   policies: {
-    [std.format('%s.yaml', $._config.policy.policyName)]: policyResource($._config.policy),
+    [std.format('%s.yaml', $._config.common.policyName)]: policy($._config.common + $._config.policy).policyResource,
   },
   dashboards: {
-    [std.format('%s.json', $._config.common.policyName)]: dashboard($._config.dashboard),
+    [std.format('%s.json', $._config.common.policyName)]: dashboard($._config.common + $._config.dashboard).dashboard,
   },
 } +
 {
-  _config:: config
+  _config:: config,
 }
 ```
 
@@ -74,14 +75,14 @@ An example (partial):
 ```jsonnet
 {
   /**
-  * @section Latency Gradient Policy
+  * @section Latency AIMD Concurrency Limiting Policy
   *
-  * @param (policy.policyName: string required) A name of the policy, used within PromQL queries for fluxmeter metrics.
-  * @param (policy.evaluationInterval: string) How often should policy be re-evaluated.
+  * @param (policy.policy_name: string required) A name of the policy, used within PromQL queries for fluxmeter metrics.
+  * @param (policy.evaluation_interval: string) How often should policy be re-evaluated.
   */
   policy: {
-    policyName: error 'policyName is not set',
-    evaluationInterval: '0.5s',
+    policy_name: error 'policyName is not set',
+    evaluation_interval: '0.5s',
   }
 }
 ```
@@ -134,17 +135,17 @@ of the generated README.md.
 # Updating README.md
 
 README.md generator depends on Python 3.8+ and some extra libraries that can be
-installed from `dev-requirements.txt`:
+installed from `requirements.txt`:
 
 ```sh
-pip install -r dev-requirements.txt
+pip install -r requirements.txt
 ```
 
 To update README.md from blueprint configuration, use
 `scripts/blueprint-readme-generator.py`:
 
 ```sh
-$ ./scripts/blueprint-readme-generator.py blueprints/latency-gradient
+$ ./scripts/blueprint-readme-generator.py policies/latency-aimd-concurrency-limiting
 $
 ```
 
@@ -159,8 +160,8 @@ Blueprints can be visualized. A blueprint is saved as a
 into an image with GraphViz:
 
 ```sh
-go run -mod=mod scripts/circuit-compiler/main.go -cr blueprints/latency-gradient/example/gen/policies/example.yaml -dot blueprints/latency-gradient/example/gen/graph/graph.dot
-dot -Tsvg  blueprints/latency-gradient/example/gen/graph/graph.dot > blueprints/latency-gradient/example/gen/graph/graph.svg
+go run -mod=mod cmd/aperturectl/main.go compile --cr blueprints/examples/latency-aimd-concurrency-limiting/gen/policies/example.yaml --dot blueprints/examples/latency-aimd-concurrency-limiting/gen/graph/graph.dot
+dot -Tsvg  blueprints/examples/latency-aimd-concurrency-limiting/gen/graph/graph.dot > blueprints/examples/latency-aimd-concurrency-limiting/gen/graph/graph.svg
 ```
 
 Before doing so make sure that generated yamls are up-to-date.

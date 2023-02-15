@@ -75,6 +75,15 @@ func IterateMetrics(md pmetric.Metrics, fn func(pmetric.Metric)) {
 	}
 }
 
+// IterateResourceMetrics calls given function for each metric.
+func IterateResourceMetrics(md pmetric.Metrics, fn func(pmetric.ResourceMetrics)) {
+	resourceMetricsSlice := md.ResourceMetrics()
+	for resourceMetricsIt := 0; resourceMetricsIt < resourceMetricsSlice.Len(); resourceMetricsIt++ {
+		resourceMetrics := resourceMetricsSlice.At(resourceMetricsIt)
+		fn(resourceMetrics)
+	}
+}
+
 // IterateDataPoints calls given function for each metric data point.
 func IterateDataPoints(metric pmetric.Metric, fn func(pcommon.Map)) {
 	switch metric.Type() {

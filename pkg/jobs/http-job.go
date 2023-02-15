@@ -14,8 +14,8 @@ import (
 
 // HTTPJob wraps a basic job along with HTTPJobConfig to execute an HTTP job.
 type HTTPJob struct {
-	BasicJob
-	config HTTPJobConfig
+	basicJob Job
+	config   HTTPJobConfig
 }
 
 // Make sure HTTPJob complies with Job interface.
@@ -39,8 +39,7 @@ type BodyProvider func() io.Reader
 func NewHTTPJob(config HTTPJobConfig) *HTTPJob {
 	job := &HTTPJob{}
 	job.config = config
-	job.JobName = config.Name
-	job.JobFunc = func(ctx context.Context) (proto.Message, error) {
+	httpFunc := func(ctx context.Context) (proto.Message, error) {
 		resp, err := fetchURL(ctx, config.Method, config.URL, config.Client, config.Body())
 		if err != nil {
 			return nil, err
@@ -66,22 +65,24 @@ func NewHTTPJob(config HTTPJobConfig) *HTTPJob {
 		message := wrapperspb.String(fmt.Sprintf("%s is accessible", config.URL))
 		return message, nil
 	}
+	job.basicJob = NewBasicJob(config.Name, httpFunc)
+
 	return job
 }
 
 // Name returns the name of the job.
 func (job *HTTPJob) Name() string {
-	return job.BasicJob.Name()
+	return job.basicJob.Name()
 }
 
 // JobWatchers returns the job watchers for the job.
 func (job *HTTPJob) JobWatchers() JobWatchers {
-	return job.BasicJob.JobWatchers()
+	return job.basicJob.JobWatchers()
 }
 
 // Execute executes the job.
 func (job *HTTPJob) Execute(ctx context.Context) (proto.Message, error) {
-	return job.BasicJob.Execute(ctx)
+	return job.basicJob.Execute(ctx)
 }
 
 func fetchURL(ctx context.Context, method string, url string, client *http.Client, body io.Reader) (*http.Response, error) {

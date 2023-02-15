@@ -9,7 +9,6 @@ import (
 	ext_authz "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	envoy_type "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	"github.com/open-policy-agent/opa-envoy-plugin/envoyauth"
-	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/logging"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
@@ -22,7 +21,7 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
@@ -105,7 +104,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		return &ext_authz.CheckResponse{
 			DynamicMetadata: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
-					otelcollector.ApertureCheckResponseLabel: structpb.NewStringValue(checkResponseBase64),
+					otelconsts.ApertureCheckResponseLabel: structpb.NewStringValue(checkResponseBase64),
 				},
 			},
 		}
@@ -138,14 +137,6 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 			Err(err).Code(codes.InvalidArgument).Msg("converting raw input into rego input failed")
 	}
 
-	inputValue, err := ast.InterfaceToValue(input)
-	if err != nil {
-		// RequestToInput should never produce anything that's not convertible
-		// to ast.Value, so in theory it shouldn't happen.
-		// TODO(krdln) metrics
-		return nil, grpc.Bug().Err(err).Msg("converting rego input to value failed")
-	}
-
 	// Default flow labels from Authz request
 	requestFlowLabels := AuthzRequestToFlowLabels(req.GetAttributes().GetRequest())
 	// Extract flow labels from baggage headers
@@ -157,7 +148,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	// Baggage can overwrite request flow labels
 	flowlabel.Merge(mergedFlowLabels, baggageFlowLabels)
 
-	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), inputValue)
+	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
 
 	for key, fl := range newFlowLabels {
 		cleanValue := sanitizeBaggageHeaderValue(fl.Value)
@@ -183,6 +174,8 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	checkResponse.ClassifierInfos = classifierMsgs
 	// Set telemetry_flow_labels in the CheckResponse
 	checkResponse.TelemetryFlowLabels = flowLabels
+	// add control point type
+	checkResponse.TelemetryFlowLabels[otelconsts.ApertureControlPointTypeLabel] = otelconsts.HTTPControlPoint
 
 	resp := createExtAuthzResponse(checkResponse)
 

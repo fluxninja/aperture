@@ -2,7 +2,7 @@
 Create the name of the service account to use
 */}}
 {{- define "agent-operator.serviceAccountName" -}}
-{{- default (include "common.names.fullname" .) .Values.operator.serviceAccount.name }}
+{{- default ( print (include "common.names.fullname" .) "-operator" ) .Values.operator.serviceAccount.name }}
 {{- end }}
 
 {{/*
@@ -58,7 +58,7 @@ Create the address of the Prometheus for Aperture Agent
 {{- end -}}
 
 {{/*
-Fetch the endpoint of the FluxNinja cloud instance
+Fetch the endpoint of the FluxNinja ARC instance
 {{ include "agent.fluxNinjaPlugin.endpoint" ( dict "agent" .Values.path.to.the.agent $) }}
 */}}
 {{- define "agent.fluxNinjaPlugin.endpoint" -}}

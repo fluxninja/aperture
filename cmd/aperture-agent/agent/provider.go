@@ -6,7 +6,8 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/info"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/peers"
 	"go.uber.org/fx"
 )
@@ -20,28 +21,33 @@ func ProvidePeersPrefix(agentInfo *agentinfo.AgentInfo) (peers.PeerDiscoveryPref
 
 type FxIn struct {
 	fx.In
-	BaseConfig *otelcollector.OTELConfig `name:"base"`
+	BaseConfig *otelconfig.OTELConfig `name:"base"`
 	AgentInfo  *agentinfo.AgentInfo
 }
 
 func AddAgentInfoAttribute(in FxIn) {
-	in.BaseConfig.AddProcessor(otelcollector.ProcessorAgentGroup, map[string]interface{}{
+	in.BaseConfig.AddProcessor(otelconsts.ProcessorAgentGroup, map[string]interface{}{
 		"actions": []map[string]interface{}{
 			{
-				"key":    otelcollector.AgentGroupLabel,
+				"key":    otelconsts.AgentGroupLabel,
 				"action": "insert",
 				"value":  in.AgentInfo.GetAgentGroup(),
 			},
 		},
 	})
-	in.BaseConfig.AddProcessor(otelcollector.ProcessorAgentResourceLabels, map[string]interface{}{
-		"logs": map[string]interface{}{
+	transformStatements := []map[string]interface{}{
+		{
+			"context": "resource",
 			"statements": []string{
-				fmt.Sprintf(`set(resource.attributes["%v"], "%v")`,
-					otelcollector.AgentGroupLabel, in.AgentInfo.GetAgentGroup()),
-				fmt.Sprintf(`set(resource.attributes["%v"], "%v")`,
-					otelcollector.InstanceLabel, info.Hostname),
+				fmt.Sprintf(`set(attributes["%v"], "%v")`,
+					otelconsts.AgentGroupLabel, in.AgentInfo.GetAgentGroup()),
+				fmt.Sprintf(`set(attributes["%v"], "%v")`,
+					otelconsts.InstanceLabel, info.Hostname),
 			},
 		},
+	}
+	in.BaseConfig.AddProcessor(otelconsts.ProcessorAgentResourceLabels, map[string]interface{}{
+		"log_statements":    transformStatements,
+		"metric_statements": transformStatements,
 	})
 }

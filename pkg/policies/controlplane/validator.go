@@ -6,6 +6,7 @@ import (
 
 	policiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
@@ -63,7 +64,9 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circ
 	if err != nil {
 		return nil, false, err.Error(), nil
 	}
-	registry := status.NewRegistry(log.GetGlobalLogger())
+
+	alerter := alerts.NewSimpleAlerter(100)
+	registry := status.NewRegistry(log.GetGlobalLogger(), alerter)
 	circuit, err := CompilePolicy(policy, registry)
 	if err != nil {
 		return nil, false, err.Error(), err
@@ -73,10 +76,10 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circ
 		for _, c := range policy.GetResources().Classifiers {
 			_, err = compiler.CompileRuleset(ctx, name, &policysyncv1.ClassifierWrapper{
 				Classifier: c,
-				CommonAttributes: &policysyncv1.CommonAttributes{
-					PolicyName:     "dummy",
-					PolicyHash:     "dummy",
-					ComponentIndex: 0,
+				ClassifierAttributes: &policysyncv1.ClassifierAttributes{
+					PolicyName:      "dummy",
+					PolicyHash:      "dummy",
+					ClassifierIndex: 0,
 				},
 			})
 			if err != nil {

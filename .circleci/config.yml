@@ -6,10 +6,7 @@ setup: true
 executors:
   base-cimg-executor:
     docker:
-      - image: cimg/base:2021.07
-  ubuntu-go-executor:
-    docker:
-      - image: cimg/go:1.19
+      - image: cimg/base:2022.07
 
 orbs:
   path-filtering: circleci/path-filtering@0.1.3
@@ -71,14 +68,14 @@ commands:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7" # fluxninja/cloud R/O
+            - "10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8" # fluxninja/cloud R/O
       - run:
           name: Install opsninja and its dependencies
           command: |
             # We need R/O access to cloud repository to be able to fetch opsninja library
             # FIXME: make "releases" of opsninja library somehow, even as a separate repository
             # to limit exposure.
-            export CLOUD_RO_KEY_FINGERPRINT="8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7"
+            export CLOUD_RO_KEY_FINGERPRINT="10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8"
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
             export SSH_AUTH_SOCK=""
             # Bust asdf cache as our opsninja version is always 0.0.0
@@ -104,93 +101,17 @@ jobs:
       - asdf_save_cache:
           cache_name: release
 
-  package-agent:
-    parameters:
-      executor:
-        type: executor
-        description: executor to use for this job
-        default: ubuntu-go-executor
-      workspace-name:
-        type: string
-        description:
-          the name of the workspace to which built packages should be added
-        default: packages
-      goarch:
-        type: string
-        description: the GOARCH to use for the build
-        default: amd64
-    executor: <<parameters.executor>>
-    environment:
-      PACKAGES_DIR: "/tmp/packages"
-      GOARCH: <<parameters.goarch>>
-    steps:
-      - checkout
-      - run:
-          name: "Set build vars"
-          command: |
-            GIT_BRANCH="$(git branch --show-current)"
-            GIT_COMMIT_HASH="$(git log -n1 --format=%H)"
-            GOOS="$(go env GOOS)"
-            VERSION="$(cut -d/ -f3- \<<<"${RELEASE_TAG}")"
-            if which dpkg; then
-              PACKAGER=deb
-            elif which rpm; then
-              PACKAGER=rpm
-            elif which apk; then
-              PACKAGER=apk
-            else
-              echo "Unable to determine proper packager for current OS"
-              exit 1
-            fi
-
-            export GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION PACKAGER
-            declare -p GIT_BRANCH GIT_COMMIT_HASH GOOS VERSION PACKAGER >> "${BASH_ENV}"
-          environment:
-            RELEASE_TAG: <<pipeline.git.tag>>
-      - run:
-          name: "Compile agent and plugins"
-          command: |
-            SOURCE="./cmd/aperture-agent" TARGET="./dist/aperture-agent" ./pkg/info/build.sh
-            for plugin_dir in ./plugins/*/aperture-plugin-*; do
-              plugin="$(basename "${plugin_dir}")"
-              echo "Building plugin ${plugin}"
-              SOURCE="${plugin_dir}" TARGET="./dist/plugins/${plugin}.so" ./pkg/plugins/build.sh
-            done
-          environment:
-            CGO_ENABLED: "1"
-            PREFIX: "aperture"
-            LDFLAGS: "-s -w -extldflags \"-Wl,--allow-multiple-definition\""
-      - run:
-          name: Install nFPM
-          command: |
-            filename="nfpm_amd64.${PACKAGER}"
-            file="/tmp/${filename}"
-            curl --silent --show-error --location https://github.com/goreleaser/nfpm/releases/latest/download/${filename} -o "${file}"
-            case "${PACKAGER}" in
-              deb) sudo dpkg -i "${file}";;
-              rpm) sudo rpm -i "${file}";;
-              apk) sudo apk add --allow-untrusted "${file}";;
-              *) echo "Unknown packager ${PACKAGER}"; exit 1;;
-            esac
-            which nfpm
-      - run:
-          name: Package
-          command: |
-            mkdir -p dist/packages/
-            nfpm package --packager "${PACKAGER}" --target dist/packages/
-            ls -l dist/packages/
-
   helm-release:
     executor: base-cimg-executor
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "e1:10:c4:c4:f6:4e:fd:9e:e3:f6:21:5c:02:e2:ad:37" # fluxninja/aperture R/W
+            - "44:8f:25:14:ad:f5:55:a5:a9:37:b2:21:7e:15:8a:ab" # fluxninja/aperture R/W
       - checkout
       - run:
           name: "Package and release Helm Chart"
           command: |
-            export APERTURE_RW_KEY_FINGERPRINT="e1:10:c4:c4:f6:4e:fd:9e:e3:f6:21:5c:02:e2:ad:37"
+            export APERTURE_RW_KEY_FINGERPRINT="44:8f:25:14:ad:f5:55:a5:a9:37:b2:21:7e:15:8a:ab"
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${APERTURE_RW_KEY_FINGERPRINT}" | tr -d ':')"
             export SSH_AUTH_SOCK=""
             .circleci/scripts/helm_release.sh
@@ -217,6 +138,8 @@ workflows:
           mapping: |
             .dockerignore updated-aperture true
             (cmd|pkg|plugins|api|test)/.* updated-aperture true
+            packaging/agent/.* updated-aperture-agent-packaging true
+            packaging/cli/.* updated-aperturectl-packaging true
             operator/(api|config|controllers|hack)/.*|operator/main.go updated-aperture-operator true
             (go.mod|go.sum) updated-aperture true
             docs/.* updated-aperture-docs true
@@ -226,6 +149,8 @@ workflows:
             sdks/aperture-go/.* updated-aperture-go true
             sdks/aperture-js/.* updated-aperture-js true
             sdks/aperture-java/.* updated-aperture-java true
+            cmd/sdk-validator/.* updated-sdk-validator true
+            blueprints/.*|playground/tanka/.* updated-blueprints true
 
   filter-paths-pr:
     when:
@@ -252,17 +177,6 @@ workflows:
               ignore: /.+/
             tags:
               only: /^releases\/.*$/
-      - package-agent:
-          # both this and workflow's when is needed
-          filters:
-            branches:
-              ignore: /.+/
-            tags:
-              only: /^releases\/aperture-agent\/.*$/
-          matrix:
-            parameters:
-              executor: [ubuntu-go-executor]
-              goarch: [amd64]
 
   helm-release:
     when:
