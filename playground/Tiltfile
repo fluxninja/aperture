@@ -1,5 +1,5 @@
 # vim: ft=bzl sw=4
-v1alpha1.extension_repo(name='default', url='https://github.com/tilt-dev/tilt-extensions', ref='HEAD')
+v1alpha1.extension_repo(name='default', url='https://github.com/tilt-dev/tilt-extensions', ref='v0.31.2')
 load("ext://namespace", "namespace_create", "namespace_inject")
 load('ext://uibutton', 'cmd_button', 'location')
 
@@ -1002,6 +1002,7 @@ config.define_bool("only", usage="Only deploy explicitly resources, without hand
 config.define_bool("verbose", usage="Enable verbose logging")
 config.define_bool("trace", usage="Enable trace logging")
 config.define_bool("race",usage="Enable race detector for agent and controller")
+config.define_bool("skip-plugins", usage="Skip plugin building")
 cfg = config.parse()
 # Enable all resources, as calling `config.parse()` by default disables all
 config.set_enabled_resources([])
@@ -1020,6 +1021,10 @@ TRACE = cfg_trace == True
 
 cfg_verbose = cfg.get("verbose", os.getenv("NINJA_TILT_VERBOSE", cfg_trace))
 VERBOSE = cfg_verbose == True
+
+if cfg.get("skip-plugins", os.getenv("SKIP_PLUGINS", "false").lower() == "true"):
+    DEP_TREE[APERTURE_CONTROLLER_NS]["controller"]["images"][0]["target"] = "controller-base"
+    DEP_TREE[APERTURE_AGENT_NS]["agent"]["images"][0]["target"] = "agent-base"
 
 run_only_listed = cfg.get("only", False)
 to_run = cfg.get("to-run", ["all"])

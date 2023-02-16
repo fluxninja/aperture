@@ -41,7 +41,7 @@ RUN --mount=type=cache,target=/go/pkg/,readonly \
   '
 
 # Final image
-FROM debian:bullseye-slim
+FROM debian:bullseye-slim AS controller-base
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates \
@@ -51,5 +51,7 @@ RUN apt-get update \
 # Ensure config dirs exists, even if not mounted
 RUN mkdir -p /etc/aperture/aperture-controller/classifiers /etc/aperture/aperture-controller/policies /opt/aperture/aperture-controller/plugins
 COPY --link --from=builder /aperture-controller /aperture-controller
-COPY --link --from=plugins-builder /plugins /opt/aperture/aperture-controller/plugins
 CMD ["/aperture-controller"]
+
+FROM controller-base AS controller-with-plugins
+COPY --link --from=plugins-builder /plugins /opt/aperture/aperture-controller/plugins
