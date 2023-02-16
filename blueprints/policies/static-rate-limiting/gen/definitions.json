@@ -36,19 +36,19 @@
             "flow_selector": {
               "description": "A flow selector to match requests against",
               "type": "object",
-              "$ref": "../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
             },
 
             "parameters": {
               "description": "Parameters.",
               "type": "object",
-              "$ref": "../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
             },
 
             "default_config": {
               "description": "Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.",
               "type": "object",
-              "$ref": "../../gen/jsonschema/_definitions.json#/definitions/RateLimiterDynamicConfig"
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterDynamicConfig"
             }
           }
         }

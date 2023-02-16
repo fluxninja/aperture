@@ -30,25 +30,25 @@
             "flow_selector": {
               "description": "Concurrency Limiter flow selector.",
               "type": "object",
-              "$ref": "../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
             },
 
             "scheduler": {
               "description": "Scheduler parameters.",
               "type": "object",
-              "$ref": "../../gen/jsonschema/_definitions.json#/definitions/SchedulerParameters"
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/SchedulerParameters"
             },
 
             "gradient": {
               "description": "Gradient Controller parameters.",
               "type": "object",
-              "$ref": "../../gen/jsonschema/_definitions.json#/definitions/GradientControllerParameters"
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/GradientControllerParameters"
             },
 
             "alerter": {
               "description": "Whether tokens for workloads are computed dynamically or set statically by the user.",
               "type": "object",
-              "$ref": "../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
             },
 
             "concurrency_limit_multiplier": {
@@ -72,7 +72,7 @@
             "default_config": {
               "description": "Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.",
               "type": "object",
-              "$ref": "../../gen/jsonschema/_definitions.json#/definitions/LoadActuatorDynamicConfig"
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/LoadActuatorDynamicConfig"
             }
           }
         }
