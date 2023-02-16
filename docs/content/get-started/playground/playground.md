@@ -323,6 +323,55 @@ Below is the mapping of the ports being forwarded by Tilt:
 
 ### Running demo applications and designing test scenarios
 
+By default, playground is started with a simple demo scenario loaded. The demo application
+comes with three sets of pods and services. There is also a simple latency gradient policy
+applied to them, and K6 load generator pattern created. When entire deployment turns green,
+load generator can be started with "Start Wavepool Generator" button in the Tilt UI. It will
+run a 2 minute test in a loop, until "Stop Wavepool Geneator" button is not clicked.
+
+There are other playground scenarios under *playground/scenarios/* and they can be loaded during
+tilt setup by passing a relative path to the scenario, e.g. `tilt up -- --scenario scenarios/demo-app`
+
+:::note
+
+You can skip building of aperture container images to speed up your work on the scenario, by passing `-- --dockerhub-image`
+to the `tilt up` command. In that case latest images will be pulled from dockerhub and used instead.
+
+:::
+
+#### Creating your own test scenarios
+
+```
+graphql-example-1
+├── application
+│   └── graphql_demo_app
+│       └── Dockerfile
+├── charts
+│   └── graphql-demo-app
+│       └── [...]
+├── jsonnetfile.json
+├── jsonnetfile.lock.json
+├── load_generator
+│   └── test.js
+├── manifests
+│   ├── main.jsonnet
+│   └── mixins.libsonnet
+├── metadata.json
+└── policies
+    └── policy.jsonnet
+```
+
+Each test scenario consists of few directories, for kubernetes manifests, docker images, policies and load testing configuration:
+- `metadata.json` describes test scenario, what images to build, what tilt dependencies to add etc. See existing test scenarios,
+  as well as Tiltfile for examples of how to prepare this file.
+- `application` stores Dockerfile and any support files used for building container images
+- `manifests` contains kubernetes manifests that will be deployed on the cluster. Currently, they can be tanka-based jsonnet applications,
+  or raw yaml files which will be applied on the cluster without any processing (other than ensuring *demoapp* namespace)
+- `policies/policy.jsonnet` is a policy jsonnet that will be applied on the cluster
+- `load_generator/test.js` is configuration for the K6 load generator.
+- `jsonnetfile.json` and `jsonnetfile.lock.json` as well as `chartfile.yaml` allow for adding external jsonnet and helm dependencies
+  to the project.
+
 ## FAQs
 
 ### Too many open files "warning"
