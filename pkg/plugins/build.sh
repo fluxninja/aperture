@@ -26,8 +26,7 @@ build_args=(
   -o "${TARGET}"
   "${SOURCE}"
 )
-if [[ -n "${RACE}" ]]; then
+if [ -n "${RACE:-}" ]; then
   build_args+=( --race )
 fi
-
 go build "${build_args[@]}"
