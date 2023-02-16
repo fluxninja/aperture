@@ -22,10 +22,10 @@ $FIND "$blueprints_root" -type f -name config.libsonnet | while read -r files; d
 
 	python "${git_root}"/scripts/blueprint-readme-generator.py "$dir"
 
-	values_files=("$dir"/values.yaml "$dir"/values-required.yaml "$dir"/dynamic-config-values.yaml "$dir"/dynamic-config-values-required.yaml)
-	for values_file in "${values_files[@]}"; do
-		if [ -f "$values_file" ]; then
-			npx prettier --write "$values_file"
+	gen_files=("$dir"/values.yaml "$dir"/values-required.yaml "$dir"/dynamic-config-values.yaml "$dir"/dynamic-config-values-required.yaml "$dir"/definitions.json "$dir"/dynamic-config-definitions.json)
+	for gen_file in "${gen_files[@]}"; do
+		if [ -f "$gen_file" ]; then
+			npx prettier --write "$gen_file"
 		fi
 	done
 

@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "policies/latency-aimd-concurrency-limiting blueprint",
+  "additionalProperties": false,
+  "required": ["common", "policy"],
+  "properties": {
+    "common": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_name"],
+      "properties": {
+        "policy_name": {
+          "description": "Name of the policy.",
+          "type": "string"
+        }
+      }
+    },
+
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["concurrency_controller"],
+      "properties": {
+        "concurrency_controller": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["flow_selector"],
+          "properties": {
+            "flow_selector": {
+              "description": "Concurrency Limiter flow selector.",
+              "type": "object",
+              "$ref": "../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
+            },
+
+            "scheduler": {
+              "description": "Scheduler parameters.",
+              "type": "object",
+              "$ref": "../../gen/jsonschema/_definitions.json#/definitions/SchedulerParameters"
+            },
+
+            "gradient": {
+              "description": "Gradient Controller parameters.",
+              "type": "object",
+              "$ref": "../../gen/jsonschema/_definitions.json#/definitions/GradientControllerParameters"
+            },
+
+            "alerter": {
+              "description": "Whether tokens for workloads are computed dynamically or set statically by the user.",
+              "type": "object",
+              "$ref": "../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
+            },
+
+            "concurrency_limit_multiplier": {
+              "description": "Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.",
+              "type": "number",
+              "format": "double"
+            },
+
+            "concurrency_linear_increment": {
+              "description": "Linear increment to concurrency in each execution tick when the system is not in overloaded state.",
+              "type": "number",
+              "format": "double"
+            },
+
+            "concurrency_sqrt_increment_multiplier": {
+              "description": "Scale factor to multiply square root of current accepted concurrrency. This, along with concurrency_linear_increment helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).",
+              "type": "number",
+              "format": "double"
+            },
+
+            "default_config": {
+              "description": "Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.",
+              "type": "object",
+              "$ref": "../../gen/jsonschema/_definitions.json#/definitions/LoadActuatorDynamicConfig"
+            }
+          }
+        }
+      }
+    },
+
+    "dashboard": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "datasource": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "description": "Datasource name.",
+              "type": "string"
+            },
+
+            "filter_regex": {
+              "description": "Datasource filter regex.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

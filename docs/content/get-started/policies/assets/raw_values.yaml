@@ -14,6 +14,8 @@ policy:
     # Type: float64
     # Required: True
     rate_limit: "__REQUIRED_FIELD__"
+    # A flow selector to match requests against
+    # Type: aperture.spec.v1.FlowSelector
     flow_selector:
       service_selector:
         # Service Name.
@@ -25,8 +27,14 @@ policy:
         # Type: string
         # Required: True
         control_point: "__REQUIRED_FIELD__"
+    # Parameters.
+    # Type: aperture.spec.v1.RateLimiterParameters
     parameters:
       # Flow label to use for rate limiting.
       # Type: string
       # Required: True
       label_key: "__REQUIRED_FIELD__"
+    # Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.
+    # Type: aperture.spec.v1.RateLimiterDynamicConfig
+    default_config:
+      overrides: []

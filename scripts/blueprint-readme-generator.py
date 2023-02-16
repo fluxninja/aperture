@@ -16,7 +16,8 @@ import re
 
 
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Set
+from ordered_set import OrderedSet
 
 from loguru import logger
 import jinja2
@@ -33,7 +34,8 @@ class ExitException(RuntimeError):
 class DocBlockParam:
     param_name: str
     param_type: str
-    param_link: str
+    json_schema_link: str
+    spec_link: str
     description: str
     required: bool
     default: Optional[Any] = None
@@ -48,6 +50,7 @@ PARAMETER_DETAILED_RE = re.compile(r".*@param \((?P<param_name>[\w.\[\]]+): (?P<
 class DocBlockNode:
     parameter: DocBlockParam
     children: Dict[str, DocBlockNode]
+    required_children: OrderedSet[str]
 
 @dataclasses.dataclass
 class DocBlock:
@@ -62,12 +65,9 @@ class DocBlock:
     nested_required_parameters: DocBlockNode
 
     @classmethod
-    def _resolve_param_to_policy_ref(cls, spec_path: str, param: str) -> str:
+    def _resolve_param_links(cls, aperture_json_schema_path: str, spec_path: str, param: str) -> tuple[str, str]:
         if not param.startswith("aperture.spec") and not param.startswith("[]aperture.spec"):
-            return ""
-
-        if spec_path == "":
-            return ""
+            return "", ""
 
         component = param.split(".")[-1]
 
@@ -81,17 +81,17 @@ class DocBlock:
 
         component_final = "-".join(["".join(l) for l in parts])
 
-        return f"{spec_path}#{component_final}"
+        return f"{spec_path}#{component_final}", f"{aperture_json_schema_path}{component}"
 
     @classmethod
-    def from_comment(cls, spec_path: str, comment: List[str]) -> DocBlock:
+    def from_comment(cls, aperture_json_schema_path: str, spec_path: str, comment: List[str]) -> DocBlock:
         section = None
         subsection = None
         description = ""
         description_parsed = False
         parameters = {}
-        nested_parameters = DocBlockNode(DocBlockParam("", "object", "", "", False), {})
-        nested_required_parameters = DocBlockNode(DocBlockParam("", "object", "", "", False), {})
+        nested_parameters = DocBlockNode(DocBlockParam("", "intermediate_node", "", "", "", False), {}, OrderedSet([]))
+        nested_required_parameters = DocBlockNode(DocBlockParam("", "intermediate_node", "", "", "", False), {}, OrderedSet([]))
         for line in comment:
             if matched := SECTION_RE.match(line.strip()):
                 if description:
@@ -112,27 +112,38 @@ class DocBlock:
 
                 groups = inner.groupdict()
                 param_name, param_type = groups["param_name"], groups["param_type"]
-                param_link = cls._resolve_param_to_policy_ref(spec_path, param_type)
+                spec_link, json_schema_link = cls._resolve_param_links(aperture_json_schema_path, spec_path, param_type)
                 param_required = groups.get("param_required", "") == "required"
                 param_description = groups["param_description"]
-                parameters[param_name] = (DocBlockParam(param_name, param_type, param_link, param_description, param_required))
+                parameters[param_name] = (DocBlockParam(param_name, param_type, json_schema_link, spec_link, param_description, param_required))
                 # tokenize param_name and create nested_parameters
                 parts = param_name.split(".")
                 parent = nested_parameters.children
                 parent_required = nested_required_parameters.children
+                if param_required:
+                    nested_parameters.required_children.add(parts[0])
+                    nested_required_parameters.required_children.add(parts[0])
                 for idx, part in enumerate(parts):
                     if idx == len(parts) - 1:
-                        parent[part] = DocBlockNode(DocBlockParam(part, param_type, param_link, param_description, param_required), {})
+                        node = DocBlockNode(DocBlockParam(part, param_type, json_schema_link, spec_link, param_description, param_required), {}, OrderedSet([]))
+                        parent[part] = node
                         if param_required:
-                            parent_required[part] = DocBlockNode(DocBlockParam(part, param_type, param_link, param_description, param_required), {})
+                            parent_required[part] = node
                     else:
+                        next_part = parts[idx + 1]
+                        node = DocBlockNode(DocBlockParam(part, "intermediate_node", "", "", "", False), {}, OrderedSet([]))
                         if part not in parent:
-                            parent[part] = DocBlockNode(DocBlockParam(part, "object", "", "", False), {})
+                            parent[part] = node
+                        if param_required:
+                            parent[part].required_children.add(next_part)
                         parent = parent[part].children
                         if param_required:
                             if part not in parent_required:
-                                parent_required[part] = DocBlockNode(DocBlockParam(part, "object", "", "", False), {})
+                                parent_required[part] = node
+                            parent_required[part].required_children.add(next_part)
                             parent_required = parent_required[part].children
+
+
 
             else:
                 stripped = line.lstrip(" ")
@@ -258,7 +269,7 @@ def update_docblock_param_defaults(repository_root: Path, config_path: Path, blo
         logger.trace(param)
     # walk nested_parameters and update defaults
     def update_nested_param_defaults(node, prefix):
-        if node.parameter.param_type != "object":
+        if node.parameter.param_type != "intermediate_node":
             node.parameter.default = get_param_default_from_rendered_config(rendered_config["_config"], prefix)
         for key, child in node.children.items():
             if prefix != "":
@@ -299,7 +310,7 @@ SECTION_TPL = """
 <ParameterDescription
     name="{{ param.param_name }}"
     type="{{ param.param_type }}"
-    reference="{{ param.param_link }}"
+    reference="{{ param.spec_link }}"
     value={% if param.required %}"__REQUIRED_FIELD__"{% else %}"{{ param.default | quoteValue }}"{% endif %}
     description='{{ param.description }}' />
 
@@ -307,6 +318,74 @@ SECTION_TPL = """
 {%- endfor %}
 
 {%- endfor %}
+"""
+
+JSON_SCHEMA_TPL = """
+{%- macro render_type(param_type, json_schema_link) %}
+{%- if param_type.startswith('aperture.spec') %}
+"type": "object",
+{{ ' ' * 4 }}"$ref": "{{- json_schema_link }}"
+{%- elif param_type == 'bool' %}
+"type": "boolean"
+{%- elif param_type == 'float32' %}
+"type": "number",
+"format": "float"
+{%- elif param_type == 'float64' %}
+"type": "number",
+"format": "double"
+{%- elif param_type == 'int32' %}
+"type": "integer",
+"format": "int32"
+{%- elif param_type == 'int64' %}
+"type": "integer",
+"format": "int64"
+{%- elif param_type.startswith('[]') %}
+"type": "array",
+"items": {"type": {{ render_type(param_type[2:], json_schema_link) }}}
+{%- elif param_type.startswith('map[') %}
+"type": "object",
+"additionalProperties": {"type": {{ render_type(param_type[4:-1], json_schema_link) }}}
+{%- else %}
+"type": "{{ param_type }}"
+{%- endif %}
+{%- endmacro %}
+
+{%- macro render_properties(node) %}
+"{{ node.parameter.param_name }}": {
+{%- if node.parameter.param_type == 'intermediate_node' %}
+"type": "object",
+"additionalProperties": false,
+{%- if node.required_children %}
+"required": [{%- for child_name in node.required_children %}"{{ child_name }}"{%- if not loop.last %},{% endif %}{%- endfor %}],
+{%- endif %}
+"properties": {
+{%- for child_name, child_node in node.children.items() %}
+{{ render_properties(child_node) }}
+{%- if not loop.last %},{% endif %}
+{%- endfor %}
+}
+{%- else %}
+"description": "{{ node.parameter.description }}",
+{{- render_type(node.parameter.param_type, node.parameter.json_schema_link) }}
+{%- endif %}
+}
+{%- endmacro %}
+
+{
+"$schema": "http://json-schema.org/draft-07/schema#",
+"type": "object",
+"title": "{{ blueprint_name }} blueprint",
+"additionalProperties": false,
+{%- if json_schema_data.required_children %}
+"required": [{%- for child_name in json_schema_data.required_children %}"{{ child_name }}"{%- if not loop.last %},{% endif %}{%- endfor %}],
+{%- endif %}
+"properties": {
+{%- for child_name, child_node in json_schema_data.children.items() %}
+{{ render_properties(child_node) }}
+{%- if not loop.last %},{% endif %}
+{%- endfor %}
+}
+}
 """
 
 YAML_TPL = """
@@ -323,7 +402,7 @@ YAML_TPL = """
 {%- endif %}
 {%- endmacro %}
 {%- macro render_node(node, level) %}
-{%- if node.parameter.param_type != 'object' %}
+{%- if node.parameter.param_type != 'intermediate_node' %}
 {{ '  ' * level }}# {{ node.parameter.description }}
 {{ '  ' * level }}# Type: {{ node.parameter.param_type }}
 {%- if node.parameter.required != False %}
@@ -369,7 +448,7 @@ def quoteValue(value: str) -> str:
 
 
 def get_jinja2_environment() -> jinja2.Environment:
-    JINJA2_TEMPLATES = {"section.md.j2": SECTION_TPL, "values.yaml.j2": YAML_TPL}
+    JINJA2_TEMPLATES = {"section.md.j2": SECTION_TPL, "values.yaml.j2": YAML_TPL, "definitions.json.j2": JSON_SCHEMA_TPL}
     loader = jinja2.DictLoader(JINJA2_TEMPLATES)
     env = jinja2.Environment(loader=loader)
     env.filters["quoteValue"] = quoteValue
@@ -461,13 +540,15 @@ def update_readme_markdown(readme_path: Path, config_blocks: List[DocBlock], dyn
 def render_sample_config_yaml(blueprint_name: Path, sample_config_path: Path, only_required: bool, blocks: List[DocBlock]):
     """Render sample config YAML file from blocks"""
     # merge all nested parameters into one dict
-    sample_config_data = DocBlockNode(DocBlockParam("", "object", "", "", False), {})
+    sample_config_data = DocBlockNode(DocBlockParam("", "intermediate_node", "", "", "", False), {}, OrderedSet([]))
     if only_required is False:
         for block in blocks:
             sample_config_data.children.update(block.nested_parameters.children)
+            sample_config_data.required_children.update(block.nested_parameters.required_children)
     else:
         for block in blocks:
             sample_config_data.children.update(block.nested_required_parameters.children)
+            sample_config_data.required_children.update(block.nested_required_parameters.required_children)
 
 
     env = get_jinja2_environment()
@@ -475,7 +556,19 @@ def render_sample_config_yaml(blueprint_name: Path, sample_config_path: Path, on
     rendered = template.render({"sample_config_data": sample_config_data, "blueprint_name": blueprint_name})
     sample_config_path.write_text(rendered)
 
-def extract_docblock_comments(spec_path: str, jsonnet_data: str) -> List[DocBlock]:
+def render_json_schema(blueprint_name: Path, json_schema_path: Path, blocks: List[DocBlock]):
+    """Render JSON schema file from blocks"""
+    json_schema_data = DocBlockNode(DocBlockParam("", "intermediate_node", "", "", "", False), {}, OrderedSet([]))
+    for block in blocks:
+        json_schema_data.children.update(block.nested_parameters.children)
+        json_schema_data.required_children.update(block.nested_parameters.required_children)
+
+    env = get_jinja2_environment()
+    template = env.get_template("definitions.json.j2")
+    rendered = template.render({"json_schema_data": json_schema_data, "blueprint_name": blueprint_name})
+    json_schema_path.write_text(rendered)
+
+def extract_docblock_comments(aperture_json_schema_path: str, spec_path: str, jsonnet_data: str) -> List[DocBlock]:
     docblock_start_re = r".*\/\*\*$"
     docblock_end_re = r".*\*\/$"
 
@@ -489,7 +582,7 @@ def extract_docblock_comments(spec_path: str, jsonnet_data: str) -> List[DocBloc
         elif re.match(docblock_end_re, line):
             assert inside_docblock
             inside_docblock = False
-            docblocks.append(DocBlock.from_comment(spec_path, docblock_data))
+            docblocks.append(DocBlock.from_comment(aperture_json_schema_path, spec_path, docblock_data))
             docblock_data = []
         else:
            if inside_docblock:
@@ -520,12 +613,16 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
     spec_path = "/".join([".."] * len(relative_blueprint_path_parts)) + "/spec"
     aperture_version_path = "/".join([".."] * (len(relative_blueprint_path_parts)+2)) + "/apertureVersion.js"
 
+    aperture_json_schema_path = "/".join([".."] * len(relative_blueprint_path_parts)) + "/gen/jsonschema/_definitions.json#/definitions/"
 
-    config_docblocks = parse_config_docblocks(repository_root, blueprint_path, spec_path)
+
+    config_docblocks = parse_config_docblocks(repository_root, blueprint_path, aperture_json_schema_path, spec_path)
+    render_json_schema(blueprint_name, blueprint_path / "definitions.json", config_docblocks)
     render_sample_config_yaml(blueprint_name, blueprint_path / "values.yaml", False, config_docblocks)
     render_sample_config_yaml(blueprint_name, blueprint_path / "values-required.yaml", True, config_docblocks)
 
-    dynamic_config_docblocks = parse_dynamic_config_docblocks(repository_root, blueprint_path, spec_path)
+    dynamic_config_docblocks = parse_dynamic_config_docblocks(repository_root, blueprint_path, aperture_json_schema_path, spec_path)
+    render_json_schema(blueprint_name, blueprint_path / "dynamic-config-definitions.json", dynamic_config_docblocks)
     render_sample_config_yaml(blueprint_name, blueprint_path / "dynamic-config-values.yaml", False, dynamic_config_docblocks)
     render_sample_config_yaml(blueprint_name, blueprint_path / "dynamic-config-values-required.yaml", True, dynamic_config_docblocks)
 
@@ -533,7 +630,7 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
 
 
 
-def parse_config_docblocks(repository_root: Path, blueprint_path: Path, spec_path: str) -> List[DocBlock]:
+def parse_config_docblocks(repository_root: Path, blueprint_path: Path, aperture_json_schema_path: str, spec_path: str) -> List[DocBlock]:
 
     config_path = blueprint_path / "config.libsonnet"
 
@@ -546,7 +643,7 @@ def parse_config_docblocks(repository_root: Path, blueprint_path: Path, spec_pat
     metadata = yaml.safe_load(metadata_path.read_text())
 
 
-    docblocks = extract_docblock_comments(spec_path, config_path.read_text())
+    docblocks = extract_docblock_comments(aperture_json_schema_path, spec_path, config_path.read_text())
 
     sections = {section: [] for section in metadata["sources"].keys()}
     # append Common to sections
@@ -571,13 +668,13 @@ def parse_config_docblocks(repository_root: Path, blueprint_path: Path, spec_pat
     return docblocks
 
 
-def parse_dynamic_config_docblocks(repository_root: Path, blueprint_path: Path, spec_path: str) -> List[DocBlock]:
+def parse_dynamic_config_docblocks(repository_root: Path, blueprint_path: Path, aperture_json_schema_path: str, spec_path: str) -> List[DocBlock]:
 
     config_path = blueprint_path / "dynamic-config.libsonnet"
     if not config_path.exists():
         return []
 
-    docblocks = extract_docblock_comments(spec_path, config_path.read_text())
+    docblocks = extract_docblock_comments(aperture_json_schema_path, spec_path, config_path.read_text())
 
     sections = {}
     for block in docblocks:

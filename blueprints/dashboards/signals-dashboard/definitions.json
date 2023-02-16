@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "dashboards/signals-dashboard blueprint",
+  "additionalProperties": false,
+  "required": ["common"],
+  "properties": {
+    "common": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_name"],
+      "properties": {
+        "policy_name": {
+          "description": "Name of the policy.",
+          "type": "string"
+        }
+      }
+    },
+
+    "dashboard": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "datasource": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "description": "Datasource name.",
+              "type": "string"
+            },
+
+            "filter_regex": {
+              "description": "Datasource filter regex.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
