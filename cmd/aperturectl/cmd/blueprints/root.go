@@ -28,10 +28,10 @@ var (
 	// Location of cache for blueprints.
 	blueprintsCacheRoot string
 	// Location of blueprints in disk (e.g. within cache or custom location).
-	blueprintsDir string
+	blueprintsURIRoot string
 
-	// Location of specific blueprint.
-	blueprintDir string
+	// Location of blueprints directory within URI directory.
+	blueprintsDir string
 
 	// Args for `blueprints`.
 	blueprintsURI     string
@@ -90,13 +90,13 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 
 		// convert the URI to a local dir name which is disk friendly
 		dirName := strings.ReplaceAll(blueprintsURI, "/", "_")
-		blueprintsDir = filepath.Join(blueprintsCacheRoot, dirName)
-		err = os.MkdirAll(blueprintsDir, os.ModePerm)
+		blueprintsURIRoot = filepath.Join(blueprintsCacheRoot, dirName)
+		err = os.MkdirAll(blueprintsURIRoot, os.ModePerm)
 		if err != nil {
 			return err
 		}
 		// lock blueprintsDir to prevent concurrent access using flock package
-		lock = flock.New(filepath.Join(blueprintsDir, lockFilename))
+		lock = flock.New(filepath.Join(blueprintsURIRoot, lockFilename))
 
 		// pull the latest blueprints based on skipPull and whether cmd is remove
 		if !skipPull && cmd.Use != "remove" {
@@ -143,6 +143,6 @@ func unlock() {
 	if err != nil {
 		log.Error().Err(err).Msg("unable to release lock on blueprints directory")
 		// try resetting lock by removing lockfile
-		os.Remove(filepath.Join(blueprintsDir, lockFilename))
+		os.Remove(filepath.Join(blueprintsURIRoot, lockFilename))
 	}
 }

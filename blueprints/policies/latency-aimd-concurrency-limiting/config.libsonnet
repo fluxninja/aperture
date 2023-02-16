@@ -60,7 +60,7 @@
     * @param (policy.concurrency_controller.concurrency_limit_multiplier: float64) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
     * @param (policy.concurrency_controller.concurrency_linear_increment: float64) Linear increment to concurrency in each execution tick when the system is not in overloaded state.
     * @param (policy.concurrency_controller.concurrency_sqrt_increment_multiplier: float64) Scale factor to multiply square root of current accepted concurrrency. This, along with concurrency_linear_increment helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
-    * @param (policy.concurrency_controller.default_config: aperture.v1.LoadActuatorDynamicConfig) Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.
+    * @param (policy.concurrency_controller.default_config: aperture.spec.v1.LoadActuatorDynamicConfig) Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.
     */
     concurrency_controller: {
       flow_selector: {

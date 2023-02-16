@@ -30,13 +30,13 @@ var pullFunc = func(_ *cobra.Command, _ []string) error {
 	spec.LegacyImports = false
 	contents = append(contents, []byte("\n")...)
 
-	filename := filepath.Join(blueprintsDir, jsonnetfile.File)
+	filename := filepath.Join(blueprintsURIRoot, jsonnetfile.File)
 	err = os.WriteFile(filename, contents, os.ModePerm)
 	if err != nil {
 		return err
 	}
 
-	jbLockFileBytes, err := os.ReadFile(filepath.Join(blueprintsDir, jsonnetfile.LockFile))
+	jbLockFileBytes, err := os.ReadFile(filepath.Join(blueprintsURIRoot, jsonnetfile.LockFile))
 	if !os.IsNotExist(err) {
 		return err
 	}
@@ -46,7 +46,7 @@ var pullFunc = func(_ *cobra.Command, _ []string) error {
 		return err
 	}
 
-	err = os.MkdirAll(filepath.Join(blueprintsDir, ".tmp"), os.ModePerm)
+	err = os.MkdirAll(filepath.Join(blueprintsURIRoot, ".tmp"), os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -72,15 +72,15 @@ var pullFunc = func(_ *cobra.Command, _ []string) error {
 		return errors.New("unable to parse blueprints URI: " + blueprintsURI)
 	}
 
-	err = os.WriteFile(filepath.Join(blueprintsDir, sourceFilename), []byte(source), os.ModePerm)
+	err = os.WriteFile(filepath.Join(blueprintsURIRoot, sourceFilename), []byte(source), os.ModePerm)
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(filepath.Join(blueprintsDir, relPathFilename), []byte(relPath), os.ModePerm)
+	err = os.WriteFile(filepath.Join(blueprintsURIRoot, relPathFilename), []byte(relPath), os.ModePerm)
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(filepath.Join(blueprintsDir, versionFilename), []byte(version), os.ModePerm)
+	err = os.WriteFile(filepath.Join(blueprintsURIRoot, versionFilename), []byte(version), os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ var pullFunc = func(_ *cobra.Command, _ []string) error {
 		delete(lockFile.Dependencies, d.Name())
 	}
 
-	locked, err := pkg.Ensure(spec, blueprintsDir, lockFile.Dependencies)
+	locked, err := pkg.Ensure(spec, blueprintsURIRoot, lockFile.Dependencies)
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ var pullFunc = func(_ *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	err = writeChangedJsonnetFile(jbLockFileBytes, &specv1.JsonnetFile{Dependencies: locked}, filepath.Join(blueprintsDir, jsonnetfile.LockFile))
+	err = writeChangedJsonnetFile(jbLockFileBytes, &specv1.JsonnetFile{Dependencies: locked}, filepath.Join(blueprintsURIRoot, jsonnetfile.LockFile))
 	if err != nil {
 		return err
 	}
