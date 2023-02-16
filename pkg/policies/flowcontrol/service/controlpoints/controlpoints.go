@@ -25,12 +25,12 @@ func NewHandler(serviceControlPointCache *cache.Cache[selectors.ControlPointID])
 
 // GetControlPoints returns all control points.
 func (h *Handler) GetControlPoints(ctx context.Context, _ *emptypb.Empty) (*flowcontrolcontrolpointsv1.FlowControlControlPoints, error) {
-	serviceControlPointObjects := make(map[selectors.ControlPointID]struct{})
+	var serviceControlPointObjects []selectors.ControlPointID
 	if h.serviceControlPointCache != nil {
 		serviceControlPointObjects = h.serviceControlPointCache.GetAll()
 	}
 	controlpoints := make([]*flowcontrolcontrolpointsv1.FlowControlControlPoint, 0, len(serviceControlPointObjects))
-	for controlPointID := range serviceControlPointObjects {
+	for _, controlPointID := range serviceControlPointObjects {
 		cp := &flowcontrolcontrolpointsv1.FlowControlControlPoint{
 			Service:      controlPointID.Service,
 			ControlPoint: controlPointID.ControlPoint,
