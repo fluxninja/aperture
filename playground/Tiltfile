@@ -23,11 +23,10 @@ APERTURE_JS_EXAMPLE_NS = "aperture-js-example"
 APERTURE_JAVA_EXAMPLE_NS = "aperture-java-example"
 APERTURE_DEMOAPP_NS = "demoapp"
 APERTURE_ISTIO_NS = "istio-system"
+DEFAULT_TEST_SCENARIO = "scenarios/graphql-example-1"
 TANKA = "tk"
 SKIP_LOCAL_CMDS = False  # If set to true, skips actually running local commands (useful for developing and testing Tiltfile itself)
-# Mutable global state, since global values are not mutable
-GLOBAL_STATE = {}
-GLOBAL_RAN_TANKA_DEPS_KEY = "RAN_TANKA_DEPS"
+TANKA_DEPS_HANDLED = []
 
 # Dependency tree and service configuration.
 # Top level maps NAMESPACE to services
@@ -455,22 +454,15 @@ def render_tanka(environment, env_vars, base_dir, namespace):
     if SKIP_LOCAL_CMDS:
         return
 
-    if not GLOBAL_STATE.get(GLOBAL_RAN_TANKA_DEPS_KEY):
+    if base_dir not in TANKA_DEPS_HANDLED:
         # Get base directory for Jsonnet Bundler execution
         # tanka/apps/default -> tanka/
         # apps/default -> ./
         # Make sure jb dependencies are up to date
-        local(command=["./scripts/jb_install.sh"])
-
-        # Refreshing the dependencies for the Agent chart
-        refresh_chart_dependencies(base_dir + "charts/aperture-agent")
-        refresh_chart_dependencies(base_dir + "charts/aperture-controller")
-
-        # Fetch any vendored charts that are not included in our repository
-        local(command=[TANKA, "tool", "charts", "vendor"], dir=base_dir)
+        local(command=["./scripts/deps_install.sh", base_dir])
 
         # Skip refreshing deps the second time
-        GLOBAL_STATE[GLOBAL_RAN_TANKA_DEPS_KEY] = True
+        TANKA_DEPS_HANDLED.append(base_dir)
 
     trace("Rendering tanka with env: %s" % env_vars)
 
@@ -780,7 +772,7 @@ def process_aperture_scenario(scenario_path):
 
     policies = {
         "renderer": "jsonnet",
-        "namespace": "aperture-controller",
+        "namespace": APERTURE_CONTROLLER_NS,
         "jsonnet_args": ["--yaml-stream"],
         "labels": "TestScenarioApplication",
         "manifests_path": scenario_path + "/" + "policies/policy.jsonnet",
@@ -816,12 +808,6 @@ def process_aperture_scenario(scenario_path):
                     "wavepool-config:configmap"
                 ]
             },
-            {
-                "workload": "wavepool-graphql-generator",
-                "extra_objects": [
-                    "wavepool-graphql-config:configmap"
-                ]
-            }
         ]
     }
     DEP_TREE[APERTURE_DEMOAPP_NS]["scenario-wavepool"] = wavepool
@@ -1091,13 +1077,11 @@ if dockerhub_images:
     process_dockerhub_images(dockerhub_images)
 
 scenario = cfg.get("scenario", None)
-# If we are running specific test scenario, we don't want to run all workloads but only what's needed
-# to execute scenarios.
-if scenario:
-    to_run = ["agent", "controller", "aperture-grafana", "istio", "scenario-app", "scenario-policies", "scenario-wavepool"]
-    process_aperture_scenario(scenario)
-else:
-    to_run = cfg.get("to-run", ["all"])
+if not scenario:
+    scenario = DEFAULT_TEST_SCENARIO
+
+to_run = ["agent", "controller", "aperture-grafana", "istio", "scenario-app", "scenario-policies", "scenario-wavepool"]
+process_aperture_scenario(scenario)
 
 cfg_trace = cfg.get("trace", os.getenv("NINJA_TILT_TRACE", "false"))
 TRACE = cfg_trace == True

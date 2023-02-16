@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "dependencies": [
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/jsonnet-libs.git",
+          "subdir": "tanka-util"
+        }
+      },
+      "version": "10f4670bd5bc6bdcb3e91ba6a397e37610f2ee94",
+      "sum": "ShSIissXdvCy1izTCDZX6tY7qxCoepE5L+WJ52Hw7ZQ="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/jsonnet-libs/docsonnet.git",
+          "subdir": "doc-util"
+        }
+      },
+      "version": "b2e9d3bb1227ad5332724e5412ce2d5ca9776f7d",
+      "sum": "yRBlDzGmyJ4eTdfftx51XrRW1fcBrtym+/yJENZywyE="
+    },
+    {
+      "source": {
+        "local": {
+          "directory": "../../../playground/tanka/lib/ninja"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "legacyImports": false
+}
