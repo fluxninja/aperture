@@ -3,6 +3,6 @@
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting
 
 # Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.
-# Type: aperture.v1.LoadActuatorDynamicConfig
+# Type: aperture.spec.v1.LoadActuatorDynamicConfig
 # Required: True
 concurrency_controller: "__REQUIRED_FIELD__"

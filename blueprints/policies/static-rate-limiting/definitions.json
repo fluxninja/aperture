@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "policies/static-rate-limiting blueprint",
+  "additionalProperties": false,
+  "required": ["common", "policy"],
+  "properties": {
+    "common": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_name"],
+      "properties": {
+        "policy_name": {
+          "description": "Name of the policy.",
+          "type": "string"
+        }
+      }
+    },
+
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rate_limiter"],
+      "properties": {
+        "rate_limiter": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["rate_limit", "flow_selector", "parameters"],
+          "properties": {
+            "rate_limit": {
+              "description": "Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept",
+              "type": "number",
+              "format": "double"
+            },
+
+            "flow_selector": {
+              "description": "A flow selector to match requests against",
+              "type": "object",
+              "$ref": "../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
+            },
+
+            "parameters": {
+              "description": "Parameters.",
+              "type": "object",
+              "$ref": "../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
+            },
+
+            "default_config": {
+              "description": "Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.",
+              "type": "object",
+              "$ref": "../../gen/jsonschema/_definitions.json#/definitions/RateLimiterDynamicConfig"
+            }
+          }
+        }
+      }
+    },
+
+    "dashboard": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "datasource": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "description": "Datasource name.",
+              "type": "string"
+            },
+
+            "filter_regex": {
+              "description": "Datasource filter regex.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -210,8 +210,8 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
 
 <ParameterDescription
     name="policy.concurrency_controller.default_config"
-    type="aperture.v1.LoadActuatorDynamicConfig"
-    reference=""
+    type="aperture.spec.v1.LoadActuatorDynamicConfig"
+    reference="../../spec#load-actuator-dynamic-config"
     value="{'dry_run': False}"
     description='Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.' />
 
@@ -247,7 +247,7 @@ at runtime, without reloading the policy.
 
 <ParameterDescription
     name="concurrency_controller"
-    type="aperture.v1.LoadActuatorDynamicConfig"
-    reference=""
+    type="aperture.spec.v1.LoadActuatorDynamicConfig"
+    reference="../../spec#load-actuator-dynamic-config"
     value="__REQUIRED_FIELD__"
     description='Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.' />

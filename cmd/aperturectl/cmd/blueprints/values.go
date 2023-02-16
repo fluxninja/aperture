@@ -24,6 +24,7 @@ func init() {
 	valuesCmd.Flags().StringVar(&valuesFile, "output-file", "", "Path to the output values file")
 	valuesCmd.Flags().BoolVar(&onlyRequired, "only-required", false, "Show only required values")
 	valuesCmd.Flags().BoolVar(&dynamicConfig, "dynamic-config", false, "Show dynamic config values instead")
+	valuesCmd.Flags().BoolVar(&noYAMLModeline, "no-yaml-modeline", false, "Do not add YAML language server modeline to generated YAML files")
 }
 
 var valuesCmd = &cobra.Command{
@@ -42,7 +43,7 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 		if valuesFile == "" {
 			return fmt.Errorf("--output-file must be provided")
 		}
-		blueprintDir = filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
+		blueprintsDir = filepath.Join(blueprintsURIRoot, getRelPath(blueprintsURIRoot))
 
 		var valFileName string
 
@@ -64,12 +65,45 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 			valFileName = requiredValuesFileName
 		}
 
-		file := filepath.Join(blueprintDir, blueprintName, valFileName)
-		if _, err := os.Stat(file); err != nil {
-			return fmt.Errorf("values file not found for the blueprint at: %s", file)
+		srcValuesFile := filepath.Join(blueprintsDir, blueprintName, valFileName)
+		if _, err := os.Stat(srcValuesFile); err != nil {
+			return fmt.Errorf("values file not found for the blueprint at: %s", srcValuesFile)
 		}
-		// make a new copy values.yaml to the output file
-		if err := copyFile(file, valuesFile); err != nil {
+
+		in, err := os.Open(srcValuesFile)
+		if err != nil {
+			return err
+		}
+		defer in.Close()
+		out, err := os.Create(valuesFile)
+		if err != nil {
+			return err
+		}
+		defer func() {
+			cerr := out.Close()
+			if err == nil {
+				err = cerr
+			}
+		}()
+		// prepend YAML modeline to the file
+		if !noYAMLModeline {
+			var schemaURL string
+			if !dynamicConfig {
+				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintsDir, blueprintName, "definitions.json"))
+			} else {
+				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintsDir, blueprintName, "dynamic-config-definitions.json"))
+			}
+			_, err = out.WriteString("# yaml-language-server: $schema=" + schemaURL + "\n")
+			if err != nil {
+				return err
+			}
+		}
+
+		if _, err = io.Copy(out, in); err != nil {
+			return err
+		}
+		err = out.Sync()
+		if err != nil {
 			return err
 		}
 
@@ -81,7 +115,7 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 		cmd.Stdin = os.Stdin
 		cmd.Stderr = os.Stderr
 		cmd.Stdout = os.Stdout
-		err := cmd.Run()
+		err = cmd.Run()
 		if err != nil {
 			return fmt.Errorf("error opening file with editor: %s", err)
 		}
@@ -89,28 +123,4 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 		log.Info().Msgf("values file for the blueprint %s is available at: %s", blueprintName, valuesFile)
 		return nil
 	},
-}
-
-// copyFile copies a file from src to dst. Any existing file will be overwritten and will not copy file attributes.
-func copyFile(src, dst string) error {
-	in, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer in.Close()
-	out, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		cerr := out.Close()
-		if err == nil {
-			err = cerr
-		}
-	}()
-	if _, err = io.Copy(out, in); err != nil {
-		return err
-	}
-	err = out.Sync()
-	return err
 }

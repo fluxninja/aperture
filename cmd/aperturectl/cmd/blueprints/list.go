@@ -55,7 +55,7 @@ aperturectl blueprints list --all`,
 		} else {
 			w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
 
-			policies, err := getBlueprints(blueprintsDir)
+			policies, err := getBlueprints(blueprintsURIRoot)
 			if err != nil {
 				return err
 			}

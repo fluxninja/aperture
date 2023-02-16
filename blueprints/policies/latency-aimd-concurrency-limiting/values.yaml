@@ -53,7 +53,7 @@ policy:
     # Type: float64
     concurrency_sqrt_increment_multiplier: 1
     # Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.
-    # Type: aperture.v1.LoadActuatorDynamicConfig
+    # Type: aperture.spec.v1.LoadActuatorDynamicConfig
     default_config:
       dry_run: false
 
