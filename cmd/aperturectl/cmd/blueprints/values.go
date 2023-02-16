@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -17,6 +18,7 @@ const (
 	requiredValuesFileName              = "values-required.yaml"
 	dynamicConfigValuesFileName         = "dynamic-config-values.yaml"
 	requiredDynamicConfigValuesFileName = "dynamic-config-values-required.yaml"
+	fallbackEditor                      = "vi"
 )
 
 func init() {
@@ -25,6 +27,26 @@ func init() {
 	valuesCmd.Flags().BoolVar(&onlyRequired, "only-required", false, "Show only required values")
 	valuesCmd.Flags().BoolVar(&dynamicConfig, "dynamic-config", false, "Show dynamic config values instead")
 	valuesCmd.Flags().BoolVar(&noYAMLModeline, "no-yaml-modeline", false, "Do not add YAML language server modeline to generated YAML files")
+}
+
+func getEnvEditorWithFallback() (string, []string) {
+	visual := os.Getenv("VISUAL")
+	var found string
+	if visual != "" {
+		found = visual
+	}
+
+	if found == "" {
+		editor := os.Getenv("EDITOR")
+		if editor != "" {
+			found = editor
+		} else {
+			found = fallbackEditor
+		}
+	}
+
+	parts := strings.Split(found, " ")
+	return parts[0], parts[1:]
 }
 
 var valuesCmd = &cobra.Command{
@@ -107,11 +129,9 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 			return err
 		}
 
-		editor := os.Getenv("EDITOR")
-		if editor == "" {
-			editor = "vi"
-		}
-		cmd := exec.Command(editor, valuesFile)
+		command, args := getEnvEditorWithFallback()
+		args = append(args, valuesFile)
+		cmd := exec.Command(command, args...)
 		cmd.Stdin = os.Stdin
 		cmd.Stderr = os.Stderr
 		cmd.Stdout = os.Stdout
