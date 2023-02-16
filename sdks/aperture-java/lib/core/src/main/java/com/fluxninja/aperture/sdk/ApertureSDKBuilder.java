@@ -128,28 +128,31 @@ public final class ApertureSDKBuilder {
     SdkTracerProvider tracerProvider = tpb.build();
     Tracer tracer = tracerProvider.tracerBuilder(LIBRARY_NAME).build();
 
+    ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
 
-    if (this.forceHttp) {
-      System.out.println("Not yet supported");
-      return new ApertureSDK(
-              null,
-              null,
-              tracer,
-              timeout,
-              blockedPaths,
-              blockedPathsMatchRegex);
-    } else {
-      ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
-      FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient = FlowControlServiceGrpc
-              .newBlockingStub(channel);
-      AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient = AuthorizationGrpc.newBlockingStub(channel);
-      return new ApertureSDK(
-              flowControlClient,
-              envoyAuthzClient,
-              tracer,
-              timeout,
-              blockedPaths,
-              blockedPathsMatchRegex);
-    }
+    FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlGrpcClient = FlowControlServiceGrpc
+            .newBlockingStub(channel);
+    FlowControlClient flowControlClient = new FlowControlClient(
+            true,
+            this.host,
+            this.port,
+            flowControlGrpcClient
+    );
+
+    AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzGrpcClient = AuthorizationGrpc.newBlockingStub(channel);
+    EnvoyAuthzClient envoyAuthzClient = new EnvoyAuthzClient(
+            true,
+            this.host,
+            this.port,
+            envoyAuthzGrpcClient
+    );
+
+    return new ApertureSDK(
+            flowControlClient,
+            envoyAuthzClient,
+            tracer,
+            timeout,
+            blockedPaths,
+            blockedPathsMatchRegex);
   }
 }

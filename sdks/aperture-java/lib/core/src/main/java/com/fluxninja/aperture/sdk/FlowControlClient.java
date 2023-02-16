@@ -22,11 +22,11 @@ class FlowControlClient {
     FlowControlClient(
             boolean forceHttp,
             String agentHost,
-            String agentPort,
+            int agentPort,
             FlowControlServiceGrpc.FlowControlServiceBlockingStub grpcFlowControlClient) {
         this.forceHttp = forceHttp;
         this.agentHost = agentHost;
-        this.agentPort = agentPort;
+        this.agentPort = String.valueOf(agentPort);
         this.grpcFlowControlClient = grpcFlowControlClient;
     }
 
@@ -36,7 +36,7 @@ class FlowControlClient {
             String requestGson = new Gson().toJson(req);
             System.out.println(requestGson);
 
-            String checkUrl = agentHost + ":" + agentPort + "/Check";
+            String checkUrl = "http://" + agentHost + ":" + agentPort + "/v1/flowcontrol/check";
             try {
                 URL url = new URL(checkUrl);
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -71,6 +71,7 @@ class FlowControlClient {
             } catch (Exception e) {
                 // TODO: proper exceptions
                 System.out.println("oops");
+                e.printStackTrace();
                 return null;
             }
         } else {

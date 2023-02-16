@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 
@@ -11,6 +12,7 @@ import (
 // Module .
 var Module = fx.Options(
 	fx.Provide(ProvideFlowcontrolHandler),
+	grpcgateway.RegisterHandler{Handler: flowcontrolv1.RegisterFlowControlServiceHandlerFromEndpoint}.Annotate(),
 	fx.Invoke(Register),
 )
 

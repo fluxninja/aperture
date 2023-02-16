@@ -38,6 +38,26 @@ paths:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
+  /v1/flowcontrol/check:
+    post:
+      tags:
+      - aperture-agent
+      summary: Check wraps the given arbitrary resource and matches the given labels
+        against Flow Control Limiters to makes a decision whether to allow/deny.
+      operationId: FlowControlService_Check
+      parameters:
+      - type: string
+        name: control_point
+        in: query
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1CheckResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
   /v1/flowcontrol/controlpoints:
     get:
       tags:
@@ -288,6 +308,23 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
 definitions:
+  CheckResponseDecisionType:
+    description: DecisionType contains fields that represent decision made by Check
+      call.
+    type: string
+    default: DECISION_TYPE_ACCEPTED
+    enum:
+    - DECISION_TYPE_ACCEPTED
+    - DECISION_TYPE_REJECTED
+  CheckResponseRejectReason:
+    description: RejectReason contains fields that give further information about
+      rejection.
+    type: string
+    default: REJECT_REASON_NONE
+    enum:
+    - REJECT_REASON_NONE
+    - REJECT_REASON_RATE_LIMITED
+    - REJECT_REASON_CONCURRENCY_LIMITED
   EntityCacheEntities:
     description: Entities defines mapping of entities.
     type: object
@@ -296,6 +333,28 @@ definitions:
         type: object
         additionalProperties:
           $ref: '#/definitions/v1Entity'
+  LimiterDecisionConcurrencyLimiterInfo:
+    type: object
+    properties:
+      workload_index:
+        type: string
+  LimiterDecisionLimiterReason:
+    type: string
+    default: LIMITER_REASON_UNSPECIFIED
+    enum:
+    - LIMITER_REASON_UNSPECIFIED
+    - LIMITER_REASON_KEY_NOT_FOUND
+  LimiterDecisionRateLimiterInfo:
+    type: object
+    properties:
+      current:
+        type: string
+        format: int64
+      label:
+        type: string
+      remaining:
+        type: string
+        format: int64
   MatchExpressionList:
     description: 'eg. {any: {of: [expr1, expr2]}}.'
     type: object
@@ -453,6 +512,86 @@ definitions:
       timestamp:
         type: string
         format: date-time
+  v1CheckResponse:
+    description: CheckResponse contains fields that represent decision made by Check
+      call.
+    type: object
+    properties:
+      classifier_infos:
+        description: classifiers that were matched for this request.
+        type: array
+        items:
+          $ref: '#/definitions/v1ClassifierInfo'
+      control_point:
+        type: string
+        title: control_point of request
+      decision_type:
+        description: decision_type contains what the decision was.
+        $ref: '#/definitions/CheckResponseDecisionType'
+      end:
+        type: string
+        format: date-time
+        title: end timestamp
+      flow_label_keys:
+        description: flow label keys that were matched for this request.
+        type: array
+        items:
+          type: string
+      flux_meter_infos:
+        description: flux meters that were matched for this request.
+        type: array
+        items:
+          $ref: '#/definitions/v1FluxMeterInfo'
+      limiter_decisions:
+        description: limiter_decisions contains information about decision made by
+          each limiter.
+        type: array
+        items:
+          $ref: '#/definitions/v1LimiterDecision'
+      reject_reason:
+        description: reject_reason contains the reason for the rejection.
+        $ref: '#/definitions/CheckResponseRejectReason'
+      services:
+        type: array
+        title: services that matched
+        items:
+          type: string
+      start:
+        type: string
+        format: date-time
+        title: start timestamp
+      telemetry_flow_labels:
+        description: telemetry_flow_labels are labels for telemetry purpose. The keys
+          in telemetry_flow_labels is subset of flow_label_keys.
+        type: object
+        additionalProperties:
+          type: string
+  v1ClassifierInfo:
+    description: ClassifierInfo describes details for each ClassifierInfo.
+    type: object
+    properties:
+      classifier_index:
+        type: string
+        format: int64
+      error:
+        $ref: '#/definitions/v1ClassifierInfoError'
+      label_key:
+        type: string
+      policy_hash:
+        type: string
+      policy_name:
+        type: string
+  v1ClassifierInfoError:
+    description: Error information.
+    type: string
+    default: ERROR_NONE
+    enum:
+    - ERROR_NONE
+    - ERROR_EVAL_FAILED
+    - ERROR_EMPTY_RESULTSET
+    - ERROR_AMBIGUOUS_RESULTSET
+    - ERROR_MULTI_EXPRESSION
+    - ERROR_EXPRESSION_NOT_MAP
   v1DMap:
     type: object
     properties:
@@ -550,6 +689,12 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/v1FlowControlControlPoint'
+  v1FluxMeterInfo:
+    description: FluxMeterInfo describes detail for each FluxMeterInfo.
+    type: object
+    properties:
+      flux_meter_name:
+        type: string
   v1GroupStatus:
     description: |-
       Groups is nested structure that holds status information about the node and a
@@ -652,6 +797,24 @@ definitions:
         type: object
         additionalProperties:
           type: string
+  v1LimiterDecision:
+    description: LimiterDecision describes details for each limiter.
+    type: object
+    properties:
+      component_id:
+        type: string
+      concurrency_limiter_info:
+        $ref: '#/definitions/LimiterDecisionConcurrencyLimiterInfo'
+      dropped:
+        type: boolean
+      policy_hash:
+        type: string
+      policy_name:
+        type: string
+      rate_limiter_info:
+        $ref: '#/definitions/LimiterDecisionRateLimiterInfo'
+      reason:
+        $ref: '#/definitions/LimiterDecisionLimiterReason'
   v1MatchExpression:
     description: |-
       MatchExpression has multiple variants, exactly one should be set.

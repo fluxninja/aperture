@@ -2,12 +2,19 @@ syntax = "proto3";
 
 package aperture.flowcontrol.check.v1;
 
+import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 // FlowControlService is used to perform Flow Control operations.
 service FlowControlService {
   // Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
-  rpc Check(CheckRequest) returns (CheckResponse) {}
+  rpc Check(CheckRequest) returns (CheckResponse) {
+    option (google.api.http) = {post: "/v1/flowcontrol/check"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-agent"];
+    };
+  }
 }
 
 // CheckRequest contains fields required to perform Check call.

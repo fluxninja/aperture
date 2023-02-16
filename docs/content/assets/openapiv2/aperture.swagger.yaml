@@ -83,6 +83,26 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       tags:
         - aperture-agent
+  /v1/flowcontrol/check:
+    post:
+      summary: Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
+      operationId: FlowControlService_Check
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1CheckResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: control_point
+          in: query
+          required: false
+          type: string
+      tags:
+        - aperture-agent
   /v1/flowcontrol/controlpoints:
     get:
       operationId: FlowControlControlPointsService_GetControlPoints

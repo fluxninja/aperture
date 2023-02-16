@@ -23,11 +23,11 @@ class EnvoyAuthzClient {
     EnvoyAuthzClient(
             boolean forceHttp,
             String agentHost,
-            String agentPort,
+            int agentPort,
             AuthorizationGrpc.AuthorizationBlockingStub grpcEnvoyAuthzClient) {
         this.forceHttp = forceHttp;
         this.agentHost = agentHost;
-        this.agentPort = agentPort;
+        this.agentPort = String.valueOf(agentPort);
         this.grpcEnvoyAuthzClient = grpcEnvoyAuthzClient;
     }
 
@@ -37,7 +37,7 @@ class EnvoyAuthzClient {
             String requestGson = new Gson().toJson(req);
             System.out.println(requestGson);
 
-            String checkUrl = agentHost + ":" + agentPort + "/Check";
+            String checkUrl = "http://" + agentHost + ":" + agentPort + "/v3/envoyauthz/check";
             try {
                 URL url = new URL(checkUrl);
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -72,6 +72,8 @@ class EnvoyAuthzClient {
             } catch (Exception e) {
                 // TODO: proper exceptions
                 System.out.println("oops");
+                System.out.println(e);
+                e.printStackTrace();
                 return null;
             }
         } else {

@@ -2,6 +2,7 @@ package check
 
 import (
 	"fmt"
+	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
@@ -25,6 +26,7 @@ func Module() fx.Option {
 			ProvideMetrics,
 			ProvideHandler,
 		),
+		grpcgateway.RegisterHandler{Handler: flowcontrolv1.RegisterFlowControlServiceHandlerFromEndpoint}.Annotate(),
 		fx.Invoke(Register),
 	)
 }
