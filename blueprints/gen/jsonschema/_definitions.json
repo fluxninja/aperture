@@ -176,9 +176,9 @@
           "x-order": 2
         },
         "resolve_timeout": {
-          "description": "Duration of alert resolver.\n\n@gotags: default:\"300s\"",
+          "description": "Duration of alert resolver.\n\n@gotags: default:\"10s\"",
           "type": "string",
-          "x-go-default": "300s",
+          "x-go-default": "10s",
           "x-order": 3
         },
         "severity": {
