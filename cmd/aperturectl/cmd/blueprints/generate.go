@@ -74,8 +74,6 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 			return err
 		}
 
-		blueprintsDir = filepath.Join(blueprintsURIRoot, getRelPath(blueprintsURIRoot))
-
 		err = blueprintExists(blueprintsDir, blueprintName)
 		if err != nil {
 			return err

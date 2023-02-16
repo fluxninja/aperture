@@ -8,7 +8,7 @@
     "rate_limiter": {
       "description": "Rate limiter dynamic configuration that is updated at runtime.",
       "type": "object",
-      "$ref": "../../gen/jsonschema/_definitions.json#/definitions/RateLimiterDynamicConfig"
+      "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterDynamicConfig"
     }
   }
 }

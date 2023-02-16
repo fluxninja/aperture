@@ -142,10 +142,10 @@ pip install -r requirements.txt
 ```
 
 To update README.md from blueprint configuration, use
-`scripts/blueprint-readme-generator.py`:
+`scripts/blueprint-assets-generator.py`:
 
 ```sh
-$ ./scripts/blueprint-readme-generator.py policies/latency-aimd-concurrency-limiting
+$ ./scripts/blueprint-assets-generator.py policies/latency-aimd-concurrency-limiting
 $
 ```
 

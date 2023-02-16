@@ -167,8 +167,8 @@ Every time you wish to manually run the traffic, make sure to press the
 
 ## Tools
 
-As Described hereafter, deployment methods assume usage of specific deployment
-and configuration/management tools (which must be installed beforehand).
+Playground environment assumes usage of specific deployment and
+configuration/management tools which must be installed beforehand.
 
 To install the required tools, you have two options:
 
