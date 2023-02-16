@@ -613,18 +613,20 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
     spec_path = "/".join([".."] * len(relative_blueprint_path_parts)) + "/spec"
     aperture_version_path = "/".join([".."] * (len(relative_blueprint_path_parts)+2)) + "/apertureVersion.js"
 
-    aperture_json_schema_path = "/".join([".."] * len(relative_blueprint_path_parts)) + "/gen/jsonschema/_definitions.json#/definitions/"
+    aperture_json_schema_path = "/".join([".."] * (len(relative_blueprint_path_parts)+1)) + "/gen/jsonschema/_definitions.json#/definitions/"
+
+    blueprint_gen_path = blueprint_path / "gen"
 
 
     config_docblocks = parse_config_docblocks(repository_root, blueprint_path, aperture_json_schema_path, spec_path)
-    render_json_schema(blueprint_name, blueprint_path / "definitions.json", config_docblocks)
-    render_sample_config_yaml(blueprint_name, blueprint_path / "values.yaml", False, config_docblocks)
-    render_sample_config_yaml(blueprint_name, blueprint_path / "values-required.yaml", True, config_docblocks)
+    render_json_schema(blueprint_name, blueprint_gen_path / "definitions.json", config_docblocks)
+    render_sample_config_yaml(blueprint_name, blueprint_gen_path / "values.yaml", False, config_docblocks)
+    render_sample_config_yaml(blueprint_name, blueprint_gen_path / "values-required.yaml", True, config_docblocks)
 
     dynamic_config_docblocks = parse_dynamic_config_docblocks(repository_root, blueprint_path, aperture_json_schema_path, spec_path)
-    render_json_schema(blueprint_name, blueprint_path / "dynamic-config-definitions.json", dynamic_config_docblocks)
-    render_sample_config_yaml(blueprint_name, blueprint_path / "dynamic-config-values.yaml", False, dynamic_config_docblocks)
-    render_sample_config_yaml(blueprint_name, blueprint_path / "dynamic-config-values-required.yaml", True, dynamic_config_docblocks)
+    render_json_schema(blueprint_name, blueprint_gen_path / "dynamic-config-definitions.json", dynamic_config_docblocks)
+    render_sample_config_yaml(blueprint_name, blueprint_gen_path / "dynamic-config-values.yaml", False, dynamic_config_docblocks)
+    render_sample_config_yaml(blueprint_name, blueprint_gen_path / "dynamic-config-values-required.yaml", True, dynamic_config_docblocks)
 
     update_readme_markdown(readme_path, config_docblocks, dynamic_config_docblocks, blueprint_name, aperture_version_path)
 

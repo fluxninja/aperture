@@ -20,9 +20,10 @@ $FIND "$blueprints_root" -type f -name config.libsonnet | while read -r files; d
 	dir=$(dirname "$files")
 	echo "Generating README and Sample Values for $dir"
 
-	python "${git_root}"/scripts/blueprint-readme-generator.py "$dir"
+	python "${git_root}"/scripts/blueprint-assets-generator.py "$dir"
 
-	gen_files=("$dir"/values.yaml "$dir"/values-required.yaml "$dir"/dynamic-config-values.yaml "$dir"/dynamic-config-values-required.yaml "$dir"/definitions.json "$dir"/dynamic-config-definitions.json)
+	gen_dir="$dir"/gen
+	gen_files=("$gen_dir"/values.yaml "$gen_dir"/values-required.yaml "$gen_dir"/dynamic-config-values.yaml "$gen_dir"/dynamic-config-values-required.yaml "$gen_dir"/definitions.json "$gen_dir"/dynamic-config-definitions.json)
 	for gen_file in "${gen_files[@]}"; do
 		if [ -f "$gen_file" ]; then
 			npx prettier --write "$gen_file"
@@ -31,6 +32,7 @@ $FIND "$blueprints_root" -type f -name config.libsonnet | while read -r files; d
 
 done
 
+# run prettier on generated readme docs
 $FIND "$git_root"/docs/content/reference/policies/bundled-blueprints -type f -name '*.md' | while read -r files; do
 	npx prettier --write "$files"
 done

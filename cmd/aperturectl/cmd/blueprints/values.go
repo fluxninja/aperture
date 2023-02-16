@@ -65,7 +65,6 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 		if valuesFile == "" {
 			return fmt.Errorf("--output-file must be provided")
 		}
-		blueprintsDir = filepath.Join(blueprintsURIRoot, getRelPath(blueprintsURIRoot))
 
 		var valFileName string
 
@@ -87,7 +86,9 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 			valFileName = requiredValuesFileName
 		}
 
-		srcValuesFile := filepath.Join(blueprintsDir, blueprintName, valFileName)
+		blueprintGenDir := filepath.Join(blueprintsDir, blueprintName, "gen")
+
+		srcValuesFile := filepath.Join(blueprintGenDir, valFileName)
 		if _, err := os.Stat(srcValuesFile); err != nil {
 			return fmt.Errorf("values file not found for the blueprint at: %s", srcValuesFile)
 		}
@@ -111,9 +112,9 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 		if !noYAMLModeline {
 			var schemaURL string
 			if !dynamicConfig {
-				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintsDir, blueprintName, "definitions.json"))
+				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintGenDir, "definitions.json"))
 			} else {
-				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintsDir, blueprintName, "dynamic-config-definitions.json"))
+				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintGenDir, "dynamic-config-definitions.json"))
 			}
 			_, err = out.WriteString("# yaml-language-server: $schema=" + schemaURL + "\n")
 			if err != nil {
