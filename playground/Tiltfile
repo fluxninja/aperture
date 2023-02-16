@@ -443,27 +443,7 @@ def refresh_chart_dependencies(chart_dir):
             local(command=["helm", "dependency", "update"], dir=chart_dir)
             return
 
-
-def _render_tanka(base_dir, environment, env_vars):
-    wrapped_k8s_yaml(
-        local(
-            quiet=True,
-            command=[
-                TANKA,
-                "--ext-str=projectRoot=" + base_dir,
-                "show",
-                # Allow dumping the templates to stdout,
-                # instead of using tk export to generate files
-                # and then have to manage deleting them etc.
-                "--dangerous-allow-redirect",
-                environment
-            ],
-            env=env_vars
-        )
-    )
-
-
-def render_tanka(environment, env_vars, base_dir=None):
+def render_tanka(environment, env_vars, base_dir, namespace):
     print(
         "Rendering tanka environment",
         environment,
@@ -493,8 +473,27 @@ def render_tanka(environment, env_vars, base_dir=None):
         GLOBAL_STATE[GLOBAL_RAN_TANKA_DEPS_KEY] = True
 
     trace("Rendering tanka with env: %s" % env_vars)
+
     # Generate manifests with tanka
-    _render_tanka(base_dir, environment, env_vars)
+    rendered = local(
+        quiet=True,
+        command=[
+            TANKA,
+            "--ext-str=projectRoot=" + base_dir,
+            "show",
+            # Allow dumping the templates to stdout,
+            # instead of using tk export to generate files
+            # and then have to manage deleting them etc.
+            "--dangerous-allow-redirect",
+            environment
+        ],
+        env=env_vars
+    )
+
+    if namespace:
+        rendered = namespace_inject(rendered, namespace)
+    wrapped_k8s_yaml(rendered)
+
 
 
 def print_available_resources(dep_tree):
@@ -739,20 +738,18 @@ def render_yaml(manifests_path, env_vars=None):
     )
 
 
-def render_jsonnet(manifests_path, jsonnet_args=None):
+def render_jsonnet(manifests_path, jsonnet_args, namespace):
     if not jsonnet_args:
         jsonnet_args = []
-    print(jsonnet_args)
 
-    wrapped_k8s_yaml(
-        namespace_inject(
-            local(
-                quiet=True,
-                command=["jsonnet"] + jsonnet_args + [manifests_path]
-            ),
-            APERTURE_DEMOAPP_NS
-        )
+    rendered = local(
+        quiet=True,
+        command=["jsonnet"] + jsonnet_args + [manifests_path]
     )
+
+    if namespace:
+        rendered = namespace_inject(rendered, namespace)
+    wrapped_k8s_yaml(rendered)
 
 def process_aperture_scenario(scenario_path):
     # If this is a relative path, it's relative to Tiltfile (PLAYGROUND_ROOT_PATH)
@@ -776,10 +773,14 @@ def process_aperture_scenario(scenario_path):
     images = app_manifest.get("images", [])
     for image in images:
         image["context"] = scenario_path + "/" + image["context"]
+
+    if APERTURE_DEMOAPP_NS not in DEP_TREE:
+        DEP_TREE[APERTURE_DEMOAPP_NS] = {}
     DEP_TREE[APERTURE_DEMOAPP_NS]["scenario-app"] = app_manifest
 
     policies = {
         "renderer": "jsonnet",
+        "namespace": "aperture-controller",
         "jsonnet_args": ["--yaml-stream"],
         "labels": "TestScenarioApplication",
         "manifests_path": scenario_path + "/" + "policies/policy.jsonnet",
@@ -801,6 +802,7 @@ def process_aperture_scenario(scenario_path):
     wavepool_js = "\\n".join(lines)
     wavepool = {
         "renderer": "yaml",
+        "namespace": APERTURE_DEMOAPP_NS,
         "labels": "TestScenarioApplication",
         "manifests_path": PLAYGROUND_ROOT + "/" + "scenarios/wavepool-generator",
         "resource_deps": ["scenario-policies", "cluster-bootstrap"],
@@ -923,14 +925,16 @@ def declare_resources(resources, dep_tree, inv_dep_tree,race_arg):
             manifests_path = app_config.get("manifests_path")
             tkenv = app_config.get("tkenv")
             env_vars = app_config.get("env_vars", {})
+            namespace = app_config.get("namespace", None)
             if tkenv:
                 base_dir = app_config.get("base_dir")
-                render_tanka(tkenv, env_vars, base_dir)
+                render_tanka(tkenv, env_vars, base_dir, namespace)
             elif renderer == "yaml":
                 render_yaml(manifests_path, env_vars)
             elif renderer == "jsonnet":
+                namespace = app_config.get("namespace", None)
                 jsonnet_args = app_config.get("jsonnet_args", [])
-                render_jsonnet(manifests_path, jsonnet_args)
+                render_jsonnet(manifests_path, jsonnet_args, namespace)
             else:
                 fail("Tanka app is not found for %s." % app)
 
