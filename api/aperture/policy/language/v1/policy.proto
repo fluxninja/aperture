@@ -262,8 +262,9 @@ message FlowControl {
 // AutoScale components are used to scale a service.
 message AutoScale {
   oneof component {
-    // HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
-    HorizontalPodScaler horizontal_pod_scaler = 1;
+    // PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+    PodScaler pod_scaler = 1;
+    // GradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.
   }
 }
 
@@ -1481,9 +1482,9 @@ message Differentiator {
   }]; // @gotags: default:"5s"
 }
 
-message HorizontalPodScaler {
+message PodScaler {
   message ScaleReporter {
-    // Outputs for the HorizontalPodScaler component.
+    // Outputs for the PodScaler component.
     message Outs {
       OutPort actual_replicas = 1;
       OutPort configured_replicas = 2;
@@ -1505,7 +1506,7 @@ message HorizontalPodScaler {
       }]; // @gotags: default:"false"
     }
 
-    // Inputs for the HorizontalPodScaler component.
+    // Inputs for the PodScaler component.
     message Ins {
       InPort desired_replicas = 1;
     }

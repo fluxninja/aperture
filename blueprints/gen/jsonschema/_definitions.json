@@ -291,10 +291,10 @@
       "description": "AutoScale components are used to scale a service.",
       "type": "object",
       "properties": {
-        "horizontal_pod_scaler": {
-          "description": "HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.",
+        "pod_scaler": {
+          "description": "PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.\n\nGradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.",
           "x-order": 0,
-          "$ref": "#/definitions/HorizontalPodScaler"
+          "$ref": "#/definitions/PodScaler"
         }
       },
       "additionalProperties": false
@@ -1247,95 +1247,6 @@
       },
       "additionalProperties": false
     },
-    "HorizontalPodScaler": {
-      "type": "object",
-      "properties": {
-        "kubernetes_object_selector": {
-          "description": "The Kubernetes object on which horizontal scaling is applied.\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
-          "x-order": 0,
-          "$ref": "#/definitions/KubernetesObjectSelector"
-        },
-        "scale_actuator": {
-          "x-order": 1,
-          "$ref": "#/definitions/HorizontalPodScalerScaleActuator"
-        },
-        "scale_reporter": {
-          "x-order": 2,
-          "$ref": "#/definitions/HorizontalPodScalerScaleReporter"
-        }
-      },
-      "additionalProperties": false
-    },
-    "HorizontalPodScalerScaleActuator": {
-      "type": "object",
-      "properties": {
-        "default_config": {
-          "description": "Default configuration.",
-          "x-order": 0,
-          "$ref": "#/definitions/HorizontalPodScalerScaleActuatorDynamicConfig"
-        },
-        "dynamic_config_key": {
-          "type": "string",
-          "title": "Configuration key for DynamicConfig",
-          "x-order": 1
-        },
-        "in_ports": {
-          "x-order": 2,
-          "$ref": "#/definitions/HorizontalPodScalerScaleActuatorIns"
-        }
-      },
-      "additionalProperties": false
-    },
-    "HorizontalPodScalerScaleActuatorDynamicConfig": {
-      "type": "object",
-      "title": "Dynamic Configuration for ScaleActuator",
-      "properties": {
-        "dry_run": {
-          "description": "Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.\nUseful for observing the behavior of Scaler without disrupting any real traffic.\n\n@gotags: default:\"false\"",
-          "type": "boolean",
-          "x-go-default": false,
-          "x-order": 0
-        }
-      },
-      "additionalProperties": false
-    },
-    "HorizontalPodScalerScaleActuatorIns": {
-      "description": "Inputs for the HorizontalPodScaler component.",
-      "type": "object",
-      "properties": {
-        "desired_replicas": {
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
-        }
-      },
-      "additionalProperties": false
-    },
-    "HorizontalPodScalerScaleReporter": {
-      "type": "object",
-      "properties": {
-        "out_ports": {
-          "x-order": 0,
-          "$ref": "#/definitions/HorizontalPodScalerScaleReporterOuts"
-        }
-      },
-      "additionalProperties": false
-    },
-    "HorizontalPodScalerScaleReporterOuts": {
-      "description": "Outputs for the HorizontalPodScaler component.",
-      "type": "object",
-      "properties": {
-        "actual_replicas": {
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
-        },
-        "configured_replicas": {
-          "x-order": 1,
-          "$ref": "#/definitions/OutPort"
-        }
-      },
-      "additionalProperties": false
-    },
     "InPort": {
       "type": "object",
       "title": "Components receive input from other components via InPorts",
@@ -1954,6 +1865,95 @@
           },
           "x-go-validate": "required",
           "x-order": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "PodScaler": {
+      "type": "object",
+      "properties": {
+        "kubernetes_object_selector": {
+          "description": "The Kubernetes object on which horizontal scaling is applied.\n\n@gotags: validate:\"required\"",
+          "x-go-validate": "required",
+          "x-order": 0,
+          "$ref": "#/definitions/KubernetesObjectSelector"
+        },
+        "scale_actuator": {
+          "x-order": 1,
+          "$ref": "#/definitions/PodScalerScaleActuator"
+        },
+        "scale_reporter": {
+          "x-order": 2,
+          "$ref": "#/definitions/PodScalerScaleReporter"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PodScalerScaleActuator": {
+      "type": "object",
+      "properties": {
+        "default_config": {
+          "description": "Default configuration.",
+          "x-order": 0,
+          "$ref": "#/definitions/PodScalerScaleActuatorDynamicConfig"
+        },
+        "dynamic_config_key": {
+          "type": "string",
+          "title": "Configuration key for DynamicConfig",
+          "x-order": 1
+        },
+        "in_ports": {
+          "x-order": 2,
+          "$ref": "#/definitions/PodScalerScaleActuatorIns"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PodScalerScaleActuatorDynamicConfig": {
+      "type": "object",
+      "title": "Dynamic Configuration for ScaleActuator",
+      "properties": {
+        "dry_run": {
+          "description": "Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.\nUseful for observing the behavior of Scaler without disrupting any real traffic.\n\n@gotags: default:\"false\"",
+          "type": "boolean",
+          "x-go-default": false,
+          "x-order": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "PodScalerScaleActuatorIns": {
+      "description": "Inputs for the PodScaler component.",
+      "type": "object",
+      "properties": {
+        "desired_replicas": {
+          "x-order": 0,
+          "$ref": "#/definitions/InPort"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PodScalerScaleReporter": {
+      "type": "object",
+      "properties": {
+        "out_ports": {
+          "x-order": 0,
+          "$ref": "#/definitions/PodScalerScaleReporterOuts"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PodScalerScaleReporterOuts": {
+      "description": "Outputs for the PodScaler component.",
+      "type": "object",
+      "properties": {
+        "actual_replicas": {
+          "x-order": 0,
+          "$ref": "#/definitions/OutPort"
+        },
+        "configured_replicas": {
+          "x-order": 1,
+          "$ref": "#/definitions/OutPort"
         }
       },
       "additionalProperties": false

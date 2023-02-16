@@ -1,10 +1,10 @@
 {
   new():: {
   },
-  withHorizontalPodScaler(horizontal_pod_scaler):: {
-    horizontal_pod_scaler: horizontal_pod_scaler,
+  withPodScaler(pod_scaler):: {
+    pod_scaler: pod_scaler,
   },
-  withHorizontalPodScalerMixin(horizontal_pod_scaler):: {
-    horizontal_pod_scaler+: horizontal_pod_scaler,
+  withPodScalerMixin(pod_scaler):: {
+    pod_scaler+: pod_scaler,
   },
 }

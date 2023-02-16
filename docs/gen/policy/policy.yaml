@@ -315,11 +315,13 @@ definitions:
     description: AutoScale components are used to scale a service.
     type: object
     properties:
-      horizontal_pod_scaler:
-        description: HorizontalPodScaler provides pod horizontal scaling functionality
-          for scalable Kubernetes resources.
+      pod_scaler:
+        description: |-
+          PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+
+          GradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.
         x-order: 0
-        $ref: '#/definitions/HorizontalPodScaler'
+        $ref: '#/definitions/PodScaler'
   Circuit:
     description: |-
       :::info
@@ -1495,73 +1497,6 @@ definitions:
       output:
         x-order: 0
         $ref: '#/definitions/OutPort'
-  HorizontalPodScaler:
-    type: object
-    properties:
-      kubernetes_object_selector:
-        description: |-
-          The Kubernetes object on which horizontal scaling is applied.
-
-          @gotags: validate:"required"
-        x-go-validate: required
-        x-order: 0
-        $ref: '#/definitions/KubernetesObjectSelector'
-      scale_actuator:
-        x-order: 1
-        $ref: '#/definitions/HorizontalPodScalerScaleActuator'
-      scale_reporter:
-        x-order: 2
-        $ref: '#/definitions/HorizontalPodScalerScaleReporter'
-  HorizontalPodScalerScaleActuator:
-    type: object
-    properties:
-      default_config:
-        description: Default configuration.
-        x-order: 0
-        $ref: '#/definitions/HorizontalPodScalerScaleActuatorDynamicConfig'
-      dynamic_config_key:
-        type: string
-        title: Configuration key for DynamicConfig
-        x-order: 1
-      in_ports:
-        x-order: 2
-        $ref: '#/definitions/HorizontalPodScalerScaleActuatorIns'
-  HorizontalPodScalerScaleActuatorDynamicConfig:
-    type: object
-    title: Dynamic Configuration for ScaleActuator
-    properties:
-      dry_run:
-        description: |-
-          Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
-          Useful for observing the behavior of Scaler without disrupting any real traffic.
-
-          @gotags: default:"false"
-        type: boolean
-        x-go-default: false
-        x-order: 0
-  HorizontalPodScalerScaleActuatorIns:
-    description: Inputs for the HorizontalPodScaler component.
-    type: object
-    properties:
-      desired_replicas:
-        x-order: 0
-        $ref: '#/definitions/InPort'
-  HorizontalPodScalerScaleReporter:
-    type: object
-    properties:
-      out_ports:
-        x-order: 0
-        $ref: '#/definitions/HorizontalPodScalerScaleReporterOuts'
-  HorizontalPodScalerScaleReporterOuts:
-    description: Outputs for the HorizontalPodScaler component.
-    type: object
-    properties:
-      actual_replicas:
-        x-order: 0
-        $ref: '#/definitions/OutPort'
-      configured_replicas:
-        x-order: 1
-        $ref: '#/definitions/OutPort'
   InPort:
     type: object
     title: Components receive input from other components via InPorts
@@ -2158,6 +2093,73 @@ definitions:
           type: string
         x-go-validate: required
         x-order: 0
+  PodScaler:
+    type: object
+    properties:
+      kubernetes_object_selector:
+        description: |-
+          The Kubernetes object on which horizontal scaling is applied.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+        x-order: 0
+        $ref: '#/definitions/KubernetesObjectSelector'
+      scale_actuator:
+        x-order: 1
+        $ref: '#/definitions/PodScalerScaleActuator'
+      scale_reporter:
+        x-order: 2
+        $ref: '#/definitions/PodScalerScaleReporter'
+  PodScalerScaleActuator:
+    type: object
+    properties:
+      default_config:
+        description: Default configuration.
+        x-order: 0
+        $ref: '#/definitions/PodScalerScaleActuatorDynamicConfig'
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
+        x-order: 1
+      in_ports:
+        x-order: 2
+        $ref: '#/definitions/PodScalerScaleActuatorIns'
+  PodScalerScaleActuatorDynamicConfig:
+    type: object
+    title: Dynamic Configuration for ScaleActuator
+    properties:
+      dry_run:
+        description: |-
+          Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+          Useful for observing the behavior of Scaler without disrupting any real traffic.
+
+          @gotags: default:"false"
+        type: boolean
+        x-go-default: false
+        x-order: 0
+  PodScalerScaleActuatorIns:
+    description: Inputs for the PodScaler component.
+    type: object
+    properties:
+      desired_replicas:
+        x-order: 0
+        $ref: '#/definitions/InPort'
+  PodScalerScaleReporter:
+    type: object
+    properties:
+      out_ports:
+        x-order: 0
+        $ref: '#/definitions/PodScalerScaleReporterOuts'
+  PodScalerScaleReporterOuts:
+    description: Outputs for the PodScaler component.
+    type: object
+    properties:
+      actual_replicas:
+        x-order: 0
+        $ref: '#/definitions/OutPort'
+      configured_replicas:
+        x-order: 1
+        $ref: '#/definitions/OutPort'
   Policy:
     description: |-
       :::info

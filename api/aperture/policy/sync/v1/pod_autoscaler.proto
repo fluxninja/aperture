@@ -5,17 +5,17 @@ package aperture.policy.sync.v1;
 import "aperture/policy/language/v1/policy.proto";
 import "aperture/policy/sync/v1/common_attributes.proto";
 
-message HorizontalPodScalerWrapper {
+message PodScalerWrapper {
   // CommonAttributes
   CommonAttributes common_attributes = 1;
-  policy.language.v1.HorizontalPodScaler horizontal_pod_scaler = 2;
+  policy.language.v1.PodScaler pod_scaler = 2;
 }
 
-message HorizontalPodScalerDynamicConfigWrapper {
+message PodScalerDynamicConfigWrapper {
   // CommonAttributes
   CommonAttributes common_attributes = 1;
-  // HorizontalPodScalerDynamicConfig is the dynamic configuration for the horizontal pod scaler.
-  policy.language.v1.HorizontalPodScaler.ScaleActuator.DynamicConfig horizontal_pod_scaler_dynamic_config = 2;
+  // PodScalerDynamicConfig is the dynamic configuration for the pod scaler.
+  policy.language.v1.PodScaler.ScaleActuator.DynamicConfig pod_scaler_dynamic_config = 2;
 }
 
 message ScaleStatusWrapper {
