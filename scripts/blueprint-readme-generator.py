@@ -616,6 +616,7 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
     render_sample_config_yaml(blueprint_name, blueprint_path / "values-required.yaml", True, config_docblocks)
 
     dynamic_config_docblocks = parse_dynamic_config_docblocks(repository_root, blueprint_path, aperture_json_schema_path, spec_path)
+    render_json_schema(blueprint_name, blueprint_path / "dynamic-config-definitions.json", dynamic_config_docblocks)
     render_sample_config_yaml(blueprint_name, blueprint_path / "dynamic-config-values.yaml", False, dynamic_config_docblocks)
     render_sample_config_yaml(blueprint_name, blueprint_path / "dynamic-config-values-required.yaml", True, dynamic_config_docblocks)
 

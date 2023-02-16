@@ -74,19 +74,19 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 			return err
 		}
 
-		blueprintDir = filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
+		blueprintsDir = filepath.Join(blueprintsURIRoot, getRelPath(blueprintsURIRoot))
 
-		err = blueprintExists(blueprintDir, blueprintName)
+		err = blueprintExists(blueprintsDir, blueprintName)
 		if err != nil {
 			return err
 		}
 
 		vm := jsonnet.MakeVM()
 		vm.Importer(&jsonnet.FileImporter{
-			JPaths: []string{blueprintsDir},
+			JPaths: []string{blueprintsURIRoot},
 		})
 
-		importPath := fmt.Sprintf("%s/%s", blueprintDir, blueprintName)
+		importPath := fmt.Sprintf("%s/%s", blueprintsDir, blueprintName)
 
 		bundleStr, err := vm.EvaluateAnonymousSnippet("bundle.libsonnet", fmt.Sprintf(`
 		local bundle = import '%s/bundle.libsonnet';
@@ -192,10 +192,10 @@ func saveYAMLFile(categoryName, path, filename string, content map[string]interf
 			var schemaURL string
 			// if content contains kind: Policy then use the policy schema
 			if kind, ok := content["kind"]; ok && kind == "Policy" {
-				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintDir, "gen/jsonschema/_definitions.json#/definitions/PolicyCustomResource"))
+				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintsDir, "gen/jsonschema/_definitions.json#/definitions/PolicyCustomResource"))
 			} else {
 				// prepend the file with yaml-language-server modeline that points to the schema
-				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintDir, "gen/jsonschema/_definitions.json#/definitions/Policy"))
+				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintsDir, "gen/jsonschema/_definitions.json#/definitions/Policy"))
 			}
 			yamlBytes = append([]byte(fmt.Sprintf("# yaml-language-server: $schema=%s\n", schemaURL)), yamlBytes...)
 		}
