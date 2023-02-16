@@ -3,6 +3,7 @@
   "type": "object",
   "title": "policies/static-rate-limiting blueprint",
   "additionalProperties": false,
+  "required": ["rate_limiter"],
   "properties": {
     "rate_limiter": {
       "description": "Rate limiter dynamic configuration that is updated at runtime.",

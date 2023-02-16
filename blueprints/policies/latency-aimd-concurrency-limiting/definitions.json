@@ -3,6 +3,7 @@
   "type": "object",
   "title": "policies/latency-aimd-concurrency-limiting blueprint",
   "additionalProperties": false,
+  "required": ["common", "policy"],
   "properties": {
     "common": {
       "type": "object",

@@ -3,6 +3,7 @@
   "type": "object",
   "title": "policies/latency-aimd-concurrency-limiting blueprint",
   "additionalProperties": false,
+  "required": ["concurrency_controller"],
   "properties": {
     "concurrency_controller": {
       "description": "Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.",

@@ -120,6 +120,9 @@ class DocBlock:
                 parts = param_name.split(".")
                 parent = nested_parameters.children
                 parent_required = nested_required_parameters.children
+                if param_required:
+                    nested_parameters.required_children.add(parts[0])
+                    nested_required_parameters.required_children.add(parts[0])
                 for idx, part in enumerate(parts):
                     if idx == len(parts) - 1:
                         node = DocBlockNode(DocBlockParam(part, param_type, json_schema_link, spec_link, param_description, param_required), {}, OrderedSet([]))
@@ -373,6 +376,9 @@ JSON_SCHEMA_TPL = """
 "type": "object",
 "title": "{{ blueprint_name }} blueprint",
 "additionalProperties": false,
+{%- if json_schema_data.required_children %}
+"required": [{%- for child_name in json_schema_data.required_children %}"{{ child_name }}"{%- if not loop.last %},{% endif %}{%- endfor %}],
+{%- endif %}
 "properties": {
 {%- for child_name, child_node in json_schema_data.children.items() %}
 {{ render_properties(child_node) }}
@@ -538,11 +544,11 @@ def render_sample_config_yaml(blueprint_name: Path, sample_config_path: Path, on
     if only_required is False:
         for block in blocks:
             sample_config_data.children.update(block.nested_parameters.children)
-            sample_config_data.required_children.union(block.nested_parameters.required_children)
+            sample_config_data.required_children.update(block.nested_parameters.required_children)
     else:
         for block in blocks:
             sample_config_data.children.update(block.nested_required_parameters.children)
-            sample_config_data.required_children.union(block.nested_required_parameters.required_children)
+            sample_config_data.required_children.update(block.nested_required_parameters.required_children)
 
 
     env = get_jinja2_environment()
@@ -555,7 +561,7 @@ def render_json_schema(blueprint_name: Path, json_schema_path: Path, blocks: Lis
     json_schema_data = DocBlockNode(DocBlockParam("", "intermediate_node", "", "", "", False), {}, OrderedSet([]))
     for block in blocks:
         json_schema_data.children.update(block.nested_parameters.children)
-        json_schema_data.required_children.union(block.nested_parameters.required_children)
+        json_schema_data.required_children.update(block.nested_parameters.required_children)
 
     env = get_jinja2_environment()
     template = env.get_template("definitions.json.j2")
