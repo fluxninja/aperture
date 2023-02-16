@@ -151,9 +151,9 @@ definitions:
                 description: |-
                     Duration of alert resolver.
 
-                    @gotags: default:"300s"
+                    @gotags: default:"10s"
                 type: string
-                x-go-default: 300s
+                x-go-default: 10s
             severity:
                 description: |-
                     Severity of the alert, one of 'info', 'warn' or 'crit'.

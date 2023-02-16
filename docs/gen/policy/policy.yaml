@@ -203,9 +203,9 @@ definitions:
         description: |-
           Duration of alert resolver.
 
-          @gotags: default:"300s"
+          @gotags: default:"10s"
         type: string
-        x-go-default: 300s
+        x-go-default: 10s
         x-order: 3
       severity:
         description: |-
