@@ -29,10 +29,15 @@ func (c *Cache[K]) Put(k K) {
 	c.cache[k] = struct{}{}
 }
 
-// GetAll returns the current state of cache.
-func (c *Cache[K]) GetAll() map[K]struct{} {
+// GetAll returns a copy of current state of cache.
+//
+// State is returned as a list in an arbitrary order.
+func (c *Cache[K]) GetAll() []K {
 	c.Lock()
 	defer c.Unlock()
-	result := c.cache
-	return result
+	items := make([]K, 0, len(c.cache))
+	for elem := range c.cache {
+		items = append(items, elem)
+	}
+	return items
 }
