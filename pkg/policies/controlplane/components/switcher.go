@@ -40,7 +40,7 @@ func (dec *Switcher) Execute(inPortReadings runtime.PortToReading, tickInfo runt
 
 	var output runtime.Reading
 
-	if tristate.FromReading(switchValue) > tristate.True {
+	if tristate.FromReading(switchValue) == tristate.IsTrue() {
 		output = onTrue
 	} else {
 		output = onFalse

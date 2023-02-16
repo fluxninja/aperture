@@ -63,6 +63,21 @@ func FromReading(reading runtime.Reading) Bool {
 	return True
 }
 
+// IsTrue returns the tri-state boolean True.
+func IsTrue() Bool {
+	return True
+}
+
+// IsFalse returns the tri-state boolean False.
+func IsFalse() Bool {
+	return False
+}
+
+// IsUnknown returns the tri-state boolean Unknown.
+func IsUnknown() Bool {
+	return Unknown
+}
+
 func min(x, y int) int {
 	if x < y {
 		return x

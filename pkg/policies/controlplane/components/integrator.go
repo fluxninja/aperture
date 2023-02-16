@@ -49,7 +49,7 @@ func NewIntegratorAndOptions(_ *policylangv1.Integrator, _ string, _ iface.Polic
 func (in *Integrator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	inputVal := inPortReadings.ReadSingleReadingPort("input")
 	resetVal := inPortReadings.ReadSingleReadingPort("reset")
-	if tristate.FromReading(resetVal) > tristate.True {
+	if tristate.FromReading(resetVal) == tristate.IsTrue() {
 		in.sum = 0
 	} else if inputVal.Valid() {
 		minVal := inPortReadings.ReadSingleReadingPort("min")
