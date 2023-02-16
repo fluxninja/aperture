@@ -276,53 +276,6 @@ DEP_TREE = {
             ]
         },
     },
-    APERTURE_DEMOAPP_NS: {
-        "demo-app": {
-            "labels": ["DemoApplications"],
-            "tkenv": TANKA_ROOT + "/apps/demoapp",
-            "needs": ["istio"],
-            "images": [
-                {
-                    "ref": "demo-app",
-                    "context": GIT_ROOT + "/playground/demo_app",
-                    "ssh": "default",
-                }
-            ],
-            "child_resources": [
-                {
-                    "workload": "service1-demo-app",
-                    "resource_deps": ["cluster-bootstrap", "istiod"],
-                    "extra_objects": [
-                        "service1-demo-app:serviceaccount"
-                    ]
-                },
-                {
-                    "workload": "service2-demo-app",
-                    "resource_deps": ["cluster-bootstrap", "istiod"],
-                    "extra_objects": [
-                        "service2-demo-app:serviceaccount"
-                    ]
-                },
-                {
-                    "workload": "service3-demo-app",
-                    "resource_deps": ["cluster-bootstrap", "istiod"],
-                    "extra_objects": [
-                        "service3-demo-app:serviceaccount"
-                    ]
-                },
-                {
-                    "workload": "wavepool-generator",
-                    "resource_deps": ["service1-demo-app", "policies"],
-                    "extra_objects": [
-                        "wavepool-config:configmap"
-                    ],
-                    "extra_pod_selectors": [
-                        {'app.kubernetes.io/component':  'wavepool-generator'},
-                    ]
-                },
-            ]
-        },
-    },
     APERTURE_GO_EXAMPLE_NS: {
         "aperture-go-example": {
             "labels": ["Aperture"],
@@ -1087,6 +1040,11 @@ def process_local_settings(local_settings):
     if override_default_registry:
         print("Overriding default registry to: "+ override_default_registry)
         default_registry(override_default_registry)
+
+    override_allowed_k8s_contexts = local_settings.get("allowed_k8s_contexts", [])
+    if override_allowed_k8s_contexts:
+        print("Overriding allowed_k8s_contexts with: " + ",".join(override_allowed_k8s_contexts))
+        allow_k8s_contexts(override_allowed_k8s_contexts)
 
 
 ############
