@@ -6,13 +6,13 @@ replicaCount: 1
 
 simplesrv:
   image:
-    repository: gcr.io/devel-309501/cf-fn/graphql-demo-app
+    repository: fluxninja/graphql-demo-app
     pullPolicy: IfNotPresent
     tag: "latest"
 
 proxy:
   image:
-    repository: gcr.io/devel-309501/cf-fn/fluxninja-proxy-envoy
+    repository: fluxninja/fluxninja-proxy-envoy
     pullPolicy: IfNotPresent
     tag: "latest"
 
