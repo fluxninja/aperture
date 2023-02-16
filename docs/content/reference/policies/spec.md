@@ -268,9 +268,9 @@ Alerter Parameters is a common config for separate alerter components and alerte
 <dt>resolve_timeout</dt>
 <dd>
 
-(string, default: `300s`) Duration of alert resolver.
+(string, default: `10s`) Duration of alert resolver.
 
-@gotags: default:"300s"
+@gotags: default:"10s"
 
 </dd>
 <dt>severity</dt>
