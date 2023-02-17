@@ -1,8 +1,9 @@
 package servicegetter
 
 import (
-	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
+
+	"github.com/fluxninja/aperture/pkg/metrics"
 )
 
 // Metrics is used for collecting metrics about servicegetter

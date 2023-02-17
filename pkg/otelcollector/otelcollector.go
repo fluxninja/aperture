@@ -11,7 +11,6 @@ import (
 	logsv1 "go.opentelemetry.io/proto/otlp/collector/logs/v1"
 	metricsv1 "go.opentelemetry.io/proto/otlp/collector/metrics/v1"
 	tracev1 "go.opentelemetry.io/proto/otlp/collector/trace/v1"
-
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"

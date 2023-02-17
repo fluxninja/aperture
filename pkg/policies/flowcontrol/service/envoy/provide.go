@@ -1,7 +1,7 @@
 package envoy
 
 import (
-	ext_authz "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
+	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -26,7 +26,7 @@ func Module() fx.Option {
 // To be used in fx.Invoke.
 func Register(handler *Handler, server *grpc.Server, healthsrv *health.Server) {
 	// If changing params to this function, keep RegisterAnnotated in sync.
-	ext_authz.RegisterAuthorizationServer(server, handler)
+	authv3.RegisterAuthorizationServer(server, handler)
 
 	healthsrv.SetServingStatus("envoy.service.auth.v3.Authorization", grpc_health_v1.HealthCheckResponse_SERVING)
 	log.Info().Msg("Authz handler registered")
