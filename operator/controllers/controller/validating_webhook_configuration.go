@@ -27,7 +27,7 @@ import (
 
 // validatingWebhookConfiguration prepares the ValidatingWebhookConfiguration object for the Controller, based on the provided parameter.
 func validatingWebhookConfiguration(instance *controllerv1alpha1.Controller, cert []byte) *admissionregistrationv1.ValidatingWebhookConfiguration {
-	serverPort, _ := controllers.GetPort(instance.Spec.ConfigSpec.Server.Addr)
+	serverPort, _ := controllers.GetPort(instance.Spec.ConfigSpec.Server.Listener.Addr)
 
 	validatingWebhookConfiguration := &admissionregistrationv1.ValidatingWebhookConfiguration{
 		ObjectMeta: v1.ObjectMeta{

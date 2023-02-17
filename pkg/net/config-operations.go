@@ -6,7 +6,8 @@ package net
 // ---
 // x-fn-config-env: true
 // parameters:
-// - in: body
+// - name: listener
+//   in: body
 //   schema:
 //     "$ref": "#/definitions/ListenerConfig"
 // - name: http

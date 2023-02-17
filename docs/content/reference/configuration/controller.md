@@ -342,14 +342,6 @@ Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_`
 
 <dl>
 
-<dt></dt>
-<dd>
-
-Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_`
-Type: [ListenerConfig](#listener-config)
-
-</dd>
-
 <dt>grpc</dt>
 <dd>
 
@@ -371,6 +363,14 @@ Type: [GRPCGatewayConfig](#g-rpc-gateway-config)
 
 Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_HTTP_`
 Type: [HTTPServerConfig](#http-server-config)
+
+</dd>
+
+<dt>listener</dt>
+<dd>
+
+Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_LISTENER_`
+Type: [ListenerConfig](#listener-config)
 
 </dd>
 

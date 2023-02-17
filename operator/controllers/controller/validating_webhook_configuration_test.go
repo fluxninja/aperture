@@ -47,7 +47,7 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 					ConfigSpec: controllerv1alpha1.ControllerConfigSpec{
 						CommonConfigSpec: common.CommonConfigSpec{
 							Server: common.ServerConfigSpec{
-								ListenerConfig: listener.ListenerConfig{
+								Listener: listener.ListenerConfig{
 									Addr: ":8080",
 								},
 							},
@@ -130,7 +130,7 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 					ConfigSpec: controllerv1alpha1.ControllerConfigSpec{
 						CommonConfigSpec: common.CommonConfigSpec{
 							Server: common.ServerConfigSpec{
-								ListenerConfig: listener.ListenerConfig{
+								Listener: listener.ListenerConfig{
 									Addr: ":80",
 								},
 							},

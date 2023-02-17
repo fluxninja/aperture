@@ -49,7 +49,7 @@ func serviceForController(instance *controllerv1alpha1.Controller, log logr.Logg
 		}
 	}
 
-	serverPort, err := controllers.GetPort(spec.ConfigSpec.Server.Addr)
+	serverPort, err := controllers.GetPort(spec.ConfigSpec.Server.Listener.Addr)
 	if err != nil {
 		return nil, err
 	}

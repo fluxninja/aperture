@@ -1033,6 +1033,7 @@ paths:
       operationId: Server
       parameters:
       - in: body
+        name: listener
         schema:
           $ref: '#/definitions/ListenerConfig'
       - in: body
