@@ -59,10 +59,6 @@ var _ = Describe("Koanf-unmarshaller", func() {
 		})
 
 		It("unmarshal using the underlying koanf", func() {
-			var testConfig simpleTestConfig
-			err := koanf.Unmarshal(&testConfig)
-			Expect(err).NotTo(HaveOccurred())
-
 			cm := koanf.Get("")
 			koanfMap := map[string]interface{}{
 				"koanf-unmarshaller": "test",
@@ -107,10 +103,6 @@ var _ = Describe("Koanf-unmarshaller", func() {
 		})
 
 		It("unmarshal using the underlying koanf", func() {
-			var testConfig nestedTestConfig
-			err := koanf.Unmarshal(&testConfig)
-			Expect(err).NotTo(HaveOccurred())
-
 			cm := koanf.Get("")
 			koanfMap := map[string]interface{}{
 				"koanf1": "test1",
