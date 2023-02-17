@@ -9,7 +9,6 @@
 | `global.imageRegistry`    | Global Docker image registry                    | `nil` |
 | `global.imagePullSecrets` | Global Docker registry secret names as an array | `[]`  |
 
-
 ### Common Parameters
 
 | Name                | Description                                                          | Value           |
@@ -22,7 +21,6 @@
 | `commonLabels`      | Labels to add to all deployed objects                                | `{}`            |
 | `commonAnnotations` | Annotations to add to all deployed objects                           | `{}`            |
 | `clusterDomain`     | Kubernetes cluster domain name                                       | `cluster.local` |
-
 
 ### Operator Parameters
 
@@ -102,7 +100,6 @@
 | `operator.serviceAccount.annotations`                        | Add annotations                                                                                                        | `{}`                  |
 | `operator.serviceAccount.automountServiceAccountToken`       | Automount API credentials for a service account.                                                                       | `true`                |
 
-
 ### Controller Custom Resource Parameters
 
 | Name                                                         | Description                                                                                                                                             | Value    |
@@ -164,14 +161,12 @@
 | `controller.config.etcd.lease_ttl`                           | Lease time-to-live.                                                                                                                                     | `60s`    |
 | `controller.config.prometheus.address`                       | specifies the address of the Prometheus server. Example, "http://prometheus-server:80". This must not be empty when prometheus.enabled is set to false. | `nil`    |
 
-
 ### Ingress
 
 | Name                  | Description                                  | Value   |
 | --------------------- | -------------------------------------------- | ------- |
 | `ingress.enabled`     | Enables Ingress for Etcd and Prometheus      | `false` |
 | `ingress.domain_name` | Domain Name to use for configuring the Paths | `nil`   |
-
 
 ### etcd
 
@@ -187,7 +182,6 @@
 | `etcd.initContainer.image.repository` | Init container image repository.                                                          | `etcd`              |
 | `etcd.initContainer.image.tag`        | Init container image tag.                                                                 | `3.5`               |
 | `etcd.initContainer.image.pullPolicy` | Init container image pull policy.                                                         | `IfNotPresent`      |
-
 
 ### prometheus
 
