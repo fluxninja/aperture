@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	defaultKey = "server"
+	defaultKey = "server.listener"
 )
 
 // Listener wraps net.Listener, that can be potentially not-yet-started.

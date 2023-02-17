@@ -91,9 +91,6 @@ local policyResource = latencyAIMDPolicy({
         + workload.withLabelMatcher(labelMatcher.withMatchLabels({ user_type: 'subscriber' })),
       ],
     },
-    default_workload_parameters: {
-      priority: 20,
-    },
     alerter+: {
       alert_channels: ['service1-demo-app'],
     },
