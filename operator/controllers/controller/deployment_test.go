@@ -109,7 +109,7 @@ var _ = Describe("Controller Deployment", func() {
 					ConfigSpec: controllerv1alpha1.ControllerConfigSpec{
 						CommonConfigSpec: common.CommonConfigSpec{
 							Server: common.ServerConfigSpec{
-								ListenerConfig: listener.ListenerConfig{
+								Listener: listener.ListenerConfig{
 									Addr: ":80",
 								},
 							},
@@ -334,7 +334,7 @@ var _ = Describe("Controller Deployment", func() {
 					ConfigSpec: controllerv1alpha1.ControllerConfigSpec{
 						CommonConfigSpec: common.CommonConfigSpec{
 							Server: common.ServerConfigSpec{
-								ListenerConfig: listener.ListenerConfig{
+								Listener: listener.ListenerConfig{
 									Addr: ":80",
 								},
 							},

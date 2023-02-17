@@ -1443,9 +1443,6 @@ spec:
                   server:
                     description: Server configuration.
                     properties:
-                      addr:
-                        description: Address to bind to in the form of [host%zone]:port
-                        type: string
                       grpc:
                         description: GRPC server configuration.
                         properties:
@@ -1497,14 +1494,21 @@ spec:
                             description: Write timeout
                             type: string
                         type: object
-                      keep_alive:
-                        description: Keep-alive period - 0 = enabled if supported
-                          by protocol or OS. If negative then keep-alive is disabled.
-                        type: string
-                      network:
-                        description: TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6"
-                          (IPv6-only)
-                        type: string
+                      listener:
+                        description: Listener configuration.
+                        properties:
+                          addr:
+                            description: Address to bind to in the form of [host%zone]:port
+                            type: string
+                          keep_alive:
+                            description: Keep-alive period - 0 = enabled if supported
+                              by protocol or OS. If negative then keep-alive is disabled.
+                            type: string
+                          network:
+                            description: TCP networks - "tcp", "tcp4" (IPv4-only),
+                              "tcp6" (IPv6-only)
+                            type: string
+                        type: object
                       tls:
                         description: TLS configuration.
                         properties:
