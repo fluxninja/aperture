@@ -53,7 +53,7 @@ func daemonsetForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *r
 
 	livenessProbe, readinessProbe := controllers.ContainerProbes(spec.CommonSpec, probeScheme)
 
-	serverPort, err := controllers.GetPort(spec.ConfigSpec.Server.Addr)
+	serverPort, err := controllers.GetPort(spec.ConfigSpec.Server.Listener.Addr)
 	if err != nil {
 		return nil, err
 	}

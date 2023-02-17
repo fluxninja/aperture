@@ -1017,7 +1017,7 @@ workflows:
           name: aperture-agent-update-environment
           requires:
             - image-build-aperture-agent
-          environment-path: environments/customer-demo/
+          environment-path: environments/latest/
           component: aperture-agent
           update: images
 
@@ -1037,7 +1037,7 @@ workflows:
           name: aperture-controller-update-environment
           requires:
             - image-build-aperture-controller
-          environment-path: environments/customer-demo/
+          environment-path: environments/latest/
           component: aperture-controller
           update: images
 
@@ -1132,7 +1132,7 @@ workflows:
           name: aperture-operator-update-environment
           requires:
             - image-build-aperture-operator
-          environment-path: environments/customer-demo/
+          environment-path: environments/latest/
           component: aperture-operator
           update: images
 
@@ -1156,7 +1156,7 @@ workflows:
           name: demo-app-update-environment
           requires:
             - image-demo-app
-          environment-path: environments/customer-demo/
+          environment-path: environments/latest/
           component: demo-app
           update: images
   pre-commit:
@@ -1196,7 +1196,7 @@ workflows:
                 - main
           name: push-blueprints-changes-update-environment
           update: blueprints
-          environment-path: environments/customer-demo/
+          environment-path: environments/latest/
 
   push-deployment-changes:
     when:
@@ -1220,7 +1220,7 @@ workflows:
           requires:
             - push-deployment-changes
           update: deployment-code
-          environment-path: environments/customer-demo/
+          environment-path: environments/latest/
 
   preview-deployment-changes:
     when:
