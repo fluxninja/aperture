@@ -4621,7 +4621,7 @@ type Scheduler_Parameters struct {
 	AutoTokens bool `protobuf:"varint,3,opt,name=auto_tokens,json=autoTokens,proto3" json:"auto_tokens,omitempty" default:"true"` // @gotags: default:"true"
 	// Timeout as a factor of tokens for a flow in a workload
 	//
-	// If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,
+	// If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
 	// it will be rejected.
 	//
 	// This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
@@ -4802,6 +4802,12 @@ type Scheduler_Workload_Parameters struct {
 	// Describes priority level of the requests within the workload.
 	// Priority level ranges from 0 to 255.
 	// Higher numbers means higher priority level.
+	// Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
+	//
+	// $$
+	// \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+	// $$
+	//
 	Priority uint32 `protobuf:"varint,1,opt,name=priority,proto3" json:"priority,omitempty" validate:"gte=0,lte=255"` // @gotags: validate:"gte=0,lte=255"
 	// Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
 	// This override is applicable only if `auto_tokens` is set to false.

@@ -179,8 +179,11 @@ function(cfg) {
   local AcceptedConcurrency =
     newTimeSeriesPanel('Accepted Concurrency', dsName, 'sum(rate(accepted_work_seconds_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Concurrency', 'none'),
 
-  local WorkloadDecisions =
-    newTimeSeriesPanel('Workload Decisions', dsName, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Decisions', 'reqps'),
+  local WorkloadDecisionsAccepted =
+    newTimeSeriesPanel('Workload Decisions (accepted)', dsName, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s",decision_type="DECISION_TYPE_ACCEPTED"}[$__rate_interval]))' % { policy_name: policyName }, 'Decisions', 'reqps'),
+
+  local WorkloadDecisionsRejected =
+    newTimeSeriesPanel('Workload Decisions (rejected)', dsName, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s",decision_type="DECISION_TYPE_REJECTED"}[$__rate_interval]))' % { policy_name: policyName }, 'Decisions', 'reqps'),
 
   local WorkloadLatency =
     newTimeSeriesPanel('Workload Latency (Auto Tokens)', dsName, '(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name="%(policy_name)s"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name="%(policy_name)s"}[$__rate_interval])))' % { policy_name: policyName }, 'Latency', 'ms'),
@@ -212,16 +215,17 @@ function(cfg) {
       }
     )
     .addPanel(fluxMeterPanel, gridPos={ h: 10, w: 24, x: 0, y: 0 })
-    .addPanel(WorkloadDecisions, gridPos={ h: 10, w: 24, x: 0, y: 10 })
-    .addPanel(WorkloadLatency, gridPos={ h: 10, w: 24, x: 0, y: 20 })
-    .addPanel(IncomingConcurrency, gridPos={ h: 8, w: 12, x: 0, y: 30 })
-    .addPanel(AcceptedConcurrency, gridPos={ h: 8, w: 12, x: 12, y: 30 })
-    .addPanel(WFQSchedulerFlows, gridPos={ h: 3, w: 8, x: 0, y: 40 })
-    .addPanel(TotalBucketLoadSchedFactor, gridPos={ h: 6, w: 4, x: 8, y: 40 })
-    .addPanel(TokenBucketBucketCapacity, gridPos={ h: 6, w: 4, x: 12, y: 40 })
-    .addPanel(TokenBucketBucketFillRate, gridPos={ h: 6, w: 4, x: 16, y: 40 })
-    .addPanel(TokenBucketAvailableTokens, gridPos={ h: 6, w: 4, x: 20, y: 40 })
-    .addPanel(WFQSchedulerHeapRequests, gridPos={ h: 3, w: 8, x: 0, y: 40 }),
+    .addPanel(WorkloadDecisionsAccepted, gridPos={ h: 10, w: 24, x: 0, y: 10 })
+    .addPanel(WorkloadDecisionsRejected, gridPos={ h: 10, w: 24, x: 0, y: 20 })
+    .addPanel(WorkloadLatency, gridPos={ h: 10, w: 24, x: 0, y: 30 })
+    .addPanel(IncomingConcurrency, gridPos={ h: 8, w: 12, x: 0, y: 40 })
+    .addPanel(AcceptedConcurrency, gridPos={ h: 8, w: 12, x: 12, y: 40 })
+    .addPanel(WFQSchedulerFlows, gridPos={ h: 3, w: 8, x: 0, y: 50 })
+    .addPanel(TotalBucketLoadSchedFactor, gridPos={ h: 6, w: 4, x: 8, y: 50 })
+    .addPanel(TokenBucketBucketCapacity, gridPos={ h: 6, w: 4, x: 12, y: 50 })
+    .addPanel(TokenBucketBucketFillRate, gridPos={ h: 6, w: 4, x: 16, y: 50 })
+    .addPanel(TokenBucketAvailableTokens, gridPos={ h: 6, w: 4, x: 20, y: 50 })
+    .addPanel(WFQSchedulerHeapRequests, gridPos={ h: 3, w: 8, x: 0, y: 50 }),
 
   dashboard: dashboardDef,
 }

@@ -2322,7 +2322,7 @@
           "x-order": 2
         },
         "timeout_factor": {
-          "description": "If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,\nit will be rejected.\n\nThis value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.\n\n@gotags: validate:\"gte=0.0\" default:\"0.5\"",
+          "description": "If a flow is not able to get tokens within `timeout_factor * tokens` of duration,\nit will be rejected.\n\nThis value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.\n\n@gotags: validate:\"gte=0.0\" default:\"0.5\"",
           "type": "number",
           "format": "double",
           "title": "Timeout as a factor of tokens for a flow in a workload",
@@ -2370,9 +2370,10 @@
           "x-order": 0
         },
         "priority": {
-          "description": "Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level.\n\n@gotags: validate:\"gte=0,lte=255\"",
+          "description": "$$\n\\text{virtual\\_finish\\_time} = \\text{virtual\\_time} + \\left(\\text{tokens} \\cdot \\left(\\text{256} - \\text{priority}\\right)\\right)\n$$\n\n@gotags: validate:\"gte=0,lte=255\"",
           "type": "integer",
           "format": "int64",
+          "title": "Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level.\nPriority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:",
           "x-go-validate": "gte=0,lte=255",
           "x-order": 1
         },
