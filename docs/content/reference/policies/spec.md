@@ -3723,10 +3723,10 @@ Outputs for the Sqrt component.
 
 ### Switcher {#switcher}
 
-Type of combinator that switches between `on_true` and `on_false` signals based on switch input
+Type of combinator that switches between `on` and `off` signals based on switch input
 
-`on_true` will be returned if switch input is valid and not equal to 0.0 ,
-otherwise `on_false` will be returned.
+`on` will be returned if switch input is valid and not equal to 0.0 ,
+otherwise `off` will be returned.
 
 #### Properties
 
@@ -3752,13 +3752,13 @@ Inputs for the Switcher component.
 #### Properties
 
 <dl>
-<dt>on_false</dt>
+<dt>off</dt>
 <dd>
 
 ([InPort](#in-port)) Output signal when switch is invalid or 0.0.
 
 </dd>
-<dt>on_true</dt>
+<dt>on</dt>
 <dd>
 
 ([InPort](#in-port)) Output signal when switch is valid and not 0.0.
@@ -3767,7 +3767,7 @@ Inputs for the Switcher component.
 <dt>switch</dt>
 <dd>
 
-([InPort](#in-port)) Decides whether to return on_true or on_false.
+([InPort](#in-port)) Decides whether to return on or off.
 
 </dd>
 </dl>
@@ -3782,7 +3782,7 @@ Outputs for the Switcher component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) Selected signal (on_true or on_false).
+([OutPort](#out-port)) Selected signal (on or off).
 
 </dd>
 </dl>

@@ -110,8 +110,8 @@ local policyResource = latencyAIMDPolicy({
       switcher.new()
       + switcher.withInPorts({
         switch: port.withSignalName('IS_BOT_ESCALATION'),
-        on_true: port.withConstantSignal(0.0),
-        on_false: port.withConstantSignal(10.0),
+        on: port.withConstantSignal(0.0),
+        off: port.withConstantSignal(10.0),
       })
       + switcher.withOutPorts({ output: port.withSignalName('RATE_LIMIT') })
     ),

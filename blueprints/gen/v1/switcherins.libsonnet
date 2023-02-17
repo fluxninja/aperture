@@ -1,17 +1,17 @@
 {
   new():: {
   },
-  withOnFalse(on_false):: {
-    on_false: on_false,
+  withOff(off):: {
+    off: off,
   },
-  withOnFalseMixin(on_false):: {
-    on_false+: on_false,
+  withOffMixin(off):: {
+    off+: off,
   },
-  withOnTrue(on_true):: {
-    on_true: on_true,
+  withOn(on):: {
+    on: on,
   },
-  withOnTrueMixin(on_true):: {
-    on_true+: on_true,
+  withOnMixin(on):: {
+    on+: on,
   },
   withSwitch(switch):: {
     switch: switch,

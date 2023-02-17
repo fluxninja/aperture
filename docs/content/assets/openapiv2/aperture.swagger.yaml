@@ -3025,8 +3025,8 @@ definitions:
         type: object
     Switcher:
         description: |-
-            `on_true` will be returned if switch input is valid and not equal to 0.0 ,
-             otherwise `on_false` will be returned.
+            `on` will be returned if switch input is valid and not equal to 0.0 ,
+             otherwise `off` will be returned.
         properties:
             in_ports:
                 $ref: '#/definitions/SwitcherIns'
@@ -3034,27 +3034,27 @@ definitions:
             out_ports:
                 $ref: '#/definitions/SwitcherOuts'
                 description: Output ports for the Switcher component.
-        title: Type of combinator that switches between `on_true` and `on_false` signals based on switch input
+        title: Type of combinator that switches between `on` and `off` signals based on switch input
         type: object
     SwitcherIns:
         description: Inputs for the Switcher component.
         properties:
-            on_false:
+            "off":
                 $ref: '#/definitions/InPort'
                 description: Output signal when switch is invalid or 0.0.
-            on_true:
+            "on":
                 $ref: '#/definitions/InPort'
                 description: Output signal when switch is valid and not 0.0.
             switch:
                 $ref: '#/definitions/InPort'
-                description: Decides whether to return on_true or on_false.
+                description: Decides whether to return on or off.
         type: object
     SwitcherOuts:
         description: Outputs for the Switcher component.
         properties:
             output:
                 $ref: '#/definitions/OutPort'
-                description: Selected signal (on_true or on_false).
+                description: Selected signal (on or off).
         type: object
     Variable:
         description: Component that emits a variable value as an output signal, can be defined in dynamic configuration.

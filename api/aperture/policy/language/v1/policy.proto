@@ -662,26 +662,26 @@ message Decider {
   }]; // @gotags: default:"0s"
 }
 
-// Type of combinator that switches between `on_true` and `on_false` signals based on switch input
+// Type of combinator that switches between `on` and `off` signals based on switch input
 //
-// `on_true` will be returned if switch input is valid and not equal to 0.0 ,
-//  otherwise `on_false` will be returned.
+// `on` will be returned if switch input is valid and not equal to 0.0 ,
+//  otherwise `off` will be returned.
 message Switcher {
   // Inputs for the Switcher component.
   message Ins {
     // Output signal when switch is valid and not 0.0.
-    InPort on_true = 1;
+    InPort on = 1;
 
     // Output signal when switch is invalid or 0.0.
-    InPort on_false = 2;
+    InPort off = 2;
 
-    // Decides whether to return on_true or on_false.
+    // Decides whether to return on or off.
     InPort switch = 3;
   }
 
   // Outputs for the Switcher component.
   message Outs {
-    // Selected signal (on_true or on_false).
+    // Selected signal (on or off).
     OutPort output = 1;
   }
 

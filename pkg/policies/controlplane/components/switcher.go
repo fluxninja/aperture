@@ -33,16 +33,16 @@ func NewSwitcherAndOptions(_ *policylangv1.Switcher, _ string, _ iface.Policy) (
 
 // Execute implements runtime.Component.Execute.
 func (dec *Switcher) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
-	onTrue := inPortReadings.ReadSingleReadingPort("on_true")
-	onFalse := inPortReadings.ReadSingleReadingPort("on_false")
+	on := inPortReadings.ReadSingleReadingPort("on")
+	off := inPortReadings.ReadSingleReadingPort("off")
 	switchValue := inPortReadings.ReadSingleReadingPort("switch")
 
 	var output runtime.Reading
 
 	if switchValue.Valid() && switchValue.Value() != 0 {
-		output = onTrue
+		output = on
 	} else {
-		output = onFalse
+		output = off
 	}
 
 	return runtime.PortToReading{

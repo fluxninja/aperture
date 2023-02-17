@@ -414,12 +414,12 @@ func ParseAIMDConcurrencyController(
 				Component: &policylangv1.Component_Switcher{
 					Switcher: &policylangv1.Switcher{
 						InPorts: &policylangv1.Switcher_Ins{
-							OnFalse: &policylangv1.InPort{
+							Off: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
 									SignalName: "CONCURRENCY_INCREMENT_NORMAL",
 								},
 							},
-							OnTrue: &policylangv1.InPort{
+							On: &policylangv1.InPort{
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{

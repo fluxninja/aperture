@@ -114,10 +114,10 @@ spec:
           true_for: 30s
       - switcher:
           in_ports:
-            on_false:
+            "off":
               constant_signal:
                 value: 10
-            on_true:
+            "on":
               constant_signal:
                 value: 0
             switch:
