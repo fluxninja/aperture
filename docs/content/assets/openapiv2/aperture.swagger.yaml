@@ -2748,7 +2748,7 @@ definitions:
                 x-go-default: 0.49s
             timeout_factor:
                 description: |-
-                    If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,
+                    If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
                     it will be rejected.
 
                     This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
@@ -2821,12 +2821,17 @@ definitions:
                 type: string
             priority:
                 description: |-
-                    Describes priority level of the requests within the workload.
-                    Priority level ranges from 0 to 255.
-                    Higher numbers means higher priority level.
+                    $$
+                    \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+                    $$
 
                     @gotags: validate:"gte=0,lte=255"
                 format: int64
+                title: |-
+                    Describes priority level of the requests within the workload.
+                    Priority level ranges from 0 to 255.
+                    Higher numbers means higher priority level.
+                    Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
                 type: integer
                 x-go-validate: gte=0,lte=255
             tokens:
