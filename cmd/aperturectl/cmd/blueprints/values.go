@@ -90,7 +90,11 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 
 		srcValuesFile := filepath.Join(blueprintGenDir, valFileName)
 		if _, err := os.Stat(srcValuesFile); err != nil {
-			return fmt.Errorf("values file not found for the blueprint at: %s", srcValuesFile)
+			blueprintGenDir = filepath.Dir(blueprintGenDir)
+			srcValuesFile = filepath.Join(blueprintGenDir, valFileName)
+			if _, err := os.Stat(srcValuesFile); err != nil {
+				return fmt.Errorf("values file not found for the blueprint at: %s", srcValuesFile)
+			}
 		}
 
 		in, err := os.Open(srcValuesFile)
