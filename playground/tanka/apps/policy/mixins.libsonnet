@@ -98,7 +98,7 @@ local policyResource = latencyAIMDPolicy({
     + component.withDecider(
       decider.new()
       + decider.withOperator('lt')
-      + decider.withInPorts({ lhs: port.withSignalName('LOAD_MULTIPLIER'), rhs: port.withConstantSignal(1.0) })
+      + decider.withInPorts({ lhs: port.withSignalName('OBSERVED_LOAD_MULTIPLIER'), rhs: port.withConstantSignal(1.0) })
       + decider.withOutPorts({ output: port.withSignalName('IS_BOT_ESCALATION') })
       + decider.withTrueFor('30s')
     ),

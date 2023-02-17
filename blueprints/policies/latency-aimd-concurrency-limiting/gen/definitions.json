@@ -51,20 +51,14 @@
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
             },
 
-            "concurrency_limit_multiplier": {
+            "max_load_multiplier": {
               "description": "Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.",
               "type": "number",
               "format": "double"
             },
 
-            "concurrency_linear_increment": {
-              "description": "Linear increment to concurrency in each execution tick when the system is not in overloaded state.",
-              "type": "number",
-              "format": "double"
-            },
-
-            "concurrency_sqrt_increment_multiplier": {
-              "description": "Scale factor to multiply square root of current accepted concurrrency. This, along with concurrency_linear_increment helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).",
+            "load_multiplier_linear_increment": {
+              "description": "Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.",
               "type": "number",
               "format": "double"
             },

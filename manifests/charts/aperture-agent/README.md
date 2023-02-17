@@ -9,6 +9,7 @@
 | `global.imageRegistry`    | Global Docker image registry                    | `nil` |
 | `global.imagePullSecrets` | Global Docker registry secret names as an array | `[]`  |
 
+
 ### Common Parameters
 
 | Name                | Description                                                          | Value           |
@@ -21,6 +22,7 @@
 | `commonLabels`      | Labels to add to all deployed objects                                | `{}`            |
 | `commonAnnotations` | Annotations to add to all deployed objects                           | `{}`            |
 | `clusterDomain`     | Kubernetes cluster domain name                                       | `cluster.local` |
+
 
 ### Operator Parameters
 
@@ -99,6 +101,7 @@
 | `operator.serviceAccount.name`                               | The name of the service account to use. If not set and create is true, a name is generated using the fullname template | `""`                  |
 | `operator.serviceAccount.annotations`                        | Add annotations                                                                                                        | `{}`                  |
 | `operator.serviceAccount.automountServiceAccountToken`       | Automount API credentials for a service account.                                                                       | `true`                |
+
 
 ### Agent Custom Resource Parameters
 
