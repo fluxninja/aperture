@@ -1635,8 +1635,14 @@ message AIMDConcurrencyController {
   message Outs {
     // Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
     OutPort is_overload = 1;
-    // Load multiplier is the ratio of desired concurrency to the incoming concurrency.
-    OutPort load_multiplier = 2;
+    // Desired Load multiplier is the ratio of desired concurrency to the incoming concurrency.
+    OutPort desired_load_multiplier = 2;
+    // Observed Load multiplier is the ratio of accepted concurrency to the incoming concurrency.
+    OutPort observed_load_multiplier = 3;
+    // Accepted concurrency is the number of concurrent requests that are accepted by the service.
+    OutPort accepted_concurrency = 4;
+    // IncomingConcurrency is the number of concurrent requests that are received by the service.
+    OutPort incoming_concurrency = 5;
   }
 
   // Input ports for the AIMDConcurrencyController component.
@@ -1668,35 +1674,27 @@ message AIMDConcurrencyController {
   GradientController.Parameters gradient_parameters = 5;
 
   // Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
-  double concurrency_limit_multiplier = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  double max_load_multiplier = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {number_value: 2}
+      value: {number_value: 2.0}
     }
   }]; // @gotags: default:"2.0"
 
-  // Linear increment to concurrency in each execution tick when the system is not in overloaded state.
-  double concurrency_linear_increment = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  // Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+  double load_multiplier_linear_increment = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {number_value: 5}
+      value: {number_value: 0.01}
     }
-  }]; // @gotags: default:"5.0"
-
-  // Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
-  double concurrency_sqrt_increment_multiplier = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {number_value: 1}
-    }
-  }]; // @gotags: default:"1.0"
+  }]; // @gotags: default:"0.01"
 
   // Configuration for embedded alerter.
-  Alerter.Parameters alerter_parameters = 9;
+  Alerter.Parameters alerter_parameters = 8;
 
   // Configuration key for load actuation.
-  string dynamic_config_key = 10;
+  string dynamic_config_key = 9;
 
   // Default configuration.
-  LoadActuator.DynamicConfig default_config = 11;
+  LoadActuator.DynamicConfig default_config = 10;
 }

@@ -33,48 +33,21 @@ definitions:
         description: Configuration for embedded alerter.
         x-order: 0
         $ref: '#/definitions/AlerterParameters'
-      concurrency_limit_multiplier:
-        description: |-
-          Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
-
-          @gotags: default:"2.0"
-        type: number
-        format: double
-        x-go-default: 2
-        x-order: 1
-      concurrency_linear_increment:
-        description: |-
-          Linear increment to concurrency in each execution tick when the system is not in overloaded state.
-
-          @gotags: default:"5.0"
-        type: number
-        format: double
-        x-go-default: 5
-        x-order: 2
-      concurrency_sqrt_increment_multiplier:
-        description: |-
-          Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
-
-          @gotags: default:"1.0"
-        type: number
-        format: double
-        x-go-default: 1
-        x-order: 3
       default_config:
         description: Default configuration.
-        x-order: 4
+        x-order: 1
         $ref: '#/definitions/LoadActuatorDynamicConfig'
       dynamic_config_key:
         description: Configuration key for load actuation.
         type: string
-        x-order: 5
+        x-order: 2
       flow_selector:
         description: |-
           Flow Selector decides the service and flows at which the concurrency limiter is applied.
 
           @gotags: validate:"required"
         x-go-validate: required
-        x-order: 6
+        x-order: 3
         $ref: '#/definitions/FlowSelector'
       gradient_parameters:
         title: |-
@@ -82,15 +55,33 @@ definitions:
           * slope = -1
           * min_gradient = 0.1
           * max_gradient = 1
-        x-order: 7
+        x-order: 4
         $ref: '#/definitions/GradientControllerParameters'
       in_ports:
         description: Input ports for the AIMDConcurrencyController component.
-        x-order: 8
+        x-order: 5
         $ref: '#/definitions/AIMDConcurrencyControllerIns'
+      load_multiplier_linear_increment:
+        description: |-
+          Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+
+          @gotags: default:"0.01"
+        type: number
+        format: double
+        x-go-default: 0.01
+        x-order: 6
+      max_load_multiplier:
+        description: |-
+          Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+
+          @gotags: default:"2.0"
+        type: number
+        format: double
+        x-go-default: 2
+        x-order: 7
       out_ports:
         description: Output ports for the AIMDConcurrencyController component.
-        x-order: 9
+        x-order: 8
         $ref: '#/definitions/AIMDConcurrencyControllerOuts'
       scheduler_parameters:
         description: |-
@@ -98,7 +89,7 @@ definitions:
 
           @gotags: validate:"required"
         x-go-validate: required
-        x-order: 10
+        x-order: 9
         $ref: '#/definitions/SchedulerParameters'
   AIMDConcurrencyControllerIns:
     description: Inputs for the AIMDConcurrencyController component.
@@ -116,16 +107,31 @@ definitions:
     description: Outputs for the AIMDConcurrencyController component.
     type: object
     properties:
+      accepted_concurrency:
+        description: Accepted concurrency is the number of concurrent requests that
+          are accepted by the service.
+        x-order: 0
+        $ref: '#/definitions/OutPort'
+      desired_load_multiplier:
+        description: Desired Load multiplier is the ratio of desired concurrency to
+          the incoming concurrency.
+        x-order: 1
+        $ref: '#/definitions/OutPort'
+      incoming_concurrency:
+        description: IncomingConcurrency is the number of concurrent requests that
+          are received by the service.
+        x-order: 2
+        $ref: '#/definitions/OutPort'
       is_overload:
         description: Is overload is a boolean signal that indicates whether the service
           is overloaded based on the deviation of the signal from the setpoint taking
           into account some tolerance.
-        x-order: 0
+        x-order: 3
         $ref: '#/definitions/OutPort'
-      load_multiplier:
-        description: Load multiplier is the ratio of desired concurrency to the incoming
-          concurrency.
-        x-order: 1
+      observed_load_multiplier:
+        description: Observed Load multiplier is the ratio of accepted concurrency
+          to the incoming concurrency.
+        x-order: 4
         $ref: '#/definitions/OutPort'
   AddressExtractor:
     description: |-

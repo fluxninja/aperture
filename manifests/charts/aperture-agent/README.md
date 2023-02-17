@@ -161,5 +161,3 @@
 | `agent.config.etcd.endpoints`                           | List of Etcd server endpoints. Example, ["http://etcd:2379"]. This must not be empty.                           | `[]`     |
 | `agent.config.etcd.lease_ttl`                           | Lease time-to-live.                                                                                             | `60s`    |
 | `agent.config.prometheus.address`                       | specifies the address of the Prometheus server. Example, "http://prometheus-server:80". This must not be empty. | `nil`    |
-
-

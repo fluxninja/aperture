@@ -47,7 +47,7 @@ policy:
     - decider:
         in_ports:
           lhs:
-            signal_name: LOAD_MULTIPLIER
+            signal_name: OBSERVED_LOAD_MULTIPLIER
           rhs:
             constant_signal:
               value: 1

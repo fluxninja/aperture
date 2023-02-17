@@ -52,30 +52,6 @@ High level concurrency control component. Baselines a signal via exponential mov
 ([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
 
 </dd>
-<dt>concurrency_limit_multiplier</dt>
-<dd>
-
-(float64, default: `2`) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
-
-@gotags: default:"2.0"
-
-</dd>
-<dt>concurrency_linear_increment</dt>
-<dd>
-
-(float64, default: `5`) Linear increment to concurrency in each execution tick when the system is not in overloaded state.
-
-@gotags: default:"5.0"
-
-</dd>
-<dt>concurrency_sqrt_increment_multiplier</dt>
-<dd>
-
-(float64, default: `1`) Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
-
-@gotags: default:"1.0"
-
-</dd>
 <dt>default_config</dt>
 <dd>
 
@@ -110,6 +86,22 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dd>
 
 ([AIMDConcurrencyControllerIns](#a-i-m-d-concurrency-controller-ins)) Input ports for the AIMDConcurrencyController component.
+
+</dd>
+<dt>load_multiplier_linear_increment</dt>
+<dd>
+
+(float64, default: `0.01`) Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+
+@gotags: default:"0.01"
+
+</dd>
+<dt>max_load_multiplier</dt>
+<dd>
+
+(float64, default: `2`) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+
+@gotags: default:"2.0"
 
 </dd>
 <dt>out_ports</dt>
@@ -156,16 +148,34 @@ Outputs for the AIMDConcurrencyController component.
 #### Properties
 
 <dl>
+<dt>accepted_concurrency</dt>
+<dd>
+
+([OutPort](#out-port)) Accepted concurrency is the number of concurrent requests that are accepted by the service.
+
+</dd>
+<dt>desired_load_multiplier</dt>
+<dd>
+
+([OutPort](#out-port)) Desired Load multiplier is the ratio of desired concurrency to the incoming concurrency.
+
+</dd>
+<dt>incoming_concurrency</dt>
+<dd>
+
+([OutPort](#out-port)) IncomingConcurrency is the number of concurrent requests that are received by the service.
+
+</dd>
 <dt>is_overload</dt>
 <dd>
 
 ([OutPort](#out-port)) Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
 
 </dd>
-<dt>load_multiplier</dt>
+<dt>observed_load_multiplier</dt>
 <dd>
 
-([OutPort](#out-port)) Load multiplier is the ratio of desired concurrency to the incoming concurrency.
+([OutPort](#out-port)) Observed Load multiplier is the ratio of accepted concurrency to the incoming concurrency.
 
 </dd>
 </dl>
