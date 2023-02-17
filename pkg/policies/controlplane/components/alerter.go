@@ -71,7 +71,7 @@ func (a *Alerter) setup(alerterIface *alerts.SimpleAlerter) {
 func (a *Alerter) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	signalValue := inPortReadings.ReadSingleReadingPort("signal")
 
-	if tristate.FromReading(signalValue) == tristate.IsTrue() {
+	if tristate.FromReading(signalValue).IsTrue() {
 		a.alerterIface.AddAlert(a.createAlert())
 	}
 
