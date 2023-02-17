@@ -7,30 +7,6 @@ definitions:
             alerter_parameters:
                 $ref: '#/definitions/AlerterParameters'
                 description: Configuration for embedded alerter.
-            concurrency_limit_multiplier:
-                description: |-
-                    Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
-
-                    @gotags: default:"2.0"
-                format: double
-                type: number
-                x-go-default: 2
-            concurrency_linear_increment:
-                description: |-
-                    Linear increment to concurrency in each execution tick when the system is not in overloaded state.
-
-                    @gotags: default:"5.0"
-                format: double
-                type: number
-                x-go-default: 5
-            concurrency_sqrt_increment_multiplier:
-                description: |-
-                    Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
-
-                    @gotags: default:"1.0"
-                format: double
-                type: number
-                x-go-default: 1
             default_config:
                 $ref: '#/definitions/LoadActuatorDynamicConfig'
                 description: Default configuration.
@@ -54,6 +30,22 @@ definitions:
             in_ports:
                 $ref: '#/definitions/AIMDConcurrencyControllerIns'
                 description: Input ports for the AIMDConcurrencyController component.
+            load_multiplier_linear_increment:
+                description: |-
+                    Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+
+                    @gotags: default:"0.01"
+                format: double
+                type: number
+                x-go-default: 0.01
+            max_load_multiplier:
+                description: |-
+                    Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+
+                    @gotags: default:"2.0"
+                format: double
+                type: number
+                x-go-default: 2
             out_ports:
                 $ref: '#/definitions/AIMDConcurrencyControllerOuts'
                 description: Output ports for the AIMDConcurrencyController component.
@@ -78,12 +70,21 @@ definitions:
     AIMDConcurrencyControllerOuts:
         description: Outputs for the AIMDConcurrencyController component.
         properties:
+            accepted_concurrency:
+                $ref: '#/definitions/OutPort'
+                description: Accepted concurrency is the number of concurrent requests that are accepted by the service.
+            desired_load_multiplier:
+                $ref: '#/definitions/OutPort'
+                description: Desired Load multiplier is the ratio of desired concurrency to the incoming concurrency.
+            incoming_concurrency:
+                $ref: '#/definitions/OutPort'
+                description: IncomingConcurrency is the number of concurrent requests that are received by the service.
             is_overload:
                 $ref: '#/definitions/OutPort'
                 description: Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
-            load_multiplier:
+            observed_load_multiplier:
                 $ref: '#/definitions/OutPort'
-                description: Load multiplier is the ratio of desired concurrency to the incoming concurrency.
+                description: Observed Load multiplier is the ratio of accepted concurrency to the incoming concurrency.
         type: object
     AddressExtractor:
         description: |-

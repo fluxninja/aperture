@@ -9,7 +9,6 @@
 | `global.imageRegistry`    | Global Docker image registry                    | `nil` |
 | `global.imagePullSecrets` | Global Docker registry secret names as an array | `[]`  |
 
-
 ### Common Parameters
 
 | Name                | Description                                                          | Value           |
@@ -22,7 +21,6 @@
 | `commonLabels`      | Labels to add to all deployed objects                                | `{}`            |
 | `commonAnnotations` | Annotations to add to all deployed objects                           | `{}`            |
 | `clusterDomain`     | Kubernetes cluster domain name                                       | `cluster.local` |
-
 
 ### Operator Parameters
 
@@ -102,7 +100,6 @@
 | `operator.serviceAccount.annotations`                        | Add annotations                                                                                                        | `{}`                  |
 | `operator.serviceAccount.automountServiceAccountToken`       | Automount API credentials for a service account.                                                                       | `true`                |
 
-
 ### Agent Custom Resource Parameters
 
 | Name                                                    | Description                                                                                                     | Value    |
@@ -164,5 +161,3 @@
 | `agent.config.etcd.endpoints`                           | List of Etcd server endpoints. Example, ["http://etcd:2379"]. This must not be empty.                           | `[]`     |
 | `agent.config.etcd.lease_ttl`                           | Lease time-to-live.                                                                                             | `60s`    |
 | `agent.config.prometheus.address`                       | specifies the address of the Prometheus server. Example, "http://prometheus-server:80". This must not be empty. | `nil`    |
-
-

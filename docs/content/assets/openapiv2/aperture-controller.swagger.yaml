@@ -100,30 +100,6 @@ definitions:
       alerter_parameters:
         description: Configuration for embedded alerter.
         $ref: '#/definitions/AlerterParameters'
-      concurrency_limit_multiplier:
-        description: |-
-          Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
-
-          @gotags: default:"2.0"
-        type: number
-        format: double
-        x-go-default: 2
-      concurrency_linear_increment:
-        description: |-
-          Linear increment to concurrency in each execution tick when the system is not in overloaded state.
-
-          @gotags: default:"5.0"
-        type: number
-        format: double
-        x-go-default: 5
-      concurrency_sqrt_increment_multiplier:
-        description: |-
-          Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
-
-          @gotags: default:"1.0"
-        type: number
-        format: double
-        x-go-default: 1
       default_config:
         description: Default configuration.
         $ref: '#/definitions/LoadActuatorDynamicConfig'
@@ -147,6 +123,22 @@ definitions:
       in_ports:
         description: Input ports for the AIMDConcurrencyController component.
         $ref: '#/definitions/AIMDConcurrencyControllerIns'
+      load_multiplier_linear_increment:
+        description: |-
+          Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+
+          @gotags: default:"0.01"
+        type: number
+        format: double
+        x-go-default: 0.01
+      max_load_multiplier:
+        description: |-
+          Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+
+          @gotags: default:"2.0"
+        type: number
+        format: double
+        x-go-default: 2
       out_ports:
         description: Output ports for the AIMDConcurrencyController component.
         $ref: '#/definitions/AIMDConcurrencyControllerOuts'
@@ -171,14 +163,26 @@ definitions:
     description: Outputs for the AIMDConcurrencyController component.
     type: object
     properties:
+      accepted_concurrency:
+        description: Accepted concurrency is the number of concurrent requests that
+          are accepted by the service.
+        $ref: '#/definitions/OutPort'
+      desired_load_multiplier:
+        description: Desired Load multiplier is the ratio of desired concurrency to
+          the incoming concurrency.
+        $ref: '#/definitions/OutPort'
+      incoming_concurrency:
+        description: IncomingConcurrency is the number of concurrent requests that
+          are received by the service.
+        $ref: '#/definitions/OutPort'
       is_overload:
         description: Is overload is a boolean signal that indicates whether the service
           is overloaded based on the deviation of the signal from the setpoint taking
           into account some tolerance.
         $ref: '#/definitions/OutPort'
-      load_multiplier:
-        description: Load multiplier is the ratio of desired concurrency to the incoming
-          concurrency.
+      observed_load_multiplier:
+        description: Observed Load multiplier is the ratio of accepted concurrency
+          to the incoming concurrency.
         $ref: '#/definitions/OutPort'
   AddressExtractor:
     description: |-

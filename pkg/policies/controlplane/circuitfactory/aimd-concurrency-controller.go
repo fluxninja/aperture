@@ -11,10 +11,13 @@ import (
 )
 
 const (
-	aimdSignalPortName         = "signal"
-	aimdSetpointPortName       = "setpoint"
-	aimdIsOverloadPortName     = "is_overload"
-	aimdLoadMultiplierPortName = "load_multiplier"
+	aimdSignalPortName                 = "signal"
+	aimdSetpointPortName               = "setpoint"
+	aimdIsOverloadPortName             = "is_overload"
+	aimdDesiredLoadMultiplierPortName  = "desired_load_multiplier"
+	aimdObservedLoadMultiplierPortName = "observed_load_multiplier"
+	aimdAcceptedConcurrencyPortName    = "accepted_concurrency"
+	aimdIncomingConcurrencyPortName    = "incoming_concurrency"
 )
 
 // ParseAIMDConcurrencyController parses an AIMD concurrency controller and returns the parent, leaf components, and options.
@@ -43,9 +46,21 @@ func ParseAIMDConcurrencyController(
 		if isOverloadPort != nil {
 			nestedOutPortsMap[aimdIsOverloadPortName] = isOverloadPort
 		}
-		loadMultiplierPort := outPorts.LoadMultiplier
-		if loadMultiplierPort != nil {
-			nestedOutPortsMap[aimdLoadMultiplierPortName] = loadMultiplierPort
+		desiredLoadMultiplierPort := outPorts.DesiredLoadMultiplier
+		if desiredLoadMultiplierPort != nil {
+			nestedOutPortsMap[aimdDesiredLoadMultiplierPortName] = desiredLoadMultiplierPort
+		}
+		observedLoadMultiplierPort := outPorts.ObservedLoadMultiplier
+		if observedLoadMultiplierPort != nil {
+			nestedOutPortsMap[aimdObservedLoadMultiplierPortName] = observedLoadMultiplierPort
+		}
+		acceptedConcurrencyPort := outPorts.AcceptedConcurrency
+		if acceptedConcurrencyPort != nil {
+			nestedOutPortsMap[aimdAcceptedConcurrencyPortName] = acceptedConcurrencyPort
+		}
+		incomingConcurrencyPort := outPorts.IncomingConcurrency
+		if incomingConcurrencyPort != nil {
+			nestedOutPortsMap[aimdIncomingConcurrencyPortName] = incomingConcurrencyPort
 		}
 	}
 
@@ -77,7 +92,7 @@ func ParseAIMDConcurrencyController(
 						InPorts: &policylangv1.ArithmeticCombinator_Ins{
 							Lhs: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "DESIRED_CONCURRENCY",
+									SignalName: "ACCEPTED_CONCURRENCY",
 								},
 							},
 							Rhs: &policylangv1.InPort{
@@ -88,160 +103,7 @@ func ParseAIMDConcurrencyController(
 						},
 						OutPorts: &policylangv1.ArithmeticCombinator_Outs{
 							Output: &policylangv1.OutPort{
-								SignalName: "DESIRED_CONCURRENCY_RATIO",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_ArithmeticCombinator{
-					ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
-						Operator: "mul",
-						InPorts: &policylangv1.ArithmeticCombinator_Ins{
-							Lhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_ConstantSignal{
-									ConstantSignal: &policylangv1.ConstantSignal{
-										Const: &policylangv1.ConstantSignal_Value{
-											Value: aimdConcurrencyController.ConcurrencyLimitMultiplier,
-										},
-									},
-								},
-							},
-							Rhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "ACCEPTED_CONCURRENCY",
-								},
-							},
-						},
-						OutPorts: &policylangv1.ArithmeticCombinator_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "NORMAL_CONCURRENCY_LIMIT",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_ArithmeticCombinator{
-					ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
-						Operator: "add",
-						InPorts: &policylangv1.ArithmeticCombinator_Ins{
-							Lhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_ConstantSignal{
-									ConstantSignal: &policylangv1.ConstantSignal{
-										Const: &policylangv1.ConstantSignal_Value{
-											Value: aimdConcurrencyController.ConcurrencyLinearIncrement,
-										},
-									},
-								},
-							},
-							Rhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "SQRT_CONCURRENCY_INCREMENT",
-								},
-							},
-						},
-						OutPorts: &policylangv1.ArithmeticCombinator_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "CONCURRENCY_INCREMENT_SINGLE_TICK",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_ArithmeticCombinator{
-					ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
-						Operator: "add",
-						InPorts: &policylangv1.ArithmeticCombinator_Ins{
-							Lhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "CONCURRENCY_INCREMENT_SINGLE_TICK",
-								},
-							},
-							Rhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "CONCURRENCY_INCREMENT",
-								},
-							},
-						},
-						OutPorts: &policylangv1.ArithmeticCombinator_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "CONCURRENCY_INCREMENT_INTEGRAL",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_Min{
-					Min: &policylangv1.Min{
-						InPorts: &policylangv1.Min_Ins{
-							Inputs: []*policylangv1.InPort{
-								{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "CONCURRENCY_INCREMENT_INTEGRAL",
-									},
-								},
-								{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "ACCEPTED_CONCURRENCY",
-									},
-								},
-							},
-						},
-						OutPorts: &policylangv1.Min_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "CONCURRENCY_INCREMENT_INTEGRAL_CAPPED",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_FirstValid{
-					FirstValid: &policylangv1.FirstValid{
-						InPorts: &policylangv1.FirstValid_Ins{
-							Inputs: []*policylangv1.InPort{
-								{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "CONCURRENCY_INCREMENT_INTEGRAL_CAPPED",
-									},
-								},
-								{
-									Value: &policylangv1.InPort_ConstantSignal{
-										ConstantSignal: &policylangv1.ConstantSignal{
-											Const: &policylangv1.ConstantSignal_Value{
-												Value: 0,
-											},
-										},
-									},
-								},
-							},
-						},
-						OutPorts: &policylangv1.FirstValid_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "CONCURRENCY_INCREMENT_NORMAL",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_Sqrt{
-					Sqrt: &policylangv1.Sqrt{
-						Scale: aimdConcurrencyController.ConcurrencySqrtIncrementMultiplier,
-						InPorts: &policylangv1.Sqrt_Ins{
-							Input: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "ACCEPTED_CONCURRENCY",
-								},
-							},
-						},
-						OutPorts: &policylangv1.Sqrt_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "SQRT_CONCURRENCY_INCREMENT",
+								SignalName: "OBSERVED_LOAD_MULTIPLIER",
 							},
 						},
 					},
@@ -254,17 +116,21 @@ func ParseAIMDConcurrencyController(
 						InPorts: &policylangv1.GradientController_Ins{
 							ControlVariable: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "ACCEPTED_CONCURRENCY",
+									SignalName: "OBSERVED_LOAD_MULTIPLIER",
 								},
 							},
 							Max: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "NORMAL_CONCURRENCY_LIMIT",
+								Value: &policylangv1.InPort_ConstantSignal{
+									ConstantSignal: &policylangv1.ConstantSignal{
+										Const: &policylangv1.ConstantSignal_Value{
+											Value: aimdConcurrencyController.MaxLoadMultiplier,
+										},
+									},
 								},
 							},
 							Optimize: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "CONCURRENCY_INCREMENT",
+									SignalName: "LOAD_MULTIPLIER_INCREMENT",
 								},
 							},
 							Setpoint: &policylangv1.InPort{
@@ -280,7 +146,7 @@ func ParseAIMDConcurrencyController(
 						},
 						OutPorts: &policylangv1.GradientController_Outs{
 							Output: &policylangv1.OutPort{
-								SignalName: "DESIRED_CONCURRENCY",
+								SignalName: "CONTROLLER_ADJUSTED_LOAD_MULTIPLIER",
 							},
 						},
 					},
@@ -295,13 +161,13 @@ func ParseAIMDConcurrencyController(
 						InPorts: &policylangv1.Extrapolator_Ins{
 							Input: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "DESIRED_CONCURRENCY_RATIO",
+									SignalName: "CONTROLLER_ADJUSTED_LOAD_MULTIPLIER",
 								},
 							},
 						},
 						OutPorts: &policylangv1.Extrapolator_Outs{
 							Output: &policylangv1.OutPort{
-								SignalName: "LOAD_MULTIPLIER",
+								SignalName: "DESIRED_LOAD_MULTIPLIER",
 							},
 						},
 					},
@@ -331,7 +197,7 @@ func ParseAIMDConcurrencyController(
 										InPorts: &policylangv1.LoadActuator_Ins{
 											LoadMultiplier: &policylangv1.InPort{
 												Value: &policylangv1.InPort_SignalName{
-													SignalName: "LOAD_MULTIPLIER",
+													SignalName: "DESIRED_LOAD_MULTIPLIER",
 												},
 											},
 										},
@@ -348,7 +214,7 @@ func ParseAIMDConcurrencyController(
 						InPorts: &policylangv1.Decider_Ins{
 							Lhs: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "LOAD_MULTIPLIER",
+									SignalName: "DESIRED_LOAD_MULTIPLIER",
 								},
 							},
 							Rhs: &policylangv1.InPort{
@@ -411,12 +277,99 @@ func ParseAIMDConcurrencyController(
 				},
 			},
 			{
+				Component: &policylangv1.Component_ArithmeticCombinator{
+					ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
+						Operator: "add",
+						InPorts: &policylangv1.ArithmeticCombinator_Ins{
+							Lhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_ConstantSignal{
+									ConstantSignal: &policylangv1.ConstantSignal{
+										Const: &policylangv1.ConstantSignal_Value{
+											Value: aimdConcurrencyController.LoadMultiplierLinearIncrement,
+										},
+									},
+								},
+							},
+							Rhs: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "LOAD_MULTIPLIER_INCREMENT",
+								},
+							},
+						},
+						OutPorts: &policylangv1.ArithmeticCombinator_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "LOAD_MULTIPLIER_INCREMENT_INTEGRAL",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Min{
+					Min: &policylangv1.Min{
+						InPorts: &policylangv1.Min_Ins{
+							Inputs: []*policylangv1.InPort{
+								{
+									Value: &policylangv1.InPort_SignalName{
+										SignalName: "LOAD_MULTIPLIER_INCREMENT_INTEGRAL",
+									},
+								},
+								{
+									Value: &policylangv1.InPort_ConstantSignal{
+										ConstantSignal: &policylangv1.ConstantSignal{
+											Const: &policylangv1.ConstantSignal_Value{
+												Value: aimdConcurrencyController.MaxLoadMultiplier,
+											},
+										},
+									},
+								},
+							},
+						},
+						OutPorts: &policylangv1.Min_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "LOAD_MULTIPLIER_INCREMENT_INTEGRAL_CAPPED",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_FirstValid{
+					FirstValid: &policylangv1.FirstValid{
+						InPorts: &policylangv1.FirstValid_Ins{
+							Inputs: []*policylangv1.InPort{
+								{
+									Value: &policylangv1.InPort_SignalName{
+										SignalName: "LOAD_MULTIPLIER_INCREMENT_INTEGRAL_CAPPED",
+									},
+								},
+								{
+									Value: &policylangv1.InPort_ConstantSignal{
+										ConstantSignal: &policylangv1.ConstantSignal{
+											Const: &policylangv1.ConstantSignal_Value{
+												Value: 0,
+											},
+										},
+									},
+								},
+							},
+						},
+						OutPorts: &policylangv1.FirstValid_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "LOAD_MULTIPLIER_INCREMENT_NORMAL",
+							},
+						},
+					},
+				},
+			},
+
+			{
 				Component: &policylangv1.Component_Switcher{
 					Switcher: &policylangv1.Switcher{
 						InPorts: &policylangv1.Switcher_Ins{
 							OnFalse: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "CONCURRENCY_INCREMENT_NORMAL",
+									SignalName: "LOAD_MULTIPLIER_INCREMENT_NORMAL",
 								},
 							},
 							OnTrue: &policylangv1.InPort{
@@ -436,12 +389,13 @@ func ParseAIMDConcurrencyController(
 						},
 						OutPorts: &policylangv1.Switcher_Outs{
 							Output: &policylangv1.OutPort{
-								SignalName: "CONCURRENCY_INCREMENT",
+								SignalName: "LOAD_MULTIPLIER_INCREMENT",
 							},
 						},
 					},
 				},
 			},
+
 			{
 				Component: &policylangv1.Component_NestedSignalIngress{
 					NestedSignalIngress: &policylangv1.NestedSignalIngress{
@@ -483,11 +437,53 @@ func ParseAIMDConcurrencyController(
 			{
 				Component: &policylangv1.Component_NestedSignalEgress{
 					NestedSignalEgress: &policylangv1.NestedSignalEgress{
-						PortName: aimdLoadMultiplierPortName,
+						PortName: aimdDesiredLoadMultiplierPortName,
 						InPorts: &policylangv1.NestedSignalEgress_Ins{
 							Signal: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "LOAD_MULTIPLIER",
+									SignalName: "DESIRED_LOAD_MULTIPLIER",
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_NestedSignalEgress{
+					NestedSignalEgress: &policylangv1.NestedSignalEgress{
+						PortName: aimdObservedLoadMultiplierPortName,
+						InPorts: &policylangv1.NestedSignalEgress_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "OBSERVED_LOAD_MULTIPLIER",
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_NestedSignalEgress{
+					NestedSignalEgress: &policylangv1.NestedSignalEgress{
+						PortName: aimdAcceptedConcurrencyPortName,
+						InPorts: &policylangv1.NestedSignalEgress_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "ACCEPTED_CONCURRENCY",
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_NestedSignalEgress{
+					NestedSignalEgress: &policylangv1.NestedSignalEgress{
+						PortName: aimdIncomingConcurrencyPortName,
+						InPorts: &policylangv1.NestedSignalEgress_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "INCOMING_CONCURRENCY",
 								},
 							},
 						},
