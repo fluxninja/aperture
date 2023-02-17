@@ -10,6 +10,8 @@ local classifier = aperture.spec.v1.Classifier;
 local fluxMeter = aperture.spec.v1.FluxMeter;
 local extractor = aperture.spec.v1.Extractor;
 local rule = aperture.spec.v1.Rule;
+local rulerego = aperture.spec.v1.RuleRego;
+
 local flowSelector = aperture.spec.v1.FlowSelector;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowMatcher = aperture.spec.v1.FlowMatcher;
@@ -67,6 +69,9 @@ local policyResource = latencyAIMDPolicy({
   flux_meter: fluxMeter.new() + fluxMeter.withFlowSelector(fluxMeterSelector),
   concurrency_controller+: {
     flow_selector: concurrencyLimiterFlowSelector,
+    default_config: {
+        dry_run: false,
+      },
     scheduler+: {
       timeout_factor: 0.5,
       workloads: [
@@ -74,10 +79,16 @@ local policyResource = latencyAIMDPolicy({
         + workload.withParameters(workloadParameters.withPriority(50))
         // match the label extracted by classifier
         + workload.withLabelMatcher(labelMatcher.withMatchLabels({ user_type: 'guest' })),
+
         workload.new()
-        + workload.withParameters(workloadParameters.withPriority(200))
+        + workload.withParameters(workloadParameters.withPriority(255))
+        // match the label extracted by classifier using rego expressesion
+        + workload.withLabelMatcher(labelMatcher.withMatchLabels({ user_type: 'premium' })),
+
+        workload.new()
+        + workload.withParameters(workloadParameters.withPriority(150))
         // match the http header directly
-        + workload.withLabelMatcher(labelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
+        + workload.withLabelMatcher(labelMatcher.withMatchLabels({ user_type: 'subscriber' })),
       ],
     },
     default_workload_parameters: {
@@ -94,7 +105,10 @@ local policyResource = latencyAIMDPolicy({
       user_type: rule.new()
                  + rule.withExtractor(extractor.new()
                                       + extractor.withFrom('request.http.headers.user-type')),
-    }),
+      user_data_from_cookie: rule.new()
+                             + rule.withRego(rulerego.new()
+                                             + rulerego.withQuery('data.user_from_cookie.user')
+                                             + rulerego.withSource('package user_from_cookie\n                                                                    cookies := split(input.attributes.request.http.headers.cookie, "; ")\n                                                                    user := user {\n                                                                        cookie := cookies[_]\n                                                                        startswith(cookie, "session=")\n                                                                        session := substring(cookie, count("session="), -1)\n                                                                        parts := split(session, ".")\n                                                                        object := json.unmarshal(base64url.decode(parts[0]))\n                                                                        user := object.user_type\n                                                                    }')),}),
   ],
   components: [
     component.new()
