@@ -36,10 +36,10 @@
           "$ref": "#/definitions/AIMDConcurrencyControllerIns"
         },
         "load_multiplier_linear_increment": {
-          "description": "Linear increment to load multiplier in each execution tick when the system is not in overloaded state.\n\n@gotags: default:\"0.01\"",
+          "description": "Linear increment to load multiplier in each execution tick when the system is not in overloaded state.\n\n@gotags: default:\"0.0025\"",
           "type": "number",
           "format": "double",
-          "x-go-default": 0.01,
+          "x-go-default": 0.0025,
           "x-order": 6
         },
         "max_load_multiplier": {
@@ -1392,14 +1392,9 @@
           "x-order": 1,
           "$ref": "#/definitions/InPort"
         },
-        "min": {
-          "description": "The minimum output when reset is not set.",
-          "x-order": 2,
-          "$ref": "#/definitions/InPort"
-        },
         "reset": {
           "description": "Resets the integrator output to zero when reset signal is valid and non-zero.",
-          "x-order": 3,
+          "x-order": 2,
           "$ref": "#/definitions/InPort"
         }
       },

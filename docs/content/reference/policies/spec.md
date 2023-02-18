@@ -91,9 +91,9 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dt>load_multiplier_linear_increment</dt>
 <dd>
 
-(float64, default: `0.01`) Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+(float64, default: `0.0025`) Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
 
-@gotags: default:"0.01"
+@gotags: default:"0.0025"
 
 </dd>
 <dt>max_load_multiplier</dt>
@@ -2127,12 +2127,6 @@ Inputs for the Integrator component.
 <dd>
 
 ([InPort](#in-port)) The maximum output when reset is not set.
-
-</dd>
-<dt>min</dt>
-<dd>
-
-([InPort](#in-port)) The minimum output when reset is not set.
 
 </dd>
 <dt>reset</dt>

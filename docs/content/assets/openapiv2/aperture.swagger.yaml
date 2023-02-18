@@ -34,10 +34,10 @@ definitions:
                 description: |-
                     Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
 
-                    @gotags: default:"0.01"
+                    @gotags: default:"0.0025"
                 format: double
                 type: number
-                x-go-default: 0.01
+                x-go-default: 0.0025
             max_load_multiplier:
                 description: |-
                     Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
@@ -1600,9 +1600,6 @@ definitions:
             max:
                 $ref: '#/definitions/InPort'
                 description: The maximum output when reset is not set.
-            min:
-                $ref: '#/definitions/InPort'
-                description: The minimum output when reset is not set.
             reset:
                 $ref: '#/definitions/InPort'
                 description: Resets the integrator output to zero when reset signal is valid and non-zero.
