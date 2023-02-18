@@ -1442,10 +1442,8 @@ message Integrator {
     InPort input = 1;
     // Resets the integrator output to zero when reset signal is valid and non-zero.
     InPort reset = 2;
-    // The minimum output when reset is not set.
-    InPort min = 3;
     //The maximum output when reset is not set.
-    InPort max = 4;
+    InPort max = 3;
   }
 
   // Outputs for the Integrator component.
@@ -1691,9 +1689,9 @@ message AIMDConcurrencyController {
   double load_multiplier_linear_increment = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {number_value: 0.01}
+      value: {number_value: 0.0025}
     }
-  }]; // @gotags: default:"0.01"
+  }]; // @gotags: default:"0.0025"
 
   // Configuration for embedded alerter.
   Alerter.Parameters alerter_parameters = 8;
