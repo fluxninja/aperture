@@ -653,7 +653,6 @@ def parse_config_docblocks(repository_root: Path, blueprint_path: Path, aperture
             logger.error(f"Unknown docblocks @section: {block.section}")
             raise typer.Exit(1)
         sections[block.section].append(block)
-        sections[block.section].append(block)
 
     # Make sure that all non-required parameters have their default values updated based on library defaults
     for section, blocks in sections.items():
