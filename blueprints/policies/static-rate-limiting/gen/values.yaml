@@ -9,6 +9,12 @@ common:
   policy_name: "__REQUIRED_FIELD__"
 
 policy:
+  # How often should the policy be re-evaluated
+  # Type: string
+  evaluation_interval: "300s"
+  # List of classification rules.
+  # Type: []aperture.spec.v1.Classifier
+  classifiers: []
   rate_limiter:
     # Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept
     # Type: float64
@@ -40,6 +46,9 @@ policy:
       overrides: []
 
 dashboard:
+  # Refresh interval for dashboard panels.
+  # Type: string
+  refresh_interval: "10s"
   datasource:
     # Datasource name.
     # Type: string

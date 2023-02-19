@@ -341,10 +341,10 @@ JSON_SCHEMA_TPL = """
 "format": "int64"
 {%- elif param_type.startswith('[]') %}
 "type": "array",
-"items": {"type": {{ render_type(param_type[2:], json_schema_link) }}}
+"items": { {{- render_type(param_type[2:], json_schema_link) }} }
 {%- elif param_type.startswith('map[') %}
 "type": "object",
-"additionalProperties": {"type": {{ render_type(param_type[4:-1], json_schema_link) }}}
+"additionalProperties": { {{- render_type(param_type[4:-1], json_schema_link) }}}
 {%- else %}
 "type": "{{ param_type }}"
 {%- endif %}
@@ -543,12 +543,10 @@ def render_sample_config_yaml(blueprint_name: Path, sample_config_path: Path, on
     sample_config_data = DocBlockNode(DocBlockParam("", "intermediate_node", "", "", "", False), {}, OrderedSet([]))
     if only_required is False:
         for block in blocks:
-            sample_config_data.children.update(block.nested_parameters.children)
-            sample_config_data.required_children.update(block.nested_parameters.required_children)
+            merge_docblocknodes(sample_config_data, block.nested_parameters)
     else:
         for block in blocks:
-            sample_config_data.children.update(block.nested_required_parameters.children)
-            sample_config_data.required_children.update(block.nested_required_parameters.required_children)
+            merge_docblocknodes(sample_config_data, block.nested_required_parameters)
 
 
     env = get_jinja2_environment()
@@ -560,8 +558,7 @@ def render_json_schema(blueprint_name: Path, json_schema_path: Path, blocks: Lis
     """Render JSON schema file from blocks"""
     json_schema_data = DocBlockNode(DocBlockParam("", "intermediate_node", "", "", "", False), {}, OrderedSet([]))
     for block in blocks:
-        json_schema_data.children.update(block.nested_parameters.children)
-        json_schema_data.required_children.update(block.nested_parameters.required_children)
+        merge_docblocknodes(json_schema_data, block.nested_parameters)
 
     env = get_jinja2_environment()
     template = env.get_template("definitions.json.j2")
@@ -656,6 +653,7 @@ def parse_config_docblocks(repository_root: Path, blueprint_path: Path, aperture
             logger.error(f"Unknown docblocks @section: {block.section}")
             raise typer.Exit(1)
         sections[block.section].append(block)
+        sections[block.section].append(block)
 
     # Make sure that all non-required parameters have their default values updated based on library defaults
     for section, blocks in sections.items():
@@ -685,6 +683,16 @@ def parse_dynamic_config_docblocks(repository_root: Path, blueprint_path: Path, 
     for _, blocks in sections.items():
         update_docblock_param_defaults(repository_root, config_path, blocks)
     return docblocks
+
+# merge 2nd docblock into 1st
+def merge_docblocknodes(docblock1: DocBlockNode, docblock2: DocBlockNode):
+    docblock1.required_children.update(docblock2.required_children)
+    # recursive merge docblock1.children and docblock2.children
+    for key, value in docblock2.children.items():
+        if key in docblock1.children:
+            merge_docblocknodes(docblock1.children[key], value)
+        else:
+            docblock1.children[key] = value
 
 if __name__ == "__main__":
     typer.run(main)

@@ -12,4 +12,5 @@ var (
 	skipPull       bool
 	dynamicConfig  bool
 	noYAMLModeline bool
+	noValidate     bool
 )
