@@ -47,7 +47,7 @@ policy:
     - decider:
         in_ports:
           lhs:
-            signal_name: LOAD_MULTIPLIER
+            signal_name: OBSERVED_LOAD_MULTIPLIER
           rhs:
             constant_signal:
               value: 1
@@ -58,10 +58,10 @@ policy:
         true_for: 30s
     - switcher:
         in_ports:
-          off:
+          off_signal:
             constant_signal:
               value: 10
-          on:
+          on_signal:
             constant_signal:
               value: 0
           switch:

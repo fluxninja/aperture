@@ -5,7 +5,6 @@ local integratorouts = import './integratorouts.libsonnet';
     in_ports: {
       input: error 'Port input is missing',
       max: error 'Port max is missing',
-      min: error 'Port min is missing',
       reset: error 'Port reset is missing',
     },
     out_ports: {

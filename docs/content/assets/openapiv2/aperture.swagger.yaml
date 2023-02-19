@@ -7,30 +7,6 @@ definitions:
             alerter_parameters:
                 $ref: '#/definitions/AlerterParameters'
                 description: Configuration for embedded alerter.
-            concurrency_limit_multiplier:
-                description: |-
-                    Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
-
-                    @gotags: default:"2.0"
-                format: double
-                type: number
-                x-go-default: 2
-            concurrency_linear_increment:
-                description: |-
-                    Linear increment to concurrency in each execution tick when the system is not in overloaded state.
-
-                    @gotags: default:"5.0"
-                format: double
-                type: number
-                x-go-default: 5
-            concurrency_sqrt_increment_multiplier:
-                description: |-
-                    Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
-
-                    @gotags: default:"1.0"
-                format: double
-                type: number
-                x-go-default: 1
             default_config:
                 $ref: '#/definitions/LoadActuatorDynamicConfig'
                 description: Default configuration.
@@ -54,6 +30,22 @@ definitions:
             in_ports:
                 $ref: '#/definitions/AIMDConcurrencyControllerIns'
                 description: Input ports for the AIMDConcurrencyController component.
+            load_multiplier_linear_increment:
+                description: |-
+                    Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+
+                    @gotags: default:"0.0025"
+                format: double
+                type: number
+                x-go-default: 0.0025
+            max_load_multiplier:
+                description: |-
+                    Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+
+                    @gotags: default:"2.0"
+                format: double
+                type: number
+                x-go-default: 2
             out_ports:
                 $ref: '#/definitions/AIMDConcurrencyControllerOuts'
                 description: Output ports for the AIMDConcurrencyController component.
@@ -78,12 +70,21 @@ definitions:
     AIMDConcurrencyControllerOuts:
         description: Outputs for the AIMDConcurrencyController component.
         properties:
+            accepted_concurrency:
+                $ref: '#/definitions/OutPort'
+                description: Accepted concurrency is the number of concurrent requests that are accepted by the service.
+            desired_load_multiplier:
+                $ref: '#/definitions/OutPort'
+                description: Desired Load multiplier is the ratio of desired concurrency to the incoming concurrency.
+            incoming_concurrency:
+                $ref: '#/definitions/OutPort'
+                description: IncomingConcurrency is the number of concurrent requests that are received by the service.
             is_overload:
                 $ref: '#/definitions/OutPort'
                 description: Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
-            load_multiplier:
+            observed_load_multiplier:
                 $ref: '#/definitions/OutPort'
-                description: Load multiplier is the ratio of desired concurrency to the incoming concurrency.
+                description: Observed Load multiplier is the ratio of accepted concurrency to the incoming concurrency.
         type: object
     AddressExtractor:
         description: |-
@@ -151,9 +152,9 @@ definitions:
                 description: |-
                     Duration of alert resolver.
 
-                    @gotags: default:"300s"
+                    @gotags: default:"10s"
                 type: string
-                x-go-default: 300s
+                x-go-default: 10s
             severity:
                 description: |-
                     Severity of the alert, one of 'info', 'warn' or 'crit'.
@@ -1546,9 +1547,6 @@ definitions:
             max:
                 $ref: '#/definitions/InPort'
                 description: The maximum output when reset is not set.
-            min:
-                $ref: '#/definitions/InPort'
-                description: The minimum output when reset is not set.
             reset:
                 $ref: '#/definitions/InPort'
                 description: Resets the integrator output to zero when reset signal is valid and non-zero.
@@ -2750,7 +2748,7 @@ definitions:
                 x-go-default: 0.49s
             timeout_factor:
                 description: |-
-                    If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,
+                    If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
                     it will be rejected.
 
                     This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
@@ -2823,12 +2821,17 @@ definitions:
                 type: string
             priority:
                 description: |-
-                    Describes priority level of the requests within the workload.
-                    Priority level ranges from 0 to 255.
-                    Higher numbers means higher priority level.
+                    $$
+                    \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+                    $$
 
                     @gotags: validate:"gte=0,lte=255"
                 format: int64
+                title: |-
+                    Describes priority level of the requests within the workload.
+                    Priority level ranges from 0 to 255.
+                    Higher numbers means higher priority level.
+                    Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
                 type: integer
                 x-go-validate: gte=0,lte=255
             tokens:
@@ -3025,8 +3028,8 @@ definitions:
         type: object
     Switcher:
         description: |-
-            `on` will be returned if switch input is valid and not equal to 0.0 ,
-             otherwise `off` will be returned.
+            `on_signal` will be returned if switch input is valid and not equal to 0.0 ,
+             otherwise `off_signal` will be returned.
         properties:
             in_ports:
                 $ref: '#/definitions/SwitcherIns'
@@ -3034,27 +3037,27 @@ definitions:
             out_ports:
                 $ref: '#/definitions/SwitcherOuts'
                 description: Output ports for the Switcher component.
-        title: Type of combinator that switches between `on` and `off` signals based on switch input
+        title: Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input
         type: object
     SwitcherIns:
         description: Inputs for the Switcher component.
         properties:
-            "off":
+            off_signal:
                 $ref: '#/definitions/InPort'
                 description: Output signal when switch is invalid or 0.0.
-            "on":
+            on_signal:
                 $ref: '#/definitions/InPort'
                 description: Output signal when switch is valid and not 0.0.
             switch:
                 $ref: '#/definitions/InPort'
-                description: Decides whether to return on or off.
+                description: Decides whether to return `on_signal` or `off_signal`.
         type: object
     SwitcherOuts:
         description: Outputs for the Switcher component.
         properties:
             output:
                 $ref: '#/definitions/OutPort'
-                description: Selected signal (on or off).
+                description: Selected signal (`on_signal` or `off_signal`).
         type: object
     Variable:
         description: Component that emits a variable value as an output signal, can be defined in dynamic configuration.

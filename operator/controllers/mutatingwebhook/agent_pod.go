@@ -64,9 +64,9 @@ func agentContainer(instance *v1alpha1.Agent, container *corev1.Container, agent
 		container.Resources.Requests = spec.Resources.Requests
 	}
 
-	serverPort, err := controllers.GetPort(spec.ConfigSpec.Server.Addr)
+	serverPort, err := controllers.GetPort(spec.ConfigSpec.Server.Listener.Addr)
 	if err != nil {
-		return fmt.Errorf("invalid value '%v' provided for 'server.addr' config", spec.ConfigSpec.Server.Addr)
+		return fmt.Errorf("invalid value '%v' provided for 'server.addr' config", spec.ConfigSpec.Server.Listener.Addr)
 	}
 
 	distCachePort, err := controllers.GetPort(spec.ConfigSpec.DistCache.BindAddr)

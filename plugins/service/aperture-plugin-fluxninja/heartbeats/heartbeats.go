@@ -224,13 +224,13 @@ func (h *Heartbeats) newHeartbeat(
 		policies.PolicyWrappers = h.policyFactory.GetPolicyWrappers()
 	}
 
-	serviceControlPointObjects := make(map[selectors.ControlPointID]struct{})
+	var serviceControlPointObjects []selectors.ControlPointID
 	if h.serviceControlPointCache != nil {
 		serviceControlPointObjects = h.serviceControlPointCache.GetAll()
 	}
 
 	serviceControlPoints := make([]*heartbeatv1.ServiceControlPoint, 0, len(serviceControlPointObjects))
-	for cp := range serviceControlPointObjects {
+	for _, cp := range serviceControlPointObjects {
 		serviceControlPoints = append(serviceControlPoints, &heartbeatv1.ServiceControlPoint{
 			Name:        cp.ControlPoint,
 			ServiceName: cp.Service,

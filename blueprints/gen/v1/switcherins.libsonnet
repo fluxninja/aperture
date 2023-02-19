@@ -1,17 +1,17 @@
 {
   new():: {
   },
-  withOff(off):: {
-    off: off,
+  withOffSignal(off_signal):: {
+    off_signal: off_signal,
   },
-  withOffMixin(off):: {
-    off+: off,
+  withOffSignalMixin(off_signal):: {
+    off_signal+: off_signal,
   },
-  withOn(on):: {
-    on: on,
+  withOnSignal(on_signal):: {
+    on_signal: on_signal,
   },
-  withOnMixin(on):: {
-    on+: on,
+  withOnSignalMixin(on_signal):: {
+    on_signal+: on_signal,
   },
   withSwitch(switch):: {
     switch: switch,

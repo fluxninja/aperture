@@ -38,12 +38,3 @@ policy:
     # Type: aperture.spec.v1.RateLimiterDynamicConfig
     default_config:
       overrides: []
-
-dashboard:
-  datasource:
-    # Datasource name.
-    # Type: string
-    name: "$datasource"
-    # Datasource filter regex.
-    # Type: string
-    filter_regex: ""

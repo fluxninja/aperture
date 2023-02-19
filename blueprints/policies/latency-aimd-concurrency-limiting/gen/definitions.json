@@ -1,0 +1,151 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "policies/latency-aimd-concurrency-limiting blueprint",
+  "additionalProperties": false,
+  "required": ["common", "policy"],
+  "properties": {
+    "common": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_name"],
+      "properties": {
+        "policy_name": {
+          "description": "Name of the policy.",
+          "type": "string"
+        }
+      }
+    },
+
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["flux_meter", "concurrency_controller"],
+      "properties": {
+        "flux_meter": {
+          "description": "Flux Meter.",
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/FluxMeter"
+        },
+
+        "classifiers": {
+          "description": "List of classification rules.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Classifier"
+          }
+        },
+
+        "components": {
+          "description": "List of additional circuit components.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
+          }
+        },
+
+        "latency_baseliner": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ema": {
+              "description": "EMA parameters.",
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/EMAParameters"
+            },
+
+            "latency_tolerance_multiplier": {
+              "description": "Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.",
+              "type": "number",
+              "format": "double"
+            },
+
+            "latency_ema_limit_multiplier": {
+              "description": "Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.",
+              "type": "number",
+              "format": "double"
+            }
+          }
+        },
+
+        "concurrency_controller": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["flow_selector"],
+          "properties": {
+            "flow_selector": {
+              "description": "Concurrency Limiter flow selector.",
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
+            },
+
+            "scheduler": {
+              "description": "Scheduler parameters.",
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/SchedulerParameters"
+            },
+
+            "gradient": {
+              "description": "Gradient Controller parameters.",
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/GradientControllerParameters"
+            },
+
+            "alerter": {
+              "description": "Whether tokens for workloads are computed dynamically or set statically by the user.",
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
+            },
+
+            "max_load_multiplier": {
+              "description": "Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.",
+              "type": "number",
+              "format": "double"
+            },
+
+            "load_multiplier_linear_increment": {
+              "description": "Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.",
+              "type": "number",
+              "format": "double"
+            },
+
+            "default_config": {
+              "description": "Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.",
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/LoadActuatorDynamicConfig"
+            }
+          }
+        }
+      }
+    },
+
+    "dashboard": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "refresh_interval": {
+          "description": "Refresh interval for dashboard panels.",
+          "type": "string"
+        },
+
+        "datasource": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "description": "Datasource name.",
+              "type": "string"
+            },
+
+            "filter_regex": {
+              "description": "Datasource filter regex.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

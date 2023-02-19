@@ -52,30 +52,6 @@ High level concurrency control component. Baselines a signal via exponential mov
 ([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
 
 </dd>
-<dt>concurrency_limit_multiplier</dt>
-<dd>
-
-(float64, default: `2`) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
-
-@gotags: default:"2.0"
-
-</dd>
-<dt>concurrency_linear_increment</dt>
-<dd>
-
-(float64, default: `5`) Linear increment to concurrency in each execution tick when the system is not in overloaded state.
-
-@gotags: default:"5.0"
-
-</dd>
-<dt>concurrency_sqrt_increment_multiplier</dt>
-<dd>
-
-(float64, default: `1`) Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
-
-@gotags: default:"1.0"
-
-</dd>
 <dt>default_config</dt>
 <dd>
 
@@ -110,6 +86,22 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dd>
 
 ([AIMDConcurrencyControllerIns](#a-i-m-d-concurrency-controller-ins)) Input ports for the AIMDConcurrencyController component.
+
+</dd>
+<dt>load_multiplier_linear_increment</dt>
+<dd>
+
+(float64, default: `0.0025`) Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+
+@gotags: default:"0.0025"
+
+</dd>
+<dt>max_load_multiplier</dt>
+<dd>
+
+(float64, default: `2`) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+
+@gotags: default:"2.0"
 
 </dd>
 <dt>out_ports</dt>
@@ -156,16 +148,34 @@ Outputs for the AIMDConcurrencyController component.
 #### Properties
 
 <dl>
+<dt>accepted_concurrency</dt>
+<dd>
+
+([OutPort](#out-port)) Accepted concurrency is the number of concurrent requests that are accepted by the service.
+
+</dd>
+<dt>desired_load_multiplier</dt>
+<dd>
+
+([OutPort](#out-port)) Desired Load multiplier is the ratio of desired concurrency to the incoming concurrency.
+
+</dd>
+<dt>incoming_concurrency</dt>
+<dd>
+
+([OutPort](#out-port)) IncomingConcurrency is the number of concurrent requests that are received by the service.
+
+</dd>
 <dt>is_overload</dt>
 <dd>
 
 ([OutPort](#out-port)) Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
 
 </dd>
-<dt>load_multiplier</dt>
+<dt>observed_load_multiplier</dt>
 <dd>
 
-([OutPort](#out-port)) Load multiplier is the ratio of desired concurrency to the incoming concurrency.
+([OutPort](#out-port)) Observed Load multiplier is the ratio of accepted concurrency to the incoming concurrency.
 
 </dd>
 </dl>
@@ -268,9 +278,9 @@ Alerter Parameters is a common config for separate alerter components and alerte
 <dt>resolve_timeout</dt>
 <dd>
 
-(string, default: `300s`) Duration of alert resolver.
+(string, default: `10s`) Duration of alert resolver.
 
-@gotags: default:"300s"
+@gotags: default:"10s"
 
 </dd>
 <dt>severity</dt>
@@ -2002,12 +2012,6 @@ Inputs for the Integrator component.
 ([InPort](#in-port)) The maximum output when reset is not set.
 
 </dd>
-<dt>min</dt>
-<dd>
-
-([InPort](#in-port)) The minimum output when reset is not set.
-
-</dd>
 <dt>reset</dt>
 <dd>
 
@@ -3498,7 +3502,7 @@ tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 
 (float64, `gte=0.0`, default: `0.5`) Timeout as a factor of tokens for a flow in a workload
 
-If a flow is not able to get tokens within `timeout_factor` \* `tokens` of duration,
+If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
 it will be rejected.
 
 This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
@@ -3586,6 +3590,11 @@ you have a classifier that sets `user` flow label, you might want to set
 (int64, `gte=0,lte=255`) Describes priority level of the requests within the workload.
 Priority level ranges from 0 to 255.
 Higher numbers means higher priority level.
+Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
+
+$$
+\text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+$$
 
 @gotags: validate:"gte=0,lte=255"
 
@@ -3723,10 +3732,10 @@ Outputs for the Sqrt component.
 
 ### Switcher {#switcher}
 
-Type of combinator that switches between `on` and `off` signals based on switch input
+Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input
 
-`on` will be returned if switch input is valid and not equal to 0.0 ,
-otherwise `off` will be returned.
+`on_signal` will be returned if switch input is valid and not equal to 0.0 ,
+otherwise `off_signal` will be returned.
 
 #### Properties
 
@@ -3752,13 +3761,13 @@ Inputs for the Switcher component.
 #### Properties
 
 <dl>
-<dt>off</dt>
+<dt>off_signal</dt>
 <dd>
 
 ([InPort](#in-port)) Output signal when switch is invalid or 0.0.
 
 </dd>
-<dt>on</dt>
+<dt>on_signal</dt>
 <dd>
 
 ([InPort](#in-port)) Output signal when switch is valid and not 0.0.
@@ -3767,7 +3776,7 @@ Inputs for the Switcher component.
 <dt>switch</dt>
 <dd>
 
-([InPort](#in-port)) Decides whether to return on or off.
+([InPort](#in-port)) Decides whether to return `on_signal` or `off_signal`.
 
 </dd>
 </dl>
@@ -3782,7 +3791,7 @@ Outputs for the Switcher component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) Selected signal (on or off).
+([OutPort](#out-port)) Selected signal (`on_signal` or `off_signal`).
 
 </dd>
 </dl>

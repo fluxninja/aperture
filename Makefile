@@ -84,7 +84,7 @@ generate-blueprints: generate-config-markdown
 		npx prettier --write $$git_root/blueprints/gen/jsonschema/*.json; \
 		git add $$git_root/blueprints/gen; \
 	}
-	@scripts/generate_blueprints_docs.sh
+	@scripts/generate_blueprints_assets.sh
 
 
 generate-doc-assets: generate-blueprints

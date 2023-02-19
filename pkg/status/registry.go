@@ -37,7 +37,7 @@ const (
 	uriKey       = "status_uri"
 	alertChannel = "status_registry"
 	// Resolve timeout in seconds.
-	alertResolveTimeout = 300
+	alertResolveTimeout = 10
 )
 
 // registry implements Registry.

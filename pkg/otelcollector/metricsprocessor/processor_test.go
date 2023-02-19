@@ -179,7 +179,7 @@ var _ = Describe("Metrics Processor", func() {
 
 		cp := cpCache.GetAll()
 		for _, service := range baseCheckResp.GetServices() {
-			Expect(cp).To(HaveKey(selectors.NewControlPointID(service, baseCheckResp.GetControlPoint())))
+			Expect(cp).To(ContainElement(selectors.NewControlPointID(service, baseCheckResp.GetControlPoint())))
 		}
 	})
 

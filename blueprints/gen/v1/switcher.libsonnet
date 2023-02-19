@@ -3,8 +3,8 @@ local switcherouts = import './switcherouts.libsonnet';
 {
   new():: {
     in_ports: {
-      off: error 'Port off is missing',
-      on: error 'Port on is missing',
+      off_signal: error 'Port off_signal is missing',
+      on_signal: error 'Port on_signal is missing',
       switch: error 'Port switch is missing',
     },
     out_ports: {

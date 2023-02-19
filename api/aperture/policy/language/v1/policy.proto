@@ -662,26 +662,26 @@ message Decider {
   }]; // @gotags: default:"0s"
 }
 
-// Type of combinator that switches between `on` and `off` signals based on switch input
+// Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input
 //
-// `on` will be returned if switch input is valid and not equal to 0.0 ,
-//  otherwise `off` will be returned.
+// `on_signal` will be returned if switch input is valid and not equal to 0.0 ,
+//  otherwise `off_signal` will be returned.
 message Switcher {
   // Inputs for the Switcher component.
   message Ins {
     // Output signal when switch is valid and not 0.0.
-    InPort on = 1;
+    InPort on_signal = 1;
 
     // Output signal when switch is invalid or 0.0.
-    InPort off = 2;
+    InPort off_signal = 2;
 
-    // Decides whether to return on or off.
+    // Decides whether to return `on_signal` or `off_signal`.
     InPort switch = 3;
   }
 
   // Outputs for the Switcher component.
   message Outs {
-    // Selected signal (on or off).
+    // Selected signal (`on_signal` or `off_signal`).
     OutPort output = 1;
   }
 
@@ -883,6 +883,12 @@ message Scheduler {
       // Describes priority level of the requests within the workload.
       // Priority level ranges from 0 to 255.
       // Higher numbers means higher priority level.
+      // Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
+      //
+      // $$
+      // \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+      // $$
+      //
       uint32 priority = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         extensions: {
           key: "x-go-validate"
@@ -971,7 +977,7 @@ message Scheduler {
 
     // Timeout as a factor of tokens for a flow in a workload
     //
-    // If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,
+    // If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
     // it will be rejected.
     //
     // This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
@@ -1400,9 +1406,9 @@ message Alerter {
     google.protobuf.Duration resolve_timeout = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-default"
-        value: {string_value: "300s"}
+        value: {string_value: "10s"}
       }
-    }]; // @gotags: default:"300s"
+    }]; // @gotags: default:"10s"
 
     // A list of alert channel strings.
     repeated string alert_channels = 4;
@@ -1437,10 +1443,8 @@ message Integrator {
     InPort input = 1;
     // Resets the integrator output to zero when reset signal is valid and non-zero.
     InPort reset = 2;
-    // The minimum output when reset is not set.
-    InPort min = 3;
     //The maximum output when reset is not set.
-    InPort max = 4;
+    InPort max = 3;
   }
 
   // Outputs for the Integrator component.
@@ -1636,8 +1640,14 @@ message AIMDConcurrencyController {
   message Outs {
     // Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
     OutPort is_overload = 1;
-    // Load multiplier is the ratio of desired concurrency to the incoming concurrency.
-    OutPort load_multiplier = 2;
+    // Desired Load multiplier is the ratio of desired concurrency to the incoming concurrency.
+    OutPort desired_load_multiplier = 2;
+    // Observed Load multiplier is the ratio of accepted concurrency to the incoming concurrency.
+    OutPort observed_load_multiplier = 3;
+    // Accepted concurrency is the number of concurrent requests that are accepted by the service.
+    OutPort accepted_concurrency = 4;
+    // IncomingConcurrency is the number of concurrent requests that are received by the service.
+    OutPort incoming_concurrency = 5;
   }
 
   // Input ports for the AIMDConcurrencyController component.
@@ -1669,35 +1679,27 @@ message AIMDConcurrencyController {
   GradientController.Parameters gradient_parameters = 5;
 
   // Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
-  double concurrency_limit_multiplier = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  double max_load_multiplier = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {number_value: 2}
+      value: {number_value: 2.0}
     }
   }]; // @gotags: default:"2.0"
 
-  // Linear increment to concurrency in each execution tick when the system is not in overloaded state.
-  double concurrency_linear_increment = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+  // Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+  double load_multiplier_linear_increment = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {number_value: 5}
+      value: {number_value: 0.0025}
     }
-  }]; // @gotags: default:"5.0"
-
-  // Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
-  double concurrency_sqrt_increment_multiplier = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {number_value: 1}
-    }
-  }]; // @gotags: default:"1.0"
+  }]; // @gotags: default:"0.0025"
 
   // Configuration for embedded alerter.
-  Alerter.Parameters alerter_parameters = 9;
+  Alerter.Parameters alerter_parameters = 8;
 
   // Configuration key for load actuation.
-  string dynamic_config_key = 10;
+  string dynamic_config_key = 9;
 
   // Default configuration.
-  LoadActuator.DynamicConfig default_config = 11;
+  LoadActuator.DynamicConfig default_config = 10;
 }
