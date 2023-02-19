@@ -51,13 +51,13 @@ func (in *Integrator) Execute(inPortReadings runtime.PortToReading, tickInfo run
 	if resetVal.Valid() && resetVal.Value() != 0 {
 		in.sum = 0
 	} else if inputVal.Valid() {
-		maxVal := inPortReadings.ReadSingleReadingPort("max")
 
+		in.sum += inputVal.Value()
+
+		maxVal := inPortReadings.ReadSingleReadingPort("max")
 		if maxVal.Valid() {
 			in.minMax.Max = maxVal.Value()
 			in.minMax.Min = 0
-
-			in.sum += inputVal.Value()
 			in.sum, _ = in.minMax.Constrain(in.sum)
 		}
 	}
