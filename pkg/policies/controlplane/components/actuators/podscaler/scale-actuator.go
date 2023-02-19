@@ -1,4 +1,4 @@
-package horizontalpodscaler
+package podscaler
 
 import (
 	"context"
@@ -24,7 +24,7 @@ import (
 type ScaleActuator struct {
 	policyReadAPI      iface.Policy
 	decisionWriter     *etcdwriter.Writer
-	scaleActuatorProto *policylangv1.HorizontalPodScaler_ScaleActuator
+	scaleActuatorProto *policylangv1.PodScaler_ScaleActuator
 	decisionsEtcdPath  string
 	agentGroupName     string
 	componentID        string
@@ -42,13 +42,13 @@ func (sa *ScaleActuator) ShortDescription() string { return sa.agentGroupName }
 
 // NewScaleActuatorAndOptions creates scale actuator and its fx options.
 func NewScaleActuatorAndOptions(
-	scaleActuatorProto *policylangv1.HorizontalPodScaler_ScaleActuator,
+	scaleActuatorProto *policylangv1.PodScaler_ScaleActuator,
 	componentID string,
 	policyReadAPI iface.Policy,
 	agentGroup string,
 ) (runtime.Component, fx.Option, error) {
 	etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID)
-	decisionsEtcdPath := path.Join(paths.HorizontalPodScalerDecisionsPath, etcdKey)
+	decisionsEtcdPath := path.Join(paths.PodScalerDecisionsPath, etcdKey)
 	dryRun := false
 	if scaleActuatorProto.GetDefaultConfig() != nil {
 		dryRun = scaleActuatorProto.GetDefaultConfig().GetDryRun()
@@ -113,7 +113,7 @@ func (sa *ScaleActuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller
 	key := sa.scaleActuatorProto.GetDynamicConfigKey()
 	// read dynamic config
 	if unmarshaller.IsSet(key) {
-		dynamicConfig := &policylangv1.HorizontalPodScaler_ScaleActuator_DynamicConfig{}
+		dynamicConfig := &policylangv1.PodScaler_ScaleActuator_DynamicConfig{}
 		if err := unmarshaller.UnmarshalKey(key, dynamicConfig); err != nil {
 			logger.Error().Err(err).Msg("Failed to unmarshal dynamic config")
 			return
@@ -124,7 +124,7 @@ func (sa *ScaleActuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller
 	}
 }
 
-func (sa *ScaleActuator) setConfig(config *policylangv1.HorizontalPodScaler_ScaleActuator_DynamicConfig) {
+func (sa *ScaleActuator) setConfig(config *policylangv1.PodScaler_ScaleActuator_DynamicConfig) {
 	if config != nil {
 		sa.dryRun = config.GetDryRun()
 	} else {

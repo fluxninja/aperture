@@ -438,10 +438,12 @@ AutoScale components are used to scale a service.
 #### Properties
 
 <dl>
-<dt>horizontal_pod_scaler</dt>
+<dt>pod_scaler</dt>
 <dd>
 
-([HorizontalPodScaler](#horizontal-pod-scaler)) HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+([PodScaler](#pod-scaler)) PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+
+GradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.
 
 </dd>
 </dl>
@@ -1949,125 +1951,6 @@ Outputs for the Holder component.
 </dd>
 </dl>
 
-### HorizontalPodScaler {#horizontal-pod-scaler}
-
-#### Properties
-
-<dl>
-<dt>kubernetes_object_selector</dt>
-<dd>
-
-([KubernetesObjectSelector](#kubernetes-object-selector), `required`) The Kubernetes object on which horizontal scaling is applied.
-
-@gotags: validate:"required"
-
-</dd>
-<dt>scale_actuator</dt>
-<dd>
-
-([HorizontalPodScalerScaleActuator](#horizontal-pod-scaler-scale-actuator))
-
-</dd>
-<dt>scale_reporter</dt>
-<dd>
-
-([HorizontalPodScalerScaleReporter](#horizontal-pod-scaler-scale-reporter))
-
-</dd>
-</dl>
-
-### HorizontalPodScalerScaleActuator {#horizontal-pod-scaler-scale-actuator}
-
-#### Properties
-
-<dl>
-<dt>default_config</dt>
-<dd>
-
-([HorizontalPodScalerScaleActuatorDynamicConfig](#horizontal-pod-scaler-scale-actuator-dynamic-config)) Default configuration.
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-(string) Configuration key for DynamicConfig
-
-</dd>
-<dt>in_ports</dt>
-<dd>
-
-([HorizontalPodScalerScaleActuatorIns](#horizontal-pod-scaler-scale-actuator-ins))
-
-</dd>
-</dl>
-
-### HorizontalPodScalerScaleActuatorDynamicConfig {#horizontal-pod-scaler-scale-actuator-dynamic-config}
-
-Dynamic Configuration for ScaleActuator
-
-#### Properties
-
-<dl>
-<dt>dry_run</dt>
-<dd>
-
-(bool) Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
-Useful for observing the behavior of Scaler without disrupting any real traffic.
-
-@gotags: default:"false"
-
-</dd>
-</dl>
-
-### HorizontalPodScalerScaleActuatorIns {#horizontal-pod-scaler-scale-actuator-ins}
-
-Inputs for the HorizontalPodScaler component.
-
-#### Properties
-
-<dl>
-<dt>desired_replicas</dt>
-<dd>
-
-([InPort](#in-port))
-
-</dd>
-</dl>
-
-### HorizontalPodScalerScaleReporter {#horizontal-pod-scaler-scale-reporter}
-
-#### Properties
-
-<dl>
-<dt>out_ports</dt>
-<dd>
-
-([HorizontalPodScalerScaleReporterOuts](#horizontal-pod-scaler-scale-reporter-outs))
-
-</dd>
-</dl>
-
-### HorizontalPodScalerScaleReporterOuts {#horizontal-pod-scaler-scale-reporter-outs}
-
-Outputs for the HorizontalPodScaler component.
-
-#### Properties
-
-<dl>
-<dt>actual_replicas</dt>
-<dd>
-
-([OutPort](#out-port))
-
-</dd>
-<dt>configured_replicas</dt>
-<dd>
-
-([OutPort](#out-port))
-
-</dd>
-</dl>
-
 ### InPort {#in-port}
 
 Components receive input from other components via InPorts
@@ -2902,6 +2785,125 @@ Example:
 </dd>
 </dl>
 
+### PodScaler {#pod-scaler}
+
+#### Properties
+
+<dl>
+<dt>kubernetes_object_selector</dt>
+<dd>
+
+([KubernetesObjectSelector](#kubernetes-object-selector), `required`) The Kubernetes object on which horizontal scaling is applied.
+
+@gotags: validate:"required"
+
+</dd>
+<dt>scale_actuator</dt>
+<dd>
+
+([PodScalerScaleActuator](#pod-scaler-scale-actuator))
+
+</dd>
+<dt>scale_reporter</dt>
+<dd>
+
+([PodScalerScaleReporter](#pod-scaler-scale-reporter))
+
+</dd>
+</dl>
+
+### PodScalerScaleActuator {#pod-scaler-scale-actuator}
+
+#### Properties
+
+<dl>
+<dt>default_config</dt>
+<dd>
+
+([PodScalerScaleActuatorDynamicConfig](#pod-scaler-scale-actuator-dynamic-config)) Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+([PodScalerScaleActuatorIns](#pod-scaler-scale-actuator-ins))
+
+</dd>
+</dl>
+
+### PodScalerScaleActuatorDynamicConfig {#pod-scaler-scale-actuator-dynamic-config}
+
+Dynamic Configuration for ScaleActuator
+
+#### Properties
+
+<dl>
+<dt>dry_run</dt>
+<dd>
+
+(bool) Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+Useful for observing the behavior of Scaler without disrupting any real traffic.
+
+@gotags: default:"false"
+
+</dd>
+</dl>
+
+### PodScalerScaleActuatorIns {#pod-scaler-scale-actuator-ins}
+
+Inputs for the PodScaler component.
+
+#### Properties
+
+<dl>
+<dt>desired_replicas</dt>
+<dd>
+
+([InPort](#in-port))
+
+</dd>
+</dl>
+
+### PodScalerScaleReporter {#pod-scaler-scale-reporter}
+
+#### Properties
+
+<dl>
+<dt>out_ports</dt>
+<dd>
+
+([PodScalerScaleReporterOuts](#pod-scaler-scale-reporter-outs))
+
+</dd>
+</dl>
+
+### PodScalerScaleReporterOuts {#pod-scaler-scale-reporter-outs}
+
+Outputs for the PodScaler component.
+
+#### Properties
+
+<dl>
+<dt>actual_replicas</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+<dt>configured_replicas</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+</dl>
+
 ### Policy {#policy}
 
 Policy expresses reliability automation workflow that automatically protects services
@@ -3730,10 +3732,10 @@ Outputs for the Sqrt component.
 
 ### Switcher {#switcher}
 
-Type of combinator that switches between `on_true` and `on_false` signals based on switch input
+Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input
 
-`on_true` will be returned if switch input is valid and not equal to 0.0 ,
-otherwise `on_false` will be returned.
+`on_signal` will be returned if switch input is valid and not equal to 0.0 ,
+otherwise `off_signal` will be returned.
 
 #### Properties
 
@@ -3759,13 +3761,13 @@ Inputs for the Switcher component.
 #### Properties
 
 <dl>
-<dt>on_false</dt>
+<dt>off_signal</dt>
 <dd>
 
 ([InPort](#in-port)) Output signal when switch is invalid or 0.0.
 
 </dd>
-<dt>on_true</dt>
+<dt>on_signal</dt>
 <dd>
 
 ([InPort](#in-port)) Output signal when switch is valid and not 0.0.
@@ -3774,7 +3776,7 @@ Inputs for the Switcher component.
 <dt>switch</dt>
 <dd>
 
-([InPort](#in-port)) Decides whether to return on_true or on_false.
+([InPort](#in-port)) Decides whether to return `on_signal` or `off_signal`.
 
 </dd>
 </dl>
@@ -3789,7 +3791,7 @@ Outputs for the Switcher component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) Selected signal (on_true or on_false).
+([OutPort](#out-port)) Selected signal (`on_signal` or `off_signal`).
 
 </dd>
 </dl>

@@ -251,9 +251,12 @@ definitions:
     AutoScale:
         description: AutoScale components are used to scale a service.
         properties:
-            horizontal_pod_scaler:
-                $ref: '#/definitions/HorizontalPodScaler'
-                description: HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+            pod_scaler:
+                $ref: '#/definitions/PodScaler'
+                description: |-
+                    PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+
+                    GradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.
         type: object
     CheckResponse:
         description: CheckResponse contains fields that represent decision made by Check call.
@@ -1506,62 +1509,6 @@ definitions:
             output:
                 $ref: '#/definitions/OutPort'
         type: object
-    HorizontalPodScaler:
-        properties:
-            kubernetes_object_selector:
-                $ref: '#/definitions/KubernetesObjectSelector'
-                description: |-
-                    The Kubernetes object on which horizontal scaling is applied.
-
-                    @gotags: validate:"required"
-                x-go-validate: required
-            scale_actuator:
-                $ref: '#/definitions/HorizontalPodScalerScaleActuator'
-            scale_reporter:
-                $ref: '#/definitions/HorizontalPodScalerScaleReporter'
-        type: object
-    HorizontalPodScalerScaleActuator:
-        properties:
-            default_config:
-                $ref: '#/definitions/HorizontalPodScalerScaleActuatorDynamicConfig'
-                description: Default configuration.
-            dynamic_config_key:
-                title: Configuration key for DynamicConfig
-                type: string
-            in_ports:
-                $ref: '#/definitions/HorizontalPodScalerScaleActuatorIns'
-        type: object
-    HorizontalPodScalerScaleActuatorDynamicConfig:
-        properties:
-            dry_run:
-                description: |-
-                    Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
-                    Useful for observing the behavior of Scaler without disrupting any real traffic.
-
-                    @gotags: default:"false"
-                type: boolean
-                x-go-default: false
-        title: Dynamic Configuration for ScaleActuator
-        type: object
-    HorizontalPodScalerScaleActuatorIns:
-        description: Inputs for the HorizontalPodScaler component.
-        properties:
-            desired_replicas:
-                $ref: '#/definitions/InPort'
-        type: object
-    HorizontalPodScalerScaleReporter:
-        properties:
-            out_ports:
-                $ref: '#/definitions/HorizontalPodScalerScaleReporterOuts'
-        type: object
-    HorizontalPodScalerScaleReporterOuts:
-        description: Outputs for the HorizontalPodScaler component.
-        properties:
-            actual_replicas:
-                $ref: '#/definitions/OutPort'
-            configured_replicas:
-                $ref: '#/definitions/OutPort'
-        type: object
     HostInfo:
         properties:
             hostname:
@@ -2226,6 +2173,62 @@ definitions:
                 type: object
             self_peer:
                 $ref: '#/definitions/Peer'
+        type: object
+    PodScaler:
+        properties:
+            kubernetes_object_selector:
+                $ref: '#/definitions/KubernetesObjectSelector'
+                description: |-
+                    The Kubernetes object on which horizontal scaling is applied.
+
+                    @gotags: validate:"required"
+                x-go-validate: required
+            scale_actuator:
+                $ref: '#/definitions/PodScalerScaleActuator'
+            scale_reporter:
+                $ref: '#/definitions/PodScalerScaleReporter'
+        type: object
+    PodScalerScaleActuator:
+        properties:
+            default_config:
+                $ref: '#/definitions/PodScalerScaleActuatorDynamicConfig'
+                description: Default configuration.
+            dynamic_config_key:
+                title: Configuration key for DynamicConfig
+                type: string
+            in_ports:
+                $ref: '#/definitions/PodScalerScaleActuatorIns'
+        type: object
+    PodScalerScaleActuatorDynamicConfig:
+        properties:
+            dry_run:
+                description: |-
+                    Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+                    Useful for observing the behavior of Scaler without disrupting any real traffic.
+
+                    @gotags: default:"false"
+                type: boolean
+                x-go-default: false
+        title: Dynamic Configuration for ScaleActuator
+        type: object
+    PodScalerScaleActuatorIns:
+        description: Inputs for the PodScaler component.
+        properties:
+            desired_replicas:
+                $ref: '#/definitions/InPort'
+        type: object
+    PodScalerScaleReporter:
+        properties:
+            out_ports:
+                $ref: '#/definitions/PodScalerScaleReporterOuts'
+        type: object
+    PodScalerScaleReporterOuts:
+        description: Outputs for the PodScaler component.
+        properties:
+            actual_replicas:
+                $ref: '#/definitions/OutPort'
+            configured_replicas:
+                $ref: '#/definitions/OutPort'
         type: object
     Policies:
         properties:
@@ -3025,8 +3028,8 @@ definitions:
         type: object
     Switcher:
         description: |-
-            `on_true` will be returned if switch input is valid and not equal to 0.0 ,
-             otherwise `on_false` will be returned.
+            `on_signal` will be returned if switch input is valid and not equal to 0.0 ,
+             otherwise `off_signal` will be returned.
         properties:
             in_ports:
                 $ref: '#/definitions/SwitcherIns'
@@ -3034,27 +3037,27 @@ definitions:
             out_ports:
                 $ref: '#/definitions/SwitcherOuts'
                 description: Output ports for the Switcher component.
-        title: Type of combinator that switches between `on_true` and `on_false` signals based on switch input
+        title: Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input
         type: object
     SwitcherIns:
         description: Inputs for the Switcher component.
         properties:
-            on_false:
+            off_signal:
                 $ref: '#/definitions/InPort'
                 description: Output signal when switch is invalid or 0.0.
-            on_true:
+            on_signal:
                 $ref: '#/definitions/InPort'
                 description: Output signal when switch is valid and not 0.0.
             switch:
                 $ref: '#/definitions/InPort'
-                description: Decides whether to return on_true or on_false.
+                description: Decides whether to return `on_signal` or `off_signal`.
         type: object
     SwitcherOuts:
         description: Outputs for the Switcher component.
         properties:
             output:
                 $ref: '#/definitions/OutPort'
-                description: Selected signal (on_true or on_false).
+                description: Selected signal (`on_signal` or `off_signal`).
         type: object
     Variable:
         description: Component that emits a variable value as an output signal, can be defined in dynamic configuration.

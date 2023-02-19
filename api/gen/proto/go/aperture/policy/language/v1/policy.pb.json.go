@@ -1352,7 +1352,7 @@ func (msg *Differentiator_Outs) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *HorizontalPodScaler) MarshalJSON() ([]byte, error) {
+func (msg *PodScaler) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -1361,14 +1361,14 @@ func (msg *HorizontalPodScaler) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *HorizontalPodScaler) UnmarshalJSON(b []byte) error {
+func (msg *PodScaler) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *HorizontalPodScaler_ScaleReporter) MarshalJSON() ([]byte, error) {
+func (msg *PodScaler_ScaleReporter) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -1377,14 +1377,14 @@ func (msg *HorizontalPodScaler_ScaleReporter) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *HorizontalPodScaler_ScaleReporter) UnmarshalJSON(b []byte) error {
+func (msg *PodScaler_ScaleReporter) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *HorizontalPodScaler_ScaleReporter_Outs) MarshalJSON() ([]byte, error) {
+func (msg *PodScaler_ScaleReporter_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -1393,14 +1393,14 @@ func (msg *HorizontalPodScaler_ScaleReporter_Outs) MarshalJSON() ([]byte, error)
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *HorizontalPodScaler_ScaleReporter_Outs) UnmarshalJSON(b []byte) error {
+func (msg *PodScaler_ScaleReporter_Outs) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *HorizontalPodScaler_ScaleActuator) MarshalJSON() ([]byte, error) {
+func (msg *PodScaler_ScaleActuator) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -1409,14 +1409,14 @@ func (msg *HorizontalPodScaler_ScaleActuator) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *HorizontalPodScaler_ScaleActuator) UnmarshalJSON(b []byte) error {
+func (msg *PodScaler_ScaleActuator) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *HorizontalPodScaler_ScaleActuator_DynamicConfig) MarshalJSON() ([]byte, error) {
+func (msg *PodScaler_ScaleActuator_DynamicConfig) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -1425,14 +1425,14 @@ func (msg *HorizontalPodScaler_ScaleActuator_DynamicConfig) MarshalJSON() ([]byt
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *HorizontalPodScaler_ScaleActuator_DynamicConfig) UnmarshalJSON(b []byte) error {
+func (msg *PodScaler_ScaleActuator_DynamicConfig) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *HorizontalPodScaler_ScaleActuator_Ins) MarshalJSON() ([]byte, error) {
+func (msg *PodScaler_ScaleActuator_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -1441,7 +1441,7 @@ func (msg *HorizontalPodScaler_ScaleActuator_Ins) MarshalJSON() ([]byte, error) 
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *HorizontalPodScaler_ScaleActuator_Ins) UnmarshalJSON(b []byte) error {
+func (msg *PodScaler_ScaleActuator_Ins) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

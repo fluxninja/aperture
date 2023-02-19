@@ -262,8 +262,9 @@ message FlowControl {
 // AutoScale components are used to scale a service.
 message AutoScale {
   oneof component {
-    // HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
-    HorizontalPodScaler horizontal_pod_scaler = 1;
+    // PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+    PodScaler pod_scaler = 1;
+    // GradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.
   }
 }
 
@@ -661,26 +662,26 @@ message Decider {
   }]; // @gotags: default:"0s"
 }
 
-// Type of combinator that switches between `on_true` and `on_false` signals based on switch input
+// Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input
 //
-// `on_true` will be returned if switch input is valid and not equal to 0.0 ,
-//  otherwise `on_false` will be returned.
+// `on_signal` will be returned if switch input is valid and not equal to 0.0 ,
+//  otherwise `off_signal` will be returned.
 message Switcher {
   // Inputs for the Switcher component.
   message Ins {
     // Output signal when switch is valid and not 0.0.
-    InPort on_true = 1;
+    InPort on_signal = 1;
 
     // Output signal when switch is invalid or 0.0.
-    InPort on_false = 2;
+    InPort off_signal = 2;
 
-    // Decides whether to return on_true or on_false.
+    // Decides whether to return `on_signal` or `off_signal`.
     InPort switch = 3;
   }
 
   // Outputs for the Switcher component.
   message Outs {
-    // Selected signal (on_true or on_false).
+    // Selected signal (`on_signal` or `off_signal`).
     OutPort output = 1;
   }
 
@@ -1485,9 +1486,9 @@ message Differentiator {
   }]; // @gotags: default:"5s"
 }
 
-message HorizontalPodScaler {
+message PodScaler {
   message ScaleReporter {
-    // Outputs for the HorizontalPodScaler component.
+    // Outputs for the PodScaler component.
     message Outs {
       OutPort actual_replicas = 1;
       OutPort configured_replicas = 2;
@@ -1509,7 +1510,7 @@ message HorizontalPodScaler {
       }]; // @gotags: default:"false"
     }
 
-    // Inputs for the HorizontalPodScaler component.
+    // Inputs for the PodScaler component.
     message Ins {
       InPort desired_replicas = 1;
     }
