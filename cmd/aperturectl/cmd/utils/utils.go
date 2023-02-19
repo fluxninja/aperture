@@ -242,7 +242,7 @@ func ValidateWithJSONSchema(rootSchema string, schemas []string, documentFile st
 		return err
 	}
 	if !result.Valid() {
-		merr := fmt.Errorf("the document is not valid")
+		merr := fmt.Errorf("the document %s is not valid", documentFile)
 		for _, desc := range result.Errors() {
 			errorMessage := fmt.Sprintf("- %s", desc)
 			merr = multierror.Append(merr, errors.New(errorMessage))
