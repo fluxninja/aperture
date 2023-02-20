@@ -7,13 +7,24 @@ commit_author=$(git show --format="%aN <%aE>" --quiet)
 
 args=(
     --author "${commit_author}"
-    --update "${UPDATE}"
-    --release-train "latest"
-    --push
+    --release-train "${RELEASE_TRAIN:-latest}"
 )
 
-if [ -n "${COMPONENT}" ]; then
+if [ -n "${COMPONENT:-}" ]; then
     args+=(--component "${COMPONENT}")
+fi
+
+if [ -n "${SKIP_COMPONENT:-}" ]; then
+    args+=(--skip-component "${SKIP_COMPONENT}")
+fi
+
+if [[ "${UPDATE:-}" == *","* ]]; then
+    IFS=',' read -r -a updates <<< "${UPDATE}"
+    for update in "${updates[@]}"; do
+        args+=(--update "${update}")
+    done
+elif [ -n "${UPDATE:-}" ]; then
+    args+=(--update "${UPDATE}")
 fi
 
 retry_counter=10
