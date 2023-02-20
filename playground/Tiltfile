@@ -1108,7 +1108,7 @@ if not scenario:
 process_aperture_scenario(scenario)
 to_run = ["agent", "controller", "aperture-grafana", "istio", "scenario-app", "scenario-wavepool"]
 # Not all scenarios have policies, so only load policies if they were generated based on the scenario.
-if "scenario-polcies" in DEP_TREE[APERTURE_DEMOAPP_NS]:
+if "scenario-policies" in DEP_TREE[APERTURE_DEMOAPP_NS]:
     to_run += ["scenario-policies"]
 
 cfg_trace = cfg.get("trace", os.getenv("NINJA_TILT_TRACE", "false"))

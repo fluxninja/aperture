@@ -3,7 +3,6 @@
 # A simple wrapper over `jb install` that installs libsonnet and blueprints under
 # expected paths. This is a workaround for https://github.com/jsonnet-bundler/jsonnet-bundler/issues/70
 set -euo pipefail
-set -x
 
 BASE_DIR=$1
 
@@ -33,9 +32,9 @@ symlink_directory() {
 symlink_directory blueprints
 
 if [ -f "${BASE_DIR}/chartfile.yaml" ]; then
-    pushd "${BASE_DIR}"
+    pushd "${BASE_DIR}" > /dev/null
     tk tool charts vendor
-    popd
+    popd > /dev/null
 fi
 
 
@@ -49,9 +48,9 @@ for path in "${CHARTS_DIR}"/*; do
     if [ ! -d "$path" ]; then
         continue
     fi
-    pushd "$path"
+    pushd "$path" > /dev/null
     if helm dependency list | grep -q missing$; then
         helm dependency build
     fi
-    popd
+    popd > /dev/null
 done
