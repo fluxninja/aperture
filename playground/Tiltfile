@@ -487,6 +487,22 @@ def render_tanka(environment, env_vars, base_dir, namespace):
     wrapped_k8s_yaml(rendered)
 
 
+def render_aperturectl(scenario_path, policies, namespace):
+    aperturectl_bin = str(local(command=["./scripts/build_aperturectl.sh"], quiet=True))
+
+    blueprints_uri = os.path.join(GIT_ROOT, "blueprints")
+    base_dir = os.path.join(GIT_ROOT, "playground")
+    for policy in policies:
+        policy_def = policy["policy_def"]
+        policy_name = policy["policy_name"]
+        values_file = os.path.join(scenario_path, policy["values_file"])
+        rendered = local(command=["./scripts/render-policy.sh", base_dir, aperturectl_bin, blueprints_uri,
+                                  policy_def, policy_name, values_file], quiet=True)
+
+        if namespace:
+            rendered = namespace_inject(rendered, namespace)
+        wrapped_k8s_yaml(rendered)
+
 
 def print_available_resources(dep_tree):
     print("Following resources are available:")
@@ -743,6 +759,7 @@ def render_jsonnet(manifests_path, jsonnet_args, namespace):
         rendered = namespace_inject(rendered, namespace)
     wrapped_k8s_yaml(rendered)
 
+
 def process_aperture_scenario(scenario_path):
     # If this is a relative path, it's relative to Tiltfile (PLAYGROUND_ROOT_PATH)
     if scenario_path[0] != "/":
@@ -770,23 +787,26 @@ def process_aperture_scenario(scenario_path):
         DEP_TREE[APERTURE_DEMOAPP_NS] = {}
     DEP_TREE[APERTURE_DEMOAPP_NS]["scenario-app"] = app_manifest
 
-    policies = {
-        "renderer": "jsonnet",
-        "namespace": APERTURE_CONTROLLER_NS,
-        "jsonnet_args": ["--yaml-stream"],
-        "labels": "TestScenarioApplication",
-        "manifests_path": scenario_path + "/" + "policies/policy.jsonnet",
-        "resource_deps": ["scenario-app"],
-        "child_resources": [
-            {
-                "new_name": "scenario-policy",
-                "extra_objects": [
-                    (None, "Policy", None)
-                ]
-            }
-        ]
-    }
-    DEP_TREE[APERTURE_DEMOAPP_NS]["scenario-policies"] = policies
+    aperture_policies = app_manifest.pop("aperture_policies", [])
+
+    if aperture_policies:
+        policies = {
+            "renderer": "aperturectl",
+            "namespace": APERTURE_CONTROLLER_NS,
+            "labels": "TestScenarioApplication",
+            "scenario_path": scenario_path,
+            "aperture_policies": aperture_policies,
+            "resource_deps": ["scenario-app"],
+            "child_resources": [
+                {
+                    "new_name": "scenario-policies",
+                    "extra_objects": [
+                        (None, "Policy", APERTURE_CONTROLLER_NS)
+                    ]
+                }
+            ]
+        }
+        DEP_TREE[APERTURE_DEMOAPP_NS]["scenario-policies"] = policies
 
     # Load k6 configuration and process it for inclusion into a yaml file
     wavepool_js = str(read_file(scenario_path + "/" + "load_generator/test.js"))
@@ -921,6 +941,11 @@ def declare_resources(resources, dep_tree, inv_dep_tree,race_arg):
                 namespace = app_config.get("namespace", None)
                 jsonnet_args = app_config.get("jsonnet_args", [])
                 render_jsonnet(manifests_path, jsonnet_args, namespace)
+            elif renderer == "aperturectl":
+                scenario_path = app_config.get("scenario_path")
+                namespace = app_config.get("namespace", None)
+                policies = app_config.get("aperture_policies", None)
+                render_aperturectl(scenario_path, policies, namespace)
             else:
                 fail("Tanka app is not found for %s." % app)
 
