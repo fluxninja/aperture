@@ -211,13 +211,18 @@ func ValidateWithJSONSchema(rootSchema string, schemas []string, documentFile st
 	// check whether schemas exist
 	for _, schema := range schemas {
 		if _, err := os.Stat(schema); os.IsNotExist(err) {
-			log.Warn().Msgf("Schema %s does not exist", schema)
+			log.Warn().Msgf("Schema %s does not exist. Skipping validation", schema)
 			return nil
 		}
 		err := schemaLoader.AddSchemas(gojsonschema.NewReferenceLoader("file://" + schema))
 		if err != nil {
 			return err
 		}
+	}
+
+	if _, err := os.Stat(rootSchema); os.IsNotExist(err) {
+		log.Warn().Msgf("Schema %s does not exist. Skipping validation", rootSchema)
+		return nil
 	}
 
 	schema, err := schemaLoader.Compile(gojsonschema.NewReferenceLoader("file://" + rootSchema))
