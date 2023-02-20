@@ -238,7 +238,7 @@ jobs:
             MANIFESTS_REPO: << parameters.manifests-repo >>
             COMPONENT: << parameters.component >>
             ENVIRONMENT_PATH: << parameters.environment-path >>
-            SKIP_COMPONENTS: << parameters.skip-component >>
+            SKIP_COMPONENT: << parameters.skip-component >>
             RELEASE_TRAIN: << parameters.release-train >>
           command: .circleci/scripts/update_environment.sh
       - asdf_save_cache:
