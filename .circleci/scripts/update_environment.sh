@@ -8,6 +8,7 @@ commit_author=$(git show --format="%aN <%aE>" --quiet)
 args=(
     --author "${commit_author}"
     --release-train "${RELEASE_TRAIN:-latest}"
+    --push
 )
 
 if [ -n "${COMPONENT:-}" ]; then
