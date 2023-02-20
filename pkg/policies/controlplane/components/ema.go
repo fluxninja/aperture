@@ -185,13 +185,13 @@ func (ema *EMA) applyCorrection(output, minEnvelope, maxEnvelope runtime.Reading
 	value := output.Value()
 	minxMaxConstraints := constraints.NewMinMaxConstraints()
 	if maxEnvelope.Valid() {
-		maxErr := minxMaxConstraints.SetMax(maxEnvelope.Value())
+		maxErr := minxMaxConstraints.AdjustMax(maxEnvelope.Value())
 		if maxErr != nil {
 			return runtime.InvalidReading(), maxErr
 		}
 	}
 	if minEnvelope.Valid() {
-		minErr := minxMaxConstraints.SetMin(minEnvelope.Value())
+		minErr := minxMaxConstraints.AdjustMin(minEnvelope.Value())
 		if minErr != nil {
 			return runtime.InvalidReading(), minErr
 		}

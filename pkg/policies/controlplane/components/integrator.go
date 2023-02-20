@@ -15,8 +15,8 @@ import (
 
 // Integrator is a component that accumulates sum of signal every tick.
 type Integrator struct {
-	sum    float64
 	minMax *constraints.MinMaxConstraints
+	sum    float64
 }
 
 // Name implements runtime.Component.
@@ -27,7 +27,7 @@ func (*Integrator) Type() runtime.ComponentType { return runtime.ComponentTypeSi
 
 // ShortDescription implements runtime.Component.
 func (in *Integrator) ShortDescription() string {
-	return fmt.Sprintf("min: %f, max: %f", in.minMax.Min, in.minMax.Max)
+	return fmt.Sprintf("min: %f, max: %f", in.minMax.GetMin(), in.minMax.GetMax())
 }
 
 // NewIntegrator creates an integrator component.
@@ -50,16 +50,33 @@ func (in *Integrator) Execute(inPortReadings runtime.PortToReading, tickInfo run
 	resetVal := inPortReadings.ReadSingleReadingPort("reset")
 	if resetVal.Valid() && resetVal.Value() != 0 {
 		in.sum = 0
+		// reset existing min/max constraints
+		in.minMax.Reset()
 	} else if inputVal.Valid() {
 
 		in.sum += inputVal.Value()
 
 		maxVal := inPortReadings.ReadSingleReadingPort("max")
+		minVal := inPortReadings.ReadSingleReadingPort("min")
+
 		if maxVal.Valid() {
-			in.minMax.Max = maxVal.Value()
-			in.minMax.Min = 0
-			in.sum, _ = in.minMax.Constrain(in.sum)
+			err := in.minMax.AdjustMax(maxVal.Value())
+			if err != nil {
+				return runtime.PortToReading{
+					"output": []runtime.Reading{runtime.InvalidReading()},
+				}, err
+			}
 		}
+		if minVal.Valid() {
+			err := in.minMax.AdjustMin(minVal.Value())
+			if err != nil {
+				return runtime.PortToReading{
+					"output": []runtime.Reading{runtime.InvalidReading()},
+				}, err
+			}
+		}
+
+		in.sum, _ = in.minMax.Constrain(in.sum)
 	}
 
 	return runtime.PortToReading{

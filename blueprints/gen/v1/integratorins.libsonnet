@@ -13,6 +13,12 @@
   withMaxMixin(max):: {
     max+: max,
   },
+  withMin(min):: {
+    min: min,
+  },
+  withMinMixin(min):: {
+    min+: min,
+  },
   withReset(reset):: {
     reset: reset,
   },

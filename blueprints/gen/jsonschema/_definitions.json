@@ -1299,13 +1299,18 @@
           "$ref": "#/definitions/InPort"
         },
         "max": {
-          "description": "The maximum output when reset is not set.",
+          "description": "The maximum output. Max is stored in the integrator state and is maintained as the lowest max value seen.",
           "x-order": 1,
           "$ref": "#/definitions/InPort"
         },
-        "reset": {
-          "description": "Resets the integrator output to zero when reset signal is valid and non-zero.",
+        "min": {
+          "description": "The minimum output. Min is stored in the integrator state and is maintained as the highest min value seen.",
           "x-order": 2,
+          "$ref": "#/definitions/InPort"
+        },
+        "reset": {
+          "description": "Resets the integrator output to zero when reset signal is valid and non-zero. Reset also resets the max and min constraints.",
+          "x-order": 3,
           "$ref": "#/definitions/InPort"
         }
       },

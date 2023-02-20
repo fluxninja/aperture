@@ -1441,10 +1441,12 @@ message Integrator {
   message Ins {
     // The input signal.
     InPort input = 1;
-    // Resets the integrator output to zero when reset signal is valid and non-zero.
+    // Resets the integrator output to zero when reset signal is valid and non-zero. Reset also resets the max and min constraints.
     InPort reset = 2;
-    //The maximum output when reset is not set.
+    //The maximum output. Max is stored in the integrator state and is maintained as the lowest max value seen.
     InPort max = 3;
+    //The minimum output. Min is stored in the integrator state and is maintained as the highest min value seen.
+    InPort min = 4;
   }
 
   // Outputs for the Integrator component.

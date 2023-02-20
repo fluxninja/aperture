@@ -124,14 +124,14 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToReading, tic
 	// Constraints
 	minMaxConstraints := constraints.NewMinMaxConstraints()
 	if max.Valid() {
-		// minxMaxConstraints' Max, Min are set as math.MaxFloat64, -math.MaxFloat64 initially; no error.
-		err := minMaxConstraints.SetMax(max.Value())
+		// minMaxConstraints' Max, Min are set as math.MaxFloat64, -math.MaxFloat64 initially; no error.
+		err := minMaxConstraints.AdjustMax(max.Value())
 		if err != nil {
 			return retErr(err)
 		}
 	}
 	if min.Valid() {
-		err := minMaxConstraints.SetMin(min.Value())
+		err := minMaxConstraints.AdjustMin(min.Value())
 		if err != nil {
 			// To make sure min is less than max; otherwise, emits invalid signal.
 			return retErr(err)

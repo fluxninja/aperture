@@ -2009,13 +2009,19 @@ Inputs for the Integrator component.
 <dt>max</dt>
 <dd>
 
-([InPort](#in-port)) The maximum output when reset is not set.
+([InPort](#in-port)) The maximum output. Max is stored in the integrator state and is maintained as the lowest max value seen.
+
+</dd>
+<dt>min</dt>
+<dd>
+
+([InPort](#in-port)) The minimum output. Min is stored in the integrator state and is maintained as the highest min value seen.
 
 </dd>
 <dt>reset</dt>
 <dd>
 
-([InPort](#in-port)) Resets the integrator output to zero when reset signal is valid and non-zero.
+([InPort](#in-port)) Resets the integrator output to zero when reset signal is valid and non-zero. Reset also resets the max and min constraints.
 
 </dd>
 </dl>
