@@ -55,7 +55,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - gradle-v1-{{ checksum <<parameters.path>>/"build.gradle.kts" }}
+            - gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
             - gradle-v1-
       # See https://discuss.circleci.com/t/gpg-keys-as-environment-variables/28641
       - run:
@@ -66,7 +66,7 @@ jobs:
       - save_cache:
           paths:
             - ~/.gradle
-          key: gradle-v1-{{ checksum <<parameters.path>>/"build.gradle.kts" }}
+          key: gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
 
   tag-github-repository:
     executor: base-cimg-executor
@@ -224,6 +224,10 @@ jobs:
             - "10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8" #cloud keys
       - checkout
       - gcp-gcr/gcr-auth
+      - asdf_install:
+          cache_name: update-environment
+          tools:
+            python
       - opsninja_install
       - run:
           name: Update application in the deployment
@@ -237,6 +241,8 @@ jobs:
             SKIP_COMPONENTS: << parameters.skip-component >>
             RELEASE_TRAIN: << parameters.release-train >>
           command: .circleci/scripts/update_environment.sh
+      - asdf_save_cache:
+          cache_name: update-environment
 
 workflows:
   version: 2
@@ -286,7 +292,7 @@ workflows:
           environment-path: environments/demo/
           skip-component: demo-app
           update: everything
-          release-train: final-release
+          release-train: pre-release
 
       - update-environment:
           filters:
