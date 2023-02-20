@@ -1296,7 +1296,7 @@ func (x *GradientController) GetDefaultConfig() *GradientController_DynamicConfi
 //
 // At any time EMA component operates in one of the following states:
 // 1. Warm up state: The first warmup_window samples are used to compute the initial EMA.
-//    If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
+//    If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of warm up state.
 // 2. Normal state: The EMA is computed using following formula.
 //
 // The EMA for a series $Y$ is calculated recursively as:
@@ -1316,8 +1316,6 @@ func (x *GradientController) GetDefaultConfig() *GradientController_DynamicConfi
 // $$
 // \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
 // $$
-//
-// The EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#e-m-a-ins).
 type EMA struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3692,8 +3690,8 @@ type EMA_Ins struct {
 	Input *InPort `protobuf:"bytes,1,opt,name=input,proto3" json:"input,omitempty"`
 	// Upper bound of the moving average.
 	//
-	// Used during the warm-up stage: if the signal would exceed `max_envelope`
-	// it's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.
+	// When the signal exceeds `max_envelope` it's multiplied by
+	// `correction_factor_on_max_envelope_violation` **once per tick**.
 	//
 	// :::note
 	//
@@ -3702,15 +3700,10 @@ type EMA_Ins struct {
 	//
 	// :::
 	//
-	// :::note
-	//
-	// The envelope logic is **not** used outside the warm-up stage!
-	//
-	// :::
 	MaxEnvelope *InPort `protobuf:"bytes,2,opt,name=max_envelope,json=maxEnvelope,proto3" json:"max_envelope,omitempty"`
 	// Lower bound of the moving average.
 	//
-	// Used during the warm-up stage analogously to `max_envelope`.
+	// Behavior is similar to `max_envelope`.
 	MinEnvelope *InPort `protobuf:"bytes,3,opt,name=min_envelope,json=minEnvelope,proto3" json:"min_envelope,omitempty"`
 }
 
@@ -3826,13 +3819,13 @@ type EMA_Parameters struct {
 	EmaWindow *durationpb.Duration `protobuf:"bytes,1,opt,name=ema_window,json=emaWindow,proto3" json:"ema_window,omitempty" default:"5s"` // @gotags: default:"5s"
 	// Duration of EMA warming up window.
 	//
-	// The initial value of the EMA is the average of signal readings received during the warm-up window.
+	// The initial value of the EMA is the average of signal readings received during the warm up window.
 	WarmupWindow *durationpb.Duration `protobuf:"bytes,2,opt,name=warmup_window,json=warmupWindow,proto3" json:"warmup_window,omitempty" default:"0s"` // @gotags: default:"0s"
 	// Correction factor to apply on the output value if its in violation of the min envelope.
 	CorrectionFactorOnMinEnvelopeViolation float64 `protobuf:"fixed64,3,opt,name=correction_factor_on_min_envelope_violation,json=correctionFactorOnMinEnvelopeViolation,proto3" json:"correction_factor_on_min_envelope_violation,omitempty" validate:"gte=1.0" default:"1.0"` // @gotags: validate:"gte=1.0" default:"1.0"
 	// Correction factor to apply on the output value if its in violation of the max envelope.
 	CorrectionFactorOnMaxEnvelopeViolation float64 `protobuf:"fixed64,4,opt,name=correction_factor_on_max_envelope_violation,json=correctionFactorOnMaxEnvelopeViolation,proto3" json:"correction_factor_on_max_envelope_violation,omitempty" validate:"gte=0,lte=1.0" default:"1.0"` // @gotags: validate:"gte=0,lte=1.0" default:"1.0"
-	// Whether the output is valid during the warm-up stage.
+	// Whether the output is valid during the warm up stage.
 	ValidDuringWarmup bool `protobuf:"varint,5,opt,name=valid_during_warmup,json=validDuringWarmup,proto3" json:"valid_during_warmup,omitempty" default:"false"` // @gotags: default:"false"
 }
 
