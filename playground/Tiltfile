@@ -1105,8 +1105,11 @@ scenario = cfg.get("scenario", None)
 if not scenario:
     scenario = DEFAULT_TEST_SCENARIO
 
-to_run = ["agent", "controller", "aperture-grafana", "istio", "scenario-app", "scenario-policies", "scenario-wavepool"]
 process_aperture_scenario(scenario)
+to_run = ["agent", "controller", "aperture-grafana", "istio", "scenario-app", "scenario-wavepool"]
+# Not all scenarios have policies, so only load policies if they were generated based on the scenario.
+if "scenario-polcies" in DEP_TREE[APERTURE_DEMOAPP_NS]:
+    to_run += ["scenario-policies"]
 
 cfg_trace = cfg.get("trace", os.getenv("NINJA_TILT_TRACE", "false"))
 TRACE = cfg_trace == True
