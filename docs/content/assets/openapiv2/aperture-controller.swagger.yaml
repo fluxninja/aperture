@@ -127,10 +127,10 @@ definitions:
         description: |-
           Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
 
-          @gotags: default:"0.01"
+          @gotags: default:"0.0025"
         type: number
         format: double
-        x-go-default: 0.01
+        x-go-default: 0.0025
       max_load_multiplier:
         description: |-
           Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
@@ -353,10 +353,12 @@ definitions:
     description: AutoScale components are used to scale a service.
     type: object
     properties:
-      horizontal_pod_scaler:
-        description: HorizontalPodScaler provides pod horizontal scaling functionality
-          for scalable Kubernetes resources.
-        $ref: '#/definitions/HorizontalPodScaler'
+      pod_scaler:
+        description: |-
+          PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+
+          GradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.
+        $ref: '#/definitions/PodScaler'
   Circuit:
     description: |-
       :::info
@@ -732,7 +734,7 @@ definitions:
     description: |-
       At any time EMA component operates in one of the following states:
       1. Warm up state: The first warmup_window samples are used to compute the initial EMA.
-         If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
+         If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of warm up state.
       2. Normal state: The EMA is computed using following formula.
 
       The EMA for a series $Y$ is calculated recursively as:
@@ -752,8 +754,6 @@ definitions:
       $$
       \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
       $$
-
-      The EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#e-m-a-ins).
     type: object
     title: Exponential Moving Average (EMA) is a type of moving average that applies
       exponentially more weight to recent signal readings
@@ -782,8 +782,8 @@ definitions:
         description: |-
           Upper bound of the moving average.
 
-          Used during the warm-up stage: if the signal would exceed `max_envelope`
-          it's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.
+          When the signal exceeds `max_envelope` it's multiplied by
+          `correction_factor_on_max_envelope_violation` **once per tick**.
 
           :::note
 
@@ -791,18 +791,12 @@ definitions:
           faster, it might end up exceeding the envelope.
 
           :::
-
-          :::note
-
-          The envelope logic is **not** used outside the warm-up stage!
-
-          :::
         $ref: '#/definitions/InPort'
       min_envelope:
         description: |-
           Lower bound of the moving average.
 
-          Used during the warm-up stage analogously to `max_envelope`.
+          Behavior is similar to `max_envelope`.
         $ref: '#/definitions/InPort'
   EMAOuts:
     description: Outputs for the EMA component.
@@ -843,7 +837,7 @@ definitions:
         x-go-default: 5s
       valid_during_warmup:
         description: |-
-          Whether the output is valid during the warm-up stage.
+          Whether the output is valid during the warm up stage.
 
           @gotags: default:"false"
         type: boolean
@@ -852,7 +846,7 @@ definitions:
         description: |-
           Duration of EMA warming up window.
 
-          The initial value of the EMA is the average of signal readings received during the warm-up window.
+          The initial value of the EMA is the average of signal readings received during the warm up window.
 
           @gotags: default:"0s"
         type: string
@@ -1429,62 +1423,6 @@ definitions:
     properties:
       output:
         $ref: '#/definitions/OutPort'
-  HorizontalPodScaler:
-    type: object
-    properties:
-      kubernetes_object_selector:
-        description: |-
-          The Kubernetes object on which horizontal scaling is applied.
-
-          @gotags: validate:"required"
-        x-go-validate: required
-        $ref: '#/definitions/KubernetesObjectSelector'
-      scale_actuator:
-        $ref: '#/definitions/HorizontalPodScalerScaleActuator'
-      scale_reporter:
-        $ref: '#/definitions/HorizontalPodScalerScaleReporter'
-  HorizontalPodScalerScaleActuator:
-    type: object
-    properties:
-      default_config:
-        description: Default configuration.
-        $ref: '#/definitions/HorizontalPodScalerScaleActuatorDynamicConfig'
-      dynamic_config_key:
-        type: string
-        title: Configuration key for DynamicConfig
-      in_ports:
-        $ref: '#/definitions/HorizontalPodScalerScaleActuatorIns'
-  HorizontalPodScalerScaleActuatorDynamicConfig:
-    type: object
-    title: Dynamic Configuration for ScaleActuator
-    properties:
-      dry_run:
-        description: |-
-          Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
-          Useful for observing the behavior of Scaler without disrupting any real traffic.
-
-          @gotags: default:"false"
-        type: boolean
-        x-go-default: false
-  HorizontalPodScalerScaleActuatorIns:
-    description: Inputs for the HorizontalPodScaler component.
-    type: object
-    properties:
-      desired_replicas:
-        $ref: '#/definitions/InPort'
-  HorizontalPodScalerScaleReporter:
-    type: object
-    properties:
-      out_ports:
-        $ref: '#/definitions/HorizontalPodScalerScaleReporterOuts'
-  HorizontalPodScalerScaleReporterOuts:
-    description: Outputs for the HorizontalPodScaler component.
-    type: object
-    properties:
-      actual_replicas:
-        $ref: '#/definitions/OutPort'
-      configured_replicas:
-        $ref: '#/definitions/OutPort'
   HostInfo:
     type: object
     properties:
@@ -1522,14 +1460,14 @@ definitions:
         description: The input signal.
         $ref: '#/definitions/InPort'
       max:
-        description: The maximum output when reset is not set.
+        description: The maximum output.
         $ref: '#/definitions/InPort'
       min:
-        description: The minimum output when reset is not set.
+        description: The minimum output.
         $ref: '#/definitions/InPort'
       reset:
         description: Resets the integrator output to zero when reset signal is valid
-          and non-zero.
+          and non-zero. Reset also resets the max and min constraints.
         $ref: '#/definitions/InPort'
   IntegratorOuts:
     description: Outputs for the Integrator component.
@@ -2023,6 +1961,62 @@ definitions:
         additionalProperties:
           type: string
         x-go-validate: required
+  PodScaler:
+    type: object
+    properties:
+      kubernetes_object_selector:
+        description: |-
+          The Kubernetes object on which horizontal scaling is applied.
+
+          @gotags: validate:"required"
+        x-go-validate: required
+        $ref: '#/definitions/KubernetesObjectSelector'
+      scale_actuator:
+        $ref: '#/definitions/PodScalerScaleActuator'
+      scale_reporter:
+        $ref: '#/definitions/PodScalerScaleReporter'
+  PodScalerScaleActuator:
+    type: object
+    properties:
+      default_config:
+        description: Default configuration.
+        $ref: '#/definitions/PodScalerScaleActuatorDynamicConfig'
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
+      in_ports:
+        $ref: '#/definitions/PodScalerScaleActuatorIns'
+  PodScalerScaleActuatorDynamicConfig:
+    type: object
+    title: Dynamic Configuration for ScaleActuator
+    properties:
+      dry_run:
+        description: |-
+          Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+          Useful for observing the behavior of Scaler without disrupting any real traffic.
+
+          @gotags: default:"false"
+        type: boolean
+        x-go-default: false
+  PodScalerScaleActuatorIns:
+    description: Inputs for the PodScaler component.
+    type: object
+    properties:
+      desired_replicas:
+        $ref: '#/definitions/InPort'
+  PodScalerScaleReporter:
+    type: object
+    properties:
+      out_ports:
+        $ref: '#/definitions/PodScalerScaleReporterOuts'
+  PodScalerScaleReporterOuts:
+    description: Outputs for the PodScaler component.
+    type: object
+    properties:
+      actual_replicas:
+        $ref: '#/definitions/OutPort'
+      configured_replicas:
+        $ref: '#/definitions/OutPort'
   Policies:
     type: object
     properties:
@@ -2477,7 +2471,7 @@ definitions:
         x-go-default: 0.49s
       timeout_factor:
         description: |-
-          If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,
+          If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
           it will be rejected.
 
           This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
@@ -2551,13 +2545,18 @@ definitions:
         type: string
       priority:
         description: |-
-          Describes priority level of the requests within the workload.
-          Priority level ranges from 0 to 255.
-          Higher numbers means higher priority level.
+          $$
+          \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+          $$
 
           @gotags: validate:"gte=0,lte=255"
         type: integer
         format: int64
+        title: |-
+          Describes priority level of the requests within the workload.
+          Priority level ranges from 0 to 255.
+          Higher numbers means higher priority level.
+          Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
         x-go-validate: gte=0,lte=255
       tokens:
         description: |-
@@ -2675,10 +2674,10 @@ definitions:
         type: string
   Switcher:
     description: |-
-      `on_true` will be returned if switch input is valid and not equal to 0.0 ,
-       otherwise `on_false` will be returned.
+      `on_signal` will be returned if switch input is valid and not equal to 0.0 ,
+       otherwise `off_signal` will be returned.
     type: object
-    title: Type of combinator that switches between `on_true` and `on_false` signals
+    title: Type of combinator that switches between `on_signal` and `off_signal` signals
       based on switch input
     properties:
       in_ports:
@@ -2691,21 +2690,21 @@ definitions:
     description: Inputs for the Switcher component.
     type: object
     properties:
-      on_false:
+      off_signal:
         description: Output signal when switch is invalid or 0.0.
         $ref: '#/definitions/InPort'
-      on_true:
+      on_signal:
         description: Output signal when switch is valid and not 0.0.
         $ref: '#/definitions/InPort'
       switch:
-        description: Decides whether to return on_true or on_false.
+        description: Decides whether to return `on_signal` or `off_signal`.
         $ref: '#/definitions/InPort'
   SwitcherOuts:
     description: Outputs for the Switcher component.
     type: object
     properties:
       output:
-        description: Selected signal (on_true or on_false).
+        description: Selected signal (`on_signal` or `off_signal`).
         $ref: '#/definitions/OutPort'
   Variable:
     description: Component that emits a variable value as an output signal, can be

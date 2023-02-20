@@ -22,6 +22,20 @@
       "additionalProperties": false,
       "required": ["rate_limiter"],
       "properties": {
+        "evaluation_interval": {
+          "description": "How often should the policy be re-evaluated",
+          "type": "string"
+        },
+
+        "classifiers": {
+          "description": "List of classification rules.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Classifier"
+          }
+        },
+
         "rate_limiter": {
           "type": "object",
           "additionalProperties": false,
@@ -59,6 +73,11 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "refresh_interval": {
+          "description": "Refresh interval for dashboard panels.",
+          "type": "string"
+        },
+
         "datasource": {
           "type": "object",
           "additionalProperties": false,

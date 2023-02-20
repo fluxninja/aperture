@@ -91,9 +91,9 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dt>load_multiplier_linear_increment</dt>
 <dd>
 
-(float64, default: `0.01`) Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+(float64, default: `0.0025`) Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
 
-@gotags: default:"0.01"
+@gotags: default:"0.0025"
 
 </dd>
 <dt>max_load_multiplier</dt>
@@ -438,10 +438,12 @@ AutoScale components are used to scale a service.
 #### Properties
 
 <dl>
-<dt>horizontal_pod_scaler</dt>
+<dt>pod_scaler</dt>
 <dd>
 
-([HorizontalPodScaler](#horizontal-pod-scaler)) HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+([PodScaler](#pod-scaler)) PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+
+GradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.
 
 </dd>
 </dl>
@@ -984,7 +986,7 @@ Exponential Moving Average (EMA) is a type of moving average that applies expone
 At any time EMA component operates in one of the following states:
 
 1. Warm up state: The first warmup_window samples are used to compute the initial EMA.
-   If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
+   If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of warm up state.
 2. Normal state: The EMA is computed using following formula.
 
 The EMA for a series $Y$ is calculated recursively as:
@@ -1004,8 +1006,6 @@ The $\alpha$ is computed using ema_window:
 $$
 \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
 $$
-
-The EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#e-m-a-ins).
 
 #### Properties
 
@@ -1050,19 +1050,13 @@ Inputs for the EMA component.
 
 ([InPort](#in-port)) Upper bound of the moving average.
 
-Used during the warm-up stage: if the signal would exceed `max_envelope`
-it's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.
+When the signal exceeds `max_envelope` it's multiplied by
+`correction_factor_on_max_envelope_violation` **once per tick**.
 
 :::note
 
 If the signal deviates from `max_envelope` faster than the correction
 faster, it might end up exceeding the envelope.
-
-:::
-
-:::note
-
-The envelope logic is **not** used outside the warm-up stage!
 
 :::
 
@@ -1072,7 +1066,7 @@ The envelope logic is **not** used outside the warm-up stage!
 
 ([InPort](#in-port)) Lower bound of the moving average.
 
-Used during the warm-up stage analogously to `max_envelope`.
+Behavior is similar to `max_envelope`.
 
 </dd>
 </dl>
@@ -1126,7 +1120,7 @@ Parameters for the EMA component.
 <dt>valid_during_warmup</dt>
 <dd>
 
-(bool) Whether the output is valid during the warm-up stage.
+(bool) Whether the output is valid during the warm up stage.
 
 @gotags: default:"false"
 
@@ -1136,7 +1130,7 @@ Parameters for the EMA component.
 
 (string, default: `0s`) Duration of EMA warming up window.
 
-The initial value of the EMA is the average of signal readings received during the warm-up window.
+The initial value of the EMA is the average of signal readings received during the warm up window.
 
 @gotags: default:"0s"
 
@@ -1949,125 +1943,6 @@ Outputs for the Holder component.
 </dd>
 </dl>
 
-### HorizontalPodScaler {#horizontal-pod-scaler}
-
-#### Properties
-
-<dl>
-<dt>kubernetes_object_selector</dt>
-<dd>
-
-([KubernetesObjectSelector](#kubernetes-object-selector), `required`) The Kubernetes object on which horizontal scaling is applied.
-
-@gotags: validate:"required"
-
-</dd>
-<dt>scale_actuator</dt>
-<dd>
-
-([HorizontalPodScalerScaleActuator](#horizontal-pod-scaler-scale-actuator))
-
-</dd>
-<dt>scale_reporter</dt>
-<dd>
-
-([HorizontalPodScalerScaleReporter](#horizontal-pod-scaler-scale-reporter))
-
-</dd>
-</dl>
-
-### HorizontalPodScalerScaleActuator {#horizontal-pod-scaler-scale-actuator}
-
-#### Properties
-
-<dl>
-<dt>default_config</dt>
-<dd>
-
-([HorizontalPodScalerScaleActuatorDynamicConfig](#horizontal-pod-scaler-scale-actuator-dynamic-config)) Default configuration.
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-(string) Configuration key for DynamicConfig
-
-</dd>
-<dt>in_ports</dt>
-<dd>
-
-([HorizontalPodScalerScaleActuatorIns](#horizontal-pod-scaler-scale-actuator-ins))
-
-</dd>
-</dl>
-
-### HorizontalPodScalerScaleActuatorDynamicConfig {#horizontal-pod-scaler-scale-actuator-dynamic-config}
-
-Dynamic Configuration for ScaleActuator
-
-#### Properties
-
-<dl>
-<dt>dry_run</dt>
-<dd>
-
-(bool) Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
-Useful for observing the behavior of Scaler without disrupting any real traffic.
-
-@gotags: default:"false"
-
-</dd>
-</dl>
-
-### HorizontalPodScalerScaleActuatorIns {#horizontal-pod-scaler-scale-actuator-ins}
-
-Inputs for the HorizontalPodScaler component.
-
-#### Properties
-
-<dl>
-<dt>desired_replicas</dt>
-<dd>
-
-([InPort](#in-port))
-
-</dd>
-</dl>
-
-### HorizontalPodScalerScaleReporter {#horizontal-pod-scaler-scale-reporter}
-
-#### Properties
-
-<dl>
-<dt>out_ports</dt>
-<dd>
-
-([HorizontalPodScalerScaleReporterOuts](#horizontal-pod-scaler-scale-reporter-outs))
-
-</dd>
-</dl>
-
-### HorizontalPodScalerScaleReporterOuts {#horizontal-pod-scaler-scale-reporter-outs}
-
-Outputs for the HorizontalPodScaler component.
-
-#### Properties
-
-<dl>
-<dt>actual_replicas</dt>
-<dd>
-
-([OutPort](#out-port))
-
-</dd>
-<dt>configured_replicas</dt>
-<dd>
-
-([OutPort](#out-port))
-
-</dd>
-</dl>
-
 ### InPort {#in-port}
 
 Components receive input from other components via InPorts
@@ -2126,19 +2001,19 @@ Inputs for the Integrator component.
 <dt>max</dt>
 <dd>
 
-([InPort](#in-port)) The maximum output when reset is not set.
+([InPort](#in-port)) The maximum output.
 
 </dd>
 <dt>min</dt>
 <dd>
 
-([InPort](#in-port)) The minimum output when reset is not set.
+([InPort](#in-port)) The minimum output.
 
 </dd>
 <dt>reset</dt>
 <dd>
 
-([InPort](#in-port)) Resets the integrator output to zero when reset signal is valid and non-zero.
+([InPort](#in-port)) Resets the integrator output to zero when reset signal is valid and non-zero. Reset also resets the max and min constraints.
 
 </dd>
 </dl>
@@ -2908,6 +2783,125 @@ Example:
 </dd>
 </dl>
 
+### PodScaler {#pod-scaler}
+
+#### Properties
+
+<dl>
+<dt>kubernetes_object_selector</dt>
+<dd>
+
+([KubernetesObjectSelector](#kubernetes-object-selector), `required`) The Kubernetes object on which horizontal scaling is applied.
+
+@gotags: validate:"required"
+
+</dd>
+<dt>scale_actuator</dt>
+<dd>
+
+([PodScalerScaleActuator](#pod-scaler-scale-actuator))
+
+</dd>
+<dt>scale_reporter</dt>
+<dd>
+
+([PodScalerScaleReporter](#pod-scaler-scale-reporter))
+
+</dd>
+</dl>
+
+### PodScalerScaleActuator {#pod-scaler-scale-actuator}
+
+#### Properties
+
+<dl>
+<dt>default_config</dt>
+<dd>
+
+([PodScalerScaleActuatorDynamicConfig](#pod-scaler-scale-actuator-dynamic-config)) Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+([PodScalerScaleActuatorIns](#pod-scaler-scale-actuator-ins))
+
+</dd>
+</dl>
+
+### PodScalerScaleActuatorDynamicConfig {#pod-scaler-scale-actuator-dynamic-config}
+
+Dynamic Configuration for ScaleActuator
+
+#### Properties
+
+<dl>
+<dt>dry_run</dt>
+<dd>
+
+(bool) Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+Useful for observing the behavior of Scaler without disrupting any real traffic.
+
+@gotags: default:"false"
+
+</dd>
+</dl>
+
+### PodScalerScaleActuatorIns {#pod-scaler-scale-actuator-ins}
+
+Inputs for the PodScaler component.
+
+#### Properties
+
+<dl>
+<dt>desired_replicas</dt>
+<dd>
+
+([InPort](#in-port))
+
+</dd>
+</dl>
+
+### PodScalerScaleReporter {#pod-scaler-scale-reporter}
+
+#### Properties
+
+<dl>
+<dt>out_ports</dt>
+<dd>
+
+([PodScalerScaleReporterOuts](#pod-scaler-scale-reporter-outs))
+
+</dd>
+</dl>
+
+### PodScalerScaleReporterOuts {#pod-scaler-scale-reporter-outs}
+
+Outputs for the PodScaler component.
+
+#### Properties
+
+<dl>
+<dt>actual_replicas</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+<dt>configured_replicas</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+</dl>
+
 ### Policy {#policy}
 
 Policy expresses reliability automation workflow that automatically protects services
@@ -3506,7 +3500,7 @@ tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 
 (float64, `gte=0.0`, default: `0.5`) Timeout as a factor of tokens for a flow in a workload
 
-If a flow is not able to get tokens within `timeout_factor` \* `tokens` of duration,
+If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
 it will be rejected.
 
 This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
@@ -3594,6 +3588,11 @@ you have a classifier that sets `user` flow label, you might want to set
 (int64, `gte=0,lte=255`) Describes priority level of the requests within the workload.
 Priority level ranges from 0 to 255.
 Higher numbers means higher priority level.
+Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
+
+$$
+\text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+$$
 
 @gotags: validate:"gte=0,lte=255"
 
@@ -3731,10 +3730,10 @@ Outputs for the Sqrt component.
 
 ### Switcher {#switcher}
 
-Type of combinator that switches between `on_true` and `on_false` signals based on switch input
+Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input
 
-`on_true` will be returned if switch input is valid and not equal to 0.0 ,
-otherwise `on_false` will be returned.
+`on_signal` will be returned if switch input is valid and not equal to 0.0 ,
+otherwise `off_signal` will be returned.
 
 #### Properties
 
@@ -3760,13 +3759,13 @@ Inputs for the Switcher component.
 #### Properties
 
 <dl>
-<dt>on_false</dt>
+<dt>off_signal</dt>
 <dd>
 
 ([InPort](#in-port)) Output signal when switch is invalid or 0.0.
 
 </dd>
-<dt>on_true</dt>
+<dt>on_signal</dt>
 <dd>
 
 ([InPort](#in-port)) Output signal when switch is valid and not 0.0.
@@ -3775,7 +3774,7 @@ Inputs for the Switcher component.
 <dt>switch</dt>
 <dd>
 
-([InPort](#in-port)) Decides whether to return on_true or on_false.
+([InPort](#in-port)) Decides whether to return `on_signal` or `off_signal`.
 
 </dd>
 </dl>
@@ -3790,7 +3789,7 @@ Outputs for the Switcher component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) Selected signal (on_true or on_false).
+([OutPort](#out-port)) Selected signal (`on_signal` or `off_signal`).
 
 </dd>
 </dl>

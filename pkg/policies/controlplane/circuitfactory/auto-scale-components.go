@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/horizontalpodscaler"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/podscaler"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"go.uber.org/fx"
@@ -13,7 +13,7 @@ import (
 // autoScaleModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
 func autoScaleModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 	return fx.Options(
-		horizontalpodscaler.Module(),
+		podscaler.Module(),
 	)
 }
 
@@ -32,22 +32,22 @@ func newAutoScaleCompositeAndOptions(
 		return retErr(fmt.Errorf("parent circuit ID not found for component %s", componentID))
 	}
 
-	if horizontalPodScalerProto := autoScaleComponentProto.GetHorizontalPodScaler(); horizontalPodScalerProto != nil {
+	if podScalerProto := autoScaleComponentProto.GetPodScaler(); podScalerProto != nil {
 		var (
 			configuredComponents []runtime.ConfiguredComponent
 			tree                 Tree
 			options              []fx.Option
 		)
 		portMapping := runtime.NewPortMapping()
-		horizontalPodScalerOptions, agentGroupName, horizontalPodScalerErr := horizontalpodscaler.NewHorizontalPodScalerOptions(horizontalPodScalerProto, componentID.String(), policyReadAPI)
-		if horizontalPodScalerErr != nil {
-			return retErr(horizontalPodScalerErr)
+		podScalerOptions, agentGroupName, podScalerErr := podscaler.NewPodScalerOptions(podScalerProto, componentID.String(), policyReadAPI)
+		if podScalerErr != nil {
+			return retErr(podScalerErr)
 		}
-		options = append(options, horizontalPodScalerOptions)
+		options = append(options, podScalerOptions)
 
 		// Scale Reporter
-		if scaleReporterProto := horizontalPodScalerProto.GetScaleReporter(); scaleReporterProto != nil {
-			scaleReporter, scaleReporterOptions, err := horizontalpodscaler.NewScaleReporterAndOptions(scaleReporterProto, componentID.String(), policyReadAPI, agentGroupName)
+		if scaleReporterProto := podScalerProto.GetScaleReporter(); scaleReporterProto != nil {
+			scaleReporter, scaleReporterOptions, err := podscaler.NewScaleReporterAndOptions(scaleReporterProto, componentID.String(), policyReadAPI, agentGroupName)
 			if err != nil {
 				return retErr(err)
 			}
@@ -70,8 +70,8 @@ func newAutoScaleCompositeAndOptions(
 		}
 
 		// Scale Actuator
-		if scaleActuatorProto := horizontalPodScalerProto.GetScaleActuator(); scaleActuatorProto != nil {
-			scaleActuator, scaleActuatorOptions, err := horizontalpodscaler.NewScaleActuatorAndOptions(scaleActuatorProto, componentID.String(), policyReadAPI, agentGroupName)
+		if scaleActuatorProto := podScalerProto.GetScaleActuator(); scaleActuatorProto != nil {
+			scaleActuator, scaleActuatorOptions, err := podscaler.NewScaleActuatorAndOptions(scaleActuatorProto, componentID.String(), policyReadAPI, agentGroupName)
 			if err != nil {
 				return retErr(err)
 			}
@@ -92,7 +92,7 @@ func newAutoScaleCompositeAndOptions(
 			}
 		}
 
-		kos := horizontalPodScalerProto.KubernetesObjectSelector
+		kos := podScalerProto.KubernetesObjectSelector
 		sd := fmt.Sprintf("%s/%s/%s/%s/%s",
 			kos.GetAgentGroup(),
 			kos.GetNamespace(),
@@ -101,17 +101,17 @@ func newAutoScaleCompositeAndOptions(
 			kos.GetName(),
 		)
 
-		horizontalPodScalerConfComp, err := prepareComponent(
-			runtime.NewDummyComponent("HorizontalPodScaler", sd, runtime.ComponentTypeSignalProcessor),
-			horizontalPodScalerProto,
+		podScalerConfComp, err := prepareComponent(
+			runtime.NewDummyComponent("PodScaler", sd, runtime.ComponentTypeSignalProcessor),
+			podScalerProto,
 			componentID,
 		)
 		if err != nil {
 			return retErr(err)
 		}
 
-		horizontalPodScalerConfComp.PortMapping = portMapping
-		tree.Root = horizontalPodScalerConfComp
+		podScalerConfComp.PortMapping = portMapping
+		tree.Root = podScalerConfComp
 
 		return tree, configuredComponents, fx.Options(options...), nil
 	}

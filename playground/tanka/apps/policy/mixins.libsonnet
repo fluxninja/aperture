@@ -91,6 +91,7 @@ local policyResource = latencyAIMDPolicy({
         + workload.withLabelMatcher(labelMatcher.withMatchLabels({ user_type: 'subscriber' })),
       ],
     },
+    load_multiplier_linear_increment: 0.0050,
     alerter+: {
       alert_channels: ['service1-demo-app'],
     },
@@ -121,8 +122,8 @@ local policyResource = latencyAIMDPolicy({
       switcher.new()
       + switcher.withInPorts({
         switch: port.withSignalName('IS_BOT_ESCALATION'),
-        on_true: port.withConstantSignal(0.0),
-        on_false: port.withConstantSignal(10.0),
+        on_signal: port.withConstantSignal(0.0),
+        off_signal: port.withConstantSignal(10.0),
       })
       + switcher.withOutPorts({ output: port.withSignalName('RATE_LIMIT') })
     ),

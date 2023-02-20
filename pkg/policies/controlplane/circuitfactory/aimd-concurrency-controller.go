@@ -277,11 +277,10 @@ func ParseAIMDConcurrencyController(
 				},
 			},
 			{
-				Component: &policylangv1.Component_ArithmeticCombinator{
-					ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
-						Operator: "add",
-						InPorts: &policylangv1.ArithmeticCombinator_Ins{
-							Lhs: &policylangv1.InPort{
+				Component: &policylangv1.Component_Integrator{
+					Integrator: &policylangv1.Integrator{
+						InPorts: &policylangv1.Integrator_Ins{
+							Input: &policylangv1.InPort{
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
@@ -290,104 +289,22 @@ func ParseAIMDConcurrencyController(
 									},
 								},
 							},
-							Rhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "LOAD_MULTIPLIER_INCREMENT",
-								},
-							},
-						},
-						OutPorts: &policylangv1.ArithmeticCombinator_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "LOAD_MULTIPLIER_INCREMENT_INTEGRAL",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_Min{
-					Min: &policylangv1.Min{
-						InPorts: &policylangv1.Min_Ins{
-							Inputs: []*policylangv1.InPort{
-								{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "LOAD_MULTIPLIER_INCREMENT_INTEGRAL",
-									},
-								},
-								{
-									Value: &policylangv1.InPort_ConstantSignal{
-										ConstantSignal: &policylangv1.ConstantSignal{
-											Const: &policylangv1.ConstantSignal_Value{
-												Value: aimdConcurrencyController.MaxLoadMultiplier,
-											},
-										},
-									},
-								},
-							},
-						},
-						OutPorts: &policylangv1.Min_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "LOAD_MULTIPLIER_INCREMENT_INTEGRAL_CAPPED",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_FirstValid{
-					FirstValid: &policylangv1.FirstValid{
-						InPorts: &policylangv1.FirstValid_Ins{
-							Inputs: []*policylangv1.InPort{
-								{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "LOAD_MULTIPLIER_INCREMENT_INTEGRAL_CAPPED",
-									},
-								},
-								{
-									Value: &policylangv1.InPort_ConstantSignal{
-										ConstantSignal: &policylangv1.ConstantSignal{
-											Const: &policylangv1.ConstantSignal_Value{
-												Value: 0,
-											},
-										},
-									},
-								},
-							},
-						},
-						OutPorts: &policylangv1.FirstValid_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "LOAD_MULTIPLIER_INCREMENT_NORMAL",
-							},
-						},
-					},
-				},
-			},
-
-			{
-				Component: &policylangv1.Component_Switcher{
-					Switcher: &policylangv1.Switcher{
-						InPorts: &policylangv1.Switcher_Ins{
-							OnFalse: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "LOAD_MULTIPLIER_INCREMENT_NORMAL",
-								},
-							},
-							OnTrue: &policylangv1.InPort{
+							Max: &policylangv1.InPort{
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: 0,
+											Value: aimdConcurrencyController.MaxLoadMultiplier,
 										},
 									},
 								},
 							},
-							Switch: &policylangv1.InPort{
+							Reset_: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
 									SignalName: "IS_OVERLOAD",
 								},
 							},
 						},
-						OutPorts: &policylangv1.Switcher_Outs{
+						OutPorts: &policylangv1.Integrator_Outs{
 							Output: &policylangv1.OutPort{
 								SignalName: "LOAD_MULTIPLIER_INCREMENT",
 							},
@@ -395,7 +312,6 @@ func ParseAIMDConcurrencyController(
 					},
 				},
 			},
-
 			{
 				Component: &policylangv1.Component_NestedSignalIngress{
 					NestedSignalIngress: &policylangv1.NestedSignalIngress{

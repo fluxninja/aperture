@@ -1,10 +1,11 @@
 package controller
 
 import (
+	"math"
+
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/constraints"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -121,27 +122,15 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToReading, tic
 		}
 	}
 
-	// Constraints
-	minMaxConstraints := constraints.NewMinMaxConstraints()
-	if max.Valid() {
-		// minxMaxConstraints' Max, Min are set as math.MaxFloat64, -math.MaxFloat64 initially; no error.
-		err := minMaxConstraints.SetMax(max.Value())
-		if err != nil {
-			return retErr(err)
-		}
-	}
-	if min.Valid() {
-		err := minMaxConstraints.SetMin(min.Value())
-		if err != nil {
-			// To make sure min is less than max; otherwise, emits invalid signal.
-			return retErr(err)
-		}
-	}
-
 	if output.Valid() {
+		outputReading := output
 		// Constrain output
-		outputConstrained, _ := minMaxConstraints.Constrain(output.Value())
-		outputReading := runtime.NewReading(outputConstrained)
+		if max.Valid() {
+			outputReading = runtime.NewReading(math.Min(output.Value(), max.Value()))
+		}
+		if min.Valid() {
+			outputReading = runtime.NewReading(math.Max(output.Value(), min.Value()))
+		}
 		if outputReading.Value() != output.Value() {
 			// Wind output
 			windedOutput, err := cc.controller.WindOutput(output, outputReading, cc, tickInfo)

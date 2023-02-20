@@ -262,8 +262,9 @@ message FlowControl {
 // AutoScale components are used to scale a service.
 message AutoScale {
   oneof component {
-    // HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
-    HorizontalPodScaler horizontal_pod_scaler = 1;
+    // PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+    PodScaler pod_scaler = 1;
+    // GradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.
   }
 }
 
@@ -441,7 +442,7 @@ message GradientController {
 //
 // At any time EMA component operates in one of the following states:
 // 1. Warm up state: The first warmup_window samples are used to compute the initial EMA.
-//    If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
+//    If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of warm up state.
 // 2. Normal state: The EMA is computed using following formula.
 //
 // The EMA for a series $Y$ is calculated recursively as:
@@ -461,8 +462,6 @@ message GradientController {
 // $$
 // \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
 // $$
-//
-// The EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#e-m-a-ins).
 message EMA {
   // Inputs for the EMA component.
   message Ins {
@@ -471,8 +470,8 @@ message EMA {
 
     // Upper bound of the moving average.
     //
-    // Used during the warm-up stage: if the signal would exceed `max_envelope`
-    // it's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.
+    // When the signal exceeds `max_envelope` it's multiplied by
+    // `correction_factor_on_max_envelope_violation` **once per tick**.
     //
     // :::note
     //
@@ -481,16 +480,11 @@ message EMA {
     //
     // :::
     //
-    // :::note
-    //
-    // The envelope logic is **not** used outside the warm-up stage!
-    //
-    // :::
     InPort max_envelope = 2;
 
     // Lower bound of the moving average.
     //
-    // Used during the warm-up stage analogously to `max_envelope`.
+    // Behavior is similar to `max_envelope`.
     InPort min_envelope = 3;
   }
 
@@ -512,7 +506,7 @@ message EMA {
 
     // Duration of EMA warming up window.
     //
-    // The initial value of the EMA is the average of signal readings received during the warm-up window.
+    // The initial value of the EMA is the average of signal readings received during the warm up window.
     google.protobuf.Duration warmup_window = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-default"
@@ -544,7 +538,7 @@ message EMA {
       }
     }]; // @gotags: validate:"gte=0,lte=1.0" default:"1.0"
 
-    // Whether the output is valid during the warm-up stage.
+    // Whether the output is valid during the warm up stage.
     bool valid_during_warmup = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       extensions: {
         key: "x-go-default"
@@ -661,26 +655,26 @@ message Decider {
   }]; // @gotags: default:"0s"
 }
 
-// Type of combinator that switches between `on_true` and `on_false` signals based on switch input
+// Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input
 //
-// `on_true` will be returned if switch input is valid and not equal to 0.0 ,
-//  otherwise `on_false` will be returned.
+// `on_signal` will be returned if switch input is valid and not equal to 0.0 ,
+//  otherwise `off_signal` will be returned.
 message Switcher {
   // Inputs for the Switcher component.
   message Ins {
     // Output signal when switch is valid and not 0.0.
-    InPort on_true = 1;
+    InPort on_signal = 1;
 
     // Output signal when switch is invalid or 0.0.
-    InPort on_false = 2;
+    InPort off_signal = 2;
 
-    // Decides whether to return on_true or on_false.
+    // Decides whether to return `on_signal` or `off_signal`.
     InPort switch = 3;
   }
 
   // Outputs for the Switcher component.
   message Outs {
-    // Selected signal (on_true or on_false).
+    // Selected signal (`on_signal` or `off_signal`).
     OutPort output = 1;
   }
 
@@ -882,6 +876,12 @@ message Scheduler {
       // Describes priority level of the requests within the workload.
       // Priority level ranges from 0 to 255.
       // Higher numbers means higher priority level.
+      // Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
+      //
+      // $$
+      // \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+      // $$
+      //
       uint32 priority = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         extensions: {
           key: "x-go-validate"
@@ -970,7 +970,7 @@ message Scheduler {
 
     // Timeout as a factor of tokens for a flow in a workload
     //
-    // If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,
+    // If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
     // it will be rejected.
     //
     // This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
@@ -1434,12 +1434,12 @@ message Integrator {
   message Ins {
     // The input signal.
     InPort input = 1;
-    // Resets the integrator output to zero when reset signal is valid and non-zero.
+    // Resets the integrator output to zero when reset signal is valid and non-zero. Reset also resets the max and min constraints.
     InPort reset = 2;
-    // The minimum output when reset is not set.
-    InPort min = 3;
-    //The maximum output when reset is not set.
-    InPort max = 4;
+    //The maximum output.
+    InPort max = 3;
+    //The minimum output.
+    InPort min = 4;
   }
 
   // Outputs for the Integrator component.
@@ -1481,9 +1481,9 @@ message Differentiator {
   }]; // @gotags: default:"5s"
 }
 
-message HorizontalPodScaler {
+message PodScaler {
   message ScaleReporter {
-    // Outputs for the HorizontalPodScaler component.
+    // Outputs for the PodScaler component.
     message Outs {
       OutPort actual_replicas = 1;
       OutPort configured_replicas = 2;
@@ -1505,7 +1505,7 @@ message HorizontalPodScaler {
       }]; // @gotags: default:"false"
     }
 
-    // Inputs for the HorizontalPodScaler component.
+    // Inputs for the PodScaler component.
     message Ins {
       InPort desired_replicas = 1;
     }
@@ -1685,9 +1685,9 @@ message AIMDConcurrencyController {
   double load_multiplier_linear_increment = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
     extensions: {
       key: "x-go-default"
-      value: {number_value: 0.01}
+      value: {number_value: 0.0025}
     }
-  }]; // @gotags: default:"0.01"
+  }]; // @gotags: default:"0.0025"
 
   // Configuration for embedded alerter.
   Alerter.Parameters alerter_parameters = 8;

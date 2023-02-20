@@ -240,7 +240,7 @@
       "type": "timeseries"
     }
   ],
-  "refresh": "10s",
+  "refresh": "5s",
   "rows": [],
   "schemaVersion": 18,
   "style": "dark",
@@ -286,7 +286,7 @@
     ]
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {

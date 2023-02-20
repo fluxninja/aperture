@@ -36,10 +36,10 @@
           "$ref": "#/definitions/AIMDConcurrencyControllerIns"
         },
         "load_multiplier_linear_increment": {
-          "description": "Linear increment to load multiplier in each execution tick when the system is not in overloaded state.\n\n@gotags: default:\"0.01\"",
+          "description": "Linear increment to load multiplier in each execution tick when the system is not in overloaded state.\n\n@gotags: default:\"0.0025\"",
           "type": "number",
           "format": "double",
-          "x-go-default": 0.01,
+          "x-go-default": 0.0025,
           "x-order": 6
         },
         "max_load_multiplier": {
@@ -299,10 +299,10 @@
       "description": "AutoScale components are used to scale a service.",
       "type": "object",
       "properties": {
-        "horizontal_pod_scaler": {
-          "description": "HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.",
+        "pod_scaler": {
+          "description": "PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.\n\nGradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.",
           "x-order": 0,
-          "$ref": "#/definitions/HorizontalPodScaler"
+          "$ref": "#/definitions/PodScaler"
         }
       },
       "additionalProperties": false
@@ -639,7 +639,7 @@
       "additionalProperties": false
     },
     "EMA": {
-      "description": "At any time EMA component operates in one of the following states:\n1. Warm up state: The first warmup_window samples are used to compute the initial EMA.\n   If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.\n2. Normal state: The EMA is computed using following formula.\n\nThe EMA for a series $Y$ is calculated recursively as:\n\n$$\n\\text{EMA} _t =\n\\begin{cases}\n  Y_0, &\\text{for } t = 0 \\\\\n  \\alpha Y_t + (1 - \\alpha) \\text{EMA} _{t-1}, &\\text{for }t > 0\n\\end{cases}\n$$\n\nThe coefficient $\\alpha$ represents the degree of weighting decrease, a constant smoothing factor between 0 and 1.\nA higher $\\alpha$ discounts older observations faster.\nThe $\\alpha$ is computed using ema\\_window:\n\n$$\n\\alpha = \\frac{2}{N + 1} \\quad\\text{where } N = \\frac{\\text{ema\\_window}}{\\text{evaluation\\_period}}\n$$\n\nThe EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#e-m-a-ins).",
+      "description": "At any time EMA component operates in one of the following states:\n1. Warm up state: The first warmup_window samples are used to compute the initial EMA.\n   If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of warm up state.\n2. Normal state: The EMA is computed using following formula.\n\nThe EMA for a series $Y$ is calculated recursively as:\n\n$$\n\\text{EMA} _t =\n\\begin{cases}\n  Y_0, &\\text{for } t = 0 \\\\\n  \\alpha Y_t + (1 - \\alpha) \\text{EMA} _{t-1}, &\\text{for }t > 0\n\\end{cases}\n$$\n\nThe coefficient $\\alpha$ represents the degree of weighting decrease, a constant smoothing factor between 0 and 1.\nA higher $\\alpha$ discounts older observations faster.\nThe $\\alpha$ is computed using ema\\_window:\n\n$$\n\\alpha = \\frac{2}{N + 1} \\quad\\text{where } N = \\frac{\\text{ema\\_window}}{\\text{evaluation\\_period}}\n$$",
       "type": "object",
       "title": "Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings",
       "properties": {
@@ -672,12 +672,12 @@
           "$ref": "#/definitions/InPort"
         },
         "max_envelope": {
-          "description": "Upper bound of the moving average.\n\nUsed during the warm-up stage: if the signal would exceed `max_envelope`\nit's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.\n\n:::note\n\nIf the signal deviates from `max_envelope` faster than the correction\nfaster, it might end up exceeding the envelope.\n\n:::\n\n:::note\n\nThe envelope logic is **not** used outside the warm-up stage!\n\n:::",
+          "description": "Upper bound of the moving average.\n\nWhen the signal exceeds `max_envelope` it's multiplied by\n`correction_factor_on_max_envelope_violation` **once per tick**.\n\n:::note\n\nIf the signal deviates from `max_envelope` faster than the correction\nfaster, it might end up exceeding the envelope.\n\n:::",
           "x-order": 1,
           "$ref": "#/definitions/InPort"
         },
         "min_envelope": {
-          "description": "Lower bound of the moving average.\n\nUsed during the warm-up stage analogously to `max_envelope`.",
+          "description": "Lower bound of the moving average.\n\nBehavior is similar to `max_envelope`.",
           "x-order": 2,
           "$ref": "#/definitions/InPort"
         }
@@ -723,13 +723,13 @@
           "x-order": 2
         },
         "valid_during_warmup": {
-          "description": "Whether the output is valid during the warm-up stage.\n\n@gotags: default:\"false\"",
+          "description": "Whether the output is valid during the warm up stage.\n\n@gotags: default:\"false\"",
           "type": "boolean",
           "x-go-default": false,
           "x-order": 3
         },
         "warmup_window": {
-          "description": "Duration of EMA warming up window.\n\nThe initial value of the EMA is the average of signal readings received during the warm-up window.\n\n@gotags: default:\"0s\"",
+          "description": "Duration of EMA warming up window.\n\nThe initial value of the EMA is the average of signal readings received during the warm up window.\n\n@gotags: default:\"0s\"",
           "type": "string",
           "x-go-default": "0s",
           "x-order": 4
@@ -1255,95 +1255,6 @@
       },
       "additionalProperties": false
     },
-    "HorizontalPodScaler": {
-      "type": "object",
-      "properties": {
-        "kubernetes_object_selector": {
-          "description": "The Kubernetes object on which horizontal scaling is applied.\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
-          "x-order": 0,
-          "$ref": "#/definitions/KubernetesObjectSelector"
-        },
-        "scale_actuator": {
-          "x-order": 1,
-          "$ref": "#/definitions/HorizontalPodScalerScaleActuator"
-        },
-        "scale_reporter": {
-          "x-order": 2,
-          "$ref": "#/definitions/HorizontalPodScalerScaleReporter"
-        }
-      },
-      "additionalProperties": false
-    },
-    "HorizontalPodScalerScaleActuator": {
-      "type": "object",
-      "properties": {
-        "default_config": {
-          "description": "Default configuration.",
-          "x-order": 0,
-          "$ref": "#/definitions/HorizontalPodScalerScaleActuatorDynamicConfig"
-        },
-        "dynamic_config_key": {
-          "type": "string",
-          "title": "Configuration key for DynamicConfig",
-          "x-order": 1
-        },
-        "in_ports": {
-          "x-order": 2,
-          "$ref": "#/definitions/HorizontalPodScalerScaleActuatorIns"
-        }
-      },
-      "additionalProperties": false
-    },
-    "HorizontalPodScalerScaleActuatorDynamicConfig": {
-      "type": "object",
-      "title": "Dynamic Configuration for ScaleActuator",
-      "properties": {
-        "dry_run": {
-          "description": "Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.\nUseful for observing the behavior of Scaler without disrupting any real traffic.\n\n@gotags: default:\"false\"",
-          "type": "boolean",
-          "x-go-default": false,
-          "x-order": 0
-        }
-      },
-      "additionalProperties": false
-    },
-    "HorizontalPodScalerScaleActuatorIns": {
-      "description": "Inputs for the HorizontalPodScaler component.",
-      "type": "object",
-      "properties": {
-        "desired_replicas": {
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
-        }
-      },
-      "additionalProperties": false
-    },
-    "HorizontalPodScalerScaleReporter": {
-      "type": "object",
-      "properties": {
-        "out_ports": {
-          "x-order": 0,
-          "$ref": "#/definitions/HorizontalPodScalerScaleReporterOuts"
-        }
-      },
-      "additionalProperties": false
-    },
-    "HorizontalPodScalerScaleReporterOuts": {
-      "description": "Outputs for the HorizontalPodScaler component.",
-      "type": "object",
-      "properties": {
-        "actual_replicas": {
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
-        },
-        "configured_replicas": {
-          "x-order": 1,
-          "$ref": "#/definitions/OutPort"
-        }
-      },
-      "additionalProperties": false
-    },
     "InPort": {
       "type": "object",
       "title": "Components receive input from other components via InPorts",
@@ -1388,17 +1299,17 @@
           "$ref": "#/definitions/InPort"
         },
         "max": {
-          "description": "The maximum output when reset is not set.",
+          "description": "The maximum output.",
           "x-order": 1,
           "$ref": "#/definitions/InPort"
         },
         "min": {
-          "description": "The minimum output when reset is not set.",
+          "description": "The minimum output.",
           "x-order": 2,
           "$ref": "#/definitions/InPort"
         },
         "reset": {
-          "description": "Resets the integrator output to zero when reset signal is valid and non-zero.",
+          "description": "Resets the integrator output to zero when reset signal is valid and non-zero. Reset also resets the max and min constraints.",
           "x-order": 3,
           "$ref": "#/definitions/InPort"
         }
@@ -1966,6 +1877,95 @@
       },
       "additionalProperties": false
     },
+    "PodScaler": {
+      "type": "object",
+      "properties": {
+        "kubernetes_object_selector": {
+          "description": "The Kubernetes object on which horizontal scaling is applied.\n\n@gotags: validate:\"required\"",
+          "x-go-validate": "required",
+          "x-order": 0,
+          "$ref": "#/definitions/KubernetesObjectSelector"
+        },
+        "scale_actuator": {
+          "x-order": 1,
+          "$ref": "#/definitions/PodScalerScaleActuator"
+        },
+        "scale_reporter": {
+          "x-order": 2,
+          "$ref": "#/definitions/PodScalerScaleReporter"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PodScalerScaleActuator": {
+      "type": "object",
+      "properties": {
+        "default_config": {
+          "description": "Default configuration.",
+          "x-order": 0,
+          "$ref": "#/definitions/PodScalerScaleActuatorDynamicConfig"
+        },
+        "dynamic_config_key": {
+          "type": "string",
+          "title": "Configuration key for DynamicConfig",
+          "x-order": 1
+        },
+        "in_ports": {
+          "x-order": 2,
+          "$ref": "#/definitions/PodScalerScaleActuatorIns"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PodScalerScaleActuatorDynamicConfig": {
+      "type": "object",
+      "title": "Dynamic Configuration for ScaleActuator",
+      "properties": {
+        "dry_run": {
+          "description": "Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.\nUseful for observing the behavior of Scaler without disrupting any real traffic.\n\n@gotags: default:\"false\"",
+          "type": "boolean",
+          "x-go-default": false,
+          "x-order": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "PodScalerScaleActuatorIns": {
+      "description": "Inputs for the PodScaler component.",
+      "type": "object",
+      "properties": {
+        "desired_replicas": {
+          "x-order": 0,
+          "$ref": "#/definitions/InPort"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PodScalerScaleReporter": {
+      "type": "object",
+      "properties": {
+        "out_ports": {
+          "x-order": 0,
+          "$ref": "#/definitions/PodScalerScaleReporterOuts"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PodScalerScaleReporterOuts": {
+      "description": "Outputs for the PodScaler component.",
+      "type": "object",
+      "properties": {
+        "actual_replicas": {
+          "x-order": 0,
+          "$ref": "#/definitions/OutPort"
+        },
+        "configured_replicas": {
+          "x-order": 1,
+          "$ref": "#/definitions/OutPort"
+        }
+      },
+      "additionalProperties": false
+    },
     "Policy": {
       "description": ":::info\n\nSee also [Policy overview](/concepts/policy/policy.md).\n\n:::\n\nPolicy specification contains a circuit that defines the controller logic and resources that need to be setup.",
       "type": "object",
@@ -2322,7 +2322,7 @@
           "x-order": 2
         },
         "timeout_factor": {
-          "description": "If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,\nit will be rejected.\n\nThis value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.\n\n@gotags: validate:\"gte=0.0\" default:\"0.5\"",
+          "description": "If a flow is not able to get tokens within `timeout_factor * tokens` of duration,\nit will be rejected.\n\nThis value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.\n\n@gotags: validate:\"gte=0.0\" default:\"0.5\"",
           "type": "number",
           "format": "double",
           "title": "Timeout as a factor of tokens for a flow in a workload",
@@ -2370,9 +2370,10 @@
           "x-order": 0
         },
         "priority": {
-          "description": "Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level.\n\n@gotags: validate:\"gte=0,lte=255\"",
+          "description": "$$\n\\text{virtual\\_finish\\_time} = \\text{virtual\\_time} + \\left(\\text{tokens} \\cdot \\left(\\text{256} - \\text{priority}\\right)\\right)\n$$\n\n@gotags: validate:\"gte=0,lte=255\"",
           "type": "integer",
           "format": "int64",
+          "title": "Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level.\nPriority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:",
           "x-go-validate": "gte=0,lte=255",
           "x-order": 1
         },
@@ -2456,9 +2457,9 @@
       "additionalProperties": false
     },
     "Switcher": {
-      "description": "`on_true` will be returned if switch input is valid and not equal to 0.0 ,\n otherwise `on_false` will be returned.",
+      "description": "`on_signal` will be returned if switch input is valid and not equal to 0.0 ,\n otherwise `off_signal` will be returned.",
       "type": "object",
-      "title": "Type of combinator that switches between `on_true` and `on_false` signals based on switch input",
+      "title": "Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input",
       "properties": {
         "in_ports": {
           "description": "Input ports for the Switcher component.",
@@ -2477,18 +2478,18 @@
       "description": "Inputs for the Switcher component.",
       "type": "object",
       "properties": {
-        "on_false": {
+        "off_signal": {
           "description": "Output signal when switch is invalid or 0.0.",
           "x-order": 0,
           "$ref": "#/definitions/InPort"
         },
-        "on_true": {
+        "on_signal": {
           "description": "Output signal when switch is valid and not 0.0.",
           "x-order": 1,
           "$ref": "#/definitions/InPort"
         },
         "switch": {
-          "description": "Decides whether to return on_true or on_false.",
+          "description": "Decides whether to return `on_signal` or `off_signal`.",
           "x-order": 2,
           "$ref": "#/definitions/InPort"
         }
@@ -2500,7 +2501,7 @@
       "type": "object",
       "properties": {
         "output": {
-          "description": "Selected signal (on_true or on_false).",
+          "description": "Selected signal (`on_signal` or `off_signal`).",
           "x-order": 0,
           "$ref": "#/definitions/OutPort"
         }
