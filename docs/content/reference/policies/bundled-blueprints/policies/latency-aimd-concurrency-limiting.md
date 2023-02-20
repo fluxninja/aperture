@@ -188,25 +188,18 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     description='Whether tokens for workloads are computed dynamically or set statically by the user.' />
 
 <ParameterDescription
-    name="policy.concurrency_controller.concurrency_limit_multiplier"
+    name="policy.concurrency_controller.max_load_multiplier"
     type="float64"
     reference=""
     value="2"
     description='Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.' />
 
 <ParameterDescription
-    name="policy.concurrency_controller.concurrency_linear_increment"
+    name="policy.concurrency_controller.load_multiplier_linear_increment"
     type="float64"
     reference=""
-    value="5"
-    description='Linear increment to concurrency in each execution tick when the system is not in overloaded state.' />
-
-<ParameterDescription
-    name="policy.concurrency_controller.concurrency_sqrt_increment_multiplier"
-    type="float64"
-    reference=""
-    value="1"
-    description='Scale factor to multiply square root of current accepted concurrrency. This, along with concurrency_linear_increment helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).' />
+    value="0.0025"
+    description='Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.default_config"
@@ -221,8 +214,22 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     name="dashboard.refresh_interval"
     type="string"
     reference=""
-    value="'10s'"
+    value="'5s'"
     description='Refresh interval for dashboard panels.' />
+
+<ParameterDescription
+    name="dashboard.time_from"
+    type="string"
+    reference=""
+    value="'now-15m'"
+    description='From time of dashboard.' />
+
+<ParameterDescription
+    name="dashboard.time_to"
+    type="string"
+    reference=""
+    value="'now'"
+    description='To time of dashboard.' />
 
 <h4 class="blueprints-h4">Datasource</h4>
 

@@ -15,8 +15,8 @@
   * @param (dashboard.time_to: string) To time of dashboard.
   */
   dashboard: {
-    refresh_interval: '10s',
-    time_from: 'now-30m',
+    refresh_interval: '5s',
+    time_from: 'now-15m',
     time_to: 'now',
     /**
     * @section Dashboard

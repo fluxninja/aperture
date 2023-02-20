@@ -1,4 +1,4 @@
-package horizontalpodscaler
+package podscaler
 
 import (
 	"context"
@@ -18,10 +18,10 @@ import (
 	"go.uber.org/fx"
 )
 
-// fxTag is HorizontalPodScaler's Status Watcher's Fx Tag.
+// fxTag is PodScaler's Status Watcher's Fx Tag.
 var fxTag = config.NameTag("scale_status_watcher")
 
-// scaleReporterModule returns the fx options for horizontal pod scaler in the main app.
+// scaleReporterModule returns the fx options for pod scaler in the main app.
 func scaleReporterModule() fx.Option {
 	return fx.Options(
 		fx.Provide(
@@ -42,7 +42,7 @@ func provideWatcher(
 	etcdClient *etcdclient.Client,
 	lc fx.Lifecycle,
 ) (notifiers.Watcher, error) {
-	etcdPath := paths.HorizontalPodScalerStatusPath
+	etcdPath := paths.PodScalerStatusPath
 	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (sr *ScaleReporter) ShortDescription() string { return sr.agentGroup }
 
 // NewScaleReporterAndOptions returns a new ScaleReporter and its fx options.
 func NewScaleReporterAndOptions(
-	_ *policylangv1.HorizontalPodScaler_ScaleReporter,
+	_ *policylangv1.PodScaler_ScaleReporter,
 	componentID string,
 	policyReadAPI iface.Policy,
 	agentGroup string,
