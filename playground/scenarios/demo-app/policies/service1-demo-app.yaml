@@ -42,7 +42,7 @@ policy:
   - decider:
       in_ports:
         lhs:
-          signal_name: LOAD_MULTIPLIER
+          signal_name: OBSERVED_LOAD_MULTIPLIER
         rhs:
           constant_signal:
             value: 1.0
@@ -98,7 +98,10 @@ policy:
           priority: 200
         label_matcher:
           match_labels:
-            user_type: subscriber
+            http.request.header.user_type: subscriber
+    # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
+    # Type: float64
+    load_multiplier_linear_increment: 0.005
     # Whether tokens for workloads are computed dynamically or set statically by the user.
     # Type: aperture.spec.v1.AlerterParameters
     alerter:
