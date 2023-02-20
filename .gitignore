@@ -218,3 +218,10 @@ gradle-app.setting
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+
+# Local build artifacts under cmd/
+cmd/aperturectl/aperturectl
+
+# Local playground configuration overrides
+playground/tilt_local.json

@@ -4,15 +4,16 @@
 # expected paths. This is a workaround for https://github.com/jsonnet-bundler/jsonnet-bundler/issues/70
 set -euo pipefail
 
+BASE_DIR=$1
+
 (
-cd tanka
+cd "${BASE_DIR}"
 jb install
 )
 
 GIT_REPO_ROOT=$(git rev-parse --show-toplevel)
 
-SCRIPT_ROOT=$(dirname "$0")
-VENDOR_PATH=${SCRIPT_ROOT}/../tanka/vendor/github.com/fluxninja/aperture
+VENDOR_PATH=${BASE_DIR}/vendor/github.com/fluxninja/aperture/
 
 symlink_directory() {
     local directory=$1
@@ -28,5 +29,28 @@ symlink_directory() {
     fi
 }
 
-symlink_directory libsonnet
 symlink_directory blueprints
+
+if [ -f "${BASE_DIR}/chartfile.yaml" ]; then
+    pushd "${BASE_DIR}" > /dev/null
+    tk tool charts vendor
+    popd > /dev/null
+fi
+
+
+CHARTS_DIR="${BASE_DIR}/charts"
+if [ ! -d "${CHARTS_DIR}" ]; then
+    exit 0
+fi
+
+for path in "${CHARTS_DIR}"/*; do
+    # Process directories and directory symlinks, skipping others
+    if [ ! -d "$path" ]; then
+        continue
+    fi
+    pushd "$path" > /dev/null
+    if helm dependency list | grep -q missing$; then
+        helm dependency build
+    fi
+    popd > /dev/null
+done

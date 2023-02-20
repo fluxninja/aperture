@@ -28,7 +28,7 @@ repos:
       - id: end-of-file-fixer
         exclude: ^(docs/|manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*$|blueprints/gen/jsonschema/.*
       - id: check-yaml
-        exclude: ^(manifests/charts/.*/(templates|files)/.*|playground/tanka/charts/.*)
+        exclude: ^(manifests/charts/.*/(templates|files)/.*|playground/tanka/charts/.*|playground/scenarios/.*/charts/.*)
         args:
           - "--allow-multiple-documents"
       - id: check-added-large-files

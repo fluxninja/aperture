@@ -3,6 +3,8 @@ v1alpha1.extension_repo(name='default', url='https://github.com/tilt-dev/tilt-ex
 load("ext://namespace", "namespace_create", "namespace_inject")
 load('ext://uibutton', 'cmd_button', 'location')
 
+allow_k8s_contexts('gke_devel-309501_us-central1_kklimonda-dev-cluster')
+
 #################
 ### CONSTANTS ###
 #################
@@ -21,11 +23,10 @@ APERTURE_JS_EXAMPLE_NS = "aperture-js-example"
 APERTURE_JAVA_EXAMPLE_NS = "aperture-java-example"
 APERTURE_DEMOAPP_NS = "demoapp"
 APERTURE_ISTIO_NS = "istio-system"
+DEFAULT_TEST_SCENARIO = "scenarios/graphql-example-1"
 TANKA = "tk"
 SKIP_LOCAL_CMDS = False  # If set to true, skips actually running local commands (useful for developing and testing Tiltfile itself)
-# Mutable global state, since global values are not mutable
-GLOBAL_STATE = {}
-GLOBAL_RAN_TANKA_DEPS_KEY = "RAN_TANKA_DEPS"
+TANKA_DEPS_HANDLED = []
 
 # Dependency tree and service configuration.
 # Top level maps NAMESPACE to services
@@ -93,7 +94,7 @@ DEP_TREE = {
             ]
         },
         "controller": {
-            "labels": ["ApertureController"],
+           "labels": ["ApertureController"],
             "tkenv": TANKA_ROOT + "/apps/aperture-controller",
             "images": [
                 {
@@ -177,19 +178,6 @@ DEP_TREE = {
                     ],
                     "ignored_objects": [
                         ("^controller-kube-state-metrics", "Service|Deployment", APERTURE_CONTROLLER_NS),
-                    ]
-                },
-            ]
-        },
-        "policies": {
-            "labels": ["ApertureController"],
-            "tkenv": TANKA_ROOT + "/apps/policy",
-            "child_resources": [
-                {
-                    "new_name": "policies",
-                    "resource_deps": ["cluster-bootstrap", "controller-service"],
-                    "extra_objects": [
-                        ("service1-demo-app$", "policy", APERTURE_CONTROLLER_NS),
                     ]
                 },
             ]
@@ -282,84 +270,6 @@ DEP_TREE = {
                     ],
                     "ignored_objects": [
                         ("^gateway", "Service|Deployment"),
-                    ]
-                },
-            ]
-        },
-    },
-    APERTURE_DEMOAPP_NS: {
-        "graphql-demo-app": {
-            "labels": ["GraphQLDemoApplications"],
-            "tkenv": TANKA_ROOT + "/apps/graphql-demoapp",
-            "needs": ["istio"],
-            "images": [
-                {
-                    "ref": "graphql-demo-app",
-                    "context": GIT_ROOT + "/playground/graphql_demo_app",
-                    "ssh": "default",
-                }
-            ],
-            "child_resources": [
-                {
-                    "workload": "service-graphql-demo-app",
-                    "resource_deps": ["cluster-bootstrap", "istiod"],
-                    "extra_objects": [
-                        "service-graphql-demo-app:serviceaccount"
-                    ]
-                },
-                {
-                    "workload": "wavepool-graphql-generator",
-                    "resource_deps": ["service-graphql-demo-app", "policies"],
-                    "extra_objects": [
-                        "wavepool-graphql-config:configmap"
-                    ],
-                    "extra_pod_selectors": [
-                        {'app.kubernetes.io/component':  'wavepool-graphql-generator'},
-                    ]
-                },
-            ]
-        },
-        "demo-app": {
-            "labels": ["DemoApplications"],
-            "tkenv": TANKA_ROOT + "/apps/demoapp",
-            "needs": ["istio"],
-            "images": [
-                {
-                    "ref": "demo-app",
-                    "context": GIT_ROOT + "/playground/demo_app",
-                    "ssh": "default",
-                }
-            ],
-            "child_resources": [
-                {
-                    "workload": "service1-demo-app",
-                    "resource_deps": ["cluster-bootstrap", "istiod"],
-                    "extra_objects": [
-                        "service1-demo-app:serviceaccount"
-                    ]
-                },
-                {
-                    "workload": "service2-demo-app",
-                    "resource_deps": ["cluster-bootstrap", "istiod"],
-                    "extra_objects": [
-                        "service2-demo-app:serviceaccount"
-                    ]
-                },
-                {
-                    "workload": "service3-demo-app",
-                    "resource_deps": ["cluster-bootstrap", "istiod"],
-                    "extra_objects": [
-                        "service3-demo-app:serviceaccount"
-                    ]
-                },
-                {
-                    "workload": "wavepool-generator",
-                    "resource_deps": ["service1-demo-app", "policies"],
-                    "extra_objects": [
-                        "wavepool-config:configmap"
-                    ],
-                    "extra_pod_selectors": [
-                        {'app.kubernetes.io/component':  'wavepool-generator'},
                     ]
                 },
             ]
@@ -532,52 +442,66 @@ def refresh_chart_dependencies(chart_dir):
             local(command=["helm", "dependency", "update"], dir=chart_dir)
             return
 
-
-def render_tanka(environment, env_vars):
+def render_tanka(environment, env_vars, base_dir, namespace):
     print(
         "Rendering tanka environment",
         environment,
     )
-    base_dir = environment.split("apps/")[0] or "./"
+
+    if base_dir == None:
+        base_dir = environment.split("apps/")[0] or "./"
 
     if SKIP_LOCAL_CMDS:
         return
 
-    if not GLOBAL_STATE.get(GLOBAL_RAN_TANKA_DEPS_KEY):
+    if base_dir not in TANKA_DEPS_HANDLED:
         # Get base directory for Jsonnet Bundler execution
         # tanka/apps/default -> tanka/
         # apps/default -> ./
         # Make sure jb dependencies are up to date
-        local(command=["./scripts/jb_install.sh"])
-
-        # Refreshing the dependencies for the Agent chart
-        refresh_chart_dependencies(base_dir + "charts/aperture-agent")
-        refresh_chart_dependencies(base_dir + "charts/aperture-controller")
-
-        # Fetch any vendored charts that are not included in our repository
-        local(command=[TANKA, "tool", "charts", "vendor"], dir=base_dir)
+        local(command=["./scripts/deps_install.sh", base_dir])
 
         # Skip refreshing deps the second time
-        GLOBAL_STATE[GLOBAL_RAN_TANKA_DEPS_KEY] = True
+        TANKA_DEPS_HANDLED.append(base_dir)
 
     trace("Rendering tanka with env: %s" % env_vars)
+
     # Generate manifests with tanka
-    wrapped_k8s_yaml(
-        local(
-            quiet=True,
-            command=[
-                TANKA,
-                "--ext-str=projectRoot=" + base_dir,
-                "show",
-                # Allow dumping the templates to stdout,
-                # instead of using tk export to generate files
-                # and then have to manage deleting them etc.
-                "--dangerous-allow-redirect",
-                environment
-            ],
-            env=env_vars
-        )
+    rendered = local(
+        quiet=True,
+        command=[
+            TANKA,
+            "--ext-str=projectRoot=" + base_dir,
+            "show",
+            # Allow dumping the templates to stdout,
+            # instead of using tk export to generate files
+            # and then have to manage deleting them etc.
+            "--dangerous-allow-redirect",
+            environment
+        ],
+        env=env_vars
     )
+
+    if namespace:
+        rendered = namespace_inject(rendered, namespace)
+    wrapped_k8s_yaml(rendered)
+
+
+def render_aperturectl(scenario_path, policies, namespace):
+    aperturectl_bin = str(local(command=["./scripts/build_aperturectl.sh"], quiet=True))
+
+    blueprints_uri = os.path.join(GIT_ROOT, "blueprints")
+    base_dir = os.path.join(GIT_ROOT, "playground")
+    for policy in policies:
+        policy_def = policy["policy_def"]
+        policy_name = policy["policy_name"]
+        values_file = os.path.join(scenario_path, policy["values_file"])
+        rendered = local(command=["./scripts/render-policy.sh", base_dir, aperturectl_bin, blueprints_uri,
+                                  policy_def, policy_name, values_file], quiet=True)
+
+        if namespace:
+            rendered = namespace_inject(rendered, namespace)
+        wrapped_k8s_yaml(rendered)
 
 
 def print_available_resources(dep_tree):
@@ -806,6 +730,109 @@ def resolve_objects(included_matchers, ignored_matchers):
     return matched_objs
 
 
+def render_yaml(manifests_path, env_vars=None):
+    if not env_vars:
+        env_vars = {}
+
+    wrapped_k8s_yaml(
+        local(
+            quiet=True,
+            command=[
+                "./scripts/render-yaml.sh",
+                manifests_path
+            ],
+            env=env_vars
+        )
+    )
+
+
+def render_jsonnet(manifests_path, jsonnet_args, namespace):
+    if not jsonnet_args:
+        jsonnet_args = []
+
+    rendered = local(
+        quiet=True,
+        command=["jsonnet"] + jsonnet_args + [manifests_path]
+    )
+
+    if namespace:
+        rendered = namespace_inject(rendered, namespace)
+    wrapped_k8s_yaml(rendered)
+
+
+def process_aperture_scenario(scenario_path):
+    # If this is a relative path, it's relative to Tiltfile (PLAYGROUND_ROOT_PATH)
+    if scenario_path[0] != "/":
+        scenario_path = PLAYGROUND_ROOT + "/" + scenario_path
+
+    app_manifest = read_json(scenario_path + "/metadata.json", default='')
+    if app_manifest == '':
+        fail("Unable to find or parse metadata.json, will not continue.")
+
+    tkenv = app_manifest.get("tkenv")
+    if tkenv != None and tkenv[0] != "/":
+        tkenv = scenario_path + "/" + tkenv
+        app_manifest["tkenv"] = tkenv
+
+    if "base_dir" not in app_manifest:
+        app_manifest["base_dir"] = scenario_path + "/"
+
+    app_manifest["manifests_path"] = scenario_path + "/" + "manifests"
+    app_manifest["labels"] = "TestScenarioApplication"
+    images = app_manifest.get("images", [])
+    for image in images:
+        image["context"] = scenario_path + "/" + image["context"]
+
+    if APERTURE_DEMOAPP_NS not in DEP_TREE:
+        DEP_TREE[APERTURE_DEMOAPP_NS] = {}
+    DEP_TREE[APERTURE_DEMOAPP_NS]["scenario-app"] = app_manifest
+
+    aperture_policies = app_manifest.pop("aperture_policies", [])
+
+    if aperture_policies:
+        policies = {
+            "renderer": "aperturectl",
+            "namespace": APERTURE_CONTROLLER_NS,
+            "labels": "TestScenarioApplication",
+            "scenario_path": scenario_path,
+            "aperture_policies": aperture_policies,
+            "resource_deps": ["scenario-app"],
+            "child_resources": [
+                {
+                    "new_name": "scenario-policies",
+                    "extra_objects": [
+                        (None, "Policy", APERTURE_CONTROLLER_NS)
+                    ]
+                }
+            ]
+        }
+        DEP_TREE[APERTURE_DEMOAPP_NS]["scenario-policies"] = policies
+
+    # Load k6 configuration and process it for inclusion into a yaml file
+    wavepool_js = str(read_file(scenario_path + "/" + "load_generator/test.js"))
+    lines = wavepool_js.replace("\"", "\\\"").split("\n")
+    wavepool_js = "\\n".join(lines)
+    wavepool = {
+        "renderer": "yaml",
+        "namespace": APERTURE_DEMOAPP_NS,
+        "labels": "TestScenarioApplication",
+        "manifests_path": PLAYGROUND_ROOT + "/" + "scenarios/wavepool-generator",
+        "resource_deps": ["scenario-policies", "cluster-bootstrap"],
+        "env_vars": {
+            "NINJA_WAVEPOOL_JS": wavepool_js
+        },
+        "child_resources": [
+            {
+                "workload": "wavepool-generator",
+                "extra_objects": [
+                    "wavepool-config:configmap"
+                ]
+            },
+        ]
+    }
+    DEP_TREE[APERTURE_DEMOAPP_NS]["scenario-wavepool"] = wavepool
+
+
 #################################
 ### MAIN RESOURCE DECLARATION ###
 #################################
@@ -900,11 +927,27 @@ def declare_resources(resources, dep_tree, inv_dep_tree,race_arg):
         ns_apps = DEP_TREE.get(namespace, {})
         for app in apps:
             app_config = ns_apps.get(app, {})
+            renderer = app_config.get("renderer")
+            manifests_path = app_config.get("manifests_path")
             tkenv = app_config.get("tkenv")
-            if not tkenv:
-                fail("Tanka app is not found for %s." % app)
             env_vars = app_config.get("env_vars", {})
-            render_tanka(tkenv, env_vars)
+            namespace = app_config.get("namespace", None)
+            if tkenv:
+                base_dir = app_config.get("base_dir")
+                render_tanka(tkenv, env_vars, base_dir, namespace)
+            elif renderer == "yaml":
+                render_yaml(manifests_path, env_vars)
+            elif renderer == "jsonnet":
+                namespace = app_config.get("namespace", None)
+                jsonnet_args = app_config.get("jsonnet_args", [])
+                render_jsonnet(manifests_path, jsonnet_args, namespace)
+            elif renderer == "aperturectl":
+                scenario_path = app_config.get("scenario_path")
+                namespace = app_config.get("namespace", None)
+                policies = app_config.get("aperture_policies", None)
+                render_aperturectl(scenario_path, policies, namespace)
+            else:
+                fail("Tanka app is not found for %s." % app)
 
     # Some resources are cluster-wide so we group them into a single workload "cluster-bootstrap",
     # to drop them from uncategorized resource list.
@@ -990,6 +1033,35 @@ def declare_resources(resources, dep_tree, inv_dep_tree,race_arg):
         fail("SKIP_LOCAL_CMDS mode enabled")
 
 
+def process_dockerhub_images(dockerhub_images):
+    for namespace, workloads in DEP_TREE.items():
+        for workload, sections in workloads.items():
+            if "images" not in sections:
+                continue
+
+            images_final = []
+            for image in sections["images"]:
+                image_ref = image["ref"]
+                if image_ref not in dockerhub_images:
+                    images_final += [image]
+
+                images_final += [{"ref": image_ref, "tag": "latest"}]
+            sections["images"] = images_final
+
+
+def process_local_settings(local_settings):
+    print("Applying local settings from ./tilt_local.json")
+    override_default_registry = local_settings.get("default_registry", None)
+    if override_default_registry:
+        print("Overriding default registry to: "+ override_default_registry)
+        default_registry(override_default_registry)
+
+    override_allowed_k8s_contexts = local_settings.get("allowed_k8s_contexts", [])
+    if override_allowed_k8s_contexts:
+        print("Overriding allowed_k8s_contexts with: " + ",".join(override_allowed_k8s_contexts))
+        allow_k8s_contexts(override_allowed_k8s_contexts)
+
+
 ############
 ### MAIN ###
 ############
@@ -1001,20 +1073,43 @@ config.define_bool("manual", usage="Set trigger mode to manual")
 config.define_bool("only", usage="Only deploy explicitly resources, without handling dependencies")
 config.define_bool("verbose", usage="Enable verbose logging")
 config.define_bool("trace", usage="Enable trace logging")
+config.define_string("scenario", usage="Demo scenario to execute")
+config.define_string_list("dockerhub-image", usage="A list of images to pull directly from docker.io/fluxninja")
 config.define_bool("race",usage="Enable race detector for agent and controller")
 config.define_bool("skip-plugins", usage="Skip plugin building")
 cfg = config.parse()
 # Enable all resources, as calling `config.parse()` by default disables all
 config.set_enabled_resources([])
 
+local_settings = read_json("tilt_local.json", None)
+if local_settings:
+    process_local_settings(local_settings)
+
 if cfg.get("list-resources", False):
     print_available_resources(DEP_TREE)
     exit()
+
 
 if cfg.get("manual", False):
     trigger_mode(TRIGGER_MODE_MANUAL)
 
 get_race = cfg.get("race",False)
+
+# Optionally, process a list of images that should be pulled from dockerhub instead of being
+# built locally. This is mostly meant for aperture-agent, aperture-controller and aperture-operator.
+dockerhub_images = cfg.get("dockerhub-image", [])
+if dockerhub_images:
+    process_dockerhub_images(dockerhub_images)
+
+scenario = cfg.get("scenario", None)
+if not scenario:
+    scenario = DEFAULT_TEST_SCENARIO
+
+process_aperture_scenario(scenario)
+to_run = ["agent", "controller", "aperture-grafana", "istio", "scenario-app", "scenario-wavepool"]
+# Not all scenarios have policies, so only load policies if they were generated based on the scenario.
+if "scenario-policies" in DEP_TREE[APERTURE_DEMOAPP_NS]:
+    to_run += ["scenario-policies"]
 
 cfg_trace = cfg.get("trace", os.getenv("NINJA_TILT_TRACE", "false"))
 TRACE = cfg_trace == True
@@ -1027,7 +1122,6 @@ if cfg.get("skip-plugins", os.getenv("SKIP_PLUGINS", "false").lower() == "true")
     DEP_TREE[APERTURE_AGENT_NS]["agent"]["images"][0]["target"] = "agent-base"
 
 run_only_listed = cfg.get("only", False)
-to_run = cfg.get("to-run", ["all"])
 
 inverted_dep_tree = invert_dep_tree(DEP_TREE)
 resources = get_resource_list_to_deploy(to_run, run_only_listed, DEP_TREE, inverted_dep_tree)
@@ -1041,47 +1135,23 @@ watch_file("./tanka/lib/")
 watch_file("./tanka/charts/")
 watch_file(GIT_ROOT + "/operator/config/crd")
 
-run_wavepool_generator = '''
-tk show --ext-str=projectRoot={0} {0}/apps/demoapp/ --target=configmap/wavepool-config --dangerous-allow-redirect | kubectl apply -f -
-tk show --ext-str=projectRoot={0} {0}/apps/demoapp/ --target=deployment/wavepool-generator --dangerous-allow-redirect | kubectl apply -f -
+run_wavepool_graphql_generator = '''
+kubectl -n demoapp scale --replicas=1 deployment wavepool-generator
 '''.format(TANKA_ROOT)
 cmd_button('wavepool-start',
     resource='wavepool-generator',
     icon_name='content_paste_go',
     text='Start Wavepool Generator',
-    argv=['sh', '-c', run_wavepool_generator],
+    argv=['sh', '-c', run_wavepool_graphql_generator],
 )
 
-delete_wavepool_generator = '''
-kubectl delete deploy wavepool-generator -n {0}
-kubectl delete configmap wavepool-config -n {0}
+delete_wavepool_graphql_generator = '''
+kubectl -n demoapp scale --replicas=0 deployment wavepool-generator
 '''.format(APERTURE_DEMOAPP_NS)
 cmd_button('wavepool-stop',
     resource='wavepool-generator',
     icon_name='content_paste_off',
     text='Stop Wavepool Generator',
-    argv=['sh', '-c', delete_wavepool_generator],
-)
-
-run_wavepool_graphql_generator = '''
-tk show --ext-str=projectRoot={0} {0}/apps/demoapp/ --target=configmap/wavepool-graphql-config --dangerous-allow-redirect | kubectl apply -f -
-tk show --ext-str=projectRoot={0} {0}/apps/demoapp/ --target=deployment/wavepool-graphql-generator --dangerous-allow-redirect | kubectl apply -f -
-'''.format(TANKA_ROOT)
-cmd_button('wavepool-graphql-start',
-    resource='wavepool-graphql-generator',
-    icon_name='content_paste_go',
-    text='Start GraphQL Wavepool Generator',
-    argv=['sh', '-c', run_wavepool_graphql_generator],
-)
-
-delete_wavepool_graphql_generator = '''
-kubectl delete deploy wavepool-graphql-generator -n {0}
-kubectl delete configmap wavepool-graphql-config -n {0}
-'''.format(APERTURE_DEMOAPP_NS)
-cmd_button('wavepool-graphql-stop',
-    resource='wavepool-graphql-generator',
-    icon_name='content_paste_off',
-    text='Stop GraphQL Wavepool Generator',
     argv=['sh', '-c', delete_wavepool_graphql_generator],
 )
 
