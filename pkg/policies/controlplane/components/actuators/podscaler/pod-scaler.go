@@ -1,4 +1,4 @@
-package horizontalpodscaler
+package podscaler
 
 import (
 	"context"
@@ -22,33 +22,32 @@ func Module() fx.Option {
 	)
 }
 
-// HorizontalPodScaler struct.
-type horizontalPodScalerConfigSync struct {
-	policyReadAPI            iface.Policy
-	horizontalPodScalerProto *policylangv1.HorizontalPodScaler
-	etcdPath                 string
-	componentID              string
+type podScalerConfigSync struct {
+	policyReadAPI  iface.Policy
+	podScalerProto *policylangv1.PodScaler
+	etcdPath       string
+	componentID    string
 }
 
-// NewHorizontalPodScalerOptions creates fx options for HorizontalPodScaler and also returns the agent group name associated with it.
-func NewHorizontalPodScalerOptions(
-	horizontalPodScalerProto *policylangv1.HorizontalPodScaler,
+// NewPodScalerOptions creates fx options for HorizontalPodScaler and also returns the agent group name associated with it.
+func NewPodScalerOptions(
+	podScalerProto *policylangv1.PodScaler,
 	componentStackID string,
 	policyReadAPI iface.Policy,
 ) (fx.Option, string, error) {
 	// Get Agent Group Name from HorizontalPodScaler.KubernetesObjectSelector.AgentGroup
-	k8sObjectSelectorProto := horizontalPodScalerProto.GetKubernetesObjectSelector()
+	k8sObjectSelectorProto := podScalerProto.GetKubernetesObjectSelector()
 	if k8sObjectSelectorProto == nil {
-		return fx.Options(), "", errors.New("horizontalPodScaler.Selector is nil")
+		return fx.Options(), "", errors.New("podScaler.Selector is nil")
 	}
 	agentGroup := k8sObjectSelectorProto.GetAgentGroup()
-	etcdPath := path.Join(paths.HorizontalPodScalerConfigPath,
+	etcdPath := path.Join(paths.PodScalerConfigPath,
 		paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentStackID))
-	configSync := &horizontalPodScalerConfigSync{
-		horizontalPodScalerProto: horizontalPodScalerProto,
-		policyReadAPI:            policyReadAPI,
-		etcdPath:                 etcdPath,
-		componentID:              componentStackID,
+	configSync := &podScalerConfigSync{
+		podScalerProto: podScalerProto,
+		policyReadAPI:  policyReadAPI,
+		etcdPath:       etcdPath,
+		componentID:    componentStackID,
 	}
 
 	return fx.Options(
@@ -58,13 +57,13 @@ func NewHorizontalPodScalerOptions(
 	), agentGroup, nil
 }
 
-func (configSync *horizontalPodScalerConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+func (configSync *podScalerConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	logger := configSync.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Add/remove file in lifecycle hooks in order to sync with etcd.
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper := &policysyncv1.HorizontalPodScalerWrapper{
-				HorizontalPodScaler: configSync.horizontalPodScalerProto,
+			wrapper := &policysyncv1.PodScalerWrapper{
+				PodScaler: configSync.podScalerProto,
 				CommonAttributes: &policysyncv1.CommonAttributes{
 					PolicyName:  configSync.policyReadAPI.GetPolicyName(),
 					PolicyHash:  configSync.policyReadAPI.GetPolicyHash(),

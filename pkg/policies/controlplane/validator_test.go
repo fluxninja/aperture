@@ -325,9 +325,9 @@ spec:
               signal_name: "CONCURRENCY_INCREMENT_DECISION"
       - switcher:
           in_ports:
-            on_true:
+            on_signal:
               signal_name: "CONCURRENCY_INCREMENT_OVERLOAD"
-            on_false:
+            off_signal:
               signal_name: "CONCURRENCY_INCREMENT_NORMAL"
             switch:
               signal_name: "CONCURRENCY_INCREMENT_DECISION"

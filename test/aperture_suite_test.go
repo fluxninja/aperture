@@ -109,7 +109,9 @@ var _ = BeforeSuite(func() {
 			"pretty_console": true,
 		},
 		"server": map[string]interface{}{
-			"addr": addr,
+			"listener": map[string]interface{}{
+				"addr": addr,
+			},
 			"grpc": map[string]interface{}{
 				"enable_reflection": true,
 			},

@@ -100,9 +100,16 @@ repos:
         name: "Helm Readme"
         entry: "./scripts/precommit/generate_helm_readme.sh"
         language: script
-        files: "values.yaml$"
+        files: "^manifests/charts/.*"
         pass_filenames: false
         description: "Generate helm readme"
+      - id: helmlint
+        name: "Helm Lint"
+        description: Run helm lint, a linter for helm charts
+        files: "^manifests/charts/.*"
+        pass_filenames: false
+        entry: ./scripts/precommit/helmlint.sh
+        language: script
       - id: generate-swagger
         name: "Config Swagger"
         entry: "./scripts/precommit/generate_swagger.sh"
@@ -157,11 +164,6 @@ repos:
           - fmt
         types:
           - jsonnet
-      - id: helmlint
-        name: "Helm Lint"
-        description: Run helm lint, a linter for helm charts
-        entry: ./scripts/precommit/helmlint.sh
-        language: script
       - id: check-operator-spec-changes
         name: "Check Operator Spec Changes"
         description: Checking if the Operator spec is changed

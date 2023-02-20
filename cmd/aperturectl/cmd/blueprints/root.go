@@ -95,6 +95,9 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 		if err != nil {
 			return err
 		}
+
+		blueprintsDir = filepath.Join(blueprintsURIRoot, getRelPath(blueprintsURIRoot))
+
 		// lock blueprintsDir to prevent concurrent access using flock package
 		lock = flock.New(filepath.Join(blueprintsURIRoot, lockFilename))
 
