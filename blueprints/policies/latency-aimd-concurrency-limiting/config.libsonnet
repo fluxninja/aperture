@@ -100,9 +100,13 @@
   * @section Dashboard
   *
   * @param (dashboard.refresh_interval: string) Refresh interval for dashboard panels.
+  * @param (dashboard.time_from: string) From time of dashboard.
+  * @param (dashboard.time_to: string) To time of dashboard.
   */
   dashboard: {
-    refresh_interval: '10s',
+    refresh_interval: '5s',
+    time_from: 'now-15m',
+    time_to: 'now',
     /**
     * @section Dashboard
     * @subsection Datasource

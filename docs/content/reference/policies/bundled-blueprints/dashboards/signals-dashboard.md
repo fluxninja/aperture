@@ -70,14 +70,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/
     name="dashboard.refresh_interval"
     type="string"
     reference=""
-    value="'10s'"
+    value="'5s'"
     description='Refresh interval for dashboard panels.' />
 
 <ParameterDescription
     name="dashboard.time_from"
     type="string"
     reference=""
-    value="'now-30m'"
+    value="'now-15m'"
     description='From time of dashboard.' />
 
 <ParameterDescription

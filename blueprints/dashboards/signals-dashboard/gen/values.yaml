@@ -11,10 +11,10 @@ common:
 dashboard:
   # Refresh interval for dashboard panels.
   # Type: string
-  refresh_interval: "10s"
+  refresh_interval: "5s"
   # From time of dashboard.
   # Type: string
-  time_from: "now-30m"
+  time_from: "now-15m"
   # To time of dashboard.
   # Type: string
   time_to: "now"

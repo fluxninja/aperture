@@ -214,8 +214,22 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     name="dashboard.refresh_interval"
     type="string"
     reference=""
-    value="'10s'"
+    value="'5s'"
     description='Refresh interval for dashboard panels.' />
+
+<ParameterDescription
+    name="dashboard.time_from"
+    type="string"
+    reference=""
+    value="'now-15m'"
+    description='From time of dashboard.' />
+
+<ParameterDescription
+    name="dashboard.time_to"
+    type="string"
+    reference=""
+    value="'now'"
+    description='To time of dashboard.' />
 
 <h4 class="blueprints-h4">Datasource</h4>
 
