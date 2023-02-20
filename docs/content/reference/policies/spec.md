@@ -986,7 +986,7 @@ Exponential Moving Average (EMA) is a type of moving average that applies expone
 At any time EMA component operates in one of the following states:
 
 1. Warm up state: The first warmup_window samples are used to compute the initial EMA.
-   If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
+   If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of warm up state.
 2. Normal state: The EMA is computed using following formula.
 
 The EMA for a series $Y$ is calculated recursively as:
@@ -1006,8 +1006,6 @@ The $\alpha$ is computed using ema_window:
 $$
 \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
 $$
-
-The EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#e-m-a-ins).
 
 #### Properties
 
@@ -1052,19 +1050,13 @@ Inputs for the EMA component.
 
 ([InPort](#in-port)) Upper bound of the moving average.
 
-Used during the warm-up stage: if the signal would exceed `max_envelope`
-it's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.
+When the signal exceeds `max_envelope` it's multiplied by
+`correction_factor_on_max_envelope_violation` **once per tick**.
 
 :::note
 
 If the signal deviates from `max_envelope` faster than the correction
 faster, it might end up exceeding the envelope.
-
-:::
-
-:::note
-
-The envelope logic is **not** used outside the warm-up stage!
 
 :::
 
@@ -1074,7 +1066,7 @@ The envelope logic is **not** used outside the warm-up stage!
 
 ([InPort](#in-port)) Lower bound of the moving average.
 
-Used during the warm-up stage analogously to `max_envelope`.
+Behavior is similar to `max_envelope`.
 
 </dd>
 </dl>
@@ -1128,7 +1120,7 @@ Parameters for the EMA component.
 <dt>valid_during_warmup</dt>
 <dd>
 
-(bool) Whether the output is valid during the warm-up stage.
+(bool) Whether the output is valid during the warm up stage.
 
 @gotags: default:"false"
 
@@ -1138,7 +1130,7 @@ Parameters for the EMA component.
 
 (string, default: `0s`) Duration of EMA warming up window.
 
-The initial value of the EMA is the average of signal readings received during the warm-up window.
+The initial value of the EMA is the average of signal readings received during the warm up window.
 
 @gotags: default:"0s"
 
@@ -2009,13 +2001,19 @@ Inputs for the Integrator component.
 <dt>max</dt>
 <dd>
 
-([InPort](#in-port)) The maximum output when reset is not set.
+([InPort](#in-port)) The maximum output.
+
+</dd>
+<dt>min</dt>
+<dd>
+
+([InPort](#in-port)) The minimum output.
 
 </dd>
 <dt>reset</dt>
 <dd>
 
-([InPort](#in-port)) Resets the integrator output to zero when reset signal is valid and non-zero.
+([InPort](#in-port)) Resets the integrator output to zero when reset signal is valid and non-zero. Reset also resets the max and min constraints.
 
 </dd>
 </dl>

@@ -80,6 +80,7 @@ local policyResource = latencyAIMDPolicy({
         + workload.withLabelMatcher(labelMatcher.withMatchLabels({ 'http.request.header.user_type': 'subscriber' })),
       ],
     },
+    load_multiplier_linear_increment: 0.0050,
     alerter+: {
       alert_channels: ['service1-demo-app'],
     },

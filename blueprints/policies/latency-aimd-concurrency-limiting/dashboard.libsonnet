@@ -195,8 +195,8 @@ function(cfg) {
       editable=true,
       schemaVersion=18,
       refresh=params.refresh_interval,
-      time_from='now-5m',
-      time_to='now'
+      time_from=params.time_from,
+      time_to=params.time_to
     )
     .addTemplate(
       {

@@ -639,7 +639,7 @@
       "additionalProperties": false
     },
     "EMA": {
-      "description": "At any time EMA component operates in one of the following states:\n1. Warm up state: The first warmup_window samples are used to compute the initial EMA.\n   If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.\n2. Normal state: The EMA is computed using following formula.\n\nThe EMA for a series $Y$ is calculated recursively as:\n\n$$\n\\text{EMA} _t =\n\\begin{cases}\n  Y_0, &\\text{for } t = 0 \\\\\n  \\alpha Y_t + (1 - \\alpha) \\text{EMA} _{t-1}, &\\text{for }t > 0\n\\end{cases}\n$$\n\nThe coefficient $\\alpha$ represents the degree of weighting decrease, a constant smoothing factor between 0 and 1.\nA higher $\\alpha$ discounts older observations faster.\nThe $\\alpha$ is computed using ema\\_window:\n\n$$\n\\alpha = \\frac{2}{N + 1} \\quad\\text{where } N = \\frac{\\text{ema\\_window}}{\\text{evaluation\\_period}}\n$$\n\nThe EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#e-m-a-ins).",
+      "description": "At any time EMA component operates in one of the following states:\n1. Warm up state: The first warmup_window samples are used to compute the initial EMA.\n   If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of warm up state.\n2. Normal state: The EMA is computed using following formula.\n\nThe EMA for a series $Y$ is calculated recursively as:\n\n$$\n\\text{EMA} _t =\n\\begin{cases}\n  Y_0, &\\text{for } t = 0 \\\\\n  \\alpha Y_t + (1 - \\alpha) \\text{EMA} _{t-1}, &\\text{for }t > 0\n\\end{cases}\n$$\n\nThe coefficient $\\alpha$ represents the degree of weighting decrease, a constant smoothing factor between 0 and 1.\nA higher $\\alpha$ discounts older observations faster.\nThe $\\alpha$ is computed using ema\\_window:\n\n$$\n\\alpha = \\frac{2}{N + 1} \\quad\\text{where } N = \\frac{\\text{ema\\_window}}{\\text{evaluation\\_period}}\n$$",
       "type": "object",
       "title": "Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings",
       "properties": {
@@ -672,12 +672,12 @@
           "$ref": "#/definitions/InPort"
         },
         "max_envelope": {
-          "description": "Upper bound of the moving average.\n\nUsed during the warm-up stage: if the signal would exceed `max_envelope`\nit's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.\n\n:::note\n\nIf the signal deviates from `max_envelope` faster than the correction\nfaster, it might end up exceeding the envelope.\n\n:::\n\n:::note\n\nThe envelope logic is **not** used outside the warm-up stage!\n\n:::",
+          "description": "Upper bound of the moving average.\n\nWhen the signal exceeds `max_envelope` it's multiplied by\n`correction_factor_on_max_envelope_violation` **once per tick**.\n\n:::note\n\nIf the signal deviates from `max_envelope` faster than the correction\nfaster, it might end up exceeding the envelope.\n\n:::",
           "x-order": 1,
           "$ref": "#/definitions/InPort"
         },
         "min_envelope": {
-          "description": "Lower bound of the moving average.\n\nUsed during the warm-up stage analogously to `max_envelope`.",
+          "description": "Lower bound of the moving average.\n\nBehavior is similar to `max_envelope`.",
           "x-order": 2,
           "$ref": "#/definitions/InPort"
         }
@@ -723,13 +723,13 @@
           "x-order": 2
         },
         "valid_during_warmup": {
-          "description": "Whether the output is valid during the warm-up stage.\n\n@gotags: default:\"false\"",
+          "description": "Whether the output is valid during the warm up stage.\n\n@gotags: default:\"false\"",
           "type": "boolean",
           "x-go-default": false,
           "x-order": 3
         },
         "warmup_window": {
-          "description": "Duration of EMA warming up window.\n\nThe initial value of the EMA is the average of signal readings received during the warm-up window.\n\n@gotags: default:\"0s\"",
+          "description": "Duration of EMA warming up window.\n\nThe initial value of the EMA is the average of signal readings received during the warm up window.\n\n@gotags: default:\"0s\"",
           "type": "string",
           "x-go-default": "0s",
           "x-order": 4
@@ -1299,13 +1299,18 @@
           "$ref": "#/definitions/InPort"
         },
         "max": {
-          "description": "The maximum output when reset is not set.",
+          "description": "The maximum output.",
           "x-order": 1,
           "$ref": "#/definitions/InPort"
         },
-        "reset": {
-          "description": "Resets the integrator output to zero when reset signal is valid and non-zero.",
+        "min": {
+          "description": "The minimum output.",
           "x-order": 2,
+          "$ref": "#/definitions/InPort"
+        },
+        "reset": {
+          "description": "Resets the integrator output to zero when reset signal is valid and non-zero. Reset also resets the max and min constraints.",
+          "x-order": 3,
           "$ref": "#/definitions/InPort"
         }
       },

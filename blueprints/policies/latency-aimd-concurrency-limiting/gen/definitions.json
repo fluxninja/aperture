@@ -130,6 +130,16 @@
           "type": "string"
         },
 
+        "time_from": {
+          "description": "From time of dashboard.",
+          "type": "string"
+        },
+
+        "time_to": {
+          "description": "To time of dashboard.",
+          "type": "string"
+        },
+
         "datasource": {
           "type": "object",
           "additionalProperties": false,
