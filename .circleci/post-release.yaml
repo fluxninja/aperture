@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  gcp-gcr: circleci/gcp-gcr@0.13.0
+
 executors:
   base-cimg-executor:
     docker:
@@ -7,6 +10,9 @@ executors:
   ubuntu-18-executor:
     docker:
       - image: cimg/base:2022.12-18.04
+  python-cimg-executor:
+    docker:
+      - image: cimg/python:3.10.6
 
 jobs:
   publish-protobuf-files:
@@ -171,6 +177,67 @@ jobs:
       - asdf_save_cache:
           cache_name: aperture-{{ .Environment.COMPONENT }}-packages
 
+  update-environment:
+    parameters:
+      job-root:
+        type: string
+        default: "/home/circleci"
+        description:
+          The root folder of the job where all repositories will be cloned to
+      manifests-repo:
+        type: string
+        default: git@github.com:fluxninja/argo-manifests.git
+        description: ArgoCD manifests repository to update
+      manifests-branch:
+        type: string
+        default: tests
+        description: Branch to use when pushing deployment changes
+      environment-path:
+        type: string
+        description: Path to the environment to update
+      component:
+        type: string
+        default: ""
+        description:
+          Application component to update image and deployment code for
+      skip-component:
+        type: string
+        default: ""
+        description:
+          Application component to skip to update image and deployment code for
+      update:
+        type: string
+        default: everything
+        description:
+          Whether to update 'images', 'deployment-code' or 'everything'
+      release-train:
+        type: string
+        default: latest
+        description:
+          What images to use for updating components
+    executor: python-cimg-executor
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "f9:49:04:10:b1:77:16:b0:0e:c0:ba:21:0e:9d:fd:40" # argo-manifests R/W
+            - "2a:af:6f:d5:b9:d4:dd:95:df:18:47:e9:0b:4a:c7:82" # deployment R/W
+            - "10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8" #cloud keys
+      - checkout
+      - gcp-gcr/gcr-auth
+      - opsninja_install
+      - run:
+          name: Update application in the deployment
+          environment:
+            JOB_ROOT: << parameters.job-root >>
+            UPDATE: << parameters.update >>
+            MANIFESTS_BRANCH: << parameters.manifests-branch >>
+            MANIFESTS_REPO: << parameters.manifests-repo >>
+            COMPONENT: << parameters.component >>
+            ENVIRONMENT_PATH: << parameters.environment-path >>
+            SKIP_COMPONENTS: << parameters.skip-component >>
+            RELEASE_TRAIN: << parameters.release-train >>
+          command: .circleci/scripts/update_environment.sh
+
 workflows:
   version: 2
 
@@ -208,6 +275,29 @@ workflows:
               component:
                 - agent
                 - cli
+
+      - update-environment:
+          filters:
+            branches:
+              ignore: /.+/
+            tags:
+              only: /^v.*/
+          name: aperture-update-environment-everything
+          environment-path: environments/demo/
+          skip-component: demo-app
+          update: everything
+          release-train: final-release
+
+      - update-environment:
+          filters:
+            branches:
+              ignore: /.+/
+            tags:
+              only: /^v.*/
+          name: aperture-update-environment-demoapp
+          environment-path: environments/demo/
+          component: demo-app
+          update: images,deployment-code
 
 commands:
   asdf_install:
