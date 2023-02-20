@@ -3,6 +3,14 @@
   "dependencies": [
     {
       "source": {
+        "local": {
+          "directory": "../../blueprints"
+        }
+      },
+      "version": ""
+    },
+    {
+      "source": {
         "git": {
           "remote": "https://github.com/grafana/grafonnet-lib.git",
           "subdir": "grafonnet"
@@ -70,6 +78,16 @@
       },
       "version": "21f1224e3d351cf85951221d91d015eef790ed48",
       "sum": "ASDT27EY11m/kkF07duciT+Ncfpl9EajksolMHN5NEg="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/jsonnet-libs/k8s-libsonnet.git",
+          "subdir": "1.24"
+        }
+      },
+      "version": "6e68f034db06700bc5456b144b0ee863a7b16ef9",
+      "sum": "rYV2U94H2TNkBicW6Idpcvf6/EK4iE/eAExcBvsbg3w="
     },
     {
       "source": {
