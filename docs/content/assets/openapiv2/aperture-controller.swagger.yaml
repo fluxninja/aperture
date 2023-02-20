@@ -1460,12 +1460,10 @@ definitions:
         description: The input signal.
         $ref: '#/definitions/InPort'
       max:
-        description: The maximum output. Max is stored in the integrator state and
-          is maintained as the lowest max value seen.
+        description: The maximum output.
         $ref: '#/definitions/InPort'
       min:
-        description: The minimum output. Min is stored in the integrator state and
-          is maintained as the highest min value seen.
+        description: The minimum output.
         $ref: '#/definitions/InPort'
       reset:
         description: Resets the integrator output to zero when reset signal is valid

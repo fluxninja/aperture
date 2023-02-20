@@ -6093,9 +6093,9 @@ type Integrator_Ins struct {
 	Input *InPort `protobuf:"bytes,1,opt,name=input,proto3" json:"input,omitempty"`
 	// Resets the integrator output to zero when reset signal is valid and non-zero. Reset also resets the max and min constraints.
 	Reset_ *InPort `protobuf:"bytes,2,opt,name=reset,proto3" json:"reset,omitempty"`
-	//The maximum output. Max is stored in the integrator state and is maintained as the lowest max value seen.
+	//The maximum output.
 	Max *InPort `protobuf:"bytes,3,opt,name=max,proto3" json:"max,omitempty"`
-	//The minimum output. Min is stored in the integrator state and is maintained as the highest min value seen.
+	//The minimum output.
 	Min *InPort `protobuf:"bytes,4,opt,name=min,proto3" json:"min,omitempty"`
 }
 

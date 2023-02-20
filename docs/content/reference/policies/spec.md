@@ -2001,13 +2001,13 @@ Inputs for the Integrator component.
 <dt>max</dt>
 <dd>
 
-([InPort](#in-port)) The maximum output. Max is stored in the integrator state and is maintained as the lowest max value seen.
+([InPort](#in-port)) The maximum output.
 
 </dd>
 <dt>min</dt>
 <dd>
 
-([InPort](#in-port)) The minimum output. Min is stored in the integrator state and is maintained as the highest min value seen.
+([InPort](#in-port)) The minimum output.
 
 </dd>
 <dt>reset</dt>
