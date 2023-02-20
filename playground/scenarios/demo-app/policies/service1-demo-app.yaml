@@ -1,4 +1,3 @@
-# yaml-language-server: $schema=file:/Users/krzysztofklimonda/.aperturectl/blueprints/_Users_krzysztofklimonda_src_fluxninja_aperture_blueprints/blueprints/policies/latency-aimd-concurrency-limiting/gen/definitions.json
 # Generated values file for policies/latency-aimd-concurrency-limiting blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting
