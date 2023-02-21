@@ -1,21 +1,19 @@
+# Generated values file for policies/static-rate-limiting blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/static-rate-limiting
+
 common:
+  # Name of the policy.
+  # Type: string
+  # Required: True
   policy_name: "graphql-static-rate-limiting"
+
 policy:
-  rate_limiter:
-    rate_limit: 10
-    flow_selector:
-      flow_matcher:
-        control_point: ingress
-      service_selector:
-        agent_group: default
-        service: service-graphql-demo-app.demoapp.svc.cluster.local
-    parameters:
-      label_key: user_id
-      lazy_sync:
-        enabled: true
-        num_sync: 5
-      limit_reset_interval: 1s
+  # How often should the policy be re-evaluated
+  # Type: string
   evaluation_interval: 0.5s
+  # List of classification rules.
+  # Type: []aperture.spec.v1.Classifier
   classifiers:
     - flow_selector:
         flow_matcher:
@@ -54,3 +52,33 @@ policy:
                 u := claims.userID
               }
           telemetry: true
+  rate_limiter:
+    # Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept
+    # Type: float64
+    # Required: True
+    rate_limit: 10
+    # A flow selector to match requests against
+    # Type: aperture.spec.v1.FlowSelector
+    flow_selector:
+      service_selector:
+        agent_group: default
+        # Service Name.
+        # Type: string
+        # Required: True
+        service: service-graphql-demo-app.demoapp.svc.cluster.local
+      flow_matcher:
+        # Control Point Name.
+        # Type: string
+        # Required: True
+        control_point: ingress
+    # Parameters.
+    # Type: aperture.spec.v1.RateLimiterParameters
+    parameters:
+      # Flow label to use for rate limiting.
+      # Type: string
+      # Required: True
+      label_key: user_id
+      lazy_sync:
+        enabled: true
+        num_sync: 5
+      limit_reset_interval: 1s

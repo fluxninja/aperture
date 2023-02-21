@@ -20,4 +20,6 @@ if [ ! -f "${rendered_policy}" ]; then
     exit 1
 fi
 
+head -n 1 "${rendered_policy}" | grep -q '^#' && sed -i '1d' "${rendered_policy}"
+cp "${rendered_policy}" "$(dirname "${values_file}")"
 cat "${rendered_policy}"
