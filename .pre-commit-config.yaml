@@ -138,6 +138,13 @@ repos:
         files: ^(blueprints)|\.proto$|^requirements.txt$
         pass_filenames: false
         description: "Generate Aperture libsonnet and blueprints"
+      - id: generate-playground-policies
+        name: "Generate Playground Policies"
+        entry: "./scripts/precommit/generate_playground_policies.sh"
+        language: script
+        files: ^(blueprints|playground/scenarios/)|\.proto$|^requirements.txt$
+        pass_filenames: false
+        description: "Generate Aperture libsonnet and blueprints"
       - id: generate-doc-assets
         name: "Documentation Assets"
         entry: "./scripts/precommit/generate_doc_assets.sh"
