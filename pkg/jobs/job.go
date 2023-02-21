@@ -32,9 +32,9 @@ type Job interface {
 
 // JobInfo contains information such as run count, last run time, etc. for a Job.
 type JobInfo struct {
-	LastRunTime time.Time
-	NextRunTime time.Time
-	RunCount    int
+	LastExecuteTime time.Time
+	NextExecuteTime time.Time
+	ExecuteCount    int
 }
 
 // JobBase is the base job implementation.
@@ -226,14 +226,14 @@ func (executor *jobExecutor) trigger(delay time.Duration) {
 
 func (executor *jobExecutor) jobInfo() *JobInfo {
 	ji := &JobInfo{
-		LastRunTime: executor.lastRunTime,
-		RunCount:    executor.runCount,
+		LastExecuteTime: executor.lastRunTime,
+		ExecuteCount:    executor.runCount,
 	}
 	execPeriod := executor.config.ExecutionPeriod.AsDuration()
 	if execPeriod < 0 {
-		ji.NextRunTime = time.Time{}
+		ji.NextExecuteTime = time.Time{}
 	} else {
-		ji.NextRunTime = executor.lastFinishTime.Add(execPeriod)
+		ji.NextExecuteTime = executor.lastFinishTime.Add(execPeriod)
 	}
 	return ji
 }

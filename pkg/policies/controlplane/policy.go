@@ -227,7 +227,9 @@ func (policy *Policy) executeTick(jobCtxt context.Context) (proto.Message, error
 	if jobInfo == nil {
 		return nil, fmt.Errorf("job info not found for job %s", policy.jobName)
 	}
-	tickInfo := runtime.NewTickInfo(jobInfo.LastRunTime, jobInfo.NextRunTime, jobInfo.RunCount, policy.evaluationInterval)
+	tickInfo := runtime.NewTickInfo(jobInfo.LastExecuteTime,
+		jobInfo.NextExecuteTime, jobInfo.ExecuteCount,
+		policy.evaluationInterval)
 	// Execute Circuit
 	err := policy.circuit.Execute(tickInfo)
 	// TODO: return tick info (publish to health framework) instead of returning nil proto.Message

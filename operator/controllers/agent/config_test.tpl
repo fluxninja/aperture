@@ -94,7 +94,8 @@ kubernetes_client:
   write_buffer_size: 0
 liveness:
   scheduler:
-    max_concurrent_jobs: 0
+    blocking_execution: false
+    worker_limit: 0
   service:
     execution_period: 10s
     execution_timeout: 5s
@@ -147,7 +148,8 @@ prometheus:
   address: http://aperture-prometheus-server:80
 readiness:
   scheduler:
-    max_concurrent_jobs: 0
+    blocking_execution: false
+    worker_limit: 0
   service:
     execution_period: 10s
     execution_timeout: 5s

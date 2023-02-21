@@ -60,7 +60,8 @@ fluxninja_plugin:
   heartbeat_interval: 5s
 liveness:
   scheduler:
-    max_concurrent_jobs: 0
+    blocking_execution: false
+    worker_limit: 0
   service:
     execution_period: 10s
     execution_timeout: 5s
@@ -97,7 +98,8 @@ plugins:
   plugins_path: default
 policies:
   promql_jobs_scheduler:
-    max_concurrent_jobs: 0
+    blocking_execution: false
+    worker_limit: 0
 profilers:
   cpu_profiler: false
   profiles_path: default
@@ -106,7 +108,8 @@ prometheus:
   address: http://aperture-prometheus-server:80
 readiness:
   scheduler:
-    max_concurrent_jobs: 0
+    blocking_execution: false
+    worker_limit: 0
   service:
     execution_period: 10s
     execution_timeout: 5s

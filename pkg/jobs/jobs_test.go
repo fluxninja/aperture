@@ -36,7 +36,7 @@ type testGroupConfig struct {
 func (gc *testGroupConfig) OnJobScheduled() {
 	for _, job := range gc.jobs {
 		jobInfo := gc.jobGroup.JobInfo(job.Name())
-		Expect(jobInfo.RunCount).To(Equal(0))
+		Expect(jobInfo.ExecuteCount).To(Equal(0))
 	}
 }
 
@@ -44,7 +44,7 @@ func (gc *testGroupConfig) OnJobScheduled() {
 func (gc *testGroupConfig) OnJobCompleted(_ *statusv1.Status, _ JobStats) {
 	for _, job := range gc.jobs {
 		jobInfo := gc.jobGroup.JobInfo(job.Name())
-		Expect(jobInfo.RunCount).To(Equal(gc.jobRunConfig.expectedNoOfRuns))
+		Expect(jobInfo.ExecuteCount).To(Equal(gc.jobRunConfig.expectedNoOfRuns))
 	}
 }
 

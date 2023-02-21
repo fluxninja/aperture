@@ -1320,11 +1320,9 @@ option effectively serializes all job execution.
 <dt>worker_limit</dt>
 <dd>
 
-(int64, default: `0`) When greater than 0, all jobs will be dispatched to a pool
-of goroutines of WorkerLimit size to limit the total number
-of processes usable by the Scheduler. If all worker threads
-are in use, job scheduling will wait till a job can be
-dispatched. If BlockingExecution is set, then WorkerLimit
+(int64, default: `0`) Limits how many jobs can be running at the same time. This is
+useful when running resource intensive jobs and a precise start time is
+not critical. 0 = no limit. If BlockingExecution is set, then WorkerLimit
 is ignored.
 
 </dd>

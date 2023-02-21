@@ -35,11 +35,9 @@ type SchedulerConfig struct {
 	// option effectively serializes all job execution.
 	BlockingExecution bool `json:"blocking_execution" default:"false"`
 
-	// When greater than 0, all jobs will be dispatched to a pool
-	// of goroutines of WorkerLimit size to limit the total number
-	// of processes usable by the Scheduler. If all worker threads
-	// are in use, job scheduling will wait till a job can be
-	// dispatched. If BlockingExecution is set, then WorkerLimit
+	// Limits how many jobs can be running at the same time. This is
+	// useful when running resource intensive jobs and a precise start time is
+	// not critical. 0 = no limit. If BlockingExecution is set, then WorkerLimit
 	// is ignored.
 	WorkerLimit int `json:"worker_limit" default:"0"`
 }
