@@ -76,7 +76,7 @@ spec:
               signal_name: LATENCY_SETPOINT
             signal:
               signal_name: LATENCY
-          load_multiplier_linear_increment: 0.005
+          load_multiplier_linear_increment: 0.0025
           max_load_multiplier: 2
           out_ports:
             accepted_concurrency:
