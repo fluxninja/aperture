@@ -67,12 +67,11 @@ var _ = Describe("Jobs", func() {
 		alerter := alerts.NewSimpleAlerter(100)
 		rootRegistry := status.NewRegistry(log.GetGlobalLogger(), alerter)
 		jobConfig = JobConfig{
-			InitialDelay:     config.MakeDuration(0),
 			ExecutionPeriod:  config.MakeDuration(time.Millisecond * 200),
 			ExecutionTimeout: config.MakeDuration(time.Millisecond * 200),
 			InitiallyHealthy: false,
 		}
-		jobGroup, err = NewJobGroup(rootRegistry, 10, RescheduleMode, groupWatchers)
+		jobGroup, err = NewJobGroup(rootRegistry, JobGroupConfig{}, groupWatchers)
 		Expect(err).NotTo(HaveOccurred())
 
 		addOne = func(ctx context.Context) (proto.Message, error) {
@@ -139,7 +138,6 @@ var _ = Describe("Jobs", func() {
 	})
 
 	It("checks for timed out job", func() {
-		jobConfig.InitialDelay = config.MakeDuration(time.Millisecond * 100)
 		job := NewBasicJob("timeout-job",
 			func(ctx context.Context) (proto.Message, error) {
 				time.Sleep(time.Millisecond * 4000)
@@ -290,7 +288,7 @@ func runJobGroup(jobGroup *JobGroup, groupConfig *testGroupConfig, jobConfig Job
 
 		if groupConfig.jobRunConfig.expectedStatusMsg == "Timeout" {
 			checkStatusMessage(livenessReg, groupConfig.jobRunConfig.expectedStatusMsg, true)
-			jobGroup.TriggerJob(job.Name())
+			jobGroup.TriggerJob(job.Name(), time.Duration(0))
 		} else {
 			checkStatusMessage(livenessReg, groupConfig.jobRunConfig.expectedStatusMsg, false)
 		}

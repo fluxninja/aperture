@@ -1,6 +1,7 @@
 package runtime
 
 import (
+	"fmt"
 	"time"
 
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
@@ -17,6 +18,7 @@ type TickInfo interface {
 	Tick() int
 	Interval() time.Duration
 	Serialize() *policysyncv1.TickInfo
+	String() string
 }
 
 type tickInfo struct {
@@ -64,4 +66,9 @@ func (tickInfo *tickInfo) Serialize() *policysyncv1.TickInfo {
 		Tick:          (int64)(tickInfo.tick),
 		Interval:      durationpb.New(tickInfo.interval),
 	}
+}
+
+// String returns the string representation of the tickInfo.
+func (tickInfo *tickInfo) String() string {
+	return fmt.Sprintf("TickInfo: {timestamp: %s, nextTimestamp: %s, tick: %d, interval: %s}", tickInfo.timestamp, tickInfo.nextTimestamp, tickInfo.tick, tickInfo.interval)
 }
