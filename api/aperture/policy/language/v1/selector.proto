@@ -3,7 +3,6 @@ syntax = "proto3";
 package aperture.policy.language.v1;
 
 import "aperture/policy/language/v1/label_matcher.proto";
-import "protoc-gen-openapiv2/options/annotations.proto";
 
 // Describes which flow in which service a [flow control
 // component](/concepts/integrations/flow-control/flow-control.md#components) should apply
@@ -15,18 +14,8 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 //
 // :::
 message FlowSelector {
-  ServiceSelector service_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
-  FlowMatcher flow_matcher = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  ServiceSelector service_selector = 1; // @gotags: validate:"required"
+  FlowMatcher flow_matcher = 2; // @gotags: validate:"required"
 }
 
 // Describes which service a [flow control or observability
@@ -47,12 +36,7 @@ message ServiceSelector {
   // Agent Groups are used to scope policies to a subset of agents connected to the same controller. This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode. The agents within an agent group form a peer to peer cluster and constantly share state.
   //
   // :::
-  string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "default"}
-    }
-  }]; // @gotags: default:"default"
+  string agent_group = 1; // @gotags: default:"default"
 
   // The Fully Qualified Domain Name of the
   // [service](/concepts/integrations/flow-control/service.md) to select.
@@ -72,12 +56,7 @@ message ServiceSelector {
   // An entity (e.g. Kubernetes pod) may belong to multiple services.
   //
   // :::
-  string service = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"];
+  string service = 2; // @gotags: validate:"required"];
 }
 
 // Describes which flows a [flow control
@@ -110,12 +89,7 @@ message FlowMatcher {
   // identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
   // block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
   // or filter chains.
-  string control_point = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  string control_point = 1; // @gotags: validate:"required"
 
   // Label matcher allows to add _additional_ condition on
   // [flow labels](/concepts/integrations/flow-control/flow-label.md)
@@ -147,42 +121,17 @@ message FlowMatcher {
 message KubernetesObjectSelector {
   // Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
   // selector applies to.
-  string agent_group = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "default"}
-    }
-  }]; // @gotags: default:"default"
+  string agent_group = 1; // @gotags: default:"default"
 
   // Kubernetes namespace that the resource belongs to.
-  string namespace = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  string namespace = 2; // @gotags: validate:"required"
 
   // API version of Kubernetes resource
-  string api_version = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  string api_version = 3; // @gotags: validate:"required"
 
   // Kubernetes resource type.
-  string kind = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  string kind = 4; // @gotags: validate:"required"
 
   // Kubernetes resource name.
-  string name = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  string name = 5; // @gotags: validate:"required"
 }

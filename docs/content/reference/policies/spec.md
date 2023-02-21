@@ -99,7 +99,7 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dt>max_load_multiplier</dt>
 <dd>
 
-(float64, default: `2`) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+(float64, default: `2.0`) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
 
 @gotags: default:"2.0"
 
@@ -339,7 +339,7 @@ Inputs for the And component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port)) Array of input signals.
+([[]InPort](#in-port), `dive`) Array of input signals.
 
 @gotags: validate:"dive"
 
@@ -486,7 +486,7 @@ docs on how exactly it handles invalid inputs.
 <dt>components</dt>
 <dd>
 
-([[]Component](#component)) Defines a signal processing graph as a list of components.
+([[]Component](#component), `dive`) Defines a signal processing graph as a list of components.
 
 @gotags: validate:"dive"
 
@@ -818,7 +818,7 @@ Special constant input for ports and Variable component. Can provide either a co
 <dt>special_value</dt>
 <dd>
 
-(string, `oneof=NaN +Inf -Inf`) @gotags: validate:"oneof=NaN +Inf -Inf"
+(string) @gotags: validate:"oneof=NaN +Inf -Inf"
 
 </dd>
 <dt>value</dt>
@@ -1096,7 +1096,7 @@ Parameters for the EMA component.
 <dt>correction_factor_on_max_envelope_violation</dt>
 <dd>
 
-(float64, `gte=0,lte=1.0`, default: `1`) Correction factor to apply on the output value if its in violation of the max envelope.
+(float64, `gte=0,lte=1.0`, default: `1.0`) Correction factor to apply on the output value if its in violation of the max envelope.
 
 @gotags: validate:"gte=0,lte=1.0" default:"1.0"
 
@@ -1104,7 +1104,7 @@ Parameters for the EMA component.
 <dt>correction_factor_on_min_envelope_violation</dt>
 <dd>
 
-(float64, `gte=1.0`, default: `1`) Correction factor to apply on the output value if its in violation of the min envelope.
+(float64, `gte=1.0`, default: `1.0`) Correction factor to apply on the output value if its in violation of the min envelope.
 
 @gotags: validate:"gte=1.0" default:"1.0"
 
@@ -1120,7 +1120,7 @@ Parameters for the EMA component.
 <dt>valid_during_warmup</dt>
 <dd>
 
-(bool) Whether the output is valid during the warm up stage.
+(bool, default: `false`) Whether the output is valid during the warm up stage.
 
 @gotags: default:"false"
 
@@ -1329,7 +1329,7 @@ Inputs for the FirstValid component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port)) Array of input signals.
+([[]InPort](#in-port), `dive`) Array of input signals.
 
 @gotags: validate:"dive"
 
@@ -1468,13 +1468,13 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 <dt>flow_matcher</dt>
 <dd>
 
-([FlowMatcher](#flow-matcher), `required`) @gotags: validate:"required"
+([FlowMatcher](#flow-matcher)) @gotags: validate:"required"
 
 </dd>
 <dt>service_selector</dt>
 <dd>
 
-([ServiceSelector](#service-selector), `required`) @gotags: validate:"required"
+([ServiceSelector](#service-selector)) @gotags: validate:"required"
 
 </dd>
 </dl>
@@ -1579,7 +1579,7 @@ bucket is not counted.
 <dt>start</dt>
 <dd>
 
-(float64, `gt=0`) Upper bound of the lowest bucket.
+(float64, `gt=0.0`) Upper bound of the lowest bucket.
 
 @gotags: validate:"gt=0.0"
 
@@ -1611,7 +1611,7 @@ bucket is `max`. The final +inf bucket is not counted.
 <dt>min</dt>
 <dd>
 
-(float64, `gt=0`) Lowest bucket.
+(float64, `gt=0.0`) Lowest bucket.
 
 @gotags: validate:"gt=0.0"
 
@@ -1658,7 +1658,7 @@ StaticBuckets holds the static value of the buckets where latency histogram will
 <dt>buckets</dt>
 <dd>
 
-([]float64, default: `[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]`) @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
+([]float64) @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
 
 </dd>
 </dl>
@@ -1737,7 +1737,7 @@ Dynamic Configuration for a Controller
 <dt>manual_mode</dt>
 <dd>
 
-(bool) Decides whether the controller runs in "manual_mode".
+(bool, default: `false`) Decides whether the controller runs in "manual_mode".
 In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
 
 @gotags: default:"false"
@@ -1817,7 +1817,7 @@ Gradient Parameters.
 <dt>max_gradient</dt>
 <dd>
 
-(float64, default: `1.7976931348623157e+308`) Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
+(float64, default: `1.79769313486231570814527423731704356798070e+308`) Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
 
 @gotags: default:"1.79769313486231570814527423731704356798070e+308"
 
@@ -1825,7 +1825,7 @@ Gradient Parameters.
 <dt>min_gradient</dt>
 <dd>
 
-(float64, default: `-1.7976931348623157e+308`) Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
+(float64, default: `-1.79769313486231570814527423731704356798070e+308`) Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
 
 @gotags: default:"-1.79769313486231570814527423731704356798070e+308"
 
@@ -2066,7 +2066,7 @@ Inputs for the Inverter component.
 <dt>input</dt>
 <dd>
 
-([InPort](#in-port)) Signal to be negated.
+([InPort](#in-port), `dive`) Signal to be negated.
 
 @gotags: validate:"dive"
 
@@ -2482,7 +2482,7 @@ Inputs for the Max component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port)) Array of input signals.
+([[]InPort](#in-port), `dive`) Array of input signals.
 
 @gotags: validate:"dive"
 
@@ -2536,7 +2536,7 @@ Inputs for the Min component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port)) Array of input signals.
+([[]InPort](#in-port), `dive`) Array of input signals.
 
 @gotags: validate:"dive"
 
@@ -2702,7 +2702,7 @@ Inputs for the Or component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port)) Array of input signals.
+([[]InPort](#in-port), `dive`) Array of input signals.
 
 @gotags: validate:"dive"
 
@@ -2755,7 +2755,7 @@ In case of multiple path templates matching, the most specific one will be chose
 <dt>template_values</dt>
 <dd>
 
-(map of string, `required`) Template value keys are OpenAPI-inspired path templates.
+(map of string, `gt=0,dive,keys,required,endkeys,required`) Template value keys are OpenAPI-inspired path templates.
 
 - Static path segment `/foo` matches a path segment exactly
 - `/{param}` matches arbitrary path segment.
@@ -2845,7 +2845,7 @@ Dynamic Configuration for ScaleActuator
 <dt>dry_run</dt>
 <dd>
 
-(bool) Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+(bool, default: `false`) Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
 Useful for observing the behavior of Scaler without disrupting any real traffic.
 
 @gotags: default:"false"
@@ -3082,7 +3082,7 @@ to select which label should be used as key.
 <dt>in_ports</dt>
 <dd>
 
-([RateLimiterIns](#rate-limiter-ins), `required`) @gotags: validate:"required"
+([RateLimiterIns](#rate-limiter-ins)) @gotags: validate:"required"
 
 </dd>
 <dt>parameters</dt>
@@ -3105,7 +3105,7 @@ Dynamic Configuration for the rate limiter
 <dt>overrides</dt>
 <dd>
 
-([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
+([[]RateLimiterOverride](#rate-limiter-override), `dive`) Allows to specify different limits for particular label values.
 
 @gotags: validate:"dive"
 
@@ -3153,7 +3153,7 @@ under certain circumstances. [Decider](#decider) might be helpful.
 <dt>limit_scale_factor</dt>
 <dd>
 
-(float64, default: `1`) Amount by which the _in_ports.limit_ should be multiplied for this label value.
+(float64, default: `1.0`) Amount by which the _in_ports.limit_ should be multiplied for this label value.
 
 @gotags: default:"1.0"
 
@@ -3202,7 +3202,7 @@ label set up, set `label_key: "user"`.
 <dt>enabled</dt>
 <dd>
 
-(bool) Enables lazy sync
+(bool, default: `false`) Enables lazy sync
 
 @gotags: default:"false"
 
@@ -3235,7 +3235,7 @@ Resources are typically Flux Meters, Classifiers, etc. that can be used to creat
 <dt>classifiers</dt>
 <dd>
 
-([[]Classifier](#classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+([[]Classifier](#classifier), `dive`) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
 The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
 
@@ -3245,7 +3245,7 @@ The flow labels created by Classifiers can be matched by Flux Meters to create m
 <dt>flux_meters</dt>
 <dd>
 
-(map of [FluxMeter](#flux-meter)) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
+(map of [FluxMeter](#flux-meter), `dive`) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
 Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
 
@@ -3316,7 +3316,7 @@ telemetry: false
 <dt>telemetry</dt>
 <dd>
 
-(bool, `required`) Decides if the created flow label should be available as an attribute in OLAP telemetry and
+(bool, default: `true`) Decides if the created flow label should be available as an attribute in OLAP telemetry and
 propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
 
 :::note
@@ -3511,7 +3511,7 @@ This value impacts the prioritization and fairness because the larger the timeou
 <dt>workloads</dt>
 <dd>
 
-([[]SchedulerWorkload](#scheduler-workload)) List of workloads to be used in scheduler.
+([[]SchedulerWorkload](#scheduler-workload), `dive`) List of workloads to be used in scheduler.
 
 Categorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads
 allows for load-shedding to be "smarter" than just "randomly deny 50% of
@@ -3691,7 +3691,7 @@ $$
 <dt>scale</dt>
 <dd>
 
-(float64, default: `1`) Scaling factor to be multiplied with the square root of the input signal.
+(float64) Scaling factor to be multiplied with the square root of the input signal.
 
 @gotags default:"1.0"
 

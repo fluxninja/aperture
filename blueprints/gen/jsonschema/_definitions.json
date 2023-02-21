@@ -21,7 +21,7 @@
         },
         "flow_selector": {
           "description": "Flow Selector decides the service and flows at which the concurrency limiter is applied.\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 3,
           "$ref": "#/definitions/FlowSelector"
         },
@@ -39,14 +39,14 @@
           "description": "Linear increment to load multiplier in each execution tick when the system is not in overloaded state.\n\n@gotags: default:\"0.0025\"",
           "type": "number",
           "format": "double",
-          "x-go-default": 0.0025,
+          "x-go-tag-default": "0.0025",
           "x-order": 6
         },
         "max_load_multiplier": {
           "description": "Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.\n\n@gotags: default:\"2.0\"",
           "type": "number",
           "format": "double",
-          "x-go-default": 2,
+          "x-go-tag-default": "2.0",
           "x-order": 7
         },
         "out_ports": {
@@ -56,7 +56,7 @@
         },
         "scheduler_parameters": {
           "description": "Scheduler parameters.\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 9,
           "$ref": "#/definitions/SchedulerParameters"
         }
@@ -120,7 +120,7 @@
         "from": {
           "description": "Attribute path pointing to some string - eg. \"source.address\".\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 0
         }
       },
@@ -138,7 +138,7 @@
         "parameters": {
           "description": "@gotags: validate:\"required\"",
           "title": "Alerter configuration",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 1,
           "$ref": "#/definitions/AlerterParameters"
         }
@@ -172,7 +172,7 @@
         "alert_name": {
           "description": "Name of the alert.\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 1
         },
         "labels": {
@@ -186,14 +186,14 @@
         "resolve_timeout": {
           "description": "Duration of alert resolver.\n\n@gotags: default:\"10s\"",
           "type": "string",
-          "x-go-default": "10s",
+          "x-go-tag-default": "10s",
           "x-order": 3
         },
         "severity": {
           "description": "Severity of the alert, one of 'info', 'warn' or 'crit'.\n\n@gotags: default:\"info\" validate:\"oneof=info warn crit\"",
           "type": "string",
-          "x-go-default": "info",
-          "x-go-validate": "oneof=info warn crit",
+          "x-go-tag-default": "info",
+          "x-go-tag-validate": "oneof=info warn crit",
           "x-order": 4
         }
       },
@@ -226,6 +226,7 @@
           "items": {
             "$ref": "#/definitions/InPort"
           },
+          "x-go-tag-validate": "dive",
           "x-order": 0
         }
       },
@@ -255,7 +256,7 @@
         "operator": {
           "description": "Operator of the arithmetic operation.\n\nThe arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.\nIn case of XOR and bitshifts, value of signals is cast to integers before performing the operation.\n\n@gotags: validate:\"oneof=add sub mul div xor lshift rshift\"",
           "type": "string",
-          "x-go-validate": "oneof=add sub mul div xor lshift rshift",
+          "x-go-tag-validate": "oneof=add sub mul div xor lshift rshift",
           "x-order": 1
         },
         "out_ports": {
@@ -318,12 +319,13 @@
           "items": {
             "$ref": "#/definitions/Component"
           },
+          "x-go-tag-validate": "dive",
           "x-order": 0
         },
         "evaluation_interval": {
           "description": "Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.\nThis interval is typically aligned with how often the corrective action (actuation) needs to be taken.\n\n@gotags: default:\"0.5s\"",
           "type": "string",
-          "x-go-default": "0.5s",
+          "x-go-tag-default": "0.5s",
           "x-order": 1
         }
       },
@@ -336,7 +338,7 @@
       "properties": {
         "flow_selector": {
           "description": "Defines where to apply the flow classification rule.\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 0,
           "$ref": "#/definitions/FlowSelector"
         },
@@ -346,7 +348,7 @@
           "additionalProperties": {
             "$ref": "#/definitions/Rule"
           },
-          "x-go-validate": "required,gt=0,dive,keys,required,endkeys,required",
+          "x-go-tag-validate": "required,gt=0,dive,keys,required,endkeys,required",
           "x-order": 1
         }
       },
@@ -492,7 +494,7 @@
       "properties": {
         "flow_selector": {
           "description": "Flow Selector decides the service and flows at which the concurrency limiter is applied.\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 0,
           "$ref": "#/definitions/FlowSelector"
         },
@@ -503,7 +505,7 @@
         },
         "scheduler": {
           "description": "Configuration of Weighted Fair Queuing-based workload scheduler.\n\nContains configuration of per-agent scheduler, and also defines some\noutput signals.\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 2,
           "$ref": "#/definitions/Scheduler"
         }
@@ -517,7 +519,6 @@
         "special_value": {
           "type": "string",
           "title": "@gotags: validate:\"oneof=NaN +Inf -Inf\"",
-          "x-go-validate": "oneof=NaN +Inf -Inf",
           "x-order": 0
         },
         "value": {
@@ -536,7 +537,7 @@
         "false_for": {
           "description": "Duration of time to wait before a transition to false state.\nIf the duration is zero, the transition will happen instantaneously.\n\n@gotags: default:\"0s\"",
           "type": "string",
-          "x-go-default": "0s",
+          "x-go-tag-default": "0s",
           "x-order": 0
         },
         "in_ports": {
@@ -547,7 +548,7 @@
         "operator": {
           "description": "Comparison operator that computes operation on lhs and rhs input signals.\n\n@gotags: validate:\"oneof=gt lt gte lte eq neq\"",
           "type": "string",
-          "x-go-validate": "oneof=gt lt gte lte eq neq",
+          "x-go-tag-validate": "oneof=gt lt gte lte eq neq",
           "x-order": 2
         },
         "out_ports": {
@@ -558,7 +559,7 @@
         "true_for": {
           "description": "Duration of time to wait before a transition to true state.\nIf the duration is zero, the transition will happen instantaneously.\n\n@gotags: default:\"0s\"",
           "type": "string",
-          "x-go-default": "0s",
+          "x-go-tag-default": "0s",
           "x-order": 4
         }
       },
@@ -610,7 +611,7 @@
         "window": {
           "description": "The window of time over which differentiator operates.\n\n@gotags: default:\"5s\"",
           "type": "string",
-          "x-go-default": "5s",
+          "x-go-tag-default": "5s",
           "x-order": 2
         }
       },
@@ -655,7 +656,7 @@
         },
         "parameters": {
           "description": "Parameters for the EMA component.\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 2,
           "$ref": "#/definitions/EMAParameters"
         }
@@ -704,34 +705,34 @@
           "description": "Correction factor to apply on the output value if its in violation of the max envelope.\n\n@gotags: validate:\"gte=0,lte=1.0\" default:\"1.0\"",
           "type": "number",
           "format": "double",
-          "x-go-default": 1,
-          "x-go-validate": "gte=0,lte=1.0",
+          "x-go-tag-default": "1.0",
+          "x-go-tag-validate": "gte=0,lte=1.0",
           "x-order": 0
         },
         "correction_factor_on_min_envelope_violation": {
           "description": "Correction factor to apply on the output value if its in violation of the min envelope.\n\n@gotags: validate:\"gte=1.0\" default:\"1.0\"",
           "type": "number",
           "format": "double",
-          "x-go-default": 1,
-          "x-go-validate": "gte=1.0",
+          "x-go-tag-default": "1.0",
+          "x-go-tag-validate": "gte=1.0",
           "x-order": 1
         },
         "ema_window": {
           "description": "Duration of EMA sampling window.\n\n@gotags: default:\"5s\"",
           "type": "string",
-          "x-go-default": "5s",
+          "x-go-tag-default": "5s",
           "x-order": 2
         },
         "valid_during_warmup": {
           "description": "Whether the output is valid during the warm up stage.\n\n@gotags: default:\"false\"",
           "type": "boolean",
-          "x-go-default": false,
+          "x-go-tag-default": "false",
           "x-order": 3
         },
         "warmup_window": {
           "description": "Duration of EMA warming up window.\n\nThe initial value of the EMA is the average of signal readings received during the warm up window.\n\n@gotags: default:\"0s\"",
           "type": "string",
-          "x-go-default": "0s",
+          "x-go-tag-default": "0s",
           "x-order": 4
         }
       },
@@ -744,7 +745,7 @@
         "label": {
           "description": "Name of the label to equal match the value.\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "value": {
@@ -806,7 +807,7 @@
         },
         "parameters": {
           "description": "Parameters for the Extrapolator component.\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 2,
           "$ref": "#/definitions/ExtrapolatorParameters"
         }
@@ -844,7 +845,7 @@
         "max_extrapolation_interval": {
           "description": "Maximum time interval to repeat the last valid value of input signal.\n\n@gotags: default:\"10s\"",
           "type": "string",
-          "x-go-default": "10s",
+          "x-go-tag-default": "10s",
           "x-order": 0
         }
       },
@@ -877,6 +878,7 @@
           "items": {
             "$ref": "#/definitions/InPort"
           },
+          "x-go-tag-validate": "dive",
           "x-order": 0
         }
       },
@@ -924,7 +926,7 @@
         "control_point": {
           "description": "[Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)\nidentifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution\nblock within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners\nor filter chains.\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "label_matcher": {
@@ -943,13 +945,11 @@
       "properties": {
         "flow_matcher": {
           "title": "@gotags: validate:\"required\"",
-          "x-go-validate": "required",
           "x-order": 0,
           "$ref": "#/definitions/FlowMatcher"
         },
         "service_selector": {
           "title": "@gotags: validate:\"required\"",
-          "x-go-validate": "required",
           "x-order": 1,
           "$ref": "#/definitions/ServiceSelector"
         }
@@ -963,7 +963,7 @@
         "attribute_key": {
           "description": "Key of the attribute in access log or span from which the metric for this flux meter is read.\n\n:::info\n\nFor list of available attributes in Envoy access logs, refer\n[Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)\n\n:::\n\n@gotags: default:\"workload_duration_ms\"",
           "type": "string",
-          "x-go-default": "workload_duration_ms",
+          "x-go-tag-default": "workload_duration_ms",
           "x-order": 0
         },
         "exponential_buckets": {
@@ -998,21 +998,21 @@
           "description": "Number of buckets.\n\n@gotags: validate:\"gt=0\"",
           "type": "integer",
           "format": "int32",
-          "x-go-validate": "gt=0",
+          "x-go-tag-validate": "gt=0",
           "x-order": 0
         },
         "factor": {
           "description": "Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.\n\n@gotags: validate:\"gt=1.0\"",
           "type": "number",
           "format": "double",
-          "x-go-validate": "gt=1.0",
+          "x-go-tag-validate": "gt=1.0",
           "x-order": 1
         },
         "start": {
           "description": "Upper bound of the lowest bucket.\n\n@gotags: validate:\"gt=0.0\"",
           "type": "number",
           "format": "double",
-          "x-go-validate": "gt=0",
+          "x-go-tag-validate": "gt=0.0",
           "x-order": 2
         }
       },
@@ -1026,7 +1026,7 @@
           "description": "Number of buckets.\n\n@gotags: validate:\"gt=0\"",
           "type": "integer",
           "format": "int32",
-          "x-go-validate": "gt=0",
+          "x-go-tag-validate": "gt=0",
           "x-order": 0
         },
         "max": {
@@ -1039,7 +1039,7 @@
           "description": "Lowest bucket.\n\n@gotags: validate:\"gt=0.0\"",
           "type": "number",
           "format": "double",
-          "x-go-validate": "gt=0",
+          "x-go-tag-validate": "gt=0.0",
           "x-order": 2
         }
       },
@@ -1053,7 +1053,7 @@
           "description": "Number of buckets.\n\n@gotags: validate:\"gt=0\"",
           "type": "integer",
           "format": "int32",
-          "x-go-validate": "gt=0",
+          "x-go-tag-validate": "gt=0",
           "x-order": 0
         },
         "start": {
@@ -1082,7 +1082,6 @@
             "type": "number",
             "format": "double"
           },
-          "x-go-default": "[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]",
           "x-order": 0
         }
       },
@@ -1115,7 +1114,7 @@
         },
         "parameters": {
           "description": "Gradient Parameters.\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 4,
           "$ref": "#/definitions/GradientControllerParameters"
         }
@@ -1129,7 +1128,7 @@
         "manual_mode": {
           "description": "Decides whether the controller runs in \"manual_mode\".\nIn manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.\n\n@gotags: default:\"false\"",
           "type": "boolean",
-          "x-go-default": false,
+          "x-go-tag-default": "false",
           "x-order": 0
         }
       },
@@ -1192,21 +1191,21 @@
           "description": "Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].\n\n@gotags: default:\"1.79769313486231570814527423731704356798070e+308\"",
           "type": "number",
           "format": "double",
-          "x-go-default": 1.7976931348623157e308,
+          "x-go-tag-default": "1.79769313486231570814527423731704356798070e+308",
           "x-order": 0
         },
         "min_gradient": {
           "description": "Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].\n\n@gotags: default:\"-1.79769313486231570814527423731704356798070e+308\"",
           "type": "number",
           "format": "double",
-          "x-go-default": -1.7976931348623157e308,
+          "x-go-tag-default": "-1.79769313486231570814527423731704356798070e+308",
           "x-order": 1
         },
         "slope": {
           "description": "Slope controls the aggressiveness and direction of the Gradient Controller.\n\nSlope is used as exponent on the signal to setpoint ratio in computation\nof the gradient (see the [main description](#gradient-controller) for\nexact equation). Good intuition for this parameter is \"What should the\nGradient Controller do to the control variable when signal is too high\",\neg.:\n* $\\text{slope} = 1$: when signal is too high, increase control variable,\n* $\\text{slope} = -1$: when signal is too high, decrease control variable,\n* $\\text{slope} = -0.5$: when signal is too high, decrease control variable slowly.\n\nThe sign of slope depends on correlation between the signal and control variable:\n* Use $\\text{slope} < 0$ if signal and control variable are _positively_\ncorrelated (eg. Per-pod CPU usage and total concurrency).\n* Use $\\text{slope} > 0$ if signal and control variable are _negatively_\ncorrelated (eg. Per-pod CPU usage and number of pods).\n\n:::note\n\nYou need to set _negative_ slope for a _positive_ correlation, as you're\ndescribing the _action_ which controller should make when the signal\nincreases.\n\n:::\n\nThe magnitude of slope describes how aggressively should the controller\nreact to a deviation of signal.\nWith $|\\text{slope}| = 1$, the controller will aim to bring the signal to\nthe setpoint in one tick (assuming linear correlation with signal and setpoint).\nSmaller magnitudes of slope will make the controller adjust the control\nvariable more slowly.\n\nWe recommend setting $|\\text{slope}| < 1$ (eg. $\\pm0.8$).\nIf you experience overshooting, consider lowering the magnitude even more.\nValues of $|\\text{slope}| > 1$ are not recommended.\n\n:::note\n\nRemember that the gradient and output signal can be (optionally) clamped,\nso the _slope_ might not fully describe aggressiveness of the controller.\n\n:::\n\n@gotags: validate:\"required\"",
           "type": "number",
           "format": "double",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 2
         }
       },
@@ -1219,7 +1218,7 @@
         "hold_for": {
           "description": "Holding the last valid signal value for the hold_for duration.\n\n@gotags: default:\"5s\"",
           "type": "string",
-          "x-go-default": "5s",
+          "x-go-tag-default": "5s",
           "x-order": 0
         },
         "in_ports": {
@@ -1350,6 +1349,7 @@
       "properties": {
         "input": {
           "description": "Signal to be negated.\n\n@gotags: validate:\"dive\"",
+          "x-go-tag-validate": "dive",
           "x-order": 0,
           "$ref": "#/definitions/InPort"
         }
@@ -1376,7 +1376,7 @@
         "from": {
           "description": "Attribute path pointing to some strings - eg. \"request.http.body\".\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "pointer": {
@@ -1395,7 +1395,7 @@
         "from": {
           "description": "Jwt token can be pulled from any input attribute, but most likely you'd want to use \"request.http.bearer\".\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "json_pointer": {
@@ -1413,13 +1413,13 @@
         "key": {
           "description": "Label key that the selector applies to.\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "operator": {
           "description": "Logical operator which represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.\n\n@gotags: validate:\"oneof=In NotIn Exists DoesNotExists\"",
           "type": "string",
-          "x-go-validate": "oneof=In NotIn Exists DoesNotExists",
+          "x-go-tag-validate": "oneof=In NotIn Exists DoesNotExists",
           "x-order": 1
         },
         "values": {
@@ -1440,32 +1440,32 @@
         "agent_group": {
           "description": "Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this\nselector applies to.\n\n@gotags: default:\"default\"",
           "type": "string",
-          "x-go-default": "default",
+          "x-go-tag-default": "default",
           "x-order": 0
         },
         "api_version": {
           "description": "@gotags: validate:\"required\"",
           "type": "string",
           "title": "API version of Kubernetes resource",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 1
         },
         "kind": {
           "description": "Kubernetes resource type.\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 2
         },
         "name": {
           "description": "Kubernetes resource name.\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 3
         },
         "namespace": {
           "description": "Kubernetes namespace that the resource belongs to.\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 4
         }
       },
@@ -1569,7 +1569,7 @@
         "label_exists": {
           "description": "The expression is true when label with given name exists.\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 3
         },
         "label_matches": {
@@ -1608,13 +1608,13 @@
         "label": {
           "description": "Name of the label to match the regular expression.\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "regex": {
           "description": "Regular expression that should match the label value.\nIt uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 1
         }
       },
@@ -1648,6 +1648,7 @@
           "items": {
             "$ref": "#/definitions/InPort"
           },
+          "x-go-tag-validate": "dive",
           "x-order": 0
         }
       },
@@ -1692,6 +1693,7 @@
           "items": {
             "$ref": "#/definitions/InPort"
           },
+          "x-go-tag-validate": "dive",
           "x-order": 0
         }
       },
@@ -1831,6 +1833,7 @@
           "items": {
             "$ref": "#/definitions/InPort"
           },
+          "x-go-tag-validate": "dive",
           "x-order": 0
         }
       },
@@ -1871,7 +1874,7 @@
           "additionalProperties": {
             "type": "string"
           },
-          "x-go-validate": "required",
+          "x-go-tag-validate": "gt=0,dive,keys,required,endkeys,required",
           "x-order": 0
         }
       },
@@ -1882,7 +1885,7 @@
       "properties": {
         "kubernetes_object_selector": {
           "description": "The Kubernetes object on which horizontal scaling is applied.\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 0,
           "$ref": "#/definitions/KubernetesObjectSelector"
         },
@@ -1924,7 +1927,7 @@
         "dry_run": {
           "description": "Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.\nUseful for observing the behavior of Scaler without disrupting any real traffic.\n\n@gotags: default:\"false\"",
           "type": "boolean",
-          "x-go-default": false,
+          "x-go-tag-default": "false",
           "x-order": 0
         }
       },
@@ -1991,7 +1994,7 @@
         "evaluation_interval": {
           "description": "Describes the interval between successive evaluations of the Prometheus query.\n\n@gotags: default:\"10s\"",
           "type": "string",
-          "x-go-default": "10s",
+          "x-go-tag-default": "10s",
           "x-order": 0
         },
         "out_ports": {
@@ -2026,7 +2029,7 @@
         "false_for": {
           "description": "Emitting 0 for the false_for duration.\n\n@gotags: default:\"5s\"",
           "type": "string",
-          "x-go-default": "5s",
+          "x-go-tag-default": "5s",
           "x-order": 0
         },
         "out_ports": {
@@ -2036,7 +2039,7 @@
         "true_for": {
           "description": "Emitting 1 for the true_for duration.\n\n@gotags: default:\"5s\"",
           "type": "string",
-          "x-go-default": "5s",
+          "x-go-tag-default": "5s",
           "x-order": 2
         }
       },
@@ -2082,20 +2085,19 @@
         },
         "flow_selector": {
           "description": "Which control point to apply this ratelimiter to.\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 2,
           "$ref": "#/definitions/FlowSelector"
         },
         "in_ports": {
           "title": "@gotags: validate:\"required\"",
-          "x-go-validate": "required",
           "x-order": 3,
           "$ref": "#/definitions/RateLimiterIns"
         },
         "parameters": {
           "description": "@gotags: validate:\"required\"",
           "title": "Parameters for the RateLimiter component",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 4,
           "$ref": "#/definitions/RateLimiterParameters"
         }
@@ -2112,6 +2114,7 @@
           "items": {
             "$ref": "#/definitions/RateLimiterOverride"
           },
+          "x-go-tag-validate": "dive",
           "x-order": 0
         }
       },
@@ -2123,7 +2126,7 @@
       "properties": {
         "limit": {
           "description": "Number of flows allowed per _limit\\_reset\\_interval_ per each label.\nNegative values disable the ratelimiter.\n\n:::tip\n\nNegative limit can be useful to _conditionally_ enable the ratelimiter\nunder certain circumstances. [Decider](#decider) might be helpful.\n\n:::\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 0,
           "$ref": "#/definitions/InPort"
         }
@@ -2136,14 +2139,14 @@
         "label_value": {
           "description": "Value of the label for which the override should be applied.\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "limit_scale_factor": {
           "description": "Amount by which the _in\\_ports.limit_ should be multiplied for this label value.\n\n@gotags: default:\"1.0\"",
           "type": "number",
           "format": "double",
-          "x-go-default": 1,
+          "x-go-tag-default": "1.0",
           "x-order": 1
         }
       },
@@ -2155,7 +2158,7 @@
         "label_key": {
           "description": "Specifies which label the ratelimiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/integrations/flow-control/flow-label.md) with given key.\nEg., to give each user a separate limit, assuming you have a _user_ flow\nlabel set up, set `label_key: \"user\"`.\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "lazy_sync": {
@@ -2166,7 +2169,7 @@
         "limit_reset_interval": {
           "description": "Time after which the limit for a given label value will be reset.\n\n@gotags: default:\"60s\"",
           "type": "string",
-          "x-go-default": "60s",
+          "x-go-tag-default": "60s",
           "x-order": 2
         }
       },
@@ -2179,15 +2182,15 @@
           "description": "@gotags: default:\"false\"",
           "type": "boolean",
           "title": "Enables lazy sync",
-          "x-go-default": false,
+          "x-go-tag-default": "false",
           "x-order": 0
         },
         "num_sync": {
           "description": "Number of times to lazy sync within the _limit\\_reset\\_interval_.\n\n@gotags: default:\"5\" validate:\"gt=0\"",
           "type": "integer",
           "format": "int64",
-          "x-go-default": 5,
-          "x-go-validate": "gt=0",
+          "x-go-tag-default": "5",
+          "x-go-tag-validate": "gt=0",
           "x-order": 1
         }
       },
@@ -2204,6 +2207,7 @@
           "items": {
             "$ref": "#/definitions/Classifier"
           },
+          "x-go-tag-validate": "dive",
           "x-order": 0
         },
         "flux_meters": {
@@ -2212,6 +2216,7 @@
           "additionalProperties": {
             "$ref": "#/definitions/FluxMeter"
           },
+          "x-go-tag-validate": "dive",
           "x-order": 1
         }
       },
@@ -2236,7 +2241,7 @@
           "description": ":::note\n\nThe flow label is always accessible in Aperture Policies regardless of this setting.\n\n:::\n\n:::caution\n\nWhen using [FluxNinja ARC plugin](arc/plugin.md), telemetry enabled\nlabels are sent to FluxNinja ARC for observability. Telemetry should be disabled for\nsensitive labels.\n\n:::\n\n@gotags: default:\"true\"",
           "type": "boolean",
           "title": "Decides if the created flow label should be available as an attribute in OLAP telemetry and\npropagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)",
-          "x-go-validate": "required",
+          "x-go-tag-default": "true",
           "x-order": 2
         }
       },
@@ -2250,13 +2255,13 @@
         "query": {
           "description": "Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).\n\nNote: The module name must match the package name from the \"source\".\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "source": {
           "description": "Source code of the rego module.\n\nNote: Must include a \"package\" declaration.\n\n@gotags: validate:\"required\"",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 1
         }
       },
@@ -2274,7 +2279,7 @@
         },
         "parameters": {
           "description": "Scheduler parameters.\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 1,
           "$ref": "#/definitions/SchedulerParameters"
         }
@@ -2305,12 +2310,12 @@
         "auto_tokens": {
           "description": "Automatically estimate the size of a request in each workload, based on\nhistorical latency. Each workload's `tokens` will be set to average\nlatency of flows in that workload during last few seconds (exact duration\nof this average can change).\n\n@gotags: default:\"true\"",
           "type": "boolean",
-          "x-go-default": "true",
+          "x-go-tag-default": "true",
           "x-order": 0
         },
         "default_workload_parameters": {
           "description": "Parameters to be used if none of workloads specified in `workloads` match.\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 1,
           "$ref": "#/definitions/SchedulerWorkloadParameters"
         },
@@ -2318,7 +2323,7 @@
           "description": ":::caution\n\nThis timeout needs to be strictly less than the timeout set on the\nclient for the whole GRPC call:\n* in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,\n* in case of libraries, timeout configured... TODO.\n\nWe're using fail-open logic in integrations, so if the GRPC timeout\nfires first, the flow will end up being unconditionally allowed while\nit're still waiting on the scheduler.\n\nTo avoid such cases, the end-to-end GRPC timeout should also contain\nsome headroom for constant overhead like serialization, etc. Default\nvalue for GRPC timeouts is 500ms, giving 50ms of headeroom, so when\ntweaking this timeout, make sure to adjust the GRPC timeout accordingly.\n\n:::\n\n@gotags: default:\"0.49s\"",
           "type": "string",
           "title": "Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped",
-          "x-go-default": "0.49s",
+          "x-go-tag-default": "0.49s",
           "x-order": 2
         },
         "timeout_factor": {
@@ -2326,8 +2331,8 @@
           "type": "number",
           "format": "double",
           "title": "Timeout as a factor of tokens for a flow in a workload",
-          "x-go-default": 0.5,
-          "x-go-validate": "gte=0.0",
+          "x-go-tag-default": "0.5",
+          "x-go-tag-validate": "gte=0.0",
           "x-order": 3
         },
         "workloads": {
@@ -2336,6 +2341,7 @@
           "items": {
             "$ref": "#/definitions/SchedulerWorkload"
           },
+          "x-go-tag-validate": "dive",
           "x-order": 4
         }
       },
@@ -2347,13 +2353,13 @@
       "properties": {
         "label_matcher": {
           "description": "Label Matcher to select a Workload based on\n[flow labels](/concepts/integrations/flow-control/flow-label.md).\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 0,
           "$ref": "#/definitions/LabelMatcher"
         },
         "parameters": {
           "description": "Parameters associated with flows matching the label matcher.\n\n@gotags: validate:\"required\"",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 1,
           "$ref": "#/definitions/SchedulerWorkloadParameters"
         }
@@ -2374,14 +2380,14 @@
           "type": "integer",
           "format": "int64",
           "title": "Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level.\nPriority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:",
-          "x-go-validate": "gte=0,lte=255",
+          "x-go-tag-validate": "gte=0,lte=255",
           "x-order": 1
         },
         "tokens": {
           "description": "Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.\nThis override is applicable only if `auto_tokens` is set to false.\n\n@gotags: default:\"1\"",
           "type": "string",
           "format": "uint64",
-          "x-go-default": 1,
+          "x-go-tag-default": "1",
           "x-order": 2
         }
       },
@@ -2395,13 +2401,13 @@
         "agent_group": {
           "description": "Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this\nselector applies to.\n\n:::info\n\nAgent Groups are used to scope policies to a subset of agents connected to the same controller. This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode. The agents within an agent group form a peer to peer cluster and constantly share state.\n\n:::\n\n@gotags: default:\"default\"",
           "type": "string",
-          "x-go-default": "default",
+          "x-go-tag-default": "default",
           "x-order": 0
         },
         "service": {
           "description": "The Fully Qualified Domain Name of the\n[service](/concepts/integrations/flow-control/service.md) to select.\n\nIn Kubernetes, this is the FQDN of the Service object.\n\n\"all\" means all services within an agent group (catch-all).\n\n:::info\n\nIn the Kubernetes sidecar installation mode, service discovery is switched off by default. In order to scope policies to services, the `service` should be set to `all` and instead, `agent_group` name should be used.\n\n:::\n\n:::info\n\nAn entity (e.g. Kubernetes pod) may belong to multiple services.\n\n:::\n\n@gotags: validate:\"required\"];",
           "type": "string",
-          "x-go-validate": "required",
+          "x-go-tag-validate": "required",
           "x-order": 1
         }
       },
@@ -2426,7 +2432,6 @@
           "description": "Scaling factor to be multiplied with the square root of the input signal.\n\n@gotags default:\"1.0\"",
           "type": "number",
           "format": "double",
-          "x-go-default": 1,
           "x-order": 2
         }
       },
