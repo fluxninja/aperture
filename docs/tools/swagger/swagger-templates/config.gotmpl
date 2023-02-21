@@ -43,8 +43,8 @@
   {{- if .Required -}}
  Required: `✓`
   {{- end -}}
-  {{- if (index .Extensions "x-go-validate")  -}}
- `{{ index .Extensions "x-go-validate" }}`
+  {{- if (index .Extensions "x-go-tag-validate")  -}}
+ `{{ index .Extensions "x-go-tag-validate" }}`
   {{- end -}}
 {{- end -}}
 
@@ -63,7 +63,7 @@
     , **required**
   {{- end -}}
   {{- with .Extensions }}
-    {{- with (index . "x-go-validate")  -}}
+    {{- with (index . "x-go-tag-validate")  -}}
       , `{{ . }}`
     {{- end -}}
   {{- end -}}
@@ -73,8 +73,8 @@
   {{- if .Default -}}
  Default: `{{ json .Default }}`
   {{- end -}}
-  {{- if (index .Extensions "x-go-default") -}}
- `{{ index .Extensions "x-go-default" }}`
+  {{- if (index .Extensions "x-go-tag-default") -}}
+ `{{ index .Extensions "x-go-tag-default" }}`
   {{- end -}}
 {{- end -}}
 
@@ -84,7 +84,7 @@
     , default: `{{ json . }}`
   {{- end -}}
   {{- with .Extensions }}
-    {{- with (index . "x-go-default") -}}
+    {{- with (index . "x-go-tag-default") -}}
       , default: `{{ . }}`
     {{- end -}}
   {{- end -}}

@@ -116,6 +116,7 @@ paths:
         in: path
         required: true
       - type: string
+        x-go-tag-validate: required
         description: |-
           Control point to preview.
 
@@ -131,6 +132,8 @@ paths:
           $ref: '#/definitions/LabelMatcher'
       - type: string
         format: int64
+        x-go-tag-default: "10"
+        x-go-tag-validate: min=1
         description: |-
           Number of samples to collect. Defaults to 10.
 
@@ -158,6 +161,7 @@ paths:
         in: path
         required: true
       - type: string
+        x-go-tag-validate: required
         description: |-
           Control point to preview.
 
@@ -173,6 +177,8 @@ paths:
           $ref: '#/definitions/LabelMatcher'
       - type: string
         format: int64
+        x-go-tag-default: "10"
+        x-go-tag-validate: min=1
         description: |-
           Number of samples to collect. Defaults to 10.
 
@@ -375,7 +381,7 @@ definitions:
 
           @gotags: validate:"required"
         type: string
-        x-go-validate: required
+        x-go-tag-validate: required
       value:
         description: Exact value that the label should be equal to.
         type: string
@@ -425,7 +431,7 @@ definitions:
 
           @gotags: validate:"required"
         type: string
-        x-go-validate: required
+        x-go-tag-validate: required
       operator:
         description: |-
           Logical operator which represents a key's relationship to a set of values.
@@ -433,7 +439,7 @@ definitions:
 
           @gotags: validate:"oneof=In NotIn Exists DoesNotExists"
         type: string
-        x-go-validate: oneof=In NotIn Exists DoesNotExists
+        x-go-tag-validate: oneof=In NotIn Exists DoesNotExists
       values:
         description: |-
           An array of string values that relates to the key by an operator.
@@ -524,7 +530,7 @@ definitions:
 
           @gotags: validate:"required"
         type: string
-        x-go-validate: required
+        x-go-tag-validate: required
       label_matches:
         description: The expression is true when label matches given regex.
         $ref: '#/definitions/MatchesMatchExpression'
@@ -551,7 +557,7 @@ definitions:
 
           @gotags: validate:"required"
         type: string
-        x-go-validate: required
+        x-go-tag-validate: required
       regex:
         description: |-
           Regular expression that should match the label value.
@@ -559,7 +565,7 @@ definitions:
 
           @gotags: validate:"required"
         type: string
-        x-go-validate: required
+        x-go-tag-validate: required
   Member:
     type: object
     properties:
