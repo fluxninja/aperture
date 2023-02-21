@@ -139,6 +139,13 @@ func (c *EntityCache) Put(entity *entitycachev1.Entity) {
 		c.entities.EntitiesByIpAddress.Entities[entityIP] = entity
 	}
 
+	entityClusterIP := entity.ClusterIp
+	if entityClusterIP != "" {
+		if entityClusterIP != "None" {
+			c.entities.EntitiesByIpAddress.Entities[entityClusterIP] = entity
+		}
+	}
+
 	entityName := entity.Name
 	if entityName != "" {
 		c.entities.EntitiesByName.Entities[entityName] = entity
