@@ -25,7 +25,7 @@ function sign(data, hashAlg, secret) {
 
     // Some manual base64 rawurl encoding as `Hasher.digest(encodingType)`
     // doesn't support that encoding type yet.
-    return hasher.digest("base64").replace(/\//g, "_").replace(/\+/g, "-").replace(/=/g, "");
+    return hasher.digest("base64").replace(/\\//g, "_").replace(/\\+/g, "-").replace(/=/g, "");
 }
 
 function encode(payload, secret) {

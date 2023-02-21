@@ -23,7 +23,7 @@ APERTURE_JS_EXAMPLE_NS = "aperture-js-example"
 APERTURE_JAVA_EXAMPLE_NS = "aperture-java-example"
 APERTURE_DEMOAPP_NS = "demoapp"
 APERTURE_ISTIO_NS = "istio-system"
-DEFAULT_TEST_SCENARIO = "scenarios/graphql-example-1"
+DEFAULT_TEST_SCENARIO = "scenarios/demo-app"
 TANKA = "tk"
 SKIP_LOCAL_CMDS = False  # If set to true, skips actually running local commands (useful for developing and testing Tiltfile itself)
 TANKA_DEPS_HANDLED = []
@@ -800,6 +800,7 @@ def process_aperture_scenario(scenario_path):
             "child_resources": [
                 {
                     "new_name": "scenario-policies",
+                    "resource_deps": ["controller-service"],
                     "extra_objects": [
                         (None, "Policy", APERTURE_CONTROLLER_NS)
                     ]
@@ -824,6 +825,7 @@ def process_aperture_scenario(scenario_path):
         "child_resources": [
             {
                 "workload": "wavepool-generator",
+                "resource_deps": ["scenario-policies"] if aperture_policies else [],
                 "extra_objects": [
                     "wavepool-config:configmap"
                 ]

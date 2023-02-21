@@ -1,6 +1,13 @@
 {
   "renderer": "tanka",
   "tkenv": "manifests/",
+  "aperture_policies": [
+    {
+      "policy_def": "policies/static-rate-limiting",
+      "policy_name": "graphql-static-rate-limiting",
+      "values_file": "policies/graphql-static-rate-limiting.yaml"
+    }
+  ],
   "images": [
     {
       "ref": "graphql-demo-app",
