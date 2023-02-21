@@ -30,13 +30,6 @@ type Job interface {
 	JobWatchers() JobWatchers
 }
 
-// JobInfo contains information such as run count, last run time, etc. for a Job.
-type JobInfo struct {
-	LastExecuteTime time.Time
-	NextExecuteTime time.Time
-	ExecuteCount    int
-}
-
 // JobBase is the base job implementation.
 type JobBase struct {
 	JobName string
@@ -76,9 +69,6 @@ type jobExecutor struct {
 	job              quartz.Job
 	config           JobConfig
 	running          bool
-	lastRunTime      time.Time
-	lastFinishTime   time.Time
-	runCount         int
 }
 
 // Make sure jobExecutor complies with Job interface.
@@ -91,9 +81,6 @@ func newJobExecutor(job Job, jg *JobGroup, config JobConfig, parentRegistry stat
 		config:         config,
 		parentRegistry: parentRegistry,
 		running:        false,
-		lastRunTime:    time.Time{},
-		lastFinishTime: time.Time{},
-		runCount:       0,
 	}
 	executor.job = quartz.NewIsolatedJob(quartz.NewFunctionJobWithDesc(job.Name(), executor.doJob))
 	return executor
@@ -122,8 +109,6 @@ func (executor *jobExecutor) doJob(ctx context.Context) (proto.Message, error) {
 		return nil, fmt.Errorf("job %s is not running", executor.Name())
 	}
 	now := time.Now()
-	executor.runCount++
-	executor.lastRunTime = now
 
 	executionTimeout := executor.config.ExecutionTimeout.AsDuration()
 
@@ -166,7 +151,6 @@ func (executor *jobExecutor) doJob(ctx context.Context) (proto.Message, error) {
 			s := status.NewStatus(wrapperspb.String("OK"), nil)
 			executor.livenessRegistry.SetStatus(s)
 			timer.Stop()
-			executor.lastFinishTime = time.Now()
 			return msg, err
 		}
 	}
@@ -222,18 +206,4 @@ func (executor *jobExecutor) trigger(delay time.Duration) {
 		executor.jg.gt.statusRegistry.GetLogger().Error().Err(err).Str("executor", executor.Name()).Msg("Unable to trigger the job")
 		return
 	}
-}
-
-func (executor *jobExecutor) jobInfo() *JobInfo {
-	ji := &JobInfo{
-		LastExecuteTime: executor.lastRunTime,
-		ExecuteCount:    executor.runCount,
-	}
-	execPeriod := executor.config.ExecutionPeriod.AsDuration()
-	if execPeriod < 0 {
-		ji.NextExecuteTime = time.Time{}
-	} else {
-		ji.NextExecuteTime = executor.lastFinishTime.Add(execPeriod)
-	}
-	return ji
 }

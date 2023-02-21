@@ -35,7 +35,8 @@ type testGroupConfig struct {
 // When a job is only scheduled and not run, it's number of run should be 0
 func (gc *testGroupConfig) OnJobScheduled() {
 	for _, job := range gc.jobs {
-		jobInfo := gc.jobGroup.JobInfo(job.Name())
+		jobInfo, err := gc.jobGroup.JobInfo(job.Name())
+		Expect(err).NotTo(HaveOccurred())
 		Expect(jobInfo.ExecuteCount).To(Equal(0))
 	}
 }
@@ -43,7 +44,8 @@ func (gc *testGroupConfig) OnJobScheduled() {
 // Estimate the number of runs for the job based on the provided configuration and compare with the actual result
 func (gc *testGroupConfig) OnJobCompleted(_ *statusv1.Status, _ JobStats) {
 	for _, job := range gc.jobs {
-		jobInfo := gc.jobGroup.JobInfo(job.Name())
+		jobInfo, err := gc.jobGroup.JobInfo(job.Name())
+		Expect(err).NotTo(HaveOccurred())
 		Expect(jobInfo.ExecuteCount).To(Equal(gc.jobRunConfig.expectedNoOfRuns))
 	}
 }

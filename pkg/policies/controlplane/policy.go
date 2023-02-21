@@ -223,15 +223,16 @@ func (policy *Policy) dynamicConfigUpdate(event notifiers.Event, unmarshaller co
 
 func (policy *Policy) executeTick(jobCtxt context.Context) (proto.Message, error) {
 	// Get JobInfo
-	jobInfo := policy.circuitJobGroup.JobInfo(policy.jobName)
-	if jobInfo == nil {
-		return nil, fmt.Errorf("job info not found for job %s", policy.jobName)
+	jobInfo, err := policy.circuitJobGroup.JobInfo(policy.jobName)
+	if err != nil {
+		return nil, err
 	}
+
 	tickInfo := runtime.NewTickInfo(jobInfo.LastExecuteTime,
-		jobInfo.NextExecuteTime, jobInfo.ExecuteCount,
+		jobInfo.ExecuteCount,
 		policy.evaluationInterval)
 	// Execute Circuit
-	err := policy.circuit.Execute(tickInfo)
+	err = policy.circuit.Execute(tickInfo)
 	// TODO: return tick info (publish to health framework) instead of returning nil proto.Message
 	return nil, err
 }

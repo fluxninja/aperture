@@ -3,6 +3,7 @@ package jobs
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/reugn/go-quartz/quartz"
@@ -100,7 +101,7 @@ func (jgc JobGroupConstructor) provideJobGroup(
 		OnStart: func(_ context.Context) error {
 			return jg.Start()
 		},
-		OnStop: func(ctx context.Context) error {
+		OnStop: func(_ context.Context) error {
 			defer reg.Detach()
 			return jg.Stop()
 		},
@@ -224,17 +225,15 @@ func (jg *JobGroup) TriggerJob(name string, delay time.Duration) {
 }
 
 // JobInfo returns the information related to a job with given name.
-func (jg *JobGroup) JobInfo(name string) *JobInfo {
+func (jg *JobGroup) JobInfo(name string) (JobInfo, error) {
 	jg.gt.mu.Lock()
 	defer jg.gt.mu.Unlock()
 
 	tracker, ok := jg.gt.trackers[name]
 	if ok {
-		if executor, ok := tracker.job.(*jobExecutor); ok {
-			return executor.jobInfo()
-		}
+		return tracker.jobInfo, nil
 	}
-	return nil
+	return JobInfo{}, fmt.Errorf("job %s not found", name)
 }
 
 // IsHealthy returns true if the job is healthy.
