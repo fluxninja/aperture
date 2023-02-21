@@ -83,3 +83,62 @@ var _ = Describe("Circuit", func() {
 		))
 	})
 })
+
+var _ = Describe("Integrator", func() {
+	It("integrates signals", func() {
+		circuit, err := sim.NewCircuitFromYaml(
+			`
+      evaluation_interval: 1s
+      components:
+      - integrator:
+          in_ports:
+            input: { signal_name: INPUT }
+            min: { signal_name: MIN }
+            max: { signal_name: MAX }
+          out_ports:
+            output: { signal_name: OUTPUT }
+      `,
+			sim.Inputs{
+				"INPUT": sim.NewInput([]float64{1, 2, 3, 4, 5}),
+				"MIN":   sim.NewInput([]float64{0, 0, 0, 0, 0}),
+				"MAX":   sim.NewInput([]float64{10, 10, 10, 10, 10}),
+			},
+			sim.OutputSignals{"OUTPUT"},
+		)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(circuit.RunDrainInputs()).To(Equal(
+			sim.Outputs{
+				"OUTPUT": sim.NewReadings([]float64{1, 3, 6, 10, 10}),
+			},
+		))
+	})
+})
+
+var _ = Describe("Switcher", func() {
+	It("switches between two signal values", func() {
+		circuit, err := sim.NewCircuitFromYaml(
+			`
+      components:
+      - switcher:
+          in_ports:
+            on_signal: { signal_name: ON_SIGNAL }
+            off_signal: { signal_name: OFF_SIGNAL }
+            switch: { signal_name: SWITCH }
+          out_ports:
+            output: { signal_name: OUTPUT }
+      `,
+			sim.Inputs{
+				"ON_SIGNAL":  sim.NewInput([]float64{1, 1, 1, 1, 1}),
+				"OFF_SIGNAL": sim.NewInput([]float64{0, 0, 0, 0, 0}),
+				"SWITCH":     sim.NewInput([]float64{0, 0, 1, 1, 0}),
+			},
+			sim.OutputSignals{"OUTPUT"},
+		)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(circuit.RunDrainInputs()).To(Equal(
+			sim.Outputs{
+				"OUTPUT": sim.NewReadings([]float64{0, 0, 1, 1, 0}),
+			},
+		))
+	})
+})
