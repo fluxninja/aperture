@@ -1,0 +1,107 @@
+# Generated values file for policies/latency-aimd-concurrency-limiting blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting
+
+common:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: "service1-demo-app"
+
+policy:
+  # Flux Meter.
+  # Type: aperture.spec.v1.FluxMeter
+  flux_meter:
+    flow_selector:
+      service_selector:
+        # Service Name.
+        # Type: string
+        # Required: True
+        service: service3-demo-app.demoapp.svc.cluster.local
+      flow_matcher:
+        # Control Point Name.
+        # Type: string
+        # Required: True
+        control_point: ingress
+  # List of classification rules.
+  # Type: []aperture.spec.v1.Classifier
+  classifiers:
+  - flow_selector: &concurrency_flow_selector
+      service_selector:
+        service: service1-demo-app.demoapp.svc.cluster.local
+      flow_matcher:
+        control_point: ingress
+    rules:
+      user_type:
+        extractor:
+          from: request.http.headers.user-type
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components:
+  - decider:
+      in_ports:
+        lhs:
+          signal_name: OBSERVED_LOAD_MULTIPLIER
+        rhs:
+          constant_signal:
+            value: 1.0
+      out_ports:
+        output:
+          signal_name: IS_BOT_ESCALATION
+      operator: lt
+      true_for: 30s
+  - switcher:
+      in_ports:
+        switch:
+          signal_name: IS_BOT_ESCALATION
+        on_signal:
+          constant_signal:
+            value: 0.0
+        off_signal:
+          constant_signal:
+            value: 10.0
+      out_ports:
+        output:
+          signal_name: RATE_LIMIT
+  - flow_control:
+      rate_limiter:
+        flow_selector:
+          service_selector:
+            service: service1-demo-app.demoapp.svc.cluster.local
+          flow_matcher:
+            label_matcher:
+              match_labels:
+                'http.request.header.user_type': 'bot'
+            control_point: ingress
+        in_ports:
+          limit:
+            signal_name: RATE_LIMIT
+        parameters:
+          limit_reset_interval: 1s
+          label_key: http.request.header.user_id
+        dynamic_config_key: rate_limiter
+  concurrency_controller:
+    # Concurrency Limiter flow selector.
+    # Type: aperture.spec.v1.FlowSelector
+    flow_selector: *concurrency_flow_selector
+    # Scheduler parameters.
+    # Type: aperture.spec.v1.SchedulerParameters
+    scheduler:
+      workloads:
+      - parameters:
+          priority: 50
+        label_matcher:
+          match_labels:
+            user_type: guest
+      - parameters:
+          priority: 200
+        label_matcher:
+          match_labels:
+            http.request.header.user_type: subscriber
+    # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
+    # Type: float64
+    load_multiplier_linear_increment: 0.005
+    # Whether tokens for workloads are computed dynamically or set statically by the user.
+    # Type: aperture.spec.v1.AlerterParameters
+    alerter:
+      alert_channels: ['service1-demo-app']

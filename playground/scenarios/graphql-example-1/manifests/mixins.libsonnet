@@ -1,17 +1,17 @@
-local demoApp = import 'apps/demoapp/main.libsonnet';
+local graphqlDemoApp = import './main.libsonnet';
 
 local k = import 'github.com/jsonnet-libs/k8s-libsonnet/1.22/main.libsonnet';
 
-local wavepoolConfigName = 'wavepool-config';
-local wavePoolGenerator = 'wavepool-generator';
+local wavepoolConfigName = 'wavepool-graphql-config';
+local wavePoolGenerator = 'wavepool-graphql-generator';
 
-local demoappMixin =
-  demoApp {
+local graphQLDemoappMixin =
+  graphqlDemoApp {
     values+: {
       replicaCount: 2,
       simplesrv+: {
         image: {
-          repository: 'docker.io/fluxninja/demo-app',
+          repository: 'docker.io/fluxninja/graphql-demo-app',
           tag: 'test',
         },
       },
@@ -31,7 +31,7 @@ local demoappMixin =
 local wavePoolConfigMixin =
   k.core.v1.configMap.new(wavepoolConfigName)
   + k.core.v1.configMap.withData({
-    'wavepool_generator.js': importstr '../../../load_generator/scenarios/load_test.js',
+    'graphql_wavepool_generator.js': importstr '../../../load_generator/scenarios/graphql_load_test.js',
   });
 
 local wavePoolGeneratorMixin =
@@ -43,7 +43,7 @@ local wavePoolGeneratorMixin =
     image: 'loadimpact/k6:latest',
     imagePullPolicy: 'Always',
     command: ['/bin/sh', '-xc'],
-    args: ['while true; do k6 run -v /tmp/wavepool_generator.js; done'],
+    args: ['while true; do k6 run -v /tmp/graphql_wavepool_generator.js; done'],
     resources: {
       limits: {
         cpu: '1',
@@ -52,18 +52,18 @@ local wavePoolGeneratorMixin =
     },
     volumeMounts: [{
       mountPath: '/tmp',
-      name: 'js-file',
+      name: 'graphql-js-file',
     }],
   })
   + k.apps.v1.deployment.spec.template.spec.withVolumes({
     configMap: {
       name: wavepoolConfigName,
     },
-    name: 'js-file',
+    name: 'graphql-js-file',
   });
 
 {
-  demoapp: demoappMixin,
+  demoapp: graphQLDemoappMixin,
   wavePoolconfigMap: wavePoolConfigMixin,
   wavepoolDeployment: wavePoolGeneratorMixin,
 }

@@ -1,0 +1,19 @@
+{
+  "renderer": "tanka",
+  "tkenv": "manifests/",
+  "images": [
+    {
+      "ref": "graphql-demo-app",
+      "context": "application/graphql_demo_app",
+      "ssh": "default"
+    }
+  ],
+  "needs": ["istio"],
+  "child_resources": [
+    {
+      "workload": "service-graphql-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "extra_objects": ["service-graphql-demo-app:serviceaccount"]
+    }
+  ]
+}

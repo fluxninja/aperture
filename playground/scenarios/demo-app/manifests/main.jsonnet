@@ -4,7 +4,7 @@ local helpers = import 'ninja/helpers.libsonnet';
 
 local helm = tanka.helm.new(helpers.helmChartsRoot);
 
-{
+local application = {
   environment:: {
     namespace: 'demoapp',
   },
@@ -25,4 +25,18 @@ local helm = tanka.helm.new(helpers.helmChartsRoot);
       namespace: $.environment.namespace,
       values: $.values,
     }),
+};
+
+function(apiServer='API SERVER MISSING') {
+  apiVersion: 'tanka.dev/v1alpha1',
+  kind: 'Environment',
+  metadata: {
+    name: 'apps/demoapp',
+  },
+  spec: {
+    apiServer: apiServer,
+    namespace: 'demoapp',
+    applyStrategy: 'server',
+  },
+  data: application,
 }
