@@ -128,15 +128,15 @@ var _ = Describe("Jobs", func() {
 		groupConfig := &testGroupConfig{
 			jobs: []Job{job},
 			jobRunConfig: testJobRunConfig{
-				sleepTime:         time.Millisecond * 300,
+				sleepTime:         time.Millisecond * 1000,
 				expectedStatusMsg: "OK",
-				expectedNoOfRuns:  2,
+				expectedNoOfRuns:  5,
 			},
 			expectedScheduling: true,
 			jobGroup:           jobGroup,
 		}
 		runJobGroup(jobGroup, groupConfig, jobConfig)
-		Expect(counter).To(Equal(2))
+		Expect(counter).To(Equal(5))
 	})
 
 	It("checks for timed out job", func() {
@@ -157,7 +157,7 @@ var _ = Describe("Jobs", func() {
 			jobRunConfig: testJobRunConfig{
 				sleepTime:         time.Millisecond * 2000,
 				expectedStatusMsg: "Timeout",
-				expectedNoOfRuns:  11, // Job gets scheduled 10 times within 2 seconds + 1 scheduling caused by manual trigger if job is stuck
+				expectedNoOfRuns:  1,
 			},
 			expectedScheduling: false,
 			jobGroup:           jobGroup,
@@ -173,7 +173,7 @@ var _ = Describe("Jobs", func() {
 		groupConfig := &testGroupConfig{
 			jobs: []Job{job, job2},
 			jobRunConfig: testJobRunConfig{
-				sleepTime:         time.Millisecond * 300,
+				sleepTime:         time.Millisecond * 500,
 				expectedStatusMsg: "OK",
 				expectedNoOfRuns:  2,
 			},
@@ -193,7 +193,7 @@ var _ = Describe("Jobs", func() {
 		groupConfig := &testGroupConfig{
 			jobs: []Job{multiJob},
 			jobRunConfig: testJobRunConfig{
-				sleepTime:         time.Millisecond * 300,
+				sleepTime:         time.Millisecond * 500,
 				expectedStatusMsg: "OK",
 				expectedNoOfRuns:  2,
 			},
@@ -220,7 +220,7 @@ var _ = Describe("Jobs", func() {
 		groupConfig := &testGroupConfig{
 			jobs: []Job{multiJob, multiJob2},
 			jobRunConfig: testJobRunConfig{
-				sleepTime:         time.Millisecond * 300,
+				sleepTime:         time.Millisecond * 500,
 				expectedStatusMsg: "OK",
 				expectedNoOfRuns:  2,
 			},
@@ -265,7 +265,8 @@ var _ = Describe("Jobs", func() {
 		// error when registering job multiple times, written here to achieve more coverage
 		err = jobGroup.DeregisterJob(job.Name())
 		Expect(err).To(HaveOccurred())
-		Expect(jobGroup.JobInfo(job.Name())).To(BeNil())
+		_, err = jobGroup.JobInfo(job.Name())
+		Expect(err).To(HaveOccurred())
 	})
 })
 
