@@ -108,7 +108,7 @@ var _ = Describe("Integrator", func() {
 		Expect(err).ToNot(HaveOccurred())
 		Expect(circuit.RunDrainInputs()).To(Equal(
 			sim.Outputs{
-				"OUTPUT": sim.NewReadings([]float64{1, 3, 6, 10, 15}),
+				"OUTPUT": sim.NewReadings([]float64{1, 3, 6, 10, 10}),
 			},
 		))
 	})
@@ -121,16 +121,16 @@ var _ = Describe("Switcher", func() {
       components:
       - switcher:
           in_ports:
-            on_true: { signal_name: ON_TRUE }
-            on_false: { signal_name: ON_FALSE }
+            on_signal: { signal_name: ON_SIGNAL }
+            off_signal: { signal_name: OFF_SIGNAL }
             switch: { signal_name: SWITCH }
           out_ports:
             output: { signal_name: OUTPUT }
       `,
 			sim.Inputs{
-				"ON_TRUE":  sim.NewInput([]float64{1, 1, 1, 1, 1}),
-				"ON_FALSE": sim.NewInput([]float64{0, 0, 0, 0, 0}),
-				"SWITCH":   sim.NewInput([]float64{0, 0, 1, 1, 0}),
+				"ON_SIGNAL":  sim.NewInput([]float64{1, 1, 1, 1, 1}),
+				"OFF_SIGNAL": sim.NewInput([]float64{0, 0, 0, 0, 0}),
+				"SWITCH":     sim.NewInput([]float64{0, 0, 1, 1, 0}),
 			},
 			sim.OutputSignals{"OUTPUT"},
 		)
