@@ -2,7 +2,6 @@ package components
 
 import (
 	"errors"
-	"fmt"
 
 	"go.uber.org/fx"
 
@@ -82,7 +81,7 @@ func (arith *ArithmeticCombinator) Execute(inPortReadings runtime.PortToReading,
 			output = runtime.NewReading(lhsVal * rhsVal)
 		case Div:
 			if rhsVal == 0 {
-				err = fmt.Errorf("divide by zero")
+				output = runtime.InvalidReading()
 			} else {
 				output = runtime.NewReading(lhsVal / rhsVal)
 			}

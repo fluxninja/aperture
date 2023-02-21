@@ -193,5 +193,3 @@
 | `prometheus.initContainer.image.repository` | Init container image repository.                                                                | `yq`                    |
 | `prometheus.initContainer.image.tag`        | Init container image tag.                                                                       | `3.1.0`                 |
 | `prometheus.initContainer.image.pullPolicy` | Init container image pull policy.                                                               | `IfNotPresent`          |
-
-

@@ -160,6 +160,7 @@ func (r *registry) Detach() {
 		// set parent to nil
 		r.parent = nil
 		r.logger = r.root.logger
+		r.alerter = r.root.alerter
 		r.root = r
 	}
 }

@@ -90,7 +90,7 @@ func SetGlobalLogger(lg *Logger) {
 // SetStdLogger sets output for the standard logger.
 func SetStdLogger(lg *Logger) {
 	stdlog.SetFlags(0)
-	stdlog.SetOutput(lg.logger)
+	stdlog.SetOutput(lg)
 }
 
 // NewLogger creates a new logger.
@@ -682,6 +682,11 @@ func Errorln(v ...interface{}) {
 
 // Write implements io.Writer interface.
 func (lg *Logger) Write(p []byte) (n int, err error) {
+	// if p contains the text "RunOnce trigger is expired", then don't log it
+	// this log is coming from goquartz library and there is no way to disable it
+	if strings.Contains(string(p), "RunOnce trigger is expired") {
+		return len(p), nil
+	}
 	return lg.logger.Write(p)
 }
 

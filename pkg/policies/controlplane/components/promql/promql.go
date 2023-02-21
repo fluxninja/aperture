@@ -78,12 +78,10 @@ func ModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 			fmt.Sprintf("%s-promql", circuitAPI.GetPolicyHash()), circuitAPI.GetPolicyName()), jws, nil)
 		pje.promMultiJob = promMultiJob
 
-		initialDelay := config.MakeDuration(-1)
 		executionPeriod := config.MakeDuration(-1)
 		executionTimeout := config.MakeDuration(promTimeout * 2)
 		jobConfig := jobs.JobConfig{
 			InitiallyHealthy: true,
-			InitialDelay:     initialDelay,
 			ExecutionPeriod:  executionPeriod,
 			ExecutionTimeout: executionTimeout,
 		}
@@ -231,7 +229,7 @@ func (pje *promJobsExecutor) onTickEnd(_ runtime.TickInfo) (err error) {
 		// Clear pendingJobs for future ticks
 		pje.pendingJobs = make(jobResultBrokers)
 		// Trigger the multi job
-		pje.promQLJobGroup.TriggerJob(pje.promMultiJob.Name())
+		pje.promQLJobGroup.TriggerJob(pje.promMultiJob.Name(), time.Duration(0))
 	}
 	return err
 }
@@ -282,7 +280,7 @@ func (srb *scalarResultBroker) handleError(err error, cbArgs ...interface{}) (pr
 	defer srb.lock.Unlock()
 	srb.res = math.NaN()
 	srb.err = err
-	return nil, errors.New("invalid ScalaResult, error in prometheus query")
+	return nil, errors.New("invalid ScalarResult, error in prometheus query")
 }
 
 type taggedResultBroker struct {
@@ -415,7 +413,9 @@ func (promQL *PromQL) setup(pje *promJobsExecutor, promAPI prometheusv1.API) err
 }
 
 // Execute implements runtime.Component.Execute.
-func (promQL *PromQL) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (outPortReadings runtime.PortToReading, err error) {
+func (promQL *PromQL) Execute(inPortReadings runtime.PortToReading,
+	tickInfo runtime.TickInfo,
+) (outPortReadings runtime.PortToReading, err error) {
 	// Re-run query if evaluationInterval elapsed since last query
 	if tickInfo.Timestamp().Sub(promQL.lastQueryTimestamp()) >= promQL.evaluationInterval {
 		// Run query

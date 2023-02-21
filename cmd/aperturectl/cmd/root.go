@@ -23,6 +23,7 @@ func init() {
 	RootCmd.AddCommand(installation.UnInstallCmd)
 
 	RootCmd.InitDefaultCompletionCmd()
+	RootCmd.SilenceUsage = true
 }
 
 // RootCmd is the root command for aperturectl.

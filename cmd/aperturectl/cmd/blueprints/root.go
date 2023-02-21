@@ -96,8 +96,6 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 			return err
 		}
 
-		blueprintsDir = filepath.Join(blueprintsURIRoot, getRelPath(blueprintsURIRoot))
-
 		// lock blueprintsDir to prevent concurrent access using flock package
 		lock = flock.New(filepath.Join(blueprintsURIRoot, lockFilename))
 
@@ -110,6 +108,8 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 		} else {
 			log.Debug().Msg("skipping pulling blueprints")
 		}
+
+		blueprintsDir = filepath.Join(blueprintsURIRoot, getRelPath(blueprintsURIRoot))
 		return nil
 	},
 	PersistentPostRun: func(_ *cobra.Command, _ []string) {

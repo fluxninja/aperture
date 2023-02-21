@@ -321,6 +321,79 @@ Below is the mapping of the ports being forwarded by Tilt:
 | Etcd       | 2379           | 2379       |
 | Grafana    | 3000           | 3000       |
 
+### Running demo applications and designing test scenarios
+
+By default, playground is started with a simple demo scenario loaded. The demo
+application comes with three sets of pods and services. There is also a simple
+latency gradient policy applied to them, and K6 load generator pattern created.
+When entire deployment turns green, load generator can be started with "Start
+Wavepool Generator" button in the Tilt UI. It will run a 2 minute test in a
+loop, until "Stop Wavepool Geneator" button is not clicked.
+
+There are other playground scenarios under _playground/scenarios/_ and they can
+be loaded during tilt setup by passing a relative path to the scenario, e.g.
+`tilt up -- --scenario scenarios/demo-app`
+
+:::note
+
+You can skip building of aperture container images to speed up your work on the
+scenario, by passing `-- --dockerhub-image` to the `tilt up` command. In that
+case latest images will be pulled from dockerhub and used instead.
+
+:::
+
+#### Creating your own test scenarios
+
+```
+demo-app
+├── application
+│   ├── Dockerfile
+│   ├── README.md
+│   ├── app
+│   │   ├── app.go
+│   │   └── app_test.go
+│   ├── go.mod
+│   ├── go.sum
+│   └── main.go
+├── charts
+│   └── demo-app
+│       ├── Chart.yaml
+│       ├── templates
+│       │   ├── _helpers.tpl
+│       │   ├── deployment.yaml
+│       │   ├── service.yaml
+│       │   └── serviceaccount.yaml
+│       └── values.yaml
+├── jsonnetfile.json
+├── jsonnetfile.lock.json
+├── load_generator
+│   └── test.js
+├── manifests
+│   └── main.jsonnet
+├── metadata.json
+└── policies
+    └── service1-demo-app.yaml
+```
+
+Each test scenario consists of few directories, for kubernetes manifests, docker
+images, policies and load testing configuration:
+
+- `metadata.json` describes test scenario, what images to build, what tilt
+  dependencies to add etc. See existing test scenarios, as well as Tiltfile for
+  examples of how to prepare this file.
+- `application` stores Dockerfile and any support files used for building
+  container images
+- `manifests` contains kubernetes manifests that will be deployed on the
+  cluster. Currently, they can be tanka-based jsonnet applications, or raw yaml
+  files which will be applied on the cluster without any processing (other than
+  ensuring _demoapp_ namespace is set for all resources)
+- `policies/service1-demo-app.yaml` is a values.yaml file for the given policy
+  listed in metadata.json under `aperture_policies` key.
+- `load_generator/test.js` is configuration for the K6 load generator.
+- `jsonnetfile.json` and `jsonnetfile.lock.json` as well as optional
+  `chartfile.yaml` allow for adding external jsonnet and helm dependencies to
+  the project.
+
 ## FAQs
 
 ### Too many open files "warning"
