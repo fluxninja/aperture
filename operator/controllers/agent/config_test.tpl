@@ -99,7 +99,6 @@ liveness:
   service:
     execution_period: 10s
     execution_timeout: 5s
-    initial_delay: 0s
     initially_healthy: false
 log:
   level: info
@@ -153,7 +152,6 @@ readiness:
   service:
     execution_period: 10s
     execution_timeout: 5s
-    initial_delay: 0s
     initially_healthy: false
 sentry_plugin:
   attach_stack_trace: true
@@ -239,7 +237,6 @@ watchdog:
   job:
     execution_period: 10s
     execution_timeout: 5s
-    initial_delay: 0s
     initially_healthy: false
   system:
     adaptive_policy:
