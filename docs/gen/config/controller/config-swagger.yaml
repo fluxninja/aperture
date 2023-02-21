@@ -510,13 +510,6 @@ definitions:
         x-go-default: 5s
         x-go-name: ExecutionTimeout
         x-go-validate: gte=0s
-      initial_delay:
-        description: Initial delay to start the job. Zero value will schedule the
-          job immediately. Negative value will wait for next scheduled interval.
-        format: string
-        type: string
-        x-go-default: 0s
-        x-go-name: InitialDelay
       initially_healthy:
         description: Sets whether the job is initially healthy
         type: boolean
@@ -526,15 +519,25 @@ definitions:
     x-go-package: github.com/fluxninja/aperture/pkg/jobs
   JobGroupConfig:
     properties:
-      max_concurrent_jobs:
-        description: Limits how many jobs can be running at the same time. This is
+      blocking_execution:
+        description: |-
+          When true, the scheduler will run jobs synchronously,
+          waiting for each execution instance of the job to return
+          before starting the next execution. Running with this
+          option effectively serializes all job execution.
+        type: boolean
+        x-go-default: "false"
+        x-go-name: BlockingExecution
+      worker_limit:
+        description: |-
+          Limits how many jobs can be running at the same time. This is
           useful when running resource intensive jobs and a precise start time is
-          not critical. 0 = no limit.
+          not critical. 0 = no limit. If BlockingExecution is set, then WorkerLimit
+          is ignored.
         format: int64
         type: integer
         x-go-default: "0"
-        x-go-name: MaxConcurrentJobs
-        x-go-validate: gte=0
+        x-go-name: WorkerLimit
     title: JobGroupConfig holds configuration for JobGroup.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/jobs
@@ -669,13 +672,6 @@ definitions:
         x-go-default: 5s
         x-go-name: ExecutionTimeout
         x-go-validate: gte=0s
-      initial_delay:
-        description: Initial delay to start the job. Zero value will schedule the
-          job immediately. Negative value will wait for next scheduled interval.
-        format: string
-        type: string
-        x-go-default: 0s
-        x-go-name: InitialDelay
       initially_healthy:
         description: Sets whether the job is initially healthy
         type: boolean
@@ -813,15 +809,25 @@ definitions:
     x-go-package: github.com/fluxninja/aperture/pkg/net/http
   SchedulerConfig:
     properties:
-      max_concurrent_jobs:
-        description: Limits how many jobs can be running at the same time. This is
+      blocking_execution:
+        description: |-
+          When true, the scheduler will run jobs synchronously,
+          waiting for each execution instance of the job to return
+          before starting the next execution. Running with this
+          option effectively serializes all job execution.
+        type: boolean
+        x-go-default: "false"
+        x-go-name: BlockingExecution
+      worker_limit:
+        description: |-
+          Limits how many jobs can be running at the same time. This is
           useful when running resource intensive jobs and a precise start time is
-          not critical. 0 = no limit.
+          not critical. 0 = no limit. If BlockingExecution is set, then WorkerLimit
+          is ignored.
         format: int64
         type: integer
         x-go-default: "0"
-        x-go-name: MaxConcurrentJobs
-        x-go-validate: gte=0
+        x-go-name: WorkerLimit
     title: SchedulerConfig holds configuration for job Scheduler.
     type: object
     x-go-package: github.com/fluxninja/aperture/pkg/jobs

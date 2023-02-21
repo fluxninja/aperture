@@ -957,12 +957,6 @@ JobConfig is config for Job
 (string, `gte=0s`, default: `5s`) Execution timeout
 
 </dd>
-<dt>initial_delay</dt>
-<dd>
-
-(string, default: `0s`) Initial delay to start the job. Zero value will schedule the job immediately. Negative value will wait for next scheduled interval.
-
-</dd>
 <dt>initially_healthy</dt>
 <dd>
 
@@ -978,10 +972,22 @@ JobGroupConfig holds configuration for JobGroup.
 #### Properties
 
 <dl>
-<dt>max_concurrent_jobs</dt>
+<dt>blocking_execution</dt>
 <dd>
 
-(int64, `gte=0`, default: `0`) Limits how many jobs can be running at the same time. This is useful when running resource intensive jobs and a precise start time is not critical. 0 = no limit.
+(bool, default: `false`) When true, the scheduler will run jobs synchronously,
+waiting for each execution instance of the job to return
+before starting the next execution. Running with this
+option effectively serializes all job execution.
+
+</dd>
+<dt>worker_limit</dt>
+<dd>
+
+(int64, default: `0`) Limits how many jobs can be running at the same time. This is
+useful when running resource intensive jobs and a precise start time is
+not critical. 0 = no limit. If BlockingExecution is set, then WorkerLimit
+is ignored.
 
 </dd>
 </dl>

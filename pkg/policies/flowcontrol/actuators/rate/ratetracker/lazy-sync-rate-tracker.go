@@ -44,7 +44,6 @@ func NewLazySyncRateTracker(limiter RateTracker,
 	err := lsl.jobGroup.RegisterJob(job, jobs.JobConfig{
 		ExecutionPeriod:  config.MakeDuration(syncDuration),
 		ExecutionTimeout: config.MakeDuration(syncDuration),
-		InitialDelay:     config.MakeDuration(-1),
 	})
 	if err != nil {
 		return nil, err
