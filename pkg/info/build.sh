@@ -24,12 +24,14 @@ LDFLAGS="\
     -X 'github.com/fluxninja/aperture/pkg/info.Prefix=${PREFIX}' \
 "
 
-build_args=(
+if [ -n "${RACE:-}" ]; then
+  build_args=( -race )
+fi
+
+build_args+=(
   --ldflags "${LDFLAGS}"
   -o "${TARGET}"
   "${SOURCE}"
 )
-if [ -n "${RACE:-}" ]; then
-  build_args+=( --race )
-fi
+
 go build "${build_args[@]}"

@@ -20,13 +20,15 @@ LDFLAGS="\
     -X 'main.GitCommitHash=${GIT_COMMIT_HASH}' \
 "
 
-build_args=(
+if [ -n "${RACE:-}" ]; then
+  build_args=( -race )
+fi
+
+build_args+=(
   -buildmode=plugin
   --ldflags "${LDFLAGS}"
   -o "${TARGET}"
   "${SOURCE}"
 )
-if [ -n "${RACE:-}" ]; then
-  build_args+=( --race )
-fi
+
 go build "${build_args[@]}"
