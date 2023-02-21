@@ -183,6 +183,7 @@ func (x *K8SLabelMatcherRequirement) GetValues() []string {
 //   of:
 //     - label_exists: foo
 //     - label_equals: { label = app, value = frobnicator }
+//     - label_matches: { label = version, regex = ^v1.*$ }
 // ```
 type MatchExpression struct {
 	state         protoimpl.MessageState

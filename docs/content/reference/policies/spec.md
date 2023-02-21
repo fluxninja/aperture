@@ -504,29 +504,6 @@ This interval is typically aligned with how often the corrective action (actuati
 
 ### Classifier {#classifier}
 
-Set of classification rules sharing a common selector
-
-:::info
-
-See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
-
-:::
-
-Example:
-
-```yaml
-selector:
-  service_selector:
-    service: service1.default.svc.cluster.local
-  flow_selector:
-    control_point:
-      traffic: ingress
-rules:
-  user:
-    extractor:
-      from: request.http.headers.user
-```
-
 #### Properties
 
 <dl>
@@ -1481,26 +1458,6 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 
 ### FluxMeter {#flux-meter}
 
-Flux Meter gathers metrics for the traffic that matches its selector.
-The histogram created by Flux Meter measures the workload latency by default.
-
-:::info
-
-See also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).
-
-:::
-
-Example of a selector that creates a histogram metric for all HTTP requests
-to particular service:
-
-```yaml
-selector:
-  service_selector:
-    service: myservice.mynamespace.svc.cluster.local
-  flow_selector:
-    control_point: ingress
-```
-
 #### Properties
 
 <dl>
@@ -2361,6 +2318,7 @@ all:
   of:
     - label_exists: foo
     - label_equals: { label = app, value = frobnicator }
+    - label_matches: { label = version, regex = ^v1.*$ }
 ```
 
 #### Properties

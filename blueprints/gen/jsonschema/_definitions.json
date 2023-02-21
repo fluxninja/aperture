@@ -330,9 +330,7 @@
       "additionalProperties": false
     },
     "Classifier": {
-      "description": ":::info\n\nSee also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).\n\n:::\n\nExample:\n```yaml\nselector:\n  service_selector:\n    service: service1.default.svc.cluster.local\n  flow_selector:\n    control_point:\n      traffic: ingress\nrules:\n  user:\n    extractor:\n      from: request.http.headers.user\n```",
       "type": "object",
-      "title": "Set of classification rules sharing a common selector",
       "properties": {
         "flow_selector": {
           "description": "Defines where to apply the flow classification rule.\n\n@gotags: validate:\"required\"",
@@ -957,7 +955,6 @@
       "additionalProperties": false
     },
     "FluxMeter": {
-      "description": "Flux Meter gathers metrics for the traffic that matches its selector.\nThe histogram created by Flux Meter measures the workload latency by default.\n\n:::info\n\nSee also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).\n\n:::\n\nExample of a selector that creates a histogram metric for all HTTP requests\nto particular service:\n```yaml\nselector:\n  service_selector:\n    service: myservice.mynamespace.svc.cluster.local\n  flow_selector:\n    control_point: ingress\n```",
       "type": "object",
       "properties": {
         "attribute_key": {
@@ -1547,7 +1544,7 @@
       "additionalProperties": false
     },
     "MatchExpression": {
-      "description": "MatchExpression has multiple variants, exactly one should be set.\n\nExample:\n```yaml\nall:\n  of:\n    - label_exists: foo\n    - label_equals: { label = app, value = frobnicator }\n```",
+      "description": "MatchExpression has multiple variants, exactly one should be set.\n\nExample:\n```yaml\nall:\n  of:\n    - label_exists: foo\n    - label_equals: { label = app, value = frobnicator }\n    - label_matches: { label = version, regex = ^v1.*$ }\n```",
       "type": "object",
       "title": "Defines a [map<string, string> \u2192\u00a0bool] expression to be evaluated on labels",
       "properties": {

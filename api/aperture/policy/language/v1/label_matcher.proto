@@ -66,6 +66,7 @@ message K8sLabelMatcherRequirement {
 //   of:
 //     - label_exists: foo
 //     - label_equals: { label = app, value = frobnicator }
+//     - label_matches: { label = version, regex = ^v1.*$ }
 // ```
 message MatchExpression {
   // List of MatchExpressions that is used for all/any matching

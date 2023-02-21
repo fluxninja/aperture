@@ -21,24 +21,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Flux Meter gathers metrics for the traffic that matches its selector.
-// The histogram created by Flux Meter measures the workload latency by default.
-//
-// :::info
-//
-// See also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).
-//
-// :::
-//
-// Example of a selector that creates a histogram metric for all HTTP requests
-// to particular service:
-// ```yaml
-// selector:
-//   service_selector:
-//     service: myservice.mynamespace.svc.cluster.local
-//   flow_selector:
-//     control_point: ingress
-// ```
 type FluxMeter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

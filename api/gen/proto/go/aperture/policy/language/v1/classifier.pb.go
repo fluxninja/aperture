@@ -21,27 +21,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Set of classification rules sharing a common selector
-//
-// :::info
-//
-// See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
-//
-// :::
-//
-// Example:
-// ```yaml
-// selector:
-//   service_selector:
-//     service: service1.default.svc.cluster.local
-//   flow_selector:
-//     control_point:
-//       traffic: ingress
-// rules:
-//   user:
-//     extractor:
-//       from: request.http.headers.user
-// ```
 type Classifier struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
