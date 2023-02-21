@@ -26,7 +26,7 @@ tk tool charts vendor
 exit_code=0
 while read -r app; do
 	env_dir=$(dirname "$app")
-	tk show --dangerous-allow-redirect --ext-str=projectRoot="${TOP_LEVEL}"/playground/tanka/ "$env_dir" >/dev/null || {
+	tk show --ext-str=ENABLE_CLOUD_PLUGIN=false --dangerous-allow-redirect --ext-str=projectRoot="${TOP_LEVEL}"/playground/tanka/ "$env_dir" >/dev/null || {
 		exit_code="$?"
 		printf '\n##########\nFAILED SHOWING ENV %s\n##########\n' "${env_dir}" >&2
 	}
