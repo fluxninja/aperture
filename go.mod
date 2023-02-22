@@ -629,6 +629,7 @@ require (
 exclude github.com/prometheus/prometheus v1.8.2
 
 replace (
+	github.com/jsonnet-bundler/jsonnet-bundler => github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1
 	go.opentelemetry.io/collector => github.com/fluxninja/opentelemetry-collector v0.71.0-fn.patch.3
 	go.opentelemetry.io/collector/component => github.com/fluxninja/opentelemetry-collector/component v0.71.0-fn.patch.3
 	go.opentelemetry.io/collector/confmap => github.com/fluxninja/opentelemetry-collector/confmap v0.71.0-fn.patch.3
