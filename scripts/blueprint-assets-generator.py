@@ -398,6 +398,9 @@ def quoteValue(value: str) -> str:
 
     if isinstance(value, list) or isinstance(value, dict):
         return value
+    # if value is __REQUIRED_FIELD__ return as unquoted string
+    if value == "__REQUIRED_FIELD__":
+        return value
 
     return f"\'{value}\'"
 

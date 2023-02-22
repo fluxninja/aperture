@@ -59,7 +59,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
     name="common.policy_name"
     type="string"
     reference=""
-    value="'__REQUIRED_FIELD__'"
+    value="__REQUIRED_FIELD__"
     description='Name of the policy.' />
 
 <h3 class="blueprints-h3">Policy</h3>
@@ -77,7 +77,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
     name="policy.rate_limiter.rate_limit"
     type="float64"
     reference=""
-    value="'__REQUIRED_FIELD__'"
+    value="__REQUIRED_FIELD__"
     description='Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept' />
 
 <ParameterDescription
@@ -91,14 +91,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
     name="policy.rate_limiter.flow_selector.service_selector.service"
     type="string"
     reference=""
-    value="'__REQUIRED_FIELD__'"
+    value="__REQUIRED_FIELD__"
     description='Service Name.' />
 
 <ParameterDescription
     name="policy.rate_limiter.flow_selector.flow_matcher.control_point"
     type="string"
     reference=""
-    value="'__REQUIRED_FIELD__'"
+    value="__REQUIRED_FIELD__"
     description='Control Point Name.' />
 
 <ParameterDescription
@@ -112,7 +112,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
     name="policy.rate_limiter.parameters.label_key"
     type="string"
     reference=""
-    value="'__REQUIRED_FIELD__'"
+    value="__REQUIRED_FIELD__"
     description='Flow label to use for rate limiting.' />
 
 <ParameterDescription
@@ -156,5 +156,5 @@ at runtime, without reloading the policy.
     name="rate_limiter"
     type="aperture.spec.v1.RateLimiterDynamicConfig"
     reference="../../spec#rate-limiter-dynamic-config"
-    value="'__REQUIRED_FIELD__'"
+    value="__REQUIRED_FIELD__"
     description='Rate limiter dynamic configuration that is updated at runtime.' />
