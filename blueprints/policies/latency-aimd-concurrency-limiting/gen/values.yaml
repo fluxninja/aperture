@@ -68,9 +68,6 @@ policy:
     # Whether tokens for workloads are computed dynamically or set statically by the user.
     # Type: aperture.spec.v1.AlerterParameters
     alerter:
-      # Name for alerter.
-      # Type: string
-      # Required: True
       alert_name: "Load Shed Event"
     # Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
     # Type: float64

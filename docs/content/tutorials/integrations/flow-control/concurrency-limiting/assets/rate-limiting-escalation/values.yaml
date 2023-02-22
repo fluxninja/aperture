@@ -38,13 +38,6 @@ policy:
               http.request.header.user_type: subscriber
           parameters:
             priority: 200
-    default_config:
-      dry_run: false
-    alerter:
-      # Name for alerter.
-      # Type: string
-      # Required: True
-      alert_name: "Load Shed Event"
   components:
     - decider:
         in_ports:

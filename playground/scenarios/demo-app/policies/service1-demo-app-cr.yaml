@@ -54,8 +54,6 @@ spec:
     - flow_control:
         aimd_concurrency_controller:
           alerter_parameters:
-            alert_channels:
-            - service1-demo-app
             alert_name: Load Shed Event
           default_config:
             dry_run: false

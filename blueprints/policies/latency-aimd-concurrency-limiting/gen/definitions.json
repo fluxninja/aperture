@@ -73,7 +73,7 @@
         "concurrency_controller": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["flow_selector", "alerter"],
+          "required": ["flow_selector"],
           "properties": {
             "flow_selector": {
               "description": "Concurrency Limiter flow selector.",

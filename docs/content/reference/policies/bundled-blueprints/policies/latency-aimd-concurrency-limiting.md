@@ -188,13 +188,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     description='Whether tokens for workloads are computed dynamically or set statically by the user.' />
 
 <ParameterDescription
-    name="policy.concurrency_controller.alerter.alert_name"
-    type="string"
-    reference=""
-    value="'Load Shed Event'"
-    description='Name for alerter.' />
-
-<ParameterDescription
     name="policy.concurrency_controller.max_load_multiplier"
     type="float64"
     reference=""
