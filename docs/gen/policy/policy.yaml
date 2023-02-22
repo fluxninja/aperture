@@ -29,8 +29,8 @@ definitions:
       of signal from the baseline. Internally implemented as a nested circuit.
     type: object
     required:
-    - scheduler_parameters
     - flow_selector
+    - scheduler_parameters
     properties:
       alerter_parameters:
         description: Configuration for embedded alerter.
@@ -2485,8 +2485,8 @@ definitions:
     type: object
     title: Raw rego rules are compiled 1:1 to rego queries
     required:
-    - source
     - query
+    - source
     properties:
       query:
         description: |+

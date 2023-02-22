@@ -495,7 +495,7 @@
       "description": ":::info\n\nSee also [Concurrency Limiter overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).\n\n:::\n\nIt is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.\nConcurrency is calculated in terms of total tokens which translate to (avg. latency \\* in-flight requests), i.e. Little's Law.\n\nConcurrencyLimiter configuration is split into two parts: An actuation\nstrategy and a scheduler. Right now, only `load_actuator` strategy is available.",
       "type": "object",
       "title": "Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection",
-      "required": ["scheduler", "flow_selector"],
+      "required": ["flow_selector", "scheduler"],
       "properties": {
         "flow_selector": {
           "description": "Flow Selector decides the service and flows at which the concurrency limiter is applied.\n\n",
@@ -1450,7 +1450,7 @@
     "KubernetesObjectSelector": {
       "description": "Describes which pods a control or observability\ncomponent should apply to.",
       "type": "object",
-      "required": ["name", "namespace", "api_version", "kind"],
+      "required": ["api_version", "kind", "name", "namespace"],
       "properties": {
         "agent_group": {
           "description": "Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this\nselector applies to.\n\n",
@@ -2089,7 +2089,7 @@
       "description": ":::info\n\nSee also [Rate Limiter overview](/concepts/integrations/flow-control/components/rate-limiter.md).\n\n:::\n\nRatelimiting is done separately on per-label-value basis. Use _label\\_key_\nto select which label should be used as key.",
       "type": "object",
       "title": "Limits the traffic on a control point to specified rate",
-      "required": ["parameters", "flow_selector"],
+      "required": ["flow_selector", "parameters"],
       "properties": {
         "default_config": {
           "title": "Default configuration",
