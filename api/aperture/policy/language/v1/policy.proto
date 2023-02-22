@@ -259,7 +259,8 @@ message AutoScale {
   oneof component {
     // PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
     PodScaler pod_scaler = 1;
-    // GradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.
+    // PodAutoscaler provides auto scaling functionality for scalable Kubernetes resources.
+    PodAutoscaler pod_autoscaler = 2;
   }
 }
 
@@ -1397,4 +1398,122 @@ message AIMDConcurrencyController {
 
   // Default configuration.
   LoadActuator.DynamicConfig default_config = 10;
+}
+
+// High level pod auto-scaler
+message PodAutoscaler {
+  // Increasing Gradient defines a controller for scaling out based on Gradient Controller.
+  message IncreasingGradient {
+    // This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+    message Parameters {
+      double slope = 1; // @gotags: default:"1.0"
+
+      double min_gradient = 2; // @gotags: default:"-1.79769313486231570814527423731704356798070e+308" validate:"lte=1.0"
+    }
+
+    // Inputs for Gradient.
+    message Ins {
+      // The signal to use for scale out.
+      InPort signal = 1;
+      // The setpoint to use for scale out.
+      InPort setpoint = 2;
+    }
+
+    // Input ports for the Gradient.
+    Ins in_ports = 1;
+
+    // Gradient parameters for the controller. Defaults and constraints:
+    // * slope = 1
+    // * min_gradient = 1 (cannot be changed)
+    // * max_gradient = +Inf (must be greater than 1)
+    GradientController.Parameters parameters = 2;
+  }
+
+  // Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
+  message DecreasingGradient {
+    // This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+    message Parameters {
+      double slope = 1; // @gotags: default:"1.0"
+
+      double max_gradient = 3; // @gotags: default:"1.79769313486231570814527423731704356798070e+308" validate:"gte=1.0"
+    }
+
+    // Inputs for Gradient.
+    message Ins {
+      // The signal to use for scale in.
+      InPort signal = 1;
+      // The setpoint to use for scale in.
+      InPort setpoint = 2;
+    }
+
+    // Input ports for the Gradient.
+    Ins in_ports = 1;
+
+    // Gradient parameters for the controller. Defaults and constraints:
+    // * slope = 1
+    // * min_gradient = -Inf (must be less than 1)
+    // * max_gradient = 1 (cannot be changed)
+    Parameters parameters = 2;
+  }
+
+  message ScaleOutController {
+    message Controller {
+      oneof controller {
+        IncreasingGradient gradient = 1;
+      }
+    }
+
+    // Controller
+    Controller controller = 1;
+
+    // Configuration for embedded alerter.
+    Alerter.Parameters alerter_parameters = 2;
+  }
+
+  message ScaleInController {
+    message Controller {
+      oneof controller {
+        DecreasingGradient gradient = 1;
+      }
+    }
+
+    // Controller
+    Controller controller = 1;
+
+    // Configuration for embedded alerter.
+    Alerter.Parameters alerter_parameters = 2;
+  }
+
+  // Outputs for PodAutoscaler.
+  message Outs {
+    OutPort actual_replicas = 1;
+    OutPort configured_replicas = 2;
+  }
+
+  // Output ports for the PodAutoscaler.
+  Outs out_ports = 1;
+
+  uint32 min_replicas = 2; // @gotags: default:"0"];
+  uint32 max_replicas = 3; // @gotags: default:"4294967295"]
+
+  // The amount of time to wait after a scale out operation for another scale out or scale in operation.
+  google.protobuf.Duration scale_out_cooldown = 4;
+  // The amount of time to wait after a scale in operation for another scale in operation.
+  google.protobuf.Duration scale_in_cooldown = 5;
+
+  // Cooldown override percentage defines a threshold change in scale beyond which cooldown is not applied.
+  // For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
+  // scale changes by 10% or more, the cooldown is not applied. Defaults to 50%.
+  double cooldown_override_percentage = 6; // @gotags: default:"50"
+
+  // The maximum number of pods to scale in at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 10% of current pods.
+  double scale_in_max_percentage = 7; // @gotags: default:"10"
+
+  // The maximum number of pods to scale out at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 1% of current pods.
+  double scale_out_max_percentage = 8; // @gotags: default:"1"
+
+  // List of Controllers for scaling out pods.
+  repeated ScaleOutController scale_out_controllers = 9;
+  // List of Controllers for scaling in pods.
+  repeated ScaleInController scale_in_controllers = 10;
 }

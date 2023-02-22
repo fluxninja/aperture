@@ -416,12 +416,16 @@ AutoScale components are used to scale a service.
 #### Properties
 
 <dl>
+<dt>pod_autoscaler</dt>
+<dd>
+
+([PodAutoscaler](#pod-autoscaler)) PodAutoscaler provides auto scaling functionality for scalable Kubernetes resources.
+
+</dd>
 <dt>pod_scaler</dt>
 <dd>
 
 ([PodScaler](#pod-scaler)) PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
-
-GradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.
 
 </dd>
 </dl>
@@ -2655,6 +2659,275 @@ Example:
 "/user/{userId}": user
 /static/*: other
 ```
+
+</dd>
+</dl>
+
+### PodAutoscaler {#pod-autoscaler}
+
+High level pod auto-scaler
+
+#### Properties
+
+<dl>
+<dt>cooldown_override_percentage</dt>
+<dd>
+
+(float64, default: `50`) Cooldown override percentage defines a threshold change in scale beyond which cooldown is not applied.
+For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
+scale changes by 10% or more, the cooldown is not applied. Defaults to 50%.
+
+</dd>
+<dt>max_replicas</dt>
+<dd>
+
+(int64) @gotags: default:"4294967295"]
+
+</dd>
+<dt>min_replicas</dt>
+<dd>
+
+(int64) @gotags: default:"0"];
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([PodAutoscalerOuts](#pod-autoscaler-outs)) Output ports for the PodAutoscaler.
+
+</dd>
+<dt>scale_in_controllers</dt>
+<dd>
+
+([[]PodAutoscalerScaleInController](#pod-autoscaler-scale-in-controller)) List of Controllers for scaling in pods.
+
+</dd>
+<dt>scale_in_cooldown</dt>
+<dd>
+
+(string) The amount of time to wait after a scale in operation for another scale in operation.
+
+</dd>
+<dt>scale_in_max_percentage</dt>
+<dd>
+
+(float64, default: `10`) The maximum number of pods to scale in at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 10% of current pods.
+
+</dd>
+<dt>scale_out_controllers</dt>
+<dd>
+
+([[]PodAutoscalerScaleOutController](#pod-autoscaler-scale-out-controller)) List of Controllers for scaling out pods.
+
+</dd>
+<dt>scale_out_cooldown</dt>
+<dd>
+
+(string) The amount of time to wait after a scale out operation for another scale out or scale in operation.
+
+</dd>
+<dt>scale_out_max_percentage</dt>
+<dd>
+
+(float64, default: `1`) The maximum number of pods to scale out at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 1% of current pods.
+
+</dd>
+</dl>
+
+### PodAutoscalerDecreasingGradient {#pod-autoscaler-decreasing-gradient}
+
+Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([PodAutoscalerDecreasingGradientIns](#pod-autoscaler-decreasing-gradient-ins)) Input ports for the Gradient.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+([PodAutoscalerDecreasingGradientParameters](#pod-autoscaler-decreasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
+
+- slope = 1
+- min_gradient = -Inf (must be less than 1)
+- max_gradient = 1 (cannot be changed)
+
+</dd>
+</dl>
+
+### PodAutoscalerDecreasingGradientIns {#pod-autoscaler-decreasing-gradient-ins}
+
+Inputs for Gradient.
+
+#### Properties
+
+<dl>
+<dt>setpoint</dt>
+<dd>
+
+([InPort](#in-port)) The setpoint to use for scale in.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+([InPort](#in-port)) The signal to use for scale in.
+
+</dd>
+</dl>
+
+### PodAutoscalerDecreasingGradientParameters {#pod-autoscaler-decreasing-gradient-parameters}
+
+This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+
+#### Properties
+
+<dl>
+<dt>max_gradient</dt>
+<dd>
+
+(float64) @gotags: default:"1.79769313486231570814527423731704356798070e+308" validate:"gte=1.0"
+
+</dd>
+<dt>slope</dt>
+<dd>
+
+(float64) @gotags: default:"1.0"
+
+</dd>
+</dl>
+
+### PodAutoscalerIncreasingGradient {#pod-autoscaler-increasing-gradient}
+
+Increasing Gradient defines a controller for scaling out based on Gradient Controller.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([PodAutoscalerIncreasingGradientIns](#pod-autoscaler-increasing-gradient-ins)) Input ports for the Gradient.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+([GradientControllerParameters](#gradient-controller-parameters)) Gradient parameters for the controller. Defaults and constraints:
+
+- slope = 1
+- min_gradient = 1 (cannot be changed)
+- max_gradient = +Inf (must be greater than 1)
+
+</dd>
+</dl>
+
+### PodAutoscalerIncreasingGradientIns {#pod-autoscaler-increasing-gradient-ins}
+
+Inputs for Gradient.
+
+#### Properties
+
+<dl>
+<dt>setpoint</dt>
+<dd>
+
+([InPort](#in-port)) The setpoint to use for scale out.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+([InPort](#in-port)) The signal to use for scale out.
+
+</dd>
+</dl>
+
+### PodAutoscalerOuts {#pod-autoscaler-outs}
+
+Outputs for PodAutoscaler.
+
+#### Properties
+
+<dl>
+<dt>actual_replicas</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+<dt>configured_replicas</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+</dl>
+
+### PodAutoscalerScaleInController {#pod-autoscaler-scale-in-controller}
+
+#### Properties
+
+<dl>
+<dt>alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
+
+</dd>
+<dt>controller</dt>
+<dd>
+
+([PodAutoscalerScaleInControllerController](#pod-autoscaler-scale-in-controller-controller)) Controller
+
+</dd>
+</dl>
+
+### PodAutoscalerScaleInControllerController {#pod-autoscaler-scale-in-controller-controller}
+
+#### Properties
+
+<dl>
+<dt>gradient</dt>
+<dd>
+
+([PodAutoscalerDecreasingGradient](#pod-autoscaler-decreasing-gradient))
+
+</dd>
+</dl>
+
+### PodAutoscalerScaleOutController {#pod-autoscaler-scale-out-controller}
+
+#### Properties
+
+<dl>
+<dt>alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
+
+</dd>
+<dt>controller</dt>
+<dd>
+
+([PodAutoscalerScaleOutControllerController](#pod-autoscaler-scale-out-controller-controller)) Controller
+
+</dd>
+</dl>
+
+### PodAutoscalerScaleOutControllerController {#pod-autoscaler-scale-out-controller-controller}
+
+#### Properties
+
+<dl>
+<dt>gradient</dt>
+<dd>
+
+([PodAutoscalerIncreasingGradient](#pod-autoscaler-increasing-gradient))
 
 </dd>
 </dl>

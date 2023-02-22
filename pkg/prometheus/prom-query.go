@@ -2,6 +2,7 @@ package prometheus
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/cenkalti/backoff"
@@ -47,6 +48,8 @@ func NewPromQueryJob(
 	return pQuery.execute
 }
 
+var once sync.Once
+
 func (pq *promQuery) execute(jobCtxt context.Context) (proto.Message, error) {
 	var result prometheusmodel.Value
 	var warnings prometheusv1.Warnings
@@ -61,6 +64,12 @@ func (pq *promQuery) execute(jobCtxt context.Context) (proto.Message, error) {
 			log.Error().Err(err).Str("query", pq.query).Msg("Encountered error while executing promQL query")
 			return err
 		}
+
+		// sleep once for 1min
+		once.Do(func() {
+			time.Sleep(2 * time.Second)
+		})
+
 		for _, warning := range warnings {
 			log.Warn().Str("query", pq.query).Str("warning", warning).Msg("Encountered warning while executing promQL query")
 		}
