@@ -117,10 +117,9 @@ paths:
         required: true
       - type: string
         x-go-tag-validate: required
-        description: |-
+        description: |+
           Control point to preview.
 
-          @gotags: validate:"required"
         name: control_point
         in: path
         required: true
@@ -134,10 +133,9 @@ paths:
         format: int64
         x-go-tag-default: "10"
         x-go-tag-validate: min=1
-        description: |-
+        description: |+
           Number of samples to collect. Defaults to 10.
 
-          @gotags: validate:"min=1" default:"10"
         name: samples
         in: query
       responses:
@@ -162,10 +160,9 @@ paths:
         required: true
       - type: string
         x-go-tag-validate: required
-        description: |-
+        description: |+
           Control point to preview.
 
-          @gotags: validate:"required"
         name: control_point
         in: path
         required: true
@@ -179,10 +176,9 @@ paths:
         format: int64
         x-go-tag-default: "10"
         x-go-tag-validate: min=1
-        description: |-
+        description: |+
           Number of samples to collect. Defaults to 10.
 
-          @gotags: validate:"min=1" default:"10"
         name: samples
         in: query
       responses:
@@ -374,12 +370,13 @@ definitions:
   EqualsMatchExpression:
     description: Label selector expression of the equal form "label == value".
     type: object
+    required:
+    - label
     properties:
       label:
-        description: |-
+        description: |+
           Name of the label to equal match the value.
 
-          @gotags: validate:"required"
         type: string
         x-go-tag-validate: required
       value:
@@ -424,20 +421,20 @@ definitions:
     description: Label selector requirement which is a selector that contains values,
       a key, and an operator that relates the key and values.
     type: object
+    required:
+    - key
     properties:
       key:
-        description: |-
+        description: |+
           Label key that the selector applies to.
 
-          @gotags: validate:"required"
         type: string
         x-go-tag-validate: required
       operator:
-        description: |-
+        description: |+
           Logical operator which represents a key's relationship to a set of values.
           Valid operators are In, NotIn, Exists and DoesNotExist.
 
-          @gotags: validate:"oneof=In NotIn Exists DoesNotExists"
         type: string
         x-go-tag-validate: oneof=In NotIn Exists DoesNotExists
       values:
@@ -514,6 +511,8 @@ definitions:
       ```
     type: object
     title: Defines a [map<string, string> → bool] expression to be evaluated on labels
+    required:
+    - label_exists
     properties:
       all:
         description: The expression is true when all subexpressions are true.
@@ -525,10 +524,9 @@ definitions:
         description: The expression is true when label value equals given value.
         $ref: '#/definitions/EqualsMatchExpression'
       label_exists:
-        description: |-
+        description: |+
           The expression is true when label with given name exists.
 
-          @gotags: validate:"required"
         type: string
         x-go-tag-validate: required
       label_matches:
@@ -550,20 +548,21 @@ definitions:
   MatchesMatchExpression:
     description: Label selector expression of the matches form "label matches regex".
     type: object
+    required:
+    - label
+    - regex
     properties:
       label:
-        description: |-
+        description: |+
           Name of the label to match the regular expression.
 
-          @gotags: validate:"required"
         type: string
         x-go-tag-validate: required
       regex:
-        description: |-
+        description: |+
           Regular expression that should match the label value.
           It uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
 
-          @gotags: validate:"required"
         type: string
         x-go-tag-validate: required
   Member:

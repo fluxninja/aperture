@@ -175,58 +175,15 @@ def command_with_exit_code(func):
 def _get_params_for_blocks(blocks: List[DocBlock], required: bool) -> List[DocBlockParam]:
     return [param for block in blocks for param in block.parameters.values() if param.required == required]
 
-def _generate_required_configuration(blocks: List[DocBlock]) -> str:
-    """Creates a temporary config objects and renders given policy/dashboard to extract
-       default values from resulting config object."""
-
-    required_params = _get_params_for_blocks(blocks, required=True)
-
-    # Create an object with all required parameters for the given policy/dashboard
-    root = {}
-    def create_nested_object_with_value(param_name):
-        parent = root
-        parts = param_name.split(".")[1:]
-        for idx, part in enumerate(parts):
-            if idx == len(parts) - 1:
-                parent[part] = "__REQUIRED_FIELD__"
-            else:
-                if part not in parent:
-                    parent[part] = {}
-                parent = parent[part]
-
-    for param in required_params:
-        create_nested_object_with_value(param.param_name)
-
-    jsonnet_config = "{"
-    def append_required_params(obj):
-        result = "{"
-        for key, value in obj.items():
-            if isinstance(value, str):
-                result += f"'{key}': '{value}',"
-            else:
-                inner = append_required_params(value)
-                result += f"{key}+: {inner},"
-        result += "}"
-
-        return result
-
-    jsonnet_config = append_required_params(root)
-
-    return jsonnet_config
-
-
 def update_docblock_param_defaults(repository_root: Path, config_path: Path, blocks: List[DocBlock], jsonnet_path: Path = Path(), config_key: str = ""):
     jsonnet_data = f"local config = import '{config_path}';\n"
     if jsonnet_path != Path():
         jsonnet_data += f"local fn = import '{jsonnet_path}';\n"
 
-    required_config = _generate_required_configuration(blocks)
-    jsonnet_data += f"local cfg = {required_config};\n"
-    jsonnet_data += "local c = std.mergePatch(config, cfg);\n"
     if jsonnet_path != Path():
-        jsonnet_data += f"local cfg = c.common + c.{config_key};\n"
+        jsonnet_data += f"local cfg = config.common + config.{config_key};\n"
         jsonnet_data += f"fn(cfg)\n"
-    jsonnet_data += "{_config::: c}\n"
+    jsonnet_data += "{_config::: config}\n"
 
     rendered_config = None
     with tempfile.NamedTemporaryFile(suffix=".libsonnet") as tmp:
@@ -311,7 +268,7 @@ SECTION_TPL = """
     name="{{ param.param_name }}"
     type="{{ param.param_type }}"
     reference="{{ param.spec_link }}"
-    value={% if param.required %}"__REQUIRED_FIELD__"{% else %}"{{ param.default | quoteValue }}"{% endif %}
+    value="{{ param.default | quoteValue }}"
     description='{{ param.description }}' />
 
 {%- endfor %}

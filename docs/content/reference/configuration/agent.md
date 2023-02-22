@@ -873,7 +873,7 @@ EntityConfig describes a single entity.
 <dt>ip_address</dt>
 <dd>
 
-(string, `required,ip`) IP address of the entity.
+(string, **required**, `required,ip`) IP address of the entity.
 
 </dd>
 <dt>name</dt>
@@ -900,7 +900,7 @@ EtcdConfig holds configuration for etcd client.
 <dt>endpoints</dt>
 <dd>
 
-([]string, `gt=0,dive,hostname_port|url|fqdn`) List of Etcd server endpoints
+([]string, **required**, `required,gt=0,dive,hostname_port|url|fqdn`) List of Etcd server endpoints
 
 </dd>
 <dt>lease_ttl</dt>
@@ -1605,7 +1605,7 @@ PrometheusConfig holds configuration for Prometheus Server.
 <dt>address</dt>
 <dd>
 
-(string, `required,hostname_port|url|fqdn`) Address of the prometheus server
+(string, **required**, `required,hostname_port|url|fqdn`) Address of the prometheus server
 
 </dd>
 </dl>
@@ -1747,7 +1747,7 @@ ServiceConfig describes a service and its entities.
 <dt>name</dt>
 <dd>
 
-(string, `required`) Name of the service.
+(string, **required**, `required`) Name of the service.
 
 </dd>
 </dl>

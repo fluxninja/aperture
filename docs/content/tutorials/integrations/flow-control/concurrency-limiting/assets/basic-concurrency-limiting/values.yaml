@@ -15,5 +15,16 @@ policy:
         service: service1-demo-app.demoapp.svc.cluster.local
       flow_matcher:
         control_point: ingress
+    scheduler:
+      # Scheduler parameters.
+      # Type: aperture.spec.v1.SchedulerWorkloadParameters
+      # Required: True
+      default_workload_parameters:
+        priority: 20
+    alerter:
+      # Name for alerter.
+      # Type: string
+      # Required: True
+      alert_name: "Load Shed Event"
     default_config:
       dry_run: false

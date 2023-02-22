@@ -1,4 +1,5 @@
 //go:generate swagger generate spec --scan-models --include="github.com/fluxninja*" --include-tag=common-configuration --include-tag=controller-configuration -o ../../docs/gen/config/controller/config-swagger.yaml
+//go:generate go run ../../docs/tools/swagger/process-go-tags.go ../../docs/gen/config/controller/config-swagger.yaml
 
 // Package main Controller
 //

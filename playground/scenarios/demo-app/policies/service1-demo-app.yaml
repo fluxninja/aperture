@@ -88,6 +88,11 @@ policy:
     # Scheduler parameters.
     # Type: aperture.spec.v1.SchedulerParameters
     scheduler:
+      # Scheduler parameters.
+      # Type: aperture.spec.v1.SchedulerWorkloadParameters
+      # Required: True
+      default_workload_parameters:
+        priority: 20
       workloads:
         - parameters:
             priority: 50
@@ -105,4 +110,8 @@ policy:
     # Whether tokens for workloads are computed dynamically or set statically by the user.
     # Type: aperture.spec.v1.AlerterParameters
     alerter:
+      # Name for alerter.
+      # Type: string
+      # Required: True
+      alert_name: "Load Shed Event"
       alert_channels: ["service1-demo-app"]

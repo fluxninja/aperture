@@ -14,7 +14,7 @@ const configKey = "alerter"
 // +kubebuilder:object:generate=true
 type AlerterConfig struct {
 	// ChannelSize size of the alerts channel in the alerter. Alerts should be
-	// consument from it quickly, so no big sizes are needed.
+	// consumed from it quickly, so no big sizes are needed.
 	ChannelSize int `json:"channel_size" validate:"gt=0" default:"100"`
 }
 
