@@ -2,34 +2,24 @@ package controlpoints
 
 import (
 	"github.com/spf13/cobra"
+
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 )
 
-var (
-	controllerAddr string
-	insecure       bool
-)
+var controller utils.ControllerConn
 
 func init() {
-	ControlPointsCmd.PersistentFlags().StringVar(
-		&controllerAddr,
-		"controller",
-		"aperture-controller.aperture-controller",
-		"Controller's address",
-	)
-	ControlPointsCmd.PersistentFlags().BoolVar(
-		&insecure,
-		"insecure",
-		false,
-		"Don't check TLS certificates when connecting to controller",
-	)
+	controller.InitFlags(ControlPointsCmd.PersistentFlags())
 
 	ControlPointsCmd.AddCommand(ListCmd)
 }
 
-// ControlPointsCmd is the command to observe control points
+// ControlPointsCmd is the command to observe control points.
 var ControlPointsCmd = &cobra.Command{
-	Use:           "experimental-control-points",
-	Short:         "Query control points information",
-	Long:          `Use this command to get information about discovered control points`,
-	SilenceErrors: true,
+	Use:               "experimental-control-points {--kube | --controller ADDRESS}",
+	Short:             "Query control points information",
+	Long:              `Use this command to get information about discovered control points`,
+	SilenceErrors:     true,
+	PersistentPreRunE: controller.PreRunE,
+	PersistentPostRun: controller.PostRun,
 }

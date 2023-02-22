@@ -2,15 +2,12 @@ package controlpoints
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"os"
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slices"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 
 	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
 )
@@ -23,24 +20,10 @@ var ListCmd = &cobra.Command{
 	SilenceErrors: true,
 	Example:       `aperturectl control-points list`,
 	RunE: func(_ *cobra.Command, _ []string) error {
-		var opts []grpc.DialOption
-
-		if insecure {
-			opts = append(opts, grpc.WithTransportCredentials(
-				credentials.NewTLS(&tls.Config{
-					InsecureSkipVerify: true,
-				}),
-			),
-			)
-		}
-
-		conn, err := grpc.Dial(controllerAddr, opts...)
+		client, err := controller.Client()
 		if err != nil {
 			return err
 		}
-		defer conn.Close()
-
-		client := cmdv1.NewControllerClient(conn)
 
 		resp, err := client.ListControlPoints(
 			context.Background(),
@@ -55,8 +38,8 @@ var ListCmd = &cobra.Command{
 		}
 
 		slices.SortFunc(resp.ControlPoints, func(a, b *cmdv1.ServiceControlPoint) bool {
-			if a.ServiceName < b.ServiceName {
-				return true
+			if a.ServiceName != b.ServiceName {
+				return a.ServiceName < b.ServiceName
 			}
 			return a.Name < b.Name
 		})
