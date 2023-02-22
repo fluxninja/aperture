@@ -30,6 +30,7 @@ definitions:
                 $ref: '#/definitions/AIMDConcurrencyControllerIns'
                 description: Input ports for the AIMDConcurrencyController component.
             load_multiplier_linear_increment:
+                default: 0.0025
                 description: |+
                     Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
 
@@ -37,6 +38,7 @@ definitions:
                 type: number
                 x-go-tag-default: "0.0025"
             max_load_multiplier:
+                default: 2
                 description: |+
                     Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
 
@@ -150,12 +152,14 @@ definitions:
                 description: Additional labels to add to alert.
                 type: object
             resolve_timeout:
+                default: 5s
                 description: |+
                     Duration of alert resolver.
 
                 type: string
                 x-go-tag-default: 5s
             severity:
+                default: info
                 description: |+
                     Severity of the alert, one of 'info', 'warn' or 'crit'.
 
@@ -363,6 +367,7 @@ definitions:
                 type: array
                 x-go-tag-validate: dive
             evaluation_interval:
+                default: 0.5s
                 description: |+
                     Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
                     This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
@@ -692,6 +697,7 @@ definitions:
             instantaneous.
         properties:
             false_for:
+                default: 0s
                 description: |+
                     Duration of time to wait before a transition to false state.
                     If the duration is zero, the transition will happen instantaneously.
@@ -711,6 +717,7 @@ definitions:
                 $ref: '#/definitions/DeciderOuts'
                 description: Output ports for the Decider component.
             true_for:
+                default: 0s
                 description: |+
                     Duration of time to wait before a transition to true state.
                     If the duration is zero, the transition will happen instantaneously.
@@ -746,6 +753,7 @@ definitions:
                 $ref: '#/definitions/DifferentiatorOuts'
                 description: Output ports for the Differentiator component.
             window:
+                default: 5s
                 description: |+
                     The window of time over which differentiator operates.
 
@@ -843,6 +851,7 @@ definitions:
         description: Parameters for the EMA component.
         properties:
             correction_factor_on_max_envelope_violation:
+                default: 1
                 description: |+
                     Correction factor to apply on the output value if its in violation of the max envelope.
 
@@ -851,6 +860,7 @@ definitions:
                 x-go-tag-default: "1.0"
                 x-go-tag-validate: gte=0,lte=1.0
             correction_factor_on_min_envelope_violation:
+                default: 1
                 description: |+
                     Correction factor to apply on the output value if its in violation of the min envelope.
 
@@ -865,6 +875,7 @@ definitions:
                 type: string
                 x-go-tag-validate: required
             valid_during_warmup:
+                default: false
                 description: |+
                     Whether the output is valid during the warm up stage.
 
@@ -1172,6 +1183,7 @@ definitions:
             ```
         properties:
             attribute_key:
+                default: workload_duration_ms
                 description: |+
                     Key of the attribute in access log or span from which the metric for this flux meter is read.
 
@@ -1340,6 +1352,7 @@ definitions:
     GradientControllerDynamicConfig:
         properties:
             manual_mode:
+                default: false
                 description: |+
                     Decides whether the controller runs in "manual_mode".
                     In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
@@ -1384,6 +1397,7 @@ definitions:
         description: Gradient Parameters.
         properties:
             max_gradient:
+                default: 1.7976931348623157e+308
                 description: |+
                     Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
 
@@ -1391,6 +1405,7 @@ definitions:
                 type: number
                 x-go-tag-default: "1.79769313486231570814527423731704356798070e+308"
             min_gradient:
+                default: -1.7976931348623157e+308
                 description: |+
                     Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
 
@@ -1466,6 +1481,7 @@ definitions:
             If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
         properties:
             hold_for:
+                default: 5s
                 description: |+
                     Holding the last valid signal value for the hold_for duration.
 
@@ -1678,6 +1694,7 @@ definitions:
             component should apply to.
         properties:
             agent_group:
+                default: default
                 description: |+
                     Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
                     selector applies to.
@@ -2189,6 +2206,7 @@ definitions:
     PodScalerScaleActuatorDynamicConfig:
         properties:
             dry_run:
+                default: false
                 description: |+
                     Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
                     Useful for observing the behavior of Scaler without disrupting any real traffic.
@@ -2289,6 +2307,7 @@ definitions:
     PromQL:
         properties:
             evaluation_interval:
+                default: 10s
                 description: |+
                     Describes the interval between successive evaluations of the Prometheus query.
 
@@ -2321,6 +2340,7 @@ definitions:
         description: Generates 0 and 1 in turns.
         properties:
             false_for:
+                default: 5s
                 description: |+
                     Emitting 0 for the false_for duration.
 
@@ -2329,6 +2349,7 @@ definitions:
             out_ports:
                 $ref: '#/definitions/PulseGeneratorOuts'
             true_for:
+                default: 5s
                 description: |+
                     Emitting 1 for the true_for duration.
 
@@ -2425,6 +2446,7 @@ definitions:
                 type: string
                 x-go-tag-validate: required
             limit_scale_factor:
+                default: 1
                 description: |+
                     Amount by which the _in\_ports.limit_ should be multiplied for this label value.
 
@@ -2451,6 +2473,7 @@ definitions:
                 $ref: '#/definitions/RateLimiterParametersLazySync'
                 title: Configuration of lazy-syncing behaviour of ratelimiter
             limit_reset_interval:
+                default: 60s
                 description: |+
                     Time after which the limit for a given label value will be reset.
 
@@ -2462,11 +2485,13 @@ definitions:
     RateLimiterParametersLazySync:
         properties:
             enabled:
+                default: false
                 description: ""
                 title: Enables lazy sync
                 type: boolean
                 x-go-tag-default: "false"
             num_sync:
+                default: 5
                 description: |+
                     Number of times to lazy sync within the _limit\_reset\_interval_.
 
@@ -2586,6 +2611,7 @@ definitions:
                 $ref: '#/definitions/RuleRego'
                 description: Rego module to extract a value from.
             telemetry:
+                default: true
                 description: |+
                     :::note
 
@@ -2691,6 +2717,7 @@ definitions:
     SchedulerParameters:
         properties:
             auto_tokens:
+                default: true
                 description: |+
                     Automatically estimate the size of a request in each workload, based on
                     historical latency. Each workload's `tokens` will be set to average
@@ -2703,6 +2730,7 @@ definitions:
                 $ref: '#/definitions/SchedulerWorkloadParameters'
                 description: Parameters to be used if none of workloads specified in `workloads` match.
             max_timeout:
+                default: 0.49s
                 description: |+
                     :::caution
 
@@ -2726,6 +2754,7 @@ definitions:
                 type: string
                 x-go-tag-default: 0.49s
             timeout_factor:
+                default: 0.5
                 description: |+
                     If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
                     it will be rejected.
@@ -2799,6 +2828,7 @@ definitions:
                     `fairness_key = "user"`.
                 type: string
             priority:
+                default: 0
                 description: |+
                     $$
                     \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
@@ -2814,6 +2844,7 @@ definitions:
                 x-go-tag-default: "0"
                 x-go-tag-validate: gte=0,lte=255
             tokens:
+                default: "1"
                 description: |+
                     Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
                     This override is applicable only if `auto_tokens` is set to false.
@@ -2850,6 +2881,7 @@ definitions:
             :::
         properties:
             agent_group:
+                default: default
                 description: |+
                     Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
                     selector applies to.

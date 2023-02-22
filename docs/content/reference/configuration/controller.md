@@ -416,13 +416,13 @@ AdaptivePolicy creates a policy that forces GC when the usage surpasses the conf
 <dt>enabled</dt>
 <dd>
 
-(bool, default: `false`) Flag to enable the policy
+(bool) Flag to enable the policy
 
 </dd>
 <dt>factor</dt>
 <dd>
 
-(float64, `gte=0,lte=1`, default: `0.50`) Factor sets user-configured limit of available memory
+(float64, `gte=0,lte=1`, default: `0.5`) Factor sets user-configured limit of available memory
 
 </dd>
 </dl>
@@ -437,7 +437,7 @@ BackoffConfig holds configuration for GRPC Client Backoff.
 <dt>base_delay</dt>
 <dd>
 
-(string, `gte=0`, default: `1s`) Base Delay
+(string, `gte=0`, default: `"1s"`) Base Delay
 
 </dd>
 <dt>jitter</dt>
@@ -449,7 +449,7 @@ BackoffConfig holds configuration for GRPC Client Backoff.
 <dt>max_delay</dt>
 <dd>
 
-(string, `gte=0`, default: `120s`) Max Delay
+(string, `gte=0`, default: `"120s"`) Max Delay
 
 </dd>
 <dt>multiplier</dt>
@@ -470,20 +470,20 @@ BatchAlertsConfig defines configuration for OTEL batch processor.
 <dt>send_batch_max_size</dt>
 <dd>
 
-(uint32, `gte=0`, default: `100`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+(uint32, `gte=0`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
 into smaller units.
 
 </dd>
 <dt>send_batch_size</dt>
 <dd>
 
-(uint32, `gt=0`, default: `100`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+(uint32, `gt=0`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
 
 </dd>
 <dt>timeout</dt>
 <dd>
 
-(string, `gt=0`, default: `1s`) Timeout sets the time after which a batch will be sent regardless of size.
+(string, `gt=0`, default: `"1s"`) Timeout sets the time after which a batch will be sent regardless of size.
 
 </dd>
 </dl>
@@ -585,7 +585,7 @@ EtcdConfig holds configuration for etcd client.
 <dt>lease_ttl</dt>
 <dd>
 
-(string, `gte=1s`, default: `60s`) Lease time-to-live
+(string, `gte=1s`, default: `"60s"`) Lease time-to-live
 
 </dd>
 <dt>password</dt>
@@ -630,7 +630,7 @@ FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
 <dt>heartbeat_interval</dt>
 <dd>
 
-(string, `gte=0s`, default: `5s`) Interval between each heartbeat.
+(string, `gte=0s`, default: `"5s"`) Interval between each heartbeat.
 
 </dd>
 <dt>client</dt>
@@ -651,19 +651,19 @@ GRPCClientConfig holds configuration for GRPC Client.
 <dt>insecure</dt>
 <dd>
 
-(bool, default: `false`) Disable ClientTLS
+(bool) Disable ClientTLS
 
 </dd>
 <dt>min_connection_timeout</dt>
 <dd>
 
-(string, `gte=0`, default: `20s`) Minimum connection timeout
+(string, `gte=0`, default: `"20s"`) Minimum connection timeout
 
 </dd>
 <dt>use_proxy</dt>
 <dd>
 
-(bool, default: `false`) Use HTTP CONNECT Proxy
+(bool) Use HTTP CONNECT Proxy
 
 </dd>
 <dt>backoff</dt>
@@ -690,7 +690,7 @@ GRPCGatewayConfig holds configuration for grpc-http gateway
 <dt>grpc_server_address</dt>
 <dd>
 
-(string, `hostname_port`, default: `0.0.0.0:1`) GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
+(string, `hostname_port`, default: `"0.0.0.0:1"`) GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
 
 </dd>
 </dl>
@@ -705,19 +705,19 @@ GRPCServerConfig holds configuration for GRPC Server.
 <dt>connection_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `120s`) Connection timeout
+(string, `gte=0s`, default: `"120s"`) Connection timeout
 
 </dd>
 <dt>enable_reflection</dt>
 <dd>
 
-(bool, default: `false`) Enable Reflection
+(bool) Enable Reflection
 
 </dd>
 <dt>latency_buckets_ms</dt>
 <dd>
 
-([]float64, `gte=0`, default: `[10.0,25.0,100.0,250.0,1000.0]`) Buckets specification in latency histogram
+([]float64, `gte=0`, default: `[10,25,100,250,1000]`) Buckets specification in latency histogram
 
 </dd>
 </dl>
@@ -732,25 +732,25 @@ HTTPClientConfig holds configuration for HTTP Client.
 <dt>disable_compression</dt>
 <dd>
 
-(bool, default: `false`) Disable Compression
+(bool) Disable Compression
 
 </dd>
 <dt>disable_keep_alives</dt>
 <dd>
 
-(bool, default: `false`) Disable HTTP Keep Alives
+(bool) Disable HTTP Keep Alives
 
 </dd>
 <dt>expect_continue_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `1s`) Expect Continue Timeout. 0 = no timeout.
+(string, `gte=0s`, default: `"1s"`) Expect Continue Timeout. 0 = no timeout.
 
 </dd>
 <dt>idle_connection_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `90s`) Idle Connection Timeout. 0 = no timeout.
+(string, `gte=0s`, default: `"90s"`) Idle Connection Timeout. 0 = no timeout.
 
 </dd>
 <dt>key_log_file</dt>
@@ -762,7 +762,7 @@ HTTPClientConfig holds configuration for HTTP Client.
 <dt>max_conns_per_host</dt>
 <dd>
 
-(int64, `gte=0`, default: `0`) Max Connections Per Host. 0 = no limit.
+(int64, `gte=0`) Max Connections Per Host. 0 = no limit.
 
 </dd>
 <dt>max_idle_connections</dt>
@@ -780,55 +780,55 @@ HTTPClientConfig holds configuration for HTTP Client.
 <dt>max_response_header_bytes</dt>
 <dd>
 
-(int64, `gte=0`, default: `0`) Max Response Header Bytes. 0 = no limit.
+(int64, `gte=0`) Max Response Header Bytes. 0 = no limit.
 
 </dd>
 <dt>network_keep_alive</dt>
 <dd>
 
-(string, `gte=0s`, default: `30s`) Network level keep-alive duration
+(string, `gte=0s`, default: `"30s"`) Network level keep-alive duration
 
 </dd>
 <dt>network_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `30s`) Timeout for making network connection
+(string, `gte=0s`, default: `"30s"`) Timeout for making network connection
 
 </dd>
 <dt>read_buffer_size</dt>
 <dd>
 
-(int64, `gte=0`, default: `0`) Read Buffer Size. 0 = 4KB
+(int64, `gte=0`) Read Buffer Size. 0 = 4KB
 
 </dd>
 <dt>response_header_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `0s`) Response Header Timeout. 0 = no timeout.
+(string, `gte=0s`, default: `"0s"`) Response Header Timeout. 0 = no timeout.
 
 </dd>
 <dt>tls_handshake_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `10s`) TLS Handshake Timeout. 0 = no timeout
+(string, `gte=0s`, default: `"10s"`) TLS Handshake Timeout. 0 = no timeout
 
 </dd>
 <dt>timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `60s`) HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
+(string, `gte=0s`, default: `"60s"`) HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
 
 </dd>
 <dt>use_proxy</dt>
 <dd>
 
-(bool, default: `false`) Use Proxy
+(bool) Use Proxy
 
 </dd>
 <dt>write_buffer_size</dt>
 <dd>
 
-(int64, `gte=0`, default: `0`) Write Buffer Size. 0 = 4KB.
+(int64, `gte=0`) Write Buffer Size. 0 = 4KB.
 
 </dd>
 <dt>proxy_connect_header</dt>
@@ -855,19 +855,19 @@ HTTPServerConfig holds configuration for HTTP Server.
 <dt>disable_http_keep_alives</dt>
 <dd>
 
-(bool, default: `false`) Disable HTTP Keep Alives
+(bool) Disable HTTP Keep Alives
 
 </dd>
 <dt>idle_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `30s`) Idle timeout
+(string, `gte=0s`, default: `"30s"`) Idle timeout
 
 </dd>
 <dt>latency_buckets_ms</dt>
 <dd>
 
-([]float64, `gte=0`, default: `[10.0,25.0,100.0,250.0,1000.0]`) Buckets specification in latency histogram
+([]float64, `gte=0`, default: `[10,25,100,250,1000]`) Buckets specification in latency histogram
 
 </dd>
 <dt>max_header_bytes</dt>
@@ -879,19 +879,19 @@ HTTPServerConfig holds configuration for HTTP Server.
 <dt>read_header_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `10s`) Read header timeout
+(string, `gte=0s`, default: `"10s"`) Read header timeout
 
 </dd>
 <dt>read_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `10s`) Read timeout
+(string, `gte=0s`, default: `"10s"`) Read timeout
 
 </dd>
 <dt>write_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `45s`) Write timeout
+(string, `gte=0s`, default: `"45s"`) Write timeout
 
 </dd>
 </dl>
@@ -915,7 +915,7 @@ HeapConfig holds configuration for heap Watchdog.
 <dt>limit</dt>
 <dd>
 
-(uint64, `gt=0`, default: `268435456`) Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
+(uint64, `gt=0`) Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
 
 </dd>
 <dt>min_gogc</dt>
@@ -948,19 +948,19 @@ JobConfig is config for Job
 <dt>execution_period</dt>
 <dd>
 
-(string, default: `10s`) Time period between job executions. Zero or negative value means that the job will never execute periodically.
+(string, default: `"10s"`) Time period between job executions. Zero or negative value means that the job will never execute periodically.
 
 </dd>
 <dt>execution_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `5s`) Execution timeout
+(string, `gte=0s`, default: `"5s"`) Execution timeout
 
 </dd>
 <dt>initially_healthy</dt>
 <dd>
 
-(bool, default: `false`) Sets whether the job is initially healthy
+(bool) Sets whether the job is initially healthy
 
 </dd>
 </dl>
@@ -975,7 +975,7 @@ JobGroupConfig holds configuration for JobGroup.
 <dt>blocking_execution</dt>
 <dd>
 
-(bool, default: `false`) When true, the scheduler will run jobs synchronously,
+(bool) When true, the scheduler will run jobs synchronously,
 waiting for each execution instance of the job to return
 before starting the next execution. Running with this
 option effectively serializes all job execution.
@@ -984,7 +984,7 @@ option effectively serializes all job execution.
 <dt>worker_limit</dt>
 <dd>
 
-(int64, default: `0`) Limits how many jobs can be running at the same time. This is
+(int64) Limits how many jobs can be running at the same time. This is
 useful when running resource intensive jobs and a precise start time is
 not critical. 0 = no limit. If BlockingExecution is set, then WorkerLimit
 is ignored.
@@ -1002,19 +1002,19 @@ ListenerConfig holds configuration for socket listeners.
 <dt>addr</dt>
 <dd>
 
-(string, `hostname_port`, default: `:8080`) Address to bind to in the form of [host%zone]:port
+(string, `hostname_port`, default: `":8080"`) Address to bind to in the form of [host%zone]:port
 
 </dd>
 <dt>keep_alive</dt>
 <dd>
 
-(string, `gte=0s`, default: `180s`) Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alive is disabled.
+(string, `gte=0s`, default: `"180s"`) Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alive is disabled.
 
 </dd>
 <dt>network</dt>
 <dd>
 
-(string, `oneof=tcp tcp4 tcp6`, default: `tcp`) TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
+(string, `oneof=tcp tcp4 tcp6`, default: `"tcp"`) TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
 
 </dd>
 </dl>
@@ -1029,7 +1029,7 @@ LogConfig holds configuration for a logger and log writers.
 <dt>level</dt>
 <dd>
 
-(string, `oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED`, default: `info`) Log level
+(string, `oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED`, default: `"info"`) Log level
 
 </dd>
 <dt>non_blocking</dt>
@@ -1041,7 +1041,7 @@ LogConfig holds configuration for a logger and log writers.
 <dt>pretty_console</dt>
 <dd>
 
-(bool, default: `false`) Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
+(bool) Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
 
 </dd>
 <dt>writers</dt>
@@ -1062,13 +1062,13 @@ LogWriterConfig holds configuration for a log writer.
 <dt>compress</dt>
 <dd>
 
-(bool, default: `false`) Compress
+(bool) Compress
 
 </dd>
 <dt>file</dt>
 <dd>
 
-(string, default: `stderr`) Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+(string, default: `"stderr"`) Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
 
 </dd>
 <dt>max_age</dt>
@@ -1101,19 +1101,19 @@ MetricsConfig holds configuration for service metrics.
 <dt>enable_go_metrics</dt>
 <dd>
 
-(bool, default: `false`) EnableGoCollector controls whether the go collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewGoCollector>
+(bool) EnableGoCollector controls whether the go collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewGoCollector>
 
 </dd>
 <dt>enable_process_collector</dt>
 <dd>
 
-(bool, default: `false`) EnableProcessCollector controls whether the process collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewProcessCollector>
+(bool) EnableProcessCollector controls whether the process collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewProcessCollector>
 
 </dd>
 <dt>pedantic</dt>
 <dd>
 
-(bool, default: `false`) Pedantic controls whether a pedantic Registerer is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
+(bool) Pedantic controls whether a pedantic Registerer is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
 
 </dd>
 </dl>
@@ -1128,7 +1128,7 @@ PluginsConfig holds configuration for plugins.
 <dt>disable_plugins</dt>
 <dd>
 
-(bool, default: `false`) Disables all plugins
+(bool) Disables all plugins
 
 </dd>
 <dt>disabled_plugins</dt>
@@ -1146,7 +1146,7 @@ PluginsConfig holds configuration for plugins.
 <dt>plugins_path</dt>
 <dd>
 
-(string, default: `default`) Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
+(string, default: `"default"`) Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
 
 </dd>
 </dl>
@@ -1161,25 +1161,25 @@ PortsConfig defines configuration for OTEL debug and extension ports.
 <dt>debug_port</dt>
 <dd>
 
-(uint32, `gte=0`, default: `8888`) Port on which otel collector exposes prometheus metrics on /metrics path.
+(uint32, `gte=0`) Port on which otel collector exposes prometheus metrics on /metrics path.
 
 </dd>
 <dt>health_check_port</dt>
 <dd>
 
-(uint32, `gte=0`, default: `13133`) Port on which health check extension in exposed.
+(uint32, `gte=0`) Port on which health check extension in exposed.
 
 </dd>
 <dt>pprof_port</dt>
 <dd>
 
-(uint32, `gte=0`, default: `1777`) Port on which pprof extension in exposed.
+(uint32, `gte=0`) Port on which pprof extension in exposed.
 
 </dd>
 <dt>zpages_port</dt>
 <dd>
 
-(uint32, `gte=0`, default: `55679`) Port on which zpages extension in exposed.
+(uint32, `gte=0`) Port on which zpages extension in exposed.
 
 </dd>
 </dl>
@@ -1194,13 +1194,13 @@ ProfilersConfig holds configuration for profilers.
 <dt>cpu_profiler</dt>
 <dd>
 
-(bool, default: `false`) Flag to enable cpu profiling on process start and save it to a file. HTTP interface will not work if this is enabled as CPU profile will always be running.
+(bool) Flag to enable cpu profiling on process start and save it to a file. HTTP interface will not work if this is enabled as CPU profile will always be running.
 
 </dd>
 <dt>profiles_path</dt>
 <dd>
 
-(string, default: `default`) Path to save performance profiles. "default" path is `/var/log/aperture/<service>/profiles`.
+(string, default: `"default"`) Path to save performance profiles. "default" path is `/var/log/aperture/<service>/profiles`.
 
 </dd>
 <dt>register_http_routes</dt>
@@ -1277,13 +1277,13 @@ SentryConfig holds configuration for Sentry.
 <dt>disabled</dt>
 <dd>
 
-(bool, default: `false`) Sentry crash report disabled
+(bool) Sentry crash report disabled
 
 </dd>
 <dt>dsn</dt>
 <dd>
 
-(string, default: `https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877`) If DSN is not set, the client is effectively disabled
+(string, default: `"https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877"`) If DSN is not set, the client is effectively disabled
 You can set test project's dsn to send log events.
 oss-aperture project dsn is set as default.
 
@@ -1291,13 +1291,13 @@ oss-aperture project dsn is set as default.
 <dt>environment</dt>
 <dd>
 
-(string, default: `production`) Environment
+(string, default: `"production"`) Environment
 
 </dd>
 <dt>sample_rate</dt>
 <dd>
 
-(float64, default: `1.0`) Sample rate for event submission i.e. 0.0 to 1.0
+(float64, default: `1`) Sample rate for event submission i.e. 0.0 to 1.0
 
 </dd>
 <dt>traces_sample_rate</dt>
@@ -1336,7 +1336,7 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 <dt>enabled</dt>
 <dd>
 
-(bool, default: `false`) Enabled TLS
+(bool) Enabled TLS
 
 </dd>
 <dt>key_file</dt>
@@ -1411,13 +1411,13 @@ WatermarksPolicy creates a Watchdog policy that schedules GC at concrete waterma
 <dt>enabled</dt>
 <dd>
 
-(bool, default: `false`) Flag to enable the policy
+(bool) Flag to enable the policy
 
 </dd>
 <dt>watermarks</dt>
 <dd>
 
-([]float64, `omitempty,dive,gte=0,lte=1`, default: `[0.50,0.75,0.80,0.85,0.90,0.95,0.99]`) Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
+([]float64, `omitempty,dive,gte=0,lte=1`, default: `[0.5,0.75,0.8,0.85,0.9,0.95,0.99]`) Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
 
 </dd>
 </dl>

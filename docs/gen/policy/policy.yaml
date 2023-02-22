@@ -69,6 +69,7 @@ definitions:
 
         type: number
         format: double
+        default: 0.0025
         x-go-tag-default: "0.0025"
         x-order: 6
       max_load_multiplier:
@@ -77,6 +78,7 @@ definitions:
 
         type: number
         format: double
+        default: 2
         x-go-tag-default: "2.0"
         x-order: 7
       out_ports:
@@ -212,6 +214,7 @@ definitions:
           Duration of alert resolver.
 
         type: string
+        default: 5s
         x-go-tag-default: 5s
         x-order: 3
       severity:
@@ -219,6 +222,7 @@ definitions:
           Severity of the alert, one of 'info', 'warn' or 'crit'.
 
         type: string
+        default: info
         x-go-tag-default: info
         x-go-tag-validate: oneof=info warn crit
         x-order: 4
@@ -374,6 +378,7 @@ definitions:
           This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
 
         type: string
+        default: 0.5s
         x-go-tag-default: 0.5s
         x-order: 1
   Classifier:
@@ -663,6 +668,7 @@ definitions:
           If the duration is zero, the transition will happen instantaneously.
 
         type: string
+        default: 0s
         x-go-tag-default: 0s
         x-order: 0
       in_ports:
@@ -686,6 +692,7 @@ definitions:
           If the duration is zero, the transition will happen instantaneously.
 
         type: string
+        default: 0s
         x-go-tag-default: 0s
         x-order: 4
   DeciderIns:
@@ -725,6 +732,7 @@ definitions:
           The window of time over which differentiator operates.
 
         type: string
+        default: 5s
         x-go-tag-default: 5s
         x-order: 2
   DifferentiatorIns:
@@ -838,6 +846,7 @@ definitions:
 
         type: number
         format: double
+        default: 1
         x-go-tag-default: "1.0"
         x-go-tag-validate: gte=0,lte=1.0
         x-order: 0
@@ -847,6 +856,7 @@ definitions:
 
         type: number
         format: double
+        default: 1
         x-go-tag-default: "1.0"
         x-go-tag-validate: gte=1.0
         x-order: 1
@@ -862,6 +872,7 @@ definitions:
           Whether the output is valid during the warm up stage.
 
         type: boolean
+        default: false
         x-go-tag-default: "false"
         x-order: 3
       warmup_window:
@@ -1162,6 +1173,7 @@ definitions:
           :::
 
         type: string
+        default: workload_duration_ms
         x-go-tag-default: workload_duration_ms
         x-order: 0
       exponential_buckets:
@@ -1336,6 +1348,7 @@ definitions:
           In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
 
         type: boolean
+        default: false
         x-go-tag-default: "false"
         x-order: 0
   GradientControllerIns:
@@ -1389,6 +1402,7 @@ definitions:
 
         type: number
         format: double
+        default: 1.7976931348623157e+308
         x-go-tag-default: "1.79769313486231570814527423731704356798070e+308"
         x-order: 0
       min_gradient:
@@ -1397,6 +1411,7 @@ definitions:
 
         type: number
         format: double
+        default: -1.7976931348623157e+308
         x-go-tag-default: "-1.79769313486231570814527423731704356798070e+308"
         x-order: 1
       slope:
@@ -1459,6 +1474,7 @@ definitions:
           Holding the last valid signal value for the hold_for duration.
 
         type: string
+        default: 5s
         x-go-tag-default: 5s
         x-order: 0
       in_ports:
@@ -1677,6 +1693,7 @@ definitions:
           selector applies to.
 
         type: string
+        default: default
         x-go-tag-default: default
         x-order: 0
       api_version:
@@ -2122,6 +2139,7 @@ definitions:
           Useful for observing the behavior of Scaler without disrupting any real traffic.
 
         type: boolean
+        default: false
         x-go-tag-default: "false"
         x-order: 0
   PodScalerScaleActuatorIns:
@@ -2178,6 +2196,7 @@ definitions:
           Describes the interval between successive evaluations of the Prometheus query.
 
         type: string
+        default: 10s
         x-go-tag-default: 10s
         x-order: 0
       out_ports:
@@ -2213,6 +2232,7 @@ definitions:
           Emitting 0 for the false_for duration.
 
         type: string
+        default: 5s
         x-go-tag-default: 5s
         x-order: 0
       out_ports:
@@ -2223,6 +2243,7 @@ definitions:
           Emitting 1 for the true_for duration.
 
         type: string
+        default: 5s
         x-go-tag-default: 5s
         x-order: 2
   PulseGeneratorOuts:
@@ -2333,6 +2354,7 @@ definitions:
 
         type: number
         format: double
+        default: 1
         x-go-tag-default: "1.0"
         x-order: 1
   RateLimiterParameters:
@@ -2361,6 +2383,7 @@ definitions:
           Time after which the limit for a given label value will be reset.
 
         type: string
+        default: 60s
         x-go-tag-default: 60s
         x-order: 2
   RateLimiterParametersLazySync:
@@ -2369,6 +2392,7 @@ definitions:
       enabled:
         type: boolean
         title: Enables lazy sync
+        default: false
         x-go-tag-default: "false"
         x-order: 0
       num_sync:
@@ -2377,6 +2401,7 @@ definitions:
 
         type: integer
         format: int64
+        default: 5
         x-go-tag-default: "5"
         x-go-tag-validate: gt=0
         x-order: 1
@@ -2482,6 +2507,7 @@ definitions:
         title: |-
           Decides if the created flow label should be available as an attribute in OLAP telemetry and
           propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
+        default: true
         x-go-tag-default: "true"
         x-order: 2
   RuleRego:
@@ -2583,6 +2609,7 @@ definitions:
           of this average can change).
 
         type: boolean
+        default: true
         x-go-tag-default: "true"
         x-order: 0
       default_workload_parameters:
@@ -2613,6 +2640,7 @@ definitions:
         type: string
         title: Max Timeout is the value with which the flow timeout calculated by
           `timeout_factor` is capped
+        default: 0.49s
         x-go-tag-default: 0.49s
         x-order: 2
       timeout_factor:
@@ -2625,6 +2653,7 @@ definitions:
         type: number
         format: double
         title: Timeout as a factor of tokens for a flow in a workload
+        default: 0.5
         x-go-tag-default: "0.5"
         x-go-tag-validate: gte=0.0
         x-order: 3
@@ -2707,6 +2736,7 @@ definitions:
           Priority level ranges from 0 to 255.
           Higher numbers means higher priority level.
           Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
+        default: 0
         x-go-tag-default: "0"
         x-go-tag-validate: gte=0,lte=255
         x-order: 1
@@ -2717,6 +2747,7 @@ definitions:
 
         type: string
         format: uint64
+        default: "1"
         x-go-tag-default: "1"
         x-order: 2
   ServiceSelector:
@@ -2746,6 +2777,7 @@ definitions:
           :::
 
         type: string
+        default: default
         x-go-tag-default: default
         x-order: 0
       service:

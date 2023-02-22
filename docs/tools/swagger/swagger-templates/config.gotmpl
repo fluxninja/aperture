@@ -73,20 +73,12 @@
   {{- if .Default -}}
  Default: `{{ json .Default }}`
   {{- end -}}
-  {{- if (index .Extensions "x-go-tag-default") -}}
- `{{ index .Extensions "x-go-tag-default" }}`
-  {{- end -}}
 {{- end -}}
 
 {{/* Like fnDefault, but appropriate to rendering within body of text */ -}}
 {{- define "fnDefaultInline" }}
   {{- with .Default -}}
     , default: `{{ json . }}`
-  {{- end -}}
-  {{- with .Extensions }}
-    {{- with (index . "x-go-tag-default") -}}
-      , default: `{{ . }}`
-    {{- end -}}
   {{- end -}}
 {{- end -}}
 
