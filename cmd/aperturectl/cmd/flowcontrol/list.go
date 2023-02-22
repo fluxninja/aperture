@@ -1,4 +1,4 @@
-package controlpoints
+package flowcontrol
 
 import (
 	"context"
@@ -14,11 +14,10 @@ import (
 
 // ListCmd is the command to list control points.
 var ListCmd = &cobra.Command{
-	Use:           "list",
-	Short:         "List control points",
-	Long:          `List control points`,
+	Use:           "control-points",
+	Short:         "List Flow Control control points",
+	Long:          `List Flow Control control points`,
 	SilenceErrors: true,
-	Example:       `aperturectl control-points list`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		client, err := controller.Client()
 		if err != nil {
