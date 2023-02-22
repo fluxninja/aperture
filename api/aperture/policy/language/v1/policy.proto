@@ -730,7 +730,7 @@ message Scheduler {
       // \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
       // $$
       //
-      uint32 priority = 1; // @gotags: validate:"gte=0,lte=255"
+      uint32 priority = 1; // @gotags: validate:"gte=0,lte=255" default:"0"
 
       // Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
       // This override is applicable only if `auto_tokens` is set to false.
@@ -778,7 +778,7 @@ message Scheduler {
     repeated Workload workloads = 1; // @gotags: validate:"dive"
 
     // Parameters to be used if none of workloads specified in `workloads` match.
-    Workload.Parameters default_workload_parameters = 2; // @gotags: validate:"required"
+    Workload.Parameters default_workload_parameters = 2;
 
     // Automatically estimate the size of a request in each workload, based on
     // historical latency. Each workload's `tokens` will be set to average

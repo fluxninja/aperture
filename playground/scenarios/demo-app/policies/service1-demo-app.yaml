@@ -88,11 +88,6 @@ policy:
     # Scheduler parameters.
     # Type: aperture.spec.v1.SchedulerParameters
     scheduler:
-      # Scheduler parameters.
-      # Type: aperture.spec.v1.SchedulerWorkloadParameters
-      # Required: True
-      default_workload_parameters:
-        priority: 20
       workloads:
         - parameters:
             priority: 50

@@ -55,7 +55,6 @@
     * @param (policy.concurrency_controller.flow_selector.service_selector.service: string required) Service Name.
     * @param (policy.concurrency_controller.flow_selector.flow_matcher.control_point: string required) Control Point Name.
     * @param (policy.concurrency_controller.scheduler: aperture.spec.v1.SchedulerParameters) Scheduler parameters.
-    * @param (policy.concurrency_controller.scheduler.default_workload_parameters: aperture.spec.v1.SchedulerWorkloadParameters required) Scheduler parameters.
     * @param (policy.concurrency_controller.gradient: aperture.spec.v1.GradientControllerParameters) Gradient Controller parameters.
     * @param (policy.concurrency_controller.alerter: aperture.spec.v1.AlerterParameters) Whether tokens for workloads are computed dynamically or set statically by the user.
     * @param (policy.concurrency_controller.alerter.alert_name: string required) Name for alerter.
@@ -74,11 +73,6 @@
         },
       },
       scheduler: {
-        auto_tokens: true,
-        timeout_factor: 0.5,
-        default_workload_parameters: {
-          priority: 20,
-        },
         workloads: [],
       },
       gradient: {

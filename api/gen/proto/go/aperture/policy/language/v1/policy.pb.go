@@ -4606,7 +4606,7 @@ type Scheduler_Parameters struct {
 	// :::
 	Workloads []*Scheduler_Workload `protobuf:"bytes,1,rep,name=workloads,proto3" json:"workloads,omitempty" validate:"dive"` // @gotags: validate:"dive"
 	// Parameters to be used if none of workloads specified in `workloads` match.
-	DefaultWorkloadParameters *Scheduler_Workload_Parameters `protobuf:"bytes,2,opt,name=default_workload_parameters,json=defaultWorkloadParameters,proto3" json:"default_workload_parameters,omitempty" validate:"required"` // @gotags: validate:"required"
+	DefaultWorkloadParameters *Scheduler_Workload_Parameters `protobuf:"bytes,2,opt,name=default_workload_parameters,json=defaultWorkloadParameters,proto3" json:"default_workload_parameters,omitempty"`
 	// Automatically estimate the size of a request in each workload, based on
 	// historical latency. Each workload's `tokens` will be set to average
 	// latency of flows in that workload during last few seconds (exact duration
@@ -4801,7 +4801,7 @@ type Scheduler_Workload_Parameters struct {
 	// \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
 	// $$
 	//
-	Priority uint32 `protobuf:"varint,1,opt,name=priority,proto3" json:"priority,omitempty" validate:"gte=0,lte=255"` // @gotags: validate:"gte=0,lte=255"
+	Priority uint32 `protobuf:"varint,1,opt,name=priority,proto3" json:"priority,omitempty" validate:"gte=0,lte=255" default:"0"` // @gotags: validate:"gte=0,lte=255" default:"0"
 	// Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
 	// This override is applicable only if `auto_tokens` is set to false.
 	Tokens uint64 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" default:"1"` // @gotags: default:"1"

@@ -3295,7 +3295,7 @@ of this average can change).
 <dt>default_workload_parameters</dt>
 <dd>
 
-([SchedulerWorkloadParameters](#scheduler-workload-parameters), **required**, `required`) Parameters to be used if none of workloads specified in `workloads` match.
+([SchedulerWorkloadParameters](#scheduler-workload-parameters)) Parameters to be used if none of workloads specified in `workloads` match.
 
 </dd>
 <dt>max_timeout</dt>
@@ -3405,7 +3405,7 @@ you have a classifier that sets `user` flow label, you might want to set
 <dt>priority</dt>
 <dd>
 
-(int64, `gte=0,lte=255`) Describes priority level of the requests within the workload.
+(int64, `gte=0,lte=255`, default: `0`) Describes priority level of the requests within the workload.
 Priority level ranges from 0 to 255.
 Higher numbers means higher priority level.
 Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:

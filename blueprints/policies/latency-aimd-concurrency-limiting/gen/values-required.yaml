@@ -33,12 +33,6 @@ policy:
         # Type: string
         # Required: True
         control_point: "__REQUIRED_FIELD__"
-    scheduler:
-      # Scheduler parameters.
-      # Type: aperture.spec.v1.SchedulerWorkloadParameters
-      # Required: True
-      default_workload_parameters:
-        priority: 20
     alerter:
       # Name for alerter.
       # Type: string

@@ -53,8 +53,8 @@ definitions:
 
                 x-go-tag-validate: required
         required:
-            - scheduler_parameters
             - flow_selector
+            - scheduler_parameters
         type: object
     AIMDConcurrencyControllerIns:
         description: Inputs for the AIMDConcurrencyController component.
@@ -2623,8 +2623,8 @@ definitions:
                 type: string
                 x-go-tag-validate: required
         required:
-            - source
             - query
+            - source
         title: Raw rego rules are compiled 1:1 to rego queries
         type: object
     Scheduler:
@@ -2696,10 +2696,7 @@ definitions:
                 x-go-tag-default: "true"
             default_workload_parameters:
                 $ref: '#/definitions/SchedulerWorkloadParameters'
-                description: |+
-                    Parameters to be used if none of workloads specified in `workloads` match.
-
-                x-go-tag-validate: required
+                description: Parameters to be used if none of workloads specified in `workloads` match.
             max_timeout:
                 description: |+
                     :::caution
@@ -2764,8 +2761,6 @@ definitions:
                     $ref: '#/definitions/SchedulerWorkload'
                 type: array
                 x-go-tag-validate: dive
-        required:
-            - default_workload_parameters
         title: Scheduler parameters
         type: object
     SchedulerWorkload:
@@ -2811,6 +2806,7 @@ definitions:
                     Higher numbers means higher priority level.
                     Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
                 type: integer
+                x-go-tag-default: "0"
                 x-go-tag-validate: gte=0,lte=255
             tokens:
                 description: |+

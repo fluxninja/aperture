@@ -170,14 +170,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     name="policy.concurrency_controller.scheduler"
     type="aperture.spec.v1.SchedulerParameters"
     reference="../../spec#scheduler-parameters"
-    value="{'auto_tokens': True, 'default_workload_parameters': {'priority': 20}, 'timeout_factor': 0.5, 'workloads': []}"
-    description='Scheduler parameters.' />
-
-<ParameterDescription
-    name="policy.concurrency_controller.scheduler.default_workload_parameters"
-    type="aperture.spec.v1.SchedulerWorkloadParameters"
-    reference="../../spec#scheduler-workload-parameters"
-    value="'None'"
+    value="{'workloads': []}"
     description='Scheduler parameters.' />
 
 <ParameterDescription

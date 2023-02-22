@@ -29,8 +29,8 @@ definitions:
       of signal from the baseline. Internally implemented as a nested circuit.
     type: object
     required:
-    - scheduler_parameters
     - flow_selector
+    - scheduler_parameters
     properties:
       alerter_parameters:
         description: Configuration for embedded alerter.
@@ -2485,8 +2485,8 @@ definitions:
     type: object
     title: Raw rego rules are compiled 1:1 to rego queries
     required:
-    - source
     - query
+    - source
     properties:
       query:
         description: |+
@@ -2569,8 +2569,6 @@ definitions:
   SchedulerParameters:
     type: object
     title: Scheduler parameters
-    required:
-    - default_workload_parameters
     properties:
       auto_tokens:
         description: |+
@@ -2583,10 +2581,8 @@ definitions:
         x-go-tag-default: "true"
         x-order: 0
       default_workload_parameters:
-        description: |+
-          Parameters to be used if none of workloads specified in `workloads` match.
-
-        x-go-tag-validate: required
+        description: Parameters to be used if none of workloads specified in `workloads`
+          match.
         x-order: 1
         $ref: '#/definitions/SchedulerWorkloadParameters'
       max_timeout:
@@ -2706,6 +2702,7 @@ definitions:
           Priority level ranges from 0 to 255.
           Higher numbers means higher priority level.
           Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
+        x-go-tag-default: "0"
         x-go-tag-validate: gte=0,lte=255
         x-order: 1
       tokens:
