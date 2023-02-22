@@ -915,7 +915,7 @@
       "additionalProperties": false
     },
     "FlowMatcher": {
-      "description": ":::info\n\nSee also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).\n\n:::\n\nExample:\n```yaml\ncontrol_point: ingress\nlabel_matcher:\n  match_labels:\n    user_tier: gold\n  match_expressions:\n    - key: query\n      operator: In\n      values:\n        - insert\n        - delete\n    - label: user_agent\n      regex: ^(?!.*Chrome).*Safari\n```",
+      "description": ":::info\n\nSee also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).\n\n:::\nExample:\n```yaml\ncontrol_point: ingress\nlabel_matcher:\n  match_labels:\n    user_tier: gold\n  match_expressions:\n    - key: query\n      operator: In\n      values:\n        - insert\n        - delete\n    - label: user_agent\n      regex: ^(?!.*Chrome).*Safari\n```",
       "type": "object",
       "title": "Describes which flows a [flow control\ncomponent](/concepts/integrations/flow-control/flow-control.md#components) should apply\nto",
       "properties": {
@@ -1544,7 +1544,7 @@
       "additionalProperties": false
     },
     "MatchExpression": {
-      "description": "MatchExpression has multiple variants, exactly one should be set.\n\nExample:\n```yaml\nall:\n  of:\n    - label_exists: foo\n    - label_equals: { label = app, value = frobnicator }\n    - label_matches: { label = version, regex = ^v1.*$ }\n```",
+      "description": "MatchExpression has multiple variants, exactly one should be set.\n\nExample:\n```yaml\nall:\n  of:\n    - label_exists: foo\n    - label_equals: { label = app, value = frobnicator }\n```",
       "type": "object",
       "title": "Defines a [map<string, string> \u2192\u00a0bool] expression to be evaluated on labels",
       "properties": {

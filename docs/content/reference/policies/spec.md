@@ -1366,7 +1366,6 @@ to
 See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 
 :::
-
 Example:
 
 ```yaml
@@ -2318,7 +2317,6 @@ all:
   of:
     - label_exists: foo
     - label_equals: { label = app, value = frobnicator }
-    - label_matches: { label = version, regex = ^v1.*$ }
 ```
 
 #### Properties

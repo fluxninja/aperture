@@ -14,22 +14,24 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 //
 // :::
 //
-// Example of buckets that will be used to create a histogram:
+// Example:
 // ```yaml
-// static_buckets:
-//   buckets: [5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]
-// linear_buckets:
-//   start: 5.0
-//   width: 5.0
-//   count: 10
-// exponential_buckets:
-//   start: 5.0
-//   factor: 2.0
-//   count: 10
-// exponential_buckets_range:
-//   min: 5.0
-//   max: 10000.0
-//   count: 10
+// flow_selector:
+//  static_buckets:
+//    buckets: [5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]
+//  linear_buckets:
+//    start: 5.0
+//    width: 5.0
+//    count: 10
+//  exponential_buckets:
+//    start: 5.0
+//    factor: 2.0
+//    count: 10
+//  exponential_buckets_range:
+//    min: 5.0
+//    max: 10000.0
+//    count: 10
+// attribute_key: "response_duration_ms"
 // ```
 
 message FluxMeter {

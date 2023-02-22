@@ -184,7 +184,6 @@ func (x *ServiceSelector) GetService() string {
 // See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 //
 // :::
-//
 // Example:
 // ```yaml
 // control_point: ingress
