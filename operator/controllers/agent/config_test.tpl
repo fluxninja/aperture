@@ -162,10 +162,6 @@ sentry_plugin:
   sample_rate: 1
   traces_sample_rate: 0.2
 server:
-  listener:
-    addr: :80
-    keep_alive: 180s
-    network: tcp
   grpc:
     connection_timeout: 120s
     enable_reflection: false
@@ -190,6 +186,10 @@ server:
     read_header_timeout: 10s
     read_timeout: 10s
     write_timeout: 45s
+  listener:
+    addr: :80
+    keep_alive: 180s
+    network: tcp
   tls:
     allowed_cn: ""
     cert_file: ""
