@@ -61,7 +61,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/
     name="common.policy_name"
     type="string"
     reference=""
-    value="'None'"
+    value="'__REQUIRED_FIELD__'"
     description='Name of the policy.' />
 
 <h3 class="blueprints-h3">Dashboard</h3>

@@ -171,10 +171,6 @@ def command_with_exit_code(func):
 
     return wrapper
 
-
-def _get_params_for_blocks(blocks: List[DocBlock], required: bool) -> List[DocBlockParam]:
-    return [param for block in blocks for param in block.parameters.values() if param.required == required]
-
 def update_docblock_param_defaults(repository_root: Path, config_path: Path, blocks: List[DocBlock], jsonnet_path: Path = Path(), config_key: str = ""):
     jsonnet_data = f"local config = import '{config_path}';\n"
     if jsonnet_path != Path():
@@ -220,10 +216,12 @@ def update_docblock_param_defaults(repository_root: Path, config_path: Path, blo
                     return None
 
     logger.trace(rendered_config)
-    params_with_defaults = _get_params_for_blocks(blocks, required=False)
-    for param in params_with_defaults:
-        param.default = get_param_default_from_rendered_config(rendered_config["_config"], param.param_name)
-        logger.trace(param)
+    # process defaults
+    for block in blocks:
+        for param in block.parameters.values():
+            param.default = get_param_default_from_rendered_config(rendered_config["_config"], param.param_name)
+            logger.trace(param)
+
     # walk nested_parameters and update defaults
     def update_nested_param_defaults(node, prefix):
         if node.parameter.param_type != "intermediate_node":

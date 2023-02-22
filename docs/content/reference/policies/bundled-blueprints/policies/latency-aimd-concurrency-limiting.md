@@ -80,7 +80,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     name="common.policy_name"
     type="string"
     reference=""
-    value="'None'"
+    value="'__REQUIRED_FIELD__'"
     description='Name of the policy.' />
 
 <h3 class="blueprints-h3">Policy</h3>
@@ -96,14 +96,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     name="policy.flux_meter.flow_selector.service_selector.service"
     type="string"
     reference=""
-    value="'None'"
+    value="'__REQUIRED_FIELD__'"
     description='Service Name.' />
 
 <ParameterDescription
     name="policy.flux_meter.flow_selector.flow_matcher.control_point"
     type="string"
     reference=""
-    value="'None'"
+    value="'__REQUIRED_FIELD__'"
     description='Control Point Name.' />
 
 <ParameterDescription
@@ -156,14 +156,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     name="policy.concurrency_controller.flow_selector.service_selector.service"
     type="string"
     reference=""
-    value="'None'"
+    value="'__REQUIRED_FIELD__'"
     description='Service Name.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.flow_selector.flow_matcher.control_point"
     type="string"
     reference=""
-    value="'None'"
+    value="'__REQUIRED_FIELD__'"
     description='Control Point Name.' />
 
 <ParameterDescription
@@ -191,7 +191,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     name="policy.concurrency_controller.alerter.alert_name"
     type="string"
     reference=""
-    value="'None'"
+    value="'Load Shed Event'"
     description='Name for alerter.' />
 
 <ParameterDescription
@@ -263,5 +263,5 @@ at runtime, without reloading the policy.
     name="concurrency_controller"
     type="aperture.spec.v1.LoadActuatorDynamicConfig"
     reference="../../spec#load-actuator-dynamic-config"
-    value="'None'"
+    value="'__REQUIRED_FIELD__'"
     description='Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.' />
