@@ -62,7 +62,7 @@ func RegisterStreamClient(
 	})
 }
 
-// NewStreamClient creates a new StreamClient
+// NewStreamClient creates a new StreamClient.
 func NewStreamClient(
 	name string,
 	handlers *HandlerRegistry,
@@ -75,14 +75,14 @@ func NewStreamClient(
 	}
 }
 
-// Start starts the StreamClient
+// Start starts the StreamClient.
 func (c *StreamClient) Start() {
 	c.ctx, c.cancel = context.WithCancel(context.Background())
 	c.wg.Add(1)
 	go c.runClient()
 }
 
-// Start stops the StreamClient
+// Stop stops the StreamClient.
 func (c *StreamClient) Stop() {
 	c.cancel()
 	c.wg.Wait()
@@ -179,10 +179,10 @@ func (c *StreamClient) runClientIteration() {
 	}
 }
 
-// StreamClient is a client part of "stream" transport, which uses
+// StreamServer is a server part of "stream" transport, which uses
 // bidirectional grpc stream methods.
 //
-// Implements rpc.v1.Coordinator
+// Implements rpc.v1.Coordinator.
 type StreamServer struct {
 	clients *Clients
 }
@@ -194,6 +194,7 @@ func NewStreamServer(clients *Clients) *StreamServer {
 	}
 }
 
+// Connect implements rpcv1.CoordinatorServer.
 func (s *StreamServer) Connect(conn rpcv1.Coordinator_ConnectServer) error {
 	firstMsg, err := conn.Recv()
 	if err != nil {

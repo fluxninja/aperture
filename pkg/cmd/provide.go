@@ -10,13 +10,13 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-// Module is a module for running cmd.v1.Controller service
+// Module is a module for running cmd.v1.Controller service.
 var Module = fx.Options(
 	fx.Provide(NewHandler),
 	fx.Invoke(RegisterControllerServer),
 )
 
-// RegisterControllerServer registers handler for cmd.v1.Controller service
+// RegisterControllerServer registers handler for cmd.v1.Controller service.
 func RegisterControllerServer(handler *Handler, server *grpc.Server, healthsrv *health.Server) {
 	cmdv1.RegisterControllerServer(server, handler)
 
@@ -25,5 +25,4 @@ func RegisterControllerServer(handler *Handler, server *grpc.Server, healthsrv *
 		grpc_health_v1.HealthCheckResponse_SERVING,
 	)
 	log.Info().Msg("Controller handler registered")
-
 }

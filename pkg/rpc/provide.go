@@ -10,7 +10,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-// ServerModule are components needed for server-side of rpc
+// ServerModule are components needed for server-side of rpc.
 var ServerModule = fx.Options(
 	fx.Provide(NewClients),
 	fx.Provide(NewStreamServer),
@@ -23,7 +23,7 @@ var ServerModule = fx.Options(
 // know what to connect to.
 var ClientModule = fx.Provide(NewHandlerRegistry)
 
-// Register registers the handler on grpc.Server
+// RegisterStreamServer registers the handler on grpc.Server
 //
 // To be used in fx.Invoke.
 func RegisterStreamServer(handler *StreamServer, server *grpc.Server, healthsrv *health.Server) {

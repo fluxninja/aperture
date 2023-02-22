@@ -113,7 +113,7 @@ func (c *ControllerConn) Client() (cmdv1.ControllerClient, error) {
 	} else {
 		port, err := c.startPortForward()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to start port forward: %w", err)
 		}
 
 		// We know we connect to known controller via forwarded port, thus we
@@ -198,9 +198,16 @@ func (c *ControllerConn) startPortForward() (uint16, error) {
 		return 0, err
 	}
 
-	go fw.ForwardPorts()
+	fwErrChan := make(chan error, 1)
+	go func() {
+		fwErrChan <- fw.ForwardPorts()
+	}()
 
-	<-readyChan
+	select {
+	case err = <-fwErrChan:
+		return 0, err
+	case <-readyChan:
+	}
 	ports, err := fw.GetPorts()
 	if err != nil {
 		return 0, err

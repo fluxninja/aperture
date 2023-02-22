@@ -14,9 +14,10 @@ import (
 	"github.com/fluxninja/aperture/pkg/rpc"
 )
 
+// ConfigKey is the key for agentfunctions configuration.
 const ConfigKey = "agent_functions"
 
-// Module provides rpc client for agent functions
+// Module provides rpc client for agent functions.
 var Module = fx.Options(
 	// FIXME(krdln) Do we actually need a separate grpc client for each module?
 	grpcclient.ClientConstructor{
@@ -38,13 +39,13 @@ type Config struct {
 	ClientConfig ClientConfig `json:"client"`
 }
 
-// ClientConfig is configuration for network clients used by agent-functions
+// ClientConfig is configuration for network clients used by agent-functions.
 type ClientConfig struct {
 	// GRPC client settings.
 	GRPCClient grpcclient.GRPCClientConfig `json:"grpc"`
 }
 
-// RegisterClientIn are parameters for InvokeClient function
+// RegisterClientIn are parameters for InvokeClient function.
 type RegisterClientIn struct {
 	fx.In
 	Lc           fx.Lifecycle
@@ -63,6 +64,7 @@ func RegisterClient(in RegisterClientIn) error {
 	in.ConnBuilder = in.ConnBuilder.AddOptions(
 		grpc.WithTransportCredentials(
 			credentials.NewTLS(&tls.Config{
+				// TODO agent manager to inject correct certificate
 				InsecureSkipVerify: true,
 			}),
 		),

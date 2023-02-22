@@ -343,7 +343,8 @@ func Call[
 func CallAll[
 	RespValue any,
 	Resp ExactMessage[RespValue],
-](clients *Clients, req proto.Message) ([]Result[*RespValue], error) {
+](clients *Clients, req proto.Message,
+) ([]Result[*RespValue], error) {
 	anyreq, err := anypb.New(req)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())

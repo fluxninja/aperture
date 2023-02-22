@@ -22,7 +22,7 @@ func NewControlPointID(service string, controlPoint string) ControlPointID {
 	}
 }
 
-// ToProto returns protobuf representation of control point
+// ToProto returns protobuf representation of control point.
 func (cp *ControlPointID) ToProto() *cmdv1.ServiceControlPoint {
 	return &cmdv1.ServiceControlPoint{
 		ServiceName: cp.Service,
@@ -30,7 +30,7 @@ func (cp *ControlPointID) ToProto() *cmdv1.ServiceControlPoint {
 	}
 }
 
-// ControlPointIDFromProto creates ControlPointID from protobuf representation
+// ControlPointIDFromProto creates ControlPointID from protobuf representation.
 func ControlPointIDFromProto(protoCP *cmdv1.ServiceControlPoint) ControlPointID {
 	return ControlPointID{
 		Service:      protoCP.GetServiceName(),

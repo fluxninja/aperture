@@ -17,12 +17,12 @@ type ControlPointsHandler struct {
 	cache *cache.Cache[selectors.ControlPointID]
 }
 
-// NewControlPointsHandler returns a new ControlPointsHandler
+// NewControlPointsHandler returns a new ControlPointsHandler.
 func NewControlPointsHandler(cache *cache.Cache[selectors.ControlPointID]) ControlPointsHandler {
 	return ControlPointsHandler{cache: cache}
 }
 
-// ListControlPoints lists currently discovered control points
+// ListControlPoints lists currently discovered control points.
 func (h *ControlPointsHandler) ListControlPoints(
 	ctx context.Context,
 	_ *cmdv1.ListControlPointsRequest,
@@ -42,6 +42,7 @@ func (h *ControlPointsHandler) ListControlPoints(
 	}, nil
 }
 
-func RegisterControlPointsHandler(handler ControlPointsHandler, registry *rpc.HandlerRegistry) {
-	rpc.RegisterFunction(registry, handler.ListControlPoints)
+// RegisterControlPointsHandler registers ControlPointsHandler in handler registry.
+func RegisterControlPointsHandler(handler ControlPointsHandler, registry *rpc.HandlerRegistry) error {
+	return rpc.RegisterFunction(registry, handler.ListControlPoints)
 }

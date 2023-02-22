@@ -1,24 +1,28 @@
 ---
-sidebar_label: Experimental-Control-Points
+sidebar_label: Agents
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_experimental-control-points
+  - aperturectl_agents
 ---
 
-## aperturectl experimental-control-points
+## aperturectl agents
 
-Query control points information
+List connected agents
 
 ### Synopsis
 
-Use this command to get information about discovered control points
+List connected agents
+
+```
+aperturectl agents {--kube | --controller ADDRESS} [flags]
+```
 
 ### Options
 
 ```
       --controller string    Address of Aperture controller
-  -h, --help                 help for experimental-control-points
+  -h, --help                 help for agents
       --kube                 Find controller in Kubernetes cluster, instead of connecting directly
       --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
 ```
@@ -26,4 +30,3 @@ Use this command to get information about discovered control points
 ### SEE ALSO
 
 - [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture
-- [aperturectl experimental-control-points list](/reference/aperturectl/experimental-control-points/list/list.md) - List control points
