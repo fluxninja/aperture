@@ -10,7 +10,9 @@
   /**
   * @section Policy
   *
-  * @param (policy.flux_meter: aperture.spec.v1.FluxMeter required) Flux Meter.
+  * @param (policy.flux_meter: aperture.spec.v1.FluxMeter) Flux Meter.
+  * @param (policy.flux_meter.flow_selector.service_selector.service: string required) Service Name.
+  * @param (policy.flux_meter.flow_selector.flow_matcher.control_point: string required) Control Point Name.
   * @param (policy.classifiers: []aperture.spec.v1.Classifier) List of classification rules.
   * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
   */
@@ -49,10 +51,14 @@
     * @section Policy
     * @subsection Concurrency Controller
     *
-    * @param (policy.concurrency_controller.flow_selector: aperture.spec.v1.FlowSelector required) Concurrency Limiter flow selector.
-    * @param (policy.concurrency_controller.scheduler: aperture.spec.v1.SchedulerParameters required) Scheduler parameters.
+    * @param (policy.concurrency_controller.flow_selector: aperture.spec.v1.FlowSelector) Concurrency Limiter flow selector.
+    * @param (policy.concurrency_controller.flow_selector.service_selector.service: string required) Service Name.
+    * @param (policy.concurrency_controller.flow_selector.flow_matcher.control_point: string required) Control Point Name.
+    * @param (policy.concurrency_controller.scheduler: aperture.spec.v1.SchedulerParameters) Scheduler parameters.
+    * @param (policy.concurrency_controller.scheduler.default_workload_parameters: aperture.spec.v1.SchedulerWorkloadParameters required) Scheduler parameters.
     * @param (policy.concurrency_controller.gradient: aperture.spec.v1.GradientControllerParameters) Gradient Controller parameters.
-    * @param (policy.concurrency_controller.alerter: aperture.spec.v1.AlerterParameters required) Whether tokens for workloads are computed dynamically or set statically by the user.
+    * @param (policy.concurrency_controller.alerter: aperture.spec.v1.AlerterParameters) Whether tokens for workloads are computed dynamically or set statically by the user.
+    * @param (policy.concurrency_controller.alerter.alert_name: string required) Name for alerter.
     * @param (policy.concurrency_controller.max_load_multiplier: float64) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
     * @param (policy.concurrency_controller.load_multiplier_linear_increment: float64) Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
     * @param (policy.concurrency_controller.default_config: aperture.spec.v1.LoadActuatorDynamicConfig) Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.

@@ -53,8 +53,8 @@ definitions:
 
                 x-go-tag-validate: required
         required:
-            - flow_selector
             - scheduler_parameters
+            - flow_selector
         type: object
     AIMDConcurrencyControllerIns:
         description: Inputs for the AIMDConcurrencyController component.
@@ -2623,8 +2623,8 @@ definitions:
                 type: string
                 x-go-tag-validate: required
         required:
-            - query
             - source
+            - query
         title: Raw rego rules are compiled 1:1 to rego queries
         type: object
     Scheduler:

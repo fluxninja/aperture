@@ -91,15 +91,36 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
     name="policy.rate_limiter.flow_selector"
     type="aperture.spec.v1.FlowSelector"
     reference="../../spec#flow-selector"
-    value="'None'"
+    value="{'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'agent_group': 'default', 'service': '__REQUIRED_FIELD__'}}"
     description='A flow selector to match requests against' />
+
+<ParameterDescription
+    name="policy.rate_limiter.flow_selector.service_selector.service"
+    type="string"
+    reference=""
+    value="'None'"
+    description='Service Name.' />
+
+<ParameterDescription
+    name="policy.rate_limiter.flow_selector.flow_matcher.control_point"
+    type="string"
+    reference=""
+    value="'None'"
+    description='Control Point Name.' />
 
 <ParameterDescription
     name="policy.rate_limiter.parameters"
     type="aperture.spec.v1.RateLimiterParameters"
     reference="../../spec#rate-limiter-parameters"
-    value="'None'"
+    value="{'label_key': '__REQUIRED_FIELD__', 'lazy_sync': {'enabled': True, 'num_sync': 5}, 'limit_reset_interval': '1s'}"
     description='Parameters.' />
+
+<ParameterDescription
+    name="policy.rate_limiter.parameters.label_key"
+    type="string"
+    reference=""
+    value="'None'"
+    description='Flow label to use for rate limiting.' />
 
 <ParameterDescription
     name="policy.rate_limiter.default_config"
