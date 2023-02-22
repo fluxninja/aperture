@@ -40,6 +40,7 @@
           "description": "Linear increment to load multiplier in each execution tick when the system is not in overloaded state.\n\n",
           "type": "number",
           "format": "double",
+          "default": 0.0025,
           "x-go-tag-default": "0.0025",
           "x-order": 6
         },
@@ -47,6 +48,7 @@
           "description": "Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.\n\n",
           "type": "number",
           "format": "double",
+          "default": 2,
           "x-go-tag-default": "2.0",
           "x-order": 7
         },
@@ -189,12 +191,14 @@
         "resolve_timeout": {
           "description": "Duration of alert resolver.\n\n",
           "type": "string",
+          "default": "5s",
           "x-go-tag-default": "5s",
           "x-order": 3
         },
         "severity": {
           "description": "Severity of the alert, one of 'info', 'warn' or 'crit'.\n\n",
           "type": "string",
+          "default": "info",
           "x-go-tag-default": "info",
           "x-go-tag-validate": "oneof=info warn crit",
           "x-order": 4
@@ -328,6 +332,7 @@
         "evaluation_interval": {
           "description": "Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.\nThis interval is typically aligned with how often the corrective action (actuation) needs to be taken.\n\n",
           "type": "string",
+          "default": "0.5s",
           "x-go-tag-default": "0.5s",
           "x-order": 1
         }
@@ -542,6 +547,7 @@
         "false_for": {
           "description": "Duration of time to wait before a transition to false state.\nIf the duration is zero, the transition will happen instantaneously.\n\n",
           "type": "string",
+          "default": "0s",
           "x-go-tag-default": "0s",
           "x-order": 0
         },
@@ -564,6 +570,7 @@
         "true_for": {
           "description": "Duration of time to wait before a transition to true state.\nIf the duration is zero, the transition will happen instantaneously.\n\n",
           "type": "string",
+          "default": "0s",
           "x-go-tag-default": "0s",
           "x-order": 4
         }
@@ -616,6 +623,7 @@
         "window": {
           "description": "The window of time over which differentiator operates.\n\n",
           "type": "string",
+          "default": "5s",
           "x-go-tag-default": "5s",
           "x-order": 2
         }
@@ -712,6 +720,7 @@
           "description": "Correction factor to apply on the output value if its in violation of the max envelope.\n\n",
           "type": "number",
           "format": "double",
+          "default": 1,
           "x-go-tag-default": "1.0",
           "x-go-tag-validate": "gte=0,lte=1.0",
           "x-order": 0
@@ -720,6 +729,7 @@
           "description": "Correction factor to apply on the output value if its in violation of the min envelope.\n\n",
           "type": "number",
           "format": "double",
+          "default": 1,
           "x-go-tag-default": "1.0",
           "x-go-tag-validate": "gte=1.0",
           "x-order": 1
@@ -733,6 +743,7 @@
         "valid_during_warmup": {
           "description": "Whether the output is valid during the warm up stage.\n\n",
           "type": "boolean",
+          "default": false,
           "x-go-tag-default": "false",
           "x-order": 3
         },
@@ -974,6 +985,7 @@
         "attribute_key": {
           "description": "Key of the attribute in access log or span from which the metric for this flux meter is read.\n\n:::info\n\nFor list of available attributes in Envoy access logs, refer\n[Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)\n\n:::\n\n",
           "type": "string",
+          "default": "workload_duration_ms",
           "x-go-tag-default": "workload_duration_ms",
           "x-order": 0
         },
@@ -1140,6 +1152,7 @@
         "manual_mode": {
           "description": "Decides whether the controller runs in \"manual_mode\".\nIn manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.\n\n",
           "type": "boolean",
+          "default": false,
           "x-go-tag-default": "false",
           "x-order": 0
         }
@@ -1204,6 +1217,7 @@
           "description": "Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].\n\n",
           "type": "number",
           "format": "double",
+          "default": 1.7976931348623157e308,
           "x-go-tag-default": "1.79769313486231570814527423731704356798070e+308",
           "x-order": 0
         },
@@ -1211,6 +1225,7 @@
           "description": "Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].\n\n",
           "type": "number",
           "format": "double",
+          "default": -1.7976931348623157e308,
           "x-go-tag-default": "-1.79769313486231570814527423731704356798070e+308",
           "x-order": 1
         },
@@ -1231,6 +1246,7 @@
         "hold_for": {
           "description": "Holding the last valid signal value for the hold_for duration.\n\n",
           "type": "string",
+          "default": "5s",
           "x-go-tag-default": "5s",
           "x-order": 0
         },
@@ -1457,6 +1473,7 @@
         "agent_group": {
           "description": "Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this\nselector applies to.\n\n",
           "type": "string",
+          "default": "default",
           "x-go-tag-default": "default",
           "x-order": 0
         },
@@ -1946,6 +1963,7 @@
         "dry_run": {
           "description": "Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.\nUseful for observing the behavior of Scaler without disrupting any real traffic.\n\n",
           "type": "boolean",
+          "default": false,
           "x-go-tag-default": "false",
           "x-order": 0
         }
@@ -2013,6 +2031,7 @@
         "evaluation_interval": {
           "description": "Describes the interval between successive evaluations of the Prometheus query.\n\n",
           "type": "string",
+          "default": "10s",
           "x-go-tag-default": "10s",
           "x-order": 0
         },
@@ -2048,6 +2067,7 @@
         "false_for": {
           "description": "Emitting 0 for the false_for duration.\n\n",
           "type": "string",
+          "default": "5s",
           "x-go-tag-default": "5s",
           "x-order": 0
         },
@@ -2058,6 +2078,7 @@
         "true_for": {
           "description": "Emitting 1 for the true_for duration.\n\n",
           "type": "string",
+          "default": "5s",
           "x-go-tag-default": "5s",
           "x-order": 2
         }
@@ -2167,6 +2188,7 @@
           "description": "Amount by which the _in\\_ports.limit_ should be multiplied for this label value.\n\n",
           "type": "number",
           "format": "double",
+          "default": 1,
           "x-go-tag-default": "1.0",
           "x-order": 1
         }
@@ -2191,6 +2213,7 @@
         "limit_reset_interval": {
           "description": "Time after which the limit for a given label value will be reset.\n\n",
           "type": "string",
+          "default": "60s",
           "x-go-tag-default": "60s",
           "x-order": 2
         }
@@ -2203,6 +2226,7 @@
         "enabled": {
           "type": "boolean",
           "title": "Enables lazy sync",
+          "default": false,
           "x-go-tag-default": "false",
           "x-order": 0
         },
@@ -2210,6 +2234,7 @@
           "description": "Number of times to lazy sync within the _limit\\_reset\\_interval_.\n\n",
           "type": "integer",
           "format": "int64",
+          "default": 5,
           "x-go-tag-default": "5",
           "x-go-tag-validate": "gt=0",
           "x-order": 1
@@ -2262,6 +2287,7 @@
           "description": ":::note\n\nThe flow label is always accessible in Aperture Policies regardless of this setting.\n\n:::\n\n:::caution\n\nWhen using [FluxNinja ARC plugin](arc/plugin.md), telemetry enabled\nlabels are sent to FluxNinja ARC for observability. Telemetry should be disabled for\nsensitive labels.\n\n:::\n\n",
           "type": "boolean",
           "title": "Decides if the created flow label should be available as an attribute in OLAP telemetry and\npropagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)",
+          "default": true,
           "x-go-tag-default": "true",
           "x-order": 2
         }
@@ -2333,6 +2359,7 @@
         "auto_tokens": {
           "description": "Automatically estimate the size of a request in each workload, based on\nhistorical latency. Each workload's `tokens` will be set to average\nlatency of flows in that workload during last few seconds (exact duration\nof this average can change).\n\n",
           "type": "boolean",
+          "default": true,
           "x-go-tag-default": "true",
           "x-order": 0
         },
@@ -2345,6 +2372,7 @@
           "description": ":::caution\n\nThis timeout needs to be strictly less than the timeout set on the\nclient for the whole GRPC call:\n* in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,\n* in case of libraries, timeout configured... TODO.\n\nWe're using fail-open logic in integrations, so if the GRPC timeout\nfires first, the flow will end up being unconditionally allowed while\nit're still waiting on the scheduler.\n\nTo avoid such cases, the end-to-end GRPC timeout should also contain\nsome headroom for constant overhead like serialization, etc. Default\nvalue for GRPC timeouts is 500ms, giving 50ms of headeroom, so when\ntweaking this timeout, make sure to adjust the GRPC timeout accordingly.\n\n:::\n\n",
           "type": "string",
           "title": "Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped",
+          "default": "0.49s",
           "x-go-tag-default": "0.49s",
           "x-order": 2
         },
@@ -2353,6 +2381,7 @@
           "type": "number",
           "format": "double",
           "title": "Timeout as a factor of tokens for a flow in a workload",
+          "default": 0.5,
           "x-go-tag-default": "0.5",
           "x-go-tag-validate": "gte=0.0",
           "x-order": 3
@@ -2403,6 +2432,7 @@
           "type": "integer",
           "format": "int64",
           "title": "Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level.\nPriority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:",
+          "default": 0,
           "x-go-tag-default": "0",
           "x-go-tag-validate": "gte=0,lte=255",
           "x-order": 1
@@ -2411,6 +2441,7 @@
           "description": "Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.\nThis override is applicable only if `auto_tokens` is set to false.\n\n",
           "type": "string",
           "format": "uint64",
+          "default": "1",
           "x-go-tag-default": "1",
           "x-order": 2
         }
@@ -2426,6 +2457,7 @@
         "agent_group": {
           "description": "Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this\nselector applies to.\n\n:::info\n\nAgent Groups are used to scope policies to a subset of agents connected to the same controller. This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode. The agents within an agent group form a peer to peer cluster and constantly share state.\n\n:::\n\n",
           "type": "string",
+          "default": "default",
           "x-go-tag-default": "default",
           "x-order": 0
         },

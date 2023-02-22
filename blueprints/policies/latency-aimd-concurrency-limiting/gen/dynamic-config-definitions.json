@@ -7,6 +7,7 @@
   "properties": {
     "concurrency_controller": {
       "description": "Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.",
+      "default": "__REQUIRED_FIELD__",
       "type": "object",
       "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/LoadActuatorDynamicConfig"
     }

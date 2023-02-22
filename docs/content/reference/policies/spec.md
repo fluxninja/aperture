@@ -95,7 +95,7 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dt>max_load_multiplier</dt>
 <dd>
 
-(float64, default: `2.0`) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+(float64, default: `2`) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
 
 </dd>
 <dt>out_ports</dt>
@@ -264,13 +264,13 @@ Alerter Parameters is a common config for separate alerter components and alerte
 <dt>resolve_timeout</dt>
 <dd>
 
-(string, default: `5s`) Duration of alert resolver.
+(string, default: `"5s"`) Duration of alert resolver.
 
 </dd>
 <dt>severity</dt>
 <dd>
 
-(string, `oneof=info warn crit`, default: `info`) Severity of the alert, one of 'info', 'warn' or 'crit'.
+(string, `oneof=info warn crit`, default: `"info"`) Severity of the alert, one of 'info', 'warn' or 'crit'.
 
 </dd>
 </dl>
@@ -470,7 +470,7 @@ docs on how exactly it handles invalid inputs.
 <dt>evaluation_interval</dt>
 <dd>
 
-(string, default: `0.5s`) Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
+(string, default: `"0.5s"`) Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
 This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
 
 </dd>
@@ -813,7 +813,7 @@ instantaneous.
 <dt>false_for</dt>
 <dd>
 
-(string, default: `0s`) Duration of time to wait before a transition to false state.
+(string, default: `"0s"`) Duration of time to wait before a transition to false state.
 If the duration is zero, the transition will happen instantaneously.
 
 </dd>
@@ -838,7 +838,7 @@ If the duration is zero, the transition will happen instantaneously.
 <dt>true_for</dt>
 <dd>
 
-(string, default: `0s`) Duration of time to wait before a transition to true state.
+(string, default: `"0s"`) Duration of time to wait before a transition to true state.
 If the duration is zero, the transition will happen instantaneously.
 
 </dd>
@@ -902,7 +902,7 @@ Differentiator calculates rate of change per tick.
 <dt>window</dt>
 <dd>
 
-(string, default: `5s`) The window of time over which differentiator operates.
+(string, default: `"5s"`) The window of time over which differentiator operates.
 
 </dd>
 </dl>
@@ -1052,13 +1052,13 @@ Parameters for the EMA component.
 <dt>correction_factor_on_max_envelope_violation</dt>
 <dd>
 
-(float64, `gte=0,lte=1.0`, default: `1.0`) Correction factor to apply on the output value if its in violation of the max envelope.
+(float64, `gte=0,lte=1.0`, default: `1`) Correction factor to apply on the output value if its in violation of the max envelope.
 
 </dd>
 <dt>correction_factor_on_min_envelope_violation</dt>
 <dd>
 
-(float64, `gte=1.0`, default: `1.0`) Correction factor to apply on the output value if its in violation of the min envelope.
+(float64, `gte=1.0`, default: `1`) Correction factor to apply on the output value if its in violation of the min envelope.
 
 </dd>
 <dt>ema_window</dt>
@@ -1070,7 +1070,7 @@ Parameters for the EMA component.
 <dt>valid_during_warmup</dt>
 <dd>
 
-(bool, default: `false`) Whether the output is valid during the warm up stage.
+(bool) Whether the output is valid during the warm up stage.
 
 </dd>
 <dt>warmup_window</dt>
@@ -1443,7 +1443,7 @@ selector:
 <dt>attribute_key</dt>
 <dd>
 
-(string, default: `workload_duration_ms`) Key of the attribute in access log or span from which the metric for this flux meter is read.
+(string, default: `"workload_duration_ms"`) Key of the attribute in access log or span from which the metric for this flux meter is read.
 
 :::info
 
@@ -1657,7 +1657,7 @@ Dynamic Configuration for a Controller
 <dt>manual_mode</dt>
 <dd>
 
-(bool, default: `false`) Decides whether the controller runs in "manual_mode".
+(bool) Decides whether the controller runs in "manual_mode".
 In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
 
 </dd>
@@ -1735,13 +1735,13 @@ Gradient Parameters.
 <dt>max_gradient</dt>
 <dd>
 
-(float64, default: `1.79769313486231570814527423731704356798070e+308`) Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
+(float64, default: `1.7976931348623157e+308`) Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
 
 </dd>
 <dt>min_gradient</dt>
 <dd>
 
-(float64, default: `-1.79769313486231570814527423731704356798070e+308`) Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
+(float64, default: `-1.7976931348623157e+308`) Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
 
 </dd>
 <dt>slope</dt>
@@ -1806,7 +1806,7 @@ If it's holding a value that means it ignores both valid and invalid new signals
 <dt>hold_for</dt>
 <dd>
 
-(string, default: `5s`) Holding the last valid signal value for the hold_for duration.
+(string, default: `"5s"`) Holding the last valid signal value for the hold_for duration.
 
 </dd>
 <dt>in_ports</dt>
@@ -2106,7 +2106,7 @@ component should apply to.
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
+(string, default: `"default"`) Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
 selector applies to.
 
 </dd>
@@ -2719,7 +2719,7 @@ Dynamic Configuration for ScaleActuator
 <dt>dry_run</dt>
 <dd>
 
-(bool, default: `false`) Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+(bool) Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
 Useful for observing the behavior of Scaler without disrupting any real traffic.
 
 </dd>
@@ -2813,7 +2813,7 @@ Component that runs a Prometheus query periodically and returns the result as an
 <dt>evaluation_interval</dt>
 <dd>
 
-(string, default: `10s`) Describes the interval between successive evaluations of the Prometheus query.
+(string, default: `"10s"`) Describes the interval between successive evaluations of the Prometheus query.
 
 </dd>
 <dt>out_ports</dt>
@@ -2862,7 +2862,7 @@ Generates 0 and 1 in turns.
 <dt>false_for</dt>
 <dd>
 
-(string, default: `5s`) Emitting 0 for the false_for duration.
+(string, default: `"5s"`) Emitting 0 for the false_for duration.
 
 </dd>
 <dt>out_ports</dt>
@@ -2874,7 +2874,7 @@ Generates 0 and 1 in turns.
 <dt>true_for</dt>
 <dd>
 
-(string, default: `5s`) Emitting 1 for the true_for duration.
+(string, default: `"5s"`) Emitting 1 for the true_for duration.
 
 </dd>
 </dl>
@@ -3009,7 +3009,7 @@ under certain circumstances. [Decider](#decider) might be helpful.
 <dt>limit_scale_factor</dt>
 <dd>
 
-(float64, default: `1.0`) Amount by which the _in_ports.limit_ should be multiplied for this label value.
+(float64, default: `1`) Amount by which the _in_ports.limit_ should be multiplied for this label value.
 
 </dd>
 </dl>
@@ -3039,7 +3039,7 @@ label set up, set `label_key: "user"`.
 <dt>limit_reset_interval</dt>
 <dd>
 
-(string, default: `60s`) Time after which the limit for a given label value will be reset.
+(string, default: `"60s"`) Time after which the limit for a given label value will be reset.
 
 </dd>
 </dl>
@@ -3052,7 +3052,7 @@ label set up, set `label_key: "user"`.
 <dt>enabled</dt>
 <dd>
 
-(bool, default: `false`) Enables lazy sync
+(bool) Enables lazy sync
 
 </dd>
 <dt>num_sync</dt>
@@ -3301,7 +3301,7 @@ of this average can change).
 <dt>max_timeout</dt>
 <dd>
 
-(string, default: `0.49s`) Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
+(string, default: `"0.49s"`) Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
 
 :::caution
 
@@ -3405,7 +3405,7 @@ you have a classifier that sets `user` flow label, you might want to set
 <dt>priority</dt>
 <dd>
 
-(int64, `gte=0,lte=255`, default: `0`) Describes priority level of the requests within the workload.
+(int64, `gte=0,lte=255`) Describes priority level of the requests within the workload.
 Priority level ranges from 0 to 255.
 Higher numbers means higher priority level.
 Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
@@ -3418,7 +3418,7 @@ $$
 <dt>tokens</dt>
 <dd>
 
-(string, default: `1`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
+(string, default: `"1"`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
 This override is applicable only if `auto_tokens` is set to false.
 
 </dd>
@@ -3442,7 +3442,7 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
+(string, default: `"default"`) Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
 selector applies to.
 
 :::info

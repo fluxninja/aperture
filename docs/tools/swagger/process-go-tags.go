@@ -3,12 +3,13 @@ package main
 import (
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 
 	"gopkg.in/yaml.v3"
 )
 
-// process swaagger extensions such as x-go-tag-default and x-go-tag-validate
+// process swagger extensions such as x-go-tag-default and x-go-tag-validate
 // and translate them to swagger's defaults and validations.
 func main() {
 	swaggerFile := os.Args[1]
@@ -86,12 +87,94 @@ func processProperties(properties map[string]interface{}) []string {
 				if req {
 					required = append(required, p)
 				}
+			} else if k == "x-go-tag-default" {
+				// extract default value
+				defaultValue, ok := v.(string)
+				if !ok {
+					continue
+				}
+				// add default value to swagger
+				processDefault(pmap, defaultValue)
 			}
 		}
 	}
 	// sort required
 	sort.Strings(required)
 	return required
+}
+
+func processDefault(m map[string]interface{}, d string) {
+	dv := processValue(m, d)
+	if dv != nil {
+		m["default"] = dv
+	}
+}
+
+func processValue(m map[string]interface{}, d string) interface{} {
+	vtype, ok := m["type"].(string)
+	if !ok {
+		return nil
+	}
+	switch vtype {
+	case "array":
+		if strings.HasPrefix(d, "[") && strings.HasSuffix(d, "]") {
+			// extract items
+			items, ok := m["items"].(map[string]interface{})
+			if !ok {
+				panic("no items")
+			}
+			d = d[1 : len(d)-1]
+			elements := strings.Split(d, ",")
+			var values []interface{}
+			for _, e := range elements {
+				values = append(values, processValue(items, e))
+			}
+			return values
+		}
+	case "string":
+		return d
+	case "boolean":
+		return d == "true"
+	case "integer":
+		format, ok := m["format"].(string)
+		if !ok {
+			return nil
+		}
+		switch format {
+		case "int64":
+			f, err := strconv.ParseInt(d, 10, 64)
+			if err != nil {
+				panic(err)
+			}
+			return f
+		case "int32":
+			f, err := strconv.ParseInt(d, 10, 32)
+			if err != nil {
+				panic(err)
+			}
+			return f
+		}
+	case "number":
+		format, ok := m["format"].(string)
+		if !ok {
+			return nil
+		}
+		switch format {
+		case "float":
+			f, err := strconv.ParseFloat(d, 32)
+			if err != nil {
+				panic(err)
+			}
+			return f
+		case "double":
+			f, err := strconv.ParseFloat(d, 64)
+			if err != nil {
+				panic(err)
+			}
+			return f
+		}
+	}
+	return nil
 }
 
 func processValidateRules(_ map[string]interface{}, rules string) (required bool) {

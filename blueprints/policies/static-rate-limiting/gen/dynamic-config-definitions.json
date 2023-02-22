@@ -7,6 +7,7 @@
   "properties": {
     "rate_limiter": {
       "description": "Rate limiter dynamic configuration that is updated at runtime.",
+      "default": "__REQUIRED_FIELD__",
       "type": "object",
       "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterDynamicConfig"
     }
