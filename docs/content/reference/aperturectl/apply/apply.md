@@ -18,7 +18,7 @@ Use this command to apply the Aperture Policies.
 
 ```
   -h, --help                 help for apply
-      --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
+      --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
 ```
 
 ### SEE ALSO

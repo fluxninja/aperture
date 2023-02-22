@@ -13,7 +13,7 @@ var (
 )
 
 func init() {
-	ApplyCmd.Flags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
+	ApplyCmd.Flags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG")
 
 	ApplyCmd.AddCommand(ApplyPolicyCmd)
 	ApplyCmd.AddCommand(ApplyDynamicConfigCmd)
