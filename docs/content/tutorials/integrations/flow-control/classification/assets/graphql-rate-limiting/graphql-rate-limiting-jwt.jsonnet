@@ -13,7 +13,6 @@ local svcSelector =
   flowSelector.new()
   + flowSelector.withServiceSelector(
     serviceSelector.new()
-    + serviceSelector.withAgentGroup('default')
     + serviceSelector.withService('service-graphql-demo-app.demoapp.svc.cluster.local')
   )
   + flowSelector.withFlowMatcher(
@@ -23,7 +22,6 @@ local svcSelector =
 
 local policyResource = StaticRateLimiting({
   policy_name: 'graphql-static-rate-limiting',
-  evaluation_interval: '0.5s',
   rate_limiter+: {
     flow_selector: svcSelector,
     rate_limit: 10.0,

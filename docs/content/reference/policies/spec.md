@@ -264,7 +264,7 @@ Alerter Parameters is a common config for separate alerter components and alerte
 <dt>resolve_timeout</dt>
 <dd>
 
-(string, default: `10s`) Duration of alert resolver.
+(string, default: `5s`) Duration of alert resolver.
 
 </dd>
 <dt>severity</dt>
@@ -1064,7 +1064,7 @@ Parameters for the EMA component.
 <dt>ema_window</dt>
 <dd>
 
-(string, default: `5s`) Duration of EMA sampling window.
+(string, **required**, `required`) Duration of EMA sampling window.
 
 </dd>
 <dt>valid_during_warmup</dt>
@@ -1076,7 +1076,7 @@ Parameters for the EMA component.
 <dt>warmup_window</dt>
 <dd>
 
-(string, default: `0s`) Duration of EMA warming up window.
+(string, **required**, `required`) Duration of EMA warming up window.
 
 The initial value of the EMA is the average of signal readings received during the warm up window.
 
@@ -1233,7 +1233,7 @@ Parameters for the Extrapolator component.
 <dt>max_extrapolation_interval</dt>
 <dd>
 
-(string, default: `10s`) Maximum time interval to repeat the last valid value of input signal.
+(string, **required**, `required`) Maximum time interval to repeat the last valid value of input signal.
 
 </dd>
 </dl>

@@ -28,7 +28,7 @@ spec:
               enabled: true
               num_sync: 5
             limit_reset_interval: 1s
-    evaluation_interval: 0.5s
+    evaluation_interval: 1s
   resources:
     classifiers:
     - flow_selector:

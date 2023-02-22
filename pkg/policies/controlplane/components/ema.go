@@ -62,6 +62,7 @@ func NewEMAAndOptions(emaProto *policylangv1.EMA,
 	// period of tick
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()
 	params := emaProto.GetParameters()
+
 	// number of ticks in emaWindow
 	emaWindow := math.Ceil(float64(params.EmaWindow.AsDuration()) / float64(evaluationPeriod))
 

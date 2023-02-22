@@ -20,7 +20,6 @@
     flux_meter: {
       flow_selector: {
         service_selector: {
-          agent_group: 'default',
           service: '__REQUIRED_FIELD__',
         },
         flow_matcher: {
@@ -65,7 +64,6 @@
     concurrency_controller: {
       flow_selector: {
         service_selector: {
-          agent_group: 'default',
           service: '__REQUIRED_FIELD__',
         },
         flow_matcher: {
@@ -73,7 +71,6 @@
         },
       },
       scheduler: {
-        workloads: [],
       },
       gradient: {
         slope: -1,
@@ -82,8 +79,6 @@
       },
       alerter: {
         alert_name: 'Load Shed Event',
-        alert_channels: [],
-        resolve_timeout: '5s',
       },
       max_load_multiplier: 2.0,
       load_multiplier_linear_increment: 0.0025,

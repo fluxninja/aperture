@@ -55,9 +55,7 @@ spec:
       - flow_control:
           aimd_concurrency_controller:
             alerter_parameters:
-              alert_channels: []
               alert_name: Load Shed Event
-              resolve_timeout: 5s
             default_config:
               dry_run: false
             dynamic_config_key: concurrency_controller

@@ -59,7 +59,6 @@ policy:
     # Scheduler parameters.
     # Type: aperture.spec.v1.SchedulerParameters
     scheduler:
-      workloads: []
     # Gradient Controller parameters.
     # Type: aperture.spec.v1.GradientControllerParameters
     gradient:

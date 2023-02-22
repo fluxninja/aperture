@@ -212,7 +212,7 @@ definitions:
           Duration of alert resolver.
 
         type: string
-        x-go-tag-default: 10s
+        x-go-tag-default: 5s
         x-order: 3
       severity:
         description: |+
@@ -828,6 +828,9 @@ definitions:
   EMAParameters:
     description: Parameters for the EMA component.
     type: object
+    required:
+    - ema_window
+    - warmup_window
     properties:
       correction_factor_on_max_envelope_violation:
         description: |+
@@ -852,7 +855,7 @@ definitions:
           Duration of EMA sampling window.
 
         type: string
-        x-go-tag-default: 5s
+        x-go-tag-validate: required
         x-order: 2
       valid_during_warmup:
         description: |+
@@ -868,7 +871,7 @@ definitions:
           The initial value of the EMA is the average of signal readings received during the warm up window.
 
         type: string
-        x-go-tag-default: 0s
+        x-go-tag-validate: required
         x-order: 4
   EqualsMatchExpression:
     description: Label selector expression of the equal form "label == value".
@@ -972,13 +975,15 @@ definitions:
   ExtrapolatorParameters:
     description: Parameters for the Extrapolator component.
     type: object
+    required:
+    - max_extrapolation_interval
     properties:
       max_extrapolation_interval:
         description: |+
           Maximum time interval to repeat the last valid value of input signal.
 
         type: string
-        x-go-tag-default: 10s
+        x-go-tag-validate: required
         x-order: 0
   FirstValid:
     type: object

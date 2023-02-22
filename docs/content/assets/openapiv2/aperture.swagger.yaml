@@ -154,7 +154,7 @@ definitions:
                     Duration of alert resolver.
 
                 type: string
-                x-go-tag-default: 10s
+                x-go-tag-default: 5s
             severity:
                 description: |+
                     Severity of the alert, one of 'info', 'warn' or 'crit'.
@@ -863,7 +863,7 @@ definitions:
                     Duration of EMA sampling window.
 
                 type: string
-                x-go-tag-default: 5s
+                x-go-tag-validate: required
             valid_during_warmup:
                 description: |+
                     Whether the output is valid during the warm up stage.
@@ -877,7 +877,10 @@ definitions:
                     The initial value of the EMA is the average of signal readings received during the warm up window.
 
                 type: string
-                x-go-tag-default: 0s
+                x-go-tag-validate: required
+        required:
+            - ema_window
+            - warmup_window
         type: object
     Entity:
         description: Entity represents a pod, vm, etc.
@@ -1003,7 +1006,9 @@ definitions:
                     Maximum time interval to repeat the last valid value of input signal.
 
                 type: string
-                x-go-tag-default: 10s
+                x-go-tag-validate: required
+        required:
+            - max_extrapolation_interval
         type: object
     FirstValid:
         properties:

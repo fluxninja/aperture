@@ -189,7 +189,7 @@
         "resolve_timeout": {
           "description": "Duration of alert resolver.\n\n",
           "type": "string",
-          "x-go-tag-default": "10s",
+          "x-go-tag-default": "5s",
           "x-order": 3
         },
         "severity": {
@@ -706,6 +706,7 @@
     "EMAParameters": {
       "description": "Parameters for the EMA component.",
       "type": "object",
+      "required": ["ema_window", "warmup_window"],
       "properties": {
         "correction_factor_on_max_envelope_violation": {
           "description": "Correction factor to apply on the output value if its in violation of the max envelope.\n\n",
@@ -726,7 +727,7 @@
         "ema_window": {
           "description": "Duration of EMA sampling window.\n\n",
           "type": "string",
-          "x-go-tag-default": "5s",
+          "x-go-tag-validate": "required",
           "x-order": 2
         },
         "valid_during_warmup": {
@@ -738,7 +739,7 @@
         "warmup_window": {
           "description": "Duration of EMA warming up window.\n\nThe initial value of the EMA is the average of signal readings received during the warm up window.\n\n",
           "type": "string",
-          "x-go-tag-default": "0s",
+          "x-go-tag-validate": "required",
           "x-order": 4
         }
       },
@@ -849,11 +850,12 @@
     "ExtrapolatorParameters": {
       "description": "Parameters for the Extrapolator component.",
       "type": "object",
+      "required": ["max_extrapolation_interval"],
       "properties": {
         "max_extrapolation_interval": {
           "description": "Maximum time interval to repeat the last valid value of input signal.\n\n",
           "type": "string",
-          "x-go-tag-default": "10s",
+          "x-go-tag-validate": "required",
           "x-order": 0
         }
       },

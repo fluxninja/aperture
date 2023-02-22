@@ -65,13 +65,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
 <h3 class="blueprints-h3">Policy</h3>
 
 <ParameterDescription
-    name="policy.evaluation_interval"
-    type="string"
-    reference=""
-    value="'300s'"
-    description='How often should the policy be re-evaluated' />
-
-<ParameterDescription
     name="policy.classifiers"
     type="[]aperture.spec.v1.Classifier"
     reference="../../spec#classifier"
@@ -91,7 +84,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
     name="policy.rate_limiter.flow_selector"
     type="aperture.spec.v1.FlowSelector"
     reference="../../spec#flow-selector"
-    value="{'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'agent_group': 'default', 'service': '__REQUIRED_FIELD__'}}"
+    value="{'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}"
     description='A flow selector to match requests against' />
 
 <ParameterDescription
@@ -112,7 +105,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
     name="policy.rate_limiter.parameters"
     type="aperture.spec.v1.RateLimiterParameters"
     reference="../../spec#rate-limiter-parameters"
-    value="{'label_key': '__REQUIRED_FIELD__', 'lazy_sync': {'enabled': True, 'num_sync': 5}, 'limit_reset_interval': '1s'}"
+    value="{'label_key': '__REQUIRED_FIELD__', 'limit_reset_interval': '1s'}"
     description='Parameters.' />
 
 <ParameterDescription
