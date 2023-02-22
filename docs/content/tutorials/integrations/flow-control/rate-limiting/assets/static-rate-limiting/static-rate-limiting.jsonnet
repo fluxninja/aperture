@@ -10,7 +10,6 @@ local svcSelector =
   flowSelector.new()
   + flowSelector.withServiceSelector(
     serviceSelector.new()
-    + serviceSelector.withAgentGroup('default')
     + serviceSelector.withService('service1-demo-app.demoapp.svc.cluster.local')
   )
   + flowSelector.withFlowMatcher(
@@ -20,7 +19,6 @@ local svcSelector =
 
 local policyResource = StaticRateLimiting({
   policy_name: 'static-rate-limiting',
-  evaluation_interval: '300s',
   rate_limiter+: {
     flow_selector: svcSelector,
     rate_limit: 120.0,

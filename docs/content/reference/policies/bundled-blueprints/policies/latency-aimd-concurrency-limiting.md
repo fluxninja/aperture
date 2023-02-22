@@ -89,7 +89,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     name="policy.flux_meter"
     type="aperture.spec.v1.FluxMeter"
     reference="../../spec#flux-meter"
-    value="{'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'agent_group': 'default', 'service': '__REQUIRED_FIELD__'}}}"
+    value="{'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}}"
     description='Flux Meter.' />
 
 <ParameterDescription
@@ -149,7 +149,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     name="policy.concurrency_controller.flow_selector"
     type="aperture.spec.v1.FlowSelector"
     reference="../../spec#flow-selector"
-    value="{'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'agent_group': 'default', 'service': '__REQUIRED_FIELD__'}}"
+    value="{'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}"
     description='Concurrency Limiter flow selector.' />
 
 <ParameterDescription
@@ -170,7 +170,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     name="policy.concurrency_controller.scheduler"
     type="aperture.spec.v1.SchedulerParameters"
     reference="../../spec#scheduler-parameters"
-    value="{'auto_tokens': True, 'default_workload_parameters': {'priority': 20}, 'timeout_factor': 0.5, 'workloads': []}"
+    value="{}"
     description='Scheduler parameters.' />
 
 <ParameterDescription
@@ -184,8 +184,15 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     name="policy.concurrency_controller.alerter"
     type="aperture.spec.v1.AlerterParameters"
     reference="../../spec#alerter-parameters"
-    value="{'alert_channels': [], 'alert_name': 'Load Shed Event', 'resolve_timeout': '5s'}"
+    value="{'alert_name': 'Load Shed Event'}"
     description='Whether tokens for workloads are computed dynamically or set statically by the user.' />
+
+<ParameterDescription
+    name="policy.concurrency_controller.alerter.alert_name"
+    type="string"
+    reference=""
+    value="'Load Shed Event'"
+    description='Name for alerter.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.max_load_multiplier"

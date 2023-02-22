@@ -57,7 +57,6 @@ spec:
             alert_channels:
             - service1-demo-app
             alert_name: Load Shed Event
-            resolve_timeout: 5s
           default_config:
             dry_run: false
           dynamic_config_key: concurrency_controller
@@ -65,7 +64,6 @@ spec:
             flow_matcher:
               control_point: ingress
             service_selector:
-              agent_group: default
               service: service1-demo-app.demoapp.svc.cluster.local
           gradient_parameters:
             max_gradient: 1
@@ -90,10 +88,6 @@ spec:
             observed_load_multiplier:
               signal_name: OBSERVED_LOAD_MULTIPLIER
           scheduler_parameters:
-            auto_tokens: true
-            default_workload_parameters:
-              priority: 20
-            timeout_factor: 0.5
             workloads:
             - label_matcher:
                 match_labels:
@@ -165,5 +159,4 @@ spec:
           flow_matcher:
             control_point: ingress
           service_selector:
-            agent_group: default
             service: service3-demo-app.demoapp.svc.cluster.local

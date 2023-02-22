@@ -315,8 +315,13 @@ func (conLimiterFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions
 		registry:                     reg,
 		concurrencyLimiterFactory:    conLimiterFactory,
 		workloadMultiMatcher:         mm,
-		defaultWorkloadParametersMsg: schedulerParams.DefaultWorkloadParameters,
+		defaultWorkloadParametersMsg: schedulerParams.GetDefaultWorkloadParameters(),
 		schedulerParameters:          schedulerParams,
+	}
+	// default workload params is not a required param so it can be nil
+	if conLimiter.defaultWorkloadParametersMsg == nil {
+		conLimiter.defaultWorkloadParametersMsg = &policylangv1.Scheduler_Workload_Parameters{}
+		config.SetDefaults(conLimiter.defaultWorkloadParametersMsg)
 	}
 
 	return fx.Options(

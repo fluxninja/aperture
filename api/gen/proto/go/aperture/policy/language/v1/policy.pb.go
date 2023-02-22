@@ -3816,11 +3816,11 @@ type EMA_Parameters struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Duration of EMA sampling window.
-	EmaWindow *durationpb.Duration `protobuf:"bytes,1,opt,name=ema_window,json=emaWindow,proto3" json:"ema_window,omitempty" default:"5s"` // @gotags: default:"5s"
+	EmaWindow *durationpb.Duration `protobuf:"bytes,1,opt,name=ema_window,json=emaWindow,proto3" json:"ema_window,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Duration of EMA warming up window.
 	//
 	// The initial value of the EMA is the average of signal readings received during the warm up window.
-	WarmupWindow *durationpb.Duration `protobuf:"bytes,2,opt,name=warmup_window,json=warmupWindow,proto3" json:"warmup_window,omitempty" default:"0s"` // @gotags: default:"0s"
+	WarmupWindow *durationpb.Duration `protobuf:"bytes,2,opt,name=warmup_window,json=warmupWindow,proto3" json:"warmup_window,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Correction factor to apply on the output value if its in violation of the min envelope.
 	CorrectionFactorOnMinEnvelopeViolation float64 `protobuf:"fixed64,3,opt,name=correction_factor_on_min_envelope_violation,json=correctionFactorOnMinEnvelopeViolation,proto3" json:"correction_factor_on_min_envelope_violation,omitempty" validate:"gte=1.0" default:"1.0"` // @gotags: validate:"gte=1.0" default:"1.0"
 	// Correction factor to apply on the output value if its in violation of the max envelope.
@@ -4606,7 +4606,7 @@ type Scheduler_Parameters struct {
 	// :::
 	Workloads []*Scheduler_Workload `protobuf:"bytes,1,rep,name=workloads,proto3" json:"workloads,omitempty" validate:"dive"` // @gotags: validate:"dive"
 	// Parameters to be used if none of workloads specified in `workloads` match.
-	DefaultWorkloadParameters *Scheduler_Workload_Parameters `protobuf:"bytes,2,opt,name=default_workload_parameters,json=defaultWorkloadParameters,proto3" json:"default_workload_parameters,omitempty" validate:"required"` // @gotags: validate:"required"
+	DefaultWorkloadParameters *Scheduler_Workload_Parameters `protobuf:"bytes,2,opt,name=default_workload_parameters,json=defaultWorkloadParameters,proto3" json:"default_workload_parameters,omitempty"`
 	// Automatically estimate the size of a request in each workload, based on
 	// historical latency. Each workload's `tokens` will be set to average
 	// latency of flows in that workload during last few seconds (exact duration
@@ -4801,7 +4801,7 @@ type Scheduler_Workload_Parameters struct {
 	// \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
 	// $$
 	//
-	Priority uint32 `protobuf:"varint,1,opt,name=priority,proto3" json:"priority,omitempty" validate:"gte=0,lte=255"` // @gotags: validate:"gte=0,lte=255"
+	Priority uint32 `protobuf:"varint,1,opt,name=priority,proto3" json:"priority,omitempty" validate:"gte=0,lte=255" default:"0"` // @gotags: validate:"gte=0,lte=255" default:"0"
 	// Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
 	// This override is applicable only if `auto_tokens` is set to false.
 	Tokens uint64 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" default:"1"` // @gotags: default:"1"
@@ -5215,7 +5215,7 @@ type Extrapolator_Parameters struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Maximum time interval to repeat the last valid value of input signal.
-	MaxExtrapolationInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=max_extrapolation_interval,json=maxExtrapolationInterval,proto3" json:"max_extrapolation_interval,omitempty" default:"10s"` // @gotags: default:"10s"
+	MaxExtrapolationInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=max_extrapolation_interval,json=maxExtrapolationInterval,proto3" json:"max_extrapolation_interval,omitempty" validate:"required"` // @gotags: validate:"required"
 }
 
 func (x *Extrapolator_Parameters) Reset() {
@@ -5960,7 +5960,7 @@ type Alerter_Parameters struct {
 	// Severity of the alert, one of 'info', 'warn' or 'crit'.
 	Severity string `protobuf:"bytes,2,opt,name=severity,proto3" json:"severity,omitempty" default:"info" validate:"oneof=info warn crit"` // @gotags: default:"info" validate:"oneof=info warn crit"
 	// Duration of alert resolver.
-	ResolveTimeout *durationpb.Duration `protobuf:"bytes,3,opt,name=resolve_timeout,json=resolveTimeout,proto3" json:"resolve_timeout,omitempty" default:"10s"` // @gotags: default:"10s"
+	ResolveTimeout *durationpb.Duration `protobuf:"bytes,3,opt,name=resolve_timeout,json=resolveTimeout,proto3" json:"resolve_timeout,omitempty" default:"5s"` // @gotags: default:"5s"
 	// A list of alert channel strings.
 	AlertChannels []string `protobuf:"bytes,4,rep,name=alert_channels,json=alertChannels,proto3" json:"alert_channels,omitempty"`
 	// Additional labels to add to alert.

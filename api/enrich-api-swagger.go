@@ -119,6 +119,11 @@ func processGoTags(content map[string]interface{}) {
 				if !strings.HasPrefix(line, prefix) {
 					continue
 				}
+
+				// remove line from description
+				desc = strings.ReplaceAll(desc, line, "")
+				content["description"] = desc
+
 				// remove "@gotags: " prefix
 				tags := line[len(prefix):]
 				tagMap := parseStructTag(tags)

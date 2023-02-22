@@ -6,7 +6,7 @@ common:
   # Name of the policy.
   # Type: string
   # Required: True
-  policy_name: "__REQUIRED_FIELD__"
+  policy_name: __REQUIRED_FIELD__
 
 dashboard:
   # Refresh interval for dashboard panels.

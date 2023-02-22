@@ -105,4 +105,8 @@ policy:
     # Whether tokens for workloads are computed dynamically or set statically by the user.
     # Type: aperture.spec.v1.AlerterParameters
     alerter:
+      # Name for alerter.
+      # Type: string
+      # Required: True
+      alert_name: "Load Shed Event"
       alert_channels: ["service1-demo-app"]

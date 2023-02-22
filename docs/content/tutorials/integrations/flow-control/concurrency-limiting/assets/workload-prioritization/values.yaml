@@ -27,9 +27,6 @@ policy:
       flow_matcher:
         control_point: ingress
     scheduler:
-      timeout_factor: 0.5
-      default_workload_parameters:
-        priority: 20
       workloads:
         - label_matcher:
             match_labels:
@@ -41,5 +38,10 @@ policy:
               http.request.header.user_type: subscriber
           parameters:
             priority: 200
+    alerter:
+      # Name for alerter.
+      # Type: string
+      # Required: True
+      alert_name: "Load Shed Event"
     default_config:
       dry_run: false

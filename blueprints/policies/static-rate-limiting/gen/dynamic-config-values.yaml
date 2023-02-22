@@ -5,4 +5,4 @@
 # Rate limiter dynamic configuration that is updated at runtime.
 # Type: aperture.spec.v1.RateLimiterDynamicConfig
 # Required: True
-rate_limiter: "__REQUIRED_FIELD__"
+rate_limiter: __REQUIRED_FIELD__

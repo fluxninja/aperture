@@ -1,304 +1,300 @@
 definitions:
-  BackoffConfig:
-    properties:
-      base_delay:
-        description: Base Delay
-        format: string
-        type: string
-        x-go-name: BaseDelay
-        x-go-tag-default: 1s
-        x-go-tag-json: base_delay
-        x-go-tag-validate: gte=0
-      jitter:
-        description: Jitter
-        format: double
-        type: number
-        x-go-name: Jitter
-        x-go-tag-default: "0.2"
-        x-go-tag-json: jitter
-        x-go-tag-validate: gte=0
-      max_delay:
-        description: Max Delay
-        format: string
-        type: string
-        x-go-name: MaxDelay
-        x-go-tag-default: 120s
-        x-go-tag-json: max_delay
-        x-go-tag-validate: gte=0
-      multiplier:
-        description: Backoff multiplier
-        format: double
-        type: number
-        x-go-name: Multiplier
-        x-go-tag-default: "1.6"
-        x-go-tag-json: multiplier
-        x-go-tag-validate: gte=0
-    title: BackoffConfig holds configuration for GRPC Client Backoff.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
-  ClientConfig:
-    properties:
-      grpc:
-        $ref: '#/definitions/GRPCClientConfig'
-        x-go-tag-json: grpc
-      http:
-        $ref: '#/definitions/HTTPClientConfig'
-        x-go-tag-json: http
-    title: ClientConfig is the client configuration.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig
-  ClientTLSConfig:
-    properties:
-      ca_file:
-        type: string
-        x-go-name: CAFile
-        x-go-tag-json: ca_file
-      cert_file:
-        type: string
-        x-go-name: CertFile
-        x-go-tag-json: cert_file
-      insecure_skip_verify:
-        type: boolean
-        x-go-name: InsecureSkipVerify
-        x-go-tag-json: insecure_skip_verify
-      key_file:
-        type: string
-        x-go-name: KeyFile
-        x-go-tag-json: key_file
-      key_log_file:
-        type: string
-        x-go-name: KeyLogWriter
-        x-go-tag-json: key_log_file
-    title: ClientTLSConfig is the config for client TLS.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
-  Duration:
-    description: It holds *durationpb.Duration which is generated type for google/protobuf/duration.proto.
-    title: Duration is encoded as a string message which represents a signed span
-      of time.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/config
-  FluxNinjaPluginConfig:
-    properties:
-      api_key:
-        description: API Key for this agent.
-        type: string
-        x-go-name: APIKey
-        x-go-tag-json: api_key
-      client:
-        $ref: '#/definitions/ClientConfig'
-        x-go-tag-json: client
-      fluxninja_endpoint:
-        description: Address to grpc or http(s) server listening in agent service.
-          To use http protocol, the address must start with http(s)://.
-        type: string
-        x-go-name: FluxNinjaEndpoint
-        x-go-tag-json: fluxninja_endpoint
-        x-go-tag-validate: omitempty,hostname_port|url|fqdn
-      heartbeat_interval:
-        description: Interval between each heartbeat.
-        format: string
-        type: string
-        x-go-name: HeartbeatInterval
-        x-go-tag-default: 5s
-        x-go-tag-json: heartbeat_interval
-        x-go-tag-validate: gte=0s
-    title: FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration
-      plugin.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig
-  GRPCClientConfig:
-    properties:
-      backoff:
-        $ref: '#/definitions/BackoffConfig'
-        x-go-tag-json: backoff
-      insecure:
-        description: Disable ClientTLS
-        type: boolean
-        x-go-name: Insecure
-        x-go-tag-default: "false"
-        x-go-tag-json: insecure
-      min_connection_timeout:
-        description: Minimum connection timeout
-        format: string
-        type: string
-        x-go-name: MinConnectionTimeout
-        x-go-tag-default: 20s
-        x-go-tag-json: min_connection_timeout
-        x-go-tag-validate: gte=0
-      tls:
-        $ref: '#/definitions/ClientTLSConfig'
-        x-go-tag-json: tls
-      use_proxy:
-        description: Use HTTP CONNECT Proxy
-        type: boolean
-        x-go-name: UseProxy
-        x-go-tag-default: "false"
-        x-go-tag-json: use_proxy
-    title: GRPCClientConfig holds configuration for GRPC Client.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
-  HTTPClientConfig:
-    properties:
-      disable_compression:
-        description: Disable Compression
-        type: boolean
-        x-go-name: DisableCompression
-        x-go-tag-default: "false"
-        x-go-tag-json: disable_compression
-      disable_keep_alives:
-        description: Disable HTTP Keep Alives
-        type: boolean
-        x-go-name: DisableKeepAlives
-        x-go-tag-default: "false"
-        x-go-tag-json: disable_keep_alives
-      expect_continue_timeout:
-        description: Expect Continue Timeout. 0 = no timeout.
-        format: string
-        type: string
-        x-go-name: ExpectContinueTimeout
-        x-go-tag-default: 1s
-        x-go-tag-json: expect_continue_timeout
-        x-go-tag-validate: gte=0s
-      idle_connection_timeout:
-        description: Idle Connection Timeout. 0 = no timeout.
-        format: string
-        type: string
-        x-go-name: IdleConnTimeout
-        x-go-tag-default: 90s
-        x-go-tag-json: idle_connection_timeout
-        x-go-tag-validate: gte=0s
-      key_log_file:
-        description: SSL key log file (useful for debugging with wireshark)
-        type: string
-        x-go-name: KeyLogWriter
-        x-go-tag-json: key_log_file
-      max_conns_per_host:
-        description: Max Connections Per Host. 0 = no limit.
-        format: int64
-        type: integer
-        x-go-name: MaxConnsPerHost
-        x-go-tag-default: "0"
-        x-go-tag-json: max_conns_per_host
-        x-go-tag-validate: gte=0
-      max_idle_connections:
-        description: Max Idle Connections. 0 = no limit.
-        format: int64
-        type: integer
-        x-go-name: MaxIdleConns
-        x-go-tag-default: "100"
-        x-go-tag-json: max_idle_connections
-        x-go-tag-validate: gte=0
-      max_idle_connections_per_host:
-        description: Max Idle Connections per host. 0 = no limit.
-        format: int64
-        type: integer
-        x-go-name: MaxIdleConnsPerHost
-        x-go-tag-default: "5"
-        x-go-tag-json: max_idle_connections_per_host
-        x-go-tag-validate: gte=0
-      max_response_header_bytes:
-        description: Max Response Header Bytes. 0 = no limit.
-        format: int64
-        type: integer
-        x-go-name: MaxResponseHeaderBytes
-        x-go-tag-default: "0"
-        x-go-tag-json: max_response_header_bytes
-        x-go-tag-validate: gte=0
-      network_keep_alive:
-        description: Network level keep-alive duration
-        format: string
-        type: string
-        x-go-name: NetworkKeepAlive
-        x-go-tag-default: 30s
-        x-go-tag-json: network_keep_alive
-        x-go-tag-validate: gte=0s
-      network_timeout:
-        description: Timeout for making network connection
-        format: string
-        type: string
-        x-go-name: NetworkTimeout
-        x-go-tag-default: 30s
-        x-go-tag-json: network_timeout
-        x-go-tag-validate: gte=0s
-      proxy_connect_header:
-        $ref: '#/definitions/Header'
-        x-go-tag-json: proxy_connect_header,omitempty
-        x-go-tag-validate: omitempty
-      read_buffer_size:
-        description: Read Buffer Size. 0 = 4KB
-        format: int64
-        type: integer
-        x-go-name: ReadBufferSize
-        x-go-tag-default: "0"
-        x-go-tag-json: read_buffer_size
-        x-go-tag-validate: gte=0
-      response_header_timeout:
-        description: Response Header Timeout. 0 = no timeout.
-        format: string
-        type: string
-        x-go-name: ResponseHeaderTimeout
-        x-go-tag-default: 0s
-        x-go-tag-json: response_header_timeout
-        x-go-tag-validate: gte=0s
-      timeout:
-        description: HTTP client timeout - Timeouts includes connection time, redirects,
-          reading the response etc. 0 = no timeout.
-        format: string
-        type: string
-        x-go-name: Timeout
-        x-go-tag-default: 60s
-        x-go-tag-json: timeout
-        x-go-tag-validate: gte=0s
-      tls:
-        $ref: '#/definitions/ClientTLSConfig'
-        x-go-tag-json: tls
-      tls_handshake_timeout:
-        description: TLS Handshake Timeout. 0 = no timeout
-        format: string
-        type: string
-        x-go-name: TLSHandshakeTimeout
-        x-go-tag-default: 10s
-        x-go-tag-json: tls_handshake_timeout
-        x-go-tag-validate: gte=0s
-      use_proxy:
-        description: Use Proxy
-        type: boolean
-        x-go-name: UseProxy
-        x-go-tag-default: "false"
-        x-go-tag-json: use_proxy
-      write_buffer_size:
-        description: Write Buffer Size. 0 = 4KB.
-        format: int64
-        type: integer
-        x-go-name: WriteBufferSize
-        x-go-tag-default: "0"
-        x-go-tag-json: write_buffer_size
-        x-go-tag-validate: gte=0
-    title: HTTPClientConfig holds configuration for HTTP Client.
-    type: object
-    x-go-package: github.com/fluxninja/aperture/pkg/net/http
-  Header:
-    additionalProperties:
-      items:
-        type: string
-      type: array
-    description: |-
-      The keys should be in canonical form, as returned by
-      CanonicalHeaderKey.
-    title: A Header represents the key-value pairs in an HTTP header.
-    type: object
-    x-go-package: net/http
+    BackoffConfig:
+        properties:
+            base_delay:
+                description: Base Delay
+                format: string
+                type: string
+                x-go-name: BaseDelay
+                x-go-tag-default: 1s
+                x-go-tag-json: base_delay
+                x-go-tag-validate: gte=0
+            jitter:
+                description: Jitter
+                format: double
+                type: number
+                x-go-name: Jitter
+                x-go-tag-default: "0.2"
+                x-go-tag-json: jitter
+                x-go-tag-validate: gte=0
+            max_delay:
+                description: Max Delay
+                format: string
+                type: string
+                x-go-name: MaxDelay
+                x-go-tag-default: 120s
+                x-go-tag-json: max_delay
+                x-go-tag-validate: gte=0
+            multiplier:
+                description: Backoff multiplier
+                format: double
+                type: number
+                x-go-name: Multiplier
+                x-go-tag-default: "1.6"
+                x-go-tag-json: multiplier
+                x-go-tag-validate: gte=0
+        title: BackoffConfig holds configuration for GRPC Client Backoff.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
+    ClientConfig:
+        properties:
+            grpc:
+                $ref: '#/definitions/GRPCClientConfig'
+                x-go-tag-json: grpc
+            http:
+                $ref: '#/definitions/HTTPClientConfig'
+                x-go-tag-json: http
+        title: ClientConfig is the client configuration.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig
+    ClientTLSConfig:
+        properties:
+            ca_file:
+                type: string
+                x-go-name: CAFile
+                x-go-tag-json: ca_file
+            cert_file:
+                type: string
+                x-go-name: CertFile
+                x-go-tag-json: cert_file
+            insecure_skip_verify:
+                type: boolean
+                x-go-name: InsecureSkipVerify
+                x-go-tag-json: insecure_skip_verify
+            key_file:
+                type: string
+                x-go-name: KeyFile
+                x-go-tag-json: key_file
+            key_log_file:
+                type: string
+                x-go-name: KeyLogWriter
+                x-go-tag-json: key_log_file
+        title: ClientTLSConfig is the config for client TLS.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
+    Duration:
+        description: It holds *durationpb.Duration which is generated type for google/protobuf/duration.proto.
+        title: Duration is encoded as a string message which represents a signed span of time.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/pkg/config
+    FluxNinjaPluginConfig:
+        properties:
+            api_key:
+                description: API Key for this agent.
+                type: string
+                x-go-name: APIKey
+                x-go-tag-json: api_key
+            client:
+                $ref: '#/definitions/ClientConfig'
+                x-go-tag-json: client
+            fluxninja_endpoint:
+                description: Address to grpc or http(s) server listening in agent service. To use http protocol, the address must start with http(s)://.
+                type: string
+                x-go-name: FluxNinjaEndpoint
+                x-go-tag-json: fluxninja_endpoint
+                x-go-tag-validate: omitempty,hostname_port|url|fqdn
+            heartbeat_interval:
+                description: Interval between each heartbeat.
+                format: string
+                type: string
+                x-go-name: HeartbeatInterval
+                x-go-tag-default: 5s
+                x-go-tag-json: heartbeat_interval
+                x-go-tag-validate: gte=0s
+        title: FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig
+    GRPCClientConfig:
+        properties:
+            backoff:
+                $ref: '#/definitions/BackoffConfig'
+                x-go-tag-json: backoff
+            insecure:
+                description: Disable ClientTLS
+                type: boolean
+                x-go-name: Insecure
+                x-go-tag-default: "false"
+                x-go-tag-json: insecure
+            min_connection_timeout:
+                description: Minimum connection timeout
+                format: string
+                type: string
+                x-go-name: MinConnectionTimeout
+                x-go-tag-default: 20s
+                x-go-tag-json: min_connection_timeout
+                x-go-tag-validate: gte=0
+            tls:
+                $ref: '#/definitions/ClientTLSConfig'
+                x-go-tag-json: tls
+            use_proxy:
+                description: Use HTTP CONNECT Proxy
+                type: boolean
+                x-go-name: UseProxy
+                x-go-tag-default: "false"
+                x-go-tag-json: use_proxy
+        title: GRPCClientConfig holds configuration for GRPC Client.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
+    HTTPClientConfig:
+        properties:
+            disable_compression:
+                description: Disable Compression
+                type: boolean
+                x-go-name: DisableCompression
+                x-go-tag-default: "false"
+                x-go-tag-json: disable_compression
+            disable_keep_alives:
+                description: Disable HTTP Keep Alives
+                type: boolean
+                x-go-name: DisableKeepAlives
+                x-go-tag-default: "false"
+                x-go-tag-json: disable_keep_alives
+            expect_continue_timeout:
+                description: Expect Continue Timeout. 0 = no timeout.
+                format: string
+                type: string
+                x-go-name: ExpectContinueTimeout
+                x-go-tag-default: 1s
+                x-go-tag-json: expect_continue_timeout
+                x-go-tag-validate: gte=0s
+            idle_connection_timeout:
+                description: Idle Connection Timeout. 0 = no timeout.
+                format: string
+                type: string
+                x-go-name: IdleConnTimeout
+                x-go-tag-default: 90s
+                x-go-tag-json: idle_connection_timeout
+                x-go-tag-validate: gte=0s
+            key_log_file:
+                description: SSL key log file (useful for debugging with wireshark)
+                type: string
+                x-go-name: KeyLogWriter
+                x-go-tag-json: key_log_file
+            max_conns_per_host:
+                description: Max Connections Per Host. 0 = no limit.
+                format: int64
+                type: integer
+                x-go-name: MaxConnsPerHost
+                x-go-tag-default: "0"
+                x-go-tag-json: max_conns_per_host
+                x-go-tag-validate: gte=0
+            max_idle_connections:
+                description: Max Idle Connections. 0 = no limit.
+                format: int64
+                type: integer
+                x-go-name: MaxIdleConns
+                x-go-tag-default: "100"
+                x-go-tag-json: max_idle_connections
+                x-go-tag-validate: gte=0
+            max_idle_connections_per_host:
+                description: Max Idle Connections per host. 0 = no limit.
+                format: int64
+                type: integer
+                x-go-name: MaxIdleConnsPerHost
+                x-go-tag-default: "5"
+                x-go-tag-json: max_idle_connections_per_host
+                x-go-tag-validate: gte=0
+            max_response_header_bytes:
+                description: Max Response Header Bytes. 0 = no limit.
+                format: int64
+                type: integer
+                x-go-name: MaxResponseHeaderBytes
+                x-go-tag-default: "0"
+                x-go-tag-json: max_response_header_bytes
+                x-go-tag-validate: gte=0
+            network_keep_alive:
+                description: Network level keep-alive duration
+                format: string
+                type: string
+                x-go-name: NetworkKeepAlive
+                x-go-tag-default: 30s
+                x-go-tag-json: network_keep_alive
+                x-go-tag-validate: gte=0s
+            network_timeout:
+                description: Timeout for making network connection
+                format: string
+                type: string
+                x-go-name: NetworkTimeout
+                x-go-tag-default: 30s
+                x-go-tag-json: network_timeout
+                x-go-tag-validate: gte=0s
+            proxy_connect_header:
+                $ref: '#/definitions/Header'
+                x-go-tag-json: proxy_connect_header,omitempty
+                x-go-tag-validate: omitempty
+            read_buffer_size:
+                description: Read Buffer Size. 0 = 4KB
+                format: int64
+                type: integer
+                x-go-name: ReadBufferSize
+                x-go-tag-default: "0"
+                x-go-tag-json: read_buffer_size
+                x-go-tag-validate: gte=0
+            response_header_timeout:
+                description: Response Header Timeout. 0 = no timeout.
+                format: string
+                type: string
+                x-go-name: ResponseHeaderTimeout
+                x-go-tag-default: 0s
+                x-go-tag-json: response_header_timeout
+                x-go-tag-validate: gte=0s
+            timeout:
+                description: HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
+                format: string
+                type: string
+                x-go-name: Timeout
+                x-go-tag-default: 60s
+                x-go-tag-json: timeout
+                x-go-tag-validate: gte=0s
+            tls:
+                $ref: '#/definitions/ClientTLSConfig'
+                x-go-tag-json: tls
+            tls_handshake_timeout:
+                description: TLS Handshake Timeout. 0 = no timeout
+                format: string
+                type: string
+                x-go-name: TLSHandshakeTimeout
+                x-go-tag-default: 10s
+                x-go-tag-json: tls_handshake_timeout
+                x-go-tag-validate: gte=0s
+            use_proxy:
+                description: Use Proxy
+                type: boolean
+                x-go-name: UseProxy
+                x-go-tag-default: "false"
+                x-go-tag-json: use_proxy
+            write_buffer_size:
+                description: Write Buffer Size. 0 = 4KB.
+                format: int64
+                type: integer
+                x-go-name: WriteBufferSize
+                x-go-tag-default: "0"
+                x-go-tag-json: write_buffer_size
+                x-go-tag-validate: gte=0
+        title: HTTPClientConfig holds configuration for HTTP Client.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/pkg/net/http
+    Header:
+        additionalProperties:
+            items:
+                type: string
+            type: array
+        description: |-
+            The keys should be in canonical form, as returned by
+            CanonicalHeaderKey.
+        title: A Header represents the key-value pairs in an HTTP header.
+        type: object
+        x-go-package: net/http
 info: {}
 paths:
-  /fluxninja_plugin:
-    post:
-      operationId: FluxNinjaPlugin
-      parameters:
-      - in: body
-        schema:
-          $ref: '#/definitions/FluxNinjaPluginConfig'
-      tags:
-      - plugin-configuration
-      x-fn-config-env: true
+    /fluxninja_plugin:
+        post:
+            operationId: FluxNinjaPlugin
+            parameters:
+                - in: body
+                  schema:
+                    $ref: '#/definitions/FluxNinjaPluginConfig'
+            tags:
+                - plugin-configuration
+            x-fn-config-env: true
 swagger: "2.0"

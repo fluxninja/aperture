@@ -6,6 +6,7 @@ export GOMAXPROCS ?= 4
 BUFPRESENT := $(shell command -v buf 2> /dev/null)
 GIT_ROOT := $(shell git rev-parse --show-toplevel)
 DOCS_OPENAPI := $(GIT_ROOT)/docs/content/assets/openapiv2
+DOCS_ROOT := $(GIT_ROOT)/docs
 
 buf-update:
 	@echo Updating buf dependencies
@@ -34,9 +35,10 @@ buf-generate:
 	@#generate api docs
 	@rm -rfd $(DOCS_OPENAPI)
 	@mv gen/openapiv2 $(DOCS_OPENAPI)
-	@go run enrich-api-swagger.go $(DOCS_OPENAPI)/aperture.swagger.yaml
 	@{ \
 		set -e; \
+		go run enrich-api-swagger.go $(DOCS_OPENAPI)/aperture.swagger.yaml; \
+		go run $(DOCS_ROOT)/tools/swagger/process-go-tags.go $(DOCS_OPENAPI)/aperture.swagger.yaml; \
 		for process in aperture-agent aperture-controller; do \
 			yq eval "del(.paths | .[] | select(.*.tags | contains([\"$$process\"]) | not))" $(DOCS_OPENAPI)/aperture.swagger.yaml > $(DOCS_OPENAPI)/$$process.swagger.yaml; \
 			yq eval -i "del(.tags)" $(DOCS_OPENAPI)/$$process.swagger.yaml; \

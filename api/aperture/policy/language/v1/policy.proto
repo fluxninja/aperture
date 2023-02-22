@@ -467,12 +467,12 @@ message EMA {
   // Parameters for the EMA component.
   message Parameters {
     // Duration of EMA sampling window.
-    google.protobuf.Duration ema_window = 1; // @gotags: default:"5s"
+    google.protobuf.Duration ema_window = 1; // @gotags: validate:"required"
 
     // Duration of EMA warming up window.
     //
     // The initial value of the EMA is the average of signal readings received during the warm up window.
-    google.protobuf.Duration warmup_window = 2; // @gotags: default:"0s"
+    google.protobuf.Duration warmup_window = 2; // @gotags: validate:"required"
 
     // Correction factor to apply on the output value if its in violation of the min envelope.
     double correction_factor_on_min_envelope_violation = 3; // @gotags: validate:"gte=1.0" default:"1.0"
@@ -730,7 +730,7 @@ message Scheduler {
       // \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
       // $$
       //
-      uint32 priority = 1; // @gotags: validate:"gte=0,lte=255"
+      uint32 priority = 1; // @gotags: validate:"gte=0,lte=255" default:"0"
 
       // Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
       // This override is applicable only if `auto_tokens` is set to false.
@@ -778,7 +778,7 @@ message Scheduler {
     repeated Workload workloads = 1; // @gotags: validate:"dive"
 
     // Parameters to be used if none of workloads specified in `workloads` match.
-    Workload.Parameters default_workload_parameters = 2; // @gotags: validate:"required"
+    Workload.Parameters default_workload_parameters = 2;
 
     // Automatically estimate the size of a request in each workload, based on
     // historical latency. Each workload's `tokens` will be set to average
@@ -967,7 +967,7 @@ message Extrapolator {
   // Parameters for the Extrapolator component.
   message Parameters {
     // Maximum time interval to repeat the last valid value of input signal.
-    google.protobuf.Duration max_extrapolation_interval = 1; // @gotags: default:"10s"
+    google.protobuf.Duration max_extrapolation_interval = 1; // @gotags: validate:"required"
   }
 
   // Inputs for the Extrapolator component.
@@ -1156,7 +1156,7 @@ message Alerter {
     string severity = 2; // @gotags: default:"info" validate:"oneof=info warn crit"
 
     // Duration of alert resolver.
-    google.protobuf.Duration resolve_timeout = 3; // @gotags: default:"10s"
+    google.protobuf.Duration resolve_timeout = 3; // @gotags: default:"5s"
 
     // A list of alert channel strings.
     repeated string alert_channels = 4;

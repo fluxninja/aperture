@@ -47,7 +47,7 @@ type EtcdConfig struct {
 	// Client TLS configuration
 	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
 	// List of Etcd server endpoints
-	Endpoints []string `json:"endpoints" validate:"gt=0,dive,hostname_port|url|fqdn"`
+	Endpoints []string `json:"endpoints" validate:"required,gt=0,dive,hostname_port|url|fqdn"`
 }
 
 // ClientIn holds parameters for ProvideClient.

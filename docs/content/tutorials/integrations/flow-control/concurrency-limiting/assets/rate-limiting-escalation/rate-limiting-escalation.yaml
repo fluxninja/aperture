@@ -55,9 +55,7 @@ spec:
       - flow_control:
           aimd_concurrency_controller:
             alerter_parameters:
-              alert_channels: []
               alert_name: Load Shed Event
-              resolve_timeout: 5s
             default_config:
               dry_run: false
             dynamic_config_key: concurrency_controller
@@ -90,10 +88,6 @@ spec:
               observed_load_multiplier:
                 signal_name: OBSERVED_LOAD_MULTIPLIER
             scheduler_parameters:
-              auto_tokens: true
-              default_workload_parameters:
-                priority: 20
-              timeout_factor: 0.5
               workloads:
                 - label_matcher:
                     match_labels:
