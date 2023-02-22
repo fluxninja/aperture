@@ -23,6 +23,7 @@ func init() {
 	RootCmd.AddCommand(installation.InstallCmd)
 	RootCmd.AddCommand(installation.UnInstallCmd)
 	RootCmd.AddCommand(flowcontrol.FlowControlCmd)
+	RootCmd.AddCommand(agentsCmd)
 
 	RootCmd.InitDefaultCompletionCmd()
 	RootCmd.SilenceUsage = true

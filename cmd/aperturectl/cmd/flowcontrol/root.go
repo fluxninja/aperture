@@ -14,7 +14,7 @@ func init() {
 	FlowControlCmd.AddCommand(ListCmd)
 }
 
-// FlowControlCmd is the command to observe control points.
+// FlowControlCmd is the command to observe Flow Control control points.
 var FlowControlCmd = &cobra.Command{
 	Use:               "flow-control {--kube | --controller ADDRESS}",
 	Short:             "Flow Control integrations",
