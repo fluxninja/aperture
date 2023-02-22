@@ -97,8 +97,8 @@ definitions:
       of signal from the baseline. Internally implemented as a nested circuit.
     type: object
     required:
-    - flow_selector
     - scheduler_parameters
+    - flow_selector
     properties:
       alerter_parameters:
         description: Configuration for embedded alerter.
@@ -606,8 +606,8 @@ definitions:
     title: Concurrency Limiter is an actuator component that regulates flows in order
       to provide active service protection
     required:
-    - scheduler
     - flow_selector
+    - scheduler
     properties:
       flow_selector:
         description: |+
@@ -1578,10 +1578,10 @@ definitions:
       component should apply to.
     type: object
     required:
-    - name
-    - namespace
     - api_version
     - kind
+    - name
+    - namespace
     properties:
       agent_group:
         description: |+
@@ -2112,8 +2112,8 @@ definitions:
     type: object
     title: Limits the traffic on a control point to specified rate
     required:
-    - parameters
     - flow_selector
+    - parameters
     properties:
       default_config:
         title: Default configuration
@@ -2329,8 +2329,8 @@ definitions:
     type: object
     title: Raw rego rules are compiled 1:1 to rego queries
     required:
-    - query
     - source
+    - query
     properties:
       query:
         description: |+

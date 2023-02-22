@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"sort"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -88,6 +89,8 @@ func processProperties(properties map[string]interface{}) []string {
 			}
 		}
 	}
+	// sort required
+	sort.Strings(required)
 	return required
 }
 

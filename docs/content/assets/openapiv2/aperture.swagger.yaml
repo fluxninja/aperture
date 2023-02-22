@@ -53,8 +53,8 @@ definitions:
 
                 x-go-tag-validate: required
         required:
-            - flow_selector
             - scheduler_parameters
+            - flow_selector
         type: object
     AIMDConcurrencyControllerIns:
         description: Inputs for the AIMDConcurrencyController component.
@@ -618,8 +618,8 @@ definitions:
 
                 x-go-tag-validate: required
         required:
-            - scheduler
             - flow_selector
+            - scheduler
         title: Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
         type: object
     ConstantSignal:
@@ -1703,10 +1703,10 @@ definitions:
                 type: string
                 x-go-tag-validate: required
         required:
-            - name
-            - namespace
             - api_version
             - kind
+            - name
+            - namespace
         type: object
     LabelMatcher:
         description: |-
@@ -2375,8 +2375,8 @@ definitions:
                 title: Parameters for the RateLimiter component
                 x-go-tag-validate: required
         required:
-            - parameters
             - flow_selector
+            - parameters
         title: Limits the traffic on a control point to specified rate
         type: object
     RateLimiterDynamicConfig:
@@ -2623,8 +2623,8 @@ definitions:
                 type: string
                 x-go-tag-validate: required
         required:
-            - query
             - source
+            - query
         title: Raw rego rules are compiled 1:1 to rego queries
         type: object
     Scheduler:
