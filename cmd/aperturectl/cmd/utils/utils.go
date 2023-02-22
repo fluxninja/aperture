@@ -148,11 +148,15 @@ func FetchPolicyFromCR(crPath string) (string, error) {
 // GetKubeConfig prepares Kubernetes config to connect with the cluster using provided or default kube config file location.
 func GetKubeConfig(kubeConfig string) (*rest.Config, error) {
 	if kubeConfig == "" {
-		homeDir, err := os.UserHomeDir()
-		if err != nil {
-			return nil, err
+		if kubeConfigEnv, exists := os.LookupEnv("KUBECONFIG"); exists {
+			kubeConfig = kubeConfigEnv
+		} else {
+			homeDir, err := os.UserHomeDir()
+			if err != nil {
+				return nil, err
+			}
+			kubeConfig = filepath.Join(homeDir, ".kube", "config")
 		}
-		kubeConfig = filepath.Join(homeDir, ".kube", "config")
 		log.Info().Msgf("Using Kubernetes config '%s'", kubeConfig)
 	}
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfig)
