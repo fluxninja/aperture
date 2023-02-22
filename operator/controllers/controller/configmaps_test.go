@@ -19,6 +19,7 @@ package controller
 import (
 	"bytes"
 	_ "embed"
+	"encoding/json"
 	"fmt"
 	"path"
 	"text/template"
@@ -143,7 +144,14 @@ var _ = Describe("ConfigMap for Controller", func() {
 			result, err := configMapForControllerConfig(instance.DeepCopy(), scheme.Scheme)
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(result.Data).To(Equal(expected.Data))
+
+			resultByte, err := json.Marshal(result.Data)
+			Expect(err).NotTo(HaveOccurred())
+
+			expectedByte, err := json.Marshal(expected.Data)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(resultByte).Should(MatchYAML(expectedByte))
 		})
 	})
 })
