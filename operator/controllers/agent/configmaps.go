@@ -20,6 +20,7 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
+	"strings"
 
 	"github.com/fluxninja/aperture/operator/controllers"
 
@@ -28,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -38,7 +40,48 @@ import (
 )
 
 // configMapForAgentConfig prepares the ConfigMap object for the Agent.
-func configMapForAgentConfig(instance *agentv1alpha1.Agent, scheme *runtime.Scheme) (*corev1.ConfigMap, error) {
+func configMapForAgentConfig(
+	ctx context.Context,
+	client client.Client,
+	instance *agentv1alpha1.Agent,
+	scheme *runtime.Scheme,
+) (*corev1.ConfigMap, error) {
+	// HACK: auto-inject controller's cert to agent if we detect it connects to local controller.
+	// FIXME: Mounting optional configmap with controller CA would be a better
+	// solution, but right now we don't have a configmap with CA, just a secret
+	// that contains also the key.
+	// Also, we should figure out the way so that both CA file from config and
+	// controller's CA can be used simultaneously.
+	// FIXME: Even better solution would be for local controller to be signed
+	// using https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/
+	var localControllerCert []byte
+	for _, endpoint := range instance.Spec.ConfigSpec.AgentFunctions.Endpoints {
+		if !isLocalControllerEndpoint(endpoint) {
+			continue
+		}
+
+		caFile := &instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile
+		if *caFile != "" {
+			continue
+		}
+
+		if client == nil {
+			continue
+		}
+
+		var secret corev1.Secret
+		_ = client.Get(
+			ctx,
+			types.NamespacedName{Namespace: "aperture-controller", Name: "controller-controller-cert"},
+			&secret,
+		)
+
+		localControllerCert = secret.Data[controllers.ControllerCertName]
+		if localControllerCert != nil {
+			*caFile = "/etc/aperture/aperture-agent/config/controller-ca.pem"
+		}
+	}
+
 	jsonConfig, err := json.Marshal(instance.Spec.ConfigSpec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal Agent config to JSON. Error: '%s'", err.Error())
@@ -59,6 +102,10 @@ func configMapForAgentConfig(instance *agentv1alpha1.Agent, scheme *runtime.Sche
 		Data: map[string]string{
 			"aperture-agent.yaml": string(config),
 		},
+	}
+
+	if localControllerCert != nil {
+		cm.Data["controller-ca.pem"] = string(localControllerCert)
 	}
 
 	if scheme != nil {
@@ -106,10 +153,27 @@ func CreateConfigMapForAgent(
 }
 
 // CreateAgentConfigMapInNamespace creates the Agent ConfigMap in the given namespace instead of the default one.
-func CreateAgentConfigMapInNamespace(instance *agentv1alpha1.Agent, namespace string) *corev1.ConfigMap {
-	configMap, _ := configMapForAgentConfig(instance, nil)
+func CreateAgentConfigMapInNamespace(
+	ctx context.Context,
+	client client.Client,
+	instance *agentv1alpha1.Agent,
+	namespace string,
+) *corev1.ConfigMap {
+	configMap, _ := configMapForAgentConfig(ctx, client, instance, nil)
 	configMap.Namespace = namespace
 	configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
 
 	return configMap
+}
+
+// does the endpoint point to local controller in its default namespace at its default port.
+func isLocalControllerEndpoint(endpoint string) bool {
+	addr, port, ok := strings.Cut(endpoint, ":")
+	if !ok {
+		return false
+	}
+
+	addr += "."
+	return port == "8080" && strings.HasPrefix(addr, "aperture-controller.aperture-controller.") &&
+		strings.HasPrefix("aperture-controller.aperture-controller.svc.cluster.local.", addr) //nolint:gocritic
 }

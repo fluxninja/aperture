@@ -1,11 +1,7 @@
 package agentfunctions
 
 import (
-	"crypto/tls"
-
 	"go.uber.org/fx"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/info"
@@ -32,6 +28,8 @@ var Module = fx.Options(
 )
 
 // Config is configuration for agent functions.
+// swagger:model
+// +kubebuilder:object:generate=true
 type Config struct {
 	// RPC servers to connect to (which will be able to call agent functions)
 	Endpoints []string `json:"endpoints"`
@@ -40,6 +38,8 @@ type Config struct {
 }
 
 // ClientConfig is configuration for network clients used by agent-functions.
+// swagger:model
+// +kubebuilder:object:generate=true
 type ClientConfig struct {
 	// GRPC client settings.
 	GRPCClient grpcclient.GRPCClientConfig `json:"grpc"`
@@ -61,17 +61,7 @@ func RegisterClient(in RegisterClientIn) error {
 		return err
 	}
 
-	in.ConnBuilder = in.ConnBuilder.AddOptions(
-		grpc.WithTransportCredentials(
-			credentials.NewTLS(&tls.Config{
-				// TODO agent manager to inject correct certificate
-				InsecureSkipVerify: true,
-			}),
-		),
-	)
-	// TODO go back to config.Endpoints
-	// for _, addr := range config.Endpoints {
-	for _, addr := range []string{"dns:aperture-controller.aperture-controller:8080"} {
+	for _, addr := range config.Endpoints {
 		rpc.RegisterStreamClient(info.UUID, in.Lc, in.Handlers, in.ConnBuilder.Build(), addr)
 		log.Info().Msgf("Rpc client started, server: %s", addr)
 	}

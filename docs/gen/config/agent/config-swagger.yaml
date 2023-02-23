@@ -222,6 +222,13 @@ definitions:
     title: BatchPrerollupConfig defines configuration for OTEL batch processor.
     type: object
     x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
+  ClientConfig:
+    properties:
+      grpc:
+        $ref: '#/definitions/GRPCClientConfig'
+    title: ClientConfig is configuration for network clients used by agent-functions.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions
   ClientTLSConfig:
     properties:
       ca_file:
@@ -261,6 +268,19 @@ definitions:
       https://github.com/kubernetes-sigs/kubebuilder/issues/528
     type: object
     x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
+  Config:
+    properties:
+      client:
+        $ref: '#/definitions/ClientConfig'
+      endpoints:
+        description: RPC servers to connect to (which will be able to call agent functions)
+        items:
+          type: string
+        type: array
+        x-go-name: Endpoints
+    title: Config is configuration for agent functions.
+    type: object
+    x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions
   CustomMetricsConfig:
     description: which will be exported to the controller prometheus.
     properties:
