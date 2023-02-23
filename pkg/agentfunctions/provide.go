@@ -32,8 +32,11 @@ var Module = fx.Options(
 // +kubebuilder:object:generate=true
 type Config struct {
 	// RPC servers to connect to (which will be able to call agent functions)
+	//+kubebuilder:validation:Optional
 	Endpoints []string `json:"endpoints"`
+
 	// Network client configuration
+	//+kubebuilder:validation:Optional
 	ClientConfig ClientConfig `json:"client"`
 }
 
