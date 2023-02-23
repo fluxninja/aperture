@@ -198,6 +198,7 @@
           "type": "string",
           "x-go-tag-default": "info",
           "x-go-tag-validate": "oneof=info warn crit",
+          "x-oneof": "info | warn | crit",
           "x-order": 4
         }
       },
@@ -262,6 +263,7 @@
           "enum": ["add", "sub", "mul", "div", "xor", "lshift", "rshift"],
           "type": "string",
           "x-go-tag-validate": "oneof=add sub mul div xor lshift rshift",
+          "x-oneof": "add | sub | mul | div | xor | lshift | rshift",
           "x-order": 1
         },
         "out_ports": {
@@ -526,11 +528,15 @@
       "description": "Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.",
       "properties": {
         "special_value": {
-          "title": "@gotags: validate:\"oneof=NaN +Inf -Inf\"",
+          "description": "A special value such as NaN, +Inf, -Inf.\n\n",
+          "enum": ["NaN", "+Inf", "-Inf"],
           "type": "string",
+          "x-go-tag-validate": "oneof=NaN +Inf -Inf",
+          "x-oneof": "NaN | +Inf | -Inf",
           "x-order": 0
         },
         "value": {
+          "description": "A constant value.",
           "format": "double",
           "type": "number",
           "x-order": 1
@@ -559,6 +565,7 @@
           "enum": ["gt", "lt", "gte", "lte", "eq", "neq"],
           "type": "string",
           "x-go-tag-validate": "oneof=gt lt gte lte eq neq",
+          "x-oneof": "gt | lt | gte | lte | eq | neq",
           "x-order": 2
         },
         "out_ports": {
@@ -965,12 +972,14 @@
       "properties": {
         "flow_matcher": {
           "$ref": "#/definitions/FlowMatcher",
-          "title": "@gotags: validate:\"required\"",
+          "title": "Match control points and labels",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "service_selector": {
           "$ref": "#/definitions/ServiceSelector",
-          "title": "@gotags: validate:\"required\"",
+          "title": "Match agent group and service",
+          "x-go-tag-validate": "required",
           "x-order": 1
         }
       },
@@ -1101,12 +1110,14 @@
       "description": "StaticBuckets holds the static value of the buckets where latency histogram will be stored.",
       "properties": {
         "buckets": {
+          "default": [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
+          "description": "The buckets in which latency histogram will be stored.\n\n",
           "items": {
             "format": "double",
             "type": "number"
           },
-          "title": "@gotags: default:\"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]\"",
           "type": "array",
+          "x-go-tag-default": "[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]",
           "x-order": 0
         }
       },
@@ -1253,10 +1264,12 @@
         },
         "in_ports": {
           "$ref": "#/definitions/HolderIns",
+          "description": "Input ports for the Holder component.",
           "x-order": 1
         },
         "out_ports": {
           "$ref": "#/definitions/HolderOuts",
+          "description": "Output ports for the Holder component.",
           "x-order": 2
         }
       },
@@ -1268,6 +1281,7 @@
       "properties": {
         "input": {
           "$ref": "#/definitions/InPort",
+          "description": "The input signal.",
           "x-order": 0
         }
       },
@@ -1279,6 +1293,7 @@
       "properties": {
         "output": {
           "$ref": "#/definitions/OutPort",
+          "description": "The output signal.",
           "x-order": 0
         }
       },
@@ -1453,6 +1468,7 @@
           "enum": ["In", "NotIn", "Exists", "DoesNotExists"],
           "type": "string",
           "x-go-tag-validate": "oneof=In NotIn Exists DoesNotExists",
+          "x-oneof": "In | NotIn | Exists | DoesNotExists",
           "x-order": 1
         },
         "values": {
@@ -1753,17 +1769,19 @@
       "description": "Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.",
       "properties": {
         "components": {
+          "description": "List of components in the nested circuit.\n\n",
           "items": {
             "$ref": "#/definitions/Component"
           },
-          "title": "@gotags: validate:\"dive\"",
           "type": "array",
+          "x-go-tag-validate": "dive",
           "x-order": 0
         },
         "in_ports_map": {
           "additionalProperties": {
             "$ref": "#/definitions/InPort"
           },
+          "description": "Maps input port names to input ports.",
           "type": "object",
           "x-order": 1
         },
@@ -1776,6 +1794,7 @@
           "additionalProperties": {
             "$ref": "#/definitions/OutPort"
           },
+          "description": "Maps output port names to output ports.",
           "type": "object",
           "x-order": 3
         },
@@ -1797,6 +1816,7 @@
           "x-order": 0
         },
         "port_name": {
+          "description": "Name of the port.",
           "type": "string",
           "x-order": 1
         }
@@ -1825,6 +1845,7 @@
           "x-order": 0
         },
         "port_name": {
+          "description": "Name of the port.",
           "type": "string",
           "x-order": 1
         }
@@ -1920,6 +1941,7 @@
       "additionalProperties": false
     },
     "PodScaler": {
+      "description": "Component for scaling pods based on a signal.",
       "properties": {
         "kubernetes_object_selector": {
           "$ref": "#/definitions/KubernetesObjectSelector",
@@ -1929,10 +1951,12 @@
         },
         "scale_actuator": {
           "$ref": "#/definitions/PodScalerScaleActuator",
+          "description": "Actuates scaling of pods based on a signal.",
           "x-order": 1
         },
         "scale_reporter": {
           "$ref": "#/definitions/PodScalerScaleReporter",
+          "description": "Reports actual and configured number of replicas.",
           "x-order": 2
         }
       },
@@ -1940,6 +1964,7 @@
       "additionalProperties": false
     },
     "PodScalerScaleActuator": {
+      "description": "Actuates scaling of pods based on a signal.",
       "properties": {
         "default_config": {
           "$ref": "#/definitions/PodScalerScaleActuatorDynamicConfig",
@@ -1953,6 +1978,7 @@
         },
         "in_ports": {
           "$ref": "#/definitions/PodScalerScaleActuatorIns",
+          "description": "Input ports for the PodScaler component.",
           "x-order": 2
         }
       },
@@ -1985,9 +2011,11 @@
       "additionalProperties": false
     },
     "PodScalerScaleReporter": {
+      "description": "Reports actual and configured number of replicas.",
       "properties": {
         "out_ports": {
           "$ref": "#/definitions/PodScalerScaleReporterOuts",
+          "description": "Output ports for the PodScaler component.",
           "x-order": 0
         }
       },
@@ -1999,10 +2027,12 @@
       "properties": {
         "actual_replicas": {
           "$ref": "#/definitions/OutPort",
+          "description": "The number of replicas that are currently running.",
           "x-order": 0
         },
         "configured_replicas": {
           "$ref": "#/definitions/OutPort",
+          "description": "The number of replicas that are desired.",
           "x-order": 1
         }
       },
@@ -2075,6 +2105,7 @@
         },
         "out_ports": {
           "$ref": "#/definitions/PulseGeneratorOuts",
+          "description": "Output ports for the PulseGenerator component.",
           "x-order": 1
         },
         "true_for": {
@@ -2132,7 +2163,8 @@
         },
         "in_ports": {
           "$ref": "#/definitions/RateLimiterIns",
-          "title": "@gotags: validate:\"required\"",
+          "title": "Input ports for the RateLimiter component",
+          "x-go-tag-validate": "required",
           "x-order": 3
         },
         "parameters": {
@@ -2486,9 +2518,11 @@
           "x-order": 1
         },
         "scale": {
-          "description": "Scaling factor to be multiplied with the square root of the input signal.\n\n@gotags default:\"1.0\"",
+          "default": 1,
+          "description": "Scaling factor to be multiplied with the square root of the input signal.\n\n",
           "format": "double",
           "type": "number",
+          "x-go-tag-default": "1.0",
           "x-order": 2
         }
       },
