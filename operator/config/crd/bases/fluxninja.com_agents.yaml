@@ -937,8 +937,6 @@ spec:
                                 description: Use HTTP CONNECT Proxy
                                 type: boolean
                             type: object
-                        required:
-                        - grpc
                         type: object
                       endpoints:
                         description: RPC servers to connect to (which will be able
