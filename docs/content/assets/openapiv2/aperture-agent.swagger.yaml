@@ -442,6 +442,7 @@ definitions:
         - Exists
         - DoesNotExists
         x-go-tag-validate: oneof=In NotIn Exists DoesNotExists
+        x-oneof: In | NotIn | Exists | DoesNotExists
       values:
         description: |-
           An array of string values that relates to the key by an operator.

@@ -270,7 +270,7 @@ Alerter Parameters is a common config for separate alerter components and alerte
 <dt>severity</dt>
 <dd>
 
-(string, default: `"info"`) Severity of the alert, one of 'info', 'warn' or 'crit'.
+(string, oneof: `info | warn | crit`, default: `"info"`) Severity of the alert, one of 'info', 'warn' or 'crit'.
 
 </dd>
 </dl>
@@ -359,7 +359,7 @@ Type of combinator that computes the arithmetic operation on the operand signals
 <dt>operator</dt>
 <dd>
 
-(string) Operator of the arithmetic operation.
+(string, oneof: `add | sub | mul | div | xor | lshift | rshift`) Operator of the arithmetic operation.
 
 The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
 In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
@@ -784,13 +784,13 @@ Special constant input for ports and Variable component. Can provide either a co
 <dt>special_value</dt>
 <dd>
 
-(string) @gotags: validate:"oneof=NaN +Inf -Inf"
+(string, oneof: `NaN | +Inf | -Inf`) A special value such as NaN, +Inf, -Inf.
 
 </dd>
 <dt>value</dt>
 <dd>
 
-(float64)
+(float64) A constant value.
 
 </dd>
 </dl>
@@ -826,7 +826,7 @@ If the duration is zero, the transition will happen instantaneously.
 <dt>operator</dt>
 <dd>
 
-(string) Comparison operator that computes operation on lhs and rhs input signals.
+(string, oneof: `gt | lt | gte | lte | eq | neq`) Comparison operator that computes operation on lhs and rhs input signals.
 
 </dd>
 <dt>out_ports</dt>
@@ -1404,13 +1404,13 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 <dt>flow_matcher</dt>
 <dd>
 
-([FlowMatcher](#flow-matcher)) @gotags: validate:"required"
+([FlowMatcher](#flow-matcher)) Match control points and labels
 
 </dd>
 <dt>service_selector</dt>
 <dd>
 
-([ServiceSelector](#service-selector)) @gotags: validate:"required"
+([ServiceSelector](#service-selector)) Match agent group and service
 
 </dd>
 </dl>
@@ -1580,7 +1580,7 @@ StaticBuckets holds the static value of the buckets where latency histogram will
 <dt>buckets</dt>
 <dd>
 
-([]float64) @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
+([]float64, default: `[5,10,25,50,100,250,500,1000,2500,5000,10000]`) The buckets in which latency histogram will be stored.
 
 </dd>
 </dl>
@@ -1812,13 +1812,13 @@ If it's holding a value that means it ignores both valid and invalid new signals
 <dt>in_ports</dt>
 <dd>
 
-([HolderIns](#holder-ins))
+([HolderIns](#holder-ins)) Input ports for the Holder component.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([HolderOuts](#holder-outs))
+([HolderOuts](#holder-outs)) Output ports for the Holder component.
 
 </dd>
 </dl>
@@ -1833,7 +1833,7 @@ Inputs for the Holder component.
 <dt>input</dt>
 <dd>
 
-([InPort](#in-port))
+([InPort](#in-port)) The input signal.
 
 </dd>
 </dl>
@@ -1848,7 +1848,7 @@ Outputs for the Holder component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port))
+([OutPort](#out-port)) The output signal.
 
 </dd>
 </dl>
@@ -2081,7 +2081,7 @@ Label selector requirement which is a selector that contains values, a key, and 
 <dt>operator</dt>
 <dd>
 
-(string) Logical operator which represents a key's relationship to a set of values.
+(string, oneof: `In | NotIn | Exists | DoesNotExists`) Logical operator which represents a key's relationship to a set of values.
 Valid operators are In, NotIn, Exists and DoesNotExist.
 
 </dd>
@@ -2448,13 +2448,13 @@ Nested circuit defines a sub-circuit as a high-level component. It consists of a
 <dt>components</dt>
 <dd>
 
-([[]Component](#component)) @gotags: validate:"dive"
+([[]Component](#component)) List of components in the nested circuit.
 
 </dd>
 <dt>in_ports_map</dt>
 <dd>
 
-(map of [InPort](#in-port))
+(map of [InPort](#in-port)) Maps input port names to input ports.
 
 </dd>
 <dt>name</dt>
@@ -2466,7 +2466,7 @@ Nested circuit defines a sub-circuit as a high-level component. It consists of a
 <dt>out_ports_map</dt>
 <dd>
 
-(map of [OutPort](#out-port))
+(map of [OutPort](#out-port)) Maps output port names to output ports.
 
 </dd>
 <dt>short_description</dt>
@@ -2493,7 +2493,7 @@ Nested signal egress is a special type of component that allows to extract a sig
 <dt>port_name</dt>
 <dd>
 
-(string)
+(string) Name of the port.
 
 </dd>
 </dl>
@@ -2529,7 +2529,7 @@ Nested signal ingress is a special type of component that allows to inject a sig
 <dt>port_name</dt>
 <dd>
 
-(string)
+(string) Name of the port.
 
 </dd>
 </dl>
@@ -2661,6 +2661,8 @@ Example:
 
 ### PodScaler {#pod-scaler}
 
+Component for scaling pods based on a signal.
+
 #### Properties
 
 <dl>
@@ -2673,18 +2675,20 @@ Example:
 <dt>scale_actuator</dt>
 <dd>
 
-([PodScalerScaleActuator](#pod-scaler-scale-actuator))
+([PodScalerScaleActuator](#pod-scaler-scale-actuator)) Actuates scaling of pods based on a signal.
 
 </dd>
 <dt>scale_reporter</dt>
 <dd>
 
-([PodScalerScaleReporter](#pod-scaler-scale-reporter))
+([PodScalerScaleReporter](#pod-scaler-scale-reporter)) Reports actual and configured number of replicas.
 
 </dd>
 </dl>
 
 ### PodScalerScaleActuator {#pod-scaler-scale-actuator}
+
+Actuates scaling of pods based on a signal.
 
 #### Properties
 
@@ -2704,7 +2708,7 @@ Example:
 <dt>in_ports</dt>
 <dd>
 
-([PodScalerScaleActuatorIns](#pod-scaler-scale-actuator-ins))
+([PodScalerScaleActuatorIns](#pod-scaler-scale-actuator-ins)) Input ports for the PodScaler component.
 
 </dd>
 </dl>
@@ -2742,13 +2746,15 @@ Inputs for the PodScaler component.
 
 ### PodScalerScaleReporter {#pod-scaler-scale-reporter}
 
+Reports actual and configured number of replicas.
+
 #### Properties
 
 <dl>
 <dt>out_ports</dt>
 <dd>
 
-([PodScalerScaleReporterOuts](#pod-scaler-scale-reporter-outs))
+([PodScalerScaleReporterOuts](#pod-scaler-scale-reporter-outs)) Output ports for the PodScaler component.
 
 </dd>
 </dl>
@@ -2763,13 +2769,13 @@ Outputs for the PodScaler component.
 <dt>actual_replicas</dt>
 <dd>
 
-([OutPort](#out-port))
+([OutPort](#out-port)) The number of replicas that are currently running.
 
 </dd>
 <dt>configured_replicas</dt>
 <dd>
 
-([OutPort](#out-port))
+([OutPort](#out-port)) The number of replicas that are desired.
 
 </dd>
 </dl>
@@ -2868,7 +2874,7 @@ Generates 0 and 1 in turns.
 <dt>out_ports</dt>
 <dd>
 
-([PulseGeneratorOuts](#pulse-generator-outs))
+([PulseGeneratorOuts](#pulse-generator-outs)) Output ports for the PulseGenerator component.
 
 </dd>
 <dt>true_for</dt>
@@ -2946,7 +2952,7 @@ to select which label should be used as key.
 <dt>in_ports</dt>
 <dd>
 
-([RateLimiterIns](#rate-limiter-ins)) @gotags: validate:"required"
+([RateLimiterIns](#rate-limiter-ins)) Input ports for the RateLimiter component
 
 </dd>
 <dt>parameters</dt>
@@ -3503,9 +3509,7 @@ $$
 <dt>scale</dt>
 <dd>
 
-(float64) Scaling factor to be multiplied with the square root of the input signal.
-
-@gotags default:"1.0"
+(float64, default: `1`) Scaling factor to be multiplied with the square root of the input signal.
 
 </dd>
 </dl>
