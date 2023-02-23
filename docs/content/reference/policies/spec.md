@@ -270,7 +270,7 @@ Alerter Parameters is a common config for separate alerter components and alerte
 <dt>severity</dt>
 <dd>
 
-(string, default: `"info"`) Severity of the alert, one of 'info', 'warn' or 'crit'.
+(string, oneof: `info | warn | crit`, default: `"info"`) Severity of the alert, one of 'info', 'warn' or 'crit'.
 
 </dd>
 </dl>
@@ -359,7 +359,7 @@ Type of combinator that computes the arithmetic operation on the operand signals
 <dt>operator</dt>
 <dd>
 
-(string) Operator of the arithmetic operation.
+(string, oneof: `add | sub | mul | div | xor | lshift | rshift`) Operator of the arithmetic operation.
 
 The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
 In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
@@ -826,7 +826,7 @@ If the duration is zero, the transition will happen instantaneously.
 <dt>operator</dt>
 <dd>
 
-(string) Comparison operator that computes operation on lhs and rhs input signals.
+(string, oneof: `gt | lt | gte | lte | eq | neq`) Comparison operator that computes operation on lhs and rhs input signals.
 
 </dd>
 <dt>out_ports</dt>
@@ -2081,7 +2081,7 @@ Label selector requirement which is a selector that contains values, a key, and 
 <dt>operator</dt>
 <dd>
 
-(string) Logical operator which represents a key's relationship to a set of values.
+(string, oneof: `In | NotIn | Exists | DoesNotExists`) Logical operator which represents a key's relationship to a set of values.
 Valid operators are In, NotIn, Exists and DoesNotExist.
 
 </dd>

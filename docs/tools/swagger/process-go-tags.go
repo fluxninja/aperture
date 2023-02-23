@@ -209,7 +209,9 @@ func processValidateRules(m map[string]interface{}, rules []string) (required bo
 				switch key {
 				case "oneof":
 					// oneof=info warn crit
-					m["enum"] = strings.Split(value, " ")
+					oneofs := strings.Split(value, " ")
+					m["enum"] = oneofs
+					m["x-oneof"] = strings.Join(oneofs, " | ")
 				case "gt", "gte":
 					v, err := strconv.Atoi(value)
 					if err != nil {

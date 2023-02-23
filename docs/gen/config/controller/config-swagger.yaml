@@ -732,6 +732,7 @@ definitions:
                 x-go-tag-default: tcp
                 x-go-tag-json: network
                 x-go-tag-validate: oneof=tcp tcp4 tcp6
+                x-oneof: tcp | tcp4 | tcp6
         title: ListenerConfig holds configuration for socket listeners.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/listener
@@ -762,6 +763,7 @@ definitions:
                 x-go-tag-default: info
                 x-go-tag-json: level
                 x-go-tag-validate: oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED
+                x-oneof: debug | DEBUG | info | INFO | warn | WARN | error | ERROR | fatal | FATAL | panic | PANIC | trace | TRACE | disabled | DISABLED
             non_blocking:
                 default: true
                 description: Use non-blocking log writer (can lose logs at high throughput)

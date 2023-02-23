@@ -224,6 +224,7 @@ definitions:
         - crit
         x-go-tag-default: info
         x-go-tag-validate: oneof=info warn crit
+        x-oneof: info | warn | crit
         x-order: 4
   And:
     description: |-
@@ -302,6 +303,7 @@ definitions:
         - lshift
         - rshift
         x-go-tag-validate: oneof=add sub mul div xor lshift rshift
+        x-oneof: add | sub | mul | div | xor | lshift | rshift
         x-order: 1
       out_ports:
         description: Output ports for the Arithmetic Combinator component.
@@ -692,6 +694,7 @@ definitions:
         - eq
         - neq
         x-go-tag-validate: oneof=gt lt gte lte eq neq
+        x-oneof: gt | lt | gte | lte | eq | neq
         x-order: 2
       out_ports:
         description: Output ports for the Decider component.
@@ -1683,6 +1686,7 @@ definitions:
         - Exists
         - DoesNotExists
         x-go-tag-validate: oneof=In NotIn Exists DoesNotExists
+        x-oneof: In | NotIn | Exists | DoesNotExists
         x-order: 1
       values:
         description: |-

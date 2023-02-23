@@ -165,6 +165,7 @@ definitions:
                 type: string
                 x-go-tag-default: info
                 x-go-tag-validate: oneof=info warn crit
+                x-oneof: info | warn | crit
         required:
             - alert_name
         type: object
@@ -237,6 +238,7 @@ definitions:
                     - rshift
                 type: string
                 x-go-tag-validate: oneof=add sub mul div xor lshift rshift
+                x-oneof: add | sub | mul | div | xor | lshift | rshift
             out_ports:
                 $ref: '#/definitions/ArithmeticCombinatorOuts'
                 description: Output ports for the Arithmetic Combinator component.
@@ -724,6 +726,7 @@ definitions:
                     - neq
                 type: string
                 x-go-tag-validate: oneof=gt lt gte lte eq neq
+                x-oneof: gt | lt | gte | lte | eq | neq
             out_ports:
                 $ref: '#/definitions/DeciderOuts'
                 description: Output ports for the Decider component.
@@ -1676,6 +1679,7 @@ definitions:
                     - DoesNotExists
                 type: string
                 x-go-tag-validate: oneof=In NotIn Exists DoesNotExists
+                x-oneof: In | NotIn | Exists | DoesNotExists
             values:
                 description: |-
                     An array of string values that relates to the key by an operator.

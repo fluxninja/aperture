@@ -33,7 +33,10 @@
 {{- define "fnConstraints" }}
   {{- with .Extensions -}}
     {{- with (index . "x-pattern-rules") -}}
- Pattern: `{{ . }}`
+ Format: `{{ . }}`
+    {{- end -}}
+    {{- with (index . "x-oneof") -}}
+ OneOf: `{{ . }}`
     {{- end -}}
   {{- end -}}
   {{- if .Minimum -}}
@@ -52,6 +55,9 @@
   {{- with .Extensions -}}
     {{- with (index . "x-pattern-rules") -}}
     , format: `{{ . }}`
+    {{- end -}}
+    {{- with (index . "x-oneof") -}}
+    , oneof: `{{ . }}`
     {{- end -}}
   {{- end -}}
   {{- with .Minimum -}}

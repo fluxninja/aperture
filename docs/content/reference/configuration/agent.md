@@ -1383,7 +1383,7 @@ ListenerConfig holds configuration for socket listeners.
 <dt>network</dt>
 <dd>
 
-(string, default: `"tcp"`) TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
+(string, oneof: `tcp | tcp4 | tcp6`, default: `"tcp"`) TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
 
 </dd>
 </dl>
@@ -1398,7 +1398,7 @@ LogConfig holds configuration for a logger and log writers.
 <dt>level</dt>
 <dd>
 
-(string, default: `"info"`) Log level
+(string, oneof: `debug | DEBUG | info | INFO | warn | WARN | error | ERROR | fatal | FATAL | panic | PANIC | trace | TRACE | disabled | DISABLED`, default: `"info"`) Log level
 
 </dd>
 <dt>non_blocking</dt>
