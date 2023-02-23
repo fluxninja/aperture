@@ -25,9 +25,6 @@ local policyResource = latencyAIMDPolicy({
   flux_meter: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector),
   concurrency_controller+: {
     flow_selector: svcSelector,
-    default_config: {
-      dry_run: false,
-    },
   },
 }).policyResource;
 

@@ -3,14 +3,18 @@ definitions:
     AdaptivePolicy:
         properties:
             enabled:
+                default: false
                 description: Flag to enable the policy
                 type: boolean
                 x-go-name: Enabled
                 x-go-tag-default: "false"
                 x-go-tag-json: enabled
             factor:
+                default: 0.5
                 description: Factor sets user-configured limit of available memory
                 format: double
+                maximum: 1
+                minimum: 0
                 type: number
                 x-go-name: Factor
                 x-go-tag-default: "0.50"
@@ -22,11 +26,13 @@ definitions:
     AlertManagerClientConfig:
         properties:
             address:
+                pattern: ((^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)
                 type: string
                 x-go-name: Address
                 x-go-tag-json: address
                 x-go-tag-validate: hostname_port|url|fqdn
             base_path:
+                default: /
                 type: string
                 x-go-name: BasePath
                 x-go-tag-default: /
@@ -55,10 +61,13 @@ definitions:
     AlerterConfig:
         properties:
             channel_size:
+                default: 100
                 description: |-
                     ChannelSize size of the alerts channel in the alerter. Alerts should be
                     consumed from it quickly, so no big sizes are needed.
+                exclusiveMinimum: true
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: ChannelSize
                 x-go-tag-default: "100"
@@ -70,32 +79,40 @@ definitions:
     BackoffConfig:
         properties:
             base_delay:
+                default: 1s
                 description: Base Delay
                 format: string
+                minLength: 0
                 type: string
                 x-go-name: BaseDelay
                 x-go-tag-default: 1s
                 x-go-tag-json: base_delay
                 x-go-tag-validate: gte=0
             jitter:
+                default: 0.2
                 description: Jitter
                 format: double
+                minimum: 0
                 type: number
                 x-go-name: Jitter
                 x-go-tag-default: "0.2"
                 x-go-tag-json: jitter
                 x-go-tag-validate: gte=0
             max_delay:
+                default: 120s
                 description: Max Delay
                 format: string
+                minLength: 0
                 type: string
                 x-go-name: MaxDelay
                 x-go-tag-default: 120s
                 x-go-tag-json: max_delay
                 x-go-tag-validate: gte=0
             multiplier:
+                default: 1.6
                 description: Backoff multiplier
                 format: double
+                minimum: 0
                 type: number
                 x-go-name: Multiplier
                 x-go-tag-default: "1.6"
@@ -111,6 +128,7 @@ definitions:
                     SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
                     into smaller units.
                 format: uint32
+                minimum: 0
                 type: integer
                 x-go-name: SendBatchMaxSize
                 x-go-tag-default: "100"
@@ -118,15 +136,19 @@ definitions:
                 x-go-tag-validate: gte=0
             send_batch_size:
                 description: SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+                exclusiveMinimum: true
                 format: uint32
+                minimum: 0
                 type: integer
                 x-go-name: SendBatchSize
                 x-go-tag-default: "100"
                 x-go-tag-json: send_batch_size
                 x-go-tag-validate: gt=0
             timeout:
+                default: 1s
                 description: Timeout sets the time after which a batch will be sent regardless of size.
                 format: string
+                minLength: 1
                 type: string
                 x-go-name: Timeout
                 x-go-tag-default: 1s
@@ -193,11 +215,13 @@ definitions:
                 description: List of Etcd server endpoints
                 items:
                     type: string
+                minItems: 1
                 type: array
                 x-go-name: Endpoints
                 x-go-tag-json: endpoints
                 x-go-tag-validate: required,gt=0,dive,hostname_port|url|fqdn
             lease_ttl:
+                default: 60s
                 description: Lease time-to-live
                 format: string
                 type: string
@@ -228,14 +252,17 @@ definitions:
                 $ref: '#/definitions/BackoffConfig'
                 x-go-tag-json: backoff
             insecure:
+                default: false
                 description: Disable ClientTLS
                 type: boolean
                 x-go-name: Insecure
                 x-go-tag-default: "false"
                 x-go-tag-json: insecure
             min_connection_timeout:
+                default: 20s
                 description: Minimum connection timeout
                 format: string
+                minLength: 0
                 type: string
                 x-go-name: MinConnectionTimeout
                 x-go-tag-default: 20s
@@ -245,6 +272,7 @@ definitions:
                 $ref: '#/definitions/ClientTLSConfig'
                 x-go-tag-json: tls
             use_proxy:
+                default: false
                 description: Use HTTP CONNECT Proxy
                 type: boolean
                 x-go-name: UseProxy
@@ -257,7 +285,9 @@ definitions:
         description: GRPCGatewayConfig holds configuration for grpc-http gateway
         properties:
             grpc_server_address:
+                default: 0.0.0.0:1
                 description: GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
+                pattern: ^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$
                 type: string
                 x-go-name: GRPCAddr
                 x-go-tag-default: 0.0.0.0:1
@@ -268,6 +298,7 @@ definitions:
     GRPCServerConfig:
         properties:
             connection_timeout:
+                default: 120s
                 description: Connection timeout
                 format: string
                 type: string
@@ -276,16 +307,24 @@ definitions:
                 x-go-tag-json: connection_timeout
                 x-go-tag-validate: gte=0s
             enable_reflection:
+                default: false
                 description: Enable Reflection
                 type: boolean
                 x-go-name: EnableReflection
                 x-go-tag-default: "false"
                 x-go-tag-json: enable_reflection
             latency_buckets_ms:
+                default:
+                    - 10
+                    - 25
+                    - 100
+                    - 250
+                    - 1000
                 description: Buckets specification in latency histogram
                 items:
                     format: double
                     type: number
+                minItems: 0
                 type: array
                 x-go-name: LatencyBucketsMS
                 x-go-tag-default: '[10.0,25.0,100.0,250.0,1000.0]'
@@ -297,18 +336,21 @@ definitions:
     HTTPClientConfig:
         properties:
             disable_compression:
+                default: false
                 description: Disable Compression
                 type: boolean
                 x-go-name: DisableCompression
                 x-go-tag-default: "false"
                 x-go-tag-json: disable_compression
             disable_keep_alives:
+                default: false
                 description: Disable HTTP Keep Alives
                 type: boolean
                 x-go-name: DisableKeepAlives
                 x-go-tag-default: "false"
                 x-go-tag-json: disable_keep_alives
             expect_continue_timeout:
+                default: 1s
                 description: Expect Continue Timeout. 0 = no timeout.
                 format: string
                 type: string
@@ -317,6 +359,7 @@ definitions:
                 x-go-tag-json: expect_continue_timeout
                 x-go-tag-validate: gte=0s
             idle_connection_timeout:
+                default: 90s
                 description: Idle Connection Timeout. 0 = no timeout.
                 format: string
                 type: string
@@ -330,38 +373,47 @@ definitions:
                 x-go-name: KeyLogWriter
                 x-go-tag-json: key_log_file
             max_conns_per_host:
+                default: 0
                 description: Max Connections Per Host. 0 = no limit.
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: MaxConnsPerHost
                 x-go-tag-default: "0"
                 x-go-tag-json: max_conns_per_host
                 x-go-tag-validate: gte=0
             max_idle_connections:
+                default: 100
                 description: Max Idle Connections. 0 = no limit.
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: MaxIdleConns
                 x-go-tag-default: "100"
                 x-go-tag-json: max_idle_connections
                 x-go-tag-validate: gte=0
             max_idle_connections_per_host:
+                default: 5
                 description: Max Idle Connections per host. 0 = no limit.
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: MaxIdleConnsPerHost
                 x-go-tag-default: "5"
                 x-go-tag-json: max_idle_connections_per_host
                 x-go-tag-validate: gte=0
             max_response_header_bytes:
+                default: 0
                 description: Max Response Header Bytes. 0 = no limit.
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: MaxResponseHeaderBytes
                 x-go-tag-default: "0"
                 x-go-tag-json: max_response_header_bytes
                 x-go-tag-validate: gte=0
             network_keep_alive:
+                default: 30s
                 description: Network level keep-alive duration
                 format: string
                 type: string
@@ -370,6 +422,7 @@ definitions:
                 x-go-tag-json: network_keep_alive
                 x-go-tag-validate: gte=0s
             network_timeout:
+                default: 30s
                 description: Timeout for making network connection
                 format: string
                 type: string
@@ -382,14 +435,17 @@ definitions:
                 x-go-tag-json: proxy_connect_header,omitempty
                 x-go-tag-validate: omitempty
             read_buffer_size:
+                default: 0
                 description: Read Buffer Size. 0 = 4KB
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: ReadBufferSize
                 x-go-tag-default: "0"
                 x-go-tag-json: read_buffer_size
                 x-go-tag-validate: gte=0
             response_header_timeout:
+                default: 0s
                 description: Response Header Timeout. 0 = no timeout.
                 format: string
                 type: string
@@ -398,6 +454,7 @@ definitions:
                 x-go-tag-json: response_header_timeout
                 x-go-tag-validate: gte=0s
             timeout:
+                default: 60s
                 description: HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
                 format: string
                 type: string
@@ -409,6 +466,7 @@ definitions:
                 $ref: '#/definitions/ClientTLSConfig'
                 x-go-tag-json: tls
             tls_handshake_timeout:
+                default: 10s
                 description: TLS Handshake Timeout. 0 = no timeout
                 format: string
                 type: string
@@ -417,14 +475,17 @@ definitions:
                 x-go-tag-json: tls_handshake_timeout
                 x-go-tag-validate: gte=0s
             use_proxy:
+                default: false
                 description: Use Proxy
                 type: boolean
                 x-go-name: UseProxy
                 x-go-tag-default: "false"
                 x-go-tag-json: use_proxy
             write_buffer_size:
+                default: 0
                 description: Write Buffer Size. 0 = 4KB.
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: WriteBufferSize
                 x-go-tag-default: "0"
@@ -436,12 +497,14 @@ definitions:
     HTTPServerConfig:
         properties:
             disable_http_keep_alives:
+                default: false
                 description: Disable HTTP Keep Alives
                 type: boolean
                 x-go-name: DisableHTTPKeepAlives
                 x-go-tag-default: "false"
                 x-go-tag-json: disable_http_keep_alives
             idle_timeout:
+                default: 30s
                 description: Idle timeout
                 format: string
                 type: string
@@ -450,24 +513,34 @@ definitions:
                 x-go-tag-json: idle_timeout
                 x-go-tag-validate: gte=0s
             latency_buckets_ms:
+                default:
+                    - 10
+                    - 25
+                    - 100
+                    - 250
+                    - 1000
                 description: Buckets specification in latency histogram
                 items:
                     format: double
                     type: number
+                minItems: 0
                 type: array
                 x-go-name: LatencyBucketsMS
                 x-go-tag-default: '[10.0,25.0,100.0,250.0,1000.0]'
                 x-go-tag-json: latency_buckets_ms
                 x-go-tag-validate: gte=0
             max_header_bytes:
+                default: 1048576
                 description: Max header size in bytes
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: MaxHeaderBytes
                 x-go-tag-default: "1048576"
                 x-go-tag-json: max_header_bytes
                 x-go-tag-validate: gte=0
             read_header_timeout:
+                default: 10s
                 description: Read header timeout
                 format: string
                 type: string
@@ -476,6 +549,7 @@ definitions:
                 x-go-tag-json: read_header_timeout
                 x-go-tag-validate: gte=0s
             read_timeout:
+                default: 10s
                 description: Read timeout
                 format: string
                 type: string
@@ -484,6 +558,7 @@ definitions:
                 x-go-tag-json: read_timeout
                 x-go-tag-validate: gte=0s
             write_timeout:
+                default: 45s
                 description: Write timeout
                 format: string
                 type: string
@@ -512,15 +587,21 @@ definitions:
                 x-go-tag-json: adaptive_policy
             limit:
                 description: Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
+                exclusiveMinimum: true
                 format: uint64
+                minimum: 0
                 type: integer
                 x-go-name: Limit
                 x-go-tag-default: "268435456"
                 x-go-tag-json: limit
                 x-go-tag-validate: gt=0
             min_gogc:
+                default: 25
                 description: Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
+                exclusiveMinimum: true
                 format: int64
+                maximum: 100
+                minimum: 0
                 type: integer
                 x-go-name: MinGoGC
                 x-go-tag-default: "25"
@@ -536,15 +617,21 @@ definitions:
         properties:
             limit:
                 description: Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
+                exclusiveMinimum: true
                 format: uint64
+                minimum: 0
                 type: integer
                 x-go-name: Limit
                 x-go-tag-default: "268435456"
                 x-go-tag-json: limit
                 x-go-tag-validate: gt=0
             min_gogc:
+                default: 25
                 description: Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
+                exclusiveMinimum: true
                 format: int64
+                maximum: 100
+                minimum: 0
                 type: integer
                 x-go-name: MinGoGC
                 x-go-tag-default: "25"
@@ -557,6 +644,7 @@ definitions:
         description: JobConfig is config for Job
         properties:
             execution_period:
+                default: 10s
                 description: Time period between job executions. Zero or negative value means that the job will never execute periodically.
                 format: string
                 type: string
@@ -564,6 +652,7 @@ definitions:
                 x-go-tag-default: 10s
                 x-go-tag-json: execution_period
             execution_timeout:
+                default: 5s
                 description: Execution timeout
                 format: string
                 type: string
@@ -572,6 +661,7 @@ definitions:
                 x-go-tag-json: execution_timeout
                 x-go-tag-validate: gte=0s
             initially_healthy:
+                default: false
                 description: Sets whether the job is initially healthy
                 type: boolean
                 x-go-name: InitiallyHealthy
@@ -582,6 +672,7 @@ definitions:
     JobGroupConfig:
         properties:
             blocking_execution:
+                default: false
                 description: |-
                     When true, the scheduler will run jobs synchronously,
                     waiting for each execution instance of the job to return
@@ -592,6 +683,7 @@ definitions:
                 x-go-tag-default: "false"
                 x-go-tag-json: blocking_execution
             worker_limit:
+                default: 0
                 description: |-
                     Limits how many jobs can be running at the same time. This is
                     useful when running resource intensive jobs and a precise start time is
@@ -608,13 +700,16 @@ definitions:
     ListenerConfig:
         properties:
             addr:
+                default: :8080
                 description: Address to bind to in the form of [host%zone]:port
+                pattern: ^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$
                 type: string
                 x-go-name: Addr
                 x-go-tag-default: :8080
                 x-go-tag-json: addr
                 x-go-tag-validate: hostname_port
             keep_alive:
+                default: 180s
                 description: Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alive is disabled.
                 format: string
                 type: string
@@ -623,7 +718,12 @@ definitions:
                 x-go-tag-json: keep_alive
                 x-go-tag-validate: gte=0s
             network:
+                default: tcp
                 description: TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
+                enum:
+                    - tcp
+                    - tcp4
+                    - tcp6
                 type: string
                 x-go-name: Network
                 x-go-tag-default: tcp
@@ -635,19 +735,39 @@ definitions:
     LogConfig:
         properties:
             level:
+                default: info
                 description: Log level
+                enum:
+                    - debug
+                    - DEBUG
+                    - info
+                    - INFO
+                    - warn
+                    - WARN
+                    - error
+                    - ERROR
+                    - fatal
+                    - FATAL
+                    - panic
+                    - PANIC
+                    - trace
+                    - TRACE
+                    - disabled
+                    - DISABLED
                 type: string
                 x-go-name: LogLevel
                 x-go-tag-default: info
                 x-go-tag-json: level
                 x-go-tag-validate: oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED
             non_blocking:
+                default: true
                 description: Use non-blocking log writer (can lose logs at high throughput)
                 type: boolean
                 x-go-name: NonBlocking
                 x-go-tag-default: "true"
                 x-go-tag-json: non_blocking
             pretty_console:
+                default: false
                 description: 'Additional log writer: pretty console (stdout) logging (not recommended for prod environments)'
                 type: boolean
                 x-go-name: PrettyConsole
@@ -667,36 +787,44 @@ definitions:
     LogWriterConfig:
         properties:
             compress:
+                default: false
                 description: Compress
                 type: boolean
                 x-go-name: Compress
                 x-go-tag-default: "false"
                 x-go-tag-json: compress
             file:
+                default: stderr
                 description: Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
                 type: string
                 x-go-name: File
                 x-go-tag-default: stderr
                 x-go-tag-json: file
             max_age:
+                default: 7
                 description: Max age in days for log files
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: MaxAge
                 x-go-tag-default: "7"
                 x-go-tag-json: max_age
                 x-go-tag-validate: gte=0
             max_backups:
+                default: 3
                 description: Max log file backups
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: MaxBackups
                 x-go-tag-default: "3"
                 x-go-tag-json: max_backups
                 x-go-tag-validate: gte=0
             max_size:
+                default: 50
                 description: Log file max size in MB
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: MaxSize
                 x-go-tag-default: "50"
@@ -708,18 +836,21 @@ definitions:
     MetricsConfig:
         properties:
             enable_go_metrics:
+                default: false
                 description: EnableGoCollector controls whether the go collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewGoCollector>
                 type: boolean
                 x-go-name: EnableGoCollector
                 x-go-tag-default: "false"
                 x-go-tag-json: enable_go_metrics
             enable_process_collector:
+                default: false
                 description: EnableProcessCollector controls whether the process collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewProcessCollector>
                 type: boolean
                 x-go-name: EnableProcessCollector
                 x-go-tag-default: "false"
                 x-go-tag-json: enable_process_collector
             pedantic:
+                default: false
                 description: Pedantic controls whether a pedantic Registerer is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
                 type: boolean
                 x-go-name: Pedantic
@@ -731,6 +862,7 @@ definitions:
     MultiJobConfig:
         properties:
             execution_period:
+                default: 10s
                 description: Time period between job executions. Zero or negative value means that the job will never execute periodically.
                 format: string
                 type: string
@@ -738,6 +870,7 @@ definitions:
                 x-go-tag-default: 10s
                 x-go-tag-json: execution_period
             execution_timeout:
+                default: 5s
                 description: Execution timeout
                 format: string
                 type: string
@@ -746,6 +879,7 @@ definitions:
                 x-go-tag-json: execution_timeout
                 x-go-tag-validate: gte=0s
             initially_healthy:
+                default: false
                 description: Sets whether the job is initially healthy
                 type: boolean
                 x-go-name: InitiallyHealthy
@@ -757,6 +891,7 @@ definitions:
     PluginsConfig:
         properties:
             disable_plugins:
+                default: false
                 description: Disables all plugins
                 type: boolean
                 x-go-name: DisablePlugins
@@ -779,6 +914,7 @@ definitions:
                 x-go-tag-json: disabled_symbols,omitempty
                 x-go-tag-validate: omitempty
             plugins_path:
+                default: default
                 description: Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
                 type: string
                 x-go-name: PluginsPath
@@ -790,6 +926,7 @@ definitions:
     PolicyCommon:
         properties:
             enabled:
+                default: false
                 description: Flag to enable the policy
                 type: boolean
                 x-go-name: Enabled
@@ -803,6 +940,7 @@ definitions:
             debug_port:
                 description: Port on which otel collector exposes prometheus metrics on /metrics path.
                 format: uint32
+                minimum: 0
                 type: integer
                 x-go-name: DebugPort
                 x-go-tag-default: "8888"
@@ -811,6 +949,7 @@ definitions:
             health_check_port:
                 description: Port on which health check extension in exposed.
                 format: uint32
+                minimum: 0
                 type: integer
                 x-go-name: HealthCheckPort
                 x-go-tag-default: "13133"
@@ -819,6 +958,7 @@ definitions:
             pprof_port:
                 description: Port on which pprof extension in exposed.
                 format: uint32
+                minimum: 0
                 type: integer
                 x-go-name: PprofPort
                 x-go-tag-default: "1777"
@@ -827,6 +967,7 @@ definitions:
             zpages_port:
                 description: Port on which zpages extension in exposed.
                 format: uint32
+                minimum: 0
                 type: integer
                 x-go-name: ZpagesPort
                 x-go-tag-default: "55679"
@@ -838,18 +979,21 @@ definitions:
     ProfilersConfig:
         properties:
             cpu_profiler:
+                default: false
                 description: Flag to enable cpu profiling on process start and save it to a file. HTTP interface will not work if this is enabled as CPU profile will always be running.
                 type: boolean
                 x-go-name: CPUProfile
                 x-go-tag-default: "false"
                 x-go-tag-json: cpu_profiler
             profiles_path:
+                default: default
                 description: Path to save performance profiles. "default" path is `/var/log/aperture/<service>/profiles`.
                 type: string
                 x-go-name: ProfilesPath
                 x-go-tag-default: default
                 x-go-tag-json: profiles_path
             register_http_routes:
+                default: true
                 description: Register routes. Profile types profile, symbol and cmdline will be registered at /debug/pprof/{profile,symbol,cmdline}.
                 type: boolean
                 x-go-name: RegisterHTTPRoutes
@@ -862,6 +1006,7 @@ definitions:
         properties:
             address:
                 description: Address of the prometheus server
+                pattern: ((^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)
                 type: string
                 x-go-name: Address
                 x-go-tag-json: address
@@ -875,11 +1020,13 @@ definitions:
         description: This configuration has preference over environment variables HTTP_PROXY, HTTPS_PROXY or NO_PROXY. See <https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config>
         properties:
             http:
+                pattern: ((^$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)
                 type: string
                 x-go-name: HTTPProxy
                 x-go-tag-json: http
                 x-go-tag-validate: omitempty,url|hostname_port
             https:
+                pattern: ((^$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)
                 type: string
                 x-go-name: HTTPSProxy
                 x-go-tag-json: https
@@ -897,6 +1044,7 @@ definitions:
     SchedulerConfig:
         properties:
             blocking_execution:
+                default: false
                 description: |-
                     When true, the scheduler will run jobs synchronously,
                     waiting for each execution instance of the job to return
@@ -907,6 +1055,7 @@ definitions:
                 x-go-tag-default: "false"
                 x-go-tag-json: blocking_execution
             worker_limit:
+                default: 0
                 description: |-
                     Limits how many jobs can be running at the same time. This is
                     useful when running resource intensive jobs and a precise start time is
@@ -924,6 +1073,7 @@ definitions:
         properties:
             allowed_cn:
                 description: Allowed CN
+                pattern: (^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)
                 type: string
                 x-go-name: AllowedCN
                 x-go-tag-json: allowed_cn
@@ -939,6 +1089,7 @@ definitions:
                 x-go-name: ClientCAFile
                 x-go-tag-json: client_ca_file
             enabled:
+                default: false
                 description: Enabled TLS
                 type: boolean
                 x-go-name: Enabled
@@ -983,12 +1134,21 @@ definitions:
     WatermarksPolicy:
         properties:
             enabled:
+                default: false
                 description: Flag to enable the policy
                 type: boolean
                 x-go-name: Enabled
                 x-go-tag-default: "false"
                 x-go-tag-json: enabled
             watermarks:
+                default:
+                    - 0.5
+                    - 0.75
+                    - 0.8
+                    - 0.85
+                    - 0.9
+                    - 0.95
+                    - 0.99
                 description: Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
                 items:
                     format: double

@@ -33,8 +33,3 @@ policy:
         # Type: string
         # Required: True
         control_point: __REQUIRED_FIELD__
-    alerter:
-      # Name for alerter.
-      # Type: string
-      # Required: True
-      alert_name: "Load Shed Event"

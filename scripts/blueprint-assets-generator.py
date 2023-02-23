@@ -266,7 +266,7 @@ SECTION_TPL = """
     name="{{ param.param_name }}"
     type="{{ param.param_type }}"
     reference="{{ param.spec_link }}"
-    value="{{ param.default | quoteValue }}"
+    value="{{ param.default | quoteValueDocs }}"
     description='{{ param.description }}' />
 
 {%- endfor %}
@@ -321,6 +321,7 @@ JSON_SCHEMA_TPL = """
 }
 {%- else %}
 "description": "{{ node.parameter.description }}",
+"default": {{ node.parameter.default | quoteValueJSON }},
 {{- render_type(node.parameter.param_type, node.parameter.json_schema_link) }}
 {%- endif %}
 }
@@ -353,7 +354,7 @@ YAML_TPL = """
 {{ '  ' * (level) }}{{ key }}: {{ render_value(val, level+1) }}
 {%- endfor %}
 {%- else %}
-{{- value | quoteValue }}
+{{- value | quoteValueYAML }}
 {%- endif %}
 {%- endmacro %}
 {%- macro render_node(node, level) %}
@@ -380,7 +381,20 @@ YAML_TPL = """
 {%- endfor %}
 """
 
-def quoteValue(value: str) -> str:
+def quoteValueYAML(value: str) -> str:
+    # if value is __REQUIRED_FIELD__ return as unquoted string
+    if value == "__REQUIRED_FIELD__":
+        return value
+    return quoteValueJSON(value)
+
+def quoteValueJSON(value: str) -> str:
+    return json.dumps(value)
+
+def quoteValueDocs(value: str) -> str:
+    # if value is __REQUIRED_FIELD__ return as unquoted string
+    if value == "__REQUIRED_FIELD__":
+        return value
+
     if isinstance(value, bool):
         return str(value).lower()
 
@@ -398,18 +412,16 @@ def quoteValue(value: str) -> str:
 
     if isinstance(value, list) or isinstance(value, dict):
         return value
-    # if value is __REQUIRED_FIELD__ return as unquoted string
-    if value == "__REQUIRED_FIELD__":
-        return value
 
     return f"\'{value}\'"
-
 
 def get_jinja2_environment() -> jinja2.Environment:
     JINJA2_TEMPLATES = {"section.md.j2": SECTION_TPL, "values.yaml.j2": YAML_TPL, "definitions.json.j2": JSON_SCHEMA_TPL}
     loader = jinja2.DictLoader(JINJA2_TEMPLATES)
     env = jinja2.Environment(loader=loader)
-    env.filters["quoteValue"] = quoteValue
+    env.filters["quoteValueYAML"] = quoteValueYAML
+    env.filters["quoteValueJSON"] = quoteValueJSON
+    env.filters["quoteValueDocs"] = quoteValueDocs
     return env
 
 
