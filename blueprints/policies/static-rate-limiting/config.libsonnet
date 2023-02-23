@@ -10,11 +10,9 @@
   /**
   * @section Policy
   *
-  * @param (policy.evaluation_interval: string) How often should the policy be re-evaluated
   * @param (policy.classifiers: []aperture.spec.v1.Classifier) List of classification rules.
   */
   policy: {
-    evaluation_interval: '300s',
     classifiers: [],
     /**
     * @section Policy
@@ -32,7 +30,6 @@
       rate_limit: '__REQUIRED_FIELD__',
       flow_selector: {
         service_selector: {
-          agent_group: 'default',
           service: '__REQUIRED_FIELD__',
         },
         flow_matcher: {
@@ -42,10 +39,6 @@
       parameters: {
         limit_reset_interval: '1s',
         label_key: '__REQUIRED_FIELD__',
-        lazy_sync: {
-          enabled: true,
-          num_sync: 5,
-        },
       },
       default_config: {
         overrides: [],

@@ -43,8 +43,8 @@
   {{- if .Required -}}
  Required: `✓`
   {{- end -}}
-  {{- if (index .Extensions "x-go-validate")  -}}
- `{{ index .Extensions "x-go-validate" }}`
+  {{- if (index .Extensions "x-go-tag-validate")  -}}
+ `{{ index .Extensions "x-go-tag-validate" }}`
   {{- end -}}
 {{- end -}}
 
@@ -63,7 +63,7 @@
     , **required**
   {{- end -}}
   {{- with .Extensions }}
-    {{- with (index . "x-go-validate")  -}}
+    {{- with (index . "x-go-tag-validate")  -}}
       , `{{ . }}`
     {{- end -}}
   {{- end -}}
@@ -73,20 +73,12 @@
   {{- if .Default -}}
  Default: `{{ json .Default }}`
   {{- end -}}
-  {{- if (index .Extensions "x-go-default") -}}
- `{{ index .Extensions "x-go-default" }}`
-  {{- end -}}
 {{- end -}}
 
 {{/* Like fnDefault, but appropriate to rendering within body of text */ -}}
 {{- define "fnDefaultInline" }}
   {{- with .Default -}}
     , default: `{{ json . }}`
-  {{- end -}}
-  {{- with .Extensions }}
-    {{- with (index . "x-go-default") -}}
-      , default: `{{ . }}`
-    {{- end -}}
   {{- end -}}
 {{- end -}}
 

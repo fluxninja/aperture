@@ -20,7 +20,7 @@ function(cfg) {
                            + resources.withClassifiers(params.classifiers))
     + policy.withCircuit(
       circuit.new()
-      + circuit.withEvaluationInterval(params.evaluation_interval)
+      + circuit.withEvaluationInterval('1s')
       + circuit.withComponents([
         component.withFlowControl(
           flowControl.new()

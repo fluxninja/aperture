@@ -523,6 +523,8 @@ github.com/felixge/httpsnoop v1.0.3/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSw
 github.com/flowstack/go-jsonschema v0.1.1/go.mod h1:yL7fNggx1o8rm9RlgXv7hTBWxdBM0rVwpMwimd3F3N0=
 github.com/fluxninja/datasketches-go v0.0.0-20220916235224-7501a2d28551 h1:36dbH3YM42lTv2n35xGwfVnSQ5zqW4BbzR6VYLFmsS8=
 github.com/fluxninja/datasketches-go v0.0.0-20220916235224-7501a2d28551/go.mod h1:OiaOzKtscjnrkm40xpAB11hg/RFJ9tU+ujFeAivDM3g=
+github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1 h1:aZbbKMGqnRUQubdJS5tfoZrGRVcoYR9J6IzBeZ4SB58=
+github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1/go.mod h1:Qrdw/7mOFS2SKCOALKFfEH8gdvXJi8XZjw9g5ilpf4I=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814 h1:AHC1PtYLUw9PWqmgB9VHcxzGEm1GDYGXzC1PRtgIqqs=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814/go.mod h1:kARLh/xWGaisrwkOGOWKcqk7fagFUFthOTX7mIFVJlw=
 github.com/fluxninja/opentelemetry-collector v0.71.0-fn.patch.3 h1:u3cwH+PlbavfBVOkmh6gaPYD0JCY54ily0ePOW+s6/g=
@@ -1034,8 +1036,6 @@ github.com/json-iterator/go v1.1.10/go.mod h1:KdQUCv79m/52Kvf8AW2vK1V8akMuk1QjK/
 github.com/json-iterator/go v1.1.11/go.mod h1:KdQUCv79m/52Kvf8AW2vK1V8akMuk1QjK/uOdHXbAo4=
 github.com/json-iterator/go v1.1.12 h1:PV8peI4a0ysnczrg+LtxykD8LfKY9ML6u2jnxaEnrnM=
 github.com/json-iterator/go v1.1.12/go.mod h1:e30LSqwooZae/UwlEbR2852Gd8hjQvJoHmT4TnhNGBo=
-github.com/jsonnet-bundler/jsonnet-bundler v0.5.1 h1:eUd6EA1Qzz73Q4NLNLOrNkMb96+6NTTERbX9lqaxVwk=
-github.com/jsonnet-bundler/jsonnet-bundler v0.5.1/go.mod h1:Qrdw/7mOFS2SKCOALKFfEH8gdvXJi8XZjw9g5ilpf4I=
 github.com/jstemmer/go-junit-report v0.0.0-20190106144839-af01ea7f8024/go.mod h1:6v2b51hI/fHJwM22ozAgKL4VKDeJcHhJFhtBdhmNjmU=
 github.com/jstemmer/go-junit-report v0.9.1/go.mod h1:Brl9GWCQeLvo8nXZwPNNblvFj/XSXhF0NWZEnDohbsk=
 github.com/jtolds/gls v4.20.0+incompatible/go.mod h1:QJZ7F/aHp+rZTRtaJ1ow/lLfFfVYBRgL+9YlvaHOwJU=

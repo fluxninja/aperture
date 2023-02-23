@@ -54,14 +54,7 @@ local policyResource = latencyAIMDPolicy({
   flux_meter: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector),
   concurrency_controller+: {
     flow_selector: svcSelector,
-    default_config: {
-      dry_run: false,
-    },
     scheduler+: {
-      timeout_factor: 0.5,
-      default_workload_parameters: {
-        priority: 20,
-      },
       workloads: [
         workload.new()
         + workload.withParameters(workloadParameters.withPriority(50))

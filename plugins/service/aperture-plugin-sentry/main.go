@@ -1,4 +1,5 @@
 //go:generate swagger generate spec --scan-models --include="github.com/fluxninja/aperture/plugins/service/aperture-plugin-sentry/*" --include-tag=plugin-configuration -o ../../../docs/gen/config/aperture-plugin-sentry/plugin-swagger.yaml
+//go:generate go run ../../../docs/tools/swagger/process-go-tags.go ../../../docs/gen/config/aperture-plugin-sentry/plugin-swagger.yaml
 
 // Sentry Plugin
 //   BasePath: /aperture-controller

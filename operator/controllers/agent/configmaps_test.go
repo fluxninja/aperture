@@ -19,6 +19,7 @@ package agent
 import (
 	"bytes"
 	_ "embed"
+	"encoding/json"
 	"fmt"
 	"text/template"
 	"time"
@@ -151,7 +152,14 @@ var _ = Describe("ConfigMap for Agent", func() {
 			result, err := configMapForAgentConfig(instance.DeepCopy(), scheme.Scheme)
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(result.Data).To(Equal(expected.Data))
+
+			resultByte, err := json.Marshal(result.Data)
+			Expect(err).NotTo(HaveOccurred())
+
+			expectedByte, err := json.Marshal(expected.Data)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(resultByte).Should(MatchYAML(expectedByte))
 		})
 	})
 })

@@ -10,9 +10,6 @@ common:
   policy_name: "graphql-static-rate-limiting"
 
 policy:
-  # How often should the policy be re-evaluated
-  # Type: string
-  evaluation_interval: 0.5s
   # List of classification rules.
   # Type: []aperture.spec.v1.Classifier
   classifiers:

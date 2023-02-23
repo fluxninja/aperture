@@ -15,5 +15,3 @@ policy:
         service: service1-demo-app.demoapp.svc.cluster.local
       flow_matcher:
         control_point: ingress
-    default_config:
-      dry_run: false

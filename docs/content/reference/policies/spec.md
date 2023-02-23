@@ -67,9 +67,7 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector), `required`) Flow Selector decides the service and flows at which the concurrency limiter is applied.
-
-@gotags: validate:"required"
+([FlowSelector](#flow-selector), **required**, `required`) Flow Selector decides the service and flows at which the concurrency limiter is applied.
 
 </dd>
 <dt>gradient_parameters</dt>
@@ -93,15 +91,11 @@ High level concurrency control component. Baselines a signal via exponential mov
 
 (float64, default: `0.0025`) Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
 
-@gotags: default:"0.0025"
-
 </dd>
 <dt>max_load_multiplier</dt>
 <dd>
 
 (float64, default: `2`) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
-
-@gotags: default:"2.0"
 
 </dd>
 <dt>out_ports</dt>
@@ -113,9 +107,7 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dt>scheduler_parameters</dt>
 <dd>
 
-([SchedulerParameters](#scheduler-parameters), `required`) Scheduler parameters.
-
-@gotags: validate:"required"
+([SchedulerParameters](#scheduler-parameters), **required**, `required`) Scheduler parameters.
 
 </dd>
 </dl>
@@ -203,9 +195,7 @@ from: "source.address # or destination.address"
 <dt>from</dt>
 <dd>
 
-(string, `required`) Attribute path pointing to some string - eg. "source.address".
-
-@gotags: validate:"required"
+(string, **required**, `required`) Attribute path pointing to some string - eg. "source.address".
 
 </dd>
 </dl>
@@ -226,9 +216,7 @@ Alerter reacts to a signal and generates alert to send to alert manager.
 <dt>parameters</dt>
 <dd>
 
-([AlerterParameters](#alerter-parameters), `required`) Alerter configuration
-
-@gotags: validate:"required"
+([AlerterParameters](#alerter-parameters), **required**, `required`) Alerter configuration
 
 </dd>
 </dl>
@@ -264,9 +252,7 @@ Alerter Parameters is a common config for separate alerter components and alerte
 <dt>alert_name</dt>
 <dd>
 
-(string, `required`) Name of the alert.
-
-@gotags: validate:"required"
+(string, **required**, `required`) Name of the alert.
 
 </dd>
 <dt>labels</dt>
@@ -278,17 +264,13 @@ Alerter Parameters is a common config for separate alerter components and alerte
 <dt>resolve_timeout</dt>
 <dd>
 
-(string, default: `10s`) Duration of alert resolver.
-
-@gotags: default:"10s"
+(string, default: `"5s"`) Duration of alert resolver.
 
 </dd>
 <dt>severity</dt>
 <dd>
 
-(string, `oneof=info warn crit`, default: `info`) Severity of the alert, one of 'info', 'warn' or 'crit'.
-
-@gotags: default:"info" validate:"oneof=info warn crit"
+(string, `oneof=info warn crit`, default: `"info"`) Severity of the alert, one of 'info', 'warn' or 'crit'.
 
 </dd>
 </dl>
@@ -339,9 +321,7 @@ Inputs for the And component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port)) Array of input signals.
-
-@gotags: validate:"dive"
+([[]InPort](#in-port), `dive`) Array of input signals.
 
 </dd>
 </dl>
@@ -383,8 +363,6 @@ Type of combinator that computes the arithmetic operation on the operand signals
 
 The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
 In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
-
-@gotags: validate:"oneof=add sub mul div xor lshift rshift"
 
 </dd>
 <dt>out_ports</dt>
@@ -486,18 +464,14 @@ docs on how exactly it handles invalid inputs.
 <dt>components</dt>
 <dd>
 
-([[]Component](#component)) Defines a signal processing graph as a list of components.
-
-@gotags: validate:"dive"
+([[]Component](#component), `dive`) Defines a signal processing graph as a list of components.
 
 </dd>
 <dt>evaluation_interval</dt>
 <dd>
 
-(string, default: `0.5s`) Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
+(string, default: `"0.5s"`) Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
 This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
-
-@gotags: default:"0.5s"
 
 </dd>
 </dl>
@@ -510,19 +484,15 @@ This interval is typically aligned with how often the corrective action (actuati
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector), `required`) Defines where to apply the flow classification rule.
-
-@gotags: validate:"required"
+([FlowSelector](#flow-selector), **required**, `required`) Defines where to apply the flow classification rule.
 
 </dd>
 <dt>rules</dt>
 <dd>
 
-(map of [Rule](#rule), `required,gt=0,dive,keys,required,endkeys,required`) A map of {key, value} pairs mapping from
+(map of [Rule](#rule), **required**, `required,gt=0,dive,keys,required,endkeys,required`) A map of {key, value} pairs mapping from
 [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
 how to extract and propagate flow labels with that key.
-
-@gotags: validate:"required,gt=0,dive,keys,required,endkeys,required"
 
 </dd>
 </dl>
@@ -759,9 +729,7 @@ strategy and a scheduler. Right now, only `load_actuator` strategy is available.
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector), `required`) Flow Selector decides the service and flows at which the concurrency limiter is applied.
-
-@gotags: validate:"required"
+([FlowSelector](#flow-selector), **required**, `required`) Flow Selector decides the service and flows at which the concurrency limiter is applied.
 
 </dd>
 <dt>load_actuator</dt>
@@ -775,12 +743,10 @@ Actuation strategy defines the input signal that will drive the scheduler.
 <dt>scheduler</dt>
 <dd>
 
-([Scheduler](#scheduler), `required`) Configuration of Weighted Fair Queuing-based workload scheduler.
+([Scheduler](#scheduler), **required**, `required`) Configuration of Weighted Fair Queuing-based workload scheduler.
 
 Contains configuration of per-agent scheduler, and also defines some
 output signals.
-
-@gotags: validate:"required"
 
 </dd>
 </dl>
@@ -795,7 +761,7 @@ Special constant input for ports and Variable component. Can provide either a co
 <dt>special_value</dt>
 <dd>
 
-(string, `oneof=NaN +Inf -Inf`) @gotags: validate:"oneof=NaN +Inf -Inf"
+(string) @gotags: validate:"oneof=NaN +Inf -Inf"
 
 </dd>
 <dt>value</dt>
@@ -824,10 +790,8 @@ instantaneous.
 <dt>false_for</dt>
 <dd>
 
-(string, default: `0s`) Duration of time to wait before a transition to false state.
+(string, default: `"0s"`) Duration of time to wait before a transition to false state.
 If the duration is zero, the transition will happen instantaneously.
-
-@gotags: default:"0s"
 
 </dd>
 <dt>in_ports</dt>
@@ -841,8 +805,6 @@ If the duration is zero, the transition will happen instantaneously.
 
 (string, `oneof=gt lt gte lte eq neq`) Comparison operator that computes operation on lhs and rhs input signals.
 
-@gotags: validate:"oneof=gt lt gte lte eq neq"
-
 </dd>
 <dt>out_ports</dt>
 <dd>
@@ -853,10 +815,8 @@ If the duration is zero, the transition will happen instantaneously.
 <dt>true_for</dt>
 <dd>
 
-(string, default: `0s`) Duration of time to wait before a transition to true state.
+(string, default: `"0s"`) Duration of time to wait before a transition to true state.
 If the duration is zero, the transition will happen instantaneously.
-
-@gotags: default:"0s"
 
 </dd>
 </dl>
@@ -919,9 +879,7 @@ Differentiator calculates rate of change per tick.
 <dt>window</dt>
 <dd>
 
-(string, default: `5s`) The window of time over which differentiator operates.
-
-@gotags: default:"5s"
+(string, default: `"5s"`) The window of time over which differentiator operates.
 
 </dd>
 </dl>
@@ -1002,9 +960,7 @@ $$
 <dt>parameters</dt>
 <dd>
 
-([EMAParameters](#e-m-a-parameters), `required`) Parameters for the EMA component.
-
-@gotags: validate:"required"
+([EMAParameters](#e-m-a-parameters), **required**, `required`) Parameters for the EMA component.
 
 </dd>
 </dl>
@@ -1075,23 +1031,17 @@ Parameters for the EMA component.
 
 (float64, `gte=0,lte=1.0`, default: `1`) Correction factor to apply on the output value if its in violation of the max envelope.
 
-@gotags: validate:"gte=0,lte=1.0" default:"1.0"
-
 </dd>
 <dt>correction_factor_on_min_envelope_violation</dt>
 <dd>
 
 (float64, `gte=1.0`, default: `1`) Correction factor to apply on the output value if its in violation of the min envelope.
 
-@gotags: validate:"gte=1.0" default:"1.0"
-
 </dd>
 <dt>ema_window</dt>
 <dd>
 
-(string, default: `5s`) Duration of EMA sampling window.
-
-@gotags: default:"5s"
+(string, **required**, `required`) Duration of EMA sampling window.
 
 </dd>
 <dt>valid_during_warmup</dt>
@@ -1099,17 +1049,13 @@ Parameters for the EMA component.
 
 (bool) Whether the output is valid during the warm up stage.
 
-@gotags: default:"false"
-
 </dd>
 <dt>warmup_window</dt>
 <dd>
 
-(string, default: `0s`) Duration of EMA warming up window.
+(string, **required**, `required`) Duration of EMA warming up window.
 
 The initial value of the EMA is the average of signal readings received during the warm up window.
-
-@gotags: default:"0s"
 
 </dd>
 </dl>
@@ -1124,9 +1070,7 @@ Label selector expression of the equal form "label == value".
 <dt>label</dt>
 <dd>
 
-(string, `required`) Name of the label to equal match the value.
-
-@gotags: validate:"required"
+(string, **required**, `required`) Name of the label to equal match the value.
 
 </dd>
 <dt>value</dt>
@@ -1221,9 +1165,7 @@ It does so until `maximum_extrapolation_interval` is reached, beyond which it em
 <dt>parameters</dt>
 <dd>
 
-([ExtrapolatorParameters](#extrapolator-parameters), `required`) Parameters for the Extrapolator component.
-
-@gotags: validate:"required"
+([ExtrapolatorParameters](#extrapolator-parameters), **required**, `required`) Parameters for the Extrapolator component.
 
 </dd>
 </dl>
@@ -1268,9 +1210,7 @@ Parameters for the Extrapolator component.
 <dt>max_extrapolation_interval</dt>
 <dd>
 
-(string, default: `10s`) Maximum time interval to repeat the last valid value of input signal.
-
-@gotags: default:"10s"
+(string, **required**, `required`) Maximum time interval to repeat the last valid value of input signal.
 
 </dd>
 </dl>
@@ -1306,9 +1246,7 @@ Inputs for the FirstValid component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port)) Array of input signals.
-
-@gotags: validate:"dive"
+([[]InPort](#in-port), `dive`) Array of input signals.
 
 </dd>
 </dl>
@@ -1389,12 +1327,10 @@ label_matcher:
 <dt>control_point</dt>
 <dd>
 
-(string, `required`) [Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)
+(string, **required**, `required`) [Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)
 identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
 block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
 or filter chains.
-
-@gotags: validate:"required"
 
 </dd>
 <dt>label_matcher</dt>
@@ -1444,13 +1380,13 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 <dt>flow_matcher</dt>
 <dd>
 
-([FlowMatcher](#flow-matcher), `required`) @gotags: validate:"required"
+([FlowMatcher](#flow-matcher)) @gotags: validate:"required"
 
 </dd>
 <dt>service_selector</dt>
 <dd>
 
-([ServiceSelector](#service-selector), `required`) @gotags: validate:"required"
+([ServiceSelector](#service-selector)) @gotags: validate:"required"
 
 </dd>
 </dl>
@@ -1463,7 +1399,7 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 <dt>attribute_key</dt>
 <dd>
 
-(string, default: `workload_duration_ms`) Key of the attribute in access log or span from which the metric for this flux meter is read.
+(string, default: `"workload_duration_ms"`) Key of the attribute in access log or span from which the metric for this flux meter is read.
 
 :::info
 
@@ -1471,8 +1407,6 @@ For list of available attributes in Envoy access logs, refer
 [Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)
 
 :::
-
-@gotags: default:"workload_duration_ms"
 
 </dd>
 <dt>exponential_buckets</dt>
@@ -1521,23 +1455,17 @@ bucket is not counted.
 
 (int32, `gt=0`) Number of buckets.
 
-@gotags: validate:"gt=0"
-
 </dd>
 <dt>factor</dt>
 <dd>
 
 (float64, `gt=1.0`) Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
 
-@gotags: validate:"gt=1.0"
-
 </dd>
 <dt>start</dt>
 <dd>
 
-(float64, `gt=0`) Upper bound of the lowest bucket.
-
-@gotags: validate:"gt=0.0"
+(float64, `gt=0.0`) Upper bound of the lowest bucket.
 
 </dd>
 </dl>
@@ -1555,8 +1483,6 @@ bucket is `max`. The final +inf bucket is not counted.
 
 (int32, `gt=0`) Number of buckets.
 
-@gotags: validate:"gt=0"
-
 </dd>
 <dt>max</dt>
 <dd>
@@ -1567,9 +1493,7 @@ bucket is `max`. The final +inf bucket is not counted.
 <dt>min</dt>
 <dd>
 
-(float64, `gt=0`) Lowest bucket.
-
-@gotags: validate:"gt=0.0"
+(float64, `gt=0.0`) Lowest bucket.
 
 </dd>
 </dl>
@@ -1586,8 +1510,6 @@ upper bound of `start`. The final +inf bucket is not counted.
 <dd>
 
 (int32, `gt=0`) Number of buckets.
-
-@gotags: validate:"gt=0"
 
 </dd>
 <dt>start</dt>
@@ -1614,7 +1536,7 @@ StaticBuckets holds the static value of the buckets where latency histogram will
 <dt>buckets</dt>
 <dd>
 
-([]float64, default: `[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]`) @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
+([]float64) @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
 
 </dd>
 </dl>
@@ -1676,9 +1598,7 @@ The output can be _optionally_ clamped to desired range using `max` and
 <dt>parameters</dt>
 <dd>
 
-([GradientControllerParameters](#gradient-controller-parameters), `required`) Gradient Parameters.
-
-@gotags: validate:"required"
+([GradientControllerParameters](#gradient-controller-parameters), **required**, `required`) Gradient Parameters.
 
 </dd>
 </dl>
@@ -1695,8 +1615,6 @@ Dynamic Configuration for a Controller
 
 (bool) Decides whether the controller runs in "manual_mode".
 In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
-
-@gotags: default:"false"
 
 </dd>
 </dl>
@@ -1775,21 +1693,17 @@ Gradient Parameters.
 
 (float64, default: `1.7976931348623157e+308`) Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
 
-@gotags: default:"1.79769313486231570814527423731704356798070e+308"
-
 </dd>
 <dt>min_gradient</dt>
 <dd>
 
 (float64, default: `-1.7976931348623157e+308`) Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
 
-@gotags: default:"-1.79769313486231570814527423731704356798070e+308"
-
 </dd>
 <dt>slope</dt>
 <dd>
 
-(float64, `required`) Slope controls the aggressiveness and direction of the Gradient Controller.
+(float64, **required**, `required`) Slope controls the aggressiveness and direction of the Gradient Controller.
 
 Slope is used as exponent on the signal to setpoint ratio in computation
 of the gradient (see the [main description](#gradient-controller) for
@@ -1834,8 +1748,6 @@ so the _slope_ might not fully describe aggressiveness of the controller.
 
 :::
 
-@gotags: validate:"required"
-
 </dd>
 </dl>
 
@@ -1850,9 +1762,7 @@ If it's holding a value that means it ignores both valid and invalid new signals
 <dt>hold_for</dt>
 <dd>
 
-(string, default: `5s`) Holding the last valid signal value for the hold_for duration.
-
-@gotags: default:"5s"
+(string, default: `"5s"`) Holding the last valid signal value for the hold_for duration.
 
 </dd>
 <dt>in_ports</dt>
@@ -2022,9 +1932,7 @@ Inputs for the Inverter component.
 <dt>input</dt>
 <dd>
 
-([InPort](#in-port)) Signal to be negated.
-
-@gotags: validate:"dive"
+([InPort](#in-port), `dive`) Signal to be negated.
 
 </dd>
 </dl>
@@ -2063,9 +1971,7 @@ pointer: /user/name
 <dt>from</dt>
 <dd>
 
-(string, `required`) Attribute path pointing to some strings - eg. "request.http.body".
-
-@gotags: validate:"required"
+(string, **required**, `required`) Attribute path pointing to some strings - eg. "request.http.body".
 
 </dd>
 <dt>pointer</dt>
@@ -2101,9 +2007,7 @@ json_pointer: /user/email
 <dt>from</dt>
 <dd>
 
-(string, `required`) Jwt token can be pulled from any input attribute, but most likely you'd want to use "request.http.bearer".
-
-@gotags: validate:"required"
+(string, **required**, `required`) Jwt token can be pulled from any input attribute, but most likely you'd want to use "request.http.bearer".
 
 </dd>
 <dt>json_pointer</dt>
@@ -2127,9 +2031,7 @@ Label selector requirement which is a selector that contains values, a key, and 
 <dt>key</dt>
 <dd>
 
-(string, `required`) Label key that the selector applies to.
-
-@gotags: validate:"required"
+(string, **required**, `required`) Label key that the selector applies to.
 
 </dd>
 <dt>operator</dt>
@@ -2137,8 +2039,6 @@ Label selector requirement which is a selector that contains values, a key, and 
 
 (string, `oneof=In NotIn Exists DoesNotExists`) Logical operator which represents a key's relationship to a set of values.
 Valid operators are In, NotIn, Exists and DoesNotExist.
-
-@gotags: validate:"oneof=In NotIn Exists DoesNotExists"
 
 </dd>
 <dt>values</dt>
@@ -2162,42 +2062,32 @@ component should apply to.
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
+(string, default: `"default"`) Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
 selector applies to.
-
-@gotags: default:"default"
 
 </dd>
 <dt>api_version</dt>
 <dd>
 
-(string, `required`) API version of Kubernetes resource
-
-@gotags: validate:"required"
+(string, **required**, `required`) API version of Kubernetes resource
 
 </dd>
 <dt>kind</dt>
 <dd>
 
-(string, `required`) Kubernetes resource type.
-
-@gotags: validate:"required"
+(string, **required**, `required`) Kubernetes resource type.
 
 </dd>
 <dt>name</dt>
 <dd>
 
-(string, `required`) Kubernetes resource name.
-
-@gotags: validate:"required"
+(string, **required**, `required`) Kubernetes resource name.
 
 </dd>
 <dt>namespace</dt>
 <dd>
 
-(string, `required`) Kubernetes namespace that the resource belongs to.
-
-@gotags: validate:"required"
+(string, **required**, `required`) Kubernetes namespace that the resource belongs to.
 
 </dd>
 </dl>
@@ -2343,9 +2233,7 @@ all:
 <dt>label_exists</dt>
 <dd>
 
-(string, `required`) The expression is true when label with given name exists.
-
-@gotags: validate:"required"
+(string, **required**, `required`) The expression is true when label with given name exists.
 
 </dd>
 <dt>label_matches</dt>
@@ -2389,18 +2277,14 @@ Label selector expression of the matches form "label matches regex".
 <dt>label</dt>
 <dd>
 
-(string, `required`) Name of the label to match the regular expression.
-
-@gotags: validate:"required"
+(string, **required**, `required`) Name of the label to match the regular expression.
 
 </dd>
 <dt>regex</dt>
 <dd>
 
-(string, `required`) Regular expression that should match the label value.
+(string, **required**, `required`) Regular expression that should match the label value.
 It uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
-
-@gotags: validate:"required"
 
 </dd>
 </dl>
@@ -2438,9 +2322,7 @@ Inputs for the Max component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port)) Array of input signals.
-
-@gotags: validate:"dive"
+([[]InPort](#in-port), `dive`) Array of input signals.
 
 </dd>
 </dl>
@@ -2492,9 +2374,7 @@ Inputs for the Min component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port)) Array of input signals.
-
-@gotags: validate:"dive"
+([[]InPort](#in-port), `dive`) Array of input signals.
 
 </dd>
 </dl>
@@ -2658,9 +2538,7 @@ Inputs for the Or component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port)) Array of input signals.
-
-@gotags: validate:"dive"
+([[]InPort](#in-port), `dive`) Array of input signals.
 
 </dd>
 </dl>
@@ -2711,7 +2589,7 @@ In case of multiple path templates matching, the most specific one will be chose
 <dt>template_values</dt>
 <dd>
 
-(map of string, `required`) Template value keys are OpenAPI-inspired path templates.
+(map of string, `gt=0,dive,keys,required,endkeys,required`) Template value keys are OpenAPI-inspired path templates.
 
 - Static path segment `/foo` matches a path segment exactly
 - `/{param}` matches arbitrary path segment.
@@ -2734,8 +2612,6 @@ Example:
 /static/*: other
 ```
 
-@gotags: validate:"gt=0,dive,keys,required,endkeys,required"
-
 </dd>
 </dl>
 
@@ -2747,9 +2623,7 @@ Example:
 <dt>kubernetes_object_selector</dt>
 <dd>
 
-([KubernetesObjectSelector](#kubernetes-object-selector), `required`) The Kubernetes object on which horizontal scaling is applied.
-
-@gotags: validate:"required"
+([KubernetesObjectSelector](#kubernetes-object-selector), **required**, `required`) The Kubernetes object on which horizontal scaling is applied.
 
 </dd>
 <dt>scale_actuator</dt>
@@ -2803,8 +2677,6 @@ Dynamic Configuration for ScaleActuator
 
 (bool) Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
 Useful for observing the behavior of Scaler without disrupting any real traffic.
-
-@gotags: default:"false"
 
 </dd>
 </dl>
@@ -2897,9 +2769,7 @@ Component that runs a Prometheus query periodically and returns the result as an
 <dt>evaluation_interval</dt>
 <dd>
 
-(string, default: `10s`) Describes the interval between successive evaluations of the Prometheus query.
-
-@gotags: default:"10s"
+(string, default: `"10s"`) Describes the interval between successive evaluations of the Prometheus query.
 
 </dd>
 <dt>out_ports</dt>
@@ -2948,9 +2818,7 @@ Generates 0 and 1 in turns.
 <dt>false_for</dt>
 <dd>
 
-(string, default: `5s`) Emitting 0 for the false_for duration.
-
-@gotags: default:"5s"
+(string, default: `"5s"`) Emitting 0 for the false_for duration.
 
 </dd>
 <dt>out_ports</dt>
@@ -2962,9 +2830,7 @@ Generates 0 and 1 in turns.
 <dt>true_for</dt>
 <dd>
 
-(string, default: `5s`) Emitting 1 for the true_for duration.
-
-@gotags: default:"5s"
+(string, default: `"5s"`) Emitting 1 for the true_for duration.
 
 </dd>
 </dl>
@@ -3030,23 +2896,19 @@ to select which label should be used as key.
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector), `required`) Which control point to apply this ratelimiter to.
-
-@gotags: validate:"required"
+([FlowSelector](#flow-selector), **required**, `required`) Which control point to apply this ratelimiter to.
 
 </dd>
 <dt>in_ports</dt>
 <dd>
 
-([RateLimiterIns](#rate-limiter-ins), `required`) @gotags: validate:"required"
+([RateLimiterIns](#rate-limiter-ins)) @gotags: validate:"required"
 
 </dd>
 <dt>parameters</dt>
 <dd>
 
-([RateLimiterParameters](#rate-limiter-parameters), `required`) Parameters for the RateLimiter component
-
-@gotags: validate:"required"
+([RateLimiterParameters](#rate-limiter-parameters), **required**, `required`) Parameters for the RateLimiter component
 
 </dd>
 </dl>
@@ -3061,9 +2923,7 @@ Dynamic Configuration for the rate limiter
 <dt>overrides</dt>
 <dd>
 
-([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
-
-@gotags: validate:"dive"
+([[]RateLimiterOverride](#rate-limiter-override), `dive`) Allows to specify different limits for particular label values.
 
 </dd>
 </dl>
@@ -3078,7 +2938,7 @@ Inputs for the RateLimiter component
 <dt>limit</dt>
 <dd>
 
-([InPort](#in-port), `required`) Number of flows allowed per _limit_reset_interval_ per each label.
+([InPort](#in-port), **required**, `required`) Number of flows allowed per _limit_reset_interval_ per each label.
 Negative values disable the ratelimiter.
 
 :::tip
@@ -3087,8 +2947,6 @@ Negative limit can be useful to _conditionally_ enable the ratelimiter
 under certain circumstances. [Decider](#decider) might be helpful.
 
 :::
-
-@gotags: validate:"required"
 
 </dd>
 </dl>
@@ -3101,17 +2959,13 @@ under certain circumstances. [Decider](#decider) might be helpful.
 <dt>label_value</dt>
 <dd>
 
-(string, `required`) Value of the label for which the override should be applied.
-
-@gotags: validate:"required"
+(string, **required**, `required`) Value of the label for which the override should be applied.
 
 </dd>
 <dt>limit_scale_factor</dt>
 <dd>
 
 (float64, default: `1`) Amount by which the _in_ports.limit_ should be multiplied for this label value.
-
-@gotags: default:"1.0"
 
 </dd>
 </dl>
@@ -3124,14 +2978,12 @@ under certain circumstances. [Decider](#decider) might be helpful.
 <dt>label_key</dt>
 <dd>
 
-(string, `required`) Specifies which label the ratelimiter should be keyed by.
+(string, **required**, `required`) Specifies which label the ratelimiter should be keyed by.
 
 Rate limiting is done independently for each value of the
 [label](/concepts/integrations/flow-control/flow-label.md) with given key.
 Eg., to give each user a separate limit, assuming you have a _user_ flow
 label set up, set `label_key: "user"`.
-
-@gotags: validate:"required"
 
 </dd>
 <dt>lazy_sync</dt>
@@ -3143,9 +2995,7 @@ label set up, set `label_key: "user"`.
 <dt>limit_reset_interval</dt>
 <dd>
 
-(string, default: `60s`) Time after which the limit for a given label value will be reset.
-
-@gotags: default:"60s"
+(string, default: `"60s"`) Time after which the limit for a given label value will be reset.
 
 </dd>
 </dl>
@@ -3160,15 +3010,11 @@ label set up, set `label_key: "user"`.
 
 (bool) Enables lazy sync
 
-@gotags: default:"false"
-
 </dd>
 <dt>num_sync</dt>
 <dd>
 
 (int64, `gt=0`, default: `5`) Number of times to lazy sync within the _limit_reset_interval_.
-
-@gotags: default:"5" validate:"gt=0"
 
 </dd>
 </dl>
@@ -3191,21 +3037,17 @@ Resources are typically Flux Meters, Classifiers, etc. that can be used to creat
 <dt>classifiers</dt>
 <dd>
 
-([[]Classifier](#classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+([[]Classifier](#classifier), `dive`) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
 The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
-
-@gotags: validate:"dive"
 
 </dd>
 <dt>flux_meters</dt>
 <dd>
 
-(map of [FluxMeter](#flux-meter)) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
+(map of [FluxMeter](#flux-meter), `dive`) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
 Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
-
-@gotags: validate:"dive"
 
 </dd>
 </dl>
@@ -3272,7 +3114,7 @@ telemetry: false
 <dt>telemetry</dt>
 <dd>
 
-(bool, `required`) Decides if the created flow label should be available as an attribute in OLAP telemetry and
+(bool, default: `true`) Decides if the created flow label should be available as an attribute in OLAP telemetry and
 propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
 
 :::note
@@ -3289,8 +3131,6 @@ sensitive labels.
 
 :::
 
-@gotags: default:"true"
-
 </dd>
 </dl>
 
@@ -3306,21 +3146,17 @@ High-level extractor-based rules are compiled into a single rego query.
 <dt>query</dt>
 <dd>
 
-(string, `required`) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
+(string, **required**, `required`) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
 
 Note: The module name must match the package name from the "source".
-
-@gotags: validate:"required"
 
 </dd>
 <dt>source</dt>
 <dd>
 
-(string, `required`) Source code of the rego module.
+(string, **required**, `required`) Source code of the rego module.
 
 Note: Must include a "package" declaration.
-
-@gotags: validate:"required"
 
 </dd>
 </dl>
@@ -3350,9 +3186,7 @@ See [ConcurrencyLimiter](#concurrency-limiter) for more context.
 <dt>parameters</dt>
 <dd>
 
-([SchedulerParameters](#scheduler-parameters), `required`) Scheduler parameters.
-
-@gotags: validate:"required"
+([SchedulerParameters](#scheduler-parameters), **required**, `required`) Scheduler parameters.
 
 </dd>
 </dl>
@@ -3413,21 +3247,17 @@ historical latency. Each workload's `tokens` will be set to average
 latency of flows in that workload during last few seconds (exact duration
 of this average can change).
 
-@gotags: default:"true"
-
 </dd>
 <dt>default_workload_parameters</dt>
 <dd>
 
-([SchedulerWorkloadParameters](#scheduler-workload-parameters), `required`) Parameters to be used if none of workloads specified in `workloads` match.
-
-@gotags: validate:"required"
+([SchedulerWorkloadParameters](#scheduler-workload-parameters)) Parameters to be used if none of workloads specified in `workloads` match.
 
 </dd>
 <dt>max_timeout</dt>
 <dd>
 
-(string, default: `0.49s`) Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
+(string, default: `"0.49s"`) Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
 
 :::caution
 
@@ -3448,8 +3278,6 @@ tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 
 :::
 
-@gotags: default:"0.49s"
-
 </dd>
 <dt>timeout_factor</dt>
 <dd>
@@ -3461,13 +3289,11 @@ it will be rejected.
 
 This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
 
-@gotags: validate:"gte=0.0" default:"0.5"
-
 </dd>
 <dt>workloads</dt>
 <dd>
 
-([[]SchedulerWorkload](#scheduler-workload)) List of workloads to be used in scheduler.
+([[]SchedulerWorkload](#scheduler-workload), `dive`) List of workloads to be used in scheduler.
 
 Categorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads
 allows for load-shedding to be "smarter" than just "randomly deny 50% of
@@ -3491,8 +3317,6 @@ section](/concepts/integrations/flow-control/components/concurrency-limiter.md#w
 
 :::
 
-@gotags: validate:"dive"
-
 </dd>
 </dl>
 
@@ -3506,18 +3330,14 @@ Workload defines a class of requests that preferably have similar properties suc
 <dt>label_matcher</dt>
 <dd>
 
-([LabelMatcher](#label-matcher), `required`) Label Matcher to select a Workload based on
+([LabelMatcher](#label-matcher), **required**, `required`) Label Matcher to select a Workload based on
 [flow labels](/concepts/integrations/flow-control/flow-label.md).
-
-@gotags: validate:"required"
 
 </dd>
 <dt>parameters</dt>
 <dd>
 
-([SchedulerWorkloadParameters](#scheduler-workload-parameters), `required`) Parameters associated with flows matching the label matcher.
-
-@gotags: validate:"required"
+([SchedulerWorkloadParameters](#scheduler-workload-parameters), **required**, `required`) Parameters associated with flows matching the label matcher.
 
 </dd>
 </dl>
@@ -3550,16 +3370,12 @@ $$
 \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
 $$
 
-@gotags: validate:"gte=0,lte=255"
-
 </dd>
 <dt>tokens</dt>
 <dd>
 
-(string, default: `1`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
+(string, default: `"1"`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
 This override is applicable only if `auto_tokens` is set to false.
-
-@gotags: default:"1"
 
 </dd>
 </dl>
@@ -3582,7 +3398,7 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `default`) Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
+(string, default: `"default"`) Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
 selector applies to.
 
 :::info
@@ -3591,13 +3407,11 @@ Agent Groups are used to scope policies to a subset of agents connected to the s
 
 :::
 
-@gotags: default:"default"
-
 </dd>
 <dt>service</dt>
 <dd>
 
-(string, `required`) The Fully Qualified Domain Name of the
+(string, **required**, `required`) The Fully Qualified Domain Name of the
 [service](/concepts/integrations/flow-control/service.md) to select.
 
 In Kubernetes, this is the FQDN of the Service object.
@@ -3615,8 +3429,6 @@ In the Kubernetes sidecar installation mode, service discovery is switched off b
 An entity (e.g. Kubernetes pod) may belong to multiple services.
 
 :::
-
-@gotags: validate:"required"];
 
 </dd>
 </dl>
@@ -3647,7 +3459,7 @@ $$
 <dt>scale</dt>
 <dd>
 
-(float64, default: `1`) Scaling factor to be multiplied with the square root of the input signal.
+(float64) Scaling factor to be multiplied with the square root of the input signal.
 
 @gotags default:"1.0"
 

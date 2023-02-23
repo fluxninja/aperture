@@ -78,6 +78,15 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 			return err
 		}
 		if !noValidate {
+			var valuesBytes []byte
+			valuesBytes, err = os.ReadFile(valuesFile)
+			if err != nil {
+				return err
+			}
+			if strings.Contains(string(valuesBytes), "__REQUIRED_FIELD__") {
+				return fmt.Errorf("values file contains '__REQUIRED_FIELD__' placeholder value")
+			}
+
 			// validate values.yaml against the json schema
 			schemaFile := filepath.Join(blueprintsDir, blueprintName, "gen/definitions.json")
 			definitionsFile := filepath.Join(blueprintsDir, "gen/jsonschema/_definitions.json")

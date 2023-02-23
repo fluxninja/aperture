@@ -1,4 +1,5 @@
 //go:generate swagger generate spec --scan-models --include="github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/*" --include-tag=plugin-configuration -o ../../../docs/gen/config/aperture-plugin-fluxninja/plugin-swagger.yaml
+//go:generate go run ../../../docs/tools/swagger/process-go-tags.go ../../../docs/gen/config/aperture-plugin-fluxninja/plugin-swagger.yaml
 
 // FluxNinja ARC Plugin
 //   BasePath: /aperture-controller
