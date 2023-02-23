@@ -31,8 +31,10 @@
 {{- end }}
 
 {{- define "fnConstraints" }}
-  {{- if .Pattern -}}
- Pattern: `{{ .Pattern }}`
+  {{- with .Extensions -}}
+    {{- with (index . "x-pattern-rules") -}}
+ Pattern: `{{ . }}`
+    {{- end -}}
   {{- end -}}
   {{- if .Minimum -}}
  Minimum: `{{ json .Minimum }}`
@@ -47,8 +49,10 @@
 
 {{/* Like fnConstraints, but appropriate to rendering within body of text */ -}}
 {{- define "fnConstraintsInline" }}
-  {{- with .Pattern -}}
-    , pattern: `{{ . }}`
+  {{- with .Extensions -}}
+    {{- with (index . "x-pattern-rules") -}}
+    , format: `{{ . }}`
+    {{- end -}}
   {{- end -}}
   {{- with .Minimum -}}
     , minimum: `{{ json . }}`

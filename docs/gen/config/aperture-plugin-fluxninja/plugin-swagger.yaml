@@ -102,6 +102,7 @@ definitions:
                 x-go-name: FluxNinjaEndpoint
                 x-go-tag-json: fluxninja_endpoint
                 x-go-tag-validate: omitempty,hostname_port|url|fqdn
+                x-pattern-rules: empty | hostname_port | url | fqdn
             heartbeat_interval:
                 default: 5s
                 description: Interval between each heartbeat.

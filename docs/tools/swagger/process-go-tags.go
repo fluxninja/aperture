@@ -198,7 +198,7 @@ func processValidateRules(m map[string]interface{}, rules []string) (required bo
 		case "omitempty":
 			if mType == "string" {
 				// add empty string as allowed value in pattern
-				addPattern(m, "^$")
+				addPattern(m, "^$", "empty")
 			}
 		default:
 			// split rule into key and value
@@ -271,16 +271,16 @@ func processValidateRules(m map[string]interface{}, rules []string) (required bo
 					switch subrule {
 					case "hostname_port":
 						// match pattern
-						addPattern(m, `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$`)
+						addPattern(m, `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$`, subrule)
 					case "fqdn":
 						// match pattern
-						addPattern(m, `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$`)
+						addPattern(m, `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$`, subrule)
 					case "url":
 						// match pattern
-						addPattern(m, `^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$`)
+						addPattern(m, `^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$`, subrule)
 					case "ip":
 						// match pattern
-						addPattern(m, `^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$`)
+						addPattern(m, `^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$`, subrule)
 					default:
 						log.Warn().Msgf("unknown validation subrule %s", subrule)
 					}
@@ -291,10 +291,16 @@ func processValidateRules(m map[string]interface{}, rules []string) (required bo
 	return
 }
 
-func addPattern(m map[string]interface{}, pattern string) {
+func addPattern(m map[string]interface{}, pattern string, rule string) {
 	if existing, ok := m["pattern"]; ok {
 		// add to existing pattern
 		pattern = fmt.Sprintf("(%s)|(%s)", existing, pattern)
 	}
 	m["pattern"] = pattern
+	// add x-pattern-rules for documentation
+	if existing, ok := m["x-pattern-rules"]; ok {
+		// add to existing pattern
+		rule = fmt.Sprintf("%s | %s", existing, rule)
+	}
+	m["x-pattern-rules"] = rule
 }
