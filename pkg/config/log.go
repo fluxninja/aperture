@@ -157,6 +157,9 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 		writers = append(writers, log.GetPrettyConsoleWriter())
 	}
 
+	// append writers provided via Fx
+	writers = append(writers, w...)
+
 	multi := zerolog.MultiLevelWriter(writers...)
 
 	var wr io.Writer
@@ -173,9 +176,6 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 	}
 
 	logger := log.NewLogger(wr, strings.ToLower(config.LogLevel))
-
-	// append writers provided via Fx
-	writers = append(writers, w...)
 
 	if constructor.IsGlobal {
 		// set global logger
