@@ -12,9 +12,9 @@ from jinja2.utils import import_string
 import prance
 import typer
 
-import subprocess
+import subprocess, tempfile
 
-import json
+import json, yaml
 
 from loguru import logger
 
@@ -378,28 +378,53 @@ def main(output_dir: Path = typer.Option(..., help="Output path for the generate
     ]
     render_gen_libsonnet(gen_libsonnet_path, imports)
 
-    # next, generate json schema using openapi2jsonschema
-    # execute openapi2jsonschema with arguments -
-    # 1. path in aperture_swagger_path variable
-    # 2. --strict flag
-    # 3. --output flag with value as output_dir/jsonschema
-    jsonschema_dir = output_dir / "jsonschema"
-    exit_code = subprocess.call(["openapi2jsonschema", str(aperture_swagger_path), "--strict", "--output", str(jsonschema_dir)])
-    if exit_code != 0:
-        logger.error(f"openapi2jsonschema exited with non-zero exit code: {exit_code}")
-        raise typer.Exit(1)
-    # remove all files in output_dir/jsonschema except for the _definitions.json file
-    for path in jsonschema_dir.rglob("*"):
-        if path.is_file() and path.name != "_definitions.json":
-            os.remove(path)
+    # rewrite exclusiveMinimum, exclusiveMaximum to use numbers based on minimum and maximum
+    # instead of booleans in aperture_swagger_path, save to temp file
+    with open(aperture_swagger_path, "r") as f:
+        aperture_swagger_data = f.read()
+        # read aperture_swagger_data as yaml
+        aperture_swagger_yaml = yaml.safe_load(aperture_swagger_data)
+        # iterate over all definitions
+        for _, definition in aperture_swagger_yaml["definitions"].items():
+            # iterate over all properties in definition
+            for _, property in definition["properties"].items():
+                # if the property has exclusiveMinimum or exclusiveMaximum, set it to the value of minimum or maximum
+                if "exclusiveMinimum" in property and property["exclusiveMinimum"] == True:
+                    property["exclusiveMinimum"] = property["minimum"]
+                    # remove minimum
+                    del property["minimum"]
+                if "exclusiveMaximum" in property and property["exclusiveMaximum"] == True:
+                    property["exclusiveMaximum"] = property["maximum"]
+                    # remove maximum
+                    del property["maximum"]
+        # write aperture_swagger_yaml as yaml to temp file
+        with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
+            yaml.dump(aperture_swagger_yaml, f)
 
-    # inject k8s custom resource definition into _definitions.json
-    jsonschema_definitions_path = jsonschema_dir / "_definitions.json"
-    with open(jsonschema_definitions_path, "r") as f:
-        jsonschema_definitions = json.load(f)
-        jsonschema_definitions["definitions"]["PolicyCustomResource"] = json.loads(CUSTOM_RESOURCE_DEFINITION)
-    with open(jsonschema_definitions_path, "w") as f:
-        json.dump(jsonschema_definitions, f, indent=2)
+            # next, generate json schema using openapi2jsonschema
+            # execute openapi2jsonschema with arguments -
+            # 1. path in aperture_swagger_path variable
+            # 2. --strict flag
+            # 3. --output flag with value as output_dir/jsonschema
+            jsonschema_dir = output_dir / "jsonschema"
+            exit_code = subprocess.call(["openapi2jsonschema", f.name, "--strict", "--output", str(jsonschema_dir)])
+            # remove temp file
+            os.remove(f.name)
+            if exit_code != 0:
+                logger.error(f"openapi2jsonschema exited with non-zero exit code: {exit_code}")
+                raise typer.Exit(1)
+            # remove all files in output_dir/jsonschema except for the _definitions.json file
+            for path in jsonschema_dir.rglob("*"):
+                if path.is_file() and path.name != "_definitions.json":
+                    os.remove(path)
+
+            # inject k8s custom resource definition into _definitions.json
+            jsonschema_definitions_path = jsonschema_dir / "_definitions.json"
+            with open(jsonschema_definitions_path, "r") as f:
+                jsonschema_definitions = json.load(f)
+                jsonschema_definitions["definitions"]["PolicyCustomResource"] = json.loads(CUSTOM_RESOURCE_DEFINITION)
+            with open(jsonschema_definitions_path, "w") as f:
+                json.dump(jsonschema_definitions, f, indent=2)
 
 
 CUSTOM_RESOURCE_DEFINITION="""

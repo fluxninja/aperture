@@ -54,9 +54,6 @@ definitions:
                     Scheduler parameters.
 
                 x-go-tag-validate: required
-        required:
-            - flow_selector
-            - scheduler_parameters
         type: object
     AIMDConcurrencyControllerIns:
         description: Inputs for the AIMDConcurrencyController component.
@@ -122,8 +119,6 @@ definitions:
                 description: ""
                 title: Alerter configuration
                 x-go-tag-validate: required
-        required:
-            - parameters
         type: object
     AlerterIns:
         description: Inputs for the Alerter component.
@@ -163,6 +158,10 @@ definitions:
                 description: |+
                     Severity of the alert, one of 'info', 'warn' or 'crit'.
 
+                enum:
+                    - info
+                    - warn
+                    - crit
                 type: string
                 x-go-tag-default: info
                 x-go-tag-validate: oneof=info warn crit
@@ -228,6 +227,14 @@ definitions:
                     The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
                     In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
 
+                enum:
+                    - add
+                    - sub
+                    - mul
+                    - div
+                    - xor
+                    - lshift
+                    - rshift
                 type: string
                 x-go-tag-validate: oneof=add sub mul div xor lshift rshift
             out_ports:
@@ -412,10 +419,10 @@ definitions:
                     [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
                     how to extract and propagate flow labels with that key.
 
+                minProperties: 1
                 type: object
                 x-go-tag-validate: required,gt=0,dive,keys,required,endkeys,required
         required:
-            - flow_selector
             - rules
         title: Set of classification rules sharing a common selector
         type: object
@@ -622,9 +629,6 @@ definitions:
                     output signals.
 
                 x-go-tag-validate: required
-        required:
-            - flow_selector
-            - scheduler
         title: Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
         type: object
     ConstantSignal:
@@ -711,6 +715,13 @@ definitions:
                 description: |+
                     Comparison operator that computes operation on lhs and rhs input signals.
 
+                enum:
+                    - gt
+                    - lt
+                    - gte
+                    - lte
+                    - eq
+                    - neq
                 type: string
                 x-go-tag-validate: oneof=gt lt gte lte eq neq
             out_ports:
@@ -809,8 +820,6 @@ definitions:
                     Parameters for the EMA component.
 
                 x-go-tag-validate: required
-        required:
-            - parameters
         title: Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings
         type: object
     EMAIns:
@@ -856,6 +865,7 @@ definitions:
                     Correction factor to apply on the output value if its in violation of the max envelope.
 
                 format: double
+                minimum: 0
                 type: number
                 x-go-tag-default: "1.0"
                 x-go-tag-validate: gte=0,lte=1.0
@@ -991,8 +1001,6 @@ definitions:
                     Parameters for the Extrapolator component.
 
                 x-go-tag-validate: required
-        required:
-            - parameters
         title: Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
         type: object
     ExtrapolatorIns:
@@ -1218,7 +1226,9 @@ definitions:
                 description: |+
                     Number of buckets.
 
+                exclusiveMinimum: true
                 format: int32
+                minimum: 0
                 type: integer
                 x-go-tag-validate: gt=0
             factor:
@@ -1245,7 +1255,9 @@ definitions:
                 description: |+
                     Number of buckets.
 
+                exclusiveMinimum: true
                 format: int32
+                minimum: 0
                 type: integer
                 x-go-tag-validate: gt=0
             max:
@@ -1275,7 +1287,9 @@ definitions:
                 description: |+
                     Number of buckets.
 
+                exclusiveMinimum: true
                 format: int32
+                minimum: 0
                 type: integer
                 x-go-tag-validate: gt=0
             start:
@@ -1342,8 +1356,6 @@ definitions:
                     Gradient Parameters.
 
                 x-go-tag-validate: required
-        required:
-            - parameters
         title: |-
             Gradient controller is a type of controller which tries to adjust the
             control variable proportionally to the relative difference between setpoint
@@ -1657,6 +1669,11 @@ definitions:
                     Logical operator which represents a key's relationship to a set of values.
                     Valid operators are In, NotIn, Exists and DoesNotExist.
 
+                enum:
+                    - In
+                    - NotIn
+                    - Exists
+                    - DoesNotExists
                 type: string
                 x-go-tag-validate: oneof=In NotIn Exists DoesNotExists
             values:
@@ -2151,6 +2168,7 @@ definitions:
                     /static/*: other
                     ```
 
+                minProperties: 1
                 type: object
                 x-go-tag-validate: gt=0,dive,keys,required,endkeys,required
         title: Matches HTTP Path to given path templates
@@ -2189,8 +2207,6 @@ definitions:
                 $ref: '#/definitions/PodScalerScaleActuator'
             scale_reporter:
                 $ref: '#/definitions/PodScalerScaleReporter'
-        required:
-            - kubernetes_object_selector
         type: object
     PodScalerScaleActuator:
         properties:
@@ -2400,9 +2416,6 @@ definitions:
                 description: ""
                 title: Parameters for the RateLimiter component
                 x-go-tag-validate: required
-        required:
-            - flow_selector
-            - parameters
         title: Limits the traffic on a control point to specified rate
         type: object
     RateLimiterDynamicConfig:
@@ -2433,8 +2446,6 @@ definitions:
                     :::
 
                 x-go-tag-validate: required
-        required:
-            - limit
         title: Inputs for the RateLimiter component
         type: object
     RateLimiterOverride:
@@ -2495,7 +2506,9 @@ definitions:
                 description: |+
                     Number of times to lazy sync within the _limit\_reset\_interval_.
 
+                exclusiveMinimum: true
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-tag-default: "5"
                 x-go-tag-validate: gt=0
@@ -2678,8 +2691,6 @@ definitions:
                     Scheduler parameters.
 
                 x-go-tag-validate: required
-        required:
-            - parameters
         title: Weighted Fair Queuing-based workload scheduler
         type: object
     SchedulerOuts:
@@ -2813,9 +2824,6 @@ definitions:
                     Parameters associated with flows matching the label matcher.
 
                 x-go-tag-validate: required
-        required:
-            - label_matcher
-            - parameters
         type: object
     SchedulerWorkloadParameters:
         description: Parameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
@@ -2835,6 +2843,8 @@ definitions:
                     $$
 
                 format: int64
+                maximum: 255
+                minimum: 0
                 title: |-
                     Describes priority level of the requests within the workload.
                     Priority level ranges from 0 to 255.

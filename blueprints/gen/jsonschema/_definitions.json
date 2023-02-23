@@ -2,18 +2,16 @@
   "definitions": {
     "AIMDConcurrencyController": {
       "description": "High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.",
-      "type": "object",
-      "required": ["flow_selector", "scheduler_parameters"],
       "properties": {
         "alerter_parameters": {
+          "$ref": "#/definitions/AlerterParameters",
           "description": "Configuration for embedded alerter.",
-          "x-order": 0,
-          "$ref": "#/definitions/AlerterParameters"
+          "x-order": 0
         },
         "default_config": {
+          "$ref": "#/definitions/LoadActuatorDynamicConfig",
           "description": "Default configuration.",
-          "x-order": 1,
-          "$ref": "#/definitions/LoadActuatorDynamicConfig"
+          "x-order": 1
         },
         "dynamic_config_key": {
           "description": "Configuration key for load actuation.",
@@ -21,105 +19,103 @@
           "x-order": 2
         },
         "flow_selector": {
+          "$ref": "#/definitions/FlowSelector",
           "description": "Flow Selector decides the service and flows at which the concurrency limiter is applied.\n\n",
           "x-go-tag-validate": "required",
-          "x-order": 3,
-          "$ref": "#/definitions/FlowSelector"
+          "x-order": 3
         },
         "gradient_parameters": {
+          "$ref": "#/definitions/GradientControllerParameters",
           "title": "Gradient parameters for the controller. Defaults to:\n* slope = -1\n* min_gradient = 0.1\n* max_gradient = 1",
-          "x-order": 4,
-          "$ref": "#/definitions/GradientControllerParameters"
+          "x-order": 4
         },
         "in_ports": {
+          "$ref": "#/definitions/AIMDConcurrencyControllerIns",
           "description": "Input ports for the AIMDConcurrencyController component.",
-          "x-order": 5,
-          "$ref": "#/definitions/AIMDConcurrencyControllerIns"
+          "x-order": 5
         },
         "load_multiplier_linear_increment": {
-          "description": "Linear increment to load multiplier in each execution tick when the system is not in overloaded state.\n\n",
-          "type": "number",
-          "format": "double",
           "default": 0.0025,
+          "description": "Linear increment to load multiplier in each execution tick when the system is not in overloaded state.\n\n",
+          "format": "double",
+          "type": "number",
           "x-go-tag-default": "0.0025",
           "x-order": 6
         },
         "max_load_multiplier": {
-          "description": "Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.\n\n",
-          "type": "number",
-          "format": "double",
           "default": 2,
+          "description": "Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.\n\n",
+          "format": "double",
+          "type": "number",
           "x-go-tag-default": "2.0",
           "x-order": 7
         },
         "out_ports": {
+          "$ref": "#/definitions/AIMDConcurrencyControllerOuts",
           "description": "Output ports for the AIMDConcurrencyController component.",
-          "x-order": 8,
-          "$ref": "#/definitions/AIMDConcurrencyControllerOuts"
+          "x-order": 8
         },
         "scheduler_parameters": {
+          "$ref": "#/definitions/SchedulerParameters",
           "description": "Scheduler parameters.\n\n",
           "x-go-tag-validate": "required",
-          "x-order": 9,
-          "$ref": "#/definitions/SchedulerParameters"
+          "x-order": 9
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "AIMDConcurrencyControllerIns": {
       "description": "Inputs for the AIMDConcurrencyController component.",
-      "type": "object",
       "properties": {
         "setpoint": {
+          "$ref": "#/definitions/InPort",
           "description": "The setpoint to the controller.",
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "x-order": 0
         },
         "signal": {
+          "$ref": "#/definitions/InPort",
           "description": "The signal to the controller.",
-          "x-order": 1,
-          "$ref": "#/definitions/InPort"
+          "x-order": 1
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "AIMDConcurrencyControllerOuts": {
       "description": "Outputs for the AIMDConcurrencyController component.",
-      "type": "object",
       "properties": {
         "accepted_concurrency": {
+          "$ref": "#/definitions/OutPort",
           "description": "Accepted concurrency is the number of concurrent requests that are accepted by the service.",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         },
         "desired_load_multiplier": {
+          "$ref": "#/definitions/OutPort",
           "description": "Desired Load multiplier is the ratio of desired concurrency to the incoming concurrency.",
-          "x-order": 1,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 1
         },
         "incoming_concurrency": {
+          "$ref": "#/definitions/OutPort",
           "description": "IncomingConcurrency is the number of concurrent requests that are received by the service.",
-          "x-order": 2,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 2
         },
         "is_overload": {
+          "$ref": "#/definitions/OutPort",
           "description": "Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.",
-          "x-order": 3,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 3
         },
         "observed_load_multiplier": {
+          "$ref": "#/definitions/OutPort",
           "description": "Observed Load multiplier is the ratio of accepted concurrency to the incoming concurrency.",
-          "x-order": 4,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 4
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "AddressExtractor": {
       "description": "IP addresses in attribute context are defined as objects with separate ip and port fields.\nThis is a helper to display an address as a single string.\n\nNote: Use with care, as it might accidentally introduce a high-cardinality flow label values.\n\n[ext-authz-address]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/address.proto#config-core-v3-address\n\nExample:\n```yaml\nfrom: \"source.address # or destination.address\"\n```",
-      "type": "object",
-      "title": "Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`",
-      "required": ["from"],
       "properties": {
         "from": {
           "description": "Attribute path pointing to some string - eg. \"source.address\".\n\n",
@@ -128,50 +124,50 @@
           "x-order": 0
         }
       },
+      "required": ["from"],
+      "title": "Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`",
+      "type": "object",
       "additionalProperties": false
     },
     "Alerter": {
       "description": "Alerter reacts to a signal and generates alert to send to alert manager.",
-      "type": "object",
-      "required": ["parameters"],
       "properties": {
         "in_ports": {
+          "$ref": "#/definitions/AlerterIns",
           "description": "Input ports for the Alerter component.",
-          "x-order": 0,
-          "$ref": "#/definitions/AlerterIns"
+          "x-order": 0
         },
         "parameters": {
+          "$ref": "#/definitions/AlerterParameters",
           "title": "Alerter configuration",
           "x-go-tag-validate": "required",
-          "x-order": 1,
-          "$ref": "#/definitions/AlerterParameters"
+          "x-order": 1
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "AlerterIns": {
       "description": "Inputs for the Alerter component.",
-      "type": "object",
       "properties": {
         "signal": {
+          "$ref": "#/definitions/InPort",
           "description": "Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.",
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "AlerterParameters": {
       "description": "Alerter Parameters is a common config for separate alerter components and alerters embedded in other components.",
-      "type": "object",
-      "required": ["alert_name"],
       "properties": {
         "alert_channels": {
           "description": "A list of alert channel strings.",
-          "type": "array",
           "items": {
             "type": "string"
           },
+          "type": "array",
           "x-order": 0
         },
         "alert_name": {
@@ -181,555 +177,558 @@
           "x-order": 1
         },
         "labels": {
-          "description": "Additional labels to add to alert.",
-          "type": "object",
           "additionalProperties": {
             "type": "string"
           },
+          "description": "Additional labels to add to alert.",
+          "type": "object",
           "x-order": 2
         },
         "resolve_timeout": {
+          "default": "5s",
           "description": "Duration of alert resolver.\n\n",
           "type": "string",
-          "default": "5s",
           "x-go-tag-default": "5s",
           "x-order": 3
         },
         "severity": {
-          "description": "Severity of the alert, one of 'info', 'warn' or 'crit'.\n\n",
-          "type": "string",
           "default": "info",
+          "description": "Severity of the alert, one of 'info', 'warn' or 'crit'.\n\n",
+          "enum": ["info", "warn", "crit"],
+          "type": "string",
           "x-go-tag-default": "info",
           "x-go-tag-validate": "oneof=info warn crit",
           "x-order": 4
         }
       },
+      "required": ["alert_name"],
+      "type": "object",
       "additionalProperties": false
     },
     "And": {
       "description": "Logical AND.\n\nSignals are mapped to boolean values as follows:\n* Zero is treated as false.\n* Any non-zero is treated as true.\n* Invalid inputs are considered unknown.\n\n  :::note\n\n  Treating invalid inputs as \"unknowns\" has a consequence that the result\n  might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,\n  because the result would end up false no matter if\n  first signal was true or false. On the other hand, `unknown && true == unknown`.\n\n  :::",
-      "type": "object",
       "properties": {
         "in_ports": {
+          "$ref": "#/definitions/AndIns",
           "description": "Input ports for the And component.",
-          "x-order": 0,
-          "$ref": "#/definitions/AndIns"
+          "x-order": 0
         },
         "out_ports": {
+          "$ref": "#/definitions/AndOuts",
           "description": "Output ports for the And component.",
-          "x-order": 1,
-          "$ref": "#/definitions/AndOuts"
+          "x-order": 1
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "AndIns": {
       "description": "Inputs for the And component.",
-      "type": "object",
       "properties": {
         "inputs": {
           "description": "Array of input signals.\n\n",
-          "type": "array",
           "items": {
             "$ref": "#/definitions/InPort"
           },
+          "type": "array",
           "x-go-tag-validate": "dive",
           "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "AndOuts": {
       "description": "Output ports for the And component.",
-      "type": "object",
       "properties": {
         "output": {
+          "$ref": "#/definitions/OutPort",
           "description": "Result of logical AND of all the input signals.\n\nWill always be 0 (false), 1 (true) or invalid (unknown).",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "ArithmeticCombinator": {
-      "type": "object",
-      "title": "Type of combinator that computes the arithmetic operation on the operand signals",
       "properties": {
         "in_ports": {
+          "$ref": "#/definitions/ArithmeticCombinatorIns",
           "description": "Input ports for the Arithmetic Combinator component.",
-          "x-order": 0,
-          "$ref": "#/definitions/ArithmeticCombinatorIns"
+          "x-order": 0
         },
         "operator": {
           "description": "Operator of the arithmetic operation.\n\nThe arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.\nIn case of XOR and bitshifts, value of signals is cast to integers before performing the operation.\n\n",
+          "enum": ["add", "sub", "mul", "div", "xor", "lshift", "rshift"],
           "type": "string",
           "x-go-tag-validate": "oneof=add sub mul div xor lshift rshift",
           "x-order": 1
         },
         "out_ports": {
+          "$ref": "#/definitions/ArithmeticCombinatorOuts",
           "description": "Output ports for the Arithmetic Combinator component.",
-          "x-order": 2,
-          "$ref": "#/definitions/ArithmeticCombinatorOuts"
+          "x-order": 2
         }
       },
+      "title": "Type of combinator that computes the arithmetic operation on the operand signals",
+      "type": "object",
       "additionalProperties": false
     },
     "ArithmeticCombinatorIns": {
       "description": "Inputs for the Arithmetic Combinator component.",
-      "type": "object",
       "properties": {
         "lhs": {
+          "$ref": "#/definitions/InPort",
           "description": "Left hand side of the arithmetic operation.",
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "x-order": 0
         },
         "rhs": {
+          "$ref": "#/definitions/InPort",
           "description": "Right hand side of the arithmetic operation.",
-          "x-order": 1,
-          "$ref": "#/definitions/InPort"
+          "x-order": 1
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "ArithmeticCombinatorOuts": {
       "description": "Outputs for the Arithmetic Combinator component.",
-      "type": "object",
       "properties": {
         "output": {
+          "$ref": "#/definitions/OutPort",
           "description": "Result of arithmetic operation.",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "AutoScale": {
       "description": "AutoScale components are used to scale a service.",
-      "type": "object",
       "properties": {
         "pod_scaler": {
+          "$ref": "#/definitions/PodScaler",
           "description": "PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.\n\nGradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.",
-          "x-order": 0,
-          "$ref": "#/definitions/PodScaler"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "Circuit": {
       "description": ":::info\n\nSee also [Circuit overview](/concepts/policy/circuit.md).\n\n:::\n\nSignals flow between components via ports.\nAs signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load-shed, rate-limit, auto-scale etc.).\nCircuit is evaluated periodically in order to respond to changes in signal readings.\n\n:::info\n\n**Signal**\n\nSignals are floating-point values.\n\nA signal can also have a special **Invalid** value. It's usually used to\ncommunicate that signal doesn't have a meaningful value at the moment, eg.\n[PromQL](#prom-q-l) emits such a value if it cannot execute a query.\nComponents know when their input signals are invalid and can act\naccordingly. They can either propagate the invalidness, by making their\noutput itself invalid (like eg.\n[ArithmeticCombinator](#arithmetic-combinator)) or use some different\nlogic, like eg. [Extrapolator](#extrapolator). Refer to a component's\ndocs on how exactly it handles invalid inputs.\n\n:::",
-      "type": "object",
-      "title": "Circuit is defined as a dataflow graph of inter-connected components",
       "properties": {
         "components": {
           "description": "Defines a signal processing graph as a list of components.\n\n",
-          "type": "array",
           "items": {
             "$ref": "#/definitions/Component"
           },
+          "type": "array",
           "x-go-tag-validate": "dive",
           "x-order": 0
         },
         "evaluation_interval": {
+          "default": "0.5s",
           "description": "Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.\nThis interval is typically aligned with how often the corrective action (actuation) needs to be taken.\n\n",
           "type": "string",
-          "default": "0.5s",
           "x-go-tag-default": "0.5s",
           "x-order": 1
         }
       },
+      "title": "Circuit is defined as a dataflow graph of inter-connected components",
+      "type": "object",
       "additionalProperties": false
     },
     "Classifier": {
       "description": ":::info\n\nSee also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).\n\n:::\n\nExample:\n```yaml\nselector:\n  service_selector:\n    service: service1.default.svc.cluster.local\n  flow_selector:\n    control_point:\n      traffic: ingress\nrules:\n  user:\n    extractor:\n      from: request.http.headers.user\n```",
-      "type": "object",
-      "title": "Set of classification rules sharing a common selector",
-      "required": ["flow_selector", "rules"],
       "properties": {
         "flow_selector": {
+          "$ref": "#/definitions/FlowSelector",
           "description": "Defines where to apply the flow classification rule.\n\n",
           "x-go-tag-validate": "required",
-          "x-order": 0,
-          "$ref": "#/definitions/FlowSelector"
+          "x-order": 0
         },
         "rules": {
-          "description": "A map of {key, value} pairs mapping from\n[flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define\nhow to extract and propagate flow labels with that key.\n\n",
-          "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/Rule"
           },
+          "description": "A map of {key, value} pairs mapping from\n[flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define\nhow to extract and propagate flow labels with that key.\n\n",
+          "minProperties": 1,
+          "type": "object",
           "x-go-tag-validate": "required,gt=0,dive,keys,required,endkeys,required",
           "x-order": 1
         }
       },
+      "required": ["rules"],
+      "title": "Set of classification rules sharing a common selector",
+      "type": "object",
       "additionalProperties": false
     },
     "Component": {
       "description": ":::info\n\nSee also [Components overview](/concepts/policy/circuit.md#components).\n\n:::\n\nSignals flow into the components via input ports and results are emitted on output ports.\nComponents are wired to each other based on signal names forming an execution graph of the circuit.\n\n:::note\n\nLoops are broken by the runtime at the earliest component index that is part of the loop.\nThe looped signals are saved in the tick they are generated and served in the subsequent tick.\n\n:::\n\nThere are three categories of components:\n* \"source\" components \u2013 they take some sort of input from \"the real world\" and output\n  a signal based on this input. Example: [PromQL](#prom-q-l). In the UI\n  they're represented by green color.\n* signal processor components \u2013 \"pure\" components that don't interact with the \"real world\".\n  Examples: [GradientController](#gradient-controller), [Max](#max).\n\n  :::note\n\n  Signal processor components's output can depend on their internal state, in addition to the inputs.\n  Eg. see the [Exponential Moving Average filter](#e-m-a).\n\n  :::\n\n* \"sink\" components \u2013\u00a0they affect the real world.\n  [ConcurrencyLimiter.LoadActuator](#concurrency-limiter) and [RateLimiter](#rate-limiter).\n  In the UI, represented by orange color.  Sink components usually come in pairs with a\n  \"sources\" component which emits a feedback signal, like\n  `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.\n\n:::tip\n\nSometimes you may want to use a constant value as one of component's inputs.\nYou can create an input port containing the constant value instead of being connected to a signal.\nTo do so, use the [InPort](#in_port)'s .withConstantSignal(constant_signal) method.\nYou can also use it to provide special math values such as NaN and +- Inf.\nIf You need to provide the same constant signal to multiple components,\nYou can use the [Variable](#variable) component.\n\n:::\n\nSee also [Policy](#policy) for a higher-level explanation of circuits.",
-      "type": "object",
-      "title": "Computational block that form the circuit",
       "properties": {
         "alerter": {
+          "$ref": "#/definitions/Alerter",
           "description": "Alerter reacts to a signal and generates alert to send to alert manager.",
-          "x-order": 0,
-          "$ref": "#/definitions/Alerter"
+          "x-order": 0
         },
         "and": {
+          "$ref": "#/definitions/And",
           "description": "Logical AND.",
-          "x-order": 1,
-          "$ref": "#/definitions/And"
+          "x-order": 1
         },
         "arithmetic_combinator": {
+          "$ref": "#/definitions/ArithmeticCombinator",
           "description": "Applies the given operator on input operands (signals) and emits the result.",
-          "x-order": 2,
-          "$ref": "#/definitions/ArithmeticCombinator"
+          "x-order": 2
         },
         "auto_scale": {
+          "$ref": "#/definitions/AutoScale",
           "description": "AutoScale components are used to scale the service.",
-          "x-order": 3,
-          "$ref": "#/definitions/AutoScale"
+          "x-order": 3
         },
         "decider": {
+          "$ref": "#/definitions/Decider",
           "description": "Decider emits the binary result of comparison operator on two operands.",
-          "x-order": 4,
-          "$ref": "#/definitions/Decider"
+          "x-order": 4
         },
         "differentiator": {
+          "$ref": "#/definitions/Differentiator",
           "description": "Differentiator calculates rate of change per tick.",
-          "x-order": 5,
-          "$ref": "#/definitions/Differentiator"
+          "x-order": 5
         },
         "ema": {
+          "$ref": "#/definitions/EMA",
           "description": "Exponential Moving Average filter.",
-          "x-order": 6,
-          "$ref": "#/definitions/EMA"
+          "x-order": 6
         },
         "extrapolator": {
+          "$ref": "#/definitions/Extrapolator",
           "description": "Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval.",
-          "x-order": 7,
-          "$ref": "#/definitions/Extrapolator"
+          "x-order": 7
         },
         "first_valid": {
+          "$ref": "#/definitions/FirstValid",
           "description": "Picks the first valid input signal and emits it.",
-          "x-order": 8,
-          "$ref": "#/definitions/FirstValid"
+          "x-order": 8
         },
         "flow_control": {
+          "$ref": "#/definitions/FlowControl",
           "description": "FlowControl components are used to regulate requests flow.",
-          "x-order": 9,
-          "$ref": "#/definitions/FlowControl"
+          "x-order": 9
         },
         "gradient_controller": {
+          "$ref": "#/definitions/GradientController",
           "description": "Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.\nThis controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.",
-          "x-order": 10,
-          "$ref": "#/definitions/GradientController"
+          "x-order": 10
         },
         "holder": {
+          "$ref": "#/definitions/Holder",
           "description": "Holds the last valid signal value for the specified duration then waits for next valid value to hold.",
-          "x-order": 11,
-          "$ref": "#/definitions/Holder"
+          "x-order": 11
         },
         "integrator": {
+          "$ref": "#/definitions/Integrator",
           "description": "Accumulates sum of signal every tick.",
-          "x-order": 12,
-          "$ref": "#/definitions/Integrator"
+          "x-order": 12
         },
         "inverter": {
+          "$ref": "#/definitions/Inverter",
           "description": "Logical NOT.",
-          "x-order": 13,
-          "$ref": "#/definitions/Inverter"
+          "x-order": 13
         },
         "max": {
+          "$ref": "#/definitions/Max",
           "description": "Emits the maximum of the input signals.",
-          "x-order": 14,
-          "$ref": "#/definitions/Max"
+          "x-order": 14
         },
         "min": {
+          "$ref": "#/definitions/Min",
           "description": "Emits the minimum of the input signals.",
-          "x-order": 15,
-          "$ref": "#/definitions/Min"
+          "x-order": 15
         },
         "nested_circuit": {
+          "$ref": "#/definitions/NestedCircuit",
           "description": "Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.",
-          "x-order": 16,
-          "$ref": "#/definitions/NestedCircuit"
+          "x-order": 16
         },
         "nested_signal_egress": {
+          "$ref": "#/definitions/NestedSignalEgress",
           "description": "Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.",
-          "x-order": 17,
-          "$ref": "#/definitions/NestedSignalEgress"
+          "x-order": 17
         },
         "nested_signal_ingress": {
+          "$ref": "#/definitions/NestedSignalIngress",
           "description": "Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.",
-          "x-order": 18,
-          "$ref": "#/definitions/NestedSignalIngress"
+          "x-order": 18
         },
         "or": {
+          "$ref": "#/definitions/Or",
           "description": "Logical OR.",
-          "x-order": 19,
-          "$ref": "#/definitions/Or"
+          "x-order": 19
         },
         "pulse_generator": {
+          "$ref": "#/definitions/PulseGenerator",
           "description": "Generates 0 and 1 in turns.",
-          "x-order": 20,
-          "$ref": "#/definitions/PulseGenerator"
+          "x-order": 20
         },
         "query": {
+          "$ref": "#/definitions/Query",
           "description": "Query components that are query databases such as Prometheus.",
-          "x-order": 21,
-          "$ref": "#/definitions/Query"
+          "x-order": 21
         },
         "sqrt": {
+          "$ref": "#/definitions/Sqrt",
           "description": "Takes an input signal and emits the square root of the input signal.",
-          "x-order": 22,
-          "$ref": "#/definitions/Sqrt"
+          "x-order": 22
         },
         "switcher": {
+          "$ref": "#/definitions/Switcher",
           "description": "Switcher acts as a switch that emits one of the two signals based on third signal.",
-          "x-order": 23,
-          "$ref": "#/definitions/Switcher"
+          "x-order": 23
         },
         "variable": {
+          "$ref": "#/definitions/Variable",
           "description": "Emits a variable signal which can be set to invalid.",
-          "x-order": 24,
-          "$ref": "#/definitions/Variable"
+          "x-order": 24
         }
       },
+      "title": "Computational block that form the circuit",
+      "type": "object",
       "additionalProperties": false
     },
     "ConcurrencyLimiter": {
       "description": ":::info\n\nSee also [Concurrency Limiter overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).\n\n:::\n\nIt is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.\nConcurrency is calculated in terms of total tokens which translate to (avg. latency \\* in-flight requests), i.e. Little's Law.\n\nConcurrencyLimiter configuration is split into two parts: An actuation\nstrategy and a scheduler. Right now, only `load_actuator` strategy is available.",
-      "type": "object",
-      "title": "Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection",
-      "required": ["flow_selector", "scheduler"],
       "properties": {
         "flow_selector": {
+          "$ref": "#/definitions/FlowSelector",
           "description": "Flow Selector decides the service and flows at which the concurrency limiter is applied.\n\n",
           "x-go-tag-validate": "required",
-          "x-order": 0,
-          "$ref": "#/definitions/FlowSelector"
+          "x-order": 0
         },
         "load_actuator": {
+          "$ref": "#/definitions/LoadActuator",
           "description": "Actuator based on limiting the accepted concurrency under incoming concurrency * load multiplier.\n\nActuation strategy defines the input signal that will drive the scheduler.",
-          "x-order": 1,
-          "$ref": "#/definitions/LoadActuator"
+          "x-order": 1
         },
         "scheduler": {
+          "$ref": "#/definitions/Scheduler",
           "description": "Configuration of Weighted Fair Queuing-based workload scheduler.\n\nContains configuration of per-agent scheduler, and also defines some\noutput signals.\n\n",
           "x-go-tag-validate": "required",
-          "x-order": 2,
-          "$ref": "#/definitions/Scheduler"
+          "x-order": 2
         }
       },
+      "title": "Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection",
+      "type": "object",
       "additionalProperties": false
     },
     "ConstantSignal": {
       "description": "Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.",
-      "type": "object",
       "properties": {
         "special_value": {
-          "type": "string",
           "title": "@gotags: validate:\"oneof=NaN +Inf -Inf\"",
+          "type": "string",
           "x-order": 0
         },
         "value": {
-          "type": "number",
           "format": "double",
+          "type": "number",
           "x-order": 1
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "Decider": {
       "description": "The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.\n\nThis component also supports time-based response, i.e. the output\ntransitions between 1.0 or 0.0 signal if the decider condition is\ntrue or false for at least \"true_for\" or \"false_for\" duration. If\n`true_for` and `false_for` durations are zero then the transitions are\ninstantaneous.",
-      "type": "object",
-      "title": "Type of combinator that computes the comparison operation on lhs and rhs signals",
       "properties": {
         "false_for": {
+          "default": "0s",
           "description": "Duration of time to wait before a transition to false state.\nIf the duration is zero, the transition will happen instantaneously.\n\n",
           "type": "string",
-          "default": "0s",
           "x-go-tag-default": "0s",
           "x-order": 0
         },
         "in_ports": {
+          "$ref": "#/definitions/DeciderIns",
           "description": "Input ports for the Decider component.",
-          "x-order": 1,
-          "$ref": "#/definitions/DeciderIns"
+          "x-order": 1
         },
         "operator": {
           "description": "Comparison operator that computes operation on lhs and rhs input signals.\n\n",
+          "enum": ["gt", "lt", "gte", "lte", "eq", "neq"],
           "type": "string",
           "x-go-tag-validate": "oneof=gt lt gte lte eq neq",
           "x-order": 2
         },
         "out_ports": {
+          "$ref": "#/definitions/DeciderOuts",
           "description": "Output ports for the Decider component.",
-          "x-order": 3,
-          "$ref": "#/definitions/DeciderOuts"
+          "x-order": 3
         },
         "true_for": {
+          "default": "0s",
           "description": "Duration of time to wait before a transition to true state.\nIf the duration is zero, the transition will happen instantaneously.\n\n",
           "type": "string",
-          "default": "0s",
           "x-go-tag-default": "0s",
           "x-order": 4
         }
       },
+      "title": "Type of combinator that computes the comparison operation on lhs and rhs signals",
+      "type": "object",
       "additionalProperties": false
     },
     "DeciderIns": {
       "description": "Inputs for the Decider component.",
-      "type": "object",
       "properties": {
         "lhs": {
+          "$ref": "#/definitions/InPort",
           "description": "Left hand side input signal for the comparison operation.",
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "x-order": 0
         },
         "rhs": {
+          "$ref": "#/definitions/InPort",
           "description": "Right hand side input signal for the comparison operation.",
-          "x-order": 1,
-          "$ref": "#/definitions/InPort"
+          "x-order": 1
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "DeciderOuts": {
       "description": "Outputs for the Decider component.",
-      "type": "object",
       "properties": {
         "output": {
+          "$ref": "#/definitions/OutPort",
           "description": "Selected signal (1.0 or 0.0).",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "Differentiator": {
       "description": "Differentiator calculates rate of change per tick.",
-      "type": "object",
       "properties": {
         "in_ports": {
+          "$ref": "#/definitions/DifferentiatorIns",
           "description": "Input ports for the Differentiator component.",
-          "x-order": 0,
-          "$ref": "#/definitions/DifferentiatorIns"
+          "x-order": 0
         },
         "out_ports": {
+          "$ref": "#/definitions/DifferentiatorOuts",
           "description": "Output ports for the Differentiator component.",
-          "x-order": 1,
-          "$ref": "#/definitions/DifferentiatorOuts"
+          "x-order": 1
         },
         "window": {
+          "default": "5s",
           "description": "The window of time over which differentiator operates.\n\n",
           "type": "string",
-          "default": "5s",
           "x-go-tag-default": "5s",
           "x-order": 2
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "DifferentiatorIns": {
       "description": "Inputs for the Differentiator component.",
-      "type": "object",
       "properties": {
         "input": {
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "$ref": "#/definitions/InPort",
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "DifferentiatorOuts": {
       "description": "Outputs for the Differentiator component.",
-      "type": "object",
       "properties": {
         "output": {
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "$ref": "#/definitions/OutPort",
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "EMA": {
       "description": "At any time EMA component operates in one of the following states:\n1. Warm up state: The first warmup_window samples are used to compute the initial EMA.\n   If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of warm up state.\n2. Normal state: The EMA is computed using following formula.\n\nThe EMA for a series $Y$ is calculated recursively as:\n\n$$\n\\text{EMA} _t =\n\\begin{cases}\n  Y_0, &\\text{for } t = 0 \\\\\n  \\alpha Y_t + (1 - \\alpha) \\text{EMA} _{t-1}, &\\text{for }t > 0\n\\end{cases}\n$$\n\nThe coefficient $\\alpha$ represents the degree of weighting decrease, a constant smoothing factor between 0 and 1.\nA higher $\\alpha$ discounts older observations faster.\nThe $\\alpha$ is computed using ema\\_window:\n\n$$\n\\alpha = \\frac{2}{N + 1} \\quad\\text{where } N = \\frac{\\text{ema\\_window}}{\\text{evaluation\\_period}}\n$$",
-      "type": "object",
-      "title": "Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings",
-      "required": ["parameters"],
       "properties": {
         "in_ports": {
+          "$ref": "#/definitions/EMAIns",
           "description": "Input ports for the EMA component.",
-          "x-order": 0,
-          "$ref": "#/definitions/EMAIns"
+          "x-order": 0
         },
         "out_ports": {
+          "$ref": "#/definitions/EMAOuts",
           "description": "Output ports for the EMA component.",
-          "x-order": 1,
-          "$ref": "#/definitions/EMAOuts"
+          "x-order": 1
         },
         "parameters": {
+          "$ref": "#/definitions/EMAParameters",
           "description": "Parameters for the EMA component.\n\n",
           "x-go-tag-validate": "required",
-          "x-order": 2,
-          "$ref": "#/definitions/EMAParameters"
+          "x-order": 2
         }
       },
+      "title": "Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings",
+      "type": "object",
       "additionalProperties": false
     },
     "EMAIns": {
       "description": "Inputs for the EMA component.",
-      "type": "object",
       "properties": {
         "input": {
+          "$ref": "#/definitions/InPort",
           "description": "Input signal to be used for the EMA computation.",
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "x-order": 0
         },
         "max_envelope": {
+          "$ref": "#/definitions/InPort",
           "description": "Upper bound of the moving average.\n\nWhen the signal exceeds `max_envelope` it's multiplied by\n`correction_factor_on_max_envelope_violation` **once per tick**.\n\n:::note\n\nIf the signal deviates from `max_envelope` faster than the correction\nfaster, it might end up exceeding the envelope.\n\n:::",
-          "x-order": 1,
-          "$ref": "#/definitions/InPort"
+          "x-order": 1
         },
         "min_envelope": {
+          "$ref": "#/definitions/InPort",
           "description": "Lower bound of the moving average.\n\nBehavior is similar to `max_envelope`.",
-          "x-order": 2,
-          "$ref": "#/definitions/InPort"
+          "x-order": 2
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "EMAOuts": {
       "description": "Outputs for the EMA component.",
-      "type": "object",
       "properties": {
         "output": {
+          "$ref": "#/definitions/OutPort",
           "description": "Exponential moving average of the series of reading as an output signal.",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "EMAParameters": {
       "description": "Parameters for the EMA component.",
-      "type": "object",
-      "required": ["ema_window", "warmup_window"],
       "properties": {
         "correction_factor_on_max_envelope_violation": {
-          "description": "Correction factor to apply on the output value if its in violation of the max envelope.\n\n",
-          "type": "number",
-          "format": "double",
           "default": 1,
+          "description": "Correction factor to apply on the output value if its in violation of the max envelope.\n\n",
+          "format": "double",
+          "minimum": 0,
+          "type": "number",
           "x-go-tag-default": "1.0",
           "x-go-tag-validate": "gte=0,lte=1.0",
           "x-order": 0
         },
         "correction_factor_on_min_envelope_violation": {
-          "description": "Correction factor to apply on the output value if its in violation of the min envelope.\n\n",
-          "type": "number",
-          "format": "double",
           "default": 1,
+          "description": "Correction factor to apply on the output value if its in violation of the min envelope.\n\n",
+          "format": "double",
+          "type": "number",
           "x-go-tag-default": "1.0",
           "x-go-tag-validate": "gte=1.0",
           "x-order": 1
@@ -741,9 +740,9 @@
           "x-order": 2
         },
         "valid_during_warmup": {
+          "default": false,
           "description": "Whether the output is valid during the warm up stage.\n\n",
           "type": "boolean",
-          "default": false,
           "x-go-tag-default": "false",
           "x-order": 3
         },
@@ -754,12 +753,12 @@
           "x-order": 4
         }
       },
+      "required": ["ema_window", "warmup_window"],
+      "type": "object",
       "additionalProperties": false
     },
     "EqualsMatchExpression": {
       "description": "Label selector expression of the equal form \"label == value\".",
-      "type": "object",
-      "required": ["label"],
       "properties": {
         "label": {
           "description": "Name of the label to equal match the value.\n\n",
@@ -773,95 +772,94 @@
           "x-order": 1
         }
       },
+      "required": ["label"],
+      "type": "object",
       "additionalProperties": false
     },
     "Extractor": {
       "description": "There are multiple variants of extractor, specify exactly one.",
-      "type": "object",
-      "title": "Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code",
       "properties": {
         "address": {
+          "$ref": "#/definitions/AddressExtractor",
           "description": "Display an address as a single string - `<ip>:<port>`.",
-          "x-order": 0,
-          "$ref": "#/definitions/AddressExtractor"
+          "x-order": 0
         },
         "from": {
           "description": "Attribute path is a dot-separated path to attribute.\n\nShould be either:\n* one of the fields of [Attribute Context][attribute-context], or\n* a special \"request.http.bearer\" pseudo-attribute.\nEg. \"request.http.method\" or \"request.http.header.user-agent\"\n\nNote: The same attribute path syntax is shared by other extractor variants,\nwherever attribute path is needed in their \"from\" syntax.\n\nExample:\n```yaml\nfrom: request.http.headers.user-agent\n```\n[attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto",
-          "type": "string",
           "title": "Use an attribute with no conversion",
+          "type": "string",
           "x-order": 1
         },
         "json": {
+          "$ref": "#/definitions/JSONExtractor",
           "description": "Deserialize a json, and extract one of the fields.",
-          "x-order": 2,
-          "$ref": "#/definitions/JSONExtractor"
+          "x-order": 2
         },
         "jwt": {
+          "$ref": "#/definitions/JWTExtractor",
           "description": "Parse the attribute as JWT and read the payload.",
-          "x-order": 3,
-          "$ref": "#/definitions/JWTExtractor"
+          "x-order": 3
         },
         "path_templates": {
+          "$ref": "#/definitions/PathTemplateMatcher",
           "description": "Match HTTP Path to given path templates.",
-          "x-order": 4,
-          "$ref": "#/definitions/PathTemplateMatcher"
+          "x-order": 4
         }
       },
+      "title": "Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code",
+      "type": "object",
       "additionalProperties": false
     },
     "Extrapolator": {
       "description": "It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.",
-      "type": "object",
-      "title": "Extrapolates the input signal by repeating the last valid value during the period in which it is invalid",
-      "required": ["parameters"],
       "properties": {
         "in_ports": {
+          "$ref": "#/definitions/ExtrapolatorIns",
           "description": "Input ports for the Extrapolator component.",
-          "x-order": 0,
-          "$ref": "#/definitions/ExtrapolatorIns"
+          "x-order": 0
         },
         "out_ports": {
+          "$ref": "#/definitions/ExtrapolatorOuts",
           "description": "Output ports for the Extrapolator component.",
-          "x-order": 1,
-          "$ref": "#/definitions/ExtrapolatorOuts"
+          "x-order": 1
         },
         "parameters": {
+          "$ref": "#/definitions/ExtrapolatorParameters",
           "description": "Parameters for the Extrapolator component.\n\n",
           "x-go-tag-validate": "required",
-          "x-order": 2,
-          "$ref": "#/definitions/ExtrapolatorParameters"
+          "x-order": 2
         }
       },
+      "title": "Extrapolates the input signal by repeating the last valid value during the period in which it is invalid",
+      "type": "object",
       "additionalProperties": false
     },
     "ExtrapolatorIns": {
       "description": "Inputs for the Extrapolator component.",
-      "type": "object",
       "properties": {
         "input": {
+          "$ref": "#/definitions/InPort",
           "description": "Input signal for the Extrapolator component.",
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "ExtrapolatorOuts": {
       "description": "Outputs for the Extrapolator component.",
-      "type": "object",
       "properties": {
         "output": {
+          "$ref": "#/definitions/OutPort",
           "description": "Extrapolated signal.",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "ExtrapolatorParameters": {
       "description": "Parameters for the Extrapolator component.",
-      "type": "object",
-      "required": ["max_extrapolation_interval"],
       "properties": {
         "max_extrapolation_interval": {
           "description": "Maximum time interval to repeat the last valid value of input signal.\n\n",
@@ -870,80 +868,79 @@
           "x-order": 0
         }
       },
+      "required": ["max_extrapolation_interval"],
+      "type": "object",
       "additionalProperties": false
     },
     "FirstValid": {
-      "type": "object",
-      "title": "Picks the first valid input signal from the array of input signals and emits it as an output signal",
       "properties": {
         "in_ports": {
+          "$ref": "#/definitions/FirstValidIns",
           "description": "Input ports for the FirstValid component.",
-          "x-order": 0,
-          "$ref": "#/definitions/FirstValidIns"
+          "x-order": 0
         },
         "out_ports": {
+          "$ref": "#/definitions/FirstValidOuts",
           "description": "Output ports for the FirstValid component.",
-          "x-order": 1,
-          "$ref": "#/definitions/FirstValidOuts"
+          "x-order": 1
         }
       },
+      "title": "Picks the first valid input signal from the array of input signals and emits it as an output signal",
+      "type": "object",
       "additionalProperties": false
     },
     "FirstValidIns": {
       "description": "Inputs for the FirstValid component.",
-      "type": "object",
       "properties": {
         "inputs": {
           "description": "Array of input signals.\n\n",
-          "type": "array",
           "items": {
             "$ref": "#/definitions/InPort"
           },
+          "type": "array",
           "x-go-tag-validate": "dive",
           "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "FirstValidOuts": {
       "description": "Outputs for the FirstValid component.",
-      "type": "object",
       "properties": {
         "output": {
+          "$ref": "#/definitions/OutPort",
           "description": "First valid input signal as an output signal.",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "FlowControl": {
       "description": "FlowControl components are used to regulate requests flow.",
-      "type": "object",
       "properties": {
         "aimd_concurrency_controller": {
+          "$ref": "#/definitions/AIMDConcurrencyController",
           "description": "AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.",
-          "x-order": 0,
-          "$ref": "#/definitions/AIMDConcurrencyController"
+          "x-order": 0
         },
         "concurrency_limiter": {
+          "$ref": "#/definitions/ConcurrencyLimiter",
           "description": "Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).",
-          "x-order": 1,
-          "$ref": "#/definitions/ConcurrencyLimiter"
+          "x-order": 1
         },
         "rate_limiter": {
+          "$ref": "#/definitions/RateLimiter",
           "description": "Rate Limiter provides service protection by applying rate limiter.",
-          "x-order": 2,
-          "$ref": "#/definitions/RateLimiter"
+          "x-order": 2
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "FlowMatcher": {
       "description": ":::info\n\nSee also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).\n\n:::\n\nExample:\n```yaml\ncontrol_point: ingress\nlabel_matcher:\n  match_labels:\n    user_tier: gold\n  match_expressions:\n    - key: query\n      operator: In\n      values:\n        - insert\n        - delete\n    - label: user_agent\n      regex: ^(?!.*Chrome).*Safari\n```",
-      "type": "object",
-      "title": "Describes which flows a [flow control\ncomponent](/concepts/integrations/flow-control/flow-control.md#components) should apply\nto",
-      "required": ["control_point"],
       "properties": {
         "control_point": {
           "description": "[Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)\nidentifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution\nblock within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners\nor filter chains.\n\n",
@@ -952,345 +949,348 @@
           "x-order": 0
         },
         "label_matcher": {
+          "$ref": "#/definitions/LabelMatcher",
           "description": ":::info\n\nSee also [Label Matcher overview](/concepts/integrations/flow-control/flow-selector.md#label-matcher).\n\n:::\n\n:::note\n\n[Classifiers](#classifier) _can_ use flow labels created by some other\nclassifier, but only if they were created at some previous control point\n(and propagated in baggage).\n\nThis limitation doesn't apply to selectors of other entities, like\nFlux Meters or Actuators. It's valid to create a flow label on a control\npoint using classifier, and immediately use it for matching on the same\ncontrol point.\n\n:::",
           "title": "Label matcher allows to add _additional_ condition on\n[flow labels](/concepts/integrations/flow-control/flow-label.md)\nmust also be satisfied (in addition to service+control point matching)",
-          "x-order": 1,
-          "$ref": "#/definitions/LabelMatcher"
+          "x-order": 1
         }
       },
+      "required": ["control_point"],
+      "title": "Describes which flows a [flow control\ncomponent](/concepts/integrations/flow-control/flow-control.md#components) should apply\nto",
+      "type": "object",
       "additionalProperties": false
     },
     "FlowSelector": {
       "description": ":::info\n\nSee also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).\n\n:::",
-      "type": "object",
-      "title": "Describes which flow in which service a [flow control\ncomponent](/concepts/integrations/flow-control/flow-control.md#components) should apply\nto",
       "properties": {
         "flow_matcher": {
+          "$ref": "#/definitions/FlowMatcher",
           "title": "@gotags: validate:\"required\"",
-          "x-order": 0,
-          "$ref": "#/definitions/FlowMatcher"
+          "x-order": 0
         },
         "service_selector": {
+          "$ref": "#/definitions/ServiceSelector",
           "title": "@gotags: validate:\"required\"",
-          "x-order": 1,
-          "$ref": "#/definitions/ServiceSelector"
+          "x-order": 1
         }
       },
+      "title": "Describes which flow in which service a [flow control\ncomponent](/concepts/integrations/flow-control/flow-control.md#components) should apply\nto",
+      "type": "object",
       "additionalProperties": false
     },
     "FluxMeter": {
       "description": "Flux Meter gathers metrics for the traffic that matches its selector.\nThe histogram created by Flux Meter measures the workload latency by default.\n\n:::info\n\nSee also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).\n\n:::\n\nExample of a selector that creates a histogram metric for all HTTP requests\nto particular service:\n```yaml\nselector:\n  service_selector:\n    service: myservice.mynamespace.svc.cluster.local\n  flow_selector:\n    control_point: ingress\n```",
-      "type": "object",
       "properties": {
         "attribute_key": {
+          "default": "workload_duration_ms",
           "description": "Key of the attribute in access log or span from which the metric for this flux meter is read.\n\n:::info\n\nFor list of available attributes in Envoy access logs, refer\n[Envoy Filter](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)\n\n:::\n\n",
           "type": "string",
-          "default": "workload_duration_ms",
           "x-go-tag-default": "workload_duration_ms",
           "x-order": 0
         },
         "exponential_buckets": {
-          "x-order": 1,
-          "$ref": "#/definitions/FluxMeterExponentialBuckets"
+          "$ref": "#/definitions/FluxMeterExponentialBuckets",
+          "x-order": 1
         },
         "exponential_buckets_range": {
-          "x-order": 2,
-          "$ref": "#/definitions/FluxMeterExponentialBucketsRange"
+          "$ref": "#/definitions/FluxMeterExponentialBucketsRange",
+          "x-order": 2
         },
         "flow_selector": {
+          "$ref": "#/definitions/FlowSelector",
           "description": "The selection criteria for the traffic that will be measured.",
-          "x-order": 3,
-          "$ref": "#/definitions/FlowSelector"
+          "x-order": 3
         },
         "linear_buckets": {
-          "x-order": 4,
-          "$ref": "#/definitions/FluxMeterLinearBuckets"
+          "$ref": "#/definitions/FluxMeterLinearBuckets",
+          "x-order": 4
         },
         "static_buckets": {
-          "x-order": 5,
-          "$ref": "#/definitions/FluxMeterStaticBuckets"
+          "$ref": "#/definitions/FluxMeterStaticBuckets",
+          "x-order": 5
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "FluxMeterExponentialBuckets": {
       "description": "ExponentialBuckets creates `count` number of buckets where the lowest bucket has an upper bound of `start`\nand each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf\nbucket is not counted.",
-      "type": "object",
       "properties": {
         "count": {
           "description": "Number of buckets.\n\n",
-          "type": "integer",
+          "exclusiveMinimum": 0,
           "format": "int32",
+          "type": "integer",
           "x-go-tag-validate": "gt=0",
           "x-order": 0
         },
         "factor": {
           "description": "Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.\n\n",
-          "type": "number",
           "format": "double",
+          "type": "number",
           "x-go-tag-validate": "gt=1.0",
           "x-order": 1
         },
         "start": {
           "description": "Upper bound of the lowest bucket.\n\n",
-          "type": "number",
           "format": "double",
+          "type": "number",
           "x-go-tag-validate": "gt=0.0",
           "x-order": 2
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "FluxMeterExponentialBucketsRange": {
       "description": "ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest\nbucket is `max`. The final +inf bucket is not counted.",
-      "type": "object",
       "properties": {
         "count": {
           "description": "Number of buckets.\n\n",
-          "type": "integer",
+          "exclusiveMinimum": 0,
           "format": "int32",
+          "type": "integer",
           "x-go-tag-validate": "gt=0",
           "x-order": 0
         },
         "max": {
           "description": "Highest bucket.",
-          "type": "number",
           "format": "double",
+          "type": "number",
           "x-order": 1
         },
         "min": {
           "description": "Lowest bucket.\n\n",
-          "type": "number",
           "format": "double",
+          "type": "number",
           "x-go-tag-validate": "gt=0.0",
           "x-order": 2
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "FluxMeterLinearBuckets": {
       "description": "LinearBuckets creates `count` number of buckets, each `width` wide, where the lowest bucket has an\nupper bound of `start`. The final +inf bucket is not counted.",
-      "type": "object",
       "properties": {
         "count": {
           "description": "Number of buckets.\n\n",
-          "type": "integer",
+          "exclusiveMinimum": 0,
           "format": "int32",
+          "type": "integer",
           "x-go-tag-validate": "gt=0",
           "x-order": 0
         },
         "start": {
           "description": "Upper bound of the lowest bucket.",
-          "type": "number",
           "format": "double",
+          "type": "number",
           "x-order": 1
         },
         "width": {
           "description": "Width of each bucket.",
-          "type": "number",
           "format": "double",
+          "type": "number",
           "x-order": 2
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "FluxMeterStaticBuckets": {
       "description": "StaticBuckets holds the static value of the buckets where latency histogram will be stored.",
-      "type": "object",
       "properties": {
         "buckets": {
-          "type": "array",
-          "title": "@gotags: default:\"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]\"",
           "items": {
-            "type": "number",
-            "format": "double"
+            "format": "double",
+            "type": "number"
           },
+          "title": "@gotags: default:\"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]\"",
+          "type": "array",
           "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "GradientController": {
       "description": "The `gradient` describes a corrective factor that should be applied to the\ncontrol variable to get the signal closer to the setpoint. It is computed as follows:\n\n$$\n\\text{gradient} = \\left(\\frac{\\text{signal}}{\\text{setpoint}}\\right)^{\\text{slope}}\n$$\n\n`gradient` is then clamped to [min_gradient, max_gradient] range.\n\nThe output of gradient controller is computed as follows:\n$$\n\\text{output} = \\text{gradient}_{\\text{clamped}} \\cdot \\text{control\\_variable} + \\text{optimize}.\n$$\n\nNote the additional `optimize` signal, that can be used to \"nudge\" the\ncontroller into desired idle state.\n\nThe output can be _optionally_ clamped to desired range using `max` and\n`min` input.",
-      "type": "object",
-      "title": "Gradient controller is a type of controller which tries to adjust the\ncontrol variable proportionally to the relative difference between setpoint\nand actual value of the signal",
-      "required": ["parameters"],
       "properties": {
         "default_config": {
+          "$ref": "#/definitions/GradientControllerDynamicConfig",
           "description": "Default configuration.",
-          "x-order": 0,
-          "$ref": "#/definitions/GradientControllerDynamicConfig"
+          "x-order": 0
         },
         "dynamic_config_key": {
-          "type": "string",
           "title": "Configuration key for DynamicConfig",
+          "type": "string",
           "x-order": 1
         },
         "in_ports": {
+          "$ref": "#/definitions/GradientControllerIns",
           "description": "Input ports of the Gradient Controller.",
-          "x-order": 2,
-          "$ref": "#/definitions/GradientControllerIns"
+          "x-order": 2
         },
         "out_ports": {
+          "$ref": "#/definitions/GradientControllerOuts",
           "description": "Output ports of the Gradient Controller.",
-          "x-order": 3,
-          "$ref": "#/definitions/GradientControllerOuts"
+          "x-order": 3
         },
         "parameters": {
+          "$ref": "#/definitions/GradientControllerParameters",
           "description": "Gradient Parameters.\n\n",
           "x-go-tag-validate": "required",
-          "x-order": 4,
-          "$ref": "#/definitions/GradientControllerParameters"
+          "x-order": 4
         }
       },
+      "title": "Gradient controller is a type of controller which tries to adjust the\ncontrol variable proportionally to the relative difference between setpoint\nand actual value of the signal",
+      "type": "object",
       "additionalProperties": false
     },
     "GradientControllerDynamicConfig": {
-      "type": "object",
-      "title": "Dynamic Configuration for a Controller",
       "properties": {
         "manual_mode": {
+          "default": false,
           "description": "Decides whether the controller runs in \"manual_mode\".\nIn manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.\n\n",
           "type": "boolean",
-          "default": false,
           "x-go-tag-default": "false",
           "x-order": 0
         }
       },
+      "title": "Dynamic Configuration for a Controller",
+      "type": "object",
       "additionalProperties": false
     },
     "GradientControllerIns": {
       "description": "Inputs for the Gradient Controller component.",
-      "type": "object",
       "properties": {
         "control_variable": {
+          "$ref": "#/definitions/InPort",
           "description": "Actual current value of the control variable.\n\nThis signal is multiplied by the gradient to produce the output.",
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "x-order": 0
         },
         "max": {
+          "$ref": "#/definitions/InPort",
           "description": "Maximum value to limit the output signal.",
-          "x-order": 1,
-          "$ref": "#/definitions/InPort"
+          "x-order": 1
         },
         "min": {
+          "$ref": "#/definitions/InPort",
           "description": "Minimum value to limit the output signal.",
-          "x-order": 2,
-          "$ref": "#/definitions/InPort"
+          "x-order": 2
         },
         "optimize": {
+          "$ref": "#/definitions/InPort",
           "description": "Optimize signal is added to the output of the gradient calculation.",
-          "x-order": 3,
-          "$ref": "#/definitions/InPort"
+          "x-order": 3
         },
         "setpoint": {
+          "$ref": "#/definitions/InPort",
           "description": "Setpoint to be used for the gradient computation.",
-          "x-order": 4,
-          "$ref": "#/definitions/InPort"
+          "x-order": 4
         },
         "signal": {
+          "$ref": "#/definitions/InPort",
           "description": "Signal to be used for the gradient computation.",
-          "x-order": 5,
-          "$ref": "#/definitions/InPort"
+          "x-order": 5
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "GradientControllerOuts": {
       "description": "Outputs for the Gradient Controller component.",
-      "type": "object",
       "properties": {
         "output": {
+          "$ref": "#/definitions/OutPort",
           "description": "Computed desired value of the control variable.",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "GradientControllerParameters": {
       "description": "Gradient Parameters.",
-      "type": "object",
-      "required": ["slope"],
       "properties": {
         "max_gradient": {
-          "description": "Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].\n\n",
-          "type": "number",
-          "format": "double",
           "default": 1.7976931348623157e308,
+          "description": "Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].\n\n",
+          "format": "double",
+          "type": "number",
           "x-go-tag-default": "1.79769313486231570814527423731704356798070e+308",
           "x-order": 0
         },
         "min_gradient": {
-          "description": "Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].\n\n",
-          "type": "number",
-          "format": "double",
           "default": -1.7976931348623157e308,
+          "description": "Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].\n\n",
+          "format": "double",
+          "type": "number",
           "x-go-tag-default": "-1.79769313486231570814527423731704356798070e+308",
           "x-order": 1
         },
         "slope": {
           "description": "Slope controls the aggressiveness and direction of the Gradient Controller.\n\nSlope is used as exponent on the signal to setpoint ratio in computation\nof the gradient (see the [main description](#gradient-controller) for\nexact equation). Good intuition for this parameter is \"What should the\nGradient Controller do to the control variable when signal is too high\",\neg.:\n* $\\text{slope} = 1$: when signal is too high, increase control variable,\n* $\\text{slope} = -1$: when signal is too high, decrease control variable,\n* $\\text{slope} = -0.5$: when signal is too high, decrease control variable slowly.\n\nThe sign of slope depends on correlation between the signal and control variable:\n* Use $\\text{slope} < 0$ if signal and control variable are _positively_\ncorrelated (eg. Per-pod CPU usage and total concurrency).\n* Use $\\text{slope} > 0$ if signal and control variable are _negatively_\ncorrelated (eg. Per-pod CPU usage and number of pods).\n\n:::note\n\nYou need to set _negative_ slope for a _positive_ correlation, as you're\ndescribing the _action_ which controller should make when the signal\nincreases.\n\n:::\n\nThe magnitude of slope describes how aggressively should the controller\nreact to a deviation of signal.\nWith $|\\text{slope}| = 1$, the controller will aim to bring the signal to\nthe setpoint in one tick (assuming linear correlation with signal and setpoint).\nSmaller magnitudes of slope will make the controller adjust the control\nvariable more slowly.\n\nWe recommend setting $|\\text{slope}| < 1$ (eg. $\\pm0.8$).\nIf you experience overshooting, consider lowering the magnitude even more.\nValues of $|\\text{slope}| > 1$ are not recommended.\n\n:::note\n\nRemember that the gradient and output signal can be (optionally) clamped,\nso the _slope_ might not fully describe aggressiveness of the controller.\n\n:::\n\n",
-          "type": "number",
           "format": "double",
+          "type": "number",
           "x-go-tag-validate": "required",
           "x-order": 2
         }
       },
+      "required": ["slope"],
+      "type": "object",
       "additionalProperties": false
     },
     "Holder": {
       "description": "Holds the last valid signal value for the specified duration then waits for next valid value to hold.\nIf it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.",
-      "type": "object",
       "properties": {
         "hold_for": {
+          "default": "5s",
           "description": "Holding the last valid signal value for the hold_for duration.\n\n",
           "type": "string",
-          "default": "5s",
           "x-go-tag-default": "5s",
           "x-order": 0
         },
         "in_ports": {
-          "x-order": 1,
-          "$ref": "#/definitions/HolderIns"
+          "$ref": "#/definitions/HolderIns",
+          "x-order": 1
         },
         "out_ports": {
-          "x-order": 2,
-          "$ref": "#/definitions/HolderOuts"
+          "$ref": "#/definitions/HolderOuts",
+          "x-order": 2
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "HolderIns": {
       "description": "Inputs for the Holder component.",
-      "type": "object",
       "properties": {
         "input": {
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "$ref": "#/definitions/InPort",
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "HolderOuts": {
       "description": "Outputs for the Holder component.",
-      "type": "object",
       "properties": {
         "output": {
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "$ref": "#/definitions/OutPort",
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "InPort": {
-      "type": "object",
-      "title": "Components receive input from other components via InPorts",
       "properties": {
         "constant_signal": {
+          "$ref": "#/definitions/ConstantSignal",
           "description": "Constant value to be used for this InPort instead of a signal.",
-          "x-order": 0,
-          "$ref": "#/definitions/ConstantSignal"
+          "x-order": 0
         },
         "signal_name": {
           "description": "Name of the incoming Signal on the InPort.",
@@ -1298,110 +1298,109 @@
           "x-order": 1
         }
       },
+      "title": "Components receive input from other components via InPorts",
+      "type": "object",
       "additionalProperties": false
     },
     "Integrator": {
       "description": "Accumulates sum of signal every tick.",
-      "type": "object",
       "properties": {
         "in_ports": {
+          "$ref": "#/definitions/IntegratorIns",
           "description": "Input ports for the Integrator component.",
-          "x-order": 0,
-          "$ref": "#/definitions/IntegratorIns"
+          "x-order": 0
         },
         "out_ports": {
+          "$ref": "#/definitions/IntegratorOuts",
           "description": "Output ports for the Integrator component.",
-          "x-order": 1,
-          "$ref": "#/definitions/IntegratorOuts"
+          "x-order": 1
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "IntegratorIns": {
       "description": "Inputs for the Integrator component.",
-      "type": "object",
       "properties": {
         "input": {
+          "$ref": "#/definitions/InPort",
           "description": "The input signal.",
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "x-order": 0
         },
         "max": {
+          "$ref": "#/definitions/InPort",
           "description": "The maximum output.",
-          "x-order": 1,
-          "$ref": "#/definitions/InPort"
+          "x-order": 1
         },
         "min": {
+          "$ref": "#/definitions/InPort",
           "description": "The minimum output.",
-          "x-order": 2,
-          "$ref": "#/definitions/InPort"
+          "x-order": 2
         },
         "reset": {
+          "$ref": "#/definitions/InPort",
           "description": "Resets the integrator output to zero when reset signal is valid and non-zero. Reset also resets the max and min constraints.",
-          "x-order": 3,
-          "$ref": "#/definitions/InPort"
+          "x-order": 3
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "IntegratorOuts": {
       "description": "Outputs for the Integrator component.",
-      "type": "object",
       "properties": {
         "output": {
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "$ref": "#/definitions/OutPort",
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "Inverter": {
       "description": "Logical NOT.\n\nSee [And component](#and) on how signals are mapped onto boolean values.",
-      "type": "object",
       "properties": {
         "in_ports": {
+          "$ref": "#/definitions/InverterIns",
           "description": "Input ports for the Inverter component.",
-          "x-order": 0,
-          "$ref": "#/definitions/InverterIns"
+          "x-order": 0
         },
         "out_ports": {
+          "$ref": "#/definitions/InverterOuts",
           "description": "Output ports for the Inverter component.",
-          "x-order": 1,
-          "$ref": "#/definitions/InverterOuts"
+          "x-order": 1
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "InverterIns": {
       "description": "Inputs for the Inverter component.",
-      "type": "object",
       "properties": {
         "input": {
+          "$ref": "#/definitions/InPort",
           "description": "Signal to be negated.\n\n",
           "x-go-tag-validate": "dive",
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "InverterOuts": {
       "description": "Output ports for the Inverter component.",
-      "type": "object",
       "properties": {
         "output": {
+          "$ref": "#/definitions/OutPort",
           "description": "Logical negation of the input signal.\n\nWill always be 0 (false), 1 (true) or invalid (unknown).",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "JSONExtractor": {
       "description": "Example:\n```yaml\nfrom: request.http.body\npointer: /user/name\n```",
-      "type": "object",
-      "title": "Deserialize a json, and extract one of the fields",
-      "required": ["from"],
       "properties": {
         "from": {
           "description": "Attribute path pointing to some strings - eg. \"request.http.body\".\n\n",
@@ -1415,13 +1414,13 @@
           "x-order": 1
         }
       },
+      "required": ["from"],
+      "title": "Deserialize a json, and extract one of the fields",
+      "type": "object",
       "additionalProperties": false
     },
     "JWTExtractor": {
       "description": "Specify a field to be extracted from payload using \"json_pointer\".\n\nNote: The signature is not verified against the secret (we're assuming there's some\nother parts of the system that handles such verification).\n\nExample:\n```yaml\nfrom: request.http.bearer\njson_pointer: /user/email\n```",
-      "type": "object",
-      "title": "Parse the attribute as JWT and read the payload",
-      "required": ["from"],
       "properties": {
         "from": {
           "description": "Jwt token can be pulled from any input attribute, but most likely you'd want to use \"request.http.bearer\".\n\n",
@@ -1435,12 +1434,13 @@
           "x-order": 1
         }
       },
+      "required": ["from"],
+      "title": "Parse the attribute as JWT and read the payload",
+      "type": "object",
       "additionalProperties": false
     },
     "K8sLabelMatcherRequirement": {
       "description": "Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values.",
-      "type": "object",
-      "required": ["key"],
       "properties": {
         "key": {
           "description": "Label key that the selector applies to.\n\n",
@@ -1450,36 +1450,37 @@
         },
         "operator": {
           "description": "Logical operator which represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.\n\n",
+          "enum": ["In", "NotIn", "Exists", "DoesNotExists"],
           "type": "string",
           "x-go-tag-validate": "oneof=In NotIn Exists DoesNotExists",
           "x-order": 1
         },
         "values": {
           "description": "An array of string values that relates to the key by an operator.\nIf the operator is In or NotIn, the values array must be non-empty.\nIf the operator is Exists or DoesNotExist, the values array must be empty.",
-          "type": "array",
           "items": {
             "type": "string"
           },
+          "type": "array",
           "x-order": 2
         }
       },
+      "required": ["key"],
+      "type": "object",
       "additionalProperties": false
     },
     "KubernetesObjectSelector": {
       "description": "Describes which pods a control or observability\ncomponent should apply to.",
-      "type": "object",
-      "required": ["api_version", "kind", "name", "namespace"],
       "properties": {
         "agent_group": {
+          "default": "default",
           "description": "Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this\nselector applies to.\n\n",
           "type": "string",
-          "default": "default",
           "x-go-tag-default": "default",
           "x-order": 0
         },
         "api_version": {
-          "type": "string",
           "title": "API version of Kubernetes resource",
+          "type": "string",
           "x-go-tag-validate": "required",
           "x-order": 1
         },
@@ -1502,45 +1503,45 @@
           "x-order": 4
         }
       },
+      "required": ["api_version", "kind", "name", "namespace"],
+      "type": "object",
       "additionalProperties": false
     },
     "LabelMatcher": {
       "description": "It provides three ways to define requirements:\n- matchLabels\n- matchExpressions\n- arbitrary expression\n\nIf multiple requirements are set, they are all ANDed.\nAn empty label matcher always matches.",
-      "type": "object",
-      "title": "Allows to define rules whether a map of\n[labels](/concepts/integrations/flow-control/flow-label.md)\nshould be considered a match or not",
       "properties": {
         "expression": {
+          "$ref": "#/definitions/MatchExpression",
           "description": "An arbitrary expression to be evaluated on the labels.",
-          "x-order": 0,
-          "$ref": "#/definitions/MatchExpression"
+          "x-order": 0
         },
         "match_expressions": {
           "description": "List of k8s-style label matcher requirements.\n\nNote: The requirements are ANDed.",
-          "type": "array",
           "items": {
             "$ref": "#/definitions/K8sLabelMatcherRequirement"
           },
+          "type": "array",
           "x-order": 1
         },
         "match_labels": {
-          "description": "A map of {key,value} pairs representing labels to be matched.\nA single {key,value} in the matchLabels requires that the label \"key\" is present and equal to \"value\".\n\nNote: The requirements are ANDed.",
-          "type": "object",
           "additionalProperties": {
             "type": "string"
           },
+          "description": "A map of {key,value} pairs representing labels to be matched.\nA single {key,value} in the matchLabels requires that the label \"key\" is present and equal to \"value\".\n\nNote: The requirements are ANDed.",
+          "type": "object",
           "x-order": 2
         }
       },
+      "title": "Allows to define rules whether a map of\n[labels](/concepts/integrations/flow-control/flow-label.md)\nshould be considered a match or not",
+      "type": "object",
       "additionalProperties": false
     },
     "LoadActuator": {
-      "type": "object",
-      "title": "Takes the load multiplier input signal and publishes it to the schedulers in the data-plane",
       "properties": {
         "default_config": {
+          "$ref": "#/definitions/LoadActuatorDynamicConfig",
           "description": "Default configuration.",
-          "x-order": 0,
-          "$ref": "#/definitions/LoadActuatorDynamicConfig"
+          "x-order": 0
         },
         "dynamic_config_key": {
           "description": "Configuration key for DynamicConfig.",
@@ -1548,16 +1549,16 @@
           "x-order": 1
         },
         "in_ports": {
+          "$ref": "#/definitions/LoadActuatorIns",
           "description": "Input ports for the Load Actuator component.",
-          "x-order": 2,
-          "$ref": "#/definitions/LoadActuatorIns"
+          "x-order": 2
         }
       },
+      "title": "Takes the load multiplier input signal and publishes it to the schedulers in the data-plane",
+      "type": "object",
       "additionalProperties": false
     },
     "LoadActuatorDynamicConfig": {
-      "type": "object",
-      "title": "Dynamic Configuration for LoadActuator",
       "properties": {
         "dry_run": {
           "description": "Decides whether to run the load actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this load actuator.\nUseful for observing the behavior of Load Actuator without disrupting any real traffic.",
@@ -1565,40 +1566,39 @@
           "x-order": 0
         }
       },
+      "title": "Dynamic Configuration for LoadActuator",
+      "type": "object",
       "additionalProperties": false
     },
     "LoadActuatorIns": {
       "description": "Input for the Load Actuator component.",
-      "type": "object",
       "properties": {
         "load_multiplier": {
+          "$ref": "#/definitions/InPort",
           "description": "Load multiplier is ratio of [incoming\nconcurrency](#scheduler-outs) that needs to be accepted.",
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "MatchExpression": {
       "description": "MatchExpression has multiple variants, exactly one should be set.\n\nExample:\n```yaml\nall:\n  of:\n    - label_exists: foo\n    - label_equals: { label = app, value = frobnicator }\n```",
-      "type": "object",
-      "title": "Defines a [map<string, string> \u2192\u00a0bool] expression to be evaluated on labels",
-      "required": ["label_exists"],
       "properties": {
         "all": {
+          "$ref": "#/definitions/MatchExpressionList",
           "description": "The expression is true when all subexpressions are true.",
-          "x-order": 0,
-          "$ref": "#/definitions/MatchExpressionList"
+          "x-order": 0
         },
         "any": {
+          "$ref": "#/definitions/MatchExpressionList",
           "description": "The expression is true when any subexpression is true.",
-          "x-order": 1,
-          "$ref": "#/definitions/MatchExpressionList"
+          "x-order": 1
         },
         "label_equals": {
+          "$ref": "#/definitions/EqualsMatchExpression",
           "description": "The expression is true when label value equals given value.",
-          "x-order": 2,
-          "$ref": "#/definitions/EqualsMatchExpression"
+          "x-order": 2
         },
         "label_exists": {
           "description": "The expression is true when label with given name exists.\n\n",
@@ -1607,38 +1607,39 @@
           "x-order": 3
         },
         "label_matches": {
+          "$ref": "#/definitions/MatchesMatchExpression",
           "description": "The expression is true when label matches given regex.",
-          "x-order": 4,
-          "$ref": "#/definitions/MatchesMatchExpression"
+          "x-order": 4
         },
         "not": {
+          "$ref": "#/definitions/MatchExpression",
           "description": "The expression negates the result of subexpression.",
-          "x-order": 5,
-          "$ref": "#/definitions/MatchExpression"
+          "x-order": 5
         }
       },
+      "required": ["label_exists"],
+      "title": "Defines a [map<string, string> \u2192\u00a0bool] expression to be evaluated on labels",
+      "type": "object",
       "additionalProperties": false
     },
     "MatchExpressionList": {
       "description": "eg. {any: {of: [expr1, expr2]}}.",
-      "type": "object",
-      "title": "List of MatchExpressions that is used for all/any matching",
       "properties": {
         "of": {
           "description": "List of subexpressions of the match expression.",
-          "type": "array",
           "items": {
             "$ref": "#/definitions/MatchExpression"
           },
+          "type": "array",
           "x-order": 0
         }
       },
+      "title": "List of MatchExpressions that is used for all/any matching",
+      "type": "object",
       "additionalProperties": false
     },
     "MatchesMatchExpression": {
       "description": "Label selector expression of the matches form \"label matches regex\".",
-      "type": "object",
-      "required": ["label", "regex"],
       "properties": {
         "label": {
           "description": "Name of the label to match the regular expression.\n\n",
@@ -1653,116 +1654,117 @@
           "x-order": 1
         }
       },
+      "required": ["label", "regex"],
+      "type": "object",
       "additionalProperties": false
     },
     "Max": {
       "description": "Max: output = max([]inputs).",
-      "type": "object",
-      "title": "Takes a list of input signals and emits the signal with the maximum value",
       "properties": {
         "in_ports": {
+          "$ref": "#/definitions/MaxIns",
           "description": "Input ports for the Max component.",
-          "x-order": 0,
-          "$ref": "#/definitions/MaxIns"
+          "x-order": 0
         },
         "out_ports": {
+          "$ref": "#/definitions/MaxOuts",
           "description": "Output ports for the Max component.",
-          "x-order": 1,
-          "$ref": "#/definitions/MaxOuts"
+          "x-order": 1
         }
       },
+      "title": "Takes a list of input signals and emits the signal with the maximum value",
+      "type": "object",
       "additionalProperties": false
     },
     "MaxIns": {
       "description": "Inputs for the Max component.",
-      "type": "object",
       "properties": {
         "inputs": {
           "description": "Array of input signals.\n\n",
-          "type": "array",
           "items": {
             "$ref": "#/definitions/InPort"
           },
+          "type": "array",
           "x-go-tag-validate": "dive",
           "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "MaxOuts": {
       "description": "Output for the Max component.",
-      "type": "object",
       "properties": {
         "output": {
+          "$ref": "#/definitions/OutPort",
           "description": "Signal with maximum value as an output signal.",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "Min": {
       "description": "Takes an array of input signals and emits the signal with the minimum value\nMin: output = min([]inputs).",
-      "type": "object",
       "properties": {
         "in_ports": {
+          "$ref": "#/definitions/MinIns",
           "description": "Input ports for the Min component.",
-          "x-order": 0,
-          "$ref": "#/definitions/MinIns"
+          "x-order": 0
         },
         "out_ports": {
+          "$ref": "#/definitions/MinOuts",
           "description": "Output ports for the Min component.",
-          "x-order": 1,
-          "$ref": "#/definitions/MinOuts"
+          "x-order": 1
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "MinIns": {
       "description": "Inputs for the Min component.",
-      "type": "object",
       "properties": {
         "inputs": {
           "description": "Array of input signals.\n\n",
-          "type": "array",
           "items": {
             "$ref": "#/definitions/InPort"
           },
+          "type": "array",
           "x-go-tag-validate": "dive",
           "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "MinOuts": {
       "description": "Output ports for the Min component.",
-      "type": "object",
       "properties": {
         "output": {
+          "$ref": "#/definitions/OutPort",
           "description": "Signal with minimum value as an output signal.",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "NestedCircuit": {
       "description": "Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.",
-      "type": "object",
       "properties": {
         "components": {
-          "type": "array",
-          "title": "@gotags: validate:\"dive\"",
           "items": {
             "$ref": "#/definitions/Component"
           },
+          "title": "@gotags: validate:\"dive\"",
+          "type": "array",
           "x-order": 0
         },
         "in_ports_map": {
-          "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/InPort"
           },
+          "type": "object",
           "x-order": 1
         },
         "name": {
@@ -1771,10 +1773,10 @@
           "x-order": 2
         },
         "out_ports_map": {
-          "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/OutPort"
           },
+          "type": "object",
           "x-order": 3
         },
         "short_description": {
@@ -1783,112 +1785,111 @@
           "x-order": 4
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "NestedSignalEgress": {
       "description": "Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.",
-      "type": "object",
       "properties": {
         "in_ports": {
+          "$ref": "#/definitions/NestedSignalEgressIns",
           "description": "Input ports for the NestedSignalEgress component.",
-          "x-order": 0,
-          "$ref": "#/definitions/NestedSignalEgressIns"
+          "x-order": 0
         },
         "port_name": {
           "type": "string",
           "x-order": 1
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "NestedSignalEgressIns": {
       "description": "Inputs for the NestedSignalEgress component.",
-      "type": "object",
       "properties": {
         "signal": {
+          "$ref": "#/definitions/InPort",
           "description": "The signal to be egressed.",
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "NestedSignalIngress": {
       "description": "Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.",
-      "type": "object",
       "properties": {
         "out_ports": {
+          "$ref": "#/definitions/NestedSignalIngressOuts",
           "description": "Output ports for the NestedSignalIngress component.",
-          "x-order": 0,
-          "$ref": "#/definitions/NestedSignalIngressOuts"
+          "x-order": 0
         },
         "port_name": {
           "type": "string",
           "x-order": 1
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "NestedSignalIngressOuts": {
       "description": "Outputs for the NestedSignalIngress component.",
-      "type": "object",
       "properties": {
         "signal": {
+          "$ref": "#/definitions/OutPort",
           "description": "The signal to be ingressed.",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "Or": {
       "description": "Logical OR.\n\nSee [And component](#and) on how signals are mapped onto boolean values.",
-      "type": "object",
       "properties": {
         "in_ports": {
+          "$ref": "#/definitions/OrIns",
           "description": "Input ports for the Or component.",
-          "x-order": 0,
-          "$ref": "#/definitions/OrIns"
+          "x-order": 0
         },
         "out_ports": {
+          "$ref": "#/definitions/OrOuts",
           "description": "Output ports for the Or component.",
-          "x-order": 1,
-          "$ref": "#/definitions/OrOuts"
+          "x-order": 1
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "OrIns": {
       "description": "Inputs for the Or component.",
-      "type": "object",
       "properties": {
         "inputs": {
           "description": "Array of input signals.\n\n",
-          "type": "array",
           "items": {
             "$ref": "#/definitions/InPort"
           },
+          "type": "array",
           "x-go-tag-validate": "dive",
           "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "OrOuts": {
       "description": "Output ports for the Or component.",
-      "type": "object",
       "properties": {
         "output": {
+          "$ref": "#/definitions/OutPort",
           "description": "Result of logical OR of all the input signals.\n\nWill always be 0 (false), 1 (true) or invalid (unknown).",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "OutPort": {
-      "type": "object",
-      "title": "Components produce output for other components via OutPorts",
       "properties": {
         "signal_name": {
           "description": "Name of the outgoing Signal on the OutPort.",
@@ -1896,149 +1897,149 @@
           "x-order": 0
         }
       },
+      "title": "Components produce output for other components via OutPorts",
+      "type": "object",
       "additionalProperties": false
     },
     "PathTemplateMatcher": {
       "description": "HTTP path will be matched against given path templates.\nIf a match occurs, the value associated with the path template will be treated as a result.\nIn case of multiple path templates matching, the most specific one will be chosen.",
-      "type": "object",
-      "title": "Matches HTTP Path to given path templates",
       "properties": {
         "template_values": {
-          "description": "Template value keys are OpenAPI-inspired path templates.\n\n* Static path segment `/foo` matches a path segment exactly\n* `/{param}` matches arbitrary path segment.\n  (The param name is ignored and can be omitted (`{}`))\n* The parameter must cover whole segment.\n* Additionally, path template can end with `/*` wildcard to match\n  arbitrary number of trailing segments (0 or more).\n* Multiple consecutive `/` are ignored, as well as trailing `/`.\n* Parametrized path segments must come after static segments.\n* `*`, if present, must come last.\n* Most specific template \"wins\" (`/foo` over `/{}` and `/{}` over `/*`).\n\nSee also <https://swagger.io/specification/#path-templating-matching>\n\nExample:\n```yaml\n/register: register\n\"/user/{userId}\": user\n/static/*: other\n```\n\n",
-          "type": "object",
           "additionalProperties": {
             "type": "string"
           },
+          "description": "Template value keys are OpenAPI-inspired path templates.\n\n* Static path segment `/foo` matches a path segment exactly\n* `/{param}` matches arbitrary path segment.\n  (The param name is ignored and can be omitted (`{}`))\n* The parameter must cover whole segment.\n* Additionally, path template can end with `/*` wildcard to match\n  arbitrary number of trailing segments (0 or more).\n* Multiple consecutive `/` are ignored, as well as trailing `/`.\n* Parametrized path segments must come after static segments.\n* `*`, if present, must come last.\n* Most specific template \"wins\" (`/foo` over `/{}` and `/{}` over `/*`).\n\nSee also <https://swagger.io/specification/#path-templating-matching>\n\nExample:\n```yaml\n/register: register\n\"/user/{userId}\": user\n/static/*: other\n```\n\n",
+          "minProperties": 1,
+          "type": "object",
           "x-go-tag-validate": "gt=0,dive,keys,required,endkeys,required",
           "x-order": 0
         }
       },
+      "title": "Matches HTTP Path to given path templates",
+      "type": "object",
       "additionalProperties": false
     },
     "PodScaler": {
-      "type": "object",
-      "required": ["kubernetes_object_selector"],
       "properties": {
         "kubernetes_object_selector": {
+          "$ref": "#/definitions/KubernetesObjectSelector",
           "description": "The Kubernetes object on which horizontal scaling is applied.\n\n",
           "x-go-tag-validate": "required",
-          "x-order": 0,
-          "$ref": "#/definitions/KubernetesObjectSelector"
+          "x-order": 0
         },
         "scale_actuator": {
-          "x-order": 1,
-          "$ref": "#/definitions/PodScalerScaleActuator"
+          "$ref": "#/definitions/PodScalerScaleActuator",
+          "x-order": 1
         },
         "scale_reporter": {
-          "x-order": 2,
-          "$ref": "#/definitions/PodScalerScaleReporter"
+          "$ref": "#/definitions/PodScalerScaleReporter",
+          "x-order": 2
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "PodScalerScaleActuator": {
-      "type": "object",
       "properties": {
         "default_config": {
+          "$ref": "#/definitions/PodScalerScaleActuatorDynamicConfig",
           "description": "Default configuration.",
-          "x-order": 0,
-          "$ref": "#/definitions/PodScalerScaleActuatorDynamicConfig"
+          "x-order": 0
         },
         "dynamic_config_key": {
-          "type": "string",
           "title": "Configuration key for DynamicConfig",
+          "type": "string",
           "x-order": 1
         },
         "in_ports": {
-          "x-order": 2,
-          "$ref": "#/definitions/PodScalerScaleActuatorIns"
+          "$ref": "#/definitions/PodScalerScaleActuatorIns",
+          "x-order": 2
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "PodScalerScaleActuatorDynamicConfig": {
-      "type": "object",
-      "title": "Dynamic Configuration for ScaleActuator",
       "properties": {
         "dry_run": {
+          "default": false,
           "description": "Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.\nUseful for observing the behavior of Scaler without disrupting any real traffic.\n\n",
           "type": "boolean",
-          "default": false,
           "x-go-tag-default": "false",
           "x-order": 0
         }
       },
+      "title": "Dynamic Configuration for ScaleActuator",
+      "type": "object",
       "additionalProperties": false
     },
     "PodScalerScaleActuatorIns": {
       "description": "Inputs for the PodScaler component.",
-      "type": "object",
       "properties": {
         "desired_replicas": {
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "$ref": "#/definitions/InPort",
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "PodScalerScaleReporter": {
-      "type": "object",
       "properties": {
         "out_ports": {
-          "x-order": 0,
-          "$ref": "#/definitions/PodScalerScaleReporterOuts"
+          "$ref": "#/definitions/PodScalerScaleReporterOuts",
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "PodScalerScaleReporterOuts": {
       "description": "Outputs for the PodScaler component.",
-      "type": "object",
       "properties": {
         "actual_replicas": {
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "$ref": "#/definitions/OutPort",
+          "x-order": 0
         },
         "configured_replicas": {
-          "x-order": 1,
-          "$ref": "#/definitions/OutPort"
+          "$ref": "#/definitions/OutPort",
+          "x-order": 1
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "Policy": {
       "description": ":::info\n\nSee also [Policy overview](/concepts/policy/policy.md).\n\n:::\n\nPolicy specification contains a circuit that defines the controller logic and resources that need to be setup.",
-      "type": "object",
-      "title": "Policy expresses reliability automation workflow that automatically protects services",
       "properties": {
         "circuit": {
+          "$ref": "#/definitions/Circuit",
           "description": "Defines the control-loop logic of the policy.",
-          "x-order": 0,
-          "$ref": "#/definitions/Circuit"
+          "x-order": 0
         },
         "resources": {
+          "$ref": "#/definitions/Resources",
           "description": "Resources (Flux Meters, Classifiers etc.) to setup.",
-          "x-order": 1,
-          "$ref": "#/definitions/Resources"
+          "x-order": 1
         }
       },
+      "title": "Policy expresses reliability automation workflow that automatically protects services",
+      "type": "object",
       "additionalProperties": false
     },
     "PromQL": {
-      "type": "object",
-      "title": "Component that runs a Prometheus query periodically and returns the result as an output signal",
       "properties": {
         "evaluation_interval": {
+          "default": "10s",
           "description": "Describes the interval between successive evaluations of the Prometheus query.\n\n",
           "type": "string",
-          "default": "10s",
           "x-go-tag-default": "10s",
           "x-order": 0
         },
         "out_ports": {
+          "$ref": "#/definitions/PromQLOuts",
           "description": "Output ports for the PromQL component.",
-          "x-order": 1,
-          "$ref": "#/definitions/PromQLOuts"
+          "x-order": 1
         },
         "query_string": {
           "description": "Describes the Prometheus query to be run.\n\n:::caution\n\nTODO we should describe how to construct the query, eg. how to employ the\nfluxmeters here or link to appropriate place in docs.\n\n:::",
@@ -2046,137 +2047,135 @@
           "x-order": 2
         }
       },
+      "title": "Component that runs a Prometheus query periodically and returns the result as an output signal",
+      "type": "object",
       "additionalProperties": false
     },
     "PromQLOuts": {
       "description": "Output for the PromQL component.",
-      "type": "object",
       "properties": {
         "output": {
+          "$ref": "#/definitions/OutPort",
           "description": "The result of the Prometheus query as an output signal.",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "PulseGenerator": {
       "description": "Generates 0 and 1 in turns.",
-      "type": "object",
       "properties": {
         "false_for": {
+          "default": "5s",
           "description": "Emitting 0 for the false_for duration.\n\n",
           "type": "string",
-          "default": "5s",
           "x-go-tag-default": "5s",
           "x-order": 0
         },
         "out_ports": {
-          "x-order": 1,
-          "$ref": "#/definitions/PulseGeneratorOuts"
+          "$ref": "#/definitions/PulseGeneratorOuts",
+          "x-order": 1
         },
         "true_for": {
+          "default": "5s",
           "description": "Emitting 1 for the true_for duration.\n\n",
           "type": "string",
-          "default": "5s",
           "x-go-tag-default": "5s",
           "x-order": 2
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "PulseGeneratorOuts": {
       "description": "Outputs for the PulseGenerator component.",
-      "type": "object",
       "properties": {
         "output": {
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "$ref": "#/definitions/OutPort",
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "Query": {
       "description": "Query components that are query databases such as Prometheus.",
-      "type": "object",
       "properties": {
         "promql": {
+          "$ref": "#/definitions/PromQL",
           "description": "Periodically runs a Prometheus query in the background and emits the result.",
-          "x-order": 0,
-          "$ref": "#/definitions/PromQL"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "RateLimiter": {
       "description": ":::info\n\nSee also [Rate Limiter overview](/concepts/integrations/flow-control/components/rate-limiter.md).\n\n:::\n\nRatelimiting is done separately on per-label-value basis. Use _label\\_key_\nto select which label should be used as key.",
-      "type": "object",
-      "title": "Limits the traffic on a control point to specified rate",
-      "required": ["flow_selector", "parameters"],
       "properties": {
         "default_config": {
+          "$ref": "#/definitions/RateLimiterDynamicConfig",
           "title": "Default configuration",
-          "x-order": 0,
-          "$ref": "#/definitions/RateLimiterDynamicConfig"
+          "x-order": 0
         },
         "dynamic_config_key": {
-          "type": "string",
           "title": "Configuration key for DynamicConfig",
+          "type": "string",
           "x-order": 1
         },
         "flow_selector": {
+          "$ref": "#/definitions/FlowSelector",
           "description": "Which control point to apply this ratelimiter to.\n\n",
           "x-go-tag-validate": "required",
-          "x-order": 2,
-          "$ref": "#/definitions/FlowSelector"
+          "x-order": 2
         },
         "in_ports": {
+          "$ref": "#/definitions/RateLimiterIns",
           "title": "@gotags: validate:\"required\"",
-          "x-order": 3,
-          "$ref": "#/definitions/RateLimiterIns"
+          "x-order": 3
         },
         "parameters": {
+          "$ref": "#/definitions/RateLimiterParameters",
           "title": "Parameters for the RateLimiter component",
           "x-go-tag-validate": "required",
-          "x-order": 4,
-          "$ref": "#/definitions/RateLimiterParameters"
+          "x-order": 4
         }
       },
+      "title": "Limits the traffic on a control point to specified rate",
+      "type": "object",
       "additionalProperties": false
     },
     "RateLimiterDynamicConfig": {
-      "type": "object",
-      "title": "Dynamic Configuration for the rate limiter",
       "properties": {
         "overrides": {
           "description": "Allows to specify different limits for particular label values.\n\n",
-          "type": "array",
           "items": {
             "$ref": "#/definitions/RateLimiterOverride"
           },
+          "type": "array",
           "x-go-tag-validate": "dive",
           "x-order": 0
         }
       },
+      "title": "Dynamic Configuration for the rate limiter",
+      "type": "object",
       "additionalProperties": false
     },
     "RateLimiterIns": {
-      "type": "object",
-      "title": "Inputs for the RateLimiter component",
-      "required": ["limit"],
       "properties": {
         "limit": {
+          "$ref": "#/definitions/InPort",
           "description": "Number of flows allowed per _limit\\_reset\\_interval_ per each label.\nNegative values disable the ratelimiter.\n\n:::tip\n\nNegative limit can be useful to _conditionally_ enable the ratelimiter\nunder certain circumstances. [Decider](#decider) might be helpful.\n\n:::\n\n",
           "x-go-tag-validate": "required",
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "x-order": 0
         }
       },
+      "title": "Inputs for the RateLimiter component",
+      "type": "object",
       "additionalProperties": false
     },
     "RateLimiterOverride": {
-      "type": "object",
-      "required": ["label_value"],
       "properties": {
         "label_value": {
           "description": "Value of the label for which the override should be applied.\n\n",
@@ -2185,19 +2184,19 @@
           "x-order": 0
         },
         "limit_scale_factor": {
-          "description": "Amount by which the _in\\_ports.limit_ should be multiplied for this label value.\n\n",
-          "type": "number",
-          "format": "double",
           "default": 1,
+          "description": "Amount by which the _in\\_ports.limit_ should be multiplied for this label value.\n\n",
+          "format": "double",
+          "type": "number",
           "x-go-tag-default": "1.0",
           "x-order": 1
         }
       },
+      "required": ["label_value"],
+      "type": "object",
       "additionalProperties": false
     },
     "RateLimiterParameters": {
-      "type": "object",
-      "required": ["label_key"],
       "properties": {
         "label_key": {
           "description": "Specifies which label the ratelimiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/integrations/flow-control/flow-label.md) with given key.\nEg., to give each user a separate limit, assuming you have a _user_ flow\nlabel set up, set `label_key: \"user\"`.\n\n",
@@ -2206,99 +2205,99 @@
           "x-order": 0
         },
         "lazy_sync": {
+          "$ref": "#/definitions/RateLimiterParametersLazySync",
           "title": "Configuration of lazy-syncing behaviour of ratelimiter",
-          "x-order": 1,
-          "$ref": "#/definitions/RateLimiterParametersLazySync"
+          "x-order": 1
         },
         "limit_reset_interval": {
+          "default": "60s",
           "description": "Time after which the limit for a given label value will be reset.\n\n",
           "type": "string",
-          "default": "60s",
           "x-go-tag-default": "60s",
           "x-order": 2
         }
       },
+      "required": ["label_key"],
+      "type": "object",
       "additionalProperties": false
     },
     "RateLimiterParametersLazySync": {
-      "type": "object",
       "properties": {
         "enabled": {
-          "type": "boolean",
-          "title": "Enables lazy sync",
           "default": false,
+          "title": "Enables lazy sync",
+          "type": "boolean",
           "x-go-tag-default": "false",
           "x-order": 0
         },
         "num_sync": {
-          "description": "Number of times to lazy sync within the _limit\\_reset\\_interval_.\n\n",
-          "type": "integer",
-          "format": "int64",
           "default": 5,
+          "description": "Number of times to lazy sync within the _limit\\_reset\\_interval_.\n\n",
+          "exclusiveMinimum": 0,
+          "format": "int64",
+          "type": "integer",
           "x-go-tag-default": "5",
           "x-go-tag-validate": "gt=0",
           "x-order": 1
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "Resources": {
       "description": ":::info\n\nSee also [Resources overview](/concepts/policy/resources.md).\n\n:::\n\nResources are typically Flux Meters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.",
-      "type": "object",
-      "title": "Resources that need to be setup for the policy to function",
       "properties": {
         "classifiers": {
           "description": "Classifiers are installed in the data-plane and are used to label the requests based on payload content.\n\nThe flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.\n\n",
-          "type": "array",
           "items": {
             "$ref": "#/definitions/Classifier"
           },
+          "type": "array",
           "x-go-tag-validate": "dive",
           "x-order": 0
         },
         "flux_meters": {
-          "description": "Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.\n\nFlux Meter created metrics can be consumed as input to the circuit via the PromQL component.\n\n",
-          "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/FluxMeter"
           },
+          "description": "Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.\n\nFlux Meter created metrics can be consumed as input to the circuit via the PromQL component.\n\n",
+          "type": "object",
           "x-go-tag-validate": "dive",
           "x-order": 1
         }
       },
+      "title": "Resources that need to be setup for the policy to function",
+      "type": "object",
       "additionalProperties": false
     },
     "Rule": {
       "description": "Flow classification rule extracts a value from request metadata.\nMore specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].\nSee https://play.openpolicyagent.org/p/gU7vcLkc70 for an example input.\nThere are two ways to define a flow classification rule:\n* Using a declarative extractor \u2013 suitable from simple cases, such as directly reading a value from header or a field from json body.\n* Rego expression.\n\nPerformance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.\n\nExample of Declarative JSON extractor:\n```yaml\nextractor:\n  json:\n    from: request.http.body\n    pointer: /user/name\n```\n\nExample of Rego module which also disables telemetry visibility of label:\n```yaml\nrego:\n  query: data.user_from_cookie.user\n  source: |\n    package user_from_cookie\n    cookies := split(input.attributes.request.http.headers.cookie, \"; \")\n    user := user {\n        cookie := cookies[_]\n        startswith(cookie, \"session=\")\n        session := substring(cookie, count(\"session=\"), -1)\n        parts := split(session, \".\")\n        object := json.unmarshal(base64url.decode(parts[0]))\n        user := object.user\n    }\ntelemetry: false\n```\n[attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto",
-      "type": "object",
-      "title": "Rule describes a single Flow Classification Rule",
       "properties": {
         "extractor": {
+          "$ref": "#/definitions/Extractor",
           "description": "High-level declarative extractor.",
-          "x-order": 0,
-          "$ref": "#/definitions/Extractor"
+          "x-order": 0
         },
         "rego": {
+          "$ref": "#/definitions/RuleRego",
           "description": "Rego module to extract a value from.",
-          "x-order": 1,
-          "$ref": "#/definitions/RuleRego"
+          "x-order": 1
         },
         "telemetry": {
-          "description": ":::note\n\nThe flow label is always accessible in Aperture Policies regardless of this setting.\n\n:::\n\n:::caution\n\nWhen using [FluxNinja ARC plugin](arc/plugin.md), telemetry enabled\nlabels are sent to FluxNinja ARC for observability. Telemetry should be disabled for\nsensitive labels.\n\n:::\n\n",
-          "type": "boolean",
-          "title": "Decides if the created flow label should be available as an attribute in OLAP telemetry and\npropagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)",
           "default": true,
+          "description": ":::note\n\nThe flow label is always accessible in Aperture Policies regardless of this setting.\n\n:::\n\n:::caution\n\nWhen using [FluxNinja ARC plugin](arc/plugin.md), telemetry enabled\nlabels are sent to FluxNinja ARC for observability. Telemetry should be disabled for\nsensitive labels.\n\n:::\n\n",
+          "title": "Decides if the created flow label should be available as an attribute in OLAP telemetry and\npropagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)",
+          "type": "boolean",
           "x-go-tag-default": "true",
           "x-order": 2
         }
       },
+      "title": "Rule describes a single Flow Classification Rule",
+      "type": "object",
       "additionalProperties": false
     },
     "RuleRego": {
       "description": "High-level extractor-based rules are compiled into a single rego query.",
-      "type": "object",
-      "title": "Raw rego rules are compiled 1:1 to rego queries",
-      "required": ["query", "source"],
       "properties": {
         "query": {
           "description": "Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).\n\nNote: The module name must match the package name from the \"source\".\n\n",
@@ -2313,114 +2312,114 @@
           "x-order": 1
         }
       },
+      "required": ["query", "source"],
+      "title": "Raw rego rules are compiled 1:1 to rego queries",
+      "type": "object",
       "additionalProperties": false
     },
     "Scheduler": {
       "description": ":::note\n\nEach Agent instantiates an independent copy of the scheduler, but output\nsignals for accepted and incoming concurrency are aggregated across all agents.\n\n:::\n\nSee [ConcurrencyLimiter](#concurrency-limiter) for more context.",
-      "type": "object",
-      "title": "Weighted Fair Queuing-based workload scheduler",
-      "required": ["parameters"],
       "properties": {
         "out_ports": {
+          "$ref": "#/definitions/SchedulerOuts",
           "description": "Output ports for the Scheduler component.",
-          "x-order": 0,
-          "$ref": "#/definitions/SchedulerOuts"
+          "x-order": 0
         },
         "parameters": {
+          "$ref": "#/definitions/SchedulerParameters",
           "description": "Scheduler parameters.\n\n",
           "x-go-tag-validate": "required",
-          "x-order": 1,
-          "$ref": "#/definitions/SchedulerParameters"
+          "x-order": 1
         }
       },
+      "title": "Weighted Fair Queuing-based workload scheduler",
+      "type": "object",
       "additionalProperties": false
     },
     "SchedulerOuts": {
       "description": "Output for the Scheduler component.",
-      "type": "object",
       "properties": {
         "accepted_concurrency": {
+          "$ref": "#/definitions/OutPort",
           "description": "Accepted concurrency is actual concurrency on a control point that this\nscheduler is applied on.\n\n:::info\n\nConcurrency is a unitless number describing mean number of\n[flows](/concepts/integrations/flow-control/flow-control.md#flow) being\nconcurrently processed by the system (system = control point).\nConcurrency is calculated as _work_ done per unit of time (so\nwork-seconds per world-seconds). Work-seconds are computed based on\ntoken-weights of of flows (which are either estimated via `auto_tokens`\nor specified by `Workload.tokens`).\n\n:::\n\nValue of this signal is aggregated from all the relevant schedulers.",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         },
         "incoming_concurrency": {
+          "$ref": "#/definitions/OutPort",
           "description": "Incoming concurrency is concurrency that'd be needed to accept all the\nflows entering the scheduler.\n\nThis is computed in the same way as `accepted_concurrency`, but summing\nup work-seconds from all the flows entering scheduler, including\nrejected ones.",
-          "x-order": 1,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 1
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "SchedulerParameters": {
-      "type": "object",
-      "title": "Scheduler parameters",
       "properties": {
         "auto_tokens": {
+          "default": true,
           "description": "Automatically estimate the size of a request in each workload, based on\nhistorical latency. Each workload's `tokens` will be set to average\nlatency of flows in that workload during last few seconds (exact duration\nof this average can change).\n\n",
           "type": "boolean",
-          "default": true,
           "x-go-tag-default": "true",
           "x-order": 0
         },
         "default_workload_parameters": {
+          "$ref": "#/definitions/SchedulerWorkloadParameters",
           "description": "Parameters to be used if none of workloads specified in `workloads` match.",
-          "x-order": 1,
-          "$ref": "#/definitions/SchedulerWorkloadParameters"
+          "x-order": 1
         },
         "max_timeout": {
-          "description": ":::caution\n\nThis timeout needs to be strictly less than the timeout set on the\nclient for the whole GRPC call:\n* in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,\n* in case of libraries, timeout configured... TODO.\n\nWe're using fail-open logic in integrations, so if the GRPC timeout\nfires first, the flow will end up being unconditionally allowed while\nit're still waiting on the scheduler.\n\nTo avoid such cases, the end-to-end GRPC timeout should also contain\nsome headroom for constant overhead like serialization, etc. Default\nvalue for GRPC timeouts is 500ms, giving 50ms of headeroom, so when\ntweaking this timeout, make sure to adjust the GRPC timeout accordingly.\n\n:::\n\n",
-          "type": "string",
-          "title": "Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped",
           "default": "0.49s",
+          "description": ":::caution\n\nThis timeout needs to be strictly less than the timeout set on the\nclient for the whole GRPC call:\n* in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,\n* in case of libraries, timeout configured... TODO.\n\nWe're using fail-open logic in integrations, so if the GRPC timeout\nfires first, the flow will end up being unconditionally allowed while\nit're still waiting on the scheduler.\n\nTo avoid such cases, the end-to-end GRPC timeout should also contain\nsome headroom for constant overhead like serialization, etc. Default\nvalue for GRPC timeouts is 500ms, giving 50ms of headeroom, so when\ntweaking this timeout, make sure to adjust the GRPC timeout accordingly.\n\n:::\n\n",
+          "title": "Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped",
+          "type": "string",
           "x-go-tag-default": "0.49s",
           "x-order": 2
         },
         "timeout_factor": {
+          "default": 0.5,
           "description": "If a flow is not able to get tokens within `timeout_factor * tokens` of duration,\nit will be rejected.\n\nThis value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.\n\n",
-          "type": "number",
           "format": "double",
           "title": "Timeout as a factor of tokens for a flow in a workload",
-          "default": 0.5,
+          "type": "number",
           "x-go-tag-default": "0.5",
           "x-go-tag-validate": "gte=0.0",
           "x-order": 3
         },
         "workloads": {
           "description": "List of workloads to be used in scheduler.\n\nCategorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads\nallows for load-shedding to be \"smarter\" than just \"randomly deny 50% of\nrequests\". There are two aspects of this \"smartness\":\n* Scheduler can more precisely calculate concurrency if it understands\n  that flows belonging to different classes have different weights (eg.\n  inserts vs lookups).\n* Setting different priorities to different workloads lets the scheduler\n  avoid dropping important traffic during overload.\n\nEach workload in this list specifies also a matcher that's used to\ndetermine which flow will be categorized into which workload.\nIn case of multiple matching workloads, the first matching one will be used.\nIf none of workloads match, `default_workload` will be used.\n\n:::info\n\nSee also [workload definition in the concepts\nsection](/concepts/integrations/flow-control/components/concurrency-limiter.md#workload).\n\n:::\n\n",
-          "type": "array",
           "items": {
             "$ref": "#/definitions/SchedulerWorkload"
           },
+          "type": "array",
           "x-go-tag-validate": "dive",
           "x-order": 4
         }
       },
+      "title": "Scheduler parameters",
+      "type": "object",
       "additionalProperties": false
     },
     "SchedulerWorkload": {
       "description": "Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.",
-      "type": "object",
-      "required": ["label_matcher", "parameters"],
       "properties": {
         "label_matcher": {
+          "$ref": "#/definitions/LabelMatcher",
           "description": "Label Matcher to select a Workload based on\n[flow labels](/concepts/integrations/flow-control/flow-label.md).\n\n",
           "x-go-tag-validate": "required",
-          "x-order": 0,
-          "$ref": "#/definitions/LabelMatcher"
+          "x-order": 0
         },
         "parameters": {
+          "$ref": "#/definitions/SchedulerWorkloadParameters",
           "description": "Parameters associated with flows matching the label matcher.\n\n",
           "x-go-tag-validate": "required",
-          "x-order": 1,
-          "$ref": "#/definitions/SchedulerWorkloadParameters"
+          "x-order": 1
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "SchedulerWorkloadParameters": {
       "description": "Parameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.",
-      "type": "object",
       "properties": {
         "fairness_key": {
           "description": "Fairness key is a label key that can be used to provide fairness within a workload.\nAny [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if\nyou have a classifier that sets `user` flow label, you might want to set\n`fairness_key = \"user\"`.",
@@ -2428,36 +2427,36 @@
           "x-order": 0
         },
         "priority": {
-          "description": "$$\n\\text{virtual\\_finish\\_time} = \\text{virtual\\_time} + \\left(\\text{tokens} \\cdot \\left(\\text{256} - \\text{priority}\\right)\\right)\n$$\n\n",
-          "type": "integer",
-          "format": "int64",
-          "title": "Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level.\nPriority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:",
           "default": 0,
+          "description": "$$\n\\text{virtual\\_finish\\_time} = \\text{virtual\\_time} + \\left(\\text{tokens} \\cdot \\left(\\text{256} - \\text{priority}\\right)\\right)\n$$\n\n",
+          "format": "int64",
+          "maximum": 255,
+          "minimum": 0,
+          "title": "Describes priority level of the requests within the workload.\nPriority level ranges from 0 to 255.\nHigher numbers means higher priority level.\nPriority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:",
+          "type": "integer",
           "x-go-tag-default": "0",
           "x-go-tag-validate": "gte=0,lte=255",
           "x-order": 1
         },
         "tokens": {
-          "description": "Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.\nThis override is applicable only if `auto_tokens` is set to false.\n\n",
-          "type": "string",
-          "format": "uint64",
           "default": "1",
+          "description": "Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.\nThis override is applicable only if `auto_tokens` is set to false.\n\n",
+          "format": "uint64",
+          "type": "string",
           "x-go-tag-default": "1",
           "x-order": 2
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "ServiceSelector": {
       "description": ":::info\n\nSee also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).\n\n:::",
-      "type": "object",
-      "title": "Describes which service a [flow control or observability\ncomponent](/concepts/integrations/flow-control/flow-control.md#components) should apply\nto",
-      "required": ["service"],
       "properties": {
         "agent_group": {
+          "default": "default",
           "description": "Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this\nselector applies to.\n\n:::info\n\nAgent Groups are used to scope policies to a subset of agents connected to the same controller. This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode. The agents within an agent group form a peer to peer cluster and constantly share state.\n\n:::\n\n",
           "type": "string",
-          "default": "default",
           "x-go-tag-default": "default",
           "x-order": 0
         },
@@ -2468,116 +2467,118 @@
           "x-order": 1
         }
       },
+      "required": ["service"],
+      "title": "Describes which service a [flow control or observability\ncomponent](/concepts/integrations/flow-control/flow-control.md#components) should apply\nto",
+      "type": "object",
       "additionalProperties": false
     },
     "Sqrt": {
       "description": "$$\n\\text{output} = \\text{scale} \\sqrt{\\text{input}}\n$$",
-      "type": "object",
-      "title": "Takes an input signal and emits the square root of it multiplied by scale as an output",
       "properties": {
         "in_ports": {
+          "$ref": "#/definitions/SqrtIns",
           "description": "Input ports for the Sqrt component.",
-          "x-order": 0,
-          "$ref": "#/definitions/SqrtIns"
+          "x-order": 0
         },
         "out_ports": {
+          "$ref": "#/definitions/SqrtOuts",
           "description": "Output ports for the Sqrt component.",
-          "x-order": 1,
-          "$ref": "#/definitions/SqrtOuts"
+          "x-order": 1
         },
         "scale": {
           "description": "Scaling factor to be multiplied with the square root of the input signal.\n\n@gotags default:\"1.0\"",
-          "type": "number",
           "format": "double",
+          "type": "number",
           "x-order": 2
         }
       },
+      "title": "Takes an input signal and emits the square root of it multiplied by scale as an output",
+      "type": "object",
       "additionalProperties": false
     },
     "SqrtIns": {
       "description": "Inputs for the Sqrt component.",
-      "type": "object",
       "properties": {
         "input": {
+          "$ref": "#/definitions/InPort",
           "description": "Input signal.",
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "SqrtOuts": {
       "description": "Outputs for the Sqrt component.",
-      "type": "object",
       "properties": {
         "output": {
+          "$ref": "#/definitions/OutPort",
           "description": "Output signal.",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "Switcher": {
       "description": "`on_signal` will be returned if switch input is valid and not equal to 0.0 ,\n otherwise `off_signal` will be returned.",
-      "type": "object",
-      "title": "Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input",
       "properties": {
         "in_ports": {
+          "$ref": "#/definitions/SwitcherIns",
           "description": "Input ports for the Switcher component.",
-          "x-order": 0,
-          "$ref": "#/definitions/SwitcherIns"
+          "x-order": 0
         },
         "out_ports": {
+          "$ref": "#/definitions/SwitcherOuts",
           "description": "Output ports for the Switcher component.",
-          "x-order": 1,
-          "$ref": "#/definitions/SwitcherOuts"
+          "x-order": 1
         }
       },
+      "title": "Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input",
+      "type": "object",
       "additionalProperties": false
     },
     "SwitcherIns": {
       "description": "Inputs for the Switcher component.",
-      "type": "object",
       "properties": {
         "off_signal": {
+          "$ref": "#/definitions/InPort",
           "description": "Output signal when switch is invalid or 0.0.",
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
+          "x-order": 0
         },
         "on_signal": {
+          "$ref": "#/definitions/InPort",
           "description": "Output signal when switch is valid and not 0.0.",
-          "x-order": 1,
-          "$ref": "#/definitions/InPort"
+          "x-order": 1
         },
         "switch": {
+          "$ref": "#/definitions/InPort",
           "description": "Decides whether to return `on_signal` or `off_signal`.",
-          "x-order": 2,
-          "$ref": "#/definitions/InPort"
+          "x-order": 2
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "SwitcherOuts": {
       "description": "Outputs for the Switcher component.",
-      "type": "object",
       "properties": {
         "output": {
+          "$ref": "#/definitions/OutPort",
           "description": "Selected signal (`on_signal` or `off_signal`).",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "Variable": {
       "description": "Component that emits a variable value as an output signal, can be defined in dynamic configuration.",
-      "type": "object",
       "properties": {
         "default_config": {
+          "$ref": "#/definitions/VariableDynamicConfig",
           "description": "Default configuration.",
-          "x-order": 0,
-          "$ref": "#/definitions/VariableDynamicConfig"
+          "x-order": 0
         },
         "dynamic_config_key": {
           "description": "Configuration key for DynamicConfig.",
@@ -2585,33 +2586,34 @@
           "x-order": 1
         },
         "out_ports": {
+          "$ref": "#/definitions/VariableOuts",
           "description": "Output ports for the Variable component.",
-          "x-order": 2,
-          "$ref": "#/definitions/VariableOuts"
+          "x-order": 2
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "VariableDynamicConfig": {
-      "type": "object",
       "properties": {
         "constant_signal": {
-          "x-order": 0,
-          "$ref": "#/definitions/ConstantSignal"
+          "$ref": "#/definitions/ConstantSignal",
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "VariableOuts": {
       "description": "Outputs for the Variable component.",
-      "type": "object",
       "properties": {
         "output": {
+          "$ref": "#/definitions/OutPort",
           "description": "The value is emitted to the output port.",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
+          "x-order": 0
         }
       },
+      "type": "object",
       "additionalProperties": false
     },
     "PolicyCustomResource": {

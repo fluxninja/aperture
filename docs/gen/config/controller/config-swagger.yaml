@@ -13,6 +13,8 @@ definitions:
                 default: 0.5
                 description: Factor sets user-configured limit of available memory
                 format: double
+                maximum: 1
+                minimum: 0
                 type: number
                 x-go-name: Factor
                 x-go-tag-default: "0.50"
@@ -24,6 +26,7 @@ definitions:
     AlertManagerClientConfig:
         properties:
             address:
+                pattern: ((^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)
                 type: string
                 x-go-name: Address
                 x-go-tag-json: address
@@ -62,7 +65,9 @@ definitions:
                 description: |-
                     ChannelSize size of the alerts channel in the alerter. Alerts should be
                     consumed from it quickly, so no big sizes are needed.
+                exclusiveMinimum: true
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: ChannelSize
                 x-go-tag-default: "100"
@@ -77,6 +82,7 @@ definitions:
                 default: 1s
                 description: Base Delay
                 format: string
+                minLength: 0
                 type: string
                 x-go-name: BaseDelay
                 x-go-tag-default: 1s
@@ -86,6 +92,7 @@ definitions:
                 default: 0.2
                 description: Jitter
                 format: double
+                minimum: 0
                 type: number
                 x-go-name: Jitter
                 x-go-tag-default: "0.2"
@@ -95,6 +102,7 @@ definitions:
                 default: 120s
                 description: Max Delay
                 format: string
+                minLength: 0
                 type: string
                 x-go-name: MaxDelay
                 x-go-tag-default: 120s
@@ -104,6 +112,7 @@ definitions:
                 default: 1.6
                 description: Backoff multiplier
                 format: double
+                minimum: 0
                 type: number
                 x-go-name: Multiplier
                 x-go-tag-default: "1.6"
@@ -119,6 +128,7 @@ definitions:
                     SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
                     into smaller units.
                 format: uint32
+                minimum: 0
                 type: integer
                 x-go-name: SendBatchMaxSize
                 x-go-tag-default: "100"
@@ -126,7 +136,9 @@ definitions:
                 x-go-tag-validate: gte=0
             send_batch_size:
                 description: SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+                exclusiveMinimum: true
                 format: uint32
+                minimum: 0
                 type: integer
                 x-go-name: SendBatchSize
                 x-go-tag-default: "100"
@@ -136,6 +148,7 @@ definitions:
                 default: 1s
                 description: Timeout sets the time after which a batch will be sent regardless of size.
                 format: string
+                minLength: 1
                 type: string
                 x-go-name: Timeout
                 x-go-tag-default: 1s
@@ -202,6 +215,7 @@ definitions:
                 description: List of Etcd server endpoints
                 items:
                     type: string
+                minItems: 1
                 type: array
                 x-go-name: Endpoints
                 x-go-tag-json: endpoints
@@ -248,6 +262,7 @@ definitions:
                 default: 20s
                 description: Minimum connection timeout
                 format: string
+                minLength: 0
                 type: string
                 x-go-name: MinConnectionTimeout
                 x-go-tag-default: 20s
@@ -272,6 +287,7 @@ definitions:
             grpc_server_address:
                 default: 0.0.0.0:1
                 description: GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
+                pattern: ^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$
                 type: string
                 x-go-name: GRPCAddr
                 x-go-tag-default: 0.0.0.0:1
@@ -308,6 +324,7 @@ definitions:
                 items:
                     format: double
                     type: number
+                minItems: 0
                 type: array
                 x-go-name: LatencyBucketsMS
                 x-go-tag-default: '[10.0,25.0,100.0,250.0,1000.0]'
@@ -359,6 +376,7 @@ definitions:
                 default: 0
                 description: Max Connections Per Host. 0 = no limit.
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: MaxConnsPerHost
                 x-go-tag-default: "0"
@@ -368,6 +386,7 @@ definitions:
                 default: 100
                 description: Max Idle Connections. 0 = no limit.
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: MaxIdleConns
                 x-go-tag-default: "100"
@@ -377,6 +396,7 @@ definitions:
                 default: 5
                 description: Max Idle Connections per host. 0 = no limit.
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: MaxIdleConnsPerHost
                 x-go-tag-default: "5"
@@ -386,6 +406,7 @@ definitions:
                 default: 0
                 description: Max Response Header Bytes. 0 = no limit.
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: MaxResponseHeaderBytes
                 x-go-tag-default: "0"
@@ -417,6 +438,7 @@ definitions:
                 default: 0
                 description: Read Buffer Size. 0 = 4KB
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: ReadBufferSize
                 x-go-tag-default: "0"
@@ -463,6 +485,7 @@ definitions:
                 default: 0
                 description: Write Buffer Size. 0 = 4KB.
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: WriteBufferSize
                 x-go-tag-default: "0"
@@ -500,6 +523,7 @@ definitions:
                 items:
                     format: double
                     type: number
+                minItems: 0
                 type: array
                 x-go-name: LatencyBucketsMS
                 x-go-tag-default: '[10.0,25.0,100.0,250.0,1000.0]'
@@ -509,6 +533,7 @@ definitions:
                 default: 1048576
                 description: Max header size in bytes
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: MaxHeaderBytes
                 x-go-tag-default: "1048576"
@@ -562,7 +587,9 @@ definitions:
                 x-go-tag-json: adaptive_policy
             limit:
                 description: Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
+                exclusiveMinimum: true
                 format: uint64
+                minimum: 0
                 type: integer
                 x-go-name: Limit
                 x-go-tag-default: "268435456"
@@ -571,7 +598,10 @@ definitions:
             min_gogc:
                 default: 25
                 description: Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
+                exclusiveMinimum: true
                 format: int64
+                maximum: 100
+                minimum: 0
                 type: integer
                 x-go-name: MinGoGC
                 x-go-tag-default: "25"
@@ -587,7 +617,9 @@ definitions:
         properties:
             limit:
                 description: Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
+                exclusiveMinimum: true
                 format: uint64
+                minimum: 0
                 type: integer
                 x-go-name: Limit
                 x-go-tag-default: "268435456"
@@ -596,7 +628,10 @@ definitions:
             min_gogc:
                 default: 25
                 description: Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
+                exclusiveMinimum: true
                 format: int64
+                maximum: 100
+                minimum: 0
                 type: integer
                 x-go-name: MinGoGC
                 x-go-tag-default: "25"
@@ -667,6 +702,7 @@ definitions:
             addr:
                 default: :8080
                 description: Address to bind to in the form of [host%zone]:port
+                pattern: ^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$
                 type: string
                 x-go-name: Addr
                 x-go-tag-default: :8080
@@ -684,6 +720,10 @@ definitions:
             network:
                 default: tcp
                 description: TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
+                enum:
+                    - tcp
+                    - tcp4
+                    - tcp6
                 type: string
                 x-go-name: Network
                 x-go-tag-default: tcp
@@ -697,6 +737,23 @@ definitions:
             level:
                 default: info
                 description: Log level
+                enum:
+                    - debug
+                    - DEBUG
+                    - info
+                    - INFO
+                    - warn
+                    - WARN
+                    - error
+                    - ERROR
+                    - fatal
+                    - FATAL
+                    - panic
+                    - PANIC
+                    - trace
+                    - TRACE
+                    - disabled
+                    - DISABLED
                 type: string
                 x-go-name: LogLevel
                 x-go-tag-default: info
@@ -747,6 +804,7 @@ definitions:
                 default: 7
                 description: Max age in days for log files
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: MaxAge
                 x-go-tag-default: "7"
@@ -756,6 +814,7 @@ definitions:
                 default: 3
                 description: Max log file backups
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: MaxBackups
                 x-go-tag-default: "3"
@@ -765,6 +824,7 @@ definitions:
                 default: 50
                 description: Log file max size in MB
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-name: MaxSize
                 x-go-tag-default: "50"
@@ -880,6 +940,7 @@ definitions:
             debug_port:
                 description: Port on which otel collector exposes prometheus metrics on /metrics path.
                 format: uint32
+                minimum: 0
                 type: integer
                 x-go-name: DebugPort
                 x-go-tag-default: "8888"
@@ -888,6 +949,7 @@ definitions:
             health_check_port:
                 description: Port on which health check extension in exposed.
                 format: uint32
+                minimum: 0
                 type: integer
                 x-go-name: HealthCheckPort
                 x-go-tag-default: "13133"
@@ -896,6 +958,7 @@ definitions:
             pprof_port:
                 description: Port on which pprof extension in exposed.
                 format: uint32
+                minimum: 0
                 type: integer
                 x-go-name: PprofPort
                 x-go-tag-default: "1777"
@@ -904,6 +967,7 @@ definitions:
             zpages_port:
                 description: Port on which zpages extension in exposed.
                 format: uint32
+                minimum: 0
                 type: integer
                 x-go-name: ZpagesPort
                 x-go-tag-default: "55679"
@@ -942,6 +1006,7 @@ definitions:
         properties:
             address:
                 description: Address of the prometheus server
+                pattern: ((^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)
                 type: string
                 x-go-name: Address
                 x-go-tag-json: address
@@ -955,11 +1020,13 @@ definitions:
         description: This configuration has preference over environment variables HTTP_PROXY, HTTPS_PROXY or NO_PROXY. See <https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config>
         properties:
             http:
+                pattern: ((^$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)
                 type: string
                 x-go-name: HTTPProxy
                 x-go-tag-json: http
                 x-go-tag-validate: omitempty,url|hostname_port
             https:
+                pattern: ((^$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)
                 type: string
                 x-go-name: HTTPSProxy
                 x-go-tag-json: https
@@ -1006,6 +1073,7 @@ definitions:
         properties:
             allowed_cn:
                 description: Allowed CN
+                pattern: (^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)
                 type: string
                 x-go-name: AllowedCN
                 x-go-tag-json: allowed_cn

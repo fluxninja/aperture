@@ -1,17 +1,22 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
 
+	"github.com/fluxninja/aperture/pkg/log"
 	"gopkg.in/yaml.v3"
 )
 
 // process swagger extensions such as x-go-tag-default and x-go-tag-validate
 // and translate them to swagger's defaults and validations.
 func main() {
+	logger := log.NewLogger(log.GetPrettyConsoleWriter(), "info")
+	log.SetGlobalLogger(logger)
+
 	swaggerFile := os.Args[1]
 
 	swaggerBytes, err := os.ReadFile(swaggerFile)
@@ -83,7 +88,7 @@ func processProperties(properties map[string]interface{}) []string {
 					continue
 				}
 				// extract each rule
-				req := processValidateRules(pmap, rules)
+				req := processValidateRules(pmap, strings.Split(rules, ","))
 				if req {
 					required = append(required, p)
 				}
@@ -177,15 +182,119 @@ func processValue(m map[string]interface{}, d string) interface{} {
 	return nil
 }
 
-func processValidateRules(_ map[string]interface{}, rules string) (required bool) {
-	// extract each rule, for now stop when we encounter "dive"
-	for _, rule := range strings.Split(rules, ",") {
+func processValidateRules(m map[string]interface{}, rules []string) (required bool) {
+	mType, ok := m["type"].(string)
+	if !ok {
+		return
+	}
+	// convert go validator rules to swagger rules
+	for _, rule := range rules {
 		switch rule {
 		case "required":
 			required = true
 		case "dive":
+			// ignore for nested rules (on items or additionalProperties) for now
 			return
+		case "omitempty":
+			if mType == "string" {
+				// add empty string as allowed value in pattern
+				addPattern(m, "^$")
+			}
+		default:
+			// split rule into key and value
+			parts := strings.Split(rule, "=")
+			if len(parts) == 2 {
+				key := parts[0]
+				value := parts[1]
+				switch key {
+				case "oneof":
+					// oneof=info warn crit
+					m["enum"] = strings.Split(value, " ")
+				case "gt", "gte":
+					v, err := strconv.Atoi(value)
+					if err != nil {
+						// probably a time.Duration
+						continue
+					}
+					switch mType {
+					case "integer", "number":
+						m["minimum"] = v
+						if key == "gt" {
+							m["exclusiveMinimum"] = true
+						}
+					default:
+						if key == "gt" {
+							v++
+						}
+						switch mType {
+						case "string":
+							m["minLength"] = v
+						case "array":
+							m["minItems"] = v
+						case "object":
+							m["minProperties"] = v
+						}
+					}
+				case "lt", "lte":
+					v, err := strconv.Atoi(value)
+					if err != nil {
+						// probably a time.Duration
+						continue
+					}
+					switch mType {
+					case "integer", "number":
+						m["maximum"] = v
+						if key == "lt" {
+							m["exclusiveMaximum"] = true
+						}
+					default:
+						if key == "lt" {
+							v--
+						}
+						switch mType {
+						case "string":
+							m["maxLength"] = v
+						case "array":
+							m["maxItems"] = v
+						case "object":
+							m["maxProperties"] = v
+						}
+					}
+				default:
+					log.Warn().Msgf("unknown validation rule %s", rule)
+				}
+			} else {
+				// we got multiple subrules separated by |
+				// example: "ip|cidrv4|cidrv6"
+				subrules := strings.Split(rule, "|")
+				for _, subrule := range subrules {
+					switch subrule {
+					case "hostname_port":
+						// match pattern
+						addPattern(m, `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$`)
+					case "fqdn":
+						// match pattern
+						addPattern(m, `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$`)
+					case "url":
+						// match pattern
+						addPattern(m, `^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$`)
+					case "ip":
+						// match pattern
+						addPattern(m, `^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$`)
+					default:
+						log.Warn().Msgf("unknown validation subrule %s", subrule)
+					}
+				}
+			}
 		}
 	}
 	return
+}
+
+func addPattern(m map[string]interface{}, pattern string) {
+	if existing, ok := m["pattern"]; ok {
+		// add to existing pattern
+		pattern = fmt.Sprintf("(%s)|(%s)", existing, pattern)
+	}
+	m["pattern"] = pattern
 }

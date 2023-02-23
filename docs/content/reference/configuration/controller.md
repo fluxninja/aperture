@@ -422,7 +422,7 @@ AdaptivePolicy creates a policy that forces GC when the usage surpasses the conf
 <dt>factor</dt>
 <dd>
 
-(float64, `gte=0,lte=1`, default: `0.5`) Factor sets user-configured limit of available memory
+(float64, minimum: `0`, maximum: `1`, default: `0.5`) Factor sets user-configured limit of available memory
 
 </dd>
 </dl>
@@ -437,25 +437,25 @@ BackoffConfig holds configuration for GRPC Client Backoff.
 <dt>base_delay</dt>
 <dd>
 
-(string, `gte=0`, default: `"1s"`) Base Delay
+(string, default: `"1s"`) Base Delay
 
 </dd>
 <dt>jitter</dt>
 <dd>
 
-(float64, `gte=0`, default: `0.2`) Jitter
+(float64, minimum: `0`, default: `0.2`) Jitter
 
 </dd>
 <dt>max_delay</dt>
 <dd>
 
-(string, `gte=0`, default: `"120s"`) Max Delay
+(string, default: `"120s"`) Max Delay
 
 </dd>
 <dt>multiplier</dt>
 <dd>
 
-(float64, `gte=0`, default: `1.6`) Backoff multiplier
+(float64, minimum: `0`, default: `1.6`) Backoff multiplier
 
 </dd>
 </dl>
@@ -470,20 +470,20 @@ BatchAlertsConfig defines configuration for OTEL batch processor.
 <dt>send_batch_max_size</dt>
 <dd>
 
-(uint32, `gte=0`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+(uint32, minimum: `0`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
 into smaller units.
 
 </dd>
 <dt>send_batch_size</dt>
 <dd>
 
-(uint32, `gt=0`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+(uint32, minimum: `0`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
 
 </dd>
 <dt>timeout</dt>
 <dd>
 
-(string, `gt=0`, default: `"1s"`) Timeout sets the time after which a batch will be sent regardless of size.
+(string, default: `"1s"`) Timeout sets the time after which a batch will be sent regardless of size.
 
 </dd>
 </dl>
@@ -579,13 +579,13 @@ EtcdConfig holds configuration for etcd client.
 <dt>endpoints</dt>
 <dd>
 
-([]string, **required**, `required,gt=0,dive,hostname_port|url|fqdn`) List of Etcd server endpoints
+([]string, **required**) List of Etcd server endpoints
 
 </dd>
 <dt>lease_ttl</dt>
 <dd>
 
-(string, `gte=1s`, default: `"60s"`) Lease time-to-live
+(string, default: `"60s"`) Lease time-to-live
 
 </dd>
 <dt>password</dt>
@@ -624,13 +624,13 @@ FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
 <dt>fluxninja_endpoint</dt>
 <dd>
 
-(string, `omitempty,hostname_port|url|fqdn`) Address to grpc or http(s) server listening in agent service. To use http protocol, the address must start with http(s)://.
+(string, pattern: `(((^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$))|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)`) Address to grpc or http(s) server listening in agent service. To use http protocol, the address must start with http(s)://.
 
 </dd>
 <dt>heartbeat_interval</dt>
 <dd>
 
-(string, `gte=0s`, default: `"5s"`) Interval between each heartbeat.
+(string, default: `"5s"`) Interval between each heartbeat.
 
 </dd>
 <dt>client</dt>
@@ -657,7 +657,7 @@ GRPCClientConfig holds configuration for GRPC Client.
 <dt>min_connection_timeout</dt>
 <dd>
 
-(string, `gte=0`, default: `"20s"`) Minimum connection timeout
+(string, default: `"20s"`) Minimum connection timeout
 
 </dd>
 <dt>use_proxy</dt>
@@ -690,7 +690,7 @@ GRPCGatewayConfig holds configuration for grpc-http gateway
 <dt>grpc_server_address</dt>
 <dd>
 
-(string, `hostname_port`, default: `"0.0.0.0:1"`) GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
+(string, pattern: `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$`, default: `"0.0.0.0:1"`) GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
 
 </dd>
 </dl>
@@ -705,7 +705,7 @@ GRPCServerConfig holds configuration for GRPC Server.
 <dt>connection_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `"120s"`) Connection timeout
+(string, default: `"120s"`) Connection timeout
 
 </dd>
 <dt>enable_reflection</dt>
@@ -717,7 +717,7 @@ GRPCServerConfig holds configuration for GRPC Server.
 <dt>latency_buckets_ms</dt>
 <dd>
 
-([]float64, `gte=0`, default: `[10,25,100,250,1000]`) Buckets specification in latency histogram
+([]float64, default: `[10,25,100,250,1000]`) Buckets specification in latency histogram
 
 </dd>
 </dl>
@@ -744,13 +744,13 @@ HTTPClientConfig holds configuration for HTTP Client.
 <dt>expect_continue_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `"1s"`) Expect Continue Timeout. 0 = no timeout.
+(string, default: `"1s"`) Expect Continue Timeout. 0 = no timeout.
 
 </dd>
 <dt>idle_connection_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `"90s"`) Idle Connection Timeout. 0 = no timeout.
+(string, default: `"90s"`) Idle Connection Timeout. 0 = no timeout.
 
 </dd>
 <dt>key_log_file</dt>
@@ -762,61 +762,61 @@ HTTPClientConfig holds configuration for HTTP Client.
 <dt>max_conns_per_host</dt>
 <dd>
 
-(int64, `gte=0`) Max Connections Per Host. 0 = no limit.
+(int64, minimum: `0`) Max Connections Per Host. 0 = no limit.
 
 </dd>
 <dt>max_idle_connections</dt>
 <dd>
 
-(int64, `gte=0`, default: `100`) Max Idle Connections. 0 = no limit.
+(int64, minimum: `0`, default: `100`) Max Idle Connections. 0 = no limit.
 
 </dd>
 <dt>max_idle_connections_per_host</dt>
 <dd>
 
-(int64, `gte=0`, default: `5`) Max Idle Connections per host. 0 = no limit.
+(int64, minimum: `0`, default: `5`) Max Idle Connections per host. 0 = no limit.
 
 </dd>
 <dt>max_response_header_bytes</dt>
 <dd>
 
-(int64, `gte=0`) Max Response Header Bytes. 0 = no limit.
+(int64, minimum: `0`) Max Response Header Bytes. 0 = no limit.
 
 </dd>
 <dt>network_keep_alive</dt>
 <dd>
 
-(string, `gte=0s`, default: `"30s"`) Network level keep-alive duration
+(string, default: `"30s"`) Network level keep-alive duration
 
 </dd>
 <dt>network_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `"30s"`) Timeout for making network connection
+(string, default: `"30s"`) Timeout for making network connection
 
 </dd>
 <dt>read_buffer_size</dt>
 <dd>
 
-(int64, `gte=0`) Read Buffer Size. 0 = 4KB
+(int64, minimum: `0`) Read Buffer Size. 0 = 4KB
 
 </dd>
 <dt>response_header_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `"0s"`) Response Header Timeout. 0 = no timeout.
+(string, default: `"0s"`) Response Header Timeout. 0 = no timeout.
 
 </dd>
 <dt>tls_handshake_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `"10s"`) TLS Handshake Timeout. 0 = no timeout
+(string, default: `"10s"`) TLS Handshake Timeout. 0 = no timeout
 
 </dd>
 <dt>timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `"60s"`) HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
+(string, default: `"60s"`) HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
 
 </dd>
 <dt>use_proxy</dt>
@@ -828,13 +828,13 @@ HTTPClientConfig holds configuration for HTTP Client.
 <dt>write_buffer_size</dt>
 <dd>
 
-(int64, `gte=0`) Write Buffer Size. 0 = 4KB.
+(int64, minimum: `0`) Write Buffer Size. 0 = 4KB.
 
 </dd>
 <dt>proxy_connect_header</dt>
 <dd>
 
-([Header](#header), `omitempty`)
+([Header](#header))
 
 </dd>
 <dt>tls</dt>
@@ -861,37 +861,37 @@ HTTPServerConfig holds configuration for HTTP Server.
 <dt>idle_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `"30s"`) Idle timeout
+(string, default: `"30s"`) Idle timeout
 
 </dd>
 <dt>latency_buckets_ms</dt>
 <dd>
 
-([]float64, `gte=0`, default: `[10,25,100,250,1000]`) Buckets specification in latency histogram
+([]float64, default: `[10,25,100,250,1000]`) Buckets specification in latency histogram
 
 </dd>
 <dt>max_header_bytes</dt>
 <dd>
 
-(int64, `gte=0`, default: `1048576`) Max header size in bytes
+(int64, minimum: `0`, default: `1048576`) Max header size in bytes
 
 </dd>
 <dt>read_header_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `"10s"`) Read header timeout
+(string, default: `"10s"`) Read header timeout
 
 </dd>
 <dt>read_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `"10s"`) Read timeout
+(string, default: `"10s"`) Read timeout
 
 </dd>
 <dt>write_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `"45s"`) Write timeout
+(string, default: `"45s"`) Write timeout
 
 </dd>
 </dl>
@@ -915,13 +915,13 @@ HeapConfig holds configuration for heap Watchdog.
 <dt>limit</dt>
 <dd>
 
-(uint64, `gt=0`) Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
+(uint64, minimum: `0`) Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
 
 </dd>
 <dt>min_gogc</dt>
 <dd>
 
-(int64, `gt=0,lte=100`, default: `25`) Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
+(int64, minimum: `0`, maximum: `100`, default: `25`) Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
 
 </dd>
 <dt>adaptive_policy</dt>
@@ -954,7 +954,7 @@ JobConfig is config for Job
 <dt>execution_timeout</dt>
 <dd>
 
-(string, `gte=0s`, default: `"5s"`) Execution timeout
+(string, default: `"5s"`) Execution timeout
 
 </dd>
 <dt>initially_healthy</dt>
@@ -1002,19 +1002,19 @@ ListenerConfig holds configuration for socket listeners.
 <dt>addr</dt>
 <dd>
 
-(string, `hostname_port`, default: `":8080"`) Address to bind to in the form of [host%zone]:port
+(string, pattern: `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$`, default: `":8080"`) Address to bind to in the form of [host%zone]:port
 
 </dd>
 <dt>keep_alive</dt>
 <dd>
 
-(string, `gte=0s`, default: `"180s"`) Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alive is disabled.
+(string, default: `"180s"`) Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alive is disabled.
 
 </dd>
 <dt>network</dt>
 <dd>
 
-(string, `oneof=tcp tcp4 tcp6`, default: `"tcp"`) TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
+(string, default: `"tcp"`) TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
 
 </dd>
 </dl>
@@ -1029,7 +1029,7 @@ LogConfig holds configuration for a logger and log writers.
 <dt>level</dt>
 <dd>
 
-(string, `oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED`, default: `"info"`) Log level
+(string, default: `"info"`) Log level
 
 </dd>
 <dt>non_blocking</dt>
@@ -1047,7 +1047,7 @@ LogConfig holds configuration for a logger and log writers.
 <dt>writers</dt>
 <dd>
 
-([[]LogWriterConfig](#log-writer-config), `omitempty,dive,omitempty`) Log writers
+([[]LogWriterConfig](#log-writer-config)) Log writers
 
 </dd>
 </dl>
@@ -1074,19 +1074,19 @@ LogWriterConfig holds configuration for a log writer.
 <dt>max_age</dt>
 <dd>
 
-(int64, `gte=0`, default: `7`) Max age in days for log files
+(int64, minimum: `0`, default: `7`) Max age in days for log files
 
 </dd>
 <dt>max_backups</dt>
 <dd>
 
-(int64, `gte=0`, default: `3`) Max log file backups
+(int64, minimum: `0`, default: `3`) Max log file backups
 
 </dd>
 <dt>max_size</dt>
 <dd>
 
-(int64, `gte=0`, default: `50`) Log file max size in MB
+(int64, minimum: `0`, default: `50`) Log file max size in MB
 
 </dd>
 </dl>
@@ -1134,13 +1134,13 @@ PluginsConfig holds configuration for plugins.
 <dt>disabled_plugins</dt>
 <dd>
 
-([]string, `omitempty`) Specific plugins to disable
+([]string) Specific plugins to disable
 
 </dd>
 <dt>disabled_symbols</dt>
 <dd>
 
-([]string, `omitempty`) Specific plugin types to disable
+([]string) Specific plugin types to disable
 
 </dd>
 <dt>plugins_path</dt>
@@ -1161,25 +1161,25 @@ PortsConfig defines configuration for OTEL debug and extension ports.
 <dt>debug_port</dt>
 <dd>
 
-(uint32, `gte=0`) Port on which otel collector exposes prometheus metrics on /metrics path.
+(uint32, minimum: `0`) Port on which otel collector exposes prometheus metrics on /metrics path.
 
 </dd>
 <dt>health_check_port</dt>
 <dd>
 
-(uint32, `gte=0`) Port on which health check extension in exposed.
+(uint32, minimum: `0`) Port on which health check extension in exposed.
 
 </dd>
 <dt>pprof_port</dt>
 <dd>
 
-(uint32, `gte=0`) Port on which pprof extension in exposed.
+(uint32, minimum: `0`) Port on which pprof extension in exposed.
 
 </dd>
 <dt>zpages_port</dt>
 <dd>
 
-(uint32, `gte=0`) Port on which zpages extension in exposed.
+(uint32, minimum: `0`) Port on which zpages extension in exposed.
 
 </dd>
 </dl>
@@ -1221,7 +1221,7 @@ PrometheusConfig holds configuration for Prometheus Server.
 <dt>address</dt>
 <dd>
 
-(string, **required**, `required,hostname_port|url|fqdn`) Address of the prometheus server
+(string, pattern: `((^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)`, **required**) Address of the prometheus server
 
 </dd>
 </dl>
@@ -1238,19 +1238,19 @@ This configuration has preference over environment variables HTTP_PROXY, HTTPS_P
 <dt>http</dt>
 <dd>
 
-(string, `omitempty,url|hostname_port`)
+(string, pattern: `((^$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)`)
 
 </dd>
 <dt>https</dt>
 <dd>
 
-(string, `omitempty,url|hostname_port`)
+(string, pattern: `((^$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)`)
 
 </dd>
 <dt>no_proxy</dt>
 <dd>
 
-([]string, `omitempty,dive,ip|cidr|fqdn|hostname_port`)
+([]string)
 
 </dd>
 </dl>
@@ -1318,7 +1318,7 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 <dt>allowed_cn</dt>
 <dd>
 
-(string, `omitempty,fqdn`) Allowed CN
+(string, pattern: `(^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)`) Allowed CN
 
 </dd>
 <dt>cert_file</dt>
@@ -1417,7 +1417,7 @@ WatermarksPolicy creates a Watchdog policy that schedules GC at concrete waterma
 <dt>watermarks</dt>
 <dd>
 
-([]float64, `omitempty,dive,gte=0,lte=1`, default: `[0.5,0.75,0.8,0.85,0.9,0.95,0.99]`) Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
+([]float64, default: `[0.5,0.75,0.8,0.85,0.9,0.95,0.99]`) Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
 
 </dd>
 </dl>
