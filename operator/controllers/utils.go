@@ -29,7 +29,6 @@ import (
 	"net"
 	"os"
 	"path/filepath"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -818,59 +817,21 @@ func GetPort(addr string) (int32, error) {
 }
 
 // CompareComfigMap compares two ConfigMaps by recursively sorting the keys in each map and comparing the sorted maps for given key in Data.
-func CompareComfigMap(result, expected *corev1.ConfigMap, dataKey string) {
-	var obj1, obj2 map[string]interface{}
-	err := yaml.Unmarshal([]byte(result.Data[dataKey]), &obj1)
-	Expect(err).NotTo(HaveOccurred())
-	err = yaml.Unmarshal([]byte(expected.Data[dataKey]), &obj2)
-	Expect(err).NotTo(HaveOccurred())
+func CompareComfigMap(result, expected *corev1.ConfigMap) {
+	for key := range result.Data {
+		var obj1, obj2 map[string]interface{}
+		err1 := yaml.Unmarshal([]byte(result.Data[key]), &obj1)
+		err2 := yaml.Unmarshal([]byte(expected.Data[key]), &obj2)
 
-	// Sort keys in each map and compare sorted maps
-	sorted1 := make(map[string]interface{})
-	for k, v := range obj1 {
-		sorted1[k] = sortMap(v)
+		if err1 == nil && err2 == nil {
+			Expect(obj1).To(Equal(obj2))
+		} else {
+			Expect(result.Data[key]).To(Equal(expected.Data[key]))
+		}
 	}
-	sorted2 := make(map[string]interface{})
-	for k, v := range obj2 {
-		sorted2[k] = sortMap(v)
-	}
-
-	Expect(sorted1).To(Equal(sorted2))
 
 	// Compare the rest of the fields in the ConfigMap object that are not in the Data field
-	result.Data[dataKey] = ""
-	expected.Data[dataKey] = ""
+	result.Data = nil
+	expected.Data = nil
 	Expect(result).To(Equal(expected))
-}
-
-// sortMap sorts the keys in a map and returns a new map with sorted keys.
-func sortMap(v interface{}) interface{} {
-	switch v := v.(type) {
-	case map[interface{}]interface{}:
-		sorted := make(map[interface{}]interface{})
-		var keys []interface{}
-		for k := range v {
-			keys = append(keys, k)
-		}
-		sort.Slice(keys, func(i, j int) bool {
-			return keys[i].(string) < keys[j].(string)
-		})
-		for _, k := range keys {
-			sorted[k] = sortMap(v[k])
-		}
-		return sorted
-	case map[string]interface{}:
-		sorted := make(map[string]interface{})
-		var keys []string
-		for k := range v {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-		for _, k := range keys {
-			sorted[k] = sortMap(v[k])
-		}
-		return sorted
-	default:
-		return v
-	}
 }
