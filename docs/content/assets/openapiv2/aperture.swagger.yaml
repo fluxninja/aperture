@@ -1481,6 +1481,8 @@ definitions:
         properties:
             input:
                 $ref: '#/definitions/InPort'
+            reset:
+                $ref: '#/definitions/InPort'
         type: object
     HolderOuts:
         description: Outputs for the Holder component.
@@ -2200,14 +2202,20 @@ definitions:
             out_ports:
                 $ref: '#/definitions/PodAutoscalerOuts'
                 description: Output ports for the PodAutoscaler.
+            scale_in_alerter_parameters:
+                $ref: '#/definitions/AlerterParameters'
+                description: Configuration for scale in alerter.
             scale_in_controllers:
                 description: List of Controllers for scaling in pods.
                 items:
                     $ref: '#/definitions/PodAutoscalerScaleInController'
                 type: array
             scale_in_cooldown:
-                description: The amount of time to wait after a scale in operation for another scale in operation.
+                description: |+
+                    The amount of time to wait after a scale in operation for another scale in operation.
+
                 type: string
+                x-go-tag-default: 120s
             scale_in_max_percentage:
                 description: |+
                     The maximum number of pods to scale in at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 10% of current pods.
@@ -2215,14 +2223,20 @@ definitions:
                 format: double
                 type: number
                 x-go-tag-default: "10"
+            scale_out_alerter_parameters:
+                $ref: '#/definitions/AlerterParameters'
+                description: Configuration for scale out alerter.
             scale_out_controllers:
                 description: List of Controllers for scaling out pods.
                 items:
                     $ref: '#/definitions/PodAutoscalerScaleOutController'
                 type: array
             scale_out_cooldown:
-                description: The amount of time to wait after a scale out operation for another scale out or scale in operation.
+                description: |+
+                    The amount of time to wait after a scale out operation for another scale out or scale in operation.
+
                 type: string
+                x-go-tag-default: 30s
             scale_out_max_percentage:
                 description: |+
                     The maximum number of pods to scale out at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 1% of current pods.
@@ -2261,9 +2275,9 @@ definitions:
     PodAutoscalerDecreasingGradientParameters:
         description: This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
         properties:
-            max_gradient:
+            min_gradient:
                 format: double
-                title: '@gotags: default:"1.79769313486231570814527423731704356798070e+308" validate:"gte=1.0"'
+                title: '@gotags: default:"-1.79769313486231570814527423731704356798070e+308" validate:"lte=1.0"'
                 type: number
             slope:
                 format: double
@@ -2277,7 +2291,7 @@ definitions:
                 $ref: '#/definitions/PodAutoscalerIncreasingGradientIns'
                 description: Input ports for the Gradient.
             parameters:
-                $ref: '#/definitions/GradientControllerParameters'
+                $ref: '#/definitions/PodAutoscalerIncreasingGradientParameters'
                 title: |-
                     Gradient parameters for the controller. Defaults and constraints:
                     * slope = 1
@@ -2293,6 +2307,18 @@ definitions:
             signal:
                 $ref: '#/definitions/InPort'
                 description: The signal to use for scale out.
+        type: object
+    PodAutoscalerIncreasingGradientParameters:
+        description: This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+        properties:
+            max_gradient:
+                format: double
+                title: '@gotags: default:"1.79769313486231570814527423731704356798070e+308" validate:"gte=1.0"'
+                type: number
+            slope:
+                format: double
+                title: '@gotags: default:"1.0"'
+                type: number
         type: object
     PodAutoscalerOuts:
         description: Outputs for PodAutoscaler.
@@ -2325,7 +2351,11 @@ definitions:
                 description: Configuration for embedded alerter.
             controller:
                 $ref: '#/definitions/PodAutoscalerScaleOutControllerController'
+                description: ""
                 title: Controller
+                x-go-tag-validate: required
+        required:
+            - controller
         type: object
     PodAutoscalerScaleOutControllerController:
         properties:

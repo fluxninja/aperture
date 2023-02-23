@@ -1840,6 +1840,12 @@ Inputs for the Holder component.
 ([InPort](#in-port))
 
 </dd>
+<dt>reset</dt>
+<dd>
+
+([InPort](#in-port))
+
+</dd>
 </dl>
 
 ### HolderOuts {#holder-outs}
@@ -2714,6 +2720,12 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 ([PodAutoscalerOuts](#pod-autoscaler-outs)) Output ports for the PodAutoscaler.
 
 </dd>
+<dt>scale_in_alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for scale in alerter.
+
+</dd>
 <dt>scale_in_controllers</dt>
 <dd>
 
@@ -2723,13 +2735,19 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>scale_in_cooldown</dt>
 <dd>
 
-(string) The amount of time to wait after a scale in operation for another scale in operation.
+(string, default: `120s`) The amount of time to wait after a scale in operation for another scale in operation.
 
 </dd>
 <dt>scale_in_max_percentage</dt>
 <dd>
 
 (float64, default: `10`) The maximum number of pods to scale in at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 10% of current pods.
+
+</dd>
+<dt>scale_out_alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for scale out alerter.
 
 </dd>
 <dt>scale_out_controllers</dt>
@@ -2741,7 +2759,7 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>scale_out_cooldown</dt>
 <dd>
 
-(string) The amount of time to wait after a scale out operation for another scale out or scale in operation.
+(string, default: `30s`) The amount of time to wait after a scale out operation for another scale out or scale in operation.
 
 </dd>
 <dt>scale_out_max_percentage</dt>
@@ -2805,10 +2823,10 @@ This allows subset of parameters with constrained values compared to a regular g
 #### Properties
 
 <dl>
-<dt>max_gradient</dt>
+<dt>min_gradient</dt>
 <dd>
 
-(float64) @gotags: default:"1.79769313486231570814527423731704356798070e+308" validate:"gte=1.0"
+(float64) @gotags: default:"-1.79769313486231570814527423731704356798070e+308" validate:"lte=1.0"
 
 </dd>
 <dt>slope</dt>
@@ -2835,7 +2853,7 @@ Increasing Gradient defines a controller for scaling out based on Gradient Contr
 <dt>parameters</dt>
 <dd>
 
-([GradientControllerParameters](#gradient-controller-parameters)) Gradient parameters for the controller. Defaults and constraints:
+([PodAutoscalerIncreasingGradientParameters](#pod-autoscaler-increasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
 
 - slope = 1
 - min_gradient = 1 (cannot be changed)
@@ -2861,6 +2879,27 @@ Inputs for Gradient.
 <dd>
 
 ([InPort](#in-port)) The signal to use for scale out.
+
+</dd>
+</dl>
+
+### PodAutoscalerIncreasingGradientParameters {#pod-autoscaler-increasing-gradient-parameters}
+
+This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+
+#### Properties
+
+<dl>
+<dt>max_gradient</dt>
+<dd>
+
+(float64) @gotags: default:"1.79769313486231570814527423731704356798070e+308" validate:"gte=1.0"
+
+</dd>
+<dt>slope</dt>
+<dd>
+
+(float64) @gotags: default:"1.0"
 
 </dd>
 </dl>
@@ -2938,7 +2977,7 @@ Outputs for PodAutoscaler.
 <dt>controller</dt>
 <dd>
 
-([PodAutoscalerScaleOutControllerController](#pod-autoscaler-scale-out-controller-controller)) Controller
+([PodAutoscalerScaleOutControllerController](#pod-autoscaler-scale-out-controller-controller), **required**, `required`) Controller
 
 </dd>
 </dl>

@@ -50,6 +50,12 @@ local podautoscalerouts = import './podautoscalerouts.libsonnet';
   withOutPortsMixin(out_ports):: {
     out_ports+: out_ports,
   },
+  withScaleInAlerterParameters(scale_in_alerter_parameters):: {
+    scale_in_alerter_parameters: scale_in_alerter_parameters,
+  },
+  withScaleInAlerterParametersMixin(scale_in_alerter_parameters):: {
+    scale_in_alerter_parameters+: scale_in_alerter_parameters,
+  },
   withScaleInControllers(scale_in_controllers):: {
     scale_in_controllers:
       if std.isArray(scale_in_controllers)
@@ -70,6 +76,12 @@ local podautoscalerouts = import './podautoscalerouts.libsonnet';
   },
   withScaleInMaxPercentageMixin(scale_in_max_percentage):: {
     scale_in_max_percentage+: scale_in_max_percentage,
+  },
+  withScaleOutAlerterParameters(scale_out_alerter_parameters):: {
+    scale_out_alerter_parameters: scale_out_alerter_parameters,
+  },
+  withScaleOutAlerterParametersMixin(scale_out_alerter_parameters):: {
+    scale_out_alerter_parameters+: scale_out_alerter_parameters,
   },
   withScaleOutControllers(scale_out_controllers):: {
     scale_out_controllers:

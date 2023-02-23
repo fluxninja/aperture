@@ -1329,6 +1329,7 @@ message Holder {
   // Inputs for the Holder component.
   message Ins {
     InPort input = 1;
+    InPort reset = 2;
   }
 
   // Outputs for the Holder component.
@@ -1447,7 +1448,7 @@ message PodAutoscaler {
     message Parameters {
       double slope = 1; // @gotags: default:"1.0"
 
-      double min_gradient = 2; // @gotags: default:"-1.79769313486231570814527423731704356798070e+308" validate:"lte=1.0"
+      double max_gradient = 3; // @gotags: default:"1.79769313486231570814527423731704356798070e+308" validate:"gte=1.0"
     }
 
     // Inputs for Gradient.
@@ -1465,7 +1466,7 @@ message PodAutoscaler {
     // * slope = 1
     // * min_gradient = 1 (cannot be changed)
     // * max_gradient = +Inf (must be greater than 1)
-    GradientController.Parameters parameters = 2;
+    Parameters parameters = 2;
   }
 
   // Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
@@ -1474,7 +1475,7 @@ message PodAutoscaler {
     message Parameters {
       double slope = 1; // @gotags: default:"1.0"
 
-      double max_gradient = 3; // @gotags: default:"1.79769313486231570814527423731704356798070e+308" validate:"gte=1.0"
+      double min_gradient = 2; // @gotags: default:"-1.79769313486231570814527423731704356798070e+308" validate:"lte=1.0"
     }
 
     // Inputs for Gradient.
@@ -1503,7 +1504,7 @@ message PodAutoscaler {
     }
 
     // Controller
-    Controller controller = 1;
+    Controller controller = 1; // @gotags: validate:"required"
 
     // Configuration for embedded alerter.
     Alerter.Parameters alerter_parameters = 2;
@@ -1552,18 +1553,24 @@ message PodAutoscaler {
   double scale_out_max_percentage = 8; // @gotags: default:"1"
 
   // The amount of time to wait after a scale out operation for another scale out or scale in operation.
-  google.protobuf.Duration scale_out_cooldown = 9;
+  google.protobuf.Duration scale_out_cooldown = 9; // @gotags: default:"30s"
   // The amount of time to wait after a scale in operation for another scale in operation.
-  google.protobuf.Duration scale_in_cooldown = 10;
+  google.protobuf.Duration scale_in_cooldown = 10; // @gotags: default:"120s"
 
   // Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.
   // For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
   // scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
   double cooldown_override_percentage = 11; // @gotags: default:"50"
 
+  // Configuration for scale out alerter.
+  Alerter.Parameters scale_out_alerter_parameters = 12;
+
+  // Configuration for scale in alerter.
+  Alerter.Parameters scale_in_alerter_parameters = 13;
+
   // Configuration key for DynamicConfig
-  string dynamic_config_key = 12;
+  string dynamic_config_key = 14;
 
   // Default configuration.
-  PodScaler.ScaleActuator.DynamicConfig default_config = 13;
+  PodScaler.ScaleActuator.DynamicConfig default_config = 15;
 }

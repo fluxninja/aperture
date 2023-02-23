@@ -1257,6 +1257,10 @@
         "input": {
           "x-order": 0,
           "$ref": "#/definitions/InPort"
+        },
+        "reset": {
+          "x-order": 1,
+          "$ref": "#/definitions/InPort"
         }
       },
       "additionalProperties": false
@@ -1950,25 +1954,36 @@
           "x-order": 6,
           "$ref": "#/definitions/PodAutoscalerOuts"
         },
+        "scale_in_alerter_parameters": {
+          "description": "Configuration for scale in alerter.",
+          "x-order": 7,
+          "$ref": "#/definitions/AlerterParameters"
+        },
         "scale_in_controllers": {
           "description": "List of Controllers for scaling in pods.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/PodAutoscalerScaleInController"
           },
-          "x-order": 7
+          "x-order": 8
         },
         "scale_in_cooldown": {
-          "description": "The amount of time to wait after a scale in operation for another scale in operation.",
+          "description": "The amount of time to wait after a scale in operation for another scale in operation.\n\n",
           "type": "string",
-          "x-order": 8
+          "x-go-tag-default": "120s",
+          "x-order": 9
         },
         "scale_in_max_percentage": {
           "description": "The maximum number of pods to scale in at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 10% of current pods.\n\n",
           "type": "number",
           "format": "double",
           "x-go-tag-default": "10",
-          "x-order": 9
+          "x-order": 10
+        },
+        "scale_out_alerter_parameters": {
+          "description": "Configuration for scale out alerter.",
+          "x-order": 11,
+          "$ref": "#/definitions/AlerterParameters"
         },
         "scale_out_controllers": {
           "description": "List of Controllers for scaling out pods.",
@@ -1976,19 +1991,20 @@
           "items": {
             "$ref": "#/definitions/PodAutoscalerScaleOutController"
           },
-          "x-order": 10
+          "x-order": 12
         },
         "scale_out_cooldown": {
-          "description": "The amount of time to wait after a scale out operation for another scale out or scale in operation.",
+          "description": "The amount of time to wait after a scale out operation for another scale out or scale in operation.\n\n",
           "type": "string",
-          "x-order": 11
+          "x-go-tag-default": "30s",
+          "x-order": 13
         },
         "scale_out_max_percentage": {
           "description": "The maximum number of pods to scale out at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 1% of current pods.\n\n",
           "type": "number",
           "format": "double",
           "x-go-tag-default": "1",
-          "x-order": 12
+          "x-order": 14
         }
       },
       "additionalProperties": false
@@ -2031,10 +2047,10 @@
       "description": "This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).",
       "type": "object",
       "properties": {
-        "max_gradient": {
+        "min_gradient": {
           "type": "number",
           "format": "double",
-          "title": "@gotags: default:\"1.79769313486231570814527423731704356798070e+308\" validate:\"gte=1.0\"",
+          "title": "@gotags: default:\"-1.79769313486231570814527423731704356798070e+308\" validate:\"lte=1.0\"",
           "x-order": 0
         },
         "slope": {
@@ -2058,7 +2074,7 @@
         "parameters": {
           "title": "Gradient parameters for the controller. Defaults and constraints:\n* slope = 1\n* min_gradient = 1 (cannot be changed)\n* max_gradient = +Inf (must be greater than 1)",
           "x-order": 1,
-          "$ref": "#/definitions/GradientControllerParameters"
+          "$ref": "#/definitions/PodAutoscalerIncreasingGradientParameters"
         }
       },
       "additionalProperties": false
@@ -2076,6 +2092,25 @@
           "description": "The signal to use for scale out.",
           "x-order": 1,
           "$ref": "#/definitions/InPort"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PodAutoscalerIncreasingGradientParameters": {
+      "description": "This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).",
+      "type": "object",
+      "properties": {
+        "max_gradient": {
+          "type": "number",
+          "format": "double",
+          "title": "@gotags: default:\"1.79769313486231570814527423731704356798070e+308\" validate:\"gte=1.0\"",
+          "x-order": 0
+        },
+        "slope": {
+          "type": "number",
+          "format": "double",
+          "title": "@gotags: default:\"1.0\"",
+          "x-order": 1
         }
       },
       "additionalProperties": false
@@ -2127,6 +2162,7 @@
     },
     "PodAutoscalerScaleOutController": {
       "type": "object",
+      "required": ["controller"],
       "properties": {
         "alerter_parameters": {
           "description": "Configuration for embedded alerter.",
@@ -2135,6 +2171,7 @@
         },
         "controller": {
           "title": "Controller",
+          "x-go-tag-validate": "required",
           "x-order": 1,
           "$ref": "#/definitions/PodAutoscalerScaleOutControllerController"
         }

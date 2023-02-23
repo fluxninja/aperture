@@ -93,6 +93,7 @@
   PodAutoscalerDecreasingGradientParameters: import 'podautoscalerdecreasinggradientparameters.libsonnet',
   PodAutoscalerIncreasingGradient: import 'podautoscalerincreasinggradient.libsonnet',
   PodAutoscalerIncreasingGradientIns: import 'podautoscalerincreasinggradientins.libsonnet',
+  PodAutoscalerIncreasingGradientParameters: import 'podautoscalerincreasinggradientparameters.libsonnet',
   PodAutoscalerOuts: import 'podautoscalerouts.libsonnet',
   PodAutoscalerScaleInController: import 'podautoscalerscaleincontroller.libsonnet',
   PodAutoscalerScaleInControllerController: import 'podautoscalerscaleincontrollercontroller.libsonnet',
