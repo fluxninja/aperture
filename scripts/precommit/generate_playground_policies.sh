@@ -27,7 +27,7 @@ function generate_policies() {
 		policy_def=$(jq --raw-output '.policy_def' <<<"$policy")
 		values_file=$(jq --raw-output '.values_file' <<<"$policy")
 		echo "Generating policies: $policy_name"
-		"$gitroot"/playground/scripts/render-policy.sh "$gitroot/playground" "$aperturectl" "$gitroot/blueprints" "$policy_def" "$policy_name" "$scenario_dir"/"$values_file" >/dev/null
+		"$gitroot"/playground/scripts/render-policy.sh "$scenario_dir" "$aperturectl" "$gitroot/blueprints" "$policy_def" "$policy_name" "$scenario_dir"/"$values_file" >/dev/null
 	done
 }
 
