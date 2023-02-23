@@ -808,7 +808,7 @@ func (msg *Variable_Outs) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *Sqrt) MarshalJSON() ([]byte, error) {
+func (msg *UnaryOperator) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -817,14 +817,14 @@ func (msg *Sqrt) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *Sqrt) UnmarshalJSON(b []byte) error {
+func (msg *UnaryOperator) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *Sqrt_Ins) MarshalJSON() ([]byte, error) {
+func (msg *UnaryOperator_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -833,14 +833,14 @@ func (msg *Sqrt_Ins) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *Sqrt_Ins) UnmarshalJSON(b []byte) error {
+func (msg *UnaryOperator_Ins) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *Sqrt_Outs) MarshalJSON() ([]byte, error) {
+func (msg *UnaryOperator_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -849,7 +849,7 @@ func (msg *Sqrt_Outs) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *Sqrt_Outs) UnmarshalJSON(b []byte) error {
+func (msg *UnaryOperator_Outs) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

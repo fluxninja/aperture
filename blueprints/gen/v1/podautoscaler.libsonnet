@@ -4,6 +4,7 @@ local podautoscalerouts = import './podautoscalerouts.libsonnet';
     out_ports: {
       actual_replicas: error 'Port actual_replicas is missing',
       configured_replicas: error 'Port configured_replicas is missing',
+      desired_replicas: error 'Port desired_replicas is missing',
     },
   },
   outPorts:: podautoscalerouts,
@@ -12,6 +13,24 @@ local podautoscalerouts = import './podautoscalerouts.libsonnet';
   },
   withCooldownOverridePercentageMixin(cooldown_override_percentage):: {
     cooldown_override_percentage+: cooldown_override_percentage,
+  },
+  withDefaultConfig(default_config):: {
+    default_config: default_config,
+  },
+  withDefaultConfigMixin(default_config):: {
+    default_config+: default_config,
+  },
+  withDynamicConfigKey(dynamic_config_key):: {
+    dynamic_config_key: dynamic_config_key,
+  },
+  withDynamicConfigKeyMixin(dynamic_config_key):: {
+    dynamic_config_key+: dynamic_config_key,
+  },
+  withKubernetesObjectSelector(kubernetes_object_selector):: {
+    kubernetes_object_selector: kubernetes_object_selector,
+  },
+  withKubernetesObjectSelectorMixin(kubernetes_object_selector):: {
+    kubernetes_object_selector+: kubernetes_object_selector,
   },
   withMaxReplicas(max_replicas):: {
     max_replicas: max_replicas,

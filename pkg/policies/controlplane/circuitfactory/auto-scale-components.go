@@ -114,6 +114,13 @@ func newAutoScaleCompositeAndOptions(
 		tree.Root = podScalerConfComp
 
 		return tree, configuredComponents, fx.Options(options...), nil
+	} else if podAutoscaler := autoScaleComponentProto.GetPodAutoscaler(); podAutoscaler != nil {
+		nestedCircuit, err := podscaler.ParsePodAutoscaler(podAutoscaler)
+		if err != nil {
+			return retErr(err)
+		}
+
+		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
 	}
 	return retErr(fmt.Errorf("unsupported/missing component type, proto: %+v", autoScaleComponentProto))
 }

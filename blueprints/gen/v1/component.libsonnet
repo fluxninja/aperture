@@ -133,17 +133,17 @@
   withQueryMixin(query):: {
     query+: query,
   },
-  withSqrt(sqrt):: {
-    sqrt: sqrt,
-  },
-  withSqrtMixin(sqrt):: {
-    sqrt+: sqrt,
-  },
   withSwitcher(switcher):: {
     switcher: switcher,
   },
   withSwitcherMixin(switcher):: {
     switcher+: switcher,
+  },
+  withUnaryOperator(unary_operator):: {
+    unary_operator: unary_operator,
+  },
+  withUnaryOperatorMixin(unary_operator):: {
+    unary_operator+: unary_operator,
   },
   withVariable(variable):: {
     variable: variable,

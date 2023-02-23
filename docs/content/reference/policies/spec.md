@@ -714,16 +714,16 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([Query](#query)) Query components that are query databases such as Prometheus.
 
 </dd>
-<dt>sqrt</dt>
-<dd>
-
-([Sqrt](#sqrt)) Takes an input signal and emits the square root of the input signal.
-
-</dd>
 <dt>switcher</dt>
 <dd>
 
 ([Switcher](#switcher)) Switcher acts as a switch that emits one of the two signals based on third signal.
+
+</dd>
+<dt>unary_operator</dt>
+<dd>
+
+([UnaryOperator](#unary-operator)) Takes an input signal and emits the square root of the input signal.
 
 </dd>
 <dt>variable</dt>
@@ -2665,7 +2665,7 @@ Example:
 
 ### PodAutoscaler {#pod-autoscaler}
 
-High level pod auto-scaler
+Pod Autoscaler
 
 #### Properties
 
@@ -2673,21 +2673,39 @@ High level pod auto-scaler
 <dt>cooldown_override_percentage</dt>
 <dd>
 
-(float64, default: `50`) Cooldown override percentage defines a threshold change in scale beyond which cooldown is not applied.
+(float64, default: `50`) Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.
 For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
-scale changes by 10% or more, the cooldown is not applied. Defaults to 50%.
+scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+
+</dd>
+<dt>default_config</dt>
+<dd>
+
+([PodScalerScaleActuatorDynamicConfig](#pod-scaler-scale-actuator-dynamic-config)) Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig
+
+</dd>
+<dt>kubernetes_object_selector</dt>
+<dd>
+
+([KubernetesObjectSelector](#kubernetes-object-selector), **required**, `required`) The Kubernetes object on which horizontal scaling is applied.
 
 </dd>
 <dt>max_replicas</dt>
 <dd>
 
-(int64) @gotags: default:"4294967295"]
+(int64, default: `4294967295`) The maximum number of replicas to which the autoscaler can scale out.
 
 </dd>
 <dt>min_replicas</dt>
 <dd>
 
-(int64) @gotags: default:"0"];
+(int64, default: `0`) The minimum number of replicas to which the autoscaler can scale in.
 
 </dd>
 <dt>out_ports</dt>
@@ -2861,6 +2879,12 @@ Outputs for PodAutoscaler.
 
 </dd>
 <dt>configured_replicas</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+<dt>desired_replicas</dt>
 <dd>
 
 ([OutPort](#out-port))
@@ -3750,69 +3774,6 @@ An entity (e.g. Kubernetes pod) may belong to multiple services.
 </dd>
 </dl>
 
-### Sqrt {#sqrt}
-
-Takes an input signal and emits the square root of it multiplied by scale as an output
-
-$$
-\text{output} = \text{scale} \sqrt{\text{input}}
-$$
-
-#### Properties
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-([SqrtIns](#sqrt-ins)) Input ports for the Sqrt component.
-
-</dd>
-<dt>out_ports</dt>
-<dd>
-
-([SqrtOuts](#sqrt-outs)) Output ports for the Sqrt component.
-
-</dd>
-<dt>scale</dt>
-<dd>
-
-(float64) Scaling factor to be multiplied with the square root of the input signal.
-
-@gotags default:"1.0"
-
-</dd>
-</dl>
-
-### SqrtIns {#sqrt-ins}
-
-Inputs for the Sqrt component.
-
-#### Properties
-
-<dl>
-<dt>input</dt>
-<dd>
-
-([InPort](#in-port)) Input signal.
-
-</dd>
-</dl>
-
-### SqrtOuts {#sqrt-outs}
-
-Outputs for the Sqrt component.
-
-#### Properties
-
-<dl>
-<dt>output</dt>
-<dd>
-
-([OutPort](#out-port)) Output signal.
-
-</dd>
-</dl>
-
 ### Switcher {#switcher}
 
 Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input
@@ -3875,6 +3836,107 @@ Outputs for the Switcher component.
 <dd>
 
 ([OutPort](#out-port)) Selected signal (`on_signal` or `off_signal`).
+
+</dd>
+</dl>
+
+### UnaryOperator {#unary-operator}
+
+Takes an input signal and emits the output after applying the specified unary operator
+
+$$
+\text{output} = \unary_operator{\text{input}}
+$$
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([UnaryOperatorIns](#unary-operator-ins)) Input ports for the UnaryOperator component.
+
+</dd>
+<dt>operator</dt>
+<dd>
+
+(string, `oneof=abs acos acosh asin asinh atan atanh cbrt ceil cos cosh erf erfc erfcinv erfinv exp exp2 expm1 floor gamma j0 j1 lgamma log log10 log1p log2 round roundtoeven sin sinh sqrt tan tanh trunc y0 y1`) Unary Operator to apply.
+
+The unary operator can be one of the following:
+
+- abs: Absolute value with the sign removed.
+- acos: arccosine, in radians.
+- acosh: Inverse hyperbolic cosine.
+- asin: arcsine, in radians.
+- asinh: Inverse hyperbolic sine.
+- atan: arctangent, in radians.
+- atanh: Inverse hyperbolic tangent.
+- cbrt: Cube root.
+- ceil: Least integer value greater than or equal to input signal.
+- cos: cosine, in radians.
+- cosh: Hyperbolic cosine.
+- erf: Error function.
+- erfc: Complementary error function.
+- erfcinv: Inverse complementary error function.
+- erfinv: Inverse error function.
+- exp: The base-e exponential of input signal.
+- exp2: The base-2 exponential of input signal.
+- expm1: The base-e exponential of input signal minus 1.
+- floor: Greatest integer value less than or equal to input signal.
+- gamma: Gamma function.
+- j0: Bessel function of the first kind of order 0.
+- j1: Bessel function of the first kind of order 1.
+- lgamma: Natural logarithm of the absolute value of the gamma function.
+- log: Natural logarithm of input signal.
+- log10: Base-10 logarithm of input signal.
+- log1p: Natural logarithm of input signal plus 1.
+- log2: Base-2 logarithm of input signal.
+- round: Round to nearest integer.
+- roundtoeven: Round to nearest integer, with ties going to the nearest even integer.
+- sin: sine, in radians.
+- sinh: Hyperbolic sine.
+- sqrt: Square root.
+- tan: tangent, in radians.
+- tanh: Hyperbolic tangent.
+- trunc: Truncate to integer.
+- y0: Bessel function of the second kind of order 0.
+- y1: Bessel function of the second kind of order 1.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([UnaryOperatorOuts](#unary-operator-outs)) Output ports for the UnaryOperator component.
+
+</dd>
+</dl>
+
+### UnaryOperatorIns {#unary-operator-ins}
+
+Inputs for the UnaryOperator component.
+
+#### Properties
+
+<dl>
+<dt>input</dt>
+<dd>
+
+([InPort](#in-port)) Input signal.
+
+</dd>
+</dl>
+
+### UnaryOperatorOuts {#unary-operator-outs}
+
+Outputs for the UnaryOperator component.
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([OutPort](#out-port)) Output signal.
 
 </dd>
 </dl>

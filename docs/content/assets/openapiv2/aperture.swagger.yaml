@@ -571,12 +571,12 @@ definitions:
             query:
                 $ref: '#/definitions/Query'
                 description: Query components that are query databases such as Prometheus.
-            sqrt:
-                $ref: '#/definitions/Sqrt'
-                description: Takes an input signal and emits the square root of the input signal.
             switcher:
                 $ref: '#/definitions/Switcher'
                 description: Switcher acts as a switch that emits one of the two signals based on third signal.
+            unary_operator:
+                $ref: '#/definitions/UnaryOperator'
+                description: Takes an input signal and emits the square root of the input signal.
             variable:
                 $ref: '#/definitions/Variable'
                 description: Emits a variable signal which can be set to invalid.
@@ -2164,21 +2164,39 @@ definitions:
         properties:
             cooldown_override_percentage:
                 description: |+
-                    Cooldown override percentage defines a threshold change in scale beyond which cooldown is not applied.
+                    Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.
                     For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
-                    scale changes by 10% or more, the cooldown is not applied. Defaults to 50%.
+                    scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
 
                 format: double
                 type: number
                 x-go-tag-default: "50"
+            default_config:
+                $ref: '#/definitions/PodScalerScaleActuatorDynamicConfig'
+                description: Default configuration.
+            dynamic_config_key:
+                title: Configuration key for DynamicConfig
+                type: string
+            kubernetes_object_selector:
+                $ref: '#/definitions/KubernetesObjectSelector'
+                description: |+
+                    The Kubernetes object on which horizontal scaling is applied.
+
+                x-go-tag-validate: required
             max_replicas:
+                description: |+
+                    The maximum number of replicas to which the autoscaler can scale out.
+
                 format: int64
-                title: '@gotags: default:"4294967295"]'
                 type: integer
+                x-go-tag-default: "4294967295"
             min_replicas:
+                description: |+
+                    The minimum number of replicas to which the autoscaler can scale in.
+
                 format: int64
-                title: '@gotags: default:"0"];'
                 type: integer
+                x-go-tag-default: "0"
             out_ports:
                 $ref: '#/definitions/PodAutoscalerOuts'
                 description: Output ports for the PodAutoscaler.
@@ -2212,7 +2230,9 @@ definitions:
                 format: double
                 type: number
                 x-go-tag-default: "1"
-        title: High level pod auto-scaler
+        required:
+            - kubernetes_object_selector
+        title: Pod Autoscaler
         type: object
     PodAutoscalerDecreasingGradient:
         description: Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
@@ -2280,6 +2300,8 @@ definitions:
             actual_replicas:
                 $ref: '#/definitions/OutPort'
             configured_replicas:
+                $ref: '#/definitions/OutPort'
+            desired_replicas:
                 $ref: '#/definitions/OutPort'
         type: object
     PodAutoscalerScaleInController:
@@ -3065,41 +3087,6 @@ definitions:
                 format: int64
                 type: string
         type: object
-    Sqrt:
-        description: |-
-            $$
-            \text{output} = \text{scale} \sqrt{\text{input}}
-            $$
-        properties:
-            in_ports:
-                $ref: '#/definitions/SqrtIns'
-                description: Input ports for the Sqrt component.
-            out_ports:
-                $ref: '#/definitions/SqrtOuts'
-                description: Output ports for the Sqrt component.
-            scale:
-                description: |-
-                    Scaling factor to be multiplied with the square root of the input signal.
-
-                    @gotags default:"1.0"
-                format: double
-                type: number
-        title: Takes an input signal and emits the square root of it multiplied by scale as an output
-        type: object
-    SqrtIns:
-        description: Inputs for the Sqrt component.
-        properties:
-            input:
-                $ref: '#/definitions/InPort'
-                description: Input signal.
-        type: object
-    SqrtOuts:
-        description: Outputs for the Sqrt component.
-        properties:
-            output:
-                $ref: '#/definitions/OutPort'
-                description: Output signal.
-        type: object
     Stats:
         properties:
             backups:
@@ -3185,6 +3172,79 @@ definitions:
             output:
                 $ref: '#/definitions/OutPort'
                 description: Selected signal (`on_signal` or `off_signal`).
+        type: object
+    UnaryOperator:
+        description: |-
+            $$
+            \text{output} = \unary_operator{\text{input}}
+            $$
+        properties:
+            in_ports:
+                $ref: '#/definitions/UnaryOperatorIns'
+                description: Input ports for the UnaryOperator component.
+            operator:
+                description: |+
+                    Unary Operator to apply.
+
+                    The unary operator can be one of the following:
+                    * abs: Absolute value with the sign removed.
+                    * acos: arccosine, in radians.
+                    * acosh: Inverse hyperbolic cosine.
+                    * asin: arcsine, in radians.
+                    * asinh: Inverse hyperbolic sine.
+                    * atan: arctangent, in radians.
+                    * atanh: Inverse hyperbolic tangent.
+                    * cbrt: Cube root.
+                    * ceil: Least integer value greater than or equal to input signal.
+                    * cos: cosine, in radians.
+                    * cosh: Hyperbolic cosine.
+                    * erf: Error function.
+                    * erfc: Complementary error function.
+                    * erfcinv: Inverse complementary error function.
+                    * erfinv: Inverse error function.
+                    * exp: The base-e exponential of input signal.
+                    * exp2: The base-2 exponential of input signal.
+                    * expm1: The base-e exponential of input signal minus 1.
+                    * floor: Greatest integer value less than or equal to input signal.
+                    * gamma: Gamma function.
+                    * j0: Bessel function of the first kind of order 0.
+                    * j1: Bessel function of the first kind of order 1.
+                    * lgamma: Natural logarithm of the absolute value of the gamma function.
+                    * log: Natural logarithm of input signal.
+                    * log10: Base-10 logarithm of input signal.
+                    * log1p: Natural logarithm of input signal plus 1.
+                    * log2: Base-2 logarithm of input signal.
+                    * round: Round to nearest integer.
+                    * roundtoeven: Round to nearest integer, with ties going to the nearest even integer.
+                    * sin: sine, in radians.
+                    * sinh: Hyperbolic sine.
+                    * sqrt: Square root.
+                    * tan: tangent, in radians.
+                    * tanh: Hyperbolic tangent.
+                    * trunc: Truncate to integer.
+                    * y0: Bessel function of the second kind of order 0.
+                    * y1: Bessel function of the second kind of order 1.
+
+                type: string
+                x-go-tag-validate: oneof=abs acos acosh asin asinh atan atanh cbrt ceil cos cosh erf erfc erfcinv erfinv exp exp2 expm1 floor gamma j0 j1 lgamma log log10 log1p log2 round roundtoeven sin sinh sqrt tan tanh trunc y0 y1
+            out_ports:
+                $ref: '#/definitions/UnaryOperatorOuts'
+                description: Output ports for the UnaryOperator component.
+        title: Takes an input signal and emits the output after applying the specified unary operator
+        type: object
+    UnaryOperatorIns:
+        description: Inputs for the UnaryOperator component.
+        properties:
+            input:
+                $ref: '#/definitions/InPort'
+                description: Input signal.
+        type: object
+    UnaryOperatorOuts:
+        description: Outputs for the UnaryOperator component.
+        properties:
+            output:
+                $ref: '#/definitions/OutPort'
+                description: Output signal.
         type: object
     Variable:
         description: Component that emits a variable value as an output signal, can be defined in dynamic configuration.

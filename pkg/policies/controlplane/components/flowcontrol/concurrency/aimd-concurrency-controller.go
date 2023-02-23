@@ -18,7 +18,7 @@ const (
 	aimdIncomingConcurrencyPortName    = "incoming_concurrency"
 )
 
-// ParseAIMDConcurrencyController parses an AIMD concurrency controller and returns the parent, leaf components, and options.
+// ParseAIMDConcurrencyController parses an AIMD concurrency controller and returns its nested circuit representation.
 func ParseAIMDConcurrencyController(
 	aimdConcurrencyController *policylangv1.AIMDConcurrencyController,
 ) (*policylangv1.NestedCircuit, error) {

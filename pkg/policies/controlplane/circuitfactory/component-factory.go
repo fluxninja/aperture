@@ -50,8 +50,8 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.Decider, components.NewDeciderAndOptions)
 	case *policylangv1.Component_Switcher:
 		ctor = mkCtor(config.Switcher, components.NewSwitcherAndOptions)
-	case *policylangv1.Component_Sqrt:
-		ctor = mkCtor(config.Sqrt, components.NewSqrtAndOptions)
+	case *policylangv1.Component_UnaryOperator:
+		ctor = mkCtor(config.UnaryOperator, components.NewUnaryOperatorAndOptions)
 	case *policylangv1.Component_Max:
 		ctor = mkCtor(config.Max, components.NewMaxAndOptions)
 	case *policylangv1.Component_Min:

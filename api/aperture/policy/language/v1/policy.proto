@@ -174,7 +174,7 @@ message Component {
     Variable variable = 9;
 
     // Takes an input signal and emits the square root of the input signal.
-    Sqrt sqrt = 10;
+    UnaryOperator unary_operator = 10;
 
     // Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval.
     Extrapolator extrapolator = 11;
@@ -933,32 +933,71 @@ message Variable {
   DynamicConfig default_config = 3;
 }
 
-// Takes an input signal and emits the square root of it multiplied by scale as an output
+// Takes an input signal and emits the output after applying the specified unary operator
 //
 // $$
-// \text{output} = \text{scale} \sqrt{\text{input}}
+// \text{output} = \unary_operator{\text{input}}
 // $$
-message Sqrt {
-  // Inputs for the Sqrt component.
+message UnaryOperator {
+  // Inputs for the UnaryOperator component.
   message Ins {
     // Input signal.
     InPort input = 1;
   }
 
-  // Outputs for the Sqrt component.
+  // Outputs for the UnaryOperator component.
   message Outs {
     // Output signal.
     OutPort output = 1;
   }
 
-  // Input ports for the Sqrt component.
+  // Input ports for the UnaryOperator component.
   Ins in_ports = 1;
 
-  // Output ports for the Sqrt component.
+  // Output ports for the UnaryOperator component.
   Outs out_ports = 2;
 
-  // Scaling factor to be multiplied with the square root of the input signal.
-  double scale = 3; // @gotags default:"1.0"
+  // Unary Operator to apply.
+  //
+  // The unary operator can be one of the following:
+  // * abs: Absolute value with the sign removed.
+  // * acos: arccosine, in radians.
+  // * acosh: Inverse hyperbolic cosine.
+  // * asin: arcsine, in radians.
+  // * asinh: Inverse hyperbolic sine.
+  // * atan: arctangent, in radians.
+  // * atanh: Inverse hyperbolic tangent.
+  // * cbrt: Cube root.
+  // * ceil: Least integer value greater than or equal to input signal.
+  // * cos: cosine, in radians.
+  // * cosh: Hyperbolic cosine.
+  // * erf: Error function.
+  // * erfc: Complementary error function.
+  // * erfcinv: Inverse complementary error function.
+  // * erfinv: Inverse error function.
+  // * exp: The base-e exponential of input signal.
+  // * exp2: The base-2 exponential of input signal.
+  // * expm1: The base-e exponential of input signal minus 1.
+  // * floor: Greatest integer value less than or equal to input signal.
+  // * gamma: Gamma function.
+  // * j0: Bessel function of the first kind of order 0.
+  // * j1: Bessel function of the first kind of order 1.
+  // * lgamma: Natural logarithm of the absolute value of the gamma function.
+  // * log: Natural logarithm of input signal.
+  // * log10: Base-10 logarithm of input signal.
+  // * log1p: Natural logarithm of input signal plus 1.
+  // * log2: Base-2 logarithm of input signal.
+  // * round: Round to nearest integer.
+  // * roundtoeven: Round to nearest integer, with ties going to the nearest even integer.
+  // * sin: sine, in radians.
+  // * sinh: Hyperbolic sine.
+  // * sqrt: Square root.
+  // * tan: tangent, in radians.
+  // * tanh: Hyperbolic tangent.
+  // * trunc: Truncate to integer.
+  // * y0: Bessel function of the second kind of order 0.
+  // * y1: Bessel function of the second kind of order 1.
+  string operator = 3; // @gotags: validate:"oneof=abs acos acosh asin asinh atan atanh cbrt ceil cos cosh erf erfc erfcinv erfinv exp exp2 expm1 floor gamma j0 j1 lgamma log log10 log1p log2 round roundtoeven sin sinh sqrt tan tanh trunc y0 y1"
 }
 
 // Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
@@ -1400,7 +1439,7 @@ message AIMDConcurrencyController {
   LoadActuator.DynamicConfig default_config = 10;
 }
 
-// High level pod auto-scaler
+// Pod Autoscaler
 message PodAutoscaler {
   // Increasing Gradient defines a controller for scaling out based on Gradient Controller.
   message IncreasingGradient {
@@ -1488,32 +1527,43 @@ message PodAutoscaler {
   message Outs {
     OutPort actual_replicas = 1;
     OutPort configured_replicas = 2;
+    OutPort desired_replicas = 3;
   }
 
   // Output ports for the PodAutoscaler.
   Outs out_ports = 1;
 
-  uint32 min_replicas = 2; // @gotags: default:"0"];
-  uint32 max_replicas = 3; // @gotags: default:"4294967295"]
+  // The Kubernetes object on which horizontal scaling is applied.
+  KubernetesObjectSelector kubernetes_object_selector = 2; // @gotags: validate:"required"
 
-  // The amount of time to wait after a scale out operation for another scale out or scale in operation.
-  google.protobuf.Duration scale_out_cooldown = 4;
-  // The amount of time to wait after a scale in operation for another scale in operation.
-  google.protobuf.Duration scale_in_cooldown = 5;
+  // The minimum number of replicas to which the autoscaler can scale in.
+  uint32 min_replicas = 3; // @gotags: default:"0"];
+  // The maximum number of replicas to which the autoscaler can scale out.
+  uint32 max_replicas = 4; // @gotags: default:"4294967295"]
 
-  // Cooldown override percentage defines a threshold change in scale beyond which cooldown is not applied.
-  // For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
-  // scale changes by 10% or more, the cooldown is not applied. Defaults to 50%.
-  double cooldown_override_percentage = 6; // @gotags: default:"50"
+  // List of Controllers for scaling out pods.
+  repeated ScaleOutController scale_out_controllers = 5;
+  // List of Controllers for scaling in pods.
+  repeated ScaleInController scale_in_controllers = 6;
 
   // The maximum number of pods to scale in at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 10% of current pods.
   double scale_in_max_percentage = 7; // @gotags: default:"10"
-
   // The maximum number of pods to scale out at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 1% of current pods.
   double scale_out_max_percentage = 8; // @gotags: default:"1"
 
-  // List of Controllers for scaling out pods.
-  repeated ScaleOutController scale_out_controllers = 9;
-  // List of Controllers for scaling in pods.
-  repeated ScaleInController scale_in_controllers = 10;
+  // The amount of time to wait after a scale out operation for another scale out or scale in operation.
+  google.protobuf.Duration scale_out_cooldown = 9;
+  // The amount of time to wait after a scale in operation for another scale in operation.
+  google.protobuf.Duration scale_in_cooldown = 10;
+
+  // Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.
+  // For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
+  // scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+  double cooldown_override_percentage = 11; // @gotags: default:"50"
+
+  // Configuration key for DynamicConfig
+  string dynamic_config_key = 12;
+
+  // Default configuration.
+  PodScaler.ScaleActuator.DynamicConfig default_config = 13;
 }

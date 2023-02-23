@@ -13,4 +13,10 @@
   withConfiguredReplicasMixin(configured_replicas):: {
     configured_replicas+: configured_replicas,
   },
+  withDesiredReplicas(desired_replicas):: {
+    desired_replicas: desired_replicas,
+  },
+  withDesiredReplicasMixin(desired_replicas):: {
+    desired_replicas+: desired_replicas,
+  },
 }

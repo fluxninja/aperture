@@ -478,15 +478,15 @@
           "x-order": 21,
           "$ref": "#/definitions/Query"
         },
-        "sqrt": {
-          "description": "Takes an input signal and emits the square root of the input signal.",
-          "x-order": 22,
-          "$ref": "#/definitions/Sqrt"
-        },
         "switcher": {
           "description": "Switcher acts as a switch that emits one of the two signals based on third signal.",
-          "x-order": 23,
+          "x-order": 22,
           "$ref": "#/definitions/Switcher"
+        },
+        "unary_operator": {
+          "description": "Takes an input signal and emits the square root of the input signal.",
+          "x-order": 23,
+          "$ref": "#/definitions/UnaryOperator"
         },
         "variable": {
           "description": "Emits a variable signal which can be set to invalid.",
@@ -1905,30 +1905,49 @@
     },
     "PodAutoscaler": {
       "type": "object",
-      "title": "High level pod auto-scaler",
+      "title": "Pod Autoscaler",
+      "required": ["kubernetes_object_selector"],
       "properties": {
         "cooldown_override_percentage": {
-          "description": "Cooldown override percentage defines a threshold change in scale beyond which cooldown is not applied.\nFor example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the\nscale changes by 10% or more, the cooldown is not applied. Defaults to 50%.\n\n",
+          "description": "Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.\nFor example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the\nscale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.\n\n",
           "type": "number",
           "format": "double",
           "x-go-tag-default": "50",
           "x-order": 0
         },
+        "default_config": {
+          "description": "Default configuration.",
+          "x-order": 1,
+          "$ref": "#/definitions/PodScalerScaleActuatorDynamicConfig"
+        },
+        "dynamic_config_key": {
+          "type": "string",
+          "title": "Configuration key for DynamicConfig",
+          "x-order": 2
+        },
+        "kubernetes_object_selector": {
+          "description": "The Kubernetes object on which horizontal scaling is applied.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 3,
+          "$ref": "#/definitions/KubernetesObjectSelector"
+        },
         "max_replicas": {
+          "description": "The maximum number of replicas to which the autoscaler can scale out.\n\n",
           "type": "integer",
           "format": "int64",
-          "title": "@gotags: default:\"4294967295\"]",
-          "x-order": 1
+          "x-go-tag-default": "4294967295",
+          "x-order": 4
         },
         "min_replicas": {
+          "description": "The minimum number of replicas to which the autoscaler can scale in.\n\n",
           "type": "integer",
           "format": "int64",
-          "title": "@gotags: default:\"0\"];",
-          "x-order": 2
+          "x-go-tag-default": "0",
+          "x-order": 5
         },
         "out_ports": {
           "description": "Output ports for the PodAutoscaler.",
-          "x-order": 3,
+          "x-order": 6,
           "$ref": "#/definitions/PodAutoscalerOuts"
         },
         "scale_in_controllers": {
@@ -1937,19 +1956,19 @@
           "items": {
             "$ref": "#/definitions/PodAutoscalerScaleInController"
           },
-          "x-order": 4
+          "x-order": 7
         },
         "scale_in_cooldown": {
           "description": "The amount of time to wait after a scale in operation for another scale in operation.",
           "type": "string",
-          "x-order": 5
+          "x-order": 8
         },
         "scale_in_max_percentage": {
           "description": "The maximum number of pods to scale in at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 10% of current pods.\n\n",
           "type": "number",
           "format": "double",
           "x-go-tag-default": "10",
-          "x-order": 6
+          "x-order": 9
         },
         "scale_out_controllers": {
           "description": "List of Controllers for scaling out pods.",
@@ -1957,19 +1976,19 @@
           "items": {
             "$ref": "#/definitions/PodAutoscalerScaleOutController"
           },
-          "x-order": 7
+          "x-order": 10
         },
         "scale_out_cooldown": {
           "description": "The amount of time to wait after a scale out operation for another scale out or scale in operation.",
           "type": "string",
-          "x-order": 8
+          "x-order": 11
         },
         "scale_out_max_percentage": {
           "description": "The maximum number of pods to scale out at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 1% of current pods.\n\n",
           "type": "number",
           "format": "double",
           "x-go-tag-default": "1",
-          "x-order": 9
+          "x-order": 12
         }
       },
       "additionalProperties": false
@@ -2071,6 +2090,10 @@
         },
         "configured_replicas": {
           "x-order": 1,
+          "$ref": "#/definitions/OutPort"
+        },
+        "desired_replicas": {
+          "x-order": 2,
           "$ref": "#/definitions/OutPort"
         }
       },
@@ -2668,54 +2691,6 @@
       },
       "additionalProperties": false
     },
-    "Sqrt": {
-      "description": "$$\n\\text{output} = \\text{scale} \\sqrt{\\text{input}}\n$$",
-      "type": "object",
-      "title": "Takes an input signal and emits the square root of it multiplied by scale as an output",
-      "properties": {
-        "in_ports": {
-          "description": "Input ports for the Sqrt component.",
-          "x-order": 0,
-          "$ref": "#/definitions/SqrtIns"
-        },
-        "out_ports": {
-          "description": "Output ports for the Sqrt component.",
-          "x-order": 1,
-          "$ref": "#/definitions/SqrtOuts"
-        },
-        "scale": {
-          "description": "Scaling factor to be multiplied with the square root of the input signal.\n\n@gotags default:\"1.0\"",
-          "type": "number",
-          "format": "double",
-          "x-order": 2
-        }
-      },
-      "additionalProperties": false
-    },
-    "SqrtIns": {
-      "description": "Inputs for the Sqrt component.",
-      "type": "object",
-      "properties": {
-        "input": {
-          "description": "Input signal.",
-          "x-order": 0,
-          "$ref": "#/definitions/InPort"
-        }
-      },
-      "additionalProperties": false
-    },
-    "SqrtOuts": {
-      "description": "Outputs for the Sqrt component.",
-      "type": "object",
-      "properties": {
-        "output": {
-          "description": "Output signal.",
-          "x-order": 0,
-          "$ref": "#/definitions/OutPort"
-        }
-      },
-      "additionalProperties": false
-    },
     "Switcher": {
       "description": "`on_signal` will be returned if switch input is valid and not equal to 0.0 ,\n otherwise `off_signal` will be returned.",
       "type": "object",
@@ -2762,6 +2737,54 @@
       "properties": {
         "output": {
           "description": "Selected signal (`on_signal` or `off_signal`).",
+          "x-order": 0,
+          "$ref": "#/definitions/OutPort"
+        }
+      },
+      "additionalProperties": false
+    },
+    "UnaryOperator": {
+      "description": "$$\n\\text{output} = \\unary_operator{\\text{input}}\n$$",
+      "type": "object",
+      "title": "Takes an input signal and emits the output after applying the specified unary operator",
+      "properties": {
+        "in_ports": {
+          "description": "Input ports for the UnaryOperator component.",
+          "x-order": 0,
+          "$ref": "#/definitions/UnaryOperatorIns"
+        },
+        "operator": {
+          "description": "Unary Operator to apply.\n\nThe unary operator can be one of the following:\n* abs: Absolute value with the sign removed.\n* acos: arccosine, in radians.\n* acosh: Inverse hyperbolic cosine.\n* asin: arcsine, in radians.\n* asinh: Inverse hyperbolic sine.\n* atan: arctangent, in radians.\n* atanh: Inverse hyperbolic tangent.\n* cbrt: Cube root.\n* ceil: Least integer value greater than or equal to input signal.\n* cos: cosine, in radians.\n* cosh: Hyperbolic cosine.\n* erf: Error function.\n* erfc: Complementary error function.\n* erfcinv: Inverse complementary error function.\n* erfinv: Inverse error function.\n* exp: The base-e exponential of input signal.\n* exp2: The base-2 exponential of input signal.\n* expm1: The base-e exponential of input signal minus 1.\n* floor: Greatest integer value less than or equal to input signal.\n* gamma: Gamma function.\n* j0: Bessel function of the first kind of order 0.\n* j1: Bessel function of the first kind of order 1.\n* lgamma: Natural logarithm of the absolute value of the gamma function.\n* log: Natural logarithm of input signal.\n* log10: Base-10 logarithm of input signal.\n* log1p: Natural logarithm of input signal plus 1.\n* log2: Base-2 logarithm of input signal.\n* round: Round to nearest integer.\n* roundtoeven: Round to nearest integer, with ties going to the nearest even integer.\n* sin: sine, in radians.\n* sinh: Hyperbolic sine.\n* sqrt: Square root.\n* tan: tangent, in radians.\n* tanh: Hyperbolic tangent.\n* trunc: Truncate to integer.\n* y0: Bessel function of the second kind of order 0.\n* y1: Bessel function of the second kind of order 1.\n\n",
+          "type": "string",
+          "x-go-tag-validate": "oneof=abs acos acosh asin asinh atan atanh cbrt ceil cos cosh erf erfc erfcinv erfinv exp exp2 expm1 floor gamma j0 j1 lgamma log log10 log1p log2 round roundtoeven sin sinh sqrt tan tanh trunc y0 y1",
+          "x-order": 1
+        },
+        "out_ports": {
+          "description": "Output ports for the UnaryOperator component.",
+          "x-order": 2,
+          "$ref": "#/definitions/UnaryOperatorOuts"
+        }
+      },
+      "additionalProperties": false
+    },
+    "UnaryOperatorIns": {
+      "description": "Inputs for the UnaryOperator component.",
+      "type": "object",
+      "properties": {
+        "input": {
+          "description": "Input signal.",
+          "x-order": 0,
+          "$ref": "#/definitions/InPort"
+        }
+      },
+      "additionalProperties": false
+    },
+    "UnaryOperatorOuts": {
+      "description": "Outputs for the UnaryOperator component.",
+      "type": "object",
+      "properties": {
+        "output": {
+          "description": "Output signal.",
           "x-order": 0,
           "$ref": "#/definitions/OutPort"
         }

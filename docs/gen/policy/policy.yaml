@@ -576,16 +576,16 @@ definitions:
         description: Query components that are query databases such as Prometheus.
         x-order: 21
         $ref: '#/definitions/Query'
-      sqrt:
-        description: Takes an input signal and emits the square root of the input
-          signal.
-        x-order: 22
-        $ref: '#/definitions/Sqrt'
       switcher:
         description: Switcher acts as a switch that emits one of the two signals based
           on third signal.
-        x-order: 23
+        x-order: 22
         $ref: '#/definitions/Switcher'
+      unary_operator:
+        description: Takes an input signal and emits the square root of the input
+          signal.
+        x-order: 23
+        $ref: '#/definitions/UnaryOperator'
       variable:
         description: Emits a variable signal which can be set to invalid.
         x-order: 24
@@ -2085,43 +2085,66 @@ definitions:
         x-order: 0
   PodAutoscaler:
     type: object
-    title: High level pod auto-scaler
+    title: Pod Autoscaler
+    required:
+    - kubernetes_object_selector
     properties:
       cooldown_override_percentage:
         description: |+
-          Cooldown override percentage defines a threshold change in scale beyond which cooldown is not applied.
+          Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.
           For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
-          scale changes by 10% or more, the cooldown is not applied. Defaults to 50%.
+          scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
 
         type: number
         format: double
         x-go-tag-default: "50"
         x-order: 0
-      max_replicas:
-        type: integer
-        format: int64
-        title: '@gotags: default:"4294967295"]'
+      default_config:
+        description: Default configuration.
         x-order: 1
-      min_replicas:
+        $ref: '#/definitions/PodScalerScaleActuatorDynamicConfig'
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
+        x-order: 2
+      kubernetes_object_selector:
+        description: |+
+          The Kubernetes object on which horizontal scaling is applied.
+
+        x-go-tag-validate: required
+        x-order: 3
+        $ref: '#/definitions/KubernetesObjectSelector'
+      max_replicas:
+        description: |+
+          The maximum number of replicas to which the autoscaler can scale out.
+
         type: integer
         format: int64
-        title: '@gotags: default:"0"];'
-        x-order: 2
+        x-go-tag-default: "4294967295"
+        x-order: 4
+      min_replicas:
+        description: |+
+          The minimum number of replicas to which the autoscaler can scale in.
+
+        type: integer
+        format: int64
+        x-go-tag-default: "0"
+        x-order: 5
       out_ports:
         description: Output ports for the PodAutoscaler.
-        x-order: 3
+        x-order: 6
         $ref: '#/definitions/PodAutoscalerOuts'
       scale_in_controllers:
         description: List of Controllers for scaling in pods.
         type: array
         items:
           $ref: '#/definitions/PodAutoscalerScaleInController'
-        x-order: 4
+        x-order: 7
       scale_in_cooldown:
         description: The amount of time to wait after a scale in operation for another
           scale in operation.
         type: string
-        x-order: 5
+        x-order: 8
       scale_in_max_percentage:
         description: |+
           The maximum number of pods to scale in at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 10% of current pods.
@@ -2129,18 +2152,18 @@ definitions:
         type: number
         format: double
         x-go-tag-default: "10"
-        x-order: 6
+        x-order: 9
       scale_out_controllers:
         description: List of Controllers for scaling out pods.
         type: array
         items:
           $ref: '#/definitions/PodAutoscalerScaleOutController'
-        x-order: 7
+        x-order: 10
       scale_out_cooldown:
         description: The amount of time to wait after a scale out operation for another
           scale out or scale in operation.
         type: string
-        x-order: 8
+        x-order: 11
       scale_out_max_percentage:
         description: |+
           The maximum number of pods to scale out at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 1% of current pods.
@@ -2148,7 +2171,7 @@ definitions:
         type: number
         format: double
         x-go-tag-default: "1"
-        x-order: 9
+        x-order: 12
   PodAutoscalerDecreasingGradient:
     description: Decreasing Gradient defines a controller for scaling in based on
       Gradient Controller.
@@ -2233,6 +2256,9 @@ definitions:
         $ref: '#/definitions/OutPort'
       configured_replicas:
         x-order: 1
+        $ref: '#/definitions/OutPort'
+      desired_replicas:
+        x-order: 2
         $ref: '#/definitions/OutPort'
   PodAutoscalerScaleInController:
     type: object
@@ -2960,47 +2986,6 @@ definitions:
         type: string
         x-go-tag-validate: required
         x-order: 1
-  Sqrt:
-    description: |-
-      $$
-      \text{output} = \text{scale} \sqrt{\text{input}}
-      $$
-    type: object
-    title: Takes an input signal and emits the square root of it multiplied by scale
-      as an output
-    properties:
-      in_ports:
-        description: Input ports for the Sqrt component.
-        x-order: 0
-        $ref: '#/definitions/SqrtIns'
-      out_ports:
-        description: Output ports for the Sqrt component.
-        x-order: 1
-        $ref: '#/definitions/SqrtOuts'
-      scale:
-        description: |-
-          Scaling factor to be multiplied with the square root of the input signal.
-
-          @gotags default:"1.0"
-        type: number
-        format: double
-        x-order: 2
-  SqrtIns:
-    description: Inputs for the Sqrt component.
-    type: object
-    properties:
-      input:
-        description: Input signal.
-        x-order: 0
-        $ref: '#/definitions/InPort'
-  SqrtOuts:
-    description: Outputs for the Sqrt component.
-    type: object
-    properties:
-      output:
-        description: Output signal.
-        x-order: 0
-        $ref: '#/definitions/OutPort'
   Switcher:
     description: |-
       `on_signal` will be returned if switch input is valid and not equal to 0.0 ,
@@ -3039,6 +3024,87 @@ definitions:
     properties:
       output:
         description: Selected signal (`on_signal` or `off_signal`).
+        x-order: 0
+        $ref: '#/definitions/OutPort'
+  UnaryOperator:
+    description: |-
+      $$
+      \text{output} = \unary_operator{\text{input}}
+      $$
+    type: object
+    title: Takes an input signal and emits the output after applying the specified
+      unary operator
+    properties:
+      in_ports:
+        description: Input ports for the UnaryOperator component.
+        x-order: 0
+        $ref: '#/definitions/UnaryOperatorIns'
+      operator:
+        description: |+
+          Unary Operator to apply.
+
+          The unary operator can be one of the following:
+          * abs: Absolute value with the sign removed.
+          * acos: arccosine, in radians.
+          * acosh: Inverse hyperbolic cosine.
+          * asin: arcsine, in radians.
+          * asinh: Inverse hyperbolic sine.
+          * atan: arctangent, in radians.
+          * atanh: Inverse hyperbolic tangent.
+          * cbrt: Cube root.
+          * ceil: Least integer value greater than or equal to input signal.
+          * cos: cosine, in radians.
+          * cosh: Hyperbolic cosine.
+          * erf: Error function.
+          * erfc: Complementary error function.
+          * erfcinv: Inverse complementary error function.
+          * erfinv: Inverse error function.
+          * exp: The base-e exponential of input signal.
+          * exp2: The base-2 exponential of input signal.
+          * expm1: The base-e exponential of input signal minus 1.
+          * floor: Greatest integer value less than or equal to input signal.
+          * gamma: Gamma function.
+          * j0: Bessel function of the first kind of order 0.
+          * j1: Bessel function of the first kind of order 1.
+          * lgamma: Natural logarithm of the absolute value of the gamma function.
+          * log: Natural logarithm of input signal.
+          * log10: Base-10 logarithm of input signal.
+          * log1p: Natural logarithm of input signal plus 1.
+          * log2: Base-2 logarithm of input signal.
+          * round: Round to nearest integer.
+          * roundtoeven: Round to nearest integer, with ties going to the nearest even integer.
+          * sin: sine, in radians.
+          * sinh: Hyperbolic sine.
+          * sqrt: Square root.
+          * tan: tangent, in radians.
+          * tanh: Hyperbolic tangent.
+          * trunc: Truncate to integer.
+          * y0: Bessel function of the second kind of order 0.
+          * y1: Bessel function of the second kind of order 1.
+
+        type: string
+        x-go-tag-validate: oneof=abs acos acosh asin asinh atan atanh cbrt ceil cos
+          cosh erf erfc erfcinv erfinv exp exp2 expm1 floor gamma j0 j1 lgamma log
+          log10 log1p log2 round roundtoeven sin sinh sqrt tan tanh trunc y0 y1
+        x-order: 1
+      out_ports:
+        description: Output ports for the UnaryOperator component.
+        x-order: 2
+        $ref: '#/definitions/UnaryOperatorOuts'
+  UnaryOperatorIns:
+    description: Inputs for the UnaryOperator component.
+    type: object
+    properties:
+      input:
+        description: Input signal.
+        x-order: 0
+        $ref: '#/definitions/InPort'
+  UnaryOperatorOuts:
+    description: Outputs for the UnaryOperator component.
+    type: object
+    properties:
+      output:
+        description: Output signal.
         x-order: 0
         $ref: '#/definitions/OutPort'
   Variable:
