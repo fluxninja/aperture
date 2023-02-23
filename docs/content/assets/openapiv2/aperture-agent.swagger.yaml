@@ -338,6 +338,8 @@ definitions:
     description: Entity represents a pod, vm, etc.
     type: object
     properties:
+      cluster_ip:
+        type: string
       ip_address:
         type: string
       name:

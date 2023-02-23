@@ -918,6 +918,8 @@ definitions:
     Entity:
         description: Entity represents a pod, vm, etc.
         properties:
+            cluster_ip:
+                type: string
             ip_address:
                 type: string
             name:

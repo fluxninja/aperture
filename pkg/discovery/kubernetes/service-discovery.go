@@ -41,6 +41,7 @@ type podInfo struct {
 	Node      string
 	UID       string
 	IPAddress string
+	ClusterIP string
 }
 
 func podInfoOrder(a, b podInfo) bool {
@@ -288,6 +289,7 @@ func (kd *serviceDiscovery) writeEntityInTracker(podInfo podInfo) error {
 		Uid:       podInfo.UID,
 		Prefix:    podTrackerPrefix,
 		Name:      podInfo.Name,
+		ClusterIp: podInfo.ClusterIP,
 	}
 
 	value, err := json.Marshal(entity)
@@ -309,7 +311,18 @@ func (kd *serviceDiscovery) updateMappingFromEndpoints(endpoints *v1.Endpoints, 
 	fqdn := kd.getFQDN(endpoints)
 	pods := getServicePods(endpoints, kd.nodeName)
 
+	svc, err := kd.cli.CoreV1().Services(endpoints.Namespace).Get(kd.ctx, endpoints.Name, metav1.GetOptions{ResourceVersion: endpoints.ResourceVersion})
+	if err != nil {
+		log.Trace().Err(err).Msgf("Unable to get service of endpoint %s/%s", endpoints.Namespace, endpoints.Name)
+	}
+
 	for _, pod := range pods {
+		if svc.Spec.ClusterIP != "" {
+			if svc.Spec.ClusterIP != "None" {
+				pod.ClusterIP = svc.Spec.ClusterIP
+			}
+		}
+
 		if operation == add {
 			kd.mapping.addService(pod.Namespace, pod.Name, fqdn)
 			err := kd.writeEntityInTracker(pod)
@@ -342,9 +355,6 @@ func getServicePods(endpoints *v1.Endpoints, nodeName string) []podInfo {
 				continue
 			}
 			if address.TargetRef.Kind != "Pod" {
-				continue
-			}
-			if *(address.NodeName) != nodeName {
 				continue
 			}
 			p := podInfo{
