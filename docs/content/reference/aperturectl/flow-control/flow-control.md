@@ -19,6 +19,7 @@ Use this command to query information about active Flow Control integrations
 ```
       --controller string    Address of Aperture controller
   -h, --help                 help for flow-control
+      --insecure             Allow insecure connection to controller
       --kube                 Find controller in Kubernetes cluster, instead of connecting directly
       --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
 ```

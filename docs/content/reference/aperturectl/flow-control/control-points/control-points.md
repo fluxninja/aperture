@@ -28,6 +28,7 @@ aperturectl flow-control control-points [flags]
 
 ```
       --controller string    Address of Aperture controller
+      --insecure             Allow insecure connection to controller
       --kube                 Find controller in Kubernetes cluster, instead of connecting directly
       --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
 ```

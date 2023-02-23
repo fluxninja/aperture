@@ -34,6 +34,7 @@ const (
 // address or kubeconfig.
 type ControllerConn struct {
 	controllerAddr string
+	allowInsecure  bool
 	isKube         bool
 	kubeConfigPath string
 	kubeConfig     *rest.Config
@@ -49,6 +50,12 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		"controller",
 		"",
 		"Address of Aperture controller",
+	)
+	flags.BoolVar(
+		&c.allowInsecure,
+		"insecure",
+		false,
+		"Allow insecure connection to controller",
 	)
 	flags.BoolVar(
 		&c.isKube,
@@ -95,41 +102,50 @@ func (c *ControllerConn) Client() (cmdv1.ControllerClient, error) {
 		return cmdv1.NewControllerClient(c.conn), nil
 	}
 
-	if !c.isKube {
-		certPool, err := x509.SystemCertPool()
-		if err != nil {
-			return nil, err
-		}
+	var addr string
+	var cred credentials.TransportCredentials
+	if c.allowInsecure {
+		cred = credentials.NewTLS(&tls.Config{
+			InsecureSkipVerify: true, //nolint:gosec // Requires enabling CLI option
+		})
+	}
 
-		c.conn, err = grpc.Dial(
-			c.controllerAddr,
-			grpc.WithTransportCredentials(
-				credentials.NewClientTLSFromCert(certPool, ""),
-			),
-		)
-		if err != nil {
-			return nil, err
+	if !c.isKube {
+		addr = c.controllerAddr
+
+		if cred == nil {
+			certPool, err := x509.SystemCertPool()
+			if err != nil {
+				return nil, err
+			}
+			cred = credentials.NewClientTLSFromCert(certPool, "")
 		}
 	} else {
-		port, err := c.startPortForward()
+		port, cert, err := c.startPortForward()
 		if err != nil {
 			return nil, fmt.Errorf("failed to start port forward: %w", err)
 		}
 
-		// We know we connect to known controller via forwarded port, thus we
-		// can skip checking its cert.
-		// FIXME Perhaps we should check it anyway?
-		c.conn, err = grpc.Dial(
-			fmt.Sprintf("localhost:%d", port),
-			grpc.WithTransportCredentials(
-				credentials.NewTLS(&tls.Config{
-					InsecureSkipVerify: true, //nolint:gosec
-				}),
-			),
-		)
-		if err != nil {
-			return nil, err
+		addr = fmt.Sprintf("localhost:%d", port)
+
+		if cred == nil {
+			if cert == nil {
+				return nil, errors.New("cannot find controller cert and --insecure is off")
+			}
+
+			certPool := x509.NewCertPool()
+			ok := certPool.AppendCertsFromPEM(cert)
+			if !ok {
+				return nil, fmt.Errorf("cannot apply controller cert")
+			}
+			cred = credentials.NewClientTLSFromCert(certPool, "aperture-controller.aperture-controller")
 		}
+	}
+
+	var err error
+	c.conn, err = grpc.Dial(addr, grpc.WithTransportCredentials(cred))
+	if err != nil {
+		return nil, err
 	}
 
 	return cmdv1.NewControllerClient(c.conn), nil
@@ -148,10 +164,10 @@ func (c *ControllerConn) PostRun(_ *cobra.Command, _ []string) {
 	}
 }
 
-func (c *ControllerConn) startPortForward() (uint16, error) {
+func (c *ControllerConn) startPortForward() (localPort uint16, cert []byte, err error) {
 	clientset, err := kubernetes.NewForConfig(c.kubeConfig)
 	if err != nil {
-		return 0, fmt.Errorf("failed to create Kubernetes client: %w", err)
+		return 0, nil, fmt.Errorf("failed to create Kubernetes client: %w", err)
 	}
 
 	// FIXME Forwarding to a service would be nicer solution, but couldn't make
@@ -161,10 +177,10 @@ func (c *ControllerConn) startPortForward() (uint16, error) {
 		FieldSelector: labels.Set{"status.phase": "Running"}.String(),
 	})
 	if err != nil {
-		return 0, fmt.Errorf("failed to list pods: %w", err)
+		return 0, nil, fmt.Errorf("failed to list pods: %w", err)
 	}
 	if len(pods.Items) == 0 {
-		return 0, fmt.Errorf("no pods found")
+		return 0, nil, fmt.Errorf("no pods found")
 	}
 
 	pod := &pods.Items[0]
@@ -172,7 +188,7 @@ func (c *ControllerConn) startPortForward() (uint16, error) {
 
 	transport, upgrader, err := spdy.RoundTripperFor(c.kubeConfig)
 	if err != nil {
-		return 0, err
+		return 0, nil, err
 	}
 
 	hostIP := strings.TrimPrefix(c.kubeConfig.Host, "https://")
@@ -195,7 +211,7 @@ func (c *ControllerConn) startPortForward() (uint16, error) {
 		io.Discard,
 	)
 	if err != nil {
-		return 0, err
+		return 0, nil, err
 	}
 
 	fwErrChan := make(chan error, 1)
@@ -203,15 +219,24 @@ func (c *ControllerConn) startPortForward() (uint16, error) {
 		fwErrChan <- fw.ForwardPorts()
 	}()
 
+	certSecret, err := clientset.CoreV1().Secrets(controllerNs).Get(
+		context.Background(),
+		"controller-controller-cert",
+		metav1.GetOptions{},
+	)
+	if err == nil {
+		cert = certSecret.Data["crt.pem"]
+	}
+
 	select {
 	case err = <-fwErrChan:
-		return 0, err
+		return 0, nil, err
 	case <-readyChan:
 	}
 	ports, err := fw.GetPorts()
 	if err != nil {
-		return 0, err
+		return 0, nil, err
 	}
 
-	return ports[0].Local, nil
+	return ports[0].Local, cert, nil
 }
