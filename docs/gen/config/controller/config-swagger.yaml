@@ -31,6 +31,7 @@ definitions:
                 x-go-name: Address
                 x-go-tag-json: address
                 x-go-tag-validate: hostname_port|url|fqdn
+                x-pattern-rules: hostname_port | url | fqdn
             base_path:
                 default: /
                 type: string
@@ -293,6 +294,7 @@ definitions:
                 x-go-tag-default: 0.0.0.0:1
                 x-go-tag-json: grpc_server_address
                 x-go-tag-validate: hostname_port
+                x-pattern-rules: hostname_port
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/grpcgateway
     GRPCServerConfig:
@@ -708,6 +710,7 @@ definitions:
                 x-go-tag-default: :8080
                 x-go-tag-json: addr
                 x-go-tag-validate: hostname_port
+                x-pattern-rules: hostname_port
             keep_alive:
                 default: 180s
                 description: Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alive is disabled.
@@ -729,6 +732,7 @@ definitions:
                 x-go-tag-default: tcp
                 x-go-tag-json: network
                 x-go-tag-validate: oneof=tcp tcp4 tcp6
+                x-oneof: tcp | tcp4 | tcp6
         title: ListenerConfig holds configuration for socket listeners.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/listener
@@ -759,6 +763,7 @@ definitions:
                 x-go-tag-default: info
                 x-go-tag-json: level
                 x-go-tag-validate: oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED
+                x-oneof: debug | DEBUG | info | INFO | warn | WARN | error | ERROR | fatal | FATAL | panic | PANIC | trace | TRACE | disabled | DISABLED
             non_blocking:
                 default: true
                 description: Use non-blocking log writer (can lose logs at high throughput)
@@ -1011,6 +1016,7 @@ definitions:
                 x-go-name: Address
                 x-go-tag-json: address
                 x-go-tag-validate: required,hostname_port|url|fqdn
+                x-pattern-rules: hostname_port | url | fqdn
         required:
             - address
         title: PrometheusConfig holds configuration for Prometheus Server.
@@ -1025,12 +1031,14 @@ definitions:
                 x-go-name: HTTPProxy
                 x-go-tag-json: http
                 x-go-tag-validate: omitempty,url|hostname_port
+                x-pattern-rules: empty | url | hostname_port
             https:
                 pattern: ((^$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)
                 type: string
                 x-go-name: HTTPSProxy
                 x-go-tag-json: https
                 x-go-tag-validate: omitempty,url|hostname_port
+                x-pattern-rules: empty | url | hostname_port
             no_proxy:
                 items:
                     type: string
@@ -1078,6 +1086,7 @@ definitions:
                 x-go-name: AllowedCN
                 x-go-tag-json: allowed_cn
                 x-go-tag-validate: omitempty,fqdn
+                x-pattern-rules: empty | fqdn
             cert_file:
                 description: Server Cert file path
                 type: string

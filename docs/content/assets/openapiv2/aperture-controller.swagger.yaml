@@ -267,6 +267,7 @@ definitions:
         - crit
         x-go-tag-default: info
         x-go-tag-validate: oneof=info warn crit
+        x-oneof: info | warn | crit
   And:
     description: |-
       Logical AND.
@@ -339,6 +340,7 @@ definitions:
         - lshift
         - rshift
         x-go-tag-validate: oneof=add sub mul div xor lshift rshift
+        x-oneof: add | sub | mul | div | xor | lshift | rshift
       out_ports:
         description: Output ports for the Arithmetic Combinator component.
         $ref: '#/definitions/ArithmeticCombinatorOuts'
@@ -645,9 +647,18 @@ definitions:
     type: object
     properties:
       special_value:
+        description: |+
+          A special value such as NaN, +Inf, -Inf.
+
         type: string
-        title: '@gotags: validate:"oneof=NaN +Inf -Inf"'
+        enum:
+        - NaN
+        - +Inf
+        - -Inf
+        x-go-tag-validate: oneof=NaN +Inf -Inf
+        x-oneof: NaN | +Inf | -Inf
       value:
+        description: A constant value.
         type: number
         format: double
   Decider:
@@ -687,6 +698,7 @@ definitions:
         - eq
         - neq
         x-go-tag-validate: oneof=gt lt gte lte eq neq
+        x-oneof: gt | lt | gte | lte | eq | neq
       out_ports:
         description: Output ports for the Decider component.
         $ref: '#/definitions/DeciderOuts'
@@ -1090,10 +1102,12 @@ definitions:
       to
     properties:
       flow_matcher:
-        title: '@gotags: validate:"required"'
+        title: Match control points and labels
+        x-go-tag-validate: required
         $ref: '#/definitions/FlowMatcher'
       service_selector:
-        title: '@gotags: validate:"required"'
+        title: Match agent group and service
+        x-go-tag-validate: required
         $ref: '#/definitions/ServiceSelector'
   FluxMeter:
     description: |-
@@ -1227,11 +1241,26 @@ definitions:
     type: object
     properties:
       buckets:
+        description: |+
+          The buckets in which latency histogram will be stored.
+
         type: array
-        title: '@gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"'
+        default:
+        - 5
+        - 10
+        - 25
+        - 50
+        - 100
+        - 250
+        - 500
+        - 1000
+        - 2500
+        - 5000
+        - 10000
         items:
           type: number
           format: double
+        x-go-tag-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
   GetPoliciesResponse:
     type: object
     properties:
@@ -1422,20 +1451,24 @@ definitions:
         default: 5s
         x-go-tag-default: 5s
       in_ports:
+        description: Input ports for the Holder component.
         $ref: '#/definitions/HolderIns'
       out_ports:
+        description: Output ports for the Holder component.
         $ref: '#/definitions/HolderOuts'
   HolderIns:
     description: Inputs for the Holder component.
     type: object
     properties:
       input:
+        description: The input signal.
         $ref: '#/definitions/InPort'
   HolderOuts:
     description: Outputs for the Holder component.
     type: object
     properties:
       output:
+        description: The output signal.
         $ref: '#/definitions/OutPort'
   HostInfo:
     type: object
@@ -1602,6 +1635,7 @@ definitions:
         - Exists
         - DoesNotExists
         x-go-tag-validate: oneof=In NotIn Exists DoesNotExists
+        x-oneof: In | NotIn | Exists | DoesNotExists
       values:
         description: |-
           An array of string values that relates to the key by an operator.
@@ -1852,11 +1886,15 @@ definitions:
     type: object
     properties:
       components:
+        description: |+
+          List of components in the nested circuit.
+
         type: array
-        title: '@gotags: validate:"dive"'
         items:
           $ref: '#/definitions/Component'
+        x-go-tag-validate: dive
       in_ports_map:
+        description: Maps input port names to input ports.
         type: object
         additionalProperties:
           $ref: '#/definitions/InPort'
@@ -1865,6 +1903,7 @@ definitions:
           by graph visualization tools.
         type: string
       out_ports_map:
+        description: Maps output port names to output ports.
         type: object
         additionalProperties:
           $ref: '#/definitions/OutPort'
@@ -1881,6 +1920,7 @@ definitions:
         description: Input ports for the NestedSignalEgress component.
         $ref: '#/definitions/NestedSignalEgressIns'
       port_name:
+        description: Name of the port.
         type: string
   NestedSignalEgressIns:
     description: Inputs for the NestedSignalEgress component.
@@ -1898,6 +1938,7 @@ definitions:
         description: Output ports for the NestedSignalIngress component.
         $ref: '#/definitions/NestedSignalIngressOuts'
       port_name:
+        description: Name of the port.
         type: string
   NestedSignalIngressOuts:
     description: Outputs for the NestedSignalIngress component.
@@ -1986,6 +2027,7 @@ definitions:
           type: string
         x-go-tag-validate: gt=0,dive,keys,required,endkeys,required
   PodScaler:
+    description: Component for scaling pods based on a signal.
     type: object
     properties:
       kubernetes_object_selector:
@@ -1995,10 +2037,13 @@ definitions:
         x-go-tag-validate: required
         $ref: '#/definitions/KubernetesObjectSelector'
       scale_actuator:
+        description: Actuates scaling of pods based on a signal.
         $ref: '#/definitions/PodScalerScaleActuator'
       scale_reporter:
+        description: Reports actual and configured number of replicas.
         $ref: '#/definitions/PodScalerScaleReporter'
   PodScalerScaleActuator:
+    description: Actuates scaling of pods based on a signal.
     type: object
     properties:
       default_config:
@@ -2008,6 +2053,7 @@ definitions:
         type: string
         title: Configuration key for DynamicConfig
       in_ports:
+        description: Input ports for the PodScaler component.
         $ref: '#/definitions/PodScalerScaleActuatorIns'
   PodScalerScaleActuatorDynamicConfig:
     type: object
@@ -2028,17 +2074,21 @@ definitions:
       desired_replicas:
         $ref: '#/definitions/InPort'
   PodScalerScaleReporter:
+    description: Reports actual and configured number of replicas.
     type: object
     properties:
       out_ports:
+        description: Output ports for the PodScaler component.
         $ref: '#/definitions/PodScalerScaleReporterOuts'
   PodScalerScaleReporterOuts:
     description: Outputs for the PodScaler component.
     type: object
     properties:
       actual_replicas:
+        description: The number of replicas that are currently running.
         $ref: '#/definitions/OutPort'
       configured_replicas:
+        description: The number of replicas that are desired.
         $ref: '#/definitions/OutPort'
   Policies:
     type: object
@@ -2119,6 +2169,7 @@ definitions:
         default: 5s
         x-go-tag-default: 5s
       out_ports:
+        description: Output ports for the PulseGenerator component.
         $ref: '#/definitions/PulseGeneratorOuts'
       true_for:
         description: |+
@@ -2167,7 +2218,8 @@ definitions:
         x-go-tag-validate: required
         $ref: '#/definitions/FlowSelector'
       in_ports:
-        title: '@gotags: validate:"required"'
+        title: Input ports for the RateLimiter component
+        x-go-tag-validate: required
         $ref: '#/definitions/RateLimiterIns'
       parameters:
         title: Parameters for the RateLimiter component
@@ -2656,12 +2708,13 @@ definitions:
         description: Output ports for the Sqrt component.
         $ref: '#/definitions/SqrtOuts'
       scale:
-        description: |-
+        description: |+
           Scaling factor to be multiplied with the square root of the input signal.
 
-          @gotags default:"1.0"
         type: number
         format: double
+        default: 1
+        x-go-tag-default: "1.0"
   SqrtIns:
     description: Inputs for the Sqrt component.
     type: object

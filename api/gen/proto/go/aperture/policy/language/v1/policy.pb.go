@@ -1623,6 +1623,7 @@ type RateLimiter struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Input ports for the RateLimiter component
 	InPorts *RateLimiter_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Which control point to apply this ratelimiter to.
 	FlowSelector *FlowSelector `protobuf:"bytes,2,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required"` // @gotags: validate:"required"
@@ -2082,10 +2083,12 @@ type isConstantSignal_Const interface {
 }
 
 type ConstantSignal_SpecialValue struct {
+	// A special value such as NaN, +Inf, -Inf.
 	SpecialValue string `protobuf:"bytes,1,opt,name=special_value,json=specialValue,proto3,oneof" validate:"oneof=NaN +Inf -Inf"` // @gotags: validate:"oneof=NaN +Inf -Inf"
 }
 
 type ConstantSignal_Value struct {
+	// A constant value.
 	Value float64 `protobuf:"fixed64,2,opt,name=value,proto3,oneof"`
 }
 
@@ -2175,7 +2178,7 @@ type Sqrt struct {
 	// Output ports for the Sqrt component.
 	OutPorts *Sqrt_Outs `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// Scaling factor to be multiplied with the square root of the input signal.
-	Scale float64 `protobuf:"fixed64,3,opt,name=scale,proto3" json:"scale,omitempty"` // @gotags default:"1.0"
+	Scale float64 `protobuf:"fixed64,3,opt,name=scale,proto3" json:"scale,omitempty" default:"1.0"` // @gotags: default:"1.0"
 }
 
 func (x *Sqrt) Reset() {
@@ -2852,6 +2855,7 @@ func (x *Differentiator) GetWindow() *durationpb.Duration {
 	return nil
 }
 
+// Component for scaling pods based on a signal.
 type PodScaler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2859,8 +2863,10 @@ type PodScaler struct {
 
 	// The Kubernetes object on which horizontal scaling is applied.
 	KubernetesObjectSelector *KubernetesObjectSelector `protobuf:"bytes,1,opt,name=kubernetes_object_selector,json=kubernetesObjectSelector,proto3" json:"kubernetes_object_selector,omitempty" validate:"required"` // @gotags: validate:"required"
-	ScaleReporter            *PodScaler_ScaleReporter  `protobuf:"bytes,2,opt,name=scale_reporter,json=scaleReporter,proto3" json:"scale_reporter,omitempty"`
-	ScaleActuator            *PodScaler_ScaleActuator  `protobuf:"bytes,3,opt,name=scale_actuator,json=scaleActuator,proto3" json:"scale_actuator,omitempty"`
+	// Reports actual and configured number of replicas.
+	ScaleReporter *PodScaler_ScaleReporter `protobuf:"bytes,2,opt,name=scale_reporter,json=scaleReporter,proto3" json:"scale_reporter,omitempty"`
+	// Actuates scaling of pods based on a signal.
+	ScaleActuator *PodScaler_ScaleActuator `protobuf:"bytes,3,opt,name=scale_actuator,json=scaleActuator,proto3" json:"scale_actuator,omitempty"`
 }
 
 func (x *PodScaler) Reset() {
@@ -2922,6 +2928,7 @@ type PulseGenerator struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Output ports for the PulseGenerator component.
 	OutPorts *PulseGenerator_Outs `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// Emitting 1 for the true_for duration.
 	TrueFor *durationpb.Duration `protobuf:"bytes,2,opt,name=true_for,json=trueFor,proto3" json:"true_for,omitempty" default:"5s"` // @gotags: default:"5s"
@@ -2989,7 +2996,9 @@ type Holder struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	InPorts  *Holder_Ins  `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
+	// Input ports for the Holder component.
+	InPorts *Holder_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
+	// Output ports for the Holder component.
 	OutPorts *Holder_Outs `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// Holding the last valid signal value for the hold_for duration.
 	HoldFor *durationpb.Duration `protobuf:"bytes,3,opt,name=hold_for,json=holdFor,proto3" json:"hold_for,omitempty" default:"5s"` // @gotags: default:"5s"
@@ -3054,9 +3063,12 @@ type NestedCircuit struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	InPortsMap  map[string]*InPort  `protobuf:"bytes,1,rep,name=in_ports_map,json=inPortsMap,proto3" json:"in_ports_map,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// Maps input port names to input ports.
+	InPortsMap map[string]*InPort `protobuf:"bytes,1,rep,name=in_ports_map,json=inPortsMap,proto3" json:"in_ports_map,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// Maps output port names to output ports.
 	OutPortsMap map[string]*OutPort `protobuf:"bytes,2,rep,name=out_ports_map,json=outPortsMap,proto3" json:"out_ports_map,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Components  []*Component        `protobuf:"bytes,3,rep,name=components,proto3" json:"components,omitempty" validate:"dive"` // @gotags: validate:"dive"
+	// List of components in the nested circuit.
+	Components []*Component `protobuf:"bytes,3,rep,name=components,proto3" json:"components,omitempty" validate:"dive"` // @gotags: validate:"dive"
 	// Name of the nested circuit component. This name is displayed by graph visualization tools.
 	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	// Short description of the nested circuit component. This description is displayed by graph visualization tools.
@@ -3138,7 +3150,8 @@ type NestedSignalIngress struct {
 
 	// Output ports for the NestedSignalIngress component.
 	OutPorts *NestedSignalIngress_Outs `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
-	PortName string                    `protobuf:"bytes,2,opt,name=port_name,json=portName,proto3" json:"port_name,omitempty"`
+	// Name of the port.
+	PortName string `protobuf:"bytes,2,opt,name=port_name,json=portName,proto3" json:"port_name,omitempty"`
 }
 
 func (x *NestedSignalIngress) Reset() {
@@ -3194,8 +3207,9 @@ type NestedSignalEgress struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Input ports for the NestedSignalEgress component.
-	InPorts  *NestedSignalEgress_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
-	PortName string                  `protobuf:"bytes,2,opt,name=port_name,json=portName,proto3" json:"port_name,omitempty"`
+	InPorts *NestedSignalEgress_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
+	// Name of the port.
+	PortName string `protobuf:"bytes,2,opt,name=port_name,json=portName,proto3" json:"port_name,omitempty"`
 }
 
 func (x *NestedSignalEgress) Reset() {
@@ -6303,11 +6317,13 @@ func (x *Differentiator_Outs) GetOutput() *OutPort {
 	return nil
 }
 
+// Reports actual and configured number of replicas.
 type PodScaler_ScaleReporter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Output ports for the PodScaler component.
 	OutPorts *PodScaler_ScaleReporter_Outs `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 }
 
@@ -6350,11 +6366,13 @@ func (x *PodScaler_ScaleReporter) GetOutPorts() *PodScaler_ScaleReporter_Outs {
 	return nil
 }
 
+// Actuates scaling of pods based on a signal.
 type PodScaler_ScaleActuator struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Input ports for the PodScaler component.
 	InPorts *PodScaler_ScaleActuator_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
 	// Configuration key for DynamicConfig
 	DynamicConfigKey string `protobuf:"bytes,2,opt,name=dynamic_config_key,json=dynamicConfigKey,proto3" json:"dynamic_config_key,omitempty"`
@@ -6421,7 +6439,9 @@ type PodScaler_ScaleReporter_Outs struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ActualReplicas     *OutPort `protobuf:"bytes,1,opt,name=actual_replicas,json=actualReplicas,proto3" json:"actual_replicas,omitempty"`
+	// The number of replicas that are currently running.
+	ActualReplicas *OutPort `protobuf:"bytes,1,opt,name=actual_replicas,json=actualReplicas,proto3" json:"actual_replicas,omitempty"`
+	// The number of replicas that are desired.
 	ConfiguredReplicas *OutPort `protobuf:"bytes,2,opt,name=configured_replicas,json=configuredReplicas,proto3" json:"configured_replicas,omitempty"`
 }
 
@@ -6623,6 +6643,7 @@ type Holder_Ins struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The input signal.
 	Input *InPort `protobuf:"bytes,1,opt,name=input,proto3" json:"input,omitempty"`
 }
 
@@ -6671,6 +6692,7 @@ type Holder_Outs struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The output signal.
 	Output *OutPort `protobuf:"bytes,1,opt,name=output,proto3" json:"output,omitempty"`
 }
 
