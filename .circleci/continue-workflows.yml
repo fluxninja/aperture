@@ -526,49 +526,39 @@ jobs:
           command: >
             go run cmd/sdk-validator/main.go
             -sdk-docker-image=<<parameters.registry>>/aperture-java-feature-flow:<<parameters.tag>>
-            -port=<<parameters.port>>
-            -requests=<<parameters.requests>>
-            -rejects=<<parameters.rejects>>
-            -sdk-port=<<parameters.sdk-port>>
+            -port=<<parameters.port>> -requests=<<parameters.requests>>
+            -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk-port>>
       - run:
           name: Run SDK Validator against armeria example
           command: >
             go run cmd/sdk-validator/main.go
             -sdk-docker-image=<<parameters.registry>>/aperture-java-armeria:<<parameters.tag>>
-            -port=<<parameters.port>>
-            -requests=<<parameters.requests>>
-            -rejects=<<parameters.rejects>>
-            -sdk-port=<<parameters.sdk-port>>
+            -port=<<parameters.port>> -requests=<<parameters.requests>>
+            -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk-port>>
       - run:
           name: Run SDK Validator against netty example
           command: >
             go run cmd/sdk-validator/main.go
             -sdk-docker-image=<<parameters.registry>>/aperture-java-netty:<<parameters.tag>>
-            -port=<<parameters.port>>
-            -requests=<<parameters.requests>>
-            -rejects=<<parameters.rejects>>
-            -sdk-port=<<parameters.sdk-port>>
+            -port=<<parameters.port>> -requests=<<parameters.requests>>
+            -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk-port>>
       - run:
           name: Run SDK Validator against javaagent armeria example
           command: >
             go run cmd/sdk-validator/main.go
             -sdk-docker-image=<<parameters.registry>>/aperture-javaagent-armeria:<<parameters.tag>>
-            -port=<<parameters.port>>
-            -requests=<<parameters.requests>>
-            -rejects=<<parameters.rejects>>
-            -sdk-port=<<parameters.sdk-port>>
+            -port=<<parameters.port>> -requests=<<parameters.requests>>
+            -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk-port>>
       - run:
           name: Run SDK Validator against javaagent netty example
           command: >
             go run cmd/sdk-validator/main.go
             -sdk-docker-image=<<parameters.registry>>/aperture-javaagent-netty:<<parameters.tag>>
-            -port=<<parameters.port>>
-            -requests=<<parameters.requests>>
-            -rejects=<<parameters.rejects>>
-            -sdk-port=<<parameters.sdk-port>>
+            -port=<<parameters.port>> -requests=<<parameters.requests>>
+            -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk-port>>
       - when:
           condition:
-            equal: [ main, << pipeline.git.branch >> ]
+            equal: [main, << pipeline.git.branch >>]
           steps:
             - run:
                 name: Publish SDK to <<parameters.remote-repo>>
@@ -1262,10 +1252,10 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v1-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
               checksum "tools/go/go.mod" }}
-            - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v1-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
           name: Install ASDF tools
@@ -1283,7 +1273,7 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
+            aperture-asdf-cache-v1-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "tools/go/go.mod" }}
           paths:
