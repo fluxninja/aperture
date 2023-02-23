@@ -19,10 +19,22 @@ import "aperture/policy/language/v1/selector.proto";
 //      service: service1-demo-app.demoapp.svc.cluster.local
 //   flow_matcher:
 //      control_point: ingress
-//      rules:
-//        user_type:
-//          extractor:
-//            from: request.http.headers.user-type
+//      label_matcher:
+//         match_labels:
+//           user_tier: gold
+//         match_expressions:
+//           - key: user_type
+//             operator: In
+//             values:
+//               - insert
+//               - delete
+//           - label: user_agent
+//             regex: ".*Chrome.*"
+//
+// rules:
+//   extractor:
+//     from: request.http.headers.user-agent
+//   telemetry: false
 // ```
 
 message Classifier {
