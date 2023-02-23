@@ -660,6 +660,7 @@ message RateLimiter {
     InPort limit = 1; // @gotags: validate:"required"
   }
 
+  // Input ports for the RateLimiter component
   Ins in_ports = 1; // @gotags: validate:"required"
 
   // Which control point to apply this ratelimiter to.
@@ -906,7 +907,9 @@ message PromQL {
 // Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
 message ConstantSignal {
   oneof const {
+    // A special value such as NaN, +Inf, -Inf.
     string special_value = 1; // @gotags: validate:"oneof=NaN +Inf -Inf"
+    // A constant value.
     double value = 2;
   }
 }
@@ -957,7 +960,7 @@ message Sqrt {
   Outs out_ports = 2;
 
   // Scaling factor to be multiplied with the square root of the input signal.
-  double scale = 3; // @gotags default:"1.0"
+  double scale = 3; // @gotags: default:"1.0"
 }
 
 // Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
@@ -1226,17 +1229,23 @@ message Differentiator {
   google.protobuf.Duration window = 3; // @gotags: default:"5s"
 }
 
+// Component for scaling pods based on a signal.
 message PodScaler {
+  // Reports actual and configured number of replicas.
   message ScaleReporter {
     // Outputs for the PodScaler component.
     message Outs {
+      // The number of replicas that are currently running.
       OutPort actual_replicas = 1;
+      // The number of replicas that are desired.
       OutPort configured_replicas = 2;
     }
 
+    // Output ports for the PodScaler component.
     Outs out_ports = 1;
   }
 
+  // Actuates scaling of pods based on a signal.
   message ScaleActuator {
     // Dynamic Configuration for ScaleActuator
     message DynamicConfig {
@@ -1250,6 +1259,7 @@ message PodScaler {
       InPort desired_replicas = 1;
     }
 
+    // Input ports for the PodScaler component.
     Ins in_ports = 1;
 
     // Configuration key for DynamicConfig
@@ -1262,8 +1272,10 @@ message PodScaler {
   // The Kubernetes object on which horizontal scaling is applied.
   KubernetesObjectSelector kubernetes_object_selector = 1; // @gotags: validate:"required"
 
+  // Reports actual and configured number of replicas.
   ScaleReporter scale_reporter = 2;
 
+  // Actuates scaling of pods based on a signal.
   ScaleActuator scale_actuator = 3;
 }
 
@@ -1274,6 +1286,7 @@ message PulseGenerator {
     OutPort output = 1;
   }
 
+  // Output ports for the PulseGenerator component.
   Outs out_ports = 1;
 
   // Emitting 1 for the true_for duration.
@@ -1288,15 +1301,19 @@ message PulseGenerator {
 message Holder {
   // Inputs for the Holder component.
   message Ins {
+    // The input signal.
     InPort input = 1;
   }
 
   // Outputs for the Holder component.
   message Outs {
+    // The output signal.
     OutPort output = 1;
   }
 
+  // Input ports for the Holder component.
   Ins in_ports = 1;
+  // Output ports for the Holder component.
   Outs out_ports = 2;
 
   // Holding the last valid signal value for the hold_for duration.
@@ -1305,9 +1322,12 @@ message Holder {
 
 // Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
 message NestedCircuit {
+  // Maps input port names to input ports.
   map<string, InPort> in_ports_map = 1;
+  // Maps output port names to output ports.
   map<string, OutPort> out_ports_map = 2;
 
+  // List of components in the nested circuit.
   repeated Component components = 3; // @gotags: validate:"dive"
   // Name of the nested circuit component. This name is displayed by graph visualization tools.
   string name = 4;
@@ -1325,6 +1345,7 @@ message NestedSignalIngress {
 
   // Output ports for the NestedSignalIngress component.
   Outs out_ports = 1;
+  // Name of the port.
   string port_name = 2;
 }
 
@@ -1338,6 +1359,7 @@ message NestedSignalEgress {
 
   // Input ports for the NestedSignalEgress component.
   Ins in_ports = 1;
+  // Name of the port.
   string port_name = 2;
 }
 

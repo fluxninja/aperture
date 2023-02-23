@@ -624,7 +624,7 @@ FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
 <dt>fluxninja_endpoint</dt>
 <dd>
 
-(string, pattern: `(((^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$))|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)`) Address to grpc or http(s) server listening in agent service. To use http protocol, the address must start with http(s)://.
+(string, format: `empty | hostname_port | url | fqdn`) Address to grpc or http(s) server listening in agent service. To use http protocol, the address must start with http(s)://.
 
 </dd>
 <dt>heartbeat_interval</dt>
@@ -690,7 +690,7 @@ GRPCGatewayConfig holds configuration for grpc-http gateway
 <dt>grpc_server_address</dt>
 <dd>
 
-(string, pattern: `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$`, default: `"0.0.0.0:1"`) GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
+(string, format: `hostname_port`, default: `"0.0.0.0:1"`) GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
 
 </dd>
 </dl>
@@ -1002,7 +1002,7 @@ ListenerConfig holds configuration for socket listeners.
 <dt>addr</dt>
 <dd>
 
-(string, pattern: `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$`, default: `":8080"`) Address to bind to in the form of [host%zone]:port
+(string, format: `hostname_port`, default: `":8080"`) Address to bind to in the form of [host%zone]:port
 
 </dd>
 <dt>keep_alive</dt>
@@ -1014,7 +1014,7 @@ ListenerConfig holds configuration for socket listeners.
 <dt>network</dt>
 <dd>
 
-(string, default: `"tcp"`) TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
+(string, oneof: `tcp | tcp4 | tcp6`, default: `"tcp"`) TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
 
 </dd>
 </dl>
@@ -1029,7 +1029,7 @@ LogConfig holds configuration for a logger and log writers.
 <dt>level</dt>
 <dd>
 
-(string, default: `"info"`) Log level
+(string, oneof: `debug | DEBUG | info | INFO | warn | WARN | error | ERROR | fatal | FATAL | panic | PANIC | trace | TRACE | disabled | DISABLED`, default: `"info"`) Log level
 
 </dd>
 <dt>non_blocking</dt>
@@ -1221,7 +1221,7 @@ PrometheusConfig holds configuration for Prometheus Server.
 <dt>address</dt>
 <dd>
 
-(string, pattern: `((^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)`, **required**) Address of the prometheus server
+(string, format: `hostname_port | url | fqdn`, **required**) Address of the prometheus server
 
 </dd>
 </dl>
@@ -1238,13 +1238,13 @@ This configuration has preference over environment variables HTTP_PROXY, HTTPS_P
 <dt>http</dt>
 <dd>
 
-(string, pattern: `((^$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)`)
+(string, format: `empty | url | hostname_port`)
 
 </dd>
 <dt>https</dt>
 <dd>
 
-(string, pattern: `((^$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)`)
+(string, format: `empty | url | hostname_port`)
 
 </dd>
 <dt>no_proxy</dt>
@@ -1318,7 +1318,7 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 <dt>allowed_cn</dt>
 <dd>
 
-(string, pattern: `(^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)`) Allowed CN
+(string, format: `empty | fqdn`) Allowed CN
 
 </dd>
 <dt>cert_file</dt>
