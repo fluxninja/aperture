@@ -143,7 +143,7 @@ var _ = Describe("ConfigMap for Controller", func() {
 			result, err := configMapForControllerConfig(instance.DeepCopy(), scheme.Scheme)
 			Expect(err).NotTo(HaveOccurred())
 
-			CompareComfigMap(result, expected, "aperture-controller.yaml")
+			CompareComfigMap(result, expected)
 		})
 	})
 })

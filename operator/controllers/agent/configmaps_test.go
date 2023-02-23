@@ -151,7 +151,7 @@ var _ = Describe("ConfigMap for Agent", func() {
 			result, err := configMapForAgentConfig(instance.DeepCopy(), scheme.Scheme)
 			Expect(err).NotTo(HaveOccurred())
 
-			CompareComfigMap(result, expected, "aperture-agent.yaml")
+			CompareComfigMap(result, expected)
 		})
 	})
 })
