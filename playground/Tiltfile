@@ -1132,6 +1132,7 @@ print("Will deploy resources:", ", ".join(resources))
 
 # Watch charts and crd definitions
 watch_file("Tiltfile")
+watch_file("./scenarios/")
 watch_file("./tanka/apps/")
 watch_file("./tanka/lib/")
 watch_file("./tanka/charts/")
