@@ -436,6 +436,11 @@ definitions:
           Valid operators are In, NotIn, Exists and DoesNotExist.
 
         type: string
+        enum:
+        - In
+        - NotIn
+        - Exists
+        - DoesNotExists
         x-go-tag-validate: oneof=In NotIn Exists DoesNotExists
       values:
         description: |-

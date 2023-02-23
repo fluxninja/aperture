@@ -28,9 +28,6 @@ definitions:
       exponential moving average and applies concurrency limits based on deviation
       of signal from the baseline. Internally implemented as a nested circuit.
     type: object
-    required:
-    - flow_selector
-    - scheduler_parameters
     properties:
       alerter_parameters:
         description: Configuration for embedded alerter.
@@ -162,8 +159,6 @@ definitions:
   Alerter:
     description: Alerter reacts to a signal and generates alert to send to alert manager.
     type: object
-    required:
-    - parameters
     properties:
       in_ports:
         description: Input ports for the Alerter component.
@@ -223,6 +218,10 @@ definitions:
 
         type: string
         default: info
+        enum:
+        - info
+        - warn
+        - crit
         x-go-tag-default: info
         x-go-tag-validate: oneof=info warn crit
         x-order: 4
@@ -294,6 +293,14 @@ definitions:
           In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
 
         type: string
+        enum:
+        - add
+        - sub
+        - mul
+        - div
+        - xor
+        - lshift
+        - rshift
         x-go-tag-validate: oneof=add sub mul div xor lshift rshift
         x-order: 1
       out_ports:
@@ -405,7 +412,6 @@ definitions:
     type: object
     title: Set of classification rules sharing a common selector
     required:
-    - flow_selector
     - rules
     properties:
       flow_selector:
@@ -422,6 +428,7 @@ definitions:
           how to extract and propagate flow labels with that key.
 
         type: object
+        minProperties: 1
         additionalProperties:
           $ref: '#/definitions/Rule'
         x-go-tag-validate: required,gt=0,dive,keys,required,endkeys,required
@@ -608,9 +615,6 @@ definitions:
     type: object
     title: Concurrency Limiter is an actuator component that regulates flows in order
       to provide active service protection
-    required:
-    - flow_selector
-    - scheduler
     properties:
       flow_selector:
         description: |+
@@ -680,6 +684,13 @@ definitions:
           Comparison operator that computes operation on lhs and rhs input signals.
 
         type: string
+        enum:
+        - gt
+        - lt
+        - gte
+        - lte
+        - eq
+        - neq
         x-go-tag-validate: oneof=gt lt gte lte eq neq
         x-order: 2
       out_ports:
@@ -776,8 +787,6 @@ definitions:
     type: object
     title: Exponential Moving Average (EMA) is a type of moving average that applies
       exponentially more weight to recent signal readings
-    required:
-    - parameters
     properties:
       in_ports:
         description: Input ports for the EMA component.
@@ -847,6 +856,7 @@ definitions:
         type: number
         format: double
         default: 1
+        minimum: 0
         x-go-tag-default: "1.0"
         x-go-tag-validate: gte=0,lte=1.0
         x-order: 0
@@ -949,8 +959,6 @@ definitions:
     type: object
     title: Extrapolates the input signal by repeating the last valid value during
       the period in which it is invalid
-    required:
-    - parameters
     properties:
       in_ports:
         description: Input ports for the Extrapolator component.
@@ -1205,6 +1213,8 @@ definitions:
 
         type: integer
         format: int32
+        minimum: 0
+        exclusiveMinimum: true
         x-go-tag-validate: gt=0
         x-order: 0
       factor:
@@ -1235,6 +1245,8 @@ definitions:
 
         type: integer
         format: int32
+        minimum: 0
+        exclusiveMinimum: true
         x-go-tag-validate: gt=0
         x-order: 0
       max:
@@ -1262,6 +1274,8 @@ definitions:
 
         type: integer
         format: int32
+        minimum: 0
+        exclusiveMinimum: true
         x-go-tag-validate: gt=0
         x-order: 0
       start:
@@ -1312,8 +1326,6 @@ definitions:
       Gradient controller is a type of controller which tries to adjust the
       control variable proportionally to the relative difference between setpoint
       and actual value of the signal
-    required:
-    - parameters
     properties:
       default_config:
         description: Default configuration.
@@ -1665,6 +1677,11 @@ definitions:
           Valid operators are In, NotIn, Exists and DoesNotExist.
 
         type: string
+        enum:
+        - In
+        - NotIn
+        - Exists
+        - DoesNotExists
         x-go-tag-validate: oneof=In NotIn Exists DoesNotExists
         x-order: 1
       values:
@@ -2093,14 +2110,13 @@ definitions:
           ```
 
         type: object
+        minProperties: 1
         additionalProperties:
           type: string
         x-go-tag-validate: gt=0,dive,keys,required,endkeys,required
         x-order: 0
   PodScaler:
     type: object
-    required:
-    - kubernetes_object_selector
     properties:
       kubernetes_object_selector:
         description: |+
@@ -2274,9 +2290,6 @@ definitions:
       to select which label should be used as key.
     type: object
     title: Limits the traffic on a control point to specified rate
-    required:
-    - flow_selector
-    - parameters
     properties:
       default_config:
         title: Default configuration
@@ -2318,8 +2331,6 @@ definitions:
   RateLimiterIns:
     type: object
     title: Inputs for the RateLimiter component
-    required:
-    - limit
     properties:
       limit:
         description: |+
@@ -2402,6 +2413,8 @@ definitions:
         type: integer
         format: int64
         default: 5
+        minimum: 0
+        exclusiveMinimum: true
         x-go-tag-default: "5"
         x-go-tag-validate: gt=0
         x-order: 1
@@ -2549,8 +2562,6 @@ definitions:
       See [ConcurrencyLimiter](#concurrency-limiter) for more context.
     type: object
     title: Weighted Fair Queuing-based workload scheduler
-    required:
-    - parameters
     properties:
       out_ports:
         description: Output ports for the Scheduler component.
@@ -2691,9 +2702,6 @@ definitions:
     description: Workload defines a class of requests that preferably have similar
       properties such as response latency or desired priority.
     type: object
-    required:
-    - label_matcher
-    - parameters
     properties:
       label_matcher:
         description: |+
@@ -2737,6 +2745,8 @@ definitions:
           Higher numbers means higher priority level.
           Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
         default: 0
+        maximum: 255
+        minimum: 0
         x-go-tag-default: "0"
         x-go-tag-validate: gte=0,lte=255
         x-order: 1

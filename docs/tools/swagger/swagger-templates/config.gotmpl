@@ -43,9 +43,6 @@
   {{- if .Required -}}
  Required: `✓`
   {{- end -}}
-  {{- if (index .Extensions "x-go-tag-validate")  -}}
- `{{ index .Extensions "x-go-tag-validate" }}`
-  {{- end -}}
 {{- end -}}
 
 {{/* Like fnConstraints, but appropriate to rendering within body of text */ -}}
@@ -53,7 +50,7 @@
   {{- with .Pattern -}}
     , pattern: `{{ . }}`
   {{- end -}}
-  {{- if .Minimum -}}
+  {{- with .Minimum -}}
     , minimum: `{{ json . }}`
   {{- end -}}
   {{- with .Maximum -}}
@@ -61,11 +58,6 @@
   {{- end -}}
   {{- if .Required -}}
     , **required**
-  {{- end -}}
-  {{- with .Extensions }}
-    {{- with (index . "x-go-tag-validate")  -}}
-      , `{{ . }}`
-    {{- end -}}
   {{- end -}}
 {{- end -}}
 
