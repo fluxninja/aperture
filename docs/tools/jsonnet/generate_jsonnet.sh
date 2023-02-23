@@ -42,58 +42,10 @@ pushd "${blueprints_root}" >/dev/null
 jb install
 popd >/dev/null
 
-function generate_jsonnet() {
-	set -euo pipefail
-	dir=$(dirname "$1")
-	filename=$(basename "$1")
-	# make a unique tmp directory
-	tmpdir=$(mktemp -d)
-
-	filenameNoExt="${filename%.*}"
-	out_dir="$dir"/assets/gen/"$filenameNoExt"/jsonnet
-	rm -rf "$out_dir"/*.jsonnet || true
-
-	#shellcheck disable=SC2002,SC2016
-	cat "$1" | $SED -n '/```jsonnet/,/```/p' | $GREP -vP '^```$' >"$tmpdir"/records.txt
-	# use awk to separate out jsonnet_records using RS='```' into an array of sections
-	#shellcheck disable=SC2016
-	$AWK -v tmpdir="$tmpdir" '{RS="```jsonnet"} NR > 1 { print $0 > tmpdir"/jsonnet_section_" ++i}' "$tmpdir"/records.txt
-
-	# for each jsonnet section in tmp directory
-	jsonnet_section_files=$($FIND "$tmpdir" -type f -name "jsonnet_section_*" | sort -n)
-	count=0
-	for jsonnet_section_file in $jsonnet_section_files; do
-		echo "Processing $1 :: $count"
-		# ignore if the jsonnet file contains "@include:"
-		if $GREP -qP '@include:' "$jsonnet_section_file"; then
-			continue
-		fi
-
-		# mkdir -p "$out_dir" if it doesn't exist
-		if [ ! -d "$out_dir" ]; then
-			mkdir -p "$out_dir"
-		fi
-
-		jsonnetfilepath="$out_dir"/"$filenameNoExt"_"$count".jsonnet
-		mv "$jsonnet_section_file" "$jsonnetfilepath"
-		# tanka fmt "$jsonnetfilepath"
-		tk fmt "$jsonnetfilepath"
-
-		# increment count
-		count=$((count + 1))
-	done
-	rm -rf "$tmpdir"
-}
-
-export -f generate_jsonnet
-
-parallel -j4 --no-notice --bar --eta generate_jsonnet ::: "$($FIND "$docsdir"/content -type f -name "*.md")"
-
 function generate_jsonnet_files() {
 	set -euo pipefail
 	jsonnet_file="$1"
 	echo "Processing $jsonnet_file"
-	dir=$(dirname "$jsonnet_file")
 	# remove extension and add .yaml
 	yamlfilepath="${jsonnet_file%.*}".yaml
 	jsonfilepath="${jsonnet_file%.*}".json
