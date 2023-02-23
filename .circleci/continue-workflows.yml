@@ -369,7 +369,7 @@ jobs:
             - ../.cache/golangci-lint
             - ../.cache/go-build
             - ~/.aperturectl
-            - blueprints/vendor
+            - ./blueprints/vendor
           when: on_success
       - save_cache:
           name: Save pre-commit cache
