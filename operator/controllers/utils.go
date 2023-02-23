@@ -29,6 +29,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -39,12 +40,14 @@ import (
 	"github.com/fluxninja/aperture/operator/api/common"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
 	"github.com/imdario/mergo"
+	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/yaml"
 )
 
 // ContainerSecurityContext prepares SecurityContext for containers based on the provided parameter.
@@ -812,4 +815,62 @@ func GetPort(addr string) (int32, error) {
 		return 0, err
 	}
 	return int32(port), nil
+}
+
+// CompareComfigMap compares two ConfigMaps by recursively sorting the keys in each map and comparing the sorted maps for given key in Data.
+func CompareComfigMap(result, expected *corev1.ConfigMap, dataKey string) {
+	var obj1, obj2 map[string]interface{}
+	err := yaml.Unmarshal([]byte(result.Data[dataKey]), &obj1)
+	Expect(err).NotTo(HaveOccurred())
+	err = yaml.Unmarshal([]byte(expected.Data[dataKey]), &obj2)
+	Expect(err).NotTo(HaveOccurred())
+
+	// Sort keys in each map and compare sorted maps
+	sorted1 := make(map[string]interface{})
+	for k, v := range obj1 {
+		sorted1[k] = sortMap(v)
+	}
+	sorted2 := make(map[string]interface{})
+	for k, v := range obj2 {
+		sorted2[k] = sortMap(v)
+	}
+
+	Expect(sorted1).To(Equal(sorted2))
+
+	// Compare the rest of the fields in the ConfigMap object that are not in the Data field
+	result.Data[dataKey] = ""
+	expected.Data[dataKey] = ""
+	Expect(result).To(Equal(expected))
+}
+
+// sortMap sorts the keys in a map and returns a new map with sorted keys.
+func sortMap(v interface{}) interface{} {
+	switch v := v.(type) {
+	case map[interface{}]interface{}:
+		sorted := make(map[interface{}]interface{})
+		var keys []interface{}
+		for k := range v {
+			keys = append(keys, k)
+		}
+		sort.Slice(keys, func(i, j int) bool {
+			return keys[i].(string) < keys[j].(string)
+		})
+		for _, k := range keys {
+			sorted[k] = sortMap(v[k])
+		}
+		return sorted
+	case map[string]interface{}:
+		sorted := make(map[string]interface{})
+		var keys []string
+		for k := range v {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
+			sorted[k] = sortMap(v[k])
+		}
+		return sorted
+	default:
+		return v
+	}
 }
