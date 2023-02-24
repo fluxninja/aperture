@@ -10,7 +10,7 @@ export FIND
 gitroot="$(git rev-parse --show-toplevel)"
 export gitroot
 
-aperturectl="$("$gitroot"/playground/scripts/build_aperturectl.sh)"
+aperturectl="$("$gitroot"/scripts/build_aperturectl.sh)"
 export aperturectl
 
 pushd "$gitroot" >/dev/null

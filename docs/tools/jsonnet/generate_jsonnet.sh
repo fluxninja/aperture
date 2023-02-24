@@ -28,6 +28,9 @@ export SED
 export AWK
 export FIND
 
+aperturectl="$("$gitroot"/scripts/build_aperturectl.sh)"
+export aperturectl
+
 # accept a --force flag to force the regeneration of all graphs
 # check if $1 is bounded and equal to --force
 if [[ -n "${1:-}" ]] && [[ "$1" == "--force" ]]; then
@@ -36,6 +39,9 @@ else
 	force=false
 fi
 export force
+
+# build json2yaml
+go build -o "$scriptroot"/json2yaml "$scriptroot"/json2yaml.go
 
 # run jb install in the blueprints_root
 pushd "${blueprints_root}" >/dev/null
@@ -66,7 +72,7 @@ function generate_jsonnet_files() {
 			old_yaml_file_contents=$(cat "$yamlfilepath")
 		fi
 		# convert the policy to yaml
-		go run "$scriptroot"/json2yaml.go "$jsonfilepath" "$yamlfilepath"
+		"$scriptroot"/json2yaml "$jsonfilepath" "$yamlfilepath"
 		rm -rf "$jsonfilepath"
 		# run prettier
 		npx prettier --write "$yamlfilepath"
@@ -76,10 +82,10 @@ function generate_jsonnet_files() {
 			# generate mermaid diagram
 			mermaidfilepath="${jsonnet_file%.*}".mmd
 			# compile the policy
-			go run "$gitroot"/cmd/aperturectl/main.go compile --cr "$yamlfilepath" --mermaid "$mermaidfilepath"
+			"$aperturectl" compile --cr "$yamlfilepath" --mermaid "$mermaidfilepath"
 		else
 			# still validate the policy with compiler
-			go run "$gitroot"/cmd/aperturectl/main.go compile --cr "$yamlfilepath"
+			"$aperturectl" compile --cr "$yamlfilepath"
 		fi
 	else
 		npx prettier --write "$jsonfilepath"

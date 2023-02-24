@@ -26,7 +26,7 @@
         },
         "gradient_parameters": {
           "$ref": "#/definitions/GradientControllerParameters",
-          "title": "Gradient parameters for the controller. Defaults to:\n* slope = -1\n* min_gradient = 0.1\n* max_gradient = 1",
+          "description": "Gradient parameters for the controller.",
           "x-order": 4
         },
         "in_ports": {

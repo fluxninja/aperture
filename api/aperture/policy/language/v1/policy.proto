@@ -1399,10 +1399,7 @@ message AIMDConcurrencyController {
   // Scheduler parameters.
   Scheduler.Parameters scheduler_parameters = 4; // @gotags: validate:"required"
 
-  // Gradient parameters for the controller. Defaults to:
-  // * slope = -1
-  // * min_gradient = 0.1
-  // * max_gradient = 1
+  // Gradient parameters for the controller.
   GradientController.Parameters gradient_parameters = 5;
 
   // Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.

@@ -63,7 +63,7 @@ aperturectl apply policy --dir=policies`,
 			for policyIndex := range model.Selected {
 				fileName := policies[policyIndex]
 				if err := ApplyPolicy(fileName); err != nil {
-					log.Error().Msgf("failed to apply policy '%s' on Kubernetes.", fileName)
+					log.Error().Err(err).Msgf("failed to apply policy '%s' on Kubernetes.", fileName)
 				}
 			}
 			return nil

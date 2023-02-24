@@ -68,7 +68,7 @@ For example, to generate `policies/static-rate-limiting` policy, you can first
 generate a `values.yaml` file using the following command:
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints values --name=policies/static-rate-limiting --version={apertureVersion} --only-required --output-file=values.yaml</CodeBlock>
+<CodeBlock language="bash">aperturectl blueprints values --name=policies/static-rate-limiting --version={apertureVersion} --output-file=values.yaml</CodeBlock>
 ```
 
 You can then edit the `values.yaml` to provide the required fields
