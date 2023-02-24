@@ -478,6 +478,35 @@ This interval is typically aligned with how often the corrective action (actuati
 
 ### Classifier {#classifier}
 
+Set of classification rules sharing a common selector
+
+:::info
+
+See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
+
+:::
+Example
+
+```yaml
+flow_selector:
+  service_selector:
+    agent_group: demoapp
+    service: service1-demo-app.demoapp.svc.cluster.local
+  flow_matcher:
+    control_point: ingress
+    label_matcher:
+      match_labels:
+        user_tier: gold
+      match_expressions:
+        - key: user_type
+          operator: In
+rules:
+  user:
+    extractor:
+      from: request.http.headers.user-agent
+  telemetry: false
+```
+
 #### Properties
 
 <dl>
@@ -1317,8 +1346,10 @@ label_matcher:
       values:
         - insert
         - delete
-    - label: user_agent
-      regex: ^(?!.*Chrome).*Safari
+  expression:
+    label_matches:
+      - label: user_agent
+        regex: ^(?!.*Chrome).*Safari
 ```
 
 #### Properties
@@ -1392,6 +1423,41 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 </dl>
 
 ### FluxMeter {#flux-meter}
+
+Flux Meter gathers metrics for the traffic that matches its selector.
+The histogram created by Flux Meter measures the workload latency by default.
+
+:::info
+
+See also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).
+
+:::
+Example:
+
+```yaml
+static_buckets:
+  buckets:
+    [
+      5.0,
+      10.0,
+      25.0,
+      50.0,
+      100.0,
+      250.0,
+      500.0,
+      1000.0,
+      2500.0,
+      5000.0,
+      10000.0,
+    ]
+flow_selector:
+  service_selector:
+    agent_group: demoapp
+    service: service1-demo-app.demoapp.svc.cluster.local
+  flow_matcher:
+    control_point: ingress
+attribute_key: response_duration_ms
+```
 
 #### Properties
 

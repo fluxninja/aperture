@@ -195,8 +195,10 @@ func (x *ServiceSelector) GetService() string {
 //       values:
 //         - insert
 //         - delete
-//     - label: user_agent
-//       regex: ^(?!.*Chrome).*Safari
+//   expression:
+//     label_matches:
+//         - label: user_agent
+//           regex: ^(?!.*Chrome).*Safari
 // ```
 type FlowMatcher struct {
 	state         protoimpl.MessageState

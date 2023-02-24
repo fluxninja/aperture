@@ -20,21 +20,10 @@ import "aperture/policy/language/v1/selector.proto";
 //   service_selector:
 //      agent_group: demoapp
 //      service: service1-demo-app.demoapp.svc.cluster.local
-// flow_matcher:
-//   control_point: ingress
-//   label_matcher:
-//      match_labels:
-//        user_tier: gold
-//      match_expressions:
-//        - key: query
-//          operator: In
-//          values:
-//            - insert
-//            - delete
-//        - label: user_agent
-//          regex: ^(?!.*Chrome).*Safari
+//   flow_matcher:
+//      control_point: ingress
 // attribute_key: response_duration_ms
-
+// ```
 message FluxMeter {
   // StaticBuckets holds the static value of the buckets where latency histogram will be stored.
   message StaticBuckets {

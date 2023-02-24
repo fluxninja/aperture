@@ -25,18 +25,12 @@ import "aperture/policy/language/v1/selector.proto";
 //         match_expressions:
 //           - key: user_type
 //             operator: In
-//             values:
-//               - insert
-//               - delete
-//           - label: user_agent
-//             regex: ".*Chrome.*"
-//
 // rules:
-//   extractor:
-//     from: request.http.headers.user-agent
+//   user:
+//    extractor:
+//      from: request.http.headers.user-agent
 //   telemetry: false
 // ```
-
 message Classifier {
   // Defines where to apply the flow classification rule.
   FlowSelector flow_selector = 1; // @gotags: validate:"required"
