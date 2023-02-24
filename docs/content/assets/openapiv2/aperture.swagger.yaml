@@ -1309,6 +1309,26 @@ definitions:
             policies:
                 $ref: '#/definitions/Policies'
         type: object
+    GlobalService:
+        description: GlobalService is a service with explicit agent group.
+        properties:
+            agent_group:
+                type: string
+            name:
+                type: string
+        type: object
+    GlobalServiceControlPoint:
+        description: |-
+            GlobalServiceControlPoint contains info about a control point on a given
+            service with explicit Agent Group.
+        properties:
+            agent_group:
+                type: string
+            name:
+                type: string
+            service_name:
+                type: string
+        type: object
     GradientController:
         description: |-
             The `gradient` describes a corrective factor that should be applied to the
@@ -1813,26 +1833,24 @@ definitions:
                     type: string
                 type: array
         type: object
-    ListControlPointsResponse:
+    ListControlPointsControllerResponse:
         properties:
             control_points:
                 items:
-                    $ref: '#/definitions/ServiceControlPoint'
+                    $ref: '#/definitions/GlobalServiceControlPoint'
                 type: array
             errors_count:
                 format: int64
-                title: only used for controller→ctl
                 type: integer
         type: object
-    ListServicesResponse:
+    ListServicesControllerResponse:
         properties:
             errors_count:
                 format: int64
-                title: only used for controller→ctl
                 type: integer
             services:
                 items:
-                    type: string
+                    $ref: '#/definitions/GlobalService'
                 type: array
         type: object
     LoadActuator:
@@ -2303,6 +2321,11 @@ definitions:
                     $ref: '#/definitions/PolicyWrapper'
                 type: object
         type: object
+    PreviewFlowLabelsControllerResponse:
+        properties:
+            response:
+                $ref: '#/definitions/PreviewFlowLabelsResponse'
+        type: object
     PreviewFlowLabelsResponse:
         properties:
             samples:
@@ -2317,12 +2340,39 @@ definitions:
                     type: string
                 type: object
         type: object
+    PreviewHTTPRequestsControllerResponse:
+        properties:
+            response:
+                $ref: '#/definitions/PreviewHTTPRequestsResponse'
+        type: object
     PreviewHTTPRequestsResponse:
         properties:
             samples:
                 items:
                     type: object
                 type: array
+        type: object
+    PreviewRequest:
+        properties:
+            control_point:
+                description: |-
+                    Control point to preview.
+
+                    @gotags: validate:"required"
+                type: string
+            label_matcher:
+                $ref: '#/definitions/LabelMatcher'
+                description: Flow labels to match. Optional parameter for advanced filtering.
+            samples:
+                description: |-
+                    Number of samples to collect. Defaults to 10.
+
+                    @gotags: validate:"min=1" default:"10"
+                format: int64
+                type: string
+            service:
+                description: Service to preview.
+                type: string
         type: object
     ProcessInfo:
         properties:
@@ -2935,7 +2985,10 @@ definitions:
                 type: string
         type: object
     ServiceControlPoint:
-        description: ServiceControlPoint contains info about a control point on a given service.
+        description: |-
+            ServiceControlPoint contains info about a control point on a given service.
+
+            Agent group is implied.
         properties:
             name:
                 type: string
@@ -3676,13 +3729,13 @@ produces:
     - application/json
 swagger: "2.0"
 tags:
+    - name: FlowPreviewService
     - name: Controller
     - name: ControlPointCache
     - name: DistCacheService
     - name: FlowControlService
     - name: FlowControlControlPointsService
     - name: EntityCacheService
-    - name: FlowPreviewService
     - name: InfoService
     - name: PeerDiscoveryService
     - name: PolicyService

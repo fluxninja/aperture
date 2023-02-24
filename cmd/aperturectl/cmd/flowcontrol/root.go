@@ -12,11 +12,12 @@ func init() {
 	controller.InitFlags(FlowControlCmd.PersistentFlags())
 
 	FlowControlCmd.AddCommand(ListCmd)
+	FlowControlCmd.AddCommand(PreviewCmd)
 }
 
 // FlowControlCmd is the command to observe Flow Control control points.
 var FlowControlCmd = &cobra.Command{
-	Use:               "flow-control {--kube | --controller ADDRESS}",
+	Use:               "flow-control",
 	Short:             "Flow Control integrations",
 	Long:              `Use this command to query information about active Flow Control integrations`,
 	SilenceErrors:     true,

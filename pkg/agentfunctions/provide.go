@@ -21,10 +21,14 @@ var Module = fx.Options(
 		Name:      "agent-functions",
 		ConfigKey: ConfigKey + ".client.grpc",
 	}.Annotate(),
-	fx.Provide(NewControlPointsHandler),
+	fx.Provide(
+		NewControlPointsHandler,
+		ProvidePreviewHandler,
+	),
 	fx.Invoke(
 		RegisterClient,
 		RegisterControlPointsHandler,
+		RegisterPreviewHandler,
 	),
 )
 

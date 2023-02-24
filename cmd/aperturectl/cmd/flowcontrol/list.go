@@ -36,7 +36,10 @@ var ListCmd = &cobra.Command{
 			fmt.Fprintf(os.Stderr, "Could not get answer from %d agents", resp.ErrorsCount)
 		}
 
-		slices.SortFunc(resp.ControlPoints, func(a, b *cmdv1.ServiceControlPoint) bool {
+		slices.SortFunc(resp.ControlPoints, func(a, b *cmdv1.GlobalServiceControlPoint) bool {
+			if a.AgentGroup != b.AgentGroup {
+				return a.AgentGroup < b.AgentGroup
+			}
 			if a.ServiceName != b.ServiceName {
 				return a.ServiceName < b.ServiceName
 			}
@@ -44,9 +47,9 @@ var ListCmd = &cobra.Command{
 		})
 
 		tabwriter := tabwriter.NewWriter(os.Stdout, 5, 0, 3, ' ', 0)
-		fmt.Fprintln(tabwriter, "SERVICE\tNAME")
+		fmt.Fprintln(tabwriter, "AGENT GROUP\tSERVICE\tNAME")
 		for _, cp := range resp.ControlPoints {
-			fmt.Fprintf(tabwriter, "%s\t%s\n", cp.ServiceName, cp.Name)
+			fmt.Fprintf(tabwriter, "%s\t%s\t%s\n", cp.AgentGroup, cp.ServiceName, cp.Name)
 		}
 		tabwriter.Flush()
 
