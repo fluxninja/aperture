@@ -490,7 +490,7 @@ def render_tanka(environment, env_vars, base_dir, namespace,enable_cloud_plugin)
 
 
 def render_aperturectl(scenario_path, policies, namespace):
-    aperturectl_bin = str(local(command=["./scripts/build_aperturectl.sh"], quiet=True))
+    aperturectl_bin = str(local(command=["../scripts/build_aperturectl.sh"], quiet=True))
 
     blueprints_uri = os.path.join(GIT_ROOT, "blueprints")
     base_dir = os.path.join(GIT_ROOT, "playground")

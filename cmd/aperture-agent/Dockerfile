@@ -26,7 +26,7 @@ RUN --mount=type=cache,target=/go/pkg/,readonly \
 
 
 # BUILD PLUGINS STAGE
-FROM base AS plugins-builder
+FROM builder AS plugins-builder
 # Plugins build
 RUN --mount=type=cache,target=/go/pkg/,readonly \
   --mount=type=cache,target=/root/.cache/go-build/,sharing=private \
@@ -34,10 +34,10 @@ RUN --mount=type=cache,target=/go/pkg/,readonly \
   'set -euo pipefail; \
   shopt -s nullglob; \
   for plugin in ./plugins/{service,agent}/aperture-plugin-*; do\
-    echo "building plugin $plugin";\
-    CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" \
-    LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
-    ./pkg/plugins/build.sh;\
+  echo "building plugin $plugin";\
+  CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" \
+  LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
+  ./pkg/plugins/build.sh;\
   done\
   '
 
@@ -45,9 +45,9 @@ RUN --mount=type=cache,target=/go/pkg/,readonly \
 FROM debian:bullseye-slim AS agent-base
 
 RUN apt-get update \
- && apt-get install -y --no-install-recommends ca-certificates \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
+  && apt-get install -y --no-install-recommends ca-certificates \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 # Ensure config dirs exists, even if not mounted
 RUN mkdir -p /etc/aperture/aperture-agent/flowcontrol /etc/aperture/aperture-agent/classifiers /opt/aperture/aperture-agent/plugins
