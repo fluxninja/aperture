@@ -1,17 +1,17 @@
 package envoy_test
 
 import (
-	. "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy"
+	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	ext_authz "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
+	. "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy"
 )
 
 var _ = Describe("Flow labels", func() {
 	It("should contain all the request labels with OTEL-compatible keys", func() {
-		req := &ext_authz.AttributeContext_Request{
-			Http: &ext_authz.AttributeContext_HttpRequest{
+		req := &authv3.AttributeContext_Request{
+			Http: &authv3.AttributeContext_HttpRequest{
 				Id:     "123",
 				Method: "GET",
 				Headers: map[string]string{

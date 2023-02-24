@@ -6,4 +6,4 @@ common:
   # Name of the policy.
   # Type: string
   # Required: True
-  policy_name: "__REQUIRED_FIELD__"
+  policy_name: __REQUIRED_FIELD__

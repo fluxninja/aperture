@@ -31,8 +31,13 @@
 {{- end }}
 
 {{- define "fnConstraints" }}
-  {{- if .Pattern -}}
- Pattern: `{{ .Pattern }}`
+  {{- with .Extensions -}}
+    {{- with (index . "x-pattern-rules") -}}
+ Format: `{{ . }}`
+    {{- end -}}
+    {{- with (index . "x-oneof") -}}
+ OneOf: `{{ . }}`
+    {{- end -}}
   {{- end -}}
   {{- if .Minimum -}}
  Minimum: `{{ json .Minimum }}`
@@ -43,17 +48,19 @@
   {{- if .Required -}}
  Required: `✓`
   {{- end -}}
-  {{- if (index .Extensions "x-go-validate")  -}}
- `{{ index .Extensions "x-go-validate" }}`
-  {{- end -}}
 {{- end -}}
 
 {{/* Like fnConstraints, but appropriate to rendering within body of text */ -}}
 {{- define "fnConstraintsInline" }}
-  {{- with .Pattern -}}
-    , pattern: `{{ . }}`
+  {{- with .Extensions -}}
+    {{- with (index . "x-pattern-rules") -}}
+    , format: `{{ . }}`
+    {{- end -}}
+    {{- with (index . "x-oneof") -}}
+    , oneof: `{{ . }}`
+    {{- end -}}
   {{- end -}}
-  {{- if .Minimum -}}
+  {{- with .Minimum -}}
     , minimum: `{{ json . }}`
   {{- end -}}
   {{- with .Maximum -}}
@@ -62,19 +69,11 @@
   {{- if .Required -}}
     , **required**
   {{- end -}}
-  {{- with .Extensions }}
-    {{- with (index . "x-go-validate")  -}}
-      , `{{ . }}`
-    {{- end -}}
-  {{- end -}}
 {{- end -}}
 
 {{- define "fnDefault" }}
   {{- if .Default -}}
  Default: `{{ json .Default }}`
-  {{- end -}}
-  {{- if (index .Extensions "x-go-default") -}}
- `{{ index .Extensions "x-go-default" }}`
   {{- end -}}
 {{- end -}}
 
@@ -82,11 +81,6 @@
 {{- define "fnDefaultInline" }}
   {{- with .Default -}}
     , default: `{{ json . }}`
-  {{- end -}}
-  {{- with .Extensions }}
-    {{- with (index . "x-go-default") -}}
-      , default: `{{ . }}`
-    {{- end -}}
   {{- end -}}
 {{- end -}}
 

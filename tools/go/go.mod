@@ -1,6 +1,6 @@
 module github.com/fluxninja/aperture/tools/go
 
-go 1.19
+go 1.20
 
 require (
 	github.com/dmarkham/enumer v1.5.7
@@ -108,5 +108,5 @@ require (
 
 replace (
 	github.com/go-openapi/analysis => github.com/fluxninja/analysis v0.21.2-fn.patch.3
-	github.com/go-swagger/go-swagger => github.com/fluxninja/go-swagger v0.29.0-fn.patch.10
+	github.com/go-swagger/go-swagger => github.com/fluxninja/go-swagger v0.29.0-fn.patch.11
 )

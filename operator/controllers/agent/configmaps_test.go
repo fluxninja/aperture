@@ -149,9 +149,9 @@ var _ = Describe("ConfigMap for Agent", func() {
 			}
 
 			result, err := configMapForAgentConfig(instance.DeepCopy(), scheme.Scheme)
-
 			Expect(err).NotTo(HaveOccurred())
-			Expect(result.Data).To(Equal(expected.Data))
+
+			CompareComfigMap(result, expected)
 		})
 	})
 })

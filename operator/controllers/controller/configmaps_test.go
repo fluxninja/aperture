@@ -141,9 +141,9 @@ var _ = Describe("ConfigMap for Controller", func() {
 			}
 
 			result, err := configMapForControllerConfig(instance.DeepCopy(), scheme.Scheme)
-
 			Expect(err).NotTo(HaveOccurred())
-			Expect(result.Data).To(Equal(expected.Data))
+
+			CompareComfigMap(result, expected)
 		})
 	})
 })

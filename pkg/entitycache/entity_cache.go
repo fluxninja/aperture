@@ -139,6 +139,13 @@ func (c *EntityCache) Put(entity *entitycachev1.Entity) {
 		c.entities.EntitiesByIpAddress.Entities[entityIP] = entity
 	}
 
+	entityClusterIP := entity.ClusterIp
+	if entityClusterIP != "" {
+		if entityClusterIP != "None" {
+			c.entities.EntitiesByIpAddress.Entities[entityClusterIP] = entity
+		}
+	}
+
 	entityName := entity.Name
 	if entityName != "" {
 		c.entities.EntitiesByName.Entities[entityName] = entity
@@ -205,6 +212,11 @@ func (c *EntityCache) Remove(entity *entitycachev1.Entity) bool {
 	_, okByIP := c.entities.EntitiesByIpAddress.Entities[entityIP]
 	if okByIP {
 		delete(c.entities.EntitiesByIpAddress.Entities, entityIP)
+	}
+	entityClusterIP := entity.ClusterIp
+	_, ok := c.entities.EntitiesByIpAddress.Entities[entityClusterIP]
+	if ok {
+		delete(c.entities.EntitiesByIpAddress.Entities, entityClusterIP)
 	}
 	entityName := entity.Name
 	_, okByName := c.entities.EntitiesByName.Entities[entityName]

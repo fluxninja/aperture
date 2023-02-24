@@ -33,6 +33,8 @@ var (
 		otelconsts.ApertureControlPointTypeLabel,
 		otelconsts.ApertureFlowStatusLabel,
 		otelconsts.ResponseReceivedLabel,
+		otelconsts.ApertureSourceServiceLabel,
+		otelconsts.ApertureDestinationServiceLabel,
 	}
 
 	_includeAttributesHTTP = []string{

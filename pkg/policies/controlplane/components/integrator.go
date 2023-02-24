@@ -10,6 +10,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime/tristate"
 )
 
 // Integrator is a component that accumulates sum of signal every tick.
@@ -45,7 +46,7 @@ func NewIntegratorAndOptions(_ *policylangv1.Integrator, _ string, _ iface.Polic
 func (in *Integrator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	inputVal := inPortReadings.ReadSingleReadingPort("input")
 	resetVal := inPortReadings.ReadSingleReadingPort("reset")
-	if resetVal.Valid() && resetVal.Value() != 0 {
+	if tristate.FromReading(resetVal).IsTrue() {
 		in.sum = 0
 		// reset existing min/max constraints
 	} else if inputVal.Valid() {

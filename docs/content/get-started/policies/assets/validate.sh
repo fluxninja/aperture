@@ -3,8 +3,9 @@
 set -e
 
 git_root=$(git rev-parse --show-toplevel)
+aperturectl="$git_root"/cmd/aperturectl/aperturectl
 
-go run "$git_root"/cmd/aperturectl/main.go blueprints generate \
+"$aperturectl" blueprints generate \
 	--uri "$git_root"/blueprints \
 	--name policies/static-rate-limiting \
 	--values-file values.yaml \

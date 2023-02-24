@@ -209,9 +209,6 @@ spec:
                 control_point: "ingress"
             scheduler:
               parameters:
-                auto_tokens: true
-                default_workload_parameters:
-                  priority: 20
                 workloads:
                   - parameters:
                       priority: 50

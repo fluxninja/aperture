@@ -56,7 +56,7 @@ repos:
       - id: go-generate
       - id: go-mod-tidy-repo
         args:
-          - -compat=1.19
+          - -compat=1.20
   - repo: meta
     hooks:
       - id: check-hooks-apply
@@ -136,6 +136,13 @@ repos:
         entry: "./scripts/precommit/generate_blueprints.sh"
         language: script
         files: ^(blueprints)|\.proto$|^requirements.txt$
+        pass_filenames: false
+        description: "Generate Aperture libsonnet and blueprints"
+      - id: generate-playground-policies
+        name: "Generate Playground Policies"
+        entry: "./scripts/precommit/generate_playground_policies.sh"
+        language: script
+        files: ^(blueprints|playground/scenarios/)|\.proto$|^requirements.txt$
         pass_filenames: false
         description: "Generate Aperture libsonnet and blueprints"
       - id: generate-doc-assets

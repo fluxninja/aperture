@@ -63,6 +63,21 @@ func FromReading(reading runtime.Reading) Bool {
 	return True
 }
 
+// IsTrue returns true if Bool is True.
+func (b Bool) IsTrue() bool {
+	return b == True
+}
+
+// IsFalse returns true if Bool is False.
+func (b Bool) IsFalse() bool {
+	return b == False
+}
+
+// IsUnknown returns true if Bool is Unknown.
+func (b Bool) IsUnknown() bool {
+	return b == Unknown
+}
+
 func min(x, y int) int {
 	if x < y {
 		return x

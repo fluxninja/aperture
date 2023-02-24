@@ -1,0 +1,4 @@
+# vim: ft=tiltignore
+# Ignore the auto generated Policy CR files and jsonnet vendor directory
+scenarios/**/*-cr.yaml
+scenarios/**/vendor/
