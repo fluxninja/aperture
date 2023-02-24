@@ -368,6 +368,7 @@ jobs:
           paths:
             - ../.cache/golangci-lint
             - ../.cache/go-build
+            - ../.cache/buf
             - ~/.aperturectl
             - ./blueprints/vendor
           when: on_success
