@@ -146,7 +146,7 @@ jobs:
         default: true
       no_output_timeout:
         type: string
-        default: 10m
+        default: 20m
         description: |
           Pass through a default timeout if your Docker build does not output anything for more than 10 minutes.
     executor: <<parameters.executor>>
