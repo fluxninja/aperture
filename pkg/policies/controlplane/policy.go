@@ -169,12 +169,10 @@ func (policy *Policy) setupCircuitJob(
 			OnStart: func(_ context.Context) error {
 				// Create a job that runs every tick i.e. evaluation_interval. Set timeout duration to half of evaluation_interval
 				job := jobs.NewBasicJob(policy.jobName, policy.executeTick)
-				initialDelay := config.MakeDuration(0)
 				executionPeriod := config.MakeDuration(policy.evaluationInterval)
 				executionTimeout := config.MakeDuration(time.Millisecond * 100)
 				jobConfig := jobs.JobConfig{
 					InitiallyHealthy: true,
-					InitialDelay:     initialDelay,
 					ExecutionPeriod:  executionPeriod,
 					ExecutionTimeout: executionTimeout,
 				}
@@ -225,13 +223,16 @@ func (policy *Policy) dynamicConfigUpdate(event notifiers.Event, unmarshaller co
 
 func (policy *Policy) executeTick(jobCtxt context.Context) (proto.Message, error) {
 	// Get JobInfo
-	jobInfo := policy.circuitJobGroup.JobInfo(policy.jobName)
-	if jobInfo == nil {
-		return nil, fmt.Errorf("job info not found for job %s", policy.jobName)
+	jobInfo, err := policy.circuitJobGroup.JobInfo(policy.jobName)
+	if err != nil {
+		return nil, err
 	}
-	tickInfo := runtime.NewTickInfo(jobInfo.LastRunTime, jobInfo.NextRunTime, jobInfo.RunCount, policy.evaluationInterval)
+
+	tickInfo := runtime.NewTickInfo(jobInfo.LastExecuteTime,
+		jobInfo.ExecuteCount,
+		policy.evaluationInterval)
 	// Execute Circuit
-	err := policy.circuit.Execute(tickInfo)
+	err = policy.circuit.Execute(tickInfo)
 	// TODO: return tick info (publish to health framework) instead of returning nil proto.Message
 	return nil, err
 }

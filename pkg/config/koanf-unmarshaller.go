@@ -503,6 +503,5 @@ var json = jsoniter.Config{
 	CaseSensitive: true,
 
 	// Error on typos.
-	// (Currently disabled, as we sometimes marshal the same config into two structs)
-	// DisallowUnknownFields: true,
+	DisallowUnknownFields: true,
 }.Froze()

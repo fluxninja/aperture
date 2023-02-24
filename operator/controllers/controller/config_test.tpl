@@ -60,11 +60,11 @@ fluxninja_plugin:
   heartbeat_interval: 5s
 liveness:
   scheduler:
-    max_concurrent_jobs: 0
+    blocking_execution: false
+    worker_limit: 0
   service:
     execution_period: 10s
     execution_timeout: 5s
-    initial_delay: 0s
     initially_healthy: false
 log:
   level: info
@@ -97,7 +97,8 @@ plugins:
   plugins_path: default
 policies:
   promql_jobs_scheduler:
-    max_concurrent_jobs: 0
+    blocking_execution: false
+    worker_limit: 0
 profilers:
   cpu_profiler: false
   profiles_path: default
@@ -106,11 +107,11 @@ prometheus:
   address: http://aperture-prometheus-server:80
 readiness:
   scheduler:
-    max_concurrent_jobs: 0
+    blocking_execution: false
+    worker_limit: 0
   service:
     execution_period: 10s
     execution_timeout: 5s
-    initial_delay: 0s
     initially_healthy: false
 sentry_plugin:
   attach_stack_trace: true
@@ -121,7 +122,6 @@ sentry_plugin:
   sample_rate: 1
   traces_sample_rate: 0.2
 server:
-  addr: :80
   grpc:
     connection_timeout: 120s
     enable_reflection: false
@@ -146,8 +146,10 @@ server:
     read_header_timeout: 10s
     read_timeout: 10s
     write_timeout: 45s
-  keep_alive: 180s
-  network: tcp
+  listener:
+    addr: :80
+    keep_alive: 180s
+    network: tcp
   tls:
     allowed_cn: ""
     cert_file: /etc/aperture/aperture-controller/certs/crt.pem
@@ -188,7 +190,6 @@ watchdog:
   job:
     execution_period: 10s
     execution_timeout: 5s
-    initial_delay: 0s
     initially_healthy: false
   system:
     adaptive_policy:

@@ -18,7 +18,7 @@ go-mod-tidy:
 	@go mod tidy
 	@cd tools/go && go mod tidy
 	@cd sdks/aperture-go && go mod tidy
-	@cd playground/demo_app && go mod tidy
+	@cd playground/scenarios/demo-app/application && go mod tidy
 
 go-test:
 	@echo Running go tests
@@ -76,15 +76,8 @@ helm-lint:
 	@cd ./manifests/charts && $(MAKE) helm-lint
 
 generate-blueprints: generate-config-markdown
-	@echo Generating libsonnet library
-	@{ \
-		git_root=$$(git rev-parse --show-toplevel); \
-		python $$git_root/scripts/jsonnet-lib-gen.py --output-dir $$git_root/blueprints/gen $$git_root/docs/gen/policy/policy.yaml; \
-		tk fmt $$git_root/blueprints/gen; \
-		npx prettier --write $$git_root/blueprints/gen/jsonschema/*.json; \
-		git add $$git_root/blueprints/gen; \
-	}
-	@scripts/generate_blueprints_docs.sh
+	@echo Generating blueprints
+	@./scripts/generate_blueprints.sh
 
 
 generate-doc-assets: generate-blueprints

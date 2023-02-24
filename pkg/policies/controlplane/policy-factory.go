@@ -64,7 +64,7 @@ func providePolicyFactory(
 	policiesStatusRegistry := registry.Child("system", iface.PoliciesRoot)
 	logger := policiesStatusRegistry.GetLogger()
 
-	circuitJobGroup, err := jobs.NewJobGroup(policiesStatusRegistry.Child("jg", "circuit_jobs"), 0, jobs.RescheduleMode, nil)
+	circuitJobGroup, err := jobs.NewJobGroup(policiesStatusRegistry.Child("jg", "circuit_jobs"), jobs.JobGroupConfig{}, nil)
 	if err != nil {
 		logger.Error().Err(err).Msg("Failed to create job group")
 		return nil, err

@@ -50,7 +50,7 @@ root.4signal[signal]
 end
 subgraph root.4_outports[ ]
 style root.4_outports fill:none,stroke:none
-root.4load_multiplier[load_multiplier]
+root.4observed_load_multiplier[observed_load_multiplier]
 end
 end
 FakeConstant2((1.00))
@@ -58,8 +58,8 @@ FakeConstant2 --> root.5rhs
 subgraph root.5[<center>Decider<br/>LT for 30s</center>]
 subgraph root.5_inports[ ]
 style root.5_inports fill:none,stroke:none
-root.5lhs[lhs]
 root.5rhs[rhs]
+root.5lhs[lhs]
 end
 subgraph root.5_outports[ ]
 style root.5_outports fill:none,stroke:none
@@ -67,15 +67,15 @@ root.5output[output]
 end
 end
 FakeConstant3((0.00))
-FakeConstant3 --> root.6on_true
+FakeConstant3 --> root.6on_signal
 FakeConstant4((10.00))
-FakeConstant4 --> root.6on_false
+FakeConstant4 --> root.6off_signal
 subgraph root.6[Switcher]
 subgraph root.6_inports[ ]
 style root.6_inports fill:none,stroke:none
+root.6on_signal[on_signal]
+root.6off_signal[off_signal]
 root.6switch[switch]
-root.6on_true[on_true]
-root.6on_false[on_false]
 end
 subgraph root.6_outports[ ]
 style root.6_outports fill:none,stroke:none
@@ -88,12 +88,12 @@ style root.7_inports fill:none,stroke:none
 root.7limit[limit]
 end
 end
+root.5output --> |IS_BOT_ESCALATION| root.6switch
+root.2output --> |LATENCY_SETPOINT| root.4setpoint
+root.1output --> |MAX_EMA| root.3max_envelope
+root.3output --> |LATENCY_EMA| root.2lhs
+root.4observed_load_multiplier --> |OBSERVED_LOAD_MULTIPLIER| root.5lhs
+root.6output --> |RATE_LIMIT| root.7limit
 root.0output --> |LATENCY| root.1lhs
 root.0output --> |LATENCY| root.3input
 root.0output --> |LATENCY| root.4signal
-root.1output --> |MAX_EMA| root.3max_envelope
-root.2output --> |LATENCY_SETPOINT| root.4setpoint
-root.3output --> |LATENCY_EMA| root.2lhs
-root.4load_multiplier --> |LOAD_MULTIPLIER| root.5lhs
-root.5output --> |IS_BOT_ESCALATION| root.6switch
-root.6output --> |RATE_LIMIT| root.7limit

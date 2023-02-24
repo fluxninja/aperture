@@ -33,6 +33,10 @@ func (svc *StatusService) GetGroupStatus(ctx context.Context, req *statusv1.Grou
 	keys := strings.Split(req.Path, "/")
 
 	registry := svc.registry
+	if req.Path == "" || len(keys) == 0 {
+		return registry.GetGroupStatus(), nil
+	}
+
 	for i := 0; i < len(keys); i += 2 {
 		if i >= len(keys) || i+1 >= len(keys) {
 			log.Warn().Msgf("Incorrect status path: %+v", req.Path)

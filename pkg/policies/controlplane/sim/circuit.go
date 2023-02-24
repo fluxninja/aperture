@@ -179,7 +179,6 @@ func (s *Circuit) execStep() {
 	err := s.circuit.Execute(
 		runtime.NewTickInfo(
 			s.time,
-			s.time.Add(s.meta.EvaluationInterval),
 			s.tickNo,
 			s.meta.EvaluationInterval,
 		),

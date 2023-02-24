@@ -7,6 +7,7 @@ import (
 	"math"
 	"runtime"
 	"runtime/debug"
+	"time"
 
 	"github.com/elastic/gosigar"
 	"go.uber.org/fx"
@@ -172,7 +173,7 @@ func (w *watchdog) start() error {
 			select {
 			case <-w.sentinel.gcTriggered:
 				log.Trace().Msg("GC detected, triggering watchdog checks")
-				w.jobGroup.TriggerJob(watchdogJobName)
+				w.jobGroup.TriggerJob(watchdogJobName, time.Duration(0))
 				if hp != nil {
 					details, e := hp.checkHeap()
 					if e != nil {

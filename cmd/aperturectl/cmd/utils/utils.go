@@ -8,7 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gopkg.in/yaml.v2"
+	"github.com/ghodss/yaml"
+	"github.com/hashicorp/go-multierror"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
@@ -20,6 +21,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/storage/memory"
+	"github.com/xeipuuv/gojsonschema"
 )
 
 // GenerateDotFile generates a DOT file from the circuit.
@@ -146,11 +148,15 @@ func FetchPolicyFromCR(crPath string) (string, error) {
 // GetKubeConfig prepares Kubernetes config to connect with the cluster using provided or default kube config file location.
 func GetKubeConfig(kubeConfig string) (*rest.Config, error) {
 	if kubeConfig == "" {
-		homeDir, err := os.UserHomeDir()
-		if err != nil {
-			return nil, err
+		if kubeConfigEnv, exists := os.LookupEnv("KUBECONFIG"); exists {
+			kubeConfig = kubeConfigEnv
+		} else {
+			homeDir, err := os.UserHomeDir()
+			if err != nil {
+				return nil, err
+			}
+			kubeConfig = filepath.Join(homeDir, ".kube", "config")
 		}
-		kubeConfig = filepath.Join(homeDir, ".kube", "config")
 		log.Info().Msgf("Using Kubernetes config '%s'", kubeConfig)
 	}
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfig)
@@ -200,4 +206,57 @@ func ResolveLatestVersion() (string, error) {
 		return "", errors.New("unable to resolve release tags to find latest release")
 	}
 	return fmt.Sprintf("v%s", latestRelease.String()), nil
+}
+
+// ValidateWithJSONSchema validates the given document (YAML) against the given JSON schema.
+func ValidateWithJSONSchema(rootSchema string, schemas []string, documentFile string) error {
+	// load schema
+	schemaLoader := gojsonschema.NewSchemaLoader()
+	// check whether schemas exist
+	for _, schema := range schemas {
+		if _, err := os.Stat(schema); os.IsNotExist(err) {
+			log.Warn().Msgf("Schema %s does not exist. Skipping validation", schema)
+			return nil
+		}
+		err := schemaLoader.AddSchemas(gojsonschema.NewReferenceLoader("file://" + schema))
+		if err != nil {
+			return err
+		}
+	}
+
+	if _, err := os.Stat(rootSchema); os.IsNotExist(err) {
+		log.Warn().Msgf("Schema %s does not exist. Skipping validation", rootSchema)
+		return nil
+	}
+
+	schema, err := schemaLoader.Compile(gojsonschema.NewReferenceLoader("file://" + rootSchema))
+	if err != nil {
+		return err
+	}
+	// marshal documentFile to json and load it
+	documentYamlBytes, err := os.ReadFile(documentFile)
+	if err != nil {
+		return err
+	}
+	documentJSON, err := yaml.YAMLToJSON(documentYamlBytes)
+	if err != nil {
+		return err
+	}
+
+	documentLoader := gojsonschema.NewBytesLoader(documentJSON)
+
+	// validate document
+	result, err := schema.Validate(documentLoader)
+	if err != nil {
+		return err
+	}
+	if !result.Valid() {
+		merr := fmt.Errorf("the document %s is not valid", documentFile)
+		for _, desc := range result.Errors() {
+			errorMessage := fmt.Sprintf("- %s", desc)
+			merr = multierror.Append(merr, errors.New(errorMessage))
+		}
+		return merr
+	}
+	return nil
 }

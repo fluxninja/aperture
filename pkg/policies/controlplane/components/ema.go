@@ -10,7 +10,6 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/constraints"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -63,6 +62,7 @@ func NewEMAAndOptions(emaProto *policylangv1.EMA,
 	// period of tick
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()
 	params := emaProto.GetParameters()
+
 	// number of ticks in emaWindow
 	emaWindow := math.Ceil(float64(params.EmaWindow.AsDuration()) / float64(evaluationPeriod))
 
@@ -156,10 +156,12 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.T
 	// Set the last good output
 	if output.Valid() {
 		// apply correction
-		var err error
-		output, err = ema.applyCorrection(output, minEnvelope, maxEnvelope)
-		if err != nil {
-			return retErr(err)
+		value := output.Value()
+		if maxEnvelope.Valid() && value > maxEnvelope.Value() {
+			output = runtime.NewReading(value * ema.correctionFactorOnMaxViolation)
+		}
+		if minEnvelope.Valid() && value < minEnvelope.Value() {
+			output = runtime.NewReading(value * ema.correctionFactorOnMinViolation)
 		}
 		ema.lastGoodOutput = output
 	}
@@ -180,31 +182,3 @@ func (ema *EMA) computeAverage() (runtime.Reading, error) {
 
 // DynamicConfigUpdate is a no-op for EMA.
 func (ema *EMA) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}
-
-func (ema *EMA) applyCorrection(output, minEnvelope, maxEnvelope runtime.Reading) (runtime.Reading, error) {
-	value := output.Value()
-	minxMaxConstraints := constraints.NewMinMaxConstraints()
-	if maxEnvelope.Valid() {
-		maxErr := minxMaxConstraints.SetMax(maxEnvelope.Value())
-		if maxErr != nil {
-			return runtime.InvalidReading(), maxErr
-		}
-	}
-	if minEnvelope.Valid() {
-		minErr := minxMaxConstraints.SetMin(minEnvelope.Value())
-		if minErr != nil {
-			return runtime.InvalidReading(), minErr
-		}
-	}
-
-	_, constraintType := minxMaxConstraints.Constrain(value)
-	correctedValue := value
-
-	if constraintType == constraints.MinConstraint && ema.correctionFactorOnMinViolation != 1 {
-		correctedValue = value * ema.correctionFactorOnMinViolation
-	} else if constraintType == constraints.MaxConstraint && ema.correctionFactorOnMaxViolation != 1 {
-		correctedValue = value * ema.correctionFactorOnMaxViolation
-	}
-
-	return runtime.NewReading(correctedValue), nil
-}

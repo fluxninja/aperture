@@ -54,14 +54,7 @@ local policyResource = latencyAIMDPolicy({
   flux_meter: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector),
   concurrency_controller+: {
     flow_selector: svcSelector,
-    default_config: {
-      dry_run: false,
-    },
     scheduler+: {
-      timeout_factor: 0.5,
-      default_workload_parameters: {
-        priority: 20,
-      },
       workloads: [
         workload.new()
         + workload.withParameters(workloadParameters.withPriority(50))
@@ -89,7 +82,7 @@ local policyResource = latencyAIMDPolicy({
     + component.withDecider(
       decider.new()
       + decider.withOperator('lt')
-      + decider.withInPorts({ lhs: port.withSignalName('LOAD_MULTIPLIER'), rhs: port.withConstantSignal(1.0) })
+      + decider.withInPorts({ lhs: port.withSignalName('OBSERVED_LOAD_MULTIPLIER'), rhs: port.withConstantSignal(1.0) })
       + decider.withOutPorts({ output: port.withSignalName('IS_BOT_ESCALATION') })
       + decider.withTrueFor('30s')
     ),
@@ -98,8 +91,8 @@ local policyResource = latencyAIMDPolicy({
       switcher.new()
       + switcher.withInPorts({
         switch: port.withSignalName('IS_BOT_ESCALATION'),
-        on_true: port.withConstantSignal(0.0),
-        on_false: port.withConstantSignal(10.0),
+        off_signal: port.withConstantSignal(10.0),
+        on_signal: port.withConstantSignal(0.0),
       })
       + switcher.withOutPorts({ output: port.withSignalName('RATE_LIMIT') })
     ),

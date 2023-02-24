@@ -1,22 +1,21 @@
 package components
 
 import (
-	"fmt"
+	"math"
 
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/constraints"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime/tristate"
 )
 
 // Integrator is a component that accumulates sum of signal every tick.
 type Integrator struct {
-	sum    float64
-	minMax *constraints.MinMaxConstraints
+	sum float64
 }
 
 // Name implements runtime.Component.
@@ -27,14 +26,13 @@ func (*Integrator) Type() runtime.ComponentType { return runtime.ComponentTypeSi
 
 // ShortDescription implements runtime.Component.
 func (in *Integrator) ShortDescription() string {
-	return fmt.Sprintf("min: %f, max: %f", in.minMax.Min, in.minMax.Max)
+	return ""
 }
 
 // NewIntegrator creates an integrator component.
 func NewIntegrator() runtime.Component {
 	integrator := &Integrator{
-		sum:    0,
-		minMax: constraints.NewMinMaxConstraints(),
+		sum: 0,
 	}
 	return integrator
 }
@@ -48,18 +46,20 @@ func NewIntegratorAndOptions(_ *policylangv1.Integrator, _ string, _ iface.Polic
 func (in *Integrator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	inputVal := inPortReadings.ReadSingleReadingPort("input")
 	resetVal := inPortReadings.ReadSingleReadingPort("reset")
-	if resetVal.Valid() && resetVal.Value() != 0 {
+	if tristate.FromReading(resetVal).IsTrue() {
 		in.sum = 0
+		// reset existing min/max constraints
 	} else if inputVal.Valid() {
-		minVal := inPortReadings.ReadSingleReadingPort("min")
+		in.sum += inputVal.Value()
+
 		maxVal := inPortReadings.ReadSingleReadingPort("max")
+		if maxVal.Valid() {
+			in.sum = math.Min(in.sum, maxVal.Value())
+		}
 
-		if minVal.Valid() && maxVal.Valid() {
-			in.minMax.Max = maxVal.Value()
-			in.minMax.Min = minVal.Value()
-
-			value, _ := in.minMax.Constrain(inputVal.Value())
-			in.sum += value
+		minVal := inPortReadings.ReadSingleReadingPort("min")
+		if minVal.Valid() {
+			in.sum = math.Max(in.sum, minVal.Value())
 		}
 	}
 

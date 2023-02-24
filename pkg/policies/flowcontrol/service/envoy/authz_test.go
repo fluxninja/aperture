@@ -3,7 +3,7 @@ package envoy_test
 import (
 	"context"
 
-	ext_authz "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
+	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/genproto/googleapis/rpc/code"
@@ -83,7 +83,7 @@ var _ = Describe("Authorization handler", func() {
 				ctxWithIp,
 				metadata.Pairs("control-point", "ingress"),
 			)
-			resp, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
+			resp, err := handler.Check(ctxWithIp, &authv3.CheckRequest{})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(code.Code(resp.GetStatus().GetCode())).To(Equal(code.Code_OK))
 		})
@@ -93,7 +93,7 @@ var _ = Describe("Authorization handler", func() {
 				ctxWithIp,
 				metadata.Pairs("control-point", "ingress"),
 			)
-			resp, err := handler.Check(ctxWithIp, &ext_authz.CheckRequest{})
+			resp, err := handler.Check(ctxWithIp, &authv3.CheckRequest{})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(resp.GetDynamicMetadata()).NotTo(BeNil())
 		})

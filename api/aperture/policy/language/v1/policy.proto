@@ -76,12 +76,7 @@ message Policy {
 message Circuit {
   // Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
   // This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
-  google.protobuf.Duration evaluation_interval = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "0.5s"}
-    }
-  }]; // @gotags: default:"0.5s"
+  google.protobuf.Duration evaluation_interval = 1; // @gotags: default:"0.5s"
 
   // Defines a signal processing graph as a list of components.
   repeated Component components = 2; // @gotags: validate:"dive"
@@ -262,8 +257,9 @@ message FlowControl {
 // AutoScale components are used to scale a service.
 message AutoScale {
   oneof component {
-    // HorizontalPodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
-    HorizontalPodScaler horizontal_pod_scaler = 1;
+    // PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+    PodScaler pod_scaler = 1;
+    // GradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.
   }
 }
 
@@ -351,40 +347,20 @@ message GradientController {
     // so the _slope_ might not fully describe aggressiveness of the controller.
     //
     // :::
-    double slope = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; // @gotags: validate:"required"
+    double slope = 1; // @gotags: validate:"required"
 
     // Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
-    double min_gradient = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {number_value: -1.7976931348623157e+308}
-      }
-    }]; // @gotags: default:"-1.79769313486231570814527423731704356798070e+308"
+    double min_gradient = 2; // @gotags: default:"-1.79769313486231570814527423731704356798070e+308"
 
     // Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
-    double max_gradient = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {number_value: 1.7976931348623157e+308}
-      }
-    }]; // @gotags: default:"1.79769313486231570814527423731704356798070e+308"
+    double max_gradient = 3; // @gotags: default:"1.79769313486231570814527423731704356798070e+308"
   }
 
   // Dynamic Configuration for a Controller
   message DynamicConfig {
     // Decides whether the controller runs in "manual_mode".
     // In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
-    bool manual_mode = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {bool_value: false}
-      }
-    }]; // @gotags: default:"false"
+    bool manual_mode = 1; // @gotags: default:"false"
   }
 
   // Inputs for the Gradient Controller component.
@@ -423,12 +399,7 @@ message GradientController {
   Outs out_ports = 2;
 
   // Gradient Parameters.
-  Parameters parameters = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  Parameters parameters = 3; // @gotags: validate:"required"
 
   // Configuration key for DynamicConfig
   string dynamic_config_key = 4;
@@ -441,7 +412,7 @@ message GradientController {
 //
 // At any time EMA component operates in one of the following states:
 // 1. Warm up state: The first warmup_window samples are used to compute the initial EMA.
-//    If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of Warm up state.
+//    If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of warm up state.
 // 2. Normal state: The EMA is computed using following formula.
 //
 // The EMA for a series $Y$ is calculated recursively as:
@@ -461,8 +432,6 @@ message GradientController {
 // $$
 // \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
 // $$
-//
-// The EMA filter also employs a min-max-envelope logic during warm up stage, explained [here](#e-m-a-ins).
 message EMA {
   // Inputs for the EMA component.
   message Ins {
@@ -471,8 +440,8 @@ message EMA {
 
     // Upper bound of the moving average.
     //
-    // Used during the warm-up stage: if the signal would exceed `max_envelope`
-    // it's multiplied by `correction_factor_on_max_envelope_violation` **once per tick**.
+    // When the signal exceeds `max_envelope` it's multiplied by
+    // `correction_factor_on_max_envelope_violation` **once per tick**.
     //
     // :::note
     //
@@ -481,16 +450,11 @@ message EMA {
     //
     // :::
     //
-    // :::note
-    //
-    // The envelope logic is **not** used outside the warm-up stage!
-    //
-    // :::
     InPort max_envelope = 2;
 
     // Lower bound of the moving average.
     //
-    // Used during the warm-up stage analogously to `max_envelope`.
+    // Behavior is similar to `max_envelope`.
     InPort min_envelope = 3;
   }
 
@@ -503,54 +467,21 @@ message EMA {
   // Parameters for the EMA component.
   message Parameters {
     // Duration of EMA sampling window.
-    google.protobuf.Duration ema_window = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {string_value: "5s"}
-      }
-    }]; // @gotags: default:"5s"
+    google.protobuf.Duration ema_window = 1; // @gotags: validate:"required"
 
     // Duration of EMA warming up window.
     //
-    // The initial value of the EMA is the average of signal readings received during the warm-up window.
-    google.protobuf.Duration warmup_window = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {string_value: "0s"}
-      }
-    }]; // @gotags: default:"0s"
+    // The initial value of the EMA is the average of signal readings received during the warm up window.
+    google.protobuf.Duration warmup_window = 2; // @gotags: validate:"required"
 
     // Correction factor to apply on the output value if its in violation of the min envelope.
-    double correction_factor_on_min_envelope_violation = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {number_value: 1}
-      }
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "gte=1.0"}
-      }
-    }]; // @gotags: validate:"gte=1.0" default:"1.0"
+    double correction_factor_on_min_envelope_violation = 3; // @gotags: validate:"gte=1.0" default:"1.0"
 
     // Correction factor to apply on the output value if its in violation of the max envelope.
-    double correction_factor_on_max_envelope_violation = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {number_value: 1}
-      }
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "gte=0,lte=1.0"}
-      }
-    }]; // @gotags: validate:"gte=0,lte=1.0" default:"1.0"
+    double correction_factor_on_max_envelope_violation = 4; // @gotags: validate:"gte=0,lte=1.0" default:"1.0"
 
-    // Whether the output is valid during the warm-up stage.
-    bool valid_during_warmup = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {bool_value: false}
-      }
-    }]; // @gotags: default:"false"
+    // Whether the output is valid during the warm up stage.
+    bool valid_during_warmup = 5; // @gotags: default:"false"
   }
 
   // Input ports for the EMA component.
@@ -560,12 +491,7 @@ message EMA {
   Outs out_ports = 2;
 
   // Parameters for the EMA component.
-  Parameters parameters = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  Parameters parameters = 3; // @gotags: validate:"required"
 }
 
 // Type of combinator that computes the arithmetic operation on the operand signals
@@ -595,12 +521,7 @@ message ArithmeticCombinator {
   //
   // The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
   // In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
-  string operator = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "oneof=add sub mul div xor lshift rshift"}
-    }
-  }]; // @gotags: validate:"oneof=add sub mul div xor lshift rshift"
+  string operator = 3; // @gotags: validate:"oneof=add sub mul div xor lshift rshift"
 }
 
 // Type of combinator that computes the comparison operation on lhs and rhs signals
@@ -635,52 +556,37 @@ message Decider {
   Outs out_ports = 2;
 
   // Comparison operator that computes operation on lhs and rhs input signals.
-  string operator = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "oneof=gt lt gte lte eq neq"}
-    }
-  }]; // @gotags: validate:"oneof=gt lt gte lte eq neq"
+  string operator = 3; // @gotags: validate:"oneof=gt lt gte lte eq neq"
 
   // Duration of time to wait before a transition to true state.
   // If the duration is zero, the transition will happen instantaneously.
-  google.protobuf.Duration true_for = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "0s"}
-    }
-  }]; // @gotags: default:"0s"
+  google.protobuf.Duration true_for = 4; // @gotags: default:"0s"
 
   // Duration of time to wait before a transition to false state.
   // If the duration is zero, the transition will happen instantaneously.
-  google.protobuf.Duration false_for = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "0s"}
-    }
-  }]; // @gotags: default:"0s"
+  google.protobuf.Duration false_for = 5; // @gotags: default:"0s"
 }
 
-// Type of combinator that switches between `on_true` and `on_false` signals based on switch input
+// Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input
 //
-// `on_true` will be returned if switch input is valid and not equal to 0.0 ,
-//  otherwise `on_false` will be returned.
+// `on_signal` will be returned if switch input is valid and not equal to 0.0 ,
+//  otherwise `off_signal` will be returned.
 message Switcher {
   // Inputs for the Switcher component.
   message Ins {
     // Output signal when switch is valid and not 0.0.
-    InPort on_true = 1;
+    InPort on_signal = 1;
 
     // Output signal when switch is invalid or 0.0.
-    InPort on_false = 2;
+    InPort off_signal = 2;
 
-    // Decides whether to return on_true or on_false.
+    // Decides whether to return `on_signal` or `off_signal`.
     InPort switch = 3;
   }
 
   // Outputs for the Switcher component.
   message Outs {
-    // Selected signal (on_true or on_false).
+    // Selected signal (`on_signal` or `off_signal`).
     OutPort output = 1;
   }
 
@@ -705,33 +611,14 @@ message RateLimiter {
   message Parameters {
     message LazySync {
       // Enables lazy sync
-      bool enabled = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        extensions: {
-          key: "x-go-default"
-          value: {bool_value: false}
-        }
-      }]; // @gotags: default:"false"
+      bool enabled = 1; // @gotags: default:"false"
 
       // Number of times to lazy sync within the _limit\_reset\_interval_.
-      uint32 num_sync = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        extensions: {
-          key: "x-go-default"
-          value: {number_value: 5}
-        }
-        extensions: {
-          key: "x-go-validate"
-          value: {string_value: "gt=0"}
-        }
-      }]; // @gotags: default:"5" validate:"gt=0"
+      uint32 num_sync = 2; // @gotags: default:"5" validate:"gt=0"
     }
 
     // Time after which the limit for a given label value will be reset.
-    google.protobuf.Duration limit_reset_interval = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {string_value: "60s"}
-      }
-    }]; // @gotags: default:"60s"
+    google.protobuf.Duration limit_reset_interval = 1; // @gotags: default:"60s"
 
     // Specifies which label the ratelimiter should be keyed by.
     //
@@ -739,12 +626,7 @@ message RateLimiter {
     // [label](/concepts/integrations/flow-control/flow-label.md) with given key.
     // Eg., to give each user a separate limit, assuming you have a _user_ flow
     // label set up, set `label_key: "user"`.
-    string label_key = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; // @gotags: validate:"required"
+    string label_key = 2; // @gotags: validate:"required"
 
     // Configuration of lazy-syncing behaviour of ratelimiter
     LazySync lazy_sync = 3;
@@ -752,20 +634,10 @@ message RateLimiter {
 
   message Override {
     // Value of the label for which the override should be applied.
-    string label_value = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; // @gotags: validate:"required"
+    string label_value = 1; // @gotags: validate:"required"
 
     // Amount by which the _in\_ports.limit_ should be multiplied for this label value.
-    double limit_scale_factor = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {number_value: 1}
-      }
-    }]; // @gotags: default:"1.0"
+    double limit_scale_factor = 2; // @gotags: default:"1.0"
   }
 
   // Dynamic Configuration for the rate limiter
@@ -785,36 +657,17 @@ message RateLimiter {
     // under certain circumstances. [Decider](#decider) might be helpful.
     //
     // :::
-    InPort limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; // @gotags: validate:"required"
+    InPort limit = 1; // @gotags: validate:"required"
   }
 
-  Ins in_ports = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  // Input ports for the RateLimiter component
+  Ins in_ports = 1; // @gotags: validate:"required"
 
   // Which control point to apply this ratelimiter to.
-  FlowSelector flow_selector = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  FlowSelector flow_selector = 2; // @gotags: validate:"required"
 
   // Parameters for the RateLimiter component
-  Parameters parameters = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  Parameters parameters = 3; // @gotags: validate:"required"
 
   // Configuration key for DynamicConfig
   string dynamic_config_key = 4;
@@ -838,23 +691,13 @@ message RateLimiter {
 // strategy and a scheduler. Right now, only `load_actuator` strategy is available.
 message ConcurrencyLimiter {
   // Flow Selector decides the service and flows at which the concurrency limiter is applied.
-  FlowSelector flow_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  FlowSelector flow_selector = 1; // @gotags: validate:"required"
 
   // Configuration of Weighted Fair Queuing-based workload scheduler.
   //
   // Contains configuration of per-agent scheduler, and also defines some
   // output signals.
-  Scheduler scheduler = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  Scheduler scheduler = 2; // @gotags: validate:"required"
 
   oneof actuation_strategy {
     // Actuator based on limiting the accepted concurrency under incoming concurrency * load multiplier.
@@ -882,21 +725,17 @@ message Scheduler {
       // Describes priority level of the requests within the workload.
       // Priority level ranges from 0 to 255.
       // Higher numbers means higher priority level.
-      uint32 priority = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        extensions: {
-          key: "x-go-validate"
-          value: {string_value: "gte=0,lte=255"}
-        }
-      }]; // @gotags: validate:"gte=0,lte=255"
+      // Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
+      //
+      // $$
+      // \text{virtual\_finish\_time} = \text{virtual\_time} + \left(\text{tokens} \cdot \left(\text{256} - \text{priority}\right)\right)
+      // $$
+      //
+      uint32 priority = 1; // @gotags: validate:"gte=0,lte=255" default:"0"
 
       // Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
       // This override is applicable only if `auto_tokens` is set to false.
-      uint64 tokens = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        extensions: {
-          key: "x-go-default"
-          value: {number_value: 1}
-        }
-      }]; // @gotags: default:"1"
+      uint64 tokens = 2; // @gotags: default:"1"
 
       // Fairness key is a label key that can be used to provide fairness within a workload.
       // Any [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if
@@ -906,21 +745,11 @@ message Scheduler {
     }
 
     // Parameters associated with flows matching the label matcher.
-    Parameters parameters = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; // @gotags: validate:"required"
+    Parameters parameters = 1; // @gotags: validate:"required"
 
     // Label Matcher to select a Workload based on
     // [flow labels](/concepts/integrations/flow-control/flow-label.md).
-    LabelMatcher label_matcher = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; // @gotags: validate:"required"
+    LabelMatcher label_matcher = 2; // @gotags: validate:"required"
   }
 
   // Scheduler parameters
@@ -950,40 +779,21 @@ message Scheduler {
     repeated Workload workloads = 1; // @gotags: validate:"dive"
 
     // Parameters to be used if none of workloads specified in `workloads` match.
-    Workload.Parameters default_workload_parameters = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; // @gotags: validate:"required"
+    Workload.Parameters default_workload_parameters = 2;
 
     // Automatically estimate the size of a request in each workload, based on
     // historical latency. Each workload's `tokens` will be set to average
     // latency of flows in that workload during last few seconds (exact duration
     // of this average can change).
-    bool auto_tokens = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {string_value: "true"}
-      }
-    }]; // @gotags: default:"true"
+    bool auto_tokens = 3; // @gotags: default:"true"
 
     // Timeout as a factor of tokens for a flow in a workload
     //
-    // If a flow is not able to get tokens within `timeout_factor` * `tokens` of duration,
+    // If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
     // it will be rejected.
     //
     // This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
-    double timeout_factor = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {number_value: 0.5}
-      }
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "gte=0.0"}
-      }
-    }]; // @gotags: validate:"gte=0.0" default:"0.5"
+    double timeout_factor = 4; // @gotags: validate:"gte=0.0" default:"0.5"
 
     // Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
     //
@@ -1004,12 +814,7 @@ message Scheduler {
     // tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
     //
     // :::
-    google.protobuf.Duration max_timeout = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {string_value: "0.49s"}
-      }
-    }]; // @gotags: default:"0.49s"
+    google.protobuf.Duration max_timeout = 5; // @gotags: default:"0.49s"
   }
 
   // Output for the Scheduler component.
@@ -1045,12 +850,7 @@ message Scheduler {
   Outs out_ports = 1;
 
   // Scheduler parameters.
-  Parameters parameters = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  Parameters parameters = 2; // @gotags: validate:"required"
 }
 
 // Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
@@ -1101,23 +901,15 @@ message PromQL {
   string query_string = 2;
 
   // Describes the interval between successive evaluations of the Prometheus query.
-  google.protobuf.Duration evaluation_interval = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "10s"}
-    }
-  }]; // @gotags: default:"10s"
+  google.protobuf.Duration evaluation_interval = 3; // @gotags: default:"10s"
 }
 
 // Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
 message ConstantSignal {
   oneof const {
-    string special_value = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "oneof=NaN +Inf -Inf"}
-      }
-    }]; // @gotags: validate:"oneof=NaN +Inf -Inf"
+    // A special value such as NaN, +Inf, -Inf.
+    string special_value = 1; // @gotags: validate:"oneof=NaN +Inf -Inf"
+    // A constant value.
     double value = 2;
   }
 }
@@ -1168,12 +960,7 @@ message Sqrt {
   Outs out_ports = 2;
 
   // Scaling factor to be multiplied with the square root of the input signal.
-  double scale = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {number_value: 1}
-    }
-  }]; // @gotags default:"1.0"
+  double scale = 3; // @gotags: default:"1.0"
 }
 
 // Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
@@ -1183,12 +970,7 @@ message Extrapolator {
   // Parameters for the Extrapolator component.
   message Parameters {
     // Maximum time interval to repeat the last valid value of input signal.
-    google.protobuf.Duration max_extrapolation_interval = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {string_value: "10s"}
-      }
-    }]; // @gotags: default:"10s"
+    google.protobuf.Duration max_extrapolation_interval = 1; // @gotags: validate:"required"
   }
 
   // Inputs for the Extrapolator component.
@@ -1210,12 +992,7 @@ message Extrapolator {
   Outs out_ports = 2;
 
   // Parameters for the Extrapolator component.
-  Parameters parameters = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  Parameters parameters = 3; // @gotags: validate:"required"
 }
 
 // Takes a list of input signals and emits the signal with the maximum value
@@ -1376,32 +1153,13 @@ message Alerter {
   // Alerter Parameters is a common config for separate alerter components and alerters embedded in other components.
   message Parameters {
     // Name of the alert.
-    string alert_name = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "required"}
-      }
-    }]; // @gotags: validate:"required"
+    string alert_name = 1; // @gotags: validate:"required"
 
     // Severity of the alert, one of 'info', 'warn' or 'crit'.
-    string severity = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-validate"
-        value: {string_value: "oneof=info warn crit"}
-      }
-      extensions: {
-        key: "x-go-default"
-        value: {string_value: "info"}
-      }
-    }]; // @gotags: default:"info" validate:"oneof=info warn crit"
+    string severity = 2; // @gotags: default:"info" validate:"oneof=info warn crit"
 
     // Duration of alert resolver.
-    google.protobuf.Duration resolve_timeout = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      extensions: {
-        key: "x-go-default"
-        value: {string_value: "300s"}
-      }
-    }]; // @gotags: default:"300s"
+    google.protobuf.Duration resolve_timeout = 3; // @gotags: default:"5s"
 
     // A list of alert channel strings.
     repeated string alert_channels = 4;
@@ -1420,12 +1178,7 @@ message Alerter {
   Ins in_ports = 1;
 
   // Alerter configuration
-  Parameters parameters = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  Parameters parameters = 2; // @gotags: validate:"required"
 }
 
 // Accumulates sum of signal every tick.
@@ -1434,12 +1187,12 @@ message Integrator {
   message Ins {
     // The input signal.
     InPort input = 1;
-    // Resets the integrator output to zero when reset signal is valid and non-zero.
+    // Resets the integrator output to zero when reset signal is valid and non-zero. Reset also resets the max and min constraints.
     InPort reset = 2;
-    // The minimum output when reset is not set.
-    InPort min = 3;
-    //The maximum output when reset is not set.
-    InPort max = 4;
+    //The maximum output.
+    InPort max = 3;
+    //The minimum output.
+    InPort min = 4;
   }
 
   // Outputs for the Integrator component.
@@ -1473,43 +1226,40 @@ message Differentiator {
   Outs out_ports = 2;
 
   // The window of time over which differentiator operates.
-  google.protobuf.Duration window = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "5s"}
-    }
-  }]; // @gotags: default:"5s"
+  google.protobuf.Duration window = 3; // @gotags: default:"5s"
 }
 
-message HorizontalPodScaler {
+// Component for scaling pods based on a signal.
+message PodScaler {
+  // Reports actual and configured number of replicas.
   message ScaleReporter {
-    // Outputs for the HorizontalPodScaler component.
+    // Outputs for the PodScaler component.
     message Outs {
+      // The number of replicas that are currently running.
       OutPort actual_replicas = 1;
+      // The number of replicas that are desired.
       OutPort configured_replicas = 2;
     }
 
+    // Output ports for the PodScaler component.
     Outs out_ports = 1;
   }
 
+  // Actuates scaling of pods based on a signal.
   message ScaleActuator {
     // Dynamic Configuration for ScaleActuator
     message DynamicConfig {
       // Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
       // Useful for observing the behavior of Scaler without disrupting any real traffic.
-      bool dry_run = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        extensions: {
-          key: "x-go-default"
-          value: {bool_value: false}
-        }
-      }]; // @gotags: default:"false"
+      bool dry_run = 1; // @gotags: default:"false"
     }
 
-    // Inputs for the HorizontalPodScaler component.
+    // Inputs for the PodScaler component.
     message Ins {
       InPort desired_replicas = 1;
     }
 
+    // Input ports for the PodScaler component.
     Ins in_ports = 1;
 
     // Configuration key for DynamicConfig
@@ -1520,15 +1270,12 @@ message HorizontalPodScaler {
   }
 
   // The Kubernetes object on which horizontal scaling is applied.
-  KubernetesObjectSelector kubernetes_object_selector = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  KubernetesObjectSelector kubernetes_object_selector = 1; // @gotags: validate:"required"
 
+  // Reports actual and configured number of replicas.
   ScaleReporter scale_reporter = 2;
 
+  // Actuates scaling of pods based on a signal.
   ScaleActuator scale_actuator = 3;
 }
 
@@ -1539,23 +1286,14 @@ message PulseGenerator {
     OutPort output = 1;
   }
 
+  // Output ports for the PulseGenerator component.
   Outs out_ports = 1;
 
   // Emitting 1 for the true_for duration.
-  google.protobuf.Duration true_for = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "5s"}
-    }
-  }]; // @gotags: default:"5s"
+  google.protobuf.Duration true_for = 2; // @gotags: default:"5s"
 
   // Emitting 0 for the false_for duration.
-  google.protobuf.Duration false_for = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "5s"}
-    }
-  }]; // @gotags: default:"5s"
+  google.protobuf.Duration false_for = 3; // @gotags: default:"5s"
 }
 
 // Holds the last valid signal value for the specified duration then waits for next valid value to hold.
@@ -1563,31 +1301,33 @@ message PulseGenerator {
 message Holder {
   // Inputs for the Holder component.
   message Ins {
+    // The input signal.
     InPort input = 1;
   }
 
   // Outputs for the Holder component.
   message Outs {
+    // The output signal.
     OutPort output = 1;
   }
 
+  // Input ports for the Holder component.
   Ins in_ports = 1;
+  // Output ports for the Holder component.
   Outs out_ports = 2;
 
   // Holding the last valid signal value for the hold_for duration.
-  google.protobuf.Duration hold_for = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {string_value: "5s"}
-    }
-  }]; // @gotags: default:"5s"
+  google.protobuf.Duration hold_for = 3; // @gotags: default:"5s"
 }
 
 // Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
 message NestedCircuit {
+  // Maps input port names to input ports.
   map<string, InPort> in_ports_map = 1;
+  // Maps output port names to output ports.
   map<string, OutPort> out_ports_map = 2;
 
+  // List of components in the nested circuit.
   repeated Component components = 3; // @gotags: validate:"dive"
   // Name of the nested circuit component. This name is displayed by graph visualization tools.
   string name = 4;
@@ -1605,6 +1345,7 @@ message NestedSignalIngress {
 
   // Output ports for the NestedSignalIngress component.
   Outs out_ports = 1;
+  // Name of the port.
   string port_name = 2;
 }
 
@@ -1618,6 +1359,7 @@ message NestedSignalEgress {
 
   // Input ports for the NestedSignalEgress component.
   Ins in_ports = 1;
+  // Name of the port.
   string port_name = 2;
 }
 
@@ -1635,8 +1377,14 @@ message AIMDConcurrencyController {
   message Outs {
     // Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
     OutPort is_overload = 1;
-    // Load multiplier is the ratio of desired concurrency to the incoming concurrency.
-    OutPort load_multiplier = 2;
+    // Desired Load multiplier is the ratio of desired concurrency to the incoming concurrency.
+    OutPort desired_load_multiplier = 2;
+    // Observed Load multiplier is the ratio of accepted concurrency to the incoming concurrency.
+    OutPort observed_load_multiplier = 3;
+    // Accepted concurrency is the number of concurrent requests that are accepted by the service.
+    OutPort accepted_concurrency = 4;
+    // IncomingConcurrency is the number of concurrent requests that are received by the service.
+    OutPort incoming_concurrency = 5;
   }
 
   // Input ports for the AIMDConcurrencyController component.
@@ -1646,20 +1394,10 @@ message AIMDConcurrencyController {
   Outs out_ports = 2;
 
   // Flow Selector decides the service and flows at which the concurrency limiter is applied.
-  FlowSelector flow_selector = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  FlowSelector flow_selector = 3; // @gotags: validate:"required"
 
   // Scheduler parameters.
-  Scheduler.Parameters scheduler_parameters = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-validate"
-      value: {string_value: "required"}
-    }
-  }]; // @gotags: validate:"required"
+  Scheduler.Parameters scheduler_parameters = 4; // @gotags: validate:"required"
 
   // Gradient parameters for the controller. Defaults to:
   // * slope = -1
@@ -1668,35 +1406,17 @@ message AIMDConcurrencyController {
   GradientController.Parameters gradient_parameters = 5;
 
   // Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
-  double concurrency_limit_multiplier = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {number_value: 2}
-    }
-  }]; // @gotags: default:"2.0"
+  double max_load_multiplier = 6; // @gotags: default:"2.0"
 
-  // Linear increment to concurrency in each execution tick when the system is not in overloaded state.
-  double concurrency_linear_increment = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {number_value: 5}
-    }
-  }]; // @gotags: default:"5.0"
-
-  // Scale factor to multiply square root of current accepted concurrrency. This, along with concurrencyLinearIncrement helps calculate overall concurrency increment in each tick. Concurrency is rapidly ramped up in each execution cycle during normal (non-overload) state (integral effect).
-  double concurrency_sqrt_increment_multiplier = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    extensions: {
-      key: "x-go-default"
-      value: {number_value: 1}
-    }
-  }]; // @gotags: default:"1.0"
+  // Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+  double load_multiplier_linear_increment = 7; // @gotags: default:"0.0025"
 
   // Configuration for embedded alerter.
-  Alerter.Parameters alerter_parameters = 9;
+  Alerter.Parameters alerter_parameters = 8;
 
   // Configuration key for load actuation.
-  string dynamic_config_key = 10;
+  string dynamic_config_key = 9;
 
   // Default configuration.
-  LoadActuator.DynamicConfig default_config = 11;
+  LoadActuator.DynamicConfig default_config = 10;
 }

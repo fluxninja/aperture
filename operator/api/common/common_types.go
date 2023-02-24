@@ -352,7 +352,7 @@ type CommonConfigSpec struct {
 type ServerConfigSpec struct {
 	// Listener configuration.
 	//+kubebuilder:validation:Optional
-	listener.ListenerConfig `json:",inline"`
+	Listener listener.ListenerConfig `json:"listener"`
 
 	// GRPC server configuration.
 	//+kubebuilder:validation:Optional

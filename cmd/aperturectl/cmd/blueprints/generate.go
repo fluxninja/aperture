@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ghodss/yaml"
 	"github.com/google/go-jsonnet"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slices"
-	"gopkg.in/yaml.v3"
 
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/apply"
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
@@ -25,6 +25,7 @@ func init() {
 	generateCmd.Flags().BoolVar(&applyPolicy, "apply", false, "Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed")
 	generateCmd.Flags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
 	generateCmd.Flags().BoolVar(&noYAMLModeline, "no-yaml-modeline", false, "Do not add YAML language server modeline to generated YAML files")
+	generateCmd.Flags().BoolVar(&noValidate, "no-validation", false, "Do not validate values.yaml file")
 }
 
 var generateCmd = &cobra.Command{
@@ -34,8 +35,6 @@ var generateCmd = &cobra.Command{
 Use this command to generate Aperture Policy related resources like Kubernetes Custom Resource, Grafana Dashboards and graphs in DOT and Mermaid format.`,
 	SilenceErrors: true,
 	Example: `aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml
-
-aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --version latest
 
 aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --apply`,
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -74,19 +73,35 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 			return err
 		}
 
-		blueprintDir = filepath.Join(blueprintsDir, getRelPath(blueprintsDir))
-
-		err = blueprintExists(blueprintDir, blueprintName)
+		err = blueprintExists(blueprintsDir, blueprintName)
 		if err != nil {
 			return err
+		}
+		if !noValidate {
+			var valuesBytes []byte
+			valuesBytes, err = os.ReadFile(valuesFile)
+			if err != nil {
+				return err
+			}
+			if strings.Contains(string(valuesBytes), "__REQUIRED_FIELD__") {
+				return fmt.Errorf("values file contains '__REQUIRED_FIELD__' placeholder value")
+			}
+
+			// validate values.yaml against the json schema
+			schemaFile := filepath.Join(blueprintsDir, blueprintName, "gen/definitions.json")
+			definitionsFile := filepath.Join(blueprintsDir, "gen/jsonschema/_definitions.json")
+			err = utils.ValidateWithJSONSchema(schemaFile, []string{definitionsFile}, valuesFile)
+			if err != nil {
+				return err
+			}
 		}
 
 		vm := jsonnet.MakeVM()
 		vm.Importer(&jsonnet.FileImporter{
-			JPaths: []string{blueprintsDir},
+			JPaths: []string{blueprintsURIRoot},
 		})
 
-		importPath := fmt.Sprintf("%s/%s", blueprintDir, blueprintName)
+		importPath := fmt.Sprintf("%s/%s", blueprintsDir, blueprintName)
 
 		bundleStr, err := vm.EvaluateAnonymousSnippet("bundle.libsonnet", fmt.Sprintf(`
 		local bundle = import '%s/bundle.libsonnet';
@@ -192,10 +207,10 @@ func saveYAMLFile(categoryName, path, filename string, content map[string]interf
 			var schemaURL string
 			// if content contains kind: Policy then use the policy schema
 			if kind, ok := content["kind"]; ok && kind == "Policy" {
-				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintDir, "gen/jsonschema/_definitions.json#/definitions/PolicyCustomResource"))
+				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintsDir, "gen/jsonschema/_definitions.json#/definitions/PolicyCustomResource"))
 			} else {
 				// prepend the file with yaml-language-server modeline that points to the schema
-				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintDir, "gen/jsonschema/_definitions.json#/definitions/Policy"))
+				schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintsDir, "gen/jsonschema/_definitions.json#/definitions/Policy"))
 			}
 			yamlBytes = append([]byte(fmt.Sprintf("# yaml-language-server: $schema=%s\n", schemaURL)), yamlBytes...)
 		}
@@ -206,6 +221,15 @@ func saveYAMLFile(categoryName, path, filename string, content map[string]interf
 	err = os.WriteFile(filePath, yamlBytes, 0o600)
 	if err != nil {
 		return err
+	}
+
+	if !noValidate && categoryName == "policies" {
+		// validate the generated yaml against the json schema
+		schemaFile := filepath.Join(blueprintsDir, "gen/jsonschema/_definitions.json")
+		err = utils.ValidateWithJSONSchema(schemaFile, []string{}, filePath)
+		if err != nil {
+			log.Warn().Msgf("failed to validate generated policy yaml against the json schema: %s", err)
+		}
 	}
 
 	return generateGraphs(yamlBytes, filePath)
@@ -260,7 +284,7 @@ func setupOutputDir(outputPath string) (string, error) {
 func generateGraphs(content []byte, contentPath string) error {
 	policy := &policyv1alpha1.Policy{}
 	err := yaml.Unmarshal(content, policy)
-	if err != nil || policy.Kind == "" {
+	if err != nil || policy.Kind != "Policy" {
 		return nil
 	}
 

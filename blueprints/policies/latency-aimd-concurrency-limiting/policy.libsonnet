@@ -74,9 +74,8 @@ function(cfg) {
               + aimdConcurrencyController.withFlowSelector(cc.flow_selector)
               + aimdConcurrencyController.withSchedulerParameters(cc.scheduler)
               + aimdConcurrencyController.withGradientParameters(cc.gradient)
-              + aimdConcurrencyController.withConcurrencyLimitMultiplier(cc.concurrency_limit_multiplier)
-              + aimdConcurrencyController.withConcurrencyLinearIncrement(cc.concurrency_linear_increment)
-              + aimdConcurrencyController.withConcurrencySqrtIncrementMultiplier(cc.concurrency_sqrt_increment_multiplier)
+              + aimdConcurrencyController.withMaxLoadMultiplier(cc.max_load_multiplier)
+              + aimdConcurrencyController.withLoadMultiplierLinearIncrement(cc.load_multiplier_linear_increment)
               + aimdConcurrencyController.withAlerterParameters(cc.alerter)
               + aimdConcurrencyController.withDynamicConfigKey('concurrency_controller')
               + aimdConcurrencyController.withDefaultConfig(params.concurrency_controller.default_config)
@@ -86,7 +85,10 @@ function(cfg) {
               })
               + aimdConcurrencyController.withOutPorts({
                 is_overload: port.withSignalName('IS_OVERLOAD'),
-                load_multiplier: port.withSignalName('LOAD_MULTIPLIER'),
+                desired_load_multiplier: port.withSignalName('DESIRED_LOAD_MULTIPLIER'),
+                observed_load_multiplier: port.withSignalName('OBSERVED_LOAD_MULTIPLIER'),
+                accepted_concurrency: port.withSignalName('ACCEPTED_CONCURRENCY'),
+                incoming_concurrency: port.withSignalName('INCOMING_CONCURRENCY'),
               }),
             ),
           ),

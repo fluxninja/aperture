@@ -1304,11 +1304,18 @@ spec:
                       scheduler:
                         description: Scheduler settings.
                         properties:
-                          max_concurrent_jobs:
+                          blocking_execution:
+                            description: When true, the scheduler will run jobs synchronously,
+                              waiting for each execution instance of the job to return
+                              before starting the next execution. Running with this
+                              option effectively serializes all job execution.
+                            type: boolean
+                          worker_limit:
                             description: Limits how many jobs can be running at the
                               same time. This is useful when running resource intensive
                               jobs and a precise start time is not critical. 0 = no
-                              limit.
+                              limit. If BlockingExecution is set, then WorkerLimit
+                              is ignored.
                             type: integer
                         type: object
                       service:
@@ -1321,11 +1328,6 @@ spec:
                             type: string
                           execution_timeout:
                             description: Execution timeout
-                            type: string
-                          initial_delay:
-                            description: Initial delay to start the job. Zero value
-                              will schedule the job immediately. Negative value will
-                              wait for next scheduled interval.
                             type: string
                           initially_healthy:
                             description: Sets whether the job is initially healthy
@@ -1568,11 +1570,18 @@ spec:
                       scheduler:
                         description: Scheduler settings.
                         properties:
-                          max_concurrent_jobs:
+                          blocking_execution:
+                            description: When true, the scheduler will run jobs synchronously,
+                              waiting for each execution instance of the job to return
+                              before starting the next execution. Running with this
+                              option effectively serializes all job execution.
+                            type: boolean
+                          worker_limit:
                             description: Limits how many jobs can be running at the
                               same time. This is useful when running resource intensive
                               jobs and a precise start time is not critical. 0 = no
-                              limit.
+                              limit. If BlockingExecution is set, then WorkerLimit
+                              is ignored.
                             type: integer
                         type: object
                       service:
@@ -1585,11 +1594,6 @@ spec:
                             type: string
                           execution_timeout:
                             description: Execution timeout
-                            type: string
-                          initial_delay:
-                            description: Initial delay to start the job. Zero value
-                              will schedule the job immediately. Negative value will
-                              wait for next scheduled interval.
                             type: string
                           initially_healthy:
                             description: Sets whether the job is initially healthy
@@ -1628,9 +1632,6 @@ spec:
                   server:
                     description: Server configuration.
                     properties:
-                      addr:
-                        description: Address to bind to in the form of [host%zone]:port
-                        type: string
                       grpc:
                         description: GRPC server configuration.
                         properties:
@@ -1682,14 +1683,21 @@ spec:
                             description: Write timeout
                             type: string
                         type: object
-                      keep_alive:
-                        description: Keep-alive period - 0 = enabled if supported
-                          by protocol or OS. If negative then keep-alive is disabled.
-                        type: string
-                      network:
-                        description: TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6"
-                          (IPv6-only)
-                        type: string
+                      listener:
+                        description: Listener configuration.
+                        properties:
+                          addr:
+                            description: Address to bind to in the form of [host%zone]:port
+                            type: string
+                          keep_alive:
+                            description: Keep-alive period - 0 = enabled if supported
+                              by protocol or OS. If negative then keep-alive is disabled.
+                            type: string
+                          network:
+                            description: TCP networks - "tcp", "tcp4" (IPv4-only),
+                              "tcp6" (IPv6-only)
+                            type: string
+                        type: object
                       tls:
                         description: TLS configuration.
                         properties:
@@ -1859,11 +1867,6 @@ spec:
                             type: string
                           execution_timeout:
                             description: Execution timeout
-                            type: string
-                          initial_delay:
-                            description: Initial delay to start the job. Zero value
-                              will schedule the job immediately. Negative value will
-                              wait for next scheduled interval.
                             type: string
                           initially_healthy:
                             description: Sets whether the job is initially healthy

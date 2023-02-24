@@ -35,16 +35,18 @@ type testGroupConfig struct {
 // When a job is only scheduled and not run, it's number of run should be 0
 func (gc *testGroupConfig) OnJobScheduled() {
 	for _, job := range gc.jobs {
-		jobInfo := gc.jobGroup.JobInfo(job.Name())
-		Expect(jobInfo.RunCount).To(Equal(0))
+		jobInfo, err := gc.jobGroup.JobInfo(job.Name())
+		Expect(err).NotTo(HaveOccurred())
+		Expect(jobInfo.ExecuteCount).To(Equal(0))
 	}
 }
 
 // Estimate the number of runs for the job based on the provided configuration and compare with the actual result
 func (gc *testGroupConfig) OnJobCompleted(_ *statusv1.Status, _ JobStats) {
 	for _, job := range gc.jobs {
-		jobInfo := gc.jobGroup.JobInfo(job.Name())
-		Expect(jobInfo.RunCount).To(Equal(gc.jobRunConfig.expectedNoOfRuns))
+		jobInfo, err := gc.jobGroup.JobInfo(job.Name())
+		Expect(err).NotTo(HaveOccurred())
+		Expect(jobInfo.ExecuteCount).To(Equal(gc.jobRunConfig.expectedNoOfRuns))
 	}
 }
 
@@ -67,12 +69,11 @@ var _ = Describe("Jobs", func() {
 		alerter := alerts.NewSimpleAlerter(100)
 		rootRegistry := status.NewRegistry(log.GetGlobalLogger(), alerter)
 		jobConfig = JobConfig{
-			InitialDelay:     config.MakeDuration(0),
 			ExecutionPeriod:  config.MakeDuration(time.Millisecond * 200),
 			ExecutionTimeout: config.MakeDuration(time.Millisecond * 200),
 			InitiallyHealthy: false,
 		}
-		jobGroup, err = NewJobGroup(rootRegistry, 10, RescheduleMode, groupWatchers)
+		jobGroup, err = NewJobGroup(rootRegistry, JobGroupConfig{}, groupWatchers)
 		Expect(err).NotTo(HaveOccurred())
 
 		addOne = func(ctx context.Context) (proto.Message, error) {
@@ -127,19 +128,18 @@ var _ = Describe("Jobs", func() {
 		groupConfig := &testGroupConfig{
 			jobs: []Job{job},
 			jobRunConfig: testJobRunConfig{
-				sleepTime:         time.Millisecond * 300,
+				sleepTime:         time.Millisecond * 1000,
 				expectedStatusMsg: "OK",
-				expectedNoOfRuns:  2,
+				expectedNoOfRuns:  5,
 			},
 			expectedScheduling: true,
 			jobGroup:           jobGroup,
 		}
 		runJobGroup(jobGroup, groupConfig, jobConfig)
-		Expect(counter).To(Equal(2))
+		Expect(counter).To(Equal(5))
 	})
 
 	It("checks for timed out job", func() {
-		jobConfig.InitialDelay = config.MakeDuration(time.Millisecond * 100)
 		job := NewBasicJob("timeout-job",
 			func(ctx context.Context) (proto.Message, error) {
 				time.Sleep(time.Millisecond * 4000)
@@ -157,7 +157,7 @@ var _ = Describe("Jobs", func() {
 			jobRunConfig: testJobRunConfig{
 				sleepTime:         time.Millisecond * 2000,
 				expectedStatusMsg: "Timeout",
-				expectedNoOfRuns:  11, // Job gets scheduled 10 times within 2 seconds + 1 scheduling caused by manual trigger if job is stuck
+				expectedNoOfRuns:  1,
 			},
 			expectedScheduling: false,
 			jobGroup:           jobGroup,
@@ -173,7 +173,7 @@ var _ = Describe("Jobs", func() {
 		groupConfig := &testGroupConfig{
 			jobs: []Job{job, job2},
 			jobRunConfig: testJobRunConfig{
-				sleepTime:         time.Millisecond * 300,
+				sleepTime:         time.Millisecond * 500,
 				expectedStatusMsg: "OK",
 				expectedNoOfRuns:  2,
 			},
@@ -193,7 +193,7 @@ var _ = Describe("Jobs", func() {
 		groupConfig := &testGroupConfig{
 			jobs: []Job{multiJob},
 			jobRunConfig: testJobRunConfig{
-				sleepTime:         time.Millisecond * 300,
+				sleepTime:         time.Millisecond * 500,
 				expectedStatusMsg: "OK",
 				expectedNoOfRuns:  2,
 			},
@@ -220,7 +220,7 @@ var _ = Describe("Jobs", func() {
 		groupConfig := &testGroupConfig{
 			jobs: []Job{multiJob, multiJob2},
 			jobRunConfig: testJobRunConfig{
-				sleepTime:         time.Millisecond * 300,
+				sleepTime:         time.Millisecond * 500,
 				expectedStatusMsg: "OK",
 				expectedNoOfRuns:  2,
 			},
@@ -265,7 +265,8 @@ var _ = Describe("Jobs", func() {
 		// error when registering job multiple times, written here to achieve more coverage
 		err = jobGroup.DeregisterJob(job.Name())
 		Expect(err).To(HaveOccurred())
-		Expect(jobGroup.JobInfo(job.Name())).To(BeNil())
+		_, err = jobGroup.JobInfo(job.Name())
+		Expect(err).To(HaveOccurred())
 	})
 })
 
@@ -290,7 +291,7 @@ func runJobGroup(jobGroup *JobGroup, groupConfig *testGroupConfig, jobConfig Job
 
 		if groupConfig.jobRunConfig.expectedStatusMsg == "Timeout" {
 			checkStatusMessage(livenessReg, groupConfig.jobRunConfig.expectedStatusMsg, true)
-			jobGroup.TriggerJob(job.Name())
+			jobGroup.TriggerJob(job.Name(), time.Duration(0))
 		} else {
 			checkStatusMessage(livenessReg, groupConfig.jobRunConfig.expectedStatusMsg, false)
 		}

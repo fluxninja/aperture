@@ -58,7 +58,7 @@ var _ = Describe("ConfigMap for Agent", func() {
 					ConfigSpec: agentv1alpha1.AgentConfigSpec{
 						CommonConfigSpec: common.CommonConfigSpec{
 							Server: common.ServerConfigSpec{
-								ListenerConfig: listener.ListenerConfig{
+								Listener: listener.ListenerConfig{
 									Addr: ":80",
 								},
 							},
@@ -149,9 +149,9 @@ var _ = Describe("ConfigMap for Agent", func() {
 			}
 
 			result, err := configMapForAgentConfig(instance.DeepCopy(), scheme.Scheme)
-
 			Expect(err).NotTo(HaveOccurred())
-			Expect(result.Data).To(Equal(expected.Data))
+
+			CompareComfigMap(result, expected)
 		})
 	})
 })

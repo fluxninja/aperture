@@ -5,8 +5,8 @@ client:
     http: ""
     https: ""
 dist_cache:
-  bind_addr: :3320
   memberlist_advertise_addr: ""
+  bind_addr: :3320
   memberlist_bind_addr: :3322
   replica_count: 1
 etcd:
@@ -29,8 +29,8 @@ fluxninja_plugin:
   client:
     grpc:
       backoff:
-        base_delay: 1s
         jitter: 0.2
+        base_delay: 1s
         max_delay: 120s
         multiplier: 1.6
       insecure: false
@@ -94,11 +94,11 @@ kubernetes_client:
   write_buffer_size: 0
 liveness:
   scheduler:
-    max_concurrent_jobs: 0
+    blocking_execution: false
+    worker_limit: 0
   service:
     execution_period: 10s
     execution_timeout: 5s
-    initial_delay: 0s
     initially_healthy: false
 log:
   level: info
@@ -147,11 +147,11 @@ prometheus:
   address: http://aperture-prometheus-server:80
 readiness:
   scheduler:
-    max_concurrent_jobs: 0
+    blocking_execution: false
+    worker_limit: 0
   service:
     execution_period: 10s
     execution_timeout: 5s
-    initial_delay: 0s
     initially_healthy: false
 sentry_plugin:
   attach_stack_trace: true
@@ -162,7 +162,6 @@ sentry_plugin:
   sample_rate: 1
   traces_sample_rate: 0.2
 server:
-  addr: :80
   grpc:
     connection_timeout: 120s
     enable_reflection: false
@@ -187,8 +186,10 @@ server:
     read_header_timeout: 10s
     read_timeout: 10s
     write_timeout: 45s
-  keep_alive: 180s
-  network: tcp
+  listener:
+    addr: :80
+    keep_alive: 180s
+    network: tcp
   tls:
     allowed_cn: ""
     cert_file: ""
@@ -236,7 +237,6 @@ watchdog:
   job:
     execution_period: 10s
     execution_timeout: 5s
-    initial_delay: 0s
     initially_healthy: false
   system:
     adaptive_policy:

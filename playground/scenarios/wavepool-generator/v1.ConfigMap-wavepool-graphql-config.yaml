@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  test.js: "${NINJA_WAVEPOOL_JS}"
+kind: ConfigMap
+metadata:
+  name: wavepool-config
+  namespace: demoapp

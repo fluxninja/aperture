@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/base64"
 	"regexp"
+	"strings"
 	"time"
 
-	ext_authz "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
-	envoy_type "github.com/envoyproxy/go-control-plane/envoy/type/v3"
+	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
+	typev3 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	"github.com/open-policy-agent/opa-envoy-plugin/envoyauth"
 	"github.com/open-policy-agent/opa/logging"
 	"google.golang.org/genproto/googleapis/rpc/code"
@@ -76,11 +77,11 @@ func sanitizeBaggageHeaderValue(value string) string {
 // Check
 // * computes flow labels and returns them via DynamicMetadata.
 // * makes the allow/deny decision - sends flow labels to flow control's Check function.
-func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_authz.CheckResponse, error) {
+func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.CheckResponse, error) {
 	// record the start time of the request
 	start := time.Now()
 
-	createExtAuthzResponse := func(checkResponse *flowcontrolv1.CheckResponse) *ext_authz.CheckResponse {
+	createExtAuthzResponse := func(checkResponse *flowcontrolv1.CheckResponse) *authv3.CheckResponse {
 		// We don't care about the particular format we send the CheckResponse,
 		// Envoy can treat is as black-box. The only thing we care about is for
 		// it to be deserializable by logs processing pipeline.
@@ -101,7 +102,7 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		checkResponse.Start = timestamppb.New(start)
 		checkResponse.End = timestamppb.New(end)
 
-		return &ext_authz.CheckResponse{
+		return &authv3.CheckResponse{
 			DynamicMetadata: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
 					otelconsts.ApertureCheckResponseLabel: structpb.NewStringValue(checkResponseBase64),
@@ -125,6 +126,11 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	}
 
 	svcs := h.serviceGetter.ServicesFromContext(ctx)
+
+	sourceAddress := req.GetAttributes().GetSource().GetAddress().GetSocketAddress()
+	sourceSvcs := h.serviceGetter.ServicesFromSocketAddress(sourceAddress)
+	destinationAddress := req.GetAttributes().GetDestination().GetAddress().GetSocketAddress()
+	destinationSvcs := h.serviceGetter.ServicesFromSocketAddress(destinationAddress)
 
 	logger := logging.New().WithFields(map[string]interface{}{"rego": "input"})
 	skipRequestBodyParse := false
@@ -176,6 +182,8 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 	checkResponse.TelemetryFlowLabels = flowLabels
 	// add control point type
 	checkResponse.TelemetryFlowLabels[otelconsts.ApertureControlPointTypeLabel] = otelconsts.HTTPControlPoint
+	checkResponse.TelemetryFlowLabels[otelconsts.ApertureSourceServiceLabel] = strings.Join(sourceSvcs, ",")
+	checkResponse.TelemetryFlowLabels[otelconsts.ApertureDestinationServiceLabel] = strings.Join(destinationSvcs, ",")
 
 	resp := createExtAuthzResponse(checkResponse)
 
@@ -184,8 +192,8 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		resp.Status = &status.Status{
 			Code: int32(code.Code_OK),
 		}
-		resp.HttpResponse = &ext_authz.CheckResponse_OkResponse{
-			OkResponse: &ext_authz.OkHttpResponse{
+		resp.HttpResponse = &authv3.CheckResponse_OkResponse{
+			OkResponse: &authv3.OkHttpResponse{
 				Headers: newHeaders,
 			},
 		}
@@ -195,18 +203,18 @@ func (h *Handler) Check(ctx context.Context, req *ext_authz.CheckRequest) (*ext_
 		}
 		switch checkResponse.RejectReason {
 		case flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED:
-			resp.HttpResponse = &ext_authz.CheckResponse_DeniedResponse{
-				DeniedResponse: &ext_authz.DeniedHttpResponse{
-					Status: &envoy_type.HttpStatus{
-						Code: envoy_type.StatusCode_TooManyRequests,
+			resp.HttpResponse = &authv3.CheckResponse_DeniedResponse{
+				DeniedResponse: &authv3.DeniedHttpResponse{
+					Status: &typev3.HttpStatus{
+						Code: typev3.StatusCode_TooManyRequests,
 					},
 				},
 			}
 		case flowcontrolv1.CheckResponse_REJECT_REASON_CONCURRENCY_LIMITED:
-			resp.HttpResponse = &ext_authz.CheckResponse_DeniedResponse{
-				DeniedResponse: &ext_authz.DeniedHttpResponse{
-					Status: &envoy_type.HttpStatus{
-						Code: envoy_type.StatusCode_ServiceUnavailable,
+			resp.HttpResponse = &authv3.CheckResponse_DeniedResponse{
+				DeniedResponse: &authv3.DeniedHttpResponse{
+					Status: &typev3.HttpStatus{
+						Code: typev3.StatusCode_ServiceUnavailable,
 					},
 				},
 			}

@@ -37,10 +37,6 @@ local policyResource = latencyAIMDPolicy({
     },
     // highlight-start
     scheduler+: {
-      timeout_factor: 0.5,
-      default_workload_parameters: {
-        priority: 20,
-      },
       workloads: [
         workload.new()
         + workload.withParameters(workloadParameters.withPriority(50))

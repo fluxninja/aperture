@@ -27,9 +27,6 @@ policy:
       flow_matcher:
         control_point: ingress
     scheduler:
-      timeout_factor: 0.5
-      default_workload_parameters:
-        priority: 20
       workloads:
         - label_matcher:
             match_labels:
@@ -41,13 +38,11 @@ policy:
               http.request.header.user_type: subscriber
           parameters:
             priority: 200
-    default_config:
-      dry_run: false
   components:
     - decider:
         in_ports:
           lhs:
-            signal_name: LOAD_MULTIPLIER
+            signal_name: OBSERVED_LOAD_MULTIPLIER
           rhs:
             constant_signal:
               value: 1
@@ -58,10 +53,10 @@ policy:
         true_for: 30s
     - switcher:
         in_ports:
-          on_false:
+          off_signal:
             constant_signal:
               value: 10
-          on_true:
+          on_signal:
             constant_signal:
               value: 0
           switch:

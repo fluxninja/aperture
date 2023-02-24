@@ -17,9 +17,16 @@ var (
 	errExistingJob = errors.New("job with same name already exists")
 )
 
+// JobInfo contains information such as run count, last run time, etc. for a Job.
+type JobInfo struct {
+	LastExecuteTime time.Time
+	ExecuteCount    int
+}
+
 type jobTracker struct {
 	job            Job
 	statusRegistry status.Registry
+	jobInfo        JobInfo
 }
 
 func newJobTracker(job Job, statusRegistry status.Registry) *jobTracker {
@@ -63,7 +70,6 @@ func (gt *groupTracker) updateStatus(job Job, s *statusv1.Status) error {
 	}
 
 	tracker.statusRegistry.SetStatus(s)
-
 	return nil
 }
 
@@ -160,16 +166,37 @@ func (gt *groupTracker) getJobs() []Job {
 	return jobs
 }
 
+func (gt *groupTracker) updateJobInfo(job Job, startTime time.Time) error {
+	gt.mu.Lock()
+	defer gt.mu.Unlock()
+
+	tracker, ok := gt.trackers[job.Name()]
+	if !ok {
+		return errInvalidJob
+	}
+
+	tracker.jobInfo.LastExecuteTime = startTime
+	tracker.jobInfo.ExecuteCount++
+	return nil
+}
+
 func (gt *groupTracker) execute(ctx context.Context, job Job) (proto.Message, error) {
 	gt.groupWatchers.OnJobScheduled(job.Name())
 	job.JobWatchers().OnJobScheduled()
 
 	startTime := time.Now()
+
+	err := gt.updateJobInfo(job, startTime)
+	if err != nil {
+		return nil, err
+	}
+
 	details, err := job.Execute(ctx)
 	if err != nil {
 		return nil, err
 	}
-	duration := time.Since(startTime)
+	endTime := time.Now()
+	duration := endTime.Sub(startTime)
 
 	s := status.NewStatus(details, err)
 	err = gt.updateStatus(job, s)
