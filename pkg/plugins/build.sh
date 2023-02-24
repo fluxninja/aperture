@@ -21,14 +21,15 @@ LDFLAGS="\
 "
 
 if [ -n "${RACE:-}" ]; then
-  build_args=( -race )
+	build_args=(-race)
 fi
 
 build_args+=(
-  -buildmode=plugin
-  --ldflags "${LDFLAGS}"
-  -o "${TARGET}"
-  "${SOURCE}"
+	-x -v
+	-buildmode=plugin
+	--ldflags "${LDFLAGS}"
+	-o "${TARGET}"
+	"${SOURCE}"
 )
 
 go build "${build_args[@]}"

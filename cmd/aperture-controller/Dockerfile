@@ -1,10 +1,10 @@
-# syntax=docker/dockerfile:1
-FROM golang:1.19-bullseye AS base
+# syntax=docker/dockerfile:1.4
+FROM golang:1.20 AS base
 
 WORKDIR /src
 COPY --link . .
 
-RUN --mount=type=cache,target=/go/pkg/ \
+RUN --mount=type=cache,target=/go/pkg/,id=controller \
   go mod download
 
 # App build
@@ -18,8 +18,8 @@ ARG RACE
 ENV RACE=${RACE}
 
 FROM base AS builder
-RUN --mount=type=cache,target=/go/pkg/,readonly \
-  --mount=type=cache,target=/root/.cache/go-build/,sharing=private \
+RUN --mount=type=cache,target=/go/pkg/,id=controller,readonly \
+  --mount=type=cache,target=/root/.cache/go-build/,id=controller,sharing=private \
   CGO_ENABLED=1 TARGET="/aperture-controller" PREFIX="aperture" SOURCE="./cmd/aperture-controller" \
   LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
   ./pkg/info/build.sh
@@ -27,8 +27,8 @@ RUN --mount=type=cache,target=/go/pkg/,readonly \
 
 # BUILD PLUGINS STAGE
 FROM builder AS plugins-builder
-RUN --mount=type=cache,target=/go/pkg/,readonly \
-  --mount=type=cache,target=/root/.cache/go-build/,sharing=private \
+RUN --mount=type=cache,target=/go/pkg/,id=controller,readonly \
+  --mount=type=cache,target=/root/.cache/go-build/,id=controller,sharing=private \
   /bin/bash -c \
   'set -euo pipefail; \
   shopt -s nullglob; \

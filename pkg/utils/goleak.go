@@ -30,6 +30,7 @@ var ignoreFuncs = []string{
 	"github.com/DataDog/datadog-agent/pkg/trace/metrics/timing.(*Set).Autoreport.func1",
 	"github.com/SAP/go-hdb/driver.(*metrics).collect",
 	"internal/poll.runtime_pollWait",
+	"database/sql.(*DB).connectionOpener",
 }
 
 // GoLeakDetector holds options for the goleak detector.
