@@ -3,10 +3,13 @@ set -eux
 
 # This script builds a Go plugin and injects build-time variables.
 
-BUILD_TIME=$(date --rfc-3339=seconds)
+VERSION=${VERSION:-0.0.1}
+BUILD_TIME=${BUILD_TIME:-$(date -Iseconds)}
 GOOS=$(go env GOOS)
 GOARCH=$(go env GOARCH)
 HOSTNAME=$(hostname)
+PREFIX="${PREFIX:-aperture}"
+
 PLUGIN_FILE=$(basename -- "${TARGET}")
 PLUGIN="${PLUGIN_FILE%.*}"
 
@@ -25,7 +28,6 @@ if [ -n "${RACE:-}" ]; then
 fi
 
 build_args+=(
-	-x -v
 	-buildmode=plugin
 	--ldflags "${LDFLAGS}"
 	-o "${TARGET}"
