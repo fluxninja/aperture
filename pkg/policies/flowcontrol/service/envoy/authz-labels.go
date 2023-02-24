@@ -4,7 +4,8 @@ import (
 	"strconv"
 	"strings"
 
-	ext_authz "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
+	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
+
 	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
 )
 
@@ -17,7 +18,7 @@ const (
 )
 
 // AuthzRequestToFlowLabels converts request attributes to new FlowLabels.
-func AuthzRequestToFlowLabels(request *ext_authz.AttributeContext_Request) flowlabel.FlowLabels {
+func AuthzRequestToFlowLabels(request *authv3.AttributeContext_Request) flowlabel.FlowLabels {
 	capacity := numRequestLabels + len(request.GetHttp().GetHeaders())
 	flowLabels := make(flowlabel.FlowLabels, capacity)
 	if request != nil {

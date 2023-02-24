@@ -29,7 +29,7 @@ service FlowPreviewService {
 }
 
 message PreviewRequest {
-  // Number of samples to collect. Defaults to 10.
+  // Number of samples to collect.
   int64 samples = 1; // @gotags: validate:"min=1" default:"10"
   // Control point to preview.
   string control_point = 2; // @gotags: validate:"required"

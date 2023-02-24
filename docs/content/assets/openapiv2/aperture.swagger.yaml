@@ -21,11 +21,7 @@ definitions:
                 x-go-tag-validate: required
             gradient_parameters:
                 $ref: '#/definitions/GradientControllerParameters'
-                title: |-
-                    Gradient parameters for the controller. Defaults to:
-                    * slope = -1
-                    * min_gradient = 0.1
-                    * max_gradient = 1
+                description: Gradient parameters for the controller.
             in_ports:
                 $ref: '#/definitions/AIMDConcurrencyControllerIns'
                 description: Input ports for the AIMDConcurrencyController component.
@@ -54,9 +50,6 @@ definitions:
                     Scheduler parameters.
 
                 x-go-tag-validate: required
-        required:
-            - flow_selector
-            - scheduler_parameters
         type: object
     AIMDConcurrencyControllerIns:
         description: Inputs for the AIMDConcurrencyController component.
@@ -119,11 +112,8 @@ definitions:
                 description: Input ports for the Alerter component.
             parameters:
                 $ref: '#/definitions/AlerterParameters'
-                description: ""
                 title: Alerter configuration
                 x-go-tag-validate: required
-        required:
-            - parameters
         type: object
     AlerterIns:
         description: Inputs for the Alerter component.
@@ -163,9 +153,14 @@ definitions:
                 description: |+
                     Severity of the alert, one of 'info', 'warn' or 'crit'.
 
+                enum:
+                    - info
+                    - warn
+                    - crit
                 type: string
                 x-go-tag-default: info
                 x-go-tag-validate: oneof=info warn crit
+                x-oneof: info | warn | crit
         required:
             - alert_name
         type: object
@@ -228,8 +223,17 @@ definitions:
                     The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
                     In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
 
+                enum:
+                    - add
+                    - sub
+                    - mul
+                    - div
+                    - xor
+                    - lshift
+                    - rshift
                 type: string
                 x-go-tag-validate: oneof=add sub mul div xor lshift rshift
+                x-oneof: add | sub | mul | div | xor | lshift | rshift
             out_ports:
                 $ref: '#/definitions/ArithmeticCombinatorOuts'
                 description: Output ports for the Arithmetic Combinator component.
@@ -418,10 +422,10 @@ definitions:
                     [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
                     how to extract and propagate flow labels with that key.
 
+                minProperties: 1
                 type: object
                 x-go-tag-validate: required,gt=0,dive,keys,required,endkeys,required
         required:
-            - flow_selector
             - rules
         title: Set of classification rules sharing a common selector
         type: object
@@ -628,18 +632,24 @@ definitions:
                     output signals.
 
                 x-go-tag-validate: required
-        required:
-            - flow_selector
-            - scheduler
         title: Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
         type: object
     ConstantSignal:
         description: Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
         properties:
             special_value:
-                title: '@gotags: validate:"oneof=NaN +Inf -Inf"'
+                description: |+
+                    A special value such as NaN, +Inf, -Inf.
+
+                enum:
+                    - NaN
+                    - +Inf
+                    - -Inf
                 type: string
+                x-go-tag-validate: oneof=NaN +Inf -Inf
+                x-oneof: NaN | +Inf | -Inf
             value:
+                description: A constant value.
                 format: double
                 type: number
         type: object
@@ -717,8 +727,16 @@ definitions:
                 description: |+
                     Comparison operator that computes operation on lhs and rhs input signals.
 
+                enum:
+                    - gt
+                    - lt
+                    - gte
+                    - lte
+                    - eq
+                    - neq
                 type: string
                 x-go-tag-validate: oneof=gt lt gte lte eq neq
+                x-oneof: gt | lt | gte | lte | eq | neq
             out_ports:
                 $ref: '#/definitions/DeciderOuts'
                 description: Output ports for the Decider component.
@@ -815,8 +833,6 @@ definitions:
                     Parameters for the EMA component.
 
                 x-go-tag-validate: required
-        required:
-            - parameters
         title: Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings
         type: object
     EMAIns:
@@ -862,6 +878,7 @@ definitions:
                     Correction factor to apply on the output value if its in violation of the max envelope.
 
                 format: double
+                minimum: 0
                 type: number
                 x-go-tag-default: "1.0"
                 x-go-tag-validate: gte=0,lte=1.0
@@ -902,6 +919,8 @@ definitions:
     Entity:
         description: Entity represents a pod, vm, etc.
         properties:
+            cluster_ip:
+                type: string
             ip_address:
                 type: string
             name:
@@ -997,8 +1016,6 @@ definitions:
                     Parameters for the Extrapolator component.
 
                 x-go-tag-validate: required
-        required:
-            - parameters
         title: Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
         type: object
     ExtrapolatorIns:
@@ -1159,10 +1176,12 @@ definitions:
         properties:
             flow_matcher:
                 $ref: '#/definitions/FlowMatcher'
-                title: '@gotags: validate:"required"'
+                title: Match control points and labels
+                x-go-tag-validate: required
             service_selector:
                 $ref: '#/definitions/ServiceSelector'
-                title: '@gotags: validate:"required"'
+                title: Match agent group and service
+                x-go-tag-validate: required
         title: |-
             Describes which flow in which service a [flow control
             component](/concepts/integrations/flow-control/flow-control.md#components) should apply
@@ -1227,7 +1246,9 @@ definitions:
                 description: |+
                     Number of buckets.
 
+                exclusiveMinimum: true
                 format: int32
+                minimum: 0
                 type: integer
                 x-go-tag-validate: gt=0
             factor:
@@ -1254,7 +1275,9 @@ definitions:
                 description: |+
                     Number of buckets.
 
+                exclusiveMinimum: true
                 format: int32
+                minimum: 0
                 type: integer
                 x-go-tag-validate: gt=0
             max:
@@ -1284,7 +1307,9 @@ definitions:
                 description: |+
                     Number of buckets.
 
+                exclusiveMinimum: true
                 format: int32
+                minimum: 0
                 type: integer
                 x-go-tag-validate: gt=0
             start:
@@ -1300,11 +1325,26 @@ definitions:
         description: StaticBuckets holds the static value of the buckets where latency histogram will be stored.
         properties:
             buckets:
+                default:
+                    - 5
+                    - 10
+                    - 25
+                    - 50
+                    - 100
+                    - 250
+                    - 500
+                    - 1000
+                    - 2500
+                    - 5000
+                    - 10000
+                description: |+
+                    The buckets in which latency histogram will be stored.
+
                 items:
                     format: double
                     type: number
-                title: '@gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"'
                 type: array
+                x-go-tag-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
         type: object
     GetPoliciesResponse:
         properties:
@@ -1351,8 +1391,6 @@ definitions:
                     Gradient Parameters.
 
                 x-go-tag-validate: required
-        required:
-            - parameters
         title: |-
             Gradient controller is a type of controller which tries to adjust the
             control variable proportionally to the relative difference between setpoint
@@ -1498,20 +1536,24 @@ definitions:
                 x-go-tag-default: 5s
             in_ports:
                 $ref: '#/definitions/HolderIns'
+                description: Input ports for the Holder component.
             out_ports:
                 $ref: '#/definitions/HolderOuts'
+                description: Output ports for the Holder component.
         type: object
     HolderIns:
         description: Inputs for the Holder component.
         properties:
             input:
                 $ref: '#/definitions/InPort'
+                description: The input signal.
         type: object
     HolderOuts:
         description: Outputs for the Holder component.
         properties:
             output:
                 $ref: '#/definitions/OutPort'
+                description: The output signal.
         type: object
     HostInfo:
         properties:
@@ -1666,8 +1708,14 @@ definitions:
                     Logical operator which represents a key's relationship to a set of values.
                     Valid operators are In, NotIn, Exists and DoesNotExist.
 
+                enum:
+                    - In
+                    - NotIn
+                    - Exists
+                    - DoesNotExists
                 type: string
                 x-go-tag-validate: oneof=In NotIn Exists DoesNotExists
+                x-oneof: In | NotIn | Exists | DoesNotExists
             values:
                 description: |-
                     An array of string values that relates to the key by an operator.
@@ -1711,7 +1759,6 @@ definitions:
                 type: string
                 x-go-tag-default: default
             api_version:
-                description: ""
                 title: API version of Kubernetes resource
                 type: string
                 x-go-tag-validate: required
@@ -1988,13 +2035,17 @@ definitions:
         description: Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
         properties:
             components:
+                description: |+
+                    List of components in the nested circuit.
+
                 items:
                     $ref: '#/definitions/Component'
-                title: '@gotags: validate:"dive"'
                 type: array
+                x-go-tag-validate: dive
             in_ports_map:
                 additionalProperties:
                     $ref: '#/definitions/InPort'
+                description: Maps input port names to input ports.
                 type: object
             name:
                 description: Name of the nested circuit component. This name is displayed by graph visualization tools.
@@ -2002,6 +2053,7 @@ definitions:
             out_ports_map:
                 additionalProperties:
                     $ref: '#/definitions/OutPort'
+                description: Maps output port names to output ports.
                 type: object
             short_description:
                 description: Short description of the nested circuit component. This description is displayed by graph visualization tools.
@@ -2014,6 +2066,7 @@ definitions:
                 $ref: '#/definitions/NestedSignalEgressIns'
                 description: Input ports for the NestedSignalEgress component.
             port_name:
+                description: Name of the port.
                 type: string
         type: object
     NestedSignalEgressIns:
@@ -2030,6 +2083,7 @@ definitions:
                 $ref: '#/definitions/NestedSignalIngressOuts'
                 description: Output ports for the NestedSignalIngress component.
             port_name:
+                description: Name of the port.
                 type: string
         type: object
     NestedSignalIngressOuts:
@@ -2160,6 +2214,7 @@ definitions:
                     /static/*: other
                     ```
 
+                minProperties: 1
                 type: object
                 x-go-tag-validate: gt=0,dive,keys,required,endkeys,required
         title: Matches HTTP Path to given path templates
@@ -2187,6 +2242,7 @@ definitions:
                 $ref: '#/definitions/Peer'
         type: object
     PodScaler:
+        description: Component for scaling pods based on a signal.
         properties:
             kubernetes_object_selector:
                 $ref: '#/definitions/KubernetesObjectSelector'
@@ -2196,12 +2252,13 @@ definitions:
                 x-go-tag-validate: required
             scale_actuator:
                 $ref: '#/definitions/PodScalerScaleActuator'
+                description: Actuates scaling of pods based on a signal.
             scale_reporter:
                 $ref: '#/definitions/PodScalerScaleReporter'
-        required:
-            - kubernetes_object_selector
+                description: Reports actual and configured number of replicas.
         type: object
     PodScalerScaleActuator:
+        description: Actuates scaling of pods based on a signal.
         properties:
             default_config:
                 $ref: '#/definitions/PodScalerScaleActuatorDynamicConfig'
@@ -2211,6 +2268,7 @@ definitions:
                 type: string
             in_ports:
                 $ref: '#/definitions/PodScalerScaleActuatorIns'
+                description: Input ports for the PodScaler component.
         type: object
     PodScalerScaleActuatorDynamicConfig:
         properties:
@@ -2231,17 +2289,21 @@ definitions:
                 $ref: '#/definitions/InPort'
         type: object
     PodScalerScaleReporter:
+        description: Reports actual and configured number of replicas.
         properties:
             out_ports:
                 $ref: '#/definitions/PodScalerScaleReporterOuts'
+                description: Output ports for the PodScaler component.
         type: object
     PodScalerScaleReporterOuts:
         description: Outputs for the PodScaler component.
         properties:
             actual_replicas:
                 $ref: '#/definitions/OutPort'
+                description: The number of replicas that are currently running.
             configured_replicas:
                 $ref: '#/definitions/OutPort'
+                description: The number of replicas that are desired.
         type: object
     Policies:
         properties:
@@ -2357,6 +2419,7 @@ definitions:
                 x-go-tag-default: 5s
             out_ports:
                 $ref: '#/definitions/PulseGeneratorOuts'
+                description: Output ports for the PulseGenerator component.
             true_for:
                 default: 5s
                 description: |+
@@ -2403,15 +2466,12 @@ definitions:
                 x-go-tag-validate: required
             in_ports:
                 $ref: '#/definitions/RateLimiterIns'
-                title: '@gotags: validate:"required"'
+                title: Input ports for the RateLimiter component
+                x-go-tag-validate: required
             parameters:
                 $ref: '#/definitions/RateLimiterParameters'
-                description: ""
                 title: Parameters for the RateLimiter component
                 x-go-tag-validate: required
-        required:
-            - flow_selector
-            - parameters
         title: Limits the traffic on a control point to specified rate
         type: object
     RateLimiterDynamicConfig:
@@ -2442,8 +2502,6 @@ definitions:
                     :::
 
                 x-go-tag-validate: required
-        required:
-            - limit
         title: Inputs for the RateLimiter component
         type: object
     RateLimiterOverride:
@@ -2495,7 +2553,6 @@ definitions:
         properties:
             enabled:
                 default: false
-                description: ""
                 title: Enables lazy sync
                 type: boolean
                 x-go-tag-default: "false"
@@ -2504,7 +2561,9 @@ definitions:
                 description: |+
                     Number of times to lazy sync within the _limit\_reset\_interval_.
 
+                exclusiveMinimum: true
                 format: int64
+                minimum: 0
                 type: integer
                 x-go-tag-default: "5"
                 x-go-tag-validate: gt=0
@@ -2687,8 +2746,6 @@ definitions:
                     Scheduler parameters.
 
                 x-go-tag-validate: required
-        required:
-            - parameters
         title: Weighted Fair Queuing-based workload scheduler
         type: object
     SchedulerOuts:
@@ -2822,9 +2879,6 @@ definitions:
                     Parameters associated with flows matching the label matcher.
 
                 x-go-tag-validate: required
-        required:
-            - label_matcher
-            - parameters
         type: object
     SchedulerWorkloadParameters:
         description: Parameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
@@ -2844,6 +2898,8 @@ definitions:
                     $$
 
                 format: int64
+                maximum: 255
+                minimum: 0
                 title: |-
                     Describes priority level of the requests within the workload.
                     Priority level ranges from 0 to 255.
@@ -2969,12 +3025,13 @@ definitions:
                 $ref: '#/definitions/SqrtOuts'
                 description: Output ports for the Sqrt component.
             scale:
-                description: |-
+                default: 1
+                description: |+
                     Scaling factor to be multiplied with the square root of the input signal.
 
-                    @gotags default:"1.0"
                 format: double
                 type: number
+                x-go-tag-default: "1.0"
         title: Takes an input signal and emits the square root of it multiplied by scale as an output
         type: object
     SqrtIns:
@@ -3417,7 +3474,7 @@ paths:
                   schema:
                     $ref: '#/definitions/LabelMatcher'
                 - description: |+
-                    Number of samples to collect. Defaults to 10.
+                    Number of samples to collect.
 
                   format: int64
                   in: query
@@ -3461,7 +3518,7 @@ paths:
                   schema:
                     $ref: '#/definitions/LabelMatcher'
                 - description: |+
-                    Number of samples to collect. Defaults to 10.
+                    Number of samples to collect.
 
                   format: int64
                   in: query

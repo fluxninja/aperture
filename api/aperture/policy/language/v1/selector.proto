@@ -14,7 +14,9 @@ import "aperture/policy/language/v1/label_matcher.proto";
 //
 // :::
 message FlowSelector {
+  // Match agent group and service
   ServiceSelector service_selector = 1; // @gotags: validate:"required"
+  // Match control points and labels
   FlowMatcher flow_matcher = 2; // @gotags: validate:"required"
 }
 

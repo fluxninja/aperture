@@ -67,17 +67,13 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector), **required**, `required`) Flow Selector decides the service and flows at which the concurrency limiter is applied.
+([FlowSelector](#flow-selector)) Flow Selector decides the service and flows at which the concurrency limiter is applied.
 
 </dd>
 <dt>gradient_parameters</dt>
 <dd>
 
-([GradientControllerParameters](#gradient-controller-parameters)) Gradient parameters for the controller. Defaults to:
-
-- slope = -1
-- min_gradient = 0.1
-- max_gradient = 1
+([GradientControllerParameters](#gradient-controller-parameters)) Gradient parameters for the controller.
 
 </dd>
 <dt>in_ports</dt>
@@ -107,7 +103,7 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dt>scheduler_parameters</dt>
 <dd>
 
-([SchedulerParameters](#scheduler-parameters), **required**, `required`) Scheduler parameters.
+([SchedulerParameters](#scheduler-parameters)) Scheduler parameters.
 
 </dd>
 </dl>
@@ -195,7 +191,7 @@ from: "source.address # or destination.address"
 <dt>from</dt>
 <dd>
 
-(string, **required**, `required`) Attribute path pointing to some string - eg. "source.address".
+(string, **required**) Attribute path pointing to some string - eg. "source.address".
 
 </dd>
 </dl>
@@ -216,7 +212,7 @@ Alerter reacts to a signal and generates alert to send to alert manager.
 <dt>parameters</dt>
 <dd>
 
-([AlerterParameters](#alerter-parameters), **required**, `required`) Alerter configuration
+([AlerterParameters](#alerter-parameters)) Alerter configuration
 
 </dd>
 </dl>
@@ -252,7 +248,7 @@ Alerter Parameters is a common config for separate alerter components and alerte
 <dt>alert_name</dt>
 <dd>
 
-(string, **required**, `required`) Name of the alert.
+(string, **required**) Name of the alert.
 
 </dd>
 <dt>labels</dt>
@@ -270,7 +266,7 @@ Alerter Parameters is a common config for separate alerter components and alerte
 <dt>severity</dt>
 <dd>
 
-(string, `oneof=info warn crit`, default: `"info"`) Severity of the alert, one of 'info', 'warn' or 'crit'.
+(string, oneof: `info | warn | crit`, default: `"info"`) Severity of the alert, one of 'info', 'warn' or 'crit'.
 
 </dd>
 </dl>
@@ -321,7 +317,7 @@ Inputs for the And component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port), `dive`) Array of input signals.
+([[]InPort](#in-port)) Array of input signals.
 
 </dd>
 </dl>
@@ -359,7 +355,7 @@ Type of combinator that computes the arithmetic operation on the operand signals
 <dt>operator</dt>
 <dd>
 
-(string, `oneof=add sub mul div xor lshift rshift`) Operator of the arithmetic operation.
+(string, oneof: `add | sub | mul | div | xor | lshift | rshift`) Operator of the arithmetic operation.
 
 The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
 In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
@@ -464,7 +460,7 @@ docs on how exactly it handles invalid inputs.
 <dt>components</dt>
 <dd>
 
-([[]Component](#component), `dive`) Defines a signal processing graph as a list of components.
+([[]Component](#component)) Defines a signal processing graph as a list of components.
 
 </dd>
 <dt>evaluation_interval</dt>
@@ -513,13 +509,13 @@ rules:
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector), **required**, `required`) Defines where to apply the flow classification rule.
+([FlowSelector](#flow-selector)) Defines where to apply the flow classification rule.
 
 </dd>
 <dt>rules</dt>
 <dd>
 
-(map of [Rule](#rule), **required**, `required,gt=0,dive,keys,required,endkeys,required`) A map of {key, value} pairs mapping from
+(map of [Rule](#rule), **required**) A map of {key, value} pairs mapping from
 [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
 how to extract and propagate flow labels with that key.
 
@@ -758,7 +754,7 @@ strategy and a scheduler. Right now, only `load_actuator` strategy is available.
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector), **required**, `required`) Flow Selector decides the service and flows at which the concurrency limiter is applied.
+([FlowSelector](#flow-selector)) Flow Selector decides the service and flows at which the concurrency limiter is applied.
 
 </dd>
 <dt>load_actuator</dt>
@@ -772,7 +768,7 @@ Actuation strategy defines the input signal that will drive the scheduler.
 <dt>scheduler</dt>
 <dd>
 
-([Scheduler](#scheduler), **required**, `required`) Configuration of Weighted Fair Queuing-based workload scheduler.
+([Scheduler](#scheduler)) Configuration of Weighted Fair Queuing-based workload scheduler.
 
 Contains configuration of per-agent scheduler, and also defines some
 output signals.
@@ -790,13 +786,13 @@ Special constant input for ports and Variable component. Can provide either a co
 <dt>special_value</dt>
 <dd>
 
-(string) @gotags: validate:"oneof=NaN +Inf -Inf"
+(string, oneof: `NaN | +Inf | -Inf`) A special value such as NaN, +Inf, -Inf.
 
 </dd>
 <dt>value</dt>
 <dd>
 
-(float64)
+(float64) A constant value.
 
 </dd>
 </dl>
@@ -832,7 +828,7 @@ If the duration is zero, the transition will happen instantaneously.
 <dt>operator</dt>
 <dd>
 
-(string, `oneof=gt lt gte lte eq neq`) Comparison operator that computes operation on lhs and rhs input signals.
+(string, oneof: `gt | lt | gte | lte | eq | neq`) Comparison operator that computes operation on lhs and rhs input signals.
 
 </dd>
 <dt>out_ports</dt>
@@ -989,7 +985,7 @@ $$
 <dt>parameters</dt>
 <dd>
 
-([EMAParameters](#e-m-a-parameters), **required**, `required`) Parameters for the EMA component.
+([EMAParameters](#e-m-a-parameters)) Parameters for the EMA component.
 
 </dd>
 </dl>
@@ -1058,19 +1054,19 @@ Parameters for the EMA component.
 <dt>correction_factor_on_max_envelope_violation</dt>
 <dd>
 
-(float64, `gte=0,lte=1.0`, default: `1`) Correction factor to apply on the output value if its in violation of the max envelope.
+(float64, minimum: `0`, default: `1`) Correction factor to apply on the output value if its in violation of the max envelope.
 
 </dd>
 <dt>correction_factor_on_min_envelope_violation</dt>
 <dd>
 
-(float64, `gte=1.0`, default: `1`) Correction factor to apply on the output value if its in violation of the min envelope.
+(float64, default: `1`) Correction factor to apply on the output value if its in violation of the min envelope.
 
 </dd>
 <dt>ema_window</dt>
 <dd>
 
-(string, **required**, `required`) Duration of EMA sampling window.
+(string, **required**) Duration of EMA sampling window.
 
 </dd>
 <dt>valid_during_warmup</dt>
@@ -1082,7 +1078,7 @@ Parameters for the EMA component.
 <dt>warmup_window</dt>
 <dd>
 
-(string, **required**, `required`) Duration of EMA warming up window.
+(string, **required**) Duration of EMA warming up window.
 
 The initial value of the EMA is the average of signal readings received during the warm up window.
 
@@ -1099,7 +1095,7 @@ Label selector expression of the equal form "label == value".
 <dt>label</dt>
 <dd>
 
-(string, **required**, `required`) Name of the label to equal match the value.
+(string, **required**) Name of the label to equal match the value.
 
 </dd>
 <dt>value</dt>
@@ -1194,7 +1190,7 @@ It does so until `maximum_extrapolation_interval` is reached, beyond which it em
 <dt>parameters</dt>
 <dd>
 
-([ExtrapolatorParameters](#extrapolator-parameters), **required**, `required`) Parameters for the Extrapolator component.
+([ExtrapolatorParameters](#extrapolator-parameters)) Parameters for the Extrapolator component.
 
 </dd>
 </dl>
@@ -1239,7 +1235,7 @@ Parameters for the Extrapolator component.
 <dt>max_extrapolation_interval</dt>
 <dd>
 
-(string, **required**, `required`) Maximum time interval to repeat the last valid value of input signal.
+(string, **required**) Maximum time interval to repeat the last valid value of input signal.
 
 </dd>
 </dl>
@@ -1275,7 +1271,7 @@ Inputs for the FirstValid component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port), `dive`) Array of input signals.
+([[]InPort](#in-port)) Array of input signals.
 
 </dd>
 </dl>
@@ -1358,7 +1354,7 @@ label_matcher:
 <dt>control_point</dt>
 <dd>
 
-(string, **required**, `required`) [Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)
+(string, **required**) [Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)
 identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
 block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
 or filter chains.
@@ -1411,13 +1407,13 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 <dt>flow_matcher</dt>
 <dd>
 
-([FlowMatcher](#flow-matcher)) @gotags: validate:"required"
+([FlowMatcher](#flow-matcher)) Match control points and labels
 
 </dd>
 <dt>service_selector</dt>
 <dd>
 
-([ServiceSelector](#service-selector)) @gotags: validate:"required"
+([ServiceSelector](#service-selector)) Match agent group and service
 
 </dd>
 </dl>
@@ -1519,19 +1515,19 @@ bucket is not counted.
 <dt>count</dt>
 <dd>
 
-(int32, `gt=0`) Number of buckets.
+(int32, minimum: `0`) Number of buckets.
 
 </dd>
 <dt>factor</dt>
 <dd>
 
-(float64, `gt=1.0`) Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
+(float64) Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
 
 </dd>
 <dt>start</dt>
 <dd>
 
-(float64, `gt=0.0`) Upper bound of the lowest bucket.
+(float64) Upper bound of the lowest bucket.
 
 </dd>
 </dl>
@@ -1547,7 +1543,7 @@ bucket is `max`. The final +inf bucket is not counted.
 <dt>count</dt>
 <dd>
 
-(int32, `gt=0`) Number of buckets.
+(int32, minimum: `0`) Number of buckets.
 
 </dd>
 <dt>max</dt>
@@ -1559,7 +1555,7 @@ bucket is `max`. The final +inf bucket is not counted.
 <dt>min</dt>
 <dd>
 
-(float64, `gt=0.0`) Lowest bucket.
+(float64) Lowest bucket.
 
 </dd>
 </dl>
@@ -1575,7 +1571,7 @@ upper bound of `start`. The final +inf bucket is not counted.
 <dt>count</dt>
 <dd>
 
-(int32, `gt=0`) Number of buckets.
+(int32, minimum: `0`) Number of buckets.
 
 </dd>
 <dt>start</dt>
@@ -1602,7 +1598,7 @@ StaticBuckets holds the static value of the buckets where latency histogram will
 <dt>buckets</dt>
 <dd>
 
-([]float64) @gotags: default:"[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]"
+([]float64, default: `[5,10,25,50,100,250,500,1000,2500,5000,10000]`) The buckets in which latency histogram will be stored.
 
 </dd>
 </dl>
@@ -1664,7 +1660,7 @@ The output can be _optionally_ clamped to desired range using `max` and
 <dt>parameters</dt>
 <dd>
 
-([GradientControllerParameters](#gradient-controller-parameters), **required**, `required`) Gradient Parameters.
+([GradientControllerParameters](#gradient-controller-parameters)) Gradient Parameters.
 
 </dd>
 </dl>
@@ -1769,7 +1765,7 @@ Gradient Parameters.
 <dt>slope</dt>
 <dd>
 
-(float64, **required**, `required`) Slope controls the aggressiveness and direction of the Gradient Controller.
+(float64, **required**) Slope controls the aggressiveness and direction of the Gradient Controller.
 
 Slope is used as exponent on the signal to setpoint ratio in computation
 of the gradient (see the [main description](#gradient-controller) for
@@ -1834,13 +1830,13 @@ If it's holding a value that means it ignores both valid and invalid new signals
 <dt>in_ports</dt>
 <dd>
 
-([HolderIns](#holder-ins))
+([HolderIns](#holder-ins)) Input ports for the Holder component.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([HolderOuts](#holder-outs))
+([HolderOuts](#holder-outs)) Output ports for the Holder component.
 
 </dd>
 </dl>
@@ -1855,7 +1851,7 @@ Inputs for the Holder component.
 <dt>input</dt>
 <dd>
 
-([InPort](#in-port))
+([InPort](#in-port)) The input signal.
 
 </dd>
 </dl>
@@ -1870,7 +1866,7 @@ Outputs for the Holder component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port))
+([OutPort](#out-port)) The output signal.
 
 </dd>
 </dl>
@@ -1998,7 +1994,7 @@ Inputs for the Inverter component.
 <dt>input</dt>
 <dd>
 
-([InPort](#in-port), `dive`) Signal to be negated.
+([InPort](#in-port)) Signal to be negated.
 
 </dd>
 </dl>
@@ -2037,7 +2033,7 @@ pointer: /user/name
 <dt>from</dt>
 <dd>
 
-(string, **required**, `required`) Attribute path pointing to some strings - eg. "request.http.body".
+(string, **required**) Attribute path pointing to some strings - eg. "request.http.body".
 
 </dd>
 <dt>pointer</dt>
@@ -2073,7 +2069,7 @@ json_pointer: /user/email
 <dt>from</dt>
 <dd>
 
-(string, **required**, `required`) Jwt token can be pulled from any input attribute, but most likely you'd want to use "request.http.bearer".
+(string, **required**) Jwt token can be pulled from any input attribute, but most likely you'd want to use "request.http.bearer".
 
 </dd>
 <dt>json_pointer</dt>
@@ -2097,13 +2093,13 @@ Label selector requirement which is a selector that contains values, a key, and 
 <dt>key</dt>
 <dd>
 
-(string, **required**, `required`) Label key that the selector applies to.
+(string, **required**) Label key that the selector applies to.
 
 </dd>
 <dt>operator</dt>
 <dd>
 
-(string, `oneof=In NotIn Exists DoesNotExists`) Logical operator which represents a key's relationship to a set of values.
+(string, oneof: `In | NotIn | Exists | DoesNotExists`) Logical operator which represents a key's relationship to a set of values.
 Valid operators are In, NotIn, Exists and DoesNotExist.
 
 </dd>
@@ -2135,25 +2131,25 @@ selector applies to.
 <dt>api_version</dt>
 <dd>
 
-(string, **required**, `required`) API version of Kubernetes resource
+(string, **required**) API version of Kubernetes resource
 
 </dd>
 <dt>kind</dt>
 <dd>
 
-(string, **required**, `required`) Kubernetes resource type.
+(string, **required**) Kubernetes resource type.
 
 </dd>
 <dt>name</dt>
 <dd>
 
-(string, **required**, `required`) Kubernetes resource name.
+(string, **required**) Kubernetes resource name.
 
 </dd>
 <dt>namespace</dt>
 <dd>
 
-(string, **required**, `required`) Kubernetes namespace that the resource belongs to.
+(string, **required**) Kubernetes namespace that the resource belongs to.
 
 </dd>
 </dl>
@@ -2299,7 +2295,7 @@ all:
 <dt>label_exists</dt>
 <dd>
 
-(string, **required**, `required`) The expression is true when label with given name exists.
+(string, **required**) The expression is true when label with given name exists.
 
 </dd>
 <dt>label_matches</dt>
@@ -2343,13 +2339,13 @@ Label selector expression of the matches form "label matches regex".
 <dt>label</dt>
 <dd>
 
-(string, **required**, `required`) Name of the label to match the regular expression.
+(string, **required**) Name of the label to match the regular expression.
 
 </dd>
 <dt>regex</dt>
 <dd>
 
-(string, **required**, `required`) Regular expression that should match the label value.
+(string, **required**) Regular expression that should match the label value.
 It uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
 
 </dd>
@@ -2388,7 +2384,7 @@ Inputs for the Max component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port), `dive`) Array of input signals.
+([[]InPort](#in-port)) Array of input signals.
 
 </dd>
 </dl>
@@ -2440,7 +2436,7 @@ Inputs for the Min component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port), `dive`) Array of input signals.
+([[]InPort](#in-port)) Array of input signals.
 
 </dd>
 </dl>
@@ -2470,13 +2466,13 @@ Nested circuit defines a sub-circuit as a high-level component. It consists of a
 <dt>components</dt>
 <dd>
 
-([[]Component](#component)) @gotags: validate:"dive"
+([[]Component](#component)) List of components in the nested circuit.
 
 </dd>
 <dt>in_ports_map</dt>
 <dd>
 
-(map of [InPort](#in-port))
+(map of [InPort](#in-port)) Maps input port names to input ports.
 
 </dd>
 <dt>name</dt>
@@ -2488,7 +2484,7 @@ Nested circuit defines a sub-circuit as a high-level component. It consists of a
 <dt>out_ports_map</dt>
 <dd>
 
-(map of [OutPort](#out-port))
+(map of [OutPort](#out-port)) Maps output port names to output ports.
 
 </dd>
 <dt>short_description</dt>
@@ -2515,7 +2511,7 @@ Nested signal egress is a special type of component that allows to extract a sig
 <dt>port_name</dt>
 <dd>
 
-(string)
+(string) Name of the port.
 
 </dd>
 </dl>
@@ -2551,7 +2547,7 @@ Nested signal ingress is a special type of component that allows to inject a sig
 <dt>port_name</dt>
 <dd>
 
-(string)
+(string) Name of the port.
 
 </dd>
 </dl>
@@ -2604,7 +2600,7 @@ Inputs for the Or component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port), `dive`) Array of input signals.
+([[]InPort](#in-port)) Array of input signals.
 
 </dd>
 </dl>
@@ -2655,7 +2651,7 @@ In case of multiple path templates matching, the most specific one will be chose
 <dt>template_values</dt>
 <dd>
 
-(map of string, `gt=0,dive,keys,required,endkeys,required`) Template value keys are OpenAPI-inspired path templates.
+(map of string) Template value keys are OpenAPI-inspired path templates.
 
 - Static path segment `/foo` matches a path segment exactly
 - `/{param}` matches arbitrary path segment.
@@ -2683,30 +2679,34 @@ Example:
 
 ### PodScaler {#pod-scaler}
 
+Component for scaling pods based on a signal.
+
 #### Properties
 
 <dl>
 <dt>kubernetes_object_selector</dt>
 <dd>
 
-([KubernetesObjectSelector](#kubernetes-object-selector), **required**, `required`) The Kubernetes object on which horizontal scaling is applied.
+([KubernetesObjectSelector](#kubernetes-object-selector)) The Kubernetes object on which horizontal scaling is applied.
 
 </dd>
 <dt>scale_actuator</dt>
 <dd>
 
-([PodScalerScaleActuator](#pod-scaler-scale-actuator))
+([PodScalerScaleActuator](#pod-scaler-scale-actuator)) Actuates scaling of pods based on a signal.
 
 </dd>
 <dt>scale_reporter</dt>
 <dd>
 
-([PodScalerScaleReporter](#pod-scaler-scale-reporter))
+([PodScalerScaleReporter](#pod-scaler-scale-reporter)) Reports actual and configured number of replicas.
 
 </dd>
 </dl>
 
 ### PodScalerScaleActuator {#pod-scaler-scale-actuator}
+
+Actuates scaling of pods based on a signal.
 
 #### Properties
 
@@ -2726,7 +2726,7 @@ Example:
 <dt>in_ports</dt>
 <dd>
 
-([PodScalerScaleActuatorIns](#pod-scaler-scale-actuator-ins))
+([PodScalerScaleActuatorIns](#pod-scaler-scale-actuator-ins)) Input ports for the PodScaler component.
 
 </dd>
 </dl>
@@ -2764,13 +2764,15 @@ Inputs for the PodScaler component.
 
 ### PodScalerScaleReporter {#pod-scaler-scale-reporter}
 
+Reports actual and configured number of replicas.
+
 #### Properties
 
 <dl>
 <dt>out_ports</dt>
 <dd>
 
-([PodScalerScaleReporterOuts](#pod-scaler-scale-reporter-outs))
+([PodScalerScaleReporterOuts](#pod-scaler-scale-reporter-outs)) Output ports for the PodScaler component.
 
 </dd>
 </dl>
@@ -2785,13 +2787,13 @@ Outputs for the PodScaler component.
 <dt>actual_replicas</dt>
 <dd>
 
-([OutPort](#out-port))
+([OutPort](#out-port)) The number of replicas that are currently running.
 
 </dd>
 <dt>configured_replicas</dt>
 <dd>
 
-([OutPort](#out-port))
+([OutPort](#out-port)) The number of replicas that are desired.
 
 </dd>
 </dl>
@@ -2890,7 +2892,7 @@ Generates 0 and 1 in turns.
 <dt>out_ports</dt>
 <dd>
 
-([PulseGeneratorOuts](#pulse-generator-outs))
+([PulseGeneratorOuts](#pulse-generator-outs)) Output ports for the PulseGenerator component.
 
 </dd>
 <dt>true_for</dt>
@@ -2962,19 +2964,19 @@ to select which label should be used as key.
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector), **required**, `required`) Which control point to apply this ratelimiter to.
+([FlowSelector](#flow-selector)) Which control point to apply this ratelimiter to.
 
 </dd>
 <dt>in_ports</dt>
 <dd>
 
-([RateLimiterIns](#rate-limiter-ins)) @gotags: validate:"required"
+([RateLimiterIns](#rate-limiter-ins)) Input ports for the RateLimiter component
 
 </dd>
 <dt>parameters</dt>
 <dd>
 
-([RateLimiterParameters](#rate-limiter-parameters), **required**, `required`) Parameters for the RateLimiter component
+([RateLimiterParameters](#rate-limiter-parameters)) Parameters for the RateLimiter component
 
 </dd>
 </dl>
@@ -2989,7 +2991,7 @@ Dynamic Configuration for the rate limiter
 <dt>overrides</dt>
 <dd>
 
-([[]RateLimiterOverride](#rate-limiter-override), `dive`) Allows to specify different limits for particular label values.
+([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
 
 </dd>
 </dl>
@@ -3004,7 +3006,7 @@ Inputs for the RateLimiter component
 <dt>limit</dt>
 <dd>
 
-([InPort](#in-port), **required**, `required`) Number of flows allowed per _limit_reset_interval_ per each label.
+([InPort](#in-port)) Number of flows allowed per _limit_reset_interval_ per each label.
 Negative values disable the ratelimiter.
 
 :::tip
@@ -3025,7 +3027,7 @@ under certain circumstances. [Decider](#decider) might be helpful.
 <dt>label_value</dt>
 <dd>
 
-(string, **required**, `required`) Value of the label for which the override should be applied.
+(string, **required**) Value of the label for which the override should be applied.
 
 </dd>
 <dt>limit_scale_factor</dt>
@@ -3044,7 +3046,7 @@ under certain circumstances. [Decider](#decider) might be helpful.
 <dt>label_key</dt>
 <dd>
 
-(string, **required**, `required`) Specifies which label the ratelimiter should be keyed by.
+(string, **required**) Specifies which label the ratelimiter should be keyed by.
 
 Rate limiting is done independently for each value of the
 [label](/concepts/integrations/flow-control/flow-label.md) with given key.
@@ -3080,7 +3082,7 @@ label set up, set `label_key: "user"`.
 <dt>num_sync</dt>
 <dd>
 
-(int64, `gt=0`, default: `5`) Number of times to lazy sync within the _limit_reset_interval_.
+(int64, minimum: `0`, default: `5`) Number of times to lazy sync within the _limit_reset_interval_.
 
 </dd>
 </dl>
@@ -3103,7 +3105,7 @@ Resources are typically Flux Meters, Classifiers, etc. that can be used to creat
 <dt>classifiers</dt>
 <dd>
 
-([[]Classifier](#classifier), `dive`) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+([[]Classifier](#classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
 The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
 
@@ -3111,7 +3113,7 @@ The flow labels created by Classifiers can be matched by Flux Meters to create m
 <dt>flux_meters</dt>
 <dd>
 
-(map of [FluxMeter](#flux-meter), `dive`) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
+(map of [FluxMeter](#flux-meter)) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
 Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
 
@@ -3212,7 +3214,7 @@ High-level extractor-based rules are compiled into a single rego query.
 <dt>query</dt>
 <dd>
 
-(string, **required**, `required`) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
+(string, **required**) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
 
 Note: The module name must match the package name from the "source".
 
@@ -3220,7 +3222,7 @@ Note: The module name must match the package name from the "source".
 <dt>source</dt>
 <dd>
 
-(string, **required**, `required`) Source code of the rego module.
+(string, **required**) Source code of the rego module.
 
 Note: Must include a "package" declaration.
 
@@ -3252,7 +3254,7 @@ See [ConcurrencyLimiter](#concurrency-limiter) for more context.
 <dt>parameters</dt>
 <dd>
 
-([SchedulerParameters](#scheduler-parameters), **required**, `required`) Scheduler parameters.
+([SchedulerParameters](#scheduler-parameters)) Scheduler parameters.
 
 </dd>
 </dl>
@@ -3348,7 +3350,7 @@ tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 <dt>timeout_factor</dt>
 <dd>
 
-(float64, `gte=0.0`, default: `0.5`) Timeout as a factor of tokens for a flow in a workload
+(float64, default: `0.5`) Timeout as a factor of tokens for a flow in a workload
 
 If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
 it will be rejected.
@@ -3359,7 +3361,7 @@ This value impacts the prioritization and fairness because the larger the timeou
 <dt>workloads</dt>
 <dd>
 
-([[]SchedulerWorkload](#scheduler-workload), `dive`) List of workloads to be used in scheduler.
+([[]SchedulerWorkload](#scheduler-workload)) List of workloads to be used in scheduler.
 
 Categorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads
 allows for load-shedding to be "smarter" than just "randomly deny 50% of
@@ -3396,14 +3398,14 @@ Workload defines a class of requests that preferably have similar properties suc
 <dt>label_matcher</dt>
 <dd>
 
-([LabelMatcher](#label-matcher), **required**, `required`) Label Matcher to select a Workload based on
+([LabelMatcher](#label-matcher)) Label Matcher to select a Workload based on
 [flow labels](/concepts/integrations/flow-control/flow-label.md).
 
 </dd>
 <dt>parameters</dt>
 <dd>
 
-([SchedulerWorkloadParameters](#scheduler-workload-parameters), **required**, `required`) Parameters associated with flows matching the label matcher.
+([SchedulerWorkloadParameters](#scheduler-workload-parameters)) Parameters associated with flows matching the label matcher.
 
 </dd>
 </dl>
@@ -3427,7 +3429,7 @@ you have a classifier that sets `user` flow label, you might want to set
 <dt>priority</dt>
 <dd>
 
-(int64, `gte=0,lte=255`) Describes priority level of the requests within the workload.
+(int64, minimum: `0`, maximum: `255`) Describes priority level of the requests within the workload.
 Priority level ranges from 0 to 255.
 Higher numbers means higher priority level.
 Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
@@ -3477,7 +3479,7 @@ Agent Groups are used to scope policies to a subset of agents connected to the s
 <dt>service</dt>
 <dd>
 
-(string, **required**, `required`) The Fully Qualified Domain Name of the
+(string, **required**) The Fully Qualified Domain Name of the
 [service](/concepts/integrations/flow-control/service.md) to select.
 
 In Kubernetes, this is the FQDN of the Service object.
@@ -3525,9 +3527,7 @@ $$
 <dt>scale</dt>
 <dd>
 
-(float64) Scaling factor to be multiplied with the square root of the input signal.
-
-@gotags default:"1.0"
+(float64, default: `1`) Scaling factor to be multiplied with the square root of the input signal.
 
 </dd>
 </dl>

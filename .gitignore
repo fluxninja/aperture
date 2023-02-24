@@ -6,7 +6,6 @@ build/
 .gradle/
 
 blueprints/vendor/
-cmd/aperturectl/main
 
 ### Go ###
 # If you prefer the allow list template instead of the deny list, see community template:
@@ -223,6 +222,8 @@ gradle-app.setting
 
 # Local build artifacts under cmd/
 cmd/aperturectl/aperturectl
+# Other artifacts
+docs/tools/jsonnet/json2yaml
 
 # Local playground configuration overrides
 playground/tilt_local.json
