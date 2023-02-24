@@ -16,17 +16,17 @@ ARG VERSION
 ENV VERSION=${VERSION}
 ARG RACE
 ENV RACE=${RACE}
+ARG BUILD_TIME="$(date -Iseconds)"
+ENV BUILD_TIME=${BUILD_TIME}
 
 FROM base AS builder
+
 RUN --mount=type=cache,target=/go/pkg/,readonly \
   --mount=type=cache,target=/root/.cache/go-build/,sharing=private \
   CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" \
   LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
   ./pkg/info/build.sh
 
-
-# BUILD PLUGINS STAGE
-FROM builder AS plugins-builder
 # Plugins build
 RUN --mount=type=cache,target=/go/pkg/,readonly \
   --mount=type=cache,target=/root/.cache/go-build/,sharing=private \
@@ -55,4 +55,4 @@ COPY --link --from=builder /aperture-agent /aperture-agent
 CMD ["/aperture-agent"]
 
 FROM agent-base AS agent-with-plugins
-COPY --link --from=plugins-builder /plugins /opt/aperture/aperture-agent/plugins
+COPY --link --from=builder /plugins /opt/aperture/aperture-agent/plugins

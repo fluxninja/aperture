@@ -23,6 +23,8 @@ const (
 	BuildTime     = "unknown"
 	GitBranch     = "unknown"
 	GitCommitHash = "unknown"
+	Version       = "unknown"
+	Prefix        = "unknown"
 )
 
 func ServicePlugin() plugins.ServicePluginIface {

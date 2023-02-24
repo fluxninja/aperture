@@ -16,6 +16,8 @@ ARG VERSION
 ENV VERSION=${VERSION}
 ARG RACE
 ENV RACE=${RACE}
+ARG BUILD_TIME="$(date -Iseconds)"
+ENV BUILD_TIME=${BUILD_TIME}
 
 FROM base AS builder
 RUN --mount=type=cache,target=/go/pkg/,readonly \
@@ -24,9 +26,7 @@ RUN --mount=type=cache,target=/go/pkg/,readonly \
   LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
   ./pkg/info/build.sh
 
-
 # BUILD PLUGINS STAGE
-FROM builder AS plugins-builder
 RUN --mount=type=cache,target=/go/pkg/,readonly \
   --mount=type=cache,target=/root/.cache/go-build/,sharing=private \
   /bin/bash -c \
@@ -54,4 +54,4 @@ COPY --link --from=builder /aperture-controller /aperture-controller
 CMD ["/aperture-controller"]
 
 FROM controller-base AS controller-with-plugins
-COPY --link --from=plugins-builder /plugins /opt/aperture/aperture-controller/plugins
+COPY --link --from=builder /plugins /opt/aperture/aperture-controller/plugins
