@@ -134,7 +134,7 @@ paths:
         x-go-tag-default: "10"
         x-go-tag-validate: min=1
         description: |+
-          Number of samples to collect. Defaults to 10.
+          Number of samples to collect.
 
         name: samples
         in: query
@@ -177,7 +177,7 @@ paths:
         x-go-tag-default: "10"
         x-go-tag-validate: min=1
         description: |+
-          Number of samples to collect. Defaults to 10.
+          Number of samples to collect.
 
         name: samples
         in: query

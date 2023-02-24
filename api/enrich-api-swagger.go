@@ -102,49 +102,60 @@ func replaceRef(content map[string]interface{}, replacements map[string]string) 
 }
 
 func processGoTags(content map[string]interface{}) {
-	// look for "@gotags: " line in the description
+	// look for "@gotags: " line in the description or title
 	// example of gotags annotation: "@gotags: default:"info" validate:"oneof=info warn crit"
 	for k, v := range content {
-		if k == "description" {
-			desc, ok := v.(string)
-			if !ok {
+		var text string
+		switch k {
+		case "description":
+			if t, ok := v.(string); ok {
+				text = t
+			}
+		case "title":
+			if t, ok := v.(string); ok {
+				text = t
+			}
+		default:
+			// dive into the map or array
+			if m, ok := v.(map[string]interface{}); ok {
+				processGoTags(m)
+			} else if a, ok := v.([]interface{}); ok {
+				for _, v1 := range a {
+					if m, ok := v1.(map[string]interface{}); ok {
+						processGoTags(m)
+					}
+				}
+			}
+			continue
+		}
+
+		// split desc into separate lines
+		lines := strings.Split(text, "\n")
+		// look for "@gotags: " line
+		for _, line := range lines {
+			prefix := "@gotags: "
+			// look for "@gotags:" line
+			if !strings.HasPrefix(line, prefix) {
 				continue
 			}
-			// split desc into separate lines
-			lines := strings.Split(desc, "\n")
-			// look for "@gotags: " line
-			for _, line := range lines {
-				prefix := "@gotags: "
-				// look for "@gotags:" line
-				if !strings.HasPrefix(line, prefix) {
-					continue
-				}
 
-				// remove line from description
-				desc = strings.ReplaceAll(desc, line, "")
-				content["description"] = desc
+			// remove line from description
+			text = strings.ReplaceAll(text, line, "")
+			if text == "" {
+				delete(content, k)
+			} else {
+				content[k] = text
+			}
 
-				// remove "@gotags: " prefix
-				tags := line[len(prefix):]
-				tagMap := parseStructTag(tags)
-				// add each tag as "x-go-tag-<tagname>" key
-				for k1, v1 := range tagMap {
-					content["x-go-tag-"+k1] = v1
-				}
+			// remove "@gotags: " prefix
+			tags := line[len(prefix):]
+			tagMap := parseStructTag(tags)
+			// add each tag as "x-go-tag-<tagname>" key
+			for k1, v1 := range tagMap {
+				content["x-go-tag-"+k1] = v1
 			}
 		}
-		// dive into the map
-		if m, ok := v.(map[string]interface{}); ok {
-			processGoTags(m)
-		}
-		// dive into the array
-		if a, ok := v.([]interface{}); ok {
-			for _, v1 := range a {
-				if m, ok := v1.(map[string]interface{}); ok {
-					processGoTags(m)
-				}
-			}
-		}
+
 	}
 }
 
