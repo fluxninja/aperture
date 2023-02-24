@@ -49,11 +49,7 @@ definitions:
         x-order: 3
         $ref: '#/definitions/FlowSelector'
       gradient_parameters:
-        title: |-
-          Gradient parameters for the controller. Defaults to:
-          * slope = -1
-          * min_gradient = 0.1
-          * max_gradient = 1
+        description: Gradient parameters for the controller.
         x-order: 4
         $ref: '#/definitions/GradientControllerParameters'
       in_ports:

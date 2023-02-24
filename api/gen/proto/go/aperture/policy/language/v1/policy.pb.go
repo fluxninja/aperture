@@ -3272,10 +3272,7 @@ type AIMDConcurrencyController struct {
 	FlowSelector *FlowSelector `protobuf:"bytes,3,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Scheduler parameters.
 	SchedulerParameters *Scheduler_Parameters `protobuf:"bytes,4,opt,name=scheduler_parameters,json=schedulerParameters,proto3" json:"scheduler_parameters,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Gradient parameters for the controller. Defaults to:
-	// * slope = -1
-	// * min_gradient = 0.1
-	// * max_gradient = 1
+	// Gradient parameters for the controller.
 	GradientParameters *GradientController_Parameters `protobuf:"bytes,5,opt,name=gradient_parameters,json=gradientParameters,proto3" json:"gradient_parameters,omitempty"`
 	// Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
 	MaxLoadMultiplier float64 `protobuf:"fixed64,6,opt,name=max_load_multiplier,json=maxLoadMultiplier,proto3" json:"max_load_multiplier,omitempty" default:"2.0"` // @gotags: default:"2.0"

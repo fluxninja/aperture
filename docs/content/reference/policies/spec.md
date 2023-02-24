@@ -73,11 +73,7 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dt>gradient_parameters</dt>
 <dd>
 
-([GradientControllerParameters](#gradient-controller-parameters)) Gradient parameters for the controller. Defaults to:
-
-- slope = -1
-- min_gradient = 0.1
-- max_gradient = 1
+([GradientControllerParameters](#gradient-controller-parameters)) Gradient parameters for the controller.
 
 </dd>
 <dt>in_ports</dt>

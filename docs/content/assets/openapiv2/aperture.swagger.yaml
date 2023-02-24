@@ -21,11 +21,7 @@ definitions:
                 x-go-tag-validate: required
             gradient_parameters:
                 $ref: '#/definitions/GradientControllerParameters'
-                title: |-
-                    Gradient parameters for the controller. Defaults to:
-                    * slope = -1
-                    * min_gradient = 0.1
-                    * max_gradient = 1
+                description: Gradient parameters for the controller.
             in_ports:
                 $ref: '#/definitions/AIMDConcurrencyControllerIns'
                 description: Input ports for the AIMDConcurrencyController component.
@@ -116,7 +112,6 @@ definitions:
                 description: Input ports for the Alerter component.
             parameters:
                 $ref: '#/definitions/AlerterParameters'
-                description: ""
                 title: Alerter configuration
                 x-go-tag-validate: required
         type: object
@@ -1174,12 +1169,10 @@ definitions:
         properties:
             flow_matcher:
                 $ref: '#/definitions/FlowMatcher'
-                description: ""
                 title: Match control points and labels
                 x-go-tag-validate: required
             service_selector:
                 $ref: '#/definitions/ServiceSelector'
-                description: ""
                 title: Match agent group and service
                 x-go-tag-validate: required
         title: |-
@@ -1757,7 +1750,6 @@ definitions:
                 type: string
                 x-go-tag-default: default
             api_version:
-                description: ""
                 title: API version of Kubernetes resource
                 type: string
                 x-go-tag-validate: required
@@ -2465,12 +2457,10 @@ definitions:
                 x-go-tag-validate: required
             in_ports:
                 $ref: '#/definitions/RateLimiterIns'
-                description: ""
                 title: Input ports for the RateLimiter component
                 x-go-tag-validate: required
             parameters:
                 $ref: '#/definitions/RateLimiterParameters'
-                description: ""
                 title: Parameters for the RateLimiter component
                 x-go-tag-validate: required
         title: Limits the traffic on a control point to specified rate
@@ -2554,7 +2544,6 @@ definitions:
         properties:
             enabled:
                 default: false
-                description: ""
                 title: Enables lazy sync
                 type: boolean
                 x-go-tag-default: "false"
@@ -3476,7 +3465,7 @@ paths:
                   schema:
                     $ref: '#/definitions/LabelMatcher'
                 - description: |+
-                    Number of samples to collect. Defaults to 10.
+                    Number of samples to collect.
 
                   format: int64
                   in: query
@@ -3520,7 +3509,7 @@ paths:
                   schema:
                     $ref: '#/definitions/LabelMatcher'
                 - description: |+
-                    Number of samples to collect. Defaults to 10.
+                    Number of samples to collect.
 
                   format: int64
                   in: query
