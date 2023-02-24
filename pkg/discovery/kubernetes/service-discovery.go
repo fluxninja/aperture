@@ -4,9 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net"
 	"sort"
-	"strings"
 	"sync"
 	"time"
 
@@ -188,7 +186,7 @@ func (kd *serviceDiscovery) start() {
 
 		operation := func() error {
 			// get cluster domain
-			clusterDomain, err := getClusterDomain()
+			clusterDomain, err := utils.GetClusterDomain()
 			if err != nil {
 				log.Error().Err(err).Msg("Could not get cluster domain, will retry")
 				return err
@@ -369,20 +367,4 @@ func getServicePods(endpoints *v1.Endpoints, nodeName string) []podInfo {
 	}
 
 	return pods
-}
-
-// Retrieve cluster domain of Kubernetes cluster we are installed on. It can be retrieved by looking up CNAME of
-// kubernetes.default.svc and extracting its suffix.
-func getClusterDomain() (string, error) {
-	apiSvc := "kubernetes.default.svc"
-
-	cname, err := net.LookupCNAME(apiSvc)
-	if err != nil {
-		return "", err
-	}
-
-	clusterDomain := strings.TrimPrefix(cname, apiSvc+".")
-	clusterDomain = strings.TrimSuffix(clusterDomain, ".")
-
-	return clusterDomain, nil
 }
