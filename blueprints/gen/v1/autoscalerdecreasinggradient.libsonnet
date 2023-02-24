@@ -1,4 +1,4 @@
-local podautoscalerdecreasinggradientins = import './podautoscalerdecreasinggradientins.libsonnet';
+local autoscalerdecreasinggradientins = import './autoscalerdecreasinggradientins.libsonnet';
 {
   new():: {
     in_ports: {
@@ -6,7 +6,7 @@ local podautoscalerdecreasinggradientins = import './podautoscalerdecreasinggrad
       signal: error 'Port signal is missing',
     },
   },
-  inPorts:: podautoscalerdecreasinggradientins,
+  inPorts:: autoscalerdecreasinggradientins,
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },

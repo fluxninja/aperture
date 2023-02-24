@@ -259,8 +259,8 @@ message AutoScale {
   oneof component {
     // PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
     PodScaler pod_scaler = 1;
-    // PodAutoscaler provides auto scaling functionality for scalable Kubernetes resources.
-    PodAutoscaler pod_autoscaler = 2;
+    // Autoscaler provides auto scaling functionality for any resource.
+    Autoscaler autoscaler = 2;
   }
 }
 
@@ -1440,8 +1440,8 @@ message AIMDConcurrencyController {
   LoadActuator.DynamicConfig default_config = 10;
 }
 
-// Pod Autoscaler
-message PodAutoscaler {
+// Autoscaler
+message Autoscaler {
   // Increasing Gradient defines a controller for scaling out based on Gradient Controller.
   message IncreasingGradient {
     // This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
@@ -1524,32 +1524,49 @@ message PodAutoscaler {
     Alerter.Parameters alerter_parameters = 2;
   }
 
-  // Outputs for PodAutoscaler.
-  message Outs {
-    OutPort actual_replicas = 1;
-    OutPort configured_replicas = 2;
-    OutPort desired_replicas = 3;
+  message Scaler {
+    oneof scaler {
+      KubernetesReplicas kubernetes_replicas = 1;
+    }
   }
 
-  // Output ports for the PodAutoscaler.
+  // KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
+  message KubernetesReplicas {
+    // The Kubernetes object on which horizontal scaling is applied.
+    KubernetesObjectSelector kubernetes_object_selector = 1; // @gotags: validate:"required"
+
+    // Configuration key for DynamicConfig
+    string dynamic_config_key = 2;
+
+    // Default configuration.
+    PodScaler.ScaleActuator.DynamicConfig default_config = 3;
+  }
+
+  // Outputs for Autoscaler.
+  message Outs {
+    OutPort actual_scale = 1;
+    OutPort configured_scale = 2;
+    OutPort desired_scale = 3;
+  }
+
+  // Output ports for the Autoscaler.
   Outs out_ports = 1;
 
-  // The Kubernetes object on which horizontal scaling is applied.
-  KubernetesObjectSelector kubernetes_object_selector = 2; // @gotags: validate:"required"
+  Scaler scaler = 2; // @gotags: validate:"required"
 
-  // The minimum number of replicas to which the autoscaler can scale in.
-  uint32 min_replicas = 3; // @gotags: default:"0"];
-  // The maximum number of replicas to which the autoscaler can scale out.
-  uint32 max_replicas = 4; // @gotags: default:"4294967295"]
+  // The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+  uint64 min_scale = 3; // @gotags: default:"0"];
+  // The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+  uint64 max_scale = 4; // @gotags: default:"4294967295"]
 
-  // List of Controllers for scaling out pods.
+  // List of Controllers for scaling out.
   repeated ScaleOutController scale_out_controllers = 5;
-  // List of Controllers for scaling in pods.
+  // List of Controllers for scaling in.
   repeated ScaleInController scale_in_controllers = 6;
 
-  // The maximum number of pods to scale in at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 10% of current pods.
+  // The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
   double scale_in_max_percentage = 7; // @gotags: default:"10"
-  // The maximum number of pods to scale out at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 1% of current pods.
+  // The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
   double scale_out_max_percentage = 8; // @gotags: default:"1"
 
   // The amount of time to wait after a scale out operation for another scale out or scale in operation.
@@ -1567,10 +1584,4 @@ message PodAutoscaler {
 
   // Configuration for scale in alerter.
   Alerter.Parameters scale_in_alerter_parameters = 13;
-
-  // Configuration key for DynamicConfig
-  string dynamic_config_key = 14;
-
-  // Default configuration.
-  PodScaler.ScaleActuator.DynamicConfig default_config = 15;
 }

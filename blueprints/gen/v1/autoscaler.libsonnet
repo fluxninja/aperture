@@ -1,48 +1,30 @@
-local podautoscalerouts = import './podautoscalerouts.libsonnet';
+local autoscalerouts = import './autoscalerouts.libsonnet';
 {
   new():: {
     out_ports: {
-      actual_replicas: error 'Port actual_replicas is missing',
-      configured_replicas: error 'Port configured_replicas is missing',
-      desired_replicas: error 'Port desired_replicas is missing',
+      actual_scale: error 'Port actual_scale is missing',
+      configured_scale: error 'Port configured_scale is missing',
+      desired_scale: error 'Port desired_scale is missing',
     },
   },
-  outPorts:: podautoscalerouts,
+  outPorts:: autoscalerouts,
   withCooldownOverridePercentage(cooldown_override_percentage):: {
     cooldown_override_percentage: cooldown_override_percentage,
   },
   withCooldownOverridePercentageMixin(cooldown_override_percentage):: {
     cooldown_override_percentage+: cooldown_override_percentage,
   },
-  withDefaultConfig(default_config):: {
-    default_config: default_config,
+  withMaxScale(max_scale):: {
+    max_scale: max_scale,
   },
-  withDefaultConfigMixin(default_config):: {
-    default_config+: default_config,
+  withMaxScaleMixin(max_scale):: {
+    max_scale+: max_scale,
   },
-  withDynamicConfigKey(dynamic_config_key):: {
-    dynamic_config_key: dynamic_config_key,
+  withMinScale(min_scale):: {
+    min_scale: min_scale,
   },
-  withDynamicConfigKeyMixin(dynamic_config_key):: {
-    dynamic_config_key+: dynamic_config_key,
-  },
-  withKubernetesObjectSelector(kubernetes_object_selector):: {
-    kubernetes_object_selector: kubernetes_object_selector,
-  },
-  withKubernetesObjectSelectorMixin(kubernetes_object_selector):: {
-    kubernetes_object_selector+: kubernetes_object_selector,
-  },
-  withMaxReplicas(max_replicas):: {
-    max_replicas: max_replicas,
-  },
-  withMaxReplicasMixin(max_replicas):: {
-    max_replicas+: max_replicas,
-  },
-  withMinReplicas(min_replicas):: {
-    min_replicas: min_replicas,
-  },
-  withMinReplicasMixin(min_replicas):: {
-    min_replicas+: min_replicas,
+  withMinScaleMixin(min_scale):: {
+    min_scale+: min_scale,
   },
   withOutPorts(out_ports):: {
     out_ports: out_ports,
@@ -103,5 +85,11 @@ local podautoscalerouts = import './podautoscalerouts.libsonnet';
   },
   withScaleOutMaxPercentageMixin(scale_out_max_percentage):: {
     scale_out_max_percentage+: scale_out_max_percentage,
+  },
+  withScaler(scaler):: {
+    scaler: scaler,
+  },
+  withScalerMixin(scaler):: {
+    scaler+: scaler,
   },
 }

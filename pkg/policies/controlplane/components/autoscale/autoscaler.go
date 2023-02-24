@@ -1,4 +1,4 @@
-package podscaler
+package autoscale
 
 import (
 	"fmt"
@@ -9,40 +9,40 @@ import (
 )
 
 const (
-	autoscalerActualReplicasPortName           = "actual_replicas"
-	autoscalerConfiguredReplicasPortName       = "configured_replicas"
-	autoscalerDesiredReplicasPortName          = "desired_replicas"
+	autoscalerActualScalePortName              = "actual_scale"
+	autoscalerConfiguredScalePortName          = "configured_scale"
+	autoscalerDesiredScalePortName             = "desired_scale"
 	autoscalerScaleOutSignalPortNameTemplate   = "scale_out_signal_%d"
 	autoscalerScaleOutSetpointPortNameTemplate = "scale_out_setpoint_%d"
 	autoscalerScaleInSignalPortNameTemplate    = "scale_in_signal_%d"
 	autoscalerScaleInSetpointPortNameTemplate  = "scale_in_setpoint_%d"
 )
 
-// ParsePodAutoscaler parses a PodAutoscaler and returns its nested circuit representation.
-func ParsePodAutoscaler(
-	podAutoscaler *policylangv1.PodAutoscaler,
+// ParseAutoscaler parses a Autoscaler and returns its nested circuit representation.
+func ParseAutoscaler(
+	autoscaler *policylangv1.Autoscaler,
 ) (*policylangv1.NestedCircuit, error) {
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 
 	nestedOutPortsMap := make(map[string]*policylangv1.OutPort)
-	outPorts := podAutoscaler.OutPorts
+	outPorts := autoscaler.OutPorts
 	if outPorts != nil {
-		actualReplicasPort := outPorts.ActualReplicas
-		if actualReplicasPort != nil {
-			nestedOutPortsMap[autoscalerActualReplicasPortName] = actualReplicasPort
+		actualScalePort := outPorts.ActualScale
+		if actualScalePort != nil {
+			nestedOutPortsMap[autoscalerActualScalePortName] = actualScalePort
 		}
-		configuredReplicasPort := outPorts.ConfiguredReplicas
-		if configuredReplicasPort != nil {
-			nestedOutPortsMap[autoscalerConfiguredReplicasPortName] = configuredReplicasPort
+		configuredScalePort := outPorts.ConfiguredScale
+		if configuredScalePort != nil {
+			nestedOutPortsMap[autoscalerConfiguredScalePortName] = configuredScalePort
 		}
-		desiredReplicasPort := outPorts.DesiredReplicas
-		if desiredReplicasPort != nil {
-			nestedOutPortsMap[autoscalerDesiredReplicasPortName] = desiredReplicasPort
+		desiredScalePort := outPorts.DesiredScale
+		if desiredScalePort != nil {
+			nestedOutPortsMap[autoscalerDesiredScalePortName] = desiredScalePort
 		}
 	}
 
-	// Components to find the min and max values for the desired replicas.
-	componentsMinDesiredReplicas := []*policylangv1.Component{
+	// Components to find the min and max values for the desired scale.
+	componentsMinDesiredScale := []*policylangv1.Component{
 		{
 			Component: &policylangv1.Component_ArithmeticCombinator{
 				ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
@@ -52,14 +52,14 @@ func ParsePodAutoscaler(
 							Value: &policylangv1.InPort_ConstantSignal{
 								ConstantSignal: &policylangv1.ConstantSignal{
 									Const: &policylangv1.ConstantSignal_Value{
-										Value: float64(podAutoscaler.ScaleInMaxPercentage) / 100.0,
+										Value: float64(autoscaler.ScaleInMaxPercentage) / 100.0,
 									},
 								},
 							},
 						},
 						Rhs: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "ACTUAL_REPLICAS",
+								SignalName: "ACTUAL_SCALE",
 							},
 						},
 					},
@@ -126,7 +126,7 @@ func ParsePodAutoscaler(
 					InPorts: &policylangv1.ArithmeticCombinator_Ins{
 						Lhs: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "ACTUAL_REPLICAS",
+								SignalName: "ACTUAL_SCALE",
 							},
 						},
 						Rhs: &policylangv1.InPort{
@@ -137,7 +137,7 @@ func ParsePodAutoscaler(
 					},
 					OutPorts: &policylangv1.ArithmeticCombinator_Outs{
 						Output: &policylangv1.OutPort{
-							SignalName: "MIN_DESIRED_REPLICAS_PRE_CONSTRAINT",
+							SignalName: "MIN_DESIRED_SCALE_PRE_CONSTRAINT",
 						},
 					},
 				},
@@ -150,14 +150,14 @@ func ParsePodAutoscaler(
 						Inputs: []*policylangv1.InPort{
 							{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "MIN_DESIRED_REPLICAS_PRE_CONSTRAINT",
+									SignalName: "MIN_DESIRED_SCALE_PRE_CONSTRAINT",
 								},
 							},
 							{
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: float64(podAutoscaler.MinReplicas),
+											Value: float64(autoscaler.MinScale),
 										},
 									},
 								},
@@ -166,7 +166,7 @@ func ParsePodAutoscaler(
 					},
 					OutPorts: &policylangv1.Max_Outs{
 						Output: &policylangv1.OutPort{
-							SignalName: "MIN_DESIRED_REPLICAS",
+							SignalName: "MIN_DESIRED_SCALE",
 						},
 					},
 				},
@@ -174,7 +174,7 @@ func ParsePodAutoscaler(
 		},
 	}
 
-	componentsMaxDesiredReplicas := []*policylangv1.Component{
+	componentsMaxDesiredScale := []*policylangv1.Component{
 		{
 			Component: &policylangv1.Component_ArithmeticCombinator{
 				ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
@@ -184,14 +184,14 @@ func ParsePodAutoscaler(
 							Value: &policylangv1.InPort_ConstantSignal{
 								ConstantSignal: &policylangv1.ConstantSignal{
 									Const: &policylangv1.ConstantSignal_Value{
-										Value: float64(podAutoscaler.ScaleOutMaxPercentage) / 100.0,
+										Value: float64(autoscaler.ScaleOutMaxPercentage) / 100.0,
 									},
 								},
 							},
 						},
 						Rhs: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "ACTUAL_REPLICAS",
+								SignalName: "ACTUAL_SCALE",
 							},
 						},
 					},
@@ -258,7 +258,7 @@ func ParsePodAutoscaler(
 					InPorts: &policylangv1.ArithmeticCombinator_Ins{
 						Lhs: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "ACTUAL_REPLICAS",
+								SignalName: "ACTUAL_SCALE",
 							},
 						},
 						Rhs: &policylangv1.InPort{
@@ -269,7 +269,7 @@ func ParsePodAutoscaler(
 					},
 					OutPorts: &policylangv1.ArithmeticCombinator_Outs{
 						Output: &policylangv1.OutPort{
-							SignalName: "MAX_DESIRED_REPLICAS_PRE_CONSTRAINT",
+							SignalName: "MAX_DESIRED_SCALE_PRE_CONSTRAINT",
 						},
 					},
 				},
@@ -282,14 +282,14 @@ func ParsePodAutoscaler(
 						Inputs: []*policylangv1.InPort{
 							{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "MAX_DESIRED_REPLICAS_PRE_CONSTRAINT",
+									SignalName: "MAX_DESIRED_SCALE_PRE_CONSTRAINT",
 								},
 							},
 							{
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: float64(podAutoscaler.MaxReplicas),
+											Value: float64(autoscaler.MaxScale),
 										},
 									},
 								},
@@ -298,7 +298,7 @@ func ParsePodAutoscaler(
 					},
 					OutPorts: &policylangv1.Min_Outs{
 						Output: &policylangv1.OutPort{
-							SignalName: "MAX_DESIRED_REPLICAS",
+							SignalName: "MAX_DESIRED_SCALE",
 						},
 					},
 				},
@@ -311,7 +311,7 @@ func ParsePodAutoscaler(
 		componentsScaleOut, componentsScaleIn []*policylangv1.Component
 	)
 
-	for scaleOutIndex, scaleOutController := range podAutoscaler.ScaleOutControllers {
+	for scaleOutIndex, scaleOutController := range autoscaler.ScaleOutControllers {
 		signalPortName := fmt.Sprintf(autoscalerScaleOutSignalPortNameTemplate, scaleOutIndex)
 		setpointPortName := fmt.Sprintf(autoscalerScaleOutSetpointPortNameTemplate, scaleOutIndex)
 
@@ -335,7 +335,7 @@ func ParsePodAutoscaler(
 		if gradient := controller.GetGradient(); gradient != nil {
 			inPorts := gradient.GetInPorts()
 			if inPorts == nil {
-				inPorts = &policylangv1.PodAutoscaler_IncreasingGradient_Ins{}
+				inPorts = &policylangv1.Autoscaler_IncreasingGradient_Ins{}
 			}
 			signalPort := inPorts.GetSignal()
 			if signalPort != nil {
@@ -397,17 +397,17 @@ func ParsePodAutoscaler(
 								},
 								ControlVariable: &policylangv1.InPort{
 									Value: &policylangv1.InPort_SignalName{
-										SignalName: "ACTUAL_REPLICAS",
+										SignalName: "ACTUAL_SCALE",
 									},
 								},
 								Min: &policylangv1.InPort{
 									Value: &policylangv1.InPort_SignalName{
-										SignalName: "ACTUAL_REPLICAS",
+										SignalName: "ACTUAL_SCALE",
 									},
 								},
 								Max: &policylangv1.InPort{
 									Value: &policylangv1.InPort_SignalName{
-										SignalName: "MAX_DESIRED_REPLICAS",
+										SignalName: "MAX_DESIRED_SCALE",
 									},
 								},
 							},
@@ -452,7 +452,7 @@ func ParsePodAutoscaler(
 								},
 								Rhs: &policylangv1.InPort{
 									Value: &policylangv1.InPort_SignalName{
-										SignalName: "ACTUAL_REPLICAS",
+										SignalName: "ACTUAL_SCALE",
 									},
 								},
 							},
@@ -495,7 +495,7 @@ func ParsePodAutoscaler(
 		}
 	}
 
-	for scaleInIndex, scaleInController := range podAutoscaler.ScaleInControllers {
+	for scaleInIndex, scaleInController := range autoscaler.ScaleInControllers {
 		signalPortName := fmt.Sprintf(autoscalerScaleInSignalPortNameTemplate, scaleInIndex)
 		setpointPortName := fmt.Sprintf(autoscalerScaleInSetpointPortNameTemplate, scaleInIndex)
 
@@ -519,7 +519,7 @@ func ParsePodAutoscaler(
 		if gradient := controller.GetGradient(); gradient != nil {
 			inPorts := gradient.GetInPorts()
 			if inPorts == nil {
-				inPorts = &policylangv1.PodAutoscaler_DecreasingGradient_Ins{}
+				inPorts = &policylangv1.Autoscaler_DecreasingGradient_Ins{}
 			}
 			signalPort := inPorts.GetSignal()
 			if signalPort != nil {
@@ -581,17 +581,17 @@ func ParsePodAutoscaler(
 								},
 								ControlVariable: &policylangv1.InPort{
 									Value: &policylangv1.InPort_SignalName{
-										SignalName: "ACTUAL_REPLICAS",
+										SignalName: "ACTUAL_SCALE",
 									},
 								},
 								Min: &policylangv1.InPort{
 									Value: &policylangv1.InPort_SignalName{
-										SignalName: "MIN_DESIRED_REPLICAS",
+										SignalName: "MIN_DESIRED_SCALE",
 									},
 								},
 								Max: &policylangv1.InPort{
 									Value: &policylangv1.InPort_SignalName{
-										SignalName: "ACTUAL_REPLICAS",
+										SignalName: "ACTUAL_SCALE",
 									},
 								},
 							},
@@ -636,7 +636,7 @@ func ParsePodAutoscaler(
 								},
 								Rhs: &policylangv1.InPort{
 									Value: &policylangv1.InPort_SignalName{
-										SignalName: "ACTUAL_REPLICAS",
+										SignalName: "ACTUAL_SCALE",
 									},
 								},
 							},
@@ -680,9 +680,9 @@ func ParsePodAutoscaler(
 
 	}
 
-	// Process scale in and scale out signals and pass them to pod scaler
+	// Process scale in and scale out signals
 	// to scale the pods.
-	componentsScaler := []*policylangv1.Component{
+	componentsPreScaler := []*policylangv1.Component{
 		{
 			Component: &policylangv1.Component_Max{
 				Max: &policylangv1.Max{
@@ -714,7 +714,7 @@ func ParsePodAutoscaler(
 		{
 			Component: &policylangv1.Component_Holder{
 				Holder: &policylangv1.Holder{
-					HoldFor: podAutoscaler.ScaleOutCooldown,
+					HoldFor: autoscaler.ScaleOutCooldown,
 					InPorts: &policylangv1.Holder_Ins{
 						Input: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
@@ -738,7 +738,7 @@ func ParsePodAutoscaler(
 		{
 			Component: &policylangv1.Component_Holder{
 				Holder: &policylangv1.Holder{
-					HoldFor: podAutoscaler.ScaleInCooldown,
+					HoldFor: autoscaler.ScaleInCooldown,
 					InPorts: &policylangv1.Holder_Ins{
 						Input: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
@@ -773,7 +773,7 @@ func ParsePodAutoscaler(
 							Value: &policylangv1.InPort_ConstantSignal{
 								ConstantSignal: &policylangv1.ConstantSignal{
 									Const: &policylangv1.ConstantSignal_Value{
-										Value: (float64(podAutoscaler.CooldownOverridePercentage) / 100.0) + 1.0,
+										Value: (float64(autoscaler.CooldownOverridePercentage) / 100.0) + 1.0,
 									},
 								},
 							},
@@ -790,7 +790,7 @@ func ParsePodAutoscaler(
 		{
 			Component: &policylangv1.Component_Holder{
 				Holder: &policylangv1.Holder{
-					HoldFor: podAutoscaler.ScaleInCooldown,
+					HoldFor: autoscaler.ScaleInCooldown,
 					InPorts: &policylangv1.Holder_Ins{
 						Input: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
@@ -850,81 +850,7 @@ func ParsePodAutoscaler(
 					},
 					OutPorts: &policylangv1.Max_Outs{
 						Output: &policylangv1.OutPort{
-							SignalName: "DESIRED_REPLICAS",
-						},
-					},
-				},
-			},
-		},
-		{
-			Component: &policylangv1.Component_AutoScale{
-				AutoScale: &policylangv1.AutoScale{
-					Component: &policylangv1.AutoScale_PodScaler{
-						PodScaler: &policylangv1.PodScaler{
-							KubernetesObjectSelector: podAutoscaler.KubernetesObjectSelector,
-							ScaleActuator: &policylangv1.PodScaler_ScaleActuator{
-								DynamicConfigKey: podAutoscaler.DynamicConfigKey,
-								DefaultConfig:    podAutoscaler.DefaultConfig,
-								InPorts: &policylangv1.PodScaler_ScaleActuator_Ins{
-									DesiredReplicas: &policylangv1.InPort{
-										Value: &policylangv1.InPort_SignalName{
-											SignalName: "DESIRED_REPLICAS",
-										},
-									},
-								},
-							},
-							ScaleReporter: &policylangv1.PodScaler_ScaleReporter{
-								OutPorts: &policylangv1.PodScaler_ScaleReporter_Outs{
-									ActualReplicas: &policylangv1.OutPort{
-										SignalName: "ACTUAL_REPLICAS",
-									},
-									ConfiguredReplicas: &policylangv1.OutPort{
-										SignalName: "CONFIGURED_REPLICAS",
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			Component: &policylangv1.Component_NestedSignalEgress{
-				NestedSignalEgress: &policylangv1.NestedSignalEgress{
-					PortName: autoscalerActualReplicasPortName,
-					InPorts: &policylangv1.NestedSignalEgress_Ins{
-						Signal: &policylangv1.InPort{
-							Value: &policylangv1.InPort_SignalName{
-								SignalName: "ACTUAL_REPLICAS",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			Component: &policylangv1.Component_NestedSignalEgress{
-				NestedSignalEgress: &policylangv1.NestedSignalEgress{
-					PortName: autoscalerConfiguredReplicasPortName,
-					InPorts: &policylangv1.NestedSignalEgress_Ins{
-						Signal: &policylangv1.InPort{
-							Value: &policylangv1.InPort_SignalName{
-								SignalName: "CONFIGURED_REPLICAS",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			Component: &policylangv1.Component_NestedSignalEgress{
-				NestedSignalEgress: &policylangv1.NestedSignalEgress{
-					PortName: autoscalerDesiredReplicasPortName,
-					InPorts: &policylangv1.NestedSignalEgress_Ins{
-						Signal: &policylangv1.InPort{
-							Value: &policylangv1.InPort_SignalName{
-								SignalName: "DESIRED_REPLICAS",
-							},
+							SignalName: "DESIRED_SCALE",
 						},
 					},
 				},
@@ -932,18 +858,109 @@ func ParsePodAutoscaler(
 		},
 	}
 
+	var (
+		componentsScaler []*policylangv1.Component
+		shortDescription string
+	)
+	scaler := autoscaler.Scaler
+	if scaler == nil {
+		return nil, fmt.Errorf("no scaler specified")
+	}
+	if kubernetesReplicas := scaler.GetKubernetesReplicas(); kubernetesReplicas != nil {
+		shortDescription = kubernetesReplicas.KubernetesObjectSelector.GetNamespace() + ":" + kubernetesReplicas.KubernetesObjectSelector.GetKind() + "/" + kubernetesReplicas.KubernetesObjectSelector.Name
+		componentsScaler = []*policylangv1.Component{
+			{
+				Component: &policylangv1.Component_AutoScale{
+					AutoScale: &policylangv1.AutoScale{
+						Component: &policylangv1.AutoScale_PodScaler{
+							PodScaler: &policylangv1.PodScaler{
+								KubernetesObjectSelector: kubernetesReplicas.KubernetesObjectSelector,
+								ScaleActuator: &policylangv1.PodScaler_ScaleActuator{
+									DynamicConfigKey: kubernetesReplicas.DynamicConfigKey,
+									DefaultConfig:    kubernetesReplicas.DefaultConfig,
+									InPorts: &policylangv1.PodScaler_ScaleActuator_Ins{
+										DesiredReplicas: &policylangv1.InPort{
+											Value: &policylangv1.InPort_SignalName{
+												SignalName: "DESIRED_SCALE",
+											},
+										},
+									},
+								},
+								ScaleReporter: &policylangv1.PodScaler_ScaleReporter{
+									OutPorts: &policylangv1.PodScaler_ScaleReporter_Outs{
+										ActualReplicas: &policylangv1.OutPort{
+											SignalName: "ACTUAL_SCALE",
+										},
+										ConfiguredReplicas: &policylangv1.OutPort{
+											SignalName: "CONFIGURED_SCALE",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_NestedSignalEgress{
+					NestedSignalEgress: &policylangv1.NestedSignalEgress{
+						PortName: autoscalerActualScalePortName,
+						InPorts: &policylangv1.NestedSignalEgress_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "ACTUAL_SCALE",
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_NestedSignalEgress{
+					NestedSignalEgress: &policylangv1.NestedSignalEgress{
+						PortName: autoscalerConfiguredScalePortName,
+						InPorts: &policylangv1.NestedSignalEgress_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "CONFIGURED_SCALE",
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_NestedSignalEgress{
+					NestedSignalEgress: &policylangv1.NestedSignalEgress{
+						PortName: autoscalerDesiredScalePortName,
+						InPorts: &policylangv1.NestedSignalEgress_Ins{
+							Signal: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "DESIRED_SCALE",
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+	} else {
+		return nil, fmt.Errorf("unsupported scaler type: %T", scaler)
+	}
+
 	// Concatenate the components into a single components list.
 	var components []*policylangv1.Component
-	components = append(components, componentsMinDesiredReplicas...)
-	components = append(components, componentsMaxDesiredReplicas...)
+	components = append(components, componentsMinDesiredScale...)
+	components = append(components, componentsMaxDesiredScale...)
 	components = append(components, componentsScaleIn...)
 	components = append(components, componentsScaleOut...)
+	components = append(components, componentsPreScaler...)
 	components = append(components, componentsScaler...)
 
 	// Construct nested circuit.
 	nestedCircuit := &policylangv1.NestedCircuit{
-		Name:             "PodAutoscaler",
-		ShortDescription: podAutoscaler.KubernetesObjectSelector.GetNamespace() + ":" + podAutoscaler.KubernetesObjectSelector.GetKind() + "/" + podAutoscaler.KubernetesObjectSelector.Name,
+		Name:             "Autoscaler",
+		ShortDescription: shortDescription,
 		InPortsMap:       nestedInPortsMap,
 		OutPortsMap:      nestedOutPortsMap,
 		Components:       components,

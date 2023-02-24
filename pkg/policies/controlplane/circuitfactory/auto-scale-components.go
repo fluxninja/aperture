@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/autoscale"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/autoscale/podscaler"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -114,8 +115,8 @@ func newAutoScaleCompositeAndOptions(
 		tree.Root = podScalerConfComp
 
 		return tree, configuredComponents, fx.Options(options...), nil
-	} else if podAutoscaler := autoScaleComponentProto.GetPodAutoscaler(); podAutoscaler != nil {
-		nestedCircuit, err := podscaler.ParsePodAutoscaler(podAutoscaler)
+	} else if autoscaler := autoScaleComponentProto.GetAutoscaler(); autoscaler != nil {
+		nestedCircuit, err := autoscale.ParseAutoscaler(autoscaler)
 		if err != nil {
 			return retErr(err)
 		}

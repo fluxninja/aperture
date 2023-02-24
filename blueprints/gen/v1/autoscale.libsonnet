@@ -1,11 +1,11 @@
 {
   new():: {
   },
-  withPodAutoscaler(pod_autoscaler):: {
-    pod_autoscaler: pod_autoscaler,
+  withAutoscaler(autoscaler):: {
+    autoscaler: autoscaler,
   },
-  withPodAutoscalerMixin(pod_autoscaler):: {
-    pod_autoscaler+: pod_autoscaler,
+  withAutoscalerMixin(autoscaler):: {
+    autoscaler+: autoscaler,
   },
   withPodScaler(pod_scaler):: {
     pod_scaler: pod_scaler,

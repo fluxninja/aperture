@@ -251,12 +251,224 @@ definitions:
     AutoScale:
         description: AutoScale components are used to scale a service.
         properties:
-            pod_autoscaler:
-                $ref: '#/definitions/PodAutoscaler'
-                description: PodAutoscaler provides auto scaling functionality for scalable Kubernetes resources.
+            autoscaler:
+                $ref: '#/definitions/Autoscaler'
+                description: Autoscaler provides auto scaling functionality for any resource.
             pod_scaler:
                 $ref: '#/definitions/PodScaler'
                 description: PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+        type: object
+    Autoscaler:
+        properties:
+            cooldown_override_percentage:
+                description: |+
+                    Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.
+                    For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
+                    scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+
+                format: double
+                type: number
+                x-go-tag-default: "50"
+            max_scale:
+                description: |+
+                    The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+
+                format: uint64
+                type: string
+                x-go-tag-default: "4294967295"
+            min_scale:
+                description: |+
+                    The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+
+                format: uint64
+                type: string
+                x-go-tag-default: "0"
+            out_ports:
+                $ref: '#/definitions/AutoscalerOuts'
+                description: Output ports for the Autoscaler.
+            scale_in_alerter_parameters:
+                $ref: '#/definitions/AlerterParameters'
+                description: Configuration for scale in alerter.
+            scale_in_controllers:
+                description: List of Controllers for scaling in.
+                items:
+                    $ref: '#/definitions/AutoscalerScaleInController'
+                type: array
+            scale_in_cooldown:
+                description: |+
+                    The amount of time to wait after a scale in operation for another scale in operation.
+
+                type: string
+                x-go-tag-default: 120s
+            scale_in_max_percentage:
+                description: |+
+                    The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+
+                format: double
+                type: number
+                x-go-tag-default: "10"
+            scale_out_alerter_parameters:
+                $ref: '#/definitions/AlerterParameters'
+                description: Configuration for scale out alerter.
+            scale_out_controllers:
+                description: List of Controllers for scaling out.
+                items:
+                    $ref: '#/definitions/AutoscalerScaleOutController'
+                type: array
+            scale_out_cooldown:
+                description: |+
+                    The amount of time to wait after a scale out operation for another scale out or scale in operation.
+
+                type: string
+                x-go-tag-default: 30s
+            scale_out_max_percentage:
+                description: |+
+                    The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+
+                format: double
+                type: number
+                x-go-tag-default: "1"
+            scaler:
+                $ref: '#/definitions/AutoscalerScaler'
+                title: '@gotags: validate:"required"'
+        title: Autoscaler
+        type: object
+    AutoscalerDecreasingGradient:
+        description: Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
+        properties:
+            in_ports:
+                $ref: '#/definitions/AutoscalerDecreasingGradientIns'
+                description: Input ports for the Gradient.
+            parameters:
+                $ref: '#/definitions/AutoscalerDecreasingGradientParameters'
+                title: |-
+                    Gradient parameters for the controller. Defaults and constraints:
+                    * slope = 1
+                    * min_gradient = -Inf (must be less than 1)
+                    * max_gradient = 1 (cannot be changed)
+        type: object
+    AutoscalerDecreasingGradientIns:
+        description: Inputs for Gradient.
+        properties:
+            setpoint:
+                $ref: '#/definitions/InPort'
+                description: The setpoint to use for scale in.
+            signal:
+                $ref: '#/definitions/InPort'
+                description: The signal to use for scale in.
+        type: object
+    AutoscalerDecreasingGradientParameters:
+        description: This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+        properties:
+            min_gradient:
+                format: double
+                title: '@gotags: default:"-1.79769313486231570814527423731704356798070e+308" validate:"lte=1.0"'
+                type: number
+            slope:
+                format: double
+                title: '@gotags: default:"1.0"'
+                type: number
+        type: object
+    AutoscalerIncreasingGradient:
+        description: Increasing Gradient defines a controller for scaling out based on Gradient Controller.
+        properties:
+            in_ports:
+                $ref: '#/definitions/AutoscalerIncreasingGradientIns'
+                description: Input ports for the Gradient.
+            parameters:
+                $ref: '#/definitions/AutoscalerIncreasingGradientParameters'
+                title: |-
+                    Gradient parameters for the controller. Defaults and constraints:
+                    * slope = 1
+                    * min_gradient = 1 (cannot be changed)
+                    * max_gradient = +Inf (must be greater than 1)
+        type: object
+    AutoscalerIncreasingGradientIns:
+        description: Inputs for Gradient.
+        properties:
+            setpoint:
+                $ref: '#/definitions/InPort'
+                description: The setpoint to use for scale out.
+            signal:
+                $ref: '#/definitions/InPort'
+                description: The signal to use for scale out.
+        type: object
+    AutoscalerIncreasingGradientParameters:
+        description: This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+        properties:
+            max_gradient:
+                format: double
+                title: '@gotags: default:"1.79769313486231570814527423731704356798070e+308" validate:"gte=1.0"'
+                type: number
+            slope:
+                format: double
+                title: '@gotags: default:"1.0"'
+                type: number
+        type: object
+    AutoscalerKubernetesReplicas:
+        description: KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
+        properties:
+            default_config:
+                $ref: '#/definitions/PodScalerScaleActuatorDynamicConfig'
+                description: Default configuration.
+            dynamic_config_key:
+                title: Configuration key for DynamicConfig
+                type: string
+            kubernetes_object_selector:
+                $ref: '#/definitions/KubernetesObjectSelector'
+                description: |+
+                    The Kubernetes object on which horizontal scaling is applied.
+
+                x-go-tag-validate: required
+        required:
+            - kubernetes_object_selector
+        type: object
+    AutoscalerOuts:
+        description: Outputs for Autoscaler.
+        properties:
+            actual_scale:
+                $ref: '#/definitions/OutPort'
+            configured_scale:
+                $ref: '#/definitions/OutPort'
+            desired_scale:
+                $ref: '#/definitions/OutPort'
+        type: object
+    AutoscalerScaleInController:
+        properties:
+            alerter_parameters:
+                $ref: '#/definitions/AlerterParameters'
+                description: Configuration for embedded alerter.
+            controller:
+                $ref: '#/definitions/AutoscalerScaleInControllerController'
+                title: Controller
+        type: object
+    AutoscalerScaleInControllerController:
+        properties:
+            gradient:
+                $ref: '#/definitions/AutoscalerDecreasingGradient'
+        type: object
+    AutoscalerScaleOutController:
+        properties:
+            alerter_parameters:
+                $ref: '#/definitions/AlerterParameters'
+                description: Configuration for embedded alerter.
+            controller:
+                $ref: '#/definitions/AutoscalerScaleOutControllerController'
+                description: ""
+                title: Controller
+                x-go-tag-validate: required
+        required:
+            - controller
+        type: object
+    AutoscalerScaleOutControllerController:
+        properties:
+            gradient:
+                $ref: '#/definitions/AutoscalerIncreasingGradient'
+        type: object
+    AutoscalerScaler:
+        properties:
+            kubernetes_replicas:
+                $ref: '#/definitions/AutoscalerKubernetesReplicas'
         type: object
     CheckResponse:
         description: CheckResponse contains fields that represent decision made by Check call.
@@ -2161,206 +2373,6 @@ definitions:
                 type: object
             self_peer:
                 $ref: '#/definitions/Peer'
-        type: object
-    PodAutoscaler:
-        properties:
-            cooldown_override_percentage:
-                description: |+
-                    Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.
-                    For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
-                    scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
-
-                format: double
-                type: number
-                x-go-tag-default: "50"
-            default_config:
-                $ref: '#/definitions/PodScalerScaleActuatorDynamicConfig'
-                description: Default configuration.
-            dynamic_config_key:
-                title: Configuration key for DynamicConfig
-                type: string
-            kubernetes_object_selector:
-                $ref: '#/definitions/KubernetesObjectSelector'
-                description: |+
-                    The Kubernetes object on which horizontal scaling is applied.
-
-                x-go-tag-validate: required
-            max_replicas:
-                description: |+
-                    The maximum number of replicas to which the autoscaler can scale out.
-
-                format: int64
-                type: integer
-                x-go-tag-default: "4294967295"
-            min_replicas:
-                description: |+
-                    The minimum number of replicas to which the autoscaler can scale in.
-
-                format: int64
-                type: integer
-                x-go-tag-default: "0"
-            out_ports:
-                $ref: '#/definitions/PodAutoscalerOuts'
-                description: Output ports for the PodAutoscaler.
-            scale_in_alerter_parameters:
-                $ref: '#/definitions/AlerterParameters'
-                description: Configuration for scale in alerter.
-            scale_in_controllers:
-                description: List of Controllers for scaling in pods.
-                items:
-                    $ref: '#/definitions/PodAutoscalerScaleInController'
-                type: array
-            scale_in_cooldown:
-                description: |+
-                    The amount of time to wait after a scale in operation for another scale in operation.
-
-                type: string
-                x-go-tag-default: 120s
-            scale_in_max_percentage:
-                description: |+
-                    The maximum number of pods to scale in at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 10% of current pods.
-
-                format: double
-                type: number
-                x-go-tag-default: "10"
-            scale_out_alerter_parameters:
-                $ref: '#/definitions/AlerterParameters'
-                description: Configuration for scale out alerter.
-            scale_out_controllers:
-                description: List of Controllers for scaling out pods.
-                items:
-                    $ref: '#/definitions/PodAutoscalerScaleOutController'
-                type: array
-            scale_out_cooldown:
-                description: |+
-                    The amount of time to wait after a scale out operation for another scale out or scale in operation.
-
-                type: string
-                x-go-tag-default: 30s
-            scale_out_max_percentage:
-                description: |+
-                    The maximum number of pods to scale out at a time defined as percentage of current pods. Can never go below one pod even if percentage computation is less than one. Defaults to 1% of current pods.
-
-                format: double
-                type: number
-                x-go-tag-default: "1"
-        required:
-            - kubernetes_object_selector
-        title: Pod Autoscaler
-        type: object
-    PodAutoscalerDecreasingGradient:
-        description: Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
-        properties:
-            in_ports:
-                $ref: '#/definitions/PodAutoscalerDecreasingGradientIns'
-                description: Input ports for the Gradient.
-            parameters:
-                $ref: '#/definitions/PodAutoscalerDecreasingGradientParameters'
-                title: |-
-                    Gradient parameters for the controller. Defaults and constraints:
-                    * slope = 1
-                    * min_gradient = -Inf (must be less than 1)
-                    * max_gradient = 1 (cannot be changed)
-        type: object
-    PodAutoscalerDecreasingGradientIns:
-        description: Inputs for Gradient.
-        properties:
-            setpoint:
-                $ref: '#/definitions/InPort'
-                description: The setpoint to use for scale in.
-            signal:
-                $ref: '#/definitions/InPort'
-                description: The signal to use for scale in.
-        type: object
-    PodAutoscalerDecreasingGradientParameters:
-        description: This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
-        properties:
-            min_gradient:
-                format: double
-                title: '@gotags: default:"-1.79769313486231570814527423731704356798070e+308" validate:"lte=1.0"'
-                type: number
-            slope:
-                format: double
-                title: '@gotags: default:"1.0"'
-                type: number
-        type: object
-    PodAutoscalerIncreasingGradient:
-        description: Increasing Gradient defines a controller for scaling out based on Gradient Controller.
-        properties:
-            in_ports:
-                $ref: '#/definitions/PodAutoscalerIncreasingGradientIns'
-                description: Input ports for the Gradient.
-            parameters:
-                $ref: '#/definitions/PodAutoscalerIncreasingGradientParameters'
-                title: |-
-                    Gradient parameters for the controller. Defaults and constraints:
-                    * slope = 1
-                    * min_gradient = 1 (cannot be changed)
-                    * max_gradient = +Inf (must be greater than 1)
-        type: object
-    PodAutoscalerIncreasingGradientIns:
-        description: Inputs for Gradient.
-        properties:
-            setpoint:
-                $ref: '#/definitions/InPort'
-                description: The setpoint to use for scale out.
-            signal:
-                $ref: '#/definitions/InPort'
-                description: The signal to use for scale out.
-        type: object
-    PodAutoscalerIncreasingGradientParameters:
-        description: This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
-        properties:
-            max_gradient:
-                format: double
-                title: '@gotags: default:"1.79769313486231570814527423731704356798070e+308" validate:"gte=1.0"'
-                type: number
-            slope:
-                format: double
-                title: '@gotags: default:"1.0"'
-                type: number
-        type: object
-    PodAutoscalerOuts:
-        description: Outputs for PodAutoscaler.
-        properties:
-            actual_replicas:
-                $ref: '#/definitions/OutPort'
-            configured_replicas:
-                $ref: '#/definitions/OutPort'
-            desired_replicas:
-                $ref: '#/definitions/OutPort'
-        type: object
-    PodAutoscalerScaleInController:
-        properties:
-            alerter_parameters:
-                $ref: '#/definitions/AlerterParameters'
-                description: Configuration for embedded alerter.
-            controller:
-                $ref: '#/definitions/PodAutoscalerScaleInControllerController'
-                title: Controller
-        type: object
-    PodAutoscalerScaleInControllerController:
-        properties:
-            gradient:
-                $ref: '#/definitions/PodAutoscalerDecreasingGradient'
-        type: object
-    PodAutoscalerScaleOutController:
-        properties:
-            alerter_parameters:
-                $ref: '#/definitions/AlerterParameters'
-                description: Configuration for embedded alerter.
-            controller:
-                $ref: '#/definitions/PodAutoscalerScaleOutControllerController'
-                description: ""
-                title: Controller
-                x-go-tag-validate: required
-        required:
-            - controller
-        type: object
-    PodAutoscalerScaleOutControllerController:
-        properties:
-            gradient:
-                $ref: '#/definitions/PodAutoscalerIncreasingGradient'
         type: object
     PodScaler:
         properties:
