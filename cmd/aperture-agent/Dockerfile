@@ -1,11 +1,13 @@
-# syntax=docker/dockerfile:1
-FROM golang:1.19-bullseye AS base
+# syntax=docker/dockerfile:1.4
+FROM golang:1.20.1-bullseye AS base
 
 WORKDIR /src
 COPY --link . .
 
-RUN --mount=type=cache,target=/go/pkg/ \
+RUN --mount=type=cache,target=/go/pkg/,id=agent-v1 \
   go mod download
+
+FROM base AS builder
 
 # App build
 ARG GIT_COMMIT_HASH
@@ -16,23 +18,17 @@ ARG VERSION
 ENV VERSION=${VERSION}
 ARG RACE
 ENV RACE=${RACE}
+ARG BUILD_TIME="$(date -Iseconds)"
+ENV BUILD_TIME=${BUILD_TIME}
 
-FROM base AS builder
-RUN --mount=type=cache,target=/go/pkg/,readonly \
-  --mount=type=cache,target=/root/.cache/go-build/,sharing=private \
-  CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" \
-  LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
-  ./pkg/info/build.sh
-
-
-# BUILD PLUGINS STAGE
-FROM builder AS plugins-builder
-# Plugins build
-RUN --mount=type=cache,target=/go/pkg/,readonly \
-  --mount=type=cache,target=/root/.cache/go-build/,sharing=private \
+RUN --mount=type=cache,target=/go/pkg/,id=agent-v1,readonly \
+  --mount=type=cache,target=/root/.cache/go-build/,id=agent-v1,sharing=private \
   /bin/bash -c \
   'set -euo pipefail; \
   shopt -s nullglob; \
+  CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" \
+  LDFLAGS="-extldflags \"-Wl,--allow-multiple-definition\"" \
+  ./pkg/info/build.sh;\
   for plugin in ./plugins/{service,agent}/aperture-plugin-*; do\
   echo "building plugin $plugin";\
   CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" \
@@ -42,7 +38,7 @@ RUN --mount=type=cache,target=/go/pkg/,readonly \
   '
 
 # Final image
-FROM debian:bullseye-slim AS agent-base
+FROM debian:bullseye-slim AS agent
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates \
@@ -51,8 +47,8 @@ RUN apt-get update \
 
 # Ensure config dirs exists, even if not mounted
 RUN mkdir -p /etc/aperture/aperture-agent/flowcontrol /etc/aperture/aperture-agent/classifiers /opt/aperture/aperture-agent/plugins
+
 COPY --link --from=builder /aperture-agent /aperture-agent
 CMD ["/aperture-agent"]
 
-FROM agent-base AS agent-with-plugins
-COPY --link --from=plugins-builder /plugins /opt/aperture/aperture-agent/plugins
+COPY --link --from=builder /plugins /opt/aperture/aperture-agent/plugins

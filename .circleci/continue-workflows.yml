@@ -13,7 +13,7 @@ executors:
       - image: cimg/base:2022.07
   go-cimg-executor:
     docker:
-      - image: cimg/go:1.19
+      - image: cimg/go:1.20
         user: root
   python-cimg-executor:
     docker:
@@ -1255,10 +1255,10 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v2-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v3-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
               checksum "tools/go/go.mod" }}
-            - aperture-asdf-cache-v2-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v3-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
           name: Install ASDF tools
@@ -1276,7 +1276,7 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            aperture-asdf-cache-v2-{{ checksum "~/month" }}-<<
+            aperture-asdf-cache-v3-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "tools/go/go.mod" }}
           paths:
