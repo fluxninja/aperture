@@ -38,7 +38,7 @@ RUN --mount=type=cache,target=/go/pkg/,id=agent,readonly \
   '
 
 # Final image
-FROM debian:bullseye-slim AS agent-base
+FROM debian:bullseye-slim AS agent
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates \
@@ -47,8 +47,8 @@ RUN apt-get update \
 
 # Ensure config dirs exists, even if not mounted
 RUN mkdir -p /etc/aperture/aperture-agent/flowcontrol /etc/aperture/aperture-agent/classifiers /opt/aperture/aperture-agent/plugins
+
 COPY --link --from=builder /aperture-agent /aperture-agent
 CMD ["/aperture-agent"]
 
-FROM agent-base AS agent-with-plugins
 COPY --link --from=builder /plugins /opt/aperture/aperture-agent/plugins
