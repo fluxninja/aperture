@@ -20,18 +20,13 @@ ENV RACE=${RACE}
 FROM base AS builder
 RUN --mount=type=cache,target=/go/pkg/,readonly \
   --mount=type=cache,target=/root/.cache/go-build/,sharing=private \
-  CGO_ENABLED=1 TARGET="/aperture-controller" PREFIX="aperture" SOURCE="./cmd/aperture-controller" \
-  LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
-  ./pkg/info/build.sh
-
-
-# BUILD PLUGINS STAGE
-FROM builder AS plugins-builder
-RUN --mount=type=cache,target=/go/pkg/,readonly \
-  --mount=type=cache,target=/root/.cache/go-build/,sharing=private \
   /bin/bash -c \
   'set -euo pipefail; \
   shopt -s nullglob; \
+  CGO_ENABLED=1 TARGET="/aperture-controller" PREFIX="aperture" SOURCE="./cmd/aperture-controller" \
+  LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
+  ./pkg/info/build.sh; \
+  echo "building plugins"; \
   for plugin in ./plugins/{service,controller}/aperture-plugin-*; do\
   echo "building plugin $plugin";\
   CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" \
@@ -54,4 +49,4 @@ COPY --link --from=builder /aperture-controller /aperture-controller
 CMD ["/aperture-controller"]
 
 FROM controller-base AS controller-with-plugins
-COPY --link --from=plugins-builder /plugins /opt/aperture/aperture-controller/plugins
+COPY --link --from=builder /plugins /opt/aperture/aperture-controller/plugins

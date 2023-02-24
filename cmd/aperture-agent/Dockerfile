@@ -20,19 +20,13 @@ ENV RACE=${RACE}
 FROM base AS builder
 RUN --mount=type=cache,target=/go/pkg/,readonly \
   --mount=type=cache,target=/root/.cache/go-build/,sharing=private \
-  CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" \
-  LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
-  ./pkg/info/build.sh
-
-
-# BUILD PLUGINS STAGE
-FROM builder AS plugins-builder
-# Plugins build
-RUN --mount=type=cache,target=/go/pkg/,readonly \
-  --mount=type=cache,target=/root/.cache/go-build/,sharing=private \
   /bin/bash -c \
   'set -euo pipefail; \
   shopt -s nullglob; \
+  CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" \
+  LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
+  ./pkg/info/build.sh; \
+  echo "building plugins"; \
   for plugin in ./plugins/{service,agent}/aperture-plugin-*; do\
   echo "building plugin $plugin";\
   CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" \
@@ -55,4 +49,4 @@ COPY --link --from=builder /aperture-agent /aperture-agent
 CMD ["/aperture-agent"]
 
 FROM agent-base AS agent-with-plugins
-COPY --link --from=plugins-builder /plugins /opt/aperture/aperture-agent/plugins
+COPY --link --from=builder /plugins /opt/aperture/aperture-agent/plugins
