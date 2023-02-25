@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1.4
-FROM golang:1.20.1-bullseye AS base
+FROM golang:1.19.6-bullseye AS base
 
 WORKDIR /src
 COPY --link . .
 
-RUN --mount=type=cache,target=/go/pkg/,id=agent-v1 \
+RUN --mount=type=cache,target=/go/pkg/,id=agent-1.19.6 \
   go mod download
 
 FROM base AS builder
@@ -21,8 +21,8 @@ ENV RACE=${RACE}
 ARG BUILD_TIME="$(date -Iseconds)"
 ENV BUILD_TIME=${BUILD_TIME}
 
-RUN --mount=type=cache,target=/go/pkg/,id=agent-v1,readonly \
-  --mount=type=cache,target=/root/.cache/go-build/,id=agent-v1,sharing=private \
+RUN --mount=type=cache,target=/go/pkg/,id=agent-1.19.6,readonly \
+  --mount=type=cache,target=/root/.cache/go-build/,id=agent-1.19.6,sharing=private \
   /bin/bash -c \
   'set -euo pipefail; \
   shopt -s nullglob; \
