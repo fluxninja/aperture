@@ -6,9 +6,11 @@ gitroot=$(git rev-parse --show-toplevel)
 
 FIND="find"
 SED="sed"
+AWK="awk"
 if [[ "$OSTYPE" == "darwin"* ]]; then
 	FIND="gfind"
 	SED="gsed"
+	AWK="gawk"
 fi
 
 # make sure go version is of the form major.minor.patch
@@ -50,3 +52,9 @@ major_minor="$major.$minor"
 
 # in .pre-commit-config.yaml, replace -compat=1.15 with -compat=1.16
 "$SED" -i "s/-compat=[0-9]\+\.[0-9]\+/-compat=$major_minor/" "$gitroot"/.pre-commit-config.yaml
+
+# for all yml or yaml files in .circleci directory, increment asdf cache version which looks like aperture-asdf-cache-v<version>. it should look like aperture-asdf-cache-v<version+1>
+# shellcheck disable=SC2016
+"$FIND" .circleci -type f \( -name "*.yml" -o -name "*.yaml" \) -print0 | while read -r -d $'\0' file; do
+	"$AWK" -i inplace '/aperture-asdf-cache-v[0-9]+/ {match($0, /aperture-asdf-cache-v([0-9]+)(.*)/, a); $0 = gensub(/aperture-asdf-cache-v[0-9]+/, "aperture-asdf-cache-v" a[1]+1 a[2], "g", $0)} {print}' "$file"
+done
