@@ -62,4 +62,5 @@ message Entity {
   string ip_address = 3;
   string name = 4;
   repeated string services = 5;
+  string cluster_ip = 6;
 }

@@ -105,8 +105,15 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
     name="policy.rate_limiter.parameters"
     type="aperture.spec.v1.RateLimiterParameters"
     reference="../../spec#rate-limiter-parameters"
-    value="{'label_key': '__REQUIRED_FIELD__', 'limit_reset_interval': '1s'}"
+    value="{'label_key': '__REQUIRED_FIELD__', 'limit_reset_interval': '__REQUIRED_FIELD__'}"
     description='Parameters.' />
+
+<ParameterDescription
+    name="policy.rate_limiter.parameters.limit_reset_interval"
+    type="string"
+    reference=""
+    value="__REQUIRED_FIELD__"
+    description='Time after which the limit for a given label value will be reset.' />
 
 <ParameterDescription
     name="policy.rate_limiter.parameters.label_key"
@@ -121,6 +128,13 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
     reference="../../spec#rate-limiter-dynamic-config"
     value="{'overrides': []}"
     description='Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.' />
+
+<ParameterDescription
+    name="policy.rate_limiter.default_config.overrides"
+    type="[]aperture.spec.v1.RateLimiterOverride"
+    reference="../../spec#rate-limiter-override"
+    value="[]"
+    description='Allows to specify different limits for particular label values.' />
 
 <h3 class="blueprints-h3">Dashboard</h3>
 

@@ -5,8 +5,8 @@ client:
     http: ""
     https: ""
 dist_cache:
-  bind_addr: :3320
   memberlist_advertise_addr: ""
+  bind_addr: :3320
   memberlist_bind_addr: :3322
   replica_count: 1
 etcd:
@@ -29,8 +29,8 @@ fluxninja_plugin:
   client:
     grpc:
       backoff:
-        base_delay: 1s
         jitter: 0.2
+        base_delay: 1s
         max_delay: 120s
         multiplier: 1.6
       insecure: false

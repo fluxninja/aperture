@@ -1,5 +1,7 @@
 local apertureAgentApp = import 'apps/aperture-agent/main.libsonnet';
 
+local pluginEnv = std.extVar('ENABLE_CLOUD_PLUGIN');
+
 local apertureAgentMixin =
   apertureAgentApp {
     values+:: {
@@ -13,10 +15,24 @@ local apertureAgentMixin =
       agent+: {
         createUninstallHook: false,
         config+: {
+          fluxninja_plugin+: {
+            fluxninja_endpoint: 'aperture.latest.dev.fluxninja.com' + ':443',
+            client+: {
+              grpc+: {
+                insecure: false,
+                tls+: {
+                  insecure_skip_verify: true,
+                },
+              },
+              http+: {
+                tls+: {
+                  insecure_skip_verify: true,
+                },
+              },
+            },
+          },
           plugins+: {
-            disabled_plugins: [
-              'aperture-plugin-fluxninja',
-            ],
+            disabled_plugins: if pluginEnv == 'True' then [] else ['aperture-plugin-fluxninja'],
           },
           log+: {
             pretty_console: true,
@@ -35,6 +51,12 @@ local apertureAgentMixin =
             },
           },
         },
+        secrets+: {
+          fluxNinjaPlugin+: {
+            create: pluginEnv,
+            value: '2b97802cf7984791919758a537c05ad0',
+          },
+        },
         image: {
           registry: '',
           repository: 'docker.io/fluxninja/aperture-agent',
@@ -49,4 +71,5 @@ local apertureAgentMixin =
 
 {
   agent: apertureAgentMixin,
+  // pluign_env : pluginEnv(),
 }

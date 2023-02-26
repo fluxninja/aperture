@@ -29,7 +29,7 @@ type PreviewRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Number of samples to collect. Defaults to 10.
+	// Number of samples to collect.
 	Samples int64 `protobuf:"varint,1,opt,name=samples,proto3" json:"samples,omitempty" validate:"min=1" default:"10"` // @gotags: validate:"min=1" default:"10"
 	// Control point to preview.
 	ControlPoint string `protobuf:"bytes,2,opt,name=control_point,json=controlPoint,proto3" json:"control_point,omitempty" validate:"required"` // @gotags: validate:"required"

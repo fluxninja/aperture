@@ -134,7 +134,7 @@ paths:
         x-go-tag-default: "10"
         x-go-tag-validate: min=1
         description: |+
-          Number of samples to collect. Defaults to 10.
+          Number of samples to collect.
 
         name: samples
         in: query
@@ -177,7 +177,7 @@ paths:
         x-go-tag-default: "10"
         x-go-tag-validate: min=1
         description: |+
-          Number of samples to collect. Defaults to 10.
+          Number of samples to collect.
 
         name: samples
         in: query
@@ -338,6 +338,8 @@ definitions:
     description: Entity represents a pod, vm, etc.
     type: object
     properties:
+      cluster_ip:
+        type: string
       ip_address:
         type: string
       name:
@@ -436,7 +438,13 @@ definitions:
           Valid operators are In, NotIn, Exists and DoesNotExist.
 
         type: string
+        enum:
+        - In
+        - NotIn
+        - Exists
+        - DoesNotExists
         x-go-tag-validate: oneof=In NotIn Exists DoesNotExists
+        x-oneof: In | NotIn | Exists | DoesNotExists
       values:
         description: |-
           An array of string values that relates to the key by an operator.

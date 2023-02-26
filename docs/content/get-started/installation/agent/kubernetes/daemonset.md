@@ -51,8 +51,12 @@ which will be managed by the Aperture Operator.
 By following these instructions, you will have deployed the Aperture Agent into
 your cluster.
 
-:::info Refer Kubernetes Objects which will be created by following steps are
-listed [here](/reference/kubernetes-operator/agent.md). :::
+:::info Refer
+
+Kubernetes Objects which will be created by following steps are listed
+[here](/reference/kubernetes-operator/agent.md).
+
+:::
 
 1. Configure the below parameters of Plugins, Etcd and Prometheus for the Agent
    Custom Resource by creating a `values.yaml` and pass it with `install`

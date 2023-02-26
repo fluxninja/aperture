@@ -34,8 +34,10 @@ type FlowSelector struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Match agent group and service
 	ServiceSelector *ServiceSelector `protobuf:"bytes,1,opt,name=service_selector,json=serviceSelector,proto3" json:"service_selector,omitempty" validate:"required"` // @gotags: validate:"required"
-	FlowMatcher     *FlowMatcher     `protobuf:"bytes,2,opt,name=flow_matcher,json=flowMatcher,proto3" json:"flow_matcher,omitempty" validate:"required"`             // @gotags: validate:"required"
+	// Match control points and labels
+	FlowMatcher *FlowMatcher `protobuf:"bytes,2,opt,name=flow_matcher,json=flowMatcher,proto3" json:"flow_matcher,omitempty" validate:"required"` // @gotags: validate:"required"
 }
 
 func (x *FlowSelector) Reset() {
