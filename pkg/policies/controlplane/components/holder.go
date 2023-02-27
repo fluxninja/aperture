@@ -12,16 +12,17 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime/tristate"
 )
 
 // Holder is a component that holds the last valid signal value
 // for the specified duration then waits for next valid value to hold.
 type Holder struct {
+	currentReading runtime.Reading
 	holdFor        time.Duration
 	holdWindow     uint32
 	windowCount    uint32
 	holdPhase      bool
-	currentReading runtime.Reading
 }
 
 // Name implements runtime.Component.
@@ -36,11 +37,11 @@ func (h *Holder) ShortDescription() string { return fmt.Sprintf("for: %s", h.hol
 // NewHolderAndOptions creates a holder component and its fx options.
 func NewHolderAndOptions(holderProto *policylangv1.Holder, _ string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()
-	holdFor := math.Ceil(float64(holderProto.HoldFor.AsDuration()) / float64(evaluationPeriod))
+	holdWindow := uint32(math.Ceil(float64(holderProto.HoldFor.AsDuration()) / float64(evaluationPeriod)))
 
 	holder := &Holder{
 		holdFor:     holderProto.HoldFor.AsDuration(),
-		holdWindow:  uint32(holdFor),
+		holdWindow:  holdWindow,
 		windowCount: 0,
 		holdPhase:   false,
 	}
@@ -50,14 +51,18 @@ func NewHolderAndOptions(holderProto *policylangv1.Holder, _ string, policyReadA
 // Execute implements runtime.Component.Execute.
 func (h *Holder) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	input := inPortReadings.ReadSingleReadingPort("input")
+	reset := inPortReadings.ReadSingleReadingPort("reset")
 	output := runtime.InvalidReading()
+
+	if tristate.FromReading(reset).IsTrue() {
+		h.reset()
+	}
 
 	if h.holdPhase {
 		h.windowCount++
 		// hold_for is finished
 		if h.windowCount >= h.holdWindow {
-			h.holdPhase = false
-			h.windowCount = 0
+			h.reset()
 		} else {
 			output = h.currentReading
 		}
@@ -75,6 +80,12 @@ func (h *Holder) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.
 	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
+}
+
+func (h *Holder) reset() {
+	h.currentReading = runtime.InvalidReading()
+	h.holdPhase = false
+	h.windowCount = 0
 }
 
 // DynamicConfigUpdate is a no-op for Holder.

@@ -8,9 +8,9 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/rate"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/controller"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/promql"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/rate"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -50,8 +50,8 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.Decider, components.NewDeciderAndOptions)
 	case *policylangv1.Component_Switcher:
 		ctor = mkCtor(config.Switcher, components.NewSwitcherAndOptions)
-	case *policylangv1.Component_Sqrt:
-		ctor = mkCtor(config.Sqrt, components.NewSqrtAndOptions)
+	case *policylangv1.Component_UnaryOperator:
+		ctor = mkCtor(config.UnaryOperator, components.NewUnaryOperatorAndOptions)
 	case *policylangv1.Component_Max:
 		ctor = mkCtor(config.Max, components.NewMaxAndOptions)
 	case *policylangv1.Component_Min:

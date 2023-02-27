@@ -47,7 +47,7 @@ applications:
       docker_context: playground/scenarios/demo-app/application
       dockerfile: playground/scenarios/demo-app/application/Dockerfile
     deployment:
-      playground/scenarios/demo-app/charts/demo-app/.+: charts/aperture/demo-app/
+      playground/tanka/charts/demo-app/.+: charts/aperture/demo-app/
   istioconfig:
     deployment:
       manifests/charts/istioconfig/.+: charts/aperture/istioconfig/

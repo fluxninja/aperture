@@ -129,7 +129,7 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToReading, tic
 			outputReading = runtime.NewReading(math.Min(output.Value(), max.Value()))
 		}
 		if min.Valid() {
-			outputReading = runtime.NewReading(math.Max(output.Value(), min.Value()))
+			outputReading = runtime.NewReading(math.Max(outputReading.Value(), min.Value()))
 		}
 		if outputReading.Value() != output.Value() {
 			// Wind output

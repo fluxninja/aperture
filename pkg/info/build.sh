@@ -5,10 +5,12 @@ set -eux
 # TODO: it should be used in every Dockerfile requiring version endpoint.
 
 VERSION=${VERSION:-0.0.1}
-BUILD_TIME=$(date -Iseconds)
+BUILD_TIME=${BUILD_TIME:-$(date -Iseconds)}
 GOOS=$(go env GOOS)
 GOARCH=$(go env GOARCH)
 HOSTNAME=$(hostname)
+PREFIX="${PREFIX:-aperture}"
+
 SERVICE_FILE=$(basename -- "${TARGET}")
 SERVICE="${SERVICE_FILE%.*}"
 
@@ -25,13 +27,13 @@ LDFLAGS="\
 "
 
 if [ -n "${RACE:-}" ]; then
-  build_args=( -race )
+	build_args=(-race)
 fi
 
 build_args+=(
-  --ldflags "${LDFLAGS}"
-  -o "${TARGET}"
-  "${SOURCE}"
+	--ldflags "${LDFLAGS}"
+	-o "${TARGET}"
+	"${SOURCE}"
 )
 
 go build "${build_args[@]}"

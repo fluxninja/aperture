@@ -133,10 +133,16 @@ func ParseNestedCircuit(
 // DecodePortMap decodes a proto port map into a PortToSignals map.
 func DecodePortMap(config any, circuitID string) (runtime.PortToSignals, error) {
 	ports := make(runtime.PortToSignals)
+	if config == nil {
+		return ports, nil
+	}
 
 	mapStruct, err := mapstruct.EncodeObject(config)
 	if err != nil {
 		return nil, err
+	}
+	if len(mapStruct) == 0 {
+		return ports, nil
 	}
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		WeaklyTypedInput: true, // So that singular ports will transparently be converted to lists.

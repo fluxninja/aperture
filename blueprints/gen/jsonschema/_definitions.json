@@ -308,9 +308,328 @@
     "AutoScale": {
       "description": "AutoScale components are used to scale a service.",
       "properties": {
+        "autoscaler": {
+          "$ref": "#/definitions/Autoscaler",
+          "description": "Autoscaler provides auto scaling functionality for any resource.",
+          "x-order": 0
+        },
         "pod_scaler": {
           "$ref": "#/definitions/PodScaler",
-          "description": "PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.\n\nGradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.",
+          "description": "PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.",
+          "x-order": 1
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "Autoscaler": {
+      "properties": {
+        "cooldown_override_percentage": {
+          "default": 50,
+          "description": "Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.\nFor example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the\nscale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.\n\n",
+          "format": "double",
+          "type": "number",
+          "x-go-tag-default": "50",
+          "x-order": 0
+        },
+        "max_scale": {
+          "default": "4294967295",
+          "description": "The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.\n\n",
+          "format": "uint64",
+          "type": "string",
+          "x-go-tag-default": "4294967295",
+          "x-order": 1
+        },
+        "min_scale": {
+          "default": "0",
+          "description": "The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.\n\n",
+          "format": "uint64",
+          "type": "string",
+          "x-go-tag-default": "0",
+          "x-order": 2
+        },
+        "out_ports": {
+          "$ref": "#/definitions/AutoscalerOuts",
+          "description": "Output ports for the Autoscaler.",
+          "x-order": 3
+        },
+        "scale_in_alerter_parameters": {
+          "$ref": "#/definitions/AlerterParameters",
+          "description": "Configuration for scale in alerter.",
+          "x-order": 4
+        },
+        "scale_in_controllers": {
+          "description": "List of Controllers for scaling in.",
+          "items": {
+            "$ref": "#/definitions/AutoscalerScaleInController"
+          },
+          "type": "array",
+          "x-order": 5
+        },
+        "scale_in_cooldown": {
+          "default": "120s",
+          "description": "The amount of time to wait after a scale in operation for another scale in operation.\n\n",
+          "type": "string",
+          "x-go-tag-default": "120s",
+          "x-order": 6
+        },
+        "scale_in_max_percentage": {
+          "default": 10,
+          "description": "The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.\n\n",
+          "format": "double",
+          "type": "number",
+          "x-go-tag-default": "10",
+          "x-order": 7
+        },
+        "scale_out_alerter_parameters": {
+          "$ref": "#/definitions/AlerterParameters",
+          "description": "Configuration for scale out alerter.",
+          "x-order": 8
+        },
+        "scale_out_controllers": {
+          "description": "List of Controllers for scaling out.",
+          "items": {
+            "$ref": "#/definitions/AutoscalerScaleOutController"
+          },
+          "type": "array",
+          "x-order": 9
+        },
+        "scale_out_cooldown": {
+          "default": "30s",
+          "description": "The amount of time to wait after a scale out operation for another scale out or scale in operation.\n\n",
+          "type": "string",
+          "x-go-tag-default": "30s",
+          "x-order": 10
+        },
+        "scale_out_max_percentage": {
+          "default": 1,
+          "description": "The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.\n\n",
+          "format": "double",
+          "type": "number",
+          "x-go-tag-default": "1",
+          "x-order": 11
+        },
+        "scaler": {
+          "$ref": "#/definitions/AutoscalerScaler",
+          "x-go-tag-validate": "required",
+          "x-order": 12
+        }
+      },
+      "title": "Autoscaler",
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoscalerDecreasingGradient": {
+      "description": "Decreasing Gradient defines a controller for scaling in based on Gradient Controller.",
+      "properties": {
+        "in_ports": {
+          "$ref": "#/definitions/AutoscalerDecreasingGradientIns",
+          "description": "Input ports for the Gradient.",
+          "x-order": 0
+        },
+        "parameters": {
+          "$ref": "#/definitions/AutoscalerDecreasingGradientParameters",
+          "title": "Gradient parameters for the controller. Defaults and constraints:\n* slope = 1\n* min_gradient = -Inf (must be less than 1)\n* max_gradient = 1 (cannot be changed)",
+          "x-order": 1
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoscalerDecreasingGradientIns": {
+      "description": "Inputs for Gradient.",
+      "properties": {
+        "setpoint": {
+          "$ref": "#/definitions/InPort",
+          "description": "The setpoint to use for scale in.",
+          "x-order": 0
+        },
+        "signal": {
+          "$ref": "#/definitions/InPort",
+          "description": "The signal to use for scale in.",
+          "x-order": 1
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoscalerDecreasingGradientParameters": {
+      "description": "This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).",
+      "properties": {
+        "min_gradient": {
+          "default": -1.7976931348623157e308,
+          "format": "double",
+          "type": "number",
+          "x-go-tag-default": "-1.79769313486231570814527423731704356798070e+308",
+          "x-go-tag-validate": "lte=1.0",
+          "x-order": 0
+        },
+        "slope": {
+          "default": 1,
+          "format": "double",
+          "type": "number",
+          "x-go-tag-default": "1.0",
+          "x-order": 1
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoscalerIncreasingGradient": {
+      "description": "Increasing Gradient defines a controller for scaling out based on Gradient Controller.",
+      "properties": {
+        "in_ports": {
+          "$ref": "#/definitions/AutoscalerIncreasingGradientIns",
+          "description": "Input ports for the Gradient.",
+          "x-order": 0
+        },
+        "parameters": {
+          "$ref": "#/definitions/AutoscalerIncreasingGradientParameters",
+          "title": "Gradient parameters for the controller. Defaults and constraints:\n* slope = 1\n* min_gradient = 1 (cannot be changed)\n* max_gradient = +Inf (must be greater than 1)",
+          "x-order": 1
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoscalerIncreasingGradientIns": {
+      "description": "Inputs for Gradient.",
+      "properties": {
+        "setpoint": {
+          "$ref": "#/definitions/InPort",
+          "description": "The setpoint to use for scale out.",
+          "x-order": 0
+        },
+        "signal": {
+          "$ref": "#/definitions/InPort",
+          "description": "The signal to use for scale out.",
+          "x-order": 1
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoscalerIncreasingGradientParameters": {
+      "description": "This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).",
+      "properties": {
+        "max_gradient": {
+          "default": 1.7976931348623157e308,
+          "format": "double",
+          "type": "number",
+          "x-go-tag-default": "1.79769313486231570814527423731704356798070e+308",
+          "x-go-tag-validate": "gte=1.0",
+          "x-order": 0
+        },
+        "slope": {
+          "default": 1,
+          "format": "double",
+          "type": "number",
+          "x-go-tag-default": "1.0",
+          "x-order": 1
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoscalerKubernetesReplicas": {
+      "description": "KubernetesReplicas defines a horizontal pod scaler for Kubernetes.",
+      "properties": {
+        "default_config": {
+          "$ref": "#/definitions/PodScalerScaleActuatorDynamicConfig",
+          "description": "Default configuration.",
+          "x-order": 0
+        },
+        "dynamic_config_key": {
+          "title": "Configuration key for DynamicConfig",
+          "type": "string",
+          "x-order": 1
+        },
+        "kubernetes_object_selector": {
+          "$ref": "#/definitions/KubernetesObjectSelector",
+          "description": "The Kubernetes object on which horizontal scaling is applied.\n\n",
+          "x-go-tag-validate": "required",
+          "x-order": 2
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoscalerOuts": {
+      "description": "Outputs for Autoscaler.",
+      "properties": {
+        "actual_scale": {
+          "$ref": "#/definitions/OutPort",
+          "x-order": 0
+        },
+        "configured_scale": {
+          "$ref": "#/definitions/OutPort",
+          "x-order": 1
+        },
+        "desired_scale": {
+          "$ref": "#/definitions/OutPort",
+          "x-order": 2
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoscalerScaleInController": {
+      "properties": {
+        "alerter_parameters": {
+          "$ref": "#/definitions/AlerterParameters",
+          "description": "Configuration for embedded alerter.",
+          "x-order": 0
+        },
+        "controller": {
+          "$ref": "#/definitions/AutoscalerScaleInControllerController",
+          "title": "Controller",
+          "x-order": 1
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoscalerScaleInControllerController": {
+      "properties": {
+        "gradient": {
+          "$ref": "#/definitions/AutoscalerDecreasingGradient",
+          "x-order": 0
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoscalerScaleOutController": {
+      "properties": {
+        "alerter_parameters": {
+          "$ref": "#/definitions/AlerterParameters",
+          "description": "Configuration for embedded alerter.",
+          "x-order": 0
+        },
+        "controller": {
+          "$ref": "#/definitions/AutoscalerScaleOutControllerController",
+          "title": "Controller",
+          "x-go-tag-validate": "required",
+          "x-order": 1
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoscalerScaleOutControllerController": {
+      "properties": {
+        "gradient": {
+          "$ref": "#/definitions/AutoscalerIncreasingGradient",
+          "x-order": 0
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AutoscalerScaler": {
+      "properties": {
+        "kubernetes_replicas": {
+          "$ref": "#/definitions/AutoscalerKubernetesReplicas",
           "x-order": 0
         }
       },
@@ -479,14 +798,14 @@
           "description": "Query components that are query databases such as Prometheus.",
           "x-order": 21
         },
-        "sqrt": {
-          "$ref": "#/definitions/Sqrt",
-          "description": "Takes an input signal and emits the square root of the input signal.",
-          "x-order": 22
-        },
         "switcher": {
           "$ref": "#/definitions/Switcher",
           "description": "Switcher acts as a switch that emits one of the two signals based on third signal.",
+          "x-order": 22
+        },
+        "unary_operator": {
+          "$ref": "#/definitions/UnaryOperator",
+          "description": "Takes an input signal and emits the square root of the input signal.",
           "x-order": 23
         },
         "variable": {
@@ -1283,6 +1602,11 @@
           "$ref": "#/definitions/InPort",
           "description": "The input signal.",
           "x-order": 0
+        },
+        "reset": {
+          "$ref": "#/definitions/InPort",
+          "description": "Resets the holder output to the current input signal when reset signal is valid and non-zero.",
+          "x-order": 1
         }
       },
       "type": "object",
@@ -2504,56 +2828,6 @@
       "type": "object",
       "additionalProperties": false
     },
-    "Sqrt": {
-      "description": "$$\n\\text{output} = \\text{scale} \\sqrt{\\text{input}}\n$$",
-      "properties": {
-        "in_ports": {
-          "$ref": "#/definitions/SqrtIns",
-          "description": "Input ports for the Sqrt component.",
-          "x-order": 0
-        },
-        "out_ports": {
-          "$ref": "#/definitions/SqrtOuts",
-          "description": "Output ports for the Sqrt component.",
-          "x-order": 1
-        },
-        "scale": {
-          "default": 1,
-          "description": "Scaling factor to be multiplied with the square root of the input signal.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "1.0",
-          "x-order": 2
-        }
-      },
-      "title": "Takes an input signal and emits the square root of it multiplied by scale as an output",
-      "type": "object",
-      "additionalProperties": false
-    },
-    "SqrtIns": {
-      "description": "Inputs for the Sqrt component.",
-      "properties": {
-        "input": {
-          "$ref": "#/definitions/InPort",
-          "description": "Input signal.",
-          "x-order": 0
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "SqrtOuts": {
-      "description": "Outputs for the Sqrt component.",
-      "properties": {
-        "output": {
-          "$ref": "#/definitions/OutPort",
-          "description": "Output signal.",
-          "x-order": 0
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
     "Switcher": {
       "description": "`on_signal` will be returned if switch input is valid and not equal to 0.0 ,\n otherwise `off_signal` will be returned.",
       "properties": {
@@ -2600,6 +2874,94 @@
         "output": {
           "$ref": "#/definitions/OutPort",
           "description": "Selected signal (`on_signal` or `off_signal`).",
+          "x-order": 0
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "UnaryOperator": {
+      "description": "$$\n\\text{output} = \\unary_operator{\\text{input}}\n$$",
+      "properties": {
+        "in_ports": {
+          "$ref": "#/definitions/UnaryOperatorIns",
+          "description": "Input ports for the UnaryOperator component.",
+          "x-order": 0
+        },
+        "operator": {
+          "description": "Unary Operator to apply.\n\nThe unary operator can be one of the following:\n* abs: Absolute value with the sign removed.\n* acos: arccosine, in radians.\n* acosh: Inverse hyperbolic cosine.\n* asin: arcsine, in radians.\n* asinh: Inverse hyperbolic sine.\n* atan: arctangent, in radians.\n* atanh: Inverse hyperbolic tangent.\n* cbrt: Cube root.\n* ceil: Least integer value greater than or equal to input signal.\n* cos: cosine, in radians.\n* cosh: Hyperbolic cosine.\n* erf: Error function.\n* erfc: Complementary error function.\n* erfcinv: Inverse complementary error function.\n* erfinv: Inverse error function.\n* exp: The base-e exponential of input signal.\n* exp2: The base-2 exponential of input signal.\n* expm1: The base-e exponential of input signal minus 1.\n* floor: Greatest integer value less than or equal to input signal.\n* gamma: Gamma function.\n* j0: Bessel function of the first kind of order 0.\n* j1: Bessel function of the first kind of order 1.\n* lgamma: Natural logarithm of the absolute value of the gamma function.\n* log: Natural logarithm of input signal.\n* log10: Base-10 logarithm of input signal.\n* log1p: Natural logarithm of input signal plus 1.\n* log2: Base-2 logarithm of input signal.\n* round: Round to nearest integer.\n* roundtoeven: Round to nearest integer, with ties going to the nearest even integer.\n* sin: sine, in radians.\n* sinh: Hyperbolic sine.\n* sqrt: Square root.\n* tan: tangent, in radians.\n* tanh: Hyperbolic tangent.\n* trunc: Truncate to integer.\n* y0: Bessel function of the second kind of order 0.\n* y1: Bessel function of the second kind of order 1.\n\n",
+          "enum": [
+            "abs",
+            "acos",
+            "acosh",
+            "asin",
+            "asinh",
+            "atan",
+            "atanh",
+            "cbrt",
+            "ceil",
+            "cos",
+            "cosh",
+            "erf",
+            "erfc",
+            "erfcinv",
+            "erfinv",
+            "exp",
+            "exp2",
+            "expm1",
+            "floor",
+            "gamma",
+            "j0",
+            "j1",
+            "lgamma",
+            "log",
+            "log10",
+            "log1p",
+            "log2",
+            "round",
+            "roundtoeven",
+            "sin",
+            "sinh",
+            "sqrt",
+            "tan",
+            "tanh",
+            "trunc",
+            "y0",
+            "y1"
+          ],
+          "type": "string",
+          "x-go-tag-validate": "oneof=abs acos acosh asin asinh atan atanh cbrt ceil cos cosh erf erfc erfcinv erfinv exp exp2 expm1 floor gamma j0 j1 lgamma log log10 log1p log2 round roundtoeven sin sinh sqrt tan tanh trunc y0 y1",
+          "x-oneof": "abs | acos | acosh | asin | asinh | atan | atanh | cbrt | ceil | cos | cosh | erf | erfc | erfcinv | erfinv | exp | exp2 | expm1 | floor | gamma | j0 | j1 | lgamma | log | log10 | log1p | log2 | round | roundtoeven | sin | sinh | sqrt | tan | tanh | trunc | y0 | y1",
+          "x-order": 1
+        },
+        "out_ports": {
+          "$ref": "#/definitions/UnaryOperatorOuts",
+          "description": "Output ports for the UnaryOperator component.",
+          "x-order": 2
+        }
+      },
+      "title": "Takes an input signal and emits the output after applying the specified unary operator",
+      "type": "object",
+      "additionalProperties": false
+    },
+    "UnaryOperatorIns": {
+      "description": "Inputs for the UnaryOperator component.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/InPort",
+          "description": "Input signal.",
+          "x-order": 0
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "UnaryOperatorOuts": {
+      "description": "Outputs for the UnaryOperator component.",
+      "properties": {
+        "output": {
+          "$ref": "#/definitions/OutPort",
+          "description": "Output signal.",
           "x-order": 0
         }
       },

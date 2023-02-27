@@ -174,7 +174,7 @@ message Component {
     Variable variable = 9;
 
     // Takes an input signal and emits the square root of the input signal.
-    Sqrt sqrt = 10;
+    UnaryOperator unary_operator = 10;
 
     // Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval.
     Extrapolator extrapolator = 11;
@@ -259,7 +259,8 @@ message AutoScale {
   oneof component {
     // PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
     PodScaler pod_scaler = 1;
-    // GradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.
+    // Autoscaler provides auto scaling functionality for any resource.
+    Autoscaler autoscaler = 2;
   }
 }
 
@@ -935,32 +936,71 @@ message Variable {
   DynamicConfig default_config = 3;
 }
 
-// Takes an input signal and emits the square root of it multiplied by scale as an output
+// Takes an input signal and emits the output after applying the specified unary operator
 //
 // $$
-// \text{output} = \text{scale} \sqrt{\text{input}}
+// \text{output} = \unary_operator{\text{input}}
 // $$
-message Sqrt {
-  // Inputs for the Sqrt component.
+message UnaryOperator {
+  // Inputs for the UnaryOperator component.
   message Ins {
     // Input signal.
     InPort input = 1;
   }
 
-  // Outputs for the Sqrt component.
+  // Outputs for the UnaryOperator component.
   message Outs {
     // Output signal.
     OutPort output = 1;
   }
 
-  // Input ports for the Sqrt component.
+  // Input ports for the UnaryOperator component.
   Ins in_ports = 1;
 
-  // Output ports for the Sqrt component.
+  // Output ports for the UnaryOperator component.
   Outs out_ports = 2;
 
-  // Scaling factor to be multiplied with the square root of the input signal.
-  double scale = 3; // @gotags: default:"1.0"
+  // Unary Operator to apply.
+  //
+  // The unary operator can be one of the following:
+  // * abs: Absolute value with the sign removed.
+  // * acos: arccosine, in radians.
+  // * acosh: Inverse hyperbolic cosine.
+  // * asin: arcsine, in radians.
+  // * asinh: Inverse hyperbolic sine.
+  // * atan: arctangent, in radians.
+  // * atanh: Inverse hyperbolic tangent.
+  // * cbrt: Cube root.
+  // * ceil: Least integer value greater than or equal to input signal.
+  // * cos: cosine, in radians.
+  // * cosh: Hyperbolic cosine.
+  // * erf: Error function.
+  // * erfc: Complementary error function.
+  // * erfcinv: Inverse complementary error function.
+  // * erfinv: Inverse error function.
+  // * exp: The base-e exponential of input signal.
+  // * exp2: The base-2 exponential of input signal.
+  // * expm1: The base-e exponential of input signal minus 1.
+  // * floor: Greatest integer value less than or equal to input signal.
+  // * gamma: Gamma function.
+  // * j0: Bessel function of the first kind of order 0.
+  // * j1: Bessel function of the first kind of order 1.
+  // * lgamma: Natural logarithm of the absolute value of the gamma function.
+  // * log: Natural logarithm of input signal.
+  // * log10: Base-10 logarithm of input signal.
+  // * log1p: Natural logarithm of input signal plus 1.
+  // * log2: Base-2 logarithm of input signal.
+  // * round: Round to nearest integer.
+  // * roundtoeven: Round to nearest integer, with ties going to the nearest even integer.
+  // * sin: sine, in radians.
+  // * sinh: Hyperbolic sine.
+  // * sqrt: Square root.
+  // * tan: tangent, in radians.
+  // * tanh: Hyperbolic tangent.
+  // * trunc: Truncate to integer.
+  // * y0: Bessel function of the second kind of order 0.
+  // * y1: Bessel function of the second kind of order 1.
+  string operator = 3; // @gotags: validate:"oneof=abs acos acosh asin asinh atan atanh cbrt ceil cos cosh erf erfc erfcinv erfinv exp exp2 expm1 floor gamma j0 j1 lgamma log log10 log1p log2 round roundtoeven sin sinh sqrt tan tanh trunc y0 y1"
 }
 
 // Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
@@ -1303,6 +1343,8 @@ message Holder {
   message Ins {
     // The input signal.
     InPort input = 1;
+    // Resets the holder output to the current input signal when reset signal is valid and non-zero.
+    InPort reset = 2;
   }
 
   // Outputs for the Holder component.
@@ -1416,4 +1458,150 @@ message AIMDConcurrencyController {
 
   // Default configuration.
   LoadActuator.DynamicConfig default_config = 10;
+}
+
+// Autoscaler
+message Autoscaler {
+  // Increasing Gradient defines a controller for scaling out based on Gradient Controller.
+  message IncreasingGradient {
+    // This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+    message Parameters {
+      double slope = 1; // @gotags: default:"1.0"
+
+      double max_gradient = 3; // @gotags: default:"1.79769313486231570814527423731704356798070e+308" validate:"gte=1.0"
+    }
+
+    // Inputs for Gradient.
+    message Ins {
+      // The signal to use for scale out.
+      InPort signal = 1;
+      // The setpoint to use for scale out.
+      InPort setpoint = 2;
+    }
+
+    // Input ports for the Gradient.
+    Ins in_ports = 1;
+
+    // Gradient parameters for the controller. Defaults and constraints:
+    // * slope = 1
+    // * min_gradient = 1 (cannot be changed)
+    // * max_gradient = +Inf (must be greater than 1)
+    Parameters parameters = 2;
+  }
+
+  // Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
+  message DecreasingGradient {
+    // This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+    message Parameters {
+      double slope = 1; // @gotags: default:"1.0"
+
+      double min_gradient = 2; // @gotags: default:"-1.79769313486231570814527423731704356798070e+308" validate:"lte=1.0"
+    }
+
+    // Inputs for Gradient.
+    message Ins {
+      // The signal to use for scale in.
+      InPort signal = 1;
+      // The setpoint to use for scale in.
+      InPort setpoint = 2;
+    }
+
+    // Input ports for the Gradient.
+    Ins in_ports = 1;
+
+    // Gradient parameters for the controller. Defaults and constraints:
+    // * slope = 1
+    // * min_gradient = -Inf (must be less than 1)
+    // * max_gradient = 1 (cannot be changed)
+    Parameters parameters = 2;
+  }
+
+  message ScaleOutController {
+    message Controller {
+      oneof controller {
+        IncreasingGradient gradient = 1;
+      }
+    }
+
+    // Controller
+    Controller controller = 1; // @gotags: validate:"required"
+
+    // Configuration for embedded alerter.
+    Alerter.Parameters alerter_parameters = 2;
+  }
+
+  message ScaleInController {
+    message Controller {
+      oneof controller {
+        DecreasingGradient gradient = 1;
+      }
+    }
+
+    // Controller
+    Controller controller = 1;
+
+    // Configuration for embedded alerter.
+    Alerter.Parameters alerter_parameters = 2;
+  }
+
+  message Scaler {
+    oneof scaler {
+      KubernetesReplicas kubernetes_replicas = 1;
+    }
+  }
+
+  // KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
+  message KubernetesReplicas {
+    // The Kubernetes object on which horizontal scaling is applied.
+    KubernetesObjectSelector kubernetes_object_selector = 1; // @gotags: validate:"required"
+
+    // Configuration key for DynamicConfig
+    string dynamic_config_key = 2;
+
+    // Default configuration.
+    PodScaler.ScaleActuator.DynamicConfig default_config = 3;
+  }
+
+  // Outputs for Autoscaler.
+  message Outs {
+    OutPort actual_scale = 1;
+    OutPort configured_scale = 2;
+    OutPort desired_scale = 3;
+  }
+
+  // Output ports for the Autoscaler.
+  Outs out_ports = 1;
+
+  Scaler scaler = 2; // @gotags: validate:"required"
+
+  // The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+  uint64 min_scale = 3; // @gotags: default:"0"];
+  // The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+  uint64 max_scale = 4; // @gotags: default:"4294967295"]
+
+  // List of Controllers for scaling out.
+  repeated ScaleOutController scale_out_controllers = 5;
+  // List of Controllers for scaling in.
+  repeated ScaleInController scale_in_controllers = 6;
+
+  // The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+  double scale_in_max_percentage = 7; // @gotags: default:"10"
+  // The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+  double scale_out_max_percentage = 8; // @gotags: default:"1"
+
+  // The amount of time to wait after a scale out operation for another scale out or scale in operation.
+  google.protobuf.Duration scale_out_cooldown = 9; // @gotags: default:"30s"
+  // The amount of time to wait after a scale in operation for another scale in operation.
+  google.protobuf.Duration scale_in_cooldown = 10; // @gotags: default:"120s"
+
+  // Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.
+  // For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
+  // scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+  double cooldown_override_percentage = 11; // @gotags: default:"50"
+
+  // Configuration for scale out alerter.
+  Alerter.Parameters scale_out_alerter_parameters = 12;
+
+  // Configuration for scale in alerter.
+  Alerter.Parameters scale_in_alerter_parameters = 13;
 }

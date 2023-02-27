@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+// Messages for aperturectl → controller and controller → agent communication.
+package aperture.cmd.v1;
+
+import "aperture/flowcontrol/preview/v1/preview.proto";
+import "google/protobuf/empty.proto";
+
+// Controller describes APIs of the controller from the aperturectl POV
+service Controller {
+  rpc ListAgents(google.protobuf.Empty) returns (ListAgentsResponse);
+  rpc ListServices(ListServicesRequest) returns (ListServicesControllerResponse);
+  rpc ListControlPoints(ListControlPointsRequest) returns (ListControlPointsControllerResponse);
+
+  // duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
+  rpc PreviewFlowLabels(PreviewFlowLabelsRequest) returns (PreviewFlowLabelsControllerResponse);
+  rpc PreviewHTTPRequests(PreviewHTTPRequestsRequest) returns (PreviewHTTPRequestsControllerResponse);
+}
+
+message ListServicesRequest {}
+
+message ListServicesAgentResponse {
+  repeated string services = 1;
+  // FIXME: Remove. Controller should be aware which agent group agent belongs to.
+  string agent_group = 2;
+}
+
+message ListServicesControllerResponse {
+  repeated GlobalService services = 1;
+  uint32 errors_count = 2;
+}
+
+message ListControlPointsRequest {}
+
+message ListControlPointsAgentResponse {
+  repeated ServiceControlPoint control_points = 1;
+  // FIXME: Remove. Controller should be aware which agent group agent belongs to.
+  string agent_group = 2;
+}
+
+message ListControlPointsControllerResponse {
+  repeated GlobalServiceControlPoint control_points = 1;
+  uint32 errors_count = 2;
+}
+
+message ListAgentsResponse {
+  repeated string agents = 1;
+}
+
+// ServiceControlPoint contains info about a control point on a given service.
+//
+// Agent group is implied.
+message ServiceControlPoint {
+  string name = 1;
+  string service_name = 2;
+}
+
+// GlobalServiceControlPoint contains info about a control point on a given
+// service with explicit Agent Group.
+message GlobalServiceControlPoint {
+  string name = 1;
+  string service_name = 2;
+  string agent_group = 3;
+}
+
+// GlobalService is a service with explicit agent group.
+message GlobalService {
+  string name = 1;
+  string agent_group = 2;
+}
+
+// Duplicating preview.PreviewRequest because rpc framework needs separate types.
+
+message PreviewFlowLabelsRequest {
+  string agent_group = 1; // Used only in ctl→controller communication.
+  aperture.flowcontrol.preview.v1.PreviewRequest request = 2;
+}
+
+message PreviewHTTPRequestsRequest {
+  string agent_group = 1; // Used only in ctl→controller communication.
+  aperture.flowcontrol.preview.v1.PreviewRequest request = 2;
+}
+
+// Wrapping response types, as we probably will want to add more
+// controller-specific fields in the future.
+
+message PreviewFlowLabelsControllerResponse {
+  aperture.flowcontrol.preview.v1.PreviewFlowLabelsResponse response = 1;
+}
+
+message PreviewHTTPRequestsControllerResponse {
+  aperture.flowcontrol.preview.v1.PreviewHTTPRequestsResponse response = 1;
+}
