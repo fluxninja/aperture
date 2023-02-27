@@ -34,8 +34,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/profilers"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/watchdog"
-	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
-	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-sentry/sentry"
+	"github.com/fluxninja/aperture/plugins/common/aperture-plugin-fluxninja/pluginconfig"
+	"github.com/fluxninja/aperture/plugins/common/aperture-plugin-sentry/sentry"
 
 	corev1 "k8s.io/api/core/v1"
 )

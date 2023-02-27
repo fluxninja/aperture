@@ -54,7 +54,7 @@ definitions:
                 x-go-tag-json: http
         title: ClientConfig is the client configuration.
         type: object
-        x-go-package: github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig
+        x-go-package: github.com/fluxninja/aperture/plugins/common/aperture-plugin-fluxninja/pluginconfig
     ClientTLSConfig:
         properties:
             ca_file:
@@ -114,7 +114,7 @@ definitions:
                 x-go-tag-validate: gte=0s
         title: FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
         type: object
-        x-go-package: github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig
+        x-go-package: github.com/fluxninja/aperture/plugins/common/aperture-plugin-fluxninja/pluginconfig
     GRPCClientConfig:
         properties:
             backoff:

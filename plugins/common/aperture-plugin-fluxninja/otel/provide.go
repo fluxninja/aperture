@@ -20,8 +20,8 @@ import (
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/utils"
-	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/heartbeats"
-	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
+	"github.com/fluxninja/aperture/plugins/common/aperture-plugin-fluxninja/heartbeats"
+	"github.com/fluxninja/aperture/plugins/common/aperture-plugin-fluxninja/pluginconfig"
 )
 
 const (

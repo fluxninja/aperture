@@ -1,4 +1,4 @@
-//go:generate swagger generate spec --scan-models --include="github.com/fluxninja/aperture/plugins/service/aperture-plugin-sentry/*" --include-tag=plugin-configuration -o ../../../docs/gen/config/aperture-plugin-sentry/plugin-swagger.yaml
+//go:generate swagger generate spec --scan-models --include="github.com/fluxninja/aperture/plugins/common/aperture-plugin-sentry/*" --include-tag=plugin-configuration -o ../../../docs/gen/config/aperture-plugin-sentry/plugin-swagger.yaml
 //go:generate go run ../../../docs/tools/swagger/process-go-tags.go ../../../docs/gen/config/aperture-plugin-sentry/plugin-swagger.yaml
 
 // Sentry Plugin
@@ -12,7 +12,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/plugins"
-	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-sentry/sentry"
+	"github.com/fluxninja/aperture/plugins/common/aperture-plugin-sentry/sentry"
 )
 
 // Set via ldflags.

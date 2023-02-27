@@ -20,7 +20,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/status"
-	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
+	"github.com/fluxninja/aperture/plugins/common/aperture-plugin-fluxninja/pluginconfig"
 )
 
 // Module returns the module for heartbeats.

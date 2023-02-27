@@ -18,9 +18,9 @@ import (
 	httpclient "github.com/fluxninja/aperture/pkg/net/http"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	"github.com/fluxninja/aperture/pkg/platform"
-	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/heartbeats"
-	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/otel"
-	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
+	"github.com/fluxninja/aperture/plugins/common/aperture-plugin-fluxninja/heartbeats"
+	"github.com/fluxninja/aperture/plugins/common/aperture-plugin-fluxninja/otel"
+	"github.com/fluxninja/aperture/plugins/common/aperture-plugin-fluxninja/pluginconfig"
 )
 
 type inStruct struct {
