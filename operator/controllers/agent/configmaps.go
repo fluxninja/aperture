@@ -29,7 +29,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -42,7 +41,7 @@ import (
 // configMapForAgentConfig prepares the ConfigMap object for the Agent.
 func configMapForAgentConfig(
 	ctx context.Context,
-	client client.Client,
+	client_ client.Client,
 	instance *agentv1alpha1.Agent,
 	scheme *runtime.Scheme,
 ) (*corev1.ConfigMap, error) {
@@ -56,7 +55,8 @@ func configMapForAgentConfig(
 	// using https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/
 	var localControllerCert []byte
 	for _, endpoint := range instance.Spec.ConfigSpec.AgentFunctions.Endpoints {
-		if !isLocalControllerEndpoint(endpoint) {
+		controllerNS := localControllerNamespaceFromEndpoint(endpoint)
+		if controllerNS == "" {
 			continue
 		}
 
@@ -65,20 +65,21 @@ func configMapForAgentConfig(
 			continue
 		}
 
-		if client == nil {
+		if client_ == nil {
 			continue
 		}
 
-		var secret corev1.Secret
-		_ = client.Get(
-			ctx,
-			types.NamespacedName{Namespace: "aperture-controller", Name: "controller-controller-cert"},
-			&secret,
-		)
+		var secrets corev1.SecretList
+		_ = client_.List(ctx, &secrets, &client.ListOptions{Namespace: controllerNS})
 
-		localControllerCert = secret.Data[controllers.ControllerCertName]
-		if localControllerCert != nil {
-			*caFile = "/etc/aperture/aperture-agent/config/controller-ca.pem"
+		for _, secret := range secrets.Items {
+			if !strings.HasSuffix(secret.Name, "-controller-cert") {
+				continue
+			}
+			localControllerCert = append(localControllerCert, secret.Data[controllers.ControllerCertName]...)
+			if localControllerCert != nil {
+				*caFile = "/etc/aperture/aperture-agent/config/controller-ca.pem"
+			}
 		}
 	}
 
@@ -166,14 +167,29 @@ func CreateAgentConfigMapInNamespace(
 	return configMap
 }
 
-// does the endpoint point to local controller in its default namespace at its default port.
-func isLocalControllerEndpoint(endpoint string) bool {
+func localControllerNamespaceFromEndpoint(endpoint string) string {
 	addr, port, ok := strings.Cut(endpoint, ":")
 	if !ok {
-		return false
+		return ""
 	}
 
-	addr += "."
-	return port == "8080" && strings.HasPrefix(addr, "aperture-controller.aperture-controller.") &&
-		strings.HasPrefix("aperture-controller.aperture-controller.svc.cluster.local.", addr) //nolint:gocritic
+	if port != "8080" {
+		return ""
+	}
+
+	subdomains := strings.Split(addr, ".")
+	if len(subdomains) < 2 {
+		return ""
+	}
+
+	if subdomains[0] != "aperture-controller" {
+		return ""
+	}
+
+	tail := strings.Join(subdomains[2:], ".") + "."
+	if !strings.HasPrefix("svc.cluster.local.", tail) { //nolint:gocritic
+		return ""
+	}
+
+	return subdomains[1]
 }
