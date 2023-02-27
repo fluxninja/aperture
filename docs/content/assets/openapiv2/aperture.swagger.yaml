@@ -286,6 +286,22 @@ definitions:
                 format: uint64
                 type: string
                 x-go-tag-default: "4294967295"
+            max_scale_in_percentage:
+                default: 1
+                description: |+
+                    The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+
+                format: double
+                type: number
+                x-go-tag-default: "1"
+            max_scale_out_percentage:
+                default: 10
+                description: |+
+                    The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+
+                format: double
+                type: number
+                x-go-tag-default: "10"
             min_scale:
                 default: "0"
                 description: |+
@@ -312,14 +328,6 @@ definitions:
 
                 type: string
                 x-go-tag-default: 120s
-            scale_in_max_percentage:
-                default: 10
-                description: |+
-                    The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
-
-                format: double
-                type: number
-                x-go-tag-default: "10"
             scale_out_alerter_parameters:
                 $ref: '#/definitions/AlerterParameters'
                 description: Configuration for scale out alerter.
@@ -335,14 +343,6 @@ definitions:
 
                 type: string
                 x-go-tag-default: 30s
-            scale_out_max_percentage:
-                default: 1
-                description: |+
-                    The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
-
-                format: double
-                type: number
-                x-go-tag-default: "1"
             scaler:
                 $ref: '#/definitions/AutoscalerScaler'
                 x-go-tag-validate: required
