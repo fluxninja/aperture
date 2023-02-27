@@ -29,7 +29,7 @@ RUN --mount=type=cache,target=/go/pkg/,readonly \
   CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" \
   LDFLAGS="-extldflags \"-Wl,--allow-multiple-definition\"" \
   ./pkg/info/build.sh;\
-  for plugin in ./plugins/{service,agent}/aperture-plugin-*; do\
+  for plugin in ./plugins/{common,agent}/aperture-plugin-*; do\
   echo "building plugin $plugin";\
   CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" \
   LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
