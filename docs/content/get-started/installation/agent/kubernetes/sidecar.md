@@ -98,6 +98,8 @@ Kubernetes Objects which will be created by following steps are listed
          endpoints: ["ETCD_ENDPOINT_HERE"]
        prometheus:
          address: "PROMETHEUS_ADDRESS_HERE"
+       agent_functions:
+         endpoints: ["CONTROLLER_ENDPOINT_HERE"]
        plugins:
          disabled_plugins:
            - aperture-plugin-fluxninja
@@ -106,12 +108,15 @@ Kubernetes Objects which will be created by following steps are listed
    Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with
    the actual values of Etcd and Prometheus, which is also being used by the
    Aperture Controller you want these Agents to connect with.
+   `CONTROLLER_ENDPOINT_HERE` should point to Aperture Controller. If you skip
+   it, some subcommands `aperturectl` commands won't work.
 
    If you have installed the
    [Aperture Controller](/get-started/installation/controller/controller.md) on
    the same cluster in `default` namespace, with Etcd and Prometheus using
    `controller` as release name, the values for the values for
-   `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` would be as below:
+   `ETCD_ENDPOINT_HERE`, `PROMETHEUS_ADDRESS_HERE` and
+   `CONTROLLER_ENDPOINT_HERE` would be as below:
 
    ```yaml
    agent:
@@ -122,6 +127,8 @@ Kubernetes Objects which will be created by following steps are listed
          endpoints: ["http://controller-etcd.default.svc.cluster.local:2379"]
        prometheus:
          address: "http://controller-prometheus-server.default.svc.cluster.local:80"
+       agent_functions:
+         endpoints: ["aperture-controller.default.svc.cluster.local:8080"]
        plugins:
          disabled_plugins:
            - aperture-plugin-fluxninja

@@ -238,7 +238,7 @@ func (r *AgentReconciler) updateStatus(ctx context.Context, instance *agentv1alp
 
 // deleteDaemonSetModeResources deletes resources installed for DaemonSet mode of Agent.
 func (r *AgentReconciler) deleteDaemonSetModeResources(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) {
-	cm, err := configMapForAgentConfig(instance.DeepCopy(), r.Scheme)
+	cm, err := configMapForAgentConfig(ctx, r.Client, instance.DeepCopy(), r.Scheme)
 	if err == nil {
 		if err = r.Delete(ctx, cm); err != nil {
 			log.Error(err, "failed to delete object of ConfigMap")
@@ -295,7 +295,7 @@ func (r *AgentReconciler) deleteSidecarModeResources(ctx context.Context, log lo
 				continue
 			}
 
-			configMap, err := configMapForAgentConfig(instance, nil)
+			configMap, err := configMapForAgentConfig(ctx, r.Client, instance, nil)
 			if err != nil {
 				log.Error(err, fmt.Sprintf("failed to create object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
 			}
@@ -466,7 +466,7 @@ func (r *AgentReconciler) manageResources(ctx context.Context, log logr.Logger, 
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileConfigMap(ctx context.Context, instance *agentv1alpha1.Agent) error {
 	if !instance.Spec.Sidecar.Enabled {
-		configMap, err := configMapForAgentConfig(instance.DeepCopy(), r.Scheme)
+		configMap, err := configMapForAgentConfig(ctx, r.Client, instance.DeepCopy(), r.Scheme)
 		if err != nil {
 			return err
 		}
@@ -712,7 +712,7 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 			continue
 		}
 
-		configMap := CreateAgentConfigMapInNamespace(instance.DeepCopy(), ns.GetName())
+		configMap := CreateAgentConfigMapInNamespace(ctx, r.Client, instance.DeepCopy(), ns.GetName())
 		if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 			return err
 		}

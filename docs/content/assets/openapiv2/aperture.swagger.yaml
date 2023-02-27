@@ -669,6 +669,14 @@ definitions:
             - ERROR_MULTI_EXPRESSION
             - ERROR_EXPRESSION_NOT_MAP
         type: string
+    ClientToServerHello:
+        properties:
+            name:
+                type: string
+            next_id:
+                format: uint64
+                type: string
+        type: object
     CommonAttributes:
         properties:
             component_id:
@@ -1562,6 +1570,26 @@ definitions:
             policies:
                 $ref: '#/definitions/Policies'
         type: object
+    GlobalService:
+        description: GlobalService is a service with explicit agent group.
+        properties:
+            agent_group:
+                type: string
+            name:
+                type: string
+        type: object
+    GlobalServiceControlPoint:
+        description: |-
+            GlobalServiceControlPoint contains info about a control point on a given
+            service with explicit Agent Group.
+        properties:
+            agent_group:
+                type: string
+            name:
+                type: string
+            service_name:
+                type: string
+        type: object
     GradientController:
         description: |-
             The `gradient` describes a corrective factor that should be applied to the
@@ -2075,6 +2103,33 @@ definitions:
                 format: int64
                 type: string
         type: object
+    ListAgentsResponse:
+        properties:
+            agents:
+                items:
+                    type: string
+                type: array
+        type: object
+    ListControlPointsControllerResponse:
+        properties:
+            control_points:
+                items:
+                    $ref: '#/definitions/GlobalServiceControlPoint'
+                type: array
+            errors_count:
+                format: int64
+                type: integer
+        type: object
+    ListServicesControllerResponse:
+        properties:
+            errors_count:
+                format: int64
+                type: integer
+            services:
+                items:
+                    $ref: '#/definitions/GlobalService'
+                type: array
+        type: object
     LoadActuator:
         properties:
             default_config:
@@ -2560,6 +2615,11 @@ definitions:
                     $ref: '#/definitions/PolicyWrapper'
                 type: object
         type: object
+    PreviewFlowLabelsControllerResponse:
+        properties:
+            response:
+                $ref: '#/definitions/PreviewFlowLabelsResponse'
+        type: object
     PreviewFlowLabelsResponse:
         properties:
             samples:
@@ -2574,12 +2634,43 @@ definitions:
                     type: string
                 type: object
         type: object
+    PreviewHTTPRequestsControllerResponse:
+        properties:
+            response:
+                $ref: '#/definitions/PreviewHTTPRequestsResponse'
+        type: object
     PreviewHTTPRequestsResponse:
         properties:
             samples:
                 items:
                     type: object
                 type: array
+        type: object
+    PreviewRequest:
+        properties:
+            control_point:
+                description: |+
+                    Control point to preview.
+
+                type: string
+                x-go-tag-validate: required
+            label_matcher:
+                $ref: '#/definitions/LabelMatcher'
+                description: Flow labels to match. Optional parameter for advanced filtering.
+            samples:
+                default: "10"
+                description: |+
+                    Number of samples to collect.
+
+                format: int64
+                type: string
+                x-go-tag-default: "10"
+                x-go-tag-validate: min=1
+            service:
+                description: Service to preview.
+                type: string
+        required:
+            - control_point
         type: object
     ProcessInfo:
         properties:
@@ -2816,6 +2907,25 @@ definitions:
     ReportResponse:
         description: ReportResponse is empty for now.
         type: object
+    Request:
+        properties:
+            id:
+                description: |-
+                    Id of the request, this should be unique per client connection. First
+                    request id on the connection should be equal to nextID from the Hello
+                    message.
+                format: uint64
+                type: string
+            payload:
+                $ref: '#/definitions/googleprotobufAny'
+                description: Request payload. The method on the callee will be dispatched by request's type.
+            timeout:
+                description: |-
+                    Mandatory timeout for processing request. Timeout is handled on
+                    caller-side. After it passes, caller is no longer interested in a response,
+                    and callee can forget about the request.
+                type: string
+        type: object
     Resources:
         description: |-
             :::info
@@ -2847,6 +2957,18 @@ definitions:
                 type: object
                 x-go-tag-validate: dive
         title: Resources that need to be setup for the policy to function
+        type: object
+    Response:
+        properties:
+            error:
+                $ref: '#/definitions/googlerpcStatus'
+            id:
+                format: uint64
+                type: string
+            payload:
+                description: Payload is a message of a type implied by request kind.
+                format: byte
+                type: string
         type: object
     Rule:
         description: |-
@@ -3132,6 +3254,22 @@ definitions:
                 type: string
                 x-go-tag-default: "1"
         type: object
+    ServerToClient:
+        properties:
+            cancel_id:
+                description: |-
+                    Cancels in-flight request.
+
+                    After cancellation, the response is not expected to be received, but
+                    might happen that it will be received. If so, it should be ignored.
+                format: uint64
+                type: string
+            request:
+                $ref: '#/definitions/Request'
+                description: |-
+                    Make a request to client. Expect AgentToController message in the
+                    future containing Response with the same id.
+        type: object
     Service:
         description: |-
             Service contains information about single service discovered in agent group by a
@@ -3144,7 +3282,10 @@ definitions:
                 type: string
         type: object
     ServiceControlPoint:
-        description: ServiceControlPoint contains info about a control point on a given service.
+        description: |-
+            ServiceControlPoint contains info about a control point on a given service.
+
+            Agent group is implied.
         properties:
             name:
                 type: string
@@ -3596,15 +3737,34 @@ definitions:
             - NULL_VALUE
         type: string
     googlerpcStatus:
+        description: |-
+            The `Status` type defines a logical error model that is suitable for
+            different programming environments, including REST APIs and RPC APIs. It is
+            used by [gRPC](https://github.com/grpc). Each `Status` message contains
+            three pieces of data: error code, error message, and error details.
+
+            You can find out more about this error model and how to work with it in the
+            [API Design Guide](https://cloud.google.com/apis/design/errors).
         properties:
             code:
+                description: |-
+                    The status code, which should be an enum value of
+                    [google.rpc.Code][google.rpc.Code].
                 format: int32
                 type: integer
             details:
+                description: |-
+                    A list of messages that carry the error details.  There is a common set of
+                    message types for APIs to use.
                 items:
                     $ref: '#/definitions/googleprotobufAny'
                 type: array
             message:
+                description: |-
+                    A developer-facing error message, which should be in English. Any
+                    user-facing error message should be localized and sent in the
+                    [google.rpc.Status.details][google.rpc.Status.details] field, or localized
+                    by the client.
                 type: string
         type: object
 info:
@@ -3945,15 +4105,17 @@ produces:
     - application/json
 swagger: "2.0"
 tags:
+    - name: FlowPreviewService
+    - name: Controller
     - name: ControlPointCache
     - name: DistCacheService
     - name: FlowControlService
     - name: FlowControlControlPointsService
     - name: EntityCacheService
-    - name: FlowPreviewService
     - name: InfoService
     - name: PeerDiscoveryService
     - name: PolicyService
     - name: StatusService
     - name: FluxNinjaService
     - name: ControllerInfoService
+    - name: Coordinator

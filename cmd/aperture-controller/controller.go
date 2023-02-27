@@ -15,10 +15,13 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/cmd/aperture-controller/controller"
+	"github.com/fluxninja/aperture/pkg/agentfunctions/agents"
+	"github.com/fluxninja/aperture/pkg/cmd"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
+	"github.com/fluxninja/aperture/pkg/rpc"
 	"github.com/fluxninja/aperture/pkg/webhooks"
 	"github.com/fluxninja/aperture/pkg/webhooks/policyvalidator"
 )
@@ -34,6 +37,9 @@ func main() {
 		controlplane.Module(),
 		webhooks.Module(),
 		policyvalidator.Module(),
+		rpc.ServerModule,
+		agents.Module,
+		cmd.Module,
 	)
 
 	if err := app.Err(); err != nil {
@@ -45,5 +51,6 @@ func main() {
 	}
 
 	log.Info().Msg("aperture-controller app created")
+
 	platform.Run(app)
 }

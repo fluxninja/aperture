@@ -15,6 +15,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
+	"github.com/fluxninja/aperture/pkg/agentfunctions"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/discovery"
 	"github.com/fluxninja/aperture/pkg/distcache"
@@ -28,6 +29,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/policies/infra"
 	"github.com/fluxninja/aperture/pkg/prometheus"
+	"github.com/fluxninja/aperture/pkg/rpc"
 )
 
 func main() {
@@ -52,6 +54,8 @@ func main() {
 		agent.ModuleForAgentOTEL(),
 		discovery.Module(),
 		election.Module(),
+		rpc.ClientModule,
+		agentfunctions.Module,
 	)
 
 	if err := app.Err(); err != nil {

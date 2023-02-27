@@ -18,6 +18,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
 	controlpointcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/controlpointcache/v1"
 	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/peers/v1"
 	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
@@ -229,12 +230,9 @@ func (h *Heartbeats) newHeartbeat(
 		serviceControlPointObjects = h.serviceControlPointCache.GetAll()
 	}
 
-	serviceControlPoints := make([]*heartbeatv1.ServiceControlPoint, 0, len(serviceControlPointObjects))
+	serviceControlPoints := make([]*cmdv1.ServiceControlPoint, 0, len(serviceControlPointObjects))
 	for _, cp := range serviceControlPointObjects {
-		serviceControlPoints = append(serviceControlPoints, &heartbeatv1.ServiceControlPoint{
-			Name:        cp.ControlPoint,
-			ServiceName: cp.Service,
-		})
+		serviceControlPoints = append(serviceControlPoints, cp.ToProto())
 	}
 
 	var kubernetesControlPoints []*controlpointcachev1.KubernetesControlPoint
