@@ -126,7 +126,7 @@ func ParseAutoscaler(
 					InPorts: &policylangv1.ArithmeticCombinator_Ins{
 						Lhs: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "CONFIGURED_SCALE",
+								SignalName: "ACTUAL_SCALE",
 							},
 						},
 						Rhs: &policylangv1.InPort{
@@ -186,7 +186,7 @@ func ParseAutoscaler(
 								Value: &policylangv1.InPort_ConstantSignal{
 									ConstantSignal: &policylangv1.ConstantSignal{
 										Const: &policylangv1.ConstantSignal_Value{
-											Value: float64(autoscaler.MaxScale) * 2, // TODO: remove this hack; used for reproducing bug
+											Value: float64(autoscaler.MaxScale),
 										},
 									},
 								},
@@ -287,7 +287,7 @@ func ParseAutoscaler(
 					InPorts: &policylangv1.ArithmeticCombinator_Ins{
 						Lhs: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "CONFIGURED_SCALE",
+								SignalName: "ACTUAL_SCALE",
 							},
 						},
 						Rhs: &policylangv1.InPort{
