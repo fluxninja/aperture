@@ -882,7 +882,7 @@ func ParseAutoscaler(
 					},
 					OutPorts: &policylangv1.Holder_Outs{
 						Output: &policylangv1.OutPort{
-							SignalName: "SCALE_IN_HOLD_PRE_OVERRIDE",
+							SignalName: "SCALE_IN_HOLD",
 						},
 					},
 				},
@@ -900,14 +900,39 @@ func ParseAutoscaler(
 							},
 							{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "SCALE_IN_HOLD_PRE_OVERRIDE",
+									SignalName: "SCALE_IN_HOLD",
 								},
 							},
 						},
 					},
 					OutPorts: &policylangv1.FirstValid_Outs{
 						Output: &policylangv1.OutPort{
-							SignalName: "SCALE_IN_HOLD",
+							SignalName: "SCALE_IN_OR_OUT_HOLD",
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_FirstValid{
+				FirstValid: &policylangv1.FirstValid{
+					InPorts: &policylangv1.FirstValid_Ins{
+						Inputs: []*policylangv1.InPort{
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "SCALE_OUT_HOLD",
+								},
+							},
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "SCALE_IN_HOLD",
+								},
+							},
+						},
+					},
+					OutPorts: &policylangv1.FirstValid_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "SCALE_OUT_OR_IN_HOLD",
 						},
 					},
 				},
@@ -920,12 +945,12 @@ func ParseAutoscaler(
 						Inputs: []*policylangv1.InPort{
 							{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "SCALE_OUT_HOLD",
+									SignalName: "SCALE_OUT_OR_IN_HOLD",
 								},
 							},
 							{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "SCALE_IN_HOLD",
+									SignalName: "SCALE_IN_OR_OUT_HOLD",
 								},
 							},
 						},

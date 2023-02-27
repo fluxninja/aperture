@@ -53,8 +53,8 @@ var _ = Describe("Circuit", func() {
 		circuit, err := sim.NewCircuitFromYaml(
 			`
 			components:
-			- sqrt:
-				scale: 1.0 # FIXME, for some reason default doesn't load
+			- unary_operator:
+				operator: "sqrt"
 				in_ports:
 					input: { signal_name: INPUT }
 				out_ports:
@@ -79,8 +79,8 @@ var _ = Describe("Circuit", func() {
 		circuit, err := sim.NewCircuitFromYaml(
 			`
 			components:
-			- sqrt:
-				scale: 1.0 # FIXME, for some reason default doesn't load
+			- unary_operator:
+				operator: "sqrt"
 				in_ports:
 					input: { signal_name: INPUT }
 				out_ports:
