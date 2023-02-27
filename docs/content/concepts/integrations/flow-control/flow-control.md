@@ -17,6 +17,36 @@ import Zoom from 'react-medium-image-zoom';
 import {apertureVersion} from '../../../apertureVersion.js';
 ```
 
+Modern web-scale apps are a complex network of inter-connected microservices
+that implement features such as account management, search, payments & more.
+This decoupled architecture has advantages but introduces new complex failure
+modes. When traffic surges, it can result in a queue buildup on a critical
+service, kick-starting a positive feedback loop and causing
+[cascading failures](https://sre.google/sre-book/addressing-cascading-failures/).
+The application stops serving responses in a timely manner and critical end-user
+transactions are interrupted.
+
+![Absence of flow control](assets/img/no-flow-control.png#gh-light-mode-only)
+![Absence of flow control](assets/img/no-flow-control-dark.png#gh-dark-mode-only)
+
+Applications are governed by
+[Little’s Law](https://en.wikipedia.org/wiki/Little%27s_law), which describes
+the relationship between concurrent requests in the system, arrival rate of
+requests, and response times. For the application to remain stable, the
+concurrent requests in the system must be limited. Indirect techniques to
+stabilize applications such as rate-limiting and auto-scaling fall short in
+enabling good user experiences or business outcomes. Rate-limiting individual
+users are insufficient in protecting services. Autoscaling is slow to respond
+and can be cost-prohibitive. As the number of services scales, these techniques
+get harder to deploy.
+
+![Reliability with flow control](assets/img/active-flow-control.png#gh-light-mode-only)
+![Reliability with flow control](assets/img/active-flow-control-dark.png#gh-dark-mode-only)
+
+This is where flow control comes in. Applications can degrade gracefully in
+real-time when using flow control techniques with Aperture, by prioritizing
+high-importance features over others.
+
 Reliable operations at web-scale are impossible without effective flow control.
 Aperture splits the process of flow control in two layers:
 
@@ -140,9 +170,6 @@ execution):
 - [Rate Limiter][rate-limiter]
 - [Concurrency Limiter][cl]
 - [Flux Meters][flux-meter]
-
-[Flux Meters][flux-meter] enrich the telemetry stream and can be thought to
-apply after the [Flow](#flow) has ended.
 
 You can learn more about each of the components in the subsequent sections, but
 we recommend to start with concepts like [services][service] and
