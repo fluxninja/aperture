@@ -489,6 +489,7 @@ func (pa *podScaler) scale(scaleDecision *policysyncv1.ScaleDecision) {
 }
 
 func (pa *podScaler) controlPointUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	log.Info().Msg("Control point update callback")
 	pa.statusMutex.Lock()
 	defer pa.statusMutex.Unlock()
 	logger := pa.registry.GetLogger()

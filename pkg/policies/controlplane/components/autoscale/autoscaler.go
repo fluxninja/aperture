@@ -126,7 +126,7 @@ func ParseAutoscaler(
 					InPorts: &policylangv1.ArithmeticCombinator_Ins{
 						Lhs: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "ACTUAL_SCALE",
+								SignalName: "CONFIGURED_SCALE",
 							},
 						},
 						Rhs: &policylangv1.InPort{
@@ -165,6 +165,35 @@ func ParseAutoscaler(
 						},
 					},
 					OutPorts: &policylangv1.Max_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "MIN_DESIRED_SCALE_POST_MIN_SCALE",
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_Min{
+				Min: &policylangv1.Min{
+					InPorts: &policylangv1.Min_Ins{
+						Inputs: []*policylangv1.InPort{
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "MIN_DESIRED_SCALE_POST_MIN_SCALE",
+								},
+							},
+							{
+								Value: &policylangv1.InPort_ConstantSignal{
+									ConstantSignal: &policylangv1.ConstantSignal{
+										Const: &policylangv1.ConstantSignal_Value{
+											Value: float64(autoscaler.MaxScale) * 2, // TODO: remove this hack; used for reproducing bug
+										},
+									},
+								},
+							},
+						},
+					},
+					OutPorts: &policylangv1.Min_Outs{
 						Output: &policylangv1.OutPort{
 							SignalName: "MIN_DESIRED_SCALE",
 						},
@@ -258,7 +287,7 @@ func ParseAutoscaler(
 					InPorts: &policylangv1.ArithmeticCombinator_Ins{
 						Lhs: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "ACTUAL_SCALE",
+								SignalName: "CONFIGURED_SCALE",
 							},
 						},
 						Rhs: &policylangv1.InPort{
@@ -297,6 +326,35 @@ func ParseAutoscaler(
 						},
 					},
 					OutPorts: &policylangv1.Min_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "MAX_DESIRED_SCALE_POST_MAX_SCALE",
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_Max{
+				Max: &policylangv1.Max{
+					InPorts: &policylangv1.Max_Ins{
+						Inputs: []*policylangv1.InPort{
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "MAX_DESIRED_SCALE_POST_MAX_SCALE",
+								},
+							},
+							{
+								Value: &policylangv1.InPort_ConstantSignal{
+									ConstantSignal: &policylangv1.ConstantSignal{
+										Const: &policylangv1.ConstantSignal_Value{
+											Value: float64(autoscaler.MinScale),
+										},
+									},
+								},
+							},
+						},
+					},
+					OutPorts: &policylangv1.Max_Outs{
 						Output: &policylangv1.OutPort{
 							SignalName: "MAX_DESIRED_SCALE",
 						},
@@ -402,7 +460,7 @@ func ParseAutoscaler(
 								},
 								Min: &policylangv1.InPort{
 									Value: &policylangv1.InPort_SignalName{
-										SignalName: "ACTUAL_SCALE",
+										SignalName: "MIN_DESIRED_SCALE",
 									},
 								},
 								Max: &policylangv1.InPort{
@@ -591,7 +649,7 @@ func ParseAutoscaler(
 								},
 								Max: &policylangv1.InPort{
 									Value: &policylangv1.InPort_SignalName{
-										SignalName: "ACTUAL_SCALE",
+										SignalName: "MAX_DESIRED_SCALE",
 									},
 								},
 							},

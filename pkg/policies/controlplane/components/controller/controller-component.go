@@ -5,6 +5,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
@@ -123,14 +124,18 @@ func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToReading, tic
 	}
 
 	if output.Valid() {
+		log.Info().Msgf("output: %f", output.Value())
 		outputReading := output
 		// Constrain output
 		if max.Valid() {
+			log.Info().Msgf("max: %f", max.Value())
 			outputReading = runtime.NewReading(math.Min(output.Value(), max.Value()))
 		}
 		if min.Valid() {
-			outputReading = runtime.NewReading(math.Max(output.Value(), min.Value()))
+			log.Info().Msgf("min: %f", min.Value())
+			outputReading = runtime.NewReading(math.Max(outputReading.Value(), min.Value()))
 		}
+		log.Info().Msgf("outputReading: %f", outputReading.Value())
 		if outputReading.Value() != output.Value() {
 			// Wind output
 			windedOutput, err := cc.controller.WindOutput(output, outputReading, cc, tickInfo)
