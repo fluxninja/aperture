@@ -3,9 +3,10 @@ package sentry_test
 import (
 	"encoding/json"
 
-	"github.com/fluxninja/aperture/plugins/common/aperture-plugin-sentry/sentry"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
+	"github.com/fluxninja/aperture/plugins/common/aperture-plugin-sentry/sentry"
 )
 
 var _ = Describe("Crash-Writer", func() {

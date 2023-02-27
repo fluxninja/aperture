@@ -25,12 +25,15 @@ const (
 	GitCommitHash = "unknown"
 )
 
+// ServicePlugin returns the plugin.
 func ServicePlugin() plugins.ServicePluginIface {
 	return &SentryPlugin{}
 }
 
+// SentryPlugin is the plugin.
 type SentryPlugin struct{}
 
+// Module returns the plugin module.
 func (sp *SentryPlugin) Module() fx.Option {
 	log.Info().Msg("Loading SentryPlugin")
 	return fx.Options(
