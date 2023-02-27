@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/podscaler"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/autoscale"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/autoscale/podscaler"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 	"go.uber.org/fx"
@@ -114,6 +115,13 @@ func newAutoScaleCompositeAndOptions(
 		tree.Root = podScalerConfComp
 
 		return tree, configuredComponents, fx.Options(options...), nil
+	} else if autoscaler := autoScaleComponentProto.GetAutoscaler(); autoscaler != nil {
+		nestedCircuit, err := autoscale.ParseAutoscaler(autoscaler)
+		if err != nil {
+			return retErr(err)
+		}
+
+		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
 	}
 	return retErr(fmt.Errorf("unsupported/missing component type, proto: %+v", autoScaleComponentProto))
 }

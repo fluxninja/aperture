@@ -6,7 +6,7 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/actuators/concurrency"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/concurrency"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -104,7 +104,12 @@ func newFlowControlCompositeAndOptions(
 
 		return tree, configuredComponents, fx.Options(options...), nil
 	} else if aimdConcurrencyController := flowControlComponentProto.GetAimdConcurrencyController(); aimdConcurrencyController != nil {
-		return ParseAIMDConcurrencyController(componentID, aimdConcurrencyController, policyReadAPI)
+		nestedCircuit, err := concurrency.ParseAIMDConcurrencyController(aimdConcurrencyController)
+		if err != nil {
+			return retErr(err)
+		}
+
+		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
 	}
 	return retErr(fmt.Errorf("unsupported/missing component type, proto: %+v", flowControlComponentProto))
 }

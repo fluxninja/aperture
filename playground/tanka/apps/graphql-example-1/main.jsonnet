@@ -1,6 +1,6 @@
 local tanka = import 'github.com/grafana/jsonnet-libs/tanka-util/main.libsonnet';
 
-local helpers = import 'tanka/lib/ninja/helpers.libsonnet';
+local helpers = import 'ninja/helpers.libsonnet';
 
 local helm = tanka.helm.new(helpers.helmChartsRoot);
 

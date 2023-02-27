@@ -158,11 +158,12 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.T
 		// apply correction
 		value := output.Value()
 		if maxEnvelope.Valid() && value > maxEnvelope.Value() {
-			output = runtime.NewReading(value * ema.correctionFactorOnMaxViolation)
+			value *= ema.correctionFactorOnMaxViolation
 		}
 		if minEnvelope.Valid() && value < minEnvelope.Value() {
-			output = runtime.NewReading(value * ema.correctionFactorOnMinViolation)
+			value *= ema.correctionFactorOnMinViolation
 		}
+		output = runtime.NewReading(value)
 		ema.lastGoodOutput = output
 	}
 	// Returns Exponential Moving Average of a series of readings.

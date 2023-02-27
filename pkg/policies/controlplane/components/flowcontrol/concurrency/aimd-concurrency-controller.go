@@ -1,12 +1,10 @@
-package circuitfactory
+package concurrency
 
 import (
 	"time"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
-	"go.uber.org/fx"
 	"google.golang.org/protobuf/types/known/durationpb"
 )
 
@@ -20,12 +18,10 @@ const (
 	aimdIncomingConcurrencyPortName    = "incoming_concurrency"
 )
 
-// ParseAIMDConcurrencyController parses an AIMD concurrency controller and returns the parent, leaf components, and options.
+// ParseAIMDConcurrencyController parses an AIMD concurrency controller and returns its nested circuit representation.
 func ParseAIMDConcurrencyController(
-	nestedCircuitID runtime.ComponentID,
 	aimdConcurrencyController *policylangv1.AIMDConcurrencyController,
-	policyReadAPI iface.Policy,
-) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
+) (*policylangv1.NestedCircuit, error) {
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 	inPorts := aimdConcurrencyController.InPorts
 	if inPorts != nil {
@@ -409,5 +405,5 @@ func ParseAIMDConcurrencyController(
 		},
 	}
 
-	return ParseNestedCircuit(nestedCircuitID, nestedCircuit, policyReadAPI)
+	return nestedCircuit, nil
 }

@@ -412,12 +412,370 @@ AutoScale components are used to scale a service.
 #### Properties
 
 <dl>
+<dt>autoscaler</dt>
+<dd>
+
+([Autoscaler](#autoscaler)) Autoscaler provides auto scaling functionality for any resource.
+
+</dd>
 <dt>pod_scaler</dt>
 <dd>
 
 ([PodScaler](#pod-scaler)) PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
 
-GradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.
+</dd>
+</dl>
+
+### Autoscaler {#autoscaler}
+
+Autoscaler
+
+#### Properties
+
+<dl>
+<dt>cooldown_override_percentage</dt>
+<dd>
+
+(float64, default: `50`) Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.
+For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
+scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+
+</dd>
+<dt>max_scale</dt>
+<dd>
+
+(string, default: `"4294967295"`) The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+
+</dd>
+<dt>min_scale</dt>
+<dd>
+
+(string, default: `"0"`) The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([AutoscalerOuts](#autoscaler-outs)) Output ports for the Autoscaler.
+
+</dd>
+<dt>scale_in_alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for scale in alerter.
+
+</dd>
+<dt>scale_in_controllers</dt>
+<dd>
+
+([[]AutoscalerScaleInController](#autoscaler-scale-in-controller)) List of Controllers for scaling in.
+
+</dd>
+<dt>scale_in_cooldown</dt>
+<dd>
+
+(string, default: `"120s"`) The amount of time to wait after a scale in operation for another scale in operation.
+
+</dd>
+<dt>scale_in_max_percentage</dt>
+<dd>
+
+(float64, default: `10`) The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+
+</dd>
+<dt>scale_out_alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for scale out alerter.
+
+</dd>
+<dt>scale_out_controllers</dt>
+<dd>
+
+([[]AutoscalerScaleOutController](#autoscaler-scale-out-controller)) List of Controllers for scaling out.
+
+</dd>
+<dt>scale_out_cooldown</dt>
+<dd>
+
+(string, default: `"30s"`) The amount of time to wait after a scale out operation for another scale out or scale in operation.
+
+</dd>
+<dt>scale_out_max_percentage</dt>
+<dd>
+
+(float64, default: `1`) The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+
+</dd>
+<dt>scaler</dt>
+<dd>
+
+([AutoscalerScaler](#autoscaler-scaler))
+
+</dd>
+</dl>
+
+### AutoscalerDecreasingGradient {#autoscaler-decreasing-gradient}
+
+Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([AutoscalerDecreasingGradientIns](#autoscaler-decreasing-gradient-ins)) Input ports for the Gradient.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+([AutoscalerDecreasingGradientParameters](#autoscaler-decreasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
+
+- slope = 1
+- min_gradient = -Inf (must be less than 1)
+- max_gradient = 1 (cannot be changed)
+
+</dd>
+</dl>
+
+### AutoscalerDecreasingGradientIns {#autoscaler-decreasing-gradient-ins}
+
+Inputs for Gradient.
+
+#### Properties
+
+<dl>
+<dt>setpoint</dt>
+<dd>
+
+([InPort](#in-port)) The setpoint to use for scale in.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+([InPort](#in-port)) The signal to use for scale in.
+
+</dd>
+</dl>
+
+### AutoscalerDecreasingGradientParameters {#autoscaler-decreasing-gradient-parameters}
+
+This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+
+#### Properties
+
+<dl>
+<dt>min_gradient</dt>
+<dd>
+
+(float64, default: `-1.7976931348623157e+308`)
+
+</dd>
+<dt>slope</dt>
+<dd>
+
+(float64, default: `1`)
+
+</dd>
+</dl>
+
+### AutoscalerIncreasingGradient {#autoscaler-increasing-gradient}
+
+Increasing Gradient defines a controller for scaling out based on Gradient Controller.
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([AutoscalerIncreasingGradientIns](#autoscaler-increasing-gradient-ins)) Input ports for the Gradient.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+([AutoscalerIncreasingGradientParameters](#autoscaler-increasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
+
+- slope = 1
+- min_gradient = 1 (cannot be changed)
+- max_gradient = +Inf (must be greater than 1)
+
+</dd>
+</dl>
+
+### AutoscalerIncreasingGradientIns {#autoscaler-increasing-gradient-ins}
+
+Inputs for Gradient.
+
+#### Properties
+
+<dl>
+<dt>setpoint</dt>
+<dd>
+
+([InPort](#in-port)) The setpoint to use for scale out.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+([InPort](#in-port)) The signal to use for scale out.
+
+</dd>
+</dl>
+
+### AutoscalerIncreasingGradientParameters {#autoscaler-increasing-gradient-parameters}
+
+This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+
+#### Properties
+
+<dl>
+<dt>max_gradient</dt>
+<dd>
+
+(float64, default: `1.7976931348623157e+308`)
+
+</dd>
+<dt>slope</dt>
+<dd>
+
+(float64, default: `1`)
+
+</dd>
+</dl>
+
+### AutoscalerKubernetesReplicas {#autoscaler-kubernetes-replicas}
+
+KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
+
+#### Properties
+
+<dl>
+<dt>default_config</dt>
+<dd>
+
+([PodScalerScaleActuatorDynamicConfig](#pod-scaler-scale-actuator-dynamic-config)) Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig
+
+</dd>
+<dt>kubernetes_object_selector</dt>
+<dd>
+
+([KubernetesObjectSelector](#kubernetes-object-selector)) The Kubernetes object on which horizontal scaling is applied.
+
+</dd>
+</dl>
+
+### AutoscalerOuts {#autoscaler-outs}
+
+Outputs for Autoscaler.
+
+#### Properties
+
+<dl>
+<dt>actual_scale</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+<dt>configured_scale</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+<dt>desired_scale</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+</dl>
+
+### AutoscalerScaleInController {#autoscaler-scale-in-controller}
+
+#### Properties
+
+<dl>
+<dt>alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
+
+</dd>
+<dt>controller</dt>
+<dd>
+
+([AutoscalerScaleInControllerController](#autoscaler-scale-in-controller-controller)) Controller
+
+</dd>
+</dl>
+
+### AutoscalerScaleInControllerController {#autoscaler-scale-in-controller-controller}
+
+#### Properties
+
+<dl>
+<dt>gradient</dt>
+<dd>
+
+([AutoscalerDecreasingGradient](#autoscaler-decreasing-gradient))
+
+</dd>
+</dl>
+
+### AutoscalerScaleOutController {#autoscaler-scale-out-controller}
+
+#### Properties
+
+<dl>
+<dt>alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
+
+</dd>
+<dt>controller</dt>
+<dd>
+
+([AutoscalerScaleOutControllerController](#autoscaler-scale-out-controller-controller)) Controller
+
+</dd>
+</dl>
+
+### AutoscalerScaleOutControllerController {#autoscaler-scale-out-controller-controller}
+
+#### Properties
+
+<dl>
+<dt>gradient</dt>
+<dd>
+
+([AutoscalerIncreasingGradient](#autoscaler-increasing-gradient))
+
+</dd>
+</dl>
+
+### AutoscalerScaler {#autoscaler-scaler}
+
+#### Properties
+
+<dl>
+<dt>kubernetes_replicas</dt>
+<dd>
+
+([AutoscalerKubernetesReplicas](#autoscaler-kubernetes-replicas))
 
 </dd>
 </dl>
@@ -706,16 +1064,16 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([Query](#query)) Query components that are query databases such as Prometheus.
 
 </dd>
-<dt>sqrt</dt>
-<dd>
-
-([Sqrt](#sqrt)) Takes an input signal and emits the square root of the input signal.
-
-</dd>
 <dt>switcher</dt>
 <dd>
 
 ([Switcher](#switcher)) Switcher acts as a switch that emits one of the two signals based on third signal.
+
+</dd>
+<dt>unary_operator</dt>
+<dd>
+
+([UnaryOperator](#unary-operator)) Takes an input signal and emits the square root of the input signal.
 
 </dd>
 <dt>variable</dt>
@@ -1830,6 +2188,12 @@ Inputs for the Holder component.
 <dd>
 
 ([InPort](#in-port)) The input signal.
+
+</dd>
+<dt>reset</dt>
+<dd>
+
+([InPort](#in-port)) Resets the holder output to the current input signal when reset signal is valid and non-zero.
 
 </dd>
 </dl>
@@ -3479,67 +3843,6 @@ An entity (e.g. Kubernetes pod) may belong to multiple services.
 </dd>
 </dl>
 
-### Sqrt {#sqrt}
-
-Takes an input signal and emits the square root of it multiplied by scale as an output
-
-$$
-\text{output} = \text{scale} \sqrt{\text{input}}
-$$
-
-#### Properties
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-([SqrtIns](#sqrt-ins)) Input ports for the Sqrt component.
-
-</dd>
-<dt>out_ports</dt>
-<dd>
-
-([SqrtOuts](#sqrt-outs)) Output ports for the Sqrt component.
-
-</dd>
-<dt>scale</dt>
-<dd>
-
-(float64, default: `1`) Scaling factor to be multiplied with the square root of the input signal.
-
-</dd>
-</dl>
-
-### SqrtIns {#sqrt-ins}
-
-Inputs for the Sqrt component.
-
-#### Properties
-
-<dl>
-<dt>input</dt>
-<dd>
-
-([InPort](#in-port)) Input signal.
-
-</dd>
-</dl>
-
-### SqrtOuts {#sqrt-outs}
-
-Outputs for the Sqrt component.
-
-#### Properties
-
-<dl>
-<dt>output</dt>
-<dd>
-
-([OutPort](#out-port)) Output signal.
-
-</dd>
-</dl>
-
 ### Switcher {#switcher}
 
 Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input
@@ -3602,6 +3905,107 @@ Outputs for the Switcher component.
 <dd>
 
 ([OutPort](#out-port)) Selected signal (`on_signal` or `off_signal`).
+
+</dd>
+</dl>
+
+### UnaryOperator {#unary-operator}
+
+Takes an input signal and emits the output after applying the specified unary operator
+
+$$
+\text{output} = \unary_operator{\text{input}}
+$$
+
+#### Properties
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([UnaryOperatorIns](#unary-operator-ins)) Input ports for the UnaryOperator component.
+
+</dd>
+<dt>operator</dt>
+<dd>
+
+(string, oneof: `abs | acos | acosh | asin | asinh | atan | atanh | cbrt | ceil | cos | cosh | erf | erfc | erfcinv | erfinv | exp | exp2 | expm1 | floor | gamma | j0 | j1 | lgamma | log | log10 | log1p | log2 | round | roundtoeven | sin | sinh | sqrt | tan | tanh | trunc | y0 | y1`) Unary Operator to apply.
+
+The unary operator can be one of the following:
+
+- abs: Absolute value with the sign removed.
+- acos: arccosine, in radians.
+- acosh: Inverse hyperbolic cosine.
+- asin: arcsine, in radians.
+- asinh: Inverse hyperbolic sine.
+- atan: arctangent, in radians.
+- atanh: Inverse hyperbolic tangent.
+- cbrt: Cube root.
+- ceil: Least integer value greater than or equal to input signal.
+- cos: cosine, in radians.
+- cosh: Hyperbolic cosine.
+- erf: Error function.
+- erfc: Complementary error function.
+- erfcinv: Inverse complementary error function.
+- erfinv: Inverse error function.
+- exp: The base-e exponential of input signal.
+- exp2: The base-2 exponential of input signal.
+- expm1: The base-e exponential of input signal minus 1.
+- floor: Greatest integer value less than or equal to input signal.
+- gamma: Gamma function.
+- j0: Bessel function of the first kind of order 0.
+- j1: Bessel function of the first kind of order 1.
+- lgamma: Natural logarithm of the absolute value of the gamma function.
+- log: Natural logarithm of input signal.
+- log10: Base-10 logarithm of input signal.
+- log1p: Natural logarithm of input signal plus 1.
+- log2: Base-2 logarithm of input signal.
+- round: Round to nearest integer.
+- roundtoeven: Round to nearest integer, with ties going to the nearest even integer.
+- sin: sine, in radians.
+- sinh: Hyperbolic sine.
+- sqrt: Square root.
+- tan: tangent, in radians.
+- tanh: Hyperbolic tangent.
+- trunc: Truncate to integer.
+- y0: Bessel function of the second kind of order 0.
+- y1: Bessel function of the second kind of order 1.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([UnaryOperatorOuts](#unary-operator-outs)) Output ports for the UnaryOperator component.
+
+</dd>
+</dl>
+
+### UnaryOperatorIns {#unary-operator-ins}
+
+Inputs for the UnaryOperator component.
+
+#### Properties
+
+<dl>
+<dt>input</dt>
+<dd>
+
+([InPort](#in-port)) Input signal.
+
+</dd>
+</dl>
+
+### UnaryOperatorOuts {#unary-operator-outs}
+
+Outputs for the UnaryOperator component.
+
+#### Properties
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([OutPort](#out-port)) Output signal.
 
 </dd>
 </dl>

@@ -1,5 +1,5 @@
-local sqrtins = import './sqrtins.libsonnet';
-local sqrtouts = import './sqrtouts.libsonnet';
+local unaryoperatorins = import './unaryoperatorins.libsonnet';
+local unaryoperatorouts = import './unaryoperatorouts.libsonnet';
 {
   new():: {
     in_ports: {
@@ -9,24 +9,24 @@ local sqrtouts = import './sqrtouts.libsonnet';
       output: error 'Port output is missing',
     },
   },
-  inPorts:: sqrtins,
-  outPorts:: sqrtouts,
+  inPorts:: unaryoperatorins,
+  outPorts:: unaryoperatorouts,
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },
   withInPortsMixin(in_ports):: {
     in_ports+: in_ports,
   },
+  withOperator(operator):: {
+    operator: operator,
+  },
+  withOperatorMixin(operator):: {
+    operator+: operator,
+  },
   withOutPorts(out_ports):: {
     out_ports: out_ports,
   },
   withOutPortsMixin(out_ports):: {
     out_ports+: out_ports,
-  },
-  withScale(scale):: {
-    scale: scale,
-  },
-  withScaleMixin(scale):: {
-    scale+: scale,
   },
 }
