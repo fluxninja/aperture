@@ -1585,9 +1585,9 @@ message Autoscaler {
   repeated ScaleInController scale_in_controllers = 6;
 
   // The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
-  double scale_in_max_percentage = 7; // @gotags: default:"10"
+  double max_scale_out_percentage = 8; // @gotags: default:"10"
   // The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
-  double scale_out_max_percentage = 8; // @gotags: default:"1"
+  double max_scale_in_percentage = 7; // @gotags: default:"1"
 
   // The amount of time to wait after a scale out operation for another scale out or scale in operation.
   google.protobuf.Duration scale_out_cooldown = 9; // @gotags: default:"30s"

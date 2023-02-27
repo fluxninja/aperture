@@ -447,6 +447,18 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 (string, default: `"4294967295"`) The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
 
 </dd>
+<dt>max_scale_in_percentage</dt>
+<dd>
+
+(float64, default: `1`) The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+
+</dd>
+<dt>max_scale_out_percentage</dt>
+<dd>
+
+(float64, default: `10`) The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+
+</dd>
 <dt>min_scale</dt>
 <dd>
 
@@ -477,12 +489,6 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 (string, default: `"120s"`) The amount of time to wait after a scale in operation for another scale in operation.
 
 </dd>
-<dt>scale_in_max_percentage</dt>
-<dd>
-
-(float64, default: `10`) The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
-
-</dd>
 <dt>scale_out_alerter_parameters</dt>
 <dd>
 
@@ -499,12 +505,6 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dd>
 
 (string, default: `"30s"`) The amount of time to wait after a scale out operation for another scale out or scale in operation.
-
-</dd>
-<dt>scale_out_max_percentage</dt>
-<dd>
-
-(float64, default: `1`) The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
 
 </dd>
 <dt>scaler</dt>

@@ -340,23 +340,39 @@
           "x-go-tag-default": "4294967295",
           "x-order": 1
         },
+        "max_scale_in_percentage": {
+          "default": 1,
+          "description": "The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.\n\n",
+          "format": "double",
+          "type": "number",
+          "x-go-tag-default": "1",
+          "x-order": 2
+        },
+        "max_scale_out_percentage": {
+          "default": 10,
+          "description": "The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.\n\n",
+          "format": "double",
+          "type": "number",
+          "x-go-tag-default": "10",
+          "x-order": 3
+        },
         "min_scale": {
           "default": "0",
           "description": "The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.\n\n",
           "format": "uint64",
           "type": "string",
           "x-go-tag-default": "0",
-          "x-order": 2
+          "x-order": 4
         },
         "out_ports": {
           "$ref": "#/definitions/AutoscalerOuts",
           "description": "Output ports for the Autoscaler.",
-          "x-order": 3
+          "x-order": 5
         },
         "scale_in_alerter_parameters": {
           "$ref": "#/definitions/AlerterParameters",
           "description": "Configuration for scale in alerter.",
-          "x-order": 4
+          "x-order": 6
         },
         "scale_in_controllers": {
           "description": "List of Controllers for scaling in.",
@@ -364,27 +380,19 @@
             "$ref": "#/definitions/AutoscalerScaleInController"
           },
           "type": "array",
-          "x-order": 5
+          "x-order": 7
         },
         "scale_in_cooldown": {
           "default": "120s",
           "description": "The amount of time to wait after a scale in operation for another scale in operation.\n\n",
           "type": "string",
           "x-go-tag-default": "120s",
-          "x-order": 6
-        },
-        "scale_in_max_percentage": {
-          "default": 10,
-          "description": "The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "10",
-          "x-order": 7
+          "x-order": 8
         },
         "scale_out_alerter_parameters": {
           "$ref": "#/definitions/AlerterParameters",
           "description": "Configuration for scale out alerter.",
-          "x-order": 8
+          "x-order": 9
         },
         "scale_out_controllers": {
           "description": "List of Controllers for scaling out.",
@@ -392,21 +400,13 @@
             "$ref": "#/definitions/AutoscalerScaleOutController"
           },
           "type": "array",
-          "x-order": 9
+          "x-order": 10
         },
         "scale_out_cooldown": {
           "default": "30s",
           "description": "The amount of time to wait after a scale out operation for another scale out or scale in operation.\n\n",
           "type": "string",
           "x-go-tag-default": "30s",
-          "x-order": 10
-        },
-        "scale_out_max_percentage": {
-          "default": 1,
-          "description": "The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "1",
           "x-order": 11
         },
         "scaler": {
