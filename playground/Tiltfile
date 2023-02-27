@@ -27,6 +27,7 @@ DEFAULT_TEST_SCENARIO = "scenarios/demo-app"
 TANKA = "tk"
 SKIP_LOCAL_CMDS = False  # If set to true, skips actually running local commands (useful for developing and testing Tiltfile itself)
 TANKA_DEPS_HANDLED = []
+DASHBOARDS = []
 
 # Dependency tree and service configuration.
 # Top level maps NAMESPACE to services
@@ -81,7 +82,8 @@ DEP_TREE = {
                     "new_name": "dashboards",
                     "resource_deps": ["grafana-operator-bootstrap"],
                     "extra_objects": [
-                        (None, "GrafanaDashboard", APERTURE_CONTROLLER_NS)
+                        "aperture-signals:grafanadashboard",
+                        "k8s-resources:grafanadashboard"
                     ]
                 },
                 {
@@ -442,7 +444,7 @@ def refresh_chart_dependencies(chart_dir):
             local(command=["helm", "dependency", "update"], dir=chart_dir)
             return
 
-def render_tanka(environment, env_vars, base_dir, namespace,enable_cloud_plugin):
+def render_tanka(environment, env_vars, base_dir, namespace, enable_cloud_plugin):
     print(
         "Rendering tanka environment",
         environment,
@@ -487,6 +489,25 @@ def render_tanka(environment, env_vars, base_dir, namespace,enable_cloud_plugin)
     if namespace:
         rendered = namespace_inject(rendered, namespace)
     wrapped_k8s_yaml(rendered)
+
+
+def render_dashboards(policies):
+    aperturectl_bin = str(local(command=["../scripts/build_aperturectl.sh"], quiet=True))
+
+    blueprints_uri = os.path.join(GIT_ROOT, "blueprints")
+    dashboards = {}
+    base_dir = os.path.join(GIT_ROOT, "playground")
+    for policy in policies:
+        blueprint_name = policy["blueprint_name"]
+        policy_name = policy["policy_name"]
+        values_file = policy["values_file"]
+        dashboard_name = policy["dashboard_name"]
+        dashboard_mixin_dir = policy["dashboard_mixin_dir"]
+        rendered = local(command=["./scripts/render-dashboard.sh", base_dir, aperturectl_bin, blueprints_uri,
+                                    blueprint_name, policy_name, values_file], quiet=True)
+        dashboards[dashboard_name] = {"path": dashboard_mixin_dir, "content": rendered}
+
+    return dashboards
 
 
 def render_aperturectl(policies, namespace):
@@ -792,9 +813,8 @@ def process_aperture_scenario(scenario_path):
     for policy in aperture_policies:
         if "values_file" in policy:
             policy["values_file"] = scenario_path + "/" + policy["values_file"]
-
-    print("scenario_path", scenario_path)
-    print("aperture_policies", aperture_policies)
+        if "dashboard_mixin_dir" in policy:
+            policy["dashboard_mixin_dir"] = scenario_path + "/" + policy["dashboard_mixin_dir"]
 
     if aperture_policies:
         policies = {
@@ -815,6 +835,27 @@ def process_aperture_scenario(scenario_path):
             ]
         }
         DEP_TREE[APERTURE_DEMOAPP_NS]["scenario-policies"] = policies
+
+        for dashboard_name, dashboard in render_dashboards(aperture_policies).items():
+            ds = {
+                "renderer": "jsonnet",
+                "namespace": APERTURE_CONTROLLER_NS,
+                "labels": "ApertureController",
+                "needs": ["aperture-grafana"],
+                "manifests_path": dashboard["path"] + "/main.jsonnet",
+                "jsonnet_args": ["-J", PLAYGROUND_ROOT + "/tanka/vendor", "--ext-str", "APERTURE_DASHBOARD=%s" % dashboard["content"]],
+                "child_resources": [
+                    {
+                        "new_name": dashboard_name,
+                        "resource_deps": ["grafana-operator-bootstrap"],
+                        "extra_objects": [
+                            ("^%s" % dashboard_name, "GrafanaDashboard", APERTURE_CONTROLLER_NS)
+                        ]
+                    },
+                ]
+            }
+            DEP_TREE[APERTURE_CONTROLLER_NS]["scenario-dashboard-%s" % dashboard_name] = ds
+
 
     # Load k6 configuration and process it for inclusion into a yaml file
     wavepool_js = str(read_file(scenario_path + "/" + "load_generator/test.js"))
@@ -943,7 +984,7 @@ def declare_resources(resources, dep_tree, inv_dep_tree,race_arg,enable_cloud_pl
             namespace = app_config.get("namespace", None)
             if tkenv:
                 base_dir = app_config.get("base_dir")
-                render_tanka(tkenv, env_vars, base_dir, namespace,enable_cloud_plugin)
+                render_tanka(tkenv, env_vars, base_dir, namespace, enable_cloud_plugin)
             elif renderer == "yaml":
                 render_yaml(manifests_path, env_vars)
             elif renderer == "jsonnet":
@@ -1123,6 +1164,10 @@ to_run = ["agent", "controller", "aperture-grafana", "istio", "scenario-app", "s
 # Not all scenarios have policies, so only load policies if they were generated based on the scenario.
 if "scenario-policies" in DEP_TREE[APERTURE_DEMOAPP_NS]:
     to_run += ["scenario-policies"]
+
+for resource in DEP_TREE[APERTURE_CONTROLLER_NS]:
+    if "scenario-dashboard" in resource:
+        to_run += [resource]
 
 cfg_trace = cfg.get("trace", os.getenv("NINJA_TILT_TRACE", "false"))
 TRACE = cfg_trace == True
