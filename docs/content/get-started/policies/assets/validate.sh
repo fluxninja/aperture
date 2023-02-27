@@ -15,4 +15,4 @@ aperturectl="$git_root"/cmd/aperturectl/aperturectl
 rm -rf tmp
 
 # copy over raw values.yaml as well
-cp "$git_root"/blueprints/policies/static-rate-limiting/gen/values-required.yaml raw_values.yaml
+cp "$git_root"/blueprints/policies/static-rate-limiting/gen/values.yaml raw_values.yaml

@@ -48,7 +48,6 @@ func (in *Integrator) Execute(inPortReadings runtime.PortToReading, tickInfo run
 	resetVal := inPortReadings.ReadSingleReadingPort("reset")
 	if tristate.FromReading(resetVal).IsTrue() {
 		in.sum = 0
-		// reset existing min/max constraints
 	} else if inputVal.Valid() {
 		in.sum += inputVal.Value()
 

@@ -1,6 +1,6 @@
 module github.com/fluxninja/aperture/playground/graphql_demo_app
 
-go 1.20
+go 1.19
 
 require (
 	github.com/99designs/gqlgen v0.17.20

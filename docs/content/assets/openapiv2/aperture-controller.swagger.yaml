@@ -361,12 +361,239 @@ definitions:
     description: AutoScale components are used to scale a service.
     type: object
     properties:
+      autoscaler:
+        description: Autoscaler provides auto scaling functionality for any resource.
+        $ref: '#/definitions/Autoscaler'
       pod_scaler:
-        description: |-
-          PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
-
-          GradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.
+        description: PodScaler provides pod horizontal scaling functionality for scalable
+          Kubernetes resources.
         $ref: '#/definitions/PodScaler'
+  Autoscaler:
+    type: object
+    title: Autoscaler
+    properties:
+      cooldown_override_percentage:
+        description: |+
+          Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.
+          For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
+          scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+
+        type: number
+        format: double
+        default: 50
+        x-go-tag-default: "50"
+      max_scale:
+        description: |+
+          The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+
+        type: string
+        format: uint64
+        default: "4294967295"
+        x-go-tag-default: "4294967295"
+      min_scale:
+        description: |+
+          The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+
+        type: string
+        format: uint64
+        default: "0"
+        x-go-tag-default: "0"
+      out_ports:
+        description: Output ports for the Autoscaler.
+        $ref: '#/definitions/AutoscalerOuts'
+      scale_in_alerter_parameters:
+        description: Configuration for scale in alerter.
+        $ref: '#/definitions/AlerterParameters'
+      scale_in_controllers:
+        description: List of Controllers for scaling in.
+        type: array
+        items:
+          $ref: '#/definitions/AutoscalerScaleInController'
+      scale_in_cooldown:
+        description: |+
+          The amount of time to wait after a scale in operation for another scale in operation.
+
+        type: string
+        default: 120s
+        x-go-tag-default: 120s
+      scale_in_max_percentage:
+        description: |+
+          The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+
+        type: number
+        format: double
+        default: 10
+        x-go-tag-default: "10"
+      scale_out_alerter_parameters:
+        description: Configuration for scale out alerter.
+        $ref: '#/definitions/AlerterParameters'
+      scale_out_controllers:
+        description: List of Controllers for scaling out.
+        type: array
+        items:
+          $ref: '#/definitions/AutoscalerScaleOutController'
+      scale_out_cooldown:
+        description: |+
+          The amount of time to wait after a scale out operation for another scale out or scale in operation.
+
+        type: string
+        default: 30s
+        x-go-tag-default: 30s
+      scale_out_max_percentage:
+        description: |+
+          The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+
+        type: number
+        format: double
+        default: 1
+        x-go-tag-default: "1"
+      scaler:
+        x-go-tag-validate: required
+        $ref: '#/definitions/AutoscalerScaler'
+  AutoscalerDecreasingGradient:
+    description: Decreasing Gradient defines a controller for scaling in based on
+      Gradient Controller.
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the Gradient.
+        $ref: '#/definitions/AutoscalerDecreasingGradientIns'
+      parameters:
+        title: |-
+          Gradient parameters for the controller. Defaults and constraints:
+          * slope = 1
+          * min_gradient = -Inf (must be less than 1)
+          * max_gradient = 1 (cannot be changed)
+        $ref: '#/definitions/AutoscalerDecreasingGradientParameters'
+  AutoscalerDecreasingGradientIns:
+    description: Inputs for Gradient.
+    type: object
+    properties:
+      setpoint:
+        description: The setpoint to use for scale in.
+        $ref: '#/definitions/InPort'
+      signal:
+        description: The signal to use for scale in.
+        $ref: '#/definitions/InPort'
+  AutoscalerDecreasingGradientParameters:
+    description: This allows subset of parameters with constrained values compared
+      to a regular gradient controller. For full documentation of these parameters,
+      refer to the [GradientControllerParameters](#gradient-controller-parameters).
+    type: object
+    properties:
+      min_gradient:
+        type: number
+        format: double
+        default: -1.7976931348623157e+308
+        x-go-tag-default: "-1.79769313486231570814527423731704356798070e+308"
+        x-go-tag-validate: lte=1.0
+      slope:
+        type: number
+        format: double
+        default: 1
+        x-go-tag-default: "1.0"
+  AutoscalerIncreasingGradient:
+    description: Increasing Gradient defines a controller for scaling out based on
+      Gradient Controller.
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the Gradient.
+        $ref: '#/definitions/AutoscalerIncreasingGradientIns'
+      parameters:
+        title: |-
+          Gradient parameters for the controller. Defaults and constraints:
+          * slope = 1
+          * min_gradient = 1 (cannot be changed)
+          * max_gradient = +Inf (must be greater than 1)
+        $ref: '#/definitions/AutoscalerIncreasingGradientParameters'
+  AutoscalerIncreasingGradientIns:
+    description: Inputs for Gradient.
+    type: object
+    properties:
+      setpoint:
+        description: The setpoint to use for scale out.
+        $ref: '#/definitions/InPort'
+      signal:
+        description: The signal to use for scale out.
+        $ref: '#/definitions/InPort'
+  AutoscalerIncreasingGradientParameters:
+    description: This allows subset of parameters with constrained values compared
+      to a regular gradient controller. For full documentation of these parameters,
+      refer to the [GradientControllerParameters](#gradient-controller-parameters).
+    type: object
+    properties:
+      max_gradient:
+        type: number
+        format: double
+        default: 1.7976931348623157e+308
+        x-go-tag-default: "1.79769313486231570814527423731704356798070e+308"
+        x-go-tag-validate: gte=1.0
+      slope:
+        type: number
+        format: double
+        default: 1
+        x-go-tag-default: "1.0"
+  AutoscalerKubernetesReplicas:
+    description: KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
+    type: object
+    properties:
+      default_config:
+        description: Default configuration.
+        $ref: '#/definitions/PodScalerScaleActuatorDynamicConfig'
+      dynamic_config_key:
+        type: string
+        title: Configuration key for DynamicConfig
+      kubernetes_object_selector:
+        description: |+
+          The Kubernetes object on which horizontal scaling is applied.
+
+        x-go-tag-validate: required
+        $ref: '#/definitions/KubernetesObjectSelector'
+  AutoscalerOuts:
+    description: Outputs for Autoscaler.
+    type: object
+    properties:
+      actual_scale:
+        $ref: '#/definitions/OutPort'
+      configured_scale:
+        $ref: '#/definitions/OutPort'
+      desired_scale:
+        $ref: '#/definitions/OutPort'
+  AutoscalerScaleInController:
+    type: object
+    properties:
+      alerter_parameters:
+        description: Configuration for embedded alerter.
+        $ref: '#/definitions/AlerterParameters'
+      controller:
+        title: Controller
+        $ref: '#/definitions/AutoscalerScaleInControllerController'
+  AutoscalerScaleInControllerController:
+    type: object
+    properties:
+      gradient:
+        $ref: '#/definitions/AutoscalerDecreasingGradient'
+  AutoscalerScaleOutController:
+    type: object
+    properties:
+      alerter_parameters:
+        description: Configuration for embedded alerter.
+        $ref: '#/definitions/AlerterParameters'
+      controller:
+        title: Controller
+        x-go-tag-validate: required
+        $ref: '#/definitions/AutoscalerScaleOutControllerController'
+  AutoscalerScaleOutControllerController:
+    type: object
+    properties:
+      gradient:
+        $ref: '#/definitions/AutoscalerIncreasingGradient'
+  AutoscalerScaler:
+    type: object
+    properties:
+      kubernetes_replicas:
+        $ref: '#/definitions/AutoscalerKubernetesReplicas'
   Circuit:
     description: |-
       :::info
@@ -588,14 +815,14 @@ definitions:
       query:
         description: Query components that are query databases such as Prometheus.
         $ref: '#/definitions/Query'
-      sqrt:
-        description: Takes an input signal and emits the square root of the input
-          signal.
-        $ref: '#/definitions/Sqrt'
       switcher:
         description: Switcher acts as a switch that emits one of the two signals based
           on third signal.
         $ref: '#/definitions/Switcher'
+      unary_operator:
+        description: Takes an input signal and emits the square root of the input
+          signal.
+        $ref: '#/definitions/UnaryOperator'
       variable:
         description: Emits a variable signal which can be set to invalid.
         $ref: '#/definitions/Variable'
@@ -1458,6 +1685,10 @@ definitions:
     properties:
       input:
         description: The input signal.
+        $ref: '#/definitions/InPort'
+      reset:
+        description: Resets the holder output to the current input signal when reset
+          signal is valid and non-zero.
         $ref: '#/definitions/InPort'
   HolderOuts:
     description: Outputs for the Holder component.
@@ -2688,43 +2919,6 @@ definitions:
 
         type: string
         x-go-tag-validate: required
-  Sqrt:
-    description: |-
-      $$
-      \text{output} = \text{scale} \sqrt{\text{input}}
-      $$
-    type: object
-    title: Takes an input signal and emits the square root of it multiplied by scale
-      as an output
-    properties:
-      in_ports:
-        description: Input ports for the Sqrt component.
-        $ref: '#/definitions/SqrtIns'
-      out_ports:
-        description: Output ports for the Sqrt component.
-        $ref: '#/definitions/SqrtOuts'
-      scale:
-        description: |+
-          Scaling factor to be multiplied with the square root of the input signal.
-
-        type: number
-        format: double
-        default: 1
-        x-go-tag-default: "1.0"
-  SqrtIns:
-    description: Inputs for the Sqrt component.
-    type: object
-    properties:
-      input:
-        description: Input signal.
-        $ref: '#/definitions/InPort'
-  SqrtOuts:
-    description: Outputs for the Sqrt component.
-    type: object
-    properties:
-      output:
-        description: Output signal.
-        $ref: '#/definitions/OutPort'
   Status:
     description: Status holds details about a status that can be reported to the registry.
     type: object
@@ -2775,6 +2969,124 @@ definitions:
     properties:
       output:
         description: Selected signal (`on_signal` or `off_signal`).
+        $ref: '#/definitions/OutPort'
+  UnaryOperator:
+    description: |-
+      $$
+      \text{output} = \unary_operator{\text{input}}
+      $$
+    type: object
+    title: Takes an input signal and emits the output after applying the specified
+      unary operator
+    properties:
+      in_ports:
+        description: Input ports for the UnaryOperator component.
+        $ref: '#/definitions/UnaryOperatorIns'
+      operator:
+        description: |+
+          Unary Operator to apply.
+
+          The unary operator can be one of the following:
+          * abs: Absolute value with the sign removed.
+          * acos: arccosine, in radians.
+          * acosh: Inverse hyperbolic cosine.
+          * asin: arcsine, in radians.
+          * asinh: Inverse hyperbolic sine.
+          * atan: arctangent, in radians.
+          * atanh: Inverse hyperbolic tangent.
+          * cbrt: Cube root.
+          * ceil: Least integer value greater than or equal to input signal.
+          * cos: cosine, in radians.
+          * cosh: Hyperbolic cosine.
+          * erf: Error function.
+          * erfc: Complementary error function.
+          * erfcinv: Inverse complementary error function.
+          * erfinv: Inverse error function.
+          * exp: The base-e exponential of input signal.
+          * exp2: The base-2 exponential of input signal.
+          * expm1: The base-e exponential of input signal minus 1.
+          * floor: Greatest integer value less than or equal to input signal.
+          * gamma: Gamma function.
+          * j0: Bessel function of the first kind of order 0.
+          * j1: Bessel function of the first kind of order 1.
+          * lgamma: Natural logarithm of the absolute value of the gamma function.
+          * log: Natural logarithm of input signal.
+          * log10: Base-10 logarithm of input signal.
+          * log1p: Natural logarithm of input signal plus 1.
+          * log2: Base-2 logarithm of input signal.
+          * round: Round to nearest integer.
+          * roundtoeven: Round to nearest integer, with ties going to the nearest even integer.
+          * sin: sine, in radians.
+          * sinh: Hyperbolic sine.
+          * sqrt: Square root.
+          * tan: tangent, in radians.
+          * tanh: Hyperbolic tangent.
+          * trunc: Truncate to integer.
+          * y0: Bessel function of the second kind of order 0.
+          * y1: Bessel function of the second kind of order 1.
+
+        type: string
+        enum:
+        - abs
+        - acos
+        - acosh
+        - asin
+        - asinh
+        - atan
+        - atanh
+        - cbrt
+        - ceil
+        - cos
+        - cosh
+        - erf
+        - erfc
+        - erfcinv
+        - erfinv
+        - exp
+        - exp2
+        - expm1
+        - floor
+        - gamma
+        - j0
+        - j1
+        - lgamma
+        - log
+        - log10
+        - log1p
+        - log2
+        - round
+        - roundtoeven
+        - sin
+        - sinh
+        - sqrt
+        - tan
+        - tanh
+        - trunc
+        - y0
+        - y1
+        x-go-tag-validate: oneof=abs acos acosh asin asinh atan atanh cbrt ceil cos
+          cosh erf erfc erfcinv erfinv exp exp2 expm1 floor gamma j0 j1 lgamma log
+          log10 log1p log2 round roundtoeven sin sinh sqrt tan tanh trunc y0 y1
+        x-oneof: abs | acos | acosh | asin | asinh | atan | atanh | cbrt | ceil |
+          cos | cosh | erf | erfc | erfcinv | erfinv | exp | exp2 | expm1 | floor
+          | gamma | j0 | j1 | lgamma | log | log10 | log1p | log2 | round | roundtoeven
+          | sin | sinh | sqrt | tan | tanh | trunc | y0 | y1
+      out_ports:
+        description: Output ports for the UnaryOperator component.
+        $ref: '#/definitions/UnaryOperatorOuts'
+  UnaryOperatorIns:
+    description: Inputs for the UnaryOperator component.
+    type: object
+    properties:
+      input:
+        description: Input signal.
+        $ref: '#/definitions/InPort'
+  UnaryOperatorOuts:
+    description: Outputs for the UnaryOperator component.
+    type: object
+    properties:
+      output:
+        description: Output signal.
         $ref: '#/definitions/OutPort'
   Variable:
     description: Component that emits a variable value as an output signal, can be

@@ -59,7 +59,7 @@
               "description": "Parameters.",
               "default": {
                 "label_key": "__REQUIRED_FIELD__",
-                "limit_reset_interval": "1s"
+                "limit_reset_interval": "__REQUIRED_FIELD__"
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
