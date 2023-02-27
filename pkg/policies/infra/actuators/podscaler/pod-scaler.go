@@ -476,7 +476,6 @@ func (pa *podScaler) scale(scaleDecision *policysyncv1.ScaleDecision) {
 }
 
 func (pa *podScaler) controlPointUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	log.Info().Msg("Control point update callback")
 	logger := pa.registry.GetLogger()
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Control point removed")

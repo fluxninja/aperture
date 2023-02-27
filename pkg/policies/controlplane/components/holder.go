@@ -37,11 +37,11 @@ func (h *Holder) ShortDescription() string { return fmt.Sprintf("for: %s", h.hol
 // NewHolderAndOptions creates a holder component and its fx options.
 func NewHolderAndOptions(holderProto *policylangv1.Holder, _ string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()
-	holdFor := math.Ceil(float64(holderProto.HoldFor.AsDuration()) / float64(evaluationPeriod))
+	holdWindow := uint32(math.Ceil(float64(holderProto.HoldFor.AsDuration()) / float64(evaluationPeriod)))
 
 	holder := &Holder{
 		holdFor:     holderProto.HoldFor.AsDuration(),
-		holdWindow:  uint32(holdFor),
+		holdWindow:  holdWindow,
 		windowCount: 0,
 		holdPhase:   false,
 	}

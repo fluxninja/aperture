@@ -781,7 +781,7 @@ func ParseAutoscaler(
 						},
 						Reset_: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "IS_SCALE_OUT_COOLDOWN_OVERRIDE",
+								SignalName: "IS_COOLDOWN_OVERRIDE",
 							},
 						},
 					},
@@ -805,7 +805,7 @@ func ParseAutoscaler(
 						},
 						Reset_: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "IS_SCALE_OUT_COOLDOWN_OVERRIDE",
+								SignalName: "IS_COOLDOWN_OVERRIDE",
 							},
 						},
 					},
@@ -839,7 +839,31 @@ func ParseAutoscaler(
 					},
 					OutPorts: &policylangv1.ArithmeticCombinator_Outs{
 						Output: &policylangv1.OutPort{
-							SignalName: "IS_SCALE_OUT_COOLDOWN_OVERRIDE",
+							SignalName: "COOLDOWN_OVERRIDE_THRESHOLD",
+						},
+					},
+				},
+			},
+		},
+		{
+			Component: &policylangv1.Component_Decider{
+				Decider: &policylangv1.Decider{
+					Operator: "gt",
+					InPorts: &policylangv1.Decider_Ins{
+						Lhs: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "SCALE_OUT",
+							},
+						},
+						Rhs: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "COOLDOWN_OVERRIDE_THRESHOLD",
+							},
+						},
+					},
+					OutPorts: &policylangv1.Decider_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "IS_COOLDOWN_OVERRIDE",
 						},
 					},
 				},
