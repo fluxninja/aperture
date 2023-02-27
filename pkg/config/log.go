@@ -157,8 +157,12 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 		writers = append(writers, log.GetPrettyConsoleWriter())
 	}
 
-	// append writers provided via Fx
-	writers = append(writers, w...)
+	// append writers provided via Fx if they are not nil
+	for _, w := range w {
+		if w != nil {
+			writers = append(writers, w)
+		}
+	}
 
 	multi := zerolog.MultiLevelWriter(writers...)
 
