@@ -1,0 +1,29 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: static-rate-limiting
+spec:
+  circuit:
+    components:
+    - flow_control:
+        rate_limiter:
+          default_config:
+            overrides: []
+          dynamic_config_key: rate_limiter
+          flow_selector:
+            flow_matcher:
+              control_point: ingress
+            service_selector:
+              service: service1-demo-app.demoapp.svc.cluster.local
+          in_ports:
+            limit:
+              constant_signal:
+                value: 120
+          parameters:
+            label_key: http.request.header.user_id
+            limit_reset_interval: 60s
+    evaluation_interval: 1s
+  resources:
+    classifiers: []
