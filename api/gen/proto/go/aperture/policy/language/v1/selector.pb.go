@@ -185,7 +185,6 @@ func (x *ServiceSelector) GetService() string {
 // See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 //
 // :::
-//
 // Example:
 // ```yaml
 // control_point: ingress
@@ -198,8 +197,10 @@ func (x *ServiceSelector) GetService() string {
 //       values:
 //         - insert
 //         - delete
-//     - label: user_agent
-//       regex: ^(?!.*Chrome).*Safari
+//   expression:
+//     label_matches:
+//         - label: user_agent
+//           regex: ^(?!.*Chrome).*Safari
 // ```
 type FlowMatcher struct {
 	state         protoimpl.MessageState

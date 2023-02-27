@@ -839,20 +839,26 @@ Set of classification rules sharing a common selector
 See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
 
 :::
-
-Example:
+Example
 
 ```yaml
-selector:
+flow_selector:
   service_selector:
-    service: service1.default.svc.cluster.local
-  flow_selector:
-    control_point:
-      traffic: ingress
+    agent_group: demoapp
+    service: service1-demo-app.demoapp.svc.cluster.local
+  flow_matcher:
+    control_point: ingress
+    label_matcher:
+      match_labels:
+        user_tier: gold
+      match_expressions:
+        - key: user_type
+          operator: In
 rules:
   user:
     extractor:
-      from: request.http.headers.user
+      from: request.http.headers.user-agent
+  telemetry: false
 ```
 
 #### Properties
@@ -1681,7 +1687,6 @@ to
 See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 
 :::
-
 Example:
 
 ```yaml
@@ -1695,8 +1700,10 @@ label_matcher:
       values:
         - insert
         - delete
-    - label: user_agent
-      regex: ^(?!.*Chrome).*Safari
+  expression:
+    label_matches:
+      - label: user_agent
+        regex: ^(?!.*Chrome).*Safari
 ```
 
 #### Properties
@@ -1779,16 +1786,31 @@ The histogram created by Flux Meter measures the workload latency by default.
 See also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).
 
 :::
-
-Example of a selector that creates a histogram metric for all HTTP requests
-to particular service:
+Example:
 
 ```yaml
-selector:
+static_buckets:
+  buckets:
+    [
+      5.0,
+      10.0,
+      25.0,
+      50.0,
+      100.0,
+      250.0,
+      500.0,
+      1000.0,
+      2500.0,
+      5000.0,
+      10000.0,
+    ]
+flow_selector:
   service_selector:
-    service: myservice.mynamespace.svc.cluster.local
-  flow_selector:
+    agent_group: demoapp
+    service: service1-demo-app.demoapp.svc.cluster.local
+  flow_matcher:
     control_point: ingress
+attribute_key: response_duration_ms
 ```
 
 #### Properties
