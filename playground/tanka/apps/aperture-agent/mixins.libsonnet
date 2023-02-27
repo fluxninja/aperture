@@ -50,6 +50,9 @@ local apertureAgentMixin =
               enabled: true,
             },
           },
+          agent_functions+: {
+            endpoints: ['aperture-controller.aperture-controller.svc.cluster.local:8080'],
+          },
         },
         secrets+: {
           fluxNinjaPlugin+: {

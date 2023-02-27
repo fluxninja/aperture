@@ -17,7 +17,7 @@ import (
 
 // Set via ldflags.
 const (
-	Plugin        = "aperture-plugin-sentry"
+	Plugin        = "sentry_plugin"
 	BuildHost     = "unknown"
 	BuildOS       = "unknown"
 	BuildTime     = "unknown"
