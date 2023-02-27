@@ -102,7 +102,7 @@ func (c *StreamClient) runClient() {
 
 		select {
 		case <-time.After(reconnectDelay):
-			log.Info().Msg("stream client: reconnecting")
+			log.Autosample().Info().Msg("stream client: reconnecting")
 			continue
 		case <-c.ctx.Done():
 			return
@@ -116,7 +116,7 @@ func (c *StreamClient) runClientIteration() {
 
 	conn, err := c.coordinatorClient.Connect(ctx)
 	if err != nil {
-		log.Warn().Err(err).Msg("stream client: failed to connect")
+		log.Autosample().Warn().Err(err).Msg("stream client: failed to connect")
 		return
 	}
 
