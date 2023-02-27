@@ -4,7 +4,7 @@ FROM golang:1.19.6-bullseye AS base
 WORKDIR /src
 COPY --link . .
 
-RUN --mount=type=cache,target=/go/pkg/,id=agent-1.19.6 \
+RUN --mount=type=cache,target=/go/pkg/ \
   go mod download
 
 FROM base AS builder
@@ -21,7 +21,7 @@ ENV RACE=${RACE}
 ARG BUILD_TIME="$(date -Iseconds)"
 ENV BUILD_TIME=${BUILD_TIME}
 
-RUN --mount=type=cache,target=/go/pkg/,id=agent-1.19.6,readonly \
+RUN --mount=type=cache,target=/go/pkg/,readonly \
   --mount=type=cache,target=/root/.cache/go-build/,id=agent-1.19.6,sharing=private \
   /bin/bash -c \
   'set -euo pipefail; \
