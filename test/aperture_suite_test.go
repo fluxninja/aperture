@@ -144,19 +144,17 @@ var _ = BeforeSuite(func() {
 
 	apertureOpts := fx.Options(
 		platform.Config{MergeConfig: apertureConfig}.Module(),
-		fx.Options(
-			fx.Provide(
-				fx.Annotate(
-					provideReceivers,
-					fx.ResultTags(config.GroupTag(otelcollector.ReceiverFactoriesFxTag)),
-				),
+		fx.Provide(
+			fx.Annotate(
+				provideReceivers,
+				fx.ResultTags(config.GroupTag(otelcollector.ReceiverFactoriesFxTag)),
 			),
-			fx.Provide(
-				fx.Annotate(
-					provideProcessors,
-					fx.ResultTags(config.GroupTag(otelcollector.ProcessorFactoriesFxTag)),
-				),
+			fx.Annotate(
+				provideProcessors,
+				fx.ResultTags(config.GroupTag(otelcollector.ProcessorFactoriesFxTag)),
 			),
+		),
+		fx.Option(
 			fx.Provide(
 				fx.Annotate(
 					provideOTELConfig,
