@@ -26,6 +26,7 @@ func init() {
 	generateCmd.Flags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
 	generateCmd.Flags().BoolVar(&noYAMLModeline, "no-yaml-modeline", false, "Do not add YAML language server modeline to generated YAML files")
 	generateCmd.Flags().BoolVar(&noValidate, "no-validation", false, "Do not validate values.yaml file")
+	generateCmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing output directory")
 }
 
 var generateCmd = &cobra.Command{
@@ -154,7 +155,7 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 	},
 }
 
-func processJsonnetOutput(bundle map[string]interface{}, outputPath string) error {
+func processJsonnetOutput(bundle map[string]interface{}, outputDir string) error {
 	for categoryName, category := range bundle {
 		categoriesMap, ok := category.(map[string]interface{})
 		if !ok {
@@ -162,8 +163,8 @@ func processJsonnetOutput(bundle map[string]interface{}, outputPath string) erro
 			continue
 		}
 		var updatedPath string
-		if outputPath != "" {
-			updatedPath = filepath.Join(outputPath, categoryName)
+		if outputDir != "" {
+			updatedPath = filepath.Join(outputDir, categoryName)
 			err := os.MkdirAll(updatedPath, os.ModePerm)
 			if err != nil {
 				return err
@@ -183,20 +184,20 @@ func processJsonnetOutput(bundle map[string]interface{}, outputPath string) erro
 	return nil
 }
 
-func renderOutput(categoryName string, outputPath string, fileName string, content map[string]interface{}) error {
+func renderOutput(categoryName string, outputDir string, fileName string, content map[string]interface{}) error {
 	if strings.HasSuffix(fileName, ".yaml") {
-		if err := saveYAMLFile(categoryName, outputPath, fileName, content); err != nil {
+		if err := saveYAMLFile(categoryName, outputDir, fileName, content); err != nil {
 			return err
 		}
 	} else if strings.HasSuffix(fileName, ".json") {
-		if err := saveJSONFile(categoryName, outputPath, fileName, content); err != nil {
+		if err := saveJSONFile(categoryName, outputDir, fileName, content); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func saveYAMLFile(categoryName, path, filename string, content map[string]interface{}) error {
+func saveYAMLFile(categoryName, outputDir, filename string, content map[string]interface{}) error {
 	yamlBytes, err := yaml.Marshal(content)
 	if err != nil {
 		return err
@@ -216,9 +217,9 @@ func saveYAMLFile(categoryName, path, filename string, content map[string]interf
 		}
 	}
 
-	filePath := filepath.Join(path, filename)
+	outputFilePath := filepath.Join(outputDir, filename)
 
-	err = os.WriteFile(filePath, yamlBytes, 0o600)
+	err = os.WriteFile(outputFilePath, yamlBytes, 0o600)
 	if err != nil {
 		return err
 	}
@@ -226,13 +227,13 @@ func saveYAMLFile(categoryName, path, filename string, content map[string]interf
 	if !noValidate && categoryName == "policies" {
 		// validate the generated yaml against the json schema
 		schemaFile := filepath.Join(blueprintsDir, "gen/jsonschema/_definitions.json")
-		err = utils.ValidateWithJSONSchema(schemaFile, []string{}, filePath)
+		err = utils.ValidateWithJSONSchema(schemaFile, []string{}, outputFilePath)
 		if err != nil {
 			log.Warn().Msgf("failed to validate generated policy yaml against the json schema: %s", err)
 		}
 	}
 
-	return generateGraphs(yamlBytes, filePath)
+	return generateGraphs(yamlBytes, outputDir, outputFilePath)
 }
 
 func saveJSONFile(_, path, filename string, content map[string]interface{}) error {
@@ -248,7 +249,7 @@ func saveJSONFile(_, path, filename string, content map[string]interface{}) erro
 		return err
 	}
 
-	return generateGraphs(jsonBytes, filePath)
+	return nil
 }
 
 func blueprintExists(blueprintsDir, name string) error {
@@ -263,36 +264,55 @@ func blueprintExists(blueprintsDir, name string) error {
 	return nil
 }
 
-func setupOutputDir(outputPath string) (string, error) {
-	graphDir = filepath.Join(outputPath, "graphs")
-	err := os.MkdirAll(outputPath, os.ModePerm)
+func setupOutputDir(outputDir string) (string, error) {
+	// ask for user confirmation if the output directory already exists
+	if !overwrite {
+		if _, err := os.Stat(outputDir); err == nil {
+			fmt.Printf("The output directory '%s' already exists. Do you want to overwrite it? [y/N]: ", outputDir)
+			var response string
+			fmt.Scanln(&response)
+			if response != "y" {
+				return "", fmt.Errorf("output directory '%s' already exists", outputDir)
+			}
+		}
+	}
+
+	err := os.MkdirAll(outputDir, os.ModePerm)
 	if err != nil {
 		return "", err
 	}
 
-	err = os.MkdirAll(graphDir, os.ModePerm)
+	err = os.MkdirAll(outputDir, os.ModePerm)
 	if err != nil {
 		return "", err
 	}
-	outputPath, err = filepath.Abs(outputPath)
+	outputDir, err = filepath.Abs(outputDir)
 	if err != nil {
 		return "", err
 	}
-	return outputPath, nil
+	return outputDir, nil
 }
 
-func generateGraphs(content []byte, contentPath string) error {
+func generateGraphs(content []byte, outputDir string, policyPath string) error {
 	policy := &policyv1alpha1.Policy{}
 	err := yaml.Unmarshal(content, policy)
 	if err != nil || policy.Kind != "Policy" {
 		return nil
 	}
 
-	fileName := strings.TrimSuffix(filepath.Base(contentPath), filepath.Ext(contentPath))
-	dotFilePath := filepath.Join(graphDir, fmt.Sprintf("%s.dot", fileName))
-	mmdFilePath := filepath.Join(graphDir, fmt.Sprintf("%s.mmd", fileName))
+	fileName := strings.TrimSuffix(filepath.Base(policyPath), filepath.Ext(policyPath))
 
-	policyFile, err := utils.FetchPolicyFromCR(contentPath)
+	dir := filepath.Join(filepath.Dir(outputDir), "graphs")
+	// create the directory if it doesn't exist
+	err = os.MkdirAll(dir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	dotFilePath := filepath.Join(dir, fmt.Sprintf("%s.dot", fileName))
+	mmdFilePath := filepath.Join(dir, fmt.Sprintf("%s.mmd", fileName))
+
+	policyFile, err := utils.FetchPolicyFromCR(policyPath)
 	if err != nil {
 		return nil
 	}

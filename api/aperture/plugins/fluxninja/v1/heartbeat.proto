@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package aperture.plugins.fluxninja.v1;
 
+import "aperture/cmd/v1/cmd.proto";
 import "aperture/controlpointcache/v1/kubernetes.proto";
 import "aperture/info/v1/info.proto";
 import "aperture/peers/v1/peers.proto";
@@ -38,7 +39,7 @@ message ReportRequest {
   ServicesList services_list = 8;
   aperture.status.v1.GroupStatus all_statuses = 9;
   aperture.policy.sync.v1.PolicyWrappers policies = 10;
-  repeated ServiceControlPoint service_control_points = 11;
+  repeated cmd.v1.ServiceControlPoint service_control_points = 11;
   repeated aperture.controlpointcache.v1.KubernetesControlPoint kubernetes_control_points = 12;
   string installation_mode = 13;
 }
@@ -69,10 +70,4 @@ message OverlappingService {
   string service1 = 1;
   string service2 = 2;
   int32 entities_count = 3;
-}
-
-// ServiceControlPoint contains info about a control point on a given service.
-message ServiceControlPoint {
-  string name = 1;
-  string service_name = 2;
 }

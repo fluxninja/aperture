@@ -4,6 +4,10 @@ sidebar_position: 1
 sidebar_label: Specification
 ---
 
+<head>
+  <body className="schema-docs" />
+</head>
+
 Reference for all objects used in [the Policy language](/concepts/policy/policy.md).
 
 The top-level object representing a policy is [Policy](#policy).
@@ -12,38 +16,11 @@ The top-level object representing a policy is [Policy](#policy).
 Generated File Starts
 -->
 
-## Table of contents
-
-### POLICY CONFIGURATION
-
-| Key | Reference         |
-| --- | ----------------- |
-|     | [Policy](#policy) |
-
-## Reference
-
-### _Policy_ {#policy}
-
-#### Members
-
-<dl>
-
-<dt>body</dt>
-<dd>
-
-Type: [Policy](#policy)
-
-</dd>
-
-</dl>
-
 ## Objects
 
 ### AIMDConcurrencyController {#a-i-m-d-concurrency-controller}
 
 High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
-
-#### Properties
 
 <dl>
 <dt>alerter_parameters</dt>
@@ -112,8 +89,6 @@ High level concurrency control component. Baselines a signal via exponential mov
 
 Inputs for the AIMDConcurrencyController component.
 
-#### Properties
-
 <dl>
 <dt>setpoint</dt>
 <dd>
@@ -132,8 +107,6 @@ Inputs for the AIMDConcurrencyController component.
 ### AIMDConcurrencyControllerOuts {#a-i-m-d-concurrency-controller-outs}
 
 Outputs for the AIMDConcurrencyController component.
-
-#### Properties
 
 <dl>
 <dt>accepted_concurrency</dt>
@@ -185,8 +158,6 @@ Example:
 from: "source.address # or destination.address"
 ```
 
-#### Properties
-
 <dl>
 <dt>from</dt>
 <dd>
@@ -199,8 +170,6 @@ from: "source.address # or destination.address"
 ### Alerter {#alerter}
 
 Alerter reacts to a signal and generates alert to send to alert manager.
-
-#### Properties
 
 <dl>
 <dt>in_ports</dt>
@@ -221,8 +190,6 @@ Alerter reacts to a signal and generates alert to send to alert manager.
 
 Inputs for the Alerter component.
 
-#### Properties
-
 <dl>
 <dt>signal</dt>
 <dd>
@@ -235,8 +202,6 @@ Inputs for the Alerter component.
 ### AlerterParameters {#alerter-parameters}
 
 Alerter Parameters is a common config for separate alerter components and alerters embedded in other components.
-
-#### Properties
 
 <dl>
 <dt>alert_channels</dt>
@@ -290,8 +255,6 @@ Signals are mapped to boolean values as follows:
 
   :::
 
-#### Properties
-
 <dl>
 <dt>in_ports</dt>
 <dd>
@@ -311,8 +274,6 @@ Signals are mapped to boolean values as follows:
 
 Inputs for the And component.
 
-#### Properties
-
 <dl>
 <dt>inputs</dt>
 <dd>
@@ -325,8 +286,6 @@ Inputs for the And component.
 ### AndOuts {#and-outs}
 
 Output ports for the And component.
-
-#### Properties
 
 <dl>
 <dt>output</dt>
@@ -342,8 +301,6 @@ Will always be 0 (false), 1 (true) or invalid (unknown).
 ### ArithmeticCombinator {#arithmetic-combinator}
 
 Type of combinator that computes the arithmetic operation on the operand signals
-
-#### Properties
 
 <dl>
 <dt>in_ports</dt>
@@ -373,8 +330,6 @@ In case of XOR and bitshifts, value of signals is cast to integers before perfor
 
 Inputs for the Arithmetic Combinator component.
 
-#### Properties
-
 <dl>
 <dt>lhs</dt>
 <dd>
@@ -394,8 +349,6 @@ Inputs for the Arithmetic Combinator component.
 
 Outputs for the Arithmetic Combinator component.
 
-#### Properties
-
 <dl>
 <dt>output</dt>
 <dd>
@@ -409,15 +362,343 @@ Outputs for the Arithmetic Combinator component.
 
 AutoScale components are used to scale a service.
 
-#### Properties
-
 <dl>
+<dt>autoscaler</dt>
+<dd>
+
+([Autoscaler](#autoscaler)) Autoscaler provides auto scaling functionality for any resource.
+
+</dd>
 <dt>pod_scaler</dt>
 <dd>
 
 ([PodScaler](#pod-scaler)) PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
 
-GradientPodAutoScaler provides auto scaling functionality for scalable Kubernetes resources.
+</dd>
+</dl>
+
+### Autoscaler {#autoscaler}
+
+Autoscaler
+
+<dl>
+<dt>cooldown_override_percentage</dt>
+<dd>
+
+(float64, default: `50`) Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.
+For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
+scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+
+</dd>
+<dt>max_scale</dt>
+<dd>
+
+(string, default: `"4294967295"`) The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+
+</dd>
+<dt>max_scale_in_percentage</dt>
+<dd>
+
+(float64, default: `1`) The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+
+</dd>
+<dt>max_scale_out_percentage</dt>
+<dd>
+
+(float64, default: `10`) The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+
+</dd>
+<dt>min_scale</dt>
+<dd>
+
+(string, default: `"0"`) The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([AutoscalerOuts](#autoscaler-outs)) Output ports for the Autoscaler.
+
+</dd>
+<dt>scale_in_alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for scale in alerter.
+
+</dd>
+<dt>scale_in_controllers</dt>
+<dd>
+
+([[]AutoscalerScaleInController](#autoscaler-scale-in-controller)) List of Controllers for scaling in.
+
+</dd>
+<dt>scale_in_cooldown</dt>
+<dd>
+
+(string, default: `"120s"`) The amount of time to wait after a scale in operation for another scale in operation.
+
+</dd>
+<dt>scale_out_alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for scale out alerter.
+
+</dd>
+<dt>scale_out_controllers</dt>
+<dd>
+
+([[]AutoscalerScaleOutController](#autoscaler-scale-out-controller)) List of Controllers for scaling out.
+
+</dd>
+<dt>scale_out_cooldown</dt>
+<dd>
+
+(string, default: `"30s"`) The amount of time to wait after a scale out operation for another scale out or scale in operation.
+
+</dd>
+<dt>scaler</dt>
+<dd>
+
+([AutoscalerScaler](#autoscaler-scaler))
+
+</dd>
+</dl>
+
+### AutoscalerDecreasingGradient {#autoscaler-decreasing-gradient}
+
+Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([AutoscalerDecreasingGradientIns](#autoscaler-decreasing-gradient-ins)) Input ports for the Gradient.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+([AutoscalerDecreasingGradientParameters](#autoscaler-decreasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
+
+- slope = 1
+- min_gradient = -Inf (must be less than 1)
+- max_gradient = 1 (cannot be changed)
+
+</dd>
+</dl>
+
+### AutoscalerDecreasingGradientIns {#autoscaler-decreasing-gradient-ins}
+
+Inputs for Gradient.
+
+<dl>
+<dt>setpoint</dt>
+<dd>
+
+([InPort](#in-port)) The setpoint to use for scale in.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+([InPort](#in-port)) The signal to use for scale in.
+
+</dd>
+</dl>
+
+### AutoscalerDecreasingGradientParameters {#autoscaler-decreasing-gradient-parameters}
+
+This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+
+<dl>
+<dt>min_gradient</dt>
+<dd>
+
+(float64, default: `-1.7976931348623157e+308`)
+
+</dd>
+<dt>slope</dt>
+<dd>
+
+(float64, default: `1`)
+
+</dd>
+</dl>
+
+### AutoscalerIncreasingGradient {#autoscaler-increasing-gradient}
+
+Increasing Gradient defines a controller for scaling out based on Gradient Controller.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([AutoscalerIncreasingGradientIns](#autoscaler-increasing-gradient-ins)) Input ports for the Gradient.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+([AutoscalerIncreasingGradientParameters](#autoscaler-increasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
+
+- slope = 1
+- min_gradient = 1 (cannot be changed)
+- max_gradient = +Inf (must be greater than 1)
+
+</dd>
+</dl>
+
+### AutoscalerIncreasingGradientIns {#autoscaler-increasing-gradient-ins}
+
+Inputs for Gradient.
+
+<dl>
+<dt>setpoint</dt>
+<dd>
+
+([InPort](#in-port)) The setpoint to use for scale out.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+([InPort](#in-port)) The signal to use for scale out.
+
+</dd>
+</dl>
+
+### AutoscalerIncreasingGradientParameters {#autoscaler-increasing-gradient-parameters}
+
+This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+
+<dl>
+<dt>max_gradient</dt>
+<dd>
+
+(float64, default: `1.7976931348623157e+308`)
+
+</dd>
+<dt>slope</dt>
+<dd>
+
+(float64, default: `1`)
+
+</dd>
+</dl>
+
+### AutoscalerKubernetesReplicas {#autoscaler-kubernetes-replicas}
+
+KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
+
+<dl>
+<dt>default_config</dt>
+<dd>
+
+([PodScalerScaleActuatorDynamicConfig](#pod-scaler-scale-actuator-dynamic-config)) Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig
+
+</dd>
+<dt>kubernetes_object_selector</dt>
+<dd>
+
+([KubernetesObjectSelector](#kubernetes-object-selector)) The Kubernetes object on which horizontal scaling is applied.
+
+</dd>
+</dl>
+
+### AutoscalerOuts {#autoscaler-outs}
+
+Outputs for Autoscaler.
+
+<dl>
+<dt>actual_scale</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+<dt>configured_scale</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+<dt>desired_scale</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+</dl>
+
+### AutoscalerScaleInController {#autoscaler-scale-in-controller}
+
+<dl>
+<dt>alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
+
+</dd>
+<dt>controller</dt>
+<dd>
+
+([AutoscalerScaleInControllerController](#autoscaler-scale-in-controller-controller)) Controller
+
+</dd>
+</dl>
+
+### AutoscalerScaleInControllerController {#autoscaler-scale-in-controller-controller}
+
+<dl>
+<dt>gradient</dt>
+<dd>
+
+([AutoscalerDecreasingGradient](#autoscaler-decreasing-gradient))
+
+</dd>
+</dl>
+
+### AutoscalerScaleOutController {#autoscaler-scale-out-controller}
+
+<dl>
+<dt>alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
+
+</dd>
+<dt>controller</dt>
+<dd>
+
+([AutoscalerScaleOutControllerController](#autoscaler-scale-out-controller-controller)) Controller
+
+</dd>
+</dl>
+
+### AutoscalerScaleOutControllerController {#autoscaler-scale-out-controller-controller}
+
+<dl>
+<dt>gradient</dt>
+<dd>
+
+([AutoscalerIncreasingGradient](#autoscaler-increasing-gradient))
+
+</dd>
+</dl>
+
+### AutoscalerScaler {#autoscaler-scaler}
+
+<dl>
+<dt>kubernetes_replicas</dt>
+<dd>
+
+([AutoscalerKubernetesReplicas](#autoscaler-kubernetes-replicas))
 
 </dd>
 </dl>
@@ -454,8 +735,6 @@ docs on how exactly it handles invalid inputs.
 
 :::
 
-#### Properties
-
 <dl>
 <dt>components</dt>
 <dd>
@@ -481,23 +760,27 @@ Set of classification rules sharing a common selector
 See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
 
 :::
-
-Example:
+Example
 
 ```yaml
-selector:
+flow_selector:
   service_selector:
-    service: service1.default.svc.cluster.local
-  flow_selector:
-    control_point:
-      traffic: ingress
+    agent_group: demoapp
+    service: service1-demo-app.demoapp.svc.cluster.local
+  flow_matcher:
+    control_point: ingress
+    label_matcher:
+      match_labels:
+        user_tier: gold
+      match_expressions:
+        - key: user_type
+          operator: In
 rules:
   user:
     extractor:
-      from: request.http.headers.user
+      from: request.http.headers.user-agent
+  telemetry: false
 ```
-
-#### Properties
 
 <dl>
 <dt>flow_selector</dt>
@@ -569,8 +852,6 @@ You can use the [Variable](#variable) component.
 :::
 
 See also [Policy](#policy) for a higher-level explanation of circuits.
-
-#### Properties
 
 <dl>
 <dt>alerter</dt>
@@ -706,16 +987,16 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 ([Query](#query)) Query components that are query databases such as Prometheus.
 
 </dd>
-<dt>sqrt</dt>
-<dd>
-
-([Sqrt](#sqrt)) Takes an input signal and emits the square root of the input signal.
-
-</dd>
 <dt>switcher</dt>
 <dd>
 
 ([Switcher](#switcher)) Switcher acts as a switch that emits one of the two signals based on third signal.
+
+</dd>
+<dt>unary_operator</dt>
+<dd>
+
+([UnaryOperator](#unary-operator)) Takes an input signal and emits the square root of the input signal.
 
 </dd>
 <dt>variable</dt>
@@ -741,8 +1022,6 @@ Concurrency is calculated in terms of total tokens which translate to (avg. late
 
 ConcurrencyLimiter configuration is split into two parts: An actuation
 strategy and a scheduler. Right now, only `load_actuator` strategy is available.
-
-#### Properties
 
 <dl>
 <dt>flow_selector</dt>
@@ -774,8 +1053,6 @@ output signals.
 
 Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
 
-#### Properties
-
 <dl>
 <dt>special_value</dt>
 <dd>
@@ -802,8 +1079,6 @@ transitions between 1.0 or 0.0 signal if the decider condition is
 true or false for at least "true_for" or "false_for" duration. If
 `true_for` and `false_for` durations are zero then the transitions are
 instantaneous.
-
-#### Properties
 
 <dl>
 <dt>false_for</dt>
@@ -844,8 +1119,6 @@ If the duration is zero, the transition will happen instantaneously.
 
 Inputs for the Decider component.
 
-#### Properties
-
 <dl>
 <dt>lhs</dt>
 <dd>
@@ -865,8 +1138,6 @@ Inputs for the Decider component.
 
 Outputs for the Decider component.
 
-#### Properties
-
 <dl>
 <dt>output</dt>
 <dd>
@@ -879,8 +1150,6 @@ Outputs for the Decider component.
 ### Differentiator {#differentiator}
 
 Differentiator calculates rate of change per tick.
-
-#### Properties
 
 <dl>
 <dt>in_ports</dt>
@@ -907,8 +1176,6 @@ Differentiator calculates rate of change per tick.
 
 Inputs for the Differentiator component.
 
-#### Properties
-
 <dl>
 <dt>input</dt>
 <dd>
@@ -921,8 +1188,6 @@ Inputs for the Differentiator component.
 ### DifferentiatorOuts {#differentiator-outs}
 
 Outputs for the Differentiator component.
-
-#### Properties
 
 <dl>
 <dt>output</dt>
@@ -961,8 +1226,6 @@ $$
 \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
 $$
 
-#### Properties
-
 <dl>
 <dt>in_ports</dt>
 <dd>
@@ -987,8 +1250,6 @@ $$
 ### EMAIns {#e-m-a-ins}
 
 Inputs for the EMA component.
-
-#### Properties
 
 <dl>
 <dt>input</dt>
@@ -1027,8 +1288,6 @@ Behavior is similar to `max_envelope`.
 
 Outputs for the EMA component.
 
-#### Properties
-
 <dl>
 <dt>output</dt>
 <dd>
@@ -1041,8 +1300,6 @@ Outputs for the EMA component.
 ### EMAParameters {#e-m-a-parameters}
 
 Parameters for the EMA component.
-
-#### Properties
 
 <dl>
 <dt>correction_factor_on_max_envelope_violation</dt>
@@ -1083,8 +1340,6 @@ The initial value of the EMA is the average of signal readings received during t
 
 Label selector expression of the equal form "label == value".
 
-#### Properties
-
 <dl>
 <dt>label</dt>
 <dd>
@@ -1105,8 +1360,6 @@ Label selector expression of the equal form "label == value".
 Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code
 
 There are multiple variants of extractor, specify exactly one.
-
-#### Properties
 
 <dl>
 <dt>address</dt>
@@ -1166,8 +1419,6 @@ Extrapolates the input signal by repeating the last valid value during the perio
 
 It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
 
-#### Properties
-
 <dl>
 <dt>in_ports</dt>
 <dd>
@@ -1193,8 +1444,6 @@ It does so until `maximum_extrapolation_interval` is reached, beyond which it em
 
 Inputs for the Extrapolator component.
 
-#### Properties
-
 <dl>
 <dt>input</dt>
 <dd>
@@ -1207,8 +1456,6 @@ Inputs for the Extrapolator component.
 ### ExtrapolatorOuts {#extrapolator-outs}
 
 Outputs for the Extrapolator component.
-
-#### Properties
 
 <dl>
 <dt>output</dt>
@@ -1223,8 +1470,6 @@ Outputs for the Extrapolator component.
 
 Parameters for the Extrapolator component.
 
-#### Properties
-
 <dl>
 <dt>max_extrapolation_interval</dt>
 <dd>
@@ -1237,8 +1482,6 @@ Parameters for the Extrapolator component.
 ### FirstValid {#first-valid}
 
 Picks the first valid input signal from the array of input signals and emits it as an output signal
-
-#### Properties
 
 <dl>
 <dt>in_ports</dt>
@@ -1259,8 +1502,6 @@ Picks the first valid input signal from the array of input signals and emits it 
 
 Inputs for the FirstValid component.
 
-#### Properties
-
 <dl>
 <dt>inputs</dt>
 <dd>
@@ -1274,8 +1515,6 @@ Inputs for the FirstValid component.
 
 Outputs for the FirstValid component.
 
-#### Properties
-
 <dl>
 <dt>output</dt>
 <dd>
@@ -1288,8 +1527,6 @@ Outputs for the FirstValid component.
 ### FlowControl {#flow-control}
 
 FlowControl components are used to regulate requests flow.
-
-#### Properties
 
 <dl>
 <dt>aimd_concurrency_controller</dt>
@@ -1323,7 +1560,6 @@ to
 See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 
 :::
-
 Example:
 
 ```yaml
@@ -1337,17 +1573,17 @@ label_matcher:
       values:
         - insert
         - delete
-    - label: user_agent
-      regex: ^(?!.*Chrome).*Safari
+  expression:
+    label_matches:
+      - label: user_agent
+        regex: ^(?!.*Chrome).*Safari
 ```
-
-#### Properties
 
 <dl>
 <dt>control_point</dt>
 <dd>
 
-(string, **required**) [Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)
+(string, **required**) [Control Point](/concepts/integrations/flow-control/control-point.md)
 identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
 block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
 or filter chains.
@@ -1394,8 +1630,6 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 
 :::
 
-#### Properties
-
 <dl>
 <dt>flow_matcher</dt>
 <dd>
@@ -1421,19 +1655,32 @@ The histogram created by Flux Meter measures the workload latency by default.
 See also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).
 
 :::
-
-Example of a selector that creates a histogram metric for all HTTP requests
-to particular service:
+Example:
 
 ```yaml
-selector:
+static_buckets:
+  buckets:
+    [
+      5.0,
+      10.0,
+      25.0,
+      50.0,
+      100.0,
+      250.0,
+      500.0,
+      1000.0,
+      2500.0,
+      5000.0,
+      10000.0,
+    ]
+flow_selector:
   service_selector:
-    service: myservice.mynamespace.svc.cluster.local
-  flow_selector:
+    agent_group: demoapp
+    service: service1-demo-app.demoapp.svc.cluster.local
+  flow_matcher:
     control_point: ingress
+attribute_key: response_duration_ms
 ```
-
-#### Properties
 
 <dl>
 <dt>attribute_key</dt>
@@ -1487,8 +1734,6 @@ ExponentialBuckets creates `count` number of buckets where the lowest bucket has
 and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
 bucket is not counted.
 
-#### Properties
-
 <dl>
 <dt>count</dt>
 <dd>
@@ -1514,8 +1759,6 @@ bucket is not counted.
 
 ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest
 bucket is `max`. The final +inf bucket is not counted.
-
-#### Properties
 
 <dl>
 <dt>count</dt>
@@ -1543,8 +1786,6 @@ bucket is `max`. The final +inf bucket is not counted.
 LinearBuckets creates `count` number of buckets, each `width` wide, where the lowest bucket has an
 upper bound of `start`. The final +inf bucket is not counted.
 
-#### Properties
-
 <dl>
 <dt>count</dt>
 <dd>
@@ -1569,8 +1810,6 @@ upper bound of `start`. The final +inf bucket is not counted.
 ### FluxMeterStaticBuckets {#flux-meter-static-buckets}
 
 StaticBuckets holds the static value of the buckets where latency histogram will be stored.
-
-#### Properties
 
 <dl>
 <dt>buckets</dt>
@@ -1607,8 +1846,6 @@ controller into desired idle state.
 
 The output can be _optionally_ clamped to desired range using `max` and
 `min` input.
-
-#### Properties
 
 <dl>
 <dt>default_config</dt>
@@ -1647,8 +1884,6 @@ The output can be _optionally_ clamped to desired range using `max` and
 
 Dynamic Configuration for a Controller
 
-#### Properties
-
 <dl>
 <dt>manual_mode</dt>
 <dd>
@@ -1662,8 +1897,6 @@ In manual mode, the controller does not adjust the control variable I.E. emits t
 ### GradientControllerIns {#gradient-controller-ins}
 
 Inputs for the Gradient Controller component.
-
-#### Properties
 
 <dl>
 <dt>control_variable</dt>
@@ -1710,8 +1943,6 @@ This signal is multiplied by the gradient to produce the output.
 
 Outputs for the Gradient Controller component.
 
-#### Properties
-
 <dl>
 <dt>output</dt>
 <dd>
@@ -1724,8 +1955,6 @@ Outputs for the Gradient Controller component.
 ### GradientControllerParameters {#gradient-controller-parameters}
 
 Gradient Parameters.
-
-#### Properties
 
 <dl>
 <dt>max_gradient</dt>
@@ -1796,8 +2025,6 @@ so the _slope_ might not fully describe aggressiveness of the controller.
 Holds the last valid signal value for the specified duration then waits for next valid value to hold.
 If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
 
-#### Properties
-
 <dl>
 <dt>hold_for</dt>
 <dd>
@@ -1823,8 +2050,6 @@ If it's holding a value that means it ignores both valid and invalid new signals
 
 Inputs for the Holder component.
 
-#### Properties
-
 <dl>
 <dt>input</dt>
 <dd>
@@ -1832,13 +2057,17 @@ Inputs for the Holder component.
 ([InPort](#in-port)) The input signal.
 
 </dd>
+<dt>reset</dt>
+<dd>
+
+([InPort](#in-port)) Resets the holder output to the current input signal when reset signal is valid and non-zero.
+
+</dd>
 </dl>
 
 ### HolderOuts {#holder-outs}
 
 Outputs for the Holder component.
-
-#### Properties
 
 <dl>
 <dt>output</dt>
@@ -1852,8 +2081,6 @@ Outputs for the Holder component.
 ### InPort {#in-port}
 
 Components receive input from other components via InPorts
-
-#### Properties
 
 <dl>
 <dt>constant_signal</dt>
@@ -1874,8 +2101,6 @@ Components receive input from other components via InPorts
 
 Accumulates sum of signal every tick.
 
-#### Properties
-
 <dl>
 <dt>in_ports</dt>
 <dd>
@@ -1894,8 +2119,6 @@ Accumulates sum of signal every tick.
 ### IntegratorIns {#integrator-ins}
 
 Inputs for the Integrator component.
-
-#### Properties
 
 <dl>
 <dt>input</dt>
@@ -1928,8 +2151,6 @@ Inputs for the Integrator component.
 
 Outputs for the Integrator component.
 
-#### Properties
-
 <dl>
 <dt>output</dt>
 <dd>
@@ -1944,8 +2165,6 @@ Outputs for the Integrator component.
 Logical NOT.
 
 See [And component](#and) on how signals are mapped onto boolean values.
-
-#### Properties
 
 <dl>
 <dt>in_ports</dt>
@@ -1966,8 +2185,6 @@ See [And component](#and) on how signals are mapped onto boolean values.
 
 Inputs for the Inverter component.
 
-#### Properties
-
 <dl>
 <dt>input</dt>
 <dd>
@@ -1980,8 +2197,6 @@ Inputs for the Inverter component.
 ### InverterOuts {#inverter-outs}
 
 Output ports for the Inverter component.
-
-#### Properties
 
 <dl>
 <dt>output</dt>
@@ -2004,8 +2219,6 @@ Example:
 from: request.http.body
 pointer: /user/name
 ```
-
-#### Properties
 
 <dl>
 <dt>from</dt>
@@ -2041,8 +2254,6 @@ from: request.http.bearer
 json_pointer: /user/email
 ```
 
-#### Properties
-
 <dl>
 <dt>from</dt>
 <dd>
@@ -2064,8 +2275,6 @@ eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
 ### K8sLabelMatcherRequirement {#k8s-label-matcher-requirement}
 
 Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values.
-
-#### Properties
 
 <dl>
 <dt>key</dt>
@@ -2095,8 +2304,6 @@ If the operator is Exists or DoesNotExist, the values array must be empty.
 
 Describes which pods a control or observability
 component should apply to.
-
-#### Properties
 
 <dl>
 <dt>agent_group</dt>
@@ -2147,8 +2354,6 @@ It provides three ways to define requirements:
 If multiple requirements are set, they are all ANDed.
 An empty label matcher always matches.
 
-#### Properties
-
 <dl>
 <dt>expression</dt>
 <dd>
@@ -2179,8 +2384,6 @@ Note: The requirements are ANDed.
 
 Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
 
-#### Properties
-
 <dl>
 <dt>default_config</dt>
 <dd>
@@ -2206,8 +2409,6 @@ Takes the load multiplier input signal and publishes it to the schedulers in the
 
 Dynamic Configuration for LoadActuator
 
-#### Properties
-
 <dl>
 <dt>dry_run</dt>
 <dd>
@@ -2221,8 +2422,6 @@ Useful for observing the behavior of Load Actuator without disrupting any real t
 ### LoadActuatorIns {#load-actuator-ins}
 
 Input for the Load Actuator component.
-
-#### Properties
 
 <dl>
 <dt>load_multiplier</dt>
@@ -2248,8 +2447,6 @@ all:
     - label_exists: foo
     - label_equals: { label = app, value = frobnicator }
 ```
-
-#### Properties
 
 <dl>
 <dt>all</dt>
@@ -2296,8 +2493,6 @@ List of MatchExpressions that is used for all/any matching
 
 eg. {any: {of: [expr1, expr2]}}.
 
-#### Properties
-
 <dl>
 <dt>of</dt>
 <dd>
@@ -2310,8 +2505,6 @@ eg. {any: {of: [expr1, expr2]}}.
 ### MatchesMatchExpression {#matches-match-expression}
 
 Label selector expression of the matches form "label matches regex".
-
-#### Properties
 
 <dl>
 <dt>label</dt>
@@ -2335,8 +2528,6 @@ Takes a list of input signals and emits the signal with the maximum value
 
 Max: output = max([]inputs).
 
-#### Properties
-
 <dl>
 <dt>in_ports</dt>
 <dd>
@@ -2356,8 +2547,6 @@ Max: output = max([]inputs).
 
 Inputs for the Max component.
 
-#### Properties
-
 <dl>
 <dt>inputs</dt>
 <dd>
@@ -2370,8 +2559,6 @@ Inputs for the Max component.
 ### MaxOuts {#max-outs}
 
 Output for the Max component.
-
-#### Properties
 
 <dl>
 <dt>output</dt>
@@ -2386,8 +2573,6 @@ Output for the Max component.
 
 Takes an array of input signals and emits the signal with the minimum value
 Min: output = min([]inputs).
-
-#### Properties
 
 <dl>
 <dt>in_ports</dt>
@@ -2408,8 +2593,6 @@ Min: output = min([]inputs).
 
 Inputs for the Min component.
 
-#### Properties
-
 <dl>
 <dt>inputs</dt>
 <dd>
@@ -2423,8 +2606,6 @@ Inputs for the Min component.
 
 Output ports for the Min component.
 
-#### Properties
-
 <dl>
 <dt>output</dt>
 <dd>
@@ -2437,8 +2618,6 @@ Output ports for the Min component.
 ### NestedCircuit {#nested-circuit}
 
 Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
-
-#### Properties
 
 <dl>
 <dt>components</dt>
@@ -2477,8 +2656,6 @@ Nested circuit defines a sub-circuit as a high-level component. It consists of a
 
 Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
 
-#### Properties
-
 <dl>
 <dt>in_ports</dt>
 <dd>
@@ -2498,8 +2675,6 @@ Nested signal egress is a special type of component that allows to extract a sig
 
 Inputs for the NestedSignalEgress component.
 
-#### Properties
-
 <dl>
 <dt>signal</dt>
 <dd>
@@ -2512,8 +2687,6 @@ Inputs for the NestedSignalEgress component.
 ### NestedSignalIngress {#nested-signal-ingress}
 
 Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
-
-#### Properties
 
 <dl>
 <dt>out_ports</dt>
@@ -2534,8 +2707,6 @@ Nested signal ingress is a special type of component that allows to inject a sig
 
 Outputs for the NestedSignalIngress component.
 
-#### Properties
-
 <dl>
 <dt>signal</dt>
 <dd>
@@ -2550,8 +2721,6 @@ Outputs for the NestedSignalIngress component.
 Logical OR.
 
 See [And component](#and) on how signals are mapped onto boolean values.
-
-#### Properties
 
 <dl>
 <dt>in_ports</dt>
@@ -2572,8 +2741,6 @@ See [And component](#and) on how signals are mapped onto boolean values.
 
 Inputs for the Or component.
 
-#### Properties
-
 <dl>
 <dt>inputs</dt>
 <dd>
@@ -2586,8 +2753,6 @@ Inputs for the Or component.
 ### OrOuts {#or-outs}
 
 Output ports for the Or component.
-
-#### Properties
 
 <dl>
 <dt>output</dt>
@@ -2603,8 +2768,6 @@ Will always be 0 (false), 1 (true) or invalid (unknown).
 ### OutPort {#out-port}
 
 Components produce output for other components via OutPorts
-
-#### Properties
 
 <dl>
 <dt>signal_name</dt>
@@ -2622,8 +2785,6 @@ Matches HTTP Path to given path templates
 HTTP path will be matched against given path templates.
 If a match occurs, the value associated with the path template will be treated as a result.
 In case of multiple path templates matching, the most specific one will be chosen.
-
-#### Properties
 
 <dl>
 <dt>template_values</dt>
@@ -2659,8 +2820,6 @@ Example:
 
 Component for scaling pods based on a signal.
 
-#### Properties
-
 <dl>
 <dt>kubernetes_object_selector</dt>
 <dd>
@@ -2685,8 +2844,6 @@ Component for scaling pods based on a signal.
 ### PodScalerScaleActuator {#pod-scaler-scale-actuator}
 
 Actuates scaling of pods based on a signal.
-
-#### Properties
 
 <dl>
 <dt>default_config</dt>
@@ -2713,8 +2870,6 @@ Actuates scaling of pods based on a signal.
 
 Dynamic Configuration for ScaleActuator
 
-#### Properties
-
 <dl>
 <dt>dry_run</dt>
 <dd>
@@ -2729,8 +2884,6 @@ Useful for observing the behavior of Scaler without disrupting any real traffic.
 
 Inputs for the PodScaler component.
 
-#### Properties
-
 <dl>
 <dt>desired_replicas</dt>
 <dd>
@@ -2744,8 +2897,6 @@ Inputs for the PodScaler component.
 
 Reports actual and configured number of replicas.
 
-#### Properties
-
 <dl>
 <dt>out_ports</dt>
 <dd>
@@ -2758,8 +2909,6 @@ Reports actual and configured number of replicas.
 ### PodScalerScaleReporterOuts {#pod-scaler-scale-reporter-outs}
 
 Outputs for the PodScaler component.
-
-#### Properties
 
 <dl>
 <dt>actual_replicas</dt>
@@ -2788,8 +2937,6 @@ See also [Policy overview](/concepts/policy/policy.md).
 
 Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
 
-#### Properties
-
 <dl>
 <dt>circuit</dt>
 <dd>
@@ -2808,8 +2955,6 @@ Policy specification contains a circuit that defines the controller logic and re
 ### PromQL {#prom-q-l}
 
 Component that runs a Prometheus query periodically and returns the result as an output signal
-
-#### Properties
 
 <dl>
 <dt>evaluation_interval</dt>
@@ -2843,8 +2988,6 @@ fluxmeters here or link to appropriate place in docs.
 
 Output for the PromQL component.
 
-#### Properties
-
 <dl>
 <dt>output</dt>
 <dd>
@@ -2857,8 +3000,6 @@ Output for the PromQL component.
 ### PulseGenerator {#pulse-generator}
 
 Generates 0 and 1 in turns.
-
-#### Properties
 
 <dl>
 <dt>false_for</dt>
@@ -2885,8 +3026,6 @@ Generates 0 and 1 in turns.
 
 Outputs for the PulseGenerator component.
 
-#### Properties
-
 <dl>
 <dt>output</dt>
 <dd>
@@ -2899,8 +3038,6 @@ Outputs for the PulseGenerator component.
 ### Query {#query}
 
 Query components that are query databases such as Prometheus.
-
-#### Properties
 
 <dl>
 <dt>promql</dt>
@@ -2923,8 +3060,6 @@ See also [Rate Limiter overview](/concepts/integrations/flow-control/components/
 
 Ratelimiting is done separately on per-label-value basis. Use _label_key_
 to select which label should be used as key.
-
-#### Properties
 
 <dl>
 <dt>default_config</dt>
@@ -2963,8 +3098,6 @@ to select which label should be used as key.
 
 Dynamic Configuration for the rate limiter
 
-#### Properties
-
 <dl>
 <dt>overrides</dt>
 <dd>
@@ -2977,8 +3110,6 @@ Dynamic Configuration for the rate limiter
 ### RateLimiterIns {#rate-limiter-ins}
 
 Inputs for the RateLimiter component
-
-#### Properties
 
 <dl>
 <dt>limit</dt>
@@ -2999,8 +3130,6 @@ under certain circumstances. [Decider](#decider) might be helpful.
 
 ### RateLimiterOverride {#rate-limiter-override}
 
-#### Properties
-
 <dl>
 <dt>label_value</dt>
 <dd>
@@ -3017,8 +3146,6 @@ under certain circumstances. [Decider](#decider) might be helpful.
 </dl>
 
 ### RateLimiterParameters {#rate-limiter-parameters}
-
-#### Properties
 
 <dl>
 <dt>label_key</dt>
@@ -3048,8 +3175,6 @@ label set up, set `label_key: "user"`.
 
 ### RateLimiterParametersLazySync {#rate-limiter-parameters-lazy-sync}
 
-#### Properties
-
 <dl>
 <dt>enabled</dt>
 <dd>
@@ -3076,8 +3201,6 @@ See also [Resources overview](/concepts/policy/resources.md).
 :::
 
 Resources are typically Flux Meters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
-
-#### Properties
 
 <dl>
 <dt>classifiers</dt>
@@ -3142,8 +3265,6 @@ telemetry: false
 
 [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 
-#### Properties
-
 <dl>
 <dt>extractor</dt>
 <dd>
@@ -3186,8 +3307,6 @@ Raw rego rules are compiled 1:1 to rego queries
 
 High-level extractor-based rules are compiled into a single rego query.
 
-#### Properties
-
 <dl>
 <dt>query</dt>
 <dd>
@@ -3220,8 +3339,6 @@ signals for accepted and incoming concurrency are aggregated across all agents.
 
 See [ConcurrencyLimiter](#concurrency-limiter) for more context.
 
-#### Properties
-
 <dl>
 <dt>out_ports</dt>
 <dd>
@@ -3240,8 +3357,6 @@ See [ConcurrencyLimiter](#concurrency-limiter) for more context.
 ### SchedulerOuts {#scheduler-outs}
 
 Output for the Scheduler component.
-
-#### Properties
 
 <dl>
 <dt>accepted_concurrency</dt>
@@ -3281,8 +3396,6 @@ rejected ones.
 ### SchedulerParameters {#scheduler-parameters}
 
 Scheduler parameters
-
-#### Properties
 
 <dl>
 <dt>auto_tokens</dt>
@@ -3370,8 +3483,6 @@ section](/concepts/integrations/flow-control/components/concurrency-limiter.md#w
 
 Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
 
-#### Properties
-
 <dl>
 <dt>label_matcher</dt>
 <dd>
@@ -3391,8 +3502,6 @@ Workload defines a class of requests that preferably have similar properties suc
 ### SchedulerWorkloadParameters {#scheduler-workload-parameters}
 
 Parameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
-
-#### Properties
 
 <dl>
 <dt>fairness_key</dt>
@@ -3438,8 +3547,6 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 
 :::
 
-#### Properties
-
 <dl>
 <dt>agent_group</dt>
 <dd>
@@ -3479,75 +3586,12 @@ An entity (e.g. Kubernetes pod) may belong to multiple services.
 </dd>
 </dl>
 
-### Sqrt {#sqrt}
-
-Takes an input signal and emits the square root of it multiplied by scale as an output
-
-$$
-\text{output} = \text{scale} \sqrt{\text{input}}
-$$
-
-#### Properties
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-([SqrtIns](#sqrt-ins)) Input ports for the Sqrt component.
-
-</dd>
-<dt>out_ports</dt>
-<dd>
-
-([SqrtOuts](#sqrt-outs)) Output ports for the Sqrt component.
-
-</dd>
-<dt>scale</dt>
-<dd>
-
-(float64, default: `1`) Scaling factor to be multiplied with the square root of the input signal.
-
-</dd>
-</dl>
-
-### SqrtIns {#sqrt-ins}
-
-Inputs for the Sqrt component.
-
-#### Properties
-
-<dl>
-<dt>input</dt>
-<dd>
-
-([InPort](#in-port)) Input signal.
-
-</dd>
-</dl>
-
-### SqrtOuts {#sqrt-outs}
-
-Outputs for the Sqrt component.
-
-#### Properties
-
-<dl>
-<dt>output</dt>
-<dd>
-
-([OutPort](#out-port)) Output signal.
-
-</dd>
-</dl>
-
 ### Switcher {#switcher}
 
 Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input
 
 `on_signal` will be returned if switch input is valid and not equal to 0.0 ,
 otherwise `off_signal` will be returned.
-
-#### Properties
 
 <dl>
 <dt>in_ports</dt>
@@ -3567,8 +3611,6 @@ otherwise `off_signal` will be returned.
 ### SwitcherIns {#switcher-ins}
 
 Inputs for the Switcher component.
-
-#### Properties
 
 <dl>
 <dt>off_signal</dt>
@@ -3595,8 +3637,6 @@ Inputs for the Switcher component.
 
 Outputs for the Switcher component.
 
-#### Properties
-
 <dl>
 <dt>output</dt>
 <dd>
@@ -3606,11 +3646,104 @@ Outputs for the Switcher component.
 </dd>
 </dl>
 
+### UnaryOperator {#unary-operator}
+
+Takes an input signal and emits the output after applying the specified unary operator
+
+$$
+\text{output} = \unary_operator{\text{input}}
+$$
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([UnaryOperatorIns](#unary-operator-ins)) Input ports for the UnaryOperator component.
+
+</dd>
+<dt>operator</dt>
+<dd>
+
+(string, oneof: `abs | acos | acosh | asin | asinh | atan | atanh | cbrt | ceil | cos | cosh | erf | erfc | erfcinv | erfinv | exp | exp2 | expm1 | floor | gamma | j0 | j1 | lgamma | log | log10 | log1p | log2 | round | roundtoeven | sin | sinh | sqrt | tan | tanh | trunc | y0 | y1`) Unary Operator to apply.
+
+The unary operator can be one of the following:
+
+- abs: Absolute value with the sign removed.
+- acos: arccosine, in radians.
+- acosh: Inverse hyperbolic cosine.
+- asin: arcsine, in radians.
+- asinh: Inverse hyperbolic sine.
+- atan: arctangent, in radians.
+- atanh: Inverse hyperbolic tangent.
+- cbrt: Cube root.
+- ceil: Least integer value greater than or equal to input signal.
+- cos: cosine, in radians.
+- cosh: Hyperbolic cosine.
+- erf: Error function.
+- erfc: Complementary error function.
+- erfcinv: Inverse complementary error function.
+- erfinv: Inverse error function.
+- exp: The base-e exponential of input signal.
+- exp2: The base-2 exponential of input signal.
+- expm1: The base-e exponential of input signal minus 1.
+- floor: Greatest integer value less than or equal to input signal.
+- gamma: Gamma function.
+- j0: Bessel function of the first kind of order 0.
+- j1: Bessel function of the first kind of order 1.
+- lgamma: Natural logarithm of the absolute value of the gamma function.
+- log: Natural logarithm of input signal.
+- log10: Base-10 logarithm of input signal.
+- log1p: Natural logarithm of input signal plus 1.
+- log2: Base-2 logarithm of input signal.
+- round: Round to nearest integer.
+- roundtoeven: Round to nearest integer, with ties going to the nearest even integer.
+- sin: sine, in radians.
+- sinh: Hyperbolic sine.
+- sqrt: Square root.
+- tan: tangent, in radians.
+- tanh: Hyperbolic tangent.
+- trunc: Truncate to integer.
+- y0: Bessel function of the second kind of order 0.
+- y1: Bessel function of the second kind of order 1.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([UnaryOperatorOuts](#unary-operator-outs)) Output ports for the UnaryOperator component.
+
+</dd>
+</dl>
+
+### UnaryOperatorIns {#unary-operator-ins}
+
+Inputs for the UnaryOperator component.
+
+<dl>
+<dt>input</dt>
+<dd>
+
+([InPort](#in-port)) Input signal.
+
+</dd>
+</dl>
+
+### UnaryOperatorOuts {#unary-operator-outs}
+
+Outputs for the UnaryOperator component.
+
+<dl>
+<dt>output</dt>
+<dd>
+
+([OutPort](#out-port)) Output signal.
+
+</dd>
+</dl>
+
 ### Variable {#variable}
 
 Component that emits a variable value as an output signal, can be defined in dynamic configuration.
-
-#### Properties
 
 <dl>
 <dt>default_config</dt>
@@ -3635,8 +3768,6 @@ Component that emits a variable value as an output signal, can be defined in dyn
 
 ### VariableDynamicConfig {#variable-dynamic-config}
 
-#### Properties
-
 <dl>
 <dt>constant_signal</dt>
 <dd>
@@ -3649,8 +3780,6 @@ Component that emits a variable value as an output signal, can be defined in dyn
 ### VariableOuts {#variable-outs}
 
 Outputs for the Variable component.
-
-#### Properties
 
 <dl>
 <dt>output</dt>

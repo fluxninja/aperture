@@ -1,0 +1,28 @@
+{
+  "renderer": "tanka",
+  "tkenv": "playground/tanka/apps/single-service-app",
+  "needs": ["istio"],
+  "aperture_policies": [
+    {
+      "blueprint_name": "policies/latency-aimd-concurrency-limiting",
+      "policy_name": "load-based-autoscale-service1",
+      "values_file": "policies/load-based-autoscale-service1.yaml",
+      "dashboard_name": "load-based-autoscale-service1-dashboard",
+      "dashboard_mixin_dir": "dashboards/"
+    }
+  ],
+  "images": [
+    {
+      "ref": "demo-app",
+      "context": "playground/resources/demo-app/",
+      "ssh": "default"
+    }
+  ],
+  "child_resources": [
+    {
+      "workload": "service1-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "extra_objects": ["service1-demo-app:serviceaccount"]
+    }
+  ]
+}

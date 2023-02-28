@@ -21,6 +21,9 @@ func Module() fx.Option {
 	)
 }
 
+// ConfigKey is config path where FlowPreviewConfig is located.
+const ConfigKey = "flow_control.preview_service"
+
 // FlowPreviewConfig is the configuration for the flow control preview service.
 // swagger:model
 // +kubebuilder:object:generate=true
@@ -36,7 +39,7 @@ func Register(handler *Handler,
 	unmarshaller cfg.Unmarshaller,
 ) error {
 	var config FlowPreviewConfig
-	if err := unmarshaller.UnmarshalKey("flow_control.preview_service", &config); err != nil {
+	if err := unmarshaller.UnmarshalKey(ConfigKey, &config); err != nil {
 		return err
 	}
 

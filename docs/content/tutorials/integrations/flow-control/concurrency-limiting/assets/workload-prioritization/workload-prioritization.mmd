@@ -10,8 +10,8 @@ FakeConstant0 --> root.1rhs
 subgraph root.1[<center>ArithmeticCombinator<br/>Mul</center>]
 subgraph root.1_inports[ ]
 style root.1_inports fill:none,stroke:none
-root.1rhs[rhs]
 root.1lhs[lhs]
+root.1rhs[rhs]
 end
 subgraph root.1_outports[ ]
 style root.1_outports fill:none,stroke:none
@@ -52,9 +52,9 @@ subgraph root.4_outports[ ]
 style root.4_outports fill:none,stroke:none
 end
 end
-root.2output --> |LATENCY_SETPOINT| root.4setpoint
-root.3output --> |LATENCY_EMA| root.2lhs
 root.0output --> |LATENCY| root.1lhs
 root.0output --> |LATENCY| root.3input
 root.0output --> |LATENCY| root.4signal
 root.1output --> |MAX_EMA| root.3max_envelope
+root.2output --> |LATENCY_SETPOINT| root.4setpoint
+root.3output --> |LATENCY_EMA| root.2lhs

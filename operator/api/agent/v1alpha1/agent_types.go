@@ -22,6 +22,7 @@ import (
 	agent "github.com/fluxninja/aperture/cmd/aperture-agent/config"
 	"github.com/fluxninja/aperture/operator/api"
 	"github.com/fluxninja/aperture/operator/api/common"
+	"github.com/fluxninja/aperture/pkg/agentfunctions"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/net/http"
@@ -83,6 +84,10 @@ type AgentConfigSpec struct {
 	// OTEL configuration.
 	//+kubebuilder:validation:Optional
 	OTEL agent.AgentOTELConfig `json:"otel"`
+
+	// Agent functions configuration.
+	//+kubebuilder:validation:Optional
+	AgentFunctions agentfunctions.Config `json:"agent_functions"`
 }
 
 // FlowControlConfigSpec holds flow control configuration.

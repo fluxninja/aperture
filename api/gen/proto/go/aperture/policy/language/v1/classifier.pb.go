@@ -27,19 +27,25 @@ const (
 // See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
 //
 // :::
-//
-// Example:
+// Example
 // ```yaml
-// selector:
+// flow_selector:
 //   service_selector:
-//     service: service1.default.svc.cluster.local
-//   flow_selector:
-//     control_point:
-//       traffic: ingress
+//      agent_group: demoapp
+//      service: service1-demo-app.demoapp.svc.cluster.local
+//   flow_matcher:
+//      control_point: ingress
+//      label_matcher:
+//         match_labels:
+//           user_tier: gold
+//         match_expressions:
+//           - key: user_type
+//             operator: In
 // rules:
 //   user:
-//     extractor:
-//       from: request.http.headers.user
+//    extractor:
+//      from: request.http.headers.user-agent
+//   telemetry: false
 // ```
 type Classifier struct {
 	state         protoimpl.MessageState

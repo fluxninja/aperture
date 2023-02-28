@@ -54,7 +54,7 @@ The following command can be used to list available blueprints:
 Which will output the following:
 
 ```bash
-dashboards/signals-dashboard
+dashboards/signals
 policies/latency-aimd-concurrency-limiting
 policies/static-rate-limiting
 ```

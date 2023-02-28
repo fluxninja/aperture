@@ -185,7 +185,6 @@ func (x *ServiceSelector) GetService() string {
 // See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 //
 // :::
-//
 // Example:
 // ```yaml
 // control_point: ingress
@@ -198,15 +197,17 @@ func (x *ServiceSelector) GetService() string {
 //       values:
 //         - insert
 //         - delete
-//     - label: user_agent
-//       regex: ^(?!.*Chrome).*Safari
+//   expression:
+//     label_matches:
+//         - label: user_agent
+//           regex: ^(?!.*Chrome).*Safari
 // ```
 type FlowMatcher struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// [Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)
+	// [Control Point](/concepts/integrations/flow-control/control-point.md)
 	// identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
 	// block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
 	// or filter chains.

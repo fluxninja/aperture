@@ -9,13 +9,8 @@ See also [Rate Limiter reference][reference]
 
 :::
 
-Rate Limiter is a versatile tool that could be used to protect your services,
-but also can be used for different purposes, like giving fairness to your users.
-Some potential usecases are:
-
-- protecting the service from bot traffic,
-- ratelimiting users,
-- preventing from reaching external API quotas.
+Rate Limiter is a versatile tool that could be used to prevent recurring
+overloads by proactively regulating heavy-hitters.
 
 Rate Limiter is configured as a [policy][policies] component.
 

@@ -7,6 +7,7 @@ import (
 
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/apply"
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/blueprints"
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/flowcontrol"
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/installation"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -21,6 +22,8 @@ func init() {
 	RootCmd.AddCommand(apply.ApplyCmd)
 	RootCmd.AddCommand(installation.InstallCmd)
 	RootCmd.AddCommand(installation.UnInstallCmd)
+	RootCmd.AddCommand(flowcontrol.FlowControlCmd)
+	RootCmd.AddCommand(agentsCmd)
 
 	RootCmd.InitDefaultCompletionCmd()
 	RootCmd.SilenceUsage = true

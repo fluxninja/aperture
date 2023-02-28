@@ -6,6 +6,7 @@ import (
 	"path"
 	"sync"
 
+	"github.com/cenkalti/backoff"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
@@ -18,12 +19,12 @@ import (
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/hashicorp/go-multierror"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/sourcegraph/conc"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
@@ -187,6 +188,7 @@ func (paFactory *podScalerFactory) newPodScalerOptions(
 		podScalerProto:   podScalerProto,
 		registry:         reg,
 		podScalerFactory: paFactory,
+		scaleWaitGroup:   conc.NewWaitGroup(),
 	}
 	componentKey := paths.AgentComponentKey(paFactory.agentGroup, podScaler.GetPolicyName(), podScaler.GetComponentId())
 	statusEtcdPath := path.Join(paths.PodScalerStatusPath, componentKey)
@@ -205,23 +207,21 @@ func (paFactory *podScalerFactory) newPodScalerOptions(
 
 // podScaler implement  pod scaler on the agent side.
 type podScaler struct {
-	scaleMutex  sync.Mutex
-	statusMutex sync.Mutex
-	ctx         context.Context
-	k8sClient   k8s.K8sClient
-	registry    status.Registry
+	stateMutex sync.Mutex
+	ctx        context.Context
+	k8sClient  k8s.K8sClient
+	registry   status.Registry
 	iface.Component
-	lastStatusErr     error
-	scaleCancel       context.CancelFunc
+	statusWriter      *etcdwriter.Writer
 	etcdClient        *etcdclient.Client
 	cancel            context.CancelFunc
-	statusWriter      *etcdwriter.Writer
+	scaleCancel       context.CancelFunc
 	podScalerFactory  *podScalerFactory
 	podScalerProto    *policylangv1.PodScaler
 	lastScaleDecision *policysyncv1.ScaleDecision
+	scaleWaitGroup    *conc.WaitGroup
 	controlPoint      discoverykubernetes.ControlPoint
 	statusEtcdPath    string
-	lastStatus        []byte
 	dryRun            bool
 	isLeader          bool
 }
@@ -361,20 +361,10 @@ func (pa *podScaler) setup(
 
 func (pa *podScaler) electionResultCallback(_ notifiers.Event) {
 	log.Info().Msg("Election result callback")
-	// write the lastStatus
-	pa.statusMutex.Lock()
-	defer pa.statusMutex.Unlock()
-	if pa.lastStatusErr != nil {
-		if pa.lastStatus == nil {
-			pa.statusWriter.Delete(pa.statusEtcdPath)
-		} else {
-			pa.statusWriter.Write(pa.statusEtcdPath, pa.lastStatus)
-		}
-	}
 
 	// invoke the lastScaleDecision
-	pa.scaleMutex.Lock()
-	defer pa.scaleMutex.Unlock()
+	pa.stateMutex.Lock()
+	defer pa.stateMutex.Unlock()
 	if pa.lastScaleDecision != nil {
 		pa.scale(pa.lastScaleDecision)
 	}
@@ -419,8 +409,8 @@ func (pa *podScaler) updateDynamicConfig(dynamicConfig *policylangv1.PodScaler_S
 }
 
 func (pa *podScaler) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	pa.scaleMutex.Lock()
-	defer pa.scaleMutex.Unlock()
+	pa.stateMutex.Lock()
+	defer pa.stateMutex.Unlock()
 	logger := pa.registry.GetLogger()
 	pa.lastScaleDecision = nil
 
@@ -460,46 +450,52 @@ func (pa *podScaler) scale(scaleDecision *policysyncv1.ScaleDecision) {
 	if pa.scaleCancel != nil {
 		pa.scaleCancel()
 	}
+	// Cancel any existing scale operation
 	ctx, cancel := context.WithCancel(pa.ctx)
 	pa.scaleCancel = cancel
-	panichandler.Go(func() {
+	// Wait on existing scaleWaitGroup to make sure previous scale operation is complete
+	pa.scaleWaitGroup.Wait()
+	// Create a new scaleWaitGroup
+	pa.scaleWaitGroup = conc.NewWaitGroup()
+	pa.scaleWaitGroup.Go(func() {
 		cp := pa.controlPoint
 		targetGK := schema.GroupKind{
 			Group: cp.Group,
 			Kind:  cp.Kind,
 		}
 
-		scale, targetGR, err := pa.k8sClient.ScaleForGroupKind(ctx, cp.Namespace, cp.Name, targetGK)
-		if err != nil {
-			// TODO: update status
-			log.Error().Err(err).Msgf("Unable to get scale for %v", cp)
-			return
-		}
-
-		if scale.Spec.Replicas != replicas {
-			scale.Spec.Replicas = replicas
-			_, err = pa.k8sClient.GetScaleClient().Scales(cp.Namespace).Update(ctx, targetGR, scale, metav1.UpdateOptions{})
+		operation := func() error {
+			scale, targetGR, err := pa.k8sClient.ScaleForGroupKind(ctx, cp.Namespace, cp.Name, targetGK)
 			if err != nil {
 				// TODO: update status
-				log.Error().Err(err).Msg("Unable to update scale subresource")
-				return
+				log.Error().Err(err).Msgf("Unable to get scale for %v", cp)
+				return err
 			}
+
+			if scale.Spec.Replicas != replicas {
+				scale.Spec.Replicas = replicas
+				_, err = pa.k8sClient.GetScaleClient().Scales(cp.Namespace).Update(ctx, targetGR, scale, metav1.UpdateOptions{})
+				if err != nil {
+					// TODO: update status
+					log.Error().Err(err).Msg("Unable to update scale subresource")
+					return err
+				}
+			}
+			return nil
+		}
+
+		merr := backoff.Retry(operation, backoff.WithContext(backoff.NewExponentialBackOff(), ctx))
+		if merr != nil {
+			log.Error().Err(merr).Msgf("Context canceled while invoking scale for %v", cp)
 		}
 	})
 }
 
 func (pa *podScaler) controlPointUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	pa.statusMutex.Lock()
-	defer pa.statusMutex.Unlock()
 	logger := pa.registry.GetLogger()
-	pa.lastStatus = nil
-	pa.lastStatusErr = nil
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Control point removed")
-		pa.lastStatus = nil
-		if pa.isLeader {
-			pa.statusWriter.Delete(pa.statusEtcdPath)
-		}
+		pa.statusWriter.Delete(pa.statusEtcdPath)
 		return
 	}
 
@@ -508,7 +504,6 @@ func (pa *podScaler) controlPointUpdateCallback(event notifiers.Event, unmarshal
 	if err != nil {
 		// TODO: update status
 		log.Error().Err(err).Msg("Unable to unmarshal scale status")
-		pa.lastStatusErr = err
 		return
 	}
 
@@ -527,11 +522,7 @@ func (pa *podScaler) controlPointUpdateCallback(event notifiers.Event, unmarshal
 	if err != nil {
 		// TODO: update status
 		log.Error().Err(err).Msg("Unable to marshal scale status")
-		pa.lastStatusErr = err
 		return
 	}
-	pa.lastStatus = data
-	if pa.isLeader {
-		pa.statusWriter.Write(pa.statusEtcdPath, data)
-	}
+	pa.statusWriter.Write(pa.statusEtcdPath, data)
 }

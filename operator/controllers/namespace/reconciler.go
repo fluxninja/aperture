@@ -138,7 +138,7 @@ func (r *NamespaceReconciler) manageResources(ctx context.Context, log logr.Logg
 // reconcileConfigMap prepares the desired states for Agent configmap and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *NamespaceReconciler) reconcileConfigMap(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent, namespace string) error {
-	configMap := agent.CreateAgentConfigMapInNamespace(instance, namespace)
+	configMap := agent.CreateAgentConfigMapInNamespace(ctx, r.Client, instance, namespace)
 
 	res, err := agent.CreateConfigMapForAgent(r.Client, nil, configMap, ctx, instance)
 	if err != nil {
