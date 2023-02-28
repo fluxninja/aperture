@@ -4,6 +4,10 @@ sidebar_position: 11
 sidebar_label: Agent
 ---
 
+<head>
+  <body className="schema-docs" />
+</head>
+
 :::info
 See also [Aperture Agent installation](/get-started/installation/agent/agent.md).
 :::
@@ -517,8 +521,6 @@ Type: [WatchdogConfig](#watchdog-config)
 
 AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)\*factor.
 
-#### Properties
-
 <dl>
 <dt>enabled</dt>
 <dd>
@@ -538,8 +540,6 @@ AdaptivePolicy creates a policy that forces GC when the usage surpasses the conf
 
 AgentInfoConfig is the configuration for the agent group and other agent attributes.
 
-#### Properties
-
 <dl>
 <dt>agent_group</dt>
 <dd>
@@ -554,8 +554,6 @@ AgentInfoConfig is the configuration for the agent group and other agent attribu
 ### AgentOTELConfig {#agent-o-t-e-l-config}
 
 AgentOTELConfig is the configuration for Agent's OTEL collector.
-
-#### Properties
 
 <dl>
 <dt>custom_metrics</dt>
@@ -598,8 +596,6 @@ By default `kubeletstats` custom metrics is added, which can be overwritten.
 
 BackoffConfig holds configuration for GRPC Client Backoff.
 
-#### Properties
-
 <dl>
 <dt>base_delay</dt>
 <dd>
@@ -631,8 +627,6 @@ BackoffConfig holds configuration for GRPC Client Backoff.
 
 BatchAlertsConfig defines configuration for OTEL batch processor.
 
-#### Properties
-
 <dl>
 <dt>send_batch_max_size</dt>
 <dd>
@@ -658,8 +652,6 @@ into smaller units.
 ### BatchPostrollupConfig {#batch-postrollup-config}
 
 BatchPostrollupConfig defines configuration for OTEL batch processor.
-
-#### Properties
 
 <dl>
 <dt>send_batch_max_size</dt>
@@ -687,8 +679,6 @@ into smaller units.
 
 BatchPrerollupConfig defines configuration for OTEL batch processor.
 
-#### Properties
-
 <dl>
 <dt>send_batch_max_size</dt>
 <dd>
@@ -715,8 +705,6 @@ into smaller units.
 
 ClientConfig is the client configuration.
 
-#### Properties
-
 <dl>
 <dt>grpc</dt>
 <dd>
@@ -735,8 +723,6 @@ ClientConfig is the client configuration.
 ### ClientTLSConfig {#client-tls-config}
 
 ClientTLSConfig is the config for client TLS.
-
-#### Properties
 
 <dl>
 <dt>ca_file</dt>
@@ -786,8 +772,6 @@ CustomMetricsConfig defines receivers, processors and single metrics pipeline,
 
 which will be exported to the controller prometheus.
 
-#### Properties
-
 <dl>
 <dt>pipeline</dt>
 <dd>
@@ -813,8 +797,6 @@ which will be exported to the controller prometheus.
 
 CustomMetricsPipelineConfig defines a custom metrics pipeline.
 
-#### Properties
-
 <dl>
 <dt>processors</dt>
 <dd>
@@ -833,8 +815,6 @@ CustomMetricsPipelineConfig defines a custom metrics pipeline.
 ### DistCacheConfig {#dist-cache-config}
 
 DistCacheConfig configures distributed cache that holds per-label counters in distributed rate limiters.
-
-#### Properties
 
 <dl>
 <dt>bind_addr</dt>
@@ -867,8 +847,6 @@ DistCacheConfig configures distributed cache that holds per-label counters in di
 
 EntityConfig describes a single entity.
 
-#### Properties
-
 <dl>
 <dt>ip_address</dt>
 <dd>
@@ -893,8 +871,6 @@ EntityConfig describes a single entity.
 ### EtcdConfig {#etcd-config}
 
 EtcdConfig holds configuration for etcd client.
-
-#### Properties
 
 <dl>
 <dt>endpoints</dt>
@@ -933,8 +909,6 @@ EtcdConfig holds configuration for etcd client.
 
 FlowPreviewConfig is the configuration for the flow control preview service.
 
-#### Properties
-
 <dl>
 <dt>enabled</dt>
 <dd>
@@ -947,8 +921,6 @@ FlowPreviewConfig is the configuration for the flow control preview service.
 ### FluxNinjaPluginConfig {#flux-ninja-plugin-config}
 
 FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
-
-#### Properties
 
 <dl>
 <dt>api_key</dt>
@@ -980,8 +952,6 @@ FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
 ### GRPCClientConfig {#g-rpc-client-config}
 
 GRPCClientConfig holds configuration for GRPC Client.
-
-#### Properties
 
 <dl>
 <dt>insecure</dt>
@@ -1020,8 +990,6 @@ GRPCClientConfig holds configuration for GRPC Client.
 
 GRPCGatewayConfig holds configuration for grpc-http gateway
 
-#### Properties
-
 <dl>
 <dt>grpc_server_address</dt>
 <dd>
@@ -1034,8 +1002,6 @@ GRPCGatewayConfig holds configuration for grpc-http gateway
 ### GRPCServerConfig {#g-rpc-server-config}
 
 GRPCServerConfig holds configuration for GRPC Server.
-
-#### Properties
 
 <dl>
 <dt>connection_timeout</dt>
@@ -1061,8 +1027,6 @@ GRPCServerConfig holds configuration for GRPC Server.
 ### HTTPClientConfig {#http-client-config}
 
 HTTPClientConfig holds configuration for HTTP Client.
-
-#### Properties
 
 <dl>
 <dt>disable_compression</dt>
@@ -1185,8 +1149,6 @@ HTTPClientConfig holds configuration for HTTP Client.
 
 HTTPServerConfig holds configuration for HTTP Server.
 
-#### Properties
-
 <dl>
 <dt>disable_http_keep_alives</dt>
 <dd>
@@ -1245,8 +1207,6 @@ CanonicalHeaderKey.
 
 HeapConfig holds configuration for heap Watchdog.
 
-#### Properties
-
 <dl>
 <dt>limit</dt>
 <dd>
@@ -1278,8 +1238,6 @@ HeapConfig holds configuration for heap Watchdog.
 
 JobConfig is config for Job
 
-#### Properties
-
 <dl>
 <dt>execution_period</dt>
 <dd>
@@ -1305,8 +1263,6 @@ JobConfig is config for Job
 
 JobGroupConfig holds configuration for JobGroup.
 
-#### Properties
-
 <dl>
 <dt>blocking_execution</dt>
 <dd>
@@ -1331,8 +1287,6 @@ is ignored.
 ### KubernetesDiscoveryConfig {#kubernetes-discovery-config}
 
 KubernetesDiscoveryConfig for Kubernetes service discovery.
-
-#### Properties
 
 <dl>
 <dt>autoscale_enabled</dt>
@@ -1365,8 +1319,6 @@ KubernetesDiscoveryConfig for Kubernetes service discovery.
 
 ListenerConfig holds configuration for socket listeners.
 
-#### Properties
-
 <dl>
 <dt>addr</dt>
 <dd>
@@ -1391,8 +1343,6 @@ ListenerConfig holds configuration for socket listeners.
 ### LogConfig {#log-config}
 
 LogConfig holds configuration for a logger and log writers.
-
-#### Properties
 
 <dl>
 <dt>level</dt>
@@ -1424,8 +1374,6 @@ LogConfig holds configuration for a logger and log writers.
 ### LogWriterConfig {#log-writer-config}
 
 LogWriterConfig holds configuration for a log writer.
-
-#### Properties
 
 <dl>
 <dt>compress</dt>
@@ -1464,8 +1412,6 @@ LogWriterConfig holds configuration for a log writer.
 
 MetricsConfig holds configuration for service metrics.
 
-#### Properties
-
 <dl>
 <dt>enable_go_metrics</dt>
 <dd>
@@ -1491,8 +1437,6 @@ MetricsConfig holds configuration for service metrics.
 
 PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
 
-#### Properties
-
 <dl>
 <dt>advertisement_addr</dt>
 <dd>
@@ -1505,8 +1449,6 @@ PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
 ### PluginsConfig {#plugins-config}
 
 PluginsConfig holds configuration for plugins.
-
-#### Properties
 
 <dl>
 <dt>disable_plugins</dt>
@@ -1539,8 +1481,6 @@ PluginsConfig holds configuration for plugins.
 
 PortsConfig defines configuration for OTEL debug and extension ports.
 
-#### Properties
-
 <dl>
 <dt>debug_port</dt>
 <dd>
@@ -1572,8 +1512,6 @@ PortsConfig defines configuration for OTEL debug and extension ports.
 
 ProfilersConfig holds configuration for profilers.
 
-#### Properties
-
 <dl>
 <dt>cpu_profiler</dt>
 <dd>
@@ -1599,8 +1537,6 @@ ProfilersConfig holds configuration for profilers.
 
 PrometheusConfig holds configuration for Prometheus Server.
 
-#### Properties
-
 <dl>
 <dt>address</dt>
 <dd>
@@ -1615,8 +1551,6 @@ PrometheusConfig holds configuration for Prometheus Server.
 ProxyConfig holds proxy configuration.
 
 This configuration has preference over environment variables HTTP_PROXY, HTTPS_PROXY or NO_PROXY. See <https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config>
-
-#### Properties
 
 <dl>
 <dt>http</dt>
@@ -1642,8 +1576,6 @@ This configuration has preference over environment variables HTTP_PROXY, HTTPS_P
 ### SentryConfig {#sentry-config}
 
 SentryConfig holds configuration for Sentry.
-
-#### Properties
 
 <dl>
 <dt>attach_stack_trace</dt>
@@ -1696,8 +1628,6 @@ oss-aperture project dsn is set as default.
 
 ServerTLSConfig holds configuration for setting up server TLS support.
 
-#### Properties
-
 <dl>
 <dt>allowed_cn</dt>
 <dd>
@@ -1735,8 +1665,6 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 
 ServiceConfig describes a service and its entities.
 
-#### Properties
-
 <dl>
 <dt>entities</dt>
 <dd>
@@ -1756,8 +1684,6 @@ ServiceConfig describes a service and its entities.
 
 StaticDiscoveryConfig for pre-determined list of services.
 
-#### Properties
-
 <dl>
 <dt>services</dt>
 <dd>
@@ -1770,8 +1696,6 @@ StaticDiscoveryConfig for pre-determined list of services.
 ### WatchdogConfig {#watchdog-config}
 
 WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
-
-#### Properties
 
 <dl>
 <dt>cgroup</dt>
@@ -1804,8 +1728,6 @@ WatchdogConfig holds configuration for Watchdog Policy. For each policy, either 
 
 WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
 
-#### Properties
-
 <dl>
 <dt>adaptive_policy</dt>
 <dd>
@@ -1824,8 +1746,6 @@ WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algor
 ### WatermarksPolicy {#watermarks-policy}
 
 WatermarksPolicy creates a Watchdog policy that schedules GC at concrete watermarks.
-
-#### Properties
 
 <dl>
 <dt>enabled</dt>
