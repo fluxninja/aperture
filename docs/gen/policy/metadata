@@ -4,6 +4,10 @@ sidebar_position: 1
 sidebar_label: Specification
 ---
 
+<head>
+  <body className="schema-docs" />
+</head>
+
 Reference for all objects used in [the Policy language](/concepts/policy/policy.md).
 
 The top-level object representing a policy is [Policy](#policy).

@@ -151,7 +151,6 @@ any
       {{- end }}
     {{- end }}
     {{- if .Properties }}
-#### {{ if .IsTuple }}Tuple members{{ else }}Properties{{ end }}
 
 <dl>
       {{- range .Properties }}
@@ -177,7 +176,8 @@ Generated File Starts
 
 {{/* Metadata, title and description are handled by `metadata` files in `/docs/gen` */}}
 
-{{- if or .OperationGroups .Operations }}
+{{/* Skip TOC & Operations reference for policy docs, as they're only dummy stubs */}}
+{{- if and (ne .Info.Title "Policy") (or .OperationGroups .Operations) }}
 ## Table of contents
 
 {{- $alltags := .Tags }}
