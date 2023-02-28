@@ -1,8 +1,6 @@
 package agent
 
 import (
-	"fmt"
-
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension"
@@ -55,8 +53,8 @@ func ModuleForAgentOTEL() fx.Option {
 				AgentOTELComponents,
 				fx.ParamTags(
 					alerts.AlertsFxTag,
-					fmt.Sprintf("%s,optional:\"true\"", config.NameTag(otelcollector.ReceiverFactoriesFxTag)),
-					fmt.Sprintf("%s,optional:\"true\"", config.NameTag(otelcollector.ProcessorFactoriesFxTag)),
+					config.GroupTag(otelcollector.ReceiverFactoriesFxTag)+` optional:"true"`,
+					config.GroupTag(otelcollector.ProcessorFactoriesFxTag)+` optional:"true"`,
 				),
 			),
 		),
