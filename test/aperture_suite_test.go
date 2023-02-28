@@ -168,7 +168,11 @@ var _ = BeforeSuite(func() {
 			clockwork.NewRealClock,
 			fx.Annotate(
 				agent.AgentOTELComponents,
-				fx.ParamTags(alerts.AlertsFxTag),
+				fx.ParamTags(
+					alerts.AlertsFxTag,
+					config.GroupTag(otelcollector.ReceiverFactoriesFxTag)+`,optional:"true"`,
+					config.GroupTag(otelcollector.ProcessorFactoriesFxTag)+`,optional:"true"`,
+				),
 			),
 			entitycache.NewEntityCache,
 			servicegetter.NewEmpty,
