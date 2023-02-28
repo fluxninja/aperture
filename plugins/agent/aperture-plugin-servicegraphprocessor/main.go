@@ -32,7 +32,7 @@ func module() fx.Option {
 		fx.Provide(
 			fx.Annotate(
 				provideProcessor,
-				fx.ResultTags(config.GroupTag(otelcollector.ReceiverFactoriesFxTag)),
+				fx.ResultTags(config.GroupTag(otelcollector.ProcessorFactoriesFxTag)),
 			),
 		),
 	)
