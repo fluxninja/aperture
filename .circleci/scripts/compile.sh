@@ -24,7 +24,9 @@ case "${1:-}" in
     for plugin_dir in ./plugins/*/aperture-plugin-*; do
       plugin="$(basename "${plugin_dir}")"
       echo "Building plugin ${plugin}"
-      SOURCE="${plugin_dir}" TARGET="./dist/plugins/${plugin}.so" ./pkg/plugins/build.sh
+      cd "${plugin_dir}"
+      SOURCE="." TARGET="./dist/plugins/${plugin}.so" ./pkg/plugins/build.sh
+      cd -
     done
     ;;
   cli)
