@@ -664,8 +664,6 @@ github.com/fluxninja/opentelemetry-collector-contrib/receiver/podmanreceiver v0.
 github.com/fluxninja/opentelemetry-collector-contrib/receiver/podmanreceiver v0.72.0-fn.patch.1/go.mod h1:8h/2o4GBOloZvCQxgLbFSUABjtSUEb7NoTfCuIk0DgE=
 github.com/fluxninja/opentelemetry-collector-contrib/receiver/postgresqlreceiver v0.72.0-fn.patch.1 h1:JWsZLMxCuDHXd/OqR7Yj/2h+DI/pe2ERccgS+gUIQn0=
 github.com/fluxninja/opentelemetry-collector-contrib/receiver/postgresqlreceiver v0.72.0-fn.patch.1/go.mod h1:7BWEftjY8vmYlMtRzeNDY2MOdeGEyoaq5758NclS2/U=
-github.com/fluxninja/opentelemetry-collector-contrib/receiver/prometheusexecreceiver v0.72.0-fn.patch.1 h1:hvnHaPFkkXV1vtjpeHAPKPwQqMPffkSWkdBv7z0ichA=
-github.com/fluxninja/opentelemetry-collector-contrib/receiver/prometheusexecreceiver v0.72.0-fn.patch.1/go.mod h1:ZTGp5hKZ8eI41zAAeL99d1eEW4kcJ/8hYYciUykVeq4=
 github.com/fluxninja/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.72.0-fn.patch.1 h1:biHhh6cOYapDy5TwXSHml1+yfqtVwsJDUCCMza5stjQ=
 github.com/fluxninja/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.72.0-fn.patch.1/go.mod h1:dUePL7gglkZ3iakESBoQY4Pu6w4IY1mWtlqafdh2SxM=
 github.com/fluxninja/opentelemetry-collector-contrib/receiver/pulsarreceiver v0.72.0-fn.patch.1 h1:HopXkaVdAL7vb5BDEBExvltJLvx30PzPRQEnqOUFbUQ=
@@ -1228,8 +1226,6 @@ github.com/karrick/godirwalk v1.8.0/go.mod h1:H5KPZjojv4lE+QYImBI8xVtrBRgYrIVsaR
 github.com/karrick/godirwalk v1.10.3/go.mod h1:RoGL9dQei4vP9ilrpETWE8CLOZ1kiN0LhBygSwrAsHA=
 github.com/karrick/godirwalk v1.17.0 h1:b4kY7nqDdioR/6qnbHQyDvmA17u5G1cZ6J+CZXwSWoI=
 github.com/karrick/godirwalk v1.17.0/go.mod h1:j4mkqPuvaLI8mp1DroR3P6ad7cyYd4c1qeJ3RV7ULlk=
-github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 h1:Z9n2FFNUXsshfwJMBgNA0RU6/i7WVaAegv3PtuIHPMs=
-github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51/go.mod h1:CzGEWj7cYgsdH8dAjBGEr58BoE7ScuLd+fwFZ44+/x8=
 github.com/kevinburke/ssh_config v1.2.0 h1:x584FjTGwHzMwvHx18PXxbBVzfnxogHaAReU4gf13a4=
 github.com/kevinburke/ssh_config v1.2.0/go.mod h1:CT57kijsi8u/K/BOFA39wgDQJ9CxiF4nAY/ojJ6r6mM=
 github.com/keybase/go-keychain v0.0.0-20190712205309-48d3d31d256d/go.mod h1:JJNrCn9otv/2QP4D7SMJBgaleKpOf66PnW6F5WGNRIc=

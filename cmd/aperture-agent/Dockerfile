@@ -26,16 +26,11 @@ RUN --mount=type=cache,target=/go/pkg/,readonly \
   /bin/bash -c \
   'set -euo pipefail; \
   shopt -s nullglob; \
-  CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" \
-  LDFLAGS="-extldflags \"-Wl,--allow-multiple-definition\"" \
-  ./pkg/info/build.sh;\
-  for plugin in ./plugins/{common,agent}/aperture-plugin-*; do\
-  echo "building plugin $plugin";\
-  CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" \
-  LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
-  ./pkg/plugins/build.sh;\
-  done\
-  '
+  CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" LDFLAGS="-extldflags \"-Wl,--allow-multiple-definition\"" ./pkg/info/build.sh; \
+  for plugin in ./plugins/{common,agent}/aperture-plugin-*; do \
+  echo "building plugin $plugin"; \
+  CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" ./pkg/plugins/build.sh; \
+  done'
 
 # Final image
 FROM debian:bullseye-slim AS agent

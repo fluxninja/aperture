@@ -23,12 +23,6 @@ type Plugin struct{}
 func (p *Plugin) Module() fx.Option {
 	log.Info().Msg("Loading Delta to Rate Processor")
 	return fx.Options(
-		module(),
-	)
-}
-
-func module() fx.Option {
-	return fx.Options(
 		fx.Provide(
 			fx.Annotate(
 				provideProcessor,
