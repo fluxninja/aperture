@@ -6,7 +6,9 @@
     {
       "blueprint_name": "policies/latency-aimd-concurrency-limiting",
       "policy_name": "load-based-autoscale-service1",
-      "values_file": "policies/load-based-autoscale-service1.yaml"
+      "values_file": "policies/load-based-autoscale-service1.yaml",
+      "dashboard_name": "load-based-autoscale-service1-dashboard",
+      "dashboard_mixin_dir": "dashboards/"
     }
   ],
   "images": [
