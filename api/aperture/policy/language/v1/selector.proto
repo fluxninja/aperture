@@ -88,7 +88,7 @@ message ServiceSelector {
 //           regex: ^(?!.*Chrome).*Safari
 // ```
 message FlowMatcher {
-  // [Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)
+  // [Control Point](/concepts/integrations/flow-control/control-point.md)
   // identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
   // block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
   // or filter chains.

@@ -20,7 +20,7 @@ import (
 
 const (
 	// Identifies the piece of code for purposes of otel's tracing.
-	libraryName = "demo_app/app"
+	libraryName = "demo-app/app"
 )
 
 // HTTPClient interface for making http calls that can be mocked in tests.

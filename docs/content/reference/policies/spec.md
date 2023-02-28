@@ -1712,7 +1712,7 @@ label_matcher:
 <dt>control_point</dt>
 <dd>
 
-(string, **required**) [Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)
+(string, **required**) [Control Point](/concepts/integrations/flow-control/control-point.md)
 identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
 block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
 or filter chains.

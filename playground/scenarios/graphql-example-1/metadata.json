@@ -11,7 +11,7 @@
   "images": [
     {
       "ref": "graphql-demo-app",
-      "context": "playground/resources/graphql_demo_app",
+      "context": "playground/resources/graphql-demo-app",
       "ssh": "default"
     }
   ],
