@@ -58,7 +58,6 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/cumulativetodeltaprocessor v0.72.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/datadogprocessor v0.72.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/deltatorateprocessor v0.72.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor v0.72.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/groupbyattrsprocessor v0.72.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/groupbytraceprocessor v0.72.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8sattributesprocessor v0.72.0
@@ -67,10 +66,8 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor v0.72.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor v0.72.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor v0.72.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/processor/routingprocessor v0.72.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/servicegraphprocessor v0.72.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/spanmetricsprocessor v0.72.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/processor/spanprocessor v0.72.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/tailsamplingprocessor v0.72.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.72.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/activedirectorydsreceiver v0.72.0

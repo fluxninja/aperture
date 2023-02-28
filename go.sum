@@ -538,8 +538,6 @@ github.com/fluxninja/opentelemetry-collector-contrib/processor/datadogprocessor 
 github.com/fluxninja/opentelemetry-collector-contrib/processor/datadogprocessor v0.72.0-fn.patch.1/go.mod h1:3oIjZcKAQLz03bICnuKgRjPRt0Qb90JkmNiwQ+QQC+g=
 github.com/fluxninja/opentelemetry-collector-contrib/processor/deltatorateprocessor v0.72.0-fn.patch.1 h1:YYD4I4gj723Sfc2amX+vHi59RjKWbYXatPSzEbye6E4=
 github.com/fluxninja/opentelemetry-collector-contrib/processor/deltatorateprocessor v0.72.0-fn.patch.1/go.mod h1:VOsys8qCdm2vdY05aju13nN2yqj9rivUvVJHtIJOhuY=
-github.com/fluxninja/opentelemetry-collector-contrib/processor/filterprocessor v0.72.0-fn.patch.1 h1:Xt/V5bYr/BK7TWgKK0aL9YLIakxPPhth0yWyxSIPmgc=
-github.com/fluxninja/opentelemetry-collector-contrib/processor/filterprocessor v0.72.0-fn.patch.1/go.mod h1:XxcVemnULvCe02W997itCM0LrPEoxtGcQxjBs0ydIU0=
 github.com/fluxninja/opentelemetry-collector-contrib/processor/groupbyattrsprocessor v0.72.0-fn.patch.1 h1:XtEEuaex8D1l7+U3KvDY68/QZJLoBguxZzdfSVU8mZE=
 github.com/fluxninja/opentelemetry-collector-contrib/processor/groupbyattrsprocessor v0.72.0-fn.patch.1/go.mod h1:r1A4ad31xBz6hUafIAHAOqWXPj05IIHdEezOey0rhR0=
 github.com/fluxninja/opentelemetry-collector-contrib/processor/groupbytraceprocessor v0.72.0-fn.patch.1 h1:FTECd9AaPPejZk1KRsLrP0UET+OQrBeNB6hIRBGuPW4=
@@ -556,14 +554,10 @@ github.com/fluxninja/opentelemetry-collector-contrib/processor/resourcedetection
 github.com/fluxninja/opentelemetry-collector-contrib/processor/resourcedetectionprocessor v0.72.0-fn.patch.1/go.mod h1:9gNbk/GerBCi7HlQBNeXeqWebLkz+rlhqykgiH9TOUI=
 github.com/fluxninja/opentelemetry-collector-contrib/processor/resourceprocessor v0.72.0-fn.patch.1 h1:LjHS4bG6kEJ8ih7uNVwkP38WlS4j8eExVBheQWIh5ks=
 github.com/fluxninja/opentelemetry-collector-contrib/processor/resourceprocessor v0.72.0-fn.patch.1/go.mod h1:k0lZAY+FhjP9HaRWdIEnDUNmR9xLNIMrObuPPxXYJ9s=
-github.com/fluxninja/opentelemetry-collector-contrib/processor/routingprocessor v0.72.0-fn.patch.1 h1:U6lwlXZujeH0n66W07TS9JjBR6C56dTnjiX/I6a8Wck=
-github.com/fluxninja/opentelemetry-collector-contrib/processor/routingprocessor v0.72.0-fn.patch.1/go.mod h1:TV5SOVfhDVCveGoZPw0mQ/snOZw/oU4X5AmfWcKRLZ0=
 github.com/fluxninja/opentelemetry-collector-contrib/processor/servicegraphprocessor v0.72.0-fn.patch.1 h1:0aTrGwKZ6Tfdv7mAthLR7e1nuCui21RVtEhh3AMs4zM=
 github.com/fluxninja/opentelemetry-collector-contrib/processor/servicegraphprocessor v0.72.0-fn.patch.1/go.mod h1:Z/Ao2pXUCVKZUYv2V8tjccqBzn91fqHR4Y7eU6acXu0=
 github.com/fluxninja/opentelemetry-collector-contrib/processor/spanmetricsprocessor v0.72.0-fn.patch.1 h1:gSoYXHAtjc5b8qMrlfD1hLFVWhS5IVAJAtaZeUCTeo0=
 github.com/fluxninja/opentelemetry-collector-contrib/processor/spanmetricsprocessor v0.72.0-fn.patch.1/go.mod h1:7P4yqT0iwb5U7vEOgO7pxlzdp5x+k+xIBzMvGXH2HF0=
-github.com/fluxninja/opentelemetry-collector-contrib/processor/spanprocessor v0.72.0-fn.patch.1 h1:EVDjrMXehbIvAtpQRpM3UD9pbCNdvowRYS+OVHkKhlE=
-github.com/fluxninja/opentelemetry-collector-contrib/processor/spanprocessor v0.72.0-fn.patch.1/go.mod h1:fpF9pBkf/cusNAFkf0x+yJC9WRvdsrOaZUraH9dLySM=
 github.com/fluxninja/opentelemetry-collector-contrib/processor/tailsamplingprocessor v0.72.0-fn.patch.1 h1:VQfjYefct6ZPr1KU/hnBmWTs3l+quRm9nW0wBSSTxkE=
 github.com/fluxninja/opentelemetry-collector-contrib/processor/tailsamplingprocessor v0.72.0-fn.patch.1/go.mod h1:nz7xKQK4NqeVw0kcO3gTX8estxPeAlsM/5GiptjqnoI=
 github.com/fluxninja/opentelemetry-collector-contrib/processor/transformprocessor v0.72.0-fn.patch.1 h1:VsXYJyisWrVyEcmJ/FmPdZr6jUo8UuSdAR0oQZ/l76M=
