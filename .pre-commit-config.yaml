@@ -178,9 +178,20 @@ repos:
         language: script
         pass_filenames: false
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.1
+    rev: v2.2.2
     hooks:
       - id: codespell
         args:
           - --ignore-words=./.codespellignore
-        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*|docs/content/reference/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*|blueprints/gen/.*)$
+        exclude: |
+          (?x)^(
+            .*\.svg|
+            yarn.lock|
+            .*\.mod|
+            .*\.sum|
+            .circleci/.*|
+            docs/content/reference/api/.*|
+            api/gen/.*|
+            sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*|
+            blueprints/gen/.*
+          )$
