@@ -150,17 +150,17 @@ var _ = BeforeSuite(func() {
 					provideOTELConfig,
 					fx.ResultTags(`name:"base"`),
 				),
-			),
-			fx.Provide(
-				fx.Annotate(
-					provideReceivers,
-					fx.ResultTags(config.GroupTag(otelcollector.ReceiverFactoriesFxTag)),
+				fx.Provide(
+					fx.Annotate(
+						provideReceivers,
+						fx.ResultTags(config.GroupTag(otelcollector.ReceiverFactoriesFxTag)),
+					),
 				),
-			),
-			fx.Provide(
-				fx.Annotate(
-					provideProcessors(),
-					fx.ResultTags(config.GroupTag(otelcollector.ProcessorFactoriesFxTag)),
+				fx.Provide(
+					fx.Annotate(
+						provideProcessors,
+						fx.ResultTags(config.GroupTag(otelcollector.ProcessorFactoriesFxTag)),
+					),
 				),
 			),
 		),
