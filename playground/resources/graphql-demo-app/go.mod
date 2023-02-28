@@ -1,4 +1,4 @@
-module github.com/fluxninja/aperture/playground/graphql_demo_app
+module github.com/fluxninja/aperture/playground/resources/graphql-demo-app
 
 go 1.19
 

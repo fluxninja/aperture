@@ -14,8 +14,8 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
 
-	"github.com/fluxninja/aperture/playground/graphql_demo_app/graph"
-	"github.com/fluxninja/aperture/playground/graphql_demo_app/graph/generated"
+	"github.com/fluxninja/aperture/playground/resources/graphql-demo-app/graph"
+	"github.com/fluxninja/aperture/playground/resources/graphql-demo-app/graph/generated"
 )
 
 const defaultPort = "8080"

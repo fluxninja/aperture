@@ -1269,7 +1269,7 @@
       "description": ":::info\n\nSee also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).\n\n:::\nExample:\n```yaml\ncontrol_point: ingress\nlabel_matcher:\n  match_labels:\n    user_tier: gold\n  match_expressions:\n    - key: query\n      operator: In\n      values:\n        - insert\n        - delete\n  expression:\n    label_matches:\n        - label: user_agent\n          regex: ^(?!.*Chrome).*Safari\n```",
       "properties": {
         "control_point": {
-          "description": "[Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)\nidentifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution\nblock within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners\nor filter chains.\n\n",
+          "description": "[Control Point](/concepts/integrations/flow-control/control-point.md)\nidentifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution\nblock within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners\nor filter chains.\n\n",
           "type": "string",
           "x-go-tag-validate": "required",
           "x-order": 0
