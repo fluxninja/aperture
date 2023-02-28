@@ -1,6 +1,6 @@
 module github.com/fluxninja/aperture/plugins/agent/aperture-plugin-chronyreceiver
 
-go 1.20
+go 1.19
 
 replace github.com/fluxninja/aperture => ../../../
 

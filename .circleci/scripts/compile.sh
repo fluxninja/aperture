@@ -25,7 +25,7 @@ case "${1:-}" in
       plugin="$(basename "${plugin_dir}")"
       echo "Building plugin ${plugin}"
       cd "${plugin_dir}"
-      SOURCE="." TARGET="./dist/plugins/${plugin}.so" ./pkg/plugins/build.sh
+      SOURCE="." TARGET="./dist/plugins/${plugin}.so" ../../../pkg/plugins/build.sh
       cd -
     done
     ;;

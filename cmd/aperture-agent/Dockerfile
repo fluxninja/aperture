@@ -5,7 +5,16 @@ WORKDIR /src
 COPY --link . .
 
 RUN --mount=type=cache,target=/go/pkg/ \
-  go mod download
+  /bin/bash -c \
+  'set -euo pipefail; \
+  shopt -s nullglob; \
+  go mod download; \
+  for plugin in ./plugins/{common,agent}/aperture-plugin-*; do \
+  cd $plugin; \
+  go mod download; \
+  cd -; \
+  done'
+
 
 FROM base AS builder
 
@@ -21,7 +30,7 @@ ENV RACE=${RACE}
 ARG BUILD_TIME="$(date -Iseconds)"
 ENV BUILD_TIME=${BUILD_TIME}
 
-RUN --mount=type=cache,target=/go/pkg/ \
+RUN --mount=type=cache,target=/go/pkg/,readonly \
   --mount=type=cache,target=/root/.cache/go-build/,id=agent-1.19.6,sharing=private \
   /bin/bash -c \
   'set -euo pipefail; \
