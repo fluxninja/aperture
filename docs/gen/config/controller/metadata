@@ -4,6 +4,11 @@ sidebar_position: 10
 sidebar_label: Controller
 ---
 
+<head>
+  <body className="schema-docs" />
+</head>
+
+
 :::info
 See also [Aperture Controller installation](/get-started/installation/controller/controller.md).
 :::
