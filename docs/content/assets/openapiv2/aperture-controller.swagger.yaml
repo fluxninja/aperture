@@ -390,6 +390,22 @@ definitions:
         format: uint64
         default: "4294967295"
         x-go-tag-default: "4294967295"
+      max_scale_in_percentage:
+        description: |+
+          The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+
+        type: number
+        format: double
+        default: 1
+        x-go-tag-default: "1"
+      max_scale_out_percentage:
+        description: |+
+          The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+
+        type: number
+        format: double
+        default: 10
+        x-go-tag-default: "10"
       min_scale:
         description: |+
           The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
@@ -416,14 +432,6 @@ definitions:
         type: string
         default: 120s
         x-go-tag-default: 120s
-      scale_in_max_percentage:
-        description: |+
-          The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
-
-        type: number
-        format: double
-        default: 10
-        x-go-tag-default: "10"
       scale_out_alerter_parameters:
         description: Configuration for scale out alerter.
         $ref: '#/definitions/AlerterParameters'
@@ -439,14 +447,6 @@ definitions:
         type: string
         default: 30s
         x-go-tag-default: 30s
-      scale_out_max_percentage:
-        description: |+
-          The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
-
-        type: number
-        format: double
-        default: 1
-        x-go-tag-default: "1"
       scaler:
         x-go-tag-validate: required
         $ref: '#/definitions/AutoscalerScaler'

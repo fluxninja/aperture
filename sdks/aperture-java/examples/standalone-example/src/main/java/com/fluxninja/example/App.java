@@ -17,13 +17,16 @@ public class App {
   public static final String DEFAULT_APP_PORT = "8080";
   public static final String DEFAULT_AGENT_HOST = "localhost";
   public static final String DEFAULT_AGENT_PORT = "8089";
+  public static final String DEFAULT_FEATURE_NAME = "awesome_feature";
 
   final private ApertureSDK apertureSDK;
   final private ManagedChannel channel;
+  final private String featureName;
 
-  public App(ApertureSDK apertureSDK, ManagedChannel channel) {
+  public App(ApertureSDK apertureSDK, ManagedChannel channel, String featureName) {
     this.apertureSDK = apertureSDK;
     this.channel = channel;
+    this.featureName = featureName;
   }
 
   public static void main(String[] args) {
@@ -51,7 +54,12 @@ public class App {
       return;
     }
 
-    App app = new App(apertureSDK, channel);
+    String featureName = System.getenv("FN_FEATURE_NAME");
+    if (featureName == null) {
+      featureName = DEFAULT_FEATURE_NAME;
+    }
+
+    App app = new App(apertureSDK, channel, featureName);
     String appPort = System.getenv("FN_APP_PORT");
     if (appPort == null) {
       appPort = DEFAULT_APP_PORT;
@@ -70,7 +78,7 @@ public class App {
 
     // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a
     // Flow.
-    Flow flow = this.apertureSDK.startFlow("awesomeFeature", labels);
+    Flow flow = this.apertureSDK.startFlow(this.featureName, labels);
 
     // See whether flow was accepted by Aperture Agent.
     if (flow.accepted()) {

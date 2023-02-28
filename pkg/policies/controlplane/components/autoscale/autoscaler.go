@@ -52,7 +52,7 @@ func ParseAutoscaler(
 							Value: &policylangv1.InPort_ConstantSignal{
 								ConstantSignal: &policylangv1.ConstantSignal{
 									Const: &policylangv1.ConstantSignal_Value{
-										Value: float64(autoscaler.ScaleInMaxPercentage) / 100.0,
+										Value: float64(autoscaler.MaxScaleInPercentage) / 100.0,
 									},
 								},
 							},
@@ -213,7 +213,7 @@ func ParseAutoscaler(
 							Value: &policylangv1.InPort_ConstantSignal{
 								ConstantSignal: &policylangv1.ConstantSignal{
 									Const: &policylangv1.ConstantSignal_Value{
-										Value: float64(autoscaler.ScaleOutMaxPercentage) / 100.0,
+										Value: float64(autoscaler.MaxScaleOutPercentage) / 100.0,
 									},
 								},
 							},

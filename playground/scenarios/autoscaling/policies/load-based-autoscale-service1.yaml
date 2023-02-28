@@ -57,6 +57,8 @@ policy:
                 name: service1-demo-app
           min_scale: "1"
           max_scale: "10"
+          scale_in_cooldown: "40s"
+          scale_out_cooldown: "30s"
           scale_out_controllers:
             - controller:
                 gradient:

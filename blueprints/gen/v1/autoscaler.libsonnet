@@ -20,6 +20,18 @@ local autoscalerouts = import './autoscalerouts.libsonnet';
   withMaxScaleMixin(max_scale):: {
     max_scale+: max_scale,
   },
+  withMaxScaleInPercentage(max_scale_in_percentage):: {
+    max_scale_in_percentage: max_scale_in_percentage,
+  },
+  withMaxScaleInPercentageMixin(max_scale_in_percentage):: {
+    max_scale_in_percentage+: max_scale_in_percentage,
+  },
+  withMaxScaleOutPercentage(max_scale_out_percentage):: {
+    max_scale_out_percentage: max_scale_out_percentage,
+  },
+  withMaxScaleOutPercentageMixin(max_scale_out_percentage):: {
+    max_scale_out_percentage+: max_scale_out_percentage,
+  },
   withMinScale(min_scale):: {
     min_scale: min_scale,
   },
@@ -53,12 +65,6 @@ local autoscalerouts = import './autoscalerouts.libsonnet';
   withScaleInCooldownMixin(scale_in_cooldown):: {
     scale_in_cooldown+: scale_in_cooldown,
   },
-  withScaleInMaxPercentage(scale_in_max_percentage):: {
-    scale_in_max_percentage: scale_in_max_percentage,
-  },
-  withScaleInMaxPercentageMixin(scale_in_max_percentage):: {
-    scale_in_max_percentage+: scale_in_max_percentage,
-  },
   withScaleOutAlerterParameters(scale_out_alerter_parameters):: {
     scale_out_alerter_parameters: scale_out_alerter_parameters,
   },
@@ -79,12 +85,6 @@ local autoscalerouts = import './autoscalerouts.libsonnet';
   },
   withScaleOutCooldownMixin(scale_out_cooldown):: {
     scale_out_cooldown+: scale_out_cooldown,
-  },
-  withScaleOutMaxPercentage(scale_out_max_percentage):: {
-    scale_out_max_percentage: scale_out_max_percentage,
-  },
-  withScaleOutMaxPercentageMixin(scale_out_max_percentage):: {
-    scale_out_max_percentage+: scale_out_max_percentage,
   },
   withScaler(scaler):: {
     scaler: scaler,
