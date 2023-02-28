@@ -4,6 +4,7 @@ local holderouts = import './holderouts.libsonnet';
   new():: {
     in_ports: {
       input: error 'Port input is missing',
+      reset: error 'Port reset is missing',
     },
     out_ports: {
       output: error 'Port output is missing',

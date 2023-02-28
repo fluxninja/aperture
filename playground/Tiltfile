@@ -489,17 +489,17 @@ def render_tanka(environment, env_vars, base_dir, namespace,enable_cloud_plugin)
     wrapped_k8s_yaml(rendered)
 
 
-def render_aperturectl(scenario_path, policies, namespace):
+def render_aperturectl(policies, namespace):
     aperturectl_bin = str(local(command=["../scripts/build_aperturectl.sh"], quiet=True))
 
     blueprints_uri = os.path.join(GIT_ROOT, "blueprints")
     base_dir = os.path.join(GIT_ROOT, "playground")
     for policy in policies:
-        policy_def = policy["policy_def"]
+        blueprint_name = policy["blueprint_name"]
         policy_name = policy["policy_name"]
-        values_file = os.path.join(scenario_path, policy["values_file"])
+        values_file = policy["values_file"]
         rendered = local(command=["./scripts/render-policy.sh", base_dir, aperturectl_bin, blueprints_uri,
-                                  policy_def, policy_name, values_file], quiet=True)
+                                  blueprint_name, policy_name, values_file], quiet=True)
 
         if namespace:
             rendered = namespace_inject(rendered, namespace)
@@ -767,29 +767,34 @@ def process_aperture_scenario(scenario_path):
     if scenario_path[0] != "/":
         scenario_path = PLAYGROUND_ROOT + "/" + scenario_path
 
-    app_manifest = read_json(scenario_path + "/metadata.json", default='')
-    if app_manifest == '':
+    scenario_metadata = read_json(scenario_path + "/metadata.json", default='')
+    if scenario_metadata == '':
         fail("Unable to find or parse metadata.json, will not continue.")
 
-    tkenv = app_manifest.get("tkenv")
-    if tkenv != None and tkenv[0] != "/":
-        tkenv = scenario_path + "/" + tkenv
-        app_manifest["tkenv"] = tkenv
+    if "tkenv" in scenario_metadata:
+        # tkenv is relative to GIT_ROOT
+        scenario_metadata["tkenv"] = GIT_ROOT + "/" + scenario_metadata["tkenv"]
 
-    if "base_dir" not in app_manifest:
-        app_manifest["base_dir"] = scenario_path + "/"
+    scenario_metadata["labels"] = "TestScenarioApplication"
 
-    app_manifest["manifests_path"] = scenario_path + "/" + "manifests"
-    app_manifest["labels"] = "TestScenarioApplication"
-    images = app_manifest.get("images", [])
+    images = scenario_metadata.get("images", [])
+    # image context are relative to GIT_ROOT
     for image in images:
-        image["context"] = scenario_path + "/" + image["context"]
+        if "context" in image:
+            image["context"] = GIT_ROOT + "/" + image["context"]
 
     if APERTURE_DEMOAPP_NS not in DEP_TREE:
         DEP_TREE[APERTURE_DEMOAPP_NS] = {}
-    DEP_TREE[APERTURE_DEMOAPP_NS]["scenario-app"] = app_manifest
+    DEP_TREE[APERTURE_DEMOAPP_NS]["scenario-app"] = scenario_metadata
 
-    aperture_policies = app_manifest.pop("aperture_policies", [])
+    aperture_policies = scenario_metadata.pop("aperture_policies", [])
+    # policy values_file are relative to the scenario path
+    for policy in aperture_policies:
+        if "values_file" in policy:
+            policy["values_file"] = scenario_path + "/" + policy["values_file"]
+
+    print("scenario_path", scenario_path)
+    print("aperture_policies", aperture_policies)
 
     if aperture_policies:
         policies = {
@@ -819,7 +824,7 @@ def process_aperture_scenario(scenario_path):
         "renderer": "yaml",
         "namespace": APERTURE_DEMOAPP_NS,
         "labels": "TestScenarioApplication",
-        "manifests_path": PLAYGROUND_ROOT + "/" + "scenarios/wavepool-generator",
+        "manifests_path": PLAYGROUND_ROOT + "/" + "resources/wavepool-generator",
         "resource_deps": ["scenario-policies", "cluster-bootstrap"],
         "env_vars": {
             "NINJA_WAVEPOOL_JS": wavepool_js
@@ -946,10 +951,9 @@ def declare_resources(resources, dep_tree, inv_dep_tree,race_arg,enable_cloud_pl
                 jsonnet_args = app_config.get("jsonnet_args", [])
                 render_jsonnet(manifests_path, jsonnet_args, namespace)
             elif renderer == "aperturectl":
-                scenario_path = app_config.get("scenario_path")
                 namespace = app_config.get("namespace", None)
                 policies = app_config.get("aperture_policies", None)
-                render_aperturectl(scenario_path, policies, namespace)
+                render_aperturectl(policies, namespace)
             else:
                 fail("Tanka app is not found for %s." % app)
 
@@ -1025,8 +1029,11 @@ def declare_resources(resources, dep_tree, inv_dep_tree,race_arg,enable_cloud_pl
             local('if (kubectl get agent agent -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete agent agent -n {0};  fi'.format(APERTURE_AGENT_NS))
         if "controller" in resources:
             local('if (kubectl get controller controller -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete controller controller -n {0};  fi'.format(APERTURE_CONTROLLER_NS))
-        if "policies" in resources:
-            local('if (kubectl get policy service1-demo-app -n {0}); ret=$?; [ $ret -eq 0 ]; then kubectl delete policy service1-demo-app -n {0};  fi'.format(APERTURE_CONTROLLER_NS))
+        if "scenario-policies" in resources:
+            resource_info = inv_dep_tree["scenario-policies"]
+            for aperture_policy in resource_info.get("aperture_policies", []):
+                policy_name = aperture_policy.get("policy_name")
+                local('if (kubectl get policy {0} -n {1}); ret=$?; [ $ret -eq 0 ]; then kubectl delete policy {0} -n {1};  fi'.format(policy_name, APERTURE_CONTROLLER_NS))
         for resource_name in resources:
             resource = inv_dep_tree[resource_name]
             pvc_selectors = resource.get("pvc_selectors", [])

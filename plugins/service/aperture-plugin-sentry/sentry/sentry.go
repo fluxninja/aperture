@@ -102,7 +102,9 @@ func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller conf
 
 // setStatusRegistry sets the status registry.
 func setStatusRegistry(sentryWriter *SentryWriter, statusRegistry status.Registry) {
-	sentryWriter.statusRegistry = statusRegistry
+	if sentryWriter != nil {
+		sentryWriter.statusRegistry = statusRegistry
+	}
 }
 
 // newSentryWriter creates a new SentryWriter instance with Sentry Client and registers panic handler.

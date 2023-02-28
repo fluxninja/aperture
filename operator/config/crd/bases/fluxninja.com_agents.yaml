@@ -888,6 +888,63 @@ spec:
               config:
                 description: Agent Configuration
                 properties:
+                  agent_functions:
+                    description: Agent functions configuration.
+                    properties:
+                      client:
+                        description: Network client configuration
+                        properties:
+                          grpc:
+                            description: GRPC client settings.
+                            properties:
+                              backoff:
+                                description: Backoff config
+                                properties:
+                                  base_delay:
+                                    description: Base Delay
+                                    type: string
+                                  jitter:
+                                    description: Jitter
+                                    type: number
+                                  max_delay:
+                                    description: Max Delay
+                                    type: string
+                                  multiplier:
+                                    description: Backoff multiplier
+                                    type: number
+                                type: object
+                              insecure:
+                                description: Disable ClientTLS
+                                type: boolean
+                              min_connection_timeout:
+                                description: Minimum connection timeout
+                                type: string
+                              tls:
+                                description: Client TLS configuration
+                                properties:
+                                  ca_file:
+                                    type: string
+                                  cert_file:
+                                    type: string
+                                  insecure_skip_verify:
+                                    type: boolean
+                                  key_file:
+                                    type: string
+                                  key_log_file:
+                                    type: string
+                                type: object
+                              use_proxy:
+                                description: Use HTTP CONNECT Proxy
+                                type: boolean
+                            type: object
+                        type: object
+                      endpoints:
+                        description: RPC servers to connect to (which will be able
+                          to call agent functions)
+                        items:
+                          type: string
+                        type: array
+                    type: object
                   agent_info:
                     description: AgentInfo configuration.
                     properties:

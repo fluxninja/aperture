@@ -205,13 +205,11 @@ func (paFactory *podScalerFactory) newPodScalerOptions(
 
 // podScaler implement  pod scaler on the agent side.
 type podScaler struct {
-	scaleMutex  sync.Mutex
-	statusMutex sync.Mutex
-	ctx         context.Context
-	k8sClient   k8s.K8sClient
-	registry    status.Registry
+	scaleMutex sync.Mutex
+	ctx        context.Context
+	k8sClient  k8s.K8sClient
+	registry   status.Registry
 	iface.Component
-	lastStatusErr     error
 	scaleCancel       context.CancelFunc
 	etcdClient        *etcdclient.Client
 	cancel            context.CancelFunc
@@ -221,7 +219,6 @@ type podScaler struct {
 	lastScaleDecision *policysyncv1.ScaleDecision
 	controlPoint      discoverykubernetes.ControlPoint
 	statusEtcdPath    string
-	lastStatus        []byte
 	dryRun            bool
 	isLeader          bool
 }
@@ -361,16 +358,6 @@ func (pa *podScaler) setup(
 
 func (pa *podScaler) electionResultCallback(_ notifiers.Event) {
 	log.Info().Msg("Election result callback")
-	// write the lastStatus
-	pa.statusMutex.Lock()
-	defer pa.statusMutex.Unlock()
-	if pa.lastStatusErr != nil {
-		if pa.lastStatus == nil {
-			pa.statusWriter.Delete(pa.statusEtcdPath)
-		} else {
-			pa.statusWriter.Write(pa.statusEtcdPath, pa.lastStatus)
-		}
-	}
 
 	// invoke the lastScaleDecision
 	pa.scaleMutex.Lock()
@@ -489,17 +476,10 @@ func (pa *podScaler) scale(scaleDecision *policysyncv1.ScaleDecision) {
 }
 
 func (pa *podScaler) controlPointUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	pa.statusMutex.Lock()
-	defer pa.statusMutex.Unlock()
 	logger := pa.registry.GetLogger()
-	pa.lastStatus = nil
-	pa.lastStatusErr = nil
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Control point removed")
-		pa.lastStatus = nil
-		if pa.isLeader {
-			pa.statusWriter.Delete(pa.statusEtcdPath)
-		}
+		pa.statusWriter.Delete(pa.statusEtcdPath)
 		return
 	}
 
@@ -508,7 +488,6 @@ func (pa *podScaler) controlPointUpdateCallback(event notifiers.Event, unmarshal
 	if err != nil {
 		// TODO: update status
 		log.Error().Err(err).Msg("Unable to unmarshal scale status")
-		pa.lastStatusErr = err
 		return
 	}
 
@@ -527,11 +506,7 @@ func (pa *podScaler) controlPointUpdateCallback(event notifiers.Event, unmarshal
 	if err != nil {
 		// TODO: update status
 		log.Error().Err(err).Msg("Unable to marshal scale status")
-		pa.lastStatusErr = err
 		return
 	}
-	pa.lastStatus = data
-	if pa.isLeader {
-		pa.statusWriter.Write(pa.statusEtcdPath, data)
-	}
+	pa.statusWriter.Write(pa.statusEtcdPath, data)
 }

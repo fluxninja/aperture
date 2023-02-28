@@ -24,10 +24,10 @@ function generate_policies() {
 	readarray -t policies < <(jq --compact-output '.aperture_policies[]' "$metadata_file")
 	for policy in "${policies[@]}"; do
 		policy_name=$(jq --raw-output '.policy_name' <<<"$policy")
-		policy_def=$(jq --raw-output '.policy_def' <<<"$policy")
+		blueprint_name=$(jq --raw-output '.blueprint_name' <<<"$policy")
 		values_file=$(jq --raw-output '.values_file' <<<"$policy")
 		echo "Generating policies: $policy_name"
-		"$gitroot"/playground/scripts/render-policy.sh "$scenario_dir" "$aperturectl" "$gitroot/blueprints" "$policy_def" "$policy_name" "$scenario_dir"/"$values_file" >/dev/null
+		"$gitroot"/playground/scripts/render-policy.sh "$scenario_dir" "$aperturectl" "$gitroot/blueprints" "$blueprint_name" "$policy_name" "$scenario_dir"/"$values_file" >/dev/null
 	done
 }
 

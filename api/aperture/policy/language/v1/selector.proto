@@ -70,7 +70,6 @@ message ServiceSelector {
 // See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 //
 // :::
-//
 // Example:
 // ```yaml
 // control_point: ingress
@@ -83,8 +82,10 @@ message ServiceSelector {
 //       values:
 //         - insert
 //         - delete
-//     - label: user_agent
-//       regex: ^(?!.*Chrome).*Safari
+//   expression:
+//     label_matches:
+//         - label: user_agent
+//           regex: ^(?!.*Chrome).*Safari
 // ```
 message FlowMatcher {
   // [Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)

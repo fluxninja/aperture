@@ -268,8 +268,8 @@ spec:
           out_ports:
             output:
               signal_name: "MAX_CONCURRENCY"
-      - sqrt:
-          scale: "0.5"
+      - unary_operator:
+          operator: "sqrt"
           in_ports:
             input:
               signal_name: "ACCEPTED_CONCURRENCY"
