@@ -1,10 +1,10 @@
 ---
 title: Flow Label
-sidebar_position: 1
+sidebar_position: 2
 ---
 
-Every [Flow][flow] is annotated with a set of **Flow Labels**. Each Flow Label
-is a key:value pair. If a Flow is annotated with `user_tier:gold` label, then
+Every Flow is annotated with a set of **Flow Labels**. Each Flow Label is a
+key:value pair. If a Flow is annotated with `user_tier:gold` label, then
 `user_tier` is a label key and `gold` is a label value.
 
 Flow Labels are used in different ways in Aperture:
@@ -123,8 +123,8 @@ and produce other streams of data from it.
 ### Metrics
 
 Prometheus metrics are generated from the telemetry data that is received. Along
-the path of the [Flows][flow], telemetry data is tagged by the [flux
-meters][flux-meter] and [workloads][workload] that matched.
+the path of the Flows, telemetry data is tagged by the [flux meters][flux-meter]
+and [workloads][workload] that matched.
 
 ### OLAP-style Telemetry
 
@@ -149,8 +149,7 @@ These are Flow Labels mapped from [baggage](#baggage).
 #### Labels defined by user
 
 These are labels provided via Classifiers in case of service mesh/middleware
-integration, or explicitly at [Flow][flow] creation in [Aperture
-SDK][aperture-go].
+integration, or explicitly at Flow creation in [Aperture SDK][aperture-go].
 
 :::note
 
@@ -187,7 +186,6 @@ select which labels to include in telemetry.
 
 :::
 
-[flow]: ./flow-control.md#flow
 [flow-selector]: /concepts/integrations/flow-control/flow-selector.md
 [classifier]: /concepts/integrations/flow-control/flow-classifier.md
 [workload]: components/concurrency-limiter.md#workload
@@ -196,7 +194,7 @@ select which labels to include in telemetry.
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:
   https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces
-[control-point]: ./flow-control.md#control-point
+[control-point]: /concepts/integrations/flow-control/control-point.md
 [otel-conventions]:
   https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
 [aperture-go]: https://github.com/FluxNinja/aperture-go

@@ -9,7 +9,7 @@ COPY --link . .
 RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.cache/go-build/ <<-EOF
     go mod download
-    CGO_ENABLED=0 go build -ldflags="-w -s" -o /demo_app .
+    CGO_ENABLED=0 go build -ldflags="-w -s" -o /demo-app .
 EOF
 
 # Final image
@@ -20,5 +20,5 @@ RUN apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-COPY --link --from=builder /demo_app /demo_app
-ENTRYPOINT ["/demo_app"]
+COPY --link --from=builder /demo-app /demo-app
+ENTRYPOINT ["/demo-app"]

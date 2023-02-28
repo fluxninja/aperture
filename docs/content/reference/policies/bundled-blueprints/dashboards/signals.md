@@ -1,5 +1,5 @@
 ---
-title: Signals Dashboard
+title: Signals
 ---
 
 ## Introduction
@@ -53,7 +53,7 @@ import {apertureVersion as aver} from '../../../../apertureVersion.js'
 ```
 
 Code: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals-dashboard`}>dashboards/signals-dashboard</a>
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals`}>dashboards/signals</a>
 
 <h3 class="blueprints-h3">Common</h3>
 

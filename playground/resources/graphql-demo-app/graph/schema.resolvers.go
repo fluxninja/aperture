@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/fluxninja/aperture/playground/graphql_demo_app/graph/generated"
-	"github.com/fluxninja/aperture/playground/graphql_demo_app/graph/model"
+	"github.com/fluxninja/aperture/playground/resources/graphql-demo-app/graph/generated"
+	"github.com/fluxninja/aperture/playground/resources/graphql-demo-app/graph/model"
 )
 
 // CreateTodo is the resolver for the createTodo field.

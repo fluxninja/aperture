@@ -1,4 +1,4 @@
-module github.com/fluxninja/aperture/playground/demo_app
+module github.com/fluxninja/aperture/playground/resources/demo-app
 
 go 1.19
 

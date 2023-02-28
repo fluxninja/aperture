@@ -4,6 +4,10 @@ sidebar_position: 11
 sidebar_label: Agent
 ---
 
+<head>
+  <body className="schema-docs" />
+</head>
+
 :::info
 See also [Aperture Agent installation](/get-started/installation/agent/agent.md).
 :::

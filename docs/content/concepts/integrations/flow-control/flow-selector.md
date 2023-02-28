@@ -1,7 +1,7 @@
 ---
 title: Flow Selector
 sidebar_label: Flow Selector
-sidebar_position: 3
+sidebar_position: 4
 keywords:
   - flows
   - services
@@ -32,7 +32,7 @@ A Flow Selector consists of:
   - [control point][control-point], and
   - optional [flow label matcher](#label-matcher).
 
-### Service Selector
+### Service Selector {#service-selector}
 
 :::info
 
@@ -106,7 +106,7 @@ flow_selector:
 
 [flow]: /concepts/integrations/flow-control/flow-control.md#flow
 [label]: /concepts/integrations/flow-control/flow-label.md
-[control-point]: ./flow-control.md#control-point
+[control-point]: /concepts/integrations/flow-control/control-point.md
 [service]: /concepts/integrations/flow-control/service.md
 [agent-group]: /concepts/integrations/flow-control/service.md#agent-group
 [flux-meter]: /concepts/integrations/flow-control/flux-meter.md

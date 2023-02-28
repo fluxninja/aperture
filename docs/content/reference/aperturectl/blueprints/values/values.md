@@ -35,6 +35,7 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
       --no-yaml-modeline     Do not add YAML language server modeline to generated YAML files
       --only-required        Show only required values
       --output-file string   Path to the output values file
+      --overwrite            Overwrite existing values file
 ```
 
 ### Options inherited from parent commands
