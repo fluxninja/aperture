@@ -21,15 +21,17 @@ ENV RACE=${RACE}
 ARG BUILD_TIME="$(date -Iseconds)"
 ENV BUILD_TIME=${BUILD_TIME}
 
-RUN --mount=type=cache,target=/go/pkg/,readonly \
+RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.cache/go-build/,id=agent-1.19.6,sharing=private \
   /bin/bash -c \
   'set -euo pipefail; \
   shopt -s nullglob; \
-  CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" LDFLAGS="-extldflags \"-Wl,--allow-multiple-definition\"" ./pkg/info/build.sh; \
+  CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" LDFLAGS="" ./pkg/info/build.sh; \
   for plugin in ./plugins/{common,agent}/aperture-plugin-*; do \
   echo "building plugin $plugin"; \
-  CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" ./pkg/plugins/build.sh; \
+  cd $plugin; \
+  CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="." LDFLAGS="-s -w" ../../../pkg/plugins/build.sh; \
+  cd -; \
   done'
 
 # Final image
