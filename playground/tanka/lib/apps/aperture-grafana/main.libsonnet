@@ -42,33 +42,8 @@ local kubeDashboards =
      },
    }).grafanaDashboards;
 
-local latencyGradientPolicyDashboard =
-  policyDashboard({
-    policy_name: 'service1-demo-app',
-  }).dashboard;
-
-local rateLimitPanel =
-  rateLimitpolicyDashboard({
-    policy_name: 'service1-demo-app',
-  }).dashboard.panels[0];
-
-local policyDashBoardMixin =
-  latencyGradientPolicyDashboard
-  {
-    panels+: [rateLimitPanel { id: std.length(latencyGradientPolicyDashboard.panels) + 2 }],
-  }
-;
-
 local dashboards =
   [
-    dashboard.new('example-dashboard') +
-    dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' }) +
-    dashboard.spec.withJson(std.manifestJsonEx(policyDashBoardMixin, indent='  ')) +
-    dashboard.spec.withDatasources({
-      inputName: 'DS_CONTROLLER-PROMETHEUS',
-      datasourceName: 'controller-prometheus',
-    }),
-
     dashboard.new('k8s-resources') +
     dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' }) +
     dashboard.spec.withJson(std.manifestJsonEx(kubeDashboards['k8s-resources-pod.json'], indent='  ')) +
