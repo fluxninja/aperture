@@ -36,6 +36,7 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
       --no-validation        Do not validate values.yaml file
       --no-yaml-modeline     Do not add YAML language server modeline to generated YAML files
       --output-dir string    Directory path where the generated Policy resources will be stored. If not provided, will use current directory
+      --overwrite            Overwrite existing output directory
       --values-file string   Path to the values file for Blueprint's input
 ```
 
