@@ -15,11 +15,7 @@ go-generate:
 
 go-mod-tidy:
 	@echo Download go.mod dependencies
-	@go mod tidy
-	@cd tools/go && go mod tidy
-	@cd sdks/aperture-go && go mod tidy
-	@cd playground/resources/demo-app/app && go mod tidy
-	@cd playground/resources/graphql-demo-app && go mod tidy
+	@./scripts/go_mod_tidy.sh
 
 go-test:
 	@echo Running go tests
