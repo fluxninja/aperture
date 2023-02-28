@@ -3,7 +3,7 @@ import { ApertureClient } from "../../sdk/client.js";
 import { FlowStatus } from "../../sdk/flow.js";
 
 // Create aperture client
-export const apertureClient = new ApertureClient();
+export const apertureClient = new ApertureClient("localhost:8089");
 
 export const apertureRoute = express.Router();
 apertureRoute.get("/", function (req, res) {

@@ -451,15 +451,15 @@ def render_tanka(environment, env_vars, base_dir, namespace, enable_cloud_plugin
     )
 
     if base_dir == None:
+        # Get base directory for Jsonnet Bundler execution
+        # tanka/apps/default -> tanka/
+        # apps/default -> ./
         base_dir = environment.split("apps/")[0] or "./"
 
     if SKIP_LOCAL_CMDS:
         return
 
     if base_dir not in TANKA_DEPS_HANDLED:
-        # Get base directory for Jsonnet Bundler execution
-        # tanka/apps/default -> tanka/
-        # apps/default -> ./
         # Make sure jb dependencies are up to date
         local(command=["./scripts/deps_install.sh", base_dir])
 

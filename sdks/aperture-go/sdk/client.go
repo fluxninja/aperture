@@ -44,7 +44,7 @@ type apertureClient struct {
 }
 
 // Options that the user can pass to Aperture in order to receive a new Client.
-// FlowControlClientConn and OTLPExporterClientConn are required.
+// ApertureAgentGRPCClientConn is required.
 type Options struct {
 	ApertureAgentGRPCClientConn *grpc.ClientConn
 	CheckTimeout                time.Duration
@@ -179,7 +179,7 @@ func (client *apertureClient) HTTPMiddleware(controlPoint string, labels map[str
 				}
 			} else {
 				w.WriteHeader(http.StatusForbidden)
-				err := flow.End(OK)
+				err := flow.End(Error)
 				if err != nil {
 					client.log.Info("Aperture flow control end got error.", "error", err)
 				}
@@ -211,11 +211,11 @@ func (client *apertureClient) GRPCUnaryInterceptor(controlPoint string, labels m
 			// The second argument is error message for further diagnosis.
 			flowErr := flow.End(OK)
 			if flowErr != nil {
-				client.log.Info("Aperture flow control end got error.", "error", err)
+				client.log.Info("Aperture flow control end got error.", "error", flowErr)
 			}
 			return resp, err
 		} else {
-			err := flow.End(OK)
+			err := flow.End(Error)
 			if err != nil {
 				client.log.Info("Aperture flow control end got error.", "error", err)
 			}

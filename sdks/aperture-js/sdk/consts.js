@@ -8,12 +8,6 @@ export const PROTO_PATH = path.resolve(
   "../proto/flowcontrol/check/v1/check.proto",
 );
 
-const fn_host = process.env.FN_AGENT_HOST
-  ? process.env.FN_AGENT_HOST
-  : "localhost";
-const fn_port = process.env.FN_AGENT_PORT ? process.env.FN_AGENT_PORT : "8089";
-export const URL = fn_host + ":" + fn_port;
-
 export const LIBRARY_NAME = "aperture-js";
 export const LIBRARY_VERSION = "v0.1.0";
 

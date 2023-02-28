@@ -1,3 +1,4 @@
-# Create and publish scoped public packages
+# Aperture SDK
 
-https://docs.npmjs.com/creating-and-publishing-scoped-public-packages
+`aperture-sdk` is an SDK to interact with Aperture Agent. It allows flow control
+functionality on fine-grained features inside service code.

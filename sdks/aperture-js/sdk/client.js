@@ -17,7 +17,16 @@ import {
 import { Flow } from "./flow.js";
 import { fcs } from "./utils.js";
 
+/**
+ * Class representing Aperture client.
+ * @class
+ */
 export class ApertureClient {
+  /**
+   * Create an Aperture client.
+   * @constructor
+   * @param {number} [timeout=200] - Timeout for the client in milliseconds.
+   */
   constructor(timeout = 200) {
     this.fcsClient = new fcs.FlowControlService(
       URL,
@@ -38,10 +47,14 @@ export class ApertureClient {
     this.timeout = timeout;
   }
 
-  // StartFlow takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
-  // Return value is a Flow.
-  // The call returns immediately in case connection with Aperture Agent is not established.
-  // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.Accepted() on returned Flow returns as true.
+  /**
+   * Starts a new flow with given control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
+   * The call returns immediately in case connection with Aperture Agent is not established.
+   * The default semantics are fail-to-wire. If StartFlow fails, calling Flow.Accepted() on returned Flow returns as true.
+   * @param {string} controlPointArg - A control point.
+   * @param {LabelMap[]} labelsArg - Labels for the flow.
+   * @returns {Promise<Flow>} - A new Flow.
+   */
   async StartFlow(controlPointArg, labelsArg) {
     return new Promise((resolve, reject) => {
       let labelsMap = new Map();
@@ -89,10 +102,19 @@ export class ApertureClient {
     return;
   }
 
+  /**
+   * Returns the connectivity state of the FcsClient channel.
+   * @returns {grpc.connectivityState}
+   */
   GetState() {
     return this.fcsClient.getChannel().getConnectivityState(true);
   }
 
+  /**
+   * Creates a new resource object with default and library-specific attributes.
+   * @private
+   * @returns {Resource}
+   */
   #newResource() {
     let defaultRes = Resource.default();
     let res = new Resource({
@@ -101,5 +123,51 @@ export class ApertureClient {
     });
     let merged = defaultRes.merge(res);
     return merged;
+  }
+
+  /**
+   * @callback middlewareCallback
+   * @param {Object} req - Request object.
+   * @param {Object} res - Response object.
+   * @param {Function} next - Next middleware function.
+   * @returns {void}
+   */
+
+  /**
+   * Returns middleware for express.js.
+   * @param {string} [controlPoint] - A control point - defaults to req.path.
+   * @param {LabelMap[]} [labels] - Labels for the flow.
+   * @param {number} [timeout] - Timeout for the client in milliseconds.
+   * @return {middlewareCallback}
+   */
+  Middleware(controlPoint, labels, timeout) {
+    if (timeout === undefined) {
+      timeout = this.timeout;
+    }
+    if (labels === undefined) {
+      labels = new Map();
+    }
+    return (req, res, next) => {
+      if (controlPoint === undefined) {
+        controlPoint = req.path;
+      }
+      labels = new Map(labels);
+      labels.set("http_method", req.method);
+      labels.set("http_host", req.headers.host);
+      labels.set("http_path", req.path);
+      labels.set("http_user_agent", req.headers["user-agent"]);
+      labels.set("http_content_length", req.headers["content-length"]);
+      this.StartFlow(controlPoint, labels)
+        .then((flow) => {
+          if (flow.Accepted()) {
+            next();
+            flow.End(FlowStatus.Ok);
+          } else {
+            res.status(403).send("Forbidden");
+            flow.End(FlowStatus.Error);
+          }
+        })
+        .catch(next);
+    };
   }
 }

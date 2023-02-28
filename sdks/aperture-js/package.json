@@ -1,12 +1,17 @@
 {
-  "name": "aperture-js",
-  "version": "1.0.0",
+  "name": "aperture-sdk",
+  "version": "0.1.0",
   "description": "",
   "main": "./example/example.js",
   "scripts": {
     "grpc-client": "node ./sdk/client.js"
   },
+  "types": "types/index.d.ts",
   "type": "module",
+  "files": [
+    "sdk/",
+    "proto/"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
