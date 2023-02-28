@@ -15,6 +15,8 @@ keywords:
   - fluxninja
   - microservices
   - cloud
+  - auto-scale
+  - load management
   - flow control
 ---
 
@@ -24,86 +26,69 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-Welcome to the official documentation for
-[FluxNinja Aperture](https://github.com/fluxninja/aperture)!
+Welcome to the [FluxNinja Aperture](https://github.com/fluxninja/aperture)
+project, an open-source platform designed to empower cloud-native reliability
+engineering. The platform provides a unified controllability layer that enables
+platform and reliability engineering teams to manage complex microservices-based
+applications with ease.
 
-Aperture is an open-source platform that helps manage the flow of traffic and
-improve the reliability of modern web applications. It enables the
-prioritization of critical functions and prevent issues such as cascading
-failures during periods of high traffic, ensuring that the overall performance
-of the application is stable and reliable.
+## Simplify Cloud-Native Load Management
 
-## Why is flow control needed?
+With Aperture, teams can automate load management processes, including flow
+control and auto scaling, to ensure the reliability and stability of
+cloud-native applications. These capabilities improve the overall user
+experience, while optimizing resources and reducing costs.
 
-Modern web-scale apps are a complex network of inter-connected microservices
-that implement features such as account management, search, payments & more.
-This decoupled architecture has advantages but introduces new complex failure
-modes. When traffic surges, it can result in a queue buildup on a critical
-service, kick-starting a positive feedback loop and causing
-[cascading failures](https://sre.google/sre-book/addressing-cascading-failures/).
-The application stops serving responses in a timely manner and critical end-user
-transactions are interrupted.
+## Declarative Policy Language
 
-![Absence of flow control](assets/img/no-flow-control.png#gh-light-mode-only)
-![Absence of flow control](assets/img/no-flow-control-dark.png#gh-dark-mode-only)
+Aperture's declarative policy language enables teams to easily create and
+version policies that define the behaviors of their applications under different
+conditions. This provides teams with a visual representation of their policies,
+allowing them to quickly and intuitively understand how the system is behaving
+and correcting itself.
 
-Applications are governed by
-[Little’s Law](https://en.wikipedia.org/wiki/Little%27s_law), which describes
-the relationship between concurrent requests in the system, arrival rate of
-requests, and response times. For the application to remain stable, the
-concurrent requests in the system must be limited. Indirect techniques to
-stabilize applications such as rate-limiting and auto-scaling fall short in
-enabling good user experiences or business outcomes. Rate-limiting individual
-users are insufficient in protecting services. Autoscaling is slow to respond
-and can be cost-prohibitive. As the number of services scales, these techniques
-get harder to deploy.
+## Advanced Load Management Capabilities
 
-![Reliability with flow control](assets/img/active-flow-control.png#gh-light-mode-only)
-![Reliability with flow control](assets/img/active-flow-control-dark.png#gh-dark-mode-only)
+Aperture's intelligent load management capabilities, such as fine-grained rate
+limiting, prioritized load shedding and auto scaling, can be applied to a wide
+range of cloud-native applications. These capabilities, ensure the reliability
+and stability of applications.
 
-This is where flow control comes in. Applications can degrade gracefully in
-real-time when using flow control techniques with Aperture, by prioritizing
-high-importance features over others.
+## How Load Management Works
 
-## How Aperture Works
+At its core, load management involves the control loop of observing, analyzing,
+and actuating workloads to ensure the stability and reliability of cloud-native
+applications. This control loop is applied to both flow control and auto scaling
+use cases. In flow control, the control loop is used to manage workloads and
+ensure the system remains within capacity. In auto scaling, the control loop is
+used to adjust resource allocation based on demand and performance.
 
-At the fundamental level, Aperture enables flow control through observing,
-analyzing, and actuating, facilitated by agents and a controller.
+Learn more about how Aperture interfaces with your application in the
+[Architecture](/architecture/architecture.md) section.
 
 ![Aperture Control Loop](assets/img/oaalight.png#gh-light-mode-only)
 ![Aperture Control Loop](assets/img/oaadark.png#gh-dark-mode-only)
 
-- Observe: Aperture continuously monitors the system and collects metrics on
-  service performance and request attributes.
-- Analyze: Aperture's agent and controller use the metrics collected to identify
-  patterns and trends in the system and make decisions on how to handle requests
-  and workloads.
-- Actuate: Aperture takes appropriate actions, such as prioritizing critical
-  workloads and shedding load on non-critical workloads to ensure the stability
-  and reliability of the service in web-scale apps.
+## What Features Does Aperture Offer?
 
-## What features does Aperture bring in?
+Aperture is a load management platform that offers several features to help
+maintain the stability and reliability of modern web-scale applications,
+including:
 
-Aperture is a flow control platform that offers several features to help
-maintain the stability and reliability of modern web-scale applications:
-
-- **Weighted fair queuing**: Aperture uses a weighted fair queuing scheduler to
-  prioritize workloads based on their importance, ensuring that critical
-  application features are not affected during overload scenarios.
+- **Prioritized load shedding**: Aperture enables organizations to gracefully
+  degrade application performance by dropping traffic that is deemed less
+  important, ensuring that the most critical traffic is served.
 - **Distributed rate-limiting**: Aperture includes a distributed rate-limiter to
-  prevent abuse and protect the service from malicious requests.
-- **Prioritization of critical features**: Aperture prioritizes critical
-  application features over background workloads to ensure a graceful
-  degradation of services during overload scenarios
+  prevent abuse and protect the service from excessive requests by users.
+- **Intelligent autoscaling**: Aperture adjusts resource allocation based on
+  demand and performance to ensure that the application can scale up or down as
+  needed.
 - **Monitoring and telemetry**: Aperture continuously monitors service
   performance and request attributes using an in-built telemetry system, which
   enables the agent and controller to make informed decisions about how to
   handle requests and prioritize workloads.
-- **Dataflow-driven policies**: Aperture's controller uses dataflow-driven
-  policies to continuously track service-level indicators and perform recovery
-  actions whenever there is a deviation from service-level objectives. This
-  ensures that the application remains stable and reliable even in the face of
-  failures.
-- **Flexibility**: Aperture can be deployed with either Service Meshes or SDKs,
-  depending on your infrastructure and requirements, and allows you to customize
-  the flow control policies to meet the specific needs of your application
+- **Declarative policies**: Aperture provides a policy language that enables
+  teams to define how to react to different situations, such as when there is a
+  deviation from service-level objectives. These policies are expressed as a
+  signal processing circuit that enables Aperture to go from telemetry to
+  actions within minutes.

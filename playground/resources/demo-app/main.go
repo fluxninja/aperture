@@ -14,7 +14,7 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/playground/demo_app/app"
+	"github.com/fluxninja/aperture/playground/resources/demo-app/app"
 )
 
 func main() {

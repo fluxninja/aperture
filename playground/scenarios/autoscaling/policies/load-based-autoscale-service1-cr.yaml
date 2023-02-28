@@ -86,6 +86,7 @@ spec:
             observed_load_multiplier:
               signal_name: OBSERVED_LOAD_MULTIPLIER
           scheduler_parameters:
+            auto_tokens: true
             workloads:
             - label_matcher:
                 match_labels:
@@ -119,6 +120,7 @@ spec:
                     signal_name: AVERAGE_CPU
                 parameters:
                   slope: 1
+          scale_in_cooldown: 40s
           scale_out_controllers:
           - controller:
               gradient:
@@ -130,6 +132,7 @@ spec:
                     signal_name: OBSERVED_LOAD_MULTIPLIER
                 parameters:
                   slope: -1
+          scale_out_cooldown: 30s
           scaler:
             kubernetes_replicas:
               kubernetes_object_selector:

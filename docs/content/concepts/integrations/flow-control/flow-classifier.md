@@ -1,6 +1,6 @@
 ---
 title: Flow Classifier
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 :::info
@@ -221,5 +221,5 @@ See [full example in reference][reference]
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
-[control-point]: ./flow-control.md#control-point
+[control-point]: ./control-point.md
 [install-istio]: /get-started/integrations/flow-control/envoy/istio.md

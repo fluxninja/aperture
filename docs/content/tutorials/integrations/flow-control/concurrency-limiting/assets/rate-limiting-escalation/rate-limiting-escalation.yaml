@@ -88,6 +88,7 @@ spec:
               observed_load_multiplier:
                 signal_name: OBSERVED_LOAD_MULTIPLIER
             scheduler_parameters:
+              auto_tokens: true
               workloads:
                 - label_matcher:
                     match_labels:

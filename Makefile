@@ -18,8 +18,8 @@ go-mod-tidy:
 	@go mod tidy
 	@cd tools/go && go mod tidy
 	@cd sdks/aperture-go && go mod tidy
-	@cd playground/resources/demo-app/application && go mod tidy
-	@cd playground/resources/graphql-example-1/application/graphql_demo_app && go mod tidy
+	@cd playground/resources/demo-app/app && go mod tidy
+	@cd playground/resources/graphql-demo-app && go mod tidy
 
 go-test:
 	@echo Running go tests

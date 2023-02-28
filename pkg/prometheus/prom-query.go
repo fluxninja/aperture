@@ -21,13 +21,13 @@ type PromResultCallback func(context.Context, prometheusmodel.Value, ...interfac
 type PromErrorCallback func(error, ...interface{}) (proto.Message, error)
 
 type promQuery struct {
+	endTimestamp   time.Time
 	promAPI        prometheusv1.API
 	resultCallback PromResultCallback
 	errorCallback  PromErrorCallback
-	cbArgs         []interface{}
 	query          string
+	cbArgs         []interface{}
 	timeout        time.Duration
-	endTimestamp   time.Time
 }
 
 // NewPromQueryJob creates a new job that executes a prometheus query.
@@ -57,6 +57,10 @@ func (pq *promQuery) execute(jobCtxt context.Context) (proto.Message, error) {
 		defer cancel()
 
 		result, warnings, err = pq.promAPI.Query(ctx, pq.query, pq.endTimestamp)
+		// if jobCtxt is closed, return PermanentError
+		if jobCtxt.Err() != nil {
+			return backoff.Permanent(jobCtxt.Err())
+		}
 		if err != nil {
 			log.Error().Err(err).Str("query", pq.query).Msg("Encountered error while executing promQL query")
 			return err
@@ -74,7 +78,7 @@ func (pq *promQuery) execute(jobCtxt context.Context) (proto.Message, error) {
 		if cbErr != nil {
 			merr = multierr.Combine(merr, cbErr)
 		}
-		log.Error().Err(merr).Msg("Encountered error while executing promQL query")
+		log.Error().Err(merr).Msg("Context canceled while executing promQL query")
 		return msg, merr
 	}
 

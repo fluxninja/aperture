@@ -80,7 +80,7 @@ service1-demo-app   uploaded   103s
 The Playground comes with a demo application so that you can generate simulated
 traffic and see the policy in action. The demo application can be found in
 `demoapp` namespace. You can read more about the demo application
-[here](https://github.com/fluxninja/aperture/tree/main/playground/demo_app).
+[here](https://github.com/fluxninja/aperture/tree/main/playground/resources/demo-app).
 
 ```sh
 $ kubectl get pods -n demoapp

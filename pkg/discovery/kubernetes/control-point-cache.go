@@ -7,15 +7,16 @@ import (
 
 	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/client-go/scale"
 
+	"github.com/cenkalti/backoff"
 	controlpointcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/controlpointcache/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/sourcegraph/conc/stream"
+	autoscalingv1 "k8s.io/api/autoscaling/v1"
 )
 
 // A ControlPoint is identified by Group, Version, Kind, Namespace and Name.
@@ -83,13 +84,13 @@ type ControlPointCache interface {
 type controlPointCache struct {
 	// RW controlPointsMutex
 	controlPointsMutex sync.RWMutex
-	scaleClient        scale.ScalesGetter
 	k8sClient          k8s.K8sClient
 	// Set of unique controlPoints
 	controlPoints map[ControlPoint]*controlPointState
 	trackers      notifiers.Trackers
 	ctx           context.Context
 	cancel        context.CancelFunc
+	scaleStream   *stream.Stream
 }
 
 // controlPointCache implements the ControlPointStore interface.
@@ -103,8 +104,8 @@ func newControlPointCache(trackers notifiers.Trackers, k8sClient k8s.K8sClient) 
 	return &controlPointCache{
 		controlPoints: make(map[ControlPoint]*controlPointState),
 		trackers:      trackers,
-		scaleClient:   k8sClient.GetScaleClient(),
 		k8sClient:     k8sClient,
+		scaleStream:   stream.New(),
 	}
 }
 
@@ -125,15 +126,17 @@ func (cpc *controlPointCache) Add(cp ControlPoint) {
 	cpc.controlPointsMutex.Lock()
 	defer cpc.controlPointsMutex.Unlock()
 	// context for fetching scale subresource
-	_, cancel := context.WithCancel(cpc.ctx)
+	ctx, cancel := context.WithCancel(cpc.ctx)
 	cps := &controlPointState{
 		cancel: cancel,
+		ctx:    ctx,
 	}
 	cpc.controlPoints[cp] = cps
 
-	// Fetch scale subresource in a goroutine
-	panichandler.Go(func() {
-		cpc.fetchScale(cp, cps)
+	// Instead of launching a go routine, use sourcegraph/conc library to create a Stream and submit tasks to it.
+	// This will allow us to call the WriteEvent from fetchScale in order of arrival.
+	cpc.scaleStream.Go(func() stream.Callback {
+		return cpc.fetchScale(cp, cps)
 	})
 }
 
@@ -145,22 +148,29 @@ func (cpc *controlPointCache) Update(cp ControlPoint) {
 	defer cpc.controlPointsMutex.Unlock()
 
 	// get current control point state
-	cps, ok := cpc.controlPoints[cp]
+	cpsOld, ok := cpc.controlPoints[cp]
 	if !ok {
 		log.Error().Msgf("Control point %v not found in cache", cp)
 		return
 	}
 
+	log.Info().Msgf("Canceling goroutine for %v", cp)
 	// cancel current goroutine
-	cps.cancel()
+	cpsOld.cancel()
 
 	// context for fetching scale subresource
-	_, cancel := context.WithCancel(context.Background())
-	cps.cancel = cancel
+	ctx, cancel := context.WithCancel(cpc.ctx)
+	// construct new control point state
+	cpsNew := &controlPointState{
+		cancel: cancel,
+		ctx:    ctx,
+	}
+	// update control point state
+	cpc.controlPoints[cp] = cpsNew
 
 	// Fetch scale subresource in a goroutine
-	panichandler.Go(func() {
-		cpc.fetchScale(cp, cps)
+	cpc.scaleStream.Go(func() stream.Callback {
+		return cpc.fetchScale(cp, cpsNew)
 	})
 }
 
@@ -170,12 +180,13 @@ func (cpc *controlPointCache) Delete(cp ControlPoint) {
 	// take write mutex before modifying map
 	cpc.controlPointsMutex.Lock()
 	defer cpc.controlPointsMutex.Unlock()
-	cps, ok := cpc.controlPoints[cp]
+	cpsOld, ok := cpc.controlPoints[cp]
 	if !ok {
 		log.Error().Msgf("Control point %v not found in cache", cp)
 		return
 	}
-	cps.cancel()
+	log.Info().Msgf("Canceling goroutine for %v", cp)
+	cpsOld.cancel()
 	delete(cpc.controlPoints, cp)
 
 	key, keyErr := json.Marshal(cp)
@@ -184,23 +195,46 @@ func (cpc *controlPointCache) Delete(cp ControlPoint) {
 		return
 	}
 
-	cpc.trackers.RemoveEvent(notifiers.Key(key))
+	cpc.scaleStream.Go(func() stream.Callback {
+		return func() { cpc.trackers.RemoveEvent(notifiers.Key(key)) }
+	})
 }
 
-func (cpc *controlPointCache) fetchScale(cp ControlPoint, cps *controlPointState) {
+func (cpc *controlPointCache) fetchScale(cp ControlPoint, cps *controlPointState) stream.Callback {
+	log.Info().Msgf("fetchScale called for %v", cp)
+	noOp := func() {}
+
 	targetGK := schema.GroupKind{
 		Group: cp.Group,
 		Kind:  cp.Kind,
 	}
 
-	scale, _, err := cpc.k8sClient.ScaleForGroupKind(cpc.ctx, cp.Namespace, cp.Name, targetGK)
-	if err != nil {
-		// TODO: update status
-		log.Error().Err(err).Msgf("Unable to get scale for %v", cp)
-		return
+	// Fetch scale under backoff.Retry operation
+	var (
+		scale *autoscalingv1.Scale
+		err   error
+	)
+	operation := func() error {
+		scale, _, err = cpc.k8sClient.ScaleForGroupKind(cps.ctx, cp.Namespace, cp.Name, targetGK)
+		// if cps.ctx is closed, return PermanentError
+		if cps.ctx.Err() != nil {
+			return backoff.Permanent(cps.ctx.Err())
+		}
+		if err != nil {
+			// TODO: update status
+			log.Error().Err(err).Msgf("Unable to get scale for %v", cp)
+			return err
+		}
+
+		log.Info().Msgf("Scale subresource for %s/%s: %v", cp.Kind, cp.Name, scale)
+		return nil
 	}
 
-	log.Info().Msgf("Scale subresource for %s/%s: %v", cp.Kind, cp.Name, scale)
+	merr := backoff.Retry(operation, backoff.WithContext(backoff.NewExponentialBackOff(), cps.ctx))
+	if merr != nil {
+		log.Error().Err(merr).Msgf("Context canceled while fetching scale for %v", cp)
+		return noOp
+	}
 
 	// Write event to eventWriter
 	reported := policysyncv1.ScaleStatus{
@@ -211,16 +245,19 @@ func (cpc *controlPointCache) fetchScale(cp ControlPoint, cps *controlPointState
 	key, keyErr := json.Marshal(cp)
 	if keyErr != nil {
 		log.Error().Err(keyErr).Msgf("Unable to marshal key: %v", cp)
-		return
+		return noOp
 	}
 
 	value, valErr := proto.Marshal(&reported)
 	if valErr != nil {
 		log.Error().Err(valErr).Msg("Unable to marshal value")
-		return
+		return noOp
 	}
 
-	cpc.trackers.WriteEvent(notifiers.Key(key), value)
+	return func() {
+		log.Info().Msgf("Writing event for %v, event: %v", cp, *scale)
+		cpc.trackers.WriteEvent(notifiers.Key(key), value)
+	}
 }
 
 // Keys returns the list of ControlPoints in the cache.
@@ -248,4 +285,6 @@ func (cpc *controlPointCache) RemoveKeyNotifier(notifier notifiers.KeyNotifier) 
 type controlPointState struct {
 	// cancel is the function to cancel the context for getting the scale
 	cancel context.CancelFunc
+	// ctx is the context for getting the scale
+	ctx context.Context
 }

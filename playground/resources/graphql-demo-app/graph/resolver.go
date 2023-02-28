@@ -2,7 +2,7 @@
 
 package graph
 
-import "github.com/fluxninja/aperture/playground/graphql_demo_app/graph/model"
+import "github.com/fluxninja/aperture/playground/resources/graphql-demo-app/graph/model"
 
 // This file will not be regenerated automatically.
 //

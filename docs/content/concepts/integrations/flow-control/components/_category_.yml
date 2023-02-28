@@ -1,9 +1,11 @@
 label: Circuit Components
-position: 5
+position: 6
 collapsible: true
 collapsed: true
 link:
   type: "generated-index"
   title: "Components"
-  description: "Learn about the flow control components of Aperture and how they regulate the flow of requests for improved reliability and stability."
+  description:
+    "Learn about the flow control components of Aperture and how they regulate
+    the flow of requests for improved reliability and stability."
   keywords: ["components"]

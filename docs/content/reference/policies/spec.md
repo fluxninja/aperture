@@ -447,6 +447,18 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 (string, default: `"4294967295"`) The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
 
 </dd>
+<dt>max_scale_in_percentage</dt>
+<dd>
+
+(float64, default: `1`) The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+
+</dd>
+<dt>max_scale_out_percentage</dt>
+<dd>
+
+(float64, default: `10`) The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+
+</dd>
 <dt>min_scale</dt>
 <dd>
 
@@ -477,12 +489,6 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 (string, default: `"120s"`) The amount of time to wait after a scale in operation for another scale in operation.
 
 </dd>
-<dt>scale_in_max_percentage</dt>
-<dd>
-
-(float64, default: `10`) The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
-
-</dd>
 <dt>scale_out_alerter_parameters</dt>
 <dd>
 
@@ -499,12 +505,6 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dd>
 
 (string, default: `"30s"`) The amount of time to wait after a scale out operation for another scale out or scale in operation.
-
-</dd>
-<dt>scale_out_max_percentage</dt>
-<dd>
-
-(float64, default: `1`) The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
 
 </dd>
 <dt>scaler</dt>
@@ -839,20 +839,26 @@ Set of classification rules sharing a common selector
 See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
 
 :::
-
-Example:
+Example
 
 ```yaml
-selector:
+flow_selector:
   service_selector:
-    service: service1.default.svc.cluster.local
-  flow_selector:
-    control_point:
-      traffic: ingress
+    agent_group: demoapp
+    service: service1-demo-app.demoapp.svc.cluster.local
+  flow_matcher:
+    control_point: ingress
+    label_matcher:
+      match_labels:
+        user_tier: gold
+      match_expressions:
+        - key: user_type
+          operator: In
 rules:
   user:
     extractor:
-      from: request.http.headers.user
+      from: request.http.headers.user-agent
+  telemetry: false
 ```
 
 #### Properties
@@ -1681,7 +1687,6 @@ to
 See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
 
 :::
-
 Example:
 
 ```yaml
@@ -1695,8 +1700,10 @@ label_matcher:
       values:
         - insert
         - delete
-    - label: user_agent
-      regex: ^(?!.*Chrome).*Safari
+  expression:
+    label_matches:
+      - label: user_agent
+        regex: ^(?!.*Chrome).*Safari
 ```
 
 #### Properties
@@ -1705,7 +1712,7 @@ label_matcher:
 <dt>control_point</dt>
 <dd>
 
-(string, **required**) [Control Point](/concepts/integrations/flow-control/flow-control.md#control-point)
+(string, **required**) [Control Point](/concepts/integrations/flow-control/control-point.md)
 identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
 block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
 or filter chains.
@@ -1779,16 +1786,31 @@ The histogram created by Flux Meter measures the workload latency by default.
 See also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).
 
 :::
-
-Example of a selector that creates a histogram metric for all HTTP requests
-to particular service:
+Example:
 
 ```yaml
-selector:
+static_buckets:
+  buckets:
+    [
+      5.0,
+      10.0,
+      25.0,
+      50.0,
+      100.0,
+      250.0,
+      500.0,
+      1000.0,
+      2500.0,
+      5000.0,
+      10000.0,
+    ]
+flow_selector:
   service_selector:
-    service: myservice.mynamespace.svc.cluster.local
-  flow_selector:
+    agent_group: demoapp
+    service: service1-demo-app.demoapp.svc.cluster.local
+  flow_matcher:
     control_point: ingress
+attribute_key: response_duration_ms
 ```
 
 #### Properties
