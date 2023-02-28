@@ -8,15 +8,15 @@ import (
 	"strings"
 	"time"
 
-	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
-	httpclient "github.com/fluxninja/aperture/pkg/net/http"
-	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/imdario/mergo"
 	"github.com/mitchellh/copystructure"
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
+	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
+	httpclient "github.com/fluxninja/aperture/pkg/net/http"
+	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/utils"
@@ -35,6 +35,7 @@ const (
 	exporterFluxNinja = "otlp/fluxninja"
 )
 
+// Module returns the plugin module.
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(
@@ -49,7 +50,8 @@ func Module() fx.Option {
 	)
 }
 
-func provideOtelConfig(baseConfig *otelconfig.OTELConfig,
+func provideOtelConfig(
+	baseConfig *otelconfig.OTELConfig,
 	grpcClientConfig *grpcclient.GRPCClientConfig,
 	httpClientConfig *httpclient.HTTPClientConfig,
 	lifecycle fx.Lifecycle,
@@ -199,7 +201,8 @@ func duplicateMap(in map[string]any) (map[string]any, error) {
 	return duplicatedMap, nil
 }
 
-func addFluxNinjaExporter(config *otelconfig.OTELConfig,
+func addFluxNinjaExporter(
+	config *otelconfig.OTELConfig,
 	pluginConfig *pluginconfig.FluxNinjaPluginConfig,
 	grpcClientConfig *grpcclient.GRPCClientConfig,
 	httpClientConfig *httpclient.HTTPClientConfig,

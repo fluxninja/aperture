@@ -27,7 +27,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/alertmanager"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/cache"
+	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
@@ -49,7 +51,11 @@ func ModuleForAgentOTEL() fx.Option {
 			),
 			fx.Annotate(
 				AgentOTELComponents,
-				fx.ParamTags(alerts.AlertsFxTag),
+				fx.ParamTags(
+					alerts.AlertsFxTag,
+					config.NameTag(otelcollector.ReceiverFactoriesFxTag),
+					config.NameTag(otelcollector.ProcessorFactoriesFxTag),
+				),
 			),
 		),
 	)
@@ -58,6 +64,8 @@ func ModuleForAgentOTEL() fx.Option {
 // AgentOTELComponents constructs OTEL Collector Factories for Agent.
 func AgentOTELComponents(
 	alerter alerts.Alerter,
+	receiverFactories []receiver.Factory,
+	processorFactories []processor.Factory,
 	cache *entitycache.EntityCache,
 	promRegistry *prometheus.Registry,
 	engine iface.Engine,
@@ -86,41 +94,40 @@ func AgentOTELComponents(
 	pmetricotlp.RegisterGRPCServer(serverGRPC, msw)
 	plogotlp.RegisterGRPCServer(serverGRPC, lsw)
 
-	receiversFactory := []receiver.Factory{
+	rf := []receiver.Factory{
 		otlpreceiver.NewFactory(tsw, msw, lsw),
 		alertsreceiver.NewFactory(alerter),
 	}
-
-	receiversFactory = append(receiversFactory, otelContribReceivers()...)
-
-	receivers, err := receiver.MakeFactoryMap(receiversFactory...)
+	// receiversFactory = append(receiversFactory, otelContribReceivers()...)
+	rf = append(rf, receiverFactories...)
+	receivers, err := receiver.MakeFactoryMap(rf...)
 	errs = multierr.Append(errs, err)
 
-	exporters, err := exporter.MakeFactoryMap(
+	ef := []exporter.Factory{
 		fileexporter.NewFactory(),
 		loggingexporter.NewFactory(),
 		otlpexporter.NewFactory(),
 		otlphttpexporter.NewFactory(),
 		prometheusremotewriteexporter.NewFactory(),
 		alertsexporter.NewFactory(alertMgr),
-	)
+	}
+	exporters, err := exporter.MakeFactoryMap(ef...)
 	errs = multierr.Append(errs, err)
 
-	processorsFactory := []processor.Factory{
+	pf := []processor.Factory{
 		rollupprocessor.NewFactory(promRegistry),
 		metricsprocessor.NewFactory(promRegistry, engine, clasEng, controlPointCache),
 		tracestologsprocessor.NewFactory(),
 	}
-	processorsFactory = append(processorsFactory, otelContribProcessors()...)
-	processors, err := processor.MakeFactoryMap(processorsFactory...)
+	// processorsFactory = append(processorsFactory, otelContribProcessors()...)
+	pf = append(pf, processorFactories...)
+	processors, err := processor.MakeFactoryMap(pf...)
 	errs = multierr.Append(errs, err)
 
-	factories := otelcol.Factories{
+	return otelcol.Factories{
 		Extensions: extensions,
 		Receivers:  receivers,
 		Processors: processors,
 		Exporters:  exporters,
-	}
-
-	return factories, errs
+	}, errs
 }

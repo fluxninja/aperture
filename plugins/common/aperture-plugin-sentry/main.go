@@ -30,7 +30,7 @@ func ServicePlugin() plugins.ServicePluginIface {
 	return &SentryPlugin{}
 }
 
-// SentryPlugin is the plugin.
+// SentryPlugin implements the plugin interface.
 type SentryPlugin struct{}
 
 // Module returns the plugin module.

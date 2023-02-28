@@ -22,6 +22,12 @@ import (
 	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
+// FX tags used to pass OTEL Collector factories.
+const (
+	ReceiverFactoriesFxTag  = "otel-collector-receiver-factories"
+	ProcessorFactoriesFxTag = "otel-collector-processor-factories"
+)
+
 // Module is a fx module that invokes OTEL Collector.
 func Module() fx.Option {
 	return fx.Options(
