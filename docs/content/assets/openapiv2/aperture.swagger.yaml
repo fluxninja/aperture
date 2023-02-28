@@ -2672,6 +2672,7 @@ definitions:
                     Number of samples to collect.
 
                 format: int64
+                minLength: 1
                 type: string
                 x-go-tag-default: "10"
                 x-go-tag-validate: min=1

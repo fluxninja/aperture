@@ -170,8 +170,15 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     name="policy.concurrency_controller.scheduler"
     type="aperture.spec.v1.SchedulerParameters"
     reference="../../spec#scheduler-parameters"
-    value="{}"
+    value="{'auto_tokens': True}"
     description='Scheduler parameters.' />
+
+<ParameterDescription
+    name="policy.concurrency_controller.scheduler.auto_tokens"
+    type="bool"
+    reference=""
+    value="true"
+    description='Automatically estimate cost (tokens) for workload requests.' />
 
 <ParameterDescription
     name="policy.concurrency_controller.gradient"

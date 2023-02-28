@@ -87,7 +87,8 @@ spec:
                 signal_name: IS_OVERLOAD
               observed_load_multiplier:
                 signal_name: OBSERVED_LOAD_MULTIPLIER
-            scheduler_parameters: {}
+            scheduler_parameters:
+              auto_tokens: true
     evaluation_interval: 0.5s
   resources:
     classifiers: []

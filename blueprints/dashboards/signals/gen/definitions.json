@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "title": "dashboards/signals-dashboard blueprint",
+  "title": "dashboards/signals blueprint",
   "additionalProperties": false,
   "required": ["common"],
   "properties": {

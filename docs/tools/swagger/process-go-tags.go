@@ -212,7 +212,7 @@ func processValidateRules(m map[string]interface{}, rules []string) (required bo
 					oneofs := strings.Split(value, " ")
 					m["enum"] = oneofs
 					m["x-oneof"] = strings.Join(oneofs, " | ")
-				case "gt", "gte":
+				case "gt", "gte", "min":
 					v, err := strconv.Atoi(value)
 					if err != nil {
 						// probably a time.Duration
@@ -237,7 +237,7 @@ func processValidateRules(m map[string]interface{}, rules []string) (required bo
 							m["minProperties"] = v
 						}
 					}
-				case "lt", "lte":
+				case "lt", "lte", "max":
 					v, err := strconv.Atoi(value)
 					if err != nil {
 						// probably a time.Duration
