@@ -35,11 +35,11 @@ RUN --mount=type=cache,target=/go/pkg/,readonly \
   /bin/bash -c \
   'set -euo pipefail; \
   shopt -s nullglob; \
-  CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" LDFLAGS="" ./pkg/info/build.sh; \
+  CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" ./pkg/info/build.sh; \
   for plugin in ./plugins/{common,agent}/aperture-plugin-*; do \
   echo "building plugin $plugin"; \
   cd $plugin; \
-  CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="." LDFLAGS="-s -w" ../../../pkg/plugins/build.sh; \
+  CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="." LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" ../../../pkg/plugins/build.sh; \
   cd -; \
   done'
 
