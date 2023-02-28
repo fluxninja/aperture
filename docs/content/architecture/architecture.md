@@ -93,3 +93,22 @@ Kubernetes, VM, or bare-metal. They integrate with Service Meshes or can be used
 with SDKs depending on your requirements. Additionally, agents work with
 auto-scaling APIs for platforms such as Kubernetes, to help scale infrastructure
 when needed.
+
+## Aperture Databases
+
+Aperture uses two databases to store configuration, telemetry, and flow control
+information: [Prometheus](https://prometheus.io) and [etcd](https://etcd.io).
+Prometheus is a time-series database used to store and query telemetry data
+collected from Aperture Agents. It enables Aperture to monitor the system and
+detect deviations from the service-level objectives (SLOs) defined in the
+declarative policies.
+
+Etcd is a distributed key-value store used to store configuration and flow
+control information. Aperture Controller uses etcd to store the declarative
+policies that define the control circuits and their components, as well as the
+current system state.
+
+Users can optionally reuse their existing etcd or
+[scalable Prometheus](https://promlabs.com/blog/2021/10/14/promql-vendor-compatibility-round-three)
+installations to minimize operational overhead and leverage their existing
+monitoring infrastructure.
