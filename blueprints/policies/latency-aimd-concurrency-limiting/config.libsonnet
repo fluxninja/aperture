@@ -54,6 +54,7 @@
     * @param (policy.concurrency_controller.flow_selector.service_selector.service: string required) Service Name.
     * @param (policy.concurrency_controller.flow_selector.flow_matcher.control_point: string required) Control Point Name.
     * @param (policy.concurrency_controller.scheduler: aperture.spec.v1.SchedulerParameters) Scheduler parameters.
+    * @param (policy.concurrency_controller.scheduler.auto_tokens: bool) Automatically estimate cost (tokens) for workload requests.
     * @param (policy.concurrency_controller.gradient: aperture.spec.v1.GradientControllerParameters) Gradient Controller parameters.
     * @param (policy.concurrency_controller.alerter: aperture.spec.v1.AlerterParameters) Whether tokens for workloads are computed dynamically or set statically by the user.
     * @param (policy.concurrency_controller.max_load_multiplier: float64) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
@@ -70,6 +71,7 @@
         },
       },
       scheduler: {
+        auto_tokens: true,
       },
       gradient: {
         slope: -1,

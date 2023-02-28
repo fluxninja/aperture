@@ -4,7 +4,7 @@ local kubernetesMixin = import 'github.com/kubernetes-monitoring/kubernetes-mixi
 local aperture = import '../../../../../blueprints/main.libsonnet';
 local policyDashboard = aperture.policies.LatencyAIMDConcurrencyLimiting.dashboard;
 local rateLimitpolicyDashboard = aperture.policies.StaticRateLimiting.dashboard;
-local signalsDashboard = aperture.dashboards.SignalsDashboard.dashboard;
+local signalsDashboard = aperture.dashboards.Signals.dashboard;
 
 local grafana = grafanaOperator.integreatly.v1alpha1.grafana;
 local dashboard = grafanaOperator.integreatly.v1alpha1.grafanaDashboard;
@@ -49,13 +49,13 @@ local latencyGradientPolicyDashboard =
 
 local rateLimitPanel =
   rateLimitpolicyDashboard({
-      policy_name: 'service1-demo-app',
-    }).dashboard.panels[0];
+    policy_name: 'service1-demo-app',
+  }).dashboard.panels[0];
 
 local policyDashBoardMixin =
   latencyGradientPolicyDashboard
   {
-    panels+: [rateLimitPanel + {id: std.length(latencyGradientPolicyDashboard.panels) + 2}],
+    panels+: [rateLimitPanel { id: std.length(latencyGradientPolicyDashboard.panels) + 2 }],
   }
 ;
 

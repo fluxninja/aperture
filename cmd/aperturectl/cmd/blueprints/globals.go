@@ -4,7 +4,6 @@ var (
 	blueprintName  string
 	outputDir      string
 	valuesFile     string
-	graphDir       string
 	applyPolicy    bool
 	kubeConfig     string
 	all            bool
@@ -13,4 +12,5 @@ var (
 	dynamicConfig  bool
 	noYAMLModeline bool
 	noValidate     bool
+	overwrite      bool
 )

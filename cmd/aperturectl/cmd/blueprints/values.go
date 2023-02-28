@@ -27,6 +27,7 @@ func init() {
 	valuesCmd.Flags().BoolVar(&onlyRequired, "only-required", false, "Show only required values")
 	valuesCmd.Flags().BoolVar(&dynamicConfig, "dynamic-config", false, "Show dynamic config values instead")
 	valuesCmd.Flags().BoolVar(&noYAMLModeline, "no-yaml-modeline", false, "Do not add YAML language server modeline to generated YAML files")
+	valuesCmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing values file")
 }
 
 func getEnvEditorWithFallback() (string, []string) {
@@ -102,6 +103,17 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 			return err
 		}
 		defer in.Close()
+		// Warn if the file already exists and ask to overwrite
+		if !overwrite {
+			if _, err = os.Stat(valuesFile); err == nil {
+				fmt.Printf("File %s already exists. Overwrite? [y/N] ", valuesFile)
+				var response string
+				fmt.Scanln(&response)
+				if response != "y" {
+					return nil
+				}
+			}
+		}
 		out, err := os.Create(valuesFile)
 		if err != nil {
 			return err

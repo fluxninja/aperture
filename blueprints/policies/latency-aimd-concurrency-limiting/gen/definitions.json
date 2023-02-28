@@ -103,7 +103,7 @@
 
             "scheduler": {
               "description": "Scheduler parameters.",
-              "default": {},
+              "default": { "auto_tokens": true },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/SchedulerParameters"
             },
