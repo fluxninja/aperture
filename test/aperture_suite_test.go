@@ -11,12 +11,15 @@ import (
 	"github.com/jonboulle/clockwork"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"go.opentelemetry.io/collector/processor"
+	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/cache"
+	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
@@ -141,11 +144,23 @@ var _ = BeforeSuite(func() {
 
 	apertureOpts := fx.Options(
 		platform.Config{MergeConfig: apertureConfig}.Module(),
-		fx.Option(
+		fx.Options(
 			fx.Provide(
 				fx.Annotate(
 					provideOTELConfig,
 					fx.ResultTags(`name:"base"`),
+				),
+			),
+			fx.Provide(
+				fx.Annotate(
+					provideReceivers,
+					fx.ResultTags(config.GroupTag(otelcollector.ReceiverFactoriesFxTag)),
+				),
+			),
+			fx.Provide(
+				fx.Annotate(
+					provideProcessors(),
+					fx.ResultTags(config.GroupTag(otelcollector.ProcessorFactoriesFxTag)),
 				),
 			),
 		),
@@ -263,4 +278,12 @@ func provideOTELConfig() *otelconfig.OTELConfig {
 		})
 	}
 	return cfg
+}
+
+func provideReceivers() []receiver.Factory {
+	return []receiver.Factory{}
+}
+
+func provideProcessors() []processor.Factory {
+	return []processor.Factory{}
 }

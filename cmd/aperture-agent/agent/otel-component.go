@@ -53,8 +53,8 @@ func ModuleForAgentOTEL() fx.Option {
 				AgentOTELComponents,
 				fx.ParamTags(
 					alerts.AlertsFxTag,
-					config.GroupTag(otelcollector.ReceiverFactoriesFxTag)+` optional:"true"`,
-					config.GroupTag(otelcollector.ProcessorFactoriesFxTag)+` optional:"true"`,
+					config.GroupTag(otelcollector.ReceiverFactoriesFxTag)+`,optional:"true"`,
+					config.GroupTag(otelcollector.ProcessorFactoriesFxTag)+`,optional:"true"`,
 				),
 			),
 		),
