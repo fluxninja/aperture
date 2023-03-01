@@ -1,29 +1,37 @@
 ---
 title: Flow Label
-sidebar_position: 2
+sidebar_position: 1
 ---
 
-Every Flow is annotated with a set of **Flow Labels**. Each Flow Label is a
-key:value pair. If a Flow is annotated with `user_tier:gold` label, then
+:::info What is a flow?
+
+A flow is the fundamental unit of work from the perspective of an Aperture
+Agent. It could be an API call, a feature, or even a database query. A flow in
+Aperture is similar to [OpenTelemetry span][span].
+
+:::
+
+Every flow is annotated with a set of **Flow Labels**. Each _Flow Label_ is a
+key:value pair. If a flow is annotated with `user_tier:gold` label, then
 `user_tier` is a label key and `gold` is a label value.
 
-Flow Labels are used in different ways in Aperture:
+_Flow Labels_ are used in different ways in Aperture:
 
-- [Flow Selector][flow-selector] can select flows based on Flow Labels, thus
-  flow labels can be used to narrow the scope of [Classifiers][classifier],
-  Limiters or [_Flux Meters_][flux-meter]
-- Flow Labels are used to classify a flow to a [_workload_][workload]
-- Fairness within a scheduler's workload and [rate-limiting][ratelimiter] keys
-  are also based on Flow Labels
+- [_Flow Selector_][flow-selector] can select flows based on _Flow Labels_, thus
+  flow labels can be used to narrow the scope of [_Classifiers_][classifier],
+  [_Flux Meters_][flux-meter] etc.
+- _Flow Labels_ are used to map a flow to a [_workload_][workload].
+- Fairness within [scheduler][scheduler] and [rate-limiting][ratelimiter] keys
+  are also based on _Flow Labels_.
 
 ## Sources
 
-Flows are annotated with Flow Labels based on four sources: request labels,
+Flows are annotated with _Flow Labels_ based on four sources: request labels,
 baggage, flow classifiers, and explicit labels from the Aperture SDK call.
 
 ### Request labels
 
-For each _traffic_ [control point][control-point] (where flows are http or grpc
+For each HTTP [control point][control-point] (where flows are HTTP or GRPC
 requests), some basic metadata is available as _request labels_. These are
 `http.method` , `http.target`, `http.host`, `http.scheme`,
 `http.request_content_length` and `http.flavor`. Additionally all (non-pseudo)
@@ -42,18 +50,18 @@ propagation configured in your system, you can access the baggage as flow
 labels. This is supported on service-mesh (Envoy) and web framework based
 control point insertion.
 
-- _traffic_: Baggage is pulled from the [_baggage_][baggage] header
-- _feature_: Baggage is automatically pulled from context on each `Check()`
+- _HTTP_: Baggage is pulled from the [_baggage_][baggage] header.
+- _Feature_: Baggage is automatically pulled from context on each `Check()`
   call. This is assuming you're using the OpenTelemetry library to manage the
-  baggage
+  baggage.
 
-Baggage members are mapped to Flow Labels 1:1 – keys become label keys, values
+Baggage members are mapped to _Flow Labels_ 1:1 – keys become label keys, values
 become label values (properties are ignored).
 
 Read more about baggage propagation on:
 [Baggage | OpenTelemetry](https://opentelemetry.io/docs/concepts/signals/baggage/).
 
-### Flow Classifiers
+### Classifiers
 
 When the labels you need are not already present in baggage, nor as request
 labels, you can create a [classifier][classifier] to inject new labels into the
@@ -123,18 +131,18 @@ and produce other streams of data from it.
 ### Metrics
 
 Prometheus metrics are generated from the telemetry data that is received. Along
-the path of the Flows, telemetry data is tagged by the [flux meters][flux-meter]
+the path of the flows, telemetry data is tagged by the [flux meters][flux-meter]
 and [workloads][workload] that matched.
 
-### OLAP-style Telemetry
+### OLAP-style telemetry
 
 OLAP-style telemetry data is generated as OpenTelemetry logs and is saved in an
 OLAP database. This is done by creating multi-dimensional rollups from flow
 labels.
 
-OLAP-style telemetry doesn't work well with high-cardinality labels, thus if
-high-cardinality label is detected, some of its values may be replaced with
-`REDACTED_VIA_CARDINALITY_LIMIT` string.
+OLAP-style telemetry doesn't work well with extremely high-cardinality labels,
+thus if a extremely high-cardinality label is detected, some of its values may
+be replaced with `REDACTED_VIA_CARDINALITY_LIMIT` string.
 
 #### Default labels
 
@@ -144,16 +152,16 @@ Matchers][label-matchers], except for a few high-cardinality ones.
 
 #### Labels extracted from baggage
 
-These are Flow Labels mapped from [baggage](#baggage).
+These are _Flow Labels_ mapped from [baggage](#baggage).
 
 #### Labels defined by user
 
 These are labels provided via Classifiers in case of service mesh/middleware
-integration, or explicitly at Flow creation in [Aperture SDK][aperture-go].
+integration, or explicitly at flow creation in [Aperture SDK][aperture-go].
 
 :::note
 
-In the case of a clash, the Flow Label will be applied in the following
+In the case of a clash, the flow Label will be applied in the following
 precedence over:
 
 1. User-defined
@@ -164,38 +172,31 @@ precedence over:
 
 ## Interaction with FluxNinja ARC plugin {#plugin}
 
-All the Flow Labels are used as labels of flow events. These events are rolled
+All the flow Labels are used as labels of flow events. These events are rolled
 up and sent to the analytics database in the FluxNinja ARC. This allows:
 
-- For the Flow Labels to be used as filters or group bys
-- To see analytics for each Flow Label, eg. distribution of its values
+- For the _Flow Labels_ to be used as filters or group bys
+- To see analytics for each _Flow Label_, eg. distribution of its values
 
 :::note
 
-For Classifier-created labels, you can disable this behaviour by setting
-`hidden: true` in [the Classification rule](/reference/policies/spec.md#rule).
+For _Classifier_ created labels, you can disable this behavior by setting
+`hidden: true` in the [Classification rule](/reference/policies/spec.md#rule).
 
 :::
 
-:::caution
-
-This means that by default the already-present-in-baggage labels are sent to the
-cloud. If this is not what you want,
-[we'll be providing a way](https://github.com/fluxninja/aperture/issues/376) to
-select which labels to include in telemetry.
-
-:::
-
-[flow-selector]: /concepts/integrations/flow-control/flow-selector.md
-[classifier]: /concepts/integrations/flow-control/flow-classifier.md
-[workload]: components/concurrency-limiter.md#workload
-[ratelimiter]: components/rate-limiter.md
-[flux-meter]: /concepts/integrations/flow-control/flux-meter.md
+[flow-selector]: ./flow-selector.md
+[classifier]: ./resources/classifier.md
+[workload]: ./components/concurrency-limiter.md#workload
+[ratelimiter]: ./components/rate-limiter.md
+[scheduler]: ./components/concurrency-limiter.md#scheduler
+[flux-meter]: ./resources/flux-meter.md
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:
   https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces
-[control-point]: /concepts/integrations/flow-control/control-point.md
+[control-point]: ./flow-selector.md#control-point
 [otel-conventions]:
   https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
 [aperture-go]: https://github.com/FluxNinja/aperture-go
 [istio]: /get-started/integrations/flow-control/envoy/istio.md
+[span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span

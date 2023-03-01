@@ -25,7 +25,7 @@ const (
 //
 // :::info
 //
-// See also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).
+// See also [Flux Meter overview](/concepts/integrations/flow-control/resources/flux-meter.md).
 //
 // :::
 // Example:

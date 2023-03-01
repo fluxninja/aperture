@@ -100,7 +100,7 @@ type ServiceSelector struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
+	// Which [agent-group](/concepts/integrations/flow-control/flow-selector.md#agent-group) this
 	// selector applies to.
 	//
 	// :::info
@@ -110,7 +110,7 @@ type ServiceSelector struct {
 	// :::
 	AgentGroup string `protobuf:"bytes,1,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"default"` // @gotags: default:"default"
 	// The Fully Qualified Domain Name of the
-	// [service](/concepts/integrations/flow-control/service.md) to select.
+	// [service](/concepts/integrations/flow-control/flow-selector.md) to select.
 	//
 	// In Kubernetes, this is the FQDN of the Service object.
 	//
@@ -207,7 +207,7 @@ type FlowMatcher struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// [Control Point](/concepts/integrations/flow-control/control-point.md)
+	// [Control Point](/concepts/integrations/flow-control/flow-selector.md#control-point)
 	// identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
 	// block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
 	// or filter chains.
@@ -290,7 +290,7 @@ type KubernetesObjectSelector struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
+	// Which [agent-group](/concepts/integrations/flow-control/flow-selector.md#agent-group) this
 	// selector applies to.
 	AgentGroup string `protobuf:"bytes,1,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"default"` // @gotags: default:"default"
 	// Kubernetes namespace that the resource belongs to.
