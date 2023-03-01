@@ -1,6 +1,6 @@
 ---
-title: Flow Classifier
-sidebar_position: 3
+title: Classifier
+sidebar_position: 1
 ---
 
 :::info
@@ -9,43 +9,45 @@ See also [Classifier reference][reference]
 
 :::
 
-If existing [Flow Labels][label] are not sufficient, Flow Classifier can be used
-to inject additional ones without any changes to your service.
+The _Classifier_ can be used to create additional [_Flow Labels_][label] based
+on request metadata without requiring any changes to your service, if the
+existing flow labels are not sufficient.
 
-A classifier is defined as a resource in a [policy][policies] and describes a
-set of _rules_ on how to create new flow labels based on request metadata.
-Aperture uses Envoy's [External Authorization][ext-authz] definition to describe
-the request metadata (more specifically, the [AttributeContext][attr-context]).
-The [INPUT section at this Rego playground][rego-playground] is an example how
-the request attributes may look like.
+To define a classifier, it needs to be added as a resource in a
+[policy][policies]. It specifies a set of rules to create new flow labels based
+on request metadata. Envoy's [External Authorization][ext-authz] definition is
+used by Aperture to describe the request metadata, specifically the
+[AttributeContext][attr-context]. An example of how the request attributes might
+look can be seen in the [INPUT section at this Rego
+playground][rego-playground].
 
 :::note
 
-At _feature_ [Control Points][control-point] developers already can provide
-arbitrary flow labels – either by setting baggage, or directly as arguments to
-the `Check()` call. Since at feature control points flow labels can be easily
-controlled, classifiers are available only on at _traffic_ control points.
+At _Feature_ [control points][control-point], developers can already provide
+arbitrary flow labels by setting baggage or directly as arguments to the Check()
+call. As flow labels can be easily provided at _Feature_ control points by the
+developers, _Classifiers_ are available only at _HTTP_ control points.
 
 :::
 
-Flow Labels created via Classifier are immediately available for use in other
-components at the same [Control Point][control-point]. The Flow Label is also
-injected as baggage, so it will be available on every subsequent control point
-too (assuming you have [baggage propagation][baggage] configured in your
-system). If you're a [FluxNinja ARC plugin][plugin] user, such flow label will
-also be available in the Cloud for analytics.
+Any _Flow Labels_ created through the Classifier are immediately available for
+use in other components at the same [Control Point][control-point].
+Additionally, the _Flow Label_ is injected as baggage, so it will be available
+on every subsequent control point too (assuming you have [baggage
+propagation][baggage] configured in your system). If you're a [FluxNinja ARC
+plugin][plugin] user, such flow label will also be available for analytics.
 
 :::note
 
-Both these behaviours (baggage propagation and inclusion in telemetry) can be
+Both these behaviors (baggage propagation and inclusion in telemetry) can be
 [disabled][rule].
 
 :::
 
 :::caution
 
-Although Classifier is defined as a resource in a [policy][policies], Flow
-Labels are not namespaced in any way.
+Although Classifier is defined as a resource in a [policy][policies], _Flow
+Labels_ are not namespaced in any way and are shared across policies.
 
 :::
 
@@ -63,8 +65,8 @@ selector:
     control_point: ingress
 ```
 
-You can be more precise by adding a [label matcher][label-matcher] and e.g. gate
-the classifier to particular paths.
+You can be more precise by adding a [_Label Matcher_][label-matcher] and e.g.
+gate the classifier to particular paths.
 
 ## Live Previewing Requests {#live-previewing-requests}
 
@@ -210,16 +212,16 @@ See [full example in reference][reference]
 [rego-playground]: https://play.openpolicyagent.org/p/mG0sXxCNdQ
 [label]: /concepts/integrations/flow-control/flow-label.md
 [baggage]: /concepts/integrations/flow-control/flow-label.md#baggage
-[request-labels]: ./flow-label.md#request-labels
+[request-labels]: ../flow-label.md#request-labels
 [reference]: /reference/policies/spec.md#classifier
 [rule]: /reference/policies/spec.md#rule
 [extractor]: /reference/policies/spec.md#extractor
 [rego-rule]: /reference/policies/spec.md#rule-rego
 [plugin]: /arc/plugin.md
-[label-matcher]: ./flow-selector.md#label-matcher
+[label-matcher]: ../flow-selector.md#label-matcher
 [policies]: /concepts/policy/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
-[control-point]: ./control-point.md
+[control-point]: ../flow-selector.md#control-point
 [install-istio]: /get-started/integrations/flow-control/envoy/istio.md
