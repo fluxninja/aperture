@@ -7,7 +7,6 @@
       "blueprint_name": "policies/static-rate-limiting",
       "policy_name": "static-rate-limiting",
       "values_file": "policies/static-rate-limiting.yaml",
-      "dashboard_name": "static-rate-limiting-dashboard",
       "dashboard_mixin_dir": "dashboards/"
     }
   ],
