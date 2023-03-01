@@ -5,18 +5,18 @@ import (
 	"encoding/json"
 	"sync"
 
+	"github.com/cenkalti/backoff/v4"
+	"github.com/sourcegraph/conc/stream"
 	"google.golang.org/protobuf/proto"
+	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	"github.com/cenkalti/backoff"
 	controlpointcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/controlpointcache/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/sourcegraph/conc/stream"
-	autoscalingv1 "k8s.io/api/autoscaling/v1"
 )
 
 // A ControlPoint is identified by Group, Version, Kind, Namespace and Name.

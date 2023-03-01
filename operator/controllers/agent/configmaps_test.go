@@ -18,6 +18,7 @@ package agent
 
 import (
 	"bytes"
+	"context"
 	_ "embed"
 	"fmt"
 	"text/template"
@@ -148,7 +149,7 @@ var _ = Describe("ConfigMap for Agent", func() {
 				},
 			}
 
-			result, err := configMapForAgentConfig(instance.DeepCopy(), scheme.Scheme)
+			result, err := configMapForAgentConfig(context.Background(), K8sClient, instance.DeepCopy(), scheme.Scheme)
 			Expect(err).NotTo(HaveOccurred())
 
 			CompareComfigMap(result, expected)
