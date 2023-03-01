@@ -24,7 +24,7 @@ const (
 //
 // :::info
 //
-// See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
+// See also [Classifier overview](/concepts/integrations/flow-control/resources/classifier.md).
 //
 // :::
 // Example
@@ -106,9 +106,9 @@ func (x *Classifier) GetRules() map[string]*Rule {
 	return nil
 }
 
-// Rule describes a single Flow Classification Rule
+// Rule describes a single classification Rule
 //
-// Flow classification rule extracts a value from request metadata.
+// Classification rule extracts a value from request metadata.
 // More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
 // See https://play.openpolicyagent.org/p/gU7vcLkc70 for an example input.
 // There are two ways to define a flow classification rule:

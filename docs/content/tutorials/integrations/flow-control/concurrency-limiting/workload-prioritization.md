@@ -43,7 +43,7 @@ value to the scheduler:
   within the scheduler.
 - Guests: To identify guest users, we will first use a classification rule that
   uses an
-  [extractor](concepts/integrations/flow-control/flow-classifier.md#extractors)
+  [extractor](concepts/integrations/flow-control/resources/classifier.md#extractors)
   to assign the header value to `user-type` flow label key. Ultimately, we will
   be using the `user_type` label key in the scheduler to match the request
   against `guest` value to identify the workload.
@@ -51,7 +51,7 @@ value to the scheduler:
 :::tip
 
 You can quickly write classification rules on
-[HTTP requests](concepts/integrations/flow-control/flow-classifier.md#live-previewing-requests)
+[HTTP requests](concepts/integrations/flow-control/resources/classifier.md#live-previewing-requests)
 and define scheduler priorities on
 [Flow Labels](concepts/integrations/flow-control/flow-label.md#live-previewing-flow-labels)
 by live previewing them first via introspection APIs.
