@@ -6,7 +6,9 @@
     {
       "blueprint_name": "policies/latency-aimd-concurrency-limiting",
       "policy_name": "workload-prioritization",
-      "values_file": "policies/workload-prioritization.yaml"
+      "values_file": "policies/workload-prioritization.yaml",
+      "dashboard_name": "workload-prioritization-dashboard",
+      "dashboard_mixin_dir": "dashboards/"
     }
   ],
   "images": [

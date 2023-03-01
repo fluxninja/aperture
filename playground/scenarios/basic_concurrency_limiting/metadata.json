@@ -6,7 +6,9 @@
     {
       "blueprint_name": "policies/latency-aimd-concurrency-limiting",
       "policy_name": "basic-concurrency-limiting",
-      "values_file": "policies/basic-concurrency-limiting.yaml"
+      "values_file": "policies/basic-concurrency-limiting.yaml",
+      "dashboard_name": "basic-concurrency-limiting-dashboard",
+      "dashboard_mixin_dir": "dashboards/"
     }
   ],
   "images": [
