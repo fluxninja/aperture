@@ -1,6 +1,6 @@
 ---
 title: Flow Control
-sidebar_position: 1
+sidebar_position: 0
 keywords:
   - flows
   - tracing
@@ -47,30 +47,24 @@ This is where flow control comes in. Applications can degrade gracefully in
 real-time when using flow control techniques with Aperture, by prioritizing
 high-importance features over others.
 
-A Flow is the fundamental unit of work from the perspective of an Aperture
-Agent. It could be an API call, a feature, or even a database query. A Flow in
-Aperture is similar to [OpenTelemetry span][span] and contains [flow
-labels][flow-label].
-
 Reliable operations at web-scale are impossible without effective flow control.
 Aperture splits the process of flow control in two layers:
 
 - Governing the flow control process and making high-level decisions. This is
-  done by Aperture Controller through _policies_. You can read more about
-  policies in [Policies chapter][policies].
+  done by Aperture Controller through [_Policies_][policies].
 - Actual execution of flow control is performed by Aperture Agent via
-  [Concurrency Limiters][cl] or [Rate Limiters][rate-limiter]. Additionally the
-  Agent handles other flow-control related tasks, like gathering metrics via
-  [Flux Meters][flux-meter] and classifying traffic via
-  [Classifiers][classifier]. This chapter describes flow control capabilities at
-  the Agent.
+  [_Concurrency Limiters_][cl] or [_Rate Limiters_][rate-limiter]. Additionally
+  the Agent handles other flow-control related tasks, like gathering metrics via
+  [_Flux Meters_][flux-meter] and classifying traffic via
+  [_Classifiers_][classifier]. This chapter describes flow control capabilities
+  at the Agent.
 
-## Insertion {#integrations}
+## Insertion {#insertion}
 
-For Aperture to be able to act at any of the Control Points, you need to install
-integrations that will communicate with the Aperture Agent.
+For Aperture to be able to act at any of the [_Control Points_][control-point],
+you need to install integrations that will communicate with the Aperture Agent.
 
-- _HTTP_ Control Points: Web framework and service-mesh based integrations
+- _HTTP_ control points: Web framework and service-mesh based integrations
   expose control points at in the traffic path of a service.
 
   In principle, any web proxy or web framework can be integrated with Aperture
@@ -85,53 +79,31 @@ integrations that will communicate with the Aperture Agent.
   assigns _ingress_ and _egress_ Control Points as [identified by
   Istio][istio-patch-context].
 
-- _Feature_ Control Points: We provide
+- _Feature_ control points: We provide
   [Aperture SDKs](/get-started/integrations/flow-control/sdk/sdk.md) for popular
   languages. Aperture SDK wraps any function call or code snippet inside the
-  Service code as a Feature Control Point. Every invocation of the Feature is a
-  Flow from the perspective of Aperture.
+  service code as a Feature Control Point. Every invocation of th feature is a
+  flow from the perspective of Aperture.
 
   The SDK provides API to begin a flow which translates to a
   [flowcontrol.v1.Check][flowcontrol-proto] call into Agent. Response of this
   call contains a decision on whether to allow or reject the flow. The execution
   of a feature may be gated based on this decision. There is an API to end a
-  flow which sends an OpenTelemetry span representing the flow to the Agent as
-  telemetry.
-
-:::note
-
-Exact instructions on custom proxies / web frameworks / SDK integrations will be
-added in the future.
-
-:::
-
-## Flow Control Components {#components}
-
-Agent uses the following observability and control components (in order of
-execution):
-
-- [Classifiers][classifier]
-- [Rate Limiter][rate-limiter]
-- [Concurrency Limiter][cl]
-- [Flux Meters][flux-meter]
-
-You can learn more about each of the components in the subsequent sections, but
-we recommend to start with concepts like [services][service] and
-[labels][flow-label] first.
+  flow which sends an [OpenTelemetry span][span] representing the flow to the
+  Agent as telemetry.
 
 [policies]: /concepts/policy/policy.md
+[control-point]: ./flow-selector.md#control-point
 [cl]: ./components/concurrency-limiter.md
-[rate-limiter]: components/rate-limiter.md
-[flux-meter]: /concepts/integrations/flow-control/flux-meter.md
-[classifier]: /concepts/integrations/flow-control/flow-classifier.md
+[rate-limiter]: ./components/rate-limiter.md
+[flux-meter]: ./resources/flux-meter.md
+[classifier]: ./resources/classifier.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
 [istio]: /get-started/integrations/flow-control/envoy/istio.md
 [ext-authz]:
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto#authorization-service-proto
 [aperture-go]: https://github.com/FluxNinja/aperture-go
-[service]: /concepts/integrations/flow-control/service.md
-[flow-label]: /concepts/integrations/flow-control/flow-label.md
 [flowcontrol-proto]:
-  https://buf.build/fluxninja/aperture/docs/main:aperture.flowcontrol.v1
+  https://buf.build/fluxninja/aperture/docs/main:aperture.flowcontrol.check.v1
 [istio-patch-context]:
   https://istio.io/latest/docs/reference/config/networking/envoy-filter/#EnvoyFilter-PatchContext

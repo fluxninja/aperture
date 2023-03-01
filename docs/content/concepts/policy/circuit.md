@@ -9,105 +9,105 @@ See also [Circuit reference][circuit-reference]
 
 :::
 
-Circuit describes a [Control System][control-system] as an execution graph.
-Circuit is defined as a dataflow graph of inter-connected Components. Signals
-flow between Components via Ports. As Signals traverse the Circuit, they get
-processed, stored within Components or get acted upon (e.g. load-shed,
+Circuit describes a [control system][control-system] as an execution graph.
+Circuit is defined as a dataflow graph of inter-connected components. Signals
+flow between components via ports. As signals traverse the circuit, they get
+processed, stored within components or get acted upon (e.g. load-shed,
 rate-limit, auto-scale etc.). Circuit is evaluated periodically in order to
-respond to changes in Signal readings.
+respond to changes in signal readings.
 
 ## Component
 
-Building blocks of a Circuit are Components. Each Component has Input Ports
-(`in_ports`) and Output Ports (`out_ports`). The exact Ports available are
-determined by the [type of Component][components]. Each Port can be associated
-with a [Signal][signal]. Components get chained to one another based on name of
-the Signal.
+Building blocks of a circuit are components. Each component has input ports
+(`in_ports`) and output ports (`out_ports`). The exact ports available are
+determined by the [type of component][components]. Each port can be associated
+with a [signal][signal]. Components get chained to one another based on name of
+the signal.
 
 ## Signal
 
-Signal represents a `float64` value that updates with every [Tick][tick] of
-Circuit execution. Every Signal must have a name to uniquely identify it within
-a Circuit.
+Signal represents a `float64` value that updates with every [tick][tick] of
+circuit execution. Every signal must have a name to uniquely identify it within
+a circuit.
 
-Output Port on a Component may emit a Signal. No other Port (on any Component)
-in the Circuit can emit a Signal with the same name.
+Output port on a component may emit a signal. No other port (on any component)
+in the circuit can emit a signal with the same name.
 
-In order to receive a named Signal at a Component it must be defined exactly
-once as an Output at some Component in the Circuit. Once defined, a Signal may
-be received at multiple Components.
+In order to receive a named signal at a component it must be defined exactly
+once as an output at some component in the circuit. Once defined, a signal may
+be received at multiple components.
 
 ## Circuit Runtime
 
-The Circuit evaluates at a constant _Tick_ frequency. Each round of evaluation
-is called a Tick. The `evaluation_interval` parameter in [Policy
-spec][policy-reference] configures how often the Circuit evaluates (Ticks).
+Circuit evaluates at a constant _tick_ frequency. Each round of evaluation is
+called a tick. The `evaluation_interval` parameter in [policy
+spec][policy-reference] configures how often the circuit evaluates (ticks).
 
-On every Tick, each Component in the Circuit gets executed exactly once.
-Components get executed as they become ready. A Component is ready if all of its
-Input Signals are available.
+On every tick, each component in the circuit gets executed exactly once.
+components get executed as they become ready. A component is ready if all of its
+input signals are available.
 
-During execution, the Input Signals are processed and Output Signals are emitted
-by the Component. Any [Looping Signals][looping-signals] are saved and consumed
-by Circuit in the next Tick.
+During execution, the input signals are processed and output signals are emitted
+by the component. Any [looping signals][looping-signals] are saved and consumed
+by circuit in the next tick.
 
 Circuit runtime provides very predictable execution semantics. Any timed
 operations like PromQL queries are synchronized to execute on multiples of
-Ticks. All PromQL queries in a circuit are centrally synchronized to ensure that
-all the queries that fire in the same Tick return results together in a future
-Tick.
+ticks. All PromQL queries in a circuit are centrally synchronized to ensure that
+all the queries that fire in the same tick return results together in a future
+tick.
 
 ### Looping Signals
 
-Loops are allowed in the Circuit execution graph. In fact they enable expression
-of powerful paradigms such as integration using basic Arithmetic Components.
+Loops are allowed in the circuit execution graph. In fact they enable expression
+of powerful paradigms such as integration using basic arithmetic components.
 
-In reality, the execution is still performed on a Directed Acyclic Graph. Before
-execution, loops are detected in the Circuit. Each loop is un-linked at the
-Component with the smallest index (in list of Components). The un-linked
-Component Ports consume Looping Signals. A Looping Signal has the value of the
-un-linked Signal from the previous Tick.
+In reality, the execution is still performed on a
+[directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph).
+Before execution, loops are detected in the circuit. Each loop is un-linked at
+the component with the smallest index (in list of components). The un-linked
+component ports consume looping signals. A looping signal has the value of the
+un-linked signal from the previous tick.
 
 ## Example Components {#components}
 
 The exhaustive list of the built-in components can be found in the
-[Policy reference](reference/policies/spec.md#component).
+[policy reference](reference/policies/spec.md#component).
 
 Examples of built-in components include:
 
-- **Sources**: These Components emit Signals into the Circuit from outside.
+- **Query**: These components emit signals into the circuit from outside.
   - [PromQL][promql-reference]: Converts results from a PromQL query into a
-    Signal.
-- **Signal Processors**: These Components transform input Signal(s) into output
-  Signal(s).
-  - **Arithmetic**: These Components perform basic Arithmetic operations on
-    Signal(s).
+    signal.
+- **Signal Processors**: These components transform input signal(s) into output
+  signal(s).
+  - **Arithmetic**: These components perform basic arithmetic operations on
+    signal(s).
     - [Arithmetic Combinator](/reference/policies/spec.md#arithmetic-combinator):
-      This Component takes two input Signals and performs a basic arithmetic
-      operation to generate an output Signal.
+      This component takes two input signals and performs a basic arithmetic
+      operation to generate an output signal.
     - [Max](/reference/policies/spec.md#max) and
-      [Min](/reference/policies/spec.md#min): These Components take multiple
-      input or output Signals and emit maximum or minimum of those Signals.
-    - [Sqrt](/reference/policies/spec.md#sqrt): This Component square roots a
-      Signal.
-  - **Transformers**: These Components statefully transform an input Signal in
-    an output Signal.
-    - [EMA](/reference/policies/spec.md#e-m-a): Exponential Moving Average.
+      [Min](/reference/policies/spec.md#min): These components take multiple
+      input or output signals and emit maximum or minimum of those signals.
+      signal.
+  - **Transformers**: These components statefully transform an input signal in
+    an output signal.
+    - [EMA](/reference/policies/spec.md#e-m-a): Exponential moving average.
   - [Decider and Switcher](/reference/policies/spec.md#decider): These
-    Components work in tandem to make the Circuit adapt based on conditions.
+    components work in tandem to make the circuit adapt based on conditions.
 - **Controllers**: Controllers are an essential part of a closed loop control
-  system. A Controller take as input a signal, a setpoint and emits the
-  suggested value of Control Variable as output. The aim of the Controller is to
-  make the Signal achieve the Setpoint.
+  system. A controller take as input a signal, a setpoint and emits the
+  suggested value of Control Variable as output. The aim of the controller is to
+  make the signal achieve the setpoint.
   - [Gradient Controller](/reference/policies/spec.md#gradient-controller): This
-    Controller acts on the ratio of Setpoint and Signal.
-- **Actuators**: Actuators are Components which act on Signals to make real
+    controller acts on the ratio of setpoint and signal.
+- **Actuators**: Actuators are components which act on signals to make real
   changes like shed traffic, change rate limits etc.
   - [Concurrency Limiter](/reference/policies/spec.md#concurrency-limiter):
-    Takes load multiplier as a Signal which determines the proportion of Flow
+    Takes load multiplier as a signal which determines the proportion of Flow
     concurrency to accept.
   - [Rate Limiter](/reference/policies/spec.md#rate-limiter): Take rate limit as
-    a Signal which determines the rate of flows handled by that Rate Limiter.
+    a signal which determines the rate of flows handled by that rate limiter.
 
 [control-system]: https://en.wikipedia.org/wiki/Control_system
 [tick]: #runtime

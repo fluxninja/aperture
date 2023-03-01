@@ -38,17 +38,17 @@ and behavior. The stream can be stored and visualized in
 
 ### HTTP
 
-| Name                         | Type   | Example Values                                             | Description                                            | Flow Control Integrations |
-| ---------------------------- | ------ | ---------------------------------------------------------- | ------------------------------------------------------ | ------------------------- |
-| http.status_code             | single | 200, 429, 503                                              | HTTP status code of the response                       | Envoy                     |
-| http.request_content_length  | single | 0, 53                                                      | Length of the HTTP request content in bytes            | Envoy                     |
-| http.response_content_length | single | 201, 77                                                    | Length of the HTTP response content in bytes           | Envoy                     |
-| http.method                  | single | GET, POST                                                  | HTTP method of the response                            | Envoy                     |
-| http.target                  | single | /request                                                   | Target endpoint of the response                        | Envoy                     |
-| http.host                    | single | s1.demoapp.svc.cluster.local, s2.demoapp.svc.cluster.local | Host address of the response                           | Envoy                     |
-| http.scheme                  | single | http                                                       | HTTP scheme of the response                            | Envoy                     |
-| http.flavor                  | single | 1.1                                                        | HTTP protocol version                                  | Envoy                     |
-| {user-defined-labels}        |        |                                                            | Configured through [Flow Classifiers][flowclassifiers] | Envoy                     |
+| Name                         | Type   | Example Values                                             | Description                                   | Flow Control Integrations |
+| ---------------------------- | ------ | ---------------------------------------------------------- | --------------------------------------------- | ------------------------- |
+| http.status_code             | single | 200, 429, 503                                              | HTTP status code of the response              | Envoy                     |
+| http.request_content_length  | single | 0, 53                                                      | Length of the HTTP request content in bytes   | Envoy                     |
+| http.response_content_length | single | 201, 77                                                    | Length of the HTTP response content in bytes  | Envoy                     |
+| http.method                  | single | GET, POST                                                  | HTTP method of the response                   | Envoy                     |
+| http.target                  | single | /request                                                   | Target endpoint of the response               | Envoy                     |
+| http.host                    | single | s1.demoapp.svc.cluster.local, s2.demoapp.svc.cluster.local | Host address of the response                  | Envoy                     |
+| http.scheme                  | single | http                                                       | HTTP scheme of the response                   | Envoy                     |
+| http.flavor                  | single | 1.1                                                        | HTTP protocol version                         | Envoy                     |
+| {user-defined-labels}        |        |                                                            | Configured through [_Classifier_][classifier] | Envoy                     |
 
 ### SDK
 
@@ -85,4 +85,4 @@ and behavior. The stream can be stored and visualized in
 
 [quantilesdoublesketch]:
   https://druid.apache.org/docs/latest/development/extensions-core/datasketches-quantiles.html
-[flowclassifiers]: /concepts/integrations/flow-control/flow-classifier.md
+[classifier]: /concepts/integrations/flow-control/resources/classifier.md

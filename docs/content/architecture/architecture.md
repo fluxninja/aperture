@@ -88,11 +88,12 @@ used by paid users over those being used by free users. Aperture Agents schedule
 workloads based on their priorities, helping maximize user experience or revenue
 even during overload scenarios.
 
-Aperture Agents are capable of working with different infrastructures such as
-Kubernetes, VM, or bare-metal. They integrate with Service Meshes or can be used
-with SDKs depending on your requirements. Additionally, agents work with
-auto-scaling APIs for platforms such as Kubernetes, to help scale infrastructure
-when needed.
+Aperture Agents can be installed on a variety of infrastructure such as
+Kubernetes, VMs, or bare-metal. They integrate with Service Meshes or can be
+used with SDKs to provide
+[flow control](/concepts/integrations/flow-control/flow-control.md)
+capabilities. Additionally, agents work with auto-scaling APIs for platforms
+such as Kubernetes, to help scale infrastructure when needed.
 
 ## Aperture Databases
 

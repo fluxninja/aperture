@@ -15,6 +15,10 @@ AIMD stands for Additive Increase, Multiplicative Decrease. That is, the
 concurrency is reduced by a multiplicative factor when the service is overloaded
 and increased by an additive factor when the service is no longer overloaded.
 
+Please see reference for the
+[`AIMDConcurrencyController`](/reference/policies/spec.md#a-i-m-d-concurrency-controller)
+component that is used within this blueprint.
+
 :::
 
 :::info
