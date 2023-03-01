@@ -55,7 +55,7 @@ type ClassificationEngine struct {
 
 type rulesetID = uint64
 
-// NewClassificationEngine creates a new Flow Classifier.
+// NewClassificationEngine creates a new Classifier.
 func NewClassificationEngine(registry status.Registry) *ClassificationEngine {
 	counterVector := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: metrics.ClassifierCounterMetricName,

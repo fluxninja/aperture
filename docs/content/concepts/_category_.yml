@@ -1,9 +1,0 @@
-label: Concepts
-position: 3
-collapsible: true
-collapsed: true
-link:
-  type: "generated-index"
-  title: "Concepts"
-  description: "The Concepts page provides an in-depth understanding of the features and core functionality of the Aperture platform. It covers topics such as how flow control works, how the flow classifier functions, and an overview of the Aperture's control loop."
-  keywords: ["concepts"]
