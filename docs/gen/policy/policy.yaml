@@ -656,7 +656,7 @@ definitions:
     description: |-
       :::info
 
-      See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
+      See also [Classifier overview](/concepts/integrations/flow-control/resources/classifier.md).
 
       :::
       Example
@@ -1373,7 +1373,7 @@ definitions:
     properties:
       control_point:
         description: |+
-          [Control Point](/concepts/integrations/flow-control/control-point.md)
+          [Control Point](/concepts/integrations/flow-control/flow-selector.md#control-point)
           identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
           block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
           or filter chains.
@@ -1437,7 +1437,7 @@ definitions:
 
       :::info
 
-      See also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).
+      See also [Flux Meter overview](/concepts/integrations/flow-control/resources/flux-meter.md).
 
       :::
       Example:
@@ -2016,7 +2016,7 @@ definitions:
     properties:
       agent_group:
         description: |+
-          Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
+          Which [agent-group](/concepts/integrations/flow-control/flow-selector.md#agent-group) this
           selector applies to.
 
         type: string
@@ -2782,7 +2782,7 @@ definitions:
         x-order: 1
   Rule:
     description: |-
-      Flow classification rule extracts a value from request metadata.
+      Classification rule extracts a value from request metadata.
       More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
       See https://play.openpolicyagent.org/p/gU7vcLkc70 for an example input.
       There are two ways to define a flow classification rule:
@@ -2818,7 +2818,7 @@ definitions:
       ```
       [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
     type: object
-    title: Rule describes a single Flow Classification Rule
+    title: Rule describes a single classification Rule
     properties:
       extractor:
         description: High-level declarative extractor.
@@ -3105,7 +3105,7 @@ definitions:
     properties:
       agent_group:
         description: |+
-          Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
+          Which [agent-group](/concepts/integrations/flow-control/flow-selector.md#agent-group) this
           selector applies to.
 
           :::info
@@ -3121,7 +3121,7 @@ definitions:
       service:
         description: |+
           The Fully Qualified Domain Name of the
-          [service](/concepts/integrations/flow-control/service.md) to select.
+          [service](/concepts/integrations/flow-control/flow-selector.md) to select.
 
           In Kubernetes, this is the FQDN of the Service object.
 

@@ -8,7 +8,6 @@ require (
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
 	github.com/buger/jsonparser v1.1.1
 	github.com/buraksezer/olric v0.4.9
-	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/cenkalti/backoff/v4 v4.2.0
 	github.com/charmbracelet/bubbletea v0.23.2
 	github.com/clarketm/json v1.17.1
@@ -46,8 +45,8 @@ require (
 	github.com/mitchellh/copystructure v1.2.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/natefinch/atomic v1.0.1
-	github.com/onsi/ginkgo/v2 v2.8.0
-	github.com/onsi/gomega v1.26.0
+	github.com/onsi/ginkgo/v2 v2.8.4
+	github.com/onsi/gomega v1.27.1
 	github.com/open-policy-agent/opa v0.49.2
 	github.com/open-policy-agent/opa-envoy-plugin v0.49.2-envoy
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.72.0
@@ -309,6 +308,7 @@ require (
 	github.com/go-openapi/validate v0.22.0 // indirect
 	github.com/go-redis/redis/v7 v7.4.1 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
+	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
 	github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2 // indirect
 	github.com/gogo/googleapis v1.4.1 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
@@ -316,6 +316,7 @@ require (
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/golang/glog v1.0.0 // indirect
 	github.com/google/cadvisor v0.47.1 // indirect
+	github.com/google/pprof v0.0.0-20230111200839-76d1ae5aea2b // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/gosnmp/gosnmp v1.35.0 // indirect
 	github.com/grobie/gomemcache v0.0.0-20180201122607-1f779c573665 // indirect

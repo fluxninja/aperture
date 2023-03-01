@@ -6,6 +6,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/info"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/peers"
@@ -43,6 +44,8 @@ func AddAgentInfoAttribute(in FxIn) {
 					otelconsts.AgentGroupLabel, in.AgentInfo.GetAgentGroup()),
 				fmt.Sprintf(`set(attributes["%v"], "%v")`,
 					otelconsts.InstanceLabel, info.Hostname),
+				fmt.Sprintf(`set(attributes["%v"], "%v")`,
+					metrics.ProcessUUIDLabel, info.UUID),
 			},
 		},
 	}

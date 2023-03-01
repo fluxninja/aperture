@@ -757,7 +757,7 @@ Set of classification rules sharing a common selector
 
 :::info
 
-See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
+See also [Classifier overview](/concepts/integrations/flow-control/resources/classifier.md).
 
 :::
 Example
@@ -1583,7 +1583,7 @@ label_matcher:
 <dt>control_point</dt>
 <dd>
 
-(string, **required**) [Control Point](/concepts/integrations/flow-control/control-point.md)
+(string, **required**) [Control Point](/concepts/integrations/flow-control/flow-selector.md#control-point)
 identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
 block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
 or filter chains.
@@ -1652,7 +1652,7 @@ The histogram created by Flux Meter measures the workload latency by default.
 
 :::info
 
-See also [Flux Meter overview](/concepts/integrations/flow-control/flux-meter.md).
+See also [Flux Meter overview](/concepts/integrations/flow-control/resources/flux-meter.md).
 
 :::
 Example:
@@ -2309,7 +2309,7 @@ component should apply to.
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `"default"`) Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
+(string, default: `"default"`) Which [agent-group](/concepts/integrations/flow-control/flow-selector.md#agent-group) this
 selector applies to.
 
 </dd>
@@ -3223,9 +3223,9 @@ Flux Meter created metrics can be consumed as input to the circuit via the PromQ
 
 ### Rule {#rule}
 
-Rule describes a single Flow Classification Rule
+Rule describes a single classification Rule
 
-Flow classification rule extracts a value from request metadata.
+Classification rule extracts a value from request metadata.
 More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
 See https://play.openpolicyagent.org/p/gU7vcLkc70 for an example input.
 There are two ways to define a flow classification rule:
@@ -3551,7 +3551,7 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `"default"`) Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
+(string, default: `"default"`) Which [agent-group](/concepts/integrations/flow-control/flow-selector.md#agent-group) this
 selector applies to.
 
 :::info
@@ -3565,7 +3565,7 @@ Agent Groups are used to scope policies to a subset of agents connected to the s
 <dd>
 
 (string, **required**) The Fully Qualified Domain Name of the
-[service](/concepts/integrations/flow-control/service.md) to select.
+[service](/concepts/integrations/flow-control/flow-selector.md) to select.
 
 In Kubernetes, this is the FQDN of the Service object.
 

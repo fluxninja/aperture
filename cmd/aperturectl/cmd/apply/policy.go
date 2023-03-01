@@ -175,7 +175,7 @@ func getControllerDeployment() (*appsv1.Deployment, error) {
 			return nil, fmt.Errorf(
 				"no deployment with name 'aperture-controller' found on the Kubernetes cluster. The policy can be only applied in the namespace where the Aperture Controller is running")
 		}
-		return nil, fmt.Errorf("failed to fetch aperture-controller namespace in Kubernetes: %w", err)
+		return nil, fmt.Errorf("failed to fetch namespace of Aperture Controller in Kubernetes: %w", err)
 	}
 
 	if len(deployment.Items) != 1 {
