@@ -30,11 +30,11 @@ A _Flow Selector_ consists of:
 
 - _Service Selector_, containing
 
-  - [service][#service] name,
-  - [agent group][#agent-group] name,
+  - [service](#service) name,
+  - [agent group](#agent-group) name,
 
 - _Flow Matcher_, containing
-  - [control point][#control-point], and
+  - [control point](#control-point), and
   - optional [flow label matcher](#label-matcher).
 
 ## Service Selector {#service-selector}
@@ -207,6 +207,13 @@ entities belonging to the same service.
 
 :::
 
+:::tip
+
+You can use [`aperturectl flow-control control-points`][aperturectl] to list
+active control points:
+
+:::
+
 ### Label Matcher {#label-matcher}
 
 _Label Matcher_ allows to optionally narrow down the selected flow based on
@@ -225,7 +232,7 @@ You can also provide a matching-expression-tree, which allows for arbitrary
 conditions, including regex matching. Refer to [Label Matcher
 reference][label-matcher] for further details.
 
-### Example
+## Example
 
 ```yaml
 service_selector:
@@ -246,3 +253,4 @@ flow_selector:
 [label-matcher]: /reference/policies/spec.md#label-matcher
 [dc]: components/rate-limiter.md#distributed-counters
 [components]: ./flow-control.md#components
+[aperturectl]: /get-started/aperture-cli/aperture-cli.md

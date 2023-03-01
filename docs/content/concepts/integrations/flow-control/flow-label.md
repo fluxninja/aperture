@@ -78,14 +78,12 @@ also takes an explicit `labels` map in the `Check()` call.
 ## Live Previewing Flow Labels
 
 You can discover the labels flowing through services and control points using
-the
-[Introspection API](reference/api/agent/flow-preview-service-preview-flow-labels.api.mdx)
-on an `aperture-agent` local to the service instances (pods).
+[`aperturectl`][aperturectl].
 
 For example:
 
 ```sh
-curl -X POST localhost:8080/v1/flowcontrol/preview/labels/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
+aperturectl flow-control preview --kube service1-demo-app.demoapp.svc.cluster.local ingress
 ```
 
 Returns:
@@ -114,6 +112,14 @@ Returns:
     }
   ]
 }
+```
+
+Alternatively, you can use the
+[Introspection API](reference/api/agent/flow-preview-service-preview-flow-labels.api.mdx)
+directly on an `aperture-agent` local to the service instances (pods):
+
+```sh
+curl -X POST localhost:8080/v1/flowcontrol/preview/labels/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
 ```
 
 ## Telemetry
@@ -200,3 +206,4 @@ For _Classifier_ created labels, you can disable this behavior by setting
 [aperture-go]: https://github.com/FluxNinja/aperture-go
 [istio]: /get-started/integrations/flow-control/envoy/istio.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
+[aperturectl]: /get-started/aperture-cli/aperture-cli.md
