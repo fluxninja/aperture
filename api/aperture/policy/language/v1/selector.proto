@@ -30,7 +30,7 @@ message FlowSelector {
 //
 // :::
 message ServiceSelector {
-  // Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
+  // Which [agent-group](/concepts/integrations/flow-control/flow-selector.md#agent-group) this
   // selector applies to.
   //
   // :::info
@@ -41,7 +41,7 @@ message ServiceSelector {
   string agent_group = 1; // @gotags: default:"default"
 
   // The Fully Qualified Domain Name of the
-  // [service](/concepts/integrations/flow-control/service.md) to select.
+  // [service](/concepts/integrations/flow-control/flow-selector.md) to select.
   //
   // In Kubernetes, this is the FQDN of the Service object.
   //
@@ -88,7 +88,7 @@ message ServiceSelector {
 //           regex: ^(?!.*Chrome).*Safari
 // ```
 message FlowMatcher {
-  // [Control Point](/concepts/integrations/flow-control/control-point.md)
+  // [Control Point](/concepts/integrations/flow-control/flow-selector.md#control-point)
   // identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
   // block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
   // or filter chains.
@@ -122,7 +122,7 @@ message FlowMatcher {
 // Describes which pods a control or observability
 // component should apply to.
 message KubernetesObjectSelector {
-  // Which [agent-group](/concepts/integrations/flow-control/service.md#agent-group) this
+  // Which [agent-group](/concepts/integrations/flow-control/flow-selector.md#agent-group) this
   // selector applies to.
   string agent_group = 1; // @gotags: default:"default"
 

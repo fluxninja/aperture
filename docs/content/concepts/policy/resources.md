@@ -23,7 +23,8 @@ Examples:
    may be referred inside a [`FlowSelector`][selector-reference].
 
 [circuit]: circuit.md
-[flux-meter]: /concepts/integrations/flow-control/flux-meter.md
-[flow-classifier]: /concepts/integrations/flow-control/flow-classifier.md
+[flux-meter]: /concepts/integrations/flow-control/resources/flux-meter.md
+[flow-classifier]:
+  /concepts/integrations/flow-control/resources/flow-classifier.md
 [promql-reference]: /reference/policies/spec.md#prom-q-l
 [selector-reference]: /reference/policies/spec.md#flow-selector

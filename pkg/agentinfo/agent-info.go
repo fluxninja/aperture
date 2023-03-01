@@ -20,7 +20,7 @@ const (
 type AgentInfoConfig struct {
 	// All agents within an agent_group receive the same data-plane configuration (e.g. Flux Meters, Rate Limiters etc).
 	//
-	// [Read more about agent groups here](/concepts/integrations/flow-control/service.md#agent-group).
+	// [Read more about agent groups here](/concepts/integrations/flow-control/flow-selector.md#agent-group).
 	AgentGroup string `json:"agent_group" default:"default"`
 }
 

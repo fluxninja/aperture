@@ -24,7 +24,7 @@ const (
 //
 // :::info
 //
-// See also [Classifier overview](/concepts/integrations/flow-control/flow-classifier.md).
+// See also [Classifier overview](/concepts/integrations/flow-control/resources/flow-classifier.md).
 //
 // :::
 // Example
