@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/cenkalti/backoff"
+	"github.com/cenkalti/backoff/v4"
 	prometheusv1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	prometheusmodel "github.com/prometheus/common/model"
 	"go.uber.org/multierr"
