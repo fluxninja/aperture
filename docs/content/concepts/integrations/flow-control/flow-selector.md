@@ -30,11 +30,11 @@ A _Flow Selector_ consists of:
 
 - _Service Selector_, containing
 
-  - [service][#service] name,
-  - [agent group][#agent-group] name,
+  - [service](#service) name,
+  - [agent group](#agent-group) name,
 
 - _Flow Matcher_, containing
-  - [control point][#control-point], and
+  - [control point](#control-point), and
   - optional [flow label matcher](#label-matcher).
 
 ## Service Selector {#service-selector}
