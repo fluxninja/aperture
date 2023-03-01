@@ -82,7 +82,7 @@ DEP_TREE = {
                     "new_name": "dashboards",
                     "resource_deps": ["grafana-operator-bootstrap"],
                     "extra_objects": [
-                        "k8s-resources:grafanadashboard"
+                        (None, "GrafanaDashboard", APERTURE_CONTROLLER_NS)
                     ]
                 },
                 {
@@ -848,20 +848,10 @@ def process_aperture_scenario(scenario_path):
                 "namespace": APERTURE_CONTROLLER_NS,
                 "labels": "ApertureController",
                 "needs": ["aperture-grafana"],
-                "manifests_path": dashboard["path"] + "/main.jsonnet",
+                "manifests_path": os.path.join(dashboard["path"], "main.jsonnet"),
                 "jsonnet_args": ["-J", PLAYGROUND_ROOT + "/tanka/vendor",
                                  "--ext-str", "APERTURE_DASHBOARD=%s" % dashboard["content"],
                                  "--ext-str", "POLICY_NAME=%s" % policy_name],
-                "child_resources": [
-                    {
-                        "new_name": "%s-dashboard" % policy_name,
-                        "resource_deps": ["grafana-operator-bootstrap"],
-                        "extra_objects": [
-                            ("^%s" % policy_name, "GrafanaDashboard", APERTURE_CONTROLLER_NS),
-                            ("^aperture-signals-%s" % policy_name, "GrafanaDashboard", APERTURE_CONTROLLER_NS),
-                        ]
-                    },
-                ]
             }
             DEP_TREE[APERTURE_CONTROLLER_NS]["scenario-dashboard-%s" % policy_name] = ds
 
