@@ -35,8 +35,9 @@ Scheduler prioritizes requests based on their priority and size. Each Aperture
 Agent instantiates a
 [Weighted Fair Queueing](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
 based scheduler as a way to prioritize requests. The controller applies a _Load
-Multiplier_ that the scheduler uses to compute the fill rate of [tokens](tokens)
-per second, which it tries to maintain between each update from the controller.
+Multiplier_ that the scheduler uses to compute the fill rate of
+[tokens](#tokens) per second, which it tries to maintain between each update
+from the controller.
 
 If the rate of tokens in requests entering the scheduler exceeds the desired
 rate, requests are queued in the scheduler. If a flow can't be scheduled within
