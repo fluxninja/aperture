@@ -37,7 +37,7 @@ var pullFunc = func(_ *cobra.Command, _ []string) error {
 	}
 
 	jbLockFileBytes, err := os.ReadFile(filepath.Join(blueprintsURIRoot, jsonnetfile.LockFile))
-	if !os.IsNotExist(err) {
+	if err != nil && !os.IsNotExist(err) {
 		return err
 	}
 

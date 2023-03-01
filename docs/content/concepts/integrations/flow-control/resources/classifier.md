@@ -71,14 +71,12 @@ gate the classifier to particular paths.
 ## Live Previewing Requests {#live-previewing-requests}
 
 You can discover the request attributes flowing through services and control
-points using the
-[Introspection API](reference/api/agent/flow-preview-service-preview-http-requests.api.mdx)
-on an `aperture-agent` local to the service instances (pods).
+points using [`aperturectl`][aperturectl].
 
 For example:
 
 ```sh
-curl -X POST localhost:8080/v1/flowcontrol/preview/http_requests/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
+aperturectl flow-control preview --kube service1-demo-app.demoapp.svc.cluster.local ingress --http
 ```
 
 Returns:
@@ -142,6 +140,14 @@ Returns:
     }
   ]
 }
+```
+
+Alternatively, you can use the
+[Introspection API](reference/api/agent/flow-preview-service-preview-http-requests.api.mdx)
+directly on an `aperture-agent` local to the service instances (pods):
+
+```sh
+curl -X POST localhost:8080/v1/flowcontrol/preview/http_requests/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
 ```
 
 ## Rules ([reference][rule]) {#rules}
@@ -225,3 +231,4 @@ See [full example in reference][reference]
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
 [control-point]: ../flow-selector.md#control-point
 [install-istio]: /get-started/integrations/flow-control/envoy/istio.md
+[aperturectl]: /get-started/aperture-cli/aperture-cli.md
