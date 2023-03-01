@@ -16,9 +16,9 @@ See also [FlowSelector reference](/reference/policies/spec.md#flow-selector)
 :::
 
 Flow Selectors are used by flow control and observability components
-instantiated by Aperture Agents like [Classifiers][classifier], [Flux
-Meters][flux-meter] and [Concurrency Limiters][cl]. Flow Selectors define
-scoping rules – how these components should select [Flows][flow] for their
+instantiated by Aperture Agents like [`Classifiers`][classifier],
+[`Flux Meters`][flux-meter] and [`Concurrency Limiters`][cl]. Flow Selectors
+define scoping rules – how these components should select flows for their
 operations.
 
 A Flow Selector consists of:
@@ -28,7 +28,7 @@ A Flow Selector consists of:
   - [agent group][agent-group] name,
   - [service][service] name,
 
-- FlowMatcher, containing
+- Flow Matcher, containing
   - [control point][control-point], and
   - optional [flow label matcher](#label-matcher).
 
@@ -104,7 +104,6 @@ flow_selector:
       user_tier: gold
 ```
 
-[flow]: /concepts/integrations/flow-control/flow-control.md#flow
 [label]: /concepts/integrations/flow-control/flow-label.md
 [control-point]: /concepts/integrations/flow-control/control-point.md
 [service]: /concepts/integrations/flow-control/service.md

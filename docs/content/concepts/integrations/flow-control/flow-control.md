@@ -47,17 +47,21 @@ This is where flow control comes in. Applications can degrade gracefully in
 real-time when using flow control techniques with Aperture, by prioritizing
 high-importance features over others.
 
-A Flow is the fundamental unit of work from the perspective of an Aperture
-Agent. It could be an API call, a feature, or even a database query. A Flow in
-Aperture is similar to [OpenTelemetry span][span] and contains [flow
-labels][flow-label].
+:::info
+
+A flow is the fundamental unit of work from the perspective of an Aperture
+Agent. It could be an API call, a feature, or even a database query. A flow in
+Aperture is similar to [OpenTelemetry span][span]. A flow can be selected based
+on [flow labels][flow-label] of a request.
+
+:::
 
 Reliable operations at web-scale are impossible without effective flow control.
 Aperture splits the process of flow control in two layers:
 
 - Governing the flow control process and making high-level decisions. This is
   done by Aperture Controller through _policies_. You can read more about
-  policies in [Policies chapter][policies].
+  policies in [policies chapter][policies].
 - Actual execution of flow control is performed by Aperture Agent via
   [Concurrency Limiters][cl] or [Rate Limiters][rate-limiter]. Additionally the
   Agent handles other flow-control related tasks, like gathering metrics via
@@ -65,7 +69,7 @@ Aperture splits the process of flow control in two layers:
   [Classifiers][classifier]. This chapter describes flow control capabilities at
   the Agent.
 
-## Insertion {#integrations}
+## Insertion {#insertion}
 
 For Aperture to be able to act at any of the Control Points, you need to install
 integrations that will communicate with the Aperture Agent.
@@ -88,8 +92,8 @@ integrations that will communicate with the Aperture Agent.
 - _Feature_ Control Points: We provide
   [Aperture SDKs](/get-started/integrations/flow-control/sdk/sdk.md) for popular
   languages. Aperture SDK wraps any function call or code snippet inside the
-  Service code as a Feature Control Point. Every invocation of the Feature is a
-  Flow from the perspective of Aperture.
+  service code as a Feature Control Point. Every invocation of th feature is a
+  flow from the perspective of Aperture.
 
   The SDK provides API to begin a flow which translates to a
   [flowcontrol.v1.Check][flowcontrol-proto] call into Agent. Response of this
@@ -97,13 +101,6 @@ integrations that will communicate with the Aperture Agent.
   of a feature may be gated based on this decision. There is an API to end a
   flow which sends an OpenTelemetry span representing the flow to the Agent as
   telemetry.
-
-:::note
-
-Exact instructions on custom proxies / web frameworks / SDK integrations will be
-added in the future.
-
-:::
 
 ## Flow Control Components {#components}
 
@@ -132,6 +129,6 @@ we recommend to start with concepts like [services][service] and
 [service]: /concepts/integrations/flow-control/service.md
 [flow-label]: /concepts/integrations/flow-control/flow-label.md
 [flowcontrol-proto]:
-  https://buf.build/fluxninja/aperture/docs/main:aperture.flowcontrol.v1
+  https://buf.build/fluxninja/aperture/docs/main:aperture.flowcontrol.check.v1
 [istio-patch-context]:
   https://istio.io/latest/docs/reference/config/networking/envoy-filter/#EnvoyFilter-PatchContext

@@ -14,7 +14,8 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 In this tutorial, we will use [Flow Classifier Rego Rules][rego-rules] to
-statically rate limit a GraphQL query.
+[statically rate limit](/reference/policies/bundled-blueprints/policies/static-rate-limiting.md)
+a GraphQL query.
 
 ## Policy
 
@@ -92,8 +93,10 @@ tutorial does the following:
 
 From there on, the classifier rule assigns the value of the exported variable
 `userID` in Rego source to `user_id` flow label, effectively creating a label
-`user_id:1`. This label is used by the Rate Limiter component in the policy to
-limit the `createTodo` mutation query to 10 requests/second for each userID.
+`user_id:1`. This label is used by the
+[`RateLimiter`](/concepts/integrations/flow-control/components/rate-limiter.md)
+component in the policy to limit the `createTodo` mutation query to 10
+requests/second for each userID.
 
 ### Circuit Diagram
 

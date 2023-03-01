@@ -3,7 +3,7 @@ title: Control Point
 sidebar_position: 1
 ---
 
-To describe where the Flows are regulated or monitored, Aperture tracks Control
+To describe where the flows are regulated or monitored, Aperture tracks Control
 Points, within [services](service.md).
 
 <Zoom>
@@ -32,8 +32,8 @@ graph LR
 </Zoom>
 
 In the above diagram, each service has **HTTP** Control Points. Every incoming
-API request to a service is a Flow at its **ingress** Control Point. Likewise
-every outgoing request from a service is a Flow at its **egress** Control Point.
+API request to a service is a flow at its **ingress** Control Point. Likewise
+every outgoing request from a service is a flow at its **egress** Control Point.
 
 In addition, "Frontend" service has **Feature** Control Points identifying
 _recommendations_ and _live-update_ features inside the Frontend service's code.
@@ -41,7 +41,7 @@ _recommendations_ and _live-update_ features inside the Frontend service's code.
 :::note
 
 Control Point definition doesn't care about which particular entity (like a pod)
-is handling particular Flow. A single Control Point covers _all_ the entities
+is handling particular flow. A single Control Point covers _all_ the entities
 belonging to the same service.
 
 :::

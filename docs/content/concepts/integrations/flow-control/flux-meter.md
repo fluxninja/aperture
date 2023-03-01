@@ -14,30 +14,31 @@ See also [Flux Meter reference][reference]
 
 ## Purpose
 
-Flux Meter provides a way to translate a Flux of [Flows][flow] matching a [Flow
-Selector][flow-selector] to a Prometheus [Histogram Metric][histogram-metric].
+Flux Meter provides a way to translate a flux of [flows][flow] matching a
+[`FlowSelector`][flow-selector] to a Prometheus [histogram][histogram-metric].
 
 ## Naming
 
 Flux Meter is referred by its name. It is strongly recommended to assign
 globally unique names to Flux Meters. A good practice is to prefix the Flux
-Meter name with the Policy name.
+Meter name with the policy name.
 
 :::caution warning
 
-Flux Meters with repeated names within the same Agent Group will fail to load at
-Agents.
+Flux Meters with repeated names within the same
+[Agent Group](/concepts/integrations/flow-control/service.md#agent-group) will
+fail to load at the agents.
 
 :::
 
 ## Metric
 
-The default metric tracked by Flux Meter is the Flow's workload duration in
+The default metric tracked by Flux Meter is the flow's workload duration in
 milliseconds. The Flux Meter may be configured to track any arbitrary metric
-coming via OpenTelemetry attributes on log or span telemetry streams from a
-[Flow Control Integration][flow-control-integration]. For instance, any of the
-metrics defined in the Envoy [access log specification][envoy-access-log-spec]
-may be used by Flux Meter.
+coming via OpenTelemetry attributes on log or span telemetry streams based on
+the [insertion method][flow-control-insertion]. For instance, any of the metrics
+defined in the Envoy [access log specification][envoy-access-log-spec] may be
+used by Flux Meter.
 
 ## Buckets
 
@@ -61,11 +62,11 @@ histogram metric generated via Flux Meter is named `flux_meter` and has the
 following labels:
 
 1. `flux_meter_name`: Name of the Flux Meter metric
-2. `decision_type`: Flow Control decision from Agent
+2. `decision_type`: Flow control decision from Agent
 <!-- TODO tgill: update once we start following OTEL semantic convention on metric labels -->
-3. `status_code`: HTTP status code of the Flow. Relevant only for Traffic based
+3. `status_code`: HTTP status code of the flow. Relevant only for Traffic based
    Control Points.
-4. `flow_status`: Protocol independent status for the Flow.
+4. `flow_status`: Protocol independent status for the flow.
 5. Other common labels available at all Agent such as `instance`.
 
 Query to get average duration (assuming default Flux Meter metric):
@@ -95,15 +96,24 @@ a PromQL query as described above. The PromQL Component generates a
 A Control Loop can use a duration Signal generated via the Flux Meter metric as
 signal to a Controller which determines the desired Concurrency of a Service.
 
-### Standalone Observability
+### Observability
 
 Flux Meters are a great way to measure [SLOs][google-sre-slo] of your Service
-down to fine-grained APIs.
+down to fine-grained APIs attributes such as endpoints, user types (subscriber
+vs. logged out) and so on.
+
+:::info
+
+For more details, please
+[refer to metrics and labels](/reference/observability/prometheus-metrics/agent.md#flux-meter)
+collected by Flux Meters.
+
+:::
 
 [reference]: /reference/policies/spec.md#flux-meter
 [flow]: /concepts/integrations/flow-control/flow-control.md#flow
 [flow-selector]: /concepts/integrations/flow-control/flow-selector.md
-[flow-control-integration]: ./flow-control.md#integrations
+[flow-control-integration]: ./flow-control.md#insertion
 [histogram-metric]: https://prometheus.io/docs/practices/histograms/
 [quantiles]: https://prometheus.io/docs/practices/histograms/#quantiles
 [envoy-access-log-spec]:
