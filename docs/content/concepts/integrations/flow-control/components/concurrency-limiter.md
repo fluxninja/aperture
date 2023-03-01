@@ -13,9 +13,9 @@ sidebar_position: 6
 :::info
 
 See also
-[AIMD Concurrency Controller](/reference/policies/spec.md#a-i-m-d-concurrency-controller)
-and [Concurrency Limiter](/reference/policies/spec.md#concurrency-limiter)
-references.
+[AIMD Concurrency Controller reference](/reference/policies/spec.md#a-i-m-d-concurrency-controller)
+and
+[Concurrency Limiter reference](/reference/policies/spec.md#concurrency-limiter).
 
 :::
 

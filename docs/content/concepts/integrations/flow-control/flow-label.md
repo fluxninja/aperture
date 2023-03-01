@@ -1,6 +1,6 @@
 ---
 title: Flow Label
-sidebar_position: 0
+sidebar_position: 1
 ---
 
 :::info What is a flow?
@@ -61,7 +61,7 @@ become label values (properties are ignored).
 Read more about baggage propagation on:
 [Baggage | OpenTelemetry](https://opentelemetry.io/docs/concepts/signals/baggage/).
 
-### Flow Classifiers
+### Classifiers
 
 When the labels you need are not already present in baggage, nor as request
 labels, you can create a [classifier][classifier] to inject new labels into the
@@ -186,7 +186,7 @@ For _Classifier_ created labels, you can disable this behavior by setting
 :::
 
 [flow-selector]: ./flow-selector.md
-[classifier]: ./resources/flow-classifier.md
+[classifier]: ./resources/classifier.md
 [workload]: ./components/concurrency-limiter.md#workload
 [ratelimiter]: ./components/rate-limiter.md
 [scheduler]: ./components/concurrency-limiter.md#scheduler

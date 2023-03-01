@@ -661,7 +661,7 @@
       "additionalProperties": false
     },
     "Classifier": {
-      "description": ":::info\n\nSee also [Classifier overview](/concepts/integrations/flow-control/resources/flow-classifier.md).\n\n:::\nExample\n```yaml\nflow_selector:\n  service_selector:\n     agent_group: demoapp\n     service: service1-demo-app.demoapp.svc.cluster.local\n  flow_matcher:\n     control_point: ingress\n     label_matcher:\n        match_labels:\n          user_tier: gold\n        match_expressions:\n          - key: user_type\n            operator: In\nrules:\n  user:\n   extractor:\n     from: request.http.headers.user-agent\n  telemetry: false\n```",
+      "description": ":::info\n\nSee also [Classifier overview](/concepts/integrations/flow-control/resources/classifier.md).\n\n:::\nExample\n```yaml\nflow_selector:\n  service_selector:\n     agent_group: demoapp\n     service: service1-demo-app.demoapp.svc.cluster.local\n  flow_matcher:\n     control_point: ingress\n     label_matcher:\n        match_labels:\n          user_tier: gold\n        match_expressions:\n          - key: user_type\n            operator: In\nrules:\n  user:\n   extractor:\n     from: request.http.headers.user-agent\n  telemetry: false\n```",
       "properties": {
         "flow_selector": {
           "$ref": "#/definitions/FlowSelector",
@@ -2627,7 +2627,7 @@
       "additionalProperties": false
     },
     "Rule": {
-      "description": "Flow classification rule extracts a value from request metadata.\nMore specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].\nSee https://play.openpolicyagent.org/p/gU7vcLkc70 for an example input.\nThere are two ways to define a flow classification rule:\n* Using a declarative extractor \u2013 suitable from simple cases, such as directly reading a value from header or a field from json body.\n* Rego expression.\n\nPerformance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.\n\nExample of Declarative JSON extractor:\n```yaml\nextractor:\n  json:\n    from: request.http.body\n    pointer: /user/name\n```\n\nExample of Rego module which also disables telemetry visibility of label:\n```yaml\nrego:\n  query: data.user_from_cookie.user\n  source: |\n    package user_from_cookie\n    cookies := split(input.attributes.request.http.headers.cookie, \"; \")\n    user := user {\n        cookie := cookies[_]\n        startswith(cookie, \"session=\")\n        session := substring(cookie, count(\"session=\"), -1)\n        parts := split(session, \".\")\n        object := json.unmarshal(base64url.decode(parts[0]))\n        user := object.user\n    }\ntelemetry: false\n```\n[attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto",
+      "description": "Classification rule extracts a value from request metadata.\nMore specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].\nSee https://play.openpolicyagent.org/p/gU7vcLkc70 for an example input.\nThere are two ways to define a flow classification rule:\n* Using a declarative extractor \u2013 suitable from simple cases, such as directly reading a value from header or a field from json body.\n* Rego expression.\n\nPerformance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.\n\nExample of Declarative JSON extractor:\n```yaml\nextractor:\n  json:\n    from: request.http.body\n    pointer: /user/name\n```\n\nExample of Rego module which also disables telemetry visibility of label:\n```yaml\nrego:\n  query: data.user_from_cookie.user\n  source: |\n    package user_from_cookie\n    cookies := split(input.attributes.request.http.headers.cookie, \"; \")\n    user := user {\n        cookie := cookies[_]\n        startswith(cookie, \"session=\")\n        session := substring(cookie, count(\"session=\"), -1)\n        parts := split(session, \".\")\n        object := json.unmarshal(base64url.decode(parts[0]))\n        user := object.user\n    }\ntelemetry: false\n```\n[attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto",
       "properties": {
         "extractor": {
           "$ref": "#/definitions/Extractor",
@@ -2648,7 +2648,7 @@
           "x-order": 2
         }
       },
-      "title": "Rule describes a single Flow Classification Rule",
+      "title": "Rule describes a single classification Rule",
       "type": "object",
       "additionalProperties": false
     },

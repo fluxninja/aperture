@@ -1,5 +1,5 @@
 ---
-title: Flow Classifier
+title: Classifier
 sidebar_position: 1
 ---
 
@@ -9,7 +9,7 @@ See also [Classifier reference][reference]
 
 :::
 
-The Flow Classifier can be used to create additional [Flow Labels][label] based
+The _Classifier_ can be used to create additional [_Flow Labels_][label] based
 on request metadata without requiring any changes to your service, if the
 existing flow labels are not sufficient.
 
@@ -30,12 +30,12 @@ developers, _Classifiers_ are available only at _HTTP_ control points.
 
 :::
 
-Any Flow Labels created through the Classifier are immediately available for use
-in other components at the same [Control Point][control-point]. Additionally,
-the Flow Label is injected as baggage, so it will be available on every
-subsequent control point too (assuming you have [baggage propagation][baggage]
-configured in your system). If you're a [FluxNinja ARC plugin][plugin] user,
-such flow label will also be available for analytics.
+Any _Flow Labels_ created through the Classifier are immediately available for
+use in other components at the same [Control Point][control-point].
+Additionally, the _Flow Label_ is injected as baggage, so it will be available
+on every subsequent control point too (assuming you have [baggage
+propagation][baggage] configured in your system). If you're a [FluxNinja ARC
+plugin][plugin] user, such flow label will also be available for analytics.
 
 :::note
 
@@ -65,8 +65,8 @@ selector:
     control_point: ingress
 ```
 
-You can be more precise by adding a [label matcher][label-matcher] and e.g. gate
-the classifier to particular paths.
+You can be more precise by adding a [_Label Matcher_][label-matcher] and e.g.
+gate the classifier to particular paths.
 
 ## Live Previewing Requests {#live-previewing-requests}
 

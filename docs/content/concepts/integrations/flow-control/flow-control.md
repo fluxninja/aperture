@@ -1,6 +1,6 @@
 ---
 title: Flow Control
-sidebar_position: 1
+sidebar_position: 0
 keywords:
   - flows
   - tracing
@@ -97,7 +97,7 @@ you need to install integrations that will communicate with the Aperture Agent.
 [cl]: ./components/concurrency-limiter.md
 [rate-limiter]: ./components/rate-limiter.md
 [flux-meter]: ./resources/flux-meter.md
-[classifier]: ./resources/flow-classifier.md
+[classifier]: ./resources/classifier.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
 [istio]: /get-started/integrations/flow-control/envoy/istio.md
 [ext-authz]:

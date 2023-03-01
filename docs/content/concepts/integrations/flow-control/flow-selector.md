@@ -1,7 +1,7 @@
 ---
 title: Flow Selector
 sidebar_label: Flow Selector
-sidebar_position: 1
+sidebar_position: 2
 keywords:
   - flows
   - services
@@ -17,7 +17,7 @@ import Zoom from 'react-medium-image-zoom';
 
 :::info
 
-See also [FlowSelector reference](/reference/policies/spec.md#flow-selector)
+See also [Flow Selector reference](/reference/policies/spec.md#flow-selector)
 
 :::
 
@@ -252,7 +252,7 @@ flow_selector:
 [agent-group]: #agent-group
 [flux-meter]: ./resources/flux-meter.md
 [cl]: ./components/concurrency-limiter.md
-[classifier]: ./resources/flow-classifier.md
+[classifier]: ./resources/classifier.md
 [label-matcher]: /reference/policies/spec.md#label-matcher
 [dc]: components/rate-limiter.md#distributed-counters
 [components]: ./flow-control.md#components
