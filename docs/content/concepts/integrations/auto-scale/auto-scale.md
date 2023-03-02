@@ -8,4 +8,36 @@ keywords:
   - HPA
 ---
 
-# Kubernetes Auto Scaling
+# Auto Scaling
+
+In today's digital age, enterprises must deal with a huge amount of data and
+traffic that comes with the growth of online services. This creates a need for
+auto-scaling, where an application can adjust its resources dynamically based on
+demand. Autoscaling is crucial because it can help to optimize resource usage
+and improve user experience, while also preventing system failures due to
+overload.
+
+In the past, many organizations faced challenges related to scaling their
+applications manually. They had to predict future traffic, provision enough
+resources to handle the peak load, and then manually de-provision those
+resources when the traffic subsided. This approach led to several issues.
+
+![Scaling](./assets/img/auto-scaling.svg) TODO: Replace with a better image
+
+One of the primary issues was over-provisioning of resources. When organizations
+had to predict future traffic, they often ended up provisioning more resources
+than necessary. This led to wastage of resources, which resulted in increased
+costs. Additionally, it took time to provision new resources, which could result
+in service outages during periods of high traffic.
+
+On the other hand, under-provisioning of resources was another major issue. When
+traffic exceeded the capacity of the provisioned resources, services became
+slow, unresponsive, or completely unavailable. This led to poor user experience
+and customer dissatisfaction. Furthermore, this could also result in missed
+revenue opportunities or loss of customers to competitors.
+
+This is where FluxNinja Aperture Auto-scaling comes in where it address these
+issues by automatically adjusting the resources allocated to an application
+using load-based autoscaling. This helps manage load and ensure resources are
+used efficiently while keeping the system stability, costs are in check, and
+customers receive the best possible experience.
