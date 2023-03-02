@@ -3,7 +3,7 @@ title: Signal Processing
 keywords:
   - circuit
   - policy
-sidebar_position: 1
+sidebar_position: 0
 sidebar_label: Signal Processing
 ---
 
