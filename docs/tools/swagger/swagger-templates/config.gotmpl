@@ -199,15 +199,8 @@ Generated File Starts
 {{- range .Operations }}
  {{- $opname := .Name }}
 
-### *{{ .Name }}* {# {{- dasherize .Name -}} }
+### *{{ if slice .Path 1 }}{{ slice .Path 1 }}{{ end }}* {# {{- dasherize .Name -}} }
 {{ if .Summary }}{{ printf "\n" }}{{ trimSpace .Summary }}{{ end }}
-
-
-{{ if slice .Path 1 }}Key: ```{{ slice .Path 1 }}```{{ end }}
-
-{{ if index .Extensions "x-fn-config-env" }}Env-Var Prefix: ```{{ upper (snakize (slice .BasePath 1)) }}_{{ if .Path }}{{ (upper (snakize (slice .Path 1))) }}_{{ end }}```{{ end }}
-
-#### Members
 
 {{- $base := .BasePath }}
 {{- $path := .Path }}
@@ -234,23 +227,32 @@ Generated File Starts
 <dt>{{ .Name }}</dt>
 <dd>{{/* blank lines inside dd are important for correct markdown rendering, don't remove */}}
 
+({{ template "fnSchemaSimple" . }})
 {{ if $env  }} Env-Var Prefix: `{{ upper (snakize (slice $base 1)) }}_{{ if $path }}{{ (upper (snakize (slice $path 1))) }}_{{ end }}{{ if and .Name (ne .Name ".") }}{{ upper (snakize .Name) }}_{{ end }}`{{ end }}
-Type: {{ template "fnSchemaSimple" . }}
 
 </dd>
 {{ end }}
 {{- end }}
 {{- end }}{{/* end .HasBodyParams */}}
 </dl>
+
+---
+
 {{- end }}{{/* end range .Operations */}}
 {{- end }}{{/* end if .Operations */}}
 {{- end }}{{/* end if or .OperationGroups .Operations */}}
 
 ## Objects
+
+---
+
 {{- range .Models }}
 
 ### {{ .Name }} {# {{- dasherize .Name -}} }
 {{ template "fnModel" . }}
+
+---
+
 {{- end }}
 
 <!---

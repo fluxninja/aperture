@@ -9,6 +9,7 @@ const (
 
 // swagger:operation POST /agent_info common-configuration AgentInfo
 // ---
+// x-fn-config-env: true
 // parameters:
 // - in: body
 //   schema:

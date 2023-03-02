@@ -52,363 +52,305 @@ Generated File Starts
 
 ## Reference
 
-### _Client_ {#client}
-
-Key: `client`
-
-Env-Var Prefix: `APERTURE_CONTROLLER_CLIENT_`
-
-#### Members
+### _client_ {#client}
 
 <dl>
 
 <dt>proxy</dt>
 <dd>
 
+([ProxyConfig](#proxy-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_CLIENT_PROXY_`
-Type: [ProxyConfig](#proxy-config)
 
 </dd>
 
 </dl>
 
-### _Etcd_ {#etcd}
+---
 
-Key: `etcd`
-
-Env-Var Prefix: `APERTURE_CONTROLLER_ETCD_`
-
-#### Members
+### _etcd_ {#etcd}
 
 <dl>
 
 <dt></dt>
 <dd>
 
+([EtcdConfig](#etcd-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_ETCD_`
-Type: [EtcdConfig](#etcd-config)
 
 </dd>
 
 </dl>
 
-### _FluxNinjaPlugin_ {#flux-ninja-plugin}
+---
 
-Key: `fluxninja_plugin`
-
-Env-Var Prefix: `APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_`
-
-#### Members
+### _fluxninja_plugin_ {#flux-ninja-plugin}
 
 <dl>
 
 <dt></dt>
 <dd>
 
+([FluxNinjaPluginConfig](#flux-ninja-plugin-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_`
-Type: [FluxNinjaPluginConfig](#flux-ninja-plugin-config)
 
 </dd>
 
 </dl>
 
-### _Liveness_ {#liveness}
+---
 
-Key: `liveness`
-
-Env-Var Prefix: `APERTURE_CONTROLLER_LIVENESS_`
-
-#### Members
+### _liveness_ {#liveness}
 
 <dl>
 
 <dt>scheduler</dt>
 <dd>
 
+([JobGroupConfig](#job-group-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_LIVENESS_SCHEDULER_`
-Type: [JobGroupConfig](#job-group-config)
 
 </dd>
 
 <dt>service</dt>
 <dd>
 
+([JobConfig](#job-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_LIVENESS_SERVICE_`
-Type: [JobConfig](#job-config)
 
 </dd>
 
 </dl>
 
-### _Log_ {#log}
+---
 
-Key: `log`
+### _log_ {#log}
 
+<dl>
+
+<dt></dt>
+<dd>
+
+([LogConfig](#log-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_LOG_`
 
-#### Members
+</dd>
+
+</dl>
+
+---
+
+### _metrics_ {#metrics}
 
 <dl>
 
 <dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_CONTROLLER_LOG_`
-Type: [LogConfig](#log-config)
-
-</dd>
-
-</dl>
-
-### _Metrics_ {#metrics}
-
-Key: `metrics`
-
+([MetricsConfig](#metrics-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_METRICS_`
 
-#### Members
+</dd>
+
+</dl>
+
+---
+
+### _otel_ {#o-t-e-l}
 
 <dl>
 
 <dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_CONTROLLER_METRICS_`
-Type: [MetricsConfig](#metrics-config)
-
-</dd>
-
-</dl>
-
-### _OTEL_ {#o-t-e-l}
-
-Key: `otel`
-
+([ControllerOTELConfig](#controller-o-t-e-l-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_`
 
-#### Members
+</dd>
+
+</dl>
+
+---
+
+### _plugins_ {#plugins}
 
 <dl>
 
 <dt></dt>
 <dd>
 
-Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_`
-Type: [ControllerOTELConfig](#controller-o-t-e-l-config)
+([PluginsConfig](#plugins-config))
+Env-Var Prefix: `APERTURE_CONTROLLER_PLUGINS_`
 
 </dd>
 
 </dl>
 
-### _Plugins_ {#plugins}
+---
 
-Key: `plugins`
-
-Env-Var Prefix: `APERTURE_CONTROLLER_PLUGINS_`
-
-#### Members
-
-<dl>
-
-<dt></dt>
-<dd>
-
-Env-Var Prefix: `APERTURE_CONTROLLER_PLUGINS_`
-Type: [PluginsConfig](#plugins-config)
-
-</dd>
-
-</dl>
-
-### _PoliciesConfig_ {#policies-config}
-
-Key: `policies`
-
-Env-Var Prefix: `APERTURE_CONTROLLER_POLICIES_`
-
-#### Members
+### _policies_ {#policies-config}
 
 <dl>
 
 <dt>promql_jobs_scheduler</dt>
 <dd>
 
+([JobGroupConfig](#job-group-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_POLICIES_PROMQL_JOBS_SCHEDULER_`
-Type: [JobGroupConfig](#job-group-config)
 
 </dd>
 
 </dl>
 
-### _Profilers_ {#profilers}
+---
 
-Key: `profilers`
-
-Env-Var Prefix: `APERTURE_CONTROLLER_PROFILERS_`
-
-#### Members
+### _profilers_ {#profilers}
 
 <dl>
 
 <dt></dt>
 <dd>
 
+([ProfilersConfig](#profilers-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_PROFILERS_`
-Type: [ProfilersConfig](#profilers-config)
 
 </dd>
 
 </dl>
 
-### _Prometheus_ {#prometheus}
+---
 
-Key: `prometheus`
-
-Env-Var Prefix: `APERTURE_CONTROLLER_PROMETHEUS_`
-
-#### Members
+### _prometheus_ {#prometheus}
 
 <dl>
 
 <dt></dt>
 <dd>
 
+([PrometheusConfig](#prometheus-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_PROMETHEUS_`
-Type: [PrometheusConfig](#prometheus-config)
 
 </dd>
 
 <dt>http_client</dt>
 <dd>
 
+([HTTPClientConfig](#http-client-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_PROMETHEUS_HTTP_CLIENT_`
-Type: [HTTPClientConfig](#http-client-config)
 
 </dd>
 
 </dl>
 
-### _Readiness_ {#readiness}
+---
 
-Key: `readiness`
-
-Env-Var Prefix: `APERTURE_CONTROLLER_READINESS_`
-
-#### Members
+### _readiness_ {#readiness}
 
 <dl>
 
 <dt>scheduler</dt>
 <dd>
 
+([JobGroupConfig](#job-group-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_READINESS_SCHEDULER_`
-Type: [JobGroupConfig](#job-group-config)
 
 </dd>
 
 <dt>service</dt>
 <dd>
 
+([JobConfig](#job-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_READINESS_SERVICE_`
-Type: [JobConfig](#job-config)
 
 </dd>
 
 </dl>
 
-### _SentryPlugin_ {#sentry-plugin}
+---
 
-Key: `sentry_plugin`
-
-Env-Var Prefix: `APERTURE_CONTROLLER_SENTRY_PLUGIN_`
-
-#### Members
+### _sentry_plugin_ {#sentry-plugin}
 
 <dl>
 
 <dt>sentry</dt>
 <dd>
 
+([SentryConfig](#sentry-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_SENTRY_PLUGIN_SENTRY_`
-Type: [SentryConfig](#sentry-config)
 
 </dd>
 
 </dl>
 
-### _Server_ {#server}
+---
 
-Key: `server`
-
-Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_`
-
-#### Members
+### _server_ {#server}
 
 <dl>
 
 <dt>grpc</dt>
 <dd>
 
+([GRPCServerConfig](#g-rpc-server-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_GRPC_`
-Type: [GRPCServerConfig](#g-rpc-server-config)
 
 </dd>
 
 <dt>grpc_gateway</dt>
 <dd>
 
+([GRPCGatewayConfig](#g-rpc-gateway-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_GRPC_GATEWAY_`
-Type: [GRPCGatewayConfig](#g-rpc-gateway-config)
 
 </dd>
 
 <dt>http</dt>
 <dd>
 
+([HTTPServerConfig](#http-server-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_HTTP_`
-Type: [HTTPServerConfig](#http-server-config)
 
 </dd>
 
 <dt>listener</dt>
 <dd>
 
+([ListenerConfig](#listener-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_LISTENER_`
-Type: [ListenerConfig](#listener-config)
 
 </dd>
 
 <dt>tls</dt>
 <dd>
 
+([ServerTLSConfig](#server-tls-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_TLS_`
-Type: [ServerTLSConfig](#server-tls-config)
 
 </dd>
 
 </dl>
 
-### _Watchdog_ {#watchdog}
+---
 
-Key: `watchdog`
-
-Env-Var Prefix: `APERTURE_CONTROLLER_WATCHDOG_`
-
-#### Members
+### _watchdog_ {#watchdog}
 
 <dl>
 
 <dt>memory</dt>
 <dd>
 
+([WatchdogConfig](#watchdog-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_WATCHDOG_MEMORY_`
-Type: [WatchdogConfig](#watchdog-config)
 
 </dd>
 
 </dl>
 
+---
+
 ## Objects
+
+---
 
 ### AdaptivePolicy {#adaptive-policy}
 
@@ -428,6 +370,8 @@ AdaptivePolicy creates a policy that forces GC when the usage surpasses the conf
 
 </dd>
 </dl>
+
+---
 
 ### BackoffConfig {#backoff-config}
 
@@ -460,6 +404,8 @@ BackoffConfig holds configuration for GRPC Client Backoff.
 </dd>
 </dl>
 
+---
+
 ### BatchAlertsConfig {#batch-alerts-config}
 
 BatchAlertsConfig defines configuration for OTEL batch processor.
@@ -486,6 +432,8 @@ into smaller units.
 </dd>
 </dl>
 
+---
+
 ### ClientConfig {#client-config}
 
 ClientConfig is the client configuration.
@@ -504,6 +452,8 @@ ClientConfig is the client configuration.
 
 </dd>
 </dl>
+
+---
 
 ### ClientTLSConfig {#client-tls-config}
 
@@ -542,6 +492,8 @@ ClientTLSConfig is the config for client TLS.
 </dd>
 </dl>
 
+---
+
 ### ControllerOTELConfig {#controller-o-t-e-l-config}
 
 ControllerOTELConfig is the configuration for Agent's OTEL collector.
@@ -560,6 +512,8 @@ ControllerOTELConfig is the configuration for Agent's OTEL collector.
 
 </dd>
 </dl>
+
+---
 
 ### EtcdConfig {#etcd-config}
 
@@ -598,6 +552,8 @@ EtcdConfig holds configuration for etcd client.
 </dd>
 </dl>
 
+---
+
 ### FluxNinjaPluginConfig {#flux-ninja-plugin-config}
 
 FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
@@ -628,6 +584,8 @@ FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
 
 </dd>
 </dl>
+
+---
 
 ### GRPCClientConfig {#g-rpc-client-config}
 
@@ -666,6 +624,8 @@ GRPCClientConfig holds configuration for GRPC Client.
 </dd>
 </dl>
 
+---
+
 ### GRPCGatewayConfig {#g-rpc-gateway-config}
 
 GRPCGatewayConfig holds configuration for grpc-http gateway
@@ -678,6 +638,8 @@ GRPCGatewayConfig holds configuration for grpc-http gateway
 
 </dd>
 </dl>
+
+---
 
 ### GRPCServerConfig {#g-rpc-server-config}
 
@@ -703,6 +665,8 @@ GRPCServerConfig holds configuration for GRPC Server.
 
 </dd>
 </dl>
+
+---
 
 ### HTTPClientConfig {#http-client-config}
 
@@ -825,6 +789,8 @@ HTTPClientConfig holds configuration for HTTP Client.
 </dd>
 </dl>
 
+---
+
 ### HTTPServerConfig {#http-server-config}
 
 HTTPServerConfig holds configuration for HTTP Server.
@@ -874,6 +840,8 @@ HTTPServerConfig holds configuration for HTTP Server.
 </dd>
 </dl>
 
+---
+
 ### Header {#header}
 
 A Header represents the key-value pairs in an HTTP header.
@@ -882,6 +850,8 @@ The keys should be in canonical form, as returned by
 CanonicalHeaderKey.
 
 [Header](#header)
+
+---
 
 ### HeapConfig {#heap-config}
 
@@ -914,6 +884,8 @@ HeapConfig holds configuration for heap Watchdog.
 </dd>
 </dl>
 
+---
+
 ### JobConfig {#job-config}
 
 JobConfig is config for Job
@@ -938,6 +910,8 @@ JobConfig is config for Job
 
 </dd>
 </dl>
+
+---
 
 ### JobGroupConfig {#job-group-config}
 
@@ -964,6 +938,8 @@ is ignored.
 </dd>
 </dl>
 
+---
+
 ### ListenerConfig {#listener-config}
 
 ListenerConfig holds configuration for socket listeners.
@@ -988,6 +964,8 @@ ListenerConfig holds configuration for socket listeners.
 
 </dd>
 </dl>
+
+---
 
 ### LogConfig {#log-config}
 
@@ -1019,6 +997,8 @@ LogConfig holds configuration for a logger and log writers.
 
 </dd>
 </dl>
+
+---
 
 ### LogWriterConfig {#log-writer-config}
 
@@ -1057,6 +1037,8 @@ LogWriterConfig holds configuration for a log writer.
 </dd>
 </dl>
 
+---
+
 ### MetricsConfig {#metrics-config}
 
 MetricsConfig holds configuration for service metrics.
@@ -1081,6 +1063,8 @@ MetricsConfig holds configuration for service metrics.
 
 </dd>
 </dl>
+
+---
 
 ### PluginsConfig {#plugins-config}
 
@@ -1113,6 +1097,8 @@ PluginsConfig holds configuration for plugins.
 </dd>
 </dl>
 
+---
+
 ### PortsConfig {#ports-config}
 
 PortsConfig defines configuration for OTEL debug and extension ports.
@@ -1144,6 +1130,8 @@ PortsConfig defines configuration for OTEL debug and extension ports.
 </dd>
 </dl>
 
+---
+
 ### ProfilersConfig {#profilers-config}
 
 ProfilersConfig holds configuration for profilers.
@@ -1169,6 +1157,8 @@ ProfilersConfig holds configuration for profilers.
 </dd>
 </dl>
 
+---
+
 ### PrometheusConfig {#prometheus-config}
 
 PrometheusConfig holds configuration for Prometheus Server.
@@ -1181,6 +1171,8 @@ PrometheusConfig holds configuration for Prometheus Server.
 
 </dd>
 </dl>
+
+---
 
 ### ProxyConfig {#proxy-config}
 
@@ -1208,6 +1200,8 @@ This configuration has preference over environment variables HTTP_PROXY, HTTPS_P
 
 </dd>
 </dl>
+
+---
 
 ### SentryConfig {#sentry-config}
 
@@ -1260,6 +1254,8 @@ oss-aperture project dsn is set as default.
 </dd>
 </dl>
 
+---
+
 ### ServerTLSConfig {#server-tls-config}
 
 ServerTLSConfig holds configuration for setting up server TLS support.
@@ -1297,6 +1293,8 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 </dd>
 </dl>
 
+---
+
 ### WatchdogConfig {#watchdog-config}
 
 WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
@@ -1328,6 +1326,8 @@ WatchdogConfig holds configuration for Watchdog Policy. For each policy, either 
 </dd>
 </dl>
 
+---
+
 ### WatchdogPolicyType {#watchdog-policy-type}
 
 WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
@@ -1347,6 +1347,8 @@ WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algor
 </dd>
 </dl>
 
+---
+
 ### WatermarksPolicy {#watermarks-policy}
 
 WatermarksPolicy creates a Watchdog policy that schedules GC at concrete watermarks.
@@ -1365,6 +1367,8 @@ WatermarksPolicy creates a Watchdog policy that schedules GC at concrete waterma
 
 </dd>
 </dl>
+
+---
 
 <!---
 Generated File Ends
