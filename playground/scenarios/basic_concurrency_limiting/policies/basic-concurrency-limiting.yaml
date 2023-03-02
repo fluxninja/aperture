@@ -1,0 +1,17 @@
+common:
+  policy_name: "basic-concurrency-limiting"
+policy:
+  flux_meter:
+    flow_selector:
+      service_selector:
+        agent_group: default
+        service: service1-demo-app.demoapp.svc.cluster.local
+      flow_matcher:
+        control_point: ingress
+  concurrency_controller:
+    flow_selector:
+      service_selector:
+        agent_group: default
+        service: service1-demo-app.demoapp.svc.cluster.local
+      flow_matcher:
+        control_point: ingress
