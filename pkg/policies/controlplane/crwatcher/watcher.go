@@ -8,26 +8,25 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cenkalti/backoff"
-	"github.com/fluxninja/aperture/operator/api"
-	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/cenkalti/backoff/v4"
 	"github.com/hashicorp/go-multierror"
-	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-	ctrl "sigs.k8s.io/controller-runtime"
-
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/record"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
+	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
+	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
 // watcher holds the state of the watcher.
