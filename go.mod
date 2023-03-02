@@ -22,7 +22,7 @@ require (
 	github.com/getsentry/sentry-go v0.18.0
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/go-git/go-git/v5 v5.6.0
-	github.com/go-logr/zerologr v1.2.2
+	github.com/go-logr/zerologr v1.2.3
 	github.com/go-openapi/runtime v0.25.0
 	github.com/go-openapi/strfmt v0.21.3
 	github.com/go-playground/validator/v10 v10.11.2
