@@ -130,19 +130,19 @@ func InvokeServiceDiscovery(in FxInSvc) error {
 		return nil
 	}
 	entityEvents := in.EntityTrackers.RegisterServiceDiscovery(podTrackerPrefix)
-	ksd, err := newServiceDiscovery(entityEvents, cfg.NodeName, in.KubernetesClient)
+	ksd, err := newServiceDiscovery(entityEvents, in.KubernetesClient)
 	if err != nil {
 		log.Info().Err(err).Msg("Failed to create Kubernetes service discovery")
 		return err
 	}
 
 	in.Lifecycle.Append(fx.Hook{
-		OnStart: func(_ context.Context) error {
-			ksd.start()
+		OnStart: func(ctx context.Context) error {
+			ksd.start(ctx)
 			return nil
 		},
-		OnStop: func(_ context.Context) error {
-			ksd.stop()
+		OnStop: func(ctx context.Context) error {
+			ksd.stop(ctx)
 			return nil
 		},
 	})
