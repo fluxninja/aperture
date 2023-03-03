@@ -39,8 +39,7 @@ revenue opportunities or loss of customers to competitors.
 This is where FluxNinja Aperture Auto-scaling comes in where it address these
 issues by automatically adjusting the resources allocated to an application
 using load-based autoscaling. This helps manage load and ensure resources are
-used efficiently while keeping the system stability, costs are in check, and
-customers receive the best possible experience.
+used efficiently while keeping the system stability is in check.
 
 # Kubernetes Control Points
 
@@ -50,18 +49,11 @@ allocation of computing resources for containerized applications.
 
 Some of Kubernetes Control Points include:
 
-- Deployments: A Kubernetes deployment is a resource that manages a set of
-  identical pods.
-- ReplicaSets: A ReplicaSet is a Kubernetes resource that manages the deployment
-  of a set of identical pods.
-- StatefulSets: A StatefulSet is a Kubernetes resource that manages the
-  deployment of a set of identical pods with unique identities. They are
-  commonly used for stateful applications that require stable, unique network
-  identities and persistent storage.
+- Deployments
+- ReplicaSets
+- StatefulSets
 
 ## Kubernetes Resource Discovery
 
 Aperture has a discover mechanism to discover all the Kubernetes resources that
-are scalable as Kubernetes Control points. Kubernetes Control points are grouped
-via kind of resource. For example, all the deployments are grouped together and
-all the replica sets are grouped together.
+are scalable as Kubernetes Control points.
