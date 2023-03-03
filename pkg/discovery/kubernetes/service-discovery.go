@@ -109,9 +109,7 @@ func (kd *serviceDiscovery) handleEndpointsAdd(obj interface{}) {
 func (kd *serviceDiscovery) handleEndpointsUpdate(oldObj, newObj interface{}) {
 	oldEndpoints := oldObj.(*v1.Endpoints)
 	newEndpoints := newObj.(*v1.Endpoints)
-	if oldEndpoints.ResourceVersion == newEndpoints.ResourceVersion {
-		return
-	}
+
 	// make a deep copy of oldEndpoints
 	toRemove := oldEndpoints.DeepCopy()
 	// from this copy remove addresses that are present in newEndpoints
