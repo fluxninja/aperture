@@ -1503,6 +1503,7 @@ paths:
                     $ref: '#/definitions/AgentInfoConfig'
             tags:
                 - common-configuration
+            x-fn-config-env: true
     /client:
         post:
             operationId: Client
@@ -1610,6 +1611,7 @@ paths:
                     $ref: '#/definitions/PeerDiscoveryConfig'
             tags:
                 - common-configuration
+            x-fn-config-env: true
     /plugins:
         post:
             operationId: Plugins

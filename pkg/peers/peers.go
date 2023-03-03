@@ -31,6 +31,7 @@ import (
 const (
 	// swagger:operation POST /peer_discovery common-configuration PeerDiscovery
 	// ---
+	// x-fn-config-env: true
 	// parameters:
 	// - in: body
 	//   schema:
