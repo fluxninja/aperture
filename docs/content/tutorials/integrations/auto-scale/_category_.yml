@@ -1,0 +1,8 @@
+label: Auto Scale
+position: 1
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Auto Scale"
+  keywords: ["tutorial"]
