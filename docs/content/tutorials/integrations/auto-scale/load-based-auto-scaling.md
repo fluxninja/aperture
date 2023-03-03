@@ -34,7 +34,8 @@ providing a more accurate and nuanced approach to scaling. This is essential for
 applications where performance is critical, such as e-commerce or financial
 applications.
 
-Let's see how to use Aperture AutoScaler to auto-scale a Kubernetes application.
+In this tutorial, we will see how to use Aperture's Auto Scale component to do a
+load-based autoscaling for a Kubernetes deployment.
 
 ## Policy
 
