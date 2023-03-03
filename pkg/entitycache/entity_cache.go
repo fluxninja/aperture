@@ -156,11 +156,6 @@ func (c *EntityCache) GetByIP(entityIP string) (*entitycachev1.Entity, error) {
 
 	v, ok := c.entities.EntitiesByIpAddress.Entities[entityIP]
 	if !ok {
-		for _, entity := range c.entities.EntitiesByIpAddress.Entities {
-			if entity.Labels["cluster_ip"] == entityIP {
-				return entity.DeepCopy(), nil
-			}
-		}
 		return nil, errNotFound
 	}
 

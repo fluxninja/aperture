@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -19,6 +20,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/utils"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const podTrackerPrefix = "kubernetes_pod"
@@ -104,6 +106,9 @@ func (kd *serviceDiscovery) stop() {
 func (kd *serviceDiscovery) handleEndpointsAdd(obj interface{}) {
 	endpoints := obj.(*v1.Endpoints)
 	kd.updateEndpoints(endpoints)
+	kd.serviceStream.Go(func() stream.Callback {
+		return kd.addClusterIPs(endpoints.Namespace, endpoints.Name)
+	})
 }
 
 func (kd *serviceDiscovery) handleEndpointsUpdate(oldObj, newObj interface{}) {
@@ -131,6 +136,9 @@ func (kd *serviceDiscovery) handleEndpointsUpdate(oldObj, newObj interface{}) {
 func (kd *serviceDiscovery) handleEndpointsDelete(obj interface{}) {
 	endpoints := obj.(*v1.Endpoints)
 	kd.removeEndpoints(endpoints)
+	kd.serviceStream.Go(func() stream.Callback {
+		return kd.removeClusterIPs(endpoints.Namespace, endpoints.Name)
+	})
 }
 
 func (kd *serviceDiscovery) getEntityFromTracker(uid string) *entitycachev1.Entity {
@@ -148,10 +156,7 @@ func (kd *serviceDiscovery) getEntityFromTracker(uid string) *entitycachev1.Enti
 }
 
 // getService return the full qualified domain name of a given service.
-func (kd *serviceDiscovery) getService(endpoints *v1.Endpoints) string {
-	name := endpoints.Name
-	namespace := endpoints.Namespace
-
+func (kd *serviceDiscovery) getService(namespace, name string) string {
 	service := fmt.Sprintf("%s.%s.svc.%s", name, namespace, kd.clusterDomain)
 	return service
 }
@@ -161,7 +166,7 @@ func (kd *serviceDiscovery) removeEndpoints(endpoints *v1.Endpoints) {
 		for _, address := range subset.Addresses {
 			entity := kd.getEntityFromTracker(string(address.TargetRef.UID))
 			if entity != nil {
-				entity.Services = utils.RemoveFromSlice(entity.Services, kd.getService(endpoints))
+				entity.Services = utils.RemoveFromSlice(entity.Services, kd.getService(endpoints.Namespace, endpoints.Name))
 				if kd.shouldRemove(entity) {
 					kd.entityEvents.RemoveEvent(notifiers.Key(address.TargetRef.UID))
 				} else {
@@ -213,46 +218,14 @@ func (kd *serviceDiscovery) shouldRemove(entity *entitycachev1.Entity) bool {
 }
 
 func (kd *serviceDiscovery) updateEndpoints(endpoints *v1.Endpoints) {
-	service := kd.getService(endpoints)
 	pods := kd.getServicePods(endpoints)
-
-	kd.serviceStream.Go(func() stream.Callback {
-		return kd.fetchService(endpoints, pods, service)
-	})
-}
-
-func (kd *serviceDiscovery) fetchService(endpoints *v1.Endpoints, pods []podServiceUpdate, service string) stream.Callback {
-	// clusterIP := ""
-	// op := func() error {
-	// 	svc, err := kd.cli.CoreV1().Services(endpoints.Namespace).Get(kd.ctx, endpoints.Name, metav1.GetOptions{})
-	// 	if kd.ctx.Err() != nil {
-	// 		return backoff.Permanent(kd.ctx.Err())
-	// 	}
-	// 	if err != nil {
-	// 		log.Trace().Err(err).Str("namespace", endpoints.Namespace).Str("name", endpoints.Name).Msg("Could not fetch service")
-	// 		return nil
-	// 	}
-	// 	if svc.Spec.Type != v1.ServiceTypeClusterIP {
-	// 		return nil
-	// 	}
-	// 	clusterIP = svc.Spec.ClusterIP
-	// 	return nil
-	// }
-	// err := backoff.Retry(op, backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 3))
-	// if err != nil {
-	// 	log.Error().Err(err).Str("namespace", endpoints.Namespace).Str("name", endpoints.Name).Msg("Context canceled while fetching service")
-	// 	return func() {}
-	// }
-
-	return func() {
-		for _, pod := range pods {
-			p := pod
-			err := kd.updatePodService(p)
-			if err != nil {
-				log.Error().Err(err).Msg("Tracker could not be updated")
-			}
-
+	for _, pod := range pods {
+		p := pod
+		err := kd.updatePodService(p)
+		if err != nil {
+			log.Error().Err(err).Msg("Tracker could not be updated")
 		}
+
 	}
 }
 
@@ -273,7 +246,7 @@ func (kd *serviceDiscovery) getServicePods(endpoints *v1.Endpoints) []podService
 				Namespace: address.TargetRef.Namespace,
 				UID:       string(address.TargetRef.UID),
 				IPAddress: address.IP,
-				Service:   kd.getService(endpoints),
+				Service:   kd.getService(endpoints.Namespace, endpoints.Name),
 			}
 			if address.NodeName != nil {
 				p.NodeName = *address.NodeName
@@ -283,4 +256,68 @@ func (kd *serviceDiscovery) getServicePods(endpoints *v1.Endpoints) []podService
 	}
 
 	return pods
+}
+
+func (kd *serviceDiscovery) addClusterIPs(namespace, name string) stream.Callback {
+	clusterIPs, err := kd.fetchServiceSpec(namespace, name)
+	if err != nil {
+		log.Error().Err(err).Msg("Could not fetch service spec")
+		return func() {}
+	}
+
+	return func() {
+		for _, clusterIP := range clusterIPs {
+			p := podServiceUpdate{
+				Name:      strings.Join([]string{"ClusterIP", namespace, name, clusterIP}, "-"),
+				Namespace: namespace,
+				UID:       clusterIP,
+				IPAddress: clusterIP,
+				Service:   kd.getService(namespace, name),
+			}
+			err := kd.updatePodService(p)
+			if err != nil {
+				log.Error().Err(err).Msg("Tracker could not be updated")
+				continue
+			}
+		}
+	}
+}
+
+func (kd *serviceDiscovery) removeClusterIPs(namespace, name string) stream.Callback {
+	clusterIPs, err := kd.fetchServiceSpec(namespace, name)
+	if err != nil {
+		log.Error().Err(err).Msg("Could not fetch service spec")
+		return func() {}
+	}
+	return func() {
+		for _, clusterIP := range clusterIPs {
+			kd.entityEvents.RemoveEvent(notifiers.Key(clusterIP))
+		}
+	}
+}
+
+func (kd *serviceDiscovery) fetchServiceSpec(namespace, name string) ([]string, error) {
+	var clusterIPs []string
+	op := func() error {
+		svc, err := kd.cli.CoreV1().Services(namespace).Get(kd.ctx, name, metav1.GetOptions{})
+		if kd.ctx.Err() != nil {
+			return backoff.Permanent(kd.ctx.Err())
+		}
+		if err != nil {
+			return nil
+		}
+		if svc.Spec.Type != v1.ServiceTypeClusterIP {
+			return nil
+		}
+		clusterIPs = svc.Spec.ClusterIPs
+		// remove None from the list
+		clusterIPs = utils.RemoveFromSlice(clusterIPs, "None")
+		return nil
+	}
+	err := backoff.Retry(op, backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 3))
+	if err != nil {
+		log.Error().Err(err).Str("namespace", namespace).Str("name", name).Msg("Context canceled while fetching service")
+		return nil, err
+	}
+	return clusterIPs, nil
 }
