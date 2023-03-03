@@ -1155,6 +1155,10 @@ definitions:
                 type: object
             name:
                 type: string
+            namespace:
+                type: string
+            node_name:
+                type: string
             prefix:
                 type: string
             services:

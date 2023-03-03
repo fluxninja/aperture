@@ -34,6 +34,20 @@ func (m *MockEventWriter) EXPECT() *MockEventWriterMockRecorder {
 	return m.recorder
 }
 
+// GetCurrentValue mocks base method.
+func (m *MockEventWriter) GetCurrentValue(key notifiers.Key) []byte {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCurrentValue", key)
+	ret0, _ := ret[0].([]byte)
+	return ret0
+}
+
+// GetCurrentValue indicates an expected call of GetCurrentValue.
+func (mr *MockEventWriterMockRecorder) GetCurrentValue(key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentValue", reflect.TypeOf((*MockEventWriter)(nil).GetCurrentValue), key)
+}
+
 // Purge mocks base method.
 func (m *MockEventWriter) Purge(prefix string) {
 	m.ctrl.T.Helper()
