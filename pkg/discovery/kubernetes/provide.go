@@ -137,12 +137,12 @@ func InvokeServiceDiscovery(in FxInSvc) error {
 	}
 
 	in.Lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
-			ksd.start(ctx)
+		OnStart: func(_ context.Context) error {
+			ksd.start()
 			return nil
 		},
-		OnStop: func(ctx context.Context) error {
-			ksd.stop(ctx)
+		OnStop: func(_ context.Context) error {
+			ksd.stop()
 			return nil
 		},
 	})

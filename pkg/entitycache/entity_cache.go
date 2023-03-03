@@ -139,13 +139,6 @@ func (c *EntityCache) Put(entity *entitycachev1.Entity) {
 		c.entities.EntitiesByIpAddress.Entities[entityIP] = entity
 	}
 
-	entityClusterIP := entity.ClusterIp
-	if entityClusterIP != "" {
-		if entityClusterIP != "None" {
-			c.entities.EntitiesByIpAddress.Entities[entityClusterIP] = entity
-		}
-	}
-
 	entityName := entity.Name
 	if entityName != "" {
 		c.entities.EntitiesByName.Entities[entityName] = entity
@@ -163,8 +156,14 @@ func (c *EntityCache) GetByIP(entityIP string) (*entitycachev1.Entity, error) {
 
 	v, ok := c.entities.EntitiesByIpAddress.Entities[entityIP]
 	if !ok {
+		for _, entity := range c.entities.EntitiesByIpAddress.Entities {
+			if entity.Labels["cluster_ip"] == entityIP {
+				return entity.DeepCopy(), nil
+			}
+		}
 		return nil, errNotFound
 	}
+
 	return v.DeepCopy(), nil
 }
 
@@ -213,11 +212,7 @@ func (c *EntityCache) Remove(entity *entitycachev1.Entity) bool {
 	if okByIP {
 		delete(c.entities.EntitiesByIpAddress.Entities, entityIP)
 	}
-	entityClusterIP := entity.ClusterIp
-	_, ok := c.entities.EntitiesByIpAddress.Entities[entityClusterIP]
-	if ok {
-		delete(c.entities.EntitiesByIpAddress.Entities, entityClusterIP)
-	}
+
 	entityName := entity.Name
 	_, okByName := c.entities.EntitiesByName.Entities[entityName]
 	if okByName {
