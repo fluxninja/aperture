@@ -130,13 +130,13 @@ type EventWriter interface {
 	WriteEvent(key Key, value []byte)
 	RemoveEvent(key Key)
 	Purge(prefix string)
+	GetCurrentValue(key Key) []byte
 }
 
 // Trackers is the interface of a tracker collection.
 type Trackers interface {
 	Watcher
 	EventWriter
-	GetCurrentValue(key Key) []byte
 }
 
 // DefaultTrackers is a collection of key trackers.
@@ -447,8 +447,8 @@ func NewPrefixedEventWriter(prefix string, ew EventWriter) EventWriter {
 }
 
 type prefixedEventWriter struct {
-	prefix string
 	parent EventWriter
+	prefix string
 }
 
 // WriteEvent implements EventWriter interface.
@@ -464,4 +464,9 @@ func (ew *prefixedEventWriter) RemoveEvent(key Key) {
 // Purge implements EventWriter interface.
 func (ew *prefixedEventWriter) Purge(prefix string) {
 	ew.parent.Purge(ew.prefix + prefix)
+}
+
+// GetCurrentValue implements EventWriter interface.
+func (ew *prefixedEventWriter) GetCurrentValue(key Key) []byte {
+	return ew.parent.GetCurrentValue(Key(ew.prefix + string(key)))
 }

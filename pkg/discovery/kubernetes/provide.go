@@ -130,7 +130,7 @@ func InvokeServiceDiscovery(in FxInSvc) error {
 		return nil
 	}
 	entityEvents := in.EntityTrackers.RegisterServiceDiscovery(podTrackerPrefix)
-	ksd, err := newServiceDiscovery(entityEvents, cfg.NodeName, in.KubernetesClient)
+	ksd, err := newServiceDiscovery(entityEvents, in.KubernetesClient)
 	if err != nil {
 		log.Info().Err(err).Msg("Failed to create Kubernetes service discovery")
 		return err
