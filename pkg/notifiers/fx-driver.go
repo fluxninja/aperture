@@ -152,7 +152,7 @@ var _ PrefixNotifier = (*FxDriver)(nil)
 
 // GetKeyNotifier returns a KeyNotifier that will notify the driver of key changes.
 func (fxDriver *FxDriver) GetKeyNotifier(key Key) (KeyNotifier, error) {
-	unmarshalKeyNotifier, err := fxDriver.UnmarshalPrefixNotifier.GetUnmarshalKeyNotifier(key)
+	unmarshalKeyNotifier, err := fxDriver.GetUnmarshalKeyNotifier(key)
 	if err != nil {
 		return nil, err
 	}

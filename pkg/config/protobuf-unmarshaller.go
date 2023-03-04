@@ -45,8 +45,8 @@ func (u *ProtobufUnmarshaller) Reload(bytes []byte) error {
 
 // Marshal the config into bytes.
 func (u *ProtobufUnmarshaller) Marshal() ([]byte, error) {
-	bytes, ok := u.bytes.Load().([]byte)
-	if !ok {
+	bytes, err := u.bytes.Load().([]byte)
+	if !err {
 		return nil, errors.New("attempt to marshal nil bytes")
 	}
 	return bytes, nil
