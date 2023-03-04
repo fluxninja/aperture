@@ -7,7 +7,8 @@ import (
 
 	"go.uber.org/fx"
 
-	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/entitycache/v1"
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/entitycache/v1"
+	entitycacheservice "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/entitycache/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
@@ -19,7 +20,7 @@ func Module() fx.Option {
 	return fx.Options(
 		notifiers.TrackersConstructor{Name: "entity_trackers_private"}.Annotate(),
 		fx.Provide(provideEntityCache),
-		grpcgateway.RegisterHandler{Handler: entitycachev1.RegisterEntityCacheServiceHandlerFromEndpoint}.Annotate(),
+		grpcgateway.RegisterHandler{Handler: entitycacheservice.RegisterEntityCacheServiceHandlerFromEndpoint}.Annotate(),
 		fx.Invoke(RegisterEntityCacheService),
 	)
 }

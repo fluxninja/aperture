@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package aperture.flowcontrol.entitycache.v1;
 
+import "aperture/entitycache/v1/entitycache.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -12,19 +13,19 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 // EntityCacheService is used to query EntityCache.
 service EntityCacheService {
-  rpc GetEntityCache(google.protobuf.Empty) returns (EntityCache) {
+  rpc GetEntityCache(google.protobuf.Empty) returns (aperture.entitycache.v1.EntityCache) {
     option (google.api.http) = {get: "/v1/flowcontrol/entities"};
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["aperture-agent"];
     };
   }
-  rpc GetEntityByIPAddress(GetEntityByIPAddressRequest) returns (Entity) {
+  rpc GetEntityByIPAddress(GetEntityByIPAddressRequest) returns (aperture.entitycache.v1.Entity) {
     option (google.api.http) = {get: "/v1/flowcontrol/entities/ip-address/{ip_address}"};
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["aperture-agent"];
     };
   }
-  rpc GetEntityByName(GetEntityByNameRequest) returns (Entity) {
+  rpc GetEntityByName(GetEntityByNameRequest) returns (aperture.entitycache.v1.Entity) {
     option (google.api.http) = {get: "/v1/flowcontrol/entities/name/{name}"};
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["aperture-agent"];
@@ -38,31 +39,4 @@ message GetEntityByIPAddressRequest {
 
 message GetEntityByNameRequest {
   string name = 1;
-}
-
-//
-// Data models
-//
-
-// EntityCache contains both mappings of ip address to entity and entity name to entity.
-message EntityCache {
-  // Entities defines mapping of entities.
-  message Entities {
-    map<string, Entity> entities = 1;
-  }
-
-  Entities entities_by_ip_address = 1;
-  Entities entities_by_name = 2;
-}
-
-// Entity represents a pod, vm, etc.
-message Entity {
-  string prefix = 1;
-  string uid = 2;
-  string ip_address = 3;
-  string name = 4;
-  string namespace = 5;
-  string node_name = 6;
-  repeated string services = 7;
-  map<string, string> labels = 8;
 }

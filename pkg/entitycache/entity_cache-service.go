@@ -6,12 +6,13 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/entitycache/v1"
+	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/entitycache/v1"
+	entitycacheservice "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/entitycache/v1"
 )
 
 // EntityCacheService is the implementation of entitycachev1.EntityCacheService interface.
 type EntityCacheService struct {
-	entitycachev1.UnimplementedEntityCacheServiceServer
+	entitycacheservice.UnimplementedEntityCacheServiceServer
 	entityCache *EntityCache
 }
 
@@ -20,7 +21,7 @@ func RegisterEntityCacheService(server *grpc.Server, cache *EntityCache) {
 	svc := &EntityCacheService{
 		entityCache: cache,
 	}
-	entitycachev1.RegisterEntityCacheServiceServer(server, svc)
+	entitycacheservice.RegisterEntityCacheServiceServer(server, svc)
 }
 
 // GetEntityCache returns *entitycachev1.EntityCache which contains mappings of ip address to entity and entity name to entity.
@@ -33,11 +34,11 @@ func (c *EntityCacheService) GetEntityCache(ctx context.Context, _ *emptypb.Empt
 }
 
 // GetEntityByIPAddress returns an entity by IP address.
-func (c *EntityCacheService) GetEntityByIPAddress(ctx context.Context, req *entitycachev1.GetEntityByIPAddressRequest) (*entitycachev1.Entity, error) {
+func (c *EntityCacheService) GetEntityByIPAddress(ctx context.Context, req *entitycacheservice.GetEntityByIPAddressRequest) (*entitycachev1.Entity, error) {
 	return c.entityCache.GetByIP(req.GetIpAddress())
 }
 
 // GetEntityByName returns an entity by name.
-func (c *EntityCacheService) GetEntityByName(ctx context.Context, req *entitycachev1.GetEntityByNameRequest) (*entitycachev1.Entity, error) {
+func (c *EntityCacheService) GetEntityByName(ctx context.Context, req *entitycacheservice.GetEntityByNameRequest) (*entitycachev1.Entity, error) {
 	return c.entityCache.GetByName(req.GetName())
 }
