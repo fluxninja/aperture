@@ -1147,11 +1147,17 @@ definitions:
     Entity:
         description: Entity represents a pod, vm, etc.
         properties:
-            cluster_ip:
-                type: string
             ip_address:
                 type: string
+            labels:
+                additionalProperties:
+                    type: string
+                type: object
             name:
+                type: string
+            namespace:
+                type: string
+            node_name:
                 type: string
             prefix:
                 type: string

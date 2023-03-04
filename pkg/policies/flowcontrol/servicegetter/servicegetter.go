@@ -63,8 +63,7 @@ func (sg *ecServiceGetter) servicesFromContext(ctx context.Context) (svcs []stri
 	entity, err := sg.entityCache.GetByIP(clientIP)
 	if err != nil {
 		if sg.ecHasDiscovery {
-			log.Sample(noEntitySampler).Warn().Err(err).Str("clientIP", clientIP).
-				Msg("cannot get services")
+			log.Sample(noEntitySampler).Warn().Err(err).Str("clientIP", clientIP).Msg("cannot get services")
 		}
 		return nil, false
 	}
@@ -75,6 +74,7 @@ func (sg *ecServiceGetter) servicesFromContext(ctx context.Context) (svcs []stri
 // ServicesFromSocketAddress returns list of services associated with IP extracted from SocketAddress.
 func (sg *ecServiceGetter) ServicesFromSocketAddress(addr *corev3.SocketAddress) []string {
 	svcs, ok := sg.sericesFromSocketAddress(addr)
+	sg.metrics.inc(ok)
 	if !ok {
 		svcs = []string{"UNKNOWN"}
 	}
