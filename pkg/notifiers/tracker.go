@@ -260,8 +260,8 @@ func (t *DefaultTrackers) addPrefixNotifier(notifier PrefixNotifier) {
 	// add to existing trackers
 	for _, key := range t.getKeys() {
 		if strings.HasPrefix(key.String(), notifier.GetPrefix()) {
-			kn := notifier.GetKeyNotifier(key)
-			if kn != nil {
+			kn, err := notifier.GetKeyNotifier(key)
+			if err != nil {
 				kn.inherit(key, notifier)
 				t.addKeyNotifier(kn)
 			}
@@ -385,8 +385,8 @@ func (t *DefaultTrackers) Start() error {
 					if !valid {
 						for _, pn := range t.prefixNotifiers {
 							if strings.HasPrefix(event.Key.String(), pn.GetPrefix()) {
-								n := pn.GetKeyNotifier(event.Key)
-								if n != nil {
+								n, err := pn.GetKeyNotifier(event.Key)
+								if err != nil {
 									n.inherit(event.Key, pn)
 									tracker.addKeyNotifier(n)
 								}

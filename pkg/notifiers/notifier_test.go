@@ -20,7 +20,7 @@ func createKeyNotifier(t *testing.T, key string, value []byte) (PrefixNotifier, 
 	bpn := BasicPrefixNotifier{
 		NotifyFunc: notifierFunc,
 	}
-	bkn := bpn.GetKeyNotifier(Key(key))
+	bkn, _ := bpn.GetKeyNotifier(Key(key))
 	bkn.SetKey(Key(key))
 	bkn.setID(key + "-" + string(value))
 	bkn.SetTransformFunc(transformFunc)
@@ -151,7 +151,7 @@ func TestUnmarshallerNotifier(t *testing.T) {
 		UnmarshalNotifyFunc: unmarshalNotifyFunc,
 		GetUnmarshallerFunc: createUnmarshaller,
 	}
-	kn := upn.GetKeyNotifier("Unmarshal-Notifier-Key")
+	kn, _ := upn.GetKeyNotifier("Unmarshal-Notifier-Key")
 
 	event := createEvent(t, kn.GetKey(), bytes, 1)
 

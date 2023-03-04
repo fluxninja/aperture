@@ -14,7 +14,6 @@ type GetUnmarshallerFunc func(bytes []byte) (config.Unmarshaller, error)
 // UnmarshalKeyNotifier holds the state of a key notifier that updates config at a key using the provided unmarshaller.
 type UnmarshalKeyNotifier struct {
 	Unmarshaller        config.Unmarshaller
-	err                 error
 	UnmarshalNotifyFunc UnmarshalNotifyFunc
 	KeyNotifierBase
 }
@@ -39,21 +38,21 @@ func NewUnmarshalKeyNotifier(key Key,
 
 // Notify provides an unmarshaller based on received event.
 // It reloads the the bytes into unmarshaller before invoking callback.
-func (cfn *UnmarshalKeyNotifier) Notify(event Event) {
-	if cfn.Unmarshaller != nil {
+func (ukn *UnmarshalKeyNotifier) Notify(event Event) {
+	if ukn.Unmarshaller != nil {
 		// Only update unmarshaller on write
 		if event.Type == Write {
 			log.Trace().Str("key", event.Key.String()).Msg("write event")
 			// read config via unmarshaller
-			err := cfn.Unmarshaller.Reload(event.Value)
+			err := ukn.Unmarshaller.Reload(event.Value)
 			if err != nil {
 				log.Error().Err(err).Str("key", event.Key.String()).Msg("error reading")
 				return
 			}
 		}
-		if cfn.UnmarshalNotifyFunc != nil {
+		if ukn.UnmarshalNotifyFunc != nil {
 			// notify
-			cfn.UnmarshalNotifyFunc(event, cfn.Unmarshaller)
+			ukn.UnmarshalNotifyFunc(event, ukn.Unmarshaller)
 		}
 	}
 }
@@ -69,23 +68,23 @@ type UnmarshalPrefixNotifier struct {
 var _ PrefixNotifier = (*UnmarshalPrefixNotifier)(nil)
 
 // GetKeyNotifier returns a new key notifier for the given key.
-func (cdn *UnmarshalPrefixNotifier) GetKeyNotifier(key Key) KeyNotifier {
-	keyNotifier := cdn.getUnmarshalKeyNotifier(key)
-	return &keyNotifier
+func (upn *UnmarshalPrefixNotifier) GetKeyNotifier(key Key) (KeyNotifier, error) {
+	keyNotifier, err := upn.GetUnmarshalKeyNotifier(key)
+	return &keyNotifier, err
 }
 
-func (cdn *UnmarshalPrefixNotifier) getUnmarshalKeyNotifier(key Key) UnmarshalKeyNotifier {
+// GetUnmarshalKeyNotifier returns a new unmarshal key notifier for the given key.
+func (upn *UnmarshalPrefixNotifier) GetUnmarshalKeyNotifier(key Key) (UnmarshalKeyNotifier, error) {
 	// create a new unmarshaller instance (bytes will be reloaded within key notifier
-	unmarshaller, err := cdn.GetUnmarshallerFunc(nil)
+	unmarshaller, err := upn.GetUnmarshallerFunc(nil)
 	if err != nil {
-		unmarshaller = nil
+		return UnmarshalKeyNotifier{}, err
 	}
 
 	notifier := UnmarshalKeyNotifier{
 		Unmarshaller:        unmarshaller,
-		UnmarshalNotifyFunc: cdn.UnmarshalNotifyFunc,
-		err:                 err,
+		UnmarshalNotifyFunc: upn.UnmarshalNotifyFunc,
 	}
 
-	return notifier
+	return notifier, nil
 }

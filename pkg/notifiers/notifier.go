@@ -120,7 +120,7 @@ func (kns keyNotifiers) notify(event Event) {
 type PrefixNotifier interface {
 	notifier
 	GetPrefix() string
-	GetKeyNotifier(key Key) KeyNotifier
+	GetKeyNotifier(key Key) (KeyNotifier, error)
 }
 
 // PrefixNotifierBase is the base type for all prefix notifiers.

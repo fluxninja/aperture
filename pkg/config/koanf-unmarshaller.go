@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"reflect"
 	"regexp"
@@ -12,7 +13,7 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/knadh/koanf"
 	koanfjson "github.com/knadh/koanf/parsers/json"
-	"github.com/knadh/koanf/parsers/yaml"
+	koanfyaml "github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/confmap"
 	"github.com/knadh/koanf/providers/env"
 	"github.com/knadh/koanf/providers/posflag"
@@ -91,7 +92,6 @@ type KoanfUnmarshaller struct {
 	flagSet      *pflag.FlagSet
 	mergeConfig  map[string]interface{}
 	configFormat ConfigFormat
-	bytes        []byte
 	enableEnv    bool
 }
 
@@ -162,6 +162,21 @@ func (u *KoanfUnmarshaller) UnmarshalKey(keyPath string, i interface{}) error {
 	return ValidateStruct(i)
 }
 
+// Marshal returns the underlying koanf as bytes.
+func (u *KoanfUnmarshaller) Marshal() ([]byte, error) {
+	u.Lock()
+	defer u.Unlock()
+
+	switch u.configFormat {
+	case YAML:
+		return u.koanf.Marshal(koanfyaml.Parser())
+	case JSON:
+		return u.koanf.Marshal(koanfjson.Parser())
+	default:
+		return nil, fmt.Errorf("unknown config format: %s", u.configFormat)
+	}
+}
+
 // Reload reloads the config using the underlying koanf.
 func (u *KoanfUnmarshaller) Reload(bytes []byte) error {
 	k := koanf.New(DefaultKoanfDelim)
@@ -211,7 +226,6 @@ func (u *KoanfUnmarshaller) Reload(bytes []byte) error {
 
 	log.Trace().Strs("keys", k.Keys()).Msg("All merged config")
 	u.koanf = k
-	u.bytes = bytes
 
 	return nil
 }
@@ -221,7 +235,7 @@ func loadBytesProvider(k *koanf.Koanf, bytes []byte, configFormat ConfigFormat) 
 	if bytes != nil {
 		// TODO: allow parser config
 		if configFormat == YAML {
-			err = k.Load(rawbytes.Provider(bytes), yaml.Parser())
+			err = k.Load(rawbytes.Provider(bytes), koanfyaml.Parser())
 		} else {
 			err = k.Load(rawbytes.Provider(bytes), koanfjson.Parser())
 		}

@@ -40,9 +40,9 @@ type BasicPrefixNotifier struct {
 var _ PrefixNotifier = (*BasicPrefixNotifier)(nil)
 
 // GetKeyNotifier returns a basic key notifier for the given key.
-func (bdn *BasicPrefixNotifier) GetKeyNotifier(key Key) KeyNotifier {
+func (bdn *BasicPrefixNotifier) GetKeyNotifier(key Key) (KeyNotifier, error) {
 	notifier := BasicKeyNotifier{
 		NotifyFunc: bdn.NotifyFunc,
 	}
-	return &notifier
+	return &notifier, nil
 }

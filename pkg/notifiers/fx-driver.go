@@ -2,6 +2,7 @@ package notifiers
 
 import (
 	"context"
+	"errors"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
@@ -109,7 +110,7 @@ func (fr *fxRunner) initApp(key Key) error {
 		}
 		fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner started"), nil))
 	} else {
-		fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, fr.err))
+		fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, errors.New("fxRunner is not initialized")))
 	}
 	return nil
 }
@@ -150,15 +151,19 @@ type FxDriver struct {
 var _ PrefixNotifier = (*FxDriver)(nil)
 
 // GetKeyNotifier returns a KeyNotifier that will notify the driver of key changes.
-func (fxDriver *FxDriver) GetKeyNotifier(key Key) KeyNotifier {
+func (fxDriver *FxDriver) GetKeyNotifier(key Key) (KeyNotifier, error) {
+	unmarshalKeyNotifier, err := fxDriver.UnmarshalPrefixNotifier.GetUnmarshalKeyNotifier(key)
+	if err != nil {
+		return nil, err
+	}
 	statusRegistry := fxDriver.StatusRegistry.Child("key", key.String())
 	fr := &fxRunner{
-		UnmarshalKeyNotifier:   fxDriver.getUnmarshalKeyNotifier(key),
+		UnmarshalKeyNotifier:   unmarshalKeyNotifier,
 		fxOptionsFuncs:         fxDriver.FxOptionsFuncs,
 		statusRegistry:         statusRegistry,
 		fxRunnerStatusRegistry: statusRegistry.Child("subsystem", "fx_runner"),
 		prometheusRegistry:     fxDriver.PrometheusRegistry,
 	}
 
-	return fr
+	return fr, nil
 }

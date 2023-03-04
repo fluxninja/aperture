@@ -14,6 +14,8 @@ type Unmarshaller interface {
 	Unmarshal(interface{}) error
 	// Reload config
 	Reload(bytes []byte) error
+	// Marshal the config into bytes
+	Marshal() ([]byte, error)
 }
 
 // GetValue returns the value for the given key if config key is present.

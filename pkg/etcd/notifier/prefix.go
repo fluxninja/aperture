@@ -47,10 +47,10 @@ func (pen *PrefixToEtcdNotifier) Stop() error {
 }
 
 // GetKeyNotifier gets the underlying key notifier from prefix notifier.
-func (pen *PrefixToEtcdNotifier) GetKeyNotifier(key notifiers.Key) notifiers.KeyNotifier {
+func (pen *PrefixToEtcdNotifier) GetKeyNotifier(key notifiers.Key) (notifiers.KeyNotifier, error) {
 	ken := &KeyToEtcdNotifier{
 		etcdWriter: pen.etcdWriter,
 		etcdPath:   pen.etcdPath,
 	}
-	return ken
+	return ken, nil
 }
