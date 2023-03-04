@@ -4,6 +4,7 @@ package entitycachev1
 
 import (
 	context "context"
+	v1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/entitycache/v1"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -19,9 +20,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type EntityCacheServiceClient interface {
-	GetEntityCache(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*EntityCache, error)
-	GetEntityByIPAddress(ctx context.Context, in *GetEntityByIPAddressRequest, opts ...grpc.CallOption) (*Entity, error)
-	GetEntityByName(ctx context.Context, in *GetEntityByNameRequest, opts ...grpc.CallOption) (*Entity, error)
+	GetEntityCache(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.EntityCache, error)
+	GetEntityByIPAddress(ctx context.Context, in *GetEntityByIPAddressRequest, opts ...grpc.CallOption) (*v1.Entity, error)
+	GetEntityByName(ctx context.Context, in *GetEntityByNameRequest, opts ...grpc.CallOption) (*v1.Entity, error)
 }
 
 type entityCacheServiceClient struct {
@@ -32,8 +33,8 @@ func NewEntityCacheServiceClient(cc grpc.ClientConnInterface) EntityCacheService
 	return &entityCacheServiceClient{cc}
 }
 
-func (c *entityCacheServiceClient) GetEntityCache(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*EntityCache, error) {
-	out := new(EntityCache)
+func (c *entityCacheServiceClient) GetEntityCache(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.EntityCache, error) {
+	out := new(v1.EntityCache)
 	err := c.cc.Invoke(ctx, "/aperture.flowcontrol.entitycache.v1.EntityCacheService/GetEntityCache", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -41,8 +42,8 @@ func (c *entityCacheServiceClient) GetEntityCache(ctx context.Context, in *empty
 	return out, nil
 }
 
-func (c *entityCacheServiceClient) GetEntityByIPAddress(ctx context.Context, in *GetEntityByIPAddressRequest, opts ...grpc.CallOption) (*Entity, error) {
-	out := new(Entity)
+func (c *entityCacheServiceClient) GetEntityByIPAddress(ctx context.Context, in *GetEntityByIPAddressRequest, opts ...grpc.CallOption) (*v1.Entity, error) {
+	out := new(v1.Entity)
 	err := c.cc.Invoke(ctx, "/aperture.flowcontrol.entitycache.v1.EntityCacheService/GetEntityByIPAddress", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -50,8 +51,8 @@ func (c *entityCacheServiceClient) GetEntityByIPAddress(ctx context.Context, in 
 	return out, nil
 }
 
-func (c *entityCacheServiceClient) GetEntityByName(ctx context.Context, in *GetEntityByNameRequest, opts ...grpc.CallOption) (*Entity, error) {
-	out := new(Entity)
+func (c *entityCacheServiceClient) GetEntityByName(ctx context.Context, in *GetEntityByNameRequest, opts ...grpc.CallOption) (*v1.Entity, error) {
+	out := new(v1.Entity)
 	err := c.cc.Invoke(ctx, "/aperture.flowcontrol.entitycache.v1.EntityCacheService/GetEntityByName", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -63,22 +64,22 @@ func (c *entityCacheServiceClient) GetEntityByName(ctx context.Context, in *GetE
 // All implementations should embed UnimplementedEntityCacheServiceServer
 // for forward compatibility
 type EntityCacheServiceServer interface {
-	GetEntityCache(context.Context, *emptypb.Empty) (*EntityCache, error)
-	GetEntityByIPAddress(context.Context, *GetEntityByIPAddressRequest) (*Entity, error)
-	GetEntityByName(context.Context, *GetEntityByNameRequest) (*Entity, error)
+	GetEntityCache(context.Context, *emptypb.Empty) (*v1.EntityCache, error)
+	GetEntityByIPAddress(context.Context, *GetEntityByIPAddressRequest) (*v1.Entity, error)
+	GetEntityByName(context.Context, *GetEntityByNameRequest) (*v1.Entity, error)
 }
 
 // UnimplementedEntityCacheServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedEntityCacheServiceServer struct {
 }
 
-func (UnimplementedEntityCacheServiceServer) GetEntityCache(context.Context, *emptypb.Empty) (*EntityCache, error) {
+func (UnimplementedEntityCacheServiceServer) GetEntityCache(context.Context, *emptypb.Empty) (*v1.EntityCache, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEntityCache not implemented")
 }
-func (UnimplementedEntityCacheServiceServer) GetEntityByIPAddress(context.Context, *GetEntityByIPAddressRequest) (*Entity, error) {
+func (UnimplementedEntityCacheServiceServer) GetEntityByIPAddress(context.Context, *GetEntityByIPAddressRequest) (*v1.Entity, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEntityByIPAddress not implemented")
 }
-func (UnimplementedEntityCacheServiceServer) GetEntityByName(context.Context, *GetEntityByNameRequest) (*Entity, error) {
+func (UnimplementedEntityCacheServiceServer) GetEntityByName(context.Context, *GetEntityByNameRequest) (*v1.Entity, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEntityByName not implemented")
 }
 

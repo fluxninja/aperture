@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package aperture.entitycache.v1;
+
+// EntityCache contains both mappings of ip address to entity and entity name to entity.
+message EntityCache {
+  // Entities defines mapping of entities.
+  message Entities {
+    map<string, Entity> entities = 1;
+  }
+
+  Entities entities_by_ip_address = 1;
+  Entities entities_by_name = 2;
+}
+
+// Entity represents a pod, vm, etc.
+message Entity {
+  string prefix = 1;
+  string uid = 2;
+  string ip_address = 3;
+  string name = 4;
+  repeated string services = 5;
+  string cluster_ip = 6;
+}
