@@ -18,16 +18,16 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
-	controlpointcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/controlpointcache/v1"
+	autoscalek8scontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
+	flowcontrolcontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
 	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/peers/v1"
 	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
-	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/jobs"
@@ -47,59 +47,59 @@ const (
 	jobName            = "aperture-heartbeats"
 	jobNameHTTP        = "aperture-heartbeats-http"
 	jobTimeoutDuration = time.Minute * 2
-	entityCacheKey     = "entity-cache"
-	servicesKey        = entityCacheKey + ".services"
-	overlappingKey     = entityCacheKey + ".overlapping-services"
+	entitiesKey        = "entity-cache"
+	servicesKey        = entitiesKey + ".services"
+	overlappingKey     = entitiesKey + ".overlapping-services"
 	heartbeatsHTTPPath = "/plugins/fluxninja/v1/report"
 )
 
 // Heartbeats is the struct that holds information about heartbeats.
 type Heartbeats struct {
 	heartbeatv1.UnimplementedControllerInfoServiceServer
-	heartbeatsClient            heartbeatv1.FluxNinjaServiceClient
-	statusRegistry              status.Registry
-	agentInfo                   *agentinfo.AgentInfo
-	clientHTTP                  *http.Client
-	interval                    config.Duration
-	jobGroup                    *jobs.JobGroup
-	clientConn                  *grpc.ClientConn
-	peersWatcher                *peers.PeerDiscovery
-	entityCache                 *entitycache.EntityCache
-	policyFactory               *controlplane.PolicyFactory
-	ControllerInfo              *heartbeatv1.ControllerInfo
-	serviceControlPointCache    *cache.Cache[selectors.ControlPointID]
-	kubernetesControlPointCache kubernetes.ControlPointCache
-	heartbeatsAddr              string
-	APIKey                      string
-	jobName                     string
-	installationMode            string
+	heartbeatsClient          heartbeatv1.FluxNinjaServiceClient
+	statusRegistry            status.Registry
+	agentInfo                 *agentinfo.AgentInfo
+	clientHTTP                *http.Client
+	interval                  config.Duration
+	jobGroup                  *jobs.JobGroup
+	clientConn                *grpc.ClientConn
+	peersWatcher              *peers.PeerDiscovery
+	entities                  *entities.Entities
+	policyFactory             *controlplane.PolicyFactory
+	ControllerInfo            *heartbeatv1.ControllerInfo
+	flowControlControlPoints  *cache.Cache[selectors.ControlPointID]
+	autoscalek8sControlPoints kubernetes.AutoscaleControlPoints
+	heartbeatsAddr            string
+	APIKey                    string
+	jobName                   string
+	installationMode          string
 }
 
 func newHeartbeats(
 	jobGroup *jobs.JobGroup,
 	p pluginconfig.FluxNinjaPluginConfig,
 	statusRegistry status.Registry,
-	entityCache *entitycache.EntityCache,
+	entities *entities.Entities,
 	agentInfo *agentinfo.AgentInfo,
 	peersWatcher *peers.PeerDiscovery,
 	policyFactory *controlplane.PolicyFactory,
-	serviceControlPointCache *cache.Cache[selectors.ControlPointID],
-	kubernetesControlPointCache kubernetes.ControlPointCache,
+	flowControlControlPoints *cache.Cache[selectors.ControlPointID],
+	autoscalek8sControlPoints kubernetes.AutoscaleControlPoints,
 	installationMode string,
 ) *Heartbeats {
 	return &Heartbeats{
-		heartbeatsAddr:              p.FluxNinjaEndpoint,
-		interval:                    p.HeartbeatInterval,
-		APIKey:                      p.APIKey,
-		jobGroup:                    jobGroup,
-		statusRegistry:              statusRegistry,
-		entityCache:                 entityCache,
-		agentInfo:                   agentInfo,
-		peersWatcher:                peersWatcher,
-		policyFactory:               policyFactory,
-		serviceControlPointCache:    serviceControlPointCache,
-		kubernetesControlPointCache: kubernetesControlPointCache,
-		installationMode:            installationMode,
+		heartbeatsAddr:            p.FluxNinjaEndpoint,
+		interval:                  p.HeartbeatInterval,
+		APIKey:                    p.APIKey,
+		jobGroup:                  jobGroup,
+		statusRegistry:            statusRegistry,
+		entities:                  entities,
+		agentInfo:                 agentInfo,
+		peersWatcher:              peersWatcher,
+		policyFactory:             policyFactory,
+		flowControlControlPoints:  flowControlControlPoints,
+		autoscalek8sControlPoints: autoscalek8sControlPoints,
+		installationMode:          installationMode,
 	}
 }
 
@@ -206,8 +206,8 @@ func (h *Heartbeats) newHeartbeat(
 	jobCtxt context.Context,
 ) *heartbeatv1.ReportRequest {
 	var servicesList *heartbeatv1.ServicesList
-	if h.entityCache != nil {
-		servicesList = populateServicesList(h.entityCache)
+	if h.entities != nil {
+		servicesList = populateServicesList(h.entities)
 	}
 
 	var agentGroup string
@@ -226,37 +226,40 @@ func (h *Heartbeats) newHeartbeat(
 	}
 
 	var serviceControlPointObjects []selectors.ControlPointID
-	if h.serviceControlPointCache != nil {
-		serviceControlPointObjects = h.serviceControlPointCache.GetAll()
+	if h.flowControlControlPoints != nil {
+		serviceControlPointObjects = h.flowControlControlPoints.GetAll()
 	}
-
-	serviceControlPoints := make([]*cmdv1.ServiceControlPoint, 0, len(serviceControlPointObjects))
+	flowControlControlPoints := &flowcontrolcontrolpointsv1.FlowControlControlPoints{
+		FlowControlControlPoints: make([]*flowcontrolcontrolpointsv1.FlowControlControlPoint, 0, len(serviceControlPointObjects)),
+	}
 	for _, cp := range serviceControlPointObjects {
-		serviceControlPoints = append(serviceControlPoints, cp.ToProto())
+		flowControlControlPoints.FlowControlControlPoints = append(flowControlControlPoints.FlowControlControlPoints, cp.ToProto())
 	}
 
-	var kubernetesControlPoints []*controlpointcachev1.KubernetesControlPoint
-	if h.kubernetesControlPointCache != nil {
-		kubernetesControlPointObjects := h.kubernetesControlPointCache.Keys()
-		kubernetesControlPoints = make([]*controlpointcachev1.KubernetesControlPoint, 0, len(kubernetesControlPointObjects))
-		for _, cp := range kubernetesControlPointObjects {
-			kubernetesControlPoints = append(kubernetesControlPoints, cp.ToProto())
-		}
+	var kubernetesControlPointObjects []kubernetes.AutoscaleControlPoint
+	if h.autoscalek8sControlPoints != nil {
+		kubernetesControlPointObjects = h.autoscalek8sControlPoints.Keys()
+	}
+	autoscalek8sControlPoints := &autoscalek8scontrolpointsv1.AutoscaleKubernetesControlPoints{
+		AutoscaleKubernetesControlPoints: make([]*autoscalek8scontrolpointsv1.AutoscaleKubernetesControlPoint, 0, len(kubernetesControlPointObjects)),
+	}
+	for _, cp := range kubernetesControlPointObjects {
+		autoscalek8sControlPoints.AutoscaleKubernetesControlPoints = append(autoscalek8sControlPoints.AutoscaleKubernetesControlPoints, cp.ToProto())
 	}
 
 	return &heartbeatv1.ReportRequest{
-		VersionInfo:             info.GetVersionInfo(),
-		ProcessInfo:             info.GetProcessInfo(),
-		HostInfo:                info.GetHostInfo(),
-		AgentGroup:              agentGroup,
-		ControllerInfo:          h.ControllerInfo,
-		Peers:                   peers,
-		ServicesList:            servicesList,
-		AllStatuses:             h.statusRegistry.GetGroupStatus(),
-		Policies:                policies,
-		ServiceControlPoints:    serviceControlPoints,
-		KubernetesControlPoints: kubernetesControlPoints,
-		InstallationMode:        h.installationMode,
+		VersionInfo:                      info.GetVersionInfo(),
+		ProcessInfo:                      info.GetProcessInfo(),
+		HostInfo:                         info.GetHostInfo(),
+		AgentGroup:                       agentGroup,
+		ControllerInfo:                   h.ControllerInfo,
+		Peers:                            peers,
+		ServicesList:                     servicesList,
+		AllStatuses:                      h.statusRegistry.GetGroupStatus(),
+		Policies:                         policies,
+		FlowControlControlPoints:         flowControlControlPoints,
+		AutoscaleKubernetesControlPoints: autoscalek8sControlPoints,
+		InstallationMode:                 h.installationMode,
 	}
 }
 

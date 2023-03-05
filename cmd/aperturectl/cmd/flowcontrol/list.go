@@ -24,9 +24,9 @@ var ListCmd = &cobra.Command{
 			return err
 		}
 
-		resp, err := client.ListControlPoints(
+		resp, err := client.ListFlowControlControlPoints(
 			context.Background(),
-			&cmdv1.ListControlPointsRequest{},
+			&cmdv1.ListFlowControlControlPointsRequest{},
 		)
 		if err != nil {
 			return err
@@ -36,20 +36,23 @@ var ListCmd = &cobra.Command{
 			fmt.Fprintf(os.Stderr, "Could not get answer from %d agents", resp.ErrorsCount)
 		}
 
-		slices.SortFunc(resp.ControlPoints, func(a, b *cmdv1.GlobalServiceControlPoint) bool {
+		slices.SortFunc(resp.GlobalFlowControlControlPoints, func(a, b *cmdv1.GlobalFlowControlControlPoint) bool {
 			if a.AgentGroup != b.AgentGroup {
 				return a.AgentGroup < b.AgentGroup
 			}
-			if a.ServiceName != b.ServiceName {
-				return a.ServiceName < b.ServiceName
+			if a.FlowControlControlPoint.Service != b.FlowControlControlPoint.Service {
+				return a.FlowControlControlPoint.Service < b.FlowControlControlPoint.Service
 			}
-			return a.Name < b.Name
+			return a.FlowControlControlPoint.ControlPoint < b.FlowControlControlPoint.ControlPoint
 		})
 
 		tabwriter := tabwriter.NewWriter(os.Stdout, 5, 0, 3, ' ', 0)
 		fmt.Fprintln(tabwriter, "AGENT GROUP\tSERVICE\tNAME")
-		for _, cp := range resp.ControlPoints {
-			fmt.Fprintf(tabwriter, "%s\t%s\t%s\n", cp.AgentGroup, cp.ServiceName, cp.Name)
+		for _, cp := range resp.GlobalFlowControlControlPoints {
+			fmt.Fprintf(tabwriter, "%s\t%s\t%s\n",
+				cp.AgentGroup,
+				cp.FlowControlControlPoint.Service,
+				cp.FlowControlControlPoint.ControlPoint)
 		}
 		tabwriter.Flush()
 

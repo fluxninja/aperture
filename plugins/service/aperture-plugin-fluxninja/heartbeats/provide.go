@@ -9,8 +9,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
-	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -44,19 +44,19 @@ func Module() fx.Option {
 type ConstructorIn struct {
 	fx.In
 
-	Lifecycle                   fx.Lifecycle
-	Unmarshaller                config.Unmarshaller
-	JobGroup                    *jobs.JobGroup                     `name:"heartbeats-job-group"`
-	GRPClientConnectionBuilder  grpcclient.ClientConnectionBuilder `name:"heartbeats-grpc-client"`
-	HTTPClient                  *http.Client                       `name:"heartbeats-http-client"`
-	StatusRegistry              status.Registry
-	EntityCache                 *entitycache.EntityCache `optional:"true"`
-	AgentInfo                   *agentinfo.AgentInfo     `optional:"true"`
-	PeersWatcher                *peers.PeerDiscovery     `name:"fluxninja-peers-watcher" optional:"true"`
-	EtcdClient                  *etcdclient.Client
-	PolicyFactory               *controlplane.PolicyFactory            `optional:"true"`
-	ServiceControlPointCache    *cache.Cache[selectors.ControlPointID] `optional:"true"`
-	KubernetesControlPointCache kubernetes.ControlPointCache           `optional:"true"`
+	Lifecycle                        fx.Lifecycle
+	Unmarshaller                     config.Unmarshaller
+	JobGroup                         *jobs.JobGroup                     `name:"heartbeats-job-group"`
+	GRPClientConnectionBuilder       grpcclient.ClientConnectionBuilder `name:"heartbeats-grpc-client"`
+	HTTPClient                       *http.Client                       `name:"heartbeats-http-client"`
+	StatusRegistry                   status.Registry
+	Entities                         *entities.Entities   `optional:"true"`
+	AgentInfo                        *agentinfo.AgentInfo `optional:"true"`
+	PeersWatcher                     *peers.PeerDiscovery `name:"fluxninja-peers-watcher" optional:"true"`
+	EtcdClient                       *etcdclient.Client
+	PolicyFactory                    *controlplane.PolicyFactory            `optional:"true"`
+	FlowControlControlPoints         *cache.Cache[selectors.ControlPointID] `optional:"true"`
+	AutoscaleKubernetesControlPoints kubernetes.AutoscaleControlPoints      `optional:"true"`
 }
 
 // Provide provides a new instance of Heartbeats.
@@ -84,12 +84,12 @@ func Provide(in ConstructorIn) (*Heartbeats, error) {
 		in.JobGroup,
 		config,
 		in.StatusRegistry,
-		in.EntityCache,
+		in.Entities,
 		in.AgentInfo,
 		in.PeersWatcher,
 		in.PolicyFactory,
-		in.ServiceControlPointCache,
-		in.KubernetesControlPointCache,
+		in.FlowControlControlPoints,
+		in.AutoscaleKubernetesControlPoints,
 		installationMode,
 	)
 

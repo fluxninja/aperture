@@ -5,16 +5,13 @@ import (
 	"context"
 
 	"go.uber.org/fx"
-	"google.golang.org/grpc"
 
-	controlpointcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/controlpointcache/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/common"
-	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/etcd/election"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/status"
 )
@@ -43,11 +40,8 @@ type KubernetesDiscoveryConfig struct {
 func Module() fx.Option {
 	return fx.Options(
 		notifiers.TrackersConstructor{Name: FxTagBase}.Annotate(),
-		fx.Provide(ProvideControlPointCache),
+		fx.Provide(ProvideAutoscaleControlPoints),
 		fx.Invoke(InvokeServiceDiscovery),
-		fx.Provide(NewHandler),
-		fx.Invoke(RegisterControlPointCacheService),
-		grpcgateway.RegisterHandler{Handler: controlpointcachev1.RegisterControlPointCacheHandlerFromEndpoint}.Annotate(),
 	)
 }
 
@@ -62,15 +56,15 @@ type FxInK8sScale struct {
 	Trackers         notifiers.Trackers `name:"kubernetes_control_points"`
 }
 
-// ProvideControlPointCache provides Kubernetes AutoScaler and starts Kubernetes control point discovery if enabled.
-func ProvideControlPointCache(in FxInK8sScale) (ControlPointCache, error) {
+// ProvideAutoscaleControlPoints provides Kubernetes AutoScaler and starts Kubernetes control point discovery if enabled.
+func ProvideAutoscaleControlPoints(in FxInK8sScale) (AutoscaleControlPoints, error) {
 	var cfg KubernetesDiscoveryConfig
 	if err := in.Unmarshaller.UnmarshalKey(ConfigKey, &cfg); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize K8S discovery configuration!")
 		return nil, err
 	}
 
-	controlPointCache := newControlPointCache(in.Trackers, in.KubernetesClient)
+	controlPointCache := newAutoscaleControlPoints(in.Trackers, in.KubernetesClient)
 
 	if !cfg.AutoscaleEnabled {
 		log.Info().Msg("Skipping Kubernetes Control Point Discovery since Autoscale is disabled")
@@ -109,7 +103,7 @@ type FxInSvc struct {
 	Lifecycle        fx.Lifecycle
 	StatusRegistry   status.Registry
 	KubernetesClient k8s.K8sClient
-	EntityTrackers   *entitycache.EntityTrackers
+	EntityTrackers   *entities.EntityTrackers
 }
 
 // InvokeServiceDiscovery creates a Kubernetes service discovery.
@@ -148,9 +142,4 @@ func InvokeServiceDiscovery(in FxInSvc) error {
 	})
 
 	return nil
-}
-
-// RegisterControlPointCacheService registers the ControlPointCache service handler with the gRPC server.
-func RegisterControlPointCacheService(handler *Handler, server *grpc.Server) {
-	controlpointcachev1.RegisterControlPointCacheServer(server, handler)
 }

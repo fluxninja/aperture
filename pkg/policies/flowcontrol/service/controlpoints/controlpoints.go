@@ -12,7 +12,7 @@ import (
 
 // Handler implements FlowControlControlPointsService.
 type Handler struct {
-	flowcontrolcontrolpointsv1.UnimplementedFlowControlControlPointsServiceServer
+	flowcontrolcontrolpointsv1.UnimplementedControlPointsServiceServer
 	serviceControlPointCache *cache.Cache[selectors.ControlPointID]
 }
 
@@ -31,11 +31,7 @@ func (h *Handler) GetControlPoints(ctx context.Context, _ *emptypb.Empty) (*flow
 	}
 	controlpoints := make([]*flowcontrolcontrolpointsv1.FlowControlControlPoint, 0, len(serviceControlPointObjects))
 	for _, controlPointID := range serviceControlPointObjects {
-		cp := &flowcontrolcontrolpointsv1.FlowControlControlPoint{
-			Service:      controlPointID.Service,
-			ControlPoint: controlPointID.ControlPoint,
-		}
-		controlpoints = append(controlpoints, cp)
+		controlpoints = append(controlpoints, controlPointID.ToProto())
 	}
-	return &flowcontrolcontrolpointsv1.FlowControlControlPoints{ControlPoints: controlpoints}, nil
+	return &flowcontrolcontrolpointsv1.FlowControlControlPoints{FlowControlControlPoints: controlpoints}, nil
 }

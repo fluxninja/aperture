@@ -13,14 +13,14 @@ import (
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(NewHandler),
-		grpcgateway.RegisterHandler{Handler: flowcontrolcontrolpointsv1.RegisterFlowControlControlPointsServiceHandlerFromEndpoint}.Annotate(),
+		grpcgateway.RegisterHandler{Handler: flowcontrolcontrolpointsv1.RegisterControlPointsServiceHandlerFromEndpoint}.Annotate(),
 		fx.Invoke(Register),
 	)
 }
 
 // Register registers the handler on grpc.Server.
 func Register(handler *Handler, server *grpc.Server) error {
-	flowcontrolcontrolpointsv1.RegisterFlowControlControlPointsServiceServer(server, handler)
+	flowcontrolcontrolpointsv1.RegisterControlPointsServiceServer(server, handler)
 
 	log.Info().Msg("FlowControl ControlPoints handler registered")
 	return nil

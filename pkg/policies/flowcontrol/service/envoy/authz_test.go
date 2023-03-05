@@ -10,12 +10,12 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 
-	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/entitycache/v1"
+	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/alerts"
-	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/log"
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy"
@@ -65,14 +65,14 @@ var _ = Describe("Authorization handler", func() {
 			)
 			_, err := classifier.AddRules(context.TODO(), "test", &hardcodedRegoRules)
 			Expect(err).NotTo(HaveOccurred())
-			entities := entitycache.NewEntityCache()
-			entities.Put(&entitycachev1.Entity{
+			entities := entities.NewEntities()
+			entities.Put(&entitiesv1.Entity{
 				IpAddress: "1.2.3.4",
 				Services:  []string{service1FlowSelector.ServiceSelector.Service},
 			})
 			handler = envoy.NewHandler(
 				classifier,
-				servicegetter.FromEntityCache(entities),
+				servicegetter.FromEntities(entities),
 				&AcceptingHandler{},
 			)
 		})

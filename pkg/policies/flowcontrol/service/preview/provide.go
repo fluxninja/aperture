@@ -16,7 +16,7 @@ import (
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(NewHandler),
-		grpcgateway.RegisterHandler{Handler: flowpreviewv1.RegisterFlowPreviewServiceHandlerFromEndpoint}.Annotate(),
+		grpcgateway.RegisterHandler{Handler: flowpreviewv1.RegisterPreviewServiceHandlerFromEndpoint}.Annotate(),
 		fx.Invoke(Register),
 	)
 }
@@ -47,7 +47,7 @@ func Register(handler *Handler,
 		log.Info().Msg("flow preview service disabled")
 		return nil
 	}
-	flowpreviewv1.RegisterFlowPreviewServiceServer(server, handler)
+	flowpreviewv1.RegisterPreviewServiceServer(server, handler)
 
 	healthsrv.SetServingStatus("aperture.flowcontrol.v1.FlowPreviewService", grpc_health_v1.HealthCheckResponse_SERVING)
 	log.Info().Msg("Preview handler registered")

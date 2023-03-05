@@ -3,7 +3,7 @@ package static
 import (
 	"encoding/json"
 
-	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/entitycache/v1"
+	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 )
@@ -46,21 +46,21 @@ func (sd *StaticDiscovery) stop() error {
 	return nil
 }
 
-func (sd *StaticDiscovery) entitiesFromConfig() map[string]*entitycachev1.Entity {
+func (sd *StaticDiscovery) entitiesFromConfig() map[string]*entitiesv1.Entity {
 	// entities maps entity tracker key to the entity.
 	// We assume that configured entities are consistent, i.e. same Prefix+UID implies equality of other fields
-	entities := make(map[string]*entitycachev1.Entity)
+	entities := make(map[string]*entitiesv1.Entity)
 
 	for _, service := range sd.services {
 		serviceName := service.Name
 		for _, e := range service.Entities {
 			key := e.UID
 
-			var entity *entitycachev1.Entity
+			var entity *entitiesv1.Entity
 			var ok bool
 
 			if entity, ok = entities[key]; !ok {
-				entity = &entitycachev1.Entity{
+				entity = &entitiesv1.Entity{
 					IpAddress: e.IPAddress,
 					Prefix:    staticEntityTrackerPrefix,
 					Uid:       e.UID,

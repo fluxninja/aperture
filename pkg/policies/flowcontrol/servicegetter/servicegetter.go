@@ -8,7 +8,7 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/grpc/peer"
 
-	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
@@ -18,23 +18,23 @@ type ServiceGetter interface {
 	ServicesFromSocketAddress(addr *corev3.SocketAddress) []string
 }
 
-// FromEntityCache creates a new EntityCache-powered ServiceGetter.
-func FromEntityCache(ec *entitycache.EntityCache) ServiceGetter {
-	return &ecServiceGetter{entityCache: ec}
+// FromEntities creates a new Entities-powered ServiceGetter.
+func FromEntities(ec *entities.Entities) ServiceGetter {
+	return &ecServiceGetter{entities: ec}
 }
 
 // NewEmpty creates a new ServiceGetter that always returns nil.
 func NewEmpty() ServiceGetter { return emptyServiceGetter{} }
 
 type ecServiceGetter struct {
-	entityCache    *entitycache.EntityCache
+	entities       *entities.Entities
 	ecHasDiscovery bool
 	metrics        *Metrics
 }
 
 // ServicesFromContext returns list of services associated with IP extracted from context
 //
-// The returned list of services depends only on state of entityCache.
+// The returned list of services depends only on state of entities.
 // However, emitted warnings will depend on whether service discovery is enabled or not.
 func (sg *ecServiceGetter) ServicesFromContext(ctx context.Context) []string {
 	svcs, ok := sg.servicesFromContext(ctx)
@@ -60,7 +60,7 @@ func (sg *ecServiceGetter) servicesFromContext(ctx context.Context) (svcs []stri
 	}
 
 	clientIP := tcpAddr.IP.String()
-	entity, err := sg.entityCache.GetByIP(clientIP)
+	entity, err := sg.entities.GetByIP(clientIP)
 	if err != nil {
 		if sg.ecHasDiscovery {
 			log.Sample(noEntitySampler).Warn().Err(err).Str("clientIP", clientIP).Msg("cannot get services")
@@ -82,7 +82,7 @@ func (sg *ecServiceGetter) ServicesFromSocketAddress(addr *corev3.SocketAddress)
 }
 
 func (sg *ecServiceGetter) sericesFromSocketAddress(addr *corev3.SocketAddress) (svcs []string, ok bool) {
-	entity, err := sg.entityCache.GetByIP(addr.GetAddress())
+	entity, err := sg.entities.GetByIP(addr.GetAddress())
 	if err != nil {
 		if sg.ecHasDiscovery {
 			log.Sample(noEntitySampler).Warn().Err(err).Str("clientIP", addr.GetAddress()).Msg("cannot get services")
@@ -94,20 +94,20 @@ func (sg *ecServiceGetter) sericesFromSocketAddress(addr *corev3.SocketAddress) 
 
 var noEntitySampler = log.NewRatelimitingSampler()
 
-// FxIn are FX arguments to ProvideFromEntityCache.
+// FxIn are FX arguments to ProvideFromEntities.
 type FxIn struct {
 	fx.In
 	Lifecycle      fx.Lifecycle
-	EntityCache    *entitycache.EntityCache
-	EntityTrackers *entitycache.EntityTrackers
+	Entities       *entities.Entities
+	EntityTrackers *entities.EntityTrackers
 	Metrics        *Metrics `optional:"true"`
 }
 
-// ProvideFromEntityCache provides an EntityCache-powered ServiceGetter.
-func ProvideFromEntityCache(in FxIn) ServiceGetter {
+// ProvideFromEntities provides an Entities-powered ServiceGetter.
+func ProvideFromEntities(in FxIn) ServiceGetter {
 	sg := &ecServiceGetter{
-		entityCache: in.EntityCache,
-		metrics:     in.Metrics,
+		entities: in.Entities,
+		metrics:  in.Metrics,
 	}
 
 	in.Lifecycle.Append(fx.Hook{
