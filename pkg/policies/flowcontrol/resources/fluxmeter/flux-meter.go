@@ -81,13 +81,12 @@ func setupFluxMeterModule(
 		registry: reg,
 	}
 
-	fxDriver := &notifiers.FxDriver{
-		FxOptionsFuncs: []notifiers.FxOptionsFunc{fmf.newFluxMeterOptions},
-		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
-			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
-		},
-		StatusRegistry:     reg,
-		PrometheusRegistry: pr,
+	fxDriver, err := notifiers.NewFxDriver(reg, pr,
+		config.NewProtobufUnmarshaller,
+		[]notifiers.FxOptionsFunc{fmf.newFluxMeterOptions},
+	)
+	if err != nil {
+		return err
 	}
 
 	notifiers.WatcherLifecycle(lifecycle, watcher, []notifiers.PrefixNotifier{fxDriver})

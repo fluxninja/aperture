@@ -116,11 +116,14 @@ func (sr *ScaleReporter) setupWatch(
 	}
 
 	// status notifier
-	statusNotifier := notifiers.NewUnmarshalKeyNotifier(
+	statusNotifier, err := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(sr.etcdKey),
 		statusUnmarshaller,
 		sr.statusUpdateCallback,
 	)
+	if err != nil {
+		return err
+	}
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
