@@ -200,10 +200,13 @@ func (policy *Policy) setupDynamicConfig(
 	lifecycle fx.Lifecycle,
 ) error {
 	unmarshaller, _ := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller([]byte{})
-	unmarshalNotifier := notifiers.NewUnmarshalKeyNotifier(notifiers.Key(policy.GetPolicyName()),
+	unmarshalNotifier, err := notifiers.NewUnmarshalKeyNotifier(notifiers.Key(policy.GetPolicyName()),
 		unmarshaller,
 		policy.dynamicConfigUpdate,
 	)
+	if err != nil {
+		return err
+	}
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {

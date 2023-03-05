@@ -182,9 +182,12 @@ func NewPeerDiscovery(prefix string, client *etcdclient.Client, watchers PeerWat
 		return nil, err
 	}
 
-	pd.peerNotifier = &notifiers.UnmarshalPrefixNotifier{
-		GetUnmarshallerFunc: config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller,
-		UnmarshalNotifyFunc: pd.updatePeer,
+	pd.peerNotifier, err = notifiers.NewUnmarshalPrefixNotifier("",
+		pd.updatePeer,
+		config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller,
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	return pd, nil

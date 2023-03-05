@@ -64,13 +64,17 @@ type FxIn struct {
 }
 
 // provideEntityCache creates Entity Cache.
-func provideEntityCache(in FxIn) (*EntityCache, *EntityTrackers) {
+func provideEntityCache(in FxIn) (*EntityCache, *EntityTrackers, error) {
 	entityCache := NewEntityCache()
 
 	// create a ConfigPrefixNotifier
-	configPrefixNotifier := &notifiers.UnmarshalPrefixNotifier{
-		GetUnmarshallerFunc: config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller,
-		UnmarshalNotifyFunc: entityCache.processUpdate,
+	configPrefixNotifier, err := notifiers.NewUnmarshalPrefixNotifier("",
+		entityCache.processUpdate,
+		config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller,
+	)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to create config prefix notifier")
+		return nil, nil, err
 	}
 
 	in.Lifecycle.Append(fx.Hook{
@@ -92,7 +96,7 @@ func provideEntityCache(in FxIn) (*EntityCache, *EntityTrackers) {
 		},
 	})
 
-	return entityCache, &EntityTrackers{trackers: in.EntityTrackers}
+	return entityCache, &EntityTrackers{trackers: in.EntityTrackers}, nil
 }
 
 func (c *EntityCache) processUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
