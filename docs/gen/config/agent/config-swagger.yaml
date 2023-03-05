@@ -962,15 +962,6 @@ definitions:
                 x-go-name: DiscoveryEnabled
                 x-go-tag-default: "true"
                 x-go-tag-json: discovery_enabled
-            node_name:
-                description: NodeName is the name of the k8s node the agent should be monitoring
-                type: string
-                x-go-name: NodeName
-                x-go-tag-json: node_name
-            pod_name:
-                type: string
-                x-go-name: PodName
-                x-go-tag-json: pod_name
         title: KubernetesDiscoveryConfig for Kubernetes service discovery.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/discovery/kubernetes

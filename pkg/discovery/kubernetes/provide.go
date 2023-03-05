@@ -29,11 +29,8 @@ var (
 // swagger:model
 // +kubebuilder:object:generate=true
 type KubernetesDiscoveryConfig struct {
-	// NodeName is the name of the k8s node the agent should be monitoring
-	NodeName         string `json:"node_name"`
-	PodName          string `json:"pod_name"`
-	DiscoveryEnabled bool   `json:"discovery_enabled" default:"true"`
-	AutoscaleEnabled bool   `json:"autoscale_enabled" default:"true"`
+	DiscoveryEnabled bool `json:"discovery_enabled" default:"true"`
+	AutoscaleEnabled bool `json:"autoscale_enabled" default:"true"`
 }
 
 // Module returns an fx.Option that provides the Kubernetes discovery module.

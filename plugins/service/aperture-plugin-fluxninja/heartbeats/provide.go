@@ -3,6 +3,7 @@ package heartbeats
 import (
 	"context"
 	"net/http"
+	"os"
 
 	"go.uber.org/fx"
 
@@ -71,14 +72,7 @@ func Provide(in ConstructorIn) (*Heartbeats, error) {
 		return nil, err
 	}
 
-	var installationMode string
-	if discoveryConfig.DiscoveryEnabled {
-		installationMode = "DAEMONSET"
-	} else if discoveryConfig.PodName != "" {
-		installationMode = "SIDECAR"
-	} else {
-		installationMode = "BAREMETAL"
-	}
+	installationMode := getInstallationMode()
 
 	heartbeats := newHeartbeats(
 		in.JobGroup,
@@ -118,6 +112,24 @@ func Provide(in ConstructorIn) (*Heartbeats, error) {
 	})
 
 	return heartbeats, nil
+}
+
+func getInstallationMode() string {
+	_, kubernetesServiceHostExists := os.LookupEnv("KUBERNETES_SERVICE_HOST")
+	_, kubernetesServicePortExists := os.LookupEnv("KUBERNETES_SERVICE_PORT")
+	if kubernetesServiceHostExists && kubernetesServicePortExists {
+		// Check if the code is running in a sidecar container
+		if os.Getenv("SIDECAR") != "" {
+			return "KUBERNETES_SIDECAR"
+		} else {
+			return "KUBERNETES_DAEMONSET"
+		}
+	}
+	// Check if running on bare metal Linux
+	if _, err := os.Stat("/proc/cpuinfo"); err == nil {
+		return "BAREMETAL_LINUX"
+	}
+	return "UNKNOWN"
 }
 
 // Invoke enables heartbeats in FX.
