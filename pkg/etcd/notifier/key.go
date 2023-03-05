@@ -24,14 +24,21 @@ func NewKeyToEtcdNotifier(
 	etcdPath string,
 	etcdClient *etcdclient.Client,
 	withLease bool,
-) *KeyToEtcdNotifier {
+) (*KeyToEtcdNotifier, error) {
+	return newKeyToEtcdNotifier(key, etcdPath, etcdwriter.NewWriter(etcdClient, withLease))
+}
+
+func newKeyToEtcdNotifier(
+	key notifiers.Key,
+	etcdPath string,
+	etcdWriter *etcdwriter.Writer,
+) (*KeyToEtcdNotifier, error) {
 	ken := &KeyToEtcdNotifier{
 		KeyBase:    notifiers.NewKeyBase(key),
 		etcdPath:   etcdPath,
-		etcdWriter: etcdwriter.NewWriter(etcdClient, withLease),
+		etcdWriter: etcdWriter,
 	}
-
-	return ken
+	return ken, nil
 }
 
 // Start starts the key notifier.

@@ -179,7 +179,10 @@ func (fxd *fxDriver) GetKeyNotifier(key Key) (KeyNotifier, error) {
 		prometheusRegistry:     fxd.prometheusRegistry,
 	}
 
-	ukn := NewUnmarshalKeyNotifier(key, unmarshaller, fr.processEvent)
+	ukn, err := NewUnmarshalKeyNotifier(key, unmarshaller, fr.processEvent)
+	if err != nil {
+		return nil, err
+	}
 	fr.unmarshalKeyNotifier = ukn
 
 	return fr, nil

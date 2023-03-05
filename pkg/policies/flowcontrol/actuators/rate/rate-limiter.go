@@ -238,21 +238,27 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	if err != nil {
 		return err
 	}
-	decisionNotifier := notifiers.NewUnmarshalKeyNotifier(
+	decisionNotifier, err := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(etcdKey),
 		decisionUnmarshaller,
 		rateLimiter.decisionUpdateCallback,
 	)
+	if err != nil {
+		return err
+	}
 	// dynamic config notifier
 	dynamicConfigUnmarshaller, err := config.NewProtobufUnmarshaller(nil)
 	if err != nil {
 		return err
 	}
-	dynamicConfigNotifier := notifiers.NewUnmarshalKeyNotifier(
+	dynamicConfigNotifier, err := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(etcdKey),
 		dynamicConfigUnmarshaller,
 		rateLimiter.dynamicConfigUpdateCallback,
 	)
+	if err != nil {
+		return err
+	}
 
 	metricLabels := make(prometheus.Labels)
 	metricLabels[metrics.PolicyNameLabel] = rateLimiter.GetPolicyName()

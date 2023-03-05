@@ -40,11 +40,5 @@ func (n *PrefixToFSNotifier) Stop() error {
 
 // GetKeyNotifier gets the underlying key notifier from prefix notifier.
 func (n *PrefixToFSNotifier) GetKeyNotifier(key notifiers.Key) (notifiers.KeyNotifier, error) {
-	fi := filesystem.NewFileInfo(n.path, key.String(), n.ext)
-	kn := &KeyToFSNotifier{
-		KeyBase:  notifiers.NewKeyBase(key),
-		path:     fi.GetFilePath(),
-		fileInfo: fi,
-	}
-	return kn, nil
+	return NewKeyToFSNotifier(key, n.path, n.ext), nil
 }

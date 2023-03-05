@@ -243,21 +243,27 @@ func (pa *podScaler) setup(
 	if err != nil {
 		return err
 	}
-	decisionNotifier := notifiers.NewUnmarshalKeyNotifier(
+	decisionNotifier, err := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(etcdKey),
 		decisionUnmarshaler,
 		pa.decisionUpdateCallback,
 	)
+	if err != nil {
+		return err
+	}
 	// dynamic config notifier
 	dynamicConfigUnmarshaler, err := config.NewProtobufUnmarshaller(nil)
 	if err != nil {
 		return err
 	}
-	dynamicConfigNotifier := notifiers.NewUnmarshalKeyNotifier(
+	dynamicConfigNotifier, err := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(etcdKey),
 		dynamicConfigUnmarshaler,
 		pa.dynamicConfigUpdateCallback,
 	)
+	if err != nil {
+		return err
+	}
 	// control point notifier
 	// read the configured control point from the horizontal pod scaler proto
 	controlPointSelector := pa.podScalerProto.KubernetesObjectSelector
@@ -275,11 +281,14 @@ func (pa *podScaler) setup(
 	if err != nil {
 		return err
 	}
-	controlPointNotifier := notifiers.NewUnmarshalKeyNotifier(
+	controlPointNotifier, err := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(key),
 		controlPointUnmarshaler,
 		pa.controlPointUpdateCallback,
 	)
+	if err != nil {
+		return err
+	}
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {

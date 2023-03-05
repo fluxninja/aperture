@@ -27,13 +27,12 @@ var _ KeyNotifier = (*unmarshalKeyNotifier)(nil)
 func NewUnmarshalKeyNotifier(key Key,
 	unmarshaller config.Unmarshaller,
 	unmarshalNotifyFunc UnmarshalNotifyFunc,
-) *unmarshalKeyNotifier {
-	notifier := &unmarshalKeyNotifier{
+) (*unmarshalKeyNotifier, error) {
+	return &unmarshalKeyNotifier{
 		KeyBase:             NewKeyBase(key),
 		Unmarshaller:        unmarshaller,
 		UnmarshalNotifyFunc: unmarshalNotifyFunc,
-	}
-	return notifier
+	}, nil
 }
 
 // Notify provides an unmarshaller based on received event.
@@ -69,16 +68,12 @@ var _ PrefixNotifier = (*unmarshalPrefixNotifier)(nil)
 
 // GetKeyNotifier returns a new key notifier for the given key.
 func (upn *unmarshalPrefixNotifier) GetKeyNotifier(key Key) (KeyNotifier, error) {
-	// create a new unmarshaller instance (bytes will be reloaded within key notifier
+	// create a new unmarshaller instance
 	unmarshaller, err := upn.getUnmarshallerFunc(nil)
 	if err != nil {
 		return nil, err
 	}
-	return &unmarshalKeyNotifier{
-		KeyBase:             NewKeyBase(key),
-		Unmarshaller:        unmarshaller,
-		UnmarshalNotifyFunc: upn.unmarshalNotifyFunc,
-	}, err
+	return NewUnmarshalKeyNotifier(key, unmarshaller, upn.unmarshalNotifyFunc)
 }
 
 // NewUnmarshalPrefixNotifier returns a new instance of UnmarshalPrefixNotifier.
@@ -89,7 +84,6 @@ func NewUnmarshalPrefixNotifier(prefix string,
 	if getUnmarshallerFunc == nil {
 		return nil, fmt.Errorf("getUnmarshallerFunc cannot be nil")
 	}
-
 	notifier := &unmarshalPrefixNotifier{
 		PrefixBase:          NewPrefixBase(prefix),
 		unmarshalNotifyFunc: unmarshalNotifyFunc,

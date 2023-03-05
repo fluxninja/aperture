@@ -39,11 +39,7 @@ var _ PrefixNotifier = (*basicPrefixNotifier)(nil)
 
 // GetKeyNotifier returns a basic key notifier for the given key.
 func (bdn *basicPrefixNotifier) GetKeyNotifier(key Key) (KeyNotifier, error) {
-	notifier := BasicKeyNotifier{
-		KeyBase:    NewKeyBase(key),
-		NotifyFunc: bdn.NotifyFunc,
-	}
-	return &notifier, nil
+	return NewBasicKeyNotifier(key, bdn.NotifyFunc), nil
 }
 
 // NewBasicPrefixNotifier returns a new basic prefix notifier.

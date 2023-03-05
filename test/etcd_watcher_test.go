@@ -20,6 +20,7 @@ var _ = Describe("Etcd Watcher", func() {
 
 	When("Adding etcd key notifier", func() {
 		var etcdKeyNotifier *etcdnotifier.KeyToEtcdNotifier
+		var err error
 		const notifierPrefix = "fuu"
 		const notifierKey = "baz"
 		notifierPath := fmt.Sprintf("%s/%s", notifierPrefix, notifierKey)
@@ -28,7 +29,8 @@ var _ = Describe("Etcd Watcher", func() {
 
 		BeforeEach(func() {
 			k := notifiers.Key(notifierKey)
-			etcdKeyNotifier = etcdnotifier.NewKeyToEtcdNotifier(k, notifierPrefix, etcdClient, false)
+			etcdKeyNotifier, err = etcdnotifier.NewKeyToEtcdNotifier(k, notifierPrefix, etcdClient, false)
+			Expect(err).NotTo(HaveOccurred())
 			etcdKeyNotifier.Start()
 			err := etcdWatcher.AddKeyNotifier(etcdKeyNotifier)
 			Expect(err).NotTo(HaveOccurred())

@@ -173,7 +173,8 @@ func TestUnmarshallerNotifierConstructor(t *testing.T) {
 	unmarshaller, err := createUnmarshaller(bytes)
 	require.NoError(t, err)
 
-	kn := NewUnmarshalKeyNotifier("Unmarshal-Notifier-Key-2", unmarshaller, unmarshalNotifyFunc)
+	kn, err := NewUnmarshalKeyNotifier("Unmarshal-Notifier-Key-2", unmarshaller, unmarshalNotifyFunc)
+	require.NoError(t, err)
 
 	event := createEvent(t, kn.GetKey(), bytes, 1)
 
