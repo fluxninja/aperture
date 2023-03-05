@@ -10,6 +10,7 @@ import (
 	"github.com/cenkalti/backoff/v4"
 	"github.com/sourcegraph/conc/stream"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
@@ -32,6 +33,7 @@ type podServiceUpdate struct {
 	UID       string
 	IPAddress string
 	Service   string
+	Labels    map[string]string
 }
 
 // serviceDiscovery is a collector that collects Kubernetes information periodically.
@@ -83,8 +85,25 @@ func (kd *serviceDiscovery) start() {
 				return err
 			}
 
+			podInformer := kd.informerFactory.Core().V1().Pods().Informer()
+			_, err = podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+				AddFunc:    kd.handlePodAdd,
+				UpdateFunc: kd.handlePodUpdate,
+			})
+			if err != nil {
+				return err
+			}
+
+			// serviceInformer := kd.informerFactory.Core().V1().Services().Informer()
+			// _, err = serviceInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+			// AddFunc:    kd.handleServiceAdd,
+			// UpdateFunc: kd.handleServiceUpdate,
+			// DeleteFunc: kd.handleServiceDelete,
+			// })
+
 			kd.informerFactory.Start(kd.ctx.Done())
-			if !cache.WaitForCacheSync(kd.ctx.Done(), endpointsInformer.HasSynced) {
+			// wait for the caches to be synced
+			if !cache.WaitForCacheSync(kd.ctx.Done(), endpointsInformer.HasSynced, podInformer.HasSynced) {
 				return fmt.Errorf("timed out waiting for caches to sync")
 			}
 
@@ -141,6 +160,31 @@ func (kd *serviceDiscovery) handleEndpointsDelete(obj interface{}) {
 	})
 }
 
+func (kd *serviceDiscovery) handlePodAdd(obj interface{}) {
+	pod := obj.(*v1.Pod)
+	p := kd.getPodServiceUpdateFromPod(pod)
+	err := kd.updatePodService(p)
+	if err != nil {
+		log.Error().Err(err).Msg("Tracker could not be updated")
+	}
+}
+
+func (kd *serviceDiscovery) handlePodUpdate(oldObj, newObj interface{}) {
+	oldPod := oldObj.(*v1.Pod)
+	newPod := newObj.(*v1.Pod)
+	if oldPod.ResourceVersion == newPod.ResourceVersion {
+		return
+	}
+	p := kd.getPodServiceUpdateFromPod(newPod)
+	err := kd.updatePodService(p)
+	if err != nil {
+		log.Error().Err(err).Msg("Tracker could not be updated")
+	}
+}
+
+// func (kd *serviceDiscovery) handleServiceAdd(obj interface{}) {
+// }
+
 func (kd *serviceDiscovery) getEntityFromTracker(uid string) *entitycachev1.Entity {
 	bytes := kd.entityEvents.GetCurrentValue(notifiers.Key(uid))
 	if bytes == nil {
@@ -190,6 +234,9 @@ func (kd *serviceDiscovery) updatePodService(pod podServiceUpdate) error {
 		if !utils.SliceContains(entity.Services, pod.Service) {
 			entity.Services = append(entity.Services, pod.Service)
 		}
+		if len(pod.Labels) > 0 {
+			entity.Labels = pod.Labels
+		}
 	} else {
 		// create new entity
 		entity = &entitycachev1.Entity{
@@ -200,6 +247,7 @@ func (kd *serviceDiscovery) updatePodService(pod podServiceUpdate) error {
 			Uid:       pod.UID,
 			Prefix:    podTrackerPrefix,
 			Name:      pod.Name,
+			Labels:    pod.Labels,
 		}
 	}
 
@@ -218,21 +266,19 @@ func (kd *serviceDiscovery) shouldRemove(entity *entitycachev1.Entity) bool {
 }
 
 func (kd *serviceDiscovery) updateEndpoints(endpoints *v1.Endpoints) {
-	pods := kd.getServicePods(endpoints)
+	pods := kd.getPodServiceUpdatesFromEndpoints(endpoints)
 	for _, pod := range pods {
 		p := pod
 		err := kd.updatePodService(p)
 		if err != nil {
 			log.Error().Err(err).Msg("Tracker could not be updated")
 		}
-
 	}
 }
 
-// getServicePods retrieves a list of pods handled by a given service that are located on a given node.
-func (kd *serviceDiscovery) getServicePods(endpoints *v1.Endpoints) []podServiceUpdate {
+// getPodServiceUpdatesFromEndpoints retrieves a list of pods handled by a given service that are located on a given node.
+func (kd *serviceDiscovery) getPodServiceUpdatesFromEndpoints(endpoints *v1.Endpoints) []podServiceUpdate {
 	var pods []podServiceUpdate
-
 	for _, subset := range endpoints.Subsets {
 		for _, address := range subset.Addresses {
 			if address.TargetRef == nil {
@@ -254,8 +300,19 @@ func (kd *serviceDiscovery) getServicePods(endpoints *v1.Endpoints) []podService
 			pods = append(pods, p)
 		}
 	}
-
 	return pods
+}
+
+// getPodServiceUpdateFromPod retrieves a podServiceUpdate from a given pod.
+func (kd *serviceDiscovery) getPodServiceUpdateFromPod(pod *v1.Pod) podServiceUpdate {
+	return podServiceUpdate{
+		Name:      pod.Name,
+		Namespace: pod.Namespace,
+		UID:       string(pod.UID),
+		IPAddress: pod.Status.PodIP,
+		NodeName:  pod.Spec.NodeName,
+		Labels:    pod.Labels,
+	}
 }
 
 func (kd *serviceDiscovery) addClusterIPs(namespace, name string) stream.Callback {
@@ -304,19 +361,23 @@ func (kd *serviceDiscovery) fetchServiceSpec(namespace, name string) ([]string, 
 			return backoff.Permanent(kd.ctx.Err())
 		}
 		if err != nil {
+			// Check if the service is not found, if so we can stop retrying
+			if errors.IsNotFound(err) {
+				return backoff.Permanent(err)
+			}
 			return nil
 		}
 		if svc.Spec.Type != v1.ServiceTypeClusterIP {
 			return nil
 		}
 		clusterIPs = svc.Spec.ClusterIPs
-		// remove None from the list
+		// remove None, "" from the list
 		clusterIPs = utils.RemoveFromSlice(clusterIPs, "None")
+		clusterIPs = utils.RemoveFromSlice(clusterIPs, "")
 		return nil
 	}
 	err := backoff.Retry(op, backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 3))
 	if err != nil {
-		log.Error().Err(err).Str("namespace", namespace).Str("name", name).Msg("Context canceled while fetching service")
 		return nil, err
 	}
 	return clusterIPs, nil
