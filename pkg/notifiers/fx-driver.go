@@ -20,20 +20,14 @@ type fxRunner struct {
 	fxRunnerStatusRegistry status.Registry
 	app                    *fx.App
 	prometheusRegistry     *prometheus.Registry
-	unmarshalKeyNotifier
+	*unmarshalKeyNotifier
 	fxOptionsFuncs []FxOptionsFunc
 }
 
 // Make sure fxRunner implements KeyNotifier.
 var _ KeyNotifier = (*fxRunner)(nil)
 
-// Notify is the main function that notifies the application of the key change.
-func (fr *fxRunner) Notify(event Event) {
-	fr.unmarshalKeyNotifier.Notify(event)
-	fr.processEvent(event)
-}
-
-func (fr *fxRunner) processEvent(event Event) {
+func (fr *fxRunner) processEvent(event Event, unmarshaller config.Unmarshaller) {
 	logger := fr.fxRunnerStatusRegistry.GetLogger()
 	switch event.Type {
 	case Write:
@@ -46,7 +40,7 @@ func (fr *fxRunner) processEvent(event Event) {
 			}
 		}
 		// instantiate and start a new app
-		err := fr.initApp(event.Key)
+		err := fr.initApp(event.Key, unmarshaller)
 		if err != nil {
 			logger.Error().Err(err).Msg("Failed to instantiate and start a new app")
 		}
@@ -61,14 +55,14 @@ func (fr *fxRunner) processEvent(event Event) {
 	}
 }
 
-func (fr *fxRunner) initApp(key Key) error {
+func (fr *fxRunner) initApp(key Key, unmarshaller config.Unmarshaller) error {
 	fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner initializing"), nil))
 	logger := fr.fxRunnerStatusRegistry.GetLogger()
 
-	if fr.app == nil && fr.Unmarshaller != nil {
+	if fr.app == nil && unmarshaller != nil {
 		var options []fx.Option
 		for _, fxOptionsFunc := range fr.fxOptionsFuncs {
-			o, e := fxOptionsFunc(key, fr.Unmarshaller, fr.statusRegistry)
+			o, e := fxOptionsFunc(key, unmarshaller, fr.statusRegistry)
 			if e != nil {
 				logger.Error().Err(e).Msg("fxOptionsFunc failed")
 				return e
@@ -78,9 +72,9 @@ func (fr *fxRunner) initApp(key Key) error {
 		option := fx.Options(options...)
 
 		fr.app = fx.New(
-			// Note: Supplying fr.Unmarshaller directly results in supplying
+			// Note: Supplying unmarshaller directly results in supplying
 			// concrete type instead of interface, thus supplying via Provide.
-			fx.Provide(func() config.Unmarshaller { return fr.Unmarshaller }),
+			fx.Provide(func() config.Unmarshaller { return unmarshaller }),
 			// Supply keyinfo
 			fx.Supply(key),
 			// Supply status registry for the key
@@ -172,18 +166,21 @@ func NewFxDriver(
 
 // GetKeyNotifier returns a KeyNotifier that will notify the driver of key changes.
 func (fxd *fxDriver) GetKeyNotifier(key Key) (KeyNotifier, error) {
-	unmarshaller, err := fxd.GetUnmarshalKeyNotifier(key)
+	unmarshaller, err := fxd.getUnmarshallerFunc(nil)
 	if err != nil {
 		return nil, err
 	}
+
 	statusRegistry := fxd.statusRegistry.Child("key", key.String())
 	fr := &fxRunner{
-		unmarshalKeyNotifier:   unmarshaller,
 		fxOptionsFuncs:         fxd.fxOptionsFuncs,
 		statusRegistry:         statusRegistry,
 		fxRunnerStatusRegistry: statusRegistry.Child("subsystem", "fx_runner"),
 		prometheusRegistry:     fxd.prometheusRegistry,
 	}
+
+	ukn := NewUnmarshalKeyNotifier(key, unmarshaller, fr.processEvent)
+	fr.unmarshalKeyNotifier = ukn
 
 	return fr, nil
 }
