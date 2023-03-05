@@ -190,10 +190,13 @@ func (executor *jobExecutor) stop() {
 		return
 	}
 
-	err := executor.jg.scheduler.DeleteJob(executor.job.Key())
-	if err != nil {
-		executor.jg.gt.statusRegistry.GetLogger().Error().Err(err).Str("executor", executor.Name()).Msg("Unable to remove job")
-		return
+	// no need to DeleteJob if the job is not scheduled periodically.
+	if executor.config.ExecutionPeriod.AsDuration() > 0 {
+		err := executor.jg.scheduler.DeleteJob(executor.job.Key())
+		if err != nil {
+			executor.jg.gt.statusRegistry.GetLogger().Error().Err(err).Str("executor", executor.Name()).Msg("Unable to remove job")
+			return
+		}
 	}
 	executor.livenessRegistry.Detach()
 	executor.running = false
