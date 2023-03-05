@@ -10,7 +10,7 @@ import (
 
 // PrefixToEtcdNotifier holds the state of a notifier that writes raw/transformed contents of a watched prefix to etcd.
 type PrefixToEtcdNotifier struct {
-	notifiers.PrefixNotifierBase
+	notifiers.PrefixBase
 	etcdClient *etcdclient.Client
 	etcdWriter *etcdwriter.Writer
 	etcdPath   string
@@ -26,6 +26,8 @@ func NewPrefixToEtcdNotifier(
 	withLease bool,
 ) *PrefixToEtcdNotifier {
 	pen := &PrefixToEtcdNotifier{
+		// subscribe to all prefixes
+		PrefixBase: notifiers.NewPrefixBase(""),
 		etcdPath:   etcdPath,
 		etcdClient: etcdClient,
 		etcdWriter: etcdwriter.NewWriter(etcdClient, withLease),

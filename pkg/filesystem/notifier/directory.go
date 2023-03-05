@@ -7,7 +7,7 @@ import (
 
 // PrefixToFSNotifier holds the state of a notifier that writes raw/transformed contents of a watched prefix to a directory.
 type PrefixToFSNotifier struct {
-	notifiers.PrefixNotifierBase
+	notifiers.PrefixBase
 	path string
 	ext  string
 }
@@ -18,8 +18,10 @@ var _ notifiers.PrefixNotifier = (*PrefixToFSNotifier)(nil)
 // NewPrefixToFSNotifier returns a new prefix notifier that writes raw/transformed contents to a directory.
 func NewPrefixToFSNotifier(path string, ext string) *PrefixToFSNotifier {
 	n := &PrefixToFSNotifier{
-		path: path,
-		ext:  ext,
+		// track all prefixes
+		PrefixBase: notifiers.NewPrefixBase(""),
+		path:       path,
+		ext:        ext,
 	}
 
 	return n
@@ -40,6 +42,7 @@ func (n *PrefixToFSNotifier) Stop() error {
 func (n *PrefixToFSNotifier) GetKeyNotifier(key notifiers.Key) (notifiers.KeyNotifier, error) {
 	fi := filesystem.NewFileInfo(n.path, key.String(), n.ext)
 	kn := &KeyToFSNotifier{
+		KeyBase:  notifiers.NewKeyBase(key),
 		path:     fi.GetFilePath(),
 		fileInfo: fi,
 	}

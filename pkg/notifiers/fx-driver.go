@@ -20,7 +20,7 @@ type fxRunner struct {
 	fxRunnerStatusRegistry status.Registry
 	app                    *fx.App
 	prometheusRegistry     *prometheus.Registry
-	UnmarshalKeyNotifier
+	unmarshalKeyNotifier
 	fxOptionsFuncs []FxOptionsFunc
 }
 
@@ -29,7 +29,7 @@ var _ KeyNotifier = (*fxRunner)(nil)
 
 // Notify is the main function that notifies the application of the key change.
 func (fr *fxRunner) Notify(event Event) {
-	fr.UnmarshalKeyNotifier.Notify(event)
+	fr.unmarshalKeyNotifier.Notify(event)
 	fr.processEvent(event)
 }
 
@@ -131,12 +131,12 @@ func (fr *fxRunner) deinitApp() error {
 	return nil
 }
 
-// FxDriver tracks prefix and allows spawning "mini FX-based apps" per key in the prefix.
-type FxDriver struct {
-	StatusRegistry     status.Registry
-	PrometheusRegistry *prometheus.Registry
+// fxDriver tracks prefix and allows spawning "mini FX-based apps" per key in the prefix.
+type fxDriver struct {
+	statusRegistry     status.Registry
+	prometheusRegistry *prometheus.Registry
 	// Options for new unmarshaller instances
-	UnmarshalPrefixNotifier
+	*unmarshalPrefixNotifier
 
 	// function to provide fx.Options.
 	//
@@ -144,25 +144,45 @@ type FxDriver struct {
 	// The lifecycle of the app will be tied to the existence of the key.
 	// Note that when key's contents change the previous App will be stopped
 	// and a fresh one will be created.
-	FxOptionsFuncs []FxOptionsFunc
+	fxOptionsFuncs []FxOptionsFunc
 }
 
 // Make sure FxDriver implements PrefixNotifier.
-var _ PrefixNotifier = (*FxDriver)(nil)
+var _ PrefixNotifier = (*fxDriver)(nil)
 
-// GetKeyNotifier returns a KeyNotifier that will notify the driver of key changes.
-func (fxDriver *FxDriver) GetKeyNotifier(key Key) (KeyNotifier, error) {
-	unmarshalKeyNotifier, err := fxDriver.GetUnmarshalKeyNotifier(key)
+// NewFxDriver creates a new FxDriver.
+func NewFxDriver(
+	statusRegistry status.Registry,
+	prometheusRegistry *prometheus.Registry,
+	getUnmarshallerFunc GetUnmarshallerFunc,
+	fxOptionsFuncs []FxOptionsFunc,
+) (*fxDriver, error) {
+	// Subscribe to all prefixes and additional notifier callback is nil
+	upn, err := NewUnmarshalPrefixNotifier("", nil, getUnmarshallerFunc)
 	if err != nil {
 		return nil, err
 	}
-	statusRegistry := fxDriver.StatusRegistry.Child("key", key.String())
+	return &fxDriver{
+		statusRegistry:          statusRegistry,
+		prometheusRegistry:      prometheusRegistry,
+		unmarshalPrefixNotifier: upn,
+		fxOptionsFuncs:          fxOptionsFuncs,
+	}, nil
+}
+
+// GetKeyNotifier returns a KeyNotifier that will notify the driver of key changes.
+func (fxd *fxDriver) GetKeyNotifier(key Key) (KeyNotifier, error) {
+	unmarshaller, err := fxd.GetUnmarshalKeyNotifier(key)
+	if err != nil {
+		return nil, err
+	}
+	statusRegistry := fxd.statusRegistry.Child("key", key.String())
 	fr := &fxRunner{
-		UnmarshalKeyNotifier:   unmarshalKeyNotifier,
-		fxOptionsFuncs:         fxDriver.FxOptionsFuncs,
+		unmarshalKeyNotifier:   unmarshaller,
+		fxOptionsFuncs:         fxd.fxOptionsFuncs,
 		statusRegistry:         statusRegistry,
 		fxRunnerStatusRegistry: statusRegistry.Child("subsystem", "fx_runner"),
-		prometheusRegistry:     fxDriver.PrometheusRegistry,
+		prometheusRegistry:     fxd.prometheusRegistry,
 	}
 
 	return fr, nil

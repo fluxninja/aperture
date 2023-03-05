@@ -17,17 +17,14 @@ type testConfig struct {
 }
 
 func createKeyNotifier(t *testing.T, key string, value []byte) (PrefixNotifier, KeyNotifier) {
-	bpn := BasicPrefixNotifier{
-		NotifyFunc: notifierFunc,
-	}
+	bpn := NewBasicPrefixNotifier("", notifierFunc)
 	bkn, _ := bpn.GetKeyNotifier(Key(key))
-	bkn.SetKey(Key(key))
 	bkn.setID(key + "-" + string(value))
 	bkn.SetTransformFunc(transformFunc)
 
 	t.Log("KeyNotifier with ID: ", bkn.getID(), ", Func Address: ", bkn.GetTransformFunc(), ", Key: ", bkn.GetKey(), " has been created.")
 
-	return &bpn, bkn
+	return bpn, bkn
 }
 
 func createEvent(t *testing.T, key Key, value []byte, action EventType) Event {
@@ -147,16 +144,14 @@ func TestUnmarshallerNotifier(t *testing.T) {
             - Name: UnmarshallerNotifierTest
             - Value: 1
   `)
-	upn := UnmarshalPrefixNotifier{
-		UnmarshalNotifyFunc: unmarshalNotifyFunc,
-		GetUnmarshallerFunc: createUnmarshaller,
-	}
+	upn, err := NewUnmarshalPrefixNotifier("", unmarshalNotifyFunc, createUnmarshaller)
+	require.NoError(t, err)
 	kn, _ := upn.GetKeyNotifier("Unmarshal-Notifier-Key")
 
 	event := createEvent(t, kn.GetKey(), bytes, 1)
 
 	config := testConfig{
-		pns: []PrefixNotifier{&upn},
+		pns: []PrefixNotifier{upn},
 		kns: []KeyNotifier{kn},
 		evs: []Event{event},
 		results: [][]byte{
@@ -172,10 +167,8 @@ func TestUnmarshallerNotifierConstructor(t *testing.T) {
           configs:
             - Name: TestUnmarshallerNotifierConstructorTest
             - Value: 1`)
-	upn := UnmarshalPrefixNotifier{
-		UnmarshalNotifyFunc: unmarshalNotifyFunc,
-		GetUnmarshallerFunc: createUnmarshaller,
-	}
+	upn, err := NewUnmarshalPrefixNotifier("", unmarshalNotifyFunc, createUnmarshaller)
+	require.NoError(t, err)
 
 	unmarshaller, err := createUnmarshaller(bytes)
 	require.NoError(t, err)
@@ -185,7 +178,7 @@ func TestUnmarshallerNotifierConstructor(t *testing.T) {
 	event := createEvent(t, kn.GetKey(), bytes, 1)
 
 	config := testConfig{
-		pns: []PrefixNotifier{&upn},
+		pns: []PrefixNotifier{upn},
 		kns: []KeyNotifier{kn},
 		evs: []Event{event},
 		results: [][]byte{

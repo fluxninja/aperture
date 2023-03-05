@@ -1,6 +1,8 @@
 package notifiers
 
 import (
+	"fmt"
+
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 )
@@ -11,25 +13,23 @@ type UnmarshalNotifyFunc func(Event, config.Unmarshaller)
 // GetUnmarshallerFunc is a function that is called to create a new unmarshaller.
 type GetUnmarshallerFunc func(bytes []byte) (config.Unmarshaller, error)
 
-// UnmarshalKeyNotifier holds the state of a key notifier that updates config at a key using the provided unmarshaller.
-type UnmarshalKeyNotifier struct {
+// unmarshalKeyNotifier holds the state of a key notifier that updates config at a key using the provided unmarshaller.
+type unmarshalKeyNotifier struct {
 	Unmarshaller        config.Unmarshaller
 	UnmarshalNotifyFunc UnmarshalNotifyFunc
-	KeyNotifierBase
+	KeyBase
 }
 
 // Make sure ConfigKeyNotifier implements KeyNotifier.
-var _ KeyNotifier = (*UnmarshalKeyNotifier)(nil)
+var _ KeyNotifier = (*unmarshalKeyNotifier)(nil)
 
 // NewUnmarshalKeyNotifier creates a new instance of ConfigKeyNotifier.
 func NewUnmarshalKeyNotifier(key Key,
 	unmarshaller config.Unmarshaller,
 	unmarshalNotifyFunc UnmarshalNotifyFunc,
-) *UnmarshalKeyNotifier {
-	notifier := &UnmarshalKeyNotifier{
-		KeyNotifierBase: KeyNotifierBase{
-			key: key,
-		},
+) KeyNotifier {
+	notifier := &unmarshalKeyNotifier{
+		KeyBase:             NewKeyBase(key),
 		Unmarshaller:        unmarshaller,
 		UnmarshalNotifyFunc: unmarshalNotifyFunc,
 	}
@@ -38,7 +38,7 @@ func NewUnmarshalKeyNotifier(key Key,
 
 // Notify provides an unmarshaller based on received event.
 // It reloads the the bytes into unmarshaller before invoking callback.
-func (ukn *UnmarshalKeyNotifier) Notify(event Event) {
+func (ukn *unmarshalKeyNotifier) Notify(event Event) {
 	if ukn.Unmarshaller != nil {
 		// Only update unmarshaller on write
 		if event.Type == Write {
@@ -57,34 +57,52 @@ func (ukn *UnmarshalKeyNotifier) Notify(event Event) {
 	}
 }
 
-// UnmarshalPrefixNotifier holds the state of a prefix notifier that updates config at a prefix using the provided unmarshaller.
-type UnmarshalPrefixNotifier struct {
-	UnmarshalNotifyFunc UnmarshalNotifyFunc
-	GetUnmarshallerFunc GetUnmarshallerFunc
-	PrefixNotifierBase
+// unmarshalPrefixNotifier holds the state of a prefix notifier that updates config at a prefix using the provided unmarshaller.
+type unmarshalPrefixNotifier struct {
+	unmarshalNotifyFunc UnmarshalNotifyFunc
+	getUnmarshallerFunc GetUnmarshallerFunc
+	PrefixBase
 }
 
 // Make sure UnmarshalPrefixNotifier implements PrefixNotifier.
-var _ PrefixNotifier = (*UnmarshalPrefixNotifier)(nil)
+var _ PrefixNotifier = (*unmarshalPrefixNotifier)(nil)
 
 // GetKeyNotifier returns a new key notifier for the given key.
-func (upn *UnmarshalPrefixNotifier) GetKeyNotifier(key Key) (KeyNotifier, error) {
+func (upn *unmarshalPrefixNotifier) GetKeyNotifier(key Key) (KeyNotifier, error) {
 	keyNotifier, err := upn.GetUnmarshalKeyNotifier(key)
 	return &keyNotifier, err
 }
 
 // GetUnmarshalKeyNotifier returns a new unmarshal key notifier for the given key.
-func (upn *UnmarshalPrefixNotifier) GetUnmarshalKeyNotifier(key Key) (UnmarshalKeyNotifier, error) {
+func (upn *unmarshalPrefixNotifier) GetUnmarshalKeyNotifier(key Key) (unmarshalKeyNotifier, error) {
 	// create a new unmarshaller instance (bytes will be reloaded within key notifier
-	unmarshaller, err := upn.GetUnmarshallerFunc(nil)
+	unmarshaller, err := upn.getUnmarshallerFunc(nil)
 	if err != nil {
-		return UnmarshalKeyNotifier{}, err
+		return unmarshalKeyNotifier{}, err
 	}
 
-	notifier := UnmarshalKeyNotifier{
+	notifier := unmarshalKeyNotifier{
+		KeyBase:             NewKeyBase(key),
 		Unmarshaller:        unmarshaller,
-		UnmarshalNotifyFunc: upn.UnmarshalNotifyFunc,
+		UnmarshalNotifyFunc: upn.unmarshalNotifyFunc,
 	}
 
+	return notifier, nil
+}
+
+// NewUnmarshalPrefixNotifier returns a new instance of UnmarshalPrefixNotifier.
+func NewUnmarshalPrefixNotifier(prefix string,
+	unmarshalNotifyFunc UnmarshalNotifyFunc,
+	getUnmarshallerFunc GetUnmarshallerFunc,
+) (*unmarshalPrefixNotifier, error) {
+	if getUnmarshallerFunc == nil {
+		return nil, fmt.Errorf("getUnmarshallerFunc cannot be nil")
+	}
+
+	notifier := &unmarshalPrefixNotifier{
+		PrefixBase:          NewPrefixBase(prefix),
+		unmarshalNotifyFunc: unmarshalNotifyFunc,
+		getUnmarshallerFunc: getUnmarshallerFunc,
+	}
 	return notifier, nil
 }

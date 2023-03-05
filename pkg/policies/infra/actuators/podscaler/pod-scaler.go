@@ -126,15 +126,11 @@ func setupPodScalerFactory(
 		electionTrackers:     electionTrackers,
 	}
 
-	fxDriver := &notifiers.FxDriver{
-		FxOptionsFuncs: []notifiers.FxOptionsFunc{
-			paFactory.newPodScalerOptions,
-		},
-		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
-			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
-		},
-		StatusRegistry:     reg,
-		PrometheusRegistry: prometheusRegistry,
+	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
+		config.NewProtobufUnmarshaller,
+		[]notifiers.FxOptionsFunc{paFactory.newPodScalerOptions})
+	if err != nil {
+		return err
 	}
 
 	lifecycle.Append(fx.Hook{

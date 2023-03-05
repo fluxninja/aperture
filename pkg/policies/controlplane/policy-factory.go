@@ -15,8 +15,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/prometheus"
+	prom "github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/status"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // policyFactoryModule module for policy factory.
@@ -35,7 +36,7 @@ func policyFactoryModule() fx.Option {
 		),
 		grpcgateway.RegisterHandler{Handler: policylangv1.RegisterPolicyServiceHandlerFromEndpoint}.Annotate(),
 		fx.Invoke(RegisterPolicyService),
-		prometheus.Module(),
+		prom.Module(),
 		policyModule(),
 	)
 }
@@ -60,6 +61,7 @@ func providePolicyFactory(
 	etcdClient *etcdclient.Client,
 	lifecycle fx.Lifecycle,
 	registry status.Registry,
+	prometheusRegistry *prometheus.Registry,
 ) (*PolicyFactory, error) {
 	policiesStatusRegistry := registry.Child("system", iface.PoliciesRoot)
 	logger := policiesStatusRegistry.GetLogger()
@@ -84,12 +86,14 @@ func providePolicyFactory(
 		optionsFunc = append(optionsFunc, fxOptionsFuncs...)
 	}
 
-	fxDriver := &notifiers.FxDriver{
-		FxOptionsFuncs: optionsFunc,
-		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
-			GetUnmarshallerFunc: config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller,
-		},
-		StatusRegistry: policiesStatusRegistry,
+	fxDriver, err := notifiers.NewFxDriver(
+		policiesStatusRegistry,
+		prometheusRegistry,
+		config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller,
+		optionsFunc,
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	lifecycle.Append(fx.Hook{
