@@ -3,9 +3,9 @@ package kubernetes
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/sourcegraph/conc/stream"
@@ -19,7 +19,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/utils"
 )
 
@@ -59,48 +58,40 @@ func newServiceDiscovery(
 	return kd, nil
 }
 
-func (kd *serviceDiscovery) start() {
-	panichandler.Go(func() {
-		operation := func() error {
-			// get cluster domain
-			clusterDomain, err := utils.GetClusterDomain()
-			if err != nil {
-				log.Error().Err(err).Msg("Could not get cluster domain, will retry")
-				return err
-			}
-			kd.clusterDomain = clusterDomain
+func (kd *serviceDiscovery) start(startCtx context.Context) error {
+	// get cluster domain
+	clusterDomain, err := utils.GetClusterDomain()
+	if err != nil {
+		log.Error().Err(err).Msg("Could not get cluster domain, will retry")
+		return err
+	}
+	kd.clusterDomain = clusterDomain
 
-			// purge notifiers
-			kd.entityEvents.Purge("")
-
-			endpointsInformer := kd.informerFactory.Core().V1().Endpoints().Informer()
-			_, err = endpointsInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-				AddFunc:    kd.handleEndpointsAdd,
-				UpdateFunc: kd.handleEndpointsUpdate,
-				DeleteFunc: kd.handleEndpointsDelete,
-			})
-			if err != nil {
-				return err
-			}
-
-			kd.informerFactory.Start(kd.ctx.Done())
-			if !cache.WaitForCacheSync(kd.ctx.Done(), endpointsInformer.HasSynced) {
-				return fmt.Errorf("timed out waiting for caches to sync")
-			}
-
-			<-kd.ctx.Done()
-			return nil
-		}
-		boff := backoff.NewConstantBackOff(5 * time.Second)
-		_ = backoff.Retry(operation, backoff.WithContext(boff, kd.ctx))
-		log.Info().Msg("Service discovery stopped")
+	endpointsInformer := kd.informerFactory.Core().V1().Endpoints().Informer()
+	_, err = endpointsInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    kd.handleEndpointsAdd,
+		UpdateFunc: kd.handleEndpointsUpdate,
+		DeleteFunc: kd.handleEndpointsDelete,
 	})
+	if err != nil {
+		return err
+	}
+
+	kd.informerFactory.Start(kd.ctx.Done())
+
+	if !cache.WaitForCacheSync(startCtx.Done(), endpointsInformer.HasSynced) {
+		return errors.New("timed out waiting for caches to sync")
+	}
+
+	log.Info().Msg("Service discovery started")
+	return nil
 }
 
-func (kd *serviceDiscovery) stop() {
+func (kd *serviceDiscovery) stop(stopCtx context.Context) error {
 	kd.cancel()
 	kd.serviceStream.Wait()
 	kd.entityEvents.Purge("")
+	return nil
 }
 
 func (kd *serviceDiscovery) handleEndpointsAdd(obj interface{}) {
