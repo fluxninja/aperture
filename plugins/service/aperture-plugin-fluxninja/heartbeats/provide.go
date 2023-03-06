@@ -2,8 +2,11 @@ package heartbeats
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"go.uber.org/fx"
 
@@ -115,21 +118,92 @@ func Provide(in ConstructorIn) (*Heartbeats, error) {
 }
 
 func getInstallationMode() string {
-	_, kubernetesServiceHostExists := os.LookupEnv("KUBERNETES_SERVICE_HOST")
-	_, kubernetesServicePortExists := os.LookupEnv("KUBERNETES_SERVICE_PORT")
-	if kubernetesServiceHostExists && kubernetesServicePortExists {
-		// Check if the code is running in a sidecar container
-		if os.Getenv("SIDECAR") != "" {
+	if isKubernetes() {
+		if isKubernetesSidecar() {
 			return "KUBERNETES_SIDECAR"
-		} else {
+		} else if isKubernetesDaemonSet() {
 			return "KUBERNETES_DAEMONSET"
 		}
+		return "KUBERNETES_POD"
+	} else if isLinux() {
+		return "LINUX_BARE_METAL"
+	} else {
+		return "UNKNOWN"
 	}
+}
+
+func isLinux() bool {
 	// Check if running on bare metal Linux
 	if _, err := os.Stat("/proc/cpuinfo"); err == nil {
-		return "BAREMETAL_LINUX"
+		return true
 	}
-	return "UNKNOWN"
+	return false
+}
+
+func isKubernetes() bool {
+	_, kubernetesServiceHostExists := os.LookupEnv("KUBERNETES_SERVICE_HOST")
+	_, kubernetesServicePortExists := os.LookupEnv("KUBERNETES_SERVICE_PORT")
+	return kubernetesServiceHostExists && kubernetesServicePortExists
+}
+
+func isKubernetesSidecar() bool {
+	_, podNameExists := os.LookupEnv("POD_NAME")
+	_, podNamespaceExists := os.LookupEnv("POD_NAMESPACE")
+	if podNameExists && podNamespaceExists {
+		// Check if running as a sidecar container
+		file, err := os.Open("/proc/1/cgroup")
+		if err != nil {
+			return false
+		}
+		defer file.Close()
+
+		buf := make([]byte, 1024)
+		n, err := file.Read(buf)
+		if err != nil {
+			return false
+		}
+
+		cgroup := string(buf[:n])
+		if strings.Contains(cgroup, "pod") && !strings.Contains(cgroup, "sandbox") {
+			return true
+		}
+	}
+
+	return false
+}
+
+func isKubernetesDaemonSet() bool {
+	podName, podNameExists := os.LookupEnv("POD_NAME")
+	podNamespace, podNamespaceExists := os.LookupEnv("POD_NAMESPACE")
+	if podNameExists && podNamespaceExists {
+		// Get the pod's metadata
+		path := fmt.Sprintf("/api/v1/namespaces/%s/pods/%s", podNamespace, podName)
+		data, err := os.ReadFile(fmt.Sprintf("/var/run/secrets/kubernetes.io/serviceaccount/%s", path))
+		if err != nil {
+			return false
+		}
+
+		// Check if the pod has the daemonset label
+		var obj map[string]interface{}
+		err = json.Unmarshal(data, &obj)
+		if err != nil {
+			return false
+		}
+		metadata, ok := obj["metadata"].(map[string]interface{})
+		if !ok {
+			return false
+		}
+		labels, ok := metadata["labels"].(map[string]interface{})
+		if !ok {
+			return false
+		}
+		_, daemonsetLabelExists := labels["daemonset"]
+		if daemonsetLabelExists {
+			return true
+		}
+	}
+
+	return false
 }
 
 // Invoke enables heartbeats in FX.
