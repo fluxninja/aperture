@@ -18,9 +18,6 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	autoscalek8scontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
-	flowcontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
-	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/peers/v1"
 	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
@@ -38,6 +35,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
+	flowcontrolpoints "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/controlpoints"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/utils"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
@@ -237,32 +235,17 @@ func (h *Heartbeats) newHeartbeat(
 			report.ServicesList = servicesList
 		}
 
-		if h.flowControlPoints != nil {
-			var peers *peersv1.Peers
-			if h.peersWatcher != nil {
-				peers = h.peersWatcher.GetPeers()
-				report.Peers = peers
-			}
+		if h.peersWatcher != nil {
+			peers := h.peersWatcher.GetPeers()
+			report.Peers = peers
+		}
 
-			flowControlPointObjects := h.flowControlPoints.GetAll()
-			flowControlPoints := &flowcontrolpointsv1.FlowControlPoints{
-				FlowControlPoints: make([]*flowcontrolpointsv1.FlowControlPoint, 0, len(flowControlPointObjects)),
-			}
-			for _, cp := range flowControlPointObjects {
-				flowControlPoints.FlowControlPoints = append(flowControlPoints.FlowControlPoints, cp.ToProto())
-			}
-			report.FlowControlPoints = flowControlPoints
+		if h.flowControlPoints != nil {
+			report.FlowControlPoints = flowcontrolpoints.ToProto(h.flowControlPoints)
 		}
 
 		if h.autoscalek8sControlPoints != nil {
-			kubernetesControlPointObjects := h.autoscalek8sControlPoints.Keys()
-			autoscalek8sControlPoints := &autoscalek8scontrolpointsv1.AutoscaleKubernetesControlPoints{
-				AutoscaleKubernetesControlPoints: make([]*autoscalek8scontrolpointsv1.AutoscaleKubernetesControlPoint, 0, len(kubernetesControlPointObjects)),
-			}
-			for _, cp := range kubernetesControlPointObjects {
-				autoscalek8sControlPoints.AutoscaleKubernetesControlPoints = append(autoscalek8sControlPoints.AutoscaleKubernetesControlPoints, cp.ToProto())
-			}
-			report.AutoscaleKubernetesControlPoints = autoscalek8sControlPoints
+			report.AutoscaleKubernetesControlPoints = h.autoscalek8sControlPoints.ToProto()
 		}
 	}
 	return report

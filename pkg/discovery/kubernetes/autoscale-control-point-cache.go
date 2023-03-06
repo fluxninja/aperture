@@ -11,7 +11,7 @@ import (
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	controlpointcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
+	controlpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/k8s"
@@ -29,13 +29,13 @@ type AutoscaleControlPoint struct {
 }
 
 // ToProto converts a ControlPoint to a AutoscaleKubernetesControlPoint.
-func (cp *AutoscaleControlPoint) ToProto() *controlpointcachev1.AutoscaleKubernetesControlPoint {
+func (cp *AutoscaleControlPoint) ToProto() *controlpointsv1.AutoscaleKubernetesControlPoint {
 	groupVersion := schema.GroupVersion{
 		Group:   cp.Group,
 		Version: cp.Version,
 	}
 
-	return &controlpointcachev1.AutoscaleKubernetesControlPoint{
+	return &controlpointsv1.AutoscaleKubernetesControlPoint{
 		ApiVersion: groupVersion.String(),
 		Kind:       cp.Kind,
 		Namespace:  cp.Namespace,
@@ -73,6 +73,7 @@ type AutoscaleControlPoints interface {
 	Keys() []AutoscaleControlPoint
 	AddKeyNotifier(notifiers.KeyNotifier) error
 	RemoveKeyNotifier(notifiers.KeyNotifier) error
+	ToProto() *controlpointsv1.AutoscaleKubernetesControlPoints
 }
 
 // autocaleControlPoints is a cache of discovered Kubernetes control points and provides APIs to do CRUD on Scale type resources.
@@ -265,6 +266,18 @@ func (cpc *autocaleControlPoints) Keys() []AutoscaleControlPoint {
 		cps = append(cps, cp)
 	}
 	return cps
+}
+
+// ToProto returns the list of ControlPoints in the cache as a protobuf message.
+func (cpc *autocaleControlPoints) ToProto() *controlpointsv1.AutoscaleKubernetesControlPoints {
+	keys := cpc.Keys()
+	akcp := &controlpointsv1.AutoscaleKubernetesControlPoints{
+		AutoscaleKubernetesControlPoints: make([]*controlpointsv1.AutoscaleKubernetesControlPoint, 0, len(keys)),
+	}
+	for _, cp := range keys {
+		akcp.AutoscaleKubernetesControlPoints = append(akcp.AutoscaleKubernetesControlPoints, cp.ToProto())
+	}
+	return akcp
 }
 
 // AddKeyNotifier adds a KeyNotifier to the trackers.

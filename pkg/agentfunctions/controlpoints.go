@@ -4,10 +4,10 @@ import (
 	"context"
 
 	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
-	flowcontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/controlpoints"
 	"github.com/fluxninja/aperture/pkg/rpc"
 )
 
@@ -36,21 +36,8 @@ func (h *ControlPointsHandler) ListControlPoints(
 	ctx context.Context,
 	_ *cmdv1.ListFlowControlPointsRequest,
 ) (*cmdv1.ListFlowControlPointsAgentResponse, error) {
-	controlPoints := h.cache.GetAll()
-
-	controlPointsProto := &flowcontrolpointsv1.FlowControlPoints{
-		FlowControlPoints: make([]*flowcontrolpointsv1.FlowControlPoint, 0, len(controlPoints)),
-	}
-	for _, controlPoint := range controlPoints {
-		controlPointsProto.FlowControlPoints = append(controlPointsProto.FlowControlPoints,
-			&flowcontrolpointsv1.FlowControlPoint{
-				Service:      controlPoint.Service,
-				ControlPoint: controlPoint.ControlPoint,
-			})
-	}
-
 	return &cmdv1.ListFlowControlPointsAgentResponse{
-		FlowControlPoints: controlPointsProto,
+		FlowControlPoints: controlpoints.ToProto(h.cache),
 		AgentGroup:        h.agentGroup,
 	}, nil
 }
