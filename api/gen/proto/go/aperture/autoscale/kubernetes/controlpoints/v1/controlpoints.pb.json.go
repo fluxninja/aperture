@@ -8,7 +8,7 @@ import (
 )
 
 // MarshalJSON implements json.Marshaler
-func (msg *AutoscaleKubernetesControlPoints) MarshalJSON() ([]byte, error) {
+func (msg *AutoScaleKubernetesControlPoints) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -17,14 +17,14 @@ func (msg *AutoscaleKubernetesControlPoints) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *AutoscaleKubernetesControlPoints) UnmarshalJSON(b []byte) error {
+func (msg *AutoScaleKubernetesControlPoints) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *AutoscaleKubernetesControlPoint) MarshalJSON() ([]byte, error) {
+func (msg *AutoScaleKubernetesControlPoint) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -33,7 +33,7 @@ func (msg *AutoscaleKubernetesControlPoint) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *AutoscaleKubernetesControlPoint) UnmarshalJSON(b []byte) error {
+func (msg *AutoScaleKubernetesControlPoint) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

@@ -15,84 +15,84 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// AutoscaleKubernetesControlPointsServiceClient is the client API for AutoscaleKubernetesControlPointsService service.
+// AutoScaleKubernetesControlPointsServiceClient is the client API for AutoScaleKubernetesControlPointsService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type AutoscaleKubernetesControlPointsServiceClient interface {
-	GetControlPoints(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AutoscaleKubernetesControlPoints, error)
+type AutoScaleKubernetesControlPointsServiceClient interface {
+	GetControlPoints(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AutoScaleKubernetesControlPoints, error)
 }
 
-type autoscaleKubernetesControlPointsServiceClient struct {
+type autoScaleKubernetesControlPointsServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewAutoscaleKubernetesControlPointsServiceClient(cc grpc.ClientConnInterface) AutoscaleKubernetesControlPointsServiceClient {
-	return &autoscaleKubernetesControlPointsServiceClient{cc}
+func NewAutoScaleKubernetesControlPointsServiceClient(cc grpc.ClientConnInterface) AutoScaleKubernetesControlPointsServiceClient {
+	return &autoScaleKubernetesControlPointsServiceClient{cc}
 }
 
-func (c *autoscaleKubernetesControlPointsServiceClient) GetControlPoints(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AutoscaleKubernetesControlPoints, error) {
-	out := new(AutoscaleKubernetesControlPoints)
-	err := c.cc.Invoke(ctx, "/aperture.autoscale.kubernetes.controlpoints.v1.AutoscaleKubernetesControlPointsService/GetControlPoints", in, out, opts...)
+func (c *autoScaleKubernetesControlPointsServiceClient) GetControlPoints(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AutoScaleKubernetesControlPoints, error) {
+	out := new(AutoScaleKubernetesControlPoints)
+	err := c.cc.Invoke(ctx, "/aperture.autoscale.kubernetes.controlpoints.v1.AutoScaleKubernetesControlPointsService/GetControlPoints", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// AutoscaleKubernetesControlPointsServiceServer is the server API for AutoscaleKubernetesControlPointsService service.
-// All implementations should embed UnimplementedAutoscaleKubernetesControlPointsServiceServer
+// AutoScaleKubernetesControlPointsServiceServer is the server API for AutoScaleKubernetesControlPointsService service.
+// All implementations should embed UnimplementedAutoScaleKubernetesControlPointsServiceServer
 // for forward compatibility
-type AutoscaleKubernetesControlPointsServiceServer interface {
-	GetControlPoints(context.Context, *emptypb.Empty) (*AutoscaleKubernetesControlPoints, error)
+type AutoScaleKubernetesControlPointsServiceServer interface {
+	GetControlPoints(context.Context, *emptypb.Empty) (*AutoScaleKubernetesControlPoints, error)
 }
 
-// UnimplementedAutoscaleKubernetesControlPointsServiceServer should be embedded to have forward compatible implementations.
-type UnimplementedAutoscaleKubernetesControlPointsServiceServer struct {
+// UnimplementedAutoScaleKubernetesControlPointsServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedAutoScaleKubernetesControlPointsServiceServer struct {
 }
 
-func (UnimplementedAutoscaleKubernetesControlPointsServiceServer) GetControlPoints(context.Context, *emptypb.Empty) (*AutoscaleKubernetesControlPoints, error) {
+func (UnimplementedAutoScaleKubernetesControlPointsServiceServer) GetControlPoints(context.Context, *emptypb.Empty) (*AutoScaleKubernetesControlPoints, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetControlPoints not implemented")
 }
 
-// UnsafeAutoscaleKubernetesControlPointsServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to AutoscaleKubernetesControlPointsServiceServer will
+// UnsafeAutoScaleKubernetesControlPointsServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AutoScaleKubernetesControlPointsServiceServer will
 // result in compilation errors.
-type UnsafeAutoscaleKubernetesControlPointsServiceServer interface {
-	mustEmbedUnimplementedAutoscaleKubernetesControlPointsServiceServer()
+type UnsafeAutoScaleKubernetesControlPointsServiceServer interface {
+	mustEmbedUnimplementedAutoScaleKubernetesControlPointsServiceServer()
 }
 
-func RegisterAutoscaleKubernetesControlPointsServiceServer(s grpc.ServiceRegistrar, srv AutoscaleKubernetesControlPointsServiceServer) {
-	s.RegisterService(&AutoscaleKubernetesControlPointsService_ServiceDesc, srv)
+func RegisterAutoScaleKubernetesControlPointsServiceServer(s grpc.ServiceRegistrar, srv AutoScaleKubernetesControlPointsServiceServer) {
+	s.RegisterService(&AutoScaleKubernetesControlPointsService_ServiceDesc, srv)
 }
 
-func _AutoscaleKubernetesControlPointsService_GetControlPoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AutoScaleKubernetesControlPointsService_GetControlPoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AutoscaleKubernetesControlPointsServiceServer).GetControlPoints(ctx, in)
+		return srv.(AutoScaleKubernetesControlPointsServiceServer).GetControlPoints(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/aperture.autoscale.kubernetes.controlpoints.v1.AutoscaleKubernetesControlPointsService/GetControlPoints",
+		FullMethod: "/aperture.autoscale.kubernetes.controlpoints.v1.AutoScaleKubernetesControlPointsService/GetControlPoints",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AutoscaleKubernetesControlPointsServiceServer).GetControlPoints(ctx, req.(*emptypb.Empty))
+		return srv.(AutoScaleKubernetesControlPointsServiceServer).GetControlPoints(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// AutoscaleKubernetesControlPointsService_ServiceDesc is the grpc.ServiceDesc for AutoscaleKubernetesControlPointsService service.
+// AutoScaleKubernetesControlPointsService_ServiceDesc is the grpc.ServiceDesc for AutoScaleKubernetesControlPointsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var AutoscaleKubernetesControlPointsService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "aperture.autoscale.kubernetes.controlpoints.v1.AutoscaleKubernetesControlPointsService",
-	HandlerType: (*AutoscaleKubernetesControlPointsServiceServer)(nil),
+var AutoScaleKubernetesControlPointsService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "aperture.autoscale.kubernetes.controlpoints.v1.AutoScaleKubernetesControlPointsService",
+	HandlerType: (*AutoScaleKubernetesControlPointsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetControlPoints",
-			Handler:    _AutoscaleKubernetesControlPointsService_GetControlPoints_Handler,
+			Handler:    _AutoScaleKubernetesControlPointsService_GetControlPoints_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

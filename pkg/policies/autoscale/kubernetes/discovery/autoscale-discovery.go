@@ -1,4 +1,4 @@
-package kubernetes
+package discovery
 
 import (
 	"context"
@@ -23,7 +23,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
-func newControlPointDiscovery(election *election.Election, k8sClient k8s.K8sClient, controlPointStore AutoscaleControlPointStore) (*controlPointDiscovery, error) {
+func newControlPointDiscovery(election *election.Election, k8sClient k8s.K8sClient, controlPointStore AutoScaleControlPointStore) (*controlPointDiscovery, error) {
 	cpd := &controlPointDiscovery{
 		election:          election,
 		controlPointStore: controlPointStore,
@@ -39,7 +39,7 @@ type controlPointDiscovery struct {
 	waitGroup         sync.WaitGroup
 	ctx               context.Context
 	cancel            context.CancelFunc
-	controlPointStore AutoscaleControlPointStore
+	controlPointStore AutoScaleControlPointStore
 	discoveryClient   discovery.DiscoveryInterface
 	dynamicClient     dynamic.Interface
 	election          *election.Election
@@ -144,11 +144,11 @@ func (cpd *controlPointDiscovery) start() {
 }
 
 func (cpd *controlPointDiscovery) createResourceEventHandlerFuncs(groupVersionResource schema.GroupVersionResource, kind string) cache.ResourceEventHandlerFuncs {
-	controlPointFromObject := func(obj interface{}) AutoscaleControlPoint {
+	controlPointFromObject := func(obj interface{}) AutoScaleControlPoint {
 		// read the name of the resource
 		name := obj.(*unstructured.Unstructured).GetName()
 		namespace := obj.(*unstructured.Unstructured).GetNamespace()
-		return AutoscaleControlPoint{
+		return AutoScaleControlPoint{
 			Group:     groupVersionResource.Group,
 			Version:   groupVersionResource.Version,
 			Kind:      kind,

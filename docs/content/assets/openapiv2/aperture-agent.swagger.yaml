@@ -14,12 +14,12 @@ paths:
     get:
       tags:
       - aperture-agent
-      operationId: AutoscaleKubernetesControlPointsService_GetControlPoints
+      operationId: AutoScaleKubernetesControlPointsService_GetControlPoints
       responses:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/AutoscaleKubernetesControlPoints'
+            $ref: '#/definitions/AutoScaleKubernetesControlPoints'
         default:
           description: An unexpected error response.
           schema:
@@ -290,7 +290,7 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
 definitions:
-  AutoscaleKubernetesControlPoint:
+  AutoScaleKubernetesControlPoint:
     type: object
     properties:
       api_version:
@@ -301,13 +301,13 @@ definitions:
         type: string
       namespace:
         type: string
-  AutoscaleKubernetesControlPoints:
+  AutoScaleKubernetesControlPoints:
     type: object
     properties:
-      autoscale_kubernetes_control_points:
+      auto_scale_kubernetes_control_points:
         type: array
         items:
-          $ref: '#/definitions/AutoscaleKubernetesControlPoint'
+          $ref: '#/definitions/AutoScaleKubernetesControlPoint'
   DMap:
     type: object
     properties:

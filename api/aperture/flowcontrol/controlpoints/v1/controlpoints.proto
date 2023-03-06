@@ -21,6 +21,6 @@ message FlowControlPoints {
 }
 
 message FlowControlPoint {
-  string service = 1;
-  string control_point = 2;
+  string control_point = 1;
+  string service = 2;
 }

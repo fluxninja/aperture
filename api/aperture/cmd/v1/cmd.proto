@@ -34,7 +34,7 @@ message ListServicesControllerResponse {
 message ListFlowControlPointsRequest {}
 
 message ListFlowControlPointsAgentResponse {
-  aperture.flowcontrol.controlpoints.v1.FlowControlPoints flow_control_points = 1;
+  repeated aperture.flowcontrol.controlpoints.v1.FlowControlPoint flow_control_points = 1;
   // FIXME: Remove. Controller should be aware which agent group agent belongs to.
   string agent_group = 2;
 }

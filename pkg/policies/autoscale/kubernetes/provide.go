@@ -1,9 +1,12 @@
+// +kubebuilder:validation:Optional
 package kubernetes
 
 import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/actuators"
+	"github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/config"
+	"github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/discovery"
 	"github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/service"
 )
 
@@ -12,5 +15,7 @@ func Module() fx.Option {
 	return fx.Options(
 		actuators.Module(),
 		service.Module(),
+		discovery.Module(),
+		config.Module(),
 	)
 }
