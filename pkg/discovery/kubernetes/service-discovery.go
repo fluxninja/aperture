@@ -141,20 +141,6 @@ func (kd *serviceDiscovery) handleEndpointsDelete(obj interface{}) {
 	})
 }
 
-func (kd *serviceDiscovery) getEntityFromTracker(uid string) *entitiesv1.Entity {
-	bytes := kd.entityEvents.GetCurrentValue(notifiers.Key(uid))
-	if bytes == nil {
-		return nil
-	}
-	entity := &entitiesv1.Entity{}
-	err := json.Unmarshal(bytes, entity)
-	if err != nil {
-		log.Error().Err(err).Msg("Could not unmarshal entity")
-		return nil
-	}
-	return entity
-}
-
 // getService return the full qualified domain name of a given service.
 func (kd *serviceDiscovery) getService(namespace, name string) string {
 	service := fmt.Sprintf("%s.%s.svc.%s", name, namespace, kd.clusterDomain)
@@ -164,51 +150,69 @@ func (kd *serviceDiscovery) getService(namespace, name string) string {
 func (kd *serviceDiscovery) removeEndpoints(endpoints *v1.Endpoints) {
 	for _, subset := range endpoints.Subsets {
 		for _, address := range subset.Addresses {
-			entity := kd.getEntityFromTracker(string(address.TargetRef.UID))
-			if entity != nil {
+			updateFunc := func(oldValue []byte) (notifiers.EventType, []byte) {
+				if oldValue == nil {
+					return notifiers.Remove, nil
+				}
+				entity := &entitiesv1.Entity{}
+				err := json.Unmarshal(oldValue, entity)
+				if err != nil {
+					log.Error().Err(err).Msg("Could not unmarshal entity")
+					return notifiers.Remove, nil
+				}
 				entity.Services = utils.RemoveFromSlice(entity.Services, kd.getService(endpoints.Namespace, endpoints.Name))
 				if kd.shouldRemove(entity) {
-					kd.entityEvents.RemoveEvent(notifiers.Key(address.TargetRef.UID))
-				} else {
-					bytes, err := json.Marshal(entity)
-					if err != nil {
-						log.Error().Err(err).Msg("Could not marshal entity")
-						continue
-					}
-					kd.entityEvents.WriteEvent(notifiers.Key(address.TargetRef.UID), bytes)
+					return notifiers.Remove, nil
 				}
+				bytes, err := json.Marshal(entity)
+				if err != nil {
+					log.Error().Err(err).Msg("Could not marshal entity")
+					return notifiers.Remove, nil
+				}
+				return notifiers.Write, bytes
 			}
+
+			kd.entityEvents.UpdateValue(notifiers.Key(address.TargetRef.UID), updateFunc)
 		}
 	}
 }
 
 // updatePodService retrieves stored pod data from tracker, enriches it with new info and send the updated version.
 func (kd *serviceDiscovery) updatePodService(pod podServiceUpdate) error {
-	entity := kd.getEntityFromTracker(pod.UID)
-	if entity != nil {
-		// append to services if it doesn't exist
-		if !utils.SliceContains(entity.Services, pod.Service) {
-			entity.Services = append(entity.Services, pod.Service)
+	updateFunc := func(oldValue []byte) (notifiers.EventType, []byte) {
+		var entity *entitiesv1.Entity
+		if oldValue == nil {
+			// create new entity
+			entity = &entitiesv1.Entity{
+				Services:  []string{pod.Service},
+				IpAddress: pod.IPAddress,
+				Namespace: pod.Namespace,
+				NodeName:  pod.NodeName,
+				Uid:       pod.UID,
+				Prefix:    podTrackerPrefix,
+				Name:      pod.Name,
+			}
+		} else {
+			err := json.Unmarshal(oldValue, &entity)
+			if err != nil {
+				log.Error().Msgf("Error unmarshaling entity: %v", err)
+				return notifiers.Write, oldValue
+			}
+			// append to services if it doesn't exist
+			if !utils.SliceContains(entity.Services, pod.Service) {
+				entity.Services = append(entity.Services, pod.Service)
+			}
 		}
-	} else {
-		// create new entity
-		entity = &entitiesv1.Entity{
-			Services:  []string{pod.Service},
-			IpAddress: pod.IPAddress,
-			Namespace: pod.Namespace,
-			NodeName:  pod.NodeName,
-			Uid:       pod.UID,
-			Prefix:    podTrackerPrefix,
-			Name:      pod.Name,
+		value, err := json.Marshal(entity)
+		if err != nil {
+			log.Error().Msgf("Error marshaling entity: %v", err)
+			return notifiers.Write, oldValue
 		}
+		return notifiers.Write, value
 	}
 
-	value, err := json.Marshal(entity)
-	if err != nil {
-		log.Error().Msgf("Error marshaling entity: %v", err)
-		return err
-	}
-	kd.entityEvents.WriteEvent(notifiers.Key(pod.UID), value)
+	kd.entityEvents.UpdateValue(notifiers.Key(pod.UID), updateFunc)
+
 	return nil
 }
 
