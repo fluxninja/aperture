@@ -126,12 +126,12 @@ func (kd *serviceDiscovery) handleEndpointsUpdate(oldObj, newObj interface{}) {
 	newEndpoints := newObj.(*v1.Endpoints)
 	// make a deep copy of oldEndpoints
 	toRemove := oldEndpoints.DeepCopy()
-	// from this copy remove addresses that are present in newEndpoints
-	for _, newSubsets := range newEndpoints.Subsets {
-		for _, newAddresses := range newSubsets.Addresses {
-			for i, oldSubsets := range toRemove.Subsets {
-				for j, oldAddresses := range oldSubsets.Addresses {
-					if newAddresses.TargetRef.UID == oldAddresses.TargetRef.UID {
+	// check if an address in toRemove is found in any subsets of newEndpoints, if so remove it from toRemove
+	for _, newSubset := range newEndpoints.Subsets {
+		for _, newAddress := range newSubset.Addresses {
+			for i, oldSubset := range toRemove.Subsets {
+				for j, oldAddress := range oldSubset.Addresses {
+					if newAddress.TargetRef.UID == oldAddress.TargetRef.UID {
 						toRemove.Subsets[i].Addresses = append(toRemove.Subsets[i].Addresses[:j], toRemove.Subsets[i].Addresses[j+1:]...)
 					}
 				}
@@ -290,12 +290,12 @@ func (kd *serviceDiscovery) updatePodServiceEntity(pod podServiceUpdate) error {
 	} else {
 		// create new entity
 		entity = &entitiesv1.Entity{
+			Prefix:    podTrackerPrefix,
+			Uid:       pod.UID,
 			IpAddress: pod.IPAddress,
+			Name:      pod.Name,
 			Namespace: pod.Namespace,
 			NodeName:  pod.NodeName,
-			Uid:       pod.UID,
-			Prefix:    podTrackerPrefix,
-			Name:      pod.Name,
 		}
 		if pod.Service != "" {
 			entity.Services = []string{pod.Service}
