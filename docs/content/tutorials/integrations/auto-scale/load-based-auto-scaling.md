@@ -78,7 +78,7 @@ request headers).
 ```
 
 ```yaml
-{@include: ./assets/load-based-autoscale-service1.yaml}
+{@include: ./assets/values.yaml}
 ```
 
 ```mdx-code-block
@@ -90,7 +90,7 @@ request headers).
 <p>
 
 ```yaml
-{@include: ./assets/load-based-autoscale-service1-cr.yaml}
+{@include: ./assets/load-based-auto-scale.yaml}
 ```
 
 </p>
@@ -101,7 +101,7 @@ request headers).
 <Zoom>
 
 ```mermaid
-{@include: ./assets/load-based-autoscale-service1-cr.mmd}
+{@include: ./assets/load-based-auto-scale.mmd}
 ```
 
 </Zoom>

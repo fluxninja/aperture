@@ -22,7 +22,8 @@ function generate_compare() {
 		--values-file "$values_file" \
 		--output-dir "tmp" \
 		--no-yaml-modeline \
-		--skip-pull
+		--skip-pull \
+		--overwrite
 
 	# make sure yaml1 and yaml2 exist
 	if [ ! -f "$yaml1" ]; then

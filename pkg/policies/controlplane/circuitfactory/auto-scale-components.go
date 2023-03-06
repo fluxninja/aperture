@@ -115,8 +115,8 @@ func newAutoScaleCompositeAndOptions(
 		tree.Root = podScalerConfComp
 
 		return tree, configuredComponents, fx.Options(options...), nil
-	} else if autoscaler := autoScaleComponentProto.GetAutoscaler(); autoscaler != nil {
-		nestedCircuit, err := autoscale.ParseAutoscaler(autoscaler)
+	} else if autoscaler := autoScaleComponentProto.GetAutoScaler(); autoscaler != nil {
+		nestedCircuit, err := autoscale.ParseAutoScaler(autoscaler)
 		if err != nil {
 			return retErr(err)
 		}

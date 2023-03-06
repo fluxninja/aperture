@@ -2,14 +2,6 @@ local emains = import './emains.libsonnet';
 local emaouts = import './emaouts.libsonnet';
 {
   new():: {
-    in_ports: {
-      input: error 'Port input is missing',
-      max_envelope: error 'Port max_envelope is missing',
-      min_envelope: error 'Port min_envelope is missing',
-    },
-    out_ports: {
-      output: error 'Port output is missing',
-    },
   },
   inPorts:: emains,
   outPorts:: emaouts,

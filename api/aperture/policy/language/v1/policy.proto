@@ -259,8 +259,8 @@ message AutoScale {
   oneof component {
     // PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
     PodScaler pod_scaler = 1;
-    // Autoscaler provides auto scaling functionality for any resource.
-    Autoscaler autoscaler = 2;
+    // AutoScaler provides auto scaling functionality for any resource.
+    AutoScaler auto_scaler = 2;
   }
 }
 
@@ -736,7 +736,7 @@ message Scheduler {
 
       // Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
       // This override is applicable only if `auto_tokens` is set to false.
-      uint64 tokens = 2; // @gotags: default:"1"
+      int64 tokens = 2; // @gotags: default:"1" validate:"gt=0"
 
       // Fairness key is a label key that can be used to provide fairness within a workload.
       // Any [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if
@@ -1460,8 +1460,8 @@ message AIMDConcurrencyController {
   LoadActuator.DynamicConfig default_config = 10;
 }
 
-// Autoscaler
-message Autoscaler {
+// AutoScaler
+message AutoScaler {
   // Increasing Gradient defines a controller for scaling out based on Gradient Controller.
   message IncreasingGradient {
     // This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
@@ -1562,22 +1562,22 @@ message Autoscaler {
     PodScaler.ScaleActuator.DynamicConfig default_config = 3;
   }
 
-  // Outputs for Autoscaler.
+  // Outputs for AutoScaler.
   message Outs {
     OutPort actual_scale = 1;
     OutPort configured_scale = 2;
     OutPort desired_scale = 3;
   }
 
-  // Output ports for the Autoscaler.
+  // Output ports for the AutoScaler.
   Outs out_ports = 1;
 
   Scaler scaler = 2; // @gotags: validate:"required"
 
   // The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
-  uint64 min_scale = 3; // @gotags: default:"0"];
+  int64 min_scale = 3; // @gotags: default:"0" validate:"gt=0"
   // The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
-  uint64 max_scale = 4; // @gotags: default:"4294967295"]
+  int64 max_scale = 4; // @gotags: default:"4294967295" validate:"gt=0"
 
   // List of Controllers for scaling out.
   repeated ScaleOutController scale_out_controllers = 5;

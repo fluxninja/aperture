@@ -1,9 +1,6 @@
 local pulsegeneratorouts = import './pulsegeneratorouts.libsonnet';
 {
   new():: {
-    out_ports: {
-      output: error 'Port output is missing',
-    },
   },
   outPorts:: pulsegeneratorouts,
   withFalseFor(false_for):: {

@@ -2,12 +2,6 @@ local maxins = import './maxins.libsonnet';
 local maxouts = import './maxouts.libsonnet';
 {
   new():: {
-    in_ports: {
-      inputs: error 'Port inputs is missing',
-    },
-    out_ports: {
-      output: error 'Port output is missing',
-    },
   },
   inPorts:: maxins,
   outPorts:: maxouts,

@@ -7,7 +7,7 @@ common:
   # Name of the policy.
   # Type: string
   # Required: True
-  policy_name: "load-based-autoscale-service1"
+  policy_name: "load-based-auto-scale-service1"
 
 policy:
   # Flux Meter.
@@ -47,7 +47,7 @@ policy:
             output:
               signal_name: AVERAGE_CPU
     - auto_scale:
-        autoscaler:
+        auto_scaler:
           scaler:
             kubernetes_replicas:
               kubernetes_object_selector:

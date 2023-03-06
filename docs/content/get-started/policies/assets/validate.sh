@@ -10,7 +10,8 @@ aperturectl="$git_root"/cmd/aperturectl/aperturectl
 	--name policies/static-rate-limiting \
 	--values-file values.yaml \
 	--output-dir "tmp" \
-	--skip-pull
+	--skip-pull \
+	--overwrite
 
 rm -rf tmp
 
