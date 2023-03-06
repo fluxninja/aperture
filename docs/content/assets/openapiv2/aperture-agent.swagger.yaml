@@ -14,12 +14,64 @@ paths:
     get:
       tags:
       - aperture-agent
-      operationId: ControlPointCache_GetControlPoints
+      operationId: AutoscaleKubernetesControlPointsService_GetControlPoints
       responses:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/KubernetesControlPoints'
+            $ref: '#/definitions/AutoscaleKubernetesControlPoints'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+  /v1/discovery/entities:
+    get:
+      tags:
+      - aperture-agent
+      operationId: EntitiesService_GetEntities
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/Entities'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+  /v1/discovery/entities/ip-address/{ip_address}:
+    get:
+      tags:
+      - aperture-agent
+      operationId: EntitiesService_GetEntityByIPAddress
+      parameters:
+      - type: string
+        name: ip_address
+        in: path
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/Entity'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+  /v1/discovery/entities/name/{name}:
+    get:
+      tags:
+      - aperture-agent
+      operationId: EntitiesService_GetEntityByName
+      parameters:
+      - type: string
+        name: name
+        in: path
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/Entity'
         default:
           description: An unexpected error response.
           schema:
@@ -42,64 +94,12 @@ paths:
     get:
       tags:
       - aperture-agent
-      operationId: FlowControlControlPointsService_GetControlPoints
+      operationId: FlowControlPointsService_GetControlPoints
       responses:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/FlowControlControlPoints'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/flowcontrol/entities:
-    get:
-      tags:
-      - aperture-agent
-      operationId: EntityCacheService_GetEntityCache
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/EntityCache'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/flowcontrol/entities/ip-address/{ip_address}:
-    get:
-      tags:
-      - aperture-agent
-      operationId: EntityCacheService_GetEntityByIPAddress
-      parameters:
-      - type: string
-        name: ip_address
-        in: path
-        required: true
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/Entity'
-        default:
-          description: An unexpected error response.
-          schema:
-            $ref: '#/definitions/googlerpcStatus'
-  /v1/flowcontrol/entities/name/{name}:
-    get:
-      tags:
-      - aperture-agent
-      operationId: EntityCacheService_GetEntityByName
-      parameters:
-      - type: string
-        name: name
-        in: path
-        required: true
-      responses:
-        "200":
-          description: A successful response.
-          schema:
-            $ref: '#/definitions/Entity'
+            $ref: '#/definitions/FlowControlPoints'
         default:
           description: An unexpected error response.
           schema:
@@ -290,6 +290,24 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
 definitions:
+  AutoscaleKubernetesControlPoint:
+    type: object
+    properties:
+      api_version:
+        type: string
+      kind:
+        type: string
+      name:
+        type: string
+      namespace:
+        type: string
+  AutoscaleKubernetesControlPoints:
+    type: object
+    properties:
+      autoscale_kubernetes_control_points:
+        type: array
+        items:
+          $ref: '#/definitions/AutoscaleKubernetesControlPoint'
   DMap:
     type: object
     properties:
@@ -334,14 +352,33 @@ definitions:
       published_total:
         type: string
         format: int64
+  Entities:
+    description: Entities contains both mappings of ip address to entity and entity
+      name to entity.
+    type: object
+    properties:
+      entities_by_ip_address:
+        $ref: '#/definitions/EntitiesEntities'
+      entities_by_name:
+        $ref: '#/definitions/EntitiesEntities'
+  EntitiesEntities:
+    description: Entities defines mapping of entities.
+    type: object
+    properties:
+      entities:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/Entity'
   Entity:
     description: Entity represents a pod, vm, etc.
     type: object
     properties:
-      cluster_ip:
-        type: string
       ip_address:
         type: string
+      labels:
+        type: array
+        items:
+          type: string
       name:
         type: string
       namespace:
@@ -356,23 +393,6 @@ definitions:
           type: string
       uid:
         type: string
-  EntityCache:
-    description: EntityCache contains both mappings of ip address to entity and entity
-      name to entity.
-    type: object
-    properties:
-      entities_by_ip_address:
-        $ref: '#/definitions/EntityCacheEntities'
-      entities_by_name:
-        $ref: '#/definitions/EntityCacheEntities'
-  EntityCacheEntities:
-    description: Entities defines mapping of entities.
-    type: object
-    properties:
-      entities:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/Entity'
   EqualsMatchExpression:
     description: Label selector expression of the equal form "label == value".
     type: object
@@ -388,20 +408,20 @@ definitions:
       value:
         description: Exact value that the label should be equal to.
         type: string
-  FlowControlControlPoint:
+  FlowControlPoint:
     type: object
     properties:
       control_point:
         type: string
       service:
         type: string
-  FlowControlControlPoints:
+  FlowControlPoints:
     type: object
     properties:
-      control_points:
+      flow_control_points:
         type: array
         items:
-          $ref: '#/definitions/FlowControlControlPoint'
+          $ref: '#/definitions/FlowControlPoint'
   GroupStatus:
     description: |-
       Groups is nested structure that holds status information about the node and a
@@ -457,24 +477,6 @@ definitions:
         type: array
         items:
           type: string
-  KubernetesControlPoint:
-    type: object
-    properties:
-      api_version:
-        type: string
-      kind:
-        type: string
-      name:
-        type: string
-      namespace:
-        type: string
-  KubernetesControlPoints:
-    type: object
-    properties:
-      control_points:
-        type: array
-        items:
-          $ref: '#/definitions/KubernetesControlPoint'
   LabelMatcher:
     description: |-
       It provides three ways to define requirements:

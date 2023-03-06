@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package aperture.plugins.fluxninja.v1;
 
-import "aperture/cmd/v1/cmd.proto";
-import "aperture/controlpointcache/v1/kubernetes.proto";
+import "aperture/autoscale/kubernetes/controlpoints/v1/controlpoints.proto";
+import "aperture/flowcontrol/controlpoints/v1/controlpoints.proto";
 import "aperture/info/v1/info.proto";
 import "aperture/peers/v1/peers.proto";
 import "aperture/policy/sync/v1/policy.proto";
@@ -39,8 +39,8 @@ message ReportRequest {
   ServicesList services_list = 8;
   aperture.status.v1.GroupStatus all_statuses = 9;
   aperture.policy.sync.v1.PolicyWrappers policies = 10;
-  repeated cmd.v1.ServiceControlPoint service_control_points = 11;
-  repeated aperture.controlpointcache.v1.KubernetesControlPoint kubernetes_control_points = 12;
+  aperture.flowcontrol.controlpoints.v1.FlowControlPoints flow_control_points = 11;
+  aperture.autoscale.kubernetes.controlpoints.v1.AutoscaleKubernetesControlPoints autoscale_kubernetes_control_points = 12;
   string installation_mode = 13;
 }
 

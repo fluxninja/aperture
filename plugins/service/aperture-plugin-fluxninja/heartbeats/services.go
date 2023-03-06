@@ -1,9 +1,9 @@
 package heartbeats
 
 import (
-	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/entitycache/v1"
+	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
-	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
@@ -38,7 +38,7 @@ func Merge(originalService, mergedService *heartbeatv1.Service) {
 // for an agent group is ignored.
 // Entities which have multiple values for service name will create one service
 // for each of them.
-func populateServicesList(c *entitycache.EntityCache) *heartbeatv1.ServicesList {
+func populateServicesList(c *entities.Entities) *heartbeatv1.ServicesList {
 	services := map[ServiceKey]*heartbeatv1.Service{}
 	overlapping := make(map[pair]int)
 	entities := c.GetEntities()
@@ -111,7 +111,7 @@ func eachPair(services []ServiceKey) []pair {
 	return pairs
 }
 
-func servicesFromEntity(entity *entitycachev1.Entity) ([]*heartbeatv1.Service, error) {
+func servicesFromEntity(entity *entitiesv1.Entity) ([]*heartbeatv1.Service, error) {
 	svcIDs := entity.Services
 	svcs := make([]*heartbeatv1.Service, 0, len(svcIDs))
 	for _, svc := range svcIDs {

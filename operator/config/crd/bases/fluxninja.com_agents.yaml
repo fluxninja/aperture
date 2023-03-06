@@ -1786,12 +1786,6 @@ spec:
                             type: boolean
                           discovery_enabled:
                             type: boolean
-                          node_name:
-                            description: NodeName is the name of the k8s node the
-                              agent should be monitoring
-                            type: string
-                          pod_name:
-                            type: string
                         type: object
                       static:
                         description: StaticDiscoveryConfig for pre-determined list

@@ -1281,18 +1281,6 @@ KubernetesDiscoveryConfig for Kubernetes service discovery.
 (bool, default: `true`)
 
 </dd>
-<dt>node_name</dt>
-<dd>
-
-(string) NodeName is the name of the k8s node the agent should be monitoring
-
-</dd>
-<dt>pod_name</dt>
-<dd>
-
-(string)
-
-</dd>
 </dl>
 
 ---

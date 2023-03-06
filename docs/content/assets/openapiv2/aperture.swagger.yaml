@@ -266,6 +266,24 @@ definitions:
                 $ref: '#/definitions/PodScaler'
                 description: PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
         type: object
+    AutoscaleKubernetesControlPoint:
+        properties:
+            api_version:
+                type: string
+            kind:
+                type: string
+            name:
+                type: string
+            namespace:
+                type: string
+        type: object
+    AutoscaleKubernetesControlPoints:
+        properties:
+            autoscale_kubernetes_control_points:
+                items:
+                    $ref: '#/definitions/AutoscaleKubernetesControlPoint'
+                type: array
+        type: object
     Autoscaler:
         properties:
             cooldown_override_percentage:
@@ -1144,13 +1162,31 @@ definitions:
             - ema_window
             - warmup_window
         type: object
+    Entities:
+        description: Entities contains both mappings of ip address to entity and entity name to entity.
+        properties:
+            entities_by_ip_address:
+                $ref: '#/definitions/EntitiesEntities'
+            entities_by_name:
+                $ref: '#/definitions/EntitiesEntities'
+        type: object
+    EntitiesEntities:
+        description: Entities defines mapping of entities.
+        properties:
+            entities:
+                additionalProperties:
+                    $ref: '#/definitions/Entity'
+                type: object
+        type: object
     Entity:
         description: Entity represents a pod, vm, etc.
         properties:
-            cluster_ip:
-                type: string
             ip_address:
                 type: string
+            labels:
+                items:
+                    type: string
+                type: array
             name:
                 type: string
             namespace:
@@ -1165,22 +1201,6 @@ definitions:
                 type: array
             uid:
                 type: string
-        type: object
-    EntityCache:
-        description: EntityCache contains both mappings of ip address to entity and entity name to entity.
-        properties:
-            entities_by_ip_address:
-                $ref: '#/definitions/EntityCacheEntities'
-            entities_by_name:
-                $ref: '#/definitions/EntityCacheEntities'
-        type: object
-    EntityCacheEntities:
-        description: Entities defines mapping of entities.
-        properties:
-            entities:
-                additionalProperties:
-                    $ref: '#/definitions/Entity'
-                type: object
         type: object
     EqualsMatchExpression:
         description: Label selector expression of the equal form "label == value".
@@ -1318,18 +1338,18 @@ definitions:
                 $ref: '#/definitions/RateLimiter'
                 description: Rate Limiter provides service protection by applying rate limiter.
         type: object
-    FlowControlControlPoint:
+    FlowControlPoint:
         properties:
             control_point:
                 type: string
             service:
                 type: string
         type: object
-    FlowControlControlPoints:
+    FlowControlPoints:
         properties:
-            control_points:
+            flow_control_points:
                 items:
-                    $ref: '#/definitions/FlowControlControlPoint'
+                    $ref: '#/definitions/FlowControlPoint'
                 type: array
         type: object
     FlowMatcher:
@@ -1583,24 +1603,22 @@ definitions:
             policies:
                 $ref: '#/definitions/Policies'
         type: object
+    GlobalFlowControlPoint:
+        description: |-
+            GlobalFlowControlPoint contains info about a control point on a given
+            service with explicit Agent Group.
+        properties:
+            agent_group:
+                type: string
+            flow_control_point:
+                $ref: '#/definitions/FlowControlPoint'
+        type: object
     GlobalService:
         description: GlobalService is a service with explicit agent group.
         properties:
             agent_group:
                 type: string
             name:
-                type: string
-        type: object
-    GlobalServiceControlPoint:
-        description: |-
-            GlobalServiceControlPoint contains info about a control point on a given
-            service with explicit Agent Group.
-        properties:
-            agent_group:
-                type: string
-            name:
-                type: string
-            service_name:
                 type: string
         type: object
     GradientController:
@@ -1982,24 +2000,6 @@ definitions:
         required:
             - key
         type: object
-    KubernetesControlPoint:
-        properties:
-            api_version:
-                type: string
-            kind:
-                type: string
-            name:
-                type: string
-            namespace:
-                type: string
-        type: object
-    KubernetesControlPoints:
-        properties:
-            control_points:
-                items:
-                    $ref: '#/definitions/KubernetesControlPoint'
-                type: array
-        type: object
     KubernetesObjectSelector:
         description: |-
             Describes which pods a control or observability
@@ -2123,15 +2123,15 @@ definitions:
                     type: string
                 type: array
         type: object
-    ListControlPointsControllerResponse:
+    ListFlowControlPointsControllerResponse:
         properties:
-            control_points:
-                items:
-                    $ref: '#/definitions/GlobalServiceControlPoint'
-                type: array
             errors_count:
                 format: int64
                 type: integer
+            global_flow_control_points:
+                items:
+                    $ref: '#/definitions/GlobalFlowControlPoint'
+                type: array
         type: object
     ListServicesControllerResponse:
         properties:
@@ -2893,26 +2893,22 @@ definitions:
                 type: string
             all_statuses:
                 $ref: '#/definitions/GroupStatus'
+            autoscale_kubernetes_control_points:
+                $ref: '#/definitions/AutoscaleKubernetesControlPoints'
             controller_info:
                 $ref: '#/definitions/ControllerInfo'
+            flow_control_points:
+                $ref: '#/definitions/FlowControlPoints'
             host_info:
                 $ref: '#/definitions/HostInfo'
             installation_mode:
                 type: string
-            kubernetes_control_points:
-                items:
-                    $ref: '#/definitions/KubernetesControlPoint'
-                type: array
             peers:
                 $ref: '#/definitions/Peers'
             policies:
                 $ref: '#/definitions/PolicyWrappers'
             process_info:
                 $ref: '#/definitions/ProcessInfo'
-            service_control_points:
-                items:
-                    $ref: '#/definitions/ServiceControlPoint'
-                type: array
             services_list:
                 $ref: '#/definitions/ServicesList'
             version_info:
@@ -3293,17 +3289,6 @@ definitions:
                 format: int32
                 type: integer
             name:
-                type: string
-        type: object
-    ServiceControlPoint:
-        description: |-
-            ServiceControlPoint contains info about a control point on a given service.
-
-            Agent group is implied.
-        properties:
-            name:
-                type: string
-            service_name:
                 type: string
         type: object
     ServiceSelector:
@@ -3825,12 +3810,64 @@ paths:
                 - FluxNinjaService
     /v1/autoscale/kubernetes/controlpoints:
         get:
-            operationId: ControlPointCache_GetControlPoints
+            operationId: AutoscaleKubernetesControlPointsService_GetControlPoints
             responses:
                 "200":
                     description: A successful response.
                     schema:
-                        $ref: '#/definitions/KubernetesControlPoints'
+                        $ref: '#/definitions/AutoscaleKubernetesControlPoints'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/discovery/entities:
+        get:
+            operationId: EntitiesService_GetEntities
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/Entities'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/discovery/entities/ip-address/{ip_address}:
+        get:
+            operationId: EntitiesService_GetEntityByIPAddress
+            parameters:
+                - in: path
+                  name: ip_address
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/Entity'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/discovery/entities/name/{name}:
+        get:
+            operationId: EntitiesService_GetEntityByName
+            parameters:
+                - in: path
+                  name: name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/Entity'
                 default:
                     description: An unexpected error response.
                     schema:
@@ -3853,64 +3890,12 @@ paths:
                 - aperture-agent
     /v1/flowcontrol/controlpoints:
         get:
-            operationId: FlowControlControlPointsService_GetControlPoints
+            operationId: FlowControlPointsService_GetControlPoints
             responses:
                 "200":
                     description: A successful response.
                     schema:
-                        $ref: '#/definitions/FlowControlControlPoints'
-                default:
-                    description: An unexpected error response.
-                    schema:
-                        $ref: '#/definitions/googlerpcStatus'
-            tags:
-                - aperture-agent
-    /v1/flowcontrol/entities:
-        get:
-            operationId: EntityCacheService_GetEntityCache
-            responses:
-                "200":
-                    description: A successful response.
-                    schema:
-                        $ref: '#/definitions/EntityCache'
-                default:
-                    description: An unexpected error response.
-                    schema:
-                        $ref: '#/definitions/googlerpcStatus'
-            tags:
-                - aperture-agent
-    /v1/flowcontrol/entities/ip-address/{ip_address}:
-        get:
-            operationId: EntityCacheService_GetEntityByIPAddress
-            parameters:
-                - in: path
-                  name: ip_address
-                  required: true
-                  type: string
-            responses:
-                "200":
-                    description: A successful response.
-                    schema:
-                        $ref: '#/definitions/Entity'
-                default:
-                    description: An unexpected error response.
-                    schema:
-                        $ref: '#/definitions/googlerpcStatus'
-            tags:
-                - aperture-agent
-    /v1/flowcontrol/entities/name/{name}:
-        get:
-            operationId: EntityCacheService_GetEntityByName
-            parameters:
-                - in: path
-                  name: name
-                  required: true
-                  type: string
-            responses:
-                "200":
-                    description: A successful response.
-                    schema:
-                        $ref: '#/definitions/Entity'
+                        $ref: '#/definitions/FlowControlPoints'
                 default:
                     description: An unexpected error response.
                     schema:
@@ -4122,13 +4107,13 @@ produces:
     - application/json
 swagger: "2.0"
 tags:
+    - name: AutoscaleKubernetesControlPointsService
+    - name: FlowControlPointsService
     - name: FlowPreviewService
     - name: Controller
-    - name: ControlPointCache
+    - name: EntitiesService
     - name: DistCacheService
     - name: FlowControlService
-    - name: FlowControlControlPointsService
-    - name: EntityCacheService
     - name: InfoService
     - name: PeerDiscoveryService
     - name: PolicyService

@@ -15,7 +15,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
-	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/entitycache/v1"
+	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
@@ -141,12 +141,12 @@ func (kd *serviceDiscovery) handleEndpointsDelete(obj interface{}) {
 	})
 }
 
-func (kd *serviceDiscovery) getEntityFromTracker(uid string) *entitycachev1.Entity {
+func (kd *serviceDiscovery) getEntityFromTracker(uid string) *entitiesv1.Entity {
 	bytes := kd.entityEvents.GetCurrentValue(notifiers.Key(uid))
 	if bytes == nil {
 		return nil
 	}
-	entity := &entitycachev1.Entity{}
+	entity := &entitiesv1.Entity{}
 	err := json.Unmarshal(bytes, entity)
 	if err != nil {
 		log.Error().Err(err).Msg("Could not unmarshal entity")
@@ -192,7 +192,7 @@ func (kd *serviceDiscovery) updatePodService(pod podServiceUpdate) error {
 		}
 	} else {
 		// create new entity
-		entity = &entitycachev1.Entity{
+		entity = &entitiesv1.Entity{
 			Services:  []string{pod.Service},
 			IpAddress: pod.IPAddress,
 			Namespace: pod.Namespace,
@@ -212,7 +212,7 @@ func (kd *serviceDiscovery) updatePodService(pod podServiceUpdate) error {
 	return nil
 }
 
-func (kd *serviceDiscovery) shouldRemove(entity *entitycachev1.Entity) bool {
+func (kd *serviceDiscovery) shouldRemove(entity *entitiesv1.Entity) bool {
 	// once we have more informers then add additional checks here
 	return len(entity.Services) == 0
 }

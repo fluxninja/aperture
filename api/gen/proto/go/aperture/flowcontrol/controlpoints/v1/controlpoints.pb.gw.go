@@ -32,7 +32,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
-func request_FlowControlControlPointsService_GetControlPoints_0(ctx context.Context, marshaler runtime.Marshaler, client FlowControlControlPointsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_FlowControlPointsService_GetControlPoints_0(ctx context.Context, marshaler runtime.Marshaler, client FlowControlPointsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
 
@@ -41,7 +41,7 @@ func request_FlowControlControlPointsService_GetControlPoints_0(ctx context.Cont
 
 }
 
-func local_request_FlowControlControlPointsService_GetControlPoints_0(ctx context.Context, marshaler runtime.Marshaler, server FlowControlControlPointsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_FlowControlPointsService_GetControlPoints_0(ctx context.Context, marshaler runtime.Marshaler, server FlowControlPointsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
 
@@ -50,13 +50,13 @@ func local_request_FlowControlControlPointsService_GetControlPoints_0(ctx contex
 
 }
 
-// RegisterFlowControlControlPointsServiceHandlerServer registers the http handlers for service FlowControlControlPointsService to "mux".
-// UnaryRPC     :call FlowControlControlPointsServiceServer directly.
+// RegisterFlowControlPointsServiceHandlerServer registers the http handlers for service FlowControlPointsService to "mux".
+// UnaryRPC     :call FlowControlPointsServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterFlowControlControlPointsServiceHandlerFromEndpoint instead.
-func RegisterFlowControlControlPointsServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server FlowControlControlPointsServiceServer) error {
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterFlowControlPointsServiceHandlerFromEndpoint instead.
+func RegisterFlowControlPointsServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server FlowControlPointsServiceServer) error {
 
-	mux.Handle("GET", pattern_FlowControlControlPointsService_GetControlPoints_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_FlowControlPointsService_GetControlPoints_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -64,12 +64,12 @@ func RegisterFlowControlControlPointsServiceHandlerServer(ctx context.Context, m
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.flowcontrol.controlpoints.v1.FlowControlControlPointsService/GetControlPoints", runtime.WithHTTPPathPattern("/v1/flowcontrol/controlpoints"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.flowcontrol.controlpoints.v1.FlowControlPointsService/GetControlPoints", runtime.WithHTTPPathPattern("/v1/flowcontrol/controlpoints"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_FlowControlControlPointsService_GetControlPoints_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_FlowControlPointsService_GetControlPoints_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -77,16 +77,16 @@ func RegisterFlowControlControlPointsServiceHandlerServer(ctx context.Context, m
 			return
 		}
 
-		forward_FlowControlControlPointsService_GetControlPoints_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_FlowControlPointsService_GetControlPoints_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
 }
 
-// RegisterFlowControlControlPointsServiceHandlerFromEndpoint is same as RegisterFlowControlControlPointsServiceHandler but
+// RegisterFlowControlPointsServiceHandlerFromEndpoint is same as RegisterFlowControlPointsServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterFlowControlControlPointsServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterFlowControlPointsServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -106,41 +106,41 @@ func RegisterFlowControlControlPointsServiceHandlerFromEndpoint(ctx context.Cont
 		}()
 	}()
 
-	return RegisterFlowControlControlPointsServiceHandler(ctx, mux, conn)
+	return RegisterFlowControlPointsServiceHandler(ctx, mux, conn)
 }
 
-// RegisterFlowControlControlPointsServiceHandler registers the http handlers for service FlowControlControlPointsService to "mux".
+// RegisterFlowControlPointsServiceHandler registers the http handlers for service FlowControlPointsService to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterFlowControlControlPointsServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterFlowControlControlPointsServiceHandlerClient(ctx, mux, NewFlowControlControlPointsServiceClient(conn))
+func RegisterFlowControlPointsServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterFlowControlPointsServiceHandlerClient(ctx, mux, NewFlowControlPointsServiceClient(conn))
 }
 
-// RegisterFlowControlControlPointsServiceHandlerClient registers the http handlers for service FlowControlControlPointsService
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "FlowControlControlPointsServiceClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "FlowControlControlPointsServiceClient"
+// RegisterFlowControlPointsServiceHandlerClient registers the http handlers for service FlowControlPointsService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "FlowControlPointsServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "FlowControlPointsServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "FlowControlControlPointsServiceClient" to call the correct interceptors.
-func RegisterFlowControlControlPointsServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client FlowControlControlPointsServiceClient) error {
+// "FlowControlPointsServiceClient" to call the correct interceptors.
+func RegisterFlowControlPointsServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client FlowControlPointsServiceClient) error {
 
-	mux.Handle("GET", pattern_FlowControlControlPointsService_GetControlPoints_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_FlowControlPointsService_GetControlPoints_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.flowcontrol.controlpoints.v1.FlowControlControlPointsService/GetControlPoints", runtime.WithHTTPPathPattern("/v1/flowcontrol/controlpoints"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.flowcontrol.controlpoints.v1.FlowControlPointsService/GetControlPoints", runtime.WithHTTPPathPattern("/v1/flowcontrol/controlpoints"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_FlowControlControlPointsService_GetControlPoints_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_FlowControlPointsService_GetControlPoints_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_FlowControlControlPointsService_GetControlPoints_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_FlowControlPointsService_GetControlPoints_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -148,9 +148,9 @@ func RegisterFlowControlControlPointsServiceHandlerClient(ctx context.Context, m
 }
 
 var (
-	pattern_FlowControlControlPointsService_GetControlPoints_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "flowcontrol", "controlpoints"}, ""))
+	pattern_FlowControlPointsService_GetControlPoints_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "flowcontrol", "controlpoints"}, ""))
 )
 
 var (
-	forward_FlowControlControlPointsService_GetControlPoints_0 = runtime.ForwardResponseMessage
+	forward_FlowControlPointsService_GetControlPoints_0 = runtime.ForwardResponseMessage
 )
