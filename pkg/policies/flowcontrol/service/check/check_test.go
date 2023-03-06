@@ -9,11 +9,11 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/grpc/peer"
 
-	entitycachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/entitycache/v1"
+	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/platform"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
@@ -27,8 +27,8 @@ var (
 )
 
 var _ = BeforeEach(func() {
-	entities := entitycache.NewEntityCache()
-	entities.Put(&entitycachev1.Entity{
+	entities := entities.NewEntities()
+	entities.Put(&entitiesv1.Entity{
 		Prefix:    "",
 		Uid:       "",
 		IpAddress: hardCodedIPAddress,
@@ -49,7 +49,7 @@ var _ = BeforeEach(func() {
 		}.Module(),
 		fx.Provide(agentinfo.ProvideAgentInfo),
 		fx.Supply(entities),
-		fx.Provide(servicegetter.FromEntityCache),
+		fx.Provide(servicegetter.FromEntities),
 		fx.Provide(check.ProvideNopMetrics),
 		fx.Provide(check.ProvideHandler),
 		fx.Provide(flowcontrol.NewEngine),

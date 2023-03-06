@@ -17,7 +17,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/cache"
-	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/jobs"
@@ -157,7 +157,7 @@ var _ = BeforeSuite(func() {
 				agent.AgentOTELComponents,
 				fx.ParamTags(alerts.AlertsFxTag),
 			),
-			entitycache.NewEntityCache,
+			entities.NewEntities,
 			servicegetter.NewEmpty,
 			agentinfo.ProvideAgentInfo,
 			flowcontrol.NewEngine,

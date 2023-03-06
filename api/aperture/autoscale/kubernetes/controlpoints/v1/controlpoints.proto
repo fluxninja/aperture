@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package aperture.autoscale.kubernetes.controlpoints.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// grpc service
+service AutoscaleKubernetesControlPointsService {
+  rpc GetControlPoints(google.protobuf.Empty) returns (AutoscaleKubernetesControlPoints) {
+    option (google.api.http) = {get: "/v1/autoscale/kubernetes/controlpoints"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-agent"];
+    };
+  }
+}
+
+message AutoscaleKubernetesControlPoints {
+  repeated AutoscaleKubernetesControlPoint autoscale_kubernetes_control_points = 1;
+}
+
+message AutoscaleKubernetesControlPoint {
+  string api_version = 1;
+  string kind = 2;
+  string namespace = 3;
+  string name = 4;
+}

@@ -8,7 +8,7 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/common"
-	"github.com/fluxninja/aperture/pkg/entitycache"
+	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
@@ -51,7 +51,7 @@ type StaticDiscoveryConfig struct {
 func InvokeStaticServiceDiscovery(
 	unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
-	entityTrackers *entitycache.EntityTrackers,
+	entityTrackers *entities.EntityTrackers,
 ) error {
 	var cfg StaticDiscoveryConfig
 	if err := unmarshaller.UnmarshalKey(configKey, &cfg); err != nil {

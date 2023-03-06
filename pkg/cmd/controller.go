@@ -33,8 +33,8 @@ func (h *Handler) ListAgents(
 
 func (h *Handler) ListControlPoints(
 	ctx context.Context,
-	_ *cmdv1.ListControlPointsRequest,
-) (*cmdv1.ListControlPointsControllerResponse, error) {
+	_ *cmdv1.ListFlowControlPointsRequest,
+) (*cmdv1.ListFlowControlPointsControllerResponse, error) {
 	agentsControlPoints, err := h.agents.ListControlPoints()
 	if err != nil {
 		return nil, err
@@ -48,20 +48,20 @@ func (h *Handler) ListControlPoints(
 			continue
 		}
 
-		for _, protoCp := range resp.Success.ControlPoints {
+		for _, protoCp := range resp.Success.FlowControlPoints.FlowControlPoints {
 			gcp := selectors.ControlPointIDFromProto(protoCp).InAgentGroup(resp.Success.AgentGroup)
 			allControlPoints[gcp] = struct{}{}
 		}
 	}
 
-	protoControlPoints := make([]*cmdv1.GlobalServiceControlPoint, 0, len(allControlPoints))
+	protoControlPoints := make([]*cmdv1.GlobalFlowControlPoint, 0, len(allControlPoints))
 	for cp := range allControlPoints {
 		protoControlPoints = append(protoControlPoints, cp.ToProto())
 	}
 
-	return &cmdv1.ListControlPointsControllerResponse{
-		ControlPoints: protoControlPoints,
-		ErrorsCount:   numErrors,
+	return &cmdv1.ListFlowControlPointsControllerResponse{
+		GlobalFlowControlPoints: protoControlPoints,
+		ErrorsCount:             numErrors,
 	}, nil
 }
 
@@ -193,7 +193,7 @@ agentsLoop:
 			continue
 		}
 
-		for _, cpProto := range agent.Success.ControlPoints {
+		for _, cpProto := range agent.Success.FlowControlPoints.FlowControlPoints {
 			cp := selectors.ControlPointIDFromProto(cpProto)
 
 			if cp.ControlPoint != needle.ControlPoint {

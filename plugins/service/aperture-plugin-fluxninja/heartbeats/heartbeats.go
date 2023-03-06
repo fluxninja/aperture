@@ -18,17 +18,15 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
-	controlpointcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/controlpointcache/v1"
-	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/peers/v1"
 	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
-	"github.com/fluxninja/aperture/pkg/entitycache"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
+	"github.com/fluxninja/aperture/pkg/etcd/election"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -37,6 +35,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
+	flowcontrolpoints "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/controlpoints"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/utils"
 	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
@@ -47,59 +46,62 @@ const (
 	jobName            = "aperture-heartbeats"
 	jobNameHTTP        = "aperture-heartbeats-http"
 	jobTimeoutDuration = time.Minute * 2
-	entityCacheKey     = "entity-cache"
-	servicesKey        = entityCacheKey + ".services"
-	overlappingKey     = entityCacheKey + ".overlapping-services"
+	entitiesKey        = "entity-cache"
+	servicesKey        = entitiesKey + ".services"
+	overlappingKey     = entitiesKey + ".overlapping-services"
 	heartbeatsHTTPPath = "/plugins/fluxninja/v1/report"
 )
 
 // Heartbeats is the struct that holds information about heartbeats.
 type Heartbeats struct {
 	heartbeatv1.UnimplementedControllerInfoServiceServer
-	heartbeatsClient            heartbeatv1.FluxNinjaServiceClient
-	statusRegistry              status.Registry
-	agentInfo                   *agentinfo.AgentInfo
-	clientHTTP                  *http.Client
-	interval                    config.Duration
-	jobGroup                    *jobs.JobGroup
-	clientConn                  *grpc.ClientConn
-	peersWatcher                *peers.PeerDiscovery
-	entityCache                 *entitycache.EntityCache
-	policyFactory               *controlplane.PolicyFactory
-	ControllerInfo              *heartbeatv1.ControllerInfo
-	serviceControlPointCache    *cache.Cache[selectors.ControlPointID]
-	kubernetesControlPointCache kubernetes.ControlPointCache
-	heartbeatsAddr              string
-	APIKey                      string
-	jobName                     string
-	installationMode            string
+	heartbeatsClient          heartbeatv1.FluxNinjaServiceClient
+	statusRegistry            status.Registry
+	autoscalek8sControlPoints kubernetes.AutoscaleControlPoints
+	policyFactory             *controlplane.PolicyFactory
+	ControllerInfo            *heartbeatv1.ControllerInfo
+	jobGroup                  *jobs.JobGroup
+	clientConn                *grpc.ClientConn
+	peersWatcher              *peers.PeerDiscovery
+	entities                  *entities.Entities
+	clientHTTP                *http.Client
+	interval                  config.Duration
+	flowControlPoints         *cache.Cache[selectors.ControlPointID]
+	agentInfo                 *agentinfo.AgentInfo
+	election                  *election.Election
+	APIKey                    string
+	jobName                   string
+	installationMode          string
+	heartbeatsAddr            string
 }
 
 func newHeartbeats(
 	jobGroup *jobs.JobGroup,
 	p pluginconfig.FluxNinjaPluginConfig,
 	statusRegistry status.Registry,
-	entityCache *entitycache.EntityCache,
+	entities *entities.Entities,
 	agentInfo *agentinfo.AgentInfo,
 	peersWatcher *peers.PeerDiscovery,
 	policyFactory *controlplane.PolicyFactory,
-	serviceControlPointCache *cache.Cache[selectors.ControlPointID],
-	kubernetesControlPointCache kubernetes.ControlPointCache,
+	election *election.Election,
+	flowControlPoints *cache.Cache[selectors.ControlPointID],
+	autoscalek8sControlPoints kubernetes.AutoscaleControlPoints,
 	installationMode string,
 ) *Heartbeats {
 	return &Heartbeats{
-		heartbeatsAddr:              p.FluxNinjaEndpoint,
-		interval:                    p.HeartbeatInterval,
-		APIKey:                      p.APIKey,
-		jobGroup:                    jobGroup,
-		statusRegistry:              statusRegistry,
-		entityCache:                 entityCache,
-		agentInfo:                   agentInfo,
-		peersWatcher:                peersWatcher,
-		policyFactory:               policyFactory,
-		serviceControlPointCache:    serviceControlPointCache,
-		kubernetesControlPointCache: kubernetesControlPointCache,
-		installationMode:            installationMode,
+		heartbeatsAddr:            p.FluxNinjaEndpoint,
+		interval:                  p.HeartbeatInterval,
+		APIKey:                    p.APIKey,
+		jobGroup:                  jobGroup,
+		statusRegistry:            statusRegistry,
+		entities:                  entities,
+		agentInfo:                 agentInfo,
+		peersWatcher:              peersWatcher,
+		policyFactory:             policyFactory,
+		election:                  election,
+		flowControlPoints:         flowControlPoints,
+		autoscalek8sControlPoints: autoscalek8sControlPoints,
+		installationMode:          installationMode,
 	}
 }
 
@@ -205,59 +207,48 @@ func (h *Heartbeats) stop() {
 func (h *Heartbeats) newHeartbeat(
 	jobCtxt context.Context,
 ) *heartbeatv1.ReportRequest {
-	var servicesList *heartbeatv1.ServicesList
-	if h.entityCache != nil {
-		servicesList = populateServicesList(h.entityCache)
+	report := &heartbeatv1.ReportRequest{
+		VersionInfo:      info.GetVersionInfo(),
+		ProcessInfo:      info.GetProcessInfo(),
+		HostInfo:         info.GetHostInfo(),
+		ControllerInfo:   h.ControllerInfo,
+		AllStatuses:      h.statusRegistry.GetGroupStatus(),
+		InstallationMode: h.installationMode,
 	}
 
 	var agentGroup string
 	if h.agentInfo != nil {
 		agentGroup = h.agentInfo.GetAgentGroup()
-	}
-
-	var peers *peersv1.Peers
-	if h.peersWatcher != nil {
-		peers = h.peersWatcher.GetPeers()
+		report.AgentGroup = agentGroup
 	}
 
 	policies := &policysyncv1.PolicyWrappers{}
 	if h.policyFactory != nil {
 		policies.PolicyWrappers = h.policyFactory.GetPolicyWrappers()
+		report.Policies = policies
 	}
 
-	var serviceControlPointObjects []selectors.ControlPointID
-	if h.serviceControlPointCache != nil {
-		serviceControlPointObjects = h.serviceControlPointCache.GetAll()
-	}
+	if h.election != nil && h.election.IsLeader() {
+		var servicesList *heartbeatv1.ServicesList
+		if h.entities != nil {
+			servicesList = populateServicesList(h.entities)
+			report.ServicesList = servicesList
+		}
 
-	serviceControlPoints := make([]*cmdv1.ServiceControlPoint, 0, len(serviceControlPointObjects))
-	for _, cp := range serviceControlPointObjects {
-		serviceControlPoints = append(serviceControlPoints, cp.ToProto())
-	}
+		if h.peersWatcher != nil {
+			peers := h.peersWatcher.GetPeers()
+			report.Peers = peers
+		}
 
-	var kubernetesControlPoints []*controlpointcachev1.KubernetesControlPoint
-	if h.kubernetesControlPointCache != nil {
-		kubernetesControlPointObjects := h.kubernetesControlPointCache.Keys()
-		kubernetesControlPoints = make([]*controlpointcachev1.KubernetesControlPoint, 0, len(kubernetesControlPointObjects))
-		for _, cp := range kubernetesControlPointObjects {
-			kubernetesControlPoints = append(kubernetesControlPoints, cp.ToProto())
+		if h.flowControlPoints != nil {
+			report.FlowControlPoints = flowcontrolpoints.ToProto(h.flowControlPoints)
+		}
+
+		if h.autoscalek8sControlPoints != nil {
+			report.AutoscaleKubernetesControlPoints = h.autoscalek8sControlPoints.ToProto()
 		}
 	}
-
-	return &heartbeatv1.ReportRequest{
-		VersionInfo:             info.GetVersionInfo(),
-		ProcessInfo:             info.GetProcessInfo(),
-		HostInfo:                info.GetHostInfo(),
-		AgentGroup:              agentGroup,
-		ControllerInfo:          h.ControllerInfo,
-		Peers:                   peers,
-		ServicesList:            servicesList,
-		AllStatuses:             h.statusRegistry.GetGroupStatus(),
-		Policies:                policies,
-		ServiceControlPoints:    serviceControlPoints,
-		KubernetesControlPoints: kubernetesControlPoints,
-		InstallationMode:        h.installationMode,
-	}
+	return report
 }
 
 func (h *Heartbeats) sendSingleHeartbeat(jobCtxt context.Context) (proto.Message, error) {

@@ -3,6 +3,7 @@ syntax = "proto3";
 // Messages for aperturectl → controller and controller → agent communication.
 package aperture.cmd.v1;
 
+import "aperture/flowcontrol/controlpoints/v1/controlpoints.proto";
 import "aperture/flowcontrol/preview/v1/preview.proto";
 import "google/protobuf/empty.proto";
 
@@ -10,7 +11,7 @@ import "google/protobuf/empty.proto";
 service Controller {
   rpc ListAgents(google.protobuf.Empty) returns (ListAgentsResponse);
   rpc ListServices(ListServicesRequest) returns (ListServicesControllerResponse);
-  rpc ListControlPoints(ListControlPointsRequest) returns (ListControlPointsControllerResponse);
+  rpc ListFlowControlPoints(ListFlowControlPointsRequest) returns (ListFlowControlPointsControllerResponse);
 
   // duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
   rpc PreviewFlowLabels(PreviewFlowLabelsRequest) returns (PreviewFlowLabelsControllerResponse);
@@ -30,16 +31,16 @@ message ListServicesControllerResponse {
   uint32 errors_count = 2;
 }
 
-message ListControlPointsRequest {}
+message ListFlowControlPointsRequest {}
 
-message ListControlPointsAgentResponse {
-  repeated ServiceControlPoint control_points = 1;
+message ListFlowControlPointsAgentResponse {
+  aperture.flowcontrol.controlpoints.v1.FlowControlPoints flow_control_points = 1;
   // FIXME: Remove. Controller should be aware which agent group agent belongs to.
   string agent_group = 2;
 }
 
-message ListControlPointsControllerResponse {
-  repeated GlobalServiceControlPoint control_points = 1;
+message ListFlowControlPointsControllerResponse {
+  repeated GlobalFlowControlPoint global_flow_control_points = 1;
   uint32 errors_count = 2;
 }
 
@@ -47,20 +48,11 @@ message ListAgentsResponse {
   repeated string agents = 1;
 }
 
-// ServiceControlPoint contains info about a control point on a given service.
-//
-// Agent group is implied.
-message ServiceControlPoint {
-  string name = 1;
-  string service_name = 2;
-}
-
-// GlobalServiceControlPoint contains info about a control point on a given
+// GlobalFlowControlPoint contains info about a control point on a given
 // service with explicit Agent Group.
-message GlobalServiceControlPoint {
-  string name = 1;
-  string service_name = 2;
-  string agent_group = 3;
+message GlobalFlowControlPoint {
+  aperture.flowcontrol.controlpoints.v1.FlowControlPoint flow_control_point = 1;
+  string agent_group = 2;
 }
 
 // GlobalService is a service with explicit agent group.
