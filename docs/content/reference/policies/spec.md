@@ -394,7 +394,7 @@ AutoScale components are used to scale a service.
 <dt>autoscaler</dt>
 <dd>
 
-([Autoscaler](#autoscaler)) Autoscaler provides auto scaling functionality for any resource.
+([AutoScaler](#auto-scaler)) AutoScaler provides auto scaling functionality for any resource.
 
 </dd>
 <dt>pod_scaler</dt>
@@ -407,9 +407,9 @@ AutoScale components are used to scale a service.
 
 ---
 
-### Autoscaler {#autoscaler}
+### AutoScaler {#auto-scaler}
 
-Autoscaler
+AutoScaler
 
 <dl>
 <dt>cooldown_override_percentage</dt>
@@ -447,7 +447,7 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>out_ports</dt>
 <dd>
 
-([AutoscalerOuts](#autoscaler-outs)) Output ports for the Autoscaler.
+([AutoScalerOuts](#auto-scaler-outs)) Output ports for the AutoScaler.
 
 </dd>
 <dt>scale_in_alerter_parameters</dt>
@@ -459,7 +459,7 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>scale_in_controllers</dt>
 <dd>
 
-([[]AutoscalerScaleInController](#autoscaler-scale-in-controller)) List of Controllers for scaling in.
+([[]AutoScalerScaleInController](#auto-scaler-scale-in-controller)) List of Controllers for scaling in.
 
 </dd>
 <dt>scale_in_cooldown</dt>
@@ -477,7 +477,7 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>scale_out_controllers</dt>
 <dd>
 
-([[]AutoscalerScaleOutController](#autoscaler-scale-out-controller)) List of Controllers for scaling out.
+([[]AutoScalerScaleOutController](#auto-scaler-scale-out-controller)) List of Controllers for scaling out.
 
 </dd>
 <dt>scale_out_cooldown</dt>
@@ -489,14 +489,14 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>scaler</dt>
 <dd>
 
-([AutoscalerScaler](#autoscaler-scaler))
+([AutoScalerScaler](#auto-scaler-scaler))
 
 </dd>
 </dl>
 
 ---
 
-### AutoscalerDecreasingGradient {#autoscaler-decreasing-gradient}
+### AutoScalerDecreasingGradient {#auto-scaler-decreasing-gradient}
 
 Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
 
@@ -504,13 +504,13 @@ Decreasing Gradient defines a controller for scaling in based on Gradient Contro
 <dt>in_ports</dt>
 <dd>
 
-([AutoscalerDecreasingGradientIns](#autoscaler-decreasing-gradient-ins)) Input ports for the Gradient.
+([AutoScalerDecreasingGradientIns](#auto-scaler-decreasing-gradient-ins)) Input ports for the Gradient.
 
 </dd>
 <dt>parameters</dt>
 <dd>
 
-([AutoscalerDecreasingGradientParameters](#autoscaler-decreasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
+([AutoScalerDecreasingGradientParameters](#auto-scaler-decreasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
 
 - slope = 1
 - min_gradient = -Inf (must be less than 1)
@@ -521,7 +521,7 @@ Decreasing Gradient defines a controller for scaling in based on Gradient Contro
 
 ---
 
-### AutoscalerDecreasingGradientIns {#autoscaler-decreasing-gradient-ins}
+### AutoScalerDecreasingGradientIns {#auto-scaler-decreasing-gradient-ins}
 
 Inputs for Gradient.
 
@@ -542,7 +542,7 @@ Inputs for Gradient.
 
 ---
 
-### AutoscalerDecreasingGradientParameters {#autoscaler-decreasing-gradient-parameters}
+### AutoScalerDecreasingGradientParameters {#auto-scaler-decreasing-gradient-parameters}
 
 This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
 
@@ -563,7 +563,7 @@ This allows subset of parameters with constrained values compared to a regular g
 
 ---
 
-### AutoscalerIncreasingGradient {#autoscaler-increasing-gradient}
+### AutoScalerIncreasingGradient {#auto-scaler-increasing-gradient}
 
 Increasing Gradient defines a controller for scaling out based on Gradient Controller.
 
@@ -571,13 +571,13 @@ Increasing Gradient defines a controller for scaling out based on Gradient Contr
 <dt>in_ports</dt>
 <dd>
 
-([AutoscalerIncreasingGradientIns](#autoscaler-increasing-gradient-ins)) Input ports for the Gradient.
+([AutoScalerIncreasingGradientIns](#auto-scaler-increasing-gradient-ins)) Input ports for the Gradient.
 
 </dd>
 <dt>parameters</dt>
 <dd>
 
-([AutoscalerIncreasingGradientParameters](#autoscaler-increasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
+([AutoScalerIncreasingGradientParameters](#auto-scaler-increasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
 
 - slope = 1
 - min_gradient = 1 (cannot be changed)
@@ -588,7 +588,7 @@ Increasing Gradient defines a controller for scaling out based on Gradient Contr
 
 ---
 
-### AutoscalerIncreasingGradientIns {#autoscaler-increasing-gradient-ins}
+### AutoScalerIncreasingGradientIns {#auto-scaler-increasing-gradient-ins}
 
 Inputs for Gradient.
 
@@ -609,7 +609,7 @@ Inputs for Gradient.
 
 ---
 
-### AutoscalerIncreasingGradientParameters {#autoscaler-increasing-gradient-parameters}
+### AutoScalerIncreasingGradientParameters {#auto-scaler-increasing-gradient-parameters}
 
 This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
 
@@ -630,7 +630,7 @@ This allows subset of parameters with constrained values compared to a regular g
 
 ---
 
-### AutoscalerKubernetesReplicas {#autoscaler-kubernetes-replicas}
+### AutoScalerKubernetesReplicas {#auto-scaler-kubernetes-replicas}
 
 KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
 
@@ -657,9 +657,9 @@ KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
 
 ---
 
-### AutoscalerOuts {#autoscaler-outs}
+### AutoScalerOuts {#auto-scaler-outs}
 
-Outputs for Autoscaler.
+Outputs for AutoScaler.
 
 <dl>
 <dt>actual_scale</dt>
@@ -684,7 +684,7 @@ Outputs for Autoscaler.
 
 ---
 
-### AutoscalerScaleInController {#autoscaler-scale-in-controller}
+### AutoScalerScaleInController {#auto-scaler-scale-in-controller}
 
 <dl>
 <dt>alerter_parameters</dt>
@@ -696,27 +696,27 @@ Outputs for Autoscaler.
 <dt>controller</dt>
 <dd>
 
-([AutoscalerScaleInControllerController](#autoscaler-scale-in-controller-controller)) Controller
+([AutoScalerScaleInControllerController](#auto-scaler-scale-in-controller-controller)) Controller
 
 </dd>
 </dl>
 
 ---
 
-### AutoscalerScaleInControllerController {#autoscaler-scale-in-controller-controller}
+### AutoScalerScaleInControllerController {#auto-scaler-scale-in-controller-controller}
 
 <dl>
 <dt>gradient</dt>
 <dd>
 
-([AutoscalerDecreasingGradient](#autoscaler-decreasing-gradient))
+([AutoScalerDecreasingGradient](#auto-scaler-decreasing-gradient))
 
 </dd>
 </dl>
 
 ---
 
-### AutoscalerScaleOutController {#autoscaler-scale-out-controller}
+### AutoScalerScaleOutController {#auto-scaler-scale-out-controller}
 
 <dl>
 <dt>alerter_parameters</dt>
@@ -728,33 +728,33 @@ Outputs for Autoscaler.
 <dt>controller</dt>
 <dd>
 
-([AutoscalerScaleOutControllerController](#autoscaler-scale-out-controller-controller)) Controller
+([AutoScalerScaleOutControllerController](#auto-scaler-scale-out-controller-controller)) Controller
 
 </dd>
 </dl>
 
 ---
 
-### AutoscalerScaleOutControllerController {#autoscaler-scale-out-controller-controller}
+### AutoScalerScaleOutControllerController {#auto-scaler-scale-out-controller-controller}
 
 <dl>
 <dt>gradient</dt>
 <dd>
 
-([AutoscalerIncreasingGradient](#autoscaler-increasing-gradient))
+([AutoScalerIncreasingGradient](#auto-scaler-increasing-gradient))
 
 </dd>
 </dl>
 
 ---
 
-### AutoscalerScaler {#autoscaler-scaler}
+### AutoScalerScaler {#auto-scaler-scaler}
 
 <dl>
 <dt>kubernetes_replicas</dt>
 <dd>
 
-([AutoscalerKubernetesReplicas](#autoscaler-kubernetes-replicas))
+([AutoScalerKubernetesReplicas](#auto-scaler-kubernetes-replicas))
 
 </dd>
 </dl>

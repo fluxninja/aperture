@@ -330,17 +330,17 @@ definitions:
     type: object
     properties:
       autoscaler:
-        description: Autoscaler provides auto scaling functionality for any resource.
+        description: AutoScaler provides auto scaling functionality for any resource.
         x-order: 0
-        $ref: '#/definitions/Autoscaler'
+        $ref: '#/definitions/AutoScaler'
       pod_scaler:
         description: PodScaler provides pod horizontal scaling functionality for scalable
           Kubernetes resources.
         x-order: 1
         $ref: '#/definitions/PodScaler'
-  Autoscaler:
+  AutoScaler:
     type: object
-    title: Autoscaler
+    title: AutoScaler
     properties:
       cooldown_override_percentage:
         description: |+
@@ -390,9 +390,9 @@ definitions:
         x-go-tag-default: "0"
         x-order: 4
       out_ports:
-        description: Output ports for the Autoscaler.
+        description: Output ports for the AutoScaler.
         x-order: 5
-        $ref: '#/definitions/AutoscalerOuts'
+        $ref: '#/definitions/AutoScalerOuts'
       scale_in_alerter_parameters:
         description: Configuration for scale in alerter.
         x-order: 6
@@ -401,7 +401,7 @@ definitions:
         description: List of Controllers for scaling in.
         type: array
         items:
-          $ref: '#/definitions/AutoscalerScaleInController'
+          $ref: '#/definitions/AutoScalerScaleInController'
         x-order: 7
       scale_in_cooldown:
         description: |+
@@ -419,7 +419,7 @@ definitions:
         description: List of Controllers for scaling out.
         type: array
         items:
-          $ref: '#/definitions/AutoscalerScaleOutController'
+          $ref: '#/definitions/AutoScalerScaleOutController'
         x-order: 10
       scale_out_cooldown:
         description: |+
@@ -432,8 +432,8 @@ definitions:
       scaler:
         x-go-tag-validate: required
         x-order: 12
-        $ref: '#/definitions/AutoscalerScaler'
-  AutoscalerDecreasingGradient:
+        $ref: '#/definitions/AutoScalerScaler'
+  AutoScalerDecreasingGradient:
     description: Decreasing Gradient defines a controller for scaling in based on
       Gradient Controller.
     type: object
@@ -441,7 +441,7 @@ definitions:
       in_ports:
         description: Input ports for the Gradient.
         x-order: 0
-        $ref: '#/definitions/AutoscalerDecreasingGradientIns'
+        $ref: '#/definitions/AutoScalerDecreasingGradientIns'
       parameters:
         title: |-
           Gradient parameters for the controller. Defaults and constraints:
@@ -449,8 +449,8 @@ definitions:
           * min_gradient = -Inf (must be less than 1)
           * max_gradient = 1 (cannot be changed)
         x-order: 1
-        $ref: '#/definitions/AutoscalerDecreasingGradientParameters'
-  AutoscalerDecreasingGradientIns:
+        $ref: '#/definitions/AutoScalerDecreasingGradientParameters'
+  AutoScalerDecreasingGradientIns:
     description: Inputs for Gradient.
     type: object
     properties:
@@ -462,7 +462,7 @@ definitions:
         description: The signal to use for scale in.
         x-order: 1
         $ref: '#/definitions/InPort'
-  AutoscalerDecreasingGradientParameters:
+  AutoScalerDecreasingGradientParameters:
     description: This allows subset of parameters with constrained values compared
       to a regular gradient controller. For full documentation of these parameters,
       refer to the [GradientControllerParameters](#gradient-controller-parameters).
@@ -481,7 +481,7 @@ definitions:
         default: 1
         x-go-tag-default: "1.0"
         x-order: 1
-  AutoscalerIncreasingGradient:
+  AutoScalerIncreasingGradient:
     description: Increasing Gradient defines a controller for scaling out based on
       Gradient Controller.
     type: object
@@ -489,7 +489,7 @@ definitions:
       in_ports:
         description: Input ports for the Gradient.
         x-order: 0
-        $ref: '#/definitions/AutoscalerIncreasingGradientIns'
+        $ref: '#/definitions/AutoScalerIncreasingGradientIns'
       parameters:
         title: |-
           Gradient parameters for the controller. Defaults and constraints:
@@ -497,8 +497,8 @@ definitions:
           * min_gradient = 1 (cannot be changed)
           * max_gradient = +Inf (must be greater than 1)
         x-order: 1
-        $ref: '#/definitions/AutoscalerIncreasingGradientParameters'
-  AutoscalerIncreasingGradientIns:
+        $ref: '#/definitions/AutoScalerIncreasingGradientParameters'
+  AutoScalerIncreasingGradientIns:
     description: Inputs for Gradient.
     type: object
     properties:
@@ -510,7 +510,7 @@ definitions:
         description: The signal to use for scale out.
         x-order: 1
         $ref: '#/definitions/InPort'
-  AutoscalerIncreasingGradientParameters:
+  AutoScalerIncreasingGradientParameters:
     description: This allows subset of parameters with constrained values compared
       to a regular gradient controller. For full documentation of these parameters,
       refer to the [GradientControllerParameters](#gradient-controller-parameters).
@@ -529,7 +529,7 @@ definitions:
         default: 1
         x-go-tag-default: "1.0"
         x-order: 1
-  AutoscalerKubernetesReplicas:
+  AutoScalerKubernetesReplicas:
     description: KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
     type: object
     properties:
@@ -548,8 +548,8 @@ definitions:
         x-go-tag-validate: required
         x-order: 2
         $ref: '#/definitions/KubernetesObjectSelector'
-  AutoscalerOuts:
-    description: Outputs for Autoscaler.
+  AutoScalerOuts:
+    description: Outputs for AutoScaler.
     type: object
     properties:
       actual_scale:
@@ -561,7 +561,7 @@ definitions:
       desired_scale:
         x-order: 2
         $ref: '#/definitions/OutPort'
-  AutoscalerScaleInController:
+  AutoScalerScaleInController:
     type: object
     properties:
       alerter_parameters:
@@ -571,14 +571,14 @@ definitions:
       controller:
         title: Controller
         x-order: 1
-        $ref: '#/definitions/AutoscalerScaleInControllerController'
-  AutoscalerScaleInControllerController:
+        $ref: '#/definitions/AutoScalerScaleInControllerController'
+  AutoScalerScaleInControllerController:
     type: object
     properties:
       gradient:
         x-order: 0
-        $ref: '#/definitions/AutoscalerDecreasingGradient'
-  AutoscalerScaleOutController:
+        $ref: '#/definitions/AutoScalerDecreasingGradient'
+  AutoScalerScaleOutController:
     type: object
     properties:
       alerter_parameters:
@@ -589,19 +589,19 @@ definitions:
         title: Controller
         x-go-tag-validate: required
         x-order: 1
-        $ref: '#/definitions/AutoscalerScaleOutControllerController'
-  AutoscalerScaleOutControllerController:
+        $ref: '#/definitions/AutoScalerScaleOutControllerController'
+  AutoScalerScaleOutControllerController:
     type: object
     properties:
       gradient:
         x-order: 0
-        $ref: '#/definitions/AutoscalerIncreasingGradient'
-  AutoscalerScaler:
+        $ref: '#/definitions/AutoScalerIncreasingGradient'
+  AutoScalerScaler:
     type: object
     properties:
       kubernetes_replicas:
         x-order: 0
-        $ref: '#/definitions/AutoscalerKubernetesReplicas'
+        $ref: '#/definitions/AutoScalerKubernetesReplicas'
   Circuit:
     description: |-
       :::info

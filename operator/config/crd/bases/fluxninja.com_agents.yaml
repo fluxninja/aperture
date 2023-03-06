@@ -1058,6 +1058,20 @@ spec:
                           type: object
                         type: array
                     type: object
+                  auto_scale:
+                    description: AutoScale configuration.
+                    properties:
+                      kubernetes:
+                        description: AutoScaleKubernetesConfig holds auto scale kubernetes
+                          configuration.
+                        properties:
+                          enabled:
+                            description: Enables the Kubernetes autoscale capability.
+                            type: boolean
+                        required:
+                        - enabled
+                        type: object
+                    type: object
                   client:
                     description: Client configuration such as proxy settings.
                     properties:
@@ -1782,9 +1796,7 @@ spec:
                         description: KubernetesDiscoveryConfig for Kubernetes service
                           discovery.
                         properties:
-                          autoscale_enabled:
-                            type: boolean
-                          discovery_enabled:
+                          enabled:
                             type: boolean
                         type: object
                       static:

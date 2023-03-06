@@ -121,6 +121,18 @@ definitions:
         title: AlerterConfig for alerter.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/alerts
+    AutoScaleKubernetesConfig:
+        properties:
+            enabled:
+                default: true
+                description: Enables the Kubernetes autoscale capability.
+                type: boolean
+                x-go-name: Enabled
+                x-go-tag-default: "true"
+                x-go-tag-json: enabled
+        title: AutoScaleKubernetesConfig is the configuration for the flow preview service.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/config
     BackoffConfig:
         properties:
             base_delay:
@@ -950,18 +962,12 @@ definitions:
         x-go-package: github.com/fluxninja/aperture/pkg/jobs
     KubernetesDiscoveryConfig:
         properties:
-            autoscale_enabled:
+            enabled:
                 default: true
                 type: boolean
-                x-go-name: AutoscaleEnabled
+                x-go-name: Enabled
                 x-go-tag-default: "true"
-                x-go-tag-json: autoscale_enabled
-            discovery_enabled:
-                default: true
-                type: boolean
-                x-go-name: DiscoveryEnabled
-                x-go-tag-default: "true"
-                x-go-tag-json: discovery_enabled
+                x-go-tag-json: enabled
         title: KubernetesDiscoveryConfig for Kubernetes service discovery.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/discovery/kubernetes
@@ -1492,6 +1498,17 @@ paths:
                 - in: body
                   schema:
                     $ref: '#/definitions/AgentInfoConfig'
+            tags:
+                - common-configuration
+            x-fn-config-env: true
+    /auto_scale:
+        post:
+            operationId: AutoScaleConfig
+            parameters:
+                - in: body
+                  name: kubernetes
+                  schema:
+                    $ref: '#/definitions/AutoScaleKubernetesConfig'
             tags:
                 - common-configuration
             x-fn-config-env: true

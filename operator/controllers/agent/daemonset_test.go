@@ -204,7 +204,7 @@ var _ = Describe("Agent DaemonSet", func() {
 											},
 										},
 										{
-											Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+											Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 											Value: "true",
 										},
 									},
@@ -489,7 +489,7 @@ var _ = Describe("Agent DaemonSet", func() {
 											},
 										},
 										{
-											Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+											Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 											Value: "true",
 										},
 									},

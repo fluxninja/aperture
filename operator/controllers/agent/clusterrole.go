@@ -54,7 +54,7 @@ func genRules(instance *agentv1alpha1.Agent) []rbacv1.PolicyRule {
 		rules = append(rules, newRules...)
 	}
 
-	if instance.Spec.ConfigSpec.ServiceDiscoverySpec.KubernetesDiscoveryConfig.AutoscaleEnabled {
+	if instance.Spec.ConfigSpec.AutoScale.AutoScaleKubernetesConfig.Enabled {
 		newRules := []rbacv1.PolicyRule{
 			{
 				APIGroups: []string{"*"},

@@ -259,8 +259,8 @@ message AutoScale {
   oneof component {
     // PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
     PodScaler pod_scaler = 1;
-    // Autoscaler provides auto scaling functionality for any resource.
-    Autoscaler autoscaler = 2;
+    // AutoScaler provides auto scaling functionality for any resource.
+    AutoScaler autoscaler = 2;
   }
 }
 
@@ -1460,8 +1460,8 @@ message AIMDConcurrencyController {
   LoadActuator.DynamicConfig default_config = 10;
 }
 
-// Autoscaler
-message Autoscaler {
+// AutoScaler
+message AutoScaler {
   // Increasing Gradient defines a controller for scaling out based on Gradient Controller.
   message IncreasingGradient {
     // This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
@@ -1562,14 +1562,14 @@ message Autoscaler {
     PodScaler.ScaleActuator.DynamicConfig default_config = 3;
   }
 
-  // Outputs for Autoscaler.
+  // Outputs for AutoScaler.
   message Outs {
     OutPort actual_scale = 1;
     OutPort configured_scale = 2;
     OutPort desired_scale = 3;
   }
 
-  // Output ports for the Autoscaler.
+  // Output ports for the AutoScaler.
   Outs out_ports = 1;
 
   Scaler scaler = 2; // @gotags: validate:"required"

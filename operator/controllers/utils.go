@@ -212,7 +212,7 @@ func AgentEnv(instance *agentv1alpha1.Agent, agentGroup string) []corev1.EnvVar 
 			},
 		})
 		envs = append(envs, corev1.EnvVar{
-			Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+			Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 			Value: "false",
 		})
 	} else {
@@ -226,7 +226,7 @@ func AgentEnv(instance *agentv1alpha1.Agent, agentGroup string) []corev1.EnvVar 
 			},
 		})
 		envs = append(envs, corev1.EnvVar{
-			Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+			Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 			Value: "true",
 		})
 	}

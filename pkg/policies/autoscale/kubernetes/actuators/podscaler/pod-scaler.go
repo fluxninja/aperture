@@ -21,7 +21,6 @@ import (
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
-	discoverykubernetes "github.com/fluxninja/aperture/pkg/discovery/kubernetes"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/etcd/election"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
@@ -29,6 +28,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
+	autoscalek8sconfig "github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/config"
+	"github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/discovery"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -52,7 +53,7 @@ func Module() fx.Option {
 				setupPodScalerFactory,
 				fx.ParamTags(
 					fxTag,
-					discoverykubernetes.FxTag,
+					discovery.FxTag,
 					election.FxTag,
 				),
 			),
@@ -98,7 +99,13 @@ func setupPodScalerFactory(
 	etcdClient *etcdclient.Client,
 	k8sClient k8s.K8sClient,
 	ai *agentinfo.AgentInfo,
+	cfg autoscalek8sconfig.AutoScaleKubernetesConfig,
 ) error {
+	if !cfg.Enabled {
+		log.Info().Msg("Kubernetes AutoScaler is disabled")
+		return nil
+	}
+
 	agentGroup := ai.GetAgentGroup()
 	etcdPath := path.Join(paths.PodScalerDecisionsPath)
 	decisionsWatcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
@@ -217,7 +224,7 @@ type podScaler struct {
 	podScalerProto    *policylangv1.PodScaler
 	lastScaleDecision *policysyncv1.ScaleDecision
 	scaleWaitGroup    *conc.WaitGroup
-	controlPoint      discoverykubernetes.AutoscaleControlPoint
+	controlPoint      discovery.AutoScaleControlPoint
 	statusEtcdPath    string
 	dryRun            bool
 	isLeader          bool
@@ -267,7 +274,7 @@ func (pa *podScaler) setup(
 	// control point notifier
 	// read the configured control point from the horizontal pod scaler proto
 	controlPointSelector := pa.podScalerProto.KubernetesObjectSelector
-	controlPoint, err := discoverykubernetes.ControlPointFromSelector(controlPointSelector)
+	controlPoint, err := discovery.ControlPointFromSelector(controlPointSelector)
 	if err != nil {
 		return err
 	}

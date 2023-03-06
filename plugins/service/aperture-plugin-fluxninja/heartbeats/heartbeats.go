@@ -24,7 +24,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/entities"
-	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/etcd/election"
 	"github.com/fluxninja/aperture/pkg/info"
@@ -33,6 +32,7 @@ import (
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/peers"
+	autoscalek8sdiscovery "github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/discovery"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	flowcontrolpoints "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/controlpoints"
@@ -57,7 +57,7 @@ type Heartbeats struct {
 	heartbeatv1.UnimplementedControllerInfoServiceServer
 	heartbeatsClient          heartbeatv1.FluxNinjaServiceClient
 	statusRegistry            status.Registry
-	autoscalek8sControlPoints kubernetes.AutoscaleControlPoints
+	autoscalek8sControlPoints autoscalek8sdiscovery.AutoScaleControlPoints
 	policyFactory             *controlplane.PolicyFactory
 	ControllerInfo            *heartbeatv1.ControllerInfo
 	jobGroup                  *jobs.JobGroup
@@ -85,7 +85,7 @@ func newHeartbeats(
 	policyFactory *controlplane.PolicyFactory,
 	election *election.Election,
 	flowControlPoints *cache.Cache[selectors.ControlPointID],
-	autoscalek8sControlPoints kubernetes.AutoscaleControlPoints,
+	autoscalek8sControlPoints autoscalek8sdiscovery.AutoScaleControlPoints,
 	installationMode string,
 ) *Heartbeats {
 	return &Heartbeats{
@@ -245,7 +245,7 @@ func (h *Heartbeats) newHeartbeat(
 		}
 
 		if h.autoscalek8sControlPoints != nil {
-			report.AutoscaleKubernetesControlPoints = h.autoscalek8sControlPoints.ToProto()
+			report.AutoScaleKubernetesControlPoints = h.autoscalek8sControlPoints.ToProto()
 		}
 	}
 	return report

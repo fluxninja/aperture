@@ -1,4 +1,4 @@
-package kubernetes
+package discovery
 
 import (
 	"context"
@@ -19,8 +19,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 )
 
-// A AutoscaleControlPoint is identified by Group, Version, Kind, Namespace and Name.
-type AutoscaleControlPoint struct {
+// A AutoScaleControlPoint is identified by Group, Version, Kind, Namespace and Name.
+type AutoScaleControlPoint struct {
 	Group     string
 	Version   string
 	Kind      string
@@ -28,14 +28,14 @@ type AutoscaleControlPoint struct {
 	Name      string
 }
 
-// ToProto converts a ControlPoint to a AutoscaleKubernetesControlPoint.
-func (cp *AutoscaleControlPoint) ToProto() *controlpointsv1.AutoscaleKubernetesControlPoint {
+// ToProto converts a ControlPoint to a AutoScaleKubernetesControlPoint.
+func (cp *AutoScaleControlPoint) ToProto() *controlpointsv1.AutoScaleKubernetesControlPoint {
 	groupVersion := schema.GroupVersion{
 		Group:   cp.Group,
 		Version: cp.Version,
 	}
 
-	return &controlpointsv1.AutoscaleKubernetesControlPoint{
+	return &controlpointsv1.AutoScaleKubernetesControlPoint{
 		ApiVersion: groupVersion.String(),
 		Kind:       cp.Kind,
 		Namespace:  cp.Namespace,
@@ -44,15 +44,15 @@ func (cp *AutoscaleControlPoint) ToProto() *controlpointsv1.AutoscaleKubernetesC
 }
 
 // ControlPointFromSelector converts a policylangv1.KubernetesObjectSelector to a ControlPoint.
-func ControlPointFromSelector(k8sObjectSelector *policylangv1.KubernetesObjectSelector) (AutoscaleControlPoint, error) {
+func ControlPointFromSelector(k8sObjectSelector *policylangv1.KubernetesObjectSelector) (AutoScaleControlPoint, error) {
 	// Convert Kubernetes APIVersion into Group and Version
 	groupVersion, parseErr := schema.ParseGroupVersion(k8sObjectSelector.ApiVersion)
 	if parseErr != nil {
 		log.Error().Err(parseErr).Msgf("Unable to parse APIVersion: %s", k8sObjectSelector.ApiVersion)
-		return AutoscaleControlPoint{}, parseErr
+		return AutoScaleControlPoint{}, parseErr
 	}
 
-	return AutoscaleControlPoint{
+	return AutoScaleControlPoint{
 		Group:     groupVersion.Group,
 		Version:   groupVersion.Version,
 		Kind:      k8sObjectSelector.Kind,
@@ -61,44 +61,44 @@ func ControlPointFromSelector(k8sObjectSelector *policylangv1.KubernetesObjectSe
 	}, nil
 }
 
-// AutoscaleControlPointStore is the interface for Storing Kubernetes Control Points.
-type AutoscaleControlPointStore interface {
-	Add(cp AutoscaleControlPoint)
-	Update(cp AutoscaleControlPoint)
-	Delete(cp AutoscaleControlPoint)
+// AutoScaleControlPointStore is the interface for Storing Kubernetes Control Points.
+type AutoScaleControlPointStore interface {
+	Add(cp AutoScaleControlPoint)
+	Update(cp AutoScaleControlPoint)
+	Delete(cp AutoScaleControlPoint)
 }
 
-// AutoscaleControlPoints is the interface for Reading or Watching Kubernetes Control Points.
-type AutoscaleControlPoints interface {
-	Keys() []AutoscaleControlPoint
+// AutoScaleControlPoints is the interface for Reading or Watching Kubernetes Control Points.
+type AutoScaleControlPoints interface {
+	Keys() []AutoScaleControlPoint
 	AddKeyNotifier(notifiers.KeyNotifier) error
 	RemoveKeyNotifier(notifiers.KeyNotifier) error
-	ToProto() *controlpointsv1.AutoscaleKubernetesControlPoints
+	ToProto() *controlpointsv1.AutoScaleKubernetesControlPoints
 }
 
-// autocaleControlPoints is a cache of discovered Kubernetes control points and provides APIs to do CRUD on Scale type resources.
-type autocaleControlPoints struct {
+// autoScaleControlPoints is a cache of discovered Kubernetes control points and provides APIs to do CRUD on Scale type resources.
+type autoScaleControlPoints struct {
 	// RW controlPointsMutex
 	controlPointsMutex sync.RWMutex
 	k8sClient          k8s.K8sClient
 	// Set of unique controlPoints
-	controlPoints map[AutoscaleControlPoint]*controlPointState
+	controlPoints map[AutoScaleControlPoint]*controlPointState
 	trackers      notifiers.Trackers
 	ctx           context.Context
 	cancel        context.CancelFunc
 	scaleStream   *stream.Stream
 }
 
-// controlPointCache implements the AutoscaleControlPointStore interface.
-var _ AutoscaleControlPointStore = (*autocaleControlPoints)(nil)
+// controlPointCache implements the AutoScaleControlPointStore interface.
+var _ AutoScaleControlPointStore = (*autoScaleControlPoints)(nil)
 
-// controlPointCache implements the AutoscaleControlPoints interface.
-var _ AutoscaleControlPoints = (*autocaleControlPoints)(nil)
+// controlPointCache implements the AutoScaleControlPoints interface.
+var _ AutoScaleControlPoints = (*autoScaleControlPoints)(nil)
 
-// newAutoscaleControlPoints returns a new AutoscaleControlPoints.
-func newAutoscaleControlPoints(trackers notifiers.Trackers, k8sClient k8s.K8sClient) *autocaleControlPoints {
-	return &autocaleControlPoints{
-		controlPoints: make(map[AutoscaleControlPoint]*controlPointState),
+// newAutoScaleControlPoints returns a new AutoScaleControlPoints.
+func newAutoScaleControlPoints(trackers notifiers.Trackers, k8sClient k8s.K8sClient) *autoScaleControlPoints {
+	return &autoScaleControlPoints{
+		controlPoints: make(map[AutoScaleControlPoint]*controlPointState),
 		trackers:      trackers,
 		k8sClient:     k8sClient,
 		scaleStream:   stream.New(),
@@ -106,17 +106,17 @@ func newAutoscaleControlPoints(trackers notifiers.Trackers, k8sClient k8s.K8sCli
 }
 
 // start starts the autoScaler.
-func (cpc *autocaleControlPoints) start() {
+func (cpc *autoScaleControlPoints) start() {
 	cpc.ctx, cpc.cancel = context.WithCancel(context.Background())
 }
 
 // stop stops the autoScaler.
-func (cpc *autocaleControlPoints) stop() {
+func (cpc *autoScaleControlPoints) stop() {
 	cpc.cancel()
 }
 
 // Add adds a ControlPoint to the cache.
-func (cpc *autocaleControlPoints) Add(cp AutoscaleControlPoint) {
+func (cpc *autoScaleControlPoints) Add(cp AutoScaleControlPoint) {
 	log.Info().Msgf("Add called for %v", cp)
 	// take write mutex before modifying map
 	cpc.controlPointsMutex.Lock()
@@ -137,7 +137,7 @@ func (cpc *autocaleControlPoints) Add(cp AutoscaleControlPoint) {
 }
 
 // Update updates a ControlPoint in the cache.
-func (cpc *autocaleControlPoints) Update(cp AutoscaleControlPoint) {
+func (cpc *autoScaleControlPoints) Update(cp AutoScaleControlPoint) {
 	log.Info().Msgf("Update called for %v", cp)
 	// take write mutex before modifying map
 	cpc.controlPointsMutex.Lock()
@@ -171,7 +171,7 @@ func (cpc *autocaleControlPoints) Update(cp AutoscaleControlPoint) {
 }
 
 // Delete deletes a ControlPoint from the cache.
-func (cpc *autocaleControlPoints) Delete(cp AutoscaleControlPoint) {
+func (cpc *autoScaleControlPoints) Delete(cp AutoScaleControlPoint) {
 	log.Info().Msgf("Delete called for %v", cp)
 	// take write mutex before modifying map
 	cpc.controlPointsMutex.Lock()
@@ -196,7 +196,7 @@ func (cpc *autocaleControlPoints) Delete(cp AutoscaleControlPoint) {
 	})
 }
 
-func (cpc *autocaleControlPoints) fetchScale(cp AutoscaleControlPoint, cps *controlPointState) stream.Callback {
+func (cpc *autoScaleControlPoints) fetchScale(cp AutoScaleControlPoint, cps *controlPointState) stream.Callback {
 	log.Info().Msgf("fetchScale called for %v", cp)
 	noOp := func() {}
 
@@ -257,11 +257,11 @@ func (cpc *autocaleControlPoints) fetchScale(cp AutoscaleControlPoint, cps *cont
 }
 
 // Keys returns the list of ControlPoints in the cache.
-func (cpc *autocaleControlPoints) Keys() []AutoscaleControlPoint {
+func (cpc *autoScaleControlPoints) Keys() []AutoScaleControlPoint {
 	// take read mutex before reading map
 	cpc.controlPointsMutex.RLock()
 	defer cpc.controlPointsMutex.RUnlock()
-	var cps []AutoscaleControlPoint
+	var cps []AutoScaleControlPoint
 	for cp := range cpc.controlPoints {
 		cps = append(cps, cp)
 	}
@@ -269,24 +269,24 @@ func (cpc *autocaleControlPoints) Keys() []AutoscaleControlPoint {
 }
 
 // ToProto returns the list of ControlPoints in the cache as a protobuf message.
-func (cpc *autocaleControlPoints) ToProto() *controlpointsv1.AutoscaleKubernetesControlPoints {
+func (cpc *autoScaleControlPoints) ToProto() *controlpointsv1.AutoScaleKubernetesControlPoints {
 	keys := cpc.Keys()
-	akcp := &controlpointsv1.AutoscaleKubernetesControlPoints{
-		AutoscaleKubernetesControlPoints: make([]*controlpointsv1.AutoscaleKubernetesControlPoint, 0, len(keys)),
+	akcp := &controlpointsv1.AutoScaleKubernetesControlPoints{
+		AutoScaleKubernetesControlPoints: make([]*controlpointsv1.AutoScaleKubernetesControlPoint, 0, len(keys)),
 	}
 	for _, cp := range keys {
-		akcp.AutoscaleKubernetesControlPoints = append(akcp.AutoscaleKubernetesControlPoints, cp.ToProto())
+		akcp.AutoScaleKubernetesControlPoints = append(akcp.AutoScaleKubernetesControlPoints, cp.ToProto())
 	}
 	return akcp
 }
 
 // AddKeyNotifier adds a KeyNotifier to the trackers.
-func (cpc *autocaleControlPoints) AddKeyNotifier(notifier notifiers.KeyNotifier) error {
+func (cpc *autoScaleControlPoints) AddKeyNotifier(notifier notifiers.KeyNotifier) error {
 	return cpc.trackers.AddKeyNotifier(notifier)
 }
 
 // RemoveKeyNotifier removes a KeyNotifier from the trackers.
-func (cpc *autocaleControlPoints) RemoveKeyNotifier(notifier notifiers.KeyNotifier) error {
+func (cpc *autoScaleControlPoints) RemoveKeyNotifier(notifier notifiers.KeyNotifier) error {
 	return cpc.trackers.RemoveKeyNotifier(notifier)
 }
 

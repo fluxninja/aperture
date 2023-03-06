@@ -24,6 +24,9 @@ etcd:
 flow_control:
   preview_service:
     enabled: true
+auto_scale:
+  kubernetes:
+    enabled: true
 fluxninja_plugin:
   api_key: ""
   client:
@@ -198,10 +201,7 @@ server:
     key_file: ""
 service_discovery:
   kubernetes:
-    autoscale_enabled: true
-    discovery_enabled: true
-    node_name: ""
-    pod_name: ""
+    enabled: true
   static: {}
 watchdog:
   cgroup:
