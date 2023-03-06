@@ -2509,6 +2509,8 @@ definitions:
         $ref: '#/definitions/OutPort'
   Policy:
     description: |-
+      Policy expresses observability-driven control logic.
+
       :::info
 
       See also [Policy overview](/concepts/policy/policy.md).
@@ -2517,8 +2519,6 @@ definitions:
 
       Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
     type: object
-    title: Policy expresses reliability automation workflow that automatically protects
-      services
     properties:
       circuit:
         description: Defines the control-loop logic of the policy.
