@@ -130,13 +130,13 @@ type EventWriter interface {
 	WriteEvent(key Key, value []byte)
 	RemoveEvent(key Key)
 	Purge(prefix string)
+	GetCurrentValue(key Key) []byte
 }
 
 // Trackers is the interface of a tracker collection.
 type Trackers interface {
 	Watcher
 	EventWriter
-	GetCurrentValue(key Key) []byte
 }
 
 // DefaultTrackers is a collection of key trackers.
@@ -260,11 +260,12 @@ func (t *DefaultTrackers) addPrefixNotifier(notifier PrefixNotifier) {
 	// add to existing trackers
 	for _, key := range t.getKeys() {
 		if strings.HasPrefix(key.String(), notifier.GetPrefix()) {
-			kn := notifier.GetKeyNotifier(key)
-			if kn != nil {
-				kn.inherit(key, notifier)
-				t.addKeyNotifier(kn)
+			kn, err := notifier.GetKeyNotifier(key)
+			if err != nil {
+				continue
 			}
+			kn.inherit(key, notifier)
+			t.addKeyNotifier(kn)
 		}
 	}
 }
@@ -385,11 +386,12 @@ func (t *DefaultTrackers) Start() error {
 					if !valid {
 						for _, pn := range t.prefixNotifiers {
 							if strings.HasPrefix(event.Key.String(), pn.GetPrefix()) {
-								n := pn.GetKeyNotifier(event.Key)
-								if n != nil {
-									n.inherit(event.Key, pn)
-									tracker.addKeyNotifier(n)
+								n, err := pn.GetKeyNotifier(event.Key)
+								if err != nil {
+									continue
 								}
+								n.inherit(event.Key, pn)
+								tracker.addKeyNotifier(n)
 							}
 						}
 					}
@@ -447,8 +449,8 @@ func NewPrefixedEventWriter(prefix string, ew EventWriter) EventWriter {
 }
 
 type prefixedEventWriter struct {
-	prefix string
 	parent EventWriter
+	prefix string
 }
 
 // WriteEvent implements EventWriter interface.
@@ -464,4 +466,9 @@ func (ew *prefixedEventWriter) RemoveEvent(key Key) {
 // Purge implements EventWriter interface.
 func (ew *prefixedEventWriter) Purge(prefix string) {
 	ew.parent.Purge(ew.prefix + prefix)
+}
+
+// GetCurrentValue implements EventWriter interface.
+func (ew *prefixedEventWriter) GetCurrentValue(key Key) []byte {
+	return ew.parent.GetCurrentValue(Key(ew.prefix + string(key)))
 }

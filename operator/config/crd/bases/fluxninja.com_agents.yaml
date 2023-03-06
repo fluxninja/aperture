@@ -1058,6 +1058,20 @@ spec:
                           type: object
                         type: array
                     type: object
+                  auto_scale:
+                    description: AutoScale configuration.
+                    properties:
+                      kubernetes:
+                        description: AutoScaleKubernetesConfig holds auto scale kubernetes
+                          configuration.
+                        properties:
+                          enabled:
+                            description: Enables the Kubernetes autoscale capability.
+                            type: boolean
+                        required:
+                        - enabled
+                        type: object
+                    type: object
                   client:
                     description: Client configuration such as proxy settings.
                     properties:
@@ -1782,16 +1796,8 @@ spec:
                         description: KubernetesDiscoveryConfig for Kubernetes service
                           discovery.
                         properties:
-                          autoscale_enabled:
+                          enabled:
                             type: boolean
-                          discovery_enabled:
-                            type: boolean
-                          node_name:
-                            description: NodeName is the name of the k8s node the
-                              agent should be monitoring
-                            type: string
-                          pod_name:
-                            type: string
                         type: object
                       static:
                         description: StaticDiscoveryConfig for pre-determined list

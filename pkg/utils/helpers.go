@@ -28,6 +28,16 @@ func SliceContains(a []string, x string) bool {
 	return false
 }
 
+// RemoveFromSlice removes x from a and returns the new slice.
+func RemoveFromSlice(a []string, x string) []string {
+	for i, n := range a {
+		if x == n {
+			return append(a[:i], a[i+1:]...)
+		}
+	}
+	return a
+}
+
 // SliceToMap converts a slice of string to a map[string]bool.
 func SliceToMap(a []string) map[string]bool {
 	m := make(map[string]bool)

@@ -23,30 +23,30 @@ type notifier interface {
 // This function can transform the key and contents before processing them further.
 type TransformFunc func(key Key, bytes []byte, etype EventType) (Key, []byte, error)
 
-// NotifierBase is the base type for all notifiers.
-type NotifierBase struct {
+// notifierBase is the base type for all notifiers.
+type notifierBase struct {
 	tf TransformFunc
 	id string
 }
 
-func (idb *NotifierBase) getID() string {
+func (idb *notifierBase) getID() string {
 	if idb.id == "" {
 		idb.id = guuid.NewString()
 	}
 	return idb.id
 }
 
-func (idb *NotifierBase) setID(id string) {
+func (idb *notifierBase) setID(id string) {
 	idb.id = id
 }
 
 // GetTransformFunc returns the transform function.
-func (idb *NotifierBase) GetTransformFunc() TransformFunc {
+func (idb *notifierBase) GetTransformFunc() TransformFunc {
 	return idb.tf
 }
 
 // SetTransformFunc sets the transform function.
-func (idb *NotifierBase) SetTransformFunc(tf TransformFunc) {
+func (idb *notifierBase) SetTransformFunc(tf TransformFunc) {
 	idb.tf = tf
 }
 
@@ -54,13 +54,49 @@ func (idb *NotifierBase) SetTransformFunc(tf TransformFunc) {
 // KeyNotifier
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-// KeyNotifier is the interface that all key notifiers must implement.
-type KeyNotifier interface {
+// KeyBase is interface for key.
+type KeyBase interface {
 	notifier
 	GetKey() Key
-	SetKey(Key)
-	Notify(Event)
 	inherit(key Key, pn PrefixNotifier)
+}
+
+// keyBase is the base type for all key notifiers.
+type keyBase struct {
+	notifierBase
+	key Key
+}
+
+// NewKeyBase creates a new key notifier.
+func NewKeyBase(key Key) *keyBase {
+	return &keyBase{
+		key: key,
+	}
+}
+
+// GetKey returns the key.
+func (knb *keyBase) GetKey() Key {
+	return knb.key
+}
+
+func (knb *keyBase) inherit(key Key, pn PrefixNotifier) {
+	knb.key = key
+	knb.setID(pn.getID())
+	knb.SetTransformFunc(pn.GetTransformFunc())
+}
+
+// KeyNotifier is the interface that all key notifiers must implement.
+type KeyNotifier interface {
+	KeyBase
+	Notify(Event)
+}
+
+type keyNotifiers []KeyNotifier
+
+func (kns keyNotifiers) notify(event Event) {
+	for _, kn := range kns {
+		transformNotify(kn, event)
+	}
 }
 
 func transformNotify(kn KeyNotifier, event Event) {
@@ -82,56 +118,38 @@ func transformNotify(kn KeyNotifier, event Event) {
 	kn.Notify(ev)
 }
 
-// KeyNotifierBase is the base type for all key notifiers.
-type KeyNotifierBase struct {
-	NotifierBase
-	key Key
-}
-
-// GetKey returns the key.
-func (knb *KeyNotifierBase) GetKey() Key {
-	return knb.key
-}
-
-// SetKey sets the key.
-func (knb *KeyNotifierBase) SetKey(key Key) {
-	knb.key = key
-}
-
-func (knb *KeyNotifierBase) inherit(key Key, pn PrefixNotifier) {
-	knb.SetKey(key)
-	knb.setID(pn.getID())
-	knb.SetTransformFunc(pn.GetTransformFunc())
-}
-
-type keyNotifiers []KeyNotifier
-
-func (kns keyNotifiers) notify(event Event) {
-	for _, kn := range kns {
-		transformNotify(kn, event)
-	}
-}
-
 /////////////////////////////////////////////////////////////////////////////////////////////
 // PrefixNotifier
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-// PrefixNotifier is the interface that all prefix notifiers must implement.
-type PrefixNotifier interface {
+// PrefixBase is the base type for all prefix notifiers.
+type PrefixBase interface {
 	notifier
 	GetPrefix() string
-	GetKeyNotifier(key Key) KeyNotifier
 }
 
-// PrefixNotifierBase is the base type for all prefix notifiers.
-type PrefixNotifierBase struct {
-	NotifierBase
-	Prefix string
+// prefixBase is the base type for all prefix notifiers.
+type prefixBase struct {
+	prefix string
+	notifierBase
+}
+
+// NewPrefixBase creates a new prefix notifier.
+func NewPrefixBase(prefix string) *prefixBase {
+	return &prefixBase{
+		prefix: prefix,
+	}
 }
 
 // GetPrefix returns the prefix.
-func (pnb *PrefixNotifierBase) GetPrefix() string {
-	return pnb.Prefix
+func (pnb *prefixBase) GetPrefix() string {
+	return pnb.prefix
+}
+
+// PrefixNotifier is the interface that all prefix notifiers must implement.
+type PrefixNotifier interface {
+	PrefixBase
+	GetKeyNotifier(key Key) (KeyNotifier, error)
 }
 
 type prefixNotifiers []PrefixNotifier

@@ -177,7 +177,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 						},
 					},
 					{
-						Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+						Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 						Value: "false",
 					},
 				},
@@ -350,7 +350,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 						},
 					},
 					{
-						Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+						Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 						Value: "false",
 					},
 				},
@@ -576,7 +576,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 						},
 					},
 					{
-						Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+						Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 						Value: "false",
 					},
 				},
@@ -750,7 +750,7 @@ var _ = Describe("Pod modification for Agent", func() {
 									},
 								},
 								{
-									Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+									Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 									Value: "false",
 								},
 							},
@@ -965,7 +965,7 @@ var _ = Describe("Pod modification for Agent", func() {
 									},
 								},
 								{
-									Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+									Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 									Value: "false",
 								},
 							},

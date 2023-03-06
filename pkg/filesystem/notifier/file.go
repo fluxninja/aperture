@@ -8,7 +8,7 @@ import (
 // KeyToFSNotifier holds the state of a notifier that writes raw/transformed contents of a watched file to another file.
 type KeyToFSNotifier struct {
 	fileInfo *filesystem.FileInfo
-	notifiers.KeyNotifierBase
+	notifiers.KeyBase
 	path string
 }
 
@@ -20,11 +20,10 @@ func NewKeyToFSNotifier(key notifiers.Key, dir string, ext string) *KeyToFSNotif
 	fi := filesystem.NewFileInfo(dir, key.String(), ext)
 
 	n := &KeyToFSNotifier{
+		KeyBase:  notifiers.NewKeyBase(key),
 		path:     fi.GetFilePath(),
 		fileInfo: fi,
 	}
-	// nolint: typecheck
-	n.SetKey(key)
 
 	return n
 }

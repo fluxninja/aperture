@@ -15,84 +15,84 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// FlowControlControlPointsServiceClient is the client API for FlowControlControlPointsService service.
+// FlowControlPointsServiceClient is the client API for FlowControlPointsService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type FlowControlControlPointsServiceClient interface {
-	GetControlPoints(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*FlowControlControlPoints, error)
+type FlowControlPointsServiceClient interface {
+	GetControlPoints(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*FlowControlPoints, error)
 }
 
-type flowControlControlPointsServiceClient struct {
+type flowControlPointsServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewFlowControlControlPointsServiceClient(cc grpc.ClientConnInterface) FlowControlControlPointsServiceClient {
-	return &flowControlControlPointsServiceClient{cc}
+func NewFlowControlPointsServiceClient(cc grpc.ClientConnInterface) FlowControlPointsServiceClient {
+	return &flowControlPointsServiceClient{cc}
 }
 
-func (c *flowControlControlPointsServiceClient) GetControlPoints(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*FlowControlControlPoints, error) {
-	out := new(FlowControlControlPoints)
-	err := c.cc.Invoke(ctx, "/aperture.flowcontrol.controlpoints.v1.FlowControlControlPointsService/GetControlPoints", in, out, opts...)
+func (c *flowControlPointsServiceClient) GetControlPoints(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*FlowControlPoints, error) {
+	out := new(FlowControlPoints)
+	err := c.cc.Invoke(ctx, "/aperture.flowcontrol.controlpoints.v1.FlowControlPointsService/GetControlPoints", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// FlowControlControlPointsServiceServer is the server API for FlowControlControlPointsService service.
-// All implementations should embed UnimplementedFlowControlControlPointsServiceServer
+// FlowControlPointsServiceServer is the server API for FlowControlPointsService service.
+// All implementations should embed UnimplementedFlowControlPointsServiceServer
 // for forward compatibility
-type FlowControlControlPointsServiceServer interface {
-	GetControlPoints(context.Context, *emptypb.Empty) (*FlowControlControlPoints, error)
+type FlowControlPointsServiceServer interface {
+	GetControlPoints(context.Context, *emptypb.Empty) (*FlowControlPoints, error)
 }
 
-// UnimplementedFlowControlControlPointsServiceServer should be embedded to have forward compatible implementations.
-type UnimplementedFlowControlControlPointsServiceServer struct {
+// UnimplementedFlowControlPointsServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedFlowControlPointsServiceServer struct {
 }
 
-func (UnimplementedFlowControlControlPointsServiceServer) GetControlPoints(context.Context, *emptypb.Empty) (*FlowControlControlPoints, error) {
+func (UnimplementedFlowControlPointsServiceServer) GetControlPoints(context.Context, *emptypb.Empty) (*FlowControlPoints, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetControlPoints not implemented")
 }
 
-// UnsafeFlowControlControlPointsServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to FlowControlControlPointsServiceServer will
+// UnsafeFlowControlPointsServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to FlowControlPointsServiceServer will
 // result in compilation errors.
-type UnsafeFlowControlControlPointsServiceServer interface {
-	mustEmbedUnimplementedFlowControlControlPointsServiceServer()
+type UnsafeFlowControlPointsServiceServer interface {
+	mustEmbedUnimplementedFlowControlPointsServiceServer()
 }
 
-func RegisterFlowControlControlPointsServiceServer(s grpc.ServiceRegistrar, srv FlowControlControlPointsServiceServer) {
-	s.RegisterService(&FlowControlControlPointsService_ServiceDesc, srv)
+func RegisterFlowControlPointsServiceServer(s grpc.ServiceRegistrar, srv FlowControlPointsServiceServer) {
+	s.RegisterService(&FlowControlPointsService_ServiceDesc, srv)
 }
 
-func _FlowControlControlPointsService_GetControlPoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _FlowControlPointsService_GetControlPoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(FlowControlControlPointsServiceServer).GetControlPoints(ctx, in)
+		return srv.(FlowControlPointsServiceServer).GetControlPoints(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/aperture.flowcontrol.controlpoints.v1.FlowControlControlPointsService/GetControlPoints",
+		FullMethod: "/aperture.flowcontrol.controlpoints.v1.FlowControlPointsService/GetControlPoints",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FlowControlControlPointsServiceServer).GetControlPoints(ctx, req.(*emptypb.Empty))
+		return srv.(FlowControlPointsServiceServer).GetControlPoints(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// FlowControlControlPointsService_ServiceDesc is the grpc.ServiceDesc for FlowControlControlPointsService service.
+// FlowControlPointsService_ServiceDesc is the grpc.ServiceDesc for FlowControlPointsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var FlowControlControlPointsService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "aperture.flowcontrol.controlpoints.v1.FlowControlControlPointsService",
-	HandlerType: (*FlowControlControlPointsServiceServer)(nil),
+var FlowControlPointsService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "aperture.flowcontrol.controlpoints.v1.FlowControlPointsService",
+	HandlerType: (*FlowControlPointsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetControlPoints",
-			Handler:    _FlowControlControlPointsService_GetControlPoints_Handler,
+			Handler:    _FlowControlPointsService_GetControlPoints_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
