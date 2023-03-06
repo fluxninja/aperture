@@ -16,6 +16,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
+	"github.com/fluxninja/aperture/pkg/etcd/election"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
@@ -58,6 +59,7 @@ type ConstructorIn struct {
 	AgentInfo                        *agentinfo.AgentInfo `optional:"true"`
 	PeersWatcher                     *peers.PeerDiscovery `name:"fluxninja-peers-watcher" optional:"true"`
 	EtcdClient                       *etcdclient.Client
+	Election                         *election.Election                     `optional:"true"`
 	PolicyFactory                    *controlplane.PolicyFactory            `optional:"true"`
 	FlowControlPoints                *cache.Cache[selectors.ControlPointID] `optional:"true"`
 	AutoscaleKubernetesControlPoints kubernetes.AutoscaleControlPoints      `optional:"true"`
@@ -85,6 +87,7 @@ func Provide(in ConstructorIn) (*Heartbeats, error) {
 		in.AgentInfo,
 		in.PeersWatcher,
 		in.PolicyFactory,
+		in.Election,
 		in.FlowControlPoints,
 		in.AutoscaleKubernetesControlPoints,
 		installationMode,

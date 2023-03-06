@@ -29,6 +29,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
+	"github.com/fluxninja/aperture/pkg/etcd/election"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -58,21 +59,22 @@ type Heartbeats struct {
 	heartbeatv1.UnimplementedControllerInfoServiceServer
 	heartbeatsClient          heartbeatv1.FluxNinjaServiceClient
 	statusRegistry            status.Registry
-	agentInfo                 *agentinfo.AgentInfo
-	clientHTTP                *http.Client
-	interval                  config.Duration
+	autoscalek8sControlPoints kubernetes.AutoscaleControlPoints
+	policyFactory             *controlplane.PolicyFactory
+	ControllerInfo            *heartbeatv1.ControllerInfo
 	jobGroup                  *jobs.JobGroup
 	clientConn                *grpc.ClientConn
 	peersWatcher              *peers.PeerDiscovery
 	entities                  *entities.Entities
-	policyFactory             *controlplane.PolicyFactory
-	ControllerInfo            *heartbeatv1.ControllerInfo
+	clientHTTP                *http.Client
+	interval                  config.Duration
 	flowControlPoints         *cache.Cache[selectors.ControlPointID]
-	autoscalek8sControlPoints kubernetes.AutoscaleControlPoints
-	heartbeatsAddr            string
+	agentInfo                 *agentinfo.AgentInfo
+	election                  *election.Election
 	APIKey                    string
 	jobName                   string
 	installationMode          string
+	heartbeatsAddr            string
 }
 
 func newHeartbeats(
@@ -83,6 +85,7 @@ func newHeartbeats(
 	agentInfo *agentinfo.AgentInfo,
 	peersWatcher *peers.PeerDiscovery,
 	policyFactory *controlplane.PolicyFactory,
+	election *election.Election,
 	flowControlPoints *cache.Cache[selectors.ControlPointID],
 	autoscalek8sControlPoints kubernetes.AutoscaleControlPoints,
 	installationMode string,
@@ -97,6 +100,7 @@ func newHeartbeats(
 		agentInfo:                 agentInfo,
 		peersWatcher:              peersWatcher,
 		policyFactory:             policyFactory,
+		election:                  election,
 		flowControlPoints:         flowControlPoints,
 		autoscalek8sControlPoints: autoscalek8sControlPoints,
 		installationMode:          installationMode,
@@ -205,62 +209,63 @@ func (h *Heartbeats) stop() {
 func (h *Heartbeats) newHeartbeat(
 	jobCtxt context.Context,
 ) *heartbeatv1.ReportRequest {
-	var servicesList *heartbeatv1.ServicesList
-	if h.entities != nil {
-		servicesList = populateServicesList(h.entities)
+	report := &heartbeatv1.ReportRequest{
+		VersionInfo:      info.GetVersionInfo(),
+		ProcessInfo:      info.GetProcessInfo(),
+		HostInfo:         info.GetHostInfo(),
+		ControllerInfo:   h.ControllerInfo,
+		AllStatuses:      h.statusRegistry.GetGroupStatus(),
+		InstallationMode: h.installationMode,
 	}
 
 	var agentGroup string
 	if h.agentInfo != nil {
 		agentGroup = h.agentInfo.GetAgentGroup()
-	}
-
-	var peers *peersv1.Peers
-	if h.peersWatcher != nil {
-		peers = h.peersWatcher.GetPeers()
+		report.AgentGroup = agentGroup
 	}
 
 	policies := &policysyncv1.PolicyWrappers{}
 	if h.policyFactory != nil {
 		policies.PolicyWrappers = h.policyFactory.GetPolicyWrappers()
+		report.Policies = policies
 	}
 
-	var serviceControlPointObjects []selectors.ControlPointID
-	if h.flowControlPoints != nil {
-		serviceControlPointObjects = h.flowControlPoints.GetAll()
-	}
-	flowControlPoints := &flowcontrolpointsv1.FlowControlPoints{
-		FlowControlPoints: make([]*flowcontrolpointsv1.FlowControlPoint, 0, len(serviceControlPointObjects)),
-	}
-	for _, cp := range serviceControlPointObjects {
-		flowControlPoints.FlowControlPoints = append(flowControlPoints.FlowControlPoints, cp.ToProto())
-	}
+	if h.election != nil && h.election.IsLeader() {
+		var servicesList *heartbeatv1.ServicesList
+		if h.entities != nil {
+			servicesList = populateServicesList(h.entities)
+			report.ServicesList = servicesList
+		}
 
-	var kubernetesControlPointObjects []kubernetes.AutoscaleControlPoint
-	if h.autoscalek8sControlPoints != nil {
-		kubernetesControlPointObjects = h.autoscalek8sControlPoints.Keys()
-	}
-	autoscalek8sControlPoints := &autoscalek8scontrolpointsv1.AutoscaleKubernetesControlPoints{
-		AutoscaleKubernetesControlPoints: make([]*autoscalek8scontrolpointsv1.AutoscaleKubernetesControlPoint, 0, len(kubernetesControlPointObjects)),
-	}
-	for _, cp := range kubernetesControlPointObjects {
-		autoscalek8sControlPoints.AutoscaleKubernetesControlPoints = append(autoscalek8sControlPoints.AutoscaleKubernetesControlPoints, cp.ToProto())
-	}
+		if h.flowControlPoints != nil {
+			var peers *peersv1.Peers
+			if h.peersWatcher != nil {
+				peers = h.peersWatcher.GetPeers()
+				report.Peers = peers
+			}
 
-	return &heartbeatv1.ReportRequest{
-		VersionInfo:                      info.GetVersionInfo(),
-		ProcessInfo:                      info.GetProcessInfo(),
-		HostInfo:                         info.GetHostInfo(),
-		AgentGroup:                       agentGroup,
-		ControllerInfo:                   h.ControllerInfo,
-		Peers:                            peers,
-		ServicesList:                     servicesList,
-		AllStatuses:                      h.statusRegistry.GetGroupStatus(),
-		Policies:                         policies,
-		FlowControlPoints:                flowControlPoints,
-		AutoscaleKubernetesControlPoints: autoscalek8sControlPoints,
-		InstallationMode:                 h.installationMode,
+			flowControlPointObjects := h.flowControlPoints.GetAll()
+			flowControlPoints := &flowcontrolpointsv1.FlowControlPoints{
+				FlowControlPoints: make([]*flowcontrolpointsv1.FlowControlPoint, 0, len(flowControlPointObjects)),
+			}
+			for _, cp := range flowControlPointObjects {
+				flowControlPoints.FlowControlPoints = append(flowControlPoints.FlowControlPoints, cp.ToProto())
+			}
+			report.FlowControlPoints = flowControlPoints
+		}
+
+		if h.autoscalek8sControlPoints != nil {
+			kubernetesControlPointObjects := h.autoscalek8sControlPoints.Keys()
+			autoscalek8sControlPoints := &autoscalek8scontrolpointsv1.AutoscaleKubernetesControlPoints{
+				AutoscaleKubernetesControlPoints: make([]*autoscalek8scontrolpointsv1.AutoscaleKubernetesControlPoint, 0, len(kubernetesControlPointObjects)),
+			}
+			for _, cp := range kubernetesControlPointObjects {
+				autoscalek8sControlPoints.AutoscaleKubernetesControlPoints = append(autoscalek8sControlPoints.AutoscaleKubernetesControlPoints, cp.ToProto())
+			}
+			report.AutoscaleKubernetesControlPoints = autoscalek8sControlPoints
+		}
 	}
+	return report
 }
 
 func (h *Heartbeats) sendSingleHeartbeat(jobCtxt context.Context) (proto.Message, error) {
