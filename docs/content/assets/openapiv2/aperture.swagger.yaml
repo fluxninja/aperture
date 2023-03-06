@@ -508,6 +508,50 @@ definitions:
             kubernetes_replicas:
                 $ref: '#/definitions/AutoScalerKubernetesReplicas'
         type: object
+    CheckHTTPRequest:
+        properties:
+            destination:
+                $ref: '#/definitions/SocketAddress'
+            request:
+                $ref: '#/definitions/CheckHTTPRequestHttpRequest'
+            source:
+                $ref: '#/definitions/SocketAddress'
+        type: object
+    CheckHTTPRequestHttpRequest:
+        properties:
+            body:
+                type: string
+            headers:
+                additionalProperties:
+                    type: string
+                type: object
+            host:
+                type: string
+            method:
+                type: string
+            path:
+                type: string
+            protocol:
+                type: string
+            scheme:
+                type: string
+            size:
+                format: int64
+                type: string
+        type: object
+    CheckHTTPResponse:
+        properties:
+            denied_response:
+                $ref: '#/definitions/DeniedHttpResponse'
+                description: Supplies http attributes for a denied response.
+            dynamic_metadata:
+                type: object
+            ok_response:
+                $ref: '#/definitions/OkHttpResponse'
+                description: Supplies http attributes for an ok response.
+            status:
+                $ref: '#/definitions/googlerpcStatus'
+        type: object
     CheckResponse:
         description: CheckResponse contains fields that represent decision made by Check call.
         properties:
@@ -1016,6 +1060,17 @@ definitions:
             output:
                 $ref: '#/definitions/OutPort'
                 description: Selected signal (1.0 or 0.0).
+        type: object
+    DeniedHttpResponse:
+        properties:
+            body:
+                type: string
+            headers:
+                additionalProperties:
+                    type: string
+                type: object
+            status:
+                $ref: '#/definitions/HttpStatus'
         type: object
     Differentiator:
         description: Differentiator calculates rate of change per tick.
@@ -1863,6 +1918,11 @@ definitions:
             uuid:
                 type: string
         type: object
+    HttpStatus:
+        properties:
+            code:
+                $ref: '#/definitions/StatusCode'
+        type: object
     InPort:
         properties:
             constant_signal:
@@ -2448,6 +2508,15 @@ definitions:
             written_bytes_total:
                 format: int64
                 type: string
+        type: object
+    OkHttpResponse:
+        properties:
+            dynamic_metadata:
+                type: object
+            headers:
+                additionalProperties:
+                    type: string
+                type: object
         type: object
     Or:
         description: |-
@@ -3429,6 +3498,19 @@ definitions:
                 format: int64
                 type: string
         type: object
+    SocketAddress:
+        properties:
+            address:
+                type: string
+            protocol:
+                $ref: '#/definitions/SocketAddressProtocol'
+        type: object
+    SocketAddressProtocol:
+        default: TCP
+        enum:
+            - TCP
+            - UDP
+        type: string
     Stats:
         properties:
             backups:
@@ -3476,6 +3558,67 @@ definitions:
                 format: date-time
                 type: string
         type: object
+    StatusCode:
+        default: Empty
+        enum:
+            - Empty
+            - Continue
+            - OK
+            - Created
+            - Accepted
+            - NonAuthoritativeInformation
+            - NoContent
+            - ResetContent
+            - PartialContent
+            - MultiStatus
+            - AlreadyReported
+            - IMUsed
+            - MultipleChoices
+            - MovedPermanently
+            - Found
+            - SeeOther
+            - NotModified
+            - UseProxy
+            - TemporaryRedirect
+            - PermanentRedirect
+            - BadRequest
+            - Unauthorized
+            - PaymentRequired
+            - Forbidden
+            - NotFound
+            - MethodNotAllowed
+            - NotAcceptable
+            - ProxyAuthenticationRequired
+            - RequestTimeout
+            - Conflict
+            - Gone
+            - LengthRequired
+            - PreconditionFailed
+            - PayloadTooLarge
+            - URITooLong
+            - UnsupportedMediaType
+            - RangeNotSatisfiable
+            - ExpectationFailed
+            - MisdirectedRequest
+            - UnprocessableEntity
+            - Locked
+            - FailedDependency
+            - UpgradeRequired
+            - PreconditionRequired
+            - TooManyRequests
+            - RequestHeaderFieldsTooLarge
+            - InternalServerError
+            - NotImplemented
+            - BadGateway
+            - ServiceUnavailable
+            - GatewayTimeout
+            - HTTPVersionNotSupported
+            - VariantAlsoNegotiates
+            - InsufficientStorage
+            - LoopDetected
+            - NotExtended
+            - NetworkAuthenticationRequired
+        type: string
     StatusError:
         description: Error holds raw error message and its cause in a nested field.
         properties:
@@ -3951,6 +4094,26 @@ paths:
                         $ref: '#/definitions/googlerpcStatus'
             tags:
                 - aperture-agent
+    /v1/flowcontrol/checkhttp:
+        post:
+            operationId: FlowControlServiceHTTP_CheckHTTP
+            parameters:
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/CheckHTTPRequest'
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/CheckHTTPResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - FlowControlServiceHTTP
     /v1/flowcontrol/controlpoints:
         get:
             operationId: FlowControlPointsService_GetControlPoints
@@ -4177,6 +4340,7 @@ tags:
     - name: Controller
     - name: DistCacheService
     - name: FlowControlService
+    - name: FlowControlServiceHTTP
     - name: InfoService
     - name: PeerDiscoveryService
     - name: PolicyService

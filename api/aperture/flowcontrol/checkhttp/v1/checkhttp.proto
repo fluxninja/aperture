@@ -1,0 +1,205 @@
+syntax = "proto3";
+
+package aperture.flowcontrol.checkhttp.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+import "google/rpc/status.proto";
+import "validate/validate.proto";
+
+service FlowControlServiceHTTP {
+  rpc CheckHTTP(CheckHTTPRequest) returns (CheckHTTPResponse) {
+    option (google.api.http) = {
+      post: "/v1/flowcontrol/checkhttp"
+      body: "*"
+    };
+  }
+}
+
+message CheckHTTPRequest {
+  message HttpRequest {
+    string method = 1;
+
+    map<string, string> headers = 2;
+
+    string path = 3;
+
+    string host = 4;
+
+    string scheme = 5;
+
+    int64 size = 6;
+
+    string protocol = 7;
+
+    string body = 8;
+  }
+
+  SocketAddress source = 1;
+
+  SocketAddress destination = 2;
+
+  HttpRequest request = 3;
+}
+
+message DeniedHttpResponse {
+  HttpStatus status = 1;
+
+  map<string, string> headers = 2;
+
+  string body = 3;
+}
+
+message OkHttpResponse {
+  map<string, string> headers = 1;
+
+  google.protobuf.Struct dynamic_metadata = 2;
+}
+
+message CheckHTTPResponse {
+  google.rpc.Status status = 1;
+
+  oneof http_response {
+    // Supplies http attributes for a denied response.
+    DeniedHttpResponse denied_response = 2;
+
+    // Supplies http attributes for an ok response.
+    OkHttpResponse ok_response = 3;
+  }
+
+  google.protobuf.Struct dynamic_metadata = 4;
+}
+
+message SocketAddress {
+  enum Protocol {
+    TCP = 0;
+    UDP = 1;
+  }
+
+  Protocol protocol = 1 [(validate.rules).enum = {defined_only: true}];
+
+  string address = 2 [(validate.rules).string = {min_len: 1}];
+}
+
+enum StatusCode {
+  Empty = 0;
+
+  Continue = 100;
+
+  OK = 200;
+
+  Created = 201;
+
+  Accepted = 202;
+
+  NonAuthoritativeInformation = 203;
+
+  NoContent = 204;
+
+  ResetContent = 205;
+
+  PartialContent = 206;
+
+  MultiStatus = 207;
+
+  AlreadyReported = 208;
+
+  IMUsed = 226;
+
+  MultipleChoices = 300;
+
+  MovedPermanently = 301;
+
+  Found = 302;
+
+  SeeOther = 303;
+
+  NotModified = 304;
+
+  UseProxy = 305;
+
+  TemporaryRedirect = 307;
+
+  PermanentRedirect = 308;
+
+  BadRequest = 400;
+
+  Unauthorized = 401;
+
+  PaymentRequired = 402;
+
+  Forbidden = 403;
+
+  NotFound = 404;
+
+  MethodNotAllowed = 405;
+
+  NotAcceptable = 406;
+
+  ProxyAuthenticationRequired = 407;
+
+  RequestTimeout = 408;
+
+  Conflict = 409;
+
+  Gone = 410;
+
+  LengthRequired = 411;
+
+  PreconditionFailed = 412;
+
+  PayloadTooLarge = 413;
+
+  URITooLong = 414;
+
+  UnsupportedMediaType = 415;
+
+  RangeNotSatisfiable = 416;
+
+  ExpectationFailed = 417;
+
+  MisdirectedRequest = 421;
+
+  UnprocessableEntity = 422;
+
+  Locked = 423;
+
+  FailedDependency = 424;
+
+  UpgradeRequired = 426;
+
+  PreconditionRequired = 428;
+
+  TooManyRequests = 429;
+
+  RequestHeaderFieldsTooLarge = 431;
+
+  InternalServerError = 500;
+
+  NotImplemented = 501;
+
+  BadGateway = 502;
+
+  ServiceUnavailable = 503;
+
+  GatewayTimeout = 504;
+
+  HTTPVersionNotSupported = 505;
+
+  VariantAlsoNegotiates = 506;
+
+  InsufficientStorage = 507;
+
+  LoopDetected = 508;
+
+  NotExtended = 510;
+
+  NetworkAuthenticationRequired = 511;
+}
+
+message HttpStatus {
+  StatusCode code = 1 [(validate.rules).enum = {
+    defined_only: true
+    not_in: 0
+  }];
+}
