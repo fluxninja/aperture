@@ -31,7 +31,6 @@ type podServiceUpdate struct {
 	UID       string
 	IPAddress string
 	Service   string
-	Labels    map[string]string
 }
 
 // serviceDiscovery is a collector that collects Kubernetes information periodically.
