@@ -7,7 +7,7 @@ import "google/protobuf/empty.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 // grpc service
-service ControlPointsService {
+service AutoscaleKubernetesControlPointsService {
   rpc GetControlPoints(google.protobuf.Empty) returns (AutoscaleKubernetesControlPoints) {
     option (google.api.http) = {get: "/v1/autoscale/kubernetes/controlpoints"};
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {

@@ -14,7 +14,7 @@ paths:
     get:
       tags:
       - aperture-agent
-      operationId: ControlPointsService_GetControlPoints
+      operationId: AutoscaleKubernetesControlPointsService_GetControlPoints
       responses:
         "200":
           description: A successful response.
@@ -94,12 +94,12 @@ paths:
     get:
       tags:
       - aperture-agent
-      operationId: ControlPointsService_GetControlPoints
+      operationId: FlowControlPointsService_GetControlPoints
       responses:
         "200":
           description: A successful response.
           schema:
-            $ref: '#/definitions/FlowControlControlPoints'
+            $ref: '#/definitions/FlowControlPoints'
         default:
           description: An unexpected error response.
           schema:
@@ -108,7 +108,7 @@ paths:
     post:
       tags:
       - aperture-agent
-      operationId: PreviewService_PreviewHTTPRequests
+      operationId: FlowPreviewService_PreviewHTTPRequests
       parameters:
       - type: string
         description: Service to preview.
@@ -151,7 +151,7 @@ paths:
     post:
       tags:
       - aperture-agent
-      operationId: PreviewService_PreviewFlowLabels
+      operationId: FlowPreviewService_PreviewFlowLabels
       parameters:
       - type: string
         description: Service to preview.
@@ -408,20 +408,20 @@ definitions:
       value:
         description: Exact value that the label should be equal to.
         type: string
-  FlowControlControlPoint:
+  FlowControlPoint:
     type: object
     properties:
       control_point:
         type: string
       service:
         type: string
-  FlowControlControlPoints:
+  FlowControlPoints:
     type: object
     properties:
-      flow_control_control_points:
+      flow_control_points:
         type: array
         items:
-          $ref: '#/definitions/FlowControlControlPoint'
+          $ref: '#/definitions/FlowControlPoint'
   GroupStatus:
     description: |-
       Groups is nested structure that holds status information about the node and a

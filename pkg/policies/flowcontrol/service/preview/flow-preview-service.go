@@ -9,7 +9,7 @@ import (
 
 // Handler implements flowpreview.v1 service.
 type Handler struct {
-	flowpreviewv1.UnimplementedPreviewServiceServer
+	flowpreviewv1.UnimplementedFlowPreviewServiceServer
 	engine     iface.Engine
 	classifier *classification.ClassificationEngine
 	agentGroup string

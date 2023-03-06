@@ -32,7 +32,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
-func request_ControlPointsService_GetControlPoints_0(ctx context.Context, marshaler runtime.Marshaler, client ControlPointsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_AutoscaleKubernetesControlPointsService_GetControlPoints_0(ctx context.Context, marshaler runtime.Marshaler, client AutoscaleKubernetesControlPointsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
 
@@ -41,7 +41,7 @@ func request_ControlPointsService_GetControlPoints_0(ctx context.Context, marsha
 
 }
 
-func local_request_ControlPointsService_GetControlPoints_0(ctx context.Context, marshaler runtime.Marshaler, server ControlPointsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_AutoscaleKubernetesControlPointsService_GetControlPoints_0(ctx context.Context, marshaler runtime.Marshaler, server AutoscaleKubernetesControlPointsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
 
@@ -50,13 +50,13 @@ func local_request_ControlPointsService_GetControlPoints_0(ctx context.Context, 
 
 }
 
-// RegisterControlPointsServiceHandlerServer registers the http handlers for service ControlPointsService to "mux".
-// UnaryRPC     :call ControlPointsServiceServer directly.
+// RegisterAutoscaleKubernetesControlPointsServiceHandlerServer registers the http handlers for service AutoscaleKubernetesControlPointsService to "mux".
+// UnaryRPC     :call AutoscaleKubernetesControlPointsServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterControlPointsServiceHandlerFromEndpoint instead.
-func RegisterControlPointsServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ControlPointsServiceServer) error {
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterAutoscaleKubernetesControlPointsServiceHandlerFromEndpoint instead.
+func RegisterAutoscaleKubernetesControlPointsServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server AutoscaleKubernetesControlPointsServiceServer) error {
 
-	mux.Handle("GET", pattern_ControlPointsService_GetControlPoints_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_AutoscaleKubernetesControlPointsService_GetControlPoints_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -64,12 +64,12 @@ func RegisterControlPointsServiceHandlerServer(ctx context.Context, mux *runtime
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.autoscale.kubernetes.controlpoints.v1.ControlPointsService/GetControlPoints", runtime.WithHTTPPathPattern("/v1/autoscale/kubernetes/controlpoints"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.autoscale.kubernetes.controlpoints.v1.AutoscaleKubernetesControlPointsService/GetControlPoints", runtime.WithHTTPPathPattern("/v1/autoscale/kubernetes/controlpoints"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ControlPointsService_GetControlPoints_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_AutoscaleKubernetesControlPointsService_GetControlPoints_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -77,16 +77,16 @@ func RegisterControlPointsServiceHandlerServer(ctx context.Context, mux *runtime
 			return
 		}
 
-		forward_ControlPointsService_GetControlPoints_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AutoscaleKubernetesControlPointsService_GetControlPoints_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
 }
 
-// RegisterControlPointsServiceHandlerFromEndpoint is same as RegisterControlPointsServiceHandler but
+// RegisterAutoscaleKubernetesControlPointsServiceHandlerFromEndpoint is same as RegisterAutoscaleKubernetesControlPointsServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterControlPointsServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterAutoscaleKubernetesControlPointsServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -106,41 +106,41 @@ func RegisterControlPointsServiceHandlerFromEndpoint(ctx context.Context, mux *r
 		}()
 	}()
 
-	return RegisterControlPointsServiceHandler(ctx, mux, conn)
+	return RegisterAutoscaleKubernetesControlPointsServiceHandler(ctx, mux, conn)
 }
 
-// RegisterControlPointsServiceHandler registers the http handlers for service ControlPointsService to "mux".
+// RegisterAutoscaleKubernetesControlPointsServiceHandler registers the http handlers for service AutoscaleKubernetesControlPointsService to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterControlPointsServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterControlPointsServiceHandlerClient(ctx, mux, NewControlPointsServiceClient(conn))
+func RegisterAutoscaleKubernetesControlPointsServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterAutoscaleKubernetesControlPointsServiceHandlerClient(ctx, mux, NewAutoscaleKubernetesControlPointsServiceClient(conn))
 }
 
-// RegisterControlPointsServiceHandlerClient registers the http handlers for service ControlPointsService
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "ControlPointsServiceClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "ControlPointsServiceClient"
+// RegisterAutoscaleKubernetesControlPointsServiceHandlerClient registers the http handlers for service AutoscaleKubernetesControlPointsService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "AutoscaleKubernetesControlPointsServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "AutoscaleKubernetesControlPointsServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "ControlPointsServiceClient" to call the correct interceptors.
-func RegisterControlPointsServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ControlPointsServiceClient) error {
+// "AutoscaleKubernetesControlPointsServiceClient" to call the correct interceptors.
+func RegisterAutoscaleKubernetesControlPointsServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client AutoscaleKubernetesControlPointsServiceClient) error {
 
-	mux.Handle("GET", pattern_ControlPointsService_GetControlPoints_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_AutoscaleKubernetesControlPointsService_GetControlPoints_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.autoscale.kubernetes.controlpoints.v1.ControlPointsService/GetControlPoints", runtime.WithHTTPPathPattern("/v1/autoscale/kubernetes/controlpoints"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.autoscale.kubernetes.controlpoints.v1.AutoscaleKubernetesControlPointsService/GetControlPoints", runtime.WithHTTPPathPattern("/v1/autoscale/kubernetes/controlpoints"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ControlPointsService_GetControlPoints_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AutoscaleKubernetesControlPointsService_GetControlPoints_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ControlPointsService_GetControlPoints_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AutoscaleKubernetesControlPointsService_GetControlPoints_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -148,9 +148,9 @@ func RegisterControlPointsServiceHandlerClient(ctx context.Context, mux *runtime
 }
 
 var (
-	pattern_ControlPointsService_GetControlPoints_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "autoscale", "kubernetes", "controlpoints"}, ""))
+	pattern_AutoscaleKubernetesControlPointsService_GetControlPoints_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"v1", "autoscale", "kubernetes", "controlpoints"}, ""))
 )
 
 var (
-	forward_ControlPointsService_GetControlPoints_0 = runtime.ForwardResponseMessage
+	forward_AutoscaleKubernetesControlPointsService_GetControlPoints_0 = runtime.ForwardResponseMessage
 )

@@ -5,14 +5,14 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	flowcontrolcontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
+	flowcontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
 	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
 
-// Handler implements FlowControlControlPointsService.
+// Handler implements FlowControlPointsService.
 type Handler struct {
-	flowcontrolcontrolpointsv1.UnimplementedControlPointsServiceServer
+	flowcontrolpointsv1.UnimplementedFlowControlPointsServiceServer
 	serviceControlPointCache *cache.Cache[selectors.ControlPointID]
 }
 
@@ -24,14 +24,14 @@ func NewHandler(serviceControlPointCache *cache.Cache[selectors.ControlPointID])
 }
 
 // GetControlPoints returns all control points.
-func (h *Handler) GetControlPoints(ctx context.Context, _ *emptypb.Empty) (*flowcontrolcontrolpointsv1.FlowControlControlPoints, error) {
+func (h *Handler) GetControlPoints(ctx context.Context, _ *emptypb.Empty) (*flowcontrolpointsv1.FlowControlPoints, error) {
 	var serviceControlPointObjects []selectors.ControlPointID
 	if h.serviceControlPointCache != nil {
 		serviceControlPointObjects = h.serviceControlPointCache.GetAll()
 	}
-	controlpoints := make([]*flowcontrolcontrolpointsv1.FlowControlControlPoint, 0, len(serviceControlPointObjects))
+	controlpoints := make([]*flowcontrolpointsv1.FlowControlPoint, 0, len(serviceControlPointObjects))
 	for _, controlPointID := range serviceControlPointObjects {
 		controlpoints = append(controlpoints, controlPointID.ToProto())
 	}
-	return &flowcontrolcontrolpointsv1.FlowControlControlPoints{FlowControlControlPoints: controlpoints}, nil
+	return &flowcontrolpointsv1.FlowControlPoints{FlowControlPoints: controlpoints}, nil
 }

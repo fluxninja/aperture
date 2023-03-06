@@ -11,7 +11,7 @@ import "google/protobuf/empty.proto";
 service Controller {
   rpc ListAgents(google.protobuf.Empty) returns (ListAgentsResponse);
   rpc ListServices(ListServicesRequest) returns (ListServicesControllerResponse);
-  rpc ListFlowControlControlPoints(ListFlowControlControlPointsRequest) returns (ListFlowControlControlPointsControllerResponse);
+  rpc ListFlowControlPoints(ListFlowControlPointsRequest) returns (ListFlowControlPointsControllerResponse);
 
   // duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
   rpc PreviewFlowLabels(PreviewFlowLabelsRequest) returns (PreviewFlowLabelsControllerResponse);
@@ -31,16 +31,16 @@ message ListServicesControllerResponse {
   uint32 errors_count = 2;
 }
 
-message ListFlowControlControlPointsRequest {}
+message ListFlowControlPointsRequest {}
 
-message ListFlowControlControlPointsAgentResponse {
-  aperture.flowcontrol.controlpoints.v1.FlowControlControlPoints flow_control_control_points = 1;
+message ListFlowControlPointsAgentResponse {
+  aperture.flowcontrol.controlpoints.v1.FlowControlPoints flow_control_points = 1;
   // FIXME: Remove. Controller should be aware which agent group agent belongs to.
   string agent_group = 2;
 }
 
-message ListFlowControlControlPointsControllerResponse {
-  repeated GlobalFlowControlControlPoint global_flow_control_control_points = 1;
+message ListFlowControlPointsControllerResponse {
+  repeated GlobalFlowControlPoint global_flow_control_points = 1;
   uint32 errors_count = 2;
 }
 
@@ -48,10 +48,10 @@ message ListAgentsResponse {
   repeated string agents = 1;
 }
 
-// GlobalFlowControlControlPoint contains info about a control point on a given
+// GlobalFlowControlPoint contains info about a control point on a given
 // service with explicit Agent Group.
-message GlobalFlowControlControlPoint {
-  aperture.flowcontrol.controlpoints.v1.FlowControlControlPoint flow_control_control_point = 1;
+message GlobalFlowControlPoint {
+  aperture.flowcontrol.controlpoints.v1.FlowControlPoint flow_control_point = 1;
   string agent_group = 2;
 }
 

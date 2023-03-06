@@ -1338,18 +1338,18 @@ definitions:
                 $ref: '#/definitions/RateLimiter'
                 description: Rate Limiter provides service protection by applying rate limiter.
         type: object
-    FlowControlControlPoint:
+    FlowControlPoint:
         properties:
             control_point:
                 type: string
             service:
                 type: string
         type: object
-    FlowControlControlPoints:
+    FlowControlPoints:
         properties:
-            flow_control_control_points:
+            flow_control_points:
                 items:
-                    $ref: '#/definitions/FlowControlControlPoint'
+                    $ref: '#/definitions/FlowControlPoint'
                 type: array
         type: object
     FlowMatcher:
@@ -1603,15 +1603,15 @@ definitions:
             policies:
                 $ref: '#/definitions/Policies'
         type: object
-    GlobalFlowControlControlPoint:
+    GlobalFlowControlPoint:
         description: |-
-            GlobalFlowControlControlPoint contains info about a control point on a given
+            GlobalFlowControlPoint contains info about a control point on a given
             service with explicit Agent Group.
         properties:
             agent_group:
                 type: string
-            flow_control_control_point:
-                $ref: '#/definitions/FlowControlControlPoint'
+            flow_control_point:
+                $ref: '#/definitions/FlowControlPoint'
         type: object
     GlobalService:
         description: GlobalService is a service with explicit agent group.
@@ -2123,14 +2123,14 @@ definitions:
                     type: string
                 type: array
         type: object
-    ListFlowControlControlPointsControllerResponse:
+    ListFlowControlPointsControllerResponse:
         properties:
             errors_count:
                 format: int64
                 type: integer
-            global_flow_control_control_points:
+            global_flow_control_points:
                 items:
-                    $ref: '#/definitions/GlobalFlowControlControlPoint'
+                    $ref: '#/definitions/GlobalFlowControlPoint'
                 type: array
         type: object
     ListServicesControllerResponse:
@@ -2897,8 +2897,8 @@ definitions:
                 $ref: '#/definitions/AutoscaleKubernetesControlPoints'
             controller_info:
                 $ref: '#/definitions/ControllerInfo'
-            flow_control_control_points:
-                $ref: '#/definitions/FlowControlControlPoints'
+            flow_control_points:
+                $ref: '#/definitions/FlowControlPoints'
             host_info:
                 $ref: '#/definitions/HostInfo'
             installation_mode:
@@ -3810,7 +3810,7 @@ paths:
                 - FluxNinjaService
     /v1/autoscale/kubernetes/controlpoints:
         get:
-            operationId: ControlPointsService_GetControlPoints
+            operationId: AutoscaleKubernetesControlPointsService_GetControlPoints
             responses:
                 "200":
                     description: A successful response.
@@ -3890,12 +3890,12 @@ paths:
                 - aperture-agent
     /v1/flowcontrol/controlpoints:
         get:
-            operationId: ControlPointsService_GetControlPoints
+            operationId: FlowControlPointsService_GetControlPoints
             responses:
                 "200":
                     description: A successful response.
                     schema:
-                        $ref: '#/definitions/FlowControlControlPoints'
+                        $ref: '#/definitions/FlowControlPoints'
                 default:
                     description: An unexpected error response.
                     schema:
@@ -3904,7 +3904,7 @@ paths:
                 - aperture-agent
     /v1/flowcontrol/preview/http_requests/{service}/{control_point}:
         post:
-            operationId: PreviewService_PreviewHTTPRequests
+            operationId: FlowPreviewService_PreviewHTTPRequests
             parameters:
                 - description: Service to preview.
                   in: path
@@ -3948,7 +3948,7 @@ paths:
                 - aperture-agent
     /v1/flowcontrol/preview/labels/{service}/{control_point}:
         post:
-            operationId: PreviewService_PreviewFlowLabels
+            operationId: FlowPreviewService_PreviewFlowLabels
             parameters:
                 - description: Service to preview.
                   in: path
@@ -4107,9 +4107,9 @@ produces:
     - application/json
 swagger: "2.0"
 tags:
-    - name: ControlPointsService
-    - name: ControlPointsService
-    - name: PreviewService
+    - name: AutoscaleKubernetesControlPointsService
+    - name: FlowControlPointsService
+    - name: FlowPreviewService
     - name: Controller
     - name: EntitiesService
     - name: DistCacheService

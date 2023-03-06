@@ -19,7 +19,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	autoscalek8scontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
-	flowcontrolcontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
+	flowcontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
 	peersv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/peers/v1"
 	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/plugins/fluxninja/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
@@ -67,7 +67,7 @@ type Heartbeats struct {
 	entities                  *entities.Entities
 	policyFactory             *controlplane.PolicyFactory
 	ControllerInfo            *heartbeatv1.ControllerInfo
-	flowControlControlPoints  *cache.Cache[selectors.ControlPointID]
+	flowControlPoints         *cache.Cache[selectors.ControlPointID]
 	autoscalek8sControlPoints kubernetes.AutoscaleControlPoints
 	heartbeatsAddr            string
 	APIKey                    string
@@ -83,7 +83,7 @@ func newHeartbeats(
 	agentInfo *agentinfo.AgentInfo,
 	peersWatcher *peers.PeerDiscovery,
 	policyFactory *controlplane.PolicyFactory,
-	flowControlControlPoints *cache.Cache[selectors.ControlPointID],
+	flowControlPoints *cache.Cache[selectors.ControlPointID],
 	autoscalek8sControlPoints kubernetes.AutoscaleControlPoints,
 	installationMode string,
 ) *Heartbeats {
@@ -97,7 +97,7 @@ func newHeartbeats(
 		agentInfo:                 agentInfo,
 		peersWatcher:              peersWatcher,
 		policyFactory:             policyFactory,
-		flowControlControlPoints:  flowControlControlPoints,
+		flowControlPoints:         flowControlPoints,
 		autoscalek8sControlPoints: autoscalek8sControlPoints,
 		installationMode:          installationMode,
 	}
@@ -226,14 +226,14 @@ func (h *Heartbeats) newHeartbeat(
 	}
 
 	var serviceControlPointObjects []selectors.ControlPointID
-	if h.flowControlControlPoints != nil {
-		serviceControlPointObjects = h.flowControlControlPoints.GetAll()
+	if h.flowControlPoints != nil {
+		serviceControlPointObjects = h.flowControlPoints.GetAll()
 	}
-	flowControlControlPoints := &flowcontrolcontrolpointsv1.FlowControlControlPoints{
-		FlowControlControlPoints: make([]*flowcontrolcontrolpointsv1.FlowControlControlPoint, 0, len(serviceControlPointObjects)),
+	flowControlPoints := &flowcontrolpointsv1.FlowControlPoints{
+		FlowControlPoints: make([]*flowcontrolpointsv1.FlowControlPoint, 0, len(serviceControlPointObjects)),
 	}
 	for _, cp := range serviceControlPointObjects {
-		flowControlControlPoints.FlowControlControlPoints = append(flowControlControlPoints.FlowControlControlPoints, cp.ToProto())
+		flowControlPoints.FlowControlPoints = append(flowControlPoints.FlowControlPoints, cp.ToProto())
 	}
 
 	var kubernetesControlPointObjects []kubernetes.AutoscaleControlPoint
@@ -257,7 +257,7 @@ func (h *Heartbeats) newHeartbeat(
 		ServicesList:                     servicesList,
 		AllStatuses:                      h.statusRegistry.GetGroupStatus(),
 		Policies:                         policies,
-		FlowControlControlPoints:         flowControlControlPoints,
+		FlowControlPoints:                flowControlPoints,
 		AutoscaleKubernetesControlPoints: autoscalek8sControlPoints,
 		InstallationMode:                 h.installationMode,
 	}

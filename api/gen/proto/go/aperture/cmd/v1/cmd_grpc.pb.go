@@ -21,7 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 type ControllerClient interface {
 	ListAgents(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListAgentsResponse, error)
 	ListServices(ctx context.Context, in *ListServicesRequest, opts ...grpc.CallOption) (*ListServicesControllerResponse, error)
-	ListFlowControlControlPoints(ctx context.Context, in *ListFlowControlControlPointsRequest, opts ...grpc.CallOption) (*ListFlowControlControlPointsControllerResponse, error)
+	ListFlowControlPoints(ctx context.Context, in *ListFlowControlPointsRequest, opts ...grpc.CallOption) (*ListFlowControlPointsControllerResponse, error)
 	// duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
 	PreviewFlowLabels(ctx context.Context, in *PreviewFlowLabelsRequest, opts ...grpc.CallOption) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(ctx context.Context, in *PreviewHTTPRequestsRequest, opts ...grpc.CallOption) (*PreviewHTTPRequestsControllerResponse, error)
@@ -53,9 +53,9 @@ func (c *controllerClient) ListServices(ctx context.Context, in *ListServicesReq
 	return out, nil
 }
 
-func (c *controllerClient) ListFlowControlControlPoints(ctx context.Context, in *ListFlowControlControlPointsRequest, opts ...grpc.CallOption) (*ListFlowControlControlPointsControllerResponse, error) {
-	out := new(ListFlowControlControlPointsControllerResponse)
-	err := c.cc.Invoke(ctx, "/aperture.cmd.v1.Controller/ListFlowControlControlPoints", in, out, opts...)
+func (c *controllerClient) ListFlowControlPoints(ctx context.Context, in *ListFlowControlPointsRequest, opts ...grpc.CallOption) (*ListFlowControlPointsControllerResponse, error) {
+	out := new(ListFlowControlPointsControllerResponse)
+	err := c.cc.Invoke(ctx, "/aperture.cmd.v1.Controller/ListFlowControlPoints", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (c *controllerClient) PreviewHTTPRequests(ctx context.Context, in *PreviewH
 type ControllerServer interface {
 	ListAgents(context.Context, *emptypb.Empty) (*ListAgentsResponse, error)
 	ListServices(context.Context, *ListServicesRequest) (*ListServicesControllerResponse, error)
-	ListFlowControlControlPoints(context.Context, *ListFlowControlControlPointsRequest) (*ListFlowControlControlPointsControllerResponse, error)
+	ListFlowControlPoints(context.Context, *ListFlowControlPointsRequest) (*ListFlowControlPointsControllerResponse, error)
 	// duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
 	PreviewFlowLabels(context.Context, *PreviewFlowLabelsRequest) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(context.Context, *PreviewHTTPRequestsRequest) (*PreviewHTTPRequestsControllerResponse, error)
@@ -102,8 +102,8 @@ func (UnimplementedControllerServer) ListAgents(context.Context, *emptypb.Empty)
 func (UnimplementedControllerServer) ListServices(context.Context, *ListServicesRequest) (*ListServicesControllerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListServices not implemented")
 }
-func (UnimplementedControllerServer) ListFlowControlControlPoints(context.Context, *ListFlowControlControlPointsRequest) (*ListFlowControlControlPointsControllerResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListFlowControlControlPoints not implemented")
+func (UnimplementedControllerServer) ListFlowControlPoints(context.Context, *ListFlowControlPointsRequest) (*ListFlowControlPointsControllerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFlowControlPoints not implemented")
 }
 func (UnimplementedControllerServer) PreviewFlowLabels(context.Context, *PreviewFlowLabelsRequest) (*PreviewFlowLabelsControllerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PreviewFlowLabels not implemented")
@@ -159,20 +159,20 @@ func _Controller_ListServices_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Controller_ListFlowControlControlPoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListFlowControlControlPointsRequest)
+func _Controller_ListFlowControlPoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListFlowControlPointsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ControllerServer).ListFlowControlControlPoints(ctx, in)
+		return srv.(ControllerServer).ListFlowControlPoints(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/aperture.cmd.v1.Controller/ListFlowControlControlPoints",
+		FullMethod: "/aperture.cmd.v1.Controller/ListFlowControlPoints",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ControllerServer).ListFlowControlControlPoints(ctx, req.(*ListFlowControlControlPointsRequest))
+		return srv.(ControllerServer).ListFlowControlPoints(ctx, req.(*ListFlowControlPointsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -229,8 +229,8 @@ var Controller_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Controller_ListServices_Handler,
 		},
 		{
-			MethodName: "ListFlowControlControlPoints",
-			Handler:    _Controller_ListFlowControlControlPoints_Handler,
+			MethodName: "ListFlowControlPoints",
+			Handler:    _Controller_ListFlowControlPoints_Handler,
 		},
 		{
 			MethodName: "PreviewFlowLabels",

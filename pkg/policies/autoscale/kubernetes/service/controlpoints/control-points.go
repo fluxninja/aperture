@@ -5,13 +5,13 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	controlpointcachev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
+	controlpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
 	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
 )
 
 // Handler is the gRPC server handler.
 type Handler struct {
-	controlpointcachev1.UnimplementedControlPointsServiceServer
+	controlpointsv1.UnimplementedAutoscaleKubernetesControlPointsServiceServer
 	AutoscaleControlPoints kubernetes.AutoscaleControlPoints
 }
 
@@ -23,14 +23,14 @@ func NewHandler(cpc kubernetes.AutoscaleControlPoints) *Handler {
 }
 
 // GetControlPoints returns a ControlPoint from the cache.
-func (h *Handler) GetControlPoints(ctx context.Context, _ *emptypb.Empty) (*controlpointcachev1.AutoscaleKubernetesControlPoints, error) {
+func (h *Handler) GetControlPoints(ctx context.Context, _ *emptypb.Empty) (*controlpointsv1.AutoscaleKubernetesControlPoints, error) {
 	keys := h.AutoscaleControlPoints.Keys()
-	controlPoints := make([]*controlpointcachev1.AutoscaleKubernetesControlPoint, len(keys))
+	controlPoints := make([]*controlpointsv1.AutoscaleKubernetesControlPoint, len(keys))
 	for _, key := range keys {
 		cp := key.ToProto()
 		controlPoints = append(controlPoints, cp)
 	}
-	return &controlpointcachev1.AutoscaleKubernetesControlPoints{
+	return &controlpointsv1.AutoscaleKubernetesControlPoints{
 		AutoscaleKubernetesControlPoints: controlPoints,
 	}, nil
 }

@@ -59,7 +59,7 @@ type ConstructorIn struct {
 	PeersWatcher                     *peers.PeerDiscovery `name:"fluxninja-peers-watcher" optional:"true"`
 	EtcdClient                       *etcdclient.Client
 	PolicyFactory                    *controlplane.PolicyFactory            `optional:"true"`
-	FlowControlControlPoints         *cache.Cache[selectors.ControlPointID] `optional:"true"`
+	FlowControlPoints                *cache.Cache[selectors.ControlPointID] `optional:"true"`
 	AutoscaleKubernetesControlPoints kubernetes.AutoscaleControlPoints      `optional:"true"`
 }
 
@@ -85,7 +85,7 @@ func Provide(in ConstructorIn) (*Heartbeats, error) {
 		in.AgentInfo,
 		in.PeersWatcher,
 		in.PolicyFactory,
-		in.FlowControlControlPoints,
+		in.FlowControlPoints,
 		in.AutoscaleKubernetesControlPoints,
 		installationMode,
 	)

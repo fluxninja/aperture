@@ -2,7 +2,7 @@ package selectors
 
 import (
 	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
-	flowcontrolcontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
+	flowcontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 )
 
@@ -35,8 +35,8 @@ func NewControlPointID(service string, controlPoint string) ControlPointID {
 }
 
 // ToProto returns protobuf representation of control point.
-func (cp *ControlPointID) ToProto() *flowcontrolcontrolpointsv1.FlowControlControlPoint {
-	return &flowcontrolcontrolpointsv1.FlowControlControlPoint{
+func (cp *ControlPointID) ToProto() *flowcontrolpointsv1.FlowControlPoint {
+	return &flowcontrolpointsv1.FlowControlPoint{
 		Service:      cp.Service,
 		ControlPoint: cp.ControlPoint,
 	}
@@ -51,7 +51,7 @@ func (cp ControlPointID) InAgentGroup(agentGroup string) GlobalControlPointID {
 }
 
 // ControlPointIDFromProto creates ControlPointID from protobuf representation.
-func ControlPointIDFromProto(protoCP *flowcontrolcontrolpointsv1.FlowControlControlPoint) ControlPointID {
+func ControlPointIDFromProto(protoCP *flowcontrolpointsv1.FlowControlPoint) ControlPointID {
 	return ControlPointID{
 		Service:      protoCP.GetService(),
 		ControlPoint: protoCP.GetControlPoint(),
@@ -59,9 +59,9 @@ func ControlPointIDFromProto(protoCP *flowcontrolcontrolpointsv1.FlowControlCont
 }
 
 // ToProto returns protobuf representation of control point.
-func (cp *GlobalControlPointID) ToProto() *cmdv1.GlobalFlowControlControlPoint {
-	return &cmdv1.GlobalFlowControlControlPoint{
-		FlowControlControlPoint: &flowcontrolcontrolpointsv1.FlowControlControlPoint{
+func (cp *GlobalControlPointID) ToProto() *cmdv1.GlobalFlowControlPoint {
+	return &cmdv1.GlobalFlowControlPoint{
+		FlowControlPoint: &flowcontrolpointsv1.FlowControlPoint{
 			Service:      cp.Service,
 			ControlPoint: cp.ControlPoint,
 		},
@@ -70,11 +70,11 @@ func (cp *GlobalControlPointID) ToProto() *cmdv1.GlobalFlowControlControlPoint {
 }
 
 // GlobalControlPointIDFromProto creates ControlPointID from protobuf representation.
-func GlobalControlPointIDFromProto(protoCP *cmdv1.GlobalFlowControlControlPoint) GlobalControlPointID {
+func GlobalControlPointIDFromProto(protoCP *cmdv1.GlobalFlowControlPoint) GlobalControlPointID {
 	return GlobalControlPointID{
 		ControlPointID: ControlPointID{
-			Service:      protoCP.FlowControlControlPoint.GetService(),
-			ControlPoint: protoCP.FlowControlControlPoint.GetControlPoint(),
+			Service:      protoCP.FlowControlPoint.GetService(),
+			ControlPoint: protoCP.FlowControlPoint.GetControlPoint(),
 		},
 		AgentGroup: protoCP.GetAgentGroup(),
 	}
