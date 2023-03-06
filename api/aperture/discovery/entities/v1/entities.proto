@@ -60,5 +60,4 @@ message Entity {
   string namespace = 5;
   string node_name = 6;
   repeated string services = 7;
-  repeated string labels = 8;
 }

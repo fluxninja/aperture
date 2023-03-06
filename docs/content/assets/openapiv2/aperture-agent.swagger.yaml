@@ -375,10 +375,6 @@ definitions:
     properties:
       ip_address:
         type: string
-      labels:
-        type: array
-        items:
-          type: string
       name:
         type: string
       namespace:

@@ -1183,10 +1183,6 @@ definitions:
         properties:
             ip_address:
                 type: string
-            labels:
-                items:
-                    type: string
-                type: array
             name:
                 type: string
             namespace:

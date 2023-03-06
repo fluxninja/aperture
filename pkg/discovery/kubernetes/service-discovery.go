@@ -7,10 +7,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cenkalti/backoff/v4"
 	"github.com/sourcegraph/conc/stream"
 	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
@@ -77,9 +75,19 @@ func (kd *serviceDiscovery) start(startCtx context.Context) error {
 		return err
 	}
 
+	serviceInformer := kd.informerFactory.Core().V1().Services().Informer()
+	_, err = serviceInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    kd.handleServiceAdd,
+		UpdateFunc: kd.handleServiceUpdate,
+		DeleteFunc: kd.handleServiceDelete,
+	})
+	if err != nil {
+		return err
+	}
+
 	kd.informerFactory.Start(kd.ctx.Done())
 
-	if !cache.WaitForCacheSync(startCtx.Done(), endpointsInformer.HasSynced) {
+	if !cache.WaitForCacheSync(startCtx.Done(), endpointsInformer.HasSynced, serviceInformer.HasSynced) {
 		return errors.New("timed out waiting for caches to sync")
 	}
 
@@ -94,26 +102,24 @@ func (kd *serviceDiscovery) stop(stopCtx context.Context) error {
 	return nil
 }
 
+// Endpoints informer handlers
+
 func (kd *serviceDiscovery) handleEndpointsAdd(obj interface{}) {
 	endpoints := obj.(*v1.Endpoints)
 	kd.updateEndpoints(endpoints)
-	kd.serviceStream.Go(func() stream.Callback {
-		return kd.addClusterIPs(endpoints.Namespace, endpoints.Name)
-	})
 }
 
 func (kd *serviceDiscovery) handleEndpointsUpdate(oldObj, newObj interface{}) {
 	oldEndpoints := oldObj.(*v1.Endpoints)
 	newEndpoints := newObj.(*v1.Endpoints)
-
 	// make a deep copy of oldEndpoints
 	toRemove := oldEndpoints.DeepCopy()
-	// from this copy remove addresses that are present in newEndpoints
-	for _, newSubsets := range newEndpoints.Subsets {
-		for _, newAddresses := range newSubsets.Addresses {
-			for i, oldSubsets := range toRemove.Subsets {
-				for j, oldAddresses := range oldSubsets.Addresses {
-					if newAddresses.TargetRef.UID == oldAddresses.TargetRef.UID {
+	// check if an address in toRemove is found in any subsets of newEndpoints, if so remove it from toRemove
+	for _, newSubset := range newEndpoints.Subsets {
+		for _, newAddress := range newSubset.Addresses {
+			for i, oldSubset := range toRemove.Subsets {
+				for j, oldAddress := range oldSubset.Addresses {
+					if newAddress.TargetRef.UID == oldAddress.TargetRef.UID {
 						toRemove.Subsets[i].Addresses = append(toRemove.Subsets[i].Addresses[:j], toRemove.Subsets[i].Addresses[j+1:]...)
 					}
 				}
@@ -127,9 +133,97 @@ func (kd *serviceDiscovery) handleEndpointsUpdate(oldObj, newObj interface{}) {
 func (kd *serviceDiscovery) handleEndpointsDelete(obj interface{}) {
 	endpoints := obj.(*v1.Endpoints)
 	kd.removeEndpoints(endpoints)
-	kd.serviceStream.Go(func() stream.Callback {
-		return kd.removeClusterIPs(endpoints.Namespace, endpoints.Name)
-	})
+}
+
+func (kd *serviceDiscovery) updateEndpoints(endpoints *v1.Endpoints) {
+	pods := kd.getPodServiceUpdatesFromEndpoints(endpoints)
+	for _, pod := range pods {
+		p := pod
+		err := kd.updatePodServiceEntity(p)
+		if err != nil {
+			log.Error().Err(err).Msg("Tracker could not be updated")
+		}
+	}
+}
+
+// getPodServiceUpdatesFromEndpoints retrieves a list of pods handled by a given service that are located on a given node.
+func (kd *serviceDiscovery) getPodServiceUpdatesFromEndpoints(endpoints *v1.Endpoints) []podServiceUpdate {
+	var pods []podServiceUpdate
+	for _, subset := range endpoints.Subsets {
+		for _, address := range subset.Addresses {
+			if address.TargetRef == nil {
+				continue
+			}
+			if address.TargetRef.Kind != "Pod" {
+				continue
+			}
+			p := podServiceUpdate{
+				Name:      address.TargetRef.Name,
+				Namespace: address.TargetRef.Namespace,
+				UID:       string(address.TargetRef.UID),
+				IPAddress: address.IP,
+				Service:   kd.getService(endpoints.Namespace, endpoints.Name),
+			}
+			if address.NodeName != nil {
+				p.NodeName = *address.NodeName
+			}
+			pods = append(pods, p)
+		}
+	}
+	return pods
+}
+
+// Service informer handlers
+
+func (kd *serviceDiscovery) handleServiceAdd(obj interface{}) {
+	service := obj.(*v1.Service)
+	kd.addClusterIPs(service)
+}
+
+func (kd *serviceDiscovery) handleServiceUpdate(oldObj, newObj interface{}) {
+	oldService := oldObj.(*v1.Service)
+	newService := newObj.(*v1.Service)
+	// make a deep copy of oldService
+	toRemove := oldService.DeepCopy()
+	// from this copy remove clusterIPs that are present in newService
+	for _, newClusterIP := range newService.Spec.ClusterIPs {
+		for i, oldClusterIP := range toRemove.Spec.ClusterIPs {
+			if newClusterIP == oldClusterIP {
+				toRemove.Spec.ClusterIPs = append(toRemove.Spec.ClusterIPs[:i], toRemove.Spec.ClusterIPs[i+1:]...)
+			}
+		}
+	}
+	kd.removeClusterIPs(toRemove)
+	kd.addClusterIPs(newService)
+}
+
+func (kd *serviceDiscovery) handleServiceDelete(obj interface{}) {
+	service := obj.(*v1.Service)
+	kd.removeClusterIPs(service)
+}
+
+func (kd *serviceDiscovery) addClusterIPs(service *v1.Service) {
+	clusterIPs := getClusterIPsFromService(service)
+	for _, clusterIP := range clusterIPs {
+		p := podServiceUpdate{
+			Name:      strings.Join([]string{"ClusterIP", service.Namespace, service.Name, clusterIP}, "-"),
+			Namespace: service.Namespace,
+			UID:       clusterIP,
+			IPAddress: clusterIP,
+			Service:   kd.getService(service.Namespace, service.Name),
+		}
+		err := kd.updatePodServiceEntity(p)
+		if err != nil {
+			log.Error().Err(err).Msg("Tracker could not be updated")
+		}
+	}
+}
+
+func (kd *serviceDiscovery) removeClusterIPs(service *v1.Service) {
+	clusterIPs := getClusterIPsFromService(service)
+	for _, clusterIP := range clusterIPs {
+		kd.entityEvents.RemoveEvent(notifiers.Key(clusterIP))
+	}
 }
 
 // getService return the full qualified domain name of a given service.
@@ -152,7 +246,7 @@ func (kd *serviceDiscovery) removeEndpoints(endpoints *v1.Endpoints) {
 					return notifiers.Remove, nil
 				}
 				entity.Services = utils.RemoveFromSlice(entity.Services, kd.getService(endpoints.Namespace, endpoints.Name))
-				if kd.shouldRemove(entity) {
+				if shouldRemove(entity) {
 					return notifiers.Remove, nil
 				}
 				bytes, err := json.Marshal(entity)
@@ -168,8 +262,8 @@ func (kd *serviceDiscovery) removeEndpoints(endpoints *v1.Endpoints) {
 	}
 }
 
-// updatePodService retrieves stored pod data from tracker, enriches it with new info and send the updated version.
-func (kd *serviceDiscovery) updatePodService(pod podServiceUpdate) error {
+// updatePodServiceEntity retrieves stored pod data from tracker, enriches it with new info and send the updated version.
+func (kd *serviceDiscovery) updatePodServiceEntity(pod podServiceUpdate) error {
 	updateFunc := func(oldValue []byte) (notifiers.EventType, []byte) {
 		var entity *entitiesv1.Entity
 		if oldValue == nil {
@@ -207,112 +301,20 @@ func (kd *serviceDiscovery) updatePodService(pod podServiceUpdate) error {
 	return nil
 }
 
-func (kd *serviceDiscovery) shouldRemove(entity *entitiesv1.Entity) bool {
-	// once we have more informers then add additional checks here
-	return len(entity.Services) == 0
-}
+/* Helper functions */
 
-func (kd *serviceDiscovery) updateEndpoints(endpoints *v1.Endpoints) {
-	pods := kd.getServicePods(endpoints)
-	for _, pod := range pods {
-		p := pod
-		err := kd.updatePodService(p)
-		if err != nil {
-			log.Error().Err(err).Msg("Tracker could not be updated")
-		}
-
-	}
-}
-
-// getServicePods retrieves a list of pods handled by a given service that are located on a given node.
-func (kd *serviceDiscovery) getServicePods(endpoints *v1.Endpoints) []podServiceUpdate {
-	var pods []podServiceUpdate
-
-	for _, subset := range endpoints.Subsets {
-		for _, address := range subset.Addresses {
-			if address.TargetRef == nil {
-				continue
-			}
-			if address.TargetRef.Kind != "Pod" {
-				continue
-			}
-			p := podServiceUpdate{
-				Name:      address.TargetRef.Name,
-				Namespace: address.TargetRef.Namespace,
-				UID:       string(address.TargetRef.UID),
-				IPAddress: address.IP,
-				Service:   kd.getService(endpoints.Namespace, endpoints.Name),
-			}
-			if address.NodeName != nil {
-				p.NodeName = *address.NodeName
-			}
-			pods = append(pods, p)
-		}
-	}
-
-	return pods
-}
-
-func (kd *serviceDiscovery) addClusterIPs(namespace, name string) stream.Callback {
-	clusterIPs, err := kd.fetchServiceSpec(namespace, name)
-	if err != nil {
-		log.Error().Err(err).Msg("Could not fetch service spec")
-		return func() {}
-	}
-
-	return func() {
-		for _, clusterIP := range clusterIPs {
-			p := podServiceUpdate{
-				Name:      strings.Join([]string{"ClusterIP", namespace, name, clusterIP}, "-"),
-				Namespace: namespace,
-				UID:       clusterIP,
-				IPAddress: clusterIP,
-				Service:   kd.getService(namespace, name),
-			}
-			err := kd.updatePodService(p)
-			if err != nil {
-				log.Error().Err(err).Msg("Tracker could not be updated")
-				continue
-			}
-		}
-	}
-}
-
-func (kd *serviceDiscovery) removeClusterIPs(namespace, name string) stream.Callback {
-	clusterIPs, err := kd.fetchServiceSpec(namespace, name)
-	if err != nil {
-		log.Error().Err(err).Msg("Could not fetch service spec")
-		return func() {}
-	}
-	return func() {
-		for _, clusterIP := range clusterIPs {
-			kd.entityEvents.RemoveEvent(notifiers.Key(clusterIP))
-		}
-	}
-}
-
-func (kd *serviceDiscovery) fetchServiceSpec(namespace, name string) ([]string, error) {
-	var clusterIPs []string
-	op := func() error {
-		svc, err := kd.cli.CoreV1().Services(namespace).Get(kd.ctx, name, metav1.GetOptions{})
-		if kd.ctx.Err() != nil {
-			return backoff.Permanent(kd.ctx.Err())
-		}
-		if err != nil {
-			return nil
-		}
-		if svc.Spec.Type != v1.ServiceTypeClusterIP {
-			return nil
-		}
-		clusterIPs = svc.Spec.ClusterIPs
-		// remove None from the list
-		clusterIPs = utils.RemoveFromSlice(clusterIPs, "None")
+func getClusterIPsFromService(svc *v1.Service) []string {
+	if svc.Spec.Type != v1.ServiceTypeClusterIP {
 		return nil
 	}
-	err := backoff.Retry(op, backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 3))
-	if err != nil {
-		log.Error().Err(err).Str("namespace", namespace).Str("name", name).Msg("Context canceled while fetching service")
-		return nil, err
-	}
-	return clusterIPs, nil
+	clusterIPs := svc.Spec.ClusterIPs
+	// remove None, "" from the list
+	clusterIPs = utils.RemoveFromSlice(clusterIPs, "None")
+	clusterIPs = utils.RemoveFromSlice(clusterIPs, "")
+	return clusterIPs
+}
+
+func shouldRemove(entity *entitiesv1.Entity) bool {
+	// once we have more informers then add additional checks here
+	return len(entity.Services) == 0
 }
