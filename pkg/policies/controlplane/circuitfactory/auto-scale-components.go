@@ -116,7 +116,7 @@ func newAutoScaleCompositeAndOptions(
 
 		return tree, configuredComponents, fx.Options(options...), nil
 	} else if autoscaler := autoScaleComponentProto.GetAutoscaler(); autoscaler != nil {
-		nestedCircuit, err := autoscale.ParseAutoscaler(autoscaler)
+		nestedCircuit, err := autoscale.ParseAutoScaler(autoscaler)
 		if err != nil {
 			return retErr(err)
 		}

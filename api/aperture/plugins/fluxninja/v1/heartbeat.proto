@@ -40,7 +40,7 @@ message ReportRequest {
   aperture.status.v1.GroupStatus all_statuses = 9;
   aperture.policy.sync.v1.PolicyWrappers policies = 10;
   aperture.flowcontrol.controlpoints.v1.FlowControlPoints flow_control_points = 11;
-  aperture.autoscale.kubernetes.controlpoints.v1.AutoscaleKubernetesControlPoints autoscale_kubernetes_control_points = 12;
+  aperture.autoscale.kubernetes.controlpoints.v1.AutoScaleKubernetesControlPoints auto_scale_kubernetes_control_points = 12;
   string installation_mode = 13;
 }
 

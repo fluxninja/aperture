@@ -1043,7 +1043,7 @@ func (x *AutoScale) GetPodScaler() *PodScaler {
 	return nil
 }
 
-func (x *AutoScale) GetAutoscaler() *Autoscaler {
+func (x *AutoScale) GetAutoscaler() *AutoScaler {
 	if x, ok := x.GetComponent().(*AutoScale_Autoscaler); ok {
 		return x.Autoscaler
 	}
@@ -1060,8 +1060,8 @@ type AutoScale_PodScaler struct {
 }
 
 type AutoScale_Autoscaler struct {
-	// Autoscaler provides auto scaling functionality for any resource.
-	Autoscaler *Autoscaler `protobuf:"bytes,2,opt,name=autoscaler,proto3,oneof"`
+	// AutoScaler provides auto scaling functionality for any resource.
+	Autoscaler *AutoScaler `protobuf:"bytes,2,opt,name=autoscaler,proto3,oneof"`
 }
 
 func (*AutoScale_PodScaler) isAutoScale_Component() {}
@@ -3442,23 +3442,23 @@ func (x *AIMDConcurrencyController) GetDefaultConfig() *LoadActuator_DynamicConf
 	return nil
 }
 
-// Autoscaler
-type Autoscaler struct {
+// AutoScaler
+type AutoScaler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Output ports for the Autoscaler.
-	OutPorts *Autoscaler_Outs   `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
-	Scaler   *Autoscaler_Scaler `protobuf:"bytes,2,opt,name=scaler,proto3" json:"scaler,omitempty" validate:"required"` // @gotags: validate:"required"
+	// Output ports for the AutoScaler.
+	OutPorts *AutoScaler_Outs   `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
+	Scaler   *AutoScaler_Scaler `protobuf:"bytes,2,opt,name=scaler,proto3" json:"scaler,omitempty" validate:"required"` // @gotags: validate:"required"
 	// The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
 	MinScale uint64 `protobuf:"varint,3,opt,name=min_scale,json=minScale,proto3" json:"min_scale,omitempty" default:"0"` // @gotags: default:"0"];
 	// The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
 	MaxScale uint64 `protobuf:"varint,4,opt,name=max_scale,json=maxScale,proto3" json:"max_scale,omitempty" default:"4294967295"` // @gotags: default:"4294967295"]
 	// List of Controllers for scaling out.
-	ScaleOutControllers []*Autoscaler_ScaleOutController `protobuf:"bytes,5,rep,name=scale_out_controllers,json=scaleOutControllers,proto3" json:"scale_out_controllers,omitempty"`
+	ScaleOutControllers []*AutoScaler_ScaleOutController `protobuf:"bytes,5,rep,name=scale_out_controllers,json=scaleOutControllers,proto3" json:"scale_out_controllers,omitempty"`
 	// List of Controllers for scaling in.
-	ScaleInControllers []*Autoscaler_ScaleInController `protobuf:"bytes,6,rep,name=scale_in_controllers,json=scaleInControllers,proto3" json:"scale_in_controllers,omitempty"`
+	ScaleInControllers []*AutoScaler_ScaleInController `protobuf:"bytes,6,rep,name=scale_in_controllers,json=scaleInControllers,proto3" json:"scale_in_controllers,omitempty"`
 	// The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
 	MaxScaleOutPercentage float64 `protobuf:"fixed64,8,opt,name=max_scale_out_percentage,json=maxScaleOutPercentage,proto3" json:"max_scale_out_percentage,omitempty" default:"10"` // @gotags: default:"10"
 	// The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
@@ -3477,8 +3477,8 @@ type Autoscaler struct {
 	ScaleInAlerterParameters *Alerter_Parameters `protobuf:"bytes,13,opt,name=scale_in_alerter_parameters,json=scaleInAlerterParameters,proto3" json:"scale_in_alerter_parameters,omitempty"`
 }
 
-func (x *Autoscaler) Reset() {
-	*x = Autoscaler{}
+func (x *AutoScaler) Reset() {
+	*x = AutoScaler{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[41]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -3486,13 +3486,13 @@ func (x *Autoscaler) Reset() {
 	}
 }
 
-func (x *Autoscaler) String() string {
+func (x *AutoScaler) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Autoscaler) ProtoMessage() {}
+func (*AutoScaler) ProtoMessage() {}
 
-func (x *Autoscaler) ProtoReflect() protoreflect.Message {
+func (x *AutoScaler) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[41]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -3504,96 +3504,96 @@ func (x *Autoscaler) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Autoscaler.ProtoReflect.Descriptor instead.
-func (*Autoscaler) Descriptor() ([]byte, []int) {
+// Deprecated: Use AutoScaler.ProtoReflect.Descriptor instead.
+func (*AutoScaler) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{41}
 }
 
-func (x *Autoscaler) GetOutPorts() *Autoscaler_Outs {
+func (x *AutoScaler) GetOutPorts() *AutoScaler_Outs {
 	if x != nil {
 		return x.OutPorts
 	}
 	return nil
 }
 
-func (x *Autoscaler) GetScaler() *Autoscaler_Scaler {
+func (x *AutoScaler) GetScaler() *AutoScaler_Scaler {
 	if x != nil {
 		return x.Scaler
 	}
 	return nil
 }
 
-func (x *Autoscaler) GetMinScale() uint64 {
+func (x *AutoScaler) GetMinScale() uint64 {
 	if x != nil {
 		return x.MinScale
 	}
 	return 0
 }
 
-func (x *Autoscaler) GetMaxScale() uint64 {
+func (x *AutoScaler) GetMaxScale() uint64 {
 	if x != nil {
 		return x.MaxScale
 	}
 	return 0
 }
 
-func (x *Autoscaler) GetScaleOutControllers() []*Autoscaler_ScaleOutController {
+func (x *AutoScaler) GetScaleOutControllers() []*AutoScaler_ScaleOutController {
 	if x != nil {
 		return x.ScaleOutControllers
 	}
 	return nil
 }
 
-func (x *Autoscaler) GetScaleInControllers() []*Autoscaler_ScaleInController {
+func (x *AutoScaler) GetScaleInControllers() []*AutoScaler_ScaleInController {
 	if x != nil {
 		return x.ScaleInControllers
 	}
 	return nil
 }
 
-func (x *Autoscaler) GetMaxScaleOutPercentage() float64 {
+func (x *AutoScaler) GetMaxScaleOutPercentage() float64 {
 	if x != nil {
 		return x.MaxScaleOutPercentage
 	}
 	return 0
 }
 
-func (x *Autoscaler) GetMaxScaleInPercentage() float64 {
+func (x *AutoScaler) GetMaxScaleInPercentage() float64 {
 	if x != nil {
 		return x.MaxScaleInPercentage
 	}
 	return 0
 }
 
-func (x *Autoscaler) GetScaleOutCooldown() *durationpb.Duration {
+func (x *AutoScaler) GetScaleOutCooldown() *durationpb.Duration {
 	if x != nil {
 		return x.ScaleOutCooldown
 	}
 	return nil
 }
 
-func (x *Autoscaler) GetScaleInCooldown() *durationpb.Duration {
+func (x *AutoScaler) GetScaleInCooldown() *durationpb.Duration {
 	if x != nil {
 		return x.ScaleInCooldown
 	}
 	return nil
 }
 
-func (x *Autoscaler) GetCooldownOverridePercentage() float64 {
+func (x *AutoScaler) GetCooldownOverridePercentage() float64 {
 	if x != nil {
 		return x.CooldownOverridePercentage
 	}
 	return 0
 }
 
-func (x *Autoscaler) GetScaleOutAlerterParameters() *Alerter_Parameters {
+func (x *AutoScaler) GetScaleOutAlerterParameters() *Alerter_Parameters {
 	if x != nil {
 		return x.ScaleOutAlerterParameters
 	}
 	return nil
 }
 
-func (x *Autoscaler) GetScaleInAlerterParameters() *Alerter_Parameters {
+func (x *AutoScaler) GetScaleInAlerterParameters() *Alerter_Parameters {
 	if x != nil {
 		return x.ScaleInAlerterParameters
 	}
@@ -7195,22 +7195,22 @@ func (x *AIMDConcurrencyController_Outs) GetIncomingConcurrency() *OutPort {
 }
 
 // Increasing Gradient defines a controller for scaling out based on Gradient Controller.
-type Autoscaler_IncreasingGradient struct {
+type AutoScaler_IncreasingGradient struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// Input ports for the Gradient.
-	InPorts *Autoscaler_IncreasingGradient_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
+	InPorts *AutoScaler_IncreasingGradient_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
 	// Gradient parameters for the controller. Defaults and constraints:
 	// * slope = 1
 	// * min_gradient = 1 (cannot be changed)
 	// * max_gradient = +Inf (must be greater than 1)
-	Parameters *Autoscaler_IncreasingGradient_Parameters `protobuf:"bytes,2,opt,name=parameters,proto3" json:"parameters,omitempty"`
+	Parameters *AutoScaler_IncreasingGradient_Parameters `protobuf:"bytes,2,opt,name=parameters,proto3" json:"parameters,omitempty"`
 }
 
-func (x *Autoscaler_IncreasingGradient) Reset() {
-	*x = Autoscaler_IncreasingGradient{}
+func (x *AutoScaler_IncreasingGradient) Reset() {
+	*x = AutoScaler_IncreasingGradient{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[109]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7218,13 +7218,13 @@ func (x *Autoscaler_IncreasingGradient) Reset() {
 	}
 }
 
-func (x *Autoscaler_IncreasingGradient) String() string {
+func (x *AutoScaler_IncreasingGradient) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Autoscaler_IncreasingGradient) ProtoMessage() {}
+func (*AutoScaler_IncreasingGradient) ProtoMessage() {}
 
-func (x *Autoscaler_IncreasingGradient) ProtoReflect() protoreflect.Message {
+func (x *AutoScaler_IncreasingGradient) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[109]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7236,19 +7236,19 @@ func (x *Autoscaler_IncreasingGradient) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Autoscaler_IncreasingGradient.ProtoReflect.Descriptor instead.
-func (*Autoscaler_IncreasingGradient) Descriptor() ([]byte, []int) {
+// Deprecated: Use AutoScaler_IncreasingGradient.ProtoReflect.Descriptor instead.
+func (*AutoScaler_IncreasingGradient) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{41, 0}
 }
 
-func (x *Autoscaler_IncreasingGradient) GetInPorts() *Autoscaler_IncreasingGradient_Ins {
+func (x *AutoScaler_IncreasingGradient) GetInPorts() *AutoScaler_IncreasingGradient_Ins {
 	if x != nil {
 		return x.InPorts
 	}
 	return nil
 }
 
-func (x *Autoscaler_IncreasingGradient) GetParameters() *Autoscaler_IncreasingGradient_Parameters {
+func (x *AutoScaler_IncreasingGradient) GetParameters() *AutoScaler_IncreasingGradient_Parameters {
 	if x != nil {
 		return x.Parameters
 	}
@@ -7256,22 +7256,22 @@ func (x *Autoscaler_IncreasingGradient) GetParameters() *Autoscaler_IncreasingGr
 }
 
 // Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
-type Autoscaler_DecreasingGradient struct {
+type AutoScaler_DecreasingGradient struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// Input ports for the Gradient.
-	InPorts *Autoscaler_DecreasingGradient_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
+	InPorts *AutoScaler_DecreasingGradient_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
 	// Gradient parameters for the controller. Defaults and constraints:
 	// * slope = 1
 	// * min_gradient = -Inf (must be less than 1)
 	// * max_gradient = 1 (cannot be changed)
-	Parameters *Autoscaler_DecreasingGradient_Parameters `protobuf:"bytes,2,opt,name=parameters,proto3" json:"parameters,omitempty"`
+	Parameters *AutoScaler_DecreasingGradient_Parameters `protobuf:"bytes,2,opt,name=parameters,proto3" json:"parameters,omitempty"`
 }
 
-func (x *Autoscaler_DecreasingGradient) Reset() {
-	*x = Autoscaler_DecreasingGradient{}
+func (x *AutoScaler_DecreasingGradient) Reset() {
+	*x = AutoScaler_DecreasingGradient{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[110]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7279,13 +7279,13 @@ func (x *Autoscaler_DecreasingGradient) Reset() {
 	}
 }
 
-func (x *Autoscaler_DecreasingGradient) String() string {
+func (x *AutoScaler_DecreasingGradient) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Autoscaler_DecreasingGradient) ProtoMessage() {}
+func (*AutoScaler_DecreasingGradient) ProtoMessage() {}
 
-func (x *Autoscaler_DecreasingGradient) ProtoReflect() protoreflect.Message {
+func (x *AutoScaler_DecreasingGradient) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[110]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7297,38 +7297,38 @@ func (x *Autoscaler_DecreasingGradient) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Autoscaler_DecreasingGradient.ProtoReflect.Descriptor instead.
-func (*Autoscaler_DecreasingGradient) Descriptor() ([]byte, []int) {
+// Deprecated: Use AutoScaler_DecreasingGradient.ProtoReflect.Descriptor instead.
+func (*AutoScaler_DecreasingGradient) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{41, 1}
 }
 
-func (x *Autoscaler_DecreasingGradient) GetInPorts() *Autoscaler_DecreasingGradient_Ins {
+func (x *AutoScaler_DecreasingGradient) GetInPorts() *AutoScaler_DecreasingGradient_Ins {
 	if x != nil {
 		return x.InPorts
 	}
 	return nil
 }
 
-func (x *Autoscaler_DecreasingGradient) GetParameters() *Autoscaler_DecreasingGradient_Parameters {
+func (x *AutoScaler_DecreasingGradient) GetParameters() *AutoScaler_DecreasingGradient_Parameters {
 	if x != nil {
 		return x.Parameters
 	}
 	return nil
 }
 
-type Autoscaler_ScaleOutController struct {
+type AutoScaler_ScaleOutController struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// Controller
-	Controller *Autoscaler_ScaleOutController_Controller `protobuf:"bytes,1,opt,name=controller,proto3" json:"controller,omitempty" validate:"required"` // @gotags: validate:"required"
+	Controller *AutoScaler_ScaleOutController_Controller `protobuf:"bytes,1,opt,name=controller,proto3" json:"controller,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Configuration for embedded alerter.
 	AlerterParameters *Alerter_Parameters `protobuf:"bytes,2,opt,name=alerter_parameters,json=alerterParameters,proto3" json:"alerter_parameters,omitempty"`
 }
 
-func (x *Autoscaler_ScaleOutController) Reset() {
-	*x = Autoscaler_ScaleOutController{}
+func (x *AutoScaler_ScaleOutController) Reset() {
+	*x = AutoScaler_ScaleOutController{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[111]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7336,13 +7336,13 @@ func (x *Autoscaler_ScaleOutController) Reset() {
 	}
 }
 
-func (x *Autoscaler_ScaleOutController) String() string {
+func (x *AutoScaler_ScaleOutController) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Autoscaler_ScaleOutController) ProtoMessage() {}
+func (*AutoScaler_ScaleOutController) ProtoMessage() {}
 
-func (x *Autoscaler_ScaleOutController) ProtoReflect() protoreflect.Message {
+func (x *AutoScaler_ScaleOutController) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[111]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7354,38 +7354,38 @@ func (x *Autoscaler_ScaleOutController) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Autoscaler_ScaleOutController.ProtoReflect.Descriptor instead.
-func (*Autoscaler_ScaleOutController) Descriptor() ([]byte, []int) {
+// Deprecated: Use AutoScaler_ScaleOutController.ProtoReflect.Descriptor instead.
+func (*AutoScaler_ScaleOutController) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{41, 2}
 }
 
-func (x *Autoscaler_ScaleOutController) GetController() *Autoscaler_ScaleOutController_Controller {
+func (x *AutoScaler_ScaleOutController) GetController() *AutoScaler_ScaleOutController_Controller {
 	if x != nil {
 		return x.Controller
 	}
 	return nil
 }
 
-func (x *Autoscaler_ScaleOutController) GetAlerterParameters() *Alerter_Parameters {
+func (x *AutoScaler_ScaleOutController) GetAlerterParameters() *Alerter_Parameters {
 	if x != nil {
 		return x.AlerterParameters
 	}
 	return nil
 }
 
-type Autoscaler_ScaleInController struct {
+type AutoScaler_ScaleInController struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// Controller
-	Controller *Autoscaler_ScaleInController_Controller `protobuf:"bytes,1,opt,name=controller,proto3" json:"controller,omitempty"`
+	Controller *AutoScaler_ScaleInController_Controller `protobuf:"bytes,1,opt,name=controller,proto3" json:"controller,omitempty"`
 	// Configuration for embedded alerter.
 	AlerterParameters *Alerter_Parameters `protobuf:"bytes,2,opt,name=alerter_parameters,json=alerterParameters,proto3" json:"alerter_parameters,omitempty"`
 }
 
-func (x *Autoscaler_ScaleInController) Reset() {
-	*x = Autoscaler_ScaleInController{}
+func (x *AutoScaler_ScaleInController) Reset() {
+	*x = AutoScaler_ScaleInController{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[112]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7393,13 +7393,13 @@ func (x *Autoscaler_ScaleInController) Reset() {
 	}
 }
 
-func (x *Autoscaler_ScaleInController) String() string {
+func (x *AutoScaler_ScaleInController) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Autoscaler_ScaleInController) ProtoMessage() {}
+func (*AutoScaler_ScaleInController) ProtoMessage() {}
 
-func (x *Autoscaler_ScaleInController) ProtoReflect() protoreflect.Message {
+func (x *AutoScaler_ScaleInController) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[112]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7411,37 +7411,37 @@ func (x *Autoscaler_ScaleInController) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Autoscaler_ScaleInController.ProtoReflect.Descriptor instead.
-func (*Autoscaler_ScaleInController) Descriptor() ([]byte, []int) {
+// Deprecated: Use AutoScaler_ScaleInController.ProtoReflect.Descriptor instead.
+func (*AutoScaler_ScaleInController) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{41, 3}
 }
 
-func (x *Autoscaler_ScaleInController) GetController() *Autoscaler_ScaleInController_Controller {
+func (x *AutoScaler_ScaleInController) GetController() *AutoScaler_ScaleInController_Controller {
 	if x != nil {
 		return x.Controller
 	}
 	return nil
 }
 
-func (x *Autoscaler_ScaleInController) GetAlerterParameters() *Alerter_Parameters {
+func (x *AutoScaler_ScaleInController) GetAlerterParameters() *Alerter_Parameters {
 	if x != nil {
 		return x.AlerterParameters
 	}
 	return nil
 }
 
-type Autoscaler_Scaler struct {
+type AutoScaler_Scaler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Scaler:
-	//	*Autoscaler_Scaler_KubernetesReplicas
-	Scaler isAutoscaler_Scaler_Scaler `protobuf_oneof:"scaler"`
+	//	*AutoScaler_Scaler_KubernetesReplicas
+	Scaler isAutoScaler_Scaler_Scaler `protobuf_oneof:"scaler"`
 }
 
-func (x *Autoscaler_Scaler) Reset() {
-	*x = Autoscaler_Scaler{}
+func (x *AutoScaler_Scaler) Reset() {
+	*x = AutoScaler_Scaler{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[113]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7449,13 +7449,13 @@ func (x *Autoscaler_Scaler) Reset() {
 	}
 }
 
-func (x *Autoscaler_Scaler) String() string {
+func (x *AutoScaler_Scaler) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Autoscaler_Scaler) ProtoMessage() {}
+func (*AutoScaler_Scaler) ProtoMessage() {}
 
-func (x *Autoscaler_Scaler) ProtoReflect() protoreflect.Message {
+func (x *AutoScaler_Scaler) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[113]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7467,37 +7467,37 @@ func (x *Autoscaler_Scaler) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Autoscaler_Scaler.ProtoReflect.Descriptor instead.
-func (*Autoscaler_Scaler) Descriptor() ([]byte, []int) {
+// Deprecated: Use AutoScaler_Scaler.ProtoReflect.Descriptor instead.
+func (*AutoScaler_Scaler) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{41, 4}
 }
 
-func (m *Autoscaler_Scaler) GetScaler() isAutoscaler_Scaler_Scaler {
+func (m *AutoScaler_Scaler) GetScaler() isAutoScaler_Scaler_Scaler {
 	if m != nil {
 		return m.Scaler
 	}
 	return nil
 }
 
-func (x *Autoscaler_Scaler) GetKubernetesReplicas() *Autoscaler_KubernetesReplicas {
-	if x, ok := x.GetScaler().(*Autoscaler_Scaler_KubernetesReplicas); ok {
+func (x *AutoScaler_Scaler) GetKubernetesReplicas() *AutoScaler_KubernetesReplicas {
+	if x, ok := x.GetScaler().(*AutoScaler_Scaler_KubernetesReplicas); ok {
 		return x.KubernetesReplicas
 	}
 	return nil
 }
 
-type isAutoscaler_Scaler_Scaler interface {
-	isAutoscaler_Scaler_Scaler()
+type isAutoScaler_Scaler_Scaler interface {
+	isAutoScaler_Scaler_Scaler()
 }
 
-type Autoscaler_Scaler_KubernetesReplicas struct {
-	KubernetesReplicas *Autoscaler_KubernetesReplicas `protobuf:"bytes,1,opt,name=kubernetes_replicas,json=kubernetesReplicas,proto3,oneof"`
+type AutoScaler_Scaler_KubernetesReplicas struct {
+	KubernetesReplicas *AutoScaler_KubernetesReplicas `protobuf:"bytes,1,opt,name=kubernetes_replicas,json=kubernetesReplicas,proto3,oneof"`
 }
 
-func (*Autoscaler_Scaler_KubernetesReplicas) isAutoscaler_Scaler_Scaler() {}
+func (*AutoScaler_Scaler_KubernetesReplicas) isAutoScaler_Scaler_Scaler() {}
 
 // KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
-type Autoscaler_KubernetesReplicas struct {
+type AutoScaler_KubernetesReplicas struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -7510,8 +7510,8 @@ type Autoscaler_KubernetesReplicas struct {
 	DefaultConfig *PodScaler_ScaleActuator_DynamicConfig `protobuf:"bytes,3,opt,name=default_config,json=defaultConfig,proto3" json:"default_config,omitempty"`
 }
 
-func (x *Autoscaler_KubernetesReplicas) Reset() {
-	*x = Autoscaler_KubernetesReplicas{}
+func (x *AutoScaler_KubernetesReplicas) Reset() {
+	*x = AutoScaler_KubernetesReplicas{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[114]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7519,13 +7519,13 @@ func (x *Autoscaler_KubernetesReplicas) Reset() {
 	}
 }
 
-func (x *Autoscaler_KubernetesReplicas) String() string {
+func (x *AutoScaler_KubernetesReplicas) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Autoscaler_KubernetesReplicas) ProtoMessage() {}
+func (*AutoScaler_KubernetesReplicas) ProtoMessage() {}
 
-func (x *Autoscaler_KubernetesReplicas) ProtoReflect() protoreflect.Message {
+func (x *AutoScaler_KubernetesReplicas) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[114]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7537,34 +7537,34 @@ func (x *Autoscaler_KubernetesReplicas) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Autoscaler_KubernetesReplicas.ProtoReflect.Descriptor instead.
-func (*Autoscaler_KubernetesReplicas) Descriptor() ([]byte, []int) {
+// Deprecated: Use AutoScaler_KubernetesReplicas.ProtoReflect.Descriptor instead.
+func (*AutoScaler_KubernetesReplicas) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{41, 5}
 }
 
-func (x *Autoscaler_KubernetesReplicas) GetKubernetesObjectSelector() *KubernetesObjectSelector {
+func (x *AutoScaler_KubernetesReplicas) GetKubernetesObjectSelector() *KubernetesObjectSelector {
 	if x != nil {
 		return x.KubernetesObjectSelector
 	}
 	return nil
 }
 
-func (x *Autoscaler_KubernetesReplicas) GetDynamicConfigKey() string {
+func (x *AutoScaler_KubernetesReplicas) GetDynamicConfigKey() string {
 	if x != nil {
 		return x.DynamicConfigKey
 	}
 	return ""
 }
 
-func (x *Autoscaler_KubernetesReplicas) GetDefaultConfig() *PodScaler_ScaleActuator_DynamicConfig {
+func (x *AutoScaler_KubernetesReplicas) GetDefaultConfig() *PodScaler_ScaleActuator_DynamicConfig {
 	if x != nil {
 		return x.DefaultConfig
 	}
 	return nil
 }
 
-// Outputs for Autoscaler.
-type Autoscaler_Outs struct {
+// Outputs for AutoScaler.
+type AutoScaler_Outs struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -7574,8 +7574,8 @@ type Autoscaler_Outs struct {
 	DesiredScale    *OutPort `protobuf:"bytes,3,opt,name=desired_scale,json=desiredScale,proto3" json:"desired_scale,omitempty"`
 }
 
-func (x *Autoscaler_Outs) Reset() {
-	*x = Autoscaler_Outs{}
+func (x *AutoScaler_Outs) Reset() {
+	*x = AutoScaler_Outs{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[115]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7583,13 +7583,13 @@ func (x *Autoscaler_Outs) Reset() {
 	}
 }
 
-func (x *Autoscaler_Outs) String() string {
+func (x *AutoScaler_Outs) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Autoscaler_Outs) ProtoMessage() {}
+func (*AutoScaler_Outs) ProtoMessage() {}
 
-func (x *Autoscaler_Outs) ProtoReflect() protoreflect.Message {
+func (x *AutoScaler_Outs) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[115]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7601,26 +7601,26 @@ func (x *Autoscaler_Outs) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Autoscaler_Outs.ProtoReflect.Descriptor instead.
-func (*Autoscaler_Outs) Descriptor() ([]byte, []int) {
+// Deprecated: Use AutoScaler_Outs.ProtoReflect.Descriptor instead.
+func (*AutoScaler_Outs) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{41, 6}
 }
 
-func (x *Autoscaler_Outs) GetActualScale() *OutPort {
+func (x *AutoScaler_Outs) GetActualScale() *OutPort {
 	if x != nil {
 		return x.ActualScale
 	}
 	return nil
 }
 
-func (x *Autoscaler_Outs) GetConfiguredScale() *OutPort {
+func (x *AutoScaler_Outs) GetConfiguredScale() *OutPort {
 	if x != nil {
 		return x.ConfiguredScale
 	}
 	return nil
 }
 
-func (x *Autoscaler_Outs) GetDesiredScale() *OutPort {
+func (x *AutoScaler_Outs) GetDesiredScale() *OutPort {
 	if x != nil {
 		return x.DesiredScale
 	}
@@ -7628,7 +7628,7 @@ func (x *Autoscaler_Outs) GetDesiredScale() *OutPort {
 }
 
 // This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
-type Autoscaler_IncreasingGradient_Parameters struct {
+type AutoScaler_IncreasingGradient_Parameters struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -7637,8 +7637,8 @@ type Autoscaler_IncreasingGradient_Parameters struct {
 	MaxGradient float64 `protobuf:"fixed64,3,opt,name=max_gradient,json=maxGradient,proto3" json:"max_gradient,omitempty" default:"1.79769313486231570814527423731704356798070e+308" validate:"gte=1.0"` // @gotags: default:"1.79769313486231570814527423731704356798070e+308" validate:"gte=1.0"
 }
 
-func (x *Autoscaler_IncreasingGradient_Parameters) Reset() {
-	*x = Autoscaler_IncreasingGradient_Parameters{}
+func (x *AutoScaler_IncreasingGradient_Parameters) Reset() {
+	*x = AutoScaler_IncreasingGradient_Parameters{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[116]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7646,13 +7646,13 @@ func (x *Autoscaler_IncreasingGradient_Parameters) Reset() {
 	}
 }
 
-func (x *Autoscaler_IncreasingGradient_Parameters) String() string {
+func (x *AutoScaler_IncreasingGradient_Parameters) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Autoscaler_IncreasingGradient_Parameters) ProtoMessage() {}
+func (*AutoScaler_IncreasingGradient_Parameters) ProtoMessage() {}
 
-func (x *Autoscaler_IncreasingGradient_Parameters) ProtoReflect() protoreflect.Message {
+func (x *AutoScaler_IncreasingGradient_Parameters) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[116]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7664,19 +7664,19 @@ func (x *Autoscaler_IncreasingGradient_Parameters) ProtoReflect() protoreflect.M
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Autoscaler_IncreasingGradient_Parameters.ProtoReflect.Descriptor instead.
-func (*Autoscaler_IncreasingGradient_Parameters) Descriptor() ([]byte, []int) {
+// Deprecated: Use AutoScaler_IncreasingGradient_Parameters.ProtoReflect.Descriptor instead.
+func (*AutoScaler_IncreasingGradient_Parameters) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{41, 0, 0}
 }
 
-func (x *Autoscaler_IncreasingGradient_Parameters) GetSlope() float64 {
+func (x *AutoScaler_IncreasingGradient_Parameters) GetSlope() float64 {
 	if x != nil {
 		return x.Slope
 	}
 	return 0
 }
 
-func (x *Autoscaler_IncreasingGradient_Parameters) GetMaxGradient() float64 {
+func (x *AutoScaler_IncreasingGradient_Parameters) GetMaxGradient() float64 {
 	if x != nil {
 		return x.MaxGradient
 	}
@@ -7684,7 +7684,7 @@ func (x *Autoscaler_IncreasingGradient_Parameters) GetMaxGradient() float64 {
 }
 
 // Inputs for Gradient.
-type Autoscaler_IncreasingGradient_Ins struct {
+type AutoScaler_IncreasingGradient_Ins struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -7695,8 +7695,8 @@ type Autoscaler_IncreasingGradient_Ins struct {
 	Setpoint *InPort `protobuf:"bytes,2,opt,name=setpoint,proto3" json:"setpoint,omitempty"`
 }
 
-func (x *Autoscaler_IncreasingGradient_Ins) Reset() {
-	*x = Autoscaler_IncreasingGradient_Ins{}
+func (x *AutoScaler_IncreasingGradient_Ins) Reset() {
+	*x = AutoScaler_IncreasingGradient_Ins{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[117]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7704,13 +7704,13 @@ func (x *Autoscaler_IncreasingGradient_Ins) Reset() {
 	}
 }
 
-func (x *Autoscaler_IncreasingGradient_Ins) String() string {
+func (x *AutoScaler_IncreasingGradient_Ins) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Autoscaler_IncreasingGradient_Ins) ProtoMessage() {}
+func (*AutoScaler_IncreasingGradient_Ins) ProtoMessage() {}
 
-func (x *Autoscaler_IncreasingGradient_Ins) ProtoReflect() protoreflect.Message {
+func (x *AutoScaler_IncreasingGradient_Ins) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[117]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7722,19 +7722,19 @@ func (x *Autoscaler_IncreasingGradient_Ins) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Autoscaler_IncreasingGradient_Ins.ProtoReflect.Descriptor instead.
-func (*Autoscaler_IncreasingGradient_Ins) Descriptor() ([]byte, []int) {
+// Deprecated: Use AutoScaler_IncreasingGradient_Ins.ProtoReflect.Descriptor instead.
+func (*AutoScaler_IncreasingGradient_Ins) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{41, 0, 1}
 }
 
-func (x *Autoscaler_IncreasingGradient_Ins) GetSignal() *InPort {
+func (x *AutoScaler_IncreasingGradient_Ins) GetSignal() *InPort {
 	if x != nil {
 		return x.Signal
 	}
 	return nil
 }
 
-func (x *Autoscaler_IncreasingGradient_Ins) GetSetpoint() *InPort {
+func (x *AutoScaler_IncreasingGradient_Ins) GetSetpoint() *InPort {
 	if x != nil {
 		return x.Setpoint
 	}
@@ -7742,7 +7742,7 @@ func (x *Autoscaler_IncreasingGradient_Ins) GetSetpoint() *InPort {
 }
 
 // This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
-type Autoscaler_DecreasingGradient_Parameters struct {
+type AutoScaler_DecreasingGradient_Parameters struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -7751,8 +7751,8 @@ type Autoscaler_DecreasingGradient_Parameters struct {
 	MinGradient float64 `protobuf:"fixed64,2,opt,name=min_gradient,json=minGradient,proto3" json:"min_gradient,omitempty" default:"-1.79769313486231570814527423731704356798070e+308" validate:"lte=1.0"` // @gotags: default:"-1.79769313486231570814527423731704356798070e+308" validate:"lte=1.0"
 }
 
-func (x *Autoscaler_DecreasingGradient_Parameters) Reset() {
-	*x = Autoscaler_DecreasingGradient_Parameters{}
+func (x *AutoScaler_DecreasingGradient_Parameters) Reset() {
+	*x = AutoScaler_DecreasingGradient_Parameters{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[118]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7760,13 +7760,13 @@ func (x *Autoscaler_DecreasingGradient_Parameters) Reset() {
 	}
 }
 
-func (x *Autoscaler_DecreasingGradient_Parameters) String() string {
+func (x *AutoScaler_DecreasingGradient_Parameters) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Autoscaler_DecreasingGradient_Parameters) ProtoMessage() {}
+func (*AutoScaler_DecreasingGradient_Parameters) ProtoMessage() {}
 
-func (x *Autoscaler_DecreasingGradient_Parameters) ProtoReflect() protoreflect.Message {
+func (x *AutoScaler_DecreasingGradient_Parameters) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[118]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7778,19 +7778,19 @@ func (x *Autoscaler_DecreasingGradient_Parameters) ProtoReflect() protoreflect.M
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Autoscaler_DecreasingGradient_Parameters.ProtoReflect.Descriptor instead.
-func (*Autoscaler_DecreasingGradient_Parameters) Descriptor() ([]byte, []int) {
+// Deprecated: Use AutoScaler_DecreasingGradient_Parameters.ProtoReflect.Descriptor instead.
+func (*AutoScaler_DecreasingGradient_Parameters) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{41, 1, 0}
 }
 
-func (x *Autoscaler_DecreasingGradient_Parameters) GetSlope() float64 {
+func (x *AutoScaler_DecreasingGradient_Parameters) GetSlope() float64 {
 	if x != nil {
 		return x.Slope
 	}
 	return 0
 }
 
-func (x *Autoscaler_DecreasingGradient_Parameters) GetMinGradient() float64 {
+func (x *AutoScaler_DecreasingGradient_Parameters) GetMinGradient() float64 {
 	if x != nil {
 		return x.MinGradient
 	}
@@ -7798,7 +7798,7 @@ func (x *Autoscaler_DecreasingGradient_Parameters) GetMinGradient() float64 {
 }
 
 // Inputs for Gradient.
-type Autoscaler_DecreasingGradient_Ins struct {
+type AutoScaler_DecreasingGradient_Ins struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -7809,8 +7809,8 @@ type Autoscaler_DecreasingGradient_Ins struct {
 	Setpoint *InPort `protobuf:"bytes,2,opt,name=setpoint,proto3" json:"setpoint,omitempty"`
 }
 
-func (x *Autoscaler_DecreasingGradient_Ins) Reset() {
-	*x = Autoscaler_DecreasingGradient_Ins{}
+func (x *AutoScaler_DecreasingGradient_Ins) Reset() {
+	*x = AutoScaler_DecreasingGradient_Ins{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[119]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7818,13 +7818,13 @@ func (x *Autoscaler_DecreasingGradient_Ins) Reset() {
 	}
 }
 
-func (x *Autoscaler_DecreasingGradient_Ins) String() string {
+func (x *AutoScaler_DecreasingGradient_Ins) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Autoscaler_DecreasingGradient_Ins) ProtoMessage() {}
+func (*AutoScaler_DecreasingGradient_Ins) ProtoMessage() {}
 
-func (x *Autoscaler_DecreasingGradient_Ins) ProtoReflect() protoreflect.Message {
+func (x *AutoScaler_DecreasingGradient_Ins) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[119]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7836,37 +7836,37 @@ func (x *Autoscaler_DecreasingGradient_Ins) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Autoscaler_DecreasingGradient_Ins.ProtoReflect.Descriptor instead.
-func (*Autoscaler_DecreasingGradient_Ins) Descriptor() ([]byte, []int) {
+// Deprecated: Use AutoScaler_DecreasingGradient_Ins.ProtoReflect.Descriptor instead.
+func (*AutoScaler_DecreasingGradient_Ins) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{41, 1, 1}
 }
 
-func (x *Autoscaler_DecreasingGradient_Ins) GetSignal() *InPort {
+func (x *AutoScaler_DecreasingGradient_Ins) GetSignal() *InPort {
 	if x != nil {
 		return x.Signal
 	}
 	return nil
 }
 
-func (x *Autoscaler_DecreasingGradient_Ins) GetSetpoint() *InPort {
+func (x *AutoScaler_DecreasingGradient_Ins) GetSetpoint() *InPort {
 	if x != nil {
 		return x.Setpoint
 	}
 	return nil
 }
 
-type Autoscaler_ScaleOutController_Controller struct {
+type AutoScaler_ScaleOutController_Controller struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Controller:
-	//	*Autoscaler_ScaleOutController_Controller_Gradient
-	Controller isAutoscaler_ScaleOutController_Controller_Controller `protobuf_oneof:"controller"`
+	//	*AutoScaler_ScaleOutController_Controller_Gradient
+	Controller isAutoScaler_ScaleOutController_Controller_Controller `protobuf_oneof:"controller"`
 }
 
-func (x *Autoscaler_ScaleOutController_Controller) Reset() {
-	*x = Autoscaler_ScaleOutController_Controller{}
+func (x *AutoScaler_ScaleOutController_Controller) Reset() {
+	*x = AutoScaler_ScaleOutController_Controller{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[120]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7874,13 +7874,13 @@ func (x *Autoscaler_ScaleOutController_Controller) Reset() {
 	}
 }
 
-func (x *Autoscaler_ScaleOutController_Controller) String() string {
+func (x *AutoScaler_ScaleOutController_Controller) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Autoscaler_ScaleOutController_Controller) ProtoMessage() {}
+func (*AutoScaler_ScaleOutController_Controller) ProtoMessage() {}
 
-func (x *Autoscaler_ScaleOutController_Controller) ProtoReflect() protoreflect.Message {
+func (x *AutoScaler_ScaleOutController_Controller) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[120]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7892,48 +7892,48 @@ func (x *Autoscaler_ScaleOutController_Controller) ProtoReflect() protoreflect.M
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Autoscaler_ScaleOutController_Controller.ProtoReflect.Descriptor instead.
-func (*Autoscaler_ScaleOutController_Controller) Descriptor() ([]byte, []int) {
+// Deprecated: Use AutoScaler_ScaleOutController_Controller.ProtoReflect.Descriptor instead.
+func (*AutoScaler_ScaleOutController_Controller) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{41, 2, 0}
 }
 
-func (m *Autoscaler_ScaleOutController_Controller) GetController() isAutoscaler_ScaleOutController_Controller_Controller {
+func (m *AutoScaler_ScaleOutController_Controller) GetController() isAutoScaler_ScaleOutController_Controller_Controller {
 	if m != nil {
 		return m.Controller
 	}
 	return nil
 }
 
-func (x *Autoscaler_ScaleOutController_Controller) GetGradient() *Autoscaler_IncreasingGradient {
-	if x, ok := x.GetController().(*Autoscaler_ScaleOutController_Controller_Gradient); ok {
+func (x *AutoScaler_ScaleOutController_Controller) GetGradient() *AutoScaler_IncreasingGradient {
+	if x, ok := x.GetController().(*AutoScaler_ScaleOutController_Controller_Gradient); ok {
 		return x.Gradient
 	}
 	return nil
 }
 
-type isAutoscaler_ScaleOutController_Controller_Controller interface {
-	isAutoscaler_ScaleOutController_Controller_Controller()
+type isAutoScaler_ScaleOutController_Controller_Controller interface {
+	isAutoScaler_ScaleOutController_Controller_Controller()
 }
 
-type Autoscaler_ScaleOutController_Controller_Gradient struct {
-	Gradient *Autoscaler_IncreasingGradient `protobuf:"bytes,1,opt,name=gradient,proto3,oneof"`
+type AutoScaler_ScaleOutController_Controller_Gradient struct {
+	Gradient *AutoScaler_IncreasingGradient `protobuf:"bytes,1,opt,name=gradient,proto3,oneof"`
 }
 
-func (*Autoscaler_ScaleOutController_Controller_Gradient) isAutoscaler_ScaleOutController_Controller_Controller() {
+func (*AutoScaler_ScaleOutController_Controller_Gradient) isAutoScaler_ScaleOutController_Controller_Controller() {
 }
 
-type Autoscaler_ScaleInController_Controller struct {
+type AutoScaler_ScaleInController_Controller struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Controller:
-	//	*Autoscaler_ScaleInController_Controller_Gradient
-	Controller isAutoscaler_ScaleInController_Controller_Controller `protobuf_oneof:"controller"`
+	//	*AutoScaler_ScaleInController_Controller_Gradient
+	Controller isAutoScaler_ScaleInController_Controller_Controller `protobuf_oneof:"controller"`
 }
 
-func (x *Autoscaler_ScaleInController_Controller) Reset() {
-	*x = Autoscaler_ScaleInController_Controller{}
+func (x *AutoScaler_ScaleInController_Controller) Reset() {
+	*x = AutoScaler_ScaleInController_Controller{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[121]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7941,13 +7941,13 @@ func (x *Autoscaler_ScaleInController_Controller) Reset() {
 	}
 }
 
-func (x *Autoscaler_ScaleInController_Controller) String() string {
+func (x *AutoScaler_ScaleInController_Controller) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Autoscaler_ScaleInController_Controller) ProtoMessage() {}
+func (*AutoScaler_ScaleInController_Controller) ProtoMessage() {}
 
-func (x *Autoscaler_ScaleInController_Controller) ProtoReflect() protoreflect.Message {
+func (x *AutoScaler_ScaleInController_Controller) ProtoReflect() protoreflect.Message {
 	mi := &file_aperture_policy_language_v1_policy_proto_msgTypes[121]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7959,34 +7959,34 @@ func (x *Autoscaler_ScaleInController_Controller) ProtoReflect() protoreflect.Me
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Autoscaler_ScaleInController_Controller.ProtoReflect.Descriptor instead.
-func (*Autoscaler_ScaleInController_Controller) Descriptor() ([]byte, []int) {
+// Deprecated: Use AutoScaler_ScaleInController_Controller.ProtoReflect.Descriptor instead.
+func (*AutoScaler_ScaleInController_Controller) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_language_v1_policy_proto_rawDescGZIP(), []int{41, 3, 0}
 }
 
-func (m *Autoscaler_ScaleInController_Controller) GetController() isAutoscaler_ScaleInController_Controller_Controller {
+func (m *AutoScaler_ScaleInController_Controller) GetController() isAutoScaler_ScaleInController_Controller_Controller {
 	if m != nil {
 		return m.Controller
 	}
 	return nil
 }
 
-func (x *Autoscaler_ScaleInController_Controller) GetGradient() *Autoscaler_DecreasingGradient {
-	if x, ok := x.GetController().(*Autoscaler_ScaleInController_Controller_Gradient); ok {
+func (x *AutoScaler_ScaleInController_Controller) GetGradient() *AutoScaler_DecreasingGradient {
+	if x, ok := x.GetController().(*AutoScaler_ScaleInController_Controller_Gradient); ok {
 		return x.Gradient
 	}
 	return nil
 }
 
-type isAutoscaler_ScaleInController_Controller_Controller interface {
-	isAutoscaler_ScaleInController_Controller_Controller()
+type isAutoScaler_ScaleInController_Controller_Controller interface {
+	isAutoScaler_ScaleInController_Controller_Controller()
 }
 
-type Autoscaler_ScaleInController_Controller_Gradient struct {
-	Gradient *Autoscaler_DecreasingGradient `protobuf:"bytes,1,opt,name=gradient,proto3,oneof"`
+type AutoScaler_ScaleInController_Controller_Gradient struct {
+	Gradient *AutoScaler_DecreasingGradient `protobuf:"bytes,1,opt,name=gradient,proto3,oneof"`
 }
 
-func (*Autoscaler_ScaleInController_Controller_Gradient) isAutoscaler_ScaleInController_Controller_Controller() {
+func (*AutoScaler_ScaleInController_Controller_Gradient) isAutoScaler_ScaleInController_Controller_Controller() {
 }
 
 var File_aperture_policy_language_v1_policy_proto protoreflect.FileDescriptor
@@ -8224,7 +8224,7 @@ var file_aperture_policy_language_v1_policy_proto_rawDesc = []byte{
 	0x61, 0x75, 0x74, 0x6f, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b,
 	0x32, 0x27, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69,
 	0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x41,
-	0x75, 0x74, 0x6f, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x48, 0x00, 0x52, 0x0a, 0x61, 0x75, 0x74,
+	0x75, 0x74, 0x6f, 0x53, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x48, 0x00, 0x52, 0x0a, 0x61, 0x75, 0x74,
 	0x6f, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x42, 0x0b, 0x0a, 0x09, 0x63, 0x6f, 0x6d, 0x70, 0x6f,
 	0x6e, 0x65, 0x6e, 0x74, 0x22, 0x8c, 0x01, 0x0a, 0x06, 0x49, 0x6e, 0x50, 0x6f, 0x72, 0x74, 0x12,
 	0x21, 0x0a, 0x0b, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x6c, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01,
@@ -9145,15 +9145,15 @@ var file_aperture_policy_language_v1_policy_proto_rawDesc = []byte{
 	0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x4f, 0x75, 0x74, 0x50, 0x6f,
 	0x72, 0x74, 0x52, 0x13, 0x69, 0x6e, 0x63, 0x6f, 0x6d, 0x69, 0x6e, 0x67, 0x43, 0x6f, 0x6e, 0x63,
 	0x75, 0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x22, 0xe3, 0x18, 0x0a, 0x0a, 0x41, 0x75, 0x74, 0x6f,
-	0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x12, 0x49, 0x0a, 0x09, 0x6f, 0x75, 0x74, 0x5f, 0x70, 0x6f,
+	0x53, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x12, 0x49, 0x0a, 0x09, 0x6f, 0x75, 0x74, 0x5f, 0x70, 0x6f,
 	0x72, 0x74, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2c, 0x2e, 0x61, 0x70, 0x65, 0x72,
 	0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67,
-	0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x75, 0x74, 0x6f, 0x73, 0x63, 0x61, 0x6c,
+	0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x75, 0x74, 0x6f, 0x53, 0x63, 0x61, 0x6c,
 	0x65, 0x72, 0x2e, 0x4f, 0x75, 0x74, 0x73, 0x52, 0x08, 0x6f, 0x75, 0x74, 0x50, 0x6f, 0x72, 0x74,
 	0x73, 0x12, 0x46, 0x0a, 0x06, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28,
 	0x0b, 0x32, 0x2e, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c,
 	0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e,
-	0x41, 0x75, 0x74, 0x6f, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x53, 0x63, 0x61, 0x6c, 0x65,
+	0x41, 0x75, 0x74, 0x6f, 0x53, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x53, 0x63, 0x61, 0x6c, 0x65,
 	0x72, 0x52, 0x06, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x12, 0x1b, 0x0a, 0x09, 0x6d, 0x69, 0x6e,
 	0x5f, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x08, 0x6d, 0x69,
 	0x6e, 0x53, 0x63, 0x61, 0x6c, 0x65, 0x12, 0x1b, 0x0a, 0x09, 0x6d, 0x61, 0x78, 0x5f, 0x73, 0x63,
@@ -9162,14 +9162,14 @@ var file_aperture_policy_language_v1_policy_proto_rawDesc = []byte{
 	0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x73, 0x18, 0x05, 0x20, 0x03,
 	0x28, 0x0b, 0x32, 0x3a, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f,
 	0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31,
-	0x2e, 0x41, 0x75, 0x74, 0x6f, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x53, 0x63, 0x61, 0x6c,
+	0x2e, 0x41, 0x75, 0x74, 0x6f, 0x53, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x53, 0x63, 0x61, 0x6c,
 	0x65, 0x4f, 0x75, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x52, 0x13,
 	0x73, 0x63, 0x61, 0x6c, 0x65, 0x4f, 0x75, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c,
 	0x65, 0x72, 0x73, 0x12, 0x6b, 0x0a, 0x14, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x5f, 0x69, 0x6e, 0x5f,
 	0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x73, 0x18, 0x06, 0x20, 0x03, 0x28,
 	0x0b, 0x32, 0x39, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c,
 	0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e,
-	0x41, 0x75, 0x74, 0x6f, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x53, 0x63, 0x61, 0x6c, 0x65,
+	0x41, 0x75, 0x74, 0x6f, 0x53, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x53, 0x63, 0x61, 0x6c, 0x65,
 	0x49, 0x6e, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x52, 0x12, 0x73, 0x63,
 	0x61, 0x6c, 0x65, 0x49, 0x6e, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x73,
 	0x12, 0x37, 0x0a, 0x18, 0x6d, 0x61, 0x78, 0x5f, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x5f, 0x6f, 0x75,
@@ -9211,12 +9211,12 @@ var file_aperture_policy_language_v1_policy_proto_rawDesc = []byte{
 	0x6e, 0x5f, 0x70, 0x6f, 0x72, 0x74, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x3e, 0x2e,
 	0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e,
 	0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x75, 0x74, 0x6f,
-	0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x49, 0x6e, 0x63, 0x72, 0x65, 0x61, 0x73, 0x69, 0x6e,
+	0x53, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x49, 0x6e, 0x63, 0x72, 0x65, 0x61, 0x73, 0x69, 0x6e,
 	0x67, 0x47, 0x72, 0x61, 0x64, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x49, 0x6e, 0x73, 0x52, 0x07, 0x69,
 	0x6e, 0x50, 0x6f, 0x72, 0x74, 0x73, 0x12, 0x65, 0x0a, 0x0a, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x65,
 	0x74, 0x65, 0x72, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x45, 0x2e, 0x61, 0x70, 0x65,
 	0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e,
-	0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x75, 0x74, 0x6f, 0x73, 0x63, 0x61,
+	0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x75, 0x74, 0x6f, 0x53, 0x63, 0x61,
 	0x6c, 0x65, 0x72, 0x2e, 0x49, 0x6e, 0x63, 0x72, 0x65, 0x61, 0x73, 0x69, 0x6e, 0x67, 0x47, 0x72,
 	0x61, 0x64, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72,
 	0x73, 0x52, 0x0a, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x1a, 0x45, 0x0a,
@@ -9237,13 +9237,13 @@ var file_aperture_policy_language_v1_policy_proto_rawDesc = []byte{
 	0x74, 0x12, 0x59, 0x0a, 0x08, 0x69, 0x6e, 0x5f, 0x70, 0x6f, 0x72, 0x74, 0x73, 0x18, 0x01, 0x20,
 	0x01, 0x28, 0x0b, 0x32, 0x3e, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70,
 	0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76,
-	0x31, 0x2e, 0x41, 0x75, 0x74, 0x6f, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x44, 0x65, 0x63,
+	0x31, 0x2e, 0x41, 0x75, 0x74, 0x6f, 0x53, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x44, 0x65, 0x63,
 	0x72, 0x65, 0x61, 0x73, 0x69, 0x6e, 0x67, 0x47, 0x72, 0x61, 0x64, 0x69, 0x65, 0x6e, 0x74, 0x2e,
 	0x49, 0x6e, 0x73, 0x52, 0x07, 0x69, 0x6e, 0x50, 0x6f, 0x72, 0x74, 0x73, 0x12, 0x65, 0x0a, 0x0a,
 	0x70, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b,
 	0x32, 0x45, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69,
 	0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x41,
-	0x75, 0x74, 0x6f, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x44, 0x65, 0x63, 0x72, 0x65, 0x61,
+	0x75, 0x74, 0x6f, 0x53, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x44, 0x65, 0x63, 0x72, 0x65, 0x61,
 	0x73, 0x69, 0x6e, 0x67, 0x47, 0x72, 0x61, 0x64, 0x69, 0x65, 0x6e, 0x74, 0x2e, 0x50, 0x61, 0x72,
 	0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x52, 0x0a, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74,
 	0x65, 0x72, 0x73, 0x1a, 0x45, 0x0a, 0x0a, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72,
@@ -9263,7 +9263,7 @@ var file_aperture_policy_language_v1_policy_proto_rawDesc = []byte{
 	0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x12, 0x65, 0x0a, 0x0a, 0x63, 0x6f, 0x6e, 0x74, 0x72,
 	0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x45, 0x2e, 0x61, 0x70,
 	0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61,
-	0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x75, 0x74, 0x6f, 0x73, 0x63,
+	0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x75, 0x74, 0x6f, 0x53, 0x63,
 	0x61, 0x6c, 0x65, 0x72, 0x2e, 0x53, 0x63, 0x61, 0x6c, 0x65, 0x4f, 0x75, 0x74, 0x43, 0x6f, 0x6e,
 	0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2e, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c,
 	0x65, 0x72, 0x52, 0x0a, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x12, 0x5e,
@@ -9277,7 +9277,7 @@ var file_aperture_policy_language_v1_policy_proto_rawDesc = []byte{
 	0x67, 0x72, 0x61, 0x64, 0x69, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x3a,
 	0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79,
 	0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x75, 0x74,
-	0x6f, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x49, 0x6e, 0x63, 0x72, 0x65, 0x61, 0x73, 0x69,
+	0x6f, 0x53, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x49, 0x6e, 0x63, 0x72, 0x65, 0x61, 0x73, 0x69,
 	0x6e, 0x67, 0x47, 0x72, 0x61, 0x64, 0x69, 0x65, 0x6e, 0x74, 0x48, 0x00, 0x52, 0x08, 0x67, 0x72,
 	0x61, 0x64, 0x69, 0x65, 0x6e, 0x74, 0x42, 0x0c, 0x0a, 0x0a, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f,
 	0x6c, 0x6c, 0x65, 0x72, 0x1a, 0xcf, 0x02, 0x0a, 0x11, 0x53, 0x63, 0x61, 0x6c, 0x65, 0x49, 0x6e,
@@ -9285,7 +9285,7 @@ var file_aperture_policy_language_v1_policy_proto_rawDesc = []byte{
 	0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x44,
 	0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79,
 	0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x75, 0x74,
-	0x6f, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x53, 0x63, 0x61, 0x6c, 0x65, 0x49, 0x6e, 0x43,
+	0x6f, 0x53, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x53, 0x63, 0x61, 0x6c, 0x65, 0x49, 0x6e, 0x43,
 	0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2e, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f,
 	0x6c, 0x6c, 0x65, 0x72, 0x52, 0x0a, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72,
 	0x12, 0x5e, 0x0a, 0x12, 0x61, 0x6c, 0x65, 0x72, 0x74, 0x65, 0x72, 0x5f, 0x70, 0x61, 0x72, 0x61,
@@ -9298,7 +9298,7 @@ var file_aperture_policy_language_v1_policy_proto_rawDesc = []byte{
 	0x0a, 0x08, 0x67, 0x72, 0x61, 0x64, 0x69, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
 	0x32, 0x3a, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69,
 	0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x41,
-	0x75, 0x74, 0x6f, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x44, 0x65, 0x63, 0x72, 0x65, 0x61,
+	0x75, 0x74, 0x6f, 0x53, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x44, 0x65, 0x63, 0x72, 0x65, 0x61,
 	0x73, 0x69, 0x6e, 0x67, 0x47, 0x72, 0x61, 0x64, 0x69, 0x65, 0x6e, 0x74, 0x48, 0x00, 0x52, 0x08,
 	0x67, 0x72, 0x61, 0x64, 0x69, 0x65, 0x6e, 0x74, 0x42, 0x0c, 0x0a, 0x0a, 0x63, 0x6f, 0x6e, 0x74,
 	0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x1a, 0x81, 0x01, 0x0a, 0x06, 0x53, 0x63, 0x61, 0x6c, 0x65,
@@ -9306,7 +9306,7 @@ var file_aperture_policy_language_v1_policy_proto_rawDesc = []byte{
 	0x72, 0x65, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x3a,
 	0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79,
 	0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x75, 0x74,
-	0x6f, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x4b, 0x75, 0x62, 0x65, 0x72, 0x6e, 0x65, 0x74,
+	0x6f, 0x53, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x2e, 0x4b, 0x75, 0x62, 0x65, 0x72, 0x6e, 0x65, 0x74,
 	0x65, 0x73, 0x52, 0x65, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x73, 0x48, 0x00, 0x52, 0x12, 0x6b, 0x75,
 	0x62, 0x65, 0x72, 0x6e, 0x65, 0x74, 0x65, 0x73, 0x52, 0x65, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x73,
 	0x42, 0x08, 0x0a, 0x06, 0x73, 0x63, 0x61, 0x6c, 0x65, 0x72, 0x1a, 0xa2, 0x02, 0x0a, 0x12, 0x4b,
@@ -9429,7 +9429,7 @@ var file_aperture_policy_language_v1_policy_proto_goTypes = []interface{}{
 	(*NestedSignalIngress)(nil),                      // 38: aperture.policy.language.v1.NestedSignalIngress
 	(*NestedSignalEgress)(nil),                       // 39: aperture.policy.language.v1.NestedSignalEgress
 	(*AIMDConcurrencyController)(nil),                // 40: aperture.policy.language.v1.AIMDConcurrencyController
-	(*Autoscaler)(nil),                               // 41: aperture.policy.language.v1.Autoscaler
+	(*AutoScaler)(nil),                               // 41: aperture.policy.language.v1.AutoScaler
 	nil,                                              // 42: aperture.policy.language.v1.Policies.PoliciesEntry
 	nil,                                              // 43: aperture.policy.language.v1.Resources.FluxMetersEntry
 	(*GradientController_Parameters)(nil),            // 44: aperture.policy.language.v1.GradientController.Parameters
@@ -9497,19 +9497,19 @@ var file_aperture_policy_language_v1_policy_proto_goTypes = []interface{}{
 	(*NestedSignalEgress_Ins)(nil),                   // 106: aperture.policy.language.v1.NestedSignalEgress.Ins
 	(*AIMDConcurrencyController_Ins)(nil),            // 107: aperture.policy.language.v1.AIMDConcurrencyController.Ins
 	(*AIMDConcurrencyController_Outs)(nil),           // 108: aperture.policy.language.v1.AIMDConcurrencyController.Outs
-	(*Autoscaler_IncreasingGradient)(nil),            // 109: aperture.policy.language.v1.Autoscaler.IncreasingGradient
-	(*Autoscaler_DecreasingGradient)(nil),            // 110: aperture.policy.language.v1.Autoscaler.DecreasingGradient
-	(*Autoscaler_ScaleOutController)(nil),            // 111: aperture.policy.language.v1.Autoscaler.ScaleOutController
-	(*Autoscaler_ScaleInController)(nil),             // 112: aperture.policy.language.v1.Autoscaler.ScaleInController
-	(*Autoscaler_Scaler)(nil),                        // 113: aperture.policy.language.v1.Autoscaler.Scaler
-	(*Autoscaler_KubernetesReplicas)(nil),            // 114: aperture.policy.language.v1.Autoscaler.KubernetesReplicas
-	(*Autoscaler_Outs)(nil),                          // 115: aperture.policy.language.v1.Autoscaler.Outs
-	(*Autoscaler_IncreasingGradient_Parameters)(nil), // 116: aperture.policy.language.v1.Autoscaler.IncreasingGradient.Parameters
-	(*Autoscaler_IncreasingGradient_Ins)(nil),        // 117: aperture.policy.language.v1.Autoscaler.IncreasingGradient.Ins
-	(*Autoscaler_DecreasingGradient_Parameters)(nil), // 118: aperture.policy.language.v1.Autoscaler.DecreasingGradient.Parameters
-	(*Autoscaler_DecreasingGradient_Ins)(nil),        // 119: aperture.policy.language.v1.Autoscaler.DecreasingGradient.Ins
-	(*Autoscaler_ScaleOutController_Controller)(nil), // 120: aperture.policy.language.v1.Autoscaler.ScaleOutController.Controller
-	(*Autoscaler_ScaleInController_Controller)(nil),  // 121: aperture.policy.language.v1.Autoscaler.ScaleInController.Controller
+	(*AutoScaler_IncreasingGradient)(nil),            // 109: aperture.policy.language.v1.AutoScaler.IncreasingGradient
+	(*AutoScaler_DecreasingGradient)(nil),            // 110: aperture.policy.language.v1.AutoScaler.DecreasingGradient
+	(*AutoScaler_ScaleOutController)(nil),            // 111: aperture.policy.language.v1.AutoScaler.ScaleOutController
+	(*AutoScaler_ScaleInController)(nil),             // 112: aperture.policy.language.v1.AutoScaler.ScaleInController
+	(*AutoScaler_Scaler)(nil),                        // 113: aperture.policy.language.v1.AutoScaler.Scaler
+	(*AutoScaler_KubernetesReplicas)(nil),            // 114: aperture.policy.language.v1.AutoScaler.KubernetesReplicas
+	(*AutoScaler_Outs)(nil),                          // 115: aperture.policy.language.v1.AutoScaler.Outs
+	(*AutoScaler_IncreasingGradient_Parameters)(nil), // 116: aperture.policy.language.v1.AutoScaler.IncreasingGradient.Parameters
+	(*AutoScaler_IncreasingGradient_Ins)(nil),        // 117: aperture.policy.language.v1.AutoScaler.IncreasingGradient.Ins
+	(*AutoScaler_DecreasingGradient_Parameters)(nil), // 118: aperture.policy.language.v1.AutoScaler.DecreasingGradient.Parameters
+	(*AutoScaler_DecreasingGradient_Ins)(nil),        // 119: aperture.policy.language.v1.AutoScaler.DecreasingGradient.Ins
+	(*AutoScaler_ScaleOutController_Controller)(nil), // 120: aperture.policy.language.v1.AutoScaler.ScaleOutController.Controller
+	(*AutoScaler_ScaleInController_Controller)(nil),  // 121: aperture.policy.language.v1.AutoScaler.ScaleInController.Controller
 	(*durationpb.Duration)(nil),                      // 122: google.protobuf.Duration
 	(*Classifier)(nil),                               // 123: aperture.policy.language.v1.Classifier
 	(*FlowSelector)(nil),                             // 124: aperture.policy.language.v1.FlowSelector
@@ -9557,7 +9557,7 @@ var file_aperture_policy_language_v1_policy_proto_depIdxs = []int32{
 	17,  // 35: aperture.policy.language.v1.FlowControl.concurrency_limiter:type_name -> aperture.policy.language.v1.ConcurrencyLimiter
 	40,  // 36: aperture.policy.language.v1.FlowControl.aimd_concurrency_controller:type_name -> aperture.policy.language.v1.AIMDConcurrencyController
 	34,  // 37: aperture.policy.language.v1.AutoScale.pod_scaler:type_name -> aperture.policy.language.v1.PodScaler
-	41,  // 38: aperture.policy.language.v1.AutoScale.autoscaler:type_name -> aperture.policy.language.v1.Autoscaler
+	41,  // 38: aperture.policy.language.v1.AutoScale.autoscaler:type_name -> aperture.policy.language.v1.AutoScaler
 	21,  // 39: aperture.policy.language.v1.InPort.constant_signal:type_name -> aperture.policy.language.v1.ConstantSignal
 	46,  // 40: aperture.policy.language.v1.GradientController.in_ports:type_name -> aperture.policy.language.v1.GradientController.Ins
 	47,  // 41: aperture.policy.language.v1.GradientController.out_ports:type_name -> aperture.policy.language.v1.GradientController.Outs
@@ -9634,14 +9634,14 @@ var file_aperture_policy_language_v1_policy_proto_depIdxs = []int32{
 	44,  // 112: aperture.policy.language.v1.AIMDConcurrencyController.gradient_parameters:type_name -> aperture.policy.language.v1.GradientController.Parameters
 	88,  // 113: aperture.policy.language.v1.AIMDConcurrencyController.alerter_parameters:type_name -> aperture.policy.language.v1.Alerter.Parameters
 	66,  // 114: aperture.policy.language.v1.AIMDConcurrencyController.default_config:type_name -> aperture.policy.language.v1.LoadActuator.DynamicConfig
-	115, // 115: aperture.policy.language.v1.Autoscaler.out_ports:type_name -> aperture.policy.language.v1.Autoscaler.Outs
-	113, // 116: aperture.policy.language.v1.Autoscaler.scaler:type_name -> aperture.policy.language.v1.Autoscaler.Scaler
-	111, // 117: aperture.policy.language.v1.Autoscaler.scale_out_controllers:type_name -> aperture.policy.language.v1.Autoscaler.ScaleOutController
-	112, // 118: aperture.policy.language.v1.Autoscaler.scale_in_controllers:type_name -> aperture.policy.language.v1.Autoscaler.ScaleInController
-	122, // 119: aperture.policy.language.v1.Autoscaler.scale_out_cooldown:type_name -> google.protobuf.Duration
-	122, // 120: aperture.policy.language.v1.Autoscaler.scale_in_cooldown:type_name -> google.protobuf.Duration
-	88,  // 121: aperture.policy.language.v1.Autoscaler.scale_out_alerter_parameters:type_name -> aperture.policy.language.v1.Alerter.Parameters
-	88,  // 122: aperture.policy.language.v1.Autoscaler.scale_in_alerter_parameters:type_name -> aperture.policy.language.v1.Alerter.Parameters
+	115, // 115: aperture.policy.language.v1.AutoScaler.out_ports:type_name -> aperture.policy.language.v1.AutoScaler.Outs
+	113, // 116: aperture.policy.language.v1.AutoScaler.scaler:type_name -> aperture.policy.language.v1.AutoScaler.Scaler
+	111, // 117: aperture.policy.language.v1.AutoScaler.scale_out_controllers:type_name -> aperture.policy.language.v1.AutoScaler.ScaleOutController
+	112, // 118: aperture.policy.language.v1.AutoScaler.scale_in_controllers:type_name -> aperture.policy.language.v1.AutoScaler.ScaleInController
+	122, // 119: aperture.policy.language.v1.AutoScaler.scale_out_cooldown:type_name -> google.protobuf.Duration
+	122, // 120: aperture.policy.language.v1.AutoScaler.scale_in_cooldown:type_name -> google.protobuf.Duration
+	88,  // 121: aperture.policy.language.v1.AutoScaler.scale_out_alerter_parameters:type_name -> aperture.policy.language.v1.Alerter.Parameters
+	88,  // 122: aperture.policy.language.v1.AutoScaler.scale_in_alerter_parameters:type_name -> aperture.policy.language.v1.Alerter.Parameters
 	2,   // 123: aperture.policy.language.v1.Policies.PoliciesEntry.value:type_name -> aperture.policy.language.v1.Policy
 	126, // 124: aperture.policy.language.v1.Resources.FluxMetersEntry.value:type_name -> aperture.policy.language.v1.FluxMeter
 	9,   // 125: aperture.policy.language.v1.GradientController.Ins.signal:type_name -> aperture.policy.language.v1.InPort
@@ -9730,26 +9730,26 @@ var file_aperture_policy_language_v1_policy_proto_depIdxs = []int32{
 	10,  // 208: aperture.policy.language.v1.AIMDConcurrencyController.Outs.observed_load_multiplier:type_name -> aperture.policy.language.v1.OutPort
 	10,  // 209: aperture.policy.language.v1.AIMDConcurrencyController.Outs.accepted_concurrency:type_name -> aperture.policy.language.v1.OutPort
 	10,  // 210: aperture.policy.language.v1.AIMDConcurrencyController.Outs.incoming_concurrency:type_name -> aperture.policy.language.v1.OutPort
-	117, // 211: aperture.policy.language.v1.Autoscaler.IncreasingGradient.in_ports:type_name -> aperture.policy.language.v1.Autoscaler.IncreasingGradient.Ins
-	116, // 212: aperture.policy.language.v1.Autoscaler.IncreasingGradient.parameters:type_name -> aperture.policy.language.v1.Autoscaler.IncreasingGradient.Parameters
-	119, // 213: aperture.policy.language.v1.Autoscaler.DecreasingGradient.in_ports:type_name -> aperture.policy.language.v1.Autoscaler.DecreasingGradient.Ins
-	118, // 214: aperture.policy.language.v1.Autoscaler.DecreasingGradient.parameters:type_name -> aperture.policy.language.v1.Autoscaler.DecreasingGradient.Parameters
-	120, // 215: aperture.policy.language.v1.Autoscaler.ScaleOutController.controller:type_name -> aperture.policy.language.v1.Autoscaler.ScaleOutController.Controller
-	88,  // 216: aperture.policy.language.v1.Autoscaler.ScaleOutController.alerter_parameters:type_name -> aperture.policy.language.v1.Alerter.Parameters
-	121, // 217: aperture.policy.language.v1.Autoscaler.ScaleInController.controller:type_name -> aperture.policy.language.v1.Autoscaler.ScaleInController.Controller
-	88,  // 218: aperture.policy.language.v1.Autoscaler.ScaleInController.alerter_parameters:type_name -> aperture.policy.language.v1.Alerter.Parameters
-	114, // 219: aperture.policy.language.v1.Autoscaler.Scaler.kubernetes_replicas:type_name -> aperture.policy.language.v1.Autoscaler.KubernetesReplicas
-	125, // 220: aperture.policy.language.v1.Autoscaler.KubernetesReplicas.kubernetes_object_selector:type_name -> aperture.policy.language.v1.KubernetesObjectSelector
-	98,  // 221: aperture.policy.language.v1.Autoscaler.KubernetesReplicas.default_config:type_name -> aperture.policy.language.v1.PodScaler.ScaleActuator.DynamicConfig
-	10,  // 222: aperture.policy.language.v1.Autoscaler.Outs.actual_scale:type_name -> aperture.policy.language.v1.OutPort
-	10,  // 223: aperture.policy.language.v1.Autoscaler.Outs.configured_scale:type_name -> aperture.policy.language.v1.OutPort
-	10,  // 224: aperture.policy.language.v1.Autoscaler.Outs.desired_scale:type_name -> aperture.policy.language.v1.OutPort
-	9,   // 225: aperture.policy.language.v1.Autoscaler.IncreasingGradient.Ins.signal:type_name -> aperture.policy.language.v1.InPort
-	9,   // 226: aperture.policy.language.v1.Autoscaler.IncreasingGradient.Ins.setpoint:type_name -> aperture.policy.language.v1.InPort
-	9,   // 227: aperture.policy.language.v1.Autoscaler.DecreasingGradient.Ins.signal:type_name -> aperture.policy.language.v1.InPort
-	9,   // 228: aperture.policy.language.v1.Autoscaler.DecreasingGradient.Ins.setpoint:type_name -> aperture.policy.language.v1.InPort
-	109, // 229: aperture.policy.language.v1.Autoscaler.ScaleOutController.Controller.gradient:type_name -> aperture.policy.language.v1.Autoscaler.IncreasingGradient
-	110, // 230: aperture.policy.language.v1.Autoscaler.ScaleInController.Controller.gradient:type_name -> aperture.policy.language.v1.Autoscaler.DecreasingGradient
+	117, // 211: aperture.policy.language.v1.AutoScaler.IncreasingGradient.in_ports:type_name -> aperture.policy.language.v1.AutoScaler.IncreasingGradient.Ins
+	116, // 212: aperture.policy.language.v1.AutoScaler.IncreasingGradient.parameters:type_name -> aperture.policy.language.v1.AutoScaler.IncreasingGradient.Parameters
+	119, // 213: aperture.policy.language.v1.AutoScaler.DecreasingGradient.in_ports:type_name -> aperture.policy.language.v1.AutoScaler.DecreasingGradient.Ins
+	118, // 214: aperture.policy.language.v1.AutoScaler.DecreasingGradient.parameters:type_name -> aperture.policy.language.v1.AutoScaler.DecreasingGradient.Parameters
+	120, // 215: aperture.policy.language.v1.AutoScaler.ScaleOutController.controller:type_name -> aperture.policy.language.v1.AutoScaler.ScaleOutController.Controller
+	88,  // 216: aperture.policy.language.v1.AutoScaler.ScaleOutController.alerter_parameters:type_name -> aperture.policy.language.v1.Alerter.Parameters
+	121, // 217: aperture.policy.language.v1.AutoScaler.ScaleInController.controller:type_name -> aperture.policy.language.v1.AutoScaler.ScaleInController.Controller
+	88,  // 218: aperture.policy.language.v1.AutoScaler.ScaleInController.alerter_parameters:type_name -> aperture.policy.language.v1.Alerter.Parameters
+	114, // 219: aperture.policy.language.v1.AutoScaler.Scaler.kubernetes_replicas:type_name -> aperture.policy.language.v1.AutoScaler.KubernetesReplicas
+	125, // 220: aperture.policy.language.v1.AutoScaler.KubernetesReplicas.kubernetes_object_selector:type_name -> aperture.policy.language.v1.KubernetesObjectSelector
+	98,  // 221: aperture.policy.language.v1.AutoScaler.KubernetesReplicas.default_config:type_name -> aperture.policy.language.v1.PodScaler.ScaleActuator.DynamicConfig
+	10,  // 222: aperture.policy.language.v1.AutoScaler.Outs.actual_scale:type_name -> aperture.policy.language.v1.OutPort
+	10,  // 223: aperture.policy.language.v1.AutoScaler.Outs.configured_scale:type_name -> aperture.policy.language.v1.OutPort
+	10,  // 224: aperture.policy.language.v1.AutoScaler.Outs.desired_scale:type_name -> aperture.policy.language.v1.OutPort
+	9,   // 225: aperture.policy.language.v1.AutoScaler.IncreasingGradient.Ins.signal:type_name -> aperture.policy.language.v1.InPort
+	9,   // 226: aperture.policy.language.v1.AutoScaler.IncreasingGradient.Ins.setpoint:type_name -> aperture.policy.language.v1.InPort
+	9,   // 227: aperture.policy.language.v1.AutoScaler.DecreasingGradient.Ins.signal:type_name -> aperture.policy.language.v1.InPort
+	9,   // 228: aperture.policy.language.v1.AutoScaler.DecreasingGradient.Ins.setpoint:type_name -> aperture.policy.language.v1.InPort
+	109, // 229: aperture.policy.language.v1.AutoScaler.ScaleOutController.Controller.gradient:type_name -> aperture.policy.language.v1.AutoScaler.IncreasingGradient
+	110, // 230: aperture.policy.language.v1.AutoScaler.ScaleInController.Controller.gradient:type_name -> aperture.policy.language.v1.AutoScaler.DecreasingGradient
 	128, // 231: aperture.policy.language.v1.PolicyService.GetPolicies:input_type -> google.protobuf.Empty
 	0,   // 232: aperture.policy.language.v1.PolicyService.GetPolicies:output_type -> aperture.policy.language.v1.GetPoliciesResponse
 	232, // [232:233] is the sub-list for method output_type
@@ -10262,7 +10262,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Autoscaler); i {
+			switch v := v.(*AutoScaler); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11018,7 +11018,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[109].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Autoscaler_IncreasingGradient); i {
+			switch v := v.(*AutoScaler_IncreasingGradient); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11030,7 +11030,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[110].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Autoscaler_DecreasingGradient); i {
+			switch v := v.(*AutoScaler_DecreasingGradient); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11042,7 +11042,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[111].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Autoscaler_ScaleOutController); i {
+			switch v := v.(*AutoScaler_ScaleOutController); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11054,7 +11054,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[112].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Autoscaler_ScaleInController); i {
+			switch v := v.(*AutoScaler_ScaleInController); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11066,7 +11066,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[113].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Autoscaler_Scaler); i {
+			switch v := v.(*AutoScaler_Scaler); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11078,7 +11078,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[114].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Autoscaler_KubernetesReplicas); i {
+			switch v := v.(*AutoScaler_KubernetesReplicas); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11090,7 +11090,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[115].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Autoscaler_Outs); i {
+			switch v := v.(*AutoScaler_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11102,7 +11102,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[116].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Autoscaler_IncreasingGradient_Parameters); i {
+			switch v := v.(*AutoScaler_IncreasingGradient_Parameters); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11114,7 +11114,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[117].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Autoscaler_IncreasingGradient_Ins); i {
+			switch v := v.(*AutoScaler_IncreasingGradient_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11126,7 +11126,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[118].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Autoscaler_DecreasingGradient_Parameters); i {
+			switch v := v.(*AutoScaler_DecreasingGradient_Parameters); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11138,7 +11138,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[119].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Autoscaler_DecreasingGradient_Ins); i {
+			switch v := v.(*AutoScaler_DecreasingGradient_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11150,7 +11150,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[120].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Autoscaler_ScaleOutController_Controller); i {
+			switch v := v.(*AutoScaler_ScaleOutController_Controller); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11162,7 +11162,7 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_policy_proto_msgTypes[121].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Autoscaler_ScaleInController_Controller); i {
+			switch v := v.(*AutoScaler_ScaleInController_Controller); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11225,13 +11225,13 @@ func file_aperture_policy_language_v1_policy_proto_init() {
 		(*ConstantSignal_Value)(nil),
 	}
 	file_aperture_policy_language_v1_policy_proto_msgTypes[113].OneofWrappers = []interface{}{
-		(*Autoscaler_Scaler_KubernetesReplicas)(nil),
+		(*AutoScaler_Scaler_KubernetesReplicas)(nil),
 	}
 	file_aperture_policy_language_v1_policy_proto_msgTypes[120].OneofWrappers = []interface{}{
-		(*Autoscaler_ScaleOutController_Controller_Gradient)(nil),
+		(*AutoScaler_ScaleOutController_Controller_Gradient)(nil),
 	}
 	file_aperture_policy_language_v1_policy_proto_msgTypes[121].OneofWrappers = []interface{}{
-		(*Autoscaler_ScaleInController_Controller_Gradient)(nil),
+		(*AutoScaler_ScaleInController_Controller_Gradient)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

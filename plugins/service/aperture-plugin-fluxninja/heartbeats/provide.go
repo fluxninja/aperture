@@ -14,7 +14,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/cache"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/entities"
-	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/etcd/election"
 	"github.com/fluxninja/aperture/pkg/jobs"
@@ -22,6 +21,7 @@ import (
 	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
 	httpclient "github.com/fluxninja/aperture/pkg/net/http"
 	"github.com/fluxninja/aperture/pkg/peers"
+	autoscalediscovery "github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/discovery"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -59,21 +59,16 @@ type ConstructorIn struct {
 	AgentInfo                        *agentinfo.AgentInfo `optional:"true"`
 	PeersWatcher                     *peers.PeerDiscovery `name:"fluxninja-peers-watcher" optional:"true"`
 	EtcdClient                       *etcdclient.Client
-	Election                         *election.Election                     `optional:"true"`
-	PolicyFactory                    *controlplane.PolicyFactory            `optional:"true"`
-	FlowControlPoints                *cache.Cache[selectors.ControlPointID] `optional:"true"`
-	AutoscaleKubernetesControlPoints kubernetes.AutoscaleControlPoints      `optional:"true"`
+	Election                         *election.Election                        `optional:"true"`
+	PolicyFactory                    *controlplane.PolicyFactory               `optional:"true"`
+	FlowControlPoints                *cache.Cache[selectors.ControlPointID]    `optional:"true"`
+	AutoscaleKubernetesControlPoints autoscalediscovery.AutoScaleControlPoints `optional:"true"`
 }
 
 // Provide provides a new instance of Heartbeats.
 func Provide(in ConstructorIn) (*Heartbeats, error) {
 	var config pluginconfig.FluxNinjaPluginConfig
 	if err := in.Unmarshaller.UnmarshalKey(pluginconfig.PluginConfigKey, &config); err != nil {
-		return nil, err
-	}
-
-	var discoveryConfig kubernetes.KubernetesDiscoveryConfig
-	if err := in.Unmarshaller.UnmarshalKey(kubernetes.ConfigKey, &discoveryConfig); err != nil {
 		return nil, err
 	}
 

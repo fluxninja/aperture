@@ -31,6 +31,7 @@ Generated File Starts
 | Key                 | Reference                              |
 | ------------------- | -------------------------------------- |
 | `agent_info`        | [AgentInfo](#agent-info)               |
+| `auto_scale`        | [AutoScaleConfig](#auto-scale-config)  |
 | `client`            | [Client](#client)                      |
 | `dist_cache`        | [DistCache](#dist-cache)               |
 | `etcd`              | [Etcd](#etcd)                          |
@@ -66,6 +67,22 @@ Generated File Starts
 
 ([AgentInfoConfig](#agent-info-config))
 Env-Var Prefix: `APERTURE_AGENT_AGENT_INFO_`
+
+</dd>
+
+</dl>
+
+---
+
+### _auto_scale_ {#auto-scale-config}
+
+<dl>
+
+<dt>kubernetes</dt>
+<dd>
+
+([AutoScaleKubernetesConfig](#auto-scale-kubernetes-config))
+Env-Var Prefix: `APERTURE_AGENT_AUTO_SCALE_KUBERNETES_`
 
 </dd>
 
@@ -520,6 +537,21 @@ By default `kubeletstats` custom metrics is added, which can be overwritten.
 <dd>
 
 ([PortsConfig](#ports-config))
+
+</dd>
+</dl>
+
+---
+
+### AutoScaleKubernetesConfig {#auto-scale-kubernetes-config}
+
+AutoScaleKubernetesConfig is the configuration for the flow preview service.
+
+<dl>
+<dt>enabled</dt>
+<dd>
+
+(bool, default: `true`) Enables the Kubernetes autoscale capability.
 
 </dd>
 </dl>
@@ -1269,13 +1301,7 @@ is ignored.
 KubernetesDiscoveryConfig for Kubernetes service discovery.
 
 <dl>
-<dt>autoscale_enabled</dt>
-<dd>
-
-(bool, default: `true`)
-
-</dd>
-<dt>discovery_enabled</dt>
+<dt>enabled</dt>
 <dd>
 
 (bool, default: `true`)

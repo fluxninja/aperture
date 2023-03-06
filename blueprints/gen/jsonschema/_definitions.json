@@ -309,8 +309,8 @@
       "description": "AutoScale components are used to scale a service.",
       "properties": {
         "autoscaler": {
-          "$ref": "#/definitions/Autoscaler",
-          "description": "Autoscaler provides auto scaling functionality for any resource.",
+          "$ref": "#/definitions/AutoScaler",
+          "description": "AutoScaler provides auto scaling functionality for any resource.",
           "x-order": 0
         },
         "pod_scaler": {
@@ -322,7 +322,7 @@
       "type": "object",
       "additionalProperties": false
     },
-    "Autoscaler": {
+    "AutoScaler": {
       "properties": {
         "cooldown_override_percentage": {
           "default": 50,
@@ -365,8 +365,8 @@
           "x-order": 4
         },
         "out_ports": {
-          "$ref": "#/definitions/AutoscalerOuts",
-          "description": "Output ports for the Autoscaler.",
+          "$ref": "#/definitions/AutoScalerOuts",
+          "description": "Output ports for the AutoScaler.",
           "x-order": 5
         },
         "scale_in_alerter_parameters": {
@@ -377,7 +377,7 @@
         "scale_in_controllers": {
           "description": "List of Controllers for scaling in.",
           "items": {
-            "$ref": "#/definitions/AutoscalerScaleInController"
+            "$ref": "#/definitions/AutoScalerScaleInController"
           },
           "type": "array",
           "x-order": 7
@@ -397,7 +397,7 @@
         "scale_out_controllers": {
           "description": "List of Controllers for scaling out.",
           "items": {
-            "$ref": "#/definitions/AutoscalerScaleOutController"
+            "$ref": "#/definitions/AutoScalerScaleOutController"
           },
           "type": "array",
           "x-order": 10
@@ -410,25 +410,25 @@
           "x-order": 11
         },
         "scaler": {
-          "$ref": "#/definitions/AutoscalerScaler",
+          "$ref": "#/definitions/AutoScalerScaler",
           "x-go-tag-validate": "required",
           "x-order": 12
         }
       },
-      "title": "Autoscaler",
+      "title": "AutoScaler",
       "type": "object",
       "additionalProperties": false
     },
-    "AutoscalerDecreasingGradient": {
+    "AutoScalerDecreasingGradient": {
       "description": "Decreasing Gradient defines a controller for scaling in based on Gradient Controller.",
       "properties": {
         "in_ports": {
-          "$ref": "#/definitions/AutoscalerDecreasingGradientIns",
+          "$ref": "#/definitions/AutoScalerDecreasingGradientIns",
           "description": "Input ports for the Gradient.",
           "x-order": 0
         },
         "parameters": {
-          "$ref": "#/definitions/AutoscalerDecreasingGradientParameters",
+          "$ref": "#/definitions/AutoScalerDecreasingGradientParameters",
           "title": "Gradient parameters for the controller. Defaults and constraints:\n* slope = 1\n* min_gradient = -Inf (must be less than 1)\n* max_gradient = 1 (cannot be changed)",
           "x-order": 1
         }
@@ -436,7 +436,7 @@
       "type": "object",
       "additionalProperties": false
     },
-    "AutoscalerDecreasingGradientIns": {
+    "AutoScalerDecreasingGradientIns": {
       "description": "Inputs for Gradient.",
       "properties": {
         "setpoint": {
@@ -453,7 +453,7 @@
       "type": "object",
       "additionalProperties": false
     },
-    "AutoscalerDecreasingGradientParameters": {
+    "AutoScalerDecreasingGradientParameters": {
       "description": "This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).",
       "properties": {
         "min_gradient": {
@@ -475,16 +475,16 @@
       "type": "object",
       "additionalProperties": false
     },
-    "AutoscalerIncreasingGradient": {
+    "AutoScalerIncreasingGradient": {
       "description": "Increasing Gradient defines a controller for scaling out based on Gradient Controller.",
       "properties": {
         "in_ports": {
-          "$ref": "#/definitions/AutoscalerIncreasingGradientIns",
+          "$ref": "#/definitions/AutoScalerIncreasingGradientIns",
           "description": "Input ports for the Gradient.",
           "x-order": 0
         },
         "parameters": {
-          "$ref": "#/definitions/AutoscalerIncreasingGradientParameters",
+          "$ref": "#/definitions/AutoScalerIncreasingGradientParameters",
           "title": "Gradient parameters for the controller. Defaults and constraints:\n* slope = 1\n* min_gradient = 1 (cannot be changed)\n* max_gradient = +Inf (must be greater than 1)",
           "x-order": 1
         }
@@ -492,7 +492,7 @@
       "type": "object",
       "additionalProperties": false
     },
-    "AutoscalerIncreasingGradientIns": {
+    "AutoScalerIncreasingGradientIns": {
       "description": "Inputs for Gradient.",
       "properties": {
         "setpoint": {
@@ -509,7 +509,7 @@
       "type": "object",
       "additionalProperties": false
     },
-    "AutoscalerIncreasingGradientParameters": {
+    "AutoScalerIncreasingGradientParameters": {
       "description": "This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).",
       "properties": {
         "max_gradient": {
@@ -531,7 +531,7 @@
       "type": "object",
       "additionalProperties": false
     },
-    "AutoscalerKubernetesReplicas": {
+    "AutoScalerKubernetesReplicas": {
       "description": "KubernetesReplicas defines a horizontal pod scaler for Kubernetes.",
       "properties": {
         "default_config": {
@@ -554,8 +554,8 @@
       "type": "object",
       "additionalProperties": false
     },
-    "AutoscalerOuts": {
-      "description": "Outputs for Autoscaler.",
+    "AutoScalerOuts": {
+      "description": "Outputs for AutoScaler.",
       "properties": {
         "actual_scale": {
           "$ref": "#/definitions/OutPort",
@@ -573,7 +573,7 @@
       "type": "object",
       "additionalProperties": false
     },
-    "AutoscalerScaleInController": {
+    "AutoScalerScaleInController": {
       "properties": {
         "alerter_parameters": {
           "$ref": "#/definitions/AlerterParameters",
@@ -581,7 +581,7 @@
           "x-order": 0
         },
         "controller": {
-          "$ref": "#/definitions/AutoscalerScaleInControllerController",
+          "$ref": "#/definitions/AutoScalerScaleInControllerController",
           "title": "Controller",
           "x-order": 1
         }
@@ -589,17 +589,17 @@
       "type": "object",
       "additionalProperties": false
     },
-    "AutoscalerScaleInControllerController": {
+    "AutoScalerScaleInControllerController": {
       "properties": {
         "gradient": {
-          "$ref": "#/definitions/AutoscalerDecreasingGradient",
+          "$ref": "#/definitions/AutoScalerDecreasingGradient",
           "x-order": 0
         }
       },
       "type": "object",
       "additionalProperties": false
     },
-    "AutoscalerScaleOutController": {
+    "AutoScalerScaleOutController": {
       "properties": {
         "alerter_parameters": {
           "$ref": "#/definitions/AlerterParameters",
@@ -607,7 +607,7 @@
           "x-order": 0
         },
         "controller": {
-          "$ref": "#/definitions/AutoscalerScaleOutControllerController",
+          "$ref": "#/definitions/AutoScalerScaleOutControllerController",
           "title": "Controller",
           "x-go-tag-validate": "required",
           "x-order": 1
@@ -616,20 +616,20 @@
       "type": "object",
       "additionalProperties": false
     },
-    "AutoscalerScaleOutControllerController": {
+    "AutoScalerScaleOutControllerController": {
       "properties": {
         "gradient": {
-          "$ref": "#/definitions/AutoscalerIncreasingGradient",
+          "$ref": "#/definitions/AutoScalerIncreasingGradient",
           "x-order": 0
         }
       },
       "type": "object",
       "additionalProperties": false
     },
-    "AutoscalerScaler": {
+    "AutoScalerScaler": {
       "properties": {
         "kubernetes_replicas": {
-          "$ref": "#/definitions/AutoscalerKubernetesReplicas",
+          "$ref": "#/definitions/AutoScalerKubernetesReplicas",
           "x-order": 0
         }
       },

@@ -25,7 +25,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/peers"
 	"github.com/fluxninja/aperture/pkg/platform"
-	autoscalekubernetes "github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes"
+	"github.com/fluxninja/aperture/pkg/policies/autoscale"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/rpc"
@@ -47,7 +47,7 @@ func main() {
 		),
 		distcache.Module(),
 		flowcontrol.Module(),
-		autoscalekubernetes.Module(),
+		autoscale.Module(),
 		otelcollector.Module(),
 		agent.ModuleForAgentOTEL(),
 		discovery.Module(),

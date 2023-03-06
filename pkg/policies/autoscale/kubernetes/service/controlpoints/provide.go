@@ -13,11 +13,11 @@ func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(NewHandler),
 		fx.Invoke(RegisterControlPointCacheService),
-		grpcgateway.RegisterHandler{Handler: controlpointsv1.RegisterAutoscaleKubernetesControlPointsServiceHandlerFromEndpoint}.Annotate(),
+		grpcgateway.RegisterHandler{Handler: controlpointsv1.RegisterAutoScaleKubernetesControlPointsServiceHandlerFromEndpoint}.Annotate(),
 	)
 }
 
 // RegisterControlPointCacheService registers the ControlPointCache service handler with the gRPC server.
 func RegisterControlPointCacheService(handler *Handler, server *grpc.Server) {
-	controlpointsv1.RegisterAutoscaleKubernetesControlPointsServiceServer(server, handler)
+	controlpointsv1.RegisterAutoScaleKubernetesControlPointsServiceServer(server, handler)
 }
