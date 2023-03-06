@@ -48,7 +48,7 @@ func (h *Handler) ListControlPoints(
 			continue
 		}
 
-		for _, protoCp := range resp.Success.FlowControlPoints.FlowControlPoints {
+		for _, protoCp := range resp.Success.FlowControlPoints {
 			gcp := selectors.ControlPointIDFromProto(protoCp).InAgentGroup(resp.Success.AgentGroup)
 			allControlPoints[gcp] = struct{}{}
 		}
@@ -193,7 +193,7 @@ agentsLoop:
 			continue
 		}
 
-		for _, cpProto := range agent.Success.FlowControlPoints.FlowControlPoints {
+		for _, cpProto := range agent.Success.FlowControlPoints {
 			cp := selectors.ControlPointIDFromProto(cpProto)
 
 			if cp.ControlPoint != needle.ControlPoint {
