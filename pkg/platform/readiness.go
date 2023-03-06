@@ -9,11 +9,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-const (
-	readinessStatusPath = "readiness"
-	platformStatusPath  = "platform"
-)
-
 func platformStatusModule() fx.Option {
 	return fx.Options(
 		fx.Invoke(platformReadinessStatus),
