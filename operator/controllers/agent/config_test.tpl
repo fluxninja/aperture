@@ -1,3 +1,20 @@
+agent_functions:
+  client:
+    grpc:
+      backoff:
+        jitter: 0.2
+        base_delay: 1s
+        max_delay: 120s
+        multiplier: 1.6
+      insecure: false
+      min_connection_timeout: 20s
+      tls:
+        ca_file: ""
+        cert_file: ""
+        insecure_skip_verify: false
+        key_file: ""
+        key_log_file: ""
+      use_proxy: false
 agent_info:
   agent_group: default
 client:
