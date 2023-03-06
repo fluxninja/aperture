@@ -175,7 +175,7 @@ func (fxd *fxDriver) GetKeyNotifier(key Key) (KeyNotifier, error) {
 	fr := &fxRunner{
 		fxOptionsFuncs:         fxd.fxOptionsFuncs,
 		statusRegistry:         statusRegistry,
-		fxRunnerStatusRegistry: statusRegistry.Child("subsystem", "fx_runner"),
+		fxRunnerStatusRegistry: statusRegistry.Child("system", "fx_runner"),
 		prometheusRegistry:     fxd.prometheusRegistry,
 	}
 
