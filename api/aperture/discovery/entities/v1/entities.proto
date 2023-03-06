@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package aperture.discovery.entities.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+//
+// gRPC service
+//
+
+// EntitiesService is used to query Entities.
+service EntitiesService {
+  rpc GetEntities(google.protobuf.Empty) returns (Entities) {
+    option (google.api.http) = {get: "/v1/discovery/entities"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-agent"];
+    };
+  }
+  rpc GetEntityByIPAddress(GetEntityByIPAddressRequest) returns (Entity) {
+    option (google.api.http) = {get: "/v1/discovery/entities/ip-address/{ip_address}"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-agent"];
+    };
+  }
+  rpc GetEntityByName(GetEntityByNameRequest) returns (Entity) {
+    option (google.api.http) = {get: "/v1/discovery/entities/name/{name}"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-agent"];
+    };
+  }
+}
+
+message GetEntityByIPAddressRequest {
+  string ip_address = 1;
+}
+
+message GetEntityByNameRequest {
+  string name = 1;
+}
+
+// Entities contains both mappings of ip address to entity and entity name to entity.
+message Entities {
+  // Entities defines mapping of entities.
+  message Entities {
+    map<string, Entity> entities = 1;
+  }
+
+  Entities entities_by_ip_address = 1;
+  Entities entities_by_name = 2;
+}
+
+// Entity represents a pod, vm, etc.
+message Entity {
+  string prefix = 1;
+  string uid = 2;
+  string ip_address = 3;
+  string name = 4;
+  string namespace = 5;
+  string node_name = 6;
+  repeated string services = 7;
+  repeated string labels = 8;
+}

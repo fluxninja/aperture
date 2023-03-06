@@ -1,3 +1,20 @@
+agent_functions:
+  client:
+    grpc:
+      backoff:
+        jitter: 0.2
+        base_delay: 1s
+        max_delay: 120s
+        multiplier: 1.6
+      insecure: false
+      min_connection_timeout: 20s
+      tls:
+        ca_file: ""
+        cert_file: ""
+        insecure_skip_verify: false
+        key_file: ""
+        key_log_file: ""
+      use_proxy: false
 agent_info:
   agent_group: default
 client:
@@ -23,6 +40,9 @@ etcd:
   username: ""
 flow_control:
   preview_service:
+    enabled: true
+auto_scale:
+  kubernetes:
     enabled: true
 fluxninja_plugin:
   api_key: ""
@@ -198,10 +218,7 @@ server:
     key_file: ""
 service_discovery:
   kubernetes:
-    autoscale_enabled: true
-    discovery_enabled: true
-    node_name: ""
-    pod_name: ""
+    enabled: true
   static: {}
 watchdog:
   cgroup:

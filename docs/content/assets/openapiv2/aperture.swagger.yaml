@@ -260,13 +260,31 @@ definitions:
         description: AutoScale components are used to scale a service.
         properties:
             autoscaler:
-                $ref: '#/definitions/Autoscaler'
-                description: Autoscaler provides auto scaling functionality for any resource.
+                $ref: '#/definitions/AutoScaler'
+                description: AutoScaler provides auto scaling functionality for any resource.
             pod_scaler:
                 $ref: '#/definitions/PodScaler'
                 description: PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
         type: object
-    Autoscaler:
+    AutoScaleKubernetesControlPoint:
+        properties:
+            api_version:
+                type: string
+            kind:
+                type: string
+            name:
+                type: string
+            namespace:
+                type: string
+        type: object
+    AutoScaleKubernetesControlPoints:
+        properties:
+            auto_scale_kubernetes_control_points:
+                items:
+                    $ref: '#/definitions/AutoScaleKubernetesControlPoint'
+                type: array
+        type: object
+    AutoScaler:
         properties:
             cooldown_override_percentage:
                 default: 50
@@ -311,15 +329,15 @@ definitions:
                 type: string
                 x-go-tag-default: "0"
             out_ports:
-                $ref: '#/definitions/AutoscalerOuts'
-                description: Output ports for the Autoscaler.
+                $ref: '#/definitions/AutoScalerOuts'
+                description: Output ports for the AutoScaler.
             scale_in_alerter_parameters:
                 $ref: '#/definitions/AlerterParameters'
                 description: Configuration for scale in alerter.
             scale_in_controllers:
                 description: List of Controllers for scaling in.
                 items:
-                    $ref: '#/definitions/AutoscalerScaleInController'
+                    $ref: '#/definitions/AutoScalerScaleInController'
                 type: array
             scale_in_cooldown:
                 default: 120s
@@ -334,7 +352,7 @@ definitions:
             scale_out_controllers:
                 description: List of Controllers for scaling out.
                 items:
-                    $ref: '#/definitions/AutoscalerScaleOutController'
+                    $ref: '#/definitions/AutoScalerScaleOutController'
                 type: array
             scale_out_cooldown:
                 default: 30s
@@ -344,25 +362,25 @@ definitions:
                 type: string
                 x-go-tag-default: 30s
             scaler:
-                $ref: '#/definitions/AutoscalerScaler'
+                $ref: '#/definitions/AutoScalerScaler'
                 x-go-tag-validate: required
-        title: Autoscaler
+        title: AutoScaler
         type: object
-    AutoscalerDecreasingGradient:
+    AutoScalerDecreasingGradient:
         description: Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
         properties:
             in_ports:
-                $ref: '#/definitions/AutoscalerDecreasingGradientIns'
+                $ref: '#/definitions/AutoScalerDecreasingGradientIns'
                 description: Input ports for the Gradient.
             parameters:
-                $ref: '#/definitions/AutoscalerDecreasingGradientParameters'
+                $ref: '#/definitions/AutoScalerDecreasingGradientParameters'
                 title: |-
                     Gradient parameters for the controller. Defaults and constraints:
                     * slope = 1
                     * min_gradient = -Inf (must be less than 1)
                     * max_gradient = 1 (cannot be changed)
         type: object
-    AutoscalerDecreasingGradientIns:
+    AutoScalerDecreasingGradientIns:
         description: Inputs for Gradient.
         properties:
             setpoint:
@@ -372,7 +390,7 @@ definitions:
                 $ref: '#/definitions/InPort'
                 description: The signal to use for scale in.
         type: object
-    AutoscalerDecreasingGradientParameters:
+    AutoScalerDecreasingGradientParameters:
         description: This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
         properties:
             min_gradient:
@@ -387,21 +405,21 @@ definitions:
                 type: number
                 x-go-tag-default: "1.0"
         type: object
-    AutoscalerIncreasingGradient:
+    AutoScalerIncreasingGradient:
         description: Increasing Gradient defines a controller for scaling out based on Gradient Controller.
         properties:
             in_ports:
-                $ref: '#/definitions/AutoscalerIncreasingGradientIns'
+                $ref: '#/definitions/AutoScalerIncreasingGradientIns'
                 description: Input ports for the Gradient.
             parameters:
-                $ref: '#/definitions/AutoscalerIncreasingGradientParameters'
+                $ref: '#/definitions/AutoScalerIncreasingGradientParameters'
                 title: |-
                     Gradient parameters for the controller. Defaults and constraints:
                     * slope = 1
                     * min_gradient = 1 (cannot be changed)
                     * max_gradient = +Inf (must be greater than 1)
         type: object
-    AutoscalerIncreasingGradientIns:
+    AutoScalerIncreasingGradientIns:
         description: Inputs for Gradient.
         properties:
             setpoint:
@@ -411,7 +429,7 @@ definitions:
                 $ref: '#/definitions/InPort'
                 description: The signal to use for scale out.
         type: object
-    AutoscalerIncreasingGradientParameters:
+    AutoScalerIncreasingGradientParameters:
         description: This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
         properties:
             max_gradient:
@@ -426,7 +444,7 @@ definitions:
                 type: number
                 x-go-tag-default: "1.0"
         type: object
-    AutoscalerKubernetesReplicas:
+    AutoScalerKubernetesReplicas:
         description: KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
         properties:
             default_config:
@@ -442,8 +460,8 @@ definitions:
 
                 x-go-tag-validate: required
         type: object
-    AutoscalerOuts:
-        description: Outputs for Autoscaler.
+    AutoScalerOuts:
+        description: Outputs for AutoScaler.
         properties:
             actual_scale:
                 $ref: '#/definitions/OutPort'
@@ -452,39 +470,39 @@ definitions:
             desired_scale:
                 $ref: '#/definitions/OutPort'
         type: object
-    AutoscalerScaleInController:
+    AutoScalerScaleInController:
         properties:
             alerter_parameters:
                 $ref: '#/definitions/AlerterParameters'
                 description: Configuration for embedded alerter.
             controller:
-                $ref: '#/definitions/AutoscalerScaleInControllerController'
+                $ref: '#/definitions/AutoScalerScaleInControllerController'
                 title: Controller
         type: object
-    AutoscalerScaleInControllerController:
+    AutoScalerScaleInControllerController:
         properties:
             gradient:
-                $ref: '#/definitions/AutoscalerDecreasingGradient'
+                $ref: '#/definitions/AutoScalerDecreasingGradient'
         type: object
-    AutoscalerScaleOutController:
+    AutoScalerScaleOutController:
         properties:
             alerter_parameters:
                 $ref: '#/definitions/AlerterParameters'
                 description: Configuration for embedded alerter.
             controller:
-                $ref: '#/definitions/AutoscalerScaleOutControllerController'
+                $ref: '#/definitions/AutoScalerScaleOutControllerController'
                 title: Controller
                 x-go-tag-validate: required
         type: object
-    AutoscalerScaleOutControllerController:
+    AutoScalerScaleOutControllerController:
         properties:
             gradient:
-                $ref: '#/definitions/AutoscalerIncreasingGradient'
+                $ref: '#/definitions/AutoScalerIncreasingGradient'
         type: object
-    AutoscalerScaler:
+    AutoScalerScaler:
         properties:
             kubernetes_replicas:
-                $ref: '#/definitions/AutoscalerKubernetesReplicas'
+                $ref: '#/definitions/AutoScalerKubernetesReplicas'
         type: object
     CheckResponse:
         description: CheckResponse contains fields that represent decision made by Check call.
@@ -1144,14 +1162,36 @@ definitions:
             - ema_window
             - warmup_window
         type: object
+    Entities:
+        description: Entities contains both mappings of ip address to entity and entity name to entity.
+        properties:
+            entities_by_ip_address:
+                $ref: '#/definitions/EntitiesEntities'
+            entities_by_name:
+                $ref: '#/definitions/EntitiesEntities'
+        type: object
+    EntitiesEntities:
+        description: Entities defines mapping of entities.
+        properties:
+            entities:
+                additionalProperties:
+                    $ref: '#/definitions/Entity'
+                type: object
+        type: object
     Entity:
         description: Entity represents a pod, vm, etc.
         properties:
-            cluster_ip:
-                type: string
             ip_address:
                 type: string
+            labels:
+                items:
+                    type: string
+                type: array
             name:
+                type: string
+            namespace:
+                type: string
+            node_name:
                 type: string
             prefix:
                 type: string
@@ -1161,22 +1201,6 @@ definitions:
                 type: array
             uid:
                 type: string
-        type: object
-    EntityCache:
-        description: EntityCache contains both mappings of ip address to entity and entity name to entity.
-        properties:
-            entities_by_ip_address:
-                $ref: '#/definitions/EntityCacheEntities'
-            entities_by_name:
-                $ref: '#/definitions/EntityCacheEntities'
-        type: object
-    EntityCacheEntities:
-        description: Entities defines mapping of entities.
-        properties:
-            entities:
-                additionalProperties:
-                    $ref: '#/definitions/Entity'
-                type: object
         type: object
     EqualsMatchExpression:
         description: Label selector expression of the equal form "label == value".
@@ -1314,18 +1338,18 @@ definitions:
                 $ref: '#/definitions/RateLimiter'
                 description: Rate Limiter provides service protection by applying rate limiter.
         type: object
-    FlowControlControlPoint:
+    FlowControlPoint:
         properties:
             control_point:
                 type: string
             service:
                 type: string
         type: object
-    FlowControlControlPoints:
+    FlowControlPoints:
         properties:
-            control_points:
+            flow_control_points:
                 items:
-                    $ref: '#/definitions/FlowControlControlPoint'
+                    $ref: '#/definitions/FlowControlPoint'
                 type: array
         type: object
     FlowMatcher:
@@ -1579,24 +1603,22 @@ definitions:
             policies:
                 $ref: '#/definitions/Policies'
         type: object
+    GlobalFlowControlPoint:
+        description: |-
+            GlobalFlowControlPoint contains info about a control point on a given
+            service with explicit Agent Group.
+        properties:
+            agent_group:
+                type: string
+            flow_control_point:
+                $ref: '#/definitions/FlowControlPoint'
+        type: object
     GlobalService:
         description: GlobalService is a service with explicit agent group.
         properties:
             agent_group:
                 type: string
             name:
-                type: string
-        type: object
-    GlobalServiceControlPoint:
-        description: |-
-            GlobalServiceControlPoint contains info about a control point on a given
-            service with explicit Agent Group.
-        properties:
-            agent_group:
-                type: string
-            name:
-                type: string
-            service_name:
                 type: string
         type: object
     GradientController:
@@ -1978,24 +2000,6 @@ definitions:
         required:
             - key
         type: object
-    KubernetesControlPoint:
-        properties:
-            api_version:
-                type: string
-            kind:
-                type: string
-            name:
-                type: string
-            namespace:
-                type: string
-        type: object
-    KubernetesControlPoints:
-        properties:
-            control_points:
-                items:
-                    $ref: '#/definitions/KubernetesControlPoint'
-                type: array
-        type: object
     KubernetesObjectSelector:
         description: |-
             Describes which pods a control or observability
@@ -2119,15 +2123,15 @@ definitions:
                     type: string
                 type: array
         type: object
-    ListControlPointsControllerResponse:
+    ListFlowControlPointsControllerResponse:
         properties:
-            control_points:
-                items:
-                    $ref: '#/definitions/GlobalServiceControlPoint'
-                type: array
             errors_count:
                 format: int64
                 type: integer
+            global_flow_control_points:
+                items:
+                    $ref: '#/definitions/GlobalFlowControlPoint'
+                type: array
         type: object
     ListServicesControllerResponse:
         properties:
@@ -2592,6 +2596,8 @@ definitions:
         type: object
     Policy:
         description: |-
+            Policy expresses observability-driven control logic.
+
             :::info
 
             See also [Policy overview](/concepts/policy/policy.md).
@@ -2606,7 +2612,6 @@ definitions:
             resources:
                 $ref: '#/definitions/Resources'
                 description: Resources (Flux Meters, Classifiers etc.) to setup.
-        title: Policy expresses reliability automation workflow that automatically protects services
         type: object
     PolicyWrapper:
         properties:
@@ -2889,26 +2894,26 @@ definitions:
                 type: string
             all_statuses:
                 $ref: '#/definitions/GroupStatus'
+            auto_scale_kubernetes_control_points:
+                items:
+                    $ref: '#/definitions/AutoScaleKubernetesControlPoint'
+                type: array
             controller_info:
                 $ref: '#/definitions/ControllerInfo'
+            flow_control_points:
+                items:
+                    $ref: '#/definitions/FlowControlPoint'
+                type: array
             host_info:
                 $ref: '#/definitions/HostInfo'
             installation_mode:
                 type: string
-            kubernetes_control_points:
-                items:
-                    $ref: '#/definitions/KubernetesControlPoint'
-                type: array
             peers:
                 $ref: '#/definitions/Peers'
             policies:
                 $ref: '#/definitions/PolicyWrappers'
             process_info:
                 $ref: '#/definitions/ProcessInfo'
-            service_control_points:
-                items:
-                    $ref: '#/definitions/ServiceControlPoint'
-                type: array
             services_list:
                 $ref: '#/definitions/ServicesList'
             version_info:
@@ -3289,17 +3294,6 @@ definitions:
                 format: int32
                 type: integer
             name:
-                type: string
-        type: object
-    ServiceControlPoint:
-        description: |-
-            ServiceControlPoint contains info about a control point on a given service.
-
-            Agent group is implied.
-        properties:
-            name:
-                type: string
-            service_name:
                 type: string
         type: object
     ServiceSelector:
@@ -3821,12 +3815,64 @@ paths:
                 - FluxNinjaService
     /v1/autoscale/kubernetes/controlpoints:
         get:
-            operationId: ControlPointCache_GetControlPoints
+            operationId: AutoScaleKubernetesControlPointsService_GetControlPoints
             responses:
                 "200":
                     description: A successful response.
                     schema:
-                        $ref: '#/definitions/KubernetesControlPoints'
+                        $ref: '#/definitions/AutoScaleKubernetesControlPoints'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/discovery/entities:
+        get:
+            operationId: EntitiesService_GetEntities
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/Entities'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/discovery/entities/ip-address/{ip_address}:
+        get:
+            operationId: EntitiesService_GetEntityByIPAddress
+            parameters:
+                - in: path
+                  name: ip_address
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/Entity'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/discovery/entities/name/{name}:
+        get:
+            operationId: EntitiesService_GetEntityByName
+            parameters:
+                - in: path
+                  name: name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/Entity'
                 default:
                     description: An unexpected error response.
                     schema:
@@ -3849,64 +3895,12 @@ paths:
                 - aperture-agent
     /v1/flowcontrol/controlpoints:
         get:
-            operationId: FlowControlControlPointsService_GetControlPoints
+            operationId: FlowControlPointsService_GetControlPoints
             responses:
                 "200":
                     description: A successful response.
                     schema:
-                        $ref: '#/definitions/FlowControlControlPoints'
-                default:
-                    description: An unexpected error response.
-                    schema:
-                        $ref: '#/definitions/googlerpcStatus'
-            tags:
-                - aperture-agent
-    /v1/flowcontrol/entities:
-        get:
-            operationId: EntityCacheService_GetEntityCache
-            responses:
-                "200":
-                    description: A successful response.
-                    schema:
-                        $ref: '#/definitions/EntityCache'
-                default:
-                    description: An unexpected error response.
-                    schema:
-                        $ref: '#/definitions/googlerpcStatus'
-            tags:
-                - aperture-agent
-    /v1/flowcontrol/entities/ip-address/{ip_address}:
-        get:
-            operationId: EntityCacheService_GetEntityByIPAddress
-            parameters:
-                - in: path
-                  name: ip_address
-                  required: true
-                  type: string
-            responses:
-                "200":
-                    description: A successful response.
-                    schema:
-                        $ref: '#/definitions/Entity'
-                default:
-                    description: An unexpected error response.
-                    schema:
-                        $ref: '#/definitions/googlerpcStatus'
-            tags:
-                - aperture-agent
-    /v1/flowcontrol/entities/name/{name}:
-        get:
-            operationId: EntityCacheService_GetEntityByName
-            parameters:
-                - in: path
-                  name: name
-                  required: true
-                  type: string
-            responses:
-                "200":
-                    description: A successful response.
-                    schema:
-                        $ref: '#/definitions/Entity'
+                        $ref: '#/definitions/FlowControlPoints'
                 default:
                     description: An unexpected error response.
                     schema:
@@ -4118,13 +4112,13 @@ produces:
     - application/json
 swagger: "2.0"
 tags:
+    - name: AutoScaleKubernetesControlPointsService
+    - name: FlowControlPointsService
     - name: FlowPreviewService
     - name: Controller
-    - name: ControlPointCache
+    - name: EntitiesService
     - name: DistCacheService
     - name: FlowControlService
-    - name: FlowControlControlPointsService
-    - name: EntityCacheService
     - name: InfoService
     - name: PeerDiscoveryService
     - name: PolicyService

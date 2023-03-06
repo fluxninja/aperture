@@ -161,11 +161,14 @@ func (lsaFactory *loadActuatorFactory) newLoadActuator(
 	}
 
 	// decision notifier
-	decisionNotifier := notifiers.NewUnmarshalKeyNotifier(
+	decisionNotifier, err := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(etcdKey),
 		decisionUnmarshaller,
 		la.decisionUpdateCallback,
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {

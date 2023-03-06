@@ -6,7 +6,7 @@ type NotifyFunc func(Event)
 // BasicKeyNotifier holds fields for basic key notifier.
 type BasicKeyNotifier struct {
 	NotifyFunc NotifyFunc
-	KeyNotifierBase
+	KeyBase
 }
 
 // Make sure BasicKeyNotifier implements KeyNotifier.
@@ -15,9 +15,7 @@ var _ KeyNotifier = (*BasicKeyNotifier)(nil)
 // NewBasicKeyNotifier returns a new basic key notifier.
 func NewBasicKeyNotifier(key Key, notifyFunc NotifyFunc) *BasicKeyNotifier {
 	notifier := &BasicKeyNotifier{
-		KeyNotifierBase: KeyNotifierBase{
-			key: key,
-		},
+		KeyBase:    NewKeyBase(key),
 		NotifyFunc: notifyFunc,
 	}
 	return notifier
@@ -30,19 +28,25 @@ func (bfn *BasicKeyNotifier) Notify(event Event) {
 	}
 }
 
-// BasicPrefixNotifier holds fields for basic prefix notifier.
-type BasicPrefixNotifier struct {
+// basicPrefixNotifier holds fields for basic prefix notifier.
+type basicPrefixNotifier struct {
 	NotifyFunc NotifyFunc
-	PrefixNotifierBase
+	PrefixBase
 }
 
 // Make sure BasicPrefixNotifier implements PrefixNotifier.
-var _ PrefixNotifier = (*BasicPrefixNotifier)(nil)
+var _ PrefixNotifier = (*basicPrefixNotifier)(nil)
 
 // GetKeyNotifier returns a basic key notifier for the given key.
-func (bdn *BasicPrefixNotifier) GetKeyNotifier(key Key) KeyNotifier {
-	notifier := BasicKeyNotifier{
-		NotifyFunc: bdn.NotifyFunc,
+func (bdn *basicPrefixNotifier) GetKeyNotifier(key Key) (KeyNotifier, error) {
+	return NewBasicKeyNotifier(key, bdn.NotifyFunc), nil
+}
+
+// NewBasicPrefixNotifier returns a new basic prefix notifier.
+func NewBasicPrefixNotifier(prefix string, notifyFunc NotifyFunc) PrefixNotifier {
+	notifier := &basicPrefixNotifier{
+		PrefixBase: NewPrefixBase(prefix),
+		NotifyFunc: notifyFunc,
 	}
-	return &notifier
+	return notifier
 }

@@ -23,9 +23,9 @@ func NewAgents(clients *rpc.Clients) Agents { return Agents{Clients: clients} }
 // ListControlPoints lists control points of all agents.
 //
 // Handled by agentfunctions.ControlPointsHandler.
-func (a Agents) ListControlPoints() ([]rpc.Result[*cmdv1.ListControlPointsAgentResponse], error) {
-	var req cmdv1.ListControlPointsRequest
-	return rpc.CallAll[cmdv1.ListControlPointsAgentResponse](a.Clients, &req)
+func (a Agents) ListControlPoints() ([]rpc.Result[*cmdv1.ListFlowControlPointsAgentResponse], error) {
+	var req cmdv1.ListFlowControlPointsRequest
+	return rpc.CallAll[cmdv1.ListFlowControlPointsAgentResponse](a.Clients, &req)
 }
 
 // PreviewFlowLabels previews flow labels on a given agent.

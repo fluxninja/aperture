@@ -18,9 +18,9 @@ const (
 	autoscalerScaleInSetpointPortNameTemplate  = "scale_in_setpoint_%d"
 )
 
-// ParseAutoscaler parses a Autoscaler and returns its nested circuit representation.
-func ParseAutoscaler(
-	autoscaler *policylangv1.Autoscaler,
+// ParseAutoScaler parses a AutoScaler and returns its nested circuit representation.
+func ParseAutoScaler(
+	autoscaler *policylangv1.AutoScaler,
 ) (*policylangv1.NestedCircuit, error) {
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 
@@ -393,7 +393,7 @@ func ParseAutoscaler(
 		if gradient := controller.GetGradient(); gradient != nil {
 			inPorts := gradient.GetInPorts()
 			if inPorts == nil {
-				inPorts = &policylangv1.Autoscaler_IncreasingGradient_Ins{}
+				inPorts = &policylangv1.AutoScaler_IncreasingGradient_Ins{}
 			}
 			signalPort := inPorts.GetSignal()
 			if signalPort != nil {
@@ -577,7 +577,7 @@ func ParseAutoscaler(
 		if gradient := controller.GetGradient(); gradient != nil {
 			inPorts := gradient.GetInPorts()
 			if inPorts == nil {
-				inPorts = &policylangv1.Autoscaler_DecreasingGradient_Ins{}
+				inPorts = &policylangv1.AutoScaler_DecreasingGradient_Ins{}
 			}
 			signalPort := inPorts.GetSignal()
 			if signalPort != nil {
@@ -1066,7 +1066,7 @@ func ParseAutoscaler(
 
 	// Construct nested circuit.
 	nestedCircuit := &policylangv1.NestedCircuit{
-		Name:             "Autoscaler",
+		Name:             "AutoScaler",
 		ShortDescription: shortDescription,
 		InPortsMap:       nestedInPortsMap,
 		OutPortsMap:      nestedOutPortsMap,

@@ -75,12 +75,11 @@ func ProvideClassificationEngine(in ClassificationEngineIn) (iface.Classificatio
 
 	classificationEngine := NewClassificationEngine(reg)
 
-	fxDriver := &notifiers.FxDriver{
-		FxOptionsFuncs: []notifiers.FxOptionsFunc{classificationEngine.provideClassifierFxOptions},
-		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
-			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
-		},
-		StatusRegistry: reg,
+	fxDriver, err := notifiers.NewFxDriver(reg, in.PromRegistry,
+		config.NewProtobufUnmarshaller,
+		[]notifiers.FxOptionsFunc{classificationEngine.provideClassifierFxOptions})
+	if err != nil {
+		reg.GetLogger().Fatal().Err(err).Msg("Failed to create fx driver")
 	}
 
 	in.Lifecycle.Append(fx.Hook{
