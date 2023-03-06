@@ -3,7 +3,6 @@ package com.fluxninja.example.filter;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.Filter;
@@ -20,7 +19,7 @@ import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.sdk.Flow;
 import com.fluxninja.aperture.sdk.FlowStatus;
 
-public class ApertureFilter implements Filter {
+public class ApertureFeatureFilter implements Filter {
 
     private ApertureSDK apertureSDK;
 

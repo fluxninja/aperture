@@ -491,6 +491,16 @@ jobs:
           use-buildkit: true
           extra_build_args: --build-arg=IMAGE_TAG=<<parameters.tag>>
       - aperture_docker_build:
+          step-name: Build spring boot example image
+          docker-context: <<parameters.docker-context>>
+          dockerfile: dockerfiles/middlewares/spring/Dockerfile
+          image: aperture-java-spring
+          path: <<parameters.path>>
+          tag: <<parameters.tag>>
+          registry: <<parameters.registry>>
+          use-buildkit: true
+          extra_build_args: --build-arg=IMAGE_TAG=<<parameters.tag>>
+      - aperture_docker_build:
           step-name: Build javaagent armeria example image
           docker-context: <<parameters.docker-context>>
           dockerfile: dockerfiles/javaagent/armeria/Dockerfile
@@ -543,6 +553,13 @@ jobs:
           command: >
             go run cmd/sdk-validator/main.go
             -sdk-docker-image=<<parameters.registry>>/aperture-java-netty:<<parameters.tag>>
+            -port=<<parameters.port>> -requests=<<parameters.requests>>
+            -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk-port>>
+      - run:
+          name: Run SDK Validator against spring boot example
+          command: >
+            go run cmd/sdk-validator/main.go
+            -sdk-docker-image=<<parameters.registry>>/aperture-java-spring:<<parameters.tag>>
             -port=<<parameters.port>> -requests=<<parameters.requests>>
             -rejects=<<parameters.rejects>> -sdk-port=<<parameters.sdk-port>>
       - run:
@@ -770,6 +787,10 @@ jobs:
         type: string
         description: Path to aperture-java
         default: sdks/aperture-java
+      omit-examples:
+        type: boolean
+        description: Whether examples should be omitted.
+        default: false
     docker:
       - image: <<parameters.docker-image>>
     environment:
@@ -781,26 +802,50 @@ jobs:
           keys:
             - gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
             - gradle-v1-
-      - run:
-          name: Dependencies
-          command: |
-            cd <<parameters.path>>
-            gradle dependencies
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
-      # run tests!
-      - run:
-          name: Build
-          command: |
-            cd <<parameters.path>>
-            gradle build --no-daemon
-      - run:
-          name: Test
-          command: |
-            cd <<parameters.path>>
-            gradle test
+      - when:
+          condition: <<parameters.omit-examples>>
+          steps:
+            - run:
+                name: Dependencies (no examples)
+                command: |
+                  cd <<parameters.path>>
+                  gradle --configure-on-demand :lib:dependencies
+                  gradle --configure-on-demand :javaagent:dependencies
+            - save_cache:
+                paths:
+                  - ~/.gradle
+                key: gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
+            - run:
+                name: Build
+                command: |
+                  cd <<parameters.path>>
+                  gradle --configure-on-demand :lib:build --no-daemon
+                  gradle --configure-on-demand :javaagent:build --no-daemon
+            # run tests if any are added
+      - when:
+          condition:
+              not: <<parameters.omit-examples>>
+          steps:
+            - run:
+                name: Dependencies
+                command: |
+                  cd <<parameters.path>>
+                  gradle dependencies
+            - save_cache:
+                paths:
+                  - ~/.gradle
+                key: gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
+            - run:
+                name: Build
+                command: |
+                  cd <<parameters.path>>
+                  gradle build --no-daemon
+            # run tests!
+            - run:
+                name: Test
+                command: |
+                  cd <<parameters.path>>
+                  gradle test
 
   update-environment:
     parameters:
@@ -1068,6 +1113,8 @@ workflows:
           remote-repo: fluxninja/aperture-js
           remote-repo-fingerprint: "00:5e:cf:81:48:2d:e9:b8:34:74:8b:46:cc:ad:2f:ce"
 
+# Verify that libs and java agent can be built with Java 8+
+# Verify that lib, java agent and examples can be built with Java 17+
   aperture-java:
     when:
       or:
@@ -1078,18 +1125,22 @@ workflows:
           name: Build with OpenJDK 8
           docker-image: cimg/openjdk:8.0
           path: sdks/aperture-java
+          omit-examples: true
       - build-aperture-java:
           name: Build with OpenJDK 11
           docker-image: cimg/openjdk:11.0
           path: sdks/aperture-java
+          omit-examples: true
       - build-aperture-java:
           name: Build with OpenJDK 13
           docker-image: cimg/openjdk:13.0
           path: sdks/aperture-java
+          omit-examples: true
       - build-aperture-java:
           name: Build with OpenJDK 15
           docker-image: cimg/openjdk:15.0
           path: sdks/aperture-java
+          omit-examples: true
       - build-aperture-java:
           name: Build with OpenJDK 17
           docker-image: cimg/openjdk:17.0

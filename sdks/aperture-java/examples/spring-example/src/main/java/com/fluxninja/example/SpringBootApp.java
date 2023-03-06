@@ -1,13 +1,10 @@
 package com.fluxninja.example;
 
-import com.fluxninja.example.filter.ApertureFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 
+@ServletComponentScan
 @SpringBootApplication
 public class SpringBootApp {
 	public static final String DEFAULT_APP_PORT = "8080";

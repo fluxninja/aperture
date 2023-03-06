@@ -19,7 +19,7 @@ import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.sdk.Flow;
 import com.fluxninja.aperture.sdk.FlowStatus;
 
-public class ApertureFilter implements Filter {
+public class ApertureFeatureFilter implements Filter {
 
     private ApertureSDK apertureSDK;
 

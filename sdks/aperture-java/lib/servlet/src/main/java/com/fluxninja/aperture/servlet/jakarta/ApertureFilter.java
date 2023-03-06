@@ -1,16 +1,18 @@
-package com.fluxninja.aperture.tomcat7;
+package com.fluxninja.aperture.servlet.jakarta;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.fluxninja.aperture.sdk.*;
 import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
@@ -36,7 +38,9 @@ public class ApertureFilter implements Filter {
 
         if (flow.accepted()) {
             try {
-                chain.doFilter(request, response);
+                List<HeaderValueOption> newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
+                ServletRequest newRequest = ServletUtils.updateHeaders(request, newHeaders);
+                chain.doFilter(newRequest, response);
                 flow.end(FlowStatus.OK);
             } catch (ApertureSDKException e) {
                 // ending flow failed
@@ -52,11 +56,6 @@ public class ApertureFilter implements Filter {
             }
         } else {
             int code = ServletUtils.handleRejectedFlow(flow);
-            try {
-                flow.end(FlowStatus.Error);
-            } catch (Exception e) {
-                throw new ServletException(e);
-            }
             response.sendError(code, "Request denied");
         }
     }
