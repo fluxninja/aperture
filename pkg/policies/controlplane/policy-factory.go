@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
@@ -17,7 +18,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	prom "github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/status"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 // policyFactoryModule module for policy factory.
@@ -66,7 +66,7 @@ func providePolicyFactory(
 	policiesStatusRegistry := registry.Child("system", iface.PoliciesRoot)
 	logger := policiesStatusRegistry.GetLogger()
 
-	circuitJobGroup, err := jobs.NewJobGroup(policiesStatusRegistry.Child("jg", "circuit_jobs"), jobs.JobGroupConfig{}, nil)
+	circuitJobGroup, err := jobs.NewJobGroup(policiesStatusRegistry.Child("job-group", "circuit_jobs"), jobs.JobGroupConfig{}, nil)
 	if err != nil {
 		logger.Error().Err(err).Msg("Failed to create job group")
 		return nil, err
