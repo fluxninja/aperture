@@ -2596,6 +2596,8 @@ definitions:
         type: object
     Policy:
         description: |-
+            Policy expresses observability-driven control logic.
+
             :::info
 
             See also [Policy overview](/concepts/policy/policy.md).
@@ -2610,7 +2612,6 @@ definitions:
             resources:
                 $ref: '#/definitions/Resources'
                 description: Resources (Flux Meters, Classifiers etc.) to setup.
-        title: Policy expresses reliability automation workflow that automatically protects services
         type: object
     PolicyWrapper:
         properties:

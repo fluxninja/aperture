@@ -2364,7 +2364,7 @@
       "additionalProperties": false
     },
     "Policy": {
-      "description": ":::info\n\nSee also [Policy overview](/concepts/policy/policy.md).\n\n:::\n\nPolicy specification contains a circuit that defines the controller logic and resources that need to be setup.",
+      "description": "Policy expresses observability-driven control logic.\n\n:::info\n\nSee also [Policy overview](/concepts/policy/policy.md).\n\n:::\n\nPolicy specification contains a circuit that defines the controller logic and resources that need to be setup.",
       "properties": {
         "circuit": {
           "$ref": "#/definitions/Circuit",
@@ -2377,7 +2377,6 @@
           "x-order": 1
         }
       },
-      "title": "Policy expresses reliability automation workflow that automatically protects services",
       "type": "object",
       "additionalProperties": false
     },
