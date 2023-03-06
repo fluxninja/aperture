@@ -362,15 +362,19 @@ definitions:
     type: object
     properties:
       auto_scaler:
-        description: AutoScaler provides auto scaling functionality for any resource.
+        description: AutoScaler provides auto scaling functionality for any scalable
+          resource.
         $ref: '#/definitions/AutoScaler'
       pod_scaler:
         description: PodScaler provides pod horizontal scaling functionality for scalable
           Kubernetes resources.
         $ref: '#/definitions/PodScaler'
   AutoScaler:
+    description: 'AutoScaler: AutoScaler provides auto scaling functionality for any
+      scalable resource. Multiple Controllers can be defined on the AutoScaler for
+      performing scale out or scale in. The AutoScaler can interface with infrastructure
+      APIs such as Kubernetes to perform auto-scale.'
     type: object
-    title: AutoScaler
     properties:
       cooldown_override_percentage:
         description: |+

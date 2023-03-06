@@ -310,7 +310,7 @@
       "properties": {
         "auto_scaler": {
           "$ref": "#/definitions/AutoScaler",
-          "description": "AutoScaler provides auto scaling functionality for any resource.",
+          "description": "AutoScaler provides auto scaling functionality for any scalable resource.",
           "x-order": 0
         },
         "pod_scaler": {
@@ -323,6 +323,7 @@
       "additionalProperties": false
     },
     "AutoScaler": {
+      "description": "AutoScaler: AutoScaler provides auto scaling functionality for any scalable resource. Multiple Controllers can be defined on the AutoScaler for performing scale out or scale in. The AutoScaler can interface with infrastructure APIs such as Kubernetes to perform auto-scale.",
       "properties": {
         "cooldown_override_percentage": {
           "default": 50,
@@ -419,7 +420,6 @@
           "x-order": 12
         }
       },
-      "title": "AutoScaler",
       "type": "object",
       "additionalProperties": false
     },

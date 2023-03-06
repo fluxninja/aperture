@@ -1060,7 +1060,7 @@ type AutoScale_PodScaler struct {
 }
 
 type AutoScale_AutoScaler struct {
-	// AutoScaler provides auto scaling functionality for any resource.
+	// AutoScaler provides auto scaling functionality for any scalable resource.
 	AutoScaler *AutoScaler `protobuf:"bytes,2,opt,name=auto_scaler,json=autoScaler,proto3,oneof"`
 }
 
@@ -3442,7 +3442,7 @@ func (x *AIMDConcurrencyController) GetDefaultConfig() *LoadActuator_DynamicConf
 	return nil
 }
 
-// AutoScaler
+// AutoScaler: AutoScaler provides auto scaling functionality for any scalable resource. Multiple Controllers can be defined on the AutoScaler for performing scale out or scale in. The AutoScaler can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
 type AutoScaler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

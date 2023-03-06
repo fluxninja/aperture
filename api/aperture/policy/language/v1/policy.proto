@@ -259,7 +259,7 @@ message AutoScale {
   oneof component {
     // PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
     PodScaler pod_scaler = 1;
-    // AutoScaler provides auto scaling functionality for any resource.
+    // AutoScaler provides auto scaling functionality for any scalable resource.
     AutoScaler auto_scaler = 2;
   }
 }
@@ -1460,7 +1460,7 @@ message AIMDConcurrencyController {
   LoadActuator.DynamicConfig default_config = 10;
 }
 
-// AutoScaler
+// AutoScaler: AutoScaler provides auto scaling functionality for any scalable resource. Multiple Controllers can be defined on the AutoScaler for performing scale out or scale in. The AutoScaler can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
 message AutoScaler {
   // Increasing Gradient defines a controller for scaling out based on Gradient Controller.
   message IncreasingGradient {

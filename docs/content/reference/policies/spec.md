@@ -394,7 +394,7 @@ AutoScale components are used to scale a service.
 <dt>auto_scaler</dt>
 <dd>
 
-([AutoScaler](#auto-scaler)) AutoScaler provides auto scaling functionality for any resource.
+([AutoScaler](#auto-scaler)) AutoScaler provides auto scaling functionality for any scalable resource.
 
 </dd>
 <dt>pod_scaler</dt>
@@ -409,7 +409,7 @@ AutoScale components are used to scale a service.
 
 ### AutoScaler {#auto-scaler}
 
-AutoScaler
+AutoScaler: AutoScaler provides auto scaling functionality for any scalable resource. Multiple Controllers can be defined on the AutoScaler for performing scale out or scale in. The AutoScaler can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
 
 <dl>
 <dt>cooldown_override_percentage</dt>
