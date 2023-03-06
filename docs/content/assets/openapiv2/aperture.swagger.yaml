@@ -2895,11 +2895,15 @@ definitions:
             all_statuses:
                 $ref: '#/definitions/GroupStatus'
             auto_scale_kubernetes_control_points:
-                $ref: '#/definitions/AutoScaleKubernetesControlPoints'
+                items:
+                    $ref: '#/definitions/AutoScaleKubernetesControlPoint'
+                type: array
             controller_info:
                 $ref: '#/definitions/ControllerInfo'
             flow_control_points:
-                $ref: '#/definitions/FlowControlPoints'
+                items:
+                    $ref: '#/definitions/FlowControlPoint'
+                type: array
             host_info:
                 $ref: '#/definitions/HostInfo'
             installation_mode:

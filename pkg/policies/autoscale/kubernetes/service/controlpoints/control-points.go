@@ -24,5 +24,7 @@ func NewHandler(cpc discovery.AutoScaleControlPoints) *Handler {
 
 // GetControlPoints returns a ControlPoint from the cache.
 func (h *Handler) GetControlPoints(ctx context.Context, _ *emptypb.Empty) (*controlpointsv1.AutoScaleKubernetesControlPoints, error) {
-	return h.AutoScaleControlPoints.ToProto(), nil
+	return &controlpointsv1.AutoScaleKubernetesControlPoints{
+		AutoScaleKubernetesControlPoints: h.AutoScaleControlPoints.ToProto(),
+	}, nil
 }
