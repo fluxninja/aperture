@@ -19,8 +19,6 @@ package controller
 import (
 	"fmt"
 
-	controller "github.com/fluxninja/aperture/cmd/aperture-controller/config"
-	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -31,6 +29,9 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/pointer"
+
+	controller "github.com/fluxninja/aperture/cmd/aperture-controller/config"
+	. "github.com/fluxninja/aperture/operator/controllers"
 
 	"github.com/fluxninja/aperture/operator/api/common"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
@@ -566,7 +567,7 @@ var _ = Describe("Controller Deployment", func() {
 									LivenessProbe: &corev1.Probe{
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
-												Path:   "/v1/status/subsystem/liveness",
+												Path:   "/v1/status/system/liveness",
 												Port:   intstr.FromString(Server),
 												Scheme: corev1.URISchemeHTTP,
 											},
@@ -580,7 +581,7 @@ var _ = Describe("Controller Deployment", func() {
 									ReadinessProbe: &corev1.Probe{
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
-												Path:   "/v1/status/subsystem/readiness",
+												Path:   "/v1/status/system/readiness",
 												Port:   intstr.FromString(Server),
 												Scheme: corev1.URISchemeHTTP,
 											},

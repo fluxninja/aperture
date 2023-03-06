@@ -4,17 +4,18 @@ import (
 	"context"
 	"time"
 
-	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/status/v1"
-	"github.com/fluxninja/aperture/pkg/alerts"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/status"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
+
+	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/status/v1"
+	"github.com/fluxninja/aperture/pkg/alerts"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/status"
 )
 
 var _ JobWatcher = (*testGroupConfig)(nil)
@@ -284,8 +285,8 @@ func runJobGroup(jobGroup *JobGroup, groupConfig *testGroupConfig, jobConfig Job
 	for _, job := range groupConfig.jobs {
 		registry := jobGroup.livenessRegistry
 		livenessReg := registry.Root().
-			Child("subsystem", "liveness").
-			Child("jg", "job_groups").
+			Child("system", "liveness").
+			Child("job-group", "job_groups").
 			Child(registry.Key(), registry.Value()).
 			Child("executor", job.Name())
 

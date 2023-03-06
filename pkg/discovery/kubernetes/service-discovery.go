@@ -3,11 +3,10 @@ package kubernetes
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
-	"time"
 
-	"github.com/cenkalti/backoff/v4"
 	"github.com/sourcegraph/conc/stream"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/informers"
@@ -18,7 +17,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/utils"
 )
 
@@ -58,59 +56,50 @@ func newServiceDiscovery(
 	return kd, nil
 }
 
-func (kd *serviceDiscovery) start() {
-	panichandler.Go(func() {
-		operation := func() error {
-			// get cluster domain
-			clusterDomain, err := utils.GetClusterDomain()
-			if err != nil {
-				log.Error().Err(err).Msg("Could not get cluster domain, will retry")
-				return err
-			}
-			kd.clusterDomain = clusterDomain
+func (kd *serviceDiscovery) start(startCtx context.Context) error {
+	// get cluster domain
+	clusterDomain, err := utils.GetClusterDomain()
+	if err != nil {
+		log.Error().Err(err).Msg("Could not get cluster domain, will retry")
+		return err
+	}
+	kd.clusterDomain = clusterDomain
 
-			// purge notifiers
-			kd.entityEvents.Purge("")
-
-			endpointsInformer := kd.informerFactory.Core().V1().Endpoints().Informer()
-			_, err = endpointsInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-				AddFunc:    kd.handleEndpointsAdd,
-				UpdateFunc: kd.handleEndpointsUpdate,
-				DeleteFunc: kd.handleEndpointsDelete,
-			})
-			if err != nil {
-				return err
-			}
-
-			serviceInformer := kd.informerFactory.Core().V1().Services().Informer()
-			_, err = serviceInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-				AddFunc:    kd.handleServiceAdd,
-				UpdateFunc: kd.handleServiceUpdate,
-				DeleteFunc: kd.handleServiceDelete,
-			})
-			if err != nil {
-				return err
-			}
-
-			kd.informerFactory.Start(kd.ctx.Done())
-			// wait for the caches to be synced
-			if !cache.WaitForCacheSync(kd.ctx.Done(), endpointsInformer.HasSynced, serviceInformer.HasSynced) {
-				return fmt.Errorf("timed out waiting for caches to sync")
-			}
-
-			<-kd.ctx.Done()
-			return nil
-		}
-		boff := backoff.NewConstantBackOff(5 * time.Second)
-		_ = backoff.Retry(operation, backoff.WithContext(boff, kd.ctx))
-		log.Info().Msg("Service discovery stopped")
+	endpointsInformer := kd.informerFactory.Core().V1().Endpoints().Informer()
+	_, err = endpointsInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    kd.handleEndpointsAdd,
+		UpdateFunc: kd.handleEndpointsUpdate,
+		DeleteFunc: kd.handleEndpointsDelete,
 	})
+	if err != nil {
+		return err
+	}
+
+	serviceInformer := kd.informerFactory.Core().V1().Services().Informer()
+	_, err = serviceInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    kd.handleServiceAdd,
+		UpdateFunc: kd.handleServiceUpdate,
+		DeleteFunc: kd.handleServiceDelete,
+	})
+	if err != nil {
+		return err
+	}
+
+	kd.informerFactory.Start(kd.ctx.Done())
+
+	if !cache.WaitForCacheSync(startCtx.Done(), endpointsInformer.HasSynced, serviceInformer.HasSynced) {
+		return errors.New("timed out waiting for caches to sync")
+	}
+
+	log.Info().Msg("Service discovery started")
+	return nil
 }
 
-func (kd *serviceDiscovery) stop() {
+func (kd *serviceDiscovery) stop(stopCtx context.Context) error {
 	kd.cancel()
 	kd.serviceStream.Wait()
 	kd.entityEvents.Purge("")
+	return nil
 }
 
 // Endpoints informer handlers
@@ -184,27 +173,6 @@ func (kd *serviceDiscovery) getPodServiceUpdatesFromEndpoints(endpoints *v1.Endp
 	return pods
 }
 
-func (kd *serviceDiscovery) removeEndpoints(endpoints *v1.Endpoints) {
-	for _, subset := range endpoints.Subsets {
-		for _, address := range subset.Addresses {
-			entity := kd.getEntityFromTracker(string(address.TargetRef.UID))
-			if entity != nil {
-				entity.Services = utils.RemoveFromSlice(entity.Services, kd.getService(endpoints.Namespace, endpoints.Name))
-				if shouldRemove(entity) {
-					kd.entityEvents.RemoveEvent(notifiers.Key(address.TargetRef.UID))
-				} else {
-					bytes, err := json.Marshal(entity)
-					if err != nil {
-						log.Error().Err(err).Msg("Could not marshal entity")
-						continue
-					}
-					kd.entityEvents.WriteEvent(notifiers.Key(address.TargetRef.UID), bytes)
-				}
-			}
-		}
-	}
-}
-
 // Service informer handlers
 
 func (kd *serviceDiscovery) handleServiceAdd(obj interface{}) {
@@ -258,55 +226,78 @@ func (kd *serviceDiscovery) removeClusterIPs(service *v1.Service) {
 	}
 }
 
-func (kd *serviceDiscovery) getEntityFromTracker(uid string) *entitiesv1.Entity {
-	bytes := kd.entityEvents.GetCurrentValue(notifiers.Key(uid))
-	if bytes == nil {
-		return nil
-	}
-	entity := &entitiesv1.Entity{}
-	err := json.Unmarshal(bytes, entity)
-	if err != nil {
-		log.Error().Err(err).Msg("Could not unmarshal entity")
-		return nil
-	}
-	return entity
-}
-
 // getService return the full qualified domain name of a given service.
 func (kd *serviceDiscovery) getService(namespace, name string) string {
 	service := fmt.Sprintf("%s.%s.svc.%s", name, namespace, kd.clusterDomain)
 	return service
 }
 
+func (kd *serviceDiscovery) removeEndpoints(endpoints *v1.Endpoints) {
+	for _, subset := range endpoints.Subsets {
+		for _, address := range subset.Addresses {
+			updateFunc := func(oldValue []byte) (notifiers.EventType, []byte) {
+				if oldValue == nil {
+					return notifiers.Remove, nil
+				}
+				entity := &entitiesv1.Entity{}
+				err := json.Unmarshal(oldValue, entity)
+				if err != nil {
+					log.Error().Err(err).Msg("Could not unmarshal entity")
+					return notifiers.Remove, nil
+				}
+				entity.Services = utils.RemoveFromSlice(entity.Services, kd.getService(endpoints.Namespace, endpoints.Name))
+				if shouldRemove(entity) {
+					return notifiers.Remove, nil
+				}
+				bytes, err := json.Marshal(entity)
+				if err != nil {
+					log.Error().Err(err).Msg("Could not marshal entity")
+					return notifiers.Remove, nil
+				}
+				return notifiers.Write, bytes
+			}
+
+			kd.entityEvents.UpdateValue(notifiers.Key(address.TargetRef.UID), updateFunc)
+		}
+	}
+}
+
 // updatePodServiceEntity retrieves stored pod data from tracker, enriches it with new info and send the updated version.
 func (kd *serviceDiscovery) updatePodServiceEntity(pod podServiceUpdate) error {
-	entity := kd.getEntityFromTracker(pod.UID)
-	if entity != nil {
-		// append to services if it doesn't exist
-		if pod.Service != "" && !utils.SliceContains(entity.Services, pod.Service) {
-			entity.Services = append(entity.Services, pod.Service)
+	updateFunc := func(oldValue []byte) (notifiers.EventType, []byte) {
+		var entity *entitiesv1.Entity
+		if oldValue == nil {
+			// create new entity
+			entity = &entitiesv1.Entity{
+				Services:  []string{pod.Service},
+				IpAddress: pod.IPAddress,
+				Namespace: pod.Namespace,
+				NodeName:  pod.NodeName,
+				Uid:       pod.UID,
+				Prefix:    podTrackerPrefix,
+				Name:      pod.Name,
+			}
+		} else {
+			err := json.Unmarshal(oldValue, &entity)
+			if err != nil {
+				log.Error().Msgf("Error unmarshaling entity: %v", err)
+				return notifiers.Write, oldValue
+			}
+			// append to services if it doesn't exist
+			if !utils.SliceContains(entity.Services, pod.Service) {
+				entity.Services = append(entity.Services, pod.Service)
+			}
 		}
-	} else {
-		// create new entity
-		entity = &entitiesv1.Entity{
-			Prefix:    podTrackerPrefix,
-			Uid:       pod.UID,
-			IpAddress: pod.IPAddress,
-			Name:      pod.Name,
-			Namespace: pod.Namespace,
-			NodeName:  pod.NodeName,
+		value, err := json.Marshal(entity)
+		if err != nil {
+			log.Error().Msgf("Error marshaling entity: %v", err)
+			return notifiers.Write, oldValue
 		}
-		if pod.Service != "" {
-			entity.Services = []string{pod.Service}
-		}
+		return notifiers.Write, value
 	}
 
-	value, err := json.Marshal(entity)
-	if err != nil {
-		log.Error().Msgf("Error marshaling entity: %v", err)
-		return err
-	}
-	kd.entityEvents.WriteEvent(notifiers.Key(pod.UID), value)
+	kd.entityEvents.UpdateValue(notifiers.Key(pod.UID), updateFunc)
+
 	return nil
 }
 

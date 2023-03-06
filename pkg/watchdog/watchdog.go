@@ -82,7 +82,7 @@ func (constructor Constructor) setupWatchdog(in WatchdogIn) error {
 		return err
 	}
 
-	watchdogRegistry := in.StatusRegistry.Child("subsystem", "liveness").Child(watchdogJobName, watchdogJobName)
+	watchdogRegistry := in.StatusRegistry.Child("system", "liveness").Child(watchdogJobName, watchdogJobName)
 
 	w := newWatchdog(in.JobGroup, watchdogRegistry, config)
 

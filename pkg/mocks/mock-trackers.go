@@ -34,20 +34,6 @@ func (m *MockEventWriter) EXPECT() *MockEventWriterMockRecorder {
 	return m.recorder
 }
 
-// GetCurrentValue mocks base method.
-func (m *MockEventWriter) GetCurrentValue(key notifiers.Key) []byte {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCurrentValue", key)
-	ret0, _ := ret[0].([]byte)
-	return ret0
-}
-
-// GetCurrentValue indicates an expected call of GetCurrentValue.
-func (mr *MockEventWriterMockRecorder) GetCurrentValue(key interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentValue", reflect.TypeOf((*MockEventWriter)(nil).GetCurrentValue), key)
-}
-
 // Purge mocks base method.
 func (m *MockEventWriter) Purge(prefix string) {
 	m.ctrl.T.Helper()
@@ -70,6 +56,18 @@ func (m *MockEventWriter) RemoveEvent(key notifiers.Key) {
 func (mr *MockEventWriterMockRecorder) RemoveEvent(key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveEvent", reflect.TypeOf((*MockEventWriter)(nil).RemoveEvent), key)
+}
+
+// UpdateValue mocks base method.
+func (m *MockEventWriter) UpdateValue(key notifiers.Key, updateFunc notifiers.UpdateValueFunc) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UpdateValue", key, updateFunc)
+}
+
+// UpdateValue indicates an expected call of UpdateValue.
+func (mr *MockEventWriterMockRecorder) UpdateValue(key, updateFunc interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateValue", reflect.TypeOf((*MockEventWriter)(nil).UpdateValue), key, updateFunc)
 }
 
 // WriteEvent mocks base method.
@@ -133,20 +131,6 @@ func (m *MockTrackers) AddPrefixNotifier(arg0 notifiers.PrefixNotifier) error {
 func (mr *MockTrackersMockRecorder) AddPrefixNotifier(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddPrefixNotifier", reflect.TypeOf((*MockTrackers)(nil).AddPrefixNotifier), arg0)
-}
-
-// GetCurrentValue mocks base method.
-func (m *MockTrackers) GetCurrentValue(key notifiers.Key) []byte {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCurrentValue", key)
-	ret0, _ := ret[0].([]byte)
-	return ret0
-}
-
-// GetCurrentValue indicates an expected call of GetCurrentValue.
-func (mr *MockTrackersMockRecorder) GetCurrentValue(key interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentValue", reflect.TypeOf((*MockTrackers)(nil).GetCurrentValue), key)
 }
 
 // Purge mocks base method.
@@ -227,6 +211,18 @@ func (m *MockTrackers) Stop() error {
 func (mr *MockTrackersMockRecorder) Stop() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stop", reflect.TypeOf((*MockTrackers)(nil).Stop))
+}
+
+// UpdateValue mocks base method.
+func (m *MockTrackers) UpdateValue(key notifiers.Key, updateFunc notifiers.UpdateValueFunc) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UpdateValue", key, updateFunc)
+}
+
+// UpdateValue indicates an expected call of UpdateValue.
+func (mr *MockTrackersMockRecorder) UpdateValue(key, updateFunc interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateValue", reflect.TypeOf((*MockTrackers)(nil).UpdateValue), key, updateFunc)
 }
 
 // WriteEvent mocks base method.
