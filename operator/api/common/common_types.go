@@ -21,7 +21,6 @@ import (
 	amclient "github.com/fluxninja/aperture/pkg/alertmanager/client"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
-	"github.com/fluxninja/aperture/pkg/discovery/static"
 	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/metrics"
@@ -404,7 +403,4 @@ type BundledPluginsSpec struct {
 type ServiceDiscoverySpec struct {
 	// KubernetesDiscoveryConfig for Kubernetes service discovery.
 	KubernetesDiscoveryConfig kubernetes.KubernetesDiscoveryConfig `json:"kubernetes"`
-
-	// StaticDiscoveryConfig for pre-determined list of services.
-	StaticDiscoveryConfig static.StaticDiscoveryConfig `json:"static"`
 }

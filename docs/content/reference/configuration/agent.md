@@ -430,14 +430,6 @@ Env-Var Prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_`
 
 </dd>
 
-<dt>static</dt>
-<dd>
-
-([StaticDiscoveryConfig](#static-discovery-config))
-Env-Var Prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_STATIC_`
-
-</dd>
-
 </dl>
 
 ---
@@ -823,33 +815,6 @@ DistCacheConfig configures distributed cache that holds per-label counters in di
 <dd>
 
 (int64, default: `1`) ReplicaCount is 1 by default.
-
-</dd>
-</dl>
-
----
-
-### EntityConfig {#entity-config}
-
-EntityConfig describes a single entity.
-
-<dl>
-<dt>ip_address</dt>
-<dd>
-
-(string, format: `ip`, **required**) IP address of the entity.
-
-</dd>
-<dt>name</dt>
-<dd>
-
-(string) Name of the entity.
-
-</dd>
-<dt>uid</dt>
-<dd>
-
-(string) UID of the entity.
 
 </dd>
 </dl>
@@ -1675,42 +1640,6 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 <dd>
 
 (string) Server Key file path
-
-</dd>
-</dl>
-
----
-
-### ServiceConfig {#service-config}
-
-ServiceConfig describes a service and its entities.
-
-<dl>
-<dt>entities</dt>
-<dd>
-
-([[]EntityConfig](#entity-config)) Entities of the service.
-
-</dd>
-<dt>name</dt>
-<dd>
-
-(string, **required**) Name of the service.
-
-</dd>
-</dl>
-
----
-
-### StaticDiscoveryConfig {#static-discovery-config}
-
-StaticDiscoveryConfig for pre-determined list of services.
-
-<dl>
-<dt>services</dt>
-<dd>
-
-([[]ServiceConfig](#service-config)) Services list.
 
 </dd>
 </dl>

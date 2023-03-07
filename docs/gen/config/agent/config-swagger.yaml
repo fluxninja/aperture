@@ -434,31 +434,6 @@ definitions:
         title: Duration is encoded as a string message which represents a signed span of time.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/config
-    EntityConfig:
-        properties:
-            ip_address:
-                description: IP address of the entity.
-                pattern: ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
-                type: string
-                x-go-name: IPAddress
-                x-go-tag-json: ip_address
-                x-go-tag-validate: required,ip
-                x-pattern-rules: ip
-            name:
-                description: Name of the entity.
-                type: string
-                x-go-name: Name
-                x-go-tag-json: name
-            uid:
-                description: UID of the entity.
-                type: string
-                x-go-name: UID
-                x-go-tag-json: uid
-        required:
-            - ip_address
-        title: EntityConfig describes a single entity.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/discovery/static
     EtcdConfig:
         properties:
             endpoints:
@@ -1397,38 +1372,6 @@ definitions:
         title: ServerTLSConfig holds configuration for setting up server TLS support.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
-    ServiceConfig:
-        properties:
-            entities:
-                description: Entities of the service.
-                items:
-                    $ref: '#/definitions/EntityConfig'
-                type: array
-                x-go-name: Entities
-                x-go-tag-json: entities,omitempty
-            name:
-                description: Name of the service.
-                type: string
-                x-go-name: Name
-                x-go-tag-json: name
-                x-go-tag-validate: required
-        required:
-            - name
-        title: ServiceConfig describes a service and its entities.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/discovery/static
-    StaticDiscoveryConfig:
-        properties:
-            services:
-                description: Services list.
-                items:
-                    $ref: '#/definitions/ServiceConfig'
-                type: array
-                x-go-name: Services
-                x-go-tag-json: services,omitempty
-        title: StaticDiscoveryConfig for pre-determined list of services.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/discovery/static
     WatchdogConfig:
         properties:
             cgroup:
@@ -1700,10 +1643,6 @@ paths:
         post:
             operationId: ServiceDiscovery
             parameters:
-                - in: body
-                  name: static
-                  schema:
-                    $ref: '#/definitions/StaticDiscoveryConfig'
                 - in: body
                   name: kubernetes
                   schema:

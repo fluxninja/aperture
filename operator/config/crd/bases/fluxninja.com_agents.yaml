@@ -1799,42 +1799,8 @@ spec:
                           enabled:
                             type: boolean
                         type: object
-                      static:
-                        description: StaticDiscoveryConfig for pre-determined list
-                          of services.
-                        properties:
-                          services:
-                            description: Services list.
-                            items:
-                              description: ServiceConfig describes a service and its
-                                entities. swagger:model
-                              properties:
-                                entities:
-                                  description: Entities of the service.
-                                  items:
-                                    description: EntityConfig describes a single entity.
-                                      swagger:model
-                                    properties:
-                                      ip_address:
-                                        description: IP address of the entity.
-                                        type: string
-                                      name:
-                                        description: Name of the entity.
-                                        type: string
-                                      uid:
-                                        description: UID of the entity.
-                                        type: string
-                                    type: object
-                                  type: array
-                                name:
-                                  description: Name of the service.
-                                  type: string
-                              type: object
-                            type: array
-                        type: object
                     required:
                     - kubernetes
-                    - static
                     type: object
                   watchdog:
                     description: Watchdog configuration.
