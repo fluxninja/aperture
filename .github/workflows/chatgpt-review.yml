@@ -23,6 +23,13 @@ jobs:
         with:
           debug: false
           action: score
+          path_filters: |
+            **.go
+            **.py
+            **.java
+            **.sh
+            **.ts
+            **.js
 
       - uses: unsafecoerce/chatgpt-action@main
         env:
@@ -32,3 +39,10 @@ jobs:
           debug: false
           action: review
           review_comment_lgtm: true
+          path_filters: |
+            **.go
+            **.py
+            **.java
+            **.sh
+            **.ts
+            **.js
