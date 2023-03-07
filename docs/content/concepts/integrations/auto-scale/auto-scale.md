@@ -6,7 +6,6 @@ keywords:
   - Autoscaling
   - auto-scaler
   - Kubernetes
-  - HPA
 ---
 
 # Auto Scale
@@ -62,20 +61,3 @@ autoscaling decisions.
 ```
 
 </Zoom>
-
-# Kubernetes Control Points
-
-Kubernetes Control Points are a type of Kubernetes resource that can be scaled
-up or down dynamically. These resources can be used to manage and optimize the
-allocation of computing resources for containerized applications.
-
-Some of Kubernetes Control Points include:
-
-- Deployments
-- ReplicaSets
-- StatefulSets
-
-## Kubernetes Resource Discovery
-
-Aperture has a discover mechanism to discover all the Kubernetes resources that
-are scalable as Kubernetes Control points.
