@@ -90,7 +90,7 @@ func (jgc JobGroupConstructor) provideJobGroup(
 		gwAll = append(gwAll, jgc.GW...)
 		gwAll = append(gwAll, gw...)
 	}
-	reg := registry.Child("jg", jgc.Name)
+	reg := registry.Child("job-group", jgc.Name)
 
 	jg, err := NewJobGroup(reg, schedulerConfig, gwAll)
 	if err != nil {
@@ -142,8 +142,8 @@ func NewJobGroup(
 // Start starts the JobGroup.
 func (jg *JobGroup) Start() error {
 	jg.livenessRegistry = jg.gt.statusRegistry.Root().
-		Child("subsystem", "liveness").
-		Child("jg", "job_groups").
+		Child("system", "liveness").
+		Child("job-group", "job_groups").
 		Child(jg.gt.statusRegistry.Key(), jg.gt.statusRegistry.Value())
 	jg.scheduler.Start(context.Background())
 	return nil

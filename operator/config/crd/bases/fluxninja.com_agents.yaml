@@ -1803,31 +1803,32 @@ spec:
                         description: StaticDiscoveryConfig for pre-determined list
                           of services.
                         properties:
-                          services:
-                            description: Services list.
+                          entities:
                             items:
-                              description: ServiceConfig describes a service and its
-                                entities. swagger:model
+                              description: Entity represents a pod, vm, etc.
                               properties:
-                                entities:
-                                  description: Entities of the service.
-                                  items:
-                                    description: EntityConfig describes a single entity.
-                                      swagger:model
-                                    properties:
-                                      ip_address:
-                                        description: IP address of the entity.
-                                        type: string
-                                      name:
-                                        description: Name of the entity.
-                                        type: string
-                                      uid:
-                                        description: UID of the entity.
-                                        type: string
-                                    type: object
-                                  type: array
+                                ip_address:
+                                  description: IP address of the entity.
+                                  type: string
                                 name:
-                                  description: Name of the service.
+                                  description: Name of the entity. For example, pod
+                                    name.
+                                  type: string
+                                namespace:
+                                  description: Namespace of the entity. For example,
+                                    pod namespace.
+                                  type: string
+                                node_name:
+                                  description: Node name of the entity. For example,
+                                    host name.
+                                  type: string
+                                services:
+                                  description: Services of the entity.
+                                  items:
+                                    type: string
+                                  type: array
+                                uid:
+                                  description: Unique identifier of the entity.
                                   type: string
                               type: object
                             type: array

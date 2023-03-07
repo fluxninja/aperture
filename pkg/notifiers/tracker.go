@@ -111,7 +111,7 @@ func (tracker *keyTracker) String() string {
 const (
 	add = iota
 	remove
-	get
+	update
 	purge
 	stop
 )
@@ -119,18 +119,21 @@ const (
 type notifierOp struct {
 	keyNotifier    KeyNotifier
 	prefixNotifier PrefixNotifier
-	getKey         Key
-	getValueChan   chan []byte
+	updateKey      Key
+	updateFunc     UpdateValueFunc
 	purgePrefix    string
 	op             int
 }
+
+// UpdateValueFunc is a function that can be used to update the value of an existing tracker entry.
+type UpdateValueFunc func(oldValue []byte) (EventType, []byte)
 
 // EventWriter can be used to inject events into a tracker collection.
 type EventWriter interface {
 	WriteEvent(key Key, value []byte)
 	RemoveEvent(key Key)
 	Purge(prefix string)
-	GetCurrentValue(key Key) []byte
+	UpdateValue(key Key, updateFunc UpdateValueFunc)
 }
 
 // Trackers is the interface of a tracker collection.
@@ -322,26 +325,57 @@ func (t *DefaultTrackers) purge(prefix string) {
 	}
 }
 
-// GetCurrentValue returns the current value tracked by a key.
-func (t *DefaultTrackers) GetCurrentValue(key Key) []byte {
-	ch := make(chan []byte)
+// UpdateValue returns the current value tracked by a key.
+func (t *DefaultTrackers) UpdateValue(key Key, updateFunc UpdateValueFunc) {
 	t.notifiersChannel <- notifierOp{
-		op:           get,
-		getValueChan: ch,
-		getKey:       key,
+		op:         update,
+		updateKey:  key,
+		updateFunc: updateFunc,
 	}
-	// get value from channel
-	return <-ch
 }
 
-func (t *DefaultTrackers) getCurrentValue(key Key, ch chan []byte) {
-	if tracker, ok := t.trackers[key]; ok {
-		if tracker.isValidKey() {
-			ch <- tracker.value
-			return
+func (t *DefaultTrackers) updateValue(key Key, updateFunc UpdateValueFunc) {
+	tracker, _ := t.getTracker(key)
+	eventType, newValue := updateFunc(tracker.value)
+	event := Event{
+		Type:  eventType,
+		Key:   key,
+		Value: newValue,
+	}
+	switch eventType {
+	case Write:
+		t.writeEvent(tracker, event)
+	case Remove:
+		t.removeEvent(tracker, event)
+	}
+}
+
+func (t *DefaultTrackers) writeEvent(tracker *keyTracker, event Event) {
+	valid := tracker.isValidKey()
+	tracker.notify(Write, event.Value)
+	// if the key was not valid earlier, then this is a create event
+	if !valid {
+		for _, pn := range t.prefixNotifiers {
+			if strings.HasPrefix(event.Key.String(), pn.GetPrefix()) {
+				n, err := pn.GetKeyNotifier(event.Key)
+				if err != nil {
+					continue
+				}
+				n.inherit(event.Key, pn)
+				tracker.addKeyNotifier(n)
+			}
 		}
 	}
-	ch <- nil
+}
+
+func (t *DefaultTrackers) removeEvent(tracker *keyTracker, event Event) {
+	for _, n := range t.prefixNotifiers {
+		tracker.removeKeyNotifier(n.getID())
+	}
+	tracker.notify(Remove, nil)
+	if len(tracker.getKeyNotifiers()) == 0 {
+		delete(t.trackers, event.Key)
+	}
 }
 
 // Start opens the underlying event channel and starts the event loop.
@@ -367,10 +401,8 @@ func (t *DefaultTrackers) Start() error {
 					} else if op.prefixNotifier != nil {
 						t.removePrefixNotifier(op.prefixNotifier)
 					}
-				case get:
-					if op.getValueChan != nil {
-						t.getCurrentValue(op.getKey, op.getValueChan)
-					}
+				case update:
+					t.updateValue(op.updateKey, op.updateFunc)
 				case purge:
 					t.purge(op.purgePrefix)
 				case stop:
@@ -378,31 +410,11 @@ func (t *DefaultTrackers) Start() error {
 				}
 			case event := <-t.eventsChannel:
 				tracker, _ := t.getTracker(event.Key)
-				valid := tracker.isValidKey()
 				switch event.Type {
 				case Write:
-					tracker.notify(Write, event.Value)
-					// if the key was not valid earlier, then this is a create event
-					if !valid {
-						for _, pn := range t.prefixNotifiers {
-							if strings.HasPrefix(event.Key.String(), pn.GetPrefix()) {
-								n, err := pn.GetKeyNotifier(event.Key)
-								if err != nil {
-									continue
-								}
-								n.inherit(event.Key, pn)
-								tracker.addKeyNotifier(n)
-							}
-						}
-					}
+					t.writeEvent(tracker, event)
 				case Remove:
-					for _, n := range t.prefixNotifiers {
-						tracker.removeKeyNotifier(n.getID())
-					}
-					tracker.notify(Remove, nil)
-					if len(tracker.getKeyNotifiers()) == 0 {
-						delete(t.trackers, event.Key)
-					}
+					t.removeEvent(tracker, event)
 				}
 			case <-t.ctx.Done():
 				break OUTER
@@ -468,7 +480,7 @@ func (ew *prefixedEventWriter) Purge(prefix string) {
 	ew.parent.Purge(ew.prefix + prefix)
 }
 
-// GetCurrentValue implements EventWriter interface.
-func (ew *prefixedEventWriter) GetCurrentValue(key Key) []byte {
-	return ew.parent.GetCurrentValue(Key(ew.prefix + string(key)))
+// UpdateValue implements EventWriter interface.
+func (ew *prefixedEventWriter) UpdateValue(key Key, updateFunc UpdateValueFunc) {
+	ew.parent.UpdateValue(Key(ew.prefix+string(key)), updateFunc)
 }
