@@ -20,7 +20,7 @@ dependencies {
     tomcat("org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}")
     tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}")
 
-    implementation(project(":lib:tomcat7"))
+    implementation(project(":lib:servlet"))
 
     providedCompile("javax.servlet:javax.servlet-api:3.1.0")
 }
