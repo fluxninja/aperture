@@ -78,7 +78,6 @@ func (kd *serviceDiscovery) start(startCtx context.Context) error {
 	serviceInformer := kd.informerFactory.Core().V1().Services().Informer()
 	_, err = serviceInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    kd.handleServiceAdd,
-		UpdateFunc: kd.handleServiceUpdate,
 		DeleteFunc: kd.handleServiceDelete,
 	})
 	if err != nil {
@@ -183,23 +182,6 @@ func (kd *serviceDiscovery) getPodServiceUpdatesFromEndpoints(endpoints *v1.Endp
 func (kd *serviceDiscovery) handleServiceAdd(obj interface{}) {
 	service := obj.(*v1.Service)
 	kd.addClusterIPs(service)
-}
-
-func (kd *serviceDiscovery) handleServiceUpdate(oldObj, newObj interface{}) {
-	oldService := oldObj.(*v1.Service)
-	newService := newObj.(*v1.Service)
-	// make a deep copy of oldService
-	toRemove := oldService.DeepCopy()
-	// from this copy remove clusterIPs that are present in newService
-	for _, newClusterIP := range newService.Spec.ClusterIPs {
-		for i, oldClusterIP := range toRemove.Spec.ClusterIPs {
-			if newClusterIP == oldClusterIP {
-				toRemove.Spec.ClusterIPs = append(toRemove.Spec.ClusterIPs[:i], toRemove.Spec.ClusterIPs[i+1:]...)
-			}
-		}
-	}
-	kd.removeClusterIPs(toRemove)
-	kd.addClusterIPs(newService)
 }
 
 func (kd *serviceDiscovery) handleServiceDelete(obj interface{}) {
