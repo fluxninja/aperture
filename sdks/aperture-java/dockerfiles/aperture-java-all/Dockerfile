@@ -9,6 +9,7 @@ COPY --link . .
 RUN gradle javaagent:agent:shadowJar
 RUN gradle javaagent:test-services:armeria-test-service:shadowJar
 RUN gradle javaagent:test-services:netty-test-service:shadowJar
+RUN gradle javaagent:test-services:spring-boot-test-service:assemble
 
 RUN gradle examples:armeria-example:shadowJar
 RUN gradle examples:netty-example:shadowJar
@@ -21,6 +22,7 @@ FROM --platform=linux/amd64 openjdk:18-jdk-alpine
 COPY --link --from=builder /javaagent/agent/build/libs/agent*.jar /javaagent.jar
 COPY --link --from=builder /javaagent/test-services/armeria-test-service/build/libs/*-all.jar /armeria.jar
 COPY --link --from=builder /javaagent/test-services/netty-test-service/build/libs/*-all.jar /netty.jar
+COPY --link --from=builder /javaagent/test-services/spring-boot-test-service/build/libs/*-SNAPSHOT.jar /spring-boot.jar
 
 COPY --link --from=builder /examples/armeria-example/build/libs/*-all.jar /armeria-example.jar
 COPY --link --from=builder /examples/netty-example/build/libs/*-all.jar /netty-example.jar
