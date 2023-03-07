@@ -1,20 +1,18 @@
-name: ChatGPT Review
+name: Code Review
 
-on: [pull_request]
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request:
+    types: [opened, reopened]
 
 jobs:
-  chatgpt-review:
-    name: ChatGPT Review
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: feiskyer/ChatGPT-Reviewer@v0
-        name: ChatGPT Review
+      - uses: anc95/ChatGPT-CodeReview@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        # Optional configurations:
-        # with:
-        #   model: "gpt-3.5-turbo"
-        #   temperature: 0.2
-        #   review_per_file: true
-        #   comment_per_file: true
