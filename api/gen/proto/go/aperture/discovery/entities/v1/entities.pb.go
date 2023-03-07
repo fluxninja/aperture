@@ -179,12 +179,18 @@ type Entity struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Uid       string   `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	IpAddress string   `protobuf:"bytes,2,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty"`
-	Name      string   `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Namespace string   `protobuf:"bytes,4,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	NodeName  string   `protobuf:"bytes,5,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty"`
-	Services  []string `protobuf:"bytes,6,rep,name=services,proto3" json:"services,omitempty"`
+	// Unique identifier of the entity.
+	Uid string `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty" validate:"required"` // @gotags: validate:"required"
+	// IP address of the entity.
+	IpAddress string `protobuf:"bytes,2,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty" validate:"required,ip"` // @gotags: validate:"required,ip"
+	// Name of the entity. For example, pod name.
+	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	// Namespace of the entity. For example, pod namespace.
+	Namespace string `protobuf:"bytes,4,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	// Node name of the entity. For example, host name.
+	NodeName string `protobuf:"bytes,5,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty"`
+	// Services of the entity.
+	Services []string `protobuf:"bytes,6,rep,name=services,proto3" json:"services,omitempty" validate:"gt=0"` // @gotags: validate:"gt=0"
 }
 
 func (x *Entity) Reset() {

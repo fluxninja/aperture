@@ -53,10 +53,16 @@ message Entities {
 
 // Entity represents a pod, vm, etc.
 message Entity {
-  string uid = 1;
-  string ip_address = 2;
+  // Unique identifier of the entity.
+  string uid = 1; // @gotags: validate:"required"
+  // IP address of the entity.
+  string ip_address = 2; // @gotags: validate:"required,ip"
+  // Name of the entity. For example, pod name.
   string name = 3;
+  // Namespace of the entity. For example, pod namespace.
   string namespace = 4;
+  // Node name of the entity. For example, host name.
   string node_name = 5;
-  repeated string services = 6;
+  // Services of the entity.
+  repeated string services = 6; // @gotags: validate:"gt=0"
 }
