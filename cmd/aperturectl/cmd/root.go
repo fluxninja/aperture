@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/apply"
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/autoscale"
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/blueprints"
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/flowcontrol"
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/installation"
@@ -23,6 +24,7 @@ func init() {
 	RootCmd.AddCommand(installation.InstallCmd)
 	RootCmd.AddCommand(installation.UnInstallCmd)
 	RootCmd.AddCommand(flowcontrol.FlowControlCmd)
+	RootCmd.AddCommand(autoscale.AutoScaleCmd)
 	RootCmd.AddCommand(agentsCmd)
 
 	RootCmd.InitDefaultCompletionCmd()
