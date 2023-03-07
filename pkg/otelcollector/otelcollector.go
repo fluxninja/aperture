@@ -2,6 +2,7 @@ package otelcollector
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"go.opentelemetry.io/collector/component"
@@ -14,12 +15,16 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/aperture/pkg/status"
 )
 
 // Module is a fx module that invokes OTEL Collector.
@@ -35,13 +40,15 @@ func Module() fx.Option {
 // ConstructorIn describes parameters passed to create OTEL Collector, server providing the OpenTelemetry Collector service.
 type ConstructorIn struct {
 	fx.In
-	Factories     otelcol.Factories
-	Lifecycle     fx.Lifecycle
-	Shutdowner    fx.Shutdowner
-	Unmarshaller  config.Unmarshaller
-	BaseConfig    *otelconfig.OTELConfig `name:"base"`
-	Logger        *log.Logger
-	PluginConfigs []*otelconfig.OTELConfig `group:"plugin-config"`
+	Factories      otelcol.Factories
+	Lifecycle      fx.Lifecycle
+	Shutdowner     fx.Shutdowner
+	Unmarshaller   config.Unmarshaller
+	BaseConfig     *otelconfig.OTELConfig `name:"base"`
+	Logger         *log.Logger
+	PluginConfigs  []*otelconfig.OTELConfig `group:"plugin-config"`
+	StatusRegistry status.Registry
+	Readiness      *jobs.MultiJob `name:"readiness.service"`
 }
 
 // setup creates and runs a new instance of OTEL Collector with the passed configuration.
@@ -50,6 +57,7 @@ func setup(in ConstructorIn) error {
 	var otelService *otelcol.Collector
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
+			setReadinessStatus(in.StatusRegistry, nil, errors.New("OTEL collector starting"))
 			providers := map[string]confmap.Provider{
 				"file": otelconfig.NewOTELConfigUnmarshaler(in.BaseConfig.AsMap()),
 			}
@@ -87,6 +95,10 @@ func setup(in ConstructorIn) error {
 			if err != nil {
 				return fmt.Errorf("constructing OTEL Service: %v", err)
 			}
+			err = registerReadinessJob(in.StatusRegistry, in.Readiness, otelService)
+			if err != nil {
+				return fmt.Errorf("registering OTEL Service readiness job: %v", err)
+			}
 
 			log.Info().Msg("Starting OTEL Collector")
 			panichandler.Go(func() {
@@ -99,6 +111,7 @@ func setup(in ConstructorIn) error {
 			return nil
 		},
 		OnStop: func(context.Context) error {
+			setReadinessStatus(in.StatusRegistry, nil, errors.New("OTEL collector stopping"))
 			log.Info().Msg("Stopping OTEL Collector")
 			otelService.Shutdown()
 			return nil
@@ -106,4 +119,31 @@ func setup(in ConstructorIn) error {
 	})
 
 	return nil
+}
+
+func registerReadinessJob(
+	statusRegistry status.Registry,
+	readiness *jobs.MultiJob,
+	otelService *otelcol.Collector,
+) error {
+	return readiness.RegisterJob(jobs.NewBasicJob("otel-collector", func(ctx context.Context) (proto.Message, error) {
+		msg, err := otelState(otelService)
+		setReadinessStatus(statusRegistry, msg, err)
+		return msg, err
+	}))
+}
+
+func otelState(otelService *otelcol.Collector) (proto.Message, error) {
+	state := otelService.GetState()
+	var err error
+	if state != otelcol.StateRunning {
+		err = errors.New("otel-collector is not running")
+	}
+	return wrapperspb.String(state.String()), err
+}
+
+func setReadinessStatus(statusRegistry status.Registry, msg proto.Message, err error) {
+	statusRegistry.Child("system", "readiness").
+		Child("component", "otel-collector").
+		SetStatus(status.NewStatus(msg, err))
 }
