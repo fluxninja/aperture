@@ -1,20 +1,35 @@
-name: ChatGPT Review
+name: ChatGPT Code Review
 
-on: [pull_request]
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request_target:
 
 jobs:
-  chatgpt-review:
-    name: ChatGPT Review
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: feiskyer/ChatGPT-Reviewer@v0
-        name: ChatGPT Review
+      - uses: actions/checkout@v3
+        with:
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+          ref: ${{github.event.pull_request.head.ref}}
+          submodules: false
+
+      - uses: unsafecoerce/chatgpt-action@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        # Optional configurations:
-        # with:
-        #   model: "gpt-3.5-turbo"
-        #   temperature: 0.2
-        #   review_per_file: true
-        #   comment_per_file: true
+        with:
+          debug: false
+          action: score
+
+      - uses: unsafecoerce/chatgpt-action@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        with:
+          debug: false
+          action: review
+          review_comment_lgtm: true
