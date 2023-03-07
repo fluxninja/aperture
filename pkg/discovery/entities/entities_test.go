@@ -128,7 +128,6 @@ var _ = Describe("Cache", func() {
 
 func testEntity(uid, ipAddress, name string, services []string) *entitiesv1.Entity {
 	return &entitiesv1.Entity{
-		Prefix:    "test",
 		Uid:       uid,
 		IpAddress: ipAddress,
 		Name:      name,

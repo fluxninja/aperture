@@ -62,7 +62,6 @@ func (sd *StaticDiscovery) entitiesFromConfig() map[string]*entitiesv1.Entity {
 			if entity, ok = entities[key]; !ok {
 				entity = &entitiesv1.Entity{
 					IpAddress: e.IPAddress,
-					Prefix:    staticEntityTrackerPrefix,
 					Uid:       e.UID,
 					Services:  nil,
 					Name:      e.Name,

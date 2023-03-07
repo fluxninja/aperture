@@ -381,8 +381,6 @@ definitions:
         type: string
       node_name:
         type: string
-      prefix:
-        type: string
       services:
         type: array
         items:

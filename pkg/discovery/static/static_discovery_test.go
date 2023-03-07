@@ -60,7 +60,6 @@ var _ = Describe("Static service discovery", func() {
 
 			expectedEntity := &entitiesv1.Entity{
 				IpAddress: someIPAddress,
-				Prefix:    staticEntityTrackerPrefix,
 				Uid:       someUID,
 				Services:  []string{someService},
 				Name:      someName,
@@ -141,7 +140,6 @@ var _ = Describe("Static service discovery", func() {
 
 			expectedEntity := &entitiesv1.Entity{
 				IpAddress: someIPAddress,
-				Prefix:    staticEntityTrackerPrefix,
 				Uid:       someUID,
 				Services:  []string{someService, someOtherService},
 				Name:      someName,

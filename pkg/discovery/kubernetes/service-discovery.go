@@ -274,7 +274,6 @@ func (kd *serviceDiscovery) updatePodServiceEntity(pod podServiceUpdate) error {
 				Namespace: pod.Namespace,
 				NodeName:  pod.NodeName,
 				Uid:       pod.UID,
-				Prefix:    podTrackerPrefix,
 				Name:      pod.Name,
 			}
 		} else {
