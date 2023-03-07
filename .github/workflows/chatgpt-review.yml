@@ -4,9 +4,7 @@ permissions:
   contents: read
   pull-requests: write
 
-on:
-  pull_request_target:
-    types: [opened, reopened]
+on: [pull_request]
 
 jobs:
   test:
