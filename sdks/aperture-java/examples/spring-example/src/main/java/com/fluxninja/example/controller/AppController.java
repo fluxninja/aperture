@@ -1,6 +1,6 @@
 package com.fluxninja.example.controller;
 
-import com.fluxninja.aperture.servlet.jakarta.ApertureFilter;
+import com.fluxninja.aperture.servlet.javax.ApertureFilter;
 import com.fluxninja.example.filter.ApertureFeatureFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;

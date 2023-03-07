@@ -1130,17 +1130,14 @@ workflows:
           name: Build with OpenJDK 11
           docker-image: cimg/openjdk:11.0
           path: sdks/aperture-java
-          omit-examples: true
       - build-aperture-java:
           name: Build with OpenJDK 13
           docker-image: cimg/openjdk:13.0
           path: sdks/aperture-java
-          omit-examples: true
       - build-aperture-java:
           name: Build with OpenJDK 15
           docker-image: cimg/openjdk:15.0
           path: sdks/aperture-java
-          omit-examples: true
       - build-aperture-java:
           name: Build with OpenJDK 17
           docker-image: cimg/openjdk:17.0
