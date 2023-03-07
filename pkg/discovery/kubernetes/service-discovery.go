@@ -22,15 +22,6 @@ import (
 
 const podTrackerPrefix = "kubernetes_pod"
 
-type podServiceUpdate struct {
-	Name      string
-	Namespace string
-	NodeName  string
-	UID       string
-	IPAddress string
-	Service   string
-}
-
 // serviceDiscovery is a collector that collects Kubernetes information periodically.
 type serviceDiscovery struct {
 	ctx             context.Context
@@ -136,19 +127,6 @@ func (kd *serviceDiscovery) handleEndpointsDelete(obj interface{}) {
 }
 
 func (kd *serviceDiscovery) updateEndpoints(endpoints *v1.Endpoints) {
-	pods := kd.getPodServiceUpdatesFromEndpoints(endpoints)
-	for _, pod := range pods {
-		p := pod
-		err := kd.updatePodServiceEntity(p)
-		if err != nil {
-			log.Error().Err(err).Msg("Tracker could not be updated")
-		}
-	}
-}
-
-// getPodServiceUpdatesFromEndpoints retrieves a list of pods handled by a given service that are located on a given node.
-func (kd *serviceDiscovery) getPodServiceUpdatesFromEndpoints(endpoints *v1.Endpoints) []podServiceUpdate {
-	var pods []podServiceUpdate
 	for _, subset := range endpoints.Subsets {
 		for _, address := range subset.Addresses {
 			if address.TargetRef == nil {
@@ -157,20 +135,22 @@ func (kd *serviceDiscovery) getPodServiceUpdatesFromEndpoints(endpoints *v1.Endp
 			if address.TargetRef.Kind != "Pod" {
 				continue
 			}
-			p := podServiceUpdate{
+			p := &entitiesv1.Entity{
 				Name:      address.TargetRef.Name,
 				Namespace: address.TargetRef.Namespace,
-				UID:       string(address.TargetRef.UID),
-				IPAddress: address.IP,
-				Service:   kd.getService(endpoints.Namespace, endpoints.Name),
+				Uid:       string(address.TargetRef.UID),
+				IpAddress: address.IP,
+				Services:  []string{kd.getService(endpoints.Namespace, endpoints.Name)},
 			}
 			if address.NodeName != nil {
 				p.NodeName = *address.NodeName
 			}
-			pods = append(pods, p)
+			err := kd.updateEntity(p)
+			if err != nil {
+				log.Error().Err(err).Msg("Tracker could not be updated")
+			}
 		}
 	}
-	return pods
 }
 
 // Service informer handlers
@@ -205,14 +185,14 @@ func (kd *serviceDiscovery) handleServiceDelete(obj interface{}) {
 func (kd *serviceDiscovery) addClusterIPs(service *v1.Service) {
 	clusterIPs := getClusterIPsFromService(service)
 	for _, clusterIP := range clusterIPs {
-		p := podServiceUpdate{
+		p := &entitiesv1.Entity{
 			Name:      strings.Join([]string{"ClusterIP", service.Namespace, service.Name, clusterIP}, "-"),
 			Namespace: service.Namespace,
-			UID:       clusterIP,
-			IPAddress: clusterIP,
-			Service:   kd.getService(service.Namespace, service.Name),
+			Uid:       clusterIP,
+			IpAddress: clusterIP,
+			Services:  []string{kd.getService(service.Namespace, service.Name)},
 		}
-		err := kd.updatePodServiceEntity(p)
+		err := kd.updateEntity(p)
 		if err != nil {
 			log.Error().Err(err).Msg("Tracker could not be updated")
 		}
@@ -262,30 +242,23 @@ func (kd *serviceDiscovery) removeEndpoints(endpoints *v1.Endpoints) {
 	}
 }
 
-// updatePodServiceEntity retrieves stored pod data from tracker, enriches it with new info and send the updated version.
-func (kd *serviceDiscovery) updatePodServiceEntity(pod podServiceUpdate) error {
+// updateEntity updates the entity in the tracker.
+func (kd *serviceDiscovery) updateEntity(pod *entitiesv1.Entity) error {
 	updateFunc := func(oldValue []byte) (notifiers.EventType, []byte) {
 		var entity *entitiesv1.Entity
 		if oldValue == nil {
 			// create new entity
-			entity = &entitiesv1.Entity{
-				Services:  []string{pod.Service},
-				IpAddress: pod.IPAddress,
-				Namespace: pod.Namespace,
-				NodeName:  pod.NodeName,
-				Uid:       pod.UID,
-				Prefix:    podTrackerPrefix,
-				Name:      pod.Name,
-			}
+			entity = pod
 		} else {
 			err := json.Unmarshal(oldValue, &entity)
 			if err != nil {
 				log.Error().Msgf("Error unmarshaling entity: %v", err)
 				return notifiers.Write, oldValue
 			}
-			// append to services if it doesn't exist
-			if !utils.SliceContains(entity.Services, pod.Service) {
-				entity.Services = append(entity.Services, pod.Service)
+			for _, service := range pod.Services {
+				if !utils.SliceContains(entity.Services, service) {
+					entity.Services = append(entity.Services, service)
+				}
 			}
 		}
 		value, err := json.Marshal(entity)
@@ -296,7 +269,7 @@ func (kd *serviceDiscovery) updatePodServiceEntity(pod podServiceUpdate) error {
 		return notifiers.Write, value
 	}
 
-	kd.entityEvents.UpdateValue(notifiers.Key(pod.UID), updateFunc)
+	kd.entityEvents.UpdateValue(notifiers.Key(pod.Uid), updateFunc)
 
 	return nil
 }

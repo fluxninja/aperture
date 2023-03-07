@@ -6,6 +6,7 @@ import (
 
 	"go.uber.org/fx"
 
+	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/common"
 	"github.com/fluxninja/aperture/pkg/discovery/entities"
@@ -17,34 +18,11 @@ const (
 	staticEntityTrackerPrefix = "static_entity"
 )
 
-// EntityConfig describes a single entity.
-// swagger:model
-// +kubebuilder:object:generate=true
-type EntityConfig struct {
-	// IP address of the entity.
-	IPAddress string `json:"ip_address" validate:"required,ip"`
-	// UID of the entity.
-	UID string `json:"uid"`
-	// Name of the entity.
-	Name string `json:"name"`
-}
-
-// ServiceConfig describes a service and its entities.
-// swagger:model
-// +kubebuilder:object:generate=true
-type ServiceConfig struct {
-	// Name of the service.
-	Name string `json:"name" validate:"required"`
-	// Entities of the service.
-	Entities []*EntityConfig `json:"entities,omitempty"`
-}
-
 // StaticDiscoveryConfig for pre-determined list of services.
 // swagger:model
 // +kubebuilder:object:generate=true
 type StaticDiscoveryConfig struct {
-	// Services list.
-	Services []*ServiceConfig `json:"services,omitempty"`
+	Entities []entitiesv1.Entity `json:"entities,omitempty"`
 }
 
 // InvokeStaticServiceDiscovery causes statically configured services to be uploaded to the tracker.
@@ -59,13 +37,13 @@ func InvokeStaticServiceDiscovery(
 		return err
 	}
 
-	if len(cfg.Services) == 0 {
+	if len(cfg.Entities) == 0 {
 		log.Info().Msg("No services configured, disabling static service discovery")
 		return nil
 	}
 
 	entityEvents := entityTrackers.RegisterServiceDiscovery(staticEntityTrackerPrefix)
-	sd := newStaticServiceDiscovery(entityEvents, cfg)
+	sd := newStaticServiceDiscovery(entityEvents, &cfg)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
