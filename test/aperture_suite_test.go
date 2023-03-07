@@ -2,6 +2,7 @@ package test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -12,6 +13,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.uber.org/fx"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
@@ -55,6 +57,7 @@ var (
 	ph          *harness.PrometheusHarness
 	phStarted   bool
 	jgIn        *JobGroupIn
+	registry    status.Registry
 )
 
 type JobGroupIn struct {
@@ -167,6 +170,7 @@ var _ = BeforeSuite(func() {
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
 		jobs.JobGroupConstructor{Name: jobGroupName}.Annotate(),
 		fx.Populate(jgIn),
+		fx.Populate(&registry),
 	)
 
 	if ehStarted {
@@ -185,7 +189,6 @@ var _ = BeforeSuite(func() {
 		visualize, _ := fx.VisualizeError(err)
 		log.Error().Err(err).Msg("fx.New failed: " + visualize)
 	}
-
 	Expect(err).NotTo(HaveOccurred())
 
 	startCtx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
@@ -197,6 +200,8 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	etcdWatcher.Start()
 
+	registry.Child("system", "readiness").Child("component", "platform").SetStatus(status.NewStatus(wrapperspb.String("platform running"), nil))
+
 	project = "staging"
 	Eventually(func() bool {
 		_, err := http.Get(fmt.Sprintf("http://%v/version", addr))
@@ -205,6 +210,8 @@ var _ = BeforeSuite(func() {
 })
 
 var _ = AfterSuite(func() {
+	registry.Child("system", "readiness").Child("component", "platform").SetStatus(status.NewStatus(nil, errors.New("platform stopping")))
+
 	stopCtx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 

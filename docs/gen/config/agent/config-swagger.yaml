@@ -434,31 +434,58 @@ definitions:
         title: Duration is encoded as a string message which represents a signed span of time.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/config
-    EntityConfig:
+    Entity:
         properties:
             ip_address:
                 description: IP address of the entity.
                 pattern: ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
                 type: string
-                x-go-name: IPAddress
-                x-go-tag-json: ip_address
+                x-go-name: IpAddress
+                x-go-tag-json: ip_address,omitempty
+                x-go-tag-protobuf: bytes,2,opt,name=ip_address,json=ipAddress,proto3
                 x-go-tag-validate: required,ip
                 x-pattern-rules: ip
             name:
-                description: Name of the entity.
+                description: Name of the entity. For example, pod name.
                 type: string
                 x-go-name: Name
-                x-go-tag-json: name
-            uid:
-                description: UID of the entity.
+                x-go-tag-json: name,omitempty
+                x-go-tag-protobuf: bytes,3,opt,name=name,proto3
+            namespace:
+                description: Namespace of the entity. For example, pod namespace.
                 type: string
-                x-go-name: UID
-                x-go-tag-json: uid
+                x-go-name: Namespace
+                x-go-tag-json: namespace,omitempty
+                x-go-tag-protobuf: bytes,4,opt,name=namespace,proto3
+            node_name:
+                description: Node name of the entity. For example, host name.
+                type: string
+                x-go-name: NodeName
+                x-go-tag-json: node_name,omitempty
+                x-go-tag-protobuf: bytes,5,opt,name=node_name,json=nodeName,proto3
+            services:
+                description: Services of the entity.
+                items:
+                    type: string
+                minItems: 1
+                type: array
+                x-go-name: Services
+                x-go-tag-json: services,omitempty
+                x-go-tag-protobuf: bytes,6,rep,name=services,proto3
+                x-go-tag-validate: gt=0
+            uid:
+                description: Unique identifier of the entity.
+                type: string
+                x-go-name: Uid
+                x-go-tag-json: uid,omitempty
+                x-go-tag-protobuf: bytes,1,opt,name=uid,proto3
+                x-go-tag-validate: required
         required:
             - ip_address
-        title: EntityConfig describes a single entity.
+            - uid
+        title: Entity represents a pod, vm, etc.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/discovery/static
+        x-go-package: github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1
     EtcdConfig:
         properties:
             endpoints:
@@ -1397,35 +1424,14 @@ definitions:
         title: ServerTLSConfig holds configuration for setting up server TLS support.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
-    ServiceConfig:
+    StaticDiscoveryConfig:
         properties:
             entities:
-                description: Entities of the service.
                 items:
-                    $ref: '#/definitions/EntityConfig'
+                    $ref: '#/definitions/Entity'
                 type: array
                 x-go-name: Entities
                 x-go-tag-json: entities,omitempty
-            name:
-                description: Name of the service.
-                type: string
-                x-go-name: Name
-                x-go-tag-json: name
-                x-go-tag-validate: required
-        required:
-            - name
-        title: ServiceConfig describes a service and its entities.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/discovery/static
-    StaticDiscoveryConfig:
-        properties:
-            services:
-                description: Services list.
-                items:
-                    $ref: '#/definitions/ServiceConfig'
-                type: array
-                x-go-name: Services
-                x-go-tag-json: services,omitempty
         title: StaticDiscoveryConfig for pre-determined list of services.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/discovery/static

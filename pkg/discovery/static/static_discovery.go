@@ -3,7 +3,6 @@ package static
 import (
 	"encoding/json"
 
-	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 )
@@ -11,25 +10,25 @@ import (
 // StaticDiscovery reads entities from config and writes them to tracker.
 type StaticDiscovery struct {
 	entityEvents notifiers.EventWriter
-	services     []*ServiceConfig
+	config       *StaticDiscoveryConfig
 }
 
 func newStaticServiceDiscovery(
 	entityEvents notifiers.EventWriter,
-	config StaticDiscoveryConfig,
+	config *StaticDiscoveryConfig,
 ) *StaticDiscovery {
 	return &StaticDiscovery{
 		entityEvents: entityEvents,
-		services:     config.Services,
+		config:       config,
 	}
 }
 
 // start loads all configured entities into the tracker.
 func (sd *StaticDiscovery) start() error {
-	entities := sd.entitiesFromConfig()
-	log.Debug().Msgf("Uploading %v pre-configured entities to tracker", len(entities))
-	for rawKey, entity := range entities {
-		key := notifiers.Key(rawKey)
+	log.Debug().Msgf("Uploading %v pre-configured entities to tracker", len(sd.config.Entities))
+	for i := 0; i < len(sd.config.Entities); i++ {
+		entity := &sd.config.Entities[i]
+		key := notifiers.Key(entity.GetUid())
 		value, err := json.Marshal(entity)
 		if err != nil {
 			log.Error().Msgf("Error marshaling entity: %v", err)
@@ -37,42 +36,11 @@ func (sd *StaticDiscovery) start() error {
 		}
 		sd.entityEvents.WriteEvent(key, value)
 	}
-	log.Info().Msgf("Uploaded %v pre-configured entities to tracker", len(entities))
+	log.Info().Msgf("Uploaded %v pre-configured entities to tracker", len(sd.config.Entities))
 	return nil
 }
 
 func (sd *StaticDiscovery) stop() error {
 	sd.entityEvents.Purge("")
 	return nil
-}
-
-func (sd *StaticDiscovery) entitiesFromConfig() map[string]*entitiesv1.Entity {
-	// entities maps entity tracker key to the entity.
-	// We assume that configured entities are consistent, i.e. same Prefix+UID implies equality of other fields
-	entities := make(map[string]*entitiesv1.Entity)
-
-	for _, service := range sd.services {
-		serviceName := service.Name
-		for _, e := range service.Entities {
-			key := e.UID
-
-			var entity *entitiesv1.Entity
-			var ok bool
-
-			if entity, ok = entities[key]; !ok {
-				entity = &entitiesv1.Entity{
-					IpAddress: e.IPAddress,
-					Prefix:    staticEntityTrackerPrefix,
-					Uid:       e.UID,
-					Services:  nil,
-					Name:      e.Name,
-				}
-				entities[key] = entity
-			}
-
-			entity.Services = append(entity.Services, serviceName)
-		}
-	}
-
-	return entities
 }

@@ -12,7 +12,7 @@ import static com.fluxninja.aperture.sdk.Constants.*;
 public class TrafficFlow {
   private final CheckResponse checkResponse;
   private final Span span;
-  private boolean ended;
+  public boolean ended;
   private boolean ignored;
 
   TrafficFlow(

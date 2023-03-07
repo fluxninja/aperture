@@ -209,6 +209,11 @@ func addFluxNinjaExporter(config *otelconfig.OTELConfig,
 		"headers": map[string]interface{}{
 			"authorization": fmt.Sprintf("Bearer %s", pluginConfig.APIKey),
 		},
+		"sending_queue": map[string]interface{}{
+			// Needed to avoid sending metrics out of order, which leads to metrics
+			// being dropped.
+			"num_consumers": 1,
+		},
 	}
 
 	var clientTLSConfig tlsconfig.ClientTLSConfig
