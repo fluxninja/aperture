@@ -28,11 +28,15 @@ type platformReadinessStatusIn struct {
 func platformReadinessStatus(in platformReadinessStatusIn) error {
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			platform.statusRegistry.Child("system", readinessStatusPath).Child("component", platformStatusPath).SetStatus(status.NewStatus(nil, errors.New("platform starting")))
+			platform.statusRegistry.Child("system", readinessStatusPath).
+				Child("component", platformStatusPath).
+				SetStatus(status.NewStatus(nil, errors.New("platform starting")))
 			return nil
 		},
 		OnStop: func(context.Context) error {
-			platform.statusRegistry.Child("system", readinessStatusPath).Child("component", platformStatusPath).SetStatus(status.NewStatus(nil, errors.New("platform stopped")))
+			platform.statusRegistry.Child("system", readinessStatusPath).
+				Child("component", platformStatusPath).
+				SetStatus(status.NewStatus(nil, errors.New("platform stopped")))
 			return nil
 		},
 	})

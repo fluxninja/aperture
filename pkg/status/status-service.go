@@ -33,24 +33,26 @@ func (svc *StatusService) GetGroupStatus(ctx context.Context, req *statusv1.Grou
 	pathKeys := strings.Split(req.Path, "/")
 
 	registry := svc.registry
-	if req.Path != "" && len(pathKeys) != 0 {
-		for i := 0; i < len(pathKeys); i += 2 {
-			if i >= len(pathKeys) || i+1 >= len(pathKeys) {
-				log.Warn().Str("path", req.Path).Msg("Incorrect status path")
-				_ = grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "404"))
-				return &statusv1.GroupStatus{}, nil
-			}
+	if req.Path == "" || len(pathKeys) == 0 {
+		return registry.GetGroupStatus(), nil
+	}
 
-			key := pathKeys[i]
-			val := pathKeys[i+1]
-			registry = registry.ChildIfExists(key, val)
-			if registry == nil {
-				_ = grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "404"))
-				return &statusv1.GroupStatus{}, nil
-			}
-			if registry.HasError() {
-				_ = grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "503"))
-			}
+	for i := 0; i < len(pathKeys); i += 2 {
+		if i >= len(pathKeys) || i+1 >= len(pathKeys) {
+			log.Warn().Str("path", req.Path).Msg("Incorrect status path")
+			_ = grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "404"))
+			return &statusv1.GroupStatus{}, nil
+		}
+
+		key := pathKeys[i]
+		val := pathKeys[i+1]
+		registry = registry.ChildIfExists(key, val)
+		if registry == nil {
+			_ = grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "404"))
+			return &statusv1.GroupStatus{}, nil
+		}
+		if registry.HasError() {
+			_ = grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "503"))
 		}
 	}
 

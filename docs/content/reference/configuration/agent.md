@@ -829,9 +829,9 @@ DistCacheConfig configures distributed cache that holds per-label counters in di
 
 ---
 
-### EntityConfig {#entity-config}
+### Entity {#entity}
 
-EntityConfig describes a single entity.
+Entity represents a pod, vm, etc.
 
 <dl>
 <dt>ip_address</dt>
@@ -843,13 +843,31 @@ EntityConfig describes a single entity.
 <dt>name</dt>
 <dd>
 
-(string) Name of the entity.
+(string) Name of the entity. For example, pod name.
+
+</dd>
+<dt>namespace</dt>
+<dd>
+
+(string) Namespace of the entity. For example, pod namespace.
+
+</dd>
+<dt>node_name</dt>
+<dd>
+
+(string) Node name of the entity. For example, host name.
+
+</dd>
+<dt>services</dt>
+<dd>
+
+([]string) Services of the entity.
 
 </dd>
 <dt>uid</dt>
 <dd>
 
-(string) UID of the entity.
+(string, **required**) Unique identifier of the entity.
 
 </dd>
 </dl>
@@ -1681,36 +1699,15 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 
 ---
 
-### ServiceConfig {#service-config}
-
-ServiceConfig describes a service and its entities.
-
-<dl>
-<dt>entities</dt>
-<dd>
-
-([[]EntityConfig](#entity-config)) Entities of the service.
-
-</dd>
-<dt>name</dt>
-<dd>
-
-(string, **required**) Name of the service.
-
-</dd>
-</dl>
-
----
-
 ### StaticDiscoveryConfig {#static-discovery-config}
 
 StaticDiscoveryConfig for pre-determined list of services.
 
 <dl>
-<dt>services</dt>
+<dt>entities</dt>
 <dd>
 
-([[]ServiceConfig](#service-config)) Services list.
+([[]Entity](#entity))
 
 </dd>
 </dl>

@@ -5,15 +5,15 @@ sidebar_position: 1
 
 :::info
 
-See also [Circuit reference][circuit-reference]
+See also [_Circuit_ reference][circuit-reference]
 
 :::
 
-Circuit describes a [control system][control-system] as an execution graph.
-Circuit is defined as a dataflow graph of inter-connected components. Signals
-flow between components via ports. As signals traverse the circuit, they get
-processed, stored within components or get acted upon (e.g. load-shed,
-rate-limit, auto-scale etc.). Circuit is evaluated periodically in order to
+_Circuit_ describes a [control system][control-system] as an execution graph.
+_Circuit_ is defined as a dataflow graph of inter-connected components.
+_Signals_ flow between components via ports. As signals traverse the circuit,
+they get processed, stored within components or get acted upon (e.g. load-shed,
+rate-limit, auto-scale etc.). _Circuit_ is evaluated periodically in order to
 respond to changes in signal readings.
 
 ## Component
@@ -26,7 +26,7 @@ the signal.
 
 ## Signal
 
-Signal represents a `float64` value that updates with every [tick][tick] of
+_Signal_ represents a `float64` value that updates with every [tick][tick] of
 circuit execution. Every signal must have a name to uniquely identify it within
 a circuit.
 
@@ -39,7 +39,7 @@ be received at multiple components.
 
 ## Circuit Runtime
 
-Circuit evaluates at a constant _tick_ frequency. Each round of evaluation is
+_Circuit_ evaluates at a constant _tick_ frequency. Each round of evaluation is
 called a tick. The `evaluation_interval` parameter in [policy
 spec][policy-reference] configures how often the circuit evaluates (ticks).
 
@@ -51,11 +51,11 @@ During execution, the input signals are processed and output signals are emitted
 by the component. Any [looping signals][looping-signals] are saved and consumed
 by circuit in the next tick.
 
-Circuit runtime provides very predictable execution semantics. Any timed
-operations like PromQL queries are synchronized to execute on multiples of
-ticks. All PromQL queries in a circuit are centrally synchronized to ensure that
-all the queries that fire in the same tick return results together in a future
-tick.
+_Circuit_ runtime provides very predictable execution semantics. Any timed
+operations like [_PromQL_][promql-reference] queries are synchronized to execute
+on multiples of ticks. All _PromQL_ queries in a circuit are centrally
+synchronized to ensure that all the queries that fire in the same tick return
+results together in a future tick.
 
 ### Looping Signals
 

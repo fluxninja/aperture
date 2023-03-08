@@ -1182,21 +1182,40 @@ definitions:
         description: Entity represents a pod, vm, etc.
         properties:
             ip_address:
+                description: |+
+                    IP address of the entity.
+
+                pattern: ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
                 type: string
+                x-go-tag-validate: required,ip
+                x-pattern-rules: ip
             name:
+                description: Name of the entity. For example, pod name.
                 type: string
             namespace:
+                description: Namespace of the entity. For example, pod namespace.
                 type: string
             node_name:
-                type: string
-            prefix:
+                description: Node name of the entity. For example, host name.
                 type: string
             services:
+                description: |+
+                    Services of the entity.
+
                 items:
                     type: string
+                minItems: 1
                 type: array
+                x-go-tag-validate: gt=0
             uid:
+                description: |+
+                    Unique identifier of the entity.
+
                 type: string
+                x-go-tag-validate: required
+        required:
+            - ip_address
+            - uid
         type: object
     EqualsMatchExpression:
         description: Label selector expression of the equal form "label == value".

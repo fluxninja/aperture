@@ -17,7 +17,7 @@ import Zoom from 'react-medium-image-zoom';
 
 :::info
 
-See also [Flow Selector reference](/reference/policies/spec.md#flow-selector)
+See also [_Flow Selector_ reference](/reference/policies/spec.md#flow-selector)
 
 :::
 
@@ -30,19 +30,19 @@ A _Flow Selector_ consists of:
 
 - _Service Selector_, containing
 
-  - [service](#service) name,
-  - [agent group](#agent-group) name,
+  - [_Service_](#service) name,
+  - [_Agent Group_](#agent-group) name,
 
 - _Flow Matcher_, containing
-  - [control point](#control-point), and
-  - optional [flow label matcher](#label-matcher).
+  - [_Control Point_](#control-point), and
+  - [_Flow Matcher_](#label-matcher).
 
 ## Service Selector {#service-selector}
 
 :::info
 
 See also
-[Service Selector reference](/reference/policies/spec.md#service-selector)
+[_Service Selector_ reference](/reference/policies/spec.md#service-selector)
 
 :::
 
@@ -157,7 +157,7 @@ to select flows from.
 
 :::info
 
-See also [Flow Matcher reference](/reference/policies/spec.md#flow-matcher)
+See also [_Flow Matcher_ reference](/reference/policies/spec.md#flow-matcher)
 
 :::
 
