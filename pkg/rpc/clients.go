@@ -289,7 +289,6 @@ func (c *Clients) CallAll(req *anypb.Any) []RawResult {
 			}
 			return results
 		case result := <-respChan:
-			log.Info().Interface("result", result).Msg("got result")
 			results = append(results, result)
 			delete(remainingClients, result.Client)
 			if len(remainingClients) == 0 {
