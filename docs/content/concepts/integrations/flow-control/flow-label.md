@@ -20,9 +20,9 @@ _Flow Labels_ are used in different ways in Aperture:
 - [_Flow Selector_][flow-selector] can select flows based on _Flow Labels_, thus
   flow labels can be used to narrow the scope of [_Classifiers_][classifier],
   [_Flux Meters_][flux-meter] etc.
-- _Flow Labels_ are used to map a flow to a [_workload_][workload].
-- Fairness within [scheduler][scheduler] and [rate limiting][ratelimiter] keys
-  are also based on _Flow Labels_.
+- _Flow Labels_ are used to map a flow to a [_Workload_][workload].
+- Fairness within [_Scheduler_][scheduler] and [_Rate Limiter_][ratelimiter]
+  keys are also based on _Flow Labels_.
 
 ## Sources
 
