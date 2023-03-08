@@ -24,12 +24,19 @@ jobs:
           debug: false
           action: score
           path_filters: |
-            **/*.go
-            **/*.py
-            **/*.java
-            **/*.sh
-            **/*.ts
-            **/*.js
+            !**/*.yaml
+            !**/*.yml
+            !**/*.cfg
+            !**/*.ini
+            !**/*.mod
+            !**/*.sum
+            !**/*.json
+            !**/*.mmd
+            !**/*.svg
+            !**/*.png
+            !**/*.dot
+            !**/gen/**
+            !**/vendor/**
 
       - uses: unsafecoerce/chatgpt-action@main
         env:
@@ -40,9 +47,16 @@ jobs:
           action: review
           review_comment_lgtm: false
           path_filters: |
-            **/*.go
-            **/*.py
-            **/*.java
-            **/*.sh
-            **/*.ts
-            **/*.js
+            !**/*.yaml
+            !**/*.yml
+            !**/*.cfg
+            !**/*.ini
+            !**/*.mod
+            !**/*.sum
+            !**/*.json
+            !**/*.mmd
+            !**/*.svg
+            !**/*.png
+            !**/*.dot
+            !**/gen/**
+            !**/vendor/**
