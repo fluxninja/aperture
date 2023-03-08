@@ -69,7 +69,6 @@ func (kd *serviceDiscovery) start(startCtx context.Context) error {
 	serviceInformer := kd.informerFactory.Core().V1().Services().Informer()
 	_, err = serviceInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    kd.handleServiceAdd,
-		UpdateFunc: kd.handleServiceUpdate,
 		DeleteFunc: kd.handleServiceDelete,
 	})
 	if err != nil {
@@ -103,21 +102,26 @@ func (kd *serviceDiscovery) handleEndpointsAdd(obj interface{}) {
 func (kd *serviceDiscovery) handleEndpointsUpdate(oldObj, newObj interface{}) {
 	oldEndpoints := oldObj.(*v1.Endpoints)
 	newEndpoints := newObj.(*v1.Endpoints)
-	// make a deep copy of oldEndpoints
-	toRemove := oldEndpoints.DeepCopy()
-	// check if an address in toRemove is found in any subsets of newEndpoints, if so remove it from toRemove
-	for _, newSubset := range newEndpoints.Subsets {
-		for _, newAddress := range newSubset.Addresses {
-			for i, oldSubset := range toRemove.Subsets {
-				for j, oldAddress := range oldSubset.Addresses {
+
+	// remove addresses that are no longer in the newEndpoints
+	for _, oldSubset := range oldEndpoints.Subsets {
+		for _, oldAddress := range oldSubset.Addresses {
+			found := false
+			for _, newSubset := range newEndpoints.Subsets {
+				for _, newAddress := range newSubset.Addresses {
 					if newAddress.TargetRef.UID == oldAddress.TargetRef.UID {
-						toRemove.Subsets[i].Addresses = append(toRemove.Subsets[i].Addresses[:j], toRemove.Subsets[i].Addresses[j+1:]...)
+						found = true
+						break
 					}
 				}
 			}
+			if !found {
+				// address is no longer in the newEndpoints, remove it
+				kd.removeEndpointAddress(oldAddress, oldEndpoints.Namespace, oldEndpoints.Name)
+			}
 		}
 	}
-	kd.removeEndpoints(toRemove)
+
 	kd.updateEndpoints(newEndpoints)
 }
 
@@ -160,23 +164,6 @@ func (kd *serviceDiscovery) handleServiceAdd(obj interface{}) {
 	kd.addClusterIPs(service)
 }
 
-func (kd *serviceDiscovery) handleServiceUpdate(oldObj, newObj interface{}) {
-	oldService := oldObj.(*v1.Service)
-	newService := newObj.(*v1.Service)
-	// make a deep copy of oldService
-	toRemove := oldService.DeepCopy()
-	// from this copy remove clusterIPs that are present in newService
-	for _, newClusterIP := range newService.Spec.ClusterIPs {
-		for i, oldClusterIP := range toRemove.Spec.ClusterIPs {
-			if newClusterIP == oldClusterIP {
-				toRemove.Spec.ClusterIPs = append(toRemove.Spec.ClusterIPs[:i], toRemove.Spec.ClusterIPs[i+1:]...)
-			}
-		}
-	}
-	kd.removeClusterIPs(toRemove)
-	kd.addClusterIPs(newService)
-}
-
 func (kd *serviceDiscovery) handleServiceDelete(obj interface{}) {
 	service := obj.(*v1.Service)
 	kd.removeClusterIPs(service)
@@ -212,32 +199,36 @@ func (kd *serviceDiscovery) getService(namespace, name string) string {
 	return service
 }
 
+func (kd *serviceDiscovery) removeEndpointAddress(address v1.EndpointAddress, namespace, name string) {
+	updateFunc := func(oldValue []byte) (notifiers.EventType, []byte) {
+		if oldValue == nil {
+			return notifiers.Remove, nil
+		}
+		entity := &entitiesv1.Entity{}
+		err := json.Unmarshal(oldValue, entity)
+		if err != nil {
+			log.Error().Err(err).Msg("Could not unmarshal entity")
+			return notifiers.Remove, nil
+		}
+		entity.Services = utils.RemoveFromSlice(entity.Services, kd.getService(namespace, name))
+		if shouldRemove(entity) {
+			return notifiers.Remove, nil
+		}
+		bytes, err := json.Marshal(entity)
+		if err != nil {
+			log.Error().Err(err).Msg("Could not marshal entity")
+			return notifiers.Remove, nil
+		}
+		return notifiers.Write, bytes
+	}
+
+	kd.entityEvents.UpdateValue(notifiers.Key(address.TargetRef.UID), updateFunc)
+}
+
 func (kd *serviceDiscovery) removeEndpoints(endpoints *v1.Endpoints) {
 	for _, subset := range endpoints.Subsets {
 		for _, address := range subset.Addresses {
-			updateFunc := func(oldValue []byte) (notifiers.EventType, []byte) {
-				if oldValue == nil {
-					return notifiers.Remove, nil
-				}
-				entity := &entitiesv1.Entity{}
-				err := json.Unmarshal(oldValue, entity)
-				if err != nil {
-					log.Error().Err(err).Msg("Could not unmarshal entity")
-					return notifiers.Remove, nil
-				}
-				entity.Services = utils.RemoveFromSlice(entity.Services, kd.getService(endpoints.Namespace, endpoints.Name))
-				if shouldRemove(entity) {
-					return notifiers.Remove, nil
-				}
-				bytes, err := json.Marshal(entity)
-				if err != nil {
-					log.Error().Err(err).Msg("Could not marshal entity")
-					return notifiers.Remove, nil
-				}
-				return notifiers.Write, bytes
-			}
-
-			kd.entityEvents.UpdateValue(notifiers.Key(address.TargetRef.UID), updateFunc)
+			kd.removeEndpointAddress(address, endpoints.Namespace, endpoints.Name)
 		}
 	}
 }
