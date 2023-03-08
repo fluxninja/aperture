@@ -154,7 +154,7 @@ func basePluginOTELConfigWithMetrics(pipelineName string) *otelconfig.OTELConfig
 	cfg.AddProcessor("batch/metrics-slow", batchprocessor.Config{
 		SendBatchSize:    10000,
 		SendBatchMaxSize: 10000,
-		Timeout:          10 * time.Second,
+		Timeout:          5 * time.Second,
 	})
 	processors := []string{
 		"batch/metrics-slow",
