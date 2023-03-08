@@ -522,7 +522,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 				LivenessProbe: &corev1.Probe{
 					ProbeHandler: corev1.ProbeHandler{
 						HTTPGet: &corev1.HTTPGetAction{
-							Path:   "/v1/status/subsystem/liveness",
+							Path:   "/v1/status/system/liveness",
 							Port:   intstr.FromString(Server),
 							Scheme: corev1.URISchemeHTTP,
 						},
@@ -536,7 +536,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 				ReadinessProbe: &corev1.Probe{
 					ProbeHandler: corev1.ProbeHandler{
 						HTTPGet: &corev1.HTTPGetAction{
-							Path:   "/v1/status/subsystem/readiness",
+							Path:   "/v1/status/system/readiness",
 							Port:   intstr.FromString(Server),
 							Scheme: corev1.URISchemeHTTP,
 						},

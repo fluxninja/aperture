@@ -19,6 +19,7 @@ package controllers
 import (
 	"bytes"
 	"context"
+	cryptorand "crypto/rand"
 	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
@@ -33,11 +34,6 @@ import (
 	"strings"
 	"time"
 
-	cryptorand "crypto/rand"
-
-	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
-	"github.com/fluxninja/aperture/operator/api/common"
-	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
 	"github.com/imdario/mergo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -47,6 +43,10 @@ import (
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
+
+	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
+	"github.com/fluxninja/aperture/operator/api/common"
+	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
 )
 
 // ContainerSecurityContext prepares SecurityContext for containers based on the provided parameter.
@@ -137,7 +137,7 @@ func ContainerProbes(spec common.CommonSpec, scheme corev1.URIScheme) (*corev1.P
 		livenessProbe = &corev1.Probe{
 			ProbeHandler: corev1.ProbeHandler{
 				HTTPGet: &corev1.HTTPGetAction{
-					Path:   "/v1/status/subsystem/liveness",
+					Path:   "/v1/status/system/liveness",
 					Port:   intstr.FromString(Server),
 					Scheme: scheme,
 				},
@@ -156,7 +156,7 @@ func ContainerProbes(spec common.CommonSpec, scheme corev1.URIScheme) (*corev1.P
 		readinessProbe = &corev1.Probe{
 			ProbeHandler: corev1.ProbeHandler{
 				HTTPGet: &corev1.HTTPGetAction{
-					Path:   "/v1/status/subsystem/readiness",
+					Path:   "/v1/status/system/readiness",
 					Port:   intstr.FromString(Server),
 					Scheme: scheme,
 				},

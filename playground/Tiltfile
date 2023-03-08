@@ -339,7 +339,7 @@ DEP_TREE = {
 NS_CONFIG = {
     APERTURE_DEMOAPP_NS: {
         "labels": ["istio-injection: enabled"],
-    },
+    }
 }
 
 ###############
@@ -1154,12 +1154,14 @@ dockerhub_images = cfg.get("dockerhub-image", [])
 if dockerhub_images:
     process_dockerhub_images(dockerhub_images)
 
+to_run = cfg.get("to-run", ["agent"])
+
 scenario = cfg.get("scenario", None)
 if not scenario:
     scenario = DEFAULT_TEST_SCENARIO
 
 process_aperture_scenario(scenario)
-to_run = ["agent", "controller", "aperture-grafana", "istio", "scenario-app", "scenario-wavepool"]
+to_run += ["scenario-app", "scenario-wavepool"]
 # Not all scenarios have policies, so only load policies if they were generated based on the scenario.
 if "scenario-policies" in DEP_TREE[APERTURE_DEMOAPP_NS]:
     to_run += ["scenario-policies"]

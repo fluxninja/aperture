@@ -27,27 +27,28 @@ func RegisterStatusService(server *grpc.Server, reg Registry) {
 
 // GetGroupStatus returns the group status for the requested group in the Registry.
 func (svc *StatusService) GetGroupStatus(ctx context.Context, req *statusv1.GroupStatusRequest) (*statusv1.GroupStatus, error) {
-	log.Trace().Interface("path", req.Path).Msg("Received request on GetGroupStatus handler")
+	log.Trace().Str("path", req.Path).Msg("Received request on GetGroupStatus handler")
 
 	// extract pairs of key-value from the path, separated by /
-	keys := strings.Split(req.Path, "/")
+	pathKeys := strings.Split(req.Path, "/")
 
 	registry := svc.registry
-	if req.Path == "" || len(keys) == 0 {
+	if req.Path == "" || len(pathKeys) == 0 {
 		return registry.GetGroupStatus(), nil
 	}
 
-	for i := 0; i < len(keys); i += 2 {
-		if i >= len(keys) || i+1 >= len(keys) {
-			log.Warn().Msgf("Incorrect status path: %+v", req.Path)
+	for i := 0; i < len(pathKeys); i += 2 {
+		if i >= len(pathKeys) || i+1 >= len(pathKeys) {
+			log.Warn().Str("path", req.Path).Msg("Incorrect status path")
 			_ = grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "404"))
 			return &statusv1.GroupStatus{}, nil
 		}
 
-		key := keys[i]
-		val := keys[i+1]
+		key := pathKeys[i]
+		val := pathKeys[i+1]
 		registry = registry.ChildIfExists(key, val)
 		if registry == nil {
+			_ = grpc.SetHeader(ctx, metadata.Pairs("x-http-code", "404"))
 			return &statusv1.GroupStatus{}, nil
 		}
 		if registry.HasError() {

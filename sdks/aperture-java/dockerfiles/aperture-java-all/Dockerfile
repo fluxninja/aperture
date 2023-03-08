@@ -13,6 +13,7 @@ RUN gradle javaagent:test-services:netty-test-service:shadowJar
 RUN gradle examples:armeria-example:shadowJar
 RUN gradle examples:netty-example:shadowJar
 RUN gradle examples:standalone-example:shadowJar
+RUN gradle examples:spring-example:assemble
 # TODO: also add tomcat here
 
 FROM --platform=linux/amd64 openjdk:18-jdk-alpine
@@ -24,6 +25,7 @@ COPY --link --from=builder /javaagent/test-services/netty-test-service/build/lib
 COPY --link --from=builder /examples/armeria-example/build/libs/*-all.jar /armeria-example.jar
 COPY --link --from=builder /examples/netty-example/build/libs/*-all.jar /netty-example.jar
 COPY --link --from=builder /examples/standalone-example/build/libs/*-all.jar /standalone-example.jar
+COPY --link --from=builder /examples/spring-example/build/libs/*-SNAPSHOT.jar /spring-example.jar
 
 HEALTHCHECK --interval=5s --timeout=60s --retries=3 --start-period=20s \
    CMD wget --no-verbose --tries=1 --spider 127.0.0.1:8080/health || exit 1

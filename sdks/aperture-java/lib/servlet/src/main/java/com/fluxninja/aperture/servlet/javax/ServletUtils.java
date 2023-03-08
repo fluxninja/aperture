@@ -1,4 +1,4 @@
-package com.fluxninja.aperture.tomcat7;
+package com.fluxninja.aperture.servlet.javax;
 
 import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.sdk.FlowStatus;
@@ -11,12 +11,10 @@ import io.opentelemetry.api.baggage.BaggageEntry;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ServletUtils {
     protected static int handleRejectedFlow(TrafficFlow flow) {
@@ -51,8 +49,36 @@ public class ServletUtils {
     }
 
     protected static ServletRequest updateHeaders(ServletRequest req, List<HeaderValueOption> newHeaders) {
-        // TODO: Update headers of ServletRequest (probably need to create requestWrapper)
-        return req;
+        HttpServletRequest httpReq = (HttpServletRequest) req;
+        Map<String, String> headerMap = new HashMap<>();
+        for (HeaderValueOption option : newHeaders) {
+            headerMap.put(option.getHeader().getKey(), option.getHeader().getValue());
+        }
+        return new HttpServletRequestWrapper(httpReq) {
+            @Override
+            public Enumeration<String> getHeaderNames() {
+                Set<String> headerNames = new HashSet<>(Collections.list(super.getHeaderNames()));
+                headerNames.addAll(headerMap.keySet());
+                return Collections.enumeration(headerNames);
+            }
+
+            @Override
+            public String getHeader(String name) {
+                String header = headerMap.get(name);
+                return header != null ? header : super.getHeader(name);
+            }
+
+            @Override
+            public Enumeration<String> getHeaders(String name) {
+                String header = headerMap.get(name);
+                if (header != null) {
+                    List<String> values = Arrays.asList(header.split(","));
+                    return Collections.enumeration(values);
+                } else {
+                    return super.getHeaders(name);
+                }
+            }
+        };
     }
 
     private static AttributeContext.Builder addHttpAttributes(AttributeContext.Builder builder, ServletRequest req) {

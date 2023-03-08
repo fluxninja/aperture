@@ -209,6 +209,9 @@ func basePluginOTELConfig() *otelconfig.OTELConfig {
 		"headers": map[string]interface{}{
 			"authorization": "Bearer deadbeef",
 		},
+		"sending_queue": map[string]interface{}{
+			"num_consumers": 1,
+		},
 		"tls": map[string]interface{}{
 			"key_file":             "",
 			"ca_file":              "",

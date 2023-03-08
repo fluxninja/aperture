@@ -110,10 +110,10 @@ func (c *Entities) processUpdate(event notifiers.Event, unmarshaller config.Unma
 
 	switch event.Type {
 	case notifiers.Write:
-		log.Trace().Str("entity", entity.Prefix+entity.Uid).Str("ip", ip).Str("name", name).Msg("new entity")
+		log.Trace().Str("entity", entity.Uid).Str("ip", ip).Str("name", name).Msg("new entity")
 		c.Put(entity)
 	case notifiers.Remove:
-		log.Trace().Str("entity", entity.Prefix+entity.Uid).Str("ip", ip).Str("name", name).Msg("removing entity")
+		log.Trace().Str("entity", entity.Uid).Str("ip", ip).Str("name", name).Msg("removing entity")
 		c.Remove(entity)
 	}
 }
