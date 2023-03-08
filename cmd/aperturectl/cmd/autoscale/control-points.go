@@ -44,12 +44,13 @@ var ControlPointsCmd = &cobra.Command{
 		})
 
 		tabwriter := tabwriter.NewWriter(os.Stdout, 5, 0, 3, ' ', 0)
-		fmt.Fprintln(tabwriter, "AGENT GROUP\tNAME\tNAMESPACE")
+		fmt.Fprintln(tabwriter, "AGENT GROUP\tNAME\tNAMESPACE\tKIND")
 		for _, cp := range resp.GlobalAutoScaleControlPoints {
-			fmt.Fprintf(tabwriter, "%s\t%s\t%s\n",
+			fmt.Fprintf(tabwriter, "%s\t%s\t%s\t%s\n",
 				cp.AgentGroup,
 				cp.AutoScaleControlPoint.Name,
-				cp.AutoScaleControlPoint.Namespace)
+				cp.AutoScaleControlPoint.Namespace,
+				cp.AutoScaleControlPoint.Kind)
 		}
 		tabwriter.Flush()
 

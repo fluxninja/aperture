@@ -8,11 +8,11 @@ keywords:
 
 ## aperturectl auto-scale control-points
 
-List Flow Control control points
+List AutoScale control points
 
 ### Synopsis
 
-List Flow Control control points
+List AutoScale control points
 
 ```
 aperturectl auto-scale control-points [flags]

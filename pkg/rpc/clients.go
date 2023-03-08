@@ -289,6 +289,7 @@ func (c *Clients) CallAll(req *anypb.Any) []RawResult {
 			}
 			return results
 		case result := <-respChan:
+			log.Info().Interface("result", result).Msg("got result")
 			results = append(results, result)
 			delete(remainingClients, result.Client)
 			if len(remainingClients) == 0 {
@@ -364,12 +365,10 @@ func CallAll[
 				Client:  rawResult.Client,
 				Success: new(RespValue),
 			}
-
 			if err := proto.Unmarshal(rawResult.Success, Resp(result.Success)); err != nil {
 				result.Success = nil
 				result.Err = status.Error(codes.InvalidArgument, err.Error())
 			}
-
 			resps = append(resps, result)
 		}
 	}

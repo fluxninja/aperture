@@ -27,4 +27,4 @@ Use this command to query information about active AutoScale integrations
 ### SEE ALSO
 
 - [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture
-- [aperturectl auto-scale control-points](/reference/aperturectl/auto-scale/control-points/control-points.md) - List Flow Control control points
+- [aperturectl auto-scale control-points](/reference/aperturectl/auto-scale/control-points/control-points.md) - List AutoScale control points

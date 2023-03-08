@@ -50,7 +50,7 @@ message ListAutoScaleControlPointsRequest {}
 
 message ListAutoScaleControlPointsAgentResponse {
   repeated aperture.autoscale.kubernetes.controlpoints.v1.AutoScaleKubernetesControlPoint auto_scale_control_points = 1;
-  uint32 agent_group = 2;
+  string agent_group = 2;
 }
 
 message ListAutoScaleControlPointsControllerResponse {
