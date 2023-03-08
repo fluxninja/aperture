@@ -15,8 +15,8 @@ import (
 // ControlPointsCmd is the command to list control points.
 var ControlPointsCmd = &cobra.Command{
 	Use:           "control-points",
-	Short:         "List Flow Control control points",
-	Long:          `List Flow Control control points`,
+	Short:         "List AutoScale control points",
+	Long:          `List AutoScale control points`,
 	SilenceErrors: true,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		client, err := controller.Client()
@@ -24,10 +24,7 @@ var ControlPointsCmd = &cobra.Command{
 			return err
 		}
 
-		resp, err := client.ListFlowControlPoints(
-			context.Background(),
-			&cmdv1.ListFlowControlPointsRequest{},
-		)
+		resp, err := client.ListAutoScaleControlPoints(context.Background(), &cmdv1.ListAutoScaleControlPointsRequest{})
 		if err != nil {
 			return err
 		}
@@ -36,23 +33,23 @@ var ControlPointsCmd = &cobra.Command{
 			fmt.Fprintf(os.Stderr, "Could not get answer from %d agents", resp.ErrorsCount)
 		}
 
-		slices.SortFunc(resp.GlobalFlowControlPoints, func(a, b *cmdv1.GlobalFlowControlPoint) bool {
+		slices.SortFunc(resp.GlobalAutoScaleControlPoints, func(a, b *cmdv1.GlobalAutoScaleControlPoint) bool {
 			if a.AgentGroup != b.AgentGroup {
 				return a.AgentGroup < b.AgentGroup
 			}
-			if a.FlowControlPoint.Service != b.FlowControlPoint.Service {
-				return a.FlowControlPoint.Service < b.FlowControlPoint.Service
+			if a.AutoScaleControlPoint.Name != b.AutoScaleControlPoint.Name {
+				return a.AutoScaleControlPoint.Name < b.AutoScaleControlPoint.Name
 			}
-			return a.FlowControlPoint.ControlPoint < b.FlowControlPoint.ControlPoint
+			return a.AutoScaleControlPoint.Namespace < b.AutoScaleControlPoint.Namespace
 		})
 
 		tabwriter := tabwriter.NewWriter(os.Stdout, 5, 0, 3, ' ', 0)
-		fmt.Fprintln(tabwriter, "AGENT GROUP\tSERVICE\tNAME")
-		for _, cp := range resp.GlobalFlowControlPoints {
+		fmt.Fprintln(tabwriter, "AGENT GROUP\tNAME\tNAMESPACE")
+		for _, cp := range resp.GlobalAutoScaleControlPoints {
 			fmt.Fprintf(tabwriter, "%s\t%s\t%s\n",
 				cp.AgentGroup,
-				cp.FlowControlPoint.Service,
-				cp.FlowControlPoint.ControlPoint)
+				cp.AutoScaleControlPoint.Name,
+				cp.AutoScaleControlPoint.Namespace)
 		}
 		tabwriter.Flush()
 

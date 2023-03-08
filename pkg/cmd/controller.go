@@ -65,6 +65,40 @@ func (h *Handler) ListControlPoints(
 	}, nil
 }
 
+func (h *Handler) ListAutoScaleControlPoints(
+	ctx context.Context,
+	_ *cmdv1.ListAutoScaleControlPointsRequest,
+) (*cmdv1.ListAutoScaleControlPointsControllerResponse, error) {
+	agentsControlPoints, err := h.agents.ListAutoScaleControlPoints()
+	if err != nil {
+		return nil, err
+	}
+
+	numErrors := uint32(0)
+	allControlPoints := map[selectors.GlobalControlPointID]struct{}{}
+	for _, resp := range agentsControlPoints {
+		if resp.Err != nil {
+			numErrors += 1
+			continue
+		}
+
+		for _, protoCp := range resp.Success.FlowControlPoints {
+			gcp := selectors.ControlPointIDFromProto(protoCp).InAgentGroup(resp.Success.AgentGroup)
+			allControlPoints[gcp] = struct{}{}
+		}
+	}
+
+	protoControlPoints := make([]*cmdv1.GlobalFlowControlPoint, 0, len(allControlPoints))
+	for cp := range allControlPoints {
+		protoControlPoints = append(protoControlPoints, cp.ToProto())
+	}
+
+	return &cmdv1.ListAutoScaleControlPointsControllerResponse{
+		GlobalFlowControlPoints: protoControlPoints,
+		ErrorsCount:             numErrors,
+	}, nil
+}
+
 func (h *Handler) PreviewFlowLabels(
 	ctx context.Context,
 	req *cmdv1.PreviewFlowLabelsRequest,

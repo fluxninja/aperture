@@ -28,6 +28,14 @@ func (a Agents) ListControlPoints() ([]rpc.Result[*cmdv1.ListFlowControlPointsAg
 	return rpc.CallAll[cmdv1.ListFlowControlPointsAgentResponse](a.Clients, &req)
 }
 
+// ListAutoScaleControlPoints lists auto scale control points of all agents.
+//
+// Handled by agentfunctions.AutoScaleControlPointsHandler.
+func (a Agents) ListAutoScaleControlPoints() ([]rpc.Result[*cmdv1.ListAutoScaleControlPointsAgentResponse], error) {
+	var req cmdv1.ListAutoScaleControlPointsRequest
+	return rpc.CallAll[cmdv1.ListAutoScaleControlPointsAgentResponse](a.Clients, &req)
+}
+
 // PreviewFlowLabels previews flow labels on a given agent.
 //
 // Handled by agentfunctions.PreviewHandler.
