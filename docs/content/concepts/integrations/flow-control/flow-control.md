@@ -64,8 +64,8 @@ Aperture splits the process of flow control in two layers:
 For Aperture to be able to act at any of the [_Control Points_][control-point],
 you need to install integrations that will communicate with the Aperture Agent.
 
-- _HTTP_ control points: Web framework and service-mesh based integrations
-  expose control points at in the traffic path of a service.
+- _HTTP_ _Control Points_: Web framework and service-mesh based integrations
+  expose _Control Points_ at in the traffic path of a service.
 
   In principle, any web proxy or web framework can be integrated with Aperture
   in this way. These integrations use [Envoy's External Authorization
@@ -79,18 +79,18 @@ you need to install integrations that will communicate with the Aperture Agent.
   assigns _ingress_ and _egress_ Control Points as [identified by
   Istio][istio-patch-context].
 
-- _Feature_ control points: We provide
+- _Feature_ _Control Points_: We provide
   [Aperture SDKs](/get-started/integrations/flow-control/sdk/sdk.md) for popular
   languages. Aperture SDK wraps any function call or code snippet inside the
-  service code as a Feature Control Point. Every invocation of th feature is a
-  flow from the perspective of Aperture.
+  service code as a _Feature_ _Control Point_. Every invocation of th feature is
+  a flow from the perspective of Aperture.
 
   The SDK provides API to begin a flow which translates to a
   [flowcontrol.v1.Check][flowcontrol-proto] call into Agent. Response of this
   call contains a decision on whether to allow or reject the flow. The execution
   of a feature may be gated based on this decision. There is an API to end a
   flow which sends an [OpenTelemetry span][span] representing the flow to the
-  Agent as telemetry.
+  _Agent_ as telemetry.
 
 [policies]: /concepts/policy/policy.md
 [control-point]: ./flow-selector.md#control-point
