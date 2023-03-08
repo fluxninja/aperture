@@ -141,7 +141,7 @@ func addFNToPipeline(
 
 func addMetricsSlowPipeline(baseConfig, config *otelconfig.OTELConfig) {
 	addFluxNinjaPrometheusReceiver(baseConfig, config)
-	config.AddBatchProcessor(processorBatchMetricsSlow, 10*time.Second, 10000, 10000)
+	config.AddBatchProcessor(processorBatchMetricsSlow, 5*time.Second, 10000, 10000)
 	config.Service.AddPipeline("metrics/slow", otelconfig.Pipeline{
 		Receivers: []string{receiverPrometheus},
 		Processors: []string{
@@ -154,7 +154,7 @@ func addMetricsSlowPipeline(baseConfig, config *otelconfig.OTELConfig) {
 
 func addMetricsControllerSlowPipeline(baseConfig, config *otelconfig.OTELConfig) {
 	addFluxNinjaPrometheusReceiver(baseConfig, config)
-	config.AddBatchProcessor(processorBatchMetricsSlow, 10*time.Second, 10000, 10000)
+	config.AddBatchProcessor(processorBatchMetricsSlow, 5*time.Second, 10000, 10000)
 	config.Service.AddPipeline("metrics/controller-slow", otelconfig.Pipeline{
 		Receivers: []string{receiverPrometheus},
 		Processors: []string{
