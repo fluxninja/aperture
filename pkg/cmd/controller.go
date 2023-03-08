@@ -14,15 +14,18 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
 
+// Handler is a gRPC server for the controller service.
 type Handler struct {
 	cmdv1.UnimplementedControllerServer
 	agents agents.Agents
 }
 
+// NewHandler creates a new Handler.
 func NewHandler(agents agents.Agents) *Handler {
 	return &Handler{agents: agents}
 }
 
+// ListAgents lists all agents.
 func (h *Handler) ListAgents(
 	ctx context.Context,
 	_ *emptypb.Empty,
@@ -32,6 +35,7 @@ func (h *Handler) ListAgents(
 	}, nil
 }
 
+// ListFlowControlPoints lists all FlowControlPoints.
 func (h *Handler) ListFlowControlPoints(
 	ctx context.Context,
 	_ *cmdv1.ListFlowControlPointsRequest,
@@ -66,6 +70,34 @@ func (h *Handler) ListFlowControlPoints(
 	}, nil
 }
 
+// AutoScaleControlPointID is a ControlPointID without an agent group.
+type AutoScaleControlPointID struct {
+	APIVersion string
+	Kind       string
+	Namespace  string
+	Name       string
+}
+
+// GlobalAutoScaleControlPointID is a ControlPointID with an agent group.
+type GlobalAutoScaleControlPointID struct {
+	AutoScaleControlPointID
+	AgentGroup string
+}
+
+// ToProto converts ControlPointID to protobuf representation.
+func (gcp GlobalAutoScaleControlPointID) ToProto() *cmdv1.GlobalAutoScaleControlPoint {
+	return &cmdv1.GlobalAutoScaleControlPoint{
+		AgentGroup: gcp.AgentGroup,
+		AutoScaleControlPoint: &autoscalecontrolpointsv1.AutoScaleKubernetesControlPoint{
+			ApiVersion: gcp.APIVersion,
+			Kind:       gcp.Kind,
+			Namespace:  gcp.Namespace,
+			Name:       gcp.Name,
+		},
+	}
+}
+
+// ListAutoScaleControlPoints lists all AutoScaleControlPoints.
 func (h *Handler) ListAutoScaleControlPoints(
 	ctx context.Context,
 	_ *cmdv1.ListAutoScaleControlPointsRequest,
@@ -103,33 +135,6 @@ func (h *Handler) ListAutoScaleControlPoints(
 	}, nil
 }
 
-// AutoScaleControlPointID is a ControlPointID without an agent group.
-type AutoScaleControlPointID struct {
-	APIVersion string
-	Kind       string
-	Namespace  string
-	Name       string
-}
-
-// GlobalAutoScaleControlPointID is a ControlPointID with an agent group.
-type GlobalAutoScaleControlPointID struct {
-	AutoScaleControlPointID
-	AgentGroup string
-}
-
-// ToProto converts ControlPointID to protobuf representation.
-func (gcp GlobalAutoScaleControlPointID) ToProto() *cmdv1.GlobalAutoScaleControlPoint {
-	return &cmdv1.GlobalAutoScaleControlPoint{
-		AgentGroup: gcp.AgentGroup,
-		AutoScaleControlPoint: &autoscalecontrolpointsv1.AutoScaleKubernetesControlPoint{
-			ApiVersion: gcp.APIVersion,
-			Kind:       gcp.Kind,
-			Namespace:  gcp.Namespace,
-			Name:       gcp.Name,
-		},
-	}
-}
-
 // AutoScaleControlPointIDFromProto creates ControlPointID from protobuf representation.
 func AutoScaleControlPointIDFromProto(protoCP *autoscalecontrolpointsv1.AutoScaleKubernetesControlPoint) AutoScaleControlPointID {
 	return AutoScaleControlPointID{
@@ -140,6 +145,7 @@ func AutoScaleControlPointIDFromProto(protoCP *autoscalecontrolpointsv1.AutoScal
 	}
 }
 
+// PreviewFlowLabels previews flow labels.
 func (h *Handler) PreviewFlowLabels(
 	ctx context.Context,
 	req *cmdv1.PreviewFlowLabelsRequest,
@@ -159,6 +165,7 @@ func (h *Handler) PreviewFlowLabels(
 	)
 }
 
+// PreviewHTTPRequests previews HTTP requests.
 func (h *Handler) PreviewHTTPRequests(
 	ctx context.Context,
 	req *cmdv1.PreviewHTTPRequestsRequest,
