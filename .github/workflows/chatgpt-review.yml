@@ -24,6 +24,7 @@ jobs:
           debug: false
           action: score
           path_filters: |
+            !**/*.pb.go
             !**/*.yaml
             !**/*.yml
             !**/*.cfg
@@ -47,6 +48,7 @@ jobs:
           action: review
           review_comment_lgtm: false
           path_filters: |
+            !**/*.pb.go
             !**/*.yaml
             !**/*.yml
             !**/*.cfg
