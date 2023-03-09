@@ -1,9 +1,6 @@
 local variableouts = import './variableouts.libsonnet';
 {
   new():: {
-    out_ports: {
-      output: error 'Port output is missing',
-    },
   },
   outPorts:: variableouts,
   withDefaultConfig(default_config):: {

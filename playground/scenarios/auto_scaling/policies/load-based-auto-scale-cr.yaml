@@ -3,7 +3,7 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: load-based-autoscale-service1
+  name: load-based-auto-scale
 spec:
   circuit:
     components:
@@ -14,8 +14,8 @@ spec:
             output:
               signal_name: LATENCY
           query_string: sum(increase(flux_meter_sum{valid="true", flow_status="OK",
-            flux_meter_name="load-based-autoscale-service1"}[5s]))/sum(increase(flux_meter_count{valid="true",
-            flow_status="OK", flux_meter_name="load-based-autoscale-service1"}[5s]))
+            flux_meter_name="load-based-auto-scale"}[5s]))/sum(increase(flux_meter_count{valid="true",
+            flow_status="OK", flux_meter_name="load-based-auto-scale"}[5s]))
     - arithmetic_combinator:
         in_ports:
           lhs:
@@ -62,6 +62,7 @@ spec:
             flow_matcher:
               control_point: ingress
             service_selector:
+              agent_group: default
               service: service1-demo-app.demoapp.svc.cluster.local
           gradient_parameters:
             max_gradient: 1
@@ -87,17 +88,6 @@ spec:
               signal_name: OBSERVED_LOAD_MULTIPLIER
           scheduler_parameters:
             auto_tokens: true
-            workloads:
-            - label_matcher:
-                match_labels:
-                  user_type: guest
-              parameters:
-                priority: 50
-            - label_matcher:
-                match_labels:
-                  http.request.header.user_type: subscriber
-              parameters:
-                priority: 200
     - query:
         promql:
           evaluation_interval: 10s
@@ -106,7 +96,7 @@ spec:
               signal_name: AVERAGE_CPU
           query_string: avg(avg_over_time(k8s_pod_cpu_utilization{k8s_deployment_name="service1-demo-app"}[30s]))
     - auto_scale:
-        autoscaler:
+        auto_scaler:
           max_scale: "10"
           min_scale: "1"
           scale_in_controllers:
@@ -142,20 +132,12 @@ spec:
                 namespace: demoapp
     evaluation_interval: 0.5s
   resources:
-    classifiers:
-    - flow_selector:
-        flow_matcher:
-          control_point: ingress
-        service_selector:
-          service: service1-demo-app.demoapp.svc.cluster.local
-      rules:
-        user_type:
-          extractor:
-            from: request.http.headers.user-type
+    classifiers: []
     flux_meters:
-      load-based-autoscale-service1:
+      load-based-auto-scale:
         flow_selector:
           flow_matcher:
             control_point: ingress
           service_selector:
+            agent_group: default
             service: service1-demo-app.demoapp.svc.cluster.local

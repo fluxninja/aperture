@@ -89,7 +89,7 @@ _Agent Group_ also defines the scope of **Agent-to-Agent synchronization**.
 Agents within their group form a peer-to-peer network to synchronize
 fine-grained state such as per-label global counters that are used for [rate
 limiting purposes][dc]. Also, all the agents within an _Agent Group_ instantiate
-the same set of [dataplane components][components], as published by Aperture
+the same set of [flowcontrol components][components], as published by Aperture
 Controller.
 
 Services in Aperture are additionally scoped within _Agent Groups_, creating two
@@ -252,5 +252,5 @@ flow_selector:
 [classifier]: ./resources/classifier.md
 [label-matcher]: /reference/policies/spec.md#label-matcher
 [dc]: components/rate-limiter.md#distributed-counters
-[components]: ./flow-control.md#components
+[components]: ./components/components.md
 [aperturectl]: /get-started/aperture-cli/aperture-cli.md
