@@ -17,72 +17,49 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 Load-based auto-scaling is a technique used to dynamically adjust the number of
-instances or resources allocated to a service based on workload demands. In
-Aperture, the
-[_AutoScaler_](concepts/integrations/auto-scale/components/auto-scaler.md)
-component enables load-based auto-scaling by interfacing with infrastructure
-APIs such as Kubernetes to automatically adjust the resources allocated to a
-service.
+instances or resources allocated to a service based on workload demands. This
+policy builds upon the _Latency based AIMD Concurrency Limiting_
+[blueprint](reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md)
+to add an escalation for auto-scaling. While concurrency limiting can protect
+the service from sudden traffic spikes, it's necessary to scale the service in
+response to persistent changes in load.
 
-This tutorial builds upon the
-[basic concurrency limiting policy](tutorials/integrations/flow-control/concurrency-limiting/basic-concurrency-limiting.md)
-to add an escalation for auto-scaling. The concurrency limiter protects the
-service from sudden traffic spikes, but to protect from persistent changes in
-load, it's necessary to scale the service in response to demand.
+To achieve this, the policy makes use of an
+[_Auto Scaler_](concepts/integrations/auto-scale/components/auto-scaler.md)
+component that is configured using _Controllers_ to adjust the number of
+instances allocated to the service. Load-based auto-scaling is achieved by
+defining a scale-out _Controller_ that acts on a load-shedding signal (load
+multiplier) signal from the blueprint. This signal measures the fraction of
+traffic that the
+[_Concurrency Limiter_](concepts/integrations/flow-control/components/concurrency-limiter.md)
+is shedding. The _Auto Scaler_ is configured to scale-out using a _Gradient
+Controller_ based on this signal and a setpoint of 1.0.
 
-Load-based auto-scaling extends the concurrency limiting policy by automatically
-scaling the service to meet persistent changes in demand. In Aperture,
-load-based auto-scaling is accomplished by configuring the _AutoScaler_
-component with Controllers that can adjust the number of instances or resources
-allocated to the service.
-
-Observed Load Multiplier The load-based auto-scaling policy makes use of the
-OBSERVED*LOAD_MULTIPLIER signal from the
-[AIMDConcurrencyController](reference/policies/spec.md#a-i-m-d-concurrency-controller)
-component. This signal measures the amount of traffic that is being load shed by
-the Concurrency Controller. The \_AutoScaler* is configured to scale out based
-on this signal and a setpoint of 1.0.
-
-CPU Utilization In addition to the load shedding signal, the load-based
-auto-scaling policy also includes scale in and scale out Controllers based on
-CPU utilization. These Controllers adjust the resources allocated to the service
-based on changes in CPU usage, ensuring that the service can handle the workload
-efficiently.
+In addition to load-based scaling, the policy includes scale-in and scale-out
+_Controllers_ based on CPU utilization. These _Controllers_ adjust the resources
+allocated to the service based on changes in CPU usage, ensuring that the
+service can handle the workload efficiently.
 
 ## Policy
 
-In this policy we will be using the Latency based AIMD (Additive
-Increase,Multiplicative Decrease) Concurrency Limiting
-[Blueprint](reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md).
-Policy will do load-based autoscaling for a Kubernetes deployment.
+This policy extends the _Latency based AIMD Concurrency Limiting_
+[blueprint](reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md)
+by adding auto-scaling to meet persistent changes in demand.
 
-At a high Level, this policy consist:
+At a high Level, this policy consist of:
 
-This policy includes:
-
-- Using a Flux Meter to gather latency metrics from a service control point,
-  which are then fed into an EMA component to establish a long-term trend that
-  can be compared against current latency to detect overloads
-- A Gradient Controller that adjusts the Accepted Concurrency based on Setpoint
-  Latency and current Latency signals
-- An Integral Optimizer that additively increases the concurrency on the service
-  in each execution cycle of the circuit when the service is in the normal
-  state, allowing warming-up from a cold start state and protecting applications
-  from sudden spikes in traffic
-- A Concurrency Limiting Actuator that actuates concurrency limits via a
-  weighted-fair queueing scheduler, with adjustments to accepted concurrency
-  made by gradient controller and optimizer logic translated to a load
-  multiplier that adjusts token bucket fill rates based on incoming concurrency
-  observed at each agent
-- An Auto Scale feature that adjusts the number of replicas of the configured
-  Kubernetes Resource, including a scale-in controller that adjusts the number
-  of replicas based on observed CPU utilization and a scale-out controller that
-  adjusts the number of replicas based on the observed load multiplier
-
-The Policy also includes a set of resources classifiers and flux meters, which
-are used to define the components of the policy that should be applied to the
-deployment based on certain criteria (in this case, the "user_type" field in the
-request headers).
+- Concurrency limiting based on response latency trend of the service.
+- An _Auto Scaler_ that adjusts the number of replicas of the Kubernetes
+  Deployment for the service.
+- Load based scale-out is done based on `OBSERVED_LOAD_MULTIPLIER` signal from
+  the blueprint. This signal measures the fraction of traffic that the
+  _Concurrency Limiter_ is shedding. The _Auto Scaler_ is configured to
+  scale-out based on a _Gradient Controller_ using this signal and a setpoint of
+  1.0.
+- In addition to the load based scale-out, the policy also includes scale-in and
+  scale-out _Controllers_ based on CPU utilization. These _Controllers_ adjust
+  the resources allocated to the service based on changes in CPU usage, ensuring
+  that the service can handle the workload efficiently.
 
 ```mdx-code-block
 <Tabs>
@@ -122,10 +99,16 @@ request headers).
 
 When the above policy is loaded in Aperture's
 [Playground](/get-started/playground/playground.md), we will see that as the
-traffic spikes above the concurrency limit of
-`service1-demo-app.demoapp.svc.cluster.local`, controller triggers load-shed for
-a proportion of requests matching the Selector and average cpu signal and load
-multiplier triggers a signal to do auto-scale.
+response latency increases, the AIMD policy load-sheds a proportion of requests.
+The auto-scaler makes a scale-out decision as the `OBSERVED_LOAD_MULTIPLIER`
+becomes less than 1. As replicas get added to the deployment the
+`OBSERVED_LOAD_MULTIPLIER` gets larger than 1. At this point the service will be
+able to meet the increased demand. The response latency will be in normal range
+and _Concurrency Limiter_ won't load shed any traffic.
+
+After the scale-out cooldown period, the scale-in based on CPU utilization gets
+triggered which will cause the replicas to decrease. Once the traffic ramps up
+again, the above cycle continues.
 
 <Zoom>
 

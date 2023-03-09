@@ -1460,7 +1460,7 @@ message AIMDConcurrencyController {
   LoadActuator.DynamicConfig default_config = 10;
 }
 
-// AutoScaler: AutoScaler provides auto scaling functionality for any scalable resource. Multiple Controllers can be defined on the AutoScaler for performing scale out or scale in. The AutoScaler can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
+// AutoScaler: AutoScaler provides auto scaling functionality for any scalable resource. Multiple Controllers can be defined on the AutoScaler for performing scale-out or scale-in. The AutoScaler can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
 message AutoScaler {
   // Increasing Gradient defines a controller for scaling out based on Gradient Controller.
   message IncreasingGradient {
@@ -1473,9 +1473,9 @@ message AutoScaler {
 
     // Inputs for Gradient.
     message Ins {
-      // The signal to use for scale out.
+      // The signal to use for scale-out.
       InPort signal = 1;
-      // The setpoint to use for scale out.
+      // The setpoint to use for scale-out.
       InPort setpoint = 2;
     }
 
@@ -1500,9 +1500,9 @@ message AutoScaler {
 
     // Inputs for Gradient.
     message Ins {
-      // The signal to use for scale in.
+      // The signal to use for scale-in.
       InPort signal = 1;
-      // The setpoint to use for scale in.
+      // The setpoint to use for scale-in.
       InPort setpoint = 2;
     }
 
@@ -1574,9 +1574,9 @@ message AutoScaler {
 
   Scaler scaler = 2; // @gotags: validate:"required"
 
-  // The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+  // The minimum scale to which the autoscaler can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
   int64 min_scale = 3; // @gotags: default:"0" validate:"gte=0"
-  // The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+  // The maximum scale to which the autoscaler can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
   int64 max_scale = 4; // @gotags: default:"9223372036854775807" validate:"gt=0"
 
   // List of Controllers for scaling out.
@@ -1589,19 +1589,19 @@ message AutoScaler {
   // The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
   double max_scale_in_percentage = 7; // @gotags: default:"1"
 
-  // The amount of time to wait after a scale out operation for another scale out or scale in operation.
+  // The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
   google.protobuf.Duration scale_out_cooldown = 9; // @gotags: default:"30s"
-  // The amount of time to wait after a scale in operation for another scale in operation.
+  // The amount of time to wait after a scale-in operation for another scale-in operation.
   google.protobuf.Duration scale_in_cooldown = 10; // @gotags: default:"120s"
 
-  // Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.
+  // Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
   // For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
-  // scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+  // scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
   double cooldown_override_percentage = 11; // @gotags: default:"50"
 
-  // Configuration for scale out alerter.
+  // Configuration for scale-out alerter.
   Alerter.Parameters scale_out_alerter_parameters = 12;
 
-  // Configuration for scale in alerter.
+  // Configuration for scale-in alerter.
   Alerter.Parameters scale_in_alerter_parameters = 13;
 }

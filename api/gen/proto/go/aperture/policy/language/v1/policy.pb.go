@@ -3442,7 +3442,7 @@ func (x *AIMDConcurrencyController) GetDefaultConfig() *LoadActuator_DynamicConf
 	return nil
 }
 
-// AutoScaler: AutoScaler provides auto scaling functionality for any scalable resource. Multiple Controllers can be defined on the AutoScaler for performing scale out or scale in. The AutoScaler can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
+// AutoScaler: AutoScaler provides auto scaling functionality for any scalable resource. Multiple Controllers can be defined on the AutoScaler for performing scale-out or scale-in. The AutoScaler can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
 type AutoScaler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3451,9 +3451,9 @@ type AutoScaler struct {
 	// Output ports for the AutoScaler.
 	OutPorts *AutoScaler_Outs   `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	Scaler   *AutoScaler_Scaler `protobuf:"bytes,2,opt,name=scaler,proto3" json:"scaler,omitempty" validate:"required"` // @gotags: validate:"required"
-	// The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+	// The minimum scale to which the autoscaler can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
 	MinScale int64 `protobuf:"varint,3,opt,name=min_scale,json=minScale,proto3" json:"min_scale,omitempty" default:"0" validate:"gte=0"` // @gotags: default:"0" validate:"gte=0"
-	// The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+	// The maximum scale to which the autoscaler can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
 	MaxScale int64 `protobuf:"varint,4,opt,name=max_scale,json=maxScale,proto3" json:"max_scale,omitempty" default:"9223372036854775807" validate:"gt=0"` // @gotags: default:"9223372036854775807" validate:"gt=0"
 	// List of Controllers for scaling out.
 	ScaleOutControllers []*AutoScaler_ScaleOutController `protobuf:"bytes,5,rep,name=scale_out_controllers,json=scaleOutControllers,proto3" json:"scale_out_controllers,omitempty"`
@@ -3463,17 +3463,17 @@ type AutoScaler struct {
 	MaxScaleOutPercentage float64 `protobuf:"fixed64,8,opt,name=max_scale_out_percentage,json=maxScaleOutPercentage,proto3" json:"max_scale_out_percentage,omitempty" default:"10"` // @gotags: default:"10"
 	// The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
 	MaxScaleInPercentage float64 `protobuf:"fixed64,7,opt,name=max_scale_in_percentage,json=maxScaleInPercentage,proto3" json:"max_scale_in_percentage,omitempty" default:"1"` // @gotags: default:"1"
-	// The amount of time to wait after a scale out operation for another scale out or scale in operation.
+	// The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
 	ScaleOutCooldown *durationpb.Duration `protobuf:"bytes,9,opt,name=scale_out_cooldown,json=scaleOutCooldown,proto3" json:"scale_out_cooldown,omitempty" default:"30s"` // @gotags: default:"30s"
-	// The amount of time to wait after a scale in operation for another scale in operation.
+	// The amount of time to wait after a scale-in operation for another scale-in operation.
 	ScaleInCooldown *durationpb.Duration `protobuf:"bytes,10,opt,name=scale_in_cooldown,json=scaleInCooldown,proto3" json:"scale_in_cooldown,omitempty" default:"120s"` // @gotags: default:"120s"
-	// Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.
+	// Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
 	// For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
-	// scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+	// scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
 	CooldownOverridePercentage float64 `protobuf:"fixed64,11,opt,name=cooldown_override_percentage,json=cooldownOverridePercentage,proto3" json:"cooldown_override_percentage,omitempty" default:"50"` // @gotags: default:"50"
-	// Configuration for scale out alerter.
+	// Configuration for scale-out alerter.
 	ScaleOutAlerterParameters *Alerter_Parameters `protobuf:"bytes,12,opt,name=scale_out_alerter_parameters,json=scaleOutAlerterParameters,proto3" json:"scale_out_alerter_parameters,omitempty"`
-	// Configuration for scale in alerter.
+	// Configuration for scale-in alerter.
 	ScaleInAlerterParameters *Alerter_Parameters `protobuf:"bytes,13,opt,name=scale_in_alerter_parameters,json=scaleInAlerterParameters,proto3" json:"scale_in_alerter_parameters,omitempty"`
 }
 
@@ -7689,9 +7689,9 @@ type AutoScaler_IncreasingGradient_Ins struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The signal to use for scale out.
+	// The signal to use for scale-out.
 	Signal *InPort `protobuf:"bytes,1,opt,name=signal,proto3" json:"signal,omitempty"`
-	// The setpoint to use for scale out.
+	// The setpoint to use for scale-out.
 	Setpoint *InPort `protobuf:"bytes,2,opt,name=setpoint,proto3" json:"setpoint,omitempty"`
 }
 
@@ -7803,9 +7803,9 @@ type AutoScaler_DecreasingGradient_Ins struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The signal to use for scale in.
+	// The signal to use for scale-in.
 	Signal *InPort `protobuf:"bytes,1,opt,name=signal,proto3" json:"signal,omitempty"`
-	// The setpoint to use for scale in.
+	// The setpoint to use for scale-in.
 	Setpoint *InPort `protobuf:"bytes,2,opt,name=setpoint,proto3" json:"setpoint,omitempty"`
 }
 
