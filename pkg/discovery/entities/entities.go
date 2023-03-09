@@ -20,7 +20,10 @@ func Module() fx.Option {
 		notifiers.TrackersConstructor{Name: "entity_trackers_private"}.Annotate(),
 		fx.Provide(provideEntities),
 		grpcgateway.RegisterHandler{Handler: entitiesv1.RegisterEntitiesServiceHandlerFromEndpoint}.Annotate(),
-		fx.Invoke(RegisterEntitiesService),
+		fx.Invoke(
+			RegisterEntitiesService,
+			RegisterControlPointsHandler,
+		),
 	)
 }
 
