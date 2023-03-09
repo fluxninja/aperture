@@ -1,8 +1,11 @@
+import { AttributeValue, Span } from "@opentelemetry/api";
+
 import {
   CHECK_RESPONSE_LABEL,
   FLOW_END_TIMESTAMP_LABEL,
   FLOW_STATUS_LABEL,
 } from "./consts.js";
+import { Response } from "./types.js";
 
 export const FlowStatus = Object.freeze({
   Ok: "Ok",
@@ -16,34 +19,35 @@ export const FlowDecision = Object.freeze({
 })
 
 export class Flow {
-  constructor(span, checkResponse = null) {
-    this.span = span;
-    this.checkResponse = checkResponse;
-    this.statusCode = FlowStatus.Ok;
-    this.ended = false;
-    this.failOpen = true;
-  }
+  constructor(
+    public span: Span,
+    public checkResponse: Response | null | undefined = null,
+    public statusCode: AttributeValue = FlowStatus.Ok,
+    public ended: boolean = false,
+    public failOpen: boolean = true,
+  ) {}
 
   ShouldRun() {
-    var decision = this.Decision();
-    return decision === FlowDecision.Accepted || (this.failOpen && decision === FlowDecision.Unreachable)
+    if (this.checkResponse === undefined || this.checkResponse === null) {
+      return true;
+    }
   }
 
   DisableFailOpen() {
-    this.failOpen = false;
-  }
+      this.failOpen = false;
+    }
 
   Decision() {
     if (this.checkResponse === undefined) {
       return FlowDecision.Unreachable;
     }
-    if (this.checkResponse.decisionType === "DECISION_TYPE_ACCEPTED") {
+    if (this.checkResponse!.decisionType === "DECISION_TYPE_ACCEPTED") {
       return FlowDecision.Accepted;
     }
     return FlowDecision.Rejected;
   }
 
-  SetStatus(statusCode) {
+  SetStatus(statusCode: AttributeValue) {
     this.statusCode = statusCode;
   }
 
@@ -60,6 +64,8 @@ export class Flow {
     );
     this.span.setAttribute(FLOW_END_TIMESTAMP_LABEL, Date.now());
 
+    // TODO: attr are unused, can be deleted? MOreover ts throws that attributes do not exist on Span
+    // @ts-ignore
     let attr = this.span.attributes;
     this.span.end();
   }
