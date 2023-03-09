@@ -4,7 +4,9 @@
   "description": "",
   "exports": "./lib/example/example.js",
   "scripts": {
-    "build": "rm -rf ./lib && tsc && cp -r ./proto ./lib/proto",
+    "pre-build": "rm -rf ./lib",
+    "build": "tsc",
+    "post-build": "cp -r ./proto ./lib/proto",
     "prepare": "npm run build",
     "grpc-client": "npm run build && node ./lib/sdk/client.js"
   },
