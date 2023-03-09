@@ -9,7 +9,6 @@ group = 'com.javademoapp'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = "17"
 
-
 repositories {
     mavenCentral()
 }
@@ -19,17 +18,26 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webflux'
+    testImplementation 'org.springframework.boot:spring-boot-starter-tomcat'
+    testImplementation 'org.springframework.boot:spring-boot-starter-validation'
+    testImplementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.mockito:mockito-core:3.0.0'
     implementation 'io.opentelemetry:opentelemetry-api:1.10.0'
     implementation 'io.opentelemetry:opentelemetry-sdk:1.10.0'
     implementation 'io.opentelemetry:opentelemetry-exporter-otlp:1.10.0'
     implementation 'org.springframework.boot:spring-boot-starter-parent:2.7.9'
     implementation 'org.springframework:spring-webflux:5.3.14'
+    testImplementation 'org.springframework:spring-test:5.3.14'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'io.projectreactor:reactor-core:3.4.14'
     implementation 'jakarta.platform:jakarta.jakartaee-api:9.0.0'
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'org.apache.logging.log4j:log4j-core:2.17.1'
-    testImplementation 'org.springframework:spring-test:5.3.14'
+    implementation 'com.fluxninja.aperture:aperture-java-core:0.20.0'
 }
 
 tasks.named('test') {

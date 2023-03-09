@@ -5,12 +5,14 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.opentelemetry.context.propagation.TextMapSetter;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.connector.Response;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.HttpURLConnection;
@@ -27,8 +29,7 @@ public class JavademoappApplication {
 	}
 
 	@GetMapping("/")
-	public String demoApp() throws LifecycleException {
-
+	public String demoApp() throws LifecycleException, ServletException {
 
 		String hostname = getHostnamefromEnv();
 		int port = getPortfromEnv();
@@ -37,22 +38,23 @@ public class JavademoappApplication {
 		double rejectRatio = getRejectRatiofromEnv();
 
 		SimpleService simpleService = new SimpleService(hostname, port, concurrency, latency, rejectRatio);
-
-		//HttpServletRequest request = new MockHttpServletRequest();
-		//HttpServletResponse response = new MockHttpServletResponse();
 		HttpServletRequest request = null;
-		HttpServletResponse response = null;
-
+		HttpServletResponse response = new Response();
 		simpleService.run(request, response);
 		return "Demo App running successfully";
 	}
 
 	public String getHostnamefromEnv() {
-		return System.getenv("HOSTNAME");
+		if (System.getenv("HOSTNAME") == null)
+			return "localhost";
+		else
+			return System.getenv("HOSTNAME");
 	}
 
 	public int getPortfromEnv() {
-		return Integer.parseInt(System.getenv("SIMPLE_SERVICE_PORT"));
+		if (System.getenv("SIMPLE_SERVICE_PORT") == null)
+			return 8088;
+		else return Integer.parseInt(System.getenv("SIMPLE_SERVICE_PORT"));
 	}
 
 	public int getConcurrencyfromEnv() {

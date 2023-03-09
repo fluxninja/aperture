@@ -27,7 +27,7 @@ public class RequestHandler {
 
     public RequestHandler(WebClient webClient, String hostname, int concurrency, Duration latency, double rejectRatio) {
         this.webClient = webClient;
-        this.limitClients = new LinkedBlockingQueue<>(concurrency);
+        this.limitClients = new LinkedBlockingQueue<WebClient>(concurrency);
         this.hostname = hostname;
         this.concurrency = concurrency;
         this.latency = latency;
@@ -55,6 +55,7 @@ public class RequestHandler {
         // Randomly reject requests based on rejectRatio
         if (getRejectRatio() > 0 && Math.random() < getRejectRatio()) {
             status = HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+            writeErrorResponse(response, "Service unavailable", status);
             return;
         }
 
@@ -135,6 +136,7 @@ public class RequestHandler {
     public int processRequest(Subrequest subReq) throws InterruptedException {
         if (getConcurrency() > 0) {
             try {
+                //limitClients.put(subReq);
                 limitClients.put(this.webClient);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
