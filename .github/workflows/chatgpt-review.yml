@@ -16,7 +16,7 @@ jobs:
           ref: ${{github.event.pull_request.head.ref}}
           submodules: false
 
-      - uses: unsafecoerce/chatgpt-action@main
+      - uses: harjotgill/chatgpt-action@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -24,6 +24,7 @@ jobs:
           debug: false
           action: score
           path_filters: |
+            !**/*.pb.go
             !**/*.yaml
             !**/*.yml
             !**/*.cfg
@@ -38,7 +39,7 @@ jobs:
             !**/gen/**
             !**/vendor/**
 
-      - uses: unsafecoerce/chatgpt-action@main
+      - uses: harjotgill/chatgpt-action@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -47,6 +48,7 @@ jobs:
           action: review
           review_comment_lgtm: false
           path_filters: |
+            !**/*.pb.go
             !**/*.yaml
             !**/*.yml
             !**/*.cfg

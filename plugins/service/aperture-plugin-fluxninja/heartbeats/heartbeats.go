@@ -228,6 +228,10 @@ func (h *Heartbeats) newHeartbeat(
 		report.Policies = policies
 	}
 
+	if h.flowControlPoints != nil {
+		report.FlowControlPoints = flowcontrolpoints.ToProto(h.flowControlPoints)
+	}
+
 	if h.election != nil && h.election.IsLeader() {
 		var servicesList *heartbeatv1.ServicesList
 		if h.entities != nil {
@@ -238,10 +242,6 @@ func (h *Heartbeats) newHeartbeat(
 		if h.peersWatcher != nil {
 			peers := h.peersWatcher.GetPeers()
 			report.Peers = peers
-		}
-
-		if h.flowControlPoints != nil {
-			report.FlowControlPoints = flowcontrolpoints.ToProto(h.flowControlPoints)
 		}
 
 		if h.autoscalek8sControlPoints != nil {
