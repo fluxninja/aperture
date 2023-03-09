@@ -177,14 +177,12 @@ func setupConcurrencyLimiterFactory(
 		metrics.WorkloadIndexLabel,
 		metrics.LimiterDroppedLabel,
 	})
-
-	fxDriver := &notifiers.FxDriver{
-		FxOptionsFuncs: []notifiers.FxOptionsFunc{conLimiterFactory.newConcurrencyLimiterOptions},
-		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
-			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
-		},
-		StatusRegistry:     reg,
-		PrometheusRegistry: prometheusRegistry,
+	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
+		config.NewProtobufUnmarshaller,
+		[]notifiers.FxOptionsFunc{conLimiterFactory.newConcurrencyLimiterOptions},
+	)
+	if err != nil {
+		return err
 	}
 
 	lifecycle.Append(fx.Hook{

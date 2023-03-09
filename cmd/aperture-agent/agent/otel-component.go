@@ -27,7 +27,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/alertmanager"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/cache"
-	"github.com/fluxninja/aperture/pkg/entitycache"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
@@ -58,7 +57,6 @@ func ModuleForAgentOTEL() fx.Option {
 // AgentOTELComponents constructs OTEL Collector Factories for Agent.
 func AgentOTELComponents(
 	alerter alerts.Alerter,
-	cache *entitycache.EntityCache,
 	promRegistry *prometheus.Registry,
 	engine iface.Engine,
 	clasEng iface.ClassificationEngine,

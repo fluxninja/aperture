@@ -20,7 +20,6 @@ import (
 	"fmt"
 
 	. "github.com/fluxninja/aperture/operator/controllers"
-	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -28,6 +27,7 @@ import (
 
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
+	autoscalek8sconfig "github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/config"
 )
 
 var _ = Describe("clusterRoleForAgent", func() {
@@ -104,9 +104,9 @@ var _ = Describe("clusterRoleForAgent", func() {
 						Annotations: TestMap,
 					},
 					ConfigSpec: agentv1alpha1.AgentConfigSpec{
-						ServiceDiscoverySpec: common.ServiceDiscoverySpec{
-							KubernetesDiscoveryConfig: kubernetes.KubernetesDiscoveryConfig{
-								AutoscaleEnabled: true,
+						AutoScale: agentv1alpha1.AutoScaleConfigSpec{
+							AutoScaleKubernetesConfig: autoscalek8sconfig.AutoScaleKubernetesConfig{
+								Enabled: true,
 							},
 						},
 					},
@@ -236,9 +236,9 @@ var _ = Describe("clusterRoleForAgent", func() {
 						Annotations: TestMap,
 					},
 					ConfigSpec: agentv1alpha1.AgentConfigSpec{
-						ServiceDiscoverySpec: common.ServiceDiscoverySpec{
-							KubernetesDiscoveryConfig: kubernetes.KubernetesDiscoveryConfig{
-								AutoscaleEnabled: true,
+						AutoScale: agentv1alpha1.AutoScaleConfigSpec{
+							AutoScaleKubernetesConfig: autoscalek8sconfig.AutoScaleKubernetesConfig{
+								Enabled: true,
 							},
 						},
 					},

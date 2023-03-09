@@ -204,7 +204,7 @@ var _ = Describe("Agent DaemonSet", func() {
 											},
 										},
 										{
-											Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+											Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 											Value: "true",
 										},
 									},
@@ -489,7 +489,7 @@ var _ = Describe("Agent DaemonSet", func() {
 											},
 										},
 										{
-											Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_DISCOVERY_ENABLED",
+											Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
 											Value: "true",
 										},
 									},
@@ -552,7 +552,7 @@ var _ = Describe("Agent DaemonSet", func() {
 									LivenessProbe: &corev1.Probe{
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
-												Path:   "/v1/status/subsystem/liveness",
+												Path:   "/v1/status/system/liveness",
 												Port:   intstr.FromString(Server),
 												Scheme: corev1.URISchemeHTTP,
 											},
@@ -566,7 +566,7 @@ var _ = Describe("Agent DaemonSet", func() {
 									ReadinessProbe: &corev1.Probe{
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
-												Path:   "/v1/status/subsystem/readiness",
+												Path:   "/v1/status/system/readiness",
 												Port:   intstr.FromString(Server),
 												Scheme: corev1.URISchemeHTTP,
 											},

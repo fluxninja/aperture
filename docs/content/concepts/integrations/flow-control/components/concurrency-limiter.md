@@ -13,20 +13,20 @@ sidebar_position: 6
 :::info
 
 See also
-[AIMD Concurrency Controller reference](/reference/policies/spec.md#a-i-m-d-concurrency-controller)
+[_AIMD Concurrency Controller_ reference](/reference/policies/spec.md#a-i-m-d-concurrency-controller)
 and
-[Concurrency Limiter reference](/reference/policies/spec.md#concurrency-limiter).
+[_Concurrency Limiter_ reference](/reference/policies/spec.md#concurrency-limiter).
 
 :::
 
-The Concurrency Limiter is a powerful tool designed to protect your services
-from overloads and prevent cascading failures. Its primary goal is to limit the
-number of concurrent requests to a service, ensuring that the service can handle
-the incoming workload. By defining workloads with different priorities and
-weights, the Concurrency Limiter can prioritize certain requests over others,
-enabling graceful degradation of service during times of high traffic.
+The _Concurrency Limiter_ is a powerful tool designed to protect your services
+from overloads and prevent cascading failures. Its **primary goal is to limit**
+the number of concurrent requests to a service, ensuring that the service can
+handle the incoming workload. By defining workloads with different priorities
+and weights, the _Concurrency Limiter_ can prioritize certain requests over
+others, enabling graceful degradation of service during times of high traffic.
 
-As with other components of the Aperture platform, the Concurrency Limiter is
+As with other components of the Aperture platform, the _Concurrency Limiter_ is
 configured using a [policy][policies] component.
 
 ## Scheduler {#scheduler}

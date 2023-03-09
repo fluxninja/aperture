@@ -31,6 +31,7 @@ Generated File Starts
 | Key                 | Reference                              |
 | ------------------- | -------------------------------------- |
 | `agent_info`        | [AgentInfo](#agent-info)               |
+| `auto_scale`        | [AutoScaleConfig](#auto-scale-config)  |
 | `client`            | [Client](#client)                      |
 | `dist_cache`        | [DistCache](#dist-cache)               |
 | `etcd`              | [Etcd](#etcd)                          |
@@ -66,6 +67,22 @@ Generated File Starts
 
 ([AgentInfoConfig](#agent-info-config))
 Env-Var Prefix: `APERTURE_AGENT_AGENT_INFO_`
+
+</dd>
+
+</dl>
+
+---
+
+### _auto_scale_ {#auto-scale-config}
+
+<dl>
+
+<dt>kubernetes</dt>
+<dd>
+
+([AutoScaleKubernetesConfig](#auto-scale-kubernetes-config))
+Env-Var Prefix: `APERTURE_AGENT_AUTO_SCALE_KUBERNETES_`
 
 </dd>
 
@@ -526,6 +543,21 @@ By default `kubeletstats` custom metrics is added, which can be overwritten.
 
 ---
 
+### AutoScaleKubernetesConfig {#auto-scale-kubernetes-config}
+
+AutoScaleKubernetesConfig is the configuration for the flow preview service.
+
+<dl>
+<dt>enabled</dt>
+<dd>
+
+(bool, default: `true`) Enables the Kubernetes autoscale capability.
+
+</dd>
+</dl>
+
+---
+
 ### BackoffConfig {#backoff-config}
 
 BackoffConfig holds configuration for GRPC Client Backoff.
@@ -797,9 +829,9 @@ DistCacheConfig configures distributed cache that holds per-label counters in di
 
 ---
 
-### EntityConfig {#entity-config}
+### Entity {#entity}
 
-EntityConfig describes a single entity.
+Entity represents a pod, vm, etc.
 
 <dl>
 <dt>ip_address</dt>
@@ -811,13 +843,31 @@ EntityConfig describes a single entity.
 <dt>name</dt>
 <dd>
 
-(string) Name of the entity.
+(string) Name of the entity. For example, pod name.
+
+</dd>
+<dt>namespace</dt>
+<dd>
+
+(string) Namespace of the entity. For example, pod namespace.
+
+</dd>
+<dt>node_name</dt>
+<dd>
+
+(string) Node name of the entity. For example, host name.
+
+</dd>
+<dt>services</dt>
+<dd>
+
+([]string) Services of the entity.
 
 </dd>
 <dt>uid</dt>
 <dd>
 
-(string) UID of the entity.
+(string, **required**) Unique identifier of the entity.
 
 </dd>
 </dl>
@@ -1269,28 +1319,10 @@ is ignored.
 KubernetesDiscoveryConfig for Kubernetes service discovery.
 
 <dl>
-<dt>autoscale_enabled</dt>
+<dt>enabled</dt>
 <dd>
 
 (bool, default: `true`)
-
-</dd>
-<dt>discovery_enabled</dt>
-<dd>
-
-(bool, default: `true`)
-
-</dd>
-<dt>node_name</dt>
-<dd>
-
-(string) NodeName is the name of the k8s node the agent should be monitoring
-
-</dd>
-<dt>pod_name</dt>
-<dd>
-
-(string)
 
 </dd>
 </dl>
@@ -1667,36 +1699,15 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 
 ---
 
-### ServiceConfig {#service-config}
-
-ServiceConfig describes a service and its entities.
-
-<dl>
-<dt>entities</dt>
-<dd>
-
-([[]EntityConfig](#entity-config)) Entities of the service.
-
-</dd>
-<dt>name</dt>
-<dd>
-
-(string, **required**) Name of the service.
-
-</dd>
-</dl>
-
----
-
 ### StaticDiscoveryConfig {#static-discovery-config}
 
 StaticDiscoveryConfig for pre-determined list of services.
 
 <dl>
-<dt>services</dt>
+<dt>entities</dt>
 <dd>
 
-([[]ServiceConfig](#service-config)) Services list.
+([[]Entity](#entity))
 
 </dd>
 </dl>

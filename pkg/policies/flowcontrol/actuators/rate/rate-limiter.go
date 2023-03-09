@@ -128,15 +128,11 @@ func setupRateLimiterFactory(
 		counterVector:        counterVector,
 	}
 
-	fxDriver := &notifiers.FxDriver{
-		FxOptionsFuncs: []notifiers.FxOptionsFunc{
-			rateLimiterFactory.newRateLimiterOptions,
-		},
-		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
-			GetUnmarshallerFunc: config.NewProtobufUnmarshaller,
-		},
-		StatusRegistry:     reg,
-		PrometheusRegistry: prometheusRegistry,
+	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
+		config.NewProtobufUnmarshaller,
+		[]notifiers.FxOptionsFunc{rateLimiterFactory.newRateLimiterOptions})
+	if err != nil {
+		return err
 	}
 
 	lifecycle.Append(fx.Hook{
@@ -242,21 +238,27 @@ func (rateLimiter *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	if err != nil {
 		return err
 	}
-	decisionNotifier := notifiers.NewUnmarshalKeyNotifier(
+	decisionNotifier, err := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(etcdKey),
 		decisionUnmarshaller,
 		rateLimiter.decisionUpdateCallback,
 	)
+	if err != nil {
+		return err
+	}
 	// dynamic config notifier
 	dynamicConfigUnmarshaller, err := config.NewProtobufUnmarshaller(nil)
 	if err != nil {
 		return err
 	}
-	dynamicConfigNotifier := notifiers.NewUnmarshalKeyNotifier(
+	dynamicConfigNotifier, err := notifiers.NewUnmarshalKeyNotifier(
 		notifiers.Key(etcdKey),
 		dynamicConfigUnmarshaller,
 		rateLimiter.dynamicConfigUpdateCallback,
 	)
+	if err != nil {
+		return err
+	}
 
 	metricLabels := make(prometheus.Labels)
 	metricLabels[metrics.PolicyNameLabel] = rateLimiter.GetPolicyName()

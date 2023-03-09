@@ -3145,7 +3145,7 @@ Outputs for the PodScaler component.
 
 ### Policy {#policy}
 
-Policy expresses reliability automation workflow that automatically protects services
+Policy expresses observability-driven control logic.
 
 :::info
 

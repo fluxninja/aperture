@@ -154,7 +154,7 @@ func basePluginOTELConfigWithMetrics(pipelineName string) *otelconfig.OTELConfig
 	cfg.AddProcessor("batch/metrics-slow", batchprocessor.Config{
 		SendBatchSize:    10000,
 		SendBatchMaxSize: 10000,
-		Timeout:          10 * time.Second,
+		Timeout:          5 * time.Second,
 	})
 	processors := []string{
 		"batch/metrics-slow",
@@ -208,6 +208,9 @@ func basePluginOTELConfig() *otelconfig.OTELConfig {
 		"endpoint": "http://localhost:1234",
 		"headers": map[string]interface{}{
 			"authorization": "Bearer deadbeef",
+		},
+		"sending_queue": map[string]interface{}{
+			"num_consumers": 1,
 		},
 		"tls": map[string]interface{}{
 			"key_file":             "",

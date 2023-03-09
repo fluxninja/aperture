@@ -5,7 +5,7 @@ sidebar_position: 1
 
 :::info
 
-See also [Classifier reference][reference]
+See also [_Classifier_ reference][reference]
 
 :::
 
@@ -23,15 +23,15 @@ playground][rego-playground].
 
 :::note
 
-At _Feature_ [control points][control-point], developers can already provide
+At _Feature_ [_Control Points_][control-point], developers can already provide
 arbitrary flow labels by setting baggage or directly as arguments to the Check()
 call. As flow labels can be easily provided at _Feature_ control points by the
 developers, _Classifiers_ are available only at _HTTP_ control points.
 
 :::
 
-Any _Flow Labels_ created through the Classifier are immediately available for
-use in other components at the same [Control Point][control-point].
+Any _Flow Labels_ created through the _Classifier_ are immediately available for
+use in other components at the same [_Control Point_][control-point].
 Additionally, the _Flow Label_ is injected as baggage, so it will be available
 on every subsequent control point too (assuming you have [baggage
 propagation][baggage] configured in your system). If you're a [FluxNinja ARC
@@ -46,14 +46,14 @@ Both these behaviors (baggage propagation and inclusion in telemetry) can be
 
 :::caution
 
-Although Classifier is defined as a resource in a [policy][policies], _Flow
+Although Classifier is defined as a resource in a [_Policy_][policies], _Flow
 Labels_ are not namespaced in any way and are shared across policies.
 
 :::
 
 ## Selector {#selector}
 
-Each classifier needs to specify which control point it will be run at. For
+Each _Classifier_ needs to specify which control point it will be run at. For
 instance, the following selector is for the "ingress" control point at a
 service:
 

@@ -28,7 +28,7 @@ message Policies {
   map<string, Policy> policies = 1;
 }
 
-// Policy expresses reliability automation workflow that automatically protects services
+// Policy expresses observability-driven control logic.
 //
 // :::info
 //

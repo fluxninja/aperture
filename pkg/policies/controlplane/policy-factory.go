@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
@@ -15,7 +16,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
-	"github.com/fluxninja/aperture/pkg/prometheus"
+	prom "github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -35,7 +36,7 @@ func policyFactoryModule() fx.Option {
 		),
 		grpcgateway.RegisterHandler{Handler: policylangv1.RegisterPolicyServiceHandlerFromEndpoint}.Annotate(),
 		fx.Invoke(RegisterPolicyService),
-		prometheus.Module(),
+		prom.Module(),
 		policyModule(),
 	)
 }
@@ -60,11 +61,12 @@ func providePolicyFactory(
 	etcdClient *etcdclient.Client,
 	lifecycle fx.Lifecycle,
 	registry status.Registry,
+	prometheusRegistry *prometheus.Registry,
 ) (*PolicyFactory, error) {
 	policiesStatusRegistry := registry.Child("system", iface.PoliciesRoot)
 	logger := policiesStatusRegistry.GetLogger()
 
-	circuitJobGroup, err := jobs.NewJobGroup(policiesStatusRegistry.Child("jg", "circuit_jobs"), jobs.JobGroupConfig{}, nil)
+	circuitJobGroup, err := jobs.NewJobGroup(policiesStatusRegistry.Child("job-group", "circuit_jobs"), jobs.JobGroupConfig{}, nil)
 	if err != nil {
 		logger.Error().Err(err).Msg("Failed to create job group")
 		return nil, err
@@ -84,12 +86,14 @@ func providePolicyFactory(
 		optionsFunc = append(optionsFunc, fxOptionsFuncs...)
 	}
 
-	fxDriver := &notifiers.FxDriver{
-		FxOptionsFuncs: optionsFunc,
-		UnmarshalPrefixNotifier: notifiers.UnmarshalPrefixNotifier{
-			GetUnmarshallerFunc: config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller,
-		},
-		StatusRegistry: policiesStatusRegistry,
+	fxDriver, err := notifiers.NewFxDriver(
+		policiesStatusRegistry,
+		prometheusRegistry,
+		config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller,
+		optionsFunc,
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	lifecycle.Append(fx.Hook{

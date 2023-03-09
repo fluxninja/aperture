@@ -118,7 +118,7 @@ func (x *Policies) GetPolicies() map[string]*Policy {
 	return nil
 }
 
-// Policy expresses reliability automation workflow that automatically protects services
+// Policy expresses observability-driven control logic.
 //
 // :::info
 //

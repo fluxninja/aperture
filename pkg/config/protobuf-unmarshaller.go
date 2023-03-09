@@ -43,6 +43,15 @@ func (u *ProtobufUnmarshaller) Reload(bytes []byte) error {
 	return nil
 }
 
+// Marshal the config into bytes.
+func (u *ProtobufUnmarshaller) Marshal() ([]byte, error) {
+	bytes, err := u.bytes.Load().([]byte)
+	if !err {
+		return nil, errors.New("attempt to marshal nil bytes")
+	}
+	return bytes, nil
+}
+
 // Unmarshal unmarshals previously set protobuf-encoded bytes into output.
 //
 // Output should be a proto.Message.
@@ -61,9 +70,9 @@ func (u *ProtobufUnmarshaller) Unmarshal(output interface{}) error {
 func NewProtobufUnmarshaller(bytes []byte) (Unmarshaller, error) {
 	pu := &ProtobufUnmarshaller{}
 	if bytes != nil {
-		err := pu.Reload(bytes)
-		if err != nil {
-			return nil, err
+		ok := pu.Reload(bytes)
+		if ok != nil {
+			return nil, ok
 		}
 	}
 	return pu, nil

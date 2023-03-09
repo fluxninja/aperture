@@ -20,9 +20,9 @@ _Flow Labels_ are used in different ways in Aperture:
 - [_Flow Selector_][flow-selector] can select flows based on _Flow Labels_, thus
   flow labels can be used to narrow the scope of [_Classifiers_][classifier],
   [_Flux Meters_][flux-meter] etc.
-- _Flow Labels_ are used to map a flow to a [_workload_][workload].
-- Fairness within [scheduler][scheduler] and [rate-limiting][ratelimiter] keys
-  are also based on _Flow Labels_.
+- _Flow Labels_ are used to map a flow to a [_Workload_][workload].
+- Fairness within [_Scheduler_][scheduler] and [_Rate Limiter_][ratelimiter]
+  keys are also based on _Flow Labels_.
 
 ## Sources
 
@@ -31,7 +31,7 @@ baggage, flow classifiers, and explicit labels from the Aperture SDK call.
 
 ### Request labels
 
-For each HTTP [control point][control-point] (where flows are HTTP or GRPC
+For each HTTP [_Control Point_][control-point] (where flows are HTTP or GRPC
 requests), some basic metadata is available as _request labels_. These are
 `http.method` , `http.target`, `http.host`, `http.scheme`,
 `http.request_content_length` and `http.flavor`. Additionally all (non-pseudo)
@@ -187,7 +187,7 @@ up and sent to the analytics database in the FluxNinja ARC. This allows:
 :::note
 
 For _Classifier_ created labels, you can disable this behavior by setting
-`hidden: true` in the [Classification rule](/reference/policies/spec.md#rule).
+`hidden: true` in the [classification rule](/reference/policies/spec.md#rule).
 
 :::
 

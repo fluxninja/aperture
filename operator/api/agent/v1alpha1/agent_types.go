@@ -27,6 +27,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/distcache"
 	"github.com/fluxninja/aperture/pkg/net/http"
 	"github.com/fluxninja/aperture/pkg/peers"
+	autoscalek8sconfig "github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/config"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -77,6 +78,10 @@ type AgentConfigSpec struct {
 	//+kubebuilder:validation:Optional
 	FlowControl FlowControlConfigSpec `json:"flow_control"`
 
+	// AutoScale configuration.
+	//+kubebuilder:validation:Optional
+	AutoScale AutoScaleConfigSpec `json:"auto_scale"`
+
 	// Service Discovery configuration.
 	//+kubebuilder:validation:Optional
 	ServiceDiscoverySpec common.ServiceDiscoverySpec `json:"service_discovery"`
@@ -95,6 +100,13 @@ type FlowControlConfigSpec struct {
 	// FlowPreviewConfig holds flow preview configuration.
 	//+kubebuilder:validation:Optional
 	FlowPreviewConfig preview.FlowPreviewConfig `json:"preview_service"`
+}
+
+// AutoScaleConfigSpec holds auto scale configuration.
+type AutoScaleConfigSpec struct {
+	// AutoScaleKubernetesConfig holds auto scale kubernetes configuration.
+	//+kubebuilder:validation:Optional
+	AutoScaleKubernetesConfig autoscalek8sconfig.AutoScaleKubernetesConfig `json:"kubernetes"`
 }
 
 // AgentStatus defines the observed state of Agent.
