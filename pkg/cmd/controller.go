@@ -7,21 +7,25 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	autoscalecontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
 	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
 	previewv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/preview/v1"
 	"github.com/fluxninja/aperture/pkg/agentfunctions/agents"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
 
+// Handler is a gRPC server for the controller service.
 type Handler struct {
 	cmdv1.UnimplementedControllerServer
 	agents agents.Agents
 }
 
+// NewHandler creates a new Handler.
 func NewHandler(agents agents.Agents) *Handler {
 	return &Handler{agents: agents}
 }
 
+// ListAgents lists all agents.
 func (h *Handler) ListAgents(
 	ctx context.Context,
 	_ *emptypb.Empty,
@@ -31,11 +35,12 @@ func (h *Handler) ListAgents(
 	}, nil
 }
 
-func (h *Handler) ListControlPoints(
+// ListFlowControlPoints lists all FlowControlPoints.
+func (h *Handler) ListFlowControlPoints(
 	ctx context.Context,
 	_ *cmdv1.ListFlowControlPointsRequest,
 ) (*cmdv1.ListFlowControlPointsControllerResponse, error) {
-	agentsControlPoints, err := h.agents.ListControlPoints()
+	agentsControlPoints, err := h.agents.ListFlowControlPoints()
 	if err != nil {
 		return nil, err
 	}
@@ -65,6 +70,82 @@ func (h *Handler) ListControlPoints(
 	}, nil
 }
 
+// AutoScaleControlPointID is a ControlPointID without an agent group.
+type AutoScaleControlPointID struct {
+	APIVersion string
+	Kind       string
+	Namespace  string
+	Name       string
+}
+
+// GlobalAutoScaleControlPointID is a ControlPointID with an agent group.
+type GlobalAutoScaleControlPointID struct {
+	AutoScaleControlPointID
+	AgentGroup string
+}
+
+// ToProto converts ControlPointID to protobuf representation.
+func (gcp GlobalAutoScaleControlPointID) ToProto() *cmdv1.GlobalAutoScaleControlPoint {
+	return &cmdv1.GlobalAutoScaleControlPoint{
+		AgentGroup: gcp.AgentGroup,
+		AutoScaleControlPoint: &autoscalecontrolpointsv1.AutoScaleKubernetesControlPoint{
+			ApiVersion: gcp.APIVersion,
+			Kind:       gcp.Kind,
+			Namespace:  gcp.Namespace,
+			Name:       gcp.Name,
+		},
+	}
+}
+
+// ListAutoScaleControlPoints lists all AutoScaleControlPoints.
+func (h *Handler) ListAutoScaleControlPoints(
+	ctx context.Context,
+	_ *cmdv1.ListAutoScaleControlPointsRequest,
+) (*cmdv1.ListAutoScaleControlPointsControllerResponse, error) {
+	agentsControlPoints, err := h.agents.ListAutoScaleControlPoints()
+	if err != nil {
+		return nil, err
+	}
+
+	numErrors := uint32(0)
+	allControlPoints := map[GlobalAutoScaleControlPointID]struct{}{}
+	for _, resp := range agentsControlPoints {
+		if resp.Err != nil {
+			numErrors += 1
+			continue
+		}
+
+		for _, protoCp := range resp.Success.AutoScaleControlPoints {
+			gcp := GlobalAutoScaleControlPointID{
+				AutoScaleControlPointID: AutoScaleControlPointIDFromProto(protoCp),
+				AgentGroup:              resp.Success.AgentGroup,
+			}
+			allControlPoints[gcp] = struct{}{}
+		}
+	}
+
+	protoControlPoints := make([]*cmdv1.GlobalAutoScaleControlPoint, 0, len(allControlPoints))
+	for cp := range allControlPoints {
+		protoControlPoints = append(protoControlPoints, cp.ToProto())
+	}
+
+	return &cmdv1.ListAutoScaleControlPointsControllerResponse{
+		GlobalAutoScaleControlPoints: protoControlPoints,
+		ErrorsCount:                  numErrors,
+	}, nil
+}
+
+// AutoScaleControlPointIDFromProto creates ControlPointID from protobuf representation.
+func AutoScaleControlPointIDFromProto(protoCP *autoscalecontrolpointsv1.AutoScaleKubernetesControlPoint) AutoScaleControlPointID {
+	return AutoScaleControlPointID{
+		APIVersion: protoCP.ApiVersion,
+		Kind:       protoCP.Kind,
+		Namespace:  protoCP.Namespace,
+		Name:       protoCP.Name,
+	}
+}
+
+// PreviewFlowLabels previews flow labels.
 func (h *Handler) PreviewFlowLabels(
 	ctx context.Context,
 	req *cmdv1.PreviewFlowLabelsRequest,
@@ -84,6 +165,7 @@ func (h *Handler) PreviewFlowLabels(
 	)
 }
 
+// PreviewHTTPRequests previews HTTP requests.
 func (h *Handler) PreviewHTTPRequests(
 	ctx context.Context,
 	req *cmdv1.PreviewHTTPRequestsRequest,
@@ -174,9 +256,9 @@ func (h *Handler) agentsWithControlPoint(
 ) ([]string, error) {
 	// FIXME We could narrow down list of agents to ask for control points if
 	// we'd cache agent groups.
-	// FIXME we can add argument to ListControlPoints for agents to filter
+	// FIXME we can add argument to ListFlowControlPoints for agents to filter
 	// non-matching control points.
-	agentsControlPoints, err := h.agents.ListControlPoints()
+	agentsControlPoints, err := h.agents.ListFlowControlPoints()
 	if err != nil {
 		return nil, err
 	}

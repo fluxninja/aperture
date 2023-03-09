@@ -24,6 +24,7 @@ jobs:
           review_comment_lgtm: false
           path_filters: |
             !**/*.pb.go
+            !**/*.lock
             !**/*.yaml
             !**/*.yml
             !**/*.cfg
