@@ -22,7 +22,7 @@ var Module = fx.Options(
 		ConfigKey: ConfigKey + ".client.grpc",
 	}.Annotate(),
 	fx.Provide(
-		NewControlPointsHandler,
+		NewFlowControlControlPointsHandler,
 		ProvidePreviewHandler,
 	),
 	fx.Invoke(

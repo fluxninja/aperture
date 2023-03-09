@@ -12,8 +12,8 @@ import (
 	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
 )
 
-// ListCmd is the command to list control points.
-var ListCmd = &cobra.Command{
+// ControlPointsCmd is the command to list control points.
+var ControlPointsCmd = &cobra.Command{
 	Use:           "control-points",
 	Short:         "List Flow Control control points",
 	Long:          `List Flow Control control points`,

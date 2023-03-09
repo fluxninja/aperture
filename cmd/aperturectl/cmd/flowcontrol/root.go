@@ -11,7 +11,7 @@ var controller utils.ControllerConn
 func init() {
 	controller.InitFlags(FlowControlCmd.PersistentFlags())
 
-	FlowControlCmd.AddCommand(ListCmd)
+	FlowControlCmd.AddCommand(ControlPointsCmd)
 	FlowControlCmd.AddCommand(PreviewCmd)
 }
 

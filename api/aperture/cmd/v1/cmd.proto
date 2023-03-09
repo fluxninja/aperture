@@ -3,6 +3,7 @@ syntax = "proto3";
 // Messages for aperturectl → controller and controller → agent communication.
 package aperture.cmd.v1;
 
+import "aperture/autoscale/kubernetes/controlpoints/v1/controlpoints.proto";
 import "aperture/flowcontrol/controlpoints/v1/controlpoints.proto";
 import "aperture/flowcontrol/preview/v1/preview.proto";
 import "google/protobuf/empty.proto";
@@ -12,6 +13,7 @@ service Controller {
   rpc ListAgents(google.protobuf.Empty) returns (ListAgentsResponse);
   rpc ListServices(ListServicesRequest) returns (ListServicesControllerResponse);
   rpc ListFlowControlPoints(ListFlowControlPointsRequest) returns (ListFlowControlPointsControllerResponse);
+  rpc ListAutoScaleControlPoints(ListAutoScaleControlPointsRequest) returns (ListAutoScaleControlPointsControllerResponse);
 
   // duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
   rpc PreviewFlowLabels(PreviewFlowLabelsRequest) returns (PreviewFlowLabelsControllerResponse);
@@ -44,6 +46,18 @@ message ListFlowControlPointsControllerResponse {
   uint32 errors_count = 2;
 }
 
+message ListAutoScaleControlPointsRequest {}
+
+message ListAutoScaleControlPointsAgentResponse {
+  repeated aperture.autoscale.kubernetes.controlpoints.v1.AutoScaleKubernetesControlPoint auto_scale_control_points = 1;
+  string agent_group = 2;
+}
+
+message ListAutoScaleControlPointsControllerResponse {
+  repeated GlobalAutoScaleControlPoint global_auto_scale_control_points = 1;
+  uint32 errors_count = 2;
+}
+
 message ListAgentsResponse {
   repeated string agents = 1;
 }
@@ -52,6 +66,11 @@ message ListAgentsResponse {
 // service with explicit Agent Group.
 message GlobalFlowControlPoint {
   aperture.flowcontrol.controlpoints.v1.FlowControlPoint flow_control_point = 1;
+  string agent_group = 2;
+}
+
+message GlobalAutoScaleControlPoint {
+  aperture.autoscale.kubernetes.controlpoints.v1.AutoScaleKubernetesControlPoint auto_scale_control_point = 1;
   string agent_group = 2;
 }
 

@@ -1622,6 +1622,13 @@ definitions:
             policies:
                 $ref: '#/definitions/Policies'
         type: object
+    GlobalAutoScaleControlPoint:
+        properties:
+            agent_group:
+                type: string
+            auto_scale_control_point:
+                $ref: '#/definitions/AutoScaleKubernetesControlPoint'
+        type: object
     GlobalFlowControlPoint:
         description: |-
             GlobalFlowControlPoint contains info about a control point on a given
@@ -2140,6 +2147,16 @@ definitions:
             agents:
                 items:
                     type: string
+                type: array
+        type: object
+    ListAutoScaleControlPointsControllerResponse:
+        properties:
+            errors_count:
+                format: int64
+                type: integer
+            global_auto_scale_control_points:
+                items:
+                    $ref: '#/definitions/GlobalAutoScaleControlPoint'
                 type: array
         type: object
     ListFlowControlPointsControllerResponse:
