@@ -3,6 +3,8 @@ plugins {
     signing
     id("java")
     id("com.github.johnrengelman.shadow")
+    id("org.springframework.boot") version "2.7.9"
+    id("io.spring.dependency-management") version "1.1.0"
 }
 
 java {
@@ -89,6 +91,9 @@ if (System.getenv("CI") != null) {
 dependencies {
     implementation("net.bytebuddy:byte-buddy-dep:1.12.19")
     implementation("org.slf4j:log4j-over-slf4j:2.0.6")
+    implementation("org.springframework.boot:spring-boot-starter-web") {
+        exclude("org.springframework.boot", "spring-boot-starter-logging")
+    }
 
     implementation(project(":lib:core"))
     implementation(project(":lib:armeria"))

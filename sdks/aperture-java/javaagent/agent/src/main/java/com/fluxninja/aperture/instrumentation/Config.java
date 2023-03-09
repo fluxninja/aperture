@@ -46,7 +46,7 @@ public class Config {
                 props.load(Files.newInputStream(Paths.get(configFileName)));
             }
         } catch (IOException e) {
-            throw new RuntimeException("Could not read properties from file", e);
+            throw new RuntimeException("Could not read properties from file: " + e.getMessage(), e);
         }
 
         // Get property overrides from env and commandline
