@@ -15,37 +15,12 @@ jobs:
           repository: ${{github.event.pull_request.head.repo.full_name}}
           ref: ${{github.event.pull_request.head.ref}}
           submodules: false
-
       - uses: harjotgill/chatgpt-action@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
           debug: false
-          action: score
-          path_filters: |
-            !**/*.pb.go
-            !**/*.yaml
-            !**/*.yml
-            !**/*.cfg
-            !**/*.ini
-            !**/*.mod
-            !**/*.sum
-            !**/*.json
-            !**/*.mmd
-            !**/*.svg
-            !**/*.png
-            !**/*.dot
-            !**/gen/**
-            !**/vendor/**
-
-      - uses: harjotgill/chatgpt-action@main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        with:
-          debug: false
-          action: review
           review_comment_lgtm: false
           path_filters: |
             !**/*.pb.go
