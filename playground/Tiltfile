@@ -1161,17 +1161,16 @@ if dockerhub_images:
 to_run = cfg.get("to-run",[])
 
 # If no resources are specified, run the default ones
-if not len(to_run):
-    print("No resources specified, running default scenario resources")
-    to_run=["agent"]
-else:
+if len(to_run):
     print("Running resources: " + ",".join(to_run))
+else:
+    print("No resources specified, running default scenario resources")
 
 # If no scenario is specified, use the default one only if no resources were specified
-
 scenario = cfg.get("scenario", None)
 if not scenario and not len(to_run):
     scenario = DEFAULT_TEST_SCENARIO
+    to_run=["agent"]
 
 # if scenario is specified, load the scenario and all its dependencies
 if scenario:
