@@ -45,7 +45,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
-          debug: false
+          debug: true
           action: review
           review_comment_lgtm: false
           path_filters: |
