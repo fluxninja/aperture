@@ -1,7 +1,7 @@
 {
   "renderer": "tanka",
   "tkenv": "playground/tanka/apps/demo-app",
-  "needs": ["istio"],
+  "needs": ["istio", "aperture-grafana"],
   "aperture_policies": [],
   "images": [
     {
