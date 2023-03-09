@@ -1,9 +1,6 @@
 local nestedsignalegressins = import './nestedsignalegressins.libsonnet';
 {
   new():: {
-    in_ports: {
-      signal: error 'Port signal is missing',
-    },
   },
   inPorts:: nestedsignalegressins,
   withInPorts(in_ports):: {

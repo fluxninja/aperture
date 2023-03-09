@@ -1,9 +1,6 @@
 local ratelimiterins = import './ratelimiterins.libsonnet';
 {
   new():: {
-    in_ports: {
-      limit: error 'Port limit is missing',
-    },
   },
   inPorts:: ratelimiterins,
   withDefaultConfig(default_config):: {

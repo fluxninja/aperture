@@ -391,10 +391,10 @@ Outputs for the Arithmetic Combinator component.
 AutoScale components are used to scale a service.
 
 <dl>
-<dt>autoscaler</dt>
+<dt>auto_scaler</dt>
 <dd>
 
-([AutoScaler](#auto-scaler)) AutoScaler provides auto scaling functionality for any resource.
+([AutoScaler](#auto-scaler)) AutoScaler provides auto scaling functionality for any scalable resource.
 
 </dd>
 <dt>pod_scaler</dt>
@@ -409,21 +409,21 @@ AutoScale components are used to scale a service.
 
 ### AutoScaler {#auto-scaler}
 
-AutoScaler
+AutoScaler: AutoScaler provides auto scaling functionality for any scalable resource. Multiple Controllers can be defined on the AutoScaler for performing scale-out or scale-in. The AutoScaler can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
 
 <dl>
 <dt>cooldown_override_percentage</dt>
 <dd>
 
-(float64, default: `50`) Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.
+(float64, default: `50`) Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
 For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
-scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
 
 </dd>
 <dt>max_scale</dt>
 <dd>
 
-(string, default: `"4294967295"`) The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+(string, default: `"9223372036854775807"`) The maximum scale to which the autoscaler can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
 
 </dd>
 <dt>max_scale_in_percentage</dt>
@@ -441,7 +441,7 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>min_scale</dt>
 <dd>
 
-(string, default: `"0"`) The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+(string, default: `"0"`) The minimum scale to which the autoscaler can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
 
 </dd>
 <dt>out_ports</dt>
@@ -453,7 +453,7 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>scale_in_alerter_parameters</dt>
 <dd>
 
-([AlerterParameters](#alerter-parameters)) Configuration for scale in alerter.
+([AlerterParameters](#alerter-parameters)) Configuration for scale-in alerter.
 
 </dd>
 <dt>scale_in_controllers</dt>
@@ -465,13 +465,13 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>scale_in_cooldown</dt>
 <dd>
 
-(string, default: `"120s"`) The amount of time to wait after a scale in operation for another scale in operation.
+(string, default: `"120s"`) The amount of time to wait after a scale-in operation for another scale-in operation.
 
 </dd>
 <dt>scale_out_alerter_parameters</dt>
 <dd>
 
-([AlerterParameters](#alerter-parameters)) Configuration for scale out alerter.
+([AlerterParameters](#alerter-parameters)) Configuration for scale-out alerter.
 
 </dd>
 <dt>scale_out_controllers</dt>
@@ -483,7 +483,7 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>scale_out_cooldown</dt>
 <dd>
 
-(string, default: `"30s"`) The amount of time to wait after a scale out operation for another scale out or scale in operation.
+(string, default: `"30s"`) The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
 
 </dd>
 <dt>scaler</dt>
@@ -529,13 +529,13 @@ Inputs for Gradient.
 <dt>setpoint</dt>
 <dd>
 
-([InPort](#in-port)) The setpoint to use for scale in.
+([InPort](#in-port)) The setpoint to use for scale-in.
 
 </dd>
 <dt>signal</dt>
 <dd>
 
-([InPort](#in-port)) The signal to use for scale in.
+([InPort](#in-port)) The signal to use for scale-in.
 
 </dd>
 </dl>
@@ -596,13 +596,13 @@ Inputs for Gradient.
 <dt>setpoint</dt>
 <dd>
 
-([InPort](#in-port)) The setpoint to use for scale out.
+([InPort](#in-port)) The setpoint to use for scale-out.
 
 </dd>
 <dt>signal</dt>
 <dd>
 
-([InPort](#in-port)) The signal to use for scale out.
+([InPort](#in-port)) The signal to use for scale-out.
 
 </dd>
 </dl>
@@ -1955,7 +1955,7 @@ $$
 \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
 $$
 
-`gradient` is then clamped to [min_gradient, max_gradient] range.
+`gradient` is then clamped to `[min_gradient, max_gradient]` range.
 
 The output of gradient controller is computed as follows:
 
