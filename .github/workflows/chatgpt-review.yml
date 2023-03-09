@@ -21,7 +21,6 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
           debug: true
-          action: review
           review_comment_lgtm: false
           path_filters: |
             !**/*.pb.go
