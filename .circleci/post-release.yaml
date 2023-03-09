@@ -234,11 +234,7 @@ jobs:
             git clone --depth=1 git@github.com:fluxninja/homebrew-aperture.git "${TAP_REPO}"
           environment:
             DEPLOYMENT_KEY: << parameters.deployment-key >>
-      - run:
-          name: "Update brew formulas"
-          command: |
-            "${TAP_REPO}/scripts/update_brews.py" "${TAP_REPO}/Formulas/*.rb"
-      - run: *install-gh-cli
+      #- run: *install-gh-cli
       - run:
           name: "Update brew repository"
           command: |
@@ -247,9 +243,10 @@ jobs:
             vless="${VERSION:1}"
             rcless="${vless%%-*}"
             formula_version="${rcless%.*}"
-            branch="update_aperture_${formula_version}"
+            # branch="update_aperture_${formula_version}"
+            branch=main
 
-            git checkout -B "${branch}"
+            # git checkout -B "${branch}"
             ./scripts/update_brews.py add-version "${formula_version}"
             ./scripts/update_brews.py delete
             ./scripts/update_brews.py update
@@ -259,7 +256,7 @@ jobs:
             git add .
             git commit -m "Update brews for release ${VERSION}"
             git push origin "${branch}"
-            gh pr create --title "${MSG}" --body "" --label "pr-pull"
+            # gh pr create --title "${MSG}" --body "" --label "pr-pull"
 
 workflows:
   version: 2
