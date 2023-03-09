@@ -1,5 +1,5 @@
 ---
-title: Load-Based Auto Scaling
+title: Load-based Auto Scaling
 sidebar_position: 2
 keywords:
   - scaling
@@ -8,7 +8,7 @@ keywords:
   - HPA
 ---
 
-# **Load-Based Auto Scaling**
+# **Load-based Auto Scaling**
 
 ```mdx-code-block
 import Tabs from '@theme/Tabs';
@@ -16,26 +16,38 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-Overload protection is done by adaptive concurrency limiting it is also
-important to scale your services up and down based on the traffic. Aperture
-provides a way to scale your services up and down based on the metrics using
-Autoscale and Pod Scale components.
+Load-based auto-scaling is a technique used to dynamically adjust the number of
+instances or resources allocated to a service based on workload demands. In
+Aperture, the
+[_AutoScaler_](concepts/integrations/auto-scale/components/auto-scaler.md)
+component enables load-based auto-scaling by interfacing with infrastructure
+APIs such as Kubernetes to automatically adjust the resources allocated to a
+service.
 
-Though there is Horizontal Pod Autoscaler (HPA) in Kubernetes but it has
-limitations. The HPA can only scale based on a limited set of metrics, such as
-CPU or memory utilization. Additionally, it can't handle complex scaling
-behavior based on multiple metrics, making it difficult to optimize application
-performance and efficiency.
+This tutorial builds upon the
+[basic concurrency limiting policy](tutorials/integrations/flow-control/concurrency-limiting/basic-concurrency-limiting.md)
+to add an escalation for auto-scaling. The concurrency limiter protects the
+service from sudden traffic spikes, but to protect from persistent changes in
+load, it's necessary to scale the service in response to demand.
 
-Whereas Aperture Auto Scale has ability to handle complex scaling behavior based
-on multiple metrics. For example, Aperture Auto Scale can use a combination of
-latency, throughput, and error rates to determine how many replicas to deploy,
-providing a more accurate and nuanced approach to scaling. This is essential for
-applications where performance is critical, such as e-commerce or financial
-applications.
+Load-based auto-scaling extends the concurrency limiting policy by automatically
+scaling the service to meet persistent changes in demand. In Aperture,
+load-based auto-scaling is accomplished by configuring the _AutoScaler_
+component with Controllers that can adjust the number of instances or resources
+allocated to the service.
 
-In this tutorial, we will see how to use Aperture's Auto Scale component to do a
-load-based autoscaling for a Kubernetes deployment.
+Observed Load Multiplier The load-based auto-scaling policy makes use of the
+OBSERVED*LOAD_MULTIPLIER signal from the
+[AIMDConcurrencyController](reference/policies/spec.md#a-i-m-d-concurrency-controller)
+component. This signal measures the amount of traffic that is being load shed by
+the Concurrency Controller. The \_AutoScaler* is configured to scale out based
+on this signal and a setpoint of 1.0.
+
+CPU Utilization In addition to the load shedding signal, the load-based
+auto-scaling policy also includes scale in and scale out Controllers based on
+CPU utilization. These Controllers adjust the resources allocated to the service
+based on changes in CPU usage, ensuring that the service can handle the workload
+efficiently.
 
 ## Policy
 
@@ -113,7 +125,7 @@ When the above policy is loaded in Aperture's
 traffic spikes above the concurrency limit of
 `service1-demo-app.demoapp.svc.cluster.local`, controller triggers load-shed for
 a proportion of requests matching the Selector and average cpu signal and load
-multiplier triggers a signal to do autoscale.
+multiplier triggers a signal to do auto-scale.
 
 <Zoom>
 

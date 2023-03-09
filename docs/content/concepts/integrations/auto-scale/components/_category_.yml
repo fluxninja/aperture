@@ -1,9 +1,0 @@
-label: Components
-position: 2
-collapsible: true
-collapsed: true
-link:
-  type: "generated-index"
-  title: "Components"
-  description: "Components provided by auto-scale integration."
-  keywords: ["components"]

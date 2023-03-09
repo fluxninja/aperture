@@ -363,9 +363,9 @@ definitions:
 
         type: string
         format: int64
-        default: "4294967295"
+        default: "9223372036854775807"
         minLength: 1
-        x-go-tag-default: "4294967295"
+        x-go-tag-default: "9223372036854775807"
         x-go-tag-validate: gt=0
         x-order: 1
       max_scale_in_percentage:
@@ -393,9 +393,9 @@ definitions:
         type: string
         format: int64
         default: "0"
-        minLength: 1
+        minLength: 0
         x-go-tag-default: "0"
-        x-go-tag-validate: gt=0
+        x-go-tag-validate: gte=0
         x-order: 4
       out_ports:
         description: Output ports for the AutoScaler.
@@ -1617,7 +1617,7 @@ definitions:
       \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
       $$
 
-      `gradient` is then clamped to [min_gradient, max_gradient] range.
+      `gradient` is then clamped to `[min_gradient, max_gradient]` range.
 
       The output of gradient controller is computed as follows:
       $$

@@ -1211,7 +1211,7 @@ func (x *OutPort) GetSignalName() string {
 // \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
 // $$
 //
-// `gradient` is then clamped to [min_gradient, max_gradient] range.
+// `gradient` is then clamped to `[min_gradient, max_gradient]` range.
 //
 // The output of gradient controller is computed as follows:
 // $$
@@ -3452,9 +3452,9 @@ type AutoScaler struct {
 	OutPorts *AutoScaler_Outs   `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	Scaler   *AutoScaler_Scaler `protobuf:"bytes,2,opt,name=scaler,proto3" json:"scaler,omitempty" validate:"required"` // @gotags: validate:"required"
 	// The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
-	MinScale int64 `protobuf:"varint,3,opt,name=min_scale,json=minScale,proto3" json:"min_scale,omitempty" default:"0" validate:"gt=0"` // @gotags: default:"0" validate:"gt=0"
+	MinScale int64 `protobuf:"varint,3,opt,name=min_scale,json=minScale,proto3" json:"min_scale,omitempty" default:"0" validate:"gte=0"` // @gotags: default:"0" validate:"gte=0"
 	// The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
-	MaxScale int64 `protobuf:"varint,4,opt,name=max_scale,json=maxScale,proto3" json:"max_scale,omitempty" default:"4294967295" validate:"gt=0"` // @gotags: default:"4294967295" validate:"gt=0"
+	MaxScale int64 `protobuf:"varint,4,opt,name=max_scale,json=maxScale,proto3" json:"max_scale,omitempty" default:"9223372036854775807" validate:"gt=0"` // @gotags: default:"9223372036854775807" validate:"gt=0"
 	// List of Controllers for scaling out.
 	ScaleOutControllers []*AutoScaler_ScaleOutController `protobuf:"bytes,5,rep,name=scale_out_controllers,json=scaleOutControllers,proto3" json:"scale_out_controllers,omitempty"`
 	// List of Controllers for scaling in.

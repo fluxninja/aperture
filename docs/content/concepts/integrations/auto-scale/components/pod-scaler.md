@@ -21,6 +21,5 @@ loop the component emits output signals for the number of configured replicas
 and the actual number of replicas deployed.
 
 A Pod Scaler component is not required if you are using the high-level
-[Auto Scaler](reference/policies/spec.md#auto-scaler) component. It defines
-multiple scale in, scale out controllers and takes care of instantiating the Pod
-Scaler component.
+[Auto Scaler](auto-scaler.md) component. It defines multiple scale in, scale out
+controllers and takes care of instantiating the Pod Scaler component.

@@ -423,7 +423,7 @@ scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>max_scale</dt>
 <dd>
 
-(string, default: `"4294967295"`) The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+(string, default: `"9223372036854775807"`) The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
 
 </dd>
 <dt>max_scale_in_percentage</dt>
@@ -1955,7 +1955,7 @@ $$
 \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
 $$
 
-`gradient` is then clamped to [min_gradient, max_gradient] range.
+`gradient` is then clamped to `[min_gradient, max_gradient]` range.
 
 The output of gradient controller is computed as follows:
 

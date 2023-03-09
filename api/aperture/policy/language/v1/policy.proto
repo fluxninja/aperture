@@ -291,7 +291,7 @@ message OutPort {
 // \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
 // $$
 //
-// `gradient` is then clamped to [min_gradient, max_gradient] range.
+// `gradient` is then clamped to `[min_gradient, max_gradient]` range.
 //
 // The output of gradient controller is computed as follows:
 // $$
@@ -1575,9 +1575,9 @@ message AutoScaler {
   Scaler scaler = 2; // @gotags: validate:"required"
 
   // The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
-  int64 min_scale = 3; // @gotags: default:"0" validate:"gt=0"
+  int64 min_scale = 3; // @gotags: default:"0" validate:"gte=0"
   // The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
-  int64 max_scale = 4; // @gotags: default:"4294967295" validate:"gt=0"
+  int64 max_scale = 4; // @gotags: default:"9223372036854775807" validate:"gt=0"
 
   // List of Controllers for scaling out.
   repeated ScaleOutController scale_out_controllers = 5;
