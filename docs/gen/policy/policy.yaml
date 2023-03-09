@@ -329,8 +329,9 @@ definitions:
     description: AutoScale components are used to scale a service.
     type: object
     properties:
-      autoscaler:
-        description: AutoScaler provides auto scaling functionality for any resource.
+      auto_scaler:
+        description: AutoScaler provides auto scaling functionality for any scalable
+          resource.
         x-order: 0
         $ref: '#/definitions/AutoScaler'
       pod_scaler:
@@ -339,14 +340,17 @@ definitions:
         x-order: 1
         $ref: '#/definitions/PodScaler'
   AutoScaler:
+    description: 'AutoScaler: AutoScaler provides auto scaling functionality for any
+      scalable resource. Multiple Controllers can be defined on the AutoScaler for
+      performing scale-out or scale-in. The AutoScaler can interface with infrastructure
+      APIs such as Kubernetes to perform auto-scale.'
     type: object
-    title: AutoScaler
     properties:
       cooldown_override_percentage:
         description: |+
-          Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.
+          Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
           For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
-          scale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+          scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
 
         type: number
         format: double
@@ -355,12 +359,14 @@ definitions:
         x-order: 0
       max_scale:
         description: |+
-          The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+          The maximum scale to which the autoscaler can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
 
         type: string
-        format: uint64
-        default: "4294967295"
-        x-go-tag-default: "4294967295"
+        format: int64
+        default: "9223372036854775807"
+        minLength: 1
+        x-go-tag-default: "9223372036854775807"
+        x-go-tag-validate: gt=0
         x-order: 1
       max_scale_in_percentage:
         description: |+
@@ -382,19 +388,21 @@ definitions:
         x-order: 3
       min_scale:
         description: |+
-          The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+          The minimum scale to which the autoscaler can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
 
         type: string
-        format: uint64
+        format: int64
         default: "0"
+        minLength: 0
         x-go-tag-default: "0"
+        x-go-tag-validate: gte=0
         x-order: 4
       out_ports:
         description: Output ports for the AutoScaler.
         x-order: 5
         $ref: '#/definitions/AutoScalerOuts'
       scale_in_alerter_parameters:
-        description: Configuration for scale in alerter.
+        description: Configuration for scale-in alerter.
         x-order: 6
         $ref: '#/definitions/AlerterParameters'
       scale_in_controllers:
@@ -405,14 +413,14 @@ definitions:
         x-order: 7
       scale_in_cooldown:
         description: |+
-          The amount of time to wait after a scale in operation for another scale in operation.
+          The amount of time to wait after a scale-in operation for another scale-in operation.
 
         type: string
         default: 120s
         x-go-tag-default: 120s
         x-order: 8
       scale_out_alerter_parameters:
-        description: Configuration for scale out alerter.
+        description: Configuration for scale-out alerter.
         x-order: 9
         $ref: '#/definitions/AlerterParameters'
       scale_out_controllers:
@@ -423,7 +431,7 @@ definitions:
         x-order: 10
       scale_out_cooldown:
         description: |+
-          The amount of time to wait after a scale out operation for another scale out or scale in operation.
+          The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
 
         type: string
         default: 30s
@@ -455,11 +463,11 @@ definitions:
     type: object
     properties:
       setpoint:
-        description: The setpoint to use for scale in.
+        description: The setpoint to use for scale-in.
         x-order: 0
         $ref: '#/definitions/InPort'
       signal:
-        description: The signal to use for scale in.
+        description: The signal to use for scale-in.
         x-order: 1
         $ref: '#/definitions/InPort'
   AutoScalerDecreasingGradientParameters:
@@ -503,11 +511,11 @@ definitions:
     type: object
     properties:
       setpoint:
-        description: The setpoint to use for scale out.
+        description: The setpoint to use for scale-out.
         x-order: 0
         $ref: '#/definitions/InPort'
       signal:
-        description: The signal to use for scale out.
+        description: The signal to use for scale-out.
         x-order: 1
         $ref: '#/definitions/InPort'
   AutoScalerIncreasingGradientParameters:
@@ -1609,7 +1617,7 @@ definitions:
       \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
       $$
 
-      `gradient` is then clamped to [min_gradient, max_gradient] range.
+      `gradient` is then clamped to `[min_gradient, max_gradient]` range.
 
       The output of gradient controller is computed as follows:
       $$
@@ -3084,9 +3092,11 @@ definitions:
           This override is applicable only if `auto_tokens` is set to false.
 
         type: string
-        format: uint64
+        format: int64
         default: "1"
+        minLength: 1
         x-go-tag-default: "1"
+        x-go-tag-validate: gt=0
         x-order: 2
   ServiceSelector:
     description: |-

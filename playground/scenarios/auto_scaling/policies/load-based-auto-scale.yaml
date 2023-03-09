@@ -7,7 +7,7 @@ common:
   # Name of the policy.
   # Type: string
   # Required: True
-  policy_name: "load-based-autoscale-service1"
+  policy_name: "load-based-auto-scale"
 
 policy:
   # Flux Meter.
@@ -15,6 +15,7 @@ policy:
   flux_meter:
     flow_selector:
       service_selector:
+        agent_group: default
         # Service Name.
         # Type: string
         # Required: True
@@ -24,18 +25,6 @@ policy:
         # Type: string
         # Required: True
         control_point: ingress
-  # List of classification rules.
-  # Type: []aperture.spec.v1.Classifier
-  classifiers:
-    - flow_selector: &concurrency_flow_selector
-        service_selector:
-          service: service1-demo-app.demoapp.svc.cluster.local
-        flow_matcher:
-          control_point: ingress
-      rules:
-        user_type:
-          extractor:
-            from: request.http.headers.user-type
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
   components:
@@ -47,7 +36,7 @@ policy:
             output:
               signal_name: AVERAGE_CPU
     - auto_scale:
-        autoscaler:
+        auto_scaler:
           scaler:
             kubernetes_replicas:
               kubernetes_object_selector:
@@ -85,21 +74,9 @@ policy:
   concurrency_controller:
     # Concurrency Limiter flow selector.
     # Type: aperture.spec.v1.FlowSelector
-    flow_selector: *concurrency_flow_selector
-    # Scheduler parameters.
-    # Type: aperture.spec.v1.SchedulerParameters
-    scheduler:
-      workloads:
-        - parameters:
-            priority: 50
-          label_matcher:
-            match_labels:
-              user_type: guest
-        - parameters:
-            priority: 200
-          label_matcher:
-            match_labels:
-              http.request.header.user_type: subscriber
-    # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
-    # Type: float64
-    load_multiplier_linear_increment: 0.0025
+    flow_selector:
+      service_selector:
+        agent_group: default
+        service: service1-demo-app.demoapp.svc.cluster.local
+      flow_matcher:
+        control_point: ingress

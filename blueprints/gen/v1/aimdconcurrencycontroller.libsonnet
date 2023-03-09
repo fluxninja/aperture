@@ -2,17 +2,6 @@ local aimdconcurrencycontrollerins = import './aimdconcurrencycontrollerins.libs
 local aimdconcurrencycontrollerouts = import './aimdconcurrencycontrollerouts.libsonnet';
 {
   new():: {
-    in_ports: {
-      setpoint: error 'Port setpoint is missing',
-      signal: error 'Port signal is missing',
-    },
-    out_ports: {
-      accepted_concurrency: error 'Port accepted_concurrency is missing',
-      desired_load_multiplier: error 'Port desired_load_multiplier is missing',
-      incoming_concurrency: error 'Port incoming_concurrency is missing',
-      is_overload: error 'Port is_overload is missing',
-      observed_load_multiplier: error 'Port observed_load_multiplier is missing',
-    },
   },
   inPorts:: aimdconcurrencycontrollerins,
   outPorts:: aimdconcurrencycontrollerouts,

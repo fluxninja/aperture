@@ -5,8 +5,8 @@
   "aperture_policies": [
     {
       "blueprint_name": "policies/latency-aimd-concurrency-limiting",
-      "policy_name": "load-based-autoscale-service1",
-      "values_file": "policies/load-based-autoscale-service1.yaml",
+      "policy_name": "load-based-auto-scale",
+      "values_file": "policies/load-based-auto-scale.yaml",
       "dashboard_mixin_dir": "dashboards/"
     }
   ],

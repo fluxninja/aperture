@@ -1,9 +1,6 @@
 local alerterins = import './alerterins.libsonnet';
 {
   new():: {
-    in_ports: {
-      signal: error 'Port signal is missing',
-    },
   },
   inPorts:: alerterins,
   withInPorts(in_ports):: {

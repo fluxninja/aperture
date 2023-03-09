@@ -24,6 +24,7 @@ aperturectl is a CLI tool which can be used to interact with Aperture seamlessly
 
 - [aperturectl agents](/reference/aperturectl/agents/agents.md) - List connected agents
 - [aperturectl apply](/reference/aperturectl/apply/apply.md) - Apply Aperture Policies
+- [aperturectl auto-scale](/reference/aperturectl/auto-scale/auto-scale.md) - AutoScale integrations
 - [aperturectl blueprints](/reference/aperturectl/blueprints/blueprints.md) - Aperture Blueprints
 - [aperturectl compile](/reference/aperturectl/compile/compile.md) - Compile circuit from Aperture Policy file
 - [aperturectl completion](/reference/aperturectl/completion/completion.md) - Generate the autocompletion script for the specified shell

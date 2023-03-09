@@ -8,20 +8,20 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/Masterminds/semver/v3"
 	"github.com/ghodss/yaml"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
+	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/hashicorp/go-multierror"
+	"github.com/xeipuuv/gojsonschema"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/Masterminds/semver/v3"
 	monitoringv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/monitoring/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/config"
-	"github.com/go-git/go-git/v5/storage/memory"
-	"github.com/xeipuuv/gojsonschema"
 )
 
 // GenerateDotFile generates a DOT file from the circuit.
@@ -167,6 +167,7 @@ func GetKubeConfig(kubeConfig string) (*rest.Config, error) {
 	return kubeRestConfig, nil
 }
 
+// ResolveLatestVersion returns the latest release version of Aperture.
 func ResolveLatestVersion() (string, error) {
 	remote := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
 		Name: "origin",

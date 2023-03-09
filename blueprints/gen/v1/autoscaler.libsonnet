@@ -1,11 +1,6 @@
 local autoscalerouts = import './autoscalerouts.libsonnet';
 {
   new():: {
-    out_ports: {
-      actual_scale: error 'Port actual_scale is missing',
-      configured_scale: error 'Port configured_scale is missing',
-      desired_scale: error 'Port desired_scale is missing',
-    },
   },
   outPorts:: autoscalerouts,
   withCooldownOverridePercentage(cooldown_override_percentage):: {

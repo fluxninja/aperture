@@ -364,12 +364,10 @@ func CallAll[
 				Client:  rawResult.Client,
 				Success: new(RespValue),
 			}
-
 			if err := proto.Unmarshal(rawResult.Success, Resp(result.Success)); err != nil {
 				result.Success = nil
 				result.Err = status.Error(codes.InvalidArgument, err.Error())
 			}
-
 			resps = append(resps, result)
 		}
 	}

@@ -522,7 +522,7 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 			tokens = tokensAuto
 		}
 	} else {
-		tokens = matchedWorkloadProto.Tokens
+		tokens = uint64(matchedWorkloadProto.Tokens)
 	}
 
 	// timeout is tokens(which is in milliseconds) * conLimiter.schedulerProto.TimeoutFactor(float64)
