@@ -68,51 +68,6 @@ jobs:
             - ~/.gradle
           key: gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
 
-  tag-github-repository:
-    executor: base-cimg-executor
-    parameters:
-      repository:
-        type: string
-        description: Github repository to tag (organization/repository)
-      deployment-key:
-        type: string
-        description:
-          Deployment key to use when interacting with remote repository
-      tag:
-        type: string
-        description: What git tag to use when tagging remote repository
-    steps:
-      - add_ssh_keys:
-          fingerprints:
-            - << parameters.deployment-key >>
-      - run:
-          name: Fetch git ssh host keys and add them to known_hosts
-          command: |
-            ssh-keyscan github.com >> ~/.ssh/known_hosts
-      - run:
-          name: Configure git identity for tag annotations
-          command: |
-            git config --global user.name "CircleCI-Gitbot"
-            git config --global user.email "circleci-gitbot@fluxninja.com"
-      - run:
-          name: Checkout github repository
-          command: |
-            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "<< parameters.deployment-key >>" | tr -d ':')"
-            export SSH_AUTH_SOCK=""
-            git clone ssh://git@github.com/<< parameters.repository >> /home/circleci/project
-      - run:
-          name: Create release tag in the repository
-          command: |
-            cd /home/circleci/project
-            git tag --annotate -m "Releasing version << parameters.tag >>" << parameters.tag >>
-      - run:
-          name: Push release tags to remote repository
-          command: |
-            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "<< parameters.deployment-key >>" | tr -d ':')"
-            export SSH_AUTH_SOCK=""
-            cd /home/circleci/project
-            git push origin --tags
-
   publish-packages:
     parameters:
       workspace-name:
@@ -155,8 +110,8 @@ jobs:
       - run:
           name: Package
           command: ./.circleci/scripts/nfpm_package.sh
-      - run:
-          name: Attach packages to release
+      - run: &install-gh-cli
+          name: Install GH cli
           command: |
             type -p curl >/dev/null || sudo apt install curl -y
             curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
@@ -164,6 +119,9 @@ jobs:
             && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
             && sudo apt update \
             && sudo apt install gh -y
+      - run:
+          name: Attach packages to release
+          command: |
             to_upload=( $(ls dist/packages/*) )
             [ "${COMPONENT}" != "cli" ] || to_upload+=("dist/aperturectl")
             gh release upload "${VERSION}" "${to_upload[@]}" --repo=fluxninja/aperture
@@ -242,6 +200,64 @@ jobs:
       - asdf_save_cache:
           cache_name: update-environment
 
+  update-brews:
+    parameters:
+      tag:
+        type: string
+        description: The release tag
+      deployment-key:
+        type: string
+        description:
+          Deployment key to use when interacting with remote repository
+    executor: ubuntu-18-executor
+    environment:
+      TAP_REPO: /home/circleci/taps
+      APERTURE_REPO: /home/circleci/project
+      VERSION: <<parameters.tag>>
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - << parameters.deployment-key >>
+      - run:
+          name: "Prepare brews repository"
+          command: |
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_${DEPLOYMENT_KEY//:/}"
+            export SSH_AUTH_SOCK=""
+            declare -p GIT_SSH_COMMAND SSH_AUTH_SOCK >> "${BASH_ENV}"
+
+            git config --global user.name "CircleCI-Gitbot"
+            git config --global user.email "circleci-gitbot@fluxninja.com"
+
+            git clone --depth=1 git@github.com:fluxninja/homebrew-aperture.git "${TAP_REPO}"
+          environment:
+            DEPLOYMENT_KEY: << parameters.deployment-key >>
+      #- run: *install-gh-cli
+      - run:
+          name: "Update brew repository"
+          command: |
+            cd "${TAP_REPO}"
+
+            vless="${VERSION:1}"
+            rcless="${vless%%-*}"
+            formula_version="${rcless%.*}"
+            # branch="update_aperture_${formula_version}"
+            branch=main
+
+            # git checkout -B "${branch}"
+            ./scripts/update_brews.py add-version "${formula_version}"
+            ./scripts/update_brews.py delete
+            ./scripts/update_brews.py update
+
+            git status
+            git diff
+            git add .
+            git commit -m "Update brews for release ${VERSION}"
+            git push origin "${branch}"
+            # gh pr create --title "${MSG}" --body "" --label "pr-pull"
+
 workflows:
   version: 2
 
@@ -250,7 +266,7 @@ workflows:
       matches: { value: << pipeline.git.tag >>, pattern: ^v.*$ }
     jobs:
       - publish-protobuf-files:
-          filters:
+          filters: &release-filters
             branches:
               ignore: /.+/
             tags:
@@ -261,18 +277,10 @@ workflows:
           path: sdks/aperture-java
           context: sonatype
           # both this and workflow's when is needed
-          filters:
-            branches:
-              ignore: /.+/
-            tags:
-              only: /^v.*$/
+          filters: *release-filters
 
       - publish-packages:
-          filters:
-            branches:
-              ignore: /.+/
-            tags:
-              only: /^v.*/
+          filters: *release-filters
           tag: << pipeline.git.tag >>
           matrix:
             parameters:
@@ -302,6 +310,15 @@ workflows:
           environment-path: environments/demo/
           component: demo-app
           update: images,deployment-code
+
+      - update-brews:
+          filters:
+            <<: *release-filters
+            tags:
+              only: /^v.*/
+              ignore: /^.*-rc.*/
+          tag: << pipeline.git.tag >>
+          deployment-key: "a4:df:98:54:5d:18:ba:a1:01:66:88:e2:26:e3:f2:eb"
 
 commands:
   asdf_install:

@@ -308,9 +308,9 @@
     "AutoScale": {
       "description": "AutoScale components are used to scale a service.",
       "properties": {
-        "autoscaler": {
+        "auto_scaler": {
           "$ref": "#/definitions/AutoScaler",
-          "description": "AutoScaler provides auto scaling functionality for any resource.",
+          "description": "AutoScaler provides auto scaling functionality for any scalable resource.",
           "x-order": 0
         },
         "pod_scaler": {
@@ -323,21 +323,24 @@
       "additionalProperties": false
     },
     "AutoScaler": {
+      "description": "AutoScaler: AutoScaler provides auto scaling functionality for any scalable resource. Multiple Controllers can be defined on the AutoScaler for performing scale-out or scale-in. The AutoScaler can interface with infrastructure APIs such as Kubernetes to perform auto-scale.",
       "properties": {
         "cooldown_override_percentage": {
           "default": 50,
-          "description": "Cooldown override percentage defines a threshold change in scale out beyond which previous cooldown is overridden.\nFor example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the\nscale increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.\n\n",
+          "description": "Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.\nFor example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the\nscale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.\n\n",
           "format": "double",
           "type": "number",
           "x-go-tag-default": "50",
           "x-order": 0
         },
         "max_scale": {
-          "default": "4294967295",
-          "description": "The maximum scale to which the autoscaler can scale out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.\n\n",
-          "format": "uint64",
+          "default": "9223372036854775807",
+          "description": "The maximum scale to which the autoscaler can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.\n\n",
+          "format": "int64",
+          "minLength": 1,
           "type": "string",
-          "x-go-tag-default": "4294967295",
+          "x-go-tag-default": "9223372036854775807",
+          "x-go-tag-validate": "gt=0",
           "x-order": 1
         },
         "max_scale_in_percentage": {
@@ -358,10 +361,12 @@
         },
         "min_scale": {
           "default": "0",
-          "description": "The minimum scale to which the autoscaler can scale in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.\n\n",
-          "format": "uint64",
+          "description": "The minimum scale to which the autoscaler can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.\n\n",
+          "format": "int64",
+          "minLength": 0,
           "type": "string",
           "x-go-tag-default": "0",
+          "x-go-tag-validate": "gte=0",
           "x-order": 4
         },
         "out_ports": {
@@ -371,7 +376,7 @@
         },
         "scale_in_alerter_parameters": {
           "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for scale in alerter.",
+          "description": "Configuration for scale-in alerter.",
           "x-order": 6
         },
         "scale_in_controllers": {
@@ -384,14 +389,14 @@
         },
         "scale_in_cooldown": {
           "default": "120s",
-          "description": "The amount of time to wait after a scale in operation for another scale in operation.\n\n",
+          "description": "The amount of time to wait after a scale-in operation for another scale-in operation.\n\n",
           "type": "string",
           "x-go-tag-default": "120s",
           "x-order": 8
         },
         "scale_out_alerter_parameters": {
           "$ref": "#/definitions/AlerterParameters",
-          "description": "Configuration for scale out alerter.",
+          "description": "Configuration for scale-out alerter.",
           "x-order": 9
         },
         "scale_out_controllers": {
@@ -404,7 +409,7 @@
         },
         "scale_out_cooldown": {
           "default": "30s",
-          "description": "The amount of time to wait after a scale out operation for another scale out or scale in operation.\n\n",
+          "description": "The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.\n\n",
           "type": "string",
           "x-go-tag-default": "30s",
           "x-order": 11
@@ -415,7 +420,6 @@
           "x-order": 12
         }
       },
-      "title": "AutoScaler",
       "type": "object",
       "additionalProperties": false
     },
@@ -441,12 +445,12 @@
       "properties": {
         "setpoint": {
           "$ref": "#/definitions/InPort",
-          "description": "The setpoint to use for scale in.",
+          "description": "The setpoint to use for scale-in.",
           "x-order": 0
         },
         "signal": {
           "$ref": "#/definitions/InPort",
-          "description": "The signal to use for scale in.",
+          "description": "The signal to use for scale-in.",
           "x-order": 1
         }
       },
@@ -497,12 +501,12 @@
       "properties": {
         "setpoint": {
           "$ref": "#/definitions/InPort",
-          "description": "The setpoint to use for scale out.",
+          "description": "The setpoint to use for scale-out.",
           "x-order": 0
         },
         "signal": {
           "$ref": "#/definitions/InPort",
-          "description": "The signal to use for scale out.",
+          "description": "The signal to use for scale-out.",
           "x-order": 1
         }
       },
@@ -1444,7 +1448,7 @@
       "additionalProperties": false
     },
     "GradientController": {
-      "description": "The `gradient` describes a corrective factor that should be applied to the\ncontrol variable to get the signal closer to the setpoint. It is computed as follows:\n\n$$\n\\text{gradient} = \\left(\\frac{\\text{signal}}{\\text{setpoint}}\\right)^{\\text{slope}}\n$$\n\n`gradient` is then clamped to [min_gradient, max_gradient] range.\n\nThe output of gradient controller is computed as follows:\n$$\n\\text{output} = \\text{gradient}_{\\text{clamped}} \\cdot \\text{control\\_variable} + \\text{optimize}.\n$$\n\nNote the additional `optimize` signal, that can be used to \"nudge\" the\ncontroller into desired idle state.\n\nThe output can be _optionally_ clamped to desired range using `max` and\n`min` input.",
+      "description": "The `gradient` describes a corrective factor that should be applied to the\ncontrol variable to get the signal closer to the setpoint. It is computed as follows:\n\n$$\n\\text{gradient} = \\left(\\frac{\\text{signal}}{\\text{setpoint}}\\right)^{\\text{slope}}\n$$\n\n`gradient` is then clamped to `[min_gradient, max_gradient]` range.\n\nThe output of gradient controller is computed as follows:\n$$\n\\text{output} = \\text{gradient}_{\\text{clamped}} \\cdot \\text{control\\_variable} + \\text{optimize}.\n$$\n\nNote the additional `optimize` signal, that can be used to \"nudge\" the\ncontroller into desired idle state.\n\nThe output can be _optionally_ clamped to desired range using `max` and\n`min` input.",
       "properties": {
         "default_config": {
           "$ref": "#/definitions/GradientControllerDynamicConfig",
@@ -2796,9 +2800,11 @@
         "tokens": {
           "default": "1",
           "description": "Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.\nThis override is applicable only if `auto_tokens` is set to false.\n\n",
-          "format": "uint64",
+          "format": "int64",
+          "minLength": 1,
           "type": "string",
           "x-go-tag-default": "1",
+          "x-go-tag-validate": "gt=0",
           "x-order": 2
         }
       },

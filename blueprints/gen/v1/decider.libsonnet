@@ -2,13 +2,6 @@ local deciderins = import './deciderins.libsonnet';
 local deciderouts = import './deciderouts.libsonnet';
 {
   new():: {
-    in_ports: {
-      lhs: error 'Port lhs is missing',
-      rhs: error 'Port rhs is missing',
-    },
-    out_ports: {
-      output: error 'Port output is missing',
-    },
   },
   inPorts:: deciderins,
   outPorts:: deciderouts,

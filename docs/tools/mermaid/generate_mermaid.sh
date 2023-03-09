@@ -37,8 +37,12 @@ function generate_mermaid_images() {
 	# generate svg and png files only when mmd contents change (using md5sum)
 	#shellcheck disable=SC2016
 	md5sum=$(md5sum "$mmd_file" | $AWK '{print $1}')
-	#shellcheck disable=SC2016
-	md5sum_file=$(cat "$mmd_file".md5sum 2>/dev/null)
+	# check if md5sum file exists
+	md5sum_file=""
+	if [ -f "$mmd_file".md5sum ]; then
+		#shellcheck disable=SC2016
+		md5sum_file=$(cat "$mmd_file".md5sum 2>/dev/null)
+	fi
 	if [ "$md5sum" != "$md5sum_file" ] || [ "$force" == true ]; then
 		echo "generating svg and png files for $mmd_file"
 		# generate svg and png files
@@ -55,4 +59,4 @@ function generate_mermaid_images() {
 
 export -f generate_mermaid_images
 
-parallel -j4 --no-notice --bar --eta generate_mermaid_images ::: "$($FIND "$docsdir"/content -type f -name "*.mmd")"
+parallel -j4 --halt-on-error now,fail,1 --no-notice --bar --eta generate_mermaid_images ::: "$($FIND "$docsdir"/content -type f -name "*.mmd")"

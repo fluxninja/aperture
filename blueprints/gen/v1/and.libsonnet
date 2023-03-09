@@ -2,12 +2,6 @@ local andins = import './andins.libsonnet';
 local andouts = import './andouts.libsonnet';
 {
   new():: {
-    in_ports: {
-      inputs: error 'Port inputs is missing',
-    },
-    out_ports: {
-      output: error 'Port output is missing',
-    },
   },
   inPorts:: andins,
   outPorts:: andouts,

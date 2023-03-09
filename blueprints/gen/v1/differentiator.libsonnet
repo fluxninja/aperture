@@ -2,12 +2,6 @@ local differentiatorins = import './differentiatorins.libsonnet';
 local differentiatorouts = import './differentiatorouts.libsonnet';
 {
   new():: {
-    in_ports: {
-      input: error 'Port input is missing',
-    },
-    out_ports: {
-      output: error 'Port output is missing',
-    },
   },
   inPorts:: differentiatorins,
   outPorts:: differentiatorouts,

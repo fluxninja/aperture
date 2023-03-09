@@ -2,12 +2,6 @@ local orins = import './orins.libsonnet';
 local orouts = import './orouts.libsonnet';
 {
   new():: {
-    in_ports: {
-      inputs: error 'Port inputs is missing',
-    },
-    out_ports: {
-      output: error 'Port output is missing',
-    },
   },
   inPorts:: orins,
   outPorts:: orouts,
