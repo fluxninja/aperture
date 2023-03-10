@@ -4,6 +4,7 @@ syntax = "proto3";
 package aperture.cmd.v1;
 
 import "aperture/autoscale/kubernetes/controlpoints/v1/controlpoints.proto";
+import "aperture/discovery/entities/v1/entities.proto";
 import "aperture/flowcontrol/controlpoints/v1/controlpoints.proto";
 import "aperture/flowcontrol/preview/v1/preview.proto";
 import "google/protobuf/empty.proto";
@@ -14,6 +15,8 @@ service Controller {
   rpc ListServices(ListServicesRequest) returns (ListServicesControllerResponse);
   rpc ListFlowControlPoints(ListFlowControlPointsRequest) returns (ListFlowControlPointsControllerResponse);
   rpc ListAutoScaleControlPoints(ListAutoScaleControlPointsRequest) returns (ListAutoScaleControlPointsControllerResponse);
+  rpc ListDiscoveryEntities(ListDiscoveryEntitiesRequest) returns (ListDiscoveryEntitiesControllerResponse);
+  rpc ListDiscoveryEntity(ListDiscoveryEntityRequest) returns (ListDiscoveryEntityAgentResponse);
 
   // duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
   rpc PreviewFlowLabels(PreviewFlowLabelsRequest) returns (PreviewFlowLabelsControllerResponse);
@@ -56,6 +59,28 @@ message ListAutoScaleControlPointsAgentResponse {
 message ListAutoScaleControlPointsControllerResponse {
   repeated GlobalAutoScaleControlPoint global_auto_scale_control_points = 1;
   uint32 errors_count = 2;
+}
+
+message ListDiscoveryEntitiesRequest {}
+
+message ListDiscoveryEntitiesAgentResponse {
+  map<string, aperture.discovery.entities.v1.Entity> entities = 1;
+}
+
+message ListDiscoveryEntitiesControllerResponse {
+  ListDiscoveryEntitiesAgentResponse entities = 1;
+  uint32 errors_count = 2;
+}
+
+message ListDiscoveryEntityRequest {
+  oneof by {
+    string ip_address = 1;
+    string name = 2;
+  }
+}
+
+message ListDiscoveryEntityAgentResponse {
+  aperture.discovery.entities.v1.Entity entity = 1;
 }
 
 message ListAgentsResponse {
