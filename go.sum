@@ -1510,8 +1510,8 @@ github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin 
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin v0.73.0/go.mod h1:QSmkyR4JcfMMIbgL+4p9+e7MqzKIboISLI+DpqGfhQY=
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/winperfcounters v0.73.0 h1:0JTWJ58L0qg+TqQHbB4CyUZa6soRR+7056iJnajYN+c=
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/winperfcounters v0.73.0/go.mod h1:LzaEfNFUff43RLmi5EWTfHD5vhpihwFuL2weVHuECpw=
-github.com/open-telemetry/opentelemetry-collector-contrib/receiver/bigipreceiver v0.72.0 h1:IgxwQ1rvMQsmZ7IkhwyXr0kQcVg4QMXe40CTQdYSJJQ=
-github.com/open-telemetry/opentelemetry-collector-contrib/receiver/bigipreceiver v0.72.0/go.mod h1:aOnJteSVcXGTFwV2ix64YS7evXPMNeMsiH+qV2KW6yQ=
+github.com/open-telemetry/opentelemetry-collector-contrib/receiver/bigipreceiver v0.73.0 h1:XbUnoOPQr+5qXcOE0y1m80UZjpnxRBAHGlma62c6o9A=
+github.com/open-telemetry/opentelemetry-collector-contrib/receiver/bigipreceiver v0.73.0/go.mod h1:/pmdR2cnkFsaNHReQQQeVLlCP3ALZzHcH+3wHmpKBYo=
 github.com/opencontainers/go-digest v1.0.0 h1:apOUWs51W5PlhuyGyz9FCeeBIOUDA/6nW8Oi/yOhh5U=
 github.com/opencontainers/go-digest v1.0.0/go.mod h1:0JzlMkj0TRzQZfJkVvzbP0HBR3IKzErnv2BNG4W4MAM=
 github.com/opencontainers/image-spec v1.0.2/go.mod h1:BtxoFyWECRxE4U/7sNtV5W15zMzWCbyJoFRP3s7yZA0=
