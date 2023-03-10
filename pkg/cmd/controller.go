@@ -9,6 +9,7 @@ import (
 
 	autoscalecontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
 	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
+	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	previewv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/preview/v1"
 	"github.com/fluxninja/aperture/pkg/agentfunctions/agents"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
@@ -132,6 +133,60 @@ func (h *Handler) ListAutoScaleControlPoints(
 	return &cmdv1.ListAutoScaleControlPointsControllerResponse{
 		GlobalAutoScaleControlPoints: protoControlPoints,
 		ErrorsCount:                  numErrors,
+	}, nil
+}
+
+// ListDiscoveryEntities lists all Discovery entities.
+func (h *Handler) ListDiscoveryEntities(ctx context.Context, req *cmdv1.ListDiscoveryEntitiesRequest) (*cmdv1.ListDiscoveryEntitiesControllerResponse, error) {
+	discoveryEntities, err := h.agents.ListDiscoveryEntities()
+	if err != nil {
+		return nil, err
+	}
+
+	numErrors := uint32(0)
+	entities := make(map[string]*entitiesv1.Entity)
+	for _, resp := range discoveryEntities {
+		if resp.Err != nil {
+			numErrors += 1
+			continue
+		}
+
+		for k, v := range resp.Success.Entities {
+			entities[k] = v
+		}
+	}
+
+	return &cmdv1.ListDiscoveryEntitiesControllerResponse{
+		Entities: &cmdv1.ListDiscoveryEntitiesAgentResponse{
+			Entities: entities,
+		},
+		ErrorsCount: numErrors,
+	}, nil
+}
+
+// ListDiscoveryEntity lists all Discovery entity.
+func (h *Handler) ListDiscoveryEntity(ctx context.Context, req *cmdv1.ListDiscoveryEntityRequest) (*cmdv1.ListDiscoveryEntityAgentResponse, error) {
+	discoveryEntity, err := h.agents.ListDiscoveryEntity(req)
+	if err != nil {
+		return nil, err
+	}
+
+	var entity *entitiesv1.Entity
+	if discoveryEntity.Entity != nil {
+		services := make([]string, 0, len(discoveryEntity.Entity.Services))
+		services = append(services, discoveryEntity.Entity.Services...)
+		entity = &entitiesv1.Entity{
+			Uid:       discoveryEntity.Entity.Uid,
+			IpAddress: discoveryEntity.Entity.IpAddress,
+			Name:      discoveryEntity.Entity.Name,
+			Namespace: discoveryEntity.Entity.Namespace,
+			NodeName:  discoveryEntity.Entity.NodeName,
+			Services:  services,
+		}
+	}
+
+	return &cmdv1.ListDiscoveryEntityAgentResponse{
+		Entity: entity,
 	}, nil
 }
 

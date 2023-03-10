@@ -23,6 +23,8 @@ type ControllerClient interface {
 	ListServices(ctx context.Context, in *ListServicesRequest, opts ...grpc.CallOption) (*ListServicesControllerResponse, error)
 	ListFlowControlPoints(ctx context.Context, in *ListFlowControlPointsRequest, opts ...grpc.CallOption) (*ListFlowControlPointsControllerResponse, error)
 	ListAutoScaleControlPoints(ctx context.Context, in *ListAutoScaleControlPointsRequest, opts ...grpc.CallOption) (*ListAutoScaleControlPointsControllerResponse, error)
+	ListDiscoveryEntities(ctx context.Context, in *ListDiscoveryEntitiesRequest, opts ...grpc.CallOption) (*ListDiscoveryEntitiesControllerResponse, error)
+	ListDiscoveryEntity(ctx context.Context, in *ListDiscoveryEntityRequest, opts ...grpc.CallOption) (*ListDiscoveryEntityAgentResponse, error)
 	// duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
 	PreviewFlowLabels(ctx context.Context, in *PreviewFlowLabelsRequest, opts ...grpc.CallOption) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(ctx context.Context, in *PreviewHTTPRequestsRequest, opts ...grpc.CallOption) (*PreviewHTTPRequestsControllerResponse, error)
@@ -72,6 +74,24 @@ func (c *controllerClient) ListAutoScaleControlPoints(ctx context.Context, in *L
 	return out, nil
 }
 
+func (c *controllerClient) ListDiscoveryEntities(ctx context.Context, in *ListDiscoveryEntitiesRequest, opts ...grpc.CallOption) (*ListDiscoveryEntitiesControllerResponse, error) {
+	out := new(ListDiscoveryEntitiesControllerResponse)
+	err := c.cc.Invoke(ctx, "/aperture.cmd.v1.Controller/ListDiscoveryEntities", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *controllerClient) ListDiscoveryEntity(ctx context.Context, in *ListDiscoveryEntityRequest, opts ...grpc.CallOption) (*ListDiscoveryEntityAgentResponse, error) {
+	out := new(ListDiscoveryEntityAgentResponse)
+	err := c.cc.Invoke(ctx, "/aperture.cmd.v1.Controller/ListDiscoveryEntity", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *controllerClient) PreviewFlowLabels(ctx context.Context, in *PreviewFlowLabelsRequest, opts ...grpc.CallOption) (*PreviewFlowLabelsControllerResponse, error) {
 	out := new(PreviewFlowLabelsControllerResponse)
 	err := c.cc.Invoke(ctx, "/aperture.cmd.v1.Controller/PreviewFlowLabels", in, out, opts...)
@@ -98,6 +118,8 @@ type ControllerServer interface {
 	ListServices(context.Context, *ListServicesRequest) (*ListServicesControllerResponse, error)
 	ListFlowControlPoints(context.Context, *ListFlowControlPointsRequest) (*ListFlowControlPointsControllerResponse, error)
 	ListAutoScaleControlPoints(context.Context, *ListAutoScaleControlPointsRequest) (*ListAutoScaleControlPointsControllerResponse, error)
+	ListDiscoveryEntities(context.Context, *ListDiscoveryEntitiesRequest) (*ListDiscoveryEntitiesControllerResponse, error)
+	ListDiscoveryEntity(context.Context, *ListDiscoveryEntityRequest) (*ListDiscoveryEntityAgentResponse, error)
 	// duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
 	PreviewFlowLabels(context.Context, *PreviewFlowLabelsRequest) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(context.Context, *PreviewHTTPRequestsRequest) (*PreviewHTTPRequestsControllerResponse, error)
@@ -118,6 +140,12 @@ func (UnimplementedControllerServer) ListFlowControlPoints(context.Context, *Lis
 }
 func (UnimplementedControllerServer) ListAutoScaleControlPoints(context.Context, *ListAutoScaleControlPointsRequest) (*ListAutoScaleControlPointsControllerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAutoScaleControlPoints not implemented")
+}
+func (UnimplementedControllerServer) ListDiscoveryEntities(context.Context, *ListDiscoveryEntitiesRequest) (*ListDiscoveryEntitiesControllerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListDiscoveryEntities not implemented")
+}
+func (UnimplementedControllerServer) ListDiscoveryEntity(context.Context, *ListDiscoveryEntityRequest) (*ListDiscoveryEntityAgentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListDiscoveryEntity not implemented")
 }
 func (UnimplementedControllerServer) PreviewFlowLabels(context.Context, *PreviewFlowLabelsRequest) (*PreviewFlowLabelsControllerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PreviewFlowLabels not implemented")
@@ -209,6 +237,42 @@ func _Controller_ListAutoScaleControlPoints_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Controller_ListDiscoveryEntities_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDiscoveryEntitiesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).ListDiscoveryEntities(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/aperture.cmd.v1.Controller/ListDiscoveryEntities",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).ListDiscoveryEntities(ctx, req.(*ListDiscoveryEntitiesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Controller_ListDiscoveryEntity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDiscoveryEntityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).ListDiscoveryEntity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/aperture.cmd.v1.Controller/ListDiscoveryEntity",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).ListDiscoveryEntity(ctx, req.(*ListDiscoveryEntityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Controller_PreviewFlowLabels_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PreviewFlowLabelsRequest)
 	if err := dec(in); err != nil {
@@ -267,6 +331,14 @@ var Controller_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListAutoScaleControlPoints",
 			Handler:    _Controller_ListAutoScaleControlPoints_Handler,
+		},
+		{
+			MethodName: "ListDiscoveryEntities",
+			Handler:    _Controller_ListDiscoveryEntities_Handler,
+		},
+		{
+			MethodName: "ListDiscoveryEntity",
+			Handler:    _Controller_ListDiscoveryEntity_Handler,
 		},
 		{
 			MethodName: "PreviewFlowLabels",

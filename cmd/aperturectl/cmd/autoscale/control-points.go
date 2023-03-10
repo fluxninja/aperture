@@ -18,6 +18,7 @@ var ControlPointsCmd = &cobra.Command{
 	Short:         "List AutoScale control points",
 	Long:          `List AutoScale control points`,
 	SilenceErrors: true,
+	Example:       `aperturectl auto-scale control-points --kube`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		client, err := controller.Client()
 		if err != nil {
@@ -40,7 +41,10 @@ var ControlPointsCmd = &cobra.Command{
 			if a.AutoScaleControlPoint.Name != b.AutoScaleControlPoint.Name {
 				return a.AutoScaleControlPoint.Name < b.AutoScaleControlPoint.Name
 			}
-			return a.AutoScaleControlPoint.Namespace < b.AutoScaleControlPoint.Namespace
+			if a.AutoScaleControlPoint.Namespace != b.AutoScaleControlPoint.Namespace {
+				return a.AutoScaleControlPoint.Namespace < b.AutoScaleControlPoint.Namespace
+			}
+			return a.AutoScaleControlPoint.Kind < b.AutoScaleControlPoint.Kind
 		})
 
 		tabwriter := tabwriter.NewWriter(os.Stdout, 5, 0, 3, ' ', 0)

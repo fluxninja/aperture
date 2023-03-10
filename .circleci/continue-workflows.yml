@@ -72,13 +72,11 @@ jobs:
     parameters:
       attach-workspace:
         type: boolean
-        description:
-          Boolean for whether or not to attach to an existing workspace
+        description: Boolean for whether or not to attach to an existing workspace
         default: false
       docker-context:
         type: string
-        description:
-          Path to the directory containing your build context, defaults to .
+        description: Path to the directory containing your build context, defaults to .
         default: .
       dockerfile:
         type: string
@@ -107,8 +105,7 @@ jobs:
         description: A name for the image pushed to GCR
       path:
         type: string
-        description:
-          Path to the directory containing your Dockerfile, defaults to .
+        description: Path to the directory containing your Dockerfile, defaults to .
         default: .
       remote-docker-version:
         type: string
@@ -374,15 +371,13 @@ jobs:
           when: on_success
       - save_cache:
           name: Save pre-commit cache
-          key:
-            aperture-v1-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
+          key: aperture-v1-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
           paths:
             - ~/.cache/pre-commit
       - asdf_save_cache:
           cache_name: pre-commit
       - run:
-          name:
-            Show diff and assert pre-commit didn't create any non-ignored files
+          name: Show diff and assert pre-commit didn't create any non-ignored files
           command: |
             git status
             git add .
@@ -396,13 +391,11 @@ jobs:
     parameters:
       docker-context:
         type: string
-        description:
-          Path to the directory containing your build context, defaults to "".
+        description: Path to the directory containing your build context, defaults to "".
         default: .
       path:
         type: string
-        description:
-          Path to the directory containing your Dockerfile, defaults to "".
+        description: Path to the directory containing your Dockerfile, defaults to "".
         default: .
       tag:
         type: string
@@ -598,8 +591,7 @@ jobs:
     parameters:
       docker-context:
         type: string
-        description:
-          Path to the directory containing your build context, defaults to "".
+        description: Path to the directory containing your build context, defaults to "".
         default: .
       dockerfile:
         type: string
@@ -610,8 +602,7 @@ jobs:
         description: Name for Docker image
       path:
         type: string
-        description:
-          Path to the directory containing your Dockerfile, defaults to "".
+        description: Path to the directory containing your Dockerfile, defaults to "".
         default: .
       tag:
         type: string
@@ -824,7 +815,7 @@ jobs:
             # run tests if any are added
       - when:
           condition:
-              not: <<parameters.omit-examples>>
+            not: <<parameters.omit-examples>>
           steps:
             - run:
                 name: Dependencies
@@ -852,8 +843,7 @@ jobs:
       job-root:
         type: string
         default: "/home/circleci"
-        description:
-          The root folder of the job where all repositories will be cloned to
+        description: The root folder of the job where all repositories will be cloned to
       manifests-repo:
         type: string
         default: git@github.com:fluxninja/argo-manifests.git
@@ -868,13 +858,11 @@ jobs:
       component:
         type: string
         default: ""
-        description:
-          Application component to update image and deployment code for
+        description: Application component to update image and deployment code for
       update:
         type: string
         default: everything
-        description:
-          Whether to update 'images', 'deployment-code' or 'everything'
+        description: Whether to update 'images', 'deployment-code' or 'everything'
     executor: python-cimg-executor
     steps:
       - add_ssh_keys:
@@ -900,8 +888,7 @@ jobs:
     parameters:
       workspace-name:
         type: string
-        description:
-          the name of the workspace to which built packages should be added
+        description: the name of the workspace to which built packages should be added
         default: packages
       goarch:
         type: string
@@ -933,7 +920,8 @@ jobs:
             component=aperture-agent
             tag_matcher="releases/${component}/*"
             current_branch="$(git branch --show-current)"
-            tag="$(git tag -l --sort="-version:refname" "${tag_matcher}" | head -n1)"
+            tags="$(git tag -l --sort="-version:refname" "${tag_matcher}")"
+            tag="$(head -n1 \<<<"${tags}")"
             commits="$(git rev-list "${tag}"..HEAD --count)"
             VERSION="${tag##*/}-b.${commits}"
 
@@ -1113,8 +1101,8 @@ workflows:
           remote-repo: fluxninja/aperture-js
           remote-repo-fingerprint: "00:5e:cf:81:48:2d:e9:b8:34:74:8b:46:cc:ad:2f:ce"
 
-# Verify that libs and java agent can be built with Java 8+
-# Verify that lib, java agent and examples can be built with Java 17+
+  # Verify that libs and java agent can be built with Java 8+
+  # Verify that lib, java agent and examples can be built with Java 17+
   aperture-java:
     when:
       or:
@@ -1274,8 +1262,7 @@ workflows:
           <<: *push_deployment_code_job
           name: preview-deployment-changes
           dry-run: true
-          task-name:
-            "Preview changes between aperture.git and deployment repository"
+          task-name: "Preview changes between aperture.git and deployment repository"
 
 commands:
   asdf_install:
@@ -1323,8 +1310,7 @@ commands:
     steps:
       - save_cache:
           name: Save ASDF cache
-          key:
-            aperture-asdf-cache-v4-{{ checksum "~/month" }}-<<
+          key: aperture-asdf-cache-v4-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "tools/go/go.mod" }}
           paths:
@@ -1411,8 +1397,7 @@ commands:
         type: string
       git-branch:
         type: string
-        description:
-          Use the name of the current branch been used for Image build
+        description: Use the name of the current branch been used for Image build
         default: ${CIRCLE_BRANCH}
       git-commit-hash:
         type: string

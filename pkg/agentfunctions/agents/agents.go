@@ -29,11 +29,20 @@ func (a Agents) ListFlowControlPoints() ([]rpc.Result[*cmdv1.ListFlowControlPoin
 }
 
 // ListAutoScaleControlPoints lists auto scale control points of all agents.
-//
-// Handled by agentfunctions.AutoScaleControlPointsHandler.
 func (a Agents) ListAutoScaleControlPoints() ([]rpc.Result[*cmdv1.ListAutoScaleControlPointsAgentResponse], error) {
 	var req cmdv1.ListAutoScaleControlPointsRequest
 	return rpc.CallAll[cmdv1.ListAutoScaleControlPointsAgentResponse](a.Clients, &req)
+}
+
+// ListDiscoveryEntities lists discovery entities.
+func (a Agents) ListDiscoveryEntities() ([]rpc.Result[*cmdv1.ListDiscoveryEntitiesAgentResponse], error) {
+	var req cmdv1.ListDiscoveryEntitiesRequest
+	return rpc.CallAll[cmdv1.ListDiscoveryEntitiesAgentResponse](a.Clients, &req)
+}
+
+// ListDiscoveryEntity lists discovery entity by ip address or name.
+func (a Agents) ListDiscoveryEntity(req *cmdv1.ListDiscoveryEntityRequest) (*cmdv1.ListDiscoveryEntityAgentResponse, error) {
+	return rpc.Call[cmdv1.ListDiscoveryEntityAgentResponse](a.Clients, a.List()[0], req)
 }
 
 // PreviewFlowLabels previews flow labels on a given agent.
