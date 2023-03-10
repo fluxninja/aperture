@@ -18,6 +18,12 @@ List Flow Control control points
 aperturectl flow-control control-points [flags]
 ```
 
+### Examples
+
+```
+aperturectl flow-control control-points --kube
+```
+
 ### Options
 
 ```

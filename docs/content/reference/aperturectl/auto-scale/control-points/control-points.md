@@ -18,6 +18,12 @@ List AutoScale control points
 aperturectl auto-scale control-points [flags]
 ```
 
+### Examples
+
+```
+aperturectl auto-scale control-points --kube
+```
+
 ### Options
 
 ```

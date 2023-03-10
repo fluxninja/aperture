@@ -24,6 +24,11 @@ var EntitiesCmd = &cobra.Command{
 	Short:         "List AutoScale control points",
 	Long:          `List AutoScale control points`,
 	SilenceErrors: true,
+	Example: `aperturectl discovery entities --kube
+
+aperturectl discovery entities --kube --find-by="name=service1-demo-app-7dfdf9c698-4wmlt"
+
+aperturectl discovery entities --kube --find-by=“ip=10.244.1.24”`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		client, err := controller.Client()
 		if err != nil {
@@ -40,6 +45,9 @@ var EntitiesCmd = &cobra.Command{
 
 			switch find[0] {
 			case "name":
+				if find[1] == "" {
+					return fmt.Errorf("must provide a name to find by: %s", findBy)
+				}
 				resp, err := client.ListDiscoveryEntity(context.Background(), &cmdv1.ListDiscoveryEntityRequest{By: &cmdv1.ListDiscoveryEntityRequest_Name{Name: find[1]}})
 				if err != nil {
 					return err
@@ -50,6 +58,9 @@ var EntitiesCmd = &cobra.Command{
 				}
 				toPrint = string(entity)
 			case "ip":
+				if find[1] == "" {
+					return fmt.Errorf("invalid findBy argument: %s", findBy)
+				}
 				resp, err := client.ListDiscoveryEntity(context.Background(), &cmdv1.ListDiscoveryEntityRequest{By: &cmdv1.ListDiscoveryEntityRequest_IpAddress{IpAddress: find[1]}})
 				if err != nil {
 					return err
@@ -59,6 +70,8 @@ var EntitiesCmd = &cobra.Command{
 					return err
 				}
 				toPrint = string(entity)
+			default:
+				return fmt.Errorf("invalid findBy argument: %s", findBy)
 			}
 		} else {
 			resp, err := client.ListDiscoveryEntities(context.Background(), &cmdv1.ListDiscoveryEntitiesRequest{})

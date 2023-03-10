@@ -18,6 +18,16 @@ List AutoScale control points
 aperturectl discovery entities [flags]
 ```
 
+### Examples
+
+```
+aperturectl discovery entities --kube
+
+aperturectl discovery entities --kube --find-by="name=service1-demo-app-7dfdf9c698-4wmlt"
+
+aperturectl discovery entities --kube --find-by=“ip=10.244.1.24”
+```
+
 ### Options
 
 ```
