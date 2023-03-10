@@ -6,7 +6,6 @@ local istioAppMixin =
       base+: {},
       istiod+: {},
       gateway+: {},
-      envoyfilter+: {},
     },
   };
 

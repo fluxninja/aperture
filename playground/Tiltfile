@@ -245,7 +245,6 @@ DEP_TREE = {
                     "new_name": "istio-bootstrap",
                     "extra_objects": [
                         "istio:configmap",
-                        "aperture-envoy-filter:envoyfilter",
                         "istiod-default-validator:validatingwebhookconfiguration",
                         ("istio.io$", "customresourcedefinition"),
                         (None, "EnvoyFilter", "istio-system"),
@@ -338,7 +337,6 @@ DEP_TREE = {
 
 NS_CONFIG = {
     APERTURE_DEMOAPP_NS: {
-        "labels": ["istio-injection: enabled"],
     }
 }
 
@@ -571,6 +569,7 @@ def get_resource_list_to_deploy(names, run_only_listed, dep_tree, inv_dep_tree):
     Recursively convert list of NS and service names to set of required services
     If a given name is both a name of resource and namespace, it is assumed to be resource
     """
+
     if "all" in names:
         names = inv_dep_tree.keys()
     resources = (
@@ -856,32 +855,33 @@ def process_aperture_scenario(scenario_path):
             DEP_TREE[APERTURE_CONTROLLER_NS]["scenario-dashboard-%s" % policy_name] = ds
 
 
-    # Load k6 configuration and process it for inclusion into a yaml file
-    wavepool_js = str(read_file(scenario_path + "/" + "load_generator/test.js"))
-    lines = wavepool_js.replace("\"", "\\\"").split("\n")
-    wavepool_js = "\\n".join(lines)
-    wavepool = {
-        "renderer": "yaml",
-        "namespace": APERTURE_DEMOAPP_NS,
-        "labels": "TestScenarioApplication",
-        "manifests_path": PLAYGROUND_ROOT + "/" + "resources/wavepool-generator",
-        "resource_deps": ["scenario-policies", "cluster-bootstrap"],
-        "env_vars": {
-            "NINJA_WAVEPOOL_JS": wavepool_js
-        },
-        "child_resources": [
-            {
-                "workload": "wavepool-generator",
-                "resource_deps": ["scenario-policies"] if aperture_policies else [],
-                "extra_objects": [
-                    "wavepool-config:configmap"
-                ]
+    if os.path.exists(scenario_path + "/" + "load_generator/test.js"):
+        # Load k6 configuration and process it for inclusion into a yaml file
+        wavepool_js = str(read_file(scenario_path + "/" + "load_generator/test.js"))
+        lines = wavepool_js.replace("\"", "\\\"").split("\n")
+        wavepool_js = "\\n".join(lines)
+        wavepool = {
+            "renderer": "yaml",
+            "namespace": APERTURE_DEMOAPP_NS,
+            "labels": "TestScenarioApplication",
+            "manifests_path": PLAYGROUND_ROOT + "/" + "resources/wavepool-generator",
+            "resource_deps": ["scenario-policies", "cluster-bootstrap"],
+            "env_vars": {
+                "NINJA_WAVEPOOL_JS": wavepool_js
             },
-        ]
-    }
-    DEP_TREE[APERTURE_DEMOAPP_NS]["scenario-wavepool"] = wavepool
-
-
+            "child_resources": [
+                {
+                    "workload": "wavepool-generator",
+                    "resource_deps": ["scenario-policies"] if aperture_policies else [],
+                    "extra_objects": [
+                        "wavepool-config:configmap"
+                    ]
+                },
+            ]
+        }
+        DEP_TREE[APERTURE_DEMOAPP_NS]["scenario-wavepool"] = wavepool
+    else:
+        print("No load Generator Config found!")
 #################################
 ### MAIN RESOURCE DECLARATION ###
 #################################
@@ -994,6 +994,8 @@ def declare_resources(resources, dep_tree, inv_dep_tree,race_arg,enable_cloud_pl
                 namespace = app_config.get("namespace", None)
                 policies = app_config.get("aperture_policies", None)
                 render_aperturectl(policies, namespace)
+            elif renderer == "none":
+                pass
             else:
                 fail("Tanka app is not found for %s." % app)
 
@@ -1154,19 +1156,30 @@ dockerhub_images = cfg.get("dockerhub-image", [])
 if dockerhub_images:
     process_dockerhub_images(dockerhub_images)
 
-to_run = cfg.get("to-run", ["agent"])
+to_run = cfg.get("to-run",[])
 
+# If no resources are specified, run the default ones
+if len(to_run):
+    print("Running resources: " + ",".join(to_run))
+else:
+    print("No resources specified, running default scenario resources")
+
+# If no scenario is specified, use the default one only if no resources were specified
 scenario = cfg.get("scenario", None)
-if not scenario:
+if not scenario and not len(to_run):
     scenario = DEFAULT_TEST_SCENARIO
+    to_run=["agent"]
 
-process_aperture_scenario(scenario)
-to_run += ["scenario-app", "scenario-wavepool"]
+# if scenario is specified, load the scenario and all its dependencies
+if scenario:
+    process_aperture_scenario(scenario)
+    to_run += DEP_TREE[APERTURE_DEMOAPP_NS].keys()
+
 # Not all scenarios have policies, so only load policies if they were generated based on the scenario.
-if "scenario-policies" in DEP_TREE[APERTURE_DEMOAPP_NS]:
+if "scenario-policies" in DEP_TREE.get(APERTURE_DEMOAPP_NS,{}):
     to_run += ["scenario-policies"]
 
-for resource in DEP_TREE[APERTURE_CONTROLLER_NS]:
+for resource in DEP_TREE.get(APERTURE_CONTROLLER_NS,{}):
     if "scenario-dashboard" in resource:
         to_run += [resource]
 

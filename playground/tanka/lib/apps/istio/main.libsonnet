@@ -11,7 +11,6 @@ local helm = tanka.helm.new(helpers.helmChartsRoot);
   values:: {
     base: {},
     istiod: {},
-    envoyfilter: {},
   },
   base:
     helm.template('base', 'charts/base', {
@@ -30,10 +29,5 @@ local helm = tanka.helm.new(helpers.helmChartsRoot);
       namespace: $.environment.namespace,
       includeCrds: true,
       values: $.values.gateway,
-    }),
-  envoyfilter:
-    helm.template('envoyfilter', 'charts/istioconfig', {
-      namespace: $.environment.namespace,
-      values: $.values.envoyfilter,
     }),
 }
