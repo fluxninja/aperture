@@ -1,6 +1,6 @@
 ---
 title: Using instrumentation agent to automatically set control points
-sidebar_position: 3
+sidebar_position: 2
 slug: using-instrumentation-agent-to-automatically-set-control-points-using-java-sdk
 keywords:
   - java
@@ -76,4 +76,4 @@ aperture.javaagent.blocked.paths=/health,/connected
 ```
 
 [download_link]:
-  https://repo1.maven.org/maven2/com/fluxninja/aperture/aperture-javaagent/0.20.0/aperture-javaagent-0.20.0.jar
+  https://repo1.maven.org/maven2/com/fluxninja/aperture/aperture-javaagent/0.26.0/aperture-javaagent-0.26.0.jar
