@@ -1148,6 +1148,8 @@ if cfg.get("manual", False):
 get_race = cfg.get("race",False)
 enable_cloud_plugin = cfg.get("enable-cloud-plugin",False)
 
+run_only_listed = cfg.get("only", False)
+
 # Optionally, process a list of images that should be pulled from dockerhub instead of being
 # built locally. This is mostly meant for aperture-agent, aperture-controller and aperture-operator.
 dockerhub_images = cfg.get("dockerhub-image", [])
@@ -1156,19 +1158,17 @@ if dockerhub_images:
 
 to_run = cfg.get("to-run", ["agent"])
 
-scenario = cfg.get("scenario", None)
-if not scenario:
-    scenario = DEFAULT_TEST_SCENARIO
+scenario = cfg.get("scenario", DEFAULT_TEST_SCENARIO if not run_only_listed else None)
+if scenario:
+    process_aperture_scenario(scenario)
+    to_run += ["scenario-app", "scenario-wavepool"]
+    # Not all scenarios have policies, so only load policies if they were generated based on the scenario.
+    if "scenario-policies" in DEP_TREE[APERTURE_DEMOAPP_NS]:
+        to_run += ["scenario-policies", "aperture-grafana"]
 
-process_aperture_scenario(scenario)
-to_run += ["scenario-app", "scenario-wavepool"]
-# Not all scenarios have policies, so only load policies if they were generated based on the scenario.
-if "scenario-policies" in DEP_TREE[APERTURE_DEMOAPP_NS]:
-    to_run += ["scenario-policies"]
-
-for resource in DEP_TREE[APERTURE_CONTROLLER_NS]:
-    if "scenario-dashboard" in resource:
-        to_run += [resource]
+    for resource in DEP_TREE[APERTURE_CONTROLLER_NS]:
+        if "scenario-dashboard" in resource:
+            to_run += [resource]
 
 cfg_trace = cfg.get("trace", os.getenv("NINJA_TILT_TRACE", "false"))
 TRACE = cfg_trace == True
@@ -1179,8 +1179,6 @@ VERBOSE = cfg_verbose == True
 if cfg.get("skip-plugins", os.getenv("SKIP_PLUGINS", "false").lower() == "true"):
     DEP_TREE[APERTURE_CONTROLLER_NS]["controller"]["images"][0]["target"] = "controller-base"
     DEP_TREE[APERTURE_AGENT_NS]["agent"]["images"][0]["target"] = "agent-base"
-
-run_only_listed = cfg.get("only", False)
 
 inverted_dep_tree = invert_dep_tree(DEP_TREE)
 resources = get_resource_list_to_deploy(to_run, run_only_listed, DEP_TREE, inverted_dep_tree)
