@@ -171,15 +171,18 @@ func (h *Handler) ListDiscoveryEntity(ctx context.Context, req *cmdv1.ListDiscov
 		return nil, err
 	}
 
-	services := make([]string, 0, len(discoveryEntity.Entity.Services))
-	services = append(services, discoveryEntity.Entity.Services...)
-	entity := &entitiesv1.Entity{
-		Uid:       discoveryEntity.Entity.Uid,
-		IpAddress: discoveryEntity.Entity.IpAddress,
-		Name:      discoveryEntity.Entity.Name,
-		Namespace: discoveryEntity.Entity.Namespace,
-		NodeName:  discoveryEntity.Entity.NodeName,
-		Services:  services,
+	var entity *entitiesv1.Entity
+	if discoveryEntity.Entity != nil {
+		services := make([]string, 0, len(discoveryEntity.Entity.Services))
+		services = append(services, discoveryEntity.Entity.Services...)
+		entity = &entitiesv1.Entity{
+			Uid:       discoveryEntity.Entity.Uid,
+			IpAddress: discoveryEntity.Entity.IpAddress,
+			Name:      discoveryEntity.Entity.Name,
+			Namespace: discoveryEntity.Entity.Namespace,
+			NodeName:  discoveryEntity.Entity.NodeName,
+			Services:  services,
+		}
 	}
 
 	return &cmdv1.ListDiscoveryEntityAgentResponse{
