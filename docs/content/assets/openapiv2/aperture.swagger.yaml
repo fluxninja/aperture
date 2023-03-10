@@ -2159,6 +2159,26 @@ definitions:
                     $ref: '#/definitions/GlobalAutoScaleControlPoint'
                 type: array
         type: object
+    ListDiscoveryEntitiesAgentResponse:
+        properties:
+            entities:
+                additionalProperties:
+                    $ref: '#/definitions/Entity'
+                type: object
+        type: object
+    ListDiscoveryEntitiesControllerResponse:
+        properties:
+            entities:
+                $ref: '#/definitions/ListDiscoveryEntitiesAgentResponse'
+            errors_count:
+                format: int64
+                type: integer
+        type: object
+    ListDiscoveryEntityAgentResponse:
+        properties:
+            entity:
+                $ref: '#/definitions/Entity'
+        type: object
     ListFlowControlPointsControllerResponse:
         properties:
             errors_count:
@@ -4151,10 +4171,10 @@ produces:
 swagger: "2.0"
 tags:
     - name: AutoScaleKubernetesControlPointsService
+    - name: EntitiesService
     - name: FlowControlPointsService
     - name: FlowPreviewService
     - name: Controller
-    - name: EntitiesService
     - name: DistCacheService
     - name: FlowControlService
     - name: InfoService

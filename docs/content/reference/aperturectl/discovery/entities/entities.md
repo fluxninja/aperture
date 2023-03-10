@@ -1,12 +1,12 @@
 ---
-sidebar_label: Control-Points
+sidebar_label: Entities
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_auto-scale_control-points
+  - aperturectl_discovery_entities
 ---
 
-## aperturectl auto-scale control-points
+## aperturectl discovery entities
 
 List AutoScale control points
 
@@ -15,19 +15,24 @@ List AutoScale control points
 List AutoScale control points
 
 ```
-aperturectl auto-scale control-points [flags]
+aperturectl discovery entities [flags]
 ```
 
 ### Examples
 
 ```
-aperturectl auto-scale control-points --kube
+aperturectl discovery entities --kube
+
+aperturectl discovery entities --kube --find-by="name=service1-demo-app-7dfdf9c698-4wmlt"
+
+aperturectl discovery entities --kube --find-by=“ip=10.244.1.24”
 ```
 
 ### Options
 
 ```
-  -h, --help   help for control-points
+      --find-by string   Find entity by [name|ip]
+  -h, --help             help for entities
 ```
 
 ### Options inherited from parent commands
@@ -41,4 +46,4 @@ aperturectl auto-scale control-points --kube
 
 ### SEE ALSO
 
-- [aperturectl auto-scale](/reference/aperturectl/auto-scale/auto-scale.md) - AutoScale integrations
+- [aperturectl discovery](/reference/aperturectl/discovery/discovery.md) - Discovery integrations
