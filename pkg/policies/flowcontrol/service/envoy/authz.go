@@ -129,8 +129,21 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 
 	sourceAddress := req.GetAttributes().GetSource().GetAddress().GetSocketAddress()
 	sourceSvcs := h.serviceGetter.ServicesFromSocketAddress(sourceAddress)
+	sourceSvcsStr := strings.Join(sourceSvcs, ",")
 	destinationAddress := req.GetAttributes().GetDestination().GetAddress().GetSocketAddress()
 	destinationSvcs := h.serviceGetter.ServicesFromSocketAddress(destinationAddress)
+	destinationSvcsStr := strings.Join(destinationSvcs, ",")
+
+	// make flowlabels from source and destination services
+	sdFlowLabels := make(flowlabel.FlowLabels, 2)
+	sdFlowLabels[otelconsts.ApertureSourceServiceLabel] = flowlabel.FlowLabelValue{
+		Value:     sourceSvcsStr,
+		Telemetry: true,
+	}
+	sdFlowLabels[otelconsts.ApertureDestinationServiceLabel] = flowlabel.FlowLabelValue{
+		Value:     destinationSvcsStr,
+		Telemetry: true,
+	}
 
 	logger := logging.New().WithFields(map[string]interface{}{"rego": "input"})
 	skipRequestBodyParse := false
@@ -143,6 +156,21 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 			Err(err).Code(codes.InvalidArgument).Msg("converting raw input into rego input failed")
 	}
 
+	attributesSource := input["attributes"]
+	attributes, ok := attributesSource.(map[string]interface{})
+	if ok {
+		source := attributes["source"]
+		sourceMap, ok := source.(map[string]interface{})
+		if ok {
+			sourceMap["services"] = sourceSvcs
+		}
+		destination := attributes["destination"]
+		destinationMap, ok := destination.(map[string]interface{})
+		if ok {
+			destinationMap["services"] = destinationSvcs
+		}
+	}
+
 	// Default flow labels from Authz request
 	requestFlowLabels := AuthzRequestToFlowLabels(req.GetAttributes().GetRequest())
 	// Extract flow labels from baggage headers
@@ -153,6 +181,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	mergedFlowLabels := requestFlowLabels
 	// Baggage can overwrite request flow labels
 	flowlabel.Merge(mergedFlowLabels, baggageFlowLabels)
+	flowlabel.Merge(mergedFlowLabels, sdFlowLabels)
 
 	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
 
@@ -182,8 +211,6 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	checkResponse.TelemetryFlowLabels = flowLabels
 	// add control point type
 	checkResponse.TelemetryFlowLabels[otelconsts.ApertureControlPointTypeLabel] = otelconsts.HTTPControlPoint
-	checkResponse.TelemetryFlowLabels[otelconsts.ApertureSourceServiceLabel] = strings.Join(sourceSvcs, ",")
-	checkResponse.TelemetryFlowLabels[otelconsts.ApertureDestinationServiceLabel] = strings.Join(destinationSvcs, ",")
 
 	resp := createExtAuthzResponse(checkResponse)
 
