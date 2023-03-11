@@ -314,11 +314,7 @@ func (c *Clients) cancelRequest(client *connectedClient, globalReqID uint64, isT
 // Call is Clients.Call with conversion to typed response
 //
 // Intended as a building-block for typed wrappers.
-func Call[
-	RespValue any,
-	Resp ExactMessage[RespValue],
-](clients *Clients, client string, req proto.Message,
-) (*RespValue, error) {
+func Call[RespValue any, Resp ExactMessage[RespValue]](clients *Clients, client string, req proto.Message) (*RespValue, error) {
 	anyreq, err := anypb.New(req)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -340,11 +336,7 @@ func Call[
 // CallAll is Clients.CallAll with conversion to typed response
 //
 // Intended as a building-block for typed wrappers.
-func CallAll[
-	RespValue any,
-	Resp ExactMessage[RespValue],
-](clients *Clients, req proto.Message,
-) ([]Result[*RespValue], error) {
+func CallAll[RespValue any, Resp ExactMessage[RespValue]](clients *Clients, req proto.Message) ([]Result[*RespValue], error) {
 	anyreq, err := anypb.New(req)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())

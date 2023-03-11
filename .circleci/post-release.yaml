@@ -209,7 +209,7 @@ jobs:
         type: string
         description:
           Deployment key to use when interacting with remote repository
-    executor: ubuntu-18-executor
+    executor: python-cimg-executor
     environment:
       TAP_REPO: /home/circleci/taps
       APERTURE_REPO: /home/circleci/project
@@ -234,7 +234,7 @@ jobs:
             git clone --depth=1 git@github.com:fluxninja/homebrew-aperture.git "${TAP_REPO}"
           environment:
             DEPLOYMENT_KEY: << parameters.deployment-key >>
-      #- run: *install-gh-cli
+      - run: *install-gh-cli
       - run:
           name: "Update brew repository"
           command: |
@@ -243,10 +243,11 @@ jobs:
             vless="${VERSION:1}"
             rcless="${vless%%-*}"
             formula_version="${rcless%.*}"
-            # branch="update_aperture_${formula_version}"
-            branch=main
+            branch="update_aperture_${VERSION}"
+            msg="Update brews for release ${VERSION}"
 
-            # git checkout -B "${branch}"
+
+            git checkout -B "${branch}"
             ./scripts/update_brews.py add-version "${formula_version}"
             ./scripts/update_brews.py delete
             ./scripts/update_brews.py update
@@ -254,9 +255,9 @@ jobs:
             git status
             git diff
             git add .
-            git commit -m "Update brews for release ${VERSION}"
+            git commit -m "${msg}"
             git push origin "${branch}"
-            # gh pr create --title "${MSG}" --body "" --label "pr-pull"
+            gh pr create --title "${msg}" --body "" --label "pr-pull"
 
 workflows:
   version: 2
