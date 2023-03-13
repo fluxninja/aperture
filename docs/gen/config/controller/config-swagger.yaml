@@ -23,21 +23,6 @@ definitions:
         title: AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)*factor.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/watchdog
-    AgentInfoConfig:
-        properties:
-            agent_group:
-                default: default
-                description: |-
-                    All agents within an agent_group receive the same data-plane configuration (e.g. Flux Meters, Rate Limiters etc).
-
-                    [Read more about agent groups here](/concepts/integrations/flow-control/flow-selector.md#agent-group).
-                type: string
-                x-go-name: AgentGroup
-                x-go-tag-default: default
-                x-go-tag-json: agent_group
-        title: AgentInfoConfig is the configuration for the agent group and other agent attributes.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/agentinfo
     AlertManagerClientConfig:
         properties:
             address:
@@ -92,18 +77,6 @@ definitions:
         title: AlerterConfig for alerter.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/alerts
-    AutoScaleKubernetesConfig:
-        properties:
-            enabled:
-                default: true
-                description: Enables the Kubernetes autoscale capability.
-                type: boolean
-                x-go-name: Enabled
-                x-go-tag-default: "true"
-                x-go-tag-json: enabled
-        title: AutoScaleKubernetesConfig is the configuration for the flow preview service.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/config
     BackoffConfig:
         properties:
             base_delay:
@@ -185,17 +158,6 @@ definitions:
         title: BatchAlertsConfig defines configuration for OTEL batch processor.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
-    ClientConfig:
-        properties:
-            grpc:
-                $ref: '#/definitions/GRPCClientConfig'
-                x-go-tag-json: grpc
-            http:
-                $ref: '#/definitions/HTTPClientConfig'
-                x-go-tag-json: http
-        title: ClientConfig is the client configuration.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/extensions/fluxninja/extconfig
     ClientTLSConfig:
         properties:
             ca_file:
@@ -285,36 +247,6 @@ definitions:
         title: EtcdConfig holds configuration for etcd client.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/etcd/client
-    FluxNinjaExtensionConfig:
-        properties:
-            api_key:
-                description: API Key for this agent. If this key is not set, the extension will not be enabled.
-                type: string
-                x-go-name: APIKey
-                x-go-tag-json: api_key
-            client:
-                $ref: '#/definitions/ClientConfig'
-                x-go-tag-json: client
-            endpoint:
-                description: Address to grpc or http(s) server listening in agent service. To use http protocol, the address must start with http(s)://.
-                pattern: (((^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$))|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)
-                type: string
-                x-go-name: Endpoint
-                x-go-tag-json: endpoint
-                x-go-tag-validate: omitempty,hostname_port|url|fqdn
-                x-pattern-rules: empty | hostname_port | url | fqdn
-            heartbeat_interval:
-                default: 5s
-                description: Interval between each heartbeat.
-                format: string
-                type: string
-                x-go-name: HeartbeatInterval
-                x-go-tag-default: 5s
-                x-go-tag-json: heartbeat_interval
-                x-go-tag-validate: gte=0s
-        title: FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/extensions/fluxninja/extconfig
     GRPCClientConfig:
         properties:
             backoff:
@@ -961,19 +893,6 @@ definitions:
         title: MultiJobConfig holds configuration for MultiJob.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/jobs
-    PeerDiscoveryConfig:
-        properties:
-            advertisement_addr:
-                description: Network address of aperture server to advertise to peers - this address should be reachable from other agents. Used for nat traversal when provided.
-                pattern: (^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)
-                type: string
-                x-go-name: AdvertisementAddr
-                x-go-tag-json: advertisement_addr
-                x-go-tag-validate: omitempty,hostname_port
-                x-pattern-rules: empty | hostname_port
-        title: PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/peers
     PolicyCommon:
         properties:
             enabled:
@@ -1123,65 +1042,6 @@ definitions:
         title: SchedulerConfig holds configuration for job Scheduler.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/jobs
-    SentryConfig:
-        properties:
-            attach_stack_trace:
-                default: true
-                description: Configure to generate and attach stacktraces to capturing message calls
-                type: boolean
-                x-go-name: AttachStacktrace
-                x-go-tag-default: "true"
-                x-go-tag-json: attach_stack_trace
-            debug:
-                default: true
-                description: Debug enables printing of Sentry SDK debug messages
-                type: boolean
-                x-go-name: Debug
-                x-go-tag-default: "true"
-                x-go-tag-json: debug
-            disabled:
-                default: false
-                description: Sentry crash report disabled
-                type: boolean
-                x-go-name: Disabled
-                x-go-tag-default: "false"
-                x-go-tag-json: disabled
-            dsn:
-                default: https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877
-                description: |-
-                    If DSN is not set, the client is effectively disabled
-                    You can set test project's dsn to send log events.
-                    oss-aperture project dsn is set as default.
-                type: string
-                x-go-name: Dsn
-                x-go-tag-default: https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877
-                x-go-tag-json: dsn
-            environment:
-                default: production
-                description: Environment
-                type: string
-                x-go-name: Environment
-                x-go-tag-default: production
-                x-go-tag-json: environment
-            sample_rate:
-                default: 1
-                description: Sample rate for event submission i.e. 0.0 to 1.0
-                format: double
-                type: number
-                x-go-name: SampleRate
-                x-go-tag-default: "1.0"
-                x-go-tag-json: sample_rate
-            traces_sample_rate:
-                default: 0.2
-                description: Sample rate for sampling traces i.e. 0.0 to 1.0
-                format: double
-                type: number
-                x-go-name: TracesSampleRate
-                x-go-tag-default: "0.2"
-                x-go-tag-json: traces_sample_rate
-        title: SentryConfig holds configuration for Sentry.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/extensions/sentry
     ServerTLSConfig:
         properties:
             allowed_cn:
@@ -1279,16 +1139,6 @@ info:
     description: Aperture Controller
     title: Controller
 paths:
-    /agent_info:
-        post:
-            operationId: AgentInfo
-            parameters:
-                - in: body
-                  schema:
-                    $ref: '#/definitions/AgentInfoConfig'
-            tags:
-                - common-configuration
-            x-fn-config-env: true
     /client:
         post:
             operationId: Client
@@ -1307,17 +1157,6 @@ paths:
                 - in: body
                   schema:
                     $ref: '#/definitions/EtcdConfig'
-            tags:
-                - common-configuration
-            x-fn-config-env: true
-    /kubernetes_client:
-        post:
-            operationId: KubernetesClient
-            parameters:
-                - in: body
-                  name: http_client
-                  schema:
-                    $ref: '#/definitions/HTTPClientConfig'
             tags:
                 - common-configuration
             x-fn-config-env: true
@@ -1365,16 +1204,6 @@ paths:
                     $ref: '#/definitions/ControllerOTELConfig'
             tags:
                 - controller-configuration
-            x-fn-config-env: true
-    /peer_discovery:
-        post:
-            operationId: PeerDiscovery
-            parameters:
-                - in: body
-                  schema:
-                    $ref: '#/definitions/PeerDiscoveryConfig'
-            tags:
-                - common-configuration
             x-fn-config-env: true
     /policies:
         post:
