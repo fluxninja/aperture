@@ -18,6 +18,8 @@ limitations under the License.
 package common
 
 import (
+	"github.com/fluxninja/aperture/extensions/fluxninja/extconfig"
+	"github.com/fluxninja/aperture/extensions/sentry"
 	amclient "github.com/fluxninja/aperture/pkg/alertmanager/client"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
@@ -30,12 +32,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/http"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
-	"github.com/fluxninja/aperture/pkg/plugins"
 	"github.com/fluxninja/aperture/pkg/profilers"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/watchdog"
-	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-fluxninja/pluginconfig"
-	"github.com/fluxninja/aperture/plugins/service/aperture-plugin-sentry/sentry"
 
 	corev1 "k8s.io/api/core/v1"
 )
@@ -253,9 +252,9 @@ type CommonSpec struct {
 
 // Secrets for Agent or Controller.
 type Secrets struct {
-	// FluxNinja plugin.
+	// FluxNinja extension.
 	//+kubebuilder:validation:Optional
-	FluxNinjaPlugin APIKeySecret `json:"fluxNinjaPlugin"`
+	FluxNinjaExtension APIKeySecret `json:"fluxNinjaExtension"`
 }
 
 // APIKeySecret defines fields required for creation/usage of secret for the ApiKey of Agent and Controller.
@@ -319,10 +318,6 @@ type CommonConfigSpec struct {
 	//+kubebuilder:validation:Optional
 	Metrics metrics.MetricsConfig `json:"metrics"`
 
-	// Plugins configuration.
-	//+kubebuilder:validation:Optional
-	Plugins plugins.PluginsConfig `json:"plugins"`
-
 	// Profilers configuration.
 	//+kubebuilder:validation:Optional
 	Profilers profilers.ProfilersConfig `json:"profilers"`
@@ -343,9 +338,9 @@ type CommonConfigSpec struct {
 	//+kubebuilder:validation:Optional
 	Alertmanagers amclient.AlertManagerConfig `json:"alertmanagers,omitempty"`
 
-	// BundledPluginsSpec defines configuration for bundled plugins.
+	// BundledExtensionsSpec defines configuration for bundled extensions.
 	//+kubebuilder:validation:Optional
-	BundledPluginsSpec `json:",inline"`
+	BundledExtensionsSpec `json:",inline"`
 }
 
 // ServerConfigSpec configures main server.
@@ -389,15 +384,15 @@ type ClientConfigSpec struct {
 	Proxy http.ProxyConfig `json:"proxy"`
 }
 
-// BundledPluginsSpec defines configuration for bundled plugins.
-type BundledPluginsSpec struct {
-	// FluxNinja ARC plugin configuration.
+// BundledExtensionsSpec defines configuration for bundled extensions.
+type BundledExtensionsSpec struct {
+	// FluxNinja ARC extension configuration.
 	//+kubebuilder:validation:Optional
-	FluxNinjaPlugin pluginconfig.FluxNinjaPluginConfig `json:"fluxninja_plugin"`
+	FluxNinja extconfig.FluxNinjaExtensionConfig `json:"fluxninja"`
 
-	// Sentry plugin configuration.
+	// Sentry extension configuration.
 	//+kubebuilder:validation:Optional
-	SentryPlugin sentry.SentryConfig `json:"sentry_plugin"`
+	Sentry sentry.SentryConfig `json:"sentry"`
 }
 
 // ServiceDiscoverySpec defines configuration for Service discoveru.

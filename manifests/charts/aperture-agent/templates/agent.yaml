@@ -125,17 +125,17 @@ spec:
   {{- if .Values.commonAnnotations }}
   annotations: {{ .Values.commonAnnotations | toYaml | nindent 4 }}
   {{- end }}
-  {{- if and .Values.agent.secrets .Values.agent.secrets.fluxNinjaPlugin .Values.agent.secrets.fluxNinjaPlugin.create }}
+  {{- if and .Values.agent.secrets .Values.agent.secrets.fluxNinjaExtension .Values.agent.secrets.fluxNinjaExtension.create }}
   secrets:
-    fluxNinjaPlugin:
-      create: {{ .Values.agent.secrets.fluxNinjaPlugin.create }}
-      {{- if or .Values.agent.secrets.fluxNinjaPlugin.secretKeyRef.name .Values.agent.secrets.fluxNinjaPlugin.secretKeyRef.key }}
+    fluxNinjaExtension:
+      create: {{ .Values.agent.secrets.fluxNinjaExtension.create }}
+      {{- if or .Values.agent.secrets.fluxNinjaExtension.secretKeyRef.name .Values.agent.secrets.fluxNinjaExtension.secretKeyRef.key }}
       secretKeyRef:
-        {{- if .Values.agent.secrets.fluxNinjaPlugin.secretKeyRef.name }}
-        name: {{ .Values.agent.secrets.fluxNinjaPlugin.secretKeyRef.name }}
+        {{- if .Values.agent.secrets.fluxNinjaExtension.secretKeyRef.name }}
+        name: {{ .Values.agent.secrets.fluxNinjaExtension.secretKeyRef.name }}
         {{- end }}
-        {{- if .Values.agent.secrets.fluxNinjaPlugin.secretKeyRef.key }}
-        key: {{ .Values.agent.secrets.fluxNinjaPlugin.secretKeyRef.key }}
+        {{- if .Values.agent.secrets.fluxNinjaExtension.secretKeyRef.key }}
+        key: {{ .Values.agent.secrets.fluxNinjaExtension.secretKeyRef.key }}
         {{- end }}
       {{- end }}
       value: {{ include "agent.apisecret.value" ( dict "agent" .Values.agent $) }}

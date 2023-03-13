@@ -43,7 +43,7 @@ var _ = Describe("Secret for Controller", func() {
 				Spec: controllerv1alpha1.ControllerSpec{
 					CommonSpec: common.CommonSpec{
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								Value: Test,
 							},
 						},
@@ -95,7 +95,7 @@ var _ = Describe("Secret for Controller", func() {
 					CommonSpec: common.CommonSpec{
 						Annotations: TestMap,
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								SecretKeyRef: common.SecretKeyRef{
 									Name: Test,
 									Key:  Test,

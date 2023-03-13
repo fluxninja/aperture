@@ -16,18 +16,9 @@ scripts:
 contents:
   - src: ./dist/aperture-agent
     dst: /opt/aperture/bin/aperture-agent
-  - &conf_dir
-    dst: /etc/aperture/aperture-agent/flowcontrol
-    type: dir
+  - type: dir
     file_info:
       mode: 0700
-  - <<: *conf_dir
-    dst: /etc/aperture/aperture-agent/classifiers
-  - <<: *conf_dir
-    dst: /opt/aperture/aperture-agent/plugins
-  - src: ./dist/plugins/*.so
-    dst: /opt/aperture/aperture-agent/plugins
-  - <<: *conf_dir
     dst: /etc/aperture/aperture-agent/config
   - src: ./packaging/agent/aperture-agent.yaml
     dst: /etc/aperture/aperture-agent/config/aperture-agent.yaml.example

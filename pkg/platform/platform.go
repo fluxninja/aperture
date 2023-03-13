@@ -28,7 +28,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/fluxninja/aperture/pkg/panichandler"
-	"github.com/fluxninja/aperture/pkg/plugins"
 	"github.com/fluxninja/aperture/pkg/profilers"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/watchdog"
@@ -42,8 +41,6 @@ func init() {
 type Config struct {
 	// Additional config to be merged (used for unit tests etc)
 	MergeConfig map[string]interface{}
-	// Plugin symbols to look for
-	PluginSymbols []string
 }
 
 var platform = initPlatform()
@@ -93,17 +90,6 @@ func (cfg Config) Module() fx.Option {
 	// mkdir temp
 	_ = os.MkdirAll(config.DefaultTempDirectory, os.ModePerm)
 
-	// Create a temporary Fx App to load plugins
-	var pluginOptions fx.Option
-	var registry *plugins.PluginRegistry
-	_ = fx.New(
-		config.ModuleConfig{MergeConfig: cfg.MergeConfig, UnknownFlags: true}.Module(),
-		plugins.ModuleConfig{PluginSymbols: cfg.PluginSymbols}.Module(),
-		fx.Populate(&registry),
-		fx.Populate(&pluginOptions),
-		fx.NopLogger,
-	)
-
 	options := fx.Options(
 		fx.Provide(
 			provideFlagSetBuilder,
@@ -123,17 +109,10 @@ func (cfg Config) Module() fx.Option {
 		status.Module(),
 		fx.Populate(&platform.statusRegistry),
 		platformStatusModule(),
-		fx.Supply(registry),
 		fx.Populate(&platform.unmarshaller),
 		fx.Populate(&platform.dotgraph),
 		alertmanager.Module(),
 	)
-	if pluginOptions != nil {
-		options = fx.Options(
-			options,
-			pluginOptions,
-		)
-	}
 	return options
 }
 

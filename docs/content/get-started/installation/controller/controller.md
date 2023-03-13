@@ -79,22 +79,6 @@ Kubernetes Objects which will be created by following steps are listed
 1. Configure the below parameters for the Controller Custom Resource by creating
    a `values.yaml` and pass it with the `install` command:
 
-   :::info
-
-   The below parameters disable the FluxNinja ARC Plugin for the Aperture
-   Controller. If you want to keep it enabled, add parameters provided
-   [here](/arc/plugin.md#configuration) under the `controller.config` section.
-
-   :::
-
-   ```yaml
-   controller:
-     config:
-       plugins:
-         disabled_plugins:
-           - aperture-plugin-fluxninja
-   ```
-
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
    <CodeBlock language="bash">
@@ -119,10 +103,6 @@ Kubernetes Objects which will be created by following steps are listed
          endpoints: ["ETCD_ENDPOINT_HERE"]
        prometheus:
          address: "PROMETHEUS_ADDRESS_HERE"
-       plugins:
-         disabled_plugins:
-           - aperture-plugin-fluxninja
-
    etcd:
      enabled: false
 
@@ -162,9 +142,6 @@ Kubernetes Objects which will be created by following steps are listed
    ```yaml
    controller:
      config:
-       plugins:
-         disabled_plugins:
-           - aperture-plugin-fluxninja
        log:
          level: debug
          pretty_console: true
@@ -247,9 +224,6 @@ Kubernetes Objects which will be created by following steps are listed
             endpoints: ["http://controller-etcd.default.svc.cluster.local:2379"]
           prometheus:
             address: "http://controller-prometheus-server.default.svc.cluster.local:80"
-          plugins:
-            disabled_plugins:
-              - aperture-plugin-fluxninja
       ```
 
       All the configuration parameters for the Controller Custom Resource are

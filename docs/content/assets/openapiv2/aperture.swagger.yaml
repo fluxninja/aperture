@@ -3096,7 +3096,7 @@ definitions:
 
                     :::caution
 
-                    When using [FluxNinja ARC plugin](arc/plugin.md), telemetry enabled
+                    When using [FluxNinja ARC extension](arc/extension.md), telemetry enabled
                     labels are sent to FluxNinja ARC for observability. Telemetry should be disabled for
                     sensitive labels.
 
@@ -3836,7 +3836,7 @@ info:
     title: Aperture API
     version: "1.0"
 paths:
-    /plugins/fluxninja/v1/controllerinfo:
+    /extensions/fluxninja/v1/controllerinfo:
         get:
             operationId: ControllerInfoService_GetControllerInfo
             responses:
@@ -3850,9 +3850,30 @@ paths:
                         $ref: '#/definitions/googlerpcStatus'
             tags:
                 - ControllerInfoService
-    /plugins/fluxninja/v1/report:
+    /extensions/fluxninja/v1/report:
         post:
             operationId: FluxNinjaService_Report
+            parameters:
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/ReportRequest'
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/ReportResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            summary: Report accepts information about agents' health and applied configurations/policies.
+            tags:
+                - FluxNinjaService
+    /plugins/fluxninja/v1/report:
+        post:
+            operationId: FluxNinjaService_Report2
             parameters:
                 - in: body
                   name: body
@@ -4176,11 +4197,11 @@ tags:
     - name: FlowPreviewService
     - name: Controller
     - name: DistCacheService
-    - name: FlowControlService
     - name: InfoService
     - name: PeerDiscoveryService
     - name: PolicyService
     - name: StatusService
     - name: FluxNinjaService
     - name: ControllerInfoService
+    - name: FlowControlService
     - name: Coordinator

@@ -893,41 +893,6 @@ definitions:
         title: MultiJobConfig holds configuration for MultiJob.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/jobs
-    PluginsConfig:
-        properties:
-            disable_plugins:
-                default: false
-                description: Disables all plugins
-                type: boolean
-                x-go-name: DisablePlugins
-                x-go-tag-default: "false"
-                x-go-tag-json: disable_plugins
-            disabled_plugins:
-                description: Specific plugins to disable
-                items:
-                    type: string
-                type: array
-                x-go-name: DisabledPlugins
-                x-go-tag-json: disabled_plugins,omitempty
-                x-go-tag-validate: omitempty
-            disabled_symbols:
-                description: Specific plugin types to disable
-                items:
-                    type: string
-                type: array
-                x-go-name: DisabledSymbols
-                x-go-tag-json: disabled_symbols,omitempty
-                x-go-tag-validate: omitempty
-            plugins_path:
-                default: default
-                description: Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
-                type: string
-                x-go-name: PluginsPath
-                x-go-tag-default: default
-                x-go-tag-json: plugins_path
-        title: PluginsConfig holds configuration for plugins.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/plugins
     PolicyCommon:
         properties:
             enabled:
@@ -1239,16 +1204,6 @@ paths:
                     $ref: '#/definitions/ControllerOTELConfig'
             tags:
                 - controller-configuration
-            x-fn-config-env: true
-    /plugins:
-        post:
-            operationId: Plugins
-            parameters:
-                - in: body
-                  schema:
-                    $ref: '#/definitions/PluginsConfig'
-            tags:
-                - common-configuration
             x-fn-config-env: true
     /policies:
         post:

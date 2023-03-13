@@ -14,7 +14,7 @@ etcd:
     key_file: ""
     key_log_file: ""
   username: ""
-fluxninja_plugin:
+fluxninja:
   api_key: ""
   client:
     grpc:
@@ -56,7 +56,7 @@ fluxninja_plugin:
       tls_handshake_timeout: 10s
       use_proxy: false
       write_buffer_size: 0
-  fluxninja_endpoint: ""
+  endpoint: ""
   heartbeat_interval: 5s
 liveness:
   scheduler:
@@ -90,11 +90,6 @@ otel:
     health_check_port: 13133
     pprof_port: 1777
     zpages_port: 55679
-plugins:
-  disable_plugins: false
-  disabled_plugins:
-  - aperture-plugin-fluxninja
-  plugins_path: default
 policies:
   promql_jobs_scheduler:
     blocking_execution: false
@@ -113,7 +108,7 @@ readiness:
     execution_period: 10s
     execution_timeout: 5s
     initially_healthy: false
-sentry_plugin:
+sentry:
   attach_stack_trace: true
   debug: true
   disabled: false

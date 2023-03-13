@@ -112,7 +112,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			vwcKey := types.NamespacedName{Name: ControllerServiceName}
 
 			createdControllerSecret := &corev1.Secret{}
-			controllerSecretKey := types.NamespacedName{Name: SecretName(Test, "controller", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace}
+			controllerSecretKey := types.NamespacedName{Name: SecretName(Test, "controller", &instance.Spec.Secrets.FluxNinjaExtension), Namespace: namespace}
 
 			createdControllerCertSecret := &corev1.Secret{}
 			controllerCertSecretKey := types.NamespacedName{Name: fmt.Sprintf("%s-controller-cert", instance.GetName()), Namespace: namespace}
@@ -150,8 +150,8 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
 
 			instance.Namespace = namespace
-			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
-			instance.Spec.Secrets.FluxNinjaPlugin.Value = Test
+			instance.Spec.Secrets.FluxNinjaExtension.Create = true
+			instance.Spec.Secrets.FluxNinjaExtension.Value = Test
 			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
 
 			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
@@ -183,7 +183,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			vwcKey := types.NamespacedName{Name: ControllerServiceName}
 
 			createdControllerSecret := &corev1.Secret{}
-			controllerSecretKey := types.NamespacedName{Name: SecretName(Test, "controller", &instance.Spec.Secrets.FluxNinjaPlugin), Namespace: namespace}
+			controllerSecretKey := types.NamespacedName{Name: SecretName(Test, "controller", &instance.Spec.Secrets.FluxNinjaExtension), Namespace: namespace}
 
 			createdControllerCertSecret := &corev1.Secret{}
 			controllerCertSecretKey := types.NamespacedName{Name: fmt.Sprintf("%s-controller-cert", instance.GetName()), Namespace: namespace}
@@ -208,8 +208,8 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(Succeed())
 			Expect(instance.Status.Resources).To(Equal("created"))
 			Expect(instance.Finalizers).To(Equal([]string{FinalizerName}))
-			Expect(instance.Spec.Secrets.FluxNinjaPlugin.Create).To(BeFalse())
-			Expect(instance.Spec.Secrets.FluxNinjaPlugin.Value).To(Equal(""))
+			Expect(instance.Spec.Secrets.FluxNinjaExtension.Create).To(BeFalse())
+			Expect(instance.Spec.Secrets.FluxNinjaExtension.Value).To(Equal(""))
 
 			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
 		})
@@ -270,8 +270,8 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 
 			instance.Namespace = namespace
 			instance.Spec.CommonSpec.ServiceAccountSpec.Create = false
-			instance.Spec.Secrets.FluxNinjaPlugin.Create = true
-			instance.Spec.Secrets.FluxNinjaPlugin.Value = Test
+			instance.Spec.Secrets.FluxNinjaExtension.Create = true
+			instance.Spec.Secrets.FluxNinjaExtension.Value = Test
 
 			os.Setenv("APERTURE_OPERATOR_CERT_DIR", CertDir)
 			os.Setenv("APERTURE_OPERATOR_CERT_NAME", "tls6.crt")
@@ -398,7 +398,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 					Spec: controllerv1alpha1.ControllerSpec{
 						CommonSpec: common.CommonSpec{
 							Secrets: common.Secrets{
-								FluxNinjaPlugin: common.APIKeySecret{
+								FluxNinjaExtension: common.APIKeySecret{
 									Value: Test,
 								},
 							},
@@ -409,7 +409,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 					Spec: controllerv1alpha1.ControllerSpec{
 						CommonSpec: common.CommonSpec{
 							Secrets: common.Secrets{
-								FluxNinjaPlugin: common.APIKeySecret{
+								FluxNinjaExtension: common.APIKeySecret{
 									Value: "",
 								},
 							},

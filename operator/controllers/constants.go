@@ -87,8 +87,6 @@ const (
 	DistCache = "dist-cache"
 	// MemberList string.
 	MemberList = "memberlist"
-	// ApertureFluxNinjaPlugin defines FluxNinja plugin name.
-	ApertureFluxNinjaPlugin = "aperture-plugin-fluxninja"
 	// DefaulterAnnotationKey defines annotation key for set defaults.
 	DefaulterAnnotationKey = "fluxninja.com/set-defaults"
 	// AgentModeChangeAnnotationKey defines annotation key for change in Agent installation mode.

@@ -76,9 +76,6 @@ below steps.
   ```yaml
   agent:
     config:
-      plugins:
-        disabled_plugins:
-          - aperture-plugin-fluxninja
       etcd:
         endpoints: ["http://controller-etcd:2379"]
       prometheus:
@@ -123,9 +120,6 @@ below steps.
   ```yaml
   controller:
     config:
-      plugins:
-        disabled_plugins:
-          - aperture-plugin-fluxninja
       etcd:
         endpoints: ["ETCD_ENDPOINT"]
       prometheus:
@@ -141,9 +135,6 @@ below steps.
   ```yaml
   agent:
     config:
-      plugins:
-        disabled_plugins:
-          - aperture-plugin-fluxninja
       etcd:
         endpoints: ["ETCD_ENDPOINT"]
       prometheus:

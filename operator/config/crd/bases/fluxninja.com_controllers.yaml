@@ -1039,11 +1039,12 @@ spec:
                         description: Authentication
                         type: string
                     type: object
-                  fluxninja_plugin:
-                    description: FluxNinja ARC plugin configuration.
+                  fluxninja:
+                    description: FluxNinja ARC extension configuration.
                     properties:
                       api_key:
-                        description: API Key for this agent.
+                        description: API Key for this agent. If this key is not set,
+                          the extension will not be enabled.
                         type: string
                       client:
                         description: Client configuration.
@@ -1173,7 +1174,7 @@ spec:
                                 type: integer
                             type: object
                         type: object
-                      fluxninja_endpoint:
+                      endpoint:
                         description: Address to grpc or http(s) server listening in
                           agent service. To use http protocol, the address must start
                           with http(s)://.
@@ -1318,27 +1319,6 @@ spec:
                             type: integer
                         type: object
                     type: object
-                  plugins:
-                    description: Plugins configuration.
-                    properties:
-                      disable_plugins:
-                        description: Disables all plugins
-                        type: boolean
-                      disabled_plugins:
-                        description: Specific plugins to disable
-                        items:
-                          type: string
-                        type: array
-                      disabled_symbols:
-                        description: Specific plugin types to disable
-                        items:
-                          type: string
-                        type: array
-                      plugins_path:
-                        description: Path to plugins directory. "default" points to
-                          `/var/lib/aperture/<service>/plugins`.
-                        type: string
-                    type: object
                   policies:
                     description: Policies configuration.
                     properties:
@@ -1422,8 +1402,8 @@ spec:
                             type: boolean
                         type: object
                     type: object
-                  sentry_plugin:
-                    description: Sentry plugin configuration.
+                  sentry:
+                    description: Sentry extension configuration.
                     properties:
                       attach_stack_trace:
                         description: Configure to generate and attach stacktraces
@@ -5309,8 +5289,8 @@ spec:
               secrets:
                 description: Secrets
                 properties:
-                  fluxNinjaPlugin:
-                    description: FluxNinja plugin.
+                  fluxNinjaExtension:
+                    description: FluxNinja extension.
                     properties:
                       create:
                         description: Create new secret or not

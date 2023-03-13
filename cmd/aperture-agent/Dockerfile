@@ -29,12 +29,6 @@ RUN --mount=type=cache,target=/go/pkg/,readonly \
   CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" \
   LDFLAGS="-extldflags \"-Wl,--allow-multiple-definition\"" \
   ./pkg/info/build.sh;\
-  for plugin in ./plugins/{service,agent}/aperture-plugin-*; do\
-  echo "building plugin $plugin";\
-  CGO_ENABLED=1 TARGET="/plugins/$(basename $plugin).so" PREFIX="aperture" SOURCE="$plugin" \
-  LDFLAGS="-s -w -extldflags \"-Wl,--allow-multiple-definition\"" \
-  ./pkg/plugins/build.sh;\
-  done\
   '
 
 # Final image
@@ -45,10 +39,5 @@ RUN apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-# Ensure config dirs exists, even if not mounted
-RUN mkdir -p /etc/aperture/aperture-agent/flowcontrol /etc/aperture/aperture-agent/classifiers /opt/aperture/aperture-agent/plugins
-
 COPY --link --from=builder /aperture-agent /aperture-agent
 CMD ["/aperture-agent"]
-
-COPY --link --from=builder /plugins /opt/aperture/aperture-agent/plugins

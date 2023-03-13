@@ -44,7 +44,7 @@ flow_control:
 auto_scale:
   kubernetes:
     enabled: true
-fluxninja_plugin:
+fluxninja:
   api_key: ""
   client:
     grpc:
@@ -86,7 +86,7 @@ fluxninja_plugin:
       tls_handshake_timeout: 10s
       use_proxy: false
       write_buffer_size: 0
-  fluxninja_endpoint: ""
+  endpoint: ""
   heartbeat_interval: 5s
 kubernetes_client:
   disable_compression: false
@@ -154,11 +154,6 @@ otel:
     zpages_port: 55679
 peer_discovery:
   advertisement_addr: ""
-plugins:
-  disable_plugins: false
-  disabled_plugins:
-  - aperture-plugin-fluxninja
-  plugins_path: default
 profilers:
   cpu_profiler: false
   profiles_path: default
@@ -173,7 +168,7 @@ readiness:
     execution_period: 10s
     execution_timeout: 5s
     initially_healthy: false
-sentry_plugin:
+sentry:
   attach_stack_trace: true
   debug: true
   disabled: false

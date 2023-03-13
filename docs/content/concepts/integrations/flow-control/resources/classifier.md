@@ -35,7 +35,7 @@ use in other components at the same [_Control Point_][control-point].
 Additionally, the _Flow Label_ is injected as baggage, so it will be available
 on every subsequent control point too (assuming you have [baggage
 propagation][baggage] configured in your system). If you're a [FluxNinja ARC
-plugin][plugin] user, such flow label will also be available for analytics.
+extension][arc] user, such flow label will also be available for analytics.
 
 :::note
 
@@ -223,7 +223,7 @@ See [full example in reference][reference]
 [rule]: /reference/policies/spec.md#rule
 [extractor]: /reference/policies/spec.md#extractor
 [rego-rule]: /reference/policies/spec.md#rule-rego
-[plugin]: /arc/plugin.md
+[arc]: /arc/extension.md
 [label-matcher]: ../flow-selector.md#label-matcher
 [policies]: /concepts/policy/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/

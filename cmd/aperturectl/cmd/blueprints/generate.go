@@ -39,11 +39,11 @@ Use this command to generate Aperture Policy related resources like Kubernetes C
 
 aperturectl blueprints generate --name=policies/static-rate-limiting --values-file=rate-limiting.yaml --apply`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := readerLock()
+		err := utils.ReaderLock(blueprintsURIRoot)
 		if err != nil {
 			return err
 		}
-		defer unlock()
+		defer utils.Unlock(blueprintsURIRoot)
 
 		if blueprintName == "" {
 			return fmt.Errorf("--name must be provided")
@@ -74,7 +74,7 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 			return err
 		}
 
-		err = blueprintExists(blueprintsDir, blueprintName)
+		err = blueprintExists(blueprintName)
 		if err != nil {
 			return err
 		}
@@ -252,8 +252,8 @@ func saveJSONFile(_, path, filename string, content map[string]interface{}) erro
 	return nil
 }
 
-func blueprintExists(blueprintsDir, name string) error {
-	blueprintsList, err := getBlueprints(blueprintsDir)
+func blueprintExists(name string) error {
+	blueprintsList, err := getBlueprints(blueprintsURIRoot)
 	if err != nil {
 		return err
 	}

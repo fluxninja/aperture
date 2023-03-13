@@ -501,13 +501,13 @@ controller:
   ##
   initContainers: []
   ## Controller API secret for FluxNinja ARC connection
-  ## @param controller.secrets.fluxNinjaPlugin.create Whether to create Kubernetes Secret with provided Controller API Key.
-  ## @param controller.secrets.fluxNinjaPlugin.secretKeyRef.name specifies a name of the Secret for Controller API Key to be used. This defaults to {{ .Release.Name }}-controller-apikey
-  ## @param controller.secrets.fluxNinjaPlugin.secretKeyRef.key specifies which key from the Secret for Controller API Key to use
-  ## @param controller.secrets.fluxNinjaPlugin.value API Key to use when creating a new Controller API Key Secret
+  ## @param controller.secrets.fluxNinjaExtension.create Whether to create Kubernetes Secret with provided Controller API Key.
+  ## @param controller.secrets.fluxNinjaExtension.secretKeyRef.name specifies a name of the Secret for Controller API Key to be used. This defaults to {{ .Release.Name }}-controller-apikey
+  ## @param controller.secrets.fluxNinjaExtension.secretKeyRef.key specifies which key from the Secret for Controller API Key to use
+  ## @param controller.secrets.fluxNinjaExtension.value API Key to use when creating a new Controller API Key Secret
   ##
   secrets:
-    fluxNinjaPlugin:
+    fluxNinjaExtension:
       create: false
       secretKeyRef:
         name: ~

@@ -36,7 +36,7 @@ import (
 
 // secretForControllerAPIKey prepares the Secret object for the ApiKey of Agent.
 func secretForControllerAPIKey(instance *controllerv1alpha1.Controller, scheme *runtime.Scheme) (*corev1.Secret, error) {
-	spec := &instance.Spec.Secrets.FluxNinjaPlugin
+	spec := &instance.Spec.Secrets.FluxNinjaExtension
 
 	secret := &corev1.Secret{
 		ObjectMeta: v1.ObjectMeta{

@@ -9,6 +9,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/facebookgo/symwalk"
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -27,11 +28,11 @@ aperturectl blueprints list --version latest
 
 aperturectl blueprints list --all`,
 	RunE: func(_ *cobra.Command, _ []string) error {
-		err := readerLock()
+		err := utils.ReaderLock(blueprintsURIRoot)
 		if err != nil {
 			return err
 		}
-		defer unlock()
+		defer utils.Unlock(blueprintsURIRoot)
 		if all {
 			w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
 
@@ -71,18 +72,17 @@ aperturectl blueprints list --all`,
 	},
 }
 
-func getBlueprints(blueprintsDir string) ([]string, error) {
-	relPath := getRelPath(blueprintsDir)
-
+func getBlueprints(blURIRoot string) ([]string, error) {
+	relPath := utils.GetRelPath(blURIRoot)
 	policies := []string{}
 
-	blueprintsPath := filepath.Join(blueprintsDir, relPath)
-	err := symwalk.Walk(blueprintsPath, func(path string, fi fs.FileInfo, err error) error {
+	blDir := filepath.Join(blURIRoot, relPath)
+	err := symwalk.Walk(blDir, func(path string, fi fs.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if !fi.IsDir() && fi.Name() == "config.libsonnet" {
-			strippedPath := strings.TrimPrefix(path, blueprintsPath)
+			strippedPath := strings.TrimPrefix(path, blDir)
 			strippedPath = strings.TrimSuffix(strippedPath, "/config.libsonnet")
 			strippedPath = strings.TrimPrefix(strippedPath, "/")
 			policies = append(policies, strippedPath)
@@ -98,20 +98,20 @@ func getBlueprints(blueprintsDir string) ([]string, error) {
 
 func getCachedBlueprints() (map[string][]string, error) {
 	blueprintsList := map[string][]string{}
-	blueprintsDirs, err := os.ReadDir(blueprintsCacheRoot)
+	blueprintsURIDirs, err := os.ReadDir(blueprintsCacheRoot)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, blueprintsDir := range blueprintsDirs {
-		if blueprintsDir.IsDir() {
-			dir := filepath.Join(blueprintsCacheRoot, blueprintsDir.Name())
+	for _, blueprintsURIDir := range blueprintsURIDirs {
+		if blueprintsURIDir.IsDir() {
+			dir := filepath.Join(blueprintsCacheRoot, blueprintsURIDir.Name())
 			policies, err := getBlueprints(dir)
 			if err != nil {
 				return nil, err
 			}
-			source := getSource(dir)
-			version := getVersion(dir)
+			source := utils.GetSource(dir)
+			version := utils.GetVersion(dir)
 			if version != "" {
 				source = fmt.Sprintf("%s@%s", source, version)
 			}
