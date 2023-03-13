@@ -22,19 +22,22 @@ Generated File Starts
 
 ### COMMON CONFIGURATION
 
-| Key          | Reference                          |
-| ------------ | ---------------------------------- |
-| `client`     | [Client](#client)                  |
-| `etcd`       | [Etcd](#etcd)                      |
-| `liveness`   | [Liveness](#liveness)              |
-| `log`        | [Log](#log)                        |
-| `metrics`    | [Metrics](#metrics)                |
-| `policies`   | [PoliciesConfig](#policies-config) |
-| `profilers`  | [Profilers](#profilers)            |
-| `prometheus` | [Prometheus](#prometheus)          |
-| `readiness`  | [Readiness](#readiness)            |
-| `server`     | [Server](#server)                  |
-| `watchdog`   | [Watchdog](#watchdog)              |
+| Key                 | Reference                              |
+| ------------------- | -------------------------------------- |
+| `agent_info`        | [AgentInfo](#agent-info)               |
+| `client`            | [Client](#client)                      |
+| `etcd`              | [Etcd](#etcd)                          |
+| `kubernetes_client` | [KubernetesClient](#kubernetes-client) |
+| `liveness`          | [Liveness](#liveness)                  |
+| `log`               | [Log](#log)                            |
+| `metrics`           | [Metrics](#metrics)                    |
+| `peer_discovery`    | [PeerDiscovery](#peer-discovery)       |
+| `policies`          | [PoliciesConfig](#policies-config)     |
+| `profilers`         | [Profilers](#profilers)                |
+| `prometheus`        | [Prometheus](#prometheus)              |
+| `readiness`         | [Readiness](#readiness)                |
+| `server`            | [Server](#server)                      |
+| `watchdog`          | [Watchdog](#watchdog)                  |
 
 ### CONTROLLER CONFIGURATION
 
@@ -50,6 +53,22 @@ Generated File Starts
 | `sentry`    | [SentryExtension](#sentry-extension)        |
 
 ## Reference
+
+### _agent_info_ {#agent-info}
+
+<dl>
+
+<dt></dt>
+<dd>
+
+([AgentInfoConfig](#agent-info-config))
+Env-Var Prefix: `APERTURE_CONTROLLER_AGENT_INFO_`
+
+</dd>
+
+</dl>
+
+---
 
 ### _client_ {#client}
 
@@ -92,6 +111,22 @@ Env-Var Prefix: `APERTURE_CONTROLLER_ETCD_`
 
 ([FluxNinjaExtensionConfig](#flux-ninja-extension-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
+
+</dd>
+
+</dl>
+
+---
+
+### _kubernetes_client_ {#kubernetes-client}
+
+<dl>
+
+<dt>http_client</dt>
+<dd>
+
+([HTTPClientConfig](#http-client-config))
+Env-Var Prefix: `APERTURE_CONTROLLER_KUBERNETES_CLIENT_HTTP_CLIENT_`
 
 </dd>
 
@@ -164,6 +199,22 @@ Env-Var Prefix: `APERTURE_CONTROLLER_METRICS_`
 
 ([ControllerOTELConfig](#controller-o-t-e-l-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_`
+
+</dd>
+
+</dl>
+
+---
+
+### _peer_discovery_ {#peer-discovery}
+
+<dl>
+
+<dt></dt>
+<dd>
+
+([PeerDiscoveryConfig](#peer-discovery-config))
+Env-Var Prefix: `APERTURE_CONTROLLER_PEER_DISCOVERY_`
 
 </dd>
 
@@ -350,6 +401,23 @@ AdaptivePolicy creates a policy that forces GC when the usage surpasses the conf
 <dd>
 
 (float64, minimum: `0`, maximum: `1`, default: `0.5`) Factor sets user-configured limit of available memory
+
+</dd>
+</dl>
+
+---
+
+### AgentInfoConfig {#agent-info-config}
+
+AgentInfoConfig is the configuration for the agent group and other agent attributes.
+
+<dl>
+<dt>agent_group</dt>
+<dd>
+
+(string, default: `"default"`) All agents within an agent_group receive the same data-plane configuration (e.g. Flux Meters, Rate Limiters etc).
+
+[Read more about agent groups here](/concepts/integrations/flow-control/flow-selector.md#agent-group).
 
 </dd>
 </dl>
@@ -1043,6 +1111,21 @@ MetricsConfig holds configuration for service metrics.
 <dd>
 
 (bool) Pedantic controls whether a pedantic Registerer is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
+
+</dd>
+</dl>
+
+---
+
+### PeerDiscoveryConfig {#peer-discovery-config}
+
+PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
+
+<dl>
+<dt>advertisement_addr</dt>
+<dd>
+
+(string, format: `empty | hostname_port`) Network address of aperture server to advertise to peers - this address should be reachable from other agents. Used for nat traversal when provided.
 
 </dd>
 </dl>

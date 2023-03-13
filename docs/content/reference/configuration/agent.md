@@ -41,6 +41,7 @@ Generated File Starts
 | `log`               | [Log](#log)                            |
 | `metrics`           | [Metrics](#metrics)                    |
 | `peer_discovery`    | [PeerDiscovery](#peer-discovery)       |
+| `policies`          | [PoliciesConfig](#policies-config)     |
 | `profilers`         | [Profilers](#profilers)                |
 | `prometheus`        | [Prometheus](#prometheus)              |
 | `readiness`         | [Readiness](#readiness)                |
@@ -266,6 +267,22 @@ Env-Var Prefix: `APERTURE_AGENT_OTEL_`
 
 ([PeerDiscoveryConfig](#peer-discovery-config))
 Env-Var Prefix: `APERTURE_AGENT_PEER_DISCOVERY_`
+
+</dd>
+
+</dl>
+
+---
+
+### _policies_ {#policies-config}
+
+<dl>
+
+<dt>promql_jobs_scheduler</dt>
+<dd>
+
+([JobGroupConfig](#job-group-config))
+Env-Var Prefix: `APERTURE_AGENT_POLICIES_PROMQL_JOBS_SCHEDULER_`
 
 </dd>
 
