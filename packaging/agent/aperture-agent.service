@@ -1,5 +1,5 @@
 [Unit]
-Description=Aperture Agent - Flow control and reliability management for modern web applications
+Description=Aperture Agent
 Documentation=https://docs.fluxninja.com
 StartLimitIntervalSec=60
 StartLimitBurst=4

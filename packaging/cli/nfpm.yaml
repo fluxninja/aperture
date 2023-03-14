@@ -1,13 +1,13 @@
 # check https://nfpm.goreleaser.com/configuration for detailed usage
 name: "aperturectl"
 arch: "${GOARCH}"
-version: "${VERSION}"
+version: "${APERTURECTL_BUILD_VERSION}"
 section: "default"
 priority: "extra"
 provides: [aperturectl]
-maintainer: "FluxNinja <help@fluxninja.com>"
+maintainer: "FluxNinja <info@fluxninja.com>"
 description: |
-  CLI for flow control and reliability management for modern web applications
+  CLI for FluxNinja Aperture
 vendor: "FluxNinja"
 homepage: "https://www.fluxninja.com"
 license: "Apache-2.0"
