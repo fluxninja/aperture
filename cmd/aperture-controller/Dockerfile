@@ -1,34 +1,35 @@
 # syntax=docker/dockerfile:1.4
-FROM golang:1.19.6-bullseye AS base
+FROM golang:1.19.6-bullseye AS builder
 
 WORKDIR /src
 COPY --link . .
 
-RUN --mount=type=cache,target=/go/pkg/ \
-  go mod download
-
-FROM base AS builder
-
 # App build
-ARG GIT_COMMIT_HASH
-ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
-ARG GIT_BRANCH
-ENV GIT_BRANCH=${GIT_BRANCH}
-ARG VERSION
-ENV VERSION=${VERSION}
-ARG RACE
-ENV RACE=${RACE}
-ARG BUILD_TIME="$(date -Iseconds)"
-ENV BUILD_TIME=${BUILD_TIME}
+ARG APERTURE_VERSION
+ENV APERTURE_VERSION=${APERTURE_VERSION}
+ARG APERTURE_GIT_COMMIT_HASH
+ENV APERTURE_GIT_COMMIT_HASH=${APERTURE_GIT_COMMIT_HASH}
+ARG APERTURE_GIT_BRANCH
+ENV APERTURE_GIT_BRANCH=${APERTURE_GIT_BRANCH}
+ARG APERTURE_APERTURE_BUILDER_CONFIG_FILE
+ENV APERTURE_BUILDER_CONFIG_FILE=${APERTURE_BUILDER_CONFIG_FILE}
 
-RUN  --mount=type=cache,target=/go/pkg/,readonly \
+# If config file exists, copy it to the build context
+RUN if [[ -f "${APERTURE_BUILDER_CONFIG_FILE}" ]]; then \
+  cp "${APERTURE_BUILDER_CONFIG_FILE}" ./config.yaml; \
+  else \
+  echo "APERTURE_BUILDER_CONFIG_FILE is not set"; \
+  echo "bundled_extensions: [fluxninja, sentry]" > ./config.yaml; \
+  fi
+
+
+RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.cache/go-build/,id=controller-1.19.6,sharing=private \
+  --mount=type=cache,target=/root/.aperturectl,id=controller-1.19.6,sharing=private \
   /bin/bash -c \
-  'set -euo pipefail; \
-  shopt -s nullglob; \
-  CGO_ENABLED=1 TARGET="/aperture-controller" PREFIX="aperture" SOURCE="./cmd/aperture-controller" \
-  LDFLAGS="-extldflags \"-Wl,--allow-multiple-definition\"" \
-  ./pkg/info/build.sh;\
+  'go mod download; \
+  go build -o cmd/aperturectl/aperturectl ./cmd/aperturectl; \
+  ./cmd/aperturectl/aperturectl build controller -c ./config.yaml -o / --uri .; \
   '
 
 # Final image
