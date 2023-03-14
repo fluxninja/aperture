@@ -40,6 +40,8 @@ func main() {
 		rpc.ServerModule,
 		agents.Module,
 		cmd.Module,
+		PlatformModule(),
+		ControllerModule(),
 	)
 
 	if err := app.Err(); err != nil {
