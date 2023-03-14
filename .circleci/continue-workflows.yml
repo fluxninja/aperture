@@ -60,6 +60,9 @@ parameters:
   updated-aperture-java:
     type: boolean
     default: false
+  updated-aperture-py:
+    type: boolean
+    default: false
   updated-sdk-validator:
     type: boolean
     default: false
@@ -1117,6 +1120,21 @@ workflows:
           docker-image: aperture-js-example
           remote-repo: fluxninja/aperture-js
           remote-repo-fingerprint: "00:5e:cf:81:48:2d:e9:b8:34:74:8b:46:cc:ad:2f:ce"
+
+  aperture-py:
+    when:
+      or:
+        - << pipeline.parameters.updated-aperture-py >>
+        - << pipeline.parameters.updated-sdk-validator >>
+    jobs:
+      - validate-publish-sdk:
+          name: validate-publish-aperture-py
+          path: sdks/aperture-py
+          docker-context: sdks/aperture-py
+          dockerfile: example/Dockerfile
+          docker-image: aperture-py-example
+          remote-repo: fluxninja/aperture-py
+          remote-repo-fingerprint: "0b:a2:a7:de:46:d5:e8:c7:46:1e:49:29:e3:6e:e8:a8"
 
   # Verify that libs and java agent can be built with Java 8+
   # Verify that lib, java agent and examples can be built with Java 17+

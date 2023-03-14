@@ -1,0 +1,181 @@
+import datetime
+import functools
+import inspect
+import logging
+import time
+from typing import Dict, Literal, Optional, Tuple, Type, TypedDict
+from typing import Any, Callable, ParamSpec, TypeVar
+
+from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import (
+    CheckRequest,
+    CheckResponse,
+)
+from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2_grpc import (
+    FlowControlServiceStub,
+)
+from aperture_sdk.const import (
+    default_grpc_reconnection_time,
+    default_rpc_timeout,
+    flow_start_timestamp_label,
+    library_name,
+    library_version,
+    source_label,
+    workload_start_timestamp_label,
+)
+from aperture_sdk.flow import Flow, FlowStatus
+from aperture_sdk.utils import TWrappedFunction, TWrappedParam, TWrappedReturn, run_fn
+import grpc
+from opentelemetry import baggage, trace
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk.resources import Resource, SERVICE_NAME, SERVICE_VERSION
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+import wsgitypes
+
+TApertureClient = TypeVar("TApertureClient", bound="ApertureClient")
+
+
+class ApertureClient:
+    def __init__(
+        self,
+        channel: grpc.Channel,
+        otlp_exporter: OTLPSpanExporter,
+        check_timeout: datetime.timedelta = default_rpc_timeout,
+    ):
+        self.logger = logging.getLogger("aperture-py-sdk")
+        self.timeout = check_timeout
+
+        resource = Resource.create(
+            {
+                SERVICE_NAME: library_name,
+                SERVICE_VERSION: library_version,
+            }
+        )
+        tracer_provider = TracerProvider(resource=resource)
+        trace.set_tracer_provider(tracer_provider)
+        self.tracer = trace.get_tracer(library_name, library_version)
+
+        span_processor = BatchSpanProcessor(otlp_exporter)
+        tracer_provider.add_span_processor(span_processor)
+        self.otlp_exporter = otlp_exporter
+        self.grpc_channel = channel
+
+    @classmethod
+    def new_client(
+        cls: Type[TApertureClient],
+        endpoint: str = "http://localhost:4317",
+        insecure: bool = False,
+        check_timeout: datetime.timedelta = default_rpc_timeout,
+        grpc_timeout: datetime.timedelta = default_grpc_reconnection_time,
+        credentials: Optional[grpc.ChannelCredentials] = None,
+        compression: grpc.Compression = grpc.Compression.NoCompression,
+    ) -> TApertureClient:
+        if credentials is None:
+            credentials = grpc.ssl_channel_credentials()
+        otlp_exporter = OTLPSpanExporter(
+            endpoint=endpoint,
+            insecure=insecure,
+            credentials=credentials,
+            compression=compression,
+            timeout=int(grpc_timeout.total_seconds()),
+        )
+        grpc_channel = (
+            grpc.insecure_channel(endpoint, compression=compression)
+            if insecure
+            else grpc.secure_channel(endpoint, credentials, compression=compression)
+        )
+        return cls(
+            channel=grpc_channel,
+            otlp_exporter=otlp_exporter,
+            check_timeout=check_timeout,
+        )
+
+    def start_flow(
+        self, control_point: str, explicit_labels: Optional[Dict[str, str]] = None
+    ) -> Flow:
+        labels = {}
+        labels.update(baggage.get_all())
+        # Explicit labels override baggage
+        labels.update(explicit_labels or {})
+        request = CheckRequest(control_point=control_point, labels=labels)
+        span_attributes = {
+            flow_start_timestamp_label: time.monotonic_ns(),
+            source_label: "sdk",
+        }
+
+        span = self.tracer.start_span("Aperture Check", attributes=span_attributes)
+        stub = FlowControlServiceStub(self.grpc_channel)
+        response = stub.Check(request, timeout=self.timeout.total_seconds())
+        span.set_attribute(workload_start_timestamp_label, time.monotonic_ns())
+        return Flow(span=span, check_response=response)
+
+    def decorate(
+        self,
+        control_point: str,
+        explicit_labels: Optional[Dict[str, str]] = None,
+        on_reject: Optional[Callable] = None,
+    ) -> Callable[[TWrappedFunction], TWrappedFunction]:
+        def decorator(fn: TWrappedFunction) -> TWrappedFunction:
+            @functools.wraps(fn)
+            async def wrapper(*args, **kwargs):
+                try:
+                    flow = self.start_flow(control_point, explicit_labels)
+                except Exception:
+                    self.logger.exception(
+                        "Aperture flow control failed to start flow. Defaulting to accept the flow.",
+                    )
+                    return await run_fn(fn, *args, **kwargs)
+
+                try:
+                    if flow.accepted():
+                        return await run_fn(fn, *args, **kwargs)
+                    else:
+                        if on_reject:
+                            return on_reject()
+                        raise RejectedFlowException("Flow was rejected")
+                finally:
+                    try:
+                        flow.end(FlowStatus.OK)
+                    except Exception as e:
+                        self.logger.exception(
+                            "Aperture flow control failed to end.",
+                        )
+
+            return wrapper
+
+        return decorator
+
+    def http_middleware(
+        self,
+        application: wsgitypes.Application,
+        control_point: str,
+        explicit_labels: Optional[Dict[str, str]] = None,
+    ):
+        """Create HTTP WSGI middeleware to automatically handle flows"""
+
+        wrapper = self.decorate(control_point, explicit_labels)
+
+        def middleware(
+            environ: wsgitypes.Environ, start_response: wsgitypes.StartResponse
+        ) -> wsgitypes.Response:
+            fn = wrapper(application)
+            try:
+                return fn(environ, start_response)
+            except RejectedFlowException:
+                status = "403 Forbidden"
+                headers = [("Content-Type", "text/plain")]
+                start_response(status, headers)
+                return [b"Forbidden"]
+
+        return middleware
+
+    def close(self):
+        self.otlp_exporter.shutdown()
+
+
+class ApertureException(Exception):
+    pass
+
+
+class RejectedFlowException(ApertureException):
+    pass

@@ -16,11 +16,13 @@ TILT_OBJECTS = []
 APERTURE_GO_REPO_PATH = GIT_ROOT + "/sdks/aperture-go"
 APERTURE_JAVA_REPO_PATH = GIT_ROOT + "/sdks/aperture-java"
 APERTURE_JS_REPO_PATH = GIT_ROOT + "/sdks/aperture-js"
+APERTURE_PYTHON_REPO_PATH = GIT_ROOT + "/sdks/aperture-py"
 APERTURE_AGENT_NS = "aperture-agent"
 APERTURE_CONTROLLER_NS = "aperture-controller"
 APERTURE_GO_EXAMPLE_NS = "aperture-go-example"
 APERTURE_JS_EXAMPLE_NS = "aperture-js-example"
 APERTURE_JAVA_EXAMPLE_NS = "aperture-java-example"
+APERTURE_PYTHON_EXAMPLE_NS = "aperture-python-example"
 APERTURE_DEMOAPP_NS = "demoapp"
 APERTURE_ISTIO_NS = "istio-system"
 DEFAULT_TEST_SCENARIO = "scenarios/rate_limiting_escalation"
@@ -303,7 +305,7 @@ DEP_TREE = {
             "images": [
                 {
                     "ref": "aperture-js-example",
-                    "context": APERTURE_JS_REPO_PATH if os.path.exists(APERTURE_JS_REPO_PATH) else "https://github.com/fluxninja/aperture-js.git#main",
+                    "context": APERTURE_JS_REPO_PATH,
                 }
             ],
             "child_resources": [
@@ -329,6 +331,26 @@ DEP_TREE = {
             "child_resources": [
                 {
                     "workload": "aperture-java-example",
+                    "resource_deps": ["agent", "controller", "cluster-bootstrap"],
+                }
+            ]
+        },
+    },
+    APERTURE_PYTHON_EXAMPLE_NS: {
+        "aperture-python-example": {
+            "labels": ["Aperture"],
+            "needs": ["agent"],
+            "tkenv": TANKA_ROOT + "/apps/aperture-python-example",
+            "images": [
+                {
+                    "ref": "aperture-python-example",
+                    "context": APERTURE_PYTHON_REPO_PATH,
+                    "dockerfile": "example/Dockerfile",
+                }
+            ],
+            "child_resources": [
+                {
+                    "workload": "aperture-python-example",
                     "resource_deps": ["agent", "controller", "cluster-bootstrap"],
                 }
             ]
