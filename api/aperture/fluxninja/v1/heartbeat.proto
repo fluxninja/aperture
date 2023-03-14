@@ -16,7 +16,7 @@ service FluxNinjaService {
   // Report accepts information about agents' health and applied configurations/policies.
   rpc Report(ReportRequest) returns (ReportResponse) {
     option (google.api.http) = {
-      post: "/arc/v1/report"
+      post: "/fluxninja/v1/report"
       body: "*"
     };
   }
@@ -25,7 +25,7 @@ service FluxNinjaService {
 // ControllerInfoService is used to read controllerID to which agent/controller belong.
 service ControllerInfoService {
   rpc GetControllerInfo(google.protobuf.Empty) returns (ControllerInfo) {
-    option (google.api.http) = {get: "/arc/v1/controllerinfo"};
+    option (google.api.http) = {get: "/fluxninja/v1/controllerinfo"};
   }
 }
 

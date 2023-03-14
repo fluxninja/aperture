@@ -3832,7 +3832,7 @@ info:
     title: Aperture API
     version: "1.0"
 paths:
-    /arc/v1/controllerinfo:
+    /fluxninja/v1/controllerinfo:
         get:
             operationId: ControllerInfoService_GetControllerInfo
             responses:
@@ -3846,7 +3846,7 @@ paths:
                         $ref: '#/definitions/googlerpcStatus'
             tags:
                 - ControllerInfoService
-    /arc/v1/report:
+    /fluxninja/v1/report:
         post:
             operationId: FluxNinjaService_Report
             parameters:

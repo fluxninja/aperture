@@ -98,7 +98,7 @@ func RegisterFluxNinjaServiceHandlerServer(ctx context.Context, mux *runtime.Ser
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.fluxninja.v1.FluxNinjaService/Report", runtime.WithHTTPPathPattern("/arc/v1/report"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.fluxninja.v1.FluxNinjaService/Report", runtime.WithHTTPPathPattern("/fluxninja/v1/report"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -132,7 +132,7 @@ func RegisterControllerInfoServiceHandlerServer(ctx context.Context, mux *runtim
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.fluxninja.v1.ControllerInfoService/GetControllerInfo", runtime.WithHTTPPathPattern("/arc/v1/controllerinfo"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.fluxninja.v1.ControllerInfoService/GetControllerInfo", runtime.WithHTTPPathPattern("/fluxninja/v1/controllerinfo"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -196,7 +196,7 @@ func RegisterFluxNinjaServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.fluxninja.v1.FluxNinjaService/Report", runtime.WithHTTPPathPattern("/arc/v1/report"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.fluxninja.v1.FluxNinjaService/Report", runtime.WithHTTPPathPattern("/fluxninja/v1/report"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -216,7 +216,7 @@ func RegisterFluxNinjaServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 }
 
 var (
-	pattern_FluxNinjaService_Report_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"arc", "v1", "report"}, ""))
+	pattern_FluxNinjaService_Report_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"fluxninja", "v1", "report"}, ""))
 )
 
 var (
@@ -267,7 +267,7 @@ func RegisterControllerInfoServiceHandlerClient(ctx context.Context, mux *runtim
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.fluxninja.v1.ControllerInfoService/GetControllerInfo", runtime.WithHTTPPathPattern("/arc/v1/controllerinfo"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.fluxninja.v1.ControllerInfoService/GetControllerInfo", runtime.WithHTTPPathPattern("/fluxninja/v1/controllerinfo"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -287,7 +287,7 @@ func RegisterControllerInfoServiceHandlerClient(ctx context.Context, mux *runtim
 }
 
 var (
-	pattern_ControllerInfoService_GetControllerInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"arc", "v1", "controllerinfo"}, ""))
+	pattern_ControllerInfoService_GetControllerInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"fluxninja", "v1", "controllerinfo"}, ""))
 )
 
 var (

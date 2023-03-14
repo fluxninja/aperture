@@ -47,7 +47,7 @@ const (
 	entitiesKey        = "entity-cache"
 	servicesKey        = entitiesKey + ".services"
 	overlappingKey     = entitiesKey + ".overlapping-services"
-	heartbeatsHTTPPath = "/extensions/fluxninja/v1/report"
+	heartbeatsHTTPPath = "/fluxninja/v1/report"
 )
 
 // Heartbeats is the struct that holds information about heartbeats.
