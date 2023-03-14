@@ -33,7 +33,7 @@ func NewFluxNinjaServiceClient(cc grpc.ClientConnInterface) FluxNinjaServiceClie
 
 func (c *fluxNinjaServiceClient) Report(ctx context.Context, in *ReportRequest, opts ...grpc.CallOption) (*ReportResponse, error) {
 	out := new(ReportResponse)
-	err := c.cc.Invoke(ctx, "/aperture.extensions.fluxninja.v1.FluxNinjaService/Report", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/aperture.fluxninja.v1.FluxNinjaService/Report", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func _FluxNinjaService_Report_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/aperture.extensions.fluxninja.v1.FluxNinjaService/Report",
+		FullMethod: "/aperture.fluxninja.v1.FluxNinjaService/Report",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(FluxNinjaServiceServer).Report(ctx, req.(*ReportRequest))
@@ -89,7 +89,7 @@ func _FluxNinjaService_Report_Handler(srv interface{}, ctx context.Context, dec 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var FluxNinjaService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "aperture.extensions.fluxninja.v1.FluxNinjaService",
+	ServiceName: "aperture.fluxninja.v1.FluxNinjaService",
 	HandlerType: (*FluxNinjaServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -98,7 +98,7 @@ var FluxNinjaService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "aperture/extensions/fluxninja/v1/heartbeat.proto",
+	Metadata: "aperture/fluxninja/v1/heartbeat.proto",
 }
 
 // ControllerInfoServiceClient is the client API for ControllerInfoService service.
@@ -118,7 +118,7 @@ func NewControllerInfoServiceClient(cc grpc.ClientConnInterface) ControllerInfoS
 
 func (c *controllerInfoServiceClient) GetControllerInfo(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ControllerInfo, error) {
 	out := new(ControllerInfo)
-	err := c.cc.Invoke(ctx, "/aperture.extensions.fluxninja.v1.ControllerInfoService/GetControllerInfo", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/aperture.fluxninja.v1.ControllerInfoService/GetControllerInfo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func _ControllerInfoService_GetControllerInfo_Handler(srv interface{}, ctx conte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/aperture.extensions.fluxninja.v1.ControllerInfoService/GetControllerInfo",
+		FullMethod: "/aperture.fluxninja.v1.ControllerInfoService/GetControllerInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ControllerInfoServiceServer).GetControllerInfo(ctx, req.(*emptypb.Empty))
@@ -173,7 +173,7 @@ func _ControllerInfoService_GetControllerInfo_Handler(srv interface{}, ctx conte
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ControllerInfoService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "aperture.extensions.fluxninja.v1.ControllerInfoService",
+	ServiceName: "aperture.fluxninja.v1.ControllerInfoService",
 	HandlerType: (*ControllerInfoServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -182,5 +182,5 @@ var ControllerInfoService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "aperture/extensions/fluxninja/v1/heartbeat.proto",
+	Metadata: "aperture/fluxninja/v1/heartbeat.proto",
 }

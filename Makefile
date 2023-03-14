@@ -96,7 +96,7 @@ pre-commit-checks:
 
 extensions_md5sum:
 	@echo Resetting extensions.go checksum
-	@scripts/precommit/check_extensions_go.sh generate
+	@scripts/precommit/check-extensions-go.sh generate
 
 all: install-asdf-tools install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs generate-helm-readme generate-blueprints helm-lint pre-commit-checks
 	@echo "Done"

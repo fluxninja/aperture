@@ -39,7 +39,7 @@ message ListServicesControllerResponse {
 message ListFlowControlPointsRequest {}
 
 message ListFlowControlPointsAgentResponse {
-  repeated aperture.flowcontrol.controlpoints.v1.FlowControlPoint flow_control_points = 1;
+  aperture.flowcontrol.controlpoints.v1.FlowControlPoints flow_control_points = 1;
   // FIXME: Remove. Controller should be aware which agent group agent belongs to.
   string agent_group = 2;
 }
@@ -52,7 +52,7 @@ message ListFlowControlPointsControllerResponse {
 message ListAutoScaleControlPointsRequest {}
 
 message ListAutoScaleControlPointsAgentResponse {
-  repeated aperture.autoscale.kubernetes.controlpoints.v1.AutoScaleKubernetesControlPoint auto_scale_control_points = 1;
+  aperture.autoscale.kubernetes.controlpoints.v1.AutoScaleKubernetesControlPoints auto_scale_control_points = 1;
   string agent_group = 2;
 }
 

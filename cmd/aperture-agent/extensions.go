@@ -4,10 +4,6 @@ import (
 	"go.uber.org/fx"
 )
 
-func PlatformModule() fx.Option {
-	return fx.Options()
-}
-
-func AgentModule() fx.Option {
+func Module() fx.Option {
 	return fx.Options()
 }

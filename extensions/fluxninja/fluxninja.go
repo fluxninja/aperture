@@ -16,22 +16,12 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-// PlatformModule returns the FluxNinja extension module for the platform.
-func PlatformModule() fx.Option {
+// Module returns the FluxNinja extension module for the platform.
+func Module() fx.Option {
 	log.Info().Msg("Loading FluxNinjaExtension")
 	return fx.Options(
 		heartbeats.Module(),
 		otel.Module(),
 		extconfig.Module(),
 	)
-}
-
-// AgentModule returns the FluxNinja extension module for the agent.
-func AgentModule() fx.Option {
-	return fx.Options()
-}
-
-// ControllerModule returns the FluxNinja extension module for the controller.
-func ControllerModule() fx.Option {
-	return fx.Options()
 }

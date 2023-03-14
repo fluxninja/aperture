@@ -11,7 +11,7 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 
-	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/extensions/fluxninja/v1"
+	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/fluxninja/v1"
 	"github.com/fluxninja/aperture/extensions/fluxninja/extconfig"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/cache"

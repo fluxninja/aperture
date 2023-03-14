@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package aperture.extensions.fluxninja.v1;
+package aperture.fluxninja.v1;
 
 import "aperture/autoscale/kubernetes/controlpoints/v1/controlpoints.proto";
 import "aperture/flowcontrol/controlpoints/v1/controlpoints.proto";
@@ -16,14 +16,8 @@ service FluxNinjaService {
   // Report accepts information about agents' health and applied configurations/policies.
   rpc Report(ReportRequest) returns (ReportResponse) {
     option (google.api.http) = {
-      post: "/extensions/fluxninja/v1/report"
+      post: "/arc/v1/report"
       body: "*"
-      additional_bindings: [
-        {
-          post: "/plugins/fluxninja/v1/report"
-          body: "*"
-        }
-      ]
     };
   }
 }
@@ -31,7 +25,7 @@ service FluxNinjaService {
 // ControllerInfoService is used to read controllerID to which agent/controller belong.
 service ControllerInfoService {
   rpc GetControllerInfo(google.protobuf.Empty) returns (ControllerInfo) {
-    option (google.api.http) = {get: "/extensions/fluxninja/v1/controllerinfo"};
+    option (google.api.http) = {get: "/arc/v1/controllerinfo"};
   }
 }
 
@@ -45,8 +39,8 @@ message ReportRequest {
   ServicesList services_list = 8;
   aperture.status.v1.GroupStatus all_statuses = 9;
   aperture.policy.sync.v1.PolicyWrappers policies = 10;
-  repeated aperture.flowcontrol.controlpoints.v1.FlowControlPoint flow_control_points = 11;
-  repeated aperture.autoscale.kubernetes.controlpoints.v1.AutoScaleKubernetesControlPoint auto_scale_kubernetes_control_points = 12;
+  aperture.flowcontrol.controlpoints.v1.FlowControlPoints flow_control_points = 11;
+  aperture.autoscale.kubernetes.controlpoints.v1.AutoScaleKubernetesControlPoints auto_scale_kubernetes_control_points = 12;
   string installation_mode = 13;
 }
 

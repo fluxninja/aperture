@@ -54,7 +54,7 @@ func (h *Handler) ListFlowControlPoints(
 			continue
 		}
 
-		for _, protoCp := range resp.Success.FlowControlPoints {
+		for _, protoCp := range resp.Success.FlowControlPoints.FlowControlPoints {
 			gcp := selectors.ControlPointIDFromProto(protoCp).InAgentGroup(resp.Success.AgentGroup)
 			allControlPoints[gcp] = struct{}{}
 		}
@@ -116,7 +116,7 @@ func (h *Handler) ListAutoScaleControlPoints(
 			continue
 		}
 
-		for _, protoCp := range resp.Success.AutoScaleControlPoints {
+		for _, protoCp := range resp.Success.AutoScaleControlPoints.AutoScaleKubernetesControlPoints {
 			gcp := GlobalAutoScaleControlPointID{
 				AutoScaleControlPointID: AutoScaleControlPointIDFromProto(protoCp),
 				AgentGroup:              resp.Success.AgentGroup,
@@ -330,7 +330,7 @@ agentsLoop:
 			continue
 		}
 
-		for _, cpProto := range agent.Success.FlowControlPoints {
+		for _, cpProto := range agent.Success.FlowControlPoints.FlowControlPoints {
 			cp := selectors.ControlPointIDFromProto(cpProto)
 
 			if cp.ControlPoint != needle.ControlPoint {

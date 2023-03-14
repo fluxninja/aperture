@@ -2951,15 +2951,11 @@ definitions:
             all_statuses:
                 $ref: '#/definitions/GroupStatus'
             auto_scale_kubernetes_control_points:
-                items:
-                    $ref: '#/definitions/AutoScaleKubernetesControlPoint'
-                type: array
+                $ref: '#/definitions/AutoScaleKubernetesControlPoints'
             controller_info:
                 $ref: '#/definitions/ControllerInfo'
             flow_control_points:
-                items:
-                    $ref: '#/definitions/FlowControlPoint'
-                type: array
+                $ref: '#/definitions/FlowControlPoints'
             host_info:
                 $ref: '#/definitions/HostInfo'
             installation_mode:
@@ -3836,7 +3832,7 @@ info:
     title: Aperture API
     version: "1.0"
 paths:
-    /extensions/fluxninja/v1/controllerinfo:
+    /arc/v1/controllerinfo:
         get:
             operationId: ControllerInfoService_GetControllerInfo
             responses:
@@ -3850,30 +3846,9 @@ paths:
                         $ref: '#/definitions/googlerpcStatus'
             tags:
                 - ControllerInfoService
-    /extensions/fluxninja/v1/report:
+    /arc/v1/report:
         post:
             operationId: FluxNinjaService_Report
-            parameters:
-                - in: body
-                  name: body
-                  required: true
-                  schema:
-                    $ref: '#/definitions/ReportRequest'
-            responses:
-                "200":
-                    description: A successful response.
-                    schema:
-                        $ref: '#/definitions/ReportResponse'
-                default:
-                    description: An unexpected error response.
-                    schema:
-                        $ref: '#/definitions/googlerpcStatus'
-            summary: Report accepts information about agents' health and applied configurations/policies.
-            tags:
-                - FluxNinjaService
-    /plugins/fluxninja/v1/report:
-        post:
-            operationId: FluxNinjaService_Report2
             parameters:
                 - in: body
                   name: body
@@ -4197,11 +4172,11 @@ tags:
     - name: FlowPreviewService
     - name: Controller
     - name: DistCacheService
+    - name: FlowControlService
     - name: InfoService
     - name: PeerDiscoveryService
     - name: PolicyService
     - name: StatusService
     - name: FluxNinjaService
     - name: ControllerInfoService
-    - name: FlowControlService
     - name: Coordinator

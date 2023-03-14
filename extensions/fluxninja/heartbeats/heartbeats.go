@@ -17,7 +17,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/extensions/fluxninja/v1"
+	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/fluxninja/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/extensions/fluxninja/extconfig"
 	"github.com/fluxninja/aperture/pkg/agentinfo"

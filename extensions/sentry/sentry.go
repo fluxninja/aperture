@@ -13,21 +13,11 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-// PlatformModule returns the Sentry extension module for the platform.
-func PlatformModule() fx.Option {
+// Module returns the Sentry extension module for the platform.
+func Module() fx.Option {
 	log.Info().Msg("Loading Sentry Extension")
 	constructor := &sentryWriterConstructor{ConfigKey: "sentry"}
 	return fx.Options(
 		constructor.annotate(),
 	)
-}
-
-// AgentModule returns the Sentry extension module for the agent.
-func AgentModule() fx.Option {
-	return fx.Options()
-}
-
-// ControllerModule returns the Sentry extension module for the controller.
-func ControllerModule() fx.Option {
-	return fx.Options()
 }

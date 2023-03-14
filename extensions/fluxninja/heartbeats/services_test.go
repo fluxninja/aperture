@@ -5,7 +5,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
-	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/extensions/fluxninja/v1"
+	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/fluxninja/v1"
 	"github.com/fluxninja/aperture/pkg/discovery/entities"
 )
 

@@ -70,26 +70,16 @@ import (
 {{- end }}
 )
 
-func PlatformModule() fx.Option {
+func Module() fx.Option {
   return fx.Options(
     {{- range .Extensions }}
-    {{ .PkgName }}.PlatformModule(),
+    {{ .PkgName }}.Module(),
     {{- end }}
     {{- range .BundledExtensions }}
-    {{ .Name }}.PlatformModule(),
+    {{ .Name }}.Module(),
     {{- end }}
   )
 }
-
-func {{ .ModuleName }}Module() fx.Option {
-  return fx.Options(
-    {{- range .Extensions }}
-    {{ .PkgName }}.{{ $.ModuleName }}Module(),
-    {{- end }}
-    {{- range .BundledExtensions }}
-    {{ .Name }}.{{ $.ModuleName }}Module(),
-    {{- end }}
-  )
 }`
 
 func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
@@ -124,8 +114,8 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 		}
 		if cfg.EnableCoreExtensions {
 			// add fluxninja and sentry to the list of extensions if they are not already there
-			if !autils.SliceContains(cfg.BundledExtensions, "fluxninja") {
-				cfg.BundledExtensions = append(cfg.BundledExtensions, "fluxninja")
+			if !autils.SliceContains(cfg.BundledExtensions, "arc") {
+				cfg.BundledExtensions = append(cfg.BundledExtensions, "arc")
 			}
 			if !autils.SliceContains(cfg.BundledExtensions, "sentry") {
 				cfg.BundledExtensions = append(cfg.BundledExtensions, "sentry")
@@ -207,7 +197,7 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 		}
 
 		// generate code using templates that calls the extension's module's
-		// PlatformModule(), AgentModule(), ControllerModule() functions
+		// Module() functions
 		// keep the code in cmd/aperture-agent/extensions.go and cmd/aperture-controller/extensions.go
 		// Note: local extensions are in ./extension and we can use replace directives to point to their local paths
 
@@ -218,7 +208,7 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 			return err
 		}
 		defer utils.RestoreFile(agentExtensionsFile)
-		err = generateExtensionsCode("Agent", agentExtensionsFile)
+		err = generateExtensionsCode(agentExtensionsFile)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to generate agent extensions code")
 			return err
@@ -231,7 +221,7 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 			return err
 		}
 		defer utils.RestoreFile(controllerExtensionsFile)
-		err = generateExtensionsCode("Controller", controllerExtensionsFile)
+		err = generateExtensionsCode(controllerExtensionsFile)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to generate controller extensions code")
 			return err
@@ -367,7 +357,7 @@ func getLdFlags(service string) (string, error) {
 	return ldFlagsFinal, nil
 }
 
-func generateExtensionsCode(moduleName string, dest string) error {
+func generateExtensionsCode(dest string) error {
 	// create the destination file
 	f, err := os.Create(dest)
 	if err != nil {
@@ -379,14 +369,12 @@ func generateExtensionsCode(moduleName string, dest string) error {
 	t := template.Must(template.New("extensions").Parse(extensionsTpl))
 
 	data := struct {
-		ModuleName        string
 		Extensions        []ExtensionConfig
 		BundledExtensions []struct {
 			Name      string
 			GoModName string
 		}
 	}{
-		ModuleName: moduleName,
 		Extensions: cfg.Extensions,
 	}
 	// add bundled extensions which are local and their path is extensions/<name>
