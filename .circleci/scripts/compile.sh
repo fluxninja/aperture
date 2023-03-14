@@ -15,13 +15,13 @@ export PATH="$PATH:$GOPATH/bin"
 
 case "${1:-}" in
 agent)
-	./scripts/build_aperturectl.sh
-	./cmd/aperturectl/aperturectl build agent --output-dir ./dist --uri .
+	aperturectl="$(./scripts/build_aperturectl.sh)"
+	"$aperturectl" build agent --output-dir ./dist --uri .
 	;;
 cli)
-	./scripts/build_aperturectl.sh
+	aperturectl="$(./scripts/build_aperturectl.sh)"
 	mkdir -p ./dist
-	cp ./cmd/aperturectl/aperturectl ./dist/aperturectl
+	cp "$aperturectl" ./dist/aperturectl
 	;;
 *)
 	printf "UNKNOWN COMPONENT '%s' - valid are 'agent', 'cli'.\n" "${1:-}"
