@@ -100,6 +100,11 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 		}
 
 		blueprintsDir = filepath.Join(blueprintsURIRoot, utils.GetRelPath(blueprintsURIRoot))
+		// resolve symlink
+		blueprintsDir, err = filepath.EvalSymlinks(blueprintsDir)
+		if err != nil {
+			return err
+		}
 		return nil
 	},
 	PersistentPostRun: func(_ *cobra.Command, _ []string) {

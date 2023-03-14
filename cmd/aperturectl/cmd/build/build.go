@@ -204,6 +204,7 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 
 		// execute go mod tidy
 		goModTidyCmd := exec.Command("go", "mod", "tidy")
+		goModTidyCmd.Dir = builderDir
 		goModTidyCmd.Stdout = os.Stdout
 		goModTidyCmd.Stderr = os.Stderr
 		err = goModTidyCmd.Run()

@@ -104,6 +104,11 @@ var BuildCmd = &cobra.Command{
 		}
 
 		builderDir = filepath.Join(builderURIRoot, utils.GetRelPath(builderURIRoot))
+		// if builderDir is a symlink, resolve it
+		builderDir, err = filepath.EvalSymlinks(builderDir)
+		if err != nil {
+			return err
+		}
 		return nil
 	},
 }
