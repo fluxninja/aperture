@@ -229,3 +229,4 @@ playground/tilt_local.json
 
 # do not ignore cmd/aperturectl/cmd/build
 !cmd/aperturectl/cmd/build
+!docs/content/reference/aperturectl/build
