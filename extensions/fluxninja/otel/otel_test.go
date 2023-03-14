@@ -47,6 +47,7 @@ var _ = DescribeTable("FN Extension OTEL", func(
 	opts := fx.Options(
 		grpcclient.ClientConstructor{Name: "heartbeats-grpc-client", ConfigKey: extconfig.ExtensionConfigKey + ".client.grpc"}.Annotate(),
 		httpclient.ClientConstructor{Name: "heartbeats-http-client", ConfigKey: extconfig.ExtensionConfigKey + ".client.http"}.Annotate(),
+		extconfig.Module(),
 		fx.Provide(
 			func() config.Unmarshaller {
 				return unmarshaller
