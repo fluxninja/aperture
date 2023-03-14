@@ -20,6 +20,7 @@ agent)
 	;;
 cli)
 	./scripts/build_aperturectl.sh
+	mkdir -p ./dist
 	cp ./cmd/aperturectl/aperturectl ./dist/aperturectl
 	;;
 *)
