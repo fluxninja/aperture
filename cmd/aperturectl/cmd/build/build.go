@@ -204,7 +204,6 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 
 		// execute go mod tidy
 		goModTidyCmd := exec.Command("go", "mod", "tidy")
-		goModTidyCmd.Dir = builderDir
 		goModTidyCmd.Stdout = os.Stdout
 		goModTidyCmd.Stderr = os.Stderr
 		err = goModTidyCmd.Run()
@@ -232,7 +231,7 @@ func buildBinary(service string, ldFlags, flags []string) error {
 	}
 	flagsFinal := strings.Join(flags, " ")
 
-	cmdString := fmt.Sprintf("go env && go build -o %s %s %s", service, ldFlagsFinal, flagsFinal)
+	cmdString := fmt.Sprintf("go build -o %s %s %s", service, ldFlagsFinal, flagsFinal)
 
 	buildCmd := exec.Command("bash", "-c", cmdString)
 	buildCmd.Dir = filepath.Join(builderDir, "cmd", service)
@@ -304,7 +303,7 @@ func getLdFlags(service string, ldFlags []string) (string, error) {
 		return "", err
 	}
 	// add all the ldflags
-	ldFlagsFinal := "--ldflags \""
+	ldFlagsFinal := "--ldflags \"-s -w -extldflags \"-Wl,--allow-multiple-definition\" "
 	for _, flag := range ldFlags {
 		ldFlagsFinal += fmt.Sprintf("%s ", flag)
 	}

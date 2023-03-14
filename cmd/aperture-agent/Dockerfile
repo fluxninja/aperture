@@ -34,15 +34,13 @@ RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.aperturectl,sharing=private \
   ./cmd/aperturectl/aperturectl build agent -c ./config.yaml -o . --uri .
 
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+# Final image
+FROM debian:bullseye-slim AS agent
 
-# # Final image
-# FROM debian:bullseye-slim AS agent
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
-# RUN apt-get update \
-#   && apt-get install -y --no-install-recommends ca-certificates \
-#   && apt-get clean \
-#   && rm -rf /var/lib/apt/lists/*
-
-# COPY --link --from=builder /aperture-agent /aperture-agent
-# CMD ["/aperture-agent"]
+COPY --link --from=builder /aperture-agent /aperture-agent
+CMD ["/aperture-agent"]
