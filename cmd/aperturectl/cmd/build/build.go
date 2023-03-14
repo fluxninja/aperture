@@ -39,8 +39,8 @@ type BuildConfig struct {
 type ExtensionConfig struct {
 	// GoModName. e.g. github.com/fluxninja/aperture-extensions/extension/test
 	GoModName string `json:"go_mod_name" validate:"required"`
-	// Import path e.g. github.com/fluxninja/aperture-extensions/extension/test v0.0.1.
-	ImportPath string `json:"import_path" validate:"required"`
+	// Version e.g. v0.0.1
+	Version string `json:"version" validate:"required"`
 	// PkgName name of the extension. e.g. test
 	PkgName string `json:"pkg_name"`
 }
@@ -185,7 +185,7 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 				log.Error().Err(err).Msg("failed to get go package name")
 				return err
 			}
-			err = apertureGoModFile.AddModuleStmt(ext.ImportPath)
+			err = apertureGoModFile.AddModuleStmt(ext.GoModName + " " + ext.Version)
 		}
 		// add the replace directive to the final go.mod
 		for _, replace := range cfg.Replaces {
