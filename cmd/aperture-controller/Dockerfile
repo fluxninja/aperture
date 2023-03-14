@@ -22,7 +22,6 @@ RUN if [[ -f "${APERTURECTL_BUILD_BUILDER_CONFIG_FILE}" ]]; then \
   touch ./config.yaml; \
   fi
 
-
 RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.cache/go-build/,id=controller-1.19.6,sharing=private \
   --mount=type=cache,target=/root/.aperturectl,id=controller-1.19.6,sharing=private \
@@ -41,4 +40,5 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 COPY --link --from=builder /aperture-controller /aperture-controller
+
 CMD ["/aperture-controller"]
