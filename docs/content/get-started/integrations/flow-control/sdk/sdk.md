@@ -31,6 +31,7 @@ SDKs</a> for popular languages, such as :-
 - [Golang][golang]
 - [Java][java]
 - [JavaScript][javascript]
+- [Python][python]
 
 Aperture SDK allows you to manually wrap any function call or code snippet
 inside the Service code as a Feature Control Point. Every invocation of the
@@ -46,3 +47,4 @@ traffic Control Points within your service.
 [golang]: ./go/manual.md
 [java]: ./java/manual.md
 [javascript]: ./javascript/manual.md
+[python]: ./python/manual.md
