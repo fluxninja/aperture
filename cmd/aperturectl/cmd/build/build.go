@@ -346,7 +346,12 @@ func getLdFlags(service string) (string, error) {
 	}
 
 	// add all the ldflags
-	ldFlagsFinal := "--ldflags \"-s -w -extldflags \"-Wl,--allow-multiple-definition\" "
+	// check if we are on Linux
+	ldFlagsFinal := "--ldflags \"-s -w "
+	if strings.TrimSpace(string(goosOut)) == "linux" {
+		ldFlagsFinal += "-extldflags \"-Wl,--allow-multiple-definition\" "
+	}
+
 	for _, flag := range cfg.LdFlags {
 		ldFlagsFinal += fmt.Sprintf("%s ", flag)
 	}

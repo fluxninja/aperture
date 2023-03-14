@@ -40,8 +40,10 @@ type SentryConfig struct {
 	Disabled bool `json:"disabled" default:"false"`
 }
 
-// SentryWriterConstructor holds fields to create an annotated instance of Sentry Writer.
-type SentryWriterConstructor struct {
+// sentryWriterConstructor holds fields to create an annotated instance of Sentry Writer.
+type sentryWriterConstructor struct {
+	// sentryWriter
+	sentryWriter *sentryWriter
 	// Name of sentry instance
 	Name string
 	// Config key
@@ -50,8 +52,8 @@ type SentryWriterConstructor struct {
 	DefaultConfig SentryConfig
 }
 
-// Annotate creates an annotated instance of SentryWriter.
-func (constructor SentryWriterConstructor) Annotate() fx.Option {
+// annotate creates an annotated instance of SentryWriter.
+func (constructor *sentryWriterConstructor) annotate() fx.Option {
 	var group string
 	if constructor.Name == "" {
 		group = config.GroupTag("main-logger")
@@ -65,12 +67,12 @@ func (constructor SentryWriterConstructor) Annotate() fx.Option {
 				fx.ResultTags(group),
 			),
 		),
+		fx.Invoke(constructor.setupSentryWriter),
 	)
 }
 
-func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller,
+func (constructor *sentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
-	statusRegistry status.Registry,
 ) (io.Writer, error) {
 	config := constructor.DefaultConfig
 
@@ -85,7 +87,7 @@ func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller conf
 
 	sentryWriter, _ := newSentryWriter(config)
 
-	sentryWriter.statusRegistry = statusRegistry
+	constructor.sentryWriter = sentryWriter
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
@@ -100,6 +102,10 @@ func (constructor SentryWriterConstructor) provideSentryWriter(unmarshaller conf
 	})
 
 	return sentryWriter, nil
+}
+
+func (constructor *sentryWriterConstructor) setupSentryWriter(registry status.Registry) {
+	constructor.sentryWriter.statusRegistry = registry
 }
 
 // newSentryWriter creates a new SentryWriter instance with Sentry Client and registers panic handler.

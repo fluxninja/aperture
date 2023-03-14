@@ -16,8 +16,9 @@ import (
 // PlatformModule returns the Sentry extension module for the platform.
 func PlatformModule() fx.Option {
 	log.Info().Msg("Loading Sentry Extension")
+	constructor := &sentryWriterConstructor{ConfigKey: "sentry"}
 	return fx.Options(
-		SentryWriterConstructor{ConfigKey: "sentry"}.Annotate(),
+		constructor.annotate(),
 	)
 }
 
