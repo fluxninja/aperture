@@ -12,9 +12,8 @@ ENV APERTURECTL_BUILD_GIT_COMMIT_HASH=${APERTURECTL_BUILD_GIT_COMMIT_HASH}
 ARG APERTURECTL_BUILD_GIT_BRANCH
 ENV APERTURECTL_BUILD_GIT_BRANCH=${APERTURECTL_BUILD_GIT_BRANCH}
 
-# if config_file exists, then mv it to config.yaml, otherwise use create empty config.yaml
-ARG config_file
-RUN if [ -f "${config_file}" ]; then cat "${config_file}" > config.yaml; else touch config.yaml; fi
+# if config.yaml doesn't exist, create empty config.yaml
+RUN if [ ! -f "config.yaml" ]; then touch config.yaml; fi
 
 RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.cache/go-build/,id=agent-1.19.6,sharing=private \
