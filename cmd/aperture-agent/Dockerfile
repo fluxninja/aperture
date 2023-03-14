@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4
-FROM golang:1.19.6-bullseye AS base
+FROM golang:1.19.6-bullseye AS builder
 
 WORKDIR /src
 COPY --link . .
@@ -7,37 +7,42 @@ COPY --link . .
 RUN --mount=type=cache,target=/go/pkg/ \
   go mod download
 
-FROM base AS builder
+# build aperturectl
+RUN --mount=type=cache,target=/go/pkg/ \
+  --mount=type=cache,target=/root/.cache/go-build/,id=agent-1.19.6,sharing=private \
+  go build -o cmd/aperturectl/aperturectl ./cmd/aperturectl
 
 # App build
-ARG GIT_COMMIT_HASH
-ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
-ARG GIT_BRANCH
-ENV GIT_BRANCH=${GIT_BRANCH}
-ARG VERSION
-ENV VERSION=${VERSION}
-ARG RACE
-ENV RACE=${RACE}
-ARG BUILD_TIME="$(date -Iseconds)"
-ENV BUILD_TIME=${BUILD_TIME}
+ARG APERTURE_GIT_COMMIT_HASH
+ENV APERTURE_GIT_COMMIT_HASH=${APERTURE_GIT_COMMIT_HASH}
+ARG APERTURE_GIT_BRANCH
+ENV APERTURE_GIT_BRANCH=${APERTURE_GIT_BRANCH}
+ARG CONFIG_FILE
+ENV CONFIG_FILE=${CONFIG_FILE}
 
-RUN --mount=type=cache,target=/go/pkg/,readonly \
+# If config file exists, copy it to the build context
+RUN if [[ -f "${CONFIG_FILE}" ]]; then \
+  cp "${CONFIG_FILE}" ./config.yaml; \
+  else \
+  echo "CONFIG_FILE is not set"; \
+  echo "bundled_extensions: [fluxninja, sentry]" > ./config.yaml; \
+  fi
+
+
+RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.cache/go-build/,id=agent-1.19.6,sharing=private \
-  /bin/bash -c \
-  'set -euo pipefail; \
-  shopt -s nullglob; \
-  CGO_ENABLED=1 TARGET="/aperture-agent" PREFIX="aperture" SOURCE="./cmd/aperture-agent" \
-  LDFLAGS="-extldflags \"-Wl,--allow-multiple-definition\"" \
-  ./pkg/info/build.sh;\
-  '
+  --mount=type=cache,target=/root/.aperturectl,sharing=private \
+  ./cmd/aperturectl/aperturectl build agent -c ./config.yaml -o . --uri .
 
-# Final image
-FROM debian:bullseye-slim AS agent
+ENTRYPOINT ["tail", "-f", "/dev/null"]
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+# # Final image
+# FROM debian:bullseye-slim AS agent
 
-COPY --link --from=builder /aperture-agent /aperture-agent
-CMD ["/aperture-agent"]
+# RUN apt-get update \
+#   && apt-get install -y --no-install-recommends ca-certificates \
+#   && apt-get clean \
+#   && rm -rf /var/lib/apt/lists/*
+
+# COPY --link --from=builder /aperture-agent /aperture-agent
+# CMD ["/aperture-agent"]

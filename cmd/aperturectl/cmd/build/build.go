@@ -8,23 +8,29 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/spf13/cobra"
+	"golang.org/x/mod/modfile"
+
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/spf13/cobra"
-	"golang.org/x/mod/modfile"
 )
 
-// subcommand to build Agent and Controller binaries
+var (
+	buildConfigFile string
+	outputDir       string
+)
 
+// BuildConfig is the configuration for building the binary.
 type BuildConfig struct {
-	BundledExtensions []BundledExtensionConfig `json:"bundled_extensions"`
-	Extensions        []ExtensionConfig        `json:"extensions"`
-	Replaces          []ReplaceConfig          `json:"replaces"`
-	LdFlags           []string                 `json:"ldflags"`
-	Flags             []string                 `json:"flags"`
+	BundledExtensions []string          `json:"bundled_extensions"`
+	Extensions        []ExtensionConfig `json:"extensions"`
+	Replaces          []ReplaceConfig   `json:"replaces"`
+	LdFlags           []string          `json:"ldflags"`
+	Flags             []string          `json:"flags"`
 }
 
+// ExtensionConfig is the configuration for an extension.
 type ExtensionConfig struct {
 	// GoModName. e.g. github.com/fluxninja/aperture-extensions/extension/test
 	GoModName string `json:"go_mod_name" validate:"required"`
@@ -34,24 +40,10 @@ type ExtensionConfig struct {
 	PkgName string `json:"pkg_name"`
 }
 
-type BundledExtensionConfig struct {
-	// Name of the extension. e.g. test
-	Name string `json:"name" validate:"required"`
-}
-
+// ReplaceConfig is the configuration for a replace directive.
 type ReplaceConfig struct {
 	Old string `json:"old" validate:"required"`
 	New string `json:"new" validate:"required"`
-}
-
-var (
-	buildConfigFile string
-	outputDir       string
-)
-
-func init() {
-	binariesCmd.Flags().StringVarP(&buildConfigFile, "config", "c", "", "path to the build configuration file")
-	binariesCmd.Flags().StringVarP(&outputDir, "output-dir", "o", "", "path to the output directory")
 }
 
 const extensionsTpl = `package main
@@ -88,11 +80,8 @@ func {{ .ModuleName }}Module() fx.Option {
   )
 }`
 
-var binariesCmd = &cobra.Command{
-	Use:   "binaries",
-	Short: "Build binaries for Aperture",
-	Long:  "Build binaries for Aperture",
-	RunE: func(_ *cobra.Command, _ []string) error {
+func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
+	return func(_ *cobra.Command, _ []string) error {
 		if buildConfigFile == "" {
 			return fmt.Errorf("build config file is required")
 		}
@@ -214,26 +203,25 @@ var binariesCmd = &cobra.Command{
 		}
 
 		// execute go mod tidy
-		err = exec.Command("go", "mod", "tidy").Run()
+		goModTidyCmd := exec.Command("go", "mod", "tidy")
+		goModTidyCmd.Dir = builderDir
+		goModTidyCmd.Stdout = os.Stdout
+		goModTidyCmd.Stderr = os.Stderr
+		err = goModTidyCmd.Run()
 		if err != nil {
 			log.Error().Err(err).Msg("failed to execute go mod tidy")
 			return err
 		}
 
 		// build binaries
-		err = buildBinary("aperture-agent", cfg.LdFlags, cfg.Flags)
+		err = buildBinary(cmd, cfg.LdFlags, cfg.Flags)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to build agent binary")
 			return err
 		}
-		err = buildBinary("aperture-controller", cfg.LdFlags, cfg.Flags)
-		if err != nil {
-			log.Error().Err(err).Msg("failed to build controller binary")
-			return err
-		}
 
 		return nil
-	},
+	}
 }
 
 func buildBinary(service string, ldFlags, flags []string) error {
@@ -244,7 +232,7 @@ func buildBinary(service string, ldFlags, flags []string) error {
 	}
 	flagsFinal := strings.Join(flags, " ")
 
-	cmdString := fmt.Sprintf("go build -o %s %s %s", service, ldFlagsFinal, flagsFinal)
+	cmdString := fmt.Sprintf("go env && go build -o %s %s %s", service, ldFlagsFinal, flagsFinal)
 
 	buildCmd := exec.Command("bash", "-c", cmdString)
 	buildCmd.Dir = filepath.Join(builderDir, "cmd", service)
@@ -258,6 +246,12 @@ func buildBinary(service string, ldFlags, flags []string) error {
 		return err
 	}
 
+	// remove the existing binary if it exists
+	err = os.Remove(filepath.Join(outputDir, service))
+	if err != nil && !os.IsNotExist(err) {
+		log.Error().Err(err).Msg("failed to remove existing binary")
+		return err
+	}
 	err = os.Rename(filepath.Join(buildCmd.Dir, service), filepath.Join(outputDir, service))
 	if err != nil {
 		log.Error().Err(err).Msg("failed to move binary")
@@ -295,19 +289,13 @@ func getLdFlags(service string, ldFlags []string) (string, error) {
 	if prefix == "" {
 		prefix = "aperture"
 	}
-	// git branch is 'cd $builderDir && git rev-parse --abbrev-ref HEAD'
-	gitBranch := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
-	gitBranch.Dir = builderDir
-	gitBranchOut, err := gitBranch.Output()
-	if err != nil {
-		return "", err
+	gitBranch := os.Getenv("APERTURE_GIT_BRANCH")
+	if gitBranch == "" {
+		gitBranch = "undefined"
 	}
-	// git commit hash is 'cd $builderDir && git rev-parse HEAD'
-	gitCommitHash := exec.Command("git", "rev-parse", "HEAD")
-	gitCommitHash.Dir = builderDir
-	gitCommitHashOut, err := gitCommitHash.Output()
-	if err != nil {
-		return "", err
+	gitCommitHash := os.Getenv("APERTURE_GIT_COMMIT_HASH")
+	if gitCommitHash == "" {
+		gitCommitHash = "undefined"
 	}
 	// build time is 'date -Iseconds'
 	buildTime := exec.Command("date", "-Iseconds")
@@ -324,8 +312,8 @@ func getLdFlags(service string, ldFlags []string) (string, error) {
 	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.BuildOS=%s/%s' ", strings.TrimSpace(string(goosOut)), strings.TrimSpace(string(goarchOut)))
 	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.BuildHost=%s' ", strings.TrimSpace(string(hostnameOut)))
 	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.BuildTime=%s' ", strings.TrimSpace(string(buildTimeOut)))
-	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.GitBranch=%s' ", strings.TrimSpace(string(gitBranchOut)))
-	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.GitCommitHash=%s' ", strings.TrimSpace(string(gitCommitHashOut)))
+	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.GitBranch=%s' ", strings.TrimSpace(string(gitBranch)))
+	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.GitCommitHash=%s' ", strings.TrimSpace(string(gitCommitHash)))
 	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.Prefix=%s' ", prefix)
 	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.Service=%s'", service)
 	ldFlagsFinal += "\"" // close the ldflags
@@ -360,8 +348,8 @@ func generateExtensionsCode(cfg BuildConfig, moduleName string, apertureModuleNa
 			Name      string
 			GoModName string
 		}{
-			Name:      ext.Name,
-			GoModName: apertureModuleName + "/extensions/" + ext.Name,
+			Name:      ext,
+			GoModName: apertureModuleName + "/extensions/" + ext,
 		})
 	}
 

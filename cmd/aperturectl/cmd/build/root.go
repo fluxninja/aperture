@@ -7,9 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/spf13/cobra"
 )
 
 // builder builds agent or controller binaries.
@@ -43,9 +44,11 @@ func init() {
 	BuildCmd.PersistentFlags().StringVar(&apertureVersion, "version", defaultApertureVersion, "Version of Aperture, e.g. latest. This field should not be provided when the URI is provided")
 	BuildCmd.PersistentFlags().StringVar(&apertureURI, "uri", "", "URI of Aperture repository, could be a local path or a remote git repository, e.g. github.com/fluxninja/aperture@latest. This field should not be provided when the Version is provided.")
 	BuildCmd.PersistentFlags().BoolVar(&skipPull, "skip-pull", false, "Skip pulling the repository update.")
-	BuildCmd.AddCommand(binariesCmd)
+	BuildCmd.AddCommand(agentCmd)
+	BuildCmd.AddCommand(controllerCmd)
 }
 
+// BuildCmd is the root command for the build command.
 var BuildCmd = &cobra.Command{
 	Use:   "build",
 	Short: "Builds the agent and controller binaries",
