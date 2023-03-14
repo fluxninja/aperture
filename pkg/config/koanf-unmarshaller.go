@@ -15,7 +15,6 @@ import (
 	koanfjson "github.com/knadh/koanf/parsers/json"
 	koanfyaml "github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/confmap"
-	"github.com/knadh/koanf/providers/env"
 	"github.com/knadh/koanf/providers/posflag"
 	"github.com/knadh/koanf/providers/rawbytes"
 	"github.com/mitchellh/mapstructure"
@@ -206,15 +205,6 @@ func (u *KoanfUnmarshaller) Reload(bytes []byte) error {
 	if err != nil {
 		log.Error().Err(err).Msg("failed to load")
 		return err
-	}
-
-	if u.enableEnv {
-		err = k.Load(env.Provider(EnvPrefix, k.Delim(), func(s string) string {
-			return strings.TrimPrefix(s, EnvPrefix)
-		}), nil)
-		if err != nil {
-			return err
-		}
 	}
 
 	if u.mergeConfig != nil {

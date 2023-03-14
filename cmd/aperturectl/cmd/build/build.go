@@ -21,17 +21,15 @@ var (
 	buildConfigFile   string
 	outputDir         string
 	apertureGoModName string
-	builderCfg        Config
-	cfg               BuildConfig
+	cfg               Config
 )
 
-// BuildConfig is the configuration for building the binary.
-type BuildConfig struct {
+// Config is the configuration for building the binary.
+type Config struct {
+	Build                BuildConfig       `json:"build"`
 	BundledExtensions    []string          `json:"bundled_extensions"`
 	Extensions           []ExtensionConfig `json:"extensions"`
 	Replaces             []ReplaceConfig   `json:"replaces"`
-	LdFlags              []string          `json:"ldflags"`
-	Flags                []string          `json:"flags"`
 	EnableCoreExtensions bool              `json:"enable_core_extensions" default:"true"`
 }
 
@@ -51,11 +49,13 @@ type ReplaceConfig struct {
 	New string `json:"new" validate:"required"`
 }
 
-// Config picked up from environment variables.
-type Config struct {
-	Version       string `json:"version" default:"unknown"`
-	GitCommitHash string `json:"git_commit_hash"`
-	GitBranch     string `json:"git_branch"`
+// BuildConfig picked up from environment variables.
+type BuildConfig struct {
+	Version       string   `json:"version" default:"unknown"`
+	GitCommitHash string   `json:"git_commit_hash"`
+	GitBranch     string   `json:"git_branch"`
+	LdFlags       []string `json:"ldflags"`
+	Flags         []string `json:"flags"`
 }
 
 const extensionsTpl = `package main
@@ -79,7 +79,6 @@ func Module() fx.Option {
     {{ .Name }}.Module(),
     {{- end }}
   )
-}
 }`
 
 func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
@@ -98,24 +97,20 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 
 		unmarshaller, err := config.KoanfUnmarshallerConstructor{
 			EnableEnv: true,
-		}.NewKoanfUnmarshaller(nil)
+		}.NewKoanfUnmarshaller(configBytes)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to create unmarshaller")
 			return err
 		}
-		if err = unmarshaller.UnmarshalKey("build", &builderCfg); err != nil {
+		if err = unmarshaller.Unmarshal(&cfg); err != nil {
 			log.Error().Err(err).Msg("failed to unmarshal builder config")
 			return err
 		}
 
-		if err = config.UnmarshalYAML(configBytes, &cfg); err != nil {
-			log.Error().Err(err).Msg("failed to unmarshal build config file")
-			return err
-		}
 		if cfg.EnableCoreExtensions {
 			// add fluxninja and sentry to the list of extensions if they are not already there
-			if !autils.SliceContains(cfg.BundledExtensions, "arc") {
-				cfg.BundledExtensions = append(cfg.BundledExtensions, "arc")
+			if !autils.SliceContains(cfg.BundledExtensions, "fluxninja") {
+				cfg.BundledExtensions = append(cfg.BundledExtensions, "fluxninja")
 			}
 			if !autils.SliceContains(cfg.BundledExtensions, "sentry") {
 				cfg.BundledExtensions = append(cfg.BundledExtensions, "sentry")
@@ -256,7 +251,7 @@ func buildBinary(service string) error {
 		return err
 	}
 
-	flagsFinal := strings.Join(cfg.Flags, " ")
+	flagsFinal := strings.Join(cfg.Build.Flags, " ")
 
 	cmdString := fmt.Sprintf("go build -o %s %s %s", service, ldFlagsFinal, flagsFinal)
 
@@ -314,24 +309,24 @@ func getLdFlags(service string) (string, error) {
 	}
 
 	// if builderDir is a git project, find the git commit hash and branch
-	if builderCfg.GitCommitHash != "" && builderCfg.GitBranch != "" {
+	if cfg.Build.GitCommitHash != "" && cfg.Build.GitBranch != "" {
 		// git commit is 'git rev-parse HEAD'
 		gitCommit := exec.Command("git", "rev-parse", "HEAD")
 		gitCommit.Dir = builderDir
 		gitCommitOut, err := gitCommit.Output()
 		if err != nil {
-			builderCfg.GitCommitHash = "unknown"
+			cfg.Build.GitCommitHash = "unknown"
 		} else {
-			builderCfg.GitCommitHash = strings.TrimSpace(string(gitCommitOut))
+			cfg.Build.GitCommitHash = strings.TrimSpace(string(gitCommitOut))
 		}
 		// git branch is 'git rev-parse --abbrev-ref HEAD'
 		gitBranch := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
 		gitBranch.Dir = builderDir
 		gitBranchOut, err := gitBranch.Output()
 		if err != nil {
-			builderCfg.GitBranch = "unknown"
+			cfg.Build.GitBranch = "unknown"
 		} else {
-			builderCfg.GitBranch = strings.TrimSpace(string(gitBranchOut))
+			cfg.Build.GitBranch = strings.TrimSpace(string(gitBranchOut))
 		}
 	}
 
@@ -342,15 +337,15 @@ func getLdFlags(service string) (string, error) {
 		ldFlagsFinal += "-extldflags \"-Wl,--allow-multiple-definition\" "
 	}
 
-	for _, flag := range cfg.LdFlags {
+	for _, flag := range cfg.Build.LdFlags {
 		ldFlagsFinal += fmt.Sprintf("%s ", flag)
 	}
-	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.Version=%s' ", apertureGoModName, builderCfg.Version)
+	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.Version=%s' ", apertureGoModName, cfg.Build.Version)
 	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.BuildOS=%s/%s' ", apertureGoModName, strings.TrimSpace(string(goosOut)), strings.TrimSpace(string(goarchOut)))
 	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.BuildHost=%s' ", apertureGoModName, strings.TrimSpace(string(hostnameOut)))
 	ldFlagsFinal += fmt.Sprintf("-X '%s/info.BuildTime=%s' ", apertureGoModName, strings.TrimSpace(string(buildTimeOut)))
-	ldFlagsFinal += fmt.Sprintf("-X '%s/info.GitBranch=%s' ", apertureGoModName, strings.TrimSpace(string(builderCfg.GitBranch)))
-	ldFlagsFinal += fmt.Sprintf("-X '%s/info.GitCommitHash=%s' ", apertureGoModName, strings.TrimSpace(string(builderCfg.GitCommitHash)))
+	ldFlagsFinal += fmt.Sprintf("-X '%s/info.GitBranch=%s' ", apertureGoModName, strings.TrimSpace(string(cfg.Build.GitBranch)))
+	ldFlagsFinal += fmt.Sprintf("-X '%s/info.GitCommitHash=%s' ", apertureGoModName, strings.TrimSpace(string(cfg.Build.GitCommitHash)))
 	ldFlagsFinal += fmt.Sprintf("-X '%s/info.Prefix=aperture' ", apertureGoModName)
 	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.Service=%s'", apertureGoModName, service)
 	ldFlagsFinal += "\"" // close the ldflags
