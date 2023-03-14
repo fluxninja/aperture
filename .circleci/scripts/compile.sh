@@ -16,7 +16,7 @@ export PATH="$PATH:$GOPATH/bin"
 case "${1:-}" in
 agent)
 	./scripts/build_aperturectl.sh
-	./cmd/aperturectl/aperturectl build agent --output-dir ./dist
+	./cmd/aperturectl/aperturectl build agent --output-dir ./dist --uri .
 	;;
 cli)
 	./scripts/build_aperturectl.sh
