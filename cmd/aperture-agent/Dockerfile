@@ -11,16 +11,10 @@ ARG APERTURECTL_BUILD_GIT_COMMIT_HASH
 ENV APERTURECTL_BUILD_GIT_COMMIT_HASH=${APERTURECTL_BUILD_GIT_COMMIT_HASH}
 ARG APERTURECTL_BUILD_GIT_BRANCH
 ENV APERTURECTL_BUILD_GIT_BRANCH=${APERTURECTL_BUILD_GIT_BRANCH}
-ARG APERTURECTL_BUILD_BUILDER_CONFIG_FILE
-ENV APERTURECTL_BUILD_BUILDER_CONFIG_FILE=${APERTURECTL_BUILD_BUILDER_CONFIG_FILE}
 
-# If config file exists, copy it to the build context
-RUN if [[ -f "${APERTURECTL_BUILD_BUILDER_CONFIG_FILE}" ]]; then \
-  cp "${APERTURECTL_BUILD_BUILDER_CONFIG_FILE}" ./config.yaml; \
-  else \
-  echo "APERTURECTL_BUILD_BUILDER_CONFIG_FILE is not set"; \
-  touch ./config.yaml; \
-  fi
+# builder_config is not empty, write it to config.yaml; else, make an empty config.yaml file
+ARG builder_config
+RUN if [ -n "$builder_config" ]; then echo "$builder_config" > config.yaml; else touch config.yaml; fi
 
 RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.cache/go-build/,id=agent-1.19.6,sharing=private \
