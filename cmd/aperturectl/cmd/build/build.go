@@ -14,20 +14,25 @@ import (
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
+	autils "github.com/fluxninja/aperture/pkg/utils"
 )
 
 var (
-	buildConfigFile string
-	outputDir       string
+	buildConfigFile   string
+	outputDir         string
+	apertureGoModName string
+	builderCfg        Config
+	cfg               BuildConfig
 )
 
 // BuildConfig is the configuration for building the binary.
 type BuildConfig struct {
-	BundledExtensions []string          `json:"bundled_extensions"`
-	Extensions        []ExtensionConfig `json:"extensions"`
-	Replaces          []ReplaceConfig   `json:"replaces"`
-	LdFlags           []string          `json:"ldflags"`
-	Flags             []string          `json:"flags"`
+	BundledExtensions    []string          `json:"bundled_extensions"`
+	Extensions           []ExtensionConfig `json:"extensions"`
+	Replaces             []ReplaceConfig   `json:"replaces"`
+	LdFlags              []string          `json:"ldflags"`
+	Flags                []string          `json:"flags"`
+	EnableCoreExtensions bool              `json:"enable_core_extensions" default:"true"`
 }
 
 // ExtensionConfig is the configuration for an extension.
@@ -44,6 +49,13 @@ type ExtensionConfig struct {
 type ReplaceConfig struct {
 	Old string `json:"old" validate:"required"`
 	New string `json:"new" validate:"required"`
+}
+
+// Config picked up from environment variables.
+type Config struct {
+	Version       string `json:"version" default:"unknown"`
+	GitCommitHash string `json:"git_commit_hash"`
+	GitBranch     string `json:"git_branch"`
 }
 
 const extensionsTpl = `package main
@@ -82,19 +94,42 @@ func {{ .ModuleName }}Module() fx.Option {
 
 func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 	return func(_ *cobra.Command, _ []string) error {
-		if buildConfigFile == "" {
-			return fmt.Errorf("build config file is required")
+		var configBytes []byte
+		var err error
+
+		if buildConfigFile != "" {
+			// read config file and unmarshal into BuildConfig struct
+			configBytes, err = os.ReadFile(buildConfigFile)
+			if err != nil {
+				log.Error().Err(err).Msg("failed to read build config file")
+				return err
+			}
 		}
-		// read config file and unmarshal into BuildConfig struct
-		configBytes, err := os.ReadFile(buildConfigFile)
+
+		unmarshaller, err := config.KoanfUnmarshallerConstructor{
+			EnableEnv: true,
+		}.NewKoanfUnmarshaller(nil)
 		if err != nil {
-			log.Error().Err(err).Msg("failed to read build config file")
+			log.Error().Err(err).Msg("failed to create unmarshaller")
 			return err
 		}
-		var cfg BuildConfig
+		if err = unmarshaller.UnmarshalKey("build", &builderCfg); err != nil {
+			log.Error().Err(err).Msg("failed to unmarshal builder config")
+			return err
+		}
+
 		if err = config.UnmarshalYAML(configBytes, &cfg); err != nil {
 			log.Error().Err(err).Msg("failed to unmarshal build config file")
 			return err
+		}
+		if cfg.EnableCoreExtensions {
+			// add fluxninja and sentry to the list of extensions if they are not already there
+			if !autils.SliceContains(cfg.BundledExtensions, "fluxninja") {
+				cfg.BundledExtensions = append(cfg.BundledExtensions, "fluxninja")
+			}
+			if !autils.SliceContains(cfg.BundledExtensions, "sentry") {
+				cfg.BundledExtensions = append(cfg.BundledExtensions, "sentry")
+			}
 		}
 
 		// outputDir
@@ -139,7 +174,7 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 			log.Error().Err(err).Msg("failed to parse go.mod file")
 			return err
 		}
-		apertureGoModName := apertureGoModFile.Module.Mod.Path
+		apertureGoModName = apertureGoModFile.Module.Mod.Path
 
 		// add the extensions to the final go.mod
 		for _, ext := range cfg.Extensions {
@@ -183,7 +218,7 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 			return err
 		}
 		defer utils.RestoreFile(agentExtensionsFile)
-		err = generateExtensionsCode(cfg, "Agent", apertureGoModName, agentExtensionsFile)
+		err = generateExtensionsCode("Agent", agentExtensionsFile)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to generate agent extensions code")
 			return err
@@ -196,7 +231,7 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 			return err
 		}
 		defer utils.RestoreFile(controllerExtensionsFile)
-		err = generateExtensionsCode(cfg, "Controller", apertureGoModName, controllerExtensionsFile)
+		err = generateExtensionsCode("Controller", controllerExtensionsFile)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to generate controller extensions code")
 			return err
@@ -214,7 +249,7 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 		}
 
 		// build binaries
-		err = buildBinary(cmd, cfg.LdFlags, cfg.Flags)
+		err = buildBinary(cmd)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to build agent binary")
 			return err
@@ -224,13 +259,14 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 	}
 }
 
-func buildBinary(service string, ldFlags, flags []string) error {
-	ldFlagsFinal, err := getLdFlags(service, ldFlags)
+func buildBinary(service string) error {
+	ldFlagsFinal, err := getLdFlags(service)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to get ldflags")
 		return err
 	}
-	flagsFinal := strings.Join(flags, " ")
+
+	flagsFinal := strings.Join(cfg.Flags, " ")
 
 	cmdString := fmt.Sprintf("go build -o %s %s %s", service, ldFlagsFinal, flagsFinal)
 
@@ -261,12 +297,7 @@ func buildBinary(service string, ldFlags, flags []string) error {
 	return nil
 }
 
-func getLdFlags(service string, ldFlags []string) (string, error) {
-	// pick up version from env
-	version := os.Getenv("APERTURE_VERSION")
-	if version == "" {
-		version = "0.0.1"
-	}
+func getLdFlags(service string) (string, error) {
 	// goos is 'go env GOOS'
 	goos := exec.Command("go", "env", "GOOS")
 	goosOut, err := goos.Output()
@@ -285,42 +316,53 @@ func getLdFlags(service string, ldFlags []string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	prefix := os.Getenv("APERTURE_PREFIX")
-	if prefix == "" {
-		prefix = "aperture"
-	}
-	gitBranch := os.Getenv("APERTURE_GIT_BRANCH")
-	if gitBranch == "" {
-		gitBranch = "undefined"
-	}
-	gitCommitHash := os.Getenv("APERTURE_GIT_COMMIT_HASH")
-	if gitCommitHash == "" {
-		gitCommitHash = "undefined"
-	}
 	// build time is 'date -Iseconds'
 	buildTime := exec.Command("date", "-Iseconds")
 	buildTimeOut, err := buildTime.Output()
 	if err != nil {
 		return "", err
 	}
+
+	// if builderDir is a git project, find the git commit hash and branch
+	if builderCfg.GitCommitHash != "" && builderCfg.GitBranch != "" {
+		// git commit is 'git rev-parse HEAD'
+		gitCommit := exec.Command("git", "rev-parse", "HEAD")
+		gitCommit.Dir = builderDir
+		gitCommitOut, err := gitCommit.Output()
+		if err != nil {
+			builderCfg.GitCommitHash = "unknown"
+		} else {
+			builderCfg.GitCommitHash = strings.TrimSpace(string(gitCommitOut))
+		}
+		// git branch is 'git rev-parse --abbrev-ref HEAD'
+		gitBranch := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
+		gitBranch.Dir = builderDir
+		gitBranchOut, err := gitBranch.Output()
+		if err != nil {
+			builderCfg.GitBranch = "unknown"
+		} else {
+			builderCfg.GitBranch = strings.TrimSpace(string(gitBranchOut))
+		}
+	}
+
 	// add all the ldflags
 	ldFlagsFinal := "--ldflags \"-s -w -extldflags \"-Wl,--allow-multiple-definition\" "
-	for _, flag := range ldFlags {
+	for _, flag := range cfg.LdFlags {
 		ldFlagsFinal += fmt.Sprintf("%s ", flag)
 	}
-	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.Version=%s' ", version)
-	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.BuildOS=%s/%s' ", strings.TrimSpace(string(goosOut)), strings.TrimSpace(string(goarchOut)))
-	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.BuildHost=%s' ", strings.TrimSpace(string(hostnameOut)))
-	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.BuildTime=%s' ", strings.TrimSpace(string(buildTimeOut)))
-	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.GitBranch=%s' ", strings.TrimSpace(string(gitBranch)))
-	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.GitCommitHash=%s' ", strings.TrimSpace(string(gitCommitHash)))
-	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.Prefix=%s' ", prefix)
-	ldFlagsFinal += fmt.Sprintf("-X 'github.com/fluxninja/aperture/pkg/info.Service=%s'", service)
+	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.Version=%s' ", apertureGoModName, builderCfg.Version)
+	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.BuildOS=%s/%s' ", apertureGoModName, strings.TrimSpace(string(goosOut)), strings.TrimSpace(string(goarchOut)))
+	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.BuildHost=%s' ", apertureGoModName, strings.TrimSpace(string(hostnameOut)))
+	ldFlagsFinal += fmt.Sprintf("-X '%s/info.BuildTime=%s' ", apertureGoModName, strings.TrimSpace(string(buildTimeOut)))
+	ldFlagsFinal += fmt.Sprintf("-X '%s/info.GitBranch=%s' ", apertureGoModName, strings.TrimSpace(string(builderCfg.GitBranch)))
+	ldFlagsFinal += fmt.Sprintf("-X '%s/info.GitCommitHash=%s' ", apertureGoModName, strings.TrimSpace(string(builderCfg.GitCommitHash)))
+	ldFlagsFinal += fmt.Sprintf("-X '%s/info.Prefix=aperture' ", apertureGoModName)
+	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.Service=%s'", apertureGoModName, service)
 	ldFlagsFinal += "\"" // close the ldflags
 	return ldFlagsFinal, nil
 }
 
-func generateExtensionsCode(cfg BuildConfig, moduleName string, apertureModuleName string, dest string) error {
+func generateExtensionsCode(moduleName string, dest string) error {
 	// create the destination file
 	f, err := os.Create(dest)
 	if err != nil {
@@ -349,7 +391,7 @@ func generateExtensionsCode(cfg BuildConfig, moduleName string, apertureModuleNa
 			GoModName string
 		}{
 			Name:      ext,
-			GoModName: apertureModuleName + "/extensions/" + ext,
+			GoModName: apertureGoModName + "/extensions/" + ext,
 		})
 	}
 
