@@ -39,7 +39,7 @@ func Module() fx.Option {
 		httpclient.ClientConstructor{Name: "heartbeats-http-client", ConfigKey: extconfig.ExtensionConfigKey + ".client.http"}.Annotate(),
 		PeersWatcherModule(),
 		jobs.JobGroupConstructor{Name: heartbeatsGroup}.Annotate(),
-		fx.Invoke(setup),
+		fx.Provide(provide),
 	)
 }
 
@@ -64,11 +64,11 @@ type ConstructorIn struct {
 	AutoscaleKubernetesControlPoints autoscalediscovery.AutoScaleControlPoints `optional:"true"`
 }
 
-// setup provides a new instance of Heartbeats.
-func setup(in ConstructorIn) error {
+// provide provides a new instance of Heartbeats.
+func provide(in ConstructorIn) (*Heartbeats, error) {
 	if in.ExtensionConfig.APIKey == "" {
 		log.Info().Msg("Heartbeats API key not set, skipping")
-		return nil
+		return nil, nil
 	}
 
 	installationMode := getInstallationMode()
@@ -113,7 +113,7 @@ func setup(in ConstructorIn) error {
 		},
 	})
 
-	return nil
+	return heartbeats, nil
 }
 
 func getInstallationMode() string {
