@@ -71,7 +71,8 @@ func (constructor *sentryWriterConstructor) annotate() fx.Option {
 	)
 }
 
-func (constructor *sentryWriterConstructor) provideSentryWriter(unmarshaller config.Unmarshaller,
+func (constructor *sentryWriterConstructor) provideSentryWriter(
+	unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
 ) (io.Writer, error) {
 	config := constructor.DefaultConfig
@@ -105,7 +106,9 @@ func (constructor *sentryWriterConstructor) provideSentryWriter(unmarshaller con
 }
 
 func (constructor *sentryWriterConstructor) setupSentryWriter(registry status.Registry) {
-	constructor.sentryWriter.statusRegistry = registry
+	if constructor.sentryWriter != nil {
+		constructor.sentryWriter.statusRegistry = registry
+	}
 }
 
 // newSentryWriter creates a new SentryWriter instance with Sentry Client and registers panic handler.
