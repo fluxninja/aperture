@@ -44,11 +44,11 @@ type ConstructorIn struct {
 	Lifecycle        fx.Lifecycle
 	Shutdowner       fx.Shutdowner
 	Unmarshaller     config.Unmarshaller
+	StatusRegistry   status.Registry
 	BaseConfig       *otelconfig.OTELConfig `name:"base"`
 	Logger           *log.Logger
+	Readiness        *jobs.MultiJob           `name:"readiness.service"`
 	ExtensionConfigs []*otelconfig.OTELConfig `group:"extension-config"`
-	StatusRegistry   status.Registry
-	Readiness        *jobs.MultiJob `name:"readiness.service"`
 }
 
 // setup creates and runs a new instance of OTEL Collector with the passed configuration.
@@ -62,6 +62,9 @@ func setup(in ConstructorIn) error {
 				"file": otelconfig.NewOTELConfigUnmarshaler(in.BaseConfig.AsMap()),
 			}
 			for i, extensionConfig := range in.ExtensionConfigs {
+				if extensionConfig == nil {
+					continue
+				}
 				scheme := fmt.Sprintf("extension-%v", i)
 				uris = append(uris, fmt.Sprintf("%v:%v", scheme, scheme))
 				providers[scheme] = otelconfig.NewOTELConfigUnmarshaler(extensionConfig.AsMap())
