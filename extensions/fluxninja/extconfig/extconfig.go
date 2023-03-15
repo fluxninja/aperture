@@ -2,10 +2,11 @@
 package extconfig
 
 import (
+	"go.uber.org/fx"
+
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/net/http"
-	"go.uber.org/fx"
 )
 
 const (

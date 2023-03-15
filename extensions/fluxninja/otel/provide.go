@@ -8,9 +8,6 @@ import (
 	"strings"
 	"time"
 
-	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
-	httpclient "github.com/fluxninja/aperture/pkg/net/http"
-	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/imdario/mergo"
 	"github.com/mitchellh/copystructure"
 	"go.uber.org/fx"
@@ -19,6 +16,9 @@ import (
 	"github.com/fluxninja/aperture/extensions/fluxninja/heartbeats"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
+	grpcclient "github.com/fluxninja/aperture/pkg/net/grpc"
+	httpclient "github.com/fluxninja/aperture/pkg/net/http"
+	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/utils"
@@ -50,7 +50,8 @@ func Module() fx.Option {
 	)
 }
 
-func provideOtelConfig(baseConfig *otelconfig.OTELConfig,
+func provideOtelConfig(
+	baseConfig *otelconfig.OTELConfig,
 	grpcClientConfig *grpcclient.GRPCClientConfig,
 	httpClientConfig *httpclient.HTTPClientConfig,
 	lifecycle fx.Lifecycle,
