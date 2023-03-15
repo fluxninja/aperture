@@ -6,4 +6,4 @@
 !api
 !operator
 !tools
-!*.yaml
+!cmd/*/build-config.yaml
