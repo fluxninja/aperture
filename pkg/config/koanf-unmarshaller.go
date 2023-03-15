@@ -335,6 +335,8 @@ func (u *KoanfUnmarshaller) bindEnvsKey(keyPrefix string, in interface{}, prev .
 						v, err = sliceconv.Atoi(sliceValues)
 					case reflect.Float32, reflect.Float64:
 						v, err = sliceconv.Atof(sliceValues)
+					case reflect.String:
+						v, err = sliceValues, nil
 					case reflect.Struct:
 						switch fv.Type().String() {
 						case "config.Duration", "*durationpb.Duration", "config.Timestamp", "*timestamp.Timestamp":
