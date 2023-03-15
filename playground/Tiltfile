@@ -435,14 +435,6 @@ def wrapped_k8s_yaml(yaml, allow_duplicates=False):
     k8s_yaml(yaml, allow_duplicates)
 
 
-def refresh_chart_dependencies(chart_dir):
-    dep_output = local(command=["helm", "dependency", "list"], dir=chart_dir)
-    lines = str(dep_output).splitlines()
-    for number in range(1, len(lines) - 1):
-        if not lines[number].strip().endswith("ok"):
-            local(command=["helm", "dependency", "update"], dir=chart_dir)
-            return
-
 def render_tanka(environment, env_vars, base_dir, namespace, enable_cloud_extension):
     print(
         "Rendering tanka environment",

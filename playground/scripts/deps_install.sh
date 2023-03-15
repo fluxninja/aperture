@@ -50,7 +50,7 @@ for path in "${CHARTS_DIR}"/*; do
 	pushd "$path" >/dev/null
 	echo "Processing $path"
 	if helm dependency list | grep -q missing$; then
-		helm dependency build
+		helm dependency update
 	fi
 	popd >/dev/null
 done
