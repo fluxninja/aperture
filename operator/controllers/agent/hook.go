@@ -43,8 +43,8 @@ func (agentHooks *AgentHooks) Handle(ctx context.Context, req admission.Request)
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
-	if newAgent.Spec.Secrets.FluxNinjaPlugin.Create && newAgent.Spec.Secrets.FluxNinjaPlugin.Value == "" {
-		return admission.Denied("The value for 'spec.secrets.fluxNinjaPlugin.value' can not be empty when 'spec.secrets.fluxNinjaPlugin.create' is set to true")
+	if newAgent.Spec.Secrets.FluxNinjaExtension.Create && newAgent.Spec.Secrets.FluxNinjaExtension.Value == "" {
+		return admission.Denied("The value for 'spec.secrets.fluxNinjaExtension.value' can not be empty when 'spec.secrets.fluxNinjaExtension.create' is set to true")
 	}
 
 	if newAgent.ObjectMeta.Annotations == nil {

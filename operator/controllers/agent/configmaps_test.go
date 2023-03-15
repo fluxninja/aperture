@@ -40,7 +40,6 @@ import (
 	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	"github.com/fluxninja/aperture/pkg/plugins"
 	"github.com/fluxninja/aperture/pkg/prometheus"
 )
 
@@ -48,7 +47,7 @@ import (
 var agentConfigYAML string
 
 var _ = Describe("ConfigMap for Agent", func() {
-	Context("Instance without FluxNinja plugin enabled", func() {
+	Context("Instance", func() {
 		It("returns correct ConfigMap", func() {
 			instance := &agentv1alpha1.Agent{
 				ObjectMeta: metav1.ObjectMeta{
@@ -72,10 +71,6 @@ var _ = Describe("ConfigMap for Agent", func() {
 										File: "stderr",
 									},
 								},
-							},
-							Plugins: plugins.PluginsConfig{
-								DisablePlugins:  false,
-								DisabledPlugins: []string{"aperture-plugin-fluxninja"},
 							},
 							Etcd: etcd.EtcdConfig{
 								Endpoints: []string{"http://agent-etcd:2379"},

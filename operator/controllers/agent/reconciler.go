@@ -406,9 +406,9 @@ func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *agentv1al
 		return nil
 	}
 
-	if instance.Spec.Secrets.FluxNinjaPlugin.Create && instance.Spec.Secrets.FluxNinjaPlugin.Value == "" {
+	if instance.Spec.Secrets.FluxNinjaExtension.Create && instance.Spec.Secrets.FluxNinjaExtension.Value == "" {
 		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaPlugin.value' can not be empty when 'spec.secrets.fluxNinjaPlugin.create' is set to true")
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaExtension.value' can not be empty when 'spec.secrets.fluxNinjaExtension.create' is set to true")
 		errUpdate := r.updateStatus(ctx, instance)
 		if errUpdate != nil {
 			return errUpdate
@@ -654,7 +654,7 @@ func (r *AgentReconciler) reconcileMutatingWebhookConfiguration(ctx context.Cont
 // reconcileSecret prepares the desired states for Agent ApiKey secret and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileSecret(ctx context.Context, instance *agentv1alpha1.Agent) error {
-	if instance.Spec.Secrets.FluxNinjaPlugin.Create {
+	if instance.Spec.Secrets.FluxNinjaExtension.Create {
 		if !instance.Spec.Sidecar.Enabled {
 			secret, err := secretForAgentAPIKey(instance.DeepCopy(), r.Scheme)
 			if err != nil {
@@ -663,15 +663,15 @@ func (r *AgentReconciler) reconcileSecret(ctx context.Context, instance *agentv1
 			if _, err = CreateSecretForAgent(r.Client, r.Recorder, secret, ctx, instance); err != nil {
 				return err
 			}
-			instance.Spec.Secrets.FluxNinjaPlugin.Create = false
-			instance.Spec.Secrets.FluxNinjaPlugin.Value = ""
-			instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef.Name = controllers.SecretName(
-				instance.GetName(), "agent", &instance.Spec.Secrets.FluxNinjaPlugin)
+			instance.Spec.Secrets.FluxNinjaExtension.Create = false
+			instance.Spec.Secrets.FluxNinjaExtension.Value = ""
+			instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef.Name = controllers.SecretName(
+				instance.GetName(), "agent", &instance.Spec.Secrets.FluxNinjaExtension)
 		} else {
-			value := instance.Spec.Secrets.FluxNinjaPlugin.Value
+			value := instance.Spec.Secrets.FluxNinjaExtension.Value
 			if !strings.HasPrefix(value, "enc::") && !strings.HasSuffix(value, "::enc") {
-				instance.Spec.Secrets.FluxNinjaPlugin.Value = fmt.Sprintf(
-					"enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(instance.Spec.Secrets.FluxNinjaPlugin.Value)))
+				instance.Spec.Secrets.FluxNinjaExtension.Value = fmt.Sprintf(
+					"enc::%s::enc", base64.StdEncoding.EncodeToString([]byte(instance.Spec.Secrets.FluxNinjaExtension.Value)))
 			}
 		}
 	}
@@ -717,7 +717,7 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 			return err
 		}
 
-		if instance.Spec.Secrets.FluxNinjaPlugin.Create {
+		if instance.Spec.Secrets.FluxNinjaExtension.Create {
 			secret, err := CreateAgentSecretInNamespace(instance.DeepCopy(), ns.GetName())
 			if err != nil {
 				return err
@@ -757,8 +757,8 @@ func eventFiltersForAgent() predicate.Predicate {
 
 			diffObjects := !reflect.DeepEqual(old.Spec, new.Spec)
 			// Skipping update events for Secret updates
-			if diffObjects && old.Spec.Secrets.FluxNinjaPlugin.Value != "" &&
-				(new.Spec.Secrets.FluxNinjaPlugin.Value == "" || strings.HasPrefix(new.Spec.Secrets.FluxNinjaPlugin.Value, "enc::")) {
+			if diffObjects && old.Spec.Secrets.FluxNinjaExtension.Value != "" &&
+				(new.Spec.Secrets.FluxNinjaExtension.Value == "" || strings.HasPrefix(new.Spec.Secrets.FluxNinjaExtension.Value, "enc::")) {
 				return false
 			}
 

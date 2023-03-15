@@ -74,9 +74,9 @@ All the config parameters for the Aperture Agent are available
 
 :::info
 
-The default config disables the FluxNinja ARC Plugin for the Aperture Agent. If
-you want to keep it enabled, add parameters provided
-[here](/arc/plugin.md#configuration).
+The default config disables the FluxNinja ARC Extension for the Aperture Agent.
+If you want to keep it enabled, add parameters provided
+[here](/arc/extension.md#configuration).
 
 :::
 

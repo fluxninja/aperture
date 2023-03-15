@@ -11,20 +11,20 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 	FIND="gfind"
 fi
 
-cp "$docs_root"/gen/config/aperture-plugin-fluxninja/plugin-swagger.yaml merged-plugin-swagger.yaml
-dirs=$(find . -name 'plugin-swagger.yaml' -exec dirname {} \;)
+cp "$docs_root"/gen/config/extensions/fluxninja/extension-swagger.yaml merged-extension-swagger.yaml
+dirs=$(find . -name 'extension-swagger.yaml' -exec dirname {} \;)
 for dir in $dirs; do
-	echo "Merging $dir/plugin-swagger.yaml"
-	yq eval-all --inplace "select(fileIndex==0).definitions *= select(fileIndex==1).definitions | select(fileIndex==0)" merged-plugin-swagger.yaml "$dir"/plugin-swagger.yaml
-	yq eval-all --inplace "select(fileIndex==0).paths *= select(fileIndex==1).paths | select(fileIndex==0)" merged-plugin-swagger.yaml "$dir"/plugin-swagger.yaml
+	echo "Merging $dir/extension-swagger.yaml"
+	yq eval-all --inplace "select(fileIndex==0).definitions *= select(fileIndex==1).definitions | select(fileIndex==0)" merged-extension-swagger.yaml "$dir"/extension-swagger.yaml
+	yq eval-all --inplace "select(fileIndex==0).paths *= select(fileIndex==1).paths | select(fileIndex==0)" merged-extension-swagger.yaml "$dir"/extension-swagger.yaml
 done
 dirs=$($FIND "$docs_root"/gen/config -name 'config-swagger.yaml' -exec dirname {} \;)
 for dir in $dirs; do
 	echo generating markdown for "$dir"/config-swagger.yaml
 	basename=$(basename "$dir")
 	cp "$dir"/config-swagger.yaml "$dir"/gen.yaml
-	yq eval-all --inplace "select(fileIndex==0).definitions *= select(fileIndex==1).definitions | select(fileIndex==0)" "$dir"/gen.yaml merged-plugin-swagger.yaml
-	yq eval-all --inplace "select(fileIndex==0).paths *= select(fileIndex==1).paths | select(fileIndex==0)" "$dir"/gen.yaml merged-plugin-swagger.yaml
+	yq eval-all --inplace "select(fileIndex==0).definitions *= select(fileIndex==1).definitions | select(fileIndex==0)" "$dir"/gen.yaml merged-extension-swagger.yaml
+	yq eval-all --inplace "select(fileIndex==0).paths *= select(fileIndex==1).paths | select(fileIndex==0)" "$dir"/gen.yaml merged-extension-swagger.yaml
 	swagger flatten \
 		--with-flatten=remove-unused "$dir"/gen.yaml \
 		--format=yaml --output "$dir"/gen.yaml
@@ -35,7 +35,7 @@ for dir in $dirs; do
 		--quiet \
 		--with-flatten=remove-unused \
 		--tags=common-configuration \
-		--tags=plugin-configuration \
+		--tags=extension-configuration \
 		--tags=agent-configuration \
 		--tags=controller-configuration \
 		--allow-template-override \
@@ -48,7 +48,7 @@ for dir in $dirs; do
 	npx prettier --prose-wrap="preserve" --write "$dir"/"$basename".md
 	mv "$dir"/"$basename".md "$docs_root"/content/reference/configuration
 done
-rm merged-plugin-swagger.yaml
+rm merged-extension-swagger.yaml
 
 # policy markdown
 echo generating policy markdown

@@ -443,7 +443,7 @@ def refresh_chart_dependencies(chart_dir):
             local(command=["helm", "dependency", "update"], dir=chart_dir)
             return
 
-def render_tanka(environment, env_vars, base_dir, namespace, enable_cloud_plugin):
+def render_tanka(environment, env_vars, base_dir, namespace, enable_cloud_extension):
     print(
         "Rendering tanka environment",
         environment,
@@ -467,14 +467,14 @@ def render_tanka(environment, env_vars, base_dir, namespace, enable_cloud_plugin
 
     trace("Rendering tanka with env: %s" % env_vars)
 
-    enable_cloud_plugin = str(enable_cloud_plugin)
+    enable_cloud_extension = str(enable_cloud_extension)
     # Generate manifests with tanka
     rendered = local(
         quiet=True,
         command=[
             TANKA,
             "--ext-str=projectRoot=" + base_dir,
-            "--ext-str=ENABLE_CLOUD_PLUGIN=" + enable_cloud_plugin,
+            "--ext-str=ENABLE_CLOUD_EXTENSION=" + enable_cloud_extension,
             "show",
             # Allow dumping the templates to stdout,
             # instead of using tk export to generate files
@@ -908,7 +908,7 @@ def forward_port_delayed(workload, labels, resource_deps, namespace, service, lo
     )
 
 
-def declare_resources(resources, dep_tree, inv_dep_tree,race_arg,enable_cloud_plugin):
+def declare_resources(resources, dep_tree, inv_dep_tree,race_arg,enable_cloud_extension):
     """
     Declares resource-specific actions (images, ports, etc)
     Generating manifests with tanka is done separately, in order to speed up builds
@@ -919,9 +919,9 @@ def declare_resources(resources, dep_tree, inv_dep_tree,race_arg,enable_cloud_pl
         if race_arg:
             images = resource_info.get("images",{})
             if resource == "controller":
-                images[0]["build_args"]["RACE"] = "Yes"
+                images[0]["build_args"]["APERTURECTL_BUILD_FLAGS"] = "['-race']"
             if resource == "agent":
-                images[0]["build_args"]["RACE"] = "Yes"
+                images[0]["build_args"]["APERTURECTL_BUILD_FLAGS"] = "['-race']"
         for image in resource_info.get("images", []):
             if 'tag' in image.keys():
                 # We will be pulling existing image
@@ -983,7 +983,7 @@ def declare_resources(resources, dep_tree, inv_dep_tree,race_arg,enable_cloud_pl
             namespace = app_config.get("namespace", None)
             if tkenv:
                 base_dir = app_config.get("base_dir")
-                render_tanka(tkenv, env_vars, base_dir, namespace, enable_cloud_plugin)
+                render_tanka(tkenv, env_vars, base_dir, namespace, enable_cloud_extension)
             elif renderer == "yaml":
                 render_yaml(manifests_path, env_vars)
             elif renderer == "jsonnet":
@@ -1127,8 +1127,8 @@ config.define_bool("trace", usage="Enable trace logging")
 config.define_string("scenario", usage="Demo scenario to execute")
 config.define_string_list("dockerhub-image", usage="A list of images to pull directly from docker.io/fluxninja")
 config.define_bool("race",usage="Enable race detector for agent and controller")
-config.define_bool("skip-plugins", usage="Skip plugin building")
-config.define_bool("enable-cloud-plugin",usage="Enable ARC API key authentication, which will send the data to the ARC cloud")
+config.define_bool("skip-extensions", usage="Skip extension building")
+config.define_bool("enable-cloud-extension",usage="Enable ARC API key authentication, which will send the data to the ARC cloud")
 cfg = config.parse()
 # Enable all resources, as calling `config.parse()` by default disables all
 config.set_enabled_resources([])
@@ -1146,7 +1146,7 @@ if cfg.get("manual", False):
     trigger_mode(TRIGGER_MODE_MANUAL)
 
 get_race = cfg.get("race",False)
-enable_cloud_plugin = cfg.get("enable-cloud-plugin",False)
+enable_cloud_extension = cfg.get("enable-cloud-extension",False)
 
 run_only_listed = cfg.get("only", False)
 
@@ -1176,7 +1176,7 @@ TRACE = cfg_trace == True
 cfg_verbose = cfg.get("verbose", os.getenv("NINJA_TILT_VERBOSE", cfg_trace))
 VERBOSE = cfg_verbose == True
 
-if cfg.get("skip-plugins", os.getenv("SKIP_PLUGINS", "false").lower() == "true"):
+if cfg.get("skip-extensions", os.getenv("SKIP_EXTENSIONS", "false").lower() == "true"):
     DEP_TREE[APERTURE_CONTROLLER_NS]["controller"]["images"][0]["target"] = "controller-base"
     DEP_TREE[APERTURE_AGENT_NS]["agent"]["images"][0]["target"] = "agent-base"
 
@@ -1248,4 +1248,4 @@ cmd_button('aperture-java-trigger',
         icon_name='ads_click',
         text='Trigger library example',
 )
-declare_resources(resources, DEP_TREE, inverted_dep_tree,get_race, enable_cloud_plugin)
+declare_resources(resources, DEP_TREE, inverted_dep_tree,get_race, enable_cloud_extension)

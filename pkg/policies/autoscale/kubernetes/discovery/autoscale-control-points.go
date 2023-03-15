@@ -73,7 +73,7 @@ type AutoScaleControlPoints interface {
 	Keys() []AutoScaleControlPoint
 	AddKeyNotifier(notifiers.KeyNotifier) error
 	RemoveKeyNotifier(notifiers.KeyNotifier) error
-	ToProto() []*controlpointsv1.AutoScaleKubernetesControlPoint
+	ToProto() *controlpointsv1.AutoScaleKubernetesControlPoints
 }
 
 // autoScaleControlPoints is a cache of discovered Kubernetes control points and provides APIs to do CRUD on Scale type resources.
@@ -268,14 +268,16 @@ func (cpc *autoScaleControlPoints) Keys() []AutoScaleControlPoint {
 	return cps
 }
 
-// ToProto returns the list of ControlPoints in the cache as a list of protobuf messages.
-func (cpc *autoScaleControlPoints) ToProto() []*controlpointsv1.AutoScaleKubernetesControlPoint {
+// ToProto returns the list of ControlPoints in the cache as a protobuf message.
+func (cpc *autoScaleControlPoints) ToProto() *controlpointsv1.AutoScaleKubernetesControlPoints {
 	keys := cpc.Keys()
-	akcps := make([]*controlpointsv1.AutoScaleKubernetesControlPoint, 0, len(keys))
-	for _, cp := range keys {
-		akcps = append(akcps, cp.ToProto())
+	akcp := &controlpointsv1.AutoScaleKubernetesControlPoints{
+		AutoScaleKubernetesControlPoints: make([]*controlpointsv1.AutoScaleKubernetesControlPoint, 0, len(keys)),
 	}
-	return akcps
+	for _, cp := range keys {
+		akcp.AutoScaleKubernetesControlPoints = append(akcp.AutoScaleKubernetesControlPoints, cp.ToProto())
+	}
+	return akcp
 }
 
 // AddKeyNotifier adds a KeyNotifier to the trackers.

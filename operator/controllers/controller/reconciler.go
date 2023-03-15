@@ -305,9 +305,9 @@ func (r *ControllerReconciler) checkDefaults(ctx context.Context, instance *cont
 		return nil
 	}
 
-	if instance.Spec.Secrets.FluxNinjaPlugin.Create && instance.Spec.Secrets.FluxNinjaPlugin.Value == "" {
+	if instance.Spec.Secrets.FluxNinjaExtension.Create && instance.Spec.Secrets.FluxNinjaExtension.Value == "" {
 		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaPlugin.value' can not be empty when 'spec.secrets.fluxNinjaPlugin.create' is set to true")
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaExtension.value' can not be empty when 'spec.secrets.fluxNinjaExtension.create' is set to true")
 		errUpdate := r.updateStatus(ctx, instance)
 		if errUpdate != nil {
 			return errUpdate
@@ -557,7 +557,7 @@ func (r *ControllerReconciler) reconcileValidatingWebhookConfigurationAndCertSec
 // reconcileSecret prepares the desired states for Controller ApiKey secret and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *controllerv1alpha1.Controller) error {
-	if !instance.Spec.Secrets.FluxNinjaPlugin.Create {
+	if !instance.Spec.Secrets.FluxNinjaExtension.Create {
 		return nil
 	}
 	secret, err := secretForControllerAPIKey(instance.DeepCopy(), r.Scheme)
@@ -568,10 +568,10 @@ func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *co
 		return err
 	}
 
-	instance.Spec.Secrets.FluxNinjaPlugin.Create = false
-	instance.Spec.Secrets.FluxNinjaPlugin.Value = ""
-	instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef.Name = controllers.SecretName(
-		instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaPlugin)
+	instance.Spec.Secrets.FluxNinjaExtension.Create = false
+	instance.Spec.Secrets.FluxNinjaExtension.Value = ""
+	instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef.Name = controllers.SecretName(
+		instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaExtension)
 
 	return nil
 }
@@ -596,8 +596,8 @@ func eventFiltersForController() predicate.Predicate {
 
 			diffObjects := !reflect.DeepEqual(old.Spec, new.Spec)
 			// Skipping update events for Secret updates
-			if diffObjects && old.Spec.Secrets.FluxNinjaPlugin.Value != "" &&
-				new.Spec.Secrets.FluxNinjaPlugin.Value == "" {
+			if diffObjects && old.Spec.Secrets.FluxNinjaExtension.Value != "" &&
+				new.Spec.Secrets.FluxNinjaExtension.Value == "" {
 				return false
 			}
 

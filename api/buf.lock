@@ -4,11 +4,11 @@ deps:
   - remote: buf.build
     owner: cncf
     repository: xds
-    commit: c313df85559e44248d0115969f2c8c24
+    commit: ed1d3f62ca8047d7acf9f1dbaeee323a
   - remote: buf.build
     owner: envoyproxy
     repository: envoy
-    commit: 2f1c772183114eefa8493dbb5d9931b3
+    commit: 7b296122ab1e4f05b3ff7f260d90de26
   - remote: buf.build
     owner: envoyproxy
     repository: protoc-gen-validate

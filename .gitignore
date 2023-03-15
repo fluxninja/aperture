@@ -226,3 +226,7 @@ docs/tools/jsonnet/json2yaml
 
 # Local playground configuration overrides
 playground/tilt_local.json
+
+# do not ignore cmd/aperturectl/cmd/build
+!cmd/aperturectl/cmd/build
+!docs/content/reference/aperturectl/build

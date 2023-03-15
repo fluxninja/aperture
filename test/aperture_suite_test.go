@@ -103,9 +103,6 @@ var _ = BeforeSuite(func() {
 	jgIn = &JobGroupIn{}
 
 	apertureConfig := map[string]interface{}{
-		"plugins": map[string]interface{}{
-			"disabled_plugins": []string{"aperture-plugin-fluxninja"},
-		},
 		"log": map[string]interface{}{
 			// for cleaner logs and for testing config
 			"level":          "debug",

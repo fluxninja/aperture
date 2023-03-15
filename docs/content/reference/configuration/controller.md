@@ -29,7 +29,6 @@ Generated File Starts
 | `liveness`   | [Liveness](#liveness)              |
 | `log`        | [Log](#log)                        |
 | `metrics`    | [Metrics](#metrics)                |
-| `plugins`    | [Plugins](#plugins)                |
 | `policies`   | [PoliciesConfig](#policies-config) |
 | `profilers`  | [Profilers](#profilers)            |
 | `prometheus` | [Prometheus](#prometheus)          |
@@ -43,12 +42,12 @@ Generated File Starts
 | ------ | ---------------- |
 | `otel` | [OTEL](#o-t-e-l) |
 
-### PLUGIN CONFIGURATION
+### EXTENSION CONFIGURATION
 
-| Key                | Reference                             |
-| ------------------ | ------------------------------------- |
-| `fluxninja_plugin` | [FluxNinjaPlugin](#flux-ninja-plugin) |
-| `sentry_plugin`    | [SentryPlugin](#sentry-plugin)        |
+| Key         | Reference                                   |
+| ----------- | ------------------------------------------- |
+| `fluxninja` | [FluxNinjaExtension](#flux-ninja-extension) |
+| `sentry`    | [SentryExtension](#sentry-extension)        |
 
 ## Reference
 
@@ -84,15 +83,15 @@ Env-Var Prefix: `APERTURE_CONTROLLER_ETCD_`
 
 ---
 
-### _fluxninja_plugin_ {#flux-ninja-plugin}
+### _fluxninja_ {#flux-ninja-extension}
 
 <dl>
 
 <dt></dt>
 <dd>
 
-([FluxNinjaPluginConfig](#flux-ninja-plugin-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_`
+([FluxNinjaExtensionConfig](#flux-ninja-extension-config))
+Env-Var Prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
 
 </dd>
 
@@ -165,22 +164,6 @@ Env-Var Prefix: `APERTURE_CONTROLLER_METRICS_`
 
 ([ControllerOTELConfig](#controller-o-t-e-l-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_`
-
-</dd>
-
-</dl>
-
----
-
-### _plugins_ {#plugins}
-
-<dl>
-
-<dt></dt>
-<dd>
-
-([PluginsConfig](#plugins-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_PLUGINS_`
 
 </dd>
 
@@ -268,15 +251,15 @@ Env-Var Prefix: `APERTURE_CONTROLLER_READINESS_SERVICE_`
 
 ---
 
-### _sentry_plugin_ {#sentry-plugin}
+### _sentry_ {#sentry-extension}
 
 <dl>
 
-<dt>sentry</dt>
+<dt></dt>
 <dd>
 
 ([SentryConfig](#sentry-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_SENTRY_PLUGIN_SENTRY_`
+Env-Var Prefix: `APERTURE_CONTROLLER_SENTRY_`
 
 </dd>
 
@@ -554,18 +537,18 @@ EtcdConfig holds configuration for etcd client.
 
 ---
 
-### FluxNinjaPluginConfig {#flux-ninja-plugin-config}
+### FluxNinjaExtensionConfig {#flux-ninja-extension-config}
 
-FluxNinjaPluginConfig is the configuration for FluxNinja ARC integration plugin.
+FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
 
 <dl>
 <dt>api_key</dt>
 <dd>
 
-(string) API Key for this agent.
+(string) API Key for this agent. If this key is not set, the extension will not be enabled.
 
 </dd>
-<dt>fluxninja_endpoint</dt>
+<dt>endpoint</dt>
 <dd>
 
 (string, format: `empty | hostname_port | url | fqdn`) Address to grpc or http(s) server listening in agent service. To use http protocol, the address must start with http(s)://.
@@ -1060,39 +1043,6 @@ MetricsConfig holds configuration for service metrics.
 <dd>
 
 (bool) Pedantic controls whether a pedantic Registerer is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
-
-</dd>
-</dl>
-
----
-
-### PluginsConfig {#plugins-config}
-
-PluginsConfig holds configuration for plugins.
-
-<dl>
-<dt>disable_plugins</dt>
-<dd>
-
-(bool) Disables all plugins
-
-</dd>
-<dt>disabled_plugins</dt>
-<dd>
-
-([]string) Specific plugins to disable
-
-</dd>
-<dt>disabled_symbols</dt>
-<dd>
-
-([]string) Specific plugin types to disable
-
-</dd>
-<dt>plugins_path</dt>
-<dd>
-
-(string, default: `"default"`) Path to plugins directory. "default" points to `/var/lib/aperture/<service>/plugins`.
 
 </dd>
 </dl>

@@ -231,15 +231,15 @@ func AgentEnv(instance *agentv1alpha1.Agent, agentGroup string) []corev1.EnvVar 
 		})
 	}
 
-	if instance.Spec.Secrets.FluxNinjaPlugin.Create || instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef.Name != "" {
+	if instance.Spec.Secrets.FluxNinjaExtension.Create || instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef.Name != "" {
 		envs = append(envs, corev1.EnvVar{
-			Name: "APERTURE_AGENT_FLUXNINJA_PLUGIN_API_KEY",
+			Name: "APERTURE_AGENT_FLUXNINJA_API_KEY",
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: SecretName(instance.GetName(), "agent", &instance.Spec.Secrets.FluxNinjaPlugin),
+						Name: SecretName(instance.GetName(), "agent", &instance.Spec.Secrets.FluxNinjaExtension),
 					},
-					Key:      SecretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef),
+					Key:      SecretDataKey(&instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef),
 					Optional: pointer.Bool(false),
 				},
 			},
@@ -300,15 +300,15 @@ func ControllerEnv(instance *controllerv1alpha1.Controller) []corev1.EnvVar {
 		},
 	}
 
-	if spec.Secrets.FluxNinjaPlugin.Create || instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef.Name != "" {
+	if spec.Secrets.FluxNinjaExtension.Create || instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef.Name != "" {
 		envs = append(envs, corev1.EnvVar{
-			Name: "APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_API_KEY",
+			Name: "APERTURE_CONTROLLER_FLUXNINJA_API_KEY",
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: SecretName(instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaPlugin),
+						Name: SecretName(instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaExtension),
 					},
-					Key:      SecretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef),
+					Key:      SecretDataKey(&instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef),
 					Optional: pointer.Bool(false),
 				},
 			},

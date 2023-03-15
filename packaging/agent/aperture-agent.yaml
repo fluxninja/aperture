@@ -11,8 +11,3 @@ log:
   level: info
   non_blocking: false
   pretty_console: true
-
-plugins:
-  disable_plugins: false
-  disabled_plugins:
-    - aperture-plugin-fluxninja

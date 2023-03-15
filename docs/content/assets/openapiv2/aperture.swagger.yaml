@@ -2951,15 +2951,11 @@ definitions:
             all_statuses:
                 $ref: '#/definitions/GroupStatus'
             auto_scale_kubernetes_control_points:
-                items:
-                    $ref: '#/definitions/AutoScaleKubernetesControlPoint'
-                type: array
+                $ref: '#/definitions/AutoScaleKubernetesControlPoints'
             controller_info:
                 $ref: '#/definitions/ControllerInfo'
             flow_control_points:
-                items:
-                    $ref: '#/definitions/FlowControlPoint'
-                type: array
+                $ref: '#/definitions/FlowControlPoints'
             host_info:
                 $ref: '#/definitions/HostInfo'
             installation_mode:
@@ -3096,7 +3092,7 @@ definitions:
 
                     :::caution
 
-                    When using [FluxNinja ARC plugin](arc/plugin.md), telemetry enabled
+                    When using [FluxNinja ARC extension](arc/extension.md), telemetry enabled
                     labels are sent to FluxNinja ARC for observability. Telemetry should be disabled for
                     sensitive labels.
 
@@ -3836,7 +3832,7 @@ info:
     title: Aperture API
     version: "1.0"
 paths:
-    /plugins/fluxninja/v1/controllerinfo:
+    /fluxninja/v1/controllerinfo:
         get:
             operationId: ControllerInfoService_GetControllerInfo
             responses:
@@ -3850,7 +3846,7 @@ paths:
                         $ref: '#/definitions/googlerpcStatus'
             tags:
                 - ControllerInfoService
-    /plugins/fluxninja/v1/report:
+    /fluxninja/v1/report:
         post:
             operationId: FluxNinjaService_Report
             parameters:

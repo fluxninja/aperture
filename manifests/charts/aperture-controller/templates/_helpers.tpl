@@ -66,31 +66,15 @@ Create the address of the Prometheus for Aperture Controller
 {{- end -}}
 
 {{/*
-Fetch the endpoint of the FluxNinja ARC instance
-{{ include "controller.fluxNinjaPlugin.endpoint" ( dict "controller" .Values.path.to.the.controller $) }}
-*/}}
-{{- define "controller.fluxNinjaPlugin.endpoint" -}}
-{{- if .controller.config.fluxninja_plugin.enabled -}}
-    {{- if .controller.config.fluxninja_plugin.endpoint -}}
-        {{ print .controller.config.fluxninja_plugin.endpoint }}
-    {{- else -}}
-        {{- fail "Value of endpoint for FluxNinja plugin cannot be empty when .Values.controller.config.fluxninja_plugin.enabled is set to true." -}}
-    {{- end -}}
-{{- else -}}
-    {{ print "" }}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Fetch the value of the API Key secret for Aperture Controller
 {{ include "controller.apiSecret.value" ( dict "controller" .Values.path.to.the.controller $) }}
 */}}
 {{- define "controller.apisecret.value" -}}
-{{- if .controller.secrets.fluxNinjaPlugin.create -}}
-    {{- if .controller.secrets.fluxNinjaPlugin.value -}}
-        {{ print .controller.secrets.fluxNinjaPlugin.value }}
+{{- if .controller.secrets.fluxNinjaExtension.create -}}
+    {{- if .controller.secrets.fluxNinjaExtension.value -}}
+        {{ print .controller.secrets.fluxNinjaExtension.value }}
     {{- else -}}
-        {{- fail "Value of API Key for Controller cannot be empty when .Values.controller.secrets.fluxNinjaPlugin.create is set to true." -}}
+        {{- fail "Value of API Key for Controller cannot be empty when .Values.controller.secrets.fluxNinjaExtension.create is set to true." -}}
     {{- end -}}
 {{- else -}}
     {{ print "" }}

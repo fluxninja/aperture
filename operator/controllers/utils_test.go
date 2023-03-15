@@ -551,7 +551,7 @@ var _ = Describe("Tests for agentEnv", func() {
 				Spec: agentv1alpha1.AgentSpec{
 					CommonSpec: common.CommonSpec{
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								Create: true,
 								SecretKeyRef: common.SecretKeyRef{
 									Name: Test,
@@ -587,7 +587,7 @@ var _ = Describe("Tests for agentEnv", func() {
 					Value: "true",
 				},
 				{
-					Name: "APERTURE_AGENT_FLUXNINJA_PLUGIN_API_KEY",
+					Name: "APERTURE_AGENT_FLUXNINJA_API_KEY",
 					ValueFrom: &corev1.EnvVarSource{
 						SecretKeyRef: &corev1.SecretKeySelector{
 							LocalObjectReference: corev1.LocalObjectReference{
@@ -806,7 +806,7 @@ var _ = Describe("Tests for controllerEnv", func() {
 				Spec: controllerv1alpha1.ControllerSpec{
 					CommonSpec: common.CommonSpec{
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								Create: true,
 								SecretKeyRef: common.SecretKeyRef{
 									Name: Test,
@@ -833,7 +833,7 @@ var _ = Describe("Tests for controllerEnv", func() {
 					Value: AppName,
 				},
 				{
-					Name: "APERTURE_CONTROLLER_FLUXNINJA_PLUGIN_API_KEY",
+					Name: "APERTURE_CONTROLLER_FLUXNINJA_API_KEY",
 					ValueFrom: &corev1.EnvVarSource{
 						SecretKeyRef: &corev1.SecretKeySelector{
 							LocalObjectReference: corev1.LocalObjectReference{
@@ -1178,7 +1178,7 @@ var _ = Describe("Tests for secretName", func() {
 				Spec: agentv1alpha1.AgentSpec{
 					CommonSpec: common.CommonSpec{
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								SecretKeyRef: common.SecretKeyRef{
 									Name: Test,
 								},
@@ -1188,7 +1188,7 @@ var _ = Describe("Tests for secretName", func() {
 				},
 			}
 
-			result := SecretName(AppName, "agent", &instance.Spec.Secrets.FluxNinjaPlugin)
+			result := SecretName(AppName, "agent", &instance.Spec.Secrets.FluxNinjaExtension)
 			Expect(result).To(Equal(Test))
 		})
 	})
@@ -1203,7 +1203,7 @@ var _ = Describe("Tests for secretName", func() {
 				Spec: agentv1alpha1.AgentSpec{
 					CommonSpec: common.CommonSpec{
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								SecretKeyRef: common.SecretKeyRef{},
 							},
 						},
@@ -1213,7 +1213,7 @@ var _ = Describe("Tests for secretName", func() {
 
 			expected := fmt.Sprintf("%s-agent-apikey", AppName)
 
-			result := SecretName(AppName, "agent", &instance.Spec.Secrets.FluxNinjaPlugin)
+			result := SecretName(AppName, "agent", &instance.Spec.Secrets.FluxNinjaExtension)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -1228,7 +1228,7 @@ var _ = Describe("Tests for secretName", func() {
 				Spec: agentv1alpha1.AgentSpec{
 					CommonSpec: common.CommonSpec{
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								SecretKeyRef: common.SecretKeyRef{},
 							},
 						},
@@ -1238,7 +1238,7 @@ var _ = Describe("Tests for secretName", func() {
 
 			expected := fmt.Sprintf("%s-controller-apikey", AppName)
 
-			result := SecretName(AppName, "controller", &instance.Spec.Secrets.FluxNinjaPlugin)
+			result := SecretName(AppName, "controller", &instance.Spec.Secrets.FluxNinjaExtension)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -1255,7 +1255,7 @@ var _ = Describe("Tests for secretDataKey", func() {
 				Spec: agentv1alpha1.AgentSpec{
 					CommonSpec: common.CommonSpec{
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								SecretKeyRef: common.SecretKeyRef{
 									Key: Test,
 								},
@@ -1265,7 +1265,7 @@ var _ = Describe("Tests for secretDataKey", func() {
 				},
 			}
 
-			result := SecretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef)
+			result := SecretDataKey(&instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef)
 			Expect(result).To(Equal(Test))
 		})
 	})
@@ -1280,7 +1280,7 @@ var _ = Describe("Tests for secretDataKey", func() {
 				Spec: agentv1alpha1.AgentSpec{
 					CommonSpec: common.CommonSpec{
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								SecretKeyRef: common.SecretKeyRef{},
 							},
 						},
@@ -1288,7 +1288,7 @@ var _ = Describe("Tests for secretDataKey", func() {
 				},
 			}
 
-			result := SecretDataKey(&instance.Spec.Secrets.FluxNinjaPlugin.SecretKeyRef)
+			result := SecretDataKey(&instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef)
 			Expect(result).To(Equal(SecretKey))
 		})
 	})

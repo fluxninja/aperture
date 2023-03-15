@@ -29,9 +29,7 @@ func NewHandler(cpc discovery.AutoScaleControlPoints, agentInfo *agentinfo.Agent
 
 // GetControlPoints returns a ControlPoint from the cache.
 func (h *Handler) GetControlPoints(ctx context.Context, _ *emptypb.Empty) (*controlpointsv1.AutoScaleKubernetesControlPoints, error) {
-	return &controlpointsv1.AutoScaleKubernetesControlPoints{
-		AutoScaleKubernetesControlPoints: h.AutoScaleControlPoints.ToProto(),
-	}, nil
+	return h.AutoScaleControlPoints.ToProto(), nil
 }
 
 // RegisterControlPointsHandler registers ControlPointsHandler in RPC handler registry.

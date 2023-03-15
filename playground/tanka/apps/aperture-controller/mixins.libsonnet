@@ -1,6 +1,6 @@
 local apertureControllerApp = import 'apps/aperture-controller/main.libsonnet';
 
-local pluginEnv = std.extVar('ENABLE_CLOUD_PLUGIN');
+local extensionEnv = std.extVar('ENABLE_CLOUD_EXTENSION');
 
 local apertureControllerMixin =
   apertureControllerApp {
@@ -16,8 +16,8 @@ local apertureControllerMixin =
       controller+: {
         createUninstallHook: false,
         config+: {
-          fluxninja_plugin+: {
-            fluxninja_endpoint: 'aperture.latest.dev.fluxninja.com' + ':443',
+          fluxninja+: {
+            endpoint: 'aperture.latest.dev.fluxninja.com' + ':443',
             client+: {
               grpc+: {
                 insecure: false,
@@ -32,9 +32,6 @@ local apertureControllerMixin =
               },
             },
           },
-          plugins+: {
-            disabled_plugins: if pluginEnv == 'True' then [] else ['aperture-plugin-fluxninja'],
-          },
           log+: {
             pretty_console: true,
             non_blocking: true,
@@ -48,8 +45,8 @@ local apertureControllerMixin =
           },
         },
         secrets+: {
-          fluxNinjaPlugin+: {
-            create: pluginEnv,
+          fluxNinjaExtension+: {
+            create: extensionEnv,
             value: '2b97802cf7984791919758a537c05ad0',
           },
         },

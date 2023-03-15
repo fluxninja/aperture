@@ -497,13 +497,13 @@ agent:
   ##
   initContainers: []
   ## Agent API secret for FluxNinja ARC connection
-  ## @param agent.secrets.fluxNinjaPlugin.create Whether to create Kubernetes Secret with provided Agent API Key.
-  ## @param agent.secrets.fluxNinjaPlugin.secretKeyRef.name specifies a name of the Secret for Agent API Key to be used. This defaults to {{ .Release.Name }}-agent-apikey
-  ## @param agent.secrets.fluxNinjaPlugin.secretKeyRef.key specifies which key from the Secret for Agent API Key to use
-  ## @param agent.secrets.fluxNinjaPlugin.value API Key to use when creating a new Agent API Key Secret
+  ## @param agent.secrets.fluxNinjaExtension.create Whether to create Kubernetes Secret with provided Agent API Key.
+  ## @param agent.secrets.fluxNinjaExtension.secretKeyRef.name specifies a name of the Secret for Agent API Key to be used. This defaults to {{ .Release.Name }}-agent-apikey
+  ## @param agent.secrets.fluxNinjaExtension.secretKeyRef.key specifies which key from the Secret for Agent API Key to use
+  ## @param agent.secrets.fluxNinjaExtension.value API Key to use when creating a new Agent API Key Secret
   ##
   secrets:
-    fluxNinjaPlugin:
+    fluxNinjaExtension:
       create: false
       secretKeyRef:
         name: ~

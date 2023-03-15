@@ -1,14 +1,12 @@
 package blueprints
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/gofrs/flock"
 	"github.com/spf13/cobra"
 
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
@@ -18,25 +16,20 @@ import (
 const (
 	defaultBlueprintsRepo    = "github.com/fluxninja/aperture/blueprints"
 	defaultBlueprintsVersion = "latest"
-	sourceFilename           = ".source"
-	versionFilename          = ".version"
-	relPathFilename          = ".relpath"
-	lockFilename             = ".flock"
 )
 
 var (
-	// Location of cache for blueprints.
+	// Location of cache for blueprints. E.g. ~/.aperturectl/blueprints.
 	blueprintsCacheRoot string
-	// Location of blueprints in disk (e.g. within cache or custom location).
+	// Location of blueprints uri within cache. E.g. ~/.aperturectl/blueprints/github.com/fluxninja/aperture/blueprints@latest.
 	blueprintsURIRoot string
 
-	// Location of blueprints directory within URI directory.
+	// Location of blueprints directory within URI directory. E.g. ~/.aperturectl/blueprints/github.com_fluxninja_aperture_blueprints@v0.26.1/github.com/fluxninja/aperture/blueprints/.
 	blueprintsDir string
 
 	// Args for `blueprints`.
 	blueprintsURI     string
 	blueprintsVersion string
-	lock              *flock.Flock
 )
 
 func init() {
@@ -57,7 +50,7 @@ var BlueprintsCmd = &cobra.Command{
 	Short: "Aperture Blueprints",
 	Long: `
 Use this command to pull, list, remove and generate Aperture Policy resources using the Aperture Blueprints.`,
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+	PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 		userHomeDir, err := os.UserHomeDir()
 		if err != nil {
 			return err
@@ -96,12 +89,9 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 			return err
 		}
 
-		// lock blueprintsDir to prevent concurrent access using flock package
-		lock = flock.New(filepath.Join(blueprintsURIRoot, lockFilename))
-
 		// pull the latest blueprints based on skipPull and whether cmd is remove
 		if !skipPull && cmd.Use != "remove" {
-			err = pullFunc(cmd, args)
+			err = utils.PullSource(blueprintsURIRoot, blueprintsURI)
 			if err != nil {
 				return err
 			}
@@ -109,43 +99,15 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 			log.Debug().Msg("skipping pulling blueprints")
 		}
 
-		blueprintsDir = filepath.Join(blueprintsURIRoot, getRelPath(blueprintsURIRoot))
+		blueprintsDir = filepath.Join(blueprintsURIRoot, utils.GetRelPath(blueprintsURIRoot))
+		// resolve symlink
+		blueprintsDir, err = filepath.EvalSymlinks(blueprintsDir)
+		if err != nil {
+			return err
+		}
 		return nil
 	},
 	PersistentPostRun: func(_ *cobra.Command, _ []string) {
-		unlock()
+		utils.Unlock(blueprintsURIRoot)
 	},
-}
-
-func writerLock() error {
-	// Get writer lock
-	locked, err := lock.TryLockContext(context.Background(), 10)
-	if err != nil {
-		return err
-	}
-	if !locked {
-		return errors.New("unable to acquire lock on blueprints directory")
-	}
-	return nil
-}
-
-func readerLock() error {
-	// Get reader lock
-	locked, err := lock.TryRLockContext(context.Background(), 10)
-	if err != nil {
-		return err
-	}
-	if !locked {
-		return errors.New("unable to acquire lock on blueprints directory")
-	}
-	return nil
-}
-
-func unlock() {
-	err := lock.Unlock()
-	if err != nil {
-		log.Error().Err(err).Msg("unable to release lock on blueprints directory")
-		// try resetting lock by removing lockfile
-		os.Remove(filepath.Join(blueprintsURIRoot, lockFilename))
-	}
 }

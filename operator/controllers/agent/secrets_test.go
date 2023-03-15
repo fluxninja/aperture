@@ -42,7 +42,7 @@ var _ = Describe("Secret for Agent", func() {
 				Spec: agentv1alpha1.AgentSpec{
 					CommonSpec: common.CommonSpec{
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								Value: Test,
 							},
 						},
@@ -94,7 +94,7 @@ var _ = Describe("Secret for Agent", func() {
 					CommonSpec: common.CommonSpec{
 						Annotations: TestMap,
 						Secrets: common.Secrets{
-							FluxNinjaPlugin: common.APIKeySecret{
+							FluxNinjaExtension: common.APIKeySecret{
 								SecretKeyRef: common.SecretKeyRef{
 									Name: Test,
 									Key:  Test,

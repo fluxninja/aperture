@@ -19,8 +19,6 @@ import (
 var (
 	// DefaultAssetsDirectory is path to default assets directory.
 	DefaultAssetsDirectory = path.Join("/", "etc", info.Prefix, info.Service)
-	// DefaultArtifactsDirectory is path to default artifacts directory.
-	DefaultArtifactsDirectory = path.Join("/", "opt", info.Prefix, info.Service)
 	// DefaultLogDirectory is path to default log directory.
 	DefaultLogDirectory = path.Join("/", "var", "log", info.Prefix, info.Service)
 	// DefaultTempBase is path to default temporary base.

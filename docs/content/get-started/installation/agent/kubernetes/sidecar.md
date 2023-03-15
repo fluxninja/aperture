@@ -77,15 +77,15 @@ Kubernetes Objects which will be created by following steps are listed
 
 :::
 
-1. Configure the below parameters of Plugins, Etcd and Prometheus for the Agent
-   Custom Resource by creating a `values.yaml` with below parameters and pass it
-   with `install` command:
+1. Configure the below parameters of Etcd and Prometheus for the Agent Custom
+   Resource by creating a `values.yaml` with below parameters and pass it with
+   `install` command:
 
    :::info
 
-   The below parameters disable the FluxNinja ARC Plugin for the Aperture Agent.
-   If you want to keep it enabled, add parameters provided
-   [here](/arc/plugin.md#configuration) under the `agent.config` section.
+   The below parameters disable the FluxNinja ARC Extension for the Aperture
+   Agent. If you want to keep it enabled, add parameters provided
+   [here](/arc/extension.md#configuration) under the `agent.config` section.
 
    :::
 
@@ -100,9 +100,6 @@ Kubernetes Objects which will be created by following steps are listed
          address: "PROMETHEUS_ADDRESS_HERE"
        agent_functions:
          endpoints: ["CONTROLLER_ENDPOINT_HERE"]
-       plugins:
-         disabled_plugins:
-           - aperture-plugin-fluxninja
    ```
 
    Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with
@@ -129,9 +126,6 @@ Kubernetes Objects which will be created by following steps are listed
          address: "http://controller-prometheus-server.default.svc.cluster.local:80"
        agent_functions:
          endpoints: ["aperture-controller.default.svc.cluster.local:8080"]
-       plugins:
-         disabled_plugins:
-           - aperture-plugin-fluxninja
    ```
 
    <Tabs groupId="setup" queryString>
@@ -162,9 +156,6 @@ Kubernetes Objects which will be created by following steps are listed
          endpoints: ["http://controller-etcd.default.svc.cluster.local:2379"]
        prometheus:
          address: "http://controller-prometheus-server.default.svc.cluster.local:80"
-       plugins:
-         disabled_plugins:
-           - aperture-plugin-fluxninja
    ```
 
    Replace the `NAMESPACE1`, `NAMESPACE2` and so on, with the actual namespaces
@@ -196,9 +187,6 @@ Kubernetes Objects which will be created by following steps are listed
          endpoints: ["ETCD_ENDPOINT_HERE"]
        prometheus:
          address: "PROMETHEUS_ADDRESS_HERE"
-       plugins:
-         disabled_plugins:
-           - aperture-plugin-fluxninja
        log:
          level: debug
          pretty_console: true
@@ -279,9 +267,6 @@ Kubernetes Objects which will be created by following steps are listed
             endpoints: ["ETCD_ENDPOINT_HERE"]
           prometheus:
             address: "PROMETHEUS_ADDRESS_HERE"
-          plugins:
-            disabled_plugins:
-              - aperture-plugin-fluxninja
       ```
 
       Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE`

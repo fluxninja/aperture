@@ -40,15 +40,15 @@ func Module() fx.Option {
 // ConstructorIn describes parameters passed to create OTEL Collector, server providing the OpenTelemetry Collector service.
 type ConstructorIn struct {
 	fx.In
-	Factories      otelcol.Factories
-	Lifecycle      fx.Lifecycle
-	Shutdowner     fx.Shutdowner
-	Unmarshaller   config.Unmarshaller
-	BaseConfig     *otelconfig.OTELConfig `name:"base"`
-	Logger         *log.Logger
-	PluginConfigs  []*otelconfig.OTELConfig `group:"plugin-config"`
-	StatusRegistry status.Registry
-	Readiness      *jobs.MultiJob `name:"readiness.service"`
+	Factories        otelcol.Factories
+	Lifecycle        fx.Lifecycle
+	Shutdowner       fx.Shutdowner
+	Unmarshaller     config.Unmarshaller
+	StatusRegistry   status.Registry
+	BaseConfig       *otelconfig.OTELConfig `name:"base"`
+	Logger           *log.Logger
+	Readiness        *jobs.MultiJob           `name:"readiness.service"`
+	ExtensionConfigs []*otelconfig.OTELConfig `group:"extension-config"`
 }
 
 // setup creates and runs a new instance of OTEL Collector with the passed configuration.
@@ -61,10 +61,13 @@ func setup(in ConstructorIn) error {
 			providers := map[string]confmap.Provider{
 				"file": otelconfig.NewOTELConfigUnmarshaler(in.BaseConfig.AsMap()),
 			}
-			for i, pluginConfig := range in.PluginConfigs {
-				scheme := fmt.Sprintf("plugin-%v", i)
+			for i, extensionConfig := range in.ExtensionConfigs {
+				if extensionConfig == nil {
+					continue
+				}
+				scheme := fmt.Sprintf("extension-%v", i)
 				uris = append(uris, fmt.Sprintf("%v:%v", scheme, scheme))
-				providers[scheme] = otelconfig.NewOTELConfigUnmarshaler(pluginConfig.AsMap())
+				providers[scheme] = otelconfig.NewOTELConfigUnmarshaler(extensionConfig.AsMap())
 			}
 
 			configProvider, err := otelcol.NewConfigProvider(otelcol.ConfigProviderSettings{

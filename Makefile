@@ -94,10 +94,14 @@ pre-commit-checks:
 	@echo Running pre-commit checks
 	@pre-commit run --all-files
 
+extensions_md5sum:
+	@echo Resetting extensions.go checksum
+	@scripts/precommit/check-extensions-go.sh generate
+
 all: install-asdf-tools install-go-tools generate-api go-generate go-mod-tidy go-lint go-build go-build-plugins go-test generate-docs generate-helm-readme generate-blueprints helm-lint pre-commit-checks
 	@echo "Done"
 
-.PHONY: install-asdf-tools install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-doc-assets generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser generate-helm-readme helm-lint generate-blueprints pre-commit-checks generate-aperturectl-docs
+.PHONY: install-asdf-tools install-go-tools generate-api go-generate go-generate-swagger go-mod-tidy generate-config-markdown generate-doc-assets generate-docs go-test go-lint go-build go-build-plugins coverage_profile show_coverage_in_browser generate-helm-readme helm-lint generate-blueprints pre-commit-checks generate-aperturectl-docs extensions_md5sum
 
 #####################################
 ###### OPERATOR section starts ######
@@ -157,6 +161,8 @@ operator-help: ## Display this help.
 .PHONY: operator-manifests
 operator-manifests: ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) rbac:roleName=manager-role crd:ignoreUnexportedFields=true,allowDangerousTypes=true webhook paths="./operator/..." output:crd:artifacts:config=operator/config/crd/bases output:rbac:artifacts:config=operator/config/rbac output:webhook:artifacts:config=operator/config/webhook
+	cp ./operator/config/crd/bases/fluxninja.com_agents.yaml ./manifests/charts/aperture-agent/crds/fluxninja.com_agents.yaml
+	cp ./operator/config/crd/bases/fluxninja.com_controllers.yaml ./manifests/charts/aperture-controller/crds/fluxninja.com_controllers.yaml
 	./operator/hack/create_policy_sample.sh
 
 .PHONY: operator-generate

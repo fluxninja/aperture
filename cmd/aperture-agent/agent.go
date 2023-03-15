@@ -54,6 +54,7 @@ func main() {
 		election.Module(),
 		rpc.ClientModule,
 		agentfunctions.Module,
+		Module(),
 	)
 
 	if err := app.Err(); err != nil {
