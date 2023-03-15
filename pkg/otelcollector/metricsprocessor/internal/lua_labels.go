@@ -3,13 +3,14 @@ package internal
 import (
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
+	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
-// AddEnvoySpecificLabels adds labels specific to Envoy data source.
-func AddEnvoySpecificLabels(attributes pcommon.Map) {
-	treatAsMissing := []string{otelconsts.EnvoyMissingAttributeValue}
+// AddLuaSpecificLabels adds labels specific to data source.
+func AddLuaSpecificLabels(attributes pcommon.Map) {
+	treatAsMissing := []string{""}
 	// Retrieve request length
 	requestLength, requestLengthFound := otelcollector.GetFloat64(attributes, otelconsts.BytesSentLabel, treatAsMissing)
 	if requestLengthFound {
@@ -23,7 +24,7 @@ func AddEnvoySpecificLabels(attributes pcommon.Map) {
 
 	// Compute durations
 	responseDuration, responseDurationExists := otelcollector.GetFloat64(attributes, otelconsts.ResponseDurationLabel, treatAsMissing)
-	authzDuration, authzDurationExists := otelcollector.GetFloat64(attributes, otelconsts.EnvoyAuthzDurationLabel, treatAsMissing)
+	checkHTTPDuration, checkHTTPDurationExists := otelcollector.GetFloat64(attributes, otelconsts.CheckHTTPDurationLabel, treatAsMissing)
 
 	// Add ResponseReceivedLabel based on whether responseDuration is present and non-zero
 	if responseDurationExists && responseDuration > 0 {
@@ -36,11 +37,13 @@ func AddEnvoySpecificLabels(attributes pcommon.Map) {
 		attributes.PutDouble(otelconsts.FlowDurationLabel, responseDuration)
 	}
 
-	if responseDurationExists && authzDurationExists {
-		workloadDuration := responseDuration - authzDuration
+	if responseDurationExists && checkHTTPDurationExists {
+		workloadDuration := responseDuration - checkHTTPDuration
 		// discard negative values which can happen in case of connection resets
 		if workloadDuration > 0 {
 			attributes.PutDouble(otelconsts.WorkloadDurationLabel, workloadDuration)
 		}
 	}
+
+	log.Error().Msgf("Updated attributes '%+v': ", attributes)
 }

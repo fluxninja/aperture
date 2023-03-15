@@ -9,6 +9,8 @@ const (
 	ApertureSourceSDK = "sdk"
 	// ApertureSourceEnvoy const for Envoy source.
 	ApertureSourceEnvoy = "envoy"
+	// ApertureSourceLua const for Lua source.
+	ApertureSourceLua = "lua"
 	// FeatureControlPoint const for feature control point.
 	FeatureControlPoint = "feature"
 	// HTTPControlPoint for envoy control point.
@@ -89,12 +91,16 @@ const (
 
 	// EnvoyAuthzDurationLabel describes duration of the Authz call in milliseconds.
 	EnvoyAuthzDurationLabel = "authz_duration"
-	// EnvoyResponseDurationLabel from envoy access logs.
-	EnvoyResponseDurationLabel = "RESPONSE_DURATION"
-	// EnvoyBytesReceivedLabel from envoy access logs.
-	EnvoyBytesReceivedLabel = "BYTES_RECEIVED"
-	// EnvoyBytesSentLabel from envoy access logs.
-	EnvoyBytesSentLabel = "BYTES_SENT"
+
+	// CheckHTTPDurationLabel describes duration of the CheckHTTP call in milliseconds.
+	CheckHTTPDurationLabel = "	"
+
+	// ResponseDurationLabel from access logs.
+	ResponseDurationLabel = "RESPONSE_DURATION"
+	// BytesReceivedLabel from access logs.
+	BytesReceivedLabel = "BYTES_RECEIVED"
+	// BytesSentLabel from access logs.
+	BytesSentLabel = "BYTES_SENT"
 
 	// EnvoyMissingAttributeValue is a special attribute value, which can
 	// happen when (eg. Envoy's) logger tries to send attribute value, but it
