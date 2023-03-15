@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.time.Duration;
 
-
 @SpringBootApplication
 public class JavaDemoAppApplication {
 
@@ -13,10 +12,9 @@ public class JavaDemoAppApplication {
 	public static final String DEFAULT_AGENT_HOST = "localhost";
 	public static final String DEFAULT_AGENT_PORT = "8089";
 
-	public static final int CONCURRENCY = 10;
-	public static final Duration LATENCY = Duration.ofMillis(50);
-	public static final double REJECT_RATIO = 0.05;
-
+	public static final String DEFAULT_CONCURRENCY = "10";
+	public static final String DEFAULT_LATENCY = "50";
+	public static final String DEFAULT_REJECT_RATIO = "0.05";
 
 	public static void main(String[] args) {
 		String agentHost = System.getenv("FN_AGENT_HOST");
@@ -49,23 +47,23 @@ public class JavaDemoAppApplication {
 		}
 		System.setProperty("PORT", port);
 
-		/*String concurrency = System.getenv("CONCURRENCY");
+		String concurrency = System.getenv("CONCURRENCY");
 		if (concurrency == null) {
-			concurrency = "10";
+			concurrency = DEFAULT_CONCURRENCY;
 		}
 		System.setProperty("CONCURRENCY", concurrency);
 
 		String latency = System.getenv("LATENCY");
 		if (latency == null) {
-			latency = "50";
+			latency = DEFAULT_LATENCY;
 		}
 		System.setProperty("LATENCY", latency);
 
 		String rejectRatio = System.getenv("REJECT_RATIO");
 		if (rejectRatio == null) {
-			rejectRatio = "0.05";
+			rejectRatio = DEFAULT_REJECT_RATIO;
 		}
-		System.setProperty("REJECT_RATIO", rejectRatio);*/
+		System.setProperty("REJECT_RATIO", rejectRatio);
 
 		SpringApplication.run(JavaDemoAppApplication.class, args);
 	}
