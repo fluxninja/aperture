@@ -688,6 +688,10 @@ definitions:
   ProcessInfo:
     type: object
     properties:
+      extensions:
+        type: array
+        items:
+          type: string
       start_time:
         type: string
         format: date-time

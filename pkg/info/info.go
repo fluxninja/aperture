@@ -40,6 +40,8 @@ var (
 	LocalIP = "unknown"
 	// UUID is the unique identifier for the process.
 	UUID = "unknown"
+	// Extensions is the list of extensions that are enabled.
+	Extensions = ""
 )
 
 var (
@@ -64,6 +66,8 @@ func init() {
 
 	// ProcessInfo
 	processInfo.StartTime = timestamppb.Now()
+	extensions := strings.Split(Extensions, ",")
+	processInfo.Extensions = extensions
 
 	// Hostname
 	hostname, err := os.Hostname()
