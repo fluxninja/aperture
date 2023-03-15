@@ -103,7 +103,7 @@ DEP_TREE = {
                     "context": GIT_ROOT,
                     "dockerfile": GIT_ROOT + "/cmd/aperture-controller/Dockerfile",
                     "ssh": "default",
-                    "build_args":{'RACE': ""},
+                    "build_args":{},
                 },
                 {
                     "ref": "aperture-operator",
@@ -195,7 +195,7 @@ DEP_TREE = {
                     "context": GIT_ROOT,
                     "dockerfile": GIT_ROOT + "/cmd/aperture-agent/Dockerfile",
                     "ssh": "default",
-                    "build_args":{'RACE':""},
+                    "build_args":{},
                 }
             ],
             "port_forwards": {
