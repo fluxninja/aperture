@@ -27,15 +27,17 @@ public class TrafficFlow {
 
   static TrafficFlow ignoredFlow() {
     TrafficFlow flow = new TrafficFlow(
-            successfulResponse(),
-            null,
-            true
-    );
+        successfulResponse(),
+        null,
+        true);
     flow.ignored = true;
     return flow;
   }
 
   public boolean accepted() {
+    if (this.checkResponse == null) {
+      return false;
+    }
     return this.checkResponse.getStatus().getCode() == Code.OK_VALUE;
   }
 
@@ -85,7 +87,7 @@ public class TrafficFlow {
   // Artificial response if none is received from agent
   static CheckResponse successfulResponse() {
     return CheckResponse.newBuilder()
-            .setStatus(Status.newBuilder().setCode(Code.OK_VALUE).build())
-            .build();
+        .setStatus(Status.newBuilder().setCode(Code.OK_VALUE).build())
+        .build();
   }
 }

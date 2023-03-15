@@ -91,8 +91,7 @@ class ApertureClient:
         )
 
     def start_flow(
-        self, control_point: str, explicit_labels: Optional[Dict[str, str]] = None
-    ) -> Flow:
+        self, control_point: str, explicit_labels: Optional[Dict[str, str]] = None) -> Flow:
         labels = {}
         labels.update(baggage.get_all())
         # Explicit labels override baggage
@@ -105,7 +104,10 @@ class ApertureClient:
 
         span = self.tracer.start_span("Aperture Check", attributes=span_attributes)
         stub = FlowControlServiceStub(self.grpc_channel)
-        response = stub.Check(request, timeout=self.timeout.total_seconds())
+        try:
+            response = stub.Check(request, timeout=self.timeout.total_seconds())
+        except grpc.RpcError:
+            response = None
         span.set_attribute(workload_start_timestamp_label, time.monotonic_ns())
         return Flow(span=span, check_response=response)
 
@@ -144,30 +146,6 @@ class ApertureClient:
             return wrapper
 
         return decorator
-
-    def http_middleware(
-        self,
-        application: wsgitypes.Application,
-        control_point: str,
-        explicit_labels: Optional[Dict[str, str]] = None,
-    ):
-        """Create HTTP WSGI middeleware to automatically handle flows"""
-
-        wrapper = self.decorate(control_point, explicit_labels)
-
-        def middleware(
-            environ: wsgitypes.Environ, start_response: wsgitypes.StartResponse
-        ) -> wsgitypes.Response:
-            fn = wrapper(application)
-            try:
-                return fn(environ, start_response)
-            except RejectedFlowException:
-                status = "403 Forbidden"
-                headers = [("Content-Type", "text/plain")]
-                start_response(status, headers)
-                return [b"Forbidden"]
-
-        return middleware
 
     def close(self):
         self.otlp_exporter.shutdown()
