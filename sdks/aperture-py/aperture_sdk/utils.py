@@ -3,6 +3,7 @@ from typing import Callable, TypeVar
 
 TWrappedReturn = TypeVar("TWrappedReturn")
 
+
 async def run_fn(fn: Callable[..., TWrappedReturn], *args, **kwargs) -> TWrappedReturn:
     """Run a function or coroutine."""
     # We want to support both sync and async functions

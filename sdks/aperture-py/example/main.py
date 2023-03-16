@@ -3,8 +3,8 @@ import asyncio
 import os
 from typing import Optional
 
-from aperture_sdk import ApertureClient
 import grpc
+from aperture_sdk import ApertureClient
 from quart import Quart
 
 defaultAgentHost = "localhost"

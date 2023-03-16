@@ -1,7 +1,6 @@
-from contextlib import AbstractContextManager
-from datetime import datetime, timezone
 import enum
 import time
+from contextlib import AbstractContextManager
 from typing import Optional, TypeVar
 
 from aperture_sdk._gen.aperture.flowcontrol.check.v1 import check_pb2
@@ -21,6 +20,7 @@ class FlowStatus(enum.Enum):
 
 TFlow = TypeVar("TFlow", bound="Flow")
 
+
 class Flow(AbstractContextManager):
     def __init__(
         self, span: trace.Span, check_response: Optional[check_pb2.CheckResponse]
@@ -33,7 +33,10 @@ class Flow(AbstractContextManager):
     def accepted(self) -> bool:
         if not self.check_response:
             return True
-        return self.check_response.decision_type == check_pb2.CheckResponse.DECISION_TYPE_ACCEPTED
+        return (
+            self.check_response.decision_type
+            == check_pb2.CheckResponse.DECISION_TYPE_ACCEPTED
+        )
 
     @property
     def success(self) -> bool:

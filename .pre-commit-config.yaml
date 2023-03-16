@@ -76,6 +76,7 @@ repos:
           - --remove-all-unused-imports
           - --exclude
           - "__init__.py"
+        exclude: &py_exclude "^sdks/aperture-py/aperture_sdk/_gen/"
   - repo: https://github.com/pycqa/isort
     rev: 5.12.0
     hooks:
@@ -85,11 +86,13 @@ repos:
           - --filter-files
           - --profile
           - black
+        exclude: *py_exclude
   - repo: https://github.com/ambv/black
     rev: 23.1.0
     hooks:
       - id: black
         language_version: python3.10
+        exclude: *py_exclude
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: "v2.7.1"
     hooks:

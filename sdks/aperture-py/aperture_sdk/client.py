@@ -2,9 +2,9 @@ import datetime
 import functools
 import logging
 import time
-from typing import Dict, Optional, Type
-from typing import Callable, TypeVar
+from typing import Callable, Dict, Optional, Type, TypeVar
 
+import grpc
 from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import CheckRequest
 from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2_grpc import (
     FlowControlServiceStub,
@@ -20,15 +20,16 @@ from aperture_sdk.const import (
 )
 from aperture_sdk.flow import Flow
 from aperture_sdk.utils import TWrappedReturn, run_fn
-import grpc
 from opentelemetry import baggage, trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-from opentelemetry.sdk.resources import Resource, SERVICE_NAME, SERVICE_VERSION
+from opentelemetry.sdk.resources import SERVICE_NAME, SERVICE_VERSION, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 TApertureClient = TypeVar("TApertureClient", bound="ApertureClient")
 TWrappedFunction = Callable[..., TWrappedReturn]
+
+
 class ApertureClient:
     def __init__(
         self,
@@ -85,7 +86,8 @@ class ApertureClient:
         )
 
     def start_flow(
-        self, control_point: str, explicit_labels: Optional[Dict[str, str]] = None) -> Flow:
+        self, control_point: str, explicit_labels: Optional[Dict[str, str]] = None
+    ) -> Flow:
         labels = {}
         labels.update(baggage.get_all())
         # Explicit labels override baggage
@@ -114,7 +116,6 @@ class ApertureClient:
         def decorator(fn: TWrappedFunction) -> TWrappedFunction:
             @functools.wraps(fn)
             async def wrapper(*args, **kwargs):
-
                 with self.start_flow(control_point, explicit_labels) as flow:
                     if flow.accepted:
                         return await run_fn(fn, *args, **kwargs)
