@@ -20,7 +20,7 @@ RUN --mount=type=cache,target=/go/pkg/ \
   /bin/bash -c \
   'go mod download; \
   go build -o cmd/aperturectl/aperturectl ./cmd/aperturectl; \
-  ./cmd/aperturectl/aperturectl build agent -o / --uri ."; \
+  ./cmd/aperturectl/aperturectl build agent -o / --uri .; \
   '
 
 # Final image
