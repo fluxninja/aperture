@@ -23,9 +23,9 @@ aperturectl build agent [flags]
 ```
 # Build agent binary for Aperture
 
-aperturectl --uri . build agent -c build_config.yaml -o /
+aperturectl --uri . build agent -c build-config.yaml -o /
 
-Where build_config.yaml can be:
+Where build-config.yaml can be:
 ---
 build:
   version: 1.0.0
@@ -53,9 +53,9 @@ enable_core_extensions: false # default is true
 ### Options
 
 ```
-  -c, --config string       path to the build configuration file
+  -c, --config string       path to the build configuration file (default: build-config.yaml in the main package directory)
   -h, --help                help for agent
-  -o, --output-dir string   path to the output directory
+  -o, --output-dir string   path to the output directory (default: current directory)
 ```
 
 ### Options inherited from parent commands

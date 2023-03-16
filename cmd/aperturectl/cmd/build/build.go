@@ -17,11 +17,42 @@ import (
 	autils "github.com/fluxninja/aperture/pkg/utils"
 )
 
+const (
+	exampleFmt = `# Build %s binary for Aperture
+
+aperturectl --uri . build %s -c build-config.yaml -o /
+
+Where build-config.yaml can be:
+---
+build:
+  version: 1.0.0
+  git_commit_hash: 1234567890
+  git_branch: branch1
+  ldflags:
+    - -some-flag
+    - -some-other-flag
+  flags:
+    - -some-flag
+    - -some-other-flag
+bundled_extensions: # remote extensions to be bundled
+  - go_mod_name: github.com/org/name
+    version: v1.0.0
+    pkg_name: pkg
+extensions: # built-in extensions to be enabled
+  - fluxninja
+  - sentry
+replaces:
+  - old: github.com/org/name
+    new: github.com/org/name2
+enable_core_extensions: false # default is true`
+)
+
 var (
 	buildConfigFile   string
 	outputDir         string
 	apertureGoModName string
 	cfg               Config
+	serviceDir        string
 )
 
 // Config is the configuration for building the binary.
@@ -92,10 +123,23 @@ func GetExtensions() []string {
   }
 }`
 
-func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
+func buildRunE(service string) func(cmd *cobra.Command, args []string) error {
 	return func(_ *cobra.Command, _ []string) error {
 		var configBytes []byte
 		var err error
+
+		serviceDir = filepath.Join(builderDir, "cmd", service)
+
+		if buildConfigFile == "" {
+			// look for this file under cmd/{service}/build-config.yaml
+			buildConfigFile = filepath.Join(serviceDir, "build-config.yaml")
+			if _, err = os.Stat(buildConfigFile); os.IsNotExist(err) {
+				log.Info().Msgf("No build config file provided. Using default values.")
+				buildConfigFile = ""
+			} else {
+				log.Info().Msgf("Using build config file: %s", buildConfigFile)
+			}
+		}
 
 		if buildConfigFile != "" {
 			// read config file and unmarshal into BuildConfig struct
@@ -130,11 +174,17 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 
 		// outputDir
 		if outputDir == "" {
-			return fmt.Errorf("output directory is required")
-		}
-		if err = os.MkdirAll(outputDir, 0o700); err != nil {
-			log.Error().Err(err).Msg("failed to create output directory")
-			return err
+			// use current directory
+			outputDir, err = os.Getwd()
+			if err != nil {
+				return err
+			}
+			log.Info().Msgf("Using default output directory: %s", outputDir)
+		} else {
+			if err = os.MkdirAll(outputDir, 0o700); err != nil {
+				log.Error().Err(err).Msg("failed to create output directory")
+				return err
+			}
 		}
 
 		// get lock file
@@ -182,6 +232,7 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 				log.Error().Err(err).Msg("failed to add require directive to go.mod file")
 				return err
 			}
+			log.Info().Msgf("Adding extension %s", ext.GoModName)
 		}
 		// add the replace directive to the final go.mod
 		for _, replace := range cfg.Replaces {
@@ -202,50 +253,8 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		// generate code using templates that calls the extension's module's
-		// Module() functions
-		// keep the code in cmd/aperture-agent/extensions.go and cmd/aperture-controller/extensions.go
-		// Note: local extensions are in ./extension and we can use replace directives to point to their local paths
-
-		agentExtensionsFile := filepath.Join(builderDir, "cmd", "aperture-agent", "extensions.go")
-		err = utils.BackupFile(agentExtensionsFile)
-		if err != nil {
-			log.Error().Err(err).Msg("failed to backup agent extensions file")
-			return err
-		}
-		defer utils.RestoreFile(agentExtensionsFile)
-		err = generateExtensionsCode(agentExtensionsFile)
-		if err != nil {
-			log.Error().Err(err).Msg("failed to generate agent extensions code")
-			return err
-		}
-
-		controllerExtensionsFile := filepath.Join(builderDir, "cmd", "aperture-controller", "extensions.go")
-		err = utils.BackupFile(controllerExtensionsFile)
-		if err != nil {
-			log.Error().Err(err).Msg("failed to backup controller extensions file")
-			return err
-		}
-		defer utils.RestoreFile(controllerExtensionsFile)
-		err = generateExtensionsCode(controllerExtensionsFile)
-		if err != nil {
-			log.Error().Err(err).Msg("failed to generate controller extensions code")
-			return err
-		}
-
-		// execute go mod tidy
-		goModTidyCmd := exec.Command("go", "mod", "tidy")
-		goModTidyCmd.Dir = builderDir
-		goModTidyCmd.Stdout = os.Stdout
-		goModTidyCmd.Stderr = os.Stderr
-		err = goModTidyCmd.Run()
-		if err != nil {
-			log.Error().Err(err).Msg("failed to execute go mod tidy")
-			return err
-		}
-
 		// build binaries
-		err = buildBinary(cmd)
+		err = buildBinary(service)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to build agent binary")
 			return err
@@ -255,7 +264,43 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 	}
 }
 
+func goModTidy() error {
+	// execute go mod tidy
+	goModTidyCmd := exec.Command("go", "mod", "tidy")
+	goModTidyCmd.Dir = builderDir
+	goModTidyCmd.Stdout = os.Stdout
+	goModTidyCmd.Stderr = os.Stderr
+	err := goModTidyCmd.Run()
+	if err != nil {
+		log.Error().Err(err).Msg("failed to execute go mod tidy")
+		return err
+	}
+	return nil
+}
+
 func buildBinary(service string) error {
+	defer func() {
+		_ = goModTidy()
+	}()
+
+	extensionsFile := filepath.Join(serviceDir, "extensions.go")
+	err := utils.BackupFile(extensionsFile)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to backup agent extensions file")
+		return err
+	}
+	defer utils.RestoreFile(extensionsFile)
+	err = generateExtensionsCode(extensionsFile)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to generate agent extensions code")
+		return err
+	}
+
+	err = goModTidy()
+	if err != nil {
+		return err
+	}
+
 	ldFlagsFinal, err := getLdFlags(service)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to get ldflags")
@@ -267,9 +312,9 @@ func buildBinary(service string) error {
 	cmdString := fmt.Sprintf("go build -o %s %s %s", service, ldFlagsFinal, flagsFinal)
 
 	buildCmd := exec.Command("bash", "-c", cmdString)
-	buildCmd.Dir = filepath.Join(builderDir, "cmd", service)
+	buildCmd.Dir = serviceDir
 	// print the command and directory
-	log.Info().Msgf("building binary: %s", buildCmd.String())
+	log.Info().Msgf("Building binary: %s", buildCmd.String())
 	buildCmd.Stdout = os.Stdout
 	buildCmd.Stderr = os.Stderr
 	err = buildCmd.Run()
@@ -392,6 +437,7 @@ func generateExtensionsCode(dest string) error {
 			Name:      ext,
 			GoModName: apertureGoModName + "/extensions/" + ext,
 		})
+		log.Info().Msgf("Adding bundled extension: %s", ext)
 	}
 
 	err = t.Execute(f, data)
