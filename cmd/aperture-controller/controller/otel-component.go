@@ -42,8 +42,8 @@ func ModuleForControllerOTEL() fx.Option {
 				ControllerOTELComponents,
 				fx.ParamTags(
 					alerts.AlertsFxTag,
-					config.GroupTag(otelcollector.ReceiverFactoriesFxTag)+`,optional:"true"`,
-					config.GroupTag(otelcollector.ProcessorFactoriesFxTag)+`,optional:"true"`,
+					config.GroupTag(otelcollector.ReceiverFactoriesFxTag),
+					config.GroupTag(otelcollector.ProcessorFactoriesFxTag),
 				),
 			),
 		),
