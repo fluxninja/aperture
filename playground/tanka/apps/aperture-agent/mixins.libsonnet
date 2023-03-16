@@ -7,7 +7,7 @@ local apertureAgentMixin =
     values+:: {
       operator+: {
         image: {
-          registry: 'docker.io/fluxninja',
+          registry: 'quay.io/fluxninja',
           repository: 'aperture-operator',
           tag: 'latest',
         },
@@ -59,7 +59,7 @@ local apertureAgentMixin =
         },
         image: {
           registry: '',
-          repository: 'docker.io/fluxninja/aperture-agent',
+          repository: 'quay.io/fluxninja/aperture-agent',
           tag: 'latest',
         },
         sidecar+: {

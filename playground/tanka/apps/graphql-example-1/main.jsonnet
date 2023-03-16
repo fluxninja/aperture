@@ -12,7 +12,7 @@ local application = {
     replicaCount: 2,
     simplesrv+: {
       image: {
-        repository: 'docker.io/fluxninja/graphql-demo-app',
+        repository: 'quay.io/fluxninja/graphql-demo-app',
         tag: 'test',
       },
     },

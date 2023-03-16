@@ -337,8 +337,8 @@ be loaded during tilt setup by passing a relative path to the scenario, e.g.
 :::note
 
 You can skip building of aperture container images to speed up your work on the
-scenario, by passing `-- --dockerhub-image` to the `tilt up` command. In that
-case latest images will be pulled from dockerhub and used instead.
+scenario, by passing `-- --quay-image` to the `tilt up` command. In that case
+latest images will be pulled from quay and used instead.
 
 :::
 

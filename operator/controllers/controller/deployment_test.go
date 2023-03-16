@@ -128,7 +128,7 @@ var _ = Describe("Controller Deployment", func() {
 					},
 					Image: common.ControllerImage{
 						Image: common.Image{
-							Registry:   "docker.io/fluxninja",
+							Registry:   "quay.io/fluxninja",
 							Tag:        "latest",
 							PullPolicy: "IfNotPresent",
 						},
@@ -188,7 +188,7 @@ var _ = Describe("Controller Deployment", func() {
 							Containers: []corev1.Container{
 								{
 									Name:            ControllerServiceName,
-									Image:           "docker.io/fluxninja/aperture-controller:latest",
+									Image:           "quay.io/fluxninja/aperture-controller:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									SecurityContext: &corev1.SecurityContext{},
 									Command:         nil,
@@ -414,7 +414,7 @@ var _ = Describe("Controller Deployment", func() {
 					},
 					Image: common.ControllerImage{
 						Image: common.Image{
-							Registry:    "docker.io/fluxninja",
+							Registry:    "quay.io/fluxninja",
 							Tag:         "latest",
 							PullPolicy:  "IfNotPresent",
 							PullSecrets: TestArray,
@@ -490,7 +490,7 @@ var _ = Describe("Controller Deployment", func() {
 							Containers: []corev1.Container{
 								{
 									Name:            ControllerServiceName,
-									Image:           "docker.io/fluxninja/aperture-controller:latest",
+									Image:           "quay.io/fluxninja/aperture-controller:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									SecurityContext: &corev1.SecurityContext{
 										RunAsUser:              pointer.Int64(0),

@@ -6,6 +6,7 @@ replicaCount: 1
 
 simplesrv:
   image:
+    registry: quay.io
     repository: fluxninja/demo-app
     pullPolicy: IfNotPresent
     tag: "latest"

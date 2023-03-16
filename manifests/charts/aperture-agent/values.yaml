@@ -48,7 +48,7 @@ operator:
   ## @param operator.image.pullSecrets Operator image pull secrets
   ##
   image:
-    registry: docker.io/fluxninja
+    registry: quay.io/fluxninja
     repository: aperture-operator
     tag: ~
     ## Specify a imagePullPolicy
@@ -325,7 +325,7 @@ agent:
   ## @skip agent.createUninstallHook Specifies whether to create the Job for for graceful termination of Agent CR and operator.
   ##
   createUninstallHook: true
-  ## @param agent.image.registry Agent image registry. Defaults to 'docker.io/fluxninja'.
+  ## @param agent.image.registry Agent image registry. Defaults to 'quay.io/fluxninja'.
   ## @param agent.image.repository Agent image repository. Defaults to 'aperture-agent'.
   ## @param agent.image.tag Agent image tag (immutable tags are recommended). Defaults to 'latest'.
   ## @param agent.image.pullPolicy Agent image pull policy. Defaults to 'IfNotPresent'.

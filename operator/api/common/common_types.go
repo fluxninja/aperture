@@ -43,7 +43,7 @@ import (
 type Image struct {
 	// The registry of the image
 	//+kubebuilder:validation:Optional
-	Registry string `json:"registry" default:"docker.io/fluxninja"`
+	Registry string `json:"registry" default:"quay.io/fluxninja"`
 
 	// The tag (version) of the image
 	//+kubebuilder:validation:Optional

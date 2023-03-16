@@ -216,7 +216,7 @@ Kubernetes Objects which will be created by following steps are listed
         name: controller
       spec:
         image:
-          registry: docker.io/fluxninja
+          registry: quay.io/fluxninja
           repository: aperture-controller
           tag: latest
         config:

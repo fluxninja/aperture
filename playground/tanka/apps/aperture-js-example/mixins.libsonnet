@@ -4,7 +4,7 @@ sdk
 {
   values+:: {
     image+: {
-      repository: 'docker.io/fluxninja/aperture-js-example',
+      repository: 'quay.io/fluxninja/aperture-js-example',
     },
   },
   environment+:: {

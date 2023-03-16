@@ -96,7 +96,7 @@ jobs:
         type: string
         description: SSH socket to forward to the docker build process
         default: ""
-      dockerhub-image:
+      repository:
         type: string
         description: A name for your Docker image
       gcr-registry:
@@ -120,8 +120,8 @@ jobs:
         default: true
       registry:
         type: string
-        default: docker.io
-        description: Name of registry to use, defaults to docker.io
+        default: quay.io
+        description: Name of registry to use, defaults to quay.io
       tag:
         type: string
         description: A Docker image tag
@@ -140,9 +140,9 @@ jobs:
           Workspace root path that is either an absolute path or a path relative
           to the working directory. Defaults to '.' (the working directory)
         default: .
-      push-to-dockerhub:
+      push-to-quay:
         type: boolean
-        description: Boolean for whether or not to push images to DockerHub
+        description: Boolean for whether or not to push images to Quay
         default: true
       no_output_timeout:
         type: string
@@ -172,7 +172,7 @@ jobs:
           dockerfile: <<parameters.dockerfile>>
           extra_build_args: <<parameters.extra_build_args>>
           registry: <<parameters.registry>>``
-          image: <<parameters.dockerhub-image>>
+          image: <<parameters.repository>>
           path: <<parameters.path>>
           tag: <<parameters.tag>>
           ssh: <<parameters.docker_ssh>>
@@ -180,7 +180,7 @@ jobs:
           use-buildkit: true
       - aperture_docker_tag:
           source-registry: <<parameters.registry>>
-          source-image: <<parameters.dockerhub-image>>
+          source-image: <<parameters.repository>>
           source-tag: <<parameters.tag>>
           dest-registry: <<parameters.gcr-registry>>
           dest-image: <<parameters.gcr-image>>
@@ -198,14 +198,14 @@ jobs:
                 source-tag: <<parameters.tag>>
                 target-tag: <<parameters.target-tag>>
             - when:
-                condition: <<parameters.push-to-dockerhub>>
+                condition: <<parameters.push-to-quay>>
                 steps:
                   - run:
-                      name: Push images to DockerHub
+                      name: Push images to Quay
                       command: |
-                        docker tag <<parameters.dockerhub-image>>:<<parameters.tag>> <<parameters.dockerhub-image>>:<<parameters.target-tag>>
-                        docker login -u "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
-                        docker push <<parameters.dockerhub-image>>:<<parameters.target-tag>>
+                        docker tag <<parameters.registry>>/<<parameters.repository>>:<<parameters.tag>> <<parameters.registry>>/<<parameters.repository>>:<<parameters.target-tag>>
+                        docker login -u "$QUAY_USERNAME" --password "$QUAY_PASSWORD" <<parameters.registry>>
+                        docker push <<parameters.registry>>/<<parameters.repository>>:<<parameters.target-tag>>
 
   go-test-coverage:
     parameters:
@@ -410,8 +410,8 @@ jobs:
         default: ${CIRCLE_SHA1:0:8}
       registry:
         type: string
-        default: docker.io
-        description: Name of registry to use, defaults to docker.io.
+        default: quay.io
+        description: Name of registry to use, defaults to quay.io.
       remote-repo:
         type: string
         default: ""
@@ -619,8 +619,8 @@ jobs:
         default: ${CIRCLE_SHA1:0:8}
       registry:
         type: string
-        default: docker.io
-        description: Name of registry to use, defaults to docker.io.
+        default: quay.io
+        description: Name of registry to use, defaults to quay.io.
       remote-repo:
         type: string
         default: ""
@@ -1046,7 +1046,7 @@ workflows:
     jobs:
       - build-push-add-tag:
           name: image-build-aperture-agent
-          dockerhub-image: fluxninja/aperture-agent
+          repository: fluxninja/aperture-agent
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-agent
           docker-context: .
@@ -1066,7 +1066,7 @@ workflows:
 
       - build-push-add-tag:
           name: image-build-aperture-controller
-          dockerhub-image: fluxninja/aperture-controller
+          repository: fluxninja/aperture-controller
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-controller
           docker-context: .
@@ -1163,7 +1163,7 @@ workflows:
     jobs:
       - build-push-add-tag:
           name: image-build-aperture-operator
-          dockerhub-image: fluxninja/aperture-operator
+          repository: fluxninja/aperture-operator
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-operator
           docker-context: .
@@ -1187,13 +1187,13 @@ workflows:
     jobs:
       - build-push-add-tag:
           name: image-demo-app
-          dockerhub-image: fluxninja/demo-app
+          repository: fluxninja/demo-app
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/demo-app
           docker-context: ./playground/demo_app
           dockerfile: ./playground/demo_app/Dockerfile
           use-docker-layer-caching: true
-          push-to-dockerhub: false
+          push-to-quay: false
       - update-environment:
           filters:
             branches:
@@ -1387,9 +1387,9 @@ commands:
           Path to the directory containing your Dockerfile, defaults to . (working directory)
         type: string
       registry:
-        default: docker.io
+        default: quay.io
         description: |
-          Name of registry to use, defaults to docker.io
+          Name of registry to use, defaults to quay.io
         type: string
       step-name:
         default: Docker build

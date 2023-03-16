@@ -98,7 +98,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 					},
 					Image: common.AgentImage{
 						Image: common.Image{
-							Registry:   "docker.io/fluxninja",
+							Registry:   "quay.io/fluxninja",
 							Tag:        "latest",
 							PullPolicy: "IfNotPresent",
 						},
@@ -111,7 +111,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 
 			expected := corev1.Container{
 				Name:            AgentServiceName,
-				Image:           "docker.io/fluxninja/aperture-agent:latest",
+				Image:           "quay.io/fluxninja/aperture-agent:latest",
 				ImagePullPolicy: corev1.PullIfNotPresent,
 				SecurityContext: &corev1.SecurityContext{},
 				Command:         nil,
@@ -233,7 +233,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 					},
 					Image: common.AgentImage{
 						Image: common.Image{
-							Registry:   "docker.io/fluxninja",
+							Registry:   "quay.io/fluxninja",
 							Tag:        "latest",
 							PullPolicy: "IfNotPresent",
 						},
@@ -273,7 +273,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 
 			expected := corev1.Container{
 				Name:            AgentServiceName,
-				Image:           "docker.io/fluxninja/aperture-agent:latest",
+				Image:           "quay.io/fluxninja/aperture-agent:latest",
 				ImagePullPolicy: corev1.PullAlways,
 				SecurityContext: &corev1.SecurityContext{
 					RunAsUser: pointer.Int64(1001),
@@ -441,7 +441,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 					},
 					Image: common.AgentImage{
 						Image: common.Image{
-							Registry:    "docker.io/fluxninja",
+							Registry:    "quay.io/fluxninja",
 							Tag:         "latest",
 							PullPolicy:  "IfNotPresent",
 							PullSecrets: TestArray,
@@ -472,7 +472,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 
 			expected := corev1.Container{
 				Name:            AgentServiceName,
-				Image:           "docker.io/fluxninja/aperture-agent:latest",
+				Image:           "quay.io/fluxninja/aperture-agent:latest",
 				ImagePullPolicy: corev1.PullIfNotPresent,
 				SecurityContext: &corev1.SecurityContext{
 					RunAsUser:              pointer.Int64(0),
@@ -667,7 +667,7 @@ var _ = Describe("Pod modification for Agent", func() {
 					},
 					Image: common.AgentImage{
 						Image: common.Image{
-							Registry:   "docker.io/fluxninja",
+							Registry:   "quay.io/fluxninja",
 							Tag:        "latest",
 							PullPolicy: "IfNotPresent",
 						},
@@ -684,7 +684,7 @@ var _ = Describe("Pod modification for Agent", func() {
 					Containers: []corev1.Container{
 						{
 							Name:            AgentServiceName,
-							Image:           "docker.io/fluxninja/aperture-agent:latest",
+							Image:           "quay.io/fluxninja/aperture-agent:latest",
 							ImagePullPolicy: corev1.PullIfNotPresent,
 							SecurityContext: &corev1.SecurityContext{},
 							Command:         nil,
@@ -837,7 +837,7 @@ var _ = Describe("Pod modification for Agent", func() {
 					},
 					Image: common.AgentImage{
 						Image: common.Image{
-							Registry:    "docker.io/fluxninja",
+							Registry:    "quay.io/fluxninja",
 							Tag:         "latest",
 							PullPolicy:  "IfNotPresent",
 							PullSecrets: TestArrayTwo,
@@ -895,7 +895,7 @@ var _ = Describe("Pod modification for Agent", func() {
 					Containers: []corev1.Container{
 						{
 							Name:            AgentServiceName,
-							Image:           "docker.io/fluxninja/aperture-agent:latest",
+							Image:           "quay.io/fluxninja/aperture-agent:latest",
 							ImagePullPolicy: corev1.PullNever,
 							SecurityContext: &corev1.SecurityContext{},
 							Command:         nil,

@@ -107,7 +107,7 @@ all: install-asdf-tools install-go-tools generate-api go-generate go-mod-tidy go
 ###### OPERATOR section starts ######
 #####################################
 
-# IMAGE_TAG_BASE defines the docker.io namespace and part of the image name for remote images.
+# IMAGE_TAG_BASE defines the quay.io namespace and part of the image name for remote images.
 IMAGE_TAG_BASE ?= fluxninja/aperture-operator
 
 # USE_IMAGE_DIGESTS defines if images are resolved via tags or digests

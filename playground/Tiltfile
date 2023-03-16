@@ -8,7 +8,7 @@ allow_k8s_contexts('gke_devel-309501_us-central1_kklimonda-dev-cluster')
 #################
 ### CONSTANTS ###
 #################
-IMG_REPO = "docker.io/fluxninja"
+IMG_REPO = "quay.io/fluxninja"
 GIT_ROOT = str(local("git rev-parse --show-toplevel")).strip()
 PLAYGROUND_ROOT = GIT_ROOT + "/playground"
 TANKA_ROOT = GIT_ROOT + "/playground/tanka"
@@ -1076,7 +1076,7 @@ def declare_resources(resources, dep_tree, inv_dep_tree,race_arg,enable_cloud_ex
         fail("SKIP_LOCAL_CMDS mode enabled")
 
 
-def process_dockerhub_images(dockerhub_images):
+def process_quay_images(quay_images):
     for namespace, workloads in DEP_TREE.items():
         for workload, sections in workloads.items():
             if "images" not in sections:
@@ -1085,7 +1085,7 @@ def process_dockerhub_images(dockerhub_images):
             images_final = []
             for image in sections["images"]:
                 image_ref = image["ref"]
-                if image_ref not in dockerhub_images:
+                if image_ref not in quay_images:
                     images_final += [image]
 
                 images_final += [{"ref": image_ref, "tag": "latest"}]
@@ -1117,7 +1117,7 @@ config.define_bool("only", usage="Only deploy explicitly resources, without hand
 config.define_bool("verbose", usage="Enable verbose logging")
 config.define_bool("trace", usage="Enable trace logging")
 config.define_string("scenario", usage="Demo scenario to execute")
-config.define_string_list("dockerhub-image", usage="A list of images to pull directly from docker.io/fluxninja")
+config.define_string_list("quay-image", usage="A list of images to pull directly from quay.io/fluxninja")
 config.define_bool("race",usage="Enable race detector for agent and controller")
 config.define_bool("skip-extensions", usage="Skip extension building")
 config.define_bool("enable-cloud-extension",usage="Enable ARC API key authentication, which will send the data to the ARC cloud")
@@ -1142,11 +1142,11 @@ enable_cloud_extension = cfg.get("enable-cloud-extension",False)
 
 run_only_listed = cfg.get("only", False)
 
-# Optionally, process a list of images that should be pulled from dockerhub instead of being
+# Optionally, process a list of images that should be pulled from quay instead of being
 # built locally. This is mostly meant for aperture-agent, aperture-controller and aperture-operator.
-dockerhub_images = cfg.get("dockerhub-image", [])
-if dockerhub_images:
-    process_dockerhub_images(dockerhub_images)
+quay_images = cfg.get("quay-image", [])
+if quay_images:
+    process_quay_images(quay_images)
 
 to_run = cfg.get("to-run", ["agent"])
 

@@ -40,7 +40,7 @@ spec:
         - name: simplesrv
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.simplesrv.image.repository }}:{{ .Values.simplesrv.image.tag }}"
+          image: "{{ .Values.simplesrv.image.registry }}/{{ .Values.simplesrv.image.repository }}:{{ .Values.simplesrv.image.tag }}"
           imagePullPolicy: {{ .Values.simplesrv.image.pullPolicy }}
           ports:
             - name: srvhttp

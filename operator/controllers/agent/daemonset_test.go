@@ -125,7 +125,7 @@ var _ = Describe("Agent DaemonSet", func() {
 					},
 					Image: common.AgentImage{
 						Image: common.Image{
-							Registry:   "docker.io/fluxninja",
+							Registry:   "quay.io/fluxninja",
 							Tag:        "latest",
 							PullPolicy: "IfNotPresent",
 						},
@@ -179,7 +179,7 @@ var _ = Describe("Agent DaemonSet", func() {
 							Containers: []corev1.Container{
 								{
 									Name:            AgentServiceName,
-									Image:           "docker.io/fluxninja/aperture-agent:latest",
+									Image:           "quay.io/fluxninja/aperture-agent:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									SecurityContext: &corev1.SecurityContext{},
 									Command:         nil,
@@ -386,7 +386,7 @@ var _ = Describe("Agent DaemonSet", func() {
 					},
 					Image: common.AgentImage{
 						Image: common.Image{
-							Registry:    "docker.io/fluxninja",
+							Registry:    "quay.io/fluxninja",
 							Tag:         "latest",
 							PullPolicy:  "IfNotPresent",
 							PullSecrets: TestArray,
@@ -456,7 +456,7 @@ var _ = Describe("Agent DaemonSet", func() {
 							Containers: []corev1.Container{
 								{
 									Name:            AgentServiceName,
-									Image:           "docker.io/fluxninja/aperture-agent:latest",
+									Image:           "quay.io/fluxninja/aperture-agent:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									SecurityContext: &corev1.SecurityContext{
 										RunAsUser:              pointer.Int64(0),

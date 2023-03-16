@@ -7,7 +7,7 @@ local apertureControllerMixin =
     values+:: {
       operator+: {
         image: {
-          registry: 'docker.io/fluxninja',
+          registry: 'quay.io/fluxninja',
           repository: 'aperture-operator',
           tag: 'latest',
           pullPolicy: 'IfNotPresent',
@@ -52,7 +52,7 @@ local apertureControllerMixin =
         },
         image: {
           registry: '',
-          repository: 'docker.io/fluxninja/aperture-controller',
+          repository: 'quay.io/fluxninja/aperture-controller',
           tag: 'latest',
         },
       },
