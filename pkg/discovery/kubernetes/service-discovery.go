@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sourcegraph/conc/stream"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/informers"
@@ -15,10 +14,8 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
-	"github.com/fluxninja/aperture/pkg/etcd/election"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/utils"
 )
@@ -34,41 +31,16 @@ type serviceDiscovery struct {
 	cancel          context.CancelFunc
 	serviceStream   *stream.Stream
 	clusterDomain   string
-
-	podCounter *prometheus.GaugeVec
-	election   *election.Election
 }
 
 func newServiceDiscovery(
 	entityEvents notifiers.EventWriter,
 	k8sClient k8s.K8sClient,
-	pr *prometheus.Registry,
-	election *election.Election,
 ) (*serviceDiscovery, error) {
 	kd := &serviceDiscovery{
 		cli:           k8sClient.GetClientSet(),
 		entityEvents:  entityEvents,
 		serviceStream: stream.New(),
-		election:      election,
-	}
-	if kd.election != nil && kd.election.IsLeader() {
-		defaultLabels := []string{
-			metrics.K8sNamespaceName, metrics.K8sNodeName, metrics.K8sStatus,
-			metrics.K8sCronjobName, metrics.K8sDaemonsetName, metrics.K8sDeploymentName, metrics.K8sJobName, metrics.K8sReplicasetName, metrics.K8sStatefulsetName,
-		}
-		podCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
-			Name: metrics.K8sPodCount,
-			Help: "The number of pods",
-		}, defaultLabels)
-		err := pr.Register(podCounter)
-		if err != nil {
-			// Ignore already registered error, as this is not harmful. Metrics may
-			// be registered by other running server.
-			if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
-				return nil, fmt.Errorf("couldn't register prometheus metrics: %w", err)
-			}
-		}
-		kd.podCounter = podCounter
 	}
 	kd.informerFactory = informers.NewSharedInformerFactory(kd.cli, 0)
 	kd.ctx, kd.cancel = context.WithCancel(context.Background())
@@ -83,7 +55,7 @@ func (kd *serviceDiscovery) start(startCtx context.Context) error {
 		return err
 	}
 	kd.clusterDomain = clusterDomain
-	var informerSynced []cache.InformerSynced
+
 	endpointsInformer := kd.informerFactory.Core().V1().Endpoints().Informer()
 	_, err = endpointsInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    kd.handleEndpointsAdd,
@@ -93,7 +65,7 @@ func (kd *serviceDiscovery) start(startCtx context.Context) error {
 	if err != nil {
 		return err
 	}
-	informerSynced = append(informerSynced, endpointsInformer.HasSynced)
+
 	serviceInformer := kd.informerFactory.Core().V1().Services().Informer()
 	_, err = serviceInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    kd.handleServiceAdd,
@@ -102,22 +74,10 @@ func (kd *serviceDiscovery) start(startCtx context.Context) error {
 	if err != nil {
 		return err
 	}
-	informerSynced = append(informerSynced, serviceInformer.HasSynced)
-	if kd.election != nil && kd.election.IsLeader() {
-		podInformer := kd.informerFactory.Core().V1().Pods().Informer()
-		_, err = podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-			AddFunc:    kd.handlePodAdd,
-			UpdateFunc: kd.handlePodUpdate,
-			DeleteFunc: kd.handlePodDelete,
-		})
-		if err != nil {
-			return err
-		}
-		informerSynced = append(informerSynced, podInformer.HasSynced)
-	}
+
 	kd.informerFactory.Start(kd.ctx.Done())
 
-	if !cache.WaitForCacheSync(startCtx.Done(), informerSynced...) {
+	if !cache.WaitForCacheSync(startCtx.Done(), endpointsInformer.HasSynced, serviceInformer.HasSynced) {
 		return errors.New("timed out waiting for caches to sync")
 	}
 
@@ -305,66 +265,7 @@ func (kd *serviceDiscovery) updateEntity(pod *entitiesv1.Entity) error {
 	return nil
 }
 
-func (kd *serviceDiscovery) handlePodAdd(obj any) {
-	pod := obj.(*v1.Pod)
-	labels := podLabels(pod)
-
-	podCounter, err := kd.podCounter.GetMetricWith(labels)
-	if err != nil {
-		log.Debug().Msgf("Could not extract request counter metric from registry: %v", err)
-		return
-	}
-	podCounter.Inc()
-}
-
-func (kd *serviceDiscovery) handlePodDelete(obj any) {
-	pod := obj.(*v1.Pod)
-	newPod := pod.DeepCopy()
-	newPod.Status.Phase = v1.PodSucceeded
-	kd.handlePodUpdate(pod, newPod)
-}
-
-func (kd *serviceDiscovery) handlePodUpdate(oldObj, newObj any) {
-	oldPod := oldObj.(*v1.Pod)
-	newPod := newObj.(*v1.Pod)
-
-	if oldPod.Status.Phase != newPod.Status.Phase || oldPod.Spec.NodeName != newPod.Spec.NodeName {
-		oldPodCounter, errOld := kd.podCounter.GetMetricWith(podLabels(oldPod))
-		newPodCounter, errNew := kd.podCounter.GetMetricWith(podLabels(newPod))
-		if errOld != nil {
-			log.Error().Msgf("Could not extract request counter metric from registry: %v", errOld)
-			return
-		}
-		if errNew != nil {
-			log.Error().Msgf("Could not extract request counter metric from registry: %v", errNew)
-			return
-		}
-		oldPodCounter.Dec()
-		newPodCounter.Inc()
-	}
-}
-
 /* Helper functions */
-
-func podLabels(pod *v1.Pod) map[string]string {
-	labels := map[string]string{
-		metrics.K8sNamespaceName:   pod.Namespace,
-		metrics.K8sNodeName:        pod.Spec.NodeName,
-		metrics.K8sStatus:          string(pod.Status.Phase),
-		metrics.K8sCronjobName:     "",
-		metrics.K8sDaemonsetName:   "",
-		metrics.K8sDeploymentName:  "",
-		metrics.K8sJobName:         "",
-		metrics.K8sReplicasetName:  "",
-		metrics.K8sStatefulsetName: "",
-	}
-	owners := pod.GetObjectMeta().GetOwnerReferences()
-	for _, owner := range owners {
-		kind := strings.ToLower(owner.Kind)
-		labels[fmt.Sprintf("k8s_%s_name", kind)] = owner.Name
-	}
-	return labels
-}
 
 func getClusterIPsFromService(svc *v1.Service) []string {
 	if svc.Spec.Type != v1.ServiceTypeClusterIP {
