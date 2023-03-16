@@ -177,11 +177,11 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 			if ext.PkgName == "" {
 				ext.PkgName = getGoPkgName(ext.GoModName)
 			}
+			err = apertureGoModFile.AddRequire(ext.GoModName, ext.Version)
 			if err != nil {
-				log.Error().Err(err).Msg("failed to get go package name")
+				log.Error().Err(err).Msg("failed to add require directive to go.mod file")
 				return err
 			}
-			err = apertureGoModFile.AddModuleStmt(ext.GoModName + " " + ext.Version)
 		}
 		// add the replace directive to the final go.mod
 		for _, replace := range cfg.Replaces {
