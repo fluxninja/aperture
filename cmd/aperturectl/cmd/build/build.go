@@ -107,7 +107,7 @@ func Module() fx.Option {
     {{ .PkgName }}.Module(),
     {{- end }}
     {{- range .BundledExtensions }}
-    {{ .Name }}.Module(),
+    {{ .PkgName }}.Module(),
     {{- end }}
   )
 }
@@ -424,18 +424,23 @@ func generateExtensionsCode(dest string) error {
 		BundledExtensions []struct {
 			Name      string
 			GoModName string
+			PkgName   string
 		}
 	}{
 		Extensions: cfg.Extensions,
 	}
 	// add bundled extensions which are local and their path is extensions/<name>
 	for _, ext := range cfg.BundledExtensions {
+		goModName := apertureGoModName + "/extensions/" + ext
+		pkgName := getGoPkgName(goModName)
 		data.BundledExtensions = append(data.BundledExtensions, struct {
 			Name      string
 			GoModName string
+			PkgName   string
 		}{
 			Name:      ext,
-			GoModName: apertureGoModName + "/extensions/" + ext,
+			GoModName: goModName,
+			PkgName:   pkgName,
 		})
 		log.Info().Msgf("Adding bundled extension: %s", ext)
 	}

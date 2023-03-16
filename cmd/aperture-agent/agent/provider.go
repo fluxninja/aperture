@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"path"
 
+	"go.uber.org/fx"
+
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/pkg/peers"
-	"go.uber.org/fx"
 )
 
 // ProvidePeersPrefix provides the peers prefix.
@@ -20,12 +21,14 @@ func ProvidePeersPrefix(agentInfo *agentinfo.AgentInfo) (peers.PeerDiscoveryPref
 	return peers.PeerDiscoveryPrefix(prefix), nil
 }
 
+// FxIn is the input for the AddAgentInfoAttribute function.
 type FxIn struct {
 	fx.In
 	BaseConfig *otelconfig.OTELConfig `name:"base"`
 	AgentInfo  *agentinfo.AgentInfo
 }
 
+// AddAgentInfoAttribute adds the agent group and instance labels to OTEL config.
 func AddAgentInfoAttribute(in FxIn) {
 	in.BaseConfig.AddProcessor(otelconsts.ProcessorAgentGroup, map[string]interface{}{
 		"actions": []map[string]interface{}{
