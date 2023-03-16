@@ -181,8 +181,8 @@ func (u *KoanfUnmarshaller) Reload(bytes []byte) error {
 	k := koanf.New(DefaultKoanfDelim)
 
 	// Precedence:
-	// 1. MergeConfig
-	// 2. Env
+	// 1. Env (resolved during unmarshal stage)
+	// 2. MergeConfig
 	// 3. Bytes
 	// 4. Flags
 
@@ -371,9 +371,7 @@ func (u *KoanfUnmarshaller) bindEnvsKey(keyPrefix string, in interface{}, prev .
 				continue
 			}
 			if v != nil {
-				if tv, ok := t.Tag.Lookup("public"); ok && tv == "true" {
-					log.Info().Str("env", env).Str("key", key).Interface("v", v).Msg("reading env var")
-				}
+				log.Debug().Str("env", env).Str("key", key).Msg("reading env var")
 				keyVals[key] = v
 			}
 		}

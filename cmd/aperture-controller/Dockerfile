@@ -14,18 +14,13 @@ ENV APERTURECTL_BUILD_GIT_BRANCH=${APERTURECTL_BUILD_GIT_BRANCH}
 ARG APERTURECTL_BUILD_FLAGS
 ENV APERTURECTL_BUILD_FLAGS=${APERTURECTL_BUILD_FLAGS}
 
-ENV CONFIG_FILE=cmd/aperture-agent/build-config.yaml
-
-# if build-config.yaml doesn't exist, create empty build-config.yaml
-RUN if [ ! -f "${CONFIG_FILE}" ]; then touch "${CONFIG_FILE}"; fi
-
 RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.cache/go-build/,id=controller-1.19.6,sharing=private \
   --mount=type=cache,target=/root/.aperturectl,id=controller-1.19.6,sharing=private \
   /bin/bash -c \
   'go mod download; \
   go build -o cmd/aperturectl/aperturectl ./cmd/aperturectl; \
-  ./cmd/aperturectl/aperturectl build controller -o / --uri . -c "${CONFIG_FILE}"; \
+  ./cmd/aperturectl/aperturectl build controller -o / --uri .; \
   '
 
 # Final image
