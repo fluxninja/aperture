@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/open-policy-agent/opa/rego"
+
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier/extractors"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
-	"github.com/open-policy-agent/opa/rego"
 )
 
 const defaultPackageName = "fluxninja.classification.extractors"

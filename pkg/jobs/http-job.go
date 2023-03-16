@@ -92,7 +92,7 @@ func fetchURL(ctx context.Context, method string, url string, client *http.Clien
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("fail to execute %v request: %v", method, err)
+		return nil, fmt.Errorf("fail to execute %v request: %w", method, err)
 	}
 	return resp, nil
 }
