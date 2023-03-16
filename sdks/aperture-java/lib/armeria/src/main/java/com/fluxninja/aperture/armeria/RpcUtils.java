@@ -12,7 +12,10 @@ import java.util.Map;
 
 class RpcUtils {
   protected static HttpStatus handleRejectedFlow(Flow flow) {
-    CheckResponse.RejectReason reason = flow.checkResponse().getRejectReason();
+    CheckResponse.RejectReason reason = null;
+    if (flow.checkResponse() != null) {
+      flow.checkResponse().getRejectReason();
+    }
     try {
       flow.end(FlowStatus.Unset);
     } catch (ApertureSDKException e) {
