@@ -152,27 +152,4 @@ const (
 	DefaultWorkloadIndex = "default"
 	// DefaultAgentGroup - default agent group.
 	DefaultAgentGroup = "default"
-
-	// K8S METRICS.
-
-	// K8sPodCount - number of pods in the cluster.
-	K8sPodCount = "k8s_pod_count"
-	// K8sNamespaceName - namespace of a resource.
-	K8sNamespaceName = "k8s_namespace_name"
-	// K8sNodeName - name of a node.
-	K8sNodeName = "k8s_node_name"
-	// K8sStatus - status of a resource.
-	K8sStatus = "k8s_status"
-	// K8sReplicasetName - name of a replicaset.
-	K8sReplicasetName = "k8s_replicaset_name"
-	// K8sDaemonsetName - name of a daemonset.
-	K8sDaemonsetName = "k8s_daemonset_name"
-	// K8sStatefulsetName - name of a statefulset.
-	K8sStatefulsetName = "k8s_statefulset_name"
-	// K8sJobName - name of a job.
-	K8sJobName = "k8s_job_name"
-	// K8sCronjobName - name of a cronjob.
-	K8sCronjobName = "k8s_cronjob_name"
-	// K8sDeploymentName - name of a deployment.
-	K8sDeploymentName = "k8s_deployment_name"
 )
