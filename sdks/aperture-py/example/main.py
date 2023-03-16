@@ -24,7 +24,7 @@ aperture_client = ApertureClient.new_client(
     "awesomeFeature", on_reject=lambda: ("Flow was rejected", 503)
 )
 async def super_handler():
-    # Symulate work being done
+    # Simulate work being done
     await asyncio.sleep(2)
     return "", 202
 

@@ -1,3 +1,4 @@
+from contextlib import AbstractContextManager
 from datetime import datetime, timezone
 import enum
 import time
@@ -18,7 +19,7 @@ class FlowStatus(enum.Enum):
     Error = enum.auto()
 
 
-class Flow:
+class Flow(AbstractContextManager):
     def __init__(
         self, span: trace.Span, check_response: Optional[check_pb2.CheckResponse]
     ):
@@ -26,16 +27,17 @@ class Flow:
         self._check_response = check_response
         self._ended = False
 
+    @property
     def accepted(self) -> bool:
-        if not self._check_response:
+        if not self.check_response:
             return True
-        if (
-            self._check_response.decision_type
-            == check_pb2.CheckResponse.DECISION_TYPE_ACCEPTED
-        ):
-            return True
-        return False
+        return self.check_response.decision_type == check_pb2.CheckResponse.DECISION_TYPE_ACCEPTED
 
+    @property
+    def success(self) -> bool:
+        return self.check_response is not None
+
+    @property
     def check_response(self) -> Optional[check_pb2.CheckResponse]:
         return self._check_response
 
@@ -45,8 +47,8 @@ class Flow:
         self._ended = True
 
         check_response_json = (
-            json_format.MessageToJson(self._check_response)
-            if self._check_response
+            json_format.MessageToJson(self.check_response)
+            if self.check_response
             else ""
         )
         self._span.set_attributes(
@@ -57,3 +59,14 @@ class Flow:
             }
         )
         self._span.end()
+
+    def __enter__(self) -> "Flow":
+        return self
+
+    def __exit__(self, exc_type, _exc_value, _traceback) -> None:
+        if self._ended:
+            return
+        if exc_type:
+            self.end(FlowStatus.Error)
+        else:
+            self.end(FlowStatus.OK)

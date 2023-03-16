@@ -120,28 +120,14 @@ class ApertureClient:
         def decorator(fn: TWrappedFunction) -> TWrappedFunction:
             @functools.wraps(fn)
             async def wrapper(*args, **kwargs):
-                try:
-                    flow = self.start_flow(control_point, explicit_labels)
-                except Exception:
-                    self.logger.exception(
-                        "Aperture flow control failed to start flow. Defaulting to accept the flow.",
-                    )
-                    return await run_fn(fn, *args, **kwargs)
 
-                try:
-                    if flow.accepted():
+                with self.start_flow(control_point, explicit_labels) as flow:
+                    if flow.accepted:
                         return await run_fn(fn, *args, **kwargs)
                     else:
                         if on_reject:
                             return on_reject()
                         raise RejectedFlowException("Flow was rejected")
-                finally:
-                    try:
-                        flow.end(FlowStatus.OK)
-                    except Exception as e:
-                        self.logger.exception(
-                            "Aperture flow control failed to end.",
-                        )
 
             return wrapper
 
