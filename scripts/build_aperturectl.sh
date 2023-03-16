@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eux
 
-APERTURECTL_DIR=$(git rev-parse --show-toplevel)/cmd/aperturectl
+APERTURECTL_DIR=${1:-$(git rev-parse --show-toplevel)/cmd/aperturectl}
 
 APERTURECTL_BUILD_VERSION=${APERTURECTL_BUILD_VERSION:-0.0.1}
 BUILD_TIME=${BUILD_TIME:-$(date -Iseconds)}

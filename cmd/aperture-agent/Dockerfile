@@ -19,7 +19,7 @@ RUN --mount=type=cache,target=/go/pkg/ \
   --mount=type=cache,target=/root/.aperturectl,id=agent-1.20.2,sharing=private \
   /bin/bash -c \
   'go mod download; \
-  go build -o cmd/aperturectl/aperturectl ./cmd/aperturectl; \
+  ./scripts/build_aperturectl.sh ./cmd/aperturectl; \
   ./cmd/aperturectl/aperturectl build agent -o / --uri .; \
   '
 
