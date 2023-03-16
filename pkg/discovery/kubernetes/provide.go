@@ -4,11 +4,13 @@ package kubernetes
 import (
 	"context"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/common"
 	"github.com/fluxninja/aperture/pkg/discovery/entities"
+	"github.com/fluxninja/aperture/pkg/etcd/election"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -34,11 +36,13 @@ func Module() fx.Option {
 // FxInSvc describes parameters passed to k8s discovery constructor.
 type FxInSvc struct {
 	fx.In
-	Unmarshaller     config.Unmarshaller
-	Lifecycle        fx.Lifecycle
-	StatusRegistry   status.Registry
-	KubernetesClient k8s.K8sClient
-	EntityTrackers   *entities.EntityTrackers
+	Unmarshaller       config.Unmarshaller
+	Lifecycle          fx.Lifecycle
+	StatusRegistry     status.Registry
+	KubernetesClient   k8s.K8sClient
+	EntityTrackers     *entities.EntityTrackers
+	PrometheusRegistry *prometheus.Registry
+	Election           *election.Election `optional:"true"`
 }
 
 // InvokeServiceDiscovery creates a Kubernetes service discovery.
@@ -59,7 +63,7 @@ func InvokeServiceDiscovery(in FxInSvc) error {
 		return nil
 	}
 	entityEvents := in.EntityTrackers.RegisterServiceDiscovery(podTrackerPrefix)
-	ksd, err := newServiceDiscovery(entityEvents, in.KubernetesClient)
+	ksd, err := newServiceDiscovery(entityEvents, in.KubernetesClient, in.PrometheusRegistry, in.Election)
 	if err != nil {
 		log.Info().Err(err).Msg("Failed to create Kubernetes service discovery")
 		return err
