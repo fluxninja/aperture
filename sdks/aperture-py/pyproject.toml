@@ -12,7 +12,6 @@ grpcio = "^1.51"
 opentelemetry-api = "^1.16.0"
 opentelemetry-sdk = "^1.16.0"
 opentelemetry-exporter-otlp = "^1.16.0"
-wsgitypes = "^0.0.4"
 protobuf = "^4.22.1"
 
 [tool.poetry.group.dev.dependencies]

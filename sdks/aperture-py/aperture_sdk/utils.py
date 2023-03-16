@@ -1,13 +1,9 @@
 import inspect
 from typing import Any, Callable, ParamSpec, TypeVar
 
-# TODO: Remove this as it requires python 3.10
-TWrappedParam = ParamSpec("TWrappedParam")
 TWrappedReturn = TypeVar("TWrappedReturn")
-TWrappedFunction = Callable[TWrappedParam, TWrappedReturn]
 
-
-async def run_fn(fn: TWrappedFunction, *args, **kwargs) -> TWrappedReturn:
+async def run_fn(fn: Callable[..., TWrappedReturn], *args, **kwargs) -> TWrappedReturn:
     """Run a function or coroutine."""
     # We want to support both sync and async functions
     # https://stackoverflow.com/questions/44169998/how-to-create-a-python-decorator-that-can-wrap-either-coroutine-or-function

@@ -23,18 +23,16 @@ from aperture_sdk.const import (
     workload_start_timestamp_label,
 )
 from aperture_sdk.flow import Flow, FlowStatus
-from aperture_sdk.utils import TWrappedFunction, TWrappedParam, TWrappedReturn, run_fn
+from aperture_sdk.utils import TWrappedReturn, run_fn
 import grpc
 from opentelemetry import baggage, trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import Resource, SERVICE_NAME, SERVICE_VERSION
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
-import wsgitypes
 
 TApertureClient = TypeVar("TApertureClient", bound="ApertureClient")
-
-
+TWrappedFunction = Callable[..., TWrappedReturn]
 class ApertureClient:
     def __init__(
         self,

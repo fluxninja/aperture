@@ -2,7 +2,7 @@ from contextlib import AbstractContextManager
 from datetime import datetime, timezone
 import enum
 import time
-from typing import Optional
+from typing import Optional, TypeVar
 
 from aperture_sdk._gen.aperture.flowcontrol.check.v1 import check_pb2
 from aperture_sdk.const import (
@@ -18,6 +18,8 @@ class FlowStatus(enum.Enum):
     OK = enum.auto()
     Error = enum.auto()
 
+
+TFlow = TypeVar("TFlow", bound="Flow")
 
 class Flow(AbstractContextManager):
     def __init__(
@@ -60,13 +62,13 @@ class Flow(AbstractContextManager):
         )
         self._span.end()
 
-    def __enter__(self) -> "Flow":
+    def __enter__(self: TFlow) -> TFlow:
         return self
 
     def __exit__(self, exc_type, _exc_value, _traceback) -> None:
         if self._ended:
             return
-        if exc_type:
+        if exc_type is not None:
             self.end(FlowStatus.Error)
         else:
             self.end(FlowStatus.OK)
