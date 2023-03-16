@@ -2,6 +2,7 @@ package concurrency
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math"
 	"path"
@@ -9,7 +10,6 @@ import (
 	"time"
 
 	"github.com/jonboulle/clockwork"
-	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
@@ -402,12 +402,12 @@ func (conLimiter *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 
 			wfqFlowsGauge, err := wfqFlowsGaugeVec.GetMetricWith(metricLabels)
 			if err != nil {
-				return errors.Wrap(err, "failed to get wfq flows gauge")
+				return fmt.Errorf("%w: failed to get wfq flows gauge", err)
 			}
 
 			wfqRequestsGauge, err := wfqRequestsGaugeVec.GetMetricWith(metricLabels)
 			if err != nil {
-				return errors.Wrap(err, "failed to get wfq requests gauge")
+				return fmt.Errorf("%w: failed to get wfq requests gauge", err)
 			}
 
 			wfqMetrics := &scheduler.WFQMetrics{
