@@ -1,5 +1,5 @@
 import inspect
-from typing import Any, Callable, ParamSpec, TypeVar
+from typing import Callable, TypeVar
 
 TWrappedReturn = TypeVar("TWrappedReturn")
 

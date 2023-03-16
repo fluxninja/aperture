@@ -1,15 +1,11 @@
 import datetime
 import functools
-import inspect
 import logging
 import time
-from typing import Dict, Literal, Optional, Tuple, Type, TypedDict
-from typing import Any, Callable, ParamSpec, TypeVar
+from typing import Dict, Optional, Type
+from typing import Callable, TypeVar
 
-from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import (
-    CheckRequest,
-    CheckResponse,
-)
+from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import CheckRequest
 from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2_grpc import (
     FlowControlServiceStub,
 )
@@ -22,7 +18,7 @@ from aperture_sdk.const import (
     source_label,
     workload_start_timestamp_label,
 )
-from aperture_sdk.flow import Flow, FlowStatus
+from aperture_sdk.flow import Flow
 from aperture_sdk.utils import TWrappedReturn, run_fn
 import grpc
 from opentelemetry import baggage, trace
