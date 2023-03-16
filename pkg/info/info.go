@@ -40,6 +40,8 @@ var (
 	LocalIP = "unknown"
 	// UUID is the unique identifier for the process.
 	UUID = "unknown"
+	// Extensions is the list of extensions that are enabled.
+	Extensions = []string{}
 )
 
 var (
@@ -91,6 +93,7 @@ func GetVersionInfo() *infov1.VersionInfo {
 func GetProcessInfo() *infov1.ProcessInfo {
 	mutex.Lock()
 	defer mutex.Unlock()
+	processInfo.Extensions = Extensions
 	// reset uptime
 	processInfo.Uptime = durationpb.New(time.Since(processInfo.StartTime.AsTime()))
 	return (proto.Clone(&processInfo)).(*infov1.ProcessInfo)

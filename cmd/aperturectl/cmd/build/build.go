@@ -79,6 +79,17 @@ func Module() fx.Option {
     {{ .Name }}.Module(),
     {{- end }}
   )
+}
+
+func GetExtensions() []string {
+  return []string{
+	{{- range .Extensions }}
+	"{{ .GoModName }}",
+	{{- end }}
+	{{- range .BundledExtensions }}
+	"{{ .GoModName }}",
+	{{- end }}
+  }
 }`
 
 func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
@@ -166,11 +177,11 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 			if ext.PkgName == "" {
 				ext.PkgName = getGoPkgName(ext.GoModName)
 			}
+			err = apertureGoModFile.AddRequire(ext.GoModName, ext.Version)
 			if err != nil {
-				log.Error().Err(err).Msg("failed to get go package name")
+				log.Error().Err(err).Msg("failed to add require directive to go.mod file")
 				return err
 			}
-			err = apertureGoModFile.AddModuleStmt(ext.GoModName + " " + ext.Version)
 		}
 		// add the replace directive to the final go.mod
 		for _, replace := range cfg.Replaces {
@@ -343,10 +354,10 @@ func getLdFlags(service string) (string, error) {
 	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.Version=%s' ", apertureGoModName, cfg.Build.Version)
 	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.BuildOS=%s/%s' ", apertureGoModName, strings.TrimSpace(string(goosOut)), strings.TrimSpace(string(goarchOut)))
 	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.BuildHost=%s' ", apertureGoModName, strings.TrimSpace(string(hostnameOut)))
-	ldFlagsFinal += fmt.Sprintf("-X '%s/info.BuildTime=%s' ", apertureGoModName, strings.TrimSpace(string(buildTimeOut)))
-	ldFlagsFinal += fmt.Sprintf("-X '%s/info.GitBranch=%s' ", apertureGoModName, strings.TrimSpace(string(cfg.Build.GitBranch)))
-	ldFlagsFinal += fmt.Sprintf("-X '%s/info.GitCommitHash=%s' ", apertureGoModName, strings.TrimSpace(string(cfg.Build.GitCommitHash)))
-	ldFlagsFinal += fmt.Sprintf("-X '%s/info.Prefix=aperture' ", apertureGoModName)
+	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.BuildTime=%s' ", apertureGoModName, strings.TrimSpace(string(buildTimeOut)))
+	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.GitBranch=%s' ", apertureGoModName, strings.TrimSpace(string(cfg.Build.GitBranch)))
+	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.GitCommitHash=%s' ", apertureGoModName, strings.TrimSpace(string(cfg.Build.GitCommitHash)))
+	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.Prefix=aperture' ", apertureGoModName)
 	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.Service=%s'", apertureGoModName, service)
 	ldFlagsFinal += "\"" // close the ldflags
 	return ldFlagsFinal, nil

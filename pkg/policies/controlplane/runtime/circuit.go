@@ -2,10 +2,10 @@ package runtime
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
-	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
@@ -163,7 +163,7 @@ func (circuit *Circuit) setup(lifecycle fx.Lifecycle) {
 			for _, labels := range circuitMetricsLabels {
 				_, err := circuitMetrics.SignalSummaryVec.GetMetricWith(labels)
 				if err != nil {
-					err = errors.Wrapf(err, "failed to create metrics for %+v", labels)
+					err = fmt.Errorf("%w: failed to create metrics for %+v", err, labels)
 					merr = multierr.Append(merr, err)
 				}
 			}

@@ -1,11 +1,12 @@
 package runtime
 
 import (
+	"errors"
 	"math"
 
-	"github.com/fluxninja/aperture/pkg/mapstruct"
 	"github.com/mitchellh/mapstructure"
-	"github.com/pkg/errors"
+
+	"github.com/fluxninja/aperture/pkg/mapstruct"
 )
 
 // PortMapping is description of a component's ports mapping.
