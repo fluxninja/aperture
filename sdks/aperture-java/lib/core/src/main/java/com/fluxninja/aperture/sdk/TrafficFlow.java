@@ -60,7 +60,8 @@ public class TrafficFlow {
     this.ended = true;
 
     String serializedFlowcontrolCheckResponse = "";
-    if (this.checkResponse.hasDynamicMetadata()
+    if (this.checkResponse != null
+        && this.checkResponse.hasDynamicMetadata()
         && this.checkResponse.getDynamicMetadata().getFieldsMap().containsKey("aperture.check_response")) {
       Value checkResponse = this.checkResponse.getDynamicMetadata().getFieldsMap().get("aperture.check_response");
       if (checkResponse.hasStringValue()) {
