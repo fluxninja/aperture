@@ -41,7 +41,7 @@ var (
 	// UUID is the unique identifier for the process.
 	UUID = "unknown"
 	// Extensions is the list of extensions that are enabled.
-	Extensions = ""
+	Extensions = []string{}
 )
 
 var (
@@ -66,8 +66,6 @@ func init() {
 
 	// ProcessInfo
 	processInfo.StartTime = timestamppb.Now()
-	extensions := strings.Split(Extensions, ",")
-	processInfo.Extensions = extensions
 
 	// Hostname
 	hostname, err := os.Hostname()
@@ -95,6 +93,7 @@ func GetVersionInfo() *infov1.VersionInfo {
 func GetProcessInfo() *infov1.ProcessInfo {
 	mutex.Lock()
 	defer mutex.Unlock()
+	processInfo.Extensions = Extensions
 	// reset uptime
 	processInfo.Uptime = durationpb.New(time.Since(processInfo.StartTime.AsTime()))
 	return (proto.Clone(&processInfo)).(*infov1.ProcessInfo)

@@ -79,6 +79,17 @@ func Module() fx.Option {
     {{ .Name }}.Module(),
     {{- end }}
   )
+}
+
+func GetExtensions() []string {
+  return []string{
+	{{- range .Extensions }}
+	"{{ .GoModName }}",
+	{{- end }}
+	{{- range .BundledExtensions }}
+	"{{ .GoModName }}",
+	{{- end }}
+  }
 }`
 
 func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
@@ -107,16 +118,12 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		extensions := make([]string, len(cfg.Extensions))
-
 		if cfg.EnableCoreExtensions {
 			// add fluxninja and sentry to the list of extensions if they are not already there
 			if !autils.SliceContains(cfg.BundledExtensions, "fluxninja") {
-				extensions = append(extensions, "fluxninja")
 				cfg.BundledExtensions = append(cfg.BundledExtensions, "fluxninja")
 			}
 			if !autils.SliceContains(cfg.BundledExtensions, "sentry") {
-				extensions = append(extensions, "sentry")
 				cfg.BundledExtensions = append(cfg.BundledExtensions, "sentry")
 			}
 		}
@@ -170,7 +177,6 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 			if ext.PkgName == "" {
 				ext.PkgName = getGoPkgName(ext.GoModName)
 			}
-			extensions = append(extensions, ext.PkgName)
 			if err != nil {
 				log.Error().Err(err).Msg("failed to get go package name")
 				return err
@@ -239,7 +245,7 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 		}
 
 		// build binaries
-		err = buildBinary(cmd, extensions)
+		err = buildBinary(cmd)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to build agent binary")
 			return err
@@ -249,8 +255,8 @@ func buildRunE(cmd string) func(cmd *cobra.Command, args []string) error {
 	}
 }
 
-func buildBinary(service string, extensions []string) error {
-	ldFlagsFinal, err := getLdFlags(service, extensions)
+func buildBinary(service string) error {
+	ldFlagsFinal, err := getLdFlags(service)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to get ldflags")
 		return err
@@ -287,7 +293,7 @@ func buildBinary(service string, extensions []string) error {
 	return nil
 }
 
-func getLdFlags(service string, extensions []string) (string, error) {
+func getLdFlags(service string) (string, error) {
 	// goos is 'go env GOOS'
 	goos := exec.Command("go", "env", "GOOS")
 	goosOut, err := goos.Output()
@@ -353,7 +359,6 @@ func getLdFlags(service string, extensions []string) (string, error) {
 	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.GitCommitHash=%s' ", apertureGoModName, strings.TrimSpace(string(cfg.Build.GitCommitHash)))
 	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.Prefix=aperture' ", apertureGoModName)
 	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.Service=%s'", apertureGoModName, service)
-	ldFlagsFinal += fmt.Sprintf("-X '%s/pkg/info.Extensions=%s'", apertureGoModName, strings.Join(extensions, ","))
 	ldFlagsFinal += "\"" // close the ldflags
 	return ldFlagsFinal, nil
 }
