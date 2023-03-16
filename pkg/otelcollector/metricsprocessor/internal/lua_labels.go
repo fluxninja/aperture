@@ -3,14 +3,13 @@ package internal
 import (
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
 )
 
 // AddLuaSpecificLabels adds labels specific to data source.
 func AddLuaSpecificLabels(attributes pcommon.Map) {
-	treatAsMissing := []string{""}
+	treatAsMissing := []string{otelconsts.LuaMissingAttributeValue}
 	// Retrieve request length
 	requestLength, requestLengthFound := otelcollector.GetFloat64(attributes, otelconsts.BytesSentLabel, treatAsMissing)
 	if requestLengthFound {
@@ -44,6 +43,4 @@ func AddLuaSpecificLabels(attributes pcommon.Map) {
 			attributes.PutDouble(otelconsts.WorkloadDurationLabel, workloadDuration)
 		}
 	}
-
-	log.Error().Msgf("Updated attributes '%+v': ", attributes)
 }

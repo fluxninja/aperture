@@ -109,6 +109,11 @@ const (
 	// from "just empty", eg. "", "[]" or "{}".
 	EnvoyMissingAttributeValue = "-"
 
+	// LuaMissingAttributeValue is a special attribute value, which can
+	// happen when (eg. Lua's) logger tries to send attribute value, but it
+	// is not available.
+	LuaMissingAttributeValue = "-"
+
 	/* SDK specific labels. */
 
 	// ApertureFlowStartTimestampLabel is the start timestamp of the flow.

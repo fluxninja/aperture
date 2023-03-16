@@ -66,7 +66,6 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 			return otelcollector.Discard
 		}
 		sourceStr := source.Str()
-		log.Error().Msgf("Received attributes '%+v' for source '%s': ", attributes, sourceStr)
 		if sourceStr == otelconsts.ApertureSourceSDK {
 			success := otelcollector.GetStruct(attributes, otelconsts.ApertureCheckResponseLabel, checkResponse, []string{})
 			if !success {
@@ -111,6 +110,9 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 			internal.EnforceIncludeListSDK(attributes)
 		} else if sourceStr == otelconsts.ApertureSourceEnvoy {
 			p.updateMetrics(attributes, checkResponse, []string{otelconsts.EnvoyMissingAttributeValue})
+			internal.EnforceIncludeListHTTP(attributes)
+		} else if sourceStr == otelconsts.ApertureSourceLua {
+			p.updateMetrics(attributes, checkResponse, []string{otelconsts.LuaMissingAttributeValue})
 			internal.EnforceIncludeListHTTP(attributes)
 		}
 
