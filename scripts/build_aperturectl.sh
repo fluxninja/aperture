@@ -9,8 +9,10 @@ GOOS=$(go env GOOS)
 GOARCH=$(go env GOARCH)
 HOSTNAME=$(hostname)
 
-APERTURECTL_BUILD_GIT_BRANCH=${APERTURECTL_BUILD_GIT_BRANCH:-$(git branch --show-current)}
-APERTURECTL_BUILD_GIT_COMMIT_HASH=${APERTURECTL_BUILD_GIT_COMMIT_HASH:-$(git log -n1 --format=%H)}
+if git rev-parse --git-dir > /dev/null 2>&1; then
+  APERTURECTL_BUILD_GIT_BRANCH=${APERTURECTL_BUILD_GIT_BRANCH:-$(git branch --show-current)}
+  APERTURECTL_BUILD_GIT_COMMIT_HASH=${APERTURECTL_BUILD_GIT_COMMIT_HASH:-$(git log -n1 --format=%H)}
+fi
 
 LDFLAGS="\
     ${LDFLAGS:-} \
