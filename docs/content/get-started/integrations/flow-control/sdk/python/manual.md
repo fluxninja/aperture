@@ -12,10 +12,8 @@ keywords:
   - manual
 ---
 
-<!--- TODO: Add link to pypi package once it is published.
-<a href={`https://pkg.go.dev/github.com/fluxninja/aperture-go`}>Aperture Go
-SDK</a> can be used to manually set feature Control Points within a Go service.
--->
+[Aperture Python SDK][pythonsdk] can be used to manually set feature Control
+Points within a Go service.
 
 To do so, first create an instance of ApertureClient:
 
@@ -83,5 +81,8 @@ For more context on how to use Aperture Python SDK to set feature Control
 Points, you can take a look at the [example app][example] available in our
 repository.
 
+<!--- TODO: Change to pypi package once it is published. --->
+
+[pythonsdk]: https://github.com/fluxninja/aperture/tree/main/sdks/aperture-py
 [example]:
   https://github.com/fluxninja/aperture/tree/main/sdks/aperture-py/example
