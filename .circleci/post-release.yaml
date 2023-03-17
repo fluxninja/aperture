@@ -91,6 +91,7 @@ jobs:
       GOARCH: <<parameters.goarch>>
       COMPONENT: <<parameters.component>>
       VERSION: <<parameters.tag>>
+      APERTURECTL_BUILD_VERSION: <<parameters.tag>>
     steps:
       - checkout
       - asdf_install:
@@ -256,7 +257,7 @@ jobs:
             git diff
             git add .
             git commit -m "${msg}"
-            git push origin "${branch}"
+            git push --set-upstream origin "${branch}"
             gh pr create --title "${msg}" --body "" --label "pr-pull"
 
 workflows:

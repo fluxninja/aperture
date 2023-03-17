@@ -13,13 +13,13 @@ export PATH="$PATH:$GOPATH/bin"
 
 : "${APERTURECTL_BUILD_VERSION?APERTURECTL_BUILD_VERSION needs to be set}"
 
+aperturectl="$(./scripts/build_aperturectl.sh)"
+
 case "${1:-}" in
 agent)
-	aperturectl="$(./scripts/build_aperturectl.sh)"
 	"$aperturectl" build agent --output-dir ./dist --uri .
 	;;
 cli)
-	aperturectl="$(./scripts/build_aperturectl.sh)"
 	mkdir -p ./dist
 	cp "$aperturectl" ./dist/aperturectl
 	;;
