@@ -1,0 +1,10 @@
+label: Gateway
+position: 1
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Gateways"
+  keywords: ["flow control", "gateway"]
+  description: |
+    Aperture also support Gateways integration for Flow Control.
