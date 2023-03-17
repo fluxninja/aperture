@@ -17,7 +17,7 @@ nginx:
     repository: fluxninja/demo-app-nginx
     pullPolicy: IfNotPresent
     tag: "latest"
-  agentEndpoint: "aperture-agent.aperture-agent.svc.cluster.local:8080"
+  agentEndpoint: "http://aperture-agent.aperture-agent.svc.cluster.local:8080"
 
 proxy:
   image:

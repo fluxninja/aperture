@@ -4,7 +4,7 @@ local helpers = import 'ninja/helpers.libsonnet';
 
 local helm = tanka.helm.new(helpers.helmChartsRoot);
 
-local enableNginx = std.extVar('ENABLE_DEMO_APP_NGINX');
+local enableNginx = std.extVar('ENABLE_DEMO_APP_NGINX') == 'true';
 
 local application = {
   environment:: {

@@ -48,7 +48,7 @@ export default function () {
     request: [
       [
         {
-          destination: "service1-demo-app.demoapp.svc.cluster.local",
+          destination: "service1-demo-app.demoapp.svc.cluster.local/request",
         },
       ],
     ],

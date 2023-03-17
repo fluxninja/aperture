@@ -61,11 +61,8 @@ spec:
           flow_selector:
             flow_matcher:
               control_point: ingress
-              label_matcher:
-                match_labels:
-                  http.target: /service1
             service_selector:
-              service: nginx-server.demoapp.svc.cluster.local
+              service: service1-demo-app.demoapp.svc.cluster.local
           gradient_parameters:
             max_gradient: 1
             min_gradient: 0.1
@@ -135,9 +132,8 @@ spec:
               label_matcher:
                 match_labels:
                   http.request.header.user_type: bot
-                  http.target: /service1
             service_selector:
-              service: nginx-server.demoapp.svc.cluster.local
+              service: service1-demo-app.demoapp.svc.cluster.local
           in_ports:
             limit:
               signal_name: RATE_LIMIT
@@ -150,11 +146,8 @@ spec:
     - flow_selector:
         flow_matcher:
           control_point: ingress
-          label_matcher:
-            match_labels:
-              http.target: /service1
         service_selector:
-          service: nginx-server.demoapp.svc.cluster.local
+          service: service1-demo-app.demoapp.svc.cluster.local
       rules:
         user_type:
           extractor:
@@ -164,8 +157,5 @@ spec:
         flow_selector:
           flow_matcher:
             control_point: ingress
-            label_matcher:
-              match_labels:
-                http.target: /service3
           service_selector:
-            service: nginx-server.demoapp.svc.cluster.local
+            service: service3-demo-app.demoapp.svc.cluster.local

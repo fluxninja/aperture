@@ -1,4 +1,5 @@
 local json = require("cjson")
+local socket = require("socket")
 local http = require("socket.http")
 http.TIMEOUE = 5
 local ltn12 = require("ltn12")
@@ -27,6 +28,24 @@ function authorize_request(request)
   request.read_body()
   request_headers = request.get_headers()
 
+  local server_addr = ""
+  local server_port = ""
+
+  if ngx.var.destination_hostname ~= nil then
+    server_addr = socket.dns.toip(ngx.var.destination_hostname)
+  end
+
+  if not server_addr then
+    server_addr = ngx.var.server_addr
+  end
+
+  if ngx.var.destination_port ~= nil then
+    server_port = ngx.var.destination_port
+  end
+  if not server_port then
+    server_port = ngx.var.server_port
+  end
+
   local response_body = {}
   local request_body = {
     source = {
@@ -35,9 +54,9 @@ function authorize_request(request)
       port = ngx.var.remote_port
     },
     destination = {
-      address = ngx.var.server_addr,
+      address = server_addr,
       protocol = ngx.var.protocol,
-      port = ngx.var.server_port
+      port = server_port
     },
     request = {
       method = request.get_method(),
@@ -65,7 +84,7 @@ function authorize_request(request)
 
   local checkHTTPStart = ngx.now()
   local response, code, response_headers = http.request{
-    url = "http://" .. apertureAgentEndpoint .. "/v1/flowcontrol/checkhttp",
+    url = apertureAgentEndpoint .. "/v1/flowcontrol/checkhttp",
     method = "POST",
     headers = request_headers,
     source = ltn12.source.string(request_body_json),
