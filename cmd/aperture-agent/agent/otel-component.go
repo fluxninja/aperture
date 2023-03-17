@@ -24,16 +24,16 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/grpc"
 
-	"github.com/fluxninja/aperture/extensions/integrations/otel/attributesprocessor"
-	"github.com/fluxninja/aperture/extensions/integrations/otel/batchprocessor"
-	"github.com/fluxninja/aperture/extensions/integrations/otel/filelogreceiver"
-	"github.com/fluxninja/aperture/extensions/integrations/otel/filterprocessor"
-	"github.com/fluxninja/aperture/extensions/integrations/otel/k8sattributesprocessor"
-	"github.com/fluxninja/aperture/extensions/integrations/otel/kubeletstatsreceiver"
-	"github.com/fluxninja/aperture/extensions/integrations/otel/memorylimiterprocessor"
-	"github.com/fluxninja/aperture/extensions/integrations/otel/prometheusreceiver"
-	"github.com/fluxninja/aperture/extensions/integrations/otel/resourceprocessor"
-	"github.com/fluxninja/aperture/extensions/integrations/otel/transformprocessor"
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent/otel/attributesprocessor"
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent/otel/batchprocessor"
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent/otel/filelogreceiver"
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent/otel/filterprocessor"
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent/otel/k8sattributesprocessor"
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent/otel/kubeletstatsreceiver"
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent/otel/memorylimiterprocessor"
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent/otel/prometheusreceiver"
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent/otel/resourceprocessor"
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent/otel/transformprocessor"
 	"github.com/fluxninja/aperture/pkg/alertmanager"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/cache"
@@ -52,15 +52,15 @@ import (
 // ModuleForAgentOTEL provides fx options for AgentOTELComponent.
 func ModuleForAgentOTEL() fx.Option {
 	return fx.Options(
+		kubeletstatsreceiver.Module(),
+		k8sattributesprocessor.Module(),
 		prometheusreceiver.Module(),
 		filelogreceiver.Module(),
 		batchprocessor.Module(),
 		memorylimiterprocessor.Module(),
 		attributesprocessor.Module(),
 		transformprocessor.Module(),
-		kubeletstatsreceiver.Module(),
 		resourceprocessor.Module(),
-		k8sattributesprocessor.Module(),
 		filterprocessor.Module(),
 		fx.Provide(
 			cache.Provide[selectors.ControlPointID],
