@@ -16,7 +16,7 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
-	"github.com/fluxninja/aperture/extensions/integrations/otel/prometheusreceiver"
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent/otel/prometheusreceiver"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/cache"
