@@ -18,12 +18,44 @@ Build agent binary for Aperture
 aperturectl build agent [flags]
 ```
 
+### Examples
+
+```
+# Build agent binary for Aperture
+
+aperturectl --uri . build agent -c build-config.yaml -o /
+
+Where build-config.yaml can be:
+---
+build:
+  version: 1.0.0
+  git_commit_hash: 1234567890
+  git_branch: branch1
+  ldflags:
+    - -some-flag
+    - -some-other-flag
+  flags:
+    - -some-flag
+    - -some-other-flag
+bundled_extensions: # remote extensions to be bundled
+  - go_mod_name: github.com/org/name
+    version: v1.0.0
+    pkg_name: pkg
+extensions: # built-in extensions to be enabled
+  - fluxninja
+  - sentry
+replaces:
+  - old: github.com/org/name
+    new: github.com/org/name2
+enable_core_extensions: false # default is true
+```
+
 ### Options
 
 ```
-  -c, --config string       path to the build configuration file
+  -c, --config string       path to the build configuration file (default: build-config.yaml in the main package directory)
   -h, --help                help for agent
-  -o, --output-dir string   path to the output directory
+  -o, --output-dir string   path to the output directory (default: current directory)
 ```
 
 ### Options inherited from parent commands

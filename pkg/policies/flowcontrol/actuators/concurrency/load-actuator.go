@@ -2,12 +2,12 @@ package concurrency
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path"
 	"time"
 
 	"github.com/jonboulle/clockwork"
-	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
@@ -179,22 +179,22 @@ func (lsaFactory *loadActuatorFactory) newLoadActuator(
 
 			tokenBucketLMGauge, err := lsaFactory.tokenBucketLMGaugeVec.GetMetricWith(metricLabels)
 			if err != nil {
-				return retErr(errors.Wrap(err, "Failed to get token bucket LM gauge"))
+				return retErr(fmt.Errorf("%w: Failed to get token bucket LM gauge", err))
 			}
 
 			tokenBucketFillRateGauge, err := lsaFactory.tokenBucketFillRateGaugeVec.GetMetricWith(metricLabels)
 			if err != nil {
-				return retErr(errors.Wrap(err, "Failed to get token bucket fill rate gauge"))
+				return retErr(fmt.Errorf("%w: Failed to get token bucket fill rate gauge", err))
 			}
 
 			tokenBucketBucketCapacityGauge, err := lsaFactory.tokenBucketBucketCapacityGaugeVec.GetMetricWith(metricLabels)
 			if err != nil {
-				return retErr(errors.Wrap(err, "Failed to get token bucket bucket capacity gauge"))
+				return retErr(fmt.Errorf("%w: Failed to get token bucket bucket capacity gauge", err))
 			}
 
 			tokenBucketAvailableTokensGauge, err := lsaFactory.tokenBucketAvailableTokensGaugeVec.GetMetricWith(metricLabels)
 			if err != nil {
-				return retErr(errors.Wrap(err, "Failed to get token bucket available tokens gauge"))
+				return retErr(fmt.Errorf("%w: Failed to get token bucket available tokens gauge", err))
 			}
 
 			tokenBucketMetrics := &scheduler.TokenBucketLoadMultiplierMetrics{

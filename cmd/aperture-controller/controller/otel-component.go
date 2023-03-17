@@ -23,6 +23,8 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/alertmanager"
 	"github.com/fluxninja/aperture/pkg/alerts"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
@@ -38,7 +40,11 @@ func ModuleForControllerOTEL() fx.Option {
 			),
 			fx.Annotate(
 				ControllerOTELComponents,
-				fx.ParamTags(alerts.AlertsFxTag),
+				fx.ParamTags(
+					alerts.AlertsFxTag,
+					config.GroupTag(otelcollector.ReceiverFactoriesFxTag),
+					config.GroupTag(otelcollector.ProcessorFactoriesFxTag),
+				),
 			),
 		),
 	)
@@ -47,6 +53,8 @@ func ModuleForControllerOTEL() fx.Option {
 // ControllerOTELComponents constructs OTEL Collector Factories for Controller.
 func ControllerOTELComponents(
 	alerter alerts.Alerter,
+	receiverFactories []receiver.Factory,
+	processorFactories []processor.Factory,
 	alertMgr *alertmanager.AlertManager,
 ) (otelcol.Factories, error) {
 	var errs error
@@ -59,26 +67,33 @@ func ControllerOTELComponents(
 	)
 	errs = multierr.Append(errs, err)
 
-	receivers, err := receiver.MakeFactoryMap(
+	rf := []receiver.Factory{
 		prometheusreceiver.NewFactory(),
 		alertsreceiver.NewFactory(alerter),
-	)
+	}
+	// receiversFactory = append(receiversFactory, otelContribReceivers()...)
+	rf = append(rf, receiverFactories...)
+	receivers, err := receiver.MakeFactoryMap(rf...)
 	errs = multierr.Append(errs, err)
 
-	exporters, err := exporter.MakeFactoryMap(
+	ef := []exporter.Factory{
 		otlpexporter.NewFactory(),
 		otlphttpexporter.NewFactory(),
 		prometheusremotewriteexporter.NewFactory(),
 		loggingexporter.NewFactory(),
 		alertsexporter.NewFactory(alertMgr),
-	)
+	}
+	exporters, err := exporter.MakeFactoryMap(ef...)
 	errs = multierr.Append(errs, err)
 
-	processors, err := processor.MakeFactoryMap(
+	pf := []processor.Factory{
 		batchprocessor.NewFactory(),
 		attributesprocessor.NewFactory(),
 		transformprocessor.NewFactory(),
-	)
+	}
+	// processorsFactory = append(processorsFactory, otelContribProcessors()...)
+	pf = append(pf, processorFactories...)
+	processors, err := processor.MakeFactoryMap(pf...)
 	errs = multierr.Append(errs, err)
 
 	factories := otelcol.Factories{

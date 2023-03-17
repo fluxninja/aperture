@@ -2745,6 +2745,10 @@ definitions:
         type: object
     ProcessInfo:
         properties:
+            extensions:
+                items:
+                    type: string
+                type: array
             start_time:
                 format: date-time
                 type: string

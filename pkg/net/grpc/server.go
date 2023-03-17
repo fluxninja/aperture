@@ -107,24 +107,27 @@ func (constructor ServerConstructor) provideServer(
 		grpc_prometheus.WithHistogramBuckets(config.LatencyBucketsMS),
 	)
 
-	constructor.ServerOptions = append(constructor.ServerOptions, additionalOptions...)
+	serverOptions := []grpc.ServerOption{}
+	serverOptions = append(serverOptions, constructor.ServerOptions...)
 
-	// Connection timeout from config
-	constructor.ServerOptions = append(constructor.ServerOptions, grpc.ConnectionTimeout(config.ConnectionTimeout.AsDuration()))
+	serverOptions = append(serverOptions, grpc.ConnectionTimeout(config.ConnectionTimeout.AsDuration()))
 
 	unaryServerInterceptors := []grpc.UnaryServerInterceptor{
 		grpcServerMetrics.UnaryServerInterceptor(),
 		otelgrpc.UnaryServerInterceptor(),
 	}
-	constructor.ServerOptions = append(constructor.ServerOptions, grpc.ChainUnaryInterceptor(unaryServerInterceptors...))
+	serverOptions = append(serverOptions, grpc.ChainUnaryInterceptor(unaryServerInterceptors...))
 
 	streamServerInterceptors := []grpc.StreamServerInterceptor{
 		grpcServerMetrics.StreamServerInterceptor(),
 		otelgrpc.StreamServerInterceptor(),
 	}
-	constructor.ServerOptions = append(constructor.ServerOptions, grpc.ChainStreamInterceptor(streamServerInterceptors...))
+	serverOptions = append(serverOptions, grpc.ChainStreamInterceptor(streamServerInterceptors...))
 
-	server := grpc.NewServer(constructor.ServerOptions...)
+	// add additionalOptions
+	serverOptions = append(serverOptions, additionalOptions...)
+
+	server := grpc.NewServer(serverOptions...)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {

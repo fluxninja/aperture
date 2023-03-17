@@ -8,7 +8,6 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/fluxninja/lumberjack"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/diode"
 	"go.uber.org/fx"
@@ -18,6 +17,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/panichandler"
+	"github.com/fluxninja/lumberjack"
 )
 
 // defaultLogFilePath is the default path for the log files to be stored.
