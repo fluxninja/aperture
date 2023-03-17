@@ -36,7 +36,7 @@ public class TrafficFlow {
 
   public boolean accepted() {
     if (this.checkResponse == null) {
-      return false;
+      return true;
     }
     return this.checkResponse.getStatus().getCode() == Code.OK_VALUE;
   }
