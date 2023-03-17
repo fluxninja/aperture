@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/imdario/mergo"
@@ -28,6 +27,8 @@ import (
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
+
+	"github.com/fluxninja/aperture/pkg/log"
 )
 
 var (
@@ -45,11 +46,11 @@ const (
 	apertureLatestVersion  = "latest"
 	defaultNS              = "default"
 	controller             = "controller"
-	apertureController     = "aperture-controller"
 	agent                  = "agent"
-	apertureAgent          = "aperture-agent"
 	istioConfig            = "istioconfig"
 	istioConfigReleaseName = "aperture-envoy-filter"
+	apertureAgent          = "aperture-agent"
+	apertureController     = "aperture-controller"
 )
 
 // getTemplets loads CRDs, hooks and manifests from the Helm chart.

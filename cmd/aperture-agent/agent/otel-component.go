@@ -52,15 +52,15 @@ import (
 // ModuleForAgentOTEL provides fx options for AgentOTELComponent.
 func ModuleForAgentOTEL() fx.Option {
 	return fx.Options(
+		kubeletstatsreceiver.Module(),
+		k8sattributesprocessor.Module(),
 		prometheusreceiver.Module(),
 		filelogreceiver.Module(),
 		batchprocessor.Module(),
 		memorylimiterprocessor.Module(),
 		attributesprocessor.Module(),
 		transformprocessor.Module(),
-		kubeletstatsreceiver.Module(),
 		resourceprocessor.Module(),
-		k8sattributesprocessor.Module(),
 		filterprocessor.Module(),
 		fx.Provide(
 			cache.Provide[selectors.ControlPointID],
