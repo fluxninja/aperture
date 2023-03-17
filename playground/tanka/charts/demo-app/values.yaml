@@ -10,6 +10,15 @@ simplesrv:
     pullPolicy: IfNotPresent
     tag: "latest"
 
+nginx:
+  enabled: false
+  resources: {}
+  image:
+    repository: fluxninja/demo-app-nginx
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  agentEndpoint: "aperture-agent.aperture-agent.svc.cluster.local:8080"
+
 proxy:
   image:
     repository: fluxninja/fluxninja-proxy-envoy

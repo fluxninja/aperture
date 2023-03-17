@@ -1070,7 +1070,8 @@ definitions:
                     type: string
                 type: object
             status:
-                $ref: '#/definitions/HttpStatus'
+                format: int32
+                type: integer
         type: object
     Differentiator:
         description: Differentiator calculates rate of change per tick.
@@ -1917,11 +1918,6 @@ definitions:
                 type: string
             uuid:
                 type: string
-        type: object
-    HttpStatus:
-        properties:
-            code:
-                $ref: '#/definitions/StatusCode'
         type: object
     InPort:
         properties:
@@ -3502,6 +3498,9 @@ definitions:
         properties:
             address:
                 type: string
+            port:
+                format: int64
+                type: integer
             protocol:
                 $ref: '#/definitions/SocketAddressProtocol'
         type: object
@@ -3558,67 +3557,6 @@ definitions:
                 format: date-time
                 type: string
         type: object
-    StatusCode:
-        default: Empty
-        enum:
-            - Empty
-            - Continue
-            - OK
-            - Created
-            - Accepted
-            - NonAuthoritativeInformation
-            - NoContent
-            - ResetContent
-            - PartialContent
-            - MultiStatus
-            - AlreadyReported
-            - IMUsed
-            - MultipleChoices
-            - MovedPermanently
-            - Found
-            - SeeOther
-            - NotModified
-            - UseProxy
-            - TemporaryRedirect
-            - PermanentRedirect
-            - BadRequest
-            - Unauthorized
-            - PaymentRequired
-            - Forbidden
-            - NotFound
-            - MethodNotAllowed
-            - NotAcceptable
-            - ProxyAuthenticationRequired
-            - RequestTimeout
-            - Conflict
-            - Gone
-            - LengthRequired
-            - PreconditionFailed
-            - PayloadTooLarge
-            - URITooLong
-            - UnsupportedMediaType
-            - RangeNotSatisfiable
-            - ExpectationFailed
-            - MisdirectedRequest
-            - UnprocessableEntity
-            - Locked
-            - FailedDependency
-            - UpgradeRequired
-            - PreconditionRequired
-            - TooManyRequests
-            - RequestHeaderFieldsTooLarge
-            - InternalServerError
-            - NotImplemented
-            - BadGateway
-            - ServiceUnavailable
-            - GatewayTimeout
-            - HTTPVersionNotSupported
-            - VariantAlsoNegotiates
-            - InsufficientStorage
-            - LoopDetected
-            - NotExtended
-            - NetworkAuthenticationRequired
-        type: string
     StatusError:
         description: Error holds raw error message and its cause in a nested field.
         properties:

@@ -172,12 +172,12 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Received empty subrequest chain", http.StatusBadRequest)
 			return
 		}
-		requestDestination := chain.subrequests[0].Destination
-		if requestDestination != h.hostname {
-			log.Autosample().Warn().Err(err).Msg("Invalid destination")
-			http.Error(w, "Invalid message destination", http.StatusBadRequest)
-			return
-		}
+		// requestDestination := chain.subrequests[0].Destination
+		// if requestDestination != h.hostname {
+		// 	log.Autosample().Warn().Err(err).Msg("Invalid destination")
+		// 	http.Error(w, "Invalid message destination", http.StatusBadRequest)
+		// 	return
+		// }
 		code, err = h.processChain(ctx, chain)
 		if err != nil {
 			log.Autosample().Warn().Err(err).Msg("Failed to process chain")
@@ -225,7 +225,7 @@ func (h RequestHandler) processRequest(s Subrequest) (int, error) {
 }
 
 func (h RequestHandler) forwardRequest(ctx context.Context, destinationHostname string, requestBody Request) (int, error) {
-	address := fmt.Sprintf("http://%s/request", destinationHostname)
+	address := fmt.Sprintf("http://%s", destinationHostname)
 
 	jsonRequest, err := json.Marshal(requestBody)
 	if err != nil {

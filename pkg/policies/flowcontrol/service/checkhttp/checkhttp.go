@@ -6,6 +6,7 @@ import (
 	"io"
 	"mime"
 	"mime/multipart"
+	"net/http"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -28,7 +29,6 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -81,7 +81,6 @@ type Handler struct {
 func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTTPRequest) (*flowcontrolhttpv1.CheckHTTPResponse, error) {
 	// record the start time of the request
 	start := time.Now()
-
 	createResponse := func(checkResponse *flowcontrolv1.CheckResponse) *flowcontrolhttpv1.CheckHTTPResponse {
 		marshalledCheckResponse, err := proto.Marshal(checkResponse)
 		if err != nil {
@@ -115,17 +114,28 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 			Code(codes.InvalidArgument).Msg("missing control-point")
 	}
 
-	svcs := h.serviceGetter.ServicesFromContext(ctx)
-
 	sourceAddress := req.GetSource().GetAddress()
 	sourceSvcs := h.serviceGetter.ServicesFromAddress(sourceAddress)
 	if sourceSvcs == nil {
 		sourceSvcs = []string{"UNKNOWN"}
 	}
+	sourceSvcsStr := strings.Join(sourceSvcs, ",")
 	destinationAddress := req.GetDestination().GetAddress()
 	destinationSvcs := h.serviceGetter.ServicesFromAddress(destinationAddress)
 	if destinationSvcs == nil {
 		sourceSvcs = []string{"UNKNOWN"}
+	}
+	destinationSvcsStr := strings.Join(destinationSvcs, ",")
+
+	// make flowlabels from source and destination services
+	sdFlowLabels := make(flowlabel.FlowLabels, 2)
+	sdFlowLabels[otelconsts.ApertureSourceServiceLabel] = flowlabel.FlowLabelValue{
+		Value:     sourceSvcsStr,
+		Telemetry: true,
+	}
+	sdFlowLabels[otelconsts.ApertureDestinationServiceLabel] = flowlabel.FlowLabelValue{
+		Value:     destinationSvcsStr,
+		Telemetry: true,
 	}
 
 	logger := logging.New().WithFields(map[string]interface{}{"rego": "input"})
@@ -140,8 +150,9 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 	mergedFlowLabels := requestFlowLabels
 	// Baggage can overwrite request flow labels
 	flowlabel.Merge(mergedFlowLabels, baggageFlowLabels)
+	flowlabel.Merge(mergedFlowLabels, sdFlowLabels)
 
-	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
+	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, destinationSvcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
 
 	for key, fl := range newFlowLabels {
 		cleanValue := sanitizeBaggageHeaderValue(fl.Value)
@@ -160,9 +171,10 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 	// Newly created flow labels can overwrite existing flow labels.
 	flowlabel.Merge(mergedFlowLabels, newFlowLabels)
 	flowLabels := mergedFlowLabels.ToPlainMap()
+	log.Error().Msgf("flowLabels: %v", flowLabels)
 
 	// Ask flow control service for Ok/Deny
-	checkResponse := h.fcHandler.CheckWithValues(ctx, svcs, ctrlPt, flowLabels)
+	checkResponse := h.fcHandler.CheckWithValues(ctx, destinationSvcs, ctrlPt, flowLabels)
 	checkResponse.ClassifierInfos = classifierMsgs
 	// Set telemetry_flow_labels in the CheckResponse
 	checkResponse.TelemetryFlowLabels = flowLabels
@@ -191,17 +203,13 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 		case flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED:
 			resp.HttpResponse = &flowcontrolhttpv1.CheckHTTPResponse_DeniedResponse{
 				DeniedResponse: &flowcontrolhttpv1.DeniedHttpResponse{
-					Status: &flowcontrolhttpv1.HttpStatus{
-						Code: flowcontrolhttpv1.StatusCode_TooManyRequests,
-					},
+					Status: http.StatusTooManyRequests,
 				},
 			}
 		case flowcontrolv1.CheckResponse_REJECT_REASON_CONCURRENCY_LIMITED:
 			resp.HttpResponse = &flowcontrolhttpv1.CheckHTTPResponse_DeniedResponse{
 				DeniedResponse: &flowcontrolhttpv1.DeniedHttpResponse{
-					Status: &flowcontrolhttpv1.HttpStatus{
-						Code: flowcontrolhttpv1.StatusCode_ServiceUnavailable,
-					},
+					Status: http.StatusServiceUnavailable,
 				},
 			}
 		default:
@@ -218,18 +226,45 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 // RequestToInput - Converts a CheckHTTPRequest to an input map.
 func RequestToInput(req *flowcontrolhttpv1.CheckHTTPRequest, logger logging.Logger) map[string]interface{} {
 	var err error
-	var input map[string]interface{}
+	input := map[string]interface{}{}
 
 	path := req.GetRequest().GetPath()
 	body := req.GetRequest().GetBody()
 	headers := req.GetRequest().GetHeaders()
 
-	bs, err := protojson.Marshal(req)
-	if err != nil {
-		input = map[string]interface{}{}
-	}
+	http := map[string]interface{}{}
+	http["path"] = path
+	http["body"] = body
+	http["headers"] = headers
+	http["host"] = req.GetRequest().GetHost()
+	http["method"] = req.GetRequest().GetMethod()
+	http["scheme"] = req.GetRequest().GetScheme()
+	http["size"] = req.GetRequest().GetSize()
+	http["protocol"] = req.GetRequest().GetProtocol()
 
-	util.UnmarshalJSON(bs, &input) //nolint:errcheck
+	sourceSocketAddress := map[string]interface{}{}
+	sourceSocketAddress["address"] = req.GetSource().GetAddress()
+	sourceSocketAddress["port"] = req.GetSource().GetPort()
+
+	destinationSocketAddress := map[string]interface{}{}
+	destinationSocketAddress["address"] = req.GetDestination().GetAddress()
+	destinationSocketAddress["port"] = req.GetDestination().GetPort()
+
+	source := map[string]interface{}{}
+	source["socketAddress"] = sourceSocketAddress
+
+	destination := map[string]interface{}{}
+	destination["socketAddress"] = destinationSocketAddress
+
+	request := map[string]interface{}{}
+	request["http"] = http
+
+	attributes := map[string]interface{}{}
+	attributes["request"] = request
+	attributes["source"] = source
+	attributes["destination"] = destination
+
+	input["attributes"] = attributes
 
 	parsedPath, parsedQuery, err := getParsedPathAndQuery(path)
 	if err == nil {

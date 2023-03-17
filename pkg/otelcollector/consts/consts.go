@@ -93,7 +93,7 @@ const (
 	EnvoyAuthzDurationLabel = "authz_duration"
 
 	// CheckHTTPDurationLabel describes duration of the CheckHTTP call in milliseconds.
-	CheckHTTPDurationLabel = "	"
+	CheckHTTPDurationLabel = "checkhttp_duration"
 
 	// ResponseDurationLabel from access logs.
 	ResponseDurationLabel = "RESPONSE_DURATION"
