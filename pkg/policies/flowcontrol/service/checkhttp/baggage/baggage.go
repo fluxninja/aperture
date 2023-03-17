@@ -45,7 +45,7 @@ func (b W3Baggage) Extract(headers Headers) flowlabel.FlowLabels {
 	baggage, err := otel_baggage.Parse(headers[w3BaggageHeaderName])
 	if err != nil {
 		log.Warn().Err(err).Msg("Failed to parse baggage header")
-		return nil
+		return flowlabel.FlowLabels{}
 	}
 	flowLabels := make(flowlabel.FlowLabels)
 	for _, member := range baggage.Members() {

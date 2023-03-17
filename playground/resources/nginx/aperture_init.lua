@@ -1,10 +1,13 @@
 local json = require("cjson")
 local socket = require("socket")
 local http = require("socket.http")
-http.TIMEOUE = 5
+http.TIMEOUT = 0.5
 local ltn12 = require("ltn12")
 
 local apertureAgentEndpoint = os.getenv("APERTURE_AGENT_ENDPOINT")
+if apertureAgentEndpoint == nil or apertureAgentEndpoint == "" then
+  error("Environment variable APERTURE_AGENT_ENDPOINT must be set")
+end
 
 local otlp_tracer_provider_new = require("opentelemetry.trace.tracer_provider").new
 local otlp_simple_span_processor_new = require("opentelemetry.trace.simple_span_processor").new
@@ -106,7 +109,6 @@ function authorize_request(request)
       end
     elseif response_json.denied_response ~= nil then
       code = response_json.denied_response.status
-      ngx.log(ngx.ERR, "Aperture CheckHTTP denied request. Code: " .. code)
     end
     local checkHTTPEnd = ngx.now()
     span:set_attributes(otlp_attr.string("checkhttp_duration", tostring((checkHTTPEnd - checkHTTPStart) * 1000)))
