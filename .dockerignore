@@ -7,3 +7,4 @@
 !operator
 !tools
 !cmd/*/build-config.yaml
+!scripts/build_aperturectl.sh

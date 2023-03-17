@@ -68,7 +68,7 @@ build_args=(
 	"$DOCKER_TAGS_ARG"
 	"--build-arg=APERTURECTL_GIT_BRANCH=$PARAM_GIT_BRANCH"
 	"--build-arg=APERTURECTL_GIT_COMMIT_HASH=$PARAM_GIT_COMMIT_HASH"
-	"--build-arg=APERTURECTL_VERSION=$(fetch_aperture_version)"
+	"--build-arg=APERTURECTL_BUILD_VERSION=$(fetch_aperture_version)"
 )
 
 if [ -n "$PARAM_SSH_FORWARD" ]; then

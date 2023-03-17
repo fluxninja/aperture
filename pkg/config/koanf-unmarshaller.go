@@ -320,7 +320,7 @@ func (u *KoanfUnmarshaller) bindEnvsKey(keyPrefix string, in interface{}, prev .
 				reg := regexp.MustCompile(`^\[(.*)\]$`)
 				matches := reg.FindStringSubmatch(val)
 				if len(matches) != 2 {
-					return
+					break
 				}
 				if matches[1] == "" {
 					v, err = nil, errors.New("empty slice provided in env var")

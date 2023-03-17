@@ -44,7 +44,7 @@ var _ = Describe("Rollup processor", func() {
 		JustBeforeEach(func() {
 			var err error
 			logsProcessor, err = CreateLogsProcessor(
-				context.TODO(), processor.CreateSettings{}, config, testConsumer)
+				context.Background(), processor.CreateSettings{}, config, testConsumer)
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -62,7 +62,7 @@ var _ = Describe("Rollup processor", func() {
 			logRecord.Attributes().PutStr(otelconsts.ApertureSourceLabel, otelconsts.ApertureSourceEnvoy)
 			logRecord.Attributes().PutStr(otelconsts.WorkloadDurationLabel, strconv.Itoa(attributeValues[0]))
 
-			err = logsProcessor.ConsumeLogs(context.TODO(), input)
+			err = logsProcessor.ConsumeLogs(context.Background(), input)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(testConsumer.receivedLogs).To(HaveLen(1))
@@ -93,7 +93,7 @@ var _ = Describe("Rollup processor", func() {
 			logRecord = logs.AppendEmpty()
 			logRecord.Attributes().PutStr(otelconsts.HTTPRequestContentLength, strconv.Itoa(1234))
 
-			err = logsProcessor.ConsumeLogs(context.TODO(), input)
+			err = logsProcessor.ConsumeLogs(context.Background(), input)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(testConsumer.receivedLogs).To(HaveLen(1))
@@ -121,7 +121,7 @@ var _ = Describe("Rollup processor", func() {
 				logRecord.Attributes().PutStr("high-cardinality", strconv.Itoa(i))
 			}
 
-			err := logsProcessor.ConsumeLogs(context.TODO(), input)
+			err := logsProcessor.ConsumeLogs(context.Background(), input)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(testConsumer.receivedLogs).To(HaveLen(1))
