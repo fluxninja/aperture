@@ -263,7 +263,7 @@ func (u *KoanfUnmarshaller) bindEnvsKey(keyPrefix string, in interface{}, prev .
 
 		tv, ok := t.Tag.Lookup("json")
 		if ok && tv != "" {
-			// scrub omitmepty and string options
+			// scrub omitempty and string options
 			vals := strings.Split(tv, ",")
 			tv = vals[0]
 			if tv == "-" {
