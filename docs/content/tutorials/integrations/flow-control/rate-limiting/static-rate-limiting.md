@@ -66,11 +66,12 @@ In addition, we will be configuring our rate limiter to apply these limits to
 </p>
 </details>
 
-### Circuit Diagram
+:::info
 
-```mermaid
-{@include: ./assets/static-rate-limiting/static-rate-limiting.mmd}
-```
+[Circuit Diagram](./assets/static-rate-limiting/static-rate-limiting.mmd.svg)
+for this policy.
+
+:::
 
 ### Playground
 

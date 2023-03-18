@@ -97,15 +97,12 @@ highlighted in the Jsonnet spec below.
 </p>
 </details>
 
-### Circuit Diagram
+:::info
 
-<Zoom>
+[Circuit Diagram](./assets/workload-prioritization/workload-prioritization.mmd.svg)
+for this policy.
 
-```mermaid
-{@include: ./assets/workload-prioritization/workload-prioritization.mmd}
-```
-
-</Zoom>
+:::
 
 ### Playground
 
