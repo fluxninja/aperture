@@ -94,15 +94,12 @@ At a high-level, this policy consists of:
 </p>
 </details>
 
-### Circuit Diagram
+:::info
 
-<Zoom>
+[Circuit Diagram](./assets/basic-concurrency-limiting/basic-concurrency-limiting.mmd.svg)
+for this policy.
 
-```mermaid
-{@include: ./assets/basic-concurrency-limiting/basic-concurrency-limiting.mmd}
-```
-
-</Zoom>
+:::
 
 ### Playground
 

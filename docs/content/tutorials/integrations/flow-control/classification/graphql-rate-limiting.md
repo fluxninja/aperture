@@ -98,11 +98,12 @@ From there on, the classifier rule assigns the value of the exported variable
 component in the policy to limit the `createTodo` mutation query to 10
 requests/second for each userID.
 
-### Circuit Diagram
+:::info
 
-```mermaid
-{@include: ./assets/graphql-rate-limiting/graphql-rate-limiting-jwt.mmd}
-```
+[Circuit Diagram](./assets/graphql-rate-limiting/graphql-rate-limiting-jwt.mmd.svg)
+for this policy.
+
+:::
 
 ### Playground
 

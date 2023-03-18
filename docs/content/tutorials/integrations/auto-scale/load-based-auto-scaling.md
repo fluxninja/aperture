@@ -85,15 +85,11 @@ At a high Level, this policy consist of:
 </p>
 </details>
 
-### Circuit Diagram
+:::info
 
-<Zoom>
+[Circuit Diagram](./assets/load-based-auto-scale.mmd.svg) for this policy.
 
-```mermaid
-{@include: ./assets/load-based-auto-scale.mmd}
-```
-
-</Zoom>
+:::
 
 ### Playground
 
