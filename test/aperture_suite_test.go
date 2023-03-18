@@ -16,7 +16,7 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/fluxninja/aperture/cmd/aperture-agent/agent"
-	"github.com/fluxninja/aperture/extensions/integrations/otel/prometheusreceiver"
+	"github.com/fluxninja/aperture/cmd/aperture-agent/agent/otel/prometheusreceiver"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/cache"
@@ -24,6 +24,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
+	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
@@ -140,6 +141,8 @@ var _ = BeforeSuite(func() {
 			"address": ph.Endpoint,
 		}
 	}
+
+	info.Service = utils.ApertureAgent
 
 	apertureOpts := fx.Options(
 		platform.Config{MergeConfig: apertureConfig}.Module(),
