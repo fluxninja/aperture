@@ -1,5 +1,7 @@
 package com.fluxninja.aperture.servlet.jakarta;
 
+import com.fluxninja.aperture.sdk.*;
+import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
 import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
