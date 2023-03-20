@@ -51,7 +51,7 @@ Install the tool of your choice using below links:
 
     :::info Refer
     [aperturectl install controller](/reference/aperturectl/install/controller/controller.md)
-    to see all the available command line arguments. :::
+    to see all the available command line arguments.
 
 2.  [Helm](https://helm.sh/docs/intro/install/)
 
@@ -76,18 +76,17 @@ Kubernetes Objects which will be created by following steps are listed
 
 :::
 
-1. Configure the below parameters for the Controller Custom Resource by creating
-   a `values.yaml` and pass it with the `install` command:
+1. Run the following `install` command:
 
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
    <CodeBlock language="bash">
-   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml`}
+   {`aperturectl install controller --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
-   {`helm install controller aperture/aperture-controller -f values.yaml`}
+   {`helm install controller aperture/aperture-controller`}
    </CodeBlock>
    </TabItem>
    </Tabs>

@@ -27,6 +27,10 @@ policy:
         # Required: True
         control_point: ingress
     parameters:
+      # Time after which the limit for a given label value will be reset.
+      # Type: string
+      # Required: True
+      limit_reset_interval: 60s
       # Flow label to use for rate limiting.
       # Type: string
       # Required: True
