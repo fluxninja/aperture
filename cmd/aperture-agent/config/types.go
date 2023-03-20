@@ -63,8 +63,7 @@ type BatchPostrollupConfig struct {
 	SendBatchMaxSize uint32 `json:"send_batch_max_size" validate:"gte=0" default:"100"`
 }
 
-// CustomMetricsConfig defines receivers, processors and single metrics pipeline,
-// which will be exported to the controller prometheus.
+// CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller prometheus.
 // swagger:model
 // +kubebuilder:object:generate=true
 type CustomMetricsConfig struct {

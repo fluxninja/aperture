@@ -1523,8 +1523,8 @@ spec:
                         type: object
                       custom_metrics:
                         additionalProperties:
-                          description: CustomMetricsConfig defines receivers, processors
-                            and single metrics pipeline, which will be exported to
+                          description: CustomMetricsConfig defines receivers, processors,
+                            and single metrics pipeline which will be exported to
                             the controller prometheus. swagger:model
                           properties:
                             pipeline:

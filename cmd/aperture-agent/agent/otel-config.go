@@ -135,7 +135,7 @@ func addCustomMetricsPipelines(
 	config *otelconfig.OTELConfig,
 	agentConfig *agentconfig.AgentOTELConfig,
 ) {
-	config.AddProcessor(otelconsts.ProcessorCustromMetrics, map[string]any{
+	config.AddProcessor(otelconsts.ProcessorCustomMetrics, map[string]any{
 		"attributes": []map[string]interface{}{
 			{
 				"key":    "service.name",
@@ -144,10 +144,10 @@ func addCustomMetricsPipelines(
 			},
 		},
 	})
+	if agentConfig.CustomMetrics == nil {
+		agentConfig.CustomMetrics = map[string]agentconfig.CustomMetricsConfig{}
+	}
 	if _, ok := agentConfig.CustomMetrics[otelconsts.ReceiverKubeletStats]; !ok {
-		if agentConfig.CustomMetrics == nil {
-			agentConfig.CustomMetrics = map[string]agentconfig.CustomMetricsConfig{}
-		}
 		agentConfig.CustomMetrics[otelconsts.ReceiverKubeletStats] = makeCustomMetricsConfigForKubeletStats()
 	}
 	for pipelineName, metricConfig := range agentConfig.CustomMetrics {
@@ -162,7 +162,7 @@ func addCustomMetricsPipelines(
 			Receivers: normalizeComponentNames(pipelineName, metricConfig.Pipeline.Receivers),
 			Processors: append(
 				normalizeComponentNames(pipelineName, metricConfig.Pipeline.Processors),
-				otelconsts.ProcessorCustromMetrics,
+				otelconsts.ProcessorCustomMetrics,
 				otelconsts.ProcessorAgentResourceLabels,
 			),
 			Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},

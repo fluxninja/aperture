@@ -357,7 +357,6 @@ definitions:
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions
     CustomMetricsConfig:
-        description: which will be exported to the controller prometheus.
         properties:
             pipeline:
                 $ref: '#/definitions/CustomMetricsPipelineConfig'
@@ -368,7 +367,7 @@ definitions:
             receivers:
                 $ref: '#/definitions/Components'
                 x-go-tag-json: receivers
-        title: CustomMetricsConfig defines receivers, processors and single metrics pipeline,
+        title: CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller prometheus.
         type: object
         x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
     CustomMetricsPipelineConfig:
