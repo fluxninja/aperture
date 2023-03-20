@@ -1,18 +1,23 @@
-package filelogreceiver
+package kubeletstatsreceiver
 
 import (
-	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 // Module returns the extension module.
 func Module() fx.Option {
-	log.Info().Msg("Loading filelogreceiver Receiver")
+	log.Info().Msg("Loading kubeletstatsreceiver Receiver")
+	if info.Service != utils.ApertureAgent {
+		return nil
+	}
 	return fx.Options(
 		fx.Provide(
 			fx.Annotate(
@@ -24,5 +29,5 @@ func Module() fx.Option {
 }
 
 func provideReceiver() receiver.Factory {
-	return filelogreceiver.NewFactory()
+	return kubeletstatsreceiver.NewFactory()
 }

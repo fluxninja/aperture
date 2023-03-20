@@ -9,6 +9,7 @@ import (
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
 	"github.com/fluxninja/aperture/pkg/info"
 	"github.com/fluxninja/aperture/pkg/peers"
+	"github.com/fluxninja/aperture/pkg/utils"
 )
 
 // PeersWatcherModule is a fx module that watches all agent peers.
@@ -36,7 +37,7 @@ func setupPeersWatcher(
 		return PeersOut{}, nil
 	}
 
-	if info.Service != "aperture-controller" {
+	if info.Service != utils.ApertureController {
 		return PeersOut{}, nil
 	}
 	pd, err := peers.NewPeerDiscovery("aperture-agent", client, nil)

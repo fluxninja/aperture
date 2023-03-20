@@ -80,15 +80,12 @@ Jsonnet spec below.
 </p>
 </details>
 
-### Circuit Diagram
+:::info
 
-<Zoom>
+[Circuit Diagram](./assets/rate-limiting-escalation/rate-limiting-escalation.mmd.svg)
+for this policy.
 
-```mermaid
-{@include: ./assets/rate-limiting-escalation/rate-limiting-escalation.mmd}
-```
-
-</Zoom>
+:::
 
 ### Playground
 
