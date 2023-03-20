@@ -364,8 +364,8 @@ func getLdFlags(service string) (string, error) {
 		return "", err
 	}
 
-	// if builderDir is a git project, find the git commit hash and branch
-	if cfg.Build.GitCommitHash != "" && cfg.Build.GitBranch != "" {
+	// if builderDir is a git project, find the git commit hash
+	if cfg.Build.GitCommitHash == "" {
 		// git commit is 'git rev-parse HEAD'
 		gitCommit := exec.Command("git", "rev-parse", "HEAD")
 		gitCommit.Dir = builderDir
@@ -375,6 +375,10 @@ func getLdFlags(service string) (string, error) {
 		} else {
 			cfg.Build.GitCommitHash = strings.TrimSpace(string(gitCommitOut))
 		}
+	}
+
+	// if builderDir is a git project, find the git branch
+	if cfg.Build.GitBranch == "" {
 		// git branch is 'git rev-parse --abbrev-ref HEAD'
 		gitBranch := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
 		gitBranch.Dir = builderDir
