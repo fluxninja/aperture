@@ -38,7 +38,11 @@ var (
 )
 
 func init() {
-	logger = log.NewLogger(log.GetPrettyConsoleWriter(), log.DebugLevel.String())
+	logLevel, logLevelSet := os.LookupEnv("LOG_LEVEL")
+	if !logLevelSet {
+		logLevel = log.DebugLevel.String()
+	}
+	logger = log.NewLogger(log.GetPrettyConsoleWriter(), logLevel)
 	log.SetGlobalLogger(logger)
 }
 
@@ -235,6 +239,9 @@ func runDockerContainer(image string, port string) (string, error) {
 			return "", err
 		}
 		if containerJSON.State != nil {
+			if containerJSON.State.Status == "exited" {
+				log.Fatal().Msg("Container exited")
+			}
 			if containerJSON.State.Health != nil {
 				if containerJSON.State.Health.Status == "healthy" {
 					return resp.ID, nil

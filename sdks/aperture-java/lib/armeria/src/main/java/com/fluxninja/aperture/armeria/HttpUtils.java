@@ -26,7 +26,8 @@ class HttpUtils {
         } catch (ApertureSDKException e) {
             e.printStackTrace();
         }
-        if (flow.checkResponse().hasDeniedResponse() && flow.checkResponse().getDeniedResponse().hasStatus()) {
+        if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()
+                && flow.checkResponse().getDeniedResponse().hasStatus()) {
             int httpStatusCode = flow.checkResponse().getDeniedResponse().getStatus().getCodeValue();
             return HttpStatus.valueOf(httpStatusCode);
         }
@@ -36,7 +37,7 @@ class HttpUtils {
     protected static Map<String, String> labelsFromRequest(HttpRequest req) {
         Map<String, String> labels = new HashMap<>();
         RequestHeaders headers = req.headers();
-        for (Map.Entry<AsciiString, String> header: headers) {
+        for (Map.Entry<AsciiString, String> header : headers) {
             String headerKey = header.getKey().toString();
             if (headerKey.startsWith(":")) {
                 continue;
@@ -57,7 +58,8 @@ class HttpUtils {
             try {
                 value = URLDecoder.decode(entry.getValue().getValue(), StandardCharsets.UTF_8.name());
             } catch (java.io.UnsupportedEncodingException e) {
-                // This should never happen, as `StandardCharsets.UTF_8.name()` is a valid encoding
+                // This should never happen, as `StandardCharsets.UTF_8.name()` is a valid
+                // encoding
                 throw new RuntimeException(e);
             }
             baggageLabels.put(entry.getKey(), value);
@@ -70,10 +72,10 @@ class HttpUtils {
     }
 
     // getAppend is deprecated but agent does set it, so we should use it
-    @SuppressWarnings( "deprecation" )
+    @SuppressWarnings("deprecation")
     protected static HttpRequest updateHeaders(HttpRequest req, List<HeaderValueOption> newHeaders) {
         RequestHeadersBuilder newHeadersBuilder = req.headers().toBuilder();
-        for (HeaderValueOption newHeader: newHeaders) {
+        for (HeaderValueOption newHeader : newHeaders) {
             String headerKey = newHeader.getHeader().getKey().toLowerCase();
             String headerValue = newHeader.getHeader().getValue();
             if (!newHeader.getKeepEmptyValue() && headerValue.isEmpty()) {
@@ -92,7 +94,7 @@ class HttpUtils {
     private static AttributeContext.Builder addHttpAttributes(AttributeContext.Builder builder, HttpRequest req) {
         Map<String, String> extractedHeaders = new HashMap<>();
         RequestHeaders headers = req.headers();
-        for (Map.Entry<AsciiString, String> header: headers) {
+        for (Map.Entry<AsciiString, String> header : headers) {
             String headerKey = header.getKey().toString();
             if (headerKey.startsWith(":")) {
                 continue;
@@ -103,13 +105,13 @@ class HttpUtils {
         return builder
                 .putContextExtensions("control-point", "ingress")
                 .setRequest(AttributeContext.Request.newBuilder()
-                .setHttp(AttributeContext.HttpRequest.newBuilder()
-                        .setMethod(req.method().toString())
-                        .setPath(req.path())
-                        .setHost(req.authority())
-                        .setScheme(req.scheme())
-                        .setSize(headers.contentLength())
-                        .setProtocol("HTTP/2")
-                        .putAllHeaders(extractedHeaders)));
+                        .setHttp(AttributeContext.HttpRequest.newBuilder()
+                                .setMethod(req.method().toString())
+                                .setPath(req.path())
+                                .setHost(req.authority())
+                                .setScheme(req.scheme())
+                                .setSize(headers.contentLength())
+                                .setProtocol("HTTP/2")
+                                .putAllHeaders(extractedHeaders)));
     }
 }

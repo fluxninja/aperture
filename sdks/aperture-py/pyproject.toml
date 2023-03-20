@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "aperture-sdk"
+version = "0.1.0"
+description = "SDK to interact with the Aperture Agent"
+authors = ["FluxNinja <support@fluxninja.com>"]
+readme = "README.md"
+packages = [{ include = "aperture_sdk" }]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+grpcio = "^1.51"
+opentelemetry-api = "^1.16.0"
+opentelemetry-sdk = "^1.16.0"
+opentelemetry-exporter-otlp = "^1.16.0"
+protobuf = "^4.22.1"
+
+[tool.poetry.group.dev.dependencies]
+grpcio-tools = "^1.51"
+black = "^23.1.0"
+
+
+[tool.poetry.group.example.dependencies]
+quart = "^0.18.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -3,6 +3,7 @@ package com.fluxninja.aperture.servlet.jakarta;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
+import java.util.ArrayList;
 
 import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
 import jakarta.servlet.Filter;
@@ -22,7 +23,8 @@ public class ApertureFilter implements Filter {
     private ApertureSDK apertureSDK;
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException, IOException {
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+            throws ServletException, IOException {
         AttributeContext attributes = ServletUtils.attributesFromRequest(req);
 
         HttpServletRequest request = (HttpServletRequest) req;
@@ -38,7 +40,10 @@ public class ApertureFilter implements Filter {
 
         if (flow.accepted()) {
             try {
-                List<HeaderValueOption> newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
+                List<HeaderValueOption> newHeaders = new ArrayList<>();
+                if (flow.checkResponse() != null) {
+                    newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
+                }
                 ServletRequest newRequest = ServletUtils.updateHeaders(request, newHeaders);
                 chain.doFilter(newRequest, response);
                 flow.end(FlowStatus.OK);
@@ -92,5 +97,6 @@ public class ApertureFilter implements Filter {
     }
 
     @Override
-    public void destroy() {}
+    public void destroy() {
+    }
 }

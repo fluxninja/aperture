@@ -23,11 +23,13 @@ public class ServletUtils {
         } catch (ApertureSDKException e) {
             e.printStackTrace();
         }
-        if (flow.checkResponse().hasDeniedResponse() && flow.checkResponse().getDeniedResponse().hasStatus()) {
+        if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()
+                && flow.checkResponse().getDeniedResponse().hasStatus()) {
             return flow.checkResponse().getDeniedResponse().getStatus().getCodeValue();
         }
         return 403;
     }
+
     protected static AttributeContext attributesFromRequest(ServletRequest req) {
         Map<String, String> baggageLabels = new HashMap<>();
 
@@ -36,7 +38,8 @@ public class ServletUtils {
             try {
                 value = URLDecoder.decode(entry.getValue().getValue(), StandardCharsets.UTF_8.name());
             } catch (java.io.UnsupportedEncodingException e) {
-                // This should never happen, as `StandardCharsets.UTF_8.name()` is a valid encoding
+                // This should never happen, as `StandardCharsets.UTF_8.name()` is a valid
+                // encoding
                 throw new RuntimeException(e);
             }
             baggageLabels.put(entry.getKey(), value);

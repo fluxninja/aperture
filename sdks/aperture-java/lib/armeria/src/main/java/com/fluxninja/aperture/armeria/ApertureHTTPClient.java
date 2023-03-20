@@ -14,10 +14,12 @@ import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.function.Function;
 
 /**
- * Decorates an {@link HttpClient} to enable flow control using provided {@link ApertureSDK}
+ * Decorates an {@link HttpClient} to enable flow control using provided
+ * {@link ApertureSDK}
  */
 public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
     private final ApertureSDK apertureSDK;
@@ -45,7 +47,10 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
         if (flow.accepted()) {
             HttpResponse res;
             try {
-                List<HeaderValueOption> newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
+                List<HeaderValueOption> newHeaders = new ArrayList<>();
+                if (flow.checkResponse() != null) {
+                    newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
+                }
                 HttpRequest newRequest = HttpUtils.updateHeaders(req, newHeaders);
                 ctx.updateRequest(newRequest);
 

@@ -10,82 +10,85 @@ import io.opentelemetry.api.trace.Span;
 import static com.fluxninja.aperture.sdk.Constants.*;
 
 public class TrafficFlow {
-  private final CheckResponse checkResponse;
-  private final Span span;
-  public boolean ended;
-  private boolean ignored;
+    private final CheckResponse checkResponse;
+    private final Span span;
+    public boolean ended;
+    private boolean ignored;
 
-  TrafficFlow(
-      CheckResponse checkResponse,
-      Span span,
-      boolean ended) {
-    this.checkResponse = checkResponse;
-    this.span = span;
-    this.ended = ended;
-    this.ignored = false;
-  }
-
-  static TrafficFlow ignoredFlow() {
-    TrafficFlow flow = new TrafficFlow(
-            successfulResponse(),
-            null,
-            true
-    );
-    flow.ignored = true;
-    return flow;
-  }
-
-  public boolean accepted() {
-    return this.checkResponse.getStatus().getCode() == Code.OK_VALUE;
-  }
-
-  public boolean ignored() {
-    return this.ignored;
-  }
-
-  public CheckResponse checkResponse() {
-    return this.checkResponse;
-  }
-
-  public void end(FlowStatus statusCode) throws ApertureSDKException {
-    if (this.ignored) {
-      // span has not been started, and so doesn't need to be ended.
-      return;
+    TrafficFlow(
+            CheckResponse checkResponse,
+            Span span,
+            boolean ended) {
+        this.checkResponse = checkResponse;
+        this.span = span;
+        this.ended = ended;
+        this.ignored = false;
     }
-    if (this.ended) {
-      throw new ApertureSDKException("Flow already ended");
-    }
-    this.ended = true;
 
-    String serializedFlowcontrolCheckResponse = "";
-    if (this.checkResponse.hasDynamicMetadata()
-        && this.checkResponse.getDynamicMetadata().getFieldsMap().containsKey("aperture.check_response")) {
-      Value checkResponse = this.checkResponse.getDynamicMetadata().getFieldsMap().get("aperture.check_response");
-      if (checkResponse.hasStringValue()) {
-        // If checkResponse comes pre-serialized from envoy, pass it
-        // through as-is.
-        serializedFlowcontrolCheckResponse = checkResponse.getStringValue();
-      } else {
-        // Otherwise, serialize it.
-        try {
-          serializedFlowcontrolCheckResponse = JsonFormat.printer().print(checkResponse);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw new ApertureSDKException(e);
+    static TrafficFlow ignoredFlow() {
+        TrafficFlow flow = new TrafficFlow(
+                successfulResponse(),
+                null,
+                true);
+        flow.ignored = true;
+        return flow;
+    }
+
+    public boolean accepted() {
+        if (this.checkResponse == null) {
+            return true;
         }
-      }
+        return this.checkResponse.getStatus().getCode() == Code.OK_VALUE;
     }
 
-    this.span.setAttribute(FLOW_STATUS_LABEL, statusCode.name())
-        .setAttribute(CHECK_RESPONSE_LABEL, serializedFlowcontrolCheckResponse)
-        .setAttribute(FLOW_STOP_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
+    public boolean ignored() {
+        return this.ignored;
+    }
 
-    this.span.end();
-  }
+    public CheckResponse checkResponse() {
+        return this.checkResponse;
+    }
 
-  // Artificial response if none is received from agent
-  static CheckResponse successfulResponse() {
-    return CheckResponse.newBuilder()
-            .setStatus(Status.newBuilder().setCode(Code.OK_VALUE).build())
-            .build();
-  }
+    public void end(FlowStatus statusCode) throws ApertureSDKException {
+        if (this.ignored) {
+            // span has not been started, and so doesn't need to be ended.
+            return;
+        }
+        if (this.ended) {
+            throw new ApertureSDKException("Flow already ended");
+        }
+        this.ended = true;
+
+        String serializedFlowcontrolCheckResponse = "";
+        if (this.checkResponse != null
+                && this.checkResponse.hasDynamicMetadata()
+                && this.checkResponse.getDynamicMetadata().getFieldsMap().containsKey("aperture.check_response")) {
+            Value checkResponse = this.checkResponse.getDynamicMetadata().getFieldsMap().get("aperture.check_response");
+            if (checkResponse.hasStringValue()) {
+                // If checkResponse comes pre-serialized from envoy, pass it
+                // through as-is.
+                serializedFlowcontrolCheckResponse = checkResponse.getStringValue();
+            } else {
+                // Otherwise, serialize it.
+                try {
+                    serializedFlowcontrolCheckResponse = JsonFormat.printer().print(checkResponse);
+                } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                    throw new ApertureSDKException(e);
+                }
+            }
+        }
+
+        this.span.setAttribute(FLOW_STATUS_LABEL, statusCode.name())
+                .setAttribute(CHECK_RESPONSE_LABEL, serializedFlowcontrolCheckResponse)
+                .setAttribute(FLOW_STOP_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
+
+        this.span.end();
+    }
+
+    // Artificial response if none is received from agent
+    static CheckResponse successfulResponse() {
+        return CheckResponse.newBuilder()
+                .setStatus(Status.newBuilder().setCode(Code.OK_VALUE).build())
+                .build();
+    }
 }

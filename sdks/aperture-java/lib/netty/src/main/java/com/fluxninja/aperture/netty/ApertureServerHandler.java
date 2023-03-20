@@ -9,14 +9,12 @@ import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundInvoker;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpRequest> {
 
@@ -40,7 +38,10 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
 
         if (flow.accepted()) {
             try {
-                List<HeaderValueOption> newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
+                List<HeaderValueOption> newHeaders = new ArrayList<>();
+                if (flow.checkResponse() != null) {
+                    newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
+                }
                 HttpRequest newRequest = NettyUtils.updateHeaders(req, newHeaders);
 
                 ctx.fireChannelRead(newRequest);
@@ -48,7 +49,8 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
             } catch (ApertureSDKException e) {
                 // ending flow failed
                 e.printStackTrace();
-                FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+                FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
+                        HttpResponseStatus.INTERNAL_SERVER_ERROR);
                 ctx.write(response);
                 ctx.flush();
             } catch (Exception e) {
@@ -67,8 +69,10 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
                 e.printStackTrace();
             }
             HttpResponseStatus status;
-            if (flow.checkResponse().hasDeniedResponse() && flow.checkResponse().getDeniedResponse().hasStatus()) {
-                status = HttpResponseStatus.valueOf(flow.checkResponse().getDeniedResponse().getStatus().getCodeValue());
+            if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()
+                    && flow.checkResponse().getDeniedResponse().hasStatus()) {
+                status = HttpResponseStatus
+                        .valueOf(flow.checkResponse().getDeniedResponse().getStatus().getCodeValue());
             } else {
                 status = HttpResponseStatus.FORBIDDEN;
             }
