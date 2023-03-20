@@ -36,6 +36,5 @@ spec:
           env:
             - name: APERTURE_AGENT_ENDPOINT
               value: {{ .Values.nginx.agentEndpoint }}
-          command: ["nginx", "-g", "daemon off;"]
           resources: {{ toYaml .Values.nginx.resources | nindent 12 }}
 {{- end -}}

@@ -171,7 +171,6 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 	// Newly created flow labels can overwrite existing flow labels.
 	flowlabel.Merge(mergedFlowLabels, newFlowLabels)
 	flowLabels := mergedFlowLabels.ToPlainMap()
-	log.Error().Msgf("flowLabels: %v", flowLabels)
 
 	// Ask flow control service for Ok/Deny
 	checkResponse := h.fcHandler.CheckWithValues(ctx, destinationSvcs, ctrlPt, flowLabels)

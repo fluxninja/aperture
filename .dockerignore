@@ -9,3 +9,5 @@
 !cmd/*/build-config.yaml
 !scripts/build_aperturectl.sh
 !.git
+!playground/resources/**/*
+!gateways

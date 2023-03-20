@@ -5,6 +5,7 @@ local helpers = import 'ninja/helpers.libsonnet';
 local helm = tanka.helm.new(helpers.helmChartsRoot);
 
 local enableNginx = std.extVar('ENABLE_DEMO_APP_NGINX') == 'true';
+local enableKong = std.extVar('ENABLE_DEMO_APP_KONG') == 'true';
 
 local application = {
   environment:: {
@@ -18,6 +19,19 @@ local application = {
       values: $.values {
         nginx: {
           enabled: enableNginx,
+          resources: {
+            requests: {
+              cpu: '1',
+              memory: '1024Mi',
+            },
+            limits: {
+              cpu: '4',
+              memory: '4096Mi',
+            },
+          },
+        },
+        kong: {
+          enabled: enableKong,
           resources: {
             requests: {
               cpu: '1',

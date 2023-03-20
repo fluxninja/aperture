@@ -75,9 +75,16 @@ type CheckHTTPRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Source      *SocketAddress                `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
-	Destination *SocketAddress                `protobuf:"bytes,2,opt,name=destination,proto3" json:"destination,omitempty"`
-	Request     *CheckHTTPRequest_HttpRequest `protobuf:"bytes,3,opt,name=request,proto3" json:"request,omitempty"`
+	// The source of a network activity, such as starting a TCP connection.
+	// In a multi hop network activity, the source represents the sender of the
+	// last hop.
+	Source *SocketAddress `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
+	// The destination of a network activity, such as accepting a TCP connection.
+	// In a multi hop network activity, the destination represents the receiver of
+	// the last hop.
+	Destination *SocketAddress `protobuf:"bytes,2,opt,name=destination,proto3" json:"destination,omitempty"`
+	// Represents a network request, such as an HTTP request.
+	Request *CheckHTTPRequest_HttpRequest `protobuf:"bytes,3,opt,name=request,proto3" json:"request,omitempty"`
 }
 
 func (x *CheckHTTPRequest) Reset() {
@@ -133,14 +140,21 @@ func (x *CheckHTTPRequest) GetRequest() *CheckHTTPRequest_HttpRequest {
 	return nil
 }
 
+// HTTP attributes for a denied response.
 type DeniedHttpResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Status  int32             `protobuf:"varint,1,opt,name=status,proto3" json:"status,omitempty"`
+	// This field allows the authorization service to send an HTTP response status code to the
+	// downstream client. If not set, Envoy sends ``403 Forbidden`` HTTP status code by default.
+	Status int32 `protobuf:"varint,1,opt,name=status,proto3" json:"status,omitempty"`
+	// This field allows the authorization service to send HTTP response headers
+	// to the downstream client.
 	Headers map[string]string `protobuf:"bytes,2,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Body    string            `protobuf:"bytes,3,opt,name=body,proto3" json:"body,omitempty"`
+	// This field allows the authorization service to send a response body data
+	// to the downstream client.
+	Body string `protobuf:"bytes,3,opt,name=body,proto3" json:"body,omitempty"`
 }
 
 func (x *DeniedHttpResponse) Reset() {
@@ -196,11 +210,13 @@ func (x *DeniedHttpResponse) GetBody() string {
 	return ""
 }
 
+// HTTP attributes for an OK response.
 type OkHttpResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// HTTP entity headers in addition to the original request headers.
 	Headers         map[string]string `protobuf:"bytes,1,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	DynamicMetadata *structpb.Struct  `protobuf:"bytes,2,opt,name=dynamic_metadata,json=dynamicMetadata,proto3" json:"dynamic_metadata,omitempty"`
 }
@@ -256,12 +272,17 @@ type CheckHTTPResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Status ``OK`` allows the request. Any other status indicates the request should be denied
 	Status *status.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	// An message that contains HTTP response attributes.
+	//
 	// Types that are assignable to HttpResponse:
 	//	*CheckHTTPResponse_DeniedResponse
 	//	*CheckHTTPResponse_OkResponse
-	HttpResponse    isCheckHTTPResponse_HttpResponse `protobuf_oneof:"http_response"`
-	DynamicMetadata *structpb.Struct                 `protobuf:"bytes,4,opt,name=dynamic_metadata,json=dynamicMetadata,proto3" json:"dynamic_metadata,omitempty"`
+	HttpResponse isCheckHTTPResponse_HttpResponse `protobuf_oneof:"http_response"`
+	// Optional response metadata that will be emitted as dynamic metadata to be consumed by the next
+	// filter.
+	DynamicMetadata *structpb.Struct `protobuf:"bytes,4,opt,name=dynamic_metadata,json=dynamicMetadata,proto3" json:"dynamic_metadata,omitempty"`
 }
 
 func (x *CheckHTTPResponse) Reset() {
@@ -355,8 +376,10 @@ type SocketAddress struct {
 	unknownFields protoimpl.UnknownFields
 
 	Protocol SocketAddress_Protocol `protobuf:"varint,1,opt,name=protocol,proto3,enum=aperture.flowcontrol.checkhttp.v1.SocketAddress_Protocol" json:"protocol,omitempty"`
-	Address  string                 `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
-	Port     uint32                 `protobuf:"varint,3,opt,name=port,proto3" json:"port,omitempty"`
+	// The address for this socket.
+	Address string `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
+	// The port for this socket.
+	Port uint32 `protobuf:"varint,3,opt,name=port,proto3" json:"port,omitempty"`
 }
 
 func (x *SocketAddress) Reset() {
@@ -412,19 +435,30 @@ func (x *SocketAddress) GetPort() uint32 {
 	return 0
 }
 
+// This message defines attributes for an HTTP request.
+// HTTP/1.x, HTTP/2, gRPC are all considered as HTTP requests.
 type CheckHTTPRequest_HttpRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Method   string            `protobuf:"bytes,1,opt,name=method,proto3" json:"method,omitempty"`
-	Headers  map[string]string `protobuf:"bytes,2,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Path     string            `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
-	Host     string            `protobuf:"bytes,4,opt,name=host,proto3" json:"host,omitempty"`
-	Scheme   string            `protobuf:"bytes,5,opt,name=scheme,proto3" json:"scheme,omitempty"`
-	Size     int64             `protobuf:"varint,6,opt,name=size,proto3" json:"size,omitempty"`
-	Protocol string            `protobuf:"bytes,7,opt,name=protocol,proto3" json:"protocol,omitempty"`
-	Body     string            `protobuf:"bytes,8,opt,name=body,proto3" json:"body,omitempty"`
+	// The HTTP request method, such as ``GET``, ``POST``.
+	Method string `protobuf:"bytes,1,opt,name=method,proto3" json:"method,omitempty"`
+	// The HTTP request headers.
+	Headers map[string]string `protobuf:"bytes,2,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// The request target, as it appears in the first line of the HTTP request. This includes
+	// the URL path and query-string. No decoding is performed.
+	Path string `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
+	// The HTTP request ``Host`` header value.
+	Host string `protobuf:"bytes,4,opt,name=host,proto3" json:"host,omitempty"`
+	// The HTTP URL scheme, such as ``http`` and ``https``.
+	Scheme string `protobuf:"bytes,5,opt,name=scheme,proto3" json:"scheme,omitempty"`
+	// The HTTP request size in bytes. If unknown, it must be -1.
+	Size int64 `protobuf:"varint,6,opt,name=size,proto3" json:"size,omitempty"`
+	// The network protocol used with the request, such as "HTTP/1.0", "HTTP/1.1", or "HTTP/2".
+	Protocol string `protobuf:"bytes,7,opt,name=protocol,proto3" json:"protocol,omitempty"`
+	// The HTTP request body.
+	Body string `protobuf:"bytes,8,opt,name=body,proto3" json:"body,omitempty"`
 }
 
 func (x *CheckHTTPRequest_HttpRequest) Reset() {

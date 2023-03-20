@@ -19,6 +19,15 @@ nginx:
     tag: "latest"
   agentEndpoint: "http://aperture-agent.aperture-agent.svc.cluster.local:8080"
 
+kong:
+  enabled: false
+  resources: {}
+  image:
+    repository: fluxninja/demo-app-kong
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  agentEndpoint: "http://aperture-agent.aperture-agent.svc.cluster.local:8080"
+
 proxy:
   image:
     repository: fluxninja/fluxninja-proxy-envoy
