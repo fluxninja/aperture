@@ -2,7 +2,7 @@
 set -uo pipefail
 
 javasdk=$(git rev-parse --show-toplevel)/sdks/aperture-java
-cd $javasdk
+cd "$javasdk" || exit 1
 
 ./gradlew spotlessCheck
 code=$?

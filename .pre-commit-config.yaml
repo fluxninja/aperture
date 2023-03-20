@@ -99,7 +99,7 @@ repos:
       - id: java-spotless-lint
         name: Run gradle spotless
         description: "Run gradle spotless"
-        entry: ./scripts/java_spotless_lint.sh
+        entry: ./scripts/precommit/java_spotless_lint.sh
         language: script
         pass_filenames: false
         types:

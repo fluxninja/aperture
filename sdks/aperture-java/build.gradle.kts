@@ -2,7 +2,7 @@ import java.time.Duration
 
 plugins {
     id("io.github.gradle-nexus.publish-plugin")
-    id("com.diffplug.spotless")
+    id("com.diffplug.gradle.spotless")
 }
 
 subprojects {
@@ -39,8 +39,6 @@ spotless {
         target("**/*.java")
         targetExclude("lib/core/src/main/java/com/fluxninja/generated/**/*.java")
 
-        googleJavaFormat().aosp().reflowLongStrings()
-
-        formatAnnotations()
+        googleJavaFormat().aosp()
     }
 }
