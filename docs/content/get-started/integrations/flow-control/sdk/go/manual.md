@@ -65,5 +65,4 @@ The created instance can then be used to start a flow:
 For more context on how to use Aperture Go SDK to set feature Control Points,
 you can take a look at the [example app][example] available in our repository.
 
-[example]:
-  https://github.com/fluxninja/aperture/tree/main/sdks/aperture-go/example
+[example]: https://github.com/fluxninja/aperture-go/tree/v1.0.0/example

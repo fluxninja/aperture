@@ -76,4 +76,4 @@ aperture.javaagent.blocked.paths=/health,/connected
 ```
 
 [download_link]:
-  https://repo1.maven.org/maven2/com/fluxninja/aperture/aperture-javaagent/0.26.0/aperture-javaagent-0.26.0.jar
+  https://repo1.maven.org/maven2/com/fluxninja/aperture/aperture-javaagent/1.0.0/aperture-javaagent-1.0.0.jar
