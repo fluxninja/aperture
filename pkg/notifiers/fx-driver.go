@@ -12,6 +12,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
+// genrate unit test code for this file
+
 // FxOptionsFunc is a function that returns fx.Option.
 type FxOptionsFunc func(Key, config.Unmarshaller, status.Registry) (fx.Option, error)
 
