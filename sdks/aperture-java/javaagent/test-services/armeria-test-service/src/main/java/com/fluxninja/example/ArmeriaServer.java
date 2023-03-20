@@ -3,7 +3,6 @@ package com.fluxninja.example;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.server.*;
-
 import java.util.concurrent.CompletableFuture;
 
 public class ArmeriaServer {
@@ -18,6 +17,7 @@ public class ArmeriaServer {
             }
         };
     }
+
     public static HttpService createHealthService() {
         return new AbstractHttpService() {
             @Override
@@ -26,6 +26,7 @@ public class ArmeriaServer {
             }
         };
     }
+
     public static HttpService createConnectedHTTPService() {
         return new AbstractHttpService() {
             @Override
@@ -41,7 +42,6 @@ public class ArmeriaServer {
             appPort = DEFAULT_APP_PORT;
         }
 
-
         ServerBuilder serverBuilder = Server.builder();
         serverBuilder.http(Integer.parseInt(appPort));
 
@@ -49,7 +49,6 @@ public class ArmeriaServer {
         serverBuilder.service("/super", createHelloHTTPService());
         serverBuilder.service("/health", createHealthService());
         serverBuilder.service("/connected", createConnectedHTTPService());
-
 
         Server server = serverBuilder.build();
         CompletableFuture<Void> future = server.start();

@@ -15,7 +15,6 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     String agentHost;
     int agentPort;
 
-
     public ServerInitializer(String agentHost, String agentPort) {
         this.agentHost = agentHost;
         this.agentPort = Integer.parseInt(agentPort);
@@ -37,5 +36,4 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(new ApertureServerHandler(sdk));
         pipeline.addLast(new HelloWorldHandler());
     }
-
 }

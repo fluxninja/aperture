@@ -6,6 +6,6 @@ public class Utils {
     public static long getCurrentEpochNanos() {
         long nanosInSecond = 1000000000L;
         Instant currentTime = Instant.now();
-        return currentTime.getEpochSecond()*nanosInSecond+ currentTime.getNano();
+        return currentTime.getEpochSecond() * nanosInSecond + currentTime.getNano();
     }
 }

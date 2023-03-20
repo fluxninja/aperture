@@ -6,6 +6,7 @@ import com.linecorp.armeria.server.HttpService;
 /** A builder for configuring an {@link ApertureHTTPService}. */
 public class ApertureHTTPServiceBuilder {
     ApertureSDK apertureSDK;
+
     public ApertureHTTPServiceBuilder setApertureSDK(ApertureSDK apertureSDK) {
         this.apertureSDK = apertureSDK;
         return this;

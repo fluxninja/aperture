@@ -1,9 +1,11 @@
 package com.fluxninja.aperture.servlet.javax;
 
+import com.fluxninja.aperture.sdk.*;
+import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
+import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -13,16 +15,13 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.fluxninja.aperture.sdk.*;
-import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
-import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
-
 public class ApertureFilter implements Filter {
 
     private ApertureSDK apertureSDK;
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException, IOException {
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+            throws ServletException, IOException {
         AttributeContext attributes = ServletUtils.attributesFromRequest(req);
 
         HttpServletRequest request = (HttpServletRequest) req;
@@ -38,7 +37,8 @@ public class ApertureFilter implements Filter {
 
         if (flow.accepted()) {
             try {
-                List<HeaderValueOption> newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
+                List<HeaderValueOption> newHeaders =
+                        flow.checkResponse().getOkResponse().getHeadersList();
                 ServletRequest newRequest = ServletUtils.updateHeaders(request, newHeaders);
                 chain.doFilter(newRequest, response);
                 flow.end(FlowStatus.OK);
@@ -70,10 +70,11 @@ public class ApertureFilter implements Filter {
             agentPort = filterConfig.getInitParameter("agent_port");
             timeoutMs = filterConfig.getInitParameter("timeout_ms");
         } catch (Exception e) {
-            throw new ServletException("Invalid agent connection information "
-                    + filterConfig.getInitParameter("agent_host")
-                    + ":"
-                    + filterConfig.getInitParameter("agent_port"));
+            throw new ServletException(
+                    "Invalid agent connection information "
+                            + filterConfig.getInitParameter("agent_host")
+                            + ":"
+                            + filterConfig.getInitParameter("agent_port"));
         }
 
         try {
