@@ -35,7 +35,7 @@ public class AppController {
 
     // Register imported Aperture Filter to apply to /super endpoint
     @Bean
-    public FilterRegistrationBean<ApertureFilter> apertureFilter(Environment env){
+    public FilterRegistrationBean<ApertureFilter> apertureFilter(Environment env) {
         FilterRegistrationBean<ApertureFilter> registrationBean = new FilterRegistrationBean<>();
 
         registrationBean.setFilter(new ApertureFilter());
@@ -51,8 +51,9 @@ public class AppController {
 
     // Register locally defined Aperture Feature Filter to apply to /super2 endpoint
     @Bean
-    public FilterRegistrationBean<ApertureFeatureFilter> apertureFeatureFilter(Environment env){
-        FilterRegistrationBean<ApertureFeatureFilter> registrationBean = new FilterRegistrationBean<>();
+    public FilterRegistrationBean<ApertureFeatureFilter> apertureFeatureFilter(Environment env) {
+        FilterRegistrationBean<ApertureFeatureFilter> registrationBean =
+                new FilterRegistrationBean<>();
 
         registrationBean.setFilter(new ApertureFeatureFilter());
         registrationBean.addUrlPatterns("/super2");

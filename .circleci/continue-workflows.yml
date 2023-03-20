@@ -287,21 +287,22 @@ jobs:
       - asdf_install:
           cache_name: pre-commit
           tools: |-
-            pre-commit
             bats
+            buf
+            circleci
             golang
             golangci-lint
-            buf
+            helm
+            java
+            jb
+            jsonnet
+            kustomize
             mockery
             nodejs
+            pre-commit
             shellcheck
-            yq
-            jb
             tanka
-            helm
-            kustomize
-            jsonnet
-            circleci
+            yq
       - run:
           name: Install additional system dependencies for pre-commit
           command: |

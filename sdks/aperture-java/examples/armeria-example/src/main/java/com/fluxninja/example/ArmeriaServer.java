@@ -6,7 +6,6 @@ import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.server.*;
-
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
@@ -24,6 +23,7 @@ public class ArmeriaServer {
             }
         };
     }
+
     public static HttpService createHealthService() {
         return new AbstractHttpService() {
             @Override
@@ -32,6 +32,7 @@ public class ArmeriaServer {
             }
         };
     }
+
     public static HttpService createConnectedHTTPService() {
         return new AbstractHttpService() {
             @Override
@@ -57,11 +58,12 @@ public class ArmeriaServer {
 
         ApertureSDK apertureSDK;
         try {
-            apertureSDK = ApertureSDK.builder()
-                    .setHost(agentHost)
-                    .setPort(Integer.parseInt(agentPort))
-                    .setDuration(Duration.ofMillis(1000))
-                    .build();
+            apertureSDK =
+                    ApertureSDK.builder()
+                            .setHost(agentHost)
+                            .setPort(Integer.parseInt(agentPort))
+                            .setDuration(Duration.ofMillis(1000))
+                            .build();
         } catch (ApertureSDKException e) {
             e.printStackTrace();
             return;
@@ -72,8 +74,8 @@ public class ArmeriaServer {
         serverBuilder.service("/health", createHealthService());
         serverBuilder.service("/connected", createConnectedHTTPService());
 
-        ApertureHTTPService decoratedService = createHelloHTTPService()
-            .decorate(ApertureHTTPService.newDecorator(apertureSDK));
+        ApertureHTTPService decoratedService =
+                createHelloHTTPService().decorate(ApertureHTTPService.newDecorator(apertureSDK));
         serverBuilder.service("/super", decoratedService);
 
         Server server = serverBuilder.build();

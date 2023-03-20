@@ -1,10 +1,7 @@
 package com.fluxninja.aperture.servlet.jakarta;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.util.List;
-import java.util.ArrayList;
-
+import com.fluxninja.aperture.sdk.*;
+import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
 import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -14,9 +11,10 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import com.fluxninja.aperture.sdk.*;
-import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ApertureFilter implements Filter {
 
@@ -75,10 +73,11 @@ public class ApertureFilter implements Filter {
             agentPort = filterConfig.getInitParameter("agent_port");
             timeoutMs = filterConfig.getInitParameter("timeout_ms");
         } catch (Exception e) {
-            throw new ServletException("Invalid agent connection information "
-                    + filterConfig.getInitParameter("agent_host")
-                    + ":"
-                    + filterConfig.getInitParameter("agent_port"));
+            throw new ServletException(
+                    "Invalid agent connection information "
+                            + filterConfig.getInitParameter("agent_host")
+                            + ":"
+                            + filterConfig.getInitParameter("agent_port"));
         }
 
         try {
@@ -97,6 +96,5 @@ public class ApertureFilter implements Filter {
     }
 
     @Override
-    public void destroy() {
-    }
+    public void destroy() {}
 }

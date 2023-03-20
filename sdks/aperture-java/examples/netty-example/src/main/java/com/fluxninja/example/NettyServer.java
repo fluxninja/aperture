@@ -34,7 +34,8 @@ public class NettyServer {
 
             ServerBootstrap httpBootstrap = new ServerBootstrap();
 
-            httpBootstrap.group(bossGroup, workerGroup)
+            httpBootstrap
+                    .group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ServerInitializer(agentHost, agentPort))
                     .option(ChannelOption.SO_BACKLOG, 128)
@@ -45,8 +46,7 @@ public class NettyServer {
 
             // Wait until the server socket is closed
             httpChannel.channel().closeFuture().sync();
-        }
-        finally {
+        } finally {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }

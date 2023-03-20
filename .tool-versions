@@ -19,3 +19,4 @@ tanka 0.24.0
 tilt 0.31.2
 jsonnet 0.19.1
 circleci 0.1.23667
+java corretto-19.0.2.7.1

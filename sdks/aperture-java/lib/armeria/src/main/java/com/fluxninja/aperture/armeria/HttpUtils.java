@@ -3,8 +3,8 @@ package com.fluxninja.aperture.armeria;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.fluxninja.aperture.sdk.TrafficFlow;
-import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
 import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
+import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.RequestHeaders;
@@ -12,7 +12,6 @@ import com.linecorp.armeria.common.RequestHeadersBuilder;
 import io.netty.util.AsciiString;
 import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageEntry;
-
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -26,9 +25,11 @@ class HttpUtils {
         } catch (ApertureSDKException e) {
             e.printStackTrace();
         }
-        if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()
+        if (flow.checkResponse() != null
+                && flow.checkResponse().hasDeniedResponse()
                 && flow.checkResponse().getDeniedResponse().hasStatus()) {
-            int httpStatusCode = flow.checkResponse().getDeniedResponse().getStatus().getCodeValue();
+            int httpStatusCode =
+                    flow.checkResponse().getDeniedResponse().getStatus().getCodeValue();
             return HttpStatus.valueOf(httpStatusCode);
         }
         return HttpStatus.FORBIDDEN;
@@ -56,7 +57,9 @@ class HttpUtils {
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
             String value;
             try {
-                value = URLDecoder.decode(entry.getValue().getValue(), StandardCharsets.UTF_8.name());
+                value =
+                        URLDecoder.decode(
+                                entry.getValue().getValue(), StandardCharsets.UTF_8.name());
             } catch (java.io.UnsupportedEncodingException e) {
                 // This should never happen, as `StandardCharsets.UTF_8.name()` is a valid
                 // encoding
@@ -73,7 +76,8 @@ class HttpUtils {
 
     // getAppend is deprecated but agent does set it, so we should use it
     @SuppressWarnings("deprecation")
-    protected static HttpRequest updateHeaders(HttpRequest req, List<HeaderValueOption> newHeaders) {
+    protected static HttpRequest updateHeaders(
+            HttpRequest req, List<HeaderValueOption> newHeaders) {
         RequestHeadersBuilder newHeadersBuilder = req.headers().toBuilder();
         for (HeaderValueOption newHeader : newHeaders) {
             String headerKey = newHeader.getHeader().getKey().toLowerCase();
@@ -91,7 +95,8 @@ class HttpUtils {
         return req.withHeaders(newHeadersBuilder.build());
     }
 
-    private static AttributeContext.Builder addHttpAttributes(AttributeContext.Builder builder, HttpRequest req) {
+    private static AttributeContext.Builder addHttpAttributes(
+            AttributeContext.Builder builder, HttpRequest req) {
         Map<String, String> extractedHeaders = new HashMap<>();
         RequestHeaders headers = req.headers();
         for (Map.Entry<AsciiString, String> header : headers) {
@@ -102,16 +107,17 @@ class HttpUtils {
             extractedHeaders.put(headerKey, header.getValue());
         }
 
-        return builder
-                .putContextExtensions("control-point", "ingress")
-                .setRequest(AttributeContext.Request.newBuilder()
-                        .setHttp(AttributeContext.HttpRequest.newBuilder()
-                                .setMethod(req.method().toString())
-                                .setPath(req.path())
-                                .setHost(req.authority())
-                                .setScheme(req.scheme())
-                                .setSize(headers.contentLength())
-                                .setProtocol("HTTP/2")
-                                .putAllHeaders(extractedHeaders)));
+        return builder.putContextExtensions("control-point", "ingress")
+                .setRequest(
+                        AttributeContext.Request.newBuilder()
+                                .setHttp(
+                                        AttributeContext.HttpRequest.newBuilder()
+                                                .setMethod(req.method().toString())
+                                                .setPath(req.path())
+                                                .setHost(req.authority())
+                                                .setScheme(req.scheme())
+                                                .setSize(headers.contentLength())
+                                                .setProtocol("HTTP/2")
+                                                .putAllHeaders(extractedHeaders)));
     }
 }

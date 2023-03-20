@@ -1,12 +1,11 @@
 package com.fluxninja.aperture.armeria;
 
-import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.sdk.Flow;
 import com.fluxninja.aperture.sdk.FlowStatus;
+import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse;
 import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.RpcRequest;
-
 import java.util.HashMap;
 import java.util.Map;
 

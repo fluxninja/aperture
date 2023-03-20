@@ -4,27 +4,24 @@ import com.fluxninja.aperture.sdk.ApertureSDK;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.fluxninja.aperture.sdk.TrafficFlow;
-import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
 import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
+import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
 import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.client.HttpClient;
 import com.linecorp.armeria.client.SimpleDecoratingHttpClient;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
-/**
- * Decorates an {@link HttpClient} to enable flow control using provided
- * {@link ApertureSDK}
- */
+/** Decorates an {@link HttpClient} to enable flow control using provided {@link ApertureSDK} */
 public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
     private final ApertureSDK apertureSDK;
 
-    public static Function<? super HttpClient, ApertureHTTPClient> newDecorator(ApertureSDK apertureSDK) {
+    public static Function<? super HttpClient, ApertureHTTPClient> newDecorator(
+            ApertureSDK apertureSDK) {
         ApertureHTTPClientBuilder builder = new ApertureHTTPClientBuilder();
         builder.setApertureSDK(apertureSDK);
         return builder::build;

@@ -6,6 +6,7 @@ import com.linecorp.armeria.server.RpcService;
 /** A builder for configuring an {@link ApertureRPCService}. */
 public class ApertureRPCServiceBuilder {
     ApertureSDK apertureSDK;
+
     public ApertureRPCServiceBuilder setApertureSDK(ApertureSDK apertureSDK) {
         this.apertureSDK = apertureSDK;
         return this;

@@ -129,6 +129,14 @@ repos:
           - commit
         args:
           - --fix
+      - id: java-spotless-lint
+        name: Run gradle spotless
+        description: "Run gradle spotless"
+        entry: ./scripts/precommit/java_spotless_lint.sh
+        language: script
+        pass_filenames: false
+        types:
+          - java
       - id: generate-helm-readme
         name: "Helm Readme"
         entry: "./scripts/precommit/generate_helm_readme.sh"

@@ -1,5 +1,7 @@
 package com.fluxninja.aperture.sdk;
 
+import static com.fluxninja.aperture.sdk.Constants.*;
+
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest;
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse;
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowControlServiceGrpc;
@@ -10,7 +12,6 @@ import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageEntry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
-
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -19,8 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-
-import static com.fluxninja.aperture.sdk.Constants.*;
 
 public final class ApertureSDK {
     private final FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient;
@@ -46,8 +45,7 @@ public final class ApertureSDK {
     }
 
     /**
-     * Returns a new {@link ApertureSDKBuilder} for configuring an instance of
-     * {@linkplain
+     * Returns a new {@link ApertureSDKBuilder} for configuring an instance of {@linkplain
      * ApertureSDK the Aperture SDK}.
      */
     public static ApertureSDKBuilder builder() {
@@ -60,7 +58,9 @@ public final class ApertureSDK {
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
             String value;
             try {
-                value = URLDecoder.decode(entry.getValue().getValue(), StandardCharsets.UTF_8.name());
+                value =
+                        URLDecoder.decode(
+                                entry.getValue().getValue(), StandardCharsets.UTF_8.name());
             } catch (java.io.UnsupportedEncodingException e) {
                 // This should never happen, as `StandardCharsets.UTF_8.name()` is a valid
                 // encoding
@@ -73,29 +73,31 @@ public final class ApertureSDK {
             labels.putAll(explicitLabels);
         }
 
-        CheckRequest req = CheckRequest.newBuilder()
-                .setControlPoint(controlPoint)
-                .putAllLabels(labels)
-                .build();
+        CheckRequest req =
+                CheckRequest.newBuilder()
+                        .setControlPoint(controlPoint)
+                        .putAllLabels(labels)
+                        .build();
 
-        Span span = this.tracer.spanBuilder("Aperture Check").startSpan()
-                .setAttribute(FLOW_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos())
-                .setAttribute(SOURCE_LABEL, "sdk");
+        Span span =
+                this.tracer
+                        .spanBuilder("Aperture Check")
+                        .startSpan()
+                        .setAttribute(FLOW_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos())
+                        .setAttribute(SOURCE_LABEL, "sdk");
 
         CheckResponse res = null;
         try {
-            res = this.flowControlClient
-                    .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
-                    .check(req);
+            res =
+                    this.flowControlClient
+                            .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
+                            .check(req);
         } catch (StatusRuntimeException e) {
             // deadline exceeded or couldn't reach agent - request should not be blocked
         }
         span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
-        return new Flow(
-                res,
-                span,
-                false);
+        return new Flow(res, span, false);
     }
 
     public TrafficFlow startTrafficFlow(String path, AttributeContext attributes) {
@@ -103,29 +105,30 @@ public final class ApertureSDK {
             return TrafficFlow.ignoredFlow();
         }
 
-        com.fluxninja.generated.envoy.service.auth.v3.CheckRequest req = com.fluxninja.generated.envoy.service.auth.v3.CheckRequest
-                .newBuilder()
-                .setAttributes(attributes)
-                .build();
+        com.fluxninja.generated.envoy.service.auth.v3.CheckRequest req =
+                com.fluxninja.generated.envoy.service.auth.v3.CheckRequest.newBuilder()
+                        .setAttributes(attributes)
+                        .build();
 
-        Span span = this.tracer.spanBuilder("Aperture Check").startSpan()
-                .setAttribute(FLOW_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos())
-                .setAttribute(SOURCE_LABEL, "sdk");
+        Span span =
+                this.tracer
+                        .spanBuilder("Aperture Check")
+                        .startSpan()
+                        .setAttribute(FLOW_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos())
+                        .setAttribute(SOURCE_LABEL, "sdk");
 
         com.fluxninja.generated.envoy.service.auth.v3.CheckResponse res = null;
         try {
-            res = this.envoyAuthzClient
-                    .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
-                    .check(req);
+            res =
+                    this.envoyAuthzClient
+                            .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
+                            .check(req);
         } catch (StatusRuntimeException e) {
             // deadline exceeded or couldn't reach agent - request should not be blocked
         }
         span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
-        return new TrafficFlow(
-                res,
-                span,
-                false);
+        return new TrafficFlow(res, span, false);
     }
 
     private boolean isBlocked(String path) {

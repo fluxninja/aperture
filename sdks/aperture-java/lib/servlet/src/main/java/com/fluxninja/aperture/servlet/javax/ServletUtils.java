@@ -5,16 +5,14 @@ import com.fluxninja.aperture.sdk.FlowStatus;
 import com.fluxninja.aperture.sdk.TrafficFlow;
 import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
 import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
-
 import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageEntry;
-
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 
 public class ServletUtils {
     protected static int handleRejectedFlow(TrafficFlow flow) {
@@ -23,7 +21,8 @@ public class ServletUtils {
         } catch (ApertureSDKException e) {
             e.printStackTrace();
         }
-        if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()
+        if (flow.checkResponse() != null
+                && flow.checkResponse().hasDeniedResponse()
                 && flow.checkResponse().getDeniedResponse().hasStatus()) {
             return flow.checkResponse().getDeniedResponse().getStatus().getCodeValue();
         }
@@ -36,7 +35,9 @@ public class ServletUtils {
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
             String value;
             try {
-                value = URLDecoder.decode(entry.getValue().getValue(), StandardCharsets.UTF_8.name());
+                value =
+                        URLDecoder.decode(
+                                entry.getValue().getValue(), StandardCharsets.UTF_8.name());
             } catch (java.io.UnsupportedEncodingException e) {
                 // This should never happen, as `StandardCharsets.UTF_8.name()` is a valid
                 // encoding
@@ -51,7 +52,8 @@ public class ServletUtils {
         return addHttpAttributes(builder, req).build();
     }
 
-    protected static ServletRequest updateHeaders(ServletRequest req, List<HeaderValueOption> newHeaders) {
+    protected static ServletRequest updateHeaders(
+            ServletRequest req, List<HeaderValueOption> newHeaders) {
         HttpServletRequest httpReq = (HttpServletRequest) req;
         Map<String, String> headerMap = new HashMap<>();
         for (HeaderValueOption option : newHeaders) {
@@ -84,7 +86,8 @@ public class ServletUtils {
         };
     }
 
-    private static AttributeContext.Builder addHttpAttributes(AttributeContext.Builder builder, ServletRequest req) {
+    private static AttributeContext.Builder addHttpAttributes(
+            AttributeContext.Builder builder, ServletRequest req) {
         HttpServletRequest request = (HttpServletRequest) req;
         Map<String, String> extractedHeaders = new HashMap<>();
         Enumeration<String> headers = request.getHeaderNames();
@@ -93,16 +96,17 @@ public class ServletUtils {
             extractedHeaders.put(headerKey, request.getHeader(headerKey));
         }
 
-        return builder
-                .putContextExtensions("control-point", "ingress")
-                .setRequest(AttributeContext.Request.newBuilder()
-                        .setHttp(AttributeContext.HttpRequest.newBuilder()
-                                .setMethod(request.getMethod())
-                                .setPath(request.getServletPath())
-                                .setHost(req.getRemoteHost())
-                                .setScheme(req.getScheme())
-                                .setSize(req.getContentLength())
-                                .setProtocol(req.getProtocol())
-                                .putAllHeaders(extractedHeaders)));
+        return builder.putContextExtensions("control-point", "ingress")
+                .setRequest(
+                        AttributeContext.Request.newBuilder()
+                                .setHttp(
+                                        AttributeContext.HttpRequest.newBuilder()
+                                                .setMethod(request.getMethod())
+                                                .setPath(request.getServletPath())
+                                                .setHost(req.getRemoteHost())
+                                                .setScheme(req.getScheme())
+                                                .setSize(req.getContentLength())
+                                                .setProtocol(req.getProtocol())
+                                                .putAllHeaders(extractedHeaders)));
     }
 }

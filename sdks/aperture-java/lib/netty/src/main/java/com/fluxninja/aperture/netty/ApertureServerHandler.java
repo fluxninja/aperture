@@ -12,7 +12,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,8 +48,9 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
             } catch (ApertureSDKException e) {
                 // ending flow failed
                 e.printStackTrace();
-                FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
-                        HttpResponseStatus.INTERNAL_SERVER_ERROR);
+                FullHttpResponse response =
+                        new DefaultFullHttpResponse(
+                                HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR);
                 ctx.write(response);
                 ctx.flush();
             } catch (Exception e) {
@@ -69,16 +69,22 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
                 e.printStackTrace();
             }
             HttpResponseStatus status;
-            if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()
+            if (flow.checkResponse() != null
+                    && flow.checkResponse().hasDeniedResponse()
                     && flow.checkResponse().getDeniedResponse().hasStatus()) {
-                status = HttpResponseStatus
-                        .valueOf(flow.checkResponse().getDeniedResponse().getStatus().getCodeValue());
+                status =
+                        HttpResponseStatus.valueOf(
+                                flow.checkResponse()
+                                        .getDeniedResponse()
+                                        .getStatus()
+                                        .getCodeValue());
             } else {
                 status = HttpResponseStatus.FORBIDDEN;
             }
 
             ByteBuf content = Unpooled.copiedBuffer(status.toString(), CharsetUtil.UTF_8);
-            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, content);
+            FullHttpResponse response =
+                    new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, content);
             response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/html");
             response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
             ctx.write(response);
