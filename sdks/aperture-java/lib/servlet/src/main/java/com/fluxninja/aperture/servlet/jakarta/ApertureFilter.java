@@ -1,7 +1,5 @@
 package com.fluxninja.aperture.servlet.jakarta;
 
-import com.fluxninja.aperture.sdk.*;
-import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
 import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -13,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ApertureFilter implements Filter {
@@ -37,8 +36,10 @@ public class ApertureFilter implements Filter {
 
         if (flow.accepted()) {
             try {
-                List<HeaderValueOption> newHeaders =
-                        flow.checkResponse().getOkResponse().getHeadersList();
+                List<HeaderValueOption> newHeaders = new ArrayList<>();
+                if (flow.checkResponse() != null) {
+                    newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
+                }
                 ServletRequest newRequest = ServletUtils.updateHeaders(request, newHeaders);
                 chain.doFilter(newRequest, response);
                 flow.end(FlowStatus.OK);

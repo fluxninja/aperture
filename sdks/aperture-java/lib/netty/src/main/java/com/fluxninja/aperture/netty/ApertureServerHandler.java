@@ -36,8 +36,10 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
 
         if (flow.accepted()) {
             try {
-                List<HeaderValueOption> newHeaders =
-                        flow.checkResponse().getOkResponse().getHeadersList();
+                List<HeaderValueOption> newHeaders = new ArrayList<>();
+                if (flow.checkResponse() != null) {
+                    newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
+                }
                 HttpRequest newRequest = NettyUtils.updateHeaders(req, newHeaders);
 
                 ctx.fireChannelRead(newRequest);
@@ -66,7 +68,8 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
                 e.printStackTrace();
             }
             HttpResponseStatus status;
-            if (flow.checkResponse().hasDeniedResponse()
+            if (flow.checkResponse() != null
+                    && flow.checkResponse().hasDeniedResponse()
                     && flow.checkResponse().getDeniedResponse().hasStatus()) {
                 status =
                         HttpResponseStatus.valueOf(

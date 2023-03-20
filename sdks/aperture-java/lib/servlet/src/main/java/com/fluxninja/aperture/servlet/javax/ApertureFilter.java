@@ -5,6 +5,7 @@ import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
 import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -37,8 +38,10 @@ public class ApertureFilter implements Filter {
 
         if (flow.accepted()) {
             try {
-                List<HeaderValueOption> newHeaders =
-                        flow.checkResponse().getOkResponse().getHeadersList();
+                List<HeaderValueOption> newHeaders = new ArrayList<>();
+                if (flow.checkResponse() != null) {
+                    newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
+                }
                 ServletRequest newRequest = ServletUtils.updateHeaders(request, newHeaders);
                 chain.doFilter(newRequest, response);
                 flow.end(FlowStatus.OK);

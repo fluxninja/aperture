@@ -86,7 +86,7 @@ public final class ApertureSDK {
                         .setAttribute(FLOW_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos())
                         .setAttribute(SOURCE_LABEL, "sdk");
 
-        CheckResponse res;
+        CheckResponse res = null;
         try {
             res =
                     this.flowControlClient
@@ -94,10 +94,6 @@ public final class ApertureSDK {
                             .check(req);
         } catch (StatusRuntimeException e) {
             // deadline exceeded or couldn't reach agent - request should not be blocked
-            res =
-                    CheckResponse.newBuilder()
-                            .setDecisionType(CheckResponse.DecisionType.DECISION_TYPE_ACCEPTED)
-                            .build();
         }
         span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
@@ -121,7 +117,7 @@ public final class ApertureSDK {
                         .setAttribute(FLOW_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos())
                         .setAttribute(SOURCE_LABEL, "sdk");
 
-        com.fluxninja.generated.envoy.service.auth.v3.CheckResponse res;
+        com.fluxninja.generated.envoy.service.auth.v3.CheckResponse res = null;
         try {
             res =
                     this.envoyAuthzClient
@@ -129,7 +125,6 @@ public final class ApertureSDK {
                             .check(req);
         } catch (StatusRuntimeException e) {
             // deadline exceeded or couldn't reach agent - request should not be blocked
-            res = TrafficFlow.successfulResponse();
         }
         span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 

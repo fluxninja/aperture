@@ -29,6 +29,9 @@ public class TrafficFlow {
     }
 
     public boolean accepted() {
+        if (this.checkResponse == null) {
+            return true;
+        }
         return this.checkResponse.getStatus().getCode() == Code.OK_VALUE;
     }
 
@@ -51,7 +54,8 @@ public class TrafficFlow {
         this.ended = true;
 
         String serializedFlowcontrolCheckResponse = "";
-        if (this.checkResponse.hasDynamicMetadata()
+        if (this.checkResponse != null
+                && this.checkResponse.hasDynamicMetadata()
                 && this.checkResponse
                         .getDynamicMetadata()
                         .getFieldsMap()

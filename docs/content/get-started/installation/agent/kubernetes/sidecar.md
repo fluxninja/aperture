@@ -48,7 +48,7 @@ Install the tool of your choice using below links:
 
     :::info Refer
     [aperturectl install agent](/reference/aperturectl/install/agent/agent.md)
-    to see all the available command line arguments. :::
+    to see all the available command line arguments.
 
 2.  [Helm](https://helm.sh/docs/intro/install/)
 

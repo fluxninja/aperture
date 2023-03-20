@@ -20,6 +20,12 @@ repos:
         files: '\.proto$'
         pass_filenames: false
         description: "Protobuf generation"
+      - id: grpc
+        name: "Generate gRPC"
+        entry: ./scripts/generate_proto.sh
+        language: script
+        files: ^(api/aperture/flowcontrol/check/.*.proto|scripts/generate_proto.sh)$
+        pass_filenames: false
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.2.0
     hooks:
@@ -60,6 +66,33 @@ repos:
   - repo: meta
     hooks:
       - id: check-hooks-apply
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.0.2
+    hooks:
+      - id: autoflake
+        args:
+          - --in-place
+          - --remove-unused-variables
+          - --remove-all-unused-imports
+          - --exclude
+          - "__init__.py"
+        exclude: &py_exclude "^sdks/aperture-py/aperture_sdk/_gen/"
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        name: isort (python)
+        args:
+          - --filter-files
+          - --profile
+          - black
+        exclude: *py_exclude
+  - repo: https://github.com/ambv/black
+    rev: 23.1.0
+    hooks:
+      - id: black
+        language_version: python3.10
+        exclude: *py_exclude
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: "v2.7.1"
     hooks:
