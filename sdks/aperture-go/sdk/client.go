@@ -144,13 +144,14 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 	res, err := c.flowControlClient.Check(ctx, req)
 	if err != nil {
 		f.checkResponse = nil
+	} else {
+		f.checkResponse = res
 	}
 
 	span.SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),
 	)
 
-	f.checkResponse = res
 	return f, nil
 }
 

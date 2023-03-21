@@ -17,8 +17,7 @@ public class NettyServerAdvice {
     public static void onExit(
             @Advice.This ChannelPipeline pipeline,
             @Advice.Argument(1) String handlerName,
-            @Advice.Argument(2) ChannelHandler handler
-            ) {
+            @Advice.Argument(2) ChannelHandler handler) {
         if (handler instanceof HttpServerCodec || handler instanceof HttpRequestDecoder) {
             // only add the aperture handler after the HttpRequestDecoder or HttpServerCodec
             ApertureServerHandler apertureHandler = new ApertureServerHandler(apertureSDK);

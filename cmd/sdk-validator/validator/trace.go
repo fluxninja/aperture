@@ -78,7 +78,16 @@ func (t TraceHandler) Export(ctx context.Context, req *tracev1.ExportTraceServic
 						workloadTS = attribute.Value.GetIntValue()
 					}
 				}
-				log.Trace().Str("attribute", otelconsts.ApertureFlowStartTimestampLabel).Str("attribute", otelconsts.ApertureFlowEndTimestampLabel).Msg("Validating attribute")
+				log.Trace().Str("attribute", otelconsts.ApertureFlowStartTimestampLabel).Int64("value", flowStartTS).Msg("Validating attribute")
+				if flowStartTS == 0 {
+					log.Error().Msg("Missing start flow timestamp")
+					err = multierr.Append(err, fmt.Errorf("invalid %s", otelconsts.ApertureFlowStartTimestampLabel))
+				}
+				log.Trace().Str("attribute", otelconsts.ApertureFlowEndTimestampLabel).Int64("value", flowEndTS).Msg("Validating attribute")
+				if flowEndTS == 0 {
+					log.Error().Msg("Missing end flow timestamp")
+					err = multierr.Append(err, fmt.Errorf("invalid %s", otelconsts.ApertureFlowEndTimestampLabel))
+				}
 				if flowStartTS > flowEndTS {
 					log.Error().Msg("Failed to validate start and end flow timestamps")
 					err = multierr.Append(err, fmt.Errorf("invalid %s and %s", otelconsts.ApertureFlowStartTimestampLabel, otelconsts.ApertureFlowEndTimestampLabel))
