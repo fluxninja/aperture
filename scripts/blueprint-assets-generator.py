@@ -46,8 +46,9 @@ PARAMETER_DETAILED_RE = re.compile(
     r".*@param \((?P<param_name>[\w.\[\]]+): (?P<param_type>[\w.\[\]]+) ?(?P<param_required>\w+)?\) (?P<param_description>.+)"
 )
 
-
 # DocBlockNode for nested_parameters
+
+
 @dataclasses.dataclass
 class DocBlockNode:
     parameter: DocBlockParam
@@ -582,8 +583,9 @@ def update_readme_markdown(
             sections[block.section] = []
         sections[block.section].append(block)
     if len(sections) > 0:
-        readme_copied += "## Dynamic Configuration\n"
-        readme_copied += "The following configuration parameters can be [dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md) at runtime, without reloading the policy.\n"
+        readme_copied += "\n\n:::note\n\n"
+        readme_copied += "The following configuration parameters can be [dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md) at runtime, without reloading the policy.\n\n"
+        readme_copied += ":::\n\n"
         rendered = template.render({"sections": sections})
         readme_copied += rendered
 
@@ -820,6 +822,8 @@ def parse_dynamic_config_docblocks(
 
 
 # merge 2nd docblock into 1st
+
+
 def merge_docblocknodes(docblock1: DocBlockNode, docblock2: DocBlockNode):
     docblock1.required_children.update(docblock2.required_children)
     # recursive merge docblock1.children and docblock2.children

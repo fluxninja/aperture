@@ -8,24 +8,24 @@ sidebar_position: 1
 
 :::info
 
-See also [Auto Scaler reference](/reference/policies/spec.md#auto-scaler)
+See also [_Auto Scaler_ reference](/reference/policies/spec.md#auto-scaler)
 
 :::
 
-Auto Scaler is a high-level component in Aperture that performs auto-scaling. It
-can interface with infrastructure APIs such as Kubernetes to automatically
+_Auto Scaler_ is a high-level component in Aperture that performs auto-scaling.
+It can interface with infrastructure APIs such as Kubernetes to automatically
 adjust the number of instances or resources allocated to a service to meet
-changing workload demands. Auto Scaler is designed to ensure that the service is
-scaled out to meet demand and safely scaled in when demand is low. Scaling out
-is done more aggressively than scaling in to ensure optimal performance and
+changing workload demands. _Auto Scaler_ is designed to ensure that the service
+is scaled out to meet demand and safely scaled in when demand is low. Scaling
+out is done more aggressively than scaling in to ensure optimal performance and
 availability.
 
-- Controllers: Auto Scaler uses Controllers to make scaling decisions. A
+- Controllers: _Auto Scaler_ uses Controllers to make scaling decisions. A
   Controller can be configured for either scaling in or out and defines the
   criteria that determine when to scale. Controllers process one or more input
   signals to compute a desired scale value. By configuring Controllers, you can
-  fine-tune the Autoscaling behavior to meet the specific needs of your service.
-  See [Gradient Controller](#gradient-controller) for more details.
+  fine-tune the auto-scaling behavior to meet the specific needs of your
+  service. See [Gradient Controller](#gradient-controller) for more details.
 - A scale-in Controller is active only when it's output is smaller than the
   actual scale value. A scale-out Controller is active only when it's output is
   larger than the actual scale value. E.g. the actual number of replicas of a
@@ -37,15 +37,15 @@ availability.
   at a time is limited by the maximum scale-in and scale-out step sizes. This is
   to prevent large scale changes from happening at once.
 - Cooldown periods: There are cooldown periods defined separately for scale-out
-  and scale-in. The Auto Scaler will not scale-out or scale-in again until the
+  and scale-in. The _Auto Scaler_ will not scale-out or scale-in again until the
   cooldown period has elapsed. The intention of cooldowns is to make the changes
   slowly and observe their effect in order to prevent overdoing either scale-in
   our scale-out.
-  - Scale-in cooldown: The Auto Scaler will not scale-in again until the
+  - Scale-in cooldown: The _Auto Scaler_ will not scale-in again until the
     cooldown period has elapsed. If there is a scale-out decision, the scale-in
     cooldown is reset. This is to make sure that excessive scale-in is
     immediately corrected.
-  - Scale-out cooldown: The Auto Scaler will not scale-out again until the
+  - Scale-out cooldown: The _Auto Scaler_ will not scale-out again until the
     cooldown period has elapsed. If there is a scale-out decision which is much
     larger than the current scale value, the scale-out cooldown is reset. This
     is done to accommodate any urgent need for scale-out.

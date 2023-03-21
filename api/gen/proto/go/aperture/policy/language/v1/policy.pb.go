@@ -1060,7 +1060,7 @@ type AutoScale_PodScaler struct {
 }
 
 type AutoScale_AutoScaler struct {
-	// AutoScaler provides auto scaling functionality for any scalable resource.
+	// _AutoScaler_ provides auto-scaling functionality for any scalable resource.
 	AutoScaler *AutoScaler `protobuf:"bytes,2,opt,name=auto_scaler,json=autoScaler,proto3,oneof"`
 }
 
@@ -3442,22 +3442,22 @@ func (x *AIMDConcurrencyController) GetDefaultConfig() *LoadActuator_DynamicConf
 	return nil
 }
 
-// AutoScaler: AutoScaler provides auto scaling functionality for any scalable resource. Multiple Controllers can be defined on the AutoScaler for performing scale-out or scale-in. The AutoScaler can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
+// _AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
 type AutoScaler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Output ports for the AutoScaler.
+	// Output ports for the _AutoScaler_.
 	OutPorts *AutoScaler_Outs   `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	Scaler   *AutoScaler_Scaler `protobuf:"bytes,2,opt,name=scaler,proto3" json:"scaler,omitempty" validate:"required"` // @gotags: validate:"required"
-	// The minimum scale to which the autoscaler can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+	// The minimum scale to which the _AutoScaler_ can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
 	MinScale int64 `protobuf:"varint,3,opt,name=min_scale,json=minScale,proto3" json:"min_scale,omitempty" default:"0" validate:"gte=0"` // @gotags: default:"0" validate:"gte=0"
-	// The maximum scale to which the autoscaler can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+	// The maximum scale to which the _AutoScaler_ can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
 	MaxScale int64 `protobuf:"varint,4,opt,name=max_scale,json=maxScale,proto3" json:"max_scale,omitempty" default:"9223372036854775807" validate:"gt=0"` // @gotags: default:"9223372036854775807" validate:"gt=0"
-	// List of Controllers for scaling out.
+	// List of _Controllers_ for scaling out.
 	ScaleOutControllers []*AutoScaler_ScaleOutController `protobuf:"bytes,5,rep,name=scale_out_controllers,json=scaleOutControllers,proto3" json:"scale_out_controllers,omitempty"`
-	// List of Controllers for scaling in.
+	// List of _Controllers_ for scaling in.
 	ScaleInControllers []*AutoScaler_ScaleInController `protobuf:"bytes,6,rep,name=scale_in_controllers,json=scaleInControllers,proto3" json:"scale_in_controllers,omitempty"`
 	// The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
 	MaxScaleOutPercentage float64 `protobuf:"fixed64,8,opt,name=max_scale_out_percentage,json=maxScaleOutPercentage,proto3" json:"max_scale_out_percentage,omitempty" default:"10"` // @gotags: default:"10"
@@ -7563,7 +7563,7 @@ func (x *AutoScaler_KubernetesReplicas) GetDefaultConfig() *PodScaler_ScaleActua
 	return nil
 }
 
-// Outputs for AutoScaler.
+// Outputs for _AutoScaler_.
 type AutoScaler_Outs struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
