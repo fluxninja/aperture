@@ -35,10 +35,10 @@ traffic that the
 is shedding. The _Auto Scaler_ is configured to scale-out using a _Gradient
 Controller_ based on this signal and a setpoint of 1.0.
 
-In addition to load-based scaling, the policy includes scale-in and scale-out
-_Controllers_ based on CPU utilization. These _Controllers_ adjust the resources
-allocated to the service based on changes in CPU usage, ensuring that the
-service can handle the workload efficiently.
+In addition to load-based scaling, the policy includes scale-in _Controller_
+based on CPU utilization. These _Controllers_ adjust the resources allocated to
+the service based on changes in CPU usage, ensuring that the service can handle
+the workload efficiently.
 
 ## Policy
 
@@ -56,10 +56,10 @@ At a high Level, this policy consist of:
   _Concurrency Limiter_ is shedding. The _Auto Scaler_ is configured to
   scale-out based on a _Gradient Controller_ using this signal and a setpoint of
   1.0.
-- In addition to the load based scale-out, the policy also includes scale-in and
-  scale-out _Controllers_ based on CPU utilization. These _Controllers_ adjust
-  the resources allocated to the service based on changes in CPU usage, ensuring
-  that the service can handle the workload efficiently.
+- In addition to the load based scale-out, the policy also includes scale-in
+  _Controller_ based on CPU utilization which adjusts the instances of the
+  service based on changes in CPU usage, ensuring that the service is not
+  over-provisioned.
 
 ```mdx-code-block
 <Tabs>

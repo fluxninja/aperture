@@ -345,54 +345,27 @@ case latest images will be pulled from dockerhub and used instead.
 #### Creating your own test scenarios
 
 ```
-demo-app
-├── application
-│   ├── Dockerfile
-│   ├── README.md
-│   ├── app
-│   │   ├── app.go
-│   │   └── app_test.go
-│   ├── go.mod
-│   ├── go.sum
-│   └── main.go
-├── charts
-│   └── demo-app
-│       ├── Chart.yaml
-│       ├── templates
-│       │   ├── _helpers.tpl
-│       │   ├── deployment.yaml
-│       │   ├── service.yaml
-│       │   └── serviceaccount.yaml
-│       └── values.yaml
-├── jsonnetfile.json
-├── jsonnetfile.lock.json
+rate_limiting_escalation
+├── dashboards
+│  └── main.jsonnet
 ├── load_generator
-│   └── test.js
-├── manifests
-│   └── main.jsonnet
+│  └── test.js
 ├── metadata.json
 └── policies
-    └── service1-demo-app.yaml
+   ├── service1-demo-app-cr.yaml
+   └── service1-demo-app.yaml
+
 ```
 
-Each test scenario consists of few directories, for kubernetes manifests, docker
-images, policies and load testing configuration:
+Each test scenario consists of few directories, for policies, dashboards and
+load generator configuration:
 
 - `metadata.json` describes test scenario, what images to build, what tilt
   dependencies to add etc. See existing test scenarios, as well as Tiltfile for
   examples of how to prepare this file.
-- `application` stores Dockerfile and any support files used for building
-  container images
-- `manifests` contains kubernetes manifests that will be deployed on the
-  cluster. Currently, they can be tanka-based jsonnet applications, or raw yaml
-  files which will be applied on the cluster without any processing (other than
-  ensuring _demoapp_ namespace is set for all resources)
 - `policies/service1-demo-app.yaml` is a values.yaml file for the given policy
   listed in metadata.json under `aperture_policies` key.
 - `load_generator/test.js` is configuration for the K6 load generator.
-- `jsonnetfile.json` and `jsonnetfile.lock.json` as well as optional
-  `chartfile.yaml` allow for adding external jsonnet and helm dependencies to
-  the project.
 
 ## FAQs
 

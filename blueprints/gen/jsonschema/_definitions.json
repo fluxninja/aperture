@@ -310,7 +310,7 @@
       "properties": {
         "auto_scaler": {
           "$ref": "#/definitions/AutoScaler",
-          "description": "AutoScaler provides auto scaling functionality for any scalable resource.",
+          "description": "_AutoScaler_ provides auto-scaling functionality for any scalable resource.",
           "x-order": 0
         },
         "pod_scaler": {
@@ -323,7 +323,7 @@
       "additionalProperties": false
     },
     "AutoScaler": {
-      "description": "AutoScaler: AutoScaler provides auto scaling functionality for any scalable resource. Multiple Controllers can be defined on the AutoScaler for performing scale-out or scale-in. The AutoScaler can interface with infrastructure APIs such as Kubernetes to perform auto-scale.",
+      "description": "_AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.",
       "properties": {
         "cooldown_override_percentage": {
           "default": 50,
@@ -335,7 +335,7 @@
         },
         "max_scale": {
           "default": "9223372036854775807",
-          "description": "The maximum scale to which the autoscaler can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.\n\n",
+          "description": "The maximum scale to which the _AutoScaler_ can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.\n\n",
           "format": "int64",
           "minLength": 1,
           "type": "string",
@@ -361,7 +361,7 @@
         },
         "min_scale": {
           "default": "0",
-          "description": "The minimum scale to which the autoscaler can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.\n\n",
+          "description": "The minimum scale to which the _AutoScaler_ can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.\n\n",
           "format": "int64",
           "minLength": 0,
           "type": "string",
@@ -371,7 +371,7 @@
         },
         "out_ports": {
           "$ref": "#/definitions/AutoScalerOuts",
-          "description": "Output ports for the AutoScaler.",
+          "description": "Output ports for the _AutoScaler_.",
           "x-order": 5
         },
         "scale_in_alerter_parameters": {
@@ -380,7 +380,7 @@
           "x-order": 6
         },
         "scale_in_controllers": {
-          "description": "List of Controllers for scaling in.",
+          "description": "List of _Controllers_ for scaling in.",
           "items": {
             "$ref": "#/definitions/AutoScalerScaleInController"
           },
@@ -400,7 +400,7 @@
           "x-order": 9
         },
         "scale_out_controllers": {
-          "description": "List of Controllers for scaling out.",
+          "description": "List of _Controllers_ for scaling out.",
           "items": {
             "$ref": "#/definitions/AutoScalerScaleOutController"
           },
@@ -559,7 +559,7 @@
       "additionalProperties": false
     },
     "AutoScalerOuts": {
-      "description": "Outputs for AutoScaler.",
+      "description": "Outputs for _AutoScaler_.",
       "properties": {
         "actual_scale": {
           "$ref": "#/definitions/OutPort",

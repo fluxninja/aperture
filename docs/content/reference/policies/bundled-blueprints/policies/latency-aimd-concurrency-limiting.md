@@ -256,10 +256,15 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
     type="string"
     reference=""
     value="''"
-    description='Datasource filter regex.' />## Dynamic Configuration The
-following configuration parameters can be
+    description='Datasource filter regex.' />
+
+:::note
+
+The following configuration parameters can be
 [dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md)
 at runtime, without reloading the policy.
+
+:::
 
 <h3 class="blueprints-h3">Dynamic Configuration</h3>
 

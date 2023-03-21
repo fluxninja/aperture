@@ -9,15 +9,13 @@ keywords:
 
 # Auto Scale
 
-Auto-scaling is the process of automatically adjusting the number of instances
-or resources allocated to a service to meet changing workload demands.
-Aperture's closed-loop control policies are a natural fit for defining
-auto-scaling criteria. Aperture Agents interface with infrastructure APIs in
-order to perform auto-scaling. For example, Aperture Agents can invoke
+uto-scaling is a powerful method for automatically adjusting the number of
+instances or resources allocated to a service based on fluctuating workload
+demands. Aperture's closed-loop control policies provide an ideal solution for
+defining auto-scaling criteria. Aperture Agents interface with infrastructure
+APIs in order to perform auto-scaling. For example, Aperture Agents can invoke
 Kubernetes APIs to perform auto-scaling of any scalable resource in a Kubernetes
-cluster. In this guide, we will explore how to configure auto-scaling policies
-in Aperture and take advantage of this powerful capability to optimize the
-performance and cost of your services.
+cluster.
 
 ## Setup
 
@@ -25,7 +23,9 @@ Aperture performs auto-scaling based on
 [Signals](concepts/policy/circuit#signal) in an
 [Aperture policy](concepts/policy/policy.md).
 
-- [Kubernetes](./kubernetes/kubernetes.md): Any scalable resource in a
-  Kubernetes cluster can be auto-scaled via Aperture. An Aperture Agent must be
-  installed on the cluster. And auto-scale policies need to be configured at the
-  Aperture Controller.
+- [Kubernetes](./kubernetes/kubernetes.md): Auto-scaling any scalable resource
+  in a Kubernetes cluster can be achieved using Aperture. In order to do this,
+  you must first ensure that an Aperture Agent is installed on the cluster, and
+  then configure
+  [auto-scaling policies](tutorials/integrations/auto-scale/auto-scale.md) at
+  the Aperture Controller.

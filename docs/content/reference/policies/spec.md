@@ -394,7 +394,7 @@ AutoScale components are used to scale a service.
 <dt>auto_scaler</dt>
 <dd>
 
-([AutoScaler](#auto-scaler)) AutoScaler provides auto scaling functionality for any scalable resource.
+([AutoScaler](#auto-scaler)) _AutoScaler_ provides auto-scaling functionality for any scalable resource.
 
 </dd>
 <dt>pod_scaler</dt>
@@ -409,7 +409,7 @@ AutoScale components are used to scale a service.
 
 ### AutoScaler {#auto-scaler}
 
-AutoScaler: AutoScaler provides auto scaling functionality for any scalable resource. Multiple Controllers can be defined on the AutoScaler for performing scale-out or scale-in. The AutoScaler can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
+_AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
 
 <dl>
 <dt>cooldown_override_percentage</dt>
@@ -423,7 +423,7 @@ scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>max_scale</dt>
 <dd>
 
-(string, default: `"9223372036854775807"`) The maximum scale to which the autoscaler can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+(string, default: `"9223372036854775807"`) The maximum scale to which the _AutoScaler_ can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
 
 </dd>
 <dt>max_scale_in_percentage</dt>
@@ -441,13 +441,13 @@ scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>min_scale</dt>
 <dd>
 
-(string, default: `"0"`) The minimum scale to which the autoscaler can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+(string, default: `"0"`) The minimum scale to which the _AutoScaler_ can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([AutoScalerOuts](#auto-scaler-outs)) Output ports for the AutoScaler.
+([AutoScalerOuts](#auto-scaler-outs)) Output ports for the _AutoScaler_.
 
 </dd>
 <dt>scale_in_alerter_parameters</dt>
@@ -459,7 +459,7 @@ scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>scale_in_controllers</dt>
 <dd>
 
-([[]AutoScalerScaleInController](#auto-scaler-scale-in-controller)) List of Controllers for scaling in.
+([[]AutoScalerScaleInController](#auto-scaler-scale-in-controller)) List of _Controllers_ for scaling in.
 
 </dd>
 <dt>scale_in_cooldown</dt>
@@ -477,7 +477,7 @@ scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>scale_out_controllers</dt>
 <dd>
 
-([[]AutoScalerScaleOutController](#auto-scaler-scale-out-controller)) List of Controllers for scaling out.
+([[]AutoScalerScaleOutController](#auto-scaler-scale-out-controller)) List of _Controllers_ for scaling out.
 
 </dd>
 <dt>scale_out_cooldown</dt>
@@ -659,7 +659,7 @@ KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
 
 ### AutoScalerOuts {#auto-scaler-outs}
 
-Outputs for AutoScaler.
+Outputs for _AutoScaler_.
 
 <dl>
 <dt>actual_scale</dt>
