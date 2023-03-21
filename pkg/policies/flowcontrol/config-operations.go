@@ -1,6 +1,6 @@
 package flowcontrol
 
-// swagger:operation POST /flow_control common-configuration FlowControl
+//swagger:operation POST /flow_control common-configuration FlowControl
 // ---
 // x-fn-config-env: true
 // parameters:

@@ -10,7 +10,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
-// swagger:operation POST /liveness common-configuration Liveness
+//swagger:operation POST /liveness common-configuration Liveness
 // ---
 // x-fn-config-env: true
 // parameters:
@@ -23,7 +23,7 @@ import (
 //   schema:
 //     "$ref": "#/definitions/JobGroupConfig"
 
-// swagger:operation POST /readiness common-configuration Readiness
+//swagger:operation POST /readiness common-configuration Readiness
 // ---
 // x-fn-config-env: true
 // parameters:

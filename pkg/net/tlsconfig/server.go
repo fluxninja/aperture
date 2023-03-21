@@ -26,8 +26,9 @@ func Module() fx.Option {
 }
 
 // ServerTLSConfig holds configuration for setting up server TLS support.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type ServerTLSConfig struct {
 	// Server Cert file path
 	CertFile string `json:"cert_file"`

@@ -36,7 +36,7 @@ func Module() fx.Option {
 	)
 }
 
-// swagger:operation POST /profilers common-configuration Profilers
+//swagger:operation POST /profilers common-configuration Profilers
 // ---
 // x-fn-config-env: true
 // parameters:
@@ -45,8 +45,9 @@ func Module() fx.Option {
 //     "$ref": "#/definitions/ProfilersConfig"
 
 // ProfilersConfig holds configuration for profilers.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type ProfilersConfig struct {
 	// Path to save performance profiles. "default" path is `/var/log/aperture/<service>/profiles`.
 	ProfilesPath string `json:"profiles_path" default:"default"`

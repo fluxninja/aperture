@@ -45,7 +45,7 @@ func Module() fx.Option {
 	)
 }
 
-// swagger:operation POST /dist_cache common-configuration DistCache
+//swagger:operation POST /dist_cache common-configuration DistCache
 // ---
 // x-fn-config-env: true
 // parameters:
@@ -54,8 +54,9 @@ func Module() fx.Option {
 //     "$ref": "#/definitions/DistCacheConfig"
 
 // DistCacheConfig configures distributed cache that holds per-label counters in distributed rate limiters.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type DistCacheConfig struct {
 	// BindAddr denotes the address that DistCache will bind to for communication with other peer nodes.
 	BindAddr string `json:"bind_addr" default:":3320" validate:"hostname_port"`

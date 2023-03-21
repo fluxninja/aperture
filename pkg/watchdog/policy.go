@@ -16,8 +16,9 @@ import (
 )
 
 // WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type WatchdogConfig struct {
 	Job jobs.JobConfig `json:"job"`
 
@@ -29,8 +30,9 @@ type WatchdogConfig struct {
 }
 
 // WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
-// swagger:model WatchdogPolicyType
 // +kubebuilder:object:generate=true
+//
+//swagger:model WatchdogPolicyType
 type WatchdogPolicyType struct {
 	WatermarksPolicy WatermarksPolicy `json:"watermarks_policy"`
 
@@ -38,8 +40,9 @@ type WatchdogPolicyType struct {
 }
 
 // HeapLimit holds configuration for Watchdog heap limit.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type HeapLimit struct {
 	// Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
 	MinGoGC int `json:"min_gogc" validate:"gt=0,lte=100" default:"25"`
@@ -49,8 +52,9 @@ type HeapLimit struct {
 }
 
 // HeapConfig holds configuration for heap Watchdog.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type HeapConfig struct {
 	WatchdogPolicyType `json:",inline"`
 
@@ -58,8 +62,9 @@ type HeapConfig struct {
 }
 
 // PolicyCommon holds common configuration for Watchdog policies.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type PolicyCommon struct {
 	// Flag to enable the policy
 	Enabled bool `json:"enabled" default:"false"`
@@ -76,8 +81,9 @@ type policyInterface interface {
 }
 
 // WatermarksPolicy creates a Watchdog policy that schedules GC at concrete watermarks.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type WatermarksPolicy struct {
 	// Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
 	Watermarks []float64 `json:"watermarks,omitempty" validate:"omitempty,dive,gte=0,lte=1" default:"[0.50,0.75,0.80,0.85,0.90,0.95,0.99]"`
@@ -113,8 +119,9 @@ func (policy *WatermarksPolicy) nextThreshold(total, used uint64) uint64 {
 }
 
 // AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)*factor.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type AdaptivePolicy struct {
 	PolicyCommon `json:",inline"`
 

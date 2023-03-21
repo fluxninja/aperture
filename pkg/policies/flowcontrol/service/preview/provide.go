@@ -25,8 +25,9 @@ func Module() fx.Option {
 const ConfigKey = "flow_control.preview_service"
 
 // FlowPreviewConfig is the configuration for the flow control preview service.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type FlowPreviewConfig struct {
 	// Enables the flow preview service.
 	Enabled bool `json:"enabled" default:"true"`

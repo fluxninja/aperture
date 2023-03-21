@@ -1,6 +1,6 @@
 package discovery
 
-// swagger:operation POST /service_discovery common-configuration ServiceDiscovery
+//swagger:operation POST /service_discovery common-configuration ServiceDiscovery
 // ---
 // x-fn-config-env: true
 // parameters:

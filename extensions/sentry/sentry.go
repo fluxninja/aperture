@@ -3,7 +3,7 @@
 
 // Sentry Extension
 //   BasePath: /aperture-controller
-// swagger:meta
+//swagger:meta
 
 package sentry
 

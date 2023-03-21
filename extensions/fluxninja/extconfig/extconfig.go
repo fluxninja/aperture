@@ -15,8 +15,9 @@ const (
 )
 
 // FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type FluxNinjaExtensionConfig struct {
 	// Interval between each heartbeat.
 	HeartbeatInterval config.Duration `json:"heartbeat_interval" validate:"gte=0s" default:"5s"`
@@ -29,8 +30,9 @@ type FluxNinjaExtensionConfig struct {
 }
 
 // ClientConfig is the client configuration.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type ClientConfig struct {
 	// HTTP client settings.
 	HTTPClient http.HTTPClientConfig `json:"http"`

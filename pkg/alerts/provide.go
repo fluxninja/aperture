@@ -10,8 +10,9 @@ import (
 const configKey = "alerter"
 
 // AlerterConfig for alerter.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type AlerterConfig struct {
 	// ChannelSize size of the alerts channel in the alerter. Alerts should be
 	// consumed from it quickly, so no big sizes are needed.

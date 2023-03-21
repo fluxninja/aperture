@@ -16,8 +16,9 @@ func NewDefaultCommonOTELConfig() *CommonOTELConfig {
 }
 
 // CommonOTELConfig is the configuration for the OTEL collector.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type CommonOTELConfig struct {
 	// BatchAlerts configures batch alerts processor.
 	BatchAlerts BatchAlertsConfig `json:"batch_alerts"`
@@ -26,8 +27,9 @@ type CommonOTELConfig struct {
 }
 
 // PortsConfig defines configuration for OTEL debug and extension ports.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type PortsConfig struct {
 	// Port on which otel collector exposes prometheus metrics on /metrics path.
 	DebugPort uint32 `json:"debug_port" validate:"gte=0" default:"8888"`
@@ -40,8 +42,9 @@ type PortsConfig struct {
 }
 
 // BatchAlertsConfig defines configuration for OTEL batch processor.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type BatchAlertsConfig struct {
 	// Timeout sets the time after which a batch will be sent regardless of size.
 	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`

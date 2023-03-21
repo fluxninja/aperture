@@ -1,6 +1,6 @@
 package sentry
 
-// swagger:operation POST /sentry extension-configuration SentryExtension
+//swagger:operation POST /sentry extension-configuration SentryExtension
 // ---
 // x-fn-config-env: true
 // parameters:

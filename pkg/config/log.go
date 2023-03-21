@@ -38,7 +38,7 @@ func LogModule() fx.Option {
 	)
 }
 
-// swagger:operation POST /log common-configuration Log
+//swagger:operation POST /log common-configuration Log
 // ---
 // x-fn-config-env: true
 // parameters:
@@ -47,8 +47,9 @@ func LogModule() fx.Option {
 //     "$ref": "#/definitions/LogConfig"
 
 // LogConfig holds configuration for a logger and log writers.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type LogConfig struct {
 	// Log level
 	LogLevel string `json:"level" validate:"oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED" default:"info"`
@@ -64,8 +65,9 @@ type LogConfig struct {
 }
 
 // LogWriterConfig holds configuration for a log writer.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type LogWriterConfig struct {
 	// Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
 	File string `json:"file" default:"stderr"`

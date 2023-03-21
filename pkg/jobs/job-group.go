@@ -20,15 +20,17 @@ const (
 )
 
 // JobGroupConfig holds configuration for JobGroup.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type JobGroupConfig struct {
 	SchedulerConfig `json:",inline"`
 }
 
 // SchedulerConfig holds configuration for job Scheduler.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type SchedulerConfig struct {
 	// When true, the scheduler will run jobs synchronously,
 	// waiting for each execution instance of the job to return

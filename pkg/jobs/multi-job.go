@@ -15,7 +15,8 @@ import (
 )
 
 // MultiJobConfig holds configuration for MultiJob.
-// swagger:model
+//
+//swagger:model
 type MultiJobConfig struct {
 	JobConfig
 }

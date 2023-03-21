@@ -23,7 +23,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-// swagger:operation POST /watchdog common-configuration Watchdog
+//swagger:operation POST /watchdog common-configuration Watchdog
 // ---
 // x-fn-config-env: true
 // parameters:

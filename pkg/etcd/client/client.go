@@ -36,8 +36,9 @@ const (
 )
 
 // EtcdConfig holds configuration for etcd client.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type EtcdConfig struct {
 	// Lease time-to-live
 	LeaseTTL config.Duration `json:"lease_ttl" validate:"gte=1s" default:"60s"`

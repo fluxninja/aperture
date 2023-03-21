@@ -15,8 +15,9 @@ func Module() fx.Option {
 const ConfigKey = "auto_scale.kubernetes"
 
 // AutoScaleKubernetesConfig is the configuration for the flow preview service.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type AutoScaleKubernetesConfig struct {
 	// Enables the Kubernetes autoscale capability.
 	Enabled bool `json:"enabled" default:"true"`

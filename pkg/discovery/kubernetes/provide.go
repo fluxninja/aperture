@@ -18,8 +18,9 @@ import (
 var ConfigKey = common.DiscoveryConfigKey + ".kubernetes"
 
 // KubernetesDiscoveryConfig for Kubernetes service discovery.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type KubernetesDiscoveryConfig struct {
 	Enabled bool `json:"enabled" default:"true"`
 }

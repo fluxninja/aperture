@@ -19,8 +19,9 @@ const (
 )
 
 // StaticDiscoveryConfig for pre-determined list of services.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type StaticDiscoveryConfig struct {
 	Entities []entitiesv1.Entity `json:"entities,omitempty"`
 }

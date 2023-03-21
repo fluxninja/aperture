@@ -2,7 +2,7 @@ package net
 
 // Dummy Swagger operations that represent yaml based configuration. For use with markdown generator only.
 
-// swagger:operation POST /server common-configuration Server
+//swagger:operation POST /server common-configuration Server
 // ---
 // x-fn-config-env: true
 // parameters:
@@ -27,7 +27,7 @@ package net
 //   schema:
 //     "$ref": "#/definitions/ServerTLSConfig"
 
-// swagger:operation POST /client common-configuration Client
+//swagger:operation POST /client common-configuration Client
 // ---
 // x-fn-config-env: true
 // parameters:

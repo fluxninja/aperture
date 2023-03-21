@@ -13,8 +13,9 @@ import (
 )
 
 // ClientTLSConfig is the config for client TLS.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type ClientTLSConfig struct {
 	CertFile           string `json:"cert_file"`
 	KeyFile            string `json:"key_file"`

@@ -47,8 +47,9 @@ func (job JobBase) JobWatchers() JobWatchers {
 }
 
 // JobConfig is config for Job
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type JobConfig struct {
 	// Time period between job executions. Zero or negative value means that the job will never execute periodically.
 	ExecutionPeriod config.Duration `json:"execution_period" default:"10s"`

@@ -10,7 +10,7 @@ const (
 	policiesDynamicConfigFxTag = "PoliciesDynamicConfig"
 )
 
-// swagger:operation POST /policies common-configuration PoliciesConfig
+//swagger:operation POST /policies common-configuration PoliciesConfig
 // ---
 // x-fn-config-env: true
 // parameters:

@@ -8,7 +8,7 @@ import (
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 )
 
-// swagger:operation POST /otel agent-configuration OTEL
+//swagger:operation POST /otel agent-configuration OTEL
 // ---
 // x-fn-config-env: true
 // parameters:
@@ -17,8 +17,9 @@ import (
 //     "$ref": "#/definitions/AgentOTELConfig"
 
 // AgentOTELConfig is the configuration for Agent's OTEL collector.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type AgentOTELConfig struct {
 	otelconfig.CommonOTELConfig `json:",inline"`
 	// BatchPrerollup configures batch prerollup processor.
@@ -34,8 +35,9 @@ type AgentOTELConfig struct {
 }
 
 // BatchPrerollupConfig defines configuration for OTEL batch processor.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type BatchPrerollupConfig struct {
 	// Timeout sets the time after which a batch will be sent regardless of size.
 	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"10s"`
@@ -49,8 +51,9 @@ type BatchPrerollupConfig struct {
 }
 
 // BatchPostrollupConfig defines configuration for OTEL batch processor.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type BatchPostrollupConfig struct {
 	// Timeout sets the time after which a batch will be sent regardless of size.
 	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`
@@ -65,8 +68,9 @@ type BatchPostrollupConfig struct {
 
 // CustomMetricsConfig defines receivers, processors and single metrics pipeline,
 // which will be exported to the controller prometheus.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type CustomMetricsConfig struct {
 	// Receivers define receivers to be used in custom metrics pipelines. This should
 	// be in OTEL format - https://opentelemetry.io/docs/collector/configuration/#receivers.
@@ -116,8 +120,9 @@ func (in *Components) DeepCopy() *Components {
 }
 
 // CustomMetricsPipelineConfig defines a custom metrics pipeline.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type CustomMetricsPipelineConfig struct {
 	Receivers  []string `json:"receivers"`
 	Processors []string `json:"processors"`

@@ -3,7 +3,7 @@
 
 // FluxNinja ARC Extension
 //   BasePath: /aperture-controller
-// swagger:meta
+//swagger:meta
 
 package fluxninja
 

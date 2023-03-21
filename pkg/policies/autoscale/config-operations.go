@@ -1,6 +1,6 @@
 package autoscale
 
-// swagger:operation POST /auto_scale common-configuration AutoScaleConfig
+//swagger:operation POST /auto_scale common-configuration AutoScaleConfig
 // ---
 // x-fn-config-env: true
 // parameters:

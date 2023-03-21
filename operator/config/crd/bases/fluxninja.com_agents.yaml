@@ -960,7 +960,7 @@ spec:
                       clients:
                         items:
                           description: AlertManagerClientConfig config for single
-                            alertmanager client. swagger:model AlertManagerClientConfig
+                            alertmanager client.
                           properties:
                             address:
                               type: string
@@ -968,7 +968,7 @@ spec:
                               type: string
                             http_client:
                               description: HTTPClientConfig holds configuration for
-                                HTTP Client. swagger:model
+                                HTTP Client.
                               properties:
                                 disable_compression:
                                   description: Disable Compression
@@ -1424,7 +1424,7 @@ spec:
                         description: Log writers
                         items:
                           description: LogWriterConfig holds configuration for a log
-                            writer. swagger:model
+                            writer.
                           properties:
                             compress:
                               description: Compress
@@ -1525,7 +1525,7 @@ spec:
                         additionalProperties:
                           description: CustomMetricsConfig defines receivers, processors
                             and single metrics pipeline, which will be exported to
-                            the controller prometheus. swagger:model
+                            the controller prometheus.
                           properties:
                             pipeline:
                               description: Pipeline is an OTEL metrics pipeline definition,
@@ -1823,13 +1823,13 @@ spec:
                       cgroup:
                         description: WatchdogPolicyType holds configuration Watchdog
                           Policy algorithms. If both algorithms are configured then
-                          only watermark algorithm is used. swagger:model WatchdogPolicyType
+                          only watermark algorithm is used.
                         properties:
                           adaptive_policy:
                             description: AdaptivePolicy creates a policy that forces
                               GC when the usage surpasses the configured factor of
                               the available memory. This policy calculates next target
-                              as usage+(limit-usage)*factor. swagger:model
+                              as usage+(limit-usage)*factor.
                             properties:
                               enabled:
                                 description: Flag to enable the policy
@@ -1841,7 +1841,7 @@ spec:
                             type: object
                           watermarks_policy:
                             description: WatermarksPolicy creates a Watchdog policy
-                              that schedules GC at concrete watermarks. swagger:model
+                              that schedules GC at concrete watermarks.
                             properties:
                               enabled:
                                 description: Flag to enable the policy
@@ -1858,13 +1858,12 @@ spec:
                         type: object
                       heap:
                         description: HeapConfig holds configuration for heap Watchdog.
-                          swagger:model
                         properties:
                           adaptive_policy:
                             description: AdaptivePolicy creates a policy that forces
                               GC when the usage surpasses the configured factor of
                               the available memory. This policy calculates next target
-                              as usage+(limit-usage)*factor. swagger:model
+                              as usage+(limit-usage)*factor.
                             properties:
                               enabled:
                                 description: Flag to enable the policy
@@ -1886,7 +1885,7 @@ spec:
                             type: integer
                           watermarks_policy:
                             description: WatermarksPolicy creates a Watchdog policy
-                              that schedules GC at concrete watermarks. swagger:model
+                              that schedules GC at concrete watermarks.
                             properties:
                               enabled:
                                 description: Flag to enable the policy
@@ -1902,7 +1901,7 @@ spec:
                             type: object
                         type: object
                       job:
-                        description: JobConfig is config for Job swagger:model
+                        description: JobConfig is config for Job
                         properties:
                           execution_period:
                             description: Time period between job executions. Zero
@@ -1919,13 +1918,13 @@ spec:
                       system:
                         description: WatchdogPolicyType holds configuration Watchdog
                           Policy algorithms. If both algorithms are configured then
-                          only watermark algorithm is used. swagger:model WatchdogPolicyType
+                          only watermark algorithm is used.
                         properties:
                           adaptive_policy:
                             description: AdaptivePolicy creates a policy that forces
                               GC when the usage surpasses the configured factor of
                               the available memory. This policy calculates next target
-                              as usage+(limit-usage)*factor. swagger:model
+                              as usage+(limit-usage)*factor.
                             properties:
                               enabled:
                                 description: Flag to enable the policy
@@ -1937,7 +1936,7 @@ spec:
                             type: object
                           watermarks_policy:
                             description: WatermarksPolicy creates a Watchdog policy
-                              that schedules GC at concrete watermarks. swagger:model
+                              that schedules GC at concrete watermarks.
                             properties:
                               enabled:
                                 description: Flag to enable the policy

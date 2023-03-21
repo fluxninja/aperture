@@ -27,7 +27,7 @@ const (
 	metricsEndpoint = "/metrics"
 )
 
-// swagger:operation POST /metrics common-configuration Metrics
+//swagger:operation POST /metrics common-configuration Metrics
 // ---
 // x-fn-config-env: true
 // parameters:
@@ -36,8 +36,9 @@ const (
 //     "$ref": "#/definitions/MetricsConfig"
 
 // MetricsConfig holds configuration for service metrics.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type MetricsConfig struct {
 	// Pedantic controls whether a pedantic Registerer is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
 	Pedantic bool `json:"pedantic" default:"false"`

@@ -20,15 +20,17 @@ import (
 var configKey = "alertmanagers"
 
 // AlertManagerConfig main level config for alertmanager.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type AlertManagerConfig struct {
 	Clients []AlertManagerClientConfig `json:"clients,omitempty"`
 }
 
 // AlertManagerClientConfig config for single alertmanager client.
-// swagger:model AlertManagerClientConfig
 // +kubebuilder:object:generate=true
+//
+//swagger:model AlertManagerClientConfig
 type AlertManagerClientConfig struct {
 	Name       string                      `json:"name"`
 	Address    string                      `json:"address" validate:"hostname_port|url|fqdn"`

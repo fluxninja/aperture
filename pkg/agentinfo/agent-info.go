@@ -7,7 +7,7 @@ const (
 	configKey = "agent_info"
 )
 
-// swagger:operation POST /agent_info common-configuration AgentInfo
+//swagger:operation POST /agent_info common-configuration AgentInfo
 // ---
 // x-fn-config-env: true
 // parameters:
@@ -16,8 +16,9 @@ const (
 //     "$ref": "#/definitions/AgentInfoConfig"
 
 // AgentInfoConfig is the configuration for the agent group and other agent attributes.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type AgentInfoConfig struct {
 	// All agents within an agent_group receive the same data-plane configuration (e.g. Flux Meters, Rate Limiters etc).
 	//

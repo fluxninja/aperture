@@ -7,7 +7,7 @@
 //
 //	BasePath: /aperture-agent
 //
-// swagger:meta
+//swagger:meta
 package main
 
 import (

@@ -33,8 +33,9 @@ var Module = fx.Options(
 )
 
 // Config is configuration for agent functions.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type Config struct {
 	// RPC servers to connect to (which will be able to call agent functions)
 	Endpoints []string `json:"endpoints,omitempty" validate:"omitempty,dive,omitempty"`
@@ -44,8 +45,9 @@ type Config struct {
 }
 
 // ClientConfig is configuration for network clients used by agent-functions.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type ClientConfig struct {
 	// GRPC client settings.
 	GRPCClient grpcclient.GRPCClientConfig `json:"grpc"`

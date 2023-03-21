@@ -7,7 +7,7 @@
 //
 //	BasePath: /aperture-controller
 //
-// swagger:meta
+//swagger:meta
 package main
 
 import (
