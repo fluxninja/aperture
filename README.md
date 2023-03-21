@@ -67,10 +67,6 @@ analyzing, and actuating, facilitated by agents and a controller.
   that continuously track deviations from service-level objectives (SLOs) and
   calculate recovery or escalation actions.
 
-## ▶️ Explainer Video
-
-[![Build Indestructible Applications with Aperture Flow Control](https://img.youtube.com/vi/sEl4SMo3KNo/0.jpg)](https://www.youtube.com/watch?v=sEl4SMo3KNo)
-
 ## 🏗️ Architecture
 
 ![Aperture Architecture Overview](./docs/content/assets/diagrams/architecture/architecture_simple.mmd.svg)
@@ -94,9 +90,12 @@ To install Aperture system, please follow the
 To learn how to write Aperture policies, please read the
 [Tutorials](https://docs.fluxninja.com/category/tutorials).
 
-### 🎥 Demo Video
+## 🎥 Videos
 
-[![How Concurrency Limits Help Protect Against Cascading Failures](https://img.youtube.com/vi/m070bAvrDHM/0.jpg)](https://youtu.be/m070bAvrDHM)
+- [![Chaos Carnival 2023-Graceful Degradation:Keeping The Lights On When Everything Goes Wrong](https://img.youtube.com/vi/yHKPXsZOc5I/0.jpg)](https://www.youtube.com/watch?v=yHKPXsZOc5I)
+- [![Graceful Degradation: When All Goes Wrong | Tanveer Gill | Conf42 Chaos Engineering 2023](https://img.youtube.com/vi/nm62d2gYqNk/0.jpg)](https://www.youtube.com/watch?v=nm62d2gYqNk)
+- [![How Concurrency Limits Help Protect Against Cascading Failures](https://img.youtube.com/vi/m070bAvrDHM/0.jpg)](https://youtu.be/m070bAvrDHM)
+- [![Build Indestructible Applications with Aperture Flow Control](https://img.youtube.com/vi/sEl4SMo3KNo/0.jpg)](https://www.youtube.com/watch?v=sEl4SMo3KNo)
 
 ## 👷 Contributing
 
