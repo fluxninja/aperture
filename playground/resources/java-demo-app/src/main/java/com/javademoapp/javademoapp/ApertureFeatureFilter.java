@@ -30,20 +30,16 @@ public class ApertureFeatureFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
 
         // See whether flow was accepted by Aperture Agent.
-        if (flow.accepted()) {
-            try {
+        try {
+            if (flow.accepted()) {
                 chain.doFilter(request, response);
                 flow.end(FlowStatus.OK);
-            } catch (ApertureSDKException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
+            } else {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Request denied");
                 flow.end(FlowStatus.Error);
-            } catch (ApertureSDKException e) {
-                e.printStackTrace();
             }
+        } catch (ApertureSDKException e) {
+            e.printStackTrace();
         }
     }
 
@@ -54,14 +50,6 @@ public class ApertureFeatureFilter implements Filter {
         try {
             agentHost = filterConfig.getInitParameter("agent_host");
             agentPort = filterConfig.getInitParameter("agent_port");
-        } catch (Exception e) {
-            throw new ServletException("Invalid agent connection information "
-                    + filterConfig.getInitParameter("agent_host")
-                    + ":"
-                    + filterConfig.getInitParameter("agent_port"));
-        }
-
-        try {
             this.apertureSDK = ApertureSDK.builder()
                     .setHost(agentHost)
                     .setPort(Integer.parseInt(agentPort))
@@ -70,6 +58,8 @@ public class ApertureFeatureFilter implements Filter {
         } catch (ApertureSDKException e) {
             e.printStackTrace();
             throw new ServletException("Couldn't create aperture SDK");
+        } catch (Exception e) {
+            throw new ServletException("Invalid agent connection information ");
         }
     }
 

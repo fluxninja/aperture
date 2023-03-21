@@ -18,18 +18,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
+
 @RestController
 public class RequestController {
+    public static final String DEFAULT_HOST = "localhost";
+	public static final String DEFAULT_AGENT_PORT = "8089";
+    public static final String DEFAULT_CONCURRENCY = "10";
+	public static final String DEFAULT_LATENCY = "50";
+	public static final String DEFAULT_REJECT_RATIO = "0.05";
 
-    // Header for forwarding instance name
-    private static final String FORWARDING_INSTANCE_HEADER = "X-Forwarding-Instance";
-    // Counter for instance names
-    private static final AtomicInteger INSTANCE_COUNTER = new AtomicInteger(0);
-    private static final String APP_NAME = "Demo-App";
-
-    private  int concurrency = Integer.parseInt(System.getenv().getOrDefault("CONCURRENCY", "10"));
-    private  Duration latency = Duration.ofMillis(Long.parseLong(System.getenv().getOrDefault("LATENCY", "50")));
-    private  double rejectRatio = Double.parseDouble(System.getenv().getOrDefault("REJECT_RATIO", "0.05"));
+    private  int concurrency = Integer.parseInt(System.getenv().getOrDefault("CONCURRENCY", DEFAULT_CONCURRENCY));
+    private  Duration latency = Duration.ofMillis(Long.parseLong(System.getenv().getOrDefault("LATENCY", DEFAULT_LATENCY)));
+    private  double rejectRatio = Double.parseDouble(System.getenv().getOrDefault("REJECT_RATIO", DEFAULT_REJECT_RATIO));
 
     // Semaphore for limiting concurrent clients
     private Semaphore limitClients = new Semaphore(concurrency);
@@ -62,12 +62,8 @@ public class RequestController {
 
         registrationBean.setFilter(new ApertureFeatureFilter());
         registrationBean.addUrlPatterns("/super2");
-
-        String agentHost = env.getProperty("FN_AGENT_HOST");
-        String agentPort = env.getProperty("FN_AGENT_PORT");
-
-        registrationBean.addInitParameter("agent_host", agentHost);
-        registrationBean.addInitParameter("agent_port", agentPort);
+        registrationBean.addInitParameter("agent_host", System.getenv().getOrDefault("FN_AGENT_HOST", DEFAULT_HOST));
+        registrationBean.addInitParameter("agent_port", System.getenv().getOrDefault("FN_AGENT_PORT", DEFAULT_AGENT_PORT));
 
         return registrationBean;
     }
@@ -81,7 +77,7 @@ public class RequestController {
     public String handlePostRequest(@RequestBody String payload, HttpServletRequest request, HttpServletResponse response) throws ApertureSDKException {
         Map<String,String> labels = new HashMap<String,String>();
 
-        labels.put("app", APP_NAME);
+        labels.put("app", "demoapp");
         labels.put("instance", getInstanceName());
         labels.put("ip", request.getRemoteAddr());
 
@@ -95,14 +91,11 @@ public class RequestController {
         try {
             // Processing the request object's subrequests
             Request requestObj = objectMapper.readValue(payload, Request.class);
-
             for (SubrequestChain chain : requestObj.getRequest()) {
                 if (chain.getSubrequest().size() == 0) {
-
                     response.setStatus(HttpStatus.BAD_REQUEST.value());
                     response.getWriter().write("Empty Chain");
                     return "Empty Chain";
-
                 }
                 String requestDestination = chain.getSubrequest().get(0).getDestination();
                 // TODO Add check for req Dest != Hostname
@@ -114,15 +107,9 @@ public class RequestController {
             response.setStatus(HttpStatus.OK.value());
             response.getWriter().write(payload);
 
-        } catch (JsonMappingException e) {
+        } catch (Exception e) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
-            throw new RuntimeException(e);
-        } catch (JsonProcessingException e) {
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            throw new RuntimeException(e);
+            return "Error occurred" + e.getMessage();
         }
         return "Success";
     }
@@ -133,7 +120,6 @@ public class RequestController {
         }
 
         SubrequestChain trimmedSubrequestChain = new SubrequestChain();
-
         for (int i = 1; i < chain.getSubrequest().size(); i++) {
             trimmedSubrequestChain.addSubrequest(chain.getSubrequest().get(i));
         }
@@ -169,13 +155,6 @@ public class RequestController {
         return "Success";
     }
     private String forwardRequest(Request request, String destination) {
-        String address = String.format("http://%s/request", destination);
-
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(FORWARDING_INSTANCE_HEADER, getInstanceName());
-
         String requestJson;
         try {
             requestJson = new ObjectMapper().writeValueAsString(request);
@@ -183,8 +162,14 @@ public class RequestController {
             return "Error while parsing request: " + e.getMessage();
         }
 
-        // Forwarding the request
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("X-Forwarding-Instance", getInstanceName());
+
+        String address = String.format("http://%s/request", destination);
+        RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
+
         ResponseEntity<String> response = restTemplate.exchange(address, HttpMethod.POST, entity, String.class);
         if (response.getStatusCode() != HttpStatus.OK) {
             return "Error while forwarding request: " + response.getStatusCode();
@@ -193,7 +178,7 @@ public class RequestController {
         return "Success";
     }
     private String getInstanceName() {
-        return APP_NAME + "-" + INSTANCE_COUNTER.incrementAndGet();
+        return System.getenv().getOrDefault("HOSTNAME", DEFAULT_HOST);
     }
     public void setRejectRatio(double rejectRatio) {
         this.rejectRatio = rejectRatio;

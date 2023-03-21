@@ -12,8 +12,8 @@
   ],
   "images": [
     {
-      "ref": "demo-app",
-      "context": "playground/resources/demo-app/",
+      "ref": "java-demo-app",
+      "context": "playground/resources/java-demo-app/",
       "ssh": "default"
     }
   ],
