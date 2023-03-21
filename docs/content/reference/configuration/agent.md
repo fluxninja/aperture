@@ -487,6 +487,40 @@ AgentInfoConfig is the configuration for the agent group and other agent attribu
 
 AgentOTELConfig is the configuration for Agent's OTEL collector.
 
+Example configuration:
+
+```yaml
+batch_alerts:
+send_batch_max_size: 100
+send_batch_size: 100
+timeout: 1s
+batch_prerollup:
+send_batch_max_size: 10000
+send_batch_size: 10000
+timeout: 10s
+batch_postrollup:
+send_batch_max_size: 100
+send_batch_size: 100
+timeout: 1s
+custom_metrics:
+rabbitmq:
+pipeline:
+processors:
+batch
+receivers:
+rabbitmq
+processors:
+batch:
+send_batch_size: 10
+timeout: 10s
+receivers:
+rabbitmq:
+collection_interval: 10s
+endpoint: http://my-release-rabbitmq-0.my-release-rabbitmq-headless.default.svc.cluster.local:15672
+password: secretpassword
+username: admin
+```
+
 <dl>
 <dt>custom_metrics</dt>
 <dd>
