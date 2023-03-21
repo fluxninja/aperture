@@ -29,7 +29,8 @@ UI. Navigate to the **Control Points** page and select the **Kubernetes** tab.
 You should see a list of discovered control points. Alternatively, you can use
 the
 [introspection API](reference/api/agent/flow-preview-service-preview-flow-labels.api.mdx)
-at the Aperture Agent to view this information.
+or [aperturectl](reference/aperturectl/auto-scale/control-points/) to view this
+information.
 
 ## Configure Auto-Scaling Policies
 

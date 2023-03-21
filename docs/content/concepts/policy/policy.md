@@ -10,7 +10,7 @@ See also [Policy reference](/reference/policies/spec.md#policy)
 :::
 
 Aperture's policy language enables expression of closed-loop [control
-systems][control-system] in a declarative manner. Aperture comes with a
+systems][control-system] in a declarative manner. Aperture comes with
 pre-packaged [blueprints][blueprints] that can be used both as a guide for
 creating new policies, or used as-is.
 

@@ -40,17 +40,22 @@ class DocBlockParam:
     required: bool
     default: Optional[Any] = None
 
+
 SECTION_RE = re.compile(r".*@section (?P<section>.+)")
 SUBSECTION_RE = re.compile(r".*@subsection (?P<subsection>.+)")
 PARAMETER_RE = re.compile(r".*@param.*")
-PARAMETER_DETAILED_RE = re.compile(r".*@param \((?P<param_name>[\w.\[\]]+): (?P<param_type>[\w.\[\]]+) ?(?P<param_required>\w+)?\) (?P<param_description>.+)")
+PARAMETER_DETAILED_RE = re.compile(
+    r".*@param \((?P<param_name>[\w.\[\]]+): (?P<param_type>[\w.\[\]]+) ?(?P<param_required>\w+)?\) (?P<param_description>.+)")
 
 # DocBlockNode for nested_parameters
+
+
 @dataclasses.dataclass
 class DocBlockNode:
     parameter: DocBlockParam
     children: Dict[str, DocBlockNode]
     required_children: OrderedSet[str]
+
 
 @dataclasses.dataclass
 class DocBlock:
@@ -90,8 +95,10 @@ class DocBlock:
         description = ""
         description_parsed = False
         parameters = {}
-        nested_parameters = DocBlockNode(DocBlockParam("", "intermediate_node", "", "", "", False), {}, OrderedSet([]))
-        nested_required_parameters = DocBlockNode(DocBlockParam("", "intermediate_node", "", "", "", False), {}, OrderedSet([]))
+        nested_parameters = DocBlockNode(DocBlockParam(
+            "", "intermediate_node", "", "", "", False), {}, OrderedSet([]))
+        nested_required_parameters = DocBlockNode(DocBlockParam(
+            "", "intermediate_node", "", "", "", False), {}, OrderedSet([]))
         for line in comment:
             if matched := SECTION_RE.match(line.strip()):
                 if description:
@@ -112,10 +119,12 @@ class DocBlock:
 
                 groups = inner.groupdict()
                 param_name, param_type = groups["param_name"], groups["param_type"]
-                spec_link, json_schema_link = cls._resolve_param_links(aperture_json_schema_path, spec_path, param_type)
+                spec_link, json_schema_link = cls._resolve_param_links(
+                    aperture_json_schema_path, spec_path, param_type)
                 param_required = groups.get("param_required", "") == "required"
                 param_description = groups["param_description"]
-                parameters[param_name] = (DocBlockParam(param_name, param_type, json_schema_link, spec_link, param_description, param_required))
+                parameters[param_name] = (DocBlockParam(
+                    param_name, param_type, json_schema_link, spec_link, param_description, param_required))
                 # tokenize param_name and create nested_parameters
                 parts = param_name.split(".")
                 parent = nested_parameters.children
@@ -125,13 +134,15 @@ class DocBlock:
                     nested_required_parameters.required_children.add(parts[0])
                 for idx, part in enumerate(parts):
                     if idx == len(parts) - 1:
-                        node = DocBlockNode(DocBlockParam(part, param_type, json_schema_link, spec_link, param_description, param_required), {}, OrderedSet([]))
+                        node = DocBlockNode(DocBlockParam(
+                            part, param_type, json_schema_link, spec_link, param_description, param_required), {}, OrderedSet([]))
                         parent[part] = node
                         if param_required:
                             parent_required[part] = node
                     else:
                         next_part = parts[idx + 1]
-                        node = DocBlockNode(DocBlockParam(part, "intermediate_node", "", "", "", False), {}, OrderedSet([]))
+                        node = DocBlockNode(DocBlockParam(
+                            part, "intermediate_node", "", "", "", False), {}, OrderedSet([]))
                         if part not in parent:
                             parent[part] = node
                         if param_required:
@@ -140,10 +151,9 @@ class DocBlock:
                         if param_required:
                             if part not in parent_required:
                                 parent_required[part] = node
-                            parent_required[part].required_children.add(next_part)
+                            parent_required[part].required_children.add(
+                                next_part)
                             parent_required = parent_required[part].children
-
-
 
             else:
                 stripped = line.lstrip(" ")
@@ -171,6 +181,7 @@ def command_with_exit_code(func):
 
     return wrapper
 
+
 def update_docblock_param_defaults(repository_root: Path, config_path: Path, blocks: List[DocBlock], jsonnet_path: Path = Path(), config_key: str = ""):
     jsonnet_data = f"local config = import '{config_path}';\n"
     if jsonnet_path != Path():
@@ -192,7 +203,8 @@ def update_docblock_param_defaults(repository_root: Path, config_path: Path, blo
         ]
 
         try:
-            result = subprocess.run(["jsonnet", *jsonnet_jpaths, str(tmppath)], capture_output=True, check=True)
+            result = subprocess.run(
+                ["jsonnet", *jsonnet_jpaths, str(tmppath)], capture_output=True, check=True)
         except subprocess.CalledProcessError as ex:
             logger.error(f"Error while rendering jsonnet: {ex.stderr}")
             # log file for debugging
@@ -219,13 +231,15 @@ def update_docblock_param_defaults(repository_root: Path, config_path: Path, blo
     # process defaults
     for block in blocks:
         for param in block.parameters.values():
-            param.default = get_param_default_from_rendered_config(rendered_config["_config"], param.param_name)
+            param.default = get_param_default_from_rendered_config(
+                rendered_config["_config"], param.param_name)
             logger.trace(param)
 
     # walk nested_parameters and update defaults
     def update_nested_param_defaults(node, prefix):
         if node.parameter.param_type != "intermediate_node":
-            node.parameter.default = get_param_default_from_rendered_config(rendered_config["_config"], prefix)
+            node.parameter.default = get_param_default_from_rendered_config(
+                rendered_config["_config"], prefix)
         for key, child in node.children.items():
             if prefix != "":
                 keyPrefix = f"{prefix}.{key}"
@@ -381,14 +395,17 @@ YAML_TPL = """
 {%- endfor %}
 """
 
+
 def quoteValueYAML(value: str) -> str:
     # if value is __REQUIRED_FIELD__ return as unquoted string
     if value == "__REQUIRED_FIELD__":
         return value
     return quoteValueJSON(value)
 
+
 def quoteValueJSON(value: str) -> str:
     return json.dumps(value)
+
 
 def quoteValueDocs(value: str) -> str:
     # if value is __REQUIRED_FIELD__ return as unquoted string
@@ -415,8 +432,10 @@ def quoteValueDocs(value: str) -> str:
 
     return f"\'{value}\'"
 
+
 def get_jinja2_environment() -> jinja2.Environment:
-    JINJA2_TEMPLATES = {"section.md.j2": SECTION_TPL, "values.yaml.j2": YAML_TPL, "definitions.json.j2": JSON_SCHEMA_TPL}
+    JINJA2_TEMPLATES = {"section.md.j2": SECTION_TPL,
+                        "values.yaml.j2": YAML_TPL, "definitions.json.j2": JSON_SCHEMA_TPL}
     loader = jinja2.DictLoader(JINJA2_TEMPLATES)
     env = jinja2.Environment(loader=loader)
     env.filters["quoteValueYAML"] = quoteValueYAML
@@ -499,8 +518,9 @@ def update_readme_markdown(readme_path: Path, config_blocks: List[DocBlock], dyn
             sections[block.section] = []
         sections[block.section].append(block)
     if len(sections) > 0:
-        readme_copied += "## Dynamic Configuration\n"
-        readme_copied += "The following configuration parameters can be [dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md) at runtime, without reloading the policy.\n"
+        readme_copied += "\n\n:::note\n\n"
+        readme_copied += "The following configuration parameters can be [dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md) at runtime, without reloading the policy.\n\n"
+        readme_copied += ":::\n\n"
         rendered = template.render({"sections": sections})
         readme_copied += rendered
 
@@ -510,30 +530,36 @@ def update_readme_markdown(readme_path: Path, config_blocks: List[DocBlock], dyn
 def render_sample_config_yaml(blueprint_name: Path, sample_config_path: Path, only_required: bool, blocks: List[DocBlock]):
     """Render sample config YAML file from blocks"""
     # merge all nested parameters into one dict
-    sample_config_data = DocBlockNode(DocBlockParam("", "intermediate_node", "", "", "", False), {}, OrderedSet([]))
+    sample_config_data = DocBlockNode(DocBlockParam(
+        "", "intermediate_node", "", "", "", False), {}, OrderedSet([]))
     if only_required is False:
         for block in blocks:
             merge_docblocknodes(sample_config_data, block.nested_parameters)
     else:
         for block in blocks:
-            merge_docblocknodes(sample_config_data, block.nested_required_parameters)
-
+            merge_docblocknodes(sample_config_data,
+                                block.nested_required_parameters)
 
     env = get_jinja2_environment()
     template = env.get_template("values.yaml.j2")
-    rendered = template.render({"sample_config_data": sample_config_data, "blueprint_name": blueprint_name})
+    rendered = template.render(
+        {"sample_config_data": sample_config_data, "blueprint_name": blueprint_name})
     sample_config_path.write_text(rendered)
+
 
 def render_json_schema(blueprint_name: Path, json_schema_path: Path, blocks: List[DocBlock]):
     """Render JSON schema file from blocks"""
-    json_schema_data = DocBlockNode(DocBlockParam("", "intermediate_node", "", "", "", False), {}, OrderedSet([]))
+    json_schema_data = DocBlockNode(DocBlockParam(
+        "", "intermediate_node", "", "", "", False), {}, OrderedSet([]))
     for block in blocks:
         merge_docblocknodes(json_schema_data, block.nested_parameters)
 
     env = get_jinja2_environment()
     template = env.get_template("definitions.json.j2")
-    rendered = template.render({"json_schema_data": json_schema_data, "blueprint_name": blueprint_name})
+    rendered = template.render(
+        {"json_schema_data": json_schema_data, "blueprint_name": blueprint_name})
     json_schema_path.write_text(rendered)
+
 
 def extract_docblock_comments(aperture_json_schema_path: str, spec_path: str, jsonnet_data: str) -> List[DocBlock]:
     docblock_start_re = r".*\/\*\*$"
@@ -549,12 +575,14 @@ def extract_docblock_comments(aperture_json_schema_path: str, spec_path: str, js
         elif re.match(docblock_end_re, line):
             assert inside_docblock
             inside_docblock = False
-            docblocks.append(DocBlock.from_comment(aperture_json_schema_path, spec_path, docblock_data))
+            docblocks.append(DocBlock.from_comment(
+                aperture_json_schema_path, spec_path, docblock_data))
             docblock_data = []
         else:
-           if inside_docblock:
-               docblock_data.append(line.strip())
+            if inside_docblock:
+                docblock_data.append(line.strip())
     return docblocks
+
 
 def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture blueprint directory")):
     if not blueprint_path.exists():
@@ -570,7 +598,9 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
     # get parts of relative_blueprint_path
     relative_blueprint_path_parts = blueprint_name.parts
 
-    readme_path = repository_root / "docs/content/reference/policies/bundled-blueprints" / "/".join(relative_blueprint_path_parts[:-1]) / f"{relative_blueprint_path_parts[-1]}.md"
+    readme_path = repository_root / "docs/content/reference/policies/bundled-blueprints" / \
+        "/".join(relative_blueprint_path_parts[:-1]) / \
+        f"{relative_blueprint_path_parts[-1]}.md"
 
     if not readme_path.exists():
         logger.error(f"README not found: {readme_path}. Exiting.")
@@ -578,25 +608,34 @@ def main(blueprint_path: Path = typer.Argument(..., help="Path to the aperture b
 
     # make a prefix of ../ for each part
     spec_path = "/".join([".."] * len(relative_blueprint_path_parts)) + "/spec"
-    aperture_version_path = "/".join([".."] * (len(relative_blueprint_path_parts)+2)) + "/apertureVersion.js"
+    aperture_version_path = "/".join(
+        [".."] * (len(relative_blueprint_path_parts)+2)) + "/apertureVersion.js"
 
-    aperture_json_schema_path = "/".join([".."] * (len(relative_blueprint_path_parts)+1)) + "/gen/jsonschema/_definitions.json#/definitions/"
+    aperture_json_schema_path = "/".join([".."] * (len(
+        relative_blueprint_path_parts)+1)) + "/gen/jsonschema/_definitions.json#/definitions/"
 
     blueprint_gen_path = blueprint_path / "gen"
 
+    config_docblocks = parse_config_docblocks(
+        repository_root, blueprint_path, aperture_json_schema_path, spec_path)
+    render_json_schema(blueprint_name, blueprint_gen_path /
+                       "definitions.json", config_docblocks)
+    render_sample_config_yaml(
+        blueprint_name, blueprint_gen_path / "values.yaml", False, config_docblocks)
+    render_sample_config_yaml(
+        blueprint_name, blueprint_gen_path / "values-required.yaml", True, config_docblocks)
 
-    config_docblocks = parse_config_docblocks(repository_root, blueprint_path, aperture_json_schema_path, spec_path)
-    render_json_schema(blueprint_name, blueprint_gen_path / "definitions.json", config_docblocks)
-    render_sample_config_yaml(blueprint_name, blueprint_gen_path / "values.yaml", False, config_docblocks)
-    render_sample_config_yaml(blueprint_name, blueprint_gen_path / "values-required.yaml", True, config_docblocks)
+    dynamic_config_docblocks = parse_dynamic_config_docblocks(
+        repository_root, blueprint_path, aperture_json_schema_path, spec_path)
+    render_json_schema(blueprint_name, blueprint_gen_path /
+                       "dynamic-config-definitions.json", dynamic_config_docblocks)
+    render_sample_config_yaml(blueprint_name, blueprint_gen_path /
+                              "dynamic-config-values.yaml", False, dynamic_config_docblocks)
+    render_sample_config_yaml(blueprint_name, blueprint_gen_path /
+                              "dynamic-config-values-required.yaml", True, dynamic_config_docblocks)
 
-    dynamic_config_docblocks = parse_dynamic_config_docblocks(repository_root, blueprint_path, aperture_json_schema_path, spec_path)
-    render_json_schema(blueprint_name, blueprint_gen_path / "dynamic-config-definitions.json", dynamic_config_docblocks)
-    render_sample_config_yaml(blueprint_name, blueprint_gen_path / "dynamic-config-values.yaml", False, dynamic_config_docblocks)
-    render_sample_config_yaml(blueprint_name, blueprint_gen_path / "dynamic-config-values-required.yaml", True, dynamic_config_docblocks)
-
-    update_readme_markdown(readme_path, config_docblocks, dynamic_config_docblocks, blueprint_name, aperture_version_path)
-
+    update_readme_markdown(readme_path, config_docblocks,
+                           dynamic_config_docblocks, blueprint_name, aperture_version_path)
 
 
 def parse_config_docblocks(repository_root: Path, blueprint_path: Path, aperture_json_schema_path: str, spec_path: str) -> List[DocBlock]:
@@ -611,8 +650,8 @@ def parse_config_docblocks(repository_root: Path, blueprint_path: Path, aperture
 
     metadata = yaml.safe_load(metadata_path.read_text())
 
-
-    docblocks = extract_docblock_comments(aperture_json_schema_path, spec_path, config_path.read_text())
+    docblocks = extract_docblock_comments(
+        aperture_json_schema_path, spec_path, config_path.read_text())
 
     sections = {section: [] for section in metadata["sources"].keys()}
     # append Common to sections
@@ -633,7 +672,8 @@ def parse_config_docblocks(repository_root: Path, blueprint_path: Path, aperture
         config_key = metadata["sources"][section]["config_key"]
         # append common section to blocks
         blocks.extend(sections["Common"])
-        update_docblock_param_defaults(repository_root, config_path, blocks, jsonnet_path, config_key)
+        update_docblock_param_defaults(
+            repository_root, config_path, blocks, jsonnet_path, config_key)
     return docblocks
 
 
@@ -643,7 +683,8 @@ def parse_dynamic_config_docblocks(repository_root: Path, blueprint_path: Path, 
     if not config_path.exists():
         return []
 
-    docblocks = extract_docblock_comments(aperture_json_schema_path, spec_path, config_path.read_text())
+    docblocks = extract_docblock_comments(
+        aperture_json_schema_path, spec_path, config_path.read_text())
 
     sections = {}
     for block in docblocks:
@@ -654,6 +695,8 @@ def parse_dynamic_config_docblocks(repository_root: Path, blueprint_path: Path, 
     return docblocks
 
 # merge 2nd docblock into 1st
+
+
 def merge_docblocknodes(docblock1: DocBlockNode, docblock2: DocBlockNode):
     docblock1.required_children.update(docblock2.required_children)
     # recursive merge docblock1.children and docblock2.children
@@ -662,6 +705,7 @@ def merge_docblocknodes(docblock1: DocBlockNode, docblock2: DocBlockNode):
             merge_docblocknodes(docblock1.children[key], value)
         else:
             docblock1.children[key] = value
+
 
 if __name__ == "__main__":
     typer.run(main)

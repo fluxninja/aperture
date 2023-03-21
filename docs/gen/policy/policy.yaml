@@ -330,7 +330,7 @@ definitions:
     type: object
     properties:
       auto_scaler:
-        description: AutoScaler provides auto scaling functionality for any scalable
+        description: _AutoScaler_ provides auto-scaling functionality for any scalable
           resource.
         x-order: 0
         $ref: '#/definitions/AutoScaler'
@@ -340,10 +340,10 @@ definitions:
         x-order: 1
         $ref: '#/definitions/PodScaler'
   AutoScaler:
-    description: 'AutoScaler: AutoScaler provides auto scaling functionality for any
-      scalable resource. Multiple Controllers can be defined on the AutoScaler for
-      performing scale-out or scale-in. The AutoScaler can interface with infrastructure
-      APIs such as Kubernetes to perform auto-scale.'
+    description: _AutoScaler_ provides auto-scaling functionality for any scalable
+      resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing
+      scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs
+      such as Kubernetes to perform auto-scale.
     type: object
     properties:
       cooldown_override_percentage:
@@ -359,7 +359,7 @@ definitions:
         x-order: 0
       max_scale:
         description: |+
-          The maximum scale to which the autoscaler can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+          The maximum scale to which the _AutoScaler_ can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
 
         type: string
         format: int64
@@ -388,7 +388,7 @@ definitions:
         x-order: 3
       min_scale:
         description: |+
-          The minimum scale to which the autoscaler can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+          The minimum scale to which the _AutoScaler_ can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
 
         type: string
         format: int64
@@ -398,7 +398,7 @@ definitions:
         x-go-tag-validate: gte=0
         x-order: 4
       out_ports:
-        description: Output ports for the AutoScaler.
+        description: Output ports for the _AutoScaler_.
         x-order: 5
         $ref: '#/definitions/AutoScalerOuts'
       scale_in_alerter_parameters:
@@ -406,7 +406,7 @@ definitions:
         x-order: 6
         $ref: '#/definitions/AlerterParameters'
       scale_in_controllers:
-        description: List of Controllers for scaling in.
+        description: List of _Controllers_ for scaling in.
         type: array
         items:
           $ref: '#/definitions/AutoScalerScaleInController'
@@ -424,7 +424,7 @@ definitions:
         x-order: 9
         $ref: '#/definitions/AlerterParameters'
       scale_out_controllers:
-        description: List of Controllers for scaling out.
+        description: List of _Controllers_ for scaling out.
         type: array
         items:
           $ref: '#/definitions/AutoScalerScaleOutController'
@@ -557,7 +557,7 @@ definitions:
         x-order: 2
         $ref: '#/definitions/KubernetesObjectSelector'
   AutoScalerOuts:
-    description: Outputs for AutoScaler.
+    description: Outputs for _AutoScaler_.
     type: object
     properties:
       actual_scale:
