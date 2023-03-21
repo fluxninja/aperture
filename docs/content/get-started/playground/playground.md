@@ -345,15 +345,15 @@ case latest images will be pulled from dockerhub and used instead.
 #### Creating your own test scenarios
 
 ```
- rate_limiting_escalation
-├──  dashboards
-│  └──  main.jsonnet
-├──  load_generator
-│  └──  test.js
-├──  metadata.json
-└──  policies
-   ├──  service1-demo-app-cr.yaml
-   └──  service1-demo-app.yaml
+rate_limiting_escalation
+├── dashboards
+│  └── main.jsonnet
+├── load_generator
+│  └── test.js
+├── metadata.json
+└── policies
+   ├── service1-demo-app-cr.yaml
+   └── service1-demo-app.yaml
 
 ```
 
