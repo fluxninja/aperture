@@ -1,7 +1,6 @@
 {
   "renderer": "tanka",
   "tkenv": "playground/tanka/apps/java-demo-app",
-  "needs": ["istio"],
   "aperture_policies": [],
   "images": [
     {
@@ -13,17 +12,17 @@
   "child_resources": [
     {
       "workload": "service1-demo-app",
-      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "resource_deps": ["cluster-bootstrap"],
       "extra_objects": ["service1-demo-app:serviceaccount"]
     },
     {
       "workload": "service2-demo-app",
-      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "resource_deps": ["cluster-bootstrap"],
       "extra_objects": ["service2-demo-app:serviceaccount"]
     },
     {
       "workload": "service3-demo-app",
-      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "resource_deps": ["cluster-bootstrap"],
       "extra_objects": ["service3-demo-app:serviceaccount"]
     }
   ]

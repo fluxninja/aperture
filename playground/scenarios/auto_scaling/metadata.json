@@ -1,7 +1,6 @@
 {
   "renderer": "tanka",
   "tkenv": "playground/tanka/apps/single-service-app",
-  "needs": ["istio"],
   "aperture_policies": [
     {
       "blueprint_name": "policies/service-protection/average-latency",
@@ -20,7 +19,7 @@
   "child_resources": [
     {
       "workload": "service1-demo-app",
-      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "resource_deps": ["cluster-bootstrap"],
       "extra_objects": ["service1-demo-app:serviceaccount"]
     }
   ]

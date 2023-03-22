@@ -10,6 +10,10 @@ simplesrv:
     pullPolicy: IfNotPresent
     tag: "latest"
 
+agent:
+  host: aperture-agent.aperture-agent.svc.cluster.local
+  port: 8080
+
 proxy:
   image:
     repository: fluxninja/fluxninja-proxy-envoy

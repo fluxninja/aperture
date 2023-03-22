@@ -21,8 +21,8 @@ public class ApertureFeatureFilter implements Filter {
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException, IOException {
         Map<String, String> labels = new HashMap<>();
-        labels.put("app", "Demo-App");
-        labels.put("instance", "instance-1");
+        labels.put("app", "demoapp");
+        labels.put("instance", System.getenv().getOrDefault("HOSTNAME", "instance-1"));
         labels.put("ip", req.getRemoteAddr());
 
         Flow flow = this.apertureSDK.startFlow("awesomeFeature", labels);

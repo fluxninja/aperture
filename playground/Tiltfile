@@ -387,11 +387,7 @@ DEP_TREE = {
     },
 }
 
-NS_CONFIG = {
-    APERTURE_DEMOAPP_NS: {
-        "labels": ["istio-injection: enabled"],
-    }
-}
+NS_CONFIG = {}
 
 ###############
 ### HELPERS ###
