@@ -63,4 +63,4 @@ For more context on how to use Java ApertureSDK to set feature Control Points,
 you can take a look at the [example app][example] available in our repository.
 
 [example]:
-  https://github.com/fluxninja/aperture/tree/main/sdks/aperture-java/examples/standalone-example
+  https://github.com/fluxninja/aperture-java/tree/releases/aperture-java/v1.0.0/examples/standalone-example

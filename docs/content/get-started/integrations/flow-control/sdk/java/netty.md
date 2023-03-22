@@ -55,6 +55,6 @@ For more context on how to use Aperture Netty Handler to set Control Points, you
 can take a look at the [example app][netty-example] available in our repository.
 
 [netty-example]:
-  https://github.com/fluxninja/aperture/tree/main/sdks/aperture-java/examples/netty-example
+  https://github.com/fluxninja/aperture-java/tree/releases/aperture-java/v1.0.0/examples/netty-example
 [javaagent]:
   /get-started/integrations/flow-control/sdk/java/using-instrumentation-agent-to-automatically-set-control-points-using-java-sdk
