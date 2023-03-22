@@ -98,7 +98,6 @@ return function(destination_hostname, destination_port)
   })
   ngx.ctx.otlp_span = span
 
-  local checkHTTPStart = ngx.now()
   local response, code, response_headers = http.request{
     url = apertureAgentEndpoint .. "/v1/flowcontrol/checkhttp",
     method = "POST",
@@ -109,12 +108,12 @@ return function(destination_hostname, destination_port)
   }
 
   if response == nil then
-    kong.log.err("failed to call Aperture CheckHTTP. Code: " .. code)
-    code = 200
+    ngx.log(ngx.ERR, "failed to call Aperture CheckHTTP. Code: " .. code)
+    return 200
   end
 
-  local response_json = json.decode(response_body[1])
-  if code == 200 or code == 503 then
+  if code == 200 then
+    local response_json = json.decode(response_body[1])
     ngx.ctx.aperture_check_reponse = response_json.dynamic_metadata["aperture.check_response"]
     if response_json.ok_response ~= nil then
       for header_name, header_value in pairs(response_json.ok_response.headers) do
@@ -125,10 +124,10 @@ return function(destination_hostname, destination_port)
     else
       code = 200
     end
-    local checkHTTPEnd = ngx.now()
-    span:set_attributes(otlp_attr.string("checkhttp_duration", tostring((checkHTTPEnd - checkHTTPStart) * 1000)))
+    span:set_attributes(otlp_attr.int("aperture.flow_start_timestamp", ngx.req.start_time() * 1000))
+    span:set_attributes(otlp_attr.int("aperture.workload_start_timestamp", math.floor(socket.gettime() * 1000)))
   else
-    kong.log.err("failed to send Aperture CheckHTTP request. Code: " .. code .. ", Response: " .. response_body[1])
+    ngx.log(ngx.ERR, "failed to send Aperture CheckHTTP request. Code: " .. code .. ", Response: " .. response_body[1])
     code = 200
   end
   return code

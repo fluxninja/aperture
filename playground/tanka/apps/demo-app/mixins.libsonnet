@@ -12,6 +12,10 @@ local application = {
     namespace: 'demoapp',
   },
   values:: {
+    simplesrv+: {
+      rejectRatio: if enableNginx || enableKong then 0.0 else 0.05,
+      hostname: if enableNginx then 'nginx-server.demoapp.svc.cluster.local' else if enableKong then 'kong-server.demoapp.svc.cluster.local' else '',
+    },
   },
   service1:
     helm.template('service1', 'charts/demo-app', {
@@ -19,6 +23,7 @@ local application = {
       values: $.values {
         nginx: {
           enabled: enableNginx,
+          replicaCount: 2,
           resources: {
             requests: {
               cpu: '1',
@@ -32,6 +37,7 @@ local application = {
         },
         kong: {
           enabled: enableKong,
+          replicaCount: 2,
           resources: {
             requests: {
               cpu: '1',

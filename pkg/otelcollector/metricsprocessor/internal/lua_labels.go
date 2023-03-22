@@ -21,26 +21,21 @@ func AddLuaSpecificLabels(attributes pcommon.Map) {
 		attributes.PutDouble(otelconsts.HTTPResponseContentLength, responseLength)
 	}
 
-	// Compute durations
-	responseDuration, responseDurationExists := otelcollector.GetFloat64(attributes, otelconsts.ResponseDurationLabel, treatAsMissing)
-	checkHTTPDuration, checkHTTPDurationExists := otelcollector.GetFloat64(attributes, otelconsts.CheckHTTPDurationLabel, treatAsMissing)
+	flowStart, flowStartExists := otelcollector.GetFloat64(attributes, otelconsts.ApertureFlowStartTimestampLabel, treatAsMissing)
+	workloadStart, workloadStartExists := otelcollector.GetFloat64(attributes, otelconsts.ApertureWorkloadStartTimestampLabel, treatAsMissing)
+	flowEnd, flowEndExists := otelcollector.GetFloat64(attributes, otelconsts.ApertureFlowEndTimestampLabel, treatAsMissing)
 
-	// Add ResponseReceivedLabel based on whether responseDuration is present and non-zero
-	if responseDurationExists && responseDuration > 0 {
+	// Add ResponseReceivedLabel based on whether flowEnd is present
+	if flowEndExists {
 		attributes.PutStr(otelconsts.ResponseReceivedLabel, otelconsts.ResponseReceivedTrue)
 	} else {
 		attributes.PutStr(otelconsts.ResponseReceivedLabel, otelconsts.ResponseReceivedFalse)
 	}
 
-	if responseDurationExists {
-		attributes.PutDouble(otelconsts.FlowDurationLabel, responseDuration)
+	if flowStartExists && flowEndExists {
+		attributes.PutDouble(otelconsts.FlowDurationLabel, flowEnd-flowStart)
 	}
-
-	if responseDurationExists && checkHTTPDurationExists {
-		workloadDuration := responseDuration - checkHTTPDuration
-		// discard negative values which can happen in case of connection resets
-		if workloadDuration > 0 {
-			attributes.PutDouble(otelconsts.WorkloadDurationLabel, workloadDuration)
-		}
+	if workloadStartExists && flowEndExists {
+		attributes.PutDouble(otelconsts.WorkloadDurationLabel, flowEnd-workloadStart)
 	}
 }

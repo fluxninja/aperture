@@ -21,7 +21,7 @@ kind: Deployment
 metadata:
   name: kong-server
 spec:
-  replicas: 2
+  replicas: {{ .Values.kong.replicaCount }}
   selector:
     matchLabels:
       app: kong-server

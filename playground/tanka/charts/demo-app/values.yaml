@@ -5,6 +5,8 @@
 replicaCount: 1
 
 simplesrv:
+  rejectRatio: 0.05
+  hostname: ~
   image:
     repository: fluxninja/demo-app
     pullPolicy: IfNotPresent
@@ -13,6 +15,7 @@ simplesrv:
 nginx:
   enabled: false
   resources: {}
+  replicaCount: 1
   image:
     repository: fluxninja/demo-app-nginx
     pullPolicy: IfNotPresent
@@ -22,6 +25,7 @@ nginx:
 kong:
   enabled: false
   resources: {}
+  replicaCount: 1
   image:
     repository: fluxninja/demo-app-kong
     pullPolicy: IfNotPresent

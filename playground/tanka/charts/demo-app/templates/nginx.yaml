@@ -17,7 +17,7 @@ kind: Deployment
 metadata:
   name: nginx-server
 spec:
-  replicas: 2
+  replicas: {{ .Values.nginx.replicaCount }}
   selector:
     matchLabels:
       app: nginx-server

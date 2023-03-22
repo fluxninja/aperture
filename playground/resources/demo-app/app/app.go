@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"go.opentelemetry.io/otel"
@@ -172,12 +173,16 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Received empty subrequest chain", http.StatusBadRequest)
 			return
 		}
-		// requestDestination := chain.subrequests[0].Destination
-		// if requestDestination != h.hostname {
-		// 	log.Autosample().Warn().Err(err).Msg("Invalid destination")
-		// 	http.Error(w, "Invalid message destination", http.StatusBadRequest)
-		// 	return
-		// }
+		requestDestination := chain.subrequests[0].Destination
+		if !strings.HasPrefix(requestDestination, "http") {
+			requestDestination = "http://" + requestDestination
+		}
+		requestDomain, err := url.Parse(requestDestination)
+		if requestDomain.Hostname() != h.hostname {
+			log.Autosample().Warn().Err(err).Msg("Invalid destination")
+			http.Error(w, "Invalid message destination", http.StatusBadRequest)
+			return
+		}
 		code, err = h.processChain(ctx, chain)
 		if err != nil {
 			log.Autosample().Warn().Err(err).Msg("Failed to process chain")
