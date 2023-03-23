@@ -51,5 +51,4 @@ For more context on how to use Aperture Javascript SDK to set feature Control
 Points, you can take a look at the [example app][example] available in our
 repository.
 
-[example]:
-  https://github.com/fluxninja/aperture/tree/main/sdks/aperture-js/example
+[example]: https://github.com/fluxninja/aperture-js/tree/main/example

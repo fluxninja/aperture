@@ -43,6 +43,6 @@ Points, you can take a look at the [example app][armeria-example] available in
 our repository.
 
 [armeria-example]:
-  https://github.com/fluxninja/aperture/tree/main/sdks/aperture-java/examples/armeria-example
+  https://github.com/fluxninja/aperture-java/tree/releases/aperture-java/v1.0.0/examples/armeria-example
 [javaagent]:
   /get-started/integrations/flow-control/sdk/java/using-instrumentation-agent-to-automatically-set-control-points-using-java-sdk

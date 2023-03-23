@@ -57,4 +57,4 @@ For example usage, you can view the [example app][spring-example] available in
 our repository.
 
 [spring-example]:
-  https://github.com/fluxninja/aperture/tree/main/sdks/aperture-java/examples/spring-example
+  https://github.com/fluxninja/aperture-java/tree/releases/aperture-java/v1.0.0/examples/spring-example
