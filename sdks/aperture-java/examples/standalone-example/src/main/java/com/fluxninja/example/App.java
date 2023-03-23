@@ -17,6 +17,8 @@ public class App {
     public static final String DEFAULT_AGENT_HOST = "localhost";
     public static final String DEFAULT_AGENT_PORT = "8089";
     public static final String DEFAULT_FEATURE_NAME = "awesome_feature";
+    public static final String DEFAULT_INSECURE_GRPC = "true";
+    public static final String DEFAULT_SSL_CERT = "";
 
     private final ApertureSDK apertureSDK;
     private final ManagedChannel channel;
@@ -37,6 +39,16 @@ public class App {
         if (agentPort == null) {
             agentPort = DEFAULT_AGENT_PORT;
         }
+        String insecureGrpcString = System.getenv("FN_INSECURE_GRPC");
+        if (insecureGrpcString == null) {
+            insecureGrpcString = DEFAULT_INSECURE_GRPC;
+        }
+        boolean insecureGrpc = Boolean.parseBoolean(insecureGrpcString);
+
+        String sslCertFile = System.getenv("FN_SSL_CERTIFICATE_FILE");
+        if (sslCertFile == null) {
+            sslCertFile = DEFAULT_SSL_CERT;
+        }
 
         String target = String.format("%s:%s", agentHost, agentPort);
         final ManagedChannel channel = ManagedChannelBuilder.forTarget(target).build();
@@ -48,7 +60,8 @@ public class App {
                             .setHost(agentHost)
                             .setPort(Integer.parseInt(agentPort))
                             .setDuration(Duration.ofMillis(1000))
-                            .useInsecureGrpc()
+                            .useInsecureGrpc(insecureGrpc)
+                            .setSslCertificateFile(sslCertFile)
                             .build();
         } catch (ApertureSDKException e) {
             e.printStackTrace();

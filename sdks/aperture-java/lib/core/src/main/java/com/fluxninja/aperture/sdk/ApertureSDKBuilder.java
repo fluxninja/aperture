@@ -57,8 +57,8 @@ public final class ApertureSDKBuilder {
         return this;
     }
 
-    public ApertureSDKBuilder useInsecureGrpc() {
-        this.insecureGrpc = true;
+    public ApertureSDKBuilder useInsecureGrpc(boolean enabled) {
+        this.insecureGrpc = enabled;
         return this;
     }
 

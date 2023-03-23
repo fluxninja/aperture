@@ -87,9 +87,8 @@ public class ApertureFilter implements Filter {
             if (timeoutMs != null) {
                 builder.setDuration(Duration.ofMillis(Integer.parseInt(timeoutMs)));
             }
-            if (insecureGrpc) {
-                builder.useInsecureGrpc();
-            } else if (sslCertificateFile != null) {
+            builder.useInsecureGrpc(insecureGrpc);
+            if (sslCertificateFile != null && !sslCertificateFile.isEmpty()) {
                 builder.setSslCertificateFile(sslCertificateFile);
             }
 

@@ -113,9 +113,8 @@ public class Config {
                     config.getProperty(
                             SSL_CERTIFICATE_FILE_PROPERTY, SSL_CERTIFICATE_FILE_DEFAULT_VALUE);
 
-            if (insecureGrpc) {
-                sdkBuilder.useInsecureGrpc();
-            } else if (!sslCertificateFile.isEmpty()) {
+            sdkBuilder.useInsecureGrpc(insecureGrpc);
+            if (!sslCertificateFile.isEmpty()) {
                 sdkBuilder.setSslCertificateFile(sslCertificateFile);
             }
 

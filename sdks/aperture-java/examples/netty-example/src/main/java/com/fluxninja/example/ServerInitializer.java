@@ -14,10 +14,15 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     ApertureSDK sdk;
     String agentHost;
     int agentPort;
+    boolean insecureGrpc;
+    String sslCertFile;
 
-    public ServerInitializer(String agentHost, String agentPort) {
+    public ServerInitializer(
+            String agentHost, String agentPort, boolean insecureGrpc, String sslCertFile) {
         this.agentHost = agentHost;
         this.agentPort = Integer.parseInt(agentPort);
+        this.insecureGrpc = insecureGrpc;
+        this.sslCertFile = sslCertFile;
     }
 
     @Override
@@ -27,7 +32,8 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
                     ApertureSDK.builder()
                             .setHost(this.agentHost)
                             .setPort(this.agentPort)
-                            .useInsecureGrpc()
+                            .useInsecureGrpc(insecureGrpc)
+                            .setSslCertificateFile(sslCertFile)
                             .build();
         } catch (ApertureSDKException ex) {
             throw new RuntimeException(ex);
