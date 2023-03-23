@@ -5,7 +5,7 @@ keywords:
   - setup
   - nginx
   - nginx-gateway
-sidebar_position: 2
+sidebar_position: 1
 ---
 
 ```mdx-code-block
@@ -15,4 +15,229 @@ import TabItem from '@theme/TabItem';
 import {apertureVersion,apertureVersionWithOutV} from '../../../../apertureVersion.js';
 ```
 
-## Nginx {#Nginx}
+The following is documentation for integrating Aperture with Nginx using Lua
+modules.
+
+## Introduction
+
+This documentation provides instructions for integrating Aperture with Nginx
+using Lua modules. Lua modules are scripts that can be executed within Nginx to
+extend its functionality. The Aperture Lua module can be downloaded from the
+GitHub <a
+href={`https://github.com/fluxninja/aperture/releases/tag/${apertureVersion}`}>Release
+Page</a>.
+
+## Pre-requisites
+
+Before proceeding, ensure that you have the following installed:
+
+:::info Skip these steps if the Nginx server is running on Container. :::
+
+1. Nginx server
+2. [lua-nginx-module](https://github.com/openresty/lua-nginx-module) enabled for
+   Nginx. If not, follow the
+   [installation steps](https://github.com/openresty/lua-nginx-module#installation).
+3. [LuaRocks](https://luarocks.org/) which is a package manager for Lua modules.
+   Follow the
+   [installation steps](https://github.com/luarocks/luarocks/wiki/Download#installing).
+
+## Installation
+
+To install the Aperture Lua module, follow these steps:
+
+:::info Refer Refer [Example Dockerfile](#example-dockerfile) to get the steps
+for installing the Aperture Lua module for Nginx server running on Container.
+:::
+
+1. Install the
+   [opentelemetry-lua](https://github.com/fluxninja/opentelemetry-lua) SDK by
+   running the following commands:
+
+   ```bash
+   git clone https://github.com/fluxninja/opentelemetry-lua.git
+   cd opentelemetry-lua
+   luarocks make
+   ```
+
+2. Download and extract the Aperture Lua module by executing the following
+   commands:
+
+   ```mdx-code-block
+   <CodeBlock language="bash">
+   wget "https://github.com/fluxninja/aperture/releases/download/{apertureVersion}/aperture-lua.tar.gz" && tar -xzvf aperture-lua.tar.gz
+   </CodeBlock>
+   ```
+
+3. Install the module by running the following command:
+
+   ```bash
+   cd aperture-lua && luarocks make aperture-nginx-plugin-0.1.0-1.rockspec
+   ```
+
+## Example Dockerfile {#example-dockerfile}
+
+Use the following Dockerfile to install the Aperture Lua module with Nginx. This
+example uses
+[fabiocicerchia/nginx-lua](https://hub.docker.com/r/fabiocicerchia/nginx-lua/)
+as base image because it already has the
+[lua-nginx-module](https://github.com/openresty/lua-nginx-module) pre-configured
+with Nginx.
+
+```mdx-code-block
+<CodeBlock language="Dockerfile">{`FROM fabiocicerchia/nginx-lua:1.23.3-debian-compat
+RUN apt update && apt-get install -y build-essential git
+RUN git clone https://github.com/fluxninja/opentelemetry-lua.git && cd opentelemetry-lua && luarocks make
+RUN wget "https://github.com/fluxninja/aperture/releases/download/${apertureVersion}/aperture-lua.tar.gz"
+RUN tar -xzvf aperture-lua.tar.gz && cd aperture-lua && luarocks make aperture-nginx-plugin-0.1.0-1.rockspec
+COPY nginx_config.conf /etc/nginx/nginx.conf`}</CodeBlock>
+```
+
+## Configure Nginx
+
+Follow these steps to configure Nginx to use the installed Aperture Lua module:
+
+1. Create an environment variable `APERTURE_AGENT_ENDPOINT` with a value equal
+   to the endpoint to connect with Aperture Agent. For example, use the
+   following command in bash:
+
+   ```bash
+   echo 'export APERTURE_AGENT_ENDPOINT="http://aperture-agent.aperture-agent.svc.cluster.local"' >> ~/.profile
+   ```
+
+2. Optionally, create an environment variable `APERTURE_CHECK_TIMEOUT` which
+   would be considered as a timeout for execution of the Aperture check. The
+   default value for it is 500m which is 500 milliseconds. For example, use the
+   following command in bash:
+
+   :::info Refer
+
+   The format for the timeout value can be found for `Timeout` parameter on
+   [this site](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
+   :::
+
+   ```bash
+   echo 'export APERTURE_CHECK_TIMEOUT="1S"' >> ~/.profile
+   ```
+
+3. Add `init_by_lua_block` section under the `http` block of the Nginx
+   configuration to initialize the Aperture Lua module:
+
+   ```conf
+   http {
+     ...
+     init_by_lua_block {
+       access = require "aperture-plugin.access"
+       log = require "aperture-plugin.log"
+     }
+     ...
+   }
+   ```
+
+4. Add `access_by_lua_block` section under the `http` block of the Nginx
+   configuration to execute the Aperture check for all servers and locations
+   before the request is forwarded to upstream:
+
+   ```conf
+   http {
+     ...
+     access_by_lua_block {
+       local authorized_status = access(ngx.var.destination_hostname, ngx.var.destination_port)
+
+       if authorized_status ~= ngx.HTTP_OK then
+         return ngx.exit(authorized_status)
+       end
+     }
+     ...
+   }
+   ```
+
+5. Add `log_by_lua_block` section under the `http` block of the Nginx
+   configuration to forward the OpenTelemetry logs to Aperture for all servers
+   and locations after the response is received from upstream:
+
+   ```conf
+   http {
+     ...
+     log_by_lua_block {
+       log()
+     }
+     ...
+   }
+   ```
+
+6. Aperture needs the upstream address of the server using
+   `destination_hostname` and `destination_port` variables which need to be set
+   from Nginx `location` block:
+
+   ```bash
+   http {
+     ...
+     server {
+       location /service1 {
+         set $destination_hostname "service1-demo-app.demoapp.svc.cluster.local";
+         set $destination_port "80";
+         proxy_pass http://$destination_hostname:$destination_port/request;
+       }
+     }
+     ...
+   }
+   ```
+
+7. Below is the how complete Nginx configuration would like look:
+
+   ```conf
+   worker_processes auto;
+   pid /run/nginx.pid;
+
+   events {
+     worker_connections 4096;
+   }
+
+   http {
+     default_type application/octet-stream;
+     resolver 10.96.0.10;
+
+     sendfile on;
+     keepalive_timeout 65;
+
+     init_by_lua_block {
+       access = require "aperture-plugin.access"
+       log = require "aperture-plugin.log"
+     }
+
+     access_by_lua_block {
+       local authorized_status = access(ngx.var.destination_hostname, ngx.var.destination_port)
+
+       if authorized_status ~= ngx.HTTP_OK then
+         return ngx.exit(authorized_status)
+       end
+     }
+
+     log_by_lua_block {
+       log()
+     }
+
+     server {
+       listen 80;
+       proxy_http_version 1.1;
+
+       location /service1 {
+         set $destination_hostname "service1-demo-app.demoapp.svc.cluster.local";
+         set $destination_port "80";
+         proxy_pass http://$destination_hostname:$destination_port/request;
+       }
+
+       location /service2 {
+         set $destination_hostname "service2-demo-app.demoapp.svc.cluster.local";
+         set $destination_port "80";
+         proxy_pass http://$destination_hostname:$destination_port/request;
+       }
+
+       location /service3 {
+         set $destination_hostname "service3-demo-app.demoapp.svc.cluster.local";
+         set $destination_port "80";
+         proxy_pass http://$destination_hostname:$destination_port/request;
+       }
+     }
+   }
+   ```
