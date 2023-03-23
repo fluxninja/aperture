@@ -12,6 +12,8 @@ import com.linecorp.armeria.client.SimpleDecoratingHttpClient;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
+import com.linecorp.armeria.server.ServiceRequestContext;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -34,7 +36,7 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
 
     @Override
     public HttpResponse execute(ClientRequestContext ctx, HttpRequest req) throws Exception {
-        AttributeContext attributes = HttpUtils.attributesFromRequest(req);
+        AttributeContext attributes = HttpUtils.attributesFromRequest(ctx, req);
         TrafficFlow flow = this.apertureSDK.startTrafficFlow(req.path(), attributes);
 
         if (flow.ignored()) {
