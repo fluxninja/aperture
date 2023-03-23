@@ -63,6 +63,7 @@ public class ArmeriaServer {
                             .setHost(agentHost)
                             .setPort(Integer.parseInt(agentPort))
                             .setDuration(Duration.ofMillis(1000))
+                            .useInsecureGrpc()
                             .build();
         } catch (ApertureSDKException e) {
             e.printStackTrace();

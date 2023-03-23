@@ -23,7 +23,12 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     @Override
     protected void initChannel(Channel ch) {
         try {
-            sdk = ApertureSDK.builder().setHost(this.agentHost).setPort(this.agentPort).build();
+            sdk =
+                    ApertureSDK.builder()
+                            .setHost(this.agentHost)
+                            .setPort(this.agentPort)
+                            .useInsecureGrpc()
+                            .build();
         } catch (ApertureSDKException ex) {
             throw new RuntimeException(ex);
         }

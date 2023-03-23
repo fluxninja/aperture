@@ -68,16 +68,16 @@ public class ApertureFilter implements Filter {
         String agentHost;
         String agentPort;
         String timeoutMs;
+        boolean insecureGrpc;
+        String sslCertificateFile;
         try {
             agentHost = filterConfig.getInitParameter("agent_host");
             agentPort = filterConfig.getInitParameter("agent_port");
             timeoutMs = filterConfig.getInitParameter("timeout_ms");
+            insecureGrpc = Boolean.parseBoolean(filterConfig.getInitParameter("insecure_grpc"));
+            sslCertificateFile = filterConfig.getInitParameter("ssl_certificate_file");
         } catch (Exception e) {
-            throw new ServletException(
-                    "Invalid agent connection information "
-                            + filterConfig.getInitParameter("agent_host")
-                            + ":"
-                            + filterConfig.getInitParameter("agent_port"));
+            throw new ServletException("Could not read config parameters", e);
         }
 
         try {
@@ -86,6 +86,11 @@ public class ApertureFilter implements Filter {
             builder.setPort(Integer.parseInt(agentPort));
             if (timeoutMs != null) {
                 builder.setDuration(Duration.ofMillis(Integer.parseInt(timeoutMs)));
+            }
+            if (insecureGrpc) {
+                builder.useInsecureGrpc();
+            } else if (sslCertificateFile != null && !sslCertificateFile.isEmpty()) {
+                builder.setSslCertificateFile(sslCertificateFile);
             }
 
             this.apertureSDK = builder.build();

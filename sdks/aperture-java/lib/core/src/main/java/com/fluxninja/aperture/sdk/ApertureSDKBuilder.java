@@ -5,12 +5,13 @@ import static com.fluxninja.aperture.sdk.Constants.LIBRARY_NAME;
 
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowControlServiceGrpc;
 import com.fluxninja.generated.envoy.service.auth.v3.AuthorizationGrpc;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.*;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +22,9 @@ public final class ApertureSDKBuilder {
     private Duration timeout;
     private String host;
     private int port;
-    private boolean useHttps = false;
+    private boolean useHttpsInOtlpExporter = false;
+    private boolean insecureGrpc = false;
+    private String certFile;
     private final List<String> blockedPaths;
     private boolean blockedPathsMatchRegex = false;
 
@@ -44,8 +47,18 @@ public final class ApertureSDKBuilder {
         return this;
     }
 
-    public ApertureSDKBuilder useHttps() {
-        this.useHttps = true;
+    public ApertureSDKBuilder useHttpsInOtlpExporter() {
+        this.useHttpsInOtlpExporter = true;
+        return this;
+    }
+
+    public ApertureSDKBuilder setSslCertificateFile(String filename) {
+        this.certFile = filename;
+        return this;
+    }
+
+    public ApertureSDKBuilder useInsecureGrpc() {
+        this.insecureGrpc = true;
         return this;
     }
 
@@ -95,9 +108,9 @@ public final class ApertureSDKBuilder {
             throw new ApertureSDKException("port needs to be set");
         }
 
-        String protocol = "http";
-        if (this.useHttps) {
-            protocol = "https";
+        String OtlpSpanExporterProtocol = "http";
+        if (this.useHttpsInOtlpExporter) {
+            OtlpSpanExporterProtocol = "https";
         }
 
         Duration timeout = this.timeout;
@@ -105,8 +118,28 @@ public final class ApertureSDKBuilder {
             timeout = DEFAULT_RPC_TIMEOUT;
         }
 
-        ManagedChannel channel =
-                ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
+        ChannelCredentials creds;
+        if (this.insecureGrpc) {
+            creds = InsecureChannelCredentials.create();
+        } else {
+            if (this.certFile == null || this.certFile.isEmpty()) {
+                creds = TlsChannelCredentials.create();
+            } else {
+                try {
+                    creds =
+                            TlsChannelCredentials.newBuilder()
+                                    .trustManager(new File(this.certFile))
+                                    .build();
+                } catch (IOException e) {
+                    // Maybe just add IOException to signature?
+                    throw new ApertureSDKException(e);
+                }
+            }
+        }
+
+        String target = host + ":" + port;
+        ManagedChannel channel = Grpc.newChannelBuilder(target, creds).build();
+
         FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient =
                 FlowControlServiceGrpc.newBlockingStub(channel);
         AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient =
@@ -114,7 +147,8 @@ public final class ApertureSDKBuilder {
 
         OtlpGrpcSpanExporter spanExporter =
                 OtlpGrpcSpanExporter.builder()
-                        .setEndpoint(String.format("%s://%s:%d", protocol, host, port))
+                        .setEndpoint(
+                                String.format("%s://%s:%d", OtlpSpanExporterProtocol, host, port))
                         .build();
         SdkTracerProvider traceProvider =
                 SdkTracerProvider.builder()
