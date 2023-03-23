@@ -26,6 +26,16 @@ func (circuit *Circuit) ToGraphView() *policymonitoringv1.CircuitView {
 	}
 }
 
+// TODO:
+// Need to make a few changes to the following code:
+// 1. Links should not be computed recursively by toGraphViewAux. Links within the children should not be part of links at the parent.
+// 2. When computing links at a tree certain links may reach up to the components in parent trees as well.
+// 3. Signals are uniquely identified by Signal.SignalID() which returns a runtime.SignalID:
+//
+//	type SignalID struct {
+//		SubCircuitID string
+//		SignalName   string
+//	}
 func toGraphViewAux(tree Tree) (t policymonitoringv1.Tree, rootIns map[string][]componentData, rootOuts map[string][]componentData) {
 	var components []*policymonitoringv1.Tree
 	var links []*policymonitoringv1.Link
