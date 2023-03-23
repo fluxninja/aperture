@@ -1523,9 +1523,9 @@ spec:
                         type: object
                       custom_metrics:
                         additionalProperties:
-                          description: CustomMetricsConfig defines receivers, processors
-                            and single metrics pipeline, which will be exported to
-                            the controller prometheus. swagger:model
+                          description: CustomMetricsConfig defines receivers, processors,
+                            and single metrics pipeline which will be exported to
+                            the controller prometheus.
                           properties:
                             pipeline:
                               description: Pipeline is an OTEL metrics pipeline definition,

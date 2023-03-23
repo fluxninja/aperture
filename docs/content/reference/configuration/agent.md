@@ -487,6 +487,39 @@ AgentInfoConfig is the configuration for the agent group and other agent attribu
 
 AgentOTELConfig is the configuration for Agent's OTEL collector.
 
+Example configuration:
+
+    otel:
+    	batch_alerts:
+    		send_batch_max_size: 100
+    		send_batch_size: 100
+    		timeout: 1s
+    	batch_prerollup:
+    		send_batch_max_size: 10000
+    		send_batch_size: 10000
+    		timeout: 10s
+    	batch_postrollup:
+    		send_batch_max_size: 100
+    		send_batch_size: 100
+    		timeout: 1s
+    	custom_metrics:
+    		rabbitmq:
+    			pipeline:
+    				processors:
+    					- batch
+    				receivers:
+    					- rabbitmq
+    			processors:
+    				batch:
+    					send_batch_size: 10
+    	 				timeout: 10s
+    			receivers:
+    	 			rabbitmq:
+    	 				collection_interval: 10s
+    					endpoint: http://<rabbitmq-svc-fqdn>:15672
+    					password: secretpassword
+    					username: admin
+
 <dl>
 <dt>custom_metrics</dt>
 <dd>
@@ -731,9 +764,7 @@ https://github.com/kubernetes-sigs/kubebuilder/issues/528
 
 ### CustomMetricsConfig {#custom-metrics-config}
 
-CustomMetricsConfig defines receivers, processors and single metrics pipeline,
-
-which will be exported to the controller prometheus.
+CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller prometheus.
 
 <dl>
 <dt>pipeline</dt>

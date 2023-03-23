@@ -17,8 +17,43 @@ import (
 //     "$ref": "#/definitions/AgentOTELConfig"
 
 // AgentOTELConfig is the configuration for Agent's OTEL collector.
-// swagger:model
+//
+// Example configuration:
+//
+//	otel:
+//		batch_alerts:
+//			send_batch_max_size: 100
+//			send_batch_size: 100
+//			timeout: 1s
+//		batch_prerollup:
+//			send_batch_max_size: 10000
+//			send_batch_size: 10000
+//			timeout: 10s
+//		batch_postrollup:
+//			send_batch_max_size: 100
+//			send_batch_size: 100
+//			timeout: 1s
+//		custom_metrics:
+//			rabbitmq:
+//				pipeline:
+//					processors:
+//						- batch
+//					receivers:
+//						- rabbitmq
+//				processors:
+//					batch:
+//						send_batch_size: 10
+//		 				timeout: 10s
+//				receivers:
+//		 			rabbitmq:
+//		 				collection_interval: 10s
+//						endpoint: http://<rabbitmq-svc-fqdn>:15672
+//						password: secretpassword
+//						username: admin
+//
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type AgentOTELConfig struct {
 	otelconfig.CommonOTELConfig `json:",inline"`
 	// BatchPrerollup configures batch prerollup processor.
@@ -34,8 +69,9 @@ type AgentOTELConfig struct {
 }
 
 // BatchPrerollupConfig defines configuration for OTEL batch processor.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type BatchPrerollupConfig struct {
 	// Timeout sets the time after which a batch will be sent regardless of size.
 	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"10s"`
@@ -49,8 +85,9 @@ type BatchPrerollupConfig struct {
 }
 
 // BatchPostrollupConfig defines configuration for OTEL batch processor.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type BatchPostrollupConfig struct {
 	// Timeout sets the time after which a batch will be sent regardless of size.
 	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`
@@ -63,10 +100,10 @@ type BatchPostrollupConfig struct {
 	SendBatchMaxSize uint32 `json:"send_batch_max_size" validate:"gte=0" default:"100"`
 }
 
-// CustomMetricsConfig defines receivers, processors and single metrics pipeline,
-// which will be exported to the controller prometheus.
-// swagger:model
+// CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller prometheus.
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type CustomMetricsConfig struct {
 	// Receivers define receivers to be used in custom metrics pipelines. This should
 	// be in OTEL format - https://opentelemetry.io/docs/collector/configuration/#receivers.
@@ -116,8 +153,9 @@ func (in *Components) DeepCopy() *Components {
 }
 
 // CustomMetricsPipelineConfig defines a custom metrics pipeline.
-// swagger:model
 // +kubebuilder:object:generate=true
+//
+//swagger:model
 type CustomMetricsPipelineConfig struct {
 	Receivers  []string `json:"receivers"`
 	Processors []string `json:"processors"`
