@@ -36,6 +36,7 @@ message SourceTarget {
 
 message CircuitView {
   Tree tree = 1;
+  // Remove
   repeated ComponentView leaf_components = 2;
 }
 
@@ -50,4 +51,5 @@ message Link {
   SourceTarget source = 1;
   SourceTarget target = 2;
   string signal_name = 3;
+  // TODO: Add sub_circuit_id.
 }

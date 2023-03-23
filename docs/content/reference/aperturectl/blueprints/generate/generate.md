@@ -30,6 +30,7 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 
 ```
       --apply                Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed
+      --graph-depth int      Max depth of the graph when generating DOT and Mermaid files
   -h, --help                 help for generate
       --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
       --name string          Name of the Aperture Blueprint to generate Aperture Policy resources for

@@ -27,6 +27,7 @@ func init() {
 	generateCmd.Flags().BoolVar(&noYAMLModeline, "no-yaml-modeline", false, "Do not add YAML language server modeline to generated YAML files")
 	generateCmd.Flags().BoolVar(&noValidate, "no-validation", false, "Do not validate values.yaml file")
 	generateCmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing output directory")
+	generateCmd.Flags().IntVar(&graphDepth, "graph-depth", 0, "Max depth of the graph when generating DOT and Mermaid files")
 }
 
 var generateCmd = &cobra.Command{
@@ -233,7 +234,7 @@ func saveYAMLFile(categoryName, outputDir, filename string, content map[string]i
 		}
 	}
 
-	return generateGraphs(yamlBytes, outputDir, outputFilePath)
+	return generateGraphs(yamlBytes, outputDir, outputFilePath, graphDepth)
 }
 
 func saveJSONFile(_, path, filename string, content map[string]interface{}) error {
@@ -293,7 +294,7 @@ func setupOutputDir(outputDir string) (string, error) {
 	return outputDir, nil
 }
 
-func generateGraphs(content []byte, outputDir string, policyPath string) error {
+func generateGraphs(content []byte, outputDir string, policyPath string, depth int) error {
 	policy := &policyv1alpha1.Policy{}
 	err := yaml.Unmarshal(content, policy)
 	if err != nil || policy.Kind != "Policy" {
@@ -323,11 +324,11 @@ func generateGraphs(content []byte, outputDir string, policyPath string) error {
 		return nil
 	}
 
-	if err = utils.GenerateDotFile(circuit, dotFilePath); err != nil {
+	if err = utils.GenerateDotFile(circuit, dotFilePath, depth); err != nil {
 		return err
 	}
 
-	if err = utils.GenerateMermaidFile(circuit, mmdFilePath); err != nil {
+	if err = utils.GenerateMermaidFile(circuit, mmdFilePath, depth); err != nil {
 		return err
 	}
 

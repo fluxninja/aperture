@@ -278,7 +278,8 @@ type CircuitView struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Tree           *Tree            `protobuf:"bytes,1,opt,name=tree,proto3" json:"tree,omitempty"`
+	Tree *Tree `protobuf:"bytes,1,opt,name=tree,proto3" json:"tree,omitempty"`
+	// Remove
 	LeafComponents []*ComponentView `protobuf:"bytes,2,rep,name=leaf_components,json=leafComponents,proto3" json:"leaf_components,omitempty"`
 }
 
@@ -399,7 +400,7 @@ type Link struct {
 
 	Source     *SourceTarget `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
 	Target     *SourceTarget `protobuf:"bytes,2,opt,name=target,proto3" json:"target,omitempty"`
-	SignalName string        `protobuf:"bytes,3,opt,name=signal_name,json=signalName,proto3" json:"signal_name,omitempty"`
+	SignalName string        `protobuf:"bytes,3,opt,name=signal_name,json=signalName,proto3" json:"signal_name,omitempty"` // TODO: Add sub_circuit_id.
 }
 
 func (x *Link) Reset() {
