@@ -96,8 +96,6 @@ plugin is already installed:
    default value for it is 500m which is 500 milliseconds. For example, use the
    following command in bash:
 
-   Below is an example to do it with `bash`:
-
    :::info
 
    The format for the `Timeout` parameter can be found at the following
@@ -117,3 +115,45 @@ plugin is already installed:
 
    You can also set this property via its environment variable equivalent:
    `KONG_PLUGINS`.
+
+4. Enable the Aperture Custom plugin for all the services and routes by creating
+   a YAML file like below:
+
+   ```yaml
+   _format_version: "3.0"
+   _transform: true
+
+   plugins:
+   - name: aperture-plugin
+
+   services:
+   - name: service1-demo-app
+   url: http://service1-demo-app.demoapp.svc.cluster.local:80/request
+   retries: 3
+   routes:
+   - name: service1
+      paths:
+      - /service1
+   - name: service2-demo-app
+   url: http://service2-demo-app.demoapp.svc.cluster.local:80/request
+   retries: 3
+   routes:
+   - name: service2
+      paths:
+      - /service2
+   - name: service3-demo-app
+   url: http://service3-demo-app.demoapp.svc.cluster.local:80/request
+   retries: 3
+   routes:
+   - name: service3
+      paths:
+      - /service3
+   ```
+
+   This adds the provided services and routes on Kong and enables the Aperture
+   Pluing for them. This file can be passed by setting environment variable:
+   `KONG_DECLARATIVE_CONFIG=ABOVE_FILENAME`.
+
+   Alternatively, you can also enable the Aperture Custom plugin per service or
+   route using the
+   [Kong Gateway’s Admin API](https://docs.konghq.com/gateway/latest/admin-api/#plugin-object).
