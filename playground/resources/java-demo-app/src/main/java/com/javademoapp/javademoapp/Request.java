@@ -5,25 +5,25 @@ import java.util.List;
 
 public class Request {
 
-    private List<SubrequestChain> request;
+    private List<List<Subrequest>> request;
 
     public Request() {
-        this.request = new ArrayList<>();
+        this.request = new ArrayList<List<Subrequest>>();
     }
 
-    public Request(List<SubrequestChain> request) {
+    public Request(List<List<Subrequest>> request) {
         this.request = request;
     }
 
-    public List<SubrequestChain> getRequest() {
+    public List<List<Subrequest>> getRequest() {
         return request;
     }
 
-    public void setRequest(List<SubrequestChain> request) {
+    public void setRequest(List<List<Subrequest>> request) {
         this.request = request;
     }
 
-    public void addRequest(SubrequestChain chain) {
+    public void addRequest(List<Subrequest> chain) {
         this.request.add(chain);
     }
 }

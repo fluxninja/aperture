@@ -5,9 +5,16 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.fluxninja.aperture.sdk.ApertureSDK;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
@@ -17,6 +24,7 @@ import com.fluxninja.aperture.sdk.FlowStatus;
 public class ApertureFeatureFilter implements Filter {
 
     private ApertureSDK apertureSDK;
+    private Logger log = LoggerFactory.getLogger(ApertureFeatureFilter.class);
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException, IOException {
@@ -25,21 +33,24 @@ public class ApertureFeatureFilter implements Filter {
         labels.put("instance", System.getenv().getOrDefault("HOSTNAME", "instance-1"));
         labels.put("ip", req.getRemoteAddr());
 
-        Flow flow = this.apertureSDK.startFlow("awesomeFeature", labels);
-        HttpServletRequest request = (HttpServletRequest) req;
-        HttpServletResponse response = (HttpServletResponse) res;
-
         // See whether flow was accepted by Aperture Agent.
         try {
+            log.debug("Starting Aperture SDK flow");
+            Flow flow = this.apertureSDK.startFlow("awesomeFeature", labels);
+            HttpServletRequest request = (HttpServletRequest) req;
+            HttpServletResponse response = (HttpServletResponse) res;
+
             if (flow.accepted()) {
+                log.debug("Flow accepted by Aperture Agent");
                 chain.doFilter(request, response);
                 flow.end(FlowStatus.OK);
             } else {
+                log.debug("Flow rejected by Aperture Agent");
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Request denied");
                 flow.end(FlowStatus.Error);
             }
         } catch (ApertureSDKException e) {
-            e.printStackTrace();
+            log.error("Aperture SDK error: "+ e.getMessage());
         }
     }
 
@@ -56,10 +67,13 @@ public class ApertureFeatureFilter implements Filter {
                     .setDuration(Duration.ofMillis(1000))
                     .build();
         } catch (ApertureSDKException e) {
-            e.printStackTrace();
-            throw new ServletException("Couldn't create aperture SDK");
+            String message = "Couldn't create aperture SDK";
+            log.error(message);
+            throw new ServletException(message);
         } catch (Exception e) {
-            throw new ServletException("Invalid agent connection information ");
+            String message = "Invalid agent connection information";
+            log.error(message);
+            throw new ServletException(message);
         }
     }
 

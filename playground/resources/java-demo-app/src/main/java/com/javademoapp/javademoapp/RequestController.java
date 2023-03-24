@@ -1,21 +1,28 @@
 package com.javademoapp.javademoapp;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -30,6 +37,7 @@ public class RequestController {
     private  int concurrency = Integer.parseInt(System.getenv().getOrDefault("CONCURRENCY", DEFAULT_CONCURRENCY));
     private  Duration latency = Duration.ofMillis(Long.parseLong(System.getenv().getOrDefault("LATENCY", DEFAULT_LATENCY)));
     private  double rejectRatio = Double.parseDouble(System.getenv().getOrDefault("REJECT_RATIO", DEFAULT_REJECT_RATIO));
+    private Logger log = LoggerFactory.getLogger(RequestController.class);
 
     // Semaphore for limiting concurrent clients
     private Semaphore limitClients = new Semaphore(concurrency);
@@ -37,23 +45,31 @@ public class RequestController {
     @RequestMapping(value = "/super", method = RequestMethod.GET)
     // /super endpoint is protected by a Filter created using Aperture SDK feature flow
     public String hello() {
-        return "Hello World";
+        String message = "Hello World";
+        log.info(message);
+        return message;
     }
 
     @RequestMapping(value = "/super2", method = RequestMethod.GET)
     // /super2 endpoint is protected by imported, ready-to-use Aperture Filter
     public String hello2() {
-        return "Hello World 2";
+        String message = "Hello World 2";
+        log.info(message);
+        return message;
     }
 
     @RequestMapping(value = "/health", method = RequestMethod.GET)
     public String health() {
-        return "Healthy";
+        String message = "Healthy";
+        log.info(message);
+        return message;
     }
 
     @RequestMapping(value = "/connected", method = RequestMethod.GET)
     public String connected() {
-        return "";
+        String message = "Connected OK";
+        log.info(message);
+        return message;
     }
 
     @Bean
@@ -61,7 +77,7 @@ public class RequestController {
         FilterRegistrationBean<ApertureFeatureFilter> registrationBean = new FilterRegistrationBean<>();
 
         registrationBean.setFilter(new ApertureFeatureFilter());
-        registrationBean.addUrlPatterns("/super2");
+        registrationBean.addUrlPatterns("/request");
         registrationBean.addInitParameter("agent_host", System.getenv().getOrDefault("FN_AGENT_HOST", DEFAULT_HOST));
         registrationBean.addInitParameter("agent_port", System.getenv().getOrDefault("FN_AGENT_PORT", DEFAULT_AGENT_PORT));
 
@@ -70,13 +86,14 @@ public class RequestController {
 
     @GetMapping("/")
     public String index() {
-        return "Your request has been received!";
+        String message = "Your request has been received!";
+        log.info(message);
+        return message;
     }
 
-    @PostMapping("/process")
+    @PostMapping("/request")
     public String handlePostRequest(@RequestBody String payload, HttpServletRequest request, HttpServletResponse response) throws ApertureSDKException {
         Map<String,String> labels = new HashMap<String,String>();
-
         labels.put("app", "demoapp");
         labels.put("instance", getInstanceName());
         labels.put("ip", request.getRemoteAddr());
@@ -84,20 +101,23 @@ public class RequestController {
         // Randomly reject requests
         if (rejectRatio > 0 && Math.random() < rejectRatio) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
-            return "Request rejected.";
+            String message = "Request rejected";
+            log.debug(message);
+            return message;
         }
 
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            // Processing the request object's subrequests
-            Request requestObj = objectMapper.readValue(payload, Request.class);
-            for (SubrequestChain chain : requestObj.getRequest()) {
-                if (chain.getSubrequest().size() == 0) {
+            Request requestObj = new ObjectMapper().readValue(payload, Request.class);
+            List<List<Subrequest>> chains = requestObj.getRequest();
+            for (List<Subrequest> chain : chains) {
+                if (chain.size() == 0) {
+                    String msg = "Empty Chain";
                     response.setStatus(HttpStatus.BAD_REQUEST.value());
-                    response.getWriter().write("Empty Chain");
-                    return "Empty Chain";
+                    response.getWriter().write(msg);
+                    log.info(msg);
+                    return msg;
                 }
-                String requestDestination = chain.getSubrequest().get(0).getDestination();
+                String requestDestination = chain.get(0).getDestination();
                 // TODO Add check for req Dest != Hostname
                 return processChain(chain);
             }
@@ -109,27 +129,32 @@ public class RequestController {
 
         } catch (Exception e) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
-            return "Error occurred" + e.getMessage();
+            String msg = "Error occurred: " + e.getMessage();
+            log.error(msg);
+            return msg;
         }
+
+        log.debug("Success");
         return "Success";
     }
 
-    private String processChain(SubrequestChain chain){
-        if (chain.getSubrequest().size() == 1) {
-            return processRequest(chain.getSubrequest().get(0));
+    private String processChain(List<Subrequest> chain){
+        if (chain.size() == 1) {
+            return processRequest(chain.get(0));
         }
 
-        SubrequestChain trimmedSubrequestChain = new SubrequestChain();
-        for (int i = 1; i < chain.getSubrequest().size(); i++) {
-            trimmedSubrequestChain.addSubrequest(chain.getSubrequest().get(i));
+        List<Subrequest> trimmedChain = new ArrayList<>();
+        for (int i = 1; i < chain.size(); i++) {
+            trimmedChain.add(chain.get(i));
         }
 
         Request trimmedRequest = new Request();
-        trimmedRequest.addRequest(trimmedSubrequestChain);
-        String requestForwardingDestination = chain.getSubrequest().get(1).getDestination();
+        trimmedRequest.addRequest(trimmedChain);
+        String requestForwardingDestination = chain.get(1).getDestination();
 
         return forwardRequest(trimmedRequest, requestForwardingDestination);
     }
+
     private String processRequest(Subrequest request){
         // Limit concurrent clients
         if (limitClients != null && concurrency > 0) {
@@ -144,7 +169,7 @@ public class RequestController {
                 // Fake Overload
                 Thread.sleep(latency.toMillis());
             } catch (InterruptedException e) {
-                System.out.println("Error while sleeping: " + e.getMessage());
+                log.error("Error while sleeping: " + e.getMessage());
             }
         }
 
@@ -152,34 +177,43 @@ public class RequestController {
         if (limitClients != null) {
             limitClients.release();
         }
+        log.debug("processRequest success");
         return "Success";
     }
+
     private String forwardRequest(Request request, String destination) {
         String requestJson;
         try {
             requestJson = new ObjectMapper().writeValueAsString(request);
         } catch (JsonProcessingException e) {
-            return "Error while parsing request: " + e.getMessage();
+            String msg = "Error while parsing request: " + e.getMessage();
+            log.error(msg);
+            return msg;
         }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("X-Forwarding-Instance", getInstanceName());
 
-        String address = String.format("http://%s/request", destination);
+        String address = String.format("http://%s", destination);
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(address, HttpMethod.POST, entity, String.class);
         if (response.getStatusCode() != HttpStatus.OK) {
-            return "Error while forwarding request: " + response.getStatusCode();
+            String msg = "Error while forwarding request: " +response.getStatusCode();
+            log.error(msg);
+            return msg;
         }
 
+        log.debug("forwardRequest success");
         return "Success";
     }
+
     private String getInstanceName() {
         return System.getenv().getOrDefault("HOSTNAME", DEFAULT_HOST);
     }
+
     public void setRejectRatio(double rejectRatio) {
         this.rejectRatio = rejectRatio;
     }
