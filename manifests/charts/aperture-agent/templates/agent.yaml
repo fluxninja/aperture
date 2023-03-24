@@ -15,7 +15,7 @@ metadata:
   {{- end }}
 spec:
   image: {{ omit .Values.agent.image "tag" | toYaml | nindent 4 }}
-    tag: {{ default (trimPrefix "v" .Chart.AppVersion) .Values.agent.image.tag }}
+    tag: {{ default (trimPrefix "v" .Chart.AppVersion) .Values.agent.image.tag | quote }}
   {{- if .Values.agent.service.annotations }}
   service:
     annotations: {{ .Values.agent.service.annotations | toYaml | indent 6 }}
