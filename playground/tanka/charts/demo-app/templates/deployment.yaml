@@ -55,7 +55,13 @@ spec:
             #  value: "9001"
             - name: HOSTNAME
               # TODO: Don't hardcode domain
+              {{- if .Values.simplesrv.hostname }}
+              value: "{{ .Values.simplesrv.hostname }}"
+              {{- else }}
               value: "{{ include "demo-app.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local"
+              {{- end }}
+            - name: SIMPLE_SERVICE_REJECT_RATIO
+              value: "{{ .Values.simplesrv.rejectRatio }}"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -230,4 +230,4 @@ repos:
       - id: codespell
         args:
           - --ignore-words=./.codespellignore
-        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*|docs/content/reference/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*|blueprints/gen/.*)$
+        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*|docs/content/reference/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*|blueprints/gen/.*|playground/resources/nginx/.*)$

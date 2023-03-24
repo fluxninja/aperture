@@ -508,6 +508,76 @@ definitions:
             kubernetes_replicas:
                 $ref: '#/definitions/AutoScalerKubernetesReplicas'
         type: object
+    CheckHTTPRequest:
+        properties:
+            destination:
+                $ref: '#/definitions/SocketAddress'
+                description: |-
+                    The destination of a network activity, such as accepting a TCP connection.
+                    In a multi hop network activity, the destination represents the receiver of
+                    the last hop.
+            request:
+                $ref: '#/definitions/CheckHTTPRequestHttpRequest'
+                description: Represents a network request, such as an HTTP request.
+            source:
+                $ref: '#/definitions/SocketAddress'
+                description: |-
+                    The source of a network activity, such as starting a TCP connection.
+                    In a multi hop network activity, the source represents the sender of the
+                    last hop.
+        type: object
+    CheckHTTPRequestHttpRequest:
+        description: |-
+            This message defines attributes for an HTTP request.
+            HTTP/1.x, HTTP/2, gRPC are all considered as HTTP requests.
+        properties:
+            body:
+                description: The HTTP request body.
+                type: string
+            headers:
+                additionalProperties:
+                    type: string
+                description: The HTTP request headers.
+                type: object
+            host:
+                description: The HTTP request ``Host`` header value.
+                type: string
+            method:
+                description: The HTTP request method, such as ``GET``, ``POST``.
+                type: string
+            path:
+                description: |-
+                    The request target, as it appears in the first line of the HTTP request. This includes
+                    the URL path and query-string. No decoding is performed.
+                type: string
+            protocol:
+                description: The network protocol used with the request, such as "HTTP/1.0", "HTTP/1.1", or "HTTP/2".
+                type: string
+            scheme:
+                description: The HTTP URL scheme, such as ``http`` and ``https``.
+                type: string
+            size:
+                description: The HTTP request size in bytes. If unknown, it must be -1.
+                format: int64
+                type: string
+        type: object
+    CheckHTTPResponse:
+        properties:
+            denied_response:
+                $ref: '#/definitions/DeniedHttpResponse'
+                description: Supplies http attributes for a denied response.
+            dynamic_metadata:
+                description: |-
+                    Optional response metadata that will be emitted as dynamic metadata to be consumed by the next
+                    filter.
+                type: object
+            ok_response:
+                $ref: '#/definitions/OkHttpResponse'
+                description: Supplies http attributes for an ok response.
+            status:
+                $ref: '#/definitions/googlerpcStatus'
+                title: Status ``OK`` allows the request. Any other status indicates the request should be denied
+        type: object
     CheckResponse:
         description: CheckResponse contains fields that represent decision made by Check call.
         properties:
@@ -1016,6 +1086,28 @@ definitions:
             output:
                 $ref: '#/definitions/OutPort'
                 description: Selected signal (1.0 or 0.0).
+        type: object
+    DeniedHttpResponse:
+        description: HTTP attributes for a denied response.
+        properties:
+            body:
+                description: |-
+                    This field allows the authorization service to send a response body data
+                    to the downstream client.
+                type: string
+            headers:
+                additionalProperties:
+                    type: string
+                description: |-
+                    This field allows the authorization service to send HTTP response headers
+                    to the downstream client.
+                type: object
+            status:
+                description: |-
+                    This field allows the authorization service to send an HTTP response status code to the
+                    downstream client. If not set, Envoy sends ``403 Forbidden`` HTTP status code by default.
+                format: int32
+                type: integer
         type: object
     Differentiator:
         description: Differentiator calculates rate of change per tick.
@@ -2449,6 +2541,17 @@ definitions:
                 format: int64
                 type: string
         type: object
+    OkHttpResponse:
+        description: HTTP attributes for an OK response.
+        properties:
+            dynamic_metadata:
+                type: object
+            headers:
+                additionalProperties:
+                    type: string
+                description: HTTP entity headers in addition to the original request headers.
+                type: object
+        type: object
     Or:
         description: |-
             Logical OR.
@@ -3429,6 +3532,24 @@ definitions:
                 format: int64
                 type: string
         type: object
+    SocketAddress:
+        properties:
+            address:
+                description: The address for this socket.
+                type: string
+            port:
+                description: The port for this socket.
+                format: int64
+                type: integer
+            protocol:
+                $ref: '#/definitions/SocketAddressProtocol'
+        type: object
+    SocketAddressProtocol:
+        default: TCP
+        enum:
+            - TCP
+            - UDP
+        type: string
     Stats:
         properties:
             backups:
@@ -3951,6 +4072,29 @@ paths:
                         $ref: '#/definitions/googlerpcStatus'
             tags:
                 - aperture-agent
+    /v1/flowcontrol/checkhttp:
+        post:
+            operationId: FlowControlServiceHTTP_CheckHTTP
+            parameters:
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/CheckHTTPRequest'
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/CheckHTTPResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            summary: |-
+                Performs Aperture Flowcontrol check based on the fields received with the
+                incoming request, and returns status `OK` or not `OK`.
+            tags:
+                - FlowControlServiceHTTP
     /v1/flowcontrol/controlpoints:
         get:
             operationId: FlowControlPointsService_GetControlPoints
@@ -4177,6 +4321,7 @@ tags:
     - name: Controller
     - name: DistCacheService
     - name: FlowControlService
+    - name: FlowControlServiceHTTP
     - name: InfoService
     - name: PeerDiscoveryService
     - name: PolicyService

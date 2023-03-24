@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"go.opentelemetry.io/otel"
@@ -173,7 +174,11 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		requestDestination := chain.subrequests[0].Destination
-		if requestDestination != h.hostname {
+		if !strings.HasPrefix(requestDestination, "http") {
+			requestDestination = "http://" + requestDestination
+		}
+		requestDomain, err := url.Parse(requestDestination)
+		if requestDomain.Hostname() != h.hostname {
 			log.Autosample().Warn().Err(err).Msg("Invalid destination")
 			http.Error(w, "Invalid message destination", http.StatusBadRequest)
 			return
@@ -225,7 +230,7 @@ func (h RequestHandler) processRequest(s Subrequest) (int, error) {
 }
 
 func (h RequestHandler) forwardRequest(ctx context.Context, destinationHostname string, requestBody Request) (int, error) {
-	address := fmt.Sprintf("http://%s/request", destinationHostname)
+	address := fmt.Sprintf("http://%s", destinationHostname)
 
 	jsonRequest, err := json.Marshal(requestBody)
 	if err != nil {

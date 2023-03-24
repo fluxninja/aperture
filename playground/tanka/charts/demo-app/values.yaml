@@ -5,10 +5,32 @@
 replicaCount: 1
 
 simplesrv:
+  rejectRatio: 0.05
+  hostname: ~
   image:
     repository: fluxninja/demo-app
     pullPolicy: IfNotPresent
     tag: "latest"
+
+nginx:
+  enabled: false
+  resources: {}
+  replicaCount: 1
+  image:
+    repository: fluxninja/demo-app-nginx
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  agentEndpoint: "http://aperture-agent.aperture-agent.svc.cluster.local:8080"
+
+kong:
+  enabled: false
+  resources: {}
+  replicaCount: 1
+  image:
+    repository: fluxninja/demo-app-kong
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  agentEndpoint: "http://aperture-agent.aperture-agent.svc.cluster.local:8080"
 
 proxy:
   image:

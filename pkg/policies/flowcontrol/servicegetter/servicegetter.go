@@ -16,6 +16,7 @@ import (
 type ServiceGetter interface {
 	ServicesFromContext(ctx context.Context) []string
 	ServicesFromSocketAddress(addr *corev3.SocketAddress) []string
+	ServicesFromAddress(addr string) []string
 }
 
 // FromEntities creates a new Entities-powered ServiceGetter.
@@ -73,23 +74,24 @@ func (sg *ecServiceGetter) servicesFromContext(ctx context.Context) (svcs []stri
 
 // ServicesFromSocketAddress returns list of services associated with IP extracted from SocketAddress.
 func (sg *ecServiceGetter) ServicesFromSocketAddress(addr *corev3.SocketAddress) []string {
-	svcs, ok := sg.sericesFromSocketAddress(addr)
-	sg.metrics.inc(ok)
-	if !ok {
+	svcs := sg.ServicesFromAddress(addr.GetAddress())
+	sg.metrics.inc(svcs != nil)
+	if svcs == nil {
 		svcs = []string{"UNKNOWN"}
 	}
 	return svcs
 }
 
-func (sg *ecServiceGetter) sericesFromSocketAddress(addr *corev3.SocketAddress) (svcs []string, ok bool) {
-	entity, err := sg.entities.GetByIP(addr.GetAddress())
+// ServicesFromAddress returns list of services associated with given IP.
+func (sg *ecServiceGetter) ServicesFromAddress(addr string) []string {
+	entity, err := sg.entities.GetByIP(addr)
 	if err != nil {
 		if sg.ecHasDiscovery {
-			log.Sample(noEntitySampler).Warn().Err(err).Str("clientIP", addr.GetAddress()).Msg("cannot get services")
+			log.Sample(noEntitySampler).Warn().Err(err).Str("clientIP", addr).Msg("cannot get services")
 		}
-		return nil, false
+		return nil
 	}
-	return entity.Services, true
+	return entity.Services
 }
 
 var noEntitySampler = log.NewRatelimitingSampler()
@@ -130,5 +132,10 @@ func (sg emptyServiceGetter) ServicesFromContext(ctx context.Context) []string {
 
 // ServicesFromSocketAddress implements ServiceGetter interface for emptyServiceGetter.
 func (sg emptyServiceGetter) ServicesFromSocketAddress(addr *corev3.SocketAddress) []string {
+	return nil
+}
+
+// ServicesFromAddress implements ServiceGetter interface for emptyServiceGetter.
+func (sg emptyServiceGetter) ServicesFromAddress(addr string) []string {
 	return nil
 }

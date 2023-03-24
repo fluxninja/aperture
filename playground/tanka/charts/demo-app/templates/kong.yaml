@@ -1,0 +1,46 @@
+{{- if .Values.kong.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: kong-server
+spec:
+  selector:
+    app: kong-server
+  ports:
+  - name: client
+    port: 8000
+    protocol: TCP
+    targetPort: 8000
+  - name: admin
+    port: 8001
+    protocol: TCP
+    targetPort: 8001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kong-server
+spec:
+  replicas: {{ .Values.kong.replicaCount }}
+  selector:
+    matchLabels:
+      app: kong-server
+  template:
+    metadata:
+      labels:
+        app: kong-server
+    spec:
+      containers:
+        - name: kong-server
+          image: {{ .Values.kong.image.repository }}:{{ .Values.kong.image.tag }}
+          imagePullPolicy: {{ .Values.kong.image.pullPolicy }}
+          ports:
+            - name: client
+              containerPort: 8000
+            - name: admin
+              containerPort: 8001
+          env:
+            - name: APERTURE_AGENT_ENDPOINT
+              value: {{ .Values.kong.agentEndpoint }}
+          resources: {{ toYaml .Values.kong.resources | nindent 12 }}
+{{- end -}}

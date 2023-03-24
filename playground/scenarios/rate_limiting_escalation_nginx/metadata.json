@@ -1,0 +1,54 @@
+{
+  "renderer": "tanka",
+  "tkenv": "playground/tanka/apps/demo-app",
+  "env_vars": {
+    "ENABLE_DEMO_APP_NGINX": "true"
+  },
+  "aperture_policies": [
+    {
+      "blueprint_name": "policies/latency-aimd-concurrency-limiting",
+      "policy_name": "service1-demo-app",
+      "values_file": "policies/service1-demo-app.yaml",
+      "dashboard_mixin_dir": "dashboards/"
+    }
+  ],
+  "images": [
+    {
+      "ref": "demo-app",
+      "context": "playground/resources/demo-app/",
+      "ssh": "default"
+    },
+    {
+      "ref": "demo-app-nginx",
+      "context": "./",
+      "dockerfile": "playground/resources/nginx/Dockerfile",
+      "ssh": "default"
+    }
+  ],
+  "child_resources": [
+    {
+      "workload": "service1-demo-app",
+      "resource_deps": ["cluster-bootstrap"],
+      "extra_objects": ["service1-demo-app:serviceaccount"]
+    },
+    {
+      "workload": "service2-demo-app",
+      "resource_deps": ["cluster-bootstrap"],
+      "extra_objects": ["service2-demo-app:serviceaccount"]
+    },
+    {
+      "workload": "service3-demo-app",
+      "resource_deps": ["cluster-bootstrap"],
+      "extra_objects": ["service3-demo-app:serviceaccount"]
+    },
+    {
+      "workload": "nginx-server",
+      "resource_deps": [
+        "cluster-bootstrap",
+        "service1-demo-app",
+        "service2-demo-app",
+        "service3-demo-app"
+      ]
+    }
+  ]
+}

@@ -15,7 +15,7 @@ import {DownloadScript} from '../installation/agent/bare_metal.md';
 ```
 
 The Aperture CLI is available as a binary executable for all major platforms,
-the binaries can be downloaded form GitHub <a
+the binaries can be downloaded from GitHub <a
 href={`https://github.com/fluxninja/aperture/releases/tag/${apertureVersion}`}>Release
 Page</a>.
 

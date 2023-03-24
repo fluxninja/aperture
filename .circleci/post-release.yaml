@@ -266,6 +266,23 @@ jobs:
             git push --set-upstream origin "${branch}"
             gh pr create --title "${msg}" --body "" --label "pr-pull"
 
+  publish-aperture-lua:
+    parameters:
+      tag:
+        type: string
+        description: What git tag to use when tagging remote repository
+    executor: base-cimg-executor
+    environment:
+      VERSION: <<parameters.tag>>
+    steps:
+      - checkout
+      - run: *install-gh-cli
+      - run:
+          name: Attach package to release
+          command: |
+            tar -czvf aperture-lua.tar.gz gateways/lua/
+            gh release upload "${VERSION}" "aperture-lua.tar.gz" --repo=fluxninja/aperture
+
 workflows:
   version: 2
 
@@ -327,6 +344,11 @@ workflows:
               ignore: /^.*-rc.*/
           tag: << pipeline.git.tag >>
           deployment-key: "a4:df:98:54:5d:18:ba:a1:01:66:88:e2:26:e3:f2:eb"
+
+      - publish-aperture-lua:
+          filters: *release-filters
+          name: aperture-publish-lua-module
+          tag: << pipeline.git.tag >>
 
 commands:
   asdf_install:

@@ -84,6 +84,15 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 			}
 
 			internal.AddEnvoySpecificLabels(attributes)
+		} else if sourceStr == otelconsts.ApertureSourceLua {
+			success := otelcollector.GetStruct(attributes, otelconsts.ApertureCheckResponseLabel, checkResponse, []string{""})
+			if !success {
+				log.Sample(noEnvoyCheckResponseSampler).Warn().
+					Msg("aperture check response label not found in Lua access logs")
+				return otelcollector.Discard
+			}
+
+			internal.AddLuaSpecificLabels(attributes)
 		} else {
 			log.Sample(unrecognizedSourceLabelSampler).Warn().
 				Msg("aperture source label not recognized")
@@ -101,6 +110,9 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 			internal.EnforceIncludeListSDK(attributes)
 		} else if sourceStr == otelconsts.ApertureSourceEnvoy {
 			p.updateMetrics(attributes, checkResponse, []string{otelconsts.EnvoyMissingAttributeValue})
+			internal.EnforceIncludeListHTTP(attributes)
+		} else if sourceStr == otelconsts.ApertureSourceLua {
+			p.updateMetrics(attributes, checkResponse, []string{otelconsts.LuaMissingAttributeValue})
 			internal.EnforceIncludeListHTTP(attributes)
 		}
 
