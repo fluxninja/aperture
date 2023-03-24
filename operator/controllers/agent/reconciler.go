@@ -406,6 +406,12 @@ func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *agentv1al
 		return nil
 	}
 
+	if instance.Spec.Sidecar.Enabled {
+		instance.Spec.ConfigSpec.FluxNinja.InstallationMode = "KUBERNETES_SIDECAR"
+	} else {
+		instance.Spec.ConfigSpec.FluxNinja.InstallationMode = "KUBERNETES_DAEMONSET"
+	}
+
 	if instance.Spec.Secrets.FluxNinjaExtension.Create && instance.Spec.Secrets.FluxNinjaExtension.Value == "" {
 		instance.Status.Resources = controllers.FailedStatus
 		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaExtension.value' can not be empty when 'spec.secrets.fluxNinjaExtension.create' is set to true")

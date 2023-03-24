@@ -88,6 +88,7 @@ fluxninja:
       write_buffer_size: 0
   endpoint: ""
   heartbeat_interval: 5s
+  installation_mode: LINUX_BARE_METAL
 kubernetes_client:
   disable_compression: false
   disable_keep_alives: false

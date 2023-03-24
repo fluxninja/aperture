@@ -965,6 +965,12 @@ FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
 (string, default: `"5s"`) Interval between each heartbeat.
 
 </dd>
+<dt>installation_mode</dt>
+<dd>
+
+(string, oneof: `KUBERNETES_SIDECAR | KUBERNETES_DAEMONSET | LINUX_BARE_METAL`, default: `"LINUX_BARE_METAL"`) Installation mode describes how Agent/Controller is being run.
+
+</dd>
 <dt>client</dt>
 <dd>
 

@@ -112,6 +112,19 @@ definitions:
                 x-go-tag-default: 5s
                 x-go-tag-json: heartbeat_interval
                 x-go-tag-validate: gte=0s
+            installation_mode:
+                default: LINUX_BARE_METAL
+                description: Installation mode describes how Agent/Controller is being run.
+                enum:
+                    - KUBERNETES_SIDECAR
+                    - KUBERNETES_DAEMONSET
+                    - LINUX_BARE_METAL
+                type: string
+                x-go-name: InstallationMode
+                x-go-tag-default: LINUX_BARE_METAL
+                x-go-tag-json: installation_mode
+                x-go-tag-validate: oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL
+                x-oneof: KUBERNETES_SIDECAR | KUBERNETES_DAEMONSET | LINUX_BARE_METAL
         title: FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
         type: object
         x-go-package: github.com/fluxninja/aperture/extensions/fluxninja/extconfig

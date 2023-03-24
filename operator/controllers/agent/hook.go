@@ -64,6 +64,12 @@ func (agentHooks *AgentHooks) Handle(ctx context.Context, req admission.Request)
 		}
 	}
 
+	if newAgent.Spec.Sidecar.Enabled {
+		newAgent.Spec.ConfigSpec.FluxNinja.InstallationMode = "KUBERNETES_SIDECAR"
+	} else {
+		newAgent.Spec.ConfigSpec.FluxNinja.InstallationMode = "KUBERNETES_DAEMONSET"
+	}
+
 	updatedAgent, err := json.Marshal(newAgent)
 	if err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)

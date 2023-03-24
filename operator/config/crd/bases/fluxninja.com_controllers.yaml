@@ -1182,6 +1182,10 @@ spec:
                       heartbeat_interval:
                         description: Interval between each heartbeat.
                         type: string
+                      installation_mode:
+                        description: Installation mode describes how Agent/Controller
+                          is being run.
+                        type: string
                     type: object
                   liveness:
                     description: Liveness probe configuration.

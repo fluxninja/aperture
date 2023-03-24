@@ -243,6 +243,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			Expect(instance.Finalizers).To(Equal([]string{FinalizerName}))
 			Expect(instance.Spec.Secrets.FluxNinjaExtension.Create).To(BeFalse())
 			Expect(instance.Spec.Secrets.FluxNinjaExtension.Value).To(Equal(""))
+			Expect(instance.Spec.ConfigSpec.FluxNinja.InstallationMode).To(Equal("KUBERNETES_DAEMONSET"))
 
 			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
 			Expect(K8sClient.Delete(Ctx, ns1)).To(Succeed())
@@ -367,6 +368,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			Expect(instance.Status.Resources).To(Equal("created"))
 			Expect(instance.Finalizers).To(Equal([]string{FinalizerName}))
 			Expect(instance.Spec.Secrets.FluxNinjaExtension.Value).To(Equal(encodedString))
+			Expect(instance.Spec.ConfigSpec.FluxNinja.InstallationMode).To(Equal("KUBERNETES_SIDECAR"))
 
 			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
 			Expect(K8sClient.Delete(Ctx, ns1)).To(Succeed())

@@ -1291,6 +1291,10 @@ spec:
                       heartbeat_interval:
                         description: Interval between each heartbeat.
                         type: string
+                      installation_mode:
+                        description: Installation mode describes how Agent/Controller
+                          is being run.
+                        type: string
                     type: object
                   kubernetes_client:
                     description: Kubernetes client configuration.
