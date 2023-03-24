@@ -15,23 +15,24 @@ import TabItem from '@theme/TabItem';
 import {apertureVersion,apertureVersionWithOutV} from '../../../../apertureVersion.js';
 ```
 
-The following is documentation for integrating Aperture with Nginx using Lua
-modules.
+Integrating Aperture with Nginx using Lua modules.
 
 ## Introduction
 
-This documentation provides instructions for integrating Aperture with Nginx
-using Lua modules. Lua modules are scripts that can be executed within Nginx to
-extend its functionality. The Aperture Lua module can be downloaded from the
-GitHub <a
-href={`https://github.com/fluxninja/aperture/releases/tag/${apertureVersion}`}>Release
-Page</a>.
+Lua modules are scripts that can be executed within Nginx to extend its
+functionality. The Aperture Lua module can be downloaded from the GitHub <a
+href={`https://github.com/fluxninja/aperture/releases/tag/${apertureVersion}`}>
+Aperture Release Page</a>.
 
 ## Pre-requisites
 
 Before proceeding, ensure that you have the following installed:
 
-:::info Skip these steps if the Nginx server is running on Container. :::
+:::info
+
+Skip these steps if the Nginx server is running on Container.
+
+:::
 
 1. Nginx server
 2. [lua-nginx-module](https://github.com/openresty/lua-nginx-module) enabled for
@@ -45,8 +46,11 @@ Before proceeding, ensure that you have the following installed:
 
 To install the Aperture Lua module, follow these steps:
 
-:::info Refer Refer [Example Dockerfile](#example-dockerfile) to get the steps
-for installing the Aperture Lua module for Nginx server running on Container.
+:::info
+
+Refer [Example Dockerfile](#example-dockerfile) to get the steps for installing
+the Aperture Lua module for Nginx server running on Container.
+
 :::
 
 1. Install the
@@ -96,23 +100,27 @@ COPY nginx_config.conf /etc/nginx/nginx.conf`}</CodeBlock>
 
 Follow these steps to configure Nginx to use the installed Aperture Lua module:
 
-1. Create an environment variable `APERTURE_AGENT_ENDPOINT` with a value equal
-   to the endpoint to connect with Aperture Agent. For example, use the
-   following command in bash:
+1. To connect with the Aperture Agent, you need to create an environment
+   variable called APERTURE_AGENT_ENDPOINT. The value of this variable should be
+   set equal to the endpoint of the Aperture Agent. If you are using a bash
+   shell, you can create this variable by running the following command:
 
    ```bash
    echo 'export APERTURE_AGENT_ENDPOINT="http://aperture-agent.aperture-agent.svc.cluster.local"' >> ~/.profile
    ```
+
+   Replace endpoint value with the actual endpoint value of the Aperture Agent
+   if you're on different one.
 
 2. Optionally, create an environment variable `APERTURE_CHECK_TIMEOUT` which
    would be considered as a timeout for execution of the Aperture check. The
    default value for it is 500m which is 500 milliseconds. For example, use the
    following command in bash:
 
-   :::info Refer
+   :::info
 
-   The format for the timeout value can be found for `Timeout` parameter on
-   [this site](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
+   The format for the `Timeout` parameter can be found at the following
+   [link](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
    :::
 
    ```bash
@@ -122,7 +130,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
 3. Add `init_by_lua_block` section under the `http` block of the Nginx
    configuration to initialize the Aperture Lua module:
 
-   ```conf
+   ```bash
    http {
      ...
      init_by_lua_block {
@@ -137,7 +145,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
    configuration to execute the Aperture check for all servers and locations
    before the request is forwarded to upstream:
 
-   ```conf
+   ```bash
    http {
      ...
      access_by_lua_block {
@@ -155,7 +163,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
    configuration to forward the OpenTelemetry logs to Aperture for all servers
    and locations after the response is received from upstream:
 
-   ```conf
+   ```bash
    http {
      ...
      log_by_lua_block {
@@ -185,7 +193,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
 
 7. Below is the how complete Nginx configuration would like look:
 
-   ```conf
+   ```bash
    worker_processes auto;
    pid /run/nginx.pid;
 

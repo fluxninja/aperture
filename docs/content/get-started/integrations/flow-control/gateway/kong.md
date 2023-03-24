@@ -14,24 +14,24 @@ import TabItem from '@theme/TabItem';
 import {apertureVersion,apertureVersionWithOutV} from '../../../../apertureVersion.js';
 ```
 
-The following is documentation for integrating Aperture with Kong using Custom
-plugins.
+Integrating Aperture with Kong using Custom plugins.
 
 ## Introduction
 
-This documentation provides instructions for integrating Aperture with Kong
-using Custom plugin. Custom plugins are Lua scripts that can be executed within
-Kong to extend its functionality. The Aperture Custom plugin can be downloaded
-from the GitHub <a
-href={`https://github.com/fluxninja/aperture/releases/tag/${apertureVersion}`}>Release
-Page</a>.
+Custom plugins are Lua scripts that can be executed within Kong to extend its
+functionality. The Aperture Custom plugin can be downloaded from the <a
+href={`https://github.com/fluxninja/aperture/releases/tag/${apertureVersion}`}>Aperture
+Release Page</a>.
 
 ## Installation
 
 To install the Aperture Custom plugin, follow these steps:
 
-:::info Refer Refer [Example Dockerfile](#example-dockerfile) to get the steps
-for installing the Aperture Custom plugin for Kong server running on Container.
+:::info
+
+Refer [Example Dockerfile](#example-dockerfile) to get the steps for installing
+the Aperture Custom plugin for Kong server running on Container.
+
 :::
 
 1. Install the
@@ -80,12 +80,12 @@ CMD [ "kong", "start", "-c", "kong.conf"]`}</CodeBlock>
 
 ## Configure Kong
 
-Follow these steps to configure Kong to use the installed Aperture Custom
-plugin:
+Follow these steps to configure Kong to use the Aperture Custom plugin. Assuming
+plugin is already installed:
 
 1. Create an environment variable `APERTURE_AGENT_ENDPOINT` with a value equal
-   to the endpoint to connect with Aperture Agent. For example, use the
-   following command in bash:
+   to the Aperture Agent endpoint. For example, use the following command in
+   bash:
 
    ```bash
    echo 'export APERTURE_AGENT_ENDPOINT="http://aperture-agent.aperture-agent.svc.cluster.local"' >> ~/.profile
@@ -98,10 +98,10 @@ plugin:
 
    Below is an example to do it with `bash`:
 
-   :::info Refer
+   :::info
 
-   The format for the timeout value can be found for `Timeout` parameter on
-   [this site](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
+   The format for the `Timeout` parameter can be found at the following
+   [link](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#requests).
    :::
 
    ```bash
