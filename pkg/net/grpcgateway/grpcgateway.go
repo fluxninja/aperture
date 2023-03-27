@@ -6,7 +6,6 @@ import (
 	"crypto/tls"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -222,9 +221,8 @@ func httpResponseModifier(ctx context.Context, w http.ResponseWriter, _ proto.Me
 }
 
 func httpHeaderMatcher(key string) (string, bool) {
-	keyLower := strings.ToLower(key)
-	switch keyLower {
-	case "apikey", "control-point":
+	switch key {
+	case "Apikey":
 		return key, true
 	default:
 		return runtime.DefaultHeaderMatcher(key)
