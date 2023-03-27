@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 FROM fabiocicerchia/nginx-lua:1.23.3-debian-compat
 
 RUN apt update && apt-get install -y build-essential git

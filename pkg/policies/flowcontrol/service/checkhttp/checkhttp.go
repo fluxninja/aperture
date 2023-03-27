@@ -28,7 +28,6 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -103,12 +102,7 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 		}
 	}
 
-	ctrlPt := ""
-	headers, _ := metadata.FromIncomingContext(ctx)
-	if ctrlPtHeader, exists := headers["control-point"]; exists && len(ctrlPtHeader) > 0 {
-		ctrlPt = ctrlPtHeader[0]
-	}
-
+	ctrlPt := req.GetControlPoint()
 	if ctrlPt == "" {
 		return nil, grpc.LoggedError(log.Sample(missingControlPointSampler).Warn()).
 			Code(codes.InvalidArgument).Msg("missing control-point")

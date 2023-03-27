@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 FROM kong:3.1.1-ubuntu
 
 WORKDIR /usr/kong/aperture

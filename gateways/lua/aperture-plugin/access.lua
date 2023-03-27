@@ -82,13 +82,13 @@ return function(destination_hostname, destination_port)
       size = request_headers["Content-Length"],
       protocol = ngx.var.server_protocol,
       body = request.get_body_data()
-    }
+    },
+    control_point = "ingress"
   }
 
   local request_body_json = json.encode(request_body)
   request_headers["Content-Type"] = "application/json"
   request_headers["Accept"] = "application/json"
-  request_headers["control-point"] = "ingress"
   request_headers["content-length"] = string.len(request_body_json)
   request_headers["grpc-timeout"] = apertureCheckTimeout
 
