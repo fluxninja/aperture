@@ -141,7 +141,7 @@ func (constantSignal *ConstantSignal) Float() float64 {
 	if specialValue == "NaN" {
 		return math.NaN()
 	}
-	if specialValue == "Inf" {
+	if specialValue == "+Inf" {
 		return math.Inf(1)
 	}
 	if specialValue == "-Inf" {
