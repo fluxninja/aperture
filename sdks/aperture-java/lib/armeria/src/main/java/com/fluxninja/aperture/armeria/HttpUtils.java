@@ -3,16 +3,13 @@ package com.fluxninja.aperture.armeria;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.fluxninja.aperture.sdk.TrafficFlow;
-import com.fluxninja.generated.envoy.service.auth.v3.Address;
+import com.fluxninja.aperture.sdk.Utils;
 import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
 import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
-import com.fluxninja.generated.envoy.service.auth.v3.SocketAddress;
 import com.linecorp.armeria.common.*;
-import com.linecorp.armeria.server.ServiceRequestContext;
 import io.netty.util.AsciiString;
 import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageEntry;
-
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -101,71 +98,29 @@ class HttpUtils {
             AttributeContext.Builder builder, RequestContext ctx, HttpRequest req) {
         Map<String, String> extractedHeaders = new HashMap<>();
         RequestHeaders headers = req.headers();
-        System.out.println("NEW REQUEST HEADER EXTRACTION");
         for (Map.Entry<AsciiString, String> header : headers) {
             String headerKey = header.getKey().toString();
-            System.out.println(headerKey+ ": "+ header.getValue());
             if (headerKey.startsWith(":")) {
                 continue;
             }
-            if (headerKey.contains("orwarded")) {
-                System.out.println("Might've found source IP");
-            }
-            if (headerKey.contains("erver")) {
-                System.out.println("Might've found destination IP");
-            }
             extractedHeaders.put(headerKey, header.getValue());
         }
-        System.out.println("HEADER EXTRACTION ENDED");
 
         java.net.SocketAddress remoteSocket = ctx.remoteAddress();
         String sourceIp = null;
-        String sourceHostname = null;
         if (remoteSocket instanceof InetSocketAddress) {
             InetSocketAddress remoteAddress = (InetSocketAddress) remoteSocket;
             sourceIp = remoteAddress.getAddress().getHostAddress();
-            sourceHostname = remoteAddress.getHostString();
         }
 
         java.net.SocketAddress localSocket = ctx.localAddress();
         String destinationIp = null;
-        String destinationHostname = null;
         if (localSocket instanceof InetSocketAddress) {
             InetSocketAddress localAddress = (InetSocketAddress) localSocket;
             destinationIp = localAddress.getAddress().getHostAddress();
-            destinationHostname = localAddress.getHostString();
         }
 
-        System.out.println("SOURCE IP: " + sourceIp);
-        System.out.println("SOURCE HOSTNAME: " + sourceHostname);
-        System.out.println("DESTINATION IP: " + destinationIp);
-        System.out.println("DESTINATION HOSTNAME: " + destinationHostname);
-
-
-        // get source and dest from headers:
-        // X-Forwarded-For
-        // X-Armeria-Server-Address
-
-        AttributeContext.Peer source = AttributeContext.Peer.newBuilder()
-                .setAddress(
-                        Address.newBuilder()
-                                .setSocketAddress(
-                                    SocketAddress.newBuilder()
-                                        .setAddress(sourceIp)
-                                        .build()
-                                )
-                                .build()).build();
-        AttributeContext.Peer destination = AttributeContext.Peer.newBuilder()
-                .setAddress(
-                        Address.newBuilder()
-                                .setSocketAddress(
-                                    SocketAddress.newBuilder()
-                                        .setAddress(destinationIp)
-                                        .build()
-                                )
-                                .build()).build();
-
-        return builder.putContextExtensions("control-point", "ingress")
+        builder.putContextExtensions("control-point", "ingress")
                 .setRequest(
                         AttributeContext.Request.newBuilder()
                                 .setHttp(
@@ -176,8 +131,13 @@ class HttpUtils {
                                                 .setScheme(req.scheme())
                                                 .setSize(headers.contentLength())
                                                 .setProtocol("HTTP/2")
-                                                .putAllHeaders(extractedHeaders)))
-                .setSource(source)
-                .setDestination(destination);
+                                                .putAllHeaders(extractedHeaders)));
+        if (sourceIp != null) {
+            builder.setSource(Utils.peerFromAddress(sourceIp));
+        }
+        if (destinationIp != null) {
+            builder.setDestination(Utils.peerFromAddress(destinationIp));
+        }
+        return builder;
     }
 }
