@@ -84,7 +84,6 @@ func newHeartbeats(
 	election *election.Election,
 	flowControlPoints *cache.Cache[selectors.ControlPointID],
 	autoscalek8sControlPoints autoscalek8sdiscovery.AutoScaleControlPoints,
-	installationMode string,
 ) *Heartbeats {
 	return &Heartbeats{
 		heartbeatsAddr:            extensionConfig.Endpoint,
@@ -99,7 +98,7 @@ func newHeartbeats(
 		election:                  election,
 		flowControlPoints:         flowControlPoints,
 		autoscalek8sControlPoints: autoscalek8sControlPoints,
-		installationMode:          installationMode,
+		installationMode:          extensionConfig.InstallationMode,
 	}
 }
 

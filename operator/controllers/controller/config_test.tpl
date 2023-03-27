@@ -58,6 +58,7 @@ fluxninja:
       write_buffer_size: 0
   endpoint: ""
   heartbeat_interval: 5s
+  installation_mode: LINUX_BARE_METAL
 liveness:
   scheduler:
     blocking_execution: false
