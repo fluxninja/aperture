@@ -20,7 +20,7 @@ import (
 type rabbitMQEnvVar string
 
 const (
-	rabbitMQEnable         rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_ENABLE"
+	rabbitMQEnabled        rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_ENABLED"
 	rabbitMQHostEnvVar     rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_HOST"
 	rabbitMQPortEnvVar     rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_PORT"
 	rabbitMQUserEnvVar     rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_USER"
@@ -37,7 +37,7 @@ func main() {
 
 	// RabbitMQ related setup
 	rabbitMQURL := ""
-	if rabbitMQFromEnv(rabbitMQEnable) == "true" {
+	if rabbitMQFromEnv(rabbitMQEnabled) == "true" {
 		rabbitMQHost := rabbitMQFromEnv(rabbitMQHostEnvVar)
 		rabbitMQPort := rabbitMQFromEnv(rabbitMQPortEnvVar)
 		rabbitMQUser := rabbitMQFromEnv(rabbitMQUserEnvVar)
@@ -78,7 +78,7 @@ func rabbitMQFromEnv(envVar rabbitMQEnvVar) string {
 	value := os.Getenv(string(envVar))
 	if value == "" {
 		switch envVar {
-		case rabbitMQEnable:
+		case rabbitMQEnabled:
 			return "false"
 		case rabbitMQHostEnvVar:
 			return "localhost"

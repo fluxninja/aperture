@@ -62,6 +62,16 @@ spec:
               {{- end }}
             - name: SIMPLE_SERVICE_REJECT_RATIO
               value: "{{ .Values.simplesrv.rejectRatio }}"
+            - name: SIMPLE_SERVICE_RABBITMQ_ENABLE
+              value: "{{ .Values.simplesrv.rabbitMQEnabled }}"
+            - name: SIMPLE_SERVICE_RABBITMQ_HOST
+              value: "{{ .Values.simplesrv.rabbitMQHost }}"
+            - name: SIMPLE_SERVICE_RABBITMQ_PORT
+              value: "{{ .Values.simplesrv.rabbitMQPort }}"
+            - name: SIMPLE_SERVICE_RABBITMQ_USER
+              value: "{{ .Values.simplesrv.rabbitMQUser }}"
+            - name: SIMPLE_SERVICE_RABBITMQ_PASSWORD
+              value: "{{ .Values.simplesrv.rabbitMQPassword }}"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
