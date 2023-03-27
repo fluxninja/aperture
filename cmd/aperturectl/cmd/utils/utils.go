@@ -18,56 +18,11 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	monitoringv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/monitoring/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
-
-// collectComponents is a recursive function that traverses the Tree and collects
-// ComponentView elements and their links up to a specified depth. If maxDepth is set to -1, the function will
-// collect components and links up to the maximum possible depth in the tree.
-//
-// Parameters:
-//   - tree: The current Tree being processed. The function starts with the root tree of the tree.
-//   - maxDepth: The maximum depth the function should collect components for.
-//     If set to -1, the function will collect components up to the maximum possible depth.
-//   - currentDepth: The current depth in the tree traversal. Starts at 0 for the root tree.
-//
-// Returns:
-//   - A slice of *monitoringv1.ComponentView elements collected up to the specified depth.
-//   - A slice of *monitoringv1.Link elements collected up to the specified depth.
-//
-// Example usage:
-//
-//	components, links := collectComponents(tree, 3, 0)
-//	// This will collect components up to a depth of 3.
-//
-//	components, links := collectComponents(tree, -1, 0)
-//	// This will collect components up to the maximum possible depth in the tree.
-func collectComponents(tree *monitoringv1.Tree, maxDepth int, currentDepth int) ([]*monitoringv1.ComponentView, []*monitoringv1.Link) {
-	// If the current depth is greater than the maximum depth and maxDepth is not -1, return empty slices.
-	if maxDepth != -1 && currentDepth > maxDepth {
-		return []*monitoringv1.ComponentView{}, []*monitoringv1.Link{}
-	}
-	// TODO: Components and links get collected in different manner. This should be fixed. Another option is not use ToGraphView and to re-compute links from ports.
-
-	components := []*monitoringv1.ComponentView{}
-	links := []*monitoringv1.Link{}
-	// If the tree has children, recurse into them.
-	if len(tree.Children) > 0 {
-		for _, child := range tree.Children {
-			childComponents, childLinks := collectComponents(child, maxDepth, currentDepth+1)
-			components = append(components, childComponents...)
-			links = append(links, childLinks...)
-		}
-	} else {
-		// If the tree doesn't have children, add its root component and links to the lists.
-		components = append(components, tree.Root)
-		links = append(links, tree.Links...)
-	}
-	return components, links
-}
 
 // GenerateDotFile generates a DOT file from the given circuit with the specified depth.
 // The depth determines how many levels of components in the tree should be expanded in the graph.
@@ -90,10 +45,12 @@ func collectComponents(tree *monitoringv1.Tree, maxDepth int, currentDepth int) 
 //	err := GenerateDotFile(circuit, "output.dot", -1)
 //	// This will generate a DOT file with components expanded up to the maximum possible depth.
 func GenerateDotFile(circuit *circuitfactory.Circuit, dotFilePath string, depth int) error {
-	c := circuit.ToGraphView()
-	comps, links := collectComponents(c.Tree, depth, 0)
+	graph, err := circuit.Tree.GetSubGraph(runtime.NewComponentID(runtime.RootComponentID), depth)
+	if err != nil {
+		return err
+	}
 
-	d := circuitfactory.DOT(comps, links)
+	d := circuitfactory.DOTGraph(graph)
 	f, err := os.Create(dotFilePath)
 	if err != nil {
 		log.Error().Err(err).Msg("error creating file")
@@ -130,10 +87,12 @@ func GenerateDotFile(circuit *circuitfactory.Circuit, dotFilePath string, depth 
 //	err := GenerateMermaidFile(circuit, "output.mmd", -1)
 //	// This will generate a Mermaid file with components expanded up to the maximum possible depth.
 func GenerateMermaidFile(circuit *circuitfactory.Circuit, mermaidFile string, depth int) error {
-	c := circuit.ToGraphView()
-	comps, links := collectComponents(c.Tree, depth, 0)
+	graph, err := circuit.Tree.GetSubGraph(runtime.NewComponentID(runtime.RootComponentID), depth)
+	if err != nil {
+		return err
+	}
 
-	m := circuitfactory.Mermaid(comps, links)
+	m := circuitfactory.MermaidGraph(graph)
 	f, err := os.Create(mermaidFile)
 	if err != nil {
 		log.Error().Err(err).Msg("error creating file")

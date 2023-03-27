@@ -86,8 +86,8 @@ func (o *output) DynamicConfigUpdate(_ notifiers.Event, _ config.Unmarshaller) {
 // ConfigureInputComponent takes an input component and creates a
 // Component which outputs signal with given name on its "output"
 // poruntime.
-func ConfigureInputComponent(comp runtime.Component, signal runtime.SignalID) runtime.ConfiguredComponent {
-	return runtime.ConfiguredComponent{
+func ConfigureInputComponent(comp runtime.Component, signal runtime.SignalID) *runtime.ConfiguredComponent {
+	return &runtime.ConfiguredComponent{
 		Component: comp,
 		PortMapping: runtime.PortMapping{
 			Outs: map[string][]runtime.Signal{
@@ -102,8 +102,8 @@ func ConfigureInputComponent(comp runtime.Component, signal runtime.SignalID) ru
 
 // ConfigureOutputComponent takes an output component and creates a
 // Component which reads signal with a given name on its "input" port.
-func ConfigureOutputComponent(signal runtime.SignalID, comp runtime.Component) runtime.ConfiguredComponent {
-	return runtime.ConfiguredComponent{
+func ConfigureOutputComponent(signal runtime.SignalID, comp runtime.Component) *runtime.ConfiguredComponent {
+	return &runtime.ConfiguredComponent{
 		Component: comp,
 		PortMapping: runtime.PortMapping{
 			Ins: map[string][]runtime.Signal{

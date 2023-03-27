@@ -16,8 +16,8 @@ func newFlowControlCompositeAndOptions(
 	flowControlComponentProto *policylangv1.FlowControl,
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
-) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
-	retErr := func(err error) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
+) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
+	retErr := func(err error) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
 		return Tree{}, nil, nil, err
 	}
 
@@ -28,7 +28,7 @@ func newFlowControlCompositeAndOptions(
 	// Factory parser to determine what kind of composite component to create
 	if concurrencyLimiterProto := flowControlComponentProto.GetConcurrencyLimiter(); concurrencyLimiterProto != nil {
 		var (
-			configuredComponents []runtime.ConfiguredComponent
+			configuredComponents []*runtime.ConfiguredComponent
 			tree                 Tree
 			options              []fx.Option
 		)
@@ -48,13 +48,13 @@ func newFlowControlCompositeAndOptions(
 			}
 
 			// Need a unique ID for sub component since it's used for graph generation
-			schedulerConfComp, err := prepareComponentInCircuit(scheduler, schedulerProto, componentID.ChildID("Scheduler"), parentCircuitID)
+			schedulerConfComp, err := prepareComponentInCircuit(scheduler, schedulerProto, componentID.ChildID("Scheduler"), parentCircuitID, true)
 			if err != nil {
 				return retErr(err)
 			}
 
 			configuredComponents = append(configuredComponents, schedulerConfComp)
-			tree.Children = append(tree.Children, Tree{Root: schedulerConfComp})
+			tree.Children = append(tree.Children, Tree{Node: schedulerConfComp})
 
 			options = append(options, schedulerOptions)
 
@@ -72,12 +72,12 @@ func newFlowControlCompositeAndOptions(
 				return retErr(err)
 			}
 
-			loadActuatorConfComp, err := prepareComponentInCircuit(loadActuator, loadActuatorProto, componentID.ChildID(".LoadActuator"), parentCircuitID)
+			loadActuatorConfComp, err := prepareComponentInCircuit(loadActuator, loadActuatorProto, componentID.ChildID("LoadActuator"), parentCircuitID, true)
 			if err != nil {
 				return retErr(err)
 			}
 			configuredComponents = append(configuredComponents, loadActuatorConfComp)
-			tree.Children = append(tree.Children, Tree{Root: loadActuatorConfComp})
+			tree.Children = append(tree.Children, Tree{Node: loadActuatorConfComp})
 
 			options = append(options, loadActuatorOptions)
 
@@ -94,13 +94,14 @@ func newFlowControlCompositeAndOptions(
 				runtime.ComponentTypeSignalProcessor),
 			concurrencyLimiterProto,
 			componentID,
+			false,
 		)
 		if err != nil {
 			return retErr(err)
 		}
 
 		concurrencyLimiterConfComp.PortMapping = portMapping
-		tree.Root = concurrencyLimiterConfComp
+		tree.Node = concurrencyLimiterConfComp
 
 		return tree, configuredComponents, fx.Options(options...), nil
 	} else if aimdConcurrencyController := flowControlComponentProto.GetAimdConcurrencyController(); aimdConcurrencyController != nil {

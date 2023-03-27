@@ -20,8 +20,8 @@ func ParseNestedCircuit(
 	nestedCircuitID runtime.ComponentID,
 	nestedCircuit *policylangv1.NestedCircuit,
 	policyReadAPI iface.Policy,
-) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
-	retErr := func(err error) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
+) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
+	retErr := func(err error) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
 		return Tree{}, nil, nil, err
 	}
 
@@ -58,7 +58,9 @@ func ParseNestedCircuit(
 	portMapping.Ins = ins
 	portMapping.Outs = outs
 
-	tree, leafComponents, options, err := CreateComponents(
+	tree := Tree{}
+
+	leafComponents, options, err := tree.CreateComponents(
 		nestedCircuitProto.GetComponents(),
 		nestedCircuitID,
 		policyReadAPI,
@@ -121,12 +123,13 @@ func ParseNestedCircuit(
 			runtime.ComponentTypeSignalProcessor),
 		nestedCircuitProto,
 		nestedCircuitID,
+		false,
 	)
 	if err != nil {
 		return retErr(err)
 	}
 	nestedCircConfComp.PortMapping = portMapping
-	tree.Root = nestedCircConfComp
+	tree.Node = nestedCircConfComp
 
 	return tree, leafComponents, options, err
 }

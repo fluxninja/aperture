@@ -918,7 +918,7 @@ message ConstantSignal {
 // Component that emits a variable value as an output signal, can be defined in dynamic configuration.
 message Variable {
   message DynamicConfig {
-    ConstantSignal constant_signal = 1;
+    ConstantSignal constant_signal = 1; // @gotags: validate:"required"
   }
   // Outputs for the Variable component.
   message Outs {
@@ -933,7 +933,7 @@ message Variable {
   string dynamic_config_key = 2;
 
   // Default configuration.
-  DynamicConfig default_config = 3;
+  DynamicConfig default_config = 3; // @gotags: validate:"required"
 }
 
 // Takes an input signal and emits the output after applying the specified unary operator

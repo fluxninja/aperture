@@ -93,7 +93,7 @@ type Circuit struct {
 	// Looped signals persistence across ticks
 	loopedSignals signalToReading
 	// Components
-	components []ConfiguredComponent
+	components []*ConfiguredComponent
 	// Tick end callbacks
 	tickEndCallbacks []TickEndCallback
 	// Tick start callbacks
@@ -105,7 +105,7 @@ var _ CircuitAPI = &Circuit{}
 
 // NewCircuitAndOptions create a new Circuit struct along with fx options.
 func NewCircuitAndOptions(
-	configuredComponents []ConfiguredComponent,
+	configuredComponents []*ConfiguredComponent,
 	policyReadAPI iface.Policy,
 ) (*Circuit, fx.Option) {
 	reg := policyReadAPI.GetStatusRegistry().Child("circuit", "circuit_signals")

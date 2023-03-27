@@ -14,7 +14,7 @@ generate-jsonnet:
 
 generate-policy-graphs:
 	@echo generating policy graphs
-	@go run ./tools/aperturectl/generate-policy-graphs/generate-policy-graphs.go
+	@go run tools/aperturectl/generate-policy-graphs/generate-policy-graphs.go
 
 # Note: using $(MAKE) -B instead of regular dependency to ensure rerun on tools update
 generate-mermaid:

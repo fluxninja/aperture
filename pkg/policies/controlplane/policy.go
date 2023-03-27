@@ -133,7 +133,7 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 		policy.evaluationInterval = policyProto.GetCircuit().GetEvaluationInterval().AsDuration()
 
 		compiledCircuit, partialCircuitOption, err = circuitfactory.CompileFromProto(
-			policyProto.GetCircuit().Components,
+			policyProto,
 			policy,
 		)
 		if err != nil {
