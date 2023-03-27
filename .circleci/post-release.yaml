@@ -281,8 +281,8 @@ jobs:
           working_directory: gateways/lua/
           name: Attach package to release
           command: |
-            tar -czvf aperture-lua.tar.gz .
-            gh release upload "${VERSION}" "aperture-lua.tar.gz" --repo=fluxninja/aperture
+            tar -czvf $HOME/aperture-lua.tar.gz .
+            gh release upload "${VERSION}" "$HOME/aperture-lua.tar.gz" --repo=fluxninja/aperture
 
 workflows:
   version: 2
