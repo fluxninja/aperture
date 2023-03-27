@@ -16,6 +16,8 @@ message PortView {
   }
   // True if port is looped.
   bool looped = 4;
+  // Sub circuit id, applicable only if value is of type signal_name.
+  string sub_circuit_id = 5;
 }
 
 message ComponentView {
@@ -34,20 +36,34 @@ message SourceTarget {
   string port_name = 2;
 }
 
-message CircuitView {
-  Tree tree = 1;
-  repeated ComponentView leaf_components = 2;
-}
-
-message Tree {
-  ComponentView root = 1;
-  repeated Tree children = 2;
-  repeated Link links = 3;
-}
-
 // Link is a connection between Components.
 message Link {
   SourceTarget source = 1;
   SourceTarget target = 2;
-  string signal_name = 3;
+  oneof value {
+    // Name of the Signal on the Port.
+    string signal_name = 3;
+    // Constant value at an incoming Port
+    double constant_value = 4;
+  }
+  string looped = 5;
+  string sub_circuit_id = 6;
+}
+
+message Graph {
+  repeated ComponentView internal_components = 1;
+  repeated ComponentView external_components = 2;
+  repeated Link internal_links = 3;
+  repeated Link external_links = 4;
+}
+
+message CircuitView {
+  Tree tree = 1;
+}
+
+message Tree {
+  ComponentView node = 1;
+  Graph graph = 2;
+  repeated Tree children = 3;
+  repeated ComponentView actuators = 4;
 }

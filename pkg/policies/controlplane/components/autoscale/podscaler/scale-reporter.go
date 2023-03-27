@@ -74,13 +74,16 @@ type ScaleReporter struct {
 var _ runtime.Component = (*ScaleReporter)(nil)
 
 // Name implements runtime.Component.Name.
-func (sr *ScaleReporter) Name() string { return "ScaleReporter" }
+func (*ScaleReporter) Name() string { return "ScaleReporter" }
 
 // Type implements runtime.Component.Type.
 func (sr *ScaleReporter) Type() runtime.ComponentType { return runtime.ComponentTypeSource }
 
 // ShortDescription implements runtime.Component.ShortDescription.
 func (sr *ScaleReporter) ShortDescription() string { return sr.agentGroup }
+
+// IsActuator implements runtime.Component.
+func (*ScaleReporter) IsActuator() bool { return false }
 
 // NewScaleReporterAndOptions returns a new ScaleReporter and its fx options.
 func NewScaleReporterAndOptions(

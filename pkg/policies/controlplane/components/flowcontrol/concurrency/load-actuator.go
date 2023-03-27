@@ -40,6 +40,9 @@ func (*LoadActuator) Type() runtime.ComponentType { return runtime.ComponentType
 // ShortDescription implements runtime.Component.
 func (la *LoadActuator) ShortDescription() string { return la.agentGroupName }
 
+// IsActuator implements runtime.Component.
+func (*LoadActuator) IsActuator() bool { return true }
+
 // NewLoadActuatorAndOptions creates load actuator and its fx options.
 func NewLoadActuatorAndOptions(
 	loadActuatorProto *policylangv1.LoadActuator,

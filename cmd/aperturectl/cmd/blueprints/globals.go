@@ -13,4 +13,5 @@ var (
 	noYAMLModeline bool
 	noValidate     bool
 	overwrite      bool
+	graphDepth     int
 )

@@ -23,8 +23,8 @@ func newAutoScaleCompositeAndOptions(
 	autoScaleComponentProto *policylangv1.AutoScale,
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
-) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
-	retErr := func(err error) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
+) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
+	retErr := func(err error) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
 		return Tree{}, nil, nil, err
 	}
 
@@ -35,7 +35,7 @@ func newAutoScaleCompositeAndOptions(
 
 	if podScalerProto := autoScaleComponentProto.GetPodScaler(); podScalerProto != nil {
 		var (
-			configuredComponents []runtime.ConfiguredComponent
+			configuredComponents []*runtime.ConfiguredComponent
 			tree                 Tree
 			options              []fx.Option
 		)
@@ -53,13 +53,13 @@ func newAutoScaleCompositeAndOptions(
 				return retErr(err)
 			}
 
-			scaleReporterConfComp, err := prepareComponentInCircuit(scaleReporter, scaleReporterProto, componentID.ChildID("ScaleReporter"), parentCircuitID)
+			scaleReporterConfComp, err := prepareComponentInCircuit(scaleReporter, scaleReporterProto, componentID.ChildID("ScaleReporter"), parentCircuitID, true)
 			if err != nil {
 				return retErr(err)
 			}
 
 			configuredComponents = append(configuredComponents, scaleReporterConfComp)
-			tree.Children = append(tree.Children, Tree{Root: scaleReporterConfComp})
+			tree.Children = append(tree.Children, Tree{Node: scaleReporterConfComp})
 
 			options = append(options, scaleReporterOptions)
 
@@ -77,12 +77,12 @@ func newAutoScaleCompositeAndOptions(
 				return retErr(err)
 			}
 
-			scaleActuatorConfComp, err := prepareComponentInCircuit(scaleActuator, scaleActuatorProto, componentID.ChildID("ScaleActuator"), parentCircuitID)
+			scaleActuatorConfComp, err := prepareComponentInCircuit(scaleActuator, scaleActuatorProto, componentID.ChildID("ScaleActuator"), parentCircuitID, true)
 			if err != nil {
 				return retErr(err)
 			}
 			configuredComponents = append(configuredComponents, scaleActuatorConfComp)
-			tree.Children = append(tree.Children, Tree{Root: scaleActuatorConfComp})
+			tree.Children = append(tree.Children, Tree{Node: scaleActuatorConfComp})
 
 			options = append(options, scaleActuatorOptions)
 
@@ -106,13 +106,14 @@ func newAutoScaleCompositeAndOptions(
 			runtime.NewDummyComponent("PodScaler", sd, runtime.ComponentTypeSignalProcessor),
 			podScalerProto,
 			componentID,
+			false,
 		)
 		if err != nil {
 			return retErr(err)
 		}
 
 		podScalerConfComp.PortMapping = portMapping
-		tree.Root = podScalerConfComp
+		tree.Node = podScalerConfComp
 
 		return tree, configuredComponents, fx.Options(options...), nil
 	} else if autoScaler := autoScaleComponentProto.GetAutoScaler(); autoScaler != nil {

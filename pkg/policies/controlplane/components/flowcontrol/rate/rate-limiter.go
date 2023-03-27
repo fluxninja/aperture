@@ -46,6 +46,9 @@ func (limiterSync *rateLimiterSync) ShortDescription() string {
 	return iface.GetServiceShortDescription(limiterSync.flowSelectorProto.ServiceSelector)
 }
 
+// IsActuator implements runtime.Component.
+func (*rateLimiterSync) IsActuator() bool { return true }
+
 // NewRateLimiterAndOptions creates fx options for RateLimiter and also returns agent group name associated with it.
 func NewRateLimiterAndOptions(
 	rateLimiterProto *policylangv1.RateLimiter,

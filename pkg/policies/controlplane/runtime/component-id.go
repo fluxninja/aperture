@@ -2,8 +2,12 @@ package runtime
 
 import "strings"
 
-// NestedComponentDelimiter is the delimiter used to separate the parent circuit ID and the nested circuit ID.
-const NestedComponentDelimiter = "."
+const (
+	// NestedComponentDelimiter is the delimiter used to separate the parent circuit ID and the nested circuit ID.
+	NestedComponentDelimiter = "."
+	// RootComponentID is the ID of the root component.
+	RootComponentID = "root"
+)
 
 // ComponentID is a unique identifier for a component.
 type ComponentID interface {
@@ -38,6 +42,10 @@ func (cID componentID) ChildID(id string) ComponentID {
 
 // ParentID returns the parent ComponentID of the current ComponentID.
 func (cID componentID) ParentID() (ComponentID, bool) {
+	// Parent of root is an empty string.
+	if cID.id == RootComponentID {
+		return NewComponentID(""), true
+	}
 	// Parent Child component IDs are delimited by dot. So, we split the child component ID by dot and return the first part.
 	// For example, if the child component ID is "root.1.2", then the parent component ID is "root.1".
 	// Find the last delimiter in the ID

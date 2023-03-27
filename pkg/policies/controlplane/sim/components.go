@@ -31,6 +31,9 @@ func (i *Input) Type() runtime.ComponentType { return runtime.ComponentTypeSourc
 // ShortDescription implements runtime.Component.
 func (i *Input) ShortDescription() string { return "" }
 
+// IsActuator implements runtime.Component.
+func (*Input) IsActuator() bool { return false }
+
 // Execute implements runtime.Component.
 func (i *Input) Execute(_ runtime.PortToReading, _ runtime.TickInfo) (runtime.PortToReading, error) {
 	return runtime.PortToReading{
@@ -64,6 +67,9 @@ func (o *output) Type() runtime.ComponentType { return runtime.ComponentTypeSink
 // ShortDescription implements runtime.Component.
 func (o *output) ShortDescription() string { return "" }
 
+// IsActuator implements runtime.Component.
+func (*output) IsActuator() bool { return false }
+
 // TakeReadings returns the list of readings since previous TakeReadings() call
 // (or since start).
 func (o *output) TakeReadings() []runtime.Reading {
@@ -86,8 +92,8 @@ func (o *output) DynamicConfigUpdate(_ notifiers.Event, _ config.Unmarshaller) {
 // ConfigureInputComponent takes an input component and creates a
 // Component which outputs signal with given name on its "output"
 // poruntime.
-func ConfigureInputComponent(comp runtime.Component, signal runtime.SignalID) runtime.ConfiguredComponent {
-	return runtime.ConfiguredComponent{
+func ConfigureInputComponent(comp runtime.Component, signal runtime.SignalID) *runtime.ConfiguredComponent {
+	return &runtime.ConfiguredComponent{
 		Component: comp,
 		PortMapping: runtime.PortMapping{
 			Outs: map[string][]runtime.Signal{
@@ -102,8 +108,8 @@ func ConfigureInputComponent(comp runtime.Component, signal runtime.SignalID) ru
 
 // ConfigureOutputComponent takes an output component and creates a
 // Component which reads signal with a given name on its "input" port.
-func ConfigureOutputComponent(signal runtime.SignalID, comp runtime.Component) runtime.ConfiguredComponent {
-	return runtime.ConfiguredComponent{
+func ConfigureOutputComponent(signal runtime.SignalID, comp runtime.Component) *runtime.ConfiguredComponent {
+	return &runtime.ConfiguredComponent{
 		Component: comp,
 		PortMapping: runtime.PortMapping{
 			Ins: map[string][]runtime.Signal{

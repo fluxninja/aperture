@@ -5,8 +5,6 @@ style root.0_outports fill:none,stroke:none
 root.0output[output]
 end
 end
-FakeConstant0((2.00))
-FakeConstant0 --> root.1rhs
 subgraph root.1[<center>ArithmeticCombinator<br/>Mul</center>]
 subgraph root.1_inports[ ]
 style root.1_inports fill:none,stroke:none
@@ -18,8 +16,6 @@ style root.1_outports fill:none,stroke:none
 root.1output[output]
 end
 end
-FakeConstant1((1.10))
-FakeConstant1 --> root.2rhs
 subgraph root.2[<center>ArithmeticCombinator<br/>Mul</center>]
 subgraph root.2_inports[ ]
 style root.2_inports fill:none,stroke:none
@@ -59,24 +55,28 @@ style root.5_outports fill:none,stroke:none
 root.5output[output]
 end
 end
-FakeConstant2((1.00))
-FakeConstant2 --> root.6scale_out_setpoint_0
-FakeConstant3((0.50))
-FakeConstant3 --> root.6scale_in_setpoint_0
 subgraph root.6[<center>AutoScaler<br/>demoapp:Deployment/service1...</center>]
 subgraph root.6_inports[ ]
 style root.6_inports fill:none,stroke:none
-root.6scale_out_setpoint_0[scale_out_setpoint_0]
-root.6scale_out_signal_0[scale_out_signal_0]
 root.6scale_in_setpoint_0[scale_in_setpoint_0]
 root.6scale_in_signal_0[scale_in_signal_0]
+root.6scale_out_setpoint_0[scale_out_setpoint_0]
+root.6scale_out_signal_0[scale_out_signal_0]
 end
 end
+root.1_rhs_FakeConstantout((2.00))
+root.2_rhs_FakeConstantout((1.10))
+root.6_scale_in_setpoint_0_FakeConstantout((0.50))
+root.6_scale_out_setpoint_0_FakeConstantout((1.00))
+root.4observed_load_multiplier --> |OBSERVED_LOAD_MULTIPLIER| root.6scale_out_signal_0
+root.5output --> |AVERAGE_CPU| root.6scale_in_signal_0
 root.0output --> |LATENCY| root.1lhs
 root.0output --> |LATENCY| root.3input
 root.0output --> |LATENCY| root.4signal
-root.3output --> |LATENCY_EMA| root.2lhs
-root.5output --> |AVERAGE_CPU| root.6scale_in_signal_0
 root.1output --> |MAX_EMA| root.3max_envelope
+root.3output --> |LATENCY_EMA| root.2lhs
 root.2output --> |LATENCY_SETPOINT| root.4setpoint
-root.4observed_load_multiplier --> |OBSERVED_LOAD_MULTIPLIER| root.6scale_out_signal_0
+root.1_rhs_FakeConstantout --> root.1rhs
+root.2_rhs_FakeConstantout --> root.2rhs
+root.6_scale_in_setpoint_0_FakeConstantout --> root.6scale_in_setpoint_0
+root.6_scale_out_setpoint_0_FakeConstantout --> root.6scale_out_setpoint_0

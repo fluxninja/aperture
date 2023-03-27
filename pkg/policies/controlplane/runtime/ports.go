@@ -2,10 +2,12 @@ package runtime
 
 import (
 	"errors"
+	"fmt"
 	"math"
 
 	"github.com/mitchellh/mapstructure"
 
+	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/mapstruct"
 )
 
@@ -98,7 +100,7 @@ func (p *PortMapping) Merge(other PortMapping) error {
 	return err
 }
 
-// PortToSignals is a map from port name to a list of ports.
+// PortToSignals is a map from port name to a list of signals.
 type PortToSignals map[string][]Signal
 
 func (p PortToSignals) merge(other PortToSignals) error {
@@ -116,6 +118,44 @@ func (p PortToSignals) merge(other PortToSignals) error {
 type ConstantSignal struct {
 	SpecialValue string  `mapstructure:"special_value"`
 	Value        float64 `mapstructure:"value"`
+}
+
+// Description returns a description of the constant signal.
+func (constantSignal *ConstantSignal) Description() string {
+	specialValue := constantSignal.SpecialValue
+	value := constantSignal.Value
+	var description string
+	if specialValue != "" {
+		description = specialValue
+	} else {
+		description = fmt.Sprintf("%0.2f", value)
+	}
+
+	return description
+}
+
+// Float returns the float value of the constant signal.
+func (constantSignal *ConstantSignal) Float() float64 {
+	specialValue := constantSignal.SpecialValue
+	value := constantSignal.Value
+	if specialValue == "NaN" {
+		return math.NaN()
+	}
+	if specialValue == "+Inf" {
+		return math.Inf(1)
+	}
+	if specialValue == "-Inf" {
+		return math.Inf(-1)
+	}
+	return value
+}
+
+// ConstantSignalFromProto creates a ConstantSignal from a proto message.
+func ConstantSignalFromProto(constantSignalProto *policylangv1.ConstantSignal) *ConstantSignal {
+	return &ConstantSignal{
+		SpecialValue: constantSignalProto.GetSpecialValue(),
+		Value:        constantSignalProto.GetValue(),
+	}
 }
 
 // PortsFromComponentConfig extracts Ports from component's config.
@@ -198,20 +238,7 @@ func (s *Signal) SignalType() SignalType {
 // ConstantSignalValue returns the value of the constant signal.
 func (s *Signal) ConstantSignalValue() float64 {
 	constantSignal := s.ConstantSignal
-	value := 0.0
-	specialValue := constantSignal.SpecialValue
-	if specialValue != "" {
-		switch specialValue {
-		case "NaN":
-			value = math.NaN()
-		case "+Inf":
-			value = math.Inf(1)
-		case "-Inf":
-			value = math.Inf(-1)
-		}
-	} else {
-		value = constantSignal.Value
-	}
+	value := constantSignal.Float()
 
 	return value
 }

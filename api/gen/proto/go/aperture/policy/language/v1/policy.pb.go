@@ -2122,7 +2122,7 @@ type Variable struct {
 	// Configuration key for DynamicConfig.
 	DynamicConfigKey string `protobuf:"bytes,2,opt,name=dynamic_config_key,json=dynamicConfigKey,proto3" json:"dynamic_config_key,omitempty"`
 	// Default configuration.
-	DefaultConfig *Variable_DynamicConfig `protobuf:"bytes,3,opt,name=default_config,json=defaultConfig,proto3" json:"default_config,omitempty"`
+	DefaultConfig *Variable_DynamicConfig `protobuf:"bytes,3,opt,name=default_config,json=defaultConfig,proto3" json:"default_config,omitempty" validate:"required"` // @gotags: validate:"required"
 }
 
 func (x *Variable) Reset() {
@@ -5242,7 +5242,7 @@ type Variable_DynamicConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ConstantSignal *ConstantSignal `protobuf:"bytes,1,opt,name=constant_signal,json=constantSignal,proto3" json:"constant_signal,omitempty"`
+	ConstantSignal *ConstantSignal `protobuf:"bytes,1,opt,name=constant_signal,json=constantSignal,proto3" json:"constant_signal,omitempty" validate:"required"` // @gotags: validate:"required"
 }
 
 func (x *Variable_DynamicConfig) Reset() {

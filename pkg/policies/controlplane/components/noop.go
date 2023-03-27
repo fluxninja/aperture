@@ -21,6 +21,9 @@ func (*NoOp) Type() runtime.ComponentType { return runtime.ComponentTypeSignalPr
 // ShortDescription implements runtime.Component.
 func (*NoOp) ShortDescription() string { return "" }
 
+// IsActuator implements runtime.Component.
+func (*NoOp) IsActuator() bool { return false }
+
 // Execute implements runtime.Component.Execute.
 func (noOp *NoOp) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	return inPortReadings, nil

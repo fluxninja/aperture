@@ -40,6 +40,9 @@ func (*ScaleActuator) Type() runtime.ComponentType { return runtime.ComponentTyp
 // ShortDescription implements runtime.Component.
 func (sa *ScaleActuator) ShortDescription() string { return sa.agentGroupName }
 
+// IsActuator implements runtime.Component.
+func (*ScaleActuator) IsActuator() bool { return true }
+
 // NewScaleActuatorAndOptions creates scale actuator and its fx options.
 func NewScaleActuatorAndOptions(
 	scaleActuatorProto *policylangv1.PodScaler_ScaleActuator,
