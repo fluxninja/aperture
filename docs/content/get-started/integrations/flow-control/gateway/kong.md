@@ -64,18 +64,18 @@ the Aperture Custom plugin for Kong server running on Container.
 Use the following Dockerfile to install the Aperture Custom plugin with Kong.
 
 ```mdx-code-block
-<CodeBlock language="Dockerfile">{`FROM kong:3.1.1-ubuntu
-WORKDIR /usr/kong/aperture
-USER root
-RUN apt update && apt-get install -y build-essential git curl
-RUN git clone https://github.com/fluxninja/opentelemetry-lua.git && cd opentelemetry-lua && luarocks make
-RUN curl --fail --location --remote-name "https://github.com/fluxninja/aperture/releases/download/${apertureVersion}/aperture-lua.tar.gz"
-RUN tar -xzvf aperture-lua.tar.gz && luarocks make aperture-kong-plugin-0.1.0-1.rockspec
-USER kong
-COPY kong.conf .
-COPY kong.yaml .
-ENV KONG_DATABASE=off
-ENV KONG_DECLARATIVE_CONFIG=kong.yaml
+<CodeBlock language="Dockerfile">{`FROM kong:3.1.1-ubuntu\n
+WORKDIR /usr/kong/aperture\n
+USER root\n
+RUN apt update && apt-get install -y build-essential git curl\n
+RUN git clone https://github.com/fluxninja/opentelemetry-lua.git && cd opentelemetry-lua && luarocks make\n
+RUN curl --fail --location --remote-name "https://github.com/fluxninja/aperture/releases/download/${apertureVersion}/aperture-lua.tar.gz"\n
+RUN tar -xzvf aperture-lua.tar.gz && luarocks make aperture-kong-plugin-0.1.0-1.rockspec\n
+USER kong\n
+COPY kong.conf .\n
+COPY kong.yaml .\n
+ENV KONG_DATABASE=off\n
+ENV KONG_DECLARATIVE_CONFIG=kong.yaml\n
 CMD [ "kong", "start", "-c", "kong.conf"]`}</CodeBlock>
 ```
 

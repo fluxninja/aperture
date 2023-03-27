@@ -88,12 +88,13 @@ as base image because it already has the
 with Nginx.
 
 ```mdx-code-block
-<CodeBlock language="Dockerfile">{`FROM fabiocicerchia/nginx-lua:1.23.3-debian-compat
-RUN apt update && apt-get install -y build-essential git
-RUN git clone https://github.com/fluxninja/opentelemetry-lua.git && cd opentelemetry-lua && luarocks make
-RUN curl --fail --location --remote-name "https://github.com/fluxninja/aperture/releases/download/${apertureVersion}/aperture-lua.tar.gz"
-RUN tar -xzvf aperture-lua.tar.gz && luarocks make aperture-nginx-plugin-0.1.0-1.rockspec
-COPY nginx_config.conf /etc/nginx/nginx.conf`}</CodeBlock>
+<CodeBlock language="Dockerfile">{`FROM fabiocicerchia/nginx-lua:1.23.3-debian-compat\n
+RUN apt update && apt-get install -y build-essential git\n
+RUN git clone https://github.com/fluxninja/opentelemetry-lua.git && cd opentelemetry-lua && luarocks make\n
+RUN curl --fail --location --remote-name "https://github.com/fluxninja/aperture/releases/download/${apertureVersion}/aperture-lua.tar.gz"\n
+RUN tar -xzvf aperture-lua.tar.gz && luarocks make aperture-nginx-plugin-0.1.0-1.rockspec\n
+COPY nginx_config.conf /etc/nginx/nginx.conf\n
+ENTRYPOINT [ "nginx", "-g", "daemon off;" ]`}</CodeBlock>
 ```
 
 ## Configure Nginx
