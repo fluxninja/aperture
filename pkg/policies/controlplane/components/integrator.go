@@ -29,6 +29,9 @@ func (in *Integrator) ShortDescription() string {
 	return ""
 }
 
+// IsActuator implements runtime.Component.
+func (*Integrator) IsActuator() bool { return false }
+
 // NewIntegrator creates an integrator component.
 func NewIntegrator() runtime.Component {
 	integrator := &Integrator{

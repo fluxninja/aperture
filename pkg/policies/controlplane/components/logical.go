@@ -29,6 +29,9 @@ func (c *logicalCombinator) Type() runtime.ComponentType {
 // ShortDescription implements runtime.Component.
 func (c *logicalCombinator) ShortDescription() string { return "" }
 
+// IsActuator implements runtime.Component.
+func (*logicalCombinator) IsActuator() bool { return false }
+
 // Execute implements runtime.Component.
 func (c *logicalCombinator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	inputs := inPortReadings.ReadRepeatedReadingPort("inputs")
@@ -82,6 +85,9 @@ func (c *inverter) Type() runtime.ComponentType { return runtime.ComponentTypeSi
 
 // ShortDescription implements runtime.Component.
 func (c *inverter) ShortDescription() string { return "" }
+
+// IsActuator implements runtime.Component.
+func (*inverter) IsActuator() bool { return false }
 
 // Execute implements runtime.Component.
 func (c *inverter) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {

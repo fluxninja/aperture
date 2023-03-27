@@ -51,6 +51,9 @@ func (*EMA) Type() runtime.ComponentType { return runtime.ComponentTypeSignalPro
 // ShortDescription implements runtime.Component.
 func (ema *EMA) ShortDescription() string { return fmt.Sprintf("win: %v", ema.emaWindow) }
 
+// IsActuator implements runtime.Component.
+func (*EMA) IsActuator() bool { return false }
+
 // Make sure EMA complies with Component interface.
 var _ runtime.Component = (*EMA)(nil)
 

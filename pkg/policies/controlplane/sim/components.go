@@ -31,6 +31,9 @@ func (i *Input) Type() runtime.ComponentType { return runtime.ComponentTypeSourc
 // ShortDescription implements runtime.Component.
 func (i *Input) ShortDescription() string { return "" }
 
+// IsActuator implements runtime.Component.
+func (*Input) IsActuator() bool { return false }
+
 // Execute implements runtime.Component.
 func (i *Input) Execute(_ runtime.PortToReading, _ runtime.TickInfo) (runtime.PortToReading, error) {
 	return runtime.PortToReading{
@@ -63,6 +66,9 @@ func (o *output) Type() runtime.ComponentType { return runtime.ComponentTypeSink
 
 // ShortDescription implements runtime.Component.
 func (o *output) ShortDescription() string { return "" }
+
+// IsActuator implements runtime.Component.
+func (*output) IsActuator() bool { return false }
 
 // TakeReadings returns the list of readings since previous TakeReadings() call
 // (or since start).

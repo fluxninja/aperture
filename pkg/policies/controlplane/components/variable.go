@@ -28,6 +28,9 @@ func (v *Variable) ShortDescription() string {
 	return v.constantSignal.Description()
 }
 
+// IsActuator implements runtime.Component.
+func (*Variable) IsActuator() bool { return false }
+
 // NewConstantSignal creates a variable component with a value that's always valid.
 func NewConstantSignal(value float64) runtime.Component {
 	return &Variable{

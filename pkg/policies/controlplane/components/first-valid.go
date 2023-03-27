@@ -21,6 +21,9 @@ func (*FirstValid) Type() runtime.ComponentType { return runtime.ComponentTypeSi
 // ShortDescription implements runtime.Component.
 func (*FirstValid) ShortDescription() string { return "" }
 
+// IsActuator implements runtime.Component.
+func (*FirstValid) IsActuator() bool { return false }
+
 // Make sure FirstValid complies with Component interface.
 var _ runtime.Component = (*FirstValid)(nil)
 

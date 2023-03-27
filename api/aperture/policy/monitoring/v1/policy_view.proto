@@ -65,4 +65,5 @@ message Tree {
   ComponentView node = 1;
   Graph graph = 2;
   repeated Tree children = 3;
+  repeated ComponentView actuators = 4;
 }
