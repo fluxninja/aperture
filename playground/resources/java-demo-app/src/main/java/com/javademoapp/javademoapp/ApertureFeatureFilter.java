@@ -26,6 +26,11 @@ public class ApertureFeatureFilter implements Filter {
     private ApertureSDK apertureSDK;
     private Logger log = LoggerFactory.getLogger(ApertureFeatureFilter.class);
 
+    /**
+     * This filter uses Aperture SDK to start a flow,
+     * then checks if the flow was accepted before calling next filter in the chain.
+     * If the flow is denied then an error response is sent back to the client.
+     */
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException, IOException {
         Map<String, String> labels = new HashMap<>();

@@ -16,10 +16,11 @@
       "ssh": "default"
     }
   ],
+  "needs": ["istio"],
   "child_resources": [
     {
       "workload": "service-graphql-demo-app",
-      "resource_deps": ["cluster-bootstrap"],
+      "resource_deps": ["cluster-bootstrap", "istiod"],
       "extra_objects": ["service-graphql-demo-app:serviceaccount"]
     }
   ]

@@ -9,7 +9,7 @@ simplesrv:
   rejectRatio: 0.05
   hostname: ~
   image:
-    repository: fluxninja/java-demo-app
+    repository: fluxninja/demo-app
     pullPolicy: IfNotPresent
     tag: "latest"
 

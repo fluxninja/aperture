@@ -18,13 +18,9 @@ This command will download the required dependencies, compile the source code,
 and create a runnable jar file in the build/libs/ directory.
 
 To run the project, execute the following command from the root directory of the
-project:
+project. By default, the application will run on port 8080.
 
 `gradle bootRun`
-
-By default, the application will run on port 8080. To specify a different port,
-set the FN_APP_PORT environment variable to the desired port number, include
-multiple ports if you wish to run multiple instances.
 
 Once the application is running, you can access it in a web browser by
 navigating to http://localhost:<port>, where <port> is the port number on which
