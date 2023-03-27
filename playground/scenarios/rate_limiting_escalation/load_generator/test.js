@@ -48,13 +48,13 @@ export default function () {
     request: [
       [
         {
-          destination: "service1-demo-app.demoapp.svc.cluster.local",
+          destination: "service1-demo-app.demoapp.svc.cluster.local/request",
         },
         {
-          destination: "service2-demo-app.demoapp.svc.cluster.local",
+          destination: "service2-demo-app.demoapp.svc.cluster.local/request",
         },
         {
-          destination: "service3-demo-app.demoapp.svc.cluster.local",
+          destination: "service3-demo-app.demoapp.svc.cluster.local/request",
         },
       ],
     ],

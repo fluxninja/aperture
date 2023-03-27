@@ -11,18 +11,18 @@ import (
 func AddEnvoySpecificLabels(attributes pcommon.Map) {
 	treatAsMissing := []string{otelconsts.EnvoyMissingAttributeValue}
 	// Retrieve request length
-	requestLength, requestLengthFound := otelcollector.GetFloat64(attributes, otelconsts.EnvoyBytesSentLabel, treatAsMissing)
+	requestLength, requestLengthFound := otelcollector.GetFloat64(attributes, otelconsts.BytesSentLabel, treatAsMissing)
 	if requestLengthFound {
 		attributes.PutDouble(otelconsts.HTTPRequestContentLength, requestLength)
 	}
 	// Retrieve response lengths
-	responseLength, responseLengthFound := otelcollector.GetFloat64(attributes, otelconsts.EnvoyBytesReceivedLabel, treatAsMissing)
+	responseLength, responseLengthFound := otelcollector.GetFloat64(attributes, otelconsts.BytesReceivedLabel, treatAsMissing)
 	if responseLengthFound {
 		attributes.PutDouble(otelconsts.HTTPResponseContentLength, responseLength)
 	}
 
 	// Compute durations
-	responseDuration, responseDurationExists := otelcollector.GetFloat64(attributes, otelconsts.EnvoyResponseDurationLabel, treatAsMissing)
+	responseDuration, responseDurationExists := otelcollector.GetFloat64(attributes, otelconsts.ResponseDurationLabel, treatAsMissing)
 	authzDuration, authzDurationExists := otelcollector.GetFloat64(attributes, otelconsts.EnvoyAuthzDurationLabel, treatAsMissing)
 
 	// Add ResponseReceivedLabel based on whether responseDuration is present and non-zero
