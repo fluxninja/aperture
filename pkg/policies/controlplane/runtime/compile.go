@@ -26,7 +26,7 @@ type ConfiguredComponent struct {
 
 // Compile compiles list of configured components into a circuit and validates it.
 func Compile(
-	configuredComponents []ConfiguredComponent,
+	configuredComponents []*ConfiguredComponent,
 	logger *log.Logger,
 ) error {
 	// Map from signal name to a list of componentIndex(es) which accept the signal as input.

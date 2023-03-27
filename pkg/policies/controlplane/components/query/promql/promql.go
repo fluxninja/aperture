@@ -368,6 +368,9 @@ func (promQL *PromQL) ShortDescription() string {
 	return fmt.Sprintf("every %s", promQL.evaluationInterval)
 }
 
+// IsActuator implements runtime.Component.
+func (*PromQL) IsActuator() bool { return false }
+
 var _ runtime.Component = (*PromQL)(nil)
 
 // Make sure PromQL implements jobRegistererIfc.

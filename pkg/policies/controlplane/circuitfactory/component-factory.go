@@ -35,7 +35,7 @@ func NewComponentAndOptions(
 	componentProto *policylangv1.Component,
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
-) (Tree, []runtime.ConfiguredComponent, fx.Option, error) {
+) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
 	var ctor componentConstructor
 	switch config := componentProto.Component.(type) {
 	case *policylangv1.Component_GradientController:
@@ -108,12 +108,12 @@ func NewComponentAndOptions(
 		return Tree{}, nil, nil, err
 	}
 
-	configuredComponent, err := prepareComponent(component, config, componentID)
+	configuredComponent, err := prepareComponent(component, config, componentID, true)
 	if err != nil {
 		return Tree{}, nil, nil, err
 	}
 
-	return Tree{Root: configuredComponent}, []runtime.ConfiguredComponent{configuredComponent}, option, nil
+	return Tree{Node: configuredComponent}, []*runtime.ConfiguredComponent{configuredComponent}, option, nil
 }
 
 type componentConstructor func(
@@ -135,13 +135,14 @@ func prepareComponent(
 	component runtime.Component,
 	config any,
 	componentID runtime.ComponentID,
-) (runtime.ConfiguredComponent, error) {
+	doParsePortMapping bool,
+) (*runtime.ConfiguredComponent, error) {
 	subCircuitID, ok := componentID.ParentID()
 	if !ok {
-		return runtime.ConfiguredComponent{}, fmt.Errorf("component %s is not in a circuit", componentID.String())
+		return nil, fmt.Errorf("component %s is not in a circuit", componentID.String())
 	}
 
-	return prepareComponentInCircuit(component, config, componentID, subCircuitID)
+	return prepareComponentInCircuit(component, config, componentID, subCircuitID, doParsePortMapping)
 }
 
 func prepareComponentInCircuit(
@@ -149,18 +150,22 @@ func prepareComponentInCircuit(
 	config any,
 	componentID runtime.ComponentID,
 	subCircuitID runtime.ComponentID,
-) (runtime.ConfiguredComponent, error) {
+	doParsePortMapping bool,
+) (*runtime.ConfiguredComponent, error) {
 	mapStruct, err := mapstruct.EncodeObject(config)
 	if err != nil {
-		return runtime.ConfiguredComponent{}, err
+		return nil, err
 	}
 
-	ports, err := runtime.PortsFromComponentConfig(mapStruct, subCircuitID.String())
-	if err != nil {
-		return runtime.ConfiguredComponent{}, err
+	ports := runtime.NewPortMapping()
+	if doParsePortMapping {
+		ports, err = runtime.PortsFromComponentConfig(mapStruct, subCircuitID.String())
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return runtime.ConfiguredComponent{
+	return &runtime.ConfiguredComponent{
 		Component:   component,
 		PortMapping: ports,
 		Config:      mapStruct,

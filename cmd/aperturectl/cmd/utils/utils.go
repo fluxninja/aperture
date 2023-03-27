@@ -18,20 +18,39 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	monitoringv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/monitoring/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
 
-// GenerateDotFile generates a DOT file from the circuit.
-func GenerateDotFile(circuit *circuitfactory.Circuit, dotFilePath string) error {
-	c := circuit.ToGraphView()
-	comps := make([]*monitoringv1.ComponentView, len(c.Tree.Children))
-	for i, v := range c.Tree.Children {
-		comps[i] = v.Root
+// GenerateDotFile generates a DOT file from the given circuit with the specified depth.
+// The depth determines how many levels of components in the tree should be expanded in the graph.
+// If maxDepth is set to -1, the function will expand components up to the maximum possible depth.
+//
+// Parameters:
+//   - circuit: A pointer to the circuitfactory.Circuit object to be used for generating the DOT file.
+//   - dotFilePath: The file path where the generated DOT file should be saved.
+//   - maxDepth: The maximum depth the graph should be expanded to.
+//     If set to -1, the function will expand components up to the maximum possible depth.
+//
+// Returns:
+//   - An error if any issues occur during the file creation or writing process, otherwise nil.
+//
+// Example usage:
+//
+//	err := GenerateDotFile(circuit, "output.dot", 3)
+//	// This will generate a DOT file with components expanded up to a depth of 3.
+//
+//	err := GenerateDotFile(circuit, "output.dot", -1)
+//	// This will generate a DOT file with components expanded up to the maximum possible depth.
+func GenerateDotFile(circuit *circuitfactory.Circuit, dotFilePath string, depth int) error {
+	graph, err := circuit.Tree.GetSubGraph(runtime.NewComponentID(runtime.RootComponentID), depth)
+	if err != nil {
+		return err
 	}
-	d := circuitfactory.DOT(comps, c.Tree.Links)
+
+	d := circuitfactory.DOTGraph(graph)
 	f, err := os.Create(dotFilePath)
 	if err != nil {
 		log.Error().Err(err).Msg("error creating file")
@@ -47,14 +66,33 @@ func GenerateDotFile(circuit *circuitfactory.Circuit, dotFilePath string) error 
 	return nil
 }
 
-// GenerateMermaidFile generates a mermaid file from the circuit.
-func GenerateMermaidFile(circuit *circuitfactory.Circuit, mermaidFile string) error {
-	c := circuit.ToGraphView()
-	comps := make([]*monitoringv1.ComponentView, len(c.Tree.Children))
-	for i, v := range c.Tree.Children {
-		comps[i] = v.Root
+// GenerateMermaidFile generates a Mermaid file from the given circuit with the specified depth.
+// The depth determines how many levels of components in the tree should be expanded in the graph.
+// If maxDepth is set to -1, the function will expand components up to the maximum possible depth.
+//
+// Parameters:
+//   - circuit: A pointer to the circuitfactory.Circuit object to be used for generating the Mermaid file.
+//   - mermaidFile: The file path where the generated Mermaid file should be saved.
+//   - maxDepth: The maximum depth the graph should be expanded to.
+//     If set to -1, the function will expand components up to the maximum possible depth.
+//
+// Returns:
+//   - An error if any issues occur during the file creation or writing process, otherwise nil.
+//
+// Example usage:
+//
+//	err := GenerateMermaidFile(circuit, "output.mmd", 3)
+//	// This will generate a Mermaid file with components expanded up to a depth of 3.
+//
+//	err := GenerateMermaidFile(circuit, "output.mmd", -1)
+//	// This will generate a Mermaid file with components expanded up to the maximum possible depth.
+func GenerateMermaidFile(circuit *circuitfactory.Circuit, mermaidFile string, depth int) error {
+	graph, err := circuit.Tree.GetSubGraph(runtime.NewComponentID(runtime.RootComponentID), depth)
+	if err != nil {
+		return err
 	}
-	m := circuitfactory.Mermaid(comps, c.Tree.Links)
+
+	m := circuitfactory.MermaidGraph(graph)
 	f, err := os.Create(mermaidFile)
 	if err != nil {
 		log.Error().Err(err).Msg("error creating file")

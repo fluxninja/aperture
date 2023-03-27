@@ -70,6 +70,9 @@ func (cc *ControllerComponent) ShortDescription() string {
 	return cc.shortDescription
 }
 
+// IsActuator implements runtime.Component.
+func (*ControllerComponent) IsActuator() bool { return false }
+
 // Execute implements runtime.Component.Execute.
 func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (outPortReadings runtime.PortToReading, err error) {
 	retErr := func(err error) (runtime.PortToReading, error) {

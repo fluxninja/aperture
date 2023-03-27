@@ -3753,7 +3753,10 @@ definitions:
         properties:
             default_config:
                 $ref: '#/definitions/VariableDynamicConfig'
-                description: Default configuration.
+                description: |+
+                    Default configuration.
+
+                x-go-tag-validate: required
             dynamic_config_key:
                 description: Configuration key for DynamicConfig.
                 type: string
@@ -3765,6 +3768,7 @@ definitions:
         properties:
             constant_signal:
                 $ref: '#/definitions/ConstantSignal'
+                x-go-tag-validate: required
         type: object
     VariableOuts:
         description: Outputs for the Variable component.

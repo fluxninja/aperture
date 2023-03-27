@@ -34,6 +34,9 @@ func (exp *Extrapolator) ShortDescription() string {
 	return fmt.Sprintf("for: %s", exp.maxExtrapolationInterval)
 }
 
+// IsActuator implements runtime.Component.
+func (*Extrapolator) IsActuator() bool { return false }
+
 // Make sure Extrapolator complies with Component interface.
 var _ runtime.Component = (*Extrapolator)(nil)
 

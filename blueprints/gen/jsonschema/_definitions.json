@@ -2978,7 +2978,8 @@
       "properties": {
         "default_config": {
           "$ref": "#/definitions/VariableDynamicConfig",
-          "description": "Default configuration.",
+          "description": "Default configuration.\n\n",
+          "x-go-tag-validate": "required",
           "x-order": 0
         },
         "dynamic_config_key": {
@@ -2999,6 +3000,7 @@
       "properties": {
         "constant_signal": {
           "$ref": "#/definitions/ConstantSignal",
+          "x-go-tag-validate": "required",
           "x-order": 0
         }
       },

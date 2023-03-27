@@ -74,6 +74,9 @@ func (unaryOperator *UnaryOperator) ShortDescription() string {
 	return unaryOperator.operator.String()
 }
 
+// IsActuator implements runtime.Component.
+func (*UnaryOperator) IsActuator() bool { return false }
+
 // Make sure UnaryOperator complies with Component interface.
 var _ runtime.Component = (*UnaryOperator)(nil)
 

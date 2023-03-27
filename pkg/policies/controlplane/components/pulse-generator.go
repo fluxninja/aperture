@@ -35,6 +35,9 @@ func (pg *PulseGenerator) ShortDescription() string {
 	return fmt.Sprintf("true for: %d, false for: %d", pg.trueFor, pg.falseFor)
 }
 
+// IsActuator implements runtime.Component.
+func (*PulseGenerator) IsActuator() bool { return false }
+
 // NewPulseGeneratorAndOptions creates an pulse generator component and its fx options.
 func NewPulseGeneratorAndOptions(generatorProto *policylangv1.PulseGenerator, _ string, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()

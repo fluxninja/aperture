@@ -3321,7 +3321,10 @@ definitions:
     type: object
     properties:
       default_config:
-        description: Default configuration.
+        description: |+
+          Default configuration.
+
+        x-go-tag-validate: required
         x-order: 0
         $ref: '#/definitions/VariableDynamicConfig'
       dynamic_config_key:
@@ -3336,6 +3339,7 @@ definitions:
     type: object
     properties:
       constant_signal:
+        x-go-tag-validate: required
         x-order: 0
         $ref: '#/definitions/ConstantSignal'
   VariableOuts:

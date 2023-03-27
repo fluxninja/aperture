@@ -24,6 +24,9 @@ func (*Max) Type() runtime.ComponentType { return runtime.ComponentTypeSignalPro
 // ShortDescription implements runtime.Component.
 func (*Max) ShortDescription() string { return "" }
 
+// IsActuator implements runtime.Component.
+func (*Max) IsActuator() bool { return false }
+
 // Make sure Max complies with Component interface.
 var _ runtime.Component = (*Max)(nil)
 

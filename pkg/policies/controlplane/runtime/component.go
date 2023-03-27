@@ -14,6 +14,8 @@ type Component interface {
 	Type() ComponentType
 	// ShortDescription is used when generating mermaid or dot diagrams.
 	ShortDescription() string
+	// IsActuator returns true if the component is an actuator.
+	IsActuator() bool
 }
 
 // ComponentType describes the type of a component based on its connectivity in the circuit.
@@ -66,3 +68,6 @@ func (c dummyComponent) Type() ComponentType { return c.componentType }
 
 // ShortDescription implements runtime.Component.
 func (c dummyComponent) ShortDescription() string { return c.shortDescription }
+
+// IsActuator implements runtime.Component.
+func (c dummyComponent) IsActuator() bool { return false }
