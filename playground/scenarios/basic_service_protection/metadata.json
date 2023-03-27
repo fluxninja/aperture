@@ -1,6 +1,6 @@
 {
   "renderer": "tanka",
-  "tkenv": "playground/tanka/apps/java-demo-app",
+  "tkenv": "playground/tanka/apps/demo-app",
   "needs": ["istio"],
   "aperture_policies": [
     {
@@ -12,8 +12,8 @@
   ],
   "images": [
     {
-      "ref": "java-demo-app",
-      "context": "playground/resources/java-demo-app/",
+      "ref": "demo-app",
+      "context": "playground/resources/demo-app/",
       "ssh": "default"
     }
   ],
