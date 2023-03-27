@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	amqp "github.com/rabbitmq/amqp091-go"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/propagation"
@@ -40,13 +41,18 @@ type SimpleService struct {
 	// Istio proxy should handle requests without additional config
 	// if it's injected.
 	envoyPort   int
+	rabbitMQURL string
 	concurrency int
 	latency     time.Duration
 	rejectRatio float64
 }
 
 // NewSimpleService creates a SimpleService instance.
-func NewSimpleService(hostname string, port, envoyPort int,
+func NewSimpleService(
+	hostname string,
+	port int,
+	envoyPort int,
+	rabbitMQURL string,
 	concurrency int,
 	latency time.Duration,
 	rejectRatio float64,
@@ -55,6 +61,7 @@ func NewSimpleService(hostname string, port, envoyPort int,
 		hostname:    hostname,
 		port:        port,
 		envoyPort:   envoyPort,
+		rabbitMQURL: rabbitMQURL,
 		concurrency: concurrency,
 		latency:     latency,
 		rejectRatio: rejectRatio,
@@ -62,18 +69,35 @@ func NewSimpleService(hostname string, port, envoyPort int,
 }
 
 // Run starts listening for requests on given port.
-func (simpleService SimpleService) Run() error {
+func (ss SimpleService) Run() error {
 	handler := &RequestHandler{
-		hostname:     simpleService.hostname,
-		latency:      simpleService.latency,
-		rejectRatio:  simpleService.rejectRatio,
-		concurrency:  simpleService.concurrency,
-		limitClients: make(chan struct{}, simpleService.concurrency),
+		hostname:     ss.hostname,
+		latency:      ss.latency,
+		rejectRatio:  ss.rejectRatio,
+		concurrency:  ss.concurrency,
+		limitClients: make(chan struct{}, ss.concurrency),
 	}
-	if simpleService.envoyPort == -1 {
+
+	if ss.rabbitMQURL != "" {
+		conn, err := amqp.Dial(ss.rabbitMQURL)
+		if err != nil {
+			return err
+		}
+		defer conn.Close()
+
+		ch, err := conn.Channel()
+		if err != nil {
+			return err
+		}
+		defer ch.Close()
+
+		handler.rabbitMQChan = ch
+	}
+
+	if ss.envoyPort == -1 {
 		handler.httpClient = &http.Client{}
 	} else {
-		proxyURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", simpleService.envoyPort))
+		proxyURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", ss.envoyPort))
 		if err != nil {
 			log.Panic().Err(err).Msgf("Failed to parse url: %v", err)
 		}
@@ -81,7 +105,7 @@ func (simpleService SimpleService) Run() error {
 	}
 
 	http.Handle("/request", handlerFunc(handler))
-	address := fmt.Sprintf(":%d", simpleService.port)
+	address := fmt.Sprintf(":%d", ss.port)
 
 	server := &http.Server{Addr: address}
 
@@ -129,6 +153,7 @@ type Subrequest struct {
 // RequestHandler handles processing of incoming requests.
 type RequestHandler struct {
 	httpClient   HTTPClient
+	rabbitMQChan *amqp.Channel
 	limitClients chan struct{}
 	hostname     string
 	concurrency  int

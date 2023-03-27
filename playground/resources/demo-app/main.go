@@ -17,6 +17,16 @@ import (
 	"github.com/fluxninja/aperture/playground/resources/demo-app/app"
 )
 
+type rabbitMQEnvVar string
+
+const (
+	rabbitMQEnable         rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_ENABLE"
+	rabbitMQHostEnvVar     rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_HOST"
+	rabbitMQPortEnvVar     rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_PORT"
+	rabbitMQUserEnvVar     rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_USER"
+	rabbitMQPasswordEnvVar rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_PASSWORD"
+)
+
 func main() {
 	hostname := hostnameFromEnv()
 	port := portFromEnv()
@@ -24,6 +34,16 @@ func main() {
 	concurrency := concurrencyFromEnv()
 	latency := latencyFromEnv()
 	rejectRatio := rejectRatioFromEnv()
+
+	// RabbitMQ related setup
+	rabbitMQURL := ""
+	if rabbitMQFromEnv(rabbitMQEnable) == "true" {
+		rabbitMQHost := rabbitMQFromEnv(rabbitMQHostEnvVar)
+		rabbitMQPort := rabbitMQFromEnv(rabbitMQPortEnvVar)
+		rabbitMQUser := rabbitMQFromEnv(rabbitMQUserEnvVar)
+		rabbitMQPassword := rabbitMQFromEnv(rabbitMQPasswordEnvVar)
+		rabbitMQURL = "amqp://" + rabbitMQUser + ":" + rabbitMQPassword + "@" + rabbitMQHost + ":" + rabbitMQPort + "/"
+	}
 
 	// We don't necessarily need tracing providers (just propagators), but lets
 	// do them anyway to have a "more realistic" otel usage
@@ -47,11 +67,32 @@ func main() {
 		propagation.Baggage{},
 	))
 
-	service := app.NewSimpleService(hostname, port, envoyPort, concurrency, latency, rejectRatio)
+	service := app.NewSimpleService(hostname, port, envoyPort, rabbitMQURL, concurrency, latency, rejectRatio)
 	err := service.Run()
 	if err != nil {
 		log.Error().Err(err).Send()
 	}
+}
+
+func rabbitMQFromEnv(envVar rabbitMQEnvVar) string {
+	value := os.Getenv(string(envVar))
+	if value == "" {
+		switch envVar {
+		case rabbitMQEnable:
+			return "false"
+		case rabbitMQHostEnvVar:
+			return "localhost"
+		case rabbitMQPortEnvVar:
+			return "5672"
+		case rabbitMQUserEnvVar:
+			return "guest"
+		case rabbitMQPasswordEnvVar:
+			return "guest"
+		default:
+			return ""
+		}
+	}
+	return value
 }
 
 func envoyPortFromEnv() int {
