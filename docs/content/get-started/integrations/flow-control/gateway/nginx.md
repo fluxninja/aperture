@@ -91,8 +91,8 @@ with Nginx.
 <CodeBlock language="Dockerfile">{`FROM fabiocicerchia/nginx-lua:1.23.3-debian-compat
 RUN apt update && apt-get install -y build-essential git
 RUN git clone https://github.com/fluxninja/opentelemetry-lua.git && cd opentelemetry-lua && luarocks make
-RUN wget "https://github.com/fluxninja/aperture/releases/download/${apertureVersion}/aperture-lua.tar.gz"
-RUN tar -xzvf aperture-lua.tar.gz && cd aperture-lua && luarocks make aperture-nginx-plugin-0.1.0-1.rockspec
+RUN curl --fail --location --remote-name "https://github.com/fluxninja/aperture/releases/download/${apertureVersion}/aperture-lua.tar.gz"
+RUN tar -xzvf aperture-lua.tar.gz && luarocks make aperture-nginx-plugin-0.1.0-1.rockspec
 COPY nginx_config.conf /etc/nginx/nginx.conf`}</CodeBlock>
 ```
 
