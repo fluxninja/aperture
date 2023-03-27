@@ -81,9 +81,9 @@ var _ = Describe("CheckHTTP handler", func() {
 			// add "control-point" header to ctx
 			ctxWithIp = metadata.NewIncomingContext(
 				ctxWithIp,
-				metadata.Pairs("control-point", "ingress"),
+				metadata.Pairs(),
 			)
-			resp, err := handler.CheckHTTP(ctxWithIp, &flowcontrolhttpv1.CheckHTTPRequest{})
+			resp, err := handler.CheckHTTP(ctxWithIp, &flowcontrolhttpv1.CheckHTTPRequest{ControlPoint: "ingress"})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(code.Code(resp.GetStatus().GetCode())).To(Equal(code.Code_OK))
 		})
@@ -91,9 +91,9 @@ var _ = Describe("CheckHTTP handler", func() {
 			ctxWithIp := peer.NewContext(ctx, newFakeRpcPeer("1.2.3.4"))
 			ctxWithIp = metadata.NewIncomingContext(
 				ctxWithIp,
-				metadata.Pairs("control-point", "ingress"),
+				metadata.Pairs(),
 			)
-			resp, err := handler.CheckHTTP(ctxWithIp, &flowcontrolhttpv1.CheckHTTPRequest{})
+			resp, err := handler.CheckHTTP(ctxWithIp, &flowcontrolhttpv1.CheckHTTPRequest{ControlPoint: "ingress"})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(resp.GetDynamicMetadata()).NotTo(BeNil())
 		})

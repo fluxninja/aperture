@@ -510,6 +510,11 @@ definitions:
         type: object
     CheckHTTPRequest:
         properties:
+            control_point:
+                description: |-
+                    For an SDK based insertion, a Control Point can represent a particular feature or execution block within a Service.
+                    In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners or filter chains.
+                type: string
             destination:
                 $ref: '#/definitions/SocketAddress'
                 description: |-
