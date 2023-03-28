@@ -63,7 +63,7 @@ func ModuleForAgentOTEL() fx.Option {
 		resourceprocessor.Module(),
 		filterprocessor.Module(),
 		fx.Provide(
-			cache.Provide[selectors.ControlPointID],
+			cache.Provide[selectors.TypedControlPointID],
 			fx.Annotate(
 				provideAgent,
 				fx.ResultTags(otelconfig.BaseFxTag),
@@ -89,7 +89,7 @@ func AgentOTELComponents(
 	engine iface.Engine,
 	clasEng iface.ClassificationEngine,
 	serverGRPC *grpc.Server,
-	controlPointCache *cache.Cache[selectors.ControlPointID],
+	controlPointCache *cache.Cache[selectors.TypedControlPointID],
 	alertMgr *alertmanager.AlertManager,
 ) (otelcol.Factories, error) {
 	var errs error

@@ -55,7 +55,7 @@ func (h *Handler) ListFlowControlPoints(
 		}
 
 		for _, protoCp := range resp.Success.FlowControlPoints.FlowControlPoints {
-			gcp := selectors.ControlPointIDFromProto(protoCp).InAgentGroup(resp.Success.AgentGroup)
+			gcp := selectors.TypedControlPointIDFromProto(protoCp).InAgentGroup(resp.Success.AgentGroup)
 			allControlPoints[gcp] = struct{}{}
 		}
 	}
@@ -245,7 +245,7 @@ func doPreview[AgentResp, ControllerResp any](
 	ctx context.Context,
 	h *Handler,
 	req *previewv1.PreviewRequest,
-	cp selectors.GlobalControlPointID,
+	cp selectors.UntypedGlobalControlPointID,
 	preview func(string, *previewv1.PreviewRequest) (AgentResp, error),
 	wrap func(AgentResp) ControllerResp,
 ) (ControllerResp, error) {
@@ -295,8 +295,8 @@ func doPreview[AgentResp, ControllerResp any](
 func mkGlobalControlPoint(
 	agentGroup string,
 	req *previewv1.PreviewRequest,
-) selectors.GlobalControlPointID {
-	return selectors.GlobalControlPointID{
+) selectors.UntypedGlobalControlPointID {
+	return selectors.UntypedGlobalControlPointID{
 		ControlPointID: selectors.ControlPointID{
 			ControlPoint: req.GetControlPoint(),
 			Service:      req.GetService(),
@@ -307,7 +307,7 @@ func mkGlobalControlPoint(
 
 func (h *Handler) agentsWithControlPoint(
 	ctx context.Context,
-	needle selectors.GlobalControlPointID,
+	needle selectors.UntypedGlobalControlPointID,
 ) ([]string, error) {
 	// FIXME We could narrow down list of agents to ask for control points if
 	// we'd cache agent groups.
@@ -331,7 +331,7 @@ agentsLoop:
 		}
 
 		for _, cpProto := range agent.Success.FlowControlPoints.FlowControlPoints {
-			cp := selectors.ControlPointIDFromProto(cpProto)
+			cp := selectors.TypedControlPointIDFromProto(cpProto)
 
 			if cp.ControlPoint != needle.ControlPoint {
 				continue
