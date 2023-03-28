@@ -30,6 +30,70 @@ private static final long serialVersionUID = 0L;
     return new CheckRequest();
   }
 
+  @java.lang.Override
+  public final com.google.protobuf.UnknownFieldSet
+  getUnknownFields() {
+    return this.unknownFields;
+  }
+  private CheckRequest(
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
+    this();
+    if (extensionRegistry == null) {
+      throw new java.lang.NullPointerException();
+    }
+    int mutable_bitField0_ = 0;
+    com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+        com.google.protobuf.UnknownFieldSet.newBuilder();
+    try {
+      boolean done = false;
+      while (!done) {
+        int tag = input.readTag();
+        switch (tag) {
+          case 0:
+            done = true;
+            break;
+          case 10: {
+            java.lang.String s = input.readStringRequireUtf8();
+
+            controlPoint_ = s;
+            break;
+          }
+          case 18: {
+            if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+              labels_ = com.google.protobuf.MapField.newMapField(
+                  LabelsDefaultEntryHolder.defaultEntry);
+              mutable_bitField0_ |= 0x00000001;
+            }
+            com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+            labels__ = input.readMessage(
+                LabelsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+            labels_.getMutableMap().put(
+                labels__.getKey(), labels__.getValue());
+            break;
+          }
+          default: {
+            if (!parseUnknownField(
+                input, unknownFields, extensionRegistry, tag)) {
+              done = true;
+            }
+            break;
+          }
+        }
+      }
+    } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+      throw e.setUnfinishedMessage(this);
+    } catch (com.google.protobuf.UninitializedMessageException e) {
+      throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
+    } catch (java.io.IOException e) {
+      throw new com.google.protobuf.InvalidProtocolBufferException(
+          e).setUnfinishedMessage(this);
+    } finally {
+      this.unknownFields = unknownFields.build();
+      makeExtensionsImmutable();
+    }
+  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CheckRequest_descriptor;
@@ -56,8 +120,7 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int CONTROL_POINT_FIELD_NUMBER = 1;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object controlPoint_ = "";
+  private volatile java.lang.Object controlPoint_;
   /**
    * <code>string control_point = 1 [json_name = "controlPoint"];</code>
    * @return The controlPoint.
@@ -106,7 +169,6 @@ private static final long serialVersionUID = 0L;
                 com.google.protobuf.WireFormat.FieldType.STRING,
                 "");
   }
-  @SuppressWarnings("serial")
   private com.google.protobuf.MapField<
       java.lang.String, java.lang.String> labels_;
   private com.google.protobuf.MapField<java.lang.String, java.lang.String>
@@ -117,12 +179,14 @@ private static final long serialVersionUID = 0L;
     }
     return labels_;
   }
+
   public int getLabelsCount() {
     return internalGetLabels().getMap().size();
   }
   /**
    * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
    */
+
   @java.lang.Override
   public boolean containsLabels(
       java.lang.String key) {
@@ -141,6 +205,7 @@ private static final long serialVersionUID = 0L;
    * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
    */
   @java.lang.Override
+
   public java.util.Map<java.lang.String, java.lang.String> getLabelsMap() {
     return internalGetLabels().getMap();
   }
@@ -148,11 +213,10 @@ private static final long serialVersionUID = 0L;
    * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
    */
   @java.lang.Override
-  public /* nullable */
-java.lang.String getLabelsOrDefault(
+
+  public java.lang.String getLabelsOrDefault(
       java.lang.String key,
-      /* nullable */
-java.lang.String defaultValue) {
+      java.lang.String defaultValue) {
     if (key == null) { throw new NullPointerException("map key"); }
     java.util.Map<java.lang.String, java.lang.String> map =
         internalGetLabels().getMap();
@@ -162,6 +226,7 @@ java.lang.String defaultValue) {
    * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
    */
   @java.lang.Override
+
   public java.lang.String getLabelsOrThrow(
       java.lang.String key) {
     if (key == null) { throw new NullPointerException("map key"); }
@@ -196,7 +261,7 @@ java.lang.String defaultValue) {
         internalGetLabels(),
         LabelsDefaultEntryHolder.defaultEntry,
         2);
-    getUnknownFields().writeTo(output);
+    unknownFields.writeTo(output);
   }
 
   @java.lang.Override
@@ -218,7 +283,7 @@ java.lang.String defaultValue) {
       size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, labels__);
     }
-    size += getUnknownFields().getSerializedSize();
+    size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
   }
@@ -237,7 +302,7 @@ java.lang.String defaultValue) {
         .equals(other.getControlPoint())) return false;
     if (!internalGetLabels().equals(
         other.internalGetLabels())) return false;
-    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+    if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
 
@@ -254,7 +319,7 @@ java.lang.String defaultValue) {
       hash = (37 * hash) + LABELS_FIELD_NUMBER;
       hash = (53 * hash) + internalGetLabels().hashCode();
     }
-    hash = (29 * hash) + getUnknownFields().hashCode();
+    hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
   }
@@ -397,19 +462,24 @@ java.lang.String defaultValue) {
 
     // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessageV3
+              .alwaysUseFieldBuilders) {
+      }
     }
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      bitField0_ = 0;
       controlPoint_ = "";
+
       internalGetMutableLabels().clear();
       return this;
     }
@@ -437,22 +507,46 @@ java.lang.String defaultValue) {
     @java.lang.Override
     public com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest buildPartial() {
       com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest result = new com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest(this);
-      if (bitField0_ != 0) { buildPartial0(result); }
+      int from_bitField0_ = bitField0_;
+      result.controlPoint_ = controlPoint_;
+      result.labels_ = internalGetLabels();
+      result.labels_.makeImmutable();
       onBuilt();
       return result;
     }
 
-    private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest result) {
-      int from_bitField0_ = bitField0_;
-      if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.controlPoint_ = controlPoint_;
-      }
-      if (((from_bitField0_ & 0x00000002) != 0)) {
-        result.labels_ = internalGetLabels();
-        result.labels_.makeImmutable();
-      }
+    @java.lang.Override
+    public Builder clone() {
+      return super.clone();
     }
-
+    @java.lang.Override
+    public Builder setField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        java.lang.Object value) {
+      return super.setField(field, value);
+    }
+    @java.lang.Override
+    public Builder clearField(
+        com.google.protobuf.Descriptors.FieldDescriptor field) {
+      return super.clearField(field);
+    }
+    @java.lang.Override
+    public Builder clearOneof(
+        com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+      return super.clearOneof(oneof);
+    }
+    @java.lang.Override
+    public Builder setRepeatedField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        int index, java.lang.Object value) {
+      return super.setRepeatedField(field, index, value);
+    }
+    @java.lang.Override
+    public Builder addRepeatedField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        java.lang.Object value) {
+      return super.addRepeatedField(field, value);
+    }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest) {
@@ -467,13 +561,11 @@ java.lang.String defaultValue) {
       if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest.getDefaultInstance()) return this;
       if (!other.getControlPoint().isEmpty()) {
         controlPoint_ = other.controlPoint_;
-        bitField0_ |= 0x00000001;
         onChanged();
       }
       internalGetMutableLabels().mergeFrom(
           other.internalGetLabels());
-      bitField0_ |= 0x00000002;
-      this.mergeUnknownFields(other.getUnknownFields());
+      this.mergeUnknownFields(other.unknownFields);
       onChanged();
       return this;
     }
@@ -488,44 +580,17 @@ java.lang.String defaultValue) {
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest parsedMessage = null;
       try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10: {
-              controlPoint_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000001;
-              break;
-            } // case 10
-            case 18: {
-              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
-              labels__ = input.readMessage(
-                  LabelsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
-              internalGetMutableLabels().getMutableMap().put(
-                  labels__.getKey(), labels__.getValue());
-              bitField0_ |= 0x00000002;
-              break;
-            } // case 18
-            default: {
-              if (!super.parseUnknownField(input, extensionRegistry, tag)) {
-                done = true; // was an endgroup tag
-              }
-              break;
-            } // default:
-          } // switch (tag)
-        } // while (!done)
+        parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        parsedMessage = (com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
-        onChanged();
-      } // finally
+        if (parsedMessage != null) {
+          mergeFrom(parsedMessage);
+        }
+      }
       return this;
     }
     private int bitField0_;
@@ -571,9 +636,11 @@ java.lang.String defaultValue) {
      */
     public Builder setControlPoint(
         java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
       controlPoint_ = value;
-      bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
@@ -582,8 +649,8 @@ java.lang.String defaultValue) {
      * @return This builder for chaining.
      */
     public Builder clearControlPoint() {
+      
       controlPoint_ = getDefaultInstance().getControlPoint();
-      bitField0_ = (bitField0_ & ~0x00000001);
       onChanged();
       return this;
     }
@@ -594,10 +661,12 @@ java.lang.String defaultValue) {
      */
     public Builder setControlPointBytes(
         com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
       controlPoint_ = value;
-      bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
@@ -605,7 +674,7 @@ java.lang.String defaultValue) {
     private com.google.protobuf.MapField<
         java.lang.String, java.lang.String> labels_;
     private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-        internalGetLabels() {
+    internalGetLabels() {
       if (labels_ == null) {
         return com.google.protobuf.MapField.emptyMapField(
             LabelsDefaultEntryHolder.defaultEntry);
@@ -613,7 +682,8 @@ java.lang.String defaultValue) {
       return labels_;
     }
     private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-        internalGetMutableLabels() {
+    internalGetMutableLabels() {
+      onChanged();;
       if (labels_ == null) {
         labels_ = com.google.protobuf.MapField.newMapField(
             LabelsDefaultEntryHolder.defaultEntry);
@@ -621,16 +691,16 @@ java.lang.String defaultValue) {
       if (!labels_.isMutable()) {
         labels_ = labels_.copy();
       }
-      bitField0_ |= 0x00000002;
-      onChanged();
       return labels_;
     }
+
     public int getLabelsCount() {
       return internalGetLabels().getMap().size();
     }
     /**
      * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
      */
+
     @java.lang.Override
     public boolean containsLabels(
         java.lang.String key) {
@@ -649,6 +719,7 @@ java.lang.String defaultValue) {
      * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
      */
     @java.lang.Override
+
     public java.util.Map<java.lang.String, java.lang.String> getLabelsMap() {
       return internalGetLabels().getMap();
     }
@@ -656,11 +727,10 @@ java.lang.String defaultValue) {
      * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
      */
     @java.lang.Override
-    public /* nullable */
-java.lang.String getLabelsOrDefault(
+
+    public java.lang.String getLabelsOrDefault(
         java.lang.String key,
-        /* nullable */
-java.lang.String defaultValue) {
+        java.lang.String defaultValue) {
       if (key == null) { throw new NullPointerException("map key"); }
       java.util.Map<java.lang.String, java.lang.String> map =
           internalGetLabels().getMap();
@@ -670,6 +740,7 @@ java.lang.String defaultValue) {
      * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
      */
     @java.lang.Override
+
     public java.lang.String getLabelsOrThrow(
         java.lang.String key) {
       if (key == null) { throw new NullPointerException("map key"); }
@@ -680,8 +751,8 @@ java.lang.String defaultValue) {
       }
       return map.get(key);
     }
+
     public Builder clearLabels() {
-      bitField0_ = (bitField0_ & ~0x00000002);
       internalGetMutableLabels().getMutableMap()
           .clear();
       return this;
@@ -689,6 +760,7 @@ java.lang.String defaultValue) {
     /**
      * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
      */
+
     public Builder removeLabels(
         java.lang.String key) {
       if (key == null) { throw new NullPointerException("map key"); }
@@ -701,8 +773,7 @@ java.lang.String defaultValue) {
      */
     @java.lang.Deprecated
     public java.util.Map<java.lang.String, java.lang.String>
-        getMutableLabels() {
-      bitField0_ |= 0x00000002;
+    getMutableLabels() {
       return internalGetMutableLabels().getMutableMap();
     }
     /**
@@ -712,20 +783,22 @@ java.lang.String defaultValue) {
         java.lang.String key,
         java.lang.String value) {
       if (key == null) { throw new NullPointerException("map key"); }
-      if (value == null) { throw new NullPointerException("map value"); }
+      if (value == null) {
+  throw new NullPointerException("map value");
+}
+
       internalGetMutableLabels().getMutableMap()
           .put(key, value);
-      bitField0_ |= 0x00000002;
       return this;
     }
     /**
      * <code>map&lt;string, string&gt; labels = 2 [json_name = "labels"];</code>
      */
+
     public Builder putAllLabels(
         java.util.Map<java.lang.String, java.lang.String> values) {
       internalGetMutableLabels().getMutableMap()
           .putAll(values);
-      bitField0_ |= 0x00000002;
       return this;
     }
     @java.lang.Override
@@ -761,18 +834,7 @@ java.lang.String defaultValue) {
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      Builder builder = newBuilder();
-      try {
-        builder.mergeFrom(input, extensionRegistry);
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(builder.buildPartial());
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e)
-            .setUnfinishedMessage(builder.buildPartial());
-      }
-      return builder.buildPartial();
+      return new CheckRequest(input, extensionRegistry);
     }
   };
 

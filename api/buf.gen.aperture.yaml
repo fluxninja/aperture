@@ -9,6 +9,10 @@ managed:
       - buf.build/grpc-ecosystem/grpc-gateway
       - buf.build/envoyproxy/protoc-gen-validate
 plugins:
+  - remote: buf.build/protocolbuffers/plugins/java:v21.6.0-1
+    out: gen/proto/java
+  - remote: buf.build/grpc/plugins/java:v1.49.1-1
+    out: gen/proto/java
   - plugin: buf.build/protocolbuffers/go
     out: gen/proto/go
     opt:
@@ -18,10 +22,6 @@ plugins:
     opt:
       - paths=source_relative
       - require_unimplemented_servers=false
-  - plugin: buf.build/protocolbuffers/java
-    out: gen/proto/java
-  - plugin: buf.build/grpc/java
-    out: gen/proto/java
   - remote: buf.build/mitchellh/plugins/protoc-gen-go-json:v1.1.0
     out: gen/proto/go
     opt:
