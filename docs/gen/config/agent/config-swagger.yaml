@@ -324,9 +324,12 @@ definitions:
             grpc:
                 $ref: '#/definitions/GRPCClientConfig'
                 x-go-tag-json: grpc
-        title: ClientConfig is configuration for network clients used by agent-functions.
+            http:
+                $ref: '#/definitions/HTTPClientConfig'
+                x-go-tag-json: http
+        title: ClientConfig is the client configuration.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions
+        x-go-package: github.com/fluxninja/aperture/extensions/fluxninja/extconfig
     ClientTLSConfig:
         properties:
             ca_file:
