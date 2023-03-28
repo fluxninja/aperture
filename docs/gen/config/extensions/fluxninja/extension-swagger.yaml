@@ -44,17 +44,6 @@ definitions:
         title: BackoffConfig holds configuration for GRPC Client Backoff.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
-    ClientConfig:
-        properties:
-            grpc:
-                $ref: '#/definitions/GRPCClientConfig'
-                x-go-tag-json: grpc
-            http:
-                $ref: '#/definitions/HTTPClientConfig'
-                x-go-tag-json: http
-        title: ClientConfig is the client configuration.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/extensions/fluxninja/extconfig
     ClientTLSConfig:
         properties:
             ca_file:
@@ -85,6 +74,17 @@ definitions:
         title: Duration is encoded as a string message which represents a signed span of time.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/config
+    FluxNinjaClientConfig:
+        properties:
+            grpc:
+                $ref: '#/definitions/GRPCClientConfig'
+                x-go-tag-json: grpc
+            http:
+                $ref: '#/definitions/HTTPClientConfig'
+                x-go-tag-json: http
+        title: FluxNinjaClientConfig is the client configuration.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/extensions/fluxninja/extconfig
     FluxNinjaExtensionConfig:
         properties:
             api_key:
@@ -93,7 +93,7 @@ definitions:
                 x-go-name: APIKey
                 x-go-tag-json: api_key
             client:
-                $ref: '#/definitions/ClientConfig'
+                $ref: '#/definitions/FluxNinjaClientConfig'
                 x-go-tag-json: client
             endpoint:
                 description: Address to grpc or http(s) server listening in agent service. To use http protocol, the address must start with http(s)://.

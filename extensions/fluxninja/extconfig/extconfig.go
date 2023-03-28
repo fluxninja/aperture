@@ -25,15 +25,15 @@ type FluxNinjaExtensionConfig struct {
 	// API Key for this agent. If this key is not set, the extension will not be enabled.
 	APIKey string `json:"api_key"`
 	// Client configuration.
-	ClientConfig ClientConfig `json:"client"`
+	ClientConfig FluxNinjaClientConfig `json:"client"`
 	// Installation mode describes how Agent/Controller is being run.
 	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL" default:"LINUX_BARE_METAL"`
 }
 
-// ClientConfig is the client configuration.
+// FluxNinjaClientConfig is the client configuration.
 // swagger:model
 // +kubebuilder:object:generate=true
-type ClientConfig struct {
+type FluxNinjaClientConfig struct {
 	// HTTP client settings.
 	HTTPClient http.HTTPClientConfig `json:"http"`
 	// GRPC client settings.

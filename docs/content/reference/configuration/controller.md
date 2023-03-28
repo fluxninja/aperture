@@ -417,27 +417,6 @@ into smaller units.
 
 ---
 
-### ClientConfig {#client-config}
-
-ClientConfig is the client configuration.
-
-<dl>
-<dt>grpc</dt>
-<dd>
-
-([GRPCClientConfig](#g-rpc-client-config))
-
-</dd>
-<dt>http</dt>
-<dd>
-
-([HTTPClientConfig](#http-client-config))
-
-</dd>
-</dl>
-
----
-
 ### ClientTLSConfig {#client-tls-config}
 
 ClientTLSConfig is the config for client TLS.
@@ -537,6 +516,27 @@ EtcdConfig holds configuration for etcd client.
 
 ---
 
+### FluxNinjaClientConfig {#flux-ninja-client-config}
+
+FluxNinjaClientConfig is the client configuration.
+
+<dl>
+<dt>grpc</dt>
+<dd>
+
+([GRPCClientConfig](#g-rpc-client-config))
+
+</dd>
+<dt>http</dt>
+<dd>
+
+([HTTPClientConfig](#http-client-config))
+
+</dd>
+</dl>
+
+---
+
 ### FluxNinjaExtensionConfig {#flux-ninja-extension-config}
 
 FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
@@ -569,7 +569,7 @@ FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
 <dt>client</dt>
 <dd>
 
-([ClientConfig](#client-config))
+([FluxNinjaClientConfig](#flux-ninja-client-config))
 
 </dd>
 </dl>
