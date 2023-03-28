@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package aperture.policy.language.v1;
+
+// Components receive input from other components via InPorts
+message InPort {
+  oneof value {
+    // Name of the incoming Signal on the InPort.
+    string signal_name = 1;
+    // Constant value to be used for this InPort instead of a signal.
+    ConstantSignal constant_signal = 2;
+  }
+}
+
+// Components produce output for other components via OutPorts
+message OutPort {
+  // Name of the outgoing Signal on the OutPort.
+  string signal_name = 1;
+}
+
+// Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
+message ConstantSignal {
+  oneof const {
+    // A special value such as NaN, +Inf, -Inf.
+    string special_value = 1; // @gotags: validate:"oneof=NaN +Inf -Inf"
+    // A constant value.
+    double value = 2;
+  }
+}

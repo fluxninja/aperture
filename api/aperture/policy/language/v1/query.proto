@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package aperture.policy.language.v1;
+
+import "aperture/policy/language/v1/ports.proto";
+import "google/protobuf/duration.proto";
+
+// Query components that are query databases such as Prometheus.
+message Query {
+  oneof component {
+    // Periodically runs a Prometheus query in the background and emits the result.
+    PromQL promql = 1;
+  }
+}
+
+// Component that runs a Prometheus query periodically and returns the result as an output signal
+message PromQL {
+  // Output for the PromQL component.
+  message Outs {
+    // The result of the Prometheus query as an output signal.
+    OutPort output = 1;
+  }
+
+  // Output ports for the PromQL component.
+  Outs out_ports = 1;
+
+  // Describes the Prometheus query to be run.
+  //
+  // :::caution
+  //
+  // TODO we should describe how to construct the query, eg. how to employ the
+  // fluxmeters here or link to appropriate place in docs.
+  //
+  // :::
+  string query_string = 2;
+
+  // Describes the interval between successive evaluations of the Prometheus query.
+  google.protobuf.Duration evaluation_interval = 3; // @gotags: default:"10s"
+}

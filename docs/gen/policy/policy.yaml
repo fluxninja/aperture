@@ -259,6 +259,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/InPort'
         x-go-tag-validate: dive
         x-order: 0
@@ -409,6 +410,7 @@ definitions:
         description: List of _Controllers_ for scaling in.
         type: array
         items:
+          type: object
           $ref: '#/definitions/AutoScalerScaleInController'
         x-order: 7
       scale_in_cooldown:
@@ -427,6 +429,7 @@ definitions:
         description: List of _Controllers_ for scaling out.
         type: array
         items:
+          type: object
           $ref: '#/definitions/AutoScalerScaleOutController'
         x-order: 10
       scale_out_cooldown:
@@ -648,6 +651,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/Component'
         x-go-tag-validate: dive
         x-order: 0
@@ -1315,6 +1319,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/InPort'
         x-go-tag-validate: dive
         x-order: 0
@@ -1347,6 +1352,33 @@ definitions:
         description: Rate Limiter provides service protection by applying rate limiter.
         x-order: 2
         $ref: '#/definitions/RateLimiter'
+  FlowControlResources:
+    type: object
+    title: FlowControl Resources
+    properties:
+      classifiers:
+        description: |+
+          Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+
+          The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/Classifier'
+        x-go-tag-validate: dive
+        x-order: 0
+      flux_meters:
+        description: |+
+          Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
+
+          Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/FluxMeter'
+        x-go-tag-validate: dive
+        x-order: 1
   FlowMatcher:
     description: |-
       :::info
@@ -2083,6 +2115,7 @@ definitions:
           Note: The requirements are ANDed.
         type: array
         items:
+          type: object
           $ref: '#/definitions/K8sLabelMatcherRequirement'
         x-order: 1
       match_labels:
@@ -2184,6 +2217,7 @@ definitions:
         description: List of subexpressions of the match expression.
         type: array
         items:
+          type: object
           $ref: '#/definitions/MatchExpression'
         x-order: 0
   MatchesMatchExpression:
@@ -2231,6 +2265,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/InPort'
         x-go-tag-validate: dive
         x-order: 0
@@ -2266,6 +2301,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/InPort'
         x-go-tag-validate: dive
         x-order: 0
@@ -2288,6 +2324,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/Component'
         x-go-tag-validate: dive
         x-order: 0
@@ -2380,6 +2417,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/InPort'
         x-go-tag-validate: dive
         x-order: 0
@@ -2661,6 +2699,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/RateLimiterOverride'
         x-go-tag-validate: dive
         x-order: 0
@@ -2771,23 +2810,31 @@ definitions:
           Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
           The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+          Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/Classifier'
         x-go-tag-validate: dive
         x-order: 0
+      flow_control:
+        description: FlowControlResources are resources that are provided by flow
+          control integration.
+        x-order: 1
+        $ref: '#/definitions/FlowControlResources'
       flux_meters:
         description: |+
           Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
           Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+          Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 
         type: object
         additionalProperties:
           $ref: '#/definitions/FluxMeter'
         x-go-tag-validate: dive
-        x-order: 1
+        x-order: 2
   Rule:
     description: |-
       Classification rule extracts a value from request metadata.
@@ -3031,6 +3078,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/SchedulerWorkload'
         x-go-tag-validate: dive
         x-order: 4

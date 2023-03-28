@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 git_root="$(git -C "$script_dir" rev-parse --show-toplevel)"
 readonly script_dir="${script_dir}"
 readonly git_root="${git_root}"
@@ -9,9 +9,15 @@ readonly git_root="${git_root}"
 readonly api_dir="$git_root/api"
 
 proto_files=(
-  "aperture/flowcontrol/check/v1/check.proto"
+	"aperture/flowcontrol/check/v1/check.proto"
 )
 
+SED="sed"
+FIND="find"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	SED="gsed"
+	FIND="gfind"
+fi
 
 # Protoc for Python generates imports from the directory structure of the proto files,
 # ignoring package structure.
@@ -42,15 +48,15 @@ echo "Generating Python gRPC code"
 python3 -m grpc_tools.protoc -I"${api_dir}" --{python_out,mypy_out,grpc_python_out,mypy_grpc_out}="${python_gen}" "${proto_files[@]}"
 
 echo "Fixing up Python gRPC imports"
-generated_py_files_str="$(find "$python_gen" -type f -name '*.py')"
-readarray -t generated_py_files <<< "$generated_py_files_str"
-sed -i "s/^from aperture\..* import \([^ ]*_pb2\) as \([^ ]*\)$/from . import \1 as \2/" "${generated_py_files[@]}"
-generated_pyi_files_str="$(find "$python_gen" -type f -name '*.pyi')"
-readarray -t generated_pyi_files <<< "$generated_pyi_files_str"
-sed -i "s/^import grpc$/import grpc\nimport grpc.aio\nimport typing/" "${generated_pyi_files[@]}"
-sed -i "s/: grpc\.Server/: typing.Union[grpc.Server, grpc.aio.Server]/" "${generated_pyi_files[@]}"
+generated_py_files_str="$($FIND "$python_gen" -type f -name '*.py')"
+readarray -t generated_py_files <<<"$generated_py_files_str"
+$SED -i "s/^from aperture\..* import \([^ ]*_pb2\) as \([^ ]*\)$/from . import \1 as \2/" "${generated_py_files[@]}"
+generated_pyi_files_str="$($FIND "$python_gen" -type f -name '*.pyi')"
+readarray -t generated_pyi_files <<<"$generated_pyi_files_str"
+$SED -i "s/^import grpc$/import grpc\nimport grpc.aio\nimport typing/" "${generated_pyi_files[@]}"
+$SED -i "s/: grpc\.Server/: typing.Union[grpc.Server, grpc.aio.Server]/" "${generated_pyi_files[@]}"
 
 echo "Generating __init__.py files"
-find "$python_gen" -type d -exec touch "{}/__init__.py" \;
+$FIND "$python_gen" -type d -exec touch "{}/__init__.py" \;
 
 echo "Done"

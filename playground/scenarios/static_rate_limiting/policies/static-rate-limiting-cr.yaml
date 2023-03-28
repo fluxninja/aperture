@@ -26,4 +26,5 @@ spec:
             limit_reset_interval: 60s
     evaluation_interval: 1s
   resources:
-    classifiers: []
+    flow_control:
+      classifiers: []

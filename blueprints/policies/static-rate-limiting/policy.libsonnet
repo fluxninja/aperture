@@ -6,6 +6,7 @@ local resources = spec.v1.Resources;
 local circuit = spec.v1.Circuit;
 local component = spec.v1.Component;
 local flowControl = spec.v1.FlowControl;
+local flowControlResources = spec.v1.FlowControlResources;
 local rateLimiter = spec.v1.RateLimiter;
 local override = spec.v1.RateLimiterOverride;
 local lazySync = spec.v1.RateLimiterLazySync;
@@ -17,7 +18,8 @@ function(cfg) {
   local policyDef =
     policy.new()
     + policy.withResources(resources.new()
-                           + resources.withClassifiers(params.classifiers))
+                           + resources.withFlowControl(flowControlResources.new()
+                                                       + flowControlResources.withClassifiers(params.classifiers)))
     + policy.withCircuit(
       circuit.new()
       + circuit.withEvaluationInterval('1s')

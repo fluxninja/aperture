@@ -116,10 +116,7 @@ paths:
         in: path
         required: true
       - type: string
-        x-go-tag-validate: required
-        description: |+
-          Control point to preview.
-
+        description: Control point to preview.
         name: control_point
         in: path
         required: true
@@ -131,11 +128,7 @@ paths:
           $ref: '#/definitions/LabelMatcher'
       - type: string
         format: int64
-        x-go-tag-default: "10"
-        x-go-tag-validate: min=1
-        description: |+
-          Number of samples to collect.
-
+        description: Number of samples to collect.
         name: samples
         in: query
       responses:
@@ -159,10 +152,7 @@ paths:
         in: path
         required: true
       - type: string
-        x-go-tag-validate: required
-        description: |+
-          Control point to preview.
-
+        description: Control point to preview.
         name: control_point
         in: path
         required: true
@@ -174,11 +164,7 @@ paths:
           $ref: '#/definitions/LabelMatcher'
       - type: string
         format: int64
-        x-go-tag-default: "10"
-        x-go-tag-validate: min=1
-        description: |+
-          Number of samples to collect.
-
+        description: Number of samples to collect.
         name: samples
         in: query
       responses:
@@ -307,6 +293,7 @@ definitions:
       auto_scale_kubernetes_control_points:
         type: array
         items:
+          type: object
           $ref: '#/definitions/AutoScaleKubernetesControlPoint'
   DMap:
     type: object
@@ -436,6 +423,7 @@ definitions:
       flow_control_points:
         type: array
         items:
+          type: object
           $ref: '#/definitions/FlowControlPoint'
   GroupStatus:
     description: |-
@@ -517,6 +505,7 @@ definitions:
           Note: The requirements are ANDed.
         type: array
         items:
+          type: object
           $ref: '#/definitions/K8sLabelMatcherRequirement'
       match_labels:
         description: |-
@@ -573,6 +562,7 @@ definitions:
         description: List of subexpressions of the match expression.
         type: array
         items:
+          type: object
           $ref: '#/definitions/MatchExpression'
   MatchesMatchExpression:
     description: Label selector expression of the matches form "label matches regex".
@@ -629,6 +619,7 @@ definitions:
       backups:
         type: array
         items:
+          type: object
           $ref: '#/definitions/Member'
       d_maps:
         type: object
@@ -640,6 +631,7 @@ definitions:
       previous_owners:
         type: array
         items:
+          type: object
           $ref: '#/definitions/Member'
   Peer:
     description: Peer holds peer info and services.
@@ -670,6 +662,7 @@ definitions:
       samples:
         type: array
         items:
+          type: object
           $ref: '#/definitions/PreviewFlowLabelsResponseFlowLabels'
   PreviewFlowLabelsResponseFlowLabels:
     type: object
@@ -922,6 +915,7 @@ definitions:
           message types for APIs to use.
         type: array
         items:
+          type: object
           $ref: '#/definitions/googleprotobufAny'
       message:
         description: |-

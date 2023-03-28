@@ -73,7 +73,12 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circ
 	}
 
 	if policy.GetResources() != nil {
-		for _, c := range policy.GetResources().Classifiers {
+		classifiers := policy.GetResources().GetFlowControl().GetClassifiers()
+		// Deprecated: v1.5.0
+		if classifiers == nil {
+			classifiers = policy.GetResources().GetClassifiers()
+		}
+		for _, c := range classifiers {
 			_, err = compiler.CompileRuleset(ctx, name, &policysyncv1.ClassifierWrapper{
 				Classifier: c,
 				ClassifierAttributes: &policysyncv1.ClassifierAttributes{

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package aperture.policy.sync.v1;
 
-import "aperture/policy/language/v1/fluxmeter.proto";
+import "aperture/policy/language/v1/flowcontrol.proto";
 
 message FluxMeterWrapper {
   // Flux Meter
