@@ -1,21 +1,19 @@
 package main
 
 import (
-	"github.com/fluxninja/aperture/extensions/fluxninja"
-	"github.com/fluxninja/aperture/extensions/sentry"
 	"go.uber.org/fx"
+
+	"github.com/fluxninja/aperture/pkg/info"
 )
 
+func init() {
+	info.Extensions = GetExtensions()
+}
+
 func Module() fx.Option {
-	return fx.Options(
-		fluxninja.Module(),
-		sentry.Module(),
-	)
+	return fx.Options()
 }
 
 func GetExtensions() []string {
-	return []string{
-		"github.com/fluxninja/aperture/extensions/fluxninja",
-		"github.com/fluxninja/aperture/extensions/sentry",
-	}
+	return []string{}
 }
