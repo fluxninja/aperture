@@ -115,6 +115,7 @@ func (constructor ServerConstructor) provideServer(
 	unaryServerInterceptors := []grpc.UnaryServerInterceptor{
 		grpcServerMetrics.UnaryServerInterceptor(),
 		otelgrpc.UnaryServerInterceptor(),
+		validatorUnaryInterceptor(),
 	}
 	serverOptions = append(serverOptions, grpc.ChainUnaryInterceptor(unaryServerInterceptors...))
 

@@ -87,7 +87,7 @@ func RegisterFlowControlPointsServiceHandlerServer(ctx context.Context, mux *run
 // RegisterFlowControlPointsServiceHandlerFromEndpoint is same as RegisterFlowControlPointsServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterFlowControlPointsServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}

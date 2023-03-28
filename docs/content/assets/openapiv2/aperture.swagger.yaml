@@ -198,6 +198,7 @@ definitions:
 
                 items:
                     $ref: '#/definitions/InPort'
+                    type: object
                 type: array
                 x-go-tag-validate: dive
         type: object
@@ -282,6 +283,7 @@ definitions:
             auto_scale_kubernetes_control_points:
                 items:
                     $ref: '#/definitions/AutoScaleKubernetesControlPoint'
+                    type: object
                 type: array
         type: object
     AutoScaler:
@@ -343,6 +345,7 @@ definitions:
                 description: List of _Controllers_ for scaling in.
                 items:
                     $ref: '#/definitions/AutoScalerScaleInController'
+                    type: object
                 type: array
             scale_in_cooldown:
                 default: 120s
@@ -358,6 +361,7 @@ definitions:
                 description: List of _Controllers_ for scaling out.
                 items:
                     $ref: '#/definitions/AutoScalerScaleOutController'
+                    type: object
                 type: array
             scale_out_cooldown:
                 default: 30s
@@ -590,6 +594,7 @@ definitions:
                 description: classifiers that were matched for this request.
                 items:
                     $ref: '#/definitions/ClassifierInfo'
+                    type: object
                 type: array
             control_point:
                 title: control_point of request
@@ -610,11 +615,13 @@ definitions:
                 description: flux meters that were matched for this request.
                 items:
                     $ref: '#/definitions/FluxMeterInfo'
+                    type: object
                 type: array
             limiter_decisions:
                 description: limiter_decisions contains information about decision made by each limiter.
                 items:
                     $ref: '#/definitions/LimiterDecision'
+                    type: object
                 type: array
             reject_reason:
                 $ref: '#/definitions/CheckResponseRejectReason'
@@ -685,6 +692,7 @@ definitions:
 
                 items:
                     $ref: '#/definitions/Component'
+                    type: object
                 type: array
                 x-go-tag-validate: dive
             evaluation_interval:
@@ -1431,6 +1439,7 @@ definitions:
 
                 items:
                     $ref: '#/definitions/InPort'
+                    type: object
                 type: array
                 x-go-tag-validate: dive
         type: object
@@ -1466,6 +1475,7 @@ definitions:
             flow_control_points:
                 items:
                     $ref: '#/definitions/FlowControlPoint'
+                    type: object
                 type: array
         type: object
     FlowMatcher:
@@ -2184,6 +2194,7 @@ definitions:
                     Note: The requirements are ANDed.
                 items:
                     $ref: '#/definitions/K8sLabelMatcherRequirement'
+                    type: object
                 type: array
             match_labels:
                 additionalProperties:
@@ -2254,6 +2265,7 @@ definitions:
             global_auto_scale_control_points:
                 items:
                     $ref: '#/definitions/GlobalAutoScaleControlPoint'
+                    type: object
                 type: array
         type: object
     ListDiscoveryEntitiesAgentResponse:
@@ -2284,6 +2296,7 @@ definitions:
             global_flow_control_points:
                 items:
                     $ref: '#/definitions/GlobalFlowControlPoint'
+                    type: object
                 type: array
         type: object
     ListServicesControllerResponse:
@@ -2294,6 +2307,7 @@ definitions:
             services:
                 items:
                     $ref: '#/definitions/GlobalService'
+                    type: object
                 type: array
         type: object
     LoadActuator:
@@ -2371,6 +2385,7 @@ definitions:
                 description: List of subexpressions of the match expression.
                 items:
                     $ref: '#/definitions/MatchExpression'
+                    type: object
                 type: array
         title: List of MatchExpressions that is used for all/any matching
         type: object
@@ -2414,6 +2429,7 @@ definitions:
 
                 items:
                     $ref: '#/definitions/InPort'
+                    type: object
                 type: array
                 x-go-tag-validate: dive
         type: object
@@ -2456,6 +2472,7 @@ definitions:
 
                 items:
                     $ref: '#/definitions/InPort'
+                    type: object
                 type: array
                 x-go-tag-validate: dive
         type: object
@@ -2475,6 +2492,7 @@ definitions:
 
                 items:
                     $ref: '#/definitions/Component'
+                    type: object
                 type: array
                 x-go-tag-validate: dive
             in_ports_map:
@@ -2579,6 +2597,7 @@ definitions:
 
                 items:
                     $ref: '#/definitions/InPort'
+                    type: object
                 type: array
                 x-go-tag-validate: dive
         type: object
@@ -2615,6 +2634,7 @@ definitions:
             backups:
                 items:
                     $ref: '#/definitions/Member'
+                    type: object
                 type: array
             d_maps:
                 additionalProperties:
@@ -2626,6 +2646,7 @@ definitions:
             previous_owners:
                 items:
                     $ref: '#/definitions/Member'
+                    type: object
                 type: array
         type: object
     PathTemplateMatcher:
@@ -2803,6 +2824,7 @@ definitions:
             samples:
                 items:
                     $ref: '#/definitions/PreviewFlowLabelsResponseFlowLabels'
+                    type: object
                 type: array
         type: object
     PreviewFlowLabelsResponseFlowLabels:
@@ -2827,29 +2849,18 @@ definitions:
     PreviewRequest:
         properties:
             control_point:
-                description: |+
-                    Control point to preview.
-
+                description: Control point to preview.
                 type: string
-                x-go-tag-validate: required
             label_matcher:
                 $ref: '#/definitions/LabelMatcher'
                 description: Flow labels to match. Optional parameter for advanced filtering.
             samples:
-                default: "10"
-                description: |+
-                    Number of samples to collect.
-
+                description: Number of samples to collect.
                 format: int64
-                minLength: 1
                 type: string
-                x-go-tag-default: "10"
-                x-go-tag-validate: min=1
             service:
                 description: Service to preview.
                 type: string
-        required:
-            - control_point
         type: object
     ProcessInfo:
         properties:
@@ -2970,6 +2981,7 @@ definitions:
 
                 items:
                     $ref: '#/definitions/RateLimiterOverride'
+                    type: object
                 type: array
                 x-go-tag-validate: dive
         title: Dynamic Configuration for the rate limiter
@@ -3123,6 +3135,7 @@ definitions:
 
                 items:
                     $ref: '#/definitions/Classifier'
+                    type: object
                 type: array
                 x-go-tag-validate: dive
             flux_meters:
@@ -3374,6 +3387,7 @@ definitions:
 
                 items:
                     $ref: '#/definitions/SchedulerWorkload'
+                    type: object
                 type: array
                 x-go-tag-validate: dive
         title: Scheduler parameters
@@ -3519,10 +3533,12 @@ definitions:
             overlapping_services:
                 items:
                     $ref: '#/definitions/OverlappingService'
+                    type: object
                 type: array
             services:
                 items:
                     $ref: '#/definitions/Service'
+                    type: object
                 type: array
         type: object
     SlabInfo:
@@ -3953,6 +3969,7 @@ definitions:
                     message types for APIs to use.
                 items:
                     $ref: '#/definitions/googleprotobufAny'
+                    type: object
                 type: array
             message:
                 description: |-
@@ -4127,30 +4144,23 @@ paths:
                   name: service
                   required: true
                   type: string
-                - description: |+
-                    Control point to preview.
-
+                - description: Control point to preview.
                   in: path
                   name: control_point
                   required: true
                   type: string
-                  x-go-tag-validate: required
                 - description: Flow labels to match. Optional parameter for advanced filtering.
                   in: body
                   name: label_matcher
                   required: true
                   schema:
                     $ref: '#/definitions/LabelMatcher'
-                - description: |+
-                    Number of samples to collect.
-
+                - description: Number of samples to collect.
                   format: int64
                   in: query
                   name: samples
                   required: false
                   type: string
-                  x-go-tag-default: "10"
-                  x-go-tag-validate: min=1
             responses:
                 "200":
                     description: A successful response.
@@ -4171,30 +4181,23 @@ paths:
                   name: service
                   required: true
                   type: string
-                - description: |+
-                    Control point to preview.
-
+                - description: Control point to preview.
                   in: path
                   name: control_point
                   required: true
                   type: string
-                  x-go-tag-validate: required
                 - description: Flow labels to match. Optional parameter for advanced filtering.
                   in: body
                   name: label_matcher
                   required: true
                   schema:
                     $ref: '#/definitions/LabelMatcher'
-                - description: |+
-                    Number of samples to collect.
-
+                - description: Number of samples to collect.
                   format: int64
                   in: query
                   name: samples
                   required: false
                   type: string
-                  x-go-tag-default: "10"
-                  x-go-tag-validate: min=1
             responses:
                 "200":
                     description: A successful response.

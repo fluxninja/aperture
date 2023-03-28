@@ -173,7 +173,7 @@ func RegisterInfoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 // RegisterInfoServiceHandlerFromEndpoint is same as RegisterInfoServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterInfoServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}

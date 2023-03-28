@@ -229,7 +229,8 @@
         "inputs": {
           "description": "Array of input signals.\n\n",
           "items": {
-            "$ref": "#/definitions/InPort"
+            "$ref": "#/definitions/InPort",
+            "type": "object"
           },
           "type": "array",
           "x-go-tag-validate": "dive",
@@ -382,7 +383,8 @@
         "scale_in_controllers": {
           "description": "List of _Controllers_ for scaling in.",
           "items": {
-            "$ref": "#/definitions/AutoScalerScaleInController"
+            "$ref": "#/definitions/AutoScalerScaleInController",
+            "type": "object"
           },
           "type": "array",
           "x-order": 7
@@ -402,7 +404,8 @@
         "scale_out_controllers": {
           "description": "List of _Controllers_ for scaling out.",
           "items": {
-            "$ref": "#/definitions/AutoScalerScaleOutController"
+            "$ref": "#/definitions/AutoScalerScaleOutController",
+            "type": "object"
           },
           "type": "array",
           "x-order": 10
@@ -646,7 +649,8 @@
         "components": {
           "description": "Defines a signal processing graph as a list of components.\n\n",
           "items": {
-            "$ref": "#/definitions/Component"
+            "$ref": "#/definitions/Component",
+            "type": "object"
           },
           "type": "array",
           "x-go-tag-validate": "dive",
@@ -1225,7 +1229,8 @@
         "inputs": {
           "description": "Array of input signals.\n\n",
           "items": {
-            "$ref": "#/definitions/InPort"
+            "$ref": "#/definitions/InPort",
+            "type": "object"
           },
           "type": "array",
           "x-go-tag-validate": "dive",
@@ -1862,7 +1867,8 @@
         "match_expressions": {
           "description": "List of k8s-style label matcher requirements.\n\nNote: The requirements are ANDed.",
           "items": {
-            "$ref": "#/definitions/K8sLabelMatcherRequirement"
+            "$ref": "#/definitions/K8sLabelMatcherRequirement",
+            "type": "object"
           },
           "type": "array",
           "x-order": 1
@@ -1972,7 +1978,8 @@
         "of": {
           "description": "List of subexpressions of the match expression.",
           "items": {
-            "$ref": "#/definitions/MatchExpression"
+            "$ref": "#/definitions/MatchExpression",
+            "type": "object"
           },
           "type": "array",
           "x-order": 0
@@ -2026,7 +2033,8 @@
         "inputs": {
           "description": "Array of input signals.\n\n",
           "items": {
-            "$ref": "#/definitions/InPort"
+            "$ref": "#/definitions/InPort",
+            "type": "object"
           },
           "type": "array",
           "x-go-tag-validate": "dive",
@@ -2071,7 +2079,8 @@
         "inputs": {
           "description": "Array of input signals.\n\n",
           "items": {
-            "$ref": "#/definitions/InPort"
+            "$ref": "#/definitions/InPort",
+            "type": "object"
           },
           "type": "array",
           "x-go-tag-validate": "dive",
@@ -2099,7 +2108,8 @@
         "components": {
           "description": "List of components in the nested circuit.\n\n",
           "items": {
-            "$ref": "#/definitions/Component"
+            "$ref": "#/definitions/Component",
+            "type": "object"
           },
           "type": "array",
           "x-go-tag-validate": "dive",
@@ -2216,7 +2226,8 @@
         "inputs": {
           "description": "Array of input signals.\n\n",
           "items": {
-            "$ref": "#/definitions/InPort"
+            "$ref": "#/definitions/InPort",
+            "type": "object"
           },
           "type": "array",
           "x-go-tag-validate": "dive",
@@ -2510,7 +2521,8 @@
         "overrides": {
           "description": "Allows to specify different limits for particular label values.\n\n",
           "items": {
-            "$ref": "#/definitions/RateLimiterOverride"
+            "$ref": "#/definitions/RateLimiterOverride",
+            "type": "object"
           },
           "type": "array",
           "x-go-tag-validate": "dive",
@@ -2609,7 +2621,8 @@
         "classifiers": {
           "description": "Classifiers are installed in the data-plane and are used to label the requests based on payload content.\n\nThe flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.\n\n",
           "items": {
-            "$ref": "#/definitions/Classifier"
+            "$ref": "#/definitions/Classifier",
+            "type": "object"
           },
           "type": "array",
           "x-go-tag-validate": "dive",
@@ -2747,7 +2760,8 @@
         "workloads": {
           "description": "List of workloads to be used in scheduler.\n\nCategorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads\nallows for load-shedding to be \"smarter\" than just \"randomly deny 50% of\nrequests\". There are two aspects of this \"smartness\":\n* Scheduler can more precisely calculate concurrency if it understands\n  that flows belonging to different classes have different weights (eg.\n  inserts vs lookups).\n* Setting different priorities to different workloads lets the scheduler\n  avoid dropping important traffic during overload.\n\nEach workload in this list specifies also a matcher that's used to\ndetermine which flow will be categorized into which workload.\nIn case of multiple matching workloads, the first matching one will be used.\nIf none of workloads match, `default_workload` will be used.\n\n:::info\n\nSee also [workload definition in the concepts\nsection](/concepts/integrations/flow-control/components/concurrency-limiter.md#workload).\n\n:::\n\n",
           "items": {
-            "$ref": "#/definitions/SchedulerWorkload"
+            "$ref": "#/definitions/SchedulerWorkload",
+            "type": "object"
           },
           "type": "array",
           "x-go-tag-validate": "dive",

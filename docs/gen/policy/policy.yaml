@@ -259,6 +259,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/InPort'
         x-go-tag-validate: dive
         x-order: 0
@@ -409,6 +410,7 @@ definitions:
         description: List of _Controllers_ for scaling in.
         type: array
         items:
+          type: object
           $ref: '#/definitions/AutoScalerScaleInController'
         x-order: 7
       scale_in_cooldown:
@@ -427,6 +429,7 @@ definitions:
         description: List of _Controllers_ for scaling out.
         type: array
         items:
+          type: object
           $ref: '#/definitions/AutoScalerScaleOutController'
         x-order: 10
       scale_out_cooldown:
@@ -648,6 +651,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/Component'
         x-go-tag-validate: dive
         x-order: 0
@@ -1315,6 +1319,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/InPort'
         x-go-tag-validate: dive
         x-order: 0
@@ -2083,6 +2088,7 @@ definitions:
           Note: The requirements are ANDed.
         type: array
         items:
+          type: object
           $ref: '#/definitions/K8sLabelMatcherRequirement'
         x-order: 1
       match_labels:
@@ -2184,6 +2190,7 @@ definitions:
         description: List of subexpressions of the match expression.
         type: array
         items:
+          type: object
           $ref: '#/definitions/MatchExpression'
         x-order: 0
   MatchesMatchExpression:
@@ -2231,6 +2238,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/InPort'
         x-go-tag-validate: dive
         x-order: 0
@@ -2266,6 +2274,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/InPort'
         x-go-tag-validate: dive
         x-order: 0
@@ -2288,6 +2297,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/Component'
         x-go-tag-validate: dive
         x-order: 0
@@ -2380,6 +2390,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/InPort'
         x-go-tag-validate: dive
         x-order: 0
@@ -2661,6 +2672,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/RateLimiterOverride'
         x-go-tag-validate: dive
         x-order: 0
@@ -2774,6 +2786,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/Classifier'
         x-go-tag-validate: dive
         x-order: 0
@@ -3031,6 +3044,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/SchedulerWorkload'
         x-go-tag-validate: dive
         x-order: 4

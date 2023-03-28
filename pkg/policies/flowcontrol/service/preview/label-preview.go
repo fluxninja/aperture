@@ -5,12 +5,9 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	flowpreviewv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/preview/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 )
@@ -53,11 +50,6 @@ func (r *labelPreviewRequest) AddLabelPreview(labels map[string]string) {
 
 // PreviewFlowLabels implements flowpreview.v1.PreviewFlowLabels.
 func (h *Handler) PreviewFlowLabels(ctx context.Context, req *flowpreviewv1.PreviewRequest) (*flowpreviewv1.PreviewFlowLabelsResponse, error) {
-	config.SetDefaults(req)
-	if err := config.ValidateStruct(req); err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
-
 	// generate a unique ID for this request
 	previewID := iface.PreviewID{
 		RequestID: uuid.New().String(),

@@ -299,6 +299,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/InPort'
         x-go-tag-validate: dive
   AndOuts:
@@ -432,6 +433,7 @@ definitions:
         description: List of _Controllers_ for scaling in.
         type: array
         items:
+          type: object
           $ref: '#/definitions/AutoScalerScaleInController'
       scale_in_cooldown:
         description: |+
@@ -447,6 +449,7 @@ definitions:
         description: List of _Controllers_ for scaling out.
         type: array
         items:
+          type: object
           $ref: '#/definitions/AutoScalerScaleOutController'
       scale_out_cooldown:
         description: |+
@@ -640,6 +643,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/Component'
         x-go-tag-validate: dive
       evaluation_interval:
@@ -1233,6 +1237,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/InPort'
         x-go-tag-validate: dive
   FirstValidOuts:
@@ -1954,6 +1959,7 @@ definitions:
           Note: The requirements are ANDed.
         type: array
         items:
+          type: object
           $ref: '#/definitions/K8sLabelMatcherRequirement'
       match_labels:
         description: |-
@@ -2042,6 +2048,7 @@ definitions:
         description: List of subexpressions of the match expression.
         type: array
         items:
+          type: object
           $ref: '#/definitions/MatchExpression'
   MatchesMatchExpression:
     description: Label selector expression of the matches form "label matches regex".
@@ -2084,6 +2091,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/InPort'
         x-go-tag-validate: dive
   MaxOuts:
@@ -2115,6 +2123,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/InPort'
         x-go-tag-validate: dive
   MinOuts:
@@ -2135,6 +2144,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/Component'
         x-go-tag-validate: dive
       in_ports_map:
@@ -2214,6 +2224,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/InPort'
         x-go-tag-validate: dive
   OrOuts:
@@ -2483,6 +2494,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/RateLimiterOverride'
         x-go-tag-validate: dive
   RateLimiterIns:
@@ -2587,6 +2599,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/Classifier'
         x-go-tag-validate: dive
       flux_meters:
@@ -2829,6 +2842,7 @@ definitions:
 
         type: array
         items:
+          type: object
           $ref: '#/definitions/SchedulerWorkload'
         x-go-tag-validate: dive
   SchedulerWorkload:
@@ -3301,6 +3315,7 @@ definitions:
           message types for APIs to use.
         type: array
         items:
+          type: object
           $ref: '#/definitions/googleprotobufAny'
       message:
         description: |-
