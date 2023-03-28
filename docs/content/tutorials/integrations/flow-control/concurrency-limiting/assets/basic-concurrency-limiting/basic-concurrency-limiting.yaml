@@ -91,12 +91,13 @@ spec:
               auto_tokens: true
     evaluation_interval: 0.5s
   resources:
-    classifiers: []
-    flux_meters:
-      service1-demo-app:
-        flow_selector:
-          flow_matcher:
-            control_point: ingress
-          service_selector:
-            agent_group: default
-            service: service1-demo-app.demoapp.svc.cluster.local
+    flow_control:
+      classifiers: []
+      flux_meters:
+        service1-demo-app:
+          flow_selector:
+            flow_matcher:
+              control_point: ingress
+            service_selector:
+              agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
