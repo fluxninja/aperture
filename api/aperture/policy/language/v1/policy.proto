@@ -221,6 +221,9 @@ message Component {
     // Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
     NestedSignalEgress nested_signal_egress = 26;
 
+    // Generates the specified signal.
+    SignalGenerator signal_generator = 27;
+
     // Query components that are query databases such as Prometheus.
     Query query = 100;
 
@@ -251,6 +254,12 @@ message FlowControl {
 
     // AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
     AIMDConcurrencyController aimd_concurrency_controller = 3;
+
+    // Flux Regulator is a component that regulates the flux of requests to the service.
+    FluxRegulator flux_regulator = 4;
+
+    // LoadShaper is a component that shapes the load of the service.
+    LoadShaper load_shaper = 5;
   }
 }
 
@@ -664,7 +673,7 @@ message RateLimiter {
   // Input ports for the RateLimiter component
   Ins in_ports = 1; // @gotags: validate:"required"
 
-  // Which control point to apply this ratelimiter to.
+  // Flow Selector decides the service and flows at which the rate limiter is applied.
   FlowSelector flow_selector = 2; // @gotags: validate:"required"
 
   // Parameters for the RateLimiter component
@@ -905,7 +914,7 @@ message PromQL {
   google.protobuf.Duration evaluation_interval = 3; // @gotags: default:"10s"
 }
 
-// Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
+// Constant signal for input ports, Variables etc. Can provide either a constant value or special Nan/+-Inf value.
 message ConstantSignal {
   oneof const {
     // A special value such as NaN, +Inf, -Inf.
@@ -1604,4 +1613,126 @@ message AutoScaler {
 
   // Configuration for scale-in alerter.
   Alerter.Parameters scale_in_alerter_parameters = 13;
+}
+
+message FluxRegulator {
+  // Dynamic Configuration for _FluxRegulator_
+  message DynamicConfig {
+    // Specify certain label values to be accepted by this flow filter regardless of accept percentage. Note: the `accept_filter` criteria still applies.
+    repeated string enable_label_values = 1; // @gotags: validate:"dive"
+  }
+
+  message Parameters {
+    // The flow label key for identifying sessions.
+    // If label key is specified, _FluxRegulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
+    // If label key is not specified, _FluxRegulator_ acts as a stateless filter. Percentage of flows are selected randomly.
+    string label_key = 1;
+
+    // Accept filter is a flow selector that defines a label based accept critieria.
+    // If specified, the flows that don't match the accept filter are outright rejected.
+    FlowSelector accept_filter = 2;
+
+    // Rego based rules that accept or reject flows.
+    /// repeated RegoRules rules = 3;
+  }
+
+  message Ins {
+    // The percentage of requests to accept.
+    InPort accept_percentage = 1;
+  }
+
+  // Input ports for the _FluxRegulator_.
+  Ins in_ports = 1;
+
+  // Flow Selector decides the service and flows at which the _Flux Regulator_  is applied.
+  FlowSelector flow_selector = 2; // @gotags: validate:"required"
+
+  // Parameters for the _FluxRegulator_.
+  Parameters parameters = 3;
+
+  // Configuration key for DynamicConfig.
+  string dynamic_config_key = 4;
+
+  // Default configuration.
+  DynamicConfig default_config = 5;
+}
+
+// SignalGenerator generates a signal based on the steps specified.
+message SignalGenerator {
+  // Parameters for the _SignalGenerator_ component.
+  message Parameters {
+    message Step {
+      // The value of the step.
+      ConstantSignal constant_signal = 1; // @gotags: validate:"required"
+      // Duration for which the step is active.
+      google.protobuf.Duration duration = 2; // @gotags: validate:"required"
+    }
+    repeated Step steps = 1; // @gotags: validate:"required,dive"
+
+    string end_behavior = 2; // @gotags: default:"repeat" validate:"oneof=loop laststep"
+  }
+
+  // Inputs for the _SignalGenerator_ component.
+  message Ins {
+    // Whether to reset the signal generator to the first step.
+    InPort reset = 1;
+  }
+
+  // Outputs for the _SignalGenerator_ component.
+  message Outs {
+    // The generated signal.
+    OutPort output = 1;
+  }
+
+  Ins in_ports = 1;
+  Outs out_ports = 2;
+
+  // Parameters for the _SignalGenerator_ component.
+  Parameters parameters = 3; // @gotags: validate:"required"
+}
+
+// _LoadShaper_ is a component that shapes the load on a service.
+message LoadShaper {
+  // Parameters for the _LoadShaper_ component.
+  message Parameters {
+    message Step {
+      // The value of the step.
+      double accept_percentage = 1; // @gotags: validate:"required,gte=0,lte=100"
+      // Duration for which the step is active.
+      google.protobuf.Duration duration = 2; // @gotags: validate:"required"
+    }
+
+    // Parameters for the _Flux Regulator_.
+    FluxRegulator.Parameters flux_regulator_parameters = 1;
+
+    repeated Step steps = 2; // @gotags: validate:"required,dive"
+
+    string end_behavior = 3; // @gotags: default:"repeat" validate:"oneof=loop laststep"
+  }
+
+  // Inputs for the _LoadShaper_ component.
+  message Ins {
+    // Whether to reset the load shaper to the first step.
+    InPort reset = 1;
+  }
+
+  // Outputs for the _LoadShaper_ component.
+  message Outs {
+    // The percentage of flows being accepted by the _Flux Regulator_.
+    OutPort accept_percentage = 1;
+  }
+
+  Ins in_ports = 1;
+  Outs out_ports = 2;
+
+  // Flow Selector decides the service and flows at which the _Flux Regulator_ is applied.
+  FlowSelector flow_selector = 3; // @gotags: validate:"required"
+
+  Parameters parameters = 4; // @gotags: validate:"required"
+
+  // Configuration key for DynamicConfig.
+  string dynamic_config_key = 5;
+
+  // Default configuration.
+  FluxRegulator.DynamicConfig default_config = 6;
 }
