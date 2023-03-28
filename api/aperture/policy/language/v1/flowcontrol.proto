@@ -122,6 +122,18 @@ message FlowMatcher {
   LabelMatcher label_matcher = 2;
 }
 
+// FlowControl Resources
+message FlowControlResources {
+  // Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
+  //
+  // Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+  map<string, FluxMeter> flux_meters = 1; // @gotags: validate:"dive"
+  // Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+  //
+  // The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+  repeated Classifier classifiers = 2; // @gotags: validate:"dive"
+}
+
 // Flux Meter gathers metrics for the traffic that matches its selector.
 // The histogram created by Flux Meter measures the workload latency by default.
 //

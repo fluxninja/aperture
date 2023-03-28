@@ -1274,6 +1274,32 @@
       "type": "object",
       "additionalProperties": false
     },
+    "FlowControlResources": {
+      "properties": {
+        "classifiers": {
+          "description": "Classifiers are installed in the data-plane and are used to label the requests based on payload content.\n\nThe flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.\n\n",
+          "items": {
+            "$ref": "#/definitions/Classifier",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "dive",
+          "x-order": 0
+        },
+        "flux_meters": {
+          "additionalProperties": {
+            "$ref": "#/definitions/FluxMeter"
+          },
+          "description": "Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.\n\nFlux Meter created metrics can be consumed as input to the circuit via the PromQL component.\n\n",
+          "type": "object",
+          "x-go-tag-validate": "dive",
+          "x-order": 1
+        }
+      },
+      "title": "FlowControl Resources",
+      "type": "object",
+      "additionalProperties": false
+    },
     "FlowMatcher": {
       "description": ":::info\n\nSee also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).\n\n:::\nExample:\n```yaml\ncontrol_point: ingress\nlabel_matcher:\n  match_labels:\n    user_tier: gold\n  match_expressions:\n    - key: query\n      operator: In\n      values:\n        - insert\n        - delete\n  expression:\n    label_matches:\n        - label: user_agent\n          regex: ^(?!.*Chrome).*Safari\n```",
       "properties": {
@@ -2619,7 +2645,7 @@
       "description": ":::info\n\nSee also [Resources overview](/concepts/policy/resources.md).\n\n:::\n\nResources are typically Flux Meters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.",
       "properties": {
         "classifiers": {
-          "description": "Classifiers are installed in the data-plane and are used to label the requests based on payload content.\n\nThe flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.\n\n",
+          "description": "Classifiers are installed in the data-plane and are used to label the requests based on payload content.\n\nThe flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.\nDeprecated: v1.5.0. Use `flow_control.classifiers` instead.\n\n",
           "items": {
             "$ref": "#/definitions/Classifier",
             "type": "object"
@@ -2628,14 +2654,19 @@
           "x-go-tag-validate": "dive",
           "x-order": 0
         },
+        "flow_control": {
+          "$ref": "#/definitions/FlowControlResources",
+          "description": "FlowControlResources are resources that are provided by flow control integration.",
+          "x-order": 1
+        },
         "flux_meters": {
           "additionalProperties": {
             "$ref": "#/definitions/FluxMeter"
           },
-          "description": "Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.\n\nFlux Meter created metrics can be consumed as input to the circuit via the PromQL component.\n\n",
+          "description": "Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.\n\nFlux Meter created metrics can be consumed as input to the circuit via the PromQL component.\nDeprecated: v1.5.0. Use `flow_control.flux_meters` instead.\n\n",
           "type": "object",
           "x-go-tag-validate": "dive",
-          "x-order": 1
+          "x-order": 2
         }
       },
       "title": "Resources that need to be setup for the policy to function",

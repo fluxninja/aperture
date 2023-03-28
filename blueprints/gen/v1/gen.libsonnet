@@ -52,6 +52,7 @@
   FirstValidIns: import 'firstvalidins.libsonnet',
   FirstValidOuts: import 'firstvalidouts.libsonnet',
   FlowControl: import 'flowcontrol.libsonnet',
+  FlowControlResources: import 'flowcontrolresources.libsonnet',
   FlowMatcher: import 'flowmatcher.libsonnet',
   FlowSelector: import 'flowselector.libsonnet',
   FluxMeter: import 'fluxmeter.libsonnet',

@@ -426,6 +426,188 @@ var _ interface {
 	ErrorName() string
 } = FlowMatcherValidationError{}
 
+// Validate checks the field values on FlowControlResources with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *FlowControlResources) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on FlowControlResources with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// FlowControlResourcesMultiError, or nil if none found.
+func (m *FlowControlResources) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *FlowControlResources) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	{
+		sorted_keys := make([]string, len(m.GetFluxMeters()))
+		i := 0
+		for key := range m.GetFluxMeters() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetFluxMeters()[key]
+			_ = val
+
+			// no validation rules for FluxMeters[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, FlowControlResourcesValidationError{
+							field:  fmt.Sprintf("FluxMeters[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, FlowControlResourcesValidationError{
+							field:  fmt.Sprintf("FluxMeters[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return FlowControlResourcesValidationError{
+						field:  fmt.Sprintf("FluxMeters[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
+	for idx, item := range m.GetClassifiers() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, FlowControlResourcesValidationError{
+						field:  fmt.Sprintf("Classifiers[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, FlowControlResourcesValidationError{
+						field:  fmt.Sprintf("Classifiers[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FlowControlResourcesValidationError{
+					field:  fmt.Sprintf("Classifiers[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return FlowControlResourcesMultiError(errors)
+	}
+
+	return nil
+}
+
+// FlowControlResourcesMultiError is an error wrapping multiple validation
+// errors returned by FlowControlResources.ValidateAll() if the designated
+// constraints aren't met.
+type FlowControlResourcesMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m FlowControlResourcesMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m FlowControlResourcesMultiError) AllErrors() []error { return m }
+
+// FlowControlResourcesValidationError is the validation error returned by
+// FlowControlResources.Validate if the designated constraints aren't met.
+type FlowControlResourcesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FlowControlResourcesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FlowControlResourcesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FlowControlResourcesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FlowControlResourcesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FlowControlResourcesValidationError) ErrorName() string {
+	return "FlowControlResourcesValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e FlowControlResourcesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFlowControlResources.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FlowControlResourcesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FlowControlResourcesValidationError{}
+
 // Validate checks the field values on FluxMeter with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.

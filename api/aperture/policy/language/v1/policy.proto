@@ -96,11 +96,16 @@ message Resources {
   // Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
   //
   // Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+  // Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
   map<string, FluxMeter> flux_meters = 1; // @gotags: validate:"dive"
   // Classifiers are installed in the data-plane and are used to label the requests based on payload content.
   //
   // The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+  // Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
   repeated Classifier classifiers = 2; // @gotags: validate:"dive"
+
+  // FlowControlResources are resources that are provided by flow control integration.
+  FlowControlResources flow_control = 101;
 }
 
 // Computational block that form the circuit

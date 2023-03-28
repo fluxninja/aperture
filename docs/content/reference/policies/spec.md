@@ -1657,6 +1657,31 @@ FlowControl components are used to regulate requests flow.
 
 ---
 
+### FlowControlResources {#flow-control-resources}
+
+FlowControl Resources
+
+<dl>
+<dt>classifiers</dt>
+<dd>
+
+([[]Classifier](#classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+
+The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+
+</dd>
+<dt>flux_meters</dt>
+<dd>
+
+(map of [FluxMeter](#flux-meter)) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
+
+Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+
+</dd>
+</dl>
+
+---
+
 ### FlowMatcher {#flow-matcher}
 
 Describes which flows a [flow control
@@ -3451,6 +3476,13 @@ Resources are typically Flux Meters, Classifiers, etc. that can be used to creat
 ([[]Classifier](#classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
 The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
+
+</dd>
+<dt>flow_control</dt>
+<dd>
+
+([FlowControlResources](#flow-control-resources)) FlowControlResources are resources that are provided by flow control integration.
 
 </dd>
 <dt>flux_meters</dt>
@@ -3459,6 +3491,7 @@ The flow labels created by Classifiers can be matched by Flux Meters to create m
 (map of [FluxMeter](#flux-meter)) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
 Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 
 </dd>
 </dl>
