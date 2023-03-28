@@ -102,7 +102,14 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
 		attributes.PutStr(otelconsts.ApertureFlowStatusLabel, internal.FlowStatusForTelemetry(statusCode, flowStatus))
 		internal.AddCheckResponseBasedLabels(attributes, checkResponse, sourceStr)
-		p.populateControlPointCache(checkResponse, sourceStr)
+		controlPointType, exists := attributes.Get(otelconsts.ApertureControlPointTypeLabel)
+		controlPointTypeStr := ""
+		if exists {
+			controlPointTypeStr = controlPointType.Str()
+		} else {
+			log.Warn().Msg("aperture control point type label not found")
+		}
+		p.populateControlPointCache(checkResponse, controlPointTypeStr)
 
 		// Update metrics and enforce include list to eliminate any excess attributes
 		if sourceStr == otelconsts.ApertureSourceSDK {
@@ -291,9 +298,9 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 	}
 }
 
-func (p *metricsProcessor) populateControlPointCache(checkResponse *flowcontrolv1.CheckResponse, source string) {
+func (p *metricsProcessor) populateControlPointCache(checkResponse *flowcontrolv1.CheckResponse, controlPointType string) {
 	for _, service := range checkResponse.GetServices() {
-		p.cfg.controlPointCache.Put(selectors.NewTypedControlPointID(service, checkResponse.GetControlPoint(), source))
+		p.cfg.controlPointCache.Put(selectors.NewTypedControlPointID(service, checkResponse.GetControlPoint(), controlPointType))
 	}
 }
 
