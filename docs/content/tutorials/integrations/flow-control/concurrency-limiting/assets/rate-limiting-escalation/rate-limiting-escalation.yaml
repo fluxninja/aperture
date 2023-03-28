@@ -145,22 +145,23 @@ spec:
               limit_reset_interval: 1s
     evaluation_interval: 0.5s
   resources:
-    classifiers:
-      - flow_selector:
-          flow_matcher:
-            control_point: ingress
-          service_selector:
-            agent_group: default
-            service: service1-demo-app.demoapp.svc.cluster.local
-        rules:
-          user_type:
-            extractor:
-              from: request.http.headers.user-type
-    flux_meters:
-      service1-demo-app:
-        flow_selector:
-          flow_matcher:
-            control_point: ingress
-          service_selector:
-            agent_group: default
-            service: service1-demo-app.demoapp.svc.cluster.local
+    flow_control:
+      classifiers:
+        - flow_selector:
+            flow_matcher:
+              control_point: ingress
+            service_selector:
+              agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
+          rules:
+            user_type:
+              extractor:
+                from: request.http.headers.user-type
+      flux_meters:
+        service1-demo-app:
+          flow_selector:
+            flow_matcher:
+              control_point: ingress
+            service_selector:
+              agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local

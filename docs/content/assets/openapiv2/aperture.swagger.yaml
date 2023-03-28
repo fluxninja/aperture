@@ -1478,6 +1478,31 @@ definitions:
                     type: object
                 type: array
         type: object
+    FlowControlResources:
+        properties:
+            classifiers:
+                description: |+
+                    Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+
+                    The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+
+                items:
+                    $ref: '#/definitions/Classifier'
+                    type: object
+                type: array
+                x-go-tag-validate: dive
+            flux_meters:
+                additionalProperties:
+                    $ref: '#/definitions/FluxMeter'
+                description: |+
+                    Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
+
+                    Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+
+                type: object
+                x-go-tag-validate: dive
+        title: FlowControl Resources
+        type: object
     FlowMatcher:
         description: |-
             :::info
@@ -3132,12 +3157,16 @@ definitions:
                     Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
                     The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+                    Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
 
                 items:
                     $ref: '#/definitions/Classifier'
                     type: object
                 type: array
                 x-go-tag-validate: dive
+            flow_control:
+                $ref: '#/definitions/FlowControlResources'
+                description: FlowControlResources are resources that are provided by flow control integration.
             flux_meters:
                 additionalProperties:
                     $ref: '#/definitions/FluxMeter'
@@ -3145,6 +3174,7 @@ definitions:
                     Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
                     Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+                    Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 
                 type: object
                 x-go-tag-validate: dive

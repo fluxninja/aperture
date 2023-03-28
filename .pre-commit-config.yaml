@@ -117,6 +117,14 @@ repos:
   # local hooks
   - repo: local
     hooks:
+      - id: deprecated
+        name: Remove deprecated code
+        entry: ./scripts/check_deprecated.sh
+        language: script
+        pass_filenames: false
+        types_or:
+          - go
+          - proto
       - id: golangci-lint
         name: Run golangci-lint
         entry: ./scripts/golangci_lint.sh

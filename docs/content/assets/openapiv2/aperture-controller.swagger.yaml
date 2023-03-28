@@ -1265,6 +1265,31 @@ definitions:
       rate_limiter:
         description: Rate Limiter provides service protection by applying rate limiter.
         $ref: '#/definitions/RateLimiter'
+  FlowControlResources:
+    type: object
+    title: FlowControl Resources
+    properties:
+      classifiers:
+        description: |+
+          Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+
+          The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/Classifier'
+        x-go-tag-validate: dive
+      flux_meters:
+        description: |+
+          Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
+
+          Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/FluxMeter'
+        x-go-tag-validate: dive
   FlowMatcher:
     description: |-
       :::info
@@ -2596,17 +2621,23 @@ definitions:
           Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
           The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+          Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
 
         type: array
         items:
           type: object
           $ref: '#/definitions/Classifier'
         x-go-tag-validate: dive
+      flow_control:
+        description: FlowControlResources are resources that are provided by flow
+          control integration.
+        $ref: '#/definitions/FlowControlResources'
       flux_meters:
         description: |+
           Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
           Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+          Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 
         type: object
         additionalProperties:

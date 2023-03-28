@@ -58,11 +58,12 @@ spec:
             severity: crit
     evaluation_interval: 0.5s
   resources:
-    flux_meters:
-      test:
-        flow_selector:
-          flow_matcher:
-            control_point: ingress
-          service_selector:
-            agent_group: default
-            service: service1-demo-app.demoapp.svc.cluster.local
+    flow_control:
+      flux_meters:
+        test:
+          flow_selector:
+            flow_matcher:
+              control_point: ingress
+            service_selector:
+              agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
