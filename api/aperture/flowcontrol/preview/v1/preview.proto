@@ -6,6 +6,7 @@ import "aperture/policy/language/v1/label_matcher.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
 
 service FlowPreviewService {
   rpc PreviewFlowLabels(PreviewRequest) returns (PreviewFlowLabelsResponse) {
@@ -30,11 +31,11 @@ service FlowPreviewService {
 
 message PreviewRequest {
   // Number of samples to collect.
-  int64 samples = 1; // @gotags: validate:"min=1" default:"10"
+  int64 samples = 1 [(validate.rules).int64.gt = 0];
   // Control point to preview.
-  string control_point = 2; // @gotags: validate:"required"
+  string control_point = 2 [(validate.rules).string.min_len = 1];
   // Service to preview.
-  string service = 3;
+  string service = 3 [(validate.rules).string.min_len = 1];
   // Flow labels to match. Optional parameter for advanced filtering.
   policy.language.v1.LabelMatcher label_matcher = 4;
 }
