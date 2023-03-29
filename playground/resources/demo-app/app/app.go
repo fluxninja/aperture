@@ -85,15 +85,20 @@ func (ss SimpleService) Run() error {
 		}
 		defer conn.Close()
 
-		ch, err := conn.Channel()
+		pCh, err := conn.Channel()
 		if err != nil {
 			return err
 		}
-		defer ch.Close()
-		handler.rabbitMQChan = ch
+		defer pCh.Close()
+		handler.rabbitMQChan = pCh
+
+		cCh, err := conn.Channel()
+		if err != nil {
+			return err
+		}
 
 		// Declare a queue for the service to consume from.
-		q, err := ch.QueueDeclare(
+		q, err := cCh.QueueDeclare(
 			handler.hostname, // name
 			false,            // durable
 			false,            // delete when unused
@@ -105,52 +110,7 @@ func (ss SimpleService) Run() error {
 			return err
 		}
 
-		// Consume messages from the queue.
-		delivery, err := ch.Consume(
-			q.Name, // queue
-			q.Name, // consumer
-			true,   // auto-ack
-			false,  // exclusive
-			false,  // no-local
-			false,  // no-wait
-			nil,    // args
-		)
-		if err != nil {
-			log.Fatal().Err(err).Msg("Failed to consume messages")
-		}
-
-		go func() {
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-			defer cancel()
-			for d := range delivery {
-				var p Request
-				err := json.Unmarshal(d.Body, &p)
-				if err != nil {
-					log.Error().Err(err).Msg("Failed to unmarshal message")
-					continue
-				}
-				for _, chain := range p.Chains {
-					if len(chain.subrequests) == 0 {
-						log.Warn().Err(err).Msg("Empty chain")
-						break
-					}
-					requestDestination := chain.subrequests[0].Destination
-					if !strings.HasPrefix(requestDestination, "http") {
-						requestDestination = "http://" + requestDestination
-					}
-					requestDomain, err := url.Parse(requestDestination)
-					if requestDomain.Hostname() != handler.hostname {
-						log.Warn().Err(err).Msg("Invalid destination")
-						break
-					}
-					_, err = handler.processChain(ctx, chain)
-					if err != nil {
-						log.Warn().Err(err).Msg("Failed to process chain")
-						break
-					}
-				}
-			}
-		}()
+		go consumeFromQueue(q, cCh, handler)
 	}
 
 	if ss.envoyPort == -1 {
@@ -171,6 +131,65 @@ func (ss SimpleService) Run() error {
 	return server.ListenAndServe()
 }
 
+func consumeFromQueue(q amqp.Queue, cCh *amqp.Channel, handler *RequestHandler) {
+	// Consume messages from the queue.
+	delivery, err := cCh.Consume(
+		q.Name, // queue
+		"",     // consumer
+		false,  // auto-ack
+		false,  // exclusive
+		false,  // no-local
+		false,  // no-wait
+		nil,    // args
+	)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to consume messages")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	for d := range delivery {
+		var p Request
+		err := json.Unmarshal(d.Body, &p)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to unmarshal message")
+			continue
+		}
+		code := http.StatusOK
+		for _, chain := range p.Chains {
+			if len(chain.subrequests) == 0 {
+				log.Error().Err(err).Msg("Empty chain")
+				break
+			}
+			requestDestination := chain.subrequests[0].Destination
+			if !strings.HasPrefix(requestDestination, "http") {
+				requestDestination = "http://" + requestDestination
+			}
+			requestDomain, parseErr := url.Parse(requestDestination)
+			if requestDomain.Hostname() != handler.hostname {
+				log.Error().Err(parseErr).Msg("Invalid destination")
+				break
+			}
+			code, err = handler.processChain(ctx, chain)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to process chain")
+				break
+			}
+		}
+		if code == http.StatusOK {
+			err = d.Ack(false)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to ack message")
+			}
+		} else {
+			err = d.Nack(false, false)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to nack message")
+			}
+		}
+	}
+}
+
 func handlerFunc(h *RequestHandler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Autosample().Trace().Msg("received request")
@@ -187,20 +206,6 @@ type Request struct {
 // SubrequestChain is a single chain of destinations.
 type SubrequestChain struct {
 	subrequests []Subrequest
-}
-
-// MarshalJSON writes the subrequest chain as a JSON list and not a JSON object.
-func (sc SubrequestChain) MarshalJSON() ([]byte, error) {
-	return json.Marshal(sc.subrequests)
-}
-
-// UnmarshalJSON creates the subrequest chain, reading a JSON list and not a JSON object.
-func (sc *SubrequestChain) UnmarshalJSON(data []byte) error {
-	err := json.Unmarshal(data, &sc.subrequests)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // Subrequest contains information on a single destination
@@ -288,15 +293,14 @@ func (h RequestHandler) processChain(ctx context.Context, chain SubrequestChain)
 	if len(chain.subrequests) == 1 {
 		return h.processRequest(chain.subrequests[0])
 	}
-
-	requestForwardingDestination := chain.subrequests[1].Destination
+	forwardingDestination := chain.subrequests[1].Destination
 	trimmedSubrequestChain := SubrequestChain{
 		subrequests: chain.subrequests[1:],
 	}
 	trimmedRequest := Request{
 		Chains: []SubrequestChain{trimmedSubrequestChain},
 	}
-	return h.forwardRequest(ctx, requestForwardingDestination, trimmedRequest)
+	return h.forwardRequest(ctx, forwardingDestination, trimmedRequest)
 }
 
 func (h RequestHandler) processRequest(s Subrequest) (int, error) {
@@ -322,7 +326,8 @@ func (h RequestHandler) forwardRequest(ctx context.Context, destination string, 
 
 	if h.rabbitMQChan != nil {
 		destinationHostname := strings.TrimSuffix(destination, "/request")
-		err = h.rabbitMQChan.PublishWithContext(context.Background(),
+		err = h.rabbitMQChan.PublishWithContext(
+			ctx,                 // context
 			"",                  // exchange
 			destinationHostname, // routing key
 			false,               // mandatory
