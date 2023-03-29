@@ -17,9 +17,7 @@ plugins:
     out: gen/proto/python
   - plugin: buf.build/protocolbuffers/python
     out: gen/proto/python
-  # - plugin: buf.build/protocolbuffers/pyi
-  #   out: gen/proto/python
-  - remote: buf.build/adriansahlman/plugins/mypy-protobuf:v3.3.0-1
+  - plugin: buf.build/protocolbuffers/pyi
     out: gen/proto/python
   - plugin: buf.build/protocolbuffers/go
     out: gen/proto/go
