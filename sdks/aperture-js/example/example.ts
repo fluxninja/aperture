@@ -1,10 +1,10 @@
-import http from "http";
 import express from "express";
+import http from "http";
 import { createHttpTerminator } from "http-terminator";
 
-import { apertureRoute, apertureClient } from "./routes/use_aperture";
-import { healthRouter } from "./routes/health";
-import { connectedRouter } from "./routes/connected";
+import { connectedRouter } from "./routes/connected.js";
+import { healthRouter } from "./routes/health.js";
+import { apertureClient, apertureRoute } from "./routes/use_aperture.js";
 
 const host = "localhost";
 const port = process.env.FN_APP_PORT ? process.env.FN_APP_PORT : "8080";
