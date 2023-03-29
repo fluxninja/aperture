@@ -27,3 +27,5 @@ jobs:
         with:
           debug: false
           review_comment_lgtm: false
+          model: gpt-4-32k
+          max_files_to_summarize: 80
