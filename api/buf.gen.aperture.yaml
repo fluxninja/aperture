@@ -13,6 +13,12 @@ plugins:
     out: gen/proto/java
   - remote: buf.build/grpc/plugins/java:v1.49.1-1
     out: gen/proto/java
+  - plugin: buf.build/grpc/python
+    out: gen/proto/python
+  - plugin: buf.build/protocolbuffers/python
+    out: gen/proto/python
+  - plugin: buf.build/protocolbuffers/pyi
+    out: gen/proto/python
   - plugin: buf.build/protocolbuffers/go
     out: gen/proto/go
     opt:

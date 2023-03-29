@@ -32,6 +32,33 @@ buf-generate:
 	@#javascript
 	@rm -rf ../sdks/aperture-js/src/generated/aperture/flowcontrol/*
 	@cp -R aperture/flowcontrol/check ../sdks/aperture-js/proto/flowcontrol/
+	@#python
+	@rm -rf ../sdks/aperture-py/aperture_sdk/_gen/aperture/flowcontrol/*
+	@cp -R gen/proto/python/aperture/flowcontrol/check ../sdks/aperture-py/aperture_sdk/_gen/aperture/flowcontrol/
+	@# Rewrite the generated structure to add __init__.py files and fix imports
+	@{ \
+	  set -euo pipefail; \
+		readonly python_gen="../sdks/aperture-py/aperture_sdk/_gen"; \
+		SED="sed"; \
+		FIND="find"; \
+		if [[ "$$OSTYPE" == "darwin"* ]]; then \
+			SED="gsed"; \
+			FIND="gfind"; \
+		fi; \
+		echo "Fixing up Python gRPC imports"; \
+		generated_py_files_str="$$($$FIND "$$python_gen" -type f -name '*.py')"; \
+		readarray -t generated_py_files <<<"$$generated_py_files_str"; \
+		$$SED -i "s/^from aperture\..* import \([^ ]*_pb2\) as \([^ ]*\)$$/from . import \1 as \2/" "$${generated_py_files[@]}"; \
+		generated_pyi_files_str="$$($$FIND "$$python_gen" -type f -name '*.pyi')"; \
+		readarray -t generated_pyi_files <<<"$$generated_pyi_files_str"; \
+		$$SED -i "s/^import aperture\.[^ ]*\.\([^ ]*_pb2\)$$/from . import \1/" "$${generated_pyi_files[@]}"; \
+		$$SED -i "s/aperture\.[^ ]*\.\([^ ]*_pb2\)/\1/" "$${generated_pyi_files[@]}"; \
+		$$SED -i "s/^import grpc$$/import grpc\nimport grpc.aio\nimport typing/" "$${generated_pyi_files[@]}"; \
+		$$SED -i "s/: grpc\.Server/: typing.Union[grpc.Server, grpc.aio.Server]/" "$${generated_pyi_files[@]}"; \
+		echo "Generating __init__.py files"; \
+		$$FIND "$$python_gen" -type d -exec touch "{}/__init__.py" \;; \
+	}
+	@rm -rf gen/proto/python
 	@#generate api docs
 	@rm -rfd $(DOCS_OPENAPI)
 	@mv gen/openapiv2 $(DOCS_OPENAPI)

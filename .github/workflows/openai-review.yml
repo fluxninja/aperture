@@ -27,3 +27,5 @@ jobs:
         with:
           debug: false
           review_comment_lgtm: false
+          openai_model: gpt-4
+          max_files_to_summarize: 80
