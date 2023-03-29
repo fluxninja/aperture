@@ -90,8 +90,67 @@ func (ss SimpleService) Run() error {
 			return err
 		}
 		defer ch.Close()
-
 		handler.rabbitMQChan = ch
+
+		// Declare a queue for the service to consume from.
+		q, err := ch.QueueDeclare(
+			handler.hostname, // name
+			false,            // durable
+			false,            // delete when unused
+			false,            // exclusive
+			false,            // no-wait
+			nil,              // arguments
+		)
+		if err != nil {
+			return err
+		}
+
+		// Consume messages from the queue.
+		delivery, err := ch.Consume(
+			q.Name, // queue
+			q.Name, // consumer
+			true,   // auto-ack
+			false,  // exclusive
+			false,  // no-local
+			false,  // no-wait
+			nil,    // args
+		)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to consume messages")
+		}
+
+		go func() {
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			for d := range delivery {
+				var p Request
+				err := json.Unmarshal(d.Body, &p)
+				if err != nil {
+					log.Error().Err(err).Msg("Failed to unmarshal message")
+					continue
+				}
+				for _, chain := range p.Chains {
+					if len(chain.subrequests) == 0 {
+						log.Warn().Err(err).Msg("Empty chain")
+						break
+					}
+					requestDestination := chain.subrequests[0].Destination
+					if !strings.HasPrefix(requestDestination, "http") {
+						requestDestination = "http://" + requestDestination
+					}
+					requestDomain, err := url.Parse(requestDestination)
+					if requestDomain.Hostname() != handler.hostname {
+						log.Warn().Err(err).Msg("Invalid destination")
+						break
+					}
+					_, err = handler.processChain(ctx, chain)
+					if err != nil {
+						log.Warn().Err(err).Msg("Failed to process chain")
+						break
+					}
+				}
+			}
+		}()
 	}
 
 	if ss.envoyPort == -1 {
@@ -114,7 +173,7 @@ func (ss SimpleService) Run() error {
 
 func handlerFunc(h *RequestHandler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Autosample().Info().Msg("received request")
+		log.Autosample().Trace().Msg("received request")
 		h.ServeHTTP(w, r)
 	})
 }
@@ -254,15 +313,33 @@ func (h RequestHandler) processRequest(s Subrequest) (int, error) {
 	return http.StatusOK, nil
 }
 
-func (h RequestHandler) forwardRequest(ctx context.Context, destinationHostname string, requestBody Request) (int, error) {
-	address := fmt.Sprintf("http://%s", destinationHostname)
-
+func (h RequestHandler) forwardRequest(ctx context.Context, destination string, requestBody Request) (int, error) {
 	jsonRequest, err := json.Marshal(requestBody)
 	if err != nil {
 		log.Bug().Err(err).Msg("bug: Failed to marshal request")
 		return http.StatusInternalServerError, err
 	}
 
+	if h.rabbitMQChan != nil {
+		destinationHostname := strings.TrimSuffix(destination, "/request")
+		err = h.rabbitMQChan.PublishWithContext(context.Background(),
+			"",                  // exchange
+			destinationHostname, // routing key
+			false,               // mandatory
+			false,               // immediate
+			amqp.Publishing{
+				ContentType: "application/json",
+				Body:        jsonRequest,
+			},
+		)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to send request")
+			return http.StatusInternalServerError, err
+		}
+		return http.StatusOK, nil
+	}
+
+	address := fmt.Sprintf("http://%s", destination)
 	request, err := http.NewRequest("POST", address, bytes.NewBuffer(jsonRequest))
 	if err != nil {
 		log.Autosample().Error().Err(err).Msg("Failed to create request")

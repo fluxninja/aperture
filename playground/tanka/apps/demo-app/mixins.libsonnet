@@ -17,10 +17,10 @@ local application = {
       rejectRatio: if enableNginx || enableKong then 0.0 else 0.05,
       hostname: if enableNginx then 'nginx-server.demoapp.svc.cluster.local' else if enableKong then 'kong-server.demoapp.svc.cluster.local' else '',
       rabbitMQEnabled: if enableRabbitMQ then 'true' else 'false',
-      rabbitMQHost: 'rabbitmq.demoapp.svc.cluster.local',
+      rabbitMQHost: 'rabbitmq.rabbitmq.svc.cluster.local',
       rabbitMQPort: 5672,
-      rabbitMQUser: 'guest',
-      rabbitMQPassword: 'guest',
+      rabbitMQUsername: 'admin',
+      rabbitMQPassword: 'secretpassword',
     },
   },
   service1:

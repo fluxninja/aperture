@@ -23,7 +23,7 @@ const (
 	rabbitMQEnabled        rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_ENABLED"
 	rabbitMQHostEnvVar     rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_HOST"
 	rabbitMQPortEnvVar     rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_PORT"
-	rabbitMQUserEnvVar     rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_USER"
+	rabbitMQUsernameEnvVar rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_USERNAME"
 	rabbitMQPasswordEnvVar rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_PASSWORD"
 )
 
@@ -40,9 +40,9 @@ func main() {
 	if rabbitMQFromEnv(rabbitMQEnabled) == "true" {
 		rabbitMQHost := rabbitMQFromEnv(rabbitMQHostEnvVar)
 		rabbitMQPort := rabbitMQFromEnv(rabbitMQPortEnvVar)
-		rabbitMQUser := rabbitMQFromEnv(rabbitMQUserEnvVar)
+		rabbitMQUsername := rabbitMQFromEnv(rabbitMQUsernameEnvVar)
 		rabbitMQPassword := rabbitMQFromEnv(rabbitMQPasswordEnvVar)
-		rabbitMQURL = "amqp://" + rabbitMQUser + ":" + rabbitMQPassword + "@" + rabbitMQHost + ":" + rabbitMQPort + "/"
+		rabbitMQURL = "amqp://" + rabbitMQUsername + ":" + rabbitMQPassword + "@" + rabbitMQHost + ":" + rabbitMQPort + "/"
 	}
 
 	// We don't necessarily need tracing providers (just propagators), but lets
@@ -84,10 +84,10 @@ func rabbitMQFromEnv(envVar rabbitMQEnvVar) string {
 			return "localhost"
 		case rabbitMQPortEnvVar:
 			return "5672"
-		case rabbitMQUserEnvVar:
-			return "guest"
+		case rabbitMQUsernameEnvVar:
+			return "user"
 		case rabbitMQPasswordEnvVar:
-			return "guest"
+			return ""
 		default:
 			return ""
 		}
