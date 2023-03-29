@@ -17,6 +17,8 @@ protobuf = "^4.22.1"
 [tool.poetry.group.dev.dependencies]
 grpcio-tools = "^1.51"
 black = "^23.1.0"
+mypy = "^1.1.1"
+grpc-stubs = "^1.24.12.1"
 
 
 [tool.poetry.group.example.dependencies]
@@ -25,3 +27,9 @@ quart = "^0.18.3"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+namespace_packages = true
+check_untyped_defs = true
+exclude = ["aperture_sdk/_gen/"]
+python_version = 3.7
