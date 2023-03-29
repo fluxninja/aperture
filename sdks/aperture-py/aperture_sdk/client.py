@@ -2,6 +2,7 @@ import datetime
 import functools
 import logging
 import time
+import typing
 from typing import Callable, Dict, Optional, Type, TypeVar
 
 import grpc
@@ -103,8 +104,11 @@ class ApertureClient:
         span = self.tracer.start_span("Aperture Check", attributes=span_attributes)
         stub = FlowControlServiceStub(self.grpc_channel)
         try:
-            response = stub.Check(request, timeout=int(self.timeout.total_seconds()))
-        except grpc.RpcError:
+            # stub.Check is typed to accept an int, but it actually accepts a float
+            timeout = typing.cast(int, self.timeout.total_seconds())
+            response = stub.Check(request, timeout=timeout)
+        except grpc.RpcError as e:
+            self.logger.debug(f"Aperture gRPC call failed: {e.details()}")
             response = None
         span.set_attribute(workload_start_timestamp_label, time.monotonic_ns())
         return Flow(span=span, check_response=response)
