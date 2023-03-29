@@ -25,7 +25,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
-          debug: false
+          debug: true
           review_comment_lgtm: false
           openai_model: gpt-4
           max_files_to_summarize: 80
