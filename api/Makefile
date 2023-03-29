@@ -32,6 +32,10 @@ buf-generate:
 	@#javascript
 	@rm -rf ../sdks/aperture-js/src/generated/aperture/flowcontrol/*
 	@cp -R aperture/flowcontrol/check ../sdks/aperture-js/proto/flowcontrol/
+	@#python
+	@rm -rf ../sdks/aperture-py/aperture_sdk/_gen/aperture/flowcontrol/*
+	@cp -R gen/proto/python/aperture/flowcontrol/check ../sdks/aperture-py/aperture_sdk/_gen/aperture/flowcontrol/
+	@rm -rf gen/proto/python
 	@#generate api docs
 	@rm -rfd $(DOCS_OPENAPI)
 	@mv gen/openapiv2 $(DOCS_OPENAPI)

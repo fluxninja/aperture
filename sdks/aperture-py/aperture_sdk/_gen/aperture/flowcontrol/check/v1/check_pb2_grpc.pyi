@@ -3,7 +3,7 @@
 isort:skip_file
 """
 import abc
-import aperture.flowcontrol.check.v1.check_pb2
+from . import check_pb2
 import grpc
 import grpc.aio
 import typing
@@ -13,8 +13,8 @@ class FlowControlServiceStub:
 
     def __init__(self, channel: grpc.Channel) -> None: ...
     Check: grpc.UnaryUnaryMultiCallable[
-        aperture.flowcontrol.check.v1.check_pb2.CheckRequest,
-        aperture.flowcontrol.check.v1.check_pb2.CheckResponse,
+        check_pb2.CheckRequest,
+        check_pb2.CheckResponse,
     ]
     """Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny."""
 
@@ -24,9 +24,9 @@ class FlowControlServiceServicer(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def Check(
         self,
-        request: aperture.flowcontrol.check.v1.check_pb2.CheckRequest,
+        request: check_pb2.CheckRequest,
         context: grpc.ServicerContext,
-    ) -> aperture.flowcontrol.check.v1.check_pb2.CheckResponse:
+    ) -> check_pb2.CheckResponse:
         """Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny."""
 
 def add_FlowControlServiceServicer_to_server(servicer: FlowControlServiceServicer, server: typing.Union[grpc.Server, grpc.aio.Server]) -> None: ...
