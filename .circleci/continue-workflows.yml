@@ -25,6 +25,13 @@ executors:
   ubuntu-18-executor:
     docker:
       - image: cimg/base:2022.12-18.04
+  linux-arm-machine:
+    machine:
+      image: ubuntu-2004:202101-01
+    resource_class: arm.medium
+  macos:
+    macos:
+      xcode: 14.2.0
 
 parameters:
   updated-aperture:
@@ -915,6 +922,10 @@ jobs:
         type: string
         description: the GOARCH to use for the build
         default: amd64
+      goos:
+        type: string
+        description: the GOOS to use for the build
+        default: linux
       component:
         type: string
         description: the component to build
@@ -926,6 +937,7 @@ jobs:
     environment:
       PACKAGES_DIR: "/tmp/packages"
       GOARCH: <<parameters.goarch>>
+      GOOS: <<parameters.goos>>
       COMPONENT: <<parameters.component>>
     steps:
       - checkout
@@ -961,6 +973,29 @@ jobs:
       - run:
           name: Package
           command: ./.circleci/scripts/nfpm_package.sh
+      - when:
+          condition:
+            equal: [cli, << parameters.component >>]
+          steps:
+            - run:
+                name: Creating .tar.gz file for Given OS
+                command: |
+                  mkdir buildtardir
+                  cp LICENSE ./buildtardir
+                  cp ./dist/aperturectl ./buildtardir
+                  cd  ./buildtardir
+                  rm_v=${APERTURECTL_BUILD_VERSION}
+                  rm_v=$(echo $rm_v | sed 's/^v//')
+                  touch aperturectl-${rm_v}-${GOOS}-${GOARCH}.tar.gz
+                  tar --exclude=aperturectl-${rm_v}-${GOOS}-${GOARCH}.tar.gz -czvf aperturectl-${rm_v}-${GOOS}-${GOARCH}.tar.gz .
+                  cp -r *.tar.gz $HOME/project/dist/packages/
+                  #Remove the .deb and .rpm package for darwin OS.
+                  #As this packges don't work on macos and we have .tar.gz file which has aperturectl compiled binary for this systems.
+                  if [ "${GOOS}" == "darwin" ]
+                  then
+                    rm -rf $HOME/project/dist/packages/*.deb $HOME/project/dist/packages/*.rpm
+                  fi
+                  ls -al $HOME/project/dist/packages/
       - when:
           condition: <<parameters.upload-to-gcp>>
           steps:
@@ -1003,6 +1038,10 @@ workflows:
       - package-binaries:
           name: build-aperture-agent-bare-metal-package
           component: agent
+          matrix:
+            parameters:
+              goos: ["linux"]
+              goarch: ["amd64"]
 
   publish-aperture-agent-bare-metal-package:
     when:
@@ -1016,6 +1055,10 @@ workflows:
           name: publish-aperture-agent-bare-metal-package
           component: agent
           upload-to-gcp: true
+          matrix:
+            parameters:
+              goos: ["linux"]
+              goarch: ["amd64"]
 
   build-aperturectl-packages:
     when:
@@ -1029,6 +1072,11 @@ workflows:
       - package-binaries:
           name: build-aperturectl-packages
           component: cli
+          matrix:
+            parameters:
+              goos: ["linux","darwin"]
+              goarch: ["amd64","arm64"]
+
 
   publish-aperturectl-packages:
     when:
@@ -1042,6 +1090,10 @@ workflows:
           name: publish-aperturectl-packages
           component: cli
           upload-to-gcp: true
+          matrix:
+            parameters:
+              goos: ["linux","darwin"]
+              goarch: ["amd64","arm64"]
 
   aperture:
     when:

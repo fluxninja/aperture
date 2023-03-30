@@ -79,6 +79,10 @@ jobs:
         type: string
         description: the GOARCH to use for the build
         default: amd64
+      goos:
+        type: string
+        description: the GOOS to use for the build
+        default: linux
       component:
         type: string
         description: the component to build
@@ -89,6 +93,7 @@ jobs:
     environment:
       PACKAGES_DIR: "/tmp/packages"
       GOARCH: <<parameters.goarch>>
+      GOOS: <<parameters.goos>>
       COMPONENT: <<parameters.component>>
       VERSION: <<parameters.tag>>
       APERTURECTL_BUILD_VERSION: <<parameters.tag>>
@@ -111,6 +116,29 @@ jobs:
       - run:
           name: Package
           command: ./.circleci/scripts/nfpm_package.sh
+      - when:
+          condition:
+            equal: [cli, << parameters.component >>]
+          steps:
+            - run:
+                name: Creating .tar.gz file for Given OS
+                command: |
+                  mkdir buildtardir
+                  cp LICENSE ./buildtardir
+                  cp ./dist/aperturectl ./buildtardir
+                  cd  ./buildtardir
+                  rm_v=${APERTURECTL_BUILD_VERSION}
+                  rm_v=$(echo $rm_v | sed 's/^v//')
+                  touch aperturectl-${rm_v}-${GOOS}-${GOARCH}.tar.gz
+                  tar --exclude=aperturectl-${rm_v}-${GOOS}-${GOARCH}.tar.gz -czvf aperturectl-${rm_v}-${GOOS}-${GOARCH}.tar.gz .
+                  cp -r *.tar.gz $HOME/project/dist/packages/
+                  #Remove the .deb and .rpm package for darwin OS.
+                  #As this packges don't work on macos and we have .tar.gz file which has aperturectl compiled binary for this systems.
+                  if [ "${GOOS}" == "darwin" ]
+                  then
+                    rm -rf $HOME/project/dist/packages/*.deb $HOME/project/dist/packages/*.rpm
+                  fi
+                  ls -al $HOME/project/dist/packages/
       - run: &install-gh-cli
           name: Install GH cli
           command: |
@@ -308,11 +336,16 @@ workflows:
       - publish-packages:
           filters: *release-filters
           tag: << pipeline.git.tag >>
+          component: agent
+
+      - publish-packages:
+          filters: *release-filters
+          tag: << pipeline.git.tag >>
+          component: cli
           matrix:
             parameters:
-              component:
-                - agent
-                - cli
+              goos: ["linux","darwin"]
+              goarch: ["amd64","arm64"]
 
       - update-environment:
           filters:
