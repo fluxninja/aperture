@@ -587,6 +587,19 @@ definitions:
                 $ref: '#/definitions/googlerpcStatus'
                 title: Status ``OK`` allows the request. Any other status indicates the request should be denied
         type: object
+    CheckRequest:
+        description: CheckRequest contains fields required to perform Check call.
+        properties:
+            control_point:
+                type: string
+            labels:
+                additionalProperties:
+                    type: string
+                type: object
+            tokens:
+                format: uint64
+                type: string
+        type: object
     CheckResponse:
         description: CheckResponse contains fields that represent decision made by Check call.
         properties:
@@ -4211,6 +4224,28 @@ paths:
                         $ref: '#/definitions/googlerpcStatus'
             tags:
                 - aperture-agent
+    /v1/flowcontrol/check:
+        post:
+            operationId: FlowControlService_Check
+            parameters:
+                - description: CheckRequest contains fields required to perform Check call.
+                  in: body
+                  name: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/CheckRequest'
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/CheckResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            summary: Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
+            tags:
+                - FlowControlService
     /v1/flowcontrol/checkhttp:
         post:
             operationId: FlowControlServiceHTTP_CheckHTTP

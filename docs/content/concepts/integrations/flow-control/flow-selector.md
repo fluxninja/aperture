@@ -146,14 +146,14 @@ See also
 
 :::note
 
-In a _Flow Selector_, the only required field is the _Control Point_. The
-_Service Selector_ is an optional construct that helps scale Aperture
-configuration in sophisticated environments, such as Kubernetes or multiple
-clusters of Aperture Agents.
+The _Service Selector_ is an optional construct that helps scale Aperture
+configuration in complex environments, such as Kubernetes, or in multi-cluster
+environments.
 
 In standalone Aperture Agent deployments (not co-located with any service), the
-_Control Points_ alone can be used to match flows to policies and the deployment
-can be used as a feature flag decision service.
+_Control Points_ alone can be used to match flows to policies and that
+deployment can be used as a feature flag decision service serving remote flow
+control requests.
 
 :::
 
