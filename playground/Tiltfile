@@ -259,6 +259,9 @@ DEP_TREE = {
             "labels": ["TestScenarioApplication"],
             "needs": [],
             "tkenv": TANKA_ROOT + "/apps/rabbitmq",
+            "port_forwards": {
+                "rabbitmq": "15672:15672",
+            },
             "child_resources": [
                 {
                     "workload": "rabbitmq",
