@@ -16,6 +16,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import io.opentelemetry.api.baggage.Baggage;
+import io.opentelemetry.api.baggage.BaggageEntry;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -41,6 +43,7 @@ public class RequestController {
 
     // Semaphore for limiting concurrent clients
     private Semaphore limitClients = new Semaphore(concurrency);
+    private ApertureFeatureFilter apertureFilter = new ApertureFeatureFilter();
 
     @RequestMapping(value = "/super", method = RequestMethod.GET)
     // /super endpoint is protected by a Filter created using Aperture SDK feature flow
@@ -76,7 +79,7 @@ public class RequestController {
     public FilterRegistrationBean<ApertureFeatureFilter> apertureFeatureFilter(Environment env){
         FilterRegistrationBean<ApertureFeatureFilter> registrationBean = new FilterRegistrationBean<>();
 
-        registrationBean.setFilter(new ApertureFeatureFilter());
+        registrationBean.setFilter(apertureFilter);
         registrationBean.addUrlPatterns("/request");
         registrationBean.addInitParameter("agent_host", System.getenv().getOrDefault("FN_AGENT_HOST", DEFAULT_HOST));
         registrationBean.addInitParameter("agent_port", System.getenv().getOrDefault("FN_AGENT_PORT", DEFAULT_AGENT_PORT));
@@ -119,7 +122,7 @@ public class RequestController {
                 }
                 String requestDestination = chain.get(0).getDestination();
                 // TODO Add check for req Dest != Hostname
-                return processChain(chain);
+                return processChain(chain, request.HttpHeaders);
             }
 
             // If all subrequests were processed successfully, return success message
@@ -138,7 +141,7 @@ public class RequestController {
         return "Success";
     }
 
-    private String processChain(List<Subrequest> chain){
+    private String processChain(List<Subrequest> chain, HttpHeaders headers) {
         if (chain.size() == 1) {
             return processRequest(chain.get(0));
         }
@@ -152,10 +155,10 @@ public class RequestController {
         trimmedRequest.addRequest(trimmedChain);
         String requestForwardingDestination = chain.get(1).getDestination();
 
-        return forwardRequest(trimmedRequest, requestForwardingDestination);
+        return forwardRequest(trimmedRequest, requestForwardingDestination, headers);
     }
 
-    private String processRequest(Subrequest request){
+    private String processRequest(Subrequest request) {
         // Limit concurrent clients
         if (limitClients != null && concurrency > 0) {
             try {
@@ -181,7 +184,7 @@ public class RequestController {
         return "Success";
     }
 
-    private String forwardRequest(Request request, String destination) {
+    private String forwardRequest(Request request, String destination, HttpHeaders originalHeaders) {
         String requestJson;
         try {
             requestJson = new ObjectMapper().writeValueAsString(request);
@@ -198,10 +201,11 @@ public class RequestController {
         String address = String.format("http://%s", destination);
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
+        apertureFilter.getApertureSDK().addBaggage(originalHeaders.toSingleValueMap());
 
         ResponseEntity<String> response = restTemplate.exchange(address, HttpMethod.POST, entity, String.class);
         if (response.getStatusCode() != HttpStatus.OK) {
-            String msg = "Error while forwarding request: " +response.getStatusCode();
+            String msg = "Error while forwarding request: " + response.getStatusCode();
             log.error(msg);
             return msg;
         }
