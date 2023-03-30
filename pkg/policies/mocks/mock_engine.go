@@ -79,17 +79,17 @@ func (mr *MockEngineMockRecorder) GetRateLimiter(limiterID interface{}) *gomock.
 }
 
 // ProcessRequest mocks base method.
-func (m *MockEngine) ProcessRequest(ctx context.Context, controlPoint string, serviceIDs []string, labels map[string]string) *checkv1.CheckResponse {
+func (m *MockEngine) ProcessRequest(ctx context.Context, requestContext iface.RequestContext) *checkv1.CheckResponse {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ProcessRequest", ctx, controlPoint, serviceIDs, labels)
+	ret := m.ctrl.Call(m, "ProcessRequest", ctx, requestContext)
 	ret0, _ := ret[0].(*checkv1.CheckResponse)
 	return ret0
 }
 
 // ProcessRequest indicates an expected call of ProcessRequest.
-func (mr *MockEngineMockRecorder) ProcessRequest(ctx, controlPoint, serviceIDs, labels interface{}) *gomock.Call {
+func (mr *MockEngineMockRecorder) ProcessRequest(ctx, requestContext interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessRequest", reflect.TypeOf((*MockEngine)(nil).ProcessRequest), ctx, controlPoint, serviceIDs, labels)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessRequest", reflect.TypeOf((*MockEngine)(nil).ProcessRequest), ctx, requestContext)
 }
 
 // RegisterConcurrencyLimiter mocks base method.
