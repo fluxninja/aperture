@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Collections;
+import java.util.stream.Collectors;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +18,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 
 import com.fluxninja.aperture.sdk.ApertureSDK;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
@@ -40,10 +44,29 @@ public class ApertureFeatureFilter implements Filter {
 
         // See whether flow was accepted by Aperture Agent.
         try {
-            log.debug("Starting Aperture SDK flow");
-            Flow flow = this.apertureSDK.startFlow("awesomeFeature", labels);
             HttpServletRequest request = (HttpServletRequest) req;
             HttpServletResponse response = (HttpServletResponse) res;
+
+            // Add headers sent from k6 load generator
+            HttpHeaders httpHeaders = Collections.list(request.getHeaderNames())
+                .stream()
+                .collect(Collectors.toMap(
+                    Function.identity(),
+                    h -> Collections.list(request.getHeaders(h)),
+                    (oldValue, newValue) -> newValue,
+                    HttpHeaders::new
+                ));
+            String userType = httpHeaders.getFirst("User-Type");
+            if (userType != null) {
+                labels.put("user_type", userType);
+            }
+            String userID = httpHeaders.getFirst("User-Id");
+            if (userID != null) {
+                labels.put("user_id", userID);
+            }
+
+            log.debug("Starting Aperture SDK flow");
+            Flow flow = this.apertureSDK.startFlow("awesomeFeature", labels);
 
             if (flow.accepted()) {
                 log.debug("Flow accepted by Aperture Agent");

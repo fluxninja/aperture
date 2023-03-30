@@ -72,14 +72,14 @@ policy:
             flow_matcher:
               label_matcher:
                 match_labels:
-                  "http.request.header.user_type": "bot"
+                  user_type: bot
               control_point: awesomeFeature
           in_ports:
             limit:
               signal_name: RATE_LIMIT
           parameters:
             limit_reset_interval: 1s
-            label_key: http.request.header.user_id
+            label_key: user_id
           dynamic_config_key: rate_limiter
   concurrency_controller:
     # Concurrency Limiter flow selector.
@@ -98,7 +98,7 @@ policy:
             priority: 200
           label_matcher:
             match_labels:
-              http.request.header.user_type: subscriber
+              user_type: subscriber
     # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
     # Type: float64
     load_multiplier_linear_increment: 0.0025

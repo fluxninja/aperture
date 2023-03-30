@@ -39,7 +39,7 @@ public class RequestController {
     private  int concurrency = Integer.parseInt(System.getenv().getOrDefault("CONCURRENCY", DEFAULT_CONCURRENCY));
     private  Duration latency = Duration.ofMillis(Long.parseLong(System.getenv().getOrDefault("LATENCY", DEFAULT_LATENCY)));
     private  double rejectRatio = Double.parseDouble(System.getenv().getOrDefault("REJECT_RATIO", DEFAULT_REJECT_RATIO));
-    private Logger log = LoggerFactory.getLogger(RequestController.class);
+    private  Logger log = LoggerFactory.getLogger(RequestController.class);
 
     // Semaphore for limiting concurrent clients
     private Semaphore limitClients = new Semaphore(concurrency);
@@ -96,17 +96,10 @@ public class RequestController {
 
     @PostMapping("/request")
     public String handlePostRequest(@RequestBody String payload, HttpServletRequest request, HttpServletResponse response) throws ApertureSDKException {
-        Map<String,String> labels = new HashMap<String,String>();
-        labels.put("app", "demoapp");
-        labels.put("instance", getInstanceName());
-        labels.put("ip", request.getRemoteAddr());
-
         // Randomly reject requests
         if (rejectRatio > 0 && Math.random() < rejectRatio) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
-            String message = "Request rejected";
-            log.debug(message);
-            return message;
+            return "Request rejected";
         }
 
         try {
@@ -127,7 +120,6 @@ public class RequestController {
 
             // If all subrequests were processed successfully, return success message
             response.setStatus(HttpStatus.OK.value());
-            response.setStatus(HttpStatus.OK.value());
             response.getWriter().write(payload);
 
         } catch (Exception e) {
@@ -136,8 +128,6 @@ public class RequestController {
             log.error(msg);
             return msg;
         }
-
-        log.debug("Success");
         return "Success";
     }
 
@@ -180,7 +170,6 @@ public class RequestController {
         if (limitClients != null) {
             limitClients.release();
         }
-        log.debug("processRequest success");
         return "Success";
     }
 
@@ -210,15 +199,10 @@ public class RequestController {
             return msg;
         }
 
-        log.debug("forwardRequest success");
         return "Success";
     }
 
     private String getInstanceName() {
         return System.getenv().getOrDefault("HOSTNAME", DEFAULT_HOST);
-    }
-
-    public void setRejectRatio(double rejectRatio) {
-        this.rejectRatio = rejectRatio;
     }
 }

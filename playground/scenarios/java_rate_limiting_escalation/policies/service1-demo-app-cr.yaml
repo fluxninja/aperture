@@ -95,7 +95,7 @@ spec:
                 priority: 50
             - label_matcher:
                 match_labels:
-                  http.request.header.user_type: subscriber
+                  user_type: subscriber
               parameters:
                 priority: 200
     - decider:
@@ -131,31 +131,32 @@ spec:
               control_point: awesomeFeature
               label_matcher:
                 match_labels:
-                  http.request.header.user_type: bot
+                  user_type: bot
             service_selector:
               service: service1-demo-app.demoapp.svc.cluster.local
           in_ports:
             limit:
               signal_name: RATE_LIMIT
           parameters:
-            label_key: http.request.header.user_id
+            label_key: user_id
             limit_reset_interval: 1s
     evaluation_interval: 0.5s
   resources:
-    classifiers:
-    - flow_selector:
-        flow_matcher:
-          control_point: awesomeFeature
-        service_selector:
-          service: service1-demo-app.demoapp.svc.cluster.local
-      rules:
-        user_type:
-          extractor:
-            from: request.http.headers.user-type
-    flux_meters:
-      service1-demo-app:
-        flow_selector:
+    flow_control:
+      classifiers:
+      - flow_selector:
           flow_matcher:
             control_point: awesomeFeature
           service_selector:
-            service: service3-demo-app.demoapp.svc.cluster.local
+            service: service1-demo-app.demoapp.svc.cluster.local
+        rules:
+          user_type:
+            extractor:
+              from: request.http.headers.user-type
+      flux_meters:
+        service1-demo-app:
+          flow_selector:
+            flow_matcher:
+              control_point: awesomeFeature
+            service_selector:
+              service: service3-demo-app.demoapp.svc.cluster.local
