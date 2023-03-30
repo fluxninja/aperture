@@ -96,6 +96,7 @@ func (ss SimpleService) Run() error {
 		if err != nil {
 			return err
 		}
+		defer cCh.Close()
 
 		// Declare a queue for the service to consume from.
 		q, err := cCh.QueueDeclare(
@@ -206,6 +207,20 @@ type Request struct {
 // SubrequestChain is a single chain of destinations.
 type SubrequestChain struct {
 	subrequests []Subrequest
+}
+
+// MarshalJSON writes the subrequest chain as a JSON list and not a JSON object.
+func (sc SubrequestChain) MarshalJSON() ([]byte, error) {
+	return json.Marshal(sc.subrequests)
+}
+
+// UnmarshalJSON creates the subrequest chain, reading a JSON list and not a JSON object.
+func (sc *SubrequestChain) UnmarshalJSON(data []byte) error {
+	err := json.Unmarshal(data, &sc.subrequests)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Subrequest contains information on a single destination
