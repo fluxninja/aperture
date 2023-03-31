@@ -3,15 +3,14 @@ package com.fluxninja.aperture.armeria;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.fluxninja.aperture.sdk.TrafficFlow;
+import com.fluxninja.aperture.sdk.Utils;
 import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
 import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
-import com.linecorp.armeria.common.HttpRequest;
-import com.linecorp.armeria.common.HttpStatus;
-import com.linecorp.armeria.common.RequestHeaders;
-import com.linecorp.armeria.common.RequestHeadersBuilder;
+import com.linecorp.armeria.common.*;
 import io.netty.util.AsciiString;
 import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageEntry;
+import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -51,7 +50,7 @@ class HttpUtils {
         return labels;
     }
 
-    protected static AttributeContext attributesFromRequest(HttpRequest req) {
+    protected static AttributeContext attributesFromRequest(RequestContext ctx, HttpRequest req) {
         Map<String, String> baggageLabels = new HashMap<>();
 
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -71,7 +70,7 @@ class HttpUtils {
         AttributeContext.Builder builder = AttributeContext.newBuilder();
         builder.putAllContextExtensions(baggageLabels);
 
-        return addHttpAttributes(builder, req).build();
+        return addHttpAttributes(builder, ctx, req).build();
     }
 
     // getAppend is deprecated but agent does set it, so we should use it
@@ -96,7 +95,7 @@ class HttpUtils {
     }
 
     private static AttributeContext.Builder addHttpAttributes(
-            AttributeContext.Builder builder, HttpRequest req) {
+            AttributeContext.Builder builder, RequestContext ctx, HttpRequest req) {
         Map<String, String> extractedHeaders = new HashMap<>();
         RequestHeaders headers = req.headers();
         for (Map.Entry<AsciiString, String> header : headers) {
@@ -107,7 +106,21 @@ class HttpUtils {
             extractedHeaders.put(headerKey, header.getValue());
         }
 
-        return builder.putContextExtensions("control-point", "ingress")
+        java.net.SocketAddress remoteSocket = ctx.remoteAddress();
+        String sourceIp = null;
+        if (remoteSocket instanceof InetSocketAddress) {
+            InetSocketAddress remoteAddress = (InetSocketAddress) remoteSocket;
+            sourceIp = remoteAddress.getAddress().getHostAddress();
+        }
+
+        java.net.SocketAddress localSocket = ctx.localAddress();
+        String destinationIp = null;
+        if (localSocket instanceof InetSocketAddress) {
+            InetSocketAddress localAddress = (InetSocketAddress) localSocket;
+            destinationIp = localAddress.getAddress().getHostAddress();
+        }
+
+        builder.putContextExtensions("control-point", "ingress")
                 .setRequest(
                         AttributeContext.Request.newBuilder()
                                 .setHttp(
@@ -119,5 +132,12 @@ class HttpUtils {
                                                 .setSize(headers.contentLength())
                                                 .setProtocol("HTTP/2")
                                                 .putAllHeaders(extractedHeaders)));
+        if (sourceIp != null) {
+            builder.setSource(Utils.peerFromAddress(sourceIp));
+        }
+        if (destinationIp != null) {
+            builder.setDestination(Utils.peerFromAddress(destinationIp));
+        }
+        return builder;
     }
 }
