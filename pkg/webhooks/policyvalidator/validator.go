@@ -86,9 +86,9 @@ func (v *PolicyValidator) ValidateObject(
 		}
 
 		if !ok {
-			return ok, fmt.Sprintf("%s: %s", policy.GetName(), msg), nil
+			return false, fmt.Sprintf("%s: %s", policy.GetName(), msg), nil
 		}
 	}
 
-	return true, "", nil
+	return true, fmt.Sprintf("%s: Valid Policy", policy.GetName()), nil
 }
