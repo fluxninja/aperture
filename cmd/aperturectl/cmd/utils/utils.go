@@ -121,12 +121,9 @@ func CompilePolicy(path string) (*circuitfactory.Circuit, error) {
 	// command is called "circuit-compiler" though, so it's bit... surprising.
 	// If we compiled just a circuit, we could drop dependency on
 	// `controlplane` package.
-	circuit, valid, msg, err := controlplane.ValidateAndCompile(ctx, filepath.Base(path), yamlFile)
+	circuit, err := controlplane.ValidateAndCompile(ctx, filepath.Base(path), yamlFile)
 	if err != nil {
 		return nil, err
-	}
-	if !valid {
-		return nil, fmt.Errorf("invalid circuit: %s", msg)
 	}
 	return circuit, nil
 }
