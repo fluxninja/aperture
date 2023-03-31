@@ -587,19 +587,6 @@ definitions:
                 $ref: '#/definitions/googlerpcStatus'
                 title: Status ``OK`` allows the request. Any other status indicates the request should be denied
         type: object
-    CheckRequest:
-        description: CheckRequest contains fields required to perform Check call.
-        properties:
-            control_point:
-                type: string
-            labels:
-                additionalProperties:
-                    type: string
-                type: object
-            tokens:
-                format: uint64
-                type: string
-        type: object
     CheckResponse:
         description: CheckResponse contains fields that represent decision made by Check call.
         properties:
@@ -3119,8 +3106,8 @@ definitions:
 
             :::info
 
-            Special labels:
-            - `tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
+            Special rego variables:
+            - `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
 
             :::
 
@@ -3128,8 +3115,7 @@ definitions:
             ```yaml
             rego:
               labels:
-                user-id:
-                  query: data.user_from_cookie.user
+                user:
                   telemetry: false
               module: |
                 package user_from_cookie
@@ -3146,11 +3132,12 @@ definitions:
         properties:
             labels:
                 additionalProperties:
-                    $ref: '#/definitions/RegoLabelQuery'
+                    $ref: '#/definitions/RegoLabelProperties'
                 description: |+
                     A map of {key, value} pairs mapping from
                     [flow label](/concepts/integrations/flow-control/flow-label.md) keys to queries that define
                     how to extract and propagate flow labels with that key.
+                    The name of the label maps to a variable in the rego module, i.e. it maps to `data.<package>.<label>` variable.
 
                 minProperties: 1
                 type: object
@@ -3159,7 +3146,11 @@ definitions:
                 description: |+
                     Source code of the rego module.
 
-                    Note: Must include a "package" declaration.
+                    :::Note
+
+                    Must include a "package" declaration.
+
+                    :::
 
                 type: string
                 x-go-tag-validate: required
@@ -3167,16 +3158,8 @@ definitions:
             - labels
             - module
         type: object
-    RegoLabelQuery:
+    RegoLabelProperties:
         properties:
-            query:
-                description: |+
-                    Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
-
-                    Note: The module name must match the package name from the "source".
-
-                type: string
-                x-go-tag-validate: required
             telemetry:
                 default: true
                 description: |+
@@ -3199,8 +3182,6 @@ definitions:
                     propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
                 type: boolean
                 x-go-tag-default: "true"
-        required:
-            - query
         type: object
     ReportRequest:
         properties:
@@ -4224,28 +4205,6 @@ paths:
                         $ref: '#/definitions/googlerpcStatus'
             tags:
                 - aperture-agent
-    /v1/flowcontrol/check:
-        post:
-            operationId: FlowControlService_Check
-            parameters:
-                - description: CheckRequest contains fields required to perform Check call.
-                  in: body
-                  name: body
-                  required: true
-                  schema:
-                    $ref: '#/definitions/CheckRequest'
-            responses:
-                "200":
-                    description: A successful response.
-                    schema:
-                        $ref: '#/definitions/CheckResponse'
-                default:
-                    description: An unexpected error response.
-                    schema:
-                        $ref: '#/definitions/googlerpcStatus'
-            summary: Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
-            tags:
-                - FlowControlService
     /v1/flowcontrol/checkhttp:
         post:
             operationId: FlowControlServiceHTTP_CheckHTTP
@@ -4268,7 +4227,7 @@ paths:
                 Performs Aperture Flowcontrol check based on the fields received with the
                 incoming request, and returns status `OK` or not `OK`.
             tags:
-                - FlowControlServiceHTTP
+                - aperture-agent
     /v1/flowcontrol/controlpoints:
         get:
             operationId: FlowControlPointsService_GetControlPoints
@@ -4277,6 +4236,43 @@ paths:
                     description: A successful response.
                     schema:
                         $ref: '#/definitions/FlowControlPoints'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/flowcontrol/preview/http_requests/{control_point}:
+        post:
+            operationId: FlowPreviewService_PreviewHTTPRequests2
+            parameters:
+                - description: Control point to preview.
+                  in: path
+                  name: control_point
+                  required: true
+                  type: string
+                - description: Flow labels to match. Optional parameter for advanced filtering.
+                  in: body
+                  name: label_matcher
+                  required: true
+                  schema:
+                    $ref: '#/definitions/LabelMatcher'
+                - description: Number of samples to collect.
+                  format: int64
+                  in: query
+                  name: samples
+                  required: false
+                  type: string
+                - description: Service to preview.
+                  in: query
+                  name: service
+                  required: false
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/PreviewHTTPRequestsResponse'
                 default:
                     description: An unexpected error response.
                     schema:
@@ -4314,6 +4310,43 @@ paths:
                     description: A successful response.
                     schema:
                         $ref: '#/definitions/PreviewHTTPRequestsResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/flowcontrol/preview/labels/{control_point}:
+        post:
+            operationId: FlowPreviewService_PreviewFlowLabels2
+            parameters:
+                - description: Control point to preview.
+                  in: path
+                  name: control_point
+                  required: true
+                  type: string
+                - description: Flow labels to match. Optional parameter for advanced filtering.
+                  in: body
+                  name: label_matcher
+                  required: true
+                  schema:
+                    $ref: '#/definitions/LabelMatcher'
+                - description: Number of samples to collect.
+                  format: int64
+                  in: query
+                  name: samples
+                  required: false
+                  type: string
+                - description: Service to preview.
+                  in: query
+                  name: service
+                  required: false
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/PreviewFlowLabelsResponse'
                 default:
                     description: An unexpected error response.
                     schema:

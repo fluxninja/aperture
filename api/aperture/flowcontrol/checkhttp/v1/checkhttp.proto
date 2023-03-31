@@ -5,6 +5,7 @@ package aperture.flowcontrol.checkhttp.v1;
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 import "google/rpc/status.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
 // A generic interface for performing Aperture Flowcontrol check on incoming
@@ -16,6 +17,9 @@ service FlowControlServiceHTTP {
     option (google.api.http) = {
       post: "/v1/flowcontrol/checkhttp"
       body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-agent"];
     };
   }
 }

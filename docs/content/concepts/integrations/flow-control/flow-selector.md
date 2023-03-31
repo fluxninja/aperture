@@ -148,7 +148,7 @@ See also
 
 The _Service Selector_ is an optional construct that helps scale Aperture
 configuration in complex environments, such as Kubernetes, or in multi-cluster
-environments.
+installations.
 
 In standalone Aperture Agent deployments (not co-located with any service), the
 _Control Points_ alone can be used to match flows to policies and that
@@ -191,8 +191,7 @@ An entity (K8s Pod, VM, etc) may belong to multiple services.
 
 :::tip Special Service Names
 
-- `any`: Matches all services (default value)
-- `global`: Service name used when service discovery lookup fails
+- `any`: Can be used in a policy to match all services
 
 :::
 

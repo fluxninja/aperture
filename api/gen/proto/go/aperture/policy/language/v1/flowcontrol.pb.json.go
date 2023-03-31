@@ -216,7 +216,7 @@ func (msg *Rego) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *Rego_LabelQuery) MarshalJSON() ([]byte, error) {
+func (msg *Rego_LabelProperties) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -225,7 +225,7 @@ func (msg *Rego_LabelQuery) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *Rego_LabelQuery) UnmarshalJSON(b []byte) error {
+func (msg *Rego_LabelProperties) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

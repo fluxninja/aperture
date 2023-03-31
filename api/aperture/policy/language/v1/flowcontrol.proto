@@ -337,8 +337,8 @@ message Rule {
 //
 // :::info
 //
-// Special labels:
-// - `tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
+// Special rego variables:
+// - `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
 //
 // :::
 //
@@ -346,8 +346,7 @@ message Rule {
 // ```yaml
 // rego:
 //   labels:
-//     user-id:
-//       query: data.user_from_cookie.user
+//     user:
 //       telemetry: false
 //   module: |
 //     package user_from_cookie
@@ -362,12 +361,7 @@ message Rule {
 //     }
 // ```
 message Rego {
-  message LabelQuery {
-    // Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
-    //
-    // Note: The module name must match the package name from the "source".
-    string query = 1; // @gotags: validate:"required"
-
+  message LabelProperties {
     // Decides if the created flow label should be available as an attribute in OLAP telemetry and
     // propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
     //
@@ -384,17 +378,22 @@ message Rego {
     // sensitive labels.
     //
     // :::
-    bool telemetry = 2; // @gotags: default:"true"
+    bool telemetry = 1; // @gotags: default:"true"
   }
 
   // A map of {key, value} pairs mapping from
   // [flow label](/concepts/integrations/flow-control/flow-label.md) keys to queries that define
   // how to extract and propagate flow labels with that key.
-  map<string, LabelQuery> labels = 1; // @gotags: validate:"required,gt=0,dive,keys,required,endkeys,required"
+  // The name of the label maps to a variable in the rego module, i.e. it maps to `data.<package>.<label>` variable.
+  map<string, LabelProperties> labels = 1; // @gotags: validate:"required,gt=0,dive,keys,required,endkeys,required"
 
   // Source code of the rego module.
   //
-  // Note: Must include a "package" declaration.
+  // :::Note
+  //
+  // Must include a "package" declaration.
+  //
+  // :::
   string module = 2; // @gotags: validate:"required"
 }
 

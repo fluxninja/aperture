@@ -171,9 +171,12 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 						continue
 					}
 				} else {
-					flowLabels[key] = flowlabel.FlowLabelValue{
-						Value:     fmt.Sprint(value),
-						Telemetry: labeler.Labels[key].Telemetry,
+					// copy this variable to labels
+					if l, ok := labeler.Labels[key]; ok {
+						flowLabels[key] = flowlabel.FlowLabelValue{
+							Value:     fmt.Sprint(value),
+							Telemetry: l.Telemetry,
+						}
 					}
 				}
 			}

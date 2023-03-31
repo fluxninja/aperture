@@ -231,24 +231,19 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 	// compile rego rules
 	r := classifierWrapper.GetClassifier().GetRego()
 	if r != nil {
-		// make query for each label
-		labelsProperties := map[string]LabelProperties{}
-
+		module := r.GetModule()
 		labels := r.GetLabels()
-		statements := []string{r.GetModule()}
+
+		labelsProperties := map[string]LabelProperties{}
 		for labelKey, labelQuery := range labels {
 			if !extractors.IsRegoIdent(labelKey) {
 				return nil, fmt.Errorf("%w: %q is not a valid label name", BadLabelName, labelKey)
 			}
-			queryStr := fmt.Sprintf("%s := %s", labelKey, labelQuery.Query)
-			statements = append(statements, queryStr)
 			labelsProperties[labelKey] = LabelProperties{
 				Telemetry: labelQuery.Telemetry,
 			}
 		}
 
-		// join statements
-		module := strings.Join(statements, "\n")
 		// get package name in module
 		// package name is specified in a line like "package foo"
 		p := regexp.MustCompile(`package\s+(\w+)`)

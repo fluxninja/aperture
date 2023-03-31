@@ -3946,46 +3946,44 @@ var _ interface {
 	ErrorName() string
 } = Rule_RegoValidationError{}
 
-// Validate checks the field values on Rego_LabelQuery with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *Rego_LabelQuery) Validate() error {
+// Validate checks the field values on Rego_LabelProperties with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *Rego_LabelProperties) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on Rego_LabelQuery with the rules
+// ValidateAll checks the field values on Rego_LabelProperties with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// Rego_LabelQueryMultiError, or nil if none found.
-func (m *Rego_LabelQuery) ValidateAll() error {
+// Rego_LabelPropertiesMultiError, or nil if none found.
+func (m *Rego_LabelProperties) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *Rego_LabelQuery) validate(all bool) error {
+func (m *Rego_LabelProperties) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	// no validation rules for Query
-
 	// no validation rules for Telemetry
 
 	if len(errors) > 0 {
-		return Rego_LabelQueryMultiError(errors)
+		return Rego_LabelPropertiesMultiError(errors)
 	}
 
 	return nil
 }
 
-// Rego_LabelQueryMultiError is an error wrapping multiple validation errors
-// returned by Rego_LabelQuery.ValidateAll() if the designated constraints
-// aren't met.
-type Rego_LabelQueryMultiError []error
+// Rego_LabelPropertiesMultiError is an error wrapping multiple validation
+// errors returned by Rego_LabelProperties.ValidateAll() if the designated
+// constraints aren't met.
+type Rego_LabelPropertiesMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m Rego_LabelQueryMultiError) Error() string {
+func (m Rego_LabelPropertiesMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -3994,11 +3992,11 @@ func (m Rego_LabelQueryMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m Rego_LabelQueryMultiError) AllErrors() []error { return m }
+func (m Rego_LabelPropertiesMultiError) AllErrors() []error { return m }
 
-// Rego_LabelQueryValidationError is the validation error returned by
-// Rego_LabelQuery.Validate if the designated constraints aren't met.
-type Rego_LabelQueryValidationError struct {
+// Rego_LabelPropertiesValidationError is the validation error returned by
+// Rego_LabelProperties.Validate if the designated constraints aren't met.
+type Rego_LabelPropertiesValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -4006,22 +4004,24 @@ type Rego_LabelQueryValidationError struct {
 }
 
 // Field function returns field value.
-func (e Rego_LabelQueryValidationError) Field() string { return e.field }
+func (e Rego_LabelPropertiesValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e Rego_LabelQueryValidationError) Reason() string { return e.reason }
+func (e Rego_LabelPropertiesValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e Rego_LabelQueryValidationError) Cause() error { return e.cause }
+func (e Rego_LabelPropertiesValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e Rego_LabelQueryValidationError) Key() bool { return e.key }
+func (e Rego_LabelPropertiesValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e Rego_LabelQueryValidationError) ErrorName() string { return "Rego_LabelQueryValidationError" }
+func (e Rego_LabelPropertiesValidationError) ErrorName() string {
+	return "Rego_LabelPropertiesValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e Rego_LabelQueryValidationError) Error() string {
+func (e Rego_LabelPropertiesValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -4033,14 +4033,14 @@ func (e Rego_LabelQueryValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sRego_LabelQuery.%s: %s%s",
+		"invalid %sRego_LabelProperties.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = Rego_LabelQueryValidationError{}
+var _ error = Rego_LabelPropertiesValidationError{}
 
 var _ interface {
 	Field() string
@@ -4048,7 +4048,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = Rego_LabelQueryValidationError{}
+} = Rego_LabelPropertiesValidationError{}
 
 // Validate checks the field values on RateLimiter_Parameters with the rules
 // defined in the proto definition for this message. If any rules are

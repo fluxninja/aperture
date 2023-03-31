@@ -3475,9 +3475,9 @@ You can use the [live-preview](/concepts/integrations/flow-control/resources/cla
 
 :::info
 
-Special labels:
+Special rego variables:
 
-- `tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
+- `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
 
 :::
 
@@ -3486,8 +3486,7 @@ Example of Rego module which also disables telemetry visibility of label:
 ```yaml
 rego:
   labels:
-    user-id:
-      query: data.user_from_cookie.user
+    user:
       telemetry: false
   module: |
     package user_from_cookie
@@ -3506,9 +3505,10 @@ rego:
 <dt>labels</dt>
 <dd>
 
-(map of [RegoLabelQuery](#rego-label-query), **required**) A map of {key, value} pairs mapping from
+(map of [RegoLabelProperties](#rego-label-properties), **required**) A map of {key, value} pairs mapping from
 [flow label](/concepts/integrations/flow-control/flow-label.md) keys to queries that define
 how to extract and propagate flow labels with that key.
+The name of the label maps to a variable in the rego module, i.e. it maps to `data.<package>.<label>` variable.
 
 </dd>
 <dt>module</dt>
@@ -3516,24 +3516,20 @@ how to extract and propagate flow labels with that key.
 
 (string, **required**) Source code of the rego module.
 
-Note: Must include a "package" declaration.
+:::Note
+
+Must include a "package" declaration.
+
+:::
 
 </dd>
 </dl>
 
 ---
 
-### RegoLabelQuery {#rego-label-query}
+### RegoLabelProperties {#rego-label-properties}
 
 <dl>
-<dt>query</dt>
-<dd>
-
-(string, **required**) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
-
-Note: The module name must match the package name from the "source".
-
-</dd>
 <dt>telemetry</dt>
 <dd>
 
