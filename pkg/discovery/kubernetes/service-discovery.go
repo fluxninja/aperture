@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
 	"strings"
 
 	"github.com/sourcegraph/conc/stream"
@@ -49,7 +50,7 @@ func newServiceDiscovery(
 
 func (kd *serviceDiscovery) start(startCtx context.Context) error {
 	// get cluster domain
-	clusterDomain, err := utils.GetClusterDomain()
+	clusterDomain, err := getClusterDomain()
 	if err != nil {
 		log.Error().Err(err).Msg("Could not get cluster domain, will retry")
 		return err
@@ -281,4 +282,17 @@ func getClusterIPsFromService(svc *v1.Service) []string {
 func shouldRemove(entity *entitiesv1.Entity) bool {
 	// once we have more informers then add additional checks here
 	return len(entity.Services) == 0
+}
+
+// getClusterDomain retrieves cluster domain of Kubernetes cluster we are installed on.
+// It can be retrieved by looking up CNAME of kubernetes.default.svc and extracting its suffix.
+func getClusterDomain() (string, error) {
+	apiSvc := "kubernetes.default.svc"
+	cname, err := net.LookupCNAME(apiSvc)
+	if err != nil {
+		return "", err
+	}
+	clusterDomain := strings.TrimPrefix(cname, apiSvc+".")
+	clusterDomain = strings.TrimSuffix(clusterDomain, ".")
+	return clusterDomain, nil
 }

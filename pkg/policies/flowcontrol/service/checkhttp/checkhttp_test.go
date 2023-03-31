@@ -17,6 +17,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/checkhttp"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
@@ -42,11 +43,9 @@ var _ = AfterEach(func() {
 
 type AcceptingHandler struct{}
 
-func (s *AcceptingHandler) CheckWithValues(
+func (s *AcceptingHandler) CheckRequest(
 	context.Context,
-	[]string,
-	string,
-	map[string]string,
+	iface.RequestContext,
 ) *flowcontrolv1.CheckResponse {
 	resp := &flowcontrolv1.CheckResponse{
 		DecisionType: flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,

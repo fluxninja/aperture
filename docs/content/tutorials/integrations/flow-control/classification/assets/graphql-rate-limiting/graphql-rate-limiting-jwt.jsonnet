@@ -6,8 +6,7 @@ local flowSelector = aperture.spec.v1.FlowSelector;
 local serviceSelector = aperture.spec.v1.ServiceSelector;
 local flowMatcher = aperture.spec.v1.FlowMatcher;
 local classifier = aperture.spec.v1.Classifier;
-local rule = aperture.spec.v1.Rule;
-local rego = aperture.spec.v1.RuleRego;
+local rego = aperture.spec.v1.Rego;
 
 local svcSelector =
   flowSelector.new()
@@ -34,42 +33,42 @@ local policyResource = StaticRateLimiting({
   classifiers: [
     classifier.new()
     + classifier.withFlowSelector(svcSelector)
-    + classifier.withRules({
-      user_id: rule.new()
-               + rule.withTelemetry(true)
-               + rule.withRego(
-                 local source = |||
-                   package graphql_example
-                   import future.keywords.if
-                   query_ast := graphql.parse_query(input.parsed_body.query)
-                   claims := payload if {
-                     io.jwt.verify_hs256(bearer_token, "secret")
-                     [_, payload, _] := io.jwt.decode(bearer_token)
-                   }
-                   bearer_token := t if {
-                     v := input.attributes.request.http.headers.authorization
-                     startswith(v, "Bearer ")
-                     t := substring(v, count("Bearer "), -1)
-                   }
-                   queryIsCreateTodo if {
-                     some operation
-                     walk(query_ast, [_, operation])
-                     operation.Name == "createTodo"
-                     count(operation.SelectionSet) > 0
-                     some selection
-                     walk(operation.SelectionSet, [_, selection])
-                     selection.Name == "createTodo"
-                   }
-                   userID := u if {
-                     queryIsCreateTodo
-                     u := claims.userID
-                   }
-                 |||;
-                 rego.new()
-                 + rego.withQuery('data.graphql_example.userID')
-                 + rego.withSource(source)
-               ),
-    }),
+    + classifier.withRego(
+      local module = |||
+        package graphql_example
+        import future.keywords.if
+        query_ast := graphql.parse_query(input.parsed_body.query)
+        claims := payload if {
+          io.jwt.verify_hs256(bearer_token, "secret")
+          [_, payload, _] := io.jwt.decode(bearer_token)
+        }
+        bearer_token := t if {
+          v := input.attributes.request.http.headers.authorization
+          startswith(v, "Bearer ")
+          t := substring(v, count("Bearer "), -1)
+        }
+        queryIsCreateTodo if {
+          some operation
+          walk(query_ast, [_, operation])
+          operation.Name == "createTodo"
+          count(operation.SelectionSet) > 0
+          some selection
+          walk(operation.SelectionSet, [_, selection])
+          selection.Name == "createTodo"
+        }
+        user_id := u if {
+          queryIsCreateTodo
+          u := claims.userID
+        }
+      |||;
+      rego.new()
+      + rego.withLabels({
+        user_id: {
+          telemetry: true,
+        },
+      })
+      + rego.withModule(module),
+    ),
   ],
 }).policyResource;
 

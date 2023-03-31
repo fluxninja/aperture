@@ -28,7 +28,7 @@ func (limiterID LimiterID) String() string {
 type Limiter interface {
 	GetPolicyName() string
 	GetFlowSelector() *policylangv1.FlowSelector
-	RunLimiter(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision
+	RunLimiter(ctx context.Context, labels map[string]string, tokens uint64) *flowcontrolv1.LimiterDecision
 	GetLimiterID() LimiterID
 }
 

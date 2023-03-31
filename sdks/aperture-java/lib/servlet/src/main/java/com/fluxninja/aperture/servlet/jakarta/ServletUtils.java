@@ -3,6 +3,7 @@ package com.fluxninja.aperture.servlet.jakarta;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.fluxninja.aperture.sdk.TrafficFlow;
+import com.fluxninja.aperture.sdk.Utils;
 import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
 import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
 import io.opentelemetry.api.baggage.Baggage;
@@ -96,7 +97,10 @@ public class ServletUtils {
             extractedHeaders.put(headerKey, request.getHeader(headerKey));
         }
 
-        return builder.putContextExtensions("control-point", "ingress")
+        String sourceIp = req.getRemoteAddr();
+        String destinationIp = req.getLocalAddr();
+
+        builder.putContextExtensions("control-point", "ingress")
                 .setRequest(
                         AttributeContext.Request.newBuilder()
                                 .setHttp(
@@ -108,5 +112,13 @@ public class ServletUtils {
                                                 .setSize(req.getContentLength())
                                                 .setProtocol(req.getProtocol())
                                                 .putAllHeaders(extractedHeaders)));
+
+        if (sourceIp != null) {
+            builder.setSource(Utils.peerFromAddress(sourceIp));
+        }
+        if (destinationIp != null) {
+            builder.setDestination(Utils.peerFromAddress(destinationIp));
+        }
+        return builder;
     }
 }

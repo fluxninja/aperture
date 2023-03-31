@@ -8,7 +8,7 @@ deps:
   - remote: buf.build
     owner: envoyproxy
     repository: envoy
-    commit: 458090f419a648adb7e38a0ef3c4b469
+    commit: 98b2c044ebc341ff81d54493c5e4b340
   - remote: buf.build
     owner: envoyproxy
     repository: protoc-gen-validate
@@ -16,7 +16,7 @@ deps:
   - remote: buf.build
     owner: googleapis
     repository: googleapis
-    commit: 463926e7ee924d46ad0a726e1cf4eacd
+    commit: 5ae7f88519b04fe1965da0f8a375a088
   - remote: buf.build
     owner: grpc-ecosystem
     repository: grpc-gateway
