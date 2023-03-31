@@ -698,13 +698,15 @@ definitions:
         title: Rego based classification
         $ref: '#/definitions/Rego'
       rules:
-        description: |-
+        description: |+
           A map of {key, value} pairs mapping from
           [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
           how to extract and propagate flow labels with that key.
+
         type: object
         additionalProperties:
           $ref: '#/definitions/Rule'
+        x-go-tag-validate: dive,keys,required,endkeys,required
   Component:
     description: |-
       :::info
@@ -2719,7 +2721,8 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/Classifier'
-        x-go-tag-validate: dive
+        x-deprecated: true
+        x-go-tag-validate: deprecated,dive
       flow_control:
         description: FlowControlResources are resources that are provided by flow
           control integration.
@@ -2735,7 +2738,8 @@ definitions:
         type: object
         additionalProperties:
           $ref: '#/definitions/FluxMeter'
-        x-go-tag-validate: dive
+        x-deprecated: true
+        x-go-tag-validate: deprecated,dive
   Rule:
     description: |-
       Example of a JSON extractor:
@@ -2797,7 +2801,8 @@ definitions:
           Note: The module name must match the package name from the "source".
 
         type: string
-        x-go-tag-validate: required
+        x-deprecated: true
+        x-go-tag-validate: deprecated,required
       source:
         description: |+
           Source code of the rego module.
@@ -2805,7 +2810,8 @@ definitions:
           Note: Must include a "package" declaration.
 
         type: string
-        x-go-tag-validate: required
+        x-deprecated: true
+        x-go-tag-validate: deprecated,required
   Scheduler:
     description: |-
       :::note

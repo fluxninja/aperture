@@ -18,6 +18,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
+	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
@@ -109,10 +110,10 @@ func GenerateMermaidFile(circuit *circuitfactory.Circuit, mermaidFile string, de
 }
 
 // CompilePolicy compiles the policy and returns the circuit.
-func CompilePolicy(path string) (*circuitfactory.Circuit, error) {
+func CompilePolicy(path string) (*circuitfactory.Circuit, *languagev1.Policy, error) {
 	yamlFile, err := os.ReadFile(path)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	ctx := context.Background()
 
@@ -121,14 +122,11 @@ func CompilePolicy(path string) (*circuitfactory.Circuit, error) {
 	// command is called "circuit-compiler" though, so it's bit... surprising.
 	// If we compiled just a circuit, we could drop dependency on
 	// `controlplane` package.
-	circuit, valid, msg, err := controlplane.ValidateAndCompile(ctx, filepath.Base(path), yamlFile)
+	circuit, policy, err := controlplane.ValidateAndCompile(ctx, filepath.Base(path), yamlFile)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	if !valid {
-		return nil, fmt.Errorf("invalid circuit: %s", msg)
-	}
-	return circuit, nil
+	return circuit, policy, nil
 }
 
 // FetchPolicyFromCR extracts the spec key from a CR and saves it to a temp file.

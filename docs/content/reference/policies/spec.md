@@ -3575,7 +3575,7 @@ Resources are typically Flux Meters, Classifiers, etc. that can be used to creat
 <dt>classifiers</dt>
 <dd>
 
-([[]Classifier](#classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+([[]Classifier](#classifier), **DEPRECATED**) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
 The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
 
@@ -3591,7 +3591,7 @@ Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
 <dt>flux_meters</dt>
 <dd>
 
-(map of [FluxMeter](#flux-meter)) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
+(map of [FluxMeter](#flux-meter), **DEPRECATED**) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
 Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
 
@@ -3667,7 +3667,7 @@ Deprecated: 1.5.0
 <dt>query</dt>
 <dd>
 
-(string, **required**) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
+(string, **DEPRECATED**, **required**) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
 
 Note: The module name must match the package name from the "source".
 
@@ -3675,7 +3675,7 @@ Note: The module name must match the package name from the "source".
 <dt>source</dt>
 <dd>
 
-(string, **required**) Source code of the rego module.
+(string, **DEPRECATED**, **required**) Source code of the rego module.
 
 Note: Must include a "package" declaration.
 

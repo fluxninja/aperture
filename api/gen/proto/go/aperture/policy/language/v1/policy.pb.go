@@ -290,13 +290,13 @@ type Resources struct {
 	// Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
 	//
 	// Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
-	FluxMeters map[string]*FluxMeter `protobuf:"bytes,1,rep,name=flux_meters,json=fluxMeters,proto3" json:"flux_meters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"dive"` // @gotags: validate:"dive"
+	FluxMeters map[string]*FluxMeter `protobuf:"bytes,1,rep,name=flux_meters,json=fluxMeters,proto3" json:"flux_meters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"deprecated,dive"` // @gotags: validate:"deprecated,dive"
 	// Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 	//
 	// The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
 	//
 	// Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
-	Classifiers []*Classifier `protobuf:"bytes,2,rep,name=classifiers,proto3" json:"classifiers,omitempty" validate:"dive"` // @gotags: validate:"dive"
+	Classifiers []*Classifier `protobuf:"bytes,2,rep,name=classifiers,proto3" json:"classifiers,omitempty" validate:"deprecated,dive"` // @gotags: validate:"deprecated,dive"
 	// FlowControlResources are resources that are provided by flow control integration.
 	FlowControl *FlowControlResources `protobuf:"bytes,101,opt,name=flow_control,json=flowControl,proto3" json:"flow_control,omitempty"`
 }

@@ -687,8 +687,9 @@
           "additionalProperties": {
             "$ref": "#/definitions/Rule"
           },
-          "description": "A map of {key, value} pairs mapping from\n[flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define\nhow to extract and propagate flow labels with that key.",
+          "description": "A map of {key, value} pairs mapping from\n[flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define\nhow to extract and propagate flow labels with that key.\n\n",
           "type": "object",
+          "x-go-tag-validate": "dive,keys,required,endkeys,required",
           "x-order": 2
         }
       },
@@ -2692,7 +2693,8 @@
             "type": "object"
           },
           "type": "array",
-          "x-go-tag-validate": "dive",
+          "x-deprecated": true,
+          "x-go-tag-validate": "deprecated,dive",
           "x-order": 0
         },
         "flow_control": {
@@ -2706,7 +2708,8 @@
           },
           "description": "Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.\n\nFlux Meter created metrics can be consumed as input to the circuit via the PromQL component.\n\nDeprecated: v1.5.0. Use `flow_control.flux_meters` instead.\n\n",
           "type": "object",
-          "x-go-tag-validate": "dive",
+          "x-deprecated": true,
+          "x-go-tag-validate": "deprecated,dive",
           "x-order": 2
         }
       },
@@ -2746,13 +2749,15 @@
         "query": {
           "description": "Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).\n\nNote: The module name must match the package name from the \"source\".\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
+          "x-deprecated": true,
+          "x-go-tag-validate": "deprecated,required",
           "x-order": 0
         },
         "source": {
           "description": "Source code of the rego module.\n\nNote: Must include a \"package\" declaration.\n\n",
           "type": "string",
-          "x-go-tag-validate": "required",
+          "x-deprecated": true,
+          "x-go-tag-validate": "deprecated,required",
           "x-order": 1
         }
       },

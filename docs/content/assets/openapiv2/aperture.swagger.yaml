@@ -749,11 +749,13 @@ definitions:
             rules:
                 additionalProperties:
                     $ref: '#/definitions/Rule'
-                description: |-
+                description: |+
                     A map of {key, value} pairs mapping from
                     [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
                     how to extract and propagate flow labels with that key.
+
                 type: object
+                x-go-tag-validate: dive,keys,required,endkeys,required
         title: Set of classification rules sharing a common selector
         type: object
     ClassifierInfo:
@@ -3253,7 +3255,8 @@ definitions:
                     $ref: '#/definitions/Classifier'
                     type: object
                 type: array
-                x-go-tag-validate: dive
+                x-deprecated: true
+                x-go-tag-validate: deprecated,dive
             flow_control:
                 $ref: '#/definitions/FlowControlResources'
                 description: FlowControlResources are resources that are provided by flow control integration.
@@ -3268,7 +3271,8 @@ definitions:
                     Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 
                 type: object
-                x-go-tag-validate: dive
+                x-deprecated: true
+                x-go-tag-validate: deprecated,dive
         title: Resources that need to be setup for the policy to function
         type: object
     Response:
@@ -3339,7 +3343,8 @@ definitions:
                     Note: The module name must match the package name from the "source".
 
                 type: string
-                x-go-tag-validate: required
+                x-deprecated: true
+                x-go-tag-validate: deprecated,required
             source:
                 description: |+
                     Source code of the rego module.
@@ -3347,7 +3352,8 @@ definitions:
                     Note: Must include a "package" declaration.
 
                 type: string
-                x-go-tag-validate: required
+                x-deprecated: true
+                x-go-tag-validate: deprecated,required
         required:
             - query
             - source

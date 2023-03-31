@@ -37,7 +37,7 @@ You can also generate the DOT and Mermaid graphs of the compiled Aperture Policy
 	Example: `aperturectl compile --cr=policy-cr.yaml --mermaid --dot
 
 aperturectl compile --policy=policy.yaml --mermaid --dot`,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(_ *cobra.Command, _ []string) error {
 		// check if policy or cr is provided
 		if policy == "" && cr == "" || policy != "" && cr != "" {
 			errStr := "either --policy or --cr must be provided"
@@ -58,7 +58,7 @@ aperturectl compile --policy=policy.yaml --mermaid --dot`,
 			policyFile = policy
 		}
 
-		circuit, err := utils.CompilePolicy(policyFile)
+		circuit, _, err := utils.CompilePolicy(policyFile)
 		if err != nil {
 			log.Error().Err(err).Msg("error reading policy spec")
 			return err

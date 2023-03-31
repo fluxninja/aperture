@@ -82,13 +82,13 @@ func (v *PolicyValidator) ValidateObject(
 	for _, validator := range v.policyValidators {
 		ok, msg, err := validator.ValidateSpec(ctx, policy.GetName(), policy.Spec.Raw)
 		if err != nil {
-			return false, "Spec is not valid", err
+			return false, "Validator error", err
 		}
 
 		if !ok {
-			return ok, fmt.Sprintf("%s: %s", policy.GetName(), msg), err
+			return false, fmt.Sprintf("%s: %s", policy.GetName(), msg), nil
 		}
 	}
 
-	return true, "", nil
+	return true, fmt.Sprintf("%s: Valid Policy", policy.GetName()), nil
 }

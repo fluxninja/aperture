@@ -190,6 +190,8 @@ func processValidateRules(m map[string]interface{}, rules []string) (required bo
 	// convert go validator rules to swagger rules
 	for _, rule := range rules {
 		switch rule {
+		case "deprecated":
+			m["x-deprecated"] = true
 		case "required":
 			required = true
 		case "dive":

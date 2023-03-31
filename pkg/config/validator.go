@@ -13,6 +13,12 @@ import (
 
 var globalValidate = getValidate()
 
+func init() {
+	if err := RegisterDeprecatedValidator(true); err != nil {
+		log.Panic().Err(err).Msg("Failed to register deprecated validator")
+	}
+}
+
 func getValidate() *validator.Validate {
 	validate := validator.New()
 	validate.RegisterCustomTypeFunc(durationCustomTypeFunc, Duration{})
@@ -20,6 +26,22 @@ func getValidate() *validator.Validate {
 	validate.RegisterCustomTypeFunc(timestampCustomTypeFunc, Time{})
 	validate.RegisterCustomTypeFunc(timestamppbCustomTypeFunc, timestamppb.Timestamp{})
 	return validate
+}
+
+// RegisterDeprecatedValidator a function to validate "deprecated". If deprecated constraint exists then fail the validation.
+func RegisterDeprecatedValidator(warnOnly bool) error {
+	return globalValidate.RegisterValidation("deprecated", func(fl validator.FieldLevel) bool {
+		// check whether the field is set or not
+		if fl.Field().IsZero() {
+			return true
+		}
+		if warnOnly {
+			log.Warn().Msgf("Field %s is deprecated", fl.Field().String())
+		} else {
+			log.Error().Msgf("Field %s is deprecated, allow deprecated fields and retry", fl.Field().String())
+		}
+		return warnOnly
+	})
 }
 
 // ValidateStruct takes interface value and validates its fields of a struct.

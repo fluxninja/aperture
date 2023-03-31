@@ -265,7 +265,7 @@ message Classifier {
   // A map of {key, value} pairs mapping from
   // [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
   // how to extract and propagate flow labels with that key.
-  map<string, Rule> rules = 2;
+  map<string, Rule> rules = 2; // @gotags: validate:"dive,keys,required,endkeys,required"
 
   // Rego based classification
   //
@@ -294,12 +294,12 @@ message Rule {
     // Source code of the rego module.
     //
     // Note: Must include a "package" declaration.
-    string source = 1; // @gotags: validate:"required"
+    string source = 1; // @gotags: validate:"deprecated,required"
 
     // Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
     //
     // Note: The module name must match the package name from the "source".
-    string query = 2; // @gotags: validate:"required"
+    string query = 2; // @gotags: validate:"deprecated,required"
   }
 
   oneof source {
