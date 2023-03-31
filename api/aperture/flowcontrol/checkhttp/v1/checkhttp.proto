@@ -8,11 +8,11 @@ import "google/rpc/status.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-// A generic interface for performing Aperture Flowcontrol check on incoming
+// A generic interface for performing Aperture flow control check on incoming
 // requests to a networked service.
 service FlowControlServiceHTTP {
-  // Performs Aperture Flowcontrol check based on the fields received with the
-  // incoming request, and returns status `OK` or not `OK`.
+  // Performs Aperture flow control check based on the fields received with the
+  // incoming request, and returns the decision.
   rpc CheckHTTP(CheckHTTPRequest) returns (CheckHTTPResponse) {
     option (google.api.http) = {
       post: "/v1/flowcontrol/checkhttp"

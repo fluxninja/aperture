@@ -4219,8 +4219,8 @@ paths:
                     schema:
                         $ref: '#/definitions/googlerpcStatus'
             summary: |-
-                Performs Aperture Flowcontrol check based on the fields received with the
-                incoming request, and returns status `OK` or not `OK`.
+                Performs Aperture flow control check based on the fields received with the
+                incoming request, and returns the decision.
             tags:
                 - aperture-agent
     /v1/flowcontrol/controlpoints:

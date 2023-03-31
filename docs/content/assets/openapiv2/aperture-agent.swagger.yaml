@@ -95,8 +95,8 @@ paths:
       tags:
       - aperture-agent
       summary: |-
-        Performs Aperture Flowcontrol check based on the fields received with the
-        incoming request, and returns status `OK` or not `OK`.
+        Performs Aperture flow control check based on the fields received with the
+        incoming request, and returns the decision.
       operationId: FlowControlServiceHTTP_CheckHTTP
       parameters:
       - name: body
