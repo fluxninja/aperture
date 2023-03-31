@@ -549,10 +549,10 @@ definitions:
                 description: The HTTP request headers.
                 type: object
             host:
-                description: The HTTP request ``Host`` header value.
+                description: The HTTP request `Host` header value.
                 type: string
             method:
-                description: The HTTP request method, such as ``GET``, ``POST``.
+                description: The HTTP request method, such as `GET`, `POST`.
                 type: string
             path:
                 description: |-
@@ -563,7 +563,7 @@ definitions:
                 description: The network protocol used with the request, such as "HTTP/1.0", "HTTP/1.1", or "HTTP/2".
                 type: string
             scheme:
-                description: The HTTP URL scheme, such as ``http`` and ``https``.
+                description: The HTTP URL scheme, such as `http` and `https`.
                 type: string
             size:
                 description: The HTTP request size in bytes. If unknown, it must be -1.
@@ -585,7 +585,7 @@ definitions:
                 description: Supplies http attributes for an ok response.
             status:
                 $ref: '#/definitions/googlerpcStatus'
-                title: Status ``OK`` allows the request. Any other status indicates the request should be denied
+                title: Status `OK` allows the request. Any other status indicates the request should be denied
         type: object
     CheckResponse:
         description: CheckResponse contains fields that represent decision made by Check call.
@@ -1114,7 +1114,7 @@ definitions:
             status:
                 description: |-
                     This field allows the authorization service to send an HTTP response status code to the
-                    downstream client. If not set, Envoy sends ``403 Forbidden`` HTTP status code by default.
+                    downstream client. If not set, Envoy sends `403 Forbidden` HTTP status code by default.
                 format: int32
                 type: integer
         type: object
@@ -4218,11 +4218,8 @@ paths:
                     description: An unexpected error response.
                     schema:
                         $ref: '#/definitions/googlerpcStatus'
-            summary: |-
-                Performs Aperture flow control check based on the fields received with the
-                incoming request, and returns the decision.
             tags:
-                - FlowControlServiceHTTP
+                - aperture-agent
     /v1/flowcontrol/controlpoints:
         get:
             operationId: FlowControlPointsService_GetControlPoints
