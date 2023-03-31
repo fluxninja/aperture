@@ -102,14 +102,17 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 		statusCode, flowStatus := internal.StatusesFromAttributes(attributes)
 		attributes.PutStr(otelconsts.ApertureFlowStatusLabel, internal.FlowStatusForTelemetry(statusCode, flowStatus))
 		internal.AddCheckResponseBasedLabels(attributes, checkResponse, sourceStr)
-		controlPointType, exists := attributes.Get(otelconsts.ApertureControlPointTypeLabel)
-		controlPointTypeStr := ""
-		if exists {
-			controlPointTypeStr = controlPointType.Str()
+		controlPointType := ""
+		telemetryFlowLabels := checkResponse.GetTelemetryFlowLabels()
+		if telemetryFlowLabels == nil {
+			log.Sample(noTelemetryFlowLabelsSampler).Debug().Msg("aperture telemetry flow labels not found")
 		} else {
-			log.Warn().Msg("aperture control point type label not found")
+			controlPointType, exists = telemetryFlowLabels[otelconsts.ApertureControlPointTypeLabel]
+			if !exists {
+				log.Sample(noControlPointTypeSampler).Debug().Msg("aperture control point type label not found")
+			}
 		}
-		p.populateControlPointCache(checkResponse, controlPointTypeStr)
+		p.populateControlPointCache(checkResponse, controlPointType)
 
 		// Update metrics and enforce include list to eliminate any excess attributes
 		if sourceStr == otelconsts.ApertureSourceSDK {
@@ -135,6 +138,8 @@ var (
 	noSDKCheckResponseSampler      = log.NewRatelimitingSampler()
 	noEnvoyCheckResponseSampler    = log.NewRatelimitingSampler()
 	unrecognizedSourceLabelSampler = log.NewRatelimitingSampler()
+	noTelemetryFlowLabelsSampler   = log.NewRatelimitingSampler()
+	noControlPointTypeSampler      = log.NewRatelimitingSampler()
 )
 
 func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse, treatAsMissing []string) {
