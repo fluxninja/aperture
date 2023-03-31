@@ -2721,6 +2721,7 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/Classifier'
+        x-deprecated: true
         x-go-tag-validate: deprecated,dive
       flow_control:
         description: FlowControlResources are resources that are provided by flow
@@ -2737,6 +2738,7 @@ definitions:
         type: object
         additionalProperties:
           $ref: '#/definitions/FluxMeter'
+        x-deprecated: true
         x-go-tag-validate: deprecated,dive
   Rule:
     description: |-
@@ -2799,6 +2801,7 @@ definitions:
           Note: The module name must match the package name from the "source".
 
         type: string
+        x-deprecated: true
         x-go-tag-validate: deprecated,required
       source:
         description: |+
@@ -2807,6 +2810,7 @@ definitions:
           Note: Must include a "package" declaration.
 
         type: string
+        x-deprecated: true
         x-go-tag-validate: deprecated,required
   Scheduler:
     description: |-

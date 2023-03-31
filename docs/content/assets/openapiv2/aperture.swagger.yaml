@@ -3255,6 +3255,7 @@ definitions:
                     $ref: '#/definitions/Classifier'
                     type: object
                 type: array
+                x-deprecated: true
                 x-go-tag-validate: deprecated,dive
             flow_control:
                 $ref: '#/definitions/FlowControlResources'
@@ -3270,6 +3271,7 @@ definitions:
                     Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 
                 type: object
+                x-deprecated: true
                 x-go-tag-validate: deprecated,dive
         title: Resources that need to be setup for the policy to function
         type: object
@@ -3341,6 +3343,7 @@ definitions:
                     Note: The module name must match the package name from the "source".
 
                 type: string
+                x-deprecated: true
                 x-go-tag-validate: deprecated,required
             source:
                 description: |+
@@ -3349,6 +3352,7 @@ definitions:
                     Note: Must include a "package" declaration.
 
                 type: string
+                x-deprecated: true
                 x-go-tag-validate: deprecated,required
         required:
             - query

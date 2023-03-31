@@ -191,7 +191,7 @@ func processValidateRules(m map[string]interface{}, rules []string) (required bo
 	for _, rule := range rules {
 		switch rule {
 		case "deprecated":
-			continue
+			m["x-deprecated"] = true
 		case "required":
 			required = true
 		case "dive":

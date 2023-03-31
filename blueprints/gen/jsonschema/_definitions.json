@@ -2693,6 +2693,7 @@
             "type": "object"
           },
           "type": "array",
+          "x-deprecated": true,
           "x-go-tag-validate": "deprecated,dive",
           "x-order": 0
         },
@@ -2707,6 +2708,7 @@
           },
           "description": "Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.\n\nFlux Meter created metrics can be consumed as input to the circuit via the PromQL component.\n\nDeprecated: v1.5.0. Use `flow_control.flux_meters` instead.\n\n",
           "type": "object",
+          "x-deprecated": true,
           "x-go-tag-validate": "deprecated,dive",
           "x-order": 2
         }
@@ -2747,12 +2749,14 @@
         "query": {
           "description": "Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).\n\nNote: The module name must match the package name from the \"source\".\n\n",
           "type": "string",
+          "x-deprecated": true,
           "x-go-tag-validate": "deprecated,required",
           "x-order": 0
         },
         "source": {
           "description": "Source code of the rego module.\n\nNote: Must include a \"package\" declaration.\n\n",
           "type": "string",
+          "x-deprecated": true,
           "x-go-tag-validate": "deprecated,required",
           "x-order": 1
         }

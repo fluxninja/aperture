@@ -2914,6 +2914,7 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/Classifier'
+        x-deprecated: true
         x-go-tag-validate: deprecated,dive
         x-order: 0
       flow_control:
@@ -2932,6 +2933,7 @@ definitions:
         type: object
         additionalProperties:
           $ref: '#/definitions/FluxMeter'
+        x-deprecated: true
         x-go-tag-validate: deprecated,dive
         x-order: 2
   Rule:
@@ -2998,6 +3000,7 @@ definitions:
           Note: The module name must match the package name from the "source".
 
         type: string
+        x-deprecated: true
         x-go-tag-validate: deprecated,required
         x-order: 0
       source:
@@ -3007,6 +3010,7 @@ definitions:
           Note: Must include a "package" declaration.
 
         type: string
+        x-deprecated: true
         x-go-tag-validate: deprecated,required
         x-order: 1
   Scheduler:
