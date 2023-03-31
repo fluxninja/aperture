@@ -484,7 +484,7 @@ func (conLimiter *concurrencyLimiter) GetFlowSelector() *policylangv1.FlowSelect
 // RunLimiter processes a single flow by concurrency limiter in a blocking manner.
 //
 // Context is used to ensure that requests are not scheduled for longer than its deadline allows.
-func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
+func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map[string]string, tokens uint64) *flowcontrolv1.LimiterDecision {
 	var matchedWorkloadProto *policylangv1.Scheduler_Workload_Parameters
 	var matchedWorkloadIndex string
 	// match labels against conLimiter.workloadMultiMatcher
@@ -511,25 +511,29 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 	if val, ok := labels[matchedWorkloadProto.FairnessKey]; ok {
 		fairnessLabel = fairnessLabel + "," + val
 	}
-	// Lookup tokens for the workload
-	var tokens uint64
-	if conLimiter.schedulerParameters.AutoTokens {
-		tokensAuto, ok := conLimiter.autoTokens.GetTokensForWorkload(matchedWorkloadIndex)
-		if !ok {
-			// default to 1 if auto tokens not found
-			tokens = 1
+
+	timeout := conLimiter.schedulerParameters.MaxTimeout.AsDuration()
+	// Lookup tokens for the workload, if not provided
+	if tokens == 0 {
+		if matchedWorkloadProto.Tokens != 0 {
+			tokens = matchedWorkloadProto.Tokens
+		} else if conLimiter.schedulerParameters.AutoTokens {
+			tokensAuto, ok := conLimiter.autoTokens.GetTokensForWorkload(matchedWorkloadIndex)
+			if !ok {
+				// default to 1 if auto tokens not found
+				tokens = 1
+			} else {
+				tokens = tokensAuto
+				// timeout is tokens(which is in milliseconds) * conLimiter.schedulerProto.TimeoutFactor(float64)
+				timeout = time.Duration(float64(tokens)*conLimiter.schedulerParameters.TimeoutFactor) * time.Millisecond
+				if timeout > conLimiter.schedulerParameters.MaxTimeout.AsDuration() {
+					timeout = conLimiter.schedulerParameters.MaxTimeout.AsDuration()
+				}
+			}
 		} else {
-			tokens = tokensAuto
+			// default to 1 if auto tokens not enabled
+			tokens = 1
 		}
-	} else {
-		tokens = uint64(matchedWorkloadProto.Tokens)
-	}
-
-	// timeout is tokens(which is in milliseconds) * conLimiter.schedulerProto.TimeoutFactor(float64)
-	timeout := time.Duration(float64(tokens)*conLimiter.schedulerParameters.TimeoutFactor) * time.Millisecond
-
-	if timeout > conLimiter.schedulerParameters.MaxTimeout.AsDuration() {
-		timeout = conLimiter.schedulerParameters.MaxTimeout.AsDuration()
 	}
 
 	if clientDeadline, hasDeadline := ctx.Deadline(); hasDeadline {
@@ -558,16 +562,16 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 		FairnessLabel: fairnessLabel,
 		Priority:      uint8(matchedWorkloadProto.Priority),
 		Timeout:       timeout,
-		WorkMillis:    tokens,
+		Tokens:        tokens,
 	}
 
 	accepted := conLimiter.scheduler.Schedule(reqContext)
 
 	// update concurrency metrics and decisionType
-	conLimiter.incomingWorkSecondsCounter.Add(float64(reqContext.WorkMillis) / 1000)
+	conLimiter.incomingWorkSecondsCounter.Add(float64(reqContext.Tokens) / 1000)
 
 	if accepted {
-		conLimiter.acceptedWorkSecondsCounter.Add(float64(reqContext.WorkMillis) / 1000)
+		conLimiter.acceptedWorkSecondsCounter.Add(float64(reqContext.Tokens) / 1000)
 	}
 
 	return &flowcontrolv1.LimiterDecision{

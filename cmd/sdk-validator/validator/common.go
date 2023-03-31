@@ -9,6 +9,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
 )
 
@@ -22,8 +23,13 @@ type CommonHandler struct {
 
 const targetLabelMissing = "UNKNOWN"
 
-// CheckWithValues is a dummy function for creating *flowcontrolv1.CheckResponse from given parameters.
-func (c *CommonHandler) CheckWithValues(ctx context.Context, services []string, controlPoint string, labels map[string]string) *flowcontrolv1.CheckResponse {
+// CheckRequest is a dummy function for creating *flowcontrolv1.CheckResponse from given parameters.
+func (c *CommonHandler) CheckRequest(ctx context.Context,
+	requestContext iface.RequestContext,
+) *flowcontrolv1.CheckResponse {
+	labels := requestContext.FlowLabels
+	controlPoint := requestContext.ControlPoint
+	services := requestContext.Services
 	var path string
 	var found bool
 	if path, found = labels["http.target"]; !found {

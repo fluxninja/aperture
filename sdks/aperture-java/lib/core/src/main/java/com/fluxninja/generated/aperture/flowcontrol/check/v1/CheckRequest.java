@@ -73,6 +73,11 @@ private static final long serialVersionUID = 0L;
                 labels__.getKey(), labels__.getValue());
             break;
           }
+          case 24: {
+
+            tokens_ = input.readUInt64();
+            break;
+          }
           default: {
             if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
@@ -238,6 +243,17 @@ private static final long serialVersionUID = 0L;
     return map.get(key);
   }
 
+  public static final int TOKENS_FIELD_NUMBER = 3;
+  private long tokens_;
+  /**
+   * <code>uint64 tokens = 3 [json_name = "tokens"];</code>
+   * @return The tokens.
+   */
+  @java.lang.Override
+  public long getTokens() {
+    return tokens_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -261,6 +277,9 @@ private static final long serialVersionUID = 0L;
         internalGetLabels(),
         LabelsDefaultEntryHolder.defaultEntry,
         2);
+    if (tokens_ != 0L) {
+      output.writeUInt64(3, tokens_);
+    }
     unknownFields.writeTo(output);
   }
 
@@ -283,6 +302,10 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, labels__);
     }
+    if (tokens_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeUInt64Size(3, tokens_);
+    }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
@@ -302,6 +325,8 @@ private static final long serialVersionUID = 0L;
         .equals(other.getControlPoint())) return false;
     if (!internalGetLabels().equals(
         other.internalGetLabels())) return false;
+    if (getTokens()
+        != other.getTokens()) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -319,6 +344,9 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + LABELS_FIELD_NUMBER;
       hash = (53 * hash) + internalGetLabels().hashCode();
     }
+    hash = (37 * hash) + TOKENS_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getTokens());
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -481,6 +509,8 @@ private static final long serialVersionUID = 0L;
       controlPoint_ = "";
 
       internalGetMutableLabels().clear();
+      tokens_ = 0L;
+
       return this;
     }
 
@@ -511,6 +541,7 @@ private static final long serialVersionUID = 0L;
       result.controlPoint_ = controlPoint_;
       result.labels_ = internalGetLabels();
       result.labels_.makeImmutable();
+      result.tokens_ = tokens_;
       onBuilt();
       return result;
     }
@@ -565,6 +596,9 @@ private static final long serialVersionUID = 0L;
       }
       internalGetMutableLabels().mergeFrom(
           other.internalGetLabels());
+      if (other.getTokens() != 0L) {
+        setTokens(other.getTokens());
+      }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
       return this;
@@ -799,6 +833,37 @@ private static final long serialVersionUID = 0L;
         java.util.Map<java.lang.String, java.lang.String> values) {
       internalGetMutableLabels().getMutableMap()
           .putAll(values);
+      return this;
+    }
+
+    private long tokens_ ;
+    /**
+     * <code>uint64 tokens = 3 [json_name = "tokens"];</code>
+     * @return The tokens.
+     */
+    @java.lang.Override
+    public long getTokens() {
+      return tokens_;
+    }
+    /**
+     * <code>uint64 tokens = 3 [json_name = "tokens"];</code>
+     * @param value The tokens to set.
+     * @return This builder for chaining.
+     */
+    public Builder setTokens(long value) {
+      
+      tokens_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>uint64 tokens = 3 [json_name = "tokens"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearTokens() {
+      
+      tokens_ = 0L;
+      onChanged();
       return this;
     }
     @java.lang.Override

@@ -90,6 +90,26 @@ paths:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
+  /v1/flowcontrol/checkhttp:
+    post:
+      tags:
+      - aperture-agent
+      operationId: FlowControlServiceHTTP_CheckHTTP
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/CheckHTTPRequest'
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/CheckHTTPResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
   /v1/flowcontrol/controlpoints:
     get:
       tags:
@@ -100,6 +120,41 @@ paths:
           description: A successful response.
           schema:
             $ref: '#/definitions/FlowControlPoints'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+  /v1/flowcontrol/preview/http_requests/{control_point}:
+    post:
+      tags:
+      - aperture-agent
+      operationId: FlowPreviewService_PreviewHTTPRequests2
+      parameters:
+      - type: string
+        description: Control point to preview.
+        name: control_point
+        in: path
+        required: true
+      - description: Flow labels to match. Optional parameter for advanced filtering.
+        name: label_matcher
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/LabelMatcher'
+      - type: string
+        format: int64
+        description: Number of samples to collect.
+        name: samples
+        in: query
+      - type: string
+        description: Service to preview.
+        name: service
+        in: query
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/PreviewHTTPRequestsResponse'
         default:
           description: An unexpected error response.
           schema:
@@ -136,6 +191,41 @@ paths:
           description: A successful response.
           schema:
             $ref: '#/definitions/PreviewHTTPRequestsResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+  /v1/flowcontrol/preview/labels/{control_point}:
+    post:
+      tags:
+      - aperture-agent
+      operationId: FlowPreviewService_PreviewFlowLabels2
+      parameters:
+      - type: string
+        description: Control point to preview.
+        name: control_point
+        in: path
+        required: true
+      - description: Flow labels to match. Optional parameter for advanced filtering.
+        name: label_matcher
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/LabelMatcher'
+      - type: string
+        format: int64
+        description: Number of samples to collect.
+        name: samples
+        in: query
+      - type: string
+        description: Service to preview.
+        name: service
+        in: query
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/PreviewFlowLabelsResponse'
         default:
           description: An unexpected error response.
           schema:
@@ -295,6 +385,83 @@ definitions:
         items:
           type: object
           $ref: '#/definitions/AutoScaleKubernetesControlPoint'
+  CheckHTTPRequest:
+    type: object
+    properties:
+      control_point:
+        description: |-
+          For an SDK based insertion, a Control Point can represent a particular feature or execution block within a Service.
+          In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners or filter chains.
+        type: string
+      destination:
+        description: |-
+          The destination of a network activity, such as accepting a TCP connection.
+          In a multi hop network activity, the destination represents the receiver of
+          the last hop.
+        $ref: '#/definitions/SocketAddress'
+      request:
+        description: Represents a network request, such as an HTTP request.
+        $ref: '#/definitions/CheckHTTPRequestHttpRequest'
+      source:
+        description: |-
+          The source of a network activity, such as starting a TCP connection.
+          In a multi hop network activity, the source represents the sender of the
+          last hop.
+        $ref: '#/definitions/SocketAddress'
+  CheckHTTPRequestHttpRequest:
+    description: |-
+      This message defines attributes for an HTTP request.
+      HTTP/1.x, HTTP/2, gRPC are all considered as HTTP requests.
+    type: object
+    properties:
+      body:
+        description: The HTTP request body.
+        type: string
+      headers:
+        description: The HTTP request headers.
+        type: object
+        additionalProperties:
+          type: string
+      host:
+        description: The HTTP request `Host` header value.
+        type: string
+      method:
+        description: The HTTP request method, such as `GET`, `POST`.
+        type: string
+      path:
+        description: |-
+          The request target, as it appears in the first line of the HTTP request. This includes
+          the URL path and query-string. No decoding is performed.
+        type: string
+      protocol:
+        description: The network protocol used with the request, such as "HTTP/1.0",
+          "HTTP/1.1", or "HTTP/2".
+        type: string
+      scheme:
+        description: The HTTP URL scheme, such as `http` and `https`.
+        type: string
+      size:
+        description: The HTTP request size in bytes. If unknown, it must be -1.
+        type: string
+        format: int64
+  CheckHTTPResponse:
+    type: object
+    properties:
+      denied_response:
+        description: Supplies http attributes for a denied response.
+        $ref: '#/definitions/DeniedHttpResponse'
+      dynamic_metadata:
+        description: |-
+          Optional response metadata that will be emitted as dynamic metadata to be consumed by the next
+          filter.
+        type: object
+      ok_response:
+        description: Supplies http attributes for an ok response.
+        $ref: '#/definitions/OkHttpResponse'
+      status:
+        title: Status `OK` allows the request. Any other status indicates the request
+          should be denied
+        $ref: '#/definitions/googlerpcStatus'
   DMap:
     type: object
     properties:
@@ -339,6 +506,28 @@ definitions:
       published_total:
         type: string
         format: int64
+  DeniedHttpResponse:
+    description: HTTP attributes for a denied response.
+    type: object
+    properties:
+      body:
+        description: |-
+          This field allows the authorization service to send a response body data
+          to the downstream client.
+        type: string
+      headers:
+        description: |-
+          This field allows the authorization service to send HTTP response headers
+          to the downstream client.
+        type: object
+        additionalProperties:
+          type: string
+      status:
+        description: |-
+          This field allows the authorization service to send an HTTP response status code to the
+          downstream client. If not set, Envoy sends `403 Forbidden` HTTP status code by default.
+        type: integer
+        format: int32
   Entities:
     description: Entities contains both mappings of ip address to entity and entity
       name to entity.
@@ -613,6 +802,17 @@ definitions:
       written_bytes_total:
         type: string
         format: int64
+  OkHttpResponse:
+    description: HTTP attributes for an OK response.
+    type: object
+    properties:
+      dynamic_metadata:
+        type: object
+      headers:
+        description: HTTP entity headers in addition to the original request headers.
+        type: object
+        additionalProperties:
+          type: string
   Partition:
     type: object
     properties:
@@ -702,6 +902,24 @@ definitions:
       inuse:
         type: string
         format: int64
+  SocketAddress:
+    type: object
+    properties:
+      address:
+        description: The address for this socket.
+        type: string
+      port:
+        description: The port for this socket.
+        type: integer
+        format: int64
+      protocol:
+        $ref: '#/definitions/SocketAddressProtocol'
+  SocketAddressProtocol:
+    type: string
+    default: TCP
+    enum:
+    - TCP
+    - UDP
   Stats:
     type: object
     properties:

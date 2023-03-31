@@ -849,10 +849,20 @@ rules:
 ([FlowSelector](#flow-selector)) Defines where to apply the flow classification rule.
 
 </dd>
+<dt>rego</dt>
+<dd>
+
+([Rego](#rego)) Rego based classification
+
+Rego is a policy language used to express complex policies in a concise and declarative way.
+It can be used to define flow classification rules by writing custom queries that extract values from request metadata.
+For simple cases, such as directly reading a value from header or a field from json body, declarative extractors are recommended.
+
+</dd>
 <dt>rules</dt>
 <dd>
 
-(map of [Rule](#rule), **required**) A map of {key, value} pairs mapping from
+(map of [Rule](#rule)) A map of {key, value} pairs mapping from
 [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
 how to extract and propagate flow labels with that key.
 
@@ -863,7 +873,7 @@ how to extract and propagate flow labels with that key.
 
 ### Component {#component}
 
-Computational block that form the circuit
+Computational block that forms the circuit
 
 :::info
 
@@ -3457,6 +3467,98 @@ label set up, set `label_key: "user"`.
 
 ---
 
+### Rego {#rego}
+
+Rego define a set of labels that are extracted after evaluating a rego module.
+
+:::info
+
+You can use the [live-preview](/concepts/integrations/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
+
+:::
+
+:::info
+
+Special rego variables:
+
+- `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
+
+:::
+
+Example of Rego module which also disables telemetry visibility of label:
+
+```yaml
+rego:
+  labels:
+    user:
+      telemetry: false
+  module: |
+    package user_from_cookie
+    cookies := split(input.attributes.request.http.headers.cookie, "; ")
+    user := user {
+        cookie := cookies[_]
+        startswith(cookie, "session=")
+        session := substring(cookie, count("session="), -1)
+        parts := split(session, ".")
+        object := json.unmarshal(base64url.decode(parts[0]))
+        user := object.user
+    }
+```
+
+<dl>
+<dt>labels</dt>
+<dd>
+
+(map of [RegoLabelProperties](#rego-label-properties), **required**) A map of {key, value} pairs mapping from
+[flow label](/concepts/integrations/flow-control/flow-label.md) keys to queries that define
+how to extract and propagate flow labels with that key.
+The name of the label maps to a variable in the rego module, i.e. it maps to `data.<package>.<label>` variable.
+
+</dd>
+<dt>module</dt>
+<dd>
+
+(string, **required**) Source code of the rego module.
+
+:::Note
+
+Must include a "package" declaration.
+
+:::
+
+</dd>
+</dl>
+
+---
+
+### RegoLabelProperties {#rego-label-properties}
+
+<dl>
+<dt>telemetry</dt>
+<dd>
+
+(bool, default: `true`) Decides if the created flow label should be available as an attribute in OLAP telemetry and
+propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
+
+:::note
+
+The flow label is always accessible in Aperture Policies regardless of this setting.
+
+:::
+
+:::caution
+
+When using [FluxNinja ARC extension](arc/extension.md), telemetry enabled
+labels are sent to FluxNinja ARC for observability. Telemetry should be disabled for
+sensitive labels.
+
+:::
+
+</dd>
+</dl>
+
+---
+
 ### Resources {#resources}
 
 Resources that need to be setup for the policy to function
@@ -3476,6 +3578,7 @@ Resources are typically Flux Meters, Classifiers, etc. that can be used to creat
 ([[]Classifier](#classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
 The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+
 Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
 
 </dd>
@@ -3491,6 +3594,7 @@ Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
 (map of [FluxMeter](#flux-meter)) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
 Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+
 Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 
 </dd>
@@ -3502,17 +3606,7 @@ Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 
 Rule describes a single classification Rule
 
-Classification rule extracts a value from request metadata.
-More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
-See https://play.openpolicyagent.org/p/gU7vcLkc70 for an example input.
-There are two ways to define a flow classification rule:
-
-- Using a declarative extractor – suitable from simple cases, such as directly reading a value from header or a field from json body.
-- Rego expression.
-
-Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
-
-Example of Declarative JSON extractor:
+Example of a JSON extractor:
 
 ```yaml
 extractor:
@@ -3520,27 +3614,6 @@ extractor:
     from: request.http.body
     pointer: /user/name
 ```
-
-Example of Rego module which also disables telemetry visibility of label:
-
-```yaml
-rego:
-  query: data.user_from_cookie.user
-  source: |
-    package user_from_cookie
-    cookies := split(input.attributes.request.http.headers.cookie, "; ")
-    user := user {
-        cookie := cookies[_]
-        startswith(cookie, "session=")
-        session := substring(cookie, count("session="), -1)
-        parts := split(session, ".")
-        object := json.unmarshal(base64url.decode(parts[0]))
-        user := object.user
-    }
-telemetry: false
-```
-
-[attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 
 <dl>
 <dt>extractor</dt>
@@ -3553,6 +3626,8 @@ telemetry: false
 <dd>
 
 ([RuleRego](#rule-rego)) Rego module to extract a value from.
+
+Deprecated: 1.5.0
 
 </dd>
 <dt>telemetry</dt>
@@ -3585,6 +3660,8 @@ sensitive labels.
 Raw rego rules are compiled 1:1 to rego queries
 
 High-level extractor-based rules are compiled into a single rego query.
+
+Deprecated: 1.5.0
 
 <dl>
 <dt>query</dt>
@@ -3690,6 +3767,8 @@ Scheduler parameters
 historical latency. Each workload's `tokens` will be set to average
 latency of flows in that workload during last few seconds (exact duration
 of this average can change).
+Make sure to not provide `tokens` in workload definitions or in the flow
+if you want to use this feature.
 
 </dd>
 <dt>default_workload_parameters</dt>
@@ -3701,7 +3780,9 @@ of this average can change).
 <dt>max_timeout</dt>
 <dd>
 
-(string, default: `"0.49s"`) Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
+(string, default: `"0.49s"`) Max Timeout is the value with which the flow timeout is capped.
+When auto_tokens feature is not enabled, this value is used as the
+timeout for the flow, otherwise it is used as a cap for the timeout.
 
 :::caution
 
@@ -3717,7 +3798,7 @@ it're still waiting on the scheduler.
 
 To avoid such cases, the end-to-end GRPC timeout should also contain
 some headroom for constant overhead like serialization, etc. Default
-value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
+value for GRPC timeouts is 500ms, giving 50ms of headroom, so when
 tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 
 :::
@@ -3726,7 +3807,7 @@ tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 <dt>timeout_factor</dt>
 <dd>
 
-(float64, default: `0.5`) Timeout as a factor of tokens for a flow in a workload
+(float64, default: `0.5`) Timeout as a factor of tokens for a flow in a workload in case auto_tokens is set to true.
 
 If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
 it will be rejected.
@@ -3818,8 +3899,8 @@ $$
 <dt>tokens</dt>
 <dd>
 
-(string, default: `"1"`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-This override is applicable only if `auto_tokens` is set to false.
+(string) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
+This override is applicable only if tokens for the request are not specified in the request.
 
 </dd>
 </dl>
@@ -3847,7 +3928,9 @@ selector applies to.
 
 :::info
 
-Agent Groups are used to scope policies to a subset of agents connected to the same controller. This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode. The agents within an agent group form a peer to peer cluster and constantly share state.
+Agent Groups are used to scope policies to a subset of agents connected to the same controller.
+This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode.
+The agents within an agent group form a peer to peer cluster and constantly share state.
 
 :::
 
@@ -3855,16 +3938,21 @@ Agent Groups are used to scope policies to a subset of agents connected to the s
 <dt>service</dt>
 <dd>
 
-(string, **required**) The Fully Qualified Domain Name of the
+(string, default: `"any"`) The Fully Qualified Domain Name of the
 [service](/concepts/integrations/flow-control/flow-selector.md) to select.
 
 In Kubernetes, this is the FQDN of the Service object.
 
-"all" means all services within an agent group (catch-all).
+:::info
+
+`any` matches all services.
+
+:::
 
 :::info
 
-In the Kubernetes sidecar installation mode, service discovery is switched off by default. In order to scope policies to services, the `service` should be set to `all` and instead, `agent_group` name should be used.
+In the Kubernetes sidecar installation mode, service discovery is switched off by default.
+In order to scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.
 
 :::
 

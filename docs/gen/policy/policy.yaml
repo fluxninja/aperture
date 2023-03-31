@@ -693,8 +693,6 @@ definitions:
       ```
     type: object
     title: Set of classification rules sharing a common selector
-    required:
-    - rules
     properties:
       flow_selector:
         description: |+
@@ -703,18 +701,23 @@ definitions:
         x-go-tag-validate: required
         x-order: 0
         $ref: '#/definitions/FlowSelector'
+      rego:
+        description: |-
+          Rego is a policy language used to express complex policies in a concise and declarative way.
+          It can be used to define flow classification rules by writing custom queries that extract values from request metadata.
+          For simple cases, such as directly reading a value from header or a field from json body, declarative extractors are recommended.
+        title: Rego based classification
+        x-order: 1
+        $ref: '#/definitions/Rego'
       rules:
-        description: |+
+        description: |-
           A map of {key, value} pairs mapping from
           [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
           how to extract and propagate flow labels with that key.
-
         type: object
-        minProperties: 1
         additionalProperties:
           $ref: '#/definitions/Rule'
-        x-go-tag-validate: required,gt=0,dive,keys,required,endkeys,required
-        x-order: 1
+        x-order: 2
   Component:
     description: |-
       :::info
@@ -766,7 +769,7 @@ definitions:
 
       See also [Policy](#policy) for a higher-level explanation of circuits.
     type: object
-    title: Computational block that form the circuit
+    title: Computational block that forms the circuit
     properties:
       alerter:
         description: Alerter reacts to a signal and generates alert to send to alert
@@ -2793,6 +2796,98 @@ definitions:
         x-go-tag-default: "5"
         x-go-tag-validate: gt=0
         x-order: 1
+  Rego:
+    description: |-
+      Rego define a set of labels that are extracted after evaluating a rego module.
+
+      :::info
+
+      You can use the [live-preview](/concepts/integrations/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
+
+      :::
+
+      :::info
+
+      Special rego variables:
+      - `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
+
+      :::
+
+      Example of Rego module which also disables telemetry visibility of label:
+      ```yaml
+      rego:
+        labels:
+          user:
+            telemetry: false
+        module: |
+          package user_from_cookie
+          cookies := split(input.attributes.request.http.headers.cookie, "; ")
+          user := user {
+              cookie := cookies[_]
+              startswith(cookie, "session=")
+              session := substring(cookie, count("session="), -1)
+              parts := split(session, ".")
+              object := json.unmarshal(base64url.decode(parts[0]))
+              user := object.user
+          }
+      ```
+    type: object
+    required:
+    - labels
+    - module
+    properties:
+      labels:
+        description: |+
+          A map of {key, value} pairs mapping from
+          [flow label](/concepts/integrations/flow-control/flow-label.md) keys to queries that define
+          how to extract and propagate flow labels with that key.
+          The name of the label maps to a variable in the rego module, i.e. it maps to `data.<package>.<label>` variable.
+
+        type: object
+        minProperties: 1
+        additionalProperties:
+          $ref: '#/definitions/RegoLabelProperties'
+        x-go-tag-validate: required,gt=0,dive,keys,required,endkeys,required
+        x-order: 0
+      module:
+        description: |+
+          Source code of the rego module.
+
+          :::Note
+
+          Must include a "package" declaration.
+
+          :::
+
+        type: string
+        x-go-tag-validate: required
+        x-order: 1
+  RegoLabelProperties:
+    type: object
+    properties:
+      telemetry:
+        description: |+
+          :::note
+
+          The flow label is always accessible in Aperture Policies regardless of this setting.
+
+          :::
+
+          :::caution
+
+          When using [FluxNinja ARC extension](arc/extension.md), telemetry enabled
+          labels are sent to FluxNinja ARC for observability. Telemetry should be disabled for
+          sensitive labels.
+
+          :::
+
+        type: boolean
+        title: |-
+          Decides if the created flow label should be available as an attribute in OLAP telemetry and
+          propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
+        default: true
+        x-go-tag-default: "true"
+        x-order: 0
   Resources:
     description: |-
       :::info
@@ -2810,6 +2905,7 @@ definitions:
           Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
           The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+
           Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
 
         type: array
@@ -2828,6 +2924,7 @@ definitions:
           Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
           Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+
           Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 
         type: object
@@ -2837,41 +2934,13 @@ definitions:
         x-order: 2
   Rule:
     description: |-
-      Classification rule extracts a value from request metadata.
-      More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
-      See https://play.openpolicyagent.org/p/gU7vcLkc70 for an example input.
-      There are two ways to define a flow classification rule:
-      * Using a declarative extractor – suitable from simple cases, such as directly reading a value from header or a field from json body.
-      * Rego expression.
-
-      Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
-
-      Example of Declarative JSON extractor:
+      Example of a JSON extractor:
       ```yaml
       extractor:
         json:
           from: request.http.body
           pointer: /user/name
       ```
-
-      Example of Rego module which also disables telemetry visibility of label:
-      ```yaml
-      rego:
-        query: data.user_from_cookie.user
-        source: |
-          package user_from_cookie
-          cookies := split(input.attributes.request.http.headers.cookie, "; ")
-          user := user {
-              cookie := cookies[_]
-              startswith(cookie, "session=")
-              session := substring(cookie, count("session="), -1)
-              parts := split(session, ".")
-              object := json.unmarshal(base64url.decode(parts[0]))
-              user := object.user
-          }
-      telemetry: false
-      ```
-      [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
     type: object
     title: Rule describes a single classification Rule
     properties:
@@ -2880,7 +2949,10 @@ definitions:
         x-order: 0
         $ref: '#/definitions/Extractor'
       rego:
-        description: Rego module to extract a value from.
+        description: |-
+          Rego module to extract a value from.
+
+          Deprecated: 1.5.0
         x-order: 1
         $ref: '#/definitions/RuleRego'
       telemetry:
@@ -2907,8 +2979,10 @@ definitions:
         x-go-tag-default: "true"
         x-order: 2
   RuleRego:
-    description: High-level extractor-based rules are compiled into a single rego
-      query.
+    description: |-
+      High-level extractor-based rules are compiled into a single rego query.
+
+      Deprecated: 1.5.0
     type: object
     title: Raw rego rules are compiled 1:1 to rego queries
     required:
@@ -3001,6 +3075,8 @@ definitions:
           historical latency. Each workload's `tokens` will be set to average
           latency of flows in that workload during last few seconds (exact duration
           of this average can change).
+          Make sure to not provide `tokens` in workload definitions or in the flow
+          if you want to use this feature.
 
         type: boolean
         default: true
@@ -3013,6 +3089,10 @@ definitions:
         $ref: '#/definitions/SchedulerWorkloadParameters'
       max_timeout:
         description: |+
+          Max Timeout is the value with which the flow timeout is capped.
+          When auto_tokens feature is not enabled, this value is used as the
+          timeout for the flow, otherwise it is used as a cap for the timeout.
+
           :::caution
 
           This timeout needs to be strictly less than the timeout set on the
@@ -3026,19 +3106,19 @@ definitions:
 
           To avoid such cases, the end-to-end GRPC timeout should also contain
           some headroom for constant overhead like serialization, etc. Default
-          value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
+          value for GRPC timeouts is 500ms, giving 50ms of headroom, so when
           tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 
           :::
 
         type: string
-        title: Max Timeout is the value with which the flow timeout calculated by
-          `timeout_factor` is capped
         default: 0.49s
         x-go-tag-default: 0.49s
         x-order: 2
       timeout_factor:
         description: |+
+          Timeout as a factor of tokens for a flow in a workload in case auto_tokens is set to true.
+
           If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
           it will be rejected.
 
@@ -3046,7 +3126,6 @@ definitions:
 
         type: number
         format: double
-        title: Timeout as a factor of tokens for a flow in a workload
         default: 0.5
         x-go-tag-default: "0.5"
         x-go-tag-validate: gte=0.0
@@ -3135,16 +3214,11 @@ definitions:
         x-go-tag-validate: gte=0,lte=255
         x-order: 1
       tokens:
-        description: |+
+        description: |-
           Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-          This override is applicable only if `auto_tokens` is set to false.
-
+          This override is applicable only if tokens for the request are not specified in the request.
         type: string
-        format: int64
-        default: "1"
-        minLength: 1
-        x-go-tag-default: "1"
-        x-go-tag-validate: gt=0
+        format: uint64
         x-order: 2
   ServiceSelector:
     description: |-
@@ -3158,8 +3232,6 @@ definitions:
       Describes which service a [flow control or observability
       component](/concepts/integrations/flow-control/flow-control.md#components) should apply
       to
-    required:
-    - service
     properties:
       agent_group:
         description: |+
@@ -3168,7 +3240,9 @@ definitions:
 
           :::info
 
-          Agent Groups are used to scope policies to a subset of agents connected to the same controller. This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode. The agents within an agent group form a peer to peer cluster and constantly share state.
+          Agent Groups are used to scope policies to a subset of agents connected to the same controller.
+          This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode.
+          The agents within an agent group form a peer to peer cluster and constantly share state.
 
           :::
 
@@ -3183,11 +3257,16 @@ definitions:
 
           In Kubernetes, this is the FQDN of the Service object.
 
-          "all" means all services within an agent group (catch-all).
+          :::info
+
+          `any` matches all services.
+
+          :::
 
           :::info
 
-          In the Kubernetes sidecar installation mode, service discovery is switched off by default. In order to scope policies to services, the `service` should be set to `all` and instead, `agent_group` name should be used.
+          In the Kubernetes sidecar installation mode, service discovery is switched off by default.
+          In order to scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.
 
           :::
 
@@ -3198,7 +3277,8 @@ definitions:
           :::
 
         type: string
-        x-go-tag-validate: required
+        default: any
+        x-go-tag-default: any
         x-order: 1
   Switcher:
     description: |-

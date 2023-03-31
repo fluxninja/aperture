@@ -16,16 +16,16 @@ func isValidPackageName(pkg string) bool {
 		return false
 	}
 	for _, elem := range strings.Split(pkg, ".") {
-		if !isRegoIdent(elem) {
+		if !IsRegoIdent(elem) {
 			return false
 		}
 	}
 	return true
 }
 
-// isRegoIdent checks if string is a valid rego identifier – not a rego
+// IsRegoIdent checks if string is a valid rego identifier – not a rego
 // keyword and composed of allowed characters - alphanumeric and underscore.
-func isRegoIdent(ident string) bool {
+func IsRegoIdent(ident string) bool {
 	return ident != "" && !isRegoKeyword(ident) && regoIdentRegex.MatchString(ident)
 }
 

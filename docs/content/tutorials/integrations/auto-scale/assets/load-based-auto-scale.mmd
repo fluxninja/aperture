@@ -30,8 +30,8 @@ end
 subgraph root.3[<center>EMA<br/>win: 3000</center>]
 subgraph root.3_inports[ ]
 style root.3_inports fill:none,stroke:none
-root.3max_envelope[max_envelope]
 root.3input[input]
+root.3max_envelope[max_envelope]
 end
 subgraph root.3_outports[ ]
 style root.3_outports fill:none,stroke:none
@@ -69,13 +69,13 @@ root.2_rhs_FakeConstantout((1.10))
 root.6_scale_in_setpoint_0_FakeConstantout((0.50))
 root.6_scale_out_setpoint_0_FakeConstantout((1.00))
 root.3output --> |LATENCY_EMA| root.2lhs
+root.4observed_load_multiplier --> |OBSERVED_LOAD_MULTIPLIER| root.6scale_out_signal_0
 root.5output --> |AVERAGE_CPU| root.6scale_in_signal_0
 root.0output --> |LATENCY| root.1lhs
 root.0output --> |LATENCY| root.3input
 root.0output --> |LATENCY| root.4signal
 root.1output --> |MAX_EMA| root.3max_envelope
 root.2output --> |LATENCY_SETPOINT| root.4setpoint
-root.4observed_load_multiplier --> |OBSERVED_LOAD_MULTIPLIER| root.6scale_out_signal_0
 root.1_rhs_FakeConstantout --> root.1rhs
 root.2_rhs_FakeConstantout --> root.2rhs
 root.6_scale_in_setpoint_0_FakeConstantout --> root.6scale_in_setpoint_0

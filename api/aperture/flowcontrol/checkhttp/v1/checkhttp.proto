@@ -5,17 +5,17 @@ package aperture.flowcontrol.checkhttp.v1;
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 import "google/rpc/status.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-// A generic interface for performing Aperture Flowcontrol check on incoming
-// requests to a networked service.
 service FlowControlServiceHTTP {
-  // Performs Aperture Flowcontrol check based on the fields received with the
-  // incoming request, and returns status `OK` or not `OK`.
   rpc CheckHTTP(CheckHTTPRequest) returns (CheckHTTPResponse) {
     option (google.api.http) = {
       post: "/v1/flowcontrol/checkhttp"
       body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-agent"];
     };
   }
 }
@@ -24,7 +24,7 @@ message CheckHTTPRequest {
   // This message defines attributes for an HTTP request.
   // HTTP/1.x, HTTP/2, gRPC are all considered as HTTP requests.
   message HttpRequest {
-    // The HTTP request method, such as ``GET``, ``POST``.
+    // The HTTP request method, such as `GET`, `POST`.
     string method = 1;
 
     // The HTTP request headers.
@@ -34,10 +34,10 @@ message CheckHTTPRequest {
     // the URL path and query-string. No decoding is performed.
     string path = 3;
 
-    // The HTTP request ``Host`` header value.
+    // The HTTP request `Host` header value.
     string host = 4;
 
-    // The HTTP URL scheme, such as ``http`` and ``https``.
+    // The HTTP URL scheme, such as `http` and `https`.
     string scheme = 5;
 
     // The HTTP request size in bytes. If unknown, it must be -1.
@@ -71,7 +71,7 @@ message CheckHTTPRequest {
 // HTTP attributes for a denied response.
 message DeniedHttpResponse {
   // This field allows the authorization service to send an HTTP response status code to the
-  // downstream client. If not set, Envoy sends ``403 Forbidden`` HTTP status code by default.
+  // downstream client. If not set, Envoy sends `403 Forbidden` HTTP status code by default.
   int32 status = 1;
 
   // This field allows the authorization service to send HTTP response headers
@@ -92,7 +92,7 @@ message OkHttpResponse {
 }
 
 message CheckHTTPResponse {
-  // Status ``OK`` allows the request. Any other status indicates the request should be denied
+  // Status `OK` allows the request. Any other status indicates the request should be denied
   google.rpc.Status status = 1;
 
   // An message that contains HTTP response attributes.
