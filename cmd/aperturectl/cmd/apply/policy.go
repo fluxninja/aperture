@@ -17,10 +17,10 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	"sigs.k8s.io/yaml"
 
 	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/tui"
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -47,9 +47,9 @@ var ApplyPolicyCmd = &cobra.Command{
 aperturectl apply policy --dir=policies`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		if file != "" {
-			return ApplyPolicy(file)
+			return applyPolicy(file)
 		} else if dir != "" {
-			policies, err := GetPolicies(dir)
+			policies, err := getPolicies(dir)
 			if err != nil {
 				return err
 			}
@@ -62,7 +62,7 @@ aperturectl apply policy --dir=policies`,
 
 			for policyIndex := range model.Selected {
 				fileName := policies[policyIndex]
-				if err := ApplyPolicy(fileName); err != nil {
+				if err := applyPolicy(fileName); err != nil {
 					log.Error().Err(err).Msgf("failed to apply policy '%s' on Kubernetes.", fileName)
 				}
 			}
@@ -73,8 +73,8 @@ aperturectl apply policy --dir=policies`,
 	},
 }
 
-// GetPolicies applies all policies in a directory to the cluster.
-func GetPolicies(policyDir string) ([]string, error) {
+// getPolicies applies all policies in a directory to the cluster.
+func getPolicies(policyDir string) ([]string, error) {
 	policies := []string{}
 	// walk the directory and apply all policies
 	return policies, filepath.Walk(policyDir, func(path string, info os.FileInfo, err error) error {
@@ -83,36 +83,32 @@ func GetPolicies(policyDir string) ([]string, error) {
 		}
 		fileBase := info.Name()[:len(info.Name())-len(filepath.Ext(info.Name()))]
 		if filepath.Ext(info.Name()) == ".yaml" && !strings.HasSuffix(fileBase, "-cr") {
-			if policy := GetPolicy(path); policy != nil {
-				policies = append(policies, path)
+			_, err := getPolicy(path)
+			if err != nil {
+				return err
 			}
+			policies = append(policies, path)
 		}
 		return nil
 	})
 }
 
-func GetPolicy(policyFile string) *languagev1.Policy {
-	content, err := os.ReadFile(policyFile)
+func getPolicy(policyFile string) (*languagev1.Policy, error) {
+	_, policy, err := utils.CompilePolicy(policyFile)
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	policy := &languagev1.Policy{}
-	err = yaml.Unmarshal(content, policy)
-	if err != nil {
-		log.Warn().Msgf("Skipping apply for policy '%s' due to invalid spec.", policyFile)
-		return nil
-	}
-	return policy
+	return policy, nil
 }
 
-// ApplyPolicy applies a policy to the cluster.
-func ApplyPolicy(policyFile string) error {
+// applyPolicy applies a policy to the cluster.
+func applyPolicy(policyFile string) error {
 	policyFileBase := filepath.Base(policyFile)
 	policyName := policyFileBase[:len(policyFileBase)-len(filepath.Ext(policyFileBase))]
 
-	policy := GetPolicy(policyFile)
-	if policy == nil {
-		return nil
+	policy, err := getPolicy(policyFile)
+	if err != nil {
+		return err
 	}
 
 	policyBytes, err := policy.MarshalJSON()
