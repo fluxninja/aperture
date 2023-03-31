@@ -3,9 +3,11 @@ package discovery
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"sync"
 
 	"github.com/cenkalti/backoff/v4"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sourcegraph/conc/stream"
 	"google.golang.org/protobuf/proto"
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
@@ -14,8 +16,10 @@ import (
 	controlpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/etcd/election"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 )
 
@@ -87,6 +91,7 @@ type autoScaleControlPoints struct {
 	ctx           context.Context
 	cancel        context.CancelFunc
 	scaleStream   *stream.Stream
+	podCounter    *prometheus.GaugeVec
 }
 
 // controlPointCache implements the AutoScaleControlPointStore interface.
@@ -96,13 +101,32 @@ var _ AutoScaleControlPointStore = (*autoScaleControlPoints)(nil)
 var _ AutoScaleControlPoints = (*autoScaleControlPoints)(nil)
 
 // newAutoScaleControlPoints returns a new AutoScaleControlPoints.
-func newAutoScaleControlPoints(trackers notifiers.Trackers, k8sClient k8s.K8sClient) *autoScaleControlPoints {
-	return &autoScaleControlPoints{
+func newAutoScaleControlPoints(trackers notifiers.Trackers, k8sClient k8s.K8sClient, pr *prometheus.Registry, election *election.Election) (*autoScaleControlPoints, error) {
+	cpc := &autoScaleControlPoints{
 		controlPoints: make(map[AutoScaleControlPoint]*controlPointState),
 		trackers:      trackers,
 		k8sClient:     k8sClient,
 		scaleStream:   stream.New(),
 	}
+	if election != nil && election.IsLeader() {
+		defaultLabels := []string{
+			metrics.K8sNamespaceName,
+		}
+		podCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Name: metrics.K8sPodCount,
+			Help: "The number of pods",
+		}, defaultLabels)
+		err := pr.Register(podCounter)
+		if err != nil {
+			// Ignore already registered error, as this is not harmful. Metrics may
+			// be registered by other running server.
+			if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
+				return nil, fmt.Errorf("couldn't register prometheus metrics: %w", err)
+			}
+		}
+		cpc.podCounter = podCounter
+	}
+	return cpc, nil
 }
 
 // start starts the autoScaler.
@@ -243,7 +267,14 @@ func (cpc *autoScaleControlPoints) fetchScale(cp AutoScaleControlPoint, cps *con
 		log.Error().Err(keyErr).Msgf("Unable to marshal key: %v", cp)
 		return noOp
 	}
-
+	if cpc.podCounter != nil {
+		pcMetric, err := cpc.podCounter.GetMetricWith(scaleLabels(scale))
+		if err != nil {
+			log.Error().Err(err).Msgf("Unable to get pod count for %v", cp)
+		} else {
+			pcMetric.Set(float64(scale.Status.Replicas))
+		}
+	}
 	value, valErr := proto.Marshal(&reported)
 	if valErr != nil {
 		log.Error().Err(valErr).Msg("Unable to marshal value")
@@ -253,6 +284,12 @@ func (cpc *autoScaleControlPoints) fetchScale(cp AutoScaleControlPoint, cps *con
 	return func() {
 		log.Info().Msgf("Writing event for %v, event: %v", cp, *scale)
 		cpc.trackers.WriteEvent(notifiers.Key(key), value)
+	}
+}
+
+func scaleLabels(scale *autoscalingv1.Scale) map[string]string {
+	return map[string]string{
+		metrics.K8sNamespaceName: scale.Namespace,
 	}
 }
 

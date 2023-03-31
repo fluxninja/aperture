@@ -152,4 +152,13 @@ const (
 	DefaultWorkloadIndex = "default"
 	// DefaultAgentGroup - default agent group.
 	DefaultAgentGroup = "default"
+
+	// K8S METRICS.
+
+	// K8sPodCount - number of pods in the cluster.
+	K8sPodCount = "k8s_pod_count"
+	// K8sNamespaceName - namespace of a resource.
+	K8sNamespaceName = "k8s_namespace_name"
+	// K8sNodeName - name of a node.
+	K8sNodeName = "k8s_node_name"
 )
