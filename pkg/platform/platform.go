@@ -167,7 +167,8 @@ func Run(app *fx.App) {
 	platform.statusRegistry.Child("system", readinessStatusPath).Child("component", platformStatusPath).SetStatus(status.NewStatus(wrapperspb.String("platform running"), nil))
 
 	// Wait for os.Signal
-	<-app.Done()
+	signal := <-app.Done()
+	log.Info().Str("signal", signal.String()).Msg("Received signal. Stopping application")
 	platform.statusRegistry.Child("system", readinessStatusPath).Child("component", platformStatusPath).SetStatus(status.NewStatus(nil, errors.New("platform stopping")))
 }
 

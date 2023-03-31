@@ -22,7 +22,6 @@ private static final long serialVersionUID = 0L;
   private ClassifierInfo() {
     policyName_ = "";
     policyHash_ = "";
-    labelKey_ = "";
     error_ = 0;
   }
 
@@ -71,12 +70,6 @@ private static final long serialVersionUID = 0L;
           case 24: {
 
             classifierIndex_ = input.readInt64();
-            break;
-          }
-          case 34: {
-            java.lang.String s = input.readStringRequireUtf8();
-
-            labelKey_ = s;
             break;
           }
           case 40: {
@@ -354,44 +347,6 @@ private static final long serialVersionUID = 0L;
     return classifierIndex_;
   }
 
-  public static final int LABEL_KEY_FIELD_NUMBER = 4;
-  private volatile java.lang.Object labelKey_;
-  /**
-   * <code>string label_key = 4 [json_name = "labelKey"];</code>
-   * @return The labelKey.
-   */
-  @java.lang.Override
-  public java.lang.String getLabelKey() {
-    java.lang.Object ref = labelKey_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      labelKey_ = s;
-      return s;
-    }
-  }
-  /**
-   * <code>string label_key = 4 [json_name = "labelKey"];</code>
-   * @return The bytes for labelKey.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getLabelKeyBytes() {
-    java.lang.Object ref = labelKey_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      labelKey_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
-  }
-
   public static final int ERROR_FIELD_NUMBER = 5;
   private int error_;
   /**
@@ -434,9 +389,6 @@ private static final long serialVersionUID = 0L;
     if (classifierIndex_ != 0L) {
       output.writeInt64(3, classifierIndex_);
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(labelKey_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, labelKey_);
-    }
     if (error_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.ClassifierInfo.Error.ERROR_NONE.getNumber()) {
       output.writeEnum(5, error_);
     }
@@ -458,9 +410,6 @@ private static final long serialVersionUID = 0L;
     if (classifierIndex_ != 0L) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt64Size(3, classifierIndex_);
-    }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(labelKey_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, labelKey_);
     }
     if (error_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.ClassifierInfo.Error.ERROR_NONE.getNumber()) {
       size += com.google.protobuf.CodedOutputStream
@@ -487,8 +436,6 @@ private static final long serialVersionUID = 0L;
         .equals(other.getPolicyHash())) return false;
     if (getClassifierIndex()
         != other.getClassifierIndex()) return false;
-    if (!getLabelKey()
-        .equals(other.getLabelKey())) return false;
     if (error_ != other.error_) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
@@ -508,8 +455,6 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + CLASSIFIER_INDEX_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
         getClassifierIndex());
-    hash = (37 * hash) + LABEL_KEY_FIELD_NUMBER;
-    hash = (53 * hash) + getLabelKey().hashCode();
     hash = (37 * hash) + ERROR_FIELD_NUMBER;
     hash = (53 * hash) + error_;
     hash = (29 * hash) + unknownFields.hashCode();
@@ -655,8 +600,6 @@ private static final long serialVersionUID = 0L;
 
       classifierIndex_ = 0L;
 
-      labelKey_ = "";
-
       error_ = 0;
 
       return this;
@@ -688,7 +631,6 @@ private static final long serialVersionUID = 0L;
       result.policyName_ = policyName_;
       result.policyHash_ = policyHash_;
       result.classifierIndex_ = classifierIndex_;
-      result.labelKey_ = labelKey_;
       result.error_ = error_;
       onBuilt();
       return result;
@@ -748,10 +690,6 @@ private static final long serialVersionUID = 0L;
       }
       if (other.getClassifierIndex() != 0L) {
         setClassifierIndex(other.getClassifierIndex());
-      }
-      if (!other.getLabelKey().isEmpty()) {
-        labelKey_ = other.labelKey_;
-        onChanged();
       }
       if (other.error_ != 0) {
         setErrorValue(other.getErrorValue());
@@ -964,82 +902,6 @@ private static final long serialVersionUID = 0L;
     public Builder clearClassifierIndex() {
       
       classifierIndex_ = 0L;
-      onChanged();
-      return this;
-    }
-
-    private java.lang.Object labelKey_ = "";
-    /**
-     * <code>string label_key = 4 [json_name = "labelKey"];</code>
-     * @return The labelKey.
-     */
-    public java.lang.String getLabelKey() {
-      java.lang.Object ref = labelKey_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        labelKey_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
-    }
-    /**
-     * <code>string label_key = 4 [json_name = "labelKey"];</code>
-     * @return The bytes for labelKey.
-     */
-    public com.google.protobuf.ByteString
-        getLabelKeyBytes() {
-      java.lang.Object ref = labelKey_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        labelKey_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <code>string label_key = 4 [json_name = "labelKey"];</code>
-     * @param value The labelKey to set.
-     * @return This builder for chaining.
-     */
-    public Builder setLabelKey(
-        java.lang.String value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  
-      labelKey_ = value;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string label_key = 4 [json_name = "labelKey"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearLabelKey() {
-      
-      labelKey_ = getDefaultInstance().getLabelKey();
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string label_key = 4 [json_name = "labelKey"];</code>
-     * @param value The bytes for labelKey to set.
-     * @return This builder for chaining.
-     */
-    public Builder setLabelKeyBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-      
-      labelKey_ = value;
       onChanged();
       return this;
     }

@@ -180,7 +180,7 @@ func NewWFQScheduler(tokenManger TokenManager, clk clockwork.Clock, metrics *WFQ
 // Schedule blocks until the request is scheduled or until timeout (CoDel).
 // Return value - true: Accept, false: Reject.
 func (sched *WFQScheduler) Schedule(rContext RequestContext) bool {
-	if rContext.WorkMillis == 0 {
+	if rContext.Tokens == 0 {
 		return true
 	}
 
@@ -296,7 +296,7 @@ func (sched *WFQScheduler) enter(rContext RequestContext) (admitted bool, qReque
 
 	// try to schedule right now
 	if !sched.queueOpen {
-		ok := sched.manager.TakeIfAvailable(now, float64(rContext.WorkMillis))
+		ok := sched.manager.TakeIfAvailable(now, float64(rContext.Tokens))
 		if ok {
 			// we got the tokens, no need to queue
 			return true, nil
@@ -330,7 +330,7 @@ func (sched *WFQScheduler) enter(rContext RequestContext) (admitted bool, qReque
 
 	// invPriority range [1, 256]
 	invPriority := uint64(math.MaxUint8-rContext.Priority) + 1
-	cost := rContext.WorkMillis * invPriority
+	cost := rContext.Tokens * invPriority
 
 	// Get FlowInfo
 	fInfo, ok := sched.flows[flowID]
@@ -433,7 +433,7 @@ func (sched *WFQScheduler) leave(rContext RequestContext, qRequest *queuedReques
 	now := sched.clk.Now()
 
 	remainingTimeout := rContext.Timeout - now.Sub(qRequest.enqueueTime)
-	waitTime, ok := sched.manager.Take(now, remainingTimeout, float64(rContext.WorkMillis))
+	waitTime, ok := sched.manager.Take(now, remainingTimeout, float64(rContext.Tokens))
 
 	if ok {
 		// move the flow's VT forward and add the next request from flow queue to the heap

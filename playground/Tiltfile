@@ -3,7 +3,23 @@ v1alpha1.extension_repo(name='default', url='https://github.com/tilt-dev/tilt-ex
 load("ext://namespace", "namespace_create", "namespace_inject")
 load('ext://uibutton', 'cmd_button', 'location')
 
-allow_k8s_contexts('gke_devel-309501_us-central1_kklimonda-dev-cluster')
+
+def process_local_settings(local_settings):
+    print("Applying local settings from ./tilt_local.json")
+    override_default_registry = local_settings.get("default_registry", None)
+    if override_default_registry:
+        print("Overriding default registry to: "+ override_default_registry)
+        default_registry(override_default_registry)
+
+    override_allowed_k8s_contexts = local_settings.get("allowed_k8s_contexts", [])
+    if override_allowed_k8s_contexts:
+        print("Overriding allowed_k8s_contexts with: " + ",".join(override_allowed_k8s_contexts))
+        allow_k8s_contexts(override_allowed_k8s_contexts)
+
+
+local_settings = read_json("tilt_local.json", None)
+if local_settings:
+    process_local_settings(local_settings)
 
 #################
 ### CONSTANTS ###
@@ -1116,19 +1132,6 @@ def process_dockerhub_images(dockerhub_images):
             sections["images"] = images_final
 
 
-def process_local_settings(local_settings):
-    print("Applying local settings from ./tilt_local.json")
-    override_default_registry = local_settings.get("default_registry", None)
-    if override_default_registry:
-        print("Overriding default registry to: "+ override_default_registry)
-        default_registry(override_default_registry)
-
-    override_allowed_k8s_contexts = local_settings.get("allowed_k8s_contexts", [])
-    if override_allowed_k8s_contexts:
-        print("Overriding allowed_k8s_contexts with: " + ",".join(override_allowed_k8s_contexts))
-        allow_k8s_contexts(override_allowed_k8s_contexts)
-
-
 ############
 ### MAIN ###
 ############
@@ -1148,10 +1151,6 @@ config.define_bool("enable-cloud-extension",usage="Enable ARC API key authentica
 cfg = config.parse()
 # Enable all resources, as calling `config.parse()` by default disables all
 config.set_enabled_resources([])
-
-local_settings = read_json("tilt_local.json", None)
-if local_settings:
-    process_local_settings(local_settings)
 
 if cfg.get("list-resources", False):
     print_available_resources(DEP_TREE)

@@ -6,6 +6,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/info"
 )
 
+// WARNING: This is a placeholder file and should not be edited normally.
+
 func init() {
 	info.Extensions = GetExtensions()
 }

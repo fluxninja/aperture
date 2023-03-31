@@ -1004,6 +1004,35 @@ func (m *Classifier) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetRego()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClassifierValidationError{
+					field:  "Rego",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClassifierValidationError{
+					field:  "Rego",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRego()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClassifierValidationError{
+				field:  "Rego",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return ClassifierMultiError(errors)
 	}
@@ -1267,6 +1296,152 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RuleValidationError{}
+
+// Validate checks the field values on Rego with the rules defined in the proto
+// definition for this message. If any rules are violated, the first error
+// encountered is returned, or nil if there are no violations.
+func (m *Rego) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Rego with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in RegoMultiError, or nil if none found.
+func (m *Rego) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Rego) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	{
+		sorted_keys := make([]string, len(m.GetLabels()))
+		i := 0
+		for key := range m.GetLabels() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetLabels()[key]
+			_ = val
+
+			// no validation rules for Labels[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, RegoValidationError{
+							field:  fmt.Sprintf("Labels[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, RegoValidationError{
+							field:  fmt.Sprintf("Labels[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return RegoValidationError{
+						field:  fmt.Sprintf("Labels[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
+	// no validation rules for Module
+
+	if len(errors) > 0 {
+		return RegoMultiError(errors)
+	}
+
+	return nil
+}
+
+// RegoMultiError is an error wrapping multiple validation errors returned by
+// Rego.ValidateAll() if the designated constraints aren't met.
+type RegoMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RegoMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RegoMultiError) AllErrors() []error { return m }
+
+// RegoValidationError is the validation error returned by Rego.Validate if the
+// designated constraints aren't met.
+type RegoValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RegoValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RegoValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RegoValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RegoValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RegoValidationError) ErrorName() string { return "RegoValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RegoValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRego.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RegoValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RegoValidationError{}
 
 // Validate checks the field values on Extractor with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
@@ -3770,6 +3945,110 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = Rule_RegoValidationError{}
+
+// Validate checks the field values on Rego_LabelProperties with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *Rego_LabelProperties) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Rego_LabelProperties with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// Rego_LabelPropertiesMultiError, or nil if none found.
+func (m *Rego_LabelProperties) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Rego_LabelProperties) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Telemetry
+
+	if len(errors) > 0 {
+		return Rego_LabelPropertiesMultiError(errors)
+	}
+
+	return nil
+}
+
+// Rego_LabelPropertiesMultiError is an error wrapping multiple validation
+// errors returned by Rego_LabelProperties.ValidateAll() if the designated
+// constraints aren't met.
+type Rego_LabelPropertiesMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m Rego_LabelPropertiesMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m Rego_LabelPropertiesMultiError) AllErrors() []error { return m }
+
+// Rego_LabelPropertiesValidationError is the validation error returned by
+// Rego_LabelProperties.Validate if the designated constraints aren't met.
+type Rego_LabelPropertiesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e Rego_LabelPropertiesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e Rego_LabelPropertiesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e Rego_LabelPropertiesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e Rego_LabelPropertiesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e Rego_LabelPropertiesValidationError) ErrorName() string {
+	return "Rego_LabelPropertiesValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e Rego_LabelPropertiesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRego_LabelProperties.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = Rego_LabelPropertiesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = Rego_LabelPropertiesValidationError{}
 
 // Validate checks the field values on RateLimiter_Parameters with the rules
 // defined in the proto definition for this message. If any rules are

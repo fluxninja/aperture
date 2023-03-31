@@ -3,6 +3,7 @@ package classifier
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"sync"
 	"sync/atomic"
 
@@ -80,6 +81,7 @@ var (
 	emptyResultsetSampler     = log.NewRatelimitingSampler()
 	ambiguousResultsetSampler = log.NewRatelimitingSampler()
 	not1ExprSampler           = log.NewRatelimitingSampler()
+	tokenNotStringSampler     = log.NewRatelimitingSampler()
 )
 
 func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
@@ -87,7 +89,8 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 	mm *multimatcher.MultiMatcher[int, multiMatcherResult],
 	labelsForMatching map[string]string,
 	inputValue map[string]interface{},
-) (classifierMsgs []*flowcontrolv1.ClassifierInfo) {
+) (classifierMsgs []*flowcontrolv1.ClassifierInfo, tokens uint64) {
+	tokens = 0
 	input, err := ast.InterfaceToValue(inputValue)
 	if err != nil {
 		// RequestToInput should never produce anything that's not convertible
@@ -102,7 +105,6 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 			PolicyName:      labelerWithSelector.ClassifierAttributes.PolicyName,
 			PolicyHash:      labelerWithSelector.ClassifierAttributes.PolicyHash,
 			ClassifierIndex: labelerWithSelector.ClassifierAttributes.ClassifierIndex,
-			LabelKey:        labelerWithSelector.Labeler.LabelName,
 			Error:           error,
 		})
 	}
@@ -144,7 +146,8 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 		if labeler.LabelName != "" {
 			// single-label-query
 			flowLabels[labeler.LabelName] = flowlabel.FlowLabelValue{
-				Value:     resultSet[0].Expressions[0].String(),
+				Value: resultSet[0].Expressions[0].String(),
+				// nolint
 				Telemetry: labeler.Telemetry,
 			}
 			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_NONE)
@@ -159,9 +162,22 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 
 			appendNewClassifier(labelerWithSelector, flowcontrolv1.ClassifierInfo_ERROR_NONE)
 			for key, value := range variables {
-				flowLabels[key] = flowlabel.FlowLabelValue{
-					Value:     fmt.Sprint(value),
-					Telemetry: labeler.LabelsTelemetry[key],
+				// if key is tokens, set tokens instead of flowLabels
+				if key == consts.TokensLabel {
+					// parse tokens to uint64
+					tokens, err = strconv.ParseUint(fmt.Sprint(value), 10, 64)
+					if err != nil {
+						logger.Sample(tokenNotStringSampler).Warn().Msg("Rego: tokens is not a string")
+						continue
+					}
+				} else {
+					// copy this variable to labels
+					if l, ok := labeler.Labels[key]; ok {
+						flowLabels[key] = flowlabel.FlowLabelValue{
+							Value:     fmt.Sprint(value),
+							Telemetry: l.Telemetry,
+						}
+					}
 				}
 			}
 		}
@@ -169,7 +185,7 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 	return
 }
 
-// Classify takes rego input, performs classification, and returns a map of flow labels.
+// Classify takes rego input, performs classification, and returns a map of flow labels and tokens.
 // LabelsForMatching are additional labels to use for selector matching.
 func (c *ClassificationEngine) Classify(
 	ctx context.Context,
@@ -177,21 +193,24 @@ func (c *ClassificationEngine) Classify(
 	ctrlPt string,
 	labelsForMatching map[string]string,
 	input map[string]interface{},
-) ([]*flowcontrolv1.ClassifierInfo, flowlabel.FlowLabels) {
+) ([]*flowcontrolv1.ClassifierInfo, flowlabel.FlowLabels, uint64) {
+	tokens := uint64(0)
 	flowLabels := make(flowlabel.FlowLabels)
 
 	r, ok := c.activeRules.Load().(rules)
 	if !ok {
-		return nil, flowLabels
+		return nil, flowLabels, 0
 	}
 
 	var classifierMsgs []*flowcontrolv1.ClassifierInfo
 
 	// Catch all Service
-	cpID := selectors.NewControlPointID(consts.CatchAllService, ctrlPt)
+	cpID := selectors.NewControlPointID(consts.AnyService, ctrlPt)
 	mm, ok := r.MultiMatcherByControlPointID[cpID]
 	if ok {
-		classifierMsgs = append(classifierMsgs, c.populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)...)
+		classifierInfos, t := c.populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)
+		classifierMsgs = append(classifierMsgs, classifierInfos...)
+		tokens = t
 	}
 
 	// TODO (krdln): update prometheus metrics upon classification errors.
@@ -204,10 +223,15 @@ func (c *ClassificationEngine) Classify(
 			c.registry.GetLogger().Trace().Interface("controlPointID", cpID).Msg("No labelers for controlPointID")
 			continue
 		}
-		classifierMsgs = append(classifierMsgs, c.populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)...)
+		classifierInfos, t := c.populateFlowLabels(ctx, flowLabels, mm, labelsForMatching, input)
+		classifierMsgs = append(classifierMsgs, classifierInfos...)
+		// check if t is greater than tokens
+		if t > tokens {
+			tokens = t
+		}
 	}
 
-	return classifierMsgs, flowLabels
+	return classifierMsgs, flowLabels, tokens
 }
 
 // ActiveRules returns a slice of uncompiled Rules which are currently active.

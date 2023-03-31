@@ -112,7 +112,6 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 					PolicyName:      "foo",
 					PolicyHash:      "bar",
 					ClassifierIndex: 42,
-					LabelKey:        "timing",
 					Error:           flowcontrolv1.ClassifierInfo_ERROR_MULTI_EXPRESSION,
 				},
 			},

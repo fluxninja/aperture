@@ -68,29 +68,31 @@ type Engine struct {
 // ProcessRequest .
 func (e *Engine) ProcessRequest(
 	ctx context.Context,
-	controlPoint string,
-	serviceIDs []string,
-	labels map[string]string,
+	requestContext iface.RequestContext,
 ) (response *flowcontrolv1.CheckResponse) {
+	controlPoint := requestContext.ControlPoint
+	services := requestContext.Services
+	flowLabels := requestContext.FlowLabels
+	tokens := requestContext.Tokens
 	// Sorting labels keys, so that they're in predictable order, which is
 	// needed by rollupprocessor.
-	labelKeys := maps.Keys(labels)
+	labelKeys := maps.Keys(flowLabels)
 	sort.Strings(labelKeys)
 	response = &flowcontrolv1.CheckResponse{
 		DecisionType:  flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
 		FlowLabelKeys: labelKeys,
-		Services:      serviceIDs,
+		Services:      services,
 		ControlPoint:  controlPoint,
 	}
 
-	mmr := e.getMatches(controlPoint, serviceIDs, labels)
+	mmr := e.getMatches(controlPoint, services, flowLabels)
 	if mmr == nil {
 		return
 	}
 
 	labelPreviews := mmr.labelPreviews
 	for _, labelPreview := range labelPreviews {
-		labelPreview.AddLabelPreview(labels)
+		labelPreview.AddLabelPreview(flowLabels)
 	}
 
 	fluxMeters := mmr.fluxMeters
@@ -108,12 +110,12 @@ func (e *Engine) ProcessRequest(
 		rateLimiters[i] = rl
 	}
 
-	rateLimiterDecisions, rateLimitersDecisionType := runLimiters(ctx, rateLimiters, labels)
+	rateLimiterDecisions, rateLimitersDecisionType := runLimiters(ctx, rateLimiters, flowLabels, tokens)
 	response.LimiterDecisions = rateLimiterDecisions
 
 	defer func() {
 		if response.DecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
-			returnExtraTokens(mmr.rateLimiters, rateLimiterDecisions, labels)
+			returnExtraTokens(mmr.rateLimiters, rateLimiterDecisions, flowLabels)
 		}
 	}()
 
@@ -131,7 +133,7 @@ func (e *Engine) ProcessRequest(
 		concurrencyLimiters[i] = cl
 	}
 
-	concurrencyLimiterDecisions, concurrencyLimitersDecisionType := runLimiters(ctx, concurrencyLimiters, labels)
+	concurrencyLimiterDecisions, concurrencyLimitersDecisionType := runLimiters(ctx, concurrencyLimiters, flowLabels, tokens)
 	response.LimiterDecisions = append(response.LimiterDecisions, concurrencyLimiterDecisions...)
 
 	if concurrencyLimitersDecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
@@ -143,7 +145,7 @@ func (e *Engine) ProcessRequest(
 	return
 }
 
-func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[string]string) (
+func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[string]string, tokens uint64) (
 	[]*flowcontrolv1.LimiterDecision,
 	flowcontrolv1.CheckResponse_DecisionType,
 ) {
@@ -160,7 +162,7 @@ func runLimiters(ctx context.Context, limiters []iface.Limiter, labels map[strin
 	execLimiter := func(limiter iface.Limiter, i int) func() {
 		return func() {
 			defer wg.Done()
-			decisions[i] = limiter.RunLimiter(ctx, labels)
+			decisions[i] = limiter.RunLimiter(ctx, labels, tokens)
 			if decisions[i].Dropped {
 				once.Do(setDecisionRejected)
 			}
@@ -342,8 +344,8 @@ func (e *Engine) getMatches(controlPoint string, serviceIDs []string, labels map
 
 	mmResult := &multiMatchResult{}
 
-	// Lookup catchall multi matchers for controlPoint
-	controlPointID := selectors.NewControlPointID(consts.CatchAllService, controlPoint)
+	// Lookup any service multi matchers for controlPoint
+	controlPointID := selectors.NewControlPointID(consts.AnyService, controlPoint)
 	camm, ok := e.multiMatchers[controlPointID]
 	if ok {
 		mmResult.populateFromMultiMatcher(camm, labels)

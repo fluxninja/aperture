@@ -20,12 +20,6 @@ repos:
         files: '\.proto$'
         pass_filenames: false
         description: "Protobuf generation"
-      - id: grpc
-        name: "Generate gRPC"
-        entry: ./scripts/generate_proto.sh
-        language: script
-        files: ^(api/aperture/flowcontrol/check/.*.proto|scripts/generate_proto.sh)$
-        pass_filenames: false
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.2.0
     hooks:
@@ -238,4 +232,4 @@ repos:
       - id: codespell
         args:
           - --ignore-words=./.codespellignore
-        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*|docs/content/reference/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*|blueprints/gen/.*|playground/resources/nginx/.*)$
+        exclude: ^(.*\.svg|yarn.lock|go.sum|.circleci/.*|docs/content/reference/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*|sdks/aperture-py/aperture_sdk/_gen/.*|blueprints/gen/.*|playground/resources/nginx/.*)$

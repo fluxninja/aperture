@@ -93,7 +93,7 @@ func (tbls *TokenBucketLoadMultiplier) PreprocessRequest(now time.Time, rContext
 	wasBootstrapping := tbls.counter.IsBootstrapping()
 
 	// Shift counter slot if needed
-	ready := tbls.counter.AddTokens(now, rContext.WorkMillis)
+	ready := tbls.counter.AddTokens(now, rContext.Tokens)
 
 	// recalculate token rate
 	if ready {

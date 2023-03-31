@@ -12,6 +12,7 @@ import (
 	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	previewv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/preview/v1"
 	"github.com/fluxninja/aperture/pkg/agentfunctions/agents"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/consts"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
 
@@ -337,8 +338,7 @@ agentsLoop:
 				continue
 			}
 
-			// FIXME This "all" thing shouldn't be hardcoded.
-			if needle.Service == "all" || cp.Service == needle.Service {
+			if needle.Service == consts.AnyService || cp.Service == needle.Service {
 				agents = append(agents, agent.Client)
 				continue agentsLoop // avoid duplicating agent
 			}

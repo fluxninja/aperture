@@ -2,6 +2,7 @@ import datetime
 import functools
 import logging
 import time
+import typing
 from typing import Callable, Dict, Optional, Type, TypeVar
 
 import grpc
@@ -25,9 +26,11 @@ from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExport
 from opentelemetry.sdk.resources import SERVICE_NAME, SERVICE_VERSION, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.util import types as otel_types
 
 TApertureClient = TypeVar("TApertureClient", bound="ApertureClient")
 TWrappedFunction = Callable[..., TWrappedReturn]
+Labels = Dict[str, str]
 
 
 class ApertureClient:
@@ -86,14 +89,14 @@ class ApertureClient:
         )
 
     def start_flow(
-        self, control_point: str, explicit_labels: Optional[Dict[str, str]] = None
+        self, control_point: str, explicit_labels: Optional[Labels] = None
     ) -> Flow:
-        labels = {}
-        labels.update(baggage.get_all())
+        labels: Labels = {}
+        labels.update({key: str(value) for key, value in baggage.get_all().items()})
         # Explicit labels override baggage
         labels.update(explicit_labels or {})
         request = CheckRequest(control_point=control_point, labels=labels)
-        span_attributes = {
+        span_attributes: otel_types.Attributes = {
             flow_start_timestamp_label: time.monotonic_ns(),
             source_label: "sdk",
         }
@@ -101,8 +104,11 @@ class ApertureClient:
         span = self.tracer.start_span("Aperture Check", attributes=span_attributes)
         stub = FlowControlServiceStub(self.grpc_channel)
         try:
-            response = stub.Check(request, timeout=self.timeout.total_seconds())
-        except grpc.RpcError:
+            # stub.Check is typed to accept an int, but it actually accepts a float
+            timeout = typing.cast(int, self.timeout.total_seconds())
+            response = stub.Check(request, timeout=timeout)
+        except grpc.RpcError as e:
+            self.logger.debug(f"Aperture gRPC call failed: {e.details()}")
             response = None
         span.set_attribute(workload_start_timestamp_label, time.monotonic_ns())
         return Flow(span=span, check_response=response)
