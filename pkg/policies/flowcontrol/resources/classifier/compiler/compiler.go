@@ -235,12 +235,12 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 		labels := r.GetLabels()
 
 		labelsProperties := map[string]LabelProperties{}
-		for labelKey, labelQuery := range labels {
+		for labelKey, lp := range labels {
 			if !extractors.IsRegoIdent(labelKey) {
 				return nil, fmt.Errorf("%w: %q is not a valid label name", BadLabelName, labelKey)
 			}
 			labelsProperties[labelKey] = LabelProperties{
-				Telemetry: labelQuery.Telemetry,
+				Telemetry: lp.Telemetry,
 			}
 		}
 

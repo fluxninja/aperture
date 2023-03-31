@@ -858,7 +858,7 @@ rules:
 <dt>rules</dt>
 <dd>
 
-(map of [Rule](#rule), **required**) A map of {key, value} pairs mapping from
+(map of [Rule](#rule)) A map of {key, value} pairs mapping from
 [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
 how to extract and propagate flow labels with that key.
 

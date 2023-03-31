@@ -683,8 +683,6 @@ definitions:
       ```
     type: object
     title: Set of classification rules sharing a common selector
-    required:
-    - rules
     properties:
       flow_selector:
         description: |+
@@ -696,16 +694,13 @@ definitions:
         title: Rego based classification
         $ref: '#/definitions/Rego'
       rules:
-        description: |+
+        description: |-
           A map of {key, value} pairs mapping from
           [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
           how to extract and propagate flow labels with that key.
-
         type: object
-        minProperties: 1
         additionalProperties:
           $ref: '#/definitions/Rule'
-        x-go-tag-validate: required,gt=0,dive,keys,required,endkeys,required
   Component:
     description: |-
       :::info

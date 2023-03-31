@@ -745,16 +745,11 @@ definitions:
             rules:
                 additionalProperties:
                     $ref: '#/definitions/Rule'
-                description: |+
+                description: |-
                     A map of {key, value} pairs mapping from
                     [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
                     how to extract and propagate flow labels with that key.
-
-                minProperties: 1
                 type: object
-                x-go-tag-validate: required,gt=0,dive,keys,required,endkeys,required
-        required:
-            - rules
         title: Set of classification rules sharing a common selector
         type: object
     ClassifierInfo:

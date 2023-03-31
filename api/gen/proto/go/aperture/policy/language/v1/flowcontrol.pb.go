@@ -556,7 +556,7 @@ type Classifier struct {
 	// A map of {key, value} pairs mapping from
 	// [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
 	// how to extract and propagate flow labels with that key.
-	Rules map[string]*Rule `protobuf:"bytes,2,rep,name=rules,proto3" json:"rules,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"required,gt=0,dive,keys,required,endkeys,required"` // @gotags: validate:"required,gt=0,dive,keys,required,endkeys,required"
+	Rules map[string]*Rule `protobuf:"bytes,2,rep,name=rules,proto3" json:"rules,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Rego based classification
 	Rego *Rego `protobuf:"bytes,3,opt,name=rego,proto3" json:"rego,omitempty"`
 }

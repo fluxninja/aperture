@@ -265,7 +265,7 @@ message Classifier {
   // A map of {key, value} pairs mapping from
   // [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
   // how to extract and propagate flow labels with that key.
-  map<string, Rule> rules = 2; // @gotags: validate:"required,gt=0,dive,keys,required,endkeys,required"
+  map<string, Rule> rules = 2;
 
   // Rego based classification
   Rego rego = 3;
