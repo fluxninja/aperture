@@ -556,7 +556,7 @@ type Classifier struct {
 	// A map of {key, value} pairs mapping from
 	// [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
 	// how to extract and propagate flow labels with that key.
-	Rules map[string]*Rule `protobuf:"bytes,2,rep,name=rules,proto3" json:"rules,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Rules map[string]*Rule `protobuf:"bytes,2,rep,name=rules,proto3" json:"rules,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"dive,keys,required,endkeys,required"` // @gotags: validate:"dive,keys,required,endkeys,required"
 	// Rego based classification
 	//
 	// Rego is a policy language used to express complex policies in a concise and declarative way.
@@ -2087,11 +2087,11 @@ type Rule_Rego struct {
 	// Source code of the rego module.
 	//
 	// Note: Must include a "package" declaration.
-	Source string `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty" validate:"required"` // @gotags: validate:"required"
+	Source string `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty" validate:"deprecated,required"` // @gotags: validate:"deprecated,required"
 	// Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
 	//
 	// Note: The module name must match the package name from the "source".
-	Query string `protobuf:"bytes,2,opt,name=query,proto3" json:"query,omitempty" validate:"required"` // @gotags: validate:"required"
+	Query string `protobuf:"bytes,2,opt,name=query,proto3" json:"query,omitempty" validate:"deprecated,required"` // @gotags: validate:"deprecated,required"
 }
 
 func (x *Rule_Rego) Reset() {

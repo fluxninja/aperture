@@ -62,7 +62,7 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circ
 
 	err := config.UnmarshalYAML(yamlSrc, policy)
 	if err != nil {
-		return nil, false, err.Error(), nil
+		return nil, false, err.Error(), err
 	}
 
 	alerter := alerts.NewSimpleAlerter(100)

@@ -321,7 +321,7 @@ func generateGraphs(content []byte, outputDir string, policyPath string, depth i
 
 	circuit, err := utils.CompilePolicy(policyFile)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	if err = utils.GenerateDotFile(circuit, dotFilePath, depth); err != nil {
