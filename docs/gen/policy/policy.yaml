@@ -702,6 +702,10 @@ definitions:
         x-order: 0
         $ref: '#/definitions/FlowSelector'
       rego:
+        description: |-
+          Rego is a policy language used to express complex policies in a concise and declarative way.
+          It can be used to define flow classification rules by writing custom queries that extract values from request metadata.
+          For simple cases, such as directly reading a value from header or a field from json body, declarative extractors are recommended.
         title: Rego based classification
         x-order: 1
         $ref: '#/definitions/Rego'

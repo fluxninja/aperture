@@ -558,6 +558,10 @@ type Classifier struct {
 	// how to extract and propagate flow labels with that key.
 	Rules map[string]*Rule `protobuf:"bytes,2,rep,name=rules,proto3" json:"rules,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Rego based classification
+	//
+	// Rego is a policy language used to express complex policies in a concise and declarative way.
+	// It can be used to define flow classification rules by writing custom queries that extract values from request metadata.
+	// For simple cases, such as directly reading a value from header or a field from json body, declarative extractors are recommended.
 	Rego *Rego `protobuf:"bytes,3,opt,name=rego,proto3" json:"rego,omitempty"`
 }
 

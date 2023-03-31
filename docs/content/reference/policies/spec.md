@@ -854,6 +854,10 @@ rules:
 
 ([Rego](#rego)) Rego based classification
 
+Rego is a policy language used to express complex policies in a concise and declarative way.
+It can be used to define flow classification rules by writing custom queries that extract values from request metadata.
+For simple cases, such as directly reading a value from header or a field from json body, declarative extractors are recommended.
+
 </dd>
 <dt>rules</dt>
 <dd>
