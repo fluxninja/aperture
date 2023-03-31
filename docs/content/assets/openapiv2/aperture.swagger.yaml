@@ -4222,7 +4222,7 @@ paths:
                 Performs Aperture flow control check based on the fields received with the
                 incoming request, and returns the decision.
             tags:
-                - aperture-agent
+                - FlowControlServiceHTTP
     /v1/flowcontrol/controlpoints:
         get:
             operationId: FlowControlPointsService_GetControlPoints
