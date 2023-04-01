@@ -16,6 +16,7 @@ style root.1_outports fill:none,stroke:none
 root.1output[output]
 end
 end
+root.1_rhs_FakeConstantout((2.00))
 subgraph root.2[<center>ArithmeticCombinator<br/>Mul</center>]
 subgraph root.2_inports[ ]
 style root.2_inports fill:none,stroke:none
@@ -27,6 +28,7 @@ style root.2_outports fill:none,stroke:none
 root.2output[output]
 end
 end
+root.2_rhs_FakeConstantout((1.10))
 subgraph root.3[<center>EMA<br/>win: 3000</center>]
 subgraph root.3_inports[ ]
 style root.3_inports fill:none,stroke:none
@@ -60,6 +62,7 @@ style root.5_outports fill:none,stroke:none
 root.5output[output]
 end
 end
+root.5_rhs_FakeConstantout((1.00))
 subgraph root.6[Switcher]
 subgraph root.6_inports[ ]
 style root.6_inports fill:none,stroke:none
@@ -72,28 +75,25 @@ style root.6_outports fill:none,stroke:none
 root.6output[output]
 end
 end
+root.6_off_signal_FakeConstantout((10.00))
+root.6_on_signal_FakeConstantout((0.00))
 subgraph root.7[<center>RateLimiter<br/>service1-demo-app.demoapp.s...</center>]
 subgraph root.7_inports[ ]
 style root.7_inports fill:none,stroke:none
 root.7limit[limit]
 end
 end
-root.1_rhs_FakeConstantout((2.00))
-root.2_rhs_FakeConstantout((1.10))
-root.5_rhs_FakeConstantout((1.00))
-root.6_off_signal_FakeConstantout((10.00))
-root.6_on_signal_FakeConstantout((0.00))
-root.5output --> |IS_BOT_ESCALATION| root.6switch
 root.0output --> |LATENCY| root.1lhs
 root.0output --> |LATENCY| root.3input
 root.0output --> |LATENCY| root.4signal
-root.3output --> |LATENCY_EMA| root.2lhs
-root.2output --> |LATENCY_SETPOINT| root.4setpoint
 root.1output --> |MAX_EMA| root.3max_envelope
-root.4observed_load_multiplier --> |OBSERVED_LOAD_MULTIPLIER| root.5lhs
-root.6output --> |RATE_LIMIT| root.7limit
 root.1_rhs_FakeConstantout --> root.1rhs
+root.2output --> |LATENCY_SETPOINT| root.4setpoint
 root.2_rhs_FakeConstantout --> root.2rhs
+root.3output --> |LATENCY_EMA| root.2lhs
+root.4observed_load_multiplier --> |OBSERVED_LOAD_MULTIPLIER| root.5lhs
+root.5output --> |IS_BOT_ESCALATION| root.6switch
 root.5_rhs_FakeConstantout --> root.5rhs
 root.6_off_signal_FakeConstantout --> root.6off_signal
 root.6_on_signal_FakeConstantout --> root.6on_signal
+root.6output --> |RATE_LIMIT| root.7limit

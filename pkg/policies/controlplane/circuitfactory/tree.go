@@ -154,13 +154,51 @@ func (tree *Tree) GetSubGraph(componentID runtime.ComponentID, depth int) (*poli
 	internalComponentViews = append(internalComponentViews, fakeConstantNodes...)
 	internalLinks = append(internalLinks, fakeConstantLinks...)
 
+	// Sort the links. Each link has Source and Target which contain
+	//  - ComponentID
+	//  - PortName
+	// We sort the links by looking at both Source and Target ComponentID and PortName.
+	sortLinks := func(links []*policymonitoringv1.Link) []*policymonitoringv1.Link {
+		sort.Slice(links, func(i, j int) bool {
+			sourceTargetI := fmt.Sprintf("%s_%s_%s_%s", links[i].Source.ComponentId, links[i].Source.PortName, links[i].Target.ComponentId, links[i].Target.PortName)
+			sourceTargetJ := fmt.Sprintf("%s_%s_%s_%s", links[j].Source.ComponentId, links[j].Source.PortName, links[j].Target.ComponentId, links[j].Target.PortName)
+			return sourceTargetI < sourceTargetJ
+		})
+		return links
+	}
+	internalLinks = sortLinks(internalLinks)
+	externalLinks = sortLinks(externalLinks)
+	// sort the components
+	sort.Slice(internalComponentViews, func(i, j int) bool {
+		return internalComponentViews[i].ComponentId < internalComponentViews[j].ComponentId
+	})
+	sort.Slice(externalComponentViews, func(i, j int) bool {
+		return externalComponentViews[i].ComponentId < externalComponentViews[j].ComponentId
+	})
+	// sort InPorts and OutPorts in ComponentViews
+	for _, c := range internalComponentViews {
+		sort.Slice(c.InPorts, func(i, j int) bool {
+			return c.InPorts[i].PortName < c.InPorts[j].PortName
+		})
+		sort.Slice(c.OutPorts, func(i, j int) bool {
+			return c.OutPorts[i].PortName < c.OutPorts[j].PortName
+		})
+	}
+	for _, c := range externalComponentViews {
+		sort.Slice(c.InPorts, func(i, j int) bool {
+			return c.InPorts[i].PortName < c.InPorts[j].PortName
+		})
+		sort.Slice(c.OutPorts, func(i, j int) bool {
+			return c.OutPorts[i].PortName < c.OutPorts[j].PortName
+		})
+	}
+
 	graph := &policymonitoringv1.Graph{
 		InternalComponents: internalComponentViews,
 		ExternalComponents: externalComponentViews,
 		InternalLinks:      internalLinks,
 		ExternalLinks:      externalLinks,
 	}
-
 	return graph, nil
 }
 
@@ -198,13 +236,6 @@ func addFakeConstants(internalComponents []*runtime.ConfiguredComponent) (fakeCo
 			}
 		}
 	}
-	// sort the fake constant nodes and links to ensure consistent ordering
-	sort.Slice(fakeConstantNodes, func(i, j int) bool {
-		return fakeConstantNodes[i].ComponentId < fakeConstantNodes[j].ComponentId
-	})
-	sort.Slice(fakeConstantLinks, func(i, j int) bool {
-		return fakeConstantLinks[i].Source.ComponentId < fakeConstantLinks[j].Source.ComponentId
-	})
 	return
 }
 
@@ -227,10 +258,6 @@ func filterExternalComponents(externalComponents []*runtime.ConfiguredComponent,
 	for _, component := range filteredComponents {
 		filteredComponentSlice = append(filteredComponentSlice, component)
 	}
-	// sort the filtered components
-	sort.Slice(filteredComponentSlice, func(i, j int) bool {
-		return filteredComponentSlice[i].ComponentID.String() < filteredComponentSlice[j].ComponentID.String()
-	})
 
 	return filteredComponentSlice
 }
@@ -300,16 +327,7 @@ type componentData struct {
 
 func computeLinks(internalComponents, externalComponents []*runtime.ConfiguredComponent) (internalLinks, externalLinks []*policymonitoringv1.Link) {
 	createLinks := func(outIndex, inIndex signalToComponentIndex, linkList *[]*policymonitoringv1.Link) {
-		// get signalIDs and sort them first
-		signalIDs := make([]runtime.SignalID, 0, len(outIndex))
 		for signalID := range outIndex {
-			signalIDs = append(signalIDs, signalID)
-		}
-		sort.Slice(signalIDs, func(i, j int) bool {
-			return signalIDs[i].SignalName < signalIDs[j].SignalName
-		})
-		// iterate over sorted signalIDs
-		for _, signalID := range signalIDs {
 			for _, outComponent := range outIndex[signalID] {
 				for _, inComponent := range inIndex[signalID] {
 					*linkList = append(*linkList, &policymonitoringv1.Link{
@@ -420,13 +438,6 @@ func componentViewFromConfiguredComponent(component *runtime.ConfiguredComponent
 	if err != nil {
 		log.Error().Err(err).Msg("converting component map")
 	}
-	// sort inPorts and outPorts
-	sort.Slice(inPorts, func(i, j int) bool {
-		return inPorts[i].PortName < inPorts[j].PortName
-	})
-	sort.Slice(outPorts, func(i, j int) bool {
-		return outPorts[i].PortName < outPorts[j].PortName
-	})
 
 	componentName := component.Name()
 	componentDescription := component.ShortDescription()
