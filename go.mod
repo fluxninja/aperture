@@ -546,7 +546,7 @@ require (
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/hashicorp/serf v0.10.1 // indirect
 	github.com/hetznercloud/hcloud-go v1.39.0 // indirect
-	github.com/imdario/mergo v0.3.13
+	github.com/imdario/mergo v0.3.15
 	github.com/ionos-cloud/sdk-go/v6 v6.1.3 // indirect
 	github.com/jaegertracing/jaeger v1.41.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
