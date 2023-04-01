@@ -67,26 +67,15 @@ function generate_jsonnet_files() {
 	jsonnet -J "$gitroot"/blueprints/vendor "$tmpjsonnetfilepath" >"$jsonfilepath"
 	# if the file is a policy kind then generate mermaid diagram
 	if [ "$(yq e '.kind == "Policy"' "$jsonfilepath" --output-format=yaml)" = "true" ]; then
-		old_yaml_file_contents=""
-		if [ -f "$yamlfilepath" ]; then
-			old_yaml_file_contents=$(cat "$yamlfilepath")
-		fi
 		# convert the policy to yaml
 		"$scriptroot"/json2yaml "$jsonfilepath" "$yamlfilepath"
 		rm -rf "$jsonfilepath"
 		# run prettier
 		npx prettier --write "$yamlfilepath"
 		# generate mermaid diagram
-		# compile the policy and generate mermaid if yaml has changed
-		if [ "$old_yaml_file_contents" != "$(cat "$yamlfilepath")" ] || [ "$force" = true ]; then
-			# generate mermaid diagram
-			mermaidfilepath="${jsonnet_file%.*}".mmd
-			# compile the policy
-			"$aperturectl" compile --cr "$yamlfilepath" --mermaid "$mermaidfilepath"
-		else
-			# still validate the policy with compiler
-			"$aperturectl" compile --cr "$yamlfilepath"
-		fi
+		mermaidfilepath="${jsonnet_file%.*}".mmd
+		# compile the policy
+		"$aperturectl" compile --cr "$yamlfilepath" --mermaid "$mermaidfilepath"
 	else
 		npx prettier --write "$jsonfilepath"
 	fi

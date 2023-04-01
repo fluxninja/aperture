@@ -2,6 +2,7 @@ package circuitfactory
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -219,6 +220,10 @@ func filterExternalComponents(externalComponents []*runtime.ConfiguredComponent,
 	for _, component := range filteredComponents {
 		filteredComponentSlice = append(filteredComponentSlice, component)
 	}
+	// sort the filtered components
+	sort.Slice(filteredComponentSlice, func(i, j int) bool {
+		return filteredComponentSlice[i].ComponentID.String() < filteredComponentSlice[j].ComponentID.String()
+	})
 
 	return filteredComponentSlice
 }
@@ -288,7 +293,16 @@ type componentData struct {
 
 func computeLinks(internalComponents, externalComponents []*runtime.ConfiguredComponent) (internalLinks, externalLinks []*policymonitoringv1.Link) {
 	createLinks := func(outIndex, inIndex signalToComponentIndex, linkList *[]*policymonitoringv1.Link) {
+		// get signalIDs and sort them first
+		signalIDs := make([]runtime.SignalID, 0, len(outIndex))
 		for signalID := range outIndex {
+			signalIDs = append(signalIDs, signalID)
+		}
+		sort.Slice(signalIDs, func(i, j int) bool {
+			return signalIDs[i].SignalName < signalIDs[j].SignalName
+		})
+		// iterate over sorted signalIDs
+		for _, signalID := range signalIDs {
 			for _, outComponent := range outIndex[signalID] {
 				for _, inComponent := range inIndex[signalID] {
 					*linkList = append(*linkList, &policymonitoringv1.Link{
