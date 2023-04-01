@@ -189,7 +189,7 @@ require (
 	golang.org/x/net v0.8.0
 	google.golang.org/genproto v0.0.0-20230223222841-637eb2293923
 	google.golang.org/grpc v1.53.0
-	google.golang.org/protobuf v1.28.1
+	google.golang.org/protobuf v1.30.0
 	gopkg.in/fsnotify.v1 v1.4.7
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.11.1
@@ -450,7 +450,7 @@ require (
 	go.mongodb.org/mongo-driver v1.11.2 // indirect
 	go.opentelemetry.io/collector/featuregate v0.73.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.14.0 // indirect
-	golang.org/x/tools v0.6.0 // indirect
+	golang.org/x/tools v0.7.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
 	gonum.org/v1/gonum v0.12.0 // indirect
@@ -500,7 +500,7 @@ require (
 	github.com/docker/go-connections v0.4.1-0.20210727194412-58542c764a11
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/elastic/go-licenser v0.4.1 // indirect
-	github.com/envoyproxy/protoc-gen-validate v0.9.1
+	github.com/envoyproxy/protoc-gen-validate v0.10.1
 	github.com/facebookgo/symwalk v0.0.0-20150726040526-42004b9f3222
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
