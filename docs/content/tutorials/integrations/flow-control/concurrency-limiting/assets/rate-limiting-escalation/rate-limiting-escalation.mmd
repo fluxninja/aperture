@@ -81,8 +81,8 @@ end
 root.1_rhs_FakeConstantout((2.00))
 root.2_rhs_FakeConstantout((1.10))
 root.5_rhs_FakeConstantout((1.00))
-root.6_on_signal_FakeConstantout((0.00))
 root.6_off_signal_FakeConstantout((10.00))
+root.6_on_signal_FakeConstantout((0.00))
 root.5output --> |IS_BOT_ESCALATION| root.6switch
 root.0output --> |LATENCY| root.1lhs
 root.0output --> |LATENCY| root.3input
@@ -95,5 +95,5 @@ root.6output --> |RATE_LIMIT| root.7limit
 root.1_rhs_FakeConstantout --> root.1rhs
 root.2_rhs_FakeConstantout --> root.2rhs
 root.5_rhs_FakeConstantout --> root.5rhs
-root.6_on_signal_FakeConstantout --> root.6on_signal
 root.6_off_signal_FakeConstantout --> root.6off_signal
+root.6_on_signal_FakeConstantout --> root.6on_signal

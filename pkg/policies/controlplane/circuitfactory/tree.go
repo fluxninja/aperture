@@ -198,6 +198,13 @@ func addFakeConstants(internalComponents []*runtime.ConfiguredComponent) (fakeCo
 			}
 		}
 	}
+	// sort the fake constant nodes and links to ensure consistent ordering
+	sort.Slice(fakeConstantNodes, func(i, j int) bool {
+		return fakeConstantNodes[i].ComponentId < fakeConstantNodes[j].ComponentId
+	})
+	sort.Slice(fakeConstantLinks, func(i, j int) bool {
+		return fakeConstantLinks[i].Source.ComponentId < fakeConstantLinks[j].Source.ComponentId
+	})
 	return
 }
 
