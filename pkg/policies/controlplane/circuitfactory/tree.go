@@ -413,6 +413,13 @@ func componentViewFromConfiguredComponent(component *runtime.ConfiguredComponent
 	if err != nil {
 		log.Error().Err(err).Msg("converting component map")
 	}
+	// sort inPorts and outPorts
+	sort.Slice(inPorts, func(i, j int) bool {
+		return inPorts[i].PortName < inPorts[j].PortName
+	})
+	sort.Slice(outPorts, func(i, j int) bool {
+		return outPorts[i].PortName < outPorts[j].PortName
+	})
 
 	componentName := component.Name()
 	componentDescription := component.ShortDescription()
