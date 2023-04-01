@@ -66,7 +66,7 @@ function generate_jsonnet_files() {
 	$SED -i "s|github.com/fluxninja/aperture/blueprints|$gitroot/blueprints|g" "$tmpjsonnetfilepath"
 	jsonnet -J "$gitroot"/blueprints/vendor "$tmpjsonnetfilepath" >"$jsonfilepath"
 	# if the file is a policy kind then generate mermaid diagram
-	if [ "$(yq e '.kind == "Policy"' "$jsonfilepath")" = "true" ]; then
+	if [ "$(yq e '.kind == "Policy"' "$jsonfilepath" --output-format=yaml)" = "true" ]; then
 		old_yaml_file_contents=""
 		if [ -f "$yamlfilepath" ]; then
 			old_yaml_file_contents=$(cat "$yamlfilepath")
