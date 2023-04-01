@@ -188,7 +188,7 @@ require (
 	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2
 	golang.org/x/net v0.8.0
 	google.golang.org/genproto v0.0.0-20230223222841-637eb2293923
-	google.golang.org/grpc v1.53.0
+	google.golang.org/grpc v1.54.0
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/fsnotify.v1 v1.4.7
 	gopkg.in/yaml.v3 v3.0.1
