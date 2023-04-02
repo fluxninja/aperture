@@ -2,8 +2,7 @@ package election
 
 import (
 	"context"
-	"sync"
-	"time"
+	"sync/atomic"
 
 	"github.com/fluxninja/aperture/pkg/agentinfo"
 	"github.com/fluxninja/aperture/pkg/config"
@@ -47,18 +46,17 @@ type ElectionIn struct {
 func ProvideElection(in ElectionIn) (*Election, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	election := &Election{}
-
-	var waitGroup sync.WaitGroup
+	election := &Election{
+		doneChan: make(chan struct{}),
+	}
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			// Create an election for this client
 			election.Election = concurrencyv3.NewElection(in.Client.Session, "/election/"+in.AgentInfo.GetAgentGroup())
-			waitGroup.Add(1)
 			// A goroutine to do leader election
 			panichandler.Go(func() {
-				defer waitGroup.Done()
+				defer close(election.doneChan)
 				// Campaign for leadership
 				err := election.Election.Campaign(ctx, info.GetHostInfo().Uuid)
 				if err != nil {
@@ -74,27 +72,26 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 					return
 				}
 				// This is the leader
-				election.isLeader = true
-				log.Info().Msg("Propagate Election result")
+				election.isLeader.Store(true)
+				log.Info().Msg("Node is now a leader")
 				in.Trackers.WriteEvent(ElectionResultKey, []byte("true"))
 			})
 
 			return nil
 		},
-		OnStop: func(_ context.Context) error {
+		OnStop: func(stopCtx context.Context) error {
 			var err error
 			cancel()
+			// Wait for the election goroutine to finish
+			<-election.Done()
 			// resign from the election if we are the leader
 			if election.IsLeader() {
-				stopCtx, stopCancel := context.WithTimeout(context.Background(), time.Duration(time.Second*5))
+				election.isLeader.Store(false)
 				err = election.Election.Resign(stopCtx)
-				stopCancel()
 				if err != nil {
 					log.Error().Err(err).Msg("Unable to resign from the election")
 				}
 			}
-			// Wait for the election goroutine to finish
-			waitGroup.Wait()
 			return err
 		},
 	})
@@ -105,10 +102,23 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 // Election is a wrapper around etcd election.
 type Election struct {
 	Election *concurrencyv3.Election
-	isLeader bool
+	isLeader atomic.Bool
+
+	// When closed, leader election has stopped (either due to becoming the
+	// leader or due to cancellation).
+	// Note: chan is used here instead of WaitGroup, so that calls to
+	// WaitUntilLeader done before election is started don't immediately return.
+	doneChan chan struct{}
 }
 
 // IsLeader returns true if the current node is the leader.
 func (e *Election) IsLeader() bool {
-	return e.isLeader
+	return e.isLeader.Load()
 }
+
+// Done returns a channel that could be used to wait for election results.
+//
+// When the channel is closed then either:
+// * Node became a leader (IsLeader() == true),
+// * Leader election was canceled (IsLeader() == false).
+func (e *Election) Done() <-chan struct{} { return e.doneChan }

@@ -56,6 +56,7 @@ func (cpd *controlPointDiscovery) start() {
 
 		operation := func() error {
 			// Proceed only if we are the leader
+			// FIXME this goroutine leaks if we never become a leader
 			for {
 				if cpd.election.IsLeader() {
 					// Proceed
