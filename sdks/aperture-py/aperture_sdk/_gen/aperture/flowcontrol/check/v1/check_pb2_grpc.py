@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from aperture.flowcontrol.check.v1 import check_pb2 as aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2
+from . import check_pb2 as aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2
 
 
 class FlowControlServiceStub(object):

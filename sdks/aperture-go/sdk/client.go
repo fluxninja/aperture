@@ -2,6 +2,7 @@ package aperture
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -23,6 +24,7 @@ import (
 	flowcontrol "github.com/fluxninja/aperture-go/gen/proto/flowcontrol/check/v1"
 	"github.com/go-logr/logr"
 	"github.com/go-logr/stdr"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
@@ -179,8 +181,13 @@ func (client *apertureClient) HTTPMiddleware(controlPoint string, labels map[str
 					client.log.Info("Aperture flow control end got error.", "error", err)
 				}
 			} else {
-				w.WriteHeader(http.StatusForbidden)
-				err := flow.End(OK)
+				// TODO use HTTP Check and pull proper status
+				w.WriteHeader(http.StatusServiceUnavailable)
+				_, err := fmt.Fprint(w, flow.CheckResponse().GetRejectReason().String())
+				if err != nil {
+					client.log.Info("Aperture flow control end got error.", "error", err)
+				}
+				err = flow.End(OK)
 				if err != nil {
 					client.log.Info("Aperture flow control end got error.", "error", err)
 				}
@@ -220,7 +227,11 @@ func (client *apertureClient) GRPCUnaryInterceptor(controlPoint string, labels m
 			if err != nil {
 				client.log.Info("Aperture flow control end got error.", "error", err)
 			}
-			return nil, status.Error(http.StatusForbidden, "Aperture Rejected the Request")
+			// TODO use HTTP Check and pull proper status
+			return nil, status.Error(
+				codes.Unavailable,
+				fmt.Sprintf("Aperture Rejected the Request: %v", flow.CheckResponse().GetRejectReason().String()),
+			)
 		}
 	}
 }

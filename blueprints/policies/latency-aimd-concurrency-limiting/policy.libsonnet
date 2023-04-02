@@ -9,6 +9,7 @@ local flowSelector = spec.v1.FlowSelector;
 local query = spec.v1.Query;
 local component = spec.v1.Component;
 local flowControl = spec.v1.FlowControl;
+local flowControlResources = spec.v1.FlowControlResources;
 local promQL = spec.v1.PromQL;
 local port = spec.v1.Port;
 local combinator = spec.v1.ArithmeticCombinator;
@@ -35,8 +36,11 @@ function(cfg) {
   local policyDef =
     policy.new()
     + policy.withResources(resources.new()
-                           + resources.withFluxMetersMixin({ [params.policy_name]: params.flux_meter })
-                           + resources.withClassifiers(params.classifiers))
+                           + resources.withFlowControl(
+                             flowControlResources.new()
+                             + flowControlResources.withFluxMetersMixin({ [params.policy_name]: params.flux_meter })
+                             + flowControlResources.withClassifiers(params.classifiers)
+                           ))
     + policy.withCircuit(
       circuit.new()
       + circuit.withEvaluationInterval(evaluation_interval='0.5s')

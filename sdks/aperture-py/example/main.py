@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import asyncio
+import logging
 import os
 from typing import Optional
 
@@ -17,6 +18,8 @@ app = Quart(__name__)
 aperture_client = ApertureClient.new_client(
     endpoint=f"{agentHost}:{agentPort}", insecure=True
 )
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 @app.get("/super")

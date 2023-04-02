@@ -2,6 +2,7 @@ package circuitfactory
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -153,13 +154,51 @@ func (tree *Tree) GetSubGraph(componentID runtime.ComponentID, depth int) (*poli
 	internalComponentViews = append(internalComponentViews, fakeConstantNodes...)
 	internalLinks = append(internalLinks, fakeConstantLinks...)
 
+	// Sort the links. Each link has Source and Target which contain
+	//  - ComponentID
+	//  - PortName
+	// We sort the links by looking at both Source and Target ComponentID and PortName.
+	sortLinks := func(links []*policymonitoringv1.Link) []*policymonitoringv1.Link {
+		sort.Slice(links, func(i, j int) bool {
+			sourceTargetI := fmt.Sprintf("%s_%s_%s_%s", links[i].Source.ComponentId, links[i].Source.PortName, links[i].Target.ComponentId, links[i].Target.PortName)
+			sourceTargetJ := fmt.Sprintf("%s_%s_%s_%s", links[j].Source.ComponentId, links[j].Source.PortName, links[j].Target.ComponentId, links[j].Target.PortName)
+			return sourceTargetI < sourceTargetJ
+		})
+		return links
+	}
+	internalLinks = sortLinks(internalLinks)
+	externalLinks = sortLinks(externalLinks)
+	// sort the components
+	sort.Slice(internalComponentViews, func(i, j int) bool {
+		return internalComponentViews[i].ComponentId < internalComponentViews[j].ComponentId
+	})
+	sort.Slice(externalComponentViews, func(i, j int) bool {
+		return externalComponentViews[i].ComponentId < externalComponentViews[j].ComponentId
+	})
+	// sort InPorts and OutPorts in ComponentViews
+	for _, c := range internalComponentViews {
+		sort.Slice(c.InPorts, func(i, j int) bool {
+			return c.InPorts[i].PortName < c.InPorts[j].PortName
+		})
+		sort.Slice(c.OutPorts, func(i, j int) bool {
+			return c.OutPorts[i].PortName < c.OutPorts[j].PortName
+		})
+	}
+	for _, c := range externalComponentViews {
+		sort.Slice(c.InPorts, func(i, j int) bool {
+			return c.InPorts[i].PortName < c.InPorts[j].PortName
+		})
+		sort.Slice(c.OutPorts, func(i, j int) bool {
+			return c.OutPorts[i].PortName < c.OutPorts[j].PortName
+		})
+	}
+
 	graph := &policymonitoringv1.Graph{
 		InternalComponents: internalComponentViews,
 		ExternalComponents: externalComponentViews,
 		InternalLinks:      internalLinks,
 		ExternalLinks:      externalLinks,
 	}
-
 	return graph, nil
 }
 

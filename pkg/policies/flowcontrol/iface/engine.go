@@ -8,13 +8,19 @@ import (
 
 //go:generate mockgen -source=engine.go -destination=../../mocks/mock_engine.go -package=mocks
 
+// RequestContext provides the request parameters for the Check method.
+type RequestContext struct {
+	FlowLabels   map[string]string
+	ControlPoint string
+	Services     []string
+	Tokens       uint64
+}
+
 // Engine is an interface for registering fluxmeters and schedulers.
 type Engine interface {
 	ProcessRequest(
 		ctx context.Context,
-		controlPoint string,
-		serviceIDs []string,
-		labels map[string]string,
+		requestContext RequestContext,
 	) *flowcontrolv1.CheckResponse
 
 	RegisterConcurrencyLimiter(sa ConcurrencyLimiter) error

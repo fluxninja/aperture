@@ -4,6 +4,7 @@ import (
 	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
 	flowcontrolpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/consts"
 )
 
 // ControlPointID is the struct that represents a ControlPoint.
@@ -82,8 +83,14 @@ func GlobalControlPointIDFromProto(protoCP *cmdv1.GlobalFlowControlPoint) Global
 
 func controlPointIDFromSelectorProto(flowSelectorMsg *policylangv1.FlowSelector) (ControlPointID, error) {
 	ctrlPt := flowSelectorMsg.FlowMatcher.GetControlPoint()
+	service := flowSelectorMsg.ServiceSelector.GetService()
+	// map all to catch-all service for backward compatibility
+	// Deprecated: v1.5.0
+	if service == "all" {
+		service = consts.AnyService
+	}
 	return ControlPointID{
-		Service:      flowSelectorMsg.ServiceSelector.GetService(),
+		Service:      service,
 		ControlPoint: ctrlPt,
 	}, nil
 }

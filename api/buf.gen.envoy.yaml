@@ -1,7 +1,8 @@
 version: v1
 managed:
   enabled: true
-  java_package_prefix: "com.fluxninja.generated"
+  java_package_prefix:
+    default: com.fluxninja.generated
 plugins:
   - remote: buf.build/protocolbuffers/plugins/java:v21.6.0-1
     out: gen/proto/java

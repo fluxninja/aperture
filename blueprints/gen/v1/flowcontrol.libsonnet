@@ -25,6 +25,12 @@
   withLoadShaperMixin(load_shaper):: {
     load_shaper+: load_shaper,
   },
+  withLoadShaperSeries(load_shaper_series):: {
+    load_shaper_series: load_shaper_series,
+  },
+  withLoadShaperSeriesMixin(load_shaper_series):: {
+    load_shaper_series+: load_shaper_series,
+  },
   withRateLimiter(rate_limiter):: {
     rate_limiter: rate_limiter,
   },

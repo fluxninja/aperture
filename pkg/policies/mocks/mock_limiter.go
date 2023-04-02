@@ -95,17 +95,17 @@ func (mr *MockLimiterMockRecorder) GetRequestCounter(labels interface{}) *gomock
 }
 
 // RunLimiter mocks base method.
-func (m *MockLimiter) RunLimiter(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
+func (m *MockLimiter) RunLimiter(ctx context.Context, labels map[string]string, tokens uint64) *checkv1.LimiterDecision {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RunLimiter", ctx, labels)
+	ret := m.ctrl.Call(m, "RunLimiter", ctx, labels, tokens)
 	ret0, _ := ret[0].(*checkv1.LimiterDecision)
 	return ret0
 }
 
 // RunLimiter indicates an expected call of RunLimiter.
-func (mr *MockLimiterMockRecorder) RunLimiter(ctx, labels interface{}) *gomock.Call {
+func (mr *MockLimiterMockRecorder) RunLimiter(ctx, labels, tokens interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunLimiter", reflect.TypeOf((*MockLimiter)(nil).RunLimiter), ctx, labels)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunLimiter", reflect.TypeOf((*MockLimiter)(nil).RunLimiter), ctx, labels, tokens)
 }
 
 // MockRateLimiter is a mock of RateLimiter interface.
@@ -188,17 +188,17 @@ func (mr *MockRateLimiterMockRecorder) GetRequestCounter(labels interface{}) *go
 }
 
 // RunLimiter mocks base method.
-func (m *MockRateLimiter) RunLimiter(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
+func (m *MockRateLimiter) RunLimiter(ctx context.Context, labels map[string]string, tokens uint64) *checkv1.LimiterDecision {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RunLimiter", ctx, labels)
+	ret := m.ctrl.Call(m, "RunLimiter", ctx, labels, tokens)
 	ret0, _ := ret[0].(*checkv1.LimiterDecision)
 	return ret0
 }
 
 // RunLimiter indicates an expected call of RunLimiter.
-func (mr *MockRateLimiterMockRecorder) RunLimiter(ctx, labels interface{}) *gomock.Call {
+func (mr *MockRateLimiterMockRecorder) RunLimiter(ctx, labels, tokens interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunLimiter", reflect.TypeOf((*MockRateLimiter)(nil).RunLimiter), ctx, labels)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunLimiter", reflect.TypeOf((*MockRateLimiter)(nil).RunLimiter), ctx, labels, tokens)
 }
 
 // TakeN mocks base method.
@@ -312,15 +312,15 @@ func (mr *MockConcurrencyLimiterMockRecorder) GetRequestCounter(labels interface
 }
 
 // RunLimiter mocks base method.
-func (m *MockConcurrencyLimiter) RunLimiter(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
+func (m *MockConcurrencyLimiter) RunLimiter(ctx context.Context, labels map[string]string, tokens uint64) *checkv1.LimiterDecision {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RunLimiter", ctx, labels)
+	ret := m.ctrl.Call(m, "RunLimiter", ctx, labels, tokens)
 	ret0, _ := ret[0].(*checkv1.LimiterDecision)
 	return ret0
 }
 
 // RunLimiter indicates an expected call of RunLimiter.
-func (mr *MockConcurrencyLimiterMockRecorder) RunLimiter(ctx, labels interface{}) *gomock.Call {
+func (mr *MockConcurrencyLimiterMockRecorder) RunLimiter(ctx, labels, tokens interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunLimiter", reflect.TypeOf((*MockConcurrencyLimiter)(nil).RunLimiter), ctx, labels)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunLimiter", reflect.TypeOf((*MockConcurrencyLimiter)(nil).RunLimiter), ctx, labels, tokens)
 }

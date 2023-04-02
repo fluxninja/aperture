@@ -10,7 +10,7 @@ import (
 
 // Module .
 var Module = fx.Options(
-	fx.Provide(ProvideFlowcontrolHandler),
+	fx.Provide(ProvideFlowControlHandler),
 	fx.Invoke(Register),
 )
 
@@ -19,8 +19,8 @@ type ConstructorIn struct {
 	fx.In
 }
 
-// ProvideFlowcontrolHandler .
-func ProvideFlowcontrolHandler(in ConstructorIn) (flowcontrolv1.FlowControlServiceServer, error) {
+// ProvideFlowControlHandler .
+func ProvideFlowControlHandler(in ConstructorIn) (flowcontrolv1.FlowControlServiceServer, error) {
 	return &FlowControlHandler{}, nil
 }
 

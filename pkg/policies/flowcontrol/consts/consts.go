@@ -1,4 +1,7 @@
 package consts
 
-// CatchAllService is the string that represents catch-all service.
-const CatchAllService = "all"
+// AnyService is the string that represents any service.
+const AnyService = "any"
+
+// TokensLabel is the label that represents the number of tokens.
+const TokensLabel = "tokens"

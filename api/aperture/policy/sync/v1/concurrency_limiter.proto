@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package aperture.policy.sync.v1;
 
-import "aperture/policy/language/v1/policy.proto";
+import "aperture/policy/language/v1/flowcontrol.proto";
 import "aperture/policy/sync/v1/common_attributes.proto";
 import "aperture/policy/sync/v1/tick.proto";
 

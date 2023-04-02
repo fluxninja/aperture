@@ -46,7 +46,7 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector)) _Flow Selector_ decides the service and flows at which the concurrency limiter is applied.
+([FlowSelector](#flow-selector)) Flow Selector decides the service and flows at which the concurrency limiter is applied.
 
 </dd>
 <dt>gradient_parameters</dt>
@@ -849,10 +849,20 @@ rules:
 ([FlowSelector](#flow-selector)) Defines where to apply the flow classification rule.
 
 </dd>
+<dt>rego</dt>
+<dd>
+
+([Rego](#rego)) Rego based classification
+
+Rego is a policy language used to express complex policies in a concise and declarative way.
+It can be used to define flow classification rules by writing custom queries that extract values from request metadata.
+For simple cases, such as directly reading a value from header or a field from json body, declarative extractors are recommended.
+
+</dd>
 <dt>rules</dt>
 <dd>
 
-(map of [Rule](#rule), **required**) A map of {key, value} pairs mapping from
+(map of [Rule](#rule)) A map of {key, value} pairs mapping from
 [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
 how to extract and propagate flow labels with that key.
 
@@ -863,7 +873,7 @@ how to extract and propagate flow labels with that key.
 
 ### Component {#component}
 
-Computational block that form the circuit
+Computational block that forms the circuit
 
 :::info
 
@@ -1079,11 +1089,11 @@ This controller can be used to build AIMD (Additive Increase, Multiplicative Dec
 
 ### ConcurrencyLimiter {#concurrency-limiter}
 
-Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
+_Concurrency Limiter_ is an actuator component that regulates flows in order to provide active service protection
 
 :::info
 
-See also [Concurrency Limiter overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).
+See also [_Concurrency Limiter_ overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).
 
 :::
 
@@ -1097,7 +1107,7 @@ strategy and a scheduler. Right now, only `load_actuator` strategy is available.
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector)) _Flow Selector_ decides the service and flows at which the concurrency limiter is applied.
+([FlowSelector](#flow-selector)) Flow Selector decides the service and flows at which the concurrency limiter is applied.
 
 </dd>
 <dt>load_actuator</dt>
@@ -1123,7 +1133,7 @@ output signals.
 
 ### ConstantSignal {#constant-signal}
 
-Constant signal for input ports, Variables etc. Can provide either a constant value or special Nan/+-Inf value.
+Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
 
 <dl>
 <dt>special_value</dt>
@@ -1650,13 +1660,13 @@ FlowControl components are used to regulate requests flow.
 <dt>concurrency_limiter</dt>
 <dd>
 
-([ConcurrencyLimiter](#concurrency-limiter)) Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
+([ConcurrencyLimiter](#concurrency-limiter)) _Concurrency Limiter_ provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
 
 </dd>
 <dt>flow_regulator</dt>
 <dd>
 
-([FlowRegulator](#flow-regulator)) Flow Regulator is a component that regulates the flux of requests to the service.
+([FlowRegulator](#flow-regulator)) Flow Regulator is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
 
 </dd>
 <dt>load_shaper</dt>
@@ -1665,10 +1675,41 @@ FlowControl components are used to regulate requests flow.
 ([LoadShaper](#load-shaper)) LoadShaper is a component that shapes the load of the service.
 
 </dd>
+<dt>load_shaper_series</dt>
+<dd>
+
+([LoadShaperSeries](#load-shaper-series)) LoadShaperSeries is a series of LoadShaper components that shape load one after another in series.
+
+</dd>
 <dt>rate_limiter</dt>
 <dd>
 
-([RateLimiter](#rate-limiter)) Rate Limiter provides service protection by applying rate limiter.
+([RateLimiter](#rate-limiter)) _Rate Limiter_ provides service protection by applying rate limiter.
+
+</dd>
+</dl>
+
+---
+
+### FlowControlResources {#flow-control-resources}
+
+FlowControl Resources
+
+<dl>
+<dt>classifiers</dt>
+<dd>
+
+([[]Classifier](#classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+
+The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+
+</dd>
+<dt>flux_meters</dt>
+<dd>
+
+(map of [FluxMeter](#flux-meter)) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
+
+Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
 
 </dd>
 </dl>
@@ -1747,6 +1788,8 @@ control point.
 ---
 
 ### FlowRegulator {#flow-regulator}
+
+_Flow Regulator_ is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
 
 <dl>
 <dt>in_ports</dt>
@@ -2820,6 +2863,88 @@ Parameters for the _Load Shaper_ component.
 
 ---
 
+### LoadShaperSeries {#load-shaper-series}
+
+_LoadShaperSeries_ is a component that applies a series of _Load Shapers_ in order.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([LoadShaperSeriesIns](#load-shaper-series-ins))
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+([LoadShaperSeriesParameters](#load-shaper-series-parameters))
+
+</dd>
+</dl>
+
+---
+
+### LoadShaperSeriesIns {#load-shaper-series-ins}
+
+Inputs for the _LoadShaperSeries_ component.
+
+<dl>
+<dt>backward</dt>
+<dd>
+
+([InPort](#in-port)) Whether to progress the load shaper series towards the previous step.
+
+</dd>
+<dt>forward</dt>
+<dd>
+
+([InPort](#in-port)) Whether to progress the load shaper series towards the next step.
+
+</dd>
+<dt>reset</dt>
+<dd>
+
+([InPort](#in-port)) Whether to reset the load shaper series to the first step.
+
+</dd>
+</dl>
+
+---
+
+### LoadShaperSeriesLoadShaperInstance {#load-shaper-series-load-shaper-instance}
+
+<dl>
+<dt>load_shaper</dt>
+<dd>
+
+([LoadShaperParameters](#load-shaper-parameters)) The load shaper.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([LoadShaperOuts](#load-shaper-outs))
+
+</dd>
+</dl>
+
+---
+
+### LoadShaperSeriesParameters {#load-shaper-series-parameters}
+
+Parameters for the _LoadShaperSeries_ component.
+
+<dl>
+<dt>load_shapers</dt>
+<dd>
+
+([[]LoadShaperSeriesLoadShaperInstance](#load-shaper-series-load-shaper-instance), **required**) An ordered list of load shapers that get applied in order.
+
+</dd>
+</dl>
+
+---
+
 ### MatchExpression {#match-expression}
 
 Defines a [map<string, string> → bool] expression to be evaluated on labels
@@ -3503,7 +3628,7 @@ Limits the traffic on a control point to specified rate
 
 :::info
 
-See also [Rate Limiter overview](/concepts/integrations/flow-control/components/rate-limiter.md).
+See also [_Rate Limiter_ overview](/concepts/integrations/flow-control/components/rate-limiter.md).
 
 :::
 
@@ -3526,7 +3651,7 @@ to select which label should be used as key.
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector)) _Flow Selector_ decides the service and flows at which the rate limiter is applied.
+([FlowSelector](#flow-selector)) Which control point to apply this ratelimiter to.
 
 </dd>
 <dt>in_ports</dt>
@@ -3651,6 +3776,98 @@ label set up, set `label_key: "user"`.
 
 ---
 
+### Rego {#rego}
+
+Rego define a set of labels that are extracted after evaluating a rego module.
+
+:::info
+
+You can use the [live-preview](/concepts/integrations/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
+
+:::
+
+:::info
+
+Special rego variables:
+
+- `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
+
+:::
+
+Example of Rego module which also disables telemetry visibility of label:
+
+```yaml
+rego:
+  labels:
+    user:
+      telemetry: false
+  module: |
+    package user_from_cookie
+    cookies := split(input.attributes.request.http.headers.cookie, "; ")
+    user := user {
+        cookie := cookies[_]
+        startswith(cookie, "session=")
+        session := substring(cookie, count("session="), -1)
+        parts := split(session, ".")
+        object := json.unmarshal(base64url.decode(parts[0]))
+        user := object.user
+    }
+```
+
+<dl>
+<dt>labels</dt>
+<dd>
+
+(map of [RegoLabelProperties](#rego-label-properties), **required**) A map of {key, value} pairs mapping from
+[flow label](/concepts/integrations/flow-control/flow-label.md) keys to queries that define
+how to extract and propagate flow labels with that key.
+The name of the label maps to a variable in the rego module, i.e. it maps to `data.<package>.<label>` variable.
+
+</dd>
+<dt>module</dt>
+<dd>
+
+(string, **required**) Source code of the rego module.
+
+:::Note
+
+Must include a "package" declaration.
+
+:::
+
+</dd>
+</dl>
+
+---
+
+### RegoLabelProperties {#rego-label-properties}
+
+<dl>
+<dt>telemetry</dt>
+<dd>
+
+(bool, default: `true`) Decides if the created flow label should be available as an attribute in OLAP telemetry and
+propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
+
+:::note
+
+The flow label is always accessible in Aperture Policies regardless of this setting.
+
+:::
+
+:::caution
+
+When using [FluxNinja ARC extension](arc/extension.md), telemetry enabled
+labels are sent to FluxNinja ARC for observability. Telemetry should be disabled for
+sensitive labels.
+
+:::
+
+</dd>
+</dl>
+
+---
+
 ### Resources {#resources}
 
 Resources that need to be setup for the policy to function
@@ -3667,17 +3884,27 @@ Resources are typically Flux Meters, Classifiers, etc. that can be used to creat
 <dt>classifiers</dt>
 <dd>
 
-([[]Classifier](#classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+([[]Classifier](#classifier), **DEPRECATED**) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
 The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+
+Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
+
+</dd>
+<dt>flow_control</dt>
+<dd>
+
+([FlowControlResources](#flow-control-resources)) FlowControlResources are resources that are provided by flow control integration.
 
 </dd>
 <dt>flux_meters</dt>
 <dd>
 
-(map of [FluxMeter](#flux-meter)) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
+(map of [FluxMeter](#flux-meter), **DEPRECATED**) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
 Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+
+Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 
 </dd>
 </dl>
@@ -3688,17 +3915,7 @@ Flux Meter created metrics can be consumed as input to the circuit via the PromQ
 
 Rule describes a single classification Rule
 
-Classification rule extracts a value from request metadata.
-More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
-See https://play.openpolicyagent.org/p/gU7vcLkc70 for an example input.
-There are two ways to define a flow classification rule:
-
-- Using a declarative extractor – suitable from simple cases, such as directly reading a value from header or a field from json body.
-- Rego expression.
-
-Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
-
-Example of Declarative JSON extractor:
+Example of a JSON extractor:
 
 ```yaml
 extractor:
@@ -3706,27 +3923,6 @@ extractor:
     from: request.http.body
     pointer: /user/name
 ```
-
-Example of Rego module which also disables telemetry visibility of label:
-
-```yaml
-rego:
-  query: data.user_from_cookie.user
-  source: |
-    package user_from_cookie
-    cookies := split(input.attributes.request.http.headers.cookie, "; ")
-    user := user {
-        cookie := cookies[_]
-        startswith(cookie, "session=")
-        session := substring(cookie, count("session="), -1)
-        parts := split(session, ".")
-        object := json.unmarshal(base64url.decode(parts[0]))
-        user := object.user
-    }
-telemetry: false
-```
-
-[attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 
 <dl>
 <dt>extractor</dt>
@@ -3739,6 +3935,8 @@ telemetry: false
 <dd>
 
 ([RuleRego](#rule-rego)) Rego module to extract a value from.
+
+Deprecated: 1.5.0
 
 </dd>
 <dt>telemetry</dt>
@@ -3772,11 +3970,13 @@ Raw rego rules are compiled 1:1 to rego queries
 
 High-level extractor-based rules are compiled into a single rego query.
 
+Deprecated: 1.5.0
+
 <dl>
 <dt>query</dt>
 <dd>
 
-(string, **required**) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
+(string, **DEPRECATED**, **required**) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
 
 Note: The module name must match the package name from the "source".
 
@@ -3784,7 +3984,7 @@ Note: The module name must match the package name from the "source".
 <dt>source</dt>
 <dd>
 
-(string, **required**) Source code of the rego module.
+(string, **DEPRECATED**, **required**) Source code of the rego module.
 
 Note: Must include a "package" declaration.
 
@@ -3876,6 +4076,8 @@ Scheduler parameters
 historical latency. Each workload's `tokens` will be set to average
 latency of flows in that workload during last few seconds (exact duration
 of this average can change).
+Make sure to not provide `tokens` in workload definitions or in the flow
+if you want to use this feature.
 
 </dd>
 <dt>default_workload_parameters</dt>
@@ -3887,7 +4089,9 @@ of this average can change).
 <dt>max_timeout</dt>
 <dd>
 
-(string, default: `"0.49s"`) Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
+(string, default: `"0.49s"`) Max Timeout is the value with which the flow timeout is capped.
+When auto_tokens feature is not enabled, this value is used as the
+timeout for the flow, otherwise it is used as a cap for the timeout.
 
 :::caution
 
@@ -3903,7 +4107,7 @@ it're still waiting on the scheduler.
 
 To avoid such cases, the end-to-end GRPC timeout should also contain
 some headroom for constant overhead like serialization, etc. Default
-value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
+value for GRPC timeouts is 500ms, giving 50ms of headroom, so when
 tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 
 :::
@@ -3912,7 +4116,7 @@ tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 <dt>timeout_factor</dt>
 <dd>
 
-(float64, default: `0.5`) Timeout as a factor of tokens for a flow in a workload
+(float64, default: `0.5`) Timeout as a factor of tokens for a flow in a workload in case auto_tokens is set to true.
 
 If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
 it will be rejected.
@@ -4004,8 +4208,8 @@ $$
 <dt>tokens</dt>
 <dd>
 
-(string, default: `"1"`) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-This override is applicable only if `auto_tokens` is set to false.
+(string) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
+This override is applicable only if tokens for the request are not specified in the request.
 
 </dd>
 </dl>
@@ -4033,7 +4237,9 @@ selector applies to.
 
 :::info
 
-Agent Groups are used to scope policies to a subset of agents connected to the same controller. This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode. The agents within an agent group form a peer to peer cluster and constantly share state.
+Agent Groups are used to scope policies to a subset of agents connected to the same controller.
+This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode.
+The agents within an agent group form a peer to peer cluster and constantly share state.
 
 :::
 
@@ -4041,16 +4247,21 @@ Agent Groups are used to scope policies to a subset of agents connected to the s
 <dt>service</dt>
 <dd>
 
-(string, **required**) The Fully Qualified Domain Name of the
+(string, default: `"any"`) The Fully Qualified Domain Name of the
 [service](/concepts/integrations/flow-control/flow-selector.md) to select.
 
 In Kubernetes, this is the FQDN of the Service object.
 
-"all" means all services within an agent group (catch-all).
+:::info
+
+`any` matches all services.
+
+:::
 
 :::info
 
-In the Kubernetes sidecar installation mode, service discovery is switched off by default. In order to scope policies to services, the `service` should be set to `all` and instead, `agent_group` name should be used.
+In the Kubernetes sidecar installation mode, service discovery is switched off by default.
+In order to scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.
 
 :::
 

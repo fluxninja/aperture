@@ -9,6 +9,7 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
 )
 
@@ -30,7 +31,12 @@ func (f *FlowControlHandler) Check(ctx context.Context, req *flowcontrolv1.Check
 	}
 
 	start := time.Now()
-	resp := f.CommonHandler.CheckWithValues(ctx, services, req.ControlPoint, req.Labels)
+	resp := f.CommonHandler.CheckRequest(ctx, iface.RequestContext{
+		FlowLabels:   req.Labels,
+		ControlPoint: req.ControlPoint,
+		Services:     services,
+		Tokens:       req.Tokens,
+	})
 	end := time.Now()
 
 	resp.Start = timestamppb.New(start)

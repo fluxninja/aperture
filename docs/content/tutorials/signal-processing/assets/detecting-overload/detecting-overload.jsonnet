@@ -9,6 +9,7 @@ local flowMatcher = aperture.spec.v1.FlowMatcher;
 local circuit = aperture.spec.v1.Circuit;
 local port = aperture.spec.v1.Port;
 local resources = aperture.spec.v1.Resources;
+local flowControlResources = aperture.spec.v1.FlowControlResources;
 local fluxMeter = aperture.spec.v1.FluxMeter;
 local promQL = aperture.spec.v1.PromQL;
 local ema = aperture.spec.v1.EMA;
@@ -33,8 +34,13 @@ local svcSelector =
 
 local policyDef =
   policy.new()
-  + policy.withResources(resources.new()
-                         + resources.withFluxMetersMixin({ test: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector) }))
+  + policy.withResources(
+    resources.new()
+    + resources.withFlowControl(flowControlResources.new()
+                                + flowControlResources.withFluxMetersMixin(
+                                  { test: fluxMeter.new() + fluxMeter.withFlowSelector(svcSelector) }
+                                ))
+  )
   + policy.withCircuit(
     circuit.new()
     + circuit.withEvaluationInterval('0.5s')

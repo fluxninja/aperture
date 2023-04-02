@@ -344,7 +344,7 @@ func (fr *flowRegulator) GetFlowSelector() *policylangv1.FlowSelector {
 }
 
 // RunLimiter runs the limiter.
-func (fr *flowRegulator) RunLimiter(ctx context.Context, labels map[string]string) *flowcontrolv1.LimiterDecision {
+func (fr *flowRegulator) RunLimiter(ctx context.Context, labels map[string]string, _ uint64) *flowcontrolv1.LimiterDecision {
 	labelValue, hasLabelKey := labels[fr.proto.GetParameters().GetLabelKey()]
 
 	// Initialize LimiterDecision

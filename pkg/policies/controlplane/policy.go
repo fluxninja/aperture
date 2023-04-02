@@ -108,7 +108,12 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 	var resourceOptions []fx.Option
 	if policyProto.GetResources() != nil {
 		// Initialize flux meters
-		for name, fluxMeterProto := range policyProto.GetResources().FluxMeters {
+		fluxMeters := policyProto.GetResources().GetFlowControl().GetFluxMeters()
+		// Deprecated: v1.5.0
+		if fluxMeters == nil {
+			fluxMeters = policyProto.GetResources().GetFluxMeters()
+		}
+		for name, fluxMeterProto := range fluxMeters {
 			fluxMeterOption, err := fluxmeter.NewFluxMeterOptions(name, fluxMeterProto, policy)
 			if err != nil {
 				return nil, nil, nil, err
@@ -116,7 +121,12 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 			resourceOptions = append(resourceOptions, fluxMeterOption)
 		}
 		// Initialize classifiers
-		for index, classifierProto := range policyProto.GetResources().Classifiers {
+		classifiers := policyProto.GetResources().GetFlowControl().GetClassifiers()
+		// Deprecated: v1.5.0
+		if classifiers == nil {
+			classifiers = policyProto.GetResources().GetClassifiers()
+		}
+		for index, classifierProto := range classifiers {
 			classifierOption, err := classifier.NewClassifierOptions(int64(index), classifierProto, policy)
 			if err != nil {
 				return nil, nil, nil, err
