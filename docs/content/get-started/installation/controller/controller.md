@@ -25,10 +25,10 @@ Agents to effectively handle workloads.
 
 The closed feedback loop functions primarily by monitoring the variables
 reflecting stability conditions (i.e. process variables) and compares them
-against set points. The difference in the variable values against these points
-is referred to as the error signal. The feedback loop then works to minimize
-these error signals by determining and distributing control actions, that adjust
-these process variables and maintain their values within the optimal range.
+against setpoints. The difference in the variable values against these points is
+referred to as the error signal. The feedback loop then works to minimize these
+error signals by determining and distributing control actions, that adjust these
+process variables and maintain their values within the optimal range.
 
 ## Controller CRD
 
