@@ -18,6 +18,7 @@
       "Tabs",
       "TabItem",
       "ExtensionConfig",
+      "DownloadScript",
       "CodeBlock"
     ]
   },

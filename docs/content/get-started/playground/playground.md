@@ -132,7 +132,7 @@ The load generator is configured to generate the following traffic pattern for
 
 Once the traffic is running, you can visualize the decisions made by Aperture in
 Grafana. Navigate to [localhost:3000](http://localhost:3000) on your browser to
-reach Grafana. You can open the pre-loaded "FluxNinja" dashboard under
+reach Grafana. You can open the preloaded "FluxNinja" dashboard under
 "aperture-system" folder to a bunch of useful panels.
 
 <Zoom>
@@ -143,7 +143,7 @@ reach Grafana. You can open the pre-loaded "FluxNinja" dashboard under
 
 :::info
 
-Grafana dashboards url is
+Grafana's dashboards URL is
 [localhost:3000/dashboards](http://localhost:3000/dashboards)
 
 :::
@@ -176,7 +176,7 @@ To install the required tools, you have two options:
 - Manually install the tools
   [mentioned here](#tools-required-for-kubernetes-deployment).
 
-### Install via asdf
+### Install via ASDF
 
 First,
 [download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf) and
@@ -344,7 +344,7 @@ case latest images will be pulled from dockerhub and used instead.
 
 #### Creating your own test scenarios
 
-```
+```bash
 rate_limiting_escalation
 ├── dashboards
 │  └── main.jsonnet
@@ -354,7 +354,6 @@ rate_limiting_escalation
 └── policies
    ├── service1-demo-app-cr.yaml
    └── service1-demo-app.yaml
-
 ```
 
 Each test scenario consists of few directories, for policies, dashboards and

@@ -115,7 +115,7 @@ tolerance factor (`LATENCY_EMA` \* `1.1`).
 
 ![IS_OVERLOAD_SWITCH](./assets/detecting-overload/is_overload_switch.png)
 `IS_OVERLOAD_SWITCH` is a signal that decides whether the overload is currently
-happening or not based on comparing `LATENCY` with `LATENCY_SETPOINT`. It's
-value is `0` when there is no overload and `1` during overloads.
+happening or not based on comparing `LATENCY` with `LATENCY_SETPOINT`. Its value
+is `0` when there is no overload and `1` during overloads.
 
 </Zoom>

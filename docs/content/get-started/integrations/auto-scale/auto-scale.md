@@ -7,9 +7,7 @@ keywords:
   - Kubernetes
 ---
 
-# Auto Scale
-
-uto-scaling is a powerful method for automatically adjusting the number of
+Auto-scaling is a powerful method for automatically adjusting the number of
 instances or resources allocated to a service based on fluctuating workload
 demands. Aperture's closed-loop control policies provide an ideal solution for
 defining auto-scaling criteria. Aperture Agents interface with infrastructure

@@ -7,8 +7,6 @@ keywords:
   - Kubernetes
 ---
 
-# Kubernetes
-
 ## Installation
 
 To get started with auto-scaling in Kubernetes,
