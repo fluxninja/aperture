@@ -53,6 +53,8 @@ spec:
               value: "{{ .Values.agent.host }}"
             - name: FN_AGENT_PORT
               value: "{{ .Values.agent.port }}"
+            - name: REJECT_RATIO
+              value: "{{ .Values.simplesrv.rejectRatio }}"
             - name: HOSTNAME
               # TODO: Don't hardcode domain
               value: "{{ include "demo-app.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local"

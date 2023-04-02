@@ -16,8 +16,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import io.opentelemetry.api.baggage.Baggage;
-import io.opentelemetry.api.baggage.BaggageEntry;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -25,6 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.stream.Collectors;
+import java.util.function.Function;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,13 +33,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class RequestController {
     public static final String DEFAULT_HOST = "localhost";
 	public static final String DEFAULT_AGENT_PORT = "8089";
-    public static final String DEFAULT_CONCURRENCY = "10";
-	public static final String DEFAULT_LATENCY = "50";
-	public static final String DEFAULT_REJECT_RATIO = "0.05";
 
-    private  int concurrency = Integer.parseInt(System.getenv().getOrDefault("CONCURRENCY", DEFAULT_CONCURRENCY));
-    private  Duration latency = Duration.ofMillis(Long.parseLong(System.getenv().getOrDefault("LATENCY", DEFAULT_LATENCY)));
-    private  double rejectRatio = Double.parseDouble(System.getenv().getOrDefault("REJECT_RATIO", DEFAULT_REJECT_RATIO));
+    private  int concurrency = Integer.parseInt(System.getenv().getOrDefault("CONCURRENCY", "0"));
+    private  Duration latency = Duration.ofMillis(Long.parseLong(System.getenv().getOrDefault("LATENCY", "0")));
+    private  double rejectRatio = Double.parseDouble(System.getenv().getOrDefault("REJECT_RATIO", "0"));
     private  Logger log = LoggerFactory.getLogger(RequestController.class);
 
     // Semaphore for limiting concurrent clients
@@ -115,7 +113,7 @@ public class RequestController {
                 }
                 String requestDestination = chain.get(0).getDestination();
                 // TODO Add check for req Dest != Hostname
-                return processChain(chain, request.HttpHeaders);
+                return processChain(chain);
             }
 
             // If all subrequests were processed successfully, return success message
@@ -131,7 +129,7 @@ public class RequestController {
         return "Success";
     }
 
-    private String processChain(List<Subrequest> chain, HttpHeaders headers) {
+    private String processChain(List<Subrequest> chain) {
         if (chain.size() == 1) {
             return processRequest(chain.get(0));
         }
@@ -145,19 +143,19 @@ public class RequestController {
         trimmedRequest.addRequest(trimmedChain);
         String requestForwardingDestination = chain.get(1).getDestination();
 
-        return forwardRequest(trimmedRequest, requestForwardingDestination, headers);
+        return forwardRequest(trimmedRequest, requestForwardingDestination);
     }
 
     private String processRequest(Subrequest request) {
         // Limit concurrent clients
-        if (limitClients != null && concurrency > 0) {
+        if (concurrency > 0 && limitClients != null) {
             try {
                 limitClients.acquire();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
-        if (!latency.isNegative() && !latency.isZero()) {
+        if (!latency.isZero() && !latency.isNegative()) {
             try {
                 // Fake Overload
                 Thread.sleep(latency.toMillis());
@@ -173,7 +171,7 @@ public class RequestController {
         return "Success";
     }
 
-    private String forwardRequest(Request request, String destination, HttpHeaders originalHeaders) {
+    private String forwardRequest(Request request, String destination) {
         String requestJson;
         try {
             requestJson = new ObjectMapper().writeValueAsString(request);
@@ -190,7 +188,6 @@ public class RequestController {
         String address = String.format("http://%s", destination);
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
-        apertureFilter.getApertureSDK().addBaggage(originalHeaders.toSingleValueMap());
 
         ResponseEntity<String> response = restTemplate.exchange(address, HttpMethod.POST, entity, String.class);
         if (response.getStatusCode() != HttpStatus.OK) {

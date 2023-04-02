@@ -5,6 +5,7 @@
 replicaCount: 1
 
 simplesrv:
+  rejectRatio: 0.05
   image:
     repository: fluxninja/java-demo-app
     pullPolicy: IfNotPresent

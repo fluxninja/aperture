@@ -105,10 +105,6 @@ public class ApertureFeatureFilter implements Filter {
         }
     }
 
-    public ApertureSDK getApertureSDK() {
-        return apertureSDK;
-    }
-
     @Override
     public void destroy() {}
 }
