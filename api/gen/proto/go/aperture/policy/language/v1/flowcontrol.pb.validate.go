@@ -7541,7 +7541,7 @@ func (m *LoadShaper_Parameters_Step) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for AcceptPercentage
+	// no validation rules for TargetAcceptPercentage
 
 	if all {
 		switch v := interface{}(m.GetDuration()).(type) {

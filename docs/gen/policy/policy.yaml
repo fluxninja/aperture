@@ -2248,7 +2248,16 @@ definitions:
         x-order: 0
         $ref: '#/definitions/InPort'
   LoadShaper:
-    description: _LoadShaper_ is a component that shapes the load on a service.
+    description: 'The _Load Shaper_ component shapes the load at a service by following
+      a set of specified steps. The accept percentage begins at the target accept
+      percentage defined in the first step, and subsequently transitions linearly
+      from the previous step''s target accept percentage to the next target accept
+      percentage, over the duration of time specified for each step. Each step is
+      defined by two parameters: the target accept percentage and the duration of
+      time it takes for the signal to transition from the previous step''s target
+      accept percentage to the current step''s target accept percentage. The _Load
+      Generator_ thus produces a smooth and continuous traffic load that changes gradually
+      over time, based on the specified steps.'
     type: object
     properties:
       in_ports:
@@ -2302,7 +2311,10 @@ definitions:
     - steps
     properties:
       flow_regulator_parameters:
-        description: Parameters for the _Flow Regulator_.
+        description: |+
+          Parameters for the _Flow Regulator_.
+
+        x-go-tag-validate: required
         x-order: 0
         $ref: '#/definitions/FlowRegulatorParameters'
       steps:
@@ -2315,10 +2327,17 @@ definitions:
   LoadShaperParametersStep:
     type: object
     required:
-    - accept_percentage
     - duration
+    - target_accept_percentage
     properties:
-      accept_percentage:
+      duration:
+        description: |+
+          Duration for which the step is active.
+
+        type: string
+        x-go-tag-validate: required
+        x-order: 0
+      target_accept_percentage:
         description: |+
           The value of the step.
 
@@ -2327,13 +2346,6 @@ definitions:
         maximum: 100
         minimum: 0
         x-go-tag-validate: required,gte=0,lte=100
-        x-order: 0
-      duration:
-        description: |+
-          Duration for which the step is active.
-
-        type: string
-        x-go-tag-validate: required
         x-order: 1
   LoadShaperSeries:
     description: _LoadShaperSeries_ is a component that applies a series of _Load
@@ -3510,7 +3522,16 @@ definitions:
         x-go-tag-default: any
         x-order: 1
   SignalGenerator:
-    description: SignalGenerator generates a signal based on the steps specified.
+    description: 'The _Signal Generator_ component generates a signal by following
+      a set of specified steps. The output signal begins at the target output defined
+      in the first step, and subsequently transitions linearly from the previous step''s
+      target output to the next target output, over the duration of time specified
+      for each step. Each step is defined by two parameters: the target output and
+      the duration of time it takes for the signal to transition from the previous
+      step''s target output to the current step''s target output. The _Signal Generator_
+      thus produces a smooth and continuous signal that changes gradually over time,
+      based on the specified steps.The _Signal Generator_ is controlled to proceed
+      forwards or backwards or reset to the start based on readings of input signals.'
     type: object
     properties:
       in_ports:
@@ -3521,13 +3542,13 @@ definitions:
         $ref: '#/definitions/SignalGeneratorOuts'
       parameters:
         description: |+
-          Parameters for the _SignalGenerator_ component.
+          Parameters for the _Signal Generator_ component.
 
         x-go-tag-validate: required
         x-order: 2
         $ref: '#/definitions/SignalGeneratorParameters'
   SignalGeneratorIns:
-    description: Inputs for the _SignalGenerator_ component.
+    description: Inputs for the _Signal Generator_ component.
     type: object
     properties:
       backward:
@@ -3562,7 +3583,7 @@ definitions:
         x-order: 2
         $ref: '#/definitions/OutPort'
   SignalGeneratorParameters:
-    description: Parameters for the _SignalGenerator_ component.
+    description: Parameters for the _Signal Generator_ component.
     type: object
     required:
     - steps
@@ -3579,20 +3600,20 @@ definitions:
     required:
     - duration
     properties:
-      constant_signal:
-        description: |+
-          The value of the step.
-
-        x-go-tag-validate: required
-        x-order: 0
-        $ref: '#/definitions/ConstantSignal'
       duration:
         description: |+
           Duration for which the step is active.
 
         type: string
         x-go-tag-validate: required
+        x-order: 0
+      target_output:
+        description: |+
+          The value of the step.
+
+        x-go-tag-validate: required
         x-order: 1
+        $ref: '#/definitions/ConstantSignal'
   Switcher:
     description: |-
       `on_signal` will be returned if switch input is valid and not equal to 0.0 ,

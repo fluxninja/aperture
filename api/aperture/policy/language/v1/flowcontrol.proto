@@ -928,19 +928,19 @@ message FlowRegulator {
   Parameters parameters = 2;
 }
 
-// _LoadShaper_ is a component that shapes the load on a service.
+// The _Load Shaper_ component shapes the load at a service by following a set of specified steps. The accept percentage begins at the target accept percentage defined in the first step, and subsequently transitions linearly from the previous step's target accept percentage to the next target accept percentage, over the duration of time specified for each step. Each step is defined by two parameters: the target accept percentage and the duration of time it takes for the signal to transition from the previous step's target accept percentage to the current step's target accept percentage. The _Load Generator_ thus produces a smooth and continuous traffic load that changes gradually over time, based on the specified steps.
 message LoadShaper {
   // Parameters for the _Load Shaper_ component.
   message Parameters {
     message Step {
       // The value of the step.
-      double accept_percentage = 1; // @gotags: validate:"required,gte=0,lte=100"
+      double target_accept_percentage = 1; // @gotags: validate:"required,gte=0,lte=100"
       // Duration for which the step is active.
       google.protobuf.Duration duration = 2; // @gotags: validate:"required"
     }
 
     // Parameters for the _Flow Regulator_.
-    FlowRegulator.Parameters flow_regulator_parameters = 1;
+    FlowRegulator.Parameters flow_regulator_parameters = 1; // @gotags: validate:"required"
 
     repeated Step steps = 2; // @gotags: validate:"required,dive"
   }

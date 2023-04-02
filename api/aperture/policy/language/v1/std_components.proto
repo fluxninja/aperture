@@ -748,20 +748,20 @@ message NestedSignalEgress {
   string port_name = 2;
 }
 
-// SignalGenerator generates a signal based on the steps specified.
+// The _Signal Generator_ component generates a signal by following a set of specified steps. The output signal begins at the target output defined in the first step, and subsequently transitions linearly from the previous step's target output to the next target output, over the duration of time specified for each step. Each step is defined by two parameters: the target output and the duration of time it takes for the signal to transition from the previous step's target output to the current step's target output. The _Signal Generator_ thus produces a smooth and continuous signal that changes gradually over time, based on the specified steps.The _Signal Generator_ is controlled to proceed forwards or backwards or reset to the start based on readings of input signals.
 message SignalGenerator {
-  // Parameters for the _SignalGenerator_ component.
+  // Parameters for the _Signal Generator_ component.
   message Parameters {
     message Step {
       // The value of the step.
-      ConstantSignal constant_signal = 1; // @gotags: validate:"required"
+      ConstantSignal target_output = 1; // @gotags: validate:"required"
       // Duration for which the step is active.
       google.protobuf.Duration duration = 2; // @gotags: validate:"required"
     }
     repeated Step steps = 1; // @gotags: validate:"required,dive"
   }
 
-  // Inputs for the _SignalGenerator_ component.
+  // Inputs for the _Signal Generator_ component.
   message Ins {
     // Whether to progress the _Signal Generator_ towards the next step.
     InPort forward = 1;
@@ -784,6 +784,6 @@ message SignalGenerator {
   Ins in_ports = 1;
   Outs out_ports = 2;
 
-  // Parameters for the _SignalGenerator_ component.
+  // Parameters for the _Signal Generator_ component.
   Parameters parameters = 3; // @gotags: validate:"required"
 }

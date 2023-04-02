@@ -10293,11 +10293,11 @@ func (m *SignalGenerator_Parameters_Step) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetConstantSignal()).(type) {
+		switch v := interface{}(m.GetTargetOutput()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, SignalGenerator_Parameters_StepValidationError{
-					field:  "ConstantSignal",
+					field:  "TargetOutput",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -10305,16 +10305,16 @@ func (m *SignalGenerator_Parameters_Step) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, SignalGenerator_Parameters_StepValidationError{
-					field:  "ConstantSignal",
+					field:  "TargetOutput",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetConstantSignal()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetTargetOutput()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return SignalGenerator_Parameters_StepValidationError{
-				field:  "ConstantSignal",
+				field:  "TargetOutput",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

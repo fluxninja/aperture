@@ -1,16 +1,16 @@
 {
   new():: {
   },
-  withConstantSignal(constant_signal):: {
-    constant_signal: constant_signal,
-  },
-  withConstantSignalMixin(constant_signal):: {
-    constant_signal+: constant_signal,
-  },
   withDuration(duration):: {
     duration: duration,
   },
   withDurationMixin(duration):: {
     duration+: duration,
+  },
+  withTargetOutput(target_output):: {
+    target_output: target_output,
+  },
+  withTargetOutputMixin(target_output):: {
+    target_output+: target_output,
   },
 }

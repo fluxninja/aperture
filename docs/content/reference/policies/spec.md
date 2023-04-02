@@ -2744,7 +2744,7 @@ concurrency](#scheduler-outs) that needs to be accepted.
 
 ### LoadShaper {#load-shaper}
 
-_LoadShaper_ is a component that shapes the load on a service.
+The _Load Shaper_ component shapes the load at a service by following a set of specified steps. The accept percentage begins at the target accept percentage defined in the first step, and subsequently transitions linearly from the previous step's target accept percentage to the next target accept percentage, over the duration of time specified for each step. Each step is defined by two parameters: the target accept percentage and the duration of time it takes for the signal to transition from the previous step's target accept percentage to the current step's target accept percentage. The _Load Generator_ thus produces a smooth and continuous traffic load that changes gradually over time, based on the specified steps.
 
 <dl>
 <dt>in_ports</dt>
@@ -2847,16 +2847,16 @@ Parameters for the _Load Shaper_ component.
 ### LoadShaperParametersStep {#load-shaper-parameters-step}
 
 <dl>
-<dt>accept_percentage</dt>
-<dd>
-
-(float64, minimum: `0`, maximum: `100`, **required**) The value of the step.
-
-</dd>
 <dt>duration</dt>
 <dd>
 
 (string, **required**) Duration for which the step is active.
+
+</dd>
+<dt>target_accept_percentage</dt>
+<dd>
+
+(float64, minimum: `0`, maximum: `100`, **required**) The value of the step.
 
 </dd>
 </dl>
@@ -4278,7 +4278,7 @@ An entity (e.g. Kubernetes pod) may belong to multiple services.
 
 ### SignalGenerator {#signal-generator}
 
-SignalGenerator generates a signal based on the steps specified.
+The _Signal Generator_ component generates a signal by following a set of specified steps. The output signal begins at the target output defined in the first step, and subsequently transitions linearly from the previous step's target output to the next target output, over the duration of time specified for each step. Each step is defined by two parameters: the target output and the duration of time it takes for the signal to transition from the previous step's target output to the current step's target output. The _Signal Generator_ thus produces a smooth and continuous signal that changes gradually over time, based on the specified steps.The _Signal Generator_ is controlled to proceed forwards or backwards or reset to the start based on readings of input signals.
 
 <dl>
 <dt>in_ports</dt>
@@ -4296,7 +4296,7 @@ SignalGenerator generates a signal based on the steps specified.
 <dt>parameters</dt>
 <dd>
 
-([SignalGeneratorParameters](#signal-generator-parameters)) Parameters for the _SignalGenerator_ component.
+([SignalGeneratorParameters](#signal-generator-parameters)) Parameters for the _Signal Generator_ component.
 
 </dd>
 </dl>
@@ -4305,7 +4305,7 @@ SignalGenerator generates a signal based on the steps specified.
 
 ### SignalGeneratorIns {#signal-generator-ins}
 
-Inputs for the _SignalGenerator_ component.
+Inputs for the _Signal Generator_ component.
 
 <dl>
 <dt>backward</dt>
@@ -4359,7 +4359,7 @@ Outputs for the _Signal Generator_ component.
 
 ### SignalGeneratorParameters {#signal-generator-parameters}
 
-Parameters for the _SignalGenerator_ component.
+Parameters for the _Signal Generator_ component.
 
 <dl>
 <dt>steps</dt>
@@ -4375,16 +4375,16 @@ Parameters for the _SignalGenerator_ component.
 ### SignalGeneratorParametersStep {#signal-generator-parameters-step}
 
 <dl>
-<dt>constant_signal</dt>
-<dd>
-
-([ConstantSignal](#constant-signal)) The value of the step.
-
-</dd>
 <dt>duration</dt>
 <dd>
 
 (string, **required**) Duration for which the step is active.
+
+</dd>
+<dt>target_output</dt>
+<dd>
+
+([ConstantSignal](#constant-signal)) The value of the step.
 
 </dd>
 </dl>

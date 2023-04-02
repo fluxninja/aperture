@@ -100,13 +100,13 @@ func (sg *SignalGenerator) Execute(inPortReadings runtime.PortToReading, tickInf
 		}
 	}
 
-	currentSignal := runtime.ConstantSignalFromProto(sg.steps[sg.currentStep].ConstantSignal)
+	currentSignal := runtime.ConstantSignalFromProto(sg.steps[sg.currentStep].TargetOutput)
 	currentValue := currentSignal.Float()
 
 	if !isInterpolable(currentSignal) {
 		if sg.currentStep > 0 {
 			tickFraction := float64(sg.tickCount) / float64(sg.getStepDuration())
-			previousSignal := runtime.ConstantSignalFromProto(sg.steps[sg.currentStep-1].ConstantSignal)
+			previousSignal := runtime.ConstantSignalFromProto(sg.steps[sg.currentStep-1].TargetOutput)
 			if isInterpolable(previousSignal) {
 				previousValue := previousSignal.Float()
 				// If the previous and current values are not equal, interpolate between them. Avoid interpolation if the values are equal to prevent floating point errors.
