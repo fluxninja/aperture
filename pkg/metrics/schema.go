@@ -22,6 +22,8 @@ const (
 	RateLimiterCounterMetricName = "rate_limiter_counter"
 	// ClassifierCounterMetricName - name of the counter describing times classifier was triggered.
 	ClassifierCounterMetricName = "classifier_counter"
+	// FlowRegulatorCounterMetricName - name of the counter describing times flow regulator was triggered.
+	FlowRegulatorCounterMetricName = "flow_regulator_counter"
 
 	// DistCache metrics scraped from Olric DMaps statistics.
 
@@ -105,6 +107,8 @@ const (
 	WorkloadIndexLabel = "workload_index"
 	// LimiterDroppedLabel - label to indicate that the particular limiter has dropped the request.
 	LimiterDroppedLabel = "limiter_dropped"
+	// RegulatorDroppedLabel - label to indicate that the particular regulator has dropped the request.
+	RegulatorDroppedLabel = "regulator_dropped"
 	// SignalNameLabel - label for saving circuit signal metrics.
 	SignalNameLabel = "signal_name"
 	// SubCircuitIDLabel - label for saving circuit id in signal metrics.

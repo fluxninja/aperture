@@ -5,8 +5,6 @@ isort:skip_file
 import abc
 import aperture.flowcontrol.check.v1.check_pb2
 import grpc
-import grpc.aio
-import typing
 
 class FlowControlServiceStub:
     """FlowControlService is used to perform Flow Control operations."""
@@ -29,4 +27,4 @@ class FlowControlServiceServicer(metaclass=abc.ABCMeta):
     ) -> aperture.flowcontrol.check.v1.check_pb2.CheckResponse:
         """Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny."""
 
-def add_FlowControlServiceServicer_to_server(servicer: FlowControlServiceServicer, server: typing.Union[grpc.Server, grpc.aio.Server]) -> None: ...
+def add_FlowControlServiceServicer_to_server(servicer: FlowControlServiceServicer, server: grpc.Server) -> None: ...

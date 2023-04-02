@@ -1,17 +1,11 @@
 {
   new():: {
   },
-  withEndBehavior(end_behavior):: {
-    end_behavior: end_behavior,
+  withFlowRegulatorParameters(flow_regulator_parameters):: {
+    flow_regulator_parameters: flow_regulator_parameters,
   },
-  withEndBehaviorMixin(end_behavior):: {
-    end_behavior+: end_behavior,
-  },
-  withFluxRegulatorParameters(flux_regulator_parameters):: {
-    flux_regulator_parameters: flux_regulator_parameters,
-  },
-  withFluxRegulatorParametersMixin(flux_regulator_parameters):: {
-    flux_regulator_parameters+: flux_regulator_parameters,
+  withFlowRegulatorParametersMixin(flow_regulator_parameters):: {
+    flow_regulator_parameters+: flow_regulator_parameters,
   },
   withSteps(steps):: {
     steps:

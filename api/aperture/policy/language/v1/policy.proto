@@ -255,8 +255,8 @@ message FlowControl {
     // AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
     AIMDConcurrencyController aimd_concurrency_controller = 3;
 
-    // Flux Regulator is a component that regulates the flux of requests to the service.
-    FluxRegulator flux_regulator = 4;
+    // Flow Regulator is a component that regulates the flux of requests to the service.
+    FlowRegulator flow_regulator = 4;
 
     // LoadShaper is a component that shapes the load of the service.
     LoadShaper load_shaper = 5;
@@ -673,7 +673,7 @@ message RateLimiter {
   // Input ports for the RateLimiter component
   Ins in_ports = 1; // @gotags: validate:"required"
 
-  // Flow Selector decides the service and flows at which the rate limiter is applied.
+  // _Flow Selector_ decides the service and flows at which the rate limiter is applied.
   FlowSelector flow_selector = 2; // @gotags: validate:"required"
 
   // Parameters for the RateLimiter component
@@ -700,7 +700,7 @@ message RateLimiter {
 // ConcurrencyLimiter configuration is split into two parts: An actuation
 // strategy and a scheduler. Right now, only `load_actuator` strategy is available.
 message ConcurrencyLimiter {
-  // Flow Selector decides the service and flows at which the concurrency limiter is applied.
+  // _Flow Selector_ decides the service and flows at which the concurrency limiter is applied.
   FlowSelector flow_selector = 1; // @gotags: validate:"required"
 
   // Configuration of Weighted Fair Queuing-based workload scheduler.
@@ -1444,7 +1444,7 @@ message AIMDConcurrencyController {
   // Output ports for the AIMDConcurrencyController component.
   Outs out_ports = 2;
 
-  // Flow Selector decides the service and flows at which the concurrency limiter is applied.
+  // _Flow Selector_ decides the service and flows at which the concurrency limiter is applied.
   FlowSelector flow_selector = 3; // @gotags: validate:"required"
 
   // Scheduler parameters.
@@ -1615,25 +1615,27 @@ message AutoScaler {
   Alerter.Parameters scale_in_alerter_parameters = 13;
 }
 
-message FluxRegulator {
-  // Dynamic Configuration for _FluxRegulator_
+message FlowRegulator {
+  // Dynamic Configuration for _FlowRegulator_
   message DynamicConfig {
-    // Specify certain label values to be accepted by this flow filter regardless of accept percentage. Note: the `accept_filter` criteria still applies.
-    repeated string enable_label_values = 1; // @gotags: validate:"dive"
+    // Specify certain label values to be accepted by this flow filter regardless of accept percentage.
+    repeated string enable_label_values = 1;
   }
 
   message Parameters {
+    // _Flow Selector_ decides the service and flows at which the _Flow Regulator_  is applied.
+    FlowSelector flow_selector = 1; // @gotags: validate:"required"
+
     // The flow label key for identifying sessions.
-    // If label key is specified, _FluxRegulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
-    // If label key is not specified, _FluxRegulator_ acts as a stateless filter. Percentage of flows are selected randomly.
-    string label_key = 1;
+    // If label key is specified, _FlowRegulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
+    // If label key is not specified, _FlowRegulator_ acts as a stateless filter. Percentage of flows are selected randomly.
+    string label_key = 2;
 
-    // Accept filter is a flow selector that defines a label based accept critieria.
-    // If specified, the flows that don't match the accept filter are outright rejected.
-    FlowSelector accept_filter = 2;
+    // Configuration key for DynamicConfig.
+    string dynamic_config_key = 3;
 
-    // Rego based rules that accept or reject flows.
-    /// repeated RegoRules rules = 3;
+    // Default configuration.
+    DynamicConfig default_config = 4;
   }
 
   message Ins {
@@ -1641,20 +1643,11 @@ message FluxRegulator {
     InPort accept_percentage = 1;
   }
 
-  // Input ports for the _FluxRegulator_.
+  // Input ports for the _FlowRegulator_.
   Ins in_ports = 1;
 
-  // Flow Selector decides the service and flows at which the _Flux Regulator_  is applied.
-  FlowSelector flow_selector = 2; // @gotags: validate:"required"
-
-  // Parameters for the _FluxRegulator_.
-  Parameters parameters = 3;
-
-  // Configuration key for DynamicConfig.
-  string dynamic_config_key = 4;
-
-  // Default configuration.
-  DynamicConfig default_config = 5;
+  // Parameters for the _FlowRegulator_.
+  Parameters parameters = 2;
 }
 
 // SignalGenerator generates a signal based on the steps specified.
@@ -1668,20 +1661,26 @@ message SignalGenerator {
       google.protobuf.Duration duration = 2; // @gotags: validate:"required"
     }
     repeated Step steps = 1; // @gotags: validate:"required,dive"
-
-    string end_behavior = 2; // @gotags: default:"repeat" validate:"oneof=loop laststep"
   }
 
   // Inputs for the _SignalGenerator_ component.
   message Ins {
-    // Whether to reset the signal generator to the first step.
-    InPort reset = 1;
+    // Whether to progress the _Signal Generator_ towards the next step.
+    InPort forward = 1;
+    // Whether to progress the _Signal Generator_ towards the previous step.
+    InPort backward = 2;
+    // Whether to reset the _Signal Generator_ to the first step.
+    InPort reset = 3;
   }
 
-  // Outputs for the _SignalGenerator_ component.
+  // Outputs for the _Signal Generator_ component.
   message Outs {
     // The generated signal.
     OutPort output = 1;
+    // A boolean signal indicating whether the _Signal Generator_ is at the start of signal generation.
+    OutPort start_signal = 2;
+    // A boolean signal indicating whether the _Signal Generator_ is at the end of signal generation.
+    OutPort end_signal = 3;
   }
 
   Ins in_ports = 1;
@@ -1693,7 +1692,7 @@ message SignalGenerator {
 
 // _LoadShaper_ is a component that shapes the load on a service.
 message LoadShaper {
-  // Parameters for the _LoadShaper_ component.
+  // Parameters for the _Load Shaper_ component.
   message Parameters {
     message Step {
       // The value of the step.
@@ -1702,37 +1701,61 @@ message LoadShaper {
       google.protobuf.Duration duration = 2; // @gotags: validate:"required"
     }
 
-    // Parameters for the _Flux Regulator_.
-    FluxRegulator.Parameters flux_regulator_parameters = 1;
+    // Parameters for the _Flow Regulator_.
+    FlowRegulator.Parameters flow_regulator_parameters = 1;
 
     repeated Step steps = 2; // @gotags: validate:"required,dive"
-
-    string end_behavior = 3; // @gotags: default:"repeat" validate:"oneof=loop laststep"
   }
 
-  // Inputs for the _LoadShaper_ component.
+  // Inputs for the _Load Shaper_ component.
   message Ins {
-    // Whether to reset the load shaper to the first step.
-    InPort reset = 1;
+    // Whether to progress the _Load Shaper_ towards the next step.
+    InPort forward = 1;
+    // Whether to progress the _Load Shaper_ towards the previous step.
+    InPort backward = 2;
+    // Whether to reset the _Load Shaper_ to the first step.
+    InPort reset = 3;
   }
-
   // Outputs for the _LoadShaper_ component.
   message Outs {
-    // The percentage of flows being accepted by the _Flux Regulator_.
+    // The percentage of flows being accepted by the _Load Shaper_.
     OutPort accept_percentage = 1;
+    // A boolean signal indicating whether the _Load Shaper_ is at the start of signal generation.
+    OutPort start_signal = 2;
+    // A boolean signal indicating whether the _Load Shaper_ is at the end of signal generation.
+    OutPort end_signal = 3;
   }
 
   Ins in_ports = 1;
   Outs out_ports = 2;
 
-  // Flow Selector decides the service and flows at which the _Flux Regulator_ is applied.
-  FlowSelector flow_selector = 3; // @gotags: validate:"required"
+  Parameters parameters = 3; // @gotags: validate:"required"
+}
 
-  Parameters parameters = 4; // @gotags: validate:"required"
+// _LoadShaperSeries_ is a component that applies a series of _Load Shapers_ in order.
+message LoadShaperSeries {
+  message LoadShaperInstance {
+    // The load shaper.
+    LoadShaper.Parameters load_shaper = 1; // @gotags: validate:"required"
+    LoadShaper.Outs out_ports = 2;
+  }
+  // Parameters for the _LoadShaperSeries_ component.
+  message Parameters {
+    // An ordered list of load shapers that get applied in order.
+    repeated LoadShaperInstance load_shapers = 1; // @gotags: validate:"required,dive"
+  }
 
-  // Configuration key for DynamicConfig.
-  string dynamic_config_key = 5;
+  // Inputs for the _LoadShaperSeries_ component.
+  message Ins {
+    // Whether to progress the load shaper series towards the next step.
+    InPort forward = 1;
+    // Whether to progress the load shaper series towards the previous step.
+    InPort backward = 2;
+    // Whether to reset the load shaper series to the first step.
+    InPort reset = 3;
+  }
 
-  // Default configuration.
-  FluxRegulator.DynamicConfig default_config = 6;
+  Ins in_ports = 1;
+
+  Parameters parameters = 2; // @gotags: validate:"required"
 }

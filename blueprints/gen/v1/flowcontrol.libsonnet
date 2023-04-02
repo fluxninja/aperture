@@ -13,11 +13,11 @@
   withConcurrencyLimiterMixin(concurrency_limiter):: {
     concurrency_limiter+: concurrency_limiter,
   },
-  withFluxRegulator(flux_regulator):: {
-    flux_regulator: flux_regulator,
+  withFlowRegulator(flow_regulator):: {
+    flow_regulator: flow_regulator,
   },
-  withFluxRegulatorMixin(flux_regulator):: {
-    flux_regulator+: flux_regulator,
+  withFlowRegulatorMixin(flow_regulator):: {
+    flow_regulator+: flow_regulator,
   },
   withLoadShaper(load_shaper):: {
     load_shaper: load_shaper,

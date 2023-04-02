@@ -274,6 +274,19 @@ class LimiterDecision(google.protobuf.message.Message):
         ) -> None: ...
         def ClearField(self, field_name: typing_extensions.Literal["workload_index", b"workload_index"]) -> None: ...
 
+    @typing_extensions.final
+    class FlowRegulatorInfo(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        LABEL_FIELD_NUMBER: builtins.int
+        label: builtins.str
+        def __init__(
+            self,
+            *,
+            label: builtins.str = ...,
+        ) -> None: ...
+        def ClearField(self, field_name: typing_extensions.Literal["label", b"label"]) -> None: ...
+
     POLICY_NAME_FIELD_NUMBER: builtins.int
     POLICY_HASH_FIELD_NUMBER: builtins.int
     COMPONENT_ID_FIELD_NUMBER: builtins.int
@@ -281,6 +294,7 @@ class LimiterDecision(google.protobuf.message.Message):
     REASON_FIELD_NUMBER: builtins.int
     RATE_LIMITER_INFO_FIELD_NUMBER: builtins.int
     CONCURRENCY_LIMITER_INFO_FIELD_NUMBER: builtins.int
+    FLOW_REGULATOR_INFO_FIELD_NUMBER: builtins.int
     policy_name: builtins.str
     policy_hash: builtins.str
     component_id: builtins.str
@@ -290,6 +304,8 @@ class LimiterDecision(google.protobuf.message.Message):
     def rate_limiter_info(self) -> global___LimiterDecision.RateLimiterInfo: ...
     @property
     def concurrency_limiter_info(self) -> global___LimiterDecision.ConcurrencyLimiterInfo: ...
+    @property
+    def flow_regulator_info(self) -> global___LimiterDecision.FlowRegulatorInfo: ...
     def __init__(
         self,
         *,
@@ -300,10 +316,11 @@ class LimiterDecision(google.protobuf.message.Message):
         reason: global___LimiterDecision.LimiterReason.ValueType = ...,
         rate_limiter_info: global___LimiterDecision.RateLimiterInfo | None = ...,
         concurrency_limiter_info: global___LimiterDecision.ConcurrencyLimiterInfo | None = ...,
+        flow_regulator_info: global___LimiterDecision.FlowRegulatorInfo | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["concurrency_limiter_info", b"concurrency_limiter_info", "details", b"details", "rate_limiter_info", b"rate_limiter_info"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["component_id", b"component_id", "concurrency_limiter_info", b"concurrency_limiter_info", "details", b"details", "dropped", b"dropped", "policy_hash", b"policy_hash", "policy_name", b"policy_name", "rate_limiter_info", b"rate_limiter_info", "reason", b"reason"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["details", b"details"]) -> typing_extensions.Literal["rate_limiter_info", "concurrency_limiter_info"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["concurrency_limiter_info", b"concurrency_limiter_info", "details", b"details", "flow_regulator_info", b"flow_regulator_info", "rate_limiter_info", b"rate_limiter_info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["component_id", b"component_id", "concurrency_limiter_info", b"concurrency_limiter_info", "details", b"details", "dropped", b"dropped", "flow_regulator_info", b"flow_regulator_info", "policy_hash", b"policy_hash", "policy_name", b"policy_name", "rate_limiter_info", b"rate_limiter_info", "reason", b"reason"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["details", b"details"]) -> typing_extensions.Literal["rate_limiter_info", "concurrency_limiter_info", "flow_regulator_info"] | None: ...
 
 global___LimiterDecision = LimiterDecision
 

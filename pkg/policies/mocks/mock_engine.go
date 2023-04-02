@@ -50,6 +50,20 @@ func (mr *MockEngineMockRecorder) GetConcurrencyLimiter(limiterID interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConcurrencyLimiter", reflect.TypeOf((*MockEngine)(nil).GetConcurrencyLimiter), limiterID)
 }
 
+// GetFlowRegulator mocks base method.
+func (m *MockEngine) GetFlowRegulator(limiterID iface.LimiterID) iface.Limiter {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFlowRegulator", limiterID)
+	ret0, _ := ret[0].(iface.Limiter)
+	return ret0
+}
+
+// GetFlowRegulator indicates an expected call of GetFlowRegulator.
+func (mr *MockEngineMockRecorder) GetFlowRegulator(limiterID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFlowRegulator", reflect.TypeOf((*MockEngine)(nil).GetFlowRegulator), limiterID)
+}
+
 // GetFluxMeter mocks base method.
 func (m *MockEngine) GetFluxMeter(fluxMeterName string) iface.FluxMeter {
 	m.ctrl.T.Helper()
@@ -106,6 +120,20 @@ func (mr *MockEngineMockRecorder) RegisterConcurrencyLimiter(sa interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterConcurrencyLimiter", reflect.TypeOf((*MockEngine)(nil).RegisterConcurrencyLimiter), sa)
 }
 
+// RegisterFlowRegulator mocks base method.
+func (m *MockEngine) RegisterFlowRegulator(l iface.Limiter) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RegisterFlowRegulator", l)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RegisterFlowRegulator indicates an expected call of RegisterFlowRegulator.
+func (mr *MockEngineMockRecorder) RegisterFlowRegulator(l interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterFlowRegulator", reflect.TypeOf((*MockEngine)(nil).RegisterFlowRegulator), l)
+}
+
 // RegisterFluxMeter mocks base method.
 func (m *MockEngine) RegisterFluxMeter(fm iface.FluxMeter) error {
 	m.ctrl.T.Helper()
@@ -160,6 +188,20 @@ func (m *MockEngine) UnregisterConcurrencyLimiter(sa iface.ConcurrencyLimiter) e
 func (mr *MockEngineMockRecorder) UnregisterConcurrencyLimiter(sa interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnregisterConcurrencyLimiter", reflect.TypeOf((*MockEngine)(nil).UnregisterConcurrencyLimiter), sa)
+}
+
+// UnregisterFlowRegulator mocks base method.
+func (m *MockEngine) UnregisterFlowRegulator(l iface.Limiter) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UnregisterFlowRegulator", l)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UnregisterFlowRegulator indicates an expected call of UnregisterFlowRegulator.
+func (mr *MockEngineMockRecorder) UnregisterFlowRegulator(l interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnregisterFlowRegulator", reflect.TypeOf((*MockEngine)(nil).UnregisterFlowRegulator), l)
 }
 
 // UnregisterFluxMeter mocks base method.

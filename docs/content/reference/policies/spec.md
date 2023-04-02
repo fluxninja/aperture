@@ -46,7 +46,7 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector)) Flow Selector decides the service and flows at which the concurrency limiter is applied.
+([FlowSelector](#flow-selector)) _Flow Selector_ decides the service and flows at which the concurrency limiter is applied.
 
 </dd>
 <dt>gradient_parameters</dt>
@@ -1097,7 +1097,7 @@ strategy and a scheduler. Right now, only `load_actuator` strategy is available.
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector)) Flow Selector decides the service and flows at which the concurrency limiter is applied.
+([FlowSelector](#flow-selector)) _Flow Selector_ decides the service and flows at which the concurrency limiter is applied.
 
 </dd>
 <dt>load_actuator</dt>
@@ -1653,10 +1653,10 @@ FlowControl components are used to regulate requests flow.
 ([ConcurrencyLimiter](#concurrency-limiter)) Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
 
 </dd>
-<dt>flux_regulator</dt>
+<dt>flow_regulator</dt>
 <dd>
 
-([FluxRegulator](#flux-regulator)) Flux Regulator is a component that regulates the flux of requests to the service.
+([FlowRegulator](#flow-regulator)) Flow Regulator is a component that regulates the flux of requests to the service.
 
 </dd>
 <dt>load_shaper</dt>
@@ -1740,6 +1740,86 @@ point using classifier, and immediately use it for matching on the same
 control point.
 
 :::
+
+</dd>
+</dl>
+
+---
+
+### FlowRegulator {#flow-regulator}
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([FlowRegulatorIns](#flow-regulator-ins)) Input ports for the _FlowRegulator_.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+([FlowRegulatorParameters](#flow-regulator-parameters)) Parameters for the _FlowRegulator_.
+
+</dd>
+</dl>
+
+---
+
+### FlowRegulatorDynamicConfig {#flow-regulator-dynamic-config}
+
+Dynamic Configuration for _FlowRegulator_
+
+<dl>
+<dt>enable_label_values</dt>
+<dd>
+
+([]string) Specify certain label values to be accepted by this flow filter regardless of accept percentage.
+
+</dd>
+</dl>
+
+---
+
+### FlowRegulatorIns {#flow-regulator-ins}
+
+<dl>
+<dt>accept_percentage</dt>
+<dd>
+
+([InPort](#in-port)) The percentage of requests to accept.
+
+</dd>
+</dl>
+
+---
+
+### FlowRegulatorParameters {#flow-regulator-parameters}
+
+<dl>
+<dt>default_config</dt>
+<dd>
+
+([FlowRegulatorDynamicConfig](#flow-regulator-dynamic-config)) Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig.
+
+</dd>
+<dt>flow_selector</dt>
+<dd>
+
+([FlowSelector](#flow-selector)) _Flow Selector_ decides the service and flows at which the _Flow Regulator_ is applied.
+
+</dd>
+<dt>label_key</dt>
+<dd>
+
+(string) The flow label key for identifying sessions.
+If label key is specified, _FlowRegulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept*percentage is same or higher.
+If label key is not specified, \_FlowRegulator* acts as a stateless filter. Percentage of flows are selected randomly.
 
 </dd>
 </dl>
@@ -1954,93 +2034,6 @@ StaticBuckets holds the static value of the buckets where latency histogram will
 <dd>
 
 ([]float64, default: `[5,10,25,50,100,250,500,1000,2500,5000,10000]`) The buckets in which latency histogram will be stored.
-
-</dd>
-</dl>
-
----
-
-### FluxRegulator {#flux-regulator}
-
-<dl>
-<dt>default_config</dt>
-<dd>
-
-([FluxRegulatorDynamicConfig](#flux-regulator-dynamic-config)) Default configuration.
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-(string) Configuration key for DynamicConfig.
-
-</dd>
-<dt>flow_selector</dt>
-<dd>
-
-([FlowSelector](#flow-selector)) Flow Selector decides the service and flows at which the _Flux Regulator_ is applied.
-
-</dd>
-<dt>in_ports</dt>
-<dd>
-
-([FluxRegulatorIns](#flux-regulator-ins)) Input ports for the _FluxRegulator_.
-
-</dd>
-<dt>parameters</dt>
-<dd>
-
-([FluxRegulatorParameters](#flux-regulator-parameters)) Parameters for the _FluxRegulator_.
-
-</dd>
-</dl>
-
----
-
-### FluxRegulatorDynamicConfig {#flux-regulator-dynamic-config}
-
-Dynamic Configuration for _FluxRegulator_
-
-<dl>
-<dt>enable_label_values</dt>
-<dd>
-
-([]string) Specify certain label values to be accepted by this flow filter regardless of accept percentage. Note: the `accept_filter` criteria still applies.
-
-</dd>
-</dl>
-
----
-
-### FluxRegulatorIns {#flux-regulator-ins}
-
-<dl>
-<dt>accept_percentage</dt>
-<dd>
-
-([InPort](#in-port)) The percentage of requests to accept.
-
-</dd>
-</dl>
-
----
-
-### FluxRegulatorParameters {#flux-regulator-parameters}
-
-<dl>
-<dt>accept_filter</dt>
-<dd>
-
-([FlowSelector](#flow-selector)) Accept filter is a flow selector that defines a label based accept critieria.
-If specified, the flows that don't match the accept filter are outright rejected.
-
-</dd>
-<dt>label_key</dt>
-<dd>
-
-(string) The flow label key for identifying sessions.
-If label key is specified, _FluxRegulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept*percentage is same or higher.
-If label key is not specified, \_FluxRegulator* acts as a stateless filter. Percentage of flows are selected randomly.
 
 </dd>
 </dl>
@@ -2711,24 +2704,6 @@ concurrency](#scheduler-outs) that needs to be accepted.
 _LoadShaper_ is a component that shapes the load on a service.
 
 <dl>
-<dt>default_config</dt>
-<dd>
-
-([FluxRegulatorDynamicConfig](#flux-regulator-dynamic-config)) Default configuration.
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-(string) Configuration key for DynamicConfig.
-
-</dd>
-<dt>flow_selector</dt>
-<dd>
-
-([FlowSelector](#flow-selector)) Flow Selector decides the service and flows at which the _Flux Regulator_ is applied.
-
-</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -2753,13 +2728,25 @@ _LoadShaper_ is a component that shapes the load on a service.
 
 ### LoadShaperIns {#load-shaper-ins}
 
-Inputs for the _LoadShaper_ component.
+Inputs for the _Load Shaper_ component.
 
 <dl>
+<dt>backward</dt>
+<dd>
+
+([InPort](#in-port)) Whether to progress the _Load Shaper_ towards the previous step.
+
+</dd>
+<dt>forward</dt>
+<dd>
+
+([InPort](#in-port)) Whether to progress the _Load Shaper_ towards the next step.
+
+</dd>
 <dt>reset</dt>
 <dd>
 
-([InPort](#in-port)) Whether to reset the load shaper to the first step.
+([InPort](#in-port)) Whether to reset the _Load Shaper_ to the first step.
 
 </dd>
 </dl>
@@ -2774,7 +2761,19 @@ Outputs for the _LoadShaper_ component.
 <dt>accept_percentage</dt>
 <dd>
 
-([OutPort](#out-port)) The percentage of flows being accepted by the _Flux Regulator_.
+([OutPort](#out-port)) The percentage of flows being accepted by the _Load Shaper_.
+
+</dd>
+<dt>end_signal</dt>
+<dd>
+
+([OutPort](#out-port)) A boolean signal indicating whether the _Load Shaper_ is at the end of signal generation.
+
+</dd>
+<dt>start_signal</dt>
+<dd>
+
+([OutPort](#out-port)) A boolean signal indicating whether the _Load Shaper_ is at the start of signal generation.
 
 </dd>
 </dl>
@@ -2783,19 +2782,13 @@ Outputs for the _LoadShaper_ component.
 
 ### LoadShaperParameters {#load-shaper-parameters}
 
-Parameters for the _LoadShaper_ component.
+Parameters for the _Load Shaper_ component.
 
 <dl>
-<dt>end_behavior</dt>
+<dt>flow_regulator_parameters</dt>
 <dd>
 
-(string, oneof: `loop | laststep`, default: `"repeat"`)
-
-</dd>
-<dt>flux_regulator_parameters</dt>
-<dd>
-
-([FluxRegulatorParameters](#flux-regulator-parameters)) Parameters for the _Flux Regulator_.
+([FlowRegulatorParameters](#flow-regulator-parameters)) Parameters for the _Flow Regulator_.
 
 </dd>
 <dt>steps</dt>
@@ -3533,7 +3526,7 @@ to select which label should be used as key.
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector)) Flow Selector decides the service and flows at which the rate limiter is applied.
+([FlowSelector](#flow-selector)) _Flow Selector_ decides the service and flows at which the rate limiter is applied.
 
 </dd>
 <dt>in_ports</dt>
@@ -4104,10 +4097,22 @@ SignalGenerator generates a signal based on the steps specified.
 Inputs for the _SignalGenerator_ component.
 
 <dl>
+<dt>backward</dt>
+<dd>
+
+([InPort](#in-port)) Whether to progress the _Signal Generator_ towards the previous step.
+
+</dd>
+<dt>forward</dt>
+<dd>
+
+([InPort](#in-port)) Whether to progress the _Signal Generator_ towards the next step.
+
+</dd>
 <dt>reset</dt>
 <dd>
 
-([InPort](#in-port)) Whether to reset the signal generator to the first step.
+([InPort](#in-port)) Whether to reset the _Signal Generator_ to the first step.
 
 </dd>
 </dl>
@@ -4116,13 +4121,25 @@ Inputs for the _SignalGenerator_ component.
 
 ### SignalGeneratorOuts {#signal-generator-outs}
 
-Outputs for the _SignalGenerator_ component.
+Outputs for the _Signal Generator_ component.
 
 <dl>
+<dt>end_signal</dt>
+<dd>
+
+([OutPort](#out-port)) A boolean signal indicating whether the _Signal Generator_ is at the end of signal generation.
+
+</dd>
 <dt>output</dt>
 <dd>
 
 ([OutPort](#out-port)) The generated signal.
+
+</dd>
+<dt>start_signal</dt>
+<dd>
+
+([OutPort](#out-port)) A boolean signal indicating whether the _Signal Generator_ is at the start of signal generation.
 
 </dd>
 </dl>
@@ -4134,12 +4151,6 @@ Outputs for the _SignalGenerator_ component.
 Parameters for the _SignalGenerator_ component.
 
 <dl>
-<dt>end_behavior</dt>
-<dd>
-
-(string, oneof: `loop | laststep`, default: `"repeat"`)
-
-</dd>
 <dt>steps</dt>
 <dd>
 

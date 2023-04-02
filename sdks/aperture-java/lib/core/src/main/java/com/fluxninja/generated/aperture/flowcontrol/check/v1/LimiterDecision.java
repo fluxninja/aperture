@@ -113,6 +113,20 @@ private static final long serialVersionUID = 0L;
             detailsCase_ = 7;
             break;
           }
+          case 66: {
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.Builder subBuilder = null;
+            if (detailsCase_ == 8) {
+              subBuilder = ((com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo) details_).toBuilder();
+            }
+            details_ =
+                input.readMessage(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom((com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo) details_);
+              details_ = subBuilder.buildPartial();
+            }
+            detailsCase_ = 8;
+            break;
+          }
           default: {
             if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
@@ -1537,6 +1551,576 @@ private static final long serialVersionUID = 0L;
 
   }
 
+  public interface FlowRegulatorInfoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string label = 1 [json_name = "label"];</code>
+     * @return The label.
+     */
+    java.lang.String getLabel();
+    /**
+     * <code>string label = 1 [json_name = "label"];</code>
+     * @return The bytes for label.
+     */
+    com.google.protobuf.ByteString
+        getLabelBytes();
+  }
+  /**
+   * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo}
+   */
+  public static final class FlowRegulatorInfo extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo)
+      FlowRegulatorInfoOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use FlowRegulatorInfo.newBuilder() to construct.
+    private FlowRegulatorInfo(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private FlowRegulatorInfo() {
+      label_ = "";
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new FlowRegulatorInfo();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private FlowRegulatorInfo(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              label_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_FlowRegulatorInfo_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_FlowRegulatorInfo_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.Builder.class);
+    }
+
+    public static final int LABEL_FIELD_NUMBER = 1;
+    private volatile java.lang.Object label_;
+    /**
+     * <code>string label = 1 [json_name = "label"];</code>
+     * @return The label.
+     */
+    @java.lang.Override
+    public java.lang.String getLabel() {
+      java.lang.Object ref = label_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        label_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string label = 1 [json_name = "label"];</code>
+     * @return The bytes for label.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getLabelBytes() {
+      java.lang.Object ref = label_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        label_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(label_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, label_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(label_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, label_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo)) {
+        return super.equals(obj);
+      }
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo other = (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo) obj;
+
+      if (!getLabel()
+          .equals(other.getLabel())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + LABEL_FIELD_NUMBER;
+      hash = (53 * hash) + getLabel().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo)
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_FlowRegulatorInfo_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_FlowRegulatorInfo_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.Builder.class);
+      }
+
+      // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        label_ = "";
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_FlowRegulatorInfo_descriptor;
+      }
+
+      @java.lang.Override
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo getDefaultInstanceForType() {
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo build() {
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo buildPartial() {
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo result = new com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo(this);
+        result.label_ = label_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo) {
+          return mergeFrom((com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo other) {
+        if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.getDefaultInstance()) return this;
+        if (!other.getLabel().isEmpty()) {
+          label_ = other.label_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object label_ = "";
+      /**
+       * <code>string label = 1 [json_name = "label"];</code>
+       * @return The label.
+       */
+      public java.lang.String getLabel() {
+        java.lang.Object ref = label_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          label_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string label = 1 [json_name = "label"];</code>
+       * @return The bytes for label.
+       */
+      public com.google.protobuf.ByteString
+          getLabelBytes() {
+        java.lang.Object ref = label_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          label_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string label = 1 [json_name = "label"];</code>
+       * @param value The label to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLabel(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        label_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string label = 1 [json_name = "label"];</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLabel() {
+        
+        label_ = getDefaultInstance().getLabel();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string label = 1 [json_name = "label"];</code>
+       * @param value The bytes for label to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLabelBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        label_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo)
+    }
+
+    // @@protoc_insertion_point(class_scope:aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo)
+    private static final com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo();
+    }
+
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<FlowRegulatorInfo>
+        PARSER = new com.google.protobuf.AbstractParser<FlowRegulatorInfo>() {
+      @java.lang.Override
+      public FlowRegulatorInfo parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new FlowRegulatorInfo(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<FlowRegulatorInfo> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FlowRegulatorInfo> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private int detailsCase_ = 0;
   private java.lang.Object details_;
   public enum DetailsCase
@@ -1544,6 +2128,7 @@ private static final long serialVersionUID = 0L;
           com.google.protobuf.AbstractMessage.InternalOneOfEnum {
     RATE_LIMITER_INFO(6),
     CONCURRENCY_LIMITER_INFO(7),
+    FLOW_REGULATOR_INFO(8),
     DETAILS_NOT_SET(0);
     private final int value;
     private DetailsCase(int value) {
@@ -1563,6 +2148,7 @@ private static final long serialVersionUID = 0L;
       switch (value) {
         case 6: return RATE_LIMITER_INFO;
         case 7: return CONCURRENCY_LIMITER_INFO;
+        case 8: return FLOW_REGULATOR_INFO;
         case 0: return DETAILS_NOT_SET;
         default: return null;
       }
@@ -1784,6 +2370,37 @@ private static final long serialVersionUID = 0L;
     return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance();
   }
 
+  public static final int FLOW_REGULATOR_INFO_FIELD_NUMBER = 8;
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo flow_regulator_info = 8 [json_name = "flowRegulatorInfo"];</code>
+   * @return Whether the flowRegulatorInfo field is set.
+   */
+  @java.lang.Override
+  public boolean hasFlowRegulatorInfo() {
+    return detailsCase_ == 8;
+  }
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo flow_regulator_info = 8 [json_name = "flowRegulatorInfo"];</code>
+   * @return The flowRegulatorInfo.
+   */
+  @java.lang.Override
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo getFlowRegulatorInfo() {
+    if (detailsCase_ == 8) {
+       return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo) details_;
+    }
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.getDefaultInstance();
+  }
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo flow_regulator_info = 8 [json_name = "flowRegulatorInfo"];</code>
+   */
+  @java.lang.Override
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfoOrBuilder getFlowRegulatorInfoOrBuilder() {
+    if (detailsCase_ == 8) {
+       return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo) details_;
+    }
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.getDefaultInstance();
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -1819,6 +2436,9 @@ private static final long serialVersionUID = 0L;
     if (detailsCase_ == 7) {
       output.writeMessage(7, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_);
     }
+    if (detailsCase_ == 8) {
+      output.writeMessage(8, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo) details_);
+    }
     unknownFields.writeTo(output);
   }
 
@@ -1852,6 +2472,10 @@ private static final long serialVersionUID = 0L;
     if (detailsCase_ == 7) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(7, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_);
+    }
+    if (detailsCase_ == 8) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(8, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo) details_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -1887,6 +2511,10 @@ private static final long serialVersionUID = 0L;
         if (!getConcurrencyLimiterInfo()
             .equals(other.getConcurrencyLimiterInfo())) return false;
         break;
+      case 8:
+        if (!getFlowRegulatorInfo()
+            .equals(other.getFlowRegulatorInfo())) return false;
+        break;
       case 0:
       default:
     }
@@ -1920,6 +2548,10 @@ private static final long serialVersionUID = 0L;
       case 7:
         hash = (37 * hash) + CONCURRENCY_LIMITER_INFO_FIELD_NUMBER;
         hash = (53 * hash) + getConcurrencyLimiterInfo().hashCode();
+        break;
+      case 8:
+        hash = (37 * hash) + FLOW_REGULATOR_INFO_FIELD_NUMBER;
+        hash = (53 * hash) + getFlowRegulatorInfo().hashCode();
         break;
       case 0:
       default:
@@ -2118,6 +2750,13 @@ private static final long serialVersionUID = 0L;
           result.details_ = concurrencyLimiterInfoBuilder_.build();
         }
       }
+      if (detailsCase_ == 8) {
+        if (flowRegulatorInfoBuilder_ == null) {
+          result.details_ = details_;
+        } else {
+          result.details_ = flowRegulatorInfoBuilder_.build();
+        }
+      }
       result.detailsCase_ = detailsCase_;
       onBuilt();
       return result;
@@ -2192,6 +2831,10 @@ private static final long serialVersionUID = 0L;
         }
         case CONCURRENCY_LIMITER_INFO: {
           mergeConcurrencyLimiterInfo(other.getConcurrencyLimiterInfo());
+          break;
+        }
+        case FLOW_REGULATOR_INFO: {
+          mergeFlowRegulatorInfo(other.getFlowRegulatorInfo());
           break;
         }
         case DETAILS_NOT_SET: {
@@ -2837,6 +3480,148 @@ private static final long serialVersionUID = 0L;
       detailsCase_ = 7;
       onChanged();;
       return concurrencyLimiterInfoBuilder_;
+    }
+
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfoOrBuilder> flowRegulatorInfoBuilder_;
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo flow_regulator_info = 8 [json_name = "flowRegulatorInfo"];</code>
+     * @return Whether the flowRegulatorInfo field is set.
+     */
+    @java.lang.Override
+    public boolean hasFlowRegulatorInfo() {
+      return detailsCase_ == 8;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo flow_regulator_info = 8 [json_name = "flowRegulatorInfo"];</code>
+     * @return The flowRegulatorInfo.
+     */
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo getFlowRegulatorInfo() {
+      if (flowRegulatorInfoBuilder_ == null) {
+        if (detailsCase_ == 8) {
+          return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo) details_;
+        }
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.getDefaultInstance();
+      } else {
+        if (detailsCase_ == 8) {
+          return flowRegulatorInfoBuilder_.getMessage();
+        }
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.getDefaultInstance();
+      }
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo flow_regulator_info = 8 [json_name = "flowRegulatorInfo"];</code>
+     */
+    public Builder setFlowRegulatorInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo value) {
+      if (flowRegulatorInfoBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        details_ = value;
+        onChanged();
+      } else {
+        flowRegulatorInfoBuilder_.setMessage(value);
+      }
+      detailsCase_ = 8;
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo flow_regulator_info = 8 [json_name = "flowRegulatorInfo"];</code>
+     */
+    public Builder setFlowRegulatorInfo(
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.Builder builderForValue) {
+      if (flowRegulatorInfoBuilder_ == null) {
+        details_ = builderForValue.build();
+        onChanged();
+      } else {
+        flowRegulatorInfoBuilder_.setMessage(builderForValue.build());
+      }
+      detailsCase_ = 8;
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo flow_regulator_info = 8 [json_name = "flowRegulatorInfo"];</code>
+     */
+    public Builder mergeFlowRegulatorInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo value) {
+      if (flowRegulatorInfoBuilder_ == null) {
+        if (detailsCase_ == 8 &&
+            details_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.getDefaultInstance()) {
+          details_ = com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.newBuilder((com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo) details_)
+              .mergeFrom(value).buildPartial();
+        } else {
+          details_ = value;
+        }
+        onChanged();
+      } else {
+        if (detailsCase_ == 8) {
+          flowRegulatorInfoBuilder_.mergeFrom(value);
+        } else {
+          flowRegulatorInfoBuilder_.setMessage(value);
+        }
+      }
+      detailsCase_ = 8;
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo flow_regulator_info = 8 [json_name = "flowRegulatorInfo"];</code>
+     */
+    public Builder clearFlowRegulatorInfo() {
+      if (flowRegulatorInfoBuilder_ == null) {
+        if (detailsCase_ == 8) {
+          detailsCase_ = 0;
+          details_ = null;
+          onChanged();
+        }
+      } else {
+        if (detailsCase_ == 8) {
+          detailsCase_ = 0;
+          details_ = null;
+        }
+        flowRegulatorInfoBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo flow_regulator_info = 8 [json_name = "flowRegulatorInfo"];</code>
+     */
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.Builder getFlowRegulatorInfoBuilder() {
+      return getFlowRegulatorInfoFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo flow_regulator_info = 8 [json_name = "flowRegulatorInfo"];</code>
+     */
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfoOrBuilder getFlowRegulatorInfoOrBuilder() {
+      if ((detailsCase_ == 8) && (flowRegulatorInfoBuilder_ != null)) {
+        return flowRegulatorInfoBuilder_.getMessageOrBuilder();
+      } else {
+        if (detailsCase_ == 8) {
+          return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo) details_;
+        }
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.getDefaultInstance();
+      }
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo flow_regulator_info = 8 [json_name = "flowRegulatorInfo"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfoOrBuilder> 
+        getFlowRegulatorInfoFieldBuilder() {
+      if (flowRegulatorInfoBuilder_ == null) {
+        if (!(detailsCase_ == 8)) {
+          details_ = com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.getDefaultInstance();
+        }
+        flowRegulatorInfoBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfoOrBuilder>(
+                (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.FlowRegulatorInfo) details_,
+                getParentForChildren(),
+                isClean());
+        details_ = null;
+      }
+      detailsCase_ = 8;
+      onChanged();;
+      return flowRegulatorInfoBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

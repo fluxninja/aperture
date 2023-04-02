@@ -43,7 +43,7 @@ definitions:
         x-order: 2
       flow_selector:
         description: |+
-          Flow Selector decides the service and flows at which the concurrency limiter is applied.
+          _Flow Selector_ decides the service and flows at which the concurrency limiter is applied.
 
         x-go-tag-validate: required
         x-order: 3
@@ -900,7 +900,7 @@ definitions:
     properties:
       flow_selector:
         description: |+
-          Flow Selector decides the service and flows at which the concurrency limiter is applied.
+          _Flow Selector_ decides the service and flows at which the concurrency limiter is applied.
 
         x-go-tag-validate: required
         x-order: 0
@@ -1347,11 +1347,11 @@ definitions:
           load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
         x-order: 1
         $ref: '#/definitions/ConcurrencyLimiter'
-      flux_regulator:
-        description: Flux Regulator is a component that regulates the flux of requests
+      flow_regulator:
+        description: Flow Regulator is a component that regulates the flux of requests
           to the service.
         x-order: 2
-        $ref: '#/definitions/FluxRegulator'
+        $ref: '#/definitions/FlowRegulator'
       load_shaper:
         description: LoadShaper is a component that shapes the load of the service.
         x-order: 3
@@ -1428,6 +1428,60 @@ definitions:
           must also be satisfied (in addition to service+control point matching)
         x-order: 1
         $ref: '#/definitions/LabelMatcher'
+  FlowRegulator:
+    type: object
+    properties:
+      in_ports:
+        description: Input ports for the _FlowRegulator_.
+        x-order: 0
+        $ref: '#/definitions/FlowRegulatorIns'
+      parameters:
+        description: Parameters for the _FlowRegulator_.
+        x-order: 1
+        $ref: '#/definitions/FlowRegulatorParameters'
+  FlowRegulatorDynamicConfig:
+    type: object
+    title: Dynamic Configuration for _FlowRegulator_
+    properties:
+      enable_label_values:
+        description: Specify certain label values to be accepted by this flow filter
+          regardless of accept percentage.
+        type: array
+        items:
+          type: string
+        x-order: 0
+  FlowRegulatorIns:
+    type: object
+    properties:
+      accept_percentage:
+        description: The percentage of requests to accept.
+        x-order: 0
+        $ref: '#/definitions/InPort'
+  FlowRegulatorParameters:
+    type: object
+    properties:
+      default_config:
+        description: Default configuration.
+        x-order: 0
+        $ref: '#/definitions/FlowRegulatorDynamicConfig'
+      dynamic_config_key:
+        description: Configuration key for DynamicConfig.
+        type: string
+        x-order: 1
+      flow_selector:
+        description: |+
+          _Flow Selector_ decides the service and flows at which the _Flow Regulator_  is applied.
+
+        x-go-tag-validate: required
+        x-order: 2
+        $ref: '#/definitions/FlowSelector'
+      label_key:
+        description: |-
+          The flow label key for identifying sessions.
+          If label key is specified, _FlowRegulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
+          If label key is not specified, _FlowRegulator_ acts as a stateless filter. Percentage of flows are selected randomly.
+        type: string
+        x-order: 3
   FlowSelector:
     description: |-
       :::info
@@ -1621,68 +1675,6 @@ definitions:
           format: double
         x-go-tag-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
         x-order: 0
-  FluxRegulator:
-    type: object
-    properties:
-      default_config:
-        description: Default configuration.
-        x-order: 0
-        $ref: '#/definitions/FluxRegulatorDynamicConfig'
-      dynamic_config_key:
-        description: Configuration key for DynamicConfig.
-        type: string
-        x-order: 1
-      flow_selector:
-        description: |+
-          Flow Selector decides the service and flows at which the _Flux Regulator_  is applied.
-
-        x-go-tag-validate: required
-        x-order: 2
-        $ref: '#/definitions/FlowSelector'
-      in_ports:
-        description: Input ports for the _FluxRegulator_.
-        x-order: 3
-        $ref: '#/definitions/FluxRegulatorIns'
-      parameters:
-        description: Parameters for the _FluxRegulator_.
-        x-order: 4
-        $ref: '#/definitions/FluxRegulatorParameters'
-  FluxRegulatorDynamicConfig:
-    type: object
-    title: Dynamic Configuration for _FluxRegulator_
-    properties:
-      enable_label_values:
-        description: |+
-          Specify certain label values to be accepted by this flow filter regardless of accept percentage. Note: the `accept_filter` criteria still applies.
-
-        type: array
-        items:
-          type: string
-        x-go-tag-validate: dive
-        x-order: 0
-  FluxRegulatorIns:
-    type: object
-    properties:
-      accept_percentage:
-        description: The percentage of requests to accept.
-        x-order: 0
-        $ref: '#/definitions/InPort'
-  FluxRegulatorParameters:
-    type: object
-    properties:
-      accept_filter:
-        description: |-
-          Accept filter is a flow selector that defines a label based accept critieria.
-          If specified, the flows that don't match the accept filter are outright rejected.
-        x-order: 0
-        $ref: '#/definitions/FlowSelector'
-      label_key:
-        description: |-
-          The flow label key for identifying sessions.
-          If label key is specified, _FluxRegulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
-          If label key is not specified, _FluxRegulator_ acts as a stateless filter. Percentage of flows are selected randomly.
-        type: string
-        x-order: 1
   GradientController:
     description: |-
       The `gradient` describes a corrective factor that should be applied to the
@@ -2211,73 +2203,66 @@ definitions:
     description: _LoadShaper_ is a component that shapes the load on a service.
     type: object
     properties:
-      default_config:
-        description: Default configuration.
-        x-order: 0
-        $ref: '#/definitions/FluxRegulatorDynamicConfig'
-      dynamic_config_key:
-        description: Configuration key for DynamicConfig.
-        type: string
-        x-order: 1
-      flow_selector:
-        description: |+
-          Flow Selector decides the service and flows at which the _Flux Regulator_ is applied.
-
-        x-go-tag-validate: required
-        x-order: 2
-        $ref: '#/definitions/FlowSelector'
       in_ports:
-        x-order: 3
+        x-order: 0
         $ref: '#/definitions/LoadShaperIns'
       out_ports:
-        x-order: 4
+        x-order: 1
         $ref: '#/definitions/LoadShaperOuts'
       parameters:
         x-go-tag-validate: required
-        x-order: 5
+        x-order: 2
         $ref: '#/definitions/LoadShaperParameters'
   LoadShaperIns:
-    description: Inputs for the _LoadShaper_ component.
+    description: Inputs for the _Load Shaper_ component.
     type: object
     properties:
-      reset:
-        description: Whether to reset the load shaper to the first step.
+      backward:
+        description: Whether to progress the _Load Shaper_ towards the previous step.
         x-order: 0
+        $ref: '#/definitions/InPort'
+      forward:
+        description: Whether to progress the _Load Shaper_ towards the next step.
+        x-order: 1
+        $ref: '#/definitions/InPort'
+      reset:
+        description: Whether to reset the _Load Shaper_ to the first step.
+        x-order: 2
         $ref: '#/definitions/InPort'
   LoadShaperOuts:
     description: Outputs for the _LoadShaper_ component.
     type: object
     properties:
       accept_percentage:
-        description: The percentage of flows being accepted by the _Flux Regulator_.
+        description: The percentage of flows being accepted by the _Load Shaper_.
         x-order: 0
         $ref: '#/definitions/OutPort'
+      end_signal:
+        description: A boolean signal indicating whether the _Load Shaper_ is at the
+          end of signal generation.
+        x-order: 1
+        $ref: '#/definitions/OutPort'
+      start_signal:
+        description: A boolean signal indicating whether the _Load Shaper_ is at the
+          start of signal generation.
+        x-order: 2
+        $ref: '#/definitions/OutPort'
   LoadShaperParameters:
-    description: Parameters for the _LoadShaper_ component.
+    description: Parameters for the _Load Shaper_ component.
     type: object
     required:
     - steps
     properties:
-      end_behavior:
-        type: string
-        default: repeat
-        enum:
-        - loop
-        - laststep
-        x-go-tag-default: repeat
-        x-go-tag-validate: oneof=loop laststep
-        x-oneof: loop | laststep
+      flow_regulator_parameters:
+        description: Parameters for the _Flow Regulator_.
         x-order: 0
-      flux_regulator_parameters:
-        description: Parameters for the _Flux Regulator_.
-        x-order: 1
-        $ref: '#/definitions/FluxRegulatorParameters'
+        $ref: '#/definitions/FlowRegulatorParameters'
       steps:
         type: array
         items:
           $ref: '#/definitions/LoadShaperParametersStep'
         x-go-tag-validate: required,dive
-        x-order: 2
+        x-order: 1
   LoadShaperParametersStep:
     type: object
     required:
@@ -2805,7 +2790,7 @@ definitions:
         x-order: 1
       flow_selector:
         description: |+
-          Flow Selector decides the service and flows at which the rate limiter is applied.
+          _Flow Selector_ decides the service and flows at which the rate limiter is applied.
 
         x-go-tag-validate: required
         x-order: 2
@@ -3342,17 +3327,36 @@ definitions:
     description: Inputs for the _SignalGenerator_ component.
     type: object
     properties:
-      reset:
-        description: Whether to reset the signal generator to the first step.
+      backward:
+        description: Whether to progress the _Signal Generator_ towards the previous
+          step.
         x-order: 0
         $ref: '#/definitions/InPort'
+      forward:
+        description: Whether to progress the _Signal Generator_ towards the next step.
+        x-order: 1
+        $ref: '#/definitions/InPort'
+      reset:
+        description: Whether to reset the _Signal Generator_ to the first step.
+        x-order: 2
+        $ref: '#/definitions/InPort'
   SignalGeneratorOuts:
-    description: Outputs for the _SignalGenerator_ component.
+    description: Outputs for the _Signal Generator_ component.
     type: object
     properties:
+      end_signal:
+        description: A boolean signal indicating whether the _Signal Generator_ is
+          at the end of signal generation.
+        x-order: 0
+        $ref: '#/definitions/OutPort'
       output:
         description: The generated signal.
-        x-order: 0
+        x-order: 1
+        $ref: '#/definitions/OutPort'
+      start_signal:
+        description: A boolean signal indicating whether the _Signal Generator_ is
+          at the start of signal generation.
+        x-order: 2
         $ref: '#/definitions/OutPort'
   SignalGeneratorParameters:
     description: Parameters for the _SignalGenerator_ component.
@@ -3360,22 +3364,12 @@ definitions:
     required:
     - steps
     properties:
-      end_behavior:
-        type: string
-        default: repeat
-        enum:
-        - loop
-        - laststep
-        x-go-tag-default: repeat
-        x-go-tag-validate: oneof=loop laststep
-        x-oneof: loop | laststep
-        x-order: 0
       steps:
         type: array
         items:
           $ref: '#/definitions/SignalGeneratorParametersStep'
         x-go-tag-validate: required,dive
-        x-order: 1
+        x-order: 0
   SignalGeneratorParametersStep:
     type: object
     required:

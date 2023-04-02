@@ -150,6 +150,12 @@ func (constantSignal *ConstantSignal) Float() float64 {
 	return value
 }
 
+// IsSpecial returns true if the constant signal is a special value.
+func (constantSignal *ConstantSignal) IsSpecial() bool {
+	float := constantSignal.Float()
+	return math.IsNaN(float) || math.IsInf(float, 0)
+}
+
 // ConstantSignalFromProto creates a ConstantSignal from a proto message.
 func ConstantSignalFromProto(constantSignalProto *policylangv1.ConstantSignal) *ConstantSignal {
 	return &ConstantSignal{

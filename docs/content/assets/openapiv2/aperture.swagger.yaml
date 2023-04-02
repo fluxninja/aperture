@@ -16,7 +16,7 @@ definitions:
             flow_selector:
                 $ref: '#/definitions/FlowSelector'
                 description: |+
-                    Flow Selector decides the service and flows at which the concurrency limiter is applied.
+                    _Flow Selector_ decides the service and flows at which the concurrency limiter is applied.
 
                 x-go-tag-validate: required
             gradient_parameters:
@@ -942,7 +942,7 @@ definitions:
             flow_selector:
                 $ref: '#/definitions/FlowSelector'
                 description: |+
-                    Flow Selector decides the service and flows at which the concurrency limiter is applied.
+                    _Flow Selector_ decides the service and flows at which the concurrency limiter is applied.
 
                 x-go-tag-validate: required
             load_actuator:
@@ -1453,9 +1453,9 @@ definitions:
             concurrency_limiter:
                 $ref: '#/definitions/ConcurrencyLimiter'
                 description: Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
-            flux_regulator:
-                $ref: '#/definitions/FluxRegulator'
-                description: Flux Regulator is a component that regulates the flux of requests to the service.
+            flow_regulator:
+                $ref: '#/definitions/FlowRegulator'
+                description: Flow Regulator is a component that regulates the flux of requests to the service.
             load_shaper:
                 $ref: '#/definitions/LoadShaper'
                 description: LoadShaper is a component that shapes the load of the service.
@@ -1542,6 +1542,51 @@ definitions:
             Describes which flows a [flow control
             component](/concepts/integrations/flow-control/flow-control.md#components) should apply
             to
+        type: object
+    FlowRegulator:
+        properties:
+            in_ports:
+                $ref: '#/definitions/FlowRegulatorIns'
+                description: Input ports for the _FlowRegulator_.
+            parameters:
+                $ref: '#/definitions/FlowRegulatorParameters'
+                description: Parameters for the _FlowRegulator_.
+        type: object
+    FlowRegulatorDynamicConfig:
+        properties:
+            enable_label_values:
+                description: Specify certain label values to be accepted by this flow filter regardless of accept percentage.
+                items:
+                    type: string
+                type: array
+        title: Dynamic Configuration for _FlowRegulator_
+        type: object
+    FlowRegulatorIns:
+        properties:
+            accept_percentage:
+                $ref: '#/definitions/InPort'
+                description: The percentage of requests to accept.
+        type: object
+    FlowRegulatorParameters:
+        properties:
+            default_config:
+                $ref: '#/definitions/FlowRegulatorDynamicConfig'
+                description: Default configuration.
+            dynamic_config_key:
+                description: Configuration key for DynamicConfig.
+                type: string
+            flow_selector:
+                $ref: '#/definitions/FlowSelector'
+                description: |+
+                    _Flow Selector_ decides the service and flows at which the _Flow Regulator_  is applied.
+
+                x-go-tag-validate: required
+            label_key:
+                description: |-
+                    The flow label key for identifying sessions.
+                    If label key is specified, _FlowRegulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
+                    If label key is not specified, _FlowRegulator_ acts as a stateless filter. Percentage of flows are selected randomly.
+                type: string
         type: object
     FlowSelector:
         description: |-
@@ -1722,59 +1767,6 @@ definitions:
                     type: number
                 type: array
                 x-go-tag-default: '[5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]'
-        type: object
-    FluxRegulator:
-        properties:
-            default_config:
-                $ref: '#/definitions/FluxRegulatorDynamicConfig'
-                description: Default configuration.
-            dynamic_config_key:
-                description: Configuration key for DynamicConfig.
-                type: string
-            flow_selector:
-                $ref: '#/definitions/FlowSelector'
-                description: |+
-                    Flow Selector decides the service and flows at which the _Flux Regulator_  is applied.
-
-                x-go-tag-validate: required
-            in_ports:
-                $ref: '#/definitions/FluxRegulatorIns'
-                description: Input ports for the _FluxRegulator_.
-            parameters:
-                $ref: '#/definitions/FluxRegulatorParameters'
-                description: Parameters for the _FluxRegulator_.
-        type: object
-    FluxRegulatorDynamicConfig:
-        properties:
-            enable_label_values:
-                description: |+
-                    Specify certain label values to be accepted by this flow filter regardless of accept percentage. Note: the `accept_filter` criteria still applies.
-
-                items:
-                    type: string
-                type: array
-                x-go-tag-validate: dive
-        title: Dynamic Configuration for _FluxRegulator_
-        type: object
-    FluxRegulatorIns:
-        properties:
-            accept_percentage:
-                $ref: '#/definitions/InPort'
-                description: The percentage of requests to accept.
-        type: object
-    FluxRegulatorParameters:
-        properties:
-            accept_filter:
-                $ref: '#/definitions/FlowSelector'
-                description: |-
-                    Accept filter is a flow selector that defines a label based accept critieria.
-                    If specified, the flows that don't match the accept filter are outright rejected.
-            label_key:
-                description: |-
-                    The flow label key for identifying sessions.
-                    If label key is specified, _FluxRegulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
-                    If label key is not specified, _FluxRegulator_ acts as a stateless filter. Percentage of flows are selected randomly.
-                type: string
         type: object
     GetPoliciesResponse:
         properties:
@@ -2270,6 +2262,8 @@ definitions:
                 $ref: '#/definitions/LimiterDecisionConcurrencyLimiterInfo'
             dropped:
                 type: boolean
+            flow_regulator_info:
+                $ref: '#/definitions/LimiterDecisionFlowRegulatorInfo'
             policy_hash:
                 type: string
             policy_name:
@@ -2282,6 +2276,11 @@ definitions:
     LimiterDecisionConcurrencyLimiterInfo:
         properties:
             workload_index:
+                type: string
+        type: object
+    LimiterDecisionFlowRegulatorInfo:
+        properties:
+            label:
                 type: string
         type: object
     LimiterDecisionLimiterReason:
@@ -2392,18 +2391,6 @@ definitions:
     LoadShaper:
         description: _LoadShaper_ is a component that shapes the load on a service.
         properties:
-            default_config:
-                $ref: '#/definitions/FluxRegulatorDynamicConfig'
-                description: Default configuration.
-            dynamic_config_key:
-                description: Configuration key for DynamicConfig.
-                type: string
-            flow_selector:
-                $ref: '#/definitions/FlowSelector'
-                description: |+
-                    Flow Selector decides the service and flows at which the _Flux Regulator_ is applied.
-
-                x-go-tag-validate: required
             in_ports:
                 $ref: '#/definitions/LoadShaperIns'
             out_ports:
@@ -2413,34 +2400,37 @@ definitions:
                 x-go-tag-validate: required
         type: object
     LoadShaperIns:
-        description: Inputs for the _LoadShaper_ component.
+        description: Inputs for the _Load Shaper_ component.
         properties:
+            backward:
+                $ref: '#/definitions/InPort'
+                description: Whether to progress the _Load Shaper_ towards the previous step.
+            forward:
+                $ref: '#/definitions/InPort'
+                description: Whether to progress the _Load Shaper_ towards the next step.
             reset:
                 $ref: '#/definitions/InPort'
-                description: Whether to reset the load shaper to the first step.
+                description: Whether to reset the _Load Shaper_ to the first step.
         type: object
     LoadShaperOuts:
         description: Outputs for the _LoadShaper_ component.
         properties:
             accept_percentage:
                 $ref: '#/definitions/OutPort'
-                description: The percentage of flows being accepted by the _Flux Regulator_.
+                description: The percentage of flows being accepted by the _Load Shaper_.
+            end_signal:
+                $ref: '#/definitions/OutPort'
+                description: A boolean signal indicating whether the _Load Shaper_ is at the end of signal generation.
+            start_signal:
+                $ref: '#/definitions/OutPort'
+                description: A boolean signal indicating whether the _Load Shaper_ is at the start of signal generation.
         type: object
     LoadShaperParameters:
-        description: Parameters for the _LoadShaper_ component.
+        description: Parameters for the _Load Shaper_ component.
         properties:
-            end_behavior:
-                default: repeat
-                enum:
-                    - loop
-                    - laststep
-                type: string
-                x-go-tag-default: repeat
-                x-go-tag-validate: oneof=loop laststep
-                x-oneof: loop | laststep
-            flux_regulator_parameters:
-                $ref: '#/definitions/FluxRegulatorParameters'
-                description: Parameters for the _Flux Regulator_.
+            flow_regulator_parameters:
+                $ref: '#/definitions/FlowRegulatorParameters'
+                description: Parameters for the _Flow Regulator_.
             steps:
                 items:
                     $ref: '#/definitions/LoadShaperParametersStep'
@@ -3092,7 +3082,7 @@ definitions:
             flow_selector:
                 $ref: '#/definitions/FlowSelector'
                 description: |+
-                    Flow Selector decides the service and flows at which the rate limiter is applied.
+                    _Flow Selector_ decides the service and flows at which the rate limiter is applied.
 
                 x-go-tag-validate: required
             in_ports:
@@ -3685,29 +3675,32 @@ definitions:
     SignalGeneratorIns:
         description: Inputs for the _SignalGenerator_ component.
         properties:
+            backward:
+                $ref: '#/definitions/InPort'
+                description: Whether to progress the _Signal Generator_ towards the previous step.
+            forward:
+                $ref: '#/definitions/InPort'
+                description: Whether to progress the _Signal Generator_ towards the next step.
             reset:
                 $ref: '#/definitions/InPort'
-                description: Whether to reset the signal generator to the first step.
+                description: Whether to reset the _Signal Generator_ to the first step.
         type: object
     SignalGeneratorOuts:
-        description: Outputs for the _SignalGenerator_ component.
+        description: Outputs for the _Signal Generator_ component.
         properties:
+            end_signal:
+                $ref: '#/definitions/OutPort'
+                description: A boolean signal indicating whether the _Signal Generator_ is at the end of signal generation.
             output:
                 $ref: '#/definitions/OutPort'
                 description: The generated signal.
+            start_signal:
+                $ref: '#/definitions/OutPort'
+                description: A boolean signal indicating whether the _Signal Generator_ is at the start of signal generation.
         type: object
     SignalGeneratorParameters:
         description: Parameters for the _SignalGenerator_ component.
         properties:
-            end_behavior:
-                default: repeat
-                enum:
-                    - loop
-                    - laststep
-                type: string
-                x-go-tag-default: repeat
-                x-go-tag-validate: oneof=loop laststep
-                x-oneof: loop | laststep
             steps:
                 items:
                     $ref: '#/definitions/SignalGeneratorParametersStep'

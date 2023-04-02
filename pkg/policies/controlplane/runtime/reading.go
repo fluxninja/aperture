@@ -16,11 +16,19 @@ type reading struct {
 	value float64
 }
 
-// NewReading creates a reading with the given value.
+// NewReading creates a reading with the given float value.
 func NewReading(value float64) Reading {
 	return &reading{
 		value: value,
 	}
+}
+
+// NewBoolReading creates a reading with the given bool value.
+func NewBoolReading(value bool) Reading {
+	if value {
+		return NewReading(1)
+	}
+	return NewReading(0)
 }
 
 // InvalidReading creates a reading with 'value' set to math.NaN(), invalid value.

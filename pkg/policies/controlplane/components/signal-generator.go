@@ -3,6 +3,7 @@ package components
 import (
 	"fmt"
 	"math"
+	"time"
 
 	"go.uber.org/fx"
 
@@ -16,11 +17,12 @@ import (
 
 // SignalGenerator generates a signal based on the steps specified.
 type SignalGenerator struct {
-	endBehavior  string
-	steps        []*policylangv1.SignalGenerator_Parameters_Step
-	currentStep  int
-	tickCount    uint32
-	stepDuration uint32
+	steps            []*policylangv1.SignalGenerator_Parameters_Step
+	currentStep      int
+	tickCount        int32
+	atStart          bool
+	atEnd            bool
+	evaluationPeriod time.Duration
 }
 
 // Name implements runtime.Component.
@@ -42,11 +44,12 @@ func NewSignalGeneratorAndOptions(generatorProto *policylangv1.SignalGenerator, 
 	evaluationPeriod := policyReadAPI.GetEvaluationInterval()
 
 	signalGenerator := &SignalGenerator{
-		steps:        generatorProto.Parameters.Steps,
-		endBehavior:  generatorProto.Parameters.EndBehavior,
-		currentStep:  0,
-		tickCount:    0,
-		stepDuration: uint32(math.Ceil(float64(generatorProto.Parameters.Steps[0].Duration.AsDuration()) / float64(evaluationPeriod))),
+		steps:            generatorProto.Parameters.Steps,
+		currentStep:      0,
+		tickCount:        0,
+		atStart:          true,
+		atEnd:            false,
+		evaluationPeriod: evaluationPeriod,
 	}
 	return signalGenerator, fx.Options(), nil
 }
@@ -54,37 +57,110 @@ func NewSignalGeneratorAndOptions(generatorProto *policylangv1.SignalGenerator, 
 // Execute implements runtime.Component.Execute.
 func (sg *SignalGenerator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
 	resetVal := inPortReadings.ReadSingleReadingPort("reset")
+	forwardVal := inPortReadings.ReadSingleReadingPort("forward")
+	backwardVal := inPortReadings.ReadSingleReadingPort("backward")
+
+	direction := 0
+	forward := tristate.FromReading(forwardVal).IsTrue()
+	backward := tristate.FromReading(backwardVal).IsTrue()
+
+	if (forward && backward) ||
+		(!forward && !backward) {
+		direction = 0
+	} else if forward {
+		direction = 1
+	} else if backward {
+		direction = -1
+	}
+
 	if tristate.FromReading(resetVal).IsTrue() {
 		sg.currentStep = 0
 		sg.tickCount = 0
-		sg.stepDuration = uint32(math.Ceil(float64(sg.steps[sg.currentStep].Duration.AsDuration()) / float64(tickInfo.Interval())))
-	} else {
-		sg.tickCount++
+		sg.atStart = true
+		sg.atEnd = false
+	} else if direction == 1 {
+		if sg.atStart {
+			sg.atStart = false
+		}
 
-		if sg.tickCount >= sg.stepDuration {
-			sg.tickCount = 0
+		if !sg.atEnd {
+			sg.tickCount++
+			// Process tick updates currentStep and atEnd if necessary
+			sg.processForwardTick()
+		}
+	} else if direction == -1 {
+		if sg.atEnd {
+			sg.atEnd = false
+		}
 
-			sg.currentStep++
-
-			if sg.currentStep >= len(sg.steps) {
-				switch sg.endBehavior {
-				case "loop":
-					sg.currentStep = 0
-				case "laststep":
-					sg.currentStep = len(sg.steps) - 1
-				default:
-					return nil, fmt.Errorf("invalid end_behavior: %s", sg.endBehavior)
-				}
-			}
-			sg.stepDuration = uint32(math.Ceil(float64(sg.steps[sg.currentStep].Duration.AsDuration()) / float64(tickInfo.Interval())))
+		if !sg.atStart {
+			sg.tickCount--
+			// Process tick updates currentStep and atStart if necessary
+			sg.processBackwardTick()
 		}
 	}
 
 	currentSignal := runtime.ConstantSignalFromProto(sg.steps[sg.currentStep].ConstantSignal)
 	currentValue := currentSignal.Float()
+
+	if !isInterpolable(currentSignal) {
+		if sg.currentStep > 0 {
+			tickFraction := float64(sg.tickCount) / float64(sg.getStepDuration())
+			previousSignal := runtime.ConstantSignalFromProto(sg.steps[sg.currentStep-1].ConstantSignal)
+			if isInterpolable(previousSignal) {
+				previousValue := previousSignal.Float()
+				// If the previous and current values are not equal, interpolate between them. Avoid interpolation if the values are equal to prevent floating point errors.
+				if currentValue != previousValue {
+					// Interpolate between previous and current value
+					currentValue = previousValue + (currentValue-previousValue)*tickFraction
+				}
+			}
+		}
+	}
+
 	return runtime.PortToReading{
-		"output": []runtime.Reading{runtime.NewReading(currentValue)},
+		"output":       []runtime.Reading{runtime.NewReading(currentValue)},
+		"start_signal": []runtime.Reading{runtime.NewBoolReading(sg.atStart)},
+		"end_signal":   []runtime.Reading{runtime.NewBoolReading(sg.atEnd)},
 	}, nil
+}
+
+func isInterpolable(constantSignal *runtime.ConstantSignal) bool {
+	return !constantSignal.IsSpecial()
+}
+
+func (sg *SignalGenerator) processForwardTick() {
+	if sg.tickCount == sg.getStepDuration() {
+		sg.currentStep++
+		if sg.currentStep >= len(sg.steps) {
+			sg.currentStep = len(sg.steps) - 1
+			sg.atEnd = true
+			sg.tickCount = sg.getStepDuration() - 1
+		} else {
+			sg.tickCount = 0
+		}
+	}
+}
+
+func (sg *SignalGenerator) processBackwardTick() {
+	if sg.tickCount == -1 {
+		sg.currentStep--
+		if sg.currentStep < 0 {
+			sg.currentStep = 0
+			sg.atStart = true
+			sg.tickCount = 0
+		} else {
+			sg.tickCount = sg.getStepDuration() - 1
+		}
+	}
+}
+
+func (sg *SignalGenerator) getStepDuration() int32 {
+	stepDuration := float64(sg.steps[sg.currentStep].Duration.AsDuration())
+	if stepDuration == 0 {
+		return 1
+	}
+	return int32(math.Ceil(stepDuration / float64(sg.evaluationPeriod)))
 }
 
 // DynamicConfigUpdate is a no-op for SignalGenerator.
