@@ -72,4 +72,4 @@ Configuration parameters for the FluxNinja ARC Extension are available below:
 
 How various components interact with the extension:
 
-- [Flow labels](/concepts/integrations/flow-control/flow-label.md#extension)
+- [Flow labels](/concepts/flow-control/flow-label.md#extension)

@@ -22,12 +22,12 @@ const (
 )
 
 // Describes which flow in which service a [flow control
-// component](/concepts/integrations/flow-control/flow-control.md#components) should apply
+// component](/concepts/flow-control/flow-control.md#components) should apply
 // to
 //
 // :::info
 //
-// See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 //
 // :::
 type FlowSelector struct {
@@ -88,12 +88,12 @@ func (x *FlowSelector) GetFlowMatcher() *FlowMatcher {
 }
 
 // Describes which service a [flow control or observability
-// component](/concepts/integrations/flow-control/flow-control.md#components) should apply
+// component](/concepts/flow-control/flow-control.md#components) should apply
 // to
 //
 // :::info
 //
-// See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 //
 // :::
 type ServiceSelector struct {
@@ -101,7 +101,7 @@ type ServiceSelector struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Which [agent-group](/concepts/integrations/flow-control/flow-selector.md#agent-group) this
+	// Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
 	// selector applies to.
 	//
 	// :::info
@@ -113,7 +113,7 @@ type ServiceSelector struct {
 	// :::
 	AgentGroup string `protobuf:"bytes,1,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"default"` // @gotags: default:"default"
 	// The Fully Qualified Domain Name of the
-	// [service](/concepts/integrations/flow-control/flow-selector.md) to select.
+	// [service](/concepts/flow-control/flow-selector.md) to select.
 	//
 	// In Kubernetes, this is the FQDN of the Service object.
 	//
@@ -185,12 +185,12 @@ func (x *ServiceSelector) GetService() string {
 }
 
 // Describes which flows a [flow control
-// component](/concepts/integrations/flow-control/flow-control.md#components) should apply
+// component](/concepts/flow-control/flow-control.md#components) should apply
 // to
 //
 // :::info
 //
-// See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+// See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 //
 // :::
 // Example:
@@ -217,18 +217,18 @@ type FlowMatcher struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// [Control Point](/concepts/integrations/flow-control/flow-selector.md#control-point)
+	// [Control Point](/concepts/flow-control/flow-selector.md#control-point)
 	// identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
 	// block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
 	// or filter chains.
 	ControlPoint string `protobuf:"bytes,1,opt,name=control_point,json=controlPoint,proto3" json:"control_point,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Label matcher allows to add _additional_ condition on
-	// [flow labels](/concepts/integrations/flow-control/flow-label.md)
+	// [flow labels](/concepts/flow-control/flow-label.md)
 	// must also be satisfied (in addition to service+control point matching)
 	//
 	// :::info
 	//
-	// See also [Label Matcher overview](/concepts/integrations/flow-control/flow-selector.md#label-matcher).
+	// See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
 	//
 	// :::
 	//
@@ -360,7 +360,7 @@ func (x *FlowControlResources) GetClassifiers() []*Classifier {
 //
 // :::info
 //
-// See also [Flux Meter overview](/concepts/integrations/flow-control/resources/flux-meter.md).
+// See also [Flux Meter overview](/concepts/flow-control/resources/flux-meter.md).
 //
 // :::
 // Example:
@@ -519,7 +519,7 @@ func (*FluxMeter_ExponentialBucketsRange_) isFluxMeter_HistogramBuckets() {}
 //
 // :::info
 //
-// See also [Classifier overview](/concepts/integrations/flow-control/resources/classifier.md).
+// See also [Classifier overview](/concepts/flow-control/resources/classifier.md).
 //
 // :::
 // Example
@@ -554,7 +554,7 @@ type Classifier struct {
 	// Defines where to apply the flow classification rule.
 	FlowSelector *FlowSelector `protobuf:"bytes,1,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required"` // @gotags: validate:"required"
 	// A map of {key, value} pairs mapping from
-	// [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
+	// [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
 	// how to extract and propagate flow labels with that key.
 	Rules map[string]*Rule `protobuf:"bytes,2,rep,name=rules,proto3" json:"rules,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"dive,keys,required,endkeys,required"` // @gotags: validate:"dive,keys,required,endkeys,required"
 	// Rego based classification
@@ -640,7 +640,7 @@ type Rule struct {
 	//	*Rule_Rego_
 	Source isRule_Source `protobuf_oneof:"source"`
 	// Decides if the created flow label should be available as an attribute in OLAP telemetry and
-	// propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
+	// propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
 	//
 	// :::note
 	//
@@ -742,7 +742,7 @@ func (*Rule_Rego_) isRule_Source() {}
 //
 // :::info
 //
-// You can use the [live-preview](/concepts/integrations/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
+// You can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
 //
 // :::
 //
@@ -779,7 +779,7 @@ type Rego struct {
 	unknownFields protoimpl.UnknownFields
 
 	// A map of {key, value} pairs mapping from
-	// [flow label](/concepts/integrations/flow-control/flow-label.md) keys to queries that define
+	// [flow label](/concepts/flow-control/flow-label.md) keys to queries that define
 	// how to extract and propagate flow labels with that key.
 	// The name of the label maps to a variable in the rego module, i.e. it maps to `data.<package>.<label>` variable.
 	Labels map[string]*Rego_LabelProperties `protobuf:"bytes,1,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"required,gt=0,dive,keys,required,endkeys,required"` // @gotags: validate:"required,gt=0,dive,keys,required,endkeys,required"
@@ -1362,7 +1362,7 @@ func (*FlowControl_AimdConcurrencyController) isFlowControl_Component() {}
 //
 // :::info
 //
-// See also [Rate Limiter overview](/concepts/integrations/flow-control/components/rate-limiter.md).
+// See also [Rate Limiter overview](/concepts/flow-control/components/rate-limiter.md).
 //
 // :::
 //
@@ -1456,7 +1456,7 @@ func (x *RateLimiter) GetDefaultConfig() *RateLimiter_DynamicConfig {
 //
 // :::info
 //
-// See also [Concurrency Limiter overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).
+// See also [Concurrency Limiter overview](/concepts/flow-control/components/concurrency-limiter.md).
 //
 // :::
 //
@@ -2146,7 +2146,7 @@ type Rego_LabelProperties struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Decides if the created flow label should be available as an attribute in OLAP telemetry and
-	// propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
+	// propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
 	//
 	// :::note
 	//
@@ -2213,7 +2213,7 @@ type RateLimiter_Parameters struct {
 	// Specifies which label the ratelimiter should be keyed by.
 	//
 	// Rate limiting is done independently for each value of the
-	// [label](/concepts/integrations/flow-control/flow-label.md) with given key.
+	// [label](/concepts/flow-control/flow-label.md) with given key.
 	// Eg., to give each user a separate limit, assuming you have a _user_ flow
 	// label set up, set `label_key: "user"`.
 	LabelKey string `protobuf:"bytes,2,opt,name=label_key,json=labelKey,proto3" json:"label_key,omitempty" validate:"required"` // @gotags: validate:"required"
@@ -2503,7 +2503,7 @@ type Scheduler_Workload struct {
 	// Parameters associated with flows matching the label matcher.
 	Parameters *Scheduler_Workload_Parameters `protobuf:"bytes,1,opt,name=parameters,proto3" json:"parameters,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Label Matcher to select a Workload based on
-	// [flow labels](/concepts/integrations/flow-control/flow-label.md).
+	// [flow labels](/concepts/flow-control/flow-label.md).
 	LabelMatcher *LabelMatcher `protobuf:"bytes,2,opt,name=label_matcher,json=labelMatcher,proto3" json:"label_matcher,omitempty" validate:"required"` // @gotags: validate:"required"
 }
 
@@ -2561,7 +2561,7 @@ type Scheduler_Parameters struct {
 
 	// List of workloads to be used in scheduler.
 	//
-	// Categorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads
+	// Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
 	// allows for load-shedding to be "smarter" than just "randomly deny 50% of
 	// requests". There are two aspects of this "smartness":
 	//   - Scheduler can more precisely calculate concurrency if it understands
@@ -2578,7 +2578,7 @@ type Scheduler_Parameters struct {
 	// :::info
 	//
 	// See also [workload definition in the concepts
-	// section](/concepts/integrations/flow-control/components/concurrency-limiter.md#workload).
+	// section](/concepts/flow-control/components/concurrency-limiter.md#workload).
 	//
 	// :::
 	Workloads []*Scheduler_Workload `protobuf:"bytes,1,rep,name=workloads,proto3" json:"workloads,omitempty" validate:"dive"` // @gotags: validate:"dive"
@@ -2701,7 +2701,7 @@ type Scheduler_Outs struct {
 	// :::info
 	//
 	// Concurrency is a unitless number describing mean number of
-	// [flows](/concepts/integrations/flow-control/flow-control.md#flow) being
+	// [flows](/concepts/flow-control/flow-control.md#flow) being
 	// concurrently processed by the system (system = control point).
 	// Concurrency is calculated as _work_ done per unit of time (so
 	// work-seconds per world-seconds). Work-seconds are computed based on
@@ -2786,7 +2786,7 @@ type Scheduler_Workload_Parameters struct {
 	// This override is applicable only if tokens for the request are not specified in the request.
 	Tokens uint64 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty"`
 	// Fairness key is a label key that can be used to provide fairness within a workload.
-	// Any [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if
+	// Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
 	// you have a classifier that sets `user` flow label, you might want to set
 	// `fairness_key = "user"`.
 	FairnessKey string `protobuf:"bytes,3,opt,name=fairness_key,json=fairnessKey,proto3" json:"fairness_key,omitempty"`

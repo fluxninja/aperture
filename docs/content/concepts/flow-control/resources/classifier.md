@@ -216,8 +216,8 @@ See [full example in reference][reference]
 [attr-context]:
   https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 [rego-playground]: https://play.openpolicyagent.org/p/mG0sXxCNdQ
-[label]: /concepts/integrations/flow-control/flow-label.md
-[baggage]: /concepts/integrations/flow-control/flow-label.md#baggage
+[label]: /concepts/flow-control/flow-label.md
+[baggage]: /concepts/flow-control/flow-label.md#baggage
 [request-labels]: ../flow-label.md#request-labels
 [reference]: /reference/policies/spec.md#classifier
 [rule]: /reference/policies/spec.md#rule

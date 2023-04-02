@@ -26,8 +26,8 @@ Meter name with the policy name.
 :::caution warning
 
 _Flux Meters_ with repeated names within the same
-[_Agent Group_](/concepts/integrations/flow-control/flow-selector.md#agent-group)
-will fail to load at the agents.
+[_Agent Group_](/concepts/flow-control/flow-selector.md#agent-group) will fail
+to load at the agents.
 
 :::
 
@@ -112,7 +112,7 @@ down to fine-grained APIs attributes such as endpoints, user types (subscriber
 vs. logged out) and so on.
 
 [reference]: /reference/policies/spec.md#flux-meter
-[flow-selector]: /concepts/integrations/flow-control/flow-selector.md
+[flow-selector]: /concepts/flow-control/flow-selector.md
 [flow-control-integration]: ../flow-control.md#insertion
 [histogram-metric]: https://prometheus.io/docs/practices/histograms/
 [quantiles]: https://prometheus.io/docs/practices/histograms/#quantiles

@@ -35,5 +35,4 @@ information.
 ## Configure Auto-Scaling Policies
 
 Auto-scaling policies are configured at the Aperture Controller. Refer to
-[tutorials](tutorials/integrations/auto-scale/auto-scale.md) for some example
-policies.
+[tutorials](tutorials/auto-scale/auto-scale.md) for some example policies.

@@ -17,10 +17,10 @@ key:value pair. If a flow is annotated with `user_tier:gold` label, then
 
 _Flow Labels_ are used in different ways in Aperture:
 
-- [_Flow Selector_][flow-selector] can select flows based on _Flow Labels_, thus
-  flow labels can be used to narrow the scope of [_Classifiers_][classifier],
-  [_Flux Meters_][flux-meter] etc.
-- _Flow Labels_ are used to map a flow to a [_Workload_][workload].
+- [_Flow Selector_][flow-selector] can select flows based on _Flow Labels_, to
+  narrow the scope of [_Classifiers_][classifier], [_Flux Meters_][flux-meter]
+  etc.
+- Map a flow to a [_Workload_][workload].
 - Fairness within [_Scheduler_][scheduler] and [_Rate Limiter_][ratelimiter]
   keys are also based on _Flow Labels_.
 
@@ -33,8 +33,8 @@ baggage, flow classifiers, and explicit labels from the Aperture SDK call.
 
 For each HTTP [_Control Point_][control-point] (where flows are HTTP or GRPC
 requests), some basic metadata is available as _request labels_. These are
-`http.method` , `http.target`, `http.host`, `http.scheme`,
-`http.request_content_length` and `http.flavor`. Additionally all (non-pseudo)
+`http.method`, `http.target`, `http.host`, `http.scheme`,
+`http.request_content_length` and `http.flavor`. Additionally, all (non-pseudo)
 headers are available as `http.request.header.header_name`, e.g.
 `http.request.header.user_agent` (note the snake_case!). Values of these labels
 are described by [OpenTelemetry semantic conventions for HTTP
@@ -116,7 +116,7 @@ Returns:
 
 Alternatively, you can use the
 [Introspection API](reference/api/agent/flow-preview-service-preview-flow-labels.api.mdx)
-directly on an `aperture-agent` local to the service instances (pods):
+directly on a `aperture-agent` local to the service instances (pods):
 
 ```sh
 curl -X POST localhost:8080/v1/flowcontrol/preview/labels/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
@@ -131,30 +131,30 @@ collected from the following sources:
   Configuration][istio])
 - Traces from [Aperture SDK][aperture-go]
 
-Aperture uses OpenTelemetry's robust pipelining for receiving the telemetry data
+Aperture uses OpenTelemetry's robust pipelines for receiving the telemetry data
 and produce other streams of data from it.
 
 ### Metrics
 
-Prometheus metrics are generated from the telemetry data that is received. Along
-the path of the flows, telemetry data is tagged by the [flux meters][flux-meter]
-and [workloads][workload] that matched.
+Prometheus' metrics are generated from the telemetry data that is received.
+Along the path of the flows, telemetry data is tagged by the [flux
+meters][flux-meter] and [workloads][workload] that matched.
 
-### OLAP-style telemetry
+### OLAP style telemetry
 
-OLAP-style telemetry data is generated as OpenTelemetry logs and is saved in an
-OLAP database. This is done by creating multi-dimensional rollups from flow
+OLAP style telemetry data is generated as OpenTelemetry logs and is saved in an
+OLAP database. This is done by creating multidimensional roll ups from flow
 labels.
 
-OLAP-style telemetry doesn't work well with extremely high-cardinality labels,
-thus if a extremely high-cardinality label is detected, some of its values may
+OLAP style telemetry doesn't work well with extremely high-cardinality labels,
+thus if an extremely high-cardinality label is detected, some of its values may
 be replaced with `REDACTED_VIA_CARDINALITY_LIMIT` string.
 
 #### Default labels
 
-These are protocol-level labels (e.g. http, network) extracted by the configured
-service mesh/middleware and are available to be referenced in [Label
-Matchers][label-matchers], except for a few high-cardinality ones.
+These are protocol-level labels (e.g. HTTP, network) extracted by the configured
+service mesh/middleware and are available to be referenced in [Flow
+Matchers][flow-matcher], except for a few high-cardinality ones.
 
 #### Labels extracted from baggage
 
@@ -181,8 +181,8 @@ precedence over:
 All the flow Labels are used as labels of flow events. These events are rolled
 up and sent to the analytics database in the FluxNinja ARC. This allows:
 
-- For the _Flow Labels_ to be used as filters or group bys
-- To see analytics for each _Flow Label_, eg. distribution of its values
+- For the _Flow Labels_ to be used as filters or group-by
+- To see analytics for each _Flow Label_, e.g. distribution of its values
 
 :::note
 
@@ -207,3 +207,4 @@ For _Classifier_ created labels, you can disable this behavior by setting
 [istio]: /get-started/integrations/flow-control/envoy/istio.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
 [aperturectl]: /get-started/aperture-cli/aperture-cli.md
+[flow-matcher]: ./flow-selector.md#flow-matcher

@@ -21,7 +21,7 @@ const (
 )
 
 // Allows to define rules whether a map of
-// [labels](/concepts/integrations/flow-control/flow-label.md)
+// [labels](/concepts/flow-control/flow-label.md)
 // should be considered a match or not
 //
 // It provides three ways to define requirements:

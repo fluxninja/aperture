@@ -8,13 +8,11 @@ keywords:
   - opentelemetry
 ---
 
-# Flow Control
-
 ```mdx-code-block
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
-import {apertureVersion} from '../../../apertureVersion.js';
+import {apertureVersion} from '../../apertureVersion.js';
 ```
 
 Modern web-scale apps are a complex network of inter-connected microservices

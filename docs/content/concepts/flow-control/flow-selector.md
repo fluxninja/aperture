@@ -49,11 +49,11 @@ See also [_Flow Matcher_ reference](/reference/policies/spec.md#flow-matcher)
 ### Control Point {#control-point}
 
 Control points are similar to
-[feature flags](https://en.wikipedia.org/wiki/Feature_toggle). Control points
-identify the location in the code or dataplane (web servers, service meshes, API
-gateways, etc) where flow control decisions are applied. They are defined by
-developers using the SDKs or configured when integrating with API Gateways or
-Service Meshes.
+[feature flags](https://en.wikipedia.org/wiki/Feature_toggle). They identify the
+location in the code or data plane (web servers, service meshes, API gateways,
+etc.) where flow control decisions are applied. They are defined by developers
+using the SDKs or configured when integrating with API Gateways or Service
+Meshes.
 
 <Zoom>
 
@@ -81,7 +81,7 @@ graph LR
 </Zoom>
 
 In the above diagram, each service has **HTTP** control points. Every incoming
-API request to a service is a flow at its **ingress** control point. Likewise
+API request to a service is a flow at its **ingress** control point. Likewise,
 every outgoing request from a service is a flow at its **egress** control point.
 
 In addition, `Frontend` service has **Feature** control points identifying
@@ -161,14 +161,14 @@ control requests.
 
 _Agent Group_ is a flexible label that defines a collection of agents that
 operate as peers. For example, an Agent Group can be a Kubernetes cluster name
-in case of DaemonSet deployment or it can be a service name for sidecar
+in case of DaemonSet deployment, or it can be a service name for sidecar
 deployments.
 
 _Agent Group_ also defines the scope of **Agent-to-Agent synchronization**.
 Agents within their group form a peer-to-peer network to synchronize
 fine-grained state such as per-label global counters that are used for [rate
 limiting purposes][dc]. Also, all the agents within an _Agent Group_ instantiate
-the same set of [flowcontrol components][components], as published by Aperture
+the same set of [flow control components][components], as published by Aperture
 Controller.
 
 ### Service {#service}
@@ -185,7 +185,7 @@ components to execute.
 
 :::note
 
-An entity (K8s Pod, VM, etc) may belong to multiple services.
+An entity (K8s Pod, VM, etc.) may belong to multiple services.
 
 :::
 
@@ -204,7 +204,7 @@ entries can also be created manually via configuration.
 :::
 
 Services in Aperture are scoped within _Agent Groups_, creating two level
-hierarchy, eg.:
+hierarchies, e.g.:
 
 <Zoom>
 
@@ -240,7 +240,7 @@ graph TB
 
 </Zoom>
 
-as an other extreme, if your _Agent Groups_ already group entities into logical
+as another extreme, if your _Agent Groups_ already group entities into logical
 services, you can treat the _Agent Group_ as a service to match flows to
 policies (useful when installing as a sidecar):
 
@@ -261,8 +261,8 @@ graph TB
 
 </Zoom>
 
-_Agent group_ name together with _service_ name determine the [service][service]
-to select flows from.
+_Agent Group_ name together with _Service_ name determine the
+[service](#service) to select flows from.
 
 [label]: ./flow-label.md
 [flux-meter]: ./resources/flux-meter.md
