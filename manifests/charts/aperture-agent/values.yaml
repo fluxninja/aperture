@@ -536,11 +536,12 @@ agent:
     otel:
       custom_metrics:
         rabbitmq:
+          per_agent_group: true
           pipeline:
             processors:
-            - batch
+              - batch
             receivers:
-            - rabbitmq
+              - rabbitmq
           processors:
             batch:
               send_batch_size: 10
