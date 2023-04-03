@@ -4,13 +4,23 @@ import { randomIntBetween } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
 import { vu } from "k6/execution";
 import encoding from "k6/encoding";
 
+export let vuStages = [
+  { target: 600, duration: "1m" },
+  { target: 5000, duration: "2m" },
+  { target: 10000, duration: "4m" },
+  { target: 600, duration: "5m" },
+];
+
 export let options = {
   discardResponseBodies: true,
   scenarios: {
     user: {
-      executor: "constant-vus",
-      vus: 1,
-      duration: "30s",
+      executor: "ramping-arrival-rate",
+      startRate: 2,
+      timeUnit: "1m",
+      preAllocatedVUs: 2,
+      maxVUs: 50,
+      stages: vuStages,
       env: { USER_TYPE: "user" },
     },
   },

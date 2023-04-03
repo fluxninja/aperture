@@ -42,18 +42,18 @@ function(cfg) {
                            ))
     + policy.withCircuit(
       circuit.new()
-      + circuit.withEvaluationInterval('1s')
+      + circuit.withEvaluationInterval(evaluation_interval='1s')
       + circuit.withComponents(
         [
           component.withQuery(
             query.new()
             + query.withPromql(
-              local q = 'sum(rabbitmq_message_current{rabbitmq_queue_name="service3-demo-app.demoapp.svc.cluster.local",state="ready"})';
+              local q = 'sum(rabbitmq_message_current{rabbitmq_queue_name="%(queue_name)s",state="ready"})' % { queue_name: params.queue_name };
               promQL.new()
               + promQL.withQueryString(q)
               + promQL.withEvaluationInterval('1s')
-              + promQL.withOutPorts({ output: port.withSignalName('RABBITMQ_QUEUE_READY') }),
-            )
+              + promQL.withOutPorts({ output: port.withSignalName('QUEUE_BUILDUP') }),
+            ),
           ),
           component.withFlowControl(
             flowControl.new()
@@ -69,8 +69,8 @@ function(cfg) {
               + aimdConcurrencyController.withDynamicConfigKey('concurrency_controller')
               + aimdConcurrencyController.withDefaultConfig(params.concurrency_controller.default_config)
               + aimdConcurrencyController.withInPorts({
-                signal: port.withSignalName('RABBITMQ_QUEUE_READY'),
-                setpoint: port.withConstantSignal(1000),
+                signal: port.withSignalName('QUEUE_BUILDUP'),
+                setpoint: port.withConstantSignal(params.concurrency_controller.queue_buildup_setpoint),
               })
               + aimdConcurrencyController.withOutPorts({
                 is_overload: port.withSignalName('IS_OVERLOAD'),

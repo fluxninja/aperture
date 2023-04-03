@@ -5,7 +5,14 @@
   "env_vars": {
     "ENABLE_DEMO_APP_RABBITMQ": "true"
   },
-  "aperture_policies": [],
+  "aperture_policies": [
+    {
+      "blueprint_name": "policies/rabbitmq-queue-buildup",
+      "policy_name": "rabbitmq-queue-buildup",
+      "values_file": "policies/rabbitmq-queue-buildup.yaml",
+      "dashboard_mixin_dir": "dashboards/"
+    }
+  ],
   "images": [
     {
       "ref": "demo-app",

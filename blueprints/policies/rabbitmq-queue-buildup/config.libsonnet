@@ -3,9 +3,11 @@
   * @section Common
   *
   * @param (common.policy_name: string required) Name of the policy.
+  * @param (common.queue_name: string required) Name of the queue to watch for buildup.
   */
   common: {
     policy_name: '__REQUIRED_FIELD__',
+    queue_name: '__REQUIRED_FIELD__',
   },
   /**
   * @section Policy
@@ -45,6 +47,7 @@
     * @param (policy.concurrency_controller.gradient: aperture.spec.v1.GradientControllerParameters) Gradient Controller parameters.
     * @param (policy.concurrency_controller.alerter: aperture.spec.v1.AlerterParameters) Whether tokens for workloads are computed dynamically or set statically by the user.
     * @param (policy.concurrency_controller.max_load_multiplier: float64) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+    * @param (policy.concurrency_controller.queue_buildup_setpoint: float64) Queue buildup setpoint in number of messages.
     * @param (policy.concurrency_controller.load_multiplier_linear_increment: float64) Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
     * @param (policy.concurrency_controller.default_config: aperture.spec.v1.LoadActuatorDynamicConfig) Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.
     */
@@ -69,6 +72,7 @@
         alert_name: 'Load Shed Event',
       },
       max_load_multiplier: 2.0,
+      queue_buildup_setpoint: 1000,
       load_multiplier_linear_increment: 0.0025,
       default_config: {
         dry_run: false,
