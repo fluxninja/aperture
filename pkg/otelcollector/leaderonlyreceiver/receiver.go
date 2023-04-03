@@ -19,9 +19,9 @@ import (
 )
 
 const (
-	typeStr          = "aperture_leader_only"
-	stability        = component.StabilityLevelDevelopment
-	lateStartTimeout = 15 * time.Second
+	type_            component.Type = "aperture_leader_only"
+	stability                       = component.StabilityLevelDevelopment
+	lateStartTimeout                = 15 * time.Second
 )
 
 // Module provides receiver factory.
@@ -37,7 +37,7 @@ func Module() fx.Option {
 // NewFactory creates a new aperture_leader_only receiver factory using given leader election.
 func NewFactory(election *election.Election) receiver.Factory {
 	return receiver.NewFactory(
-		typeStr,
+		type_,
 		func() component.Config {
 			return &Config{
 				leaderElection: election,
