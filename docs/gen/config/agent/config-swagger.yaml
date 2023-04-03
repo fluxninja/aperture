@@ -57,11 +57,6 @@ definitions:
             			timeout: 1s
             		custom_metrics:
             			rabbitmq:
-            				pipeline:
-            					processors:
-            						- batch
-            					receivers:
-            						- rabbitmq
             				processors:
             					batch:
             						send_batch_size: 10
@@ -72,6 +67,7 @@ definitions:
             						endpoint: http://<rabbitmq-svc-fqdn>:15672
             						password: secretpassword
             						username: admin
+            				per_agent_group: true
         properties:
             batch_alerts:
                 $ref: '#/definitions/BatchAlertsConfig'
@@ -390,13 +386,25 @@ definitions:
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions
     CustomMetricsConfig:
+        description: |-
+            :::info
+            See also [Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
+            :::
         properties:
+            per_agent_group:
+                description: |-
+                    PerAgentGroup marks the pipeline to be instantiated only once per agent
+                    group. This is helpful for receivers that scrape eg. some cluster-wide
+                    metrics. When not set, pipeline will be instatiated on every Agent.
+                type: boolean
+                x-go-name: PerAgentGroup
+                x-go-tag-json: per_agent_group
             pipeline:
                 $ref: '#/definitions/CustomMetricsPipelineConfig'
                 x-go-tag-json: pipeline
             processors:
                 $ref: '#/definitions/Components'
-                x-go-tag-json: processors
+                x-go-tag-json: processors,omitempty
             receivers:
                 $ref: '#/definitions/Components'
                 x-go-tag-json: receivers
@@ -410,13 +418,13 @@ definitions:
                     type: string
                 type: array
                 x-go-name: Processors
-                x-go-tag-json: processors
+                x-go-tag-json: processors,omitempty
             receivers:
                 items:
                     type: string
                 type: array
                 x-go-name: Receivers
-                x-go-tag-json: receivers
+                x-go-tag-json: receivers,omitempty
         title: CustomMetricsPipelineConfig defines a custom metrics pipeline.
         type: object
         x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config

@@ -504,11 +504,6 @@ Example configuration:
     		timeout: 1s
     	custom_metrics:
     		rabbitmq:
-    			pipeline:
-    				processors:
-    					- batch
-    				receivers:
-    					- rabbitmq
     			processors:
     				batch:
     					send_batch_size: 10
@@ -519,6 +514,7 @@ Example configuration:
     					endpoint: http://<rabbitmq-svc-fqdn>:15672
     					password: secretpassword
     					username: admin
+    			per_agent_group: true
 
 <dl>
 <dt>custom_metrics</dt>
@@ -766,7 +762,19 @@ https://github.com/kubernetes-sigs/kubebuilder/issues/528
 
 CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller prometheus.
 
+:::info
+See also [Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
+:::
+
 <dl>
+<dt>per_agent_group</dt>
+<dd>
+
+(bool) PerAgentGroup marks the pipeline to be instantiated only once per agent
+group. This is helpful for receivers that scrape eg. some cluster-wide
+metrics. When not set, pipeline will be instatiated on every Agent.
+
+</dd>
 <dt>pipeline</dt>
 <dd>
 
