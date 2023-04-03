@@ -77,6 +77,8 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.PulseGenerator, components.NewPulseGeneratorAndOptions)
 	case *policylangv1.Component_Holder:
 		ctor = mkCtor(config.Holder, components.NewHolderAndOptions)
+	case *policylangv1.Component_SignalGenerator:
+		ctor = mkCtor(config.SignalGenerator, components.NewSignalGeneratorAndOptions)
 	case *policylangv1.Component_NestedSignalIngress:
 		ctor = mkCtor(config.NestedSignalIngress, components.NewNestedSignalIngressAndOptions)
 	case *policylangv1.Component_NestedSignalEgress:

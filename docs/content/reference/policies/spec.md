@@ -1795,13 +1795,13 @@ _Flow Regulator_ is a component that regulates the flow of requests to the servi
 <dt>in_ports</dt>
 <dd>
 
-([FlowRegulatorIns](#flow-regulator-ins)) Input ports for the _FlowRegulator_.
+([FlowRegulatorIns](#flow-regulator-ins)) Input ports for the _Flow Regulator_.
 
 </dd>
 <dt>parameters</dt>
 <dd>
 
-([FlowRegulatorParameters](#flow-regulator-parameters)) Parameters for the _FlowRegulator_.
+([FlowRegulatorParameters](#flow-regulator-parameters)) Parameters for the _Flow Regulator_.
 
 </dd>
 </dl>
@@ -1810,7 +1810,7 @@ _Flow Regulator_ is a component that regulates the flow of requests to the servi
 
 ### FlowRegulatorDynamicConfig {#flow-regulator-dynamic-config}
 
-Dynamic Configuration for _FlowRegulator_
+Dynamic Configuration for _Flow Regulator_
 
 <dl>
 <dt>enable_label_values</dt>
@@ -1861,8 +1861,8 @@ Dynamic Configuration for _FlowRegulator_
 <dd>
 
 (string) The flow label key for identifying sessions.
-If label key is specified, _FlowRegulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept*percentage is same or higher.
-If label key is not specified, \_FlowRegulator* acts as a stateless filter. Percentage of flows are selected randomly.
+If label key is specified, _Flow Regulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept*percentage is same or higher.
+If label key is not specified, \_Flow Regulator* acts as a stateless filter. Percentage of flows are selected randomly.
 
 </dd>
 </dl>
@@ -2856,7 +2856,7 @@ Parameters for the _Load Shaper_ component.
 <dt>target_accept_percentage</dt>
 <dd>
 
-(float64, minimum: `0`, maximum: `100`, **required**) The value of the step.
+(float64, minimum: `0`, maximum: `100`) The value of the step.
 
 </dd>
 </dl>

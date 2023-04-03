@@ -344,7 +344,14 @@ func (fr *flowRegulator) GetFlowSelector() *policylangv1.FlowSelector {
 
 // RunLimiter runs the limiter.
 func (fr *flowRegulator) RunLimiter(ctx context.Context, labels map[string]string, _ uint64) *flowcontrolv1.LimiterDecision {
-	labelValue, hasLabelKey := labels[fr.proto.GetParameters().GetLabelKey()]
+	var (
+		labelValue  string
+		hasLabelKey bool
+	)
+	labelKey := fr.proto.GetParameters().GetLabelKey()
+	if labelKey != "" {
+		labelValue, hasLabelKey = labels[fr.proto.GetParameters().GetLabelKey()]
+	}
 
 	// Initialize LimiterDecision
 	limiterDecision := &flowcontrolv1.LimiterDecision{
@@ -356,7 +363,7 @@ func (fr *flowRegulator) RunLimiter(ctx context.Context, labels map[string]strin
 	}
 
 	// If label_key is a non-empty string and is found within labels
-	if fr.proto.GetParameters().GetLabelKey() != "" && hasLabelKey {
+	if labelKey != "" && hasLabelKey {
 		hashValue := fnv.New32a()
 		hashValue.Write([]byte(labelValue))
 		hash := hashValue.Sum32()

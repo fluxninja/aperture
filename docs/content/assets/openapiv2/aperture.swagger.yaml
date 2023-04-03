@@ -655,6 +655,7 @@ definitions:
             - REJECT_REASON_NONE
             - REJECT_REASON_RATE_LIMITED
             - REJECT_REASON_CONCURRENCY_LIMITED
+            - REJECT_REASON_FLOW_REGULATED
         type: string
     Circuit:
         description: |-
@@ -1588,10 +1589,10 @@ definitions:
         properties:
             in_ports:
                 $ref: '#/definitions/FlowRegulatorIns'
-                description: Input ports for the _FlowRegulator_.
+                description: Input ports for the _Flow Regulator_.
             parameters:
                 $ref: '#/definitions/FlowRegulatorParameters'
-                description: Parameters for the _FlowRegulator_.
+                description: Parameters for the _Flow Regulator_.
         type: object
     FlowRegulatorDynamicConfig:
         properties:
@@ -1600,7 +1601,7 @@ definitions:
                 items:
                     type: string
                 type: array
-        title: Dynamic Configuration for _FlowRegulator_
+        title: Dynamic Configuration for _Flow Regulator_
         type: object
     FlowRegulatorIns:
         properties:
@@ -1625,8 +1626,8 @@ definitions:
             label_key:
                 description: |-
                     The flow label key for identifying sessions.
-                    If label key is specified, _FlowRegulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
-                    If label key is not specified, _FlowRegulator_ acts as a stateless filter. Percentage of flows are selected randomly.
+                    If label key is specified, _Flow Regulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
+                    If label key is not specified, _Flow Regulator_ acts as a stateless filter. Percentage of flows are selected randomly.
                 type: string
         type: object
     FlowSelector:
@@ -2505,10 +2506,9 @@ definitions:
                 maximum: 100
                 minimum: 0
                 type: number
-                x-go-tag-validate: required,gte=0,lte=100
+                x-go-tag-validate: gte=0,lte=100
         required:
             - duration
-            - target_accept_percentage
         type: object
     LoadShaperSeries:
         description: _LoadShaperSeries_ is a component that applies a series of _Load Shapers_ in order.
@@ -3906,10 +3906,7 @@ definitions:
                 x-go-tag-validate: required
             target_output:
                 $ref: '#/definitions/ConstantSignal'
-                description: |+
-                    The value of the step.
-
-                x-go-tag-validate: required
+                description: The value of the step.
         required:
             - duration
         type: object

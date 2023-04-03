@@ -31,9 +31,11 @@ class CheckResponse(_message.Message):
         REJECT_REASON_NONE: _ClassVar[CheckResponse.RejectReason]
         REJECT_REASON_RATE_LIMITED: _ClassVar[CheckResponse.RejectReason]
         REJECT_REASON_CONCURRENCY_LIMITED: _ClassVar[CheckResponse.RejectReason]
+        REJECT_REASON_FLOW_REGULATED: _ClassVar[CheckResponse.RejectReason]
     REJECT_REASON_NONE: CheckResponse.RejectReason
     REJECT_REASON_RATE_LIMITED: CheckResponse.RejectReason
     REJECT_REASON_CONCURRENCY_LIMITED: CheckResponse.RejectReason
+    REJECT_REASON_FLOW_REGULATED: CheckResponse.RejectReason
     class DecisionType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         DECISION_TYPE_ACCEPTED: _ClassVar[CheckResponse.DecisionType]

@@ -894,7 +894,7 @@ message AIMDConcurrencyController {
 
 // _Flow Regulator_ is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
 message FlowRegulator {
-  // Dynamic Configuration for _FlowRegulator_
+  // Dynamic Configuration for _Flow Regulator_
   message DynamicConfig {
     // Specify certain label values to be accepted by this flow filter regardless of accept percentage.
     repeated string enable_label_values = 1;
@@ -905,8 +905,8 @@ message FlowRegulator {
     FlowSelector flow_selector = 1; // @gotags: validate:"required"
 
     // The flow label key for identifying sessions.
-    // If label key is specified, _FlowRegulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
-    // If label key is not specified, _FlowRegulator_ acts as a stateless filter. Percentage of flows are selected randomly.
+    // If label key is specified, _Flow Regulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
+    // If label key is not specified, _Flow Regulator_ acts as a stateless filter. Percentage of flows are selected randomly.
     string label_key = 2;
 
     // Configuration key for DynamicConfig.
@@ -921,10 +921,10 @@ message FlowRegulator {
     InPort accept_percentage = 1;
   }
 
-  // Input ports for the _FlowRegulator_.
+  // Input ports for the _Flow Regulator_.
   Ins in_ports = 1;
 
-  // Parameters for the _FlowRegulator_.
+  // Parameters for the _Flow Regulator_.
   Parameters parameters = 2;
 }
 
@@ -934,7 +934,7 @@ message LoadShaper {
   message Parameters {
     message Step {
       // The value of the step.
-      double target_accept_percentage = 1; // @gotags: validate:"required,gte=0,lte=100"
+      double target_accept_percentage = 1; // @gotags: validate:"gte=0,lte=100"
       // Duration for which the step is active.
       google.protobuf.Duration duration = 2; // @gotags: validate:"required"
     }

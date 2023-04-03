@@ -117,7 +117,6 @@ func (cpc *autoScaleControlPoints) stop() {
 
 // Add adds a ControlPoint to the cache.
 func (cpc *autoScaleControlPoints) Add(cp AutoScaleControlPoint) {
-	log.Info().Msgf("Add called for %v", cp)
 	// take write mutex before modifying map
 	cpc.controlPointsMutex.Lock()
 	defer cpc.controlPointsMutex.Unlock()
@@ -197,7 +196,6 @@ func (cpc *autoScaleControlPoints) Delete(cp AutoScaleControlPoint) {
 }
 
 func (cpc *autoScaleControlPoints) fetchScale(cp AutoScaleControlPoint, cps *controlPointState) stream.Callback {
-	log.Info().Msgf("fetchScale called for %v", cp)
 	noOp := func() {}
 
 	targetGK := schema.GroupKind{
@@ -222,7 +220,6 @@ func (cpc *autoScaleControlPoints) fetchScale(cp AutoScaleControlPoint, cps *con
 			return err
 		}
 
-		log.Info().Msgf("Scale subresource for %s/%s: %v", cp.Kind, cp.Name, scale)
 		return nil
 	}
 
@@ -251,7 +248,6 @@ func (cpc *autoScaleControlPoints) fetchScale(cp AutoScaleControlPoint, cps *con
 	}
 
 	return func() {
-		log.Info().Msgf("Writing event for %v, event: %v", cp, *scale)
 		cpc.trackers.WriteEvent(notifiers.Key(key), value)
 	}
 }

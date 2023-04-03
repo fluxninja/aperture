@@ -7,6 +7,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/concurrency"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/components/flowcontrol/flowregulator"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/runtime"
 )
@@ -106,6 +107,13 @@ func newFlowControlCompositeAndOptions(
 		return tree, configuredComponents, fx.Options(options...), nil
 	} else if aimdConcurrencyController := flowControlComponentProto.GetAimdConcurrencyController(); aimdConcurrencyController != nil {
 		nestedCircuit, err := concurrency.ParseAIMDConcurrencyController(aimdConcurrencyController)
+		if err != nil {
+			return retErr(err)
+		}
+
+		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
+	} else if loadShaper := flowControlComponentProto.GetLoadShaper(); loadShaper != nil {
+		nestedCircuit, err := flowregulator.ParseLoadShaper(loadShaper)
 		if err != nil {
 			return retErr(err)
 		}

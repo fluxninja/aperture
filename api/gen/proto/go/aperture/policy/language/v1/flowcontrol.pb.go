@@ -1871,9 +1871,9 @@ type FlowRegulator struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Input ports for the _FlowRegulator_.
+	// Input ports for the _Flow Regulator_.
 	InPorts *FlowRegulator_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
-	// Parameters for the _FlowRegulator_.
+	// Parameters for the _Flow Regulator_.
 	Parameters *FlowRegulator_Parameters `protobuf:"bytes,2,opt,name=parameters,proto3" json:"parameters,omitempty"`
 }
 
@@ -3311,7 +3311,7 @@ func (x *AIMDConcurrencyController_Outs) GetIncomingConcurrency() *OutPort {
 	return nil
 }
 
-// Dynamic Configuration for _FlowRegulator_
+// Dynamic Configuration for _Flow Regulator_
 type FlowRegulator_DynamicConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3368,8 +3368,8 @@ type FlowRegulator_Parameters struct {
 	// _Flow Selector_ decides the service and flows at which the _Flow Regulator_  is applied.
 	FlowSelector *FlowSelector `protobuf:"bytes,1,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required"` // @gotags: validate:"required"
 	// The flow label key for identifying sessions.
-	// If label key is specified, _FlowRegulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
-	// If label key is not specified, _FlowRegulator_ acts as a stateless filter. Percentage of flows are selected randomly.
+	// If label key is specified, _Flow Regulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
+	// If label key is not specified, _Flow Regulator_ acts as a stateless filter. Percentage of flows are selected randomly.
 	LabelKey string `protobuf:"bytes,2,opt,name=label_key,json=labelKey,proto3" json:"label_key,omitempty"`
 	// Configuration key for DynamicConfig.
 	DynamicConfigKey string `protobuf:"bytes,3,opt,name=dynamic_config_key,json=dynamicConfigKey,proto3" json:"dynamic_config_key,omitempty"`
@@ -3682,7 +3682,7 @@ type LoadShaper_Parameters_Step struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The value of the step.
-	TargetAcceptPercentage float64 `protobuf:"fixed64,1,opt,name=target_accept_percentage,json=targetAcceptPercentage,proto3" json:"target_accept_percentage,omitempty" validate:"required,gte=0,lte=100"` // @gotags: validate:"required,gte=0,lte=100"
+	TargetAcceptPercentage float64 `protobuf:"fixed64,1,opt,name=target_accept_percentage,json=targetAcceptPercentage,proto3" json:"target_accept_percentage,omitempty" validate:"gte=0,lte=100"` // @gotags: validate:"gte=0,lte=100"
 	// Duration for which the step is active.
 	Duration *durationpb.Duration `protobuf:"bytes,2,opt,name=duration,proto3" json:"duration,omitempty" validate:"required"` // @gotags: validate:"required"
 }

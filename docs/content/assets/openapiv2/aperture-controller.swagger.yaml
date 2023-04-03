@@ -1383,14 +1383,14 @@ definitions:
     type: object
     properties:
       in_ports:
-        description: Input ports for the _FlowRegulator_.
+        description: Input ports for the _Flow Regulator_.
         $ref: '#/definitions/FlowRegulatorIns'
       parameters:
-        description: Parameters for the _FlowRegulator_.
+        description: Parameters for the _Flow Regulator_.
         $ref: '#/definitions/FlowRegulatorParameters'
   FlowRegulatorDynamicConfig:
     type: object
-    title: Dynamic Configuration for _FlowRegulator_
+    title: Dynamic Configuration for _Flow Regulator_
     properties:
       enable_label_values:
         description: Specify certain label values to be accepted by this flow filter
@@ -1422,8 +1422,8 @@ definitions:
       label_key:
         description: |-
           The flow label key for identifying sessions.
-          If label key is specified, _FlowRegulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
-          If label key is not specified, _FlowRegulator_ acts as a stateless filter. Percentage of flows are selected randomly.
+          If label key is specified, _Flow Regulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
+          If label key is not specified, _Flow Regulator_ acts as a stateless filter. Percentage of flows are selected randomly.
         type: string
   FlowSelector:
     description: |-
@@ -2167,7 +2167,6 @@ definitions:
     type: object
     required:
     - duration
-    - target_accept_percentage
     properties:
       duration:
         description: |+
@@ -2183,7 +2182,7 @@ definitions:
         format: double
         maximum: 100
         minimum: 0
-        x-go-tag-validate: required,gte=0,lte=100
+        x-go-tag-validate: gte=0,lte=100
   LoadShaperSeries:
     description: _LoadShaperSeries_ is a component that applies a series of _Load
       Shapers_ in order.
@@ -3349,10 +3348,7 @@ definitions:
         type: string
         x-go-tag-validate: required
       target_output:
-        description: |+
-          The value of the step.
-
-        x-go-tag-validate: required
+        description: The value of the step.
         $ref: '#/definitions/ConstantSignal'
   Status:
     description: Status holds details about a status that can be reported to the registry.

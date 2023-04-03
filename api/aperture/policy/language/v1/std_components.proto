@@ -754,7 +754,7 @@ message SignalGenerator {
   message Parameters {
     message Step {
       // The value of the step.
-      ConstantSignal target_output = 1; // @gotags: validate:"required"
+      ConstantSignal target_output = 1;
       // Duration for which the step is active.
       google.protobuf.Duration duration = 2; // @gotags: validate:"required"
     }

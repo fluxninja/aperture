@@ -35,17 +35,19 @@ func (result *multiMatchResult) populateFromMultiMatcher(mm *multimatcher.MultiM
 	result.concurrencyLimiters = append(result.concurrencyLimiters, resultCollection.concurrencyLimiters...)
 	result.fluxMeters = append(result.fluxMeters, resultCollection.fluxMeters...)
 	result.rateLimiters = append(result.rateLimiters, resultCollection.rateLimiters...)
+	result.flowRegulators = append(result.flowRegulators, resultCollection.flowRegulators...)
 	result.labelPreviews = append(result.labelPreviews, resultCollection.labelPreviews...)
 }
 
 // NewEngine Main fx app.
 func NewEngine() iface.Engine {
 	e := &Engine{
-		multiMatchers:   make(map[selectors.ControlPointID]*multiMatcher),
-		fluxMetersMap:   make(map[iface.FluxMeterID]iface.FluxMeter),
-		conLimiterMap:   make(map[iface.LimiterID]iface.ConcurrencyLimiter),
-		rateLimiterMap:  make(map[iface.LimiterID]iface.RateLimiter),
-		labelPreviewMap: make(map[iface.PreviewID]iface.LabelPreview),
+		multiMatchers:    make(map[selectors.ControlPointID]*multiMatcher),
+		fluxMetersMap:    make(map[iface.FluxMeterID]iface.FluxMeter),
+		conLimiterMap:    make(map[iface.LimiterID]iface.ConcurrencyLimiter),
+		rateLimiterMap:   make(map[iface.LimiterID]iface.RateLimiter),
+		flowRegulatorMap: make(map[iface.LimiterID]iface.Limiter),
+		labelPreviewMap:  make(map[iface.PreviewID]iface.LabelPreview),
 	}
 	return e
 }
@@ -107,7 +109,21 @@ func (e *Engine) ProcessRequest(
 	}
 	response.FluxMeterInfos = fluxMeterProtos
 
-	// execute rate limiters first
+	// 1. Execute flow regulators
+	flowRegulators := mmr.flowRegulators
+
+	flowRegulatorDecisions, flowRegulatorsDecisionType := runLimiters(ctx, flowRegulators, flowLabels, tokens)
+	response.LimiterDecisions = flowRegulatorDecisions
+
+	// If any flow regulator dropped, then mark this as a decision reason and return.
+	// Do not execute rate limiters.
+	if flowRegulatorsDecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
+		response.DecisionType = flowRegulatorsDecisionType
+		response.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_FLOW_REGULATED
+		return
+	}
+
+	// 2. Execute rate limiters
 	rateLimiters := make([]iface.Limiter, len(mmr.rateLimiters))
 	for i, rl := range mmr.rateLimiters {
 		rateLimiters[i] = rl
@@ -115,6 +131,7 @@ func (e *Engine) ProcessRequest(
 
 	rateLimiterDecisions, rateLimitersDecisionType := runLimiters(ctx, rateLimiters, flowLabels, tokens)
 	response.LimiterDecisions = rateLimiterDecisions
+	response.LimiterDecisions = append(response.LimiterDecisions, rateLimiterDecisions...)
 
 	defer func() {
 		if response.DecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
@@ -130,7 +147,7 @@ func (e *Engine) ProcessRequest(
 		return
 	}
 
-	// execute concurrency limiters
+	// 3. Execute concurrency limiters
 	concurrencyLimiters := make([]iface.Limiter, len(mmr.concurrencyLimiters))
 	for i, cl := range mmr.concurrencyLimiters {
 		concurrencyLimiters[i] = cl

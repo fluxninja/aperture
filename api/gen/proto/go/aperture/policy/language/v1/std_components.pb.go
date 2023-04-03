@@ -4139,7 +4139,7 @@ type SignalGenerator_Parameters_Step struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The value of the step.
-	TargetOutput *ConstantSignal `protobuf:"bytes,1,opt,name=target_output,json=targetOutput,proto3" json:"target_output,omitempty" validate:"required"` // @gotags: validate:"required"
+	TargetOutput *ConstantSignal `protobuf:"bytes,1,opt,name=target_output,json=targetOutput,proto3" json:"target_output,omitempty"`
 	// Duration for which the step is active.
 	Duration *durationpb.Duration `protobuf:"bytes,2,opt,name=duration,proto3" json:"duration,omitempty" validate:"required"` // @gotags: validate:"required"
 }
