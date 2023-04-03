@@ -400,7 +400,7 @@ definitions:
                 x-go-tag-json: pipeline
             processors:
                 $ref: '#/definitions/Components'
-                x-go-tag-json: processors
+                x-go-tag-json: processors,omitempty
             receivers:
                 $ref: '#/definitions/Components'
                 x-go-tag-json: receivers
@@ -414,13 +414,13 @@ definitions:
                     type: string
                 type: array
                 x-go-name: Processors
-                x-go-tag-json: processors
+                x-go-tag-json: processors,omitempty
             receivers:
                 items:
                     type: string
                 type: array
                 x-go-name: Receivers
-                x-go-tag-json: receivers
+                x-go-tag-json: receivers,omitempty
         title: CustomMetricsPipelineConfig defines a custom metrics pipeline.
         type: object
         x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config

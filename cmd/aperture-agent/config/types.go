@@ -110,7 +110,7 @@ type CustomMetricsConfig struct {
 	// be in OTEL format - https://opentelemetry.io/docs/collector/configuration/#processors.
 	// +kubebuilder:pruning:PreserveUnknownFields
 	// +kubebuilder:validation:Schemaless
-	Processors Components `json:"processors"`
+	Processors Components `json:"processors,omitempty"`
 	// Pipeline is an OTEL metrics pipeline definition, which **only** uses receivers
 	// and processors defined above. Exporter would be added automatically.
 	//
@@ -163,6 +163,6 @@ func (in *Components) DeepCopy() *Components {
 //
 //swagger:model
 type CustomMetricsPipelineConfig struct {
-	Receivers  []string `json:"receivers"`
-	Processors []string `json:"processors"`
+	Receivers  []string `json:"receivers,omitempty"`
+	Processors []string `json:"processors,omitempty"`
 }
