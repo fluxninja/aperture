@@ -9,7 +9,7 @@ import "google/protobuf/duration.proto";
 // Describes which pods a control or observability
 // component should apply to.
 message KubernetesObjectSelector {
-  // Which [agent-group](/concepts/integrations/flow-control/flow-selector.md#agent-group) this
+  // Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
   // selector applies to.
   string agent_group = 1; // @gotags: default:"default"
 

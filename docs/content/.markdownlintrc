@@ -1,0 +1,28 @@
+{
+  "default": true,
+  "MD013": false,
+  "MD051": false,
+  "MD033": {
+    "allowed_elements": [
+      "details",
+      "summary",
+      "p",
+      "head",
+      "body",
+      "dt",
+      "dd",
+      "dl",
+      "span",
+      "DocCardList",
+      "Zoom",
+      "Tabs",
+      "TabItem",
+      "ExtensionConfig",
+      "DownloadScript",
+      "CodeBlock"
+    ]
+  },
+  "MD024": {
+    "siblings_only": true
+  }
+}

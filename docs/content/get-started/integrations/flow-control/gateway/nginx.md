@@ -19,7 +19,7 @@ Integrating Aperture with Nginx using Lua modules.
 
 ## Introduction
 
-Lua modules are scripts that can be executed within Nginx to extend its
+Lua's modules are scripts that can be executed within Nginx to extend its
 functionality. The Aperture Lua module can be downloaded from the GitHub <a
 href={`https://github.com/fluxninja/aperture/releases/tag/${apertureVersion}`}>
 Aperture Release Page</a>.
@@ -115,8 +115,8 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
 
 2. Optionally, create an environment variable `APERTURE_CHECK_TIMEOUT` which
    would be considered as a timeout for execution of the Aperture check. The
-   default value for it is 500m which is 500 milliseconds. For example, use the
-   following command in bash:
+   default value for it is `500m` which is 500 milliseconds. For example, use
+   the following command in bash:
 
    :::info
 
@@ -192,7 +192,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
    }
    ```
 
-7. Below is the how complete Nginx configuration would like look:
+7. Below is how complete Nginx configuration would like look:
 
    ```bash
    worker_processes auto;

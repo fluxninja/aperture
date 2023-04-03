@@ -658,7 +658,7 @@ definitions:
     description: |-
       :::info
 
-      See also [Classifier overview](/concepts/integrations/flow-control/resources/classifier.md).
+      See also [Classifier overview](/concepts/flow-control/resources/classifier.md).
 
       :::
       Example
@@ -700,7 +700,7 @@ definitions:
       rules:
         description: |+
           A map of {key, value} pairs mapping from
-          [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
+          [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
           how to extract and propagate flow labels with that key.
 
         type: object
@@ -852,7 +852,7 @@ definitions:
     description: |-
       :::info
 
-      See also [Concurrency Limiter overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).
+      See also [Concurrency Limiter overview](/concepts/flow-control/components/concurrency-limiter.md).
 
       :::
 
@@ -1298,7 +1298,7 @@ definitions:
     description: |-
       :::info
 
-      See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+      See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 
       :::
       Example:
@@ -1321,14 +1321,14 @@ definitions:
     type: object
     title: |-
       Describes which flows a [flow control
-      component](/concepts/integrations/flow-control/flow-control.md#components) should apply
+      component](/concepts/flow-control/flow-control.md#components) should apply
       to
     required:
     - control_point
     properties:
       control_point:
         description: |+
-          [Control Point](/concepts/integrations/flow-control/flow-selector.md#control-point)
+          [Control Point](/concepts/flow-control/flow-selector.md#control-point)
           identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
           block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
           or filter chains.
@@ -1339,7 +1339,7 @@ definitions:
         description: |-
           :::info
 
-          See also [Label Matcher overview](/concepts/integrations/flow-control/flow-selector.md#label-matcher).
+          See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
 
           :::
 
@@ -1357,20 +1357,20 @@ definitions:
           :::
         title: |-
           Label matcher allows to add _additional_ condition on
-          [flow labels](/concepts/integrations/flow-control/flow-label.md)
+          [flow labels](/concepts/flow-control/flow-label.md)
           must also be satisfied (in addition to service+control point matching)
         $ref: '#/definitions/LabelMatcher'
   FlowSelector:
     description: |-
       :::info
 
-      See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+      See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 
       :::
     type: object
     title: |-
       Describes which flow in which service a [flow control
-      component](/concepts/integrations/flow-control/flow-control.md#components) should apply
+      component](/concepts/flow-control/flow-control.md#components) should apply
       to
     properties:
       flow_matcher:
@@ -1388,7 +1388,7 @@ definitions:
 
       :::info
 
-      See also [Flux Meter overview](/concepts/integrations/flow-control/resources/flux-meter.md).
+      See also [Flux Meter overview](/concepts/flow-control/resources/flux-meter.md).
 
       :::
       Example:
@@ -1935,7 +1935,7 @@ definitions:
     properties:
       agent_group:
         description: |+
-          Which [agent-group](/concepts/integrations/flow-control/flow-selector.md#agent-group) this
+          Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
           selector applies to.
 
         type: string
@@ -1975,7 +1975,7 @@ definitions:
     type: object
     title: |-
       Allows to define rules whether a map of
-      [labels](/concepts/integrations/flow-control/flow-label.md)
+      [labels](/concepts/flow-control/flow-label.md)
       should be considered a match or not
     properties:
       expression:
@@ -2484,7 +2484,7 @@ definitions:
     description: |-
       :::info
 
-      See also [Rate Limiter overview](/concepts/integrations/flow-control/components/rate-limiter.md).
+      See also [Rate Limiter overview](/concepts/flow-control/components/rate-limiter.md).
 
       :::
 
@@ -2573,7 +2573,7 @@ definitions:
           Specifies which label the ratelimiter should be keyed by.
 
           Rate limiting is done independently for each value of the
-          [label](/concepts/integrations/flow-control/flow-label.md) with given key.
+          [label](/concepts/flow-control/flow-label.md) with given key.
           Eg., to give each user a separate limit, assuming you have a _user_ flow
           label set up, set `label_key: "user"`.
 
@@ -2614,7 +2614,7 @@ definitions:
 
       :::info
 
-      You can use the [live-preview](/concepts/integrations/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
+      You can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
 
       :::
 
@@ -2651,7 +2651,7 @@ definitions:
       labels:
         description: |+
           A map of {key, value} pairs mapping from
-          [flow label](/concepts/integrations/flow-control/flow-label.md) keys to queries that define
+          [flow label](/concepts/flow-control/flow-label.md) keys to queries that define
           how to extract and propagate flow labels with that key.
           The name of the label maps to a variable in the rego module, i.e. it maps to `data.<package>.<label>` variable.
 
@@ -2694,7 +2694,7 @@ definitions:
         type: boolean
         title: |-
           Decides if the created flow label should be available as an attribute in OLAP telemetry and
-          propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
+          propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
         default: true
         x-go-tag-default: "true"
   Resources:
@@ -2780,7 +2780,7 @@ definitions:
         type: boolean
         title: |-
           Decides if the created flow label should be available as an attribute in OLAP telemetry and
-          propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
+          propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
         default: true
         x-go-tag-default: "true"
   RuleRego:
@@ -2846,7 +2846,7 @@ definitions:
           :::info
 
           Concurrency is a unitless number describing mean number of
-          [flows](/concepts/integrations/flow-control/flow-control.md#flow) being
+          [flows](/concepts/flow-control/flow-control.md#flow) being
           concurrently processed by the system (system = control point).
           Concurrency is calculated as _work_ done per unit of time (so
           work-seconds per world-seconds). Work-seconds are computed based on
@@ -2931,7 +2931,7 @@ definitions:
         description: |+
           List of workloads to be used in scheduler.
 
-          Categorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads
+          Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
           allows for load-shedding to be "smarter" than just "randomly deny 50% of
           requests". There are two aspects of this "smartness":
           * Scheduler can more precisely calculate concurrency if it understands
@@ -2948,7 +2948,7 @@ definitions:
           :::info
 
           See also [workload definition in the concepts
-          section](/concepts/integrations/flow-control/components/concurrency-limiter.md#workload).
+          section](/concepts/flow-control/components/concurrency-limiter.md#workload).
 
           :::
 
@@ -2965,7 +2965,7 @@ definitions:
       label_matcher:
         description: |+
           Label Matcher to select a Workload based on
-          [flow labels](/concepts/integrations/flow-control/flow-label.md).
+          [flow labels](/concepts/flow-control/flow-label.md).
 
         x-go-tag-validate: required
         $ref: '#/definitions/LabelMatcher'
@@ -2983,7 +2983,7 @@ definitions:
       fairness_key:
         description: |-
           Fairness key is a label key that can be used to provide fairness within a workload.
-          Any [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if
+          Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
           you have a classifier that sets `user` flow label, you might want to set
           `fairness_key = "user"`.
         type: string
@@ -3015,18 +3015,18 @@ definitions:
     description: |-
       :::info
 
-      See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+      See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 
       :::
     type: object
     title: |-
       Describes which service a [flow control or observability
-      component](/concepts/integrations/flow-control/flow-control.md#components) should apply
+      component](/concepts/flow-control/flow-control.md#components) should apply
       to
     properties:
       agent_group:
         description: |+
-          Which [agent-group](/concepts/integrations/flow-control/flow-selector.md#agent-group) this
+          Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
           selector applies to.
 
           :::info
@@ -3043,7 +3043,7 @@ definitions:
       service:
         description: |+
           The Fully Qualified Domain Name of the
-          [service](/concepts/integrations/flow-control/flow-selector.md) to select.
+          [service](/concepts/flow-control/flow-selector.md) to select.
 
           In Kubernetes, this is the FQDN of the Service object.
 

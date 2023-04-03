@@ -14,16 +14,27 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     ApertureSDK sdk;
     String agentHost;
     int agentPort;
+    boolean insecureGrpc;
+    String rootCertFile;
 
-    public ServerInitializer(String agentHost, String agentPort) {
+    public ServerInitializer(
+            String agentHost, String agentPort, boolean insecureGrpc, String rootCertFile) {
         this.agentHost = agentHost;
         this.agentPort = Integer.parseInt(agentPort);
+        this.insecureGrpc = insecureGrpc;
+        this.rootCertFile = rootCertFile;
     }
 
     @Override
     protected void initChannel(Channel ch) {
         try {
-            sdk = ApertureSDK.builder().setHost(this.agentHost).setPort(this.agentPort).build();
+            sdk =
+                    ApertureSDK.builder()
+                            .setHost(this.agentHost)
+                            .setPort(this.agentPort)
+                            .useInsecureGrpc(insecureGrpc)
+                            .setRootCertificateFile(rootCertFile)
+                            .build();
         } catch (ApertureSDKException ex) {
             throw new RuntimeException(ex);
         }

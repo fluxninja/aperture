@@ -42,9 +42,13 @@ public class AppController {
         registrationBean.addUrlPatterns("/super");
 
         String agentHost = env.getProperty("FN_AGENT_HOST");
-        String agentPort = env.getProperty("FN_AGENT_PORT");
         registrationBean.addInitParameter("agent_host", agentHost);
+        String agentPort = env.getProperty("FN_AGENT_PORT");
         registrationBean.addInitParameter("agent_port", agentPort);
+        String insecureGrpc = env.getProperty("FN_INSECURE_GRPC");
+        registrationBean.addInitParameter("insecure_grpc", insecureGrpc);
+        String rootCertificateFile = env.getProperty("FN_ROOT_CERTIFICATE_FILE");
+        registrationBean.addInitParameter("root_certificate_file", rootCertificateFile);
 
         return registrationBean;
     }
@@ -59,9 +63,13 @@ public class AppController {
         registrationBean.addUrlPatterns("/super2");
 
         String agentHost = env.getProperty("FN_AGENT_HOST");
-        String agentPort = env.getProperty("FN_AGENT_PORT");
         registrationBean.addInitParameter("agent_host", agentHost);
+        String agentPort = env.getProperty("FN_AGENT_PORT");
         registrationBean.addInitParameter("agent_port", agentPort);
+        String insecureGrpc = env.getProperty("FN_INSECURE_GRPC");
+        registrationBean.addInitParameter("insecure_grpc", insecureGrpc);
+        String rootCertificateFile = env.getProperty("FN_ROOT_CERTIFICATE_FILE");
+        registrationBean.addInitParameter("root_certificate_file", rootCertificateFile);
 
         return registrationBean;
     }
