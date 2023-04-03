@@ -12,7 +12,8 @@ Uninstall Aperture components
 
 ### Synopsis
 
-Use this command to uninstall Aperture Controller and Agent from your Kubernetes cluster.
+Use this command to uninstall Aperture Controller and Agent from your Kubernetes
+cluster.
 
 ### Options
 
@@ -26,7 +27,11 @@ Use this command to uninstall Aperture Controller and Agent from your Kubernetes
 
 ### SEE ALSO
 
-- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture
-- [aperturectl uninstall agent](/reference/aperturectl/uninstall/agent/agent.md) - Uninstall Aperture Agent
-- [aperturectl uninstall controller](/reference/aperturectl/uninstall/controller/controller.md) - Uninstall Aperture Controller
-- [aperturectl uninstall istioconfig](/reference/aperturectl/uninstall/istioconfig/istioconfig.md) - Install example Istio EnvoyFilter
+- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool
+  to interact with Aperture
+- [aperturectl uninstall agent](/reference/aperturectl/uninstall/agent/agent.md) -
+  Uninstall Aperture Agent
+- [aperturectl uninstall controller](/reference/aperturectl/uninstall/controller/controller.md) -
+  Uninstall Aperture Controller
+- [aperturectl uninstall istioconfig](/reference/aperturectl/uninstall/istioconfig/istioconfig.md) -
+  Install example Istio EnvoyFilter

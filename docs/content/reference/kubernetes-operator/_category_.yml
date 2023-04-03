@@ -6,6 +6,8 @@ link:
   type: "generated-index"
   title: "Kubernetes Operator"
   description:
-    "Aperture Operator for Aperture Controller and Agent manages installation for the user and creates required Kubernetes Objects.
-    It uses the configurations provided via the Custom Resources and manages the Kubernetes Objects accordingly."
+    "Aperture Operator for Aperture Controller and Agent manages installation
+    for the user and creates required Kubernetes Objects. It uses the
+    configurations provided via the Custom Resources and manages the Kubernetes
+    Objects accordingly."
   keywords: ["operator"]

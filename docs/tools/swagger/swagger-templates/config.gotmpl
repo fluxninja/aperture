@@ -32,6 +32,9 @@
 
 {{- define "fnConstraints" }}
   {{- with .Extensions -}}
+    {{- with (index . "x-deprecated") -}}
+    **DEPRECATED**
+    {{- end -}}
     {{- with (index . "x-pattern-rules") -}}
  Format: `{{ . }}`
     {{- end -}}
@@ -53,6 +56,9 @@
 {{/* Like fnConstraints, but appropriate to rendering within body of text */ -}}
 {{- define "fnConstraintsInline" }}
   {{- with .Extensions -}}
+    {{- with (index . "x-deprecated") -}}
+    , **DEPRECATED**
+    {{- end -}}
     {{- with (index . "x-pattern-rules") -}}
     , format: `{{ . }}`
     {{- end -}}

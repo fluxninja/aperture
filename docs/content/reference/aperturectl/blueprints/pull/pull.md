@@ -12,7 +12,8 @@ Pull Aperture Blueprints
 
 ### Synopsis
 
-Use this command to pull the Aperture Blueprints in local system to use for generating Aperture Policies and Grafana Dashboards.
+Use this command to pull the Aperture Blueprints in local system to use for
+generating Aperture Policies and Grafana Dashboards.
 
 ```
 aperturectl blueprints pull [flags]
@@ -42,4 +43,5 @@ aperturectl blueprints pull --version latest
 
 ### SEE ALSO
 
-- [aperturectl blueprints](/reference/aperturectl/blueprints/blueprints.md) - Aperture Blueprints
+- [aperturectl blueprints](/reference/aperturectl/blueprints/blueprints.md) -
+  Aperture Blueprints

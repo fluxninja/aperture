@@ -25,22 +25,22 @@ where it will get deployed on all the nodes of the cluster.
 You can do the installation using `aperturectl` CLI tool or using `Helm`.
 Install the tool of your choice using below links:
 
-1.  [aperturectl](/get-started/aperture-cli/aperture-cli.md)
+1. [aperturectl](/get-started/aperture-cli/aperture-cli.md)
 
-    :::info Refer
-    [aperturectl install agent](/reference/aperturectl/install/agent/agent.md)
-    to see all the available command line arguments.
+   :::info Refer
+   [aperturectl install agent](/reference/aperturectl/install/agent/agent.md) to
+   see all the available command line arguments.
 
-2.  [Helm](https://helm.sh/docs/intro/install/)
+2. [Helm](https://helm.sh/docs/intro/install/)
 
-    1. Once the Helm CLI is installed, add the
-       [Aperture Agent Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-agent)
-       repo in your environment for install/upgrade:
+   1. Once the Helm CLI is installed, add the
+      [Aperture Agent Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-agent)
+      repo in your environment for install/upgrade:
 
-       ```bash
-       helm repo add aperture https://fluxninja.github.io/aperture/
-       helm repo update
-       ```
+      ```bash
+      helm repo add aperture https://fluxninja.github.io/aperture/
+      helm repo update
+      ```
 
 ## Installation {#agent-daemonset-installation}
 
@@ -84,7 +84,7 @@ Kubernetes Objects which will be created by following steps are listed
    the actual values of Etcd and Prometheus, which is also being used by the
    Aperture Controller you want these Agents to connect with.
    `CONTROLLER_ENDPOINT_HERE` should point to Aperture Controller. If you skip
-   it, some subcommands `aperturectl` commands won't work.
+   it, some sub-commands `aperturectl` commands won't work.
 
    If you have installed the
    [Aperture Controller](/get-started/installation/controller/controller.md) on
@@ -283,7 +283,7 @@ You should see pods for Aperture Agent and Agent Manager in `RUNNING` state and
 
 ## Uninstall
 
-You can uninstall the Aperture Agent and it's components installed above by
+You can uninstall the Aperture Agent and its components installed above by
 following below steps:
 
 1. Uninstall the Aperture Agent:

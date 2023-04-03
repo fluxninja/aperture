@@ -68,4 +68,5 @@ enable_core_extensions: false # default is true
 
 ### SEE ALSO
 
-- [aperturectl build](/reference/aperturectl/build/build.md) - Builds the agent and controller binaries
+- [aperturectl build](/reference/aperturectl/build/build.md) - Builds the agent
+  and controller binaries

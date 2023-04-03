@@ -94,8 +94,8 @@ plugin is already installed:
 
 2. Optionally, create an environment variable `APERTURE_CHECK_TIMEOUT` which
    would be considered as a timeout for execution of the Aperture check. The
-   default value for it is 500m which is 500 milliseconds. For example, use the
-   following command in bash:
+   default value for it is `500m` which is 500 milliseconds. For example, use
+   the following command in bash:
 
    :::info
 
@@ -152,7 +152,7 @@ plugin is already installed:
    ```
 
    This adds the provided services and routes on Kong and enables the Aperture
-   Pluing for them. This file can be passed by setting environment variable:
+   Plugin for them. This file can be passed by setting environment variable:
    `KONG_DECLARATIVE_CONFIG=ABOVE_FILENAME`.
 
    Alternatively, you can also enable the Aperture Custom plugin per service or
