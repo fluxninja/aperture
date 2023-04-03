@@ -42,6 +42,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	"github.com/fluxninja/aperture/pkg/otelcollector/leaderonlyreceiver"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/tracestologsprocessor"
@@ -56,6 +57,7 @@ func ModuleForAgentOTEL() fx.Option {
 		k8sattributesprocessor.Module(),
 		prometheusreceiver.Module(),
 		filelogreceiver.Module(),
+		leaderonlyreceiver.Module(),
 		batchprocessor.Module(),
 		memorylimiterprocessor.Module(),
 		attributesprocessor.Module(),
