@@ -123,6 +123,13 @@ func newAutoScaleCompositeAndOptions(
 		}
 
 		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
+	} else if autoScaler := autoScaleComponentProto.GetPodAutoScaler(); autoScaler != nil {
+		nestedCircuit, err := autoscale.ParsePodAutoScaler(autoScaler)
+		if err != nil {
+			return retErr(err)
+		}
+
+		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
 	}
 	return retErr(fmt.Errorf("unsupported/missing component type, proto: %+v", autoScaleComponentProto))
 }
