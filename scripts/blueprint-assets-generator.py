@@ -269,10 +269,14 @@ def update_docblock_param_defaults(
         config = root
         for idx, part in enumerate(parts):
             if idx == len(parts) - 1:
-                return config[part]
+                return config[part] if not isinstance(config, list) else config[0][part]
             else:
                 try:
-                    config = config[part]
+                    config = (
+                        config[part]
+                        if not isinstance(config, list)
+                        else config[0][part]
+                    )
                 except KeyError:
                     # When specific param is a map (map[string]type) and there is no default
                     # then we return None here, which will be converted into an empty map later.
@@ -302,7 +306,6 @@ def update_docblock_param_defaults(
 
     for block in blocks:
         update_nested_param_defaults(block.nested_parameters, "")
-    for block in blocks:
         update_nested_param_defaults(block.nested_required_parameters, "")
 
 

@@ -1,0 +1,8 @@
+blueprint: Kubernetes Auto Scaler Policy
+sources:
+  Dashboard:
+    config_key: dashboard
+    path: policies/kubernetes-auto-scaler/dashboard.libsonnet
+  Policy:
+    config_key: policy
+    path: policies/kubernetes-auto-scaler/policy.libsonnet
