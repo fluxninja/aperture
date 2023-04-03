@@ -261,7 +261,7 @@ func (p *metricsProcessor) updateMetricsForFlowRegulator(limiterID iface.Limiter
 	}
 	// Add decision type label to the request counter metric
 	labels[metrics.DecisionTypeLabel] = decisionType.String()
-	labels[metrics.LimiterDroppedLabel] = strconv.FormatBool(dropped)
+	labels[metrics.RegulatorDroppedLabel] = strconv.FormatBool(dropped)
 	requestCounter := flowRegulator.GetRequestCounter(labels)
 	if requestCounter != nil {
 		requestCounter.Inc()
