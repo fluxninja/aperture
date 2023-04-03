@@ -112,7 +112,6 @@ func setupFlowRegulatorFactory(
 		},
 		metricLabelKeys,
 	)
-	prometheusRegistry.MustRegister(counterVector)
 
 	factory := &flowRegulatorFactory{
 		engineAPI:            e,
