@@ -15,14 +15,14 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     String agentHost;
     int agentPort;
     boolean insecureGrpc;
-    String sslCertFile;
+    String rootCertFile;
 
     public ServerInitializer(
-            String agentHost, String agentPort, boolean insecureGrpc, String sslCertFile) {
+            String agentHost, String agentPort, boolean insecureGrpc, String rootCertFile) {
         this.agentHost = agentHost;
         this.agentPort = Integer.parseInt(agentPort);
         this.insecureGrpc = insecureGrpc;
-        this.sslCertFile = sslCertFile;
+        this.rootCertFile = rootCertFile;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
                             .setHost(this.agentHost)
                             .setPort(this.agentPort)
                             .useInsecureGrpc(insecureGrpc)
-                            .setCACertificateFile(sslCertFile)
+                            .setRootCertificateFile(rootCertFile)
                             .build();
         } catch (ApertureSDKException ex) {
             throw new RuntimeException(ex);

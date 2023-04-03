@@ -55,12 +55,12 @@ public class ApertureFeatureFilter implements Filter {
         String agentHost;
         String agentPort;
         boolean insecureGrpc;
-        String sslCertificateFile;
+        String rootCertificateFile;
         try {
             agentHost = filterConfig.getInitParameter("agent_host");
             agentPort = filterConfig.getInitParameter("agent_port");
             insecureGrpc = Boolean.parseBoolean(filterConfig.getInitParameter("insecure_grpc"));
-            sslCertificateFile = filterConfig.getInitParameter("ssl_certificate_file");
+            rootCertificateFile = filterConfig.getInitParameter("root_certificate_file");
         } catch (Exception e) {
             throw new ServletException("Could not read config parameters", e);
         }
@@ -72,7 +72,7 @@ public class ApertureFeatureFilter implements Filter {
                             .setPort(Integer.parseInt(agentPort))
                             .setDuration(Duration.ofMillis(1000))
                             .useInsecureGrpc(insecureGrpc)
-                            .setCACertificateFile(sslCertificateFile)
+                            .setRootCertificateFile(rootCertificateFile)
                             .build();
         } catch (ApertureSDKException e) {
             e.printStackTrace();

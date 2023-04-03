@@ -63,14 +63,14 @@ public final class ApertureSDKBuilder {
         return this;
     }
 
-    public ApertureSDKBuilder setCACertificateFile(String filename) {
+    public ApertureSDKBuilder setRootCertificateFile(String filename) {
         this.certFile = filename;
         return this;
     }
 
     /**
      * Makes the SDK use plaintext if true, and SSL/TLS if false. Custom root CA certificates can be
-     * passes using {@link #setCACertificateFile(String)} method.
+     * passes using {@link #setRootCertificateFile(String)} method.
      *
      * @return the builder object.
      */

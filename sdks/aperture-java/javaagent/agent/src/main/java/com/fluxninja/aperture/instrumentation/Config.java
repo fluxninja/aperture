@@ -21,7 +21,8 @@ public class Config {
     public static final String BLOCKED_PATHS_REGEX_PROPERTY =
             "aperture.javaagent.blocked.paths.regex";
     public static final String INSECURE_GRPC_PROPERTY = "aperture.javaagent.insecure.grpc";
-    public static final String CA_CERTIFICATE_FILE_PROPERTY = "aperture.javaagent.ca.certificate";
+    public static final String ROOT_CERTIFICATE_FILE_PROPERTY =
+            "aperture.javaagent.root.certificate";
 
     private static final String AGENT_HOST_DEFAULT_VALUE = "localhost";
     private static final String AGENT_PORT_DEFAULT_VALUE = "8089";
@@ -29,7 +30,7 @@ public class Config {
     private static final String BLOCKED_PATHS_DEFAULT_VALUE = "";
     private static final String BLOCKED_PATHS_REGEX_DEFAULT_VALUE = "false";
     private static final String INSECURE_GRPC_DEFAULT_VALUE = "true";
-    private static final String CA_CERTIFICATE_FILE_DEFAULT_VALUE = "";
+    private static final String ROOT_CERTIFICATE_FILE_DEFAULT_VALUE = "";
 
     private static final List<String> allProperties =
             new ArrayList<String>() {
@@ -111,11 +112,11 @@ public class Config {
                                     INSECURE_GRPC_PROPERTY, INSECURE_GRPC_DEFAULT_VALUE));
             String caCertificateFile =
                     config.getProperty(
-                            CA_CERTIFICATE_FILE_PROPERTY, CA_CERTIFICATE_FILE_DEFAULT_VALUE);
+                            ROOT_CERTIFICATE_FILE_PROPERTY, ROOT_CERTIFICATE_FILE_DEFAULT_VALUE);
 
             sdkBuilder.useInsecureGrpc(insecureGrpc);
             if (!caCertificateFile.isEmpty()) {
-                sdkBuilder.setCACertificateFile(caCertificateFile);
+                sdkBuilder.setRootCertificateFile(caCertificateFile);
             }
 
             sdk = sdkBuilder.build();

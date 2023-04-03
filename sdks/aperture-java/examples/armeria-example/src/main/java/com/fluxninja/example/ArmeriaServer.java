@@ -15,7 +15,7 @@ public class ArmeriaServer {
     public static final String DEFAULT_AGENT_HOST = "localhost";
     public static final String DEFAULT_AGENT_PORT = "8089";
     public static final String DEFAULT_INSECURE_GRPC = "true";
-    public static final String DEFAULT_SSL_CERT = "";
+    public static final String DEFAULT_ROOT_CERT = "";
 
     public static HttpService createHelloHTTPService() {
         return new AbstractHttpService() {
@@ -63,9 +63,9 @@ public class ArmeriaServer {
         }
         boolean insecureGrpc = Boolean.parseBoolean(insecureGrpcString);
 
-        String sslCertFile = System.getenv("FN_SSL_CERTIFICATE_FILE");
-        if (sslCertFile == null) {
-            sslCertFile = DEFAULT_SSL_CERT;
+        String rootCertFile = System.getenv("FN_ROOT_CERTIFICATE_FILE");
+        if (rootCertFile == null) {
+            rootCertFile = DEFAULT_ROOT_CERT;
         }
 
         ApertureSDK apertureSDK;
@@ -76,7 +76,7 @@ public class ArmeriaServer {
                             .setPort(Integer.parseInt(agentPort))
                             .setDuration(Duration.ofMillis(1000))
                             .useInsecureGrpc(insecureGrpc)
-                            .setCACertificateFile(sslCertFile)
+                            .setRootCertificateFile(rootCertFile)
                             .build();
         } catch (ApertureSDKException e) {
             e.printStackTrace();

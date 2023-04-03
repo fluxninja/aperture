@@ -47,8 +47,8 @@ public class AppController {
         registrationBean.addInitParameter("agent_port", agentPort);
         String insecureGrpc = env.getProperty("FN_INSECURE_GRPC");
         registrationBean.addInitParameter("insecure_grpc", insecureGrpc);
-        String sslCertificateFile = env.getProperty("FN_SSL_CERTIFICATE_FILE");
-        registrationBean.addInitParameter("ssl_certificate_file", sslCertificateFile);
+        String rootCertificateFile = env.getProperty("FN_ROOT_CERTIFICATE_FILE");
+        registrationBean.addInitParameter("root_certificate_file", rootCertificateFile);
 
         return registrationBean;
     }
@@ -68,8 +68,8 @@ public class AppController {
         registrationBean.addInitParameter("agent_port", agentPort);
         String insecureGrpc = env.getProperty("FN_INSECURE_GRPC");
         registrationBean.addInitParameter("insecure_grpc", insecureGrpc);
-        String sslCertificateFile = env.getProperty("FN_SSL_CERTIFICATE_FILE");
-        registrationBean.addInitParameter("ssl_certificate_file", sslCertificateFile);
+        String rootCertificateFile = env.getProperty("FN_ROOT_CERTIFICATE_FILE");
+        registrationBean.addInitParameter("root_certificate_file", rootCertificateFile);
 
         return registrationBean;
     }

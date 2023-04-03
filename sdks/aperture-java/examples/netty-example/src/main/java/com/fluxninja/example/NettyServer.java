@@ -13,7 +13,7 @@ public class NettyServer {
     public static final String DEFAULT_AGENT_HOST = "localhost";
     public static final String DEFAULT_AGENT_PORT = "8089";
     public static final String DEFAULT_INSECURE_GRPC = "true";
-    public static final String DEFAULT_SSL_CERT = "";
+    public static final String DEFAULT_ROOT_CERT = "";
 
     public static void main(String[] args) throws Exception {
         String agentHost = System.getenv("FN_AGENT_HOST");
@@ -34,9 +34,9 @@ public class NettyServer {
         }
         boolean insecureGrpc = Boolean.parseBoolean(insecureGrpcString);
 
-        String sslCertFile = System.getenv("FN_SSL_CERTIFICATE_FILE");
-        if (sslCertFile == null) {
-            sslCertFile = DEFAULT_SSL_CERT;
+        String rootCertFile = System.getenv("FN_ROOT_CERTIFICATE_FILE");
+        if (rootCertFile == null) {
+            rootCertFile = DEFAULT_ROOT_CERT;
         }
 
         EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -50,7 +50,7 @@ public class NettyServer {
                     .group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(
-                            new ServerInitializer(agentHost, agentPort, insecureGrpc, sslCertFile))
+                            new ServerInitializer(agentHost, agentPort, insecureGrpc, rootCertFile))
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 

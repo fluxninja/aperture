@@ -11,7 +11,7 @@ public class SpringBootApp {
     public static final String DEFAULT_AGENT_HOST = "localhost";
     public static final String DEFAULT_AGENT_PORT = "8089";
     public static final String DEFAULT_INSECURE_GRPC = "true";
-    public static final String DEFAULT_SSL_CERT = "";
+    public static final String DEFAULT_ROOT_CERT = "";
 
     public static void main(String[] args) {
         String agentHost = System.getenv("FN_AGENT_HOST");
@@ -35,11 +35,11 @@ public class SpringBootApp {
         }
         System.setProperty("FN_INSECURE_GRPC", insecureGrpcString);
 
-        String sslCertFile = System.getenv("FN_SSL_CERTIFICATE_FILE");
-        if (sslCertFile == null) {
-            sslCertFile = DEFAULT_SSL_CERT;
+        String rootCertFile = System.getenv("FN_ROOT_CERTIFICATE_FILE");
+        if (rootCertFile == null) {
+            rootCertFile = DEFAULT_ROOT_CERT;
         }
-        System.setProperty("FN_SSL_CERTIFICATE_FILE", sslCertFile);
+        System.setProperty("FN_ROOT_CERTIFICATE_FILE", rootCertFile);
 
         SpringApplication.run(SpringBootApp.class, args);
     }
