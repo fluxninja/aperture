@@ -37,13 +37,12 @@ At a high-level, this policy consists of:
 
 - Latency EMA based overload detection: A Flux Meter is used to gather latency
   metrics from a
-  [service control point](/concepts/integrations/flow-control/flow-selector.md).
-  The latency signal is then fed into EMA component to help establish a
-  long-term trend that we can compare current latency against to detect
-  overloads. See tutorial on
+  [service control point](/concepts/flow-control/flow-selector.md). The latency
+  signal is then fed into EMA component to help establish a long-term trend that
+  we can compare current latency against to detect overloads. See tutorial on
   [Detecting Overload](/tutorials/signal-processing/detecting-overload.md) to
   learn more about how this is achieved.
-- Gradient Controller: Setpoint Latency and current Latency signals are fed to
+- Gradient Controller: Set point latency and current latency signals are fed to
   the gradient controller that calculates the proportional response to adjust
   the Accepted Concurrency (Control Variable).
 - Integral Optimizer: When the service is detected to be in the normal state, an
@@ -54,7 +53,7 @@ At a high-level, this policy consists of:
   service in each execution cycle of circuit based on the observed incoming
   concurrency.
 - Concurrency Limiting Actuator: The concurrency limits are actuated via
-  [weighted-fair queueing scheduler](/concepts/integrations/flow-control/components/concurrency-limiter.md).
+  [weighted-fair queuing scheduler](/concepts/flow-control/components/concurrency-limiter.md).
   The output of the adjustments to accepted concurrency made by gradient
   controller and optimizer logic are translated to a load multiplier that is
   synchronized with Aperture Agents via etcd. The load multiplier adjusts

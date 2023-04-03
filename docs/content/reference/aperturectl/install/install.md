@@ -12,7 +12,8 @@ Install Aperture components
 
 ### Synopsis
 
-Use this command to install Aperture Controller and Agent on your Kubernetes cluster.
+Use this command to install Aperture Controller and Agent on your Kubernetes
+cluster.
 
 ### Options
 
@@ -26,7 +27,11 @@ Use this command to install Aperture Controller and Agent on your Kubernetes clu
 
 ### SEE ALSO
 
-- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture
-- [aperturectl install agent](/reference/aperturectl/install/agent/agent.md) - Install Aperture Agent
-- [aperturectl install controller](/reference/aperturectl/install/controller/controller.md) - Install Aperture Controller
-- [aperturectl install istioconfig](/reference/aperturectl/install/istioconfig/istioconfig.md) - Install example Istio EnvoyFilter
+- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool
+  to interact with Aperture
+- [aperturectl install agent](/reference/aperturectl/install/agent/agent.md) -
+  Install Aperture Agent
+- [aperturectl install controller](/reference/aperturectl/install/controller/controller.md) -
+  Install Aperture Controller
+- [aperturectl install istioconfig](/reference/aperturectl/install/istioconfig/istioconfig.md) -
+  Install example Istio EnvoyFilter

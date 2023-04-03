@@ -1,7 +1,7 @@
-label: Flow Control
-position: 1
+label: Auto Scale
+position: 3
 collapsible: true
 collapsed: true
 link:
   type: "doc"
-  id: "flow-control"
+  id: "auto-scale"

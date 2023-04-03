@@ -1,14 +1,12 @@
 ---
 title: Load-based Auto Scaling
-sidebar_position: 2
+sidebar_position: 1
 keywords:
   - scaling
   - auto-scaler
   - Kubernetes
   - HPA
 ---
-
-# **Load-based Auto Scaling**
 
 ```mdx-code-block
 import Tabs from '@theme/Tabs';
@@ -25,13 +23,12 @@ the service from sudden traffic spikes, it's necessary to scale the service in
 response to persistent changes in load.
 
 To achieve this, the policy makes use of an
-[_Auto Scaler_](concepts/integrations/auto-scale/components/auto-scaler.md)
-component that is configured using _Controllers_ to adjust the number of
-instances allocated to the service. Load-based auto-scaling is achieved by
-defining a scale-out _Controller_ that acts on a load-shedding signal (load
-multiplier) signal from the blueprint. This signal measures the fraction of
-traffic that the
-[_Concurrency Limiter_](concepts/integrations/flow-control/components/concurrency-limiter.md)
+[_Auto Scaler_](concepts/auto-scale/components/auto-scaler.md) component that is
+configured using _Controllers_ to adjust the number of instances allocated to
+the service. Load-based auto-scaling is achieved by defining a scale-out
+_Controller_ that acts on a load-shedding signal (load multiplier) signal from
+the blueprint. This signal measures the fraction of traffic that the
+[_Concurrency Limiter_](concepts/flow-control/components/concurrency-limiter.md)
 is shedding. The _Auto Scaler_ is configured to scale-out using a _Gradient
 Controller_ based on this signal and a setpoint of 1.0.
 
@@ -46,7 +43,7 @@ This policy extends the _Latency based AIMD Concurrency Limiting_
 [blueprint](reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md)
 by adding auto-scaling to meet persistent changes in demand.
 
-At a high Level, this policy consist of:
+At a high level, this policy consists of:
 
 - Concurrency limiting based on response latency trend of the service.
 - An _Auto Scaler_ that adjusts the number of replicas of the Kubernetes

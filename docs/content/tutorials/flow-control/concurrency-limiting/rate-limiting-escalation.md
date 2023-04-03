@@ -19,14 +19,13 @@ escalation strategies beyond concurrency limits could be to more aggressively
 restrict traffic of each user by dynamically adjusting their rate limits.
 
 To recap,
-[concurrency limiter](/concepts/integrations/flow-control/components/concurrency-limiter.md)
-relies on weighted-fair queueing scheduler to make flow-control decisions at the
+[concurrency limiter](/concepts/flow-control/components/concurrency-limiter.md)
+relies on weighted-fair queuing scheduler to make flow-control decisions at the
 workload level. On the other hand, the
-[rate limiter](/concepts/integrations/flow-control/components/rate-limiter.md)
-uses a distributed cache to maintain global counters for each flow label (e.g.
-unique users) and restricts traffic when they exceed their allocated quota.
-These 2 technologies can be made to work together as we will see in the below
-example.
+[rate limiter](/concepts/flow-control/components/rate-limiter.md) uses a
+distributed cache to maintain global counters for each flow label (e.g. unique
+users) and restricts traffic when they exceed their allocated quota. These 2
+technologies can be made to work together as we will see in the below example.
 
 ## Policy
 
@@ -94,11 +93,11 @@ is configured to generate similar traffic pattern (number of concurrent users)
 for bots as the other 2 types of users - subscribers and guests.
 
 When the above policy is loaded in the playground, we see that the `bot` traffic
-is dynamically rate limited based on whether or not the service is overloaded.
-In the `Latency Gradient` dashboard, the bot traffic matches `default` workload
-as we don't have the workload matching rule for the `bot` traffic. As rate
-limiting is applied before concurrency limiter, we will see that the default
-workload metrics stop reporting when `bot` traffic is completely restricted.
+is dynamically rate limited based on whether the service is overloaded. In the
+`Latency Gradient` dashboard, the bot traffic matches `default` workload as we
+don't have the workload matching rule for the `bot` traffic. As rate limiting is
+applied before concurrency limiter, we will see that the default workload
+metrics stop reporting when `bot` traffic is completely restricted.
 
 <Zoom>
 

@@ -27,9 +27,9 @@ header in the request.
 :::tip
 
 You can quickly write classification rules on
-[HTTP requests](concepts/integrations/flow-control/resources/classifier.md#live-previewing-requests)
+[HTTP requests](concepts/flow-control/resources/classifier.md#live-previewing-requests)
 and define scheduler priorities on
-[Flow Labels](concepts/integrations/flow-control/flow-label.md#live-previewing-flow-labels)
+[Flow Labels](concepts/flow-control/flow-label.md#live-previewing-flow-labels)
 by live previewing them first via introspection APIs.
 
 :::
@@ -101,9 +101,9 @@ tutorial does the following:
 From there on, the classifier rule assigns the value of the exported variable
 `userID` in Rego source to `user_id` flow label, effectively creating a label
 `user_id:1`. This label is used by the
-[`RateLimiter`](/concepts/integrations/flow-control/components/rate-limiter.md)
-component in the policy to limit the `createTodo` mutation query to 10
-requests/second for each userID.
+[`RateLimiter`](/concepts/flow-control/components/rate-limiter.md) component in
+the policy to limit the `createTodo` mutation query to 10 requests/second for
+each `userID`.
 
 ### Playground
 
@@ -118,6 +118,6 @@ and rest of the requests are rejected.
 
 </Zoom>
 
-[rego-rules]: /concepts/integrations/flow-control/resources/classifier.md#rego
-[flow-label]: /concepts/integrations/flow-control/flow-label.md
-[classifier]: /concepts/integrations/flow-control/resources/classifier.md
+[rego-rules]: /concepts/flow-control/resources/classifier.md#rego
+[flow-label]: /concepts/flow-control/flow-label.md
+[classifier]: /concepts/flow-control/resources/classifier.md

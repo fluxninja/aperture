@@ -8,8 +8,6 @@ keywords:
   - Kubernetes
 ---
 
-# Auto Scale
-
 Auto-scaling is a crucial technique for effective load management of service
 traffic. It enables service operators to automatically adjust the number of
 instances or resources allocated to a service based on current or expected
@@ -40,7 +38,7 @@ seamlessly with flow control to provide a comprehensive solution. These
 capabilities allow services to dynamically adjust to incoming traffic patterns,
 ensuring optimal performance while minimizing infrastructure costs.
 
-# Insertion
+## Insertion
 
 Aperture Agents interface with cloud infrastructure APIs, such as Kubernetes
 API, to discover, monitor, and scale infrastructure resources. The Aperture

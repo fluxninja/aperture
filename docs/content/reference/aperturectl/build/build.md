@@ -25,6 +25,9 @@ Builds the agent and controller binaries
 
 ### SEE ALSO
 
-- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture
-- [aperturectl build agent](/reference/aperturectl/build/agent/agent.md) - Build agent binary for Aperture
-- [aperturectl build controller](/reference/aperturectl/build/controller/controller.md) - Build controller binary for Aperture
+- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool
+  to interact with Aperture
+- [aperturectl build agent](/reference/aperturectl/build/agent/agent.md) - Build
+  agent binary for Aperture
+- [aperturectl build controller](/reference/aperturectl/build/controller/controller.md) -
+  Build controller binary for Aperture
