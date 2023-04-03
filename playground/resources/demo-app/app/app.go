@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	backoff "github.com/cenkalti/backoff/v4"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
@@ -79,7 +80,16 @@ func (ss SimpleService) Run() error {
 	}
 
 	if ss.rabbitMQURL != "" {
-		conn, err := amqp.Dial(ss.rabbitMQURL)
+		var conn *amqp.Connection
+		operation := func() error {
+			var err error
+			conn, err = amqp.Dial(ss.rabbitMQURL)
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+		err := backoff.Retry(operation, backoff.WithMaxRetries(backoff.NewConstantBackOff(2*time.Second), 3))
 		if err != nil {
 			return err
 		}
@@ -98,14 +108,27 @@ func (ss SimpleService) Run() error {
 		}
 		defer cCh.Close()
 
+		err = cCh.Qos(
+			handler.concurrency*5, // prefetch count
+			0,                     // prefetch size
+			false,                 // global
+		)
+		if err != nil {
+			return err
+		}
+
 		// Declare a queue for the service to consume from.
+		queueArgs := amqp.Table{
+			"x-max-length": int32(2000),
+			"x-overflow":   string("reject-publish"),
+		}
 		q, err := cCh.QueueDeclare(
 			handler.hostname, // name
 			false,            // durable
 			false,            // delete when unused
 			false,            // exclusive
 			false,            // no-wait
-			nil,              // arguments
+			queueArgs,        // arguments
 		)
 		if err != nil {
 			return err
@@ -135,13 +158,13 @@ func (ss SimpleService) Run() error {
 func consumeFromQueue(q amqp.Queue, cCh *amqp.Channel, handler *RequestHandler) {
 	// Consume messages from the queue.
 	delivery, err := cCh.Consume(
-		q.Name, // queue
-		"",     // consumer
-		false,  // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
+		q.Name,           // queue
+		handler.hostname, // consumer
+		false,            // auto-ack
+		false,            // exclusive
+		false,            // no-local
+		false,            // no-wait
+		nil,              // args
 	)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to consume messages")

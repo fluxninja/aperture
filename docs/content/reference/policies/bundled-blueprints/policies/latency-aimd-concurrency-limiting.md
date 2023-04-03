@@ -35,6 +35,7 @@ to see this blueprint in use.
 
 <!-- Configuration Marker -->
 
+
 ```mdx-code-block
 
 export const ParameterHeading = ({children}) => (
@@ -75,8 +76,9 @@ export const ParameterDescription = ({name, type, reference, value, description}
 import {apertureVersion as aver} from '../../../../apertureVersion.js'
 ```
 
-Code: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/latency-aimd-concurrency-limiting`}>policies/latency-aimd-concurrency-limiting</a>
+Code: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/latency-aimd-concurrency-limiting`}>policies/latency-aimd-concurrency-limiting</a>
+
+
 
 <h3 class="blueprints-h3">Common</h3>
 
@@ -260,11 +262,12 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
 
 :::note
 
-The following configuration parameters can be
-[dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md)
-at runtime, without reloading the policy.
+The following configuration parameters can be [dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md) at runtime, without reloading the policy.
 
 :::
+
+
+
 
 <h3 class="blueprints-h3">Dynamic Configuration</h3>
 

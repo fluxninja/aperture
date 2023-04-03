@@ -660,7 +660,7 @@ type isComponent_Component interface {
 }
 
 type Component_GradientController struct {
-	// Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
+	// Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
 	// This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
 	GradientController *GradientController `protobuf:"bytes,1,opt,name=gradient_controller,json=gradientController,proto3,oneof"`
 }

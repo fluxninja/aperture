@@ -1,5 +1,4 @@
 local tanka = import 'github.com/grafana/jsonnet-libs/tanka-util/main.libsonnet';
-
 local helpers = import 'ninja/helpers.libsonnet';
 
 local helm = tanka.helm.new(helpers.helmChartsRoot);
@@ -16,11 +15,13 @@ local application = {
     simplesrv+: {
       rejectRatio: if enableNginx || enableKong then 0.0 else 0.05,
       hostname: if enableNginx then 'nginx-server.demoapp.svc.cluster.local' else if enableKong then 'kong-server.demoapp.svc.cluster.local' else '',
-      rabbitMQEnabled: if enableRabbitMQ then 'true' else 'false',
-      rabbitMQHost: 'rabbitmq.rabbitmq.svc.cluster.local',
-      rabbitMQPort: 5672,
-      rabbitMQUsername: 'admin',
-      rabbitMQPassword: 'secretpassword',
+    },
+    rabbitmq: {
+      enabled: enableRabbitMQ,
+      host: 'rabbitmq.rabbitmq.svc.cluster.local',
+      port: 5672,
+      username: 'admin',
+      password: 'secretpassword',
     },
   },
   service1:

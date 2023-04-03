@@ -12,6 +12,7 @@ dashboard that visualizes Signals flowing through the
 
 <!-- Configuration Marker -->
 
+
 ```mdx-code-block
 
 export const ParameterHeading = ({children}) => (
@@ -52,8 +53,9 @@ export const ParameterDescription = ({name, type, reference, value, description}
 import {apertureVersion as aver} from '../../../../apertureVersion.js'
 ```
 
-Code: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals`}>dashboards/signals</a>
+Code: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals`}>dashboards/signals</a>
+
+
 
 <h3 class="blueprints-h3">Common</h3>
 
