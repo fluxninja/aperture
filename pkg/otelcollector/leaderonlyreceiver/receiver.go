@@ -10,7 +10,6 @@ import (
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/etcd/election"
-	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
@@ -104,15 +103,12 @@ func (r *leaderOnlyReceiver) Start(startCtx context.Context, host component.Host
 	r.host = host
 
 	if r.config.leaderElection.IsLeader() {
-		log.Info().Msg("leaderonlyreceiver: leader!, early")
 		// If we already know we're the leader, we can skip creating background
 		// goroutine and start inner receiver immediately.
 		if err := r.startInnerReceiver(startCtx); err != nil {
-			log.Info().Msg("leaderonlyreceiver: leader!, failure")
 			return fmt.Errorf("failed to start %s receiver: %w", r.config.InnerType, err)
 		}
 
-		log.Info().Msg("leaderonlyreceiver: leader!, success")
 		return nil
 	}
 
@@ -139,7 +135,6 @@ func (r *leaderOnlyReceiver) Shutdown(ctx context.Context) error {
 func (r *leaderOnlyReceiver) startWhenLeader(ctx context.Context) {
 	defer r.backgroundWG.Done()
 
-	log.Info().Msg("leaderonlyreceiver: waiting")
 	select {
 	case <-ctx.Done():
 		return
@@ -148,7 +143,6 @@ func (r *leaderOnlyReceiver) startWhenLeader(ctx context.Context) {
 			return
 		}
 	}
-	log.Info().Msg("leaderonlyreceiver: leader!, starting")
 
 	startCtx, cancel := context.WithTimeout(ctx, lateStartTimeout)
 	defer cancel()
@@ -157,9 +151,7 @@ func (r *leaderOnlyReceiver) startWhenLeader(ctx context.Context) {
 			"failed to start %s receiver after becoming a leader: %w",
 			r.config.InnerType, err,
 		))
-		log.Info().Msg("leaderonlyreceiver: leader!, failed")
 	}
-	log.Info().Msg("leaderonlyreceiver: leader!, started")
 }
 
 func (r *leaderOnlyReceiver) startInnerReceiver(ctx context.Context) error {
