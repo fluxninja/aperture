@@ -238,7 +238,11 @@ func mapSlice(mapping map[string]string, xs []string) []string {
 // `user-defined-<pipeline_name>` suffix.
 // This ensures no builtin components are overwritten.
 func normalizeComponentName(pipelineName, componentName string) string {
-	return fmt.Sprintf("%s/user-defined-%s", componentName, pipelineName)
+	suffix := fmt.Sprintf("user-defined-%s", pipelineName)
+	if componentName == "" {
+		return suffix
+	}
+	return fmt.Sprintf("%s/%s", componentName, suffix)
 }
 
 func makeCustomMetricsConfigForKubeletStats() agentconfig.CustomMetricsConfig {
