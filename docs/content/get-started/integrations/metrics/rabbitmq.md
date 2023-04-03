@@ -23,7 +23,7 @@ otel:
       per_agent_group: true
       receivers:
         rabbitmq:
-          endpoint: http://my-rabbitmq.<namespace>:15672
+          endpoint: http://<rabbitmq-service-address>:15672
           username: <username>
           password: <password>
           collection_interval: 1s

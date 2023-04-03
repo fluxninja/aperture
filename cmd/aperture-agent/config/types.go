@@ -99,6 +99,10 @@ type BatchPostrollupConfig struct {
 // CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller prometheus.
 // +kubebuilder:object:generate=true
 //
+// :::info
+// See also [Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
+// :::
+//
 //swagger:model
 type CustomMetricsConfig struct {
 	// Receivers define receivers to be used in custom metrics pipelines. This should

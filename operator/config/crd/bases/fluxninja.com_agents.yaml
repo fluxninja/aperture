@@ -1527,9 +1527,11 @@ spec:
                         type: object
                       custom_metrics:
                         additionalProperties:
-                          description: CustomMetricsConfig defines receivers, processors,
+                          description: "CustomMetricsConfig defines receivers, processors,
                             and single metrics pipeline which will be exported to
-                            the controller prometheus.
+                            the controller prometheus. \n :::info See also [Get Started
+                            / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
+                            :::"
                           properties:
                             per_agent_group:
                               description: PerAgentGroup marks the pipeline to be
