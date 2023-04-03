@@ -1,8 +1,0 @@
-position: 2
-collapsible: true
-collapsed: true
-label: Integrations
-link:
-  type: "generated-index"
-  title: "Integrations"
-  keywords: ["tutorial","flow-control","integrations"]

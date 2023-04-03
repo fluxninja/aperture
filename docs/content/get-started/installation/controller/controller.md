@@ -25,10 +25,10 @@ Agents to effectively handle workloads.
 
 The closed feedback loop functions primarily by monitoring the variables
 reflecting stability conditions (i.e. process variables) and compares them
-against set points. The difference in the variable values against these points
-is referred to as the error signal. The feedback loop then works to minimize
-these error signals by determining and distributing control actions, that adjust
-these process variables and maintain their values within the optimal range.
+against setpoints. The difference in the variable values against these points is
+referred to as the error signal. The feedback loop then works to minimize these
+error signals by determining and distributing control actions, that adjust these
+process variables and maintain their values within the optimal range.
 
 ## Controller CRD
 
@@ -47,22 +47,22 @@ parameters for Aperture Controller are listed
 You can do the installation using `aperturectl` CLI tool or using `Helm`.
 Install the tool of your choice using below links:
 
-1.  [aperturectl](/get-started/aperture-cli/aperture-cli.md)
+1. [aperturectl](/get-started/aperture-cli/aperture-cli.md)
 
-    :::info Refer
-    [aperturectl install controller](/reference/aperturectl/install/controller/controller.md)
-    to see all the available command line arguments.
+   :::info Refer
+   [aperturectl install controller](/reference/aperturectl/install/controller/controller.md)
+   to see all the available command line arguments.
 
-2.  [Helm](https://helm.sh/docs/intro/install/)
+2. [Helm](https://helm.sh/docs/intro/install/)
 
-    1. Once the Helm CLI is installed, add the
-       [Aperture Controller Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-controller)
-       repo in your environment for install/upgrade:
+   1. Once the Helm CLI is installed, add the
+      [Aperture Controller Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-controller)
+      repo in your environment for install/upgrade:
 
-       ```bash
-       helm repo add aperture https://fluxninja.github.io/aperture/
-       helm repo update
-       ```
+      ```bash
+      helm repo add aperture https://fluxninja.github.io/aperture/
+      helm repo update
+      ```
 
 ## Installation {#controller-installation}
 
@@ -239,7 +239,7 @@ Kubernetes Objects which will be created by following steps are listed
 ## Exposing Etcd and Prometheus services {#expose-etcd-prometheus}
 
 If the Aperture Controller is installed with the packaged Etcd and Prometheus,
-follow below steps to expose them outside of the Kubernetes cluster so that the
+follow below steps to expose them outside the Kubernetes cluster so that the
 Aperture Agent running on Linux can access them.
 
 :::info
@@ -392,7 +392,7 @@ needs.
 
 ## Uninstall
 
-You can uninstall the Aperture Controller and it's components installed above by
+You can uninstall the Aperture Controller and its components installed above by
 following below steps:
 
 1. Uninstall the Aperture Controller:

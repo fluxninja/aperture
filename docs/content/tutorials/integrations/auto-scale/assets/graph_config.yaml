@@ -1,3 +1,0 @@
-- policy_file: "load-based-auto-scale.yaml"
-  file_type: "cr"
-  depth: 1

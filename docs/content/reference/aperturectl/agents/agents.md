@@ -30,4 +30,5 @@ aperturectl agents {--kube | --controller ADDRESS} [flags]
 
 ### SEE ALSO
 
-- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture
+- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool
+  to interact with Aperture

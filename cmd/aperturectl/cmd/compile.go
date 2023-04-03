@@ -23,7 +23,7 @@ func init() {
 	compileCmd.Flags().StringVar(&cr, "cr", "", "Path to Aperture Policy custom resource file")
 	compileCmd.Flags().StringVar(&dot, "dot", "", "Path to store the dot file")
 	compileCmd.Flags().StringVar(&mermaid, "mermaid", "", "Path to store the mermaid file")
-	compileCmd.Flags().IntVar(&depth, "depth", 0, "Maximum depth to expand the graph. Use -1 for maximum possible depth")
+	compileCmd.Flags().IntVar(&depth, "depth", 1, "Maximum depth to expand the graph. Use -1 for maximum possible depth")
 }
 
 // compileCmd is the command to compile a circuit from a policy file or CR.
@@ -37,7 +37,7 @@ You can also generate the DOT and Mermaid graphs of the compiled Aperture Policy
 	Example: `aperturectl compile --cr=policy-cr.yaml --mermaid --dot
 
 aperturectl compile --policy=policy.yaml --mermaid --dot`,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(_ *cobra.Command, _ []string) error {
 		// check if policy or cr is provided
 		if policy == "" && cr == "" || policy != "" && cr != "" {
 			errStr := "either --policy or --cr must be provided"
@@ -58,7 +58,7 @@ aperturectl compile --policy=policy.yaml --mermaid --dot`,
 			policyFile = policy
 		}
 
-		circuit, err := utils.CompilePolicy(policyFile)
+		circuit, _, err := utils.CompilePolicy(policyFile)
 		if err != nil {
 			log.Error().Err(err).Msg("error reading policy spec")
 			return err

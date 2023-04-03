@@ -54,15 +54,15 @@ public class ApertureFeatureFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         String agentHost;
         String agentPort;
+        boolean insecureGrpc;
+        String rootCertificateFile;
         try {
             agentHost = filterConfig.getInitParameter("agent_host");
             agentPort = filterConfig.getInitParameter("agent_port");
+            insecureGrpc = Boolean.parseBoolean(filterConfig.getInitParameter("insecure_grpc"));
+            rootCertificateFile = filterConfig.getInitParameter("root_certificate_file");
         } catch (Exception e) {
-            throw new ServletException(
-                    "Invalid agent connection information "
-                            + filterConfig.getInitParameter("agent_host")
-                            + ":"
-                            + filterConfig.getInitParameter("agent_port"));
+            throw new ServletException("Could not read config parameters", e);
         }
 
         try {
@@ -71,6 +71,8 @@ public class ApertureFeatureFilter implements Filter {
                             .setHost(agentHost)
                             .setPort(Integer.parseInt(agentPort))
                             .setDuration(Duration.ofMillis(1000))
+                            .useInsecureGrpc(insecureGrpc)
+                            .setRootCertificateFile(rootCertificateFile)
                             .build();
         } catch (ApertureSDKException e) {
             e.printStackTrace();

@@ -34,4 +34,5 @@ aperturectl apply dynamic-config --policy=static-rate-limiting --file=dynamic-co
 
 ### SEE ALSO
 
-- [aperturectl apply](/reference/aperturectl/apply/apply.md) - Apply Aperture Policies
+- [aperturectl apply](/reference/aperturectl/apply/apply.md) - Apply Aperture
+  Policies
