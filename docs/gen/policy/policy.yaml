@@ -2287,7 +2287,7 @@ definitions:
         x-order: 2
         $ref: '#/definitions/InPort'
   LoadShaperOuts:
-    description: Outputs for the _LoadShaper_ component.
+    description: Outputs for the _Load Shaper_ component.
     type: object
     properties:
       accept_percentage:
@@ -2319,10 +2319,11 @@ definitions:
         $ref: '#/definitions/FlowRegulatorParameters'
       steps:
         type: array
+        minItems: 1
         items:
           type: object
           $ref: '#/definitions/LoadShaperParametersStep'
-        x-go-tag-validate: required,dive
+        x-go-tag-validate: required,gt=0,dive
         x-order: 1
   LoadShaperParametersStep:
     type: object
@@ -3590,10 +3591,11 @@ definitions:
     properties:
       steps:
         type: array
+        minItems: 1
         items:
           type: object
           $ref: '#/definitions/SignalGeneratorParametersStep'
-        x-go-tag-validate: required,dive
+        x-go-tag-validate: required,gt=0,dive
         x-order: 0
   SignalGeneratorParametersStep:
     type: object

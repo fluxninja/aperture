@@ -2458,7 +2458,7 @@ definitions:
                 description: Whether to reset the _Load Shaper_ to the first step.
         type: object
     LoadShaperOuts:
-        description: Outputs for the _LoadShaper_ component.
+        description: Outputs for the _Load Shaper_ component.
         properties:
             accept_percentage:
                 $ref: '#/definitions/OutPort'
@@ -2483,8 +2483,9 @@ definitions:
                 items:
                     $ref: '#/definitions/LoadShaperParametersStep'
                     type: object
+                minItems: 1
                 type: array
-                x-go-tag-validate: required,dive
+                x-go-tag-validate: required,gt=0,dive
         required:
             - steps
         type: object
@@ -3889,8 +3890,9 @@ definitions:
                 items:
                     $ref: '#/definitions/SignalGeneratorParametersStep'
                     type: object
+                minItems: 1
                 type: array
-                x-go-tag-validate: required,dive
+                x-go-tag-validate: required,gt=0,dive
         required:
             - steps
         type: object

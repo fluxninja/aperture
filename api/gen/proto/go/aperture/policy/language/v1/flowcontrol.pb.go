@@ -3493,7 +3493,7 @@ type LoadShaper_Parameters struct {
 
 	// Parameters for the _Flow Regulator_.
 	FlowRegulatorParameters *FlowRegulator_Parameters     `protobuf:"bytes,1,opt,name=flow_regulator_parameters,json=flowRegulatorParameters,proto3" json:"flow_regulator_parameters,omitempty" validate:"required"` // @gotags: validate:"required"
-	Steps                   []*LoadShaper_Parameters_Step `protobuf:"bytes,2,rep,name=steps,proto3" json:"steps,omitempty" validate:"required,dive"`                                                                      // @gotags: validate:"required,dive"
+	Steps                   []*LoadShaper_Parameters_Step `protobuf:"bytes,2,rep,name=steps,proto3" json:"steps,omitempty" validate:"required,gt=0,dive"`                                                                      // @gotags: validate:"required,gt=0,dive"
 }
 
 func (x *LoadShaper_Parameters) Reset() {
@@ -3609,7 +3609,7 @@ func (x *LoadShaper_Ins) GetReset_() *InPort {
 	return nil
 }
 
-// Outputs for the _LoadShaper_ component.
+// Outputs for the _Load Shaper_ component.
 type LoadShaper_Outs struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

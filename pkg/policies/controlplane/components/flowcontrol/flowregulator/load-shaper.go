@@ -112,9 +112,7 @@ func ParseLoadShaper(loadShaper *policylangv1.LoadShaper) (*policylangv1.NestedC
 					FlowControl: &policylangv1.FlowControl{
 						Component: &policylangv1.FlowControl_FlowRegulator{
 							FlowRegulator: &policylangv1.FlowRegulator{
-								Parameters: &policylangv1.FlowRegulator_Parameters{
-									FlowSelector: loadShaper.Parameters.FlowRegulatorParameters.FlowSelector,
-								},
+								Parameters: loadShaper.Parameters.FlowRegulatorParameters,
 								InPorts: &policylangv1.FlowRegulator_Ins{
 									AcceptPercentage: &policylangv1.InPort{
 										Value: &policylangv1.InPort_SignalName{

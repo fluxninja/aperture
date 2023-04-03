@@ -3957,7 +3957,7 @@ type SignalGenerator_Parameters struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Steps []*SignalGenerator_Parameters_Step `protobuf:"bytes,1,rep,name=steps,proto3" json:"steps,omitempty" validate:"required,dive"` // @gotags: validate:"required,dive"
+	Steps []*SignalGenerator_Parameters_Step `protobuf:"bytes,1,rep,name=steps,proto3" json:"steps,omitempty" validate:"required,gt=0,dive"` // @gotags: validate:"required,gt=0,dive"
 }
 
 func (x *SignalGenerator_Parameters) Reset() {

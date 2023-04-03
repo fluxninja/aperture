@@ -2095,7 +2095,7 @@
       "additionalProperties": false
     },
     "LoadShaperOuts": {
-      "description": "Outputs for the _LoadShaper_ component.",
+      "description": "Outputs for the _Load Shaper_ component.",
       "properties": {
         "accept_percentage": {
           "$ref": "#/definitions/OutPort",
@@ -2130,8 +2130,9 @@
             "$ref": "#/definitions/LoadShaperParametersStep",
             "type": "object"
           },
+          "minItems": 1,
           "type": "array",
-          "x-go-tag-validate": "required,dive",
+          "x-go-tag-validate": "required,gt=0,dive",
           "x-order": 1
         }
       },
@@ -3262,8 +3263,9 @@
             "$ref": "#/definitions/SignalGeneratorParametersStep",
             "type": "object"
           },
+          "minItems": 1,
           "type": "array",
-          "x-go-tag-validate": "required,dive",
+          "x-go-tag-validate": "required,gt=0,dive",
           "x-order": 0
         }
       },

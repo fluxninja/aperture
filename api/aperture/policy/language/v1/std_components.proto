@@ -758,7 +758,7 @@ message SignalGenerator {
       // Duration for which the step is active.
       google.protobuf.Duration duration = 2; // @gotags: validate:"required"
     }
-    repeated Step steps = 1; // @gotags: validate:"required,dive"
+    repeated Step steps = 1; // @gotags: validate:"required,gt=0,dive"
   }
 
   // Inputs for the _Signal Generator_ component.

@@ -2798,7 +2798,7 @@ Inputs for the _Load Shaper_ component.
 
 ### LoadShaperOuts {#load-shaper-outs}
 
-Outputs for the _LoadShaper_ component.
+Outputs for the _Load Shaper_ component.
 
 <dl>
 <dt>accept_percentage</dt>

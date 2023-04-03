@@ -942,7 +942,7 @@ message LoadShaper {
     // Parameters for the _Flow Regulator_.
     FlowRegulator.Parameters flow_regulator_parameters = 1; // @gotags: validate:"required"
 
-    repeated Step steps = 2; // @gotags: validate:"required,dive"
+    repeated Step steps = 2; // @gotags: validate:"required,gt=0,dive"
   }
 
   // Inputs for the _Load Shaper_ component.
@@ -954,7 +954,7 @@ message LoadShaper {
     // Whether to reset the _Load Shaper_ to the first step.
     InPort reset = 3;
   }
-  // Outputs for the _LoadShaper_ component.
+  // Outputs for the _Load Shaper_ component.
   message Outs {
     // The percentage of flows being accepted by the _Load Shaper_.
     OutPort accept_percentage = 1;
