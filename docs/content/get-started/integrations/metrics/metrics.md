@@ -13,6 +13,10 @@ Aperture allows to feed custom metrics to controller prometheus. This is powered
 by adding custom metric receivers into OpenTelemetry Collector running on
 Aperture Agent. [See configuration reference][config]
 
-We provide some example configurations.
+```mdx-code-block
+import DocCardList from '@theme/DocCardList';
+```
+
+<DocCardList />
 
 [config]: /reference/configuration/agent.md#custom-metrics-config
