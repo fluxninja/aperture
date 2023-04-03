@@ -319,9 +319,9 @@ func generateGraphs(content []byte, outputDir string, policyPath string, depth i
 	}
 	defer os.Remove(policyFile)
 
-	circuit, err := utils.CompilePolicy(policyFile)
+	circuit, _, err := utils.CompilePolicy(policyFile)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	if err = utils.GenerateDotFile(circuit, dotFilePath, depth); err != nil {

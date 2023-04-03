@@ -65,7 +65,7 @@ curl --fail --location --remote-name "\${url}"
   </TabItem>
 </Tabs>
 
-You should then point Aperture Agent at etcd and prometheus deployed by the
+You should then point Aperture Agent at etcd and Prometheus deployed by the
 Aperture Controller, by editing
 `/etc/aperture/aperture-agent/config/aperture-agent.yaml`.
 
@@ -89,7 +89,7 @@ sudo systemctl enable --now aperture-agent
 
 :::caution
 
-Currently configuration watcher and automatic reload aren't supported. If you
+Currently, configuration watcher and automatic reload aren't supported. If you
 modify the configuration file, make sure to restart the service:
 
 ```bash
@@ -119,35 +119,35 @@ installation is complete.
 
 ## Uninstall
 
-1. Stop the Aperture Agent service:
+Stop the Aperture Agent service:
 
 ```bash
 sudo systemctl stop aperture-agent
 ```
 
-2. **Optional**: Remove the agent configuration:
+**Optional**: Remove the agent configuration:
 
 ```bash
 sudo rm /etc/aperture/aperture-agent/config/aperture-agent.yaml
 ```
 
-3. Uninstall the package:
+Uninstall the package:
 
-  <Tabs groupId="packageManager" queryString>
-    <TabItem value="dpkg" label="dpkg">
+<Tabs groupId="packageManager" queryString>
+  <TabItem value="dpkg" label="dpkg">
 
-    ```bash
-    sudo dpkg -r aperture-agent
-    ```
+```bash
+sudo dpkg -r aperture-agent
+```
 
-    </TabItem>
+  </TabItem>
 
-    <TabItem value="rpm" label="rpm">
+  <TabItem value="rpm" label="rpm">
 
-    ```bash
-    sudo rpm -e aperture-agent
-    ```
+```bash
+sudo rpm -e aperture-agent
+```
 
-    </TabItem>
+  </TabItem>
 
-  </Tabs>
+</Tabs>

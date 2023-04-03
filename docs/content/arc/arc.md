@@ -8,7 +8,7 @@ keywords:
   - reliability center
 ---
 
-# FluxNinja Application Reliability Center (ARC)
+## Application Reliability Center (ARC)
 
 :::info Join the FluxNinja ARC Beta
 

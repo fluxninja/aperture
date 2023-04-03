@@ -35,11 +35,6 @@ import (
 //			timeout: 1s
 //		custom_metrics:
 //			rabbitmq:
-//				pipeline:
-//					processors:
-//						- batch
-//					receivers:
-//						- rabbitmq
 //				processors:
 //					batch:
 //						send_batch_size: 10
@@ -50,6 +45,7 @@ import (
 //						endpoint: http://<rabbitmq-svc-fqdn>:15672
 //						password: secretpassword
 //						username: admin
+//				per_agent_group: true
 //
 // +kubebuilder:object:generate=true
 //
@@ -103,6 +99,10 @@ type BatchPostrollupConfig struct {
 // CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller prometheus.
 // +kubebuilder:object:generate=true
 //
+// :::info
+// See also [Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
+// :::
+//
 //swagger:model
 type CustomMetricsConfig struct {
 	// Receivers define receivers to be used in custom metrics pipelines. This should
@@ -114,10 +114,20 @@ type CustomMetricsConfig struct {
 	// be in OTEL format - https://opentelemetry.io/docs/collector/configuration/#processors.
 	// +kubebuilder:pruning:PreserveUnknownFields
 	// +kubebuilder:validation:Schemaless
-	Processors Components `json:"processors"`
+	Processors Components `json:"processors,omitempty"`
 	// Pipeline is an OTEL metrics pipeline definition, which **only** uses receivers
 	// and processors defined above. Exporter would be added automatically.
+	//
+	// If there are no processors defined or only one processor is defined, the
+	// pipeline definition can be omitted. In such cases, the pipeline will
+	// automatically use all given receivers and the defined processor (if
+	// any).  However, if there are more than one processor, the pipeline must
+	// be defined explicitly.
 	Pipeline CustomMetricsPipelineConfig `json:"pipeline"`
+	// PerAgentGroup marks the pipeline to be instantiated only once per agent
+	// group. This is helpful for receivers that scrape eg. some cluster-wide
+	// metrics. When not set, pipeline will be instatiated on every Agent.
+	PerAgentGroup bool `json:"per_agent_group"`
 }
 
 // Components is an alias type for map[string]any. This needs to be used
@@ -157,6 +167,6 @@ func (in *Components) DeepCopy() *Components {
 //
 //swagger:model
 type CustomMetricsPipelineConfig struct {
-	Receivers  []string `json:"receivers"`
-	Processors []string `json:"processors"`
+	Receivers  []string `json:"receivers,omitempty"`
+	Processors []string `json:"processors,omitempty"`
 }

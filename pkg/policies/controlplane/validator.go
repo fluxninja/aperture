@@ -49,27 +49,31 @@ func (v *PolicySpecValidator) ValidateSpec(
 	name string,
 	yamlSrc []byte,
 ) (bool, string, error) {
-	_, valid, msg, err := ValidateAndCompile(ctx, name, yamlSrc)
-	return valid, msg, err
+	_, _, err := ValidateAndCompile(ctx, name, yamlSrc)
+	if err != nil {
+		// there is no need to handle validator errors. just return validation result.
+		return false, err.Error(), nil
+	}
+	return true, "", nil
 }
 
 // ValidateAndCompile checks the validity of a single Policy and compiles it.
-func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circuitfactory.Circuit, bool, string, error) {
+func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circuitfactory.Circuit, *policiesv1.Policy, error) {
 	if len(yamlSrc) == 0 {
-		return nil, false, "Empty yaml", nil
+		return nil, nil, errors.New("empty policy")
 	}
 	policy := &policiesv1.Policy{}
 
 	err := config.UnmarshalYAML(yamlSrc, policy)
 	if err != nil {
-		return nil, false, err.Error(), nil
+		return nil, nil, err
 	}
 
 	alerter := alerts.NewSimpleAlerter(100)
 	registry := status.NewRegistry(log.GetGlobalLogger(), alerter)
 	circuit, err := CompilePolicy(policy, registry)
 	if err != nil {
-		return nil, false, err.Error(), err
+		return nil, nil, err
 	}
 
 	if policy.GetResources() != nil {
@@ -88,14 +92,9 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circ
 				},
 			})
 			if err != nil {
-				if errors.Is(err, compiler.BadExtractor) || errors.Is(err, compiler.BadSelector) ||
-					errors.Is(err, compiler.BadRego) || errors.Is(err, compiler.BadLabelName) {
-					return nil, false, err.Error(), nil
-				} else {
-					return nil, false, err.Error(), err
-				}
+				return nil, nil, err
 			}
 		}
 	}
-	return circuit, true, "", nil
+	return circuit, policy, nil
 }

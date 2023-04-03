@@ -202,7 +202,7 @@ Aperture Agent in Sidecar mode, use `localhost` as Target URL.
    `control-point` metadata included in the streams initiated to the gRPC
    service. The filter will accept the client request even if the communication
    with the authorization service has failed, or if the authorization service
-   has returned a HTTP 5xx error.
+   has returned an HTTP 5xx error.
 
    ```yaml
    applyTo: HTTP_FILTER
@@ -284,22 +284,22 @@ More information about the extracted values can be found on
 You can do the installation using `aperturectl` CLI tool or using `Helm`.
 Install the tool of your choice using below links:
 
-1.  [aperturectl](/get-started/aperture-cli/aperture-cli.md)
+1. [aperturectl](/get-started/aperture-cli/aperture-cli.md)
 
-    :::info Refer
-    [aperturectl install controller](/reference/aperturectl/install/controller/controller.md)
-    to see all the available command line arguments. :::
+   :::info Refer
+   [aperturectl install controller](/reference/aperturectl/install/controller/controller.md)
+   to see all the available command line arguments. :::
 
-2.  [Helm](https://helm.sh/docs/intro/install/)
+2. [Helm](https://helm.sh/docs/intro/install/)
 
-    1. Once the Helm CLI is installed, add the
-       [Aperture istioconfig Helm chart](https://artifacthub.io/packages/helm/aperture/istioconfig)
-       repo in your environment for installation:
+   1. Once the Helm CLI is installed, add the
+      [Aperture istioconfig Helm chart](https://artifacthub.io/packages/helm/aperture/istioconfig)
+      repo in your environment for installation:
 
-       ```bash
-       helm repo add aperture https://fluxninja.github.io/aperture/
-       helm repo update
-       ```
+      ```bash
+      helm repo add aperture https://fluxninja.github.io/aperture/
+      helm repo update
+      ```
 
 ## Installation
 
