@@ -8,7 +8,8 @@
     "build": "tsc -p tsconfig.json",
     "post-build": "cp -r ./proto ./lib/proto",
     "grpc-client": "npm run build && node ./lib/sdk/client.js",
-    "example": "npm run build && node ./lib/example/example.js"
+    "example": "npm run build && node ./lib/example/example.js",
+    "prepublishOnly": "npm run build"
   },
   "type": "module",
   "author": "",
@@ -16,7 +17,6 @@
   "files": [
     "lib/**/*",
     "@types/**/*",
-    "example/**/*",
     "proto/**/*"
   ],
   "dependencies": {

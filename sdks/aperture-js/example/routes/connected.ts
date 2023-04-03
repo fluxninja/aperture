@@ -1,6 +1,6 @@
 import grpc from "@grpc/grpc-js";
 import express from "express";
-import { apertureClient } from "./use_aperture";
+import { apertureClient } from "./use_aperture.js";
 
 export const connectedRouter = express.Router();
 
