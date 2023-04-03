@@ -360,6 +360,11 @@ func (fr *flowRegulator) RunLimiter(ctx context.Context, labels map[string]strin
 		ComponentId: fr.GetComponentId(),
 		Dropped:     false,
 		Reason:      flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED,
+		Details: &flowcontrolv1.LimiterDecision_FlowRegulatorInfo_{
+			FlowRegulatorInfo: &flowcontrolv1.LimiterDecision_FlowRegulatorInfo{
+				Label: labelKey + ":" + labelValue,
+			},
+		},
 	}
 
 	// If label_key is a non-empty string and is found within labels
