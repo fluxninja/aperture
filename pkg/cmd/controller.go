@@ -48,7 +48,7 @@ func (h *Handler) ListFlowControlPoints(
 	}
 
 	numErrors := uint32(0)
-	allControlPoints := map[selectors.GlobalControlPointID]struct{}{}
+	allControlPoints := map[selectors.TypedGlobalControlPointID]struct{}{}
 	for _, resp := range agentsControlPoints {
 		if resp.Err != nil {
 			numErrors += 1
@@ -246,7 +246,7 @@ func doPreview[AgentResp, ControllerResp any](
 	ctx context.Context,
 	h *Handler,
 	req *previewv1.PreviewRequest,
-	cp selectors.UntypedGlobalControlPointID,
+	cp selectors.GlobalControlPointID,
 	preview func(string, *previewv1.PreviewRequest) (AgentResp, error),
 	wrap func(AgentResp) ControllerResp,
 ) (ControllerResp, error) {
@@ -296,8 +296,8 @@ func doPreview[AgentResp, ControllerResp any](
 func mkGlobalControlPoint(
 	agentGroup string,
 	req *previewv1.PreviewRequest,
-) selectors.UntypedGlobalControlPointID {
-	return selectors.UntypedGlobalControlPointID{
+) selectors.GlobalControlPointID {
+	return selectors.GlobalControlPointID{
 		ControlPointID: selectors.ControlPointID{
 			ControlPoint: req.GetControlPoint(),
 			Service:      req.GetService(),
@@ -308,7 +308,7 @@ func mkGlobalControlPoint(
 
 func (h *Handler) agentsWithControlPoint(
 	ctx context.Context,
-	needle selectors.UntypedGlobalControlPointID,
+	needle selectors.GlobalControlPointID,
 ) ([]string, error) {
 	// FIXME We could narrow down list of agents to ask for control points if
 	// we'd cache agent groups.

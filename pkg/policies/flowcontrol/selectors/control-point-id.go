@@ -27,19 +27,19 @@ type TypedControlPointID struct {
 	Type string
 }
 
-// GlobalControlPointID is ControlPointID with explicit agent group.
+// TypedGlobalControlPointID is ControlPointID with explicit agent group.
 //
 // Note: We need to mirror cmdv1.GlobalFlowControlPoint, because
 // protobuf-generated struct cannot be used as map keys.
-type GlobalControlPointID struct {
+type TypedGlobalControlPointID struct {
 	TypedControlPointID
 	AgentGroup string
 }
 
-// UntypedGlobalControlPointID is just like GlobalControlPointID but embedding the ControlPointID instead of TypedControlPointID.
+// GlobalControlPointID is just like TypedGlobalControlPointID but embedding the ControlPointID instead of TypedControlPointID.
 //
 // Useful for defining a control point to find, without having to specify the source.
-type UntypedGlobalControlPointID struct {
+type GlobalControlPointID struct {
 	ControlPointID
 	AgentGroup string
 }
@@ -77,9 +77,9 @@ func (cp *TypedControlPointID) ToProto() *flowcontrolpointsv1.FlowControlPoint {
 	}
 }
 
-// InAgentGroup returns the controlpoint as GlobalControlPointID with given agent group.
-func (cp TypedControlPointID) InAgentGroup(agentGroup string) GlobalControlPointID {
-	return GlobalControlPointID{
+// InAgentGroup returns the controlpoint as TypedGlobalControlPointID with given agent group.
+func (cp TypedControlPointID) InAgentGroup(agentGroup string) TypedGlobalControlPointID {
+	return TypedGlobalControlPointID{
 		TypedControlPointID: cp,
 		AgentGroup:          agentGroup,
 	}
@@ -97,7 +97,7 @@ func TypedControlPointIDFromProto(protoCP *flowcontrolpointsv1.FlowControlPoint)
 }
 
 // ToProto returns protobuf representation of control point.
-func (cp *GlobalControlPointID) ToProto() *cmdv1.GlobalFlowControlPoint {
+func (cp *TypedGlobalControlPointID) ToProto() *cmdv1.GlobalFlowControlPoint {
 	return &cmdv1.GlobalFlowControlPoint{
 		FlowControlPoint: &flowcontrolpointsv1.FlowControlPoint{
 			Service:      cp.Service,
@@ -108,9 +108,9 @@ func (cp *GlobalControlPointID) ToProto() *cmdv1.GlobalFlowControlPoint {
 	}
 }
 
-// GlobalControlPointIDFromProto creates ControlPointID from protobuf representation.
-func GlobalControlPointIDFromProto(protoCP *cmdv1.GlobalFlowControlPoint) GlobalControlPointID {
-	return GlobalControlPointID{
+// TypedGlobalControlPointIDFromProto creates ControlPointID from protobuf representation.
+func TypedGlobalControlPointIDFromProto(protoCP *cmdv1.GlobalFlowControlPoint) TypedGlobalControlPointID {
+	return TypedGlobalControlPointID{
 		TypedControlPointID: TypedControlPointID{
 			ControlPointID: ControlPointID{
 				Service:      protoCP.FlowControlPoint.GetService(),
