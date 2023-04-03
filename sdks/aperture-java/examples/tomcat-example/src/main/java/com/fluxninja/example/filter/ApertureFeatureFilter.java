@@ -72,7 +72,7 @@ public class ApertureFeatureFilter implements Filter {
                             .setPort(Integer.parseInt(agentPort))
                             .setDuration(Duration.ofMillis(1000))
                             .useInsecureGrpc(insecureGrpc)
-                            .setSslCertificateFile(sslCertificateFile)
+                            .setCACertificateFile(sslCertificateFile)
                             .build();
         } catch (ApertureSDKException e) {
             e.printStackTrace();

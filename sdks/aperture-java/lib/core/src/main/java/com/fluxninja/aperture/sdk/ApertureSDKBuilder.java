@@ -5,13 +5,17 @@ import static com.fluxninja.aperture.sdk.Constants.LIBRARY_NAME;
 
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowControlServiceGrpc;
 import com.fluxninja.generated.envoy.service.auth.v3.AuthorizationGrpc;
+import com.google.common.io.ByteStreams;
 import io.grpc.*;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
+import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporterBuilder;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +27,7 @@ public final class ApertureSDKBuilder {
     private String host;
     private int port;
     private boolean useHttpsInOtlpExporter = false;
-    private boolean insecureGrpc = false;
+    private boolean insecureGrpc = true;
     private String certFile;
     private final List<String> blockedPaths;
     private boolean blockedPathsMatchRegex = false;
@@ -47,18 +51,32 @@ public final class ApertureSDKBuilder {
         return this;
     }
 
-    public ApertureSDKBuilder useHttpsInOtlpExporter() {
+    /**
+     * Makes the span exporter use https instead of http.
+     *
+     * @deprecated Use {@link #useInsecureGrpc(boolean)} instead.
+     * @return the builder object.
+     */
+    @Deprecated
+    public ApertureSDKBuilder useHttps() {
         this.useHttpsInOtlpExporter = true;
         return this;
     }
 
-    public ApertureSDKBuilder setSslCertificateFile(String filename) {
+    public ApertureSDKBuilder setCACertificateFile(String filename) {
         this.certFile = filename;
         return this;
     }
 
+    /**
+     * Makes the SDK use plaintext if true, and SSL/TLS if false. Custom root CA certificates can be
+     * passes using {@link #setCACertificateFile(String)} method.
+     *
+     * @return the builder object.
+     */
     public ApertureSDKBuilder useInsecureGrpc(boolean enabled) {
         this.insecureGrpc = enabled;
+        this.useHttpsInOtlpExporter = !enabled;
         return this;
     }
 
@@ -119,6 +137,7 @@ public final class ApertureSDKBuilder {
         }
 
         ChannelCredentials creds;
+        byte[] caCertContents = null;
         if (this.insecureGrpc) {
             creds = InsecureChannelCredentials.create();
         } else {
@@ -130,8 +149,10 @@ public final class ApertureSDKBuilder {
                             TlsChannelCredentials.newBuilder()
                                     .trustManager(new File(this.certFile))
                                     .build();
+                    caCertContents =
+                            ByteStreams.toByteArray(Files.newInputStream(Paths.get(this.certFile)));
                 } catch (IOException e) {
-                    // Maybe just add IOException to signature?
+                    // cert file not found
                     throw new ApertureSDKException(e);
                 }
             }
@@ -145,8 +166,13 @@ public final class ApertureSDKBuilder {
         AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient =
                 AuthorizationGrpc.newBlockingStub(channel);
 
+        OtlpGrpcSpanExporterBuilder spanExporterBuilder = OtlpGrpcSpanExporter.builder();
+        if (caCertContents != null) {
+            spanExporterBuilder.setTrustedCertificates(caCertContents);
+        }
+
         OtlpGrpcSpanExporter spanExporter =
-                OtlpGrpcSpanExporter.builder()
+                spanExporterBuilder
                         .setEndpoint(
                                 String.format("%s://%s:%d", OtlpSpanExporterProtocol, host, port))
                         .build();

@@ -76,7 +76,7 @@ public class ArmeriaServer {
                             .setPort(Integer.parseInt(agentPort))
                             .setDuration(Duration.ofMillis(1000))
                             .useInsecureGrpc(insecureGrpc)
-                            .setSslCertificateFile(sslCertFile)
+                            .setCACertificateFile(sslCertFile)
                             .build();
         } catch (ApertureSDKException e) {
             e.printStackTrace();

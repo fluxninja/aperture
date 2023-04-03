@@ -33,7 +33,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
                             .setHost(this.agentHost)
                             .setPort(this.agentPort)
                             .useInsecureGrpc(insecureGrpc)
-                            .setSslCertificateFile(sslCertFile)
+                            .setCACertificateFile(sslCertFile)
                             .build();
         } catch (ApertureSDKException ex) {
             throw new RuntimeException(ex);

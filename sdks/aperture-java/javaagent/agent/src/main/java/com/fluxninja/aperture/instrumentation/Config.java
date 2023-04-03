@@ -21,15 +21,15 @@ public class Config {
     public static final String BLOCKED_PATHS_REGEX_PROPERTY =
             "aperture.javaagent.blocked.paths.regex";
     public static final String INSECURE_GRPC_PROPERTY = "aperture.javaagent.insecure.grpc";
-    public static final String SSL_CERTIFICATE_FILE_PROPERTY = "aperture.javaagent.ssl.certificate";
+    public static final String CA_CERTIFICATE_FILE_PROPERTY = "aperture.javaagent.ca.certificate";
 
     private static final String AGENT_HOST_DEFAULT_VALUE = "localhost";
     private static final String AGENT_PORT_DEFAULT_VALUE = "8089";
     private static final String CONNECTION_TIMEOUT_MILLIS_DEFAULT_VALUE = "1000";
     private static final String BLOCKED_PATHS_DEFAULT_VALUE = "";
     private static final String BLOCKED_PATHS_REGEX_DEFAULT_VALUE = "false";
-    private static final String INSECURE_GRPC_DEFAULT_VALUE = "false";
-    private static final String SSL_CERTIFICATE_FILE_DEFAULT_VALUE = "";
+    private static final String INSECURE_GRPC_DEFAULT_VALUE = "true";
+    private static final String CA_CERTIFICATE_FILE_DEFAULT_VALUE = "";
 
     private static final List<String> allProperties =
             new ArrayList<String>() {
@@ -109,13 +109,13 @@ public class Config {
                     Boolean.parseBoolean(
                             config.getProperty(
                                     INSECURE_GRPC_PROPERTY, INSECURE_GRPC_DEFAULT_VALUE));
-            String sslCertificateFile =
+            String caCertificateFile =
                     config.getProperty(
-                            SSL_CERTIFICATE_FILE_PROPERTY, SSL_CERTIFICATE_FILE_DEFAULT_VALUE);
+                            CA_CERTIFICATE_FILE_PROPERTY, CA_CERTIFICATE_FILE_DEFAULT_VALUE);
 
             sdkBuilder.useInsecureGrpc(insecureGrpc);
-            if (!sslCertificateFile.isEmpty()) {
-                sdkBuilder.setSslCertificateFile(sslCertificateFile);
+            if (!caCertificateFile.isEmpty()) {
+                sdkBuilder.setCACertificateFile(caCertificateFile);
             }
 
             sdk = sdkBuilder.build();

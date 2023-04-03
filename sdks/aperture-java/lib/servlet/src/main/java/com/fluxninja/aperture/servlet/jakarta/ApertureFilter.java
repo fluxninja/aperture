@@ -89,7 +89,7 @@ public class ApertureFilter implements Filter {
             }
             builder.useInsecureGrpc(insecureGrpc);
             if (sslCertificateFile != null && !sslCertificateFile.isEmpty()) {
-                builder.setSslCertificateFile(sslCertificateFile);
+                builder.setCACertificateFile(sslCertificateFile);
             }
 
             this.apertureSDK = builder.build();

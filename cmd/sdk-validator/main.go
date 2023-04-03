@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"google.golang.org/grpc/credentials"
 	"net"
 	"net/http"
 	"os"
@@ -12,6 +11,8 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"google.golang.org/grpc/credentials"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -86,11 +87,11 @@ func main() {
 	// setup grpc server and register various server instances to it
 	var grpcServer *grpc.Server
 	if *sslCertFilepath != "" && *sslKeyFilepath != "" {
-		creds, err := credentials.NewServerTLSFromFile(*sslCertFilepath, *sslKeyFilepath)
-		if err != nil {
-			log.Fatal().Err(err).Msg("Failed to create TLS creds from provided files")
+		creds, err2 := credentials.NewServerTLSFromFile(*sslCertFilepath, *sslKeyFilepath)
+		if err2 != nil {
+			log.Fatal().Err(err2).Msg("Failed to create TLS creds from provided files")
 		}
-		log.Info().Msg("Starting TLS-ed grpc server")
+		log.Info().Msg("Starting TLS-secured grpc server")
 		grpcServer = grpc.NewServer(grpc.UnaryInterceptor(serverInterceptor), grpc.Creds(creds))
 	} else {
 		log.Info().Msg("Starting insecure grpc server")
