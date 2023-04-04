@@ -257,7 +257,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 			resp.HttpResponse = &authv3.CheckResponse_DeniedResponse{
 				DeniedResponse: &authv3.DeniedHttpResponse{
 					Status: &typev3.HttpStatus{
-						Code: typev3.StatusCode_ServiceUnavailable,
+						Code: typev3.StatusCode_Unauthorized,
 					},
 				},
 			}
