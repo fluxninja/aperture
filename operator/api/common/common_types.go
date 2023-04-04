@@ -34,7 +34,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/fluxninja/aperture/pkg/profilers"
 	"github.com/fluxninja/aperture/pkg/prometheus"
-	"github.com/fluxninja/aperture/pkg/watchdog"
+	watchdogconfig "github.com/fluxninja/aperture/pkg/watchdog/config"
 
 	corev1 "k8s.io/api/core/v1"
 )
@@ -332,7 +332,7 @@ type CommonConfigSpec struct {
 
 	// Watchdog configuration.
 	//+kubebuilder:validation:Optional
-	Watchdog watchdog.WatchdogConfig `json:"watchdog"`
+	Watchdog watchdogconfig.WatchdogConfig `json:"watchdog"`
 
 	// Alert Managers configuration.
 	//+kubebuilder:validation:Optional

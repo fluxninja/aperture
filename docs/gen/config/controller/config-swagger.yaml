@@ -22,7 +22,7 @@ definitions:
                 x-go-tag-validate: gte=0,lte=1
         title: AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)*factor.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
     AlertManagerClientConfig:
         properties:
             address:
@@ -614,7 +614,7 @@ definitions:
                 x-go-tag-json: watermarks_policy
         title: HeapConfig holds configuration for heap Watchdog.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
     HeapLimit:
         properties:
             limit:
@@ -641,7 +641,7 @@ definitions:
                 x-go-tag-validate: gt=0,lte=100
         title: HeapLimit holds configuration for Watchdog heap limit.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
     JobConfig:
         description: JobConfig is config for Job
         properties:
@@ -904,7 +904,7 @@ definitions:
                 x-go-tag-json: enabled
         title: PolicyCommon holds common configuration for Watchdog policies.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
     PortsConfig:
         properties:
             debug_port:
@@ -1093,7 +1093,7 @@ definitions:
                 x-go-tag-json: system
         title: WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
     WatchdogPolicyType:
         properties:
             adaptive_policy:
@@ -1104,7 +1104,7 @@ definitions:
                 x-go-tag-json: watermarks_policy
         title: WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
     WatermarksPolicy:
         properties:
             enabled:
@@ -1134,7 +1134,7 @@ definitions:
                 x-go-tag-validate: omitempty,dive,gte=0,lte=1
         title: WatermarksPolicy creates a Watchdog policy that schedules GC at concrete watermarks.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
 info:
     description: Aperture Controller
     title: Controller
