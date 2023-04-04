@@ -86,9 +86,9 @@ type leaderOnlyReceiver struct {
 	factory receiver.Factory
 	host    component.Host
 
-	inner receiver.Metrics // nil if not started
+	inner receiver.Metrics // nil if inner receiver not started
 
-	cancelBackground context.CancelFunc
+	cancelBackground context.CancelFunc // nil if background goroutine not started
 	backgroundWG     sync.WaitGroup
 }
 
@@ -122,8 +122,10 @@ func (r *leaderOnlyReceiver) Start(startCtx context.Context, host component.Host
 
 // Shutdown implements component.Component.
 func (r *leaderOnlyReceiver) Shutdown(ctx context.Context) error {
-	r.cancelBackground()
-	r.backgroundWG.Wait()
+	if r.cancelBackground != nil {
+		r.cancelBackground()
+		r.backgroundWG.Wait()
+	}
 
 	if r.inner == nil {
 		return nil
