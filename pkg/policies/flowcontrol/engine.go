@@ -130,7 +130,6 @@ func (e *Engine) ProcessRequest(
 	}
 
 	rateLimiterDecisions, rateLimitersDecisionType := runLimiters(ctx, rateLimiters, flowLabels, tokens)
-	response.LimiterDecisions = rateLimiterDecisions
 	response.LimiterDecisions = append(response.LimiterDecisions, rateLimiterDecisions...)
 
 	defer func() {
