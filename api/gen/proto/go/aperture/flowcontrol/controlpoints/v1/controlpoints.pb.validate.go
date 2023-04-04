@@ -197,6 +197,8 @@ func (m *FlowControlPoint) validate(all bool) error {
 
 	// no validation rules for ControlPoint
 
+	// no validation rules for Type
+
 	if len(errors) > 0 {
 		return FlowControlPointMultiError(errors)
 	}

@@ -171,7 +171,7 @@ var _ = BeforeSuite(func() {
 			servicegetter.NewEmpty,
 			agentinfo.ProvideAgentInfo,
 			flowcontrol.NewEngine,
-			cache.NewCache[selectors.ControlPointID],
+			cache.NewCache[selectors.TypedControlPointID],
 		),
 		otelcollector.Module(),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),

@@ -256,7 +256,7 @@ func buildRunE(service string) func(cmd *cobra.Command, args []string) error {
 		// build binaries
 		err = buildBinary(service)
 		if err != nil {
-			log.Error().Err(err).Msg("failed to build agent binary")
+			log.Error().Err(err).Msgf("failed to build %s binary", service)
 			return err
 		}
 

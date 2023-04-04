@@ -216,7 +216,7 @@ jobs:
         type: string
         description: working directory
     executor: go-cimg-executor
-    resource_class: large
+    resource_class: xlarge
     environment:
       GOMAXPROCS: 4
     steps:
