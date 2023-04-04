@@ -21,6 +21,7 @@ local scaleInController = spec.v1.ScaleInController;
 local scaleInControllerController = spec.v1.ScaleInControllerController;
 local scaleOutController = spec.v1.ScaleOutController;
 local scaleOutControllerController = spec.v1.ScaleOutControllerController;
+local alerterParameters = spec.v1.AlerterParameters;
 
 function(cfg) {
   local params = config.common + config.policy + cfg,
@@ -36,10 +37,22 @@ function(cfg) {
             autoScale.new()
             + autoScale.withPodAutoScaler(
               podAutoScaler.new()
+              + podAutoScaler.withCooldownOverridePercentage(params.cooldown_override_percentage)
+              + podAutoScaler.withMaxScaleInPercentage(params.max_scale_in_percentage)
+              + podAutoScaler.withMaxScaleOutPercentage(params.max_scale_out_percentage)
               + podAutoScaler.withMinReplicas(params.min_replicas)
               + podAutoScaler.withMaxReplicas(params.max_replicas)
               + podAutoScaler.withScaleInCooldown(params.scale_in_cooldown)
               + podAutoScaler.withScaleOutCooldown(params.scale_out_cooldown)
+              + podAutoScaler.withScaleInAlerterParameters(params.scale_in_alerter_parameters)
+              + podAutoScaler.withScaleOutAlerterParameters(params.scale_out_alerter_parameters)
+              + podAutoScaler.withOutPorts(
+                {
+                  actual_replicas: port.withSignalName('ACTUAL_REPLICAS'),
+                  configured_replicas: port.withSignalName('CONFIGURED_REPLICAS'),
+                  desired_replicas: port.withSignalName('DESIRED_REPLICAS'),
+                }
+              )
               + podAutoScaler.withPodScaler(
                 podScaler.new()
                 + podScaler.withKubernetesObjectSelector(

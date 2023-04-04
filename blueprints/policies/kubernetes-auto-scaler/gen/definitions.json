@@ -40,15 +40,47 @@
         },
 
         "scale_in_cooldown": {
-          "description": "Scale in cooldown.",
+          "description": "The amount of time to wait after a scale-in operation for another scale-in operation.",
           "default": "40s",
           "type": "string"
         },
 
         "scale_out_cooldown": {
-          "description": "Scale out cooldown.",
+          "description": "The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.",
           "default": "30s",
           "type": "string"
+        },
+
+        "cooldown_override_percentage": {
+          "description": "Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.",
+          "default": 50,
+          "type": "number"
+        },
+
+        "max_scale_in_percentage": {
+          "description": "The maximum decrease of replicas (e.g. pods) at one time.",
+          "default": 1,
+          "type": "number"
+        },
+
+        "max_scale_out_percentage": {
+          "description": "The maximum increase of replicas (e.g. pods) at one time.",
+          "default": 10,
+          "type": "number"
+        },
+
+        "scale_in_alerter_parameters": {
+          "description": "Configuration for scale-in alerter.",
+          "default": { "alert_name": "Kubernetes Auto Scaler Scale In Event" },
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
+        },
+
+        "scale_out_alerter_parameters": {
+          "description": "Cooldown override percentage.",
+          "default": { "alert_name": "Kubernetes Auto Scaler Scale Out Event" },
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
         },
 
         "components": {

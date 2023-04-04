@@ -15,12 +15,33 @@ policy:
   # Maximum number of replicas.
   # Type: string
   max_replicas: "10"
-  # Scale in cooldown.
+  # The amount of time to wait after a scale-in operation for another scale-in operation.
   # Type: string
   scale_in_cooldown: "40s"
-  # Scale out cooldown.
+  # The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
   # Type: string
   scale_out_cooldown: "30s"
+  # Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
+  # Type: number
+  cooldown_override_percentage: 50
+  # The maximum decrease of replicas (e.g. pods) at one time.
+  # Type: number
+  max_scale_in_percentage: 1
+  # The maximum increase of replicas (e.g. pods) at one time.
+  # Type: number
+  max_scale_out_percentage: 10
+  # Configuration for scale-in alerter.
+  # Type: aperture.spec.v1.AlerterParameters
+  scale_in_alerter_parameters:
+    # Name of the alert.
+    # Type: string
+    alert_name: "Kubernetes Auto Scaler Scale In Event"
+  # Cooldown override percentage.
+  # Type: aperture.spec.v1.AlerterParameters
+  scale_out_alerter_parameters:
+    # Configuration for scale-out alerter.
+    # Type: string
+    alert_name: "Kubernetes Auto Scaler Scale Out Event"
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
   components: []

@@ -12,8 +12,15 @@
   *
   * @param (policy.min_replicas: string) Minimum number of replicas.
   * @param (policy.max_replicas: string) Maximum number of replicas.
-  * @param (policy.scale_in_cooldown: string) Scale in cooldown.
-  * @param (policy.scale_out_cooldown: string) Scale out cooldown.
+  * @param (policy.scale_in_cooldown: string) The amount of time to wait after a scale-in operation for another scale-in operation.
+  * @param (policy.scale_out_cooldown: string) The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
+  * @param (policy.cooldown_override_percentage: number) Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
+  * @param (policy.max_scale_in_percentage: number) The maximum decrease of replicas (e.g. pods) at one time.
+  * @param (policy.max_scale_out_percentage: number) The maximum increase of replicas (e.g. pods) at one time.
+  * @param (policy.scale_in_alerter_parameters: aperture.spec.v1.AlerterParameters) Configuration for scale-in alerter.
+  * @param (policy.scale_in_alerter_parameters.alert_name: string) Name of the alert.
+  * @param (policy.scale_out_alerter_parameters: aperture.spec.v1.AlerterParameters) Cooldown override percentage.
+  * @param (policy.scale_out_alerter_parameters.alert_name: string) Configuration for scale-out alerter.
   * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
   */
   policy: {
@@ -36,6 +43,15 @@
     max_replicas: '10',
     scale_in_cooldown: '40s',
     scale_out_cooldown: '30s',
+    cooldown_override_percentage: 50,
+    max_scale_in_percentage: 1,
+    max_scale_out_percentage: 10,
+    scale_in_alerter_parameters: {
+      alert_name: 'Kubernetes Auto Scaler Scale In Event',
+    },
+    scale_out_alerter_parameters: {
+      alert_name: 'Kubernetes Auto Scaler Scale Out Event',
+    },
     components: [],
     /**
     * @section Policy

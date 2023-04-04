@@ -58,13 +58,13 @@ function(cfg) {
   local ds = params.datasource,
   local dsName = ds.name,
 
-  local actualScaleAverage = signalAveragePanel('Actual Scale Average', dsName, 'ACTUAL_SCALE', policyName),
-  local configuredScaleAverage = signalAveragePanel('Configured Scale Average', dsName, 'CONFIGURED_SCALE', policyName),
-  local desiredScaleAverage = signalAveragePanel('Desired Scale Average', dsName, 'DESIRED_SCALE', policyName),
+  local actualScaleAverage = signalAveragePanel('Actual Scale Average', dsName, 'ACTUAL_REPLICAS', policyName),
+  local configuredScaleAverage = signalAveragePanel('Configured Scale Average', dsName, 'CONFIGURED_REPLICAS', policyName),
+  local desiredScaleAverage = signalAveragePanel('Desired Scale Average', dsName, 'DESIRED_REPLICAS', policyName),
 
-  local actualScaleFrequency = signalFrequencyPanel('Actual Scale Validity (Frequency)', dsName, 'ACTUAL_SCALE', policyName),
-  local configuredScaleFrequency = signalFrequencyPanel('Configured Scale Validity (Frequency)', dsName, 'CONFIGURED_SCALE', policyName),
-  local desiredScaleFrequency = signalFrequencyPanel('Desired Scale Validity (Frequency)', dsName, 'DESIRED_SCALE', policyName),
+  local actualScaleFrequency = signalFrequencyPanel('Actual Scale Validity (Frequency)', dsName, 'ACTUAL_REPLICAS', policyName),
+  local configuredScaleFrequency = signalFrequencyPanel('Configured Scale Validity (Frequency)', dsName, 'CONFIGURED_REPLICAS', policyName),
+  local desiredScaleFrequency = signalFrequencyPanel('Desired Scale Validity (Frequency)', dsName, 'DESIRED_REPLICAS', policyName),
 
   local dashboardDef =
     dashboard.new(

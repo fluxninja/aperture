@@ -88,14 +88,63 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ku
     type="string"
     reference=""
     value="'40s'"
-    description='Scale in cooldown.' />
+    description='The amount of time to wait after a scale-in operation for another scale-in operation.' />
 
 <ParameterDescription
     name="policy.scale_out_cooldown"
     type="string"
     reference=""
     value="'30s'"
-    description='Scale out cooldown.' />
+    description='The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.' />
+
+<ParameterDescription
+    name="policy.cooldown_override_percentage"
+    type="number"
+    reference=""
+    value="50"
+    description='Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.' />
+
+<ParameterDescription
+    name="policy.max_scale_in_percentage"
+    type="number"
+    reference=""
+    value="1"
+    description='The maximum decrease of replicas (e.g. pods) at one time.' />
+
+<ParameterDescription
+    name="policy.max_scale_out_percentage"
+    type="number"
+    reference=""
+    value="10"
+    description='The maximum increase of replicas (e.g. pods) at one time.' />
+
+<ParameterDescription
+    name="policy.scale_in_alerter_parameters"
+    type="aperture.spec.v1.AlerterParameters"
+    reference="../../spec#alerter-parameters"
+    value="{'alert_name': 'Kubernetes Auto Scaler Scale In Event'}"
+    description='Configuration for scale-in alerter.' />
+
+<ParameterDescription
+    name="policy.scale_in_alerter_parameters.alert_name"
+    type="string"
+    reference=""
+    value="'Kubernetes Auto Scaler Scale In Event'"
+    description='Name of the alert.' />
+
+<ParameterDescription
+    name="policy.scale_out_alerter_parameters"
+    type="aperture.spec.v1.AlerterParameters"
+    reference="../../spec#alerter-parameters"
+    value="{'alert_name': 'Kubernetes Auto Scaler Scale Out Event'}"
+    description='Cooldown override percentage.' />
+
+<ParameterDescription
+    name="policy.scale_out_alerter_parameters.alert_name"
+    type="string"
+    reference=""
+    value="'Kubernetes Auto Scaler Scale Out Event'"
+    description='Configuration for scale-out alerter.' />
 
 <ParameterDescription
     name="policy.components"
