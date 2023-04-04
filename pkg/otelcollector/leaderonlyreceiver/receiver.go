@@ -122,13 +122,13 @@ func (r *leaderOnlyReceiver) Start(startCtx context.Context, host component.Host
 
 // Shutdown implements component.Component.
 func (r *leaderOnlyReceiver) Shutdown(ctx context.Context) error {
-	if r.config.leaderElection.IsLeader() {
+	if r.cancelBackground != nil {
+		r.cancelBackground()
+		r.backgroundWG.Wait()
+	}
+	if r.inner != nil {
 		return r.inner.Shutdown(ctx)
 	}
-
-	r.cancelBackground()
-	r.backgroundWG.Wait()
-
 	return nil
 }
 
