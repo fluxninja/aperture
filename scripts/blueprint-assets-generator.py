@@ -378,7 +378,10 @@ JSON_SCHEMA_TPL = """
 
 {%- macro render_properties(node) %}
 "{{ node.parameter.param_name }}": {
-{%- if node.parameter.param_type == 'intermediate_node' %}
+{%- if node.parameter.param_type in ['intermediate_node', '[]object'] %}
+{%- if node.parameter.param_type == '[]object' %}
+"type": "array",
+"items": {
 "type": "object",
 "additionalProperties": false,
 {%- if node.required_children %}
@@ -390,6 +393,22 @@ JSON_SCHEMA_TPL = """
 {%- if not loop.last %},{% endif %}
 {%- endfor %}
 }
+},
+"description": "{{ node.parameter.description }}",
+"default": {{ node.parameter.default | quoteValueJSON }},
+{%- else %}
+"type": "object",
+"additionalProperties": false,
+{%- if node.required_children %}
+"required": [{%- for child_name in node.required_children %}"{{ child_name }}"{%- if not loop.last %},{% endif %}{%- endfor %}],
+{%- endif %}
+"properties": {
+{%- for child_name, child_node in node.children.items() %}
+{{ render_properties(child_node) }}
+{%- if not loop.last %},{% endif %}
+{%- endfor %}
+}
+{%- endif %}
 {%- else %}
 "description": "{{ node.parameter.description }}",
 "default": {{ node.parameter.default | quoteValueJSON }},

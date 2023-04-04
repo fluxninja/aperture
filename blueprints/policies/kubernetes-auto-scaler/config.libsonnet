@@ -62,9 +62,11 @@
     * @param (policy.scale_in_criteria.query.promql: aperture.spec.v1.PromQL required) PromQL query.
     * @param (policy.scale_in_criteria.query.promql.query_string: string required) PromQL query string.
     * @param (policy.scale_in_criteria.query.promql.evaluation_interval: string) Evaluation interval.
+    * @param (policy.scale_in_criteria.query.promql.out_ports: aperture.spec.v1.PromQLOuts required) PromQL query execution output.
+    * @param (policy.scale_in_criteria.query.promql.out_ports.output: aperture.spec.v1.OutPort required) PromQL query execution output port.
     * @param (policy.scale_in_criteria.query.promql.out_ports.output.signal_name: string required) Output Signal name.
     * @param (policy.scale_in_criteria.set_point: number) Set point.
-    * @param (policy.scale_in_criteria.parameters: aperture.spec.v1.GradientControllerParameters) Parameters.
+    * @param (policy.scale_in_criteria.parameters: aperture.spec.v1.DecreasingGradientParameters) Parameters.
     * @param (policy.scale_in_criteria.parameters.slope: number) Slope.
     */
     scale_in_criteria: [
@@ -95,9 +97,11 @@
     * @param (policy.scale_out_criteria.query.promql: aperture.spec.v1.PromQL required) PromQL query.
     * @param (policy.scale_out_criteria.query.promql.query_string: string required) PromQL query string.
     * @param (policy.scale_out_criteria.query.promql.evaluation_interval: string) Evaluation interval.
+    * @param (policy.scale_out_criteria.query.promql.out_ports: aperture.spec.v1.PromQLOuts required) PromQL query execution output.
+    * @param (policy.scale_out_criteria.query.promql.out_ports.output: aperture.spec.v1.OutPort required) PromQL query execution output port.
     * @param (policy.scale_out_criteria.query.promql.out_ports.output.signal_name: string required) Output Signal name.
     * @param (policy.scale_out_criteria.set_point: number) Set point.
-    * @param (policy.scale_out_criteria.parameters: aperture.spec.v1.GradientControllerParameters) Parameters.
+    * @param (policy.scale_out_criteria.parameters: aperture.spec.v1.IncreasingGradientParameters) Parameters.
     * @param (policy.scale_out_criteria.parameters.slope: number) Slope.
     */
     scale_out_criteria: [

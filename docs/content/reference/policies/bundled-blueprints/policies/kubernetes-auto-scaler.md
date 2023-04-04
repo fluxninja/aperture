@@ -221,6 +221,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ku
     description='Evaluation interval.' />
 
 <ParameterDescription
+    name="policy.scale_in_criteria.query.promql.out_ports"
+    type="aperture.spec.v1.PromQLOuts"
+    reference="../../spec#prom-q-l-outs"
+    value="{'output': {'signal_name': '__REQUIRED_FIELD__'}}"
+    description='PromQL query execution output.' />
+
+<ParameterDescription
+    name="policy.scale_in_criteria.query.promql.out_ports.output"
+    type="aperture.spec.v1.OutPort"
+    reference="../../spec#out-port"
+    value="{'signal_name': '__REQUIRED_FIELD__'}"
+    description='PromQL query execution output port.' />
+
+<ParameterDescription
     name="policy.scale_in_criteria.query.promql.out_ports.output.signal_name"
     type="string"
     reference=""
@@ -236,8 +250,8 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ku
 
 <ParameterDescription
     name="policy.scale_in_criteria.parameters"
-    type="aperture.spec.v1.GradientControllerParameters"
-    reference="../../spec#gradient-controller-parameters"
+    type="aperture.spec.v1.DecreasingGradientParameters"
+    reference="../../spec#decreasing-gradient-parameters"
     value="{'slope': 1}"
     description='Parameters.' />
 
@@ -286,6 +300,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ku
     description='Evaluation interval.' />
 
 <ParameterDescription
+    name="policy.scale_out_criteria.query.promql.out_ports"
+    type="aperture.spec.v1.PromQLOuts"
+    reference="../../spec#prom-q-l-outs"
+    value="{'output': {'signal_name': '__REQUIRED_FIELD__'}}"
+    description='PromQL query execution output.' />
+
+<ParameterDescription
+    name="policy.scale_out_criteria.query.promql.out_ports.output"
+    type="aperture.spec.v1.OutPort"
+    reference="../../spec#out-port"
+    value="{'signal_name': '__REQUIRED_FIELD__'}"
+    description='PromQL query execution output port.' />
+
+<ParameterDescription
     name="policy.scale_out_criteria.query.promql.out_ports.output.signal_name"
     type="string"
     reference=""
@@ -301,8 +329,8 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ku
 
 <ParameterDescription
     name="policy.scale_out_criteria.parameters"
-    type="aperture.spec.v1.GradientControllerParameters"
-    reference="../../spec#gradient-controller-parameters"
+    type="aperture.spec.v1.IncreasingGradientParameters"
+    reference="../../spec#increasing-gradient-parameters"
     value="{'slope': -1}"
     description='Parameters.' />
 
