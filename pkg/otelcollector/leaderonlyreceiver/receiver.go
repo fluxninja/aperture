@@ -87,9 +87,9 @@ type leaderOnlyReceiver struct {
 	factory receiver.Factory
 	host    component.Host
 
-	inner receiver.Metrics // nil if not started
+	inner receiver.Metrics // nil if inner receiver not started
 
-	cancelBackground context.CancelFunc
+	cancelBackground context.CancelFunc // nil if background goroutine not started
 	backgroundWG     sync.WaitGroup
 }
 

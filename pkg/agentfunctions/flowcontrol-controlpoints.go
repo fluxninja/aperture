@@ -16,13 +16,13 @@ import (
 // Note: There's no requirement every handler needs to be in a separate struct.
 // More methods can be added to this one.
 type FlowControlControlPointsHandler struct {
-	cache      *cache.Cache[selectors.ControlPointID]
+	cache      *cache.Cache[selectors.TypedControlPointID]
 	agentGroup string
 }
 
 // NewFlowControlControlPointsHandler returns a new FlowControlControlPointsHandler.
 func NewFlowControlControlPointsHandler(
-	cache *cache.Cache[selectors.ControlPointID],
+	cache *cache.Cache[selectors.TypedControlPointID],
 	agentInfo *agentinfo.AgentInfo,
 ) FlowControlControlPointsHandler {
 	return FlowControlControlPointsHandler{

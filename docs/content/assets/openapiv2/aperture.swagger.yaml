@@ -1471,6 +1471,8 @@ definitions:
                 type: string
             service:
                 type: string
+            type:
+                type: string
         type: object
     FlowControlPoints:
         properties:
