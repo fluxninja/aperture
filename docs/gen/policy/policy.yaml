@@ -2456,8 +2456,8 @@ definitions:
   PodAutoScaler:
     description: _PodAutoScaler_ provides auto-scaling functionality for scalable
       Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_
-      for performing scale-out or scale-in. The __PodAutoScaler__ interfaces with
-      Kubernetes infrastructure APIs to perform auto-scale.
+      for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes
+      infrastructure APIs to perform auto-scale.
     type: object
     properties:
       cooldown_override_percentage:

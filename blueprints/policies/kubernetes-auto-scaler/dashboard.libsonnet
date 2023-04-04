@@ -37,92 +37,19 @@ local newTimeSeriesPanel(title, datasource, query, axisLabel='', unit='') =
     interval: '1s',
   };
 
-local newBarGaugePanel(graphTitle, datasource, graphQuery) =
-  local target =
-    prometheus.target(graphQuery) +
-    {
-      legendFormat: '{{ instance }} - {{ policy_name }}',
-      format: 'time_series',
-      instant: false,
-      range: true,
-    };
+local signalAveragePanel(title, datasource, signalName, policyName) =
+  local query = |||
+    increase(signal_reading_sum{policy_name="%(policy_name)s",signal_name="%(signal_name)s",valid="true"}[$__rate_interval])
+    /
+    increase(signal_reading_count{policy_name="%(policy_name)s",signal_name="%(signal_name)s",valid="true"}[$__rate_interval])
+  ||| % { policy_name: policyName, signal_name: signalName };
+  newTimeSeriesPanel(title, datasource, query);
 
-  barGaugePanel.new(
-    title=graphTitle,
-    datasource=datasource,
-  ).addTarget(target) +
-  {
-    fieldConfig: {
-      defaults: {
-        color: {
-          mode: 'thresholds',
-        },
-        mappings: [],
-        thresholds: {
-          mode: 'absolute',
-          steps: [
-            { color: 'green', value: null },
-          ],
-        },
-      },
-      overrides: [],
-    },
-    options: {
-      displayMode: 'gradient',
-      minVizHeight: 10,
-      minVizWidth: 0,
-      orientation: 'horizontal',
-      reduceOptions: {
-        calcs: ['lastNotNull'],
-        fields: '',
-        values: false,
-      },
-      showUnfilled: true,
-    },
-  };
-
-local newStatPanel(graphTitle, datasource, graphQuery) =
-  local target =
-    prometheus.target(graphQuery) +
-    {
-      legendFormat: '{{ instance }} - {{ policy_name }}',
-      editorMode: 'code',
-      range: true,
-    };
-
-  statPanel.new(
-    title=graphTitle,
-    datasource=datasource,
-  ).addTarget(target) +
-  {
-    fieldConfig: {
-      defaults: {
-        color: {
-          mode: 'thresholds',
-        },
-        mappings: [],
-        thresholds: {
-          mode: 'absolute',
-          steps: [
-            { color: 'green', value: null },
-          ],
-        },
-      },
-      overrides: [],
-    },
-    options: {
-      colorMode: 'value',
-      graphMode: 'none',
-      justifyMode: 'center',
-      orientation: 'horizontal',
-      reduceOptions: {
-        calcs: ['lastNotNull'],
-        fields: '',
-        values: false,
-      },
-      textMode: 'auto',
-    },
-  };
+local signalFrequencyPanel(title, datasource, signalName, policyName) =
+  local query = |||
+    avg by (valid) (rate(signal_reading_count{policy_name="%(policy_name)s",signal_name="%(signal_name)s"}[$__rate_interval]))
+  ||| % { policy_name: policyName, signal_name: signalName };
+  newTimeSeriesPanel(title, datasource, query);
 
 function(cfg) {
   local p = 'service_latency',
@@ -131,9 +58,17 @@ function(cfg) {
   local ds = params.datasource,
   local dsName = ds.name,
 
+  local actualScaleAverage = signalAveragePanel('Actual Scale Average', dsName, 'ACTUAL_SCALE', policyName),
+  local configuredScaleAverage = signalAveragePanel('Configured Scale Average', dsName, 'CONFIGURED_SCALE', policyName),
+  local desiredScaleAverage = signalAveragePanel('Desired Scale Average', dsName, 'DESIRED_SCALE', policyName),
+
+  local actualScaleFrequency = signalFrequencyPanel('Actual Scale Validity (Frequency)', dsName, 'ACTUAL_SCALE', policyName),
+  local configuredScaleFrequency = signalFrequencyPanel('Configured Scale Validity (Frequency)', dsName, 'CONFIGURED_SCALE', policyName),
+  local desiredScaleFrequency = signalFrequencyPanel('Desired Scale Validity (Frequency)', dsName, 'DESIRED_SCALE', policyName),
+
   local dashboardDef =
     dashboard.new(
-      title='Jsonnet / FluxNinja',
+      title='Jsonnet / FluxNinja - Kubernetes Auto Scaler',
       editable=true,
       schemaVersion=18,
       refresh=params.refresh_interval,
@@ -155,7 +90,13 @@ function(cfg) {
         regex: ds.filter_regex,
         type: 'datasource',
       }
-    ),
+    )
+    .addPanel(actualScaleAverage, gridPos={ h: 10, w: 24, x: 0, y: 0 })
+    .addPanel(actualScaleFrequency, gridPos={ h: 10, w: 24, x: 0, y: 10 })
+    .addPanel(configuredScaleAverage, gridPos={ h: 10, w: 24, x: 0, y: 20 })
+    .addPanel(configuredScaleFrequency, gridPos={ h: 10, w: 24, x: 0, y: 30 })
+    .addPanel(desiredScaleAverage, gridPos={ h: 10, w: 24, x: 0, y: 40 })
+    .addPanel(desiredScaleFrequency, gridPos={ h: 10, w: 24, x: 0, y: 50 }),
 
   dashboard: dashboardDef,
 }

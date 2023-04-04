@@ -10,11 +10,17 @@ local port = spec.v1.Port;
 local gradient = spec.v1.GradientController;
 local gradientInPort = spec.v1.GradientControllerIns;
 local gradientOutPort = spec.v1.GradientControllerOuts;
-local inPort = spec.v1.InPort;
+local port = spec.v1.Port;
 local outPorts = spec.v1.OutPort;
 local autoScale = spec.v1.AutoScale;
 local podAutoScaler = spec.v1.PodAutoScaler;
+local podScaler = spec.v1.PodScaler;
 local constant = spec.v1.ConstantSignal;
+local kubernetesObjectSelector = spec.v1.KubernetesObjectSelector;
+local scaleInController = spec.v1.ScaleInController;
+local scaleInControllerController = spec.v1.ScaleInControllerController;
+local scaleOutController = spec.v1.ScaleOutController;
+local scaleOutControllerController = spec.v1.ScaleOutControllerController;
 
 function(cfg) {
   local params = config.common + config.policy + cfg,
@@ -34,24 +40,46 @@ function(cfg) {
               + podAutoScaler.withMaxReplicas(params.max_replicas)
               + podAutoScaler.withScaleInCooldown(params.scale_in_cooldown)
               + podAutoScaler.withScaleOutCooldown(params.scale_out_cooldown)
-              + podAutoScaler.withScaleInControllers([
-                gradient.new()
-                + gradient.withInPorts(
-                  gradientInPort.new()
-                  + gradientInPort.withSignal(inPort.withSignalName(criteria.query.promql.out_ports.output.signal_name))
-                  + gradientInPort.withSetpoint(inPort.withConstantSignal(constant.withValue(criteria.set_point)))
+              + podAutoScaler.withPodScaler(
+                podScaler.new()
+                + podScaler.withKubernetesObjectSelector(
+                  kubernetesObjectSelector.new()
+                  + kubernetesObjectSelector.withNamespace(params.kubernetes_object_selector.namespace)
+                  + kubernetesObjectSelector.withName(params.kubernetes_object_selector.name)
+                  + kubernetesObjectSelector.withApiVersion(params.kubernetes_object_selector.api_version)
+                  + kubernetesObjectSelector.withKind(params.kubernetes_object_selector.kind)
                 )
-                + gradient.withParameters(criteria.parameters)
+              )
+              + podAutoScaler.withScaleInControllers([
+                scaleInController.new()
+                + scaleInController.withController(
+                  scaleInControllerController.new()
+                  + scaleInControllerController.withGradient(
+                    gradient.new()
+                    + gradient.withInPorts(
+                      gradientInPort.new()
+                      + gradientInPort.withSignal(port.withSignalName(criteria.query.promql.out_ports.output.signal_name))
+                      + gradientInPort.withSetpoint(port.withConstantSignal(criteria.set_point))
+                    )
+                    + gradient.withParameters(criteria.parameters)
+                  )
+                )
                 for criteria in params.scale_in_criteria
               ])
               + podAutoScaler.withScaleOutControllers([
-                gradient.new()
-                + gradient.withInPorts(
-                  gradientInPort.new()
-                  + gradientInPort.withSignal(inPort.withSignalName(criteria.query.promql.out_ports.output.signal_name))
-                  + gradientInPort.withSetpoint(inPort.withConstantSignal(constant.withValue(criteria.set_point)))
+                scaleInController.new()
+                + scaleInController.withController(
+                  scaleInControllerController.new()
+                  + scaleInControllerController.withGradient(
+                    gradient.new()
+                    + gradient.withInPorts(
+                      gradientInPort.new()
+                      + gradientInPort.withSignal(port.withSignalName(criteria.query.promql.out_ports.output.signal_name))
+                      + gradientInPort.withSetpoint(port.withConstantSignal(criteria.set_point))
+                    )
+                    + gradient.withParameters(criteria.parameters)
+                  )
                 )
-                + gradient.withParameters(criteria.parameters)
                 for criteria in params.scale_out_criteria
               ])
             )

@@ -71,14 +71,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/ku
 
 <ParameterDescription
     name="policy.min_replicas"
-    type="number"
+    type="string"
     reference=""
     value="1"
     description='Minimum number of replicas.' />
 
 <ParameterDescription
     name="policy.max_replicas"
-    type="number"
+    type="string"
     reference=""
     value="10"
     description='Maximum number of replicas.' />

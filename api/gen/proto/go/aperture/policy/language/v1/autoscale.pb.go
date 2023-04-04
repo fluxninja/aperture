@@ -735,7 +735,7 @@ func (x *AutoScaler) GetScaleInAlerterParameters() *Alerter_Parameters {
 	return nil
 }
 
-// _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The __PodAutoScaler__ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
+// _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
 type PodAutoScaler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

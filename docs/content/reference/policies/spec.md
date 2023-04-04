@@ -3001,7 +3001,7 @@ Example:
 
 ### PodAutoScaler {#pod-auto-scaler}
 
-_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The **PodAutoScaler** interfaces with Kubernetes infrastructure APIs to perform auto-scale.
+_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
 
 <dl>
 <dt>cooldown_override_percentage</dt>

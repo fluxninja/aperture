@@ -10,8 +10,8 @@
   /**
   * @section Policy
   *
-  * @param (policy.min_replicas: number) Minimum number of replicas.
-  * @param (policy.max_replicas: number) Maximum number of replicas.
+  * @param (policy.min_replicas: string) Minimum number of replicas.
+  * @param (policy.max_replicas: string) Maximum number of replicas.
   * @param (policy.scale_in_cooldown: string) Scale in cooldown.
   * @param (policy.scale_out_cooldown: string) Scale out cooldown.
   * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
@@ -32,8 +32,8 @@
       kind: '__REQUIRED_FIELD__',
       name: '__REQUIRED_FIELD__',
     },
-    min_replicas: 1,
-    max_replicas: 10,
+    min_replicas: '1',
+    max_replicas: '10',
     scale_in_cooldown: '40s',
     scale_out_cooldown: '30s',
     components: [],

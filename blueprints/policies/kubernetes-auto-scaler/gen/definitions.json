@@ -29,14 +29,14 @@
       "properties": {
         "min_replicas": {
           "description": "Minimum number of replicas.",
-          "default": 1,
-          "type": "number"
+          "default": "1",
+          "type": "string"
         },
 
         "max_replicas": {
           "description": "Maximum number of replicas.",
-          "default": 10,
-          "type": "number"
+          "default": "10",
+          "type": "string"
         },
 
         "scale_in_cooldown": {

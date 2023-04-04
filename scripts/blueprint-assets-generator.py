@@ -443,6 +443,9 @@ YAML_TPL = """
 {{ '  ' * level }}{{ node.parameter.param_name }}:
 {%- endif %}
 {%- endif %}
+{%- if node.parameter.default is iterable and not node.parameter.default is string and not node.parameter.default is mapping and node.parameter.default | list %}
+{{ '  ' * (level) }}-
+{%- endif %}
 {%- for child_name, child_node in node.children.items() %}
 {{- render_node(child_node, level + 1) }}
 {%- endfor %}
