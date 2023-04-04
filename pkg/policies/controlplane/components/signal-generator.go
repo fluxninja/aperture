@@ -119,9 +119,9 @@ func (sg *SignalGenerator) Execute(inPortReadings runtime.PortToReading, tickInf
 	}
 
 	return runtime.PortToReading{
-		"output":       []runtime.Reading{runtime.NewReading(currentValue)},
-		"start_signal": []runtime.Reading{runtime.NewBoolReading(sg.atStart)},
-		"end_signal":   []runtime.Reading{runtime.NewBoolReading(sg.atEnd)},
+		"output":   []runtime.Reading{runtime.NewReading(currentValue)},
+		"at_start": []runtime.Reading{runtime.NewBoolReading(sg.atStart)},
+		"at_end":   []runtime.Reading{runtime.NewBoolReading(sg.atEnd)},
 	}, nil
 }
 

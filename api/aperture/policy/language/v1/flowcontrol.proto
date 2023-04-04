@@ -959,9 +959,9 @@ message LoadShaper {
     // The percentage of flows being accepted by the _Load Shaper_.
     OutPort accept_percentage = 1;
     // A boolean signal indicating whether the _Load Shaper_ is at the start of signal generation.
-    OutPort start_signal = 2;
+    OutPort at_start = 2;
     // A boolean signal indicating whether the _Load Shaper_ is at the end of signal generation.
-    OutPort end_signal = 3;
+    OutPort at_end = 3;
   }
 
   Ins in_ports = 1;

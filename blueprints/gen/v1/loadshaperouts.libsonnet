@@ -7,16 +7,16 @@
   withAcceptPercentageMixin(accept_percentage):: {
     accept_percentage+: accept_percentage,
   },
-  withEndSignal(end_signal):: {
-    end_signal: end_signal,
+  withAtEnd(at_end):: {
+    at_end: at_end,
   },
-  withEndSignalMixin(end_signal):: {
-    end_signal+: end_signal,
+  withAtEndMixin(at_end):: {
+    at_end+: at_end,
   },
-  withStartSignal(start_signal):: {
-    start_signal: start_signal,
+  withAtStart(at_start):: {
+    at_start: at_start,
   },
-  withStartSignalMixin(start_signal):: {
-    start_signal+: start_signal,
+  withAtStartMixin(at_start):: {
+    at_start+: at_start,
   },
 }

@@ -11,8 +11,8 @@ const (
 	loadShaperBackwardPortName         = "backward"
 	loadShaperResetPortName            = "reset"
 	loadShaperAcceptPercentagePortName = "accept_percentage"
-	loadShaperStartSignalPortName      = "start_signal"
-	loadShaperEndSignalPortName        = "end_signal"
+	loadShaperAtStartPortName          = "at_start"
+	loadShaperAtEndPortName            = "at_end"
 )
 
 // ParseLoadShaper parses a LoadShaper from the given proto and returns its nested circuit representation.
@@ -28,9 +28,9 @@ func ParseLoadShaper(loadShaper *policylangv1.LoadShaper) (*policylangv1.NestedC
 		if backwardPort != nil {
 			nestedInPortsMap[loadShaperBackwardPortName] = backwardPort
 		}
-		resetPort := inPorts.Forward
+		resetPort := inPorts.Reset_
 		if resetPort != nil {
-			nestedInPortsMap[loadShaperForwardPortName] = resetPort
+			nestedInPortsMap[loadShaperResetPortName] = resetPort
 		}
 	}
 
@@ -41,13 +41,13 @@ func ParseLoadShaper(loadShaper *policylangv1.LoadShaper) (*policylangv1.NestedC
 		if acceptPercentagePort != nil {
 			nestedOutPortsMap[loadShaperAcceptPercentagePortName] = acceptPercentagePort
 		}
-		startSignalPort := outPorts.StartSignal
+		startSignalPort := outPorts.AtStart
 		if startSignalPort != nil {
-			nestedOutPortsMap[loadShaperStartSignalPortName] = startSignalPort
+			nestedOutPortsMap[loadShaperAtStartPortName] = startSignalPort
 		}
-		endSignalPort := outPorts.EndSignal
+		endSignalPort := outPorts.AtEnd
 		if endSignalPort != nil {
-			nestedOutPortsMap[loadShaperEndSignalPortName] = endSignalPort
+			nestedOutPortsMap[loadShaperAtEndPortName] = endSignalPort
 		}
 	}
 
@@ -97,10 +97,10 @@ func ParseLoadShaper(loadShaper *policylangv1.LoadShaper) (*policylangv1.NestedC
 							Output: &policylangv1.OutPort{
 								SignalName: "ACCEPT_PERCENTAGE",
 							},
-							StartSignal: &policylangv1.OutPort{
+							AtStart: &policylangv1.OutPort{
 								SignalName: "START_SIGNAL",
 							},
-							EndSignal: &policylangv1.OutPort{
+							AtEnd: &policylangv1.OutPort{
 								SignalName: "END_SIGNAL",
 							},
 						},
@@ -132,8 +132,8 @@ func ParseLoadShaper(loadShaper *policylangv1.LoadShaper) (*policylangv1.NestedC
 	components.AddNestedIngress(nestedCircuit, loadShaperBackwardPortName, "BACKWARD")
 	components.AddNestedIngress(nestedCircuit, loadShaperResetPortName, "RESET")
 	components.AddNestedEgress(nestedCircuit, loadShaperAcceptPercentagePortName, "ACCEPT_PERCENTAGE")
-	components.AddNestedEgress(nestedCircuit, loadShaperStartSignalPortName, "START_SIGNAL")
-	components.AddNestedEgress(nestedCircuit, loadShaperEndSignalPortName, "END_SIGNAL")
+	components.AddNestedEgress(nestedCircuit, loadShaperAtStartPortName, "START_SIGNAL")
+	components.AddNestedEgress(nestedCircuit, loadShaperAtEndPortName, "END_SIGNAL")
 
 	return nestedCircuit, nil
 }

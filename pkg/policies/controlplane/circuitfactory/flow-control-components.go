@@ -118,7 +118,8 @@ func newFlowControlCompositeAndOptions(
 			return retErr(err)
 		}
 
-		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
+		tree, configuredComponents, options, err := ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
+		return tree, configuredComponents, options, err
 	}
 	return retErr(fmt.Errorf("unsupported/missing component type, proto: %+v", flowControlComponentProto))
 }

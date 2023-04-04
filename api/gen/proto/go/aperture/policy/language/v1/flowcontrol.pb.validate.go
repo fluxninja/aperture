@@ -7384,11 +7384,11 @@ func (m *LoadShaper_Outs) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetStartSignal()).(type) {
+		switch v := interface{}(m.GetAtStart()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, LoadShaper_OutsValidationError{
-					field:  "StartSignal",
+					field:  "AtStart",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -7396,16 +7396,16 @@ func (m *LoadShaper_Outs) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, LoadShaper_OutsValidationError{
-					field:  "StartSignal",
+					field:  "AtStart",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetStartSignal()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetAtStart()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return LoadShaper_OutsValidationError{
-				field:  "StartSignal",
+				field:  "AtStart",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -7413,11 +7413,11 @@ func (m *LoadShaper_Outs) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetEndSignal()).(type) {
+		switch v := interface{}(m.GetAtEnd()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, LoadShaper_OutsValidationError{
-					field:  "EndSignal",
+					field:  "AtEnd",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -7425,16 +7425,16 @@ func (m *LoadShaper_Outs) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, LoadShaper_OutsValidationError{
-					field:  "EndSignal",
+					field:  "AtEnd",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetEndSignal()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetAtEnd()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return LoadShaper_OutsValidationError{
-				field:  "EndSignal",
+				field:  "AtEnd",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

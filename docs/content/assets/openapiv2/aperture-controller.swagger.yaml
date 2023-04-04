@@ -2136,11 +2136,11 @@ definitions:
       accept_percentage:
         description: The percentage of flows being accepted by the _Load Shaper_.
         $ref: '#/definitions/OutPort'
-      end_signal:
+      at_end:
         description: A boolean signal indicating whether the _Load Shaper_ is at the
           end of signal generation.
         $ref: '#/definitions/OutPort'
-      start_signal:
+      at_start:
         description: A boolean signal indicating whether the _Load Shaper_ is at the
           start of signal generation.
         $ref: '#/definitions/OutPort'
@@ -3312,16 +3312,16 @@ definitions:
     description: Outputs for the _Signal Generator_ component.
     type: object
     properties:
-      end_signal:
+      at_end:
         description: A boolean signal indicating whether the _Signal Generator_ is
           at the end of signal generation.
         $ref: '#/definitions/OutPort'
-      output:
-        description: The generated signal.
-        $ref: '#/definitions/OutPort'
-      start_signal:
+      at_start:
         description: A boolean signal indicating whether the _Signal Generator_ is
           at the start of signal generation.
+        $ref: '#/definitions/OutPort'
+      output:
+        description: The generated signal.
         $ref: '#/definitions/OutPort'
   SignalGeneratorParameters:
     description: Parameters for the _Signal Generator_ component.

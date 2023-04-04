@@ -1,22 +1,22 @@
 {
   new():: {
   },
-  withEndSignal(end_signal):: {
-    end_signal: end_signal,
+  withAtEnd(at_end):: {
+    at_end: at_end,
   },
-  withEndSignalMixin(end_signal):: {
-    end_signal+: end_signal,
+  withAtEndMixin(at_end):: {
+    at_end+: at_end,
+  },
+  withAtStart(at_start):: {
+    at_start: at_start,
+  },
+  withAtStartMixin(at_start):: {
+    at_start+: at_start,
   },
   withOutput(output):: {
     output: output,
   },
   withOutputMixin(output):: {
     output+: output,
-  },
-  withStartSignal(start_signal):: {
-    start_signal: start_signal,
-  },
-  withStartSignalMixin(start_signal):: {
-    start_signal+: start_signal,
   },
 }

@@ -2102,12 +2102,12 @@
           "description": "The percentage of flows being accepted by the _Load Shaper_.",
           "x-order": 0
         },
-        "end_signal": {
+        "at_end": {
           "$ref": "#/definitions/OutPort",
           "description": "A boolean signal indicating whether the _Load Shaper_ is at the end of signal generation.",
           "x-order": 1
         },
-        "start_signal": {
+        "at_start": {
           "$ref": "#/definitions/OutPort",
           "description": "A boolean signal indicating whether the _Load Shaper_ is at the start of signal generation.",
           "x-order": 2
@@ -3236,19 +3236,19 @@
     "SignalGeneratorOuts": {
       "description": "Outputs for the _Signal Generator_ component.",
       "properties": {
-        "end_signal": {
+        "at_end": {
           "$ref": "#/definitions/OutPort",
           "description": "A boolean signal indicating whether the _Signal Generator_ is at the end of signal generation.",
           "x-order": 0
         },
+        "at_start": {
+          "$ref": "#/definitions/OutPort",
+          "description": "A boolean signal indicating whether the _Signal Generator_ is at the start of signal generation.",
+          "x-order": 1
+        },
         "output": {
           "$ref": "#/definitions/OutPort",
           "description": "The generated signal.",
-          "x-order": 1
-        },
-        "start_signal": {
-          "$ref": "#/definitions/OutPort",
-          "description": "A boolean signal indicating whether the _Signal Generator_ is at the start of signal generation.",
           "x-order": 2
         }
       },

@@ -2807,13 +2807,13 @@ Outputs for the _Load Shaper_ component.
 ([OutPort](#out-port)) The percentage of flows being accepted by the _Load Shaper_.
 
 </dd>
-<dt>end_signal</dt>
+<dt>at_end</dt>
 <dd>
 
 ([OutPort](#out-port)) A boolean signal indicating whether the _Load Shaper_ is at the end of signal generation.
 
 </dd>
-<dt>start_signal</dt>
+<dt>at_start</dt>
 <dd>
 
 ([OutPort](#out-port)) A boolean signal indicating whether the _Load Shaper_ is at the start of signal generation.
@@ -4335,22 +4335,22 @@ Inputs for the _Signal Generator_ component.
 Outputs for the _Signal Generator_ component.
 
 <dl>
-<dt>end_signal</dt>
+<dt>at_end</dt>
 <dd>
 
 ([OutPort](#out-port)) A boolean signal indicating whether the _Signal Generator_ is at the end of signal generation.
+
+</dd>
+<dt>at_start</dt>
+<dd>
+
+([OutPort](#out-port)) A boolean signal indicating whether the _Signal Generator_ is at the start of signal generation.
 
 </dd>
 <dt>output</dt>
 <dd>
 
 ([OutPort](#out-port)) The generated signal.
-
-</dd>
-<dt>start_signal</dt>
-<dd>
-
-([OutPort](#out-port)) A boolean signal indicating whether the _Signal Generator_ is at the start of signal generation.
 
 </dd>
 </dl>
