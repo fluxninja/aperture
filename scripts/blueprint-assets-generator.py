@@ -269,10 +269,14 @@ def update_docblock_param_defaults(
         config = root
         for idx, part in enumerate(parts):
             if idx == len(parts) - 1:
-                return config[part]
+                return config[part] if not isinstance(config, list) else config[0][part]
             else:
                 try:
-                    config = config[part]
+                    config = (
+                        config[part]
+                        if not isinstance(config, list)
+                        else config[0][part]
+                    )
                 except KeyError:
                     # When specific param is a map (map[string]type) and there is no default
                     # then we return None here, which will be converted into an empty map later.
@@ -302,7 +306,6 @@ def update_docblock_param_defaults(
 
     for block in blocks:
         update_nested_param_defaults(block.nested_parameters, "")
-    for block in blocks:
         update_nested_param_defaults(block.nested_required_parameters, "")
 
 
@@ -375,7 +378,10 @@ JSON_SCHEMA_TPL = """
 
 {%- macro render_properties(node) %}
 "{{ node.parameter.param_name }}": {
-{%- if node.parameter.param_type == 'intermediate_node' %}
+{%- if node.parameter.param_type in ['intermediate_node', '[]object'] %}
+{%- if node.parameter.param_type == '[]object' %}
+"type": "array",
+"items": {
 "type": "object",
 "additionalProperties": false,
 {%- if node.required_children %}
@@ -387,6 +393,22 @@ JSON_SCHEMA_TPL = """
 {%- if not loop.last %},{% endif %}
 {%- endfor %}
 }
+},
+"description": "{{ node.parameter.description }}",
+"default": {{ node.parameter.default | quoteValueJSON }},
+{%- else %}
+"type": "object",
+"additionalProperties": false,
+{%- if node.required_children %}
+"required": [{%- for child_name in node.required_children %}"{{ child_name }}"{%- if not loop.last %},{% endif %}{%- endfor %}],
+{%- endif %}
+"properties": {
+{%- for child_name, child_node in node.children.items() %}
+{{ render_properties(child_node) }}
+{%- if not loop.last %},{% endif %}
+{%- endfor %}
+}
+{%- endif %}
 {%- else %}
 "description": "{{ node.parameter.description }}",
 "default": {{ node.parameter.default | quoteValueJSON }},
@@ -439,6 +461,9 @@ YAML_TPL = """
 {%- else %}
 {{ '  ' * level }}{{ node.parameter.param_name }}:
 {%- endif %}
+{%- endif %}
+{%- if node.parameter.default is iterable and not node.parameter.default is string and not node.parameter.default is mapping and node.parameter.default | list %}
+{{ '  ' * (level) }}-
 {%- endif %}
 {%- for child_name, child_node in node.children.items() %}
 {{- render_node(child_node, level + 1) }}

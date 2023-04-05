@@ -252,6 +252,47 @@ func (m *AutoScale) validate(all bool) error {
 			}
 		}
 
+	case *AutoScale_PodAutoScaler:
+		if v == nil {
+			err := AutoScaleValidationError{
+				field:  "Component",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetPodAutoScaler()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AutoScaleValidationError{
+						field:  "PodAutoScaler",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AutoScaleValidationError{
+						field:  "PodAutoScaler",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetPodAutoScaler()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AutoScaleValidationError{
+					field:  "PodAutoScaler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -518,6 +559,808 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = PodScalerValidationError{}
+
+// Validate checks the field values on IncreasingGradient with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *IncreasingGradient) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on IncreasingGradient with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// IncreasingGradientMultiError, or nil if none found.
+func (m *IncreasingGradient) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *IncreasingGradient) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, IncreasingGradientValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, IncreasingGradientValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return IncreasingGradientValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, IncreasingGradientValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, IncreasingGradientValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return IncreasingGradientValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return IncreasingGradientMultiError(errors)
+	}
+
+	return nil
+}
+
+// IncreasingGradientMultiError is an error wrapping multiple validation errors
+// returned by IncreasingGradient.ValidateAll() if the designated constraints
+// aren't met.
+type IncreasingGradientMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m IncreasingGradientMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m IncreasingGradientMultiError) AllErrors() []error { return m }
+
+// IncreasingGradientValidationError is the validation error returned by
+// IncreasingGradient.Validate if the designated constraints aren't met.
+type IncreasingGradientValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IncreasingGradientValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IncreasingGradientValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IncreasingGradientValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IncreasingGradientValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IncreasingGradientValidationError) ErrorName() string {
+	return "IncreasingGradientValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IncreasingGradientValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIncreasingGradient.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IncreasingGradientValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IncreasingGradientValidationError{}
+
+// Validate checks the field values on DecreasingGradient with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DecreasingGradient) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DecreasingGradient with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DecreasingGradientMultiError, or nil if none found.
+func (m *DecreasingGradient) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DecreasingGradient) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DecreasingGradientValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DecreasingGradientValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DecreasingGradientValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DecreasingGradientValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DecreasingGradientValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DecreasingGradientValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DecreasingGradientMultiError(errors)
+	}
+
+	return nil
+}
+
+// DecreasingGradientMultiError is an error wrapping multiple validation errors
+// returned by DecreasingGradient.ValidateAll() if the designated constraints
+// aren't met.
+type DecreasingGradientMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DecreasingGradientMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DecreasingGradientMultiError) AllErrors() []error { return m }
+
+// DecreasingGradientValidationError is the validation error returned by
+// DecreasingGradient.Validate if the designated constraints aren't met.
+type DecreasingGradientValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DecreasingGradientValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DecreasingGradientValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DecreasingGradientValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DecreasingGradientValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DecreasingGradientValidationError) ErrorName() string {
+	return "DecreasingGradientValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DecreasingGradientValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDecreasingGradient.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DecreasingGradientValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DecreasingGradientValidationError{}
+
+// Validate checks the field values on ScaleOutController with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ScaleOutController) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ScaleOutController with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ScaleOutControllerMultiError, or nil if none found.
+func (m *ScaleOutController) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ScaleOutController) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetController()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ScaleOutControllerValidationError{
+					field:  "Controller",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ScaleOutControllerValidationError{
+					field:  "Controller",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetController()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ScaleOutControllerValidationError{
+				field:  "Controller",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetAlerterParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ScaleOutControllerValidationError{
+					field:  "AlerterParameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ScaleOutControllerValidationError{
+					field:  "AlerterParameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAlerterParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ScaleOutControllerValidationError{
+				field:  "AlerterParameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ScaleOutControllerMultiError(errors)
+	}
+
+	return nil
+}
+
+// ScaleOutControllerMultiError is an error wrapping multiple validation errors
+// returned by ScaleOutController.ValidateAll() if the designated constraints
+// aren't met.
+type ScaleOutControllerMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ScaleOutControllerMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ScaleOutControllerMultiError) AllErrors() []error { return m }
+
+// ScaleOutControllerValidationError is the validation error returned by
+// ScaleOutController.Validate if the designated constraints aren't met.
+type ScaleOutControllerValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ScaleOutControllerValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ScaleOutControllerValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ScaleOutControllerValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ScaleOutControllerValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ScaleOutControllerValidationError) ErrorName() string {
+	return "ScaleOutControllerValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ScaleOutControllerValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sScaleOutController.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ScaleOutControllerValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ScaleOutControllerValidationError{}
+
+// Validate checks the field values on ScaleInController with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ScaleInController) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ScaleInController with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ScaleInControllerMultiError, or nil if none found.
+func (m *ScaleInController) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ScaleInController) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetController()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ScaleInControllerValidationError{
+					field:  "Controller",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ScaleInControllerValidationError{
+					field:  "Controller",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetController()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ScaleInControllerValidationError{
+				field:  "Controller",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetAlerterParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ScaleInControllerValidationError{
+					field:  "AlerterParameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ScaleInControllerValidationError{
+					field:  "AlerterParameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAlerterParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ScaleInControllerValidationError{
+				field:  "AlerterParameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ScaleInControllerMultiError(errors)
+	}
+
+	return nil
+}
+
+// ScaleInControllerMultiError is an error wrapping multiple validation errors
+// returned by ScaleInController.ValidateAll() if the designated constraints
+// aren't met.
+type ScaleInControllerMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ScaleInControllerMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ScaleInControllerMultiError) AllErrors() []error { return m }
+
+// ScaleInControllerValidationError is the validation error returned by
+// ScaleInController.Validate if the designated constraints aren't met.
+type ScaleInControllerValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ScaleInControllerValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ScaleInControllerValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ScaleInControllerValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ScaleInControllerValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ScaleInControllerValidationError) ErrorName() string {
+	return "ScaleInControllerValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ScaleInControllerValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sScaleInController.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ScaleInControllerValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ScaleInControllerValidationError{}
+
+// Validate checks the field values on KubernetesReplicas with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *KubernetesReplicas) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on KubernetesReplicas with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// KubernetesReplicasMultiError, or nil if none found.
+func (m *KubernetesReplicas) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *KubernetesReplicas) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetKubernetesObjectSelector()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, KubernetesReplicasValidationError{
+					field:  "KubernetesObjectSelector",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, KubernetesReplicasValidationError{
+					field:  "KubernetesObjectSelector",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetKubernetesObjectSelector()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return KubernetesReplicasValidationError{
+				field:  "KubernetesObjectSelector",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for DynamicConfigKey
+
+	if all {
+		switch v := interface{}(m.GetDefaultConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, KubernetesReplicasValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, KubernetesReplicasValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return KubernetesReplicasValidationError{
+				field:  "DefaultConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return KubernetesReplicasMultiError(errors)
+	}
+
+	return nil
+}
+
+// KubernetesReplicasMultiError is an error wrapping multiple validation errors
+// returned by KubernetesReplicas.ValidateAll() if the designated constraints
+// aren't met.
+type KubernetesReplicasMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m KubernetesReplicasMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m KubernetesReplicasMultiError) AllErrors() []error { return m }
+
+// KubernetesReplicasValidationError is the validation error returned by
+// KubernetesReplicas.Validate if the designated constraints aren't met.
+type KubernetesReplicasValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e KubernetesReplicasValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e KubernetesReplicasValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e KubernetesReplicasValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e KubernetesReplicasValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e KubernetesReplicasValidationError) ErrorName() string {
+	return "KubernetesReplicasValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e KubernetesReplicasValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sKubernetesReplicas.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = KubernetesReplicasValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = KubernetesReplicasValidationError{}
 
 // Validate checks the field values on AutoScaler with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
@@ -869,6 +1712,358 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AutoScalerValidationError{}
+
+// Validate checks the field values on PodAutoScaler with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *PodAutoScaler) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PodAutoScaler with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in PodAutoScalerMultiError, or
+// nil if none found.
+func (m *PodAutoScaler) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PodAutoScaler) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetOutPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PodAutoScalerValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PodAutoScalerValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PodAutoScalerValidationError{
+				field:  "OutPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetPodScaler()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PodAutoScalerValidationError{
+					field:  "PodScaler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PodAutoScalerValidationError{
+					field:  "PodScaler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPodScaler()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PodAutoScalerValidationError{
+				field:  "PodScaler",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for MinReplicas
+
+	// no validation rules for MaxReplicas
+
+	for idx, item := range m.GetScaleOutControllers() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, PodAutoScalerValidationError{
+						field:  fmt.Sprintf("ScaleOutControllers[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, PodAutoScalerValidationError{
+						field:  fmt.Sprintf("ScaleOutControllers[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PodAutoScalerValidationError{
+					field:  fmt.Sprintf("ScaleOutControllers[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetScaleInControllers() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, PodAutoScalerValidationError{
+						field:  fmt.Sprintf("ScaleInControllers[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, PodAutoScalerValidationError{
+						field:  fmt.Sprintf("ScaleInControllers[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PodAutoScalerValidationError{
+					field:  fmt.Sprintf("ScaleInControllers[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for MaxScaleOutPercentage
+
+	// no validation rules for MaxScaleInPercentage
+
+	if all {
+		switch v := interface{}(m.GetScaleOutCooldown()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PodAutoScalerValidationError{
+					field:  "ScaleOutCooldown",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PodAutoScalerValidationError{
+					field:  "ScaleOutCooldown",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetScaleOutCooldown()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PodAutoScalerValidationError{
+				field:  "ScaleOutCooldown",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetScaleInCooldown()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PodAutoScalerValidationError{
+					field:  "ScaleInCooldown",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PodAutoScalerValidationError{
+					field:  "ScaleInCooldown",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetScaleInCooldown()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PodAutoScalerValidationError{
+				field:  "ScaleInCooldown",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for CooldownOverridePercentage
+
+	if all {
+		switch v := interface{}(m.GetScaleOutAlerterParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PodAutoScalerValidationError{
+					field:  "ScaleOutAlerterParameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PodAutoScalerValidationError{
+					field:  "ScaleOutAlerterParameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetScaleOutAlerterParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PodAutoScalerValidationError{
+				field:  "ScaleOutAlerterParameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetScaleInAlerterParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PodAutoScalerValidationError{
+					field:  "ScaleInAlerterParameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PodAutoScalerValidationError{
+					field:  "ScaleInAlerterParameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetScaleInAlerterParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PodAutoScalerValidationError{
+				field:  "ScaleInAlerterParameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return PodAutoScalerMultiError(errors)
+	}
+
+	return nil
+}
+
+// PodAutoScalerMultiError is an error wrapping multiple validation errors
+// returned by PodAutoScaler.ValidateAll() if the designated constraints
+// aren't met.
+type PodAutoScalerMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PodAutoScalerMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PodAutoScalerMultiError) AllErrors() []error { return m }
+
+// PodAutoScalerValidationError is the validation error returned by
+// PodAutoScaler.Validate if the designated constraints aren't met.
+type PodAutoScalerValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PodAutoScalerValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PodAutoScalerValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PodAutoScalerValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PodAutoScalerValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PodAutoScalerValidationError) ErrorName() string { return "PodAutoScalerValidationError" }
+
+// Error satisfies the builtin error interface
+func (e PodAutoScalerValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPodAutoScaler.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PodAutoScalerValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PodAutoScalerValidationError{}
 
 // Validate checks the field values on PodScaler_ScaleReporter with the rules
 // defined in the proto definition for this message. If any rules are
@@ -1563,100 +2758,46 @@ var _ interface {
 	ErrorName() string
 } = PodScaler_ScaleActuator_InsValidationError{}
 
-// Validate checks the field values on AutoScaler_IncreasingGradient with the
+// Validate checks the field values on IncreasingGradient_Parameters with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *AutoScaler_IncreasingGradient) Validate() error {
+func (m *IncreasingGradient_Parameters) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on AutoScaler_IncreasingGradient with
+// ValidateAll checks the field values on IncreasingGradient_Parameters with
 // the rules defined in the proto definition for this message. If any rules
 // are violated, the result is a list of violation errors wrapped in
-// AutoScaler_IncreasingGradientMultiError, or nil if none found.
-func (m *AutoScaler_IncreasingGradient) ValidateAll() error {
+// IncreasingGradient_ParametersMultiError, or nil if none found.
+func (m *IncreasingGradient_Parameters) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AutoScaler_IncreasingGradient) validate(all bool) error {
+func (m *IncreasingGradient_Parameters) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	if all {
-		switch v := interface{}(m.GetInPorts()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_IncreasingGradientValidationError{
-					field:  "InPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_IncreasingGradientValidationError{
-					field:  "InPorts",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AutoScaler_IncreasingGradientValidationError{
-				field:  "InPorts",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for Slope
 
-	if all {
-		switch v := interface{}(m.GetParameters()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_IncreasingGradientValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_IncreasingGradientValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AutoScaler_IncreasingGradientValidationError{
-				field:  "Parameters",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for MaxGradient
 
 	if len(errors) > 0 {
-		return AutoScaler_IncreasingGradientMultiError(errors)
+		return IncreasingGradient_ParametersMultiError(errors)
 	}
 
 	return nil
 }
 
-// AutoScaler_IncreasingGradientMultiError is an error wrapping multiple
-// validation errors returned by AutoScaler_IncreasingGradient.ValidateAll()
+// IncreasingGradient_ParametersMultiError is an error wrapping multiple
+// validation errors returned by IncreasingGradient_Parameters.ValidateAll()
 // if the designated constraints aren't met.
-type AutoScaler_IncreasingGradientMultiError []error
+type IncreasingGradient_ParametersMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AutoScaler_IncreasingGradientMultiError) Error() string {
+func (m IncreasingGradient_ParametersMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1665,12 +2806,12 @@ func (m AutoScaler_IncreasingGradientMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AutoScaler_IncreasingGradientMultiError) AllErrors() []error { return m }
+func (m IncreasingGradient_ParametersMultiError) AllErrors() []error { return m }
 
-// AutoScaler_IncreasingGradientValidationError is the validation error
-// returned by AutoScaler_IncreasingGradient.Validate if the designated
+// IncreasingGradient_ParametersValidationError is the validation error
+// returned by IncreasingGradient_Parameters.Validate if the designated
 // constraints aren't met.
-type AutoScaler_IncreasingGradientValidationError struct {
+type IncreasingGradient_ParametersValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1678,24 +2819,24 @@ type AutoScaler_IncreasingGradientValidationError struct {
 }
 
 // Field function returns field value.
-func (e AutoScaler_IncreasingGradientValidationError) Field() string { return e.field }
+func (e IncreasingGradient_ParametersValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AutoScaler_IncreasingGradientValidationError) Reason() string { return e.reason }
+func (e IncreasingGradient_ParametersValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AutoScaler_IncreasingGradientValidationError) Cause() error { return e.cause }
+func (e IncreasingGradient_ParametersValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AutoScaler_IncreasingGradientValidationError) Key() bool { return e.key }
+func (e IncreasingGradient_ParametersValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AutoScaler_IncreasingGradientValidationError) ErrorName() string {
-	return "AutoScaler_IncreasingGradientValidationError"
+func (e IncreasingGradient_ParametersValidationError) ErrorName() string {
+	return "IncreasingGradient_ParametersValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e AutoScaler_IncreasingGradientValidationError) Error() string {
+func (e IncreasingGradient_ParametersValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1707,14 +2848,14 @@ func (e AutoScaler_IncreasingGradientValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAutoScaler_IncreasingGradient.%s: %s%s",
+		"invalid %sIncreasingGradient_Parameters.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AutoScaler_IncreasingGradientValidationError{}
+var _ error = IncreasingGradient_ParametersValidationError{}
 
 var _ interface {
 	Field() string
@@ -1722,24 +2863,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AutoScaler_IncreasingGradientValidationError{}
+} = IncreasingGradient_ParametersValidationError{}
 
-// Validate checks the field values on AutoScaler_DecreasingGradient with the
-// rules defined in the proto definition for this message. If any rules are
+// Validate checks the field values on IncreasingGradient_Ins with the rules
+// defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *AutoScaler_DecreasingGradient) Validate() error {
+func (m *IncreasingGradient_Ins) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on AutoScaler_DecreasingGradient with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, the result is a list of violation errors wrapped in
-// AutoScaler_DecreasingGradientMultiError, or nil if none found.
-func (m *AutoScaler_DecreasingGradient) ValidateAll() error {
+// ValidateAll checks the field values on IncreasingGradient_Ins with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// IncreasingGradient_InsMultiError, or nil if none found.
+func (m *IncreasingGradient_Ins) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AutoScaler_DecreasingGradient) validate(all bool) error {
+func (m *IncreasingGradient_Ins) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -1747,28 +2888,28 @@ func (m *AutoScaler_DecreasingGradient) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetInPorts()).(type) {
+		switch v := interface{}(m.GetSignal()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_DecreasingGradientValidationError{
-					field:  "InPorts",
+				errors = append(errors, IncreasingGradient_InsValidationError{
+					field:  "Signal",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_DecreasingGradientValidationError{
-					field:  "InPorts",
+				errors = append(errors, IncreasingGradient_InsValidationError{
+					field:  "Signal",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetSignal()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return AutoScaler_DecreasingGradientValidationError{
-				field:  "InPorts",
+			return IncreasingGradient_InsValidationError{
+				field:  "Signal",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -1776,28 +2917,28 @@ func (m *AutoScaler_DecreasingGradient) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetParameters()).(type) {
+		switch v := interface{}(m.GetSetpoint()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_DecreasingGradientValidationError{
-					field:  "Parameters",
+				errors = append(errors, IncreasingGradient_InsValidationError{
+					field:  "Setpoint",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_DecreasingGradientValidationError{
-					field:  "Parameters",
+				errors = append(errors, IncreasingGradient_InsValidationError{
+					field:  "Setpoint",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetSetpoint()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return AutoScaler_DecreasingGradientValidationError{
-				field:  "Parameters",
+			return IncreasingGradient_InsValidationError{
+				field:  "Setpoint",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -1805,19 +2946,19 @@ func (m *AutoScaler_DecreasingGradient) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return AutoScaler_DecreasingGradientMultiError(errors)
+		return IncreasingGradient_InsMultiError(errors)
 	}
 
 	return nil
 }
 
-// AutoScaler_DecreasingGradientMultiError is an error wrapping multiple
-// validation errors returned by AutoScaler_DecreasingGradient.ValidateAll()
-// if the designated constraints aren't met.
-type AutoScaler_DecreasingGradientMultiError []error
+// IncreasingGradient_InsMultiError is an error wrapping multiple validation
+// errors returned by IncreasingGradient_Ins.ValidateAll() if the designated
+// constraints aren't met.
+type IncreasingGradient_InsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AutoScaler_DecreasingGradientMultiError) Error() string {
+func (m IncreasingGradient_InsMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1826,12 +2967,11 @@ func (m AutoScaler_DecreasingGradientMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AutoScaler_DecreasingGradientMultiError) AllErrors() []error { return m }
+func (m IncreasingGradient_InsMultiError) AllErrors() []error { return m }
 
-// AutoScaler_DecreasingGradientValidationError is the validation error
-// returned by AutoScaler_DecreasingGradient.Validate if the designated
-// constraints aren't met.
-type AutoScaler_DecreasingGradientValidationError struct {
+// IncreasingGradient_InsValidationError is the validation error returned by
+// IncreasingGradient_Ins.Validate if the designated constraints aren't met.
+type IncreasingGradient_InsValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1839,24 +2979,24 @@ type AutoScaler_DecreasingGradientValidationError struct {
 }
 
 // Field function returns field value.
-func (e AutoScaler_DecreasingGradientValidationError) Field() string { return e.field }
+func (e IncreasingGradient_InsValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AutoScaler_DecreasingGradientValidationError) Reason() string { return e.reason }
+func (e IncreasingGradient_InsValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AutoScaler_DecreasingGradientValidationError) Cause() error { return e.cause }
+func (e IncreasingGradient_InsValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AutoScaler_DecreasingGradientValidationError) Key() bool { return e.key }
+func (e IncreasingGradient_InsValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AutoScaler_DecreasingGradientValidationError) ErrorName() string {
-	return "AutoScaler_DecreasingGradientValidationError"
+func (e IncreasingGradient_InsValidationError) ErrorName() string {
+	return "IncreasingGradient_InsValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e AutoScaler_DecreasingGradientValidationError) Error() string {
+func (e IncreasingGradient_InsValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1868,14 +3008,14 @@ func (e AutoScaler_DecreasingGradientValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAutoScaler_DecreasingGradient.%s: %s%s",
+		"invalid %sIncreasingGradient_Ins.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AutoScaler_DecreasingGradientValidationError{}
+var _ error = IncreasingGradient_InsValidationError{}
 
 var _ interface {
 	Field() string
@@ -1883,24 +3023,131 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AutoScaler_DecreasingGradientValidationError{}
+} = IncreasingGradient_InsValidationError{}
 
-// Validate checks the field values on AutoScaler_ScaleOutController with the
+// Validate checks the field values on DecreasingGradient_Parameters with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *AutoScaler_ScaleOutController) Validate() error {
+func (m *DecreasingGradient_Parameters) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on AutoScaler_ScaleOutController with
+// ValidateAll checks the field values on DecreasingGradient_Parameters with
 // the rules defined in the proto definition for this message. If any rules
 // are violated, the result is a list of violation errors wrapped in
-// AutoScaler_ScaleOutControllerMultiError, or nil if none found.
-func (m *AutoScaler_ScaleOutController) ValidateAll() error {
+// DecreasingGradient_ParametersMultiError, or nil if none found.
+func (m *DecreasingGradient_Parameters) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AutoScaler_ScaleOutController) validate(all bool) error {
+func (m *DecreasingGradient_Parameters) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Slope
+
+	// no validation rules for MinGradient
+
+	if len(errors) > 0 {
+		return DecreasingGradient_ParametersMultiError(errors)
+	}
+
+	return nil
+}
+
+// DecreasingGradient_ParametersMultiError is an error wrapping multiple
+// validation errors returned by DecreasingGradient_Parameters.ValidateAll()
+// if the designated constraints aren't met.
+type DecreasingGradient_ParametersMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DecreasingGradient_ParametersMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DecreasingGradient_ParametersMultiError) AllErrors() []error { return m }
+
+// DecreasingGradient_ParametersValidationError is the validation error
+// returned by DecreasingGradient_Parameters.Validate if the designated
+// constraints aren't met.
+type DecreasingGradient_ParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DecreasingGradient_ParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DecreasingGradient_ParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DecreasingGradient_ParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DecreasingGradient_ParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DecreasingGradient_ParametersValidationError) ErrorName() string {
+	return "DecreasingGradient_ParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DecreasingGradient_ParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDecreasingGradient_Parameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DecreasingGradient_ParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DecreasingGradient_ParametersValidationError{}
+
+// Validate checks the field values on DecreasingGradient_Ins with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DecreasingGradient_Ins) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DecreasingGradient_Ins with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DecreasingGradient_InsMultiError, or nil if none found.
+func (m *DecreasingGradient_Ins) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DecreasingGradient_Ins) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -1908,77 +3155,225 @@ func (m *AutoScaler_ScaleOutController) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetController()).(type) {
+		switch v := interface{}(m.GetSignal()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_ScaleOutControllerValidationError{
-					field:  "Controller",
+				errors = append(errors, DecreasingGradient_InsValidationError{
+					field:  "Signal",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_ScaleOutControllerValidationError{
-					field:  "Controller",
+				errors = append(errors, DecreasingGradient_InsValidationError{
+					field:  "Signal",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetController()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetSignal()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return AutoScaler_ScaleOutControllerValidationError{
+			return DecreasingGradient_InsValidationError{
+				field:  "Signal",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetSetpoint()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DecreasingGradient_InsValidationError{
+					field:  "Setpoint",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DecreasingGradient_InsValidationError{
+					field:  "Setpoint",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSetpoint()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DecreasingGradient_InsValidationError{
+				field:  "Setpoint",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DecreasingGradient_InsMultiError(errors)
+	}
+
+	return nil
+}
+
+// DecreasingGradient_InsMultiError is an error wrapping multiple validation
+// errors returned by DecreasingGradient_Ins.ValidateAll() if the designated
+// constraints aren't met.
+type DecreasingGradient_InsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DecreasingGradient_InsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DecreasingGradient_InsMultiError) AllErrors() []error { return m }
+
+// DecreasingGradient_InsValidationError is the validation error returned by
+// DecreasingGradient_Ins.Validate if the designated constraints aren't met.
+type DecreasingGradient_InsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DecreasingGradient_InsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DecreasingGradient_InsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DecreasingGradient_InsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DecreasingGradient_InsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DecreasingGradient_InsValidationError) ErrorName() string {
+	return "DecreasingGradient_InsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DecreasingGradient_InsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDecreasingGradient_Ins.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DecreasingGradient_InsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DecreasingGradient_InsValidationError{}
+
+// Validate checks the field values on ScaleOutController_Controller with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ScaleOutController_Controller) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ScaleOutController_Controller with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// ScaleOutController_ControllerMultiError, or nil if none found.
+func (m *ScaleOutController_Controller) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ScaleOutController_Controller) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	switch v := m.Controller.(type) {
+	case *ScaleOutController_Controller_Gradient:
+		if v == nil {
+			err := ScaleOutController_ControllerValidationError{
 				field:  "Controller",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "oneof value cannot be a typed-nil",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
-	}
 
-	if all {
-		switch v := interface{}(m.GetAlerterParameters()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_ScaleOutControllerValidationError{
-					field:  "AlerterParameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
+		if all {
+			switch v := interface{}(m.GetGradient()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ScaleOutController_ControllerValidationError{
+						field:  "Gradient",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ScaleOutController_ControllerValidationError{
+						field:  "Gradient",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
 			}
-		case interface{ Validate() error }:
+		} else if v, ok := interface{}(m.GetGradient()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_ScaleOutControllerValidationError{
-					field:  "AlerterParameters",
+				return ScaleOutController_ControllerValidationError{
+					field:  "Gradient",
 					reason: "embedded message failed validation",
 					cause:  err,
-				})
+				}
 			}
 		}
-	} else if v, ok := interface{}(m.GetAlerterParameters()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AutoScaler_ScaleOutControllerValidationError{
-				field:  "AlerterParameters",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
+
+	default:
+		_ = v // ensures v is used
 	}
 
 	if len(errors) > 0 {
-		return AutoScaler_ScaleOutControllerMultiError(errors)
+		return ScaleOutController_ControllerMultiError(errors)
 	}
 
 	return nil
 }
 
-// AutoScaler_ScaleOutControllerMultiError is an error wrapping multiple
-// validation errors returned by AutoScaler_ScaleOutController.ValidateAll()
+// ScaleOutController_ControllerMultiError is an error wrapping multiple
+// validation errors returned by ScaleOutController_Controller.ValidateAll()
 // if the designated constraints aren't met.
-type AutoScaler_ScaleOutControllerMultiError []error
+type ScaleOutController_ControllerMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AutoScaler_ScaleOutControllerMultiError) Error() string {
+func (m ScaleOutController_ControllerMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1987,12 +3382,12 @@ func (m AutoScaler_ScaleOutControllerMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AutoScaler_ScaleOutControllerMultiError) AllErrors() []error { return m }
+func (m ScaleOutController_ControllerMultiError) AllErrors() []error { return m }
 
-// AutoScaler_ScaleOutControllerValidationError is the validation error
-// returned by AutoScaler_ScaleOutController.Validate if the designated
+// ScaleOutController_ControllerValidationError is the validation error
+// returned by ScaleOutController_Controller.Validate if the designated
 // constraints aren't met.
-type AutoScaler_ScaleOutControllerValidationError struct {
+type ScaleOutController_ControllerValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2000,24 +3395,24 @@ type AutoScaler_ScaleOutControllerValidationError struct {
 }
 
 // Field function returns field value.
-func (e AutoScaler_ScaleOutControllerValidationError) Field() string { return e.field }
+func (e ScaleOutController_ControllerValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AutoScaler_ScaleOutControllerValidationError) Reason() string { return e.reason }
+func (e ScaleOutController_ControllerValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AutoScaler_ScaleOutControllerValidationError) Cause() error { return e.cause }
+func (e ScaleOutController_ControllerValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AutoScaler_ScaleOutControllerValidationError) Key() bool { return e.key }
+func (e ScaleOutController_ControllerValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AutoScaler_ScaleOutControllerValidationError) ErrorName() string {
-	return "AutoScaler_ScaleOutControllerValidationError"
+func (e ScaleOutController_ControllerValidationError) ErrorName() string {
+	return "ScaleOutController_ControllerValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e AutoScaler_ScaleOutControllerValidationError) Error() string {
+func (e ScaleOutController_ControllerValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -2029,14 +3424,14 @@ func (e AutoScaler_ScaleOutControllerValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAutoScaler_ScaleOutController.%s: %s%s",
+		"invalid %sScaleOutController_Controller.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AutoScaler_ScaleOutControllerValidationError{}
+var _ error = ScaleOutController_ControllerValidationError{}
 
 var _ interface {
 	Field() string
@@ -2044,102 +3439,90 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AutoScaler_ScaleOutControllerValidationError{}
+} = ScaleOutController_ControllerValidationError{}
 
-// Validate checks the field values on AutoScaler_ScaleInController with the
+// Validate checks the field values on ScaleInController_Controller with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *AutoScaler_ScaleInController) Validate() error {
+func (m *ScaleInController_Controller) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on AutoScaler_ScaleInController with the
+// ValidateAll checks the field values on ScaleInController_Controller with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// AutoScaler_ScaleInControllerMultiError, or nil if none found.
-func (m *AutoScaler_ScaleInController) ValidateAll() error {
+// ScaleInController_ControllerMultiError, or nil if none found.
+func (m *ScaleInController_Controller) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AutoScaler_ScaleInController) validate(all bool) error {
+func (m *ScaleInController_Controller) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	if all {
-		switch v := interface{}(m.GetController()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_ScaleInControllerValidationError{
-					field:  "Controller",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_ScaleInControllerValidationError{
-					field:  "Controller",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetController()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AutoScaler_ScaleInControllerValidationError{
+	switch v := m.Controller.(type) {
+	case *ScaleInController_Controller_Gradient:
+		if v == nil {
+			err := ScaleInController_ControllerValidationError{
 				field:  "Controller",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "oneof value cannot be a typed-nil",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
-	}
 
-	if all {
-		switch v := interface{}(m.GetAlerterParameters()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_ScaleInControllerValidationError{
-					field:  "AlerterParameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
+		if all {
+			switch v := interface{}(m.GetGradient()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ScaleInController_ControllerValidationError{
+						field:  "Gradient",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ScaleInController_ControllerValidationError{
+						field:  "Gradient",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
 			}
-		case interface{ Validate() error }:
+		} else if v, ok := interface{}(m.GetGradient()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_ScaleInControllerValidationError{
-					field:  "AlerterParameters",
+				return ScaleInController_ControllerValidationError{
+					field:  "Gradient",
 					reason: "embedded message failed validation",
 					cause:  err,
-				})
+				}
 			}
 		}
-	} else if v, ok := interface{}(m.GetAlerterParameters()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AutoScaler_ScaleInControllerValidationError{
-				field:  "AlerterParameters",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
+
+	default:
+		_ = v // ensures v is used
 	}
 
 	if len(errors) > 0 {
-		return AutoScaler_ScaleInControllerMultiError(errors)
+		return ScaleInController_ControllerMultiError(errors)
 	}
 
 	return nil
 }
 
-// AutoScaler_ScaleInControllerMultiError is an error wrapping multiple
-// validation errors returned by AutoScaler_ScaleInController.ValidateAll() if
+// ScaleInController_ControllerMultiError is an error wrapping multiple
+// validation errors returned by ScaleInController_Controller.ValidateAll() if
 // the designated constraints aren't met.
-type AutoScaler_ScaleInControllerMultiError []error
+type ScaleInController_ControllerMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AutoScaler_ScaleInControllerMultiError) Error() string {
+func (m ScaleInController_ControllerMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -2148,12 +3531,12 @@ func (m AutoScaler_ScaleInControllerMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AutoScaler_ScaleInControllerMultiError) AllErrors() []error { return m }
+func (m ScaleInController_ControllerMultiError) AllErrors() []error { return m }
 
-// AutoScaler_ScaleInControllerValidationError is the validation error returned
-// by AutoScaler_ScaleInController.Validate if the designated constraints
+// ScaleInController_ControllerValidationError is the validation error returned
+// by ScaleInController_Controller.Validate if the designated constraints
 // aren't met.
-type AutoScaler_ScaleInControllerValidationError struct {
+type ScaleInController_ControllerValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2161,24 +3544,24 @@ type AutoScaler_ScaleInControllerValidationError struct {
 }
 
 // Field function returns field value.
-func (e AutoScaler_ScaleInControllerValidationError) Field() string { return e.field }
+func (e ScaleInController_ControllerValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AutoScaler_ScaleInControllerValidationError) Reason() string { return e.reason }
+func (e ScaleInController_ControllerValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AutoScaler_ScaleInControllerValidationError) Cause() error { return e.cause }
+func (e ScaleInController_ControllerValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AutoScaler_ScaleInControllerValidationError) Key() bool { return e.key }
+func (e ScaleInController_ControllerValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AutoScaler_ScaleInControllerValidationError) ErrorName() string {
-	return "AutoScaler_ScaleInControllerValidationError"
+func (e ScaleInController_ControllerValidationError) ErrorName() string {
+	return "ScaleInController_ControllerValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e AutoScaler_ScaleInControllerValidationError) Error() string {
+func (e ScaleInController_ControllerValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -2190,14 +3573,14 @@ func (e AutoScaler_ScaleInControllerValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAutoScaler_ScaleInController.%s: %s%s",
+		"invalid %sScaleInController_Controller.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AutoScaler_ScaleInControllerValidationError{}
+var _ error = ScaleInController_ControllerValidationError{}
 
 var _ interface {
 	Field() string
@@ -2205,7 +3588,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AutoScaler_ScaleInControllerValidationError{}
+} = ScaleInController_ControllerValidationError{}
 
 // Validate checks the field values on AutoScaler_Scaler with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -2354,169 +3737,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AutoScaler_ScalerValidationError{}
-
-// Validate checks the field values on AutoScaler_KubernetesReplicas with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *AutoScaler_KubernetesReplicas) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on AutoScaler_KubernetesReplicas with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, the result is a list of violation errors wrapped in
-// AutoScaler_KubernetesReplicasMultiError, or nil if none found.
-func (m *AutoScaler_KubernetesReplicas) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *AutoScaler_KubernetesReplicas) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetKubernetesObjectSelector()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_KubernetesReplicasValidationError{
-					field:  "KubernetesObjectSelector",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_KubernetesReplicasValidationError{
-					field:  "KubernetesObjectSelector",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetKubernetesObjectSelector()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AutoScaler_KubernetesReplicasValidationError{
-				field:  "KubernetesObjectSelector",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for DynamicConfigKey
-
-	if all {
-		switch v := interface{}(m.GetDefaultConfig()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_KubernetesReplicasValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_KubernetesReplicasValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AutoScaler_KubernetesReplicasValidationError{
-				field:  "DefaultConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return AutoScaler_KubernetesReplicasMultiError(errors)
-	}
-
-	return nil
-}
-
-// AutoScaler_KubernetesReplicasMultiError is an error wrapping multiple
-// validation errors returned by AutoScaler_KubernetesReplicas.ValidateAll()
-// if the designated constraints aren't met.
-type AutoScaler_KubernetesReplicasMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m AutoScaler_KubernetesReplicasMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m AutoScaler_KubernetesReplicasMultiError) AllErrors() []error { return m }
-
-// AutoScaler_KubernetesReplicasValidationError is the validation error
-// returned by AutoScaler_KubernetesReplicas.Validate if the designated
-// constraints aren't met.
-type AutoScaler_KubernetesReplicasValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e AutoScaler_KubernetesReplicasValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e AutoScaler_KubernetesReplicasValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e AutoScaler_KubernetesReplicasValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e AutoScaler_KubernetesReplicasValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e AutoScaler_KubernetesReplicasValidationError) ErrorName() string {
-	return "AutoScaler_KubernetesReplicasValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e AutoScaler_KubernetesReplicasValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sAutoScaler_KubernetesReplicas.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = AutoScaler_KubernetesReplicasValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = AutoScaler_KubernetesReplicasValidationError{}
 
 // Validate checks the field values on AutoScaler_Outs with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -2705,133 +3925,22 @@ var _ interface {
 	ErrorName() string
 } = AutoScaler_OutsValidationError{}
 
-// Validate checks the field values on AutoScaler_IncreasingGradient_Parameters
-// with the rules defined in the proto definition for this message. If any
-// rules are violated, the first error encountered is returned, or nil if
-// there are no violations.
-func (m *AutoScaler_IncreasingGradient_Parameters) Validate() error {
+// Validate checks the field values on PodAutoScaler_Outs with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PodAutoScaler_Outs) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on
-// AutoScaler_IncreasingGradient_Parameters with the rules defined in the
-// proto definition for this message. If any rules are violated, the result is
-// a list of violation errors wrapped in
-// AutoScaler_IncreasingGradient_ParametersMultiError, or nil if none found.
-func (m *AutoScaler_IncreasingGradient_Parameters) ValidateAll() error {
+// ValidateAll checks the field values on PodAutoScaler_Outs with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PodAutoScaler_OutsMultiError, or nil if none found.
+func (m *PodAutoScaler_Outs) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AutoScaler_IncreasingGradient_Parameters) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Slope
-
-	// no validation rules for MaxGradient
-
-	if len(errors) > 0 {
-		return AutoScaler_IncreasingGradient_ParametersMultiError(errors)
-	}
-
-	return nil
-}
-
-// AutoScaler_IncreasingGradient_ParametersMultiError is an error wrapping
-// multiple validation errors returned by
-// AutoScaler_IncreasingGradient_Parameters.ValidateAll() if the designated
-// constraints aren't met.
-type AutoScaler_IncreasingGradient_ParametersMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m AutoScaler_IncreasingGradient_ParametersMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m AutoScaler_IncreasingGradient_ParametersMultiError) AllErrors() []error { return m }
-
-// AutoScaler_IncreasingGradient_ParametersValidationError is the validation
-// error returned by AutoScaler_IncreasingGradient_Parameters.Validate if the
-// designated constraints aren't met.
-type AutoScaler_IncreasingGradient_ParametersValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e AutoScaler_IncreasingGradient_ParametersValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e AutoScaler_IncreasingGradient_ParametersValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e AutoScaler_IncreasingGradient_ParametersValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e AutoScaler_IncreasingGradient_ParametersValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e AutoScaler_IncreasingGradient_ParametersValidationError) ErrorName() string {
-	return "AutoScaler_IncreasingGradient_ParametersValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e AutoScaler_IncreasingGradient_ParametersValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sAutoScaler_IncreasingGradient_Parameters.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = AutoScaler_IncreasingGradient_ParametersValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = AutoScaler_IncreasingGradient_ParametersValidationError{}
-
-// Validate checks the field values on AutoScaler_IncreasingGradient_Ins with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, the first error encountered is returned, or nil if there are
-// no violations.
-func (m *AutoScaler_IncreasingGradient_Ins) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on AutoScaler_IncreasingGradient_Ins
-// with the rules defined in the proto definition for this message. If any
-// rules are violated, the result is a list of violation errors wrapped in
-// AutoScaler_IncreasingGradient_InsMultiError, or nil if none found.
-func (m *AutoScaler_IncreasingGradient_Ins) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *AutoScaler_IncreasingGradient_Ins) validate(all bool) error {
+func (m *PodAutoScaler_Outs) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -2839,28 +3948,28 @@ func (m *AutoScaler_IncreasingGradient_Ins) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetSignal()).(type) {
+		switch v := interface{}(m.GetActualReplicas()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_IncreasingGradient_InsValidationError{
-					field:  "Signal",
+				errors = append(errors, PodAutoScaler_OutsValidationError{
+					field:  "ActualReplicas",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_IncreasingGradient_InsValidationError{
-					field:  "Signal",
+				errors = append(errors, PodAutoScaler_OutsValidationError{
+					field:  "ActualReplicas",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetSignal()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetActualReplicas()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return AutoScaler_IncreasingGradient_InsValidationError{
-				field:  "Signal",
+			return PodAutoScaler_OutsValidationError{
+				field:  "ActualReplicas",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -2868,272 +3977,28 @@ func (m *AutoScaler_IncreasingGradient_Ins) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetSetpoint()).(type) {
+		switch v := interface{}(m.GetConfiguredReplicas()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_IncreasingGradient_InsValidationError{
-					field:  "Setpoint",
+				errors = append(errors, PodAutoScaler_OutsValidationError{
+					field:  "ConfiguredReplicas",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_IncreasingGradient_InsValidationError{
-					field:  "Setpoint",
+				errors = append(errors, PodAutoScaler_OutsValidationError{
+					field:  "ConfiguredReplicas",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetSetpoint()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetConfiguredReplicas()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return AutoScaler_IncreasingGradient_InsValidationError{
-				field:  "Setpoint",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return AutoScaler_IncreasingGradient_InsMultiError(errors)
-	}
-
-	return nil
-}
-
-// AutoScaler_IncreasingGradient_InsMultiError is an error wrapping multiple
-// validation errors returned by
-// AutoScaler_IncreasingGradient_Ins.ValidateAll() if the designated
-// constraints aren't met.
-type AutoScaler_IncreasingGradient_InsMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m AutoScaler_IncreasingGradient_InsMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m AutoScaler_IncreasingGradient_InsMultiError) AllErrors() []error { return m }
-
-// AutoScaler_IncreasingGradient_InsValidationError is the validation error
-// returned by AutoScaler_IncreasingGradient_Ins.Validate if the designated
-// constraints aren't met.
-type AutoScaler_IncreasingGradient_InsValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e AutoScaler_IncreasingGradient_InsValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e AutoScaler_IncreasingGradient_InsValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e AutoScaler_IncreasingGradient_InsValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e AutoScaler_IncreasingGradient_InsValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e AutoScaler_IncreasingGradient_InsValidationError) ErrorName() string {
-	return "AutoScaler_IncreasingGradient_InsValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e AutoScaler_IncreasingGradient_InsValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sAutoScaler_IncreasingGradient_Ins.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = AutoScaler_IncreasingGradient_InsValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = AutoScaler_IncreasingGradient_InsValidationError{}
-
-// Validate checks the field values on AutoScaler_DecreasingGradient_Parameters
-// with the rules defined in the proto definition for this message. If any
-// rules are violated, the first error encountered is returned, or nil if
-// there are no violations.
-func (m *AutoScaler_DecreasingGradient_Parameters) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on
-// AutoScaler_DecreasingGradient_Parameters with the rules defined in the
-// proto definition for this message. If any rules are violated, the result is
-// a list of violation errors wrapped in
-// AutoScaler_DecreasingGradient_ParametersMultiError, or nil if none found.
-func (m *AutoScaler_DecreasingGradient_Parameters) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *AutoScaler_DecreasingGradient_Parameters) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Slope
-
-	// no validation rules for MinGradient
-
-	if len(errors) > 0 {
-		return AutoScaler_DecreasingGradient_ParametersMultiError(errors)
-	}
-
-	return nil
-}
-
-// AutoScaler_DecreasingGradient_ParametersMultiError is an error wrapping
-// multiple validation errors returned by
-// AutoScaler_DecreasingGradient_Parameters.ValidateAll() if the designated
-// constraints aren't met.
-type AutoScaler_DecreasingGradient_ParametersMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m AutoScaler_DecreasingGradient_ParametersMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m AutoScaler_DecreasingGradient_ParametersMultiError) AllErrors() []error { return m }
-
-// AutoScaler_DecreasingGradient_ParametersValidationError is the validation
-// error returned by AutoScaler_DecreasingGradient_Parameters.Validate if the
-// designated constraints aren't met.
-type AutoScaler_DecreasingGradient_ParametersValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e AutoScaler_DecreasingGradient_ParametersValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e AutoScaler_DecreasingGradient_ParametersValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e AutoScaler_DecreasingGradient_ParametersValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e AutoScaler_DecreasingGradient_ParametersValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e AutoScaler_DecreasingGradient_ParametersValidationError) ErrorName() string {
-	return "AutoScaler_DecreasingGradient_ParametersValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e AutoScaler_DecreasingGradient_ParametersValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sAutoScaler_DecreasingGradient_Parameters.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = AutoScaler_DecreasingGradient_ParametersValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = AutoScaler_DecreasingGradient_ParametersValidationError{}
-
-// Validate checks the field values on AutoScaler_DecreasingGradient_Ins with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, the first error encountered is returned, or nil if there are
-// no violations.
-func (m *AutoScaler_DecreasingGradient_Ins) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on AutoScaler_DecreasingGradient_Ins
-// with the rules defined in the proto definition for this message. If any
-// rules are violated, the result is a list of violation errors wrapped in
-// AutoScaler_DecreasingGradient_InsMultiError, or nil if none found.
-func (m *AutoScaler_DecreasingGradient_Ins) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *AutoScaler_DecreasingGradient_Ins) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetSignal()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_DecreasingGradient_InsValidationError{
-					field:  "Signal",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_DecreasingGradient_InsValidationError{
-					field:  "Signal",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetSignal()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AutoScaler_DecreasingGradient_InsValidationError{
-				field:  "Signal",
+			return PodAutoScaler_OutsValidationError{
+				field:  "ConfiguredReplicas",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -3141,28 +4006,28 @@ func (m *AutoScaler_DecreasingGradient_Ins) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetSetpoint()).(type) {
+		switch v := interface{}(m.GetDesiredReplicas()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AutoScaler_DecreasingGradient_InsValidationError{
-					field:  "Setpoint",
+				errors = append(errors, PodAutoScaler_OutsValidationError{
+					field:  "DesiredReplicas",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, AutoScaler_DecreasingGradient_InsValidationError{
-					field:  "Setpoint",
+				errors = append(errors, PodAutoScaler_OutsValidationError{
+					field:  "DesiredReplicas",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetSetpoint()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetDesiredReplicas()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return AutoScaler_DecreasingGradient_InsValidationError{
-				field:  "Setpoint",
+			return PodAutoScaler_OutsValidationError{
+				field:  "DesiredReplicas",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -3170,20 +4035,19 @@ func (m *AutoScaler_DecreasingGradient_Ins) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return AutoScaler_DecreasingGradient_InsMultiError(errors)
+		return PodAutoScaler_OutsMultiError(errors)
 	}
 
 	return nil
 }
 
-// AutoScaler_DecreasingGradient_InsMultiError is an error wrapping multiple
-// validation errors returned by
-// AutoScaler_DecreasingGradient_Ins.ValidateAll() if the designated
-// constraints aren't met.
-type AutoScaler_DecreasingGradient_InsMultiError []error
+// PodAutoScaler_OutsMultiError is an error wrapping multiple validation errors
+// returned by PodAutoScaler_Outs.ValidateAll() if the designated constraints
+// aren't met.
+type PodAutoScaler_OutsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AutoScaler_DecreasingGradient_InsMultiError) Error() string {
+func (m PodAutoScaler_OutsMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -3192,12 +4056,11 @@ func (m AutoScaler_DecreasingGradient_InsMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AutoScaler_DecreasingGradient_InsMultiError) AllErrors() []error { return m }
+func (m PodAutoScaler_OutsMultiError) AllErrors() []error { return m }
 
-// AutoScaler_DecreasingGradient_InsValidationError is the validation error
-// returned by AutoScaler_DecreasingGradient_Ins.Validate if the designated
-// constraints aren't met.
-type AutoScaler_DecreasingGradient_InsValidationError struct {
+// PodAutoScaler_OutsValidationError is the validation error returned by
+// PodAutoScaler_Outs.Validate if the designated constraints aren't met.
+type PodAutoScaler_OutsValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -3205,24 +4068,24 @@ type AutoScaler_DecreasingGradient_InsValidationError struct {
 }
 
 // Field function returns field value.
-func (e AutoScaler_DecreasingGradient_InsValidationError) Field() string { return e.field }
+func (e PodAutoScaler_OutsValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AutoScaler_DecreasingGradient_InsValidationError) Reason() string { return e.reason }
+func (e PodAutoScaler_OutsValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AutoScaler_DecreasingGradient_InsValidationError) Cause() error { return e.cause }
+func (e PodAutoScaler_OutsValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AutoScaler_DecreasingGradient_InsValidationError) Key() bool { return e.key }
+func (e PodAutoScaler_OutsValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AutoScaler_DecreasingGradient_InsValidationError) ErrorName() string {
-	return "AutoScaler_DecreasingGradient_InsValidationError"
+func (e PodAutoScaler_OutsValidationError) ErrorName() string {
+	return "PodAutoScaler_OutsValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e AutoScaler_DecreasingGradient_InsValidationError) Error() string {
+func (e PodAutoScaler_OutsValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -3234,14 +4097,14 @@ func (e AutoScaler_DecreasingGradient_InsValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAutoScaler_DecreasingGradient_Ins.%s: %s%s",
+		"invalid %sPodAutoScaler_Outs.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AutoScaler_DecreasingGradient_InsValidationError{}
+var _ error = PodAutoScaler_OutsValidationError{}
 
 var _ interface {
 	Field() string
@@ -3249,308 +4112,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AutoScaler_DecreasingGradient_InsValidationError{}
-
-// Validate checks the field values on AutoScaler_ScaleOutController_Controller
-// with the rules defined in the proto definition for this message. If any
-// rules are violated, the first error encountered is returned, or nil if
-// there are no violations.
-func (m *AutoScaler_ScaleOutController_Controller) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on
-// AutoScaler_ScaleOutController_Controller with the rules defined in the
-// proto definition for this message. If any rules are violated, the result is
-// a list of violation errors wrapped in
-// AutoScaler_ScaleOutController_ControllerMultiError, or nil if none found.
-func (m *AutoScaler_ScaleOutController_Controller) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *AutoScaler_ScaleOutController_Controller) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	switch v := m.Controller.(type) {
-	case *AutoScaler_ScaleOutController_Controller_Gradient:
-		if v == nil {
-			err := AutoScaler_ScaleOutController_ControllerValidationError{
-				field:  "Controller",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetGradient()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, AutoScaler_ScaleOutController_ControllerValidationError{
-						field:  "Gradient",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, AutoScaler_ScaleOutController_ControllerValidationError{
-						field:  "Gradient",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetGradient()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return AutoScaler_ScaleOutController_ControllerValidationError{
-					field:  "Gradient",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	default:
-		_ = v // ensures v is used
-	}
-
-	if len(errors) > 0 {
-		return AutoScaler_ScaleOutController_ControllerMultiError(errors)
-	}
-
-	return nil
-}
-
-// AutoScaler_ScaleOutController_ControllerMultiError is an error wrapping
-// multiple validation errors returned by
-// AutoScaler_ScaleOutController_Controller.ValidateAll() if the designated
-// constraints aren't met.
-type AutoScaler_ScaleOutController_ControllerMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m AutoScaler_ScaleOutController_ControllerMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m AutoScaler_ScaleOutController_ControllerMultiError) AllErrors() []error { return m }
-
-// AutoScaler_ScaleOutController_ControllerValidationError is the validation
-// error returned by AutoScaler_ScaleOutController_Controller.Validate if the
-// designated constraints aren't met.
-type AutoScaler_ScaleOutController_ControllerValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e AutoScaler_ScaleOutController_ControllerValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e AutoScaler_ScaleOutController_ControllerValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e AutoScaler_ScaleOutController_ControllerValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e AutoScaler_ScaleOutController_ControllerValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e AutoScaler_ScaleOutController_ControllerValidationError) ErrorName() string {
-	return "AutoScaler_ScaleOutController_ControllerValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e AutoScaler_ScaleOutController_ControllerValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sAutoScaler_ScaleOutController_Controller.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = AutoScaler_ScaleOutController_ControllerValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = AutoScaler_ScaleOutController_ControllerValidationError{}
-
-// Validate checks the field values on AutoScaler_ScaleInController_Controller
-// with the rules defined in the proto definition for this message. If any
-// rules are violated, the first error encountered is returned, or nil if
-// there are no violations.
-func (m *AutoScaler_ScaleInController_Controller) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on
-// AutoScaler_ScaleInController_Controller with the rules defined in the proto
-// definition for this message. If any rules are violated, the result is a
-// list of violation errors wrapped in
-// AutoScaler_ScaleInController_ControllerMultiError, or nil if none found.
-func (m *AutoScaler_ScaleInController_Controller) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *AutoScaler_ScaleInController_Controller) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	switch v := m.Controller.(type) {
-	case *AutoScaler_ScaleInController_Controller_Gradient:
-		if v == nil {
-			err := AutoScaler_ScaleInController_ControllerValidationError{
-				field:  "Controller",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetGradient()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, AutoScaler_ScaleInController_ControllerValidationError{
-						field:  "Gradient",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, AutoScaler_ScaleInController_ControllerValidationError{
-						field:  "Gradient",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetGradient()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return AutoScaler_ScaleInController_ControllerValidationError{
-					field:  "Gradient",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	default:
-		_ = v // ensures v is used
-	}
-
-	if len(errors) > 0 {
-		return AutoScaler_ScaleInController_ControllerMultiError(errors)
-	}
-
-	return nil
-}
-
-// AutoScaler_ScaleInController_ControllerMultiError is an error wrapping
-// multiple validation errors returned by
-// AutoScaler_ScaleInController_Controller.ValidateAll() if the designated
-// constraints aren't met.
-type AutoScaler_ScaleInController_ControllerMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m AutoScaler_ScaleInController_ControllerMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m AutoScaler_ScaleInController_ControllerMultiError) AllErrors() []error { return m }
-
-// AutoScaler_ScaleInController_ControllerValidationError is the validation
-// error returned by AutoScaler_ScaleInController_Controller.Validate if the
-// designated constraints aren't met.
-type AutoScaler_ScaleInController_ControllerValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e AutoScaler_ScaleInController_ControllerValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e AutoScaler_ScaleInController_ControllerValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e AutoScaler_ScaleInController_ControllerValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e AutoScaler_ScaleInController_ControllerValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e AutoScaler_ScaleInController_ControllerValidationError) ErrorName() string {
-	return "AutoScaler_ScaleInController_ControllerValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e AutoScaler_ScaleInController_ControllerValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sAutoScaler_ScaleInController_Controller.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = AutoScaler_ScaleInController_ControllerValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = AutoScaler_ScaleInController_ControllerValidationError{}
+} = PodAutoScaler_OutsValidationError{}

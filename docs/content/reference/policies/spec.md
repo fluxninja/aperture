@@ -397,6 +397,12 @@ AutoScale components are used to scale a service.
 ([AutoScaler](#auto-scaler)) _AutoScaler_ provides auto-scaling functionality for any scalable resource.
 
 </dd>
+<dt>pod_auto_scaler</dt>
+<dd>
+
+([PodAutoScaler](#pod-auto-scaler)) _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource.
+
+</dd>
 <dt>pod_scaler</dt>
 <dd>
 
@@ -459,7 +465,7 @@ scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>scale_in_controllers</dt>
 <dd>
 
-([[]AutoScalerScaleInController](#auto-scaler-scale-in-controller)) List of _Controllers_ for scaling in.
+([[]ScaleInController](#scale-in-controller)) List of _Controllers_ for scaling in.
 
 </dd>
 <dt>scale_in_cooldown</dt>
@@ -477,7 +483,7 @@ scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>scale_out_controllers</dt>
 <dd>
 
-([[]AutoScalerScaleOutController](#auto-scaler-scale-out-controller)) List of _Controllers_ for scaling out.
+([[]ScaleOutController](#scale-out-controller)) List of _Controllers_ for scaling out.
 
 </dd>
 <dt>scale_out_cooldown</dt>
@@ -490,167 +496,6 @@ scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dd>
 
 ([AutoScalerScaler](#auto-scaler-scaler))
-
-</dd>
-</dl>
-
----
-
-### AutoScalerDecreasingGradient {#auto-scaler-decreasing-gradient}
-
-Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-([AutoScalerDecreasingGradientIns](#auto-scaler-decreasing-gradient-ins)) Input ports for the Gradient.
-
-</dd>
-<dt>parameters</dt>
-<dd>
-
-([AutoScalerDecreasingGradientParameters](#auto-scaler-decreasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
-
-- slope = 1
-- min_gradient = -Inf (must be less than 1)
-- max_gradient = 1 (cannot be changed)
-
-</dd>
-</dl>
-
----
-
-### AutoScalerDecreasingGradientIns {#auto-scaler-decreasing-gradient-ins}
-
-Inputs for Gradient.
-
-<dl>
-<dt>setpoint</dt>
-<dd>
-
-([InPort](#in-port)) The setpoint to use for scale-in.
-
-</dd>
-<dt>signal</dt>
-<dd>
-
-([InPort](#in-port)) The signal to use for scale-in.
-
-</dd>
-</dl>
-
----
-
-### AutoScalerDecreasingGradientParameters {#auto-scaler-decreasing-gradient-parameters}
-
-This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
-
-<dl>
-<dt>min_gradient</dt>
-<dd>
-
-(float64, default: `-1.7976931348623157e+308`)
-
-</dd>
-<dt>slope</dt>
-<dd>
-
-(float64, default: `1`)
-
-</dd>
-</dl>
-
----
-
-### AutoScalerIncreasingGradient {#auto-scaler-increasing-gradient}
-
-Increasing Gradient defines a controller for scaling out based on Gradient Controller.
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-([AutoScalerIncreasingGradientIns](#auto-scaler-increasing-gradient-ins)) Input ports for the Gradient.
-
-</dd>
-<dt>parameters</dt>
-<dd>
-
-([AutoScalerIncreasingGradientParameters](#auto-scaler-increasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
-
-- slope = 1
-- min_gradient = 1 (cannot be changed)
-- max_gradient = +Inf (must be greater than 1)
-
-</dd>
-</dl>
-
----
-
-### AutoScalerIncreasingGradientIns {#auto-scaler-increasing-gradient-ins}
-
-Inputs for Gradient.
-
-<dl>
-<dt>setpoint</dt>
-<dd>
-
-([InPort](#in-port)) The setpoint to use for scale-out.
-
-</dd>
-<dt>signal</dt>
-<dd>
-
-([InPort](#in-port)) The signal to use for scale-out.
-
-</dd>
-</dl>
-
----
-
-### AutoScalerIncreasingGradientParameters {#auto-scaler-increasing-gradient-parameters}
-
-This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
-
-<dl>
-<dt>max_gradient</dt>
-<dd>
-
-(float64, default: `1.7976931348623157e+308`)
-
-</dd>
-<dt>slope</dt>
-<dd>
-
-(float64, default: `1`)
-
-</dd>
-</dl>
-
----
-
-### AutoScalerKubernetesReplicas {#auto-scaler-kubernetes-replicas}
-
-KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
-
-<dl>
-<dt>default_config</dt>
-<dd>
-
-([PodScalerScaleActuatorDynamicConfig](#pod-scaler-scale-actuator-dynamic-config)) Default configuration.
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-(string) Configuration key for DynamicConfig
-
-</dd>
-<dt>kubernetes_object_selector</dt>
-<dd>
-
-([KubernetesObjectSelector](#kubernetes-object-selector)) The Kubernetes object on which horizontal scaling is applied.
 
 </dd>
 </dl>
@@ -684,77 +529,13 @@ Outputs for _AutoScaler_.
 
 ---
 
-### AutoScalerScaleInController {#auto-scaler-scale-in-controller}
-
-<dl>
-<dt>alerter_parameters</dt>
-<dd>
-
-([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
-
-</dd>
-<dt>controller</dt>
-<dd>
-
-([AutoScalerScaleInControllerController](#auto-scaler-scale-in-controller-controller)) Controller
-
-</dd>
-</dl>
-
----
-
-### AutoScalerScaleInControllerController {#auto-scaler-scale-in-controller-controller}
-
-<dl>
-<dt>gradient</dt>
-<dd>
-
-([AutoScalerDecreasingGradient](#auto-scaler-decreasing-gradient))
-
-</dd>
-</dl>
-
----
-
-### AutoScalerScaleOutController {#auto-scaler-scale-out-controller}
-
-<dl>
-<dt>alerter_parameters</dt>
-<dd>
-
-([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
-
-</dd>
-<dt>controller</dt>
-<dd>
-
-([AutoScalerScaleOutControllerController](#auto-scaler-scale-out-controller-controller)) Controller
-
-</dd>
-</dl>
-
----
-
-### AutoScalerScaleOutControllerController {#auto-scaler-scale-out-controller-controller}
-
-<dl>
-<dt>gradient</dt>
-<dd>
-
-([AutoScalerIncreasingGradient](#auto-scaler-increasing-gradient))
-
-</dd>
-</dl>
-
----
-
 ### AutoScalerScaler {#auto-scaler-scaler}
 
 <dl>
 <dt>kubernetes_replicas</dt>
 <dd>
 
-([AutoScalerKubernetesReplicas](#auto-scaler-kubernetes-replicas))
+([KubernetesReplicas](#kubernetes-replicas))
 
 </dd>
 </dl>
@@ -1225,6 +1006,73 @@ Outputs for the Decider component.
 <dd>
 
 ([OutPort](#out-port)) Selected signal (1.0 or 0.0).
+
+</dd>
+</dl>
+
+---
+
+### DecreasingGradient {#decreasing-gradient}
+
+Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([DecreasingGradientIns](#decreasing-gradient-ins)) Input ports for the Gradient.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+([DecreasingGradientParameters](#decreasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
+
+- slope = 1
+- min_gradient = -Inf (must be less than 1)
+- max_gradient = 1 (cannot be changed)
+
+</dd>
+</dl>
+
+---
+
+### DecreasingGradientIns {#decreasing-gradient-ins}
+
+Inputs for Gradient.
+
+<dl>
+<dt>setpoint</dt>
+<dd>
+
+([InPort](#in-port)) The setpoint to use for scale-in.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+([InPort](#in-port)) The signal to use for scale-in.
+
+</dd>
+</dl>
+
+---
+
+### DecreasingGradientParameters {#decreasing-gradient-parameters}
+
+This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+
+<dl>
+<dt>min_gradient</dt>
+<dd>
+
+(float64, default: `-1.7976931348623157e+308`)
+
+</dd>
+<dt>slope</dt>
+<dd>
+
+(float64, default: `1`)
 
 </dd>
 </dl>
@@ -2272,6 +2120,73 @@ Components receive input from other components via InPorts
 
 ---
 
+### IncreasingGradient {#increasing-gradient}
+
+Increasing Gradient defines a controller for scaling out based on Gradient Controller.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([IncreasingGradientIns](#increasing-gradient-ins)) Input ports for the Gradient.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+([IncreasingGradientParameters](#increasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
+
+- slope = 1
+- min_gradient = 1 (cannot be changed)
+- max_gradient = +Inf (must be greater than 1)
+
+</dd>
+</dl>
+
+---
+
+### IncreasingGradientIns {#increasing-gradient-ins}
+
+Inputs for Gradient.
+
+<dl>
+<dt>setpoint</dt>
+<dd>
+
+([InPort](#in-port)) The setpoint to use for scale-out.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+([InPort](#in-port)) The signal to use for scale-out.
+
+</dd>
+</dl>
+
+---
+
+### IncreasingGradientParameters {#increasing-gradient-parameters}
+
+This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+
+<dl>
+<dt>max_gradient</dt>
+<dd>
+
+(float64, default: `1.7976931348623157e+308`)
+
+</dd>
+<dt>slope</dt>
+<dd>
+
+(float64, default: `1`)
+
+</dd>
+</dl>
+
+---
+
 ### Integrator {#integrator}
 
 Accumulates sum of signal every tick.
@@ -2528,6 +2443,33 @@ selector applies to.
 <dd>
 
 (string, **required**) Kubernetes namespace that the resource belongs to.
+
+</dd>
+</dl>
+
+---
+
+### KubernetesReplicas {#kubernetes-replicas}
+
+KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
+
+<dl>
+<dt>default_config</dt>
+<dd>
+
+([PodScalerScaleActuatorDynamicConfig](#pod-scaler-scale-actuator-dynamic-config)) Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig
+
+</dd>
+<dt>kubernetes_object_selector</dt>
+<dd>
+
+([KubernetesObjectSelector](#kubernetes-object-selector)) The Kubernetes object on which horizontal scaling is applied.
 
 </dd>
 </dl>
@@ -3051,6 +2993,122 @@ Example:
 "/user/{userId}": user
 /static/*: other
 ```
+
+</dd>
+</dl>
+
+---
+
+### PodAutoScaler {#pod-auto-scaler}
+
+_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
+
+<dl>
+<dt>cooldown_override_percentage</dt>
+<dd>
+
+(float64, default: `50`) Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
+For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
+scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+
+</dd>
+<dt>max_replicas</dt>
+<dd>
+
+(string, default: `"9223372036854775807"`) The maximum scale to which the _PodAutoScaler_ can scale-out.
+
+</dd>
+<dt>max_scale_in_percentage</dt>
+<dd>
+
+(float64, default: `1`) The maximum decrease of replicas (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+
+</dd>
+<dt>max_scale_out_percentage</dt>
+<dd>
+
+(float64, default: `10`) The maximum increase of replicas (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+
+</dd>
+<dt>min_replicas</dt>
+<dd>
+
+(string, default: `"0"`) The minimum replicas to which the _PodAutoScaler_ can scale-in.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([PodAutoScalerOuts](#pod-auto-scaler-outs)) Output ports for the _PodAutoScaler_.
+
+</dd>
+<dt>pod_scaler</dt>
+<dd>
+
+([KubernetesReplicas](#kubernetes-replicas))
+
+</dd>
+<dt>scale_in_alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for scale-in alerter.
+
+</dd>
+<dt>scale_in_controllers</dt>
+<dd>
+
+([[]ScaleInController](#scale-in-controller)) List of _Controllers_ for scaling in.
+
+</dd>
+<dt>scale_in_cooldown</dt>
+<dd>
+
+(string, default: `"120s"`) The amount of time to wait after a scale-in operation for another scale-in operation.
+
+</dd>
+<dt>scale_out_alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for scale-out alerter.
+
+</dd>
+<dt>scale_out_controllers</dt>
+<dd>
+
+([[]ScaleOutController](#scale-out-controller)) List of _Controllers_ for scaling out.
+
+</dd>
+<dt>scale_out_cooldown</dt>
+<dd>
+
+(string, default: `"30s"`) The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
+
+</dd>
+</dl>
+
+---
+
+### PodAutoScalerOuts {#pod-auto-scaler-outs}
+
+Outputs for _PodAutoScaler_.
+
+<dl>
+<dt>actual_replicas</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+<dt>configured_replicas</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+<dt>desired_replicas</dt>
+<dd>
+
+([OutPort](#out-port))
 
 </dd>
 </dl>
@@ -3678,6 +3736,70 @@ Note: The module name must match the package name from the "source".
 (string, **DEPRECATED**, **required**) Source code of the rego module.
 
 Note: Must include a "package" declaration.
+
+</dd>
+</dl>
+
+---
+
+### ScaleInController {#scale-in-controller}
+
+<dl>
+<dt>alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
+
+</dd>
+<dt>controller</dt>
+<dd>
+
+([ScaleInControllerController](#scale-in-controller-controller)) Controller
+
+</dd>
+</dl>
+
+---
+
+### ScaleInControllerController {#scale-in-controller-controller}
+
+<dl>
+<dt>gradient</dt>
+<dd>
+
+([DecreasingGradient](#decreasing-gradient))
+
+</dd>
+</dl>
+
+---
+
+### ScaleOutController {#scale-out-controller}
+
+<dl>
+<dt>alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
+
+</dd>
+<dt>controller</dt>
+<dd>
+
+([ScaleOutControllerController](#scale-out-controller-controller)) Controller
+
+</dd>
+</dl>
+
+---
+
+### ScaleOutControllerController {#scale-out-controller-controller}
+
+<dl>
+<dt>gradient</dt>
+<dd>
+
+([IncreasingGradient](#increasing-gradient))
 
 </dd>
 </dl>
