@@ -48,7 +48,7 @@ func (h *Handler) ListFlowControlPoints(
 	}
 
 	numErrors := uint32(0)
-	allControlPoints := map[selectors.GlobalControlPointID]struct{}{}
+	allControlPoints := map[selectors.TypedGlobalControlPointID]struct{}{}
 	for _, resp := range agentsControlPoints {
 		if resp.Err != nil {
 			numErrors += 1
@@ -56,7 +56,7 @@ func (h *Handler) ListFlowControlPoints(
 		}
 
 		for _, protoCp := range resp.Success.FlowControlPoints.FlowControlPoints {
-			gcp := selectors.ControlPointIDFromProto(protoCp).InAgentGroup(resp.Success.AgentGroup)
+			gcp := selectors.TypedControlPointIDFromProto(protoCp).InAgentGroup(resp.Success.AgentGroup)
 			allControlPoints[gcp] = struct{}{}
 		}
 	}
@@ -332,7 +332,7 @@ agentsLoop:
 		}
 
 		for _, cpProto := range agent.Success.FlowControlPoints.FlowControlPoints {
-			cp := selectors.ControlPointIDFromProto(cpProto)
+			cp := selectors.TypedControlPointIDFromProto(cpProto)
 
 			if cp.ControlPoint != needle.ControlPoint {
 				continue

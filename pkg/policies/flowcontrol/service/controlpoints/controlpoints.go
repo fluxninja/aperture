@@ -13,11 +13,11 @@ import (
 // Handler implements FlowControlPointsService.
 type Handler struct {
 	flowcontrolpointsv1.UnimplementedFlowControlPointsServiceServer
-	serviceControlPointCache *cache.Cache[selectors.ControlPointID]
+	serviceControlPointCache *cache.Cache[selectors.TypedControlPointID]
 }
 
 // NewHandler returns a new Handler.
-func NewHandler(serviceControlPointCache *cache.Cache[selectors.ControlPointID]) *Handler {
+func NewHandler(serviceControlPointCache *cache.Cache[selectors.TypedControlPointID]) *Handler {
 	return &Handler{
 		serviceControlPointCache: serviceControlPointCache,
 	}
@@ -29,7 +29,7 @@ func (h *Handler) GetControlPoints(ctx context.Context, _ *emptypb.Empty) (*flow
 }
 
 // ToProto converts cache to proto message.
-func ToProto(cache *cache.Cache[selectors.ControlPointID]) *flowcontrolpointsv1.FlowControlPoints {
+func ToProto(cache *cache.Cache[selectors.TypedControlPointID]) *flowcontrolpointsv1.FlowControlPoints {
 	cpObjects := cache.GetAll()
 	fcp := &flowcontrolpointsv1.FlowControlPoints{
 		FlowControlPoints: make([]*flowcontrolpointsv1.FlowControlPoint, 0, len(cpObjects)),

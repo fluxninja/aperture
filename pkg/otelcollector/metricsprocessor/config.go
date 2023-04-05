@@ -13,5 +13,5 @@ type Config struct {
 	promRegistry         *prometheus.Registry
 	engine               iface.Engine
 	classificationEngine iface.ClassificationEngine
-	controlPointCache    *cache.Cache[selectors.ControlPointID]
+	controlPointCache    *cache.Cache[selectors.TypedControlPointID]
 }

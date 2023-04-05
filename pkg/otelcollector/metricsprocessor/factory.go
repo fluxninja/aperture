@@ -24,7 +24,7 @@ func NewFactory(
 	promRegistry *prometheus.Registry,
 	engine iface.Engine,
 	clasEng iface.ClassificationEngine,
-	controlPointCache *cache.Cache[selectors.ControlPointID],
+	controlPointCache *cache.Cache[selectors.TypedControlPointID],
 ) processor.Factory {
 	return processor.NewFactory(
 		typeStr,
@@ -37,7 +37,7 @@ func createDefaultConfig(
 	promRegistry *prometheus.Registry,
 	engine iface.Engine,
 	clasEng iface.ClassificationEngine,
-	controlPointCache *cache.Cache[selectors.ControlPointID],
+	controlPointCache *cache.Cache[selectors.TypedControlPointID],
 ) component.CreateDefaultConfigFunc {
 	return func() component.Config {
 		return &Config{
