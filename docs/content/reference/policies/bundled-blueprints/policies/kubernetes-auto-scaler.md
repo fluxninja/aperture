@@ -154,75 +154,23 @@ string"
     value="__REQUIRED_FIELD__"
     description='Name.' />
 
-##### policy.scale_in_criteria {#policy-scale-in-criteria}
-
 <a id="policy-scale-in-criteria"></a> <ParameterDescription
     name="policy.scale_in_criteria"
     type="
 Array of
-object"
-    reference=""
+Object (objects.scale_criteria)"
+    reference="#objects-scale-criteria"
     value="[{'parameters': {'slope': 1}, 'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': 0.5}]"
     description='List of scale-in criteria.' />
-
-<a id="policy-scale-in-criteria-query"></a> <ParameterDescription
-    name="policy.scale_in_criteria.query"
-    type="
-Object (aperture.spec.v1.Query)"
-    reference="../../spec#query"
-    value="{'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}"
-    description='Query.' />
-
-<a id="policy-scale-in-criteria-set-point"></a> <ParameterDescription
-    name="policy.scale_in_criteria.set_point"
-    type="
-number"
-    reference=""
-    value="0.5"
-    description='Set point.' />
-
-<a id="policy-scale-in-criteria-parameters"></a> <ParameterDescription
-    name="policy.scale_in_criteria.parameters"
-    type="
-Object (aperture.spec.v1.DecreasingGradientParameters)"
-    reference="../../spec#decreasing-gradient-parameters"
-    value="{'slope': 1}"
-    description='Parameters.' />
-
-##### policy.scale_out_criteria {#policy-scale-out-criteria}
 
 <a id="policy-scale-out-criteria"></a> <ParameterDescription
     name="policy.scale_out_criteria"
     type="
 Array of
-object"
-    reference=""
+Object (objects.scale_criteria)"
+    reference="#objects-scale-criteria"
     value="[{'parameters': {'slope': -1}, 'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': 1}]"
     description='List of scale-out criteria.' />
-
-<a id="policy-scale-out-criteria-query"></a> <ParameterDescription
-    name="policy.scale_out_criteria.query"
-    type="
-Object (aperture.spec.v1.Query)"
-    reference="../../spec#query"
-    value="{'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}"
-    description='Query.' />
-
-<a id="policy-scale-out-criteria-set-point"></a> <ParameterDescription
-    name="policy.scale_out_criteria.set_point"
-    type="
-number"
-    reference=""
-    value="1"
-    description='Set point.' />
-
-<a id="policy-scale-out-criteria-parameters"></a> <ParameterDescription
-    name="policy.scale_out_criteria.parameters"
-    type="
-Object (aperture.spec.v1.IncreasingGradientParameters)"
-    reference="../../spec#increasing-gradient-parameters"
-    value="{'slope': -1}"
-    description='Parameters.' />
 
 #### dashboard {#dashboard}
 
@@ -267,3 +215,31 @@ string"
     reference=""
     value="''"
     description='Datasource filter regex.' />
+
+#### objects {#objects}
+
+##### objects.scale_criteria {#objects-scale-criteria}
+
+<a id="objects-scale-criteria-query"></a> <ParameterDescription
+    name="objects.scale_criteria.query"
+    type="
+Object (aperture.spec.v1.Query)"
+    reference="../../spec#query"
+    value="{'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}"
+    description='Query.' />
+
+<a id="objects-scale-criteria-set-point"></a> <ParameterDescription
+    name="objects.scale_criteria.set_point"
+    type="
+number"
+    reference=""
+    value="1"
+    description='Set point.' />
+
+<a id="objects-scale-criteria-parameters"></a> <ParameterDescription
+    name="objects.scale_criteria.parameters"
+    type="
+Object (aperture.spec.v1.IncreasingGradientParameters)"
+    reference="../../spec#increasing-gradient-parameters"
+    value="{'slope': -1}"
+    description='Parameters.' />

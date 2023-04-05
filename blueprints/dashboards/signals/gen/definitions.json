@@ -59,5 +59,42 @@
         }
       }
     }
+  },
+  "definitions": {
+    "common_policy_name": {
+      "description": "Name of the policy.",
+      "default": "__REQUIRED_FIELD__",
+      "type": "string"
+    },
+
+    "dashboard_refresh_interval": {
+      "description": "Refresh interval for dashboard panels.",
+      "default": "5s",
+      "type": "string"
+    },
+
+    "dashboard_time_from": {
+      "description": "From time of dashboard.",
+      "default": "now-15m",
+      "type": "string"
+    },
+
+    "dashboard_time_to": {
+      "description": "To time of dashboard.",
+      "default": "now",
+      "type": "string"
+    },
+
+    "dashboard_datasource_name": {
+      "description": "Datasource name.",
+      "default": "$datasource",
+      "type": "string"
+    },
+
+    "dashboard_datasource_filter_regex": {
+      "description": "Datasource filter regex.",
+      "default": "",
+      "type": "string"
+    }
   }
 }

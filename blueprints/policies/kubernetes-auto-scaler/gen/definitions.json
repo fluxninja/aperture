@@ -3,7 +3,7 @@
   "type": "object",
   "title": "policies/kubernetes-auto-scaler blueprint",
   "additionalProperties": false,
-  "required": ["common", "policy"],
+  "required": ["common", "policy", "objects"],
   "properties": {
     "common": {
       "type": "object",
@@ -21,11 +21,7 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "kubernetes_object_selector",
-        "scale_in_criteria",
-        "scale_out_criteria"
-      ],
+      "required": ["kubernetes_object_selector"],
       "properties": {
         "min_replicas": {
           "description": "Minimum number of replicas.",
@@ -125,41 +121,6 @@
         },
 
         "scale_in_criteria": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["query"],
-            "properties": {
-              "query": {
-                "description": "Query.",
-                "default": {
-                  "promql": {
-                    "evaluation_interval": "10s",
-                    "out_ports": {
-                      "output": { "signal_name": "__REQUIRED_FIELD__" }
-                    },
-                    "query_string": "__REQUIRED_FIELD__"
-                  }
-                },
-                "type": "object",
-                "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Query"
-              },
-
-              "set_point": {
-                "description": "Set point.",
-                "default": 0.5,
-                "type": "number"
-              },
-
-              "parameters": {
-                "description": "Parameters.",
-                "default": { "slope": 1 },
-                "type": "object",
-                "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/DecreasingGradientParameters"
-              }
-            }
-          },
           "description": "List of scale-in criteria.",
           "default": [
             {
@@ -175,45 +136,15 @@
               },
               "set_point": 0.5
             }
-          ]
-        },
-
-        "scale_out_criteria": {
+          ],
           "type": "array",
           "items": {
             "type": "object",
-            "additionalProperties": false,
-            "required": ["query"],
-            "properties": {
-              "query": {
-                "description": "Query.",
-                "default": {
-                  "promql": {
-                    "evaluation_interval": "10s",
-                    "out_ports": {
-                      "output": { "signal_name": "__REQUIRED_FIELD__" }
-                    },
-                    "query_string": "__REQUIRED_FIELD__"
-                  }
-                },
-                "type": "object",
-                "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Query"
-              },
+            "$ref": "#/definitions/properties/objects/properties/scale_criteria"
+          }
+        },
 
-              "set_point": {
-                "description": "Set point.",
-                "default": 1,
-                "type": "number"
-              },
-
-              "parameters": {
-                "description": "Parameters.",
-                "default": { "slope": -1 },
-                "type": "object",
-                "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/IncreasingGradientParameters"
-              }
-            }
-          },
+        "scale_out_criteria": {
           "description": "List of scale-out criteria.",
           "default": [
             {
@@ -229,7 +160,12 @@
               },
               "set_point": 1
             }
-          ]
+          ],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/properties/objects/properties/scale_criteria"
+          }
         }
       }
     },
@@ -274,6 +210,293 @@
           }
         }
       }
+    },
+
+    "objects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scale_criteria"],
+      "properties": {
+        "scale_criteria": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["query"],
+          "properties": {
+            "query": {
+              "description": "Query.",
+              "default": {
+                "promql": {
+                  "evaluation_interval": "10s",
+                  "out_ports": {
+                    "output": { "signal_name": "__REQUIRED_FIELD__" }
+                  },
+                  "query_string": "__REQUIRED_FIELD__"
+                }
+              },
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Query"
+            },
+
+            "set_point": {
+              "description": "Set point.",
+              "default": 1,
+              "type": "number"
+            },
+
+            "parameters": {
+              "description": "Parameters.",
+              "default": { "slope": -1 },
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/IncreasingGradientParameters"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "common_policy_name": {
+      "description": "Name of the policy.",
+      "default": "__REQUIRED_FIELD__",
+      "type": "string"
+    },
+
+    "policy_min_replicas": {
+      "description": "Minimum number of replicas.",
+      "default": "1",
+      "type": "string"
+    },
+
+    "policy_max_replicas": {
+      "description": "Maximum number of replicas.",
+      "default": "10",
+      "type": "string"
+    },
+
+    "policy_scale_in_cooldown": {
+      "description": "The amount of time to wait after a scale-in operation for another scale-in operation.",
+      "default": "40s",
+      "type": "string"
+    },
+
+    "policy_scale_out_cooldown": {
+      "description": "The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.",
+      "default": "30s",
+      "type": "string"
+    },
+
+    "policy_cooldown_override_percentage": {
+      "description": "Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.",
+      "default": 50,
+      "type": "number"
+    },
+
+    "policy_max_scale_in_percentage": {
+      "description": "The maximum decrease of replicas (e.g. pods) at one time.",
+      "default": 1,
+      "type": "number"
+    },
+
+    "policy_max_scale_out_percentage": {
+      "description": "The maximum increase of replicas (e.g. pods) at one time.",
+      "default": 10,
+      "type": "number"
+    },
+
+    "policy_scale_in_alerter_parameters": {
+      "description": "Configuration for scale-in alerter.",
+      "default": { "alert_name": "Kubernetes Auto Scaler Scale In Event" },
+      "type": "object",
+      "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
+    },
+
+    "policy_scale_out_alerter_parameters": {
+      "description": "Cooldown override percentage.",
+      "default": { "alert_name": "Kubernetes Auto Scaler Scale Out Event" },
+      "type": "object",
+      "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
+    },
+
+    "policy_components": {
+      "description": "List of additional circuit components.",
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
+      }
+    },
+
+    "policy_kubernetes_object_selector_namespace": {
+      "description": "Namespace.",
+      "default": "__REQUIRED_FIELD__",
+      "type": "string"
+    },
+
+    "policy_kubernetes_object_selector_api_version": {
+      "description": "API Version.",
+      "default": "__REQUIRED_FIELD__",
+      "type": "string"
+    },
+
+    "policy_kubernetes_object_selector_kind": {
+      "description": "Kind.",
+      "default": "__REQUIRED_FIELD__",
+      "type": "string"
+    },
+
+    "policy_kubernetes_object_selector_name": {
+      "description": "Name.",
+      "default": "__REQUIRED_FIELD__",
+      "type": "string"
+    },
+
+    "policy_scale_in_criteria": {
+      "description": "List of scale-in criteria.",
+      "default": [
+        {
+          "parameters": { "slope": 1 },
+          "query": {
+            "promql": {
+              "evaluation_interval": "10s",
+              "out_ports": {
+                "output": { "signal_name": "__REQUIRED_FIELD__" }
+              },
+              "query_string": "__REQUIRED_FIELD__"
+            }
+          },
+          "set_point": 0.5
+        }
+      ],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "$ref": "#/definitions/properties/objects/properties/scale_criteria"
+      }
+    },
+
+    "policy_scale_out_criteria": {
+      "description": "List of scale-out criteria.",
+      "default": [
+        {
+          "parameters": { "slope": -1 },
+          "query": {
+            "promql": {
+              "evaluation_interval": "10s",
+              "out_ports": {
+                "output": { "signal_name": "__REQUIRED_FIELD__" }
+              },
+              "query_string": "__REQUIRED_FIELD__"
+            }
+          },
+          "set_point": 1
+        }
+      ],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "$ref": "#/definitions/properties/objects/properties/scale_criteria"
+      }
+    },
+
+    "dashboard_refresh_interval": {
+      "description": "Refresh interval for dashboard panels.",
+      "default": "5s",
+      "type": "string"
+    },
+
+    "dashboard_time_from": {
+      "description": "From time of dashboard.",
+      "default": "now-15m",
+      "type": "string"
+    },
+
+    "dashboard_time_to": {
+      "description": "To time of dashboard.",
+      "default": "now",
+      "type": "string"
+    },
+
+    "dashboard_datasource_name": {
+      "description": "Datasource name.",
+      "default": "$datasource",
+      "type": "string"
+    },
+
+    "dashboard_datasource_filter_regex": {
+      "description": "Datasource filter regex.",
+      "default": "",
+      "type": "string"
+    },
+
+    "objects_scale_criteria_query_promql_query_string": {
+      "description": "PromQL query string.",
+      "default": "__REQUIRED_FIELD__",
+      "type": "string"
+    },
+
+    "objects_scale_criteria_query_promql_evaluation_interval": {
+      "description": "Evaluation interval.",
+      "default": "10s",
+      "type": "string"
+    },
+
+    "objects_scale_criteria_query_promql_out_ports_output_signal_name": {
+      "description": "Output Signal name.",
+      "default": "__REQUIRED_FIELD__",
+      "type": "string"
+    },
+    "objects_scale_criteria_query_promql_out_ports_output": {
+      "description": "PromQL query execution output port.",
+      "default": { "signal_name": "__REQUIRED_FIELD__" },
+      "type": "object",
+      "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/OutPort"
+    },
+    "objects_scale_criteria_query_promql_out_ports": {
+      "description": "PromQL query execution output.",
+      "default": { "output": { "signal_name": "__REQUIRED_FIELD__" } },
+      "type": "object",
+      "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/PromQLOuts"
+    },
+    "objects_scale_criteria_query_promql": {
+      "description": "PromQL query.",
+      "default": {
+        "evaluation_interval": "10s",
+        "out_ports": { "output": { "signal_name": "__REQUIRED_FIELD__" } },
+        "query_string": "__REQUIRED_FIELD__"
+      },
+      "type": "object",
+      "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/PromQL"
+    },
+    "objects_scale_criteria_query": {
+      "description": "Query.",
+      "default": {
+        "promql": {
+          "evaluation_interval": "10s",
+          "out_ports": { "output": { "signal_name": "__REQUIRED_FIELD__" } },
+          "query_string": "__REQUIRED_FIELD__"
+        }
+      },
+      "type": "object",
+      "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Query"
+    },
+
+    "objects_scale_criteria_set_point": {
+      "description": "Set point.",
+      "default": 1,
+      "type": "number"
+    },
+
+    "objects_scale_criteria_parameters_slope": {
+      "description": "Slope.",
+      "default": -1,
+      "type": "number"
+    },
+    "objects_scale_criteria_parameters": {
+      "description": "Parameters.",
+      "default": { "slope": -1 },
+      "type": "object",
+      "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/IncreasingGradientParameters"
     }
   }
 }

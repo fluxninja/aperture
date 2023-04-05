@@ -96,6 +96,19 @@ class Parameters:
                 docs_link,
                 json_schema_link,
             )
+        elif param.count(".") == 1:
+            # local parameter
+            if param.startswith("[]"):
+                param = param[2:]
+            docs_link = f"#{slugify(param)}"
+            parts = param.split(".")
+            json_schema_link = f"#/definitions"
+            for part in parts:
+                json_schema_link += f"/properties/{part}"
+            return (
+                docs_link,
+                json_schema_link,
+            )
         else:
             return "", ""
 
@@ -226,14 +239,10 @@ def update_param_defaults(
         config = root
         for idx, part in enumerate(parts):
             if idx == len(parts) - 1:
-                return config[part] if not isinstance(config, list) else config[0][part]
+                return config[part]
             else:
                 try:
-                    config = (
-                        config[part]
-                        if not isinstance(config, list)
-                        else config[0][part]
-                    )
+                    config = config[part]
                 except KeyError:
                     # the param is not present in the config, so we return None
                     # Also, when specific param is a map (map[string]type) and there is no default
@@ -267,7 +276,7 @@ MARKDOWN_DOC_TPL = """
 Array of {{- render_type(param_type[2:]) }}
 {%- elif param_type.startswith('map[') %}
 Object with keys and values of type {{- render_type(param_type[4:-1]) }}
-{%- elif param_type.startswith('aperture.spec') or ':' in param_type %}
+{%- elif param_type.startswith('aperture.spec') or ':' in param_type or "." in param_type %}
 Object ({{ param_type }})
 {%- elif param_type == 'bool' %}
 Boolean
@@ -288,26 +297,12 @@ Integer (int64)
 {%- set indent = '    ' * level %}
 {%- set anchor = (parent_prefix + node.parameter.param_name) | slugify %}
 {%- set heading_level = '#' * (level + 1) %}
-{%- if node.parameter.param_type  in ['intermediate_node', '[]object'] %}
+{%- if node.parameter.param_type == 'intermediate_node' %}
 {{ heading_level }} {{ parent_prefix }}{{ node.parameter.param_name }} {#{{ anchor }}}
 
-{%- if node.parameter.param_type == '[]object' %}
-<a id="{{ anchor }}"></a>
-<ParameterDescription
-    name="{{ parent_prefix }}{{ node.parameter.param_name }}"
-    type="{{ render_type(node.parameter.param_type) }}"
-    reference="{{ node.parameter.docs_link }}"
-    value="{{ node.parameter.default | quoteValueDocs }}"
-    description='{{ node.parameter.description }}' />
-{%- for child_name, child_node in node.children.items() %}
-{{ render_properties(child_node, level + 1, parent_prefix + node.parameter.param_name + '.') }}
-{%- if not loop.last %}{% endif %}
-{%- endfor %}
-{%- else %}
 {%- for child_name, child_node in node.children.items() %}
 {{ render_properties(child_node, level + 1, parent_prefix + node.parameter.param_name + '.') }}
 {%- endfor %}
-{%- endif %}
 {%- else %}
 <a id="{{ anchor }}"></a>
 <ParameterDescription
@@ -332,7 +327,7 @@ MARKDOWN_README_TPL = """
 Array of {{- render_type(param_type[2:]) }}
 {%- elif param_type.startswith('map[') %}
 Object with keys and values of type {{- render_type(param_type[4:-1]) }}
-{%- elif param_type.startswith('aperture.spec') or ':' in param_type %}
+{%- elif param_type.startswith('aperture.spec') or ':' in param_type or "." in param_type %}
 Object ({{ param_type }})
 {%- elif param_type == 'bool' %}
 Boolean
@@ -353,25 +348,15 @@ Integer (int64)
 {%- set indent = '    ' * level %}
 {%- set anchor = (parent_prefix + node.parameter.param_name) | slugify %}
 {%- set heading_level = '#' * (level + 1) %}
-{%- if node.parameter.param_type  == 'intermediate_node' or node.parameter.param_type.startswith('[]') %}
+{%- if node.parameter.param_type == 'intermediate_node' %}
 {{ heading_level }} {{ parent_prefix }}{{ node.parameter.param_name }} {#{{ anchor }}}
 
 {%- if node.parameter.description %}
 **Description**: {{ node.parameter.description }}
 {%- endif %}
-{%- if node.parameter.param_type == '[]object' %}
-**Type**: {{ render_type(node.parameter.param_type) }}
-**Items**:
-{%- for child_name, child_node in node.children.items() %}
-{{ render_properties(child_node, level + 1, parent_prefix + node.parameter.param_name + '.') }}
-{%- if not loop.last %}{% endif %}
-{%- endfor %}
-**Default Value**: `{{ node.parameter.default | quoteValueDocs }}`
-{%- else %}
 {%- for child_name, child_node in node.children.items() %}
 {{ render_properties(child_node, level + 1, parent_prefix + node.parameter.param_name + '.') }}
 {%- endfor %}
-{%- endif %}
 {%- else %}
 {{ heading_level }} {{ parent_prefix }}{{ node.parameter.param_name }} {#{{ anchor }}}
 **Type**: {{ render_type(node.parameter.param_type) }}
@@ -388,16 +373,16 @@ Integer (int64)
 """
 
 JSON_SCHEMA_TPL = """
-{%- macro render_type(param_type, json_schema_link) %}
+{%- macro render_type(param_type, ref_id) %}
 {%- if param_type.startswith('[]') %}
 "type": "array",
-"items": { {{- render_type(param_type[2:], json_schema_link) }} }
+"items": { {{- render_type(param_type[2:], ref_id) }} }
 {%- elif param_type.startswith('map[') %}
 "type": "object",
-"additionalProperties": { {{- render_type(param_type[4:-1], json_schema_link) }}}
-{%- elif param_type.startswith('aperture.spec') or ':' in param_type %}
+"additionalProperties": { {{- render_type(param_type[4:-1], ref_id) }}}
+{%- elif param_type.startswith('aperture.spec') or ':' in param_type or "." in param_type %}
 "type": "object",
-{{ ' ' * 4 }}"$ref": "{{- json_schema_link }}"
+{{ ' ' * 4 }}"$ref": "{{- ref_id }}"
 {%- elif param_type == 'bool' %}
 "type": "boolean"
 {%- elif param_type == 'float32' %}
@@ -416,13 +401,9 @@ JSON_SCHEMA_TPL = """
 "type": "{{ param_type }}"
 {%- endif %}
 {%- endmacro %}
-
-{%- macro render_properties(node) %}
+{%- macro render_properties(node, prefix='') %}
 "{{ node.parameter.param_name }}": {
-{%- if node.parameter.param_type in ['intermediate_node', '[]object'] %}
-{%- if node.parameter.param_type == '[]object' %}
-"type": "array",
-"items": {
+{%- if node.parameter.param_type == 'intermediate_node' %}
 "type": "object",
 "additionalProperties": false,
 {%- if node.required_children %}
@@ -430,34 +411,34 @@ JSON_SCHEMA_TPL = """
 {%- endif %}
 "properties": {
 {%- for child_name, child_node in node.children.items() %}
-{{ render_properties(child_node) }}
+{{ render_properties(child_node, prefix ~ node.parameter.param_name ~ '_') }}
 {%- if not loop.last %},{% endif %}
 {%- endfor %}
 }
-},
-"description": "{{ node.parameter.description }}",
-"default": {{ node.parameter.default | quoteValueJSON }},
-{%- else %}
-"type": "object",
-"additionalProperties": false,
-{%- if node.required_children %}
-"required": [{%- for child_name in node.required_children %}"{{ child_name }}"{%- if not loop.last %},{% endif %}{%- endfor %}],
-{%- endif %}
-"properties": {
-{%- for child_name, child_node in node.children.items() %}
-{{ render_properties(child_node) }}
-{%- if not loop.last %},{% endif %}
-{%- endfor %}
-}
-{%- endif %}
 {%- else %}
 "description": "{{ node.parameter.description }}",
 "default": {{ node.parameter.default | quoteValueJSON }},
+{%- if node.parameter.param_type.startswith('aperture.spec') or ':' in node.parameter.param_type or "." in node.parameter.param_type %}
 {{- render_type(node.parameter.param_type, node.parameter.json_schema_link) }}
+{%- else %}
+{{- render_type(node.parameter.param_type, "#/definitions/" ~ prefix ~ node.parameter.param_name) }}
+{%- endif %}
 {%- endif %}
 }
 {%- endmacro %}
-
+{%- macro render_definitions(node, prefix='') %}
+{%- for child_name, child_node in node.children.items() %}
+{{ render_definitions(child_node, prefix ~ node.parameter.param_name ~ '_') }}
+{%- if not loop.last or node.parameter.param_type != "intermediate_node" %},{% endif %}
+{%- endfor %}
+{%- if node.parameter.param_type != 'intermediate_node' %}
+"{{ prefix }}{{ node.parameter.param_name }}": {
+"description": "{{ node.parameter.description }}",
+"default": {{ node.parameter.default | quoteValueJSON }},
+{{- render_type(node.parameter.param_type, node.parameter.json_schema_link) }}
+}
+{%- endif %}
+{%- endmacro %}
 {
 "$schema": "http://json-schema.org/draft-07/schema#",
 "type": "object",
@@ -469,6 +450,12 @@ JSON_SCHEMA_TPL = """
 "properties": {
 {%- for child_name, child_node in nested_parameters.children.items() %}
 {{ render_properties(child_node) }}
+{%- if not loop.last %},{% endif %}
+{%- endfor %}
+},
+"definitions": {
+{%- for child_name, child_node in nested_parameters.children.items() %}
+{{ render_definitions(child_node) }}
 {%- if not loop.last %},{% endif %}
 {%- endfor %}
 }
@@ -504,9 +491,6 @@ YAML_TPL = """
 {%- else %}
 {{ '  ' * level }}{{ node.parameter.param_name }}:
 {%- endif %}
-{%- endif %}
-{%- if node.parameter.default is iterable and not node.parameter.default is string and not node.parameter.default is mapping and node.parameter.default | list %}
-{{ '  ' * (level) }}-
 {%- endif %}
 {%- for child_name, child_node in node.children.items() %}
 {{- render_node(child_node, level + 1) }}

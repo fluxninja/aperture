@@ -1,3 +1,21 @@
+local scale_criteria = {
+  query: {
+    promql: {
+      query_string: '__REQUIRED_FIELD__',
+      evaluation_interval: '10s',
+      out_ports: {
+        output: {
+          signal_name: '__REQUIRED_FIELD__',
+        },
+      },
+    },
+  },
+  set_point: 1.0,
+  parameters: {
+    slope: -1.0,
+  },
+};
+
 {
   /**
   * @param (common.policy_name: string required) Name of the policy.
@@ -14,9 +32,7 @@
   * @param (policy.max_scale_in_percentage: number) The maximum decrease of replicas (e.g. pods) at one time.
   * @param (policy.max_scale_out_percentage: number) The maximum increase of replicas (e.g. pods) at one time.
   * @param (policy.scale_in_alerter_parameters: aperture.spec.v1.AlerterParameters) Configuration for scale-in alerter.
-  * @param (policy.scale_in_alerter_parameters.alert_name: string) Name of the alert.
   * @param (policy.scale_out_alerter_parameters: aperture.spec.v1.AlerterParameters) Cooldown override percentage.
-  * @param (policy.scale_out_alerter_parameters.alert_name: string) Configuration for scale-out alerter.
   * @param (policy.components: []aperture.spec.v1.Component) List of additional circuit components.
   */
   policy: {
@@ -47,17 +63,7 @@
     },
     components: [],
     /**
-    * @param (policy.scale_in_criteria: []object) List of scale-in criteria.
-    * @param (policy.scale_in_criteria.query: aperture.spec.v1.Query required) Query.
-    * @param (policy.scale_in_criteria.query.promql: aperture.spec.v1.PromQL required) PromQL query.
-    * @param (policy.scale_in_criteria.query.promql.query_string: string required) PromQL query string.
-    * @param (policy.scale_in_criteria.query.promql.evaluation_interval: string) Evaluation interval.
-    * @param (policy.scale_in_criteria.query.promql.out_ports: aperture.spec.v1.PromQLOuts required) PromQL query execution output.
-    * @param (policy.scale_in_criteria.query.promql.out_ports.output: aperture.spec.v1.OutPort required) PromQL query execution output port.
-    * @param (policy.scale_in_criteria.query.promql.out_ports.output.signal_name: string required) Output Signal name.
-    * @param (policy.scale_in_criteria.set_point: number) Set point.
-    * @param (policy.scale_in_criteria.parameters: aperture.spec.v1.DecreasingGradientParameters) Parameters.
-    * @param (policy.scale_in_criteria.parameters.slope: number) Slope.
+    * @param (policy.scale_in_criteria: []objects.scale_criteria) List of scale-in criteria.
     */
     scale_in_criteria: [
       {
@@ -79,36 +85,10 @@
       },
     ],
     /**
-    * @param (policy.scale_out_criteria: []object) List of scale-out criteria.
-    * @param (policy.scale_out_criteria.query: aperture.spec.v1.Query required) Query.
-    * @param (policy.scale_out_criteria.query.promql: aperture.spec.v1.PromQL required) PromQL query.
-    * @param (policy.scale_out_criteria.query.promql.query_string: string required) PromQL query string.
-    * @param (policy.scale_out_criteria.query.promql.evaluation_interval: string) Evaluation interval.
-    * @param (policy.scale_out_criteria.query.promql.out_ports: aperture.spec.v1.PromQLOuts required) PromQL query execution output.
-    * @param (policy.scale_out_criteria.query.promql.out_ports.output: aperture.spec.v1.OutPort required) PromQL query execution output port.
-    * @param (policy.scale_out_criteria.query.promql.out_ports.output.signal_name: string required) Output Signal name.
-    * @param (policy.scale_out_criteria.set_point: number) Set point.
-    * @param (policy.scale_out_criteria.parameters: aperture.spec.v1.IncreasingGradientParameters) Parameters.
-    * @param (policy.scale_out_criteria.parameters.slope: number) Slope.
+    * @param (policy.scale_out_criteria: []objects.scale_criteria) List of scale-out criteria.
     */
     scale_out_criteria: [
-      {
-        query: {
-          promql: {
-            query_string: '__REQUIRED_FIELD__',
-            evaluation_interval: '10s',
-            out_ports: {
-              output: {
-                signal_name: '__REQUIRED_FIELD__',
-              },
-            },
-          },
-        },
-        set_point: 1.0,
-        parameters: {
-          slope: -1.0,
-        },
-      },
+      scale_criteria,
     ],
   },
   /**
@@ -128,5 +108,20 @@
       name: '$datasource',
       filter_regex: '',
     },
+  },
+  /**
+  * @param (objects.scale_criteria.query: aperture.spec.v1.Query required) Query.
+  * @param (objects.scale_criteria.query.promql: aperture.spec.v1.PromQL required) PromQL query.
+  * @param (objects.scale_criteria.query.promql.query_string: string required) PromQL query string.
+  * @param (objects.scale_criteria.query.promql.evaluation_interval: string) Evaluation interval.
+  * @param (objects.scale_criteria.query.promql.out_ports: aperture.spec.v1.PromQLOuts required) PromQL query execution output.
+  * @param (objects.scale_criteria.query.promql.out_ports.output: aperture.spec.v1.OutPort required) PromQL query execution output port.
+  * @param (objects.scale_criteria.query.promql.out_ports.output.signal_name: string required) Output Signal name.
+  * @param (objects.scale_criteria.set_point: number) Set point.
+  * @param (objects.scale_criteria.parameters: aperture.spec.v1.IncreasingGradientParameters) Parameters.
+  * @param (objects.scale_criteria.parameters.slope: number) Slope.
+  */
+  objects: {
+    scale_criteria: scale_criteria,
   },
 }
