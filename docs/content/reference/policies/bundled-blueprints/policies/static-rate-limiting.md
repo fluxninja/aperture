@@ -22,9 +22,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/st
 
 ### Parameters
 
-<a id="common"></a>
-
-#### common
+#### common {#common}
 
 <a id="common-policy-name"></a> <ParameterDescription
     name="common.policy_name"
@@ -34,9 +32,7 @@ string"
     value="__REQUIRED_FIELD__"
     description='Name of the policy.' />
 
-<a id="policy"></a>
-
-#### policy
+#### policy {#policy}
 
 <a id="policy-classifiers"></a> <ParameterDescription
     name="policy.classifiers"
@@ -47,9 +43,7 @@ Object (aperture.spec.v1.Classifier)"
     value="[]"
     description='List of classification rules.' />
 
-<a id="policy-rate-limiter"></a>
-
-##### policy.rate_limiter
+##### policy.rate_limiter {#policy-rate-limiter}
 
 <a id="policy-rate-limiter-rate-limit"></a> <ParameterDescription
     name="policy.rate_limiter.rate_limit"
@@ -83,9 +77,7 @@ Object (aperture.spec.v1.RateLimiterDynamicConfig)"
     value="{'overrides': []}"
     description='Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.' />
 
-<a id="dashboard"></a>
-
-#### dashboard
+#### dashboard {#dashboard}
 
 <a id="dashboard-refresh-interval"></a> <ParameterDescription
     name="dashboard.refresh_interval"
@@ -95,9 +87,7 @@ string"
     value="'10s'"
     description='Refresh interval for dashboard panels.' />
 
-<a id="dashboard-datasource"></a>
-
-##### dashboard.datasource
+##### dashboard.datasource {#dashboard-datasource}
 
 <a id="dashboard-datasource-name"></a> <ParameterDescription
     name="dashboard.datasource.name"

@@ -288,8 +288,7 @@ Integer (int64)
 {%- set anchor = (parent_prefix + node.parameter.param_name) | slugify %}
 {%- set heading_level = '#' * (level + 1) %}
 {%- if node.parameter.param_type == 'intermediate_node' %}
-<a id="{{ anchor }}"></a>
-{{ heading_level }} {{ parent_prefix }}{{ node.parameter.param_name }}
+{{ heading_level }} {{ parent_prefix }}{{ node.parameter.param_name }} {#{{ anchor }}}
 
 {%- for child_name, child_node in node.children.items() %}
 {{ render_properties(child_node, level + 1, parent_prefix + node.parameter.param_name + '.') }}
@@ -335,23 +334,21 @@ Integer (int64)
 {%- endif %}
 {%- endmacro %}
 
-{%- macro render_properties(node, level) %}
+{%- macro render_properties(node, level, parent_prefix='') %}
 {%- set indent = '    ' * level %}
-{%- set anchor = node.parameter.param_name | slugify %}
+{%- set anchor = (parent_prefix + node.parameter.param_name) | slugify %}
 {%- set heading_level = '#' * (level + 1) %}
 {%- if node.parameter.param_type == 'intermediate_node' %}
-<a id="{{ anchor }}"></a>
-{{ heading_level }} {{ node.parameter.param_name }}
+{{ heading_level }} {{ parent_prefix }}{{ node.parameter.param_name }} {#{{ anchor }}}
 
 {%- if node.parameter.description %}
 **Description**: {{ node.parameter.description }}
 {%- endif %}
 {%- for child_name, child_node in node.children.items() %}
-{{ render_properties(child_node, level + 1) }}
+{{ render_properties(child_node, level + 1, parent_prefix + node.parameter.param_name + '.') }}
 {%- endfor %}
 {%- else %}
-<a id="{{ anchor }}"></a>
-{{ heading_level }} {{ node.parameter.param_name }}
+{{ heading_level }} {{ parent_prefix }}{{ node.parameter.param_name }} {#{{ anchor }}}
 **Type**: {{ render_type(node.parameter.param_type) }}
 **Default Value**: `{{ node.parameter.default | quoteValueDocs }}`
 **Description**: {{ node.parameter.description }}
@@ -519,7 +516,11 @@ def get_jinja2_environment() -> jinja2.Environment:
         "definitions.json.j2": JSON_SCHEMA_TPL,
     }
     loader = jinja2.DictLoader(JINJA2_TEMPLATES)
-    env = jinja2.Environment(loader=loader)
+    env = jinja2.Environment(
+        loader=loader,
+        comment_start_string="<!--",
+        comment_end_string="-->",
+    )
     env.filters["slugify"] = slugify
     env.filters["quoteValueYAML"] = quoteValueYAML
     env.filters["quoteValueJSON"] = quoteValueJSON

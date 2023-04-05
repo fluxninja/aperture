@@ -22,9 +22,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/
 
 ### Parameters
 
-<a id="common"></a>
-
-#### common
+#### common {#common}
 
 <a id="common-policy-name"></a> <ParameterDescription
     name="common.policy_name"
@@ -34,9 +32,7 @@ string"
     value="__REQUIRED_FIELD__"
     description='Name of the policy.' />
 
-<a id="dashboard"></a>
-
-#### dashboard
+#### dashboard {#dashboard}
 
 <a id="dashboard-refresh-interval"></a> <ParameterDescription
     name="dashboard.refresh_interval"
@@ -62,9 +58,7 @@ string"
     value="'now'"
     description='To time of dashboard.' />
 
-<a id="dashboard-datasource"></a>
-
-##### dashboard.datasource
+##### dashboard.datasource {#dashboard-datasource}
 
 <a id="dashboard-datasource-name"></a> <ParameterDescription
     name="dashboard.datasource.name"

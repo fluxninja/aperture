@@ -45,9 +45,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/la
 
 ### Parameters
 
-<a id="common"></a>
-
-#### common
+#### common {#common}
 
 <a id="common-policy-name"></a> <ParameterDescription
     name="common.policy_name"
@@ -57,9 +55,7 @@ string"
     value="__REQUIRED_FIELD__"
     description='Name of the policy.' />
 
-<a id="policy"></a>
-
-#### policy
+#### policy {#policy}
 
 <a id="policy-flux-meter"></a> <ParameterDescription
     name="policy.flux_meter"
@@ -87,9 +83,7 @@ Object (aperture.spec.v1.Component)"
     value="[]"
     description='List of additional circuit components.' />
 
-<a id="policy-latency-baseliner"></a>
-
-##### policy.latency_baseliner
+##### policy.latency_baseliner {#policy-latency-baseliner}
 
 <a id="policy-latency-baseliner-ema"></a> <ParameterDescription
     name="policy.latency_baseliner.ema"
@@ -117,9 +111,7 @@ Number (double)"
     value="2"
     description='Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.' />
 
-<a id="policy-concurrency-controller"></a>
-
-##### policy.concurrency_controller
+##### policy.concurrency_controller {#policy-concurrency-controller}
 
 <a id="policy-concurrency-controller-flow-selector"></a> <ParameterDescription
     name="policy.concurrency_controller.flow_selector"
@@ -179,9 +171,7 @@ Object (aperture.spec.v1.LoadActuatorDynamicConfig)"
     value="{'dry_run': False}"
     description='Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.' />
 
-<a id="dashboard"></a>
-
-#### dashboard
+#### dashboard {#dashboard}
 
 <a id="dashboard-refresh-interval"></a> <ParameterDescription
     name="dashboard.refresh_interval"
@@ -207,9 +197,7 @@ string"
     value="'now'"
     description='To time of dashboard.' />
 
-<a id="dashboard-datasource"></a>
-
-##### dashboard.datasource
+##### dashboard.datasource {#dashboard-datasource}
 
 <a id="dashboard-datasource-name"></a> <ParameterDescription
     name="dashboard.datasource.name"
