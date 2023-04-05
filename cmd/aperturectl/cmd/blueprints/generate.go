@@ -27,7 +27,7 @@ func init() {
 	generateCmd.Flags().BoolVar(&noYAMLModeline, "no-yaml-modeline", false, "Do not add YAML language server modeline to generated YAML files")
 	generateCmd.Flags().BoolVar(&noValidate, "no-validation", false, "Do not validate values.yaml file")
 	generateCmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing output directory")
-	generateCmd.Flags().IntVar(&graphDepth, "graph-depth", 0, "Max depth of the graph when generating DOT and Mermaid files")
+	generateCmd.Flags().IntVar(&graphDepth, "graph-depth", 1, "Max depth of the graph when generating DOT and Mermaid files")
 }
 
 var generateCmd = &cobra.Command{

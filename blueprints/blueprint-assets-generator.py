@@ -226,13 +226,14 @@ def update_param_defaults(
         config = root
         for idx, part in enumerate(parts):
             if idx == len(parts) - 1:
-                try:
-                    return config[part]
-                except KeyError:
-                    return None
+                return config[part] if not isinstance(config, list) else config[0][part]
             else:
                 try:
-                    config = config[part]
+                    config = (
+                        config[part]
+                        if not isinstance(config, list)
+                        else config[0][part]
+                    )
                 except KeyError:
                     # the param is not present in the config, so we return None
                     # Also, when specific param is a map (map[string]type) and there is no default
@@ -287,12 +288,26 @@ Integer (int64)
 {%- set indent = '    ' * level %}
 {%- set anchor = (parent_prefix + node.parameter.param_name) | slugify %}
 {%- set heading_level = '#' * (level + 1) %}
-{%- if node.parameter.param_type == 'intermediate_node' %}
+{%- if node.parameter.param_type  in ['intermediate_node', '[]object'] %}
 {{ heading_level }} {{ parent_prefix }}{{ node.parameter.param_name }} {#{{ anchor }}}
 
+{%- if node.parameter.param_type == '[]object' %}
+<a id="{{ anchor }}"></a>
+<ParameterDescription
+    name="{{ parent_prefix }}{{ node.parameter.param_name }}"
+    type="{{ render_type(node.parameter.param_type) }}"
+    reference="{{ node.parameter.docs_link }}"
+    value="{{ node.parameter.default | quoteValueDocs }}"
+    description='{{ node.parameter.description }}' />
+{%- for child_name, child_node in node.children.items() %}
+{{ render_properties(child_node, level + 1, parent_prefix + node.parameter.param_name + '.') }}
+{%- if not loop.last %}{% endif %}
+{%- endfor %}
+{%- else %}
 {%- for child_name, child_node in node.children.items() %}
 {{ render_properties(child_node, level + 1, parent_prefix + node.parameter.param_name + '.') }}
 {%- endfor %}
+{%- endif %}
 {%- else %}
 <a id="{{ anchor }}"></a>
 <ParameterDescription
@@ -338,15 +353,25 @@ Integer (int64)
 {%- set indent = '    ' * level %}
 {%- set anchor = (parent_prefix + node.parameter.param_name) | slugify %}
 {%- set heading_level = '#' * (level + 1) %}
-{%- if node.parameter.param_type == 'intermediate_node' %}
+{%- if node.parameter.param_type  == 'intermediate_node' or node.parameter.param_type.startswith('[]') %}
 {{ heading_level }} {{ parent_prefix }}{{ node.parameter.param_name }} {#{{ anchor }}}
 
 {%- if node.parameter.description %}
 **Description**: {{ node.parameter.description }}
 {%- endif %}
+{%- if node.parameter.param_type == '[]object' %}
+**Type**: {{ render_type(node.parameter.param_type) }}
+**Items**:
+{%- for child_name, child_node in node.children.items() %}
+{{ render_properties(child_node, level + 1, parent_prefix + node.parameter.param_name + '.') }}
+{%- if not loop.last %}{% endif %}
+{%- endfor %}
+**Default Value**: `{{ node.parameter.default | quoteValueDocs }}`
+{%- else %}
 {%- for child_name, child_node in node.children.items() %}
 {{ render_properties(child_node, level + 1, parent_prefix + node.parameter.param_name + '.') }}
 {%- endfor %}
+{%- endif %}
 {%- else %}
 {{ heading_level }} {{ parent_prefix }}{{ node.parameter.param_name }} {#{{ anchor }}}
 **Type**: {{ render_type(node.parameter.param_type) }}
@@ -394,7 +419,10 @@ JSON_SCHEMA_TPL = """
 
 {%- macro render_properties(node) %}
 "{{ node.parameter.param_name }}": {
-{%- if node.parameter.param_type == 'intermediate_node' %}
+{%- if node.parameter.param_type in ['intermediate_node', '[]object'] %}
+{%- if node.parameter.param_type == '[]object' %}
+"type": "array",
+"items": {
 "type": "object",
 "additionalProperties": false,
 {%- if node.required_children %}
@@ -406,6 +434,22 @@ JSON_SCHEMA_TPL = """
 {%- if not loop.last %},{% endif %}
 {%- endfor %}
 }
+},
+"description": "{{ node.parameter.description }}",
+"default": {{ node.parameter.default | quoteValueJSON }},
+{%- else %}
+"type": "object",
+"additionalProperties": false,
+{%- if node.required_children %}
+"required": [{%- for child_name in node.required_children %}"{{ child_name }}"{%- if not loop.last %},{% endif %}{%- endfor %}],
+{%- endif %}
+"properties": {
+{%- for child_name, child_node in node.children.items() %}
+{{ render_properties(child_node) }}
+{%- if not loop.last %},{% endif %}
+{%- endfor %}
+}
+{%- endif %}
 {%- else %}
 "description": "{{ node.parameter.description }}",
 "default": {{ node.parameter.default | quoteValueJSON }},
@@ -460,6 +504,9 @@ YAML_TPL = """
 {%- else %}
 {{ '  ' * level }}{{ node.parameter.param_name }}:
 {%- endif %}
+{%- endif %}
+{%- if node.parameter.default is iterable and not node.parameter.default is string and not node.parameter.default is mapping and node.parameter.default | list %}
+{{ '  ' * (level) }}-
 {%- endif %}
 {%- for child_name, child_node in node.children.items() %}
 {{- render_node(child_node, level + 1) }}

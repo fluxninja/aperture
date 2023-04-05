@@ -1,8 +1,8 @@
-local autoscalerdecreasinggradientins = import './autoscalerdecreasinggradientins.libsonnet';
+local decreasinggradientins = import './decreasinggradientins.libsonnet';
 {
   new():: {
   },
-  inPorts:: autoscalerdecreasinggradientins,
+  inPorts:: decreasinggradientins,
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },

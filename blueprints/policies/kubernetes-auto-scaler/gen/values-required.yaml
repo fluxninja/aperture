@@ -1,0 +1,84 @@
+# Generated values file for policies/kubernetes-auto-scaler blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/kubernetes-auto-scaler
+
+common:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: __REQUIRED_FIELD__
+
+policy:
+  kubernetes_object_selector:
+    # Namespace.
+    # Type: string
+    # Required: True
+    namespace: __REQUIRED_FIELD__
+    # API Version.
+    # Type: string
+    # Required: True
+    api_version: __REQUIRED_FIELD__
+    # Kind.
+    # Type: string
+    # Required: True
+    kind: __REQUIRED_FIELD__
+    # Name.
+    # Type: string
+    # Required: True
+    name: __REQUIRED_FIELD__
+  scale_in_criteria:
+    # Query.
+    # Type: aperture.spec.v1.Query
+    # Required: True
+    query:
+      # PromQL query.
+      # Type: aperture.spec.v1.PromQL
+      # Required: True
+      promql:
+        # PromQL query string.
+        # Type: string
+        # Required: True
+        query_string: __REQUIRED_FIELD__
+        # Evaluation interval.
+        # Type: string
+        evaluation_interval: "10s"
+        # PromQL query execution output.
+        # Type: aperture.spec.v1.PromQLOuts
+        # Required: True
+        out_ports:
+          # PromQL query execution output port.
+          # Type: aperture.spec.v1.OutPort
+          # Required: True
+          output:
+            # Output Signal name.
+            # Type: string
+            # Required: True
+            signal_name: __REQUIRED_FIELD__
+  scale_out_criteria:
+    # Query.
+    # Type: aperture.spec.v1.Query
+    # Required: True
+    query:
+      # PromQL query.
+      # Type: aperture.spec.v1.PromQL
+      # Required: True
+      promql:
+        # PromQL query string.
+        # Type: string
+        # Required: True
+        query_string: __REQUIRED_FIELD__
+        # Evaluation interval.
+        # Type: string
+        evaluation_interval: "10s"
+        # PromQL query execution output.
+        # Type: aperture.spec.v1.PromQLOuts
+        # Required: True
+        out_ports:
+          # PromQL query execution output port.
+          # Type: aperture.spec.v1.OutPort
+          # Required: True
+          output:
+            # Output Signal name.
+            # Type: string
+            # Required: True
+            signal_name: __REQUIRED_FIELD__
