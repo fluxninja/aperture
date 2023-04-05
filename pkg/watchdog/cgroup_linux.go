@@ -9,6 +9,7 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/fluxninja/aperture/pkg/log"
+	watchdogconfig "github.com/fluxninja/aperture/pkg/watchdog/config"
 )
 
 type cgroupBase struct {
@@ -49,12 +50,12 @@ func (cg *cgroupBase) cgroupUsage() (uint64, uint64, error) {
 
 type cgroupWatermarks struct {
 	cgroupBase
-	WatermarksPolicy
+	watchdogconfig.WatermarksPolicy
 }
 
 type cgroupAdaptive struct {
 	cgroupBase
-	AdaptivePolicy
+	watchdogconfig.AdaptivePolicy
 }
 
 // Valid checks if the policy is valid in linux.
