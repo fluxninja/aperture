@@ -96,9 +96,15 @@ spec:
               signal_name: AVERAGE_CPU
           query_string: avg(avg_over_time(k8s_pod_cpu_utilization{k8s_deployment_name="service1-demo-app"}[30s]))
     - auto_scale:
-        auto_scaler:
-          max_scale: "10"
-          min_scale: "1"
+        pod_auto_scaler:
+          max_replicas: "10"
+          min_replicas: "1"
+          pod_scaler:
+            kubernetes_object_selector:
+              api_version: apps/v1
+              kind: Deployment
+              name: service1-demo-app
+              namespace: demoapp
           scale_in_controllers:
           - controller:
               gradient:
@@ -123,13 +129,6 @@ spec:
                 parameters:
                   slope: -1
           scale_out_cooldown: 30s
-          scaler:
-            kubernetes_replicas:
-              kubernetes_object_selector:
-                api_version: apps/v1
-                kind: Deployment
-                name: service1-demo-app
-                namespace: demoapp
     evaluation_interval: 0.5s
   resources:
     flow_control:

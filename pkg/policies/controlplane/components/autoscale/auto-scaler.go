@@ -393,7 +393,7 @@ func ParseAutoScaler(
 		if gradient := controller.GetGradient(); gradient != nil {
 			inPorts := gradient.GetInPorts()
 			if inPorts == nil {
-				inPorts = &policylangv1.AutoScaler_IncreasingGradient_Ins{}
+				inPorts = &policylangv1.IncreasingGradient_Ins{}
 			}
 			signalPort := inPorts.GetSignal()
 			if signalPort != nil {
@@ -577,7 +577,7 @@ func ParseAutoScaler(
 		if gradient := controller.GetGradient(); gradient != nil {
 			inPorts := gradient.GetInPorts()
 			if inPorts == nil {
-				inPorts = &policylangv1.AutoScaler_DecreasingGradient_Ins{}
+				inPorts = &policylangv1.DecreasingGradient_Ins{}
 			}
 			signalPort := inPorts.GetSignal()
 			if signalPort != nil {
