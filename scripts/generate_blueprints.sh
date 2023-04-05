@@ -29,7 +29,7 @@ function generate_readme() {
 	dir=$(dirname "$1")
 	echo "Generating README and Sample Values for $dir"
 
-	python "${git_root}"/scripts/blueprint-assets-generator.py "$dir"
+	python "${blueprints_root}"/blueprint-assets-generator.py "$dir"
 
 	gen_dir="$dir"/gen
 	gen_files=("$gen_dir"/values.yaml "$gen_dir"/values-required.yaml "$gen_dir"/dynamic-config-values.yaml "$gen_dir"/dynamic-config-values-required.yaml "$gen_dir"/definitions.json "$gen_dir"/dynamic-config-definitions.json)

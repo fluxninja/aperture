@@ -294,7 +294,60 @@ Object with keys and values of type {{- render_type(param_type[4:-1]) }}
 ### Parameters
 
 {%- for child_name, child_node in nested_parameters.children.items() %}
-{{ render_properties(child_node, 2) }}
+{{ render_properties(child_node, 3) }}
+{%- endfor %}
+"""
+
+MARKDOWN_README_TPL = """
+{%- macro render_type(param_type) %}
+{%- if param_type.startswith('aperture.spec') %}
+Object ({{ param_type }})
+{%- elif param_type == 'bool' %}
+Boolean
+{%- elif param_type == 'float32' %}
+Number (float)
+{%- elif param_type == 'float64' %}
+Number (double)
+{%- elif param_type == 'int32' %}
+Integer (int32)
+{%- elif param_type == 'int64' %}
+Integer (int64)
+{%- elif param_type.startswith('[]') %}
+Array of {{- render_type(param_type[2:]) }}
+{%- elif param_type.startswith('map[') %}
+Object with keys and values of type {{- render_type(param_type[4:-1]) }}
+{%- else %}
+{{ param_type }}
+{%- endif %}
+{%- endmacro %}
+
+{%- macro render_properties(node, level) %}
+{%- set indent = '    ' * level %}
+{%- set anchor = node.parameter.param_name | slugify %}
+{%- set heading_level = '#' * (level + 1) %}
+{%- if node.parameter.param_type == 'intermediate_node' %}
+<a id="{{ anchor }}"></a>
+{{ heading_level }} {{ node.parameter.param_name }}
+
+{%- if node.parameter.description %}
+**Description**: {{ node.parameter.description }}
+{%- endif %}
+{%- for child_name, child_node in node.children.items() %}
+{{ render_properties(child_node, level + 1) }}
+{%- endfor %}
+{%- else %}
+<a id="{{ anchor }}"></a>
+{{ heading_level }} {{ node.parameter.param_name }}
+**Type**: {{ render_type(node.parameter.param_type) }}
+**Default Value**: `{{ node.parameter.default | quoteValueDocs }}`
+**Description**: {{ node.parameter.description }}
+{%- endif %}
+{%- endmacro %}
+
+### Parameters
+
+{%- for child_name, child_node in nested_parameters.children.items() %}
+{{ render_properties(child_node, 3) }}
 {%- endfor %}
 """
 
@@ -444,7 +497,8 @@ def quoteValueDocs(value: str) -> str:
 
 def get_jinja2_environment() -> jinja2.Environment:
     JINJA2_TEMPLATES = {
-        "markdown.md.j2": MARKDOWN_DOC_TPL,
+        "markdown.doc.md.j2": MARKDOWN_DOC_TPL,
+        "markdown.readme.md.j2": MARKDOWN_README_TPL,
         "values.yaml.j2": YAML_TPL,
         "definitions.json.j2": JSON_SCHEMA_TPL,
     }
@@ -457,78 +511,87 @@ def get_jinja2_environment() -> jinja2.Environment:
     return env
 
 
-MDX_TEMPLATE = """
-```mdx-code-block
-
-export const ParameterHeading = ({children}) => (
-  <span style={{fontWeight: "bold"}}>{children}</span>
-);
-
-export const WrappedDescription = ({children}) => (
-  <span style={{wordWrap: "normal"}}>{children}</span>
-);
-
-export const RefType = ({type, reference}) => (
-  <a href={reference}>{type}</a>
-);
-
-export const ParameterDescription = ({name, type, reference, value, description}) => (
-  <table class="blueprints-params">
-  <tr>
-    <td><ParameterHeading>Parameter</ParameterHeading></td>
-    <td><code>{name}</code></td>
-  </tr>
-  <tr>
-    <td><ParameterHeading>Type</ParameterHeading></td>
-    <td><em>{reference == "" ? type : <RefType type={type} reference={reference} />}</em></td>
-  </tr>
-  <tr>
-    <td class="blueprints-default-heading"><ParameterHeading>Default Value</ParameterHeading></td>
-    <td><code>{value}</code></td>
-  </tr>
-  <tr>
-    <td class="blueprints-description"><ParameterHeading>Description</ParameterHeading></td>
-    <td class="blueprints-description"><WrappedDescription>{description}</WrappedDescription></td>
-  </tr>
-</table>
-);
-```
-"""
-
-
 def update_readme_markdown(
     readme_path: Path,
     config_parameters: Parameters,
     dynamic_config_parameters: Parameters,
-    blueprint_name: Path,
-    aperture_version_path,
 ):
-    """Find configuration marker in README and add generated content below it."""
+    """Find configuration marker in and add generated content below it."""
+    config_marker = "<!-- Configuration Marker -->"
+
+    if not readme_path.exists():
+        # create a new file with config marker
+        readme_path.write_text(config_marker)
 
     readme_data = readme_path.read_text()
+
+    # add a config marker to the end of the file
+    if config_marker not in readme_data:
+        readme_data += f"\n{config_marker}"
+
     readme_copied = ""
     for line in readme_data.split("\n"):
         readme_copied += line + "\n"
-        if line == "<!-- Configuration Marker -->":
+        if line == config_marker:
             break
 
-    readme_copied += f"\n{MDX_TEMPLATE}\n"
+    env = get_jinja2_environment()
+    template = env.get_template("markdown.readme.md.j2")
+    readme_copied += template.render(
+        {"nested_parameters": config_parameters.nested_parameters}
+    )
+    if len(dynamic_config_parameters.nested_parameters.children) > 0:
+        readme_copied += "\n\n## Dynamic Configuration\n\n"
+        readme_copied += template.render(
+            {"nested_parameters": dynamic_config_parameters.nested_parameters}
+        )
+    readme_path.write_text(readme_copied)
+
+
+def update_docs_markdown(
+    readme_path: Path,
+    config_parameters: Parameters,
+    dynamic_config_parameters: Parameters,
+    blueprint_name: Path,
+    docs_root_relative_path,
+):
+    """Find configuration marker in and add generated content below it."""
+    config_marker = "<!-- Configuration Marker -->"
+
+    if not readme_path.exists():
+        # create a new file with config marker
+        readme_path.write_text(config_marker)
+
+    readme_data = readme_path.read_text()
+
+    # add a config marker to the end of the file
+    if config_marker not in readme_data:
+        readme_data += f"\n{config_marker}"
+
+    readme_copied = ""
+    for line in readme_data.split("\n"):
+        readme_copied += line + "\n"
+        if line == config_marker:
+            break
+
+    aperture_version_path = docs_root_relative_path + "/apertureVersion.js"
+    parameter_components_path = docs_root_relative_path + "/parameterComponents.js"
 
     readme_copied += "```mdx-code-block\n"
     readme_copied += (
         f"import {{apertureVersion as aver}} from '{aperture_version_path}'\n"
     )
+    readme_copied += (
+        f"import {{ParameterDescription}} from '{parameter_components_path}'\n"
+    )
     readme_copied += "```\n\n"
 
-    readme_copied += f"## Configuration: <a href={{`https://github.com/fluxninja/aperture/tree/${{aver}}/blueprints/{blueprint_name}`}}>{blueprint_name}</a> {{#configuration}}\n"
+    readme_copied += f"## Configuration for <a href={{`https://github.com/fluxninja/aperture/tree/${{aver}}/blueprints/{blueprint_name}`}}>{blueprint_name}</a> {{#configuration}}\n"
 
     env = get_jinja2_environment()
-    template = env.get_template("markdown.md.j2")
+    template = env.get_template("markdown.doc.md.j2")
     rendered = template.render(
-        {
-            "nested_parameters": config_parameters.nested_parameters,
-            "blueprint_name": blueprint_name,
-        }
+        {"nested_parameters": config_parameters.nested_parameters}
     )
 
     readme_copied += rendered
@@ -538,10 +601,7 @@ def update_readme_markdown(
         readme_copied += "The following configuration parameters can be [dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md) at runtime, without reloading the policy.\n\n"
         readme_copied += ":::\n\n"
         rendered = template.render(
-            {
-                "nested_parameters": dynamic_config_parameters.nested_parameters,
-                "blueprint_name": blueprint_name,
-            }
+            {"nested_parameters": dynamic_config_parameters.nested_parameters}
         )
         readme_copied += rendered
 
@@ -625,14 +685,16 @@ def extract_parameters(
 
 
 def main(
+    # blueprint_path is a path and is a required argument
     blueprint_path: Path = typer.Argument(
-        ..., help="Path to the aperture blueprint directory"
+        ...,
+        help="Path to the aperture blueprint directory",
+        exists=True,
+        dir_okay=True,
+        file_okay=False,
+        resolve_path=True,
     )
 ):
-    if not blueprint_path.exists():
-        logger.error(f"No such file or directory: {blueprint_path}")
-        raise typer.Exit(1)
-
     repository_root = Path(__file__).absolute().parent.parent
 
     # calculate the path of repository_root/blueprints from the blueprint_path in terms of ../
@@ -642,22 +704,10 @@ def main(
     # get parts of relative_blueprint_path
     relative_blueprint_path_parts = blueprint_name.parts
 
-    readme_path = (
-        repository_root
-        / "docs/content/reference/policies/bundled-blueprints"
-        / "/".join(relative_blueprint_path_parts[:-1])
-        / f"{relative_blueprint_path_parts[-1]}.md"
-    )
-
-    if not readme_path.exists():
-        logger.error(f"README not found: {readme_path}. Exiting.")
-        raise typer.Exit(1)
-
     # make a prefix of ../ for each part
     spec_path = "/".join([".."] * len(relative_blueprint_path_parts)) + "/spec"
-    aperture_version_path = (
-        "/".join([".."] * (len(relative_blueprint_path_parts) + 2))
-        + "/apertureVersion.js"
+    docs_root_relative_path = "/".join(
+        [".."] * (len(relative_blueprint_path_parts) + 2)
     )
 
     aperture_json_schema_path = (
@@ -667,50 +717,66 @@ def main(
 
     blueprint_gen_path = blueprint_path / "gen"
 
-    config_docblocks = parse_config_parameters(
+    config_parameters = parse_config_parameters(
         repository_root, blueprint_path, aperture_json_schema_path, spec_path
     )
     render_json_schema(
-        blueprint_name, blueprint_gen_path / "definitions.json", config_docblocks
+        blueprint_name, blueprint_gen_path / "definitions.json", config_parameters
     )
     render_sample_config_yaml(
-        blueprint_name, blueprint_gen_path / "values.yaml", False, config_docblocks
+        blueprint_name, blueprint_gen_path / "values.yaml", False, config_parameters
     )
     render_sample_config_yaml(
         blueprint_name,
         blueprint_gen_path / "values-required.yaml",
         True,
-        config_docblocks,
+        config_parameters,
     )
 
-    dynamic_config_docblocks = parse_dynamic_config_docblocks(
+    dynamic_config_parameters = parse_dynamic_config_docblocks(
         repository_root, blueprint_path, aperture_json_schema_path, spec_path
     )
     render_json_schema(
         blueprint_name,
         blueprint_gen_path / "dynamic-config-definitions.json",
-        dynamic_config_docblocks,
+        dynamic_config_parameters,
     )
     render_sample_config_yaml(
         blueprint_name,
         blueprint_gen_path / "dynamic-config-values.yaml",
         False,
-        dynamic_config_docblocks,
+        dynamic_config_parameters,
     )
     render_sample_config_yaml(
         blueprint_name,
         blueprint_gen_path / "dynamic-config-values-required.yaml",
         True,
-        dynamic_config_docblocks,
+        dynamic_config_parameters,
     )
 
-    update_readme_markdown(
-        readme_path,
-        config_docblocks,
-        dynamic_config_docblocks,
-        blueprint_name,
-        aperture_version_path,
+    blueprints_docs_root_path = (
+        repository_root / "docs/content/reference/policies/bundled-blueprints"
     )
+    # check whether the blueprint_docs_root_path exists
+    if blueprints_docs_root_path.exists():
+        readme_path = (
+            blueprints_docs_root_path
+            / "/".join(relative_blueprint_path_parts[:-1])
+            / f"{relative_blueprint_path_parts[-1]}.md"
+        )
+
+        update_docs_markdown(
+            readme_path,
+            config_parameters,
+            dynamic_config_parameters,
+            blueprint_name,
+            docs_root_relative_path,
+        )
+    else:
+        readme_path = blueprint_path / "README.md"
+        update_readme_markdown(
+            readme_path, config_parameters, dynamic_config_parameters
+        )
 
 
 def parse_config_parameters(

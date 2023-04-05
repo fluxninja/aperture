@@ -11,52 +11,17 @@ dashboard that visualizes Signals flowing through the
 <!-- Configuration Marker -->
 
 ```mdx-code-block
-
-export const ParameterHeading = ({children}) => (
-  <span style={{fontWeight: "bold"}}>{children}</span>
-);
-
-export const WrappedDescription = ({children}) => (
-  <span style={{wordWrap: "normal"}}>{children}</span>
-);
-
-export const RefType = ({type, reference}) => (
-  <a href={reference}>{type}</a>
-);
-
-export const ParameterDescription = ({name, type, reference, value, description}) => (
-  <table class="blueprints-params">
-  <tr>
-    <td><ParameterHeading>Parameter</ParameterHeading></td>
-    <td><code>{name}</code></td>
-  </tr>
-  <tr>
-    <td><ParameterHeading>Type</ParameterHeading></td>
-    <td><em>{reference == "" ? type : <RefType type={type} reference={reference} />}</em></td>
-  </tr>
-  <tr>
-    <td class="blueprints-default-heading"><ParameterHeading>Default Value</ParameterHeading></td>
-    <td><code>{value}</code></td>
-  </tr>
-  <tr>
-    <td class="blueprints-description"><ParameterHeading>Description</ParameterHeading></td>
-    <td class="blueprints-description"><WrappedDescription>{description}</WrappedDescription></td>
-  </tr>
-</table>
-);
-```
-
-```mdx-code-block
 import {apertureVersion as aver} from '../../../../apertureVersion.js'
+import {ParameterDescription} from '../../../../parameterComponents.js'
 ```
 
-## Configuration: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals`}>dashboards/signals</a> {#configuration}
+## Configuration for <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals`}>dashboards/signals</a> {#configuration}
 
 ### Parameters
 
 <a id="common"></a>
 
-### common
+#### common
 
 <a id="common-policy-name"></a> <ParameterDescription
     name="common.policy_name"
@@ -68,7 +33,7 @@ string"
 
 <a id="dashboard"></a>
 
-### dashboard
+#### dashboard
 
 <a id="dashboard-refresh-interval"></a> <ParameterDescription
     name="dashboard.refresh_interval"
@@ -96,7 +61,7 @@ string"
 
 <a id="dashboard-datasource"></a>
 
-#### dashboard.datasource
+##### dashboard.datasource
 
 <a id="dashboard-datasource-name"></a> <ParameterDescription
     name="dashboard.datasource.name"
