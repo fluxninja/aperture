@@ -15,7 +15,10 @@ import {apertureVersion as aver} from '../../../../apertureVersion.js'
 import {ParameterDescription} from '../../../../parameterComponents.js'
 ```
 
-## Configuration for <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals`}>dashboards/signals</a> {#configuration}
+## Configuration
+
+Code: <a
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals`}>dashboards/signals</a>
 
 ### Parameters
 

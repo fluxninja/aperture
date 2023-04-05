@@ -14,12 +14,10 @@ policy:
   flux_meter:
     flow_selector:
       service_selector:
-        # None
         # Type: string
         # Required: True
         service: __REQUIRED_FIELD__
       flow_matcher:
-        # None
         # Type: string
         # Required: True
         control_point: __REQUIRED_FIELD__
@@ -47,12 +45,10 @@ policy:
     # Type: aperture.spec.v1.FlowSelector
     flow_selector:
       service_selector:
-        # None
         # Type: string
         # Required: True
         service: __REQUIRED_FIELD__
       flow_matcher:
-        # None
         # Type: string
         # Required: True
         control_point: __REQUIRED_FIELD__

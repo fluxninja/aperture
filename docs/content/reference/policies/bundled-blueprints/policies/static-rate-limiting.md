@@ -15,7 +15,10 @@ import {apertureVersion as aver} from '../../../../apertureVersion.js'
 import {ParameterDescription} from '../../../../parameterComponents.js'
 ```
 
-## Configuration for <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/static-rate-limiting`}>policies/static-rate-limiting</a> {#configuration}
+## Configuration
+
+Code: <a
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/static-rate-limiting`}>policies/static-rate-limiting</a>
 
 ### Parameters
 

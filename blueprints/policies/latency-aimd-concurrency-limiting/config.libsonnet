@@ -1,5 +1,3 @@
-local rl = import '../static-rate-limiting/config.libsonnet';
-
 {
   /**
   * @param (common.policy_name: string required) Name of the policy.

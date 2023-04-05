@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 #
-# This script is used to generate generate blueprint config.libsonnet based on
-# dashboards and policies that this policy include, as well as README with
-# configuration documentation section.
+# This script is used to generate the assets for the blueprints
+# - values.yaml
+# - dynamic-values.yaml
+# - json schema
+# - documentation
 from __future__ import annotations
 
 import dataclasses
@@ -31,7 +33,7 @@ class ExitException(RuntimeError):
 
 PARAMETER_RE = re.compile(r".*@param.*")
 PARAMETER_DETAILED_RE = re.compile(
-    r".*@param \((?P<param_name>[\w.\[\]]+): (?P<param_type>[\w.\[\]]+) ?(?P<param_required>\w+)?\) ?(?P<param_description>.+)?"
+    r".*@param \((?P<param_name>[\w.\[\]]+): (?P<param_type>[\w.\[\]/:-]+) ?(?P<param_required>\w+)?\) ?(?P<param_description>.+)?"
 )
 
 
@@ -40,7 +42,7 @@ class Parameter:
     param_name: str = ""
     param_type: str = "intermediate_node"
     json_schema_link: str = ""
-    spec_link: str = ""
+    docs_link: str = ""
     description: str = ""
     required: bool = False
     default: Optional[Any] = None
@@ -64,33 +66,45 @@ class Parameters:
 
     @classmethod
     def _resolve_param_links(
-        cls, aperture_json_schema_path: str, spec_path: str, param: str
+        cls, blueprints_root_relative_path: str, policies_relative_path: str, param: str
     ) -> tuple[str, str]:
-        if not param.startswith("aperture.spec") and not param.startswith(
-            "[]aperture.spec"
-        ):
+        if param.startswith("aperture.spec") or param.startswith("[]aperture.spec"):
+            component = param.split(".")[-1]
+
+            component_slug = camel_to_kebab_case(component)
+            docs_link = f"{policies_relative_path}/spec#{component_slug}"
+            json_schema_link = f"{blueprints_root_relative_path}/gen/jsonschema/_definitions.json#/definitions/{component}"
+            return (
+                docs_link,
+                json_schema_link,
+            )
+        elif param.count(":") == 1:
+            # if param starts with [] then it is an array of objects, remove the []
+            if param.startswith("[]"):
+                param = param[2:]
+            # parameter is of the form <blueprint>:<param>
+            blueprint, param = param.split(":")
+            docs_link = f"{policies_relative_path}/bundled-blueprints/{blueprint}#{slugify(param)}"
+            # look for path under properties in json schema after splitting by . and walking down the tree
+            parts = param.split(".")
+            json_schema_link = (
+                f"{blueprints_root_relative_path}/{blueprint}/gen/definitions.json#"
+            )
+            for part in parts:
+                json_schema_link += f"/properties/{part}"
+            return (
+                docs_link,
+                json_schema_link,
+            )
+        else:
             return "", ""
-
-        component = param.split(".")[-1]
-
-        # Transform CamelCase into camel-case
-        parts = [[component[0].lower()]]
-        for letter in component[1:]:
-            if letter.isupper():
-                parts.append(list(letter.lower()))
-            else:
-                parts[-1].append(letter)
-
-        component_final = "-".join(["".join(l) for l in parts])
-
-        return (
-            f"{spec_path}#{component_final}",
-            f"{aperture_json_schema_path}{component}",
-        )
 
     @classmethod
     def from_comment(
-        cls, aperture_json_schema_path: str, spec_path: str, comment: List[str]
+        cls,
+        blueprints_root_relative_path: str,
+        policies_relative_path: str,
+        comment: List[str],
     ) -> Parameters:
         nested_parameters = ParameterNode()
         nested_required_parameters = ParameterNode()
@@ -104,8 +118,8 @@ class Parameters:
 
                 groups = inner.groupdict()
                 param_name, param_type = groups["param_name"], groups["param_type"]
-                spec_link, json_schema_link = cls._resolve_param_links(
-                    aperture_json_schema_path, spec_path, param_type
+                docs_link, json_schema_link = cls._resolve_param_links(
+                    blueprints_root_relative_path, policies_relative_path, param_type
                 )
                 param_required = groups.get("param_required", "") == "required"
                 param_description = groups.get("param_description", "")
@@ -123,7 +137,7 @@ class Parameters:
                                 part,
                                 param_type,
                                 json_schema_link,
-                                spec_link,
+                                docs_link,
                                 param_description,
                                 param_required,
                             )
@@ -248,7 +262,11 @@ def update_param_defaults(
 
 MARKDOWN_DOC_TPL = """
 {%- macro render_type(param_type) %}
-{%- if param_type.startswith('aperture.spec') %}
+{%- if param_type.startswith('[]') %}
+Array of {{- render_type(param_type[2:]) }}
+{%- elif param_type.startswith('map[') %}
+Object with keys and values of type {{- render_type(param_type[4:-1]) }}
+{%- elif param_type.startswith('aperture.spec') or ':' in param_type %}
 Object ({{ param_type }})
 {%- elif param_type == 'bool' %}
 Boolean
@@ -260,10 +278,6 @@ Number (double)
 Integer (int32)
 {%- elif param_type == 'int64' %}
 Integer (int64)
-{%- elif param_type.startswith('[]') %}
-Array of {{- render_type(param_type[2:]) }}
-{%- elif param_type.startswith('map[') %}
-Object with keys and values of type {{- render_type(param_type[4:-1]) }}
 {%- else %}
 {{ param_type }}
 {%- endif %}
@@ -285,7 +299,7 @@ Object with keys and values of type {{- render_type(param_type[4:-1]) }}
 <ParameterDescription
     name="{{ parent_prefix }}{{ node.parameter.param_name }}"
     type="{{ render_type(node.parameter.param_type) }}"
-    reference="{{ node.parameter.spec_link }}"
+    reference="{{ node.parameter.docs_link }}"
     value="{{ node.parameter.default | quoteValueDocs }}"
     description='{{ node.parameter.description }}' />
 {%- endif %}
@@ -300,7 +314,11 @@ Object with keys and values of type {{- render_type(param_type[4:-1]) }}
 
 MARKDOWN_README_TPL = """
 {%- macro render_type(param_type) %}
-{%- if param_type.startswith('aperture.spec') %}
+{%- if param_type.startswith('[]') %}
+Array of {{- render_type(param_type[2:]) }}
+{%- elif param_type.startswith('map[') %}
+Object with keys and values of type {{- render_type(param_type[4:-1]) }}
+{%- elif param_type.startswith('aperture.spec') or ':' in param_type %}
 Object ({{ param_type }})
 {%- elif param_type == 'bool' %}
 Boolean
@@ -312,10 +330,6 @@ Number (double)
 Integer (int32)
 {%- elif param_type == 'int64' %}
 Integer (int64)
-{%- elif param_type.startswith('[]') %}
-Array of {{- render_type(param_type[2:]) }}
-{%- elif param_type.startswith('map[') %}
-Object with keys and values of type {{- render_type(param_type[4:-1]) }}
 {%- else %}
 {{ param_type }}
 {%- endif %}
@@ -353,7 +367,13 @@ Object with keys and values of type {{- render_type(param_type[4:-1]) }}
 
 JSON_SCHEMA_TPL = """
 {%- macro render_type(param_type, json_schema_link) %}
-{%- if param_type.startswith('aperture.spec') %}
+{%- if param_type.startswith('[]') %}
+"type": "array",
+"items": { {{- render_type(param_type[2:], json_schema_link) }} }
+{%- elif param_type.startswith('map[') %}
+"type": "object",
+"additionalProperties": { {{- render_type(param_type[4:-1], json_schema_link) }}}
+{%- elif param_type.startswith('aperture.spec') or ':' in param_type %}
 "type": "object",
 {{ ' ' * 4 }}"$ref": "{{- json_schema_link }}"
 {%- elif param_type == 'bool' %}
@@ -370,12 +390,6 @@ JSON_SCHEMA_TPL = """
 {%- elif param_type == 'int64' %}
 "type": "integer",
 "format": "int64"
-{%- elif param_type.startswith('[]') %}
-"type": "array",
-"items": { {{- render_type(param_type[2:], json_schema_link) }} }
-{%- elif param_type.startswith('map[') %}
-"type": "object",
-"additionalProperties": { {{- render_type(param_type[4:-1], json_schema_link) }}}
 {%- else %}
 "type": "{{ param_type }}"
 {%- endif %}
@@ -435,7 +449,9 @@ YAML_TPL = """
 {%- endmacro %}
 {%- macro render_node(node, level) %}
 {%- if node.parameter.param_type != 'intermediate_node' %}
+{%- if node.parameter.description %}
 {{ '  ' * level }}# {{ node.parameter.description }}
+{%- endif %}
 {{ '  ' * level }}# Type: {{ node.parameter.param_type }}
 {%- if node.parameter.required != False %}
 {{ '  ' * level }}# Required: {{ node.parameter.required }}
@@ -586,7 +602,8 @@ def update_docs_markdown(
     )
     readme_copied += "```\n\n"
 
-    readme_copied += f"## Configuration for <a href={{`https://github.com/fluxninja/aperture/tree/${{aver}}/blueprints/{blueprint_name}`}}>{blueprint_name}</a> {{#configuration}}\n"
+    readme_copied += f"## Configuration\n"
+    readme_copied += f"\nCode: <a href={{`https://github.com/fluxninja/aperture/tree/${{aver}}/blueprints/{blueprint_name}`}}>{blueprint_name}</a>\n\n"
 
     env = get_jinja2_environment()
     template = env.get_template("markdown.doc.md.j2")
@@ -644,7 +661,7 @@ def render_json_schema(
 
 
 def extract_parameters(
-    aperture_json_schema_path: str, spec_path: str, jsonnet_data: str
+    blueprints_root_relative_path: str, policies_relative_path: str, jsonnet_data: str
 ) -> Parameters:
     docblock_start_re = r".*\/\*\*$"
     docblock_end_re = r".*\*\/$"
@@ -661,7 +678,7 @@ def extract_parameters(
             inside_docblock = False
             docblocks.append(
                 Parameters.from_comment(
-                    aperture_json_schema_path, spec_path, docblock_data
+                    blueprints_root_relative_path, policies_relative_path, docblock_data
                 )
             )
             docblock_data = []
@@ -705,20 +722,22 @@ def main(
     relative_blueprint_path_parts = blueprint_name.parts
 
     # make a prefix of ../ for each part
-    spec_path = "/".join([".."] * len(relative_blueprint_path_parts)) + "/spec"
+    policies_relative_path = "/".join([".."] * len(relative_blueprint_path_parts))
     docs_root_relative_path = "/".join(
         [".."] * (len(relative_blueprint_path_parts) + 2)
     )
 
-    aperture_json_schema_path = (
-        "/".join([".."] * (len(relative_blueprint_path_parts) + 1))
-        + "/gen/jsonschema/_definitions.json#/definitions/"
+    blueprints_root_relative_path = "/".join(
+        [".."] * (len(relative_blueprint_path_parts) + 1)
     )
 
     blueprint_gen_path = blueprint_path / "gen"
 
     config_parameters = parse_config_parameters(
-        repository_root, blueprint_path, aperture_json_schema_path, spec_path
+        repository_root,
+        blueprint_path,
+        blueprints_root_relative_path,
+        policies_relative_path,
     )
     render_json_schema(
         blueprint_name, blueprint_gen_path / "definitions.json", config_parameters
@@ -734,7 +753,10 @@ def main(
     )
 
     dynamic_config_parameters = parse_dynamic_config_docblocks(
-        repository_root, blueprint_path, aperture_json_schema_path, spec_path
+        repository_root,
+        blueprint_path,
+        blueprints_root_relative_path,
+        policies_relative_path,
     )
     render_json_schema(
         blueprint_name,
@@ -782,8 +804,8 @@ def main(
 def parse_config_parameters(
     repository_root: Path,
     blueprint_path: Path,
-    aperture_json_schema_path: str,
-    spec_path: str,
+    blueprints_root_relative_path: str,
+    policies_relative_path: str,
 ) -> Parameters:
     config_path = blueprint_path / "config.libsonnet"
 
@@ -796,7 +818,7 @@ def parse_config_parameters(
     metadata = yaml.safe_load(metadata_path.read_text())
 
     parameters = extract_parameters(
-        aperture_json_schema_path, spec_path, config_path.read_text()
+        blueprints_root_relative_path, policies_relative_path, config_path.read_text()
     )
 
     # set defaults for nested parameters
@@ -813,15 +835,15 @@ def parse_config_parameters(
 def parse_dynamic_config_docblocks(
     repository_root: Path,
     blueprint_path: Path,
-    aperture_json_schema_path: str,
-    spec_path: str,
+    blueprints_root_relative_path: str,
+    policies_relative_path: str,
 ) -> Parameters:
     config_path = blueprint_path / "dynamic-config.libsonnet"
     if not config_path.exists():
         return Parameters()
 
     dynamic_config_parameters = extract_parameters(
-        aperture_json_schema_path, spec_path, config_path.read_text()
+        blueprints_root_relative_path, policies_relative_path, config_path.read_text()
     )
 
     update_param_defaults(repository_root, config_path, dynamic_config_parameters)
@@ -839,6 +861,19 @@ def merge_parameternodes(params1: ParameterNode, params2: ParameterNode):
             merge_parameternodes(params1.children[key], value)
         else:
             params1.children[key] = value
+
+
+def camel_to_kebab_case(s):
+    # split on uppercase letters
+    parts = re.split(r"(?=[A-Z])", s)
+    # check if first part is empty
+    if parts[0] == "":
+        # remove first part
+        parts = parts[1:]
+    # lowercase all parts
+    parts = [part.lower() for part in parts]
+    # join with - all parts
+    return "-".join(parts)
 
 
 if __name__ == "__main__":
