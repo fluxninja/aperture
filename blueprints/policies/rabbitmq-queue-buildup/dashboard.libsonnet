@@ -4,14 +4,7 @@ local config = import './config.libsonnet';
 local grafana = import 'github.com/grafana/grafonnet-lib/grafonnet/grafana.libsonnet';
 
 local dashboard = grafana.dashboard;
-local row = grafana.row;
 local prometheus = grafana.prometheus;
-local template = grafana.template;
-local graphPanel = grafana.graphPanel;
-local tablePanel = grafana.tablePanel;
-local barGaugePanel = grafana.barGaugePanel;
-local statPanel = grafana.statPanel;
-local annotation = grafana.annotation;
 local timeSeriesPanel = lib.TimeSeriesPanel;
 
 local newTimeSeriesPanel(title, datasource, query, axisLabel='', unit='') =
@@ -37,93 +30,6 @@ local newTimeSeriesPanel(title, datasource, query, axisLabel='', unit='') =
     interval: '1s',
   };
 
-local newBarGaugePanel(graphTitle, datasource, graphQuery) =
-  local target =
-    prometheus.target(graphQuery) +
-    {
-      legendFormat: '{{ instance }} - {{ policy_name }}',
-      format: 'time_series',
-      instant: false,
-      range: true,
-    };
-
-  barGaugePanel.new(
-    title=graphTitle,
-    datasource=datasource,
-  ).addTarget(target) +
-  {
-    fieldConfig: {
-      defaults: {
-        color: {
-          mode: 'thresholds',
-        },
-        mappings: [],
-        thresholds: {
-          mode: 'absolute',
-          steps: [
-            { color: 'green', value: null },
-          ],
-        },
-      },
-      overrides: [],
-    },
-    options: {
-      displayMode: 'gradient',
-      minVizHeight: 10,
-      minVizWidth: 0,
-      orientation: 'horizontal',
-      reduceOptions: {
-        calcs: ['lastNotNull'],
-        fields: '',
-        values: false,
-      },
-      showUnfilled: true,
-    },
-  };
-
-local newStatPanel(graphTitle, datasource, graphQuery) =
-  local target =
-    prometheus.target(graphQuery) +
-    {
-      legendFormat: '{{ instance }} - {{ policy_name }}',
-      editorMode: 'code',
-      range: true,
-    };
-
-  statPanel.new(
-    title=graphTitle,
-    datasource=datasource,
-  ).addTarget(target) +
-  {
-    fieldConfig: {
-      defaults: {
-        color: {
-          mode: 'thresholds',
-        },
-        mappings: [],
-        thresholds: {
-          mode: 'absolute',
-          steps: [
-            { color: 'green', value: null },
-          ],
-        },
-      },
-      overrides: [],
-    },
-    options: {
-      colorMode: 'value',
-      graphMode: 'none',
-      justifyMode: 'center',
-      orientation: 'horizontal',
-      reduceOptions: {
-        calcs: ['lastNotNull'],
-        fields: '',
-        values: false,
-      },
-      textMode: 'auto',
-    },
-  };
-
 function(cfg) {
   local params = config.common + config.dashboard + cfg,
   local policyName = params.policy_name,
@@ -139,53 +45,11 @@ function(cfg) {
                        ||| % { queue_name: queueName },
                        'Ready Messages'),
 
-  local WFQSchedulerFlows =
-    newBarGaugePanel('WFQ Scheduler Flows', dsName, 'avg(wfq_flows_total{policy_name="%(policy_name)s"})' % { policy_name: policyName }),
-
-  local WFQSchedulerHeapRequests =
-    newBarGaugePanel('WFQ Scheduler Heap Requests', dsName, 'avg(wfq_requests_total{policy_name="%(policy_name)s"})' % { policy_name: policyName }),
-
-  local TotalBucketLoadSchedFactor =
-    newStatPanel('Average Load Multiplier', dsName, 'avg(token_bucket_lm_ratio{policy_name="%(policy_name)s"})' % { policy_name: policyName }),
-
-  local TokenBucketBucketCapacity =
-    newStatPanel('Token Bucket Bucket Capacity', dsName, 'avg(token_bucket_capacity_total{policy_name="%(policy_name)s"})' % { policy_name: policyName })
-    + {
-      options+: {
-        orientation: 'auto',
-      },
-    },
-
-  local TokenBucketBucketFillRate =
-    newStatPanel('Token Bucket Bucket FillRate', dsName, 'avg(token_bucket_fill_rate{policy_name="%(policy_name)s"})' % { policy_name: policyName }) +
-    {
-      options+: {
-        orientation: 'auto',
-      },
-    },
-
-  local TokenBucketAvailableTokens =
-    newStatPanel('Token Bucket Available Tokens', dsName, 'avg(token_bucket_available_tokens_total{policy_name="%(policy_name)s"})' % { policy_name: policyName }) +
-    {
-      options+: {
-        orientation: 'auto',
-      },
-    },
-
-  local IncomingConcurrency =
-    newTimeSeriesPanel('Incoming Concurrency', dsName, 'sum(rate(incoming_work_seconds_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Concurrency', 'none'),
-
-  local AcceptedConcurrency =
-    newTimeSeriesPanel('Accepted Concurrency', dsName, 'sum(rate(accepted_work_seconds_total{policy_name="%(policy_name)s"}[$__rate_interval]))' % { policy_name: policyName }, 'Concurrency', 'none'),
-
   local WorkloadDecisionsAccepted =
     newTimeSeriesPanel('Workload Decisions (accepted)', dsName, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s",decision_type="DECISION_TYPE_ACCEPTED"}[$__rate_interval]))' % { policy_name: policyName }, 'Decisions', 'reqps'),
 
   local WorkloadDecisionsRejected =
     newTimeSeriesPanel('Workload Decisions (rejected)', dsName, 'sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name="%(policy_name)s",decision_type="DECISION_TYPE_REJECTED"}[$__rate_interval]))' % { policy_name: policyName }, 'Decisions', 'reqps'),
-
-  local WorkloadLatency =
-    newTimeSeriesPanel('Workload Latency (Auto Tokens)', dsName, '(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name="%(policy_name)s"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name="%(policy_name)s"}[$__rate_interval])))' % { policy_name: policyName }, 'Latency', 'ms'),
 
 
   local dashboardDef =
