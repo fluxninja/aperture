@@ -41,6 +41,7 @@ PARAMETER_DETAILED_RE = re.compile(
 class Parameter:
     param_name: str = ""
     param_type: str = "intermediate_node"
+    is_complex_type: bool = False
     json_schema_link: str = ""
     docs_link: str = ""
     description: str = ""
@@ -134,6 +135,11 @@ class Parameters:
                 docs_link, json_schema_link = cls._resolve_param_links(
                     blueprints_root_relative_path, policies_relative_path, param_type
                 )
+                if docs_link != "" or json_schema_link != "":
+                    is_complex_type = True
+                else:
+                    is_complex_type = False
+
                 param_required = groups.get("param_required", "") == "required"
                 param_description = groups.get("param_description", "")
                 # tokenize param_name and create nested_parameters
@@ -149,6 +155,7 @@ class Parameters:
                             Parameter(
                                 part,
                                 param_type,
+                                is_complex_type,
                                 json_schema_link,
                                 docs_link,
                                 param_description,
@@ -271,12 +278,12 @@ def update_param_defaults(
 
 
 MARKDOWN_DOC_TPL = """
-{%- macro render_type(param_type) %}
+{%- macro render_type(param_type, is_complex_type) %}
 {%- if param_type.startswith('[]') %}
-Array of {{- render_type(param_type[2:]) }}
+Array of {{- render_type(param_type[2:], is_complex_type) }}
 {%- elif param_type.startswith('map[') %}
-Object with keys and values of type {{- render_type(param_type[4:-1]) }}
-{%- elif param_type.startswith('aperture.spec') or ':' in param_type or "." in param_type %}
+Object with keys and values of type {{- render_type(param_type[4:-1], is_complex_type) }}
+{%- elif is_complex_type %}
 Object ({{ param_type }})
 {%- elif param_type == 'bool' %}
 Boolean
@@ -307,7 +314,7 @@ Integer (int64)
 <a id="{{ anchor }}"></a>
 <ParameterDescription
     name="{{ parent_prefix }}{{ node.parameter.param_name }}"
-    type="{{ render_type(node.parameter.param_type) }}"
+    type="{{ render_type(node.parameter.param_type, node.parameter.is_complex_type) }}"
     reference="{{ node.parameter.docs_link }}"
     value="{{ node.parameter.default | quoteValueDocs }}"
     description='{{ node.parameter.description }}' />
@@ -322,12 +329,12 @@ Integer (int64)
 """
 
 MARKDOWN_README_TPL = """
-{%- macro render_type(param_type) %}
+{%- macro render_type(param_type, is_complex_type) %}
 {%- if param_type.startswith('[]') %}
-Array of {{- render_type(param_type[2:]) }}
+Array of {{- render_type(param_type[2:], is_complex_type) }}
 {%- elif param_type.startswith('map[') %}
-Object with keys and values of type {{- render_type(param_type[4:-1]) }}
-{%- elif param_type.startswith('aperture.spec') or ':' in param_type or "." in param_type %}
+Object with keys and values of type {{- render_type(param_type[4:-1], is_complex_type) }}
+{%- elif is_complex_type %}
 Object ({{ param_type }})
 {%- elif param_type == 'bool' %}
 Boolean
@@ -359,7 +366,7 @@ Integer (int64)
 {%- endfor %}
 {%- else %}
 {{ heading_level }} {{ parent_prefix }}{{ node.parameter.param_name }} {#{{ anchor }}}
-**Type**: {{ render_type(node.parameter.param_type) }}
+**Type**: {{ render_type(node.parameter.param_type, node.parameter.is_complex_type) }}
 **Default Value**: `{{ node.parameter.default | quoteValueDocs }}`
 **Description**: {{ node.parameter.description }}
 {%- endif %}
@@ -373,15 +380,15 @@ Integer (int64)
 """
 
 JSON_SCHEMA_TPL = """
-{% macro render_type(param_type, ref_id) %}
+{% macro render_type(param_type, ref_id, is_complex_type) %}
 {% if param_type.startswith('[]') %}
 type: array
 items:
-  {{ render_type(param_type[2:], ref_id) | indent(2) }}
+  {{ render_type(param_type[2:], ref_id, is_complex_type) | indent(2) }}
 {% elif param_type.startswith('map[') %}
 type: object
-additionalProperties: {{ render_type(param_type[4:-1], ref_id) }}
-{% elif param_type.startswith('aperture.spec') or ':' in param_type or "." in param_type %}
+additionalProperties: {{ render_type(param_type[4:-1], ref_id, is_complex_type) }}
+{% elif is_complex_type %}
 type: object
 $ref: "{{- ref_id }}"
 {% elif param_type == 'bool' %}
@@ -420,15 +427,15 @@ type: "{{ param_type }}"
 {{ node.parameter.param_name }}:
   description: "{{ node.parameter.description }}"
   default: {{ node.parameter.default | quoteValueYAML }}
-  {% if node.parameter.param_type.startswith('aperture.spec') or ':' in node.parameter.param_type or "." in node.parameter.param_type %}
-  {{ render_type(node.parameter.param_type, node.parameter.json_schema_link) | indent(2, true) }}
+  {% if node.parameter.is_complex_type %}
+  {{ render_type(node.parameter.param_type, node.parameter.json_schema_link, node.parameter.is_complex_type) | indent(2, true) }}
   {% else %}
-  {{ render_type(node.parameter.param_type, "#/definitions/" ~ prefix ~ node.parameter.param_name) | indent(2, true) }}
+  {{ render_type(node.parameter.param_type, "#/definitions/" ~ prefix ~ node.parameter.param_name, node.parameter.is_complex_type) | indent(2, true) }}
   {% endif %}
 {% endif %}
 {% endmacro %}
 {% macro render_definitions(node, prefix='') %}
-{% if not (node.parameter.param_type.startswith('aperture.spec') or ':' in node.parameter.param_type or "." in node.parameter.param_type) %}
+{% if not node.parameter.is_complex_type %}
 {% for child_name, child_node in node.children.items() %}
 {{ render_definitions(child_node, prefix ~ node.parameter.param_name ~ '_') }}
 {% endfor %}
@@ -436,7 +443,7 @@ type: "{{ param_type }}"
   {{ prefix }}{{ node.parameter.param_name }}:
     description: "{{ node.parameter.description }}"
     default: {{ node.parameter.default | quoteValueYAML }}
-    {{ render_type(node.parameter.param_type, node.parameter.json_schema_link) | indent(4, true) }}
+    {{ render_type(node.parameter.param_type, node.parameter.json_schema_link, node.parameter.is_complex_type) | indent(4, true) }}
 {% endif %}
 {% endif %}
 {% endmacro %}
