@@ -9,10 +9,10 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     version: "=1.17.1"
   - name: etcd
-    version: "=8.5.8"
+    version: "=8.8.1"
     repository: https://charts.bitnami.com/bitnami
     condition: etcd.enabled
   - name: prometheus
-    version: "=15.17.0"
+    version: "=15.18.0"
     repository: https://prometheus-community.github.io/helm-charts
     condition: prometheus.enabled

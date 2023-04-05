@@ -329,11 +329,6 @@ func ControllerVolumeMounts(controllerSpec common.CommonSpec) []corev1.VolumeMou
 			ReadOnly:  true,
 		},
 		{
-			Name:      "etc-aperture-classification",
-			MountPath: "/etc/aperture/aperture-controller/classifiers",
-			ReadOnly:  true,
-		},
-		{
 			Name:      "server-cert",
 			MountPath: "/etc/aperture/aperture-controller/certs",
 			ReadOnly:  true,
@@ -361,18 +356,6 @@ func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume 
 			Name: "etc-aperture-policies",
 			VolumeSource: corev1.VolumeSource{
 				EmptyDir: &corev1.EmptyDirVolumeSource{},
-			},
-		},
-		{
-			Name: "etc-aperture-classification",
-			VolumeSource: corev1.VolumeSource{
-				ConfigMap: &corev1.ConfigMapVolumeSource{
-					DefaultMode: pointer.Int32(420),
-					LocalObjectReference: corev1.LocalObjectReference{
-						Name: "classification",
-					},
-					Optional: pointer.Bool(true),
-				},
 			},
 		},
 		{
