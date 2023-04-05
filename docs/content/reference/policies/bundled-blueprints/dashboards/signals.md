@@ -8,8 +8,6 @@ This blueprint provides a [policy monitoring](/reference/policies/monitoring.md)
 dashboard that visualizes Signals flowing through the
 [Circuit](/concepts/policy/circuit.md).
 
-## Configuration
-
 <!-- Configuration Marker -->
 
 ```mdx-code-block
@@ -52,53 +50,66 @@ export const ParameterDescription = ({name, type, reference, value, description}
 import {apertureVersion as aver} from '../../../../apertureVersion.js'
 ```
 
-Code: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals`}>dashboards/signals</a>
+## Configuration: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals`}>dashboards/signals</a> {#configuration}
 
-<h3 class="blueprints-h3">Common</h3>
+### Parameters
 
-<ParameterDescription
+<a id="common"></a>
+
+### common
+
+<a id="common-policy-name"></a> <ParameterDescription
     name="common.policy_name"
-    type="string"
+    type="
+string"
     reference=""
     value="__REQUIRED_FIELD__"
     description='Name of the policy.' />
 
-<h3 class="blueprints-h3">Dashboard</h3>
+<a id="dashboard"></a>
 
-<ParameterDescription
+### dashboard
+
+<a id="dashboard-refresh-interval"></a> <ParameterDescription
     name="dashboard.refresh_interval"
-    type="string"
+    type="
+string"
     reference=""
     value="'5s'"
     description='Refresh interval for dashboard panels.' />
 
-<ParameterDescription
+<a id="dashboard-time-from"></a> <ParameterDescription
     name="dashboard.time_from"
-    type="string"
+    type="
+string"
     reference=""
     value="'now-15m'"
     description='From time of dashboard.' />
 
-<ParameterDescription
+<a id="dashboard-time-to"></a> <ParameterDescription
     name="dashboard.time_to"
-    type="string"
+    type="
+string"
     reference=""
     value="'now'"
     description='To time of dashboard.' />
 
-<h4 class="blueprints-h4">Datasource</h4>
+<a id="dashboard-datasource"></a>
 
-<ParameterDescription
+#### dashboard.datasource
+
+<a id="dashboard-datasource-name"></a> <ParameterDescription
     name="dashboard.datasource.name"
-    type="string"
+    type="
+string"
     reference=""
     value="'$datasource'"
     description='Datasource name.' />
 
-<ParameterDescription
+<a id="dashboard-datasource-filter-regex"></a> <ParameterDescription
     name="dashboard.datasource.filter_regex"
-    type="string"
+    type="
+string"
     reference=""
     value="''"
     description='Datasource filter regex.' />
