@@ -373,93 +373,90 @@ Integer (int64)
 """
 
 JSON_SCHEMA_TPL = """
-{%- macro render_type(param_type, ref_id) %}
-{%- if param_type.startswith('[]') %}
-"type": "array",
-"items": { {{- render_type(param_type[2:], ref_id) }} }
-{%- elif param_type.startswith('map[') %}
-"type": "object",
-"additionalProperties": { {{- render_type(param_type[4:-1], ref_id) }}}
-{%- elif param_type.startswith('aperture.spec') or ':' in param_type or "." in param_type %}
-"type": "object",
-{{ ' ' * 4 }}"$ref": "{{- ref_id }}"
-{%- elif param_type == 'bool' %}
-"type": "boolean"
-{%- elif param_type == 'float32' %}
-"type": "number",
-"format": "float"
-{%- elif param_type == 'float64' %}
-"type": "number",
-"format": "double"
-{%- elif param_type == 'int32' %}
-"type": "integer",
-"format": "int32"
-{%- elif param_type == 'int64' %}
-"type": "integer",
-"format": "int64"
-{%- else %}
-"type": "{{ param_type }}"
-{%- endif %}
-{%- endmacro %}
-{%- macro render_properties(node, prefix='') %}
-"{{ node.parameter.param_name }}": {
-{%- if node.parameter.param_type == 'intermediate_node' %}
-"type": "object",
-"additionalProperties": false,
-{%- if node.required_children %}
-"required": [{%- for child_name in node.required_children %}"{{ child_name }}"{%- if not loop.last %},{% endif %}{%- endfor %}],
-{%- endif %}
-"properties": {
-{%- for child_name, child_node in node.children.items() %}
-{{ render_properties(child_node, prefix ~ node.parameter.param_name ~ '_') }}
-{%- if not loop.last %},{% endif %}
-{%- endfor %}
-}
-{%- else %}
-"description": "{{ node.parameter.description }}",
-"default": {{ node.parameter.default | quoteValueJSON }},
-{%- if node.parameter.param_type.startswith('aperture.spec') or ':' in node.parameter.param_type or "." in node.parameter.param_type %}
-{{- render_type(node.parameter.param_type, node.parameter.json_schema_link) }}
-{%- else %}
-{{- render_type(node.parameter.param_type, "#/definitions/" ~ prefix ~ node.parameter.param_name) }}
-{%- endif %}
-{%- endif %}
-}
-{%- endmacro %}
-{%- macro render_definitions(node, prefix='') %}
-{%- for child_name, child_node in node.children.items() %}
+{% macro render_type(param_type, ref_id) %}
+{% if param_type.startswith('[]') %}
+type: array
+items:
+  {{ render_type(param_type[2:], ref_id) | indent(2) }}
+{% elif param_type.startswith('map[') %}
+type: object
+additionalProperties: {{ render_type(param_type[4:-1], ref_id) }}
+{% elif param_type.startswith('aperture.spec') or ':' in param_type or "." in param_type %}
+type: object
+$ref: "{{- ref_id }}"
+{% elif param_type == 'bool' %}
+type: boolean
+{% elif param_type == 'float32' %}
+type: number
+format: float
+{% elif param_type == 'float64' %}
+type: number
+format: double
+{% elif param_type == 'int32' %}
+type: integer
+format: int32
+{% elif param_type == 'int64' %}
+type: integer
+format: int64
+{% else %}
+type: "{{ param_type }}"
+{% endif %}
+{% endmacro %}
+{% macro render_properties(node, prefix='') %}
+{% if node.parameter.param_type == 'intermediate_node' %}
+{{ node.parameter.param_name }}:
+  type: object
+  additionalProperties: false
+  {% if node.required_children %}
+  required:
+  {% for child_name in node.required_children %}  - {{ child_name }}
+  {% endfor %}
+  {% endif %}
+  properties:
+  {% for child_name, child_node in node.children.items() %}
+    {{ render_properties(child_node, prefix ~ node.parameter.param_name ~ '_') | indent(4) }}
+  {% endfor %}
+{% else %}
+{{ node.parameter.param_name }}:
+  description: "{{ node.parameter.description }}"
+  default: {{ node.parameter.default | quoteValueYAML }}
+  {% if node.parameter.param_type.startswith('aperture.spec') or ':' in node.parameter.param_type or "." in node.parameter.param_type %}
+  {{ render_type(node.parameter.param_type, node.parameter.json_schema_link) | indent(2, true) }}
+  {% else %}
+  {{ render_type(node.parameter.param_type, "#/definitions/" ~ prefix ~ node.parameter.param_name) | indent(2, true) }}
+  {% endif %}
+{% endif %}
+{% endmacro %}
+{% macro render_definitions(node, prefix='') %}
+{% if not (node.parameter.param_type.startswith('aperture.spec') or ':' in node.parameter.param_type or "." in node.parameter.param_type) %}
+{% for child_name, child_node in node.children.items() %}
 {{ render_definitions(child_node, prefix ~ node.parameter.param_name ~ '_') }}
-{%- if not loop.last or node.parameter.param_type != "intermediate_node" %},{% endif %}
-{%- endfor %}
-{%- if node.parameter.param_type != 'intermediate_node' %}
-"{{ prefix }}{{ node.parameter.param_name }}": {
-"description": "{{ node.parameter.description }}",
-"default": {{ node.parameter.default | quoteValueJSON }},
-{{- render_type(node.parameter.param_type, node.parameter.json_schema_link) }}
-}
-{%- endif %}
-{%- endmacro %}
-{
-"$schema": "http://json-schema.org/draft-07/schema#",
-"type": "object",
-"title": "{{ blueprint_name }} blueprint",
-"additionalProperties": false,
-{%- if nested_parameters.required_children %}
-"required": [{%- for child_name in nested_parameters.required_children %}"{{ child_name }}"{%- if not loop.last %},{% endif %}{%- endfor %}],
-{%- endif %}
-"properties": {
-{%- for child_name, child_node in nested_parameters.children.items() %}
-{{ render_properties(child_node) }}
-{%- if not loop.last %},{% endif %}
-{%- endfor %}
-},
-"definitions": {
-{%- for child_name, child_node in nested_parameters.children.items() %}
-{{ render_definitions(child_node) }}
-{%- if not loop.last %},{% endif %}
-{%- endfor %}
-}
-}
+{% endfor %}
+{% if node.parameter.param_type != 'intermediate_node' %}
+  {{ prefix }}{{ node.parameter.param_name }}:
+    description: "{{ node.parameter.description }}"
+    default: {{ node.parameter.default | quoteValueYAML }}
+    {{ render_type(node.parameter.param_type, node.parameter.json_schema_link) | indent(4, true) }}
+{% endif %}
+{% endif %}
+{% endmacro %}
+$schema: "http://json-schema.org/draft-07/schema#"
+type: object
+title: "{{ blueprint_name }} blueprint"
+additionalProperties: false
+{% if nested_parameters.required_children %}
+required:
+{% for child_name in nested_parameters.required_children %}- {{ child_name }}
+{% endfor %}
+{% endif %}
+properties:
+{% for child_name, child_node in nested_parameters.children.items() %}
+  {{ render_properties(child_node) | indent(2) }}
+{% endfor %}
+definitions:
+{% for child_name, child_node in nested_parameters.children.items() %}
+  {{ render_definitions(child_node) | indent(2) }}
+{% endfor %}
 """
 
 YAML_TPL = """
@@ -689,6 +686,9 @@ def render_json_schema(
     rendered = template.render(
         {"nested_parameters": nested_parameters, "blueprint_name": blueprint_name}
     )
+    # convert yaml to json
+    rendered = yaml.safe_load(rendered)
+    rendered = json.dumps(rendered, indent=2)
     json_schema_path.write_text(rendered)
 
 
