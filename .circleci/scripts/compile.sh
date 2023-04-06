@@ -5,7 +5,6 @@ set -x
 
 APERTURECTL_BUILD_GIT_BRANCH="$(git branch --show-current)"
 APERTURECTL_BUILD_GIT_COMMIT_HASH="$(git log -n1 --format=%H)"
-#GOOS="$(go env GOOS)"
 export APERTURECTL_BUILD_GIT_BRANCH APERTURECTL_BUILD_GIT_COMMIT_HASH
 mkdir -p "$HOME/go"
 export GOPATH="$HOME/go"
