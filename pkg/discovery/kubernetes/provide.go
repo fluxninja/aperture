@@ -1,4 +1,3 @@
-// +kubebuilder:validation:Optional
 package kubernetes
 
 import (
@@ -7,22 +6,12 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/discovery/common"
 	"github.com/fluxninja/aperture/pkg/discovery/entities"
+	kubernetesconfig "github.com/fluxninja/aperture/pkg/discovery/kubernetes/config"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/status"
 )
-
-// ConfigKey is the key for the Kubernetes discovery configuration.
-var ConfigKey = common.DiscoveryConfigKey + ".kubernetes"
-
-// KubernetesDiscoveryConfig for Kubernetes service discovery.
-// swagger:model
-// +kubebuilder:object:generate=true
-type KubernetesDiscoveryConfig struct {
-	Enabled bool `json:"enabled" default:"true"`
-}
 
 // Module returns an fx.Option that provides the Kubernetes discovery module.
 func Module() fx.Option {
@@ -43,8 +32,8 @@ type FxInSvc struct {
 
 // InvokeServiceDiscovery creates a Kubernetes service discovery.
 func InvokeServiceDiscovery(in FxInSvc) error {
-	var cfg KubernetesDiscoveryConfig
-	if err := in.Unmarshaller.UnmarshalKey(ConfigKey, &cfg); err != nil {
+	var cfg kubernetesconfig.KubernetesDiscoveryConfig
+	if err := in.Unmarshaller.UnmarshalKey(kubernetesconfig.Key, &cfg); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize K8S discovery configuration!")
 		return err
 	}
