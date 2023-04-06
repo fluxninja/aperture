@@ -349,6 +349,13 @@ Integer (int64)
 {{ render_node(child_node, 3, '@param') }}
 {%- endif %}
 {%- endfor %}
+{%- set ns = namespace(has_schema=False) %}
+{%- for child_name, child_node in nested_parameters.children.items() %}
+{%- if child_node.parameter.annotation_type == '@schema' %}
+{%- set ns.has_schema = true %}
+{%- endif %}
+{%- endfor %}
+{%- if ns.has_schema %}
 
 ### Schemas
 
@@ -357,6 +364,7 @@ Integer (int64)
 {{ render_node(child_node, 3, '@schema') }}
 {%- endif %}
 {%- endfor %}
+{%- endif %}
 """
 
 MARKDOWN_README_TPL = """
@@ -410,6 +418,13 @@ Integer (int64)
 {{ render_properties(child_node, 3, '@param') }}
 {%- endif %}
 {%- endfor %}
+{%- set ns = namespace(has_schema=False) %}
+{%- for child_name, child_node in nested_parameters.children.items() %}
+{%- if child_node.parameter.annotation_type == '@schema' %}
+{%- set ns.has_schema = true %}
+{%- endif %}
+{%- endfor %}
+{%- if ns.has_schema %}
 
 ### Schemas
 
@@ -418,6 +433,7 @@ Integer (int64)
 {{ render_properties(child_node, 3, '@schema') }}
 {%- endif %}
 {%- endfor %}
+{%- endif %}
 """
 
 

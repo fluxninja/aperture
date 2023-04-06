@@ -215,8 +215,6 @@ string"
     value="''"
     description='Datasource filter regex.' />
 
-### Schemas
-
 ## Dynamic Configuration
 
 :::note
@@ -236,5 +234,3 @@ Object (aperture.spec.v1.LoadActuatorDynamicConfig)"
     reference="../../spec#load-actuator-dynamic-config"
     value="__REQUIRED_FIELD__"
     description='Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.' />
-
-### Schemas

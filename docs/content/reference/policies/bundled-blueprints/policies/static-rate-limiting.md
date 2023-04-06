@@ -105,8 +105,6 @@ string"
     value="''"
     description='Datasource filter regex.' />
 
-### Schemas
-
 ## Dynamic Configuration
 
 :::note
@@ -126,5 +124,3 @@ Object (aperture.spec.v1.RateLimiterDynamicConfig)"
     reference="../../spec#rate-limiter-dynamic-config"
     value="__REQUIRED_FIELD__"
     description='Rate limiter dynamic configuration that is updated at runtime.' />
-
-### Schemas
