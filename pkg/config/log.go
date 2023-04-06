@@ -111,16 +111,7 @@ func (constructor LoggerConstructor) Annotate() fx.Option {
 	)
 }
 
-func (constructor LoggerConstructor) provideLogger(w []io.Writer,
-	unmarshaller Unmarshaller,
-	lifecycle fx.Lifecycle,
-) (*log.Logger, error) {
-	config := constructor.DefaultConfig
-
-	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
-		log.Panic().Err(err).Msg("Unable to deserialize log configuration!")
-	}
-
+func NewLogger(config LogConfig, w []io.Writer, isGlobalLogger bool) (*log.Logger, io.Writer, error) {
 	var writers []io.Writer
 	// append file writers
 	for _, writerConfig := range config.Writers {
@@ -179,13 +170,31 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 		wr = zerolog.SyncWriter(multi)
 	}
 
-	logger := log.NewLogger(wr, strings.ToLower(config.LogLevel))
+	logger := log.NewLoggerWithWriters(wr, writers, strings.ToLower(config.LogLevel))
 
-	if constructor.IsGlobal {
+	if isGlobalLogger {
 		// set global logger
 		log.SetGlobalLogger(logger)
 		// set standard loggers
 		log.SetStdLogger(logger)
+	}
+
+	return logger, wr, nil
+}
+
+func (constructor LoggerConstructor) provideLogger(w []io.Writer,
+	unmarshaller Unmarshaller,
+	lifecycle fx.Lifecycle,
+) (*log.Logger, error) {
+	config := constructor.DefaultConfig
+
+	if err := unmarshaller.UnmarshalKey(constructor.ConfigKey, &config); err != nil {
+		log.Panic().Err(err).Msg("Unable to deserialize log configuration!")
+	}
+
+	logger, writer, err := NewLogger(config, w, constructor.IsGlobal)
+	if err != nil {
+		return nil, err
 	}
 
 	lifecycle.Append(fx.Hook{
@@ -197,14 +206,10 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 				log.WaitFlush()
 				// close diode writer
 				if config.NonBlocking {
-					dr := wr.(diode.Writer)
+					dr := writer.(diode.Writer)
 					dr.Close()
 				}
-				for _, writer := range writers {
-					if closer, ok := writer.(io.Closer); ok {
-						_ = closer.Close()
-					}
-				}
+				logger.CloseWriters()
 			})
 			return nil
 		},
