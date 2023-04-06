@@ -20,11 +20,11 @@ package common
 import (
 	"github.com/fluxninja/aperture/extensions/fluxninja/extconfig"
 	"github.com/fluxninja/aperture/extensions/sentry"
-	amclient "github.com/fluxninja/aperture/pkg/alertmanager/client"
+	alertmgrconfig "github.com/fluxninja/aperture/pkg/alertmanager/config"
 	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
+	kubernetes "github.com/fluxninja/aperture/pkg/discovery/kubernetes/config"
 	"github.com/fluxninja/aperture/pkg/discovery/static"
-	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
+	"github.com/fluxninja/aperture/pkg/etcd"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
@@ -336,7 +336,7 @@ type CommonConfigSpec struct {
 
 	// Alert Managers configuration.
 	//+kubebuilder:validation:Optional
-	Alertmanagers amclient.AlertManagerConfig `json:"alertmanagers,omitempty"`
+	Alertmanagers alertmgrconfig.AlertManagerConfig `json:"alertmanagers,omitempty"`
 
 	// BundledExtensionsSpec defines configuration for bundled extensions.
 	//+kubebuilder:validation:Optional

@@ -120,7 +120,7 @@ definitions:
                 x-go-tag-json: name
         title: AlertManagerClientConfig config for single alertmanager client.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/alertmanager/client
+        x-go-package: github.com/fluxninja/aperture/pkg/alertmanager/config
     AlertManagerConfig:
         properties:
             clients:
@@ -131,7 +131,7 @@ definitions:
                 x-go-tag-json: clients,omitempty
         title: AlertManagerConfig main level config for alertmanager.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/alertmanager/client
+        x-go-package: github.com/fluxninja/aperture/pkg/alertmanager/config
     AlerterConfig:
         properties:
             channel_size:
@@ -322,7 +322,7 @@ definitions:
                 x-go-tag-json: grpc
         title: ClientConfig is configuration for network clients used by agent-functions.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions
+        x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions/config
     ClientTLSConfig:
         properties:
             ca_file:
@@ -384,7 +384,7 @@ definitions:
                 x-go-tag-validate: omitempty,dive,omitempty
         title: Config is configuration for agent functions.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions
+        x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions/config
     CustomMetricsConfig:
         description: |-
             :::info
@@ -468,7 +468,7 @@ definitions:
                 x-go-tag-json: replica_count
         title: DistCacheConfig configures distributed cache that holds per-label counters in distributed rate limiters.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/distcache
+        x-go-package: github.com/fluxninja/aperture/pkg/distcache/config
     Duration:
         description: It holds *durationpb.Duration which is generated type for google/protobuf/duration.proto.
         title: Duration is encoded as a string message which represents a signed span of time.
@@ -562,7 +562,7 @@ definitions:
             - endpoints
         title: EtcdConfig holds configuration for etcd client.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/etcd/client
+        x-go-package: github.com/fluxninja/aperture/pkg/etcd
     FlowPreviewConfig:
         properties:
             enabled:
@@ -574,7 +574,7 @@ definitions:
                 x-go-tag-json: enabled
         title: FlowPreviewConfig is the configuration for the flow control preview service.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview
+        x-go-package: github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview/config
     GRPCClientConfig:
         properties:
             backoff:
@@ -1037,7 +1037,7 @@ definitions:
                 x-go-tag-json: enabled
         title: KubernetesDiscoveryConfig for Kubernetes service discovery.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/discovery/kubernetes
+        x-go-package: github.com/fluxninja/aperture/pkg/discovery/kubernetes/config
     ListenerConfig:
         properties:
             addr:
@@ -1235,7 +1235,10 @@ definitions:
     PeerDiscoveryConfig:
         properties:
             advertisement_addr:
-                description: Network address of aperture server to advertise to peers - this address should be reachable from other agents. Used for nat traversal when provided.
+                description: |-
+                    Network address of aperture server to advertise to peers - this address
+                    should be reachable from other agents. Used for nat traversal when
+                    provided.
                 pattern: (^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)
                 type: string
                 x-go-name: AdvertisementAddr
@@ -1244,7 +1247,7 @@ definitions:
                 x-pattern-rules: empty | hostname_port
         title: PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/peers
+        x-go-package: github.com/fluxninja/aperture/pkg/peers/config
     PolicyCommon:
         properties:
             enabled:
