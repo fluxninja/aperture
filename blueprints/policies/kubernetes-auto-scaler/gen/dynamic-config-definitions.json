@@ -3,5 +3,6 @@
   "type": "object",
   "title": "policies/kubernetes-auto-scaler blueprint",
   "additionalProperties": false,
-  "properties": {}
+  "properties": null,
+  "$defs": null
 }

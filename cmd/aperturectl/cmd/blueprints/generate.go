@@ -91,9 +91,9 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 
 			// validate values.yaml against the json schema
 			schemaFile := filepath.Join(blueprintsDir, blueprintName, "gen/definitions.json")
-			definitionsFile := filepath.Join(blueprintsDir, "gen/jsonschema/_definitions.json")
-			err = utils.ValidateWithJSONSchema(schemaFile, []string{definitionsFile}, valuesFile)
+			err = utils.ValidateWithJSONSchema(schemaFile, []string{}, valuesFile)
 			if err != nil {
+				log.Error().Msgf("Error validating values file: %s", err)
 				return err
 			}
 		}

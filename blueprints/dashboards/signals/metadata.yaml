@@ -1,5 +1,3 @@
 blueprint: Signals
 sources:
-  Dashboard:
-    config_key: dashboard
-    path: dashboards/signals/dashboard.libsonnet
+  dashboard: dashboards/signals/dashboard.libsonnet
