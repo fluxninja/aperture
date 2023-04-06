@@ -1,4 +1,3 @@
-// +kubebuilder:validation:Optional
 package etcd
 
 import (
@@ -11,8 +10,8 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/etcd"
 	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 )
 
@@ -34,21 +33,6 @@ const (
 	defaultClientConfigKey = "etcd"
 	namespace              = "aperture"
 )
-
-// EtcdConfig holds configuration for etcd client.
-// swagger:model
-// +kubebuilder:object:generate=true
-type EtcdConfig struct {
-	// Lease time-to-live
-	LeaseTTL config.Duration `json:"lease_ttl" validate:"gte=1s" default:"60s"`
-	// Authentication
-	Username string `json:"username"`
-	Password string `json:"password"`
-	// Client TLS configuration
-	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
-	// List of Etcd server endpoints
-	Endpoints []string `json:"endpoints" validate:"required,gt=0,dive,hostname_port|url|fqdn"`
-}
 
 // ClientIn holds parameters for ProvideClient.
 type ClientIn struct {
@@ -72,7 +56,7 @@ type Client struct {
 
 // ProvideClient creates a new Etcd Client and provides it via Fx.
 func ProvideClient(in ClientIn) (*Client, error) {
-	var config EtcdConfig
+	var config etcd.EtcdConfig
 
 	if err := in.Unmarshaller.UnmarshalKey(defaultClientConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize etcd client configuration!")
