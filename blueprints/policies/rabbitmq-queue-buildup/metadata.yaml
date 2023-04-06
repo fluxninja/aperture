@@ -1,8 +1,4 @@
 blueprint: RabbitMQ Queue Buildup Policy
 sources:
-  Dashboard:
-    config_key: dashboard
-    path: policies/rabbitmq-queue-buildup/dashboard.libsonnet
-  Policy:
-    config_key: policy
-    path: policies/rabbitmq-queue-buildup/policy.libsonnet
+  dashboard: policies/rabbitmq-queue-buildup/dashboard.libsonnet
+  policy: policies/rabbitmq-queue-buildup/policy.libsonnet

@@ -67,7 +67,7 @@ policy:
     max_load_multiplier: 2
     # Queue buildup setpoint in number of messages.
     # Type: float64
-    queue_buildup_setpoint: 1000
+    queue_buildup_setpoint: __REQUIRED_FIELD__
     # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
     # Type: float64
     load_multiplier_linear_increment: 0.0025
