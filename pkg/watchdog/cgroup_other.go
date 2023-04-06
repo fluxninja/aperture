@@ -7,14 +7,16 @@ import (
 	"context"
 
 	"google.golang.org/protobuf/proto"
+
+	watchdogconfig "github.com/fluxninja/aperture/pkg/watchdog/config"
 )
 
 type cgroupWatermarks struct {
-	WatermarksPolicy
+	watchdogconfig.WatermarksPolicy
 }
 
 type cgroupAdaptive struct {
-	AdaptivePolicy
+	watchdogconfig.AdaptivePolicy
 }
 
 // Valid checks if the policy is valid in linux. Therefore, it always returns false in non-linux builds.

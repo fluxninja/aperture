@@ -21,12 +21,21 @@ otel:
   custom_metrics:
     rabbitmq:
       per_agent_group: true
+      pipeline:
+        processors:
+          - batch
+        receivers:
+          - rabbitmq
+      processors:
+        batch:
+          send_batch_size: 10
+          timeout: 10s
       receivers:
         rabbitmq:
-          endpoint: http://<rabbitmq-service-address>:15672
-          username: <username>
-          password: <password>
           collection_interval: 1s
+          endpoint: http://rabbitmq.rabbitmq.svc.cluster.local:15672
+          password: secretpassword
+          username: admin
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md

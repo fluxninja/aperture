@@ -770,7 +770,7 @@ See also [Policy](#policy) for a higher-level explanation of circuits.
 <dt>gradient_controller</dt>
 <dd>
 
-([GradientController](#gradient-controller)) Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
+([GradientController](#gradient-controller)) Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
 This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
 
 </dd>

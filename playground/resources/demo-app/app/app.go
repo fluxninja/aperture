@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	backoff "github.com/cenkalti/backoff/v4"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/propagation"
@@ -40,13 +42,18 @@ type SimpleService struct {
 	// Istio proxy should handle requests without additional config
 	// if it's injected.
 	envoyPort   int
+	rabbitMQURL string
 	concurrency int
 	latency     time.Duration
 	rejectRatio float64
 }
 
 // NewSimpleService creates a SimpleService instance.
-func NewSimpleService(hostname string, port, envoyPort int,
+func NewSimpleService(
+	hostname string,
+	port int,
+	envoyPort int,
+	rabbitMQURL string,
 	concurrency int,
 	latency time.Duration,
 	rejectRatio float64,
@@ -55,6 +62,7 @@ func NewSimpleService(hostname string, port, envoyPort int,
 		hostname:    hostname,
 		port:        port,
 		envoyPort:   envoyPort,
+		rabbitMQURL: rabbitMQURL,
 		concurrency: concurrency,
 		latency:     latency,
 		rejectRatio: rejectRatio,
@@ -62,18 +70,77 @@ func NewSimpleService(hostname string, port, envoyPort int,
 }
 
 // Run starts listening for requests on given port.
-func (simpleService SimpleService) Run() error {
+func (ss SimpleService) Run() error {
 	handler := &RequestHandler{
-		hostname:     simpleService.hostname,
-		latency:      simpleService.latency,
-		rejectRatio:  simpleService.rejectRatio,
-		concurrency:  simpleService.concurrency,
-		limitClients: make(chan struct{}, simpleService.concurrency),
+		hostname:     ss.hostname,
+		latency:      ss.latency,
+		rejectRatio:  ss.rejectRatio,
+		concurrency:  ss.concurrency,
+		limitClients: make(chan struct{}, ss.concurrency),
 	}
-	if simpleService.envoyPort == -1 {
+
+	if ss.rabbitMQURL != "" {
+		var conn *amqp.Connection
+		operation := func() error {
+			var err error
+			conn, err = amqp.Dial(ss.rabbitMQURL)
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+		err := backoff.Retry(operation, backoff.WithMaxRetries(backoff.NewConstantBackOff(2*time.Second), 3))
+		if err != nil {
+			return err
+		}
+		defer conn.Close()
+
+		pCh, err := conn.Channel()
+		if err != nil {
+			return err
+		}
+		defer pCh.Close()
+		handler.rabbitMQChan = pCh
+
+		cCh, err := conn.Channel()
+		if err != nil {
+			return err
+		}
+		defer cCh.Close()
+
+		err = cCh.Qos(
+			handler.concurrency*5, // prefetch count
+			0,                     // prefetch size
+			false,                 // global
+		)
+		if err != nil {
+			return err
+		}
+
+		// Declare a queue for the service to consume from.
+		queueArgs := amqp.Table{
+			"x-max-length": int32(2000),
+			"x-overflow":   string("reject-publish"),
+		}
+		q, err := cCh.QueueDeclare(
+			handler.hostname, // name
+			false,            // durable
+			false,            // delete when unused
+			false,            // exclusive
+			false,            // no-wait
+			queueArgs,        // arguments
+		)
+		if err != nil {
+			return err
+		}
+
+		go consumeFromQueue(q, cCh, handler)
+	}
+
+	if ss.envoyPort == -1 {
 		handler.httpClient = &http.Client{}
 	} else {
-		proxyURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", simpleService.envoyPort))
+		proxyURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", ss.envoyPort))
 		if err != nil {
 			log.Panic().Err(err).Msgf("Failed to parse url: %v", err)
 		}
@@ -81,16 +148,75 @@ func (simpleService SimpleService) Run() error {
 	}
 
 	http.Handle("/request", handlerFunc(handler))
-	address := fmt.Sprintf(":%d", simpleService.port)
+	address := fmt.Sprintf(":%d", ss.port)
 
 	server := &http.Server{Addr: address}
 
 	return server.ListenAndServe()
 }
 
+func consumeFromQueue(q amqp.Queue, cCh *amqp.Channel, handler *RequestHandler) {
+	// Consume messages from the queue.
+	delivery, err := cCh.Consume(
+		q.Name,           // queue
+		handler.hostname, // consumer
+		false,            // auto-ack
+		false,            // exclusive
+		false,            // no-local
+		false,            // no-wait
+		nil,              // args
+	)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to consume messages")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	for d := range delivery {
+		var p Request
+		err := json.Unmarshal(d.Body, &p)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to unmarshal message")
+			continue
+		}
+		code := http.StatusOK
+		for _, chain := range p.Chains {
+			if len(chain.subrequests) == 0 {
+				log.Error().Err(err).Msg("Empty chain")
+				break
+			}
+			requestDestination := chain.subrequests[0].Destination
+			if !strings.HasPrefix(requestDestination, "http") {
+				requestDestination = "http://" + requestDestination
+			}
+			requestDomain, parseErr := url.Parse(requestDestination)
+			if requestDomain.Hostname() != handler.hostname {
+				log.Error().Err(parseErr).Msg("Invalid destination")
+				break
+			}
+			code, err = handler.processChain(ctx, chain)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to process chain")
+				break
+			}
+		}
+		if code == http.StatusOK {
+			err = d.Ack(false)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to ack message")
+			}
+		} else {
+			err = d.Nack(false, false)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to nack message")
+			}
+		}
+	}
+}
+
 func handlerFunc(h *RequestHandler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Autosample().Info().Msg("received request")
+		log.Autosample().Trace().Msg("received request")
 		h.ServeHTTP(w, r)
 	})
 }
@@ -129,6 +255,7 @@ type Subrequest struct {
 // RequestHandler handles processing of incoming requests.
 type RequestHandler struct {
 	httpClient   HTTPClient
+	rabbitMQChan *amqp.Channel
 	limitClients chan struct{}
 	hostname     string
 	concurrency  int
@@ -204,15 +331,14 @@ func (h RequestHandler) processChain(ctx context.Context, chain SubrequestChain)
 	if len(chain.subrequests) == 1 {
 		return h.processRequest(chain.subrequests[0])
 	}
-
-	requestForwardingDestination := chain.subrequests[1].Destination
+	forwardingDestination := chain.subrequests[1].Destination
 	trimmedSubrequestChain := SubrequestChain{
 		subrequests: chain.subrequests[1:],
 	}
 	trimmedRequest := Request{
 		Chains: []SubrequestChain{trimmedSubrequestChain},
 	}
-	return h.forwardRequest(ctx, requestForwardingDestination, trimmedRequest)
+	return h.forwardRequest(ctx, forwardingDestination, trimmedRequest)
 }
 
 func (h RequestHandler) processRequest(s Subrequest) (int, error) {
@@ -229,15 +355,34 @@ func (h RequestHandler) processRequest(s Subrequest) (int, error) {
 	return http.StatusOK, nil
 }
 
-func (h RequestHandler) forwardRequest(ctx context.Context, destinationHostname string, requestBody Request) (int, error) {
-	address := fmt.Sprintf("http://%s", destinationHostname)
-
+func (h RequestHandler) forwardRequest(ctx context.Context, destination string, requestBody Request) (int, error) {
 	jsonRequest, err := json.Marshal(requestBody)
 	if err != nil {
 		log.Bug().Err(err).Msg("bug: Failed to marshal request")
 		return http.StatusInternalServerError, err
 	}
 
+	if h.rabbitMQChan != nil {
+		destinationHostname := strings.TrimSuffix(destination, "/request")
+		err = h.rabbitMQChan.PublishWithContext(
+			ctx,                 // context
+			"",                  // exchange
+			destinationHostname, // routing key
+			false,               // mandatory
+			false,               // immediate
+			amqp.Publishing{
+				ContentType: "application/json",
+				Body:        jsonRequest,
+			},
+		)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to send request")
+			return http.StatusInternalServerError, err
+		}
+		return http.StatusOK, nil
+	}
+
+	address := fmt.Sprintf("http://%s", destination)
 	request, err := http.NewRequest("POST", address, bytes.NewBuffer(jsonRequest))
 	if err != nil {
 		log.Autosample().Error().Err(err).Msg("Failed to create request")

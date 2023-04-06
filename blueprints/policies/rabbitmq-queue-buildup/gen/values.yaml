@@ -1,0 +1,95 @@
+# Generated values file for policies/rabbitmq-queue-buildup blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/rabbitmq-queue-buildup
+
+common:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: __REQUIRED_FIELD__
+  # Name of the queue to watch for buildup.
+  # Type: string
+  # Required: True
+  queue_name: __REQUIRED_FIELD__
+
+policy:
+  # List of classification rules.
+  # Type: []aperture.spec.v1.Classifier
+  classifiers: []
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components: []
+  latency_baseliner:
+    # EMA parameters.
+    # Type: aperture.spec.v1.EMAParameters
+    ema:
+      correction_factor_on_max_envelope_violation: 0.95
+      ema_window: "1500s"
+      warmup_window: "60s"
+    # Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.
+    # Type: float64
+    latency_tolerance_multiplier: 1.1
+    # Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.
+    # Type: float64
+    latency_ema_limit_multiplier: 2
+  concurrency_controller:
+    # Concurrency Limiter flow selector.
+    # Type: aperture.spec.v1.FlowSelector
+    flow_selector:
+      service_selector:
+        # Service Name.
+        # Type: string
+        # Required: True
+        service: __REQUIRED_FIELD__
+      flow_matcher:
+        # Control Point Name.
+        # Type: string
+        # Required: True
+        control_point: __REQUIRED_FIELD__
+    # Scheduler parameters.
+    # Type: aperture.spec.v1.SchedulerParameters
+    scheduler:
+      # Automatically estimate cost (tokens) for workload requests.
+      # Type: bool
+      auto_tokens: true
+    # Gradient Controller parameters.
+    # Type: aperture.spec.v1.GradientControllerParameters
+    gradient:
+      max_gradient: 1
+      min_gradient: 0.1
+      slope: -1
+    # Whether tokens for workloads are computed dynamically or set statically by the user.
+    # Type: aperture.spec.v1.AlerterParameters
+    alerter:
+      alert_name: "Load Shed Event"
+    # Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+    # Type: float64
+    max_load_multiplier: 2
+    # Queue buildup setpoint in number of messages.
+    # Type: float64
+    queue_buildup_setpoint: __REQUIRED_FIELD__
+    # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
+    # Type: float64
+    load_multiplier_linear_increment: 0.0025
+    # Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.
+    # Type: aperture.spec.v1.LoadActuatorDynamicConfig
+    default_config:
+      dry_run: false
+
+dashboard:
+  # Refresh interval for dashboard panels.
+  # Type: string
+  refresh_interval: "5s"
+  # From time of dashboard.
+  # Type: string
+  time_from: "now-15m"
+  # To time of dashboard.
+  # Type: string
+  time_to: "now"
+  datasource:
+    # Datasource name.
+    # Type: string
+    name: "$datasource"
+    # Datasource filter regex.
+    # Type: string
+    filter_regex: ""

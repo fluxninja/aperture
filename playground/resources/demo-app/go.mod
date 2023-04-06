@@ -3,9 +3,11 @@ module github.com/fluxninja/aperture/playground/resources/demo-app
 go 1.20
 
 require (
+	github.com/cenkalti/backoff/v4 v4.1.3
 	github.com/fluxninja/aperture v0.11.0
 	github.com/onsi/ginkgo/v2 v2.4.0
 	github.com/onsi/gomega v1.23.0
+	github.com/rabbitmq/amqp091-go v1.8.0
 	go.opentelemetry.io/otel v1.11.1
 	go.opentelemetry.io/otel/sdk v1.11.1
 )

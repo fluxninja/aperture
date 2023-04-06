@@ -162,7 +162,7 @@ message Resources {
 // See also [Policy](#policy) for a higher-level explanation of circuits.
 message Component {
   oneof component {
-    // Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
+    // Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
     // This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
     GradientController gradient_controller = 1;
 

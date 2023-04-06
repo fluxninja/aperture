@@ -1,0 +1,40 @@
+{
+  "renderer": "tanka",
+  "tkenv": "playground/tanka/apps/demo-app",
+  "needs": ["istio", "rabbitmq"],
+  "env_vars": {
+    "ENABLE_DEMO_APP_RABBITMQ": "true"
+  },
+  "aperture_policies": [
+    {
+      "blueprint_name": "policies/rabbitmq-queue-buildup",
+      "policy_name": "service1-demoapp-rabbitmq-queue-buildup",
+      "values_file": "policies/rabbitmq-queue-buildup.yaml",
+      "dashboard_mixin_dir": "dashboards/"
+    }
+  ],
+  "images": [
+    {
+      "ref": "demo-app",
+      "context": "playground/resources/demo-app/",
+      "ssh": "default"
+    }
+  ],
+  "child_resources": [
+    {
+      "workload": "service1-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod", "rabbitmq"],
+      "extra_objects": ["service1-demo-app:serviceaccount"]
+    },
+    {
+      "workload": "service2-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod", "rabbitmq"],
+      "extra_objects": ["service2-demo-app:serviceaccount"]
+    },
+    {
+      "workload": "service3-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod", "rabbitmq"],
+      "extra_objects": ["service3-demo-app:serviceaccount"]
+    }
+  ]
+}

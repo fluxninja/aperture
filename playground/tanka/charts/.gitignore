@@ -3,5 +3,6 @@ istio
 base
 istiod
 gateway
+rabbitmq
 
 **/charts/
