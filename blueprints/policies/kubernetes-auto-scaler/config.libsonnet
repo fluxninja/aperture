@@ -1,4 +1,4 @@
-local scale_criteria = {
+local scale_criteria_common_schema = {
   query: {
     promql: {
       query_string: '__REQUIRED_FIELD__',
@@ -10,9 +10,20 @@ local scale_criteria = {
       },
     },
   },
-  set_point: 1.0,
+  set_point: '__REQUIRED_FIELD__',
+};
+
+local scale_out_criteria_schema = {
+  criteria: scale_criteria_common_schema,
   parameters: {
-    slope: -1.0,
+    slope: 1.0,
+  },
+};
+
+local scale_in_criteria_schema = {
+  criteria: scale_criteria_common_schema,
+  parameters: {
+    slope: 1.0,
   },
 };
 
@@ -63,48 +74,16 @@ local scale_criteria = {
     },
     components: [],
     /**
-    * @param (policy.scale_in_criteria: []scale_criteria required) List of scale-in criteria.
+    * @param (policy.scale_in_criteria: []scale_in_criteria_schema required) List of scale-in criteria.
     */
     scale_in_criteria: [
-      {
-        query: {
-          promql: {
-            query_string: '__REQUIRED_FIELD__',
-            evaluation_interval: '10s',
-            out_ports: {
-              output: {
-                signal_name: '__REQUIRED_FIELD__',
-              },
-            },
-          },
-        },
-        set_point: '__REQUIRED_FIELD__',
-        parameters: {
-          slope: -1.0,
-        },
-      },
+      scale_in_criteria_schema,
     ],
     /**
-    * @param (policy.scale_out_criteria: []scale_criteria required) List of scale-out criteria.
+    * @param (policy.scale_out_criteria: []scale_out_criteria_schema required) List of scale-out criteria.
     */
     scale_out_criteria: [
-      {
-        query: {
-          promql: {
-            query_string: '__REQUIRED_FIELD__',
-            evaluation_interval: '10s',
-            out_ports: {
-              output: {
-                signal_name: '__REQUIRED_FIELD__',
-              },
-            },
-          },
-        },
-        set_point: '__REQUIRED_FIELD__',
-        parameters: {
-          slope: 1.0,
-        },
-      },
+      scale_out_criteria_schema,
     ],
   },
   /**
@@ -126,15 +105,23 @@ local scale_criteria = {
     },
   },
   /**
-  * @schema (scale_criteria.query: aperture.spec.v1.Query required) Query.
-  * @schema (scale_criteria.query.promql: aperture.spec.v1.PromQL required) PromQL query.
-  * @schema (scale_criteria.query.promql.query_string: string required) PromQL query string.
-  * @schema (scale_criteria.query.promql.evaluation_interval: string) Evaluation interval.
-  * @schema (scale_criteria.query.promql.out_ports: aperture.spec.v1.PromQLOuts required) PromQL query execution output.
-  * @schema (scale_criteria.query.promql.out_ports.output: aperture.spec.v1.OutPort required) PromQL query execution output port.
-  * @schema (scale_criteria.query.promql.out_ports.output.signal_name: string required) Output Signal name.
-  * @schema (scale_criteria.set_point: float64 required) Set point.
-  * @schema (scale_criteria.parameters: aperture.spec.v1.IncreasingGradientParameters) Parameters.
-  * @schema (scale_criteria.parameters.slope: float64) Slope.
+  * @schema (scale_criteria_common_schema.query: aperture.spec.v1.Query required) Query.
+  * @schema (scale_criteria_common_schema.query.promql: aperture.spec.v1.PromQL required) PromQL query.
+  * @schema (scale_criteria_common_schema.query.promql.query_string: string required) PromQL query string.
+  * @schema (scale_criteria_common_schema.query.promql.out_ports: aperture.spec.v1.PromQLOuts required) PromQL query execution output.
+  * @schema (scale_criteria_common_schema.query.promql.out_ports.output: aperture.spec.v1.OutPort required) PromQL query execution output port.
+  * @schema (scale_criteria_common_schema.query.promql.out_ports.output.signal_name: string required) Output Signal name.
+  * @schema (scale_criteria_common_schema.set_point: float64 required) Set point.
   */
+  scale_criteria_common_schema: scale_criteria_common_schema,
+  /**
+  * @schema (scale_out_criteria_schema.criteria: scale_criteria_common_schema required) Scale-out criteria.
+  * @schema (scale_out_criteria_schema.parameters: aperture.spec.v1.IncreasingGradientParameters) Parameters.
+  */
+  scale_out_criteria_schema: scale_out_criteria_schema,
+  /**
+  * @schema (scale_in_criteria_schema.criteria: scale_criteria_common_schema required) Scale-in criteria.
+  * @schema (scale_in_criteria_schema.parameters: aperture.spec.v1.DecreasingGradientParameters) Parameters.
+  */
+  scale_in_criteria_schema: scale_in_criteria_schema,
 }

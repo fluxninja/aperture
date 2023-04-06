@@ -27,42 +27,48 @@ policy:
     # Required: True
     name: __REQUIRED_FIELD__
   # List of scale-in criteria.
-  # Type: []scale_criteria
+  # Type: []scale_in_criteria_schema
   # Required: True
   scale_in_criteria:
     [
       {
-        "parameters": { "slope": -1 },
-        "query":
+        "criteria":
           {
-            "promql":
+            "query":
               {
-                "evaluation_interval": "10s",
-                "out_ports":
-                  { "output": { "signal_name": "__REQUIRED_FIELD__" } },
-                "query_string": "__REQUIRED_FIELD__",
+                "promql":
+                  {
+                    "evaluation_interval": "10s",
+                    "out_ports":
+                      { "output": { "signal_name": "__REQUIRED_FIELD__" } },
+                    "query_string": "__REQUIRED_FIELD__",
+                  },
               },
+            "set_point": "__REQUIRED_FIELD__",
           },
-        "set_point": "__REQUIRED_FIELD__",
+        "parameters": { "slope": 1 },
       },
     ]
   # List of scale-out criteria.
-  # Type: []scale_criteria
+  # Type: []scale_out_criteria_schema
   # Required: True
   scale_out_criteria:
     [
       {
-        "parameters": { "slope": 1 },
-        "query":
+        "criteria":
           {
-            "promql":
+            "query":
               {
-                "evaluation_interval": "10s",
-                "out_ports":
-                  { "output": { "signal_name": "__REQUIRED_FIELD__" } },
-                "query_string": "__REQUIRED_FIELD__",
+                "promql":
+                  {
+                    "evaluation_interval": "10s",
+                    "out_ports":
+                      { "output": { "signal_name": "__REQUIRED_FIELD__" } },
+                    "query_string": "__REQUIRED_FIELD__",
+                  },
               },
+            "set_point": "__REQUIRED_FIELD__",
           },
-        "set_point": "__REQUIRED_FIELD__",
+        "parameters": { "slope": 1 },
       },
     ]

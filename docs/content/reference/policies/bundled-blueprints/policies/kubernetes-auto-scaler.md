@@ -124,18 +124,18 @@ Object (aperture.spec.v1.Component)"
     name="policy.scale_in_criteria"
     type="
 Array of
-Object (scale_criteria)"
-    reference="#scale-criteria"
-    value="[{'parameters': {'slope': -1}, 'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': '__REQUIRED_FIELD__'}]"
+Object (scale_in_criteria_schema)"
+    reference="#scale-in-criteria-schema"
+    value="[{'criteria': {'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': '__REQUIRED_FIELD__'}, 'parameters': {'slope': 1}}]"
     description='List of scale-in criteria.' />
 
 <a id="policy-scale-out-criteria"></a> <ParameterDescription
     name="policy.scale_out_criteria"
     type="
 Array of
-Object (scale_criteria)"
-    reference="#scale-criteria"
-    value="[{'parameters': {'slope': 1}, 'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': '__REQUIRED_FIELD__'}]"
+Object (scale_out_criteria_schema)"
+    reference="#scale-out-criteria-schema"
+    value="[{'criteria': {'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': '__REQUIRED_FIELD__'}, 'parameters': {'slope': 1}}]"
     description='List of scale-out criteria.' />
 
 ##### policy.kubernetes_object_selector {#policy-kubernetes-object-selector}
@@ -222,30 +222,62 @@ string"
 
 ### Schemas
 
-#### scale_criteria {#scale-criteria}
+#### scale_criteria_common_schema {#scale-criteria-common-schema}
 
-<a id="scale-criteria-query"></a> <ParameterDescription
+<a id="scale-criteria-common-schema-query"></a> <ParameterDescription
     name="query"
     type="
 Object (aperture.spec.v1.Query)"
     reference="../../spec#query"
-    value="'None'"
+    value="{'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}"
     description='Query.' />
 
-<a id="scale-criteria-set-point"></a> <ParameterDescription
+<a id="scale-criteria-common-schema-set-point"></a> <ParameterDescription
     name="set_point"
     type="
 Number (double)"
     reference=""
-    value="'None'"
+    value="__REQUIRED_FIELD__"
     description='Set point.' />
 
-<a id="scale-criteria-parameters"></a> <ParameterDescription
+---
+
+#### scale_out_criteria_schema {#scale-out-criteria-schema}
+
+<a id="scale-out-criteria-schema-criteria"></a> <ParameterDescription
+    name="criteria"
+    type="
+Object (scale_criteria_common_schema)"
+    reference="#scale-criteria-common-schema"
+    value="{'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': '__REQUIRED_FIELD__'}"
+    description='Scale-out criteria.' />
+
+<a id="scale-out-criteria-schema-parameters"></a> <ParameterDescription
     name="parameters"
     type="
 Object (aperture.spec.v1.IncreasingGradientParameters)"
     reference="../../spec#increasing-gradient-parameters"
-    value="'None'"
+    value="{'slope': 1}"
+    description='Parameters.' />
+
+---
+
+#### scale_in_criteria_schema {#scale-in-criteria-schema}
+
+<a id="scale-in-criteria-schema-criteria"></a> <ParameterDescription
+    name="criteria"
+    type="
+Object (scale_criteria_common_schema)"
+    reference="#scale-criteria-common-schema"
+    value="{'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': '__REQUIRED_FIELD__'}"
+    description='Scale-in criteria.' />
+
+<a id="scale-in-criteria-schema-parameters"></a> <ParameterDescription
+    name="parameters"
+    type="
+Object (aperture.spec.v1.DecreasingGradientParameters)"
+    reference="../../spec#decreasing-gradient-parameters"
+    value="{'slope': 1}"
     description='Parameters.' />
 
 ---

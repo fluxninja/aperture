@@ -120,54 +120,58 @@
           "description": "List of scale-in criteria.",
           "default": [
             {
+              "criteria": {
+                "query": {
+                  "promql": {
+                    "evaluation_interval": "10s",
+                    "out_ports": {
+                      "output": {
+                        "signal_name": "__REQUIRED_FIELD__"
+                      }
+                    },
+                    "query_string": "__REQUIRED_FIELD__"
+                  }
+                },
+                "set_point": "__REQUIRED_FIELD__"
+              },
               "parameters": {
-                "slope": -1
-              },
-              "query": {
-                "promql": {
-                  "evaluation_interval": "10s",
-                  "out_ports": {
-                    "output": {
-                      "signal_name": "__REQUIRED_FIELD__"
-                    }
-                  },
-                  "query_string": "__REQUIRED_FIELD__"
-                }
-              },
-              "set_point": "__REQUIRED_FIELD__"
+                "slope": 1
+              }
             }
           ],
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/$defs/scale_criteria"
+            "$ref": "#/$defs/scale_in_criteria_schema"
           }
         },
         "scale_out_criteria": {
           "description": "List of scale-out criteria.",
           "default": [
             {
+              "criteria": {
+                "query": {
+                  "promql": {
+                    "evaluation_interval": "10s",
+                    "out_ports": {
+                      "output": {
+                        "signal_name": "__REQUIRED_FIELD__"
+                      }
+                    },
+                    "query_string": "__REQUIRED_FIELD__"
+                  }
+                },
+                "set_point": "__REQUIRED_FIELD__"
+              },
               "parameters": {
                 "slope": 1
-              },
-              "query": {
-                "promql": {
-                  "evaluation_interval": "10s",
-                  "out_ports": {
-                    "output": {
-                      "signal_name": "__REQUIRED_FIELD__"
-                    }
-                  },
-                  "query_string": "__REQUIRED_FIELD__"
-                }
-              },
-              "set_point": "__REQUIRED_FIELD__"
+              }
             }
           ],
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/$defs/scale_criteria"
+            "$ref": "#/$defs/scale_out_criteria_schema"
           }
         }
       }
@@ -211,28 +215,100 @@
     }
   },
   "$defs": {
-    "scale_criteria": {
+    "scale_criteria_common_schema": {
       "type": "object",
       "additionalProperties": false,
       "required": ["query", "set_point"],
       "properties": {
         "query": {
           "description": "Query.",
-          "default": null,
+          "default": {
+            "promql": {
+              "evaluation_interval": "10s",
+              "out_ports": {
+                "output": {
+                  "signal_name": "__REQUIRED_FIELD__"
+                }
+              },
+              "query_string": "__REQUIRED_FIELD__"
+            }
+          },
           "type": "object",
           "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Query"
         },
         "set_point": {
           "description": "Set point.",
-          "default": null,
+          "default": "__REQUIRED_FIELD__",
           "type": "number",
           "format": "double"
+        }
+      }
+    },
+    "scale_out_criteria_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["criteria"],
+      "properties": {
+        "criteria": {
+          "description": "Scale-out criteria.",
+          "default": {
+            "query": {
+              "promql": {
+                "evaluation_interval": "10s",
+                "out_ports": {
+                  "output": {
+                    "signal_name": "__REQUIRED_FIELD__"
+                  }
+                },
+                "query_string": "__REQUIRED_FIELD__"
+              }
+            },
+            "set_point": "__REQUIRED_FIELD__"
+          },
+          "type": "object",
+          "$ref": "#/$defs/scale_criteria_common_schema"
         },
         "parameters": {
           "description": "Parameters.",
-          "default": null,
+          "default": {
+            "slope": 1
+          },
           "type": "object",
           "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/IncreasingGradientParameters"
+        }
+      }
+    },
+    "scale_in_criteria_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["criteria"],
+      "properties": {
+        "criteria": {
+          "description": "Scale-in criteria.",
+          "default": {
+            "query": {
+              "promql": {
+                "evaluation_interval": "10s",
+                "out_ports": {
+                  "output": {
+                    "signal_name": "__REQUIRED_FIELD__"
+                  }
+                },
+                "query_string": "__REQUIRED_FIELD__"
+              }
+            },
+            "set_point": "__REQUIRED_FIELD__"
+          },
+          "type": "object",
+          "$ref": "#/$defs/scale_criteria_common_schema"
+        },
+        "parameters": {
+          "description": "Parameters.",
+          "default": {
+            "slope": 1
+          },
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/DecreasingGradientParameters"
         }
       }
     }

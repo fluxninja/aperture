@@ -71,8 +71,8 @@ function(cfg) {
                     gradient.new()
                     + gradient.withInPorts(
                       gradientInPort.new()
-                      + gradientInPort.withSignal(port.withSignalName(criteria.query.promql.out_ports.output.signal_name))
-                      + gradientInPort.withSetpoint(port.withConstantSignal(criteria.set_point))
+                      + gradientInPort.withSignal(port.withSignalName(criteria.criteria.query.promql.out_ports.output.signal_name))
+                      + gradientInPort.withSetpoint(port.withConstantSignal(criteria.criteria.set_point))
                     )
                     + gradient.withParameters(criteria.parameters)
                   )
@@ -87,8 +87,8 @@ function(cfg) {
                     gradient.new()
                     + gradient.withInPorts(
                       gradientInPort.new()
-                      + gradientInPort.withSignal(port.withSignalName(criteria.query.promql.out_ports.output.signal_name))
-                      + gradientInPort.withSetpoint(port.withConstantSignal(criteria.set_point))
+                      + gradientInPort.withSignal(port.withSignalName(criteria.criteria.query.promql.out_ports.output.signal_name))
+                      + gradientInPort.withSetpoint(port.withConstantSignal(criteria.criteria.set_point))
                     )
                     + gradient.withParameters(criteria.parameters)
                   )
@@ -101,11 +101,11 @@ function(cfg) {
           component.withQuery(
             query.new()
             + query.withPromql(
-              local q = criteria.query.promql.query_string;
+              local q = criteria.criteria.query.promql.query_string;
               promQL.new()
               + promQL.withQueryString(q)
-              + promQL.withEvaluationInterval(criteria.query.promql.evaluation_interval)
-              + promQL.withOutPorts({ output: port.withSignalName(criteria.query.promql.out_ports.output.signal_name) }),
+              + promQL.withEvaluationInterval(criteria.criteria.query.promql.evaluation_interval)
+              + promQL.withOutPorts({ output: port.withSignalName(criteria.criteria.query.promql.out_ports.output.signal_name) }),
             ),
           )
           for criteria in params.scale_out_criteria + params.scale_in_criteria
