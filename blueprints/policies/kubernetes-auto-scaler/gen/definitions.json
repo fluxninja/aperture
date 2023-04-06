@@ -20,7 +20,11 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kubernetes_object_selector"],
+      "required": [
+        "kubernetes_object_selector",
+        "scale_in_criteria",
+        "scale_out_criteria"
+      ],
       "properties": {
         "min_replicas": {
           "description": "Minimum number of replicas.",

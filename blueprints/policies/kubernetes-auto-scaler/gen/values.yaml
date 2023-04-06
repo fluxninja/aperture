@@ -60,6 +60,7 @@ policy:
     name: __REQUIRED_FIELD__
   # List of scale-in criteria.
   # Type: []scale_criteria
+  # Required: True
   scale_in_criteria:
     [
       {
@@ -79,6 +80,7 @@ policy:
     ]
   # List of scale-out criteria.
   # Type: []scale_criteria
+  # Required: True
   scale_out_criteria:
     [
       {

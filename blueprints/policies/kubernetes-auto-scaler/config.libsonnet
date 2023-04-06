@@ -63,7 +63,7 @@ local scale_criteria = {
     },
     components: [],
     /**
-    * @param (policy.scale_in_criteria: []scale_criteria) List of scale-in criteria.
+    * @param (policy.scale_in_criteria: []scale_criteria required) List of scale-in criteria.
     */
     scale_in_criteria: [
       {
@@ -85,7 +85,7 @@ local scale_criteria = {
       },
     ],
     /**
-    * @param (policy.scale_out_criteria: []scale_criteria) List of scale-out criteria.
+    * @param (policy.scale_out_criteria: []scale_criteria required) List of scale-out criteria.
     */
     scale_out_criteria: [
       scale_criteria,

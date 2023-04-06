@@ -26,3 +26,43 @@ policy:
     # Type: string
     # Required: True
     name: __REQUIRED_FIELD__
+  # List of scale-in criteria.
+  # Type: []scale_criteria
+  # Required: True
+  scale_in_criteria:
+    [
+      {
+        "parameters": { "slope": 1 },
+        "query":
+          {
+            "promql":
+              {
+                "evaluation_interval": "10s",
+                "out_ports":
+                  { "output": { "signal_name": "__REQUIRED_FIELD__" } },
+                "query_string": "__REQUIRED_FIELD__",
+              },
+          },
+        "set_point": 0.5,
+      },
+    ]
+  # List of scale-out criteria.
+  # Type: []scale_criteria
+  # Required: True
+  scale_out_criteria:
+    [
+      {
+        "parameters": { "slope": -1 },
+        "query":
+          {
+            "promql":
+              {
+                "evaluation_interval": "10s",
+                "out_ports":
+                  { "output": { "signal_name": "__REQUIRED_FIELD__" } },
+                "query_string": "__REQUIRED_FIELD__",
+              },
+          },
+        "set_point": 1,
+      },
+    ]
