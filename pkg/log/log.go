@@ -109,6 +109,7 @@ func NewLogger(w io.Writer, levelString string) *Logger {
 	return logger
 }
 
+// NewLoggerWithWriters creates a new logger instance and stores a list of additional io.Writers.
 func NewLoggerWithWriters(w io.Writer, writers []io.Writer, levelString string) *Logger {
 	logger := NewLogger(w, levelString)
 	logger.writers = writers
@@ -116,6 +117,7 @@ func NewLoggerWithWriters(w io.Writer, writers []io.Writer, levelString string) 
 	return logger
 }
 
+// CloseWriters iterate over a list of additional writers to close them.
 func (lg *Logger) CloseWriters() {
 	for _, writer := range lg.writers {
 		if closer, ok := writer.(io.Closer); ok {

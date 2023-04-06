@@ -111,7 +111,8 @@ func (constructor LoggerConstructor) Annotate() fx.Option {
 	)
 }
 
-func NewLogger(config LogConfig, w []io.Writer, isGlobalLogger bool) (*log.Logger, io.Writer, error) {
+// NewLogger creates a new logger instances with the provided config, and a list of additional writers.
+func NewLogger(config LogConfig, w []io.Writer, isGlobalLogger bool) (*log.Logger, io.Writer) {
 	var writers []io.Writer
 	// append file writers
 	for _, writerConfig := range config.Writers {
@@ -179,7 +180,7 @@ func NewLogger(config LogConfig, w []io.Writer, isGlobalLogger bool) (*log.Logge
 		log.SetStdLogger(logger)
 	}
 
-	return logger, wr, nil
+	return logger, wr
 }
 
 func (constructor LoggerConstructor) provideLogger(w []io.Writer,
@@ -192,10 +193,7 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 		log.Panic().Err(err).Msg("Unable to deserialize log configuration!")
 	}
 
-	logger, writer, err := NewLogger(config, w, constructor.IsGlobal)
-	if err != nil {
-		return nil, err
-	}
+	logger, writer := NewLogger(config, w, constructor.IsGlobal)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
