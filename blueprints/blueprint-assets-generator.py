@@ -44,7 +44,6 @@ class Parameter:
     param_name: str = ""
     param_type: str = "intermediate_node"
     is_complex_type: bool = False
-    render_definition: bool = True
     json_schema_link: str = ""
     docs_link: str = ""
     description: str = ""
@@ -71,19 +70,18 @@ class Parameters:
     @classmethod
     def _resolve_param_links(
         cls, blueprints_root_relative_path: str, policies_relative_path: str, param: str
-    ) -> tuple[str, str, bool, bool]:
-        if param.startswith("aperture.spec") or param.startswith("[]aperture.spec"):
+    ) -> tuple[str, str, bool]:
+        # if param starts with [] then it is an array of objects, remove the []
+        if param.startswith("[]"):
+            param = param[2:]
+
+        if param.startswith("aperture.spec"):
             component = param.split(".")[-1]
 
             component_slug = camel_to_kebab_case(component)
             docs_link = f"{policies_relative_path}/spec#{component_slug}"
             json_schema_link = f"{blueprints_root_relative_path}/gen/jsonschema/_definitions.json#/definitions/{component}"
-            return (
-                docs_link,
-                json_schema_link,
-                True,
-                False,
-            )
+            return (docs_link, json_schema_link, True)
         elif param.count(":") == 1:
             # if param starts with [] then it is an array of objects, remove the []
             if param.startswith("[]"):
@@ -98,12 +96,7 @@ class Parameters:
             )
             for part in parts:
                 json_schema_link += f"/properties/{part}"
-            return (
-                docs_link,
-                json_schema_link,
-                True,
-                False,
-            )
+            return (docs_link, json_schema_link, True)
         # check if it's not a base type bool, float32, float64, int32, int64, string
         elif param not in [
             "bool",
@@ -121,14 +114,9 @@ class Parameters:
             json_schema_link = f"#/$defs/{parts[0]}"
             for part in parts[1:]:
                 json_schema_link += f"/properties/{part}"
-            return (
-                docs_link,
-                json_schema_link,
-                True,
-                True,
-            )
+            return (docs_link, json_schema_link, True)
         else:
-            return "", "", False, True
+            return "", "", False
 
     @classmethod
     def from_comment(
@@ -153,7 +141,6 @@ class Parameters:
                     docs_link,
                     json_schema_link,
                     is_complex_type,
-                    render_definition,
                 ) = cls._resolve_param_links(
                     blueprints_root_relative_path, policies_relative_path, param_type
                 )
@@ -176,7 +163,6 @@ class Parameters:
                                 part,
                                 param_type,
                                 is_complex_type,
-                                render_definition,
                                 json_schema_link,
                                 docs_link,
                                 param_description,
