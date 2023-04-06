@@ -1,0 +1,34 @@
+{{- if .Values.agent.nonAdmin }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "common.names.fullname" . }}-config
+  namespace: {{ template "common.names.namespace" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" . $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations:
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" . $ ) | nindent 4 }}
+  {{- end }}
+data:
+  aperture-agent.yaml: |-
+    {{- if (omit .Values.agent.config "etcd" "prometheus") }}
+    {{- omit .Values.agent.config "etcd" "prometheus" "auto_scale" | toYaml | nindent 4 }}
+    {{- end }}
+    auto_scale:
+      kubernetes:
+        enabled: false
+    service_discovery:
+      kubernetes:
+        enabled: false
+    etcd:
+      {{- if (omit .Values.agent.config.etcd "endpoints")}}
+      {{- omit .Values.agent.config.etcd "endpoints" | toYaml | nindent 6 }}
+      {{- end }}
+      endpoints: {{ include "agent.etcd.endpoints" (dict "etcd" .Values.agent.config.etcd "context" . $) }}
+    prometheus:
+      address: {{ include "agent.prometheus.address" (dict "prometheus" .Values.agent.config.prometheus "context" . $) }}
+{{- end }}

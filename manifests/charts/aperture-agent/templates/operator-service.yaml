@@ -1,3 +1,4 @@
+{{- if and (not .Values.agent.nonAdmin) .Values.operator.rbac.create }}
 ---
 apiVersion: v1
 kind: Service
@@ -25,3 +26,4 @@ spec:
       targetPort: webhook-server
   selector: {{- include "common.labels.matchLabels" . | nindent 4 }}
     app.kubernetes.io/component: aperture-agent-manager
+{{- end }}

@@ -319,6 +319,9 @@ operator:
 ## @skip agent.createUninstallHook
 ##
 agent:
+  ## @param agent.nonAdmin Specifies whether Agent installation should be done without cluster level resources. It takes precedence over agent.create.
+  ##
+  nonAdmin: false
   ## @param agent.create Specifies whether a CR for Agent should be created
   ##
   create: true
@@ -332,8 +335,8 @@ agent:
   ## @param agent.image.pullSecrets Agent image pull secrets
   ##
   image:
-    registry: ~
-    repository: ~
+    registry: docker.io/fluxninja
+    repository: aperture-agent
     tag: ~
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -526,10 +529,11 @@ agent:
     ## @param agent.config.etcd.lease_ttl Lease time-to-live.
     ##
     etcd:
-      endpoints: []
+      endpoints:
+        - test
       lease_ttl: 60s
     ## Prometheus parameters for Agent
     ## @param agent.config.prometheus.address specifies the address of the Prometheus server. Example, "http://prometheus-server:80". This must not be empty.
     ##
     prometheus:
-      address: ~
+      address: test

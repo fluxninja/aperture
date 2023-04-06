@@ -46,7 +46,7 @@ spec:
       {{- if .Values.controller.tolerations }}
       tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.controller.tolerations "context" . $ ) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ template "common.names.fullname" . }}-aperture-controller-sa
+      serviceAccountName: {{ .Values.controller.serviceAccount.name | default (include "common.names.fullname" .) }}
       {{- if .Values.controller.podSecurityContext.enabled }}
       securityContext: {{- omit .Values.controller.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
@@ -101,11 +101,11 @@ spec:
           {{- if .Values.controller.command }}
           command: {{- include "common.tplvalues.render" (dict "value" .Values.controller.command "context" . $ ) | nindent 12 }}
           {{- end }}
-          {{- if .Values.operator.args }}
+          {{- if .Values.controller.args }}
           args: {{- include "common.tplvalues.render" (dict "value" .Values.controller.args "context" . $ ) | nindent 12 }}
           {{- end }}
           {{- if .Values.controller.lifecycleHooks }}
-          lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.operator.controller "context" . $ ) | nindent 12 }}
+          lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.controller.lifecycleHooks "context" . $ ) | nindent 12 }}
           {{- end }}
           env:
             - name: APERTURE_CONTROLLER_SERVICE_DISCOVERY_KUBERNETES_NODE_NAME
@@ -125,7 +125,7 @@ spec:
                   optional: false
             {{- end }}
             {{- if .Values.controller.extraEnvVars }}
-            {{- include "common.tplvalues.render" (dict "value" .Values.operator.extraEnvVars "context" . $ ) | nindent 12 }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.controller.extraEnvVars "context" . $ ) | nindent 12 }}
             {{- end }}
           {{- if or .Values.controller.extraEnvVarsCM .Values.controller.extraEnvVarsSecret }}
           envFrom:
@@ -235,8 +235,6 @@ spec:
             {{- include "common.tplvalues.render" (dict "value" .Values.controller.extraVolumeMounts "context" . $ ) | nindent 12 }}
             {{- end }}
       volumes:
-        - emptyDir: {}
-          name: cert
         - name: aperture-controller-config
           configMap:
             name: {{ template "common.names.fullname" . }}-config

@@ -190,16 +190,6 @@ DEP_TREE = {
                         "controller-prometheus:grafanadatasource"
                     ]
                 },
-                {
-                    "workload": "controller-kube-state-metrics",
-                    "resource_deps": ["cluster-bootstrap"],
-                    "extra_objects": [
-                        ("^controller-kube-state-metrics", None),
-                    ],
-                    "ignored_objects": [
-                        ("^controller-kube-state-metrics", "Service|Deployment", APERTURE_CONTROLLER_NS),
-                    ]
-                },
             ]
         }
     },
