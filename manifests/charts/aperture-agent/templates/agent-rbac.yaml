@@ -1,4 +1,4 @@
-{{- if .Values.agent.nonAdmin }}
+{{- if .Values.agent.namespaceScoped }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -40,7 +40,7 @@ subjects:
 {{- end }}
 
 ---
-{{ if and .Values.agent.nonAdmin .Values.agent.serviceAccount.create -}}
+{{ if and .Values.agent.namespaceScoped .Values.agent.serviceAccount.create -}}
 apiVersion: v1
 kind: ServiceAccount
 metadata:

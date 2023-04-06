@@ -16,7 +16,7 @@ func init() {
 	InstallCmd.PersistentFlags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
 	InstallCmd.PersistentFlags().StringVar(&valuesFile, "values-file", "", "Values YAML file containing parameters to customize the installation")
 	InstallCmd.PersistentFlags().StringVar(&version, "version", apertureLatestVersion, "Version of the Aperture")
-	InstallCmd.PersistentFlags().StringVar(&namespace, "namespace", "", "Namespace in which the component will be installed. Defaults to component name")
+	InstallCmd.PersistentFlags().StringVar(&namespace, "namespace", "", "Namespace in which the component will be installed. Defaults to 'default' namespace")
 
 	InstallCmd.AddCommand(controllerInstallCmd)
 	InstallCmd.AddCommand(agentInstallCmd)

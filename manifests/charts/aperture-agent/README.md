@@ -104,7 +104,7 @@
 
 | Name                                                    | Description                                                                                                                 | Value                 |
 | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| `agent.nonAdmin`                                        | Specifies whether Agent installation should be done without cluster level resources. It takes precedence over agent.create. | `false`               |
+| `agent.namespaceScoped`                                 | Specifies whether Agent installation should be done without cluster level resources. It takes precedence over agent.create. | `false`               |
 | `agent.create`                                          | Specifies whether a CR for Agent should be created                                                                          | `true`                |
 | `agent.image.registry`                                  | Agent image registry. Defaults to 'docker.io/fluxninja'.                                                                    | `docker.io/fluxninja` |
 | `agent.image.repository`                                | Agent image repository. Defaults to 'aperture-agent'.                                                                       | `aperture-agent`      |

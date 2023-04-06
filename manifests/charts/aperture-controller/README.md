@@ -104,7 +104,7 @@
 
 | Name                                                         | Description                                                                                                                                             | Value                 |
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| `controller.nonAdmin`                                        | Specifies whether Controller installation should be done without cluster level resources. It takes precedence over controller.create.                   | `false`               |
+| `controller.namespaceScoped`                                 | Specifies whether Controller installation should be done without cluster level resources. It takes precedence over controller.create.                   | `false`               |
 | `controller.serverCert.secretName`                           | Specifies the name of the secret containing the server certificate for Controller.                                                                      | `nil`                 |
 | `controller.serverCert.certFileName`                         | Specifies the key for Cert file in the secret containing the server certificate for Controller.                                                         | `crt.pem`             |
 | `controller.serverCert.keyFileName`                          | Specifies the key for Key file in the secret containing the server certificate for Controller.                                                          | `key.pem`             |

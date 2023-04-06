@@ -1,6 +1,6 @@
-{{- if .Values.controller.nonAdmin }}
+{{- if .Values.controller.namespaceScoped }}
 {{- if not .Values.controller.serverCert.secretName -}}
-  {{- fail ".Values.controller.serverCert.secretName must be set when .Values.controller.nonAdmin is true" -}}
+  {{- fail ".Values.controller.serverCert.secretName must be set when .Values.controller.namespaceScoped is true" -}}
 {{- end }}
 ---
 apiVersion: apps/v1

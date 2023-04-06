@@ -2,6 +2,8 @@ package installation
 
 import (
 	"context"
+	"crypto/x509"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"net/http"
@@ -23,11 +25,14 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
 
+	"github.com/fluxninja/aperture/operator/controllers"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
@@ -40,6 +45,7 @@ var (
 	namespace      string
 	kubeClient     client.Client
 	timeout        int
+	generateCert   bool
 )
 
 const (
@@ -63,16 +69,21 @@ func getTemplets(chartName, releaseName string, order releaseutil.KindSortOrder)
 	}
 	defer resp.Body.Close()
 
-	ch, err := loader.LoadArchive(resp.Body)
+	ch, err := loader.Load("/home/hardik/Work/fluxninja/aperture/manifests/charts/aperture-controller")
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to load chart: %s", err)
 	}
 
 	values := ch.Values
 	if valuesFile != "" {
-		values, err = chartutil.ReadValuesFile(valuesFile)
+		var customValues chartutil.Values
+		customValues, err = chartutil.ReadValuesFile(valuesFile)
 		if err != nil {
 			return nil, nil, nil, fmt.Errorf("failed to read values: %s", err)
+		}
+
+		if err = mergo.Merge(&values, customValues.AsMap(), mergo.WithOverride); err != nil {
+			values = customValues
 		}
 	} else if releaseName == agent && slices.Compare(order, releaseutil.UninstallOrder) == 0 {
 		values = map[string]interface{}{
@@ -89,9 +100,30 @@ func getTemplets(chartName, releaseName string, order releaseutil.KindSortOrder)
 		}
 	}
 
+	componentValues, ok := values[releaseName].(map[string]interface{})
+	if !ok {
+		return nil, nil, nil, fmt.Errorf("failed to get %s values", releaseName)
+	}
+
+	isNamespaceScoped, ok := componentValues["namespaceScoped"].(bool)
+	if !ok {
+		isNamespaceScoped = false
+	}
+
+	if releaseName == controller && isNamespaceScoped {
+		values, err = manageControllerCertificateSecret(values, fmt.Sprintf("%s-%s", controller, apertureController), namespace)
+		if err != nil {
+			return nil, nil, nil, fmt.Errorf("failed to generate Controller certificate: %s", err)
+		}
+	}
+
 	renderedValues, err := chartutil.ToRenderValues(ch, values, chartutil.ReleaseOptions{Name: releaseName, Namespace: namespace}, chartutil.DefaultCapabilities)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to read values: %s", err)
+	}
+
+	if err = chartutil.ProcessDependencies(ch, renderedValues); err != nil {
+		return nil, nil, nil, fmt.Errorf("failed to process dependencies: %s", err)
 	}
 
 	files, err := engine.RenderWithClient(ch, renderedValues, kubeRestConfig)
@@ -106,8 +138,14 @@ func getTemplets(chartName, releaseName string, order releaseutil.KindSortOrder)
 	}
 
 	hooks, manifests, err := releaseutil.SortManifests(files, chartutil.DefaultVersionSet, order)
+	crds := ch.CRDObjects()
 
-	return ch.CRDObjects(), hooks, manifests, err
+	if isNamespaceScoped {
+		crds = []chart.CRD{}
+		hooks = []*release.Hook{}
+	}
+
+	return crds, hooks, manifests, err
 }
 
 // applyManifest creates/updates the generated manifest to Kubernetes.
@@ -118,20 +156,27 @@ func applyManifest(manifest string) error {
 	}
 
 	log.Info().Msgf("Applying - %s/%s", unstructuredObject.GetKind(), unstructuredObject.GetName())
-	attempt := 0
-	for attempt < 5 {
-		attempt++
-		if err = applyObjectToKubernetes(unstructuredObject); err != nil && strings.Contains(err.Error(), "no matches for kind") {
-			time.Sleep(time.Second * time.Duration(attempt))
-			continue
-		}
-		break
-	}
-
+	err = applyObjectToKubernetesWithRetry(unstructuredObject)
 	if err != nil {
 		return fmt.Errorf("failed to apply - %s/%s, Error - '%s'", unstructuredObject.GetKind(), unstructuredObject.GetName(), err)
 	}
 	return nil
+}
+
+// applyObjectToKubernetesWithRetry applies the given object to Kubernetes with retry.
+func applyObjectToKubernetesWithRetry(unstructuredObject *unstructured.Unstructured) error {
+	attempt := 0
+	var err error
+	for attempt < 5 {
+		attempt++
+		err = applyObjectToKubernetes(unstructuredObject)
+		if err != nil && (strings.Contains(err.Error(), "no matches for kind") || apierrors.IsConflict(err)) {
+			time.Sleep(time.Second * time.Duration(attempt))
+			continue
+		}
+		return nil
+	}
+	return err
 }
 
 // applyObjectToKubernetes applies the given object to Kubernetes.
@@ -319,4 +364,103 @@ func handleUnInstall(chartName, releaseName string) error {
 		return fmt.Errorf("failed to complete uninstall successfully")
 	}
 	return nil
+}
+
+// manageControllerCertificateSecret manages secret containing the Aperture Controller certificate.
+func manageControllerCertificateSecret(values map[string]interface{}, releaseName, namespace string) (map[string]interface{}, error) {
+	controller, ok := values["controller"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("failed to get controller values")
+	}
+
+	serverCert, ok := controller["serverCert"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("failed to get serverCert values")
+	}
+
+	secretName, ok := serverCert["secretName"].(string)
+	if !ok {
+		secretName = fmt.Sprintf("%s-%s-cert", releaseName, apertureController)
+	}
+
+	keyFileName, ok := serverCert["keyFileName"].(string)
+	if !ok {
+		keyFileName = controllers.ControllerCertKeyName
+	}
+
+	certFileName, ok := serverCert["certFileName"].(string)
+	if !ok {
+		certFileName = controllers.ControllerCertName
+	}
+
+	cert, key, _, err := controllers.GenerateCertificate(releaseName, namespace)
+	if err != nil {
+		return nil, err
+	}
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        secretName,
+			Namespace:   namespace,
+			Labels:      controllers.CommonLabels(map[string]string{}, releaseName, controllers.ControllerServiceName),
+			Annotations: map[string]string{},
+		},
+		Data: map[string][]byte{
+			keyFileName:  cert.Bytes(),
+			certFileName: key.Bytes(),
+		},
+	}
+
+	if generateCert {
+		createNew, err := CheckCertificate(secretName, namespace, certFileName)
+		if err != nil {
+			return nil, err
+		}
+
+		if createNew {
+			unstructuredSecret, err := runtime.DefaultUnstructuredConverter.ToUnstructured(secret)
+			if err != nil {
+				return nil, err
+			}
+
+			gvk := schema.GroupVersionKind{Group: "", Version: "v1", Kind: "Secret"}
+			unstructured := &unstructured.Unstructured{Object: unstructuredSecret}
+			unstructured.SetGroupVersionKind(gvk)
+			err = applyObjectToKubernetesWithRetry(unstructured)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	serverCert["secretName"] = secretName
+	controller["serverCert"] = serverCert
+	values["controller"] = controller
+	return values, nil
+}
+
+// CheckCertificate checks if the certificate in the secret is valid.
+func CheckCertificate(name, namespace, certFileName string) (bool, error) {
+	existingSecret := &corev1.Secret{}
+	err := kubeClient.Get(context.Background(), types.NamespacedName{Name: name, Namespace: namespace}, existingSecret)
+	if apierrors.IsNotFound(err) {
+		return true, nil
+	} else {
+		existingCert, ok := existingSecret.Data[certFileName]
+		if !ok {
+			return false, fmt.Errorf("failed to create Aperture Controller Certificate secret as a secret named '%s' already exists", name)
+		}
+
+		block, _ := pem.Decode(existingCert)
+		cert, err := x509.ParseCertificate(block.Bytes)
+		if err != nil {
+			return true, nil
+		}
+
+		if time.Now().After(cert.NotAfter) {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }

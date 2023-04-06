@@ -319,17 +319,17 @@ operator:
 ## @skip controller.createUninstallHook
 ##
 controller:
-  ## @param controller.nonAdmin Specifies whether Controller installation should be done without cluster level resources. It takes precedence over controller.create.
+  ## @param controller.namespaceScoped Specifies whether Controller installation should be done without cluster level resources. It takes precedence over controller.create.
   ##
-  nonAdmin: false
+  namespaceScoped: false
   ## @param controller.serverCert.secretName Specifies the name of the secret containing the server certificate for Controller.
   ## @param controller.serverCert.certFileName Specifies the key for Cert file in the secret containing the server certificate for Controller.
   ## @param controller.serverCert.keyFileName Specifies the key for Key file in the secret containing the server certificate for Controller.
   ##
   serverCert:
-    secretName:
+    secretName: ~
     certFileName: "crt.pem"
-    keyFileName:  "key.pem"
+    keyFileName: "key.pem"
   ## @param controller.create Specifies whether a CR for Controller should be created
   ##
   create: true
@@ -609,7 +609,7 @@ prometheus:
     image:
       tag: v2.33.5
     extraFlags:
-      - web.enable-remote-write-receiver
+    - web.enable-remote-write-receiver
   alertmanager:
     enabled: false
   nodeExporter:

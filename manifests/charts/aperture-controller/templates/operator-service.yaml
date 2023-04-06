@@ -1,4 +1,4 @@
-{{- if (not .Values.controller.nonAdmin) }}
+{{- if (not .Values.controller.namespaceScoped) }}
 ---
 apiVersion: v1
 kind: Service

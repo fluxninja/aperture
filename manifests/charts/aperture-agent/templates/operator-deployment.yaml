@@ -1,4 +1,4 @@
-{{- if (not .Values.agent.nonAdmin) }}
+{{- if (not .Values.agent.namespaceScoped) }}
 ---
 apiVersion: apps/v1
 kind: Deployment

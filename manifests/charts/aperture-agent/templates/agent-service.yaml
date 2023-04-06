@@ -1,4 +1,4 @@
-{{- if .Values.agent.nonAdmin }}
+{{- if .Values.agent.namespaceScoped }}
 ---
 apiVersion: v1
 kind: Service
