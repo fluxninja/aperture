@@ -22,7 +22,7 @@ import (
 	"github.com/fluxninja/aperture/extensions/sentry"
 	amclient "github.com/fluxninja/aperture/pkg/alertmanager/client"
 	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
+	kubernetes "github.com/fluxninja/aperture/pkg/discovery/kubernetes/config"
 	"github.com/fluxninja/aperture/pkg/discovery/static"
 	"github.com/fluxninja/aperture/pkg/etcd"
 	"github.com/fluxninja/aperture/pkg/jobs"

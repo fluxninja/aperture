@@ -1037,7 +1037,7 @@ definitions:
                 x-go-tag-json: enabled
         title: KubernetesDiscoveryConfig for Kubernetes service discovery.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/discovery/kubernetes
+        x-go-package: github.com/fluxninja/aperture/pkg/discovery/kubernetes/config
     ListenerConfig:
         properties:
             addr:
