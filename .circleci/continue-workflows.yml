@@ -13,7 +13,7 @@ executors:
       - image: cimg/base:2022.07
   go-cimg-executor:
     docker:
-      - image: cimg/go:1.20.2
+      - image: cimg/go:1.20.3
         user: root
   python-cimg-executor:
     docker:
@@ -324,7 +324,7 @@ jobs:
       - restore_cache:
           name: Restore go cache
           keys:
-            - aperture-v3-go-cache-{{ checksum "~/day" }}
+            - aperture-v4-go-cache-{{ checksum "~/day" }}
       - run:
           name: Cache golangci-lint run
           command: |
@@ -368,7 +368,7 @@ jobs:
             fi
       - save_cache:
           name: Save go cache
-          key: aperture-v3-go-cache-{{ checksum "~/day" }}
+          key: aperture-v4-go-cache-{{ checksum "~/day" }}
           paths:
             - ../.cache/golangci-lint
             - ../.cache/go-build
@@ -1327,10 +1327,10 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v5-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v6-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
               checksum "tools/go/go.mod" }}
-            - aperture-asdf-cache-v5-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v6-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
           name: Install ASDF tools
@@ -1348,7 +1348,7 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            aperture-asdf-cache-v5-{{ checksum "~/month" }}-<<
+            aperture-asdf-cache-v6-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "tools/go/go.mod" }}
           paths:
