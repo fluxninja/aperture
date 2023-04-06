@@ -11,5 +11,6 @@
       "type": "object",
       "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterDynamicConfig"
     }
-  }
+  },
+  "$defs": null
 }

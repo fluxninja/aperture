@@ -118,8 +118,8 @@ class Parameters:
                 param = param[2:]
             docs_link = f"#{slugify(param)}"
             parts = param.split(".")
-            json_schema_link = f"#"
-            for part in parts:
+            json_schema_link = f"#/$defs/{parts[0]}"
+            for part in parts[1:]:
                 json_schema_link += f"/properties/{part}"
             return (
                 docs_link,
@@ -420,6 +420,7 @@ Integer (int64)
 {%- endfor %}
 """
 
+
 JSON_SCHEMA_TPL = """
 {% macro render_type(param_type, ref_id, is_complex_type) %}
 {% if param_type.startswith('[]') %}
@@ -450,7 +451,8 @@ format: int64
 type: "{{ param_type }}"
 {% endif %}
 {% endmacro %}
-{% macro render_properties(node, prefix='') %}
+{% macro render_properties(node, annotation_type, prefix='') %}
+{% if node.parameter.annotation_type == annotation_type %}
 {% if node.parameter.param_type == 'intermediate_node' %}
 {{ node.parameter.param_name }}:
   type: object
@@ -462,17 +464,14 @@ type: "{{ param_type }}"
   {% endif %}
   properties:
   {% for child_name, child_node in node.children.items() %}
-    {{ render_properties(child_node, prefix ~ node.parameter.param_name ~ '_') | indent(4) }}
+    {{ render_properties(child_node, annotation_type, prefix ~ node.parameter.param_name ~ '_') | indent(4) }}
   {% endfor %}
 {% else %}
 {{ node.parameter.param_name }}:
   description: "{{ node.parameter.description }}"
   default: {{ node.parameter.default | quoteValueYAML }}
-  {% if node.parameter.is_complex_type %}
   {{ render_type(node.parameter.param_type, node.parameter.json_schema_link, node.parameter.is_complex_type) | indent(2, true) }}
-  {% else %}
-  {{ render_type(node.parameter.param_type, "#/definitions/" ~ prefix ~ node.parameter.param_name, node.parameter.is_complex_type) | indent(2, true) }}
-  {% endif %}
+{% endif %}
 {% endif %}
 {% endmacro %}
 $schema: "http://json-schema.org/draft-07/schema#"
@@ -486,8 +485,16 @@ required:
 {% endif %}
 properties:
 {% for child_name, child_node in nested_parameters.children.items() %}
-  {{ render_properties(child_node) | indent(2) }}
+  {{ render_properties(child_node, '@param') | indent(2) }}
 {% endfor %}
+$defs:
+{% for child_name, child_node in nested_parameters.children.items() %}
+    {{ render_properties(child_node, '@schema', '') | indent(2) }}
+{% endfor %}
+"""
+
+JSON_SCHEMA_DEFINITIONS_TPL = """
+
 """
 
 YAML_TPL = """

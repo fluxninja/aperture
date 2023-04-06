@@ -136,7 +136,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/properties/scale_criteria"
+            "$ref": "#/$defs/scale_criteria"
           }
         },
         "scale_out_criteria": {
@@ -163,7 +163,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/properties/scale_criteria"
+            "$ref": "#/$defs/scale_criteria"
           }
         }
       }
@@ -204,7 +204,9 @@
           }
         }
       }
-    },
+    }
+  },
+  "$defs": {
     "scale_criteria": {
       "type": "object",
       "additionalProperties": false,
