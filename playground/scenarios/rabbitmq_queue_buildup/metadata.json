@@ -8,7 +8,7 @@
   "aperture_policies": [
     {
       "blueprint_name": "policies/rabbitmq-queue-buildup",
-      "policy_name": "rabbitmq-queue-buildup",
+      "policy_name": "service1-demoapp-rabbitmq-queue-buildup",
       "values_file": "policies/rabbitmq-queue-buildup.yaml",
       "dashboard_mixin_dir": "dashboards/"
     }

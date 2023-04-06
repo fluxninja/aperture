@@ -3,7 +3,7 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: rabbitmq-queue-buildup
+  name: service1-demoapp-rabbitmq-queue-buildup
 spec:
   circuit:
     components:

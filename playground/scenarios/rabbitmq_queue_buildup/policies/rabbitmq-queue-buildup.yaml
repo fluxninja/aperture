@@ -1,5 +1,5 @@
 common:
-  policy_name: "rabbitmq-queue-buildup"
+  policy_name: "service1-demoapp-rabbitmq-queue-buildup"
   queue_name: "service3-demo-app.demoapp.svc.cluster.local"
 policy:
   concurrency_controller:

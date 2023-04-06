@@ -1,2 +1,0 @@
-bundled_extensions:
-  - integrations/otel/rabbitmqreceiver
