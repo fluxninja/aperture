@@ -26,59 +26,43 @@ policy:
     # Type: string
     # Required: True
     name: __REQUIRED_FIELD__
+  # List of scale-in criteria.
+  # Type: []scale_criteria
+  # Required: True
   scale_in_criteria:
-    # Query.
-    # Type: aperture.spec.v1.Query
-    # Required: True
-    query:
-      # PromQL query.
-      # Type: aperture.spec.v1.PromQL
-      # Required: True
-      promql:
-        # PromQL query string.
-        # Type: string
-        # Required: True
-        query_string: __REQUIRED_FIELD__
-        # Evaluation interval.
-        # Type: string
-        evaluation_interval: "10s"
-        # PromQL query execution output.
-        # Type: aperture.spec.v1.PromQLOuts
-        # Required: True
-        out_ports:
-          # PromQL query execution output port.
-          # Type: aperture.spec.v1.OutPort
-          # Required: True
-          output:
-            # Output Signal name.
-            # Type: string
-            # Required: True
-            signal_name: __REQUIRED_FIELD__
+    [
+      {
+        "parameters": { "slope": 1 },
+        "query":
+          {
+            "promql":
+              {
+                "evaluation_interval": "10s",
+                "out_ports":
+                  { "output": { "signal_name": "__REQUIRED_FIELD__" } },
+                "query_string": "__REQUIRED_FIELD__",
+              },
+          },
+        "set_point": 0.5,
+      },
+    ]
+  # List of scale-out criteria.
+  # Type: []scale_criteria
+  # Required: True
   scale_out_criteria:
-    # Query.
-    # Type: aperture.spec.v1.Query
-    # Required: True
-    query:
-      # PromQL query.
-      # Type: aperture.spec.v1.PromQL
-      # Required: True
-      promql:
-        # PromQL query string.
-        # Type: string
-        # Required: True
-        query_string: __REQUIRED_FIELD__
-        # Evaluation interval.
-        # Type: string
-        evaluation_interval: "10s"
-        # PromQL query execution output.
-        # Type: aperture.spec.v1.PromQLOuts
-        # Required: True
-        out_ports:
-          # PromQL query execution output port.
-          # Type: aperture.spec.v1.OutPort
-          # Required: True
-          output:
-            # Output Signal name.
-            # Type: string
-            # Required: True
-            signal_name: __REQUIRED_FIELD__
+    [
+      {
+        "parameters": { "slope": -1 },
+        "query":
+          {
+            "promql":
+              {
+                "evaluation_interval": "10s",
+                "out_ports":
+                  { "output": { "signal_name": "__REQUIRED_FIELD__" } },
+                "query_string": "__REQUIRED_FIELD__",
+              },
+          },
+        "set_point": 1,
+      },
+    ]

@@ -22,25 +22,21 @@ policy:
   # Type: string
   scale_out_cooldown: "30s"
   # Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
-  # Type: number
+  # Type: float64
   cooldown_override_percentage: 50
   # The maximum decrease of replicas (e.g. pods) at one time.
-  # Type: number
+  # Type: float64
   max_scale_in_percentage: 1
   # The maximum increase of replicas (e.g. pods) at one time.
-  # Type: number
+  # Type: float64
   max_scale_out_percentage: 10
   # Configuration for scale-in alerter.
   # Type: aperture.spec.v1.AlerterParameters
   scale_in_alerter_parameters:
-    # Name of the alert.
-    # Type: string
     alert_name: "Kubernetes Auto Scaler Scale In Event"
   # Cooldown override percentage.
   # Type: aperture.spec.v1.AlerterParameters
   scale_out_alerter_parameters:
-    # Configuration for scale-out alerter.
-    # Type: string
     alert_name: "Kubernetes Auto Scaler Scale Out Event"
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
@@ -63,83 +59,45 @@ policy:
     # Required: True
     name: __REQUIRED_FIELD__
   # List of scale-in criteria.
-  # Type: []object
+  # Type: []scale_criteria
+  # Required: True
   scale_in_criteria:
-    - # Query.
-      # Type: aperture.spec.v1.Query
-      # Required: True
-      query:
-        # PromQL query.
-        # Type: aperture.spec.v1.PromQL
-        # Required: True
-        promql:
-          # PromQL query string.
-          # Type: string
-          # Required: True
-          query_string: __REQUIRED_FIELD__
-          # Evaluation interval.
-          # Type: string
-          evaluation_interval: "10s"
-          # PromQL query execution output.
-          # Type: aperture.spec.v1.PromQLOuts
-          # Required: True
-          out_ports:
-            # PromQL query execution output port.
-            # Type: aperture.spec.v1.OutPort
-            # Required: True
-            output:
-              # Output Signal name.
-              # Type: string
-              # Required: True
-              signal_name: __REQUIRED_FIELD__
-      # Set point.
-      # Type: number
-      set_point: 0.5
-      # Parameters.
-      # Type: aperture.spec.v1.DecreasingGradientParameters
-      parameters:
-        # Slope.
-        # Type: number
-        slope: 1
+    [
+      {
+        "parameters": { "slope": 1 },
+        "query":
+          {
+            "promql":
+              {
+                "evaluation_interval": "10s",
+                "out_ports":
+                  { "output": { "signal_name": "__REQUIRED_FIELD__" } },
+                "query_string": "__REQUIRED_FIELD__",
+              },
+          },
+        "set_point": 0.5,
+      },
+    ]
   # List of scale-out criteria.
-  # Type: []object
+  # Type: []scale_criteria
+  # Required: True
   scale_out_criteria:
-    - # Query.
-      # Type: aperture.spec.v1.Query
-      # Required: True
-      query:
-        # PromQL query.
-        # Type: aperture.spec.v1.PromQL
-        # Required: True
-        promql:
-          # PromQL query string.
-          # Type: string
-          # Required: True
-          query_string: __REQUIRED_FIELD__
-          # Evaluation interval.
-          # Type: string
-          evaluation_interval: "10s"
-          # PromQL query execution output.
-          # Type: aperture.spec.v1.PromQLOuts
-          # Required: True
-          out_ports:
-            # PromQL query execution output port.
-            # Type: aperture.spec.v1.OutPort
-            # Required: True
-            output:
-              # Output Signal name.
-              # Type: string
-              # Required: True
-              signal_name: __REQUIRED_FIELD__
-      # Set point.
-      # Type: number
-      set_point: 1
-      # Parameters.
-      # Type: aperture.spec.v1.IncreasingGradientParameters
-      parameters:
-        # Slope.
-        # Type: number
-        slope: -1
+    [
+      {
+        "parameters": { "slope": -1 },
+        "query":
+          {
+            "promql":
+              {
+                "evaluation_interval": "10s",
+                "out_ports":
+                  { "output": { "signal_name": "__REQUIRED_FIELD__" } },
+                "query_string": "__REQUIRED_FIELD__",
+              },
+          },
+        "set_point": 1,
+      },
+    ]
 
 dashboard:
   # Refresh interval for dashboard panels.

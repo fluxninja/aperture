@@ -81,9 +81,9 @@ func getBlueprints(blURIRoot string) ([]string, error) {
 		if err != nil {
 			return err
 		}
-		if !fi.IsDir() && fi.Name() == "config.libsonnet" {
+		if !fi.IsDir() && fi.Name() == "bundle.libsonnet" {
 			strippedPath := strings.TrimPrefix(path, blDir)
-			strippedPath = strings.TrimSuffix(strippedPath, "/config.libsonnet")
+			strippedPath = strings.TrimSuffix(strippedPath, "/bundle.libsonnet")
 			strippedPath = strings.TrimPrefix(strippedPath, "/")
 			policies = append(policies, strippedPath)
 		}
