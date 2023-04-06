@@ -103,33 +103,5 @@
         }
       }
     }
-  },
-  "definitions": {
-    "common_policy_name": {
-      "description": "Name of the policy.",
-      "default": "__REQUIRED_FIELD__",
-      "type": "string"
-    },
-    "policy_rate_limiter_rate_limit": {
-      "description": "Number of requests per `policy.rate_limiter.parameters.limit_reset_interval` to accept",
-      "default": "__REQUIRED_FIELD__",
-      "type": "number",
-      "format": "double"
-    },
-    "dashboard_refresh_interval": {
-      "description": "Refresh interval for dashboard panels.",
-      "default": "10s",
-      "type": "string"
-    },
-    "dashboard_datasource_name": {
-      "description": "Datasource name.",
-      "default": "$datasource",
-      "type": "string"
-    },
-    "dashboard_datasource_filter_regex": {
-      "description": "Datasource filter regex.",
-      "default": "",
-      "type": "string"
-    }
   }
 }

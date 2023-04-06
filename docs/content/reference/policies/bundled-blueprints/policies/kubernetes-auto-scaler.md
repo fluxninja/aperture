@@ -11,8 +11,6 @@ PromQL queries for scale-in and scale-out.
 This policy uses the
 [`PodAutoScaler`](/reference/policies/spec.md#pod-auto-scaler) component.
 
-## Configuration
-
 <!-- Configuration Marker -->
 
 ```mdx-code-block
@@ -74,7 +72,7 @@ string"
 <a id="policy-cooldown-override-percentage"></a> <ParameterDescription
     name="policy.cooldown_override_percentage"
     type="
-number"
+Number (double)"
     reference=""
     value="50"
     description='Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.' />
@@ -82,7 +80,7 @@ number"
 <a id="policy-max-scale-in-percentage"></a> <ParameterDescription
     name="policy.max_scale_in_percentage"
     type="
-number"
+Number (double)"
     reference=""
     value="1"
     description='The maximum decrease of replicas (e.g. pods) at one time.' />
@@ -90,7 +88,7 @@ number"
 <a id="policy-max-scale-out-percentage"></a> <ParameterDescription
     name="policy.max_scale_out_percentage"
     type="
-number"
+Number (double)"
     reference=""
     value="10"
     description='The maximum increase of replicas (e.g. pods) at one time.' />
@@ -158,8 +156,8 @@ string"
     name="policy.scale_in_criteria"
     type="
 Array of
-Object (objects.scale_criteria)"
-    reference="#objects-scale-criteria"
+Object (scale_criteria)"
+    reference="#scale-criteria"
     value="[{'parameters': {'slope': 1}, 'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': 0.5}]"
     description='List of scale-in criteria.' />
 
@@ -167,8 +165,8 @@ Object (objects.scale_criteria)"
     name="policy.scale_out_criteria"
     type="
 Array of
-Object (objects.scale_criteria)"
-    reference="#objects-scale-criteria"
+Object (scale_criteria)"
+    reference="#scale-criteria"
     value="[{'parameters': {'slope': -1}, 'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': 1}]"
     description='List of scale-out criteria.' />
 
@@ -216,28 +214,28 @@ string"
     value="''"
     description='Datasource filter regex.' />
 
-#### objects {#objects}
+### Schemas
 
-##### objects.scale_criteria {#objects-scale-criteria}
+#### scale_criteria {#scale-criteria}
 
-<a id="objects-scale-criteria-query"></a> <ParameterDescription
-    name="objects.scale_criteria.query"
+<a id="scale-criteria-query"></a> <ParameterDescription
+    name="query"
     type="
 Object (aperture.spec.v1.Query)"
     reference="../../spec#query"
     value="{'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}"
     description='Query.' />
 
-<a id="objects-scale-criteria-set-point"></a> <ParameterDescription
-    name="objects.scale_criteria.set_point"
+<a id="scale-criteria-set-point"></a> <ParameterDescription
+    name="set_point"
     type="
-number"
+Number (double)"
     reference=""
     value="1"
     description='Set point.' />
 
-<a id="objects-scale-criteria-parameters"></a> <ParameterDescription
-    name="objects.scale_criteria.parameters"
+<a id="scale-criteria-parameters"></a> <ParameterDescription
+    name="parameters"
     type="
 Object (aperture.spec.v1.IncreasingGradientParameters)"
     reference="../../spec#increasing-gradient-parameters"

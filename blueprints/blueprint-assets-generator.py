@@ -31,17 +31,20 @@ class ExitException(RuntimeError):
         self.ret_code = ret_code
 
 
-PARAMETER_RE = re.compile(r".*@param.*")
-PARAMETER_DETAILED_RE = re.compile(
-    r".*@param \((?P<param_name>[\w.\[\]]+): (?P<param_type>[\w.\[\]/:-]+) ?(?P<param_required>\w+)?\) ?(?P<param_description>.+)?"
+ANNOTATION_RE = re.compile(r".*@param.*|.*@schema.*")
+# matching either @param or @schema is mandatory
+ANNOTATION_DETAILED_RE = re.compile(
+    r".*(?P<annotation_type>@schema|@param) \((?P<param_name>[\w.\[\]]+): (?P<param_type>[\w.\[\]/:-]+) ?(?P<param_required>\w+)?\) ?(?P<param_description>.+)?"
 )
 
 
 @dataclasses.dataclass
 class Parameter:
+    annotation_type: str = "@param"
     param_name: str = ""
     param_type: str = "intermediate_node"
     is_complex_type: bool = False
+    render_definition: bool = True
     json_schema_link: str = ""
     docs_link: str = ""
     description: str = ""
@@ -68,7 +71,7 @@ class Parameters:
     @classmethod
     def _resolve_param_links(
         cls, blueprints_root_relative_path: str, policies_relative_path: str, param: str
-    ) -> tuple[str, str]:
+    ) -> tuple[str, str, bool, bool]:
         if param.startswith("aperture.spec") or param.startswith("[]aperture.spec"):
             component = param.split(".")[-1]
 
@@ -78,6 +81,8 @@ class Parameters:
             return (
                 docs_link,
                 json_schema_link,
+                True,
+                False,
             )
         elif param.count(":") == 1:
             # if param starts with [] then it is an array of objects, remove the []
@@ -96,22 +101,34 @@ class Parameters:
             return (
                 docs_link,
                 json_schema_link,
+                True,
+                False,
             )
-        elif param.count(".") == 1:
+        # check if it's not a base type bool, float32, float64, int32, int64, string
+        elif param not in [
+            "bool",
+            "float32",
+            "float64",
+            "int32",
+            "int64",
+            "string",
+        ]:
             # local parameter
             if param.startswith("[]"):
                 param = param[2:]
             docs_link = f"#{slugify(param)}"
             parts = param.split(".")
-            json_schema_link = f"#/definitions"
+            json_schema_link = f"#"
             for part in parts:
                 json_schema_link += f"/properties/{part}"
             return (
                 docs_link,
                 json_schema_link,
+                True,
+                True,
             )
         else:
-            return "", ""
+            return "", "", False, True
 
     @classmethod
     def from_comment(
@@ -123,8 +140,8 @@ class Parameters:
         nested_parameters = ParameterNode()
         nested_required_parameters = ParameterNode()
         for line in comment:
-            if PARAMETER_RE.match(line.strip()):
-                inner = PARAMETER_DETAILED_RE.match(line.strip())
+            if ANNOTATION_RE.match(line.strip()):
+                inner = ANNOTATION_DETAILED_RE.match(line.strip())
                 if not inner:
                     inner = ""
                     logger.error(f"Unable to parse @param: `{line.strip()}`")
@@ -132,30 +149,34 @@ class Parameters:
 
                 groups = inner.groupdict()
                 param_name, param_type = groups["param_name"], groups["param_type"]
-                docs_link, json_schema_link = cls._resolve_param_links(
+                (
+                    docs_link,
+                    json_schema_link,
+                    is_complex_type,
+                    render_definition,
+                ) = cls._resolve_param_links(
                     blueprints_root_relative_path, policies_relative_path, param_type
                 )
-                if docs_link != "" or json_schema_link != "":
-                    is_complex_type = True
-                else:
-                    is_complex_type = False
 
+                annotation_type = groups["annotation_type"]
                 param_required = groups.get("param_required", "") == "required"
                 param_description = groups.get("param_description", "")
                 # tokenize param_name and create nested_parameters
                 parts = param_name.split(".")
                 parent = nested_parameters.children
                 parent_required = nested_required_parameters.children
-                if param_required:
+                if param_required and annotation_type == "@param":
                     nested_parameters.required_children.add(parts[0])
                     nested_required_parameters.required_children.add(parts[0])
                 for idx, part in enumerate(parts):
                     if idx == len(parts) - 1:
                         node = ParameterNode(
                             Parameter(
+                                annotation_type,
                                 part,
                                 param_type,
                                 is_complex_type,
+                                render_definition,
                                 json_schema_link,
                                 docs_link,
                                 param_description,
@@ -167,7 +188,7 @@ class Parameters:
                             parent_required[part] = node
                     else:
                         next_part = parts[idx + 1]
-                        node = ParameterNode(Parameter(part))
+                        node = ParameterNode(Parameter(annotation_type, part))
                         if part not in parent:
                             parent[part] = node
                         if param_required:
@@ -300,20 +321,20 @@ Integer (int64)
 {%- endif %}
 {%- endmacro %}
 
-{%- macro render_properties(node, level, parent_prefix='') %}
+{%- macro render_node(node, level, annotation_type, parent_prefix='') %}
 {%- set indent = '    ' * level %}
 {%- set anchor = (parent_prefix + node.parameter.param_name) | slugify %}
 {%- set heading_level = '#' * (level + 1) %}
 {%- if node.parameter.param_type == 'intermediate_node' %}
-{{ heading_level }} {{ parent_prefix }}{{ node.parameter.param_name }} {#{{ anchor }}}
+{{ heading_level }} {{ parent_prefix if annotation_type == '@param' }}{{ node.parameter.param_name }} {#{{ anchor }}}
 
 {%- for child_name, child_node in node.children.items() %}
-{{ render_properties(child_node, level + 1, parent_prefix + node.parameter.param_name + '.') }}
+{{ render_node(child_node, level + 1, annotation_type, parent_prefix + node.parameter.param_name + '.') }}
 {%- endfor %}
 {%- else %}
 <a id="{{ anchor }}"></a>
 <ParameterDescription
-    name="{{ parent_prefix }}{{ node.parameter.param_name }}"
+    name="{{ parent_prefix if annotation_type == '@param' }}{{ node.parameter.param_name }}"
     type="{{ render_type(node.parameter.param_type, node.parameter.is_complex_type) }}"
     reference="{{ node.parameter.docs_link }}"
     value="{{ node.parameter.default | quoteValueDocs }}"
@@ -324,7 +345,17 @@ Integer (int64)
 ### Parameters
 
 {%- for child_name, child_node in nested_parameters.children.items() %}
-{{ render_properties(child_node, 3) }}
+{%- if child_node.parameter.annotation_type == '@param' %}
+{{ render_node(child_node, 3, '@param') }}
+{%- endif %}
+{%- endfor %}
+
+### Schemas
+
+{%- for child_name, child_node in nested_parameters.children.items() %}
+{%- if child_node.parameter.annotation_type == '@schema' %}
+{{ render_node(child_node, 3, '@schema') }}
+{%- endif %}
 {%- endfor %}
 """
 
@@ -351,21 +382,21 @@ Integer (int64)
 {%- endif %}
 {%- endmacro %}
 
-{%- macro render_properties(node, level, parent_prefix='') %}
+{%- macro render_properties(node, level, annotation_type, parent_prefix='') %}
 {%- set indent = '    ' * level %}
 {%- set anchor = (parent_prefix + node.parameter.param_name) | slugify %}
 {%- set heading_level = '#' * (level + 1) %}
 {%- if node.parameter.param_type == 'intermediate_node' %}
-{{ heading_level }} {{ parent_prefix }}{{ node.parameter.param_name }} {#{{ anchor }}}
+{{ heading_level }} {{ parent_prefix if annotation_type == '@param' }}{{ node.parameter.param_name }} {#{{ anchor }}}
 
 {%- if node.parameter.description %}
 **Description**: {{ node.parameter.description }}
 {%- endif %}
 {%- for child_name, child_node in node.children.items() %}
-{{ render_properties(child_node, level + 1, parent_prefix + node.parameter.param_name + '.') }}
+{{ render_properties(child_node, level + 1, annotation_type, parent_prefix + node.parameter.param_name + '.') }}
 {%- endfor %}
 {%- else %}
-{{ heading_level }} {{ parent_prefix }}{{ node.parameter.param_name }} {#{{ anchor }}}
+{{ heading_level }} {{ parent_prefix if annotation_type == '@param' }}{{ node.parameter.param_name }} {#{{ anchor }}}
 **Type**: {{ render_type(node.parameter.param_type, node.parameter.is_complex_type) }}
 **Default Value**: `{{ node.parameter.default | quoteValueDocs }}`
 **Description**: {{ node.parameter.description }}
@@ -375,7 +406,17 @@ Integer (int64)
 ### Parameters
 
 {%- for child_name, child_node in nested_parameters.children.items() %}
-{{ render_properties(child_node, 3) }}
+{%- if child_node.parameter.annotation_type == '@param' %}
+{{ render_properties(child_node, 3, '@param') }}
+{%- endif %}
+{%- endfor %}
+
+### Schemas
+
+{%- for child_name, child_node in nested_parameters.children.items() %}
+{%- if child_node.parameter.annotation_type == '@schema' %}
+{{ render_properties(child_node, 3, '@schema') }}
+{%- endif %}
 {%- endfor %}
 """
 
@@ -434,19 +475,6 @@ type: "{{ param_type }}"
   {% endif %}
 {% endif %}
 {% endmacro %}
-{% macro render_definitions(node, prefix='') %}
-{% if not node.parameter.is_complex_type %}
-{% for child_name, child_node in node.children.items() %}
-{{ render_definitions(child_node, prefix ~ node.parameter.param_name ~ '_') }}
-{% endfor %}
-{% if node.parameter.param_type != 'intermediate_node' %}
-  {{ prefix }}{{ node.parameter.param_name }}:
-    description: "{{ node.parameter.description }}"
-    default: {{ node.parameter.default | quoteValueYAML }}
-    {{ render_type(node.parameter.param_type, node.parameter.json_schema_link, node.parameter.is_complex_type) | indent(4, true) }}
-{% endif %}
-{% endif %}
-{% endmacro %}
 $schema: "http://json-schema.org/draft-07/schema#"
 type: object
 title: "{{ blueprint_name }} blueprint"
@@ -459,10 +487,6 @@ required:
 properties:
 {% for child_name, child_node in nested_parameters.children.items() %}
   {{ render_properties(child_node) | indent(2) }}
-{% endfor %}
-definitions:
-{% for child_name, child_node in nested_parameters.children.items() %}
-  {{ render_definitions(child_node) | indent(2) }}
 {% endfor %}
 """
 
@@ -480,6 +504,7 @@ YAML_TPL = """
 {%- endif %}
 {%- endmacro %}
 {%- macro render_node(node, level) %}
+{%- if node.parameter.annotation_type == '@param' %}
 {%- if node.parameter.param_type != 'intermediate_node' %}
 {%- if node.parameter.description %}
 {{ '  ' * level }}# {{ node.parameter.description }}
@@ -499,6 +524,7 @@ YAML_TPL = """
 {%- for child_name, child_node in node.children.items() %}
 {{- render_node(child_node, level + 1) }}
 {%- endfor %}
+{%- endif %}
 {%- endmacro %}
 {%- for child_name, child_node in sample_config_data.children.items() %}
 {{ render_node(child_node, 0) }}

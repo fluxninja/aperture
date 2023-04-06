@@ -11,6 +11,5 @@
       "type": "object",
       "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/LoadActuatorDynamicConfig"
     }
-  },
-  "definitions": null
+  }
 }
