@@ -30,7 +30,7 @@ import (
 	"github.com/fluxninja/aperture/operator/api/common"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/config"
-	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
+	"github.com/fluxninja/aperture/pkg/etcd/client/etcd"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
