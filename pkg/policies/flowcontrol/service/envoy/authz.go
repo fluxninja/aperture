@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	envoycorev3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	typev3 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	"github.com/open-policy-agent/opa-envoy-plugin/envoyauth"
@@ -23,11 +24,11 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/baggage"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
-	authz_baggage "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy/baggage"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
 )
 
@@ -43,7 +44,7 @@ func NewHandler(
 	return &Handler{
 		classifier:    classifier,
 		serviceGetter: serviceGetter,
-		propagator:    authz_baggage.W3Baggage{},
+		propagator:    baggage.W3Baggage{},
 		fcHandler:     fcHandler,
 	}
 }
@@ -52,7 +53,7 @@ func NewHandler(
 type Handler struct {
 	serviceGetter servicegetter.ServiceGetter
 	classifier    *classification.ClassificationEngine
-	propagator    authz_baggage.Propagator
+	propagator    baggage.Propagator
 	fcHandler     check.HandlerWithValues
 }
 
@@ -161,13 +162,13 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	attributes, ok := attributesSource.(map[string]interface{})
 	if ok {
 		source := attributes["source"]
-		sourceMap, ok := source.(map[string]interface{})
-		if ok {
+		sourceMap, sourceMapOK := source.(map[string]interface{})
+		if sourceMapOK {
 			sourceMap["services"] = sourceSvcs
 		}
 		destination := attributes["destination"]
-		destinationMap, ok := destination.(map[string]interface{})
-		if ok {
+		destinationMap, destinationMapOK := destination.(map[string]interface{})
+		if destinationMapOK {
 			destinationMap["services"] = destinationSvcs
 		}
 	}
@@ -175,7 +176,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	// Default flow labels from Authz request
 	requestFlowLabels := AuthzRequestToFlowLabels(req.GetAttributes().GetRequest())
 	// Extract flow labels from baggage headers
-	existingHeaders := authz_baggage.Headers(req.GetAttributes().GetRequest().GetHttp().GetHeaders())
+	existingHeaders := baggage.Headers(req.GetAttributes().GetRequest().GetHttp().GetHeaders())
 	baggageFlowLabels := h.propagator.Extract(existingHeaders)
 
 	// Merge flow labels from Authz request and baggage headers
@@ -193,11 +194,20 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	}
 
 	// Add new flow labels to baggage
-	newHeaders, err := h.propagator.Inject(newFlowLabels, existingHeaders)
-	if err != nil {
-		// TODO(krdln) metrics
-		log.Sample(failedBaggageInjectionSampler).
-			Warn().Err(err).Msg("Failed to inject baggage into headers")
+	var newHeaders []*envoycorev3.HeaderValueOption
+	p, ok := h.propagator.(interface {
+		Inject(flowlabel.FlowLabels, baggage.Headers) ([]*envoycorev3.HeaderValueOption, error)
+	})
+	if !ok {
+		log.Error().Msg("propagator does not implement Inject")
+		newHeaders = []*envoycorev3.HeaderValueOption{}
+	} else {
+		newHeaders, err = p.Inject(newFlowLabels, existingHeaders)
+		if err != nil {
+			// TODO(krdln) metrics
+			log.Sample(failedBaggageInjectionSampler).
+				Warn().Err(err).Msg("Failed to inject baggage into headers")
+		}
 	}
 
 	// Make the freshly created flow labels available to flowcontrol.

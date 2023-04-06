@@ -1,6 +1,7 @@
 package baggage
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 
@@ -27,14 +28,6 @@ type Propagator interface {
 	// The headers are expected to be in envoy's authz convention – with
 	// lower-case keys
 	Extract(headers Headers) flowlabel.FlowLabels
-
-	// Inject emits instructions for envoy how to inject flow labels into
-	// headers based on given flow labels and existing headers
-	//
-	// The returned list is expected to be put in
-	// CheckResponse.OkHttpResponse.Headers, so that envoy will take care of
-	// injecting appropriate headers.
-	Inject(flowLabels flowlabel.FlowLabels, headers Headers) ([]*envoy_core.HeaderValueOption, error)
 }
 
 // Prefixed puts each flow label into a separate header.  Header name is
@@ -44,6 +37,9 @@ type Prefixed struct {
 	// convention – (note that this differs from golang's conventions))
 	Prefix string
 }
+
+// make sure Prefixed implements Propogator.
+var _ Propagator = Prefixed{}
 
 // Extract extracts prefixed flow labels from headers.
 func (p Prefixed) Extract(headers Headers) flowlabel.FlowLabels {
@@ -97,6 +93,9 @@ func (p Prefixed) Inject(
 // * alternatively, we could put _all_ flow labels as a _single_ baggage item (eg. Fn-flow).
 type W3Baggage struct{}
 
+// make sure W3Baggage implements Propogator.
+var _ Propagator = W3Baggage{}
+
 const (
 	w3BaggageHeaderName = "baggage"
 	hiddenPropertyKey   = "hidden"
@@ -148,11 +147,79 @@ func (b W3Baggage) Inject(
 		return nil, err
 	}
 	_, baggageAlreadyExists := headers[w3BaggageHeaderName]
-	return []*envoy_core.HeaderValueOption{{
-		Header: &envoy_core.HeaderValue{
-			Key:   w3BaggageHeaderName,
-			Value: baggage.String(),
+	return []*envoy_core.HeaderValueOption{
+		{
+			Header: &envoy_core.HeaderValue{
+				Key:   w3BaggageHeaderName,
+				Value: baggage.String(),
+			},
+			Append: wrapperspb.Bool(baggageAlreadyExists),
 		},
-		Append: wrapperspb.Bool(baggageAlreadyExists),
-	}}, nil
+	}, nil
+}
+
+// W3BaggageCheckHTTP handles baggage propagation in a single `baggage` header, as
+// described in https://www.w3.org/TR/baggage/
+//
+// All baggage items are mapped to flow labels 1:1. This could be tweaked in future:
+// * we can use some prefixing/filtering,
+// * alternatively, we could put _all_ flow labels as a _single_ baggage item (eg. Fn-flow).
+type W3BaggageCheckHTTP struct{}
+
+// make sure W3BaggageCheckHTTP implements Propogator.
+var _ Propagator = W3BaggageCheckHTTP{}
+
+// Extract extracts flow labels from w3Baggage headers.
+func (b W3BaggageCheckHTTP) Extract(headers Headers) flowlabel.FlowLabels {
+	baggage, err := otel_baggage.Parse(headers[w3BaggageHeaderName])
+	if err != nil {
+		log.Warn().Err(err).Msg("Failed to parse baggage header")
+		return flowlabel.FlowLabels{}
+	}
+	flowLabels := make(flowlabel.FlowLabels)
+	for _, member := range baggage.Members() {
+		value, err := url.QueryUnescape(member.Value())
+		if err != nil {
+			log.Warn().Msg("Could not unescape flow label value in baggage")
+			continue
+		}
+		flowLabels[member.Key()] = flowlabel.FlowLabelValue{
+			Value:     value,
+			Telemetry: true,
+		}
+	}
+	return flowLabels
+}
+
+// Inject emits instructions for envoy how to inject flow labels into headers supported by baggage propagator.
+func (b W3BaggageCheckHTTP) Inject(
+	flowLabels flowlabel.FlowLabels,
+	headers Headers,
+) (map[string]string, error) {
+	members := make([]otel_baggage.Member, 0, len(flowLabels))
+	for k, v := range flowLabels {
+		if !v.Telemetry {
+			continue
+		}
+		member, err := otel_baggage.NewMember(k, v.Value)
+		if err != nil {
+			return nil, err
+		}
+		members = append(members, member)
+	}
+	if len(members) == 0 {
+		return nil, nil
+	}
+	baggage, err := otel_baggage.New(members...)
+	if err != nil {
+		return nil, err
+	}
+
+	baggageValue, baggageAlreadyExists := headers[w3BaggageHeaderName]
+	if baggageAlreadyExists {
+		baggageValue = fmt.Sprintf("%s,%s", baggageValue, baggage.String())
+	} else {
+		baggageValue = baggage.String()
+	}
+	return map[string]string{w3BaggageHeaderName: baggageValue}, nil
 }

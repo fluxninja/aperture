@@ -13,17 +13,6 @@ import (
 	"strings"
 	"time"
 
-	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
-	"github.com/fluxninja/aperture/pkg/log"
-	"github.com/fluxninja/aperture/pkg/net/grpc"
-	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
-	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
-	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
-	checkhttp_baggage "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/checkhttp/baggage"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
 	"github.com/open-policy-agent/opa/logging"
 	"github.com/open-policy-agent/opa/util"
 	"google.golang.org/genproto/googleapis/rpc/code"
@@ -32,6 +21,18 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
+	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/net/grpc"
+	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/baggage"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
+	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
+	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
 )
 
 var baggageSanitizeRegex *regexp.Regexp = regexp.MustCompile(`[\s\\\/;",]`)
@@ -53,7 +54,7 @@ func NewHandler(
 	return &Handler{
 		classifier:    classifier,
 		serviceGetter: serviceGetter,
-		propagator:    checkhttp_baggage.W3Baggage{},
+		propagator:    baggage.W3BaggageCheckHTTP{},
 		fcHandler:     fcHandler,
 	}
 }
@@ -72,7 +73,7 @@ type Handler struct {
 	flowcontrolhttpv1.UnimplementedFlowControlServiceHTTPServer
 	serviceGetter servicegetter.ServiceGetter
 	classifier    *classification.ClassificationEngine
-	propagator    checkhttp_baggage.Propagator
+	propagator    baggage.Propagator
 	fcHandler     check.HandlerWithValues
 }
 
@@ -138,7 +139,7 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 
 	// Default flow labels from request
 	requestFlowLabels := CheckHTTPRequestToFlowLabels(req.GetRequest())
-	existingHeaders := checkhttp_baggage.Headers(req.GetRequest().GetHeaders())
+	existingHeaders := baggage.Headers(req.GetRequest().GetHeaders())
 	baggageFlowLabels := h.propagator.Extract(existingHeaders)
 
 	// Merge flow labels from request and baggage headers
@@ -156,10 +157,20 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 	}
 
 	// Add new flow labels to baggage
-	newHeaders, err := h.propagator.Inject(newFlowLabels, existingHeaders)
-	if err != nil {
-		log.Sample(failedBaggageInjectionSampler).
-			Warn().Err(err).Msg("Failed to inject baggage into headers")
+	var newHeaders map[string]string
+	var err error
+	p, ok := h.propagator.(interface {
+		Inject(flowlabel.FlowLabels, baggage.Headers) (map[string]string, error)
+	})
+	if !ok {
+		log.Error().Msg("propagator does not implement Inject")
+		newHeaders = make(map[string]string, 0)
+	} else {
+		newHeaders, err = p.Inject(newFlowLabels, existingHeaders)
+		if err != nil {
+			log.Sample(failedBaggageInjectionSampler).
+				Warn().Err(err).Msg("Failed to inject baggage into headers")
+		}
 	}
 
 	// Make the freshly created flow labels available to flowcontrol.
