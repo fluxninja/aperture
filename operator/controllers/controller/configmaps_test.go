@@ -24,23 +24,23 @@ import (
 	"text/template"
 	"time"
 
-	controller "github.com/fluxninja/aperture/cmd/aperture-controller/config"
-	. "github.com/fluxninja/aperture/operator/controllers"
-
-	"github.com/fluxninja/aperture/operator/api/common"
-	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/etcd/client/etcd"
-	"github.com/fluxninja/aperture/pkg/net/listener"
-	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
-	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	"github.com/fluxninja/aperture/pkg/prometheus"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/pointer"
+
+	controller "github.com/fluxninja/aperture/cmd/aperture-controller/config"
+	"github.com/fluxninja/aperture/operator/api/common"
+	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
+	. "github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/etcd"
+	"github.com/fluxninja/aperture/pkg/net/listener"
+	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
+	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	"github.com/fluxninja/aperture/pkg/prometheus"
 )
 
 //go:embed config_test.tpl

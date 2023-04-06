@@ -36,7 +36,7 @@ import (
 	"github.com/fluxninja/aperture/operator/api/common"
 	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/distcache"
+	distcacheconfig "github.com/fluxninja/aperture/pkg/distcache/config"
 	"github.com/fluxninja/aperture/pkg/etcd"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
@@ -80,7 +80,7 @@ var _ = Describe("ConfigMap for Agent", func() {
 								Address: "http://aperture-prometheus-server:80",
 							},
 						},
-						DistCache: distcache.DistCacheConfig{
+						DistCache: distcacheconfig.DistCacheConfig{
 							BindAddr:           ":3320",
 							MemberlistBindAddr: ":3322",
 						},

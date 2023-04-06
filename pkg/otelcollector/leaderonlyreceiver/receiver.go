@@ -8,14 +8,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/etcd/election"
-	"github.com/fluxninja/aperture/pkg/otelcollector"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/fx"
+
+	"github.com/fluxninja/aperture/pkg/config"
+	"github.com/fluxninja/aperture/pkg/etcd/election"
+	"github.com/fluxninja/aperture/pkg/otelcollector"
 )
 
 const (
@@ -108,7 +109,6 @@ func (r *leaderOnlyReceiver) Start(startCtx context.Context, host component.Host
 		if err := r.startInnerReceiver(startCtx); err != nil {
 			return fmt.Errorf("failed to start %s receiver: %w", r.config.InnerType, err)
 		}
-
 		return nil
 	}
 
@@ -126,12 +126,10 @@ func (r *leaderOnlyReceiver) Shutdown(ctx context.Context) error {
 		r.cancelBackground()
 		r.backgroundWG.Wait()
 	}
-
-	if r.inner == nil {
-		return nil
+	if r.inner != nil {
+		return r.inner.Shutdown(ctx)
 	}
-
-	return r.inner.Shutdown(ctx)
+	return nil
 }
 
 func (r *leaderOnlyReceiver) startWhenLeader(ctx context.Context) {

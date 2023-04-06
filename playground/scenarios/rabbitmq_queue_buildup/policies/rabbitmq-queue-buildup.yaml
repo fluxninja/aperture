@@ -1,0 +1,12 @@
+common:
+  policy_name: "service1-demoapp-rabbitmq-queue-buildup"
+  queue_name: "service3-demo-app.demoapp.svc.cluster.local"
+policy:
+  concurrency_controller:
+    queue_buildup_setpoint: 1000
+    flow_selector:
+      service_selector:
+        agent_group: default
+        service: service1-demo-app.demoapp.svc.cluster.local
+      flow_matcher:
+        control_point: ingress

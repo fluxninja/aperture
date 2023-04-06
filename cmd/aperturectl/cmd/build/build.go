@@ -34,13 +34,14 @@ build:
   flags:
     - -some-flag
     - -some-other-flag
-bundled_extensions: # remote extensions to be bundled
+bundled_extensions: # built-in extensions to be enabled
+  - integrations/otel/rabbitmqreceiver
+  - fluxninja
+  - sentry
+extensions: # remote extensions to be bundled
   - go_mod_name: github.com/org/name
     version: v1.0.0
     pkg_name: pkg
-extensions: # built-in extensions to be enabled
-  - fluxninja
-  - sentry
 replaces:
   - old: github.com/org/name
     new: github.com/org/name2
