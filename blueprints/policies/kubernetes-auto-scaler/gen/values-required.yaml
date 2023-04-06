@@ -43,7 +43,7 @@ policy:
                 "query_string": "__REQUIRED_FIELD__",
               },
           },
-        "set_point": 1,
+        "set_point": "__REQUIRED_FIELD__",
       },
     ]
   # List of scale-out criteria.
@@ -52,7 +52,7 @@ policy:
   scale_out_criteria:
     [
       {
-        "parameters": { "slope": -1 },
+        "parameters": { "slope": 1 },
         "query":
           {
             "promql":
@@ -63,6 +63,6 @@ policy:
                 "query_string": "__REQUIRED_FIELD__",
               },
           },
-        "set_point": 1,
+        "set_point": "__REQUIRED_FIELD__",
       },
     ]

@@ -66,13 +66,45 @@ local scale_criteria = {
     * @param (policy.scale_in_criteria: []scale_criteria required) List of scale-in criteria.
     */
     scale_in_criteria: [
-      scale_criteria,
+      {
+        query: {
+          promql: {
+            query_string: '__REQUIRED_FIELD__',
+            evaluation_interval: '10s',
+            out_ports: {
+              output: {
+                signal_name: '__REQUIRED_FIELD__',
+              },
+            },
+          },
+        },
+        set_point: '__REQUIRED_FIELD__',
+        parameters: {
+          slope: -1.0,
+        },
+      },
     ],
     /**
     * @param (policy.scale_out_criteria: []scale_criteria required) List of scale-out criteria.
     */
     scale_out_criteria: [
-      scale_criteria,
+      {
+        query: {
+          promql: {
+            query_string: '__REQUIRED_FIELD__',
+            evaluation_interval: '10s',
+            out_ports: {
+              output: {
+                signal_name: '__REQUIRED_FIELD__',
+              },
+            },
+          },
+        },
+        set_point: '__REQUIRED_FIELD__',
+        parameters: {
+          slope: 1.0,
+        },
+      },
     ],
   },
   /**
@@ -101,9 +133,8 @@ local scale_criteria = {
   * @schema (scale_criteria.query.promql.out_ports: aperture.spec.v1.PromQLOuts required) PromQL query execution output.
   * @schema (scale_criteria.query.promql.out_ports.output: aperture.spec.v1.OutPort required) PromQL query execution output port.
   * @schema (scale_criteria.query.promql.out_ports.output.signal_name: string required) Output Signal name.
-  * @schema (scale_criteria.set_point: float64) Set point.
+  * @schema (scale_criteria.set_point: float64 required) Set point.
   * @schema (scale_criteria.parameters: aperture.spec.v1.IncreasingGradientParameters) Parameters.
   * @schema (scale_criteria.parameters.slope: float64) Slope.
   */
-  scale_criteria: scale_criteria,
 }

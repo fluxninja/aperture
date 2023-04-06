@@ -134,7 +134,7 @@
                   "query_string": "__REQUIRED_FIELD__"
                 }
               },
-              "set_point": 1
+              "set_point": "__REQUIRED_FIELD__"
             }
           ],
           "type": "array",
@@ -148,7 +148,7 @@
           "default": [
             {
               "parameters": {
-                "slope": -1
+                "slope": 1
               },
               "query": {
                 "promql": {
@@ -161,7 +161,7 @@
                   "query_string": "__REQUIRED_FIELD__"
                 }
               },
-              "set_point": 1
+              "set_point": "__REQUIRED_FIELD__"
             }
           ],
           "type": "array",
@@ -214,35 +214,23 @@
     "scale_criteria": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["query"],
+      "required": ["query", "set_point"],
       "properties": {
         "query": {
           "description": "Query.",
-          "default": {
-            "promql": {
-              "evaluation_interval": "10s",
-              "out_ports": {
-                "output": {
-                  "signal_name": "__REQUIRED_FIELD__"
-                }
-              },
-              "query_string": "__REQUIRED_FIELD__"
-            }
-          },
+          "default": null,
           "type": "object",
           "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Query"
         },
         "set_point": {
           "description": "Set point.",
-          "default": 1,
+          "default": null,
           "type": "number",
           "format": "double"
         },
         "parameters": {
           "description": "Parameters.",
-          "default": {
-            "slope": -1
-          },
+          "default": null,
           "type": "object",
           "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/IncreasingGradientParameters"
         }

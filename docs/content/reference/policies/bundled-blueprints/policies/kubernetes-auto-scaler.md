@@ -126,7 +126,7 @@ Object (aperture.spec.v1.Component)"
 Array of
 Object (scale_criteria)"
     reference="#scale-criteria"
-    value="[{'parameters': {'slope': -1}, 'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': 1}]"
+    value="[{'parameters': {'slope': -1}, 'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': '__REQUIRED_FIELD__'}]"
     description='List of scale-in criteria.' />
 
 <a id="policy-scale-out-criteria"></a> <ParameterDescription
@@ -135,7 +135,7 @@ Object (scale_criteria)"
 Array of
 Object (scale_criteria)"
     reference="#scale-criteria"
-    value="[{'parameters': {'slope': -1}, 'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': 1}]"
+    value="[{'parameters': {'slope': 1}, 'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': '__REQUIRED_FIELD__'}]"
     description='List of scale-out criteria.' />
 
 ##### policy.kubernetes_object_selector {#policy-kubernetes-object-selector}
@@ -229,7 +229,7 @@ string"
     type="
 Object (aperture.spec.v1.Query)"
     reference="../../spec#query"
-    value="{'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}"
+    value="'None'"
     description='Query.' />
 
 <a id="scale-criteria-set-point"></a> <ParameterDescription
@@ -237,7 +237,7 @@ Object (aperture.spec.v1.Query)"
     type="
 Number (double)"
     reference=""
-    value="1"
+    value="'None'"
     description='Set point.' />
 
 <a id="scale-criteria-parameters"></a> <ParameterDescription
@@ -245,7 +245,7 @@ Number (double)"
     type="
 Object (aperture.spec.v1.IncreasingGradientParameters)"
     reference="../../spec#increasing-gradient-parameters"
-    value="{'slope': -1}"
+    value="'None'"
     description='Parameters.' />
 
 ---
