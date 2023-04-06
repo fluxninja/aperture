@@ -66,23 +66,7 @@ local scale_criteria = {
     * @param (policy.scale_in_criteria: []scale_criteria required) List of scale-in criteria.
     */
     scale_in_criteria: [
-      {
-        query: {
-          promql: {
-            query_string: '__REQUIRED_FIELD__',
-            evaluation_interval: '10s',
-            out_ports: {
-              output: {
-                signal_name: '__REQUIRED_FIELD__',
-              },
-            },
-          },
-        },
-        set_point: 0.5,
-        parameters: {
-          slope: 1.0,
-        },
-      },
+      scale_criteria,
     ],
     /**
     * @param (policy.scale_out_criteria: []scale_criteria required) List of scale-out criteria.

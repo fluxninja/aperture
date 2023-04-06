@@ -35,6 +35,8 @@ string"
     value="__REQUIRED_FIELD__"
     description='Name of the policy.' />
 
+---
+
 #### policy {#policy}
 
 <a id="policy-min-replicas"></a> <ParameterDescription
@@ -118,6 +120,24 @@ Object (aperture.spec.v1.Component)"
     value="[]"
     description='List of additional circuit components.' />
 
+<a id="policy-scale-in-criteria"></a> <ParameterDescription
+    name="policy.scale_in_criteria"
+    type="
+Array of
+Object (scale_criteria)"
+    reference="#scale-criteria"
+    value="[{'parameters': {'slope': -1}, 'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': 1}]"
+    description='List of scale-in criteria.' />
+
+<a id="policy-scale-out-criteria"></a> <ParameterDescription
+    name="policy.scale_out_criteria"
+    type="
+Array of
+Object (scale_criteria)"
+    reference="#scale-criteria"
+    value="[{'parameters': {'slope': -1}, 'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': 1}]"
+    description='List of scale-out criteria.' />
+
 ##### policy.kubernetes_object_selector {#policy-kubernetes-object-selector}
 
 <a id="policy-kubernetes-object-selector-namespace"></a> <ParameterDescription
@@ -152,23 +172,7 @@ string"
     value="__REQUIRED_FIELD__"
     description='Name.' />
 
-<a id="policy-scale-in-criteria"></a> <ParameterDescription
-    name="policy.scale_in_criteria"
-    type="
-Array of
-Object (scale_criteria)"
-    reference="#scale-criteria"
-    value="[{'parameters': {'slope': 1}, 'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': 0.5}]"
-    description='List of scale-in criteria.' />
-
-<a id="policy-scale-out-criteria"></a> <ParameterDescription
-    name="policy.scale_out_criteria"
-    type="
-Array of
-Object (scale_criteria)"
-    reference="#scale-criteria"
-    value="[{'parameters': {'slope': -1}, 'query': {'promql': {'evaluation_interval': '10s', 'out_ports': {'output': {'signal_name': '__REQUIRED_FIELD__'}}, 'query_string': '__REQUIRED_FIELD__'}}, 'set_point': 1}]"
-    description='List of scale-out criteria.' />
+---
 
 #### dashboard {#dashboard}
 
@@ -214,6 +218,8 @@ string"
     value="''"
     description='Datasource filter regex.' />
 
+---
+
 ### Schemas
 
 #### scale_criteria {#scale-criteria}
@@ -241,3 +247,5 @@ Object (aperture.spec.v1.IncreasingGradientParameters)"
     reference="../../spec#increasing-gradient-parameters"
     value="{'slope': -1}"
     description='Parameters.' />
+
+---

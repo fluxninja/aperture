@@ -121,7 +121,7 @@
           "default": [
             {
               "parameters": {
-                "slope": 1
+                "slope": -1
               },
               "query": {
                 "promql": {
@@ -134,7 +134,7 @@
                   "query_string": "__REQUIRED_FIELD__"
                 }
               },
-              "set_point": 0.5
+              "set_point": 1
             }
           ],
           "type": "array",
