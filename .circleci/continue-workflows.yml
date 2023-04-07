@@ -982,15 +982,18 @@ jobs:
             - run:
                 name: Upload package to GCP
                 command: |
-                  gcloud config set artifacts/location us-central1
-                  for package in "deb" "rpm"
-                  do
-                    gcloud config set artifacts/repository aperture-${package}-packages
-                    case "${package}" in
-                      deb) gcloud artifacts apt upload aperture-${package}-packages --source="$(ls dist/packages/*.${package})" --project=${GOOGLE_PROJECT_ID};;
-                      rpm) gcloud artifacts yum upload aperture-${package}-packages --source="$(ls dist/packages/*.${package})" --project=${GOOGLE_PROJECT_ID};;
-                    esac
-                  done
+                  if [ "${GOOS}" != "darwin" ]
+                  then
+                    gcloud config set artifacts/location us-central1
+                    for package in "deb" "rpm"
+                    do
+                      gcloud config set artifacts/repository aperture-${package}-packages
+                      case "${package}" in
+                        deb) gcloud artifacts apt upload aperture-${package}-packages --source="$(ls dist/packages/*.${package})" --project=${GOOGLE_PROJECT_ID};;
+                        rpm) gcloud artifacts yum upload aperture-${package}-packages --source="$(ls dist/packages/*.${package})" --project=${GOOGLE_PROJECT_ID};;
+                      esac
+                    done
+                  fi
       - save_cache:
           name: Save go cache
           key: aperture-{{ .Environment.COMPONENT }}-packages-go-cache
