@@ -4,16 +4,15 @@ import com.fluxninja.aperture.sdk.ApertureSDK;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.fluxninja.aperture.sdk.TrafficFlow;
-import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
-import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
+import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpRequest> {
 
@@ -25,10 +24,10 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpRequest req) {
-        AttributeContext attributes = NettyUtils.attributesFromRequest(ctx, req);
+        CheckHTTPRequest checkRequest = NettyUtils.checkRequestFromRequest(ctx, req);
         String path = new QueryStringDecoder(req.uri()).path();
 
-        TrafficFlow flow = this.apertureSDK.startTrafficFlow(path, attributes);
+        TrafficFlow flow = this.apertureSDK.startTrafficFlow(path, checkRequest);
 
         if (flow.ignored()) {
             ctx.fireChannelRead(req);
@@ -37,9 +36,9 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
 
         if (flow.accepted()) {
             try {
-                List<HeaderValueOption> newHeaders = new ArrayList<>();
+                Map<String, String> newHeaders = new HashMap<>();
                 if (flow.checkResponse() != null) {
-                    newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
+                    newHeaders = flow.checkResponse().getOkResponse().getHeadersMap();
                 }
                 HttpRequest newRequest = NettyUtils.updateHeaders(req, newHeaders);
 
@@ -71,13 +70,10 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
             HttpResponseStatus status;
             if (flow.checkResponse() != null
                     && flow.checkResponse().hasDeniedResponse()
-                    && flow.checkResponse().getDeniedResponse().hasStatus()) {
+                    && flow.checkResponse().getDeniedResponse().getStatus() != 0) {
                 status =
                         HttpResponseStatus.valueOf(
-                                flow.checkResponse()
-                                        .getDeniedResponse()
-                                        .getStatus()
-                                        .getCodeValue());
+                                flow.checkResponse().getDeniedResponse().getStatus());
             } else {
                 status = HttpResponseStatus.FORBIDDEN;
             }

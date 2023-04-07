@@ -1,12 +1,11 @@
 package com.fluxninja.aperture.servlet.javax;
 
 import com.fluxninja.aperture.sdk.*;
-import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
-import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
+import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -23,13 +22,13 @@ public class ApertureFilter implements Filter {
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws ServletException, IOException {
-        AttributeContext attributes = ServletUtils.attributesFromRequest(req);
+        CheckHTTPRequest checkRequest = ServletUtils.checkRequestFromRequest(req);
 
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
         String path = request.getServletPath();
-        TrafficFlow flow = this.apertureSDK.startTrafficFlow(path, attributes);
+        TrafficFlow flow = this.apertureSDK.startTrafficFlow(path, checkRequest);
 
         if (flow.ignored()) {
             chain.doFilter(request, response);
@@ -38,9 +37,9 @@ public class ApertureFilter implements Filter {
 
         if (flow.accepted()) {
             try {
-                List<HeaderValueOption> newHeaders = new ArrayList<>();
+                Map<String, String> newHeaders = new HashMap<>();
                 if (flow.checkResponse() != null) {
-                    newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
+                    newHeaders = flow.checkResponse().getOkResponse().getHeadersMap();
                 }
                 ServletRequest newRequest = ServletUtils.updateHeaders(request, newHeaders);
                 chain.doFilter(newRequest, response);
