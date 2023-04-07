@@ -161,4 +161,12 @@ const (
 	K8sNamespaceName = "k8s_namespace_name"
 	// K8sNodeName - name of a node.
 	K8sNodeName = "k8s_node_name"
+	// K8sReplicasetName - name of a replicaset.
+	K8sReplicasetName = "k8s_replicaset_name"
+	// K8sDaemonsetName - name of a daemonset.
+	K8sDaemonsetName = "k8s_daemonset_name"
+	// K8sStatefulsetName - name of a statefulset.
+	K8sStatefulsetName = "k8s_statefulset_name"
+	// K8sDeploymentName - name of a deployment.
+	K8sDeploymentName = "k8s_deployment_name"
 )

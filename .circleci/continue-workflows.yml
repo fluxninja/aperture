@@ -17,7 +17,7 @@ executors:
         user: root
   python-cimg-executor:
     docker:
-      - image: cimg/python:3.10.6
+      - image: cimg/python:3.11
   base-machine-executor:
     machine:
       image: ubuntu-2204:2022.10.2

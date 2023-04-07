@@ -39,13 +39,14 @@ type FxIn struct {
 	KubernetesClient   k8s.K8sClient      `optional:"true"`
 	Trackers           notifiers.Trackers `name:"kubernetes_control_points"`
 	Election           *election.Election
+	ElectionTrackers   notifiers.Trackers `name:"etcd_election"`
 	Config             autoscalek8sconfig.AutoScaleKubernetesConfig
 	PrometheusRegistry *prometheus.Registry
 }
 
 // provideAutoScaleControlPoints provides Kubernetes AutoScaler and starts Kubernetes control point discovery if enabled.
 func provideAutoScaleControlPoints(in FxIn) (AutoScaleControlPoints, error) {
-	controlPointCache, err := newAutoScaleControlPoints(in.Trackers, in.KubernetesClient, in.PrometheusRegistry, in.Election)
+	controlPointCache, err := newAutoScaleControlPoints(in.Trackers, in.KubernetesClient, in.PrometheusRegistry, in.ElectionTrackers, in.Lifecycle)
 	if err != nil {
 		return nil, fmt.Errorf("could not create auto sclae control points: %w", err)
 	}
