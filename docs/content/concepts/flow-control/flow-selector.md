@@ -135,6 +135,59 @@ flow_selector:
       user_tier: gold
 ```
 
+### Filtering Out Liveness, Health Probes, and Metrics Endpoints
+
+Liveness and health probes are essential for checking the health of our
+application, and metrics endpoints are necessary for monitoring its performance.
+However, these endpoints do not contribute to the overall latency of the
+service, and if we include them in our latency calculations, they may cause
+requests to be rejected, leading to unnecessary pod restarts.
+
+To prevent these issues, we can filter out traffic to these endpoints by
+matching expressions. In the example below, we filter out flows with http.target
+starting with /health, /live, or /ready, and User Agent starting with
+kube-probe/1.23:
+
+```yaml
+service_selector:
+  service: checkout.myns.svc.cluster.local
+  agent_group: default
+flow_selector:
+  control_point:
+    traffic: ingress
+  label_matcher:
+    match_expressions:
+      - key: http.target
+        operator: NotIn
+        values:
+          - /health
+          - /live
+          - /ready
+          - /metrics
+      - key: http.user_agent
+        operator: NotIn
+        values:
+          - kube-probe/1.23
+```
+
+By filtering out traffic to these endpoints, we can prevent unnecessary pod
+restarts and ensure that our application is available to handle real user
+traffic.
+
+Note that you can filter out other flows by matching on different keys and
+operators, such as http.method with NotIn operator and GET value. For more
+information on how to configure the Label Matcher, see the [Label Matcher
+reference][label-matcher].
+
+:::info
+
+Keep in mind that while these endpoints may have a low latency, they should not
+be included in the overall latency of the service. Filtering them out can help
+improve the accuracy of our latency calculations and prevent requests from being
+rejected.
+
+:::
+
 ## Service Selector {#service-selector}
 
 :::info
