@@ -44,10 +44,10 @@ type SimpleService struct {
 	// if it's injected.
 	envoyPort   int
 	rabbitMQURL string
-	concurrency int
-	latency     time.Duration
-	rejectRatio float64
-	loadCPU     bool
+	concurrency int       // Maximum number of concurrent clients
+	latency     time.Duration // Simulated latency for each request
+	rejectRatio float64    // Ratio of requests to be rejected
+	loadCPU     bool       // Whether to simulate CPU load during latency sleep
 }
 
 // NewSimpleService creates a SimpleService instance.
