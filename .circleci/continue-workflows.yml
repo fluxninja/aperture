@@ -971,7 +971,7 @@ jobs:
             equal: [cli, << parameters.component >>]
           steps:
             - run:
-                name: Creating tarball file for Given OS
+                name: Create tarball file for Given OS
                 command: ./.circleci/scripts/create_tarball_file.sh
       - when:
           condition: <<parameters.upload-to-gcp>>
