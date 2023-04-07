@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"runtime"
 	"strings"
 	"time"
 
@@ -46,6 +47,7 @@ type SimpleService struct {
 	concurrency int
 	latency     time.Duration
 	rejectRatio float64
+	loadCPU     bool
 }
 
 // NewSimpleService creates a SimpleService instance.
@@ -57,6 +59,7 @@ func NewSimpleService(
 	concurrency int,
 	latency time.Duration,
 	rejectRatio float64,
+	loadCPU bool,
 ) *SimpleService {
 	return &SimpleService{
 		hostname:    hostname,
@@ -66,6 +69,7 @@ func NewSimpleService(
 		concurrency: concurrency,
 		latency:     latency,
 		rejectRatio: rejectRatio,
+		loadCPU:     loadCPU,
 	}
 }
 
@@ -77,6 +81,7 @@ func (ss SimpleService) Run() error {
 		rejectRatio:  ss.rejectRatio,
 		concurrency:  ss.concurrency,
 		limitClients: make(chan struct{}, ss.concurrency),
+		loadCPU:      ss.loadCPU,
 	}
 
 	if ss.rabbitMQURL != "" {
@@ -261,6 +266,7 @@ type RequestHandler struct {
 	concurrency  int
 	latency      time.Duration
 	rejectRatio  float64
+	loadCPU      bool
 }
 
 func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -349,8 +355,23 @@ func (h RequestHandler) processRequest(s Subrequest) (int, error) {
 		}()
 	}
 	if h.latency > 0 {
-		// Fake workload
+		done := make(chan int)
+		if h.loadCPU {
+			// Fake workload by spinning up a bunch of goroutines
+			for i := 0; i < runtime.NumCPU(); i++ {
+				go func() {
+					for {
+						select {
+						case <-done:
+							return
+						default:
+						}
+					}
+				}()
+			}
+		}
 		time.Sleep(h.latency)
+		close(done)
 	}
 	return http.StatusOK, nil
 }

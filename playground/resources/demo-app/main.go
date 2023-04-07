@@ -34,6 +34,7 @@ func main() {
 	concurrency := concurrencyFromEnv()
 	latency := latencyFromEnv()
 	rejectRatio := rejectRatioFromEnv()
+	loadCPU := loadCPUFromEnv()
 
 	// RabbitMQ related setup
 	rabbitMQURL := ""
@@ -67,7 +68,7 @@ func main() {
 		propagation.Baggage{},
 	))
 
-	service := app.NewSimpleService(hostname, port, envoyPort, rabbitMQURL, concurrency, latency, rejectRatio)
+	service := app.NewSimpleService(hostname, port, envoyPort, rabbitMQURL, concurrency, latency, rejectRatio, loadCPU)
 	err := service.Run()
 	if err != nil {
 		log.Error().Err(err).Send()
@@ -155,6 +156,18 @@ func rejectRatioFromEnv() float64 {
 		log.Panic().Err(err).Msgf("Failed converting SIMPLE_SERVICE_REJECT_RATIO: %v", err)
 	}
 	return rejectRatio
+}
+
+func loadCPUFromEnv() bool {
+	loadCPUValue, exists := os.LookupEnv("SIMPLE_SERVICE_LOAD_CPU")
+	if !exists {
+		return false
+	}
+	loadCPU, err := strconv.ParseBool(loadCPUValue)
+	if err != nil {
+		log.Panic().Err(err).Msgf("Failed converting SIMPLE_SERVICE_LOAD_CPU: %v", err)
+	}
+	return loadCPU
 }
 
 // newResource returns a resource describing this application.
