@@ -32,6 +32,8 @@ string"
     value="__REQUIRED_FIELD__"
     description='Name of the policy.' />
 
+---
+
 #### dashboard {#dashboard}
 
 <a id="dashboard-refresh-interval"></a> <ParameterDescription
@@ -75,3 +77,5 @@ string"
     reference=""
     value="''"
     description='Datasource filter regex.' />
+
+---

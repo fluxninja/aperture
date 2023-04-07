@@ -1491,7 +1491,9 @@ PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
 <dt>advertisement_addr</dt>
 <dd>
 
-(string, format: `empty | hostname_port`) Network address of aperture server to advertise to peers - this address should be reachable from other agents. Used for nat traversal when provided.
+(string, format: `empty | hostname_port`) Network address of aperture server to advertise to peers - this address
+should be reachable from other agents. Used for nat traversal when
+provided.
 
 </dd>
 </dl>

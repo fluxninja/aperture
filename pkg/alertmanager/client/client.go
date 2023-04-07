@@ -11,6 +11,7 @@ import (
 	promalert "github.com/prometheus/alertmanager/api/v2/client/alert"
 	prommodels "github.com/prometheus/alertmanager/api/v2/models"
 
+	amconfig "github.com/fluxninja/aperture/pkg/alertmanager/config"
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -19,28 +20,11 @@ import (
 
 var configKey = "alertmanagers"
 
-// AlertManagerConfig main level config for alertmanager.
-// swagger:model
-// +kubebuilder:object:generate=true
-type AlertManagerConfig struct {
-	Clients []AlertManagerClientConfig `json:"clients,omitempty"`
-}
-
-// AlertManagerClientConfig config for single alertmanager client.
-// swagger:model AlertManagerClientConfig
-// +kubebuilder:object:generate=true
-type AlertManagerClientConfig struct {
-	Name       string                      `json:"name"`
-	Address    string                      `json:"address" validate:"hostname_port|url|fqdn"`
-	BasePath   string                      `json:"base_path" default:"/"`
-	HTTPConfig commonhttp.HTTPClientConfig `json:"http_client"`
-}
-
 // ProvideNamedAlertManagerClients provides a list of alertmanager clients from configuration.
 func ProvideNamedAlertManagerClients(unmarshaller config.Unmarshaller) []AlertManagerClient {
 	clientSlice := []AlertManagerClient{}
 
-	var config AlertManagerConfig
+	var config amconfig.AlertManagerConfig
 	if err := unmarshaller.UnmarshalKey(configKey, &config); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize alert managers configuration!")
 		return clientSlice

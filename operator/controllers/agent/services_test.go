@@ -30,7 +30,7 @@ import (
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
 	. "github.com/fluxninja/aperture/operator/controllers"
-	"github.com/fluxninja/aperture/pkg/distcache"
+	distcacheconfig "github.com/fluxninja/aperture/pkg/distcache/config"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 )
 
@@ -51,7 +51,7 @@ var _ = Describe("Service for Agent", func() {
 								},
 							},
 						},
-						DistCache: distcache.DistCacheConfig{
+						DistCache: distcacheconfig.DistCacheConfig{
 							BindAddr:           ":3320",
 							MemberlistBindAddr: ":3322",
 						},
@@ -142,7 +142,7 @@ var _ = Describe("Service for Agent", func() {
 								},
 							},
 						},
-						DistCache: distcache.DistCacheConfig{
+						DistCache: distcacheconfig.DistCacheConfig{
 							BindAddr:           ":3320",
 							MemberlistBindAddr: ":3322",
 						},

@@ -1,0 +1,4 @@
+blueprint: RabbitMQ Queue Buildup Policy
+sources:
+  dashboard: policies/rabbitmq-queue-buildup/dashboard.libsonnet
+  policy: policies/rabbitmq-queue-buildup/policy.libsonnet

@@ -55,6 +55,8 @@ string"
     value="__REQUIRED_FIELD__"
     description='Name of the policy.' />
 
+---
+
 #### policy {#policy}
 
 <a id="policy-flux-meter"></a> <ParameterDescription
@@ -171,6 +173,8 @@ Object (aperture.spec.v1.LoadActuatorDynamicConfig)"
     value="{'dry_run': False}"
     description='Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.' />
 
+---
+
 #### dashboard {#dashboard}
 
 <a id="dashboard-refresh-interval"></a> <ParameterDescription
@@ -215,6 +219,8 @@ string"
     value="''"
     description='Datasource filter regex.' />
 
+---
+
 ## Dynamic Configuration
 
 :::note
@@ -234,3 +240,5 @@ Object (aperture.spec.v1.LoadActuatorDynamicConfig)"
     reference="../../spec#load-actuator-dynamic-config"
     value="__REQUIRED_FIELD__"
     description='Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.' />
+
+---

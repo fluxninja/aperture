@@ -569,7 +569,7 @@
         },
         "gradient_controller": {
           "$ref": "#/definitions/GradientController",
-          "description": "Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.\nThis controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.",
+          "description": "Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.\nThis controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.",
           "x-order": 10
         },
         "holder": {

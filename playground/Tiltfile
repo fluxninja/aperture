@@ -40,6 +40,7 @@ APERTURE_JS_EXAMPLE_NS = "aperture-js-example"
 APERTURE_JAVA_EXAMPLE_NS = "aperture-java-example"
 APERTURE_PYTHON_EXAMPLE_NS = "aperture-python-example"
 APERTURE_DEMOAPP_NS = "demoapp"
+APERTURE_RABBITMQ_NS = "rabbitmq"
 APERTURE_ISTIO_NS = "istio-system"
 DEFAULT_TEST_SCENARIO = "scenarios/rate_limiting_escalation"
 TANKA = "tk"
@@ -252,6 +253,28 @@ DEP_TREE = {
                 }
             ]
         }
+    },
+    APERTURE_RABBITMQ_NS: {
+        "rabbitmq": {
+            "labels": ["TestScenarioApplication"],
+            "needs": [],
+            "tkenv": TANKA_ROOT + "/apps/rabbitmq",
+            "port_forwards": {
+                "rabbitmq": "15672:15672",
+            },
+            "child_resources": [
+                {
+                    "workload": "rabbitmq",
+                    "resource_deps": ["cluster-bootstrap"],
+                    "extra_objects": [
+                        ("^rabbitmq", None),
+                    ],
+                    "ignored_objects": [
+                        ("^rabbitmq", "Service|StatefulSet")
+                    ]
+                }
+            ]
+        },
     },
     APERTURE_ISTIO_NS: {
         "istio": {
@@ -505,6 +528,7 @@ def render_tanka(environment, env_vars, base_dir, namespace, enable_cloud_extens
             TANKA,
             "--ext-str=projectRoot=" + base_dir,
             "--ext-str=ENABLE_CLOUD_EXTENSION=" + enable_cloud_extension,
+            "--ext-str=ENABLE_DEMO_APP_RABBITMQ=" + env_vars.get("ENABLE_DEMO_APP_RABBITMQ", "false"),
             "--ext-str=ENABLE_DEMO_APP_NGINX=" + env_vars.get("ENABLE_DEMO_APP_NGINX", "false"),
             "--ext-str=ENABLE_DEMO_APP_KONG=" + env_vars.get("ENABLE_DEMO_APP_KONG", "false"),
             "show",
