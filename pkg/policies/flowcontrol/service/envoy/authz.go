@@ -179,7 +179,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	existingHeaders := baggage.Headers(req.GetAttributes().GetRequest().GetHttp().GetHeaders())
 	baggageFlowLabels := h.propagator.Extract(existingHeaders)
 
-	// Merge flow labels from Authz request and baggage headers
+It is a good practice to use consistent naming for boolean variables. Consider renaming `sourceMapOK` and `destinationMapOK` to `okSourceMap` and `okDestinationMap` respectively, to match the naming convention used in other parts of the code.
 	mergedFlowLabels := requestFlowLabels
 	// Baggage can overwrite request flow labels
 	flowlabel.Merge(mergedFlowLabels, baggageFlowLabels)
