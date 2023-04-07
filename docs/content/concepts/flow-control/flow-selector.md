@@ -181,10 +181,10 @@ reference][label-matcher].
 
 :::info
 
-Keep in mind that while these endpoints may have a low latency, they
-should not be included in the overall latency of the service. Filtering them out
-can help improve the accuracy of our latency calculations and prevent requests
-from being rejected.
+Keep in mind that while these endpoints may have a low latency, they should not
+be included in the overall latency of the service. Filtering them out can help
+improve the accuracy of our latency calculations and prevent requests from being
+rejected.
 
 :::
 
