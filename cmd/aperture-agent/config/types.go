@@ -97,6 +97,7 @@ type BatchPostrollupConfig struct {
 }
 
 // CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller prometheus.
+// Environment variables can be used in the configuration using format `${ENV_VAR_NAME}`.
 // +kubebuilder:object:generate=true
 //
 // :::info
