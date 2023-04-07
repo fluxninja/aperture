@@ -32,7 +32,6 @@ class ExitException(RuntimeError):
 
 
 ANNOTATION_RE = re.compile(r".*@param.*|.*@schema.*")
-# matching either @param or @schema is mandatory
 ANNOTATION_DETAILED_RE = re.compile(
     r".*(?P<annotation_type>@schema|@param) \((?P<param_name>[\w.\[\]]+): (?P<param_type>[\w.\[\]/:-]+) ?(?P<param_required>\w+)?\) ?(?P<param_description>.+)?"
 )
@@ -77,26 +76,37 @@ class Parameters:
 
         if param.startswith("aperture.spec"):
             component = param.split(".")[-1]
-
             component_slug = camel_to_kebab_case(component)
             docs_link = f"{policies_relative_path}/spec#{component_slug}"
             json_schema_link = f"{blueprints_root_relative_path}/gen/jsonschema/_definitions.json#/definitions/{component}"
             return (docs_link, json_schema_link, True)
-        elif param.count(":") == 1:
-            # if param starts with [] then it is an array of objects, remove the []
-            if param.startswith("[]"):
-                param = param[2:]
-            # parameter is of the form <blueprint>:<param>
-            blueprint, param = param.split(":")
+        elif param.count(":") > 0:
+            if param.count(":") != 2:
+                logger.error(
+                    f"Unable to parse @param: `{param}`. Expecting format <blueprint>:<annotation_type>:<param>"
+                )
+                raise typer.Exit(1)
+            # parameter is of the form <blueprint>:<annotation_type>:<param>
+            blueprint, annotation_type, param = param.split(":")
             docs_link = f"{policies_relative_path}/bundled-blueprints/{blueprint}#{slugify(param)}"
-            # look for path under properties in json schema after splitting by . and walking down the tree
             parts = param.split(".")
             json_schema_link = (
                 f"{blueprints_root_relative_path}/{blueprint}/gen/definitions.json#"
             )
-            for part in parts:
+            if annotation_type == "@param":
+                json_schema_link += f"/properties/{parts[0]}"
+            elif annotation_type == "@schema":
+                json_schema_link += f"/$defs/{parts[0]}"
+            else:
+                logger.error(
+                    f"Unable to parse @param: `{param}`. Expecting format <blueprint>:<annotation_type>:<param>. <annotation_type> must be either @param or @schema."
+                )
+                raise typer.Exit(1)
+
+            for part in parts[1:]:
                 json_schema_link += f"/properties/{part}"
             return (docs_link, json_schema_link, True)
+
         # check if it's not a base type bool, float32, float64, int32, int64, string
         elif param not in [
             "bool",
@@ -106,9 +116,7 @@ class Parameters:
             "int64",
             "string",
         ]:
-            # local parameter
-            if param.startswith("[]"):
-                param = param[2:]
+            # local schema
             docs_link = f"#{slugify(param)}"
             parts = param.split(".")
             json_schema_link = f"#/$defs/{parts[0]}"
@@ -314,7 +322,10 @@ Integer (int64)
 {%- if node.parameter.param_type == 'intermediate_node' %}
 {{ heading_level }} {{ parent_prefix if annotation_type == '@param' }}{{ node.parameter.param_name }} {#{{ anchor }}}
 
-{%- for child_name, child_node in node.children.items() %}
+{%- for child_name, child_node in node.children.items() if child_node.parameter.param_type != 'intermediate_node' %}
+{{ render_node(child_node, level + 1, annotation_type, parent_prefix + node.parameter.param_name + '.') }}
+{%- endfor %}
+{%- for child_name, child_node in node.children.items() if child_node.parameter.param_type == 'intermediate_node' %}
 {{ render_node(child_node, level + 1, annotation_type, parent_prefix + node.parameter.param_name + '.') }}
 {%- endfor %}
 {%- else %}
@@ -333,6 +344,9 @@ Integer (int64)
 {%- for child_name, child_node in nested_parameters.children.items() %}
 {%- if child_node.parameter.annotation_type == '@param' %}
 {{ render_node(child_node, 3, '@param') }}
+
+---
+
 {%- endif %}
 {%- endfor %}
 {%- set ns = namespace(has_schema=False) %}
@@ -348,6 +362,9 @@ Integer (int64)
 {%- for child_name, child_node in nested_parameters.children.items() %}
 {%- if child_node.parameter.annotation_type == '@schema' %}
 {{ render_node(child_node, 3, '@schema') }}
+
+---
+
 {%- endif %}
 {%- endfor %}
 {%- endif %}

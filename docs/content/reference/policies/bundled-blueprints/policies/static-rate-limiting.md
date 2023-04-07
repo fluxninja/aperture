@@ -32,6 +32,8 @@ string"
     value="__REQUIRED_FIELD__"
     description='Name of the policy.' />
 
+---
+
 #### policy {#policy}
 
 <a id="policy-classifiers"></a> <ParameterDescription
@@ -77,6 +79,8 @@ Object (aperture.spec.v1.RateLimiterDynamicConfig)"
     value="{'overrides': []}"
     description='Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.' />
 
+---
+
 #### dashboard {#dashboard}
 
 <a id="dashboard-refresh-interval"></a> <ParameterDescription
@@ -105,6 +109,8 @@ string"
     value="''"
     description='Datasource filter regex.' />
 
+---
+
 ## Dynamic Configuration
 
 :::note
@@ -124,3 +130,5 @@ Object (aperture.spec.v1.RateLimiterDynamicConfig)"
     reference="../../spec#rate-limiter-dynamic-config"
     value="__REQUIRED_FIELD__"
     description='Rate limiter dynamic configuration that is updated at runtime.' />
+
+---
