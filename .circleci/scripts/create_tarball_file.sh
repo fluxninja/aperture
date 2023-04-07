@@ -5,8 +5,7 @@ mkdir buildtardir
 cp LICENSE ./buildtardir
 cp ./dist/aperturectl ./buildtardir
 cd "./buildtardir"
-version_without_v_prefix=${APERTURECTL_BUILD_VERSION}
-version_without_v_prefix=${version_without_v_prefix#v}
+version_without_v_prefix=${APERTURECTL_BUILD_VERSION#v}
 touch aperturectl-"${version_without_v_prefix}"-"${GOOS}"-"${GOARCH}".tar.gz
 tar --exclude=aperturectl-"${version_without_v_prefix}"-"${GOOS}"-"${GOARCH}".tar.gz -czvf aperturectl-"${version_without_v_prefix}"-"${GOOS}"-"${GOARCH}".tar.gz .
 cp -r -- *.tar.gz "$HOME"/project/dist/packages/
