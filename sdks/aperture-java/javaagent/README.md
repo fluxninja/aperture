@@ -49,14 +49,16 @@ following command:
 Aperture Java Instrumentation Agent can be configured using a properties file,
 system properties or environment variables:
 
-| Property name                          | Environment variable name              | Default value | Description                                                                |
-| :------------------------------------- | :------------------------------------- | :------------ | :------------------------------------------------------------------------- |
-| aperture.javaagent.config.file         | APERTURE_JAVAAGENT_CONFIG_FILE         |               | Path to a file containing configuration properties                         |
-| aperture.agent.hostname                | APERTURE_AGENT_HOSTNAME                | localhost     | Hostname of Aperture Agent to connect to                                   |
-| aperture.agent.port                    | APERTURE_AGENT_PORT                    | 8089          | Port of Aperture Agent to connect to                                       |
-| aperture.connection.timeout.millis     | APERTURE_CONNECTION_TIMEOUT_MILLIS     | 1000          | Aperture Agent connection timeout in milliseconds                          |
-| aperture.javaagent.blocked.paths       | APERTURE_JAVAAGENT_BLOCKED_PATHS       |               | Comma-separated list of paths that should not start a flow                 |
-| aperture.javaagent.blocked.paths.regex | APERTURE_JAVAAGENT_BLOCKED_PATHS_REGEX |               | Whether the configured blocked paths should be read as regular expressions |
+| Property name                          | Environment variable name              | Default value | Description                                                                                         |
+| :------------------------------------- | :------------------------------------- | :------------ | :-------------------------------------------------------------------------------------------------- |
+| aperture.javaagent.config.file         | APERTURE_JAVAAGENT_CONFIG_FILE         |               | Path to a file containing configuration properties                                                  |
+| aperture.agent.hostname                | APERTURE_AGENT_HOSTNAME                | localhost     | Hostname of Aperture Agent to connect to                                                            |
+| aperture.agent.port                    | APERTURE_AGENT_PORT                    | 8089          | Port of Aperture Agent to connect to                                                                |
+| aperture.javaagent.insecure.grpc       | APERTURE_JAVAAGENT_INSECURE_GRPC       | true          | Whether GRPC connection to Aperture Agent should be over plaintext                                  |
+| aperture.javaagent.root.certificate    | APERTURE_JAVAAGENT_ROOT_CERTIFICATE    |               | Path to a file containing root certificate to be used <br /> (insecure connection must be disabled) |
+| aperture.connection.timeout.millis     | APERTURE_CONNECTION_TIMEOUT_MILLIS     | 1000          | Aperture Agent connection timeout in milliseconds                                                   |
+| aperture.javaagent.blocked.paths       | APERTURE_JAVAAGENT_BLOCKED_PATHS       |               | Comma-separated list of paths that should not start a flow                                          |
+| aperture.javaagent.blocked.paths.regex | APERTURE_JAVAAGENT_BLOCKED_PATHS_REGEX |               | Whether the configured blocked paths should be read as regular expressions                          |
 
 The priority order is `system.property` > `ENV_VARIABLE` > `properties file`.
 

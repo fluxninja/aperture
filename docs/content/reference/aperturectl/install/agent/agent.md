@@ -12,8 +12,9 @@ Install Aperture Agent
 
 ### Synopsis
 
-Use this command to install Aperture Agent on your Kubernetes cluster.
-Refer https://artifacthub.io/packages/helm/aperture/aperture-agent#parameters for list of configurable parameters for preparing values file.
+Use this command to install Aperture Agent on your Kubernetes cluster. Refer
+https://artifacthub.io/packages/helm/aperture/aperture-agent#parameters for list
+of configurable parameters for preparing values file.
 
 ```
 aperturectl install agent [flags]
@@ -44,4 +45,5 @@ aperturectl install agent --values-file=values.yaml --namespace=aperture
 
 ### SEE ALSO
 
-- [aperturectl install](/reference/aperturectl/install/install.md) - Install Aperture components
+- [aperturectl install](/reference/aperturectl/install/install.md) - Install
+  Aperture components

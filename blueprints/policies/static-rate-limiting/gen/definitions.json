@@ -17,7 +17,6 @@
         }
       }
     },
-
     "policy": {
       "type": "object",
       "additionalProperties": false,
@@ -32,7 +31,6 @@
             "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Classifier"
           }
         },
-
         "rate_limiter": {
           "type": "object",
           "additionalProperties": false,
@@ -44,17 +42,19 @@
               "type": "number",
               "format": "double"
             },
-
             "flow_selector": {
               "description": "A flow selector to match requests against",
               "default": {
-                "flow_matcher": { "control_point": "__REQUIRED_FIELD__" },
-                "service_selector": { "service": "__REQUIRED_FIELD__" }
+                "flow_matcher": {
+                  "control_point": "__REQUIRED_FIELD__"
+                },
+                "service_selector": {
+                  "service": "__REQUIRED_FIELD__"
+                }
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
             },
-
             "parameters": {
               "description": "Parameters.",
               "default": {
@@ -64,10 +64,11 @@
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
             },
-
             "default_config": {
               "description": "Default configuration for rate limiter that can be updated at the runtime without shutting down the policy.",
-              "default": { "overrides": [] },
+              "default": {
+                "overrides": []
+              },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterDynamicConfig"
             }
@@ -75,7 +76,6 @@
         }
       }
     },
-
     "dashboard": {
       "type": "object",
       "additionalProperties": false,
@@ -85,7 +85,6 @@
           "default": "10s",
           "type": "string"
         },
-
         "datasource": {
           "type": "object",
           "additionalProperties": false,
@@ -95,7 +94,6 @@
               "default": "$datasource",
               "type": "string"
             },
-
             "filter_regex": {
               "description": "Datasource filter regex.",
               "default": "",
@@ -105,5 +103,6 @@
         }
       }
     }
-  }
+  },
+  "$defs": null
 }

@@ -168,6 +168,7 @@ operator-generate: ## Generate code containing DeepCopy, DeepCopyInto, and DeepC
 	$(CONTROLLER_GEN) object:headerFile="operator/hack/boilerplate.go.txt" paths="./cmd/..."
 	$(CONTROLLER_GEN) object:headerFile="operator/hack/boilerplate.go.txt" paths="./pkg/..."
 	$(CONTROLLER_GEN) object:headerFile="operator/hack/boilerplate.go.txt" paths="./operator/..."
+	$(CONTROLLER_GEN) object:headerFile="operator/hack/boilerplate.go.txt" paths="./extensions/..."
 
 .PHONY: operator-fmt
 operator-fmt: ## Run go fmt against code.

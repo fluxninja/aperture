@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 FIND="find"
-AWK="awk"
+# use gawk on linux and mac
+AWK="gawk"
 if [[ "$OSTYPE" == "darwin"* ]]; then
 	FIND="gfind"
-	AWK="gawk"
 fi
 
 # for all yml or yaml files in .circleci directory, increment asdf cache version which looks like aperture-asdf-cache-v<version>-*. it should look like aperture-asdf-cache-v<version+1>-*

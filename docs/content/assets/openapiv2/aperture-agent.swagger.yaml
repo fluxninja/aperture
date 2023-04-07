@@ -606,6 +606,8 @@ definitions:
         type: string
       service:
         type: string
+      type:
+        type: string
   FlowControlPoints:
     type: object
     properties:
@@ -681,7 +683,7 @@ definitions:
     type: object
     title: |-
       Allows to define rules whether a map of
-      [labels](/concepts/integrations/flow-control/flow-label.md)
+      [labels](/concepts/flow-control/flow-label.md)
       should be considered a match or not
     properties:
       expression:

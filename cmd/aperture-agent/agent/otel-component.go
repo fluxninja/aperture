@@ -42,6 +42,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/pkg/otelcollector/alertsreceiver"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
+	"github.com/fluxninja/aperture/pkg/otelcollector/leaderonlyreceiver"
 	"github.com/fluxninja/aperture/pkg/otelcollector/metricsprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/rollupprocessor"
 	"github.com/fluxninja/aperture/pkg/otelcollector/tracestologsprocessor"
@@ -56,6 +57,7 @@ func ModuleForAgentOTEL() fx.Option {
 		k8sattributesprocessor.Module(),
 		prometheusreceiver.Module(),
 		filelogreceiver.Module(),
+		leaderonlyreceiver.Module(),
 		batchprocessor.Module(),
 		memorylimiterprocessor.Module(),
 		attributesprocessor.Module(),
@@ -63,7 +65,7 @@ func ModuleForAgentOTEL() fx.Option {
 		resourceprocessor.Module(),
 		filterprocessor.Module(),
 		fx.Provide(
-			cache.Provide[selectors.ControlPointID],
+			cache.Provide[selectors.TypedControlPointID],
 			fx.Annotate(
 				provideAgent,
 				fx.ResultTags(otelconfig.BaseFxTag),
@@ -89,7 +91,7 @@ func AgentOTELComponents(
 	engine iface.Engine,
 	clasEng iface.ClassificationEngine,
 	serverGRPC *grpc.Server,
-	controlPointCache *cache.Cache[selectors.ControlPointID],
+	controlPointCache *cache.Cache[selectors.TypedControlPointID],
 	alertMgr *alertmanager.AlertManager,
 ) (otelcol.Factories, error) {
 	var errs error

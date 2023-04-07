@@ -26,7 +26,7 @@ import (
 var _ = Describe("Metrics Processor", func() {
 	var (
 		pr                *prometheus.Registry
-		cpCache           *cache.Cache[selectors.ControlPointID]
+		cpCache           *cache.Cache[selectors.TypedControlPointID]
 		cfg               *Config
 		processor         *metricsProcessor
 		engine            *mocks.MockEngine
@@ -49,7 +49,7 @@ var _ = Describe("Metrics Processor", func() {
 
 	BeforeEach(func() {
 		pr = prometheus.NewRegistry()
-		cpCache = cache.NewCache[selectors.ControlPointID]()
+		cpCache = cache.NewCache[selectors.TypedControlPointID]()
 		ctrl := gomock.NewController(GinkgoT())
 		engine = mocks.NewMockEngine(ctrl)
 		clasEngine = mocks.NewMockClassificationEngine(ctrl)
@@ -179,7 +179,7 @@ var _ = Describe("Metrics Processor", func() {
 
 		cp := cpCache.GetAll()
 		for _, service := range baseCheckResp.GetServices() {
-			Expect(cp).To(ContainElement(selectors.NewControlPointID(service, baseCheckResp.GetControlPoint())))
+			Expect(cp).To(ContainElement(selectors.NewTypedControlPointID(service, baseCheckResp.GetControlPoint(), "")))
 		}
 	})
 

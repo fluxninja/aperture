@@ -22,7 +22,7 @@ definitions:
                 x-go-tag-validate: gte=0,lte=1
         title: AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)*factor.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
     AgentInfoConfig:
         properties:
             agent_group:
@@ -30,7 +30,7 @@ definitions:
                 description: |-
                     All agents within an agent_group receive the same data-plane configuration (e.g. Flux Meters, Rate Limiters etc).
 
-                    [Read more about agent groups here](/concepts/integrations/flow-control/flow-selector.md#agent-group).
+                    [Read more about agent groups here](/concepts/flow-control/flow-selector.md#agent-group).
                 type: string
                 x-go-name: AgentGroup
                 x-go-tag-default: default
@@ -57,11 +57,6 @@ definitions:
             			timeout: 1s
             		custom_metrics:
             			rabbitmq:
-            				pipeline:
-            					processors:
-            						- batch
-            					receivers:
-            						- rabbitmq
             				processors:
             					batch:
             						send_batch_size: 10
@@ -72,6 +67,7 @@ definitions:
             						endpoint: http://<rabbitmq-svc-fqdn>:15672
             						password: secretpassword
             						username: admin
+            				per_agent_group: true
         properties:
             batch_alerts:
                 $ref: '#/definitions/BatchAlertsConfig'
@@ -124,7 +120,7 @@ definitions:
                 x-go-tag-json: name
         title: AlertManagerClientConfig config for single alertmanager client.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/alertmanager/client
+        x-go-package: github.com/fluxninja/aperture/pkg/alertmanager/config
     AlertManagerConfig:
         properties:
             clients:
@@ -135,7 +131,7 @@ definitions:
                 x-go-tag-json: clients,omitempty
         title: AlertManagerConfig main level config for alertmanager.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/alertmanager/client
+        x-go-package: github.com/fluxninja/aperture/pkg/alertmanager/config
     AlerterConfig:
         properties:
             channel_size:
@@ -326,7 +322,7 @@ definitions:
                 x-go-tag-json: grpc
         title: ClientConfig is configuration for network clients used by agent-functions.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions
+        x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions/config
     ClientTLSConfig:
         properties:
             ca_file:
@@ -388,15 +384,27 @@ definitions:
                 x-go-tag-validate: omitempty,dive,omitempty
         title: Config is configuration for agent functions.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions
+        x-go-package: github.com/fluxninja/aperture/pkg/agentfunctions/config
     CustomMetricsConfig:
+        description: |-
+            :::info
+            See also [Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
+            :::
         properties:
+            per_agent_group:
+                description: |-
+                    PerAgentGroup marks the pipeline to be instantiated only once per agent
+                    group. This is helpful for receivers that scrape eg. some cluster-wide
+                    metrics. When not set, pipeline will be instatiated on every Agent.
+                type: boolean
+                x-go-name: PerAgentGroup
+                x-go-tag-json: per_agent_group
             pipeline:
                 $ref: '#/definitions/CustomMetricsPipelineConfig'
                 x-go-tag-json: pipeline
             processors:
                 $ref: '#/definitions/Components'
-                x-go-tag-json: processors
+                x-go-tag-json: processors,omitempty
             receivers:
                 $ref: '#/definitions/Components'
                 x-go-tag-json: receivers
@@ -410,13 +418,13 @@ definitions:
                     type: string
                 type: array
                 x-go-name: Processors
-                x-go-tag-json: processors
+                x-go-tag-json: processors,omitempty
             receivers:
                 items:
                     type: string
                 type: array
                 x-go-name: Receivers
-                x-go-tag-json: receivers
+                x-go-tag-json: receivers,omitempty
         title: CustomMetricsPipelineConfig defines a custom metrics pipeline.
         type: object
         x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
@@ -460,7 +468,7 @@ definitions:
                 x-go-tag-json: replica_count
         title: DistCacheConfig configures distributed cache that holds per-label counters in distributed rate limiters.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/distcache
+        x-go-package: github.com/fluxninja/aperture/pkg/distcache/config
     Duration:
         description: It holds *durationpb.Duration which is generated type for google/protobuf/duration.proto.
         title: Duration is encoded as a string message which represents a signed span of time.
@@ -554,7 +562,7 @@ definitions:
             - endpoints
         title: EtcdConfig holds configuration for etcd client.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/etcd/client
+        x-go-package: github.com/fluxninja/aperture/pkg/etcd
     FlowPreviewConfig:
         properties:
             enabled:
@@ -566,7 +574,7 @@ definitions:
                 x-go-tag-json: enabled
         title: FlowPreviewConfig is the configuration for the flow control preview service.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview
+        x-go-package: github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview/config
     GRPCClientConfig:
         properties:
             backoff:
@@ -934,7 +942,7 @@ definitions:
                 x-go-tag-json: watermarks_policy
         title: HeapConfig holds configuration for heap Watchdog.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
     HeapLimit:
         properties:
             limit:
@@ -961,7 +969,7 @@ definitions:
                 x-go-tag-validate: gt=0,lte=100
         title: HeapLimit holds configuration for Watchdog heap limit.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
     JobConfig:
         description: JobConfig is config for Job
         properties:
@@ -1029,7 +1037,7 @@ definitions:
                 x-go-tag-json: enabled
         title: KubernetesDiscoveryConfig for Kubernetes service discovery.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/discovery/kubernetes
+        x-go-package: github.com/fluxninja/aperture/pkg/discovery/kubernetes/config
     ListenerConfig:
         properties:
             addr:
@@ -1227,7 +1235,10 @@ definitions:
     PeerDiscoveryConfig:
         properties:
             advertisement_addr:
-                description: Network address of aperture server to advertise to peers - this address should be reachable from other agents. Used for nat traversal when provided.
+                description: |-
+                    Network address of aperture server to advertise to peers - this address
+                    should be reachable from other agents. Used for nat traversal when
+                    provided.
                 pattern: (^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)
                 type: string
                 x-go-name: AdvertisementAddr
@@ -1236,7 +1247,7 @@ definitions:
                 x-pattern-rules: empty | hostname_port
         title: PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/peers
+        x-go-package: github.com/fluxninja/aperture/pkg/peers/config
     PolicyCommon:
         properties:
             enabled:
@@ -1248,7 +1259,7 @@ definitions:
                 x-go-tag-json: enabled
         title: PolicyCommon holds common configuration for Watchdog policies.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
     PortsConfig:
         properties:
             debug_port:
@@ -1448,7 +1459,7 @@ definitions:
                 x-go-tag-json: system
         title: WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
     WatchdogPolicyType:
         properties:
             adaptive_policy:
@@ -1459,7 +1470,7 @@ definitions:
                 x-go-tag-json: watermarks_policy
         title: WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
     WatermarksPolicy:
         properties:
             enabled:
@@ -1489,7 +1500,7 @@ definitions:
                 x-go-tag-validate: omitempty,dive,gte=0,lte=1
         title: WatermarksPolicy creates a Watchdog policy that schedules GC at concrete watermarks.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/watchdog
+        x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
 info:
     description: Aperture Agent
     title: Agent

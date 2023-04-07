@@ -18,24 +18,24 @@ SDK</a> can be used to manually set feature Control Points within a Go service.
 To do so, first create an instance of ApertureClient:
 
 ```go
-	agentHost := "localhost"
-	agentPort := "8089"
+agentHost := "localhost"
+agentPort := "8089"
 
-	apertureAgentGRPCClient, err := grpcClient(ctx, net.JoinHostPort(agentHost, agentPort))
-	if err != nil {
-		log.Fatalf("failed to create flow control client: %v", err)
-	}
+apertureAgentGRPCClient, err := grpcClient(ctx, net.JoinHostPort(agentHost, agentPort))
+if err != nil {
+  log.Fatalf("failed to create flow control client: %v", err)
+}
 
-	opts := aperture.Options{
-		ApertureAgentGRPCClientConn: apertureAgentGRPCClient,
-		CheckTimeout:                200 * time.Millisecond,
-	}
+opts := aperture.Options{
+  ApertureAgentGRPCClientConn: apertureAgentGRPCClient,
+  CheckTimeout:                200 * time.Millisecond,
+}
 
-	// initialize Aperture Client with the provided options.
-	apertureClient, err := aperture.NewClient(ctx, opts)
-	if err != nil {
-		log.Fatalf("failed to create client: %v", err)
-	}
+// initialize Aperture Client with the provided options.
+apertureClient, err := aperture.NewClient(ctx, opts)
+if err != nil {
+  log.Fatalf("failed to create client: %v", err)
+}
 ```
 
 The created instance can then be used to start a flow:

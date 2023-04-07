@@ -27,7 +27,7 @@ func init() {
 	generateCmd.Flags().BoolVar(&noYAMLModeline, "no-yaml-modeline", false, "Do not add YAML language server modeline to generated YAML files")
 	generateCmd.Flags().BoolVar(&noValidate, "no-validation", false, "Do not validate values.yaml file")
 	generateCmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing output directory")
-	generateCmd.Flags().IntVar(&graphDepth, "graph-depth", 0, "Max depth of the graph when generating DOT and Mermaid files")
+	generateCmd.Flags().IntVar(&graphDepth, "graph-depth", 1, "Max depth of the graph when generating DOT and Mermaid files")
 }
 
 var generateCmd = &cobra.Command{
@@ -91,9 +91,9 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 
 			// validate values.yaml against the json schema
 			schemaFile := filepath.Join(blueprintsDir, blueprintName, "gen/definitions.json")
-			definitionsFile := filepath.Join(blueprintsDir, "gen/jsonschema/_definitions.json")
-			err = utils.ValidateWithJSONSchema(schemaFile, []string{definitionsFile}, valuesFile)
+			err = utils.ValidateWithJSONSchema(schemaFile, []string{}, valuesFile)
 			if err != nil {
+				log.Error().Msgf("Error validating values file: %s", err)
 				return err
 			}
 		}

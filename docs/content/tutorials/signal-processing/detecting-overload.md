@@ -27,8 +27,7 @@ service and trigger load-shedding at a downstream service.
 
 One of the most reliable metrics to detect overload state is latency of the
 service requests. In Aperture, latency of service requests can be easily
-reported using a
-[Flux Meter](/concepts/integrations/flow-control/resources/flux-meter.md).
+reported using a [Flux Meter](/concepts/flow-control/resources/flux-meter.md).
 
 :::tip
 
@@ -36,8 +35,8 @@ It is recommended to apply the Flux Meter to a single type of workload in order
 to avoid mixing the latency measurements across distinct workloads. For example,
 if there are Select and Insert API calls on the same service, it is recommended
 to measure the latency of only one of those workloads using a Flux Meter. Refer
-[FlowSelector](/concepts/integrations/flow-control/flow-selector.md#flowselector)
-on how to apply the Flux Meter to a subset of API calls for a service.
+[FlowSelector](/concepts/flow-control/flow-selector.md#flowselector) on how to
+apply the Flux Meter to a subset of API calls for a service.
 
 :::
 
@@ -116,7 +115,7 @@ tolerance factor (`LATENCY_EMA` \* `1.1`).
 
 ![IS_OVERLOAD_SWITCH](./assets/detecting-overload/is_overload_switch.png)
 `IS_OVERLOAD_SWITCH` is a signal that decides whether the overload is currently
-happening or not based on comparing `LATENCY` with `LATENCY_SETPOINT`. It's
-value is `0` when there is no overload and `1` during overloads.
+happening or not based on comparing `LATENCY` with `LATENCY_SETPOINT`. Its value
+is `0` when there is no overload and `1` during overloads.
 
 </Zoom>

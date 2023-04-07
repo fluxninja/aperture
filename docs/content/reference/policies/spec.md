@@ -1,6 +1,6 @@
 ---
 title: Policy Language Specification
-sidebar_position: 1
+sidebar_position: 2
 sidebar_label: Specification
 ---
 
@@ -397,6 +397,12 @@ AutoScale components are used to scale a service.
 ([AutoScaler](#auto-scaler)) _AutoScaler_ provides auto-scaling functionality for any scalable resource.
 
 </dd>
+<dt>pod_auto_scaler</dt>
+<dd>
+
+([PodAutoScaler](#pod-auto-scaler)) _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource.
+
+</dd>
 <dt>pod_scaler</dt>
 <dd>
 
@@ -459,7 +465,7 @@ scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>scale_in_controllers</dt>
 <dd>
 
-([[]AutoScalerScaleInController](#auto-scaler-scale-in-controller)) List of _Controllers_ for scaling in.
+([[]ScaleInController](#scale-in-controller)) List of _Controllers_ for scaling in.
 
 </dd>
 <dt>scale_in_cooldown</dt>
@@ -477,7 +483,7 @@ scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>scale_out_controllers</dt>
 <dd>
 
-([[]AutoScalerScaleOutController](#auto-scaler-scale-out-controller)) List of _Controllers_ for scaling out.
+([[]ScaleOutController](#scale-out-controller)) List of _Controllers_ for scaling out.
 
 </dd>
 <dt>scale_out_cooldown</dt>
@@ -490,167 +496,6 @@ scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dd>
 
 ([AutoScalerScaler](#auto-scaler-scaler))
-
-</dd>
-</dl>
-
----
-
-### AutoScalerDecreasingGradient {#auto-scaler-decreasing-gradient}
-
-Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-([AutoScalerDecreasingGradientIns](#auto-scaler-decreasing-gradient-ins)) Input ports for the Gradient.
-
-</dd>
-<dt>parameters</dt>
-<dd>
-
-([AutoScalerDecreasingGradientParameters](#auto-scaler-decreasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
-
-- slope = 1
-- min_gradient = -Inf (must be less than 1)
-- max_gradient = 1 (cannot be changed)
-
-</dd>
-</dl>
-
----
-
-### AutoScalerDecreasingGradientIns {#auto-scaler-decreasing-gradient-ins}
-
-Inputs for Gradient.
-
-<dl>
-<dt>setpoint</dt>
-<dd>
-
-([InPort](#in-port)) The setpoint to use for scale-in.
-
-</dd>
-<dt>signal</dt>
-<dd>
-
-([InPort](#in-port)) The signal to use for scale-in.
-
-</dd>
-</dl>
-
----
-
-### AutoScalerDecreasingGradientParameters {#auto-scaler-decreasing-gradient-parameters}
-
-This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
-
-<dl>
-<dt>min_gradient</dt>
-<dd>
-
-(float64, default: `-1.7976931348623157e+308`)
-
-</dd>
-<dt>slope</dt>
-<dd>
-
-(float64, default: `1`)
-
-</dd>
-</dl>
-
----
-
-### AutoScalerIncreasingGradient {#auto-scaler-increasing-gradient}
-
-Increasing Gradient defines a controller for scaling out based on Gradient Controller.
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-([AutoScalerIncreasingGradientIns](#auto-scaler-increasing-gradient-ins)) Input ports for the Gradient.
-
-</dd>
-<dt>parameters</dt>
-<dd>
-
-([AutoScalerIncreasingGradientParameters](#auto-scaler-increasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
-
-- slope = 1
-- min_gradient = 1 (cannot be changed)
-- max_gradient = +Inf (must be greater than 1)
-
-</dd>
-</dl>
-
----
-
-### AutoScalerIncreasingGradientIns {#auto-scaler-increasing-gradient-ins}
-
-Inputs for Gradient.
-
-<dl>
-<dt>setpoint</dt>
-<dd>
-
-([InPort](#in-port)) The setpoint to use for scale-out.
-
-</dd>
-<dt>signal</dt>
-<dd>
-
-([InPort](#in-port)) The signal to use for scale-out.
-
-</dd>
-</dl>
-
----
-
-### AutoScalerIncreasingGradientParameters {#auto-scaler-increasing-gradient-parameters}
-
-This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
-
-<dl>
-<dt>max_gradient</dt>
-<dd>
-
-(float64, default: `1.7976931348623157e+308`)
-
-</dd>
-<dt>slope</dt>
-<dd>
-
-(float64, default: `1`)
-
-</dd>
-</dl>
-
----
-
-### AutoScalerKubernetesReplicas {#auto-scaler-kubernetes-replicas}
-
-KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
-
-<dl>
-<dt>default_config</dt>
-<dd>
-
-([PodScalerScaleActuatorDynamicConfig](#pod-scaler-scale-actuator-dynamic-config)) Default configuration.
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-(string) Configuration key for DynamicConfig
-
-</dd>
-<dt>kubernetes_object_selector</dt>
-<dd>
-
-([KubernetesObjectSelector](#kubernetes-object-selector)) The Kubernetes object on which horizontal scaling is applied.
 
 </dd>
 </dl>
@@ -684,77 +529,13 @@ Outputs for _AutoScaler_.
 
 ---
 
-### AutoScalerScaleInController {#auto-scaler-scale-in-controller}
-
-<dl>
-<dt>alerter_parameters</dt>
-<dd>
-
-([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
-
-</dd>
-<dt>controller</dt>
-<dd>
-
-([AutoScalerScaleInControllerController](#auto-scaler-scale-in-controller-controller)) Controller
-
-</dd>
-</dl>
-
----
-
-### AutoScalerScaleInControllerController {#auto-scaler-scale-in-controller-controller}
-
-<dl>
-<dt>gradient</dt>
-<dd>
-
-([AutoScalerDecreasingGradient](#auto-scaler-decreasing-gradient))
-
-</dd>
-</dl>
-
----
-
-### AutoScalerScaleOutController {#auto-scaler-scale-out-controller}
-
-<dl>
-<dt>alerter_parameters</dt>
-<dd>
-
-([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
-
-</dd>
-<dt>controller</dt>
-<dd>
-
-([AutoScalerScaleOutControllerController](#auto-scaler-scale-out-controller-controller)) Controller
-
-</dd>
-</dl>
-
----
-
-### AutoScalerScaleOutControllerController {#auto-scaler-scale-out-controller-controller}
-
-<dl>
-<dt>gradient</dt>
-<dd>
-
-([AutoScalerIncreasingGradient](#auto-scaler-increasing-gradient))
-
-</dd>
-</dl>
-
----
-
 ### AutoScalerScaler {#auto-scaler-scaler}
 
 <dl>
 <dt>kubernetes_replicas</dt>
 <dd>
 
-([AutoScalerKubernetesReplicas](#auto-scaler-kubernetes-replicas))
+([KubernetesReplicas](#kubernetes-replicas))
 
 </dd>
 </dl>
@@ -817,7 +598,7 @@ Set of classification rules sharing a common selector
 
 :::info
 
-See also [Classifier overview](/concepts/integrations/flow-control/resources/classifier.md).
+See also [Classifier overview](/concepts/flow-control/resources/classifier.md).
 
 :::
 Example
@@ -863,7 +644,7 @@ For simple cases, such as directly reading a value from header or a field from j
 <dd>
 
 (map of [Rule](#rule)) A map of {key, value} pairs mapping from
-[flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
+[flow label](/concepts/flow-control/flow-label.md) keys to rules that define
 how to extract and propagate flow labels with that key.
 
 </dd>
@@ -989,7 +770,7 @@ See also [Policy](#policy) for a higher-level explanation of circuits.
 <dt>gradient_controller</dt>
 <dd>
 
-([GradientController](#gradient-controller)) Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
+([GradientController](#gradient-controller)) Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
 This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
 
 </dd>
@@ -1093,7 +874,7 @@ _Concurrency Limiter_ is an actuator component that regulates flows in order to 
 
 :::info
 
-See also [_Concurrency Limiter_ overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).
+See also [_Concurrency Limiter_ overview](/concepts/flow-control/components/concurrency-limiter.md).
 
 :::
 
@@ -1231,6 +1012,73 @@ Outputs for the Decider component.
 <dd>
 
 ([OutPort](#out-port)) Selected signal (1.0 or 0.0).
+
+</dd>
+</dl>
+
+---
+
+### DecreasingGradient {#decreasing-gradient}
+
+Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([DecreasingGradientIns](#decreasing-gradient-ins)) Input ports for the Gradient.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+([DecreasingGradientParameters](#decreasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
+
+- slope = 1
+- min_gradient = -Inf (must be less than 1)
+- max_gradient = 1 (cannot be changed)
+
+</dd>
+</dl>
+
+---
+
+### DecreasingGradientIns {#decreasing-gradient-ins}
+
+Inputs for Gradient.
+
+<dl>
+<dt>setpoint</dt>
+<dd>
+
+([InPort](#in-port)) The setpoint to use for scale-in.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+([InPort](#in-port)) The signal to use for scale-in.
+
+</dd>
+</dl>
+
+---
+
+### DecreasingGradientParameters {#decreasing-gradient-parameters}
+
+This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+
+<dl>
+<dt>min_gradient</dt>
+<dd>
+
+(float64, default: `-1.7976931348623157e+308`)
+
+</dd>
+<dt>slope</dt>
+<dd>
+
+(float64, default: `1`)
 
 </dd>
 </dl>
@@ -1719,12 +1567,12 @@ Flux Meter created metrics can be consumed as input to the circuit via the PromQ
 ### FlowMatcher {#flow-matcher}
 
 Describes which flows a [flow control
-component](/concepts/integrations/flow-control/flow-control.md#components) should apply
+component](/concepts/flow-control/flow-control.md#components) should apply
 to
 
 :::info
 
-See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 
 :::
 Example:
@@ -1750,7 +1598,7 @@ label_matcher:
 <dt>control_point</dt>
 <dd>
 
-(string, **required**) [Control Point](/concepts/integrations/flow-control/flow-selector.md#control-point)
+(string, **required**) [Control Point](/concepts/flow-control/flow-selector.md#control-point)
 identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
 block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
 or filter chains.
@@ -1760,12 +1608,12 @@ or filter chains.
 <dd>
 
 ([LabelMatcher](#label-matcher)) Label matcher allows to add _additional_ condition on
-[flow labels](/concepts/integrations/flow-control/flow-label.md)
+[flow labels](/concepts/flow-control/flow-label.md)
 must also be satisfied (in addition to service+control point matching)
 
 :::info
 
-See also [Label Matcher overview](/concepts/integrations/flow-control/flow-selector.md#label-matcher).
+See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
 
 :::
 
@@ -1872,12 +1720,12 @@ If label key is not specified, \_Flow Regulator* acts as a stateless filter. Per
 ### FlowSelector {#flow-selector}
 
 Describes which flow in which service a [flow control
-component](/concepts/integrations/flow-control/flow-control.md#components) should apply
+component](/concepts/flow-control/flow-control.md#components) should apply
 to
 
 :::info
 
-See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 
 :::
 
@@ -1905,7 +1753,7 @@ The histogram created by Flux Meter measures the workload latency by default.
 
 :::info
 
-See also [Flux Meter overview](/concepts/integrations/flow-control/resources/flux-meter.md).
+See also [Flux Meter overview](/concepts/flow-control/resources/flux-meter.md).
 
 :::
 Example:
@@ -2378,6 +2226,73 @@ Components receive input from other components via InPorts
 
 ---
 
+### IncreasingGradient {#increasing-gradient}
+
+Increasing Gradient defines a controller for scaling out based on Gradient Controller.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+([IncreasingGradientIns](#increasing-gradient-ins)) Input ports for the Gradient.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+([IncreasingGradientParameters](#increasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
+
+- slope = 1
+- min_gradient = 1 (cannot be changed)
+- max_gradient = +Inf (must be greater than 1)
+
+</dd>
+</dl>
+
+---
+
+### IncreasingGradientIns {#increasing-gradient-ins}
+
+Inputs for Gradient.
+
+<dl>
+<dt>setpoint</dt>
+<dd>
+
+([InPort](#in-port)) The setpoint to use for scale-out.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+([InPort](#in-port)) The signal to use for scale-out.
+
+</dd>
+</dl>
+
+---
+
+### IncreasingGradientParameters {#increasing-gradient-parameters}
+
+This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+
+<dl>
+<dt>max_gradient</dt>
+<dd>
+
+(float64, default: `1.7976931348623157e+308`)
+
+</dd>
+<dt>slope</dt>
+<dd>
+
+(float64, default: `1`)
+
+</dd>
+</dl>
+
+---
+
 ### Integrator {#integrator}
 
 Accumulates sum of signal every tick.
@@ -2608,7 +2523,7 @@ component should apply to.
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `"default"`) Which [agent-group](/concepts/integrations/flow-control/flow-selector.md#agent-group) this
+(string, default: `"default"`) Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
 selector applies to.
 
 </dd>
@@ -2640,10 +2555,37 @@ selector applies to.
 
 ---
 
+### KubernetesReplicas {#kubernetes-replicas}
+
+KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
+
+<dl>
+<dt>default_config</dt>
+<dd>
+
+([PodScalerScaleActuatorDynamicConfig](#pod-scaler-scale-actuator-dynamic-config)) Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig
+
+</dd>
+<dt>kubernetes_object_selector</dt>
+<dd>
+
+([KubernetesObjectSelector](#kubernetes-object-selector)) The Kubernetes object on which horizontal scaling is applied.
+
+</dd>
+</dl>
+
+---
+
 ### LabelMatcher {#label-matcher}
 
 Allows to define rules whether a map of
-[labels](/concepts/integrations/flow-control/flow-label.md)
+[labels](/concepts/flow-control/flow-label.md)
 should be considered a match or not
 
 It provides three ways to define requirements:
@@ -3366,6 +3308,122 @@ Example:
 
 ---
 
+### PodAutoScaler {#pod-auto-scaler}
+
+_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
+
+<dl>
+<dt>cooldown_override_percentage</dt>
+<dd>
+
+(float64, default: `50`) Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
+For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
+scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+
+</dd>
+<dt>max_replicas</dt>
+<dd>
+
+(string, default: `"9223372036854775807"`) The maximum scale to which the _PodAutoScaler_ can scale-out.
+
+</dd>
+<dt>max_scale_in_percentage</dt>
+<dd>
+
+(float64, default: `1`) The maximum decrease of replicas (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+
+</dd>
+<dt>max_scale_out_percentage</dt>
+<dd>
+
+(float64, default: `10`) The maximum increase of replicas (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+
+</dd>
+<dt>min_replicas</dt>
+<dd>
+
+(string, default: `"0"`) The minimum replicas to which the _PodAutoScaler_ can scale-in.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+([PodAutoScalerOuts](#pod-auto-scaler-outs)) Output ports for the _PodAutoScaler_.
+
+</dd>
+<dt>pod_scaler</dt>
+<dd>
+
+([KubernetesReplicas](#kubernetes-replicas))
+
+</dd>
+<dt>scale_in_alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for scale-in alerter.
+
+</dd>
+<dt>scale_in_controllers</dt>
+<dd>
+
+([[]ScaleInController](#scale-in-controller)) List of _Controllers_ for scaling in.
+
+</dd>
+<dt>scale_in_cooldown</dt>
+<dd>
+
+(string, default: `"120s"`) The amount of time to wait after a scale-in operation for another scale-in operation.
+
+</dd>
+<dt>scale_out_alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for scale-out alerter.
+
+</dd>
+<dt>scale_out_controllers</dt>
+<dd>
+
+([[]ScaleOutController](#scale-out-controller)) List of _Controllers_ for scaling out.
+
+</dd>
+<dt>scale_out_cooldown</dt>
+<dd>
+
+(string, default: `"30s"`) The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
+
+</dd>
+</dl>
+
+---
+
+### PodAutoScalerOuts {#pod-auto-scaler-outs}
+
+Outputs for _PodAutoScaler_.
+
+<dl>
+<dt>actual_replicas</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+<dt>configured_replicas</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+<dt>desired_replicas</dt>
+<dd>
+
+([OutPort](#out-port))
+
+</dd>
+</dl>
+
+---
+
 ### PodScaler {#pod-scaler}
 
 Component for scaling pods based on a signal.
@@ -3628,7 +3686,7 @@ Limits the traffic on a control point to specified rate
 
 :::info
 
-See also [_Rate Limiter_ overview](/concepts/integrations/flow-control/components/rate-limiter.md).
+See also [_Rate Limiter_ overview](/concepts/flow-control/components/rate-limiter.md).
 
 :::
 
@@ -3736,7 +3794,7 @@ under certain circumstances. [Decider](#decider) might be helpful.
 (string, **required**) Specifies which label the ratelimiter should be keyed by.
 
 Rate limiting is done independently for each value of the
-[label](/concepts/integrations/flow-control/flow-label.md) with given key.
+[label](/concepts/flow-control/flow-label.md) with given key.
 Eg., to give each user a separate limit, assuming you have a _user_ flow
 label set up, set `label_key: "user"`.
 
@@ -3782,7 +3840,7 @@ Rego define a set of labels that are extracted after evaluating a rego module.
 
 :::info
 
-You can use the [live-preview](/concepts/integrations/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
+You can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
 
 :::
 
@@ -3819,7 +3877,7 @@ rego:
 <dd>
 
 (map of [RegoLabelProperties](#rego-label-properties), **required**) A map of {key, value} pairs mapping from
-[flow label](/concepts/integrations/flow-control/flow-label.md) keys to queries that define
+[flow label](/concepts/flow-control/flow-label.md) keys to queries that define
 how to extract and propagate flow labels with that key.
 The name of the label maps to a variable in the rego module, i.e. it maps to `data.<package>.<label>` variable.
 
@@ -3847,7 +3905,7 @@ Must include a "package" declaration.
 <dd>
 
 (bool, default: `true`) Decides if the created flow label should be available as an attribute in OLAP telemetry and
-propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
+propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
 
 :::note
 
@@ -3943,7 +4001,7 @@ Deprecated: 1.5.0
 <dd>
 
 (bool, default: `true`) Decides if the created flow label should be available as an attribute in OLAP telemetry and
-propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
+propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
 
 :::note
 
@@ -3987,6 +4045,70 @@ Note: The module name must match the package name from the "source".
 (string, **DEPRECATED**, **required**) Source code of the rego module.
 
 Note: Must include a "package" declaration.
+
+</dd>
+</dl>
+
+---
+
+### ScaleInController {#scale-in-controller}
+
+<dl>
+<dt>alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
+
+</dd>
+<dt>controller</dt>
+<dd>
+
+([ScaleInControllerController](#scale-in-controller-controller)) Controller
+
+</dd>
+</dl>
+
+---
+
+### ScaleInControllerController {#scale-in-controller-controller}
+
+<dl>
+<dt>gradient</dt>
+<dd>
+
+([DecreasingGradient](#decreasing-gradient))
+
+</dd>
+</dl>
+
+---
+
+### ScaleOutController {#scale-out-controller}
+
+<dl>
+<dt>alerter_parameters</dt>
+<dd>
+
+([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
+
+</dd>
+<dt>controller</dt>
+<dd>
+
+([ScaleOutControllerController](#scale-out-controller-controller)) Controller
+
+</dd>
+</dl>
+
+---
+
+### ScaleOutControllerController {#scale-out-controller-controller}
+
+<dl>
+<dt>gradient</dt>
+<dd>
+
+([IncreasingGradient](#increasing-gradient))
 
 </dd>
 </dl>
@@ -4037,7 +4159,7 @@ scheduler is applied on.
 :::info
 
 Concurrency is a unitless number describing mean number of
-[flows](/concepts/integrations/flow-control/flow-control.md#flow) being
+[flows](/concepts/flow-control/flow-control.md#flow) being
 concurrently processed by the system (system = control point).
 Concurrency is calculated as _work_ done per unit of time (so
 work-seconds per world-seconds). Work-seconds are computed based on
@@ -4129,7 +4251,7 @@ This value impacts the prioritization and fairness because the larger the timeou
 
 ([[]SchedulerWorkload](#scheduler-workload)) List of workloads to be used in scheduler.
 
-Categorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads
+Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
 allows for load-shedding to be "smarter" than just "randomly deny 50% of
 requests". There are two aspects of this "smartness":
 
@@ -4147,7 +4269,7 @@ If none of workloads match, `default_workload` will be used.
 :::info
 
 See also [workload definition in the concepts
-section](/concepts/integrations/flow-control/components/concurrency-limiter.md#workload).
+section](/concepts/flow-control/components/concurrency-limiter.md#workload).
 
 :::
 
@@ -4165,7 +4287,7 @@ Workload defines a class of requests that preferably have similar properties suc
 <dd>
 
 ([LabelMatcher](#label-matcher)) Label Matcher to select a Workload based on
-[flow labels](/concepts/integrations/flow-control/flow-label.md).
+[flow labels](/concepts/flow-control/flow-label.md).
 
 </dd>
 <dt>parameters</dt>
@@ -4187,7 +4309,7 @@ Parameters defines parameters such as priority, tokens and fairness key that are
 <dd>
 
 (string) Fairness key is a label key that can be used to provide fairness within a workload.
-Any [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if
+Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
 you have a classifier that sets `user` flow label, you might want to set
 `fairness_key = "user"`.
 
@@ -4219,12 +4341,12 @@ This override is applicable only if tokens for the request are not specified in 
 ### ServiceSelector {#service-selector}
 
 Describes which service a [flow control or observability
-component](/concepts/integrations/flow-control/flow-control.md#components) should apply
+component](/concepts/flow-control/flow-control.md#components) should apply
 to
 
 :::info
 
-See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 
 :::
 
@@ -4232,7 +4354,7 @@ See also [FlowSelector overview](/concepts/integrations/flow-control/flow-select
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `"default"`) Which [agent-group](/concepts/integrations/flow-control/flow-selector.md#agent-group) this
+(string, default: `"default"`) Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
 selector applies to.
 
 :::info
@@ -4248,7 +4370,7 @@ The agents within an agent group form a peer to peer cluster and constantly shar
 <dd>
 
 (string, default: `"any"`) The Fully Qualified Domain Name of the
-[service](/concepts/integrations/flow-control/flow-selector.md) to select.
+[service](/concepts/flow-control/flow-selector.md) to select.
 
 In Kubernetes, this is the FQDN of the Service object.
 

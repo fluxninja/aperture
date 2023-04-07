@@ -22,13 +22,13 @@ import (
 	agent "github.com/fluxninja/aperture/cmd/aperture-agent/config"
 	"github.com/fluxninja/aperture/operator/api"
 	"github.com/fluxninja/aperture/operator/api/common"
-	"github.com/fluxninja/aperture/pkg/agentfunctions"
+	agentfunctions "github.com/fluxninja/aperture/pkg/agentfunctions/config"
 	"github.com/fluxninja/aperture/pkg/agentinfo"
-	"github.com/fluxninja/aperture/pkg/distcache"
+	distcache "github.com/fluxninja/aperture/pkg/distcache/config"
 	"github.com/fluxninja/aperture/pkg/net/http"
-	"github.com/fluxninja/aperture/pkg/peers"
+	peers "github.com/fluxninja/aperture/pkg/peers/config"
 	autoscalek8sconfig "github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/config"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview"
+	preview "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview/config"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

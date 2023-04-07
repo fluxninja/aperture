@@ -33,7 +33,7 @@ installation version.
 You can then create a Policy resource using Jsonnet definitions:
 
 ```jsonnet
-{@include: ../../tutorials/integrations/flow-control/concurrency-limiting/assets/basic-concurrency-limiting/basic-concurrency-limiting.jsonnet}
+{@include: ../../tutorials/flow-control/concurrency-limiting/assets/basic-concurrency-limiting/basic-concurrency-limiting.jsonnet}
 ```
 
 And then, render it with [jsonnet][jsonnet]:
@@ -46,7 +46,7 @@ After running this command you should see the following contents in the YAML
 file:
 
 ```yaml
-{@include: ../../tutorials/integrations/flow-control/concurrency-limiting/assets/basic-concurrency-limiting/basic-concurrency-limiting.yaml}
+{@include: ../../tutorials/flow-control/concurrency-limiting/assets/basic-concurrency-limiting/basic-concurrency-limiting.yaml}
 ```
 
 The generated policy can be applied to the running instance of

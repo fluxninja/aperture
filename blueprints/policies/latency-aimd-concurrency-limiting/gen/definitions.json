@@ -17,7 +17,6 @@
         }
       }
     },
-
     "policy": {
       "type": "object",
       "additionalProperties": false,
@@ -27,14 +26,17 @@
           "description": "Flux Meter.",
           "default": {
             "flow_selector": {
-              "flow_matcher": { "control_point": "__REQUIRED_FIELD__" },
-              "service_selector": { "service": "__REQUIRED_FIELD__" }
+              "flow_matcher": {
+                "control_point": "__REQUIRED_FIELD__"
+              },
+              "service_selector": {
+                "service": "__REQUIRED_FIELD__"
+              }
             }
           },
           "type": "object",
           "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/FluxMeter"
         },
-
         "classifiers": {
           "description": "List of classification rules.",
           "default": [],
@@ -44,7 +46,6 @@
             "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Classifier"
           }
         },
-
         "components": {
           "description": "List of additional circuit components.",
           "default": [],
@@ -54,7 +55,6 @@
             "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
           }
         },
-
         "latency_baseliner": {
           "type": "object",
           "additionalProperties": false,
@@ -69,14 +69,12 @@
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/EMAParameters"
             },
-
             "latency_tolerance_multiplier": {
               "description": "Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if EMA of latency is 50ms and if Tolerance is 1.1, then service is considered to be in overloaded state if current latency is more than 55ms.",
               "default": 1.1,
               "type": "number",
               "format": "double"
             },
-
             "latency_ema_limit_multiplier": {
               "description": "Current latency value is multiplied with this factor to calculate maximum envelope of Latency EMA.",
               "default": 2,
@@ -85,7 +83,6 @@
             }
           }
         },
-
         "concurrency_controller": {
           "type": "object",
           "additionalProperties": false,
@@ -94,20 +91,24 @@
             "flow_selector": {
               "description": "Concurrency Limiter flow selector.",
               "default": {
-                "flow_matcher": { "control_point": "__REQUIRED_FIELD__" },
-                "service_selector": { "service": "__REQUIRED_FIELD__" }
+                "flow_matcher": {
+                  "control_point": "__REQUIRED_FIELD__"
+                },
+                "service_selector": {
+                  "service": "__REQUIRED_FIELD__"
+                }
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/FlowSelector"
             },
-
             "scheduler": {
               "description": "Scheduler parameters.",
-              "default": { "auto_tokens": true },
+              "default": {
+                "auto_tokens": true
+              },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/SchedulerParameters"
             },
-
             "gradient": {
               "description": "Gradient Controller parameters.",
               "default": {
@@ -118,31 +119,31 @@
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/GradientControllerParameters"
             },
-
             "alerter": {
               "description": "Whether tokens for workloads are computed dynamically or set statically by the user.",
-              "default": { "alert_name": "Load Shed Event" },
+              "default": {
+                "alert_name": "Load Shed Event"
+              },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
             },
-
             "max_load_multiplier": {
               "description": "Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.",
               "default": 2,
               "type": "number",
               "format": "double"
             },
-
             "load_multiplier_linear_increment": {
               "description": "Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.",
               "default": 0.0025,
               "type": "number",
               "format": "double"
             },
-
             "default_config": {
               "description": "Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.",
-              "default": { "dry_run": false },
+              "default": {
+                "dry_run": false
+              },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/LoadActuatorDynamicConfig"
             }
@@ -150,7 +151,6 @@
         }
       }
     },
-
     "dashboard": {
       "type": "object",
       "additionalProperties": false,
@@ -160,19 +160,16 @@
           "default": "5s",
           "type": "string"
         },
-
         "time_from": {
           "description": "From time of dashboard.",
           "default": "now-15m",
           "type": "string"
         },
-
         "time_to": {
           "description": "To time of dashboard.",
           "default": "now",
           "type": "string"
         },
-
         "datasource": {
           "type": "object",
           "additionalProperties": false,
@@ -182,7 +179,6 @@
               "default": "$datasource",
               "type": "string"
             },
-
             "filter_regex": {
               "description": "Datasource filter regex.",
               "default": "",
@@ -192,5 +188,6 @@
         }
       }
     }
-  }
+  },
+  "$defs": null
 }

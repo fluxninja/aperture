@@ -20,11 +20,11 @@ package common
 import (
 	"github.com/fluxninja/aperture/extensions/fluxninja/extconfig"
 	"github.com/fluxninja/aperture/extensions/sentry"
-	amclient "github.com/fluxninja/aperture/pkg/alertmanager/client"
+	alertmgrconfig "github.com/fluxninja/aperture/pkg/alertmanager/config"
 	"github.com/fluxninja/aperture/pkg/config"
-	"github.com/fluxninja/aperture/pkg/discovery/kubernetes"
+	kubernetes "github.com/fluxninja/aperture/pkg/discovery/kubernetes/config"
 	"github.com/fluxninja/aperture/pkg/discovery/static"
-	etcd "github.com/fluxninja/aperture/pkg/etcd/client"
+	"github.com/fluxninja/aperture/pkg/etcd"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
@@ -34,7 +34,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/fluxninja/aperture/pkg/profilers"
 	"github.com/fluxninja/aperture/pkg/prometheus"
-	"github.com/fluxninja/aperture/pkg/watchdog"
+	watchdogconfig "github.com/fluxninja/aperture/pkg/watchdog/config"
 
 	corev1 "k8s.io/api/core/v1"
 )
@@ -332,11 +332,11 @@ type CommonConfigSpec struct {
 
 	// Watchdog configuration.
 	//+kubebuilder:validation:Optional
-	Watchdog watchdog.WatchdogConfig `json:"watchdog"`
+	Watchdog watchdogconfig.WatchdogConfig `json:"watchdog"`
 
 	// Alert Managers configuration.
 	//+kubebuilder:validation:Optional
-	Alertmanagers amclient.AlertManagerConfig `json:"alertmanagers,omitempty"`
+	Alertmanagers alertmgrconfig.AlertManagerConfig `json:"alertmanagers,omitempty"`
 
 	// BundledExtensionsSpec defines configuration for bundled extensions.
 	//+kubebuilder:validation:Optional
