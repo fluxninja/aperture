@@ -24,7 +24,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
 	checkhttp_baggage "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/checkhttp/baggage"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
-	"github.com/open-policy-agent/opa/logging"
 	"github.com/open-policy-agent/opa/util"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
@@ -133,8 +132,7 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 		Telemetry: true,
 	}
 
-	logger := logging.New().WithFields(map[string]interface{}{"rego": "input"})
-	input := RequestToInput(req, logger)
+	input := RequestToInput(req)
 
 	// Default flow labels from request
 	requestFlowLabels := CheckHTTPRequestToFlowLabels(req.GetRequest())
@@ -226,23 +224,23 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 }
 
 // RequestToInput - Converts a CheckHTTPRequest to an input map.
-func RequestToInput(req *flowcontrolhttpv1.CheckHTTPRequest, logger logging.Logger) map[string]interface{} {
-	var err error
+func RequestToInput(req *flowcontrolhttpv1.CheckHTTPRequest) map[string]interface{} {
 	input := map[string]interface{}{}
 
-	path := req.GetRequest().GetPath()
-	body := req.GetRequest().GetBody()
-	headers := req.GetRequest().GetHeaders()
+	request := req.GetRequest()
+	path := request.GetPath()
+	body := request.GetBody()
+	headers := request.GetHeaders()
 
 	http := map[string]interface{}{}
 	http["path"] = path
 	http["body"] = body
 	http["headers"] = headers
-	http["host"] = req.GetRequest().GetHost()
-	http["method"] = req.GetRequest().GetMethod()
-	http["scheme"] = req.GetRequest().GetScheme()
-	http["size"] = req.GetRequest().GetSize()
-	http["protocol"] = req.GetRequest().GetProtocol()
+	http["host"] = request.GetHost()
+	http["method"] = request.GetMethod()
+	http["scheme"] = request.GetScheme()
+	http["size"] = request.GetSize()
+	http["protocol"] = request.GetProtocol()
 
 	sourceSocketAddress := map[string]interface{}{}
 	sourceSocketAddress["address"] = req.GetSource().GetAddress()
@@ -258,11 +256,11 @@ func RequestToInput(req *flowcontrolhttpv1.CheckHTTPRequest, logger logging.Logg
 	destination := map[string]interface{}{}
 	destination["socketAddress"] = destinationSocketAddress
 
-	request := map[string]interface{}{}
-	request["http"] = http
+	requestMap := map[string]interface{}{}
+	requestMap["http"] = http
 
 	attributes := map[string]interface{}{}
-	attributes["request"] = request
+	attributes["request"] = requestMap
 	attributes["source"] = source
 	attributes["destination"] = destination
 
@@ -274,7 +272,7 @@ func RequestToInput(req *flowcontrolhttpv1.CheckHTTPRequest, logger logging.Logg
 		input["parsed_query"] = parsedQuery
 	}
 
-	parsedBody, isBodyTruncated, err := getParsedBody(logger, headers, body)
+	parsedBody, isBodyTruncated, err := getParsedBody(headers, body)
 	if err == nil {
 		input["parsed_body"] = parsedBody
 		input["truncated_body"] = isBodyTruncated
@@ -307,7 +305,7 @@ func getParsedPathAndQuery(path string) ([]interface{}, map[string]interface{}, 
 	return parsedPathInterface, parsedQueryInterface, nil
 }
 
-func getParsedBody(logger logging.Logger, headers map[string]string, body string) (interface{}, bool, error) {
+func getParsedBody(headers map[string]string, body string) (interface{}, bool, error) {
 	var data interface{}
 
 	if val, ok := headers["content-type"]; ok {
@@ -421,10 +419,10 @@ func getParsedBody(logger logging.Logger, headers map[string]string, body string
 
 			data = values
 		} else {
-			logger.Debug("content-type: %s parsing not supported", val)
+			log.Debug().Msgf("rego content-type: %s parsing not supported", val)
 		}
 	} else {
-		logger.Debug("no content-type header supplied, performing no body parsing")
+		log.Debug().Msg("rego no content-type header supplied, performing no body parsing")
 	}
 
 	return data, false, nil
