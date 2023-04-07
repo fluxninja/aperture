@@ -1,6 +1,7 @@
 # check https://nfpm.goreleaser.com/configuration for detailed usage
 name: "aperturectl"
 arch: "${GOARCH}"
+platform: "${GOOS}"
 version: "${APERTURECTL_BUILD_VERSION}"
 section: "default"
 priority: "extra"
