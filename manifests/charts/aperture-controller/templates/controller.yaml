@@ -110,6 +110,12 @@ spec:
   {{- if .Values.controller.extraEnvVars }}
   extraEnvVars: {{ .Values.controller.extraEnvVars | toYaml | nindent 4 }}
   {{- end }}
+  {{- if .Values.controller.extraEnvVarsCM }}
+  extraEnvVarsCM: {{ .Values.controller.extraEnvVarsCM }}
+  {{- end }}
+  {{- if .Values.controller.extraEnvVarsSecret }}
+  extraEnvVarsSecret: {{ .Values.controller.extraEnvVarsSecret }}
+  {{- end }}
   {{- if .Values.controller.extraVolumes }}
   extraVolumes: {{ .Values.controller.extraVolumes | toYaml | nindent 4}}
   {{- end }}
