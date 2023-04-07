@@ -35,7 +35,9 @@ func (p *alertsReceiver) Start(_ context.Context, _ component.Host) error {
 
 // Shutdown calls shutdown function which kills run() goroutine.
 func (p *alertsReceiver) Shutdown(_ context.Context) error {
-	p.shutdown()
+	if p.shutdown != nil {
+		p.shutdown()
+	}
 	return nil
 }
 
