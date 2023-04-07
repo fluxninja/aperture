@@ -10,8 +10,7 @@ on:
     types: [created]
 
 concurrency:
-  group:
-    ${{ github.repository }}-${{ github.event.number || github.head_ref ||
+  group: ${{ github.repository }}-${{ github.event.number || github.head_ref ||
     github.sha }}-${{ github.workflow }}-${{ github.event_name ==
     'pull_request_review_comment' && 'pr_comment' || 'pr' }}
   cancel-in-progress: ${{ github.event_name != 'pull_request_review_comment' }}
@@ -27,5 +26,5 @@ jobs:
         with:
           debug: false
           review_comment_lgtm: false
-          openai_model: gpt-3.5-turbo
+          openai_heavy_model: gpt-4
           max_files_to_summarize: 40
