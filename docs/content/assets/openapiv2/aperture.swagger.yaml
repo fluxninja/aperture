@@ -766,7 +766,7 @@ definitions:
             gradient_controller:
                 $ref: '#/definitions/GradientController'
                 description: |-
-                    Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
+                    Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
                     This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
             holder:
                 $ref: '#/definitions/Holder'

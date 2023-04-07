@@ -36,6 +36,12 @@ spec:
                   matchLabels:
                     app.kubernetes.io/instance: {{ .Release.Name }}
                 topologyKey: kubernetes.io/hostname
+{{- if .Values.rabbitmq.enabled }}
+      initContainers:
+        - name: wait-for-rabbitmq
+          image: busybox
+          command: ['sh', '-c', 'until wget http://{{.Values.rabbitmq.username}}:{{.Values.rabbitmq.password}}@{{.Values.rabbitmq.host}}:15672/api/aliveness-test/%2F; do echo waiting for rabbitmq; sleep 2; done;']
+{{- end }}
       containers:
         - name: simplesrv
           securityContext:
@@ -62,6 +68,16 @@ spec:
               {{- end }}
             - name: SIMPLE_SERVICE_REJECT_RATIO
               value: "{{ .Values.simplesrv.rejectRatio }}"
+            - name: SIMPLE_SERVICE_RABBITMQ_ENABLED
+              value: "{{ .Values.rabbitmq.enabled }}"
+            - name: SIMPLE_SERVICE_RABBITMQ_HOST
+              value: "{{ .Values.rabbitmq.host }}"
+            - name: SIMPLE_SERVICE_RABBITMQ_PORT
+              value: "{{ .Values.rabbitmq.port }}"
+            - name: SIMPLE_SERVICE_RABBITMQ_USERNAME
+              value: "{{ .Values.rabbitmq.username }}"
+            - name: SIMPLE_SERVICE_RABBITMQ_PASSWORD
+              value: "{{ .Values.rabbitmq.password }}"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

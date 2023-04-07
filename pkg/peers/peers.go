@@ -1,4 +1,3 @@
-// +kubebuilder:validation:Optional
 package peers
 
 import (
@@ -25,6 +24,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/notifiers"
+	peersconfig "github.com/fluxninja/aperture/pkg/peers/config"
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
@@ -45,18 +45,10 @@ var (
 	etcdPath              = path.Join("/peers")
 )
 
-// PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
-// swagger:model
-// +kubebuilder:object:generate=true
-type PeerDiscoveryConfig struct {
-	// Network address of aperture server to advertise to peers - this address should be reachable from other agents. Used for nat traversal when provided.
-	AdvertisementAddr string `json:"advertisement_addr" validate:"omitempty,hostname_port"`
-}
-
 // Constructor holds fields to create and configure PeerDiscovery.
 type Constructor struct {
 	ConfigKey     string
-	DefaultConfig PeerDiscoveryConfig
+	DefaultConfig peersconfig.PeerDiscoveryConfig
 	Service       string
 }
 
@@ -93,7 +85,7 @@ func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDi
 		configKey = constructor.ConfigKey
 	}
 
-	var cfg PeerDiscoveryConfig
+	var cfg peersconfig.PeerDiscoveryConfig
 	if err := in.Unmarshaller.UnmarshalKey(configKey, &cfg); err != nil {
 		return nil, err
 	}
