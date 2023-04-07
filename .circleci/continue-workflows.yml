@@ -915,6 +915,10 @@ jobs:
         type: string
         description: the GOARCH to use for the build
         default: amd64
+      goos:
+        type: string
+        description: the GOOS to use for the build
+        default: linux
       component:
         type: string
         description: the component to build
@@ -926,6 +930,7 @@ jobs:
     environment:
       PACKAGES_DIR: "/tmp/packages"
       GOARCH: <<parameters.goarch>>
+      GOOS: <<parameters.goos>>
       COMPONENT: <<parameters.component>>
     steps:
       - checkout
@@ -961,6 +966,13 @@ jobs:
       - run:
           name: Package
           command: ./.circleci/scripts/nfpm_package.sh
+      - when:
+          condition:
+            equal: [cli, << parameters.component >>]
+          steps:
+            - run:
+                name: Create tarball file for Given OS
+                command: ./.circleci/scripts/create_tarball_file.sh
       - when:
           condition: <<parameters.upload-to-gcp>>
           steps:
@@ -1003,6 +1015,10 @@ workflows:
       - package-binaries:
           name: build-aperture-agent-bare-metal-package
           component: agent
+          matrix:
+            parameters:
+              goos: ["linux"]
+              goarch: ["amd64"]
 
   publish-aperture-agent-bare-metal-package:
     when:
@@ -1016,6 +1032,10 @@ workflows:
           name: publish-aperture-agent-bare-metal-package
           component: agent
           upload-to-gcp: true
+          matrix:
+            parameters:
+              goos: ["linux"]
+              goarch: ["amd64"]
 
   build-aperturectl-packages:
     when:
@@ -1029,6 +1049,11 @@ workflows:
       - package-binaries:
           name: build-aperturectl-packages
           component: cli
+          matrix:
+            parameters:
+              goos: ["linux","darwin"]
+              goarch: ["amd64","arm64"]
+
 
   publish-aperturectl-packages:
     when:
@@ -1042,6 +1067,10 @@ workflows:
           name: publish-aperturectl-packages
           component: cli
           upload-to-gcp: true
+          matrix:
+            parameters:
+              goos: ["linux","darwin"]
+              goarch: ["amd64","arm64"]
 
   aperture:
     when:

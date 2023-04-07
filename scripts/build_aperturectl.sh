@@ -37,7 +37,7 @@ build_args+=(
 pushd "${APERTURECTL_DIR}" >/dev/null
 
 if ! go build "${build_args[@]}" 1>&2; then
-	exit 1
+        exit 1
 fi
 
 popd >/dev/null
