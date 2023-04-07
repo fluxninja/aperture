@@ -210,7 +210,7 @@ It is a good practice to use consistent naming for boolean variables. Consider r
 		}
 	}
 
-	// Make the freshly created flow labels available to flowcontrol.
+Consider adding a comment above the `Inject` method implementation check to explain why it's necessary and what happens if the propagator does not implement the `Inject` method.
 	// Newly created flow labels can overwrite existing flow labels.
 	flowlabel.Merge(mergedFlowLabels, newFlowLabels)
 	flowLabels := mergedFlowLabels.ToPlainMap()
