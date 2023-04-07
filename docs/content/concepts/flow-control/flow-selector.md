@@ -179,10 +179,14 @@ operators, such as http.method with NotIn operator and GET value. For more
 information on how to configure the Label Matcher, see the [Label Matcher
 reference][label-matcher].
 
-:::info Keep in mind that while these endpoints may have a low latency, they
+:::info
+
+Keep in mind that while these endpoints may have a low latency, they
 should not be included in the overall latency of the service. Filtering them out
 can help improve the accuracy of our latency calculations and prevent requests
-from being rejected. :::
+from being rejected.
+
+:::
 
 ## Service Selector {#service-selector}
 
