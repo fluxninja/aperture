@@ -107,6 +107,12 @@ spec:
   {{- if .Values.agent.extraEnvVars }}
   extraEnvVars: {{ .Values.agent.extraEnvVars | toYaml | nindent 4 }}
   {{- end }}
+  {{- if .Values.agent.extraEnvVarsCM }}
+  extraEnvVarsCM: {{ .Values.agent.extraEnvVarsCM }}
+  {{- end }}
+  {{- if .Values.agent.extraEnvVarsSecret }}
+  extraEnvVarsSecret: {{ .Values.agent.extraEnvVarsSecret }}
+  {{- end }}
   {{- if .Values.agent.extraVolumes }}
   extraVolumes: {{ .Values.agent.extraVolumes | toYaml | nindent 4}}
   {{- end }}

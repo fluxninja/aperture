@@ -761,6 +761,7 @@ https://github.com/kubernetes-sigs/kubebuilder/issues/528
 ### CustomMetricsConfig {#custom-metrics-config}
 
 CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller prometheus.
+Environment variables can be used in the configuration using format `${ENV_VAR_NAME}`.
 
 :::info
 See also [Get Started / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).

@@ -1529,8 +1529,10 @@ spec:
                         additionalProperties:
                           description: "CustomMetricsConfig defines receivers, processors,
                             and single metrics pipeline which will be exported to
-                            the controller prometheus. \n :::info See also [Get Started
-                            / Setup Integrations / Metrics](/get-started/integrations/metrics/metrics.md).
+                            the controller prometheus. Environment variables can be
+                            used in the configuration using format `${ENV_VAR_NAME}`.
+                            \n :::info See also [Get Started / Setup Integrations
+                            / Metrics](/get-started/integrations/metrics/metrics.md).
                             :::"
                           properties:
                             per_agent_group:

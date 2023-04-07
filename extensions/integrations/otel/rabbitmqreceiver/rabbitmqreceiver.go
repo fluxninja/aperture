@@ -16,7 +16,7 @@ import (
 func Module() fx.Option {
 	log.Info().Msg("Loading rabbitmqreceiver Receiver")
 	if info.Service != utils.ApertureAgent {
-		return nil
+		return fx.Options()
 	}
 	return fx.Options(
 		fx.Provide(
