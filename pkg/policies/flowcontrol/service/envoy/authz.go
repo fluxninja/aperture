@@ -162,13 +162,13 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	attributes, ok := attributesSource.(map[string]interface{})
 	if ok {
 		source := attributes["source"]
-		sourceMap, sourceMapOK := source.(map[string]interface{})
-		if sourceMapOK {
+		sourceMap, okSourceMap := source.(map[string]interface{})
+		if okSourceMap {
 			sourceMap["services"] = sourceSvcs
 		}
 		destination := attributes["destination"]
-		destinationMap, destinationMapOK := destination.(map[string]interface{})
-		if destinationMapOK {
+		destinationMap, okDestinationMap := destination.(map[string]interface{})
+		if okDestinationMap {
 			destinationMap["services"] = destinationSvcs
 		}
 	}
@@ -179,7 +179,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	existingHeaders := baggage.Headers(req.GetAttributes().GetRequest().GetHttp().GetHeaders())
 	baggageFlowLabels := h.propagator.Extract(existingHeaders)
 
-It is a good practice to use consistent naming for boolean variables. Consider renaming `sourceMapOK` and `destinationMapOK` to `okSourceMap` and `okDestinationMap` respectively, to match the naming convention used in other parts of the code.
+	// Merge flow labels from Authz request and baggage headers
 	mergedFlowLabels := requestFlowLabels
 	// Baggage can overwrite request flow labels
 	flowlabel.Merge(mergedFlowLabels, baggageFlowLabels)
@@ -195,6 +195,8 @@ It is a good practice to use consistent naming for boolean variables. Consider r
 
 	// Add new flow labels to baggage
 	var newHeaders []*envoycorev3.HeaderValueOption
+	// Check if the propagator implements the Inject method before calling it.
+	// If the propagator does not implement the Inject method, log an error and continue with an empty set of new headers.
 	p, ok := h.propagator.(interface {
 		Inject(flowlabel.FlowLabels, baggage.Headers) ([]*envoycorev3.HeaderValueOption, error)
 	})
@@ -210,7 +212,6 @@ It is a good practice to use consistent naming for boolean variables. Consider r
 		}
 	}
 
-Consider adding a comment above the `Inject` method implementation check to explain why it's necessary and what happens if the propagator does not implement the `Inject` method.
 	// Newly created flow labels can overwrite existing flow labels.
 	flowlabel.Merge(mergedFlowLabels, newFlowLabels)
 	flowLabels := mergedFlowLabels.ToPlainMap()

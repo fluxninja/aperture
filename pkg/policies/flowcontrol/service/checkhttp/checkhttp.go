@@ -159,6 +159,8 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 	// Add new flow labels to baggage
 	var newHeaders map[string]string
 	var err error
+	// Check if the propagator implements the Inject method before calling it.
+	// If the propagator does not implement the Inject method, log an error and continue with an empty set of new headers.
 	p, ok := h.propagator.(interface {
 		Inject(flowlabel.FlowLabels, baggage.Headers) (map[string]string, error)
 	})

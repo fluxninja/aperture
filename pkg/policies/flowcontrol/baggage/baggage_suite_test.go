@@ -169,7 +169,7 @@ var _ = Describe("W3 Baggage propagator", func() {
 	})
 })
 
-var _ = Describe("W3 Baggage propagator", func() {
+var _ = Describe("CheckHTTP W3 Baggage propagator", func() {
 	propagator := W3BaggageCheckHTTP{}
 
 	Context("when there's no baggage header", func() {
