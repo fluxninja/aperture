@@ -45,8 +45,6 @@ otel:
           username: admin
 ```
 
-## Configuration
-
 <!-- Configuration Marker -->
 
 ```mdx-code-block
