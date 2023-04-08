@@ -165,9 +165,11 @@ func loadCPUFromEnv() bool {
 	}
 	loadCPU, err := strconv.ParseBool(loadCPUValue)
 	if err != nil {
-		log.Panic().Err(err).Msgf("Failed converting SIMPLE_SERVICE_LOAD_CPU: %v", err)
+		log.Error().Err(err).Msgf("Failed converting SIMPLE_SERVICE_LOAD_CPU: %v", err)
+		return false
 	}
 	return loadCPU
+}
 }
 
 // newResource returns a resource describing this application.
