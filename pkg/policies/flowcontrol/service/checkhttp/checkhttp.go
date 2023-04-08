@@ -3,6 +3,7 @@ package checkhttp
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"io"
 	"mime"
 	"mime/multipart"
@@ -24,6 +25,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
 	checkhttp_baggage "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/checkhttp/baggage"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
+	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/util"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
@@ -224,93 +226,99 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 }
 
 // RequestToInput - Converts a CheckHTTPRequest to an input map.
-func RequestToInput(req *flowcontrolhttpv1.CheckHTTPRequest) map[string]interface{} {
-	input := map[string]interface{}{}
-
+func RequestToInput(req *flowcontrolhttpv1.CheckHTTPRequest) ast.Value {
 	request := req.GetRequest()
 	path := request.GetPath()
 	body := request.GetBody()
 	headers := request.GetHeaders()
 
-	http := map[string]interface{}{}
-	http["path"] = path
-	http["body"] = body
-	http["headers"] = headers
-	http["host"] = request.GetHost()
-	http["method"] = request.GetMethod()
-	http["scheme"] = request.GetScheme()
-	http["size"] = request.GetSize()
-	http["protocol"] = request.GetProtocol()
+	http := ast.NewObject()
+	http.Insert(ast.StringTerm("path"), ast.StringTerm(path))
+	http.Insert(ast.StringTerm("body"), ast.StringTerm(body))
+	http.Insert(ast.StringTerm("host"), ast.StringTerm(request.GetHost()))
+	http.Insert(ast.StringTerm("method"), ast.StringTerm(request.GetMethod()))
+	http.Insert(ast.StringTerm("scheme"), ast.StringTerm(request.GetScheme()))
+	http.Insert(ast.StringTerm("size"),
+		ast.NumberTerm(json.Number(strconv.FormatInt(request.GetSize(), 10))))
+	http.Insert(ast.StringTerm("protocol"), ast.StringTerm(request.GetProtocol()))
 
-	sourceSocketAddress := map[string]interface{}{}
-	sourceSocketAddress["address"] = req.GetSource().GetAddress()
-	sourceSocketAddress["port"] = req.GetSource().GetPort()
+	headersObj := ast.NewObject()
+	for key, val := range headers {
+		headersObj.Insert(ast.StringTerm(key), ast.StringTerm(val))
+	}
+	http.Insert(ast.StringTerm("headers"), ast.NewTerm(headersObj))
 
-	destinationSocketAddress := map[string]interface{}{}
-	destinationSocketAddress["address"] = req.GetDestination().GetAddress()
-	destinationSocketAddress["port"] = req.GetDestination().GetPort()
+	srcSocketAddress := ast.NewObject()
+	srcSocketAddress.Insert(ast.StringTerm("address"), ast.StringTerm(req.GetSource().GetAddress()))
+	srcSocketAddress.Insert(ast.StringTerm("port"),
+		ast.NumberTerm(json.Number(strconv.FormatUint(uint64(req.GetSource().GetPort()), 10))))
 
-	source := map[string]interface{}{}
-	source["socketAddress"] = sourceSocketAddress
+	dstSocketAddress := ast.NewObject()
+	dstSocketAddress.Insert(ast.StringTerm("address"), ast.StringTerm(req.GetDestination().GetAddress()))
+	dstSocketAddress.Insert(ast.StringTerm("port"),
+		ast.NumberTerm(json.Number(strconv.FormatUint(uint64(req.GetDestination().GetPort()), 10))))
 
-	destination := map[string]interface{}{}
-	destination["socketAddress"] = destinationSocketAddress
+	source := ast.NewObject()
+	source.Insert(ast.StringTerm("socketAddress"), ast.NewTerm(srcSocketAddress))
 
-	requestMap := map[string]interface{}{}
-	requestMap["http"] = http
+	destination := ast.NewObject()
+	destination.Insert(ast.StringTerm("socketAddress"), ast.NewTerm(dstSocketAddress))
 
-	attributes := map[string]interface{}{}
-	attributes["request"] = requestMap
-	attributes["source"] = source
-	attributes["destination"] = destination
+	requestMap := ast.NewObject()
+	requestMap.Insert(ast.StringTerm("http"), ast.NewTerm(http))
 
-	input["attributes"] = attributes
+	attributes := ast.NewObject()
+	attributes.Insert(ast.StringTerm("request"), ast.NewTerm(requestMap))
+	attributes.Insert(ast.StringTerm("source"), ast.NewTerm(source))
+	attributes.Insert(ast.StringTerm("destination"), ast.NewTerm(destination))
+
+	input := ast.NewObject()
+	input.Insert(ast.StringTerm("attributes"), ast.NewTerm(attributes))
 
 	parsedPath, parsedQuery, err := getParsedPathAndQuery(path)
 	if err == nil {
-		input["parsed_path"] = parsedPath
-		input["parsed_query"] = parsedQuery
+		input.Insert(ast.StringTerm("parsed_path"), parsedPath)
+		input.Insert(ast.StringTerm("parsed_query"), parsedQuery)
 	}
 
 	parsedBody, isBodyTruncated, err := getParsedBody(headers, body)
 	if err == nil {
-		input["parsed_body"] = parsedBody
-		input["truncated_body"] = isBodyTruncated
+		input.Insert(ast.StringTerm("parsed_body"), parsedBody)
+		input.Insert(ast.StringTerm("truncated_body"), ast.BooleanTerm(isBodyTruncated))
 	}
 
 	return input
 }
 
-func getParsedPathAndQuery(path string) ([]interface{}, map[string]interface{}, error) {
+func getParsedPathAndQuery(path string) (*ast.Term, *ast.Term, error) {
 	parsedURL, err := url.Parse(path)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	parsedPath := strings.Split(strings.TrimLeft(parsedURL.Path, "/"), "/")
-	parsedPathInterface := make([]interface{}, len(parsedPath))
-	for i, v := range parsedPath {
-		parsedPathInterface[i] = v
+	parsedPathArray := ast.NewArray()
+	for _, v := range parsedPath {
+		parsedPathArray.Append(ast.StringTerm(v))
 	}
 
-	parsedQueryInterface := make(map[string]interface{})
+	parsedQueryInterface := ast.NewObject()
 	for paramKey, paramValues := range parsedURL.Query() {
-		queryValues := make([]interface{}, len(paramValues))
-		for i, v := range paramValues {
-			queryValues[i] = v
+		queryValues := ast.NewArray()
+		for _, v := range paramValues {
+			queryValues.Append(ast.StringTerm(v))
 		}
-		parsedQueryInterface[paramKey] = queryValues
+		parsedQueryInterface.Insert(ast.StringTerm(paramKey), ast.NewTerm(queryValues))
 	}
 
-	return parsedPathInterface, parsedQueryInterface, nil
+	return ast.NewTerm(parsedPathArray), ast.NewTerm(parsedQueryInterface), nil
 }
 
-func getParsedBody(headers map[string]string, body string) (interface{}, bool, error) {
-	var data interface{}
+func getParsedBody(headers map[string]string, body string) (*ast.Term, bool, error) {
+	data := ast.NewObject()
 
 	if val, ok := headers["content-type"]; ok {
 		if strings.Contains(val, "application/json") {
-
 			if body == "" {
 				return nil, false, nil
 			}
@@ -325,10 +333,16 @@ func getParsedBody(headers map[string]string, body string) (interface{}, bool, e
 				}
 			}
 
-			err := util.UnmarshalJSON([]byte(body), &data)
+			var jsonValue interface{}
+			err := util.UnmarshalJSON([]byte(body), &jsonValue)
 			if err != nil {
 				return nil, false, err
 			}
+			astValue, err := ast.InterfaceToValue(jsonValue)
+			if err != nil {
+				return nil, false, err
+			}
+			data.Insert(ast.StringTerm(""), ast.NewTerm(astValue))
 		} else if strings.Contains(val, "application/x-www-form-urlencoded") {
 			var payload string
 			switch {
@@ -352,8 +366,13 @@ func getParsedBody(headers map[string]string, body string) (interface{}, bool, e
 			if err != nil {
 				return nil, false, err
 			}
-
-			data = map[string][]string(parsed)
+			for key, valArray := range parsed {
+				helperArr := ast.NewArray()
+				for _, val := range valArray {
+					helperArr.Append(ast.StringTerm(val))
+				}
+				data.Insert(ast.StringTerm(key), ast.NewTerm(helperArr))
+			}
 		} else if strings.Contains(val, "multipart/form-data") {
 			var payload string
 			switch {
@@ -383,7 +402,7 @@ func getParsedBody(headers map[string]string, body string) (interface{}, bool, e
 				return nil, false, nil
 			}
 
-			values := map[string][]interface{}{}
+			values := ast.NewObject()
 
 			mr := multipart.NewReader(strings.NewReader(payload), boundary)
 			for {
@@ -411,9 +430,15 @@ func getParsedBody(headers map[string]string, body string) (interface{}, bool, e
 					if err := util.UnmarshalJSON(value, &jsonValue); err != nil {
 						return nil, false, err
 					}
-					values[name] = append(values[name], jsonValue)
+					jsonData, err := ast.InterfaceToValue(jsonValue)
+					if err != nil {
+						return nil, false, err
+					}
+					values.Insert(ast.StringTerm(name),
+						ast.NewTerm(ast.NewArray(ast.NewTerm(jsonData))))
 				default:
-					values[name] = append(values[name], string(value))
+					values.Insert(ast.StringTerm(name),
+						ast.NewTerm(ast.NewArray((ast.StringTerm(string(value))))))
 				}
 			}
 
@@ -425,7 +450,7 @@ func getParsedBody(headers map[string]string, body string) (interface{}, bool, e
 		log.Debug().Msg("rego no content-type header supplied, performing no body parsing")
 	}
 
-	return data, false, nil
+	return ast.NewTerm(data), false, nil
 }
 
 func checkIfHTTPBodyTruncated(contentLength string, bodyLength int64) (bool, error) {
