@@ -33,10 +33,7 @@ func NewBoolReading(value bool) Reading {
 
 // InvalidReading creates a reading with 'value' set to math.NaN(), invalid value.
 func InvalidReading() Reading {
-// NewBoolReading creates a reading with the given bool value.
-func NewBoolReading(value bool) Reading {
-	return NewReading(map[bool]float64{true: 1, false: 0}[value])
-}
+	return &reading{
 		value: math.NaN(),
 	}
 }
