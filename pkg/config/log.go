@@ -204,9 +204,9 @@ func (constructor LoggerConstructor) provideLogger(w []io.Writer,
 				log.WaitFlush()
 				// close diode writer
 				if config.NonBlocking {
-if dr, ok := writer.(diode.Writer); ok {
-    dr.Close()
-}
+					if dr, ok := writer.(diode.Writer); ok {
+						dr.Close()
+					}
 				}
 				logger.CloseWriters()
 			})
