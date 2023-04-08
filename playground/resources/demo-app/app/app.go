@@ -9,7 +9,6 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
-	"runtime"
 	"strings"
 	"time"
 
@@ -44,10 +43,10 @@ type SimpleService struct {
 	// if it's injected.
 	envoyPort   int
 	rabbitMQURL string
-	concurrency int       // Maximum number of concurrent clients
+	concurrency int           // Maximum number of concurrent clients
 	latency     time.Duration // Simulated latency for each request
-	rejectRatio float64    // Ratio of requests to be rejected
-	loadCPU     bool       // Whether to simulate CPU load during latency sleep
+	rejectRatio float64       // Ratio of requests to be rejected
+	loadCPU     bool          // Whether to simulate CPU load during latency sleep
 }
 
 // NewSimpleService creates a SimpleService instance.
@@ -355,23 +354,15 @@ func (h RequestHandler) processRequest(s Subrequest) (int, error) {
 		}()
 	}
 	if h.latency > 0 {
-		done := make(chan int)
 		if h.loadCPU {
-			// Fake workload by spinning up a bunch of goroutines
-			for i := 0; i < runtime.NumCPU(); i++ {
-				go func() {
-					for {
-						select {
-						case <-done:
-							return
-						default:
-						}
-					}
-				}()
+			// Simulate CPU load by running a busy loop for the specified duration
+			startTime := time.Now()
+			for time.Since(startTime) < h.latency {
+				// Busy loop
 			}
+		} else {
+			time.Sleep(h.latency)
 		}
-		time.Sleep(h.latency)
-		close(done)
 	}
 	return http.StatusOK, nil
 }
