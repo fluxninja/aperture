@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 
 	policiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
@@ -36,6 +37,7 @@ func providePolicyValidator() FxOut {
 
 // PolicySpecValidator Policy implementation of PolicySpecValidator interface.
 type PolicySpecValidator struct {
+	mu             sync.Mutex
 	fluxmeterNames map[string]bool
 }
 
@@ -65,6 +67,9 @@ func (v *PolicySpecValidator) ValidateSpec(
 	if fluxmeters == nil {
 		fluxmeters = policy.GetResources().GetFluxMeters()
 	}
+
+	v.mu.Lock()
+	defer v.mu.Unlock()
 
 	newNames := make(map[string]bool)
 	for fluxMeterName := range fluxmeters {
