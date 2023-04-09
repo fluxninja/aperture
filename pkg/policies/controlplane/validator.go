@@ -3,6 +3,8 @@ package controlplane
 import (
 	"context"
 	"errors"
+	"fmt"
+	"sync"
 
 	policiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
@@ -27,12 +29,17 @@ type FxOut struct {
 // Note: This validator must be registered to be accessible.
 func providePolicyValidator() FxOut {
 	return FxOut{
-		Validator: &PolicySpecValidator{},
+		Validator: &PolicySpecValidator{
+			fluxmeterNames: make(map[string]bool),
+		},
 	}
 }
 
 // PolicySpecValidator Policy implementation of PolicySpecValidator interface.
-type PolicySpecValidator struct{}
+type PolicySpecValidator struct {
+	mu             sync.Mutex
+	fluxmeterNames map[string]bool
+}
 
 // ValidateSpec checks the validity of a Policy spec
 //
@@ -49,11 +56,32 @@ func (v *PolicySpecValidator) ValidateSpec(
 	name string,
 	yamlSrc []byte,
 ) (bool, string, error) {
-	_, _, err := ValidateAndCompile(ctx, name, yamlSrc)
+	_, policy, err := ValidateAndCompile(ctx, name, yamlSrc)
 	if err != nil {
 		// there is no need to handle validator errors. just return validation result.
 		return false, err.Error(), nil
 	}
+
+	fluxmeters := policy.GetResources().GetFlowControl().GetFluxMeters()
+	// Deprecated: v1.5.0
+	if fluxmeters == nil {
+		fluxmeters = policy.GetResources().GetFluxMeters()
+	}
+
+	v.mu.Lock()
+	defer v.mu.Unlock()
+
+	newNames := make(map[string]bool)
+	for fluxMeterName := range fluxmeters {
+		newNames[fluxMeterName] = true
+		if v.fluxmeterNames[fluxMeterName] {
+			return false, fmt.Sprintf("fluxmeter name \"%s\" already used in other policy", fluxMeterName), nil
+		}
+	}
+	for key, val := range newNames {
+		v.fluxmeterNames[key] = val
+	}
+
 	return true, "", nil
 }
 
