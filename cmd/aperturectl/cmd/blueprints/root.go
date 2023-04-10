@@ -3,6 +3,7 @@ package blueprints
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -75,9 +76,15 @@ Use this command to pull, list, remove and generate Aperture Policy resources us
 			}
 			blueprintsURI = fmt.Sprintf("%s@%s", defaultBlueprintsRepo, blueprintsVersion)
 		} else {
-			blueprintsURI, err = filepath.Abs(blueprintsURI)
+			var blueprintsURL *url.URL
+			blueprintsURL, err = url.Parse(blueprintsURI)
 			if err != nil {
-				return err
+				blueprintsURI, err = filepath.Abs(blueprintsURI)
+				if err != nil {
+					return err
+				}
+			} else {
+				blueprintsURI = blueprintsURL.String()
 			}
 		}
 
