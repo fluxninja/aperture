@@ -34,7 +34,7 @@ func main() {
 	concurrency := concurrencyFromEnv()
 	latency := latencyFromEnv()
 	rejectRatio := rejectRatioFromEnv()
-	loadCPU := loadCPUFromEnv()
+	cpuLoad := cpuLoadFromEnv()
 
 	// RabbitMQ related setup
 	rabbitMQURL := ""
@@ -68,7 +68,7 @@ func main() {
 		propagation.Baggage{},
 	))
 
-	service := app.NewSimpleService(hostname, port, envoyPort, rabbitMQURL, concurrency, latency, rejectRatio, loadCPU)
+	service := app.NewSimpleService(hostname, port, envoyPort, rabbitMQURL, concurrency, latency, rejectRatio, cpuLoad)
 	err := service.Run()
 	if err != nil {
 		log.Error().Err(err).Send()
@@ -162,21 +162,21 @@ func rejectRatioFromEnv() float64 {
 	return rejectRatio
 }
 
-func loadCPUFromEnv() int {
-	loadCPUValue, exists := os.LookupEnv("SIMPLE_SERVICE_LOAD_CPU")
+func cpuLoadFromEnv() int {
+	loadCPUValue, exists := os.LookupEnv("SIMPLE_SERVICE_CPU_LOAD")
 	if !exists {
 		return 0
 	}
 
 	loadCPUI64, err := strconv.ParseInt(loadCPUValue, 10, 32)
 	if err != nil {
-		log.Panic().Err(err).Msg("Failed converting SIMPLE_SERVICE_LOAD_CPU")
+		log.Panic().Err(err).Msg("Failed converting SIMPLE_SERVICE_CPU_LOAD")
 	}
 
 	loadCPU := int(loadCPUI64)
 
 	if loadCPU < 0 || loadCPU > 100 {
-		log.Panic().Msg("SIMPLE_SERVICE_LOAD_CPU must be between 0 and 100")
+		log.Panic().Msg("SIMPLE_SERVICE_CPU_LOAD must be between 0 and 100")
 	}
 
 	return loadCPU

@@ -17,6 +17,9 @@
       "ssh": "default"
     }
   ],
+  "env_vars": {
+    "SIMPLE_SERVICE_CPU_LOAD": "50"
+  },
   "child_resources": [
     {
       "workload": "service1-demo-app",
