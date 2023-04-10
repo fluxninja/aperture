@@ -44,12 +44,12 @@ type SimpleService struct {
 	// If it's not set then value is -1 and we do not configure proxy.
 	// Istio proxy should handle requests without additional config
 	// if it's injected.
-	envoyPort   int
-	rabbitMQURL string
-	concurrency int           // Maximum number of concurrent clients
-	latency     time.Duration // Simulated latency for each request
-	rejectRatio float64       // Ratio of requests to be rejected
-	loadCPU     int           // Whether to simulate CPU load during latency sleep
+	envoyPort         int
+	rabbitMQURL       string
+	concurrency       int           // Maximum number of concurrent clients
+	latency           time.Duration // Simulated latency for each request
+	rejectRatio       float64       // Ratio of requests to be rejected
+	cpuLoadPercentage int           // Percentage of CPU to be loaded
 }
 
 // NewSimpleService creates a SimpleService instance.
@@ -61,29 +61,29 @@ func NewSimpleService(
 	concurrency int,
 	latency time.Duration,
 	rejectRatio float64,
-	loadCPU int,
+	cpuLoadPercentage int,
 ) *SimpleService {
 	return &SimpleService{
-		hostname:    hostname,
-		port:        port,
-		envoyPort:   envoyPort,
-		rabbitMQURL: rabbitMQURL,
-		concurrency: concurrency,
-		latency:     latency,
-		rejectRatio: rejectRatio,
-		loadCPU:     loadCPU,
+		hostname:          hostname,
+		port:              port,
+		envoyPort:         envoyPort,
+		rabbitMQURL:       rabbitMQURL,
+		concurrency:       concurrency,
+		latency:           latency,
+		rejectRatio:       rejectRatio,
+		cpuLoadPercentage: cpuLoadPercentage,
 	}
 }
 
 // Run starts listening for requests on given port.
 func (ss SimpleService) Run() error {
 	handler := &RequestHandler{
-		hostname:     ss.hostname,
-		latency:      ss.latency,
-		rejectRatio:  ss.rejectRatio,
-		concurrency:  ss.concurrency,
-		limitClients: make(chan struct{}, ss.concurrency),
-		loadCPU:      ss.loadCPU,
+		hostname:          ss.hostname,
+		latency:           ss.latency,
+		rejectRatio:       ss.rejectRatio,
+		concurrency:       ss.concurrency,
+		limitClients:      make(chan struct{}, ss.concurrency),
+		cpuLoadPercentage: ss.cpuLoadPercentage,
 	}
 
 	if ss.rabbitMQURL != "" {
@@ -261,14 +261,14 @@ type Subrequest struct {
 
 // RequestHandler handles processing of incoming requests.
 type RequestHandler struct {
-	httpClient   HTTPClient
-	rabbitMQChan *amqp.Channel
-	limitClients chan struct{}
-	hostname     string
-	concurrency  int
-	latency      time.Duration
-	rejectRatio  float64
-	loadCPU      int
+	httpClient        HTTPClient
+	rabbitMQChan      *amqp.Channel
+	limitClients      chan struct{}
+	hostname          string
+	concurrency       int
+	latency           time.Duration
+	rejectRatio       float64
+	cpuLoadPercentage int
 }
 
 func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -370,12 +370,12 @@ func (h RequestHandler) processRequest() (int, error) {
 	defer atomic.AddInt32(&ongoingRequests, -1)
 
 	if h.latency > 0 {
-		if h.loadCPU > 0 {
+		if h.cpuLoadPercentage > 0 {
 			// Simulate CPU load by busy waiting
 			numCores := runtime.NumCPU()
 
 			// Calculate busy wait and sleep durations based on h.loadCPU and ongoing requests
-			adjustedLoad := (float64(h.loadCPU) / 100) * float64(atomic.LoadInt32(&ongoingRequests))
+			adjustedLoad := (float64(h.cpuLoadPercentage) / 100) * float64(atomic.LoadInt32(&ongoingRequests))
 			if adjustedLoad > 100 {
 				adjustedLoad = 100
 			}
