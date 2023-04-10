@@ -60,6 +60,8 @@ func Execute() {
 	// set flags manually using pflag and parse them
 	pflag.BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	pflag.BoolVar(&allowDeprecated, "allow-deprecated", false, "Allow deprecated fields in the configuration")
+	// Set help flag to false by default to print help for aperturectl command instead of pflags
+	pflag.BoolP("help", "h", false, "Display help for aperturectl command")
 	// configure pflag to ignore unknown flags
 	pflag.CommandLine.ParseErrorsWhitelist.UnknownFlags = true
 	pflag.Parse()
