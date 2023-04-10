@@ -9,7 +9,10 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"runtime"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	backoff "github.com/cenkalti/backoff/v4"
@@ -46,7 +49,7 @@ type SimpleService struct {
 	concurrency int           // Maximum number of concurrent clients
 	latency     time.Duration // Simulated latency for each request
 	rejectRatio float64       // Ratio of requests to be rejected
-	loadCPU     bool          // Whether to simulate CPU load during latency sleep
+	loadCPU     int           // Whether to simulate CPU load during latency sleep
 }
 
 // NewSimpleService creates a SimpleService instance.
@@ -58,7 +61,7 @@ func NewSimpleService(
 	concurrency int,
 	latency time.Duration,
 	rejectRatio float64,
-	loadCPU bool,
+	loadCPU int,
 ) *SimpleService {
 	return &SimpleService{
 		hostname:    hostname,
@@ -265,7 +268,7 @@ type RequestHandler struct {
 	concurrency  int
 	latency      time.Duration
 	rejectRatio  float64
-	loadCPU      bool
+	loadCPU      int
 }
 
 func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -334,7 +337,7 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (h RequestHandler) processChain(ctx context.Context, chain SubrequestChain) (int, error) {
 	if len(chain.subrequests) == 1 {
-		return h.processRequest(chain.subrequests[0])
+		return h.processRequest()
 	}
 	forwardingDestination := chain.subrequests[1].Destination
 	trimmedSubrequestChain := SubrequestChain{
@@ -346,24 +349,58 @@ func (h RequestHandler) processChain(ctx context.Context, chain SubrequestChain)
 	return h.forwardRequest(ctx, forwardingDestination, trimmedRequest)
 }
 
-func (h RequestHandler) processRequest(s Subrequest) (int, error) {
+func busyWait(duration time.Duration) {
+	startTime := time.Now()
+	for time.Since(startTime) < duration {
+		// Just busy wait
+	}
+}
+
+var ongoingRequests int32
+
+func (h RequestHandler) processRequest() (int, error) {
 	if h.concurrency > 0 {
 		h.limitClients <- struct{}{}
 		defer func() {
 			<-h.limitClients
 		}()
 	}
+
+	atomic.AddInt32(&ongoingRequests, 1)
+	defer atomic.AddInt32(&ongoingRequests, -1)
+
 	if h.latency > 0 {
-		if h.loadCPU {
-			// Simulate CPU load by running a busy loop for the specified duration
-			startTime := time.Now()
-			for time.Since(startTime) < h.latency {
-				// Busy loop
+		if h.loadCPU > 0 {
+			// Simulate CPU load by busy waiting
+			numCores := runtime.NumCPU()
+
+			// Calculate busy wait and sleep durations based on h.loadCPU and ongoing requests
+			adjustedLoad := (float64(h.loadCPU) / 100) * float64(atomic.LoadInt32(&ongoingRequests))
+			if adjustedLoad > 100 {
+				adjustedLoad = 100
 			}
+			totalDuration := h.latency.Seconds()
+			busyWaitDuration := time.Duration(totalDuration * adjustedLoad / 100.0 * float64(time.Second))
+			sleepDuration := time.Duration(totalDuration * (100.0 - adjustedLoad) / 100.0 * float64(time.Second))
+
+			var wg sync.WaitGroup
+			wg.Add(numCores)
+			for i := 0; i < numCores; i++ {
+				go func() {
+					defer wg.Done()
+					startTime := time.Now()
+					for time.Since(startTime) < h.latency {
+						busyWait(busyWaitDuration)
+						time.Sleep(sleepDuration)
+					}
+				}()
+			}
+			wg.Wait()
 		} else {
 			time.Sleep(h.latency)
 		}
 	}
+
 	return http.StatusOK, nil
 }
 
