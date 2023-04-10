@@ -20,8 +20,15 @@ export const BinaryDownload = ({}) => (
 {`# Substitute BIN for your bin directory.
 VERSION="${apertureVersionWithOutV}"
 BIN="/usr/local/bin"
-echo "Will download \$(go env GOOS) package version \${VERSION} compiled for \$(go env GOARCH) machine"
-url="https://github.com/fluxninja/aperture/releases/download/v\${VERSION}/aperturectl-\${VERSION}-$(go env GOOS)-$(go env GOARCH)"
+OS="$(uname | tr '[:upper:]' '[:lower:]')"
+ARCH="$(uname -m)"
+case "$ARCH" in
+  x86_64) ARCH="amd64";;
+  aarch64) ARCH="arm64";;
+  *) echo "Unsupported architecture: $ARCH"; exit 1;;
+esac
+echo "Will download $OS package version $VERSION compiled for $ARCH machine"
+url="https://github.com/fluxninja/aperture/releases/download/v\${VERSION}/aperturectl-$\{VERSION}-$\{OS}-$\{ARCH}"
 curl --fail --location --remote-name "\${url}"
 mv aperturectl* "\${BIN}/aperturectl"
 chmod +x "\${BIN}/aperturectl"
