@@ -11,7 +11,21 @@ import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import {apertureVersion,apertureVersionWithOutV} from '../../apertureVersion.js';
-import {DownloadScript,BinaryDownload} from '../installation/agent/bare_metal.md';
+import {DownloadScript} from '../installation/agent/bare_metal.md';
+```
+
+```mdx-code-block
+export const BinaryDownload = ({}) => (
+<CodeBlock language="bash">
+{`# Substitute BIN for your bin directory.
+VERSION="${apertureVersionWithOutV}" && \
+BIN="/usr/local/bin" && \
+curl -sSL \
+"https://github.com/fluxninja/aperture/releases/download/v\${VERSION}/aperturectl-\${VERSION}-$(go env GOOS)-$(go env GOARCH)" \
+-o "\${BIN}/aperturectl" && \
+chmod +x "\${BIN}/aperturectl"
+`}</CodeBlock>
+);
 ```
 
 The Aperture CLI is available as a binary executable for all major platforms,
@@ -29,6 +43,9 @@ Alternatively download it using following script:
     <DownloadScript packager="rpm" arch="x86_64" archSeparator="." versionSeparator="-" component="aperturectl" />
   </TabItem>
   <TabItem value="binary" label="binary">
+  <div  style={{ fontStyle: "italic" }} >
+    NOTE: If the binary is downloaded directly, no installation steps need to be followed.
+  </div>
     <BinaryDownload  />
   </TabItem>
 </Tabs>

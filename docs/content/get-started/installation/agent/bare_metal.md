@@ -45,20 +45,6 @@ curl --fail --location --remote-name "\${url}"
 );
 ```
 
-```mdx-code-block
-export const BinaryDownload = ({}) => (
-<CodeBlock language="bash">
-{`# Substitute BIN for your bin directory.
-VERSION="${apertureVersionWithOutV}" && \
-BIN="/usr/local/bin" && \
-curl -sSL \
-"https://github.com/fluxninja/aperture/releases/download/v\${VERSION}/aperturectl-\${VERSION}-$(go env GOOS)-$(go env GOARCH)" \
--o "\${BIN}/aperturectl" && \
-chmod +x "\${BIN}/aperturectl"
-`}</CodeBlock>
-);
-```
-
 <Tabs groupId="packageManager" queryString>
   <TabItem value="dpkg" label="dpkg">
     <DownloadScript packager="deb" arch="amd64" archSeparator="_" versionSeparator="_" component="aperture-agent" />
