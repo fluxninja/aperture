@@ -18,11 +18,12 @@ import {DownloadScript} from '../installation/agent/bare_metal.md';
 export const BinaryDownload = ({}) => (
 <CodeBlock language="bash">
 {`# Substitute BIN for your bin directory.
-VERSION="${apertureVersionWithOutV}" && \
-BIN="/usr/local/bin" && \
-curl -sSL \
-"https://github.com/fluxninja/aperture/releases/download/v\${VERSION}/aperturectl-\${VERSION}-$(go env GOOS)-$(go env GOARCH)" \
--o "\${BIN}/aperturectl" && \
+VERSION="${apertureVersionWithOutV}"
+BIN="/usr/local/bin"
+echo "Will download \$(go env GOOS) package version \${VERSION} compiled for \$(go env GOARCH) machine"
+url="https://github.com/fluxninja/aperture/releases/download/v\${VERSION}/aperturectl-\${VERSION}-$(go env GOOS)-$(go env GOARCH)"
+curl --fail --location --remote-name "\${url}"
+mv aperturectl* "\${BIN}/aperturectl"
 chmod +x "\${BIN}/aperturectl"
 `}</CodeBlock>
 );
@@ -43,14 +44,18 @@ Alternatively download it using following script:
     <DownloadScript packager="rpm" arch="x86_64" archSeparator="." versionSeparator="-" component="aperturectl" />
   </TabItem>
   <TabItem value="binary" label="binary">
-  <div  style={{ fontStyle: "italic" }} >
-    NOTE: If the binary is downloaded directly, no installation steps need to be followed.
-  </div>
     <BinaryDownload  />
   </TabItem>
 </Tabs>
 
 ## Installation
+
+:::info
+
+Skip the following steps if you have obtained the binary file directly using the
+steps mentioned above.
+
+:::
 
 <Tabs groupId="setup" queryString>
 <TabItem value="macOS" label="macOS">
