@@ -69,7 +69,7 @@ Create the address of the Prometheus for Aperture Controller
 Fetch the value of the API Key secret for Aperture Controller
 {{ include "controller.apiSecret.value" ( dict "controller" .Values.path.to.the.controller $ ) }}
 */}}
-{{- define "controller.apisecret.value" -}}
+{{- define "controller.apiSecret.value" -}}
 {{- if .controller.secrets.fluxNinjaExtension.create -}}
     {{- if .controller.secrets.fluxNinjaExtension.value -}}
         {{ print .controller.secrets.fluxNinjaExtension.value }}
@@ -85,7 +85,7 @@ Fetch the value of the API Key secret for Aperture Controller
 Fetch the Name of the API Key secret for Aperture Controller
 {{ include "controller.apiSecret.name" ( dict "controller" .Values.path.to.the.controller "context" $.context $ ) }}
 */}}
-{{- define "controller.apisecret.name" -}}
+{{- define "controller.apiSecret.name" -}}
 {{- if .controller.secrets.fluxNinjaExtension.secretKeyRef.name -}}
     {{ print .controller.secrets.fluxNinjaExtension.secretKeyRef.name }}
 {{- else -}}
@@ -97,7 +97,7 @@ Fetch the Name of the API Key secret for Aperture Controller
 Fetch the Key of the API Key secret for Aperture Controller
 {{ include "controller.apiSecret.name" ( dict "controller" .Values.path.to.the.controller $ ) }}
 */}}
-{{- define "controller.apisecret.key" -}}
+{{- define "controller.apiSecret.key" -}}
 {{- if .controller.secrets.fluxNinjaExtension.secretKeyRef.key -}}
     {{ print .controller.secrets.fluxNinjaExtension.secretKeyRef.key }}
 {{- else -}}

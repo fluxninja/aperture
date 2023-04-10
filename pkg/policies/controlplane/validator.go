@@ -10,6 +10,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/circuitfactory"
+	"github.com/fluxninja/aperture/pkg/policies/controlplane/crwatcher"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier/compiler"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/fluxninja/aperture/pkg/webhooks/policyvalidator"
@@ -22,13 +23,31 @@ type FxOut struct {
 	Validator policyvalidator.PolicySpecValidator `group:"policy-validators"`
 }
 
+// FxIn is the input for the AddAgentInfoAttribute function.
+type FxIn struct {
+	fx.In
+	unmarshaller config.Unmarshaller
+}
+
 // providePolicyValidator provides classification Policy Custom Resource validator
 //
 // Note: This validator must be registered to be accessible.
-func providePolicyValidator() FxOut {
-	return FxOut{
-		Validator: &PolicySpecValidator{},
+func providePolicyValidator(in FxIn) (*FxOut, error) {
+	var config crwatcher.CRWatcherConfig
+	err := in.unmarshaller.UnmarshalKey(crwatcher.ConfigKey, &config)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to unmarshal Kubernetes watcher config")
+		return nil, err
 	}
+
+	if !config.Enabled {
+		log.Info().Msg("Kubernetes watcher is disabled")
+		return nil, nil
+	}
+
+	return &FxOut{
+		Validator: &PolicySpecValidator{},
+	}, nil
 }
 
 // PolicySpecValidator Policy implementation of PolicySpecValidator interface.

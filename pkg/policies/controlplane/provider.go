@@ -18,6 +18,10 @@ const (
 //   in: body
 //   schema:
 //     "$ref": "#/definitions/JobGroupConfig"
+// - name: cr_watcher
+//   in: body
+//   schema:
+//     "$ref": "#/definitions/CRWatcherConfig"
 
 // Module - Controller can be initialized by passing options from Module() to fx app.
 func Module() fx.Option {

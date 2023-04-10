@@ -61,7 +61,7 @@ Create the address of the Prometheus for Aperture Agent
 Fetch the value of the API Key secret for Aperture Agent
 {{ include "agent.apiSecret.value" ( dict "agent" .Values.path.to.the.agent $) }}
 */}}
-{{- define "agent.apisecret.value" -}}
+{{- define "agent.apiSecret.value" -}}
 {{- if .agent.secrets.fluxNinjaExtension.create -}}
     {{- if .agent.secrets.fluxNinjaExtension.value -}}
         {{ print .agent.secrets.fluxNinjaExtension.value }}
@@ -77,7 +77,7 @@ Fetch the value of the API Key secret for Aperture Agent
 Fetch the Name of the API Key secret for Aperture Agent
 {{ include "agent.apiSecret.name" ( dict "agent" .Values.path.to.the.agent "context" $.context $ ) }}
 */}}
-{{- define "agent.apisecret.name" -}}
+{{- define "agent.apiSecret.name" -}}
 {{- if .agent.secrets.fluxNinjaExtension.secretKeyRef.name -}}
     {{ print .agent.secrets.fluxNinjaExtension.secretKeyRef.name }}
 {{- else -}}
@@ -89,7 +89,7 @@ Fetch the Name of the API Key secret for Aperture Agent
 Fetch the Key of the API Key secret for Aperture Agent
 {{ include "agent.apiSecret.name" ( dict "agent" .Values.path.to.the.agent $ ) }}
 */}}
-{{- define "agent.apisecret.key" -}}
+{{- define "agent.apiSecret.key" -}}
 {{- if .agent.secrets.fluxNinjaExtension.secretKeyRef.key -}}
     {{ print .agent.secrets.fluxNinjaExtension.secretKeyRef.key }}
 {{- else -}}

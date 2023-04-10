@@ -330,6 +330,7 @@ func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Log
 		Enabled:  true,
 	}
 
+	instance.Spec.ConfigSpec.Policies.CRWatcher.Enabled = true
 	if err := r.reconcileConfigMap(ctx, instance); err != nil {
 		return err
 	}

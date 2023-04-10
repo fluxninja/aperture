@@ -10,6 +10,19 @@ import (
 	"go.uber.org/fx"
 )
 
+const (
+	// ConfigKey is the key to the Kubernetes watcher config.
+	ConfigKey = "policies.crwatcher"
+)
+
+// CRWatcherConfig holds fields to configure the Kubernetes watcher for Aperture Policy custom resource.
+// swagger:model
+// +kubebuilder:object:generate=true
+type CRWatcherConfig struct {
+	// Enabled indicates whether the Kubernetes watcher is enabled.
+	Enabled bool `json:"enabled" default:"false"`
+}
+
 // Constructor holds fields to create an annotated instance of Kubernetes Watcher.
 type Constructor struct {
 	// Name of watcher instance.
@@ -35,6 +48,18 @@ func (constructor Constructor) Annotate() fx.Option {
 
 // provideWatcher creates a Kubernetes watcher to watch the Policy Custom Resource.
 func (constructor Constructor) provideWatcher(unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) (notifiers.Watcher, notifiers.Watcher, error) {
+	var config CRWatcherConfig
+	err := unmarshaller.UnmarshalKey(ConfigKey, &config)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to unmarshal Kubernetes watcher config")
+		return nil, nil, err
+	}
+
+	if !config.Enabled {
+		log.Info().Msg("Kubernetes watcher is disabled")
+		return nil, nil, nil
+	}
+
 	if os.Getenv("APERTURE_CONTROLLER_NAMESPACE") == "" {
 		os.Setenv("APERTURE_CONTROLLER_NAMESPACE", "default")
 	}

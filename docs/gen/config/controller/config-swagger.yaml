@@ -158,6 +158,18 @@ definitions:
         title: BatchAlertsConfig defines configuration for OTel batch processor.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
+    CRWatcherConfig:
+        properties:
+            enabled:
+                default: false
+                description: Enabled indicates whether the Kubernetes watcher is enabled.
+                type: boolean
+                x-go-name: Enabled
+                x-go-tag-default: "false"
+                x-go-tag-json: enabled
+        title: CRWatcherConfig holds fields to configure the Kubernetes watcher for Aperture Policy custom resource.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/pkg/policies/controlplane/crwatcher
     ClientTLSConfig:
         properties:
             ca_file:
@@ -1213,6 +1225,10 @@ paths:
                   name: promql_jobs_scheduler
                   schema:
                     $ref: '#/definitions/JobGroupConfig'
+                - in: body
+                  name: cr_watcher
+                  schema:
+                    $ref: '#/definitions/CRWatcherConfig'
             tags:
                 - common-configuration
             x-fn-config-env: true

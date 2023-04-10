@@ -39,7 +39,7 @@ spec:
     targetPort: dist-cache
     name: dist-cache
     protocol: TCP
-  - containerPort: {{ include "agent.dist_cache.port" (dict "agent" .Values.agent "portName" "memberlist_bind_addr" "defaultPort" 3322 $ ) }}
+  - port: {{ include "agent.dist_cache.port" (dict "agent" .Values.agent "portName" "memberlist_bind_addr" "defaultPort" 3322 $ ) }}
     targetPort: port
     name: port
     protocol: TCP
