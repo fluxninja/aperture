@@ -974,11 +974,10 @@ jobs:
                 name: Create tarball file for Given OS
                 command: ./.circleci/scripts/create_tarball_file.sh
             - run:
-                name: Create binaries for Specific OS
+                name: Create binaries for different OS
                 command: |
-                  mv "$HOME"/project/dist/aperturectl "$HOME"/project/dist/aperturectl-"${GOOS}"-"${GOARCH}"
-                  cp -rf "$HOME"/project/dist/aperturectl-"${GOOS}"-"${GOARCH}" "$HOME"/project/dist/packages/
-                  ls -al "$HOME"/project/dist/
+                  mv "$HOME"/project/dist/aperturectl "$HOME"/project/dist/aperturectl-"${APERTURECTL_BUILD_VERSION#v}"-"${GOOS}"-"${GOARCH}"
+                  cp -rf "$HOME"/project/dist/aperturectl-"${APERTURECTL_BUILD_VERSION#v}"-"${GOOS}"-"${GOARCH}" "$HOME"/project/dist/packages/
                   ls -al "$HOME"/project/dist/packages/
 
       - when:

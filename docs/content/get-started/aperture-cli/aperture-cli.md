@@ -11,7 +11,7 @@ import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import {apertureVersion,apertureVersionWithOutV} from '../../apertureVersion.js';
-import {DownloadScript} from '../installation/agent/bare_metal.md';
+import {DownloadScript,BinaryDownload} from '../installation/agent/bare_metal.md';
 ```
 
 The Aperture CLI is available as a binary executable for all major platforms,
@@ -27,6 +27,9 @@ Alternatively download it using following script:
   </TabItem>
   <TabItem value="rpm" label="rpm">
     <DownloadScript packager="rpm" arch="x86_64" archSeparator="." versionSeparator="-" component="aperturectl" />
+  </TabItem>
+  <TabItem value="binary" label="binary">
+    <BinaryDownload  />
   </TabItem>
 </Tabs>
 
