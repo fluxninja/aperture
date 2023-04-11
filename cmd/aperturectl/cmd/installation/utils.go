@@ -166,17 +166,15 @@ func applyManifest(manifest string) error {
 // applyObjectToKubernetesWithRetry applies the given object to Kubernetes with retry.
 func applyObjectToKubernetesWithRetry(unstructuredObject *unstructured.Unstructured) error {
 	attempt := 0
-	var err error
 	for attempt < 5 {
 		attempt++
-		err = applyObjectToKubernetes(unstructuredObject)
-		if err != nil && (strings.Contains(err.Error(), "no matches for kind") || apierrors.IsConflict(err)) {
-			time.Sleep(time.Second * time.Duration(attempt))
-			continue
+		err := applyObjectToKubernetes(unstructuredObject)
+		if err == nil || (!strings.Contains(err.Error(), "no matches for kind") && !apierrors.IsConflict(err)) {
+			return err
 		}
-		return nil
+		time.Sleep(time.Second * time.Duration(attempt))
 	}
-	return err
+	return fmt.Errorf("failed to apply object after %d attempts", attempt)
 }
 
 // applyObjectToKubernetes applies the given object to Kubernetes.

@@ -3152,8 +3152,11 @@ definitions:
                 type: object
             name:
                 type: string
+                x-go-tag-validate: required
             policy:
                 $ref: '#/definitions/Policy'
+        required:
+            - name
         type: object
     PreviewFlowLabelsControllerResponse:
         properties:
@@ -4917,6 +4920,26 @@ paths:
                         $ref: '#/definitions/googlerpcStatus'
             tags:
                 - aperture-controller
+        patch:
+            operationId: PolicyService_PatchPolicy
+            parameters:
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/PostPolicyRequest'
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/PostPoliciesResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            summary: PatchPolicy patches policies based on the provided request.
+            tags:
+                - aperture-controller
         post:
             operationId: PolicyService_PostPolicy
             parameters:
@@ -4934,6 +4957,7 @@ paths:
                     description: An unexpected error response.
                     schema:
                         $ref: '#/definitions/googlerpcStatus'
+            summary: PostPolicy creates or updates policies based on the provided request.
             tags:
                 - aperture-controller
     /v1/policies/{name}:
@@ -4954,6 +4978,7 @@ paths:
                     description: An unexpected error response.
                     schema:
                         $ref: '#/definitions/googlerpcStatus'
+            summary: DeletePolicy removes a policy with the specified name.
             tags:
                 - aperture-controller
     /v1/status/{path}:

@@ -38,17 +38,40 @@ func (s *PolicyService) GetPolicies(ctx context.Context, _ *emptypb.Empty) (*pol
 
 // PostPolicy posts policies to the system.
 func (s *PolicyService) PostPolicy(ctx context.Context, policies *policylangv1.PostPolicyRequest) (*policylangv1.PostPoliciesResponse, error) {
+	return s.managePolicies(ctx, policies, true)
+}
+
+// PatchPolicy patches policies to the system.
+func (s *PolicyService) PatchPolicy(ctx context.Context, policies *policylangv1.PostPolicyRequest) (*policylangv1.PostPoliciesResponse, error) {
+	return s.managePolicies(ctx, policies, false)
+}
+
+// DeletePolicy deletes a policy from the system.
+func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.DeletePolicyRequest) (*emptypb.Empty, error) {
+	s.etcdTracker.RemoveEvent(notifiers.Key(policy.Name))
+	return &emptypb.Empty{}, nil
+}
+
+// managePolicies manages Post/Patch operations on policies.
+func (s *PolicyService) managePolicies(ctx context.Context, policies *policylangv1.PostPolicyRequest, checkRequired bool) (*policylangv1.PostPoliciesResponse, error) {
 	var errs []string
-	for _, request := range policies.Policies {
-		_, err := CompilePolicy(request.Policy, s.policyFactory.registry)
-		if err != nil {
-			errs = append(errs, fmt.Sprintf("failed to compile policy %s: %s", request.Name, err))
+	for idx, request := range policies.Policies {
+		if request.Name == "" {
+			errs = append(errs, fmt.Sprintf("policy name is empty at index %d", idx))
+			continue
+		}
+		if checkRequired && request.Policy == nil {
 			continue
 		}
 
-		jsonPolicy, err := request.Policy.MarshalJSON()
+		jsonPolicy, err := s.getPolicyBytes(request.Name, request.Policy)
 		if err != nil {
-			errs = append(errs, fmt.Sprintf("failed to marshal policy %s: %s", request.Name, err))
+			errs = append(errs, err.Error())
+			continue
+		}
+		s.etcdTracker.WriteEvent(notifiers.Key(request.Name), jsonPolicy)
+
+		if request.DynamicConfig == nil {
 			continue
 		}
 
@@ -57,22 +80,30 @@ func (s *PolicyService) PostPolicy(ctx context.Context, policies *policylangv1.P
 			errs = append(errs, fmt.Sprintf("failed to marshal dynamic config %s: %s", request.Name, err))
 			continue
 		}
-		s.etcdTracker.WriteEvent(notifiers.Key(request.Name), jsonPolicy)
 		s.dynamicConfigTracker.WriteEvent(notifiers.Key(request.Name), jsonDynamicConfig)
 	}
 
 	response := &policylangv1.PostPoliciesResponse{}
 	if len(errs) > 0 {
 		response.Errors = errs
-		response.Message = "failed to post policies"
+		response.Message = "failed to upload policies"
 	} else {
-		response.Message = "successfully posted policies"
+		response.Message = "successfully uploaded policies"
 	}
 	return response, nil
 }
 
-// DeletePolicy deletes a policy from the system.
-func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.DeletePolicyRequest) (*emptypb.Empty, error) {
-	s.etcdTracker.RemoveEvent(notifiers.Key(policy.Name))
-	return &emptypb.Empty{}, nil
+// getPolicyBytes returns the policy bytes after checking validity of the policy.
+func (s *PolicyService) getPolicyBytes(name string, policy *policylangv1.Policy) ([]byte, error) {
+	jsonPolicy, err := policy.MarshalJSON()
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal policy %s: %s", name, err)
+	}
+
+	_, _, err = ValidateAndCompile(context.Background(), name, jsonPolicy)
+	if err != nil {
+		return nil, fmt.Errorf("failed to compile policy %s: %s", name, err)
+	}
+
+	return jsonPolicy, nil
 }

@@ -26,18 +26,18 @@ type CRWatcherConfig struct {
 // Constructor holds fields to create an annotated instance of Kubernetes Watcher.
 type Constructor struct {
 	// Name of tracker instance.
-	TrackersName string
+	Name string
 	// Name of dynamic config tracker instance.
-	DynamicConfigTrackersName string
+	DynamicConfigName string
 }
 
 // Annotate creates an annotated instance of Kubernetes Watcher.
 func (constructor Constructor) Annotate() fx.Option {
-	if constructor.TrackersName == "" || constructor.DynamicConfigTrackersName == "" {
+	if constructor.Name == "" || constructor.DynamicConfigName == "" {
 		log.Panic().Msg("Kubernetes watcher name is required")
 	}
-	trackersName := config.NameTag(constructor.TrackersName)
-	dynamicConfigTrackersName := config.NameTag(constructor.DynamicConfigTrackersName)
+	trackersName := config.NameTag(constructor.Name)
+	dynamicConfigTrackersName := config.NameTag(constructor.DynamicConfigName)
 	return fx.Options(fx.Invoke(
 		fx.Annotate(
 			constructor.provideWatcher,

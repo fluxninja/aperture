@@ -21,6 +21,7 @@ service PolicyService {
     };
   }
 
+  // PostPolicy creates or updates policies based on the provided request.
   rpc PostPolicy(PostPolicyRequest) returns (PostPoliciesResponse) {
     option (google.api.http) = {
       post: "/v1/policies"
@@ -31,6 +32,18 @@ service PolicyService {
     };
   }
 
+  // PatchPolicy patches policies based on the provided request.
+  rpc PatchPolicy(PostPolicyRequest) returns (PostPoliciesResponse) {
+    option (google.api.http) = {
+      patch: "/v1/policies"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-controller"];
+    };
+  }
+
+  // DeletePolicy removes a policy with the specified name.
   rpc DeletePolicy(DeletePolicyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {delete: "/v1/policies/{name}"};
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -41,7 +54,7 @@ service PolicyService {
 
 message PostPolicyRequest {
   message PolicyRequest {
-    string name = 1;
+    string name = 1; // @gotags: validate:"required"
     Policy policy = 2;
     google.protobuf.Struct dynamic_config = 3;
   }

@@ -319,7 +319,7 @@ operator:
 ## @skip controller.createUninstallHook
 ##
 controller:
-  ## @param controller.namespaceScoped Specifies whether Controller installation should be done without cluster level resources. It takes precedence over controller.create.
+  ## @param controller.namespaceScoped Specifies whether the Controller installation should be namespace-scoped, avoiding the creation of cluster-level resources. This takes precedence over controller.create.
   ##
   namespaceScoped: false
   ## @param controller.serverCert.secretName Specifies the name of the secret containing the server certificate for Controller.

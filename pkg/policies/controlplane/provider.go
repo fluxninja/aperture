@@ -49,8 +49,8 @@ func Module() fx.Option {
 		),
 		// Syncing policies config to etcd
 		crwatcher.Constructor{
-			TrackersName:              policiesTrackerFxTag,
-			DynamicConfigTrackersName: policiesDynameConfigTrackerFxTag,
+			Name:              policiesTrackerFxTag,
+			DynamicConfigName: policiesDynameConfigTrackerFxTag,
 		}.Annotate(), // Create a new watcher
 		fx.Invoke(
 			fx.Annotate(

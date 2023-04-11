@@ -72,7 +72,28 @@ paths:
     post:
       tags:
       - aperture-controller
+      summary: PostPolicy creates or updates policies based on the provided request.
       operationId: PolicyService_PostPolicy
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/PostPolicyRequest'
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/PostPoliciesResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+    patch:
+      tags:
+      - aperture-controller
+      summary: PatchPolicy patches policies based on the provided request.
+      operationId: PolicyService_PatchPolicy
       parameters:
       - name: body
         in: body
@@ -92,6 +113,7 @@ paths:
     delete:
       tags:
       - aperture-controller
+      summary: DeletePolicy removes a policy with the specified name.
       operationId: PolicyService_DeletePolicy
       parameters:
       - type: string
@@ -2752,11 +2774,14 @@ definitions:
           $ref: '#/definitions/PostPolicyRequestPolicyRequest'
   PostPolicyRequestPolicyRequest:
     type: object
+    required:
+    - name
     properties:
       dynamic_config:
         type: object
       name:
         type: string
+        x-go-tag-validate: required
       policy:
         $ref: '#/definitions/Policy'
   ProcessInfo:
