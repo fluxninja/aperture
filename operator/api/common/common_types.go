@@ -25,7 +25,7 @@ import (
 	kubernetes "github.com/fluxninja/aperture/pkg/discovery/kubernetes/config"
 	static "github.com/fluxninja/aperture/pkg/discovery/static/config"
 	"github.com/fluxninja/aperture/pkg/etcd"
-	"github.com/fluxninja/aperture/pkg/jobs"
+	jobs "github.com/fluxninja/aperture/pkg/jobs/config"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
