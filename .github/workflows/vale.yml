@@ -12,3 +12,4 @@ jobs:
           files: docs/content
           fail_on_error: true
           reporter: github-pr-check
+          filter_mode: nofilter
