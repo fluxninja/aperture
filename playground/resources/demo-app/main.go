@@ -101,13 +101,12 @@ func envoyPortFromEnv() int {
 	if !exists {
 		// We do not use manually configured envoy proxy
 		return -1
-	} else {
-		envoyPort, err := strconv.Atoi(portValue)
-		if err != nil {
-			log.Panic().Err(err).Msg("Failed converting ENVOY_EGRESS_PORT value")
-		}
-		return envoyPort
 	}
+	envoyPort, err := strconv.Atoi(portValue)
+	if err != nil {
+		log.Panic().Err(err).Msg("Failed converting ENVOY_EGRESS_PORT value")
+	}
+	return envoyPort
 }
 
 func portFromEnv() int {
