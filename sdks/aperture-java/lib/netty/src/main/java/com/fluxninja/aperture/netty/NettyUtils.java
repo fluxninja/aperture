@@ -27,7 +27,7 @@ public class NettyUtils {
     }
 
     protected static CheckHTTPRequest checkRequestFromRequest(
-            ChannelHandlerContext ctx, HttpRequest req) {
+            ChannelHandlerContext ctx, HttpRequest req, String controlPointName) {
         Map<String, String> baggageLabels = new HashMap<>();
 
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -43,7 +43,9 @@ public class NettyUtils {
             baggageLabels.put(entry.getKey(), value);
         }
 
-        return addHttpAttributes(baggageLabels, ctx, req).build();
+        CheckHTTPRequest.Builder builder = addHttpAttributes(baggageLabels, ctx, req);
+        builder.setControlPoint(controlPointName);
+        return builder.build();
     }
 
     private static CheckHTTPRequest.Builder addHttpAttributes(
@@ -87,16 +89,15 @@ public class NettyUtils {
 
         CheckHTTPRequest.Builder builder = CheckHTTPRequest.newBuilder();
 
-        builder.setControlPoint("ingress")
-                .setRequest(
-                        CheckHTTPRequest.HttpRequest.newBuilder()
-                                .setMethod(req.method().toString())
-                                .setPath(new QueryStringDecoder(req.uri()).path())
-                                .setHost(req.headers().get("host"))
-                                .setScheme(scheme)
-                                .setSize(size)
-                                .setProtocol(req.protocolVersion().text())
-                                .putAllHeaders(headers));
+        builder.setRequest(
+                CheckHTTPRequest.HttpRequest.newBuilder()
+                        .setMethod(req.method().toString())
+                        .setPath(new QueryStringDecoder(req.uri()).path())
+                        .setHost(req.headers().get("host"))
+                        .setScheme(scheme)
+                        .setSize(size)
+                        .setProtocol(req.protocolVersion().text())
+                        .putAllHeaders(headers));
 
         if (sourceIp != null && sourcePort != 0) {
             builder.setSource(Utils.createSocketAddress(sourceIp, sourcePort, "TCP"));

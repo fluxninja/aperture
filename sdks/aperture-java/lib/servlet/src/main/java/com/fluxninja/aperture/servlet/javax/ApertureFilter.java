@@ -18,11 +18,12 @@ import javax.servlet.http.HttpServletResponse;
 public class ApertureFilter implements Filter {
 
     private ApertureSDK apertureSDK;
+    private String controlPointName;
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws ServletException, IOException {
-        CheckHTTPRequest checkRequest = ServletUtils.checkRequestFromRequest(req);
+        CheckHTTPRequest checkRequest = ServletUtils.checkRequestFromRequest(req, controlPointName);
 
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
@@ -66,6 +67,7 @@ public class ApertureFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         String agentHost;
         String agentPort;
+        String initControlPointName;
         String timeoutMs;
         boolean insecureGrpc;
         String rootCertificateFile;
@@ -74,6 +76,7 @@ public class ApertureFilter implements Filter {
         try {
             agentHost = filterConfig.getInitParameter("agent_host");
             agentPort = filterConfig.getInitParameter("agent_port");
+            initControlPointName = filterConfig.getInitParameter("control_point_name");
             timeoutMs = filterConfig.getInitParameter("timeout_ms");
             insecureGrpc = Boolean.parseBoolean(filterConfig.getInitParameter("insecure_grpc"));
             rootCertificateFile = filterConfig.getInitParameter("root_certificate_file");
@@ -85,6 +88,11 @@ public class ApertureFilter implements Filter {
             throw new ServletException("Could not read config parameters", e);
         }
 
+        if (initControlPointName != null) {
+            controlPointName = initControlPointName;
+        } else {
+            controlPointName = "ingress";
+        }
         try {
             ApertureSDKBuilder builder = ApertureSDK.builder();
             builder.setHost(agentHost);
