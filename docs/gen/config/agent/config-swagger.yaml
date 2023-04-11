@@ -1444,7 +1444,7 @@ definitions:
                 x-go-tag-json: entities,omitempty
         title: StaticDiscoveryConfig for pre-determined list of services.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/discovery/static
+        x-go-package: github.com/fluxninja/aperture/pkg/discovery/static/config
     WatchdogConfig:
         properties:
             cgroup:

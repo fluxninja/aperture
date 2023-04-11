@@ -23,7 +23,7 @@ import (
 	alertmgrconfig "github.com/fluxninja/aperture/pkg/alertmanager/config"
 	"github.com/fluxninja/aperture/pkg/config"
 	kubernetes "github.com/fluxninja/aperture/pkg/discovery/kubernetes/config"
-	"github.com/fluxninja/aperture/pkg/discovery/static"
+	static "github.com/fluxninja/aperture/pkg/discovery/static/config"
 	"github.com/fluxninja/aperture/pkg/etcd"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/metrics"
