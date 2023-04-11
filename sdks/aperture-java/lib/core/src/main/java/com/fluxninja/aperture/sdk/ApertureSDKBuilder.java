@@ -83,7 +83,7 @@ public final class ApertureSDKBuilder {
     /**
      * Adds comma-separated paths to ignore in traffic control points.
      *
-     * @deprecated use addIgnoredPaths
+     * @deprecated use {@link #addIgnoredPaths(String)}
      * @param paths comma-separated list of paths to ignore when creating traffic control points.
      * @return the builder object.
      */
@@ -110,7 +110,7 @@ public final class ApertureSDKBuilder {
     /**
      * Adds paths to ignore in traffic control points.
      *
-     * @deprecated use addIgnoredPaths
+     * @deprecated use {@link #addIgnoredPaths(List)}
      * @param paths list of paths to ignore when creating traffic control points.
      * @return the builder object.
      */
@@ -133,7 +133,7 @@ public final class ApertureSDKBuilder {
     /**
      * Whether ignored paths should be matched by regex. If false, exact matches will be expected.
      *
-     * @deprecated use setIgnoredPathsMatchRegex
+     * @deprecated use {@link #setIgnoredPathsMatchRegex(boolean)}
      * @param flag whether paths should be matched by regex.
      * @return the builder object.
      */
