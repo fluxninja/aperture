@@ -2,6 +2,9 @@
   "renderer": "tanka",
   "tkenv": "playground/tanka/apps/single-service-app",
   "needs": ["istio"],
+  "env_vars": {
+    "SIMPLE_SERVICE_CPU_LOAD": "50"
+  },
   "aperture_policies": [
     {
       "blueprint_name": "policies/latency-aimd-concurrency-limiting",
@@ -17,9 +20,6 @@
       "ssh": "default"
     }
   ],
-  "env_vars": {
-    "SIMPLE_SERVICE_CPU_LOAD": "50"
-  },
   "child_resources": [
     {
       "workload": "service1-demo-app",
