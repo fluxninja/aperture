@@ -34,7 +34,7 @@ web.xml file to automatically set traffic Control Points for relevant services:
 ```
 
 For example usage, you can view the [example app][tomcat-example] available in
-our repository.
+the repository.
 
 [tomcat-example]:
   https://github.com/fluxninja/aperture-java/tree/releases/aperture-java/v1.0.0/examples/tomcat-example

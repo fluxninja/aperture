@@ -40,7 +40,7 @@ traffic Control Points for decorated services:
 
 For more context on how to use Aperture Armeria Decorators to set Control
 Points, you can take a look at the [example app][armeria-example] available in
-our repository.
+the repository.
 
 [armeria-example]:
   https://github.com/fluxninja/aperture-java/tree/releases/aperture-java/v1.0.0/examples/armeria-example

@@ -78,7 +78,7 @@ helpful to handle specific routes in your service.
 ```
 
 For more context on how to use Aperture Python SDK to set feature Control
-Points, you can take a look at the [example app][example] available in our
+Points, you can take a look at the [example app][example] available in the
 repository.
 
 <!--- TODO: Change to pypi package once it is published. --->

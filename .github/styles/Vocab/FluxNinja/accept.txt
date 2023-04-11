@@ -36,3 +36,17 @@ untap
 kubectl
 subcommands
 systemd
+URL
+separately
+Lua
+Dockerfile
+lua
+dockerfile
+Nginx
+nginx
+Armeria
+Hostname
+hostname
+servlet
+JavaScript
+middlewares

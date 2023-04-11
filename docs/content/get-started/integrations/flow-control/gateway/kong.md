@@ -94,8 +94,8 @@ plugin is already installed:
 
 2. Optionally, create an environment variable `APERTURE_CHECK_TIMEOUT` which
    would be considered as a timeout for execution of the Aperture check. The
-   default value for it is `500m` which is 500 milliseconds. For example, use
-   the following command in bash:
+   default value for it's `500m` which is 500 milliseconds. For example, use the
+   following command in bash:
 
    :::info
 
