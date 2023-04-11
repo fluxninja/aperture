@@ -17,14 +17,22 @@ import java.util.Map;
 public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpRequest> {
 
     private final ApertureSDK apertureSDK;
+    private final String controlPointName;
 
     public ApertureServerHandler(ApertureSDK sdk) {
         this.apertureSDK = sdk;
+        this.controlPointName = "ingress";
+    }
+
+    public ApertureServerHandler(ApertureSDK sdk, String controlPointName) {
+        this.apertureSDK = sdk;
+        this.controlPointName = controlPointName;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpRequest req) {
-        CheckHTTPRequest checkRequest = NettyUtils.checkRequestFromRequest(ctx, req);
+        CheckHTTPRequest checkRequest =
+                NettyUtils.checkRequestFromRequest(ctx, req, controlPointName);
         String path = new QueryStringDecoder(req.uri()).path();
 
         TrafficFlow flow = this.apertureSDK.startTrafficFlow(path, checkRequest);

@@ -29,7 +29,8 @@ public class ServletUtils {
         return 403;
     }
 
-    protected static CheckHTTPRequest checkRequestFromRequest(ServletRequest req) {
+    protected static CheckHTTPRequest checkRequestFromRequest(
+            ServletRequest req, String controlPointName) {
         Map<String, String> baggageLabels = new HashMap<>();
 
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -46,7 +47,9 @@ public class ServletUtils {
             baggageLabels.put(entry.getKey(), value);
         }
 
-        return addHttpAttributes(baggageLabels, req).build();
+        CheckHTTPRequest.Builder builder = addHttpAttributes(baggageLabels, req);
+        builder.setControlPoint(controlPointName);
+        return builder.build();
     }
 
     protected static ServletRequest updateHeaders(
@@ -96,16 +99,15 @@ public class ServletUtils {
 
         CheckHTTPRequest.Builder builder = CheckHTTPRequest.newBuilder();
 
-        builder.setControlPoint("ingress")
-                .setRequest(
-                        CheckHTTPRequest.HttpRequest.newBuilder()
-                                .setMethod(request.getMethod())
-                                .setPath(request.getServletPath())
-                                .setHost(req.getRemoteHost())
-                                .setScheme(req.getScheme())
-                                .setSize(req.getContentLength())
-                                .setProtocol(req.getProtocol())
-                                .putAllHeaders(headers));
+        builder.setRequest(
+                CheckHTTPRequest.HttpRequest.newBuilder()
+                        .setMethod(request.getMethod())
+                        .setPath(request.getServletPath())
+                        .setHost(req.getRemoteHost())
+                        .setScheme(req.getScheme())
+                        .setSize(req.getContentLength())
+                        .setProtocol(req.getProtocol())
+                        .putAllHeaders(headers));
 
         if (sourceIp != null) {
             builder.setSource(Utils.createSocketAddress(sourceIp, sourcePort, "TCP"));
