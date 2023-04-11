@@ -4,21 +4,21 @@ import com.fluxninja.aperture.sdk.ApertureSDK;
 import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.fluxninja.aperture.sdk.TrafficFlow;
-import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
-import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
+import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
 import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.client.HttpClient;
 import com.linecorp.armeria.client.SimpleDecoratingHttpClient;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.Map;
 import java.util.function.Function;
 
 /** Decorates an {@link HttpClient} to enable flow control using provided {@link ApertureSDK} */
 public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
     private final ApertureSDK apertureSDK;
+    private final String controlPointName;
 
     public static Function<? super HttpClient, ApertureHTTPClient> newDecorator(
             ApertureSDK apertureSDK) {
@@ -27,15 +27,26 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
         return builder::build;
     }
 
-    public ApertureHTTPClient(HttpClient delegate, ApertureSDK apertureSDK) {
+    public static Function<? super HttpClient, ApertureHTTPClient> newDecorator(
+            ApertureSDK apertureSDK, String controlPointName) {
+        ApertureHTTPClientBuilder builder = new ApertureHTTPClientBuilder();
+        builder.setApertureSDK(apertureSDK);
+        builder.setControlPointName(controlPointName);
+        return builder::build;
+    }
+
+    public ApertureHTTPClient(
+            HttpClient delegate, ApertureSDK apertureSDK, String controlPointName) {
         super(delegate);
         this.apertureSDK = apertureSDK;
+        this.controlPointName = controlPointName;
     }
 
     @Override
     public HttpResponse execute(ClientRequestContext ctx, HttpRequest req) throws Exception {
-        AttributeContext attributes = HttpUtils.attributesFromRequest(ctx, req);
-        TrafficFlow flow = this.apertureSDK.startTrafficFlow(req.path(), attributes);
+        CheckHTTPRequest request =
+                HttpUtils.checkRequestFromRequest(ctx, req, this.controlPointName);
+        TrafficFlow flow = this.apertureSDK.startTrafficFlow(req.path(), request);
 
         if (flow.ignored()) {
             return unwrap().execute(ctx, req);
@@ -44,9 +55,9 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
         if (flow.accepted()) {
             HttpResponse res;
             try {
-                List<HeaderValueOption> newHeaders = new ArrayList<>();
+                Map<String, String> newHeaders = Collections.emptyMap();
                 if (flow.checkResponse() != null) {
-                    newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
+                    newHeaders = flow.checkResponse().getOkResponse().getHeadersMap();
                 }
                 HttpRequest newRequest = HttpUtils.updateHeaders(req, newHeaders);
                 ctx.updateRequest(newRequest);

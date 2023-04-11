@@ -2,7 +2,7 @@ package com.fluxninja.aperture.sdk;
 
 import static com.fluxninja.aperture.sdk.Constants.*;
 
-import com.fluxninja.generated.envoy.service.auth.v3.CheckResponse;
+import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse;
 import com.fluxninja.generated.google.rpc.Status;
 import com.google.protobuf.Value;
 import com.google.protobuf.util.JsonFormat;
@@ -10,12 +10,12 @@ import com.google.rpc.Code;
 import io.opentelemetry.api.trace.Span;
 
 public class TrafficFlow {
-    private final CheckResponse checkResponse;
+    private final CheckHTTPResponse checkResponse;
     private final Span span;
     public boolean ended;
     private boolean ignored;
 
-    TrafficFlow(CheckResponse checkResponse, Span span, boolean ended) {
+    TrafficFlow(CheckHTTPResponse checkResponse, Span span, boolean ended) {
         this.checkResponse = checkResponse;
         this.span = span;
         this.ended = ended;
@@ -39,7 +39,7 @@ public class TrafficFlow {
         return this.ignored;
     }
 
-    public CheckResponse checkResponse() {
+    public CheckHTTPResponse checkResponse() {
         return this.checkResponse;
     }
 
@@ -88,8 +88,8 @@ public class TrafficFlow {
     }
 
     // Artificial response if none is received from agent
-    static CheckResponse successfulResponse() {
-        return CheckResponse.newBuilder()
+    static CheckHTTPResponse successfulResponse() {
+        return CheckHTTPResponse.newBuilder()
                 .setStatus(Status.newBuilder().setCode(Code.OK_VALUE).build())
                 .build();
     }
