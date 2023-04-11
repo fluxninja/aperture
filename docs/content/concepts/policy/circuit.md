@@ -12,8 +12,8 @@ See also [_Circuit_ reference][circuit-reference]
 _Circuit_ describes a [control system][control-system] as an execution graph.
 _Circuit_ is defined as a dataflow graph of inter-connected components.
 _Signals_ flow between components via ports. As signals traverse the circuit,
-they get processed, stored within components or get acted upon (e.g. load-shed,
-rate-limit, auto-scale etc.). _Circuit_ is evaluated periodically in order to
+they get processed, stored within components or get acted upon (for example:
+load-shed, rate-limit, auto scale etc.). _Circuit_ is evaluated periodically to
 respond to changes in signal readings.
 
 ## Component
@@ -33,9 +33,9 @@ a circuit.
 Output port on a component may emit a signal. No other port (on any component)
 in the circuit can emit a signal with the same name.
 
-In order to receive a named signal at a component it must be defined exactly
-once as an output at some component in the circuit. Once defined, a signal may
-be received at multiple components.
+To receive a named signal at a component it must be defined exactly once as an
+output at some component in the circuit. Once defined, a signal may be received
+at multiple components.
 
 ## Circuit Runtime
 
@@ -44,14 +44,14 @@ called a tick. The `evaluation_interval` parameter in [policy
 spec][policy-reference] configures how often the circuit evaluates (ticks).
 
 On every tick, each component in the circuit gets executed exactly once.
-components get executed as they become ready. A component is ready if all of its
+components get executed as they become ready. A component is ready if all its
 input signals are available.
 
 During execution, the input signals are processed and output signals are emitted
 by the component. Any [looping signals][looping-signals] are saved and consumed
 by circuit in the next tick.
 
-_Circuit_ runtime provides very predictable execution semantics. Any timed
+_Circuit_ runtime provides highly predictable execution semantics. Any timed
 operations like [_PromQL_][promql-reference] queries are synchronized to execute
 on multiples of ticks. All _PromQL_ queries in a circuit are centrally
 synchronized to ensure that all the queries that fire in the same tick return

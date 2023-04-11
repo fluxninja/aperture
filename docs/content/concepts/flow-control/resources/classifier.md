@@ -11,7 +11,7 @@ See also [_Classifier_ reference][reference]
 
 The _Classifier_ can be used to create additional [_Flow Labels_][label] based
 on request metadata without requiring any changes to your service, if the
-existing flow labels are not sufficient.
+existing flow labels aren't sufficient.
 
 To define a classifier, it needs to be added as a resource in a
 [policy][policies]. It specifies a set of rules to create new flow labels based
@@ -25,8 +25,8 @@ playground][rego-playground].
 
 At _Feature_ [_Control Points_][control-point], developers can already provide
 arbitrary flow labels by setting baggage or directly as arguments to the Check()
-call. As flow labels can be easily provided at _Feature_ control points by the
-developers, _Classifiers_ are available only at _HTTP_ control points.
+call. As flow labels can be effortlessly provided at _Feature_ control points by
+the developers, _Classifiers_ are available only at _HTTP_ control points.
 
 :::
 
@@ -47,7 +47,7 @@ Both these behaviors (baggage propagation and inclusion in telemetry) can be
 :::caution
 
 Although Classifier is defined as a resource in a [_Policy_][policies], _Flow
-Labels_ are not namespaced in any way and are shared across policies.
+Labels_ aren't namespaced in any way and are shared across policies.
 
 :::
 
@@ -65,8 +65,8 @@ selector:
     control_point: ingress
 ```
 
-You can be more precise by adding a [_Label Matcher_][label-matcher] and e.g.
-gate the classifier to particular paths.
+You can be more precise by adding a [_Label Matcher_][label-matcher] and for
+example gate the classifier to particular paths.
 
 ## Live Previewing Requests {#live-previewing-requests}
 
@@ -180,12 +180,12 @@ metadata. Provided extractors include:
 - parsing JWT tokens,
 - and others.
 
-Aperture aims to expand the set of extractors to cover most-common usecases.
+Aperture aims to expand the set of extractors to cover most-common use cases.
 
 :::caution
 
 Keys of flow labels created by extractors must be valid [Rego][rego] identifiers
-(allowed are alphanumeric characters and underscore; also label name cannot be a
+(allowed are alphanumeric characters and underscore; also label name can't be a
 [Rego keyword][rego-kw], like `if` or `default`). This limitation may be lifted
 in future.
 

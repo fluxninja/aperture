@@ -21,10 +21,9 @@ updates.
 
 :::
 
-For instance, if a policy contains a rate limiter, we can provide limit
-overrides for specific flow label keys via dynamic configuration. This prevents
-resetting of distributed counters that would otherwise happen when a policy is
-restarted.
+If a policy contains a rate limiter, limit overrides for specific flow label
+keys can be provided via dynamic configuration to prevent the resetting of
+distributed counters that would otherwise occur when a policy is restarted.
 
 The dynamic configuration can be provided to an existing policy using the
 [aperturectl CLI](/reference/aperturectl/apply/apply.md). To learn more about

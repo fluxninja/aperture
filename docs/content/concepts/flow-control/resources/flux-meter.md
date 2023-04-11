@@ -19,7 +19,7 @@ Selector][flow-selector] to a Prometheus [histogram][histogram-metric].
 
 ## Naming
 
-_Flux Meter_ is referred by its name. It is strongly recommended to assign
+_Flux Meter_ is referred by its name. it's strongly recommended to assign
 globally unique names to _Flux Meters_. A good practice is to prefix the Flux
 Meter name with the policy name.
 
@@ -50,9 +50,10 @@ accuracy.
 
 :::note
 
-Buckets are needed only for quantile queries e.g. getting the 95th percentile of
-duration across pods in a service. The buckets don't matter if you are only
-interested in the average duration or throughput metrics from a _Flux Meter_.
+Buckets are needed only for quantile queries for example getting the 95th
+percentile of duration across pods in a service. The buckets don't matter if you
+are only interested in the average duration or throughput metrics from a _Flux
+Meter_.
 
 :::
 
@@ -109,7 +110,7 @@ as signal to a Controller which determines the desired Concurrency of a Service.
 
 _Flux Meters_ are a great way to measure [SLOs][google-sre-slo] of your Service
 down to fine-grained APIs attributes such as endpoints, user types (subscriber
-vs. logged out) and so on.
+vs. logged out).
 
 [reference]: /reference/policies/spec.md#flux-meter
 [flow-selector]: /concepts/flow-control/flow-selector.md

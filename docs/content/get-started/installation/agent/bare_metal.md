@@ -69,13 +69,13 @@ You should then point Aperture Agent at etcd and Prometheus deployed by the
 Aperture Controller, by editing
 `/etc/aperture/aperture-agent/config/aperture-agent.yaml`.
 
-All the config parameters for the Aperture Agent are available
+All the configuration parameters for the Aperture Agent are available
 [here](/reference/configuration/agent.md).
 
 :::info
 
-The default config disables the FluxNinja ARC Extension for the Aperture Agent.
-If you want to keep it enabled, add parameters provided
+The default configuration disables the FluxNinja ARC Extension for the Aperture
+Agent. If you want to keep it enabled, add parameters provided
 [here](/arc/extension.md#configuration).
 
 :::

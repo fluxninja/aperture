@@ -137,16 +137,16 @@ flow_selector:
 
 ### Filtering Out Liveness, Health Probes, and Metrics Endpoints
 
-Liveness and health probes are essential for checking the health of our
-application, and metrics endpoints are necessary for monitoring its performance.
-However, these endpoints don't contribute to the overall latency of the service,
-and if we include them in our latency calculations, they may cause requests to
-be rejected, leading to unnecessary pod restarts.
+Liveness and health probes are essential for checking the health of application,
+and metrics endpoints are necessary for monitoring its performance. However,
+these endpoints don't contribute to the overall latency of the service, and if
+included in latency calculations, they may cause requests to be rejected,
+leading to unnecessary pod restarts.
 
-To prevent these issues, we can filter out traffic to these endpoints by
-matching expressions. In the example below, we filter out flows with http.target
-starting with /health, /live, or /ready, and User Agent starting with
-kube-probe/1.23:
+To prevent these issues, traffic to these endpoints can be filtered out by
+matching expressions. In the example below, flows with http.target starting with
+/health, /live, or /ready, and User Agent starting with kube-probe/1.23 are
+filtered out.
 
 ```yaml
 service_selector:
@@ -170,9 +170,8 @@ flow_selector:
           - kube-probe/1.23
 ```
 
-By filtering out traffic to these endpoints, we can prevent unnecessary pod
-restarts and ensure that our application is available to handle real user
-traffic.
+Filtering out traffic to these endpoints can prevent unnecessary pod restarts
+and ensure that the application is available to handle real user traffic
 
 Note that you can filter out other flows by matching on different keys and
 operators, such as http.method with NotIn operator and GET value. For more
@@ -181,9 +180,9 @@ reference][label-matcher].
 
 :::info
 
-Keep in mind that while these endpoints may have a low latency, they should not
+Keep in mind that while these endpoints may have a low latency, they shouldn't
 be included in the overall latency of the service. Filtering them out can help
-improve the accuracy of our latency calculations and prevent requests from being
+improve the accuracy of latency calculations and prevent requests from being
 rejected.
 
 :::
@@ -217,12 +216,11 @@ operate as peers. For example, an Agent Group can be a Kubernetes cluster name
 in case of DaemonSet deployment, or it can be a service name for sidecar
 deployments.
 
-_Agent Group_ also defines the scope of **Agent-to-Agent synchronization**.
-Agents within their group form a peer-to-peer network to synchronize
-fine-grained state such as per-label global counters that are used for [rate
-limiting purposes][dc]. Also, all the agents within an _Agent Group_ instantiate
-the same set of [flow control components][components], as published by Aperture
-Controller.
+**Agent Group** defines the scope of Agent-to-Agent synchronization, with agents
+within the group forming a peer-to-peer network to synchronize fine-grained
+state per-label global counters that are used for rate limiting purposes.
+Additionally, all agents within an **Agent Group** instantiate the same set of
+flow control components as published by [Aperture Controller][controller].
 
 ### Service {#service}
 

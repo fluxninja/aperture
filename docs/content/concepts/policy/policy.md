@@ -27,9 +27,9 @@ Policy specification consists of two parts:
 
 A [circuit][circuit] in Aperture's policy language represents the signal
 processing circuit of the control system as an execution graph. It captures the
-decision-making process and describes the actions to be taken based on the
-current state of the system. A circuit is made up of nodes, which represent the
-various components of the control system, including signal processing
+process of evaluating the system's current state and describes the actions to be
+taken based on that evaluation. A circuit is made up of nodes, which represent
+the various components of the control system, including signal processing
 components, and edges, which represent the flow of signals between the nodes.
 
 Observability-driven control is an important aspect of Aperture's policy
@@ -41,8 +41,7 @@ responsible for the logic of the control system.
 
 ## Resources
 
-A list of [Resources][resources] which need to be set up in order to support the
-circuit.
+A list of [Resources][resources] which need to be set up to support the circuit.
 
 ```mdx-code-block
 import DocCardList from '@theme/DocCardList';

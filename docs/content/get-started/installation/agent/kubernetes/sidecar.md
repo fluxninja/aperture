@@ -32,12 +32,12 @@ and pod annotations as below:
 
 The injector is configured with the following logic:
 
-- If either label or annotation is disabled, the pod is not injected
-- If pod annotation is enabled but the namespace label is not present, the pod
-  is not injected
+- If either label or annotation is disabled, the pod isn't injected
+- If pod annotation is enabled but the namespace label isn't present, the pod
+  isn't injected
 - If neither label nor annotation is set, the pod is injected if the namespace
-  is listed under `.spec.sidecar.enableNamespacesByDefault`. This is not enabled
-  by default, so generally this means the pod is not injected.
+  is listed under `.spec.sidecar.enableNamespacesByDefault`. This isn't enabled
+  by default, so this means the pod isn't injected.
 
 ## Prerequisites
 
@@ -54,7 +54,7 @@ Install the tool of your choice using below links:
 
     1. Once the Helm CLI is installed, add the
        [Aperture Agent Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-agent)
-       repo in your environment for install/upgrade:
+       repository in your environment for install/upgrade:
 
        ```bash
        helm repo add aperture https://fluxninja.github.io/aperture/
@@ -77,7 +77,7 @@ Kubernetes Objects which will be created by following steps are listed
 
 :::
 
-1. Configure the below parameters of Etcd and Prometheus for the Agent Custom
+1. Configure the below parameters of etcd and Prometheus for the Agent Custom
    Resource by creating a `values.yaml` with below parameters and pass it with
    `install` command:
 
@@ -103,14 +103,14 @@ Kubernetes Objects which will be created by following steps are listed
    ```
 
    Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with
-   the actual values of Etcd and Prometheus, which is also being used by the
+   the actual values of etcd and Prometheus, which is also being used by the
    Aperture Controller you want these Agents to connect with.
    `CONTROLLER_ENDPOINT_HERE` should point to Aperture Controller. If you skip
    it, some subcommands `aperturectl` commands won't work.
 
    If you have installed the
    [Aperture Controller](/get-started/installation/controller/controller.md) on
-   the same cluster in `default` namespace, with Etcd and Prometheus using
+   the same cluster in `default` namespace, with etcd and Prometheus using
    `controller` as release name, the values for the values for
    `ETCD_ENDPOINT_HERE`, `PROMETHEUS_ADDRESS_HERE` and
    `CONTROLLER_ENDPOINT_HERE` would be as below:
@@ -158,8 +158,8 @@ Kubernetes Objects which will be created by following steps are listed
          address: "http://controller-prometheus-server.default.svc.cluster.local:80"
    ```
 
-   Replace the `NAMESPACE1`, `NAMESPACE2` and so on, with the actual namespaces
-   and add more if required.
+   Replace the `NAMESPACE1`, `NAMESPACE2` and other namespaces, with the actual
+   namespaces and add more if required.
 
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
@@ -174,9 +174,9 @@ Kubernetes Objects which will be created by following steps are listed
    </TabItem>
    </Tabs>
 
-3. If you want to modify the default parameters or the Aperture Agent config,
-   for example `log`, you can create or update the `values.yaml` file and pass
-   it with `install` command:
+3. If you want to modify the default parameters or the Aperture Agent
+   configuration, for example `log`, you can create or update the `values.yaml`
+   file and pass it with `install` command:
 
    ```yaml
    agent:
@@ -206,7 +206,7 @@ Kubernetes Objects which will be created by following steps are listed
    </TabItem>
    </Tabs>
 
-   All the config parameters for the Aperture Agent are available
+   All the configuration parameters for the Aperture Agent are available
    [here](/reference/configuration/agent.md).
 
    A list of configurable parameters for the installation can be found in the
@@ -270,7 +270,7 @@ Kubernetes Objects which will be created by following steps are listed
       ```
 
       Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE`
-      with the actual values of Etcd and Prometheus, which is also being used by
+      with the actual values of etcd and Prometheus, which is also being used by
       the Aperture Controller you want these Agents to connect with.
 
       All the configuration parameters for the Agent Custom Resource are listed
@@ -355,8 +355,8 @@ the output. There should be a container with name `aperture-agent`.
 
 ## Customizing injection
 
-Generally, the pod are injected based on the default and overridden parameters
-provided in the Custom Resource.
+The pods are injected based on the default and overridden parameters provided in
+the Custom Resource.
 
 Per-pod configuration is available to override these options on individual pods.
 This is done by adding an `aperture-agent` container to your pod. The sidecar
@@ -364,8 +364,8 @@ injection will treat any configuration defined here as an override to the
 default injection template.
 
 Care should be taken when customizing these settings, as this allows complete
-customization of the resulting Pod, including making changes that cause the
-sidecar container to not function properly.
+customization of the resulting Pod, including making changes that may affect the
+sidecar container's functionality
 
 For example, the following configuration customizes a variety of settings,
 including setting the CPU requests, adding a volume mount, and modifying
@@ -400,11 +400,11 @@ In general, any field in a pod can be set. However, care must be taken for
 certain fields:
 
 - Kubernetes requires the image field to be set before the injection has run.
-  While you can set a specific image to override the default one, it is
+  While you can set a specific image to override the default one, it's
   recommended to set the image to `auto` which will cause the sidecar injector
   to automatically select the image to use.
 - Some fields in Pod are dependent on related settings. For example, CPU request
-  must be less than CPU limit. If both fields are not configured together, the
+  must be less than CPU limit. If both fields aren't configured together, the
   pod may fail to start.
 
 Additionally, `agent-group` field can be configured using the annotation like:
@@ -422,8 +422,8 @@ following below steps:
    helm uninstall agent
    ```
 
-2. Alternatively, if you have installed the Aperture Agent Custom Resource
-   separately, follow below steps:
+2. If you have installed the Aperture Agent Custom Resource, follow the steps
+   below:
 
    1. Delete the Aperture Agent Custom Resource:
 
@@ -487,7 +487,7 @@ following below steps:
 8. **Optional**: Delete the CRD installed by the Helm chart:
 
    > Note: By design, deleting a Helm chart via Helm doesn’t delete the Custom
-   > Resource Definitions (CRDs) installed via the chart.
+   > Resource Definitions installed via the chart.
 
    ```bash
    kubectl delete crd agents.fluxninja.com
