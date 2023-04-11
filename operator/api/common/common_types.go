@@ -33,7 +33,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 	"github.com/fluxninja/aperture/pkg/profilers"
-	"github.com/fluxninja/aperture/pkg/prometheus"
+	prometheus "github.com/fluxninja/aperture/pkg/prometheus/config"
 	watchdogconfig "github.com/fluxninja/aperture/pkg/watchdog/config"
 
 	corev1 "k8s.io/api/core/v1"

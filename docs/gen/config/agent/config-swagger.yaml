@@ -1343,7 +1343,7 @@ definitions:
             - address
         title: PrometheusConfig holds configuration for Prometheus Server.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/prometheus
+        x-go-package: github.com/fluxninja/aperture/pkg/prometheus/config
     ProxyConfig:
         description: This configuration has preference over environment variables HTTP_PROXY, HTTPS_PROXY or NO_PROXY. See <https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config>
         properties:

@@ -1,4 +1,3 @@
-// +kubebuilder:validation:Optional
 package prometheus
 
 import (
@@ -13,6 +12,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	commonhttp "github.com/fluxninja/aperture/pkg/net/http"
+	promconfig "github.com/fluxninja/aperture/pkg/prometheus/config"
 )
 
 var (
@@ -34,14 +34,6 @@ var (
 	httpConfigKey = strings.Join([]string{prometheusConfigKey, "http_client"}, ".")
 )
 
-// PrometheusConfig holds configuration for Prometheus Server.
-// swagger:model
-// +kubebuilder:object:generate=true
-type PrometheusConfig struct {
-	// Address of the prometheus server
-	Address string `json:"address" validate:"required,hostname_port|url|fqdn"`
-}
-
 // Module provides a singleton pointer to prometheusv1.API via FX.
 func Module() fx.Option {
 	return fx.Options(
@@ -58,7 +50,7 @@ type ClientIn struct {
 }
 
 func providePrometheusClient(in ClientIn) (prometheusv1.API, promapi.Client, error) {
-	var config PrometheusConfig
+	var config promconfig.PrometheusConfig
 	if err := in.Unmarshaller.UnmarshalKey(prometheusConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("unable to deserialize")
 		return nil, nil, err
