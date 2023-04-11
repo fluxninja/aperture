@@ -26,26 +26,26 @@ type FxOut struct {
 // FxIn is the input for the AddAgentInfoAttribute function.
 type FxIn struct {
 	fx.In
-	unmarshaller config.Unmarshaller
+	Unmarshaller config.Unmarshaller
 }
 
 // providePolicyValidator provides classification Policy Custom Resource validator
 //
 // Note: This validator must be registered to be accessible.
-func providePolicyValidator(in FxIn) (*FxOut, error) {
+func providePolicyValidator(in FxIn) (FxOut, error) {
 	var config crwatcher.CRWatcherConfig
-	err := in.unmarshaller.UnmarshalKey(crwatcher.ConfigKey, &config)
+	err := in.Unmarshaller.UnmarshalKey(crwatcher.ConfigKey, &config)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to unmarshal Kubernetes watcher config")
-		return nil, err
+		return FxOut{}, err
 	}
 
 	if !config.Enabled {
 		log.Info().Msg("Kubernetes watcher is disabled")
-		return nil, nil
+		return FxOut{}, nil
 	}
 
-	return &FxOut{
+	return FxOut{
 		Validator: &PolicySpecValidator{},
 	}, nil
 }

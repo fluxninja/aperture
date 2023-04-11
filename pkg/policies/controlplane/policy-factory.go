@@ -12,30 +12,48 @@ import (
 	"github.com/fluxninja/aperture/pkg/alerts"
 	"github.com/fluxninja/aperture/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/pkg/etcd/client"
+	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/jobs"
 	"github.com/fluxninja/aperture/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/pkg/policies/paths"
 	prom "github.com/fluxninja/aperture/pkg/prometheus"
 	"github.com/fluxninja/aperture/pkg/status"
+)
+
+// Fx tag to match etcd watcher name.
+var (
+	policiesDriverFxTag              = "policies-driver"
+	policiesDynamicConfigDriverFxTag = "policies-dynamic-config-driver"
 )
 
 // policyFactoryModule module for policy factory.
 func policyFactoryModule() fx.Option {
 	return fx.Options(
+		etcdwatcher.Constructor{Name: policiesDriverFxTag, EtcdPath: paths.PoliciesConfigPath}.Annotate(),
+		etcdwatcher.Constructor{Name: policiesDynamicConfigDriverFxTag, EtcdPath: paths.PoliciesDynamicConfigPath}.Annotate(),
 		fx.Provide(
 			fx.Annotate(
 				providePolicyFactory,
 				fx.ParamTags(
-					config.NameTag(policiesFxTag),
-					config.NameTag(policiesDynamicConfigFxTag),
+					config.NameTag(policiesDriverFxTag),
+					config.NameTag(policiesDynamicConfigDriverFxTag),
 					iface.FxOptionsFuncTag,
 					alerts.AlertsFxTag,
 				),
 			),
 		),
 		grpcgateway.RegisterHandler{Handler: policylangv1.RegisterPolicyServiceHandlerFromEndpoint}.Annotate(),
-		fx.Invoke(RegisterPolicyService),
+		fx.Invoke(
+			fx.Annotate(
+				RegisterPolicyService,
+				fx.ParamTags(
+					config.NameTag(policiesTrackerFxTag),
+					config.NameTag(policiesDynameConfigTrackerFxTag),
+				),
+			),
+		),
 		prom.Module(),
 		policyModule(),
 	)
@@ -124,23 +142,16 @@ func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 	unmarshaller config.Unmarshaller,
 	registry status.Registry,
 ) (fx.Option, error) {
-	policyMessage := &policylangv1.Policy{}
-	err := unmarshaller.Unmarshal(policyMessage)
-	if err != nil {
+	var wrapperMessage policysyncv1.PolicyWrapper
+	err := unmarshaller.Unmarshal(&wrapperMessage)
+	if err != nil || wrapperMessage.Policy == nil {
 		registry.SetStatus(status.NewStatus(nil, err))
-		registry.GetLogger().Error().Err(err).Msg("Failed to unmarshal policy")
-		return fx.Options(), err
-	}
-
-	wrapperMessage, err := hashAndPolicyWrap(policyMessage, string(key))
-	if err != nil {
-		registry.SetStatus(status.NewStatus(nil, err))
-		registry.GetLogger().Error().Err(err).Msg("Failed to wrap message in config properties")
+		registry.GetLogger().Error().Err(err).Msg("Failed to unmarshal policy config wrapper")
 		return fx.Options(), err
 	}
 
 	policyFxOptions, err := newPolicyOptions(
-		wrapperMessage,
+		&wrapperMessage,
 		registry,
 	)
 	if err != nil {
@@ -154,7 +165,7 @@ func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 			factory.circuitJobGroup,
 			factory.etcdClient,
 			factory.alerterIface,
-			wrapperMessage,
+			&wrapperMessage,
 		),
 		policyFxOptions,
 		fx.Invoke(factory.trackPolicy),

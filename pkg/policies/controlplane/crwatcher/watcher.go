@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
-	"github.com/hashicorp/go-multierror"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -46,12 +45,12 @@ type watcher struct {
 var _ notifiers.Watcher = &watcher{}
 
 // NewWatcher prepares watcher instance for the Kuberneter Policy.
-func NewWatcher() (*watcher, error) {
+func NewWatcher(trackers, dynamicConfigTrackers notifiers.Trackers) (*watcher, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	watcher := &watcher{
-		Trackers:              notifiers.NewDefaultTrackers(),
-		dynamicConfigTrackers: notifiers.NewDefaultTrackers(),
+		Trackers:              trackers,
+		dynamicConfigTrackers: dynamicConfigTrackers,
 		ctx:                   ctx,
 		cancel:                cancel,
 	}
@@ -61,15 +60,6 @@ func NewWatcher() (*watcher, error) {
 
 // Start starts the watcher go routines and handles Policy Custom resource events from Kubernetes.
 func (w *watcher) Start() error {
-	err := w.Trackers.Start()
-	if err != nil {
-		return err
-	}
-	err = w.dynamicConfigTrackers.Start()
-	if err != nil {
-		return err
-	}
-
 	w.waitGroup.Add(1)
 
 	panichandler.Go(func() {
@@ -115,20 +105,11 @@ func (w *watcher) Start() error {
 func (w *watcher) Stop() error {
 	w.cancel()
 	w.waitGroup.Wait()
-	var err, merr error
-	err = w.Trackers.Stop()
-	if err != nil {
-		merr = multierror.Append(merr, err)
-	}
-	err = w.dynamicConfigTrackers.Stop()
-	if err != nil {
-		merr = multierror.Append(merr, err)
-	}
-	return merr
+	return nil
 }
 
 // GetDynamicConfigWatcher returns the config watcher.
-func (w *watcher) GetDynamicConfigWatcher() notifiers.Watcher {
+func (w *watcher) GetDynamicConfigWatcher() notifiers.Trackers {
 	return w.dynamicConfigTrackers
 }
 

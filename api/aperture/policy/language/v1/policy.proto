@@ -10,6 +10,7 @@ import "aperture/policy/language/v1/std_components.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 service PolicyService {
@@ -19,6 +20,42 @@ service PolicyService {
       tags: ["aperture-controller"];
     };
   }
+
+  rpc PostPolicy(PostPolicyRequest) returns (PostPoliciesResponse) {
+    option (google.api.http) = {
+      post: "/v1/policies"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-controller"];
+    };
+  }
+
+  rpc DeletePolicy(DeletePolicyRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/v1/policies/{name}"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-controller"];
+    };
+  }
+}
+
+message PostPolicyRequest {
+  message PolicyRequest {
+    string name = 1;
+    Policy policy = 2;
+    google.protobuf.Struct dynamic_config = 3;
+  }
+
+  repeated PolicyRequest policies = 1;
+}
+
+message DeletePolicyRequest {
+  string name = 1;
+}
+
+message PostPoliciesResponse {
+  repeated string errors = 1;
+  string message = 2;
 }
 
 message GetPoliciesResponse {

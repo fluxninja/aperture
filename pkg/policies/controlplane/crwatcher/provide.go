@@ -12,7 +12,7 @@ import (
 
 const (
 	// ConfigKey is the key to the Kubernetes watcher config.
-	ConfigKey = "policies.crwatcher"
+	ConfigKey = "policies.cr_watcher"
 )
 
 // CRWatcherConfig holds fields to configure the Kubernetes watcher for Aperture Policy custom resource.
@@ -25,49 +25,49 @@ type CRWatcherConfig struct {
 
 // Constructor holds fields to create an annotated instance of Kubernetes Watcher.
 type Constructor struct {
-	// Name of watcher instance.
-	Name string
-	// Name of dynamic config watcher instance.
-	DynamicConfigName string
+	// Name of tracker instance.
+	TrackersName string
+	// Name of dynamic config tracker instance.
+	DynamicConfigTrackersName string
 }
 
 // Annotate creates an annotated instance of Kubernetes Watcher.
 func (constructor Constructor) Annotate() fx.Option {
-	if constructor.Name == "" || constructor.DynamicConfigName == "" {
+	if constructor.TrackersName == "" || constructor.DynamicConfigTrackersName == "" {
 		log.Panic().Msg("Kubernetes watcher name is required")
 	}
-	name := config.NameTag(constructor.Name)
-	dynamicConfigName := config.NameTag(constructor.DynamicConfigName)
-	return fx.Options(fx.Provide(
+	trackersName := config.NameTag(constructor.TrackersName)
+	dynamicConfigTrackersName := config.NameTag(constructor.DynamicConfigTrackersName)
+	return fx.Options(fx.Invoke(
 		fx.Annotate(
 			constructor.provideWatcher,
-			fx.ResultTags(name, dynamicConfigName),
+			fx.ParamTags(trackersName, dynamicConfigTrackersName),
 		),
 	))
 }
 
 // provideWatcher creates a Kubernetes watcher to watch the Policy Custom Resource.
-func (constructor Constructor) provideWatcher(unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) (notifiers.Watcher, notifiers.Watcher, error) {
+func (constructor Constructor) provideWatcher(trackers, dynamicConfigTrackers notifiers.Trackers, unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) error {
 	var config CRWatcherConfig
 	err := unmarshaller.UnmarshalKey(ConfigKey, &config)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to unmarshal Kubernetes watcher config")
-		return nil, nil, err
+		return err
 	}
 
 	if !config.Enabled {
 		log.Info().Msg("Kubernetes watcher is disabled")
-		return nil, nil, nil
+		return nil
 	}
 
 	if os.Getenv("APERTURE_CONTROLLER_NAMESPACE") == "" {
 		os.Setenv("APERTURE_CONTROLLER_NAMESPACE", "default")
 	}
 
-	watcher, err := NewWatcher()
+	watcher, err := NewWatcher(trackers, dynamicConfigTrackers)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create Policy Kubernetes watcher")
-		return nil, nil, err
+		return err
 	}
 
 	lifecycle.Append(fx.Hook{
@@ -84,5 +84,5 @@ func (constructor Constructor) provideWatcher(unmarshaller config.Unmarshaller, 
 		},
 	})
 
-	return watcher, watcher.GetDynamicConfigWatcher(), nil
+	return nil
 }

@@ -69,6 +69,44 @@ paths:
           description: An unexpected error response.
           schema:
             $ref: '#/definitions/googlerpcStatus'
+    post:
+      tags:
+      - aperture-controller
+      operationId: PolicyService_PostPolicy
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/PostPolicyRequest'
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/PostPoliciesResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+  /v1/policies/{name}:
+    delete:
+      tags:
+      - aperture-controller
+      operationId: PolicyService_DeletePolicy
+      parameters:
+      - type: string
+        name: name
+        in: path
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            type: object
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
   /v1/status/{path}:
     get:
       tags:
@@ -2695,6 +2733,32 @@ definitions:
       resources:
         description: Resources (such as Flux Meters, Classifiers) to setup.
         $ref: '#/definitions/Resources'
+  PostPoliciesResponse:
+    type: object
+    properties:
+      errors:
+        type: array
+        items:
+          type: string
+      message:
+        type: string
+  PostPolicyRequest:
+    type: object
+    properties:
+      policies:
+        type: array
+        items:
+          type: object
+          $ref: '#/definitions/PostPolicyRequestPolicyRequest'
+  PostPolicyRequestPolicyRequest:
+    type: object
+    properties:
+      dynamic_config:
+        type: object
+      name:
+        type: string
+      policy:
+        $ref: '#/definitions/Policy'
   ProcessInfo:
     type: object
     properties:

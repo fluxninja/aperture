@@ -20,7 +20,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	PolicyService_GetPolicies_FullMethodName = "/aperture.policy.language.v1.PolicyService/GetPolicies"
+	PolicyService_GetPolicies_FullMethodName  = "/aperture.policy.language.v1.PolicyService/GetPolicies"
+	PolicyService_PostPolicy_FullMethodName   = "/aperture.policy.language.v1.PolicyService/PostPolicy"
+	PolicyService_DeletePolicy_FullMethodName = "/aperture.policy.language.v1.PolicyService/DeletePolicy"
 )
 
 // PolicyServiceClient is the client API for PolicyService service.
@@ -28,6 +30,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PolicyServiceClient interface {
 	GetPolicies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetPoliciesResponse, error)
+	PostPolicy(ctx context.Context, in *PostPolicyRequest, opts ...grpc.CallOption) (*PostPoliciesResponse, error)
+	DeletePolicy(ctx context.Context, in *DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type policyServiceClient struct {
@@ -47,11 +51,31 @@ func (c *policyServiceClient) GetPolicies(ctx context.Context, in *emptypb.Empty
 	return out, nil
 }
 
+func (c *policyServiceClient) PostPolicy(ctx context.Context, in *PostPolicyRequest, opts ...grpc.CallOption) (*PostPoliciesResponse, error) {
+	out := new(PostPoliciesResponse)
+	err := c.cc.Invoke(ctx, PolicyService_PostPolicy_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *policyServiceClient) DeletePolicy(ctx context.Context, in *DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PolicyService_DeletePolicy_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PolicyServiceServer is the server API for PolicyService service.
 // All implementations should embed UnimplementedPolicyServiceServer
 // for forward compatibility
 type PolicyServiceServer interface {
 	GetPolicies(context.Context, *emptypb.Empty) (*GetPoliciesResponse, error)
+	PostPolicy(context.Context, *PostPolicyRequest) (*PostPoliciesResponse, error)
+	DeletePolicy(context.Context, *DeletePolicyRequest) (*emptypb.Empty, error)
 }
 
 // UnimplementedPolicyServiceServer should be embedded to have forward compatible implementations.
@@ -60,6 +84,12 @@ type UnimplementedPolicyServiceServer struct {
 
 func (UnimplementedPolicyServiceServer) GetPolicies(context.Context, *emptypb.Empty) (*GetPoliciesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPolicies not implemented")
+}
+func (UnimplementedPolicyServiceServer) PostPolicy(context.Context, *PostPolicyRequest) (*PostPoliciesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostPolicy not implemented")
+}
+func (UnimplementedPolicyServiceServer) DeletePolicy(context.Context, *DeletePolicyRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePolicy not implemented")
 }
 
 // UnsafePolicyServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -91,6 +121,42 @@ func _PolicyService_GetPolicies_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PolicyService_PostPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PostPolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PolicyServiceServer).PostPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PolicyService_PostPolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PolicyServiceServer).PostPolicy(ctx, req.(*PostPolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PolicyService_DeletePolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletePolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PolicyServiceServer).DeletePolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PolicyService_DeletePolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PolicyServiceServer).DeletePolicy(ctx, req.(*DeletePolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PolicyService_ServiceDesc is the grpc.ServiceDesc for PolicyService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -101,6 +167,14 @@ var PolicyService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPolicies",
 			Handler:    _PolicyService_GetPolicies_Handler,
+		},
+		{
+			MethodName: "PostPolicy",
+			Handler:    _PolicyService_PostPolicy_Handler,
+		},
+		{
+			MethodName: "DeletePolicy",
+			Handler:    _PolicyService_DeletePolicy_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

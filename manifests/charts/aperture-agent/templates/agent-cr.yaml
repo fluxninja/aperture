@@ -144,7 +144,7 @@ spec:
         key: {{ .Values.agent.secrets.fluxNinjaExtension.secretKeyRef.key }}
         {{- end }}
       {{- end }}
-      value: {{ include "agent.apisecret.value" ( dict "agent" .Values.agent $) }}
+      value: {{ include "agent.apiSecret.value" ( dict "agent" .Values.agent $) }}
   {{- end }}
   {{- if .Values.agent.sidecar.enabled }}
   sidecar:

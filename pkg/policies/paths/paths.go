@@ -12,6 +12,10 @@ var (
 	DecisionsPrefix = path.Join("/decisions")
 	// StatusPrefix is key prefix in etcd for status.
 	StatusPrefix = path.Join("/status")
+	// PoliciesConfigPath is config path in etcd for policies.
+	PoliciesConfigPath = path.Join(ConfigPrefix, "policies")
+	// PoliciesDynamicConfigPath is config path in etcd for policies.
+	PoliciesDynamicConfigPath = path.Join(ConfigPrefix, "policies-dynamic-config")
 	// ClassifiersPath is config path in etcd for classifiers.
 	ClassifiersPath = path.Join(ConfigPrefix, "classifiers")
 	// LoadActuatorDecisionsPath is decision path in etcd for load decisions.

@@ -3129,6 +3129,32 @@ definitions:
                     $ref: '#/definitions/PolicyWrapper'
                 type: object
         type: object
+    PostPoliciesResponse:
+        properties:
+            errors:
+                items:
+                    type: string
+                type: array
+            message:
+                type: string
+        type: object
+    PostPolicyRequest:
+        properties:
+            policies:
+                items:
+                    $ref: '#/definitions/PostPolicyRequestPolicyRequest'
+                    type: object
+                type: array
+        type: object
+    PostPolicyRequestPolicyRequest:
+        properties:
+            dynamic_config:
+                type: object
+            name:
+                type: string
+            policy:
+                $ref: '#/definitions/Policy'
+        type: object
     PreviewFlowLabelsControllerResponse:
         properties:
             response:
@@ -4885,6 +4911,45 @@ paths:
                     description: A successful response.
                     schema:
                         $ref: '#/definitions/GetPoliciesResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-controller
+        post:
+            operationId: PolicyService_PostPolicy
+            parameters:
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/PostPolicyRequest'
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/PostPoliciesResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-controller
+    /v1/policies/{name}:
+        delete:
+            operationId: PolicyService_DeletePolicy
+            parameters:
+                - in: path
+                  name: name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        properties: {}
+                        type: object
                 default:
                     description: An unexpected error response.
                     schema:
