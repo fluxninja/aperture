@@ -59,7 +59,7 @@ health checks. To do this, you can add the path(s) you want to ignore to the
 filter configuration, as shown in the following code:
 
 ```java
-registrationBean.addInitParameter("ignored_paths", "/healthz");
+registrationBean.addInitParameter("ignored_paths", "/healthz,/metrics");
 ```
 
 The paths should be specified as a comma-separated list. Note that the paths you

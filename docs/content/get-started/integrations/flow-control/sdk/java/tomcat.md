@@ -41,7 +41,7 @@ filter configuration, as shown in the following code:
 ```xml
 <init-param>
   <param-name>ignored_paths</param-name>
-  <param-value>/healthz</param-value>
+  <param-value>/healthz,/metrics</param-value>
 </init-param>
 ```
 

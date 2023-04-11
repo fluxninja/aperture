@@ -57,11 +57,11 @@ health checks. To do this, you can add the path(s) you want to ignore to the
 ignoredPaths field of the SDK, as shown in the following code:
 
 ```java
-ApertureSDK sdk = ApertureSDK.Builder()
+ApertureSDK sdk = ApertureSDK.builder()
         .setHost(...)
         .setPort(...)
         ...
-        .addIgnoredPaths("/healthz")
+        .addIgnoredPaths("/healthz,/metrics")
         ...
         .build()
 ```
