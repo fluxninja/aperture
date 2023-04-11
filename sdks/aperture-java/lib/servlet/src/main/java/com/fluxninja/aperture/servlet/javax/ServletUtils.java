@@ -4,8 +4,7 @@ import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.fluxninja.aperture.sdk.TrafficFlow;
 import com.fluxninja.aperture.sdk.Utils;
-import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
-import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
+import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
 import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageEntry;
 import java.net.URLDecoder;
@@ -24,13 +23,13 @@ public class ServletUtils {
         }
         if (flow.checkResponse() != null
                 && flow.checkResponse().hasDeniedResponse()
-                && flow.checkResponse().getDeniedResponse().hasStatus()) {
-            return flow.checkResponse().getDeniedResponse().getStatus().getCodeValue();
+                && flow.checkResponse().getDeniedResponse().getStatus() != 0) {
+            return flow.checkResponse().getDeniedResponse().getStatus();
         }
         return 403;
     }
 
-    protected static AttributeContext attributesFromRequest(ServletRequest req) {
+    protected static CheckHTTPRequest checkRequestFromRequest(ServletRequest req) {
         Map<String, String> baggageLabels = new HashMap<>();
 
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -47,19 +46,13 @@ public class ServletUtils {
             baggageLabels.put(entry.getKey(), value);
         }
 
-        AttributeContext.Builder builder = AttributeContext.newBuilder();
-        builder.putAllContextExtensions(baggageLabels);
-
-        return addHttpAttributes(builder, req).build();
+        return addHttpAttributes(baggageLabels, req).build();
     }
 
     protected static ServletRequest updateHeaders(
-            ServletRequest req, List<HeaderValueOption> newHeaders) {
+            ServletRequest req, Map<String, String> newHeaders) {
         HttpServletRequest httpReq = (HttpServletRequest) req;
-        Map<String, String> headerMap = new HashMap<>();
-        for (HeaderValueOption option : newHeaders) {
-            headerMap.put(option.getHeader().getKey(), option.getHeader().getValue());
-        }
+        Map<String, String> headerMap = new HashMap<>(newHeaders);
         return new HttpServletRequestWrapper(httpReq) {
             @Override
             public Enumeration<String> getHeaderNames() {
@@ -87,37 +80,39 @@ public class ServletUtils {
         };
     }
 
-    private static AttributeContext.Builder addHttpAttributes(
-            AttributeContext.Builder builder, ServletRequest req) {
+    private static CheckHTTPRequest.Builder addHttpAttributes(
+            Map<String, String> headers, ServletRequest req) {
         HttpServletRequest request = (HttpServletRequest) req;
-        Map<String, String> extractedHeaders = new HashMap<>();
-        Enumeration<String> headers = request.getHeaderNames();
-        while (headers.hasMoreElements()) {
-            String headerKey = headers.nextElement();
-            extractedHeaders.put(headerKey, request.getHeader(headerKey));
+        Enumeration<String> originalHeaders = request.getHeaderNames();
+        while (originalHeaders.hasMoreElements()) {
+            String headerKey = originalHeaders.nextElement();
+            headers.put(headerKey, request.getHeader(headerKey));
         }
 
         String sourceIp = req.getRemoteAddr();
+        int sourcePort = req.getRemotePort();
         String destinationIp = req.getLocalAddr();
+        int destinationPort = req.getLocalPort();
 
-        builder.putContextExtensions("control-point", "ingress")
+        CheckHTTPRequest.Builder builder = CheckHTTPRequest.newBuilder();
+
+        builder.setControlPoint("ingress")
                 .setRequest(
-                        AttributeContext.Request.newBuilder()
-                                .setHttp(
-                                        AttributeContext.HttpRequest.newBuilder()
-                                                .setMethod(request.getMethod())
-                                                .setPath(request.getServletPath())
-                                                .setHost(req.getRemoteHost())
-                                                .setScheme(req.getScheme())
-                                                .setSize(req.getContentLength())
-                                                .setProtocol(req.getProtocol())
-                                                .putAllHeaders(extractedHeaders)));
+                        CheckHTTPRequest.HttpRequest.newBuilder()
+                                .setMethod(request.getMethod())
+                                .setPath(request.getServletPath())
+                                .setHost(req.getRemoteHost())
+                                .setScheme(req.getScheme())
+                                .setSize(req.getContentLength())
+                                .setProtocol(req.getProtocol())
+                                .putAllHeaders(headers));
 
         if (sourceIp != null) {
-            builder.setSource(Utils.peerFromAddress(sourceIp));
+            builder.setSource(Utils.createSocketAddress(sourceIp, sourcePort, "TCP"));
         }
         if (destinationIp != null) {
-            builder.setDestination(Utils.peerFromAddress(destinationIp));
+            builder.setDestination(
+                    Utils.createSocketAddress(destinationIp, destinationPort, "TCP"));
         }
         return builder;
     }

@@ -5,8 +5,9 @@ import static com.fluxninja.aperture.sdk.Constants.*;
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest;
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse;
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowControlServiceGrpc;
-import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
-import com.fluxninja.generated.envoy.service.auth.v3.AuthorizationGrpc;
+import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
+import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse;
+import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.FlowControlServiceHTTPGrpc;
 import io.grpc.StatusRuntimeException;
 import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageEntry;
@@ -23,7 +24,8 @@ import java.util.regex.Pattern;
 
 public final class ApertureSDK {
     private final FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient;
-    private final AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient;
+    private final FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub
+            httpFlowControlClient;
     private final Tracer tracer;
     private final Duration timeout;
     private final List<String> blockedPaths;
@@ -31,7 +33,7 @@ public final class ApertureSDK {
 
     ApertureSDK(
             FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient,
-            AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient,
+            FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub httpFlowControlClient,
             Tracer tracer,
             Duration timeout,
             List<String> blockedPaths,
@@ -39,7 +41,7 @@ public final class ApertureSDK {
         this.flowControlClient = flowControlClient;
         this.tracer = tracer;
         this.timeout = timeout;
-        this.envoyAuthzClient = envoyAuthzClient;
+        this.httpFlowControlClient = httpFlowControlClient;
         this.blockedPaths = blockedPaths;
         this.blockedPathsMatchRegex = blockedPathsMatchRegex;
     }
@@ -100,15 +102,10 @@ public final class ApertureSDK {
         return new Flow(res, span, false);
     }
 
-    public TrafficFlow startTrafficFlow(String path, AttributeContext attributes) {
+    public TrafficFlow startTrafficFlow(String path, CheckHTTPRequest req) {
         if (isBlocked(path)) {
             return TrafficFlow.ignoredFlow();
         }
-
-        com.fluxninja.generated.envoy.service.auth.v3.CheckRequest req =
-                com.fluxninja.generated.envoy.service.auth.v3.CheckRequest.newBuilder()
-                        .setAttributes(attributes)
-                        .build();
 
         Span span =
                 this.tracer
@@ -117,12 +114,12 @@ public final class ApertureSDK {
                         .setAttribute(FLOW_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos())
                         .setAttribute(SOURCE_LABEL, "sdk");
 
-        com.fluxninja.generated.envoy.service.auth.v3.CheckResponse res = null;
+        CheckHTTPResponse res = null;
         try {
             res =
-                    this.envoyAuthzClient
+                    this.httpFlowControlClient
                             .withDeadlineAfter(timeout.toNanos(), TimeUnit.NANOSECONDS)
-                            .check(req);
+                            .checkHTTP(req);
         } catch (StatusRuntimeException e) {
             // deadline exceeded or couldn't reach agent - request should not be blocked
         }

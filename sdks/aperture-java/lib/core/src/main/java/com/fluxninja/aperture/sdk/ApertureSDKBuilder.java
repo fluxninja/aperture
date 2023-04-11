@@ -4,7 +4,7 @@ import static com.fluxninja.aperture.sdk.Constants.DEFAULT_RPC_TIMEOUT;
 import static com.fluxninja.aperture.sdk.Constants.LIBRARY_NAME;
 
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowControlServiceGrpc;
-import com.fluxninja.generated.envoy.service.auth.v3.AuthorizationGrpc;
+import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.FlowControlServiceHTTPGrpc;
 import com.google.common.io.ByteStreams;
 import io.grpc.*;
 import io.opentelemetry.api.trace.Tracer;
@@ -163,8 +163,8 @@ public final class ApertureSDKBuilder {
 
         FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient =
                 FlowControlServiceGrpc.newBlockingStub(channel);
-        AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient =
-                AuthorizationGrpc.newBlockingStub(channel);
+        FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub httpFlowControlClient =
+                FlowControlServiceHTTPGrpc.newBlockingStub(channel);
 
         OtlpGrpcSpanExporterBuilder spanExporterBuilder = OtlpGrpcSpanExporter.builder();
         if (caCertContents != null) {
@@ -184,7 +184,7 @@ public final class ApertureSDKBuilder {
 
         return new ApertureSDK(
                 flowControlClient,
-                envoyAuthzClient,
+                httpFlowControlClient,
                 tracer,
                 timeout,
                 blockedPaths,

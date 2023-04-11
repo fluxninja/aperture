@@ -12,6 +12,9 @@ import (
 	"syscall"
 	"time"
 
+	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/checkhttp"
+
 	"google.golang.org/grpc/credentials"
 
 	"github.com/docker/docker/api/types"
@@ -112,6 +115,15 @@ func main() {
 
 	alerter := alerts.NewSimpleAlerter(100)
 	reg := status.NewRegistry(log.GetGlobalLogger(), alerter)
+
+	// instantiate and register flowcontrolhttp handler
+	flowcontrolHTTPHandler := checkhttp.NewHandler(
+		classifier.NewClassificationEngine(reg),
+		servicegetter.NewEmpty(),
+		commonHandler,
+	)
+	flowcontrolhttpv1.RegisterFlowControlServiceHTTPServer(grpcServer, flowcontrolHTTPHandler)
+
 	authzHandler := envoy.NewHandler(
 		classifier.NewClassificationEngine(reg),
 		servicegetter.NewEmpty(),
