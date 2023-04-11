@@ -5,6 +5,7 @@
 replicaCount: 1
 
 simplesrv:
+  cpuLoad: 0
   rejectRatio: 0.05
   hostname: ~
   image:

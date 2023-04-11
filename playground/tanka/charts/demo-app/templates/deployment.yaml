@@ -78,6 +78,8 @@ spec:
               value: "{{ .Values.rabbitmq.username }}"
             - name: SIMPLE_SERVICE_RABBITMQ_PASSWORD
               value: "{{ .Values.rabbitmq.password }}"
+            - name: SIMPLE_SERVICE_CPU_LOAD
+              value: "{{ .Values.simplesrv.cpuLoad }}"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
