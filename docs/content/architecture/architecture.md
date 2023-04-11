@@ -44,7 +44,7 @@ request types, and other relevant attributes.
 
 The controller uses declarative policies, expressed as a control circuit, to
 analyze the collected metrics and make decisions on load shedding, flow control,
-and auto-scaling to ensure that the application operates within the specified
+and auto scaling to ensure that the application operates within the specified
 SLOs. The controller's policies are based on the principles of
 Observability-driven closed-loop automation, which continuously track deviations
 from service-level objectives (SLOs) and calculate recovery or escalation
@@ -91,7 +91,7 @@ even during overload scenarios.
 Aperture Agents can be installed on a variety of infrastructure such as
 Kubernetes, VMs, or bare-metal. They integrate with Service Meshes or can be
 used with SDKs to provide [flow control](/concepts/flow-control/flow-control.md)
-capabilities. Additionally, agents work with auto-scaling APIs for platforms
+capabilities. Additionally, agents work with auto scaling APIs for platforms
 such as Kubernetes, to help scale infrastructure when needed.
 
 ## Aperture Databases

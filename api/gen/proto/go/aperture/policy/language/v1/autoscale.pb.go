@@ -192,12 +192,12 @@ type AutoScale_PodScaler struct {
 }
 
 type AutoScale_AutoScaler struct {
-	// _AutoScaler_ provides auto-scaling functionality for any scalable resource.
+	// _AutoScaler_ provides auto scaling functionality for any scalable resource.
 	AutoScaler *AutoScaler `protobuf:"bytes,2,opt,name=auto_scaler,json=autoScaler,proto3,oneof"`
 }
 
 type AutoScale_PodAutoScaler struct {
-	// _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource.
+	// _PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource.
 	PodAutoScaler *PodAutoScaler `protobuf:"bytes,3,opt,name=pod_auto_scaler,json=podAutoScaler,proto3,oneof"`
 }
 
@@ -577,7 +577,7 @@ func (x *KubernetesReplicas) GetDefaultConfig() *PodScaler_ScaleActuator_Dynamic
 	return nil
 }
 
-// _AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
+// _AutoScaler_ provides auto scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
 type AutoScaler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -735,7 +735,7 @@ func (x *AutoScaler) GetScaleInAlerterParameters() *Alerter_Parameters {
 	return nil
 }
 
-// _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
+// _PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
 type PodAutoScaler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

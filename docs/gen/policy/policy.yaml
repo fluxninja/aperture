@@ -331,12 +331,12 @@ definitions:
     type: object
     properties:
       auto_scaler:
-        description: _AutoScaler_ provides auto-scaling functionality for any scalable
+        description: _AutoScaler_ provides auto scaling functionality for any scalable
           resource.
         x-order: 0
         $ref: '#/definitions/AutoScaler'
       pod_auto_scaler:
-        description: _PodAutoScaler_ provides auto-scaling functionality for scalable
+        description: _PodAutoScaler_ provides auto scaling functionality for scalable
           Kubernetes resource.
         x-order: 1
         $ref: '#/definitions/PodAutoScaler'
@@ -346,7 +346,7 @@ definitions:
         x-order: 2
         $ref: '#/definitions/PodScaler'
   AutoScaler:
-    description: _AutoScaler_ provides auto-scaling functionality for any scalable
+    description: _AutoScaler_ provides auto scaling functionality for any scalable
       resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing
       scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs
       such as Kubernetes to perform auto-scale.
@@ -2454,7 +2454,7 @@ definitions:
         x-go-tag-validate: gt=0,dive,keys,required,endkeys,required
         x-order: 0
   PodAutoScaler:
-    description: _PodAutoScaler_ provides auto-scaling functionality for scalable
+    description: _PodAutoScaler_ provides auto scaling functionality for scalable
       Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_
       for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes
       infrastructure APIs to perform auto-scale.

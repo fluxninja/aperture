@@ -102,9 +102,9 @@ type FlowControlConfigSpec struct {
 	FlowPreviewConfig preview.FlowPreviewConfig `json:"preview_service"`
 }
 
-// AutoScaleConfigSpec holds auto scale configuration.
+// AutoScaleConfigSpec holds auto-scale configuration.
 type AutoScaleConfigSpec struct {
-	// AutoScaleKubernetesConfig holds auto scale kubernetes configuration.
+	// AutoScaleKubernetesConfig holds auto-scale kubernetes configuration.
 	//+kubebuilder:validation:Optional
 	AutoScaleKubernetesConfig autoscalek8sconfig.AutoScaleKubernetesConfig `json:"kubernetes"`
 }

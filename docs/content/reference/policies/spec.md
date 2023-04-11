@@ -394,13 +394,13 @@ AutoScale components are used to scale a service.
 <dt>auto_scaler</dt>
 <dd>
 
-([AutoScaler](#auto-scaler)) _AutoScaler_ provides auto-scaling functionality for any scalable resource.
+([AutoScaler](#auto-scaler)) _AutoScaler_ provides auto scaling functionality for any scalable resource.
 
 </dd>
 <dt>pod_auto_scaler</dt>
 <dd>
 
-([PodAutoScaler](#pod-auto-scaler)) _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource.
+([PodAutoScaler](#pod-auto-scaler)) _PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource.
 
 </dd>
 <dt>pod_scaler</dt>
@@ -415,7 +415,7 @@ AutoScale components are used to scale a service.
 
 ### AutoScaler {#auto-scaler}
 
-_AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
+_AutoScaler_ provides auto scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
 
 <dl>
 <dt>cooldown_override_percentage</dt>
@@ -3001,7 +3001,7 @@ Example:
 
 ### PodAutoScaler {#pod-auto-scaler}
 
-_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
+_PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
 
 <dl>
 <dt>cooldown_override_percentage</dt>

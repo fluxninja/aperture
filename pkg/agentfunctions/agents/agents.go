@@ -28,7 +28,7 @@ func (a Agents) ListFlowControlPoints() ([]rpc.Result[*cmdv1.ListFlowControlPoin
 	return rpc.CallAll[cmdv1.ListFlowControlPointsAgentResponse](a.Clients, &req)
 }
 
-// ListAutoScaleControlPoints lists auto scale control points of all agents.
+// ListAutoScaleControlPoints lists auto-scale control points of all agents.
 func (a Agents) ListAutoScaleControlPoints() ([]rpc.Result[*cmdv1.ListAutoScaleControlPointsAgentResponse], error) {
 	var req cmdv1.ListAutoScaleControlPointsRequest
 	return rpc.CallAll[cmdv1.ListAutoScaleControlPointsAgentResponse](a.Clients, &req)

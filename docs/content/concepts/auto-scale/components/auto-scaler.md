@@ -12,7 +12,7 @@ See also [_Auto Scaler_ reference](/reference/policies/spec.md#auto-scaler)
 
 :::
 
-_Auto Scaler_ is a high-level component in Aperture that performs auto-scaling.
+_Auto Scaler_ is a high-level component in Aperture that performs auto scaling.
 It can interface with infrastructure APIs such as Kubernetes to automatically
 adjust the number of instances or resources allocated to a service to meet
 changing workload demands. _Auto Scaler_ is designed to ensure that the service
@@ -24,7 +24,7 @@ availability.
   Controller can be configured for either scaling in or out and defines the
   criteria that determine when to scale. Controllers process one or more input
   signals to compute a desired scale value. By configuring Controllers, you can
-  fine-tune the auto-scaling behavior to meet the specific needs of your
+  fine-tune the auto scaling behavior to meet the specific needs of your
   service. See [Gradient Controller](#gradient-controller) for more details.
 - A scale-in Controller is active only when it's output is smaller than the
   actual scale value. A scale-out Controller is active only when it's output is
