@@ -17,9 +17,9 @@ tutorials cover a wide range of topics to help you get started with Aperture.
 
 ## Signal Processing
 
-We’ll build a circuit that baselines a latency metric in order to detect
-overloads. This basic circuit can be extended further to send an Alert or take a
-corrective action.
+We’ll build a circuit that baselines a latency metric to detect overloads. This
+basic circuit can be extended further to send an Alert or take a corrective
+action.
 
 - [Writing Policy for Detecting Overload](./signal-processing/detecting-overload.md)
 

@@ -15,7 +15,8 @@ the `rabbitmqreceiver` extension enabled, so that [rabbitmqreceiver][receiver]
 is available.
 
 You can configure [Custom metrics][custom-metrics] for RabbitMQ using the
-following configuration in the [Aperture Agent's config][agent-config]:
+following configuration in the [Aperture Agent's
+configuration][agent-configuration]:
 
 ```yaml
 otel:
@@ -87,7 +88,7 @@ data:
   RABBITMQ_PASSWORD: <rabbitmq-password>
 ```
 
-To use these secrets and config maps during the
+To use these secrets and configuration maps during the
 [Aperture Agent Installation](/get-started/installation/agent/agent.md#agent-installation-modes),
 refer to them in the values.yaml file, as shown below:
 
@@ -127,4 +128,4 @@ agent:
 [receiver]:
   https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/rabbitmqreceiver
 [custom-metrics]: /reference/configuration/agent.md#custom-metrics-config
-[agent-config]: /reference/configuration/agent.md#custom-metrics-config
+[agent-configuration]: /reference/configuration/agent.md#custom-metrics-config

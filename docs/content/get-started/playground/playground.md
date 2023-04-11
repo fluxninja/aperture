@@ -16,10 +16,10 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 Playground is a Kubernetes based environment for exploring the capabilities of
-Aperture. Additionally, it is used as a development environment for Aperture.
+Aperture. Additionally, it's used as a development environment for Aperture.
 Playground uses [Tilt](https://tilt.dev/) for orchestrating the deployments in
-Kubernetes. Tilt watches for changes to local files and auto-deploys any
-resources that change. This is very convenient for getting quick feedback during
+Kubernetes. Tilt watches for changes to local files and auto deploys any
+resources that change. This is convenient for getting quick feedback during
 development of Aperture.
 
 Playground deploys resources to the Kubernetes cluster that `kubectl` on your
@@ -31,7 +31,7 @@ for deploying a local Kubernetes cluster using
 
 Assuming that you have already cloned the aperture repository and brought up a
 [local Kubernetes cluster](#prerequisites-k8s), proceed to install the
-[required tools](#tools). In order to bring up the Playground, run the following
+[required tools](#tools). To bring up the Playground, run the following
 commands:
 
 ```sh
@@ -66,7 +66,7 @@ application with an Istio and Envoy based service mesh configured to integrate
 with Aperture. There is an instance of Grafana running on the cluster as well
 for viewing metrics from experiments.
 
-The Playground is preloaded with a
+The Playground is pre-loaded with a
 [Latency Gradient Policy](/tutorials/flow-control/concurrency-limiting/basic-concurrency-limiting.md)
 which protects the demo application against sudden surges in traffic load. You
 can verify it using the following command:
@@ -112,7 +112,7 @@ running on Aperture Agent:
   reply for each request.
 - Flux Meter is configured on `service3`. Flux Meter helps monitor service-level
   health signals such as latency, which are used in the Latency Gradient policy.
-- Concurrency Limiter and Rate Limiter are configured on `service1`. That is,
+- Concurrency Limiter and Rate Limiter are configured on `service1`. that's,
   when the `service3` is overloaded, load shedding happens on `service1`.
 
 Once all the resources are in the running state, simulated traffic will start
@@ -132,7 +132,7 @@ The load generator is configured to generate the following traffic pattern for
 
 Once the traffic is running, you can visualize the decisions made by Aperture in
 Grafana. Navigate to [localhost:3000](http://localhost:3000) on your browser to
-reach Grafana. You can open the preloaded "FluxNinja" dashboard under
+reach Grafana. You can open the pre-loaded "FluxNinja" dashboard under
 "aperture-system" folder to a bunch of useful panels.
 
 <Zoom>
@@ -172,11 +172,11 @@ configuration/management tools which must be installed beforehand.
 
 To install the required tools, you have two options:
 
-- Use the tool [ASDF](#install-via-asdf)
+- Use the tool [asdf](#install-via-asdf)
 - Manually install the tools
   [mentioned here](#tools-required-for-kubernetes-deployment).
 
-### Install via ASDF
+### Install via asdf
 
 First,
 [download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf) and
@@ -199,7 +199,7 @@ Please skip this section in case you already installed the required tools using
 
 Tools required are listed below
 
-- **Helm**: It is a package manager for Kubernetes. To install manually, follow
+- **Helm**: it's a package manager for Kubernetes. To install manually, follow
   instructions [here](https://helm.sh/docs/intro/install/).
 - **Tanks and Jsonnet Bundler**: Grafana Tanka is a robust configuration utility
   for your Kubernetes cluster, powered by the unique Jsonnet language. Jsonnet
@@ -208,7 +208,7 @@ Tools required are listed below
 - **Kind**: This allows you to run local Kubernetes clusters. To install
   manually, follow instructions
   [here](https://kind.sigs.k8s.io/docs/user/quick-start/#installation).
-- **Kubectl**: It is the command-line tool to interact with Kubernetes clusters.
+- **kubectl**: It's the command-line tool to interact with Kubernetes clusters.
   To install manually, follow instructions
   [here](https://kubernetes.io/docs/tasks/tools/#kubectl).
 
@@ -287,8 +287,8 @@ pass their name(s) as additional argument(s).
 
 Examples:
 
-- `tilt up aperture-grafana` - only bring up `grafana` and dependent services
-  (`grafana-operator`, ...)
+- `tilt up aperture-grafana` To bring up the grafana service and its dependent
+  services, such as `grafana-operator`.
 - `tilt up agent demoapp aperture-grafana` - you can mix namespace names and
   resource names, as well as specify as many of them as you want.
 
@@ -305,7 +305,7 @@ To view the available namespaces and resources, either:
 
 To disable automatic updates in Tilt, add `--manual` with the command.
 
-### Teardown
+### Tear down
 
 Simply run `tilt down`. All created resources will be deleted.
 
@@ -318,7 +318,7 @@ Below is the mapping of the ports being forwarded by Tilt:
 | Component  | Container Port | Local Port |
 | ---------- | -------------- | ---------- |
 | Prometheus | 9090           | 9090       |
-| Etcd       | 2379           | 2379       |
+| etcd       | 2379           | 2379       |
 | Grafana    | 3000           | 3000       |
 
 ### Running demo applications and designing test scenarios
@@ -328,7 +328,7 @@ application comes with three sets of pods and services. There is also a simple
 latency gradient policy applied to them, and K6 load generator pattern created.
 When entire deployment turns green, load generator can be started with "Start
 Wavepool Generator" button in the Tilt UI. It will run a 2 minute test in a
-loop, until "Stop Wavepool Geneator" button is not clicked.
+loop, until "Stop Wavepool Generator" button isn't clicked.
 
 There are other playground scenarios under _playground/scenarios/_ and they can
 be loaded during tilt setup by passing a relative path to the scenario, e.g.

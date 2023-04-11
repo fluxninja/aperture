@@ -30,7 +30,7 @@ to generate [policies][policies] and [Grafana dashboards][grafana]. Blueprints
 can be used both as a guide for creating new policies, or used as-is by
 providing required parameters or customizations.
 
-In order to manage blueprints and generate policies, you can use `aperturectl`
+To manage blueprints and generate policies, you can use `aperturectl`
 [CLI tool](/reference/aperturectl/aperturectl.md), by following the
 [installation steps](/get-started/aperture-cli/aperture-cli.md#installation)
 first.
@@ -168,8 +168,8 @@ kubectl get policies.fluxninja.com -n aperture-controller
 
 The policy runtime can be visualized in Grafana or any other Prometheus
 compatible analytics tool. Refer to the Prometheus compatible metrics available
-from [controller][controller-metrics] and [agent][agent-metrics]. Some of the
-policy [blueprints][blueprints] come with recommended Grafana dashboards.
+from [controller][controller-metrics] and [agent][agent-metrics]. Some policy
+[blueprints][blueprints] come with recommended Grafana dashboards.
 
 ## Deleting Policies
 
