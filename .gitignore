@@ -233,3 +233,4 @@ playground/tilt_local.json
 
 # ignore .github/styles
 .github/styles
+!.github/styles/Vocab/FluxNinja
