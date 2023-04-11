@@ -100,7 +100,7 @@ public class Config {
                             .addIgnoredPaths(
                                     config.getProperty(
                                             IGNORED_PATHS_PROPERTY, IGNORED_PATHS_DEFAULT_VALUE))
-                            .setIgnoredPathMatchRegex(
+                            .setIgnoredPathsMatchRegex(
                                     Boolean.parseBoolean(
                                             config.getProperty(
                                                     IGNORED_PATHS_REGEX_PROPERTY,

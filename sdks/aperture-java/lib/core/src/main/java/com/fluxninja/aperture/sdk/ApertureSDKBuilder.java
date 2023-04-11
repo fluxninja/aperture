@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /** A builder for configuring an {@link ApertureSDK}. */
@@ -33,7 +33,7 @@ public final class ApertureSDKBuilder {
     private boolean ignoredPathsMatchRegex = false;
 
     ApertureSDKBuilder() {
-        ignoredPaths = Collections.emptyList();
+        ignoredPaths = new ArrayList<>();
     }
 
     public ApertureSDKBuilder setHost(String host) {
@@ -133,7 +133,7 @@ public final class ApertureSDKBuilder {
     /**
      * Whether ignored paths should be matched by regex. If false, exact matches will be expected.
      *
-     * @deprecated use setIgnoredPathMatchRegex
+     * @deprecated use setIgnoredPathsMatchRegex
      * @param flag whether paths should be matched by regex.
      * @return the builder object.
      */
@@ -148,7 +148,7 @@ public final class ApertureSDKBuilder {
      * @param flag whether paths should be matched by regex.
      * @return the builder object.
      */
-    public ApertureSDKBuilder setIgnoredPathMatchRegex(boolean flag) {
+    public ApertureSDKBuilder setIgnoredPathsMatchRegex(boolean flag) {
         this.ignoredPathsMatchRegex = flag;
         return this;
     }
