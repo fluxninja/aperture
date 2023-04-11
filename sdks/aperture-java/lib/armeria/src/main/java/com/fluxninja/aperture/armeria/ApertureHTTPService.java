@@ -11,7 +11,7 @@ import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.server.HttpService;
 import com.linecorp.armeria.server.ServiceRequestContext;
 import com.linecorp.armeria.server.SimpleDecoratingHttpService;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -24,6 +24,14 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
             ApertureSDK apertureSDK) {
         ApertureHTTPServiceBuilder builder = new ApertureHTTPServiceBuilder();
         builder.setApertureSDK(apertureSDK);
+        return builder::build;
+    }
+
+    public static Function<? super HttpService, ApertureHTTPService> newDecorator(
+            ApertureSDK apertureSDK, String controlPointName) {
+        ApertureHTTPServiceBuilder builder = new ApertureHTTPServiceBuilder();
+        builder.setApertureSDK(apertureSDK);
+        builder.setControlPointName(controlPointName);
         return builder::build;
     }
 
@@ -46,7 +54,7 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
         if (flow.accepted()) {
             HttpResponse res;
             try {
-                Map<String, String> newHeaders = new HashMap<>();
+                Map<String, String> newHeaders = Collections.emptyMap();
                 if (flow.checkResponse() != null) {
                     newHeaders = flow.checkResponse().getOkResponse().getHeadersMap();
                 }

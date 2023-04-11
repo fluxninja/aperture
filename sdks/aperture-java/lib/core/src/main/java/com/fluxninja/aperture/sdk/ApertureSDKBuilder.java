@@ -163,7 +163,7 @@ public final class ApertureSDKBuilder {
 
         FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient =
                 FlowControlServiceGrpc.newBlockingStub(channel);
-        FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub httpflowControlClient =
+        FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub httpFlowControlClient =
                 FlowControlServiceHTTPGrpc.newBlockingStub(channel);
 
         OtlpGrpcSpanExporterBuilder spanExporterBuilder = OtlpGrpcSpanExporter.builder();
@@ -184,7 +184,7 @@ public final class ApertureSDKBuilder {
 
         return new ApertureSDK(
                 flowControlClient,
-                httpflowControlClient,
+                httpFlowControlClient,
                 tracer,
                 timeout,
                 blockedPaths,
