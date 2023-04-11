@@ -28,22 +28,22 @@ public final class ApertureSDK {
             httpFlowControlClient;
     private final Tracer tracer;
     private final Duration timeout;
-    private final List<String> blockedPaths;
-    private final boolean blockedPathsMatchRegex;
+    private final List<String> ignoredPaths;
+    private final boolean ignoredPathsMatchRegex;
 
     ApertureSDK(
             FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient,
             FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub httpFlowControlClient,
             Tracer tracer,
             Duration timeout,
-            List<String> blockedPaths,
-            boolean blockedPathsMatchRegex) {
+            List<String> ignoredPaths,
+            boolean ignoredPathsMatchRegex) {
         this.flowControlClient = flowControlClient;
         this.tracer = tracer;
         this.timeout = timeout;
         this.httpFlowControlClient = httpFlowControlClient;
-        this.blockedPaths = blockedPaths;
-        this.blockedPathsMatchRegex = blockedPathsMatchRegex;
+        this.ignoredPaths = ignoredPaths;
+        this.ignoredPathsMatchRegex = ignoredPathsMatchRegex;
     }
 
     /**
@@ -103,7 +103,7 @@ public final class ApertureSDK {
     }
 
     public TrafficFlow startTrafficFlow(String path, CheckHTTPRequest req) {
-        if (isBlocked(path)) {
+        if (isIgnored(path)) {
             return TrafficFlow.ignoredFlow();
         }
 
@@ -128,17 +128,17 @@ public final class ApertureSDK {
         return new TrafficFlow(res, span, false);
     }
 
-    private boolean isBlocked(String path) {
+    private boolean isIgnored(String path) {
         if (path == null) {
             return false;
         }
-        for (String blockedPattern : blockedPaths) {
-            if (blockedPathsMatchRegex) {
-                if (Pattern.matches(blockedPattern, path)) {
+        for (String ignoredPattern : ignoredPaths) {
+            if (ignoredPathsMatchRegex) {
+                if (Pattern.matches(ignoredPattern, path)) {
                     return true;
                 }
             } else {
-                if (blockedPattern.equals(path)) {
+                if (ignoredPattern.equals(path)) {
                     return true;
                 }
             }

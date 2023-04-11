@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /** A builder for configuring an {@link ApertureSDK}. */
@@ -29,11 +29,11 @@ public final class ApertureSDKBuilder {
     private boolean useHttpsInOtlpExporter = false;
     private boolean insecureGrpc = true;
     private String certFile;
-    private final List<String> blockedPaths;
-    private boolean blockedPathsMatchRegex = false;
+    private final List<String> ignoredPaths;
+    private boolean ignoredPathsMatchRegex = false;
 
     ApertureSDKBuilder() {
-        blockedPaths = new ArrayList<>();
+        ignoredPaths = Collections.emptyList();
     }
 
     public ApertureSDKBuilder setHost(String host) {
@@ -83,6 +83,7 @@ public final class ApertureSDKBuilder {
     /**
      * Adds comma-separated paths to ignore in traffic control points.
      *
+     * @deprecated use addIgnoredPaths
      * @param paths comma-separated list of paths to ignore when creating traffic control points.
      * @return the builder object.
      */
@@ -90,7 +91,32 @@ public final class ApertureSDKBuilder {
         if (paths == null || paths.isEmpty()) {
             return this;
         }
-        return this.addBlockedPaths(Arrays.asList(paths.split("\\s*,\\s*")));
+        return this.addIgnoredPaths(Arrays.asList(paths.split("\\s*,\\s*")));
+    }
+
+    /**
+     * Adds comma-separated paths to ignore in traffic control points.
+     *
+     * @param paths comma-separated list of paths to ignore when creating traffic control points.
+     * @return the builder object.
+     */
+    public ApertureSDKBuilder addIgnoredPaths(String paths) {
+        if (paths == null || paths.isEmpty()) {
+            return this;
+        }
+        return this.addIgnoredPaths(Arrays.asList(paths.split("\\s*,\\s*")));
+    }
+
+    /**
+     * Adds paths to ignore in traffic control points.
+     *
+     * @deprecated use addIgnoredPaths
+     * @param paths list of paths to ignore when creating traffic control points.
+     * @return the builder object.
+     */
+    public ApertureSDKBuilder addBlockedPaths(List<String> paths) {
+        this.ignoredPaths.addAll(paths);
+        return this;
     }
 
     /**
@@ -99,19 +125,31 @@ public final class ApertureSDKBuilder {
      * @param paths list of paths to ignore when creating traffic control points.
      * @return the builder object.
      */
-    public ApertureSDKBuilder addBlockedPaths(List<String> paths) {
-        this.blockedPaths.addAll(paths);
+    public ApertureSDKBuilder addIgnoredPaths(List<String> paths) {
+        this.ignoredPaths.addAll(paths);
         return this;
     }
 
     /**
-     * Whether paths should be matched by regex. If false, exact matches will be expected.
+     * Whether ignored paths should be matched by regex. If false, exact matches will be expected.
      *
+     * @deprecated use setIgnoredPathMatchRegex
      * @param flag whether paths should be matched by regex.
      * @return the builder object.
      */
     public ApertureSDKBuilder setBlockedPathMatchRegex(boolean flag) {
-        this.blockedPathsMatchRegex = flag;
+        this.ignoredPathsMatchRegex = flag;
+        return this;
+    }
+
+    /**
+     * Whether ignored paths should be matched by regex. If false, exact matches will be expected.
+     *
+     * @param flag whether paths should be matched by regex.
+     * @return the builder object.
+     */
+    public ApertureSDKBuilder setIgnoredPathMatchRegex(boolean flag) {
+        this.ignoredPathsMatchRegex = flag;
         return this;
     }
 
@@ -187,7 +225,7 @@ public final class ApertureSDKBuilder {
                 httpFlowControlClient,
                 tracer,
                 timeout,
-                blockedPaths,
-                blockedPathsMatchRegex);
+                ignoredPaths,
+                ignoredPathsMatchRegex);
     }
 }
