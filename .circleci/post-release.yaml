@@ -123,6 +123,11 @@ jobs:
             - run:
                 name: Create tarball file for Given OS
                 command: ./.circleci/scripts/create_tarball_file.sh
+            - run:
+                name: Create binaries for different OS
+                command: |
+                  mv "$HOME"/project/dist/aperturectl "$HOME"/project/dist/aperturectl-"${APERTURECTL_BUILD_VERSION#v}"-"${GOOS}"-"${GOARCH}"
+                  cp -rf "$HOME"/project/dist/aperturectl-"${APERTURECTL_BUILD_VERSION#v}"-"${GOOS}"-"${GOARCH}" "$HOME"/project/dist/packages/
       - run: &install-gh-cli
           name: Install GH cli
           command: |
@@ -136,7 +141,6 @@ jobs:
           name: Attach packages to release
           command: |
             to_upload=( $(ls dist/packages/*) )
-            [ "${COMPONENT}" != "cli" ] || to_upload+=("dist/aperturectl")
             gh release upload "${VERSION}" "${to_upload[@]}" --repo=fluxninja/aperture
 
       - save_cache:
