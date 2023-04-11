@@ -59,10 +59,10 @@ control components like
 further tune the concurrency limits based on specific service requirements.
 
 The controller's policies are stored in a policy database and are managed using
-the Kubernetes Custom Resource Definition (CRD) API, allowing users to easily
-configure and modify policies as needed. The controller interacts with Aperture
-Agents, which run alongside service instances as sidecars, to enforce the
-policies and ensure the reliable operation of cloud-native applications.
+the Kubernetes Custom Resource Definition (CRD) API, allowing users to configure
+and modify policies as needed. The controller interacts with Aperture Agents,
+which run alongside service instances as sidecars, to enforce the policies and
+ensure the reliable operation of cloud-native applications.
 
 ### Aperture Agents
 
@@ -103,7 +103,7 @@ collected from Aperture Agents. It enables Aperture to monitor the system and
 detect deviations from the service-level objectives (SLOs) defined in the
 declarative policies.
 
-Etcd is a distributed key-value store used to store configuration and flow
+etcd is a distributed key-value store used to store configuration and flow
 control information. Aperture Controller uses etcd to store the declarative
 policies that define the control circuits and their components, as well as the
 current system state.

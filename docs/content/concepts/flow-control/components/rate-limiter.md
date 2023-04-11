@@ -20,7 +20,7 @@ application.
 ## Distributed Counters {#distributed-counters}
 
 For each configured [_Rate Limiter Component_][reference], every matching
-Aperture Agent instantiates a copy of the _Rate Limiter_. Although each agent
+Aperture Agent instantiates a copy of the _Rate Limiter_. Although each Agent
 has its own copy of the component, they all share counters through a distributed
 counter system. This means that they work together as a single _Rate Limiter_,
 providing seamless coordination and control across agents. The distributed

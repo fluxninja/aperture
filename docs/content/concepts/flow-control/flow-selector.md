@@ -24,7 +24,7 @@ See also [_Flow Selector_ reference](/reference/policies/spec.md#flow-selector)
 _Flow Selectors_ are used by flow control and observability components
 instantiated by Aperture Agents like [_Classifiers_][classifier], [_Flux
 Meters_][flux-meter] and [_Concurrency Limiters_][cl]. _Flow Selectors_ define
-scoping rules – how these components should select flows for their operations.
+scoping rules–how these components should select flows for their operations.
 
 A _Flow Selector_ consists of:
 
@@ -51,7 +51,7 @@ See also [_Flow Matcher_ reference](/reference/policies/spec.md#flow-matcher)
 Control points are similar to
 [feature flags](https://en.wikipedia.org/wiki/Feature_toggle). They identify the
 location in the code or data plane (web servers, service meshes, API gateways,
-etc.) where flow control decisions are applied. They are defined by developers
+etc.) where flow control decisions are applied. they're defined by developers
 using the SDKs or configured when integrating with API Gateways or Service
 Meshes.
 
@@ -139,9 +139,9 @@ flow_selector:
 
 Liveness and health probes are essential for checking the health of our
 application, and metrics endpoints are necessary for monitoring its performance.
-However, these endpoints do not contribute to the overall latency of the
-service, and if we include them in our latency calculations, they may cause
-requests to be rejected, leading to unnecessary pod restarts.
+However, these endpoints don't contribute to the overall latency of the service,
+and if we include them in our latency calculations, they may cause requests to
+be rejected, leading to unnecessary pod restarts.
 
 To prevent these issues, we can filter out traffic to these endpoints by
 matching expressions. In the example below, we filter out flows with http.target

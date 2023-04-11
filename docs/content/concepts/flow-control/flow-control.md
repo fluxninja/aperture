@@ -21,7 +21,7 @@ This decoupled architecture has advantages but introduces new complex failure
 modes. When traffic surges, it can result in a queue buildup on a critical
 service, kick-starting a positive feedback loop and causing
 [cascading failures](https://sre.google/sre-book/addressing-cascading-failures/).
-The application stops serving responses in a timely manner and critical end-user
+The application stops serving responses timely and critical end-user
 transactions are interrupted.
 
 ![Absence of flow control](assets/img/no-flow-control.png#gh-light-mode-only)
@@ -34,7 +34,7 @@ requests, and response times. For the application to remain stable, the
 concurrent requests in the system must be limited. Indirect techniques to
 stabilize applications such as rate-limiting and auto scaling fall short in
 enabling good user experiences or business outcomes. Rate-limiting individual
-users are insufficient in protecting services. Autoscaling is slow to respond
+users are insufficient in protecting services. Auto scaling is slow to respond
 and can be cost-prohibitive. As the number of services scales, these techniques
 get harder to deploy.
 
@@ -70,18 +70,18 @@ you need to install integrations that will communicate with the Aperture Agent.
   API][ext-authz]. Integrations with several popular web frameworks are
   available.
 
-  We provide integration instructions for [Istio/Envoy][istio]. The user can
-  name the Control Point to identify a particular filter chain in Envoy. In case
-  of insertion via Istio, a
-  [default filter config](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter),
-  assigns _ingress_ and _egress_ Control Points as [identified by
-  Istio][istio-patch-context].
+  Integration instructions for [Istio/Envoy][istio] are provided, and the
+  Control Point can be named to identify a particular filter chain in Envoy. If
+  insertion is done via Istio, the
+  [default filter configuration](/get-started/integrations/flow-control/envoy/istio.md#envoy-filter)
+  assigns _ingress_ and _egress_ Control Points as identified by
+  [Istio][istio-patch-context].
 
-- _Feature_ _Control Points_: We provide
-  [Aperture SDKs](/get-started/integrations/flow-control/sdk/sdk.md) for popular
-  languages. Aperture SDK wraps any function call or code snippet inside the
-  service code as a _Feature_ _Control Point_. Every invocation of th feature is
-  a flow from the perspective of Aperture.
+- _Feature_ _Control Points_: SDKs for popular languages are available with
+  Aperture. [Aperture SDK](/get-started/integrations/flow-control/sdk/sdk.md)
+  wraps any function call or code snippet inside the service code as a _Feature_
+  _Control Point_. Every invocation of the feature is a flow from the
+  perspective of Aperture.
 
   The SDK provides API to begin a flow which translates to a
   [flowcontrol.v1.Check][flowcontrol-proto] call into Agent. Response of this

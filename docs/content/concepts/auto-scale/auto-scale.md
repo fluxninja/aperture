@@ -8,30 +8,29 @@ keywords:
   - Kubernetes
 ---
 
-Auto-scaling is a crucial technique for effective load management of service
+Auto scaling is a crucial technique for effective load management of service
 traffic. It enables service operators to automatically adjust the number of
 instances or resources allocated to a service based on current or expected
 demand and resource utilization. By doing so, auto scaling ensures that a
 service can handle incoming load while optimizing the cost of running the
 service by allocating just the right amount of resources.
 
-Auto-scale is a core integration in Aperture that works hand in hand with the
+Auto scale is a core integration in Aperture that works hand in hand with the
 flow control capabilities to provide a comprehensive load management platform.
-Aperture policies allow defining auto-scalers that take into account the flow
-control state for informed scaling decisions. For instance, during sudden
-traffic spikes, if a concurrency limiter on a service sheds traffic, auto-scaler
-can automatically add more instances to the service to handle the increased
-load.
+Aperture policies allow defining auto scalers that consider the flow control
+state for informed scaling decisions. For instance, during sudden traffic
+spikes, if a concurrency limiter on a service sheds traffic, auto scaler can
+automatically add more instances to the service to handle the increased load.
 
-With the auto-scaler capability in Aperture, service operators can configure
+With the auto scaler capability in Aperture, service operators can configure
 auto scaling policies based on different service overload signals, such as load
 shedding, in addition to resource utilization based on CPU, memory usage,
 network I/O, etc. This flexibility enables service operators to fine-tune the
-auto scaling behavior based on their specific service needs. Auto-scaling
+auto scaling behavior based on their specific service needs. Auto scaling
 policies can be set up to add or remove instances or resources based on these
 signals, allowing for dynamic scaling in response to changing traffic patterns.
 
-Auto-scaling is a powerful technique that enables service operators to maintain
+Auto scaling is a powerful technique that enables service operators to maintain
 service availability and performance while optimizing costs. In Aperture, auto
 scaling is an integral component of the load management platform, working
 seamlessly with flow control to provide a comprehensive solution. These

@@ -8,7 +8,7 @@ keywords:
   - reliability center
 ---
 
-## Application Reliability Center (ARC)
+## Application Reliability Center
 
 :::info Join the FluxNinja ARC Beta
 
@@ -16,7 +16,7 @@ keywords:
 application reliability center that extends open-source Aperture installation
 with advanced analytics, monitoring and alerting capabilities.
 
-We are inviting beta users. Please sign up
-[here](https://app.fluxninja.com/sign-up).
+To participate in the beta testing phase, please register by clicking on the
+provided link [here](https://app.fluxninja.com/sign-up).
 
 :::

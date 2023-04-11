@@ -41,7 +41,7 @@ from the controller.
 
 If the rate of tokens in requests entering the scheduler exceeds the desired
 rate, requests are queued in the scheduler. If a flow can't be scheduled within
-its specified timeout, it is rejected.
+its specified timeout, it's rejected.
 
 The scheduler helps ensure that requests are handled in a fair and efficient
 manner, even during periods of high load or overload. By prioritizing critical
@@ -100,8 +100,8 @@ configuration for more details.
 The Aperture Agents utilize a modified version of the
 [token bucket algorithm](https://en.wikipedia.org/wiki/Token_bucket) to regulate
 the flow of incoming requests. In this algorithm, every flow is required to
-obtain tokens from the bucket before a specified deadline in order to gain
-admission to the system.
+obtain tokens from the bucket before a specified deadline to gain admission to
+the system.
 
 ### Timeout Factor {#timeout-factor}
 
@@ -112,7 +112,7 @@ request being scheduled, improving fairness. The timeout is computed as
 
 :::info
 
-It is recommended to configure the timeouts to be in the same order of magnitude
+It's recommended to configure the timeouts to be in the same order of magnitude
 as the normal latency of the workload requests. This helps prevent retry storms
 during overload scenarios.
 
