@@ -34,7 +34,7 @@ func main() {
 	concurrency := concurrencyFromEnv()
 	latency := latencyFromEnv()
 	rejectRatio := rejectRatioFromEnv()
-	cpuLoad := cpuLoadFromEnv()
+	cpuLoadPercentage := cpuLoadPercentageFromEnv()
 
 	// RabbitMQ related setup
 	rabbitMQURL := ""
@@ -68,7 +68,7 @@ func main() {
 		propagation.Baggage{},
 	))
 
-	service := app.NewSimpleService(hostname, port, envoyPort, rabbitMQURL, concurrency, latency, rejectRatio, cpuLoad)
+	service := app.NewSimpleService(hostname, port, envoyPort, rabbitMQURL, concurrency, latency, rejectRatio, cpuLoadPercentage)
 	err := service.Run()
 	if err != nil {
 		log.Error().Err(err).Send()
@@ -162,7 +162,7 @@ func rejectRatioFromEnv() float64 {
 	return rejectRatio
 }
 
-func cpuLoadFromEnv() int {
+func cpuLoadPercentageFromEnv() int {
 	loadCPUValue, exists := os.LookupEnv("SIMPLE_SERVICE_CPU_LOAD")
 	if !exists {
 		return 0
