@@ -69,12 +69,18 @@ public class ApertureFilter implements Filter {
         String timeoutMs;
         boolean insecureGrpc;
         String rootCertificateFile;
+        String ignoredPaths;
+        boolean ignoredPathsRegex;
         try {
             agentHost = filterConfig.getInitParameter("agent_host");
             agentPort = filterConfig.getInitParameter("agent_port");
             timeoutMs = filterConfig.getInitParameter("timeout_ms");
             insecureGrpc = Boolean.parseBoolean(filterConfig.getInitParameter("insecure_grpc"));
             rootCertificateFile = filterConfig.getInitParameter("root_certificate_file");
+            ignoredPaths = filterConfig.getInitParameter("ignored_paths");
+            ignoredPathsRegex =
+                    Boolean.parseBoolean(
+                            filterConfig.getInitParameter("ignored_paths_match_regex"));
         } catch (Exception e) {
             throw new ServletException("Could not read config parameters", e);
         }
@@ -90,6 +96,8 @@ public class ApertureFilter implements Filter {
             if (rootCertificateFile != null && !rootCertificateFile.isEmpty()) {
                 builder.setRootCertificateFile(rootCertificateFile);
             }
+            builder.addIgnoredPaths(ignoredPaths);
+            builder.setIgnoredPathsMatchRegex(ignoredPathsRegex);
 
             this.apertureSDK = builder.build();
         } catch (ApertureSDKException e) {

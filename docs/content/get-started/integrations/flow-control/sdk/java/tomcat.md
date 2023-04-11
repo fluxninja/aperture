@@ -33,6 +33,30 @@ web.xml file to automatically set traffic Control Points for relevant services:
     </filter>
 ```
 
+You can instruct the filter to exclude specific paths from being monitored by
+the Aperture SDK. For example, you might want to exclude endpoints used for
+health checks. To do this, you can add the path(s) you want to ignore to the
+filter configuration, as shown in the following code:
+
+```xml
+<init-param>
+  <param-name>ignored_paths</param-name>
+  <param-value>/healthz,/metrics</param-value>
+</init-param>
+```
+
+The paths should be specified as a comma-separated list. Note that the paths you
+specify must match exactly. However, you can change this behavior to treat the
+paths as regular expressions by setting the ignored_paths_match_regex init
+parameter to true, like so:
+
+```xml
+<init-param>
+  <param-name>ignored_paths_match_regex</param-name>
+  <param-value>true</param-value>
+</init-param>
+```
+
 For example usage, you can view the [example app][tomcat-example] available in
 our repository.
 
