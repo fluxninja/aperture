@@ -4,8 +4,7 @@ import com.fluxninja.aperture.sdk.ApertureSDKException;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.fluxninja.aperture.sdk.TrafficFlow;
 import com.fluxninja.aperture.sdk.Utils;
-import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
-import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
+import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
 import com.linecorp.armeria.common.*;
 import io.netty.util.AsciiString;
 import io.opentelemetry.api.baggage.Baggage;
@@ -14,7 +13,6 @@ import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 class HttpUtils {
@@ -26,9 +24,8 @@ class HttpUtils {
         }
         if (flow.checkResponse() != null
                 && flow.checkResponse().hasDeniedResponse()
-                && flow.checkResponse().getDeniedResponse().hasStatus()) {
-            int httpStatusCode =
-                    flow.checkResponse().getDeniedResponse().getStatus().getCodeValue();
+                && flow.checkResponse().getDeniedResponse().getStatus() != 0) {
+            int httpStatusCode = flow.checkResponse().getDeniedResponse().getStatus();
             return HttpStatus.valueOf(httpStatusCode);
         }
         return HttpStatus.FORBIDDEN;
@@ -50,7 +47,8 @@ class HttpUtils {
         return labels;
     }
 
-    protected static AttributeContext attributesFromRequest(RequestContext ctx, HttpRequest req) {
+    protected static CheckHTTPRequest checkRequestFromRequest(
+            RequestContext ctx, HttpRequest req, String controlPointName) {
         Map<String, String> baggageLabels = new HashMap<>();
 
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -67,76 +65,70 @@ class HttpUtils {
             baggageLabels.put(entry.getKey(), value);
         }
 
-        AttributeContext.Builder builder = AttributeContext.newBuilder();
-        builder.putAllContextExtensions(baggageLabels);
-
-        return addHttpAttributes(builder, ctx, req).build();
+        return addHttpAttributes(baggageLabels, ctx, req, controlPointName).build();
     }
 
-    // getAppend is deprecated but agent does set it, so we should use it
-    @SuppressWarnings("deprecation")
-    protected static HttpRequest updateHeaders(
-            HttpRequest req, List<HeaderValueOption> newHeaders) {
+    protected static HttpRequest updateHeaders(HttpRequest req, Map<String, String> newHeaders) {
         RequestHeadersBuilder newHeadersBuilder = req.headers().toBuilder();
-        for (HeaderValueOption newHeader : newHeaders) {
-            String headerKey = newHeader.getHeader().getKey().toLowerCase();
-            String headerValue = newHeader.getHeader().getValue();
-            if (!newHeader.getKeepEmptyValue() && headerValue.isEmpty()) {
-                newHeadersBuilder = newHeadersBuilder.removeAndThen(headerKey);
-                continue;
-            }
-            if (newHeader.getAppend().getValue()) {
-                newHeadersBuilder = newHeadersBuilder.add(headerKey, headerValue);
-            } else {
-                newHeadersBuilder = newHeadersBuilder.set(headerKey, headerValue);
-            }
+        for (Map.Entry<String, String> newHeader : newHeaders.entrySet()) {
+            String headerKey = newHeader.getKey().toLowerCase();
+            String headerValue = newHeader.getValue();
+            newHeadersBuilder = newHeadersBuilder.add(headerKey, headerValue);
         }
         return req.withHeaders(newHeadersBuilder.build());
     }
 
-    private static AttributeContext.Builder addHttpAttributes(
-            AttributeContext.Builder builder, RequestContext ctx, HttpRequest req) {
-        Map<String, String> extractedHeaders = new HashMap<>();
-        RequestHeaders headers = req.headers();
-        for (Map.Entry<AsciiString, String> header : headers) {
+    private static CheckHTTPRequest.Builder addHttpAttributes(
+            Map<String, String> headers,
+            RequestContext ctx,
+            HttpRequest req,
+            String controlPointName) {
+        RequestHeaders originalHeaders = req.headers();
+        for (Map.Entry<AsciiString, String> header : originalHeaders) {
             String headerKey = header.getKey().toString();
             if (headerKey.startsWith(":")) {
                 continue;
             }
-            extractedHeaders.put(headerKey, header.getValue());
+            headers.put(headerKey, header.getValue());
         }
 
         java.net.SocketAddress remoteSocket = ctx.remoteAddress();
         String sourceIp = null;
+        int sourcePort = 0;
         if (remoteSocket instanceof InetSocketAddress) {
             InetSocketAddress remoteAddress = (InetSocketAddress) remoteSocket;
             sourceIp = remoteAddress.getAddress().getHostAddress();
+            sourcePort = remoteAddress.getPort();
         }
 
         java.net.SocketAddress localSocket = ctx.localAddress();
         String destinationIp = null;
+        int destinationPort = 0;
         if (localSocket instanceof InetSocketAddress) {
             InetSocketAddress localAddress = (InetSocketAddress) localSocket;
             destinationIp = localAddress.getAddress().getHostAddress();
+            destinationPort = localAddress.getPort();
         }
 
-        builder.putContextExtensions("control-point", "ingress")
+        CheckHTTPRequest.Builder builder = CheckHTTPRequest.newBuilder();
+
+        builder.setControlPoint(controlPointName)
                 .setRequest(
-                        AttributeContext.Request.newBuilder()
-                                .setHttp(
-                                        AttributeContext.HttpRequest.newBuilder()
-                                                .setMethod(req.method().toString())
-                                                .setPath(req.path())
-                                                .setHost(req.authority())
-                                                .setScheme(req.scheme())
-                                                .setSize(headers.contentLength())
-                                                .setProtocol("HTTP/2")
-                                                .putAllHeaders(extractedHeaders)));
+                        CheckHTTPRequest.HttpRequest.newBuilder()
+                                .setMethod(req.method().toString())
+                                .setPath(req.path())
+                                .setHost(req.authority())
+                                .setScheme(req.scheme())
+                                .setSize(originalHeaders.contentLength())
+                                .setProtocol("HTTP/2")
+                                .putAllHeaders(headers));
+
         if (sourceIp != null) {
-            builder.setSource(Utils.peerFromAddress(sourceIp));
+            builder.setSource(Utils.createSocketAddress(sourceIp, sourcePort, "TCP"));
         }
         if (destinationIp != null) {
-            builder.setDestination(Utils.peerFromAddress(destinationIp));
+            builder.setDestination(
+                    Utils.createSocketAddress(destinationIp, destinationPort, "TCP"));
         }
         return builder;
     }

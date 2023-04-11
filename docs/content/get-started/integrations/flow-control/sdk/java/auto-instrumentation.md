@@ -55,7 +55,7 @@ Example invocation with commandline-set properties:
 java -javaagent:path/to/javaagent.jar \
 -Daperture.agent.hostname="some_host" \
 -Daperture.agent.port=12345 \
--Daperture.javaagent.blocked.paths="/health,/connected" \
+-Daperture.javaagent.ignored.paths="/health,/connected" \
 -jar path/to/application.jar
 ```
 
@@ -72,7 +72,7 @@ The `/config.properties` file:
 ```properties
 aperture.agent.hostname=some_host
 aperture.agent.port=12345
-aperture.javaagent.blocked.paths=/health,/connected
+aperture.javaagent.ignored.paths=/health,/connected
 ```
 
 [download_link]:

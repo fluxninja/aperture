@@ -17,9 +17,9 @@ public class Config {
     public static final String AGENT_PORT_PROPERTY = "aperture.agent.port";
     public static final String CONNECTION_TIMEOUT_MILLIS_PROPERTY =
             "aperture.connection.timeout.millis";
-    public static final String BLOCKED_PATHS_PROPERTY = "aperture.javaagent.blocked.paths";
-    public static final String BLOCKED_PATHS_REGEX_PROPERTY =
-            "aperture.javaagent.blocked.paths.regex";
+    public static final String IGNORED_PATHS_PROPERTY = "aperture.javaagent.ignored.paths";
+    public static final String IGNORED_PATHS_REGEX_PROPERTY =
+            "aperture.javaagent.ignored.paths.regex";
     public static final String INSECURE_GRPC_PROPERTY = "aperture.javaagent.insecure.grpc";
     public static final String ROOT_CERTIFICATE_FILE_PROPERTY =
             "aperture.javaagent.root.certificate";
@@ -27,8 +27,8 @@ public class Config {
     private static final String AGENT_HOST_DEFAULT_VALUE = "localhost";
     private static final String AGENT_PORT_DEFAULT_VALUE = "8089";
     private static final String CONNECTION_TIMEOUT_MILLIS_DEFAULT_VALUE = "1000";
-    private static final String BLOCKED_PATHS_DEFAULT_VALUE = "";
-    private static final String BLOCKED_PATHS_REGEX_DEFAULT_VALUE = "false";
+    private static final String IGNORED_PATHS_DEFAULT_VALUE = "";
+    private static final String IGNORED_PATHS_REGEX_DEFAULT_VALUE = "false";
     private static final String INSECURE_GRPC_DEFAULT_VALUE = "true";
     private static final String ROOT_CERTIFICATE_FILE_DEFAULT_VALUE = "";
 
@@ -38,8 +38,8 @@ public class Config {
                     add(AGENT_HOST_PROPERTY);
                     add(AGENT_PORT_PROPERTY);
                     add(CONNECTION_TIMEOUT_MILLIS_PROPERTY);
-                    add(BLOCKED_PATHS_PROPERTY);
-                    add(BLOCKED_PATHS_REGEX_PROPERTY);
+                    add(IGNORED_PATHS_PROPERTY);
+                    add(IGNORED_PATHS_REGEX_PROPERTY);
                 }
             };
 
@@ -97,14 +97,14 @@ public class Config {
                                                     config.getProperty(
                                                             CONNECTION_TIMEOUT_MILLIS_PROPERTY,
                                                             CONNECTION_TIMEOUT_MILLIS_DEFAULT_VALUE))))
-                            .addBlockedPaths(
+                            .addIgnoredPaths(
                                     config.getProperty(
-                                            BLOCKED_PATHS_PROPERTY, BLOCKED_PATHS_DEFAULT_VALUE))
-                            .setBlockedPathMatchRegex(
+                                            IGNORED_PATHS_PROPERTY, IGNORED_PATHS_DEFAULT_VALUE))
+                            .setIgnoredPathsMatchRegex(
                                     Boolean.parseBoolean(
                                             config.getProperty(
-                                                    BLOCKED_PATHS_REGEX_PROPERTY,
-                                                    BLOCKED_PATHS_REGEX_DEFAULT_VALUE)));
+                                                    IGNORED_PATHS_REGEX_PROPERTY,
+                                                    IGNORED_PATHS_REGEX_DEFAULT_VALUE)));
 
             boolean insecureGrpc =
                     Boolean.parseBoolean(
