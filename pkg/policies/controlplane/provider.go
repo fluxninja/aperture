@@ -12,7 +12,6 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	"github.com/fluxninja/aperture/pkg/policies/controlplane/crwatcher"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
-	"github.com/hashicorp/go-multierror"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"sigs.k8s.io/yaml"
@@ -73,28 +72,16 @@ func provideTrackers(lifecycle fx.Lifecycle) (notifiers.Trackers, notifiers.Trac
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			var err, mulerr error
-			err = trackers.Start()
-			if err != nil {
-				mulerr = multierror.Append(mulerr, err)
-			}
-			err = dynamicConfigTrackers.Start()
-			if err != nil {
-				mulerr = multierror.Append(mulerr, err)
-			}
-			return mulerr
+			return multierr.Combine(
+				trackers.Start(),
+				dynamicConfigTrackers.Start(),
+			)
 		},
 		OnStop: func(ctx context.Context) error {
-			var err, merr error
-			err = trackers.Stop()
-			if err != nil {
-				merr = multierror.Append(merr, err)
-			}
-			err = dynamicConfigTrackers.Stop()
-			if err != nil {
-				merr = multierror.Append(merr, err)
-			}
-			return merr
+			return multierr.Combine(
+				trackers.Stop(),
+				dynamicConfigTrackers.Stop(),
+			)
 		},
 	})
 

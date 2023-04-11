@@ -159,6 +159,6 @@
 | `agent.secrets.fluxNinjaExtension.value`                | API Key to use when creating a new Agent API Key Secret                                                                     | `nil`                 |
 | `agent.sidecar.enabled`                                 | Enables sidecar mode for the Agent                                                                                          | `false`               |
 | `agent.sidecar.enableNamespacesByDefault`               | List of namespaces in which sidecar injection will be enabled when Sidecar mode is enabled.                                 | `[]`                  |
-| `agent.config.etcd.endpoints`                           | List of Etcd server endpoints. Example, ["http://etcd:2379"]. This must not be empty.                                       | `["test"]`            |
+| `agent.config.etcd.endpoints`                           | List of Etcd server endpoints. Example, ["http://etcd:2379"]. This must not be empty.                                       | `[]`                  |
 | `agent.config.etcd.lease_ttl`                           | Lease time-to-live.                                                                                                         | `60s`                 |
-| `agent.config.prometheus.address`                       | specifies the address of the Prometheus server. Example, "http://prometheus-server:80". This must not be empty.             | `test`                |
+| `agent.config.prometheus.address`                       | specifies the address of the Prometheus server. Example, "http://prometheus-server:80". This must not be empty.             | `nil`                 |

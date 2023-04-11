@@ -69,7 +69,7 @@ func getTemplets(chartName, releaseName string, order releaseutil.KindSortOrder)
 	}
 	defer resp.Body.Close()
 
-	ch, err := loader.Load("/home/hardik/Work/fluxninja/aperture/manifests/charts/aperture-controller")
+	ch, err := loader.LoadArchive(resp.Body)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to load chart: %s", err)
 	}

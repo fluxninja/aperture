@@ -529,11 +529,10 @@ agent:
     ## @param agent.config.etcd.lease_ttl Lease time-to-live.
     ##
     etcd:
-      endpoints:
-      - test
+      endpoints: []
       lease_ttl: 60s
     ## Prometheus parameters for Agent
     ## @param agent.config.prometheus.address specifies the address of the Prometheus server. Example, "http://prometheus-server:80". This must not be empty.
     ##
     prometheus:
-      address: test
+      address: ~
