@@ -1,0 +1,3 @@
+out_ports
+in_ports
+constant_signal
