@@ -35,6 +35,7 @@ import (
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
 	. "github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/operator/controllers/testutils"
 	"github.com/fluxninja/aperture/pkg/config"
 	distcacheconfig "github.com/fluxninja/aperture/pkg/distcache/config"
 	"github.com/fluxninja/aperture/pkg/etcd"
@@ -147,7 +148,7 @@ var _ = Describe("ConfigMap for Agent", func() {
 			result, err := configMapForAgentConfig(context.Background(), K8sClient, instance.DeepCopy(), scheme.Scheme)
 			Expect(err).NotTo(HaveOccurred())
 
-			CompareComfigMap(result, expected)
+			testutils.CompareConfigMap(result, expected)
 		})
 	})
 })

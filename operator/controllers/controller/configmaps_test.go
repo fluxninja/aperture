@@ -35,6 +35,7 @@ import (
 	"github.com/fluxninja/aperture/operator/api/common"
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
 	. "github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/operator/controllers/testutils"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/etcd"
 	"github.com/fluxninja/aperture/pkg/net/listener"
@@ -138,7 +139,7 @@ var _ = Describe("ConfigMap for Controller", func() {
 			result, err := configMapForControllerConfig(instance.DeepCopy(), scheme.Scheme)
 			Expect(err).NotTo(HaveOccurred())
 
-			CompareComfigMap(result, expected)
+			testutils.CompareConfigMap(result, expected)
 		})
 	})
 })
