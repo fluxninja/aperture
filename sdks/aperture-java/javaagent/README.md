@@ -57,8 +57,8 @@ system properties or environment variables:
 | aperture.javaagent.insecure.grpc       | APERTURE_JAVAAGENT_INSECURE_GRPC       | true          | Whether GRPC connection to Aperture Agent should be over plaintext                                  |
 | aperture.javaagent.root.certificate    | APERTURE_JAVAAGENT_ROOT_CERTIFICATE    |               | Path to a file containing root certificate to be used <br /> (insecure connection must be disabled) |
 | aperture.connection.timeout.millis     | APERTURE_CONNECTION_TIMEOUT_MILLIS     | 1000          | Aperture Agent connection timeout in milliseconds                                                   |
-| aperture.javaagent.blocked.paths       | APERTURE_JAVAAGENT_BLOCKED_PATHS       |               | Comma-separated list of paths that should not start a flow                                          |
-| aperture.javaagent.blocked.paths.regex | APERTURE_JAVAAGENT_BLOCKED_PATHS_REGEX |               | Whether the configured blocked paths should be read as regular expressions                          |
+| aperture.javaagent.ignored.paths       | APERTURE_JAVAAGENT_IGNORED_PATHS       |               | Comma-separated list of paths that should not start a flow                                          |
+| aperture.javaagent.ignored.paths.regex | APERTURE_JAVAAGENT_IGNORED_PATHS_REGEX |               | Whether the configured ignored paths should be read as regular expressions                          |
 
 The priority order is `system.property` > `ENV_VARIABLE` > `properties file`.
 
@@ -68,7 +68,7 @@ Example invocation with commandline-set properties:
 java -javaagent:path/to/javaagent.jar \
 -Daperture.agent.hostname="some_host" \
 -Daperture.agent.port=12345 \
--Daperture.javaagent.blocked.paths="/health,/connected" \
+-Daperture.javaagent.ignored.paths="/healthz,/connected" \
 -jar path/to/application.jar
 ```
 
@@ -85,5 +85,5 @@ The `/config.properties` file:
 ```properties
 aperture.agent.hostname=some_host
 aperture.agent.port=12345
-aperture.javaagent.blocked.paths=/health,/connected
+aperture.javaagent.ignored.paths=/healthz,/connected
 ```

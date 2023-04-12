@@ -531,6 +531,7 @@ def render_tanka(environment, env_vars, base_dir, namespace, enable_cloud_extens
             "--ext-str=ENABLE_DEMO_APP_RABBITMQ=" + env_vars.get("ENABLE_DEMO_APP_RABBITMQ", "false"),
             "--ext-str=ENABLE_DEMO_APP_NGINX=" + env_vars.get("ENABLE_DEMO_APP_NGINX", "false"),
             "--ext-str=ENABLE_DEMO_APP_KONG=" + env_vars.get("ENABLE_DEMO_APP_KONG", "false"),
+            "--ext-str=SIMPLE_SERVICE_CPU_LOAD=" + env_vars.get("SIMPLE_SERVICE_CPU_LOAD", "0"),
             "show",
             # Allow dumping the templates to stdout,
             # instead of using tk export to generate files

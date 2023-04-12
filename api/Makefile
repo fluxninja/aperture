@@ -28,6 +28,7 @@ buf-generate:
 	@#java
 	@rm -rf ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/*
 	@cp -R gen/proto/java/com/fluxninja/generated/aperture/flowcontrol/check ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/
+	@cp -R gen/proto/java/com/fluxninja/generated/aperture/flowcontrol/checkhttp ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/
 	@rm -rf gen/proto/java
 	@#javascript
 	@rm -rf ../sdks/aperture-js/src/generated/aperture/flowcontrol/*

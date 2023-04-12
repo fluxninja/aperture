@@ -79,6 +79,17 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 		if err != nil {
 			return err
 		}
+		// check whether the blueprint is deprecated
+		blueprintDir := filepath.Join(blueprintsDir, blueprintName)
+		ok, deprecated := utils.IsBlueprintDeprecated(blueprintDir)
+		if ok {
+			if utils.AllowDeprecated {
+				log.Warn().Msgf("Blueprint %s is deprecated: %s", blueprintName, deprecated)
+			} else {
+				return fmt.Errorf("blueprint %s is deprecated: %s", blueprintName, deprecated)
+			}
+		}
+
 		if !noValidate {
 			var valuesBytes []byte
 			valuesBytes, err = os.ReadFile(valuesFile)
@@ -254,13 +265,13 @@ func saveJSONFile(_, path, filename string, content map[string]interface{}) erro
 }
 
 func blueprintExists(name string) error {
-	blueprintsList, err := getBlueprints(blueprintsURIRoot)
+	blueprintsList, err := getBlueprints(blueprintsURIRoot, true)
 	if err != nil {
 		return err
 	}
 
 	if !slices.Contains(blueprintsList, name) {
-		return fmt.Errorf("invalid blueprints name '%s'", name)
+		return fmt.Errorf("invalid blueprint name '%s'", name)
 	}
 	return nil
 }

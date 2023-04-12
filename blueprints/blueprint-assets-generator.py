@@ -58,13 +58,15 @@ class ParameterNode:
 
 
 @dataclasses.dataclass
-class Parameters:
+class Blueprint:
     # nested dictionary of parameters
     nested_parameters: ParameterNode = dataclasses.field(default_factory=ParameterNode)
     # nested dictionary of required parameters
     nested_required_parameters: ParameterNode = dataclasses.field(
         default_factory=ParameterNode
     )
+    # deprecated is a string
+    deprecation_message: Optional[str] = None
 
     @classmethod
     def _resolve_param_links(
@@ -132,7 +134,7 @@ class Parameters:
         blueprints_root_relative_path: str,
         policies_relative_path: str,
         comment: List[str],
-    ) -> Parameters:
+    ) -> Blueprint:
         nested_parameters = ParameterNode()
         nested_required_parameters = ParameterNode()
         for line in comment:
@@ -217,7 +219,7 @@ def command_with_exit_code(func):
 def update_param_defaults(
     repository_root: Path,
     config_path: Path,
-    parameters: Parameters,
+    parameters: Blueprint,
     jsonnet_path: Path = Path(),
     config_key: str = "",
 ):
@@ -617,8 +619,8 @@ def get_jinja2_environment() -> jinja2.Environment:
 
 def update_readme_markdown(
     readme_path: Path,
-    config_parameters: Parameters,
-    dynamic_config_parameters: Parameters,
+    config_parameters: Blueprint,
+    dynamic_config_parameters: Blueprint,
 ):
     """Find configuration marker in and add generated content below it."""
     config_marker = "<!-- Configuration Marker -->"
@@ -654,8 +656,8 @@ def update_readme_markdown(
 
 def update_docs_markdown(
     readme_path: Path,
-    config_parameters: Parameters,
-    dynamic_config_parameters: Parameters,
+    config_parameters: Blueprint,
+    dynamic_config_parameters: Blueprint,
     blueprint_name: Path,
     docs_root_relative_path,
 ):
@@ -690,6 +692,15 @@ def update_docs_markdown(
     )
     readme_copied += "```\n\n"
 
+    # if the blueprint is deprecated, show the warning
+    if config_parameters.deprecation_message:
+        readme_copied += f":::danger\n"
+        readme_copied += (
+            f"This blueprint is deprecated and will be removed in a future release.\n"
+        )
+        readme_copied += f"{config_parameters.deprecation_message}\n"
+        readme_copied += f"\n:::\n\n"
+
     readme_copied += f"## Configuration\n"
     readme_copied += f"\nCode: <a href={{`https://github.com/fluxninja/aperture/tree/${{aver}}/blueprints/{blueprint_name}`}}>{blueprint_name}</a>\n\n"
 
@@ -717,7 +728,7 @@ def render_sample_config_yaml(
     blueprint_name: Path,
     sample_config_path: Path,
     only_required: bool,
-    parameters: Parameters,
+    parameters: Blueprint,
 ):
     """Render sample config YAML file from blocks"""
     sample_config_data = ParameterNode()
@@ -735,7 +746,7 @@ def render_sample_config_yaml(
 
 
 def render_json_schema(
-    blueprint_name: Path, json_schema_path: Path, parameters: Parameters
+    blueprint_name: Path, json_schema_path: Path, parameters: Blueprint
 ):
     """Render JSON schema file from blocks"""
     nested_parameters = parameters.nested_parameters
@@ -751,9 +762,9 @@ def render_json_schema(
     json_schema_path.write_text(rendered)
 
 
-def extract_parameters(
+def parse_annotations(
     blueprints_root_relative_path: str, policies_relative_path: str, jsonnet_data: str
-) -> Parameters:
+) -> Blueprint:
     docblock_start_re = r".*\/\*\*$"
     docblock_end_re = r".*\*\/$"
 
@@ -768,7 +779,7 @@ def extract_parameters(
             assert inside_docblock
             inside_docblock = False
             docblocks.append(
-                Parameters.from_comment(
+                Blueprint.from_comment(
                     blueprints_root_relative_path, policies_relative_path, docblock_data
                 )
             )
@@ -778,7 +789,7 @@ def extract_parameters(
                 docblock_data.append(line.strip())
 
     # merge docblocks
-    merged_parameters = Parameters()
+    merged_parameters = Blueprint()
 
     for block in docblocks:
         merge_parameternodes(
@@ -897,7 +908,7 @@ def parse_config_parameters(
     blueprint_path: Path,
     blueprints_root_relative_path: str,
     policies_relative_path: str,
-) -> Parameters:
+) -> Blueprint:
     config_path = blueprint_path / "config.libsonnet"
 
     if not config_path.exists():
@@ -908,9 +919,12 @@ def parse_config_parameters(
 
     metadata = yaml.safe_load(metadata_path.read_text())
 
-    parameters = extract_parameters(
+    parameters = parse_annotations(
         blueprints_root_relative_path, policies_relative_path, config_path.read_text()
     )
+
+    # read deprecated property (string) from metadata
+    parameters.deprecation_message = metadata.get("deprecated", None)
 
     # set defaults for nested parameters
     for source in metadata["sources"].keys():
@@ -928,12 +942,12 @@ def parse_dynamic_config_docblocks(
     blueprint_path: Path,
     blueprints_root_relative_path: str,
     policies_relative_path: str,
-) -> Parameters:
+) -> Blueprint:
     config_path = blueprint_path / "dynamic-config.libsonnet"
     if not config_path.exists():
-        return Parameters()
+        return Blueprint()
 
-    dynamic_config_parameters = extract_parameters(
+    dynamic_config_parameters = parse_annotations(
         blueprints_root_relative_path, policies_relative_path, config_path.read_text()
     )
 

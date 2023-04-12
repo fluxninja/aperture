@@ -1,8 +1,6 @@
 package com.fluxninja.aperture.sdk;
 
-import com.fluxninja.generated.envoy.service.auth.v3.Address;
-import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
-import com.fluxninja.generated.envoy.service.auth.v3.SocketAddress;
+import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress;
 import java.time.Instant;
 
 public class Utils {
@@ -12,13 +10,11 @@ public class Utils {
         return currentTime.getEpochSecond() * nanosInSecond + currentTime.getNano();
     }
 
-    public static AttributeContext.Peer peerFromAddress(String address) {
-        return AttributeContext.Peer.newBuilder()
-                .setAddress(
-                        Address.newBuilder()
-                                .setSocketAddress(
-                                        SocketAddress.newBuilder().setAddress(address).build())
-                                .build())
+    public static SocketAddress createSocketAddress(String address, int port, String protocol) {
+        return SocketAddress.newBuilder()
+                .setAddress(address)
+                .setPort(port)
+                .setProtocol(SocketAddress.Protocol.valueOf(protocol))
                 .build();
     }
 }

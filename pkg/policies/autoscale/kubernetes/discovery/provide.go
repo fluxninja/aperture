@@ -2,6 +2,7 @@ package discovery
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/etcd/election"
@@ -10,6 +11,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/notifiers"
 	autoscalek8sconfig "github.com/fluxninja/aperture/pkg/policies/autoscale/kubernetes/config"
 	"github.com/fluxninja/aperture/pkg/status"
+	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 )
 
@@ -31,18 +33,23 @@ func Module() fx.Option {
 // FxIn is the input for the ProvideKuberetesControlPointsCache function.
 type FxIn struct {
 	fx.In
-	Unmarshaller     config.Unmarshaller
-	Lifecycle        fx.Lifecycle
-	StatusRegistry   status.Registry
-	KubernetesClient k8s.K8sClient      `optional:"true"`
-	Trackers         notifiers.Trackers `name:"kubernetes_control_points"`
-	Election         *election.Election
-	Config           autoscalek8sconfig.AutoScaleKubernetesConfig
+	Unmarshaller       config.Unmarshaller
+	Lifecycle          fx.Lifecycle
+	StatusRegistry     status.Registry
+	KubernetesClient   k8s.K8sClient      `optional:"true"`
+	Trackers           notifiers.Trackers `name:"kubernetes_control_points"`
+	Election           *election.Election
+	ElectionTrackers   notifiers.Trackers `name:"etcd_election"`
+	Config             autoscalek8sconfig.AutoScaleKubernetesConfig
+	PrometheusRegistry *prometheus.Registry
 }
 
 // provideAutoScaleControlPoints provides Kubernetes AutoScaler and starts Kubernetes control point discovery if enabled.
 func provideAutoScaleControlPoints(in FxIn) (AutoScaleControlPoints, error) {
-	controlPointCache := newAutoScaleControlPoints(in.Trackers, in.KubernetesClient)
+	controlPointCache, err := newAutoScaleControlPoints(in.Trackers, in.KubernetesClient, in.PrometheusRegistry, in.ElectionTrackers, in.Lifecycle)
+	if err != nil {
+		return nil, fmt.Errorf("could not create auto sclae control points: %w", err)
+	}
 
 	if !in.Config.Enabled {
 		log.Info().Msg("Skipping Kubernetes Control Point Discovery since AutoScale is disabled")

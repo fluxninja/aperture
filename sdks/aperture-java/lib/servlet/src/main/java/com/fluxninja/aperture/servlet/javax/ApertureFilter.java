@@ -1,12 +1,11 @@
 package com.fluxninja.aperture.servlet.javax;
 
 import com.fluxninja.aperture.sdk.*;
-import com.fluxninja.generated.envoy.service.auth.v3.AttributeContext;
-import com.fluxninja.generated.envoy.service.auth.v3.HeaderValueOption;
+import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -19,17 +18,18 @@ import javax.servlet.http.HttpServletResponse;
 public class ApertureFilter implements Filter {
 
     private ApertureSDK apertureSDK;
+    private String controlPointName;
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws ServletException, IOException {
-        AttributeContext attributes = ServletUtils.attributesFromRequest(req);
+        CheckHTTPRequest checkRequest = ServletUtils.checkRequestFromRequest(req, controlPointName);
 
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
         String path = request.getServletPath();
-        TrafficFlow flow = this.apertureSDK.startTrafficFlow(path, attributes);
+        TrafficFlow flow = this.apertureSDK.startTrafficFlow(path, checkRequest);
 
         if (flow.ignored()) {
             chain.doFilter(request, response);
@@ -38,9 +38,9 @@ public class ApertureFilter implements Filter {
 
         if (flow.accepted()) {
             try {
-                List<HeaderValueOption> newHeaders = new ArrayList<>();
+                Map<String, String> newHeaders = new HashMap<>();
                 if (flow.checkResponse() != null) {
-                    newHeaders = flow.checkResponse().getOkResponse().getHeadersList();
+                    newHeaders = flow.checkResponse().getOkResponse().getHeadersMap();
                 }
                 ServletRequest newRequest = ServletUtils.updateHeaders(request, newHeaders);
                 chain.doFilter(newRequest, response);
@@ -67,19 +67,32 @@ public class ApertureFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         String agentHost;
         String agentPort;
+        String initControlPointName;
         String timeoutMs;
         boolean insecureGrpc;
         String rootCertificateFile;
+        String ignoredPaths;
+        boolean ignoredPathsRegex;
         try {
             agentHost = filterConfig.getInitParameter("agent_host");
             agentPort = filterConfig.getInitParameter("agent_port");
+            initControlPointName = filterConfig.getInitParameter("control_point_name");
             timeoutMs = filterConfig.getInitParameter("timeout_ms");
             insecureGrpc = Boolean.parseBoolean(filterConfig.getInitParameter("insecure_grpc"));
             rootCertificateFile = filterConfig.getInitParameter("root_certificate_file");
+            ignoredPaths = filterConfig.getInitParameter("ignored_paths");
+            ignoredPathsRegex =
+                    Boolean.parseBoolean(
+                            filterConfig.getInitParameter("ignored_paths_match_regex"));
         } catch (Exception e) {
             throw new ServletException("Could not read config parameters", e);
         }
 
+        if (initControlPointName != null) {
+            controlPointName = initControlPointName;
+        } else {
+            controlPointName = "ingress";
+        }
         try {
             ApertureSDKBuilder builder = ApertureSDK.builder();
             builder.setHost(agentHost);
@@ -91,6 +104,8 @@ public class ApertureFilter implements Filter {
             if (rootCertificateFile != null && !rootCertificateFile.isEmpty()) {
                 builder.setRootCertificateFile(rootCertificateFile);
             }
+            builder.addIgnoredPaths(ignoredPaths);
+            builder.setIgnoredPathsMatchRegex(ignoredPathsRegex);
 
             this.apertureSDK = builder.build();
         } catch (ApertureSDKException e) {

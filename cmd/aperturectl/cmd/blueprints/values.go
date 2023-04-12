@@ -10,6 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
@@ -87,7 +88,19 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 			valFileName = requiredValuesFileName
 		}
 
-		blueprintGenDir := filepath.Join(blueprintsDir, blueprintName, "gen")
+		blueprintDir := filepath.Join(blueprintsDir, blueprintName)
+		log.Info().Msgf("blueprintDir: %s", blueprintDir)
+		// Show a warning if the blueprint is deprecated
+		ok, message := utils.IsBlueprintDeprecated(blueprintDir)
+		if ok {
+			if utils.AllowDeprecated {
+				log.Warn().Msgf("Blueprint %s is deprecated: %s", blueprintName, message)
+			} else {
+				return fmt.Errorf("blueprint %s is deprecated: %s", blueprintName, message)
+			}
+		}
+
+		blueprintGenDir := filepath.Join(blueprintDir, "gen")
 
 		srcValuesFile := filepath.Join(blueprintGenDir, valFileName)
 		if _, err := os.Stat(srcValuesFile); err != nil {
@@ -133,6 +146,7 @@ aperturectl blueprints values --name=policies/static-rate-limiting --output-file
 				return err
 			}
 		}
+		// check whether the policy is deprecated
 
 		if _, err = io.Copy(out, in); err != nil {
 			return err
