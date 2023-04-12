@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   docker: circleci/docker@2.1.1
-  gcp-gcr: circleci/gcp-gcr@0.13.0
+  gcp-gcr: circleci/gcp-gcr@0.15.1
   slack: circleci/slack@4.4.4
   rust: circleci/rust@1.5.0
   codecov: codecov/codecov@3.2.2
@@ -75,13 +75,11 @@ jobs:
     parameters:
       attach-workspace:
         type: boolean
-        description:
-          Boolean for whether or not to attach to an existing workspace
+        description: Boolean for whether or not to attach to an existing workspace
         default: false
       docker-context:
         type: string
-        description:
-          Path to the directory containing your build context, defaults to .
+        description: Path to the directory containing your build context, defaults to .
         default: .
       dockerfile:
         type: string
@@ -110,8 +108,7 @@ jobs:
         description: A name for the image pushed to GCR
       path:
         type: string
-        description:
-          Path to the directory containing your Dockerfile, defaults to .
+        description: Path to the directory containing your Dockerfile, defaults to .
         default: .
       remote-docker-version:
         type: string
@@ -378,15 +375,13 @@ jobs:
           when: on_success
       - save_cache:
           name: Save pre-commit cache
-          key:
-            aperture-v1-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
+          key: aperture-v1-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
           paths:
             - ~/.cache/pre-commit
       - asdf_save_cache:
           cache_name: pre-commit
       - run:
-          name:
-            Show diff and assert pre-commit didn't create any non-ignored files
+          name: Show diff and assert pre-commit didn't create any non-ignored files
           command: |
             git status
             git add .
@@ -400,13 +395,11 @@ jobs:
     parameters:
       docker-context:
         type: string
-        description:
-          Path to the directory containing your build context, defaults to "".
+        description: Path to the directory containing your build context, defaults to "".
         default: .
       path:
         type: string
-        description:
-          Path to the directory containing your Dockerfile, defaults to "".
+        description: Path to the directory containing your Dockerfile, defaults to "".
         default: .
       tag:
         type: string
@@ -602,8 +595,7 @@ jobs:
     parameters:
       docker-context:
         type: string
-        description:
-          Path to the directory containing your build context, defaults to "".
+        description: Path to the directory containing your build context, defaults to "".
         default: .
       dockerfile:
         type: string
@@ -614,8 +606,7 @@ jobs:
         description: Name for Docker image
       path:
         type: string
-        description:
-          Path to the directory containing your Dockerfile, defaults to "".
+        description: Path to the directory containing your Dockerfile, defaults to "".
         default: .
       tag:
         type: string
@@ -860,8 +851,7 @@ jobs:
       job-root:
         type: string
         default: "/home/circleci"
-        description:
-          The root folder of the job where all repositories will be cloned to
+        description: The root folder of the job where all repositories will be cloned to
       manifests-repo:
         type: string
         default: git@github.com:fluxninja/argo-manifests.git
@@ -876,13 +866,11 @@ jobs:
       component:
         type: string
         default: ""
-        description:
-          Application component to update image and deployment code for
+        description: Application component to update image and deployment code for
       update:
         type: string
         default: everything
-        description:
-          Whether to update 'images', 'deployment-code' or 'everything'
+        description: Whether to update 'images', 'deployment-code' or 'everything'
     executor: python-cimg-executor
     steps:
       - add_ssh_keys:
@@ -908,8 +896,7 @@ jobs:
     parameters:
       workspace-name:
         type: string
-        description:
-          the name of the workspace to which built packages should be added
+        description: the name of the workspace to which built packages should be added
         default: packages
       goarch:
         type: string
@@ -1061,9 +1048,8 @@ workflows:
           component: cli
           matrix:
             parameters:
-              goos: ["linux","darwin"]
-              goarch: ["amd64","arm64"]
-
+              goos: ["linux", "darwin"]
+              goarch: ["amd64", "arm64"]
 
   publish-aperturectl-packages:
     when:
@@ -1079,8 +1065,8 @@ workflows:
           upload-to-gcp: true
           matrix:
             parameters:
-              goos: ["linux","darwin"]
-              goarch: ["amd64","arm64"]
+              goos: ["linux", "darwin"]
+              goarch: ["amd64", "arm64"]
 
   aperture:
     when:
@@ -1337,8 +1323,7 @@ workflows:
           <<: *push_deployment_code_job
           name: preview-deployment-changes
           dry-run: true
-          task-name:
-            "Preview changes between aperture.git and deployment repository"
+          task-name: "Preview changes between aperture.git and deployment repository"
 
 commands:
   asdf_install:
@@ -1386,8 +1371,7 @@ commands:
     steps:
       - save_cache:
           name: Save ASDF cache
-          key:
-            aperture-asdf-cache-v6-{{ checksum "~/month" }}-<<
+          key: aperture-asdf-cache-v6-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "tools/go/go.mod" }}
           paths:
@@ -1474,8 +1458,7 @@ commands:
         type: string
       git-branch:
         type: string
-        description:
-          Use the name of the current branch been used for Image build
+        description: Use the name of the current branch been used for Image build
         default: ${CIRCLE_BRANCH}
       git-commit-hash:
         type: string
