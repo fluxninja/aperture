@@ -1,6 +1,7 @@
 package checkhttp
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -227,6 +228,12 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 
 // RequestToInput - Converts a CheckHTTPRequest to an input map.
 func RequestToInput(req *flowcontrolhttpv1.CheckHTTPRequest) ast.Value {
+	return RequestToInputWithServices(req, nil, nil)
+}
+
+// RequestToInputWithServices - Converts a CheckHTTPRequest to an input map
+// Additionally sets attributes.source.services and attributes.destination.services with discovered services.
+func RequestToInputWithServices(req *flowcontrolhttpv1.CheckHTTPRequest, sourceSvcs, destinationSvcs []string) ast.Value {
 	request := req.GetRequest()
 	path := request.GetPath()
 	body := request.GetBody()
@@ -260,9 +267,23 @@ func RequestToInput(req *flowcontrolhttpv1.CheckHTTPRequest) ast.Value {
 
 	source := ast.NewObject()
 	source.Insert(ast.StringTerm("socketAddress"), ast.NewTerm(srcSocketAddress))
+	if sourceSvcs != nil {
+		srcServicesArray := ast.NewArray()
+		for _, svc := range sourceSvcs {
+			srcServicesArray.Append(ast.StringTerm(svc))
+		}
+		source.Insert(ast.StringTerm("services"), ast.NewTerm(srcServicesArray))
+	}
 
 	destination := ast.NewObject()
 	destination.Insert(ast.StringTerm("socketAddress"), ast.NewTerm(dstSocketAddress))
+	if destinationSvcs != nil {
+		dstServicesArray := ast.NewArray()
+		for _, svc := range destinationSvcs {
+			dstServicesArray.Append(ast.StringTerm(svc))
+		}
+		destination.Insert(ast.StringTerm("services"), ast.NewTerm(dstServicesArray))
+	}
 
 	requestMap := ast.NewObject()
 	requestMap.Insert(ast.StringTerm("http"), ast.NewTerm(http))
@@ -333,12 +354,7 @@ func getParsedBody(headers map[string]string, body string) (*ast.Term, bool, err
 				}
 			}
 
-			var jsonValue interface{}
-			err := util.UnmarshalJSON([]byte(body), &jsonValue)
-			if err != nil {
-				return nil, false, err
-			}
-			astValue, err := ast.InterfaceToValue(jsonValue)
+			astValue, err := ast.ValueFromReader(bytes.NewReader([]byte(body)))
 			if err != nil {
 				return nil, false, err
 			}

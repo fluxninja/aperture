@@ -103,17 +103,21 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 
 	mmResult := mm.Match(labelsForMatching)
 
-	// Extract interface{} from ast.Value
-	ifaceRequest, err := ast.ValueToInterface(input, valueResolver{})
-	if err != nil {
-		log.Errorf("failed to convert value to interface: %v", err)
-	} else {
-		ifaceMap, ok := ifaceRequest.(map[string]interface{})
-		if ok {
-			previews := mmResult.previews
-			for _, preview := range previews {
-				preview.AddHTTPRequestPreview(ifaceMap)
-			}
+	requestParsedOK := false
+	ifaceMap := make(map[string]interface{})
+	previews := mmResult.previews
+	if len(previews) > 0 {
+		// Extract interface{} from ast.Value
+		ifaceRequest, err := ast.ValueToInterface(input, valueResolver{})
+		if err != nil {
+			log.Bug().Msgf("failed to convert value to interface: %v", err)
+		} else {
+			ifaceMap, requestParsedOK = ifaceRequest.(map[string]interface{})
+		}
+	}
+	for _, preview := range previews {
+		if requestParsedOK {
+			preview.AddHTTPRequestPreview(ifaceMap)
 		}
 	}
 
@@ -195,6 +199,7 @@ func (valueResolver) Resolve(ref ast.Ref) (interface{}, error) {
 
 // Classify takes rego input, performs classification, and returns a map of flow labels and tokens.
 // LabelsForMatching are additional labels to use for selector matching.
+// Request is passed as ast.Value directly instead of map[string]interface{} to avoid unnecessary json conversion.
 func (c *ClassificationEngine) Classify(
 	ctx context.Context,
 	svcs []string,

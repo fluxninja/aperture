@@ -125,8 +125,6 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 			Code(codes.InvalidArgument).Msg("missing control-point")
 	}
 
-	svcs := h.serviceGetter.ServicesFromContext(ctx)
-
 	sourceAddress := req.GetAttributes().GetSource().GetAddress().GetSocketAddress()
 	sourceSvcs := h.serviceGetter.ServicesFromSocketAddress(sourceAddress)
 	sourceSvcsStr := strings.Join(sourceSvcs, ",")
@@ -146,7 +144,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	}
 
 	checkHTTPReq := authzRequestToCheckHTTPRequest(req, ctrlPt)
-	input := checkhttp.RequestToInput(checkHTTPReq)
+	input := checkhttp.RequestToInputWithServices(checkHTTPReq, sourceSvcs, destinationSvcs)
 
 	// Default flow labels from Authz request
 	requestFlowLabels := AuthzRequestToFlowLabels(req.GetAttributes().GetRequest())
@@ -160,6 +158,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	flowlabel.Merge(mergedFlowLabels, baggageFlowLabels)
 	flowlabel.Merge(mergedFlowLabels, sdFlowLabels)
 
+	svcs := h.serviceGetter.ServicesFromContext(ctx)
 	classifierMsgs, newFlowLabels, tokens := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
 
 	for key, fl := range newFlowLabels {
@@ -244,9 +243,12 @@ func authzRequestToCheckHTTPRequest(
 	req *authv3.CheckRequest,
 	controlPoint string,
 ) *flowcontrolhttpv1.CheckHTTPRequest {
-	httpRequest := &flowcontrolhttpv1.CheckHTTPRequest_HttpRequest{}
+	checkHTTPReq := &flowcontrolhttpv1.CheckHTTPRequest{
+		ControlPoint: controlPoint,
+	}
+
 	if http := req.GetAttributes().GetRequest().GetHttp(); http != nil {
-		httpRequest = &flowcontrolhttpv1.CheckHTTPRequest_HttpRequest{
+		httpRequest := &flowcontrolhttpv1.CheckHTTPRequest_HttpRequest{
 			Method:   http.GetMethod(),
 			Headers:  http.GetHeaders(),
 			Path:     http.GetPath(),
@@ -256,22 +258,28 @@ func authzRequestToCheckHTTPRequest(
 			Protocol: http.GetProtocol(),
 			Body:     http.GetBody(),
 		}
+		checkHTTPReq.Request = httpRequest
 	}
 
-	src := req.GetAttributes().GetSource().GetAddress().GetSocketAddress()
-	dst := req.GetAttributes().GetDestination().GetAddress().GetSocketAddress()
-	return &flowcontrolhttpv1.CheckHTTPRequest{
-		Source: &flowcontrolhttpv1.SocketAddress{
-			Address:  src.GetAddress(),
-			Port:     src.GetPortValue(),
-			Protocol: flowcontrolhttpv1.SocketAddress_Protocol(src.GetProtocol()),
-		},
-		Destination: &flowcontrolhttpv1.SocketAddress{
-			Address:  dst.GetAddress(),
-			Port:     dst.GetPortValue(),
-			Protocol: flowcontrolhttpv1.SocketAddress_Protocol(dst.GetProtocol()),
-		},
-		Request:      httpRequest,
-		ControlPoint: controlPoint,
+	src := req.GetAttributes().GetSource()
+	if src != nil {
+		srcSocketAddr := src.GetAddress().GetSocketAddress()
+		checkHTTPReq.Source = &flowcontrolhttpv1.SocketAddress{
+			Address:  srcSocketAddr.GetAddress(),
+			Port:     srcSocketAddr.GetPortValue(),
+			Protocol: flowcontrolhttpv1.SocketAddress_Protocol(srcSocketAddr.GetProtocol()),
+		}
 	}
+
+	dst := req.GetAttributes().GetDestination()
+	if dst != nil {
+		dstSocketAddr := dst.GetAddress().GetSocketAddress()
+		checkHTTPReq.Destination = &flowcontrolhttpv1.SocketAddress{
+			Address:  dstSocketAddr.GetAddress(),
+			Port:     dstSocketAddr.GetPortValue(),
+			Protocol: flowcontrolhttpv1.SocketAddress_Protocol(dstSocketAddr.GetProtocol()),
+		}
+	}
+
+	return checkHTTPReq
 }
