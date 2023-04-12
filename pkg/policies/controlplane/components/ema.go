@@ -94,16 +94,14 @@ func (ema *EMA) resetStages() {
 	ema.lastGoodOutput = runtime.InvalidReading()
 }
 
-// Execute implements runtime.Component.Execute.
 // Execute calculates the Exponential Moving Average (EMA) of a series of readings.
 // It takes inPortReadings, a map of input readings, and tickInfo, a struct containing
 // information about the current tick, as input parameters.
 // It returns a map of output readings and an error.
 func (ema *EMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
-	input, maxEnvelope, minEnvelope, err := ema.readInputs(inPortReadings)
-	if err != nil {
-		return ema.retErr(err)
-	}
+	input := inPortReadings.ReadSingleReadingPort("input")
+	maxEnvelope := inPortReadings.ReadSingleReadingPort("max_envelope")
+	minEnvelope := inPortReadings.ReadSingleReadingPort("min_envelope")
 
 	output, err := ema.calculateOutput(input, maxEnvelope, minEnvelope)
 	if err != nil {
@@ -113,13 +111,6 @@ func (ema *EMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.T
 	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
 	}, nil
-}
-
-func (ema *EMA) readInputs(inPortReadings runtime.PortToReading) (input, maxEnvelope, minEnvelope runtime.Reading, err error) {
-	input = inPortReadings.ReadSingleReadingPort("input")
-	maxEnvelope = inPortReadings.ReadSingleReadingPort("max_envelope")
-	minEnvelope = inPortReadings.ReadSingleReadingPort("min_envelope")
-	return
 }
 
 func (ema *EMA) retErr(err error) (runtime.PortToReading, error) {
