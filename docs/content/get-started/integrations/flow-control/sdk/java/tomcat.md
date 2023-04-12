@@ -47,7 +47,7 @@ filter configuration, as shown in the following code:
 
 The paths should be specified as a comma-separated list. Note that the paths you
 specify must match exactly. However, you can change this behavior to treat the
-paths as regular expressions by setting the ignored_paths_match_regex init
+paths as regular expressions by setting the `ignored_paths_match_regex` init
 parameter to true, like so:
 
 ```xml

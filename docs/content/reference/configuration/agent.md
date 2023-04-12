@@ -77,7 +77,7 @@ Env-Var Prefix: `APERTURE_AGENT_AGENT_INFO_`
 
 <dl>
 
-<dt>kubernetes</dt>
+<dt>Kubernetes</dt>
 <dd>
 
 ([AutoScaleKubernetesConfig](#auto-scale-kubernetes-config))

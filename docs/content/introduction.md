@@ -76,11 +76,11 @@ maintain the stability and reliability of modern web-scale applications,
 including:
 
 - **Prioritized load shedding**: Aperture enables organizations to gracefully
-  degrade application performance by dropping traffic that is deemed less
+  degrade application performance by dropping traffic that's deemed less
   important, ensuring that the most critical traffic is served.
 - **Distributed rate-limiting**: Aperture includes a distributed rate-limiter to
   prevent abuse and protect the service from excessive requests by users.
-- **Intelligent autoscaling**: Aperture adjusts resource allocation based on
+- **Intelligent auto scaling**: Aperture adjusts resource allocation based on
   demand and performance to ensure that the application can scale up or down as
   needed.
 - **Monitoring and telemetry**: Aperture continuously monitors service

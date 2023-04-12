@@ -31,9 +31,9 @@ reported using a [Flux Meter](/concepts/flow-control/resources/flux-meter.md).
 
 :::tip
 
-It is recommended to apply the Flux Meter to a single type of workload in order
+it's recommended to apply the Flux Meter to a single type of workload in order
 to avoid mixing the latency measurements across distinct workloads. For example,
-if there are Select and Insert API calls on the same service, it is recommended
+if there are Select and Insert API calls on the same service, it's recommended
 to measure the latency of only one of those workloads using a Flux Meter. Refer
 [FlowSelector](/concepts/flow-control/flow-selector.md#flowselector) on how to
 apply the Flux Meter to a subset of API calls for a service.
@@ -45,7 +45,7 @@ latency, gathered periodically from a
 [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query on
 Flux Meter reported metrics. Further, we will multiply EMA of latency with a
 tolerance factor to calculate setpoint latency, which is a threshold to detect
-overloaded state. That is, if the real-time latency of the service is more than
+overloaded state. that's, if the real-time latency of the service is more than
 this setpoint (which is based on long-term EMA), then we can consider the
 service to be overloaded at that time.
 

@@ -54,7 +54,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
 You can instruct the handler to exclude specific paths from being monitored by
 the Aperture SDK. For example, you might want to exclude endpoints used for
 health checks. To do this, you can add the path(s) you want to ignore to the
-ignoredPaths field of the SDK, as shown in the following code:
+`ignoredPaths` field of the SDK, as shown in the following code:
 
 ```java
 ApertureSDK sdk = ApertureSDK.builder()

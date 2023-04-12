@@ -9,7 +9,7 @@ keywords:
 sidebar_position: 3
 ---
 
-Aperture allows to feed custom metrics to controller prometheus. This is powered
+Aperture allows to feed custom metrics to controller Prometheus. This is powered
 by adding custom metric receivers into OpenTelemetry Collector running on
 Aperture Agent. [See configuration reference][config]
 

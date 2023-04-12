@@ -13,20 +13,20 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-In this tutorial, we will use [_Classifier_][rego-rules] to
-[statically rate limit](/reference/policies/bundled-blueprints/policies/static-rate-limiting.md)
-a GraphQL query.
+This tutorial demonstrates how to use [_Classifier_][rego-rules] to implement
+[static rate limiting](/reference/policies/bundled-blueprints/policies/static-rate-limiting.md)
+for a GraphQL query.
 
 ## Policy
 
-We will use a policy that will rate limit unique users based on `user_id` [_Flow
-Label_][flow-label]. This label is extracted using [_Classifier_][classifier]
-and is mapped from the `userID` claim in the JWT token sent as Authorization
-header in the request.
+This tutorial will demonstrate how to implement a policy that uses
+[_Classifier_][classifier] to extract the `userID` claim from a JWT token in the
+request's Authorization header and then rate limit unique users based on that
+`user_id` [_Flow Label_][flow-label].
 
 :::tip
 
-You can quickly write classification rules on
+You can write classification rules on
 [HTTP requests](concepts/flow-control/resources/classifier.md#live-previewing-requests)
 and define scheduler priorities on
 [Flow Labels](concepts/flow-control/flow-label.md#live-previewing-flow-labels)
@@ -93,8 +93,8 @@ tutorial does the following:
 
 1. Parse the query
 2. Check if the mutation query is `createTodo`
-3. Verify the JWT token with a very secretive secret key `secret` (only for
-   demonstration purposes)
+3. Verify the JWT token with a secret key `secret` (only for demonstration
+   purposes)
 4. Decode the JWT token and extract the `userID` from the claims
 5. Assign the value of `userID` to the exported variable `userID` in Rego source
 
@@ -107,10 +107,10 @@ each `userID`.
 
 ### Playground
 
-The traffic generator for this example is configured to generate 50
-requests/second for 2 minutes. When the above policy is loaded in the
-playground, we see that no more than 10 requests are accepted at any given time
-and rest of the requests are rejected.
+The traffic generator for this example is configured to generate 50 requests per
+second for 2 minutes. When the above policy is loaded in the playground, it can
+be observed that no more than 10 requests are accepted at any given time, and
+the rest of the requests are rejected.
 
 <Zoom>
 

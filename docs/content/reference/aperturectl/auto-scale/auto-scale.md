@@ -6,7 +6,7 @@ keywords:
   - aperturectl_auto-scale
 ---
 
-## aperturectl auto-scale
+## `aperturectl auto-scale`
 
 AutoScale integrations
 
@@ -26,7 +26,7 @@ Use this command to query information about active AutoScale integrations
 
 ### SEE ALSO
 
-- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool
+- [`aperturectl`](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool
   to interact with Aperture
-- [aperturectl auto-scale control-points](/reference/aperturectl/auto-scale/control-points/control-points.md) -
+- [`aperturectl auto-scale control-points`](/reference/aperturectl/auto-scale/control-points/control-points.md) -
   List AutoScale control points

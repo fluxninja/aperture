@@ -20,16 +20,14 @@ block specific flow labels that exceed their quota within a certain timeframe
 
 ## Policy
 
-In this example, we will be rate limiting unique users based on the `User-Id`
-header in the HTTP traffic. This header is provided by Envoy proxy under the
-label key `http.request.header.user_id` (See
-[Flow Labels](/concepts/flow-control/flow-label.md)).
+This example demonstrates rate limiting of unique users based on the `User-Id`
+header in the HTTP traffic. Envoy proxy provides this header under the label key
+`http.request.header.user_id` (see
+[Flow Labels](/concepts/flow-control/flow-label.md) for more information).
 
-We will be configuring our rate limiter to allow at most `120 requests` for each
-user in the `60s` period.
-
-In addition, we will be configuring our rate limiter to apply these limits to
-`ingress` traffic on Kubernetes service
+This configuration limits each user to at most `120 requests` in a `60s` period
+using the rate limiter. Additionally, the rate limiter applies these limits to
+`ingress` traffic on the Kubernetes service
 `service1-demo-app.demoapp.svc.cluster.local`.
 
 ```mdx-code-block
@@ -75,8 +73,8 @@ for this policy.
 
 ### Playground
 
-When the above policy is loaded in the playground, we see that no more than 120
-requests are accepted in 60 sec and rest of the requests are rejected.
+When the policy above is loaded in the playground, no more than 120 requests are
+accepted in a 60 second period and the rest of the requests are rejected.
 
 <Zoom>
 
