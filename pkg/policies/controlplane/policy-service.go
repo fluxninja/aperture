@@ -64,6 +64,7 @@ func (s *PolicyService) PatchPolicies(ctx context.Context, policies *policylangv
 // DeletePolicy deletes a policy from the system.
 func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.DeletePolicyRequest) (*emptypb.Empty, error) {
 	s.etcdTracker.RemoveEvent(notifiers.Key(policy.Name))
+	s.dynamicConfigTracker.RemoveEvent(notifiers.Key(policy.Name))
 	return &emptypb.Empty{}, nil
 }
 
