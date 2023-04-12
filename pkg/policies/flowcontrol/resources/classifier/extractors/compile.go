@@ -30,7 +30,7 @@ func CompileToRego(
 	fmt.Fprintf(&out, "package %s\n", packageName)
 	needs := needs{}
 	for _, label := range sortedLabels {
-		if !isRegoIdent(label) {
+		if !IsRegoIdent(label) {
 			return "", fmt.Errorf(
 				"%w: %s (allowed chars are alphanumeric and underscore, cannot be Rego keyword)",
 				BadLabelName, label,
@@ -175,7 +175,7 @@ func renderJSONPointer(ptr JSONPointer) string {
 func renderPath(path []string, mode pathMode) string {
 	out := strings.Builder{}
 	for _, segment := range path {
-		if isRegoIdent(segment) {
+		if IsRegoIdent(segment) {
 			fmt.Fprintf(&out, ".%s", segment)
 		} else if mode == jsonPathMode && isUint(segment) {
 			fmt.Fprintf(&out, `[{"%s", %s}[_]]`, segment, segment)

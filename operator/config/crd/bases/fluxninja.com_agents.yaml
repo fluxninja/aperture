@@ -951,7 +951,7 @@ spec:
                       agent_group:
                         description: "All agents within an agent_group receive the
                           same data-plane configuration (e.g. Flux Meters, Rate Limiters
-                          etc). \n [Read more about agent groups here](/concepts/integrations/flow-control/flow-selector.md#agent-group)."
+                          etc). \n [Read more about agent groups here](/concepts/flow-control/flow-selector.md#agent-group)."
                         type: string
                     type: object
                   alertmanagers:
@@ -1527,14 +1527,31 @@ spec:
                         type: object
                       custom_metrics:
                         additionalProperties:
-                          description: CustomMetricsConfig defines receivers, processors,
+                          description: "CustomMetricsConfig defines receivers, processors,
                             and single metrics pipeline which will be exported to
-                            the controller prometheus.
+                            the controller prometheus. Environment variables can be
+                            used in the configuration using format `${ENV_VAR_NAME}`.
+                            \n :::info See also [Get Started / Setup Integrations
+                            / Metrics](/get-started/integrations/metrics/metrics.md).
+                            :::"
                           properties:
+                            per_agent_group:
+                              description: PerAgentGroup marks the pipeline to be
+                                instantiated only once per agent group. This is helpful
+                                for receivers that scrape eg. some cluster-wide metrics.
+                                When not set, pipeline will be instatiated on every
+                                Agent.
+                              type: boolean
                             pipeline:
-                              description: Pipeline is an OTEL metrics pipeline definition,
+                              description: "Pipeline is an OTEL metrics pipeline definition,
                                 which **only** uses receivers and processors defined
-                                above. Exporter would be added automatically.
+                                above. Exporter would be added automatically. \n If
+                                there are no processors defined or only one processor
+                                is defined, the pipeline definition can be omitted.
+                                In such cases, the pipeline will automatically use
+                                all given receivers and the defined processor (if
+                                any).  However, if there are more than one processor,
+                                the pipeline must be defined explicitly."
                               properties:
                                 processors:
                                   items:
@@ -2978,7 +2995,8 @@ spec:
                                         defined in spec.resourceClaims, that are used
                                         by this container. \n This is an alpha field
                                         and requires enabling the DynamicResourceAllocation
-                                        feature gate. \n This field is immutable."
+                                        feature gate. \n This field is immutable.
+                                        It can only be set for containers."
                                       items:
                                         description: ResourceClaim references one
                                           entry in PodSpec.ResourceClaims.
@@ -4758,7 +4776,8 @@ spec:
                           description: "Claims lists the names of resources, defined
                             in spec.resourceClaims, that are used by this container.
                             \n This is an alpha field and requires enabling the DynamicResourceAllocation
-                            feature gate. \n This field is immutable."
+                            feature gate. \n This field is immutable. It can only
+                            be set for containers."
                           items:
                             description: ResourceClaim references one entry in PodSpec.ResourceClaims.
                             properties:
@@ -5532,7 +5551,8 @@ spec:
                     description: "Claims lists the names of resources, defined in
                       spec.resourceClaims, that are used by this container. \n This
                       is an alpha field and requires enabling the DynamicResourceAllocation
-                      feature gate. \n This field is immutable."
+                      feature gate. \n This field is immutable. It can only be set
+                      for containers."
                     items:
                       description: ResourceClaim references one entry in PodSpec.ResourceClaims.
                       properties:
@@ -6401,7 +6421,8 @@ spec:
                           description: "Claims lists the names of resources, defined
                             in spec.resourceClaims, that are used by this container.
                             \n This is an alpha field and requires enabling the DynamicResourceAllocation
-                            feature gate. \n This field is immutable."
+                            feature gate. \n This field is immutable. It can only
+                            be set for containers."
                           items:
                             description: ResourceClaim references one entry in PodSpec.ResourceClaims.
                             properties:

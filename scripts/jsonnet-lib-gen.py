@@ -5,7 +5,6 @@ import json
 import os
 import subprocess
 import tempfile
-import textwrap
 from pathlib import Path
 from typing import Dict, Iterable, List, Mapping, Optional, Tuple
 
@@ -201,11 +200,6 @@ def withNameMixinFilter(name: str) -> str:
 
 
 def defaultPorts(definition: JsonnetDefinition) -> str:
-    TPL = textwrap.dedent(
-        """\
-
-    """
-    )
     if definition.type_ != JsonnetType.OBJECT:
         return ""
     in_ports = definition.properties.get("in_ports")

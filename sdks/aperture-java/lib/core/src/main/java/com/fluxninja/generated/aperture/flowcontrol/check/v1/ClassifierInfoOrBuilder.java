@@ -38,18 +38,6 @@ public interface ClassifierInfoOrBuilder extends
   long getClassifierIndex();
 
   /**
-   * <code>string label_key = 4 [json_name = "labelKey"];</code>
-   * @return The labelKey.
-   */
-  java.lang.String getLabelKey();
-  /**
-   * <code>string label_key = 4 [json_name = "labelKey"];</code>
-   * @return The bytes for labelKey.
-   */
-  com.google.protobuf.ByteString
-      getLabelKeyBytes();
-
-  /**
    * <code>.aperture.flowcontrol.check.v1.ClassifierInfo.Error error = 5 [json_name = "error"];</code>
    * @return The enum numeric value on the wire for error.
    */

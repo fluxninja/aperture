@@ -3,10 +3,14 @@ package discovery
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/cenkalti/backoff/v4"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sourcegraph/conc/stream"
+	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -14,8 +18,10 @@ import (
 	controlpointsv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/pkg/etcd/election"
 	"github.com/fluxninja/aperture/pkg/k8s"
 	"github.com/fluxninja/aperture/pkg/log"
+	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 )
 
@@ -87,6 +93,7 @@ type autoScaleControlPoints struct {
 	ctx           context.Context
 	cancel        context.CancelFunc
 	scaleStream   *stream.Stream
+	pn            *podNotifier
 }
 
 // controlPointCache implements the AutoScaleControlPointStore interface.
@@ -96,13 +103,81 @@ var _ AutoScaleControlPointStore = (*autoScaleControlPoints)(nil)
 var _ AutoScaleControlPoints = (*autoScaleControlPoints)(nil)
 
 // newAutoScaleControlPoints returns a new AutoScaleControlPoints.
-func newAutoScaleControlPoints(trackers notifiers.Trackers, k8sClient k8s.K8sClient) *autoScaleControlPoints {
-	return &autoScaleControlPoints{
+func newAutoScaleControlPoints(trackers notifiers.Trackers, k8sClient k8s.K8sClient, pr *prometheus.Registry, electionTracker notifiers.Trackers, lc fx.Lifecycle) (*autoScaleControlPoints, error) {
+	pn, err := newPodNotifier(pr, electionTracker, lc)
+	if err != nil {
+		return nil, err
+	}
+	cpc := &autoScaleControlPoints{
 		controlPoints: make(map[AutoScaleControlPoint]*controlPointState),
 		trackers:      trackers,
 		k8sClient:     k8sClient,
 		scaleStream:   stream.New(),
+		pn:            pn,
 	}
+	return cpc, nil
+}
+
+type podNotifier struct {
+	stateMutex       sync.Mutex
+	isLeader         bool
+	podCounter       *prometheus.GaugeVec
+	electionTrackers notifiers.Trackers
+}
+
+func newPodNotifier(pr *prometheus.Registry, electionTrackers notifiers.Trackers, lifecycle fx.Lifecycle) (*podNotifier, error) {
+	pn := &podNotifier{
+		electionTrackers: electionTrackers,
+	}
+	electionNotifier := notifiers.NewBasicKeyNotifier(election.ElectionResultKey, pn.electionResultCallback)
+	lifecycle.Append(fx.Hook{
+		OnStart: func(_ context.Context) error {
+			return pn.electionTrackers.AddKeyNotifier(electionNotifier)
+		},
+		OnStop: func(ctx context.Context) error {
+			return pn.electionTrackers.RemoveKeyNotifier(electionNotifier)
+		},
+	})
+
+	defaultLabels := []string{
+		metrics.K8sNamespaceName, metrics.K8sDaemonsetName, metrics.K8sDeploymentName, metrics.K8sReplicasetName, metrics.K8sStatefulsetName,
+	}
+	podCounter := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: metrics.K8sPodCount,
+		Help: "The number of pods",
+	}, defaultLabels)
+	err := pr.Register(podCounter)
+	if err != nil {
+		// Ignore already registered error, as this is not harmful. Metrics may
+		// be registered by other running server.
+		if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
+			return nil, fmt.Errorf("couldn't register prometheus metrics: %w", err)
+		}
+	}
+	pn.podCounter = podCounter
+
+	return pn, nil
+}
+
+func (p *podNotifier) electionResultCallback(e notifiers.Event) {
+	log.Info().Msg("Election result callback")
+	p.stateMutex.Lock()
+	defer p.stateMutex.Unlock()
+	p.isLeader = true
+}
+
+func (p *podNotifier) setScale(scale *autoscalingv1.Scale, cp AutoScaleControlPoint) error {
+	if !p.isLeader {
+		return nil
+	}
+	p.stateMutex.Lock()
+	defer p.stateMutex.Unlock()
+	pcMetric, err := p.podCounter.GetMetricWith(scaleLabels(scale, cp))
+	if err != nil {
+		return err
+	}
+	pcMetric.Set(float64(scale.Status.Replicas))
+	return nil
 }
 
 // start starts the autoScaler.
@@ -243,7 +318,9 @@ func (cpc *autoScaleControlPoints) fetchScale(cp AutoScaleControlPoint, cps *con
 		log.Error().Err(keyErr).Msgf("Unable to marshal key: %v", cp)
 		return noOp
 	}
-
+	if err := cpc.pn.setScale(scale, cp); err != nil {
+		log.Error().Err(err).Msgf("Unable to set scale for %v", cp)
+	}
 	value, valErr := proto.Marshal(&reported)
 	if valErr != nil {
 		log.Error().Err(valErr).Msg("Unable to marshal value")
@@ -254,6 +331,19 @@ func (cpc *autoScaleControlPoints) fetchScale(cp AutoScaleControlPoint, cps *con
 		log.Info().Msgf("Writing event for %v, event: %v", cp, *scale)
 		cpc.trackers.WriteEvent(notifiers.Key(key), value)
 	}
+}
+
+func scaleLabels(scale *autoscalingv1.Scale, cp AutoScaleControlPoint) map[string]string {
+	kind := strings.ToLower(cp.Kind)
+	labels := map[string]string{
+		metrics.K8sNamespaceName:   scale.Namespace,
+		metrics.K8sDaemonsetName:   "",
+		metrics.K8sDeploymentName:  "",
+		metrics.K8sReplicasetName:  "",
+		metrics.K8sStatefulsetName: "",
+	}
+	labels[fmt.Sprintf("k8s_%s_name", kind)] = cp.Name
+	return labels
 }
 
 // Keys returns the list of ControlPoints in the cache.

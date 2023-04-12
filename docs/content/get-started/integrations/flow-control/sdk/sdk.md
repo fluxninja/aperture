@@ -42,7 +42,7 @@ traffic Control Points within your service.
 
 <DocCardList />
 
-[flow-control]: /concepts/integrations/flow-control/flow-control.md
+[flow-control]: /concepts/flow-control/flow-control.md
 [istio]: /get-started/integrations/flow-control/envoy/istio.md
 [golang]: ./go/manual.md
 [java]: ./java/manual.md

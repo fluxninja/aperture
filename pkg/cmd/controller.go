@@ -12,6 +12,7 @@ import (
 	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	previewv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/preview/v1"
 	"github.com/fluxninja/aperture/pkg/agentfunctions/agents"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/consts"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 )
 
@@ -47,7 +48,7 @@ func (h *Handler) ListFlowControlPoints(
 	}
 
 	numErrors := uint32(0)
-	allControlPoints := map[selectors.GlobalControlPointID]struct{}{}
+	allControlPoints := map[selectors.TypedGlobalControlPointID]struct{}{}
 	for _, resp := range agentsControlPoints {
 		if resp.Err != nil {
 			numErrors += 1
@@ -55,7 +56,7 @@ func (h *Handler) ListFlowControlPoints(
 		}
 
 		for _, protoCp := range resp.Success.FlowControlPoints.FlowControlPoints {
-			gcp := selectors.ControlPointIDFromProto(protoCp).InAgentGroup(resp.Success.AgentGroup)
+			gcp := selectors.TypedControlPointIDFromProto(protoCp).InAgentGroup(resp.Success.AgentGroup)
 			allControlPoints[gcp] = struct{}{}
 		}
 	}
@@ -331,14 +332,13 @@ agentsLoop:
 		}
 
 		for _, cpProto := range agent.Success.FlowControlPoints.FlowControlPoints {
-			cp := selectors.ControlPointIDFromProto(cpProto)
+			cp := selectors.TypedControlPointIDFromProto(cpProto)
 
 			if cp.ControlPoint != needle.ControlPoint {
 				continue
 			}
 
-			// FIXME This "all" thing shouldn't be hardcoded.
-			if needle.Service == "all" || cp.Service == needle.Service {
+			if needle.Service == consts.AnyService || cp.Service == needle.Service {
 				agents = append(agents, agent.Client)
 				continue agentsLoop // avoid duplicating agent
 			}

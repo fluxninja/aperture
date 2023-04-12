@@ -8,7 +8,7 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class CheckRequest(_message.Message):
-    __slots__ = ["control_point", "labels"]
+    __slots__ = ["control_point", "labels", "tokens"]
     class LabelsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -18,9 +18,11 @@ class CheckRequest(_message.Message):
         def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     CONTROL_POINT_FIELD_NUMBER: _ClassVar[int]
     LABELS_FIELD_NUMBER: _ClassVar[int]
+    TOKENS_FIELD_NUMBER: _ClassVar[int]
     control_point: str
     labels: _containers.ScalarMap[str, str]
-    def __init__(self, control_point: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    tokens: int
+    def __init__(self, control_point: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., tokens: _Optional[int] = ...) -> None: ...
 
 class CheckResponse(_message.Message):
     __slots__ = ["start", "end", "services", "control_point", "flow_label_keys", "telemetry_flow_labels", "decision_type", "reject_reason", "classifier_infos", "flux_meter_infos", "limiter_decisions"]
@@ -70,7 +72,7 @@ class CheckResponse(_message.Message):
     def __init__(self, start: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., services: _Optional[_Iterable[str]] = ..., control_point: _Optional[str] = ..., flow_label_keys: _Optional[_Iterable[str]] = ..., telemetry_flow_labels: _Optional[_Mapping[str, str]] = ..., decision_type: _Optional[_Union[CheckResponse.DecisionType, str]] = ..., reject_reason: _Optional[_Union[CheckResponse.RejectReason, str]] = ..., classifier_infos: _Optional[_Iterable[_Union[ClassifierInfo, _Mapping]]] = ..., flux_meter_infos: _Optional[_Iterable[_Union[FluxMeterInfo, _Mapping]]] = ..., limiter_decisions: _Optional[_Iterable[_Union[LimiterDecision, _Mapping]]] = ...) -> None: ...
 
 class ClassifierInfo(_message.Message):
-    __slots__ = ["policy_name", "policy_hash", "classifier_index", "label_key", "error"]
+    __slots__ = ["policy_name", "policy_hash", "classifier_index", "error"]
     class Error(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         ERROR_NONE: _ClassVar[ClassifierInfo.Error]
@@ -88,14 +90,12 @@ class ClassifierInfo(_message.Message):
     POLICY_NAME_FIELD_NUMBER: _ClassVar[int]
     POLICY_HASH_FIELD_NUMBER: _ClassVar[int]
     CLASSIFIER_INDEX_FIELD_NUMBER: _ClassVar[int]
-    LABEL_KEY_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     policy_name: str
     policy_hash: str
     classifier_index: int
-    label_key: str
     error: ClassifierInfo.Error
-    def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., classifier_index: _Optional[int] = ..., label_key: _Optional[str] = ..., error: _Optional[_Union[ClassifierInfo.Error, str]] = ...) -> None: ...
+    def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., classifier_index: _Optional[int] = ..., error: _Optional[_Union[ClassifierInfo.Error, str]] = ...) -> None: ...
 
 class LimiterDecision(_message.Message):
     __slots__ = ["policy_name", "policy_hash", "component_id", "dropped", "reason", "rate_limiter_info", "concurrency_limiter_info"]

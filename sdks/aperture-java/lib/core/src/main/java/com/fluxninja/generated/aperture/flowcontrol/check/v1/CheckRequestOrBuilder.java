@@ -54,4 +54,10 @@ java.lang.String defaultValue);
 
   java.lang.String getLabelsOrThrow(
       java.lang.String key);
+
+  /**
+   * <code>uint64 tokens = 3 [json_name = "tokens"];</code>
+   * @return The tokens.
+   */
+  long getTokens();
 }

@@ -36,16 +36,15 @@ policy:
             output:
               signal_name: AVERAGE_CPU
     - auto_scale:
-        auto_scaler:
-          scaler:
-            kubernetes_replicas:
-              kubernetes_object_selector:
-                namespace: demoapp
-                api_version: apps/v1
-                kind: Deployment
-                name: service1-demo-app
-          min_scale: "1"
-          max_scale: "10"
+        pod_auto_scaler:
+          pod_scaler:
+            kubernetes_object_selector:
+              namespace: demoapp
+              api_version: apps/v1
+              kind: Deployment
+              name: service1-demo-app
+          min_replicas: "1"
+          max_replicas: "10"
           scale_in_cooldown: "40s"
           scale_out_cooldown: "30s"
           scale_out_controllers:

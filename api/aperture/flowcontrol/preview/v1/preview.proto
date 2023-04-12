@@ -13,6 +13,12 @@ service FlowPreviewService {
     option (google.api.http) = {
       post: "/v1/flowcontrol/preview/labels/{service}/{control_point}"
       body: "label_matcher"
+      additional_bindings: [
+        {
+          post: "/v1/flowcontrol/preview/labels/{control_point}"
+          body: "label_matcher"
+        }
+      ]
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["aperture-agent"];
@@ -22,6 +28,12 @@ service FlowPreviewService {
     option (google.api.http) = {
       post: "/v1/flowcontrol/preview/http_requests/{service}/{control_point}"
       body: "label_matcher"
+      additional_bindings: [
+        {
+          post: "/v1/flowcontrol/preview/http_requests/{control_point}"
+          body: "label_matcher"
+        }
+      ]
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: ["aperture-agent"];

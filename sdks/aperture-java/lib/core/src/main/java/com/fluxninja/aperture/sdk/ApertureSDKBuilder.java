@@ -4,13 +4,18 @@ import static com.fluxninja.aperture.sdk.Constants.DEFAULT_RPC_TIMEOUT;
 import static com.fluxninja.aperture.sdk.Constants.LIBRARY_NAME;
 
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowControlServiceGrpc;
-import com.fluxninja.generated.envoy.service.auth.v3.AuthorizationGrpc;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.FlowControlServiceHTTPGrpc;
+import com.google.common.io.ByteStreams;
+import io.grpc.*;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
+import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporterBuilder;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,12 +26,14 @@ public final class ApertureSDKBuilder {
     private Duration timeout;
     private String host;
     private int port;
-    private boolean useHttps = false;
-    private final List<String> blockedPaths;
-    private boolean blockedPathsMatchRegex = false;
+    private boolean useHttpsInOtlpExporter = false;
+    private boolean insecureGrpc = true;
+    private String certFile;
+    private final List<String> ignoredPaths;
+    private boolean ignoredPathsMatchRegex = false;
 
     ApertureSDKBuilder() {
-        blockedPaths = new ArrayList<>();
+        ignoredPaths = new ArrayList<>();
     }
 
     public ApertureSDKBuilder setHost(String host) {
@@ -44,9 +51,47 @@ public final class ApertureSDKBuilder {
         return this;
     }
 
+    /**
+     * Makes the span exporter use https instead of http.
+     *
+     * @deprecated Use {@link #useInsecureGrpc(boolean)} instead.
+     * @return the builder object.
+     */
+    @Deprecated
     public ApertureSDKBuilder useHttps() {
-        this.useHttps = true;
+        this.useHttpsInOtlpExporter = true;
         return this;
+    }
+
+    public ApertureSDKBuilder setRootCertificateFile(String filename) {
+        this.certFile = filename;
+        return this;
+    }
+
+    /**
+     * Makes the SDK use plaintext if true, and SSL/TLS if false. Custom root CA certificates can be
+     * passes using {@link #setRootCertificateFile(String)} method.
+     *
+     * @return the builder object.
+     */
+    public ApertureSDKBuilder useInsecureGrpc(boolean enabled) {
+        this.insecureGrpc = enabled;
+        this.useHttpsInOtlpExporter = !enabled;
+        return this;
+    }
+
+    /**
+     * Adds comma-separated paths to ignore in traffic control points.
+     *
+     * @deprecated use {@link #addIgnoredPaths(String)}
+     * @param paths comma-separated list of paths to ignore when creating traffic control points.
+     * @return the builder object.
+     */
+    public ApertureSDKBuilder addBlockedPaths(String paths) {
+        if (paths == null || paths.isEmpty()) {
+            return this;
+        }
+        return this.addIgnoredPaths(Arrays.asList(paths.split("\\s*,\\s*")));
     }
 
     /**
@@ -55,11 +100,23 @@ public final class ApertureSDKBuilder {
      * @param paths comma-separated list of paths to ignore when creating traffic control points.
      * @return the builder object.
      */
-    public ApertureSDKBuilder addBlockedPaths(String paths) {
+    public ApertureSDKBuilder addIgnoredPaths(String paths) {
         if (paths == null || paths.isEmpty()) {
             return this;
         }
-        return this.addBlockedPaths(Arrays.asList(paths.split("\\s*,\\s*")));
+        return this.addIgnoredPaths(Arrays.asList(paths.split("\\s*,\\s*")));
+    }
+
+    /**
+     * Adds paths to ignore in traffic control points.
+     *
+     * @deprecated use {@link #addIgnoredPaths(List)}
+     * @param paths list of paths to ignore when creating traffic control points.
+     * @return the builder object.
+     */
+    public ApertureSDKBuilder addBlockedPaths(List<String> paths) {
+        this.ignoredPaths.addAll(paths);
+        return this;
     }
 
     /**
@@ -68,19 +125,31 @@ public final class ApertureSDKBuilder {
      * @param paths list of paths to ignore when creating traffic control points.
      * @return the builder object.
      */
-    public ApertureSDKBuilder addBlockedPaths(List<String> paths) {
-        this.blockedPaths.addAll(paths);
+    public ApertureSDKBuilder addIgnoredPaths(List<String> paths) {
+        this.ignoredPaths.addAll(paths);
         return this;
     }
 
     /**
-     * Whether paths should be matched by regex. If false, exact matches will be expected.
+     * Whether ignored paths should be matched by regex. If false, exact matches will be expected.
      *
+     * @deprecated use {@link #setIgnoredPathsMatchRegex(boolean)}
      * @param flag whether paths should be matched by regex.
      * @return the builder object.
      */
     public ApertureSDKBuilder setBlockedPathMatchRegex(boolean flag) {
-        this.blockedPathsMatchRegex = flag;
+        this.ignoredPathsMatchRegex = flag;
+        return this;
+    }
+
+    /**
+     * Whether ignored paths should be matched by regex. If false, exact matches will be expected.
+     *
+     * @param flag whether paths should be matched by regex.
+     * @return the builder object.
+     */
+    public ApertureSDKBuilder setIgnoredPathsMatchRegex(boolean flag) {
+        this.ignoredPathsMatchRegex = flag;
         return this;
     }
 
@@ -95,9 +164,9 @@ public final class ApertureSDKBuilder {
             throw new ApertureSDKException("port needs to be set");
         }
 
-        String protocol = "http";
-        if (this.useHttps) {
-            protocol = "https";
+        String OtlpSpanExporterProtocol = "http";
+        if (this.useHttpsInOtlpExporter) {
+            OtlpSpanExporterProtocol = "https";
         }
 
         Duration timeout = this.timeout;
@@ -105,16 +174,45 @@ public final class ApertureSDKBuilder {
             timeout = DEFAULT_RPC_TIMEOUT;
         }
 
-        ManagedChannel channel =
-                ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
+        ChannelCredentials creds;
+        byte[] caCertContents = null;
+        if (this.insecureGrpc) {
+            creds = InsecureChannelCredentials.create();
+        } else {
+            if (this.certFile == null || this.certFile.isEmpty()) {
+                creds = TlsChannelCredentials.create();
+            } else {
+                try {
+                    creds =
+                            TlsChannelCredentials.newBuilder()
+                                    .trustManager(new File(this.certFile))
+                                    .build();
+                    caCertContents =
+                            ByteStreams.toByteArray(Files.newInputStream(Paths.get(this.certFile)));
+                } catch (IOException e) {
+                    // cert file not found
+                    throw new ApertureSDKException(e);
+                }
+            }
+        }
+
+        String target = host + ":" + port;
+        ManagedChannel channel = Grpc.newChannelBuilder(target, creds).build();
+
         FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient =
                 FlowControlServiceGrpc.newBlockingStub(channel);
-        AuthorizationGrpc.AuthorizationBlockingStub envoyAuthzClient =
-                AuthorizationGrpc.newBlockingStub(channel);
+        FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub httpFlowControlClient =
+                FlowControlServiceHTTPGrpc.newBlockingStub(channel);
+
+        OtlpGrpcSpanExporterBuilder spanExporterBuilder = OtlpGrpcSpanExporter.builder();
+        if (caCertContents != null) {
+            spanExporterBuilder.setTrustedCertificates(caCertContents);
+        }
 
         OtlpGrpcSpanExporter spanExporter =
-                OtlpGrpcSpanExporter.builder()
-                        .setEndpoint(String.format("%s://%s:%d", protocol, host, port))
+                spanExporterBuilder
+                        .setEndpoint(
+                                String.format("%s://%s:%d", OtlpSpanExporterProtocol, host, port))
                         .build();
         SdkTracerProvider traceProvider =
                 SdkTracerProvider.builder()
@@ -124,10 +222,10 @@ public final class ApertureSDKBuilder {
 
         return new ApertureSDK(
                 flowControlClient,
-                envoyAuthzClient,
+                httpFlowControlClient,
                 tracer,
                 timeout,
-                blockedPaths,
-                blockedPathsMatchRegex);
+                ignoredPaths,
+                ignoredPathsMatchRegex);
     }
 }

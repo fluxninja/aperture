@@ -11,7 +11,9 @@ local helm = tanka.helm.new(helpers.helmChartsRoot);
   values:: {
     base: {},
     istiod: {},
-    envoyfilter: {},
+    envoyfilter: {
+      enableAuthzRequestBodyBuffering: true,
+    },
   },
   base:
     helm.template('base', 'charts/base', {

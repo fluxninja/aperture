@@ -7,6 +7,7 @@ import (
 	previewv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/preview/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview"
+	previewconfig "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/preview/config"
 	"github.com/fluxninja/aperture/pkg/rpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -25,8 +26,8 @@ func ProvidePreviewHandler(
 	handler *preview.Handler,
 	unmarshaller config.Unmarshaller,
 ) (*PreviewHandler, error) {
-	var previewConfig preview.FlowPreviewConfig
-	if err := unmarshaller.UnmarshalKey(preview.ConfigKey, &previewConfig); err != nil {
+	var previewConfig previewconfig.FlowPreviewConfig
+	if err := unmarshaller.UnmarshalKey(previewconfig.Key, &previewConfig); err != nil {
 		return nil, err
 	}
 

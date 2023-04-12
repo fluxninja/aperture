@@ -12,7 +12,8 @@ Generate Aperture Policy related resources from Aperture Blueprints
 
 ### Synopsis
 
-Use this command to generate Aperture Policy related resources like Kubernetes Custom Resource, Grafana Dashboards and graphs in DOT and Mermaid format.
+Use this command to generate Aperture Policy related resources like Kubernetes
+Custom Resource, Grafana Dashboards and graphs in DOT and Mermaid format.
 
 ```
 aperturectl blueprints generate [flags]
@@ -51,4 +52,5 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 
 ### SEE ALSO
 
-- [aperturectl blueprints](/reference/aperturectl/blueprints/blueprints.md) - Aperture Blueprints
+- [aperturectl blueprints](/reference/aperturectl/blueprints/blueprints.md) -
+  Aperture Blueprints

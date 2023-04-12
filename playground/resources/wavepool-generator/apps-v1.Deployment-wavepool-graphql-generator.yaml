@@ -15,22 +15,22 @@ spec:
         sidecar.istio.io/inject: "false"
     spec:
       containers:
-      - args:
-        - while true; do k6 run -v /tmp/test.js; done
-        command:
-        - /bin/sh
-        - -xc
-        image: loadimpact/k6:latest
-        imagePullPolicy: Always
-        name: wavepool-generator
-        resources:
-          limits:
-            cpu: "1"
-            memory: 2Gi
-        volumeMounts:
-        - mountPath: /tmp
-          name: graphql-js-file
+        - args:
+            - while true; do k6 run -v /tmp/test.js; done
+          command:
+            - /bin/sh
+            - -xc
+          image: loadimpact/k6:latest
+          imagePullPolicy: Always
+          name: wavepool-generator
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+          volumeMounts:
+            - mountPath: /tmp
+              name: graphql-js-file
       volumes:
-      - configMap:
-          name: wavepool-config
-        name: graphql-js-file
+        - configMap:
+            name: wavepool-config
+          name: graphql-js-file

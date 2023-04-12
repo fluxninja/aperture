@@ -288,13 +288,15 @@ type Resources struct {
 	// Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 	//
 	// Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+	//
 	// Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
-	FluxMeters map[string]*FluxMeter `protobuf:"bytes,1,rep,name=flux_meters,json=fluxMeters,proto3" json:"flux_meters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"dive"` // @gotags: validate:"dive"
+	FluxMeters map[string]*FluxMeter `protobuf:"bytes,1,rep,name=flux_meters,json=fluxMeters,proto3" json:"flux_meters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"deprecated,dive"` // @gotags: validate:"deprecated,dive"
 	// Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 	//
 	// The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+	//
 	// Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
-	Classifiers []*Classifier `protobuf:"bytes,2,rep,name=classifiers,proto3" json:"classifiers,omitempty" validate:"dive"` // @gotags: validate:"dive"
+	Classifiers []*Classifier `protobuf:"bytes,2,rep,name=classifiers,proto3" json:"classifiers,omitempty" validate:"deprecated,dive"` // @gotags: validate:"deprecated,dive"
 	// FlowControlResources are resources that are provided by flow control integration.
 	FlowControl *FlowControlResources `protobuf:"bytes,101,opt,name=flow_control,json=flowControl,proto3" json:"flow_control,omitempty"`
 }
@@ -352,7 +354,7 @@ func (x *Resources) GetFlowControl() *FlowControlResources {
 	return nil
 }
 
-// Computational block that form the circuit
+// Computational block that forms the circuit
 //
 // :::info
 //
@@ -658,7 +660,7 @@ type isComponent_Component interface {
 }
 
 type Component_GradientController struct {
-	// Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
+	// Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
 	// This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
 	GradientController *GradientController `protobuf:"bytes,1,opt,name=gradient_controller,json=gradientController,proto3,oneof"`
 }

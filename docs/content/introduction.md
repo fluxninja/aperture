@@ -35,7 +35,7 @@ applications with ease.
 ## Simplify Cloud-Native Load Management
 
 With Aperture, teams can automate load management processes, including flow
-control and auto scaling, to ensure the reliability and stability of
+control and auto-scaling, to ensure the reliability and stability of
 cloud-native applications. These capabilities improve the overall user
 experience, while optimizing resources and reducing costs.
 
@@ -50,7 +50,7 @@ and correcting itself.
 ## Advanced Load Management Capabilities
 
 Aperture's intelligent load management capabilities, such as fine-grained rate
-limiting, prioritized load shedding and auto scaling, can be applied to a wide
+limiting, prioritized load shedding and auto-scaling, can be applied to a wide
 range of cloud-native applications. These capabilities, ensure the reliability
 and stability of applications.
 
@@ -58,9 +58,9 @@ and stability of applications.
 
 At its core, load management involves the control loop of observing, analyzing,
 and actuating workloads to ensure the stability and reliability of cloud-native
-applications. This control loop is applied to both flow control and auto scaling
+applications. This control loop is applied to both flow control and auto-scaling
 use cases. In flow control, the control loop is used to manage workloads and
-ensure the system remains within capacity. In auto scaling, the control loop is
+ensure the system remains within capacity. In auto-scaling, the control loop is
 used to adjust resource allocation based on demand and performance.
 
 Learn more about how Aperture interfaces with your application in the

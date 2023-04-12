@@ -32,7 +32,7 @@ public class ApertureRPCClient extends SimpleDecoratingRpcClient {
     @Override
     public RpcResponse execute(ClientRequestContext ctx, RpcRequest req) throws Exception {
         Map<String, String> labels = RpcUtils.labelsFromRequest(req);
-        Flow flow = this.apertureSDK.startFlow("", labels);
+        Flow flow = this.apertureSDK.startFlow("egress", labels);
 
         if (flow.accepted()) {
             RpcResponse res;

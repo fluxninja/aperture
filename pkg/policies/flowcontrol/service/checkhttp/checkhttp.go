@@ -18,6 +18,7 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
 	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
@@ -146,7 +147,7 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 	flowlabel.Merge(mergedFlowLabels, baggageFlowLabels)
 	flowlabel.Merge(mergedFlowLabels, sdFlowLabels)
 
-	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, destinationSvcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
+	classifierMsgs, newFlowLabels, tokens := h.classifier.Classify(ctx, destinationSvcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
 
 	for key, fl := range newFlowLabels {
 		cleanValue := sanitizeBaggageHeaderValue(fl.Value)
@@ -167,7 +168,15 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 	flowLabels := mergedFlowLabels.ToPlainMap()
 
 	// Ask flow control service for Ok/Deny
-	checkResponse := h.fcHandler.CheckWithValues(ctx, destinationSvcs, ctrlPt, flowLabels)
+	// checkResponse := h.fcHandler.CheckRequest(ctx, destinationSvcs, ctrlPt, flowLabels)
+	checkResponse := h.fcHandler.CheckRequest(ctx,
+		iface.RequestContext{
+			Services:     destinationSvcs,
+			ControlPoint: ctrlPt,
+			FlowLabels:   flowLabels,
+			Tokens:       tokens,
+		},
+	)
 	checkResponse.ClassifierInfos = classifierMsgs
 	// Set telemetry_flow_labels in the CheckResponse
 	checkResponse.TelemetryFlowLabels = flowLabels

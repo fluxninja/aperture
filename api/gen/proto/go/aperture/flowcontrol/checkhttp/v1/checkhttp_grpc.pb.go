@@ -26,8 +26,6 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FlowControlServiceHTTPClient interface {
-	// Performs Aperture Flowcontrol check based on the fields received with the
-	// incoming request, and returns status `OK` or not `OK`.
 	CheckHTTP(ctx context.Context, in *CheckHTTPRequest, opts ...grpc.CallOption) (*CheckHTTPResponse, error)
 }
 
@@ -52,8 +50,6 @@ func (c *flowControlServiceHTTPClient) CheckHTTP(ctx context.Context, in *CheckH
 // All implementations should embed UnimplementedFlowControlServiceHTTPServer
 // for forward compatibility
 type FlowControlServiceHTTPServer interface {
-	// Performs Aperture Flowcontrol check based on the fields received with the
-	// incoming request, and returns status `OK` or not `OK`.
 	CheckHTTP(context.Context, *CheckHTTPRequest) (*CheckHTTPResponse, error)
 }
 

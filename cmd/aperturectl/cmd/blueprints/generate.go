@@ -27,7 +27,7 @@ func init() {
 	generateCmd.Flags().BoolVar(&noYAMLModeline, "no-yaml-modeline", false, "Do not add YAML language server modeline to generated YAML files")
 	generateCmd.Flags().BoolVar(&noValidate, "no-validation", false, "Do not validate values.yaml file")
 	generateCmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing output directory")
-	generateCmd.Flags().IntVar(&graphDepth, "graph-depth", 0, "Max depth of the graph when generating DOT and Mermaid files")
+	generateCmd.Flags().IntVar(&graphDepth, "graph-depth", 1, "Max depth of the graph when generating DOT and Mermaid files")
 }
 
 var generateCmd = &cobra.Command{
@@ -79,6 +79,17 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 		if err != nil {
 			return err
 		}
+		// check whether the blueprint is deprecated
+		blueprintDir := filepath.Join(blueprintsDir, blueprintName)
+		ok, deprecated := utils.IsBlueprintDeprecated(blueprintDir)
+		if ok {
+			if utils.AllowDeprecated {
+				log.Warn().Msgf("Blueprint %s is deprecated: %s", blueprintName, deprecated)
+			} else {
+				return fmt.Errorf("blueprint %s is deprecated: %s", blueprintName, deprecated)
+			}
+		}
+
 		if !noValidate {
 			var valuesBytes []byte
 			valuesBytes, err = os.ReadFile(valuesFile)
@@ -91,9 +102,9 @@ aperturectl blueprints generate --name=policies/static-rate-limiting --values-fi
 
 			// validate values.yaml against the json schema
 			schemaFile := filepath.Join(blueprintsDir, blueprintName, "gen/definitions.json")
-			definitionsFile := filepath.Join(blueprintsDir, "gen/jsonschema/_definitions.json")
-			err = utils.ValidateWithJSONSchema(schemaFile, []string{definitionsFile}, valuesFile)
+			err = utils.ValidateWithJSONSchema(schemaFile, []string{}, valuesFile)
 			if err != nil {
+				log.Error().Msgf("Error validating values file: %s", err)
 				return err
 			}
 		}
@@ -254,13 +265,13 @@ func saveJSONFile(_, path, filename string, content map[string]interface{}) erro
 }
 
 func blueprintExists(name string) error {
-	blueprintsList, err := getBlueprints(blueprintsURIRoot)
+	blueprintsList, err := getBlueprints(blueprintsURIRoot, true)
 	if err != nil {
 		return err
 	}
 
 	if !slices.Contains(blueprintsList, name) {
-		return fmt.Errorf("invalid blueprints name '%s'", name)
+		return fmt.Errorf("invalid blueprint name '%s'", name)
 	}
 	return nil
 }
@@ -319,9 +330,9 @@ func generateGraphs(content []byte, outputDir string, policyPath string, depth i
 	}
 	defer os.Remove(policyFile)
 
-	circuit, err := utils.CompilePolicy(policyFile)
+	circuit, _, err := utils.CompilePolicy(policyFile)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	if err = utils.GenerateDotFile(circuit, dotFilePath, depth); err != nil {

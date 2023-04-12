@@ -30,8 +30,8 @@ use cases leveraging Flow Control integration.
 
 ### Flow Control
 
-- [GraphQL Query Static Rate Limiting](./integrations/flow-control/classification/graphql-rate-limiting.md)
-- [Static Rate Limiting](./integrations/flow-control/rate-limiting/static-rate-limiting.md)
-- [Basic Concurrency Limiting](./integrations/flow-control/concurrency-limiting/basic-concurrency-limiting.md)
-- [Workload Prioritization](./integrations/flow-control/concurrency-limiting/workload-prioritization.md)
-- [Rate Limiting Escalation](./integrations/flow-control/concurrency-limiting/rate-limiting-escalation.md)
+- [GraphQL Query Static Rate Limiting](./flow-control/classification/graphql-rate-limiting.md)
+- [Static Rate Limiting](./flow-control/rate-limiting/static-rate-limiting.md)
+- [Basic Concurrency Limiting](./flow-control/concurrency-limiting/basic-concurrency-limiting.md)
+- [Workload Prioritization](./flow-control/concurrency-limiting/workload-prioritization.md)
+- [Rate Limiting Escalation](./flow-control/concurrency-limiting/rate-limiting-escalation.md)

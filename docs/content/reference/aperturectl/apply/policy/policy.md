@@ -36,4 +36,5 @@ aperturectl apply policy --dir=policies
 
 ### SEE ALSO
 
-- [aperturectl apply](/reference/aperturectl/apply/apply.md) - Apply Aperture Policies
+- [aperturectl apply](/reference/aperturectl/apply/apply.md) - Apply Aperture
+  Policies

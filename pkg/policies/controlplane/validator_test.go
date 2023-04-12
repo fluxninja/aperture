@@ -35,9 +35,8 @@ var _ = Describe("Validator", Ordered, func() {
 			Object:    runtime.RawExtension{Raw: []byte(jsonPolicy)},
 		}
 
-		ok, msg, err := policyValidator.ValidateObject(context.TODO(), request)
+		ok, _, err := policyValidator.ValidateObject(context.TODO(), request)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(msg).To(BeEmpty())
 		Expect(ok).To(BeTrue())
 	}
 

@@ -52,15 +52,14 @@ analyzing, and actuating, facilitated by agents and a controller.
 
 - 🚦 Aperture Agents live next to your service instances as a sidecar and
   provide powerful
-  [flow control](https://docs.fluxninja.com/concepts/integrations/flow-control/)
-  components such as a
-  [weighted fair queuing scheduler](https://docs.fluxninja.com/concepts/integrations/flow-control/components/concurrency-limiter)
+  [flow control](https://docs.fluxninja.com/concepts/flow-control/) components
+  such as a
+  [weighted fair queuing scheduler](https://docs.fluxninja.com/concepts/flow-control/components/concurrency-limiter)
   for prioritized load-shedding and a
-  [distributed rate-limiter](https://docs.fluxninja.com/concepts/integrations/flow-control/components/rate-limiter).
-  A
-  [flow](https://docs.fluxninja.com/concepts/integrations/flow-control/flow-label)
-  is the fundamental unit of work from the perspective of an Aperture Agent. It
-  could be an API call, a feature, or even a database query.
+  [distributed rate-limiter](https://docs.fluxninja.com/concepts/flow-control/components/rate-limiter).
+  A [flow](https://docs.fluxninja.com/concepts/flow-control/flow-label) is the
+  fundamental unit of work from the perspective of an Aperture Agent. It could
+  be an API call, a feature, or even a database query.
 
 - 🤖 Aperture Controller is the "brain" of system. It is powered by always-on,
   [circuit graph driven policies](https://docs.fluxninja.com/concepts/policy/)

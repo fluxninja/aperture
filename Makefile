@@ -79,7 +79,6 @@ generate-blueprints: generate-config-markdown
 
 generate-doc-assets: generate-blueprints
 	@cd ./docs && $(MAKE) generate-jsonnet
-	@cd ./docs && $(MAKE) generate-policy-graphs
 	@cd ./docs && $(MAKE) generate-mermaid
 
 generate-aperturectl-docs:
@@ -169,6 +168,7 @@ operator-generate: ## Generate code containing DeepCopy, DeepCopyInto, and DeepC
 	$(CONTROLLER_GEN) object:headerFile="operator/hack/boilerplate.go.txt" paths="./cmd/..."
 	$(CONTROLLER_GEN) object:headerFile="operator/hack/boilerplate.go.txt" paths="./pkg/..."
 	$(CONTROLLER_GEN) object:headerFile="operator/hack/boilerplate.go.txt" paths="./operator/..."
+	$(CONTROLLER_GEN) object:headerFile="operator/hack/boilerplate.go.txt" paths="./extensions/..."
 
 .PHONY: operator-fmt
 operator-fmt: ## Run go fmt against code.

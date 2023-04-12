@@ -64,7 +64,7 @@ type Heartbeats struct {
 	entities                  *entities.Entities
 	clientHTTP                *http.Client
 	interval                  config.Duration
-	flowControlPoints         *cache.Cache[selectors.ControlPointID]
+	flowControlPoints         *cache.Cache[selectors.TypedControlPointID]
 	agentInfo                 *agentinfo.AgentInfo
 	election                  *election.Election
 	APIKey                    string
@@ -82,7 +82,7 @@ func newHeartbeats(
 	peersWatcher *peers.PeerDiscovery,
 	policyFactory *controlplane.PolicyFactory,
 	election *election.Election,
-	flowControlPoints *cache.Cache[selectors.ControlPointID],
+	flowControlPoints *cache.Cache[selectors.TypedControlPointID],
 	autoscalek8sControlPoints autoscalek8sdiscovery.AutoScaleControlPoints,
 ) *Heartbeats {
 	return &Heartbeats{

@@ -48,12 +48,13 @@ var ControlPointsCmd = &cobra.Command{
 		})
 
 		tabwriter := tabwriter.NewWriter(os.Stdout, 5, 0, 3, ' ', 0)
-		fmt.Fprintln(tabwriter, "AGENT GROUP\tSERVICE\tNAME")
+		fmt.Fprintln(tabwriter, "AGENT GROUP\tSERVICE\tNAME\tTYPE")
 		for _, cp := range resp.GlobalFlowControlPoints {
-			fmt.Fprintf(tabwriter, "%s\t%s\t%s\n",
+			fmt.Fprintf(tabwriter, "%s\t%s\t%s\t%s\n",
 				cp.AgentGroup,
 				cp.FlowControlPoint.Service,
-				cp.FlowControlPoint.ControlPoint)
+				cp.FlowControlPoint.ControlPoint,
+				cp.FlowControlPoint.Type)
 		}
 		tabwriter.Flush()
 

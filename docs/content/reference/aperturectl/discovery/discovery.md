@@ -26,5 +26,7 @@ Use this command to query information about active Discovery integrations
 
 ### SEE ALSO
 
-- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture
-- [aperturectl discovery entities](/reference/aperturectl/discovery/entities/entities.md) - List AutoScale control points
+- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool
+  to interact with Aperture
+- [aperturectl discovery entities](/reference/aperturectl/discovery/entities/entities.md) -
+  List AutoScale control points

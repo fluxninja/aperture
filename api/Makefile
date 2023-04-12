@@ -28,6 +28,7 @@ buf-generate:
 	@#java
 	@rm -rf ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/*
 	@cp -R gen/proto/java/com/fluxninja/generated/aperture/flowcontrol/check ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/
+	@cp -R gen/proto/java/com/fluxninja/generated/aperture/flowcontrol/checkhttp ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/
 	@rm -rf gen/proto/java
 	@#javascript
 	@rm -rf ../sdks/aperture-js/src/generated/aperture/flowcontrol/*
@@ -47,10 +48,14 @@ buf-generate:
 		fi; \
 		echo "Fixing up Python gRPC imports"; \
 		generated_py_files_str="$$($$FIND "$$python_gen" -type f -name '*.py')"; \
-		readarray -t generated_py_files <<<"$$generated_py_files_str"; \
+		while IFS= read -r generated_py_file; do \
+			generated_py_files+=("$$generated_py_file"); \
+		done <<<"$$generated_py_files_str"; \
 		$$SED -i "s/^from aperture\..* import \([^ ]*_pb2\) as \([^ ]*\)$$/from . import \1 as \2/" "$${generated_py_files[@]}"; \
 		generated_pyi_files_str="$$($$FIND "$$python_gen" -type f -name '*.pyi')"; \
-		readarray -t generated_pyi_files <<<"$$generated_pyi_files_str"; \
+		while IFS= read -r generated_pyi_file; do \
+			generated_pyi_files+=("$$generated_pyi_file"); \
+		done <<<"$$generated_pyi_files_str"; \
 		$$SED -i "s/^import aperture\.[^ ]*\.\([^ ]*_pb2\)$$/from . import \1/" "$${generated_pyi_files[@]}"; \
 		$$SED -i "s/aperture\.[^ ]*\.\([^ ]*_pb2\)/\1/" "$${generated_pyi_files[@]}"; \
 		$$SED -i "s/^import grpc$$/import grpc\nimport grpc.aio\nimport typing/" "$${generated_pyi_files[@]}"; \

@@ -4,7 +4,7 @@ metadata:
 repositories:
   ssh://git@github.com/fluxninja/aperture:
     identities:
-    - "75:2f:7a:fe:d3:a1:5e:81:a8:d2:cc:3a:21:59:b7:2c"  # CircleCI fluxninja/aperture standard pipeline R/O
+      - "75:2f:7a:fe:d3:a1:5e:81:a8:d2:cc:3a:21:59:b7:2c" # CircleCI fluxninja/aperture standard pipeline R/O
 
 bundles:
   aperture:
@@ -19,7 +19,6 @@ charts:
     path: manifests/charts/aperture-controller/
   istioconfig:
     path: manifests/charts/istioconfig/
-
 
 applications:
   aperture-operator:

@@ -3,5 +3,6 @@
   "type": "object",
   "title": "dashboards/signals blueprint",
   "additionalProperties": false,
-  "properties": {}
+  "properties": null,
+  "$defs": null
 }

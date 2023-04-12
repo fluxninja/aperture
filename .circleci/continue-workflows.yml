@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   docker: circleci/docker@2.1.1
-  gcp-gcr: circleci/gcp-gcr@0.13.0
+  gcp-gcr: circleci/gcp-gcr@0.15.1
   slack: circleci/slack@4.4.4
   rust: circleci/rust@1.5.0
   codecov: codecov/codecov@3.2.2
@@ -13,11 +13,11 @@ executors:
       - image: cimg/base:2022.07
   go-cimg-executor:
     docker:
-      - image: cimg/go:1.20.2
+      - image: cimg/go:1.20.3
         user: root
   python-cimg-executor:
     docker:
-      - image: cimg/python:3.10.6
+      - image: cimg/python:3.11
   base-machine-executor:
     machine:
       image: ubuntu-2204:2022.10.2
@@ -75,13 +75,11 @@ jobs:
     parameters:
       attach-workspace:
         type: boolean
-        description:
-          Boolean for whether or not to attach to an existing workspace
+        description: Boolean for whether or not to attach to an existing workspace
         default: false
       docker-context:
         type: string
-        description:
-          Path to the directory containing your build context, defaults to .
+        description: Path to the directory containing your build context, defaults to .
         default: .
       dockerfile:
         type: string
@@ -110,8 +108,7 @@ jobs:
         description: A name for the image pushed to GCR
       path:
         type: string
-        description:
-          Path to the directory containing your Dockerfile, defaults to .
+        description: Path to the directory containing your Dockerfile, defaults to .
         default: .
       remote-docker-version:
         type: string
@@ -216,7 +213,7 @@ jobs:
         type: string
         description: working directory
     executor: go-cimg-executor
-    resource_class: large
+    resource_class: xlarge
     environment:
       GOMAXPROCS: 4
     steps:
@@ -324,7 +321,7 @@ jobs:
       - restore_cache:
           name: Restore go cache
           keys:
-            - aperture-v3-go-cache-{{ checksum "~/day" }}
+            - aperture-v5-go-cache-{{ checksum "~/day" }}
       - run:
           name: Cache golangci-lint run
           command: |
@@ -368,7 +365,7 @@ jobs:
             fi
       - save_cache:
           name: Save go cache
-          key: aperture-v3-go-cache-{{ checksum "~/day" }}
+          key: aperture-v5-go-cache-{{ checksum "~/day" }}
           paths:
             - ../.cache/golangci-lint
             - ../.cache/go-build
@@ -378,15 +375,13 @@ jobs:
           when: on_success
       - save_cache:
           name: Save pre-commit cache
-          key:
-            aperture-v1-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
+          key: aperture-v1-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
           paths:
             - ~/.cache/pre-commit
       - asdf_save_cache:
           cache_name: pre-commit
       - run:
-          name:
-            Show diff and assert pre-commit didn't create any non-ignored files
+          name: Show diff and assert pre-commit didn't create any non-ignored files
           command: |
             git status
             git add .
@@ -400,13 +395,11 @@ jobs:
     parameters:
       docker-context:
         type: string
-        description:
-          Path to the directory containing your build context, defaults to "".
+        description: Path to the directory containing your build context, defaults to "".
         default: .
       path:
         type: string
-        description:
-          Path to the directory containing your Dockerfile, defaults to "".
+        description: Path to the directory containing your Dockerfile, defaults to "".
         default: .
       tag:
         type: string
@@ -602,8 +595,7 @@ jobs:
     parameters:
       docker-context:
         type: string
-        description:
-          Path to the directory containing your build context, defaults to "".
+        description: Path to the directory containing your build context, defaults to "".
         default: .
       dockerfile:
         type: string
@@ -614,8 +606,7 @@ jobs:
         description: Name for Docker image
       path:
         type: string
-        description:
-          Path to the directory containing your Dockerfile, defaults to "".
+        description: Path to the directory containing your Dockerfile, defaults to "".
         default: .
       tag:
         type: string
@@ -860,8 +851,7 @@ jobs:
       job-root:
         type: string
         default: "/home/circleci"
-        description:
-          The root folder of the job where all repositories will be cloned to
+        description: The root folder of the job where all repositories will be cloned to
       manifests-repo:
         type: string
         default: git@github.com:fluxninja/argo-manifests.git
@@ -876,13 +866,11 @@ jobs:
       component:
         type: string
         default: ""
-        description:
-          Application component to update image and deployment code for
+        description: Application component to update image and deployment code for
       update:
         type: string
         default: everything
-        description:
-          Whether to update 'images', 'deployment-code' or 'everything'
+        description: Whether to update 'images', 'deployment-code' or 'everything'
     executor: python-cimg-executor
     steps:
       - add_ssh_keys:
@@ -908,13 +896,16 @@ jobs:
     parameters:
       workspace-name:
         type: string
-        description:
-          the name of the workspace to which built packages should be added
+        description: the name of the workspace to which built packages should be added
         default: packages
       goarch:
         type: string
         description: the GOARCH to use for the build
         default: amd64
+      goos:
+        type: string
+        description: the GOOS to use for the build
+        default: linux
       component:
         type: string
         description: the component to build
@@ -926,6 +917,7 @@ jobs:
     environment:
       PACKAGES_DIR: "/tmp/packages"
       GOARCH: <<parameters.goarch>>
+      GOOS: <<parameters.goos>>
       COMPONENT: <<parameters.component>>
     steps:
       - checkout
@@ -962,6 +954,20 @@ jobs:
           name: Package
           command: ./.circleci/scripts/nfpm_package.sh
       - when:
+          condition:
+            equal: [cli, << parameters.component >>]
+          steps:
+            - run:
+                name: Create tarball file for Given OS
+                command: ./.circleci/scripts/create_tarball_file.sh
+            - run:
+                name: Create binaries for different OS
+                command: |
+                  mv "$HOME"/project/dist/aperturectl "$HOME"/project/dist/aperturectl-"${APERTURECTL_BUILD_VERSION#v}"-"${GOOS}"-"${GOARCH}"
+                  cp -rf "$HOME"/project/dist/aperturectl-"${APERTURECTL_BUILD_VERSION#v}"-"${GOOS}"-"${GOARCH}" "$HOME"/project/dist/packages/
+                  ls -al "$HOME"/project/dist/packages/
+
+      - when:
           condition: <<parameters.upload-to-gcp>>
           steps:
             - run:
@@ -970,15 +976,18 @@ jobs:
             - run:
                 name: Upload package to GCP
                 command: |
-                  gcloud config set artifacts/location us-central1
-                  for package in "deb" "rpm"
-                  do
-                    gcloud config set artifacts/repository aperture-${package}-packages
-                    case "${package}" in
-                      deb) gcloud artifacts apt upload aperture-${package}-packages --source="$(ls dist/packages/*.${package})" --project=${GOOGLE_PROJECT_ID};;
-                      rpm) gcloud artifacts yum upload aperture-${package}-packages --source="$(ls dist/packages/*.${package})" --project=${GOOGLE_PROJECT_ID};;
-                    esac
-                  done
+                  if [ "${GOOS}" != "darwin" ]
+                  then
+                    gcloud config set artifacts/location us-central1
+                    for package in "deb" "rpm"
+                    do
+                      gcloud config set artifacts/repository aperture-${package}-packages
+                      case "${package}" in
+                        deb) gcloud artifacts apt upload aperture-${package}-packages --source="$(ls dist/packages/*.${package})" --project=${GOOGLE_PROJECT_ID};;
+                        rpm) gcloud artifacts yum upload aperture-${package}-packages --source="$(ls dist/packages/*.${package})" --project=${GOOGLE_PROJECT_ID};;
+                      esac
+                    done
+                  fi
       - save_cache:
           name: Save go cache
           key: aperture-{{ .Environment.COMPONENT }}-packages-go-cache
@@ -1003,6 +1012,10 @@ workflows:
       - package-binaries:
           name: build-aperture-agent-bare-metal-package
           component: agent
+          matrix:
+            parameters:
+              goos: ["linux"]
+              goarch: ["amd64"]
 
   publish-aperture-agent-bare-metal-package:
     when:
@@ -1016,6 +1029,10 @@ workflows:
           name: publish-aperture-agent-bare-metal-package
           component: agent
           upload-to-gcp: true
+          matrix:
+            parameters:
+              goos: ["linux"]
+              goarch: ["amd64"]
 
   build-aperturectl-packages:
     when:
@@ -1029,6 +1046,10 @@ workflows:
       - package-binaries:
           name: build-aperturectl-packages
           component: cli
+          matrix:
+            parameters:
+              goos: ["linux", "darwin"]
+              goarch: ["amd64", "arm64"]
 
   publish-aperturectl-packages:
     when:
@@ -1042,6 +1063,10 @@ workflows:
           name: publish-aperturectl-packages
           component: cli
           upload-to-gcp: true
+          matrix:
+            parameters:
+              goos: ["linux", "darwin"]
+              goarch: ["amd64", "arm64"]
 
   aperture:
     when:
@@ -1298,8 +1323,7 @@ workflows:
           <<: *push_deployment_code_job
           name: preview-deployment-changes
           dry-run: true
-          task-name:
-            "Preview changes between aperture.git and deployment repository"
+          task-name: "Preview changes between aperture.git and deployment repository"
 
 commands:
   asdf_install:
@@ -1327,10 +1351,10 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v5-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
               checksum "tools/go/go.mod" }}
-            - aperture-asdf-cache-v5-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
           name: Install ASDF tools
@@ -1347,8 +1371,7 @@ commands:
     steps:
       - save_cache:
           name: Save ASDF cache
-          key:
-            aperture-asdf-cache-v5-{{ checksum "~/month" }}-<<
+          key: aperture-asdf-cache-v7-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "tools/go/go.mod" }}
           paths:
@@ -1435,8 +1458,7 @@ commands:
         type: string
       git-branch:
         type: string
-        description:
-          Use the name of the current branch been used for Image build
+        description: Use the name of the current branch been used for Image build
         default: ${CIRCLE_BRANCH}
       git-commit-hash:
         type: string

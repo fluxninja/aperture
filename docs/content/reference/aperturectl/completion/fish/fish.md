@@ -37,4 +37,5 @@ aperturectl completion fish [flags]
 
 ### SEE ALSO
 
-- [aperturectl completion](/reference/aperturectl/completion/completion.md) - Generate the autocompletion script for the specified shell
+- [aperturectl completion](/reference/aperturectl/completion/completion.md) -
+  Generate the autocompletion script for the specified shell

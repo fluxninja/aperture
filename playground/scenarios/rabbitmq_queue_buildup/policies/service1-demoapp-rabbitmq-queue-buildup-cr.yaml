@@ -1,0 +1,58 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: service1-demoapp-rabbitmq-queue-buildup
+spec:
+  circuit:
+    components:
+    - query:
+        promql:
+          evaluation_interval: 1s
+          out_ports:
+            output:
+              signal_name: QUEUE_BUILDUP
+          query_string: sum(rabbitmq_message_current{rabbitmq_queue_name="service3-demo-app.demoapp.svc.cluster.local",state="ready"})
+    - flow_control:
+        aimd_concurrency_controller:
+          alerter_parameters:
+            alert_name: Load Shed Event
+          default_config:
+            dry_run: false
+          dynamic_config_key: concurrency_controller
+          flow_selector:
+            flow_matcher:
+              control_point: ingress
+            service_selector:
+              agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
+          gradient_parameters:
+            max_gradient: 1
+            min_gradient: 0.1
+            slope: -1
+          in_ports:
+            setpoint:
+              constant_signal:
+                value: 1000
+            signal:
+              signal_name: QUEUE_BUILDUP
+          load_multiplier_linear_increment: 0.0025
+          max_load_multiplier: 2
+          out_ports:
+            accepted_concurrency:
+              signal_name: ACCEPTED_CONCURRENCY
+            desired_load_multiplier:
+              signal_name: DESIRED_LOAD_MULTIPLIER
+            incoming_concurrency:
+              signal_name: INCOMING_CONCURRENCY
+            is_overload:
+              signal_name: IS_OVERLOAD
+            observed_load_multiplier:
+              signal_name: OBSERVED_LOAD_MULTIPLIER
+          scheduler_parameters:
+            auto_tokens: true
+    evaluation_interval: 1s
+  resources:
+    flow_control:
+      classifiers: []

@@ -3,6 +3,7 @@ package compiler
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/open-policy-agent/opa/rego"
@@ -42,10 +43,17 @@ type Labeler struct {
 	// map[string]interface{} otherwise.
 	Query rego.PreparedEvalQuery
 	// flags for created flow labels:
-	LabelsTelemetry map[string]bool // multi-label variant
+	Labels map[string]LabelProperties
 	// flow label that the result should be assigned to (single-label variant)
+	// Deprecated: 1.5.0
 	LabelName string
+	// Deprecated: 1.5.0
 	Telemetry bool // single-label variant
+}
+
+// LabelProperties is a set of properties for a label.
+type LabelProperties struct {
+	Telemetry bool
 }
 
 // ReportedRule is a rule along with its selector and label name.
@@ -127,91 +135,152 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 		return nil, fmt.Errorf("commonAttributes is nil")
 	}
 
-	labelRules := classifierWrapper.GetClassifier().GetRules()
-
-	// Group all the extractor-based rules so that we can compile them to a
-	// single rego query
-	labelExtractors := map[string]*policylangv1.Extractor{}
-	labelsTelemetry := map[string]bool{} // Telemetry flag for labels created by extractors
-
-	rawRegoCount := 0
 	var labelers []LabelerWithSelector
 
-	for labelName, rule := range labelRules {
-		if strings.Contains(labelName, "/") {
-			// Forbidding '/' in case we want to support multiple rules for the
-			// same label:
-			// labels:
-			//   user/1: <snip>
-			//   user/2: <snip>
-			return nil, fmt.Errorf("%w: cannot contain '/'", BadLabelName)
+	labelRules := classifierWrapper.GetClassifier().GetRules()
+
+	if len(labelRules) > 0 {
+		// Group all the extractor-based rules so that we can compile them to a
+		// single rego query
+		labelExtractors := map[string]*policylangv1.Extractor{}
+		labelsProperties := map[string]LabelProperties{} // Telemetry flag for labels created by extractors
+
+		rawRegoCount := 0
+
+		for labelName, rule := range labelRules {
+			if strings.Contains(labelName, "/") {
+				// Forbidding '/' in case we want to support multiple rules for the
+				// same label:
+				// labels:
+				//   user/1: <snip>
+				//   user/2: <snip>
+				return nil, fmt.Errorf("%w: cannot contain '/'", BadLabelName)
+			}
+
+			switch source := rule.GetSource().(type) {
+			case *policylangv1.Rule_Extractor:
+				labelExtractors[labelName] = source.Extractor
+				labelsProperties[labelName] = LabelProperties{
+					Telemetry: rule.GetTelemetry(),
+				}
+			case *policylangv1.Rule_Rego_:
+				query, err := rego.New(
+					//nolint
+					rego.Query(source.Rego.Query),
+					//nolint
+					rego.Module("tmp.rego", source.Rego.Source),
+				).PrepareForEval(ctx)
+				if err != nil {
+					//nolint
+					log.Trace().Str("src", source.Rego.Source).Str("query", source.Rego.Query).
+						Msg("Failed to prepare for eval")
+					return nil, fmt.Errorf(
+						"failed to compile raw rego module, label: %s, query: %s: %w: %v",
+						labelName,
+						// nolint
+						source.Rego.Query,
+						BadRego,
+						err,
+					)
+				}
+				labelers = append(labelers, LabelerWithSelector{
+					LabelSelector: labelSelector,
+					Labeler: &Labeler{
+						Query:     query,
+						LabelName: labelName,
+						Telemetry: rule.GetTelemetry(),
+					},
+					ClassifierAttributes: classifierAttributes,
+				})
+				rawRegoCount++
+			}
 		}
 
-		switch source := rule.GetSource().(type) {
-		case *policylangv1.Rule_Extractor:
-			labelExtractors[labelName] = source.Extractor
-			labelsTelemetry[labelName] = rule.GetTelemetry()
-		case *policylangv1.Rule_Rego_:
+		if len(labelExtractors) != 0 {
+			regoSrc, err := extractors.CompileToRego(defaultPackageName, labelExtractors)
+			if err != nil {
+				return nil, fmt.Errorf("failed to compile extractors to rego: %w", err)
+			}
 			query, err := rego.New(
-				rego.Query(source.Rego.Query),
-				rego.Module("tmp.rego", source.Rego.Source),
+				rego.Query("data."+defaultPackageName),
+				rego.Module("tmp.rego", regoSrc),
 			).PrepareForEval(ctx)
 			if err != nil {
-				log.Trace().Str("src", source.Rego.Source).Str("query", source.Rego.Query).
-					Msg("Failed to prepare for eval")
-				return nil, fmt.Errorf(
-					"failed to compile raw rego module, label: %s, query: %s: %w: %v",
-					labelName,
-					source.Rego.Query,
-					BadRego,
-					err,
-				)
+				// Note: Not wrapping BadRego error here – the rego returned by
+				// compileExtractors should always be valid, otherwise it's a
+				// bug, and not user's fault.
+				log.Trace().Str("src", regoSrc).Msg("Failed to prepare for eval")
+				return nil, fmt.Errorf("(bug) failed to compile classification rules: %w", err)
 			}
+
 			labelers = append(labelers, LabelerWithSelector{
 				LabelSelector: labelSelector,
 				Labeler: &Labeler{
-					Query:     query,
-					LabelName: labelName,
-					Telemetry: rule.GetTelemetry(),
+					Query:  query,
+					Labels: labelsProperties,
 				},
 				ClassifierAttributes: classifierAttributes,
 			})
-			rawRegoCount++
 		}
+		log.Debug().
+			Int("raw rego modules", rawRegoCount).
+			Int("extractors", len(labelExtractors)).
+			Msg("Compilation of extractor rules finished")
 	}
 
-	if len(labelExtractors) != 0 {
-		regoSrc, err := extractors.CompileToRego(defaultPackageName, labelExtractors)
-		if err != nil {
-			return nil, fmt.Errorf("failed to compile extractors to rego: %w", err)
-		}
-		query, err := rego.New(
-			rego.Query("data."+defaultPackageName),
-			rego.Module("tmp.rego", regoSrc),
-		).PrepareForEval(ctx)
-		if err != nil {
-			// Note: Not wrapping BadRego error here – the rego returned by
-			// compileExtractors should always be valid, otherwise it's a
-			// bug, and not user's fault.
-			log.Trace().Str("src", regoSrc).Msg("Failed to prepare for eval")
-			return nil, fmt.Errorf("(bug) failed to compile classification rules: %w", err)
+	// compile rego rules
+	r := classifierWrapper.GetClassifier().GetRego()
+	if r != nil {
+		module := r.GetModule()
+		labels := r.GetLabels()
+
+		labelsProperties := map[string]LabelProperties{}
+		for labelKey, lp := range labels {
+			if !extractors.IsRegoIdent(labelKey) {
+				return nil, fmt.Errorf("%w: %q is not a valid label name", BadLabelName, labelKey)
+			}
+			labelsProperties[labelKey] = LabelProperties{
+				Telemetry: lp.Telemetry,
+			}
 		}
 
+		// get package name in module
+		// package name is specified in a line like "package foo"
+		p := regexp.MustCompile(`package\s+(\w+)`)
+		m := p.FindStringSubmatch(module)
+		if len(m) != 2 {
+			return nil, fmt.Errorf("failed to get package name from rego module")
+		}
+		packageName := m[1]
+
+		// compile rego module and queries
+		query, err := rego.New(rego.Query("data."+packageName),
+			rego.Module("tmp.rego", module)).PrepareForEval(ctx)
+		if err != nil {
+			log.Trace().Str("src", r.GetModule()).Msg("Failed to prepare for eval")
+			return nil, fmt.Errorf(
+				"failed to compile raw rego module, query: %s: %w: %v",
+				r.GetModule(),
+				BadRego,
+				err,
+			)
+		}
+		// add to labelers
 		labelers = append(labelers, LabelerWithSelector{
 			LabelSelector: labelSelector,
 			Labeler: &Labeler{
-				Query:           query,
-				LabelsTelemetry: labelsTelemetry,
+				Query:  query,
+				Labels: labelsProperties,
 			},
 			ClassifierAttributes: classifierAttributes,
 		})
+		log.Debug().
+			Int("extractors", len(labels)).
+			Msg("Compilation of rego finished")
 	}
-
 	log.Debug().
-		Int("modules", len(labelers)).
-		Int("raw rego modules", rawRegoCount).
-		Int("extractors", len(labelExtractors)).
-		Msg("Compilation of rules finished")
+		Int("labelers", len(labelers)).
+		Msg("Compilation finished")
 
 	return labelers, nil
 }

@@ -263,6 +263,9 @@ definitions:
             auto_scaler:
                 $ref: '#/definitions/AutoScaler'
                 description: _AutoScaler_ provides auto-scaling functionality for any scalable resource.
+            pod_auto_scaler:
+                $ref: '#/definitions/PodAutoScaler'
+                description: _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource.
             pod_scaler:
                 $ref: '#/definitions/PodScaler'
                 description: PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
@@ -344,7 +347,7 @@ definitions:
             scale_in_controllers:
                 description: List of _Controllers_ for scaling in.
                 items:
-                    $ref: '#/definitions/AutoScalerScaleInController'
+                    $ref: '#/definitions/ScaleInController'
                     type: object
                 type: array
             scale_in_cooldown:
@@ -360,7 +363,7 @@ definitions:
             scale_out_controllers:
                 description: List of _Controllers_ for scaling out.
                 items:
-                    $ref: '#/definitions/AutoScalerScaleOutController'
+                    $ref: '#/definitions/ScaleOutController'
                     type: object
                 type: array
             scale_out_cooldown:
@@ -374,100 +377,6 @@ definitions:
                 $ref: '#/definitions/AutoScalerScaler'
                 x-go-tag-validate: required
         type: object
-    AutoScalerDecreasingGradient:
-        description: Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
-        properties:
-            in_ports:
-                $ref: '#/definitions/AutoScalerDecreasingGradientIns'
-                description: Input ports for the Gradient.
-            parameters:
-                $ref: '#/definitions/AutoScalerDecreasingGradientParameters'
-                title: |-
-                    Gradient parameters for the controller. Defaults and constraints:
-                    * slope = 1
-                    * min_gradient = -Inf (must be less than 1)
-                    * max_gradient = 1 (cannot be changed)
-        type: object
-    AutoScalerDecreasingGradientIns:
-        description: Inputs for Gradient.
-        properties:
-            setpoint:
-                $ref: '#/definitions/InPort'
-                description: The setpoint to use for scale-in.
-            signal:
-                $ref: '#/definitions/InPort'
-                description: The signal to use for scale-in.
-        type: object
-    AutoScalerDecreasingGradientParameters:
-        description: This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
-        properties:
-            min_gradient:
-                default: -1.7976931348623157e+308
-                format: double
-                type: number
-                x-go-tag-default: "-1.79769313486231570814527423731704356798070e+308"
-                x-go-tag-validate: lte=1.0
-            slope:
-                default: 1
-                format: double
-                type: number
-                x-go-tag-default: "1.0"
-        type: object
-    AutoScalerIncreasingGradient:
-        description: Increasing Gradient defines a controller for scaling out based on Gradient Controller.
-        properties:
-            in_ports:
-                $ref: '#/definitions/AutoScalerIncreasingGradientIns'
-                description: Input ports for the Gradient.
-            parameters:
-                $ref: '#/definitions/AutoScalerIncreasingGradientParameters'
-                title: |-
-                    Gradient parameters for the controller. Defaults and constraints:
-                    * slope = 1
-                    * min_gradient = 1 (cannot be changed)
-                    * max_gradient = +Inf (must be greater than 1)
-        type: object
-    AutoScalerIncreasingGradientIns:
-        description: Inputs for Gradient.
-        properties:
-            setpoint:
-                $ref: '#/definitions/InPort'
-                description: The setpoint to use for scale-out.
-            signal:
-                $ref: '#/definitions/InPort'
-                description: The signal to use for scale-out.
-        type: object
-    AutoScalerIncreasingGradientParameters:
-        description: This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
-        properties:
-            max_gradient:
-                default: 1.7976931348623157e+308
-                format: double
-                type: number
-                x-go-tag-default: "1.79769313486231570814527423731704356798070e+308"
-                x-go-tag-validate: gte=1.0
-            slope:
-                default: 1
-                format: double
-                type: number
-                x-go-tag-default: "1.0"
-        type: object
-    AutoScalerKubernetesReplicas:
-        description: KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
-        properties:
-            default_config:
-                $ref: '#/definitions/PodScalerScaleActuatorDynamicConfig'
-                description: Default configuration.
-            dynamic_config_key:
-                title: Configuration key for DynamicConfig
-                type: string
-            kubernetes_object_selector:
-                $ref: '#/definitions/KubernetesObjectSelector'
-                description: |+
-                    The Kubernetes object on which horizontal scaling is applied.
-
-                x-go-tag-validate: required
-        type: object
     AutoScalerOuts:
         description: Outputs for _AutoScaler_.
         properties:
@@ -478,39 +387,10 @@ definitions:
             desired_scale:
                 $ref: '#/definitions/OutPort'
         type: object
-    AutoScalerScaleInController:
-        properties:
-            alerter_parameters:
-                $ref: '#/definitions/AlerterParameters'
-                description: Configuration for embedded alerter.
-            controller:
-                $ref: '#/definitions/AutoScalerScaleInControllerController'
-                title: Controller
-        type: object
-    AutoScalerScaleInControllerController:
-        properties:
-            gradient:
-                $ref: '#/definitions/AutoScalerDecreasingGradient'
-        type: object
-    AutoScalerScaleOutController:
-        properties:
-            alerter_parameters:
-                $ref: '#/definitions/AlerterParameters'
-                description: Configuration for embedded alerter.
-            controller:
-                $ref: '#/definitions/AutoScalerScaleOutControllerController'
-                title: Controller
-                x-go-tag-validate: required
-        type: object
-    AutoScalerScaleOutControllerController:
-        properties:
-            gradient:
-                $ref: '#/definitions/AutoScalerIncreasingGradient'
-        type: object
     AutoScalerScaler:
         properties:
             kubernetes_replicas:
-                $ref: '#/definitions/AutoScalerKubernetesReplicas'
+                $ref: '#/definitions/KubernetesReplicas'
         type: object
     CheckHTTPRequest:
         properties:
@@ -549,10 +429,10 @@ definitions:
                 description: The HTTP request headers.
                 type: object
             host:
-                description: The HTTP request ``Host`` header value.
+                description: The HTTP request `Host` header value.
                 type: string
             method:
-                description: The HTTP request method, such as ``GET``, ``POST``.
+                description: The HTTP request method, such as `GET`, `POST`.
                 type: string
             path:
                 description: |-
@@ -563,7 +443,7 @@ definitions:
                 description: The network protocol used with the request, such as "HTTP/1.0", "HTTP/1.1", or "HTTP/2".
                 type: string
             scheme:
-                description: The HTTP URL scheme, such as ``http`` and ``https``.
+                description: The HTTP URL scheme, such as `http` and `https`.
                 type: string
             size:
                 description: The HTTP request size in bytes. If unknown, it must be -1.
@@ -585,7 +465,7 @@ definitions:
                 description: Supplies http attributes for an ok response.
             status:
                 $ref: '#/definitions/googlerpcStatus'
-                title: Status ``OK`` allows the request. Any other status indicates the request should be denied
+                title: Status `OK` allows the request. Any other status indicates the request should be denied
         type: object
     CheckResponse:
         description: CheckResponse contains fields that represent decision made by Check call.
@@ -709,7 +589,7 @@ definitions:
         description: |-
             :::info
 
-            See also [Classifier overview](/concepts/integrations/flow-control/resources/classifier.md).
+            See also [Classifier overview](/concepts/flow-control/resources/classifier.md).
 
             :::
             Example
@@ -739,19 +619,23 @@ definitions:
                     Defines where to apply the flow classification rule.
 
                 x-go-tag-validate: required
+            rego:
+                $ref: '#/definitions/Rego'
+                description: |-
+                    Rego is a policy language used to express complex policies in a concise and declarative way.
+                    It can be used to define flow classification rules by writing custom queries that extract values from request metadata.
+                    For simple cases, such as directly reading a value from header or a field from json body, declarative extractors are recommended.
+                title: Rego based classification
             rules:
                 additionalProperties:
                     $ref: '#/definitions/Rule'
                 description: |+
                     A map of {key, value} pairs mapping from
-                    [flow label](/concepts/integrations/flow-control/flow-label.md) keys to rules that define
+                    [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
                     how to extract and propagate flow labels with that key.
 
-                minProperties: 1
                 type: object
-                x-go-tag-validate: required,gt=0,dive,keys,required,endkeys,required
-        required:
-            - rules
+                x-go-tag-validate: dive,keys,required,endkeys,required
         title: Set of classification rules sharing a common selector
         type: object
     ClassifierInfo:
@@ -762,8 +646,6 @@ definitions:
                 type: string
             error:
                 $ref: '#/definitions/ClassifierInfoError'
-            label_key:
-                type: string
             policy_hash:
                 type: string
             policy_name:
@@ -884,7 +766,7 @@ definitions:
             gradient_controller:
                 $ref: '#/definitions/GradientController'
                 description: |-
-                    Gradient controller basically calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
+                    Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
                     This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
             holder:
                 $ref: '#/definitions/Holder'
@@ -928,13 +810,13 @@ definitions:
             variable:
                 $ref: '#/definitions/Variable'
                 description: Emits a variable signal which can be set to invalid.
-        title: Computational block that form the circuit
+        title: Computational block that forms the circuit
         type: object
     ConcurrencyLimiter:
         description: |-
             :::info
 
-            See also [Concurrency Limiter overview](/concepts/integrations/flow-control/components/concurrency-limiter.md).
+            See also [Concurrency Limiter overview](/concepts/flow-control/components/concurrency-limiter.md).
 
             :::
 
@@ -1100,6 +982,45 @@ definitions:
                 $ref: '#/definitions/OutPort'
                 description: Selected signal (1.0 or 0.0).
         type: object
+    DecreasingGradient:
+        description: Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
+        properties:
+            in_ports:
+                $ref: '#/definitions/DecreasingGradientIns'
+                description: Input ports for the Gradient.
+            parameters:
+                $ref: '#/definitions/DecreasingGradientParameters'
+                title: |-
+                    Gradient parameters for the controller. Defaults and constraints:
+                    * slope = 1
+                    * min_gradient = -Inf (must be less than 1)
+                    * max_gradient = 1 (cannot be changed)
+        type: object
+    DecreasingGradientIns:
+        description: Inputs for Gradient.
+        properties:
+            setpoint:
+                $ref: '#/definitions/InPort'
+                description: The setpoint to use for scale-in.
+            signal:
+                $ref: '#/definitions/InPort'
+                description: The signal to use for scale-in.
+        type: object
+    DecreasingGradientParameters:
+        description: This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+        properties:
+            min_gradient:
+                default: -1.7976931348623157e+308
+                format: double
+                type: number
+                x-go-tag-default: "-1.79769313486231570814527423731704356798070e+308"
+                x-go-tag-validate: lte=1.0
+            slope:
+                default: 1
+                format: double
+                type: number
+                x-go-tag-default: "1.0"
+        type: object
     DeniedHttpResponse:
         description: HTTP attributes for a denied response.
         properties:
@@ -1118,7 +1039,7 @@ definitions:
             status:
                 description: |-
                     This field allows the authorization service to send an HTTP response status code to the
-                    downstream client. If not set, Envoy sends ``403 Forbidden`` HTTP status code by default.
+                    downstream client. If not set, Envoy sends `403 Forbidden` HTTP status code by default.
                 format: int32
                 type: integer
         type: object
@@ -1469,6 +1390,8 @@ definitions:
                 type: string
             service:
                 type: string
+            type:
+                type: string
         type: object
     FlowControlPoints:
         properties:
@@ -1507,7 +1430,7 @@ definitions:
         description: |-
             :::info
 
-            See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+            See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 
             :::
             Example:
@@ -1530,7 +1453,7 @@ definitions:
         properties:
             control_point:
                 description: |+
-                    [Control Point](/concepts/integrations/flow-control/flow-selector.md#control-point)
+                    [Control Point](/concepts/flow-control/flow-selector.md#control-point)
                     identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
                     block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
                     or filter chains.
@@ -1542,7 +1465,7 @@ definitions:
                 description: |-
                     :::info
 
-                    See also [Label Matcher overview](/concepts/integrations/flow-control/flow-selector.md#label-matcher).
+                    See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).
 
                     :::
 
@@ -1560,20 +1483,20 @@ definitions:
                     :::
                 title: |-
                     Label matcher allows to add _additional_ condition on
-                    [flow labels](/concepts/integrations/flow-control/flow-label.md)
+                    [flow labels](/concepts/flow-control/flow-label.md)
                     must also be satisfied (in addition to service+control point matching)
         required:
             - control_point
         title: |-
             Describes which flows a [flow control
-            component](/concepts/integrations/flow-control/flow-control.md#components) should apply
+            component](/concepts/flow-control/flow-control.md#components) should apply
             to
         type: object
     FlowSelector:
         description: |-
             :::info
 
-            See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+            See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 
             :::
         properties:
@@ -1587,7 +1510,7 @@ definitions:
                 x-go-tag-validate: required
         title: |-
             Describes which flow in which service a [flow control
-            component](/concepts/integrations/flow-control/flow-control.md#components) should apply
+            component](/concepts/flow-control/flow-control.md#components) should apply
             to
         type: object
     FluxMeter:
@@ -1597,7 +1520,7 @@ definitions:
 
             :::info
 
-            See also [Flux Meter overview](/concepts/integrations/flow-control/resources/flux-meter.md).
+            See also [Flux Meter overview](/concepts/flow-control/resources/flux-meter.md).
 
             :::
             Example:
@@ -2005,6 +1928,45 @@ definitions:
                 type: string
         title: Components receive input from other components via InPorts
         type: object
+    IncreasingGradient:
+        description: Increasing Gradient defines a controller for scaling out based on Gradient Controller.
+        properties:
+            in_ports:
+                $ref: '#/definitions/IncreasingGradientIns'
+                description: Input ports for the Gradient.
+            parameters:
+                $ref: '#/definitions/IncreasingGradientParameters'
+                title: |-
+                    Gradient parameters for the controller. Defaults and constraints:
+                    * slope = 1
+                    * min_gradient = 1 (cannot be changed)
+                    * max_gradient = +Inf (must be greater than 1)
+        type: object
+    IncreasingGradientIns:
+        description: Inputs for Gradient.
+        properties:
+            setpoint:
+                $ref: '#/definitions/InPort'
+                description: The setpoint to use for scale-out.
+            signal:
+                $ref: '#/definitions/InPort'
+                description: The signal to use for scale-out.
+        type: object
+    IncreasingGradientParameters:
+        description: This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
+        properties:
+            max_gradient:
+                default: 1.7976931348623157e+308
+                format: double
+                type: number
+                x-go-tag-default: "1.79769313486231570814527423731704356798070e+308"
+                x-go-tag-validate: gte=1.0
+            slope:
+                default: 1
+                format: double
+                type: number
+                x-go-tag-default: "1.0"
+        type: object
     Integrator:
         description: Accumulates sum of signal every tick.
         properties:
@@ -2166,7 +2128,7 @@ definitions:
             agent_group:
                 default: default
                 description: |+
-                    Which [agent-group](/concepts/integrations/flow-control/flow-selector.md#agent-group) this
+                    Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
                     selector applies to.
 
                 type: string
@@ -2198,6 +2160,22 @@ definitions:
             - kind
             - name
             - namespace
+        type: object
+    KubernetesReplicas:
+        description: KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
+        properties:
+            default_config:
+                $ref: '#/definitions/PodScalerScaleActuatorDynamicConfig'
+                description: Default configuration.
+            dynamic_config_key:
+                title: Configuration key for DynamicConfig
+                type: string
+            kubernetes_object_selector:
+                $ref: '#/definitions/KubernetesObjectSelector'
+                description: |+
+                    The Kubernetes object on which horizontal scaling is applied.
+
+                x-go-tag-validate: required
         type: object
     LabelMatcher:
         description: |-
@@ -2232,7 +2210,7 @@ definitions:
                 type: object
         title: |-
             Allows to define rules whether a map of
-            [labels](/concepts/integrations/flow-control/flow-label.md)
+            [labels](/concepts/flow-control/flow-label.md)
             should be considered a match or not
         type: object
     LimiterDecision:
@@ -2733,6 +2711,104 @@ definitions:
             self_peer:
                 $ref: '#/definitions/Peer'
         type: object
+    PodAutoScaler:
+        description: _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
+        properties:
+            cooldown_override_percentage:
+                default: 50
+                description: |+
+                    Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
+                    For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
+                    scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+
+                format: double
+                type: number
+                x-go-tag-default: "50"
+            max_replicas:
+                default: "9223372036854775807"
+                description: |+
+                    The maximum scale to which the _PodAutoScaler_ can scale-out.
+
+                format: int64
+                minLength: 1
+                type: string
+                x-go-tag-default: "9223372036854775807"
+                x-go-tag-validate: gt=0
+            max_scale_in_percentage:
+                default: 1
+                description: |+
+                    The maximum decrease of replicas (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+
+                format: double
+                type: number
+                x-go-tag-default: "1"
+            max_scale_out_percentage:
+                default: 10
+                description: |+
+                    The maximum increase of replicas (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+
+                format: double
+                type: number
+                x-go-tag-default: "10"
+            min_replicas:
+                default: "0"
+                description: |+
+                    The minimum replicas to which the _PodAutoScaler_ can scale-in.
+
+                format: int64
+                minLength: 0
+                type: string
+                x-go-tag-default: "0"
+                x-go-tag-validate: gte=0
+            out_ports:
+                $ref: '#/definitions/PodAutoScalerOuts'
+                description: Output ports for the _PodAutoScaler_.
+            pod_scaler:
+                $ref: '#/definitions/KubernetesReplicas'
+                x-go-tag-validate: required
+            scale_in_alerter_parameters:
+                $ref: '#/definitions/AlerterParameters'
+                description: Configuration for scale-in alerter.
+            scale_in_controllers:
+                description: List of _Controllers_ for scaling in.
+                items:
+                    $ref: '#/definitions/ScaleInController'
+                    type: object
+                type: array
+            scale_in_cooldown:
+                default: 120s
+                description: |+
+                    The amount of time to wait after a scale-in operation for another scale-in operation.
+
+                type: string
+                x-go-tag-default: 120s
+            scale_out_alerter_parameters:
+                $ref: '#/definitions/AlerterParameters'
+                description: Configuration for scale-out alerter.
+            scale_out_controllers:
+                description: List of _Controllers_ for scaling out.
+                items:
+                    $ref: '#/definitions/ScaleOutController'
+                    type: object
+                type: array
+            scale_out_cooldown:
+                default: 30s
+                description: |+
+                    The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
+
+                type: string
+                x-go-tag-default: 30s
+        type: object
+    PodAutoScalerOuts:
+        description: Outputs for _PodAutoScaler_.
+        properties:
+            actual_replicas:
+                $ref: '#/definitions/OutPort'
+            configured_replicas:
+                $ref: '#/definitions/OutPort'
+            desired_replicas:
+                $ref: '#/definitions/OutPort'
+        type: object
     PodScaler:
         description: Component for scaling pods based on a signal.
         properties:
@@ -2969,7 +3045,7 @@ definitions:
         description: |-
             :::info
 
-            See also [Rate Limiter overview](/concepts/integrations/flow-control/components/rate-limiter.md).
+            See also [Rate Limiter overview](/concepts/flow-control/components/rate-limiter.md).
 
             :::
 
@@ -3055,7 +3131,7 @@ definitions:
                     Specifies which label the ratelimiter should be keyed by.
 
                     Rate limiting is done independently for each value of the
-                    [label](/concepts/integrations/flow-control/flow-label.md) with given key.
+                    [label](/concepts/flow-control/flow-label.md) with given key.
                     Eg., to give each user a separate limit, assuming you have a _user_ flow
                     label set up, set `label_key: "user"`.
 
@@ -3092,6 +3168,95 @@ definitions:
                 type: integer
                 x-go-tag-default: "5"
                 x-go-tag-validate: gt=0
+        type: object
+    Rego:
+        description: |-
+            Rego define a set of labels that are extracted after evaluating a rego module.
+
+            :::info
+
+            You can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
+
+            :::
+
+            :::info
+
+            Special rego variables:
+            - `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
+
+            :::
+
+            Example of Rego module which also disables telemetry visibility of label:
+            ```yaml
+            rego:
+              labels:
+                user:
+                  telemetry: false
+              module: |
+                package user_from_cookie
+                cookies := split(input.attributes.request.http.headers.cookie, "; ")
+                user := user {
+                    cookie := cookies[_]
+                    startswith(cookie, "session=")
+                    session := substring(cookie, count("session="), -1)
+                    parts := split(session, ".")
+                    object := json.unmarshal(base64url.decode(parts[0]))
+                    user := object.user
+                }
+            ```
+        properties:
+            labels:
+                additionalProperties:
+                    $ref: '#/definitions/RegoLabelProperties'
+                description: |+
+                    A map of {key, value} pairs mapping from
+                    [flow label](/concepts/flow-control/flow-label.md) keys to queries that define
+                    how to extract and propagate flow labels with that key.
+                    The name of the label maps to a variable in the rego module, i.e. it maps to `data.<package>.<label>` variable.
+
+                minProperties: 1
+                type: object
+                x-go-tag-validate: required,gt=0,dive,keys,required,endkeys,required
+            module:
+                description: |+
+                    Source code of the rego module.
+
+                    :::Note
+
+                    Must include a "package" declaration.
+
+                    :::
+
+                type: string
+                x-go-tag-validate: required
+        required:
+            - labels
+            - module
+        type: object
+    RegoLabelProperties:
+        properties:
+            telemetry:
+                default: true
+                description: |+
+                    :::note
+
+                    The flow label is always accessible in Aperture Policies regardless of this setting.
+
+                    :::
+
+                    :::caution
+
+                    When using [FluxNinja ARC extension](arc/extension.md), telemetry enabled
+                    labels are sent to FluxNinja ARC for observability. Telemetry should be disabled for
+                    sensitive labels.
+
+                    :::
+
+                title: |-
+                    Decides if the created flow label should be available as an attribute in OLAP telemetry and
+                    propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
+                type: boolean
+                x-go-tag-default: "true"
         type: object
     ReportRequest:
         properties:
@@ -3157,13 +3322,15 @@ definitions:
                     Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
                     The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
+
                     Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
 
                 items:
                     $ref: '#/definitions/Classifier'
                     type: object
                 type: array
-                x-go-tag-validate: dive
+                x-deprecated: true
+                x-go-tag-validate: deprecated,dive
             flow_control:
                 $ref: '#/definitions/FlowControlResources'
                 description: FlowControlResources are resources that are provided by flow control integration.
@@ -3174,10 +3341,12 @@ definitions:
                     Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
                     Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+
                     Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 
                 type: object
-                x-go-tag-validate: dive
+                x-deprecated: true
+                x-go-tag-validate: deprecated,dive
         title: Resources that need to be setup for the policy to function
         type: object
     Response:
@@ -3194,48 +3363,23 @@ definitions:
         type: object
     Rule:
         description: |-
-            Classification rule extracts a value from request metadata.
-            More specifically, from `input`, which has the same spec as [Envoy's External Authorization Attribute Context][attribute-context].
-            See https://play.openpolicyagent.org/p/gU7vcLkc70 for an example input.
-            There are two ways to define a flow classification rule:
-            * Using a declarative extractor – suitable from simple cases, such as directly reading a value from header or a field from json body.
-            * Rego expression.
-
-            Performance note: It's recommended to use declarative extractors where possible, as they may be slightly performant than Rego expressions.
-
-            Example of Declarative JSON extractor:
+            Example of a JSON extractor:
             ```yaml
             extractor:
               json:
                 from: request.http.body
                 pointer: /user/name
             ```
-
-            Example of Rego module which also disables telemetry visibility of label:
-            ```yaml
-            rego:
-              query: data.user_from_cookie.user
-              source: |
-                package user_from_cookie
-                cookies := split(input.attributes.request.http.headers.cookie, "; ")
-                user := user {
-                    cookie := cookies[_]
-                    startswith(cookie, "session=")
-                    session := substring(cookie, count("session="), -1)
-                    parts := split(session, ".")
-                    object := json.unmarshal(base64url.decode(parts[0]))
-                    user := object.user
-                }
-            telemetry: false
-            ```
-            [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
         properties:
             extractor:
                 $ref: '#/definitions/Extractor'
                 description: High-level declarative extractor.
             rego:
                 $ref: '#/definitions/RuleRego'
-                description: Rego module to extract a value from.
+                description: |-
+                    Rego module to extract a value from.
+
+                    Deprecated: 1.5.0
             telemetry:
                 default: true
                 description: |+
@@ -3255,13 +3399,16 @@ definitions:
 
                 title: |-
                     Decides if the created flow label should be available as an attribute in OLAP telemetry and
-                    propagated in [baggage](/concepts/integrations/flow-control/flow-label.md#baggage)
+                    propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
                 type: boolean
                 x-go-tag-default: "true"
         title: Rule describes a single classification Rule
         type: object
     RuleRego:
-        description: High-level extractor-based rules are compiled into a single rego query.
+        description: |-
+            High-level extractor-based rules are compiled into a single rego query.
+
+            Deprecated: 1.5.0
         properties:
             query:
                 description: |+
@@ -3270,7 +3417,8 @@ definitions:
                     Note: The module name must match the package name from the "source".
 
                 type: string
-                x-go-tag-validate: required
+                x-deprecated: true
+                x-go-tag-validate: deprecated,required
             source:
                 description: |+
                     Source code of the rego module.
@@ -3278,11 +3426,41 @@ definitions:
                     Note: Must include a "package" declaration.
 
                 type: string
-                x-go-tag-validate: required
+                x-deprecated: true
+                x-go-tag-validate: deprecated,required
         required:
             - query
             - source
         title: Raw rego rules are compiled 1:1 to rego queries
+        type: object
+    ScaleInController:
+        properties:
+            alerter_parameters:
+                $ref: '#/definitions/AlerterParameters'
+                description: Configuration for embedded alerter.
+            controller:
+                $ref: '#/definitions/ScaleInControllerController'
+                title: Controller
+        type: object
+    ScaleInControllerController:
+        properties:
+            gradient:
+                $ref: '#/definitions/DecreasingGradient'
+        type: object
+    ScaleOutController:
+        properties:
+            alerter_parameters:
+                $ref: '#/definitions/AlerterParameters'
+                description: Configuration for embedded alerter.
+            controller:
+                $ref: '#/definitions/ScaleOutControllerController'
+                title: Controller
+                x-go-tag-validate: required
+        type: object
+    ScaleOutControllerController:
+        properties:
+            gradient:
+                $ref: '#/definitions/IncreasingGradient'
         type: object
     Scheduler:
         description: |-
@@ -3318,7 +3496,7 @@ definitions:
                     :::info
 
                     Concurrency is a unitless number describing mean number of
-                    [flows](/concepts/integrations/flow-control/flow-control.md#flow) being
+                    [flows](/concepts/flow-control/flow-control.md#flow) being
                     concurrently processed by the system (system = control point).
                     Concurrency is calculated as _work_ done per unit of time (so
                     work-seconds per world-seconds). Work-seconds are computed based on
@@ -3347,6 +3525,8 @@ definitions:
                     historical latency. Each workload's `tokens` will be set to average
                     latency of flows in that workload during last few seconds (exact duration
                     of this average can change).
+                    Make sure to not provide `tokens` in workload definitions or in the flow
+                    if you want to use this feature.
 
                 type: boolean
                 x-go-tag-default: "true"
@@ -3356,6 +3536,10 @@ definitions:
             max_timeout:
                 default: 0.49s
                 description: |+
+                    Max Timeout is the value with which the flow timeout is capped.
+                    When auto_tokens feature is not enabled, this value is used as the
+                    timeout for the flow, otherwise it is used as a cap for the timeout.
+
                     :::caution
 
                     This timeout needs to be strictly less than the timeout set on the
@@ -3369,24 +3553,24 @@ definitions:
 
                     To avoid such cases, the end-to-end GRPC timeout should also contain
                     some headroom for constant overhead like serialization, etc. Default
-                    value for GRPC timeouts is 500ms, giving 50ms of headeroom, so when
+                    value for GRPC timeouts is 500ms, giving 50ms of headroom, so when
                     tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 
                     :::
 
-                title: Max Timeout is the value with which the flow timeout calculated by `timeout_factor` is capped
                 type: string
                 x-go-tag-default: 0.49s
             timeout_factor:
                 default: 0.5
                 description: |+
+                    Timeout as a factor of tokens for a flow in a workload in case auto_tokens is set to true.
+
                     If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
                     it will be rejected.
 
                     This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
 
                 format: double
-                title: Timeout as a factor of tokens for a flow in a workload
                 type: number
                 x-go-tag-default: "0.5"
                 x-go-tag-validate: gte=0.0
@@ -3394,7 +3578,7 @@ definitions:
                 description: |+
                     List of workloads to be used in scheduler.
 
-                    Categorizing [flows](/concepts/integrations/flow-control/flow-control.md#flow) into workloads
+                    Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
                     allows for load-shedding to be "smarter" than just "randomly deny 50% of
                     requests". There are two aspects of this "smartness":
                     * Scheduler can more precisely calculate concurrency if it understands
@@ -3411,7 +3595,7 @@ definitions:
                     :::info
 
                     See also [workload definition in the concepts
-                    section](/concepts/integrations/flow-control/components/concurrency-limiter.md#workload).
+                    section](/concepts/flow-control/components/concurrency-limiter.md#workload).
 
                     :::
 
@@ -3429,7 +3613,7 @@ definitions:
                 $ref: '#/definitions/LabelMatcher'
                 description: |+
                     Label Matcher to select a Workload based on
-                    [flow labels](/concepts/integrations/flow-control/flow-label.md).
+                    [flow labels](/concepts/flow-control/flow-label.md).
 
                 x-go-tag-validate: required
             parameters:
@@ -3445,7 +3629,7 @@ definitions:
             fairness_key:
                 description: |-
                     Fairness key is a label key that can be used to provide fairness within a workload.
-                    Any [flow label](/concepts/integrations/flow-control/flow-label.md) can be used here. Eg. if
+                    Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
                     you have a classifier that sets `user` flow label, you might want to set
                     `fairness_key = "user"`.
                 type: string
@@ -3468,16 +3652,11 @@ definitions:
                 x-go-tag-default: "0"
                 x-go-tag-validate: gte=0,lte=255
             tokens:
-                default: "1"
-                description: |+
+                description: |-
                     Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-                    This override is applicable only if `auto_tokens` is set to false.
-
-                format: int64
-                minLength: 1
+                    This override is applicable only if tokens for the request are not specified in the request.
+                format: uint64
                 type: string
-                x-go-tag-default: "1"
-                x-go-tag-validate: gt=0
         type: object
     ServerToClient:
         properties:
@@ -3510,36 +3689,44 @@ definitions:
         description: |-
             :::info
 
-            See also [FlowSelector overview](/concepts/integrations/flow-control/flow-selector.md).
+            See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 
             :::
         properties:
             agent_group:
                 default: default
                 description: |+
-                    Which [agent-group](/concepts/integrations/flow-control/flow-selector.md#agent-group) this
+                    Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
                     selector applies to.
 
                     :::info
 
-                    Agent Groups are used to scope policies to a subset of agents connected to the same controller. This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode. The agents within an agent group form a peer to peer cluster and constantly share state.
+                    Agent Groups are used to scope policies to a subset of agents connected to the same controller.
+                    This is especially useful in the Kubernetes sidecar installation because service discovery is switched off in that mode.
+                    The agents within an agent group form a peer to peer cluster and constantly share state.
 
                     :::
 
                 type: string
                 x-go-tag-default: default
             service:
+                default: any
                 description: |+
                     The Fully Qualified Domain Name of the
-                    [service](/concepts/integrations/flow-control/flow-selector.md) to select.
+                    [service](/concepts/flow-control/flow-selector.md) to select.
 
                     In Kubernetes, this is the FQDN of the Service object.
 
-                    "all" means all services within an agent group (catch-all).
+                    :::info
+
+                    `any` matches all services.
+
+                    :::
 
                     :::info
 
-                    In the Kubernetes sidecar installation mode, service discovery is switched off by default. In order to scope policies to services, the `service` should be set to `all` and instead, `agent_group` name should be used.
+                    In the Kubernetes sidecar installation mode, service discovery is switched off by default.
+                    In order to scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.
 
                     :::
 
@@ -3550,12 +3737,10 @@ definitions:
                     :::
 
                 type: string
-                x-go-tag-validate: required
-        required:
-            - service
+                x-go-tag-default: any
         title: |-
             Describes which service a [flow control or observability
-            component](/concepts/integrations/flow-control/flow-control.md#components) should apply
+            component](/concepts/flow-control/flow-control.md#components) should apply
             to
         type: object
     ServicesList:
@@ -4146,11 +4331,8 @@ paths:
                     description: An unexpected error response.
                     schema:
                         $ref: '#/definitions/googlerpcStatus'
-            summary: |-
-                Performs Aperture Flowcontrol check based on the fields received with the
-                incoming request, and returns status `OK` or not `OK`.
             tags:
-                - FlowControlServiceHTTP
+                - aperture-agent
     /v1/flowcontrol/controlpoints:
         get:
             operationId: FlowControlPointsService_GetControlPoints
@@ -4159,6 +4341,43 @@ paths:
                     description: A successful response.
                     schema:
                         $ref: '#/definitions/FlowControlPoints'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/flowcontrol/preview/http_requests/{control_point}:
+        post:
+            operationId: FlowPreviewService_PreviewHTTPRequests2
+            parameters:
+                - description: Control point to preview.
+                  in: path
+                  name: control_point
+                  required: true
+                  type: string
+                - description: Flow labels to match. Optional parameter for advanced filtering.
+                  in: body
+                  name: label_matcher
+                  required: true
+                  schema:
+                    $ref: '#/definitions/LabelMatcher'
+                - description: Number of samples to collect.
+                  format: int64
+                  in: query
+                  name: samples
+                  required: false
+                  type: string
+                - description: Service to preview.
+                  in: query
+                  name: service
+                  required: false
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/PreviewHTTPRequestsResponse'
                 default:
                     description: An unexpected error response.
                     schema:
@@ -4196,6 +4415,43 @@ paths:
                     description: A successful response.
                     schema:
                         $ref: '#/definitions/PreviewHTTPRequestsResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - aperture-agent
+    /v1/flowcontrol/preview/labels/{control_point}:
+        post:
+            operationId: FlowPreviewService_PreviewFlowLabels2
+            parameters:
+                - description: Control point to preview.
+                  in: path
+                  name: control_point
+                  required: true
+                  type: string
+                - description: Flow labels to match. Optional parameter for advanced filtering.
+                  in: body
+                  name: label_matcher
+                  required: true
+                  schema:
+                    $ref: '#/definitions/LabelMatcher'
+                - description: Number of samples to collect.
+                  format: int64
+                  in: query
+                  name: samples
+                  required: false
+                  type: string
+                - description: Service to preview.
+                  in: query
+                  name: service
+                  required: false
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/PreviewFlowLabelsResponse'
                 default:
                     description: An unexpected error response.
                     schema:
