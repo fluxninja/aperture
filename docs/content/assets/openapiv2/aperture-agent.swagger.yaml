@@ -1088,7 +1088,7 @@ definitions:
           one "/" character. The last segment of the URL's path must represent
           the fully qualified name of the type (as in
           `path/google.protobuf.Duration`). The name should be in a canonical form
-          (e.g., leading "." is not accepted).
+          (e.g., leading "." isn't accepted).
 
           In practice, teams usually precompile into the binary all types that they
           expect it to use in the context of Any. However, for URLs which use the
@@ -1104,8 +1104,8 @@ definitions:
             on changes to types. (Use versioned type names to manage
             breaking changes.)
 
-          Note: this functionality is not currently available in the official
-          protobuf release, and it is not used for type URLs beginning with
+          Note: this functionality isn't currently available in the official
+          protobuf release, and it isn't used for type URLs beginning with
           type.googleapis.com.
 
           Schemes other than `http`, `https` (or the empty scheme) might be

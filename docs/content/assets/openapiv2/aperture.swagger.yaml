@@ -28,7 +28,7 @@ definitions:
             load_multiplier_linear_increment:
                 default: 0.0025
                 description: |+
-                    Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+                    Linear increment to load multiplier in each execution tick when the system isn't in overloaded state.
 
                 format: double
                 type: number
@@ -1566,7 +1566,7 @@ definitions:
         description: |-
             ExponentialBuckets creates `count` number of buckets where the lowest bucket has an upper bound of `start`
             and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
-            bucket is not counted.
+            bucket isn't counted.
         properties:
             count:
                 description: |+
@@ -1595,7 +1595,7 @@ definitions:
     FluxMeterExponentialBucketsRange:
         description: |-
             ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest
-            bucket is `max`. The final +inf bucket is not counted.
+            bucket is `max`. The final +inf bucket isn't counted.
         properties:
             count:
                 description: |+
@@ -1627,7 +1627,7 @@ definitions:
     FluxMeterLinearBuckets:
         description: |-
             LinearBuckets creates `count` number of buckets, each `width` wide, where the lowest bucket has an
-            upper bound of `start`. The final +inf bucket is not counted.
+            upper bound of `start`. The final +inf bucket isn't counted.
         properties:
             count:
                 description: |+
@@ -2061,7 +2061,7 @@ definitions:
         description: |-
             Specify a field to be extracted from payload using "json_pointer".
 
-            Note: The signature is not verified against the secret (we're assuming there's some
+            Note: The signature isn't verified against the secret (we're assuming there's some
             other parts of the system that handles such verification).
 
             Example:
@@ -3182,7 +3182,7 @@ definitions:
             :::info
 
             Special rego variables:
-            - `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
+            - `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it isn't emitted as part of flow labels or telemetry and is solely used while processing the request.
 
             :::
 
@@ -3537,7 +3537,7 @@ definitions:
                 default: 0.49s
                 description: |+
                     Max Timeout is the value with which the flow timeout is capped.
-                    When auto_tokens feature is not enabled, this value is used as the
+                    When auto_tokens feature isn't enabled, this value is used as the
                     timeout for the flow, otherwise it is used as a cap for the timeout.
 
                     :::caution
@@ -3565,7 +3565,7 @@ definitions:
                 description: |+
                     Timeout as a factor of tokens for a flow in a workload in case auto_tokens is set to true.
 
-                    If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
+                    If a flow isn't able to get tokens within `timeout_factor * tokens` of duration,
                     it will be rejected.
 
                     This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
@@ -3664,7 +3664,7 @@ definitions:
                 description: |-
                     Cancels in-flight request.
 
-                    After cancellation, the response is not expected to be received, but
+                    After cancellation, the response isn't expected to be received, but
                     might happen that it will be received. If so, it should be ignored.
                 format: uint64
                 type: string
@@ -4126,7 +4126,7 @@ definitions:
                     one "/" character. The last segment of the URL's path must represent
                     the fully qualified name of the type (as in
                     `path/google.protobuf.Duration`). The name should be in a canonical form
-                    (e.g., leading "." is not accepted).
+                    (e.g., leading "." isn't accepted).
 
                     In practice, teams usually precompile into the binary all types that they
                     expect it to use in the context of Any. However, for URLs which use the
@@ -4142,8 +4142,8 @@ definitions:
                       on changes to types. (Use versioned type names to manage
                       breaking changes.)
 
-                    Note: this functionality is not currently available in the official
-                    protobuf release, and it is not used for type URLs beginning with
+                    Note: this functionality isn't currently available in the official
+                    protobuf release, and it isn't used for type URLs beginning with
                     type.googleapis.com.
 
                     Schemes other than `http`, `https` (or the empty scheme) might be

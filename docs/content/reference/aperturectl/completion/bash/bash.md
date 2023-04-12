@@ -14,7 +14,7 @@ Generate the autocompletion script for bash
 
 Generate the autocompletion script for the bash shell.
 
-This script depends on the 'bash-completion' package. If it is not installed
+This script depends on the 'bash-completion' package. If it's not installed
 already, you can install it via your OS's package manager.
 
 To load completions in your current shell session:

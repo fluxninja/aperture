@@ -20,7 +20,7 @@ for a GraphQL query.
 ## Policy
 
 This tutorial will demonstrate how to implement a policy that uses
-[_Classifier_][classifier] to extract the `userID` claim from a JWT token in the
+[_Classifier_][Classifier] to extract the `userID` claim from a JWT token in the
 request's Authorization header and then rate limit unique users based on that
 `user_id` [_Flow Label_][flow-label].
 
@@ -98,7 +98,7 @@ tutorial does the following:
 4. Decode the JWT token and extract the `userID` from the claims
 5. Assign the value of `userID` to the exported variable `userID` in Rego source
 
-From there on, the classifier rule assigns the value of the exported variable
+From there on, the Classifier rule assigns the value of the exported variable
 `userID` in Rego source to `user_id` flow label, effectively creating a label
 `user_id:1`. This label is used by the
 [`RateLimiter`](/concepts/flow-control/components/rate-limiter.md) component in
@@ -120,4 +120,4 @@ the rest of the requests are rejected.
 
 [rego-rules]: /concepts/flow-control/resources/classifier.md#rego
 [flow-label]: /concepts/flow-control/flow-label.md
-[classifier]: /concepts/flow-control/resources/classifier.md
+[Classifier]: /concepts/flow-control/resources/classifier.md

@@ -27,7 +27,7 @@ _Flow Labels_ are used in different ways in Aperture:
 ## Sources
 
 Flows are annotated with _Flow Labels_ based on four sources: request labels,
-baggage, flow classifiers, and explicit labels from the Aperture SDK call.
+baggage, Flow Classifiers, and explicit labels from the Aperture SDK call.
 
 ### Request labels
 
@@ -64,7 +64,7 @@ Read more about baggage propagation on:
 ### Classifiers
 
 When the labels you need aren't already present in baggage, nor as request
-labels, you can create a [classifier][classifier] to inject new labels into the
+labels, you can create a [Classifier][Classifier] to inject new labels into the
 system. Since the Classifier also injects the label into baggage by default,
 this means you can set or extract the label in a different place than where it
 is consumed (assuming you have baggage propagation configured throughout your
@@ -193,7 +193,7 @@ For _Classifier_ created labels, you can disable this behavior by setting
 :::
 
 [flow-selector]: ./flow-selector.md
-[classifier]: ./resources/classifier.md
+[Classifier]: ./resources/classifier.md
 [workload]: ./components/concurrency-limiter.md#workload
 [ratelimiter]: ./components/rate-limiter.md
 [scheduler]: ./components/concurrency-limiter.md#scheduler

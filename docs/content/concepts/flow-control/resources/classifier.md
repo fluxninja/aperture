@@ -13,7 +13,7 @@ The _Classifier_ can be used to create additional [_Flow Labels_][label] based
 on request metadata without requiring any changes to your service, if the
 existing flow labels aren't sufficient.
 
-To define a classifier, it needs to be added as a resource in a
+To define a Classifier, it needs to be added as a resource in a
 [policy][policies]. It specifies a set of rules to create new flow labels based
 on request metadata. Envoy's [External Authorization][ext-authz] definition is
 used by Aperture to describe the request metadata, specifically the
@@ -66,7 +66,7 @@ selector:
 ```
 
 You can be more precise by adding a [_Label Matcher_][label-matcher] and for
-example gate the classifier to particular paths.
+example gate the Classifier to particular paths.
 
 ## Live Previewing Requests {#live-previewing-requests}
 
@@ -152,7 +152,7 @@ curl -X POST localhost:8080/v1/flowcontrol/preview/http_requests/service1-demo-a
 
 ## Rules ([reference][rule]) {#rules}
 
-In addition to the selector, a classifier needs to specify classification rules.
+In addition to the selector, a Classifier needs to specify classification rules.
 Each classification rule consists of:
 
 - flow label key,

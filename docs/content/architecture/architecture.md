@@ -58,7 +58,7 @@ control components like
 [PID controller](https://en.wikipedia.org/wiki/PID_controller) can be used to
 further tune the concurrency limits based on specific service requirements.
 
-The controller's policies are stored in a policy database and are managed using
+The controller's policies are stored in a Policy database and are managed using
 the Kubernetes Custom Resource Definition (CRD) API, allowing users to configure
 and modify policies as needed. The controller interacts with Aperture Agents,
 which run alongside service instances as sidecars, to enforce the policies and
@@ -75,7 +75,7 @@ even a database query.
 
 The agents monitor golden signals, such as request latency, error rate, and
 saturation, using an in-built telemetry system and a programmable, high-fidelity
-flow classifier used to label requests based on attributes such as customer tier
+Flow Classifier used to label requests based on attributes such as customer tier
 or request type. These metrics are then analyzed by the Aperture Controller.
 
 Graceful degradation of services is achieved by prioritizing critical
