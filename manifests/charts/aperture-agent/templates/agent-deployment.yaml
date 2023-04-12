@@ -6,6 +6,7 @@ metadata:
   name: {{ template "common.names.fullname" . }}
   namespace: {{ template "common.names.namespace" . }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: aperture-agent
     {{- if .Values.commonLabels }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" . $ ) | nindent 4 }}
     {{- end }}
@@ -25,6 +26,7 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.agent.podAnnotations "context" . $ ) | nindent 8 }}
         {{- end }}
       labels: {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: aperture-agent
         {{- if .Values.agent.podLabels }}
         {{- include "common.tplvalues.render" (dict "value" .Values.agent.podLabels "context" . $ ) | nindent 8 }}
         {{- end }}

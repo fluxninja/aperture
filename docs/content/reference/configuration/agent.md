@@ -658,6 +658,12 @@ Key in this map refers to OTel pipeline name. Prefixing pipeline name with `metr
 is optional, as all the components and pipeline names would be normalized.
 By default `kubeletstats` custom metrics is added, which can be overwritten.
 
+Below is example to overwrite `kubeletstats` custom metrics:
+
+    otel:
+    	custom_metrics:
+    		kubeletstats: {}
+
 </dd>
 <dt>batch_alerts</dt>
 <dd>

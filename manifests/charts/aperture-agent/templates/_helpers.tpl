@@ -87,7 +87,7 @@ Fetch the Name of the API Key secret for Aperture Agent
 
 {{/*
 Fetch the Key of the API Key secret for Aperture Agent
-{{ include "agent.apiSecret.name" ( dict "agent" .Values.path.to.the.agent $ ) }}
+{{ include "agent.apiSecret.key" ( dict "agent" .Values.path.to.the.agent $ ) }}
 */}}
 {{- define "agent.apiSecret.key" -}}
 {{- if .agent.secrets.fluxNinjaExtension.secretKeyRef.key -}}
