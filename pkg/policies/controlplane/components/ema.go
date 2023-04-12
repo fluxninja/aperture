@@ -94,98 +94,71 @@ func (ema *EMA) resetStages() {
 	ema.lastGoodOutput = runtime.InvalidReading()
 }
 
-// Execute calculates the Exponential Moving Average (EMA) of a series of readings.
-// It takes inPortReadings, a map of input readings, and tickInfo, a struct containing
-// information about the current tick, as input parameters.
-// It returns a map of output readings and an error.
+// Execute implements runtime.Component.Execute.
 func (ema *EMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+	logger := ema.policyReadAPI.GetStatusRegistry().GetLogger()
+	retErr := func(err error) (runtime.PortToReading, error) {
+		return runtime.PortToReading{
+			"output": []runtime.Reading{runtime.InvalidReading()},
+		}, err
+	}
+
 	input := inPortReadings.ReadSingleReadingPort("input")
 	maxEnvelope := inPortReadings.ReadSingleReadingPort("max_envelope")
 	minEnvelope := inPortReadings.ReadSingleReadingPort("min_envelope")
-
-	output, err := ema.calculateOutput(input, maxEnvelope, minEnvelope)
-	if err != nil {
-		return ema.retErr(err)
-	}
-
-	return runtime.PortToReading{
-		"output": []runtime.Reading{output},
-	}, nil
-}
-
-func (ema *EMA) retErr(err error) (runtime.PortToReading, error) {
-	return runtime.PortToReading{
-		"output": []runtime.Reading{runtime.InvalidReading()},
-	}, err
-}
-
-func (ema *EMA) calculateOutput(input, maxEnvelope, minEnvelope runtime.Reading) (output runtime.Reading, err error) {
-	logger := ema.policyReadAPI.GetStatusRegistry().GetLogger()
+	output := runtime.InvalidReading()
 
 	switch ema.currentStage {
 	case warmUpStage:
-		output, err = ema.handleWarmUpStage(input)
+		ema.warmupCount++
+		if input.Valid() {
+			ema.sum += input.Value()
+			ema.count++
+			// Decide to switch to EMA stage
+			if ema.warmupCount >= ema.warmupWindow {
+				ema.currentStage = emaStage
+			}
+		} else {
+			// Immediately reset on any missing values during warm-up.
+			ema.resetStages()
+		}
+		// Emit valid output during emaStage or during warm-up if configured to do so.
+		if ema.currentStage == emaStage || ema.validDuringWarmup {
+			// Emit the avg value of input signal during the warm-up window.
+			avg, err := ema.computeAverage()
+			if err != nil {
+				return retErr(err)
+			}
+			output = avg
+		} else {
+			output = runtime.InvalidReading()
+		}
 	case emaStage:
-		output, err = ema.handleEMAStage(input)
+		if input.Valid() {
+			if !ema.lastGoodOutput.Valid() {
+				err := errors.New("ema: last good output is invalid")
+				logger.Error().Err(err).Msg("This is unexpected!")
+				return retErr(err)
+			}
+			// Compute the new outputValue.
+			outputValue := (ema.alpha * input.Value()) + ((1 - ema.alpha) * ema.lastGoodOutput.Value())
+			output = runtime.NewReading(outputValue)
+		} else {
+			ema.invalidCount++
+			// If invalid count is greater than the ema window, reset the stages.
+			if ema.invalidCount >= ema.emaWindow {
+				ema.resetStages()
+			}
+			// emit last good EMA value
+			output = ema.lastGoodOutput
+		}
 	default:
 		logger.Panic().Msg("unexpected ema stage")
 	}
 
-	if err != nil {
-		return runtime.InvalidReading(), err
-	}
-
-	output = ema.applyCorrection(output, maxEnvelope, minEnvelope)
-	ema.lastGoodOutput = output
-
-	return output, nil
-}
-
-func (ema *EMA) handleWarmUpStage(input runtime.Reading) (output runtime.Reading, err error) {
-	ema.warmupCount++
-	if input.Valid() {
-		ema.sum += input.Value()
-		ema.count++
-		if ema.warmupCount >= ema.warmupWindow {
-			ema.currentStage = emaStage
-		}
-	} else {
-		ema.resetStages()
-	}
-
-	if ema.currentStage == emaStage || ema.validDuringWarmup {
-		output, err = ema.computeAverage()
-	} else {
-		output = runtime.InvalidReading()
-	}
-
-	return
-}
-
-func (ema *EMA) handleEMAStage(input runtime.Reading) (output runtime.Reading, err error) {
-	logger := ema.policyReadAPI.GetStatusRegistry().GetLogger()
-
-	if input.Valid() {
-		if !ema.lastGoodOutput.Valid() {
-			err = errors.New("ema: last good output is invalid")
-			logger.Error().Err(err).Msg("This is unexpected!")
-			return runtime.InvalidReading(), err
-		}
-		outputValue := (ema.alpha * input.Value()) + ((1 - ema.alpha) * ema.lastGoodOutput.Value())
-		output = runtime.NewReading(outputValue)
-	} else {
-		ema.invalidCount++
-		if ema.invalidCount >= ema.emaWindow {
-			ema.resetStages()
-		}
-		output = ema.lastGoodOutput
-	}
-
-	return
-}
-
-func (ema *EMA) applyCorrection(output, maxEnvelope, minEnvelope runtime.Reading) runtime.Reading {
+	// Set the last good output
 	if output.Valid() {
+		// apply correction
 		value := output.Value()
 		if maxEnvelope.Valid() && value > maxEnvelope.Value() {
 			value *= ema.correctionFactorOnMaxViolation
@@ -194,8 +167,12 @@ func (ema *EMA) applyCorrection(output, maxEnvelope, minEnvelope runtime.Reading
 			value *= ema.correctionFactorOnMinViolation
 		}
 		output = runtime.NewReading(value)
+		ema.lastGoodOutput = output
 	}
-	return output
+	// Returns Exponential Moving Average of a series of readings.
+	return runtime.PortToReading{
+		"output": []runtime.Reading{output},
+	}, nil
 }
 
 func (ema *EMA) computeAverage() (runtime.Reading, error) {
