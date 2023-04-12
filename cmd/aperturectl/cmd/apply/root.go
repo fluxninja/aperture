@@ -4,16 +4,19 @@ import (
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/rest"
 
+	cmdv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/cmd/v1"
 	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 )
 
 var (
 	kubeConfig     string
 	kubeRestConfig *rest.Config
+	controller     utils.ControllerConn
+	client         cmdv1.ControllerClient
 )
 
 func init() {
-	ApplyCmd.Flags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG")
+	controller.InitFlags(ApplyCmd.PersistentFlags())
 
 	ApplyCmd.AddCommand(ApplyPolicyCmd)
 	ApplyCmd.AddCommand(ApplyDynamicConfigCmd)
@@ -32,6 +35,34 @@ Use this command to apply the Aperture Policies.`,
 		if err != nil {
 			return err
 		}
+
+		controllerAddr, err := cmd.Flags().GetString("controller")
+		if err != nil {
+			return err
+		}
+
+		kube, err := cmd.Flags().GetBool("kube")
+		if err != nil {
+			return err
+		}
+
+		if controllerAddr == "" && !kube {
+			err = cmd.Flags().Set("kube", "true")
+			if err != nil {
+				return err
+			}
+		}
+
+		err = controller.PreRunE(cmd, args)
+		if err != nil {
+			return err
+		}
+
+		client, err = controller.Client()
+		if err != nil {
+			return err
+		}
 		return nil
 	},
+	PersistentPostRun: controller.PostRun,
 }

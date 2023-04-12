@@ -72,14 +72,14 @@ paths:
     post:
       tags:
       - aperture-controller
-      summary: PostPolicy creates or updates policies based on the provided request.
-      operationId: PolicyService_PostPolicy
+      summary: PostPolicies creates or updates policies based on the provided request.
+      operationId: PolicyService_PostPolicies
       parameters:
       - name: body
         in: body
         required: true
         schema:
-          $ref: '#/definitions/PostPolicyRequest'
+          $ref: '#/definitions/PostPoliciesRequest'
       responses:
         "200":
           description: A successful response.
@@ -92,14 +92,14 @@ paths:
     patch:
       tags:
       - aperture-controller
-      summary: PatchPolicy patches policies based on the provided request.
-      operationId: PolicyService_PatchPolicy
+      summary: PatchPolicies patches policies based on the provided request.
+      operationId: PolicyService_PatchPolicies
       parameters:
       - name: body
         in: body
         required: true
         schema:
-          $ref: '#/definitions/PostPolicyRequest'
+          $ref: '#/definitions/PostPoliciesRequest'
       responses:
         "200":
           description: A successful response.
@@ -110,6 +110,24 @@ paths:
           schema:
             $ref: '#/definitions/googlerpcStatus'
   /v1/policies/{name}:
+    get:
+      tags:
+      - aperture-controller
+      operationId: PolicyService_GetPolicy
+      parameters:
+      - type: string
+        name: name
+        in: path
+        required: true
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/GetPolicyResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
     delete:
       tags:
       - aperture-controller
@@ -1588,6 +1606,11 @@ definitions:
     properties:
       policies:
         $ref: '#/definitions/Policies'
+  GetPolicyResponse:
+    type: object
+    properties:
+      policy:
+        $ref: '#/definitions/Policy'
   GradientController:
     description: |-
       The `gradient` describes a corrective factor that should be applied to the
@@ -2755,24 +2778,15 @@ definitions:
       resources:
         description: Resources (such as Flux Meters, Classifiers) to setup.
         $ref: '#/definitions/Resources'
-  PostPoliciesResponse:
-    type: object
-    properties:
-      errors:
-        type: array
-        items:
-          type: string
-      message:
-        type: string
-  PostPolicyRequest:
+  PostPoliciesRequest:
     type: object
     properties:
       policies:
         type: array
         items:
           type: object
-          $ref: '#/definitions/PostPolicyRequestPolicyRequest'
-  PostPolicyRequestPolicyRequest:
+          $ref: '#/definitions/PostPoliciesRequestPolicyRequest'
+  PostPoliciesRequestPolicyRequest:
     type: object
     required:
     - name
@@ -2784,6 +2798,15 @@ definitions:
         x-go-tag-validate: required
       policy:
         $ref: '#/definitions/Policy'
+  PostPoliciesResponse:
+    type: object
+    properties:
+      errors:
+        type: array
+        items:
+          type: string
+      message:
+        type: string
   ProcessInfo:
     type: object
     properties:

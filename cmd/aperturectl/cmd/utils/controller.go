@@ -123,7 +123,7 @@ func (c *ControllerConn) Client() (cmdv1.ControllerClient, error) {
 	} else {
 		port, cert, err := c.startPortForward()
 		if err != nil {
-			return nil, fmt.Errorf("failed to start port forward: %w", err)
+			return nil, fmt.Errorf("failed to start port forward for Aperture Controller: %w", err)
 		}
 
 		addr = fmt.Sprintf("localhost:%d", port)

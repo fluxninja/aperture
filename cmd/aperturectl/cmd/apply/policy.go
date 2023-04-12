@@ -15,7 +15,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
@@ -111,6 +111,10 @@ func applyPolicy(policyFile string) error {
 		return err
 	}
 
+	return createAndApplyPolicy(policy, policyName)
+}
+
+func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 	policyBytes, err := policy.MarshalJSON()
 	if err != nil {
 		return err
@@ -118,11 +122,8 @@ func applyPolicy(policyFile string) error {
 
 	policyCR := &policyv1alpha1.Policy{}
 	policyCR.Spec.Raw = policyBytes
-	policyCR.Name = policyName
-	return createAndApplyPolicy(policyCR)
-}
+	policyCR.Name = name
 
-func createAndApplyPolicy(policy *policyv1alpha1.Policy) error {
 	deployment, err := getControllerDeployment()
 	if err != nil {
 		return err
@@ -133,27 +134,42 @@ func createAndApplyPolicy(policy *policyv1alpha1.Policy) error {
 		return fmt.Errorf("failed to connect to Kubernetes: %w", err)
 	}
 
-	client, err := client.New(kubeRestConfig, client.Options{
+	kubeClient, err := k8sclient.New(kubeRestConfig, k8sclient.Options{
 		Scheme: scheme.Scheme,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create Kubernetes client: %w", err)
 	}
 
-	policy.Namespace = deployment.GetNamespace()
-	policy.Annotations = map[string]string{
+	policyCR.Namespace = deployment.GetNamespace()
+	policyCR.Annotations = map[string]string{
 		"fluxninja.com/validate": "true",
 	}
-	spec := policy.Spec
-	_, err = controllerutil.CreateOrUpdate(context.Background(), client, policy, func() error {
-		policy.Spec = spec
+	spec := policyCR.Spec
+	_, err = controllerutil.CreateOrUpdate(context.Background(), kubeClient, policyCR, func() error {
+		policyCR.Spec = spec
 		return nil
 	})
 	if err != nil {
-		return fmt.Errorf("failed to apply policy in Kubernetes: %w", err)
+		if strings.Contains(err.Error(), "no matches for kind") {
+			request := languagev1.PostPoliciesRequest{
+				Policies: []*languagev1.PostPoliciesRequest_PolicyRequest{
+					{
+						Name:   policyCR.GetName(),
+						Policy: policy,
+					},
+				},
+			}
+			_, err = client.PostPolicies(context.Background(), &request)
+			if err != nil {
+				return fmt.Errorf("failed to apply policy in Kubernetes: %w", err)
+			}
+		} else {
+			return fmt.Errorf("failed to apply policy in Kubernetes: %w", err)
+		}
 	}
 
-	log.Info().Str("policy", policy.GetName()).Str("namespace", policy.GetNamespace()).Msg("Applied Policy successfully")
+	log.Info().Str("policy", name).Str("namespace", deployment.GetNamespace()).Msg("Applied Policy successfully")
 	return nil
 }
 

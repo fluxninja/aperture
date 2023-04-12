@@ -45,7 +45,7 @@ func policyFactoryModule() fx.Option {
 			),
 		),
 		grpcgateway.RegisterHandler{Handler: policylangv1.RegisterPolicyServiceHandlerFromEndpoint}.Annotate(),
-		fx.Invoke(
+		fx.Provide(
 			fx.Annotate(
 				RegisterPolicyService,
 				fx.ParamTags(
@@ -211,4 +211,17 @@ func (factory *PolicyFactory) GetPolicies() *policylangv1.Policies {
 	return &policylangv1.Policies{
 		Policies: policies,
 	}
+}
+
+// GetPolicy returns policy matching given name.
+func (factory *PolicyFactory) GetPolicy(name string) *policylangv1.Policy {
+	policyWrappers := factory.GetPolicyWrappers()
+	var policy *policylangv1.Policy
+	for _, v := range policyWrappers {
+		if v.GetCommonAttributes().GetPolicyName() == name {
+			policy = v.GetPolicy().DeepCopy()
+			break
+		}
+	}
+	return policy
 }

@@ -5,7 +5,6 @@ var (
 	outputDir      string
 	valuesFile     string
 	applyPolicy    bool
-	kubeConfig     string
 	all            bool
 	onlyRequired   bool
 	skipPull       bool

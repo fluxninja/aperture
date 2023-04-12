@@ -10,6 +10,7 @@ package cmdv1
 
 import (
 	context "context"
+	v1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -30,6 +31,8 @@ const (
 	Controller_ListDiscoveryEntity_FullMethodName        = "/aperture.cmd.v1.Controller/ListDiscoveryEntity"
 	Controller_PreviewFlowLabels_FullMethodName          = "/aperture.cmd.v1.Controller/PreviewFlowLabels"
 	Controller_PreviewHTTPRequests_FullMethodName        = "/aperture.cmd.v1.Controller/PreviewHTTPRequests"
+	Controller_PostPolicies_FullMethodName               = "/aperture.cmd.v1.Controller/PostPolicies"
+	Controller_PatchPolicies_FullMethodName              = "/aperture.cmd.v1.Controller/PatchPolicies"
 )
 
 // ControllerClient is the client API for Controller service.
@@ -45,6 +48,8 @@ type ControllerClient interface {
 	// duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
 	PreviewFlowLabels(ctx context.Context, in *PreviewFlowLabelsRequest, opts ...grpc.CallOption) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(ctx context.Context, in *PreviewHTTPRequestsRequest, opts ...grpc.CallOption) (*PreviewHTTPRequestsControllerResponse, error)
+	PostPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostPoliciesResponse, error)
+	PatchPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostPoliciesResponse, error)
 }
 
 type controllerClient struct {
@@ -127,6 +132,24 @@ func (c *controllerClient) PreviewHTTPRequests(ctx context.Context, in *PreviewH
 	return out, nil
 }
 
+func (c *controllerClient) PostPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostPoliciesResponse, error) {
+	out := new(v1.PostPoliciesResponse)
+	err := c.cc.Invoke(ctx, Controller_PostPolicies_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *controllerClient) PatchPolicies(ctx context.Context, in *v1.PostPoliciesRequest, opts ...grpc.CallOption) (*v1.PostPoliciesResponse, error) {
+	out := new(v1.PostPoliciesResponse)
+	err := c.cc.Invoke(ctx, Controller_PatchPolicies_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ControllerServer is the server API for Controller service.
 // All implementations should embed UnimplementedControllerServer
 // for forward compatibility
@@ -140,6 +163,8 @@ type ControllerServer interface {
 	// duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
 	PreviewFlowLabels(context.Context, *PreviewFlowLabelsRequest) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(context.Context, *PreviewHTTPRequestsRequest) (*PreviewHTTPRequestsControllerResponse, error)
+	PostPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostPoliciesResponse, error)
+	PatchPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostPoliciesResponse, error)
 }
 
 // UnimplementedControllerServer should be embedded to have forward compatible implementations.
@@ -169,6 +194,12 @@ func (UnimplementedControllerServer) PreviewFlowLabels(context.Context, *Preview
 }
 func (UnimplementedControllerServer) PreviewHTTPRequests(context.Context, *PreviewHTTPRequestsRequest) (*PreviewHTTPRequestsControllerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PreviewHTTPRequests not implemented")
+}
+func (UnimplementedControllerServer) PostPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostPoliciesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostPolicies not implemented")
+}
+func (UnimplementedControllerServer) PatchPolicies(context.Context, *v1.PostPoliciesRequest) (*v1.PostPoliciesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PatchPolicies not implemented")
 }
 
 // UnsafeControllerServer may be embedded to opt out of forward compatibility for this service.
@@ -326,6 +357,42 @@ func _Controller_PreviewHTTPRequests_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Controller_PostPolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.PostPoliciesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).PostPolicies(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_PostPolicies_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).PostPolicies(ctx, req.(*v1.PostPoliciesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Controller_PatchPolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.PostPoliciesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).PatchPolicies(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_PatchPolicies_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).PatchPolicies(ctx, req.(*v1.PostPoliciesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Controller_ServiceDesc is the grpc.ServiceDesc for Controller service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -364,6 +431,14 @@ var Controller_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PreviewHTTPRequests",
 			Handler:    _Controller_PreviewHTTPRequests_Handler,
+		},
+		{
+			MethodName: "PostPolicies",
+			Handler:    _Controller_PostPolicies_Handler,
+		},
+		{
+			MethodName: "PatchPolicies",
+			Handler:    _Controller_PatchPolicies_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

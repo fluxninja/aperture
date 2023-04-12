@@ -35,22 +35,255 @@ var (
 	_ = sort.Sort
 )
 
-// Validate checks the field values on PostPolicyRequest with the rules defined
+// Validate checks the field values on GetPolicyRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
-func (m *PostPolicyRequest) Validate() error {
+func (m *GetPolicyRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on PostPolicyRequest with the rules
+// ValidateAll checks the field values on GetPolicyRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// PostPolicyRequestMultiError, or nil if none found.
-func (m *PostPolicyRequest) ValidateAll() error {
+// GetPolicyRequestMultiError, or nil if none found.
+func (m *GetPolicyRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *PostPolicyRequest) validate(all bool) error {
+func (m *GetPolicyRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Name
+
+	if len(errors) > 0 {
+		return GetPolicyRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetPolicyRequestMultiError is an error wrapping multiple validation errors
+// returned by GetPolicyRequest.ValidateAll() if the designated constraints
+// aren't met.
+type GetPolicyRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetPolicyRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetPolicyRequestMultiError) AllErrors() []error { return m }
+
+// GetPolicyRequestValidationError is the validation error returned by
+// GetPolicyRequest.Validate if the designated constraints aren't met.
+type GetPolicyRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetPolicyRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetPolicyRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetPolicyRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetPolicyRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetPolicyRequestValidationError) ErrorName() string { return "GetPolicyRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetPolicyRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetPolicyRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetPolicyRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetPolicyRequestValidationError{}
+
+// Validate checks the field values on GetPolicyResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *GetPolicyResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetPolicyResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetPolicyResponseMultiError, or nil if none found.
+func (m *GetPolicyResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetPolicyResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPolicy()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetPolicyResponseValidationError{
+					field:  "Policy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetPolicyResponseValidationError{
+					field:  "Policy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPolicy()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetPolicyResponseValidationError{
+				field:  "Policy",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetPolicyResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetPolicyResponseMultiError is an error wrapping multiple validation errors
+// returned by GetPolicyResponse.ValidateAll() if the designated constraints
+// aren't met.
+type GetPolicyResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetPolicyResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetPolicyResponseMultiError) AllErrors() []error { return m }
+
+// GetPolicyResponseValidationError is the validation error returned by
+// GetPolicyResponse.Validate if the designated constraints aren't met.
+type GetPolicyResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetPolicyResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetPolicyResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetPolicyResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetPolicyResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetPolicyResponseValidationError) ErrorName() string {
+	return "GetPolicyResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetPolicyResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetPolicyResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetPolicyResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetPolicyResponseValidationError{}
+
+// Validate checks the field values on PostPoliciesRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PostPoliciesRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PostPoliciesRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PostPoliciesRequestMultiError, or nil if none found.
+func (m *PostPoliciesRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PostPoliciesRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -64,7 +297,7 @@ func (m *PostPolicyRequest) validate(all bool) error {
 			switch v := interface{}(item).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, PostPolicyRequestValidationError{
+					errors = append(errors, PostPoliciesRequestValidationError{
 						field:  fmt.Sprintf("Policies[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -72,7 +305,7 @@ func (m *PostPolicyRequest) validate(all bool) error {
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, PostPolicyRequestValidationError{
+					errors = append(errors, PostPoliciesRequestValidationError{
 						field:  fmt.Sprintf("Policies[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -81,7 +314,7 @@ func (m *PostPolicyRequest) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return PostPolicyRequestValidationError{
+				return PostPoliciesRequestValidationError{
 					field:  fmt.Sprintf("Policies[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -92,19 +325,19 @@ func (m *PostPolicyRequest) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return PostPolicyRequestMultiError(errors)
+		return PostPoliciesRequestMultiError(errors)
 	}
 
 	return nil
 }
 
-// PostPolicyRequestMultiError is an error wrapping multiple validation errors
-// returned by PostPolicyRequest.ValidateAll() if the designated constraints
-// aren't met.
-type PostPolicyRequestMultiError []error
+// PostPoliciesRequestMultiError is an error wrapping multiple validation
+// errors returned by PostPoliciesRequest.ValidateAll() if the designated
+// constraints aren't met.
+type PostPoliciesRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m PostPolicyRequestMultiError) Error() string {
+func (m PostPoliciesRequestMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -113,11 +346,11 @@ func (m PostPolicyRequestMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m PostPolicyRequestMultiError) AllErrors() []error { return m }
+func (m PostPoliciesRequestMultiError) AllErrors() []error { return m }
 
-// PostPolicyRequestValidationError is the validation error returned by
-// PostPolicyRequest.Validate if the designated constraints aren't met.
-type PostPolicyRequestValidationError struct {
+// PostPoliciesRequestValidationError is the validation error returned by
+// PostPoliciesRequest.Validate if the designated constraints aren't met.
+type PostPoliciesRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -125,24 +358,24 @@ type PostPolicyRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e PostPolicyRequestValidationError) Field() string { return e.field }
+func (e PostPoliciesRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e PostPolicyRequestValidationError) Reason() string { return e.reason }
+func (e PostPoliciesRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e PostPolicyRequestValidationError) Cause() error { return e.cause }
+func (e PostPoliciesRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e PostPolicyRequestValidationError) Key() bool { return e.key }
+func (e PostPoliciesRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e PostPolicyRequestValidationError) ErrorName() string {
-	return "PostPolicyRequestValidationError"
+func (e PostPoliciesRequestValidationError) ErrorName() string {
+	return "PostPoliciesRequestValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e PostPolicyRequestValidationError) Error() string {
+func (e PostPoliciesRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -154,14 +387,14 @@ func (e PostPolicyRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sPostPolicyRequest.%s: %s%s",
+		"invalid %sPostPoliciesRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = PostPolicyRequestValidationError{}
+var _ error = PostPoliciesRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -169,7 +402,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = PostPolicyRequestValidationError{}
+} = PostPoliciesRequestValidationError{}
 
 // Validate checks the field values on DeletePolicyRequest with the rules
 // defined in the proto definition for this message. If any rules are
@@ -2580,22 +2813,23 @@ var _ interface {
 	ErrorName() string
 } = NestedCircuitValidationError{}
 
-// Validate checks the field values on PostPolicyRequest_PolicyRequest with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *PostPolicyRequest_PolicyRequest) Validate() error {
+// Validate checks the field values on PostPoliciesRequest_PolicyRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *PostPoliciesRequest_PolicyRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on PostPolicyRequest_PolicyRequest with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, the result is a list of violation errors wrapped in
-// PostPolicyRequest_PolicyRequestMultiError, or nil if none found.
-func (m *PostPolicyRequest_PolicyRequest) ValidateAll() error {
+// ValidateAll checks the field values on PostPoliciesRequest_PolicyRequest
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// PostPoliciesRequest_PolicyRequestMultiError, or nil if none found.
+func (m *PostPoliciesRequest_PolicyRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *PostPolicyRequest_PolicyRequest) validate(all bool) error {
+func (m *PostPoliciesRequest_PolicyRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -2608,7 +2842,7 @@ func (m *PostPolicyRequest_PolicyRequest) validate(all bool) error {
 		switch v := interface{}(m.GetPolicy()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, PostPolicyRequest_PolicyRequestValidationError{
+				errors = append(errors, PostPoliciesRequest_PolicyRequestValidationError{
 					field:  "Policy",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2616,7 +2850,7 @@ func (m *PostPolicyRequest_PolicyRequest) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, PostPolicyRequest_PolicyRequestValidationError{
+				errors = append(errors, PostPoliciesRequest_PolicyRequestValidationError{
 					field:  "Policy",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2625,7 +2859,7 @@ func (m *PostPolicyRequest_PolicyRequest) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetPolicy()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return PostPolicyRequest_PolicyRequestValidationError{
+			return PostPoliciesRequest_PolicyRequestValidationError{
 				field:  "Policy",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -2637,7 +2871,7 @@ func (m *PostPolicyRequest_PolicyRequest) validate(all bool) error {
 		switch v := interface{}(m.GetDynamicConfig()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, PostPolicyRequest_PolicyRequestValidationError{
+				errors = append(errors, PostPoliciesRequest_PolicyRequestValidationError{
 					field:  "DynamicConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2645,7 +2879,7 @@ func (m *PostPolicyRequest_PolicyRequest) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, PostPolicyRequest_PolicyRequestValidationError{
+				errors = append(errors, PostPoliciesRequest_PolicyRequestValidationError{
 					field:  "DynamicConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2654,7 +2888,7 @@ func (m *PostPolicyRequest_PolicyRequest) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetDynamicConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return PostPolicyRequest_PolicyRequestValidationError{
+			return PostPoliciesRequest_PolicyRequestValidationError{
 				field:  "DynamicConfig",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -2663,19 +2897,20 @@ func (m *PostPolicyRequest_PolicyRequest) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return PostPolicyRequest_PolicyRequestMultiError(errors)
+		return PostPoliciesRequest_PolicyRequestMultiError(errors)
 	}
 
 	return nil
 }
 
-// PostPolicyRequest_PolicyRequestMultiError is an error wrapping multiple
-// validation errors returned by PostPolicyRequest_PolicyRequest.ValidateAll()
-// if the designated constraints aren't met.
-type PostPolicyRequest_PolicyRequestMultiError []error
+// PostPoliciesRequest_PolicyRequestMultiError is an error wrapping multiple
+// validation errors returned by
+// PostPoliciesRequest_PolicyRequest.ValidateAll() if the designated
+// constraints aren't met.
+type PostPoliciesRequest_PolicyRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m PostPolicyRequest_PolicyRequestMultiError) Error() string {
+func (m PostPoliciesRequest_PolicyRequestMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -2684,12 +2919,12 @@ func (m PostPolicyRequest_PolicyRequestMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m PostPolicyRequest_PolicyRequestMultiError) AllErrors() []error { return m }
+func (m PostPoliciesRequest_PolicyRequestMultiError) AllErrors() []error { return m }
 
-// PostPolicyRequest_PolicyRequestValidationError is the validation error
-// returned by PostPolicyRequest_PolicyRequest.Validate if the designated
+// PostPoliciesRequest_PolicyRequestValidationError is the validation error
+// returned by PostPoliciesRequest_PolicyRequest.Validate if the designated
 // constraints aren't met.
-type PostPolicyRequest_PolicyRequestValidationError struct {
+type PostPoliciesRequest_PolicyRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2697,24 +2932,24 @@ type PostPolicyRequest_PolicyRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e PostPolicyRequest_PolicyRequestValidationError) Field() string { return e.field }
+func (e PostPoliciesRequest_PolicyRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e PostPolicyRequest_PolicyRequestValidationError) Reason() string { return e.reason }
+func (e PostPoliciesRequest_PolicyRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e PostPolicyRequest_PolicyRequestValidationError) Cause() error { return e.cause }
+func (e PostPoliciesRequest_PolicyRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e PostPolicyRequest_PolicyRequestValidationError) Key() bool { return e.key }
+func (e PostPoliciesRequest_PolicyRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e PostPolicyRequest_PolicyRequestValidationError) ErrorName() string {
-	return "PostPolicyRequest_PolicyRequestValidationError"
+func (e PostPoliciesRequest_PolicyRequestValidationError) ErrorName() string {
+	return "PostPoliciesRequest_PolicyRequestValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e PostPolicyRequest_PolicyRequestValidationError) Error() string {
+func (e PostPoliciesRequest_PolicyRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -2726,14 +2961,14 @@ func (e PostPolicyRequest_PolicyRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sPostPolicyRequest_PolicyRequest.%s: %s%s",
+		"invalid %sPostPoliciesRequest_PolicyRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = PostPolicyRequest_PolicyRequestValidationError{}
+var _ error = PostPoliciesRequest_PolicyRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -2741,4 +2976,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = PostPolicyRequest_PolicyRequestValidationError{}
+} = PostPoliciesRequest_PolicyRequestValidationError{}

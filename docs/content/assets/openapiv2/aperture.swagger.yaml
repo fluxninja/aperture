@@ -1741,6 +1741,11 @@ definitions:
             policies:
                 $ref: '#/definitions/Policies'
         type: object
+    GetPolicyResponse:
+        properties:
+            policy:
+                $ref: '#/definitions/Policy'
+        type: object
     GlobalAutoScaleControlPoint:
         properties:
             agent_group:
@@ -3129,24 +3134,15 @@ definitions:
                     $ref: '#/definitions/PolicyWrapper'
                 type: object
         type: object
-    PostPoliciesResponse:
-        properties:
-            errors:
-                items:
-                    type: string
-                type: array
-            message:
-                type: string
-        type: object
-    PostPolicyRequest:
+    PostPoliciesRequest:
         properties:
             policies:
                 items:
-                    $ref: '#/definitions/PostPolicyRequestPolicyRequest'
+                    $ref: '#/definitions/PostPoliciesRequestPolicyRequest'
                     type: object
                 type: array
         type: object
-    PostPolicyRequestPolicyRequest:
+    PostPoliciesRequestPolicyRequest:
         properties:
             dynamic_config:
                 type: object
@@ -3157,6 +3153,15 @@ definitions:
                 $ref: '#/definitions/Policy'
         required:
             - name
+        type: object
+    PostPoliciesResponse:
+        properties:
+            errors:
+                items:
+                    type: string
+                type: array
+            message:
+                type: string
         type: object
     PreviewFlowLabelsControllerResponse:
         properties:
@@ -4921,13 +4926,13 @@ paths:
             tags:
                 - aperture-controller
         patch:
-            operationId: PolicyService_PatchPolicy
+            operationId: PolicyService_PatchPolicies
             parameters:
                 - in: body
                   name: body
                   required: true
                   schema:
-                    $ref: '#/definitions/PostPolicyRequest'
+                    $ref: '#/definitions/PostPoliciesRequest'
             responses:
                 "200":
                     description: A successful response.
@@ -4937,17 +4942,17 @@ paths:
                     description: An unexpected error response.
                     schema:
                         $ref: '#/definitions/googlerpcStatus'
-            summary: PatchPolicy patches policies based on the provided request.
+            summary: PatchPolicies patches policies based on the provided request.
             tags:
                 - aperture-controller
         post:
-            operationId: PolicyService_PostPolicy
+            operationId: PolicyService_PostPolicies
             parameters:
                 - in: body
                   name: body
                   required: true
                   schema:
-                    $ref: '#/definitions/PostPolicyRequest'
+                    $ref: '#/definitions/PostPoliciesRequest'
             responses:
                 "200":
                     description: A successful response.
@@ -4957,7 +4962,7 @@ paths:
                     description: An unexpected error response.
                     schema:
                         $ref: '#/definitions/googlerpcStatus'
-            summary: PostPolicy creates or updates policies based on the provided request.
+            summary: PostPolicies creates or updates policies based on the provided request.
             tags:
                 - aperture-controller
     /v1/policies/{name}:
@@ -4979,6 +4984,24 @@ paths:
                     schema:
                         $ref: '#/definitions/googlerpcStatus'
             summary: DeletePolicy removes a policy with the specified name.
+            tags:
+                - aperture-controller
+        get:
+            operationId: PolicyService_GetPolicy
+            parameters:
+                - in: path
+                  name: name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/GetPolicyResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
             tags:
                 - aperture-controller
     /v1/status/{path}:
@@ -5010,13 +5033,13 @@ tags:
     - name: EntitiesService
     - name: FlowControlPointsService
     - name: FlowPreviewService
+    - name: PolicyService
     - name: Controller
     - name: DistCacheService
     - name: FlowControlService
     - name: FlowControlServiceHTTP
     - name: InfoService
     - name: PeerDiscoveryService
-    - name: PolicyService
     - name: StatusService
     - name: FluxNinjaService
     - name: ControllerInfoService
