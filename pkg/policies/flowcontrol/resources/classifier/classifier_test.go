@@ -2,9 +2,12 @@ package classifier_test
 
 import (
 	"context"
+	"encoding/json"
+	"strconv"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/open-policy-agent/opa/ast"
 
 	policylangv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/sync/v1"
@@ -153,7 +156,7 @@ var _ = Describe("Classifier", func() {
 				map[string]string{"version": "one", "other": "tag"},
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(Equal(flowlabel.FlowLabels{
@@ -170,7 +173,7 @@ var _ = Describe("Classifier", func() {
 				map[string]string{"version": "one"},
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(BeEmpty())
@@ -184,7 +187,7 @@ var _ = Describe("Classifier", func() {
 				map[string]string{"version": "two"},
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(Equal(flowlabel.FlowLabels{
@@ -203,7 +206,7 @@ var _ = Describe("Classifier", func() {
 					map[string]string{"version": "one"},
 					attributesWithHeaders(object{
 						"foo": "hello",
-						"bar": 21,
+						"bar": int64(21),
 					}),
 				)
 				Expect(labels).To(Equal(flowlabel.FlowLabels{
@@ -276,7 +279,7 @@ var _ = Describe("Classifier", func() {
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(Equal(flowlabel.FlowLabels{
@@ -320,7 +323,7 @@ var _ = Describe("Classifier", func() {
 				attributesWithHeaders(object{
 					"foo": "hello",
 					"xyz": "cos",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(SatisfyAny(
@@ -375,7 +378,7 @@ var _ = Describe("Classifier", func() {
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(SatisfyAny(
@@ -438,7 +441,7 @@ var _ = Describe("Classifier", func() {
 				nil,
 				attributesWithHeaders(object{
 					"foo": "hello",
-					"bar": 21,
+					"bar": int64(21),
 				}),
 			)
 			Expect(labels).To(Equal(flowlabel.FlowLabels{}))
@@ -481,16 +484,31 @@ func fl(s string) flowlabel.FlowLabelValue {
 	}
 }
 
-func attributesWithHeaders(headers object) object {
-	return object{
-		"attributes": object{
-			"request": object{
-				"http": object{
-					"headers": headers,
-				},
-			},
-		},
+func attributesWithHeaders(headers object) ast.Value {
+	astHeaders := ast.NewObject()
+	for key, val := range headers {
+		switch item := val.(type) {
+		case string:
+			astHeaders.Insert(ast.StringTerm(key), ast.StringTerm(val.(string)))
+		case int64:
+			astHeaders.Insert(ast.StringTerm(key), ast.NumberTerm(json.Number(strconv.FormatInt(val.(int64), 10))))
+		default:
+			log.Warn().Msgf("Unknown type for header %s: %T", key, item)
+		}
 	}
+
+	http := ast.NewObject()
+	http.Insert(ast.StringTerm("headers"), ast.NewTerm(astHeaders))
+
+	request := ast.NewObject()
+	request.Insert(ast.StringTerm("http"), ast.NewTerm(http))
+
+	attributes := ast.NewObject()
+	attributes.Insert(ast.StringTerm("request"), ast.NewTerm(request))
+
+	input := ast.NewObject()
+	input.Insert(ast.StringTerm("attributes"), ast.NewTerm(attributes))
+	return input
 }
 
 func headerExtractor(headerName string) *policylangv1.Rule_Extractor {
