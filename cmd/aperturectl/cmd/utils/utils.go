@@ -297,3 +297,26 @@ func ValidateWithJSONSchema(rootSchema string, schemas []string, documentFile st
 	}
 	return nil
 }
+
+// IsBlueprintDeprecated whether the policyDir is deprecated
+// it reads metadata.yaml and checks for deprecated key
+// the value of that key is the deprecation message.
+func IsBlueprintDeprecated(policyDir string) (bool, string) {
+	metadataPath := filepath.Join(policyDir, "metadata.yaml")
+	metadataFile, err := os.ReadFile(metadataPath)
+	if err != nil {
+		log.Warn().Err(err).Msgf("failed to read metadata.yaml file in %s", policyDir)
+		return false, ""
+	}
+	var metadata map[string]interface{}
+	err = yaml.Unmarshal(metadataFile, &metadata)
+	if err != nil {
+		log.Warn().Err(err).Msgf("failed to unmarshal metadata.yaml file in %s", policyDir)
+		return false, ""
+	}
+	deprecated, ok := metadata["deprecated"]
+	if !ok {
+		return false, ""
+	}
+	return true, deprecated.(string)
+}
