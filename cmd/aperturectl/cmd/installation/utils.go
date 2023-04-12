@@ -69,7 +69,7 @@ func getTemplets(chartName, releaseName string, order releaseutil.KindSortOrder)
 	}
 	defer resp.Body.Close()
 
-	ch, err := loader.LoadArchive(resp.Body)
+	ch, err := loader.Load("/home/hardik/Work/fluxninja/aperture/manifests/charts/aperture-controller")
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to load chart: %s", err)
 	}
@@ -111,9 +111,9 @@ func getTemplets(chartName, releaseName string, order releaseutil.KindSortOrder)
 	}
 
 	if releaseName == controller && isNamespaceScoped {
-		values, err = manageControllerCertificateSecret(values, fmt.Sprintf("%s-%s", controller, apertureController), namespace)
+		values, err = manageControllerCertificateSecret(values, fmt.Sprintf("%s-%s", controller, apertureController), namespace, order)
 		if err != nil {
-			return nil, nil, nil, fmt.Errorf("failed to generate Controller certificate: %s", err)
+			return nil, nil, nil, err
 		}
 	}
 
@@ -155,7 +155,6 @@ func applyManifest(manifest string) error {
 		return err
 	}
 
-	log.Info().Msgf("Applying - %s/%s", unstructuredObject.GetKind(), unstructuredObject.GetName())
 	err = applyObjectToKubernetesWithRetry(unstructuredObject)
 	if err != nil {
 		return fmt.Errorf("failed to apply - %s/%s, Error - '%s'", unstructuredObject.GetKind(), unstructuredObject.GetName(), err)
@@ -165,6 +164,7 @@ func applyManifest(manifest string) error {
 
 // applyObjectToKubernetesWithRetry applies the given object to Kubernetes with retry.
 func applyObjectToKubernetesWithRetry(unstructuredObject *unstructured.Unstructured) error {
+	log.Info().Msgf("Applying - %s/%s", unstructuredObject.GetKind(), unstructuredObject.GetName())
 	attempt := 0
 	for attempt < 5 {
 		attempt++
@@ -365,7 +365,7 @@ func handleUnInstall(chartName, releaseName string) error {
 }
 
 // manageControllerCertificateSecret manages secret containing the Aperture Controller certificate.
-func manageControllerCertificateSecret(values map[string]interface{}, releaseName, namespace string) (map[string]interface{}, error) {
+func manageControllerCertificateSecret(values map[string]interface{}, releaseName, namespace string, order releaseutil.KindSortOrder) (map[string]interface{}, error) {
 	controller, ok := values["controller"].(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("failed to get controller values")
@@ -378,7 +378,10 @@ func manageControllerCertificateSecret(values map[string]interface{}, releaseNam
 
 	secretName, ok := serverCert["secretName"].(string)
 	if !ok {
-		secretName = fmt.Sprintf("%s-%s-cert", releaseName, apertureController)
+		if !generateCert && slices.Equal(order, releaseutil.InstallOrder) {
+			return nil, fmt.Errorf(".Values.controller.serverCert.secretName must be set when .Values.controller.namespaceScoped is true and --generate-cert is not provided")
+		}
+		secretName = fmt.Sprintf("%s-cert", releaseName)
 	}
 
 	keyFileName, ok := serverCert["keyFileName"].(string)
@@ -404,8 +407,8 @@ func manageControllerCertificateSecret(values map[string]interface{}, releaseNam
 			Annotations: map[string]string{},
 		},
 		Data: map[string][]byte{
-			keyFileName:  cert.Bytes(),
-			certFileName: key.Bytes(),
+			keyFileName:  key.Bytes(),
+			certFileName: cert.Bytes(),
 		},
 	}
 

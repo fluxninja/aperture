@@ -78,14 +78,14 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED
-              value: false
+              value: "false"
             {{- if or .Values.agent.secrets.fluxNinjaExtension.create .Values.agent.secrets.fluxNinjaExtension.secretKeyRef.name -}}
             - name: APERTURE_AGENT_FLUXNINJA_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ include "agent.apiSecret.name" (dict "agent" .Values.agent "context" . $ ) }}
                   key: {{ include "agent.apiSecret.key" (dict "agent" .Values.agent $ ) }}
-                  optional: false
+                  optional: "false"
             {{- end }}
             {{- if .Values.agent.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.agent.extraEnvVars "context" . $ ) | nindent 12 }}

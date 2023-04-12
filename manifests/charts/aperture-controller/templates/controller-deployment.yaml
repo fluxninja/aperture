@@ -162,7 +162,7 @@ spec:
             httpGet:
               path: /v1/status/system/liveness
               port: server
-              scheme: HTTP
+              scheme: HTTPS
             {{- if  .Values.controller.livenessProbe.initialDelaySeconds }}
             initialDelaySeconds: {{ .Values.controller.livenessProbe.initialDelaySeconds }}
             {{- else }}
@@ -196,6 +196,7 @@ spec:
             httpGet:
               path: /v1/status/system/readiness
               port: server
+              scheme: HTTPS
             {{- if  .Values.controller.readinessProbe.initialDelaySeconds }}
             initialDelaySeconds: {{ .Values.controller.readinessProbe.initialDelaySeconds }}
             {{- else }}
