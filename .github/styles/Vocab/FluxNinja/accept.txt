@@ -395,3 +395,57 @@ VM
 is not
 is
 not
+handler_name
+GRPC
+jsonnet
+bundler
+e.g.
+classifier
+DMap
+JSON
+AutoScale
+mongodbreceiver
+oracledbreceiver
+snowflakereceiver
+oracledbreceiver
+zookeeperreceiver
+apachereceiver
+kafkareceiver
+memcachedreceiver
+saphanareceiver
+expvarreceiver
+ExpVar
+vCenter
+vcenterreceiver
+couchdbreceiver
+haproxyreceiver
+HAProxy
+sshcheckreceiver
+IP
+actuator
+golang
+they are
+they
+they're
+NOT
+sqrt
+trunc
+RateLimiter
+ratelimiter
+RateLimiting
+They
+e.g.
+DSN
+chronyreceiver
+Chrony
+Aerospike
+aerospikerreceiver
+sqlserverreceiver
+nsxtreceiver
+riakreceiver
+Riak
+one of
+e.g.
+One of
+mysqlreceiver
+postgresqlreceiver
