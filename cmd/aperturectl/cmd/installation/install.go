@@ -57,10 +57,10 @@ Use this command to install Aperture Controller and Agent on your Kubernetes clu
 			return err
 		}
 
-		// latestVersion, err = utils.ResolveLatestVersion()
-		// if err != nil {
-		// 	return err
-		// }
+		latestVersion, err = utils.ResolveLatestVersion()
+		if err != nil {
+			return err
+		}
 
 		if version == "" || version == apertureLatestVersion {
 			version = latestVersion

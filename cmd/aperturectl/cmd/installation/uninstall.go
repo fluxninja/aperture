@@ -54,10 +54,10 @@ Use this command to uninstall Aperture Controller and Agent from your Kubernetes
 			return fmt.Errorf("failed to create Kubernetes client: %w", err)
 		}
 
-		// latestVersion, err = utils.ResolveLatestVersion()
-		// if err != nil {
-		// 	return err
-		// }
+		latestVersion, err = utils.ResolveLatestVersion()
+		if err != nil {
+			return err
+		}
 
 		if version == "" || version == apertureLatestVersion {
 			version = latestVersion
