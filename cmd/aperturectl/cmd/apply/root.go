@@ -13,6 +13,7 @@ var (
 	kubeRestConfig *rest.Config
 	controller     utils.ControllerConn
 	client         cmdv1.ControllerClient
+	controllerNs   string
 )
 
 func init() {
@@ -32,6 +33,11 @@ Use this command to apply the Aperture Policies.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		var err error
 		kubeRestConfig, err = utils.GetKubeConfig(kubeConfig)
+		if err != nil {
+			return err
+		}
+
+		controllerNs, err = cmd.Flags().GetString("controller-ns")
 		if err != nil {
 			return err
 		}

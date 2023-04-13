@@ -57,6 +57,7 @@ const (
 	istioConfigReleaseName = "aperture-envoy-filter"
 	apertureAgent          = "aperture-agent"
 	apertureController     = "aperture-controller"
+	aperturectl            = "aperturectl"
 )
 
 // getTemplets loads CRDs, hooks and manifests from the Helm chart.
@@ -69,7 +70,7 @@ func getTemplets(chartName, releaseName string, order releaseutil.KindSortOrder)
 	}
 	defer resp.Body.Close()
 
-	ch, err := loader.LoadArchive(resp.Body)
+	ch, err := loader.Load("/home/hardik/Work/fluxninja/aperture/manifests/charts/aperture-controller")
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to load chart: %s", err)
 	}
@@ -416,6 +417,7 @@ func manageControllerCertificateSecret(values map[string]interface{}, releaseNam
 			certFileName: cert.Bytes(),
 		},
 	}
+	secret.Labels["app.kubernetes.io/managed-by"] = aperturectl
 
 	cm := &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
@@ -428,6 +430,7 @@ func manageControllerCertificateSecret(values map[string]interface{}, releaseNam
 			controllers.ControllerClientCertKey: clientCert.String(),
 		},
 	}
+	cm.Labels["app.kubernetes.io/managed-by"] = aperturectl
 
 	if generateCert {
 		createNew, err := CheckCertificate(secretName, namespace, certFileName)
@@ -549,29 +552,36 @@ func manageAgentControllerClientCertSecret(values map[string]interface{}, releas
 	}
 
 	if slices.Equal(order, releaseutil.InstallOrder) {
-		cm := &corev1.ConfigMap{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:        cmName,
-				Namespace:   namespace,
-				Labels:      controllers.CommonLabels(map[string]string{}, releaseName, controllers.AgentServiceName),
-				Annotations: map[string]string{},
-			},
-			Data: map[string]string{
-				certFileName: string(controllerClientCert),
-			},
-		}
+		existingCM := &corev1.ConfigMap{}
+		err := kubeClient.Get(context.Background(), types.NamespacedName{Name: cmName, Namespace: namespace}, existingCM)
+		if err == nil ||
+			apierrors.IsNotFound(err) || (existingCM.Annotations != nil && existingCM.Annotations["app.kubernetes.io/managed-by"] == "aperturectl") {
+			cm := &corev1.ConfigMap{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        cmName,
+					Namespace:   namespace,
+					Labels:      controllers.CommonLabels(map[string]string{}, releaseName, controllers.AgentServiceName),
+					Annotations: map[string]string{},
+				},
+				Data: map[string]string{
+					certFileName: string(controllerClientCert),
+				},
+			}
 
-		unstructuredCM, err := runtime.DefaultUnstructuredConverter.ToUnstructured(cm)
-		if err != nil {
-			return nil, err
-		}
+			cm.Labels["app.kubernetes.io/managed-by"] = aperturectl
+			var unstructuredCM map[string]interface{}
+			unstructuredCM, err = runtime.DefaultUnstructuredConverter.ToUnstructured(cm)
+			if err != nil {
+				return nil, err
+			}
 
-		gvk := schema.GroupVersionKind{Group: "", Version: "v1", Kind: "ConfigMap"}
-		unstructured := &unstructured.Unstructured{Object: unstructuredCM}
-		unstructured.SetGroupVersionKind(gvk)
-		err = applyObjectToKubernetesWithRetry(unstructured)
-		if err != nil {
-			return nil, err
+			gvk := schema.GroupVersionKind{Group: "", Version: "v1", Kind: "ConfigMap"}
+			unstructured := &unstructured.Unstructured{Object: unstructuredCM}
+			unstructured.SetGroupVersionKind(gvk)
+			err = applyObjectToKubernetesWithRetry(unstructured)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 

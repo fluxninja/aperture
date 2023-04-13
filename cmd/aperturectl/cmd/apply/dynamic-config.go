@@ -15,6 +15,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	languagev1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/log"
@@ -66,7 +67,7 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 			return fmt.Errorf("failed to create Kubernetes client: %w", err)
 		}
 
-		deployment, err := getControllerDeployment()
+		deployment, err := utils.GetControllerDeployment(kubeRestConfig, controllerNs)
 		if err != nil {
 			return err
 		}

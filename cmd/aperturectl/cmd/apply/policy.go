@@ -10,10 +10,6 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
-	appsv1 "k8s.io/api/apps/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -124,7 +120,7 @@ func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 	policyCR.Spec.Raw = policyBytes
 	policyCR.Name = name
 
-	deployment, err := getControllerDeployment()
+	deployment, err := utils.GetControllerDeployment(kubeRestConfig, controllerNs)
 	if err != nil {
 		return err
 	}
@@ -171,28 +167,4 @@ func createAndApplyPolicy(policy *languagev1.Policy, name string) error {
 
 	log.Info().Str("policy", name).Str("namespace", deployment.GetNamespace()).Msg("Applied Policy successfully")
 	return nil
-}
-
-func getControllerDeployment() (*appsv1.Deployment, error) {
-	clientSet, err := kubernetes.NewForConfig(kubeRestConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create new ClientSet: %w", err)
-	}
-
-	deployment, err := clientSet.AppsV1().Deployments("").List(context.Background(), metav1.ListOptions{
-		FieldSelector: "metadata.name=aperture-controller",
-	})
-	if err != nil {
-		if apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf(
-				"no deployment with name 'aperture-controller' found on the Kubernetes cluster. The policy can be only applied in the namespace where the Aperture Controller is running")
-		}
-		return nil, fmt.Errorf("failed to fetch namespace of Aperture Controller in Kubernetes: %w", err)
-	}
-
-	if len(deployment.Items) != 1 {
-		return nil, errors.New("no deployment with name 'aperture-controller' found on the Kubernetes cluster. The policy can be only applied in the namespace where the Aperture Controller is running")
-	}
-
-	return &deployment.Items[0], nil
 }
