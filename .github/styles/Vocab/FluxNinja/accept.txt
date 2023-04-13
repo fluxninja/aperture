@@ -228,6 +228,7 @@ Unary
 unary
 unary_operator
 static_buckets
+backend
 network_timeout
 min_connection_timeout
 min_envelope
@@ -414,7 +415,6 @@ kafkareceiver
 memcachedreceiver
 saphanareceiver
 expvarreceiver
-ExpVar
 vCenter
 vcenterreceiver
 couchdbreceiver
@@ -449,3 +449,14 @@ e.g.
 One of
 mysqlreceiver
 postgresqlreceiver
+Not
+Expvar
+i.e.
+matchExpressions
+tcp
+cannot
+manual_mode
+special_value
+path_templates
+in order to
+ema

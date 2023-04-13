@@ -24,8 +24,8 @@ jb install github.com/fluxninja/aperture/blueprints@main
 
 :::tip
 
-You can use specific Aperture branch instead of _main_ e.g. _stable/v0.2.x_, or
-even a specific release tag e.g. _v0.2.2_ to match your Aperture Controller
+You can use specific Aperture branch instead of _main_ for example,  _stable/v0.2.x_, or
+even a specific release tag for example,  _v0.2.2_ to match your Aperture Controller
 installation version.
 
 :::
