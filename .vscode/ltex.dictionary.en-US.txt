@@ -44,3 +44,8 @@ Istio
 kubectl
 ltex
 circleci
+inport
+outport
+atleast
+iteraction
+kubernetes
