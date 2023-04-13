@@ -268,21 +268,21 @@ func RequestToInputWithServices(req *flowcontrolhttpv1.CheckHTTPRequest, sourceS
 	source := ast.NewObject()
 	source.Insert(ast.StringTerm("socketAddress"), ast.NewTerm(srcSocketAddress))
 	if sourceSvcs != nil {
-		srcServicesArray := ast.NewArray()
+		srcServicesArray := make([]*ast.Term, 0)
 		for _, svc := range sourceSvcs {
-			srcServicesArray.Append(ast.StringTerm(svc))
+			srcServicesArray = append(srcServicesArray, ast.StringTerm(svc))
 		}
-		source.Insert(ast.StringTerm("services"), ast.NewTerm(srcServicesArray))
+		source.Insert(ast.StringTerm("services"), ast.NewTerm(ast.NewArray(srcServicesArray...)))
 	}
 
 	destination := ast.NewObject()
 	destination.Insert(ast.StringTerm("socketAddress"), ast.NewTerm(dstSocketAddress))
 	if destinationSvcs != nil {
-		dstServicesArray := ast.NewArray()
+		dstServicesArray := make([]*ast.Term, 0)
 		for _, svc := range destinationSvcs {
-			dstServicesArray.Append(ast.StringTerm(svc))
+			dstServicesArray = append(dstServicesArray, ast.StringTerm(svc))
 		}
-		destination.Insert(ast.StringTerm("services"), ast.NewTerm(dstServicesArray))
+		destination.Insert(ast.StringTerm("services"), ast.NewTerm(ast.NewArray(dstServicesArray...)))
 	}
 
 	requestMap := ast.NewObject()
@@ -314,25 +314,25 @@ func RequestToInputWithServices(req *flowcontrolhttpv1.CheckHTTPRequest, sourceS
 func getParsedPathAndQuery(path string) (*ast.Term, *ast.Term, error) {
 	parsedURL, err := url.Parse(path)
 	if err != nil {
-		return nil, nil, err
+		return ast.NullTerm(), ast.NullTerm(), err
 	}
 
 	parsedPath := strings.Split(strings.TrimLeft(parsedURL.Path, "/"), "/")
-	parsedPathArray := ast.NewArray()
+	parsedPathSlice := make([]*ast.Term, 0)
 	for _, v := range parsedPath {
-		parsedPathArray.Append(ast.StringTerm(v))
+		parsedPathSlice = append(parsedPathSlice, ast.StringTerm(v))
 	}
 
 	parsedQueryInterface := ast.NewObject()
 	for paramKey, paramValues := range parsedURL.Query() {
-		queryValues := ast.NewArray()
+		queryValues := make([]*ast.Term, 0)
 		for _, v := range paramValues {
-			queryValues.Append(ast.StringTerm(v))
+			queryValues = append(queryValues, ast.StringTerm(v))
 		}
-		parsedQueryInterface.Insert(ast.StringTerm(paramKey), ast.NewTerm(queryValues))
+		parsedQueryInterface.Insert(ast.StringTerm(paramKey), ast.NewTerm(ast.NewArray(queryValues...)))
 	}
 
-	return ast.NewTerm(parsedPathArray), ast.NewTerm(parsedQueryInterface), nil
+	return ast.NewTerm(ast.NewArray(parsedPathSlice...)), ast.NewTerm(parsedQueryInterface), nil
 }
 
 func getParsedBody(headers map[string]string, body string) (*ast.Term, bool, error) {
@@ -341,53 +341,53 @@ func getParsedBody(headers map[string]string, body string) (*ast.Term, bool, err
 	if val, ok := headers["content-type"]; ok {
 		if strings.Contains(val, "application/json") {
 			if body == "" {
-				return nil, false, nil
+				return ast.NullTerm(), false, nil
 			}
 
 			if headerVal, ok := headers["content-length"]; ok {
 				truncated, err := checkIfHTTPBodyTruncated(headerVal, int64(len(body)))
 				if err != nil {
-					return nil, false, err
+					return ast.NullTerm(), false, err
 				}
 				if truncated {
-					return nil, true, nil
+					return ast.NullTerm(), true, nil
 				}
 			}
 
 			astValue, err := ast.ValueFromReader(bytes.NewReader([]byte(body)))
 			if err != nil {
-				return nil, false, err
+				return ast.NullTerm(), false, err
 			}
-			data.Insert(ast.StringTerm(""), ast.NewTerm(astValue))
+			return ast.NewTerm(astValue), false, nil
 		} else if strings.Contains(val, "application/x-www-form-urlencoded") {
 			var payload string
 			switch {
 			case body != "":
 				payload = body
 			default:
-				return nil, false, nil
+				return ast.NullTerm(), false, nil
 			}
 
 			if headerVal, ok := headers["content-length"]; ok {
 				truncated, err := checkIfHTTPBodyTruncated(headerVal, int64(len(payload)))
 				if err != nil {
-					return nil, false, err
+					return ast.NullTerm(), false, err
 				}
 				if truncated {
-					return nil, true, nil
+					return ast.NullTerm(), true, nil
 				}
 			}
 
 			parsed, err := url.ParseQuery(payload)
 			if err != nil {
-				return nil, false, err
+				return ast.NullTerm(), false, err
 			}
 			for key, valArray := range parsed {
-				helperArr := ast.NewArray()
+				helperArr := make([]*ast.Term, 0)
 				for _, val := range valArray {
-					helperArr.Append(ast.StringTerm(val))
+					helperArr = append(helperArr, ast.StringTerm(val))
 				}
-				data.Insert(ast.StringTerm(key), ast.NewTerm(helperArr))
+				data.Insert(ast.StringTerm(key), ast.NewTerm(ast.NewArray(helperArr...)))
 			}
 		} else if strings.Contains(val, "multipart/form-data") {
 			var payload string
@@ -395,27 +395,27 @@ func getParsedBody(headers map[string]string, body string) (*ast.Term, bool, err
 			case body != "":
 				payload = body
 			default:
-				return nil, false, nil
+				return ast.NullTerm(), false, nil
 			}
 
 			if headerVal, ok := headers["content-length"]; ok {
 				truncated, err := checkIfHTTPBodyTruncated(headerVal, int64(len(payload)))
 				if err != nil {
-					return nil, false, err
+					return ast.NullTerm(), false, err
 				}
 				if truncated {
-					return nil, true, nil
+					return ast.NullTerm(), true, nil
 				}
 			}
 
 			_, params, err := mime.ParseMediaType(headers["content-type"])
 			if err != nil {
-				return nil, false, err
+				return ast.NullTerm(), false, err
 			}
 
 			boundary, ok := params["boundary"]
 			if !ok {
-				return nil, false, nil
+				return ast.NullTerm(), false, nil
 			}
 
 			values := ast.NewObject()
@@ -427,7 +427,7 @@ func getParsedBody(headers map[string]string, body string) (*ast.Term, bool, err
 					break
 				}
 				if err != nil {
-					return nil, false, err
+					return ast.NullTerm(), false, err
 				}
 
 				name := p.FormName()
@@ -437,18 +437,18 @@ func getParsedBody(headers map[string]string, body string) (*ast.Term, bool, err
 
 				value, err := io.ReadAll(p)
 				if err != nil {
-					return nil, false, err
+					return ast.NullTerm(), false, err
 				}
 
 				switch {
 				case strings.Contains(p.Header.Get("Content-Type"), "application/json"):
 					var jsonValue interface{}
 					if err := util.UnmarshalJSON(value, &jsonValue); err != nil {
-						return nil, false, err
+						return ast.NullTerm(), false, err
 					}
 					jsonData, err := ast.InterfaceToValue(jsonValue)
 					if err != nil {
-						return nil, false, err
+						return ast.NullTerm(), false, err
 					}
 					values.Insert(ast.StringTerm(name),
 						ast.NewTerm(ast.NewArray(ast.NewTerm(jsonData))))

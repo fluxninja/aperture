@@ -2,8 +2,6 @@ package classifier_test
 
 import (
 	"context"
-	"encoding/json"
-	"strconv"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -485,30 +483,15 @@ func fl(s string) flowlabel.FlowLabelValue {
 }
 
 func attributesWithHeaders(headers object) ast.Value {
-	astHeaders := ast.NewObject()
-	for key, val := range headers {
-		switch item := val.(type) {
-		case string:
-			astHeaders.Insert(ast.StringTerm(key), ast.StringTerm(val.(string)))
-		case int64:
-			astHeaders.Insert(ast.StringTerm(key), ast.NumberTerm(json.Number(strconv.FormatInt(val.(int64), 10))))
-		default:
-			log.Warn().Msgf("Unknown type for header %s: %T", key, item)
-		}
-	}
-
-	http := ast.NewObject()
-	http.Insert(ast.StringTerm("headers"), ast.NewTerm(astHeaders))
-
-	request := ast.NewObject()
-	request.Insert(ast.StringTerm("http"), ast.NewTerm(http))
-
-	attributes := ast.NewObject()
-	attributes.Insert(ast.StringTerm("request"), ast.NewTerm(request))
-
-	input := ast.NewObject()
-	input.Insert(ast.StringTerm("attributes"), ast.NewTerm(attributes))
-	return input
+	input := object{
+		"attributes": object{
+			"request": object{
+				"http": object{
+					"headers": headers,
+				},
+			},
+		}}
+	return ast.MustInterfaceToValue(input)
 }
 
 func headerExtractor(headerName string) *policylangv1.Rule_Extractor {
