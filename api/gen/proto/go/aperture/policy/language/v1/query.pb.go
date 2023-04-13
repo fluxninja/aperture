@@ -100,10 +100,10 @@ type PromQL struct {
 	OutPorts *PromQL_Outs `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// Describes the Prometheus query to be run.
 	//
-	// :::caution
+	// :::note
 	//
-	// TODO we should describe how to construct the query, eg. how to employ the
-	// fluxmeters here or link to appropriate place in docs.
+	// The query must return a single value either as a scalar or as a vector with a single element.
+	// Flux Meter metrics can be referred inside this PromQL. Flux Meter defines histogram type of metrics in Prometheus. Thus one can refer to flux_meter_sum, flux_meter_count and flux_meter_bucket. The particular Flux Meter can be identified with the `flux_meter_name` label. There are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
 	//
 	// :::
 	QueryString string `protobuf:"bytes,2,opt,name=query_string,json=queryString,proto3" json:"query_string,omitempty"`

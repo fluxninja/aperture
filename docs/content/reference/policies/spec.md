@@ -2686,7 +2686,7 @@ concurrency](#scheduler-outs) that needs to be accepted.
 
 ### LoadShaper {#load-shaper}
 
-The _Load Shaper_ component shapes the load at a service by following a set of specified steps. The accept percentage begins at the target accept percentage defined in the first step, and subsequently transitions linearly from the previous step's target accept percentage to the next target accept percentage, over the duration of time specified for each step. Each step is defined by two parameters: the target accept percentage and the duration of time it takes for the signal to transition from the previous step's target accept percentage to the current step's target accept percentage. The _Load Generator_ thus produces a smooth and continuous traffic load that changes gradually over time, based on the specified steps.
+The _Load Shaper_ component shapes the load at a service by following a set of specified steps. The accept percentage begins at the target accept percentage defined in the first step, and subsequently transitions linearly from the previous step's target accept percentage to the next target accept percentage, over the duration of time specified for each step. Each step is defined by two parameters: the target accept percentage and the duration of time it takes for the signal to transition from the previous step's target accept percentage to the current step's target accept percentage. The \_Load Shaper thus produces a smooth and continuous traffic load that changes gradually over time, based on the specified steps.
 
 <dl>
 <dt>in_ports</dt>
@@ -3596,10 +3596,10 @@ Component that runs a Prometheus query periodically and returns the result as an
 
 (string) Describes the Prometheus query to be run.
 
-:::caution
+:::note
 
-TODO we should describe how to construct the query, eg. how to employ the
-fluxmeters here or link to appropriate place in docs.
+The query must return a single value either as a scalar or as a vector with a single element.
+Flux Meter metrics can be referred inside this PromQL. Flux Meter defines histogram type of metrics in Prometheus. Thus one can refer to flux_meter_sum, flux_meter_count and flux_meter_bucket. The particular Flux Meter can be identified with the `flux_meter_name` label. There are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
 
 :::
 

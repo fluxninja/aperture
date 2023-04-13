@@ -1923,7 +1923,7 @@ func (x *FlowRegulator) GetParameters() *FlowRegulator_Parameters {
 	return nil
 }
 
-// The _Load Shaper_ component shapes the load at a service by following a set of specified steps. The accept percentage begins at the target accept percentage defined in the first step, and subsequently transitions linearly from the previous step's target accept percentage to the next target accept percentage, over the duration of time specified for each step. Each step is defined by two parameters: the target accept percentage and the duration of time it takes for the signal to transition from the previous step's target accept percentage to the current step's target accept percentage. The _Load Generator_ thus produces a smooth and continuous traffic load that changes gradually over time, based on the specified steps.
+// The _Load Shaper_ component shapes the load at a service by following a set of specified steps. The accept percentage begins at the target accept percentage defined in the first step, and subsequently transitions linearly from the previous step's target accept percentage to the next target accept percentage, over the duration of time specified for each step. Each step is defined by two parameters: the target accept percentage and the duration of time it takes for the signal to transition from the previous step's target accept percentage to the current step's target accept percentage. The _Load Shaper thus produces a smooth and continuous traffic load that changes gradually over time, based on the specified steps.
 type LoadShaper struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3365,7 +3365,7 @@ type FlowRegulator_Parameters struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// _Flow Selector_ decides the service and flows at which the _Flow Regulator_  is applied.
+	// _Flow Selector_ decides the service and flows at which the _Flow Regulator_ is applied.
 	FlowSelector *FlowSelector `protobuf:"bytes,1,opt,name=flow_selector,json=flowSelector,proto3" json:"flow_selector,omitempty" validate:"required"` // @gotags: validate:"required"
 	// The flow label key for identifying sessions.
 	// If label key is specified, _Flow Regulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.

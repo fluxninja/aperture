@@ -1,0 +1,8 @@
+# Generated values file for policies/feature-rollout blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/feature-rollout
+
+# Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.
+# Type: aperture.spec.v1.LoadActuatorDynamicConfig
+# Required: True
+concurrency_controller: __REQUIRED_FIELD__
