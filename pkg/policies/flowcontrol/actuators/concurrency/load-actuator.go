@@ -19,7 +19,7 @@ import (
 	etcdwatcher "github.com/fluxninja/aperture/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/actuators/concurrency/scheduler"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/scheduler"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
 	"github.com/fluxninja/aperture/pkg/status"
 )

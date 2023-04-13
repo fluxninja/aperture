@@ -9,6 +9,9 @@ import (
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
+// Check if TokenBucketLoadMultiplier implements TokenManager interface.
+var _ TokenManager = &TokenBucketLoadMultiplier{}
+
 // TokenBucketLoadMultiplierMetrics holds metrics related to internals of TokenBucketLoadMultiplier.
 type TokenBucketLoadMultiplierMetrics struct {
 	LMGauge            prometheus.Gauge
@@ -86,7 +89,7 @@ func (tbls *TokenBucketLoadMultiplier) LoadMultiplier() float64 {
 }
 
 // PreprocessRequest preprocesses a request and makes decision whether to accept or reject the request.
-func (tbls *TokenBucketLoadMultiplier) PreprocessRequest(now time.Time, rContext RequestContext) bool {
+func (tbls *TokenBucketLoadMultiplier) PreprocessRequest(now time.Time, rContext Request) bool {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 
@@ -135,10 +138,17 @@ func (tbls *TokenBucketLoadMultiplier) TakeIfAvailable(now time.Time, tokens flo
 // Take takes tokens from the token bucket even if available tokens are less than asked.
 // If tokens are not available at the moment, it will return amount of wait time and checks
 // whether the operation was successful or not.
-func (tbls *TokenBucketLoadMultiplier) Take(now time.Time, timeout time.Duration, tokens float64) (time.Duration, bool) {
+func (tbls *TokenBucketLoadMultiplier) Take(now time.Time, tokens float64) (time.Duration, bool) {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
-	return tbls.tbb.take(now, timeout, tokens)
+	return tbls.tbb.take(now, tokens)
+}
+
+// Return returns tokens to the token bucket.
+func (tbls *TokenBucketLoadMultiplier) Return(tokens float64) {
+	tbls.lock.Lock()
+	defer tbls.lock.Unlock()
+	tbls.tbb.addTokens(tokens)
 }
 
 func (tbls *TokenBucketLoadMultiplier) setLMGauge(v float64) {
