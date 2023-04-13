@@ -7,12 +7,11 @@ keywords:
   - opentelemetry
   - collector
   - metrics
-sidebar_position: 1
 ---
 
-Before proceeding, ensure that you have [built][build] the Aperture Agent with
-the `rabbitmqreceiver` extension enabled, so that [rabbitmqreceiver][receiver]
-is available.
+Before proceeding, ensure that you have [built][build] Aperture Agent with the
+`rabbitmqreceiver` extension enabled, so that [rabbitmqreceiver][receiver] is
+available.
 
 You can configure [Custom metrics][custom-metrics] for RabbitMQ using the
 following configuration in the [Aperture Agent's

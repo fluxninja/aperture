@@ -46,9 +46,6 @@ go.work*
 ## IDEA ##
 .idea/
 
-## VSCode ###
-.vscode/
-
 ### Vim ###
 # Swap
 [._]*.s[a-v][a-z]
@@ -231,6 +228,13 @@ playground/tilt_local.json
 !cmd/aperturectl/cmd/build
 !docs/content/reference/aperturectl/build
 
+
 # ignore .github/styles
 .github/styles
 !.github/styles/Vocab/FluxNinja
+# Ignore everything in .vscode
+.vscode/*
+
+# Do not ignore ltex dictionaries and false positives
+!.vscode/ltex.dictionary.en-US.txt
+!.vscode/ltex.hiddenFalsePositives.en-US.txt
