@@ -421,7 +421,7 @@ func manageControllerCertificateSecret(values map[string]interface{}, releaseNam
 
 	cm := &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:        fmt.Sprintf("%s-controller-client-cert", releaseName),
+			Name:        fmt.Sprintf("%s-client-cert", releaseName),
 			Namespace:   namespace,
 			Labels:      controllers.CommonLabels(map[string]string{}, releaseName, controllers.ControllerServiceName),
 			Annotations: map[string]string{},
@@ -433,7 +433,7 @@ func manageControllerCertificateSecret(values map[string]interface{}, releaseNam
 	cm.Labels["app.kubernetes.io/managed-by"] = aperturectl
 
 	if generateCert {
-		createNew, err := CheckCertificate(secretName, namespace, certFileName)
+		createNew, err := CheckCertificate(secret, cm, certFileName, keyFileName)
 		if err != nil {
 			return nil, err
 		}
@@ -475,15 +475,17 @@ func manageControllerCertificateSecret(values map[string]interface{}, releaseNam
 }
 
 // CheckCertificate checks if the certificate in the secret is valid.
-func CheckCertificate(name, namespace, certFileName string) (bool, error) {
+func CheckCertificate(secret *corev1.Secret, cm *corev1.ConfigMap, certFileName, keyFileName string) (bool, error) {
 	existingSecret := &corev1.Secret{}
+	name := secret.GetName()
 	err := kubeClient.Get(context.Background(), types.NamespacedName{Name: name, Namespace: namespace}, existingSecret)
 	if apierrors.IsNotFound(err) {
 		return true, nil
 	} else {
 		existingCert, ok := existingSecret.Data[certFileName]
 		if !ok {
-			return false, fmt.Errorf("failed to create Aperture Controller Certificate secret as a secret named '%s' already exists", name)
+			return false, fmt.Errorf(
+				"failed to create Aperture Controller Certificate secret as a secret named '%s' already exists without '%s' certificate key", certFileName, name)
 		}
 
 		block, _ := pem.Decode(existingCert)
@@ -493,6 +495,15 @@ func CheckCertificate(name, namespace, certFileName string) (bool, error) {
 		}
 
 		if time.Now().After(cert.NotAfter) {
+			return true, nil
+		}
+
+		existingCM := &corev1.ConfigMap{}
+		name = cm.GetName()
+		err = kubeClient.Get(context.Background(), types.NamespacedName{Name: name, Namespace: namespace}, existingCM)
+		if apierrors.IsNotFound(err) {
+			secret.Data[certFileName] = existingCert
+			secret.Data[keyFileName] = existingSecret.Data[keyFileName]
 			return true, nil
 		}
 	}
