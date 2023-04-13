@@ -885,7 +885,7 @@ message AIMDConcurrencyController {
   // Configuration for embedded alerter.
   Alerter.Parameters alerter_parameters = 8;
 
-  // Configuration key for load actuation.
+  // Dynamic configuration key for load actuation.
   string dynamic_config_key = 9;
 
   // Default configuration.
@@ -908,12 +908,6 @@ message FlowRegulator {
     // If label key is specified, _Flow Regulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
     // If label key is not specified, _Flow Regulator_ acts as a stateless filter. Percentage of flows are selected randomly.
     string label_key = 2;
-
-    // Configuration key for DynamicConfig.
-    string dynamic_config_key = 3;
-
-    // Default configuration.
-    DynamicConfig default_config = 4;
   }
 
   message Ins {
@@ -926,6 +920,12 @@ message FlowRegulator {
 
   // Parameters for the _Flow Regulator_.
   Parameters parameters = 2;
+
+  // Configuration key for DynamicConfig.
+  string dynamic_config_key = 3;
+
+  // Default configuration.
+  DynamicConfig default_config = 4;
 }
 
 // The _Load Shaper_ component shapes the load at a service by following a set of specified steps. The accept percentage begins at the target accept percentage defined in the first step, and subsequently transitions linearly from the previous step's target accept percentage to the next target accept percentage, over the duration of time specified for each step. Each step is defined by two parameters: the target accept percentage and the duration of time it takes for the signal to transition from the previous step's target accept percentage to the current step's target accept percentage. The _Load Shaper thus produces a smooth and continuous traffic load that changes gradually over time, based on the specified steps.
@@ -968,6 +968,12 @@ message LoadShaper {
   Outs out_ports = 2;
 
   Parameters parameters = 3; // @gotags: validate:"required"
+
+  // Dynamic configuration key for flow regulator.
+  string dynamic_config_key = 9;
+
+  // Default configuration.
+  FlowRegulator.DynamicConfig default_config = 10;
 }
 
 // _LoadShaperSeries_ is a component that applies a series of _Load Shapers_ in order.

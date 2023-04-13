@@ -1,4 +1,4 @@
-blueprint: Latency AIMD Concurrency Limiting Policy
+blueprint: Feature Rollout Policy
 sources:
-  dashboard: policies/latency-aimd-concurrency-limiting/dashboard.libsonnet
-  policy: policies/latency-aimd-concurrency-limiting/policy.libsonnet
+  dashboard: policies/feature-rollout/dashboard.libsonnet
+  policy: policies/feature-rollout/policy.libsonnet

@@ -55,7 +55,7 @@ string"
     type="
 Object (rollout_policy)"
     reference="#rollout-policy"
-    value="{'components': [], 'drivers': {'average_latency_drivers': [{'backward': {'threshold': '__REQUIRED_FIELD__'}, 'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'forward': {'threshold': '__REQUIRED_FIELD__'}, 'reset': {'threshold': '__REQUIRED_FIELD__'}}], 'ema_latency_drivers': [{'backward': {'latency_tolerance_multiplier': 1.05}, 'ema': {'ema_window': '1500s', 'warmup_window': '60s'}, 'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'forward': {'latency_tolerance_multiplier': 1.05}, 'reset': {'latency_tolerance_multiplier': 1.25}}], 'percentile_latency_drivers': [{'backward': {'threshold': '__REQUIRED_FIELD__'}, 'flux_meter': {'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'static_buckets': {'buckets': [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]}}, 'forward': {'threshold': '__REQUIRED_FIELD__'}, 'percentile': '__REQUIRED_FIELD__', 'reset': {'threshold': '__REQUIRED_FIELD__'}}], 'promql_drivers': [{'backward': {'operator': '__REQUIRED_FIELD__', 'threshold': '__REQUIRED_FIELD__'}, 'forward': {'operator': '__REQUIRED_FIELD__', 'threshold': '__REQUIRED_FIELD__'}, 'query_string': '__REQUIRED_FIELD__', 'reset': {'operator': '__REQUIRED_FIELD__', 'threshold': '__REQUIRED_FIELD__'}}]}, 'evaluation_interval': '1s', 'load_shaper': {'flow_regulator_parameters': {'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'label_key': ''}, 'steps': [{'duration': '__REQUIRED_FIELD__', 'target_accept_percentage': '__REQUIRED_FIELD__'}]}, 'resources': {'flow_control': {'classifiers': [], 'flux_meters': {}}}}"
+    value="{'components': [], 'drivers': {'average_latency_drivers': [{'backward': {'threshold': '__REQUIRED_FIELD__'}, 'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'forward': {'threshold': '__REQUIRED_FIELD__'}, 'reset': {'threshold': '__REQUIRED_FIELD__'}}], 'ema_latency_drivers': [{'backward': {'latency_tolerance_multiplier': 1.05}, 'ema': {'ema_window': '1500s', 'warmup_window': '60s'}, 'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'forward': {'latency_tolerance_multiplier': 1.05}, 'reset': {'latency_tolerance_multiplier': 1.25}}], 'percentile_latency_drivers': [{'backward': {'threshold': '__REQUIRED_FIELD__'}, 'flux_meter': {'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'static_buckets': {'buckets': [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]}}, 'forward': {'threshold': '__REQUIRED_FIELD__'}, 'percentile': 95, 'reset': {'threshold': '__REQUIRED_FIELD__'}}], 'promql_drivers': [{'backward': {'operator': '__REQUIRED_FIELD__', 'threshold': '__REQUIRED_FIELD__'}, 'forward': {'operator': '__REQUIRED_FIELD__', 'threshold': '__REQUIRED_FIELD__'}, 'query_string': '__REQUIRED_FIELD__', 'reset': {'operator': '__REQUIRED_FIELD__', 'threshold': '__REQUIRED_FIELD__'}}]}, 'evaluation_interval': '1s', 'load_shaper': {'flow_regulator_parameters': {'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'label_key': ''}, 'steps': [{'duration': '__REQUIRED_FIELD__', 'target_accept_percentage': '__REQUIRED_FIELD__'}]}, 'resources': {'flow_control': {'classifiers': [], 'flux_meters': {}}}}"
     description='Parameters for the Feature Rollout policy.' />
 
 ---
@@ -231,7 +231,7 @@ Object (aperture.spec.v1.FluxMeter)"
     type="
 Number (double)"
     reference=""
-    value="__REQUIRED_FIELD__"
+    value="95"
     description='The percentile to be used for latency measurement.' />
 
 ##### forward {#percentile-latency-driver-forward}
@@ -382,7 +382,7 @@ Object (average_latency_driver)"
 Array of
 Object (percentile_latency_driver)"
     reference="#percentile-latency-driver"
-    value="[{'backward': {'threshold': '__REQUIRED_FIELD__'}, 'flux_meter': {'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'static_buckets': {'buckets': [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]}}, 'forward': {'threshold': '__REQUIRED_FIELD__'}, 'percentile': '__REQUIRED_FIELD__', 'reset': {'threshold': '__REQUIRED_FIELD__'}}]"
+    value="[{'backward': {'threshold': '__REQUIRED_FIELD__'}, 'flux_meter': {'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'static_buckets': {'buckets': [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]}}, 'forward': {'threshold': '__REQUIRED_FIELD__'}, 'percentile': 95, 'reset': {'threshold': '__REQUIRED_FIELD__'}}]"
     description='List of drivers that compare percentile latency against forward, backward and reset thresholds.' />
 
 <a id="rollout-policy-drivers-ema-latency-drivers"></a> <ParameterDescription
@@ -408,12 +408,12 @@ at runtime, without reloading the policy.
 
 ### Parameters
 
-<a id="concurrency-controller"></a> <ParameterDescription
-    name="concurrency_controller"
+<a id="load-shaper"></a> <ParameterDescription
+    name="load_shaper"
     type="
-Object (aperture.spec.v1.LoadActuatorDynamicConfig)"
-    reference="../../spec#load-actuator-dynamic-config"
+Object (aperture.spec.v1.FlowRegulatorDynamicConfig)"
+    reference="../../spec#flow-regulator-dynamic-config"
     value="__REQUIRED_FIELD__"
-    description='Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.' />
+    description='Default configuration for flow regulator that can be updated at the runtime without shutting down the policy.' />
 
 ---

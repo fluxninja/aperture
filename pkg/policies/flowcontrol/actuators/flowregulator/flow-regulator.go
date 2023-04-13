@@ -258,7 +258,7 @@ func (fr *flowRegulator) setup(lifecycle fx.Lifecycle) error {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			var err error
-			fr.updateDynamicConfig(fr.proto.Parameters.GetDefaultConfig())
+			fr.updateDynamicConfig(fr.proto.GetDefaultConfig())
 
 			// add decisions notifier
 			err = fr.factory.decisionsWatcher.AddKeyNotifier(decisionNotifier)

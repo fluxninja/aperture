@@ -11,7 +11,7 @@ definitions:
                 $ref: '#/definitions/LoadActuatorDynamicConfig'
                 description: Default configuration.
             dynamic_config_key:
-                description: Configuration key for load actuation.
+                description: Dynamic configuration key for load actuation.
                 type: string
             flow_selector:
                 $ref: '#/definitions/FlowSelector'
@@ -1508,6 +1508,12 @@ definitions:
     FlowRegulator:
         description: _Flow Regulator_ is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
         properties:
+            default_config:
+                $ref: '#/definitions/FlowRegulatorDynamicConfig'
+                description: Default configuration.
+            dynamic_config_key:
+                description: Configuration key for DynamicConfig.
+                type: string
             in_ports:
                 $ref: '#/definitions/FlowRegulatorIns'
                 description: Input ports for the _Flow Regulator_.
@@ -1532,12 +1538,6 @@ definitions:
         type: object
     FlowRegulatorParameters:
         properties:
-            default_config:
-                $ref: '#/definitions/FlowRegulatorDynamicConfig'
-                description: Default configuration.
-            dynamic_config_key:
-                description: Configuration key for DynamicConfig.
-                type: string
             flow_selector:
                 $ref: '#/definitions/FlowSelector'
                 description: |+
@@ -2413,6 +2413,12 @@ definitions:
     LoadShaper:
         description: 'The _Load Shaper_ component shapes the load at a service by following a set of specified steps. The accept percentage begins at the target accept percentage defined in the first step, and subsequently transitions linearly from the previous step''s target accept percentage to the next target accept percentage, over the duration of time specified for each step. Each step is defined by two parameters: the target accept percentage and the duration of time it takes for the signal to transition from the previous step''s target accept percentage to the current step''s target accept percentage. The _Load Shaper thus produces a smooth and continuous traffic load that changes gradually over time, based on the specified steps.'
         properties:
+            default_config:
+                $ref: '#/definitions/FlowRegulatorDynamicConfig'
+                description: Default configuration.
+            dynamic_config_key:
+                description: Dynamic configuration key for flow regulator.
+                type: string
             in_ports:
                 $ref: '#/definitions/LoadShaperIns'
             out_ports:

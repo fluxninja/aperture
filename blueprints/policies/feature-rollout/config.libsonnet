@@ -52,7 +52,7 @@ local percentile_latency_driver_defaults = {
   reset: {
     threshold: '__REQUIRED_FIELD__',
   },
-  percentile: '__REQUIRED_FIELD__',
+  percentile: 95,
 };
 
 local ema_latency_driver_defaults = {

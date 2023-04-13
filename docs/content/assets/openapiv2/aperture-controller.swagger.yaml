@@ -104,7 +104,7 @@ definitions:
         description: Default configuration.
         $ref: '#/definitions/LoadActuatorDynamicConfig'
       dynamic_config_key:
-        description: Configuration key for load actuation.
+        description: Dynamic configuration key for load actuation.
         type: string
       flow_selector:
         description: |+
@@ -1299,6 +1299,12 @@ definitions:
       sessions.
     type: object
     properties:
+      default_config:
+        description: Default configuration.
+        $ref: '#/definitions/FlowRegulatorDynamicConfig'
+      dynamic_config_key:
+        description: Configuration key for DynamicConfig.
+        type: string
       in_ports:
         description: Input ports for the _Flow Regulator_.
         $ref: '#/definitions/FlowRegulatorIns'
@@ -1324,12 +1330,6 @@ definitions:
   FlowRegulatorParameters:
     type: object
     properties:
-      default_config:
-        description: Default configuration.
-        $ref: '#/definitions/FlowRegulatorDynamicConfig'
-      dynamic_config_key:
-        description: Configuration key for DynamicConfig.
-        type: string
       flow_selector:
         description: |+
           _Flow Selector_ decides the service and flows at which the _Flow Regulator_ is applied.
@@ -2084,6 +2084,12 @@ definitions:
       over time, based on the specified steps.'
     type: object
     properties:
+      default_config:
+        description: Default configuration.
+        $ref: '#/definitions/FlowRegulatorDynamicConfig'
+      dynamic_config_key:
+        description: Dynamic configuration key for flow regulator.
+        type: string
       in_ports:
         $ref: '#/definitions/LoadShaperIns'
       out_ports:

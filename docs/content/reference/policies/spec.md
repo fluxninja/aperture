@@ -40,7 +40,7 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dt>dynamic_config_key</dt>
 <dd>
 
-(string) Configuration key for load actuation.
+(string) Dynamic configuration key for load actuation.
 
 </dd>
 <dt>flow_selector</dt>
@@ -1640,6 +1640,18 @@ control point.
 _Flow Regulator_ is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
 
 <dl>
+<dt>default_config</dt>
+<dd>
+
+([FlowRegulatorDynamicConfig](#flow-regulator-dynamic-config)) Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Configuration key for DynamicConfig.
+
+</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -1687,18 +1699,6 @@ Dynamic Configuration for _Flow Regulator_
 ### FlowRegulatorParameters {#flow-regulator-parameters}
 
 <dl>
-<dt>default_config</dt>
-<dd>
-
-([FlowRegulatorDynamicConfig](#flow-regulator-dynamic-config)) Default configuration.
-
-</dd>
-<dt>dynamic_config_key</dt>
-<dd>
-
-(string) Configuration key for DynamicConfig.
-
-</dd>
 <dt>flow_selector</dt>
 <dd>
 
@@ -2689,6 +2689,18 @@ concurrency](#scheduler-outs) that needs to be accepted.
 The _Load Shaper_ component shapes the load at a service by following a set of specified steps. The accept percentage begins at the target accept percentage defined in the first step, and subsequently transitions linearly from the previous step's target accept percentage to the next target accept percentage, over the duration of time specified for each step. Each step is defined by two parameters: the target accept percentage and the duration of time it takes for the signal to transition from the previous step's target accept percentage to the current step's target accept percentage. The \_Load Shaper thus produces a smooth and continuous traffic load that changes gradually over time, based on the specified steps.
 
 <dl>
+<dt>default_config</dt>
+<dd>
+
+([FlowRegulatorDynamicConfig](#flow-regulator-dynamic-config)) Default configuration.
+
+</dd>
+<dt>dynamic_config_key</dt>
+<dd>
+
+(string) Dynamic configuration key for flow regulator.
+
+</dd>
 <dt>in_ports</dt>
 <dd>
 

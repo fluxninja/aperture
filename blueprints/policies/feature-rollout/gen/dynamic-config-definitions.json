@@ -3,13 +3,13 @@
   "type": "object",
   "title": "policies/feature-rollout blueprint",
   "additionalProperties": false,
-  "required": ["concurrency_controller"],
+  "required": ["load_shaper"],
   "properties": {
-    "concurrency_controller": {
-      "description": "Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.",
+    "load_shaper": {
+      "description": "Default configuration for flow regulator that can be updated at the runtime without shutting down the policy.",
       "default": "__REQUIRED_FIELD__",
       "type": "object",
-      "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/LoadActuatorDynamicConfig"
+      "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/FlowRegulatorDynamicConfig"
     }
   },
   "$defs": null

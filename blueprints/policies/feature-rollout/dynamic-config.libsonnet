@@ -1,6 +1,6 @@
 {
   /**
-  * @param (concurrency_controller: aperture.spec.v1.LoadActuatorDynamicConfig required) Default configuration for concurrency controller that can be updated at the runtime without shutting down the policy.
+  * @param (load_shaper: aperture.spec.v1.FlowRegulatorDynamicConfig required) Default configuration for flow regulator that can be updated at the runtime without shutting down the policy.
   */
-  concurrency_controller: '__REQUIRED_FIELD__',
+  load_shaper: '__REQUIRED_FIELD__',
 }

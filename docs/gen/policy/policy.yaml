@@ -38,7 +38,7 @@ definitions:
         x-order: 1
         $ref: '#/definitions/LoadActuatorDynamicConfig'
       dynamic_config_key:
-        description: Configuration key for load actuation.
+        description: Dynamic configuration key for load actuation.
         type: string
         x-order: 2
       flow_selector:
@@ -1381,13 +1381,21 @@ definitions:
       sessions.
     type: object
     properties:
+      default_config:
+        description: Default configuration.
+        x-order: 0
+        $ref: '#/definitions/FlowRegulatorDynamicConfig'
+      dynamic_config_key:
+        description: Configuration key for DynamicConfig.
+        type: string
+        x-order: 1
       in_ports:
         description: Input ports for the _Flow Regulator_.
-        x-order: 0
+        x-order: 2
         $ref: '#/definitions/FlowRegulatorIns'
       parameters:
         description: Parameters for the _Flow Regulator_.
-        x-order: 1
+        x-order: 3
         $ref: '#/definitions/FlowRegulatorParameters'
   FlowRegulatorDynamicConfig:
     type: object
@@ -1410,20 +1418,12 @@ definitions:
   FlowRegulatorParameters:
     type: object
     properties:
-      default_config:
-        description: Default configuration.
-        x-order: 0
-        $ref: '#/definitions/FlowRegulatorDynamicConfig'
-      dynamic_config_key:
-        description: Configuration key for DynamicConfig.
-        type: string
-        x-order: 1
       flow_selector:
         description: |+
           _Flow Selector_ decides the service and flows at which the _Flow Regulator_ is applied.
 
         x-go-tag-validate: required
-        x-order: 2
+        x-order: 0
         $ref: '#/definitions/FlowSelector'
       label_key:
         description: |-
@@ -1431,7 +1431,7 @@ definitions:
           If label key is specified, _Flow Regulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.
           If label key is not specified, _Flow Regulator_ acts as a stateless filter. Percentage of flows are selected randomly.
         type: string
-        x-order: 3
+        x-order: 1
   FlowSelector:
     description: |-
       :::info
@@ -2230,15 +2230,23 @@ definitions:
       over time, based on the specified steps.'
     type: object
     properties:
-      in_ports:
+      default_config:
+        description: Default configuration.
         x-order: 0
+        $ref: '#/definitions/FlowRegulatorDynamicConfig'
+      dynamic_config_key:
+        description: Dynamic configuration key for flow regulator.
+        type: string
+        x-order: 1
+      in_ports:
+        x-order: 2
         $ref: '#/definitions/LoadShaperIns'
       out_ports:
-        x-order: 1
+        x-order: 3
         $ref: '#/definitions/LoadShaperOuts'
       parameters:
         x-go-tag-validate: required
-        x-order: 2
+        x-order: 4
         $ref: '#/definitions/LoadShaperParameters'
   LoadShaperIns:
     description: Inputs for the _Load Shaper_ component.

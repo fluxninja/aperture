@@ -1,9 +1,6 @@
 local spec = import '../../spec.libsonnet';
 local config = import './config.libsonnet';
 
-
-local myList = ['a', 'b', 'c'];
-
 function(cfg) {
   local params = config.common + config.policy + cfg,
 
@@ -401,6 +398,7 @@ function(cfg) {
         reset: spec.v1.Port.withSignalName('RESET'),
       })
       + spec.v1.LoadShaper.withParameters(params.load_shaper)
+      + spec.v1.LoadShaper.withDynamicConfigKey('load_shaper'),
     ),
   ),
 

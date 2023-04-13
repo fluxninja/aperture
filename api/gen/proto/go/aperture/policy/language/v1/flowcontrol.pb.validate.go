@@ -3616,6 +3616,37 @@ func (m *FlowRegulator) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for DynamicConfigKey
+
+	if all {
+		switch v := interface{}(m.GetDefaultConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, FlowRegulatorValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, FlowRegulatorValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return FlowRegulatorValidationError{
+				field:  "DefaultConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return FlowRegulatorMultiError(errors)
 	}
@@ -3797,6 +3828,37 @@ func (m *LoadShaper) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return LoadShaperValidationError{
 				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for DynamicConfigKey
+
+	if all {
+		switch v := interface{}(m.GetDefaultConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadShaperValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadShaperValidationError{
+					field:  "DefaultConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadShaperValidationError{
+				field:  "DefaultConfig",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -6737,37 +6799,6 @@ func (m *FlowRegulator_Parameters) validate(all bool) error {
 	}
 
 	// no validation rules for LabelKey
-
-	// no validation rules for DynamicConfigKey
-
-	if all {
-		switch v := interface{}(m.GetDefaultConfig()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, FlowRegulator_ParametersValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, FlowRegulator_ParametersValidationError{
-					field:  "DefaultConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return FlowRegulator_ParametersValidationError{
-				field:  "DefaultConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
 
 	if len(errors) > 0 {
 		return FlowRegulator_ParametersMultiError(errors)

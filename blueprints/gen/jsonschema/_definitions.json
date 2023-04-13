@@ -14,7 +14,7 @@
           "x-order": 1
         },
         "dynamic_config_key": {
-          "description": "Configuration key for load actuation.",
+          "description": "Dynamic configuration key for load actuation.",
           "type": "string",
           "x-order": 2
         },
@@ -1221,15 +1221,25 @@
     "FlowRegulator": {
       "description": "_Flow Regulator_ is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.",
       "properties": {
+        "default_config": {
+          "$ref": "#/definitions/FlowRegulatorDynamicConfig",
+          "description": "Default configuration.",
+          "x-order": 0
+        },
+        "dynamic_config_key": {
+          "description": "Configuration key for DynamicConfig.",
+          "type": "string",
+          "x-order": 1
+        },
         "in_ports": {
           "$ref": "#/definitions/FlowRegulatorIns",
           "description": "Input ports for the _Flow Regulator_.",
-          "x-order": 0
+          "x-order": 2
         },
         "parameters": {
           "$ref": "#/definitions/FlowRegulatorParameters",
           "description": "Parameters for the _Flow Regulator_.",
-          "x-order": 1
+          "x-order": 3
         }
       },
       "type": "object",
@@ -1263,26 +1273,16 @@
     },
     "FlowRegulatorParameters": {
       "properties": {
-        "default_config": {
-          "$ref": "#/definitions/FlowRegulatorDynamicConfig",
-          "description": "Default configuration.",
-          "x-order": 0
-        },
-        "dynamic_config_key": {
-          "description": "Configuration key for DynamicConfig.",
-          "type": "string",
-          "x-order": 1
-        },
         "flow_selector": {
           "$ref": "#/definitions/FlowSelector",
           "description": "_Flow Selector_ decides the service and flows at which the _Flow Regulator_ is applied.\n\n",
           "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-order": 0
         },
         "label_key": {
           "description": "The flow label key for identifying sessions.\nIf label key is specified, _Flow Regulator_ acts as a sticky filter. The series of flows with the same value of label key get the same decision as long as the accept_percentage is same or higher.\nIf label key is not specified, _Flow Regulator_ acts as a stateless filter. Percentage of flows are selected randomly.",
           "type": "string",
-          "x-order": 3
+          "x-order": 1
         }
       },
       "type": "object",
@@ -2007,18 +2007,28 @@
     "LoadShaper": {
       "description": "The _Load Shaper_ component shapes the load at a service by following a set of specified steps. The accept percentage begins at the target accept percentage defined in the first step, and subsequently transitions linearly from the previous step's target accept percentage to the next target accept percentage, over the duration of time specified for each step. Each step is defined by two parameters: the target accept percentage and the duration of time it takes for the signal to transition from the previous step's target accept percentage to the current step's target accept percentage. The _Load Shaper thus produces a smooth and continuous traffic load that changes gradually over time, based on the specified steps.",
       "properties": {
+        "default_config": {
+          "$ref": "#/definitions/FlowRegulatorDynamicConfig",
+          "description": "Default configuration.",
+          "x-order": 0
+        },
+        "dynamic_config_key": {
+          "description": "Dynamic configuration key for flow regulator.",
+          "type": "string",
+          "x-order": 1
+        },
         "in_ports": {
           "$ref": "#/definitions/LoadShaperIns",
-          "x-order": 0
+          "x-order": 2
         },
         "out_ports": {
           "$ref": "#/definitions/LoadShaperOuts",
-          "x-order": 1
+          "x-order": 3
         },
         "parameters": {
           "$ref": "#/definitions/LoadShaperParameters",
           "x-go-tag-validate": "required",
-          "x-order": 2
+          "x-order": 4
         }
       },
       "type": "object",

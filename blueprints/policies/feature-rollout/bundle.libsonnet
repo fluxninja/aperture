@@ -5,24 +5,6 @@ local dashboard = blueprint.dashboard;
 local config = blueprint.config;
 
 function(params) {
-  // validate params within this function
-  // check whether common.policy_name is set
-  // check whether policy.flux_meter is set
-  // check whether policy.concurrency_controller.flow_selector is set
-  validate:: if !std.objectHas(params, 'common') then
-    error 'must provide common object'
-  else if !std.objectHas(params.common, 'policy_name') then
-    error 'must provide common.policy_name'
-  else if !std.objectHas(params, 'policy') then
-    error 'must provide policy object'
-  else if !std.objectHas(params.policy, 'flux_meter') then
-    error 'must provide policy.flux_meter'
-  else if !std.objectHas(params.policy, 'concurrency_controller') then
-    error 'must provide policy.concurrency_controller'
-  else if !std.objectHas(params.policy.concurrency_controller, 'flow_selector') then
-    error 'must provide policy.concurrency_controller.flow_selector'
-  else true,
-
   // make sure param object contains fields that are in config
   local extra_keys = std.setDiff(std.objectFields(params), std.objectFields(config)),
   assert std.length(extra_keys) == 0 : 'Unknown keys in params: ' + extra_keys,

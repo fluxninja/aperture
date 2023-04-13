@@ -59,7 +59,7 @@ policy:
                 },
             },
           "forward": { "threshold": "__REQUIRED_FIELD__" },
-          "percentile": "__REQUIRED_FIELD__",
+          "percentile": 95,
           "reset": { "threshold": "__REQUIRED_FIELD__" },
         },
       ]

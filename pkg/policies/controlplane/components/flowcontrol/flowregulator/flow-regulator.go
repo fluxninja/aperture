@@ -198,7 +198,7 @@ func (regulatorSync *flowRegulatorSync) DynamicConfigUpdate(event notifiers.Even
 		logger.Info().Msg("Flow Regulator dynamic config updated")
 	}
 	dynamicConfig := &policylangv1.FlowRegulator_DynamicConfig{}
-	key := regulatorSync.flowRegulatorProto.Parameters.GetDynamicConfigKey()
+	key := regulatorSync.flowRegulatorProto.GetDynamicConfigKey()
 	// read dynamic config
 	if unmarshaller.IsSet(key) {
 		if err := unmarshaller.UnmarshalKey(key, dynamicConfig); err != nil {
@@ -207,6 +207,6 @@ func (regulatorSync *flowRegulatorSync) DynamicConfigUpdate(event notifiers.Even
 		}
 		publishDynamicConfig(dynamicConfig)
 	} else {
-		publishDynamicConfig(regulatorSync.flowRegulatorProto.Parameters.GetDefaultConfig())
+		publishDynamicConfig(regulatorSync.flowRegulatorProto.GetDefaultConfig())
 	}
 }

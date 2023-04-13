@@ -91,7 +91,7 @@
               "forward": {
                 "threshold": "__REQUIRED_FIELD__"
               },
-              "percentile": "__REQUIRED_FIELD__",
+              "percentile": 95,
               "reset": {
                 "threshold": "__REQUIRED_FIELD__"
               }
@@ -364,7 +364,7 @@
         },
         "percentile": {
           "description": "The percentile to be used for latency measurement.",
-          "default": "__REQUIRED_FIELD__",
+          "default": 95,
           "type": "number",
           "format": "double"
         }
@@ -572,7 +572,7 @@
                   "forward": {
                     "threshold": "__REQUIRED_FIELD__"
                   },
-                  "percentile": "__REQUIRED_FIELD__",
+                  "percentile": 95,
                   "reset": {
                     "threshold": "__REQUIRED_FIELD__"
                   }
