@@ -98,7 +98,7 @@ definitions:
     type: object
     properties:
       alerter_parameters:
-        description: Configuration for embedded Alerter.
+        description: Configuration for embedded alerter.
         $ref: '#/definitions/AlerterParameters'
       default_config:
         description: Default configuration.
@@ -192,13 +192,13 @@ definitions:
       from: "source.address # or destination.address"
       ```
     type: object
-    title: Display an [Address][ext-authz-address] as a single string, for example, `<ip>:<port>`
+    title: Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
     required:
     - from
     properties:
       from:
         description: |+
-          Attribute path pointing to some string - For example: "source.address".
+          Attribute path pointing to some string - eg. "source.address".
 
         type: string
         x-go-tag-validate: required
@@ -222,8 +222,8 @@ definitions:
           0, Alerter generates an alert.
         $ref: '#/definitions/InPort'
   AlerterParameters:
-    description: Alerter Parameters is a common config for separate Alerter components
-      and Alerters embedded in other components.
+    description: Alerter Parameters is a common config for separate alerter components
+      and alerters embedded in other components.
     type: object
     required:
     - alert_name
@@ -276,7 +276,7 @@ definitions:
         :::note
 
         Treating invalid inputs as "unknowns" has a consequence that the result
-        might end up being valid even when some inputs are invalid. For Example, `unknown && false == false`,
+        might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,
         because the result would end up false no matter if
         first signal was true or false. On the other hand, `unknown && true == unknown`.
 
@@ -431,7 +431,7 @@ definitions:
         description: Output ports for the _AutoScaler_.
         $ref: '#/definitions/AutoScalerOuts'
       scale_in_alerter_parameters:
-        description: Configuration for scale-in Alerter.
+        description: Configuration for scale-in alerter.
         $ref: '#/definitions/AlerterParameters'
       scale_in_controllers:
         description: List of _Controllers_ for scaling in.
@@ -447,7 +447,7 @@ definitions:
         default: 120s
         x-go-tag-default: 120s
       scale_out_alerter_parameters:
-        description: Configuration for scale-out Alerter.
+        description: Configuration for scale-out alerter.
         $ref: '#/definitions/AlerterParameters'
       scale_out_controllers:
         description: List of _Controllers_ for scaling out.
@@ -499,12 +499,13 @@ definitions:
       Signals are floating-point values.
 
       A signal can also have a special **Invalid** value. It's usually used to
-      communicate that signal doesn't have a meaningful value at the moment, for example:
+      communicate that signal doesn't have a meaningful value at the moment, eg.
       [PromQL](#prom-q-l) emits such a value if it cannot execute a query.
       Components know when their input signals are invalid and can act
       accordingly. They can either propagate the invalidness, by making their
-      output itself invalid (like [ArithmeticCombinator](#arithmetic-combinator)) or use some different
-      logic, for example, [Extrapolator](#extrapolator). Refer to a component's
+      output itself invalid (like eg.
+      [ArithmeticCombinator](#arithmetic-combinator)) or use some different
+      logic, like eg. [Extrapolator](#extrapolator). Refer to a component's
       docs on how exactly it handles invalid inputs.
 
       :::
@@ -1575,16 +1576,16 @@ definitions:
           of the gradient (see the [main description](#gradient-controller) for
           exact equation). Good intuition for this parameter is "What should the
           Gradient Controller do to the control variable when signal is too high",
-          for example:
+          eg.:
           * $\text{slope} = 1$: when signal is too high, increase control variable,
           * $\text{slope} = -1$: when signal is too high, decrease control variable,
           * $\text{slope} = -0.5$: when signal is too high, decrease control variable slowly.
 
           The sign of slope depends on correlation between the signal and control variable:
           * Use $\text{slope} < 0$ if signal and control variable are _positively_
-          correlated (for example, Per-pod CPU usage and total concurrency).
+          correlated (eg. Per-pod CPU usage and total concurrency).
           * Use $\text{slope} > 0$ if signal and control variable are _negatively_
-          correlated (for example, Per-pod CPU usage and number of pods).
+          correlated (eg. Per-pod CPU usage and number of pods).
 
           :::note
 
@@ -1601,7 +1602,7 @@ definitions:
           Smaller magnitudes of slope will make the controller adjust the control
           variable more slowly.
 
-          We recommend setting $|\text{slope}| < 1$ (for example, $\pm0.8$).
+          We recommend setting $|\text{slope}| < 1$ (eg. $\pm0.8$).
           If you experience overshooting, consider lowering the magnitude even more.
           Values of $|\text{slope}| > 1$ are not recommended.
 
@@ -1805,7 +1806,7 @@ definitions:
     properties:
       from:
         description: |+
-          Attribute path pointing to some strings - For example, "request.http.body".
+          Attribute path pointing to some strings - eg. "request.http.body".
 
         type: string
         x-go-tag-validate: required
@@ -1814,7 +1815,7 @@ definitions:
           Json pointer represents a parsed json pointer which allows to select a specified field from the json payload.
 
           Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
-          for example, `/foo/bar`. If the pointer points into an object, it'd be stringified.
+          eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
         type: string
   JWTExtractor:
     description: |-
@@ -1844,7 +1845,7 @@ definitions:
           Json pointer allowing to select a specified field from the json payload.
 
           Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
-          for example: `/foo/bar`. If the pointer points into an object, it'd be stringified.
+          eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
         type: string
   K8sLabelMatcherRequirement:
     description: Label selector requirement which is a selector that contains values,
@@ -2043,7 +2044,7 @@ definitions:
         description: The expression negates the result of subexpression.
         $ref: '#/definitions/MatchExpression'
   MatchExpressionList:
-    description: 'For example: {any: {of: [expr1, expr2]}}.'
+    description: 'eg. {any: {of: [expr1, expr2]}}.'
     type: object
     title: List of MatchExpressions that is used for all/any matching
     properties:
@@ -2344,7 +2345,7 @@ definitions:
         x-go-tag-validate: required
         $ref: '#/definitions/KubernetesReplicas'
       scale_in_alerter_parameters:
-        description: Configuration for scale-in Alerter.
+        description: Configuration for scale-in alerter.
         $ref: '#/definitions/AlerterParameters'
       scale_in_controllers:
         description: List of _Controllers_ for scaling in.
@@ -2360,7 +2361,7 @@ definitions:
         default: 120s
         x-go-tag-default: 120s
       scale_out_alerter_parameters:
-        description: Configuration for scale-out Alerter.
+        description: Configuration for scale-out alerter.
         $ref: '#/definitions/AlerterParameters'
       scale_out_controllers:
         description: List of _Controllers_ for scaling out.
@@ -2508,7 +2509,7 @@ definitions:
 
           :::caution
 
-          TODO we should describe how to construct the query, for example: how to employ the
+          TODO we should describe how to construct the query, eg. how to employ the
           fluxmeters here or link to appropriate place in docs.
 
           :::
@@ -2576,7 +2577,7 @@ definitions:
         title: Configuration key for DynamicConfig
       flow_selector:
         description: |+
-          Which control point to apply this RateLimiter to.
+          Which control point to apply this ratelimiter to.
 
         x-go-tag-validate: required
         $ref: '#/definitions/FlowSelector'
@@ -2608,11 +2609,11 @@ definitions:
       limit:
         description: |+
           Number of flows allowed per _limit\_reset\_interval_ per each label.
-          Negative values disable the RateLimiter.
+          Negative values disable the ratelimiter.
 
           :::tip
 
-          Negative limit can be useful to _conditionally_ enable the RateLimiter
+          Negative limit can be useful to _conditionally_ enable the ratelimiter
           under certain circumstances. [Decider](#decider) might be helpful.
 
           :::
@@ -2645,7 +2646,7 @@ definitions:
     properties:
       label_key:
         description: |+
-          Specifies which label the RateLimiter should be keyed by.
+          Specifies which label the ratelimiter should be keyed by.
 
           Rate limiting is done independently for each value of the
           [label](/concepts/flow-control/flow-label.md) with given key.
@@ -2655,7 +2656,7 @@ definitions:
         type: string
         x-go-tag-validate: required
       lazy_sync:
-        title: Configuration of lazy-syncing behaviour of RateLimiter
+        title: Configuration of lazy-syncing behaviour of ratelimiter
         $ref: '#/definitions/RateLimiterParametersLazySync'
       limit_reset_interval:
         description: |+
@@ -2871,7 +2872,7 @@ definitions:
     properties:
       query:
         description: |+
-          Query string to extract a value (for example: `data.<mymodulename>.<variablename>`).
+          Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
 
           Note: The module name must match the package name from the "source".
 
@@ -2891,7 +2892,7 @@ definitions:
     type: object
     properties:
       alerter_parameters:
-        description: Configuration for embedded Alerter.
+        description: Configuration for embedded alerter.
         $ref: '#/definitions/AlerterParameters'
       controller:
         title: Controller
@@ -2905,7 +2906,7 @@ definitions:
     type: object
     properties:
       alerter_parameters:
-        description: Configuration for embedded Alerter.
+        description: Configuration for embedded alerter.
         $ref: '#/definitions/AlerterParameters'
       controller:
         title: Controller
@@ -3039,7 +3040,7 @@ definitions:
           allows for load-shedding to be "smarter" than just "randomly deny 50% of
           requests". There are two aspects of this "smartness":
           * Scheduler can more precisely calculate concurrency if it understands
-            that flows belonging to different classes have different weights (for example:
+            that flows belonging to different classes have different weights (eg.
             inserts vs lookups).
           * Setting different priorities to different workloads lets the scheduler
             avoid dropping important traffic during overload.
@@ -3485,7 +3486,7 @@ definitions:
           one "/" character. The last segment of the URL's path must represent
           the fully qualified name of the type (as in
           `path/google.protobuf.Duration`). The name should be in a canonical form
-          (e.g., leading "." isn't accepted).
+          (e.g., leading "." is not accepted).
 
           In practice, teams usually precompile into the binary all types that they
           expect it to use in the context of Any. However, for URLs which use the
@@ -3501,8 +3502,8 @@ definitions:
             on changes to types. (Use versioned type names to manage
             breaking changes.)
 
-          Note: this functionality isn't currently available in the official
-          protobuf release, and it isn't used for type URLs beginning with
+          Note: this functionality is not currently available in the official
+          protobuf release, and it is not used for type URLs beginning with
           type.googleapis.com.
 
           Schemes other than `http`, `https` (or the empty scheme) might be

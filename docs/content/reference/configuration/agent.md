@@ -12,7 +12,7 @@ sidebar_label: Agent
 See also [Aperture Agent installation](/get-started/installation/agent/agent.md).
 :::
 
-List of all config parameters for Aperture Agent.
+List of all configuration parameters for Aperture Agent.
 
 <!---
 Generated File Starts
@@ -77,7 +77,7 @@ Env-Var Prefix: `APERTURE_AGENT_AGENT_INFO_`
 
 <dl>
 
-<dt>Kubernetes</dt>
+<dt>kubernetes</dt>
 <dd>
 
 ([AutoScaleKubernetesConfig](#auto-scale-kubernetes-config))

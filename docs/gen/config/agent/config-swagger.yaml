@@ -531,7 +531,7 @@ definitions:
     EtcdConfig:
         properties:
             endpoints:
-                description: List of etcd server endpoints
+                description: List of Etcd server endpoints
                 items:
                     type: string
                 minItems: 1
@@ -609,7 +609,7 @@ definitions:
                 x-go-name: UseProxy
                 x-go-tag-default: "false"
                 x-go-tag-json: use_proxy
-        title: gRPCClientConfig holds configuration for GRPC Client.
+        title: GRPCClientConfig holds configuration for GRPC Client.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
     GRPCGatewayConfig:
@@ -617,7 +617,7 @@ definitions:
         properties:
             grpc_server_address:
                 default: 0.0.0.0:1
-                description: gRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
+                description: GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
                 pattern: ^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$
                 type: string
                 x-go-name: GRPCAddr
@@ -1522,7 +1522,7 @@ paths:
             operationId: AutoScaleConfig
             parameters:
                 - in: body
-                  name: Kubernetes
+                  name: kubernetes
                   schema:
                     $ref: '#/definitions/AutoScaleKubernetesConfig'
             tags:
@@ -1711,7 +1711,7 @@ paths:
                   schema:
                     $ref: '#/definitions/StaticDiscoveryConfig'
                 - in: body
-                  name: Kubernetes
+                  name: kubernetes
                   schema:
                     $ref: '#/definitions/KubernetesDiscoveryConfig'
             tags:
