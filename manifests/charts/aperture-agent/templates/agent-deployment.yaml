@@ -198,6 +198,10 @@ spec:
           volumeMounts:
             - mountPath: /etc/aperture/aperture-agent/config
               name: aperture-agent-config
+            {{- if and .Values.agent.controllerCert .Values.agent.controllerCert.cmName }}
+            - name: controller-cert
+              mountPath: /etc/aperture/aperture-agent/certs
+            {{- end }}
             {{- if .Values.agent.extraVolumeMounts }}
             {{- include "common.tplvalues.render" (dict "value" .Values.agent.extraVolumeMounts "context" . $ ) | nindent 12 }}
             {{- end }}
@@ -205,6 +209,11 @@ spec:
         - name: aperture-agent-config
           configMap:
             name: {{ template "common.names.fullname" . }}-config
+        {{- if and .Values.agent.controllerCert .Values.agent.controllerCert.cmName }}
+        - name: controller-cert
+          configMap:
+            name: {{ .Values.agent.controllerCert.cmName }}
+        {{- end }}
         {{- if .Values.agent.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.agent.extraVolumes "context" . $ ) | nindent 8 }}
         {{- end }}

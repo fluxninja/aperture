@@ -341,7 +341,7 @@ func addPrometheusReceiver(
 		log.Debug().Msg("K8s environment not detected. Skipping K8s scrape configurations.")
 	} else if err != nil {
 		log.Warn().Err(err).Msg("Error when discovering k8s environment")
-	} else {
+	} else if !agentConfig.DisableKubernetesScraper {
 		log.Debug().Msg("K8s environment detected. Adding K8s scrape configurations.")
 		scrapeConfigs = append(scrapeConfigs, buildKubernetesPodsScrapeConfig())
 	}

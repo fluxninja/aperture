@@ -50,6 +50,10 @@ type AgentSpec struct {
 	// Agent Configuration
 	//+kubebuilder:validation:Optional
 	ConfigSpec AgentConfigSpec `json:"config"`
+
+	// ControllerClientCertConfig configuration.
+	//+kubebuilder:validation:Optional
+	ControllerClientCertConfig common.ControllerClientCertConfig `json:"controller_client_cert"`
 }
 
 // AgentConfigSpec holds agent configuration.

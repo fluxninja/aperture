@@ -100,6 +100,13 @@ definitions:
                 type: object
                 x-go-name: CustomMetrics
                 x-go-tag-json: custom_metrics,omitempty
+            disable_kubernetes_scraper:
+                default: false
+                description: DisableKubernetesScraper disables metrics collection for Kubernetes resources.
+                type: boolean
+                x-go-name: DisableKubernetesScraper
+                x-go-tag-default: "false"
+                x-go-tag-json: disable_kubernetes_scraper
             ports:
                 $ref: '#/definitions/PortsConfig'
                 x-go-tag-json: ports

@@ -913,11 +913,6 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 					MountPath: "/etc/aperture/aperture-controller/config",
 				},
 				{
-					Name:      "etc-aperture-policies",
-					MountPath: PolicyFilePath,
-					ReadOnly:  true,
-				},
-				{
 					Name:      "server-cert",
 					MountPath: "/etc/aperture/aperture-controller/certs",
 					ReadOnly:  true,
@@ -958,11 +953,6 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 					MountPath: "/etc/aperture/aperture-controller/config",
 				},
 				{
-					Name:      "etc-aperture-policies",
-					MountPath: PolicyFilePath,
-					ReadOnly:  true,
-				},
-				{
 					Name:      "server-cert",
 					MountPath: "/etc/aperture/aperture-controller/certs",
 					ReadOnly:  true,
@@ -996,12 +986,6 @@ var _ = Describe("Tests for controllerVolumes", func() {
 								Name: ControllerServiceName,
 							},
 						},
-					},
-				},
-				{
-					Name: "etc-aperture-policies",
-					VolumeSource: corev1.VolumeSource{
-						EmptyDir: &corev1.EmptyDirVolumeSource{},
 					},
 				},
 				{
@@ -1057,12 +1041,6 @@ var _ = Describe("Tests for controllerVolumes", func() {
 								Name: ControllerServiceName,
 							},
 						},
-					},
-				},
-				{
-					Name: "etc-aperture-policies",
-					VolumeSource: corev1.VolumeSource{
-						EmptyDir: &corev1.EmptyDirVolumeSource{},
 					},
 				},
 				{

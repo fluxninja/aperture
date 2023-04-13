@@ -103,7 +103,7 @@ Fetch the server port of the Aperture Agent
 */}}
 {{- define "agent.server.port" -}}
 {{- if and .agent.config .agent.config.server .agent.config.server.listener .agent.config.server.listener.addr -}}
-    {{ print (split ":" .agent.config.server.listener.addr)._0 }}
+    {{ print (split ":" .agent.config.server.listener.addr)._1 }}
 {{- else -}}
     {{ print "8080" }}
 {{- end -}}

@@ -528,6 +528,14 @@ func (r *ControllerReconciler) reconcileValidatingWebhookConfigurationAndCertSec
 		return err
 	}
 
+	cm, err := configMapForControllerClientCert(instance.DeepCopy(), r.Scheme, controllerClientCert)
+	if err != nil {
+		return err
+	}
+	if _, err = createConfigMapForController(r.Client, r.Recorder, cm, ctx, instance); err != nil {
+		return err
+	}
+
 	vwc := validatingWebhookConfiguration(instance.DeepCopy(), controllerClientCert.Bytes())
 	res, err := controllerutil.CreateOrUpdate(ctx, r.Client, vwc, controllers.ValidatingWebhookConfigurationMutate(vwc, vwc.Webhooks))
 	if err != nil {

@@ -69,7 +69,7 @@ func getTemplets(chartName, releaseName string, order releaseutil.KindSortOrder)
 	}
 	defer resp.Body.Close()
 
-	ch, err := loader.Load("/home/hardik/Work/fluxninja/aperture/manifests/charts/aperture-controller")
+	ch, err := loader.LoadArchive(resp.Body)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to load chart: %s", err)
 	}
@@ -112,6 +112,11 @@ func getTemplets(chartName, releaseName string, order releaseutil.KindSortOrder)
 
 	if releaseName == controller && isNamespaceScoped {
 		values, err = manageControllerCertificateSecret(values, fmt.Sprintf("%s-%s", controller, apertureController), namespace, order)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+	} else if releaseName == agent && isNamespaceScoped {
+		values, err = manageAgentControllerClientCertSecret(values, fmt.Sprintf("%s-%s", agent, apertureAgent), namespace, order)
 		if err != nil {
 			return nil, nil, nil, err
 		}
@@ -394,7 +399,7 @@ func manageControllerCertificateSecret(values map[string]interface{}, releaseNam
 		certFileName = controllers.ControllerCertName
 	}
 
-	cert, key, _, err := controllers.GenerateCertificate(releaseName, namespace)
+	cert, key, clientCert, err := controllers.GenerateCertificate(releaseName, namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -412,6 +417,18 @@ func manageControllerCertificateSecret(values map[string]interface{}, releaseNam
 		},
 	}
 
+	cm := &corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        fmt.Sprintf("%s-controller-client-cert", releaseName),
+			Namespace:   namespace,
+			Labels:      controllers.CommonLabels(map[string]string{}, releaseName, controllers.ControllerServiceName),
+			Annotations: map[string]string{},
+		},
+		Data: map[string]string{
+			controllers.ControllerClientCertKey: clientCert.String(),
+		},
+	}
+
 	if generateCert {
 		createNew, err := CheckCertificate(secretName, namespace, certFileName)
 		if err != nil {
@@ -425,9 +442,23 @@ func manageControllerCertificateSecret(values map[string]interface{}, releaseNam
 			}
 
 			gvk := schema.GroupVersionKind{Group: "", Version: "v1", Kind: "Secret"}
-			unstructured := &unstructured.Unstructured{Object: unstructuredSecret}
-			unstructured.SetGroupVersionKind(gvk)
-			err = applyObjectToKubernetesWithRetry(unstructured)
+			unstructuredObject := &unstructured.Unstructured{Object: unstructuredSecret}
+			unstructuredObject.SetGroupVersionKind(gvk)
+			err = applyObjectToKubernetesWithRetry(unstructuredObject)
+			if err != nil {
+				return nil, err
+			}
+
+			var unstructuredCM map[string]interface{}
+			unstructuredCM, err = runtime.DefaultUnstructuredConverter.ToUnstructured(cm)
+			if err != nil {
+				return nil, err
+			}
+
+			gvk = schema.GroupVersionKind{Group: "", Version: "v1", Kind: "ConfigMap"}
+			unstructuredObject = &unstructured.Unstructured{Object: unstructuredCM}
+			unstructuredObject.SetGroupVersionKind(gvk)
+			err = applyObjectToKubernetesWithRetry(unstructuredObject)
 			if err != nil {
 				return nil, err
 			}
@@ -464,4 +495,89 @@ func CheckCertificate(name, namespace, certFileName string) (bool, error) {
 	}
 
 	return false, nil
+}
+
+func manageAgentControllerClientCertSecret(values map[string]interface{}, releaseName, namespace string, order releaseutil.KindSortOrder) (map[string]interface{}, error) {
+	agent, ok := values["agent"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("failed to get agent values")
+	}
+
+	config, ok := agent["config"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("failed to get agent config values")
+	}
+
+	controllerCert := agent["controllerCert"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("failed to get controllerCert values")
+	}
+
+	cmName, ok := controllerCert["cmName"].(string)
+	if !ok {
+		cmName = fmt.Sprintf("%s-client-cert", controllers.AgentServiceName)
+	}
+
+	certFileName, ok := controllerCert["certFileName"].(string)
+	if !ok {
+		certFileName = controllers.ControllerClientCertKey
+	}
+
+	agentFunctions, ok := config["agent_functions"].(map[string]interface{})
+	if !ok {
+		return nil, nil
+	}
+
+	endpoints, ok := agentFunctions["endpoints"].([]interface{})
+	if !ok {
+		return nil, nil
+	}
+
+	// Convert the endpoints to []string
+	var endpointsStr []string
+	for _, endpoint := range endpoints {
+		endpointStr, ok := endpoint.(string)
+		if !ok {
+			continue
+		}
+		endpointsStr = append(endpointsStr, endpointStr)
+	}
+
+	controllerClientCert := controllers.GetControllerClientCert(endpointsStr, kubeClient, context.Background())
+	if controllerClientCert == nil {
+		return nil, nil
+	}
+
+	if slices.Equal(order, releaseutil.InstallOrder) {
+		cm := &corev1.ConfigMap{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:        cmName,
+				Namespace:   namespace,
+				Labels:      controllers.CommonLabels(map[string]string{}, releaseName, controllers.AgentServiceName),
+				Annotations: map[string]string{},
+			},
+			Data: map[string]string{
+				certFileName: string(controllerClientCert),
+			},
+		}
+
+		unstructuredCM, err := runtime.DefaultUnstructuredConverter.ToUnstructured(cm)
+		if err != nil {
+			return nil, err
+		}
+
+		gvk := schema.GroupVersionKind{Group: "", Version: "v1", Kind: "ConfigMap"}
+		unstructured := &unstructured.Unstructured{Object: unstructuredCM}
+		unstructured.SetGroupVersionKind(gvk)
+		err = applyObjectToKubernetesWithRetry(unstructured)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	controllerCert["cmName"] = cmName
+	controllerCert["certFileName"] = certFileName
+	agent["controllerCert"] = controllerCert
+	values["agent"] = agent
+	return values, nil
 }

@@ -36,12 +36,12 @@ func (constructor Constructor) Annotate() fx.Option {
 	if constructor.Name == "" || constructor.DynamicConfigName == "" {
 		log.Panic().Msg("Kubernetes watcher name is required")
 	}
-	trackersName := config.NameTag(constructor.Name)
-	dynamicConfigTrackersName := config.NameTag(constructor.DynamicConfigName)
+	name := config.NameTag(constructor.Name)
+	dynamicConfigName := config.NameTag(constructor.DynamicConfigName)
 	return fx.Options(fx.Invoke(
 		fx.Annotate(
 			constructor.provideWatcher,
-			fx.ParamTags(trackersName, dynamicConfigTrackersName),
+			fx.ParamTags(name, dynamicConfigName),
 		),
 	))
 }

@@ -111,7 +111,7 @@ Fetch the server port of the Aperture Controller
 */}}
 {{- define "controller.server.port" -}}
 {{- if and .controller.config .controller.config.server .controller.config.server.listener .controller.config.server.listener.addr -}}
-    {{ print (split ":" .controller.config.server.listener.addr)._0 }}
+    {{ print (split ":" .controller.config.server.listener.addr)._1 }}
 {{- else -}}
     {{ print "8080" }}
 {{- end -}}

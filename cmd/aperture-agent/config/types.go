@@ -56,6 +56,8 @@ import (
 //swagger:model
 type AgentOTelConfig struct {
 	otelconfig.CommonOTelConfig `json:",inline"`
+	// DisableKubernetesScraper disables metrics collection for Kubernetes resources.
+	DisableKubernetesScraper bool `json:"disable_kubernetes_scraper" default:"false"`
 	// BatchPrerollup configures batch prerollup processor.
 	BatchPrerollup BatchPrerollupConfig `json:"batch_prerollup"`
 	// BatchPostrollup configures batch postrollup processor.

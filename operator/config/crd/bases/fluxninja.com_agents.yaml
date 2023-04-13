@@ -1583,6 +1583,10 @@ spec:
                           is example to overwrite `kubeletstats` custom metrics: \n
                           otel: custom_metrics: kubeletstats: {}"
                         type: object
+                      disable_kubernetes_scraper:
+                        description: DisableKubernetesScraper disables metrics collection
+                          for Kubernetes resources.
+                        type: boolean
                       ports:
                         description: Ports configures debug, health and extension
                           ports values.
@@ -1999,6 +2003,21 @@ spec:
                     type: integer
                 required:
                 - enabled
+                type: object
+              controller_client_cert:
+                description: ControllerClientCertConfig configuration.
+                properties:
+                  clientCertKeyName:
+                    description: ClientCertKeyName is the key name of the client certificate
+                      in the ConfigMap.
+                    type: string
+                  configMapName:
+                    description: ConfigMapName is the name of the ConfigMap containing
+                      the client certificate.
+                    type: string
+                required:
+                - clientCertKeyName
+                - configMapName
                 type: object
               customLivenessProbe:
                 description: Custom livenessProbe that overrides the default one

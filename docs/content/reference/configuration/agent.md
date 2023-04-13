@@ -665,6 +665,12 @@ Below is example to overwrite `kubeletstats` custom metrics:
     		kubeletstats: {}
 
 </dd>
+<dt>disable_kubernetes_scraper</dt>
+<dd>
+
+(bool) DisableKubernetesScraper disables metrics collection for Kubernetes resources.
+
+</dd>
 <dt>batch_alerts</dt>
 <dd>
 

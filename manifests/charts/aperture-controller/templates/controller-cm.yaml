@@ -16,7 +16,7 @@ metadata:
   {{- end }}
 data:
   aperture-controller.yaml: |-
-    {{- if (omit .Values.controller.config "etcd" "prometheus") }}
+    {{- if (omit .Values.controller.config "etcd" "prometheus" "server") }}
     {{- omit .Values.controller.config "etcd" "prometheus" "server" | toYaml | nindent 4 }}
     {{- end }}
     server:
@@ -34,6 +34,4 @@ data:
       endpoints: {{ include "controller.etcd.endpoints" (dict "etcd" .Values.controller.config.etcd "context" . $) }}
     prometheus:
       address: {{ include "controller.prometheus.address" (dict "prometheus" .Values.controller.config.prometheus "context" . $) }}
-    webhooks:
-      policy_validator:
-        enabled: false
+{{- end }}

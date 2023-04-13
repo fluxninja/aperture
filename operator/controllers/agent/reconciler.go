@@ -20,6 +20,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"path"
 	"reflect"
 	"strings"
 
@@ -306,6 +307,19 @@ func (r *AgentReconciler) deleteSidecarModeResources(ctx context.Context, log lo
 				log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
 			}
 
+			configMap, err = configMapForAgentControllerClientCert(ctx, r.Client, instance, nil)
+			if err != nil {
+				log.Error(err, fmt.Sprintf("failed to create object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+			}
+
+			if configMap != nil {
+				configMap.Namespace = ns.GetName()
+				configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
+				if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
+					log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+				}
+			}
+
 			secret, err := secretForAgentAPIKey(instance, nil)
 			if err != nil {
 				log.Error(err, fmt.Sprintf("failed to create object of Secret '%s' in namespace %s", secret.GetName(), ns.GetName()))
@@ -430,6 +444,10 @@ func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *agentv1al
 
 // manageResources creates/updates required resources.
 func (r *AgentReconciler) manageResources(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) error {
+	if err := r.reconcileControllerCertConfigMap(ctx, instance); err != nil {
+		return err
+	}
+
 	if err := r.reconcileConfigMap(ctx, instance); err != nil {
 		return err
 	}
@@ -468,19 +486,48 @@ func (r *AgentReconciler) manageResources(ctx context.Context, log logr.Logger, 
 	return nil
 }
 
-// reconcileConfigMap prepares the desired states for Agent configmaps and
+// reconcileControllerCertConfigMap prepares the desired states for Agent configmaps containing Controller cert and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
-func (r *AgentReconciler) reconcileConfigMap(ctx context.Context, instance *agentv1alpha1.Agent) error {
-	if !instance.Spec.Sidecar.Enabled {
-		configMap, err := configMapForAgentConfig(ctx, r.Client, instance.DeepCopy(), r.Scheme)
+func (r *AgentReconciler) reconcileControllerCertConfigMap(ctx context.Context, instance *agentv1alpha1.Agent) error {
+	if !instance.Spec.Sidecar.Enabled &&
+		(instance.Spec.ControllerClientCertConfig.ConfigMapName == "" ||
+			instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName) {
+		configMap, err := configMapForAgentControllerClientCert(ctx, r.Client, instance.DeepCopy(), r.Scheme)
 		if err != nil {
 			return err
 		}
 
+		if configMap == nil {
+			return nil
+		}
+
+		instance.Spec.ControllerClientCertConfig.ConfigMapName = configMap.GetName()
+		instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
 		if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 			return err
 		}
+	}
 
+	return nil
+}
+
+// reconcileConfigMap prepares the desired states for Agent configmaps and
+// sends an request to Kubernetes API to move the actual state to the prepared desired state.
+func (r *AgentReconciler) reconcileConfigMap(ctx context.Context, instance *agentv1alpha1.Agent) error {
+	if !instance.Spec.Sidecar.Enabled {
+		copiedInstance := instance.DeepCopy()
+		if copiedInstance.Spec.ControllerClientCertConfig.ConfigMapName == "" ||
+			copiedInstance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName {
+			copiedInstance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = path.Join(controllers.AgentControllerClientCertPath, controllers.ControllerClientCertKey)
+		}
+		configMap, err := configMapForAgentConfig(ctx, r.Client, copiedInstance, r.Scheme)
+		if err != nil {
+			return err
+		}
+
+		if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, copiedInstance); err != nil {
+			return err
+		}
 	}
 
 	return nil

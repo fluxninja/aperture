@@ -19,6 +19,7 @@ package namespace
 import (
 	"context"
 	"fmt"
+	"path"
 	"reflect"
 	"time"
 
@@ -124,6 +125,10 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 
 // manageResources creates/updates required resources.
 func (r *NamespaceReconciler) manageResources(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent, namespace string) error {
+	if err := r.reconcileControllerCertConfigMap(ctx, log, instance, namespace); err != nil {
+		return err
+	}
+
 	if err := r.reconcileConfigMap(ctx, log, instance.DeepCopy(), namespace); err != nil {
 		return err
 	}
@@ -132,6 +137,38 @@ func (r *NamespaceReconciler) manageResources(ctx context.Context, log logr.Logg
 		return err
 	}
 
+	return nil
+}
+
+// reconcileControllerCertConfigMap prepares the desired states for Agent configmaps containing Controller cert and
+// sends an request to Kubernetes API to move the actual state to the prepared desired state.
+func (r *NamespaceReconciler) reconcileControllerCertConfigMap(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent, namespace string) error {
+	if instance.Spec.ControllerClientCertConfig.ConfigMapName != "" {
+		return nil
+	}
+	configMap := agent.CreateAgentControllerClientCertConfigMapInNamespace(ctx, r.Client, instance, namespace)
+
+	if configMap == nil {
+		return nil
+	}
+
+	instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = path.Join(controllers.AgentControllerClientCertPath, controllers.ControllerClientCertKey)
+	res, err := agent.CreateConfigMapForAgent(r.Client, nil, configMap, ctx, instance)
+	if err != nil {
+		msg := fmt.Sprintf("failed to create/update ConfigMap in namespace '%s' for Instance '%s' in Namespace '%s'. Error='%s'",
+			namespace, instance.GetName(), instance.GetNamespace(), err.Error())
+		log.Error(err, msg)
+		return fmt.Errorf(msg)
+	}
+
+	switch res {
+	case controllerutil.OperationResultCreated:
+		log.Info(fmt.Sprintf("Created ConfigMap '%s' in Namespace '%s'", configMap.GetName(), configMap.GetNamespace()))
+	case controllerutil.OperationResultUpdated:
+		log.Info(fmt.Sprintf("Updated ConfigMap '%s' in Namespace '%s'", configMap.GetName(), configMap.GetNamespace()))
+	case controllerutil.OperationResultNone:
+	default:
+	}
 	return nil
 }
 
