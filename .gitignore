@@ -236,5 +236,4 @@ playground/tilt_local.json
 .vscode/*
 
 # Do not ignore ltex dictionaries and false positives
-!.vscode/ltex.dictionary.en-US.txt
 !.vscode/ltex.hiddenFalsePositives.en-US.txt

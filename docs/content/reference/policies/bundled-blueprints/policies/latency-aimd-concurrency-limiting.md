@@ -158,10 +158,12 @@ Number (double)"
 
 <a id="policy-concurrency-controller-load-multiplier-linear-increment"></a>
 <ParameterDescription
-name="policy.concurrency_controller.load_multiplier_linear_increment" type="
-Number (double)" reference="" value="0.0025" description='Linear increment to
-load multiplier in each execution tick (0.5s) when the system isn't in
-overloaded state.' />
+    name="policy.concurrency_controller.load_multiplier_linear_increment"
+    type="
+Number (double)"
+    reference=""
+    value="0.0025"
+    description='Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.' />
 
 <a id="policy-concurrency-controller-default-config"></a> <ParameterDescription
     name="policy.concurrency_controller.default_config"

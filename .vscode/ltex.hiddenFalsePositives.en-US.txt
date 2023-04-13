@@ -1,0 +1,1 @@
+{"rule":"EN_COMPOUNDS","sentence":"auto scaling"}

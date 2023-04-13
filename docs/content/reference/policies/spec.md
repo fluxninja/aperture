@@ -65,7 +65,7 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dt>load_multiplier_linear_increment</dt>
 <dd>
 
-(float64, default: `0.0025`) Linear increment to load multiplier in each execution tick when the system isn't in overloaded state.
+(float64, default: `0.0025`) Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
 
 </dd>
 <dt>max_load_multiplier</dt>
@@ -1730,7 +1730,7 @@ For list of available attributes in Envoy access logs, refer
 
 ExponentialBuckets creates `count` number of buckets where the lowest bucket has an upper bound of `start`
 and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
-bucket isn't counted.
+bucket is not counted.
 
 <dl>
 <dt>count</dt>
@@ -1758,7 +1758,7 @@ bucket isn't counted.
 ### FluxMeterExponentialBucketsRange {#flux-meter-exponential-buckets-range}
 
 ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest
-bucket is `max`. The final +inf bucket isn't counted.
+bucket is `max`. The final +inf bucket is not counted.
 
 <dl>
 <dt>count</dt>
@@ -1786,7 +1786,7 @@ bucket is `max`. The final +inf bucket isn't counted.
 ### FluxMeterLinearBuckets {#flux-meter-linear-buckets}
 
 LinearBuckets creates `count` number of buckets, each `width` wide, where the lowest bucket has an
-upper bound of `start`. The final +inf bucket isn't counted.
+upper bound of `start`. The final +inf bucket is not counted.
 
 <dl>
 <dt>count</dt>
@@ -2349,7 +2349,7 @@ Parse the attribute as JWT and read the payload
 
 Specify a field to be extracted from payload using "json_pointer".
 
-Note: The signature isn't verified against the secret (we're assuming there's some
+Note: The signature is not verified against the secret (we're assuming there's some
 other parts of the system that handles such verification).
 
 Example:
@@ -3540,7 +3540,7 @@ You can use the [live-preview](/concepts/flow-control/resources/classifier.md#li
 
 Special rego variables:
 
-- `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it isn't emitted as part of flow labels or telemetry and is solely used while processing the request.
+- `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
 
 :::
 
@@ -3904,7 +3904,7 @@ if you want to use this feature.
 <dd>
 
 (string, default: `"0.49s"`) Max Timeout is the value with which the flow timeout is capped.
-When auto_tokens feature isn't enabled, this value is used as the
+When auto_tokens feature is not enabled, this value is used as the
 timeout for the flow, otherwise it is used as a cap for the timeout.
 
 :::caution
@@ -3932,7 +3932,7 @@ tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 
 (float64, default: `0.5`) Timeout as a factor of tokens for a flow in a workload in case auto_tokens is set to true.
 
-If a flow isn't able to get tokens within `timeout_factor * tokens` of duration,
+If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
 it will be rejected.
 
 This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
