@@ -46,6 +46,9 @@ func putHeapRequest(qRequest *queuedRequest) {
 
 type requestHeap []*queuedRequest
 
+// make sure we implement the heap interface.
+var _ heap.Interface = &requestHeap{}
+
 // Len returns the number of heap requests in the scheduler queue.
 func (h *requestHeap) Len() int {
 	return len(*h)
@@ -367,7 +370,9 @@ func (sched *WFQScheduler) cancelRequest(qRequest *queuedRequest) {
 						qRequest.fInfo.requestOnHeap = false
 					}
 					// Fix the heap
-					heap.Fix(&sched.requests, i)
+					if i < sched.requests.Len() {
+						heap.Fix(&sched.requests, i)
+					}
 					break
 				}
 			}

@@ -243,8 +243,8 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 		i := 0
 		for pb.Next() {
 			ctx, cancel := context.WithTimeout(context.Background(), flows[i%len(flows)].timeout)
-			defer cancel()
 			_ = sched.Schedule(ctx, flows[i%len(flows)].makeRequest())
+			cancel()
 		}
 	})
 }
@@ -274,8 +274,8 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 	for c.Now().Before(startTime.Add(bootstrapTime)) {
 		for _, flow := range flows {
 			ctx, cancel := context.WithTimeout(context.Background(), flow.timeout)
-			defer cancel()
 			_ = sched.Schedule(ctx, flow.makeRequest())
+			cancel()
 		}
 	}
 
@@ -289,8 +289,8 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 		i := 0
 		for pb.Next() {
 			ctx, cancel := context.WithTimeout(context.Background(), flows[i%len(flows)].timeout)
-			defer cancel()
 			_ = sched.Schedule(ctx, flows[i%len(flows)].makeRequest())
+			cancel()
 		}
 	})
 }
