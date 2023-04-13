@@ -43,7 +43,7 @@ import (
 	controllerv1alpha1 "github.com/fluxninja/aperture/operator/api/controller/v1alpha1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/etcd"
-	"github.com/fluxninja/aperture/pkg/prometheus"
+	prometheusconfig "github.com/fluxninja/aperture/pkg/prometheus/config"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -120,7 +120,7 @@ var _ = BeforeSuite(func() {
 					Etcd: etcd.EtcdConfig{
 						Endpoints: []string{"10.10.10.10:1010"},
 					},
-					Prometheus: prometheus.PrometheusConfig{
+					Prometheus: prometheusconfig.PrometheusConfig{
 						Address: "20.20.20.20:2020",
 					},
 				},
@@ -164,7 +164,7 @@ var _ = BeforeSuite(func() {
 					Etcd: etcd.EtcdConfig{
 						Endpoints: []string{"10.10.10.10:1010"},
 					},
-					Prometheus: prometheus.PrometheusConfig{
+					Prometheus: prometheusconfig.PrometheusConfig{
 						Address: "20.20.20.20:2020",
 					},
 				},

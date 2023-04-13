@@ -35,14 +35,12 @@ import (
 	"time"
 
 	"github.com/imdario/mergo"
-	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/yaml"
 
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
@@ -814,24 +812,4 @@ func GetPort(addr string) (int32, error) {
 		return 0, err
 	}
 	return int32(port), nil
-}
-
-// CompareComfigMap compares two ConfigMaps by recursively sorting the keys in each map and comparing the sorted maps for given key in Data.
-func CompareComfigMap(result, expected *corev1.ConfigMap) {
-	for key := range result.Data {
-		var obj1, obj2 map[string]interface{}
-		err1 := yaml.Unmarshal([]byte(result.Data[key]), &obj1)
-		err2 := yaml.Unmarshal([]byte(expected.Data[key]), &obj2)
-
-		if err1 == nil && err2 == nil {
-			Expect(obj1).To(Equal(obj2))
-		} else {
-			Expect(result.Data[key]).To(Equal(expected.Data[key]))
-		}
-	}
-
-	// Compare the rest of the fields in the ConfigMap object that are not in the Data field
-	result.Data = nil
-	expected.Data = nil
-	Expect(result).To(Equal(expected))
 }

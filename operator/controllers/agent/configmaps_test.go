@@ -35,12 +35,13 @@ import (
 	agentv1alpha1 "github.com/fluxninja/aperture/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/operator/api/common"
 	. "github.com/fluxninja/aperture/operator/controllers"
+	"github.com/fluxninja/aperture/operator/controllers/testutils"
 	"github.com/fluxninja/aperture/pkg/config"
 	distcacheconfig "github.com/fluxninja/aperture/pkg/distcache/config"
 	"github.com/fluxninja/aperture/pkg/etcd"
 	"github.com/fluxninja/aperture/pkg/net/listener"
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
-	"github.com/fluxninja/aperture/pkg/prometheus"
+	prometheus "github.com/fluxninja/aperture/pkg/prometheus/config"
 )
 
 //go:embed config_test.tpl
@@ -147,7 +148,7 @@ var _ = Describe("ConfigMap for Agent", func() {
 			result, err := configMapForAgentConfig(context.Background(), K8sClient, instance.DeepCopy(), scheme.Scheme)
 			Expect(err).NotTo(HaveOccurred())
 
-			CompareComfigMap(result, expected)
+			testutils.CompareConfigMap(result, expected)
 		})
 	})
 })
