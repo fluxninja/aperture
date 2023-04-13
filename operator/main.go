@@ -132,7 +132,7 @@ func main() {
 	}
 	controllers.CurrentKubernetesVersion = apimachineryversion.MustParseSemantic(serverVersion.String())
 
-	// Checking if the minimum kubernetes version is satisfied
+	// Checking if the minimum Kubernetes version is satisfied
 	controllers.MinimumKubernetesVersionBool = controllers.CurrentKubernetesVersion.AtLeast(apimachineryversion.MustParseSemantic(controllers.MinimumKubernetesVersion))
 
 	var server *webhook.Server
