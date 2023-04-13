@@ -13,8 +13,11 @@ Go & Process metrics can be exposed by enabling `enable_go_metrics` flag and
 [Agent's MetricsConfig](reference/configuration/agent.md#metrics-config) and
 [Controller's MetricsConfig](reference/configuration/controller.md#metrics-config).
 See
+<!-- vale off -->
+
 [collector.NewGoCollector](https://pkg.go.dev/github.com/prometheus/client_golang@v1.13.0/prometheus/collectors#NewGoCollector)
 for more information.
+<!-- vale on -->
 
 ## HTTP Server Metrics
 

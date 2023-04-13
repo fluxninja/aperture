@@ -17,6 +17,8 @@ List of all configuration parameters for Aperture Agent.
 <!---
 Generated File Starts
 -->
+<!-- vale off -->
+
 
 ## Table of contents
 

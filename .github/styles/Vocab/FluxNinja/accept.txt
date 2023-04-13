@@ -460,3 +460,4 @@ special_value
 path_templates
 in order to
 ema
+collector.NewGoCollector

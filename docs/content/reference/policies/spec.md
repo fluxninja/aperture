@@ -15,6 +15,7 @@ The top-level object representing a policy is [Policy](#policy).
 <!---
 Generated File Starts
 -->
+<!-- vale off -->
 
 ## Objects
 

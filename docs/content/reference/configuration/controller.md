@@ -17,6 +17,8 @@ List of all config parameters for Aperture Controller.
 <!---
 Generated File Starts
 -->
+<!-- vale off -->
+
 
 ## Table of contents
 
