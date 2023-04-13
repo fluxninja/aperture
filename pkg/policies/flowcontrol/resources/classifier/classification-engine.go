@@ -88,17 +88,9 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 	flowLabels flowlabel.FlowLabels,
 	mm *multimatcher.MultiMatcher[int, multiMatcherResult],
 	labelsForMatching map[string]string,
-	inputValue map[string]interface{},
+	input ast.Value,
 ) (classifierMsgs []*flowcontrolv1.ClassifierInfo, tokens uint64) {
 	tokens = 0
-	input, err := ast.InterfaceToValue(inputValue)
-	if err != nil {
-		// RequestToInput should never produce anything that's not convertible
-		// to ast.Value, so in theory it shouldn't happen.
-		// TODO(krdln) metrics
-		return
-	}
-
 	logger := c.registry.GetLogger()
 	appendNewClassifier := func(labelerWithSelector *compiler.LabelerWithSelector, error flowcontrolv1.ClassifierInfo_Error) {
 		classifierMsgs = append(classifierMsgs, &flowcontrolv1.ClassifierInfo{
@@ -111,9 +103,22 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 
 	mmResult := mm.Match(labelsForMatching)
 
+	requestParsedOK := false
+	ifaceMap := make(map[string]interface{})
 	previews := mmResult.previews
+	if len(previews) > 0 {
+		// Extract interface{} from ast.Value
+		ifaceRequest, err := ast.ValueToInterface(input, valueResolver{})
+		if err != nil {
+			log.Bug().Msgf("failed to convert value to interface: %v", err)
+		} else {
+			ifaceMap, requestParsedOK = ifaceRequest.(map[string]interface{})
+		}
+	}
 	for _, preview := range previews {
-		preview.AddHTTPRequestPreview(inputValue)
+		if requestParsedOK {
+			preview.AddHTTPRequestPreview(ifaceMap)
+		}
 	}
 
 	labelers := mmResult.labelers
@@ -185,14 +190,22 @@ func (c *ClassificationEngine) populateFlowLabels(ctx context.Context,
 	return
 }
 
+type valueResolver struct{}
+
+// Resolve implements ast.ValueResolver interface.
+func (valueResolver) Resolve(ref ast.Ref) (interface{}, error) {
+	return make(map[string]interface{}), nil
+}
+
 // Classify takes rego input, performs classification, and returns a map of flow labels and tokens.
 // LabelsForMatching are additional labels to use for selector matching.
+// Request is passed as ast.Value directly instead of map[string]interface{} to avoid unnecessary json conversion.
 func (c *ClassificationEngine) Classify(
 	ctx context.Context,
 	svcs []string,
 	ctrlPt string,
 	labelsForMatching map[string]string,
-	input map[string]interface{},
+	input ast.Value,
 ) ([]*flowcontrolv1.ClassifierInfo, flowlabel.FlowLabels, uint64) {
 	tokens := uint64(0)
 	flowLabels := make(flowlabel.FlowLabels)

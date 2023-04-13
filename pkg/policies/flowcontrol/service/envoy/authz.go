@@ -9,8 +9,6 @@ import (
 
 	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	typev3 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
-	"github.com/open-policy-agent/opa-envoy-plugin/envoyauth"
-	"github.com/open-policy-agent/opa/logging"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
@@ -20,6 +18,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	flowcontrolhttpv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/net/grpc"
 	otelconsts "github.com/fluxninja/aperture/pkg/otelcollector/consts"
@@ -27,6 +26,7 @@ import (
 	flowlabel "github.com/fluxninja/aperture/pkg/policies/flowcontrol/label"
 	classification "github.com/fluxninja/aperture/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/check"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/checkhttp"
 	authz_baggage "github.com/fluxninja/aperture/pkg/policies/flowcontrol/service/envoy/baggage"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/servicegetter"
 )
@@ -60,7 +60,6 @@ var baggageSanitizeRegex *regexp.Regexp = regexp.MustCompile(`[\s\\\/;",]`)
 
 var (
 	missingControlPointSampler    = log.NewRatelimitingSampler()
-	failedReqToInputSampler       = log.NewRatelimitingSampler()
 	failedBaggageInjectionSampler = log.NewRatelimitingSampler()
 )
 
@@ -126,8 +125,6 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 			Code(codes.InvalidArgument).Msg("missing control-point")
 	}
 
-	svcs := h.serviceGetter.ServicesFromContext(ctx)
-
 	sourceAddress := req.GetAttributes().GetSource().GetAddress().GetSocketAddress()
 	sourceSvcs := h.serviceGetter.ServicesFromSocketAddress(sourceAddress)
 	sourceSvcsStr := strings.Join(sourceSvcs, ",")
@@ -146,31 +143,8 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 		Telemetry: true,
 	}
 
-	logger := logging.New().WithFields(map[string]interface{}{"rego": "input"})
-	skipRequestBodyParse := false
-	input, err := envoyauth.RequestToInput(req, logger, nil, skipRequestBodyParse)
-	if err != nil {
-		// TODO(krdln) This conversion should be made infallible instead.
-		// https://github.com/fluxninja/aperture/issues/903
-		// TODO(krdln) metrics
-		return nil, grpc.LoggedError(log.Sample(failedReqToInputSampler).Warn()).
-			Err(err).Code(codes.InvalidArgument).Msg("converting raw input into rego input failed")
-	}
-
-	attributesSource := input["attributes"]
-	attributes, ok := attributesSource.(map[string]interface{})
-	if ok {
-		source := attributes["source"]
-		sourceMap, ok := source.(map[string]interface{})
-		if ok {
-			sourceMap["services"] = sourceSvcs
-		}
-		destination := attributes["destination"]
-		destinationMap, ok := destination.(map[string]interface{})
-		if ok {
-			destinationMap["services"] = destinationSvcs
-		}
-	}
+	checkHTTPReq := authzRequestToCheckHTTPRequest(req, ctrlPt)
+	input := checkhttp.RequestToInputWithServices(checkHTTPReq, sourceSvcs, destinationSvcs)
 
 	// Default flow labels from Authz request
 	requestFlowLabels := AuthzRequestToFlowLabels(req.GetAttributes().GetRequest())
@@ -184,6 +158,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	flowlabel.Merge(mergedFlowLabels, baggageFlowLabels)
 	flowlabel.Merge(mergedFlowLabels, sdFlowLabels)
 
+	svcs := h.serviceGetter.ServicesFromContext(ctx)
 	classifierMsgs, newFlowLabels, tokens := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
 
 	for key, fl := range newFlowLabels {
@@ -262,4 +237,49 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	}
 
 	return resp, nil
+}
+
+func authzRequestToCheckHTTPRequest(
+	req *authv3.CheckRequest,
+	controlPoint string,
+) *flowcontrolhttpv1.CheckHTTPRequest {
+	checkHTTPReq := &flowcontrolhttpv1.CheckHTTPRequest{
+		ControlPoint: controlPoint,
+	}
+
+	if http := req.GetAttributes().GetRequest().GetHttp(); http != nil {
+		httpRequest := &flowcontrolhttpv1.CheckHTTPRequest_HttpRequest{
+			Method:   http.GetMethod(),
+			Headers:  http.GetHeaders(),
+			Path:     http.GetPath(),
+			Host:     http.GetHost(),
+			Scheme:   http.GetScheme(),
+			Size:     http.GetSize(),
+			Protocol: http.GetProtocol(),
+			Body:     http.GetBody(),
+		}
+		checkHTTPReq.Request = httpRequest
+	}
+
+	src := req.GetAttributes().GetSource()
+	if src != nil {
+		srcSocketAddr := src.GetAddress().GetSocketAddress()
+		checkHTTPReq.Source = &flowcontrolhttpv1.SocketAddress{
+			Address:  srcSocketAddr.GetAddress(),
+			Port:     srcSocketAddr.GetPortValue(),
+			Protocol: flowcontrolhttpv1.SocketAddress_Protocol(srcSocketAddr.GetProtocol()),
+		}
+	}
+
+	dst := req.GetAttributes().GetDestination()
+	if dst != nil {
+		dstSocketAddr := dst.GetAddress().GetSocketAddress()
+		checkHTTPReq.Destination = &flowcontrolhttpv1.SocketAddress{
+			Address:  dstSocketAddr.GetAddress(),
+			Port:     dstSocketAddr.GetPortValue(),
+			Protocol: flowcontrolhttpv1.SocketAddress_Protocol(dstSocketAddr.GetProtocol()),
+		}
+	}
+
+	return checkHTTPReq
 }
