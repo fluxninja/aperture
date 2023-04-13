@@ -9,6 +9,7 @@ import (
 
 	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	"github.com/fluxninja/aperture/pkg/config"
+	sdconfig "github.com/fluxninja/aperture/pkg/discovery/static/config"
 	"github.com/fluxninja/aperture/pkg/mocks"
 	"github.com/fluxninja/aperture/pkg/notifiers"
 )
@@ -26,7 +27,7 @@ var _ = BeforeEach(func() {
 var _ = Describe("Static service discovery", func() {
 	Context("Discovery from config", func() {
 		It("Writes no entities with nil service list", func() {
-			cfg := &StaticDiscoveryConfig{
+			cfg := &sdconfig.StaticDiscoveryConfig{
 				Entities: nil,
 			}
 
@@ -44,7 +45,7 @@ var _ = Describe("Static service discovery", func() {
 			someName := "some_entity"
 			someService := "svc1"
 
-			cfg := &StaticDiscoveryConfig{
+			cfg := &sdconfig.StaticDiscoveryConfig{
 				Entities: []entitiesv1.Entity{
 					{
 						IpAddress: someIPAddress,
@@ -97,7 +98,7 @@ var _ = Describe("Static service discovery", func() {
 			// use unmarshaller
 			unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(bytes)
 			Expect(err).NotTo(HaveOccurred())
-			var cfg StaticDiscoveryConfig
+			var cfg sdconfig.StaticDiscoveryConfig
 			err = unmarshaller.Unmarshal(&cfg)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -116,7 +117,7 @@ var _ = Describe("Static service discovery", func() {
 			someService := "svc1"
 			someOtherService := "svc2"
 
-			cfg := &StaticDiscoveryConfig{
+			cfg := &sdconfig.StaticDiscoveryConfig{
 				Entities: []entitiesv1.Entity{
 					{
 						IpAddress: someIPAddress,
@@ -148,6 +149,8 @@ var _ = Describe("Static service discovery", func() {
 	})
 })
 
-func CreateStaticDiscoveryWithFakeTracker(config *StaticDiscoveryConfig) (*StaticDiscovery, *mocks.MockEventWriter) {
+func CreateStaticDiscoveryWithFakeTracker(
+	config *sdconfig.StaticDiscoveryConfig,
+) (*StaticDiscovery, *mocks.MockEventWriter) {
 	return newStaticServiceDiscovery(mockEventWriter, config), mockEventWriter
 }

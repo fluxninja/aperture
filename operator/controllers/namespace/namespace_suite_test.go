@@ -28,7 +28,7 @@ import (
 	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/etcd"
-	"github.com/fluxninja/aperture/pkg/prometheus"
+	prometheus "github.com/fluxninja/aperture/pkg/prometheus/config"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/kubernetes/scheme"

@@ -1000,7 +1000,7 @@ definitions:
                 x-go-tag-default: "false"
                 x-go-tag-json: initially_healthy
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/jobs
+        x-go-package: github.com/fluxninja/aperture/pkg/jobs/config
     JobGroupConfig:
         properties:
             blocking_execution:
@@ -1028,7 +1028,7 @@ definitions:
                 x-go-tag-json: worker_limit
         title: JobGroupConfig holds configuration for JobGroup.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/jobs
+        x-go-package: github.com/fluxninja/aperture/pkg/jobs/config
     KubernetesDiscoveryConfig:
         properties:
             enabled:
@@ -1343,7 +1343,7 @@ definitions:
             - address
         title: PrometheusConfig holds configuration for Prometheus Server.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/prometheus
+        x-go-package: github.com/fluxninja/aperture/pkg/prometheus/config
     ProxyConfig:
         description: This configuration has preference over environment variables HTTP_PROXY, HTTPS_PROXY or NO_PROXY. See <https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config>
         properties:
@@ -1398,7 +1398,7 @@ definitions:
                 x-go-tag-json: worker_limit
         title: SchedulerConfig holds configuration for job Scheduler.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/jobs
+        x-go-package: github.com/fluxninja/aperture/pkg/jobs/config
     ServerTLSConfig:
         properties:
             allowed_cn:
@@ -1444,7 +1444,7 @@ definitions:
                 x-go-tag-json: entities,omitempty
         title: StaticDiscoveryConfig for pre-determined list of services.
         type: object
-        x-go-package: github.com/fluxninja/aperture/pkg/discovery/static
+        x-go-package: github.com/fluxninja/aperture/pkg/discovery/static/config
     WatchdogConfig:
         properties:
             cgroup:

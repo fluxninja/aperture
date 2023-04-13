@@ -11,6 +11,7 @@ import (
 
 	statusv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/status/v1"
 	"github.com/fluxninja/aperture/pkg/config"
+	jobsconfig "github.com/fluxninja/aperture/pkg/jobs/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/status"
 )
@@ -19,29 +20,8 @@ const (
 	schedulerConfigKey = "scheduler"
 )
 
-// JobGroupConfig holds configuration for JobGroup.
-// swagger:model
-// +kubebuilder:object:generate=true
-type JobGroupConfig struct {
-	SchedulerConfig `json:",inline"`
-}
-
-// SchedulerConfig holds configuration for job Scheduler.
-// swagger:model
-// +kubebuilder:object:generate=true
-type SchedulerConfig struct {
-	// When true, the scheduler will run jobs synchronously,
-	// waiting for each execution instance of the job to return
-	// before starting the next execution. Running with this
-	// option effectively serializes all job execution.
-	BlockingExecution bool `json:"blocking_execution" default:"false"`
-
-	// Limits how many jobs can be running at the same time. This is
-	// useful when running resource intensive jobs and a precise start time is
-	// not critical. 0 = no limit. If BlockingExecution is set, then WorkerLimit
-	// is ignored.
-	WorkerLimit int `json:"worker_limit" default:"0"`
-}
+// JobGroupConfig is reexported as it's commonly used when importing jobs package.
+type JobGroupConfig = jobsconfig.JobGroupConfig
 
 // JobGroupConstructor holds fields to create annotated instances of JobGroup.
 type JobGroupConstructor struct {
@@ -50,7 +30,7 @@ type JobGroupConstructor struct {
 	// Config key --  if it is empty then it is <name>.scheduler
 	Key           string
 	GW            GroupWatchers
-	DefaultConfig JobGroupConfig
+	DefaultConfig jobsconfig.JobGroupConfig
 }
 
 // Annotate provides annotated instances of JobGroup.
@@ -123,7 +103,7 @@ type JobGroup struct {
 // NewJobGroup creates a new JobGroup.
 func NewJobGroup(
 	statusRegistry status.Registry,
-	config JobGroupConfig,
+	config jobsconfig.JobGroupConfig,
 	gws GroupWatchers,
 ) (*JobGroup, error) {
 	scheduler := quartz.NewStdSchedulerWithOptions(quartz.StdSchedulerOptions{
@@ -161,7 +141,7 @@ func (jg *JobGroup) Stop() error {
 // RegisterJob registers a new Job in a JobGroup.
 // It returns an error if the job is already registered.
 // It also starts the job's executor.
-func (jg *JobGroup) RegisterJob(job Job, config JobConfig) error {
+func (jg *JobGroup) RegisterJob(job Job, config jobsconfig.JobConfig) error {
 	var initialErr error
 	if !config.InitiallyHealthy {
 		initialErr = errInitialResult

@@ -41,7 +41,7 @@ import (
 	. "github.com/fluxninja/aperture/operator/controllers"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/etcd"
-	"github.com/fluxninja/aperture/pkg/prometheus"
+	prometheus "github.com/fluxninja/aperture/pkg/prometheus/config"
 	//+kubebuilder:scaffold:imports
 )
 

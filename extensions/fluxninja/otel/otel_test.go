@@ -8,7 +8,6 @@ import (
 	"github.com/mitchellh/copystructure"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"go.opentelemetry.io/collector/processor/batchprocessor"
 	"go.uber.org/fx"
 
 	heartbeatv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/fluxninja/v1"
@@ -152,10 +151,10 @@ func baseExtensionOTELConfigWithMetrics(pipelineName string) *otelconfig.OTELCon
 			"scrape_configs": []string{"foo", "bar"},
 		},
 	})
-	cfg.AddProcessor("batch/metrics-slow", batchprocessor.Config{
-		SendBatchSize:    10000,
-		SendBatchMaxSize: 10000,
-		Timeout:          5 * time.Second,
+	cfg.AddProcessor("batch/metrics-slow", map[string]any{
+		"send_batch_size":     uint32(10000),
+		"send_batch_max_size": uint32(10000),
+		"timeout":             5 * time.Second,
 	})
 	processors := []string{
 		"batch/metrics-slow",

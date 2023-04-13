@@ -1,4 +1,3 @@
-// +kubebuilder:validation:Optional
 package jobs
 
 import (
@@ -11,7 +10,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	"github.com/fluxninja/aperture/pkg/config"
+	jobsconfig "github.com/fluxninja/aperture/pkg/jobs/config"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/status"
 	"github.com/reugn/go-quartz/quartz"
@@ -19,6 +18,9 @@ import (
 
 // JobCallback is the callback function that is called after a job is executed.
 type JobCallback func(context.Context) (proto.Message, error)
+
+// JobConfig is reexported as it's commonly used when importing jobs package.
+type JobConfig = jobsconfig.JobConfig
 
 // Job interface and basic job implementation.
 type Job interface {
@@ -46,20 +48,6 @@ func (job JobBase) JobWatchers() JobWatchers {
 	return job.JWS
 }
 
-// JobConfig is config for Job
-// swagger:model
-// +kubebuilder:object:generate=true
-type JobConfig struct {
-	// Time period between job executions. Zero or negative value means that the job will never execute periodically.
-	ExecutionPeriod config.Duration `json:"execution_period" default:"10s"`
-
-	// Execution timeout
-	ExecutionTimeout config.Duration `json:"execution_timeout" validate:"gte=0s" default:"5s"`
-
-	// Sets whether the job is initially healthy
-	InitiallyHealthy bool `json:"initially_healthy" default:"false"`
-}
-
 type jobExecutor struct {
 	execLock sync.Mutex
 	Job
@@ -67,14 +55,14 @@ type jobExecutor struct {
 	livenessRegistry status.Registry
 	jg               *JobGroup
 	job              quartz.Job
-	config           JobConfig
+	config           jobsconfig.JobConfig
 	running          bool
 }
 
 // Make sure jobExecutor complies with Job interface.
 var _ Job = (*jobExecutor)(nil)
 
-func newJobExecutor(job Job, jg *JobGroup, config JobConfig, parentRegistry status.Registry) *jobExecutor {
+func newJobExecutor(job Job, jg *JobGroup, config jobsconfig.JobConfig, parentRegistry status.Registry) *jobExecutor {
 	executor := &jobExecutor{
 		Job:            job,
 		jg:             jg,
