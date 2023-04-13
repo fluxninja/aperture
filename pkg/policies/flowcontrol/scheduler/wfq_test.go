@@ -1,6 +1,7 @@
 package scheduler
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"runtime"
@@ -169,18 +170,19 @@ func runFlow(sched Scheduler, wg *sync.WaitGroup, flow *flowTracker, duration ti
 
 func runRequest(sched Scheduler, wg *sync.WaitGroup, flow *flowTracker) {
 	defer wg.Done()
-	ok := sched.Schedule(flow.makeRequestContext())
+	ctx, cancel := context.WithTimeout(context.Background(), flow.timeout)
+	defer cancel()
+	ok := sched.Schedule(ctx, flow.makeRequest())
 	if ok {
 		atomic.AddUint64(&flow.acceptedRequests, 1)
 	}
 }
 
-func (flow *flowTracker) makeRequestContext() RequestContext {
-	return RequestContext{
+func (flow *flowTracker) makeRequest() Request {
+	return Request{
 		FairnessLabel: flow.fairnessLabel,
 		Tokens:        flow.tokens,
 		Priority:      flow.priority,
-		Timeout:       flow.timeout,
 	}
 }
 
@@ -240,7 +242,9 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		i := 0
 		for pb.Next() {
-			_ = sched.Schedule(flows[i%len(flows)].makeRequestContext())
+			ctx, cancel := context.WithTimeout(context.Background(), flows[i%len(flows)].timeout)
+			_ = sched.Schedule(ctx, flows[i%len(flows)].makeRequest())
+			cancel()
 		}
 	})
 }
@@ -269,7 +273,9 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 	bootstrapTime := time.Second * 1
 	for c.Now().Before(startTime.Add(bootstrapTime)) {
 		for _, flow := range flows {
-			_ = sched.Schedule(flow.makeRequestContext())
+			ctx, cancel := context.WithTimeout(context.Background(), flow.timeout)
+			_ = sched.Schedule(ctx, flow.makeRequest())
+			cancel()
 		}
 	}
 
@@ -282,7 +288,9 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		i := 0
 		for pb.Next() {
-			_ = sched.Schedule(flows[i%len(flows)].makeRequestContext())
+			ctx, cancel := context.WithTimeout(context.Background(), flows[i%len(flows)].timeout)
+			_ = sched.Schedule(ctx, flows[i%len(flows)].makeRequest())
+			cancel()
 		}
 	})
 }
