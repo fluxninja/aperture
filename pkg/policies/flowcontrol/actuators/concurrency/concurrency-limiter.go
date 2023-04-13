@@ -25,8 +25,8 @@ import (
 	"github.com/fluxninja/aperture/pkg/metrics"
 	"github.com/fluxninja/aperture/pkg/multimatcher"
 	"github.com/fluxninja/aperture/pkg/notifiers"
-	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/actuators/concurrency/scheduler"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/iface"
+	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/scheduler"
 	"github.com/fluxninja/aperture/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/pkg/policies/paths"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -558,14 +558,15 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 		}
 	}
 
-	reqContext := scheduler.RequestContext{
+	reqContext := scheduler.Request{
 		FairnessLabel: fairnessLabel,
 		Priority:      uint8(matchedWorkloadProto.Priority),
-		Timeout:       timeout,
 		Tokens:        tokens,
 	}
+	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
 
-	accepted := conLimiter.scheduler.Schedule(reqContext)
+	accepted := conLimiter.scheduler.Schedule(timeoutCtx, reqContext)
 
 	// update concurrency metrics and decisionType
 	conLimiter.incomingWorkSecondsCounter.Add(float64(reqContext.Tokens) / 1000)

@@ -73,7 +73,7 @@ func (tbb *tokenBucketBase) addTokens(toAdd float64) {
 	tbb.setAvailableTokensGauge(tbb.availableTokens)
 }
 
-func (tbb *tokenBucketBase) take(now time.Time, timeout time.Duration, tokens float64) (time.Duration, bool) {
+func (tbb *tokenBucketBase) take(now time.Time, tokens float64) (time.Duration, bool) {
 	// if tokens aren't coming don't provide any more tokens
 	if tbb.fillRate == 0 {
 		return time.Duration(0), false
@@ -87,13 +87,6 @@ func (tbb *tokenBucketBase) take(now time.Time, timeout time.Duration, tokens fl
 	}
 	// figure out when the tokens will be available
 	waitTime := time.Duration(-tbb.availableTokens * float64(1e9) / float64(tbb.fillRate))
-
-	// Check whether the request will timeout if it waits
-	if waitTime > timeout {
-		// return the tokens
-		tbb.addTokens(tokens)
-		return time.Duration(0), false
-	}
 
 	return waitTime, true
 }
@@ -110,6 +103,9 @@ func (tbb *tokenBucketBase) takeIfAvailable(now time.Time, tokens float64) bool 
 func (tbb *tokenBucketBase) getFillRate() float64 {
 	return tbb.fillRate
 }
+
+// Check BasicTokenBucket implements TokenManager interface.
+var _ TokenManager = &BasicTokenBucket{}
 
 // BasicTokenBucket is a basic token bucket implementation.
 type BasicTokenBucket struct {
@@ -141,14 +137,21 @@ func (btb *BasicTokenBucket) TakeIfAvailable(now time.Time, tokens float64) bool
 // Take takes tokens from the basic token bucket even if available tokens are less than asked.
 // If tokens are not available at the moment, it will return amount of wait time and checks
 // whether the operation was successful or not.
-func (btb *BasicTokenBucket) Take(now time.Time, timeout time.Duration, tokens float64) (time.Duration, bool) {
+func (btb *BasicTokenBucket) Take(now time.Time, tokens float64) (time.Duration, bool) {
 	btb.lock.Lock()
 	defer btb.lock.Unlock()
-	return btb.tbb.take(now, timeout, tokens)
+	return btb.tbb.take(now, tokens)
+}
+
+// Return returns tokens to the basic token bucket.
+func (btb *BasicTokenBucket) Return(tokens float64) {
+	btb.lock.Lock()
+	defer btb.lock.Unlock()
+	btb.tbb.addTokens(tokens)
 }
 
 // PreprocessRequest is a no-op for BasicTokenBucket and by default, it rejects the request.
-func (btb *BasicTokenBucket) PreprocessRequest(now time.Time, rContext RequestContext) bool {
+func (btb *BasicTokenBucket) PreprocessRequest(now time.Time, rContext Request) bool {
 	return btb.passThrough
 }
 
