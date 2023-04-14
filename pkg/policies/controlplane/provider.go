@@ -18,8 +18,8 @@ import (
 )
 
 const (
-	policiesTrackerFxTag             = "PoliciesTracker"
-	policiesDynameConfigTrackerFxTag = "PoliciesDynamicConfigTracker"
+	policiesTrackerFxTag              = "PoliciesTracker"
+	policiesDynamicConfigTrackerFxTag = "PoliciesDynamicConfigTracker"
 )
 
 // swagger:operation POST /policies common-configuration PoliciesConfig
@@ -43,21 +43,21 @@ func Module() fx.Option {
 				provideTrackers,
 				fx.ResultTags(
 					config.NameTag(policiesTrackerFxTag),
-					config.NameTag(policiesDynameConfigTrackerFxTag),
+					config.NameTag(policiesDynamicConfigTrackerFxTag),
 				),
 			),
 		),
 		// Syncing policies config to etcd
 		crwatcher.Constructor{
 			Name:              policiesTrackerFxTag,
-			DynamicConfigName: policiesDynameConfigTrackerFxTag,
+			DynamicConfigName: policiesDynamicConfigTrackerFxTag,
 		}.Annotate(), // Create a new watcher
 		fx.Invoke(
 			fx.Annotate(
 				setupPoliciesNotifier,
 				fx.ParamTags(
 					config.NameTag(policiesTrackerFxTag),
-					config.NameTag(policiesDynameConfigTrackerFxTag),
+					config.NameTag(policiesDynamicConfigTrackerFxTag),
 				),
 			),
 		),
@@ -96,6 +96,9 @@ func setupPoliciesNotifier(policyTrackers, policyDynamicConfigTrackers notifiers
 	}
 	wrapPolicy := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
 		var dat []byte
+		if bytes == nil {
+			return key, dat, nil
+		}
 		switch etype {
 		case notifiers.Write:
 			policyMessage := &policylangv1.Policy{}

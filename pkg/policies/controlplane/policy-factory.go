@@ -50,7 +50,7 @@ func policyFactoryModule() fx.Option {
 				RegisterPolicyService,
 				fx.ParamTags(
 					config.NameTag(policiesTrackerFxTag),
-					config.NameTag(policiesDynameConfigTrackerFxTag),
+					config.NameTag(policiesDynamicConfigTrackerFxTag),
 				),
 			),
 		),

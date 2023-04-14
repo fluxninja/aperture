@@ -83,10 +83,14 @@ func (s *PolicyService) managePolicies(ctx context.Context, policies *policylang
 				continue
 			}
 		} else {
-			_, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: request.Name})
+			policy, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: request.Name})
 			if err != nil {
 				errs = append(errs, fmt.Sprintf("policy '%s' not found", request.Name))
 				continue
+			}
+
+			if request.Policy == nil {
+				request.Policy = policy.Policy
 			}
 		}
 
