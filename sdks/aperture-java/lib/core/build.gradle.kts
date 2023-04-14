@@ -28,7 +28,7 @@ dependencies {
     implementation("io.grpc:grpc-stub:1.54.0")
     implementation("org.slf4j:slf4j-simple:1.7.0")
 
-    runtimeOnly("io.grpc:grpc-netty-shaded:1.49.0")
+    runtimeOnly("io.grpc:grpc-netty-shaded:1.54.0")
 
     // Workaround for @javax.annotation.Generated
     // see: https://github.com/grpc/grpc-java/issues/3633
