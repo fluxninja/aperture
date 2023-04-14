@@ -36,18 +36,18 @@ func (constructor Constructor) Annotate() fx.Option {
 	if constructor.Name == "" || constructor.DynamicConfigName == "" {
 		log.Panic().Msg("Kubernetes watcher name is required")
 	}
-	name := config.NameTag(constructor.Name)
-	dynamicConfigName := config.NameTag(constructor.DynamicConfigName)
+	policyTrackersName := config.NameTag(constructor.Name)
+	policyDynamicConfigTrackersName := config.NameTag(constructor.DynamicConfigName)
 	return fx.Options(fx.Invoke(
 		fx.Annotate(
 			constructor.provideWatcher,
-			fx.ParamTags(name, dynamicConfigName),
+			fx.ParamTags(policyTrackersName, policyDynamicConfigTrackersName),
 		),
 	))
 }
 
 // provideWatcher creates a Kubernetes watcher to watch the Policy Custom Resource.
-func (constructor Constructor) provideWatcher(trackers, dynamicConfigTrackers notifiers.Trackers, unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) error {
+func (constructor Constructor) provideWatcher(policyTrackers, policyDynamicConfigTrackers notifiers.Trackers, unmarshaller config.Unmarshaller, lifecycle fx.Lifecycle) error {
 	var config CRWatcherConfig
 	err := unmarshaller.UnmarshalKey(ConfigKey, &config)
 	if err != nil {
@@ -64,7 +64,7 @@ func (constructor Constructor) provideWatcher(trackers, dynamicConfigTrackers no
 		os.Setenv("APERTURE_CONTROLLER_NAMESPACE", "default")
 	}
 
-	watcher, err := NewWatcher(trackers, dynamicConfigTrackers)
+	watcher, err := NewWatcher(policyTrackers, policyDynamicConfigTrackers)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create Policy Kubernetes watcher")
 		return err

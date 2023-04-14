@@ -67,30 +67,30 @@ func Module() fx.Option {
 }
 
 func provideTrackers(lifecycle fx.Lifecycle) (notifiers.Trackers, notifiers.Trackers, error) {
-	trackers := notifiers.NewDefaultTrackers()
-	dynamicConfigTrackers := notifiers.NewDefaultTrackers()
+	policyTrackers := notifiers.NewDefaultTrackers()
+	policyDynamicConfigTrackers := notifiers.NewDefaultTrackers()
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			return multierr.Combine(
-				trackers.Start(),
-				dynamicConfigTrackers.Start(),
+				policyTrackers.Start(),
+				policyDynamicConfigTrackers.Start(),
 			)
 		},
 		OnStop: func(ctx context.Context) error {
 			return multierr.Combine(
-				trackers.Stop(),
-				dynamicConfigTrackers.Stop(),
+				policyTrackers.Stop(),
+				policyDynamicConfigTrackers.Stop(),
 			)
 		},
 	})
 
-	return trackers, dynamicConfigTrackers, nil
+	return policyTrackers, policyDynamicConfigTrackers, nil
 }
 
 // Sync policies config directory with etcd.
-func setupPoliciesNotifier(crWatcher, dynamicConfigWatcher notifiers.Trackers, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) {
-	if crWatcher == nil || dynamicConfigWatcher == nil {
+func setupPoliciesNotifier(policyTrackers, policyDynamicConfigTrackers notifiers.Trackers, etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) {
+	if policyTrackers == nil || policyDynamicConfigTrackers == nil {
 		log.Debug().Msg("Kubernetes watcher is disabled")
 		return
 	}
@@ -126,34 +126,34 @@ func setupPoliciesNotifier(crWatcher, dynamicConfigWatcher notifiers.Trackers, e
 		return key, dat, nil
 	}
 
-	crNotifier := etcdnotifier.NewPrefixToEtcdNotifier(
+	policyEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(
 		paths.PoliciesConfigPath,
 		etcdClient,
 		true)
 	// content transform callback to wrap policy in config properties wrapper
-	crNotifier.SetTransformFunc(wrapPolicy)
+	policyEtcdNotifier.SetTransformFunc(wrapPolicy)
 
-	dynamicConfigNotifier := etcdnotifier.NewPrefixToEtcdNotifier(
+	policyDynamicConfigEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(
 		paths.PoliciesDynamicConfigPath,
 		etcdClient,
 		true)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
-			err := crNotifier.Start()
+			err := policyEtcdNotifier.Start()
 			if err != nil {
 				return err
 			}
-			err = crWatcher.AddPrefixNotifier(crNotifier)
+			err = policyTrackers.AddPrefixNotifier(policyEtcdNotifier)
 			if err != nil {
 				return err
 			}
 
-			err = dynamicConfigNotifier.Start()
+			err = policyDynamicConfigEtcdNotifier.Start()
 			if err != nil {
 				return err
 			}
-			err = dynamicConfigWatcher.AddPrefixNotifier(dynamicConfigNotifier)
+			err = policyDynamicConfigTrackers.AddPrefixNotifier(policyDynamicConfigEtcdNotifier)
 			if err != nil {
 				return err
 			}
@@ -161,20 +161,20 @@ func setupPoliciesNotifier(crWatcher, dynamicConfigWatcher notifiers.Trackers, e
 		},
 		OnStop: func(_ context.Context) error {
 			var merr, err error
-			err = crWatcher.RemovePrefixNotifier(crNotifier)
+			err = policyTrackers.RemovePrefixNotifier(policyEtcdNotifier)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = crNotifier.Stop()
+			err = policyEtcdNotifier.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
 
-			err = dynamicConfigWatcher.RemovePrefixNotifier(dynamicConfigNotifier)
+			err = policyDynamicConfigTrackers.RemovePrefixNotifier(policyDynamicConfigEtcdNotifier)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = dynamicConfigNotifier.Stop()
+			err = policyDynamicConfigEtcdNotifier.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}

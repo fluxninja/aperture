@@ -16,17 +16,17 @@ import (
 // PolicyService is the implementation of policylangv1.PolicyService interface.
 type PolicyService struct {
 	policylangv1.UnimplementedPolicyServiceServer
-	policyFactory        *PolicyFactory
-	etcdTracker          notifiers.Trackers
-	dynamicConfigTracker notifiers.Trackers
+	policyFactory               *PolicyFactory
+	policyTrackers              notifiers.Trackers
+	policyDynamicConfigTrackers notifiers.Trackers
 }
 
 // RegisterPolicyService registers a service for policy.
-func RegisterPolicyService(etcdTracker, dynamicConfigYTracker notifiers.Trackers, server *grpc.Server, policyFactory *PolicyFactory) *PolicyService {
+func RegisterPolicyService(policyTrackers, policyDynamicConfigTrackers notifiers.Trackers, server *grpc.Server, policyFactory *PolicyFactory) *PolicyService {
 	svc := &PolicyService{
-		policyFactory:        policyFactory,
-		etcdTracker:          etcdTracker,
-		dynamicConfigTracker: dynamicConfigYTracker,
+		policyFactory:               policyFactory,
+		policyTrackers:              policyTrackers,
+		policyDynamicConfigTrackers: policyDynamicConfigTrackers,
 	}
 	policylangv1.RegisterPolicyServiceServer(server, svc)
 	return svc
@@ -63,8 +63,8 @@ func (s *PolicyService) PatchPolicies(ctx context.Context, policies *policylangv
 
 // DeletePolicy deletes a policy from the system.
 func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.DeletePolicyRequest) (*emptypb.Empty, error) {
-	s.etcdTracker.RemoveEvent(notifiers.Key(policy.Name))
-	s.dynamicConfigTracker.RemoveEvent(notifiers.Key(policy.Name))
+	s.policyTrackers.RemoveEvent(notifiers.Key(policy.Name))
+	s.policyDynamicConfigTrackers.RemoveEvent(notifiers.Key(policy.Name))
 	return &emptypb.Empty{}, nil
 }
 
@@ -95,7 +95,7 @@ func (s *PolicyService) managePolicies(ctx context.Context, policies *policylang
 			errs = append(errs, err.Error())
 			continue
 		}
-		s.etcdTracker.WriteEvent(notifiers.Key(request.Name), jsonPolicy)
+		s.policyTrackers.WriteEvent(notifiers.Key(request.Name), jsonPolicy)
 
 		if request.DynamicConfig == nil {
 			continue
@@ -106,7 +106,7 @@ func (s *PolicyService) managePolicies(ctx context.Context, policies *policylang
 			errs = append(errs, fmt.Sprintf("failed to marshal dynamic config '%s': '%s'", request.Name, err))
 			continue
 		}
-		s.dynamicConfigTracker.WriteEvent(notifiers.Key(request.Name), jsonDynamicConfig)
+		s.policyDynamicConfigTrackers.WriteEvent(notifiers.Key(request.Name), jsonDynamicConfig)
 	}
 
 	response := &policylangv1.PostPoliciesResponse{}

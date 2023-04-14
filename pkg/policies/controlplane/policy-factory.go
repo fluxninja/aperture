@@ -24,21 +24,21 @@ import (
 
 // Fx tag to match etcd watcher name.
 var (
-	policiesDriverFxTag              = "policies-driver"
-	policiesDynamicConfigDriverFxTag = "policies-dynamic-config-driver"
+	policiesEtcdWatcherFxTag              = "policies-driver"
+	policiesDynamicConfigEtcdWarcherFxTag = "policies-dynamic-config-driver"
 )
 
 // policyFactoryModule module for policy factory.
 func policyFactoryModule() fx.Option {
 	return fx.Options(
-		etcdwatcher.Constructor{Name: policiesDriverFxTag, EtcdPath: paths.PoliciesConfigPath}.Annotate(),
-		etcdwatcher.Constructor{Name: policiesDynamicConfigDriverFxTag, EtcdPath: paths.PoliciesDynamicConfigPath}.Annotate(),
+		etcdwatcher.Constructor{Name: policiesEtcdWatcherFxTag, EtcdPath: paths.PoliciesConfigPath}.Annotate(),
+		etcdwatcher.Constructor{Name: policiesDynamicConfigEtcdWarcherFxTag, EtcdPath: paths.PoliciesDynamicConfigPath}.Annotate(),
 		fx.Provide(
 			fx.Annotate(
 				providePolicyFactory,
 				fx.ParamTags(
-					config.NameTag(policiesDriverFxTag),
-					config.NameTag(policiesDynamicConfigDriverFxTag),
+					config.NameTag(policiesEtcdWatcherFxTag),
+					config.NameTag(policiesDynamicConfigEtcdWarcherFxTag),
 					iface.FxOptionsFuncTag,
 					alerts.AlertsFxTag,
 				),
@@ -61,19 +61,19 @@ func policyFactoryModule() fx.Option {
 
 // PolicyFactory factory for policies.
 type PolicyFactory struct {
-	lock                 sync.RWMutex
-	circuitJobGroup      *jobs.JobGroup
-	etcdClient           *etcdclient.Client
-	alerterIface         alerts.Alerter
-	registry             status.Registry
-	dynamicConfigWatcher notifiers.Watcher
-	policyTracker        map[string]*policysyncv1.PolicyWrapper
+	lock                             sync.RWMutex
+	circuitJobGroup                  *jobs.JobGroup
+	etcdClient                       *etcdclient.Client
+	alerterIface                     alerts.Alerter
+	registry                         status.Registry
+	policiesDynamicConfigEtcdWatcher notifiers.Watcher
+	policyTracker                    map[string]*policysyncv1.PolicyWrapper
 }
 
 // Main fx app.
 func providePolicyFactory(
-	etcdWatcher notifiers.Watcher,
-	dynamicConfigWatcher notifiers.Watcher,
+	policiesEtcdWatcher notifiers.Watcher,
+	policiesDynamicConfigEtcdWatcher notifiers.Watcher,
 	fxOptionsFuncs []notifiers.FxOptionsFunc,
 	alerterIface alerts.Alerter,
 	etcdClient *etcdclient.Client,
@@ -91,12 +91,12 @@ func providePolicyFactory(
 	}
 
 	factory := &PolicyFactory{
-		registry:             policiesStatusRegistry,
-		circuitJobGroup:      circuitJobGroup,
-		etcdClient:           etcdClient,
-		alerterIface:         alerterIface,
-		dynamicConfigWatcher: dynamicConfigWatcher,
-		policyTracker:        make(map[string]*policysyncv1.PolicyWrapper),
+		registry:                         policiesStatusRegistry,
+		circuitJobGroup:                  circuitJobGroup,
+		etcdClient:                       etcdClient,
+		alerterIface:                     alerterIface,
+		policiesDynamicConfigEtcdWatcher: policiesDynamicConfigEtcdWatcher,
+		policyTracker:                    make(map[string]*policysyncv1.PolicyWrapper),
 	}
 
 	optionsFunc := []notifiers.FxOptionsFunc{factory.provideControllerPolicyFxOptions}
@@ -132,7 +132,7 @@ func providePolicyFactory(
 		},
 	})
 
-	notifiers.NotifierLifecycle(lifecycle, etcdWatcher, fxDriver)
+	notifiers.NotifierLifecycle(lifecycle, policiesEtcdWatcher, fxDriver)
 	return factory, nil
 }
 
@@ -161,7 +161,7 @@ func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 	}
 	return fx.Options(
 		fx.Supply(
-			fx.Annotate(factory.dynamicConfigWatcher, fx.As(new(notifiers.Watcher))),
+			fx.Annotate(factory.policiesDynamicConfigEtcdWatcher, fx.As(new(notifiers.Watcher))),
 			factory.circuitJobGroup,
 			factory.etcdClient,
 			factory.alerterIface,
