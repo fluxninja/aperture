@@ -119,8 +119,8 @@ public final class CheckhttpProto {
       "\001\n\tCheckHTTP\0223.aperture.flowcontrol.chec" +
       "khttp.v1.CheckHTTPRequest\0324.aperture.flo" +
       "wcontrol.checkhttp.v1.CheckHTTPResponse\"" +
-      "7\222A\020\n\016aperture-agent\202\323\344\223\002\036:\001*\"\031/v1/flowc" +
-      "ontrol/checkhttpB\320\002\n9com.fluxninja.gener" +
+      "7\222A\020\n\016aperture-agent\202\323\344\223\002\036\"\031/v1/flowcont" +
+      "rol/checkhttp:\001*B\320\002\n9com.fluxninja.gener" +
       "ated.aperture.flowcontrol.checkhttp.v1B\016" +
       "CheckhttpProtoP\001Z\\github.com/fluxninja/a" +
       "perture/api/gen/proto/go/aperture/flowco" +

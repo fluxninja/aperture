@@ -25,104 +25,6 @@ private static final long serialVersionUID = 0L;
     return new CheckHTTPResponse();
   }
 
-  @java.lang.Override
-  public final com.google.protobuf.UnknownFieldSet
-  getUnknownFields() {
-    return this.unknownFields;
-  }
-  private CheckHTTPResponse(
-      com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
-    this();
-    if (extensionRegistry == null) {
-      throw new java.lang.NullPointerException();
-    }
-    com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-        com.google.protobuf.UnknownFieldSet.newBuilder();
-    try {
-      boolean done = false;
-      while (!done) {
-        int tag = input.readTag();
-        switch (tag) {
-          case 0:
-            done = true;
-            break;
-          case 10: {
-            com.fluxninja.generated.google.rpc.Status.Builder subBuilder = null;
-            if (status_ != null) {
-              subBuilder = status_.toBuilder();
-            }
-            status_ = input.readMessage(com.fluxninja.generated.google.rpc.Status.parser(), extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom(status_);
-              status_ = subBuilder.buildPartial();
-            }
-
-            break;
-          }
-          case 18: {
-            com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.DeniedHttpResponse.Builder subBuilder = null;
-            if (httpResponseCase_ == 2) {
-              subBuilder = ((com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.DeniedHttpResponse) httpResponse_).toBuilder();
-            }
-            httpResponse_ =
-                input.readMessage(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.DeniedHttpResponse.parser(), extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom((com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.DeniedHttpResponse) httpResponse_);
-              httpResponse_ = subBuilder.buildPartial();
-            }
-            httpResponseCase_ = 2;
-            break;
-          }
-          case 26: {
-            com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse.Builder subBuilder = null;
-            if (httpResponseCase_ == 3) {
-              subBuilder = ((com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse) httpResponse_).toBuilder();
-            }
-            httpResponse_ =
-                input.readMessage(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse.parser(), extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom((com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse) httpResponse_);
-              httpResponse_ = subBuilder.buildPartial();
-            }
-            httpResponseCase_ = 3;
-            break;
-          }
-          case 34: {
-            com.google.protobuf.Struct.Builder subBuilder = null;
-            if (dynamicMetadata_ != null) {
-              subBuilder = dynamicMetadata_.toBuilder();
-            }
-            dynamicMetadata_ = input.readMessage(com.google.protobuf.Struct.parser(), extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom(dynamicMetadata_);
-              dynamicMetadata_ = subBuilder.buildPartial();
-            }
-
-            break;
-          }
-          default: {
-            if (!parseUnknownField(
-                input, unknownFields, extensionRegistry, tag)) {
-              done = true;
-            }
-            break;
-          }
-        }
-      }
-    } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-      throw e.setUnfinishedMessage(this);
-    } catch (com.google.protobuf.UninitializedMessageException e) {
-      throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-    } catch (java.io.IOException e) {
-      throw new com.google.protobuf.InvalidProtocolBufferException(
-          e).setUnfinishedMessage(this);
-    } finally {
-      this.unknownFields = unknownFields.build();
-      makeExtensionsImmutable();
-    }
-  }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckhttpProto.internal_static_aperture_flowcontrol_checkhttp_v1_CheckHTTPResponse_descriptor;
@@ -137,6 +39,7 @@ private static final long serialVersionUID = 0L;
   }
 
   private int httpResponseCase_ = 0;
+  @SuppressWarnings("serial")
   private java.lang.Object httpResponse_;
   public enum HttpResponseCase
       implements com.google.protobuf.Internal.EnumLite,
@@ -212,7 +115,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.fluxninja.generated.google.rpc.StatusOrBuilder getStatusOrBuilder() {
-    return getStatus();
+    return status_ == null ? com.fluxninja.generated.google.rpc.Status.getDefaultInstance() : status_;
   }
 
   public static final int DENIED_RESPONSE_FIELD_NUMBER = 2;
@@ -339,7 +242,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public com.google.protobuf.StructOrBuilder getDynamicMetadataOrBuilder() {
-    return getDynamicMetadata();
+    return dynamicMetadata_ == null ? com.google.protobuf.Struct.getDefaultInstance() : dynamicMetadata_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -368,7 +271,7 @@ private static final long serialVersionUID = 0L;
     if (dynamicMetadata_ != null) {
       output.writeMessage(4, getDynamicMetadata());
     }
-    unknownFields.writeTo(output);
+    getUnknownFields().writeTo(output);
   }
 
   @java.lang.Override
@@ -393,7 +296,7 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(4, getDynamicMetadata());
     }
-    size += unknownFields.getSerializedSize();
+    size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
   }
@@ -431,7 +334,7 @@ private static final long serialVersionUID = 0L;
       case 0:
       default:
     }
-    if (!unknownFields.equals(other.unknownFields)) return false;
+    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
 
@@ -462,7 +365,7 @@ private static final long serialVersionUID = 0L;
       case 0:
       default:
     }
-    hash = (29 * hash) + unknownFields.hashCode();
+    hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
   }
@@ -579,32 +482,32 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse.newBuilder()
     private Builder() {
-      maybeForceBuilderInitialization();
+
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-      maybeForceBuilderInitialization();
-    }
-    private void maybeForceBuilderInitialization() {
-      if (com.google.protobuf.GeneratedMessageV3
-              .alwaysUseFieldBuilders) {
-      }
+
     }
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      if (statusBuilder_ == null) {
-        status_ = null;
-      } else {
-        status_ = null;
+      bitField0_ = 0;
+      status_ = null;
+      if (statusBuilder_ != null) {
+        statusBuilder_.dispose();
         statusBuilder_ = null;
       }
-      if (dynamicMetadataBuilder_ == null) {
-        dynamicMetadata_ = null;
-      } else {
-        dynamicMetadata_ = null;
+      if (deniedResponseBuilder_ != null) {
+        deniedResponseBuilder_.clear();
+      }
+      if (okResponseBuilder_ != null) {
+        okResponseBuilder_.clear();
+      }
+      dynamicMetadata_ = null;
+      if (dynamicMetadataBuilder_ != null) {
+        dynamicMetadataBuilder_.dispose();
         dynamicMetadataBuilder_ = null;
       }
       httpResponseCase_ = 0;
@@ -635,67 +538,39 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse buildPartial() {
       com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse result = new com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse(this);
-      if (statusBuilder_ == null) {
-        result.status_ = status_;
-      } else {
-        result.status_ = statusBuilder_.build();
-      }
-      if (httpResponseCase_ == 2) {
-        if (deniedResponseBuilder_ == null) {
-          result.httpResponse_ = httpResponse_;
-        } else {
-          result.httpResponse_ = deniedResponseBuilder_.build();
-        }
-      }
-      if (httpResponseCase_ == 3) {
-        if (okResponseBuilder_ == null) {
-          result.httpResponse_ = httpResponse_;
-        } else {
-          result.httpResponse_ = okResponseBuilder_.build();
-        }
-      }
-      if (dynamicMetadataBuilder_ == null) {
-        result.dynamicMetadata_ = dynamicMetadata_;
-      } else {
-        result.dynamicMetadata_ = dynamicMetadataBuilder_.build();
-      }
-      result.httpResponseCase_ = httpResponseCase_;
+      if (bitField0_ != 0) { buildPartial0(result); }
+      buildPartialOneofs(result);
       onBuilt();
       return result;
     }
 
-    @java.lang.Override
-    public Builder clone() {
-      return super.clone();
+    private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.status_ = statusBuilder_ == null
+            ? status_
+            : statusBuilder_.build();
+      }
+      if (((from_bitField0_ & 0x00000008) != 0)) {
+        result.dynamicMetadata_ = dynamicMetadataBuilder_ == null
+            ? dynamicMetadata_
+            : dynamicMetadataBuilder_.build();
+      }
     }
-    @java.lang.Override
-    public Builder setField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
-      return super.setField(field, value);
+
+    private void buildPartialOneofs(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse result) {
+      result.httpResponseCase_ = httpResponseCase_;
+      result.httpResponse_ = this.httpResponse_;
+      if (httpResponseCase_ == 2 &&
+          deniedResponseBuilder_ != null) {
+        result.httpResponse_ = deniedResponseBuilder_.build();
+      }
+      if (httpResponseCase_ == 3 &&
+          okResponseBuilder_ != null) {
+        result.httpResponse_ = okResponseBuilder_.build();
+      }
     }
-    @java.lang.Override
-    public Builder clearField(
-        com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return super.clearField(field);
-    }
-    @java.lang.Override
-    public Builder clearOneof(
-        com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return super.clearOneof(oneof);
-    }
-    @java.lang.Override
-    public Builder setRepeatedField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        int index, java.lang.Object value) {
-      return super.setRepeatedField(field, index, value);
-    }
-    @java.lang.Override
-    public Builder addRepeatedField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
-      return super.addRepeatedField(field, value);
-    }
+
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse) {
@@ -727,7 +602,7 @@ private static final long serialVersionUID = 0L;
           break;
         }
       }
-      this.mergeUnknownFields(other.unknownFields);
+      this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
     }
@@ -742,17 +617,58 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse parsedMessage = null;
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       try {
-        parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              input.readMessage(
+                  getStatusFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000001;
+              break;
+            } // case 10
+            case 18: {
+              input.readMessage(
+                  getDeniedResponseFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              httpResponseCase_ = 2;
+              break;
+            } // case 18
+            case 26: {
+              input.readMessage(
+                  getOkResponseFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              httpResponseCase_ = 3;
+              break;
+            } // case 26
+            case 34: {
+              input.readMessage(
+                  getDynamicMetadataFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000008;
+              break;
+            } // case 34
+            default: {
+              if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                done = true; // was an endgroup tag
+              }
+              break;
+            } // default:
+          } // switch (tag)
+        } // while (!done)
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
-        if (parsedMessage != null) {
-          mergeFrom(parsedMessage);
-        }
-      }
+        onChanged();
+      } // finally
       return this;
     }
     private int httpResponseCase_ = 0;
@@ -770,6 +686,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
+    private int bitField0_;
 
     private com.fluxninja.generated.google.rpc.Status status_;
     private com.google.protobuf.SingleFieldBuilderV3<
@@ -783,7 +700,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the status field is set.
      */
     public boolean hasStatus() {
-      return statusBuilder_ != null || status_ != null;
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <pre>
@@ -813,11 +730,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         status_ = value;
-        onChanged();
       } else {
         statusBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -831,11 +748,11 @@ private static final long serialVersionUID = 0L;
         com.fluxninja.generated.google.rpc.Status.Builder builderForValue) {
       if (statusBuilder_ == null) {
         status_ = builderForValue.build();
-        onChanged();
       } else {
         statusBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -847,17 +764,18 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeStatus(com.fluxninja.generated.google.rpc.Status value) {
       if (statusBuilder_ == null) {
-        if (status_ != null) {
-          status_ =
-            com.fluxninja.generated.google.rpc.Status.newBuilder(status_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000001) != 0) &&
+          status_ != null &&
+          status_ != com.fluxninja.generated.google.rpc.Status.getDefaultInstance()) {
+          getStatusBuilder().mergeFrom(value);
         } else {
           status_ = value;
         }
-        onChanged();
       } else {
         statusBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000001;
+      onChanged();
       return this;
     }
     /**
@@ -868,14 +786,13 @@ private static final long serialVersionUID = 0L;
      * <code>.google.rpc.Status status = 1 [json_name = "status"];</code>
      */
     public Builder clearStatus() {
-      if (statusBuilder_ == null) {
-        status_ = null;
-        onChanged();
-      } else {
-        status_ = null;
+      bitField0_ = (bitField0_ & ~0x00000001);
+      status_ = null;
+      if (statusBuilder_ != null) {
+        statusBuilder_.dispose();
         statusBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
@@ -886,7 +803,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.rpc.Status status = 1 [json_name = "status"];</code>
      */
     public com.fluxninja.generated.google.rpc.Status.Builder getStatusBuilder() {
-      
+      bitField0_ |= 0x00000001;
       onChanged();
       return getStatusFieldBuilder().getBuilder();
     }
@@ -1100,7 +1017,7 @@ private static final long serialVersionUID = 0L;
         httpResponse_ = null;
       }
       httpResponseCase_ = 2;
-      onChanged();;
+      onChanged();
       return deniedResponseBuilder_;
     }
 
@@ -1278,7 +1195,7 @@ private static final long serialVersionUID = 0L;
         httpResponse_ = null;
       }
       httpResponseCase_ = 3;
-      onChanged();;
+      onChanged();
       return okResponseBuilder_;
     }
 
@@ -1295,7 +1212,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the dynamicMetadata field is set.
      */
     public boolean hasDynamicMetadata() {
-      return dynamicMetadataBuilder_ != null || dynamicMetadata_ != null;
+      return ((bitField0_ & 0x00000008) != 0);
     }
     /**
      * <pre>
@@ -1327,11 +1244,11 @@ private static final long serialVersionUID = 0L;
           throw new NullPointerException();
         }
         dynamicMetadata_ = value;
-        onChanged();
       } else {
         dynamicMetadataBuilder_.setMessage(value);
       }
-
+      bitField0_ |= 0x00000008;
+      onChanged();
       return this;
     }
     /**
@@ -1346,11 +1263,11 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.Struct.Builder builderForValue) {
       if (dynamicMetadataBuilder_ == null) {
         dynamicMetadata_ = builderForValue.build();
-        onChanged();
       } else {
         dynamicMetadataBuilder_.setMessage(builderForValue.build());
       }
-
+      bitField0_ |= 0x00000008;
+      onChanged();
       return this;
     }
     /**
@@ -1363,17 +1280,18 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeDynamicMetadata(com.google.protobuf.Struct value) {
       if (dynamicMetadataBuilder_ == null) {
-        if (dynamicMetadata_ != null) {
-          dynamicMetadata_ =
-            com.google.protobuf.Struct.newBuilder(dynamicMetadata_).mergeFrom(value).buildPartial();
+        if (((bitField0_ & 0x00000008) != 0) &&
+          dynamicMetadata_ != null &&
+          dynamicMetadata_ != com.google.protobuf.Struct.getDefaultInstance()) {
+          getDynamicMetadataBuilder().mergeFrom(value);
         } else {
           dynamicMetadata_ = value;
         }
-        onChanged();
       } else {
         dynamicMetadataBuilder_.mergeFrom(value);
       }
-
+      bitField0_ |= 0x00000008;
+      onChanged();
       return this;
     }
     /**
@@ -1385,14 +1303,13 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Struct dynamic_metadata = 4 [json_name = "dynamicMetadata"];</code>
      */
     public Builder clearDynamicMetadata() {
-      if (dynamicMetadataBuilder_ == null) {
-        dynamicMetadata_ = null;
-        onChanged();
-      } else {
-        dynamicMetadata_ = null;
+      bitField0_ = (bitField0_ & ~0x00000008);
+      dynamicMetadata_ = null;
+      if (dynamicMetadataBuilder_ != null) {
+        dynamicMetadataBuilder_.dispose();
         dynamicMetadataBuilder_ = null;
       }
-
+      onChanged();
       return this;
     }
     /**
@@ -1404,7 +1321,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Struct dynamic_metadata = 4 [json_name = "dynamicMetadata"];</code>
      */
     public com.google.protobuf.Struct.Builder getDynamicMetadataBuilder() {
-      
+      bitField0_ |= 0x00000008;
       onChanged();
       return getDynamicMetadataFieldBuilder().getBuilder();
     }
@@ -1478,7 +1395,18 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return new CheckHTTPResponse(input, extensionRegistry);
+      Builder builder = newBuilder();
+      try {
+        builder.mergeFrom(input, extensionRegistry);
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(builder.buildPartial());
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(e)
+            .setUnfinishedMessage(builder.buildPartial());
+      }
+      return builder.buildPartial();
     }
   };
 
