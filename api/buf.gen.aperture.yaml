@@ -13,7 +13,7 @@ plugins:
   - plugin: buf.build/protocolbuffers/java
     out: gen/proto/java
   - plugin: buf.build/grpc/java
-    out: gen/proto/java`
+    out: gen/proto/java
   - plugin: buf.build/grpc/python
     out: gen/proto/python
   - plugin: buf.build/protocolbuffers/python
