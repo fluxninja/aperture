@@ -4,7 +4,7 @@ package watchdogconfig
 import (
 	"sort"
 
-	"github.com/fluxninja/aperture/pkg/jobs"
+	jobs "github.com/fluxninja/aperture/pkg/jobs/config"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 

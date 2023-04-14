@@ -8,7 +8,6 @@ import (
 	"time"
 
 	promapi "github.com/prometheus/client_golang/api"
-	"go.opentelemetry.io/collector/processor/batchprocessor"
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/pkg/config"
@@ -111,10 +110,11 @@ func (o *OTELConfig) AddBatchProcessor(
 	sendBatchSize uint32,
 	sendBatchMaxSize uint32,
 ) {
-	o.AddProcessor(name, batchprocessor.Config{
-		Timeout:          timeout,
-		SendBatchSize:    sendBatchSize,
-		SendBatchMaxSize: sendBatchMaxSize,
+	// Note: Not passing batchprocessor.Config struct to avoid depending on batchprocessor.
+	o.AddProcessor(name, map[string]interface{}{
+		"timeout":             timeout,
+		"send_batch_size":     sendBatchSize,
+		"send_batch_max_size": sendBatchMaxSize,
 	})
 }
 

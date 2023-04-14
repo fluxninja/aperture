@@ -57,7 +57,7 @@ definitions:
                 x-go-tag-json: traces_sample_rate
         title: SentryConfig holds configuration for Sentry.
         type: object
-        x-go-package: github.com/fluxninja/aperture/extensions/sentry
+        x-go-package: github.com/fluxninja/aperture/extensions/sentry/config
 info: {}
 paths:
     /sentry:

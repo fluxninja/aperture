@@ -1,4 +1,3 @@
-// +kubebuilder:validation:Optional
 package static
 
 import (
@@ -6,10 +5,10 @@ import (
 
 	"go.uber.org/fx"
 
-	entitiesv1 "github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1"
 	"github.com/fluxninja/aperture/pkg/config"
 	"github.com/fluxninja/aperture/pkg/discovery/common"
 	"github.com/fluxninja/aperture/pkg/discovery/entities"
+	sdconfig "github.com/fluxninja/aperture/pkg/discovery/static/config"
 	"github.com/fluxninja/aperture/pkg/log"
 )
 
@@ -18,20 +17,13 @@ const (
 	staticEntityTrackerPrefix = "static_entity"
 )
 
-// StaticDiscoveryConfig for pre-determined list of services.
-// swagger:model
-// +kubebuilder:object:generate=true
-type StaticDiscoveryConfig struct {
-	Entities []entitiesv1.Entity `json:"entities,omitempty"`
-}
-
 // InvokeStaticServiceDiscovery causes statically configured services to be uploaded to the tracker.
 func InvokeStaticServiceDiscovery(
 	unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
 	entityTrackers *entities.EntityTrackers,
 ) error {
-	var cfg StaticDiscoveryConfig
+	var cfg sdconfig.StaticDiscoveryConfig
 	if err := unmarshaller.UnmarshalKey(configKey, &cfg); err != nil {
 		log.Error().Err(err).Msg("Unable to deserialize static services configuration!")
 		return err

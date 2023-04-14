@@ -41,11 +41,11 @@ aperturectl blueprints list --all`,
 				return err
 			}
 
-			for version, policies := range blueprintsList {
+			for version, blueprints := range blueprintsList {
 				fmt.Printf("%s\n", version)
-				for i, policy := range policies {
-					fmt.Fprintf(w, "%s\n", policy)
-					if i == len(policies)-1 {
+				for i, blueprint := range blueprints {
+					fmt.Fprintf(w, "%s\n", blueprint)
+					if i == len(blueprints)-1 {
 						fmt.Fprintf(w, "\n")
 					}
 				}
@@ -56,13 +56,13 @@ aperturectl blueprints list --all`,
 		} else {
 			w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
 
-			policies, err := getBlueprints(blueprintsURIRoot)
+			blueprints, err := getBlueprints(blueprintsURIRoot, utils.AllowDeprecated)
 			if err != nil {
 				return err
 			}
 
-			for _, policy := range policies {
-				fmt.Fprintf(w, "%s\n", policy)
+			for _, blueprint := range blueprints {
+				fmt.Fprintf(w, "%s\n", blueprint)
 			}
 
 			w.Flush()
@@ -72,7 +72,7 @@ aperturectl blueprints list --all`,
 	},
 }
 
-func getBlueprints(blURIRoot string) ([]string, error) {
+func getBlueprints(blURIRoot string, listDeprecated bool) ([]string, error) {
 	relPath := utils.GetRelPath(blURIRoot)
 	policies := []string{}
 
@@ -85,6 +85,14 @@ func getBlueprints(blURIRoot string) ([]string, error) {
 			strippedPath := strings.TrimPrefix(path, blDir)
 			strippedPath = strings.TrimSuffix(strippedPath, "/bundle.libsonnet")
 			strippedPath = strings.TrimPrefix(strippedPath, "/")
+			if !listDeprecated {
+				// extract blueprint dir from path
+				blueprintDir := strings.TrimSuffix(path, "/bundle.libsonnet")
+				ok, _ := utils.IsBlueprintDeprecated(blueprintDir)
+				if ok {
+					return nil
+				}
+			}
 			policies = append(policies, strippedPath)
 		}
 		return nil
@@ -106,7 +114,7 @@ func getCachedBlueprints() (map[string][]string, error) {
 	for _, blueprintsURIDir := range blueprintsURIDirs {
 		if blueprintsURIDir.IsDir() {
 			dir := filepath.Join(blueprintsCacheRoot, blueprintsURIDir.Name())
-			policies, err := getBlueprints(dir)
+			policies, err := getBlueprints(dir, utils.AllowDeprecated)
 			if err != nil {
 				return nil, err
 			}

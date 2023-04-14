@@ -34,6 +34,7 @@ func main() {
 	concurrency := concurrencyFromEnv()
 	latency := latencyFromEnv()
 	rejectRatio := rejectRatioFromEnv()
+	cpuLoadPercentage := cpuLoadPercentageFromEnv()
 
 	// RabbitMQ related setup
 	rabbitMQURL := ""
@@ -67,7 +68,7 @@ func main() {
 		propagation.Baggage{},
 	))
 
-	service := app.NewSimpleService(hostname, port, envoyPort, rabbitMQURL, concurrency, latency, rejectRatio)
+	service := app.NewSimpleService(hostname, port, envoyPort, rabbitMQURL, concurrency, latency, rejectRatio, cpuLoadPercentage)
 	err := service.Run()
 	if err != nil {
 		log.Error().Err(err).Send()
@@ -100,19 +101,18 @@ func envoyPortFromEnv() int {
 	if !exists {
 		// We do not use manually configured envoy proxy
 		return -1
-	} else {
-		envoyPort, err := strconv.Atoi(portValue)
-		if err != nil {
-			log.Panic().Err(err).Msgf("Failed converting ENVOY_EGRESS_PORT value: %v", err)
-		}
-		return envoyPort
 	}
+	envoyPort, err := strconv.Atoi(portValue)
+	if err != nil {
+		log.Panic().Err(err).Msg("Failed converting ENVOY_EGRESS_PORT value")
+	}
+	return envoyPort
 }
 
 func portFromEnv() int {
 	port, err := strconv.Atoi(os.Getenv("SIMPLE_SERVICE_PORT"))
 	if err != nil {
-		log.Panic().Err(err).Msgf("Failed converting SIMPLE_SERVICE_PORT: %v", err)
+		log.Panic().Err(err).Msg("Failed converting SIMPLE_SERVICE_PORT")
 	}
 	return port
 }
@@ -128,7 +128,7 @@ func concurrencyFromEnv() int {
 	}
 	concurrency, err := strconv.Atoi(concurrencyValue)
 	if err != nil {
-		log.Panic().Err(err).Msgf("Failed converting SIMPLE_SERVICE_CONCURRENCY: %v", err)
+		log.Panic().Err(err).Msg("Failed converting SIMPLE_SERVICE_CONCURRENCY")
 	}
 	return concurrency
 }
@@ -138,10 +138,12 @@ func latencyFromEnv() time.Duration {
 	if !exists {
 		return time.Millisecond * 50
 	}
+
 	latency, err := time.ParseDuration(latencyValue)
 	if err != nil {
-		log.Panic().Err(err).Msgf("Failed converting SIMPLE_SERVICE_LATENCY: %v", err)
+		log.Panic().Err(err).Msg("Failed converting SIMPLE_SERVICE_LATENCY")
 	}
+
 	return latency
 }
 
@@ -150,11 +152,33 @@ func rejectRatioFromEnv() float64 {
 	if !exists {
 		return 0.05
 	}
+
 	rejectRatio, err := strconv.ParseFloat(rejectRatioValue, 64)
 	if err != nil {
-		log.Panic().Err(err).Msgf("Failed converting SIMPLE_SERVICE_REJECT_RATIO: %v", err)
+		log.Panic().Err(err).Msg("Failed converting SIMPLE_SERVICE_REJECT_RATIO")
 	}
+
 	return rejectRatio
+}
+
+func cpuLoadPercentageFromEnv() int {
+	loadCPUValue, exists := os.LookupEnv("SIMPLE_SERVICE_CPU_LOAD")
+	if !exists {
+		return 0
+	}
+
+	loadCPUI64, err := strconv.ParseInt(loadCPUValue, 10, 32)
+	if err != nil {
+		log.Panic().Err(err).Msg("Failed converting SIMPLE_SERVICE_CPU_LOAD")
+	}
+
+	loadCPU := int(loadCPUI64)
+
+	if loadCPU < 0 || loadCPU > 100 {
+		log.Panic().Msg("SIMPLE_SERVICE_CPU_LOAD must be between 0 and 100")
+	}
+
+	return loadCPU
 }
 
 // newResource returns a resource describing this application.

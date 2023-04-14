@@ -22,7 +22,7 @@ import (
 	controller "github.com/fluxninja/aperture/cmd/aperture-controller/config"
 	"github.com/fluxninja/aperture/operator/api"
 	"github.com/fluxninja/aperture/operator/api/common"
-	"github.com/fluxninja/aperture/pkg/jobs"
+	jobs "github.com/fluxninja/aperture/pkg/jobs/config"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

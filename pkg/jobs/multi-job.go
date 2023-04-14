@@ -9,6 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/fluxninja/aperture/pkg/config"
+	jobsconfig "github.com/fluxninja/aperture/pkg/jobs/config"
 	"github.com/fluxninja/aperture/pkg/log"
 	"github.com/fluxninja/aperture/pkg/panichandler"
 	"github.com/fluxninja/aperture/pkg/status"
@@ -17,7 +18,7 @@ import (
 // MultiJobConfig holds configuration for MultiJob.
 // swagger:model
 type MultiJobConfig struct {
-	JobConfig
+	jobsconfig.JobConfig
 }
 
 // MultiJobConstructor holds fields to create annotated instance of MultiJob.
