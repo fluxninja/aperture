@@ -3,10 +3,13 @@ title: Policy Language Specification
 sidebar_position: 2
 sidebar_label: Specification
 ---
+<!-- vale off -->
 
 <head>
   <body className="schema-docs" />
 </head>
+
+<!-- vale on -->
 
 Reference for all objects used in [the Policy language](/concepts/policy/policy.md).
 

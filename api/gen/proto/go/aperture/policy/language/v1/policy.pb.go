@@ -184,7 +184,7 @@ func (x *Policy) GetResources() *Resources {
 	return nil
 }
 
-// Circuit is defined as a dataflow graph of inter-connected components
+// Circuit is graph of inter-connected signal processing components.
 //
 // :::info
 //
@@ -193,23 +193,21 @@ func (x *Policy) GetResources() *Resources {
 // :::
 //
 // Signals flow between components via ports.
-// As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load-shed, rate-limit, auto-scale etc.).
-// Circuit is evaluated periodically in order to respond to changes in signal readings.
+// As signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto scale etc.).
+// Circuit is evaluated periodically to respond to changes in signal readings.
 //
-// :::info
-//
-// **Signal**
+// :::info Signals
 //
 // Signals are floating-point values.
 //
 // A signal can also have a special **Invalid** value. It's usually used to
-// communicate that signal doesn't have a meaningful value at the moment, eg.
-// [PromQL](#prom-q-l) emits such a value if it cannot execute a query.
+// communicate that signal doesn't have a meaningful value at the moment, for example,
+// [PromQL](#prom-q-l) emits such a value if it can't execute a query.
 // Components know when their input signals are invalid and can act
-// accordingly. They can either propagate the invalidness, by making their
-// output itself invalid (like eg.
+// accordingly. They can either propagate the invalid signal, by making their
+// output itself invalid (for example,
 // [ArithmeticCombinator](#arithmetic-combinator)) or use some different
-// logic, like eg. [Extrapolator](#extrapolator). Refer to a component's
+// logic, for example, [Extrapolator](#extrapolator). Refer to a component's
 // docs on how exactly it handles invalid inputs.
 //
 // :::
@@ -218,7 +216,7 @@ type Circuit struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
+	// Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
 	// This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
 	EvaluationInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=evaluation_interval,json=evaluationInterval,proto3" json:"evaluation_interval,omitempty" default:"0.5s"` // @gotags: default:"0.5s"
 	// Defines a signal processing graph as a list of components.
@@ -367,32 +365,32 @@ func (x *Resources) GetFlowControl() *FlowControlResources {
 //
 // :::note
 //
-// Loops are broken by the runtime at the earliest component index that is part of the loop.
-// The looped signals are saved in the tick they are generated and served in the subsequent tick.
+// Loops are broken by the runtime at the earliest component index that's part of the loop.
+// The looped signals are saved in the tick they're generated and served in the subsequent tick.
 //
 // :::
 //
 // There are three categories of components:
 //
-//   - "source" components – they take some sort of input from "the real world" and output
+//   - "source" components: they take some sort of input from "the real world" and output
 //     a signal based on this input. Example: [PromQL](#prom-q-l). In the UI
 //     they're represented by green color.
 //
-//   - signal processor components – "pure" components that don't interact with the "real world".
+//   - signal processor components: processing components that don't interact with the external systems.
 //     Examples: [GradientController](#gradient-controller), [Max](#max).
 //
 //     :::note
 //
-//     Signal processor components's output can depend on their internal state, in addition to the inputs.
+//     Signal processor components' output can depend on their internal state, in addition to the inputs.
 //     Eg. see the [Exponential Moving Average filter](#e-m-a).
 //
 //     :::
 //
-//   - "sink" components – they affect the real world.
-//     [ConcurrencyLimiter.LoadActuator](#concurrency-limiter) and [RateLimiter](#rate-limiter).
+//   - "sink" components: they affect the real world.
+//     [ConcurrencyLimiter](#concurrency-limiter) and [RateLimiter](#rate-limiter).
 //     In the UI, represented by orange color.  Sink components usually come in pairs with a
 //     "sources" component which emits a feedback signal, like
-//     `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.
+//     `accepted_concurrency` emitted by ConcurrencyLimiter.
 //
 // :::tip
 //

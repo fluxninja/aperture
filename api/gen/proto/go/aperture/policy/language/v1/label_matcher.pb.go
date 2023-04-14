@@ -25,11 +25,11 @@ const (
 // should be considered a match or not
 //
 // It provides three ways to define requirements:
-// - matchLabels
-// - matchExpressions
+// - match labels
+// - match expressions
 // - arbitrary expression
 //
-// If multiple requirements are set, they are all ANDed.
+// If multiple requirements are set, they're all combined using the logical AND operator.
 // An empty label matcher always matches.
 type LabelMatcher struct {
 	state         protoimpl.MessageState
@@ -37,13 +37,13 @@ type LabelMatcher struct {
 	unknownFields protoimpl.UnknownFields
 
 	// A map of {key,value} pairs representing labels to be matched.
-	// A single {key,value} in the matchLabels requires that the label "key" is present and equal to "value".
+	// A single {key,value} in the `match_labels` requires that the label `key` is present and equal to `value`.
 	//
-	// Note: The requirements are ANDed.
+	// Note: The requirements are combined using the logical AND operator.
 	MatchLabels map[string]string `protobuf:"bytes,1,rep,name=match_labels,json=matchLabels,proto3" json:"match_labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// List of k8s-style label matcher requirements.
 	//
-	// Note: The requirements are ANDed.
+	// Note: The requirements are combined using the logical AND operator.
 	MatchExpressions []*K8SLabelMatcherRequirement `protobuf:"bytes,2,rep,name=match_expressions,json=matchExpressions,proto3" json:"match_expressions,omitempty"`
 	// An arbitrary expression to be evaluated on the labels.
 	Expression *MatchExpression `protobuf:"bytes,3,opt,name=expression,proto3" json:"expression,omitempty"`
@@ -172,7 +172,7 @@ func (x *K8SLabelMatcherRequirement) GetValues() []string {
 	return nil
 }
 
-// Defines a [map<string, string> → bool] expression to be evaluated on labels
+// Defines a `[map<string, string> → bool]` expression to be evaluated on labels
 //
 // MatchExpression has multiple variants, exactly one should be set.
 //
@@ -289,17 +289,17 @@ type isMatchExpression_Variant interface {
 }
 
 type MatchExpression_Not struct {
-	// The expression negates the result of subexpression.
+	// The expression negates the result of sub expression.
 	Not *MatchExpression `protobuf:"bytes,1,opt,name=not,proto3,oneof"`
 }
 
 type MatchExpression_All struct {
-	// The expression is true when all subexpressions are true.
+	// The expression is true when all sub expressions are true.
 	All *MatchExpression_List `protobuf:"bytes,2,opt,name=all,proto3,oneof"`
 }
 
 type MatchExpression_Any struct {
-	// The expression is true when any subexpression is true.
+	// The expression is true when any sub expression is true.
 	Any *MatchExpression_List `protobuf:"bytes,3,opt,name=any,proto3,oneof"`
 }
 
@@ -330,7 +330,7 @@ func (*MatchExpression_LabelEquals) isMatchExpression_Variant() {}
 
 func (*MatchExpression_LabelMatches) isMatchExpression_Variant() {}
 
-// Label selector expression of the equal form "label == value".
+// Label selector expression of the equal form `label == value`.
 type EqualsMatchExpression struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -388,7 +388,7 @@ func (x *EqualsMatchExpression) GetValue() string {
 	return ""
 }
 
-// Label selector expression of the matches form "label matches regex".
+// Label selector expression of the form `label matches regex`.
 type MatchesMatchExpression struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -397,7 +397,7 @@ type MatchesMatchExpression struct {
 	// Name of the label to match the regular expression.
 	Label string `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Regular expression that should match the label value.
-	// It uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
+	// It uses [Go's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
 	Regex string `protobuf:"bytes,2,opt,name=regex,proto3" json:"regex,omitempty" validate:"required"` // @gotags: validate:"required"
 }
 
@@ -447,15 +447,15 @@ func (x *MatchesMatchExpression) GetRegex() string {
 	return ""
 }
 
-// List of MatchExpressions that is used for all/any matching
+// List of MatchExpressions that's used for all/any matching
 //
-// eg. {any: {of: [expr1, expr2]}}.
+// for example, `{any: {of: [expr1, expr2]}}`.
 type MatchExpression_List struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// List of subexpressions of the match expression.
+	// List of sub expressions of the match expression.
 	Of []*MatchExpression `protobuf:"bytes,1,rep,name=of,proto3" json:"of,omitempty"`
 }
 
