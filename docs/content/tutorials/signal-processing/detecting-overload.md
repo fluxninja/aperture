@@ -26,8 +26,8 @@ service and trigger load-shedding at a downstream service.
 ## Policy
 
 One of the most reliable metrics to detect overload state is latency of the
-service requests. In Aperture, latency of service requests can be easily
-reported using a [Flux Meter](/concepts/flow-control/resources/flux-meter.md).
+service requests. In Aperture, latency of service requests can be reported using
+a [Flux Meter](/concepts/flow-control/resources/flux-meter.md).
 
 :::tip
 
@@ -40,14 +40,14 @@ apply the Flux Meter to a subset of API calls for a service.
 
 :::
 
-In this example, we will be computing the exponential moving average (EMA) of
-latency, gathered periodically from a
+In this example, the exponential moving average (EMA) of latency is computed,
+which is gathered periodically from a
 [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query on
-Flux Meter reported metrics. Further, we will multiply EMA of latency with a
+Flux Meter reported metrics. Further, EMA of latency will be multiplied with a
 tolerance factor to calculate setpoint latency, which is a threshold to detect
 overloaded state. That's, if the real-time latency of the service is more than
-this setpoint (which is based on long-term EMA), then we can consider the
-service to be overloaded at that time.
+this setpoint (which is based on long-term EMA), then the service is considered
+to be overloaded at that time.
 
 ```mdx-code-block
 <Tabs>
@@ -85,8 +85,8 @@ service to be overloaded at that time.
 ### Playground
 
 When the above policy is loaded in Aperture's
-[Playground](/get-started/playground/playground.md), we will see the various
-signal metrics collected from the execution of the policy:
+[Playground](/get-started/playground/playground.md), the various signal metrics
+collected from the execution of the policy can be visualized:
 
 <Zoom>
 
@@ -105,9 +105,9 @@ Exponential Moving Average of `LATENCY` signal.
 <Zoom>
 
 ![LATENCY_SETPOINT](./assets/detecting-overload/latency_setpoint.png)
-`LATENCY_SETPOINT`: Latency above which we consider service to be overloaded.
-This is calculated by multiplying the exponential moving average with a
-tolerance factor (`LATENCY_EMA` \* `1.1`).
+`LATENCY_SETPOINT`: Latency above which the service is considered to be
+overloaded. This is calculated by multiplying the exponential moving average
+with a tolerance factor (`LATENCY_EMA` \* `1.1`).
 
 </Zoom>
 
