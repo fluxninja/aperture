@@ -44,6 +44,7 @@ Generated File Starts
 | `dist_cache`        | [DistCache](#dist-cache)               |
 | `etcd`              | [Etcd](#etcd)                          |
 | `flow_control`      | [FlowControl](#flow-control)           |
+| `agent_functions`   | [Functions](#functions)                |
 | `kubernetes_client` | [KubernetesClient](#kubernetes-client) |
 | `liveness`          | [Liveness](#liveness)                  |
 | `log`               | [Log](#log)                            |
@@ -202,6 +203,26 @@ Environment variable prefix: `APERTURE_AGENT_FLOW_CONTROL_PREVIEW_SERVICE_`
 
 ([FluxNinjaExtensionConfig](#flux-ninja-extension-config))
 Environment variable prefix: `APERTURE_AGENT_FLUXNINJA_`
+
+</dd>
+
+</dl>
+
+---
+
+<!-- vale off -->
+
+### _agent_functions_ {#functions}
+
+<!-- vale on -->
+
+<dl>
+
+<dt></dt>
+<dd>
+
+([Config](#config))
+Environment variable prefix: `APERTURE_AGENT_AGENT_FUNCTIONS_`
 
 </dd>
 
@@ -668,7 +689,13 @@ Below is example to overwrite `kubeletstats` custom metrics:
 <dt>disable_kubernetes_scraper</dt>
 <dd>
 
-(bool) DisableKubernetesScraper disables metrics collection for Kubernetes resources.
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+DisableKubernetesScraper disables metrics collection for Kubernetes resources.
 
 </dd>
 <dt>batch_alerts</dt>
@@ -1059,6 +1086,41 @@ https://github.com/kubernetes-sigs/controller-tools/issues/636
 https://github.com/kubernetes-sigs/kubebuilder/issues/528
 
 [Components](#components)
+
+---
+
+<!-- vale off -->
+
+### Config {#config}
+
+<!-- vale on -->
+
+Config is configuration for agent functions.
+
+<dl>
+<dt>endpoints</dt>
+<dd>
+
+<!-- vale off -->
+
+([]string)
+
+<!-- vale on -->
+
+RPC servers to connect to (which will be able to call agent functions)
+
+</dd>
+<dt>client</dt>
+<dd>
+
+<!-- vale off -->
+
+([ClientConfig](#client-config))
+
+<!-- vale on -->
+
+</dd>
+</dl>
 
 ---
 

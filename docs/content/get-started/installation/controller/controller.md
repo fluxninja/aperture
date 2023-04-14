@@ -62,7 +62,7 @@ The Aperture Agent can be installed using below options:
    available for it. This method requires access to create cluster level
    resources like ClusterRole, ClusterRoleBinding, CustomResourceDefinition etc.
 
-2. [**Namespace Scoped**](namespace-scoped/namespace-scoped.md)
+2. [**Namespace scoped Installation**](namespace-scoped/namespace-scoped.md)
 
    :::info
 

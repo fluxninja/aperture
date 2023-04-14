@@ -70,7 +70,7 @@ func getTemplets(chartName, releaseName string, order releaseutil.KindSortOrder)
 	}
 	defer resp.Body.Close()
 
-	ch, err := loader.Load("/home/hardik/Work/fluxninja/aperture/manifests/charts/aperture-controller")
+	ch, err := loader.LoadArchive(resp.Body)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to load chart: %s", err)
 	}
@@ -117,7 +117,7 @@ func getTemplets(chartName, releaseName string, order releaseutil.KindSortOrder)
 			return nil, nil, nil, err
 		}
 	} else if releaseName == agent && isNamespaceScoped {
-		values, err = manageAgentControllerClientCertSecret(values, fmt.Sprintf("%s-%s", agent, apertureAgent), namespace, order)
+		values, err = manageAgentControllerClientCertConfigMap(values, fmt.Sprintf("%s-%s", agent, apertureAgent), namespace, order)
 		if err != nil {
 			return nil, nil, nil, err
 		}
@@ -511,7 +511,8 @@ func CheckCertificate(secret *corev1.Secret, cm *corev1.ConfigMap, certFileName,
 	return false, nil
 }
 
-func manageAgentControllerClientCertSecret(values map[string]interface{}, releaseName, namespace string, order releaseutil.KindSortOrder) (map[string]interface{}, error) {
+// manageAgentControllerClientCertConfigMap manages the agent controller client certificate ConfigMap.
+func manageAgentControllerClientCertConfigMap(values map[string]interface{}, releaseName, namespace string, order releaseutil.KindSortOrder) (map[string]interface{}, error) {
 	agent, ok := values["agent"].(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("failed to get agent values")
@@ -566,7 +567,7 @@ func manageAgentControllerClientCertSecret(values map[string]interface{}, releas
 		existingCM := &corev1.ConfigMap{}
 		err := kubeClient.Get(context.Background(), types.NamespacedName{Name: cmName, Namespace: namespace}, existingCM)
 		if err == nil ||
-			apierrors.IsNotFound(err) || (existingCM.Annotations != nil && existingCM.Annotations["app.kubernetes.io/managed-by"] == "aperturectl") {
+			apierrors.IsNotFound(err) || (existingCM.Labels != nil && existingCM.Labels["app.kubernetes.io/managed-by"] == "aperturectl") {
 			cm := &corev1.ConfigMap{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:        cmName,

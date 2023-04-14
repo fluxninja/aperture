@@ -13,7 +13,7 @@ sidebar_position: 2
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import {apertureVersion,apertureVersionWithOutV} from '../../../../apertureVersion.js';
+import {apertureVersion,apertureVersionWithOutV} from '../../../../../apertureVersion.js';
 ```
 
 The Aperture Agent can also be installed as a Sidecar. In this mode, whenever a
@@ -84,14 +84,6 @@ Kubernetes Objects which will be created by following steps are listed
 1. Configure the below parameters of etcd and Prometheus for the Agent Custom
    Resource by creating a `values.yaml` with the following parameters and
    passing it with `install` command:
-
-   :::info
-
-   The below parameters disable the FluxNinja ARC Extension for the Aperture
-   Agent. If you want to keep it enabled, add parameters provided
-   [here](/arc/extension.md#configuration) under the `agent.config` section.
-
-   :::
 
    ```yaml
    agent:

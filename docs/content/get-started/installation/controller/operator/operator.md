@@ -1,5 +1,5 @@
 ---
-title: Install with Kubernetes Operator
+title: Install with Operator
 description: Install Aperture Controller using Operator
 keywords:
   - install
