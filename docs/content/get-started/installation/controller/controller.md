@@ -398,7 +398,7 @@ needs.
 ## Uninstall
 
 You can uninstall the Aperture Controller and its components installed above by
-following the following steps:
+following these steps:
 
 1. Uninstall the Aperture Controller:
 

@@ -78,7 +78,7 @@ const (
 	// FlowControlRejectReasonsMetricName - metric for reject reason on FCS Check requests.
 	FlowControlRejectReasonsMetricName = "flowcontrol_reject_reasons_total"
 
-	// OTEL metrics.
+	// OTel metrics.
 
 	// RollupMetricName - logs rollup histogram.
 	RollupMetricName = "rollup"

@@ -14,9 +14,9 @@ import (
 // parameters:
 // - in: body
 //   schema:
-//     "$ref": "#/definitions/AgentOTELConfig"
+//     "$ref": "#/definitions/AgentOTelConfig"
 
-// AgentOTELConfig is the configuration for Agent's OTel collector.
+// AgentOTelConfig is the configuration for Agent's OTel collector.
 //
 // Example configuration:
 //
@@ -54,8 +54,8 @@ import (
 // +kubebuilder:object:generate=true
 //
 //swagger:model
-type AgentOTELConfig struct {
-	otelconfig.CommonOTELConfig `json:",inline"`
+type AgentOTelConfig struct {
+	otelconfig.CommonOTelConfig `json:",inline"`
 	// BatchPrerollup configures batch prerollup processor.
 	BatchPrerollup BatchPrerollupConfig `json:"batch_prerollup"`
 	// BatchPostrollup configures batch postrollup processor.
@@ -111,16 +111,16 @@ type BatchPostrollupConfig struct {
 //swagger:model
 type CustomMetricsConfig struct {
 	// Receivers define receivers to be used in custom metrics pipelines. This should
-	// be in OTEL format - https://opentelemetry.io/docs/collector/configuration/#receivers.
+	// be in OTel format - https://opentelemetry.io/docs/collector/configuration/#receivers.
 	// +kubebuilder:pruning:PreserveUnknownFields
 	// +kubebuilder:validation:Schemaless
 	Receivers Components `json:"receivers"`
 	// Processors define processors to be used in custom metrics pipelines. This should
-	// be in OTEL format - https://opentelemetry.io/docs/collector/configuration/#processors.
+	// be in OTel format - https://opentelemetry.io/docs/collector/configuration/#processors.
 	// +kubebuilder:pruning:PreserveUnknownFields
 	// +kubebuilder:validation:Schemaless
 	Processors Components `json:"processors,omitempty"`
-	// Pipeline is an OTEL metrics pipeline definition, which **only** uses receivers
+	// Pipeline is an OTel metrics pipeline definition, which **only** uses receivers
 	// and processors defined above. Exporter would be added automatically.
 	//
 	// If there are no processors defined or only one processor is defined, the

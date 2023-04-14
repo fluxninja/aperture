@@ -19,7 +19,7 @@ requests in a web-scale application to ensure stability and reliability.
 Aperture uses a combination of techniques such as weighted fair queuing,
 distributed rate-limiting, and prioritization of critical features to manage the
 flow of requests and prevent overloading. It also uses circuit-driven policies
-and a programmable, high-fidelity Flow Classifier to make decisions about how to
+and a programmable, high-fidelity flow classifier to make decisions about how to
 handle requests and prioritize workloads.
 
 ## Setup

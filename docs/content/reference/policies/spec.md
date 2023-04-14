@@ -4022,7 +4022,7 @@ Kubernetes resource name.
 
 <!-- vale on -->
 
-Kubernetes Namespace that the resource belongs to.
+Kubernetes namespace that the resource belongs to.
 
 </dd>
 </dl>

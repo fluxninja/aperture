@@ -130,7 +130,7 @@ const (
 	// InstanceLabel describes agent group to which metrics refer.
 	InstanceLabel = "instance"
 
-	/* Specific to Agent and Controller OTEL collector factories. */
+	/* Specific to Agent and Controller OTel collector factories. */
 
 	// ReceiverOTLP collects logs from libraries and SDKs.
 	ReceiverOTLP = "otlp"

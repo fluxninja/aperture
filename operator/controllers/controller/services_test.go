@@ -50,7 +50,7 @@ var _ = Describe("Service for Controller", func() {
 								},
 							},
 						},
-						OTEL: controller.ControllerOTELConfig{},
+						OTel: controller.ControllerOTelConfig{},
 					},
 				},
 			}
@@ -124,7 +124,7 @@ var _ = Describe("Service for Controller", func() {
 								},
 							},
 						},
-						OTEL: controller.ControllerOTELConfig{},
+						OTel: controller.ControllerOTelConfig{},
 					},
 				},
 			}

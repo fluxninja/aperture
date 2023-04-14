@@ -366,7 +366,7 @@ default injection template.
 
 Care should be taken when customizing these settings, as this allows complete
 customization of the resulting Pod, including making changes that may affect the
-sidecar container's functionality
+sidecar container's functionality.
 
 For example, the following configuration customizes a variety of settings,
 including setting the CPU requests, adding a volume mount, and modifying
@@ -416,7 +416,7 @@ like:
 ## Uninstall
 
 You can uninstall the Aperture Agent and its components installed above by
-following the following steps:
+following these steps:
 
 1. Delete the Aperture Agent chart:
 

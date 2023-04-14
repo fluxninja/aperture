@@ -202,7 +202,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_METRICS_`
 <dt></dt>
 <dd>
 
-([ControllerOTELConfig](#controller-o-t-e-l-config))
+([ControllerOTelConfig](#controller-o-tel-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_`
 
 </dd>
@@ -649,11 +649,11 @@ ClientTLSConfig is the configuration for client TLS.
 
 <!-- vale off -->
 
-### ControllerOTELConfig {#controller-o-t-e-l-config}
+### ControllerOTelConfig {#controller-o-tel-config}
 
 <!-- vale on -->
 
-ControllerOTELConfig is the configuration for Controller's OTel collector.
+ControllerOTelConfig is the configuration for Controller's OTel collector.
 
 <dl>
 <dt>batch_alerts</dt>

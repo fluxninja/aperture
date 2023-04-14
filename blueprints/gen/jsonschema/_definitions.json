@@ -1804,7 +1804,7 @@
           "x-order": 3
         },
         "namespace": {
-          "description": "Kubernetes Namespace that the resource belongs to.\n\n",
+          "description": "Kubernetes namespace that the resource belongs to.\n\n",
           "type": "string",
           "x-go-tag-validate": "required",
           "x-order": 4

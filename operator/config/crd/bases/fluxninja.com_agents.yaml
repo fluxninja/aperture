@@ -1465,7 +1465,7 @@ spec:
                         type: boolean
                     type: object
                   otel:
-                    description: OTEL configuration.
+                    description: OTel configuration.
                     properties:
                       batch_alerts:
                         description: BatchAlerts configures batch alerts processor.
@@ -1542,7 +1542,7 @@ spec:
                                 on every Agent.
                               type: boolean
                             pipeline:
-                              description: "Pipeline is an OTEL metrics pipeline definition,
+                              description: "Pipeline is an OTel metrics pipeline definition,
                                 which **only** uses receivers and processors defined
                                 above. Exporter would be added automatically. \n If
                                 there are no processors defined or only one processor
@@ -1563,12 +1563,12 @@ spec:
                               type: object
                             processors:
                               description: Processors define processors to be used
-                                in custom metrics pipelines. This should be in OTEL
+                                in custom metrics pipelines. This should be in OTel
                                 format - https://opentelemetry.io/docs/collector/configuration/#processors.
                               x-kubernetes-preserve-unknown-fields: true
                             receivers:
                               description: Receivers define receivers to be used in
-                                custom metrics pipelines. This should be in OTEL format
+                                custom metrics pipelines. This should be in OTel format
                                 - https://opentelemetry.io/docs/collector/configuration/#receivers.
                               x-kubernetes-preserve-unknown-fields: true
                           type: object

@@ -1276,7 +1276,7 @@ spec:
                         type: boolean
                     type: object
                   otel:
-                    description: OTEL configuration.
+                    description: OTel configuration.
                     properties:
                       batch_alerts:
                         description: BatchAlerts configures batch alerts processor.

@@ -58,7 +58,7 @@ control components like
 [PID controller](https://en.wikipedia.org/wiki/PID_controller) can be used to
 further tune the concurrency limits based on specific service requirements.
 
-The controller's policies are stored in a Policy database and are managed using
+The controller's policies are stored in a policy database and are managed using
 the Kubernetes Custom Resource Definition (CRD) API, allowing users to configure
 and modify policies as needed. The controller interacts with Aperture Agents,
 which run alongside service instances as sidecars, to enforce the policies and
@@ -74,9 +74,10 @@ the perspective of an Aperture Agent. It could be an API call, a feature, or
 even a database query.
 
 The agents monitor golden signals, such as request latency, error rate, and
-saturation, using an in-built telemetry system and a programmable, high-fidelity
-Flow Classifier used to label requests based on attributes such as customer tier
-or request type. These metrics are then analyzed by the Aperture Controller.
+saturation, using an in-built telemetry system. In addition, a programmable,
+high-fidelity flow classifier is used to label requests based on attributes such
+as customer tier or request type. These metrics are then analyzed by the
+Aperture Controller.
 
 Graceful degradation of services is achieved by prioritizing critical
 application features over background workloads. Similar to boarding an aircraft,
@@ -103,8 +104,9 @@ collected from Aperture Agents. It enables Aperture to monitor the system and
 detect deviations from the service-level objectives (SLOs) defined in the
 declarative policies.
 
-Aperture Controller uses etcd to store the declarative policies that define the
-control circuits and their components, as well as the current system state.
+Aperture Controller uses etcd (distributed key/value store) to persist the
+declarative policies that define the control circuits and their components, as
+well as the current system state.
 
 Users can optionally reuse their existing etcd or
 [scalable Prometheus](https://promlabs.com/blog/2021/10/14/promql-vendor-compatibility-round-three)

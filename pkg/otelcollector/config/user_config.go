@@ -3,9 +3,9 @@ package config
 
 import "github.com/fluxninja/aperture/pkg/config"
 
-// NewDefaultCommonOTELConfig creates CommonOTELConfig with all the default values set.
-func NewDefaultCommonOTELConfig() *CommonOTELConfig {
-	return &CommonOTELConfig{
+// NewDefaultCommonOTelConfig creates CommonOTelConfig with all the default values set.
+func NewDefaultCommonOTelConfig() *CommonOTelConfig {
+	return &CommonOTelConfig{
 		Ports: PortsConfig{
 			DebugPort:       8888,
 			HealthCheckPort: 13133,
@@ -15,10 +15,10 @@ func NewDefaultCommonOTELConfig() *CommonOTELConfig {
 	}
 }
 
-// CommonOTELConfig is the configuration for the OTEL collector.
+// CommonOTelConfig is the configuration for the OTel collector.
 // swagger:model
 // +kubebuilder:object:generate=true
-type CommonOTELConfig struct {
+type CommonOTelConfig struct {
 	// BatchAlerts configures batch alerts processor.
 	BatchAlerts BatchAlertsConfig `json:"batch_alerts"`
 	// Ports configures debug, health and extension ports values.

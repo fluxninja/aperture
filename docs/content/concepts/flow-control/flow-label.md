@@ -72,8 +72,8 @@ system).
 
 ### Aperture SDKs
 
-The Aperture SDK, in addition to automatically pulling baggage from context,
-also takes an explicit `labels` map in the `Check()` call.
+The Aperture SDKs, in addition to automatically using baggage from context, also
+takes an explicit `labels` map in the `Check()` call.
 
 ## Live Previewing Flow Labels
 
@@ -136,9 +136,9 @@ and producing other streams of data from it.
 
 ### Metrics
 
-Prometheus' metrics are generated from the telemetry data that's received. Along
-the path of the flows, telemetry data is tagged by the [Flux Meters][flux-meter]
-and [workloads][workload] that matched.
+Prometheus' metrics are generated from the received telemetry data. Along the
+path of the flows, telemetry data is tagged by the [Flux Meters][flux-meter] and
+[workloads][workload] that matched.
 
 ### OLAP style telemetry
 

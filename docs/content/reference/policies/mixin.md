@@ -24,9 +24,10 @@ jb install github.com/fluxninja/aperture/blueprints@main
 
 :::tip
 
-You can use a specific Aperture branch instead of _main_, for example,
-_stable/v0.2.x_, or even a specific release tag for example, _v0.2.2_ to match
-your Aperture Controller installation version.
+You can use a specific Aperture
+[GitHub repository](https://github.com/fluxninja/aperture) branch instead of
+_main_, for example, _stable/v0.2.x_, or even a specific release tag for
+example, _v0.2.2_ to match your Aperture Controller installation version.
 
 :::
 
@@ -39,7 +40,7 @@ You can then create a Policy resource using Jsonnet definitions:
 And then, render it with [Jsonnet][jsonnet]:
 
 ```sh
-jsonnet -J vendor [example file].jsonnet  | yq -P
+jsonnet -J vendor [example_file].jsonnet  | yq -P
 ```
 
 After running this command, you should see the following contents in the YAML
@@ -53,7 +54,7 @@ The generated policy can be applied to the running instance of
 `aperture-controller` via `kubectl` as follows:
 
 ```sh
-kubectl apply --namespace aperture-controller --filename [example file].yaml
+kubectl apply --namespace aperture-controller --filename [example_file].yaml
 ```
 
 [jsonnet]: https://jsonnet.org/

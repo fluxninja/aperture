@@ -31,7 +31,7 @@ type KubernetesObjectSelector struct {
 	// Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
 	// selector applies to.
 	AgentGroup string `protobuf:"bytes,1,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"default"` // @gotags: default:"default"
-	// Kubernetes Namespace that the resource belongs to.
+	// Kubernetes namespace that the resource belongs to.
 	Namespace string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty" validate:"required"` // @gotags: validate:"required"
 	// API version of Kubernetes resource
 	ApiVersion string `protobuf:"bytes,3,opt,name=api_version,json=apiVersion,proto3" json:"api_version,omitempty" validate:"required"` // @gotags: validate:"required"

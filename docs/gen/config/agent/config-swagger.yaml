@@ -38,7 +38,7 @@ definitions:
         title: AgentInfoConfig is the configuration for the agent group and other agent attributes.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/agentinfo
-    AgentOTELConfig:
+    AgentOTelConfig:
         description: |-
             Example configuration:
 
@@ -97,7 +97,7 @@ definitions:
             ports:
                 $ref: '#/definitions/PortsConfig'
                 x-go-tag-json: ports
-        title: AgentOTELConfig is the configuration for Agent's OTel collector.
+        title: AgentOTelConfig is the configuration for Agent's OTel collector.
         type: object
         x-go-package: github.com/fluxninja/aperture/cmd/aperture-agent/config
     AlertManagerClientConfig:
@@ -352,7 +352,7 @@ definitions:
         title: ClientTLSConfig is the configuration for client TLS.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
-    CommonOTELConfig:
+    CommonOTelConfig:
         properties:
             batch_alerts:
                 $ref: '#/definitions/BatchAlertsConfig'
@@ -360,7 +360,7 @@ definitions:
             ports:
                 $ref: '#/definitions/PortsConfig'
                 x-go-tag-json: ports
-        title: CommonOTELConfig is the configuration for the OTEL collector.
+        title: CommonOTelConfig is the configuration for the OTel collector.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
     Components:
@@ -1626,7 +1626,7 @@ paths:
             parameters:
                 - in: body
                   schema:
-                    $ref: '#/definitions/AgentOTELConfig'
+                    $ref: '#/definitions/AgentOTelConfig'
             tags:
                 - agent-configuration
             x-fn-config-env: true

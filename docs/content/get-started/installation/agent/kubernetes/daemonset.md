@@ -292,7 +292,7 @@ You should see pods for Aperture Agent and Agent Manager in `RUNNING` state and
 ## Uninstall
 
 You can uninstall the Aperture Agent and its components installed above by
-following the following steps:
+following these steps:
 
 1. Uninstall the Aperture Agent:
 

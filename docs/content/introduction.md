@@ -41,39 +41,17 @@ experience, while optimizing resources and reducing costs.
 
 ## Declarative Policy Language
 
-Aperture's declarative policy language enables teams to rapidly create and
-version policies that define the behaviors of their applications under different
-conditions. This provides teams with a visual representation of their policies,
-allowing them to intuitively understand how the system is behaving and
-correcting itself.
+Aperture's policy language allows teams to effortlessly develop and manage
+policies that dictate their applications' behavior under various circumstances.
+This offers a visual depiction of their policies, enabling them to grasp the
+system's behavior and self-correction intuitively.
 
-## Advanced Load Management Capabilities
+## Load Management Capabilities
 
 Aperture's intelligent load management capabilities, such as fine-grained rate
 limiting, prioritized load shedding and auto scaling, can be applied to a wide
 range of cloud-native applications. These capabilities, ensure the reliability
 and stability of applications.
-
-## How Load Management Works
-
-At its core, load management involves the control loop of observing, analyzing,
-and actuating workloads to ensure the stability and reliability of cloud-native
-applications. This control loop is applied to both flow control and auto scaling
-use cases. In flow control, the control loop is used to manage workloads and
-ensure the system remains within capacity. In auto scaling, the control loop is
-used to adjust resource allocation based on demand and performance.
-
-Learn more about how Aperture interfaces with your application in the
-[Architecture](/architecture/architecture.md) section.
-
-![Aperture Control Loop](assets/img/oaalight.png#gh-light-mode-only)
-![Aperture Control Loop](assets/img/oaadark.png#gh-dark-mode-only)
-
-## Aperture Features
-
-Aperture is a load management platform that offers several features to help
-maintain the stability and reliability of modern web-scale applications,
-including:
 
 - **Prioritized load shedding**: Aperture enables organizations to gracefully
   degrade application performance by dropping traffic that's deemed less
@@ -92,3 +70,18 @@ including:
   deviation from service-level objectives. These policies are expressed as a
   signal processing circuit that enables Aperture to go from telemetry to
   actions within minutes.
+
+## How it works
+
+At its core, load management involves the control loop of observing, analyzing,
+and actuating workloads to ensure the stability and reliability of cloud-native
+applications. This control loop is applied to both flow control and auto scaling
+use cases. In flow control, the control loop is used to manage workloads and
+ensure the system remains within capacity. In auto scaling, the control loop is
+used to adjust resource allocation based on demand and performance.
+
+Learn more about how Aperture interfaces with your application in the
+[Architecture](/architecture/architecture.md) section.
+
+![Aperture Control Loop](assets/img/oaalight.png#gh-light-mode-only)
+![Aperture Control Loop](assets/img/oaadark.png#gh-dark-mode-only)

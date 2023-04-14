@@ -21,7 +21,7 @@ decoupled architecture has advantages but introduces new complex failure modes.
 When traffic surges, it can result in a queue buildup on a critical service,
 kick-starting a positive feedback loop and causing
 [cascading failures](https://sre.google/sre-book/addressing-cascading-failures/).
-The application stops serving responses timely and critical end-user
+The application stops serving timely responses and critical end-user
 transactions are interrupted.
 
 ![Absence of flow control](assets/img/no-flow-control.png#gh-light-mode-only)
@@ -43,9 +43,9 @@ get harder to deploy.
 
 This is where flow control comes in. Applications can degrade gracefully in
 real-time when using flow control techniques with Aperture, by prioritizing
-high-importance features over others.
+high-importance features over others. Reliable operations at web-scale are
+impossible without effective flow control.
 
-Reliable operations at web-scale are impossible without effective flow control.
 Aperture splits the process of flow control into two layers:
 
 - Governing the flow control process and making high-level decisions. This is
@@ -77,11 +77,11 @@ you need to install integrations that will communicate with the Aperture Agent.
   assigns _ingress_ and _egress_ Control Points as identified by
   [Istio][istio-patch-context].
 
-- _Feature_ _Control Points_: SDKs for popular languages are available with
-  Aperture. [Aperture SDK](/get-started/integrations/flow-control/sdk/sdk.md)
-  wraps any function call or code snippet inside the service code as a _Feature_
-  _Control Point_. Every invocation of the feature is a flow from the
-  perspective of Aperture.
+- _Feature_ _Control Points_:
+  [Aperture SDKs](/get-started/integrations/flow-control/sdk/sdk.md) are
+  available for popular programming languages. Aperture SDK wraps any function
+  call or code snippet inside the service code as a _Feature_ _Control Point_.
+  Every invocation of the feature is a flow from the perspective of Aperture.
 
   The SDK provides an API to begin a flow, which translates to a
   [`flowcontrol.v1.Check`][flowcontrol-proto] call into Agent. The response of

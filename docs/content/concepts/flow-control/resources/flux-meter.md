@@ -14,12 +14,12 @@ See also [_Flux Meter_ reference][reference]
 
 ## Purpose
 
-_Flux Meter_ provides a way to translate a flux of flows matching a [Flow
+The _Flux Meter_ provides a way to translate a flux of flows matching a [Flow
 Selector][flow-selector] to a Prometheus [histogram][histogram-metric].
 
 ## Naming
 
-_Flux Meter_ is referred by its name. it's strongly recommended to assign
+_Flux Meter_ is referred to by its name. It's strongly recommended to assign
 globally unique names to _Flux Meters_. A good practice is to prefix the Flux
 Meter name with the policy name.
 

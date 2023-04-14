@@ -87,7 +87,7 @@ Examples of built-in components include:
       operation to generate an output signal.
     - [Max](/reference/policies/spec.md#max) and
       [Min](/reference/policies/spec.md#min): These components take multiple
-      input or output signals and emit maximum or minimum of those signals.
+      input or output signals and emit the maximum or minimum of those signals.
   - **Transformers**: These components statefully transform an input signal into
     an output signal.
     - [EMA](/reference/policies/spec.md#e-m-a): Exponential moving average.
@@ -99,8 +99,9 @@ Examples of built-in components include:
   is to make the signal achieve the setpoint.
   - [Gradient Controller](/reference/policies/spec.md#gradient-controller): This
     controller acts on the ratio of setpoint and signal.
-- **Actuators**: Actuators are components which act on signals to make real
-  changes like shed traffic, changing rate limits etc.
+- **Actuators**: Actuators are components which act on signals and interfaces
+  with external systems to perform actions such as shedding traffic, changing
+  rate limits or auto scaling etc.
   - [Concurrency Limiter](/reference/policies/spec.md#concurrency-limiter):
     Takes load multiplier as a signal which determines the proportion of Flow
     concurrency to accept.

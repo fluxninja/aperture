@@ -76,8 +76,8 @@ true, like so:
         .setIgnoredPathMatchRegex(true)
 ```
 
-For more context on how to use Aperture Netty Handler to set Control Points, you
-can take a look at the [example app][netty-example] available in the repository.
+For more context on using Aperture Netty Handler to set Control Points, refer to
+the [example app][netty-example] available in the repository.
 
 [netty-example]:
   https://github.com/fluxninja/aperture-java/tree/releases/aperture-java/v1.0.0/examples/netty-example

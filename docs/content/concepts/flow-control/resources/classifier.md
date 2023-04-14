@@ -176,10 +176,9 @@ request body buffering by default, as it _might_ break some streaming APIs.
 Extractors are declarative recipes how to extract flow label value from
 metadata. Provided extractors include:
 
-- Extracting values from headers,
-- parsing a field from JSON encoded request payload,
-- parsing JWT tokens,
-- and others.
+- Extracting values from headers
+- Parsing a field from JSON encoded request payload
+- Parsing JWT tokens
 
 Aperture aims to expand the set of extractors to cover the most-common use
 cases.

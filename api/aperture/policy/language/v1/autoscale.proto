@@ -13,7 +13,7 @@ message KubernetesObjectSelector {
   // selector applies to.
   string agent_group = 1; // @gotags: default:"default"
 
-  // Kubernetes Namespace that the resource belongs to.
+  // Kubernetes namespace that the resource belongs to.
   string namespace = 2; // @gotags: validate:"required"
 
   // API version of Kubernetes resource

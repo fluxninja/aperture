@@ -196,7 +196,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
    }
    ```
 
-7. Below is how a complete Nginx configuration would like look:
+7. Below is how a complete Nginx configuration would look like:
 
    ```bash
    worker_processes auto;

@@ -87,7 +87,7 @@ data:
   RABBITMQ_PASSWORD: <rabbitmq-password>
 ```
 
-To use these secrets and configuration maps during the
+To use these secrets and ConfigMap during the
 [Aperture Agent Installation](/get-started/installation/agent/agent.md#agent-installation-modes),
 refer to them in the values.yaml file, as shown below:
 

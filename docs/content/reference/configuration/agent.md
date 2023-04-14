@@ -308,7 +308,7 @@ Env-Var Prefix: `APERTURE_AGENT_METRICS_`
 <dt></dt>
 <dd>
 
-([AgentOTELConfig](#agent-o-t-e-l-config))
+([AgentOTelConfig](#agent-o-tel-config))
 Env-Var Prefix: `APERTURE_AGENT_OTEL_`
 
 </dd>
@@ -603,11 +603,11 @@ All agents within an `agent_group` receive the same data-plane configuration (fo
 
 <!-- vale off -->
 
-### AgentOTELConfig {#agent-o-t-e-l-config}
+### AgentOTelConfig {#agent-o-tel-config}
 
 <!-- vale on -->
 
-AgentOTELConfig is the configuration for Agent's OTel collector.
+AgentOTelConfig is the configuration for Agent's OTel collector.
 
 Example configuration:
 

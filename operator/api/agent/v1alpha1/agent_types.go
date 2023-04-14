@@ -86,9 +86,9 @@ type AgentConfigSpec struct {
 	//+kubebuilder:validation:Optional
 	ServiceDiscoverySpec common.ServiceDiscoverySpec `json:"service_discovery"`
 
-	// OTEL configuration.
+	// OTel configuration.
 	//+kubebuilder:validation:Optional
-	OTEL agent.AgentOTELConfig `json:"otel"`
+	OTel agent.AgentOTelConfig `json:"otel"`
 
 	// Agent functions configuration.
 	//+kubebuilder:validation:Optional

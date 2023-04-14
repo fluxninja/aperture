@@ -24,7 +24,8 @@ See also [_Flow Selector_ reference](/reference/policies/spec.md#flow-selector)
 _Flow Selectors_ are used by flow control and observability components
 instantiated by Aperture Agents like [_Classifiers_][classifier], [_Flux
 Meters_][flux-meter] and [_Concurrency Limiters_][cl]. _Flow Selectors_ define
-scoping rules–how these components should select flows for their operations.
+scoping rules that decide how these components should select flows for their
+operations.
 
 A _Flow Selector_ consists of:
 
@@ -98,14 +99,14 @@ entities belonging to the same service.
 
 :::tip
 
-You can use [`aperturectl flow-control control-points`][aperturectl] to list
-active control points:
+Use the [`aperturectl flow-control control-points`][aperturectl] CLI command to
+list active control points.
 
 :::
 
 ### Label Matcher {#label-matcher}
 
-The _Label Matcher_ allows to optionally narrow down the selected flow based on
+The _Label Matcher_ optionally narrows down the selected flow based on
 conditions on [Flow Labels][label].
 
 There are multiple ways to define a label matcher. The simplest way is to
@@ -117,9 +118,9 @@ label_matcher:
     http.method: GET
 ```
 
-You can also provide a matching-expression-tree, which allows for arbitrary
-conditions, including regex matching. Refer to [Label Matcher
-reference][label-matcher] for further details.
+Matching expression trees can also be used to define more complex conditions,
+including regex matching. Refer to [Label Matcher reference][label-matcher] for
+further details.
 
 ## Example
 
@@ -239,9 +240,9 @@ graph TB
 
 </Zoom>
 
-as another extreme, if your _Agent Groups_ already group entities into logical
-services, you can treat the _Agent Group_ as a service to match flows to
-policies (useful when installing as a sidecar):
+as another extreme, if _Agent Groups_ already group entities into logical
+services, _Agent Group_ can be treated as a service to match flows to policies
+(useful when installing as a sidecar):
 
 <Zoom>
 
@@ -301,8 +302,8 @@ flow_selector:
 Filtering out traffic to these endpoints can prevent unnecessary pod restarts
 and ensure that the application is available to handle real user traffic
 
-Note that you can filter out other flows by matching on different keys and
-operators, such as `http.method` with `NotIn` operator and `GET` value. For more
+Other flows can be filtered out by matching on different keys and operators,
+such as `http.method` with `NotIn` operator and `GET` value. For more
 information on how to configure the Label Matcher, see the [Label Matcher
 reference][label-matcher].
 

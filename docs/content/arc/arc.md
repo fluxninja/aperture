@@ -8,15 +8,14 @@ keywords:
   - reliability center
 ---
 
-## Application Reliability Center
-
-:::info Join the FluxNinja ARC Beta
+## Application Reliability Center (ARC)
 
 [FluxNinja ARC](https://www.fluxninja.com/platform) is a cloud-native
 application reliability center that extends open-source Aperture installation
 with advanced analytics, monitoring and alerting capabilities.
 
-To participate in the beta testing phase, please register by clicking on the
-provided link [here](https://app.fluxninja.com/sign-up).
+:::info Sign-up
+
+To sign-up, [register here](https://app.fluxninja.com/sign-up).
 
 :::

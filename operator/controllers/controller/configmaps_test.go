@@ -86,8 +86,8 @@ var _ = Describe("ConfigMap for Controller", func() {
 								Address: "http://aperture-prometheus-server:80",
 							},
 						},
-						OTEL: controller.ControllerOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: controller.ControllerOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,

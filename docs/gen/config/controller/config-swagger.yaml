@@ -183,7 +183,7 @@ definitions:
         title: ClientTLSConfig is the configuration for client TLS.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
-    CommonOTELConfig:
+    CommonOTelConfig:
         properties:
             batch_alerts:
                 $ref: '#/definitions/BatchAlertsConfig'
@@ -191,10 +191,10 @@ definitions:
             ports:
                 $ref: '#/definitions/PortsConfig'
                 x-go-tag-json: ports
-        title: CommonOTELConfig is the configuration for the OTEL collector.
+        title: CommonOTelConfig is the configuration for the OTel collector.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
-    ControllerOTELConfig:
+    ControllerOTelConfig:
         properties:
             batch_alerts:
                 $ref: '#/definitions/BatchAlertsConfig'
@@ -202,7 +202,7 @@ definitions:
             ports:
                 $ref: '#/definitions/PortsConfig'
                 x-go-tag-json: ports
-        title: ControllerOTELConfig is the configuration for Controller's OTel collector.
+        title: ControllerOTelConfig is the configuration for Controller's OTel collector.
         type: object
         x-go-package: github.com/fluxninja/aperture/cmd/aperture-controller/config
     Duration:
@@ -1201,7 +1201,7 @@ paths:
             parameters:
                 - in: body
                   schema:
-                    $ref: '#/definitions/ControllerOTELConfig'
+                    $ref: '#/definitions/ControllerOTelConfig'
             tags:
                 - controller-configuration
             x-fn-config-env: true

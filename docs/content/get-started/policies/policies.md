@@ -20,7 +20,7 @@ import Zoom from 'react-medium-image-zoom';
 ## Introduction
 
 The easiest way to get started with policies in Aperture is to use the built-in
-blueprints' system. Advanced users can learn about designing new policies by
+blueprint system. Advanced users can learn about designing new policies by
 following the
 [signal processing](/tutorials/signal-processing/signal-processing.md)
 tutorials.
@@ -59,10 +59,10 @@ policies/latency-aimd-concurrency-limiting
 policies/static-rate-limiting
 ```
 
-## Customizing Blueprints (values.yaml)
+## Customizing Blueprints
 
-Blueprints use a `values` file to provide required fields and to customize the
-generated policy and dashboard files.
+Blueprints use a configuration file to provide required fields and to customize
+the generated policy and dashboard files.
 
 For example, to generate a `policies/static-rate-limiting` policy, you can first
 generate a `values.yaml` file using the following command:

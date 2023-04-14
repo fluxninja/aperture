@@ -31,11 +31,11 @@ configured using a [policy][policies] component.
 
 ## Scheduler {#scheduler}
 
-Scheduler prioritizes requests based on their priority and size. Each Aperture
-Agent instantiates a
-[Weighted Fair Queueing](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
-based scheduler as a way to prioritize requests. The controller applies a _Load
-Multiplier_ that the scheduler uses to compute the fill rate of
+The scheduler prioritizes requests based on their priority and size. Each
+Aperture Agent instantiates a
+[Weighted Fair Queue-based](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
+scheduler as a way to prioritize requests. The controller applies a _Load
+Multiplier_ that the scheduler uses to compute the refill rate of
 [tokens](#tokens) per second, which it tries to maintain between each update
 from the controller.
 
@@ -57,7 +57,7 @@ estimating their [tokens](#tokens).
 
 ### Priority {#priority}
 
-Priority represents the importance of a request with respect to other requests
+Priority represents the importance of a request compared to the other requests
 in the queue.
 
 :::note
@@ -65,7 +65,7 @@ in the queue.
 Priority levels are in the range `0 to 255`. `0` is the lowest priority and
 `255` is the highest priority.
 
-Priority levels have non-linear effect on the scheduler. The following formula
+Priority levels have a non-linear effect on the scheduler. The following formula
 is used to compute the position in the queue based on the concept of (virtual
 finish times)[https://en.wikipedia.org/wiki/Weighted_fair_queueing#Algorithm]:
 
@@ -73,7 +73,7 @@ finish times)[https://en.wikipedia.org/wiki/Weighted_fair_queueing#Algorithm]:
 
 This means that requests with a priority level `255` will see double the
 acceptance rate compared to requests with a priority level `254`, if they have
-same number of tokens.
+the same number of tokens.
 
 :::
 
@@ -92,8 +92,8 @@ response times. For example, when applying flow control to external APIs that
 have strict rate limits.
 
 By default, Aperture can automatically estimate the tokens for each workload.
-See the `auto_tokens` [configuration](/reference/policies/spec.md#scheduler)
-configuration for more details.
+See the `auto_tokens` [configuration](/reference/policies/spec.md#scheduler) for
+more details.
 
 ### Token bucket {#token-bucket}
 

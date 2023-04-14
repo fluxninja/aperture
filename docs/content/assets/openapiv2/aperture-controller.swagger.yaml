@@ -1924,7 +1924,7 @@ definitions:
         x-go-tag-validate: required
       namespace:
         description: |+
-          Kubernetes Namespace that the resource belongs to.
+          Kubernetes namespace that the resource belongs to.
 
         type: string
         x-go-tag-validate: required
