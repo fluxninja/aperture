@@ -829,6 +829,9 @@ def main(
 
     blueprint_gen_path = blueprint_path / "gen"
 
+    # create the gen directory if it doesn't exist
+    blueprint_gen_path.mkdir(parents=True, exist_ok=True)
+
     config_parameters = parse_config_parameters(
         repository_root,
         blueprint_path,
