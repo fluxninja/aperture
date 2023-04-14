@@ -112,8 +112,8 @@ var _ = Describe("Agent DaemonSet", func() {
 							BindAddr:           ":3320",
 							MemberlistBindAddr: ":3322",
 						},
-						OTEL: agent.AgentOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: agent.AgentOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -312,8 +312,8 @@ var _ = Describe("Agent DaemonSet", func() {
 							BindAddr:           ":3320",
 							MemberlistBindAddr: ":3322",
 						},
-						OTEL: agent.AgentOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: agent.AgentOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,

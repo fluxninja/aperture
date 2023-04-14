@@ -546,7 +546,7 @@ definitions:
         additionalProperties:
           $ref: '#/definitions/Entity'
   Entity:
-    description: Entity represents a pod, vm, etc.
+    description: Entity represents a pod, VM, etc.
     type: object
     required:
     - ip_address
@@ -585,7 +585,7 @@ definitions:
         type: string
         x-go-tag-validate: required
   EqualsMatchExpression:
-    description: Label selector expression of the equal form "label == value".
+    description: Label selector expression of the equal form `label == value`.
     type: object
     required:
     - label
@@ -674,11 +674,11 @@ definitions:
   LabelMatcher:
     description: |-
       It provides three ways to define requirements:
-      - matchLabels
-      - matchExpressions
+      - match labels
+      - match expressions
       - arbitrary expression
 
-      If multiple requirements are set, they are all ANDed.
+      If multiple requirements are set, they're all combined using the logical AND operator.
       An empty label matcher always matches.
     type: object
     title: |-
@@ -693,7 +693,7 @@ definitions:
         description: |-
           List of k8s-style label matcher requirements.
 
-          Note: The requirements are ANDed.
+          Note: The requirements are combined using the logical AND operator.
         type: array
         items:
           type: object
@@ -701,9 +701,9 @@ definitions:
       match_labels:
         description: |-
           A map of {key,value} pairs representing labels to be matched.
-          A single {key,value} in the matchLabels requires that the label "key" is present and equal to "value".
+          A single {key,value} in the `match_labels` requires that the label `key` is present and equal to `value`.
 
-          Note: The requirements are ANDed.
+          Note: The requirements are combined using the logical AND operator.
         type: object
         additionalProperties:
           type: string
@@ -719,15 +719,16 @@ definitions:
           - label_equals: { label = app, value = frobnicator }
       ```
     type: object
-    title: Defines a [map<string, string> → bool] expression to be evaluated on labels
+    title: Defines a `[map<string, string> → bool]` expression to be evaluated on
+      labels
     required:
     - label_exists
     properties:
       all:
-        description: The expression is true when all subexpressions are true.
+        description: The expression is true when all sub expressions are true.
         $ref: '#/definitions/MatchExpressionList'
       any:
-        description: The expression is true when any subexpression is true.
+        description: The expression is true when any sub expression is true.
         $ref: '#/definitions/MatchExpressionList'
       label_equals:
         description: The expression is true when label value equals given value.
@@ -742,21 +743,21 @@ definitions:
         description: The expression is true when label matches given regex.
         $ref: '#/definitions/MatchesMatchExpression'
       not:
-        description: The expression negates the result of subexpression.
+        description: The expression negates the result of sub expression.
         $ref: '#/definitions/MatchExpression'
   MatchExpressionList:
-    description: 'eg. {any: {of: [expr1, expr2]}}.'
+    description: 'for example, `{any: {of: [expr1, expr2]}}`.'
     type: object
-    title: List of MatchExpressions that is used for all/any matching
+    title: List of MatchExpressions that's used for all/any matching
     properties:
       of:
-        description: List of subexpressions of the match expression.
+        description: List of sub expressions of the match expression.
         type: array
         items:
           type: object
           $ref: '#/definitions/MatchExpression'
   MatchesMatchExpression:
-    description: Label selector expression of the matches form "label matches regex".
+    description: Label selector expression of the form `label matches regex`.
     type: object
     required:
     - label
@@ -771,7 +772,7 @@ definitions:
       regex:
         description: |+
           Regular expression that should match the label value.
-          It uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
+          It uses [Go's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
 
         type: string
         x-go-tag-validate: required

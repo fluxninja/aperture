@@ -228,9 +228,11 @@ playground/tilt_local.json
 !cmd/aperturectl/cmd/build
 !docs/content/reference/aperturectl/build
 
-# Ignore everything in .vscode
-.vscode/*
 
-# Do not ignore ltex dictionaries and false positives
-!.vscode/ltex.dictionary.en-US.txt
+# ignore .github/styles except for .github/styles/Vocab/FluxNinja
+.github/styles
+!.github/styles/Vocab/FluxNinja
+
+# Ignore everything in .vscode except for .vscode/ltex.hiddenFalsePositives.en-US.txt
+.vscode/*
 !.vscode/ltex.hiddenFalsePositives.en-US.txt

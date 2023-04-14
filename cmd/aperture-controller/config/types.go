@@ -5,17 +5,17 @@ import (
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 )
 
-// swagger:operation POST /otel controller-configuration OTEL
+// swagger:operation POST /otel controller-configuration OTel
 // ---
 // x-fn-config-env: true
 // parameters:
 // - in: body
 //   schema:
-//     "$ref": "#/definitions/ControllerOTELConfig"
+//     "$ref": "#/definitions/ControllerOTelConfig"
 
-// ControllerOTELConfig is the configuration for Agent's OTEL collector.
+// ControllerOTelConfig is the configuration for Controller's OTel collector.
 // swagger:model
 // +kubebuilder:object:generate=true
-type ControllerOTELConfig struct {
-	otelconfig.CommonOTELConfig `json:",inline"`
+type ControllerOTelConfig struct {
+	otelconfig.CommonOTelConfig `json:",inline"`
 }

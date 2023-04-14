@@ -28,7 +28,7 @@ All the configuration parameters for Aperture Agent are listed
 
 ## Installation Modes {#agent-installation-modes}
 
-The Aperture Agent can be installed in below listed modes:
+The Aperture Agent can be installed in the following modes:
 
 1. **Kubernetes**
 

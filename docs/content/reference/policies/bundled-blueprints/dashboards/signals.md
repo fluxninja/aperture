@@ -17,8 +17,12 @@ import {ParameterDescription} from '../../../../parameterComponents.js'
 
 ## Configuration
 
+<!-- vale off -->
+
 Code: <a
 href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/dashboards/signals`}>dashboards/signals</a>
+
+<!-- vale on -->
 
 ### Parameters
 

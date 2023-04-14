@@ -4,15 +4,19 @@ sidebar_position: 10
 sidebar_label: Controller
 ---
 
+<!-- vale off -->
+
 <head>
   <body className="schema-docs" />
 </head>
+
+<!-- vale on -->
 
 :::info
 See also [Aperture Controller installation](/get-started/installation/controller/controller.md).
 :::
 
-List of all config parameters for Aperture Controller.
+List of all configuration parameters for Aperture Controller.
 
 <!---
 Generated File Starts
@@ -21,6 +25,8 @@ Generated File Starts
 ## Table of contents
 
 ### COMMON CONFIGURATION
+
+<!-- vale off -->
 
 | Key          | Reference                          |
 | ------------ | ---------------------------------- |
@@ -38,20 +44,30 @@ Generated File Starts
 
 ### CONTROLLER CONFIGURATION
 
-| Key    | Reference        |
-| ------ | ---------------- |
-| `otel` | [OTEL](#o-t-e-l) |
+<!-- vale off -->
+
+| Key    | Reference      |
+| ------ | -------------- |
+| `otel` | [OTel](#o-tel) |
 
 ### EXTENSION CONFIGURATION
+
+<!-- vale off -->
 
 | Key         | Reference                                   |
 | ----------- | ------------------------------------------- |
 | `fluxninja` | [FluxNinjaExtension](#flux-ninja-extension) |
 | `sentry`    | [SentryExtension](#sentry-extension)        |
 
+<!-- vale on -->
+
 ## Reference
 
+<!-- vale off -->
+
 ### _client_ {#client}
+
+<!-- vale on -->
 
 <dl>
 
@@ -67,7 +83,11 @@ Env-Var Prefix: `APERTURE_CONTROLLER_CLIENT_PROXY_`
 
 ---
 
+<!-- vale off -->
+
 ### _etcd_ {#etcd}
+
+<!-- vale on -->
 
 <dl>
 
@@ -83,7 +103,11 @@ Env-Var Prefix: `APERTURE_CONTROLLER_ETCD_`
 
 ---
 
+<!-- vale off -->
+
 ### _fluxninja_ {#flux-ninja-extension}
+
+<!-- vale on -->
 
 <dl>
 
@@ -99,7 +123,11 @@ Env-Var Prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
 
 ---
 
+<!-- vale off -->
+
 ### _liveness_ {#liveness}
+
+<!-- vale on -->
 
 <dl>
 
@@ -123,7 +151,11 @@ Env-Var Prefix: `APERTURE_CONTROLLER_LIVENESS_SERVICE_`
 
 ---
 
+<!-- vale off -->
+
 ### _log_ {#log}
+
+<!-- vale on -->
 
 <dl>
 
@@ -139,7 +171,11 @@ Env-Var Prefix: `APERTURE_CONTROLLER_LOG_`
 
 ---
 
+<!-- vale off -->
+
 ### _metrics_ {#metrics}
+
+<!-- vale on -->
 
 <dl>
 
@@ -155,14 +191,18 @@ Env-Var Prefix: `APERTURE_CONTROLLER_METRICS_`
 
 ---
 
-### _otel_ {#o-t-e-l}
+<!-- vale off -->
+
+### _otel_ {#o-tel}
+
+<!-- vale on -->
 
 <dl>
 
 <dt></dt>
 <dd>
 
-([ControllerOTELConfig](#controller-o-t-e-l-config))
+([ControllerOTelConfig](#controller-o-tel-config))
 Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_`
 
 </dd>
@@ -171,7 +211,11 @@ Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_`
 
 ---
 
+<!-- vale off -->
+
 ### _policies_ {#policies-config}
+
+<!-- vale on -->
 
 <dl>
 
@@ -187,7 +231,11 @@ Env-Var Prefix: `APERTURE_CONTROLLER_POLICIES_PROMQL_JOBS_SCHEDULER_`
 
 ---
 
+<!-- vale off -->
+
 ### _profilers_ {#profilers}
+
+<!-- vale on -->
 
 <dl>
 
@@ -203,7 +251,11 @@ Env-Var Prefix: `APERTURE_CONTROLLER_PROFILERS_`
 
 ---
 
+<!-- vale off -->
+
 ### _prometheus_ {#prometheus}
+
+<!-- vale on -->
 
 <dl>
 
@@ -227,7 +279,11 @@ Env-Var Prefix: `APERTURE_CONTROLLER_PROMETHEUS_HTTP_CLIENT_`
 
 ---
 
+<!-- vale off -->
+
 ### _readiness_ {#readiness}
+
+<!-- vale on -->
 
 <dl>
 
@@ -251,7 +307,11 @@ Env-Var Prefix: `APERTURE_CONTROLLER_READINESS_SERVICE_`
 
 ---
 
+<!-- vale off -->
+
 ### _sentry_ {#sentry-extension}
+
+<!-- vale on -->
 
 <dl>
 
@@ -267,7 +327,11 @@ Env-Var Prefix: `APERTURE_CONTROLLER_SENTRY_`
 
 ---
 
+<!-- vale off -->
+
 ### _server_ {#server}
+
+<!-- vale on -->
 
 <dl>
 
@@ -315,7 +379,11 @@ Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_TLS_`
 
 ---
 
+<!-- vale off -->
+
 ### _watchdog_ {#watchdog}
+
+<!-- vale on -->
 
 <dl>
 
@@ -335,7 +403,11 @@ Env-Var Prefix: `APERTURE_CONTROLLER_WATCHDOG_MEMORY_`
 
 ---
 
+<!-- vale off -->
+
 ### AdaptivePolicy {#adaptive-policy}
+
+<!-- vale on -->
 
 AdaptivePolicy creates a policy that forces GC when the usage surpasses the configured factor of the available memory. This policy calculates next target as usage+(limit-usage)\*factor.
 
@@ -343,81 +415,147 @@ AdaptivePolicy creates a policy that forces GC when the usage surpasses the conf
 <dt>enabled</dt>
 <dd>
 
-(bool) Flag to enable the policy
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Flag to enable the policy
 
 </dd>
 <dt>factor</dt>
 <dd>
 
-(float64, minimum: `0`, maximum: `1`, default: `0.5`) Factor sets user-configured limit of available memory
+<!-- vale off -->
+
+(float64, minimum: `0`, maximum: `1`, default: `0.5`)
+
+<!-- vale on -->
+
+Factor sets user-configured limit of available memory
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### BackoffConfig {#backoff-config}
 
-BackoffConfig holds configuration for GRPC Client Backoff.
+<!-- vale on -->
+
+BackoffConfig holds configuration for GRPC client backoff.
 
 <dl>
 <dt>base_delay</dt>
 <dd>
 
-(string, default: `"1s"`) Base Delay
+<!-- vale off -->
+
+(string, default: `"1s"`)
+
+<!-- vale on -->
+
+Base Delay
 
 </dd>
 <dt>jitter</dt>
 <dd>
 
-(float64, minimum: `0`, default: `0.2`) Jitter
+<!-- vale off -->
+
+(float64, minimum: `0`, default: `0.2`)
+
+<!-- vale on -->
+
+Jitter
 
 </dd>
 <dt>max_delay</dt>
 <dd>
 
-(string, default: `"120s"`) Max Delay
+<!-- vale off -->
+
+(string, default: `"120s"`)
+
+<!-- vale on -->
+
+Max Delay
 
 </dd>
 <dt>multiplier</dt>
 <dd>
 
-(float64, minimum: `0`, default: `1.6`) Backoff multiplier
+<!-- vale off -->
+
+(float64, minimum: `0`, default: `1.6`)
+
+<!-- vale on -->
+
+Backoff multiplier
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### BatchAlertsConfig {#batch-alerts-config}
 
-BatchAlertsConfig defines configuration for OTEL batch processor.
+<!-- vale on -->
+
+BatchAlertsConfig defines configuration for OTel batch processor.
 
 <dl>
 <dt>send_batch_max_size</dt>
 <dd>
 
-(uint32, minimum: `0`) SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
+<!-- vale off -->
+
+(uint32, minimum: `0`)
+
+<!-- vale on -->
+
+SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
 into smaller units.
 
 </dd>
 <dt>send_batch_size</dt>
 <dd>
 
-(uint32, minimum: `0`) SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+<!-- vale off -->
+
+(uint32, minimum: `0`)
+
+<!-- vale on -->
+
+SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
 
 </dd>
 <dt>timeout</dt>
 <dd>
 
-(string, default: `"1s"`) Timeout sets the time after which a batch will be sent regardless of size.
+<!-- vale off -->
+
+(string, default: `"1s"`)
+
+<!-- vale on -->
+
+Timeout sets the time after which a batch will be sent regardless of size.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### ClientConfig {#client-config}
+
+<!-- vale on -->
 
 ClientConfig is the client configuration.
 
@@ -425,80 +563,128 @@ ClientConfig is the client configuration.
 <dt>grpc</dt>
 <dd>
 
+<!-- vale off -->
+
 ([GRPCClientConfig](#g-rpc-client-config))
+
+<!-- vale on -->
 
 </dd>
 <dt>http</dt>
 <dd>
 
+<!-- vale off -->
+
 ([HTTPClientConfig](#http-client-config))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### ClientTLSConfig {#client-tls-config}
 
-ClientTLSConfig is the config for client TLS.
+<!-- vale on -->
+
+ClientTLSConfig is the configuration for client TLS.
 
 <dl>
 <dt>ca_file</dt>
 <dd>
 
+<!-- vale off -->
+
 (string)
+
+<!-- vale on -->
 
 </dd>
 <dt>cert_file</dt>
 <dd>
 
+<!-- vale off -->
+
 (string)
+
+<!-- vale on -->
 
 </dd>
 <dt>insecure_skip_verify</dt>
 <dd>
 
+<!-- vale off -->
+
 (bool)
+
+<!-- vale on -->
 
 </dd>
 <dt>key_file</dt>
 <dd>
 
+<!-- vale off -->
+
 (string)
+
+<!-- vale on -->
 
 </dd>
 <dt>key_log_file</dt>
 <dd>
 
+<!-- vale off -->
+
 (string)
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
-### ControllerOTELConfig {#controller-o-t-e-l-config}
+<!-- vale off -->
 
-ControllerOTELConfig is the configuration for Agent's OTEL collector.
+### ControllerOTelConfig {#controller-o-tel-config}
+
+<!-- vale on -->
+
+ControllerOTelConfig is the configuration for Controller's OTel collector.
 
 <dl>
 <dt>batch_alerts</dt>
 <dd>
 
+<!-- vale off -->
+
 ([BatchAlertsConfig](#batch-alerts-config))
+
+<!-- vale on -->
 
 </dd>
 <dt>ports</dt>
 <dd>
 
+<!-- vale off -->
+
 ([PortsConfig](#ports-config))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### EtcdConfig {#etcd-config}
+
+<!-- vale on -->
 
 EtcdConfig holds configuration for etcd client.
 
@@ -506,38 +692,68 @@ EtcdConfig holds configuration for etcd client.
 <dt>endpoints</dt>
 <dd>
 
-([]string, **required**) List of Etcd server endpoints
+<!-- vale off -->
+
+([]string, **required**)
+
+<!-- vale on -->
+
+List of etcd server endpoints
 
 </dd>
 <dt>lease_ttl</dt>
 <dd>
 
-(string, default: `"60s"`) Lease time-to-live
+<!-- vale off -->
+
+(string, default: `"60s"`)
+
+<!-- vale on -->
+
+Lease time-to-live
 
 </dd>
 <dt>password</dt>
 <dd>
 
+<!-- vale off -->
+
 (string)
+
+<!-- vale on -->
 
 </dd>
 <dt>username</dt>
 <dd>
 
-(string) Authentication
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Authentication
 
 </dd>
 <dt>tls</dt>
 <dd>
 
+<!-- vale off -->
+
 ([ClientTLSConfig](#client-tls-config))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### FluxNinjaExtensionConfig {#flux-ninja-extension-config}
+
+<!-- vale on -->
 
 FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
 
@@ -545,38 +761,70 @@ FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
 <dt>api_key</dt>
 <dd>
 
-(string) API Key for this agent. If this key is not set, the extension will not be enabled.
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+API Key for this agent. If this key isn't set, the extension won't be enabled.
 
 </dd>
 <dt>endpoint</dt>
 <dd>
 
-(string, format: `empty | hostname_port | url | fqdn`) Address to grpc or http(s) server listening in agent service. To use http protocol, the address must start with http(s)://.
+<!-- vale off -->
+
+(string, format: `empty | hostname_port | url | fqdn`)
+
+<!-- vale on -->
+
+Address to GRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`.
 
 </dd>
 <dt>heartbeat_interval</dt>
 <dd>
 
-(string, default: `"5s"`) Interval between each heartbeat.
+<!-- vale off -->
+
+(string, default: `"5s"`)
+
+<!-- vale on -->
+
+Interval between each heartbeat.
 
 </dd>
 <dt>installation_mode</dt>
 <dd>
 
-(string, oneof: `KUBERNETES_SIDECAR | KUBERNETES_DAEMONSET | LINUX_BARE_METAL`, default: `"LINUX_BARE_METAL"`) Installation mode describes how Agent/Controller is being run.
+<!-- vale off -->
+
+(string, one of: `KUBERNETES_SIDECAR | KUBERNETES_DAEMONSET | LINUX_BARE_METAL`, default: `"LINUX_BARE_METAL"`)
+
+<!-- vale on -->
+
+Installation mode describes how Agent/Controller is being run.
 
 </dd>
 <dt>client</dt>
 <dd>
 
+<!-- vale off -->
+
 ([ClientConfig](#client-config))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### GRPCClientConfig {#g-rpc-client-config}
+
+<!-- vale on -->
 
 GRPCClientConfig holds configuration for GRPC Client.
 
@@ -584,38 +832,68 @@ GRPCClientConfig holds configuration for GRPC Client.
 <dt>insecure</dt>
 <dd>
 
-(bool) Disable ClientTLS
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Disable ClientTLS
 
 </dd>
 <dt>min_connection_timeout</dt>
 <dd>
 
-(string, default: `"20s"`) Minimum connection timeout
+<!-- vale off -->
+
+(string, default: `"20s"`)
+
+<!-- vale on -->
+
+Minimum connection timeout
 
 </dd>
 <dt>use_proxy</dt>
 <dd>
 
-(bool) Use HTTP CONNECT Proxy
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Use HTTP CONNECT Proxy
 
 </dd>
 <dt>backoff</dt>
 <dd>
 
+<!-- vale off -->
+
 ([BackoffConfig](#backoff-config))
+
+<!-- vale on -->
 
 </dd>
 <dt>tls</dt>
 <dd>
 
+<!-- vale off -->
+
 ([ClientTLSConfig](#client-tls-config))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### GRPCGatewayConfig {#g-rpc-gateway-config}
+
+<!-- vale on -->
 
 GRPCGatewayConfig holds configuration for grpc-http gateway
 
@@ -623,14 +901,24 @@ GRPCGatewayConfig holds configuration for grpc-http gateway
 <dt>grpc_server_address</dt>
 <dd>
 
-(string, format: `hostname_port`, default: `"0.0.0.0:1"`) GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
+<!-- vale off -->
+
+(string, format: `hostname_port`, default: `"0.0.0.0:1"`)
+
+<!-- vale on -->
+
+GRPC server address to connect to - By default it points to HTTP server port because FluxNinja stack runs GRPC and HTTP servers on the same port
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### GRPCServerConfig {#g-rpc-server-config}
+
+<!-- vale on -->
 
 GRPCServerConfig holds configuration for GRPC Server.
 
@@ -638,26 +926,48 @@ GRPCServerConfig holds configuration for GRPC Server.
 <dt>connection_timeout</dt>
 <dd>
 
-(string, default: `"120s"`) Connection timeout
+<!-- vale off -->
+
+(string, default: `"120s"`)
+
+<!-- vale on -->
+
+Connection timeout
 
 </dd>
 <dt>enable_reflection</dt>
 <dd>
 
-(bool) Enable Reflection
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Enable Reflection
 
 </dd>
 <dt>latency_buckets_ms</dt>
 <dd>
 
-([]float64, default: `[10,25,100,250,1000]`) Buckets specification in latency histogram
+<!-- vale off -->
+
+([]float64, default: `[10,25,100,250,1000]`)
+
+<!-- vale on -->
+
+Buckets specification in latency histogram
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### HTTPClientConfig {#http-client-config}
+
+<!-- vale on -->
 
 HTTPClientConfig holds configuration for HTTP Client.
 
@@ -665,122 +975,236 @@ HTTPClientConfig holds configuration for HTTP Client.
 <dt>disable_compression</dt>
 <dd>
 
-(bool) Disable Compression
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Disable Compression
 
 </dd>
 <dt>disable_keep_alives</dt>
 <dd>
 
-(bool) Disable HTTP Keep Alives
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Disable HTTP Keepalive
 
 </dd>
 <dt>expect_continue_timeout</dt>
 <dd>
 
-(string, default: `"1s"`) Expect Continue Timeout. 0 = no timeout.
+<!-- vale off -->
+
+(string, default: `"1s"`)
+
+<!-- vale on -->
+
+Expect Continue Timeout. 0 = no timeout.
 
 </dd>
 <dt>idle_connection_timeout</dt>
 <dd>
 
-(string, default: `"90s"`) Idle Connection Timeout. 0 = no timeout.
+<!-- vale off -->
+
+(string, default: `"90s"`)
+
+<!-- vale on -->
+
+Idle Connection Timeout. 0 = no timeout.
 
 </dd>
 <dt>key_log_file</dt>
 <dd>
 
-(string) SSL key log file (useful for debugging with wireshark)
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+SSL key log file (useful for debugging)
 
 </dd>
 <dt>max_conns_per_host</dt>
 <dd>
 
-(int64, minimum: `0`) Max Connections Per Host. 0 = no limit.
+<!-- vale off -->
+
+(int64, minimum: `0`)
+
+<!-- vale on -->
+
+Max Connections Per Host. 0 = no limit.
 
 </dd>
 <dt>max_idle_connections</dt>
 <dd>
 
-(int64, minimum: `0`, default: `100`) Max Idle Connections. 0 = no limit.
+<!-- vale off -->
+
+(int64, minimum: `0`, default: `100`)
+
+<!-- vale on -->
+
+Max Idle Connections. 0 = no limit.
 
 </dd>
 <dt>max_idle_connections_per_host</dt>
 <dd>
 
-(int64, minimum: `0`, default: `5`) Max Idle Connections per host. 0 = no limit.
+<!-- vale off -->
+
+(int64, minimum: `0`, default: `5`)
+
+<!-- vale on -->
+
+Max Idle Connections per host. 0 = no limit.
 
 </dd>
 <dt>max_response_header_bytes</dt>
 <dd>
 
-(int64, minimum: `0`) Max Response Header Bytes. 0 = no limit.
+<!-- vale off -->
+
+(int64, minimum: `0`)
+
+<!-- vale on -->
+
+Max Response Header Bytes. 0 = no limit.
 
 </dd>
 <dt>network_keep_alive</dt>
 <dd>
 
-(string, default: `"30s"`) Network level keep-alive duration
+<!-- vale off -->
+
+(string, default: `"30s"`)
+
+<!-- vale on -->
+
+Network level keep-alive duration
 
 </dd>
 <dt>network_timeout</dt>
 <dd>
 
-(string, default: `"30s"`) Timeout for making network connection
+<!-- vale off -->
+
+(string, default: `"30s"`)
+
+<!-- vale on -->
+
+Timeout for making network connection
 
 </dd>
 <dt>read_buffer_size</dt>
 <dd>
 
-(int64, minimum: `0`) Read Buffer Size. 0 = 4KB
+<!-- vale off -->
+
+(int64, minimum: `0`)
+
+<!-- vale on -->
+
+Read Buffer Size. 0 = 4KB
 
 </dd>
 <dt>response_header_timeout</dt>
 <dd>
 
-(string, default: `"0s"`) Response Header Timeout. 0 = no timeout.
+<!-- vale off -->
+
+(string, default: `"0s"`)
+
+<!-- vale on -->
+
+Response Header Timeout. 0 = no timeout.
 
 </dd>
 <dt>tls_handshake_timeout</dt>
 <dd>
 
-(string, default: `"10s"`) TLS Handshake Timeout. 0 = no timeout
+<!-- vale off -->
+
+(string, default: `"10s"`)
+
+<!-- vale on -->
+
+TLS Handshake Timeout. 0 = no timeout
 
 </dd>
 <dt>timeout</dt>
 <dd>
 
-(string, default: `"60s"`) HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
+<!-- vale off -->
+
+(string, default: `"60s"`)
+
+<!-- vale on -->
+
+HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
 
 </dd>
 <dt>use_proxy</dt>
 <dd>
 
-(bool) Use Proxy
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Use Proxy
 
 </dd>
 <dt>write_buffer_size</dt>
 <dd>
 
-(int64, minimum: `0`) Write Buffer Size. 0 = 4KB.
+<!-- vale off -->
+
+(int64, minimum: `0`)
+
+<!-- vale on -->
+
+Write Buffer Size. 0 = 4KB.
 
 </dd>
 <dt>proxy_connect_header</dt>
 <dd>
 
+<!-- vale off -->
+
 ([Header](#header))
+
+<!-- vale on -->
 
 </dd>
 <dt>tls</dt>
 <dd>
 
+<!-- vale off -->
+
 ([ClientTLSConfig](#client-tls-config))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### HTTPServerConfig {#http-server-config}
+
+<!-- vale on -->
 
 HTTPServerConfig holds configuration for HTTP Server.
 
@@ -788,50 +1212,96 @@ HTTPServerConfig holds configuration for HTTP Server.
 <dt>disable_http_keep_alives</dt>
 <dd>
 
-(bool) Disable HTTP Keep Alives
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Disable HTTP Keepalive
 
 </dd>
 <dt>idle_timeout</dt>
 <dd>
 
-(string, default: `"30s"`) Idle timeout
+<!-- vale off -->
+
+(string, default: `"30s"`)
+
+<!-- vale on -->
+
+Idle timeout
 
 </dd>
 <dt>latency_buckets_ms</dt>
 <dd>
 
-([]float64, default: `[10,25,100,250,1000]`) Buckets specification in latency histogram
+<!-- vale off -->
+
+([]float64, default: `[10,25,100,250,1000]`)
+
+<!-- vale on -->
+
+Buckets specification in latency histogram
 
 </dd>
 <dt>max_header_bytes</dt>
 <dd>
 
-(int64, minimum: `0`, default: `1048576`) Max header size in bytes
+<!-- vale off -->
+
+(int64, minimum: `0`, default: `1048576`)
+
+<!-- vale on -->
+
+Max header size in bytes
 
 </dd>
 <dt>read_header_timeout</dt>
 <dd>
 
-(string, default: `"10s"`) Read header timeout
+<!-- vale off -->
+
+(string, default: `"10s"`)
+
+<!-- vale on -->
+
+Read header timeout
 
 </dd>
 <dt>read_timeout</dt>
 <dd>
 
-(string, default: `"10s"`) Read timeout
+<!-- vale off -->
+
+(string, default: `"10s"`)
+
+<!-- vale on -->
+
+Read timeout
 
 </dd>
 <dt>write_timeout</dt>
 <dd>
 
-(string, default: `"45s"`) Write timeout
+<!-- vale off -->
+
+(string, default: `"45s"`)
+
+<!-- vale on -->
+
+Write timeout
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Header {#header}
+
+<!-- vale on -->
 
 A Header represents the key-value pairs in an HTTP header.
 
@@ -842,7 +1312,11 @@ CanonicalHeaderKey.
 
 ---
 
+<!-- vale off -->
+
 ### HeapConfig {#heap-config}
+
+<!-- vale on -->
 
 HeapConfig holds configuration for heap Watchdog.
 
@@ -850,59 +1324,105 @@ HeapConfig holds configuration for heap Watchdog.
 <dt>limit</dt>
 <dd>
 
-(uint64, minimum: `0`) Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
+<!-- vale off -->
+
+(uint64, minimum: `0`)
+
+<!-- vale on -->
+
+Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
 
 </dd>
 <dt>min_gogc</dt>
 <dd>
 
-(int64, minimum: `0`, maximum: `100`, default: `25`) Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
+<!-- vale off -->
+
+(int64, minimum: `0`, maximum: `100`, default: `25`)
+
+<!-- vale on -->
+
+Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid over scheduling.
 
 </dd>
 <dt>adaptive_policy</dt>
 <dd>
 
+<!-- vale off -->
+
 ([AdaptivePolicy](#adaptive-policy))
+
+<!-- vale on -->
 
 </dd>
 <dt>watermarks_policy</dt>
 <dd>
 
+<!-- vale off -->
+
 ([WatermarksPolicy](#watermarks-policy))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### JobConfig {#job-config}
 
-JobConfig is config for Job
+<!-- vale on -->
+
+JobConfig is configuration for a periodic job
 
 <dl>
 <dt>execution_period</dt>
 <dd>
 
-(string, default: `"10s"`) Time period between job executions. Zero or negative value means that the job will never execute periodically.
+<!-- vale off -->
+
+(string, default: `"10s"`)
+
+<!-- vale on -->
+
+Time between job executions. Zero or negative value means that the job will never execute periodically.
 
 </dd>
 <dt>execution_timeout</dt>
 <dd>
 
-(string, default: `"5s"`) Execution timeout
+<!-- vale off -->
+
+(string, default: `"5s"`)
+
+<!-- vale on -->
+
+Execution timeout
 
 </dd>
 <dt>initially_healthy</dt>
 <dd>
 
-(bool) Sets whether the job is initially healthy
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Sets whether the job is initially healthy
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### JobGroupConfig {#job-group-config}
+
+<!-- vale on -->
 
 JobGroupConfig holds configuration for JobGroup.
 
@@ -910,7 +1430,13 @@ JobGroupConfig holds configuration for JobGroup.
 <dt>blocking_execution</dt>
 <dd>
 
-(bool) When true, the scheduler will run jobs synchronously,
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+When true, the scheduler will run jobs synchronously,
 waiting for each execution instance of the job to return
 before starting the next execution. Running with this
 option effectively serializes all job execution.
@@ -919,7 +1445,13 @@ option effectively serializes all job execution.
 <dt>worker_limit</dt>
 <dd>
 
-(int64) Limits how many jobs can be running at the same time. This is
+<!-- vale off -->
+
+(int64)
+
+<!-- vale on -->
+
+Limits how many jobs can be running at the same time. This is
 useful when running resource intensive jobs and a precise start time is
 not critical. 0 = no limit. If BlockingExecution is set, then WorkerLimit
 is ignored.
@@ -929,7 +1461,11 @@ is ignored.
 
 ---
 
+<!-- vale off -->
+
 ### ListenerConfig {#listener-config}
+
+<!-- vale on -->
 
 ListenerConfig holds configuration for socket listeners.
 
@@ -937,26 +1473,48 @@ ListenerConfig holds configuration for socket listeners.
 <dt>addr</dt>
 <dd>
 
-(string, format: `hostname_port`, default: `":8080"`) Address to bind to in the form of [host%zone]:port
+<!-- vale off -->
+
+(string, format: `hostname_port`, default: `":8080"`)
+
+<!-- vale on -->
+
+Address to bind to in the form of [host%zone]:port
 
 </dd>
 <dt>keep_alive</dt>
 <dd>
 
-(string, default: `"180s"`) Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alive is disabled.
+<!-- vale off -->
+
+(string, default: `"180s"`)
+
+<!-- vale on -->
+
+Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alive is disabled.
 
 </dd>
 <dt>network</dt>
 <dd>
 
-(string, oneof: `tcp | tcp4 | tcp6`, default: `"tcp"`) TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
+<!-- vale off -->
+
+(string, one of: `tcp | tcp4 | tcp6`, default: `"tcp"`)
+
+<!-- vale on -->
+
+TCP networks - `tcp`, `tcp4` (IPv4-only), `tcp6` (IPv6-only)
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### LogConfig {#log-config}
+
+<!-- vale on -->
 
 LogConfig holds configuration for a logger and log writers.
 
@@ -964,32 +1522,60 @@ LogConfig holds configuration for a logger and log writers.
 <dt>level</dt>
 <dd>
 
-(string, oneof: `debug | DEBUG | info | INFO | warn | WARN | error | ERROR | fatal | FATAL | panic | PANIC | trace | TRACE | disabled | DISABLED`, default: `"info"`) Log level
+<!-- vale off -->
+
+(string, one of: `debug | DEBUG | info | INFO | warn | WARN | error | ERROR | fatal | FATAL | panic | PANIC | trace | TRACE | disabled | DISABLED`, default: `"info"`)
+
+<!-- vale on -->
+
+Log level
 
 </dd>
 <dt>non_blocking</dt>
 <dd>
 
-(bool, default: `true`) Use non-blocking log writer (can lose logs at high throughput)
+<!-- vale off -->
+
+(bool, default: `true`)
+
+<!-- vale on -->
+
+Use non-blocking log writer (can lose logs at high throughput)
 
 </dd>
 <dt>pretty_console</dt>
 <dd>
 
-(bool) Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Additional log writer: pretty console (`stdout`) logging (not recommended for prod environments)
 
 </dd>
 <dt>writers</dt>
 <dd>
 
-([[]LogWriterConfig](#log-writer-config)) Log writers
+<!-- vale off -->
+
+([[]LogWriterConfig](#log-writer-config))
+
+<!-- vale on -->
+
+Log writers
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### LogWriterConfig {#log-writer-config}
+
+<!-- vale on -->
 
 LogWriterConfig holds configuration for a log writer.
 
@@ -997,38 +1583,72 @@ LogWriterConfig holds configuration for a log writer.
 <dt>compress</dt>
 <dd>
 
-(bool) Compress
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Compress
 
 </dd>
 <dt>file</dt>
 <dd>
 
-(string, default: `"stderr"`) Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+<!-- vale off -->
+
+(string, default: `"stderr"`)
+
+<!-- vale on -->
+
+Output file for logs. Keywords allowed - [`stderr`, `default`]. `default` maps to `/var/log/fluxninja/<service>.log`
 
 </dd>
 <dt>max_age</dt>
 <dd>
 
-(int64, minimum: `0`, default: `7`) Max age in days for log files
+<!-- vale off -->
+
+(int64, minimum: `0`, default: `7`)
+
+<!-- vale on -->
+
+Max age in days for log files
 
 </dd>
 <dt>max_backups</dt>
 <dd>
 
-(int64, minimum: `0`, default: `3`) Max log file backups
+<!-- vale off -->
+
+(int64, minimum: `0`, default: `3`)
+
+<!-- vale on -->
+
+Max log file backups
 
 </dd>
 <dt>max_size</dt>
 <dd>
 
-(int64, minimum: `0`, default: `50`) Log file max size in MB
+<!-- vale off -->
+
+(int64, minimum: `0`, default: `50`)
+
+<!-- vale on -->
+
+Log file max size in MB
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### MetricsConfig {#metrics-config}
+
+<!-- vale on -->
 
 MetricsConfig holds configuration for service metrics.
 
@@ -1036,59 +1656,109 @@ MetricsConfig holds configuration for service metrics.
 <dt>enable_go_metrics</dt>
 <dd>
 
-(bool) EnableGoCollector controls whether the go collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewGoCollector>
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+EnableGoCollector controls whether the go collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewGoCollector>
 
 </dd>
 <dt>enable_process_collector</dt>
 <dd>
 
-(bool) EnableProcessCollector controls whether the process collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewProcessCollector>
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+EnableProcessCollector controls whether the process collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewProcessCollector>
 
 </dd>
 <dt>pedantic</dt>
 <dd>
 
-(bool) Pedantic controls whether a pedantic Registerer is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Pedantic controls whether a pedantic registry is used. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### PortsConfig {#ports-config}
 
-PortsConfig defines configuration for OTEL debug and extension ports.
+<!-- vale on -->
+
+PortsConfig defines configuration for OTel debug and extension ports.
 
 <dl>
 <dt>debug_port</dt>
 <dd>
 
-(uint32, minimum: `0`) Port on which otel collector exposes prometheus metrics on /metrics path.
+<!-- vale off -->
+
+(uint32, minimum: `0`)
+
+<!-- vale on -->
+
+Port on which OTel collector exposes Prometheus metrics on /metrics path.
 
 </dd>
 <dt>health_check_port</dt>
 <dd>
 
-(uint32, minimum: `0`) Port on which health check extension in exposed.
+<!-- vale off -->
+
+(uint32, minimum: `0`)
+
+<!-- vale on -->
+
+Port on which health check extension in exposed.
 
 </dd>
 <dt>pprof_port</dt>
 <dd>
 
-(uint32, minimum: `0`) Port on which pprof extension in exposed.
+<!-- vale off -->
+
+(uint32, minimum: `0`)
+
+<!-- vale on -->
+
+Port on which `pprof` extension in exposed.
 
 </dd>
 <dt>zpages_port</dt>
 <dd>
 
-(uint32, minimum: `0`) Port on which zpages extension in exposed.
+<!-- vale off -->
+
+(uint32, minimum: `0`)
+
+<!-- vale on -->
+
+Port on which `zpages` extension in exposed.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### ProfilersConfig {#profilers-config}
+
+<!-- vale on -->
 
 ProfilersConfig holds configuration for profilers.
 
@@ -1096,26 +1766,48 @@ ProfilersConfig holds configuration for profilers.
 <dt>cpu_profiler</dt>
 <dd>
 
-(bool) Flag to enable cpu profiling on process start and save it to a file. HTTP interface will not work if this is enabled as CPU profile will always be running.
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Flag to enable CPU profiling on process start and save it to a file. HTTP interface won't work if this is enabled as CPU profile will always be running.
 
 </dd>
 <dt>profiles_path</dt>
 <dd>
 
-(string, default: `"default"`) Path to save performance profiles. "default" path is `/var/log/aperture/<service>/profiles`.
+<!-- vale off -->
+
+(string, default: `"default"`)
+
+<!-- vale on -->
+
+Path to save performance profiles. "default" path is `/var/log/aperture/<service>/profiles`.
 
 </dd>
 <dt>register_http_routes</dt>
 <dd>
 
-(bool, default: `true`) Register routes. Profile types profile, symbol and cmdline will be registered at /debug/pprof/{profile,symbol,cmdline}.
+<!-- vale off -->
+
+(bool, default: `true`)
+
+<!-- vale on -->
+
+Register routes. Profile types `profile`, `symbol` and `cmdline` will be registered at `/debug/pprof/{profile,symbol,cmdline}`.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### PrometheusConfig {#prometheus-config}
+
+<!-- vale on -->
 
 PrometheusConfig holds configuration for Prometheus Server.
 
@@ -1123,14 +1815,24 @@ PrometheusConfig holds configuration for Prometheus Server.
 <dt>address</dt>
 <dd>
 
-(string, format: `hostname_port | url | fqdn`, **required**) Address of the prometheus server
+<!-- vale off -->
+
+(string, format: `hostname_port | url | fqdn`, **required**)
+
+<!-- vale on -->
+
+Address of the Prometheus server
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### ProxyConfig {#proxy-config}
+
+<!-- vale on -->
 
 ProxyConfig holds proxy configuration.
 
@@ -1140,26 +1842,42 @@ This configuration has preference over environment variables HTTP_PROXY, HTTPS_P
 <dt>http</dt>
 <dd>
 
+<!-- vale off -->
+
 (string, format: `empty | url | hostname_port`)
+
+<!-- vale on -->
 
 </dd>
 <dt>https</dt>
 <dd>
 
+<!-- vale off -->
+
 (string, format: `empty | url | hostname_port`)
+
+<!-- vale on -->
 
 </dd>
 <dt>no_proxy</dt>
 <dd>
 
+<!-- vale off -->
+
 ([]string)
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### SentryConfig {#sentry-config}
+
+<!-- vale on -->
 
 SentryConfig holds configuration for Sentry.
 
@@ -1167,52 +1885,98 @@ SentryConfig holds configuration for Sentry.
 <dt>attach_stack_trace</dt>
 <dd>
 
-(bool, default: `true`) Configure to generate and attach stacktraces to capturing message calls
+<!-- vale off -->
+
+(bool, default: `true`)
+
+<!-- vale on -->
+
+Configure to generate and attach stack traces to capturing message calls
 
 </dd>
 <dt>debug</dt>
 <dd>
 
-(bool, default: `true`) Debug enables printing of Sentry SDK debug messages
+<!-- vale off -->
+
+(bool, default: `true`)
+
+<!-- vale on -->
+
+Debug enables printing of Sentry SDK debug messages
 
 </dd>
 <dt>disabled</dt>
 <dd>
 
-(bool) Sentry crash report disabled
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Sentry crash report disabled
 
 </dd>
 <dt>dsn</dt>
 <dd>
 
-(string, default: `"https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877"`) If DSN is not set, the client is effectively disabled
-You can set test project's dsn to send log events.
-oss-aperture project dsn is set as default.
+<!-- vale off -->
+
+(string, default: `"https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877"`)
+
+<!-- vale on -->
+
+If DSN isn't set, the client is effectively disabled
+You can set test project's DSN to send log events.
+oss-aperture project DSN is set as default.
 
 </dd>
 <dt>environment</dt>
 <dd>
 
-(string, default: `"production"`) Environment
+<!-- vale off -->
+
+(string, default: `"production"`)
+
+<!-- vale on -->
+
+Environment
 
 </dd>
 <dt>sample_rate</dt>
 <dd>
 
-(float64, default: `1`) Sample rate for event submission i.e. 0.0 to 1.0
+<!-- vale off -->
+
+(float64, minimum: `0`, maximum: `1`, default: `1`)
+
+<!-- vale on -->
+
+Sample rate for event submission
 
 </dd>
 <dt>traces_sample_rate</dt>
 <dd>
 
-(float64, default: `0.2`) Sample rate for sampling traces i.e. 0.0 to 1.0
+<!-- vale off -->
+
+(float64, minimum: `0`, maximum: `1`, default: `0.2`)
+
+<!-- vale on -->
+
+Sample rate for sampling traces
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### ServerTLSConfig {#server-tls-config}
+
+<!-- vale on -->
 
 ServerTLSConfig holds configuration for setting up server TLS support.
 
@@ -1220,38 +1984,72 @@ ServerTLSConfig holds configuration for setting up server TLS support.
 <dt>allowed_cn</dt>
 <dd>
 
-(string, format: `empty | fqdn`) Allowed CN
+<!-- vale off -->
+
+(string, format: `empty | fqdn`)
+
+<!-- vale on -->
+
+Allowed CN
 
 </dd>
 <dt>cert_file</dt>
 <dd>
 
-(string) Server Cert file path
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Server Cert file path
 
 </dd>
 <dt>client_ca_file</dt>
 <dd>
 
-(string) Client CA file path
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Client CA file path
 
 </dd>
 <dt>enabled</dt>
 <dd>
 
-(bool) Enabled TLS
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Enabled TLS
 
 </dd>
 <dt>key_file</dt>
 <dd>
 
-(string) Server Key file path
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Server Key file path
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### WatchdogConfig {#watchdog-config}
+
+<!-- vale on -->
 
 WatchdogConfig holds configuration for Watchdog Policy. For each policy, either watermark or adaptive should be configured.
 
@@ -1259,32 +2057,52 @@ WatchdogConfig holds configuration for Watchdog Policy. For each policy, either 
 <dt>cgroup</dt>
 <dd>
 
+<!-- vale off -->
+
 ([WatchdogPolicyType](#watchdog-policy-type))
+
+<!-- vale on -->
 
 </dd>
 <dt>heap</dt>
 <dd>
 
+<!-- vale off -->
+
 ([HeapConfig](#heap-config))
+
+<!-- vale on -->
 
 </dd>
 <dt>job</dt>
 <dd>
 
+<!-- vale off -->
+
 ([JobConfig](#job-config))
+
+<!-- vale on -->
 
 </dd>
 <dt>system</dt>
 <dd>
 
+<!-- vale off -->
+
 ([WatchdogPolicyType](#watchdog-policy-type))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### WatchdogPolicyType {#watchdog-policy-type}
+
+<!-- vale on -->
 
 WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algorithms are configured then only watermark algorithm is used.
 
@@ -1292,20 +2110,32 @@ WatchdogPolicyType holds configuration Watchdog Policy algorithms. If both algor
 <dt>adaptive_policy</dt>
 <dd>
 
+<!-- vale off -->
+
 ([AdaptivePolicy](#adaptive-policy))
+
+<!-- vale on -->
 
 </dd>
 <dt>watermarks_policy</dt>
 <dd>
 
+<!-- vale off -->
+
 ([WatermarksPolicy](#watermarks-policy))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### WatermarksPolicy {#watermarks-policy}
+
+<!-- vale on -->
 
 WatermarksPolicy creates a Watchdog policy that schedules GC at concrete watermarks.
 
@@ -1313,13 +2143,25 @@ WatermarksPolicy creates a Watchdog policy that schedules GC at concrete waterma
 <dt>enabled</dt>
 <dd>
 
-(bool) Flag to enable the policy
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Flag to enable the policy
 
 </dd>
 <dt>watermarks</dt>
 <dd>
 
-([]float64, default: `[0.5,0.75,0.8,0.85,0.9,0.95,0.99]`) Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
+<!-- vale off -->
+
+([]float64, default: `[0.5,0.75,0.8,0.85,0.9,0.95,0.99]`)
+
+<!-- vale on -->
+
+Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It's recommended to set an extreme watermark for the last element (for example, 0.99).
 
 </dd>
 </dl>

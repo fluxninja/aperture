@@ -1,0 +1,2 @@
+{"rule":"EN_COMPOUNDS","sentence":"[Aa]uto [Ss]cal"}
+{"rule":"AUTO_HYPHEN","sentence":"[Aa]uto deploy"}

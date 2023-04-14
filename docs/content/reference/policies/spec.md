@@ -4,9 +4,13 @@ sidebar_position: 2
 sidebar_label: Specification
 ---
 
+<!-- vale off -->
+
 <head>
   <body className="schema-docs" />
 </head>
+
+<!-- vale on -->
 
 Reference for all objects used in [the Policy language](/concepts/policy/policy.md).
 
@@ -20,7 +24,11 @@ Generated File Starts
 
 ---
 
+<!-- vale off -->
+
 ### AIMDConcurrencyController {#a-i-m-d-concurrency-controller}
+
+<!-- vale on -->
 
 High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
 
@@ -28,68 +36,132 @@ High level concurrency control component. Baselines a signal via exponential mov
 <dt>alerter_parameters</dt>
 <dd>
 
-([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
+<!-- vale off -->
+
+([AlerterParameters](#alerter-parameters))
+
+<!-- vale on -->
+
+Configuration for embedded Alerter.
 
 </dd>
 <dt>default_config</dt>
 <dd>
 
-([LoadActuatorDynamicConfig](#load-actuator-dynamic-config)) Default configuration.
+<!-- vale off -->
+
+([LoadActuatorDynamicConfig](#load-actuator-dynamic-config))
+
+<!-- vale on -->
+
+Default configuration.
 
 </dd>
 <dt>dynamic_config_key</dt>
 <dd>
 
-(string) Configuration key for load actuation.
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for load actuation.
 
 </dd>
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector)) Flow Selector decides the service and flows at which the concurrency limiter is applied.
+<!-- vale off -->
+
+([FlowSelector](#flow-selector))
+
+<!-- vale on -->
+
+Flow Selector decides the service and flows at which the concurrency limiter is applied.
 
 </dd>
 <dt>gradient_parameters</dt>
 <dd>
 
-([GradientControllerParameters](#gradient-controller-parameters)) Gradient parameters for the controller.
+<!-- vale off -->
+
+([GradientControllerParameters](#gradient-controller-parameters))
+
+<!-- vale on -->
+
+Gradient parameters for the controller.
 
 </dd>
 <dt>in_ports</dt>
 <dd>
 
-([AIMDConcurrencyControllerIns](#a-i-m-d-concurrency-controller-ins)) Input ports for the AIMDConcurrencyController component.
+<!-- vale off -->
+
+([AIMDConcurrencyControllerIns](#a-i-m-d-concurrency-controller-ins))
+
+<!-- vale on -->
+
+Input ports for the AIMDConcurrencyController component.
 
 </dd>
 <dt>load_multiplier_linear_increment</dt>
 <dd>
 
-(float64, default: `0.0025`) Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
+<!-- vale off -->
+
+(float64, default: `0.0025`)
+
+<!-- vale on -->
+
+Linear increment to load multiplier in each execution tick when the system isn't in overloaded state.
 
 </dd>
 <dt>max_load_multiplier</dt>
 <dd>
 
-(float64, default: `2`) Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
+<!-- vale off -->
+
+(float64, default: `2`)
+
+<!-- vale on -->
+
+Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([AIMDConcurrencyControllerOuts](#a-i-m-d-concurrency-controller-outs)) Output ports for the AIMDConcurrencyController component.
+<!-- vale off -->
+
+([AIMDConcurrencyControllerOuts](#a-i-m-d-concurrency-controller-outs))
+
+<!-- vale on -->
+
+Output ports for the AIMDConcurrencyController component.
 
 </dd>
 <dt>scheduler_parameters</dt>
 <dd>
 
-([SchedulerParameters](#scheduler-parameters)) Scheduler parameters.
+<!-- vale off -->
+
+([SchedulerParameters](#scheduler-parameters))
+
+<!-- vale on -->
+
+Scheduler parameters.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### AIMDConcurrencyControllerIns {#a-i-m-d-concurrency-controller-ins}
+
+<!-- vale on -->
 
 Inputs for the AIMDConcurrencyController component.
 
@@ -97,20 +169,36 @@ Inputs for the AIMDConcurrencyController component.
 <dt>setpoint</dt>
 <dd>
 
-([InPort](#in-port)) The setpoint to the controller.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The setpoint to the controller.
 
 </dd>
 <dt>signal</dt>
 <dd>
 
-([InPort](#in-port)) The signal to the controller.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The signal to the controller.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### AIMDConcurrencyControllerOuts {#a-i-m-d-concurrency-controller-outs}
+
+<!-- vale on -->
 
 Outputs for the AIMDConcurrencyController component.
 
@@ -118,45 +206,83 @@ Outputs for the AIMDConcurrencyController component.
 <dt>accepted_concurrency</dt>
 <dd>
 
-([OutPort](#out-port)) Accepted concurrency is the number of concurrent requests that are accepted by the service.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Accepted concurrency is the number of concurrent requests that are accepted by the service.
 
 </dd>
 <dt>desired_load_multiplier</dt>
 <dd>
 
-([OutPort](#out-port)) Desired Load multiplier is the ratio of desired concurrency to the incoming concurrency.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Desired Load multiplier is the ratio of desired concurrency to the incoming concurrency.
 
 </dd>
 <dt>incoming_concurrency</dt>
 <dd>
 
-([OutPort](#out-port)) IncomingConcurrency is the number of concurrent requests that are received by the service.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+IncomingConcurrency is the number of concurrent requests that are received by the service.
 
 </dd>
 <dt>is_overload</dt>
 <dd>
 
-([OutPort](#out-port)) Is overload is a boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Is overload is a Boolean signal that indicates whether the service is overloaded based on the deviation of the signal from the setpoint taking into account some tolerance.
 
 </dd>
 <dt>observed_load_multiplier</dt>
 <dd>
 
-([OutPort](#out-port)) Observed Load multiplier is the ratio of accepted concurrency to the incoming concurrency.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Observed Load multiplier is the ratio of accepted concurrency to the incoming concurrency.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### AddressExtractor {#address-extractor}
 
-Display an [Address][ext-authz-address] as a single string, eg. `<ip>:<port>`
+<!-- vale on -->
 
-IP addresses in attribute context are defined as objects with separate ip and port fields.
+Display an [Address][ext-authz-address] as a single string, for example, `<ip>:<port>`
+
+IP addresses in attribute context are defined as objects with separate IP and port fields.
 This is a helper to display an address as a single string.
 
-Note: Use with care, as it might accidentally introduce a high-cardinality flow label values.
+:::caution
+
+This might introduce high-cardinality flow label values.
+
+:::
 
 [ext-authz-address]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/address.proto#config-core-v3-address
 
@@ -170,14 +296,24 @@ from: "source.address # or destination.address"
 <dt>from</dt>
 <dd>
 
-(string, **required**) Attribute path pointing to some string - eg. "source.address".
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Attribute path pointing to some string - for example, `source.address`.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Alerter {#alerter}
+
+<!-- vale on -->
 
 Alerter reacts to a signal and generates alert to send to alert manager.
 
@@ -185,20 +321,36 @@ Alerter reacts to a signal and generates alert to send to alert manager.
 <dt>in_ports</dt>
 <dd>
 
-([AlerterIns](#alerter-ins)) Input ports for the Alerter component.
+<!-- vale off -->
+
+([AlerterIns](#alerter-ins))
+
+<!-- vale on -->
+
+Input ports for the Alerter component.
 
 </dd>
 <dt>parameters</dt>
 <dd>
 
-([AlerterParameters](#alerter-parameters)) Alerter configuration
+<!-- vale off -->
+
+([AlerterParameters](#alerter-parameters))
+
+<!-- vale on -->
+
+Alerter configuration
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### AlerterIns {#alerter-ins}
+
+<!-- vale on -->
 
 Inputs for the Alerter component.
 
@@ -206,57 +358,101 @@ Inputs for the Alerter component.
 <dt>signal</dt>
 <dd>
 
-([InPort](#in-port)) Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Signal which Alerter is monitoring. If the signal greater than 0, Alerter generates an alert.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### AlerterParameters {#alerter-parameters}
 
-Alerter Parameters is a common config for separate alerter components and alerters embedded in other components.
+<!-- vale on -->
+
+Alerter Parameters configure parameters such as alert name, severity, resolve timeout, alert channels and labels.
 
 <dl>
 <dt>alert_channels</dt>
 <dd>
 
-([]string) A list of alert channel strings.
+<!-- vale off -->
+
+([]string)
+
+<!-- vale on -->
+
+A list of alert channel strings.
 
 </dd>
 <dt>alert_name</dt>
 <dd>
 
-(string, **required**) Name of the alert.
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Name of the alert.
 
 </dd>
 <dt>labels</dt>
 <dd>
 
-(map of string) Additional labels to add to alert.
+<!-- vale off -->
+
+(map of string)
+
+<!-- vale on -->
+
+Additional labels to add to alert.
 
 </dd>
 <dt>resolve_timeout</dt>
 <dd>
 
-(string, default: `"5s"`) Duration of alert resolver.
+<!-- vale off -->
+
+(string, default: `"5s"`)
+
+<!-- vale on -->
+
+Duration of alert resolver.
 
 </dd>
 <dt>severity</dt>
 <dd>
 
-(string, oneof: `info | warn | crit`, default: `"info"`) Severity of the alert, one of 'info', 'warn' or 'crit'.
+<!-- vale off -->
+
+(string, one of: `info | warn | crit`, default: `"info"`)
+
+<!-- vale on -->
+
+Severity of the alert, one of 'info', 'warn' or 'crit'.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### And {#and}
+
+<!-- vale on -->
 
 Logical AND.
 
-Signals are mapped to boolean values as follows:
+Signals are mapped to Boolean values as follows:
 
 - Zero is treated as false.
 - Any non-zero is treated as true.
@@ -265,7 +461,7 @@ Signals are mapped to boolean values as follows:
   :::note
 
   Treating invalid inputs as "unknowns" has a consequence that the result
-  might end up being valid even when some inputs are invalid. Eg. `unknown && false == false`,
+  might end up being valid even when some inputs are invalid. For example, `unknown && false == false`,
   because the result would end up false no matter if
   first signal was true or false. On the other hand, `unknown && true == unknown`.
 
@@ -275,20 +471,36 @@ Signals are mapped to boolean values as follows:
 <dt>in_ports</dt>
 <dd>
 
-([AndIns](#and-ins)) Input ports for the And component.
+<!-- vale off -->
+
+([AndIns](#and-ins))
+
+<!-- vale on -->
+
+Input ports for the And component.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([AndOuts](#and-outs)) Output ports for the And component.
+<!-- vale off -->
+
+([AndOuts](#and-outs))
+
+<!-- vale on -->
+
+Output ports for the And component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### AndIns {#and-ins}
+
+<!-- vale on -->
 
 Inputs for the And component.
 
@@ -296,14 +508,24 @@ Inputs for the And component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port)) Array of input signals.
+<!-- vale off -->
+
+([[]InPort](#in-port))
+
+<!-- vale on -->
+
+Array of input signals.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### AndOuts {#and-outs}
+
+<!-- vale on -->
 
 Output ports for the And component.
 
@@ -311,7 +533,13 @@ Output ports for the And component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) Result of logical AND of all the input signals.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Result of logical AND of all the input signals.
 
 Will always be 0 (false), 1 (true) or invalid (unknown).
 
@@ -320,37 +548,63 @@ Will always be 0 (false), 1 (true) or invalid (unknown).
 
 ---
 
+<!-- vale off -->
+
 ### ArithmeticCombinator {#arithmetic-combinator}
 
-Type of combinator that computes the arithmetic operation on the operand signals
+<!-- vale on -->
+
+Type of Combinator that computes the arithmetic operation on the operand signals
 
 <dl>
 <dt>in_ports</dt>
 <dd>
 
-([ArithmeticCombinatorIns](#arithmetic-combinator-ins)) Input ports for the Arithmetic Combinator component.
+<!-- vale off -->
+
+([ArithmeticCombinatorIns](#arithmetic-combinator-ins))
+
+<!-- vale on -->
+
+Input ports for the Arithmetic Combinator component.
 
 </dd>
 <dt>operator</dt>
 <dd>
 
-(string, oneof: `add | sub | mul | div | xor | lshift | rshift`) Operator of the arithmetic operation.
+<!-- vale off -->
+
+(string, one of: `add | sub | mul | div | xor | lshift | rshift`)
+
+<!-- vale on -->
+
+Operator of the arithmetic operation.
 
 The arithmetic operation can be addition, subtraction, multiplication, division, XOR, right bit shift or left bit shift.
-In case of XOR and bitshifts, value of signals is cast to integers before performing the operation.
+In case of XOR and bit shifts, value of signals is cast to integers before performing the operation.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([ArithmeticCombinatorOuts](#arithmetic-combinator-outs)) Output ports for the Arithmetic Combinator component.
+<!-- vale off -->
+
+([ArithmeticCombinatorOuts](#arithmetic-combinator-outs))
+
+<!-- vale on -->
+
+Output ports for the Arithmetic Combinator component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### ArithmeticCombinatorIns {#arithmetic-combinator-ins}
+
+<!-- vale on -->
 
 Inputs for the Arithmetic Combinator component.
 
@@ -358,20 +612,36 @@ Inputs for the Arithmetic Combinator component.
 <dt>lhs</dt>
 <dd>
 
-([InPort](#in-port)) Left hand side of the arithmetic operation.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Left hand side of the arithmetic operation.
 
 </dd>
 <dt>rhs</dt>
 <dd>
 
-([InPort](#in-port)) Right hand side of the arithmetic operation.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Right hand side of the arithmetic operation.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### ArithmeticCombinatorOuts {#arithmetic-combinator-outs}
+
+<!-- vale on -->
 
 Outputs for the Arithmetic Combinator component.
 
@@ -379,14 +649,24 @@ Outputs for the Arithmetic Combinator component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) Result of arithmetic operation.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Result of arithmetic operation.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### AutoScale {#auto-scale}
+
+<!-- vale on -->
 
 AutoScale components are used to scale a service.
 
@@ -394,34 +674,62 @@ AutoScale components are used to scale a service.
 <dt>auto_scaler</dt>
 <dd>
 
-([AutoScaler](#auto-scaler)) _AutoScaler_ provides auto-scaling functionality for any scalable resource.
+<!-- vale off -->
+
+([AutoScaler](#auto-scaler))
+
+<!-- vale on -->
+
+_AutoScaler_ provides auto scaling functionality for any scalable resource.
 
 </dd>
 <dt>pod_auto_scaler</dt>
 <dd>
 
-([PodAutoScaler](#pod-auto-scaler)) _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource.
+<!-- vale off -->
+
+([PodAutoScaler](#pod-auto-scaler))
+
+<!-- vale on -->
+
+_PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource.
 
 </dd>
 <dt>pod_scaler</dt>
 <dd>
 
-([PodScaler](#pod-scaler)) PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
+<!-- vale off -->
+
+([PodScaler](#pod-scaler))
+
+<!-- vale on -->
+
+PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### AutoScaler {#auto-scaler}
 
-_AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
+<!-- vale on -->
+
+_AutoScaler_ provides auto scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto scale.
 
 <dl>
 <dt>cooldown_override_percentage</dt>
 <dd>
 
-(float64, default: `50`) Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
+<!-- vale off -->
+
+(float64, default: `50`)
+
+<!-- vale on -->
+
+Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
 For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
 scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
 
@@ -429,80 +737,154 @@ scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>max_scale</dt>
 <dd>
 
-(string, default: `"9223372036854775807"`) The maximum scale to which the _AutoScaler_ can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+<!-- vale off -->
+
+(string, default: `"9223372036854775807"`)
+
+<!-- vale on -->
+
+The maximum scale to which the _AutoScaler_ can scale-out. For example, in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
 
 </dd>
 <dt>max_scale_in_percentage</dt>
 <dd>
 
-(float64, default: `1`) The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+<!-- vale off -->
+
+(float64, default: `1`)
+
+<!-- vale on -->
+
+The maximum decrease of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
 
 </dd>
 <dt>max_scale_out_percentage</dt>
 <dd>
 
-(float64, default: `10`) The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+<!-- vale off -->
+
+(float64, default: `10`)
+
+<!-- vale on -->
+
+The maximum increase of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
 
 </dd>
 <dt>min_scale</dt>
 <dd>
 
-(string, default: `"0"`) The minimum scale to which the _AutoScaler_ can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+<!-- vale off -->
+
+(string, default: `"0"`)
+
+<!-- vale on -->
+
+The minimum scale to which the _AutoScaler_ can scale-in. For example, in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([AutoScalerOuts](#auto-scaler-outs)) Output ports for the _AutoScaler_.
+<!-- vale off -->
+
+([AutoScalerOuts](#auto-scaler-outs))
+
+<!-- vale on -->
+
+Output ports for the _AutoScaler_.
 
 </dd>
 <dt>scale_in_alerter_parameters</dt>
 <dd>
 
-([AlerterParameters](#alerter-parameters)) Configuration for scale-in alerter.
+<!-- vale off -->
+
+([AlerterParameters](#alerter-parameters))
+
+<!-- vale on -->
+
+Configuration for scale-in Alerter.
 
 </dd>
 <dt>scale_in_controllers</dt>
 <dd>
 
-([[]ScaleInController](#scale-in-controller)) List of _Controllers_ for scaling in.
+<!-- vale off -->
+
+([[]ScaleInController](#scale-in-controller))
+
+<!-- vale on -->
+
+List of _Controllers_ for scaling in.
 
 </dd>
 <dt>scale_in_cooldown</dt>
 <dd>
 
-(string, default: `"120s"`) The amount of time to wait after a scale-in operation for another scale-in operation.
+<!-- vale off -->
+
+(string, default: `"120s"`)
+
+<!-- vale on -->
+
+The amount of time to wait after a scale-in operation for another scale-in operation.
 
 </dd>
 <dt>scale_out_alerter_parameters</dt>
 <dd>
 
-([AlerterParameters](#alerter-parameters)) Configuration for scale-out alerter.
+<!-- vale off -->
+
+([AlerterParameters](#alerter-parameters))
+
+<!-- vale on -->
+
+Configuration for scale-out Alerter.
 
 </dd>
 <dt>scale_out_controllers</dt>
 <dd>
 
-([[]ScaleOutController](#scale-out-controller)) List of _Controllers_ for scaling out.
+<!-- vale off -->
+
+([[]ScaleOutController](#scale-out-controller))
+
+<!-- vale on -->
+
+List of _Controllers_ for scaling out.
 
 </dd>
 <dt>scale_out_cooldown</dt>
 <dd>
 
-(string, default: `"30s"`) The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
+<!-- vale off -->
+
+(string, default: `"30s"`)
+
+<!-- vale on -->
+
+The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
 
 </dd>
 <dt>scaler</dt>
 <dd>
 
+<!-- vale off -->
+
 ([AutoScalerScaler](#auto-scaler-scaler))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### AutoScalerOuts {#auto-scaler-outs}
+
+<!-- vale on -->
 
 Outputs for _AutoScaler_.
 
@@ -510,41 +892,65 @@ Outputs for _AutoScaler_.
 <dt>actual_scale</dt>
 <dd>
 
+<!-- vale off -->
+
 ([OutPort](#out-port))
+
+<!-- vale on -->
 
 </dd>
 <dt>configured_scale</dt>
 <dd>
 
+<!-- vale off -->
+
 ([OutPort](#out-port))
+
+<!-- vale on -->
 
 </dd>
 <dt>desired_scale</dt>
 <dd>
 
+<!-- vale off -->
+
 ([OutPort](#out-port))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### AutoScalerScaler {#auto-scaler-scaler}
+
+<!-- vale on -->
 
 <dl>
 <dt>kubernetes_replicas</dt>
 <dd>
 
+<!-- vale off -->
+
 ([KubernetesReplicas](#kubernetes-replicas))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Circuit {#circuit}
 
-Circuit is defined as a dataflow graph of inter-connected components
+<!-- vale on -->
+
+Circuit is graph of inter-connected signal processing components.
 
 :::info
 
@@ -553,23 +959,21 @@ See also [Circuit overview](/concepts/policy/circuit.md).
 :::
 
 Signals flow between components via ports.
-As signals traverse the circuit, they get processed, stored within components or get acted upon (e.g. load-shed, rate-limit, auto-scale etc.).
-Circuit is evaluated periodically in order to respond to changes in signal readings.
+As signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto scale etc.).
+Circuit is evaluated periodically to respond to changes in signal readings.
 
-:::info
-
-**Signal**
+:::info Signals
 
 Signals are floating-point values.
 
 A signal can also have a special **Invalid** value. It's usually used to
-communicate that signal doesn't have a meaningful value at the moment, eg.
-[PromQL](#prom-q-l) emits such a value if it cannot execute a query.
+communicate that signal doesn't have a meaningful value at the moment, for example,
+[PromQL](#prom-q-l) emits such a value if it can't execute a query.
 Components know when their input signals are invalid and can act
-accordingly. They can either propagate the invalidness, by making their
-output itself invalid (like eg.
+accordingly. They can either propagate the invalid signal, by making their
+output itself invalid (for example,
 [ArithmeticCombinator](#arithmetic-combinator)) or use some different
-logic, like eg. [Extrapolator](#extrapolator). Refer to a component's
+logic, for example, [Extrapolator](#extrapolator). Refer to a component's
 docs on how exactly it handles invalid inputs.
 
 :::
@@ -578,13 +982,25 @@ docs on how exactly it handles invalid inputs.
 <dt>components</dt>
 <dd>
 
-([[]Component](#component)) Defines a signal processing graph as a list of components.
+<!-- vale off -->
+
+([[]Component](#component))
+
+<!-- vale on -->
+
+Defines a signal processing graph as a list of components.
 
 </dd>
 <dt>evaluation_interval</dt>
 <dd>
 
-(string, default: `"0.5s"`) Evaluation interval (tick) is the time period between consecutive runs of the policy circuit.
+<!-- vale off -->
+
+(string, default: `"0.5s"`)
+
+<!-- vale on -->
+
+Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
 This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
 
 </dd>
@@ -592,7 +1008,11 @@ This interval is typically aligned with how often the corrective action (actuati
 
 ---
 
+<!-- vale off -->
+
 ### Classifier {#classifier}
+
+<!-- vale on -->
 
 Set of classification rules sharing a common selector
 
@@ -627,23 +1047,41 @@ rules:
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector)) Defines where to apply the flow classification rule.
+<!-- vale off -->
+
+([FlowSelector](#flow-selector))
+
+<!-- vale on -->
+
+Defines where to apply the flow classification rule.
 
 </dd>
 <dt>rego</dt>
 <dd>
 
-([Rego](#rego)) Rego based classification
+<!-- vale off -->
+
+([Rego](#rego))
+
+<!-- vale on -->
+
+Rego based classification
 
 Rego is a policy language used to express complex policies in a concise and declarative way.
 It can be used to define flow classification rules by writing custom queries that extract values from request metadata.
-For simple cases, such as directly reading a value from header or a field from json body, declarative extractors are recommended.
+For simple cases, such as directly reading a value from header or a field from JSON body, declarative extractors are recommended.
 
 </dd>
 <dt>rules</dt>
 <dd>
 
-(map of [Rule](#rule)) A map of {key, value} pairs mapping from
+<!-- vale off -->
+
+(map of [Rule](#rule))
+
+<!-- vale on -->
+
+A map of {key, value} pairs mapping from
 [flow label](/concepts/flow-control/flow-label.md) keys to rules that define
 how to extract and propagate flow labels with that key.
 
@@ -652,7 +1090,11 @@ how to extract and propagate flow labels with that key.
 
 ---
 
+<!-- vale off -->
+
 ### Component {#component}
+
+<!-- vale on -->
 
 Computational block that forms the circuit
 
@@ -667,31 +1109,31 @@ Components are wired to each other based on signal names forming an execution gr
 
 :::note
 
-Loops are broken by the runtime at the earliest component index that is part of the loop.
-The looped signals are saved in the tick they are generated and served in the subsequent tick.
+Loops are broken by the runtime at the earliest component index that's part of the loop.
+The looped signals are saved in the tick they're generated and served in the subsequent tick.
 
 :::
 
 There are three categories of components:
 
-- "source" components – they take some sort of input from "the real world" and output
+- "source" components: they take some sort of input from "the real world" and output
   a signal based on this input. Example: [PromQL](#prom-q-l). In the UI
   they're represented by green color.
-- signal processor components – "pure" components that don't interact with the "real world".
+- signal processor components: processing components that don't interact with the external systems.
   Examples: [GradientController](#gradient-controller), [Max](#max).
 
   :::note
 
-  Signal processor components's output can depend on their internal state, in addition to the inputs.
+  Signal processor components' output can depend on their internal state, in addition to the inputs.
   Eg. see the [Exponential Moving Average filter](#e-m-a).
 
   :::
 
-- "sink" components – they affect the real world.
-  [ConcurrencyLimiter.LoadActuator](#concurrency-limiter) and [RateLimiter](#rate-limiter).
+- "sink" components: they affect the real world.
+  [ConcurrencyLimiter](#concurrency-limiter) and [RateLimiter](#rate-limiter).
   In the UI, represented by orange color. Sink components usually come in pairs with a
   "sources" component which emits a feedback signal, like
-  `accepted_concurrency` emitted by ConcurrencyLimiter.Scheduler.
+  `accepted_concurrency` emitted by ConcurrencyLimiter.
 
 :::tip
 
@@ -710,161 +1152,315 @@ See also [Policy](#policy) for a higher-level explanation of circuits.
 <dt>alerter</dt>
 <dd>
 
-([Alerter](#alerter)) Alerter reacts to a signal and generates alert to send to alert manager.
+<!-- vale off -->
+
+([Alerter](#alerter))
+
+<!-- vale on -->
+
+Alerter reacts to a signal and generates alert to send to alert manager.
 
 </dd>
 <dt>and</dt>
 <dd>
 
-([And](#and)) Logical AND.
+<!-- vale off -->
+
+([And](#and))
+
+<!-- vale on -->
+
+Logical AND.
 
 </dd>
 <dt>arithmetic_combinator</dt>
 <dd>
 
-([ArithmeticCombinator](#arithmetic-combinator)) Applies the given operator on input operands (signals) and emits the result.
+<!-- vale off -->
+
+([ArithmeticCombinator](#arithmetic-combinator))
+
+<!-- vale on -->
+
+Applies the given operator on input operands (signals) and emits the result.
 
 </dd>
 <dt>auto_scale</dt>
 <dd>
 
-([AutoScale](#auto-scale)) AutoScale components are used to scale the service.
+<!-- vale off -->
+
+([AutoScale](#auto-scale))
+
+<!-- vale on -->
+
+AutoScale components are used to scale the service.
 
 </dd>
 <dt>decider</dt>
 <dd>
 
-([Decider](#decider)) Decider emits the binary result of comparison operator on two operands.
+<!-- vale off -->
+
+([Decider](#decider))
+
+<!-- vale on -->
+
+Decider emits the binary result of comparison operator on two operands.
 
 </dd>
 <dt>differentiator</dt>
 <dd>
 
-([Differentiator](#differentiator)) Differentiator calculates rate of change per tick.
+<!-- vale off -->
+
+([Differentiator](#differentiator))
+
+<!-- vale on -->
+
+Differentiator calculates rate of change per tick.
 
 </dd>
 <dt>ema</dt>
 <dd>
 
-([EMA](#e-m-a)) Exponential Moving Average filter.
+<!-- vale off -->
+
+([EMA](#e-m-a))
+
+<!-- vale on -->
+
+Exponential Moving Average filter.
 
 </dd>
 <dt>extrapolator</dt>
 <dd>
 
-([Extrapolator](#extrapolator)) Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval.
+<!-- vale off -->
+
+([Extrapolator](#extrapolator))
+
+<!-- vale on -->
+
+Takes an input signal and emits the extrapolated value; either mirroring the input value or repeating the last known value up to the maximum extrapolation interval.
 
 </dd>
 <dt>first_valid</dt>
 <dd>
 
-([FirstValid](#first-valid)) Picks the first valid input signal and emits it.
+<!-- vale off -->
+
+([FirstValid](#first-valid))
+
+<!-- vale on -->
+
+Picks the first valid input signal and emits it.
 
 </dd>
 <dt>flow_control</dt>
 <dd>
 
-([FlowControl](#flow-control)) FlowControl components are used to regulate requests flow.
+<!-- vale off -->
+
+([FlowControl](#flow-control))
+
+<!-- vale on -->
+
+FlowControl components are used to regulate requests flow.
 
 </dd>
 <dt>gradient_controller</dt>
 <dd>
 
-([GradientController](#gradient-controller)) Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
+<!-- vale off -->
+
+([GradientController](#gradient-controller))
+
+<!-- vale on -->
+
+Gradient controller calculates the ratio between the signal and the setpoint to determine the magnitude of the correction that need to be applied.
 This controller can be used to build AIMD (Additive Increase, Multiplicative Decrease) or MIMD style response.
 
 </dd>
 <dt>holder</dt>
 <dd>
 
-([Holder](#holder)) Holds the last valid signal value for the specified duration then waits for next valid value to hold.
+<!-- vale off -->
+
+([Holder](#holder))
+
+<!-- vale on -->
+
+Holds the last valid signal value for the specified duration then waits for next valid value to hold.
 
 </dd>
 <dt>integrator</dt>
 <dd>
 
-([Integrator](#integrator)) Accumulates sum of signal every tick.
+<!-- vale off -->
+
+([Integrator](#integrator))
+
+<!-- vale on -->
+
+Accumulates sum of signal every tick.
 
 </dd>
 <dt>inverter</dt>
 <dd>
 
-([Inverter](#inverter)) Logical NOT.
+<!-- vale off -->
+
+([Inverter](#inverter))
+
+<!-- vale on -->
+
+Logical NOT.
 
 </dd>
 <dt>max</dt>
 <dd>
 
-([Max](#max)) Emits the maximum of the input signals.
+<!-- vale off -->
+
+([Max](#max))
+
+<!-- vale on -->
+
+Emits the maximum of the input signals.
 
 </dd>
 <dt>min</dt>
 <dd>
 
-([Min](#min)) Emits the minimum of the input signals.
+<!-- vale off -->
+
+([Min](#min))
+
+<!-- vale on -->
+
+Emits the minimum of the input signals.
 
 </dd>
 <dt>nested_circuit</dt>
 <dd>
 
-([NestedCircuit](#nested-circuit)) Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
+<!-- vale off -->
+
+([NestedCircuit](#nested-circuit))
+
+<!-- vale on -->
+
+Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
 
 </dd>
 <dt>nested_signal_egress</dt>
 <dd>
 
-([NestedSignalEgress](#nested-signal-egress)) Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
+<!-- vale off -->
+
+([NestedSignalEgress](#nested-signal-egress))
+
+<!-- vale on -->
+
+Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
 
 </dd>
 <dt>nested_signal_ingress</dt>
 <dd>
 
-([NestedSignalIngress](#nested-signal-ingress)) Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
+<!-- vale off -->
+
+([NestedSignalIngress](#nested-signal-ingress))
+
+<!-- vale on -->
+
+Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
 
 </dd>
 <dt>or</dt>
 <dd>
 
-([Or](#or)) Logical OR.
+<!-- vale off -->
+
+([Or](#or))
+
+<!-- vale on -->
+
+Logical OR.
 
 </dd>
 <dt>pulse_generator</dt>
 <dd>
 
-([PulseGenerator](#pulse-generator)) Generates 0 and 1 in turns.
+<!-- vale off -->
+
+([PulseGenerator](#pulse-generator))
+
+<!-- vale on -->
+
+Generates 0 and 1 in turns.
 
 </dd>
 <dt>query</dt>
 <dd>
 
-([Query](#query)) Query components that are query databases such as Prometheus.
+<!-- vale off -->
+
+([Query](#query))
+
+<!-- vale on -->
+
+Query components that are query databases such as Prometheus.
 
 </dd>
 <dt>switcher</dt>
 <dd>
 
-([Switcher](#switcher)) Switcher acts as a switch that emits one of the two signals based on third signal.
+<!-- vale off -->
+
+([Switcher](#switcher))
+
+<!-- vale on -->
+
+Switcher acts as a switch that emits one of the two signals based on third signal.
 
 </dd>
 <dt>unary_operator</dt>
 <dd>
 
-([UnaryOperator](#unary-operator)) Takes an input signal and emits the square root of the input signal.
+<!-- vale off -->
+
+([UnaryOperator](#unary-operator))
+
+<!-- vale on -->
+
+Takes an input signal and emits the square root of the input signal.
 
 </dd>
 <dt>variable</dt>
 <dd>
 
-([Variable](#variable)) Emits a variable signal which can be set to invalid.
+<!-- vale off -->
+
+([Variable](#variable))
+
+<!-- vale on -->
+
+Emits a variable signal which can be set to invalid.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### ConcurrencyLimiter {#concurrency-limiter}
 
-Concurrency Limiter is an actuator component that regulates flows in order to provide active service protection
+<!-- vale on -->
+
+Concurrency Limiter is an actuator component that regulates flows to provide active service protection
 
 :::info
 
@@ -872,8 +1468,8 @@ See also [Concurrency Limiter overview](/concepts/flow-control/components/concur
 
 :::
 
-It is based on the actuation strategy (e.g. load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
-Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests), i.e. Little's Law.
+It's based on the actuation strategy (for example, load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.
+Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests) (Little's Law).
 
 ConcurrencyLimiter configuration is split into two parts: An actuation
 strategy and a scheduler. Right now, only `load_actuator` strategy is available.
@@ -882,13 +1478,25 @@ strategy and a scheduler. Right now, only `load_actuator` strategy is available.
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector)) Flow Selector decides the service and flows at which the concurrency limiter is applied.
+<!-- vale off -->
+
+([FlowSelector](#flow-selector))
+
+<!-- vale on -->
+
+Flow Selector decides the service and flows at which the concurrency limiter is applied.
 
 </dd>
 <dt>load_actuator</dt>
 <dd>
 
-([LoadActuator](#load-actuator)) Actuator based on limiting the accepted concurrency under incoming concurrency \* load multiplier.
+<!-- vale off -->
+
+([LoadActuator](#load-actuator))
+
+<!-- vale on -->
+
+Actuator based on limiting the accepted concurrency under incoming concurrency \* load multiplier.
 
 Actuation strategy defines the input signal that will drive the scheduler.
 
@@ -896,7 +1504,13 @@ Actuation strategy defines the input signal that will drive the scheduler.
 <dt>scheduler</dt>
 <dd>
 
-([Scheduler](#scheduler)) Configuration of Weighted Fair Queuing-based workload scheduler.
+<!-- vale off -->
+
+([Scheduler](#scheduler))
+
+<!-- vale on -->
+
+Configuration of Weighted Fair Queuing-based workload scheduler.
 
 Contains configuration of per-agent scheduler, and also defines some
 output signals.
@@ -906,7 +1520,11 @@ output signals.
 
 ---
 
+<!-- vale off -->
+
 ### ConstantSignal {#constant-signal}
+
+<!-- vale on -->
 
 Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
 
@@ -914,28 +1532,44 @@ Special constant input for ports and Variable component. Can provide either a co
 <dt>special_value</dt>
 <dd>
 
-(string, oneof: `NaN | +Inf | -Inf`) A special value such as NaN, +Inf, -Inf.
+<!-- vale off -->
+
+(string, one of: `NaN | +Inf | -Inf`)
+
+<!-- vale on -->
+
+A special value such as NaN, +Inf, -Inf.
 
 </dd>
 <dt>value</dt>
 <dd>
 
-(float64) A constant value.
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+A constant value.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Decider {#decider}
 
-Type of combinator that computes the comparison operation on lhs and rhs signals
+<!-- vale on -->
+
+Type of Combinator that computes the comparison operation on LHS and RHS signals
 
 The comparison operator can be greater-than, less-than, greater-than-or-equal, less-than-or-equal, equal, or not-equal.
 
-This component also supports time-based response, i.e. the output
+This component also supports time-based response (the output)
 transitions between 1.0 or 0.0 signal if the decider condition is
-true or false for at least "true_for" or "false_for" duration. If
+true or false for at least `true_for` or `false_for` duration. If
 `true_for` and `false_for` durations are zero then the transitions are
 instantaneous.
 
@@ -943,32 +1577,62 @@ instantaneous.
 <dt>false_for</dt>
 <dd>
 
-(string, default: `"0s"`) Duration of time to wait before a transition to false state.
+<!-- vale off -->
+
+(string, default: `"0s"`)
+
+<!-- vale on -->
+
+Duration of time to wait before a transition to false state.
 If the duration is zero, the transition will happen instantaneously.
 
 </dd>
 <dt>in_ports</dt>
 <dd>
 
-([DeciderIns](#decider-ins)) Input ports for the Decider component.
+<!-- vale off -->
+
+([DeciderIns](#decider-ins))
+
+<!-- vale on -->
+
+Input ports for the Decider component.
 
 </dd>
 <dt>operator</dt>
 <dd>
 
-(string, oneof: `gt | lt | gte | lte | eq | neq`) Comparison operator that computes operation on lhs and rhs input signals.
+<!-- vale off -->
+
+(string, one of: `gt | lt | gte | lte | eq | neq`)
+
+<!-- vale on -->
+
+Comparison operator that computes operation on LHS and RHS input signals.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([DeciderOuts](#decider-outs)) Output ports for the Decider component.
+<!-- vale off -->
+
+([DeciderOuts](#decider-outs))
+
+<!-- vale on -->
+
+Output ports for the Decider component.
 
 </dd>
 <dt>true_for</dt>
 <dd>
 
-(string, default: `"0s"`) Duration of time to wait before a transition to true state.
+<!-- vale off -->
+
+(string, default: `"0s"`)
+
+<!-- vale on -->
+
+Duration of time to wait before a transition to true state.
 If the duration is zero, the transition will happen instantaneously.
 
 </dd>
@@ -976,7 +1640,11 @@ If the duration is zero, the transition will happen instantaneously.
 
 ---
 
+<!-- vale off -->
+
 ### DeciderIns {#decider-ins}
+
+<!-- vale on -->
 
 Inputs for the Decider component.
 
@@ -984,20 +1652,36 @@ Inputs for the Decider component.
 <dt>lhs</dt>
 <dd>
 
-([InPort](#in-port)) Left hand side input signal for the comparison operation.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Left hand side input signal for the comparison operation.
 
 </dd>
 <dt>rhs</dt>
 <dd>
 
-([InPort](#in-port)) Right hand side input signal for the comparison operation.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Right hand side input signal for the comparison operation.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### DeciderOuts {#decider-outs}
+
+<!-- vale on -->
 
 Outputs for the Decider component.
 
@@ -1005,14 +1689,24 @@ Outputs for the Decider component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) Selected signal (1.0 or 0.0).
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Selected signal (1.0 or 0.0).
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### DecreasingGradient {#decreasing-gradient}
+
+<!-- vale on -->
 
 Decreasing Gradient defines a controller for scaling in based on Gradient Controller.
 
@@ -1020,24 +1714,40 @@ Decreasing Gradient defines a controller for scaling in based on Gradient Contro
 <dt>in_ports</dt>
 <dd>
 
-([DecreasingGradientIns](#decreasing-gradient-ins)) Input ports for the Gradient.
+<!-- vale off -->
+
+([DecreasingGradientIns](#decreasing-gradient-ins))
+
+<!-- vale on -->
+
+Input ports for the Gradient.
 
 </dd>
 <dt>parameters</dt>
 <dd>
 
-([DecreasingGradientParameters](#decreasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
+<!-- vale off -->
 
-- slope = 1
-- min_gradient = -Inf (must be less than 1)
-- max_gradient = 1 (cannot be changed)
+([DecreasingGradientParameters](#decreasing-gradient-parameters))
+
+<!-- vale on -->
+
+Gradient parameters for the controller. Defaults and constraints:
+
+- `slope` = 1
+- `min_gradient` = -Inf (must be less than 1)
+- `max_gradient` = 1 (can't be changed)
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### DecreasingGradientIns {#decreasing-gradient-ins}
+
+<!-- vale on -->
 
 Inputs for Gradient.
 
@@ -1045,20 +1755,36 @@ Inputs for Gradient.
 <dt>setpoint</dt>
 <dd>
 
-([InPort](#in-port)) The setpoint to use for scale-in.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The setpoint to use for scale-in.
 
 </dd>
 <dt>signal</dt>
 <dd>
 
-([InPort](#in-port)) The signal to use for scale-in.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The signal to use for scale-in.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### DecreasingGradientParameters {#decreasing-gradient-parameters}
+
+<!-- vale on -->
 
 This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
 
@@ -1066,20 +1792,32 @@ This allows subset of parameters with constrained values compared to a regular g
 <dt>min_gradient</dt>
 <dd>
 
+<!-- vale off -->
+
 (float64, default: `-1.7976931348623157e+308`)
+
+<!-- vale on -->
 
 </dd>
 <dt>slope</dt>
 <dd>
 
+<!-- vale off -->
+
 (float64, default: `1`)
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Differentiator {#differentiator}
+
+<!-- vale on -->
 
 Differentiator calculates rate of change per tick.
 
@@ -1087,26 +1825,48 @@ Differentiator calculates rate of change per tick.
 <dt>in_ports</dt>
 <dd>
 
-([DifferentiatorIns](#differentiator-ins)) Input ports for the Differentiator component.
+<!-- vale off -->
+
+([DifferentiatorIns](#differentiator-ins))
+
+<!-- vale on -->
+
+Input ports for the Differentiator component.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([DifferentiatorOuts](#differentiator-outs)) Output ports for the Differentiator component.
+<!-- vale off -->
+
+([DifferentiatorOuts](#differentiator-outs))
+
+<!-- vale on -->
+
+Output ports for the Differentiator component.
 
 </dd>
 <dt>window</dt>
 <dd>
 
-(string, default: `"5s"`) The window of time over which differentiator operates.
+<!-- vale off -->
+
+(string, default: `"5s"`)
+
+<!-- vale on -->
+
+The window of time over which differentiator operates.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### DifferentiatorIns {#differentiator-ins}
+
+<!-- vale on -->
 
 Inputs for the Differentiator component.
 
@@ -1114,14 +1874,22 @@ Inputs for the Differentiator component.
 <dt>input</dt>
 <dd>
 
+<!-- vale off -->
+
 ([InPort](#in-port))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### DifferentiatorOuts {#differentiator-outs}
+
+<!-- vale on -->
 
 Outputs for the Differentiator component.
 
@@ -1129,30 +1897,40 @@ Outputs for the Differentiator component.
 <dt>output</dt>
 <dd>
 
+<!-- vale off -->
+
 ([OutPort](#out-port))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### EMA {#e-m-a}
+
+<!-- vale on -->
 
 Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings
 
 At any time EMA component operates in one of the following states:
 
-1. Warm up state: The first warmup_window samples are used to compute the initial EMA.
-   If an invalid reading is received during the warmup_window, the last good average is emitted and the state gets reset back to beginning of warm up state.
+1. Warm up state: The first `warmup_window` samples are used to compute the initial EMA.
+   If an invalid reading is received during the `warmup_window`, the last good average is emitted and the state gets reset back to beginning of warm up state.
 2. Normal state: The EMA is computed using following formula.
 
 The EMA for a series $Y$ is calculated recursively as:
+
+<!-- vale off -->
 
 $$
 \text{EMA} _t =
 \begin{cases}
   Y_0, &\text{for } t = 0 \\
-  \alpha Y_t + (1 - \alpha) \text{EMA} _{t-1}, &\text{for }t > 0
+  \alpha Y_t + (1 - \alpha) \text{EMA}_{t-1}, &\text{for }t > 0
 \end{cases}
 $$
 
@@ -1164,30 +1942,54 @@ $$
 \alpha = \frac{2}{N + 1} \quad\text{where } N = \frac{\text{ema\_window}}{\text{evaluation\_period}}
 $$
 
+<!-- vale on -->
+
 <dl>
 <dt>in_ports</dt>
 <dd>
 
-([EMAIns](#e-m-a-ins)) Input ports for the EMA component.
+<!-- vale off -->
+
+([EMAIns](#e-m-a-ins))
+
+<!-- vale on -->
+
+Input ports for the EMA component.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([EMAOuts](#e-m-a-outs)) Output ports for the EMA component.
+<!-- vale off -->
+
+([EMAOuts](#e-m-a-outs))
+
+<!-- vale on -->
+
+Output ports for the EMA component.
 
 </dd>
 <dt>parameters</dt>
 <dd>
 
-([EMAParameters](#e-m-a-parameters)) Parameters for the EMA component.
+<!-- vale off -->
+
+([EMAParameters](#e-m-a-parameters))
+
+<!-- vale on -->
+
+Parameters for the EMA component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### EMAIns {#e-m-a-ins}
+
+<!-- vale on -->
 
 Inputs for the EMA component.
 
@@ -1195,13 +1997,25 @@ Inputs for the EMA component.
 <dt>input</dt>
 <dd>
 
-([InPort](#in-port)) Input signal to be used for the EMA computation.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Input signal to be used for the EMA computation.
 
 </dd>
 <dt>max_envelope</dt>
 <dd>
 
-([InPort](#in-port)) Upper bound of the moving average.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Upper bound of the moving average.
 
 When the signal exceeds `max_envelope` it's multiplied by
 `correction_factor_on_max_envelope_violation` **once per tick**.
@@ -1217,7 +2031,13 @@ faster, it might end up exceeding the envelope.
 <dt>min_envelope</dt>
 <dd>
 
-([InPort](#in-port)) Lower bound of the moving average.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Lower bound of the moving average.
 
 Behavior is similar to `max_envelope`.
 
@@ -1226,7 +2046,11 @@ Behavior is similar to `max_envelope`.
 
 ---
 
+<!-- vale off -->
+
 ### EMAOuts {#e-m-a-outs}
+
+<!-- vale on -->
 
 Outputs for the EMA component.
 
@@ -1234,14 +2058,24 @@ Outputs for the EMA component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) Exponential moving average of the series of reading as an output signal.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Exponential moving average of the series of reading as an output signal.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### EMAParameters {#e-m-a-parameters}
+
+<!-- vale on -->
 
 Parameters for the EMA component.
 
@@ -1249,31 +2083,61 @@ Parameters for the EMA component.
 <dt>correction_factor_on_max_envelope_violation</dt>
 <dd>
 
-(float64, minimum: `0`, default: `1`) Correction factor to apply on the output value if its in violation of the max envelope.
+<!-- vale off -->
+
+(float64, minimum: `0`, default: `1`)
+
+<!-- vale on -->
+
+Correction factor to apply on the output value if its in violation of the max envelope.
 
 </dd>
 <dt>correction_factor_on_min_envelope_violation</dt>
 <dd>
 
-(float64, default: `1`) Correction factor to apply on the output value if its in violation of the min envelope.
+<!-- vale off -->
+
+(float64, default: `1`)
+
+<!-- vale on -->
+
+Correction factor to apply on the output value if its in violation of the min envelope.
 
 </dd>
 <dt>ema_window</dt>
 <dd>
 
-(string, **required**) Duration of EMA sampling window.
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Duration of EMA sampling window.
 
 </dd>
 <dt>valid_during_warmup</dt>
 <dd>
 
-(bool) Whether the output is valid during the warm up stage.
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Whether the output is valid during the warm up stage.
 
 </dd>
 <dt>warmup_window</dt>
 <dd>
 
-(string, **required**) Duration of EMA warming up window.
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Duration of EMA warming up window.
 
 The initial value of the EMA is the average of signal readings received during the warm up window.
 
@@ -1282,30 +2146,50 @@ The initial value of the EMA is the average of signal readings received during t
 
 ---
 
+<!-- vale off -->
+
 ### EqualsMatchExpression {#equals-match-expression}
 
-Label selector expression of the equal form "label == value".
+<!-- vale on -->
+
+Label selector expression of the equal form `label == value`.
 
 <dl>
 <dt>label</dt>
 <dd>
 
-(string, **required**) Name of the label to equal match the value.
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Name of the label to equal match the value.
 
 </dd>
 <dt>value</dt>
 <dd>
 
-(string) Exact value that the label should be equal to.
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Exact value that the label should be equal to.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Extractor {#extractor}
 
-Defines a high-level way to specify how to extract a flow label value given http request metadata, without a need to write rego code
+<!-- vale on -->
+
+Defines a high-level way to specify how to extract a flow label value given HTTP request metadata, without a need to write Rego code
 
 There are multiple variants of extractor, specify exactly one.
 
@@ -1313,21 +2197,33 @@ There are multiple variants of extractor, specify exactly one.
 <dt>address</dt>
 <dd>
 
-([AddressExtractor](#address-extractor)) Display an address as a single string - `<ip>:<port>`.
+<!-- vale off -->
+
+([AddressExtractor](#address-extractor))
+
+<!-- vale on -->
+
+Display an address as a single string - `<ip>:<port>`.
 
 </dd>
 <dt>from</dt>
 <dd>
 
-(string) Use an attribute with no conversion
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Use an attribute with no conversion
 
 Attribute path is a dot-separated path to attribute.
 
 Should be either:
 
 - one of the fields of [Attribute Context][attribute-context], or
-- a special "request.http.bearer" pseudo-attribute.
-  Eg. "request.http.method" or "request.http.header.user-agent"
+- a special `request.http.bearer` pseudo-attribute.
+  For example, `request.http.method` or `request.http.header.user-agent`
 
 Note: The same attribute path syntax is shared by other extractor variants,
 wherever attribute path is needed in their "from" syntax.
@@ -1344,28 +2240,50 @@ from: request.http.headers.user-agent
 <dt>json</dt>
 <dd>
 
-([JSONExtractor](#json-extractor)) Deserialize a json, and extract one of the fields.
+<!-- vale off -->
+
+([JSONExtractor](#json-extractor))
+
+<!-- vale on -->
+
+Parse JSON, and extract one of the fields.
 
 </dd>
 <dt>jwt</dt>
 <dd>
 
-([JWTExtractor](#j-w-t-extractor)) Parse the attribute as JWT and read the payload.
+<!-- vale off -->
+
+([JWTExtractor](#j-w-t-extractor))
+
+<!-- vale on -->
+
+Parse the attribute as JWT and read the payload.
 
 </dd>
 <dt>path_templates</dt>
 <dd>
 
-([PathTemplateMatcher](#path-template-matcher)) Match HTTP Path to given path templates.
+<!-- vale off -->
+
+([PathTemplateMatcher](#path-template-matcher))
+
+<!-- vale on -->
+
+Match HTTP Path to given path templates.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Extrapolator {#extrapolator}
 
-Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
+<!-- vale on -->
+
+Extrapolates the input signal by repeating the last valid value during the period in which it's invalid
 
 It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
 
@@ -1373,26 +2291,48 @@ It does so until `maximum_extrapolation_interval` is reached, beyond which it em
 <dt>in_ports</dt>
 <dd>
 
-([ExtrapolatorIns](#extrapolator-ins)) Input ports for the Extrapolator component.
+<!-- vale off -->
+
+([ExtrapolatorIns](#extrapolator-ins))
+
+<!-- vale on -->
+
+Input ports for the Extrapolator component.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([ExtrapolatorOuts](#extrapolator-outs)) Output ports for the Extrapolator component.
+<!-- vale off -->
+
+([ExtrapolatorOuts](#extrapolator-outs))
+
+<!-- vale on -->
+
+Output ports for the Extrapolator component.
 
 </dd>
 <dt>parameters</dt>
 <dd>
 
-([ExtrapolatorParameters](#extrapolator-parameters)) Parameters for the Extrapolator component.
+<!-- vale off -->
+
+([ExtrapolatorParameters](#extrapolator-parameters))
+
+<!-- vale on -->
+
+Parameters for the Extrapolator component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### ExtrapolatorIns {#extrapolator-ins}
+
+<!-- vale on -->
 
 Inputs for the Extrapolator component.
 
@@ -1400,14 +2340,24 @@ Inputs for the Extrapolator component.
 <dt>input</dt>
 <dd>
 
-([InPort](#in-port)) Input signal for the Extrapolator component.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Input signal for the Extrapolator component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### ExtrapolatorOuts {#extrapolator-outs}
+
+<!-- vale on -->
 
 Outputs for the Extrapolator component.
 
@@ -1415,14 +2365,24 @@ Outputs for the Extrapolator component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) Extrapolated signal.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Extrapolated signal.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### ExtrapolatorParameters {#extrapolator-parameters}
+
+<!-- vale on -->
 
 Parameters for the Extrapolator component.
 
@@ -1430,14 +2390,24 @@ Parameters for the Extrapolator component.
 <dt>max_extrapolation_interval</dt>
 <dd>
 
-(string, **required**) Maximum time interval to repeat the last valid value of input signal.
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Maximum time interval to repeat the last valid value of input signal.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### FirstValid {#first-valid}
+
+<!-- vale on -->
 
 Picks the first valid input signal from the array of input signals and emits it as an output signal
 
@@ -1445,20 +2415,36 @@ Picks the first valid input signal from the array of input signals and emits it 
 <dt>in_ports</dt>
 <dd>
 
-([FirstValidIns](#first-valid-ins)) Input ports for the FirstValid component.
+<!-- vale off -->
+
+([FirstValidIns](#first-valid-ins))
+
+<!-- vale on -->
+
+Input ports for the FirstValid component.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([FirstValidOuts](#first-valid-outs)) Output ports for the FirstValid component.
+<!-- vale off -->
+
+([FirstValidOuts](#first-valid-outs))
+
+<!-- vale on -->
+
+Output ports for the FirstValid component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### FirstValidIns {#first-valid-ins}
+
+<!-- vale on -->
 
 Inputs for the FirstValid component.
 
@@ -1466,14 +2452,24 @@ Inputs for the FirstValid component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port)) Array of input signals.
+<!-- vale off -->
+
+([[]InPort](#in-port))
+
+<!-- vale on -->
+
+Array of input signals.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### FirstValidOuts {#first-valid-outs}
+
+<!-- vale on -->
 
 Outputs for the FirstValid component.
 
@@ -1481,14 +2477,24 @@ Outputs for the FirstValid component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) First valid input signal as an output signal.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+First valid input signal as an output signal.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### FlowControl {#flow-control}
+
+<!-- vale on -->
 
 FlowControl components are used to regulate requests flow.
 
@@ -1496,26 +2502,48 @@ FlowControl components are used to regulate requests flow.
 <dt>aimd_concurrency_controller</dt>
 <dd>
 
-([AIMDConcurrencyController](#a-i-m-d-concurrency-controller)) AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
+<!-- vale off -->
+
+([AIMDConcurrencyController](#a-i-m-d-concurrency-controller))
+
+<!-- vale on -->
+
+AIMD Concurrency control component is based on Additive Increase and Multiplicative Decrease of Concurrency. It takes a signal and setpoint as inputs and reduces concurrency limits proportionally (or any arbitrary power) based on deviation of the signal from setpoint. Internally implemented as a nested circuit.
 
 </dd>
 <dt>concurrency_limiter</dt>
 <dd>
 
-([ConcurrencyLimiter](#concurrency-limiter)) Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (e.g. Weighted Fair Queuing).
+<!-- vale off -->
+
+([ConcurrencyLimiter](#concurrency-limiter))
+
+<!-- vale on -->
+
+Concurrency Limiter provides service protection by applying prioritized load shedding of flows using a network scheduler (for example, Weighted Fair Queuing).
 
 </dd>
 <dt>rate_limiter</dt>
 <dd>
 
-([RateLimiter](#rate-limiter)) Rate Limiter provides service protection by applying rate limiter.
+<!-- vale off -->
+
+([RateLimiter](#rate-limiter))
+
+<!-- vale on -->
+
+Rate Limiter provides service protection by applying rate limiter.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### FlowControlResources {#flow-control-resources}
+
+<!-- vale on -->
 
 FlowControl Resources
 
@@ -1523,7 +2551,13 @@ FlowControl Resources
 <dt>classifiers</dt>
 <dd>
 
-([[]Classifier](#classifier)) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+<!-- vale off -->
+
+([[]Classifier](#classifier))
+
+<!-- vale on -->
+
+Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
 The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
 
@@ -1531,7 +2565,13 @@ The flow labels created by Classifiers can be matched by Flux Meters to create m
 <dt>flux_meters</dt>
 <dd>
 
-(map of [FluxMeter](#flux-meter)) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
+<!-- vale off -->
+
+(map of [FluxMeter](#flux-meter))
+
+<!-- vale on -->
+
+Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
 Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
 
@@ -1540,7 +2580,11 @@ Flux Meter created metrics can be consumed as input to the circuit via the PromQ
 
 ---
 
+<!-- vale off -->
+
 ### FlowMatcher {#flow-matcher}
+
+<!-- vale on -->
 
 Describes which flows a [flow control
 component](/concepts/flow-control/flow-control.md#components) should apply
@@ -1574,7 +2618,13 @@ label_matcher:
 <dt>control_point</dt>
 <dd>
 
-(string, **required**) [Control Point](/concepts/flow-control/flow-selector.md#control-point)
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+[Control Point](/concepts/flow-control/flow-selector.md#control-point)
 identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
 block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
 or filter chains.
@@ -1583,7 +2633,13 @@ or filter chains.
 <dt>label_matcher</dt>
 <dd>
 
-([LabelMatcher](#label-matcher)) Label matcher allows to add _additional_ condition on
+<!-- vale off -->
+
+([LabelMatcher](#label-matcher))
+
+<!-- vale on -->
+
+Label matcher allows to add _additional_ condition on
 [flow labels](/concepts/flow-control/flow-label.md)
 must also be satisfied (in addition to service+control point matching)
 
@@ -1611,7 +2667,11 @@ control point.
 
 ---
 
+<!-- vale off -->
+
 ### FlowSelector {#flow-selector}
+
+<!-- vale on -->
 
 Describes which flow in which service a [flow control
 component](/concepts/flow-control/flow-control.md#components) should apply
@@ -1627,20 +2687,36 @@ See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 <dt>flow_matcher</dt>
 <dd>
 
-([FlowMatcher](#flow-matcher)) Match control points and labels
+<!-- vale off -->
+
+([FlowMatcher](#flow-matcher))
+
+<!-- vale on -->
+
+Match control points and labels
 
 </dd>
 <dt>service_selector</dt>
 <dd>
 
-([ServiceSelector](#service-selector)) Match agent group and service
+<!-- vale off -->
+
+([ServiceSelector](#service-selector))
+
+<!-- vale on -->
+
+Match agent group and service
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### FluxMeter {#flux-meter}
+
+<!-- vale on -->
 
 Flux Meter gathers metrics for the traffic that matches its selector.
 The histogram created by Flux Meter measures the workload latency by default.
@@ -1681,7 +2757,13 @@ attribute_key: response_duration_ms
 <dt>attribute_key</dt>
 <dd>
 
-(string, default: `"workload_duration_ms"`) Key of the attribute in access log or span from which the metric for this flux meter is read.
+<!-- vale off -->
+
+(string, default: `"workload_duration_ms"`)
+
+<!-- vale on -->
+
+Key of the attribute in access log or span from which the metric for this flux meter is read.
 
 :::info
 
@@ -1694,123 +2776,215 @@ For list of available attributes in Envoy access logs, refer
 <dt>exponential_buckets</dt>
 <dd>
 
+<!-- vale off -->
+
 ([FluxMeterExponentialBuckets](#flux-meter-exponential-buckets))
+
+<!-- vale on -->
 
 </dd>
 <dt>exponential_buckets_range</dt>
 <dd>
 
+<!-- vale off -->
+
 ([FluxMeterExponentialBucketsRange](#flux-meter-exponential-buckets-range))
+
+<!-- vale on -->
 
 </dd>
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector)) The selection criteria for the traffic that will be measured.
+<!-- vale off -->
+
+([FlowSelector](#flow-selector))
+
+<!-- vale on -->
+
+The selection criteria for the traffic that will be measured.
 
 </dd>
 <dt>linear_buckets</dt>
 <dd>
 
+<!-- vale off -->
+
 ([FluxMeterLinearBuckets](#flux-meter-linear-buckets))
+
+<!-- vale on -->
 
 </dd>
 <dt>static_buckets</dt>
 <dd>
 
+<!-- vale off -->
+
 ([FluxMeterStaticBuckets](#flux-meter-static-buckets))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### FluxMeterExponentialBuckets {#flux-meter-exponential-buckets}
+
+<!-- vale on -->
 
 ExponentialBuckets creates `count` number of buckets where the lowest bucket has an upper bound of `start`
 and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
-bucket is not counted.
+bucket isn't counted.
 
 <dl>
 <dt>count</dt>
 <dd>
 
-(int32, minimum: `0`) Number of buckets.
+<!-- vale off -->
+
+(int32, minimum: `0`)
+
+<!-- vale on -->
+
+Number of buckets.
 
 </dd>
 <dt>factor</dt>
 <dd>
 
-(float64) Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+Factor to be multiplied to the previous bucket's upper bound to calculate the following bucket's upper bound.
 
 </dd>
 <dt>start</dt>
 <dd>
 
-(float64) Upper bound of the lowest bucket.
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+Upper bound of the lowest bucket.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### FluxMeterExponentialBucketsRange {#flux-meter-exponential-buckets-range}
 
+<!-- vale on -->
+
 ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest
-bucket is `max`. The final +inf bucket is not counted.
+bucket is `max`. The final +inf bucket isn't counted.
 
 <dl>
 <dt>count</dt>
 <dd>
 
-(int32, minimum: `0`) Number of buckets.
+<!-- vale off -->
+
+(int32, minimum: `0`)
+
+<!-- vale on -->
+
+Number of buckets.
 
 </dd>
 <dt>max</dt>
 <dd>
 
-(float64) Highest bucket.
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+Highest bucket.
 
 </dd>
 <dt>min</dt>
 <dd>
 
-(float64) Lowest bucket.
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+Lowest bucket.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### FluxMeterLinearBuckets {#flux-meter-linear-buckets}
 
+<!-- vale on -->
+
 LinearBuckets creates `count` number of buckets, each `width` wide, where the lowest bucket has an
-upper bound of `start`. The final +inf bucket is not counted.
+upper bound of `start`. The final +inf bucket isn't counted.
 
 <dl>
 <dt>count</dt>
 <dd>
 
-(int32, minimum: `0`) Number of buckets.
+<!-- vale off -->
+
+(int32, minimum: `0`)
+
+<!-- vale on -->
+
+Number of buckets.
 
 </dd>
 <dt>start</dt>
 <dd>
 
-(float64) Upper bound of the lowest bucket.
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+Upper bound of the lowest bucket.
 
 </dd>
 <dt>width</dt>
 <dd>
 
-(float64) Width of each bucket.
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+Width of each bucket.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### FluxMeterStaticBuckets {#flux-meter-static-buckets}
+
+<!-- vale on -->
 
 StaticBuckets holds the static value of the buckets where latency histogram will be stored.
 
@@ -1818,21 +2992,31 @@ StaticBuckets holds the static value of the buckets where latency histogram will
 <dt>buckets</dt>
 <dd>
 
-([]float64, default: `[5,10,25,50,100,250,500,1000,2500,5000,10000]`) The buckets in which latency histogram will be stored.
+<!-- vale off -->
+
+([]float64, default: `[5,10,25,50,100,250,500,1000,2500,5000,10000]`)
+
+<!-- vale on -->
+
+The buckets in which latency histogram will be stored.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### GradientController {#gradient-controller}
+
+<!-- vale on -->
 
 Gradient controller is a type of controller which tries to adjust the
 control variable proportionally to the relative difference between setpoint
 and actual value of the signal
 
 The `gradient` describes a corrective factor that should be applied to the
-control variable to get the signal closer to the setpoint. It is computed as follows:
+control variable to get the signal closer to the setpoint. It's computed as follows:
 
 $$
 \text{gradient} = \left(\frac{\text{signal}}{\text{setpoint}}\right)^{\text{slope}}
@@ -1856,38 +3040,72 @@ The output can be _optionally_ clamped to desired range using `max` and
 <dt>default_config</dt>
 <dd>
 
-([GradientControllerDynamicConfig](#gradient-controller-dynamic-config)) Default configuration.
+<!-- vale off -->
+
+([GradientControllerDynamicConfig](#gradient-controller-dynamic-config))
+
+<!-- vale on -->
+
+Default configuration.
 
 </dd>
 <dt>dynamic_config_key</dt>
 <dd>
 
-(string) Configuration key for DynamicConfig
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for DynamicConfig
 
 </dd>
 <dt>in_ports</dt>
 <dd>
 
-([GradientControllerIns](#gradient-controller-ins)) Input ports of the Gradient Controller.
+<!-- vale off -->
+
+([GradientControllerIns](#gradient-controller-ins))
+
+<!-- vale on -->
+
+Input ports of the Gradient Controller.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([GradientControllerOuts](#gradient-controller-outs)) Output ports of the Gradient Controller.
+<!-- vale off -->
+
+([GradientControllerOuts](#gradient-controller-outs))
+
+<!-- vale on -->
+
+Output ports of the Gradient Controller.
 
 </dd>
 <dt>parameters</dt>
 <dd>
 
-([GradientControllerParameters](#gradient-controller-parameters)) Gradient Parameters.
+<!-- vale off -->
+
+([GradientControllerParameters](#gradient-controller-parameters))
+
+<!-- vale on -->
+
+Gradient Parameters.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### GradientControllerDynamicConfig {#gradient-controller-dynamic-config}
+
+<!-- vale on -->
 
 Dynamic Configuration for a Controller
 
@@ -1895,15 +3113,25 @@ Dynamic Configuration for a Controller
 <dt>manual_mode</dt>
 <dd>
 
-(bool) Decides whether the controller runs in "manual_mode".
-In manual mode, the controller does not adjust the control variable I.E. emits the same output as the control variable input.
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Decides whether the controller runs in `manual_mode`.
+In manual mode, the controller doesn't adjust the control variable It emits the same output as the control variable input.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### GradientControllerIns {#gradient-controller-ins}
+
+<!-- vale on -->
 
 Inputs for the Gradient Controller component.
 
@@ -1911,7 +3139,13 @@ Inputs for the Gradient Controller component.
 <dt>control_variable</dt>
 <dd>
 
-([InPort](#in-port)) Actual current value of the control variable.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Actual current value of the control variable.
 
 This signal is multiplied by the gradient to produce the output.
 
@@ -1919,38 +3153,72 @@ This signal is multiplied by the gradient to produce the output.
 <dt>max</dt>
 <dd>
 
-([InPort](#in-port)) Maximum value to limit the output signal.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Maximum value to limit the output signal.
 
 </dd>
 <dt>min</dt>
 <dd>
 
-([InPort](#in-port)) Minimum value to limit the output signal.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Minimum value to limit the output signal.
 
 </dd>
 <dt>optimize</dt>
 <dd>
 
-([InPort](#in-port)) Optimize signal is added to the output of the gradient calculation.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Optimize signal is added to the output of the gradient calculation.
 
 </dd>
 <dt>setpoint</dt>
 <dd>
 
-([InPort](#in-port)) Setpoint to be used for the gradient computation.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Setpoint to be used for the gradient computation.
 
 </dd>
 <dt>signal</dt>
 <dd>
 
-([InPort](#in-port)) Signal to be used for the gradient computation.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Signal to be used for the gradient computation.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### GradientControllerOuts {#gradient-controller-outs}
+
+<!-- vale on -->
 
 Outputs for the Gradient Controller component.
 
@@ -1958,14 +3226,24 @@ Outputs for the Gradient Controller component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) Computed desired value of the control variable.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Computed desired value of the control variable.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### GradientControllerParameters {#gradient-controller-parameters}
+
+<!-- vale on -->
 
 Gradient Parameters.
 
@@ -1973,36 +3251,54 @@ Gradient Parameters.
 <dt>max_gradient</dt>
 <dd>
 
-(float64, default: `1.7976931348623157e+308`) Maximum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
+<!-- vale off -->
+
+(float64, default: `1.7976931348623157e+308`)
+
+<!-- vale on -->
+
+Maximum gradient which clamps the computed gradient value to the range, `[min_gradient, max_gradient]`.
 
 </dd>
 <dt>min_gradient</dt>
 <dd>
 
-(float64, default: `-1.7976931348623157e+308`) Minimum gradient which clamps the computed gradient value to the range, [min_gradient, max_gradient].
+<!-- vale off -->
+
+(float64, default: `-1.7976931348623157e+308`)
+
+<!-- vale on -->
+
+Minimum gradient which clamps the computed gradient value to the range, `[min_gradient, max_gradient]`.
 
 </dd>
 <dt>slope</dt>
 <dd>
 
-(float64, **required**) Slope controls the aggressiveness and direction of the Gradient Controller.
+<!-- vale off -->
+
+(float64, **required**)
+
+<!-- vale on -->
+
+Slope controls the aggressiveness and direction of the Gradient Controller.
 
 Slope is used as exponent on the signal to setpoint ratio in computation
 of the gradient (see the [main description](#gradient-controller) for
-exact equation). Good intuition for this parameter is "What should the
-Gradient Controller do to the control variable when signal is too high",
-eg.:
+exact equation). This parameter decides how aggressive the controller
+responds to the deviation of signal from the setpoint.
+for example:
 
 - $\text{slope} = 1$: when signal is too high, increase control variable,
 - $\text{slope} = -1$: when signal is too high, decrease control variable,
-- $\text{slope} = -0.5$: when signal is too high, decrease control variable slowly.
+- $\text{slope} = -0.5$: when signal is too high, decrease control variable gradually.
 
 The sign of slope depends on correlation between the signal and control variable:
 
 - Use $\text{slope} < 0$ if signal and control variable are _positively_
-  correlated (eg. Per-pod CPU usage and total concurrency).
+  correlated (for example, Per-pod CPU usage and total concurrency).
 - Use $\text{slope} > 0$ if signal and control variable are _negatively_
-  correlated (eg. Per-pod CPU usage and number of pods).
+  correlated (for example, Per-pod CPU usage and number of pods).
 
 :::note
 
@@ -2017,11 +3313,11 @@ react to a deviation of signal.
 With $|\text{slope}| = 1$, the controller will aim to bring the signal to
 the setpoint in one tick (assuming linear correlation with signal and setpoint).
 Smaller magnitudes of slope will make the controller adjust the control
-variable more slowly.
+variable gradually.
 
-We recommend setting $|\text{slope}| < 1$ (eg. $\pm0.8$).
+Setting $|\text{slope}| < 1$ (for example, $\pm0.8$) is recommended.
 If you experience overshooting, consider lowering the magnitude even more.
-Values of $|\text{slope}| > 1$ are not recommended.
+Values of $|\text{slope}| > 1$ aren't recommended.
 
 :::note
 
@@ -2035,35 +3331,61 @@ so the _slope_ might not fully describe aggressiveness of the controller.
 
 ---
 
+<!-- vale off -->
+
 ### Holder {#holder}
 
+<!-- vale on -->
+
 Holds the last valid signal value for the specified duration then waits for next valid value to hold.
-If it's holding a value that means it ignores both valid and invalid new signals until the hold_for duration is finished.
+If it's holding a value that means it ignores both valid and invalid new signals until the `hold_for` duration is finished.
 
 <dl>
 <dt>hold_for</dt>
 <dd>
 
-(string, default: `"5s"`) Holding the last valid signal value for the hold_for duration.
+<!-- vale off -->
+
+(string, default: `"5s"`)
+
+<!-- vale on -->
+
+Holding the last valid signal value for the `hold_for` duration.
 
 </dd>
 <dt>in_ports</dt>
 <dd>
 
-([HolderIns](#holder-ins)) Input ports for the Holder component.
+<!-- vale off -->
+
+([HolderIns](#holder-ins))
+
+<!-- vale on -->
+
+Input ports for the Holder component.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([HolderOuts](#holder-outs)) Output ports for the Holder component.
+<!-- vale off -->
+
+([HolderOuts](#holder-outs))
+
+<!-- vale on -->
+
+Output ports for the Holder component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### HolderIns {#holder-ins}
+
+<!-- vale on -->
 
 Inputs for the Holder component.
 
@@ -2071,20 +3393,36 @@ Inputs for the Holder component.
 <dt>input</dt>
 <dd>
 
-([InPort](#in-port)) The input signal.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The input signal.
 
 </dd>
 <dt>reset</dt>
 <dd>
 
-([InPort](#in-port)) Resets the holder output to the current input signal when reset signal is valid and non-zero.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Resets the holder output to the current input signal when reset signal is valid and non-zero.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### HolderOuts {#holder-outs}
+
+<!-- vale on -->
 
 Outputs for the Holder component.
 
@@ -2092,14 +3430,24 @@ Outputs for the Holder component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) The output signal.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The output signal.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### InPort {#in-port}
+
+<!-- vale on -->
 
 Components receive input from other components via InPorts
 
@@ -2107,20 +3455,36 @@ Components receive input from other components via InPorts
 <dt>constant_signal</dt>
 <dd>
 
-([ConstantSignal](#constant-signal)) Constant value to be used for this InPort instead of a signal.
+<!-- vale off -->
+
+([ConstantSignal](#constant-signal))
+
+<!-- vale on -->
+
+Constant value to be used for this InPort instead of a signal.
 
 </dd>
 <dt>signal_name</dt>
 <dd>
 
-(string) Name of the incoming Signal on the InPort.
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Name of the incoming Signal on the InPort.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### IncreasingGradient {#increasing-gradient}
+
+<!-- vale on -->
 
 Increasing Gradient defines a controller for scaling out based on Gradient Controller.
 
@@ -2128,24 +3492,40 @@ Increasing Gradient defines a controller for scaling out based on Gradient Contr
 <dt>in_ports</dt>
 <dd>
 
-([IncreasingGradientIns](#increasing-gradient-ins)) Input ports for the Gradient.
+<!-- vale off -->
+
+([IncreasingGradientIns](#increasing-gradient-ins))
+
+<!-- vale on -->
+
+Input ports for the Gradient.
 
 </dd>
 <dt>parameters</dt>
 <dd>
 
-([IncreasingGradientParameters](#increasing-gradient-parameters)) Gradient parameters for the controller. Defaults and constraints:
+<!-- vale off -->
 
-- slope = 1
-- min_gradient = 1 (cannot be changed)
-- max_gradient = +Inf (must be greater than 1)
+([IncreasingGradientParameters](#increasing-gradient-parameters))
+
+<!-- vale on -->
+
+Gradient parameters for the controller. Defaults and constraints:
+
+- `slope` = 1
+- `min_gradient` = 1 (can't be changed)
+- `max_gradient` = +Inf (must be greater than 1)
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### IncreasingGradientIns {#increasing-gradient-ins}
+
+<!-- vale on -->
 
 Inputs for Gradient.
 
@@ -2153,20 +3533,36 @@ Inputs for Gradient.
 <dt>setpoint</dt>
 <dd>
 
-([InPort](#in-port)) The setpoint to use for scale-out.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The setpoint to use for scale-out.
 
 </dd>
 <dt>signal</dt>
 <dd>
 
-([InPort](#in-port)) The signal to use for scale-out.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The signal to use for scale-out.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### IncreasingGradientParameters {#increasing-gradient-parameters}
+
+<!-- vale on -->
 
 This allows subset of parameters with constrained values compared to a regular gradient controller. For full documentation of these parameters, refer to the [GradientControllerParameters](#gradient-controller-parameters).
 
@@ -2174,20 +3570,32 @@ This allows subset of parameters with constrained values compared to a regular g
 <dt>max_gradient</dt>
 <dd>
 
+<!-- vale off -->
+
 (float64, default: `1.7976931348623157e+308`)
+
+<!-- vale on -->
 
 </dd>
 <dt>slope</dt>
 <dd>
 
+<!-- vale off -->
+
 (float64, default: `1`)
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Integrator {#integrator}
+
+<!-- vale on -->
 
 Accumulates sum of signal every tick.
 
@@ -2195,20 +3603,36 @@ Accumulates sum of signal every tick.
 <dt>in_ports</dt>
 <dd>
 
-([IntegratorIns](#integrator-ins)) Input ports for the Integrator component.
+<!-- vale off -->
+
+([IntegratorIns](#integrator-ins))
+
+<!-- vale on -->
+
+Input ports for the Integrator component.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([IntegratorOuts](#integrator-outs)) Output ports for the Integrator component.
+<!-- vale off -->
+
+([IntegratorOuts](#integrator-outs))
+
+<!-- vale on -->
+
+Output ports for the Integrator component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### IntegratorIns {#integrator-ins}
+
+<!-- vale on -->
 
 Inputs for the Integrator component.
 
@@ -2216,32 +3640,60 @@ Inputs for the Integrator component.
 <dt>input</dt>
 <dd>
 
-([InPort](#in-port)) The input signal.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The input signal.
 
 </dd>
 <dt>max</dt>
 <dd>
 
-([InPort](#in-port)) The maximum output.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The maximum output.
 
 </dd>
 <dt>min</dt>
 <dd>
 
-([InPort](#in-port)) The minimum output.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The minimum output.
 
 </dd>
 <dt>reset</dt>
 <dd>
 
-([InPort](#in-port)) Resets the integrator output to zero when reset signal is valid and non-zero. Reset also resets the max and min constraints.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Resets the integrator output to zero when reset signal is valid and non-zero. Reset also resets the max and min constraints.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### IntegratorOuts {#integrator-outs}
+
+<!-- vale on -->
 
 Outputs for the Integrator component.
 
@@ -2249,37 +3701,61 @@ Outputs for the Integrator component.
 <dt>output</dt>
 <dd>
 
+<!-- vale off -->
+
 ([OutPort](#out-port))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Inverter {#inverter}
+
+<!-- vale on -->
 
 Logical NOT.
 
-See [And component](#and) on how signals are mapped onto boolean values.
+See [And component](#and) on how signals are mapped onto Boolean values.
 
 <dl>
 <dt>in_ports</dt>
 <dd>
 
-([InverterIns](#inverter-ins)) Input ports for the Inverter component.
+<!-- vale off -->
+
+([InverterIns](#inverter-ins))
+
+<!-- vale on -->
+
+Input ports for the Inverter component.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([InverterOuts](#inverter-outs)) Output ports for the Inverter component.
+<!-- vale off -->
+
+([InverterOuts](#inverter-outs))
+
+<!-- vale on -->
+
+Output ports for the Inverter component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### InverterIns {#inverter-ins}
+
+<!-- vale on -->
 
 Inputs for the Inverter component.
 
@@ -2287,14 +3763,24 @@ Inputs for the Inverter component.
 <dt>input</dt>
 <dd>
 
-([InPort](#in-port)) Signal to be negated.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Signal to be negated.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### InverterOuts {#inverter-outs}
+
+<!-- vale on -->
 
 Output ports for the Inverter component.
 
@@ -2302,7 +3788,13 @@ Output ports for the Inverter component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) Logical negation of the input signal.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Logical negation of the input signal.
 
 Will always be 0 (false), 1 (true) or invalid (unknown).
 
@@ -2311,9 +3803,13 @@ Will always be 0 (false), 1 (true) or invalid (unknown).
 
 ---
 
+<!-- vale off -->
+
 ### JSONExtractor {#json-extractor}
 
-Deserialize a json, and extract one of the fields
+<!-- vale on -->
+
+Parse JSON, and extract one of the fields
 
 Example:
 
@@ -2326,30 +3822,46 @@ pointer: /user/name
 <dt>from</dt>
 <dd>
 
-(string, **required**) Attribute path pointing to some strings - eg. "request.http.body".
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Attribute path pointing to some strings - for example, `request.http.body`.
 
 </dd>
 <dt>pointer</dt>
 <dd>
 
-(string) Json pointer represents a parsed json pointer which allows to select a specified field from the json payload.
+<!-- vale off -->
 
-Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
-eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
+(string)
+
+<!-- vale on -->
+
+JSON pointer represents a parsed JSON pointer which allows to select a specified field from the payload.
+
+Note: Uses [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
+for example, `/foo/bar`. If the pointer points into an object, it'd be converted to a string.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### JWTExtractor {#j-w-t-extractor}
+
+<!-- vale on -->
 
 Parse the attribute as JWT and read the payload
 
-Specify a field to be extracted from payload using "json_pointer".
+Specify a field to be extracted from payload using `json_pointer`.
 
-Note: The signature is not verified against the secret (we're assuming there's some
-other parts of the system that handles such verification).
+Note: The signature isn't verified against the secret (assuming there's some
+other part of the system that handles such verification).
 
 Example:
 
@@ -2362,23 +3874,39 @@ json_pointer: /user/email
 <dt>from</dt>
 <dd>
 
-(string, **required**) Jwt token can be pulled from any input attribute, but most likely you'd want to use "request.http.bearer".
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+JWT (JSON Web Token) can be extracted from any input attribute, but most likely you'd want to use `request.http.bearer`.
 
 </dd>
 <dt>json_pointer</dt>
 <dd>
 
-(string) Json pointer allowing to select a specified field from the json payload.
+<!-- vale off -->
 
-Note: Uses [json pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
-eg. `/foo/bar`. If the pointer points into an object, it'd be stringified.
+(string)
+
+<!-- vale on -->
+
+JSON pointer allowing to select a specified field from the payload.
+
+Note: Uses [JSON pointer](https://datatracker.ietf.org/doc/html/rfc6901) syntax,
+for example, `/foo/bar`. If the pointer points into an object, it'd be converted to a string.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### K8sLabelMatcherRequirement {#k8s-label-matcher-requirement}
+
+<!-- vale on -->
 
 Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values.
 
@@ -2386,20 +3914,38 @@ Label selector requirement which is a selector that contains values, a key, and 
 <dt>key</dt>
 <dd>
 
-(string, **required**) Label key that the selector applies to.
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Label key that the selector applies to.
 
 </dd>
 <dt>operator</dt>
 <dd>
 
-(string, oneof: `In | NotIn | Exists | DoesNotExists`) Logical operator which represents a key's relationship to a set of values.
+<!-- vale off -->
+
+(string, one of: `In | NotIn | Exists | DoesNotExists`)
+
+<!-- vale on -->
+
+Logical operator which represents a key's relationship to a set of values.
 Valid operators are In, NotIn, Exists and DoesNotExist.
 
 </dd>
 <dt>values</dt>
 <dd>
 
-([]string) An array of string values that relates to the key by an operator.
+<!-- vale off -->
+
+([]string)
+
+<!-- vale on -->
+
+An array of string values that relates to the key by an operator.
 If the operator is In or NotIn, the values array must be non-empty.
 If the operator is Exists or DoesNotExist, the values array must be empty.
 
@@ -2408,7 +3954,11 @@ If the operator is Exists or DoesNotExist, the values array must be empty.
 
 ---
 
+<!-- vale off -->
+
 ### KubernetesObjectSelector {#kubernetes-object-selector}
+
+<!-- vale on -->
 
 Describes which pods a control or observability
 component should apply to.
@@ -2417,39 +3967,73 @@ component should apply to.
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `"default"`) Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
+<!-- vale off -->
+
+(string, default: `"default"`)
+
+<!-- vale on -->
+
+Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
 selector applies to.
 
 </dd>
 <dt>api_version</dt>
 <dd>
 
-(string, **required**) API version of Kubernetes resource
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+API version of Kubernetes resource
 
 </dd>
 <dt>kind</dt>
 <dd>
 
-(string, **required**) Kubernetes resource type.
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Kubernetes resource type.
 
 </dd>
 <dt>name</dt>
 <dd>
 
-(string, **required**) Kubernetes resource name.
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Kubernetes resource name.
 
 </dd>
 <dt>namespace</dt>
 <dd>
 
-(string, **required**) Kubernetes namespace that the resource belongs to.
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Kubernetes namespace that the resource belongs to.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### KubernetesReplicas {#kubernetes-replicas}
+
+<!-- vale on -->
 
 KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
 
@@ -2457,26 +4041,48 @@ KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
 <dt>default_config</dt>
 <dd>
 
-([PodScalerScaleActuatorDynamicConfig](#pod-scaler-scale-actuator-dynamic-config)) Default configuration.
+<!-- vale off -->
+
+([PodScalerScaleActuatorDynamicConfig](#pod-scaler-scale-actuator-dynamic-config))
+
+<!-- vale on -->
+
+Default configuration.
 
 </dd>
 <dt>dynamic_config_key</dt>
 <dd>
 
-(string) Configuration key for DynamicConfig
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for DynamicConfig
 
 </dd>
 <dt>kubernetes_object_selector</dt>
 <dd>
 
-([KubernetesObjectSelector](#kubernetes-object-selector)) The Kubernetes object on which horizontal scaling is applied.
+<!-- vale off -->
+
+([KubernetesObjectSelector](#kubernetes-object-selector))
+
+<!-- vale on -->
+
+The Kubernetes object on which horizontal scaling is applied.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### LabelMatcher {#label-matcher}
+
+<!-- vale on -->
 
 Allows to define rules whether a map of
 [labels](/concepts/flow-control/flow-label.md)
@@ -2484,42 +4090,64 @@ should be considered a match or not
 
 It provides three ways to define requirements:
 
-- matchLabels
-- matchExpressions
+- match labels
+- match expressions
 - arbitrary expression
 
-If multiple requirements are set, they are all ANDed.
+If multiple requirements are set, they're all combined using the logical AND operator.
 An empty label matcher always matches.
 
 <dl>
 <dt>expression</dt>
 <dd>
 
-([MatchExpression](#match-expression)) An arbitrary expression to be evaluated on the labels.
+<!-- vale off -->
+
+([MatchExpression](#match-expression))
+
+<!-- vale on -->
+
+An arbitrary expression to be evaluated on the labels.
 
 </dd>
 <dt>match_expressions</dt>
 <dd>
 
-([[]K8sLabelMatcherRequirement](#k8s-label-matcher-requirement)) List of k8s-style label matcher requirements.
+<!-- vale off -->
 
-Note: The requirements are ANDed.
+([[]K8sLabelMatcherRequirement](#k8s-label-matcher-requirement))
+
+<!-- vale on -->
+
+List of k8s-style label matcher requirements.
+
+Note: The requirements are combined using the logical AND operator.
 
 </dd>
 <dt>match_labels</dt>
 <dd>
 
-(map of string) A map of {key,value} pairs representing labels to be matched.
-A single {key,value} in the matchLabels requires that the label "key" is present and equal to "value".
+<!-- vale off -->
 
-Note: The requirements are ANDed.
+(map of string)
+
+<!-- vale on -->
+
+A map of {key,value} pairs representing labels to be matched.
+A single {key,value} in the `match_labels` requires that the label `key` is present and equal to `value`.
+
+Note: The requirements are combined using the logical AND operator.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### LoadActuator {#load-actuator}
+
+<!-- vale on -->
 
 Takes the load multiplier input signal and publishes it to the schedulers in the data-plane
 
@@ -2527,26 +4155,48 @@ Takes the load multiplier input signal and publishes it to the schedulers in the
 <dt>default_config</dt>
 <dd>
 
-([LoadActuatorDynamicConfig](#load-actuator-dynamic-config)) Default configuration.
+<!-- vale off -->
+
+([LoadActuatorDynamicConfig](#load-actuator-dynamic-config))
+
+<!-- vale on -->
+
+Default configuration.
 
 </dd>
 <dt>dynamic_config_key</dt>
 <dd>
 
-(string) Configuration key for DynamicConfig.
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for DynamicConfig.
 
 </dd>
 <dt>in_ports</dt>
 <dd>
 
-([LoadActuatorIns](#load-actuator-ins)) Input ports for the Load Actuator component.
+<!-- vale off -->
+
+([LoadActuatorIns](#load-actuator-ins))
+
+<!-- vale on -->
+
+Input ports for the Load Actuator component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### LoadActuatorDynamicConfig {#load-actuator-dynamic-config}
+
+<!-- vale on -->
 
 Dynamic Configuration for LoadActuator
 
@@ -2554,7 +4204,13 @@ Dynamic Configuration for LoadActuator
 <dt>dry_run</dt>
 <dd>
 
-(bool) Decides whether to run the load actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this load actuator.
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Decides whether to run the load actuator in dry-run mode. Dry run mode ensures that no traffic gets dropped by this load actuator.
 Useful for observing the behavior of Load Actuator without disrupting any real traffic.
 
 </dd>
@@ -2562,7 +4218,11 @@ Useful for observing the behavior of Load Actuator without disrupting any real t
 
 ---
 
+<!-- vale off -->
+
 ### LoadActuatorIns {#load-actuator-ins}
+
+<!-- vale on -->
 
 Input for the Load Actuator component.
 
@@ -2570,7 +4230,13 @@ Input for the Load Actuator component.
 <dt>load_multiplier</dt>
 <dd>
 
-([InPort](#in-port)) Load multiplier is ratio of [incoming
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Load multiplier is ratio of [incoming
 concurrency](#scheduler-outs) that needs to be accepted.
 
 </dd>
@@ -2578,9 +4244,13 @@ concurrency](#scheduler-outs) that needs to be accepted.
 
 ---
 
+<!-- vale off -->
+
 ### MatchExpression {#match-expression}
 
-Defines a [map<string, string> → bool] expression to be evaluated on labels
+<!-- vale on -->
+
+Defines a `[map<string, string> → bool]` expression to be evaluated on labels
 
 MatchExpression has multiple variants, exactly one should be set.
 
@@ -2597,83 +4267,149 @@ all:
 <dt>all</dt>
 <dd>
 
-([MatchExpressionList](#match-expression-list)) The expression is true when all subexpressions are true.
+<!-- vale off -->
+
+([MatchExpressionList](#match-expression-list))
+
+<!-- vale on -->
+
+The expression is true when all sub expressions are true.
 
 </dd>
 <dt>any</dt>
 <dd>
 
-([MatchExpressionList](#match-expression-list)) The expression is true when any subexpression is true.
+<!-- vale off -->
+
+([MatchExpressionList](#match-expression-list))
+
+<!-- vale on -->
+
+The expression is true when any sub expression is true.
 
 </dd>
 <dt>label_equals</dt>
 <dd>
 
-([EqualsMatchExpression](#equals-match-expression)) The expression is true when label value equals given value.
+<!-- vale off -->
+
+([EqualsMatchExpression](#equals-match-expression))
+
+<!-- vale on -->
+
+The expression is true when label value equals given value.
 
 </dd>
 <dt>label_exists</dt>
 <dd>
 
-(string, **required**) The expression is true when label with given name exists.
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+The expression is true when label with given name exists.
 
 </dd>
 <dt>label_matches</dt>
 <dd>
 
-([MatchesMatchExpression](#matches-match-expression)) The expression is true when label matches given regex.
+<!-- vale off -->
+
+([MatchesMatchExpression](#matches-match-expression))
+
+<!-- vale on -->
+
+The expression is true when label matches given regex.
 
 </dd>
 <dt>not</dt>
 <dd>
 
-([MatchExpression](#match-expression)) The expression negates the result of subexpression.
+<!-- vale off -->
+
+([MatchExpression](#match-expression))
+
+<!-- vale on -->
+
+The expression negates the result of sub expression.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### MatchExpressionList {#match-expression-list}
 
-List of MatchExpressions that is used for all/any matching
+<!-- vale on -->
 
-eg. {any: {of: [expr1, expr2]}}.
+List of MatchExpressions that's used for all/any matching
+
+for example, `{any: {of: [expr1, expr2]}}`.
 
 <dl>
 <dt>of</dt>
 <dd>
 
-([[]MatchExpression](#match-expression)) List of subexpressions of the match expression.
+<!-- vale off -->
+
+([[]MatchExpression](#match-expression))
+
+<!-- vale on -->
+
+List of sub expressions of the match expression.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### MatchesMatchExpression {#matches-match-expression}
 
-Label selector expression of the matches form "label matches regex".
+<!-- vale on -->
+
+Label selector expression of the form `label matches regex`.
 
 <dl>
 <dt>label</dt>
 <dd>
 
-(string, **required**) Name of the label to match the regular expression.
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Name of the label to match the regular expression.
 
 </dd>
 <dt>regex</dt>
 <dd>
 
-(string, **required**) Regular expression that should match the label value.
-It uses [golang's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Regular expression that should match the label value.
+It uses [Go's regular expression syntax](https://github.com/google/re2/wiki/Syntax).
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Max {#max}
+
+<!-- vale on -->
 
 Takes a list of input signals and emits the signal with the maximum value
 
@@ -2683,20 +4419,36 @@ Max: output = max([]inputs).
 <dt>in_ports</dt>
 <dd>
 
-([MaxIns](#max-ins)) Input ports for the Max component.
+<!-- vale off -->
+
+([MaxIns](#max-ins))
+
+<!-- vale on -->
+
+Input ports for the Max component.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([MaxOuts](#max-outs)) Output ports for the Max component.
+<!-- vale off -->
+
+([MaxOuts](#max-outs))
+
+<!-- vale on -->
+
+Output ports for the Max component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### MaxIns {#max-ins}
+
+<!-- vale on -->
 
 Inputs for the Max component.
 
@@ -2704,14 +4456,24 @@ Inputs for the Max component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port)) Array of input signals.
+<!-- vale off -->
+
+([[]InPort](#in-port))
+
+<!-- vale on -->
+
+Array of input signals.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### MaxOuts {#max-outs}
+
+<!-- vale on -->
 
 Output for the Max component.
 
@@ -2719,14 +4481,24 @@ Output for the Max component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) Signal with maximum value as an output signal.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Signal with maximum value as an output signal.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Min {#min}
+
+<!-- vale on -->
 
 Takes an array of input signals and emits the signal with the minimum value
 Min: output = min([]inputs).
@@ -2735,20 +4507,36 @@ Min: output = min([]inputs).
 <dt>in_ports</dt>
 <dd>
 
-([MinIns](#min-ins)) Input ports for the Min component.
+<!-- vale off -->
+
+([MinIns](#min-ins))
+
+<!-- vale on -->
+
+Input ports for the Min component.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([MinOuts](#min-outs)) Output ports for the Min component.
+<!-- vale off -->
+
+([MinOuts](#min-outs))
+
+<!-- vale on -->
+
+Output ports for the Min component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### MinIns {#min-ins}
+
+<!-- vale on -->
 
 Inputs for the Min component.
 
@@ -2756,14 +4544,24 @@ Inputs for the Min component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port)) Array of input signals.
+<!-- vale off -->
+
+([[]InPort](#in-port))
+
+<!-- vale on -->
+
+Array of input signals.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### MinOuts {#min-outs}
+
+<!-- vale on -->
 
 Output ports for the Min component.
 
@@ -2771,14 +4569,24 @@ Output ports for the Min component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) Signal with minimum value as an output signal.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Signal with minimum value as an output signal.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### NestedCircuit {#nested-circuit}
+
+<!-- vale on -->
 
 Nested circuit defines a sub-circuit as a high-level component. It consists of a list of components and a map of input and output ports.
 
@@ -2786,38 +4594,72 @@ Nested circuit defines a sub-circuit as a high-level component. It consists of a
 <dt>components</dt>
 <dd>
 
-([[]Component](#component)) List of components in the nested circuit.
+<!-- vale off -->
+
+([[]Component](#component))
+
+<!-- vale on -->
+
+List of components in the nested circuit.
 
 </dd>
 <dt>in_ports_map</dt>
 <dd>
 
-(map of [InPort](#in-port)) Maps input port names to input ports.
+<!-- vale off -->
+
+(map of [InPort](#in-port))
+
+<!-- vale on -->
+
+Maps input port names to input ports.
 
 </dd>
 <dt>name</dt>
 <dd>
 
-(string) Name of the nested circuit component. This name is displayed by graph visualization tools.
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Name of the nested circuit component. This name is displayed by graph visualization tools.
 
 </dd>
 <dt>out_ports_map</dt>
 <dd>
 
-(map of [OutPort](#out-port)) Maps output port names to output ports.
+<!-- vale off -->
+
+(map of [OutPort](#out-port))
+
+<!-- vale on -->
+
+Maps output port names to output ports.
 
 </dd>
 <dt>short_description</dt>
 <dd>
 
-(string) Short description of the nested circuit component. This description is displayed by graph visualization tools.
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Short description of the nested circuit component. This description is displayed by graph visualization tools.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### NestedSignalEgress {#nested-signal-egress}
+
+<!-- vale on -->
 
 Nested signal egress is a special type of component that allows to extract a signal from a nested circuit.
 
@@ -2825,20 +4667,36 @@ Nested signal egress is a special type of component that allows to extract a sig
 <dt>in_ports</dt>
 <dd>
 
-([NestedSignalEgressIns](#nested-signal-egress-ins)) Input ports for the NestedSignalEgress component.
+<!-- vale off -->
+
+([NestedSignalEgressIns](#nested-signal-egress-ins))
+
+<!-- vale on -->
+
+Input ports for the NestedSignalEgress component.
 
 </dd>
 <dt>port_name</dt>
 <dd>
 
-(string) Name of the port.
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Name of the port.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### NestedSignalEgressIns {#nested-signal-egress-ins}
+
+<!-- vale on -->
 
 Inputs for the NestedSignalEgress component.
 
@@ -2846,14 +4704,24 @@ Inputs for the NestedSignalEgress component.
 <dt>signal</dt>
 <dd>
 
-([InPort](#in-port)) The signal to be egressed.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Egress signal.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### NestedSignalIngress {#nested-signal-ingress}
+
+<!-- vale on -->
 
 Nested signal ingress is a special type of component that allows to inject a signal into a nested circuit.
 
@@ -2861,20 +4729,36 @@ Nested signal ingress is a special type of component that allows to inject a sig
 <dt>out_ports</dt>
 <dd>
 
-([NestedSignalIngressOuts](#nested-signal-ingress-outs)) Output ports for the NestedSignalIngress component.
+<!-- vale off -->
+
+([NestedSignalIngressOuts](#nested-signal-ingress-outs))
+
+<!-- vale on -->
+
+Output ports for the NestedSignalIngress component.
 
 </dd>
 <dt>port_name</dt>
 <dd>
 
-(string) Name of the port.
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Name of the port.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### NestedSignalIngressOuts {#nested-signal-ingress-outs}
+
+<!-- vale on -->
 
 Outputs for the NestedSignalIngress component.
 
@@ -2882,37 +4766,63 @@ Outputs for the NestedSignalIngress component.
 <dt>signal</dt>
 <dd>
 
-([OutPort](#out-port)) The signal to be ingressed.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Ingress signal.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Or {#or}
+
+<!-- vale on -->
 
 Logical OR.
 
-See [And component](#and) on how signals are mapped onto boolean values.
+See [And component](#and) on how signals are mapped onto Boolean values.
 
 <dl>
 <dt>in_ports</dt>
 <dd>
 
-([OrIns](#or-ins)) Input ports for the Or component.
+<!-- vale off -->
+
+([OrIns](#or-ins))
+
+<!-- vale on -->
+
+Input ports for the Or component.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([OrOuts](#or-outs)) Output ports for the Or component.
+<!-- vale off -->
+
+([OrOuts](#or-outs))
+
+<!-- vale on -->
+
+Output ports for the Or component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### OrIns {#or-ins}
+
+<!-- vale on -->
 
 Inputs for the Or component.
 
@@ -2920,14 +4830,24 @@ Inputs for the Or component.
 <dt>inputs</dt>
 <dd>
 
-([[]InPort](#in-port)) Array of input signals.
+<!-- vale off -->
+
+([[]InPort](#in-port))
+
+<!-- vale on -->
+
+Array of input signals.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### OrOuts {#or-outs}
+
+<!-- vale on -->
 
 Output ports for the Or component.
 
@@ -2935,7 +4855,13 @@ Output ports for the Or component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) Result of logical OR of all the input signals.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Result of logical OR of all the input signals.
 
 Will always be 0 (false), 1 (true) or invalid (unknown).
 
@@ -2944,7 +4870,11 @@ Will always be 0 (false), 1 (true) or invalid (unknown).
 
 ---
 
+<!-- vale off -->
+
 ### OutPort {#out-port}
+
+<!-- vale on -->
 
 Components produce output for other components via OutPorts
 
@@ -2952,14 +4882,24 @@ Components produce output for other components via OutPorts
 <dt>signal_name</dt>
 <dd>
 
-(string) Name of the outgoing Signal on the OutPort.
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Name of the outgoing Signal on the OutPort.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### PathTemplateMatcher {#path-template-matcher}
+
+<!-- vale on -->
 
 Matches HTTP Path to given path templates
 
@@ -2971,11 +4911,17 @@ In case of multiple path templates matching, the most specific one will be chose
 <dt>template_values</dt>
 <dd>
 
-(map of string) Template value keys are OpenAPI-inspired path templates.
+<!-- vale off -->
+
+(map of string)
+
+<!-- vale on -->
+
+Template value keys are OpenAPI-inspired path templates.
 
 - Static path segment `/foo` matches a path segment exactly
 - `/{param}` matches arbitrary path segment.
-  (The param name is ignored and can be omitted (`{}`))
+  (The parameter name is ignored and can be omitted (`{}`))
 - The parameter must cover whole segment.
 - Additionally, path template can end with `/*` wildcard to match
   arbitrary number of trailing segments (0 or more).
@@ -2999,15 +4945,25 @@ Example:
 
 ---
 
+<!-- vale off -->
+
 ### PodAutoScaler {#pod-auto-scaler}
 
-_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
+<!-- vale on -->
+
+_PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto scale.
 
 <dl>
 <dt>cooldown_override_percentage</dt>
 <dd>
 
-(float64, default: `50`) Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
+<!-- vale off -->
+
+(float64, default: `50`)
+
+<!-- vale on -->
+
+Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
 For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
 scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
 
@@ -3015,80 +4971,154 @@ scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 
 <dt>max_replicas</dt>
 <dd>
 
-(string, default: `"9223372036854775807"`) The maximum scale to which the _PodAutoScaler_ can scale-out.
+<!-- vale off -->
+
+(string, default: `"9223372036854775807"`)
+
+<!-- vale on -->
+
+The maximum scale to which the _PodAutoScaler_ can scale-out.
 
 </dd>
 <dt>max_scale_in_percentage</dt>
 <dd>
 
-(float64, default: `1`) The maximum decrease of replicas (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+<!-- vale off -->
+
+(float64, default: `1`)
+
+<!-- vale on -->
+
+The maximum decrease of replicas (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
 
 </dd>
 <dt>max_scale_out_percentage</dt>
 <dd>
 
-(float64, default: `10`) The maximum increase of replicas (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+<!-- vale off -->
+
+(float64, default: `10`)
+
+<!-- vale on -->
+
+The maximum increase of replicas (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
 
 </dd>
 <dt>min_replicas</dt>
 <dd>
 
-(string, default: `"0"`) The minimum replicas to which the _PodAutoScaler_ can scale-in.
+<!-- vale off -->
+
+(string, default: `"0"`)
+
+<!-- vale on -->
+
+The minimum replicas to which the _PodAutoScaler_ can scale-in.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([PodAutoScalerOuts](#pod-auto-scaler-outs)) Output ports for the _PodAutoScaler_.
+<!-- vale off -->
+
+([PodAutoScalerOuts](#pod-auto-scaler-outs))
+
+<!-- vale on -->
+
+Output ports for the _PodAutoScaler_.
 
 </dd>
 <dt>pod_scaler</dt>
 <dd>
 
+<!-- vale off -->
+
 ([KubernetesReplicas](#kubernetes-replicas))
+
+<!-- vale on -->
 
 </dd>
 <dt>scale_in_alerter_parameters</dt>
 <dd>
 
-([AlerterParameters](#alerter-parameters)) Configuration for scale-in alerter.
+<!-- vale off -->
+
+([AlerterParameters](#alerter-parameters))
+
+<!-- vale on -->
+
+Configuration for scale-in Alerter.
 
 </dd>
 <dt>scale_in_controllers</dt>
 <dd>
 
-([[]ScaleInController](#scale-in-controller)) List of _Controllers_ for scaling in.
+<!-- vale off -->
+
+([[]ScaleInController](#scale-in-controller))
+
+<!-- vale on -->
+
+List of _Controllers_ for scaling in.
 
 </dd>
 <dt>scale_in_cooldown</dt>
 <dd>
 
-(string, default: `"120s"`) The amount of time to wait after a scale-in operation for another scale-in operation.
+<!-- vale off -->
+
+(string, default: `"120s"`)
+
+<!-- vale on -->
+
+The amount of time to wait after a scale-in operation for another scale-in operation.
 
 </dd>
 <dt>scale_out_alerter_parameters</dt>
 <dd>
 
-([AlerterParameters](#alerter-parameters)) Configuration for scale-out alerter.
+<!-- vale off -->
+
+([AlerterParameters](#alerter-parameters))
+
+<!-- vale on -->
+
+Configuration for scale-out Alerter.
 
 </dd>
 <dt>scale_out_controllers</dt>
 <dd>
 
-([[]ScaleOutController](#scale-out-controller)) List of _Controllers_ for scaling out.
+<!-- vale off -->
+
+([[]ScaleOutController](#scale-out-controller))
+
+<!-- vale on -->
+
+List of _Controllers_ for scaling out.
 
 </dd>
 <dt>scale_out_cooldown</dt>
 <dd>
 
-(string, default: `"30s"`) The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
+<!-- vale off -->
+
+(string, default: `"30s"`)
+
+<!-- vale on -->
+
+The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### PodAutoScalerOuts {#pod-auto-scaler-outs}
+
+<!-- vale on -->
 
 Outputs for _PodAutoScaler_.
 
@@ -3096,26 +5126,42 @@ Outputs for _PodAutoScaler_.
 <dt>actual_replicas</dt>
 <dd>
 
+<!-- vale off -->
+
 ([OutPort](#out-port))
+
+<!-- vale on -->
 
 </dd>
 <dt>configured_replicas</dt>
 <dd>
 
+<!-- vale off -->
+
 ([OutPort](#out-port))
+
+<!-- vale on -->
 
 </dd>
 <dt>desired_replicas</dt>
 <dd>
 
+<!-- vale off -->
+
 ([OutPort](#out-port))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### PodScaler {#pod-scaler}
+
+<!-- vale on -->
 
 Component for scaling pods based on a signal.
 
@@ -3123,26 +5169,48 @@ Component for scaling pods based on a signal.
 <dt>kubernetes_object_selector</dt>
 <dd>
 
-([KubernetesObjectSelector](#kubernetes-object-selector)) The Kubernetes object on which horizontal scaling is applied.
+<!-- vale off -->
+
+([KubernetesObjectSelector](#kubernetes-object-selector))
+
+<!-- vale on -->
+
+The Kubernetes object on which horizontal scaling is applied.
 
 </dd>
 <dt>scale_actuator</dt>
 <dd>
 
-([PodScalerScaleActuator](#pod-scaler-scale-actuator)) Actuates scaling of pods based on a signal.
+<!-- vale off -->
+
+([PodScalerScaleActuator](#pod-scaler-scale-actuator))
+
+<!-- vale on -->
+
+Actuates scaling of pods based on a signal.
 
 </dd>
 <dt>scale_reporter</dt>
 <dd>
 
-([PodScalerScaleReporter](#pod-scaler-scale-reporter)) Reports actual and configured number of replicas.
+<!-- vale off -->
+
+([PodScalerScaleReporter](#pod-scaler-scale-reporter))
+
+<!-- vale on -->
+
+Reports actual and configured number of replicas.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### PodScalerScaleActuator {#pod-scaler-scale-actuator}
+
+<!-- vale on -->
 
 Actuates scaling of pods based on a signal.
 
@@ -3150,26 +5218,48 @@ Actuates scaling of pods based on a signal.
 <dt>default_config</dt>
 <dd>
 
-([PodScalerScaleActuatorDynamicConfig](#pod-scaler-scale-actuator-dynamic-config)) Default configuration.
+<!-- vale off -->
+
+([PodScalerScaleActuatorDynamicConfig](#pod-scaler-scale-actuator-dynamic-config))
+
+<!-- vale on -->
+
+Default configuration.
 
 </dd>
 <dt>dynamic_config_key</dt>
 <dd>
 
-(string) Configuration key for DynamicConfig
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for DynamicConfig
 
 </dd>
 <dt>in_ports</dt>
 <dd>
 
-([PodScalerScaleActuatorIns](#pod-scaler-scale-actuator-ins)) Input ports for the PodScaler component.
+<!-- vale off -->
+
+([PodScalerScaleActuatorIns](#pod-scaler-scale-actuator-ins))
+
+<!-- vale on -->
+
+Input ports for the PodScaler component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### PodScalerScaleActuatorDynamicConfig {#pod-scaler-scale-actuator-dynamic-config}
+
+<!-- vale on -->
 
 Dynamic Configuration for ScaleActuator
 
@@ -3177,7 +5267,13 @@ Dynamic Configuration for ScaleActuator
 <dt>dry_run</dt>
 <dd>
 
-(bool) Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Decides whether to run the pod scaler in dry-run mode. Dry run mode ensures that no scaling is invoked by this pod scaler.
 Useful for observing the behavior of Scaler without disrupting any real traffic.
 
 </dd>
@@ -3185,7 +5281,11 @@ Useful for observing the behavior of Scaler without disrupting any real traffic.
 
 ---
 
+<!-- vale off -->
+
 ### PodScalerScaleActuatorIns {#pod-scaler-scale-actuator-ins}
+
+<!-- vale on -->
 
 Inputs for the PodScaler component.
 
@@ -3193,14 +5293,22 @@ Inputs for the PodScaler component.
 <dt>desired_replicas</dt>
 <dd>
 
+<!-- vale off -->
+
 ([InPort](#in-port))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### PodScalerScaleReporter {#pod-scaler-scale-reporter}
+
+<!-- vale on -->
 
 Reports actual and configured number of replicas.
 
@@ -3208,14 +5316,24 @@ Reports actual and configured number of replicas.
 <dt>out_ports</dt>
 <dd>
 
-([PodScalerScaleReporterOuts](#pod-scaler-scale-reporter-outs)) Output ports for the PodScaler component.
+<!-- vale off -->
+
+([PodScalerScaleReporterOuts](#pod-scaler-scale-reporter-outs))
+
+<!-- vale on -->
+
+Output ports for the PodScaler component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### PodScalerScaleReporterOuts {#pod-scaler-scale-reporter-outs}
+
+<!-- vale on -->
 
 Outputs for the PodScaler component.
 
@@ -3223,20 +5341,36 @@ Outputs for the PodScaler component.
 <dt>actual_replicas</dt>
 <dd>
 
-([OutPort](#out-port)) The number of replicas that are currently running.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The number of replicas that are currently running.
 
 </dd>
 <dt>configured_replicas</dt>
 <dd>
 
-([OutPort](#out-port)) The number of replicas that are desired.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The number of replicas that are desired.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Policy {#policy}
+
+<!-- vale on -->
 
 Policy expresses observability-driven control logic.
 
@@ -3252,20 +5386,36 @@ Policy specification contains a circuit that defines the controller logic and re
 <dt>circuit</dt>
 <dd>
 
-([Circuit](#circuit)) Defines the control-loop logic of the policy.
+<!-- vale off -->
+
+([Circuit](#circuit))
+
+<!-- vale on -->
+
+Defines the control-loop logic of the policy.
 
 </dd>
 <dt>resources</dt>
 <dd>
 
-([Resources](#resources)) Resources (Flux Meters, Classifiers etc.) to setup.
+<!-- vale off -->
+
+([Resources](#resources))
+
+<!-- vale on -->
+
+Resources (Flux Meters, Classifiers etc.) to setup.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### PromQL {#prom-q-l}
+
+<!-- vale on -->
 
 Component that runs a Prometheus query periodically and returns the result as an output signal
 
@@ -3273,24 +5423,43 @@ Component that runs a Prometheus query periodically and returns the result as an
 <dt>evaluation_interval</dt>
 <dd>
 
-(string, default: `"10s"`) Describes the interval between successive evaluations of the Prometheus query.
+<!-- vale off -->
+
+(string, default: `"10s"`)
+
+<!-- vale on -->
+
+Describes the interval between successive evaluations of the Prometheus query.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([PromQLOuts](#prom-q-l-outs)) Output ports for the PromQL component.
+<!-- vale off -->
+
+([PromQLOuts](#prom-q-l-outs))
+
+<!-- vale on -->
+
+Output ports for the PromQL component.
 
 </dd>
 <dt>query_string</dt>
 <dd>
 
-(string) Describes the Prometheus query to be run.
+<!-- vale off -->
 
-:::caution
+(string)
 
-TODO we should describe how to construct the query, eg. how to employ the
-fluxmeters here or link to appropriate place in docs.
+<!-- vale on -->
+
+Describes the Prometheus query to be run.
+
+:::info
+
+PromQL [reference](https://prometheus.io/docs/prometheus/latest/querying/basics/)
+Flow Metrics [reference](/reference/observability/flow-metrics/flow-metrics.md)
+OpenTelemetry Metrics [reference](/get-started/integrations/metrics/metrics.md)
 
 :::
 
@@ -3299,7 +5468,11 @@ fluxmeters here or link to appropriate place in docs.
 
 ---
 
+<!-- vale off -->
+
 ### PromQLOuts {#prom-q-l-outs}
+
+<!-- vale on -->
 
 Output for the PromQL component.
 
@@ -3307,14 +5480,24 @@ Output for the PromQL component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) The result of the Prometheus query as an output signal.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The result of the Prometheus query as an output signal.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### PulseGenerator {#pulse-generator}
+
+<!-- vale on -->
 
 Generates 0 and 1 in turns.
 
@@ -3322,26 +5505,48 @@ Generates 0 and 1 in turns.
 <dt>false_for</dt>
 <dd>
 
-(string, default: `"5s"`) Emitting 0 for the false_for duration.
+<!-- vale off -->
+
+(string, default: `"5s"`)
+
+<!-- vale on -->
+
+Emitting 0 for the `false_for` duration.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([PulseGeneratorOuts](#pulse-generator-outs)) Output ports for the PulseGenerator component.
+<!-- vale off -->
+
+([PulseGeneratorOuts](#pulse-generator-outs))
+
+<!-- vale on -->
+
+Output ports for the PulseGenerator component.
 
 </dd>
 <dt>true_for</dt>
 <dd>
 
-(string, default: `"5s"`) Emitting 1 for the true_for duration.
+<!-- vale off -->
+
+(string, default: `"5s"`)
+
+<!-- vale on -->
+
+Emitting 1 for the `true_for` duration.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### PulseGeneratorOuts {#pulse-generator-outs}
+
+<!-- vale on -->
 
 Outputs for the PulseGenerator component.
 
@@ -3349,14 +5554,22 @@ Outputs for the PulseGenerator component.
 <dt>output</dt>
 <dd>
 
+<!-- vale off -->
+
 ([OutPort](#out-port))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Query {#query}
+
+<!-- vale on -->
 
 Query components that are query databases such as Prometheus.
 
@@ -3364,14 +5577,24 @@ Query components that are query databases such as Prometheus.
 <dt>promql</dt>
 <dd>
 
-([PromQL](#prom-q-l)) Periodically runs a Prometheus query in the background and emits the result.
+<!-- vale off -->
+
+([PromQL](#prom-q-l))
+
+<!-- vale on -->
+
+Periodically runs a Prometheus query in the background and emits the result.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### RateLimiter {#rate-limiter}
+
+<!-- vale on -->
 
 Limits the traffic on a control point to specified rate
 
@@ -3381,45 +5604,79 @@ See also [Rate Limiter overview](/concepts/flow-control/components/rate-limiter.
 
 :::
 
-Ratelimiting is done separately on per-label-value basis. Use _label_key_
+RateLimiting is done on per-label-value basis. Use `label_key`
 to select which label should be used as key.
 
 <dl>
 <dt>default_config</dt>
 <dd>
 
-([RateLimiterDynamicConfig](#rate-limiter-dynamic-config)) Default configuration
+<!-- vale off -->
+
+([RateLimiterDynamicConfig](#rate-limiter-dynamic-config))
+
+<!-- vale on -->
+
+Default configuration
 
 </dd>
 <dt>dynamic_config_key</dt>
 <dd>
 
-(string) Configuration key for DynamicConfig
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for DynamicConfig
 
 </dd>
 <dt>flow_selector</dt>
 <dd>
 
-([FlowSelector](#flow-selector)) Which control point to apply this ratelimiter to.
+<!-- vale off -->
+
+([FlowSelector](#flow-selector))
+
+<!-- vale on -->
+
+Which control point to apply this rate limiter to.
 
 </dd>
 <dt>in_ports</dt>
 <dd>
 
-([RateLimiterIns](#rate-limiter-ins)) Input ports for the RateLimiter component
+<!-- vale off -->
+
+([RateLimiterIns](#rate-limiter-ins))
+
+<!-- vale on -->
+
+Input ports for the RateLimiter component
 
 </dd>
 <dt>parameters</dt>
 <dd>
 
-([RateLimiterParameters](#rate-limiter-parameters)) Parameters for the RateLimiter component
+<!-- vale off -->
+
+([RateLimiterParameters](#rate-limiter-parameters))
+
+<!-- vale on -->
+
+Parameters for the RateLimiter component
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### RateLimiterDynamicConfig {#rate-limiter-dynamic-config}
+
+<!-- vale on -->
 
 Dynamic Configuration for the rate limiter
 
@@ -3427,14 +5684,24 @@ Dynamic Configuration for the rate limiter
 <dt>overrides</dt>
 <dd>
 
-([[]RateLimiterOverride](#rate-limiter-override)) Allows to specify different limits for particular label values.
+<!-- vale off -->
+
+([[]RateLimiterOverride](#rate-limiter-override))
+
+<!-- vale on -->
+
+Allows to specify different limits for particular label values.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### RateLimiterIns {#rate-limiter-ins}
+
+<!-- vale on -->
 
 Inputs for the RateLimiter component
 
@@ -3442,12 +5709,18 @@ Inputs for the RateLimiter component
 <dt>limit</dt>
 <dd>
 
-([InPort](#in-port)) Number of flows allowed per _limit_reset_interval_ per each label.
-Negative values disable the ratelimiter.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Number of flows allowed per `limit_reset_interval` per each label.
+Negative values disable the rate limiter.
 
 :::tip
 
-Negative limit can be useful to _conditionally_ enable the ratelimiter
+Negative limit can be useful to _conditionally_ enable the rate limiter
 under certain circumstances. [Decider](#decider) might be helpful.
 
 :::
@@ -3457,77 +5730,137 @@ under certain circumstances. [Decider](#decider) might be helpful.
 
 ---
 
+<!-- vale off -->
+
 ### RateLimiterOverride {#rate-limiter-override}
+
+<!-- vale on -->
 
 <dl>
 <dt>label_value</dt>
 <dd>
 
-(string, **required**) Value of the label for which the override should be applied.
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Value of the label for which the override should be applied.
 
 </dd>
 <dt>limit_scale_factor</dt>
 <dd>
 
-(float64, default: `1`) Amount by which the _in_ports.limit_ should be multiplied for this label value.
+<!-- vale off -->
+
+(float64, default: `1`)
+
+<!-- vale on -->
+
+Amount by which the `in_ports.limit` should be multiplied for
+this label value.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### RateLimiterParameters {#rate-limiter-parameters}
+
+<!-- vale on -->
 
 <dl>
 <dt>label_key</dt>
 <dd>
 
-(string, **required**) Specifies which label the ratelimiter should be keyed by.
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Specifies which label the rate limiter should be keyed by.
 
 Rate limiting is done independently for each value of the
 [label](/concepts/flow-control/flow-label.md) with given key.
-Eg., to give each user a separate limit, assuming you have a _user_ flow
+For example, to give each user a separate limit, assuming you
+have a _user_ flow
 label set up, set `label_key: "user"`.
 
 </dd>
 <dt>lazy_sync</dt>
 <dd>
 
-([RateLimiterParametersLazySync](#rate-limiter-parameters-lazy-sync)) Configuration of lazy-syncing behaviour of ratelimiter
+<!-- vale off -->
+
+([RateLimiterParametersLazySync](#rate-limiter-parameters-lazy-sync))
+
+<!-- vale on -->
+
+Configuration of lazy-syncing behaviour of rate limiter
 
 </dd>
 <dt>limit_reset_interval</dt>
 <dd>
 
-(string, default: `"60s"`) Time after which the limit for a given label value will be reset.
+<!-- vale off -->
+
+(string, default: `"60s"`)
+
+<!-- vale on -->
+
+Time after which the limit for a given label value will be reset.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### RateLimiterParametersLazySync {#rate-limiter-parameters-lazy-sync}
+
+<!-- vale on -->
 
 <dl>
 <dt>enabled</dt>
 <dd>
 
-(bool) Enables lazy sync
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Enables lazy sync
 
 </dd>
 <dt>num_sync</dt>
 <dd>
 
-(int64, minimum: `0`, default: `5`) Number of times to lazy sync within the _limit_reset_interval_.
+<!-- vale off -->
+
+(int64, minimum: `0`, default: `5`)
+
+<!-- vale on -->
+
+Number of times to lazy sync within the `limit_reset_interval`.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Rego {#rego}
 
-Rego define a set of labels that are extracted after evaluating a rego module.
+<!-- vale on -->
+
+Rego define a set of labels that are extracted after evaluating a Rego module.
 
 :::info
 
@@ -3537,9 +5870,9 @@ You can use the [live-preview](/concepts/flow-control/resources/classifier.md#li
 
 :::info
 
-Special rego variables:
+Special Rego variables:
 
-- `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
+- `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it isn't emitted as part of flow labels or telemetry and is solely used while processing the request.
 
 :::
 
@@ -3567,16 +5900,28 @@ rego:
 <dt>labels</dt>
 <dd>
 
-(map of [RegoLabelProperties](#rego-label-properties), **required**) A map of {key, value} pairs mapping from
+<!-- vale off -->
+
+(map of [RegoLabelProperties](#rego-label-properties), **required**)
+
+<!-- vale on -->
+
+A map of {key, value} pairs mapping from
 [flow label](/concepts/flow-control/flow-label.md) keys to queries that define
 how to extract and propagate flow labels with that key.
-The name of the label maps to a variable in the rego module, i.e. it maps to `data.<package>.<label>` variable.
+The name of the label maps to a variable in the Rego module. It maps to `data.<package>.<label>` variable.
 
 </dd>
 <dt>module</dt>
 <dd>
 
-(string, **required**) Source code of the rego module.
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+Source code of the Rego module.
 
 :::Note
 
@@ -3589,13 +5934,23 @@ Must include a "package" declaration.
 
 ---
 
+<!-- vale off -->
+
 ### RegoLabelProperties {#rego-label-properties}
+
+<!-- vale on -->
 
 <dl>
 <dt>telemetry</dt>
 <dd>
 
-(bool, default: `true`) Decides if the created flow label should be available as an attribute in OLAP telemetry and
+<!-- vale off -->
+
+(bool, default: `true`)
+
+<!-- vale on -->
+
+Decides if the created flow label should be available as an attribute in OLAP telemetry and
 propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
 
 :::note
@@ -3617,7 +5972,11 @@ sensitive labels.
 
 ---
 
+<!-- vale off -->
+
 ### Resources {#resources}
+
+<!-- vale on -->
 
 Resources that need to be setup for the policy to function
 
@@ -3633,7 +5992,13 @@ Resources are typically Flux Meters, Classifiers, etc. that can be used to creat
 <dt>classifiers</dt>
 <dd>
 
-([[]Classifier](#classifier), **DEPRECATED**) Classifiers are installed in the data-plane and are used to label the requests based on payload content.
+<!-- vale off -->
+
+([[]Classifier](#classifier), **DEPRECATED**)
+
+<!-- vale on -->
+
+Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 
 The flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.
 
@@ -3643,13 +6008,25 @@ Deprecated: v1.5.0. Use `flow_control.classifiers` instead.
 <dt>flow_control</dt>
 <dd>
 
-([FlowControlResources](#flow-control-resources)) FlowControlResources are resources that are provided by flow control integration.
+<!-- vale off -->
+
+([FlowControlResources](#flow-control-resources))
+
+<!-- vale on -->
+
+FlowControlResources are resources that are provided by flow control integration.
 
 </dd>
 <dt>flux_meters</dt>
 <dd>
 
-(map of [FluxMeter](#flux-meter), **DEPRECATED**) Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
+<!-- vale off -->
+
+(map of [FluxMeter](#flux-meter), **DEPRECATED**)
+
+<!-- vale on -->
+
+Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
 Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
 
@@ -3660,7 +6037,11 @@ Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 
 ---
 
+<!-- vale off -->
+
 ### Rule {#rule}
+
+<!-- vale on -->
 
 Rule describes a single classification Rule
 
@@ -3677,13 +6058,25 @@ extractor:
 <dt>extractor</dt>
 <dd>
 
-([Extractor](#extractor)) High-level declarative extractor.
+<!-- vale off -->
+
+([Extractor](#extractor))
+
+<!-- vale on -->
+
+High-level declarative extractor.
 
 </dd>
 <dt>rego</dt>
 <dd>
 
-([RuleRego](#rule-rego)) Rego module to extract a value from.
+<!-- vale off -->
+
+([RuleRego](#rule-rego))
+
+<!-- vale on -->
+
+Rego module to extract a value from.
 
 Deprecated: 1.5.0
 
@@ -3691,7 +6084,13 @@ Deprecated: 1.5.0
 <dt>telemetry</dt>
 <dd>
 
-(bool, default: `true`) Decides if the created flow label should be available as an attribute in OLAP telemetry and
+<!-- vale off -->
+
+(bool, default: `true`)
+
+<!-- vale on -->
+
+Decides if the created flow label should be available as an attribute in OLAP telemetry and
 propagated in [baggage](/concepts/flow-control/flow-label.md#baggage)
 
 :::note
@@ -3713,11 +6112,15 @@ sensitive labels.
 
 ---
 
+<!-- vale off -->
+
 ### RuleRego {#rule-rego}
 
-Raw rego rules are compiled 1:1 to rego queries
+<!-- vale on -->
 
-High-level extractor-based rules are compiled into a single rego query.
+Raw Rego rules are compiled 1:1 to Rego queries
+
+High-level extractor-based rules are compiled into a single Rego query.
 
 Deprecated: 1.5.0
 
@@ -3725,15 +6128,27 @@ Deprecated: 1.5.0
 <dt>query</dt>
 <dd>
 
-(string, **DEPRECATED**, **required**) Query string to extract a value (eg. `data.<mymodulename>.<variablename>`).
+<!-- vale off -->
 
-Note: The module name must match the package name from the "source".
+(string, **DEPRECATED**, **required**)
+
+<!-- vale on -->
+
+Query string to extract a value (for example, `data.<mymodulename>.<variablename>`).
+
+Note: The module name must match the package name from the `source`.
 
 </dd>
 <dt>source</dt>
 <dd>
 
-(string, **DEPRECATED**, **required**) Source code of the rego module.
+<!-- vale off -->
+
+(string, **DEPRECATED**, **required**)
+
+<!-- vale on -->
+
+Source code of the Rego module.
 
 Note: Must include a "package" declaration.
 
@@ -3742,71 +6157,123 @@ Note: Must include a "package" declaration.
 
 ---
 
+<!-- vale off -->
+
 ### ScaleInController {#scale-in-controller}
+
+<!-- vale on -->
 
 <dl>
 <dt>alerter_parameters</dt>
 <dd>
 
-([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
+<!-- vale off -->
+
+([AlerterParameters](#alerter-parameters))
+
+<!-- vale on -->
+
+Configuration for embedded Alerter.
 
 </dd>
 <dt>controller</dt>
 <dd>
 
-([ScaleInControllerController](#scale-in-controller-controller)) Controller
+<!-- vale off -->
+
+([ScaleInControllerController](#scale-in-controller-controller))
+
+<!-- vale on -->
+
+Controller
 
 </dd>
 </dl>
 
 ---
+
+<!-- vale off -->
 
 ### ScaleInControllerController {#scale-in-controller-controller}
 
+<!-- vale on -->
+
 <dl>
 <dt>gradient</dt>
 <dd>
 
+<!-- vale off -->
+
 ([DecreasingGradient](#decreasing-gradient))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### ScaleOutController {#scale-out-controller}
+
+<!-- vale on -->
 
 <dl>
 <dt>alerter_parameters</dt>
 <dd>
 
-([AlerterParameters](#alerter-parameters)) Configuration for embedded alerter.
+<!-- vale off -->
+
+([AlerterParameters](#alerter-parameters))
+
+<!-- vale on -->
+
+Configuration for embedded Alerter.
 
 </dd>
 <dt>controller</dt>
 <dd>
 
-([ScaleOutControllerController](#scale-out-controller-controller)) Controller
+<!-- vale off -->
+
+([ScaleOutControllerController](#scale-out-controller-controller))
+
+<!-- vale on -->
+
+Controller
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### ScaleOutControllerController {#scale-out-controller-controller}
+
+<!-- vale on -->
 
 <dl>
 <dt>gradient</dt>
 <dd>
 
+<!-- vale off -->
+
 ([IncreasingGradient](#increasing-gradient))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Scheduler {#scheduler}
+
+<!-- vale on -->
 
 Weighted Fair Queuing-based workload scheduler
 
@@ -3823,20 +6290,36 @@ See [ConcurrencyLimiter](#concurrency-limiter) for more context.
 <dt>out_ports</dt>
 <dd>
 
-([SchedulerOuts](#scheduler-outs)) Output ports for the Scheduler component.
+<!-- vale off -->
+
+([SchedulerOuts](#scheduler-outs))
+
+<!-- vale on -->
+
+Output ports for the Scheduler component.
 
 </dd>
 <dt>parameters</dt>
 <dd>
 
-([SchedulerParameters](#scheduler-parameters)) Scheduler parameters.
+<!-- vale off -->
+
+([SchedulerParameters](#scheduler-parameters))
+
+<!-- vale on -->
+
+Scheduler parameters.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### SchedulerOuts {#scheduler-outs}
+
+<!-- vale on -->
 
 Output for the Scheduler component.
 
@@ -3844,17 +6327,23 @@ Output for the Scheduler component.
 <dt>accepted_concurrency</dt>
 <dd>
 
-([OutPort](#out-port)) Accepted concurrency is actual concurrency on a control point that this
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Accepted concurrency is actual concurrency on a control point that this
 scheduler is applied on.
 
 :::info
 
-Concurrency is a unitless number describing mean number of
+Concurrency is a unit less number describing mean number of
 [flows](/concepts/flow-control/flow-control.md#flow) being
 concurrently processed by the system (system = control point).
 Concurrency is calculated as _work_ done per unit of time (so
 work-seconds per world-seconds). Work-seconds are computed based on
-token-weights of of flows (which are either estimated via `auto_tokens`
+token-weights of flows (which are either estimated via `auto_tokens`
 or specified by `Workload.tokens`).
 
 :::
@@ -3865,7 +6354,13 @@ Value of this signal is aggregated from all the relevant schedulers.
 <dt>incoming_concurrency</dt>
 <dd>
 
-([OutPort](#out-port)) Incoming concurrency is concurrency that'd be needed to accept all the
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Incoming concurrency is concurrency that'd be needed to accept all the
 flows entering the scheduler.
 
 This is computed in the same way as `accepted_concurrency`, but summing
@@ -3877,7 +6372,11 @@ rejected ones.
 
 ---
 
+<!-- vale off -->
+
 ### SchedulerParameters {#scheduler-parameters}
+
+<!-- vale on -->
 
 Scheduler parameters
 
@@ -3885,7 +6384,13 @@ Scheduler parameters
 <dt>auto_tokens</dt>
 <dd>
 
-(bool, default: `true`) Automatically estimate the size of a request in each workload, based on
+<!-- vale off -->
+
+(bool, default: `true`)
+
+<!-- vale on -->
+
+Automatically estimate the size of a request in each workload, based on
 historical latency. Each workload's `tokens` will be set to average
 latency of flows in that workload during last few seconds (exact duration
 of this average can change).
@@ -3896,15 +6401,27 @@ if you want to use this feature.
 <dt>default_workload_parameters</dt>
 <dd>
 
-([SchedulerWorkloadParameters](#scheduler-workload-parameters)) Parameters to be used if none of workloads specified in `workloads` match.
+<!-- vale off -->
+
+([SchedulerWorkloadParameters](#scheduler-workload-parameters))
+
+<!-- vale on -->
+
+Parameters to be used if none of workloads specified in `workloads` match.
 
 </dd>
 <dt>max_timeout</dt>
 <dd>
 
-(string, default: `"0.49s"`) Max Timeout is the value with which the flow timeout is capped.
-When auto_tokens feature is not enabled, this value is used as the
-timeout for the flow, otherwise it is used as a cap for the timeout.
+<!-- vale off -->
+
+(string, default: `"0.49s"`)
+
+<!-- vale on -->
+
+Max Timeout is the value with which the flow timeout is capped.
+When `auto_tokens` feature isn't enabled, this value is used as the
+timeout for the flow, otherwise it's used as a cap for the timeout.
 
 :::caution
 
@@ -3912,11 +6429,11 @@ This timeout needs to be strictly less than the timeout set on the
 client for the whole GRPC call:
 
 - in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
-- in case of libraries, timeout configured... TODO.
+- in case of libraries, is configured during the client initialization.
 
-We're using fail-open logic in integrations, so if the GRPC timeout
+Fail-open logic is use for flow control APIs, so if the GRPC timeout
 fires first, the flow will end up being unconditionally allowed while
-it're still waiting on the scheduler.
+it's still waiting on the scheduler.
 
 To avoid such cases, the end-to-end GRPC timeout should also contain
 some headroom for constant overhead like serialization, etc. Default
@@ -3929,9 +6446,15 @@ tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 <dt>timeout_factor</dt>
 <dd>
 
-(float64, default: `0.5`) Timeout as a factor of tokens for a flow in a workload in case auto_tokens is set to true.
+<!-- vale off -->
 
-If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
+(float64, default: `0.5`)
+
+<!-- vale on -->
+
+Timeout as a factor of tokens for a flow in a workload in case `auto_tokens` is set to true.
+
+If a flow isn't able to get tokens within `timeout_factor * tokens` of duration,
 it will be rejected.
 
 This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
@@ -3940,15 +6463,20 @@ This value impacts the prioritization and fairness because the larger the timeou
 <dt>workloads</dt>
 <dd>
 
-([[]SchedulerWorkload](#scheduler-workload)) List of workloads to be used in scheduler.
+<!-- vale off -->
+
+([[]SchedulerWorkload](#scheduler-workload))
+
+<!-- vale on -->
+
+List of workloads to be used in scheduler.
 
 Categorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads
-allows for load-shedding to be "smarter" than just "randomly deny 50% of
-requests". There are two aspects of this "smartness":
+allows for load-shedding to be "intelligent" compared to random rejections.
+There are two aspects of this "intelligence":
 
 - Scheduler can more precisely calculate concurrency if it understands
-  that flows belonging to different classes have different weights (eg.
-  inserts vs lookups).
+  that flows belonging to different classes have different weights (for example, insert vs select queries).
 - Setting different priorities to different workloads lets the scheduler
   avoid dropping important traffic during overload.
 
@@ -3969,7 +6497,11 @@ section](/concepts/flow-control/components/concurrency-limiter.md#workload).
 
 ---
 
+<!-- vale off -->
+
 ### SchedulerWorkload {#scheduler-workload}
+
+<!-- vale on -->
 
 Workload defines a class of requests that preferably have similar properties such as response latency or desired priority.
 
@@ -3977,21 +6509,37 @@ Workload defines a class of requests that preferably have similar properties suc
 <dt>label_matcher</dt>
 <dd>
 
-([LabelMatcher](#label-matcher)) Label Matcher to select a Workload based on
+<!-- vale off -->
+
+([LabelMatcher](#label-matcher))
+
+<!-- vale on -->
+
+Label Matcher to select a Workload based on
 [flow labels](/concepts/flow-control/flow-label.md).
 
 </dd>
 <dt>parameters</dt>
 <dd>
 
-([SchedulerWorkloadParameters](#scheduler-workload-parameters)) Parameters associated with flows matching the label matcher.
+<!-- vale off -->
+
+([SchedulerWorkloadParameters](#scheduler-workload-parameters))
+
+<!-- vale on -->
+
+Parameters associated with flows matching the label matcher.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### SchedulerWorkloadParameters {#scheduler-workload-parameters}
+
+<!-- vale on -->
 
 Parameters defines parameters such as priority, tokens and fairness key that are applicable to flows within a workload.
 
@@ -3999,8 +6547,14 @@ Parameters defines parameters such as priority, tokens and fairness key that are
 <dt>fairness_key</dt>
 <dd>
 
-(string) Fairness key is a label key that can be used to provide fairness within a workload.
-Any [flow label](/concepts/flow-control/flow-label.md) can be used here. Eg. if
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Fairness key is a label key that can be used to provide fairness within a workload.
+Any [flow label](/concepts/flow-control/flow-label.md) can be used here. For example, if
 you have a classifier that sets `user` flow label, you might want to set
 `fairness_key = "user"`.
 
@@ -4008,7 +6562,13 @@ you have a classifier that sets `user` flow label, you might want to set
 <dt>priority</dt>
 <dd>
 
-(int64, minimum: `0`, maximum: `255`) Describes priority level of the requests within the workload.
+<!-- vale off -->
+
+(int64, minimum: `0`, maximum: `255`)
+
+<!-- vale on -->
+
+Describes priority level of the requests within the workload.
 Priority level ranges from 0 to 255.
 Higher numbers means higher priority level.
 Priority levels have non-linear effect on the workload scheduling. The following formula is used to determine the position of a request in the queue based on virtual finish time:
@@ -4021,15 +6581,25 @@ $$
 <dt>tokens</dt>
 <dd>
 
-(string) Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
-This override is applicable only if tokens for the request are not specified in the request.
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Tokens determines the cost of admitting a single request the workload, which is typically defined as milliseconds of response latency.
+This override is applicable only if tokens for the request aren't specified in the request.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### ServiceSelector {#service-selector}
+
+<!-- vale on -->
 
 Describes which service a [flow control or observability
 component](/concepts/flow-control/flow-control.md#components) should apply
@@ -4045,7 +6615,13 @@ See also [FlowSelector overview](/concepts/flow-control/flow-selector.md).
 <dt>agent_group</dt>
 <dd>
 
-(string, default: `"default"`) Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
+<!-- vale off -->
+
+(string, default: `"default"`)
+
+<!-- vale on -->
+
+Which [agent-group](/concepts/flow-control/flow-selector.md#agent-group) this
 selector applies to.
 
 :::info
@@ -4060,7 +6636,13 @@ The agents within an agent group form a peer to peer cluster and constantly shar
 <dt>service</dt>
 <dd>
 
-(string, default: `"any"`) The Fully Qualified Domain Name of the
+<!-- vale off -->
+
+(string, default: `"any"`)
+
+<!-- vale on -->
+
+The Fully Qualified Domain Name of the
 [service](/concepts/flow-control/flow-selector.md) to select.
 
 In Kubernetes, this is the FQDN of the Service object.
@@ -4074,13 +6656,13 @@ In Kubernetes, this is the FQDN of the Service object.
 :::info
 
 In the Kubernetes sidecar installation mode, service discovery is switched off by default.
-In order to scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.
+To scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.
 
 :::
 
 :::info
 
-An entity (e.g. Kubernetes pod) may belong to multiple services.
+An entity (for example, Kubernetes pod) may belong to multiple services.
 
 :::
 
@@ -4089,9 +6671,13 @@ An entity (e.g. Kubernetes pod) may belong to multiple services.
 
 ---
 
+<!-- vale off -->
+
 ### Switcher {#switcher}
 
-Type of combinator that switches between `on_signal` and `off_signal` signals based on switch input
+<!-- vale on -->
+
+Type of Combinator that switches between `on_signal` and `off_signal` signals based on switch input
 
 `on_signal` will be returned if switch input is valid and not equal to 0.0 ,
 otherwise `off_signal` will be returned.
@@ -4100,20 +6686,36 @@ otherwise `off_signal` will be returned.
 <dt>in_ports</dt>
 <dd>
 
-([SwitcherIns](#switcher-ins)) Input ports for the Switcher component.
+<!-- vale off -->
+
+([SwitcherIns](#switcher-ins))
+
+<!-- vale on -->
+
+Input ports for the Switcher component.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([SwitcherOuts](#switcher-outs)) Output ports for the Switcher component.
+<!-- vale off -->
+
+([SwitcherOuts](#switcher-outs))
+
+<!-- vale on -->
+
+Output ports for the Switcher component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### SwitcherIns {#switcher-ins}
+
+<!-- vale on -->
 
 Inputs for the Switcher component.
 
@@ -4121,26 +6723,48 @@ Inputs for the Switcher component.
 <dt>off_signal</dt>
 <dd>
 
-([InPort](#in-port)) Output signal when switch is invalid or 0.0.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Output signal when switch is invalid or 0.0.
 
 </dd>
 <dt>on_signal</dt>
 <dd>
 
-([InPort](#in-port)) Output signal when switch is valid and not 0.0.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Output signal when switch is valid and not 0.0.
 
 </dd>
 <dt>switch</dt>
 <dd>
 
-([InPort](#in-port)) Decides whether to return `on_signal` or `off_signal`.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Decides whether to return `on_signal` or `off_signal`.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### SwitcherOuts {#switcher-outs}
+
+<!-- vale on -->
 
 Outputs for the Switcher component.
 
@@ -4148,14 +6772,24 @@ Outputs for the Switcher component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) Selected signal (`on_signal` or `off_signal`).
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Selected signal (`on_signal` or `off_signal`).
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### UnaryOperator {#unary-operator}
+
+<!-- vale on -->
 
 Takes an input signal and emits the output after applying the specified unary operator
 
@@ -4167,66 +6801,88 @@ $$
 <dt>in_ports</dt>
 <dd>
 
-([UnaryOperatorIns](#unary-operator-ins)) Input ports for the UnaryOperator component.
+<!-- vale off -->
+
+([UnaryOperatorIns](#unary-operator-ins))
+
+<!-- vale on -->
+
+Input ports for the UnaryOperator component.
 
 </dd>
 <dt>operator</dt>
 <dd>
 
-(string, oneof: `abs | acos | acosh | asin | asinh | atan | atanh | cbrt | ceil | cos | cosh | erf | erfc | erfcinv | erfinv | exp | exp2 | expm1 | floor | gamma | j0 | j1 | lgamma | log | log10 | log1p | log2 | round | roundtoeven | sin | sinh | sqrt | tan | tanh | trunc | y0 | y1`) Unary Operator to apply.
+<!-- vale off -->
+
+(string, one of: `abs | acos | acosh | asin | asinh | atan | atanh | cbrt | ceil | cos | cosh | erf | erfc | erfcinv | erfinv | exp | exp2 | expm1 | floor | gamma | j0 | j1 | lgamma | log | log10 | log1p | log2 | round | roundtoeven | sin | sinh | sqrt | tan | tanh | trunc | y0 | y1`)
+
+<!-- vale on -->
+
+Unary Operator to apply.
 
 The unary operator can be one of the following:
 
-- abs: Absolute value with the sign removed.
-- acos: arccosine, in radians.
-- acosh: Inverse hyperbolic cosine.
-- asin: arcsine, in radians.
-- asinh: Inverse hyperbolic sine.
-- atan: arctangent, in radians.
-- atanh: Inverse hyperbolic tangent.
-- cbrt: Cube root.
-- ceil: Least integer value greater than or equal to input signal.
-- cos: cosine, in radians.
-- cosh: Hyperbolic cosine.
-- erf: Error function.
-- erfc: Complementary error function.
-- erfcinv: Inverse complementary error function.
-- erfinv: Inverse error function.
-- exp: The base-e exponential of input signal.
-- exp2: The base-2 exponential of input signal.
-- expm1: The base-e exponential of input signal minus 1.
-- floor: Greatest integer value less than or equal to input signal.
-- gamma: Gamma function.
-- j0: Bessel function of the first kind of order 0.
-- j1: Bessel function of the first kind of order 1.
-- lgamma: Natural logarithm of the absolute value of the gamma function.
-- log: Natural logarithm of input signal.
-- log10: Base-10 logarithm of input signal.
-- log1p: Natural logarithm of input signal plus 1.
-- log2: Base-2 logarithm of input signal.
-- round: Round to nearest integer.
-- roundtoeven: Round to nearest integer, with ties going to the nearest even integer.
-- sin: sine, in radians.
-- sinh: Hyperbolic sine.
-- sqrt: Square root.
-- tan: tangent, in radians.
-- tanh: Hyperbolic tangent.
-- trunc: Truncate to integer.
-- y0: Bessel function of the second kind of order 0.
-- y1: Bessel function of the second kind of order 1.
+- `abs`: Absolute value with the sign removed.
+- `acos`: `arccosine`, in radians.
+- `acosh`: Inverse hyperbolic cosine.
+- `asin`: `arcsine`, in radians.
+- `asinh`: Inverse hyperbolic sine.
+- `atan`: `arctangent`, in radians.
+- `atanh`: Inverse hyperbolic tangent.
+- `cbrt`: Cube root.
+- `ceil`: Least integer value greater than or equal to input signal.
+- `cos`: `cosine`, in radians.
+- `cosh`: Hyperbolic cosine.
+- `erf`: Error function.
+- `erfc`: Complementary error function.
+- `erfcinv`: Inverse complementary error function.
+- `erfinv`: Inverse error function.
+- `exp`: The base-e exponential of input signal.
+- `exp2`: The base-2 exponential of input signal.
+- `expm1`: The base-e exponential of input signal minus 1.
+- `floor`: Greatest integer value less than or equal to input signal.
+- `gamma`: Gamma function.
+- `j0`: Bessel function of the first kind of order 0.
+- `j1`: Bessel function of the first kind of order 1.
+- `lgamma`: Natural logarithm of the absolute value of the gamma function.
+- `log`: Natural logarithm of input signal.
+- `log10`: Base-10 logarithm of input signal.
+- `log1p`: Natural logarithm of input signal plus 1.
+- `log2`: Base-2 logarithm of input signal.
+- `round`: Round to nearest integer.
+- `roundtoeven`: Round to nearest integer, with ties going to the nearest even integer.
+- `sin`: `sine`, in radians.
+- `sinh`: Hyperbolic sine.
+- `sqrt`: Square root.
+- `tan`: `tangent`, in radians.
+- `tanh`: Hyperbolic tangent.
+- `trunc`: Truncate to integer.
+- `y0`: Bessel function of the second kind of order 0.
+- `y1`: Bessel function of the second kind of order 1.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([UnaryOperatorOuts](#unary-operator-outs)) Output ports for the UnaryOperator component.
+<!-- vale off -->
+
+([UnaryOperatorOuts](#unary-operator-outs))
+
+<!-- vale on -->
+
+Output ports for the UnaryOperator component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### UnaryOperatorIns {#unary-operator-ins}
+
+<!-- vale on -->
 
 Inputs for the UnaryOperator component.
 
@@ -4234,14 +6890,24 @@ Inputs for the UnaryOperator component.
 <dt>input</dt>
 <dd>
 
-([InPort](#in-port)) Input signal.
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Input signal.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### UnaryOperatorOuts {#unary-operator-outs}
+
+<!-- vale on -->
 
 Outputs for the UnaryOperator component.
 
@@ -4249,14 +6915,24 @@ Outputs for the UnaryOperator component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) Output signal.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Output signal.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### Variable {#variable}
+
+<!-- vale on -->
 
 Component that emits a variable value as an output signal, can be defined in dynamic configuration.
 
@@ -4264,39 +6940,69 @@ Component that emits a variable value as an output signal, can be defined in dyn
 <dt>default_config</dt>
 <dd>
 
-([VariableDynamicConfig](#variable-dynamic-config)) Default configuration.
+<!-- vale off -->
+
+([VariableDynamicConfig](#variable-dynamic-config))
+
+<!-- vale on -->
+
+Default configuration.
 
 </dd>
 <dt>dynamic_config_key</dt>
 <dd>
 
-(string) Configuration key for DynamicConfig.
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for DynamicConfig.
 
 </dd>
 <dt>out_ports</dt>
 <dd>
 
-([VariableOuts](#variable-outs)) Output ports for the Variable component.
+<!-- vale off -->
+
+([VariableOuts](#variable-outs))
+
+<!-- vale on -->
+
+Output ports for the Variable component.
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### VariableDynamicConfig {#variable-dynamic-config}
+
+<!-- vale on -->
 
 <dl>
 <dt>constant_signal</dt>
 <dd>
 
+<!-- vale off -->
+
 ([ConstantSignal](#constant-signal))
+
+<!-- vale on -->
 
 </dd>
 </dl>
 
 ---
 
+<!-- vale off -->
+
 ### VariableOuts {#variable-outs}
+
+<!-- vale on -->
 
 Outputs for the Variable component.
 
@@ -4304,7 +7010,13 @@ Outputs for the Variable component.
 <dt>output</dt>
 <dd>
 
-([OutPort](#out-port)) The value is emitted to the output port.
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The value is emitted to the output port.
 
 </dd>
 </dl>

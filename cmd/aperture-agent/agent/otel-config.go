@@ -28,15 +28,15 @@ func provideAgent(
 	lis *listener.Listener,
 	promClient promapi.Client,
 	tlsConfig *tls.Config,
-) (*otelconfig.OTELConfig, error) {
-	var agentCfg agentconfig.AgentOTELConfig
+) (*otelconfig.OTelConfig, error) {
+	var agentCfg agentconfig.AgentOTelConfig
 	if err := unmarshaller.UnmarshalKey("otel", &agentCfg); err != nil {
 		return nil, err
 	}
 
-	otelCfg := otelconfig.NewOTELConfig()
-	otelCfg.SetDebugPort(&agentCfg.CommonOTELConfig)
-	otelCfg.AddDebugExtensions(&agentCfg.CommonOTELConfig)
+	otelCfg := otelconfig.NewOTelConfig()
+	otelCfg.SetDebugPort(&agentCfg.CommonOTelConfig)
+	otelCfg.AddDebugExtensions(&agentCfg.CommonOTelConfig)
 
 	addLogsPipeline(otelCfg, &agentCfg)
 	addTracesPipeline(otelCfg, lis)
@@ -44,13 +44,13 @@ func provideAgent(
 	if err := addCustomMetricsPipelines(otelCfg, &agentCfg); err != nil {
 		return nil, err
 	}
-	otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTELConfig, otelconsts.ProcessorAgentResourceLabels)
+	otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTelConfig, otelconsts.ProcessorAgentResourceLabels)
 	return otelCfg, nil
 }
 
 func addLogsPipeline(
-	config *otelconfig.OTELConfig,
-	userConfig *agentconfig.AgentOTELConfig,
+	config *otelconfig.OTelConfig,
+	userConfig *agentconfig.AgentOTelConfig,
 ) {
 	// Common dependencies for pipelines
 	config.AddReceiver(otelconsts.ReceiverOTLP, otlpreceiver.Config{})
@@ -87,7 +87,7 @@ func addLogsPipeline(
 	})
 }
 
-func addTracesPipeline(config *otelconfig.OTELConfig, lis *listener.Listener) {
+func addTracesPipeline(config *otelconfig.OTelConfig, lis *listener.Listener) {
 	config.AddExporter(otelconsts.ExporterOTLPLoopback, map[string]any{
 		"endpoint": lis.GetAddr(),
 		"tls": map[string]any{
@@ -120,8 +120,8 @@ func addTracesPipeline(config *otelconfig.OTELConfig, lis *listener.Listener) {
 }
 
 func addMetricsPipeline(
-	config *otelconfig.OTELConfig,
-	agentConfig *agentconfig.AgentOTELConfig,
+	config *otelconfig.OTelConfig,
+	agentConfig *agentconfig.AgentOTelConfig,
 	tlsConfig *tls.Config,
 	lis *listener.Listener,
 	promClient promapi.Client,
@@ -138,8 +138,8 @@ func addMetricsPipeline(
 }
 
 func addCustomMetricsPipelines(
-	config *otelconfig.OTELConfig,
-	agentConfig *agentconfig.AgentOTELConfig,
+	config *otelconfig.OTelConfig,
+	agentConfig *agentconfig.AgentOTelConfig,
 ) error {
 	config.AddProcessor(otelconsts.ProcessorCustomMetrics, map[string]any{
 		"attributes": []map[string]interface{}{
@@ -165,7 +165,7 @@ func addCustomMetricsPipelines(
 }
 
 func addCustomMetricsPipeline(
-	config *otelconfig.OTELConfig,
+	config *otelconfig.OTelConfig,
 	pipelineName string,
 	metricConfig agentconfig.CustomMetricsConfig,
 ) error {
@@ -322,14 +322,14 @@ func makeCustomMetricsConfigForKubeletStats() agentconfig.CustomMetricsConfig {
 }
 
 func addPrometheusReceiver(
-	config *otelconfig.OTELConfig,
-	agentConfig *agentconfig.AgentOTELConfig,
+	config *otelconfig.OTelConfig,
+	agentConfig *agentconfig.AgentOTelConfig,
 	tlsConfig *tls.Config,
 	lis *listener.Listener,
 ) {
 	scrapeConfigs := []map[string]any{
 		otelconfig.BuildApertureSelfScrapeConfig("aperture-self", tlsConfig, lis),
-		otelconfig.BuildOTELScrapeConfig("aperture-otel", agentConfig.CommonOTELConfig),
+		otelconfig.BuildOTelScrapeConfig("aperture-otel", agentConfig.CommonOTelConfig),
 	}
 
 	_, err := rest.InClusterConfig()
@@ -343,7 +343,7 @@ func addPrometheusReceiver(
 	}
 
 	// Unfortunately prometheus config structs do not have proper `mapstructure`
-	// tags, so they are not properly read by OTEL. Need to use bare maps instead.
+	// tags, so they are not properly read by OTel. Need to use bare maps instead.
 	config.AddReceiver(otelconsts.ReceiverPrometheus, map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{

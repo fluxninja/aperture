@@ -115,8 +115,8 @@ var _ = Describe("Controller Deployment", func() {
 								},
 							},
 						},
-						OTEL: controller.ControllerOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: controller.ControllerOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -340,8 +340,8 @@ var _ = Describe("Controller Deployment", func() {
 								},
 							},
 						},
-						OTEL: controller.ControllerOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: controller.ControllerOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,

@@ -119,7 +119,7 @@ definitions:
                 x-go-tag-default: "1.6"
                 x-go-tag-json: multiplier
                 x-go-tag-validate: gte=0
-        title: BackoffConfig holds configuration for GRPC Client Backoff.
+        title: BackoffConfig holds configuration for GRPC client backoff.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
     BatchAlertsConfig:
@@ -155,7 +155,7 @@ definitions:
                 x-go-tag-default: 1s
                 x-go-tag-json: timeout
                 x-go-tag-validate: gt=0
-        title: BatchAlertsConfig defines configuration for OTEL batch processor.
+        title: BatchAlertsConfig defines configuration for OTel batch processor.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
     ClientTLSConfig:
@@ -180,10 +180,10 @@ definitions:
                 type: string
                 x-go-name: KeyLogWriter
                 x-go-tag-json: key_log_file
-        title: ClientTLSConfig is the config for client TLS.
+        title: ClientTLSConfig is the configuration for client TLS.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
-    CommonOTELConfig:
+    CommonOTelConfig:
         properties:
             batch_alerts:
                 $ref: '#/definitions/BatchAlertsConfig'
@@ -191,10 +191,10 @@ definitions:
             ports:
                 $ref: '#/definitions/PortsConfig'
                 x-go-tag-json: ports
-        title: CommonOTELConfig is the configuration for the OTEL collector.
+        title: CommonOTelConfig is the configuration for the OTel collector.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
-    ControllerOTELConfig:
+    ControllerOTelConfig:
         properties:
             batch_alerts:
                 $ref: '#/definitions/BatchAlertsConfig'
@@ -202,7 +202,7 @@ definitions:
             ports:
                 $ref: '#/definitions/PortsConfig'
                 x-go-tag-json: ports
-        title: ControllerOTELConfig is the configuration for Agent's OTEL collector.
+        title: ControllerOTelConfig is the configuration for Controller's OTel collector.
         type: object
         x-go-package: github.com/fluxninja/aperture/cmd/aperture-controller/config
     Duration:
@@ -213,7 +213,7 @@ definitions:
     EtcdConfig:
         properties:
             endpoints:
-                description: List of Etcd server endpoints
+                description: List of etcd server endpoints
                 items:
                     type: string
                 minItems: 1
@@ -346,7 +346,7 @@ definitions:
                 x-go-tag-json: disable_compression
             disable_keep_alives:
                 default: false
-                description: Disable HTTP Keep Alives
+                description: Disable HTTP Keepalive
                 type: boolean
                 x-go-name: DisableKeepAlives
                 x-go-tag-default: "false"
@@ -370,7 +370,7 @@ definitions:
                 x-go-tag-json: idle_connection_timeout
                 x-go-tag-validate: gte=0s
             key_log_file:
-                description: SSL key log file (useful for debugging with wireshark)
+                description: SSL key log file (useful for debugging)
                 type: string
                 x-go-name: KeyLogWriter
                 x-go-tag-json: key_log_file
@@ -500,7 +500,7 @@ definitions:
         properties:
             disable_http_keep_alives:
                 default: false
-                description: Disable HTTP Keep Alives
+                description: Disable HTTP Keepalive
                 type: boolean
                 x-go-name: DisableHTTPKeepAlives
                 x-go-tag-default: "false"
@@ -599,7 +599,7 @@ definitions:
                 x-go-tag-validate: gt=0
             min_gogc:
                 default: 25
-                description: Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
+                description: Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid over scheduling.
                 exclusiveMinimum: true
                 format: int64
                 maximum: 100
@@ -629,7 +629,7 @@ definitions:
                 x-go-tag-validate: gt=0
             min_gogc:
                 default: 25
-                description: Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
+                description: Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid over scheduling.
                 exclusiveMinimum: true
                 format: int64
                 maximum: 100
@@ -643,11 +643,11 @@ definitions:
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/watchdog/config
     JobConfig:
-        description: JobConfig is config for Job
+        description: JobConfig is configuration for a periodic job
         properties:
             execution_period:
                 default: 10s
-                description: Time period between job executions. Zero or negative value means that the job will never execute periodically.
+                description: Time between job executions. Zero or negative value means that the job will never execute periodically.
                 format: string
                 type: string
                 x-go-name: ExecutionPeriod
@@ -722,7 +722,7 @@ definitions:
                 x-go-tag-validate: gte=0s
             network:
                 default: tcp
-                description: TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
+                description: TCP networks - `tcp`, `tcp4` (IPv4-only), `tcp6` (IPv6-only)
                 enum:
                     - tcp
                     - tcp4
@@ -773,7 +773,7 @@ definitions:
                 x-go-tag-json: non_blocking
             pretty_console:
                 default: false
-                description: 'Additional log writer: pretty console (stdout) logging (not recommended for prod environments)'
+                description: 'Additional log writer: pretty console (`stdout`) logging (not recommended for prod environments)'
                 type: boolean
                 x-go-name: PrettyConsole
                 x-go-tag-default: "false"
@@ -800,7 +800,7 @@ definitions:
                 x-go-tag-json: compress
             file:
                 default: stderr
-                description: Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+                description: Output file for logs. Keywords allowed - [`stderr`, `default`]. `default` maps to `/var/log/fluxninja/<service>.log`
                 type: string
                 x-go-name: File
                 x-go-tag-default: stderr
@@ -856,7 +856,7 @@ definitions:
                 x-go-tag-json: enable_process_collector
             pedantic:
                 default: false
-                description: Pedantic controls whether a pedantic Registerer is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
+                description: Pedantic controls whether a pedantic registry is used. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
                 type: boolean
                 x-go-name: Pedantic
                 x-go-tag-default: "false"
@@ -868,7 +868,7 @@ definitions:
         properties:
             execution_period:
                 default: 10s
-                description: Time period between job executions. Zero or negative value means that the job will never execute periodically.
+                description: Time between job executions. Zero or negative value means that the job will never execute periodically.
                 format: string
                 type: string
                 x-go-name: ExecutionPeriod
@@ -908,7 +908,7 @@ definitions:
     PortsConfig:
         properties:
             debug_port:
-                description: Port on which otel collector exposes prometheus metrics on /metrics path.
+                description: Port on which OTel collector exposes Prometheus metrics on /metrics path.
                 format: uint32
                 minimum: 0
                 type: integer
@@ -926,7 +926,7 @@ definitions:
                 x-go-tag-json: health_check_port
                 x-go-tag-validate: gte=0
             pprof_port:
-                description: Port on which pprof extension in exposed.
+                description: Port on which `pprof` extension in exposed.
                 format: uint32
                 minimum: 0
                 type: integer
@@ -935,7 +935,7 @@ definitions:
                 x-go-tag-json: pprof_port
                 x-go-tag-validate: gte=0
             zpages_port:
-                description: Port on which zpages extension in exposed.
+                description: Port on which `zpages` extension in exposed.
                 format: uint32
                 minimum: 0
                 type: integer
@@ -943,14 +943,14 @@ definitions:
                 x-go-tag-default: "55679"
                 x-go-tag-json: zpages_port
                 x-go-tag-validate: gte=0
-        title: PortsConfig defines configuration for OTEL debug and extension ports.
+        title: PortsConfig defines configuration for OTel debug and extension ports.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/otelcollector/config
     ProfilersConfig:
         properties:
             cpu_profiler:
                 default: false
-                description: Flag to enable cpu profiling on process start and save it to a file. HTTP interface will not work if this is enabled as CPU profile will always be running.
+                description: Flag to enable CPU profiling on process start and save it to a file. HTTP interface won't work if this is enabled as CPU profile will always be running.
                 type: boolean
                 x-go-name: CPUProfile
                 x-go-tag-default: "false"
@@ -964,7 +964,7 @@ definitions:
                 x-go-tag-json: profiles_path
             register_http_routes:
                 default: true
-                description: Register routes. Profile types profile, symbol and cmdline will be registered at /debug/pprof/{profile,symbol,cmdline}.
+                description: Register routes. Profile types `profile`, `symbol` and `cmdline` will be registered at `/debug/pprof/{profile,symbol,cmdline}`.
                 type: boolean
                 x-go-name: RegisterHTTPRoutes
                 x-go-tag-default: "true"
@@ -975,7 +975,7 @@ definitions:
     PrometheusConfig:
         properties:
             address:
-                description: Address of the prometheus server
+                description: Address of the Prometheus server
                 pattern: ((^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)
                 type: string
                 x-go-name: Address
@@ -1123,7 +1123,7 @@ definitions:
                     - 0.9
                     - 0.95
                     - 0.99
-                description: Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
+                description: Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It's recommended to set an extreme watermark for the last element (for example, 0.99).
                 items:
                     format: double
                     type: number
@@ -1197,11 +1197,11 @@ paths:
             x-fn-config-env: true
     /otel:
         post:
-            operationId: OTEL
+            operationId: OTel
             parameters:
                 - in: body
                   schema:
-                    $ref: '#/definitions/ControllerOTELConfig'
+                    $ref: '#/definitions/ControllerOTelConfig'
             tags:
                 - controller-configuration
             x-fn-config-env: true

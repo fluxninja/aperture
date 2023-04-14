@@ -31,9 +31,9 @@ message AutoScale {
   oneof component {
     // PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
     PodScaler pod_scaler = 1;
-    // _AutoScaler_ provides auto-scaling functionality for any scalable resource.
+    // _AutoScaler_ provides auto scaling functionality for any scalable resource.
     AutoScaler auto_scaler = 2;
-    // _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource.
+    // _PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource.
     PodAutoScaler pod_auto_scaler = 3;
   }
 }
@@ -109,9 +109,9 @@ message IncreasingGradient {
   Ins in_ports = 1;
 
   // Gradient parameters for the controller. Defaults and constraints:
-  // * slope = 1
-  // * min_gradient = 1 (cannot be changed)
-  // * max_gradient = +Inf (must be greater than 1)
+  // * `slope` = 1
+  // * `min_gradient` = 1 (can't be changed)
+  // * `max_gradient` = +Inf (must be greater than 1)
   Parameters parameters = 2;
 }
 
@@ -136,9 +136,9 @@ message DecreasingGradient {
   Ins in_ports = 1;
 
   // Gradient parameters for the controller. Defaults and constraints:
-  // * slope = 1
-  // * min_gradient = -Inf (must be less than 1)
-  // * max_gradient = 1 (cannot be changed)
+  // * `slope` = 1
+  // * `min_gradient` = -Inf (must be less than 1)
+  // * `max_gradient` = 1 (can't be changed)
   Parameters parameters = 2;
 }
 
@@ -152,7 +152,7 @@ message ScaleOutController {
   // Controller
   Controller controller = 1; // @gotags: validate:"required"
 
-  // Configuration for embedded alerter.
+  // Configuration for embedded Alerter.
   Alerter.Parameters alerter_parameters = 2;
 }
 
@@ -166,7 +166,7 @@ message ScaleInController {
   // Controller
   Controller controller = 1;
 
-  // Configuration for embedded alerter.
+  // Configuration for embedded Alerter.
   Alerter.Parameters alerter_parameters = 2;
 }
 
@@ -182,7 +182,7 @@ message KubernetesReplicas {
   PodScaler.ScaleActuator.DynamicConfig default_config = 3;
 }
 
-// _AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
+// _AutoScaler_ provides auto scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto scale.
 message AutoScaler {
   message Scaler {
     oneof scaler {
@@ -202,9 +202,9 @@ message AutoScaler {
 
   Scaler scaler = 2; // @gotags: validate:"required"
 
-  // The minimum scale to which the _AutoScaler_ can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+  // The minimum scale to which the _AutoScaler_ can scale-in. For example, in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
   int64 min_scale = 3; // @gotags: default:"0" validate:"gte=0"
-  // The maximum scale to which the _AutoScaler_ can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+  // The maximum scale to which the _AutoScaler_ can scale-out. For example, in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
   int64 max_scale = 4; // @gotags: default:"9223372036854775807" validate:"gt=0"
 
   // List of _Controllers_ for scaling out.
@@ -212,9 +212,9 @@ message AutoScaler {
   // List of _Controllers_ for scaling in.
   repeated ScaleInController scale_in_controllers = 6;
 
-  // The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+  // The maximum increase of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
   double max_scale_out_percentage = 8; // @gotags: default:"10"
-  // The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+  // The maximum decrease of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
   double max_scale_in_percentage = 7; // @gotags: default:"1"
 
   // The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
@@ -227,14 +227,14 @@ message AutoScaler {
   // scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
   double cooldown_override_percentage = 11; // @gotags: default:"50"
 
-  // Configuration for scale-out alerter.
+  // Configuration for scale-out Alerter.
   Alerter.Parameters scale_out_alerter_parameters = 12;
 
-  // Configuration for scale-in alerter.
+  // Configuration for scale-in Alerter.
   Alerter.Parameters scale_in_alerter_parameters = 13;
 }
 
-// _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
+// _PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto scale.
 message PodAutoScaler {
   // Outputs for _PodAutoScaler_.
   message Outs {
@@ -258,9 +258,9 @@ message PodAutoScaler {
   // List of _Controllers_ for scaling in.
   repeated ScaleInController scale_in_controllers = 6;
 
-  // The maximum increase of replicas (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+  // The maximum increase of replicas (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
   double max_scale_out_percentage = 8; // @gotags: default:"10"
-  // The maximum decrease of replicas (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+  // The maximum decrease of replicas (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
   double max_scale_in_percentage = 7; // @gotags: default:"1"
 
   // The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
@@ -273,9 +273,9 @@ message PodAutoScaler {
   // scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
   double cooldown_override_percentage = 11; // @gotags: default:"50"
 
-  // Configuration for scale-out alerter.
+  // Configuration for scale-out Alerter.
   Alerter.Parameters scale_out_alerter_parameters = 12;
 
-  // Configuration for scale-in alerter.
+  // Configuration for scale-in Alerter.
   Alerter.Parameters scale_in_alerter_parameters = 13;
 }

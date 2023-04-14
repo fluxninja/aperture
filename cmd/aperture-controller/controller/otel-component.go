@@ -30,8 +30,8 @@ import (
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 )
 
-// ModuleForControllerOTEL provides fx options for ControllerOTELComponents.
-func ModuleForControllerOTEL() fx.Option {
+// ModuleForControllerOTel provides fx options for ControllerOTelComponents.
+func ModuleForControllerOTel() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			fx.Annotate(
@@ -39,7 +39,7 @@ func ModuleForControllerOTEL() fx.Option {
 				fx.ResultTags(otelconfig.BaseFxTag),
 			),
 			fx.Annotate(
-				ControllerOTELComponents,
+				ControllerOTelComponents,
 				fx.ParamTags(
 					alerts.AlertsFxTag,
 					config.GroupTag(otelcollector.ReceiverFactoriesFxTag),
@@ -50,8 +50,8 @@ func ModuleForControllerOTEL() fx.Option {
 	)
 }
 
-// ControllerOTELComponents constructs OTEL Collector Factories for Controller.
-func ControllerOTELComponents(
+// ControllerOTelComponents constructs OTel Collector Factories for Controller.
+func ControllerOTelComponents(
 	alerter alerts.Alerter,
 	receiverFactories []receiver.Factory,
 	processorFactories []processor.Factory,

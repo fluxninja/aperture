@@ -11,22 +11,23 @@ See also [_Classifier_ reference][reference]
 
 The _Classifier_ can be used to create additional [_Flow Labels_][label] based
 on request metadata without requiring any changes to your service, if the
-existing flow labels are not sufficient.
+existing flow labels aren't sufficient.
 
-To define a classifier, it needs to be added as a resource in a
+To define a Classifier, it needs to be added as a resource in a
 [policy][policies]. It specifies a set of rules to create new flow labels based
 on request metadata. Envoy's [External Authorization][ext-authz] definition is
 used by Aperture to describe the request metadata, specifically the
-[AttributeContext][attr-context]. An example of how the request attributes might
-look can be seen in the [INPUT section at this Rego
+[`AttributeContext`][attr-context]. An example of how the request attributes
+might look can be seen in the [INPUT section at this Rego
 playground][rego-playground].
 
 :::note
 
 At _Feature_ [_Control Points_][control-point], developers can already provide
-arbitrary flow labels by setting baggage or directly as arguments to the Check()
-call. As flow labels can be easily provided at _Feature_ control points by the
-developers, _Classifiers_ are available only at _HTTP_ control points.
+arbitrary flow labels by setting baggage or directly as arguments to the
+`Check()` call. As flow labels can be effortlessly provided at _Feature_ control
+points by the developers, _Classifiers_ are available only at _HTTP_ control
+points.
 
 :::
 
@@ -47,7 +48,7 @@ Both these behaviors (baggage propagation and inclusion in telemetry) can be
 :::caution
 
 Although Classifier is defined as a resource in a [_Policy_][policies], _Flow
-Labels_ are not namespaced in any way and are shared across policies.
+Labels_ aren't isolated in any way and are shared across policies.
 
 :::
 
@@ -65,8 +66,8 @@ selector:
     control_point: ingress
 ```
 
-You can be more precise by adding a [_Label Matcher_][label-matcher] and e.g.
-gate the classifier to particular paths.
+You can be more precise by adding a [_Label Matcher_][label-matcher] and, for
+example, gate the Classifier to particular paths.
 
 ## Live Previewing Requests {#live-previewing-requests}
 
@@ -144,7 +145,7 @@ Returns:
 
 Alternatively, you can use the
 [Introspection API](reference/api/agent/flow-preview-service-preview-http-requests.api.mdx)
-directly on an `aperture-agent` local to the service instances (pods):
+directly on a `aperture-agent` local to the service instances (pods):
 
 ```sh
 curl -X POST localhost:8080/v1/flowcontrol/preview/http_requests/service1-demo-app.demoapp.svc.cluster.local/ingress?samples=1
@@ -152,21 +153,21 @@ curl -X POST localhost:8080/v1/flowcontrol/preview/http_requests/service1-demo-a
 
 ## Rules ([reference][rule]) {#rules}
 
-In addition to the selector, a classifier needs to specify classification rules.
+In addition to the selector, a Classifier needs to specify classification rules.
 Each classification rule consists of:
 
-- flow label key,
-- a rule how to extract the flow label value based on request metadata.
+- _Flow Label_ key,
+- A rule how to extract the flow label value based on request metadata.
 
 There are two ways to specify a classification rule: using declarative
-extractors and [rego][rego] modules. [See examples in reference][rule].
+extractors and [Rego][rego] modules. [See examples in reference][rule].
 
 :::caution Request body availability
 
-Possibility of extracting values from request body depends on how [External
-Authorization in Envoy][ext-authz-extension] was configured. Sample [Istio
-Configuration][install-istio] provided by FluxNinja doesn't enable request body
-buffering by default, as it _might_ break some streaming APIs.
+The possibility of extracting values from the request body depends on how
+[External Authorization in Envoy][ext-authz-extension] was configured. The
+Sample [Istio Configuration][install-istio] provided by FluxNinja doesn't enable
+request body buffering by default, as it _might_ break some streaming APIs.
 
 :::
 
@@ -175,32 +176,37 @@ buffering by default, as it _might_ break some streaming APIs.
 Extractors are declarative recipes how to extract flow label value from
 metadata. Provided extractors include:
 
-- extracting values from headers,
-- grabbing a field from json-encoded request payload,
-- parsing JWT tokens,
-- and others.
+- Extracting values from headers
+- Parsing a field from JSON encoded request payload
+- Parsing JWT tokens
 
-Aperture aims to expand the set of extractors to cover most-common usecases.
+Aperture aims to expand the set of extractors to cover the most-common use
+cases.
 
 :::caution
 
 Keys of flow labels created by extractors must be valid [Rego][rego] identifiers
-(allowed are alphanumeric characters and underscore; also label name cannot be a
+(alphanumeric characters and underscore are allowed; also, label name can't be a
 [Rego keyword][rego-kw], like `if` or `default`). This limitation may be lifted
-in future.
+in the future.
 
 :::
 
 :::note
 
-Extracting value from header may seem not useful, as the value is already
-available as flow label ([as `http.request.header.<header>`][request-labels]),
-but adding flow label explicitly may still be useful, as it enables baggage
-propagation and telemetry for this flow label.
+Extracting the value from the header may seem not useful, as the value is
+already available as _Flow Label_ ([as
+`http.request.header.<header>`][request-labels]), but adding flow label
+explicitly may still be useful, as it enables baggage propagation and telemetry
+for this flow label.
 
 :::
 
+<!-- vale off -->
+
 ### Rego ([reference][rego-rule]) {#rego}
+
+<!-- vale on -->
 
 For more advanced cases, you can define the extractor in [the Rego
 language][rego].

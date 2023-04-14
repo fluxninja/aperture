@@ -51,7 +51,7 @@ The created instance can then be used to start a flow:
         flow.end(FlowStatus.Error)
 ```
 
-You can also use the flow as context manager:
+You can also use the flow as a context manager:
 
 ```python
   with aperture_client.start_flow(
@@ -77,9 +77,8 @@ helpful to handle specific routes in your service.
     return "Flow was accepted", 202
 ```
 
-For more context on how to use Aperture Python SDK to set feature Control
-Points, you can take a look at the [example app][example] available in our
-repository.
+For more context on using the Aperture Python SDK to set feature Control Points,
+refer to the [example app][example] available in the repository.
 
 <!--- TODO: Change to pypi package once it is published. --->
 

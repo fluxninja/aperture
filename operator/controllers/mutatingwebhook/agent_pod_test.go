@@ -85,8 +85,8 @@ var _ = Describe("Sidecar container for Agent", func() {
 							MemberlistBindAddr: ":3322",
 							BindAddr:           ":3320",
 						},
-						OTEL: agent.AgentOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: agent.AgentOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -220,8 +220,8 @@ var _ = Describe("Sidecar container for Agent", func() {
 							MemberlistBindAddr: ":3322",
 							BindAddr:           ":3320",
 						},
-						OTEL: agent.AgentOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: agent.AgentOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -400,8 +400,8 @@ var _ = Describe("Sidecar container for Agent", func() {
 							MemberlistBindAddr: ":3322",
 							BindAddr:           ":3320",
 						},
-						OTEL: agent.AgentOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: agent.AgentOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -654,8 +654,8 @@ var _ = Describe("Pod modification for Agent", func() {
 							MemberlistBindAddr: ":3322",
 							BindAddr:           ":3320",
 						},
-						OTEL: agent.AgentOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: agent.AgentOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,
@@ -809,8 +809,8 @@ var _ = Describe("Pod modification for Agent", func() {
 							MemberlistBindAddr: ":3322",
 							BindAddr:           ":3320",
 						},
-						OTEL: agent.AgentOTELConfig{
-							CommonOTELConfig: otelconfig.CommonOTELConfig{
+						OTel: agent.AgentOTelConfig{
+							CommonOTelConfig: otelconfig.CommonOTelConfig{
 								Ports: otelconfig.PortsConfig{
 									DebugPort:       8888,
 									HealthCheckPort: 13133,

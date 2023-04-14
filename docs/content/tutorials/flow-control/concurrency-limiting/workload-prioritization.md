@@ -16,52 +16,53 @@ When services are resource constrained and concurrency limits are being applied,
 it's often crucial to preserve key user-experience by gracefully degrading
 application behavior. Graceful degradation allows prioritizing business critical
 features while throttling background workloads and less critical features. For
-instance, for an e-commerce application, ability to check out a shopping cart is
-more critical than personalized recommendations and should be prioritized when
-resources are constrained.
+instance, for an e-commerce application, the ability to check out a shopping
+cart is more critical than personalized recommendations and should be
+prioritized when resources are constrained.
 
 Aperture's
 [weighted fair queuing scheduler](/concepts/flow-control/components/concurrency-limiter.md#scheduler)
-allows fairly prioritizing certain flows over others based on their flow labels.
-This enables graceful degradation in face of overloads and other failures, and
-maximizes user-experience or revenue.
+enables prioritization of certain flows over others based on their flow labels,
+ensuring that the user experience or revenue is maximized in the face of
+overloads and other failures, while maintaining graceful degradation.
 
 ## Policy
 
-We will be extending the policy we used in
+The policy used in
 [Basic Concurrency Limiting](../concurrency-limiting/basic-concurrency-limiting.md)
-to classify requests into workloads and prioritize them.
+will be extended to classify requests into workloads and prioritize them.
 
-In this example policy, we will be prioritizing traffic of different types of
-users - `subscriber` users will get higher priority over `guest` users. That is,
-under overload scenarios, subscribed users will get better quality of service
-over guest users. We will be using 2 alternative ways to provide the `User-Type`
-value to the scheduler:
+In this example policy, traffic of different types of users will be prioritized,
+with `subscriber` users receiving higher priority over `guest` users. This means
+that under overload scenarios, subscribed users will receive better quality of
+service than guest users. Two alternative methods will be used to provide the
+`User-Type` value to the scheduler:
 
-- Subscribers: We will directly match the header value of `User-Type` to
-  `subscriber` since all HTTP headers are directly available as flow labels
+- Subscribers: The header value of `User-Type` will be directly matched to
+  `subscriber`, since all HTTP headers are directly available as flow labels
   within the scheduler.
-- Guests: To identify guest users, we will first use a classification rule that
-  uses an [extractor](concepts/flow-control/resources/classifier.md#extractors)
-  to assign the header value to `user-type` flow label key. Ultimately, we will
-  be using the `user_type` label key in the scheduler to match the request
-  against `guest` value to identify the workload.
+- Guests: To identify guest users, a classification rule will be used that
+  utilizes an
+  [extractor](concepts/flow-control/resources/classifier.md#extractors) to
+  assign the header value to the `user-type` flow label key. The `user_type`
+  label key will then be used in the scheduler to match the request against the
+  `guest` value to identify the workload.
 
 :::tip
 
-You can quickly write classification rules on
-[HTTP requests](concepts/flow-control/resources/classifier.md#live-previewing-requests)
-and define scheduler priorities on
+Classification rules can be written for
+[HTTP requests](concepts/flow-control/resources/classifier.md#live-previewing-requests),
+and scheduler priorities can be defined for
 [Flow Labels](concepts/flow-control/flow-label.md#live-previewing-flow-labels)
 by live previewing them first via introspection APIs.
 
 :::
 
-In addition, we will be configuring the scheduler to automatically assign the
-tokens that need to be obtained in order to accept requests matching a given
-workload. This continuous estimation (auto-tokens) helps with fair scheduling
-and prioritization across workloads. This additional configuration is
-highlighted in the Jsonnet spec below.
+To improve fairness and prioritization across workloads, the scheduler will be
+configured to automatically assign tokens for accepting requests that match a
+given workload. This is achieved through continuous estimation of tokens (auto
+tokens) performed by the scheduler itself. The additional configuration required
+to enable this feature is highlighted in the Jsonnet spec below.
 
 ```mdx-code-block
 <Tabs>
@@ -109,9 +110,9 @@ The traffic generator in the [playground](/get-started/playground/playground.md)
 is configured to generate similar traffic pattern (number of concurrent users)
 for 2 types of users - subscribers and guests.
 
-When we load the above policy in the playground, we will see the that during the
-overload period, `subscriber` users have higher acceptance rate of their
-requests than `guest` users.
+Loading the policy highlighted above in the playground will reveal that, during
+overload periods, requests from `subscriber` users have a higher acceptance rate
+than those from `guest` users.
 
 <Zoom>
 

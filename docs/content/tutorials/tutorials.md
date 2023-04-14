@@ -17,9 +17,9 @@ tutorials cover a wide range of topics to help you get started with Aperture.
 
 ## Signal Processing
 
-We’ll build a circuit that baselines a latency metric in order to detect
-overloads. This basic circuit can be extended further to send an Alert or take a
-corrective action.
+We’ll build a circuit that baselines a latency metric to detect overloads. This
+basic circuit can be extended further to send an Alert or take a corrective
+action.
 
 - [Writing Policy for Detecting Overload](./signal-processing/detecting-overload.md)
 
@@ -30,8 +30,8 @@ use cases leveraging Flow Control integration.
 
 ### Flow Control
 
-- [GraphQL Query Static Rate Limiting](./flow-control/classification/graphql-rate-limiting.md)
-- [Static Rate Limiting](./flow-control/rate-limiting/static-rate-limiting.md)
+- [GraphQL Query Static Rate-Limiting](./flow-control/classification/graphql-rate-limiting.md)
+- [Static Rate-Limiting](./flow-control/rate-limiting/static-rate-limiting.md)
 - [Basic Concurrency Limiting](./flow-control/concurrency-limiting/basic-concurrency-limiting.md)
 - [Workload Prioritization](./flow-control/concurrency-limiting/workload-prioritization.md)
-- [Rate Limiting Escalation](./flow-control/concurrency-limiting/rate-limiting-escalation.md)
+- [Rate-Limiting Escalation](./flow-control/concurrency-limiting/rate-limiting-escalation.md)

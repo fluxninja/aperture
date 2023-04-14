@@ -49,7 +49,7 @@ func main() {
 		flowcontrol.Module(),
 		autoscale.Module(),
 		otelcollector.Module(),
-		agent.ModuleForAgentOTEL(),
+		agent.ModuleForAgentOTel(),
 		discovery.Module(),
 		election.Module(),
 		rpc.ClientModule,

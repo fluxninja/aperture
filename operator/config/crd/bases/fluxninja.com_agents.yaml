@@ -949,9 +949,9 @@ spec:
                     description: AgentInfo configuration.
                     properties:
                       agent_group:
-                        description: "All agents within an agent_group receive the
-                          same data-plane configuration (e.g. Flux Meters, Rate Limiters
-                          etc). \n [Read more about agent groups here](/concepts/flow-control/flow-selector.md#agent-group)."
+                        description: "All agents within an `agent_group` receive the
+                          same data-plane configuration (for example, Flux Meters,
+                          Rate Limiters etc). \n [Read more about agent groups here](/concepts/flow-control/flow-selector.md#agent-group)."
                         type: string
                     type: object
                   alertmanagers:
@@ -974,7 +974,7 @@ spec:
                                   description: Disable Compression
                                   type: boolean
                                 disable_keep_alives:
-                                  description: Disable HTTP Keep Alives
+                                  description: Disable HTTP Keepalive
                                   type: boolean
                                 expect_continue_timeout:
                                   description: Expect Continue Timeout. 0 = no timeout.
@@ -983,8 +983,7 @@ spec:
                                   description: Idle Connection Timeout. 0 = no timeout.
                                   type: string
                                 key_log_file:
-                                  description: SSL key log file (useful for debugging
-                                    with wireshark)
+                                  description: SSL key log file (useful for debugging)
                                   type: string
                                 max_conns_per_host:
                                   description: Max Connections Per Host. 0 = no limit.
@@ -1062,11 +1061,11 @@ spec:
                     description: AutoScale configuration.
                     properties:
                       kubernetes:
-                        description: AutoScaleKubernetesConfig holds auto scale kubernetes
+                        description: AutoScaleKubernetesConfig holds auto-scale kubernetes
                           configuration.
                         properties:
                           enabled:
-                            description: Enables the Kubernetes autoscale capability.
+                            description: Enables the Kubernetes auto scale capability.
                             type: boolean
                         required:
                         - enabled
@@ -1096,11 +1095,13 @@ spec:
                           bind to for communication with other peer nodes.
                         type: string
                       memberlist_advertise_addr:
-                        description: Address of memberlist to advertise to other cluster
-                          members. Used for nat traversal if provided.
+                        description: Address of [`memberlist`](https://github.com/hashicorp/memberlist)
+                          to advertise to other cluster members. Used for NAT traversal
+                          if provided.
                         type: string
                       memberlist_bind_addr:
-                        description: Address to bind mememberlist server to.
+                        description: Address to bind [`memberlist`](https://github.com/hashicorp/memberlist)
+                          server to.
                         type: string
                       replica_count:
                         description: ReplicaCount is 1 by default.
@@ -1110,7 +1111,7 @@ spec:
                     description: Etcd configuration.
                     properties:
                       endpoints:
-                        description: List of Etcd server endpoints
+                        description: List of etcd server endpoints
                         items:
                           type: string
                         type: array
@@ -1152,8 +1153,8 @@ spec:
                     description: FluxNinja ARC extension configuration.
                     properties:
                       api_key:
-                        description: API Key for this agent. If this key is not set,
-                          the extension will not be enabled.
+                        description: API Key for this agent. If this key isn't set,
+                          the extension won't be enabled.
                         type: string
                       client:
                         description: Client configuration.
@@ -1208,7 +1209,7 @@ spec:
                                 description: Disable Compression
                                 type: boolean
                               disable_keep_alives:
-                                description: Disable HTTP Keep Alives
+                                description: Disable HTTP Keepalive
                                 type: boolean
                               expect_continue_timeout:
                                 description: Expect Continue Timeout. 0 = no timeout.
@@ -1217,8 +1218,7 @@ spec:
                                 description: Idle Connection Timeout. 0 = no timeout.
                                 type: string
                               key_log_file:
-                                description: SSL key log file (useful for debugging
-                                  with wireshark)
+                                description: SSL key log file (useful for debugging)
                                 type: string
                               max_conns_per_host:
                                 description: Max Connections Per Host. 0 = no limit.
@@ -1284,9 +1284,9 @@ spec:
                             type: object
                         type: object
                       endpoint:
-                        description: Address to grpc or http(s) server listening in
-                          agent service. To use http protocol, the address must start
-                          with http(s)://.
+                        description: Address to GRPC or HTTP(s) server listening in
+                          agent service. To use HTTP protocol, the address must start
+                          with `http(s)://`.
                         type: string
                       heartbeat_interval:
                         description: Interval between each heartbeat.
@@ -1303,7 +1303,7 @@ spec:
                         description: Disable Compression
                         type: boolean
                       disable_keep_alives:
-                        description: Disable HTTP Keep Alives
+                        description: Disable HTTP Keepalive
                         type: boolean
                       expect_continue_timeout:
                         description: Expect Continue Timeout. 0 = no timeout.
@@ -1312,7 +1312,7 @@ spec:
                         description: Idle Connection Timeout. 0 = no timeout.
                         type: string
                       key_log_file:
-                        description: SSL key log file (useful for debugging with wireshark)
+                        description: SSL key log file (useful for debugging)
                         type: string
                       max_conns_per_host:
                         description: Max Connections Per Host. 0 = no limit.
@@ -1398,9 +1398,8 @@ spec:
                         description: Service settings.
                         properties:
                           execution_period:
-                            description: Time period between job executions. Zero
-                              or negative value means that the job will never execute
-                              periodically.
+                            description: Time between job executions. Zero or negative
+                              value means that the job will never execute periodically.
                             type: string
                           execution_timeout:
                             description: Execution timeout
@@ -1421,7 +1420,7 @@ spec:
                           high throughput)
                         type: boolean
                       pretty_console:
-                        description: 'Additional log writer: pretty console (stdout)
+                        description: 'Additional log writer: pretty console (`stdout`)
                           logging (not recommended for prod environments)'
                         type: boolean
                       writers:
@@ -1435,7 +1434,7 @@ spec:
                               type: boolean
                             file:
                               description: Output file for logs. Keywords allowed
-                                - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+                                - [`stderr`, `default`]. `default` maps to `/var/log/fluxninja/<service>.log`
                               type: string
                             max_age:
                               description: Max age in days for log files
@@ -1461,12 +1460,12 @@ spec:
                           collector is registered on startup. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewProcessCollector>
                         type: boolean
                       pedantic:
-                        description: Pedantic controls whether a pedantic Registerer
-                          is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
+                        description: Pedantic controls whether a pedantic registry
+                          is used. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
                         type: boolean
                     type: object
                   otel:
-                    description: OTEL configuration.
+                    description: OTel configuration.
                     properties:
                       batch_alerts:
                         description: BatchAlerts configures batch alerts processor.
@@ -1529,7 +1528,7 @@ spec:
                         additionalProperties:
                           description: "CustomMetricsConfig defines receivers, processors,
                             and single metrics pipeline which will be exported to
-                            the controller prometheus. Environment variables can be
+                            the controller Prometheus. Environment variables can be
                             used in the configuration using format `${ENV_VAR_NAME}`.
                             \n :::info See also [Get Started / Setup Integrations
                             / Metrics](/get-started/integrations/metrics/metrics.md).
@@ -1538,12 +1537,12 @@ spec:
                             per_agent_group:
                               description: PerAgentGroup marks the pipeline to be
                                 instantiated only once per agent group. This is helpful
-                                for receivers that scrape eg. some cluster-wide metrics.
-                                When not set, pipeline will be instatiated on every
-                                Agent.
+                                for receivers that scrape for example, some cluster-wide
+                                metrics. When not set, pipeline will be instantiated
+                                on every Agent.
                               type: boolean
                             pipeline:
-                              description: "Pipeline is an OTEL metrics pipeline definition,
+                              description: "Pipeline is an OTel metrics pipeline definition,
                                 which **only** uses receivers and processors defined
                                 above. Exporter would be added automatically. \n If
                                 there are no processors defined or only one processor
@@ -1564,18 +1563,18 @@ spec:
                               type: object
                             processors:
                               description: Processors define processors to be used
-                                in custom metrics pipelines. This should be in OTEL
+                                in custom metrics pipelines. This should be in OTel
                                 format - https://opentelemetry.io/docs/collector/configuration/#processors.
                               x-kubernetes-preserve-unknown-fields: true
                             receivers:
                               description: Receivers define receivers to be used in
-                                custom metrics pipelines. This should be in OTEL format
+                                custom metrics pipelines. This should be in OTel format
                                 - https://opentelemetry.io/docs/collector/configuration/#receivers.
                               x-kubernetes-preserve-unknown-fields: true
                           type: object
-                        description: CustomMetrics configures custom metrics OTEL
-                          pipelines, which will send data to the controller prometheus.
-                          Key in this map refers to OTEL pipeline name. Prefixing
+                        description: CustomMetrics configures custom metrics OTel
+                          pipelines, which will send data to the controller Prometheus.
+                          Key in this map refers to OTel pipeline name. Prefixing
                           pipeline name with `metrics/` is optional, as all the components
                           and pipeline names would be normalized. By default `kubeletstats`
                           custom metrics is added, which can be overwritten.
@@ -1585,7 +1584,7 @@ spec:
                           ports values.
                         properties:
                           debug_port:
-                            description: Port on which otel collector exposes prometheus
+                            description: Port on which OTel collector exposes Prometheus
                               metrics on /metrics path.
                             format: int32
                             type: integer
@@ -1594,11 +1593,11 @@ spec:
                             format: int32
                             type: integer
                           pprof_port:
-                            description: Port on which pprof extension in exposed.
+                            description: Port on which `pprof` extension in exposed.
                             format: int32
                             type: integer
                           zpages_port:
-                            description: Port on which zpages extension in exposed.
+                            description: Port on which `zpages` extension in exposed.
                             format: int32
                             type: integer
                         type: object
@@ -1609,15 +1608,15 @@ spec:
                       advertisement_addr:
                         description: Network address of aperture server to advertise
                           to peers - this address should be reachable from other agents.
-                          Used for nat traversal when provided.
+                          Used for NAT traversal when provided.
                         type: string
                     type: object
                   profilers:
                     description: Profilers configuration.
                     properties:
                       cpu_profiler:
-                        description: Flag to enable cpu profiling on process start
-                          and save it to a file. HTTP interface will not work if this
+                        description: Flag to enable CPU profiling on process start
+                          and save it to a file. HTTP interface won't work if this
                           is enabled as CPU profile will always be running.
                         type: boolean
                       profiles_path:
@@ -1625,15 +1624,15 @@ spec:
                           path is `/var/log/aperture/<service>/profiles`.
                         type: string
                       register_http_routes:
-                        description: Register routes. Profile types profile, symbol
-                          and cmdline will be registered at /debug/pprof/{profile,symbol,cmdline}.
+                        description: Register routes. Profile types `profile`, `symbol`
+                          and `cmdline` will be registered at `/debug/pprof/{profile,symbol,cmdline}`.
                         type: boolean
                     type: object
                   prometheus:
                     description: Prometheus configuration.
                     properties:
                       address:
-                        description: Address of the prometheus server
+                        description: Address of the Prometheus server
                         type: string
                     type: object
                   readiness:
@@ -1660,9 +1659,8 @@ spec:
                         description: Service settings.
                         properties:
                           execution_period:
-                            description: Time period between job executions. Zero
-                              or negative value means that the job will never execute
-                              periodically.
+                            description: Time between job executions. Zero or negative
+                              value means that the job will never execute periodically.
                             type: string
                           execution_timeout:
                             description: Execution timeout
@@ -1676,7 +1674,7 @@ spec:
                     description: Sentry extension configuration.
                     properties:
                       attach_stack_trace:
-                        description: Configure to generate and attach stacktraces
+                        description: Configure to generate and attach stack traces
                           to capturing message calls
                         type: boolean
                       debug:
@@ -1686,19 +1684,18 @@ spec:
                         description: Sentry crash report disabled
                         type: boolean
                       dsn:
-                        description: If DSN is not set, the client is effectively
-                          disabled You can set test project's dsn to send log events.
-                          oss-aperture project dsn is set as default.
+                        description: If DSN isn't set, the client is effectively disabled
+                          You can set test project's DSN to send log events. oss-aperture
+                          project DSN is set as default.
                         type: string
                       environment:
                         description: Environment
                         type: string
                       sample_rate:
-                        description: Sample rate for event submission i.e. 0.0 to
-                          1.0
+                        description: Sample rate for event submission
                         type: number
                       traces_sample_rate:
-                        description: Sample rate for sampling traces i.e. 0.0 to 1.0
+                        description: Sample rate for sampling traces
                         type: number
                     type: object
                   server:
@@ -1732,7 +1729,7 @@ spec:
                         description: HTTP server configuration.
                         properties:
                           disable_http_keep_alives:
-                            description: Disable HTTP Keep Alives
+                            description: Disable HTTP Keepalive
                             type: boolean
                           idle_timeout:
                             description: Idle timeout
@@ -1766,8 +1763,8 @@ spec:
                               by protocol or OS. If negative then keep-alive is disabled.
                             type: string
                           network:
-                            description: TCP networks - "tcp", "tcp4" (IPv4-only),
-                              "tcp6" (IPv6-only)
+                            description: TCP networks - `tcp`, `tcp4` (IPv4-only),
+                              `tcp6` (IPv6-only)
                             type: string
                         type: object
                       tls:
@@ -1806,7 +1803,7 @@ spec:
                         properties:
                           entities:
                             items:
-                              description: Entity represents a pod, vm, etc.
+                              description: Entity represents a pod, VM, etc.
                               properties:
                                 ip_address:
                                   description: IP address of the entity.
@@ -1870,8 +1867,8 @@ spec:
                               watermarks:
                                 description: Watermarks are increasing limits on which
                                   to trigger GC. Watchdog disarms when the last watermark
-                                  is surpassed. It is recommended to set an extreme
-                                  watermark for the last element (e.g. 0.99).
+                                  is surpassed. It's recommended to set an extreme
+                                  watermark for the last element (for example, 0.99).
                                 items:
                                   type: number
                                 type: array
@@ -1903,7 +1900,7 @@ spec:
                           min_gogc:
                             description: Minimum GoGC sets the minimum garbage collection
                               target percentage for heap driven Watchdogs. This setting
-                              helps avoid overscheduling.
+                              helps avoid over scheduling.
                             type: integer
                           watermarks_policy:
                             description: WatermarksPolicy creates a Watchdog policy
@@ -1915,20 +1912,20 @@ spec:
                               watermarks:
                                 description: Watermarks are increasing limits on which
                                   to trigger GC. Watchdog disarms when the last watermark
-                                  is surpassed. It is recommended to set an extreme
-                                  watermark for the last element (e.g. 0.99).
+                                  is surpassed. It's recommended to set an extreme
+                                  watermark for the last element (for example, 0.99).
                                 items:
                                   type: number
                                 type: array
                             type: object
                         type: object
                       job:
-                        description: JobConfig is config for Job swagger:model
+                        description: JobConfig is configuration for a periodic job
+                          swagger:model
                         properties:
                           execution_period:
-                            description: Time period between job executions. Zero
-                              or negative value means that the job will never execute
-                              periodically.
+                            description: Time between job executions. Zero or negative
+                              value means that the job will never execute periodically.
                             type: string
                           execution_timeout:
                             description: Execution timeout
@@ -1966,8 +1963,8 @@ spec:
                               watermarks:
                                 description: Watermarks are increasing limits on which
                                   to trigger GC. Watchdog disarms when the last watermark
-                                  is surpassed. It is recommended to set an extreme
-                                  watermark for the last element (e.g. 0.99).
+                                  is surpassed. It's recommended to set an extreme
+                                  watermark for the last element (for example, 0.99).
                                 items:
                                   type: number
                                 type: array

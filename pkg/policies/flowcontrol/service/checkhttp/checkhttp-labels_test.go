@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("Flow labels", func() {
-	It("should contain all the request labels with OTEL-compatible keys", func() {
+	It("should contain all the request labels with OTel-compatible keys", func() {
 		req := &flowcontrolhttpv1.CheckHTTPRequest_HttpRequest{
 			Method: "GET",
 			Headers: map[string]string{

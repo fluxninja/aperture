@@ -4,7 +4,7 @@ title: Static Rate Limiting Policy
 
 ## Introduction
 
-This blueprint provides a simple static rate limiting policy and a dashboard.
+This blueprint provides a simple static rate-limiting policy and a dashboard.
 This policy uses the [`RateLimiter`](/reference/policies/spec.md#rate-limiter)
 component.
 
@@ -17,8 +17,12 @@ import {ParameterDescription} from '../../../../parameterComponents.js'
 
 ## Configuration
 
+<!-- vale off -->
+
 Code: <a
 href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/static-rate-limiting`}>policies/static-rate-limiting</a>
+
+<!-- vale on -->
 
 ### Parameters
 

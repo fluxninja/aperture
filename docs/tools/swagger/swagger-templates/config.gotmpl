@@ -39,7 +39,7 @@
  Format: `{{ . }}`
     {{- end -}}
     {{- with (index . "x-oneof") -}}
- OneOf: `{{ . }}`
+ One Of: `{{ . }}`
     {{- end -}}
   {{- end -}}
   {{- if .Minimum -}}
@@ -63,7 +63,7 @@
     , format: `{{ . }}`
     {{- end -}}
     {{- with (index . "x-oneof") -}}
-    , oneof: `{{ . }}`
+    , one of: `{{ . }}`
     {{- end -}}
   {{- end -}}
   {{- with .Minimum -}}
@@ -163,8 +163,13 @@ any
 <dt>{{ .OriginalName }}</dt>
 <dd>{{/* blank lines inside dd are important for correct markdown rendering, don't remove */}}
 
+<!-- vale off -->
+
 ({{- template "fnProperty" . -}})
-{{- if or .Title .Description}} {{ end -}}
+
+<!-- vale on -->
+
+{{ if or .Title .Description}} {{ end -}}
 {{- .Title -}}
 {{- if and .Title .Description }}{{ printf "\n\n" }}{{ end -}}
 {{- .Description }}
@@ -179,7 +184,6 @@ any
 <!---
 Generated File Starts
 -->
-
 {{/* Metadata, title and description are handled by `metadata` files in `/docs/gen` */}}
 
 {{/* Skip TOC & Operations reference for policy docs, as they're only dummy stubs */}}
@@ -191,6 +195,8 @@ Generated File Starts
 
 ### {{ upper (humanize .PackageAlias) }}
 
+<!-- vale off -->
+
 | Key | Reference |
 |-----|-----------|
   {{- range .Operations }}
@@ -199,13 +205,20 @@ Generated File Starts
   {{- printf "\n" }}
 {{- end }}
 
+<!-- vale on -->
+
 {{- if .Operations }}
 ## Reference{{/* all config sections */}}
 
 {{- range .Operations }}
  {{- $opname := .Name }}
 
+<!-- vale off -->
+
 ### *{{ if slice .Path 1 }}{{ slice .Path 1 }}{{ end }}* {# {{- dasherize .Name -}} }
+
+<!-- vale on -->
+
 {{ if .Summary }}{{ printf "\n" }}{{ trimSpace .Summary }}{{ end }}
 
 {{- $base := .BasePath }}
@@ -217,10 +230,14 @@ Generated File Starts
 <dt>{{ .Name }}</dt>
 <dd>{{/* blank lines inside dd are important for correct markdown rendering, don't remove */}}
 
+<!-- vale off -->
+
 (
     {{- template "fnProperty" . -}}
     {{ if $env  }}, env-var: `{{ upper (snakize (slice $base 1)) }}_{{ if $path }}{{ (upper (snakize (slice $path 1))) }}_{{ end }}{{ if and .Name (ne .Name ".") }}{{ upper (snakize .Name) }}{{ end }}`{{ end -}}
 ){{ with .Description }} {{ . }}{{ end }}
+
+<!-- vale on -->
 
 </dd>
 {{- end }}
@@ -254,7 +271,12 @@ Generated File Starts
 
 {{- range .Models }}
 
+<!-- vale off -->
+
 ### {{ .Name }} {# {{- dasherize .Name -}} }
+
+<!-- vale on -->
+
 {{ template "fnModel" . }}
 
 ---

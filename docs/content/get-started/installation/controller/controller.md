@@ -24,28 +24,28 @@ set policies. Once determined, these decisions are then exported to all Aperture
 Agents to effectively handle workloads.
 
 The closed feedback loop functions primarily by monitoring the variables
-reflecting stability conditions (i.e. process variables) and compares them
+reflecting stability conditions (that's process variables) and compares them
 against setpoints. The difference in the variable values against these points is
 referred to as the error signal. The feedback loop then works to minimize these
 error signals by determining and distributing control actions, that adjust these
 process variables and maintain their values within the optimal range.
 
-## Controller CRD
+## Controller Custom Resource Definition
 
-The Aperture Controller is a Kubernetes based application and is installed using
+The Aperture Controller is a Kubernetes-based application and is installed using
 the
 [Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
 which is managed by the Aperture Operator.
 
 The configuration for the Aperture Controller process is provided to the
 Controller CRD under the `controller.config` section. All the configuration
-parameters for Aperture Controller are listed
+parameters for the Aperture Controller are listed
 [here](/reference/configuration/controller.md).
 
 ## Prerequisites
 
-You can do the installation using `aperturectl` CLI tool or using `Helm`.
-Install the tool of your choice using below links:
+You can do the installation using the `aperturectl` CLI tool or using `Helm`.
+Install the tool of your choice using the following links:
 
 1. [aperturectl](/get-started/aperture-cli/aperture-cli.md)
 
@@ -57,7 +57,7 @@ Install the tool of your choice using below links:
 
    1. Once the Helm CLI is installed, add the
       [Aperture Controller Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-controller)
-      repo in your environment for install/upgrade:
+      repository in your environment for install/upgrade:
 
       ```bash
       helm repo add aperture https://fluxninja.github.io/aperture/
@@ -91,9 +91,10 @@ Kubernetes Objects which will be created by following steps are listed
    </TabItem>
    </Tabs>
 
-2. By default, Prometheus and Etcd instances are installed. If you don't want to
-   install and use your existing instances of Prometheus or Etcd, configure
-   below values in the `values.yaml` file and pass it with `install` command:
+2. By default, Prometheus and etcd instances are installed. If you don't want to
+   install and use your existing instances of Prometheus or etcd, configure the
+   following values in the `values.yaml` file and pass it with the `install`
+   command:
 
    ```yaml
    controller:
@@ -110,7 +111,7 @@ Kubernetes Objects which will be created by following steps are listed
    ```
 
    Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with
-   the actual values of Etcd and Prometheus, which will be used by the Aperture
+   the actual values of etcd and Prometheus, which will be used by the Aperture
    Controller.
 
    <Tabs groupId="setup" queryString>
@@ -126,17 +127,17 @@ Kubernetes Objects which will be created by following steps are listed
    </TabItem>
    </Tabs>
 
-   A list of all the configurable parameters for Etcd are available
-   [here](/reference/configuration/controller.md#etcd) and Prometheus are
+   A list of all the configurable parameters for etcd are available
+   [here](/reference/configuration/controller.md#etcd), and Prometheus are
    available [here](/reference/configuration/controller.md#prometheus).
 
-   **Note**: Please make sure that the flag `web.enable-remote-write-receiver`
-   is enabled on your existing Prometheus instance as it is required by the
+   **Note**: Please ensure that the flag `web.enable-remote-write-receiver` is
+   enabled on your existing Prometheus instance, as it's required by the
    Aperture Controller.
 
 3. If you want to modify the default parameters or the Aperture Controller
-   config, for example `log`, you can create or update the `values.yaml` file
-   and pass it with `install` command:
+   configuration, for example `log`, you can create or update the `values.yaml`
+   file and pass it with `install` command:
 
    ```yaml
    controller:
@@ -160,7 +161,7 @@ Kubernetes Objects which will be created by following steps are listed
    </TabItem>
    </Tabs>
 
-   All the config parameters for the Aperture Controller are available
+   All the configuration parameters for the Aperture Controller are available
    [here](/reference/configuration/controller.md).
 
    A list of configurable parameters for the installation can be found in the
@@ -206,7 +207,7 @@ Kubernetes Objects which will be created by following steps are listed
       </TabItem>
       </Tabs>
 
-   2. Create a YAML file with below specifications:
+   2. Create a YAML file with the following specifications:
 
       ```yaml
       apiVersion: fluxninja.com/v1alpha1
@@ -236,25 +237,29 @@ Kubernetes Objects which will be created by following steps are listed
       kubectl apply -f controller.yaml
       ```
 
-## Exposing Etcd and Prometheus services {#expose-etcd-prometheus}
+<!-- vale off -->
 
-If the Aperture Controller is installed with the packaged Etcd and Prometheus,
-follow below steps to expose them outside the Kubernetes cluster so that the
-Aperture Agent running on Linux can access them.
+## Exposing etcd and Prometheus services {#expose-etcd-prometheus}
+
+<!-- vale on -->
+
+If the Aperture Controller is installed with the packaged etcd and Prometheus,
+follow the following steps to expose them outside the Kubernetes cluster so that
+the Aperture Agent running on Linux can access them.
 
 :::info
 
 [Contour](https://projectcontour.io/) is used as a
 [Kubernetes Ingress Controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
-in below steps to expose the Etcd and Prometheus services out of Kubernetes
-cluster using Load Balancer.
+in the following steps to expose the etcd and Prometheus services out of
+Kubernetes cluster using Load Balancer.
 
-Any other tools can also be used to expose the Etcd and Prometheus services out
+Any other tools can also be used to expose the etcd and Prometheus services out
 of the Kubernetes cluster based on your infrastructure.
 
 :::
 
-1. Add the Helm chart repo for Contour in your environment:
+1. Add the Helm chart repository for Contour in your environment:
 
    ```bash
    helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -266,21 +271,21 @@ of the Kubernetes cluster based on your infrastructure.
    helm install aperture bitnami/contour --namespace projectcontour --create-namespace
    ```
 
-3. It may take a few minutes for the Contour Load Balancer's IP to become
+3. It may take a few minutes for the Contour Load Balancer IP to become
    available. You can watch the status by running:
 
    ```bash
    kubectl get svc aperture-contour-envoy --namespace projectcontour -w
    ```
 
-4. Once `EXTERNAL-IP` is no longer `<pending>`, run below command to get the
-   External IP for the Load Balancer:
+4. Once `EXTERNAL-IP` is no longer `<pending>`, run the following command to get
+   the External IP for the Load Balancer:
 
    ```bash
    kubectl describe svc aperture-contour-envoy --namespace projectcontour | grep Ingress | awk '{print $3}'
    ```
 
-5. Add an entry for the above IP in the Cloud provider's DNS configuration. For
+5. Add an entry for the above IP in the cloud provider's DNS configuration. For
    example, follow steps on
    [Cloud DNS on GKE](https://cloud.google.com/dns/docs/records) for Google
    Kubernetes Engine.
@@ -288,7 +293,7 @@ of the Kubernetes cluster based on your infrastructure.
 6. Configure the below parameters to install the
    [Kubernetes Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
    with the Aperture Controller by updating the `values.yaml` created during
-   installation and pass it with `install` command:
+   installation and passing it with `install` command:
 
    ```yaml
    ingress:
@@ -324,7 +329,7 @@ of the Kubernetes cluster based on your infrastructure.
    kubectl get ingress controller-ingress -w
    ```
 
-8. Once the `ADDRESS` matches the External IP, the Etcd will be accessible on
+8. Once the `ADDRESS` matches the External IP, the etcd will be accessible on
    `http://etcd.YOUR_DOMAIN_HERE:80` and the Prometheus will be accessible on
    `http://prometheus.YOUR_DOMAIN_HERE:80`.
 
@@ -333,7 +338,7 @@ of the Kubernetes cluster based on your infrastructure.
 By following these instructions, you will have deployed the upgraded version of
 Aperture Controller into your cluster.
 
-1. Use the same `values.yaml` file created as part of
+1. Use the same `values.yaml` file created as part of the
    [Installation Steps](#controller-installation) and pass it with below
    command:
 
@@ -393,7 +398,7 @@ needs.
 ## Uninstall
 
 You can uninstall the Aperture Controller and its components installed above by
-following below steps:
+following these steps:
 
 1. Uninstall the Aperture Controller:
 
@@ -410,8 +415,8 @@ following below steps:
    </TabItem>
    </Tabs>
 
-2. Alternatively, if you have installed the Aperture Controller Custom Resource
-   separately, follow below steps:
+2. Alternatively, if you have installed the Aperture Controller Custom Resource,
+   follow the following steps:
 
    1. Delete the Aperture Controller Custom Resource:
 
@@ -434,8 +439,8 @@ following below steps:
       </TabItem>
       </Tabs>
 
-3. If you have installed the chart in some other namespace than `default`,
-   execute below commands:
+3. If you have installed the chart in some other namespace than the `default`,
+   execute the following commands:
 
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
@@ -451,7 +456,7 @@ following below steps:
    </TabItem>
    </Tabs>
 
-4. If you have installed the Contour chart for exposing the Etcd and Prometheus
+4. If you have installed the Contour chart for exposing the etcd and Prometheus
    service, execute the below command:
 
    ```bash
@@ -461,10 +466,14 @@ following below steps:
 
 5. **Optional**: Delete the CRD installed by the Helm chart:
 
-   > Note: By design, deleting a chart via Helm doesn’t delete the Custom
-   > Resource Definitions (CRDs) installed via the Helm chart.
+:::note
 
-   ```bash
-   kubectl delete crd controllers.fluxninja.com
-   kubectl delete crd policies.fluxninja.com
-   ```
+Deleting a chart via Helm doesn’t delete the Custom Resource Definitions (Custom
+Resource Definitions) installed via the Helm chart.
+
+:::
+
+```bash
+kubectl delete crd controllers.fluxninja.com
+kubectl delete crd policies.fluxninja.com
+```

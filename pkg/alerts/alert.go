@@ -43,7 +43,7 @@ func ParseSeverity(rawSeverity string) alertSeverity {
 	}
 }
 
-// specialLabels are alert labels which are propagated in dedicated fields in OTEL logs.
+// specialLabels are alert labels which are propagated in dedicated fields in OTel logs.
 var specialLabels = map[string]struct{}{
 	otelconsts.AlertNameLabel:         {},
 	otelconsts.AlertSeverityLabel:     {},
@@ -195,7 +195,7 @@ func WithResolveTimeout(t time.Duration) AlertOption {
 	}
 }
 
-// AlertsFromLogs gets slice of alerts from OTEL Logs.
+// AlertsFromLogs gets slice of alerts from OTel Logs.
 func AlertsFromLogs(ld plog.Logs) []*Alert {
 	// We can't preallocate size, as we don't know how many of those log records
 	// has incorrect data and will be dropped.
@@ -232,7 +232,7 @@ func AlertsFromLogs(ld plog.Logs) []*Alert {
 	return alerts
 }
 
-// AsLogs returns alert as OTEL Logs.
+// AsLogs returns alert as OTel Logs.
 func (a *Alert) AsLogs() plog.Logs {
 	ld := plog.NewLogs()
 	resource := ld.ResourceLogs().AppendEmpty()

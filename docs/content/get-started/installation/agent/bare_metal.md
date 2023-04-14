@@ -25,12 +25,12 @@ that's [supported](supported-platforms.md).
 ## Download {#agent-download}
 
 The Aperture Agent can be installed using packages made for your system's
-package manager like `dpkg` or `rpm`.
+package manager, like `dpkg` or `rpm`.
 
-To install Aperture Agent, first download package for your manager from
+To install Aperture Agent, first download the package for your manager from the
 [Releases Page](https://github.com/fluxninja/aperture/releases/latest).
 
-Alternatively download it using following script:
+Alternatively, download it using the following script:
 
 ```mdx-code-block
 export const DownloadScript = ({children, packager, arch, archSeparator, versionSeparator, component}) => (
@@ -66,21 +66,21 @@ curl --fail --location --remote-name "\${url}"
 </Tabs>
 
 You should then point Aperture Agent at etcd and Prometheus deployed by the
-Aperture Controller, by editing
+Aperture Controller, by editing the configuration file at
 `/etc/aperture/aperture-agent/config/aperture-agent.yaml`.
 
-All the config parameters for the Aperture Agent are available
+All the configuration parameters for the Aperture Agent are available
 [here](/reference/configuration/agent.md).
 
 :::info
 
-The default config disables the FluxNinja ARC Extension for the Aperture Agent.
-If you want to keep it enabled, add parameters provided
+The default configuration disables the FluxNinja ARC Extension for the Aperture
+Agent. If you want to keep it enabled, add parameters provided
 [here](/arc/extension.md#configuration).
 
 :::
 
-After installing, you should enable the `aperture-agent` systemd service, and
+After installing, you should enable the `aperture-agent` `systemd` service, and
 make it start after system boot:
 
 ```bash
@@ -104,7 +104,7 @@ You can then view service status:
 sudo systemctl status aperture-agent
 ```
 
-To view the logs, when default log configuration is used, you can use
+To view the logs, when the default log configuration is used, you can use
 `journalctl`:
 
 ```bash
@@ -113,7 +113,7 @@ journalctl -u aperture-agent --since "15 minutes ago"
 
 ## Upgrade
 
-[Download](#agent-download) updated package and follow
+[Download](#agent-download) the updated package and follow
 [installation](#agent-installation) steps. Remember to restart the service after
 installation is complete.
 

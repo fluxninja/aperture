@@ -24,7 +24,8 @@ See also [_Flow Selector_ reference](/reference/policies/spec.md#flow-selector)
 _Flow Selectors_ are used by flow control and observability components
 instantiated by Aperture Agents like [_Classifiers_][classifier], [_Flux
 Meters_][flux-meter] and [_Concurrency Limiters_][cl]. _Flow Selectors_ define
-scoping rules – how these components should select flows for their operations.
+scoping rules that decide how these components should select flows for their
+operations.
 
 A _Flow Selector_ consists of:
 
@@ -51,7 +52,7 @@ See also [_Flow Matcher_ reference](/reference/policies/spec.md#flow-matcher)
 Control points are similar to
 [feature flags](https://en.wikipedia.org/wiki/Feature_toggle). They identify the
 location in the code or data plane (web servers, service meshes, API gateways,
-etc.) where flow control decisions are applied. They are defined by developers
+etc.) where flow control decisions are applied. They're defined by developers
 using the SDKs or configured when integrating with API Gateways or Service
 Meshes.
 
@@ -84,28 +85,28 @@ In the above diagram, each service has **HTTP** control points. Every incoming
 API request to a service is a flow at its **ingress** control point. Likewise,
 every outgoing request from a service is a flow at its **egress** control point.
 
-In addition, `Frontend` service has **Feature** control points identifying
+In addition, the `Frontend` service has **Feature** control points identifying
 _recommendations_ and _live-update_ features inside the `Frontend` service's
 code.
 
 :::note
 
-_Control Point_ definition doesn't care about which particular entity (like a
-pod) is handling particular flow. A single _Control Point_ covers _all_ the
+The _Control Point_ definition doesn't care about which particular entity (like
+a pod) is handling a particular flow. A single _Control Point_ covers _all_ the
 entities belonging to the same service.
 
 :::
 
 :::tip
 
-You can use [`aperturectl flow-control control-points`][aperturectl] to list
-active control points:
+Use the [`aperturectl flow-control control-points`][aperturectl] CLI command to
+list active control points.
 
 :::
 
 ### Label Matcher {#label-matcher}
 
-_Label Matcher_ allows to optionally narrow down the selected flow based on
+The _Label Matcher_ optionally narrows down the selected flow based on
 conditions on [Flow Labels][label].
 
 There are multiple ways to define a label matcher. The simplest way is to
@@ -117,9 +118,9 @@ label_matcher:
     http.method: GET
 ```
 
-You can also provide a matching-expression-tree, which allows for arbitrary
-conditions, including regex matching. Refer to [Label Matcher
-reference][label-matcher] for further details.
+Matching expression trees can also be used to define more complex conditions,
+including regex matching. Refer to [Label Matcher reference][label-matcher] for
+further details.
 
 ## Example
 
@@ -134,59 +135,6 @@ flow_selector:
     match_labels:
       user_tier: gold
 ```
-
-### Filtering Out Liveness, Health Probes, and Metrics Endpoints
-
-Liveness and health probes are essential for checking the health of our
-application, and metrics endpoints are necessary for monitoring its performance.
-However, these endpoints do not contribute to the overall latency of the
-service, and if we include them in our latency calculations, they may cause
-requests to be rejected, leading to unnecessary pod restarts.
-
-To prevent these issues, we can filter out traffic to these endpoints by
-matching expressions. In the example below, we filter out flows with http.target
-starting with /health, /live, or /ready, and User Agent starting with
-kube-probe/1.23:
-
-```yaml
-service_selector:
-  service: checkout.myns.svc.cluster.local
-  agent_group: default
-flow_selector:
-  control_point:
-    traffic: ingress
-  label_matcher:
-    match_expressions:
-      - key: http.target
-        operator: NotIn
-        values:
-          - /health
-          - /live
-          - /ready
-          - /metrics
-      - key: http.user_agent
-        operator: NotIn
-        values:
-          - kube-probe/1.23
-```
-
-By filtering out traffic to these endpoints, we can prevent unnecessary pod
-restarts and ensure that our application is available to handle real user
-traffic.
-
-Note that you can filter out other flows by matching on different keys and
-operators, such as http.method with NotIn operator and GET value. For more
-information on how to configure the Label Matcher, see the [Label Matcher
-reference][label-matcher].
-
-:::info
-
-Keep in mind that while these endpoints may have a low latency, they should not
-be included in the overall latency of the service. Filtering them out can help
-improve the accuracy of our latency calculations and prevent requests from being
-rejected.
-
-:::
 
 ## Service Selector {#service-selector}
 
@@ -214,15 +162,14 @@ control requests.
 
 _Agent Group_ is a flexible label that defines a collection of agents that
 operate as peers. For example, an Agent Group can be a Kubernetes cluster name
-in case of DaemonSet deployment, or it can be a service name for sidecar
+in the case of DaemonSet deployment, or it can be a service name for sidecar
 deployments.
 
-_Agent Group_ also defines the scope of **Agent-to-Agent synchronization**.
-Agents within their group form a peer-to-peer network to synchronize
-fine-grained state such as per-label global counters that are used for [rate
-limiting purposes][dc]. Also, all the agents within an _Agent Group_ instantiate
-the same set of [flow control components][components], as published by Aperture
-Controller.
+**Agent Group** defines the scope of Agent-to-Agent synchronization, with agents
+within the group forming a peer-to-peer network to synchronize fine-grained
+state per-label global counters that are used for rate-limiting purposes.
+Additionally, all agents within an **Agent Group** instantiate the same set of
+flow control components as published by the controller.
 
 ### Service {#service}
 
@@ -275,7 +222,7 @@ graph TB
 
 </Zoom>
 
-In this example there are two independent _db.mynamespace.svc.cluster.local_
+In this example, there are two independent `db.mynamespace.svc.cluster.local`
 services.
 
 For single-cluster deployments, a single `default` _Agent Group_ can be used:
@@ -293,9 +240,9 @@ graph TB
 
 </Zoom>
 
-as another extreme, if your _Agent Groups_ already group entities into logical
-services, you can treat the _Agent Group_ as a service to match flows to
-policies (useful when installing as a sidecar):
+as another extreme, if _Agent Groups_ already group entities into logical
+services, _Agent Group_ can be treated as a service to match flows to policies
+(useful when installing as a sidecar):
 
 <Zoom>
 
@@ -317,11 +264,61 @@ graph TB
 _Agent Group_ name together with _Service_ name determine the
 [service](#service) to select flows from.
 
+## Filtering out liveness/health probes, and metrics endpoints
+
+Liveness and health probes are essential for checking the health of the
+application, and metrics endpoints are necessary for monitoring its performance.
+However, these endpoints don't contribute to the overall latency of the service,
+and if included in latency calculations, they may cause requests to be rejected,
+leading to unnecessary pod restarts.
+
+To prevent these issues, traffic to these endpoints can be filtered out by
+matching expressions. In the example below, flows with `http.target` starting
+with /health, /live, or /ready, and User Agent starting with `kube-probe/1.23`
+are filtered out.
+
+```yaml
+service_selector:
+  service: checkout.myns.svc.cluster.local
+  agent_group: default
+flow_selector:
+  control_point:
+    traffic: ingress
+  label_matcher:
+    match_expressions:
+      - key: http.target
+        operator: NotIn
+        values:
+          - /health
+          - /live
+          - /ready
+          - /metrics
+      - key: http.user_agent
+        operator: NotIn
+        values:
+          - kube-probe/1.23
+```
+
+Filtering out traffic to these endpoints can prevent unnecessary pod restarts
+and ensure that the application is available to handle real user traffic
+
+Other flows can be filtered out by matching on different keys and operators,
+such as `http.method` with `NotIn` operator and `GET` value. For more
+information on how to configure the Label Matcher, see the [Label Matcher
+reference][label-matcher].
+
+:::info
+
+Keep in mind that while these endpoints may have a low latency, they shouldn't
+be included in the overall latency of the service. Filtering them out can help
+improve the accuracy of latency calculations and prevent requests from being
+rejected.
+
+:::
+
 [label]: ./flow-label.md
 [flux-meter]: ./resources/flux-meter.md
 [cl]: ./components/concurrency-limiter.md
 [classifier]: ./resources/classifier.md
 [label-matcher]: /reference/policies/spec.md#label-matcher
-[dc]: components/rate-limiter.md#distributed-counters
-[components]: ./components/components.md
 [aperturectl]: /get-started/aperture-cli/aperture-cli.md

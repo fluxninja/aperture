@@ -25,7 +25,7 @@
 
 Aperture is an intelligent load management platform for cloud native
 applications. Aperture provides capabilities such as concurrency limiting, rate
-limiting and auto-scaling.
+limiting and auto scaling.
 
 <p align="center">
   <picture>

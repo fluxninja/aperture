@@ -9,12 +9,12 @@ keywords:
 
 ## Installation
 
-To get started with auto-scaling in Kubernetes,
+To get started with auto scaling in Kubernetes,
 [install Aperture Agent](get-started/installation/agent/kubernetes/daemonset) on
-your Kubernetes cluster. The Agent needs certain permissions in order to
-discover scalable resources and perform auto-scale. The default installation
-mode via the Aperture Operator should take care of creating the necessary roles
-and permissions for Aperture Agent.
+your Kubernetes cluster. The Agent needs certain permissions to discover
+scalable resources and perform auto scale. The default installation mode via the
+Aperture Operator should take care of creating the necessary roles and
+permissions for Aperture Agent.
 
 ## Preview Discovered Control Points
 
@@ -30,7 +30,7 @@ the
 or [aperturectl](reference/aperturectl/auto-scale/control-points/) to view this
 information.
 
-## Configure Auto-Scaling Policies
+## Configure Auto Scaling Policies
 
-Auto-scaling policies are configured at the Aperture Controller. Refer to
+Auto scaling policies are configured at the Aperture Controller. Refer to
 [tutorials](tutorials/auto-scale/auto-scale.md) for some example policies.

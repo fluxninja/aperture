@@ -4,23 +4,23 @@ title: RabbitMQ Queue Buildup Policy
 
 ## Introduction
 
-This policy detects RabbitMQ queue buildup by looking at number of messages in
-"ready" state. Gradient controller is then used to calculate a proportional
-response that limits the accepted concurrency. Concurrency is increased
-additively when the overload is no longer detected.
+This policy detects RabbitMQ queue buildup by looking at the number of messages
+in "ready" state. The gradient controller is then used to calculate a
+proportional response that limits the accepted concurrency. Concurrency is
+increased additively when the overload is no longer detected.
 
 ## Build Instructions
 
 Make sure that the aperture binary is
-[built](reference/aperturectl/build/agent/) with `rabbitmqreceiver` extension
-enabled.
+[built](reference/aperturectl/build/agent/) with the `rabbitmqreceiver`
+extension enabled.
 
 ```yaml
 bundled_extensions:
   - integrations/otel/rabbitmqreceiver
 ```
 
-Use the following agent configuration to allow agent to collect RabbitMQ
+Use the following agent configuration to allow the agent to collect RabbitMQ
 metrics.
 
 ```yaml
@@ -54,8 +54,12 @@ import {ParameterDescription} from '../../../../parameterComponents.js'
 
 ## Configuration
 
+<!-- vale off -->
+
 Code: <a
 href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/rabbitmq-queue-buildup`}>policies/rabbitmq-queue-buildup</a>
+
+<!-- vale on -->
 
 ### Parameters
 

@@ -29,13 +29,13 @@ To install the Aperture Custom plugin, follow these steps:
 
 :::info
 
-Refer [Example Dockerfile](#example-dockerfile) to get the steps for installing
-the Aperture Custom plugin for Kong server running on Container.
+Refer to [`Example Dockerfile`](#example-dockerfile) to get the steps for
+installing the Aperture Custom plugin for Kong server running on Container.
 
 :::
 
 1. Install the
-   [opentelemetry-lua](https://github.com/fluxninja/opentelemetry-lua) SDK by
+   [`opentelemetry-lua`](https://github.com/fluxninja/opentelemetry-lua) SDK by
    running the following commands:
 
    ```bash
@@ -59,7 +59,11 @@ the Aperture Custom plugin for Kong server running on Container.
    cd aperture-lua && luarocks make aperture-kong-plugin-0.1.0-1.rockspec
    ```
 
+<!-- vale off -->
+
 ## Example Dockerfile {#example-dockerfile}
+
+<!-- vale on -->
 
 Use the following Dockerfile to install the Aperture Custom plugin with Kong.
 
@@ -82,7 +86,7 @@ CMD [ "kong", "start", "-c", "kong.conf"]`}</CodeBlock>
 ## Configure Kong
 
 Follow these steps to configure Kong to use the Aperture Custom plugin. Assuming
-plugin is already installed:
+the plugin is already installed:
 
 1. Create an environment variable `APERTURE_AGENT_ENDPOINT` with a value equal
    to the Aperture Agent endpoint. For example, use the following command in
@@ -92,9 +96,9 @@ plugin is already installed:
    echo 'export APERTURE_AGENT_ENDPOINT="http://aperture-agent.aperture-agent.svc.cluster.local"' >> ~/.profile
    ```
 
-2. Optionally, create an environment variable `APERTURE_CHECK_TIMEOUT` which
+2. Optionally, create an environment variable `APERTURE_CHECK_TIMEOUT`, which
    would be considered as a timeout for execution of the Aperture check. The
-   default value for it is `500m` which is 500 milliseconds. For example, use
+   default value for it's `500m`, which is 500 milliseconds. For example, use
    the following command in bash:
 
    :::info

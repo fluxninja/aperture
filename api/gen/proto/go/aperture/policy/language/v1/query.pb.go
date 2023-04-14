@@ -100,10 +100,11 @@ type PromQL struct {
 	OutPorts *PromQL_Outs `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// Describes the Prometheus query to be run.
 	//
-	// :::caution
+	// :::info
 	//
-	// TODO we should describe how to construct the query, eg. how to employ the
-	// fluxmeters here or link to appropriate place in docs.
+	// PromQL [reference](https://prometheus.io/docs/prometheus/latest/querying/basics/)
+	// Flow Metrics [reference](/reference/observability/flow-metrics/flow-metrics.md)
+	// OpenTelemetry Metrics [reference](/get-started/integrations/metrics/metrics.md)
 	//
 	// :::
 	QueryString string `protobuf:"bytes,2,opt,name=query_string,json=queryString,proto3" json:"query_string,omitempty"`

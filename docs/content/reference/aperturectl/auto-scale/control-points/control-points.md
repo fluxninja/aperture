@@ -6,7 +6,7 @@ keywords:
   - aperturectl_auto-scale_control-points
 ---
 
-## aperturectl auto-scale control-points
+## `aperturectl auto-scale control-points`
 
 List AutoScale control points
 
@@ -41,5 +41,5 @@ aperturectl auto-scale control-points --kube
 
 ### SEE ALSO
 
-- [aperturectl auto-scale](/reference/aperturectl/auto-scale/auto-scale.md) -
+- [`aperturectl auto-scale`](/reference/aperturectl/auto-scale/auto-scale.md) -
   AutoScale integrations

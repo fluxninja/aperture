@@ -46,7 +46,7 @@ type HTTPClientConfig struct {
 	ResponseHeaderTimeout config.Duration `json:"response_header_timeout" validate:"gte=0s" default:"0s"`
 	// Idle Connection Timeout. 0 = no timeout.
 	IdleConnTimeout config.Duration `json:"idle_connection_timeout" validate:"gte=0s" default:"90s"`
-	// SSL key log file (useful for debugging with wireshark)
+	// SSL key log file (useful for debugging)
 	KeyLogWriter string `json:"key_log_file"`
 	// Client TLS configuration
 	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
@@ -66,7 +66,7 @@ type HTTPClientConfig struct {
 	DisableCompression bool `json:"disable_compression" default:"false"`
 	// Use Proxy
 	UseProxy bool `json:"use_proxy" default:"false"`
-	// Disable HTTP Keep Alives
+	// Disable HTTP Keepalive
 	DisableKeepAlives bool `json:"disable_keep_alives" default:"false"`
 }
 

@@ -3,7 +3,7 @@ title: Flow Label
 sidebar_position: 1
 ---
 
-:::info What is a flow?
+:::info what's a flow?
 
 A flow is the fundamental unit of work from the perspective of an Aperture
 Agent. It could be an API call, a feature, or even a database query. A flow in
@@ -27,7 +27,7 @@ _Flow Labels_ are used in different ways in Aperture:
 ## Sources
 
 Flows are annotated with _Flow Labels_ based on four sources: request labels,
-baggage, flow classifiers, and explicit labels from the Aperture SDK call.
+baggage, Flow Classifiers, and explicit labels from the Aperture SDK call.
 
 ### Request labels
 
@@ -36,18 +36,18 @@ requests), some basic metadata is available as _request labels_. These are
 `http.method`, `http.target`, `http.host`, `http.scheme`,
 `http.request_content_length` and `http.flavor`. Additionally, all (non-pseudo)
 headers are available as `http.request.header.header_name`, e.g.
-`http.request.header.user_agent` (note the snake_case!). Values of these labels
-are described by [OpenTelemetry semantic conventions for HTTP
-spans][otel-conventions]. The only exception is `http.host` attribute, which is
-equal to Host/Authority header. This is thus similar to `net.peer.name` OTEL
-attribute.
+`http.request.header.user_agent` (note the `snake_case`!). The values of these
+labels are described by [OpenTelemetry semantic conventions for HTTP
+spans][otel-conventions]. The only exception is the `http.host` attribute, which
+is equal to the Host/Authority header. This is thus similar to the
+`net.peer.name` OTel attribute.
 
 ### Baggage {#baggage}
 
 Baggage propagation is a powerful concept that allows attaching metadata to a
 whole request chain or to a whole [trace][traces]. If you already have baggage
 propagation configured in your system, you can access the baggage as flow
-labels. This is supported on service-mesh (Envoy) and web framework based
+labels. This is supported on service-mesh (Envoy) and web framework-based
 control point insertion.
 
 - _HTTP_: Baggage is pulled from the [_baggage_][baggage] header.
@@ -55,7 +55,7 @@ control point insertion.
   call. This is assuming you're using the OpenTelemetry library to manage the
   baggage.
 
-Baggage members are mapped to _Flow Labels_ 1:1 – keys become label keys, values
+Baggage members are mapped to _Flow Labels_ 1:1–keys become label keys, values
 become label values (properties are ignored).
 
 Read more about baggage propagation on:
@@ -63,17 +63,17 @@ Read more about baggage propagation on:
 
 ### Classifiers
 
-When the labels you need are not already present in baggage, nor as request
-labels, you can create a [classifier][classifier] to inject new labels into the
+When the labels you need aren't already present in baggage, nor as request
+labels, you can create a [Classifier][Classifier] to inject new labels into the
 system. Since the Classifier also injects the label into baggage by default,
 this means you can set or extract the label in a different place than where it
 is consumed (assuming you have baggage propagation configured throughout your
 system).
 
-### Aperture SDK
+### Aperture SDKs
 
-The Aperture SDK, in addition to automatically pulling baggage from context,
-also takes an explicit `labels` map in the `Check()` call.
+The Aperture SDKs, in addition to automatically using baggage from context, also
+takes an explicit `labels` map in the `Check()` call.
 
 ## Live Previewing Flow Labels
 
@@ -132,13 +132,13 @@ collected from the following sources:
 - Traces from [Aperture SDK][aperture-go]
 
 Aperture uses OpenTelemetry's robust pipelines for receiving the telemetry data
-and produce other streams of data from it.
+and producing other streams of data from it.
 
 ### Metrics
 
-Prometheus' metrics are generated from the telemetry data that is received.
-Along the path of the flows, telemetry data is tagged by the [flux
-meters][flux-meter] and [workloads][workload] that matched.
+Prometheus' metrics are generated from the received telemetry data. Along the
+path of the flows, telemetry data is tagged by the [Flux Meters][flux-meter] and
+[workloads][workload] that matched.
 
 ### OLAP style telemetry
 
@@ -148,13 +148,13 @@ labels.
 
 OLAP style telemetry doesn't work well with extremely high-cardinality labels,
 thus if an extremely high-cardinality label is detected, some of its values may
-be replaced with `REDACTED_VIA_CARDINALITY_LIMIT` string.
+be replaced with the `REDACTED_VIA_CARDINALITY_LIMIT` string.
 
 #### Default labels
 
-These are protocol-level labels (e.g. HTTP, network) extracted by the configured
-service mesh/middleware and are available to be referenced in [Flow
-Matchers][flow-matcher], except for a few high-cardinality ones.
+These are protocol-level labels (For example: HTTP, network) extracted by the
+configured service mesh/middleware and are available to be referenced in [Flow
+Matcher][flow-matcher], except for a few high-cardinality ones.
 
 #### Labels extracted from baggage
 
@@ -167,7 +167,7 @@ integration, or explicitly at flow creation in [Aperture SDK][aperture-go].
 
 :::note
 
-In the case of a clash, the flow Label will be applied in the following
+In the case of a clash, the _Flow Label_ will be applied in the following
 precedence over:
 
 1. User-defined
@@ -182,7 +182,8 @@ All the flow Labels are used as labels of flow events. These events are rolled
 up and sent to the analytics database in the FluxNinja ARC. This allows:
 
 - For the _Flow Labels_ to be used as filters or group-by
-- To see analytics for each _Flow Label_, e.g. distribution of its values
+- To see analytics for each _Flow Label_, for example: distribution of its
+  values
 
 :::note
 
@@ -192,7 +193,7 @@ For _Classifier_ created labels, you can disable this behavior by setting
 :::
 
 [flow-selector]: ./flow-selector.md
-[classifier]: ./resources/classifier.md
+[Classifier]: ./resources/classifier.md
 [workload]: ./components/concurrency-limiter.md#workload
 [ratelimiter]: ./components/rate-limiter.md
 [scheduler]: ./components/concurrency-limiter.md#scheduler

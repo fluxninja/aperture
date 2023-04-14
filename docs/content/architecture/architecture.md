@@ -44,7 +44,7 @@ request types, and other relevant attributes.
 
 The controller uses declarative policies, expressed as a control circuit, to
 analyze the collected metrics and make decisions on load shedding, flow control,
-and auto-scaling to ensure that the application operates within the specified
+and auto scaling to ensure that the application operates within the specified
 SLOs. The controller's policies are based on the principles of
 Observability-driven closed-loop automation, which continuously track deviations
 from service-level objectives (SLOs) and calculate recovery or escalation
@@ -59,10 +59,10 @@ control components like
 further tune the concurrency limits based on specific service requirements.
 
 The controller's policies are stored in a policy database and are managed using
-the Kubernetes Custom Resource Definition (CRD) API, allowing users to easily
-configure and modify policies as needed. The controller interacts with Aperture
-Agents, which run alongside service instances as sidecars, to enforce the
-policies and ensure the reliable operation of cloud-native applications.
+the Kubernetes Custom Resource Definition (CRD) API, allowing users to configure
+and modify policies as needed. The controller interacts with Aperture Agents,
+which run alongside service instances as sidecars, to enforce the policies and
+ensure the reliable operation of cloud-native applications.
 
 ### Aperture Agents
 
@@ -74,9 +74,10 @@ the perspective of an Aperture Agent. It could be an API call, a feature, or
 even a database query.
 
 The agents monitor golden signals, such as request latency, error rate, and
-saturation, using an in-built telemetry system and a programmable, high-fidelity
-flow classifier used to label requests based on attributes such as customer tier
-or request type. These metrics are then analyzed by the Aperture Controller.
+saturation, using an in-built telemetry system. In addition, a programmable,
+high-fidelity flow classifier is used to label requests based on attributes such
+as customer tier or request type. These metrics are then analyzed by the
+Aperture Controller.
 
 Graceful degradation of services is achieved by prioritizing critical
 application features over background workloads. Similar to boarding an aircraft,
@@ -91,7 +92,7 @@ even during overload scenarios.
 Aperture Agents can be installed on a variety of infrastructure such as
 Kubernetes, VMs, or bare-metal. They integrate with Service Meshes or can be
 used with SDKs to provide [flow control](/concepts/flow-control/flow-control.md)
-capabilities. Additionally, agents work with auto-scaling APIs for platforms
+capabilities. Additionally, agents work with auto scaling APIs for platforms
 such as Kubernetes, to help scale infrastructure when needed.
 
 ## Aperture Databases
@@ -103,10 +104,9 @@ collected from Aperture Agents. It enables Aperture to monitor the system and
 detect deviations from the service-level objectives (SLOs) defined in the
 declarative policies.
 
-Etcd is a distributed key-value store used to store configuration and flow
-control information. Aperture Controller uses etcd to store the declarative
-policies that define the control circuits and their components, as well as the
-current system state.
+Aperture Controller uses etcd (distributed key/value store) to persist the
+declarative policies that define the control circuits and their components, as
+well as the current system state.
 
 Users can optionally reuse their existing etcd or
 [scalable Prometheus](https://promlabs.com/blog/2021/10/14/promql-vendor-compatibility-round-three)

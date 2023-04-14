@@ -27,13 +27,13 @@ import (
 	"github.com/fluxninja/aperture/pkg/status"
 )
 
-// FX tags used to pass OTEL Collector factories.
+// FX tags used to pass OTel Collector factories.
 const (
 	ReceiverFactoriesFxTag  = "otel-collector-receiver-factories"
 	ProcessorFactoriesFxTag = "otel-collector-processor-factories"
 )
 
-// Module is a fx module that invokes OTEL Collector.
+// Module is a fx module that invokes OTel Collector.
 func Module() fx.Option {
 	return fx.Options(
 		grpcgateway.RegisterHandler{Handler: logsv1.RegisterLogsServiceHandlerFromEndpoint}.Annotate(),
@@ -43,7 +43,7 @@ func Module() fx.Option {
 	)
 }
 
-// ConstructorIn describes parameters passed to create OTEL Collector, server providing the OpenTelemetry Collector service.
+// ConstructorIn describes parameters passed to create OTel Collector, server providing the OpenTelemetry Collector service.
 type ConstructorIn struct {
 	fx.In
 	Factories        otelcol.Factories
@@ -51,21 +51,21 @@ type ConstructorIn struct {
 	Shutdowner       fx.Shutdowner
 	Unmarshaller     config.Unmarshaller
 	StatusRegistry   status.Registry
-	BaseConfig       *otelconfig.OTELConfig `name:"base"`
+	BaseConfig       *otelconfig.OTelConfig `name:"base"`
 	Logger           *log.Logger
 	Readiness        *jobs.MultiJob           `name:"readiness.service"`
-	ExtensionConfigs []*otelconfig.OTELConfig `group:"extension-config"`
+	ExtensionConfigs []*otelconfig.OTelConfig `group:"extension-config"`
 }
 
-// setup creates and runs a new instance of OTEL Collector with the passed configuration.
+// setup creates and runs a new instance of OTel Collector with the passed configuration.
 func setup(in ConstructorIn) error {
 	uris := []string{"file:main"}
 	var otelService *otelcol.Collector
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			setReadinessStatus(in.StatusRegistry, nil, errors.New("OTEL collector starting"))
+			setReadinessStatus(in.StatusRegistry, nil, errors.New("OTel collector starting"))
 			providers := map[string]confmap.Provider{
-				"file": otelconfig.NewOTELConfigUnmarshaler(in.BaseConfig.AsMap()),
+				"file": otelconfig.NewOTelConfigUnmarshaler(in.BaseConfig.AsMap()),
 			}
 			for i, extensionConfig := range in.ExtensionConfigs {
 				if extensionConfig == nil {
@@ -73,7 +73,7 @@ func setup(in ConstructorIn) error {
 				}
 				scheme := fmt.Sprintf("extension-%v", i)
 				uris = append(uris, fmt.Sprintf("%v:%v", scheme, scheme))
-				providers[scheme] = otelconfig.NewOTELConfigUnmarshaler(extensionConfig.AsMap())
+				providers[scheme] = otelconfig.NewOTelConfigUnmarshaler(extensionConfig.AsMap())
 			}
 
 			configProvider, err := otelcol.NewConfigProvider(otelcol.ConfigProviderSettings{
@@ -86,7 +86,7 @@ func setup(in ConstructorIn) error {
 				},
 			})
 			if err != nil {
-				return fmt.Errorf("creating OTEL config provider: %w", err)
+				return fmt.Errorf("creating OTel config provider: %w", err)
 			}
 			otelService, err = otelcol.NewCollector(
 				otelcol.CollectorSettings{
@@ -102,26 +102,26 @@ func setup(in ConstructorIn) error {
 				},
 			)
 			if err != nil {
-				return fmt.Errorf("constructing OTEL Service: %v", err)
+				return fmt.Errorf("constructing OTel Service: %v", err)
 			}
 			err = registerReadinessJob(in.StatusRegistry, in.Readiness, otelService)
 			if err != nil {
-				return fmt.Errorf("registering OTEL Service readiness job: %v", err)
+				return fmt.Errorf("registering OTel Service readiness job: %v", err)
 			}
 
-			log.Info().Msg("Starting OTEL Collector")
+			log.Info().Msg("Starting OTel Collector")
 			panichandler.Go(func() {
 				err := otelService.Run(context.Background())
 				if err != nil {
-					log.Error().Err(err).Msg("Failed to run OTEL Collector")
+					log.Error().Err(err).Msg("Failed to run OTel Collector")
 				}
 				_ = in.Shutdowner.Shutdown()
 			})
 			return nil
 		},
 		OnStop: func(context.Context) error {
-			setReadinessStatus(in.StatusRegistry, nil, errors.New("OTEL collector stopping"))
-			log.Info().Msg("Stopping OTEL Collector")
+			setReadinessStatus(in.StatusRegistry, nil, errors.New("OTel collector stopping"))
+			log.Info().Msg("Stopping OTel Collector")
 			otelService.Shutdown()
 			return nil
 		},

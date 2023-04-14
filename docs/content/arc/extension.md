@@ -41,14 +41,14 @@ export const ExtensionConfig = ({children, component}) => (
 
 If you are a FluxNinja ARC customer, you can enhance your Aperture experience by
 enabling FluxNinja extension. It enriches logs and traces collected by Aperture
-with additional dimensions and batches/rollups metrics to optimize bandwidth
+with additional dimensions and batches/roll-ups metrics to optimize bandwidth
 usage. In FluxNinja ARC, you can monitor your policies and analyze flows.
 FluxNinja extension also sends periodic heartbeats from Aperture Agents and
 Controllers to track their health and configuration.
 
 ## Configuration
 
-Configure below parameters in the `values.yaml` file generated during
+Configure the following parameters in the `values.yaml` file generated during
 installation of the Aperture Controller or Agent:
 
 <Tabs>

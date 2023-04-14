@@ -5,19 +5,19 @@ title: Latency AIMD Concurrency Limiting Policy
 ## Introduction
 
 This policy detects overloads/cascading failures by comparing the real-time
-latency with it's exponential moving average. Gradient controller is then used
-to calculate a proportional response that limits the accepted concurrency.
+latency with its exponential moving average. The gradient controller is then
+used to calculate a proportional response that limits the accepted concurrency.
 Concurrency is increased additively when the overload is no longer detected.
 
 :::info
 
-AIMD stands for Additive Increase, Multiplicative Decrease. That is, the
-concurrency is reduced by a multiplicative factor when the service is overloaded
-and increased by an additive factor when the service is no longer overloaded.
+AIMD stands for Additive Increase, Multiplicative Decrease. The concurrency is
+reduced by a multiplicative factor when the service is overloaded, and increased
+by an additive factor while the service is no longer overloaded.
 
 Please see reference for the
 [`AIMDConcurrencyController`](/reference/policies/spec.md#a-i-m-d-concurrency-controller)
-component that is used within this blueprint.
+component that's used within this blueprint.
 
 :::
 
@@ -40,8 +40,12 @@ import {ParameterDescription} from '../../../../parameterComponents.js'
 
 ## Configuration
 
+<!-- vale off -->
+
 Code: <a
 href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/latency-aimd-concurrency-limiting`}>policies/latency-aimd-concurrency-limiting</a>
+
+<!-- vale on -->
 
 ### Parameters
 

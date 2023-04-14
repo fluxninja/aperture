@@ -173,7 +173,7 @@ func (x *Entities) GetEntitiesByName() *Entities_Entities {
 	return nil
 }
 
-// Entity represents a pod, vm, etc.
+// Entity represents a pod, VM, etc.
 type Entity struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

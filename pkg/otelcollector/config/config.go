@@ -15,28 +15,28 @@ import (
 	"github.com/fluxninja/aperture/pkg/net/tlsconfig"
 )
 
-// OTELConfig represents OTEL Collector configuration.
-type OTELConfig struct {
+// OTelConfig represents OTel Collector configuration.
+type OTelConfig struct {
 	Extensions map[string]interface{} `json:"extensions,omitempty"`
 	Receivers  map[string]interface{} `json:"receivers,omitempty"`
 	Processors map[string]interface{} `json:"processors,omitempty"`
 	Exporters  map[string]interface{} `json:"exporters,omitempty"`
-	Service    *OTELService           `json:"service"`
+	Service    *OTelService           `json:"service"`
 }
 
-// NewOTELConfig creates new empty OTELConfig.
-func NewOTELConfig() *OTELConfig {
-	return &OTELConfig{
+// NewOTelConfig creates new empty OTelConfig.
+func NewOTelConfig() *OTelConfig {
+	return &OTelConfig{
 		Extensions: map[string]interface{}{},
 		Receivers:  map[string]interface{}{},
 		Processors: map[string]interface{}{},
 		Exporters:  map[string]interface{}{},
-		Service:    NewOTELService(),
+		Service:    NewOTelService(),
 	}
 }
 
-// AsMap returns map representation of OTELConfig.
-func (o *OTELConfig) AsMap() map[string]interface{} {
+// AsMap returns map representation of OTelConfig.
+func (o *OTelConfig) AsMap() map[string]interface{} {
 	return map[string]interface{}{
 		"extensions": o.Extensions,
 		"receivers":  o.Receivers,
@@ -47,7 +47,7 @@ func (o *OTELConfig) AsMap() map[string]interface{} {
 }
 
 // AddExtension adds given extension and enables it in service.
-func (o *OTELConfig) AddExtension(name string, value interface{}) {
+func (o *OTelConfig) AddExtension(name string, value interface{}) {
 	if value == nil {
 		value = map[string]interface{}{}
 	}
@@ -60,23 +60,23 @@ func (o *OTELConfig) AddExtension(name string, value interface{}) {
 	o.Service.Extensions = extensions
 }
 
-// AddReceiver adds receiver to OTEL config.
-func (o *OTELConfig) AddReceiver(name string, value interface{}) {
+// AddReceiver adds receiver to OTel config.
+func (o *OTelConfig) AddReceiver(name string, value interface{}) {
 	o.Receivers[name] = value
 }
 
-// AddProcessor adds receiver to OTEL config.
-func (o *OTELConfig) AddProcessor(name string, value interface{}) {
+// AddProcessor adds receiver to OTel config.
+func (o *OTelConfig) AddProcessor(name string, value interface{}) {
 	o.Processors[name] = value
 }
 
-// AddExporter adds receiver to OTEL config.
-func (o *OTELConfig) AddExporter(name string, value interface{}) {
+// AddExporter adds receiver to OTel config.
+func (o *OTelConfig) AddExporter(name string, value interface{}) {
 	o.Exporters[name] = value
 }
 
-// SetDebugPort configures debug port on which OTEL server /metrics as specified by user.
-func (o *OTELConfig) SetDebugPort(userCfg *CommonOTELConfig) {
+// SetDebugPort configures debug port on which OTel server /metrics as specified by user.
+func (o *OTelConfig) SetDebugPort(userCfg *CommonOTelConfig) {
 	portInput := fmt.Sprintf(":%d", userCfg.Ports.DebugPort)
 	if val, ok := o.Service.Telemetry["metrics"]; ok {
 		if val, ok := val.(map[string]interface{}); ok {
@@ -91,7 +91,7 @@ func (o *OTELConfig) SetDebugPort(userCfg *CommonOTELConfig) {
 }
 
 // AddDebugExtensions adds common debug extensions and enables them.
-func (o *OTELConfig) AddDebugExtensions(userCfg *CommonOTELConfig) {
+func (o *OTelConfig) AddDebugExtensions(userCfg *CommonOTelConfig) {
 	o.AddExtension("health_check", map[string]interface{}{
 		"endpoint": fmt.Sprintf("localhost:%d", userCfg.Ports.HealthCheckPort),
 	})
@@ -104,7 +104,7 @@ func (o *OTELConfig) AddDebugExtensions(userCfg *CommonOTELConfig) {
 }
 
 // AddBatchProcessor is a helper function for adding batch processor.
-func (o *OTELConfig) AddBatchProcessor(
+func (o *OTelConfig) AddBatchProcessor(
 	name string,
 	timeout time.Duration,
 	sendBatchSize uint32,
@@ -118,16 +118,16 @@ func (o *OTELConfig) AddBatchProcessor(
 	})
 }
 
-// OTELService represents service in OTEL Config.
-type OTELService struct {
+// OTelService represents service in OTel Config.
+type OTelService struct {
 	Telemetry  map[string]interface{}
 	Pipelines  map[string]Pipeline
 	Extensions []string
 }
 
-// NewOTELService returns new empty OTEL Service.
-func NewOTELService() *OTELService {
-	return &OTELService{
+// NewOTelService returns new empty OTel Service.
+func NewOTelService() *OTelService {
+	return &OTelService{
 		Telemetry: map[string]interface{}{
 			"logs": map[string]interface{}{
 				"level": "INFO",
@@ -138,8 +138,8 @@ func NewOTELService() *OTELService {
 	}
 }
 
-// AsMap returns map representation of OTELService.
-func (o *OTELService) AsMap() map[string]interface{} {
+// AsMap returns map representation of OTelService.
+func (o *OTelService) AsMap() map[string]interface{} {
 	pipelines := map[string]interface{}{}
 	for name, pipe := range o.Pipelines {
 		pipelines[name] = pipe.AsMap()
@@ -151,18 +151,18 @@ func (o *OTELService) AsMap() map[string]interface{} {
 	}
 }
 
-// AddPipeline adds pipeline to OTEL Service.
-func (o *OTELService) AddPipeline(name string, pipeline Pipeline) {
+// AddPipeline adds pipeline to OTel Service.
+func (o *OTelService) AddPipeline(name string, pipeline Pipeline) {
 	o.Pipelines[name] = pipeline
 }
 
-// Pipeline gets pipeline with given name from OTEL Service together with `exists` bool.
-func (o *OTELService) Pipeline(name string) (Pipeline, bool) {
+// Pipeline gets pipeline with given name from OTel Service together with `exists` bool.
+func (o *OTelService) Pipeline(name string) (Pipeline, bool) {
 	pipeline, exists := o.Pipelines[name]
 	return pipeline, exists
 }
 
-// Pipeline represents OTEL Config pipeline.
+// Pipeline represents OTel Config pipeline.
 type Pipeline struct {
 	Receivers  []string
 	Processors []string
@@ -178,7 +178,7 @@ func (p *Pipeline) AsMap() map[string]interface{} {
 	}
 }
 
-/* Specific to Agent and Controller OTEL collector factories. */
+/* Specific to Agent and Controller OTel collector factories. */
 
 // BaseFxTag is the base name tag for otel components.
 var BaseFxTag = config.NameTag("base")

@@ -192,12 +192,12 @@ type AutoScale_PodScaler struct {
 }
 
 type AutoScale_AutoScaler struct {
-	// _AutoScaler_ provides auto-scaling functionality for any scalable resource.
+	// _AutoScaler_ provides auto scaling functionality for any scalable resource.
 	AutoScaler *AutoScaler `protobuf:"bytes,2,opt,name=auto_scaler,json=autoScaler,proto3,oneof"`
 }
 
 type AutoScale_PodAutoScaler struct {
-	// _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource.
+	// _PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource.
 	PodAutoScaler *PodAutoScaler `protobuf:"bytes,3,opt,name=pod_auto_scaler,json=podAutoScaler,proto3,oneof"`
 }
 
@@ -283,9 +283,9 @@ type IncreasingGradient struct {
 	// Input ports for the Gradient.
 	InPorts *IncreasingGradient_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
 	// Gradient parameters for the controller. Defaults and constraints:
-	// * slope = 1
-	// * min_gradient = 1 (cannot be changed)
-	// * max_gradient = +Inf (must be greater than 1)
+	// * `slope` = 1
+	// * `min_gradient` = 1 (can't be changed)
+	// * `max_gradient` = +Inf (must be greater than 1)
 	Parameters *IncreasingGradient_Parameters `protobuf:"bytes,2,opt,name=parameters,proto3" json:"parameters,omitempty"`
 }
 
@@ -344,9 +344,9 @@ type DecreasingGradient struct {
 	// Input ports for the Gradient.
 	InPorts *DecreasingGradient_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
 	// Gradient parameters for the controller. Defaults and constraints:
-	// * slope = 1
-	// * min_gradient = -Inf (must be less than 1)
-	// * max_gradient = 1 (cannot be changed)
+	// * `slope` = 1
+	// * `min_gradient` = -Inf (must be less than 1)
+	// * `max_gradient` = 1 (can't be changed)
 	Parameters *DecreasingGradient_Parameters `protobuf:"bytes,2,opt,name=parameters,proto3" json:"parameters,omitempty"`
 }
 
@@ -403,7 +403,7 @@ type ScaleOutController struct {
 
 	// Controller
 	Controller *ScaleOutController_Controller `protobuf:"bytes,1,opt,name=controller,proto3" json:"controller,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Configuration for embedded alerter.
+	// Configuration for embedded Alerter.
 	AlerterParameters *Alerter_Parameters `protobuf:"bytes,2,opt,name=alerter_parameters,json=alerterParameters,proto3" json:"alerter_parameters,omitempty"`
 }
 
@@ -460,7 +460,7 @@ type ScaleInController struct {
 
 	// Controller
 	Controller *ScaleInController_Controller `protobuf:"bytes,1,opt,name=controller,proto3" json:"controller,omitempty"`
-	// Configuration for embedded alerter.
+	// Configuration for embedded Alerter.
 	AlerterParameters *Alerter_Parameters `protobuf:"bytes,2,opt,name=alerter_parameters,json=alerterParameters,proto3" json:"alerter_parameters,omitempty"`
 }
 
@@ -577,7 +577,7 @@ func (x *KubernetesReplicas) GetDefaultConfig() *PodScaler_ScaleActuator_Dynamic
 	return nil
 }
 
-// _AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
+// _AutoScaler_ provides auto scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto scale.
 type AutoScaler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -586,17 +586,17 @@ type AutoScaler struct {
 	// Output ports for the _AutoScaler_.
 	OutPorts *AutoScaler_Outs   `protobuf:"bytes,1,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	Scaler   *AutoScaler_Scaler `protobuf:"bytes,2,opt,name=scaler,proto3" json:"scaler,omitempty" validate:"required"` // @gotags: validate:"required"
-	// The minimum scale to which the _AutoScaler_ can scale-in. E.g. in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
+	// The minimum scale to which the _AutoScaler_ can scale-in. For example, in case of KubernetesReplicas Scaler, this is the minimum number of replicas.
 	MinScale int64 `protobuf:"varint,3,opt,name=min_scale,json=minScale,proto3" json:"min_scale,omitempty" default:"0" validate:"gte=0"` // @gotags: default:"0" validate:"gte=0"
-	// The maximum scale to which the _AutoScaler_ can scale-out. E.g. in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
+	// The maximum scale to which the _AutoScaler_ can scale-out. For example, in case of KubernetesReplicas Scaler, this is the maximum number of replicas.
 	MaxScale int64 `protobuf:"varint,4,opt,name=max_scale,json=maxScale,proto3" json:"max_scale,omitempty" default:"9223372036854775807" validate:"gt=0"` // @gotags: default:"9223372036854775807" validate:"gt=0"
 	// List of _Controllers_ for scaling out.
 	ScaleOutControllers []*ScaleOutController `protobuf:"bytes,5,rep,name=scale_out_controllers,json=scaleOutControllers,proto3" json:"scale_out_controllers,omitempty"`
 	// List of _Controllers_ for scaling in.
 	ScaleInControllers []*ScaleInController `protobuf:"bytes,6,rep,name=scale_in_controllers,json=scaleInControllers,proto3" json:"scale_in_controllers,omitempty"`
-	// The maximum increase of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+	// The maximum increase of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
 	MaxScaleOutPercentage float64 `protobuf:"fixed64,8,opt,name=max_scale_out_percentage,json=maxScaleOutPercentage,proto3" json:"max_scale_out_percentage,omitempty" default:"10"` // @gotags: default:"10"
-	// The maximum decrease of scale (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+	// The maximum decrease of scale (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
 	MaxScaleInPercentage float64 `protobuf:"fixed64,7,opt,name=max_scale_in_percentage,json=maxScaleInPercentage,proto3" json:"max_scale_in_percentage,omitempty" default:"1"` // @gotags: default:"1"
 	// The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
 	ScaleOutCooldown *durationpb.Duration `protobuf:"bytes,9,opt,name=scale_out_cooldown,json=scaleOutCooldown,proto3" json:"scale_out_cooldown,omitempty" default:"30s"` // @gotags: default:"30s"
@@ -606,9 +606,9 @@ type AutoScaler struct {
 	// For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
 	// scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
 	CooldownOverridePercentage float64 `protobuf:"fixed64,11,opt,name=cooldown_override_percentage,json=cooldownOverridePercentage,proto3" json:"cooldown_override_percentage,omitempty" default:"50"` // @gotags: default:"50"
-	// Configuration for scale-out alerter.
+	// Configuration for scale-out Alerter.
 	ScaleOutAlerterParameters *Alerter_Parameters `protobuf:"bytes,12,opt,name=scale_out_alerter_parameters,json=scaleOutAlerterParameters,proto3" json:"scale_out_alerter_parameters,omitempty"`
-	// Configuration for scale-in alerter.
+	// Configuration for scale-in Alerter.
 	ScaleInAlerterParameters *Alerter_Parameters `protobuf:"bytes,13,opt,name=scale_in_alerter_parameters,json=scaleInAlerterParameters,proto3" json:"scale_in_alerter_parameters,omitempty"`
 }
 
@@ -735,7 +735,7 @@ func (x *AutoScaler) GetScaleInAlerterParameters() *Alerter_Parameters {
 	return nil
 }
 
-// _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
+// _PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto scale.
 type PodAutoScaler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -752,9 +752,9 @@ type PodAutoScaler struct {
 	ScaleOutControllers []*ScaleOutController `protobuf:"bytes,5,rep,name=scale_out_controllers,json=scaleOutControllers,proto3" json:"scale_out_controllers,omitempty"`
 	// List of _Controllers_ for scaling in.
 	ScaleInControllers []*ScaleInController `protobuf:"bytes,6,rep,name=scale_in_controllers,json=scaleInControllers,proto3" json:"scale_in_controllers,omitempty"`
-	// The maximum increase of replicas (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
+	// The maximum increase of replicas (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 10% of current scale value.
 	MaxScaleOutPercentage float64 `protobuf:"fixed64,8,opt,name=max_scale_out_percentage,json=maxScaleOutPercentage,proto3" json:"max_scale_out_percentage,omitempty" default:"10"` // @gotags: default:"10"
-	// The maximum decrease of replicas (e.g. pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
+	// The maximum decrease of replicas (for example, pods) at one time. Defined as percentage of current scale value. Can never go below one even if percentage computation is less than one. Defaults to 1% of current scale value.
 	MaxScaleInPercentage float64 `protobuf:"fixed64,7,opt,name=max_scale_in_percentage,json=maxScaleInPercentage,proto3" json:"max_scale_in_percentage,omitempty" default:"1"` // @gotags: default:"1"
 	// The amount of time to wait after a scale-out operation for another scale-out or scale-in operation.
 	ScaleOutCooldown *durationpb.Duration `protobuf:"bytes,9,opt,name=scale_out_cooldown,json=scaleOutCooldown,proto3" json:"scale_out_cooldown,omitempty" default:"30s"` // @gotags: default:"30s"
@@ -764,9 +764,9 @@ type PodAutoScaler struct {
 	// For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
 	// scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
 	CooldownOverridePercentage float64 `protobuf:"fixed64,11,opt,name=cooldown_override_percentage,json=cooldownOverridePercentage,proto3" json:"cooldown_override_percentage,omitempty" default:"50"` // @gotags: default:"50"
-	// Configuration for scale-out alerter.
+	// Configuration for scale-out Alerter.
 	ScaleOutAlerterParameters *Alerter_Parameters `protobuf:"bytes,12,opt,name=scale_out_alerter_parameters,json=scaleOutAlerterParameters,proto3" json:"scale_out_alerter_parameters,omitempty"`
-	// Configuration for scale-in alerter.
+	// Configuration for scale-in Alerter.
 	ScaleInAlerterParameters *Alerter_Parameters `protobuf:"bytes,13,opt,name=scale_in_alerter_parameters,json=scaleInAlerterParameters,proto3" json:"scale_in_alerter_parameters,omitempty"`
 }
 

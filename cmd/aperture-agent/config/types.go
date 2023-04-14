@@ -8,17 +8,19 @@ import (
 	otelconfig "github.com/fluxninja/aperture/pkg/otelcollector/config"
 )
 
-// swagger:operation POST /otel agent-configuration OTEL
+// swagger:operation POST /otel agent-configuration OTel
 // ---
 // x-fn-config-env: true
 // parameters:
 // - in: body
 //   schema:
-//     "$ref": "#/definitions/AgentOTELConfig"
+//     "$ref": "#/definitions/AgentOTelConfig"
 
-// AgentOTELConfig is the configuration for Agent's OTEL collector.
+// AgentOTelConfig is the configuration for Agent's OTel collector.
 //
 // Example configuration:
+//
+// ```yaml
 //
 //	otel:
 //		batch_alerts:
@@ -47,24 +49,26 @@ import (
 //						username: admin
 //				per_agent_group: true
 //
+// ```
+//
 // +kubebuilder:object:generate=true
 //
 //swagger:model
-type AgentOTELConfig struct {
-	otelconfig.CommonOTELConfig `json:",inline"`
+type AgentOTelConfig struct {
+	otelconfig.CommonOTelConfig `json:",inline"`
 	// BatchPrerollup configures batch prerollup processor.
 	BatchPrerollup BatchPrerollupConfig `json:"batch_prerollup"`
 	// BatchPostrollup configures batch postrollup processor.
 	BatchPostrollup BatchPostrollupConfig `json:"batch_postrollup"`
-	// CustomMetrics configures custom metrics OTEL pipelines, which will send data to
-	// the controller prometheus.
-	// Key in this map refers to OTEL pipeline name. Prefixing pipeline name with `metrics/`
+	// CustomMetrics configures custom metrics OTel pipelines, which will send data to
+	// the controller Prometheus.
+	// Key in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`
 	// is optional, as all the components and pipeline names would be normalized.
 	// By default `kubeletstats` custom metrics is added, which can be overwritten.
 	CustomMetrics map[string]CustomMetricsConfig `json:"custom_metrics,omitempty"`
 }
 
-// BatchPrerollupConfig defines configuration for OTEL batch processor.
+// BatchPrerol[.*?]upConfig defines configuration for OTel batch processor.
 // +kubebuilder:object:generate=true
 //
 //swagger:model
@@ -80,7 +84,7 @@ type BatchPrerollupConfig struct {
 	SendBatchMaxSize uint32 `json:"send_batch_max_size" validate:"gte=0" default:"10000"`
 }
 
-// BatchPostrollupConfig defines configuration for OTEL batch processor.
+// BatchPostrollupConfig defines configuration for OTel batch processor.
 // +kubebuilder:object:generate=true
 //
 //swagger:model
@@ -96,7 +100,7 @@ type BatchPostrollupConfig struct {
 	SendBatchMaxSize uint32 `json:"send_batch_max_size" validate:"gte=0" default:"100"`
 }
 
-// CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller prometheus.
+// CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller Prometheus.
 // Environment variables can be used in the configuration using format `${ENV_VAR_NAME}`.
 // +kubebuilder:object:generate=true
 //
@@ -107,16 +111,16 @@ type BatchPostrollupConfig struct {
 //swagger:model
 type CustomMetricsConfig struct {
 	// Receivers define receivers to be used in custom metrics pipelines. This should
-	// be in OTEL format - https://opentelemetry.io/docs/collector/configuration/#receivers.
+	// be in OTel format - https://opentelemetry.io/docs/collector/configuration/#receivers.
 	// +kubebuilder:pruning:PreserveUnknownFields
 	// +kubebuilder:validation:Schemaless
 	Receivers Components `json:"receivers"`
 	// Processors define processors to be used in custom metrics pipelines. This should
-	// be in OTEL format - https://opentelemetry.io/docs/collector/configuration/#processors.
+	// be in OTel format - https://opentelemetry.io/docs/collector/configuration/#processors.
 	// +kubebuilder:pruning:PreserveUnknownFields
 	// +kubebuilder:validation:Schemaless
 	Processors Components `json:"processors,omitempty"`
-	// Pipeline is an OTEL metrics pipeline definition, which **only** uses receivers
+	// Pipeline is an OTel metrics pipeline definition, which **only** uses receivers
 	// and processors defined above. Exporter would be added automatically.
 	//
 	// If there are no processors defined or only one processor is defined, the
@@ -126,8 +130,8 @@ type CustomMetricsConfig struct {
 	// be defined explicitly.
 	Pipeline CustomMetricsPipelineConfig `json:"pipeline"`
 	// PerAgentGroup marks the pipeline to be instantiated only once per agent
-	// group. This is helpful for receivers that scrape eg. some cluster-wide
-	// metrics. When not set, pipeline will be instatiated on every Agent.
+	// group. This is helpful for receivers that scrape for example, some cluster-wide
+	// metrics. When not set, pipeline will be instantiated on every Agent.
 	PerAgentGroup bool `json:"per_agent_group"`
 }
 

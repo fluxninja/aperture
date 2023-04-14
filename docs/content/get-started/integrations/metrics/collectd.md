@@ -13,7 +13,7 @@ Before proceeding, ensure that you have [built][build] Aperture Agent with the
 `collectdreceiver` extension enabled, so that [collectdreceiver][receiver] is
 available.
 
-You can configure [Custom metrics][custom-metrics] for CollectD write_http
+You can configure [Custom metrics][custom-metrics] for CollectD `write_http`
 plugin JSON using the following configuration in the [Aperture Agent's
 config][agent-config]:
 

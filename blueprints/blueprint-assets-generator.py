@@ -702,7 +702,9 @@ def update_docs_markdown(
         readme_copied += f"\n:::\n\n"
 
     readme_copied += f"## Configuration\n"
+    readme_copied += f"<!-- vale off -->\n"
     readme_copied += f"\nCode: <a href={{`https://github.com/fluxninja/aperture/tree/${{aver}}/blueprints/{blueprint_name}`}}>{blueprint_name}</a>\n\n"
+    readme_copied += f"<!-- vale on -->\n"
 
     env = get_jinja2_environment()
     template = env.get_template("markdown.doc.md.j2")

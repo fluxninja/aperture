@@ -51,7 +51,7 @@ message Entities {
   Entities entities_by_name = 2;
 }
 
-// Entity represents a pod, vm, etc.
+// Entity represents a pod, VM, etc.
 message Entity {
   // Unique identifier of the entity.
   string uid = 1; // @gotags: validate:"required"
