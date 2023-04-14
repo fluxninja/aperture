@@ -63,7 +63,7 @@ true, like so:
         .setIgnoredPathMatchRegex(true)
 ```
 
-For more context on using Aperture Armeria Decorators to set Control Points,
+For more context on using Aperture Armeria Decorators to set control points,
 refer to the [example app][armeria-example] available in the repository.
 
 [armeria-example]:

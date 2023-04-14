@@ -65,7 +65,7 @@ curl --fail --location --remote-name "\${url}"
   </TabItem>
 </Tabs>
 
-You should then point Aperture Agent at etcd and Prometheus deployed by the
+The Aperture Agent should be pointed at etcd and Prometheus deployed by the
 Aperture Controller, by editing the configuration file at
 `/etc/aperture/aperture-agent/config/aperture-agent.yaml`.
 

@@ -99,7 +99,7 @@ Examples of built-in components include:
   is to make the signal achieve the setpoint.
   - [Gradient Controller](/reference/policies/spec.md#gradient-controller): This
     controller acts on the ratio of setpoint and signal.
-- **Actuators**: Actuators are components which act on signals and interfaces
+- **Actuators**: Actuators are components which act on signals and interface
   with external systems to perform actions such as shedding traffic, changing
   rate limits or auto scaling etc.
   - [Concurrency Limiter](/reference/policies/spec.md#concurrency-limiter):

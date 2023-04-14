@@ -77,7 +77,7 @@ helpful to handle specific routes in your service.
     return "Flow was accepted", 202
 ```
 
-For more context on using the Aperture Python SDK to set feature Control Points,
+For more context on using the Aperture Python SDK to set feature control points,
 refer to the [example app][example] available in the repository.
 
 <!--- TODO: Change to pypi package once it is published. --->

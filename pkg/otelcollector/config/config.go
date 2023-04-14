@@ -65,12 +65,12 @@ func (o *OTelConfig) AddReceiver(name string, value interface{}) {
 	o.Receivers[name] = value
 }
 
-// AddProcessor adds receiver to OTel config.
+// AddProcessor adds processor to OTel config.
 func (o *OTelConfig) AddProcessor(name string, value interface{}) {
 	o.Processors[name] = value
 }
 
-// AddExporter adds receiver to OTel config.
+// AddExporter adds exporter to OTel config.
 func (o *OTelConfig) AddExporter(name string, value interface{}) {
 	o.Exporters[name] = value
 }

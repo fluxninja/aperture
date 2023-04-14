@@ -59,7 +59,7 @@ The created instance can then be used to start a flow:
     }
 ```
 
-For more context on using Aperture Java SDK to set feature Control Points, refer
+For more context on using Aperture Java SDK to set feature control points, refer
 to the [example app][example] available in the repository.
 
 [example]:

@@ -5,14 +5,14 @@ title: RabbitMQ Queue Buildup Policy
 ## Introduction
 
 This policy detects RabbitMQ queue buildup by looking at the number of messages
-in "ready" state. The gradient controller is then used to calculate a
-proportional response that limits the accepted concurrency. Concurrency is
-increased additively when the overload is no longer detected.
+in "ready" state. A gradient controller calculates a proportional response to
+limit accepted concurrency, which is increased additively when the overload is
+no longer detected.
 
 ## Build Instructions
 
-Make sure that the aperture binary is
-[built](reference/aperturectl/build/agent/) with the `rabbitmqreceiver`
+Make sure that the Aperture binary is
+[built](/reference/aperturectl/build/agent/agent.md) with the `rabbitmqreceiver`
 extension enabled.
 
 ```yaml
