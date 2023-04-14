@@ -19,9 +19,6 @@ type MockEngine struct {
 	recorder *MockEngineMockRecorder
 }
 
-// Make sure that MockEngine implements the iface.Engine interface.
-var _ iface.Engine = (*MockEngine)(nil)
-
 // MockEngineMockRecorder is the mock recorder for MockEngine.
 type MockEngineMockRecorder struct {
 	mock *MockEngine

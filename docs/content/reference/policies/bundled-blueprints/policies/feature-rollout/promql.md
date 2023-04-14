@@ -29,7 +29,7 @@ string"
     type="
 Object (policies/feature-rollout/base:schema:rollout_policy)"
     reference="../../../bundled-blueprints/policies/feature-rollout/base#rollout-policy"
-    value="{'components': [], 'drivers': {}, 'evaluation_interval': '1s', 'load_shaper': {'flow_regulator_parameters': {'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'label_key': ''}, 'steps': [{'duration': '__REQUIRED_FIELD__', 'target_accept_percentage': '__REQUIRED_FIELD__'}]}, 'resources': {'flow_control': {'classifiers': []}}}"
+    value="{'components': [], 'drivers': {'promql_drivers': [{'backward': {'operator': '__REQUIRED_FIELD__', 'threshold': '__REQUIRED_FIELD__'}, 'forward': {'operator': '__REQUIRED_FIELD__', 'threshold': '__REQUIRED_FIELD__'}, 'query_string': '__REQUIRED_FIELD__', 'reset': {'operator': '__REQUIRED_FIELD__', 'threshold': '__REQUIRED_FIELD__'}}]}, 'evaluation_interval': '1s', 'load_shaper': {'flow_regulator_parameters': {'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'label_key': ''}, 'steps': [{'duration': '__REQUIRED_FIELD__', 'target_accept_percentage': '__REQUIRED_FIELD__'}]}, 'resources': {'flow_control': {'classifiers': []}}}"
     description='Parameters for the Feature Rollout policy.' />
 
 ---

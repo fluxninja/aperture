@@ -1,7 +1,7 @@
 local featureRolloutConfig = import '../base/config.libsonnet';
 
 
-local rollout_policy_defaults = {
+local rollout_policy_defaults = featureRolloutConfig.rollout_policy_base {
 
   drivers: {
     promql_drivers: [
@@ -9,7 +9,7 @@ local rollout_policy_defaults = {
     ],
   },
 
-} + featureRolloutConfig.rollout_policy_base;
+};
 
 
 {

@@ -1,15 +1,15 @@
 local featureRolloutConfig = import '../base/config.libsonnet';
 
 
-local rollout_policy_defaults = {
+local rollout_policy_defaults = featureRolloutConfig.rollout_policy_base {
 
   drivers: {
     average_latency_drivers: [
-      featureRolloutConfig.average_latency_driver_defaults,
+      featureRolloutConfig.average_latency_driver,
     ],
   },
 
-} + featureRolloutConfig.rollout_policy_base;
+};
 
 
 {

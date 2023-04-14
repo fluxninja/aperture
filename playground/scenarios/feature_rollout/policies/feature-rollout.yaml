@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=file:/home/tgill/Work/fluxninja/aperture/blueprints/policies/feature-rollout/average-latency/gen/definitions.json
 # Generated values file for policies/feature-rollout/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/feature-rollout/average-latency
@@ -6,7 +7,7 @@ common:
   # Name of the policy.
   # Type: string
   # Required: True
-  policy_name: __REQUIRED_FIELD__
+  policy_name: "feature-rollout"
 
 # Parameters for the Feature Rollout policy.
 # Type: policies/feature-rollout/base:schema:rollout_policy
@@ -17,14 +18,14 @@ policy:
     average_latency_drivers:
       [
         {
-          "backward": { "threshold": "__REQUIRED_FIELD__" },
           "flow_selector":
             {
-              "flow_matcher": { "control_point": "__REQUIRED_FIELD__" },
-              "service_selector": { "service": "__REQUIRED_FIELD__" },
+              "flow_matcher": { "control_point": "ingress" },
+              "service_selector":
+                { "service": "service1-demo-app.demoapp.svc.cluster.local" },
             },
-          "forward": { "threshold": "__REQUIRED_FIELD__" },
-          "reset": { "threshold": "__REQUIRED_FIELD__" },
+          "forward": { "threshold": 75 },
+          "reset": { "threshold": 75 },
         },
       ]
   evaluation_interval: "1s"
@@ -32,16 +33,14 @@ policy:
     flow_regulator_parameters:
       flow_selector:
         flow_matcher:
-          control_point: __REQUIRED_FIELD__
+          control_point: ingress
         service_selector:
-          service: __REQUIRED_FIELD__
+          service: service1-demo-app.demoapp.svc.cluster.local
       label_key: ""
     steps:
       [
-        {
-          "duration": "__REQUIRED_FIELD__",
-          "target_accept_percentage": "__REQUIRED_FIELD__",
-        },
+        { "duration": "0s", "target_accept_percentage": 1.0 },
+        { "duration": "300s", "target_accept_percentage": 100.0 },
       ]
   resources:
     flow_control:
