@@ -238,7 +238,6 @@ func (c *ControllerConn) startPortForward(namespace string) (localPort uint16, c
 	}
 
 	for _, secret := range secrets.Items {
-		fmt.Println(secret.Name)
 		if !strings.HasSuffix(secret.Name, "controller-cert") {
 			continue
 		}
