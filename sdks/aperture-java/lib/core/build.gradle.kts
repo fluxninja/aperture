@@ -18,7 +18,7 @@ tasks.shadowJar {
 }
 
 dependencies {
-    api("com.google.protobuf:protobuf-java-util:3.21.6")
+    api("com.google.protobuf:protobuf-java-util:3.22.2")
 
     implementation(platform("io.opentelemetry:opentelemetry-bom-alpha:1.18.0-alpha"))
     implementation("io.opentelemetry:opentelemetry-sdk-trace:1.18.0")
