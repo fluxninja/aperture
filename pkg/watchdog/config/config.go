@@ -34,7 +34,7 @@ type WatchdogPolicyType struct {
 // swagger:model
 // +kubebuilder:object:generate=true
 type HeapLimit struct {
-	// Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
+	// Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid over scheduling.
 	MinGoGC int `json:"min_gogc" validate:"gt=0,lte=100" default:"25"`
 
 	// Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
@@ -66,7 +66,7 @@ type PolicyCommon struct {
 // swagger:model
 // +kubebuilder:object:generate=true
 type WatermarksPolicy struct {
-	// Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
+	// Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It's recommended to set an extreme watermark for the last element (for example, 0.99).
 	Watermarks []float64 `json:"watermarks,omitempty" validate:"omitempty,dive,gte=0,lte=1" default:"[0.50,0.75,0.80,0.85,0.90,0.95,0.99]"`
 
 	// internal fields

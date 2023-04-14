@@ -43,8 +43,8 @@ func AddAlertsPipeline(config *OTELConfig, cfg CommonOTELConfig, extraProcessors
 	})
 }
 
-// AddPrometheusRemoteWriteExporter adds prometheus remote write exporter which
-// writes to controller prometheus instance.
+// AddPrometheusRemoteWriteExporter adds Prometheus remote write exporter which
+// writes to controller Prometheus instance.
 func AddPrometheusRemoteWriteExporter(config *OTELConfig, promClient promapi.Client) {
 	endpoint := promClient.URL("api/v1/write", nil)
 	// Unfortunately prometheus config structs do not have proper `mapstructure`

@@ -16,9 +16,9 @@ When services are resource constrained and concurrency limits are being applied,
 it's often crucial to preserve key user-experience by gracefully degrading
 application behavior. Graceful degradation allows prioritizing business critical
 features while throttling background workloads and less critical features. For
-instance, for an e-commerce application, ability to check out a shopping cart is
-more critical than personalized recommendations and should be prioritized when
-resources are constrained.
+instance, for an e-commerce application, the ability to check out a shopping
+cart is more critical than personalized recommendations and should be
+prioritized when resources are constrained.
 
 Aperture's
 [weighted fair queuing scheduler](/concepts/flow-control/components/concurrency-limiter.md#scheduler)
@@ -39,7 +39,7 @@ service than guest users. Two alternative methods will be used to provide the
 `User-Type` value to the scheduler:
 
 - Subscribers: The header value of `User-Type` will be directly matched to
-  `subscriber` since all HTTP headers are directly available as flow labels
+  `subscriber`, since all HTTP headers are directly available as flow labels
   within the scheduler.
 - Guests: To identify guest users, a classification rule will be used that
   utilizes an

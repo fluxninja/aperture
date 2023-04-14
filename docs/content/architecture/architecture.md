@@ -103,10 +103,8 @@ collected from Aperture Agents. It enables Aperture to monitor the system and
 detect deviations from the service-level objectives (SLOs) defined in the
 declarative policies.
 
-etcd is a distributed key-value store used to store configuration and flow
-control information. Aperture Controller uses etcd to store the declarative
-policies that define the control circuits and their components, as well as the
-current system state.
+Aperture Controller uses etcd to store the declarative policies that define the
+control circuits and their components, as well as the current system state.
 
 Users can optionally reuse their existing etcd or
 [scalable Prometheus](https://promlabs.com/blog/2021/10/14/promql-vendor-compatibility-round-three)

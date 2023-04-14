@@ -14,8 +14,8 @@ import Zoom from 'react-medium-image-zoom';
 
 One of the simplest flow control policies is static rate limiting to regulate
 heavy-hitters. It uses
-[Rate Limiting Actuator](/concepts/flow-control/components/rate-limiter.md) to
-block specific flow labels that exceed their quota within a certain timeframe
+[Rate-Limiting Actuator](/concepts/flow-control/components/rate-limiter.md) to
+block specific flow labels that exceed their quota within a certain time-frame
 (limit reset interval).
 
 ## Policy
@@ -74,7 +74,7 @@ for this policy.
 ### Playground
 
 When the policy above is loaded in the playground, no more than 120 requests are
-accepted in a 60 second period and the rest of the requests are rejected.
+accepted in a 60-second period and the rest of the requests are rejected.
 
 <Zoom>
 

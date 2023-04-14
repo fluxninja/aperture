@@ -1,6 +1,6 @@
 ---
-title: Google Pubsub
-description: Integrating Google Pubsub Metrics
+title: Google Pub/Sub
+description: Integrating Google Pub/Sub Metrics
 keywords:
   - googlecloudpubsub
   - otel
@@ -13,7 +13,7 @@ Before proceeding, ensure that you have [built][build] Aperture Agent with the
 `googlecloudpubsubreceiver` extension enabled, so that
 [googlecloudpubsubreceiver][receiver] is available.
 
-You can configure [Custom metrics][custom-metrics] for Google Pubsub using the
+You can configure [Custom metrics][custom-metrics] for Google Pub/Sub using the
 following configuration in the [Aperture Agent's config][agent-config]:
 
 ```yaml

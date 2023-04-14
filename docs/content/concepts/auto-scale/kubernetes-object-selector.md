@@ -15,8 +15,8 @@ See also
 
 :::
 
-_Kubernetes Object Selectors_ are used by auto scaling components in a policy
-such as [PodScaler](reference/policies/spec.md#pod-scaler) or
+_Kubernetes Object Selectors_ are used by auto scaling components in a policy,
+such as [Pod Scaler](reference/policies/spec.md#pod-scaler) or
 [_Auto Scaler_](reference/policies/spec.md#pod-scaler). A Kubernetes Object
 Selector identifies a resource in the Kubernetes cluster.
 

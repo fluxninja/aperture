@@ -36,18 +36,18 @@ requests), some basic metadata is available as _request labels_. These are
 `http.method`, `http.target`, `http.host`, `http.scheme`,
 `http.request_content_length` and `http.flavor`. Additionally, all (non-pseudo)
 headers are available as `http.request.header.header_name`, e.g.
-`http.request.header.user_agent` (note the snake_case!). Values of these labels
-are described by [OpenTelemetry semantic conventions for HTTP
-spans][otel-conventions]. The only exception is `http.host` attribute, which is
-equal to Host/Authority header. This is thus similar to `net.peer.name` OTEL
-attribute.
+`http.request.header.user_agent` (note the `snake_case`!). The values of these
+labels are described by [OpenTelemetry semantic conventions for HTTP
+spans][otel-conventions]. The only exception is the `http.host` attribute, which
+is equal to the Host/Authority header. This is thus similar to the
+`net.peer.name` OTel attribute.
 
 ### Baggage {#baggage}
 
 Baggage propagation is a powerful concept that allows attaching metadata to a
 whole request chain or to a whole [trace][traces]. If you already have baggage
 propagation configured in your system, you can access the baggage as flow
-labels. This is supported on service-mesh (Envoy) and web framework based
+labels. This is supported on service-mesh (Envoy) and web framework-based
 control point insertion.
 
 - _HTTP_: Baggage is pulled from the [_baggage_][baggage] header.
@@ -132,7 +132,7 @@ collected from the following sources:
 - Traces from [Aperture SDK][aperture-go]
 
 Aperture uses OpenTelemetry's robust pipelines for receiving the telemetry data
-and produce other streams of data from it.
+and producing other streams of data from it.
 
 ### Metrics
 
@@ -148,7 +148,7 @@ labels.
 
 OLAP style telemetry doesn't work well with extremely high-cardinality labels,
 thus if an extremely high-cardinality label is detected, some of its values may
-be replaced with `REDACTED_VIA_CARDINALITY_LIMIT` string.
+be replaced with the `REDACTED_VIA_CARDINALITY_LIMIT` string.
 
 #### Default labels
 
@@ -167,7 +167,7 @@ integration, or explicitly at flow creation in [Aperture SDK][aperture-go].
 
 :::note
 
-In the case of a clash, the flow Label will be applied in the following
+In the case of a clash, the _Flow Label_ will be applied in the following
 precedence over:
 
 1. User-defined

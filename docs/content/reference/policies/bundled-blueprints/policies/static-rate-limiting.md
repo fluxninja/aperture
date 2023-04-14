@@ -4,7 +4,7 @@ title: Static Rate Limiting Policy
 
 ## Introduction
 
-This blueprint provides a simple static rate limiting policy and a dashboard.
+This blueprint provides a simple static rate-limiting policy and a dashboard.
 This policy uses the [`RateLimiter`](/reference/policies/spec.md#rate-limiter)
 component.
 

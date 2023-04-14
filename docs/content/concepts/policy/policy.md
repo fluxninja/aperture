@@ -21,7 +21,7 @@ an application reliability context, policies codify the capability of the
 application to modify its operational state to achieve the best possible mode of
 operation despite overload and failures.
 
-Policy specification consists of two parts:
+The policy specification consists of two parts:
 
 ## Circuit
 

@@ -41,11 +41,11 @@ experience, while optimizing resources and reducing costs.
 
 ## Declarative Policy Language
 
-Aperture's declarative policy language enables teams to easily create and
+Aperture's declarative policy language enables teams to rapidly create and
 version policies that define the behaviors of their applications under different
 conditions. This provides teams with a visual representation of their policies,
-allowing them to quickly and intuitively understand how the system is behaving
-and correcting itself.
+allowing them to intuitively understand how the system is behaving and
+correcting itself.
 
 ## Advanced Load Management Capabilities
 
@@ -69,7 +69,7 @@ Learn more about how Aperture interfaces with your application in the
 ![Aperture Control Loop](assets/img/oaalight.png#gh-light-mode-only)
 ![Aperture Control Loop](assets/img/oaadark.png#gh-dark-mode-only)
 
-## What Features Does Aperture Offer?
+## Aperture Features
 
 Aperture is a load management platform that offers several features to help
 maintain the stability and reliability of modern web-scale applications,

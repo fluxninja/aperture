@@ -195,6 +195,8 @@ Generated File Starts
 
 ### {{ upper (humanize .PackageAlias) }}
 
+<!-- vale off -->
+
 | Key | Reference |
 |-----|-----------|
   {{- range .Operations }}
@@ -202,6 +204,8 @@ Generated File Starts
   {{- end }}
   {{- printf "\n" }}
 {{- end }}
+
+<!-- vale on -->
 
 {{- if .Operations }}
 ## Reference{{/* all config sections */}}

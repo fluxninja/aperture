@@ -55,8 +55,8 @@ public class AppController {
 
 You can instruct the filter to exclude specific paths from being monitored by
 the Aperture SDK. For example, you might want to exclude endpoints used for
-health checks. To do this, you can add the path(s) you want to ignore to the
-filter configuration, as shown in the following code:
+health checks. To achieve this, you can add the path(s) you want to ignore to
+the filter configuration, as shown in the following code:
 
 ```java
 registrationBean.addInitParameter("ignored_paths", "/healthz,/metrics");
@@ -64,14 +64,14 @@ registrationBean.addInitParameter("ignored_paths", "/healthz,/metrics");
 
 The paths should be specified as a comma-separated list. Note that the paths you
 specify must match exactly. However, you can change this behavior to treat the
-paths as regular expressions by setting the `ignored_paths_match_regex` init
-parameter to true, like so:
+paths as regular expressions by setting the `ignored_paths_match_regex`
+initialization parameter to true, like so:
 
 ```java
 registrationBean.addInitParameter("ignored_paths_match_regex", "true");
 ```
 
-For example usage, you can view the [example app][spring-example] available in
+For example, usage, you can view the [example app][spring-example] available in
 the repository.
 
 [spring-example]:

@@ -22,8 +22,8 @@ where it will get deployed on all the nodes of the cluster.
 
 ## Prerequisites
 
-You can do the installation using `aperturectl` CLI tool or using `Helm`.
-Install the tool of your choice using below links:
+You can do the installation using the `aperturectl` CLI tool or using `Helm`.
+Install the tool of your choice using the following links:
 
 1. [aperturectl](/get-started/aperture-cli/aperture-cli.md)
 
@@ -42,7 +42,11 @@ Install the tool of your choice using below links:
       helm repo update
       ```
 
+<!-- vale off -->
+
 ## Installation {#agent-daemonset-installation}
+
+<!-- vale on -->
 
 The Aperture Agent in the DaemonSet mode will be installed using the
 [Kubernetes Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
@@ -59,7 +63,7 @@ Kubernetes Objects which will be created by following steps are listed
 :::
 
 1. Configure the below parameters of etcd and Prometheus for the Agent Custom
-   Resource by creating a `values.yaml` and pass it with `install` command:
+   Resource by creating a `values.yaml` and passing it with `install` command:
 
    :::info
 
@@ -83,8 +87,8 @@ Kubernetes Objects which will be created by following steps are listed
    Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with
    the actual values of etcd and Prometheus, which is also being used by the
    Aperture Controller you want these Agents to connect with.
-   `CONTROLLER_ENDPOINT_HERE` should point to Aperture Controller. If you skip
-   it, some sub-commands `aperturectl` commands won't work.
+   `CONTROLLER_ENDPOINT_HERE` should point to the Aperture Controller. If you
+   skip it, some sub-commands `aperturectl` commands won't work.
 
    If you have installed the
    [Aperture Controller](/get-started/installation/controller/controller.md) on
@@ -193,7 +197,7 @@ Kubernetes Objects which will be created by following steps are listed
       </TabItem>
       </Tabs>
 
-   2. Create a YAML file with below specifications:
+   2. Create a YAML file with the following specifications:
 
       ```yaml
       apiVersion: fluxninja.com/v1alpha1
@@ -223,18 +227,22 @@ Kubernetes Objects which will be created by following steps are listed
       kubectl apply -f agent.yaml
       ```
 
-5. Refer steps on the
+5. Refer to steps on the
    [Istio Configuration](/get-started/integrations/flow-control/envoy/istio.md)
    if you don't have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.
 
+<!-- vale off -->
+
 ## Upgrade Procedure {#agent-daemonset-upgrade-procedure}
+
+<!-- vale on -->
 
 By following these instructions, you will have deployed the upgraded version of
 Aperture Agent into your cluster.
 
-1. Use the same `values.yaml` file created as part of
+1. Use the same `values.yaml` file created as part of the
    [Installation Steps](#agent-daemonset-installation) and pass it with below
    command:
 
@@ -284,7 +292,7 @@ You should see pods for Aperture Agent and Agent Manager in `RUNNING` state and
 ## Uninstall
 
 You can uninstall the Aperture Agent and its components installed above by
-following below steps:
+following the following steps:
 
 1. Uninstall the Aperture Agent:
 
@@ -325,8 +333,8 @@ following below steps:
       </TabItem>
       </Tabs>
 
-3. If you have installed the chart in some other namespace than `default`,
-   execute below commands:
+3. If you have installed the chart in some other namespace than the `default`,
+   execute the following commands:
 
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
@@ -344,9 +352,13 @@ following below steps:
 
 4. **Optional**: Delete the CRD installed by the Helm chart:
 
-   > Note: By design, deleting a Helm chart via Helm doesn’t delete the Custom
-   > Resource Definitions (CRD) installed via the chart.
+:::note
 
-   ```bash
-   kubectl delete crd agents.fluxninja.com
-   ```
+Deleting a Helm chart via Helm doesn’t delete the Custom Resource Definitions
+(CRD) installed via the chart.
+
+:::
+
+```bash
+kubectl delete crd agents.fluxninja.com
+```

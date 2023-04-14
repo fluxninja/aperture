@@ -41,7 +41,7 @@ definitions:
                 x-go-tag-default: "1.6"
                 x-go-tag-json: multiplier
                 x-go-tag-validate: gte=0
-        title: BackoffConfig holds configuration for GRPC Client Backoff.
+        title: BackoffConfig holds configuration for GRPC client backoff.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/grpc
     ClientConfig:
@@ -77,7 +77,7 @@ definitions:
                 type: string
                 x-go-name: KeyLogWriter
                 x-go-tag-json: key_log_file
-        title: ClientTLSConfig is the config for client TLS.
+        title: ClientTLSConfig is the configuration for client TLS.
         type: object
         x-go-package: github.com/fluxninja/aperture/pkg/net/tlsconfig
     Duration:
@@ -88,7 +88,7 @@ definitions:
     FluxNinjaExtensionConfig:
         properties:
             api_key:
-                description: API Key for this agent. If this key is not set, the extension will not be enabled.
+                description: API Key for this agent. If this key isn't set, the extension won't be enabled.
                 type: string
                 x-go-name: APIKey
                 x-go-tag-json: api_key
@@ -96,7 +96,7 @@ definitions:
                 $ref: '#/definitions/ClientConfig'
                 x-go-tag-json: client
             endpoint:
-                description: Address to grpc or http(s) server listening in agent service. To use http protocol, the address must start with http(s)://.
+                description: Address to GRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`.
                 pattern: (((^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$))|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)
                 type: string
                 x-go-name: Endpoint
@@ -174,7 +174,7 @@ definitions:
                 x-go-tag-json: disable_compression
             disable_keep_alives:
                 default: false
-                description: Disable HTTP Keep Alives
+                description: Disable HTTP Keepalive
                 type: boolean
                 x-go-name: DisableKeepAlives
                 x-go-tag-default: "false"
@@ -198,7 +198,7 @@ definitions:
                 x-go-tag-json: idle_connection_timeout
                 x-go-tag-validate: gte=0s
             key_log_file:
-                description: SSL key log file (useful for debugging with wireshark)
+                description: SSL key log file (useful for debugging)
                 type: string
                 x-go-name: KeyLogWriter
                 x-go-tag-json: key_log_file

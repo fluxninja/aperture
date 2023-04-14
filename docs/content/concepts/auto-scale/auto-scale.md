@@ -13,7 +13,7 @@ traffic. It enables service operators to automatically adjust the number of
 instances or resources allocated to a service based on current or expected
 demand and resource utilization. By doing so, auto scaling ensures that a
 service can handle incoming load while optimizing the cost of running the
-service by allocating just the right amount of resources.
+service by allocating just the right number of resources.
 
 Auto scale is a core integration in Aperture that works hand in hand with the
 flow control capabilities to provide a comprehensive load management platform.

@@ -38,6 +38,8 @@ following command:
 Aperture Java Instrumentation Agent can be configured using a properties file,
 system properties or environment variables:
 
+<!-- vale off -->
+
 | Property name                          | Environment variable name              | Default value | Description                                                                |
 | :------------------------------------- | :------------------------------------- | :------------ | :------------------------------------------------------------------------- |
 | aperture.javaagent.config.file         | APERTURE_JAVAAGENT_CONFIG_FILE         |               | Path to a file containing configuration properties                         |
@@ -47,9 +49,11 @@ system properties or environment variables:
 | aperture.javaagent.blocked.paths       | APERTURE_JAVAAGENT_BLOCKED_PATHS       |               | Comma-separated list of paths that shouldn't start a flow                  |
 | aperture.javaagent.blocked.paths.regex | APERTURE_JAVAAGENT_BLOCKED_PATHS_REGEX |               | Whether the configured blocked paths should be read as regular expressions |
 
+<!-- vale on -->
+
 The priority order is `system.property` > `ENV_VARIABLE` > `properties file`.
 
-Example invocation with commandline-set properties:
+Example invocation with `commandline-set` properties:
 
 ```sh
 java -javaagent:path/to/javaagent.jar \

@@ -33,33 +33,33 @@ and pod annotations as below:
 The injector is configured with the following logic:
 
 - If either label or annotation is disabled, the pod isn't injected
-- If pod annotation is enabled but the namespace label isn't present, the pod
+- If pod annotation is enabled, but the namespace label isn't present, the pod
   isn't injected
-- If neither label nor annotation is set, the pod is injected if the namespace
-  is listed under `.spec.sidecar.enableNamespacesByDefault`. This isn't enabled
-  by default, so this means the pod isn't injected.
+- If the label and annotation are unset, then the sidecar is injected if the
+  namespace is listed under `.spec.sidecar.enableNamespacesByDefault`. This
+  isn't enabled by default, so this means the sidecar isn't injected.
 
 ## Prerequisites
 
-You can do the installation using `aperturectl` CLI tool or using `Helm`.
-Install the tool of your choice using below links:
+You can do the installation using the `aperturectl` CLI tool or using `Helm`.
+Install the tool of your choice using the following links:
 
-1.  [aperturectl](/get-started/aperture-cli/aperture-cli.md)
+1. [aperturectl](/get-started/aperture-cli/aperture-cli.md)
 
-    :::info Refer
-    [aperturectl install agent](/reference/aperturectl/install/agent/agent.md)
-    to see all the available command line arguments.
+   :::info Refer
+   [aperturectl install agent](/reference/aperturectl/install/agent/agent.md) to
+   see all the available command line arguments.
 
-2.  [Helm](https://helm.sh/docs/intro/install/)
+2. [Helm](https://helm.sh/docs/intro/install/)
 
-    1. Once the Helm CLI is installed, add the
-       [Aperture Agent Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-agent)
-       repository in your environment for install/upgrade:
+   1. Once the Helm CLI is installed, add the
+      [Aperture Agent Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-agent)
+      repository in your environment for install/upgrade:
 
-       ```bash
-       helm repo add aperture https://fluxninja.github.io/aperture/
-       helm repo update
-       ```
+      ```bash
+      helm repo add aperture https://fluxninja.github.io/aperture/
+      helm repo update
+      ```
 
 ## Installation {#agent-sidecar-installation}
 
@@ -78,8 +78,8 @@ Kubernetes Objects which will be created by following steps are listed
 :::
 
 1. Configure the below parameters of etcd and Prometheus for the Agent Custom
-   Resource by creating a `values.yaml` with below parameters and pass it with
-   `install` command:
+   Resource by creating a `values.yaml` with the following parameters and
+   passing it with `install` command:
 
    :::info
 
@@ -105,8 +105,8 @@ Kubernetes Objects which will be created by following steps are listed
    Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with
    the actual values of etcd and Prometheus, which is also being used by the
    Aperture Controller you want these Agents to connect with.
-   `CONTROLLER_ENDPOINT_HERE` should point to Aperture Controller. If you skip
-   it, some subcommands `aperturectl` commands won't work.
+   `CONTROLLER_ENDPOINT_HERE` should point to the Aperture Controller. If you
+   skip it, some sub-commands `aperturectl` commands won't work.
 
    If you have installed the
    [Aperture Controller](/get-started/installation/controller/controller.md) on
@@ -142,7 +142,8 @@ Kubernetes Objects which will be created by following steps are listed
    </Tabs>
 
 2. To enable the pod injection for a list of namespaces by default, you can
-   create or update the `values.yaml` file and pass it with `install` command:
+   create or update the `values.yaml` file and pass it with the `install`
+   command:
 
    ```yaml
    agent:
@@ -252,7 +253,7 @@ Kubernetes Objects which will be created by following steps are listed
       </TabItem>
       </Tabs>
 
-   2. Create a YAML file with below specifications:
+   2. Create a YAML file with the following specifications:
 
       ```yaml
       apiVersion: fluxninja.com/v1alpha1
@@ -284,7 +285,7 @@ Kubernetes Objects which will be created by following steps are listed
       kubectl apply -f agent.yaml
       ```
 
-6. Refer steps on the
+6. Refer to the steps on the
    [Istio Configuration](/get-started/integrations/flow-control/envoy/istio.md)
    if you don't have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
@@ -295,7 +296,7 @@ Kubernetes Objects which will be created by following steps are listed
 By following these instructions, you will have deployed the upgraded version of
 Aperture Agent into your cluster.
 
-1. Use the same `values.yaml` file created as part of
+1. Use the same `values.yaml` file created as part of the
    [Installation Steps](#agent-sidecar-installation) and pass it with below
    command:
 
@@ -351,7 +352,7 @@ kubectl describe po <POD_ID>
 ```
 
 Replace the `POD_ID` with the actual pod ID and check the containers section in
-the output. There should be a container with name `aperture-agent`.
+the output. There should be a container with the name `aperture-agent`.
 
 ## Customizing injection
 
@@ -359,7 +360,7 @@ The pods are injected based on the default and overridden parameters provided in
 the Custom Resource.
 
 Per-pod configuration is available to override these options on individual pods.
-This is done by adding an `aperture-agent` container to your pod. The sidecar
+This is done by adding a `aperture-agent` container to your pod. The sidecar
 injection will treat any configuration defined here as an override to the
 default injection template.
 
@@ -396,25 +397,26 @@ spec:
   restartPolicy: Always
 ```
 
-In general, any field in a pod can be set. However, care must be taken for
+In general, any field in a pod can be set. However, care must be taken in
 certain fields:
 
 - Kubernetes requires the image field to be set before the injection has run.
   While you can set a specific image to override the default one, it's
-  recommended to set the image to `auto` which will cause the sidecar injector
+  recommended to set the image to `auto`, which will cause the sidecar injector
   to automatically select the image to use.
 - Some fields in Pod are dependent on related settings. For example, CPU request
-  must be less than CPU limit. If both fields aren't configured together, the
-  pod may fail to start.
+  must be less than the CPU limit. If both fields aren't configured together,
+  the pod may fail to start.
 
-Additionally, `agent-group` field can be configured using the annotation like:
+Additionally, the `agent-group` field can be configured using the annotation
+like:
 
 `sidecar.fluxninja.com/agent-group=group1`
 
 ## Uninstall
 
-You can uninstall the Aperture Agent and it's components installed above by
-following below steps:
+You can uninstall the Aperture Agent and its components installed above by
+following the following steps:
 
 1. Delete the Aperture Agent chart:
 
@@ -446,8 +448,8 @@ following below steps:
       </TabItem>
       </Tabs>
 
-3. If you have installed the chart in some other namespace than `default`,
-   execute below commands:
+3. If you have installed the chart in some other namespace than the `default`,
+   execute the following commands:
 
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
@@ -486,9 +488,13 @@ following below steps:
 
 8. **Optional**: Delete the CRD installed by the Helm chart:
 
-   > Note: By design, deleting a Helm chart via Helm doesn’t delete the Custom
-   > Resource Definitions installed via the chart.
+:::note
 
-   ```bash
-   kubectl delete crd agents.fluxninja.com
-   ```
+Deleting a Helm chart via Helm doesn’t delete the Custom Resource Definitions
+installed via the chart.
+
+:::
+
+```bash
+kubectl delete crd agents.fluxninja.com
+```

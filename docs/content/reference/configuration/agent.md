@@ -26,11 +26,15 @@ Generated File Starts
 
 ### AGENT CONFIGURATION
 
-| Key    | Reference        |
-| ------ | ---------------- |
-| `otel` | [OTEL](#o-t-e-l) |
+<!-- vale off -->
+
+| Key    | Reference      |
+| ------ | -------------- |
+| `otel` | [OTel](#o-tel) |
 
 ### COMMON CONFIGURATION
+
+<!-- vale off -->
 
 | Key                 | Reference                              |
 | ------------------- | -------------------------------------- |
@@ -54,10 +58,14 @@ Generated File Starts
 
 ### EXTENSION CONFIGURATION
 
+<!-- vale off -->
+
 | Key         | Reference                                   |
 | ----------- | ------------------------------------------- |
 | `fluxninja` | [FluxNinjaExtension](#flux-ninja-extension) |
 | `sentry`    | [SentryExtension](#sentry-extension)        |
+
+<!-- vale on -->
 
 ## Reference
 
@@ -291,7 +299,7 @@ Env-Var Prefix: `APERTURE_AGENT_METRICS_`
 
 <!-- vale off -->
 
-### _otel_ {#o-t-e-l}
+### _otel_ {#o-tel}
 
 <!-- vale on -->
 
@@ -584,7 +592,7 @@ AgentInfoConfig is the configuration for the agent group and other agent attribu
 
 <!-- vale on -->
 
-All agents within an agent_group receive the same data-plane configuration (e.g. Flux Meters, Rate Limiters etc).
+All agents within an `agent_group` receive the same data-plane configuration (for example, Flux Meters, Rate Limiters etc).
 
 [Read more about agent groups here](/concepts/flow-control/flow-selector.md#agent-group).
 
@@ -599,36 +607,40 @@ All agents within an agent_group receive the same data-plane configuration (e.g.
 
 <!-- vale on -->
 
-AgentOTELConfig is the configuration for Agent's OTEL collector.
+AgentOTELConfig is the configuration for Agent's OTel collector.
 
 Example configuration:
 
-    otel:
-    	batch_alerts:
-    		send_batch_max_size: 100
-    		send_batch_size: 100
-    		timeout: 1s
-    	batch_prerollup:
-    		send_batch_max_size: 10000
-    		send_batch_size: 10000
-    		timeout: 10s
-    	batch_postrollup:
-    		send_batch_max_size: 100
-    		send_batch_size: 100
-    		timeout: 1s
-    	custom_metrics:
-    		rabbitmq:
-    			processors:
-    				batch:
-    					send_batch_size: 10
-    	 				timeout: 10s
-    			receivers:
-    	 			rabbitmq:
-    	 				collection_interval: 10s
-    					endpoint: http://<rabbitmq-svc-fqdn>:15672
-    					password: secretpassword
-    					username: admin
-    			per_agent_group: true
+```yaml
+
+	otel:
+		batch_alerts:
+			send_batch_max_size: 100
+			send_batch_size: 100
+			timeout: 1s
+		batch_prerollup:
+			send_batch_max_size: 10000
+			send_batch_size: 10000
+			timeout: 10s
+		batch_postrollup:
+			send_batch_max_size: 100
+			send_batch_size: 100
+			timeout: 1s
+		custom_metrics:
+			rabbitmq:
+				processors:
+					batch:
+						send_batch_size: 10
+		 				timeout: 10s
+				receivers:
+		 			rabbitmq:
+		 				collection_interval: 10s
+						endpoint: http://<rabbitmq-svc-fqdn>:15672
+						password: secretpassword
+						username: admin
+				per_agent_group: true
+
+```
 
 <dl>
 <dt>custom_metrics</dt>
@@ -640,9 +652,9 @@ Example configuration:
 
 <!-- vale on -->
 
-CustomMetrics configures custom metrics OTEL pipelines, which will send data to
-the controller prometheus.
-Key in this map refers to OTEL pipeline name. Prefixing pipeline name with `metrics/`
+CustomMetrics configures custom metrics OTel pipelines, which will send data to
+the controller Prometheus.
+Key in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`
 is optional, as all the components and pipeline names would be normalized.
 By default `kubeletstats` custom metrics is added, which can be overwritten.
 
@@ -709,7 +721,7 @@ AutoScaleKubernetesConfig is the configuration for the flow preview service.
 
 <!-- vale on -->
 
-Enables the Kubernetes autoscale capability.
+Enables the Kubernetes auto scale capability.
 
 </dd>
 </dl>
@@ -722,7 +734,7 @@ Enables the Kubernetes autoscale capability.
 
 <!-- vale on -->
 
-BackoffConfig holds configuration for GRPC Client Backoff.
+BackoffConfig holds configuration for GRPC client backoff.
 
 <dl>
 <dt>base_delay</dt>
@@ -783,7 +795,7 @@ Backoff multiplier
 
 <!-- vale on -->
 
-BatchAlertsConfig defines configuration for OTEL batch processor.
+BatchAlertsConfig defines configuration for OTel batch processor.
 
 <dl>
 <dt>send_batch_max_size</dt>
@@ -833,7 +845,7 @@ Timeout sets the time after which a batch will be sent regardless of size.
 
 <!-- vale on -->
 
-BatchPostrollupConfig defines configuration for OTEL batch processor.
+BatchPostrollupConfig defines configuration for OTel batch processor.
 
 <dl>
 <dt>send_batch_max_size</dt>
@@ -883,7 +895,7 @@ Timeout sets the time after which a batch will be sent regardless of size.
 
 <!-- vale on -->
 
-BatchPrerollupConfig defines configuration for OTEL batch processor.
+BatchPrerol[.*?]upConfig defines configuration for OTel batch processor.
 
 <dl>
 <dt>send_batch_max_size</dt>
@@ -966,7 +978,7 @@ ClientConfig is the client configuration.
 
 <!-- vale on -->
 
-ClientTLSConfig is the config for client TLS.
+ClientTLSConfig is the configuration for client TLS.
 
 <dl>
 <dt>ca_file</dt>
@@ -1044,7 +1056,7 @@ https://github.com/kubernetes-sigs/kubebuilder/issues/528
 
 <!-- vale on -->
 
-CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller prometheus.
+CustomMetricsConfig defines receivers, processors, and single metrics pipeline which will be exported to the controller Prometheus.
 Environment variables can be used in the configuration using format `${ENV_VAR_NAME}`.
 
 :::info
@@ -1062,8 +1074,8 @@ See also [Get Started / Setup Integrations / Metrics](/get-started/integrations/
 <!-- vale on -->
 
 PerAgentGroup marks the pipeline to be instantiated only once per agent
-group. This is helpful for receivers that scrape eg. some cluster-wide
-metrics. When not set, pipeline will be instatiated on every Agent.
+group. This is helpful for receivers that scrape for example, some cluster-wide
+metrics. When not set, pipeline will be instantiated on every Agent.
 
 </dd>
 <dt>pipeline</dt>
@@ -1163,7 +1175,7 @@ BindAddr denotes the address that DistCache will bind to for communication with 
 
 <!-- vale on -->
 
-Address of memberlist to advertise to other cluster members. Used for nat traversal if provided.
+Address of [`memberlist`](https://github.com/hashicorp/memberlist) to advertise to other cluster members. Used for NAT traversal if provided.
 
 </dd>
 <dt>memberlist_bind_addr</dt>
@@ -1175,7 +1187,7 @@ Address of memberlist to advertise to other cluster members. Used for nat traver
 
 <!-- vale on -->
 
-Address to bind mememberlist server to.
+Address to bind [`memberlist`](https://github.com/hashicorp/memberlist) server to.
 
 </dd>
 <dt>replica_count</dt>
@@ -1200,7 +1212,7 @@ ReplicaCount is 1 by default.
 
 <!-- vale on -->
 
-Entity represents a pod, vm, etc.
+Entity represents a pod, VM, etc.
 
 <dl>
 <dt>ip_address</dt>
@@ -1297,7 +1309,7 @@ EtcdConfig holds configuration for etcd client.
 
 <!-- vale on -->
 
-List of Etcd server endpoints
+List of etcd server endpoints
 
 </dd>
 <dt>lease_ttl</dt>
@@ -1391,7 +1403,7 @@ FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
 
 <!-- vale on -->
 
-API Key for this agent. If this key is not set, the extension will not be enabled.
+API Key for this agent. If this key isn't set, the extension won't be enabled.
 
 </dd>
 <dt>endpoint</dt>
@@ -1403,7 +1415,7 @@ API Key for this agent. If this key is not set, the extension will not be enable
 
 <!-- vale on -->
 
-Address to grpc or http(s) server listening in agent service. To use http protocol, the address must start with http(s)://.
+Address to GRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`.
 
 </dd>
 <dt>heartbeat_interval</dt>
@@ -1617,7 +1629,7 @@ Disable Compression
 
 <!-- vale on -->
 
-Disable HTTP Keep Alives
+Disable HTTP Keepalive
 
 </dd>
 <dt>expect_continue_timeout</dt>
@@ -1653,7 +1665,7 @@ Idle Connection Timeout. 0 = no timeout.
 
 <!-- vale on -->
 
-SSL key log file (useful for debugging with wireshark)
+SSL key log file (useful for debugging)
 
 </dd>
 <dt>max_conns_per_host</dt>
@@ -1842,7 +1854,7 @@ HTTPServerConfig holds configuration for HTTP Server.
 
 <!-- vale on -->
 
-Disable HTTP Keep Alives
+Disable HTTP Keepalive
 
 </dd>
 <dt>idle_timeout</dt>
@@ -1966,7 +1978,7 @@ Maximum memory (in bytes) sets limit of process usage. Default = 256MB.
 
 <!-- vale on -->
 
-Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid overscheduling.
+Minimum GoGC sets the minimum garbage collection target percentage for heap driven Watchdogs. This setting helps avoid over scheduling.
 
 </dd>
 <dt>adaptive_policy</dt>
@@ -1999,7 +2011,7 @@ Minimum GoGC sets the minimum garbage collection target percentage for heap driv
 
 <!-- vale on -->
 
-JobConfig is config for Job
+JobConfig is configuration for a periodic job
 
 <dl>
 <dt>execution_period</dt>
@@ -2011,7 +2023,7 @@ JobConfig is config for Job
 
 <!-- vale on -->
 
-Time period between job executions. Zero or negative value means that the job will never execute periodically.
+Time between job executions. Zero or negative value means that the job will never execute periodically.
 
 </dd>
 <dt>execution_timeout</dt>
@@ -2150,7 +2162,7 @@ Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then
 
 <!-- vale on -->
 
-TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
+TCP networks - `tcp`, `tcp4` (IPv4-only), `tcp6` (IPv6-only)
 
 </dd>
 </dl>
@@ -2199,7 +2211,7 @@ Use non-blocking log writer (can lose logs at high throughput)
 
 <!-- vale on -->
 
-Additional log writer: pretty console (stdout) logging (not recommended for prod environments)
+Additional log writer: pretty console (`stdout`) logging (not recommended for prod environments)
 
 </dd>
 <dt>writers</dt>
@@ -2248,7 +2260,7 @@ Compress
 
 <!-- vale on -->
 
-Output file for logs. Keywords allowed - ["stderr", "default"]. "default" maps to `/var/log/fluxninja/<service>.log`
+Output file for logs. Keywords allowed - [`stderr`, `default`]. `default` maps to `/var/log/fluxninja/<service>.log`
 
 </dd>
 <dt>max_age</dt>
@@ -2333,7 +2345,7 @@ EnableProcessCollector controls whether the process collector is registered on s
 
 <!-- vale on -->
 
-Pedantic controls whether a pedantic Registerer is used as the prometheus backend. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
+Pedantic controls whether a pedantic registry is used. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
 
 </dd>
 </dl>
@@ -2359,7 +2371,7 @@ PeerDiscoveryConfig holds configuration for Agent Peer Discovery.
 <!-- vale on -->
 
 Network address of aperture server to advertise to peers - this address
-should be reachable from other agents. Used for nat traversal when
+should be reachable from other agents. Used for NAT traversal when
 provided.
 
 </dd>
@@ -2373,7 +2385,7 @@ provided.
 
 <!-- vale on -->
 
-PortsConfig defines configuration for OTEL debug and extension ports.
+PortsConfig defines configuration for OTel debug and extension ports.
 
 <dl>
 <dt>debug_port</dt>
@@ -2385,7 +2397,7 @@ PortsConfig defines configuration for OTEL debug and extension ports.
 
 <!-- vale on -->
 
-Port on which otel collector exposes prometheus metrics on /metrics path.
+Port on which OTel collector exposes Prometheus metrics on /metrics path.
 
 </dd>
 <dt>health_check_port</dt>
@@ -2409,7 +2421,7 @@ Port on which health check extension in exposed.
 
 <!-- vale on -->
 
-Port on which pprof extension in exposed.
+Port on which `pprof` extension in exposed.
 
 </dd>
 <dt>zpages_port</dt>
@@ -2421,7 +2433,7 @@ Port on which pprof extension in exposed.
 
 <!-- vale on -->
 
-Port on which zpages extension in exposed.
+Port on which `zpages` extension in exposed.
 
 </dd>
 </dl>
@@ -2446,7 +2458,7 @@ ProfilersConfig holds configuration for profilers.
 
 <!-- vale on -->
 
-Flag to enable cpu profiling on process start and save it to a file. HTTP interface will not work if this is enabled as CPU profile will always be running.
+Flag to enable CPU profiling on process start and save it to a file. HTTP interface won't work if this is enabled as CPU profile will always be running.
 
 </dd>
 <dt>profiles_path</dt>
@@ -2470,7 +2482,7 @@ Path to save performance profiles. "default" path is `/var/log/aperture/<service
 
 <!-- vale on -->
 
-Register routes. Profile types profile, symbol and cmdline will be registered at /debug/pprof/{profile,symbol,cmdline}.
+Register routes. Profile types `profile`, `symbol` and `cmdline` will be registered at `/debug/pprof/{profile,symbol,cmdline}`.
 
 </dd>
 </dl>
@@ -2495,7 +2507,7 @@ PrometheusConfig holds configuration for Prometheus Server.
 
 <!-- vale on -->
 
-Address of the prometheus server
+Address of the Prometheus server
 
 </dd>
 </dl>
@@ -2565,7 +2577,7 @@ SentryConfig holds configuration for Sentry.
 
 <!-- vale on -->
 
-Configure to generate and attach stacktraces to capturing message calls
+Configure to generate and attach stack traces to capturing message calls
 
 </dd>
 <dt>debug</dt>
@@ -2601,9 +2613,9 @@ Sentry crash report disabled
 
 <!-- vale on -->
 
-If DSN is not set, the client is effectively disabled
-You can set test project's dsn to send log events.
-oss-aperture project dsn is set as default.
+If DSN isn't set, the client is effectively disabled
+You can set test project's DSN to send log events.
+oss-aperture project DSN is set as default.
 
 </dd>
 <dt>environment</dt>
@@ -2623,11 +2635,11 @@ Environment
 
 <!-- vale off -->
 
-(float64, default: `1`)
+(float64, minimum: `0`, maximum: `1`, default: `1`)
 
 <!-- vale on -->
 
-Sample rate for event submission i.e. 0.0 to 1.0
+Sample rate for event submission
 
 </dd>
 <dt>traces_sample_rate</dt>
@@ -2635,11 +2647,11 @@ Sample rate for event submission i.e. 0.0 to 1.0
 
 <!-- vale off -->
 
-(float64, default: `0.2`)
+(float64, minimum: `0`, maximum: `1`, default: `0.2`)
 
 <!-- vale on -->
 
-Sample rate for sampling traces i.e. 0.0 to 1.0
+Sample rate for sampling traces
 
 </dd>
 </dl>
@@ -2858,7 +2870,7 @@ Flag to enable the policy
 
 <!-- vale on -->
 
-Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It is recommended to set an extreme watermark for the last element (e.g. 0.99).
+Watermarks are increasing limits on which to trigger GC. Watchdog disarms when the last watermark is surpassed. It's recommended to set an extreme watermark for the last element (for example, 0.99).
 
 </dd>
 </dl>

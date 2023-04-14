@@ -41,7 +41,7 @@ the binaries can be downloaded from GitHub <a
 href={`https://github.com/fluxninja/aperture/releases/tag/${apertureVersion}`}>Release
 Page</a>.
 
-Alternatively download it using following script:
+Alternatively, download it using the following script:
 
 <Tabs groupId="packageManager" queryString>
   <TabItem value="dpkg" label="dpkg">
@@ -90,7 +90,7 @@ With rpm:
 ## Enable shell autocompletion
 
 To configure your shell to load `aperturectl`
-[bash completions](/reference/aperturectl/completion/completion.md) add to your
+[bash completions](/reference/aperturectl/completion/completion.md), add to your
 profile:
 
 <Tabs>

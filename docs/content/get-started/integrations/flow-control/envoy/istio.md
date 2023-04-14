@@ -26,9 +26,9 @@ to be added via the Envoy Filter.
 
 **Note**: In all the below patches, it's presumed that the Aperture Agent is
 installed with `DaemonSet` mode and is installed in the `aperture-agent`
-namespace, which makes the target URL value
+namespace, which makes the target URL address value
 `aperture-agent.aperture-agent.svc.cluster.local`. If you are running the
-Aperture Agent in Sidecar mode, use `localhost` as Target URL.
+Aperture Agent in Sidecar mode, use `localhost` as target URL address.
 
 1. The below patch merges the
    [Access Log](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log)
@@ -315,8 +315,8 @@ into your cluster.
    :::info
 
    Replace the value of `ISTIOD_NAMESPACE_HERE` with the namespace in which
-   Istiod is running. This way, the Istio EnvoyFilter will be applied to all the
-   pods having Istio sidecar injected across namespaces.
+   `istiod` is running. This way, the Istio EnvoyFilter will be applied to all
+   the pods having Istio sidecar injected across namespaces.
 
    If you want to apply the Istio EnvoyFilter to a particular namespace, replace
    the value of `ISTIOD_NAMESPACE_HERE` with that namespace.
@@ -338,10 +338,10 @@ into your cluster.
 
    The default values for the Aperture Agent service namespace is
    `aperture-agent`, port is `8080` and sidecar mode is `false`. This makes the
-   Aperture Agent target URL
+   Aperture Agent target URL address
    `aperture-agent.aperture-agent.svc.cluster.local:8080`. If you have installed
    the Aperture Agent in a different namespace or different port, you can create
-   or update the `values.yaml` file and pass it with `install` command:
+   or update the `values.yaml` file and pass it with the `install` command:
 
    ```yaml
    envoyFilter:
@@ -400,8 +400,8 @@ You should see a Kubernetes custom resource for the Istio EnvoyFilter.
 
 ## Uninstall
 
-You can uninstall the Istio EnvoyFilter installed above by following below
-steps:
+You can uninstall the Istio EnvoyFilter installed above by following the
+following steps:
 
 1. Uninstall the Aperture istioconfig:
 

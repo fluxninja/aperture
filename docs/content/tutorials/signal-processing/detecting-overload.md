@@ -16,7 +16,7 @@ import Zoom from 'react-medium-image-zoom';
 Aperture's control-loop policies are programmable "circuits" that are evaluated
 periodically. One of the primary goals of these policies is to calculate the
 deviation from objectives and apply counter-measures such as concurrency limits
-to keep the system is safe operational zone. The policies are used to express
+to keep the system in a safe operational zone. The policies are used to express
 where the metrics are collected from and where the actuation happens, along with
 signal processing needed to translate health metrics to corrective actions.
 
@@ -31,21 +31,21 @@ reported using a [Flux Meter](/concepts/flow-control/resources/flux-meter.md).
 
 :::tip
 
-it's recommended to apply the Flux Meter to a single type of workload in order
-to avoid mixing the latency measurements across distinct workloads. For example,
-if there are Select and Insert API calls on the same service, it's recommended
-to measure the latency of only one of those workloads using a Flux Meter. Refer
+It's recommended to apply the Flux Meter to a single type of workload to avoid
+mixing the latency measurements across distinct workloads. For example, if there
+are Select and Insert API calls on the same service, it's recommended to measure
+the latency of only one of those workloads using a Flux Meter. Refer
 [FlowSelector](/concepts/flow-control/flow-selector.md#flowselector) on how to
 apply the Flux Meter to a subset of API calls for a service.
 
 :::
 
-In this example, we will be computing exponential moving average (EMA) of
+In this example, we will be computing the exponential moving average (EMA) of
 latency, gathered periodically from a
 [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query on
 Flux Meter reported metrics. Further, we will multiply EMA of latency with a
 tolerance factor to calculate setpoint latency, which is a threshold to detect
-overloaded state. that's, if the real-time latency of the service is more than
+overloaded state. That's, if the real-time latency of the service is more than
 this setpoint (which is based on long-term EMA), then we can consider the
 service to be overloaded at that time.
 

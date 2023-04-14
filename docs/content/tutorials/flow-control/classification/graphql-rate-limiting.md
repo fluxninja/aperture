@@ -13,7 +13,8 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-This tutorial demonstrates how to use [_Classifier_][rego-rules] to implement
+This tutorial demonstrates how to use the [_Classifier_][rego-rules] to
+implement
 [static rate limiting](/reference/policies/bundled-blueprints/policies/static-rate-limiting.md)
 for a GraphQL query.
 

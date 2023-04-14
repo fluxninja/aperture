@@ -3,7 +3,7 @@ definitions:
         properties:
             attach_stack_trace:
                 default: true
-                description: Configure to generate and attach stacktraces to capturing message calls
+                description: Configure to generate and attach stack traces to capturing message calls
                 type: boolean
                 x-go-name: AttachStacktrace
                 x-go-tag-default: "true"
@@ -25,9 +25,9 @@ definitions:
             dsn:
                 default: https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877
                 description: |-
-                    If DSN is not set, the client is effectively disabled
-                    You can set test project's dsn to send log events.
-                    oss-aperture project dsn is set as default.
+                    If DSN isn't set, the client is effectively disabled
+                    You can set test project's DSN to send log events.
+                    oss-aperture project DSN is set as default.
                 type: string
                 x-go-name: Dsn
                 x-go-tag-default: https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877
@@ -41,20 +41,26 @@ definitions:
                 x-go-tag-json: environment
             sample_rate:
                 default: 1
-                description: Sample rate for event submission i.e. 0.0 to 1.0
+                description: Sample rate for event submission
                 format: double
+                maximum: 1
+                minimum: 0
                 type: number
                 x-go-name: SampleRate
                 x-go-tag-default: "1.0"
                 x-go-tag-json: sample_rate
+                x-go-tag-validate: gte=0,lte=1
             traces_sample_rate:
                 default: 0.2
-                description: Sample rate for sampling traces i.e. 0.0 to 1.0
+                description: Sample rate for sampling traces
                 format: double
+                maximum: 1
+                minimum: 0
                 type: number
                 x-go-name: TracesSampleRate
                 x-go-tag-default: "0.2"
                 x-go-tag-json: traces_sample_rate
+                x-go-tag-validate: gte=0,lte=1
         title: SentryConfig holds configuration for Sentry.
         type: object
         x-go-package: github.com/fluxninja/aperture/extensions/sentry/config

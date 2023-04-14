@@ -1213,7 +1213,7 @@ definitions:
                 type: object
         type: object
     Entity:
-        description: Entity represents a pod, vm, etc.
+        description: Entity represents a pod, VM, etc.
         properties:
             ip_address:
                 description: |+

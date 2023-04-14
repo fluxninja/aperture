@@ -50,7 +50,7 @@ accuracy.
 
 :::note
 
-Buckets are needed only for quantile queries for example getting the 95th
+Buckets are needed only for quantile queries, for example, getting the 95th
 percentile of duration across pods in a service. The buckets don't matter if you
 are only interested in the average duration or throughput metrics from a _Flux
 Meter_.
@@ -65,11 +65,10 @@ following labels:
 
 1. `flux_meter_name`: Name of the _Flux Meter_ metric
 2. `decision_type`: Flow control decision from Agent
-<!-- TODO tgill: update once we start following OTEL semantic convention on metric labels -->
-3. `status_code`: HTTP status code of the flow. Relevant only for Traffic based
+3. `status_code`: HTTP status code of the flow. Relevant only for traffic-based
    _Control Points_.
 4. `flow_status`: Protocol independent status for the flow.
-5. Other common labels available at all Agent such as `instance`.
+5. Other common labels available at all agents, such as `instance`.
 
 :::info
 
@@ -81,30 +80,31 @@ collected by _Flux Meters_.
 
 Query to get average duration (assuming default _Flux Meter_ metric):
 
-```
+```promql
 sum(increase(flux_meter_sum{flux_meter_name=\"<name>\"}[10s]))/sum(increase(flux_meter_count{flux_meter_name=\"<name>\"}[10s]))
 ```
 
 Query to get requests per second:
 
-```
+```promql
 sum(rate(flux_meter_count{flux_meter_name=\"<name>\"}[10s]))
 ```
 
 Query to get 95th percentile of duration:
 
-```
+```promql
 histogram_quantile(0.95, sum(rate(flux_meter_bucket{flux_meter_name=\"<name>\"}[5m])) by (le))
 ```
 
-[PromQL Components][promql-reference] in a Circuit can use _Flux Meter_ metric
-in a PromQL query as described above. The PromQL Component generates a
+[PromQL Components][promql-reference] in a Circuit can use the _Flux Meter_
+metric in a PromQL query as described above. The PromQL Component generates a
 [signal][signal] representing the results of the PromQL query.
 
 ### Control Loop
 
 A Control Loop can use a duration Signal generated via the _Flux Meter_ metric
-as signal to a Controller which determines the desired Concurrency of a Service.
+as a signal to a Controller which determines the desired Concurrency of a
+Service.
 
 ### Observability
 
@@ -114,7 +114,7 @@ vs. logged out).
 
 [reference]: /reference/policies/spec.md#flux-meter
 [flow-selector]: /concepts/flow-control/flow-selector.md
-[flow-control-integration]: ../flow-control.md#insertion
+[flow-control-insertion]: ../flow-control.md#insertion
 [histogram-metric]: https://prometheus.io/docs/practices/histograms/
 [quantiles]: https://prometheus.io/docs/practices/histograms/#quantiles
 [envoy-access-log-spec]:

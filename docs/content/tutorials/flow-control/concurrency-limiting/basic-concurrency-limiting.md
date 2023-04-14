@@ -13,11 +13,11 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 The most effective technique to protect services from cascading failures is to
-limit the concurrency on the service to match the processing capacity of the
-service. However, figuring out concurrency limit of a service is a hard problem
-in face of continuously changing service infrastructure. Each new version
-deployed, horizontal scaling, or a change in access patterns can change the
-concurrency limit of a service.
+limit the concurrency of the service to match the processing capacity of the
+service. However, figuring out the concurrency limit of a service is a hard
+problem in the face of continuously changing service infrastructure. Each new
+version deployed, horizontal scaling, or a change in access patterns can change
+the concurrency limit of a service.
 
 To accurately model the concurrency limit of a service, it's critical to track
 its
@@ -35,24 +35,25 @@ various building blocks used in the policy separately.
 
 At a high-level, this policy consists of:
 
-- Latency EMA based overload detection: A Flux Meter is used to gather latency
+- Latency EMA-based overload detection: A Flux Meter is used to gather latency
   metrics from a
   [service control point](/concepts/flow-control/flow-selector.md). The latency
-  signal is then fed into an EMA component to establish a long-term trend that
-  can be compared to the current latency to detect overloads. For more
-  information on how this is achieved, see the tutorial on
+  signal is then fed into an Exponential Moving Average (EMA) component to
+  establish a long-term trend that can be compared to the current latency to
+  detect overloads. For more information on how this is achieved, see the
+  tutorial on
   [Detecting Overload](/tutorials/signal-processing/detecting-overload.md).
 - Gradient Controller: Set point latency and current latency signals are fed to
   the gradient controller that calculates the proportional response to adjust
   the Accepted Concurrency (Control Variable).
 - Integral Optimizer: When the service is detected to be in the normal state, an
-  integral optimizer is used to additively increase the concurrency on the
+  integral optimizer is used to additively increase the concurrency of the
   service in each execution cycle of the circuit. This design allows warming-up
-  a service from cold start state. This also protects applications from sudden
-  spikes in traffic as it sets an upper bound to the concurrency allowed on a
-  service in each execution cycle of circuit based on the observed incoming
+  a service from a cold start state. This also protects applications from sudden
+  spikes in traffic, as it sets an upper bound to the concurrency allowed on a
+  service in each execution cycle of the circuit based on the observed incoming
   concurrency.
-- Concurrency Limiting Actuator: The concurrency limits are actuated via
+- Concurrency Limiting Actuator: The concurrency limits are actuated via a
   [weighted-fair queuing scheduler](/concepts/flow-control/components/concurrency-limiter.md).
   The output of the adjustments to accepted concurrency made by gradient
   controller and optimizer logic are translated to a load multiplier that's
@@ -102,7 +103,7 @@ for this policy.
 
 ### Playground
 
-When above policy is loaded in Aperture's
+When the above policy is loaded in Aperture's
 [Playground](/get-started/playground/playground.md), it can be observed that as
 traffic spikes above the concurrency limit of
 `service1-demo-app.demoapp.svc.cluster.local`, the controller triggers load

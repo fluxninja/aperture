@@ -19,7 +19,7 @@ type ListenerConfig struct {
 	// Address to bind to in the form of [host%zone]:port
 	Addr string `json:"addr" validate:"hostname_port" default:":8080"`
 
-	// TCP networks - "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
+	// TCP networks - `tcp`, `tcp4` (IPv4-only), `tcp6` (IPv6-only)
 	Network string `json:"network" validate:"oneof=tcp tcp4 tcp6" default:"tcp"`
 }
 

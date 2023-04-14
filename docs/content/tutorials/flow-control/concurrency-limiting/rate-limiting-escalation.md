@@ -36,7 +36,7 @@ originating from web crawlers and other sources.
 
 For this example, it's assumed that `bot` users have been classified with the
 `User-Type: bot` HTTP header and the `User-Id: <id>` HTTP header identifies
-unique users. The policy will rate limit each unique bot user to `10 rps` and
+unique users. The policy will rate limit each unique bot user to `10 rps` and,
 during overload scenarios, completely restrict bot traffic (`0 rps` limit) after
 `30s` to further relieve the service.
 
@@ -89,18 +89,18 @@ for this policy.
 ### Playground
 
 The traffic generator in the [playground](/get-started/playground/playground.md)
-is configured to generate similar traffic pattern (number of concurrent users)
+is configured to generate a similar traffic pattern (number of concurrent users)
 for bots as the other 2 types of users - subscribers and guests.
 
 After loading the above policy in the playground, the `bot` traffic will be
 dynamically rate-limited based on whether the service is overloaded. In the
-`Latency Gradient` dashboard, the bot traffic will match the `default` workload
+`Latency Gradient` dashboard, the bot traffic will match the `default` workload,
 since there is no workload matching rule for the `bot` traffic. Since rate
 limiting is applied before the concurrency limiter, the default workload metrics
 will stop reporting when `bot` traffic is completely restricted.
 
 <Zoom>
 
-![Rate Limiting Escalation](./assets/rate-limiting-escalation/rate-limiting-escalation-playground.png)
+![Rate-Limiting Escalation](./assets/rate-limiting-escalation/rate-limiting-escalation-playground.png)
 
 </Zoom>
