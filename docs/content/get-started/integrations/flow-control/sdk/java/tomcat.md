@@ -13,10 +13,9 @@ keywords:
 
 ### Tomcat Filter
 
-<a
-href={`https://search.maven.org/artifact/com.fluxninja.aperture/aperture-java-servlet`}>Aperture
-Java SDK servlet package</a> contains Aperture Filter that can be added to the
-web.xml file to automatically set traffic Control Points for relevant services:
+[Aperture Java SDK servlet package](https://search.maven.org/artifact/com.fluxninja.aperture/aperture-java-servlet)
+contains Aperture Filter that can be added to the web.xml file to automatically
+set traffic Control Points for relevant services:
 
 ```xml
     <filter>

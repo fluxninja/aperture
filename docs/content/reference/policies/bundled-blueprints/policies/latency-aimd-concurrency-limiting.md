@@ -40,8 +40,12 @@ import {ParameterDescription} from '../../../../parameterComponents.js'
 
 ## Configuration
 
+<!-- vale off -->
+
 Code: <a
 href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/latency-aimd-concurrency-limiting`}>policies/latency-aimd-concurrency-limiting</a>
+
+<!-- vale on -->
 
 ### Parameters
 

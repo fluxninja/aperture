@@ -54,8 +54,12 @@ import {ParameterDescription} from '../../../../parameterComponents.js'
 
 ## Configuration
 
+<!-- vale off -->
+
 Code: <a
 href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/rabbitmq-queue-buildup`}>policies/rabbitmq-queue-buildup</a>
+
+<!-- vale on -->
 
 ### Parameters
 

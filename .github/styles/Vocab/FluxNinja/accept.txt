@@ -87,7 +87,6 @@ Liveness
 liveness
 ReplicaSet
 StatefulSet
-servlet
 Backoff
 backoff
 profilers
