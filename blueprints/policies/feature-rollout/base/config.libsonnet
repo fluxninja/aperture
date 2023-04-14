@@ -87,11 +87,12 @@ local rollout_policy_base_defaults = {
     ],
   },
 
+  drivers: {},
+
   components: [],
 
   resources: {
     flow_control: {
-      flux_meters: {},
       classifiers: [],
     },
   },
@@ -99,7 +100,7 @@ local rollout_policy_base_defaults = {
   evaluation_interval: '1s',
 };
 
-local rollout_policy_defaults = {
+local rollout_policy_defaults = rollout_policy_base_defaults {
 
   drivers: {
     promql_drivers: [
@@ -116,7 +117,7 @@ local rollout_policy_defaults = {
     ],
   },
 
-} + rollout_policy_base_defaults;
+};
 
 
 {
@@ -129,7 +130,7 @@ local rollout_policy_defaults = {
   /**
   * @param (policy: rollout_policy required) Parameters for the Feature Rollout policy.
   */
-  policy: rollout_policy_defaults,
+  policy: rollout_policy_base_defaults,
   /**
   * @schema (promql_driver.query_string: string required) The Prometheus query to be run. Must return a scalar or a vector with a single element.
   * @schema (promql_driver.forward.threshold: float64) The threshold for the forward criteria.
@@ -192,4 +193,5 @@ local rollout_policy_defaults = {
       filter_regex: '',
     },
   },
+  rollout_policy_base: rollout_policy_base_defaults,
 }

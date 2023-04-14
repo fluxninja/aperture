@@ -27,14 +27,14 @@ See tutorials on TODO tgill to see this blueprint in use.
 <!-- Configuration Marker -->
 
 ```mdx-code-block
-import {apertureVersion as aver} from '../../../../apertureVersion.js'
-import {ParameterDescription} from '../../../../parameterComponents.js'
+import {apertureVersion as aver} from '../../../../../apertureVersion.js'
+import {ParameterDescription} from '../../../../../parameterComponents.js'
 ```
 
 ## Configuration
 
 Code: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/feature-rollout`}>policies/feature-rollout</a>
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/policies/feature-rollout/base`}>policies/feature-rollout/base</a>
 
 ### Parameters
 
@@ -55,7 +55,7 @@ string"
     type="
 Object (rollout_policy)"
     reference="#rollout-policy"
-    value="{'components': [], 'drivers': {'average_latency_drivers': [{'backward': {'threshold': '__REQUIRED_FIELD__'}, 'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'forward': {'threshold': '__REQUIRED_FIELD__'}, 'reset': {'threshold': '__REQUIRED_FIELD__'}}], 'ema_latency_drivers': [{'backward': {'latency_tolerance_multiplier': 1.05}, 'ema': {'ema_window': '1500s', 'warmup_window': '60s'}, 'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'forward': {'latency_tolerance_multiplier': 1.05}, 'reset': {'latency_tolerance_multiplier': 1.25}}], 'percentile_latency_drivers': [{'backward': {'threshold': '__REQUIRED_FIELD__'}, 'flux_meter': {'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'static_buckets': {'buckets': [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]}}, 'forward': {'threshold': '__REQUIRED_FIELD__'}, 'percentile': 95, 'reset': {'threshold': '__REQUIRED_FIELD__'}}], 'promql_drivers': [{'backward': {'operator': '__REQUIRED_FIELD__', 'threshold': '__REQUIRED_FIELD__'}, 'forward': {'operator': '__REQUIRED_FIELD__', 'threshold': '__REQUIRED_FIELD__'}, 'query_string': '__REQUIRED_FIELD__', 'reset': {'operator': '__REQUIRED_FIELD__', 'threshold': '__REQUIRED_FIELD__'}}]}, 'evaluation_interval': '1s', 'load_shaper': {'flow_regulator_parameters': {'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'label_key': ''}, 'steps': [{'duration': '__REQUIRED_FIELD__', 'target_accept_percentage': '__REQUIRED_FIELD__'}]}, 'resources': {'flow_control': {'classifiers': [], 'flux_meters': {}}}}"
+    value="{'components': [], 'drivers': {}, 'evaluation_interval': '1s', 'load_shaper': {'flow_regulator_parameters': {'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'label_key': ''}, 'steps': [{'duration': '__REQUIRED_FIELD__', 'target_accept_percentage': '__REQUIRED_FIELD__'}]}, 'resources': {'flow_control': {'classifiers': []}}}"
     description='Parameters for the Feature Rollout policy.' />
 
 ---
@@ -180,7 +180,7 @@ string"
     name="flow_selector"
     type="
 Object (aperture.spec.v1.FlowSelector)"
-    reference="../../spec#flow-selector"
+    reference="../../../spec#flow-selector"
     value="{'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}"
     description='Identify the service and flows whose latency needs to be measured.' />
 
@@ -222,7 +222,7 @@ Number (double)"
     name="flux_meter"
     type="
 Object (aperture.spec.v1.FluxMeter)"
-    reference="../../spec#flux-meter"
+    reference="../../../spec#flux-meter"
     value="{'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'static_buckets': {'buckets': [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]}}"
     description='FluxMeter specifies the flows whose latency needs to be measured and parameters for the histogram metrics.' />
 
@@ -272,7 +272,7 @@ Number (double)"
     name="flow_selector"
     type="
 Object (aperture.spec.v1.FlowSelector)"
-    reference="../../spec#flow-selector"
+    reference="../../../spec#flow-selector"
     value="{'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}"
     description='Identify the service and flows whose latency needs to be measured.' />
 
@@ -280,7 +280,7 @@ Object (aperture.spec.v1.FlowSelector)"
     name="ema"
     type="
 Object (aperture.spec.v1.EMAParameters)"
-    reference="../../spec#e-m-a-parameters"
+    reference="../../../spec#e-m-a-parameters"
     value="{'ema_window': '1500s', 'warmup_window': '60s'}"
     description='The parameters for the exponential moving average.' />
 
@@ -325,7 +325,7 @@ Number (double)"
     name="load_shaper"
     type="
 Object (aperture.spec.v1.LoadShaperParameters)"
-    reference="../../spec#load-shaper-parameters"
+    reference="../../../spec#load-shaper-parameters"
     value="{'flow_regulator_parameters': {'flow_selector': {'flow_matcher': {'control_point': '__REQUIRED_FIELD__'}, 'service_selector': {'service': '__REQUIRED_FIELD__'}}, 'label_key': ''}, 'steps': [{'duration': '__REQUIRED_FIELD__', 'target_accept_percentage': '__REQUIRED_FIELD__'}]}"
     description='Identify the service and flows of the feature that needs to be rolled out. And specify feature rollout steps.' />
 
@@ -334,7 +334,7 @@ Object (aperture.spec.v1.LoadShaperParameters)"
     type="
 Array of
 Object (aperture.spec.v1.Component)"
-    reference="../../spec#component"
+    reference="../../../spec#component"
     value="[]"
     description='List of additional circuit components.' />
 
@@ -342,8 +342,8 @@ Object (aperture.spec.v1.Component)"
     name="resources"
     type="
 Object (aperture.spec.v1.Resources)"
-    reference="../../spec#resources"
-    value="{'flow_control': {'classifiers': [], 'flux_meters': {}}}"
+    reference="../../../spec#resources"
+    value="{'flow_control': {'classifiers': []}}"
     description='List of additional resources.' />
 
 <a id="rollout-policy-evaluation-interval"></a> <ParameterDescription
@@ -412,7 +412,7 @@ at runtime, without reloading the policy.
     name="load_shaper"
     type="
 Object (aperture.spec.v1.FlowRegulatorDynamicConfig)"
-    reference="../../spec#flow-regulator-dynamic-config"
+    reference="../../../spec#flow-regulator-dynamic-config"
     value="__REQUIRED_FIELD__"
     description='Default configuration for flow regulator that can be updated at the runtime without shutting down the policy.' />
 

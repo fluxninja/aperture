@@ -93,9 +93,9 @@ class Parameters:
             json_schema_link = (
                 f"{blueprints_root_relative_path}/{blueprint}/gen/definitions.json#"
             )
-            if annotation_type == "@param":
+            if annotation_type == "param":
                 json_schema_link += f"/properties/{parts[0]}"
-            elif annotation_type == "@schema":
+            elif annotation_type == "schema":
                 json_schema_link += f"/$defs/{parts[0]}"
             else:
                 logger.error(
@@ -261,7 +261,12 @@ def update_param_defaults(
         config = root
         for idx, part in enumerate(parts):
             if idx == len(parts) - 1:
-                return config[part]
+                try:
+                    return config[part]
+                except:
+                    # fatal exit
+                    logger.error(f"Unable to find param {name} in rendered config")
+                    raise typer.Exit(1)
             else:
                 try:
                     config = config[part]

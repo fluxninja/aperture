@@ -1,4 +1,4 @@
-local spec = import '../../spec.libsonnet';
+local spec = import '../../../spec.libsonnet';
 local config = import './config.libsonnet';
 
 function(cfg) {
@@ -299,10 +299,26 @@ function(cfg) {
   },
 
 
-  local driverAccumulatorStep1 = std.foldl(addPromQLDriver, params.drivers.promql_drivers, driverAccumulatorInitial),
-  local driverAccumulatorStep2 = std.foldl(addAverageLatencyDriver, params.drivers.average_latency_drivers, driverAccumulatorStep1),
-  local driverAccumulatorStep3 = std.foldl(addPercentileLatencyDriver, params.drivers.percentile_latency_drivers, driverAccumulatorStep2),
-  local driverAccumulator = std.foldl(addEMALatencyDriver, params.drivers.ema_latency_drivers, driverAccumulatorStep3),
+  local driverAccumulatorStep1 = std.foldl(
+    addPromQLDriver,
+    (if std.objectHas(params.drivers, 'promql_drivers') then params.drivers.promql_drivers else []),
+    driverAccumulatorInitial
+  ),
+  local driverAccumulatorStep2 = std.foldl(
+    addAverageLatencyDriver,
+    (if std.objectHas(params.drivers, 'average_latency_drivers') then params.drivers.average_latency_drivers else []),
+    driverAccumulatorStep1
+  ),
+  local driverAccumulatorStep3 = std.foldl(
+    addPercentileLatencyDriver,
+    (if std.objectHas(params.drivers, 'percentile_latency_drivers') then params.drivers.percentile_latency_drivers else []),
+    driverAccumulatorStep2
+  ),
+  local driverAccumulator = std.foldl(
+    addEMALatencyDriver,
+    (if std.objectHas(params.drivers, 'ema_latency_drivers') then params.drivers.ema_latency_drivers else []),
+    driverAccumulatorStep3
+  ),
 
   local forwardIntentComponent = spec.v1.Component.withOr(
     spec.v1.Or.withInPorts({
@@ -408,7 +424,7 @@ function(cfg) {
     + spec.v1.Policy.withResources(spec.v1.Resources.new()
                                    + spec.v1.Resources.withFlowControl(
                                      spec.v1.FlowControlResources.new()
-                                     + spec.v1.FlowControlResources.withFluxMeters(params.resources.flow_control.flux_meters + driverAccumulator.flux_meters)
+                                     + spec.v1.FlowControlResources.withFluxMeters((if std.objectHas(params.resources.flow_control, 'flux_meters') then params.resources.flow_control.flux_meters else {}) + driverAccumulator.flux_meters)
                                      + spec.v1.FlowControlResources.withClassifiers(params.resources.flow_control.classifiers)
                                    ))
     + spec.v1.Policy.withCircuit(
