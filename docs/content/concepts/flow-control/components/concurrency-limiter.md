@@ -40,8 +40,8 @@ Multiplier_ that the scheduler uses to compute the refill rate of
 from the controller.
 
 If the rate of tokens in requests entering the scheduler exceeds the desired
-rate, requests are queued in the scheduler. If a flow can't be scheduled within
-its specified timeout, it's rejected.
+rate, requests are queued in the scheduler. If a flow cannot be scheduled within
+its specified timeout, it is rejected.
 
 The scheduler helps ensure that requests are handled in a fair and efficient
 manner, even during periods of high load or overload. By prioritizing critical
@@ -66,8 +66,8 @@ Priority levels are in the range `0 to 255`. `0` is the lowest priority and
 `255` is the highest priority.
 
 Priority levels have a non-linear effect on the scheduler. The following formula
-is used to compute the position in the queue based on the concept of (virtual
-finish times)[https://en.wikipedia.org/wiki/Weighted_fair_queueing#Algorithm]:
+is used to compute the position in the queue based on the concept of
+[virtual finish times](https://en.wikipedia.org/wiki/Weighted_fair_queueing#Algorithm):
 
 `virtual_finish_time = virtual_time + (tokens * (256 - priority))`
 
@@ -97,7 +97,7 @@ more details.
 
 ### Token bucket {#token-bucket}
 
-The Aperture Agents utilize a modified version of the
+The Aperture Agents use a modified version of the
 [token bucket algorithm](https://en.wikipedia.org/wiki/Token_bucket) to regulate
 the flow of incoming requests. In this algorithm, every flow is required to
 obtain tokens from the bucket before a specified deadline to gain admission to

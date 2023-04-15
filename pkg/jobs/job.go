@@ -19,7 +19,7 @@ import (
 // JobCallback is the callback function that is called after a job is executed.
 type JobCallback func(context.Context) (proto.Message, error)
 
-// JobConfig is reexported as it's commonly used when importing jobs package.
+// JobConfig is reexported as it is commonly used when importing jobs package.
 type JobConfig = jobsconfig.JobConfig
 
 // Job interface and basic job implementation.

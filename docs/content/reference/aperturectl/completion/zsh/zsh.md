@@ -14,8 +14,8 @@ Generate the autocompletion script for zsh
 
 Generate the autocompletion script for the zsh shell.
 
-If shell completion isn't already enabled in your environment you will need to
-enable it. You can execute the following once:
+If shell completion is not already enabled in your environment you will need
+to enable it. You can execute the following once:
 
     echo "autoload -U compinit; compinit" >> ~/.zshrc
 
@@ -48,5 +48,4 @@ aperturectl completion zsh [flags]
 
 ### SEE ALSO
 
-- [aperturectl completion](/reference/aperturectl/completion/completion.md) -
-  Generate the autocompletion script for the specified shell
+- [aperturectl completion](/reference/aperturectl/completion/completion.md) - Generate the autocompletion script for the specified shell

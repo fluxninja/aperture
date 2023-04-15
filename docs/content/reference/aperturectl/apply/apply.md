@@ -23,9 +23,6 @@ Use this command to apply the Aperture Policies.
 
 ### SEE ALSO
 
-- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool
-  to interact with Aperture
-- [aperturectl apply dynamic-config](/reference/aperturectl/apply/dynamic-config/dynamic-config.md) -
-  Apply Aperture DynamicConfig to a Policy
-- [aperturectl apply policy](/reference/aperturectl/apply/policy/policy.md) -
-  Apply Aperture Policy to the cluster
+- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture
+- [aperturectl apply dynamic-config](/reference/aperturectl/apply/dynamic-config/dynamic-config.md) - Apply Aperture DynamicConfig to a Policy
+- [aperturectl apply policy](/reference/aperturectl/apply/policy/policy.md) - Apply Aperture Policy to the cluster

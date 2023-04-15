@@ -20,7 +20,7 @@ message LabelMatcher {
   // Note: The requirements are combined using the logical AND operator.
   map<string, string> match_labels = 1;
 
-  // List of k8s-style label matcher requirements.
+  // List of Kubernetes-style label matcher requirements.
   //
   // Note: The requirements are combined using the logical AND operator.
   repeated K8sLabelMatcherRequirement match_expressions = 2;
@@ -56,7 +56,7 @@ message K8sLabelMatcherRequirement {
 //     - label_equals: { label = app, value = frobnicator }
 // ```
 message MatchExpression {
-  // List of MatchExpressions that's used for all/any matching
+  // List of MatchExpressions that is used for all or any matching
   //
   // for example, `{any: {of: [expr1, expr2]}}`.
   message List {
@@ -81,7 +81,7 @@ message MatchExpression {
     // The expression is true when label value equals given value.
     EqualsMatchExpression label_equals = 5;
 
-    // The expression is true when label matches given regex.
+    // The expression is true when label matches given regular expression.
     MatchesMatchExpression label_matches = 6;
   }
 }

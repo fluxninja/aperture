@@ -21,7 +21,7 @@ restrict traffic of each user by dynamically adjusting their rate limits.
 To recap, the
 [concurrency limiter](/concepts/flow-control/components/concurrency-limiter.md)
 relies on a weighted fair queuing scheduler to make flow control decisions at
-the workload level. On the other hand, the
+the workload level. Conversely, the
 [rate limiter](/concepts/flow-control/components/rate-limiter.md) uses a
 distributed cache to maintain global counters for each flow label (for example:
 unique users) and restricts traffic when they exceed their allocated quota.
@@ -34,7 +34,7 @@ The policy used in
 will be extended to dynamically adjust the limits applied to `bot` traffic
 originating from web crawlers and other sources.
 
-For this example, it's assumed that `bot` users have been classified with the
+For this example, it is assumed that `bot` users have been classified with the
 `User-Type: bot` HTTP header and the `User-Id: <id>` HTTP header identifies
 unique users. The policy will rate limit each unique bot user to `10 rps` and,
 during overload scenarios, completely restrict bot traffic (`0 rps` limit) after

@@ -7,7 +7,7 @@ import (
 )
 
 // Decided to roll our own impl, as:
-// * we don't care about json pointer _logic_ (just parsing)
+// * we do not care about json pointer _logic_ (just parsing)
 // * parsing is simple enough
 
 // JSONPointer represents a parsed JSON pointer

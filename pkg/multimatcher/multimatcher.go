@@ -9,7 +9,7 @@ import (
 
 // Expr represents an expression that returns a bool decision based on labels.
 //
-// Note that even though this interface is public, it's recommended to use
+// Note that even though this interface is public, it is recommended to use
 // Exprs from this package, as multimatcher can optimize them better.
 //
 // (we're not doing it right now, but in future we might want to perform some

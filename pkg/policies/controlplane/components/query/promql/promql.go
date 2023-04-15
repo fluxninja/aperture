@@ -86,7 +86,7 @@ func ModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 			ExecutionTimeout: executionTimeout,
 		}
 
-		// Lifecycle hooks to register and deregister this circuit's promMultiJob from promQLJobGroup
+		// Lifecycle hooks to register and deregister this circuit is promMultiJob from promQLJobGroup
 		lifecycle.Append(fx.Hook{
 			OnStart: func(_ context.Context) error {
 				// Register multi job with job group

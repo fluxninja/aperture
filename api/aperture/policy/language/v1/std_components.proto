@@ -43,10 +43,10 @@ message GradientController {
     // * $\text{slope} = -0.5$: when signal is too high, decrease control variable gradually.
     //
     // The sign of slope depends on correlation between the signal and control variable:
-    // * Use $\text{slope} < 0$ if signal and control variable are _positively_
-    // correlated (for example, Per-pod CPU usage and total concurrency).
-    // * Use $\text{slope} > 0$ if signal and control variable are _negatively_
-    // correlated (for example, Per-pod CPU usage and number of pods).
+    // * Use $\text{slope} < 0$ if there is a _positive_ correlation between the signal and
+    // the control variable (for example, Per-pod CPU usage and total concurrency).
+    // * Use $\text{slope} > 0$ if there is a _negative_ correlation between the signal and
+    // the control variable (for example, Per-pod CPU usage and number of pods).
     //
     // :::note
     //
@@ -85,7 +85,7 @@ message GradientController {
   // Dynamic Configuration for a Controller
   message DynamicConfig {
     // Decides whether the controller runs in `manual_mode`.
-    // In manual mode, the controller doesn't adjust the control variable It emits the same output as the control variable input.
+    // In manual mode, the controller does not adjust the control variable It emits the same output as the control variable input.
     bool manual_mode = 1; // @gotags: default:"false"
   }
 
@@ -167,7 +167,7 @@ message EMA {
 
     // Upper bound of the moving average.
     //
-    // When the signal exceeds `max_envelope` it's multiplied by
+    // When the signal exceeds `max_envelope` it is multiplied by
     // `correction_factor_on_max_envelope_violation` **once per tick**.
     //
     // :::note
@@ -285,12 +285,12 @@ message Decider {
   // Comparison operator that computes operation on LHS and RHS input signals.
   string operator = 3; // @gotags: validate:"oneof=gt lt gte lte eq neq"
 
-  // Duration of time to wait before a transition to true state.
-  // If the duration is zero, the transition will happen instantaneously.
+  // Duration of time to wait before changing to true state.
+  // If the duration is zero, the change will happen instantaneously.```
   google.protobuf.Duration true_for = 4; // @gotags: default:"0s"
 
-  // Duration of time to wait before a transition to false state.
-  // If the duration is zero, the transition will happen instantaneously.
+  // Duration of time to wait before changing to false state.
+  // If the duration is zero, the change will happen instantaneously.
   google.protobuf.Duration false_for = 5; // @gotags: default:"0s"
 }
 
@@ -412,7 +412,7 @@ message UnaryOperator {
   string operator = 3; // @gotags: validate:"oneof=abs acos acosh asin asinh atan atanh cbrt ceil cos cosh erf erfc erfcinv erfinv exp exp2 expm1 floor gamma j0 j1 lgamma log log10 log1p log2 round roundtoeven sin sinh sqrt tan tanh trunc y0 y1"
 }
 
-// Extrapolates the input signal by repeating the last valid value during the period in which it's invalid
+// Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
 //
 // It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
 message Extrapolator {
@@ -501,7 +501,7 @@ message Min {
 //   Treating invalid inputs as "unknowns" has a consequence that the result
 //   might end up being valid even when some inputs are invalid. For example, `unknown && false == false`,
 //   because the result would end up false no matter if
-//   first signal was true or false. On the other hand, `unknown && true == unknown`.
+//   first signal was true or false. Conversely, `unknown && true == unknown`.
 //
 //   :::
 message And {
@@ -696,7 +696,7 @@ message PulseGenerator {
 }
 
 // Holds the last valid signal value for the specified duration then waits for next valid value to hold.
-// If it's holding a value that means it ignores both valid and invalid new signals until the `hold_for` duration is finished.
+// If it is holding a value that means it ignores both valid and invalid new signals until the `hold_for` duration is finished.
 message Holder {
   // Inputs for the Holder component.
   message Ins {

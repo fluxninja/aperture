@@ -35,7 +35,7 @@ Install the tool of your choice using the following links:
 
    1. Once the Helm CLI is installed, add the
       [Aperture Agent Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-agent)
-      repository in your environment for install/upgrade:
+      repository in your environment for install or upgrade:
 
       ```bash
       helm repo add aperture https://fluxninja.github.io/aperture/
@@ -86,9 +86,9 @@ Kubernetes Objects which will be created by following steps are listed
 
    Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with
    the actual values of etcd and Prometheus, which is also being used by the
-   Aperture Controller you want these Agents to connect with.
+   Aperture Controller you want these Agents to connect to.
    `CONTROLLER_ENDPOINT_HERE` should point to the Aperture Controller. If you
-   skip it, some sub-commands `aperturectl` commands won't work.
+   skip it, some sub commands `aperturectl` commands won't work.
 
    If you have installed the
    [Aperture Controller](/get-started/installation/controller/controller.md) on
@@ -214,7 +214,7 @@ Kubernetes Objects which will be created by following steps are listed
 
       Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE`
       with the actual values of etcd and Prometheus, which is also being used by
-      the Aperture Controller you want these Agents to connect with.
+      the Aperture Controller you want these Agents to connect to.
 
       All the configuration parameters for the Agent Custom Resource are listed
       on the
@@ -229,7 +229,7 @@ Kubernetes Objects which will be created by following steps are listed
 
 5. Refer to steps on the
    [Istio Configuration](/get-started/integrations/flow-control/envoy/istio.md)
-   if you don't have the
+   if you do not have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.
 
@@ -354,8 +354,8 @@ following these steps:
 
 :::note
 
-Deleting a Helm chart via Helm doesn’t delete the Custom Resource Definitions
-(CRD) installed via the chart.
+Deleting a Helm chart using Helm doesn’t delete the Custom Resource Definitions
+(CRD) installed from the chart.
 
 :::
 

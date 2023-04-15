@@ -105,10 +105,10 @@ ENTRYPOINT [ "nginx", "-g", "daemon off;" ]`}</CodeBlock>
 
 Follow these steps to configure Nginx to use the installed Aperture Lua module:
 
-1. To connect with the Aperture Agent, you need to create an environment
-   variable called APERTURE_AGENT_ENDPOINT. The value of this variable should be
-   set equal to the endpoint of the Aperture Agent. If you are using a bash
-   shell, you can create this variable by running the following command:
+1. To connect to the Aperture Agent, you need to create an environment variable
+   called APERTURE_AGENT_ENDPOINT. The value of this variable should be set
+   equal to the endpoint of the Aperture Agent. If you are using a bash shell,
+   you can create this variable by running the following command:
 
    ```bash
    echo 'export APERTURE_AGENT_ENDPOINT="http://aperture-agent.aperture-agent.svc.cluster.local"' >> ~/.profile
@@ -119,7 +119,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
 
 2. Optionally, create an environment variable `APERTURE_CHECK_TIMEOUT`, which
    would be considered as a timeout for execution of the Aperture check. The
-   default value for it's `500m`, which is 500 milliseconds. For example, use
+   default value for it is `500m`, which is 500 milliseconds. For example, use
    the following command in bash:
 
    :::info

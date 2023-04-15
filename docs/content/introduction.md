@@ -4,7 +4,7 @@ slug: /
 sidebar_position: 1
 sidebar_class_name: introduction
 description:
-  Introduction to FluxNinja Aperture, an open-source flow control and
+  Introduction to FluxNinja Aperture, an open source flow control and
   reliability management platform for modern web applications.
 image: /assets/img/aperture_logo.png
 keywords:
@@ -27,38 +27,38 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 Welcome to the [FluxNinja Aperture](https://github.com/fluxninja/aperture)
-project, an open-source platform designed to empower cloud-native reliability
-engineering. The platform provides a unified controllability layer that enables
-platform and reliability engineering teams to manage complex microservices-based
-applications with ease.
+project, an open source platform that empowers platform and reliability
+engineering teams. The platform provides a unified controllability layer that
+enables platform and reliability engineering teams to manage complex
+microservices-based applications with ease.
 
-## Simplify Cloud-Native Load Management
+## Simplify cloud native load management
 
 With Aperture, teams can automate load management processes, including flow
-control and auto scaling, to ensure the reliability and stability of
-cloud-native applications. These capabilities improve the overall user
-experience, while optimizing resources and reducing costs.
+control and auto-scaling, to ensure the reliability and stability of cloud
+native applications. These capabilities improve the overall user experience,
+while optimizing resources and reducing costs.
 
-## Declarative Policy Language
+## Declarative policy language
 
 Aperture's declarative policy language allows teams to effortlessly develop and
 manage policies that dictate their applications' behavior under various
 circumstances. This offers a visual depiction of their policies, enabling them
 to grasp the system's behavior and self-correction intuitively.
 
-## Load Management Capabilities
+## Load management capabilities
 
 Aperture's intelligent load management capabilities, such as fine-grained rate
-limiting, prioritized load shedding and auto scaling, can be applied to a wide
+limiting, prioritized load shedding and auto-scaling, are applicable to a wide
 range of cloud-native applications. These capabilities, ensure the reliability
 and stability of applications.
 
 - **Prioritized load shedding**: Aperture enables organizations to gracefully
-  degrade application performance by dropping traffic that's deemed less
+  degrade application performance by dropping traffic that is deemed less
   important, ensuring that the most critical traffic is served.
 - **Distributed rate-limiting**: Aperture includes a distributed rate-limiter to
   prevent abuse and protect the service from excessive requests by users.
-- **Intelligent auto scaling**: Aperture adjusts resource allocation based on
+- **Intelligent auto-scaling**: Aperture adjusts resource allocation based on
   demand and performance to ensure that the application can scale up or down as
   needed.
 - **Monitoring and telemetry**: Aperture continuously monitors service
@@ -75,9 +75,9 @@ and stability of applications.
 
 At its core, load management involves the control loop of observing, analyzing,
 and actuating workloads to ensure the stability and reliability of cloud-native
-applications. This control loop is applied to both flow control and auto scaling
+applications. This control loop is applied to both flow control and auto-scaling
 use cases. In flow control, the control loop is used to manage workloads and
-ensure the system remains within capacity. In auto scaling, the control loop is
+ensure the system remains within capacity. In auto-scaling, the control loop is
 used to adjust resource allocation based on demand and performance.
 
 Learn more about how Aperture interfaces with your application in the

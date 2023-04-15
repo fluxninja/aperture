@@ -19,7 +19,7 @@ problem in the face of continuously changing service infrastructure. Each new
 version deployed, horizontal scaling, or a change in access patterns can change
 the concurrency limit of a service.
 
-To accurately model the concurrency limit of a service, it's critical to track
+To accurately model the concurrency limit of a service, it is critical to track
 its
 [golden signals](https://sre.google/sre-book/monitoring-distributed-systems/#xref_monitoring_golden-signals).
 For instance, queue buildup can be detected by tracking deviation of current
@@ -30,7 +30,7 @@ latency from historically normal values.
 This policy uses the latency-based AIMD (Additive Increase, Multiplicative
 Decrease) concurrency limiting
 [Blueprint](/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md)
-and is instantiated via Jsonnet.
+and is instantiated using Jsonnet.
 
 At a high-level, this policy consists of:
 
@@ -48,15 +48,15 @@ At a high-level, this policy consists of:
 - Integral Optimizer: When the service is detected to be in the normal state, an
   integral optimizer is used to additively increase the concurrency of the
   service in each execution cycle of the circuit. This design allows warming-up
-  a service from a cold start state. This also protects applications from sudden
-  spikes in traffic, as it sets an upper bound to the concurrency allowed on a
-  service in each execution cycle of the circuit based on the observed incoming
-  concurrency.
-- Concurrency Limiting Actuator: The concurrency limits are actuated via a
+  a service from an initial inactive state. This also protects applications from
+  sudden spikes in traffic, as it sets an upper bound to the concurrency allowed
+  on a service in each execution cycle of the circuit based on the observed
+  incoming concurrency.
+- Concurrency Limiting Actuator: The concurrency limits are actuated using a
   [weighted-fair queuing scheduler](/concepts/flow-control/components/concurrency-limiter.md).
   The output of the adjustments to accepted concurrency made by gradient
-  controller and optimizer logic are translated to a load multiplier that's
-  synchronized with Aperture Agents via etcd. The load multiplier adjusts
+  controller and optimizer logic are translated to a load multiplier that is
+  synchronized with Aperture Agents through etcd. The load multiplier adjusts
   (increases or decreases) the token bucket fill rates based on the incoming
   concurrency observed at each agent.
 
@@ -119,8 +119,8 @@ the tolerance limit (`1.1`) configured in the circuit.
 ### Dry Run Mode
 
 You can run this policy in the `Dry Run` mode by setting the
-`defaultConfig.dry_run` option to `true`. In the `Dry Run` mode, the policy
-doesn't actuate (meaning traffic is never dropped) while still evaluating the
+`defaultConfig.dry_run` option to `true`. In the `Dry Run` mode, the policy does
+not actuate (meaning traffic is never dropped) while still evaluating the
 decision it would take in each cycle. This helps understand how the policy would
 behave as the input signals change.
 

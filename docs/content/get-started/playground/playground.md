@@ -16,9 +16,9 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 Playground is a Kubernetes-based environment for exploring the capabilities of
-Aperture. Additionally, it's used as a development environment for Aperture.
+Aperture. Additionally, it is used as a development environment for Aperture.
 Playground uses [Tilt](https://tilt.dev/) for orchestrating the deployments in
-Kubernetes. Tilt watches for changes to local files and auto deploys any
+Kubernetes. Tilt watches for changes to local files and auto-deploys any
 resources that change. This is convenient for getting quick feedback during
 development of Aperture.
 
@@ -55,7 +55,7 @@ Now, press Space to open the Tilt UI in your default browser.
 
 :::note
 
-Make sure nothing else is running on the [ports forwarded](#port-forwards) by
+Verify that nothing else is running on the [ports forwarded](#port-forwards) by
 `Tilt`.
 
 :::
@@ -77,8 +77,8 @@ NAME                STATUS     AGE
 service1-demo-app   uploaded   103s
 ```
 
-The Playground comes with a demo application so that you can generate simulated
-traffic and see the policy in action. The demo application can be found in
+The Playground includes a demo application so that you can generate simulated
+traffic and see the policy in action. The demo application can be found in the
 `demoapp` namespace. You can read more about the demo application
 [here](https://github.com/fluxninja/aperture/tree/main/playground/resources/demo-app).
 
@@ -144,7 +144,7 @@ folder to a bunch of useful panels.
 
 :::info
 
-Grafana's dashboard URL address is
+Grafana's dashboard browser address is
 [localhost:3000/dashboards](http://localhost:3000/dashboards)
 
 :::
@@ -159,8 +159,8 @@ To re-start the traffic, press the `Start Wavepool Generator` button in the
 
 :::note
 
-To manually run the traffic, make sure to press the `Stop Wavepool Generator`
-button first.
+To manually run the traffic, please press the `Stop Wavepool Generator` button
+first to stop the automatic runner.
 
 :::
 
@@ -169,7 +169,7 @@ button first.
 ## Tools
 
 The Playground environment assumes usage of specific deployment and
-configuration/management tools, which must be installed beforehand.
+configuration management tools, which must be installed beforehand.
 
 To install the required tools, you have two options:
 
@@ -177,7 +177,7 @@ To install the required tools, you have two options:
 - Or, manually install the tools
   [mentioned here](#tools-required-for-kubernetes-deployment).
 
-### Install via `asdf`
+### Install using `asdf`
 
 First,
 [download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf) and
@@ -200,7 +200,7 @@ Please skip this section in case you already installed the required tools using
 
 Tools required are listed below
 
-- **Helm**: it's a package manager for Kubernetes. To install manually, follow
+- **Helm**: it is a package manager for Kubernetes. To install manually, follow
   instructions [here](https://helm.sh/docs/intro/install/).
 - **Tanka and Jsonnet Bundler**: Grafana Tanka is a robust configuration utility
   for your Kubernetes cluster, powered by the unique Jsonnet language. Jsonnet
@@ -215,7 +215,7 @@ Tools required are listed below
 
 ## Deploying with Tilt
 
-In the case of local deployments and development work, it's nice to be able to
+In the case of local deployments and development work, it is nice to be able to
 automatically rebuild images and services. Aperture Playground uses Tilt to
 achieve this.
 
@@ -233,8 +233,8 @@ pointed by the `kubectl`.
 
 :::
 
-Create a K8s cluster using Kind with a configuration file by executing the
-following command from aperture home directory:
+Create a Kubernetes cluster using Kind with a configuration file by executing
+the following command from aperture home directory:
 
 ```sh
 kind create cluster --config playground/kind-config.yaml
@@ -293,7 +293,7 @@ Examples:
 - `tilt up agent demoapp aperture-grafana` - you can mix namespace names and
   resource names, as well as specify as many of them as you want.
 
-If you want to manage only explicitly passed resources/namespaces, you should
+If you want to manage only explicitly passed resources or namespaces, you should
 pass the `--only` argument:
 
 - `tilt up -- --only aperture-grafana` - only bring up Grafana, namespace
@@ -325,15 +325,15 @@ Below is the mapping of the ports being forwarded by Tilt:
 ### Running demo applications and designing test scenarios
 
 By default, playground is started with a simple demo scenario loaded. The demo
-application comes with three sets of pods and services. There is also a simple
+application includes three sets of pods and services. There is also a simple
 latency gradient policy applied to them, and K6 load generator pattern created.
 When the entire deployment turns green, the load generator can be started with
 the "Start Wavepool Generator" button in the Tilt UI. It will run a 2-minute
-test in a loop, until the "Stop Wavepool Generator" button isn't clicked.
+test in a loop, until the "Stop Wavepool Generator" button is not clicked.
 
-There are other playground scenarios under _playground/scenarios/_ and they can
-be loaded during `Tilt` setup by passing a relative path to the scenario, e.g.
-`tilt up -- --scenario scenarios/demo-app`
+There are other playground scenarios under the `playground/scenarios/` directory
+and they can be loaded during `Tilt` setup by passing a relative path to the
+scenario, e.g. `tilt up -- --scenario scenarios/demo-app`
 
 :::note
 
@@ -361,8 +361,8 @@ Each test scenario consists of a few directories, for policies, dashboards and
 load generator configuration:
 
 - `metadata.json` describes the test scenario, what images to build, what Tilt
-  dependencies to add etc. See existing test scenarios, as well as `Tiltfile`,
-  for examples of how to prepare this file.
+  dependencies to add and so on. See existing test scenarios, as well as
+  `Tiltfile`, for examples of how to prepare this file.
 - `policies/service1-demo-app.yaml` is a values.yaml file for the given policy
   listed in `metadata.json` under `aperture_policies` key.
 - `load_generator/test.js` is configuration for the K6 load generator.

@@ -43,5 +43,4 @@ aperturectl uninstall agent --namespace=aperture
 
 ### SEE ALSO
 
-- [aperturectl uninstall](/reference/aperturectl/uninstall/uninstall.md) -
-  Uninstall Aperture components
+- [aperturectl uninstall](/reference/aperturectl/uninstall/uninstall.md) - Uninstall Aperture components

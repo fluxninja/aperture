@@ -60,7 +60,7 @@ You can also use the flow as a context manager:
   ) as flow:
     if flow.accepted:
       # do actual work
-      # if you don't call flow.end() explicitly, it will be called automatically
+      # if you do not call flow.end() explicitly, it will be called automatically
       # when the context manager exits - with the status of the flow
       # depending on whether an error was raised or not
       pass

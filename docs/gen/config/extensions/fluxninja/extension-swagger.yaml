@@ -88,7 +88,7 @@ definitions:
     FluxNinjaExtensionConfig:
         properties:
             api_key:
-                description: API Key for this agent. If this key isn't set, the extension won't be enabled.
+                description: API Key for this agent. If this key is not set, the extension won't be enabled.
                 type: string
                 x-go-name: APIKey
                 x-go-tag-json: api_key
@@ -114,7 +114,7 @@ definitions:
                 x-go-tag-validate: gte=0s
             installation_mode:
                 default: LINUX_BARE_METAL
-                description: Installation mode describes how Agent/Controller is being run.
+                description: Installation mode describes on which underlying platform the Agent or the Controller is being run.
                 enum:
                     - KUBERNETES_SIDECAR
                     - KUBERNETES_DAEMONSET
@@ -198,7 +198,7 @@ definitions:
                 x-go-tag-json: idle_connection_timeout
                 x-go-tag-validate: gte=0s
             key_log_file:
-                description: SSL key log file (useful for debugging)
+                description: SSL/TLS key log file (useful for debugging)
                 type: string
                 x-go-name: KeyLogWriter
                 x-go-tag-json: key_log_file
@@ -266,7 +266,7 @@ definitions:
                 x-go-tag-validate: omitempty
             read_buffer_size:
                 default: 0
-                description: Read Buffer Size. 0 = 4KB
+                description: Read Buffer Size. 0 = 4 KB
                 format: int64
                 minimum: 0
                 type: integer
@@ -285,7 +285,7 @@ definitions:
                 x-go-tag-validate: gte=0s
             timeout:
                 default: 60s
-                description: HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
+                description: HTTP client timeout - Timeouts include connection time, redirects, reading the response and so on. 0 = no timeout.
                 format: string
                 type: string
                 x-go-name: Timeout
@@ -313,7 +313,7 @@ definitions:
                 x-go-tag-json: use_proxy
             write_buffer_size:
                 default: 0
-                description: Write Buffer Size. 0 = 4KB.
+                description: Write Buffer Size. 0 = 4 KB.
                 format: int64
                 minimum: 0
                 type: integer

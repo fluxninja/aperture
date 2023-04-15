@@ -152,7 +152,7 @@ func (w *watcher) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result,
 		if !w.resourcesDeleted[req.NamespacedName] {
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
-			// Return and don't requeue
+			// Return and do not requeue
 			log.Debug().Msg(fmt.Sprintf("Handling deletion of resources for Instance '%s' in Namespace '%s'", req.Name, req.Namespace))
 			instance.Name = req.Name
 			instance.Namespace = req.Namespace

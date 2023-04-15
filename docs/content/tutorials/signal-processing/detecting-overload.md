@@ -33,8 +33,8 @@ a [Flux Meter](/concepts/flow-control/resources/flux-meter.md).
 
 It's recommended to apply the Flux Meter to a single type of workload to avoid
 mixing the latency measurements across distinct workloads. For example, if there
-are Select and Insert API calls on the same service, it's recommended to measure
-the latency of only one of those workloads using a Flux Meter. Refer
+are Select and Insert API calls on the same service, it is recommended to
+measure the latency of only one of those workloads using a Flux Meter. Refer
 [FlowSelector](/concepts/flow-control/flow-selector.md#flowselector) on how to
 apply the Flux Meter to a subset of API calls for a service.
 

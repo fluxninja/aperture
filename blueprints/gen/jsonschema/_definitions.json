@@ -1,7 +1,7 @@
 {
   "definitions": {
     "AIMDConcurrencyController": {
-      "description": "High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.",
+      "description": "High level concurrency control component. Baselines a signal using exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.",
       "properties": {
         "alerter_parameters": {
           "$ref": "#/definitions/AlerterParameters",
@@ -36,7 +36,7 @@
         },
         "load_multiplier_linear_increment": {
           "default": 0.0025,
-          "description": "Linear increment to load multiplier in each execution tick when the system isn't in overloaded state.\n\n",
+          "description": "Linear increment to load multiplier in each execution tick when the system is not in overloaded state.\n\n",
           "format": "double",
           "type": "number",
           "x-go-tag-default": "0.0025",
@@ -207,7 +207,7 @@
       "additionalProperties": false
     },
     "And": {
-      "description": "Logical AND.\n\nSignals are mapped to Boolean values as follows:\n* Zero is treated as false.\n* Any non-zero is treated as true.\n* Invalid inputs are considered unknown.\n\n  :::note\n\n  Treating invalid inputs as \"unknowns\" has a consequence that the result\n  might end up being valid even when some inputs are invalid. For example, `unknown && false == false`,\n  because the result would end up false no matter if\n  first signal was true or false. On the other hand, `unknown && true == unknown`.\n\n  :::",
+      "description": "Logical AND.\n\nSignals are mapped to Boolean values as follows:\n* Zero is treated as false.\n* Any non-zero is treated as true.\n* Invalid inputs are considered unknown.\n\n  :::note\n\n  Treating invalid inputs as \"unknowns\" has a consequence that the result\n  might end up being valid even when some inputs are invalid. For example, `unknown && false == false`,\n  because the result would end up false no matter if\n  first signal was true or false. Conversely, `unknown && true == unknown`.\n\n  :::",
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/AndIns",
@@ -311,12 +311,12 @@
       "properties": {
         "auto_scaler": {
           "$ref": "#/definitions/AutoScaler",
-          "description": "_AutoScaler_ provides auto scaling functionality for any scalable resource.",
+          "description": "_AutoScaler_ provides auto-scaling functionality for any scalable resource.",
           "x-order": 0
         },
         "pod_auto_scaler": {
           "$ref": "#/definitions/PodAutoScaler",
-          "description": "_PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource.",
+          "description": "_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource.",
           "x-order": 1
         },
         "pod_scaler": {
@@ -329,7 +329,7 @@
       "additionalProperties": false
     },
     "AutoScaler": {
-      "description": "_AutoScaler_ provides auto scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto scale.",
+      "description": "_AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.",
       "properties": {
         "cooldown_override_percentage": {
           "default": 50,
@@ -461,7 +461,7 @@
       "additionalProperties": false
     },
     "Circuit": {
-      "description": "Circuit is graph of inter-connected signal processing components.\n\n:::info\n\nSee also [Circuit overview](/concepts/policy/circuit.md).\n\n:::\n\nSignals flow between components via ports.\nAs signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto scale etc.).\nCircuit is evaluated periodically to respond to changes in signal readings.\n\n:::info Signals\n\nSignals are floating-point values.\n\nA signal can also have a special **Invalid** value. It's usually used to\ncommunicate that signal doesn't have a meaningful value at the moment, for example,\n[PromQL](#prom-q-l) emits such a value if it can't execute a query.\nComponents know when their input signals are invalid and can act\naccordingly. They can either propagate the invalid signal, by making their\noutput itself invalid (for example,\n[ArithmeticCombinator](#arithmetic-combinator)) or use some different\nlogic, for example, [Extrapolator](#extrapolator). Refer to a component's\ndocs on how exactly it handles invalid inputs.\n\n:::",
+      "description": "Circuit is graph of inter-connected signal processing components.\n\n:::info\n\nSee also [Circuit overview](/concepts/policy/circuit.md).\n\n:::\n\nSignals flow between components through ports.\nAs signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto-scale and so on).\nCircuit is evaluated periodically to respond to changes in signal readings.\n\n:::info Signals\n\nSignals are floating point values.\n\nA signal can also have a special **Invalid** value. It's usually used to\ncommunicate that signal does not have a meaningful value at the moment, for example,\n[PromQL](#prom-q-l) emits such a value if it cannot execute a query.\nComponents know when their input signals are invalid and can act\naccordingly. They can either propagate the invalid signal, by making their\noutput itself invalid (for example,\n[ArithmeticCombinator](#arithmetic-combinator)) or use some different\nlogic, for example, [Extrapolator](#extrapolator). Refer to a component's\ndocs on how exactly it handles invalid inputs.\n\n:::",
       "properties": {
         "components": {
           "description": "Defines a signal processing graph as a list of components.\n\n",
@@ -514,7 +514,7 @@
       "additionalProperties": false
     },
     "Component": {
-      "description": ":::info\n\nSee also [Components overview](/concepts/policy/circuit.md#components).\n\n:::\n\nSignals flow into the components via input ports and results are emitted on output ports.\nComponents are wired to each other based on signal names forming an execution graph of the circuit.\n\n:::note\n\nLoops are broken by the runtime at the earliest component index that's part of the loop.\nThe looped signals are saved in the tick they're generated and served in the subsequent tick.\n\n:::\n\nThere are three categories of components:\n* \"source\" components: they take some sort of input from \"the real world\" and output\n  a signal based on this input. Example: [PromQL](#prom-q-l). In the UI\n  they're represented by green color.\n* signal processor components: processing components that don't interact with the external systems.\n  Examples: [GradientController](#gradient-controller), [Max](#max).\n\n  :::note\n\n  Signal processor components' output can depend on their internal state, in addition to the inputs.\n  Eg. see the [Exponential Moving Average filter](#e-m-a).\n\n  :::\n\n* \"sink\" components:\u00a0they affect the real world.\n  [ConcurrencyLimiter](#concurrency-limiter) and [RateLimiter](#rate-limiter).\n  In the UI, represented by orange color.  Sink components usually come in pairs with a\n  \"sources\" component which emits a feedback signal, like\n  `accepted_concurrency` emitted by ConcurrencyLimiter.\n\n:::tip\n\nSometimes you may want to use a constant value as one of component's inputs.\nYou can create an input port containing the constant value instead of being connected to a signal.\nTo do so, use the [InPort](#in_port)'s .withConstantSignal(constant_signal) method.\nYou can also use it to provide special math values such as NaN and +- Inf.\nIf You need to provide the same constant signal to multiple components,\nYou can use the [Variable](#variable) component.\n\n:::\n\nSee also [Policy](#policy) for a higher-level explanation of circuits.",
+      "description": ":::info\n\nSee also [Components overview](/concepts/policy/circuit.md#components).\n\n:::\n\nSignals flow into the components from input ports and results are emitted on output ports.\nComponents are wired to each other based on signal names forming an execution graph of the circuit.\n\n:::note\n\nLoops are broken by the runtime at the earliest component index that is part of the loop.\nThe looped signals are saved in the tick they're generated and served in the subsequent tick.\n\n:::\n\nThere are three categories of components:\n* \"source\" components: they take some sort of input from \"the real world\" and output\n  a signal based on this input. Example: [PromQL](#prom-q-l). In the UI\n  they're represented by green color.\n* signal processor components: processing components that do not interact with the external systems.\n  Examples: [GradientController](#gradient-controller), [Max](#max).\n\n  :::note\n\n  Signal processor components' output can depend on their internal state, in addition to the inputs.\n  Eg. see the [Exponential Moving Average filter](#e-m-a).\n\n  :::\n\n* \"sink\" components:\u00a0they affect the real world.\n  [ConcurrencyLimiter](#concurrency-limiter) and [RateLimiter](#rate-limiter).\n  In the UI, represented by orange color.  Sink components usually come in pairs with a\n  \"sources\" component which emits a feedback signal, like\n  `accepted_concurrency` emitted by ConcurrencyLimiter.\n\n:::tip\n\nSometimes you might want to use a constant value as one of component's inputs.\nYou can create an input port containing the constant value instead of being connected to a signal.\nTo do so, use the [InPort](#in_port)'s .withConstantSignal(constant_signal) method.\nYou can also use it to provide special math values such as NaN and +- Inf.\nIf You need to provide the same constant signal to multiple components,\nYou can use the [Variable](#variable) component.\n\n:::\n\nSee also [Policy](#policy) for a higher-level explanation of circuits.",
       "properties": {
         "alerter": {
           "$ref": "#/definitions/Alerter",
@@ -647,7 +647,7 @@
       "additionalProperties": false
     },
     "ConcurrencyLimiter": {
-      "description": ":::info\n\nSee also [Concurrency Limiter overview](/concepts/flow-control/components/concurrency-limiter.md).\n\n:::\n\nIt's based on the actuation strategy (for example, load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.\nConcurrency is calculated in terms of total tokens which translate to (avg. latency \\* in-flight requests) (Little's Law).\n\nConcurrencyLimiter configuration is split into two parts: An actuation\nstrategy and a scheduler. Right now, only `load_actuator` strategy is available.",
+      "description": ":::info\n\nSee also [Concurrency Limiter overview](/concepts/flow-control/components/concurrency-limiter.md).\n\n:::\n\nIt's based on the actuation strategy (for example, load actuator) and workload scheduling which is based on Weighted Fair Queuing principles.\nConcurrency is calculated in terms of total tokens which translate to (avg. latency \\* in-flight requests) (Little's Law).\n\nConcurrencyLimiter configuration is split into two parts: An actuation\nstrategy and a scheduler. At this time, only `load_actuator` strategy is available.",
       "properties": {
         "flow_selector": {
           "$ref": "#/definitions/FlowSelector",
@@ -697,7 +697,7 @@
       "properties": {
         "false_for": {
           "default": "0s",
-          "description": "Duration of time to wait before a transition to false state.\nIf the duration is zero, the transition will happen instantaneously.\n\n",
+          "description": "Duration of time to wait before changing to false state.\nIf the duration is zero, the change will happen instantaneously.\n\n",
           "type": "string",
           "x-go-tag-default": "0s",
           "x-order": 0
@@ -722,7 +722,7 @@
         },
         "true_for": {
           "default": "0s",
-          "description": "Duration of time to wait before a transition to true state.\nIf the duration is zero, the transition will happen instantaneously.\n\n",
+          "title": "Duration of time to wait before changing to true state.\nIf the duration is zero, the change will happen instantaneously.```",
           "type": "string",
           "x-go-tag-default": "0s",
           "x-order": 4
@@ -771,7 +771,7 @@
         },
         "parameters": {
           "$ref": "#/definitions/DecreasingGradientParameters",
-          "title": "Gradient parameters for the controller. Defaults and constraints:\n* `slope` = 1\n* `min_gradient` = -Inf (must be less than 1)\n* `max_gradient` = 1 (can't be changed)",
+          "title": "Gradient parameters for the controller. Defaults and constraints:\n* `slope` = 1\n* `min_gradient` = -Inf (must be less than 1)\n* `max_gradient` = 1 (cannot be changed)",
           "x-order": 1
         }
       },
@@ -897,7 +897,7 @@
         },
         "max_envelope": {
           "$ref": "#/definitions/InPort",
-          "description": "Upper bound of the moving average.\n\nWhen the signal exceeds `max_envelope` it's multiplied by\n`correction_factor_on_max_envelope_violation` **once per tick**.\n\n:::note\n\nIf the signal deviates from `max_envelope` faster than the correction\nfaster, it might end up exceeding the envelope.\n\n:::",
+          "description": "Upper bound of the moving average.\n\nWhen the signal exceeds `max_envelope` it is multiplied by\n`correction_factor_on_max_envelope_violation` **once per tick**.\n\n:::note\n\nIf the signal deviates from `max_envelope` faster than the correction\nfaster, it might end up exceeding the envelope.\n\n:::",
           "x-order": 1
         },
         "min_envelope": {
@@ -995,7 +995,7 @@
           "x-order": 0
         },
         "from": {
-          "description": "Attribute path is a dot-separated path to attribute.\n\nShould be either:\n* one of the fields of [Attribute Context][attribute-context], or\n* a special `request.http.bearer` pseudo-attribute.\nFor example, `request.http.method` or `request.http.header.user-agent`\n\nNote: The same attribute path syntax is shared by other extractor variants,\nwherever attribute path is needed in their \"from\" syntax.\n\nExample:\n```yaml\nfrom: request.http.headers.user-agent\n```\n[attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto",
+          "description": "Attribute path is a dot-separated path to attribute.\n\nShould be either:\n* one of the fields of [Attribute Context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto), or\n* a special `request.http.bearer` pseudo-attribute.\nFor example, `request.http.method` or `request.http.header.user-agent`\n\nNote: The same attribute path syntax is shared by other extractor variants,\nwherever attribute path is needed in their \"from\" syntax.\n\nExample:\n```yaml\nfrom: request.http.headers.user-agent\n```",
           "title": "Use an attribute with no conversion",
           "type": "string",
           "x-order": 1
@@ -1040,7 +1040,7 @@
           "x-order": 2
         }
       },
-      "title": "Extrapolates the input signal by repeating the last valid value during the period in which it's invalid",
+      "title": "Extrapolates the input signal by repeating the last valid value during the period in which it is invalid",
       "type": "object",
       "additionalProperties": false
     },
@@ -1166,7 +1166,7 @@
           "additionalProperties": {
             "$ref": "#/definitions/FluxMeter"
           },
-          "description": "Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.\n\nFlux Meter created metrics can be consumed as input to the circuit via the PromQL component.\n\n",
+          "description": "Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.\n\nFlux Meter created metrics can be consumed as input to the circuit through the PromQL component.\n\n",
           "type": "object",
           "x-go-tag-validate": "dive",
           "x-order": 1
@@ -1180,14 +1180,14 @@
       "description": ":::info\n\nSee also [FlowSelector overview](/concepts/flow-control/flow-selector.md).\n\n:::\nExample:\n```yaml\ncontrol_point: ingress\nlabel_matcher:\n  match_labels:\n    user_tier: gold\n  match_expressions:\n    - key: query\n      operator: In\n      values:\n        - insert\n        - delete\n  expression:\n    label_matches:\n        - label: user_agent\n          regex: ^(?!.*Chrome).*Safari\n```",
       "properties": {
         "control_point": {
-          "description": "[Control Point](/concepts/flow-control/flow-selector.md#control-point)\nidentifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution\nblock within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners\nor filter chains.\n\n",
+          "description": "[Control Point](/concepts/flow-control/flow-selector.md#control-point)\nidentifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution\nblock within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress or egress calls or distinct listeners\nor filter chains.\n\n",
           "type": "string",
           "x-go-tag-validate": "required",
           "x-order": 0
         },
         "label_matcher": {
           "$ref": "#/definitions/LabelMatcher",
-          "description": ":::info\n\nSee also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).\n\n:::\n\n:::note\n\n[Classifiers](#classifier) _can_ use flow labels created by some other\nclassifier, but only if they were created at some previous control point\n(and propagated in baggage).\n\nThis limitation doesn't apply to selectors of other entities, like\nFlux Meters or Actuators. It's valid to create a flow label on a control\npoint using classifier, and immediately use it for matching on the same\ncontrol point.\n\n:::",
+          "description": ":::info\n\nSee also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-matcher).\n\n:::\n\n:::note\n\n[Classifiers](#classifier) _can_ use flow labels created by some other\nclassifier, but only if they were created at some previous control point\n(and propagated in baggage).\n\nThis limitation does not apply to selectors of other entities, like\nFlux Meters or Actuators. It's valid to create a flow label on a control\npoint using classifier, and immediately use it for matching on the same\ncontrol point.\n\n:::",
           "title": "Label matcher allows to add _additional_ condition on\n[flow labels](/concepts/flow-control/flow-label.md)\nmust also be satisfied (in addition to service+control point matching)",
           "x-order": 1
         }
@@ -1253,7 +1253,7 @@
       "additionalProperties": false
     },
     "FluxMeterExponentialBuckets": {
-      "description": "ExponentialBuckets creates `count` number of buckets where the lowest bucket has an upper bound of `start`\nand each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf\nbucket isn't counted.",
+      "description": "ExponentialBuckets creates `count` number of buckets where the lowest bucket has an upper bound of `start`\nand each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf\nbucket is not counted.",
       "properties": {
         "count": {
           "description": "Number of buckets.\n\n",
@@ -1282,7 +1282,7 @@
       "additionalProperties": false
     },
     "FluxMeterExponentialBucketsRange": {
-      "description": "ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest\nbucket is `max`. The final +inf bucket isn't counted.",
+      "description": "ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest\nbucket is `max`. The final +inf bucket is not counted.",
       "properties": {
         "count": {
           "description": "Number of buckets.\n\n",
@@ -1310,7 +1310,7 @@
       "additionalProperties": false
     },
     "FluxMeterLinearBuckets": {
-      "description": "LinearBuckets creates `count` number of buckets, each `width` wide, where the lowest bucket has an\nupper bound of `start`. The final +inf bucket isn't counted.",
+      "description": "LinearBuckets creates `count` number of buckets, each `width` wide, where the lowest bucket has an\nupper bound of `start`. The final +inf bucket is not counted.",
       "properties": {
         "count": {
           "description": "Number of buckets.\n\n",
@@ -1392,7 +1392,7 @@
       "properties": {
         "manual_mode": {
           "default": false,
-          "description": "Decides whether the controller runs in `manual_mode`.\nIn manual mode, the controller doesn't adjust the control variable It emits the same output as the control variable input.\n\n",
+          "description": "Decides whether the controller runs in `manual_mode`.\nIn manual mode, the controller does not adjust the control variable It emits the same output as the control variable input.\n\n",
           "type": "boolean",
           "x-go-tag-default": "false",
           "x-order": 0
@@ -1471,7 +1471,7 @@
           "x-order": 1
         },
         "slope": {
-          "description": "Slope controls the aggressiveness and direction of the Gradient Controller.\n\nSlope is used as exponent on the signal to setpoint ratio in computation\nof the gradient (see the [main description](#gradient-controller) for\nexact equation). This parameter decides how aggressive the controller\nresponds to the deviation of signal from the setpoint.\nfor example:\n* $\\text{slope} = 1$: when signal is too high, increase control variable,\n* $\\text{slope} = -1$: when signal is too high, decrease control variable,\n* $\\text{slope} = -0.5$: when signal is too high, decrease control variable gradually.\n\nThe sign of slope depends on correlation between the signal and control variable:\n* Use $\\text{slope} < 0$ if signal and control variable are _positively_\ncorrelated (for example, Per-pod CPU usage and total concurrency).\n* Use $\\text{slope} > 0$ if signal and control variable are _negatively_\ncorrelated (for example, Per-pod CPU usage and number of pods).\n\n:::note\n\nYou need to set _negative_ slope for a _positive_ correlation, as you're\ndescribing the _action_ which controller should make when the signal\nincreases.\n\n:::\n\nThe magnitude of slope describes how aggressively should the controller\nreact to a deviation of signal.\nWith $|\\text{slope}| = 1$, the controller will aim to bring the signal to\nthe setpoint in one tick (assuming linear correlation with signal and setpoint).\nSmaller magnitudes of slope will make the controller adjust the control\nvariable gradually.\n\nSetting $|\\text{slope}| < 1$ (for example, $\\pm0.8$) is recommended.\nIf you experience overshooting, consider lowering the magnitude even more.\nValues of $|\\text{slope}| > 1$ aren't recommended.\n\n:::note\n\nRemember that the gradient and output signal can be (optionally) clamped,\nso the _slope_ might not fully describe aggressiveness of the controller.\n\n:::\n\n",
+          "description": "Slope controls the aggressiveness and direction of the Gradient Controller.\n\nSlope is used as exponent on the signal to setpoint ratio in computation\nof the gradient (see the [main description](#gradient-controller) for\nexact equation). This parameter decides how aggressive the controller\nresponds to the deviation of signal from the setpoint.\nfor example:\n* $\\text{slope} = 1$: when signal is too high, increase control variable,\n* $\\text{slope} = -1$: when signal is too high, decrease control variable,\n* $\\text{slope} = -0.5$: when signal is too high, decrease control variable gradually.\n\nThe sign of slope depends on correlation between the signal and control variable:\n* Use $\\text{slope} < 0$ if there is a _positive_ correlation between the signal and\nthe control variable (for example, Per-pod CPU usage and total concurrency).\n* Use $\\text{slope} > 0$ if there is a _negative_ correlation between the signal and\nthe control variable (for example, Per-pod CPU usage and number of pods).\n\n:::note\n\nYou need to set _negative_ slope for a _positive_ correlation, as you're\ndescribing the _action_ which controller should make when the signal\nincreases.\n\n:::\n\nThe magnitude of slope describes how aggressively should the controller\nreact to a deviation of signal.\nWith $|\\text{slope}| = 1$, the controller will aim to bring the signal to\nthe setpoint in one tick (assuming linear correlation with signal and setpoint).\nSmaller magnitudes of slope will make the controller adjust the control\nvariable gradually.\n\nSetting $|\\text{slope}| < 1$ (for example, $\\pm0.8$) is recommended.\nIf you experience overshooting, consider lowering the magnitude even more.\nValues of $|\\text{slope}| > 1$ aren't recommended.\n\n:::note\n\nRemember that the gradient and output signal can be (optionally) clamped,\nso the _slope_ might not fully describe aggressiveness of the controller.\n\n:::\n\n",
           "format": "double",
           "type": "number",
           "x-go-tag-validate": "required",
@@ -1483,7 +1483,7 @@
       "additionalProperties": false
     },
     "Holder": {
-      "description": "Holds the last valid signal value for the specified duration then waits for next valid value to hold.\nIf it's holding a value that means it ignores both valid and invalid new signals until the `hold_for` duration is finished.",
+      "description": "Holds the last valid signal value for the specified duration then waits for next valid value to hold.\nIf it is holding a value that means it ignores both valid and invalid new signals until the `hold_for` duration is finished.",
       "properties": {
         "hold_for": {
           "default": "5s",
@@ -1548,7 +1548,7 @@
           "x-order": 1
         }
       },
-      "title": "Components receive input from other components via InPorts",
+      "title": "Components receive input from other components through InPorts",
       "type": "object",
       "additionalProperties": false
     },
@@ -1562,7 +1562,7 @@
         },
         "parameters": {
           "$ref": "#/definitions/IncreasingGradientParameters",
-          "title": "Gradient parameters for the controller. Defaults and constraints:\n* `slope` = 1\n* `min_gradient` = 1 (can't be changed)\n* `max_gradient` = +Inf (must be greater than 1)",
+          "title": "Gradient parameters for the controller. Defaults and constraints:\n* `slope` = 1\n* `min_gradient` = 1 (cannot be changed)\n* `max_gradient` = +Inf (must be greater than 1)",
           "x-order": 1
         }
       },
@@ -1726,7 +1726,7 @@
       "additionalProperties": false
     },
     "JWTExtractor": {
-      "description": "Specify a field to be extracted from payload using `json_pointer`.\n\nNote: The signature isn't verified against the secret (assuming there's some\nother part of the system that handles such verification).\n\nExample:\n```yaml\nfrom: request.http.bearer\njson_pointer: /user/email\n```",
+      "description": "Specify a field to be extracted from payload using `json_pointer`.\n\nNote: The signature is not verified against the secret (assuming there's some\nother part of the system that handles such verification).\n\nExample:\n```yaml\nfrom: request.http.bearer\njson_pointer: /user/email\n```",
       "properties": {
         "from": {
           "description": "JWT (JSON Web Token) can be extracted from any input attribute, but most likely you'd want to use `request.http.bearer`.\n\n",
@@ -1846,7 +1846,7 @@
           "x-order": 0
         },
         "match_expressions": {
-          "description": "List of k8s-style label matcher requirements.\n\nNote: The requirements are combined using the logical AND operator.",
+          "description": "List of Kubernetes-style label matcher requirements.\n\nNote: The requirements are combined using the logical AND operator.",
           "items": {
             "$ref": "#/definitions/K8sLabelMatcherRequirement",
             "type": "object"
@@ -1939,7 +1939,7 @@
         },
         "label_matches": {
           "$ref": "#/definitions/MatchesMatchExpression",
-          "description": "The expression is true when label matches given regex.",
+          "description": "The expression is true when label matches given regular expression.",
           "x-order": 4
         },
         "not": {
@@ -1966,7 +1966,7 @@
           "x-order": 0
         }
       },
-      "title": "List of MatchExpressions that's used for all/any matching",
+      "title": "List of MatchExpressions that is used for all or any matching",
       "type": "object",
       "additionalProperties": false
     },
@@ -2238,7 +2238,7 @@
           "x-order": 0
         }
       },
-      "title": "Components produce output for other components via OutPorts",
+      "title": "Components produce output for other components through OutPorts",
       "type": "object",
       "additionalProperties": false
     },
@@ -2261,7 +2261,7 @@
       "additionalProperties": false
     },
     "PodAutoScaler": {
-      "description": "_PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto scale.",
+      "description": "_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.",
       "properties": {
         "cooldown_override_percentage": {
           "default": 50,
@@ -2491,7 +2491,7 @@
         },
         "resources": {
           "$ref": "#/definitions/Resources",
-          "description": "Resources (Flux Meters, Classifiers etc.) to setup.",
+          "description": "Resources (such as Flux Meters, Classifiers) to setup.",
           "x-order": 1
         }
       },
@@ -2719,7 +2719,7 @@
       "additionalProperties": false
     },
     "Rego": {
-      "description": "Rego define a set of labels that are extracted after evaluating a Rego module.\n\n:::info\n\nYou can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.\n\n:::\n\n:::info\n\nSpecial Rego variables:\n- `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it isn't emitted as part of flow labels or telemetry and is solely used while processing the request.\n\n:::\n\nExample of Rego module which also disables telemetry visibility of label:\n```yaml\nrego:\n  labels:\n    user:\n      telemetry: false\n  module: |\n    package user_from_cookie\n    cookies := split(input.attributes.request.http.headers.cookie, \"; \")\n    user := user {\n        cookie := cookies[_]\n        startswith(cookie, \"session=\")\n        session := substring(cookie, count(\"session=\"), -1)\n        parts := split(session, \".\")\n        object := json.unmarshal(base64url.decode(parts[0]))\n        user := object.user\n    }\n```",
+      "description": "Rego define a set of labels that are extracted after evaluating a Rego module.\n\n:::info\n\nYou can use the [live-preview](/concepts/flow-control/resources/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.\n\n:::\n\n:::info\n\nSpecial Rego variables:\n- `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.\n\n:::\n\nExample of Rego module which also disables telemetry visibility of label:\n```yaml\nrego:\n  labels:\n    user:\n      telemetry: false\n  module: |\n    package user_from_cookie\n    cookies := split(input.attributes.request.http.headers.cookie, \"; \")\n    user := user {\n        cookie := cookies[_]\n        startswith(cookie, \"session=\")\n        session := substring(cookie, count(\"session=\"), -1)\n        parts := split(session, \".\")\n        object := json.unmarshal(base64url.decode(parts[0]))\n        user := object.user\n    }\n```",
       "properties": {
         "labels": {
           "additionalProperties": {
@@ -2757,7 +2757,7 @@
       "additionalProperties": false
     },
     "Resources": {
-      "description": ":::info\n\nSee also [Resources overview](/concepts/policy/resources.md).\n\n:::\n\nResources are typically Flux Meters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.",
+      "description": ":::info\n\nSee also [Resources overview](/concepts/policy/resources.md).\n\n:::",
       "properties": {
         "classifiers": {
           "description": "Classifiers are installed in the data-plane and are used to label the requests based on payload content.\n\nThe flow labels created by Classifiers can be matched by Flux Meters to create metrics for control purposes.\n\nDeprecated: v1.5.0. Use `flow_control.classifiers` instead.\n\n",
@@ -2779,7 +2779,7 @@
           "additionalProperties": {
             "$ref": "#/definitions/FluxMeter"
           },
-          "description": "Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.\n\nFlux Meter created metrics can be consumed as input to the circuit via the PromQL component.\n\nDeprecated: v1.5.0. Use `flow_control.flux_meters` instead.\n\n",
+          "description": "Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.\n\nFlux Meter created metrics can be consumed as input to the circuit through the PromQL component.\n\nDeprecated: v1.5.0. Use `flow_control.flux_meters` instead.\n\n",
           "type": "object",
           "x-deprecated": true,
           "x-go-tag-validate": "deprecated,dive",
@@ -2916,7 +2916,7 @@
       "properties": {
         "accepted_concurrency": {
           "$ref": "#/definitions/OutPort",
-          "description": "Accepted concurrency is actual concurrency on a control point that this\nscheduler is applied on.\n\n:::info\n\nConcurrency is a unit less number describing mean number of\n[flows](/concepts/flow-control/flow-control.md#flow) being\nconcurrently processed by the system (system = control point).\nConcurrency is calculated as _work_ done per unit of time (so\nwork-seconds per world-seconds). Work-seconds are computed based on\ntoken-weights of flows (which are either estimated via `auto_tokens`\nor specified by `Workload.tokens`).\n\n:::\n\nValue of this signal is aggregated from all the relevant schedulers.",
+          "description": "Accepted concurrency is actual concurrency on a control point that this\nscheduler is applied on.\n\n:::info\n\nConcurrency is a unit less number describing mean number of\n[flows](/concepts/flow-control/flow-control.md#flow) being\nconcurrently processed by the system (system = control point).\nConcurrency is calculated as _work_ done per unit of time (so\nwork-seconds per world-seconds). Work-seconds are computed based on\ntoken-weights of flows (which are either estimated using the `auto_tokens` feature or specified by `Workload.tokens` setting).\n\n:::\n\nValue of this signal is aggregated from all the relevant schedulers.",
           "x-order": 0
         },
         "incoming_concurrency": {
@@ -2932,7 +2932,7 @@
       "properties": {
         "auto_tokens": {
           "default": true,
-          "description": "Automatically estimate the size of a request in each workload, based on\nhistorical latency. Each workload's `tokens` will be set to average\nlatency of flows in that workload during last few seconds (exact duration\nof this average can change).\nMake sure to not provide `tokens` in workload definitions or in the flow\nif you want to use this feature.\n\n",
+          "description": "Automatically estimate the size of a request in each workload, based on\nhistorical latency. Each workload's `tokens` will be set to average\nlatency of flows in that workload during last few seconds (exact duration\nof this average can change).\nVerify that the `tokens` in workload definitions\nor the flow aren't set if you want\nto use this feature.\n\n",
           "type": "boolean",
           "x-go-tag-default": "true",
           "x-order": 0
@@ -2944,14 +2944,14 @@
         },
         "max_timeout": {
           "default": "0.49s",
-          "description": "Max Timeout is the value with which the flow timeout is capped.\nWhen `auto_tokens` feature isn't enabled, this value is used as the\ntimeout for the flow, otherwise it's used as a cap for the timeout.\n\n:::caution\n\nThis timeout needs to be strictly less than the timeout set on the\nclient for the whole GRPC call:\n* in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,\n* in case of libraries, is configured during the client initialization.\n\nFail-open logic is use for flow control APIs, so if the GRPC timeout\nfires first, the flow will end up being unconditionally allowed while\nit's still waiting on the scheduler.\n\nTo avoid such cases, the end-to-end GRPC timeout should also contain\nsome headroom for constant overhead like serialization, etc. Default\nvalue for GRPC timeouts is 500ms, giving 50ms of headroom, so when\ntweaking this timeout, make sure to adjust the GRPC timeout accordingly.\n\n:::\n\n",
+          "description": "Max Timeout is the value with which the flow timeout is capped.\nWhen `auto_tokens` feature is not enabled, this value is used as the\ntimeout for the flow, otherwise it is used as a cap for the timeout.\n\n:::caution\n\nThis timeout needs to be less than the timeout set on the\nclient for the whole GRPC call:\n* in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,\n* in case of libraries, is configured during the client initialization.\n\nFail-open logic is use for flow control APIs, so if the GRPC timeout\nfires first, the flow will end up being unconditionally allowed while\nit is still waiting on the scheduler.\n\nTo avoid such cases, the end-to-end GRPC timeout should also contain\nsome headroom for constant overhead like serialization and other processing delays. Default\nvalue for GRPC timeouts is 500ms, giving 10ms of headroom, so when\ntweaking this timeout, adjust the GRPC timeout accordingly.\n\n:::\n\n",
           "type": "string",
           "x-go-tag-default": "0.49s",
           "x-order": 2
         },
         "timeout_factor": {
           "default": 0.5,
-          "description": "Timeout as a factor of tokens for a flow in a workload in case `auto_tokens` is set to true.\n\nIf a flow isn't able to get tokens within `timeout_factor * tokens` of duration,\nit will be rejected.\n\nThis value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.\n\n",
+          "description": "Timeout as a factor of tokens for a flow in a workload in case `auto_tokens` is set to true.\n\nIf a flow is not able to get tokens within `timeout_factor * tokens` of duration,\nit will be rejected.\n\nThis value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.\n\n",
           "format": "double",
           "type": "number",
           "x-go-tag-default": "0.5",
@@ -2959,7 +2959,7 @@
           "x-order": 3
         },
         "workloads": {
-          "description": "List of workloads to be used in scheduler.\n\nCategorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads\nallows for load-shedding to be \"intelligent\" compared to random rejections.\nThere are two aspects of this \"intelligence\":\n* Scheduler can more precisely calculate concurrency if it understands\n  that flows belonging to different classes have different weights (for example, insert vs select queries).\n* Setting different priorities to different workloads lets the scheduler\n  avoid dropping important traffic during overload.\n\nEach workload in this list specifies also a matcher that's used to\ndetermine which flow will be categorized into which workload.\nIn case of multiple matching workloads, the first matching one will be used.\nIf none of workloads match, `default_workload` will be used.\n\n:::info\n\nSee also [workload definition in the concepts\nsection](/concepts/flow-control/components/concurrency-limiter.md#workload).\n\n:::\n\n",
+          "description": "List of workloads to be used in scheduler.\n\nCategorizing [flows](/concepts/flow-control/flow-control.md#flow) into workloads\nallows for load-shedding to be \"intelligent\" compared to random rejections.\nThere are two aspects of this \"intelligence\":\n* Scheduler can more precisely calculate concurrency if it understands\n  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).\n* Setting different priorities to different workloads lets the scheduler\n  avoid dropping important traffic during overload.\n\nEach workload in this list specifies also a matcher that is used to\ndetermine which flow will be categorized into which workload.\nIn case of multiple matching workloads, the first matching one will be used.\nIf none of workloads match, `default_workload` will be used.\n\n:::info\n\nSee also [workload definition in the concepts\nsection](/concepts/flow-control/components/concurrency-limiter.md#workload).\n\n:::\n\n",
           "items": {
             "$ref": "#/definitions/SchedulerWorkload",
             "type": "object"
@@ -3034,7 +3034,7 @@
         },
         "service": {
           "default": "any",
-          "description": "The Fully Qualified Domain Name of the\n[service](/concepts/flow-control/flow-selector.md) to select.\n\nIn Kubernetes, this is the FQDN of the Service object.\n\n:::info\n\n`any` matches all services.\n\n:::\n\n:::info\n\nIn the Kubernetes sidecar installation mode, service discovery is switched off by default.\nTo scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.\n\n:::\n\n:::info\n\nAn entity (for example, Kubernetes pod) may belong to multiple services.\n\n:::\n\n",
+          "description": "The Fully Qualified Domain Name of the\n[service](/concepts/flow-control/flow-selector.md) to select.\n\nIn Kubernetes, this is the FQDN of the Service object.\n\n:::info\n\n`any` matches all services.\n\n:::\n\n:::info\n\nIn the Kubernetes sidecar installation mode, service discovery is switched off by default.\nTo scope policies to services, the `service` should be set to `any` and instead, `agent_group` name should be used.\n\n:::\n\n:::info\n\nAn entity (for example, Kubernetes pod) might belong to multiple services.\n\n:::\n\n",
           "type": "string",
           "x-go-tag-default": "any",
           "x-order": 1

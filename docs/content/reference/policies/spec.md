@@ -30,7 +30,7 @@ Generated File Starts
 
 <!-- vale on -->
 
-High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
+High level concurrency control component. Baselines a signal using exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
 
 <dl>
 <dt>alerter_parameters</dt>
@@ -114,7 +114,7 @@ Input ports for the AIMDConcurrencyController component.
 
 <!-- vale on -->
 
-Linear increment to load multiplier in each execution tick when the system isn't in overloaded state.
+Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
 
 </dd>
 <dt>max_load_multiplier</dt>
@@ -463,7 +463,7 @@ Signals are mapped to Boolean values as follows:
   Treating invalid inputs as "unknowns" has a consequence that the result
   might end up being valid even when some inputs are invalid. For example, `unknown && false == false`,
   because the result would end up false no matter if
-  first signal was true or false. On the other hand, `unknown && true == unknown`.
+  first signal was true or false. Conversely, `unknown && true == unknown`.
 
   :::
 
@@ -680,7 +680,7 @@ AutoScale components are used to scale a service.
 
 <!-- vale on -->
 
-_AutoScaler_ provides auto scaling functionality for any scalable resource.
+_AutoScaler_ provides auto-scaling functionality for any scalable resource.
 
 </dd>
 <dt>pod_auto_scaler</dt>
@@ -692,7 +692,7 @@ _AutoScaler_ provides auto scaling functionality for any scalable resource.
 
 <!-- vale on -->
 
-_PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource.
+_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource.
 
 </dd>
 <dt>pod_scaler</dt>
@@ -717,7 +717,7 @@ PodScaler provides pod horizontal scaling functionality for scalable Kubernetes 
 
 <!-- vale on -->
 
-_AutoScaler_ provides auto scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto scale.
+_AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
 
 <dl>
 <dt>cooldown_override_percentage</dt>
@@ -958,17 +958,17 @@ See also [Circuit overview](/concepts/policy/circuit.md).
 
 :::
 
-Signals flow between components via ports.
-As signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto scale etc.).
+Signals flow between components through ports.
+As signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto-scale and so on).
 Circuit is evaluated periodically to respond to changes in signal readings.
 
 :::info Signals
 
-Signals are floating-point values.
+Signals are floating point values.
 
 A signal can also have a special **Invalid** value. It's usually used to
-communicate that signal doesn't have a meaningful value at the moment, for example,
-[PromQL](#prom-q-l) emits such a value if it can't execute a query.
+communicate that signal does not have a meaningful value at the moment, for example,
+[PromQL](#prom-q-l) emits such a value if it cannot execute a query.
 Components know when their input signals are invalid and can act
 accordingly. They can either propagate the invalid signal, by making their
 output itself invalid (for example,
@@ -1104,12 +1104,12 @@ See also [Components overview](/concepts/policy/circuit.md#components).
 
 :::
 
-Signals flow into the components via input ports and results are emitted on output ports.
+Signals flow into the components from input ports and results are emitted on output ports.
 Components are wired to each other based on signal names forming an execution graph of the circuit.
 
 :::note
 
-Loops are broken by the runtime at the earliest component index that's part of the loop.
+Loops are broken by the runtime at the earliest component index that is part of the loop.
 The looped signals are saved in the tick they're generated and served in the subsequent tick.
 
 :::
@@ -1119,7 +1119,7 @@ There are three categories of components:
 - "source" components: they take some sort of input from "the real world" and output
   a signal based on this input. Example: [PromQL](#prom-q-l). In the UI
   they're represented by green color.
-- signal processor components: processing components that don't interact with the external systems.
+- signal processor components: processing components that do not interact with the external systems.
   Examples: [GradientController](#gradient-controller), [Max](#max).
 
   :::note
@@ -1137,7 +1137,7 @@ There are three categories of components:
 
 :::tip
 
-Sometimes you may want to use a constant value as one of component's inputs.
+Sometimes you might want to use a constant value as one of component's inputs.
 You can create an input port containing the constant value instead of being connected to a signal.
 To do so, use the [InPort](#in_port)'s .withConstantSignal(constant_signal) method.
 You can also use it to provide special math values such as NaN and +- Inf.
@@ -1472,7 +1472,7 @@ It's based on the actuation strategy (for example, load actuator) and workload s
 Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests) (Little's Law).
 
 ConcurrencyLimiter configuration is split into two parts: An actuation
-strategy and a scheduler. Right now, only `load_actuator` strategy is available.
+strategy and a scheduler. At this time, only `load_actuator` strategy is available.
 
 <dl>
 <dt>flow_selector</dt>
@@ -1583,8 +1583,8 @@ instantaneous.
 
 <!-- vale on -->
 
-Duration of time to wait before a transition to false state.
-If the duration is zero, the transition will happen instantaneously.
+Duration of time to wait before changing to false state.
+If the duration is zero, the change will happen instantaneously.
 
 </dd>
 <dt>in_ports</dt>
@@ -1632,8 +1632,8 @@ Output ports for the Decider component.
 
 <!-- vale on -->
 
-Duration of time to wait before a transition to true state.
-If the duration is zero, the transition will happen instantaneously.
+Duration of time to wait before changing to true state.
+If the duration is zero, the change will happen instantaneously.```
 
 </dd>
 </dl>
@@ -1736,7 +1736,7 @@ Gradient parameters for the controller. Defaults and constraints:
 
 - `slope` = 1
 - `min_gradient` = -Inf (must be less than 1)
-- `max_gradient` = 1 (can't be changed)
+- `max_gradient` = 1 (cannot be changed)
 
 </dd>
 </dl>
@@ -2017,7 +2017,7 @@ Input signal to be used for the EMA computation.
 
 Upper bound of the moving average.
 
-When the signal exceeds `max_envelope` it's multiplied by
+When the signal exceeds `max_envelope` it is multiplied by
 `correction_factor_on_max_envelope_violation` **once per tick**.
 
 :::note
@@ -2221,7 +2221,7 @@ Attribute path is a dot-separated path to attribute.
 
 Should be either:
 
-- one of the fields of [Attribute Context][attribute-context], or
+- one of the fields of [Attribute Context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto), or
 - a special `request.http.bearer` pseudo-attribute.
   For example, `request.http.method` or `request.http.header.user-agent`
 
@@ -2233,8 +2233,6 @@ Example:
 ```yaml
 from: request.http.headers.user-agent
 ```
-
-[attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 
 </dd>
 <dt>json</dt>
@@ -2283,7 +2281,7 @@ Match HTTP Path to given path templates.
 
 <!-- vale on -->
 
-Extrapolates the input signal by repeating the last valid value during the period in which it's invalid
+Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
 
 It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
 
@@ -2573,7 +2571,7 @@ The flow labels created by Classifiers can be matched by Flux Meters to create m
 
 Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
-Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+Flux Meter created metrics can be consumed as input to the circuit through the PromQL component.
 
 </dd>
 </dl>
@@ -2626,7 +2624,7 @@ label_matcher:
 
 [Control Point](/concepts/flow-control/flow-selector.md#control-point)
 identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
-block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
+block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress or egress calls or distinct listeners
 or filter chains.
 
 </dd>
@@ -2655,7 +2653,7 @@ See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-
 classifier, but only if they were created at some previous control point
 (and propagated in baggage).
 
-This limitation doesn't apply to selectors of other entities, like
+This limitation does not apply to selectors of other entities, like
 Flux Meters or Actuators. It's valid to create a flow label on a control
 point using classifier, and immediately use it for matching on the same
 control point.
@@ -2837,7 +2835,7 @@ The selection criteria for the traffic that will be measured.
 
 ExponentialBuckets creates `count` number of buckets where the lowest bucket has an upper bound of `start`
 and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
-bucket isn't counted.
+bucket is not counted.
 
 <dl>
 <dt>count</dt>
@@ -2887,7 +2885,7 @@ Upper bound of the lowest bucket.
 <!-- vale on -->
 
 ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest
-bucket is `max`. The final +inf bucket isn't counted.
+bucket is `max`. The final +inf bucket is not counted.
 
 <dl>
 <dt>count</dt>
@@ -2937,7 +2935,7 @@ Lowest bucket.
 <!-- vale on -->
 
 LinearBuckets creates `count` number of buckets, each `width` wide, where the lowest bucket has an
-upper bound of `start`. The final +inf bucket isn't counted.
+upper bound of `start`. The final +inf bucket is not counted.
 
 <dl>
 <dt>count</dt>
@@ -3120,7 +3118,7 @@ Dynamic Configuration for a Controller
 <!-- vale on -->
 
 Decides whether the controller runs in `manual_mode`.
-In manual mode, the controller doesn't adjust the control variable It emits the same output as the control variable input.
+In manual mode, the controller does not adjust the control variable It emits the same output as the control variable input.
 
 </dd>
 </dl>
@@ -3295,10 +3293,10 @@ for example:
 
 The sign of slope depends on correlation between the signal and control variable:
 
-- Use $\text{slope} < 0$ if signal and control variable are _positively_
-  correlated (for example, Per-pod CPU usage and total concurrency).
-- Use $\text{slope} > 0$ if signal and control variable are _negatively_
-  correlated (for example, Per-pod CPU usage and number of pods).
+- Use $\text{slope} < 0$ if there is a _positive_ correlation between the signal and
+  the control variable (for example, Per-pod CPU usage and total concurrency).
+- Use $\text{slope} > 0$ if there is a _negative_ correlation between the signal and
+  the control variable (for example, Per-pod CPU usage and number of pods).
 
 :::note
 
@@ -3338,7 +3336,7 @@ so the _slope_ might not fully describe aggressiveness of the controller.
 <!-- vale on -->
 
 Holds the last valid signal value for the specified duration then waits for next valid value to hold.
-If it's holding a value that means it ignores both valid and invalid new signals until the `hold_for` duration is finished.
+If it is holding a value that means it ignores both valid and invalid new signals until the `hold_for` duration is finished.
 
 <dl>
 <dt>hold_for</dt>
@@ -3449,7 +3447,7 @@ The output signal.
 
 <!-- vale on -->
 
-Components receive input from other components via InPorts
+Components receive input from other components through InPorts
 
 <dl>
 <dt>constant_signal</dt>
@@ -3513,7 +3511,7 @@ Input ports for the Gradient.
 Gradient parameters for the controller. Defaults and constraints:
 
 - `slope` = 1
-- `min_gradient` = 1 (can't be changed)
+- `min_gradient` = 1 (cannot be changed)
 - `max_gradient` = +Inf (must be greater than 1)
 
 </dd>
@@ -3860,7 +3858,7 @@ Parse the attribute as JWT and read the payload
 
 Specify a field to be extracted from payload using `json_pointer`.
 
-Note: The signature isn't verified against the secret (assuming there's some
+Note: The signature is not verified against the secret (assuming there's some
 other part of the system that handles such verification).
 
 Example:
@@ -4119,7 +4117,7 @@ An arbitrary expression to be evaluated on the labels.
 
 <!-- vale on -->
 
-List of k8s-style label matcher requirements.
+List of Kubernetes-style label matcher requirements.
 
 Note: The requirements are combined using the logical AND operator.
 
@@ -4321,7 +4319,7 @@ The expression is true when label with given name exists.
 
 <!-- vale on -->
 
-The expression is true when label matches given regex.
+The expression is true when label matches given regular expression.
 
 </dd>
 <dt>not</dt>
@@ -4346,7 +4344,7 @@ The expression negates the result of sub expression.
 
 <!-- vale on -->
 
-List of MatchExpressions that's used for all/any matching
+List of MatchExpressions that is used for all or any matching
 
 for example, `{any: {of: [expr1, expr2]}}`.
 
@@ -4876,7 +4874,7 @@ Will always be 0 (false), 1 (true) or invalid (unknown).
 
 <!-- vale on -->
 
-Components produce output for other components via OutPorts
+Components produce output for other components through OutPorts
 
 <dl>
 <dt>signal_name</dt>
@@ -4951,7 +4949,7 @@ Example:
 
 <!-- vale on -->
 
-_PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto scale.
+_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
 
 <dl>
 <dt>cooldown_override_percentage</dt>
@@ -5404,7 +5402,7 @@ Defines the control-loop logic of the policy.
 
 <!-- vale on -->
 
-Resources (Flux Meters, Classifiers etc.) to setup.
+Resources (such as Flux Meters, Classifiers) to setup.
 
 </dd>
 </dl>
@@ -5872,7 +5870,7 @@ You can use the [live-preview](/concepts/flow-control/resources/classifier.md#li
 
 Special Rego variables:
 
-- `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it isn't emitted as part of flow labels or telemetry and is solely used while processing the request.
+- `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
 
 :::
 
@@ -5986,8 +5984,6 @@ See also [Resources overview](/concepts/policy/resources.md).
 
 :::
 
-Resources are typically Flux Meters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
-
 <dl>
 <dt>classifiers</dt>
 <dd>
@@ -6028,7 +6024,7 @@ FlowControlResources are resources that are provided by flow control integration
 
 Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
-Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+Flux Meter created metrics can be consumed as input to the circuit through the PromQL component.
 
 Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 
@@ -6343,8 +6339,7 @@ Concurrency is a unit less number describing mean number of
 concurrently processed by the system (system = control point).
 Concurrency is calculated as _work_ done per unit of time (so
 work-seconds per world-seconds). Work-seconds are computed based on
-token-weights of flows (which are either estimated via `auto_tokens`
-or specified by `Workload.tokens`).
+token-weights of flows (which are either estimated using the `auto_tokens` feature or specified by `Workload.tokens` setting).
 
 :::
 
@@ -6394,8 +6389,9 @@ Automatically estimate the size of a request in each workload, based on
 historical latency. Each workload's `tokens` will be set to average
 latency of flows in that workload during last few seconds (exact duration
 of this average can change).
-Make sure to not provide `tokens` in workload definitions or in the flow
-if you want to use this feature.
+Verify that the `tokens` in workload definitions
+or the flow aren't set if you want
+to use this feature.
 
 </dd>
 <dt>default_workload_parameters</dt>
@@ -6420,12 +6416,12 @@ Parameters to be used if none of workloads specified in `workloads` match.
 <!-- vale on -->
 
 Max Timeout is the value with which the flow timeout is capped.
-When `auto_tokens` feature isn't enabled, this value is used as the
-timeout for the flow, otherwise it's used as a cap for the timeout.
+When `auto_tokens` feature is not enabled, this value is used as the
+timeout for the flow, otherwise it is used as a cap for the timeout.
 
 :::caution
 
-This timeout needs to be strictly less than the timeout set on the
+This timeout needs to be less than the timeout set on the
 client for the whole GRPC call:
 
 - in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
@@ -6433,12 +6429,12 @@ client for the whole GRPC call:
 
 Fail-open logic is use for flow control APIs, so if the GRPC timeout
 fires first, the flow will end up being unconditionally allowed while
-it's still waiting on the scheduler.
+it is still waiting on the scheduler.
 
 To avoid such cases, the end-to-end GRPC timeout should also contain
-some headroom for constant overhead like serialization, etc. Default
-value for GRPC timeouts is 500ms, giving 50ms of headroom, so when
-tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+some headroom for constant overhead like serialization and other processing delays. Default
+value for GRPC timeouts is 500ms, giving 10ms of headroom, so when
+tweaking this timeout, adjust the GRPC timeout accordingly.
 
 :::
 
@@ -6454,7 +6450,7 @@ tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
 
 Timeout as a factor of tokens for a flow in a workload in case `auto_tokens` is set to true.
 
-If a flow isn't able to get tokens within `timeout_factor * tokens` of duration,
+If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
 it will be rejected.
 
 This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
@@ -6476,11 +6472,11 @@ allows for load-shedding to be "intelligent" compared to random rejections.
 There are two aspects of this "intelligence":
 
 - Scheduler can more precisely calculate concurrency if it understands
-  that flows belonging to different classes have different weights (for example, insert vs select queries).
+  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
 - Setting different priorities to different workloads lets the scheduler
   avoid dropping important traffic during overload.
 
-Each workload in this list specifies also a matcher that's used to
+Each workload in this list specifies also a matcher that is used to
 determine which flow will be categorized into which workload.
 In case of multiple matching workloads, the first matching one will be used.
 If none of workloads match, `default_workload` will be used.
@@ -6662,7 +6658,7 @@ To scope policies to services, the `service` should be set to `any` and instead,
 
 :::info
 
-An entity (for example, Kubernetes pod) may belong to multiple services.
+An entity (for example, Kubernetes pod) might belong to multiple services.
 
 :::
 

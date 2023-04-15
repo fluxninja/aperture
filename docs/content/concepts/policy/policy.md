@@ -10,9 +10,9 @@ See also [Policy reference](/reference/policies/spec.md#policy)
 :::
 
 Aperture's policy language enables expression of closed-loop [control
-systems][control-system] in a declarative manner. Aperture comes with
-pre-packaged [blueprints][blueprints] that can be used both as a guide for
-creating new policies, or used as-is.
+systems][control-system] in a declarative manner. Aperture includes pre-packaged
+[blueprints][blueprints] that can be used both as a guide for creating new
+policies, or used as-is.
 
 Policies provide a framework for defining and managing reliability criteria and
 conditions as code. They allow service operators to define and enforce

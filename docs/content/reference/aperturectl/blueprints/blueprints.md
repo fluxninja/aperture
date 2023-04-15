@@ -12,8 +12,7 @@ Aperture Blueprints
 
 ### Synopsis
 
-Use this command to pull, list, remove and generate Aperture Policy resources
-using the Aperture Blueprints.
+Use this command to pull, list, remove and generate Aperture Policy resources using the Aperture Blueprints.
 
 ### Options
 
@@ -26,15 +25,9 @@ using the Aperture Blueprints.
 
 ### SEE ALSO
 
-- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool
-  to interact with Aperture
-- [aperturectl blueprints generate](/reference/aperturectl/blueprints/generate/generate.md) -
-  Generate Aperture Policy related resources from Aperture Blueprints
-- [aperturectl blueprints list](/reference/aperturectl/blueprints/list/list.md) -
-  List Aperture Blueprints
-- [aperturectl blueprints pull](/reference/aperturectl/blueprints/pull/pull.md) -
-  Pull Aperture Blueprints
-- [aperturectl blueprints remove](/reference/aperturectl/blueprints/remove/remove.md) -
-  Remove a Blueprint
-- [aperturectl blueprints values](/reference/aperturectl/blueprints/values/values.md) -
-  Provide values file for a given Aperture Blueprint
+- [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture
+- [aperturectl blueprints generate](/reference/aperturectl/blueprints/generate/generate.md) - Generate Aperture Policy related resources from Aperture Blueprints
+- [aperturectl blueprints list](/reference/aperturectl/blueprints/list/list.md) - List Aperture Blueprints
+- [aperturectl blueprints pull](/reference/aperturectl/blueprints/pull/pull.md) - Pull Aperture Blueprints
+- [aperturectl blueprints remove](/reference/aperturectl/blueprints/remove/remove.md) - Remove a Blueprint
+- [aperturectl blueprints values](/reference/aperturectl/blueprints/values/values.md) - Provide values file for a given Aperture Blueprint

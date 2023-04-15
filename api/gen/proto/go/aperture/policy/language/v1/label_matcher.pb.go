@@ -41,7 +41,7 @@ type LabelMatcher struct {
 	//
 	// Note: The requirements are combined using the logical AND operator.
 	MatchLabels map[string]string `protobuf:"bytes,1,rep,name=match_labels,json=matchLabels,proto3" json:"match_labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	// List of k8s-style label matcher requirements.
+	// List of Kubernetes-style label matcher requirements.
 	//
 	// Note: The requirements are combined using the logical AND operator.
 	MatchExpressions []*K8SLabelMatcherRequirement `protobuf:"bytes,2,rep,name=match_expressions,json=matchExpressions,proto3" json:"match_expressions,omitempty"`
@@ -314,7 +314,7 @@ type MatchExpression_LabelEquals struct {
 }
 
 type MatchExpression_LabelMatches struct {
-	// The expression is true when label matches given regex.
+	// The expression is true when label matches given regular expression.
 	LabelMatches *MatchesMatchExpression `protobuf:"bytes,6,opt,name=label_matches,json=labelMatches,proto3,oneof"`
 }
 
@@ -447,7 +447,7 @@ func (x *MatchesMatchExpression) GetRegex() string {
 	return ""
 }
 
-// List of MatchExpressions that's used for all/any matching
+// List of MatchExpressions that is used for all or any matching
 //
 // for example, `{any: {of: [expr1, expr2]}}`.
 type MatchExpression_List struct {

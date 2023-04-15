@@ -19,8 +19,8 @@ import {apertureVersion,apertureVersionWithOutV} from '../../../apertureVersion.
 
 ```
 
-The Aperture Agent can be installed as a system service on any Linux system
-that's [supported](supported-platforms.md).
+The Aperture Agent can be installed as a system service on any Linux system that
+is [supported](supported-platforms.md).
 
 ## Download {#agent-download}
 
@@ -90,7 +90,7 @@ sudo systemctl enable --now aperture-agent
 :::caution
 
 Currently, configuration watcher and automatic reload aren't supported. If you
-modify the configuration file, make sure to restart the service:
+modify the configuration file, do restart the service:
 
 ```bash
 sudo systemctl restart aperture-agent

@@ -22,7 +22,7 @@ updates.
 :::
 
 If a policy contains a rate limiter, limit overrides for specific flow label
-keys can be provided via dynamic configuration at runtime. This prevents the
+keys can be provided by dynamic configuration at runtime. This prevents the
 resetting of distributed counters that would otherwise occur when a policy is
 restarted.
 

@@ -52,9 +52,9 @@ See also [_Flow Matcher_ reference](/reference/policies/spec.md#flow-matcher)
 Control points are similar to
 [feature flags](https://en.wikipedia.org/wiki/Feature_toggle). They identify the
 location in the code or data plane (web servers, service meshes, API gateways,
-etc.) where flow control decisions are applied. They're defined by developers
-using the SDKs or configured when integrating with API Gateways or Service
-Meshes.
+and so on) where flow control decisions are applied. They're defined by
+developers using the SDKs or configured when integrating with API Gateways or
+Service Meshes.
 
 <Zoom>
 
@@ -81,17 +81,18 @@ graph LR
 
 </Zoom>
 
-In the above diagram, each service has **HTTP** control points. Every incoming
-API request to a service is a flow at its **ingress** control point. Likewise,
-every outgoing request from a service is a flow at its **egress** control point.
+In the above diagram, each service has _Traffic_ (HTTP or GRPC) control points.
+Every incoming API request to a service is a flow at its `ingress` control
+point. Likewise, every outgoing request from a service is a flow at its `egress`
+control point.
 
-In addition, the `Frontend` service has **Feature** control points identifying
+In addition, the `Frontend` service has _Feature_ control points identifying
 _recommendations_ and _live-update_ features inside the `Frontend` service's
 code.
 
 :::note
 
-The _Control Point_ definition doesn't care about which particular entity (like
+The _Control Point_ definition does not care about which particular entity (like
 a pod) is handling a particular flow. A single _Control Point_ covers _all_ the
 entities belonging to the same service.
 
@@ -119,8 +120,8 @@ label_matcher:
 ```
 
 Matching expression trees can also be used to define more complex conditions,
-including regex matching. Refer to [Label Matcher reference][label-matcher] for
-further details.
+including regular expression matching. Refer to [Label Matcher
+reference][label-matcher] for further details.
 
 ## Example
 
@@ -129,8 +130,7 @@ service_selector:
   service: checkout.myns.svc.cluster.local
   agent_group: default
 flow_selector:
-  control_point:
-    traffic: ingress
+  control_point: ingress
   label_matcher:
     match_labels:
       user_tier: gold
@@ -165,10 +165,10 @@ operate as peers. For example, an Agent Group can be a Kubernetes cluster name
 in the case of DaemonSet deployment, or it can be a service name for sidecar
 deployments.
 
-**Agent Group** defines the scope of Agent-to-Agent synchronization, with agents
+_Agent Group_ defines the scope of agent-to-agent synchronization, with agents
 within the group forming a peer-to-peer network to synchronize fine-grained
 state per-label global counters that are used for rate-limiting purposes.
-Additionally, all agents within an **Agent Group** instantiate the same set of
+Additionally, all agents within an _Agent Group_ instantiate the same set of
 flow control components as published by the controller.
 
 ### Service {#service}
@@ -178,14 +178,14 @@ Services in Aperture are usually referred by their fully qualified domain names
 (FQDN).
 
 A service is a collection of entities delivering a common functionality, such as
-checkout, billing etc. Aperture maintains a mapping of entity IP addresses to
-service names. For each flow control decision request sent by an entity,
+checkout, billing and so on. Aperture maintains a mapping of entity IP addresses
+to service names. For each flow control decision request sent by an entity,
 Aperture looks up the service name and then decides which flow control
 components to execute.
 
 :::note
 
-An entity (K8s Pod, VM, etc.) may belong to multiple services.
+An entity (Kubernetes pod, VM) might belong to multiple services.
 
 :::
 
@@ -199,7 +199,7 @@ An entity (K8s Pod, VM, etc.) may belong to multiple services.
 
 Aperture Agents perform automated discovery of services and entities in
 environments such as Kubernetes and watch for any changes. Service and entity
-entries can also be created manually via configuration.
+entries can also be created manually through configuration.
 
 :::
 
@@ -241,8 +241,8 @@ graph TB
 </Zoom>
 
 as another extreme, if _Agent Groups_ already group entities into logical
-services, _Agent Group_ can be treated as a service to match flows to policies
-(useful when installing as a sidecar):
+services, the _Agent Group_ can be treated as a service to match flows to
+policies (useful when installing as a sidecar):
 
 <Zoom>
 
@@ -268,9 +268,9 @@ _Agent Group_ name together with _Service_ name determine the
 
 Liveness and health probes are essential for checking the health of the
 application, and metrics endpoints are necessary for monitoring its performance.
-However, these endpoints don't contribute to the overall latency of the service,
-and if included in latency calculations, they may cause requests to be rejected,
-leading to unnecessary pod restarts.
+However, these endpoints do not contribute to the overall latency of the
+service, and if included in latency calculations, they might cause requests to
+be rejected, leading to unnecessary pod restarts.
 
 To prevent these issues, traffic to these endpoints can be filtered out by
 matching expressions. In the example below, flows with `http.target` starting
@@ -282,8 +282,7 @@ service_selector:
   service: checkout.myns.svc.cluster.local
   agent_group: default
 flow_selector:
-  control_point:
-    traffic: ingress
+  control_point: ingress
   label_matcher:
     match_expressions:
       - key: http.target
@@ -309,8 +308,8 @@ reference][label-matcher].
 
 :::info
 
-Keep in mind that while these endpoints may have a low latency, they shouldn't
-be included in the overall latency of the service. Filtering them out can help
+Remember that while these endpoints might have a low latency, they should not be
+included in the overall latency of the service. Filtering them out can help
 improve the accuracy of latency calculations and prevent requests from being
 rejected.
 

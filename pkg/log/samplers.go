@@ -12,7 +12,7 @@ import (
 // per few seconds.
 //
 // Use to report cases when we want to warn for visibility, but the warning is
-// likely to reoccur, and we don't want to spam logs. Eg. Invalid arguments on
+// likely to reoccur, and we do not want to spam logs. Eg. Invalid arguments on
 // some intra-aperture RPC call.
 //
 // This should be preferred over log.Sample(zerolog.Sometimes), so that we can
@@ -34,13 +34,13 @@ func NewRatelimitingSampler() zerolog.Sampler {
 //
 // Samplers are created using NewRatelimitingSampler().
 //
-// In most cases, this function shouldn't be used directly, unless implementing
+// In most cases, this function should not be used directly, unless implementing
 // some other helpers similar to Autosample() or Bug().
 func GetAutosampler() zerolog.Sampler {
 	// We want separate sampler for every callsite of Autosample() and Bug().
-	// Usage of Caller has some runtime cost, but that's acceptable:
+	// Usage of Caller has some runtime cost, but that is acceptable:
 	// * for Autosample() a more performant (and verbose) alternative exists,
-	// * Bug() in theory never happens, so we shouldn't care too much about perf.
+	// * Bug() in theory never happens, so we should not care too much about perf.
 	callerPC, _, _, pcValid := runtime.Caller(2)
 	if !pcValid {
 		BugWithSampler(global, badCallerSampler).Msg("bug: Cannot get caller info")
@@ -51,7 +51,7 @@ func GetAutosampler() zerolog.Sampler {
 	}
 	autoSamplersLock.Lock()
 	defer autoSamplersLock.Unlock()
-	// Note: Possible race with another getAutosampler() call, but that's a
+	// Note: Possible race with another getAutosampler() call, but that is a
 	// harmless race.
 	sampler := NewRatelimitingSampler()
 	autoSamplers[callerPC] = sampler

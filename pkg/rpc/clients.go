@@ -248,7 +248,7 @@ type Result[Resp any] struct {
 	Err     error
 }
 
-// RawResult is a Result that's not yet converted to the proper response type.
+// RawResult is a Result that is not yet converted to the proper response type.
 type RawResult = Result[[]byte]
 
 // CallAll calls all clients and returns responses from all of them (in arbitrary order).

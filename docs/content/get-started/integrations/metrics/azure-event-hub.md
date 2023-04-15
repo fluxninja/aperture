@@ -1,5 +1,5 @@
 ---
-title: Azure Event Hub
+title: Microsoft Azure Event Hub
 description: Integrating Azure Event Hub Metrics
 keywords:
   - azureeventhub
@@ -13,8 +13,9 @@ Before proceeding, ensure that you have [built][build] Aperture Agent with the
 `azureeventhubreceiver` extension enabled, so that
 [azureeventhubreceiver][receiver] is available.
 
-You can configure [Custom metrics][custom-metrics] for Azure Event Hub using the
-following configuration in the [Aperture Agent's config][agent-config]:
+You can configure [Custom metrics][custom-metrics] for Microsoft Azure Event Hub
+using the following configuration in the [Aperture Agent's
+config][agent-config]:
 
 ```yaml
 otel:

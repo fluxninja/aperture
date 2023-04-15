@@ -17,9 +17,9 @@ key:value pair. If a flow is annotated with `user_tier:gold` label, then
 
 _Flow Labels_ are used in different ways in Aperture:
 
-- [_Flow Selector_][flow-selector] can select flows based on _Flow Labels_, to
-  narrow the scope of [_Classifiers_][classifier], [_Flux Meters_][flux-meter]
-  etc.
+- The [_Flow Selector_][flow-selector] can select flows based on _Flow Labels_,
+  to narrow the scope of [_Classifiers_][classifier], [_Flux
+  Meters_][flux-meter] and so on.
 - Map a flow to a [_Workload_][workload].
 - Fairness within [_Scheduler_][scheduler] and [_Rate Limiter_][ratelimiter]
   keys are also based on _Flow Labels_.
@@ -39,8 +39,8 @@ headers are available as `http.request.header.header_name`, e.g.
 `http.request.header.user_agent` (note the `snake_case`!). The values of these
 labels are described by [OpenTelemetry semantic conventions for HTTP
 spans][otel-conventions]. The only exception is the `http.host` attribute, which
-is equal to the Host/Authority header. This is thus similar to the
-`net.peer.name` OTel attribute.
+is equal to the host or authority header. This is similar to the `net.peer.name`
+OTel attribute.
 
 ### Baggage {#baggage}
 
@@ -64,7 +64,7 @@ Read more about baggage propagation on:
 ### Classifiers
 
 When the labels you need aren't already present in baggage, nor as request
-labels, you can create a [_Classifier_][Classifier] to inject new labels into
+labels, you can create a [_Classifier_][classifier] to inject new labels into
 the system. Since the Classifier also injects the label into baggage by default,
 this means you can set or extract the label in a different place than where it
 is consumed (assuming you have baggage propagation configured throughout your
@@ -146,9 +146,9 @@ OLAP style telemetry data is generated as OpenTelemetry logs and is saved in an
 OLAP database. This is done by creating multidimensional roll ups from flow
 labels.
 
-OLAP style telemetry doesn't work well with extremely high-cardinality labels,
-thus if an extremely high-cardinality label is detected, some of its values may
-be replaced with the `REDACTED_VIA_CARDINALITY_LIMIT` string.
+OLAP style telemetry does not work well with extremely high-cardinality labels,
+therefore, if an extremely high-cardinality label is detected, some of its
+values might be replaced with the `REDACTED_VIA_CARDINALITY_LIMIT` string.
 
 #### Default labels
 
@@ -162,7 +162,7 @@ These are _Flow Labels_ mapped from [baggage](#baggage).
 
 #### Labels defined by user
 
-These are labels provided via Classifiers in case of service mesh/middleware
+These are labels provided by _Classifiers_ in case of service mesh/middleware
 integration, or explicitly at flow creation in [Aperture SDK][aperture-go].
 
 :::note
@@ -193,7 +193,7 @@ For _Classifier_ created labels, you can disable this behavior by setting
 :::
 
 [flow-selector]: ./flow-selector.md
-[Classifier]: ./resources/classifier.md
+[classifier]: ./resources/classifier.md
 [workload]: ./components/concurrency-limiter.md#workload
 [ratelimiter]: ./components/rate-limiter.md
 [scheduler]: ./components/concurrency-limiter.md#scheduler

@@ -28,7 +28,7 @@ definitions:
             agent_group:
                 default: default
                 description: |-
-                    All agents within an `agent_group` receive the same data-plane configuration (for example, Flux Meters, Rate Limiters etc).
+                    All agents within an agent group receive the same data-plane configuration (for example, Flux Meters, Rate Limiters and so on).
 
                     [Read more about agent groups here](/concepts/flow-control/flow-selector.md#agent-group).
                 type: string
@@ -158,7 +158,7 @@ definitions:
         properties:
             enabled:
                 default: true
-                description: Enables the Kubernetes auto scale capability.
+                description: Enables the Kubernetes auto-scale capability.
                 type: boolean
                 x-go-name: Enabled
                 x-go-tag-default: "true"
@@ -504,7 +504,7 @@ definitions:
                 x-go-tag-json: namespace,omitempty
                 x-go-tag-protobuf: bytes,4,opt,name=namespace,proto3
             node_name:
-                description: Node name of the entity. For example, host name.
+                description: Node name of the entity. For example, Hostname.
                 type: string
                 x-go-name: NodeName
                 x-go-tag-json: node_name,omitempty
@@ -529,7 +529,7 @@ definitions:
         required:
             - ip_address
             - uid
-        title: Entity represents a pod, VM, etc.
+        title: Entity represents a pod, VM, and so on.
         type: object
         x-go-package: github.com/fluxninja/aperture/api/gen/proto/go/aperture/discovery/entities/v1
     EtcdConfig:
@@ -704,7 +704,7 @@ definitions:
                 x-go-tag-json: idle_connection_timeout
                 x-go-tag-validate: gte=0s
             key_log_file:
-                description: SSL key log file (useful for debugging)
+                description: SSL/TLS key log file (useful for debugging)
                 type: string
                 x-go-name: KeyLogWriter
                 x-go-tag-json: key_log_file
@@ -772,7 +772,7 @@ definitions:
                 x-go-tag-validate: omitempty
             read_buffer_size:
                 default: 0
-                description: Read Buffer Size. 0 = 4KB
+                description: Read Buffer Size. 0 = 4 KB
                 format: int64
                 minimum: 0
                 type: integer
@@ -791,7 +791,7 @@ definitions:
                 x-go-tag-validate: gte=0s
             timeout:
                 default: 60s
-                description: HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
+                description: HTTP client timeout - Timeouts include connection time, redirects, reading the response and so on. 0 = no timeout.
                 format: string
                 type: string
                 x-go-name: Timeout
@@ -819,7 +819,7 @@ definitions:
                 x-go-tag-json: use_proxy
             write_buffer_size:
                 default: 0
-                description: Write Buffer Size. 0 = 4KB.
+                description: Write Buffer Size. 0 = 4 KB.
                 format: int64
                 minimum: 0
                 type: integer
@@ -1048,7 +1048,7 @@ definitions:
         properties:
             addr:
                 default: :8080
-                description: Address to bind to in the form of [host%zone]:port
+                description: Address to bind to in the form of `[host%zone]:port`
                 pattern: ^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$
                 type: string
                 x-go-name: Addr
@@ -1058,7 +1058,7 @@ definitions:
                 x-pattern-rules: hostname_port
             keep_alive:
                 default: 180s
-                description: Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alive is disabled.
+                description: Keep-alive period - 0 = enabled if supported by protocol or operating system. If negative, then keep-alive is disabled.
                 format: string
                 type: string
                 x-go-name: KeepAlive
@@ -1311,7 +1311,7 @@ definitions:
         properties:
             cpu_profiler:
                 default: false
-                description: Flag to enable CPU profiling on process start and save it to a file. HTTP interface won't work if this is enabled as CPU profile will always be running.
+                description: Flag to enable CPU profiling on process start and save it to a file. The Browser (HTTP) interface won't work if this is enabled, as the CPU profile will always be running.
                 type: boolean
                 x-go-name: CPUProfile
                 x-go-tag-default: "false"

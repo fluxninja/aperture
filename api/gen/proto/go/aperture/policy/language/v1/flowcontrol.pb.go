@@ -132,7 +132,7 @@ type ServiceSelector struct {
 	//
 	// :::info
 	//
-	// An entity (for example, Kubernetes pod) may belong to multiple services.
+	// An entity (for example, Kubernetes pod) might belong to multiple services.
 	//
 	// :::
 	Service string `protobuf:"bytes,2,opt,name=service,proto3" json:"service,omitempty" default:"any"` // @gotags: default:"any"
@@ -219,7 +219,7 @@ type FlowMatcher struct {
 
 	// [Control Point](/concepts/flow-control/flow-selector.md#control-point)
 	// identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
-	// block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
+	// block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress or egress calls or distinct listeners
 	// or filter chains.
 	ControlPoint string `protobuf:"bytes,1,opt,name=control_point,json=controlPoint,proto3" json:"control_point,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Label matcher allows to add _additional_ condition on
@@ -238,7 +238,7 @@ type FlowMatcher struct {
 	// classifier, but only if they were created at some previous control point
 	// (and propagated in baggage).
 	//
-	// This limitation doesn't apply to selectors of other entities, like
+	// This limitation does not apply to selectors of other entities, like
 	// Flux Meters or Actuators. It's valid to create a flow label on a control
 	// point using classifier, and immediately use it for matching on the same
 	// control point.
@@ -301,7 +301,7 @@ type FlowControlResources struct {
 
 	// Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 	//
-	// Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+	// Flux Meter created metrics can be consumed as input to the circuit through the PromQL component.
 	FluxMeters map[string]*FluxMeter `protobuf:"bytes,1,rep,name=flux_meters,json=fluxMeters,proto3" json:"flux_meters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"dive"` // @gotags: validate:"dive"
 	// Classifiers are installed in the data-plane and are used to label the requests based on payload content.
 	//
@@ -749,7 +749,7 @@ func (*Rule_Rego_) isRule_Source() {}
 // :::info
 //
 // Special Rego variables:
-// - `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it isn't emitted as part of flow labels or telemetry and is solely used while processing the request.
+// - `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
 //
 // :::
 //
@@ -941,7 +941,7 @@ type Extractor_From struct {
 	// Attribute path is a dot-separated path to attribute.
 	//
 	// Should be either:
-	// * one of the fields of [Attribute Context][attribute-context], or
+	// * one of the fields of [Attribute Context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto), or
 	// * a special `request.http.bearer` pseudo-attribute.
 	// For example, `request.http.method` or `request.http.header.user-agent`
 	//
@@ -952,7 +952,6 @@ type Extractor_From struct {
 	// ```yaml
 	// from: request.http.headers.user-agent
 	// ```
-	// [attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 	From string `protobuf:"bytes,1,opt,name=from,proto3,oneof"`
 }
 
@@ -1122,7 +1121,7 @@ func (x *AddressExtractor) GetFrom() string {
 //
 // Specify a field to be extracted from payload using `json_pointer`.
 //
-// Note: The signature isn't verified against the secret (assuming there's some
+// Note: The signature is not verified against the secret (assuming there's some
 // other part of the system that handles such verification).
 //
 // Example:
@@ -1468,7 +1467,7 @@ func (x *RateLimiter) GetDefaultConfig() *RateLimiter_DynamicConfig {
 // Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests) (Little's Law).
 //
 // ConcurrencyLimiter configuration is split into two parts: An actuation
-// strategy and a scheduler. Right now, only `load_actuator` strategy is available.
+// strategy and a scheduler. At this time, only `load_actuator` strategy is available.
 type ConcurrencyLimiter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1694,7 +1693,7 @@ func (x *LoadActuator) GetDefaultConfig() *LoadActuator_DynamicConfig {
 	return nil
 }
 
-// High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
+// High level concurrency control component. Baselines a signal using exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
 type AIMDConcurrencyController struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1712,7 +1711,7 @@ type AIMDConcurrencyController struct {
 	GradientParameters *GradientController_Parameters `protobuf:"bytes,5,opt,name=gradient_parameters,json=gradientParameters,proto3" json:"gradient_parameters,omitempty"`
 	// Current accepted concurrency is multiplied with this number to dynamically calculate the upper concurrency limit of a Service during normal (non-overload) state. This protects the Service from sudden spikes.
 	MaxLoadMultiplier float64 `protobuf:"fixed64,6,opt,name=max_load_multiplier,json=maxLoadMultiplier,proto3" json:"max_load_multiplier,omitempty" default:"2.0"` // @gotags: default:"2.0"
-	// Linear increment to load multiplier in each execution tick when the system isn't in overloaded state.
+	// Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
 	LoadMultiplierLinearIncrement float64 `protobuf:"fixed64,7,opt,name=load_multiplier_linear_increment,json=loadMultiplierLinearIncrement,proto3" json:"load_multiplier_linear_increment,omitempty" default:"0.0025"` // @gotags: default:"0.0025"
 	// Configuration for embedded Alerter.
 	AlerterParameters *Alerter_Parameters `protobuf:"bytes,8,opt,name=alerter_parameters,json=alerterParameters,proto3" json:"alerter_parameters,omitempty"`
@@ -1874,7 +1873,7 @@ func (x *FluxMeter_StaticBuckets) GetBuckets() []float64 {
 }
 
 // LinearBuckets creates `count` number of buckets, each `width` wide, where the lowest bucket has an
-// upper bound of `start`. The final +inf bucket isn't counted.
+// upper bound of `start`. The final +inf bucket is not counted.
 type FluxMeter_LinearBuckets struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1943,7 +1942,7 @@ func (x *FluxMeter_LinearBuckets) GetCount() int32 {
 
 // ExponentialBuckets creates `count` number of buckets where the lowest bucket has an upper bound of `start`
 // and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
-// bucket isn't counted.
+// bucket is not counted.
 type FluxMeter_ExponentialBuckets struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2011,7 +2010,7 @@ func (x *FluxMeter_ExponentialBuckets) GetCount() int32 {
 }
 
 // ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest
-// bucket is `max`. The final +inf bucket isn't counted.
+// bucket is `max`. The final +inf bucket is not counted.
 type FluxMeter_ExponentialBucketsRange struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2571,11 +2570,11 @@ type Scheduler_Parameters struct {
 	// allows for load-shedding to be "intelligent" compared to random rejections.
 	// There are two aspects of this "intelligence":
 	//   - Scheduler can more precisely calculate concurrency if it understands
-	//     that flows belonging to different classes have different weights (for example, insert vs select queries).
+	//     that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
 	//   - Setting different priorities to different workloads lets the scheduler
 	//     avoid dropping important traffic during overload.
 	//
-	// Each workload in this list specifies also a matcher that's used to
+	// Each workload in this list specifies also a matcher that is used to
 	// determine which flow will be categorized into which workload.
 	// In case of multiple matching workloads, the first matching one will be used.
 	// If none of workloads match, `default_workload` will be used.
@@ -2593,35 +2592,36 @@ type Scheduler_Parameters struct {
 	// historical latency. Each workload's `tokens` will be set to average
 	// latency of flows in that workload during last few seconds (exact duration
 	// of this average can change).
-	// Make sure to not provide `tokens` in workload definitions or in the flow
-	// if you want to use this feature.
+	// Verify that the `tokens` in workload definitions
+	// or the flow aren't set if you want
+	// to use this feature.
 	AutoTokens bool `protobuf:"varint,3,opt,name=auto_tokens,json=autoTokens,proto3" json:"auto_tokens,omitempty" default:"true"` // @gotags: default:"true"
 	// Timeout as a factor of tokens for a flow in a workload in case `auto_tokens` is set to true.
 	//
-	// If a flow isn't able to get tokens within `timeout_factor * tokens` of duration,
+	// If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
 	// it will be rejected.
 	//
 	// This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
 	TimeoutFactor float64 `protobuf:"fixed64,4,opt,name=timeout_factor,json=timeoutFactor,proto3" json:"timeout_factor,omitempty" validate:"gte=0.0" default:"0.5"` // @gotags: validate:"gte=0.0" default:"0.5"
 	// Max Timeout is the value with which the flow timeout is capped.
-	// When `auto_tokens` feature isn't enabled, this value is used as the
-	// timeout for the flow, otherwise it's used as a cap for the timeout.
+	// When `auto_tokens` feature is not enabled, this value is used as the
+	// timeout for the flow, otherwise it is used as a cap for the timeout.
 	//
 	// :::caution
 	//
-	// This timeout needs to be strictly less than the timeout set on the
+	// This timeout needs to be less than the timeout set on the
 	// client for the whole GRPC call:
 	// * in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
 	// * in case of libraries, is configured during the client initialization.
 	//
 	// Fail-open logic is use for flow control APIs, so if the GRPC timeout
 	// fires first, the flow will end up being unconditionally allowed while
-	// it's still waiting on the scheduler.
+	// it is still waiting on the scheduler.
 	//
 	// To avoid such cases, the end-to-end GRPC timeout should also contain
-	// some headroom for constant overhead like serialization, etc. Default
-	// value for GRPC timeouts is 500ms, giving 50ms of headroom, so when
-	// tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+	// some headroom for constant overhead like serialization and other processing delays. Default
+	// value for GRPC timeouts is 500ms, giving 10ms of headroom, so when
+	// tweaking this timeout, adjust the GRPC timeout accordingly.
 	//
 	// :::
 	MaxTimeout *durationpb.Duration `protobuf:"bytes,5,opt,name=max_timeout,json=maxTimeout,proto3" json:"max_timeout,omitempty" default:"0.49s"` // @gotags: default:"0.49s"
@@ -2710,8 +2710,7 @@ type Scheduler_Outs struct {
 	// concurrently processed by the system (system = control point).
 	// Concurrency is calculated as _work_ done per unit of time (so
 	// work-seconds per world-seconds). Work-seconds are computed based on
-	// token-weights of flows (which are either estimated via `auto_tokens`
-	// or specified by `Workload.tokens`).
+	// token-weights of flows (which are either estimated using the `auto_tokens` feature or specified by `Workload.tokens` setting).
 	//
 	// :::
 	//

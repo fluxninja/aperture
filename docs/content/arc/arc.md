@@ -11,7 +11,7 @@ keywords:
 ## Application Reliability Center (ARC)
 
 [FluxNinja ARC](https://www.fluxninja.com/platform) is a cloud-native
-application reliability center that extends open-source Aperture installation
+application reliability center that extends open source Aperture installation
 with advanced analytics, monitoring and alerting capabilities.
 
 :::info Sign-up

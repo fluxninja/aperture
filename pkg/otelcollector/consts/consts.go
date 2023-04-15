@@ -104,7 +104,7 @@ const (
 
 	// EnvoyMissingAttributeValue is a special attribute value, which can
 	// happen when (eg. Envoy's) logger tries to send attribute value, but it
-	// is not available. Eg. In case authz couldn't reach agent, so we know
+	// is not available. Eg. In case authz could not reach agent, so we know
 	// nothing about flowcontrol policies.  Note that this is different case
 	// from "just empty", eg. "", "[]" or "{}".
 	EnvoyMissingAttributeValue = "-"

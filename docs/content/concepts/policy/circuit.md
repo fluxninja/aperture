@@ -11,10 +11,10 @@ See also [_Circuit_ reference][circuit-reference]
 
 The _Circuit_ describes a [control system][control-system] as an execution
 graph. The _Circuit_ is defined as a graph of interconnected signal processing
-components. _Signals_ flow between components via ports. As signals traverse the
-circuit, they get processed, stored within components or get acted upon (for
-example: load-shed, rate-limit, auto scale etc.). The _Circuit_ is evaluated
-periodically to respond to changes in signal readings.
+components. _Signals_ flow between components through ports. As signals traverse
+the circuit, they get processed, stored within components or get acted upon (for
+example: load-shed, rate-limit, auto-scale and so on). The _Circuit_ is
+evaluated periodically to respond to changes in signal readings.
 
 ## Component
 
@@ -30,12 +30,12 @@ The _Signal_ represents a `float64` value that updates with every [tick][tick]
 of circuit execution. Every signal must have a name to uniquely identify it
 within a circuit.
 
-The output port on a component may emit a signal. No other port (on any
+The output port on a component can emit a signal. No other port (on any
 component) in the circuit can emit a signal with the same name.
 
 To receive a named signal at a component, it must be defined exactly once as an
-output at some component in the circuit. Once defined, a signal may be received
-at multiple components.
+output at some component in the circuit. Once defined, a signal can be received
+at other components that have an input port with the same name.
 
 ## Circuit Runtime
 
@@ -58,7 +58,7 @@ that fire in the same tick return results together in a future tick.
 
 ### Looping Signals
 
-Circuit execution graph may have loops. Looping signals enable expression of
+Circuit execution graph can have loops. Looping signals enable expression of
 powerful paradigms such as integration using basic arithmetic components.
 
 Despite loops, the execution is still performed on a
@@ -101,7 +101,7 @@ Examples of built-in components include:
     controller acts on the ratio of setpoint and signal.
 - **Actuators**: Actuators are components which act on signals and interface
   with external systems to perform actions such as shedding traffic, changing
-  rate limits or auto scaling etc.
+  rate limits or auto-scaling and so on.
   - [Concurrency Limiter](/reference/policies/spec.md#concurrency-limiter):
     Takes load multiplier as a signal which determines the proportion of Flow
     concurrency to accept.

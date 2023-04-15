@@ -13,7 +13,7 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 When services are resource constrained and concurrency limits are being applied,
-it's often crucial to preserve key user-experience by gracefully degrading
+it is often crucial to preserve key user-experience by gracefully degrading
 application behavior. Graceful degradation allows prioritizing business critical
 features while throttling background workloads and less critical features. For
 instance, for an e-commerce application, the ability to check out a shopping
@@ -54,7 +54,7 @@ Classification rules can be written for
 [HTTP requests](concepts/flow-control/resources/classifier.md#live-previewing-requests),
 and scheduler priorities can be defined for
 [Flow Labels](concepts/flow-control/flow-label.md#live-previewing-flow-labels)
-by live previewing them first via introspection APIs.
+by live previewing them first using introspection APIs.
 
 :::
 

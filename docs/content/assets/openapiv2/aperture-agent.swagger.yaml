@@ -546,7 +546,7 @@ definitions:
         additionalProperties:
           $ref: '#/definitions/Entity'
   Entity:
-    description: Entity represents a pod, VM, etc.
+    description: Entity represents a pod, VM, and so on.
     type: object
     required:
     - ip_address
@@ -567,7 +567,7 @@ definitions:
         description: Namespace of the entity. For example, pod namespace.
         type: string
       node_name:
-        description: Node name of the entity. For example, host name.
+        description: Node name of the entity. For example, Hostname.
         type: string
       services:
         description: |+
@@ -691,7 +691,7 @@ definitions:
         $ref: '#/definitions/MatchExpression'
       match_expressions:
         description: |-
-          List of k8s-style label matcher requirements.
+          List of Kubernetes-style label matcher requirements.
 
           Note: The requirements are combined using the logical AND operator.
         type: array
@@ -740,7 +740,7 @@ definitions:
         type: string
         x-go-tag-validate: required
       label_matches:
-        description: The expression is true when label matches given regex.
+        description: The expression is true when label matches given regular expression.
         $ref: '#/definitions/MatchesMatchExpression'
       not:
         description: The expression negates the result of sub expression.
@@ -748,7 +748,7 @@ definitions:
   MatchExpressionList:
     description: 'for example, `{any: {of: [expr1, expr2]}}`.'
     type: object
-    title: List of MatchExpressions that's used for all/any matching
+    title: List of MatchExpressions that is used for all or any matching
     properties:
       of:
         description: List of sub expressions of the match expression.

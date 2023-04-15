@@ -134,7 +134,7 @@ type Policy struct {
 
 	// Defines the control-loop logic of the policy.
 	Circuit *Circuit `protobuf:"bytes,1,opt,name=circuit,proto3" json:"circuit,omitempty"`
-	// Resources (Flux Meters, Classifiers etc.) to setup.
+	// Resources (such as Flux Meters, Classifiers) to setup.
 	Resources *Resources `protobuf:"bytes,2,opt,name=resources,proto3" json:"resources,omitempty"`
 }
 
@@ -192,17 +192,17 @@ func (x *Policy) GetResources() *Resources {
 //
 // :::
 //
-// Signals flow between components via ports.
-// As signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto scale etc.).
+// Signals flow between components through ports.
+// As signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto-scale and so on).
 // Circuit is evaluated periodically to respond to changes in signal readings.
 //
 // :::info Signals
 //
-// Signals are floating-point values.
+// Signals are floating point values.
 //
 // A signal can also have a special **Invalid** value. It's usually used to
-// communicate that signal doesn't have a meaningful value at the moment, for example,
-// [PromQL](#prom-q-l) emits such a value if it can't execute a query.
+// communicate that signal does not have a meaningful value at the moment, for example,
+// [PromQL](#prom-q-l) emits such a value if it cannot execute a query.
 // Components know when their input signals are invalid and can act
 // accordingly. They can either propagate the invalid signal, by making their
 // output itself invalid (for example,
@@ -276,8 +276,6 @@ func (x *Circuit) GetComponents() []*Component {
 // See also [Resources overview](/concepts/policy/resources.md).
 //
 // :::
-//
-// Resources are typically Flux Meters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
 type Resources struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -285,7 +283,7 @@ type Resources struct {
 
 	// Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 	//
-	// Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+	// Flux Meter created metrics can be consumed as input to the circuit through the PromQL component.
 	//
 	// Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 	FluxMeters map[string]*FluxMeter `protobuf:"bytes,1,rep,name=flux_meters,json=fluxMeters,proto3" json:"flux_meters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3" validate:"deprecated,dive"` // @gotags: validate:"deprecated,dive"
@@ -360,12 +358,12 @@ func (x *Resources) GetFlowControl() *FlowControlResources {
 //
 // :::
 //
-// Signals flow into the components via input ports and results are emitted on output ports.
+// Signals flow into the components from input ports and results are emitted on output ports.
 // Components are wired to each other based on signal names forming an execution graph of the circuit.
 //
 // :::note
 //
-// Loops are broken by the runtime at the earliest component index that's part of the loop.
+// Loops are broken by the runtime at the earliest component index that is part of the loop.
 // The looped signals are saved in the tick they're generated and served in the subsequent tick.
 //
 // :::
@@ -376,7 +374,7 @@ func (x *Resources) GetFlowControl() *FlowControlResources {
 //     a signal based on this input. Example: [PromQL](#prom-q-l). In the UI
 //     they're represented by green color.
 //
-//   - signal processor components: processing components that don't interact with the external systems.
+//   - signal processor components: processing components that do not interact with the external systems.
 //     Examples: [GradientController](#gradient-controller), [Max](#max).
 //
 //     :::note
@@ -394,7 +392,7 @@ func (x *Resources) GetFlowControl() *FlowControlResources {
 //
 // :::tip
 //
-// Sometimes you may want to use a constant value as one of component's inputs.
+// Sometimes you might want to use a constant value as one of component's inputs.
 // You can create an input port containing the constant value instead of being connected to a signal.
 // To do so, use the [InPort](#in_port)'s .withConstantSignal(constant_signal) method.
 // You can also use it to provide special math values such as NaN and +- Inf.

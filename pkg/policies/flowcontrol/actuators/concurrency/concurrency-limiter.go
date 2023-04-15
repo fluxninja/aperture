@@ -547,7 +547,7 @@ func (conLimiter *concurrencyLimiter) RunLimiter(ctx context.Context, labels map
 		//   that Deadline() - Now() delta might end up longer than
 		//   grpc-timeout (!), usually within 1ms),
 		// * 1ms for response overhead,
-		// * 7ms so that we don't always operate on the edge of the time budget.
+		// * 7ms so that we do not always operate on the edge of the time budget.
 		clientTimeout := time.Until(clientDeadline)
 		internalTimeout := clientTimeout - 10*time.Millisecond
 		if internalTimeout < timeout {

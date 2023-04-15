@@ -949,9 +949,10 @@ spec:
                     description: AgentInfo configuration.
                     properties:
                       agent_group:
-                        description: "All agents within an `agent_group` receive the
+                        description: "All agents within an agent group receive the
                           same data-plane configuration (for example, Flux Meters,
-                          Rate Limiters etc). \n [Read more about agent groups here](/concepts/flow-control/flow-selector.md#agent-group)."
+                          Rate Limiters and so on). \n [Read more about agent groups
+                          here](/concepts/flow-control/flow-selector.md#agent-group)."
                         type: string
                     type: object
                   alertmanagers:
@@ -983,7 +984,7 @@ spec:
                                   description: Idle Connection Timeout. 0 = no timeout.
                                   type: string
                                 key_log_file:
-                                  description: SSL key log file (useful for debugging)
+                                  description: SSL/TLS key log file (useful for debugging)
                                   type: string
                                 max_conns_per_host:
                                   description: Max Connections Per Host. 0 = no limit.
@@ -1013,15 +1014,15 @@ spec:
                                   description: Proxy Connect Header - map[string][]string
                                   type: object
                                 read_buffer_size:
-                                  description: Read Buffer Size. 0 = 4KB
+                                  description: Read Buffer Size. 0 = 4 KB
                                   type: integer
                                 response_header_timeout:
                                   description: Response Header Timeout. 0 = no timeout.
                                   type: string
                                 timeout:
-                                  description: HTTP client timeout - Timeouts includes
+                                  description: HTTP client timeout - Timeouts include
                                     connection time, redirects, reading the response
-                                    etc. 0 = no timeout.
+                                    and so on. 0 = no timeout.
                                   type: string
                                 tls:
                                   description: Client TLS configuration
@@ -1044,7 +1045,7 @@ spec:
                                   description: Use Proxy
                                   type: boolean
                                 write_buffer_size:
-                                  description: Write Buffer Size. 0 = 4KB.
+                                  description: Write Buffer Size. 0 = 4 KB.
                                   type: integer
                               type: object
                             name:
@@ -1065,7 +1066,7 @@ spec:
                           configuration.
                         properties:
                           enabled:
-                            description: Enables the Kubernetes auto scale capability.
+                            description: Enables the Kubernetes auto-scale capability.
                             type: boolean
                         required:
                         - enabled
@@ -1153,7 +1154,7 @@ spec:
                     description: FluxNinja ARC extension configuration.
                     properties:
                       api_key:
-                        description: API Key for this agent. If this key isn't set,
+                        description: API Key for this agent. If this key is not set,
                           the extension won't be enabled.
                         type: string
                       client:
@@ -1218,7 +1219,7 @@ spec:
                                 description: Idle Connection Timeout. 0 = no timeout.
                                 type: string
                               key_log_file:
-                                description: SSL key log file (useful for debugging)
+                                description: SSL/TLS key log file (useful for debugging)
                                 type: string
                               max_conns_per_host:
                                 description: Max Connections Per Host. 0 = no limit.
@@ -1248,15 +1249,15 @@ spec:
                                 description: Proxy Connect Header - map[string][]string
                                 type: object
                               read_buffer_size:
-                                description: Read Buffer Size. 0 = 4KB
+                                description: Read Buffer Size. 0 = 4 KB
                                 type: integer
                               response_header_timeout:
                                 description: Response Header Timeout. 0 = no timeout.
                                 type: string
                               timeout:
-                                description: HTTP client timeout - Timeouts includes
+                                description: HTTP client timeout - Timeouts include
                                   connection time, redirects, reading the response
-                                  etc. 0 = no timeout.
+                                  and so on. 0 = no timeout.
                                 type: string
                               tls:
                                 description: Client TLS configuration
@@ -1279,7 +1280,7 @@ spec:
                                 description: Use Proxy
                                 type: boolean
                               write_buffer_size:
-                                description: Write Buffer Size. 0 = 4KB.
+                                description: Write Buffer Size. 0 = 4 KB.
                                 type: integer
                             type: object
                         type: object
@@ -1292,8 +1293,8 @@ spec:
                         description: Interval between each heartbeat.
                         type: string
                       installation_mode:
-                        description: Installation mode describes how Agent/Controller
-                          is being run.
+                        description: Installation mode describes on which underlying
+                          platform the Agent or the Controller is being run.
                         type: string
                     type: object
                   kubernetes_client:
@@ -1312,7 +1313,7 @@ spec:
                         description: Idle Connection Timeout. 0 = no timeout.
                         type: string
                       key_log_file:
-                        description: SSL key log file (useful for debugging)
+                        description: SSL/TLS key log file (useful for debugging)
                         type: string
                       max_conns_per_host:
                         description: Max Connections Per Host. 0 = no limit.
@@ -1341,14 +1342,15 @@ spec:
                         description: Proxy Connect Header - map[string][]string
                         type: object
                       read_buffer_size:
-                        description: Read Buffer Size. 0 = 4KB
+                        description: Read Buffer Size. 0 = 4 KB
                         type: integer
                       response_header_timeout:
                         description: Response Header Timeout. 0 = no timeout.
                         type: string
                       timeout:
-                        description: HTTP client timeout - Timeouts includes connection
-                          time, redirects, reading the response etc. 0 = no timeout.
+                        description: HTTP client timeout - Timeouts include connection
+                          time, redirects, reading the response and so on. 0 = no
+                          timeout.
                         type: string
                       tls:
                         description: Client TLS configuration
@@ -1371,7 +1373,7 @@ spec:
                         description: Use Proxy
                         type: boolean
                       write_buffer_size:
-                        description: Write Buffer Size. 0 = 4KB.
+                        description: Write Buffer Size. 0 = 4 KB.
                         type: integer
                     type: object
                   liveness:
@@ -1616,8 +1618,9 @@ spec:
                     properties:
                       cpu_profiler:
                         description: Flag to enable CPU profiling on process start
-                          and save it to a file. HTTP interface won't work if this
-                          is enabled as CPU profile will always be running.
+                          and save it to a file. The Browser (HTTP) interface won't
+                          work if this is enabled, as the CPU profile will always
+                          be running.
                         type: boolean
                       profiles_path:
                         description: Path to save performance profiles. "default"
@@ -1684,9 +1687,9 @@ spec:
                         description: Sentry crash report disabled
                         type: boolean
                       dsn:
-                        description: If DSN isn't set, the client is effectively disabled
-                          You can set test project's DSN to send log events. oss-aperture
-                          project DSN is set as default.
+                        description: If DSN is not set, the client is effectively
+                          disabled You can set test project's DSN to send log events.
+                          oss-aperture project DSN is set as default.
                         type: string
                       environment:
                         description: Environment
@@ -1756,11 +1759,12 @@ spec:
                         description: Listener configuration.
                         properties:
                           addr:
-                            description: Address to bind to in the form of [host%zone]:port
+                            description: Address to bind to in the form of `[host%zone]:port`
                             type: string
                           keep_alive:
                             description: Keep-alive period - 0 = enabled if supported
-                              by protocol or OS. If negative then keep-alive is disabled.
+                              by protocol or operating system. If negative, then keep-alive
+                              is disabled.
                             type: string
                           network:
                             description: TCP networks - `tcp`, `tcp4` (IPv4-only),
@@ -1803,7 +1807,7 @@ spec:
                         properties:
                           entities:
                             items:
-                              description: Entity represents a pod, VM, etc.
+                              description: Entity represents a pod, VM, and so on.
                               properties:
                                 ip_address:
                                   description: IP address of the entity.
@@ -1818,7 +1822,7 @@ spec:
                                   type: string
                                 node_name:
                                   description: Node name of the entity. For example,
-                                    host name.
+                                    Hostname.
                                   type: string
                                 services:
                                   description: Services of the entity.

@@ -75,7 +75,7 @@ Generated File Starts
 <dd>
 
 ([ProxyConfig](#proxy-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_CLIENT_PROXY_`
+Environment variable prefix: `APERTURE_CONTROLLER_CLIENT_PROXY_`
 
 </dd>
 
@@ -95,7 +95,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_CLIENT_PROXY_`
 <dd>
 
 ([EtcdConfig](#etcd-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_ETCD_`
+Environment variable prefix: `APERTURE_CONTROLLER_ETCD_`
 
 </dd>
 
@@ -115,7 +115,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_ETCD_`
 <dd>
 
 ([FluxNinjaExtensionConfig](#flux-ninja-extension-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
+Environment variable prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
 
 </dd>
 
@@ -135,7 +135,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_FLUXNINJA_`
 <dd>
 
 ([JobGroupConfig](#job-group-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_LIVENESS_SCHEDULER_`
+Environment variable prefix: `APERTURE_CONTROLLER_LIVENESS_SCHEDULER_`
 
 </dd>
 
@@ -143,7 +143,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_LIVENESS_SCHEDULER_`
 <dd>
 
 ([JobConfig](#job-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_LIVENESS_SERVICE_`
+Environment variable prefix: `APERTURE_CONTROLLER_LIVENESS_SERVICE_`
 
 </dd>
 
@@ -163,7 +163,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_LIVENESS_SERVICE_`
 <dd>
 
 ([LogConfig](#log-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_LOG_`
+Environment variable prefix: `APERTURE_CONTROLLER_LOG_`
 
 </dd>
 
@@ -183,7 +183,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_LOG_`
 <dd>
 
 ([MetricsConfig](#metrics-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_METRICS_`
+Environment variable prefix: `APERTURE_CONTROLLER_METRICS_`
 
 </dd>
 
@@ -203,7 +203,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_METRICS_`
 <dd>
 
 ([ControllerOTelConfig](#controller-o-tel-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_`
+Environment variable prefix: `APERTURE_CONTROLLER_OTEL_`
 
 </dd>
 
@@ -223,7 +223,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_OTEL_`
 <dd>
 
 ([JobGroupConfig](#job-group-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_POLICIES_PROMQL_JOBS_SCHEDULER_`
+Environment variable prefix: `APERTURE_CONTROLLER_POLICIES_PROMQL_JOBS_SCHEDULER_`
 
 </dd>
 
@@ -243,7 +243,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_POLICIES_PROMQL_JOBS_SCHEDULER_`
 <dd>
 
 ([ProfilersConfig](#profilers-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_PROFILERS_`
+Environment variable prefix: `APERTURE_CONTROLLER_PROFILERS_`
 
 </dd>
 
@@ -263,7 +263,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_PROFILERS_`
 <dd>
 
 ([PrometheusConfig](#prometheus-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_PROMETHEUS_`
+Environment variable prefix: `APERTURE_CONTROLLER_PROMETHEUS_`
 
 </dd>
 
@@ -271,7 +271,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_PROMETHEUS_`
 <dd>
 
 ([HTTPClientConfig](#http-client-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_PROMETHEUS_HTTP_CLIENT_`
+Environment variable prefix: `APERTURE_CONTROLLER_PROMETHEUS_HTTP_CLIENT_`
 
 </dd>
 
@@ -291,7 +291,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_PROMETHEUS_HTTP_CLIENT_`
 <dd>
 
 ([JobGroupConfig](#job-group-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_READINESS_SCHEDULER_`
+Environment variable prefix: `APERTURE_CONTROLLER_READINESS_SCHEDULER_`
 
 </dd>
 
@@ -299,7 +299,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_READINESS_SCHEDULER_`
 <dd>
 
 ([JobConfig](#job-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_READINESS_SERVICE_`
+Environment variable prefix: `APERTURE_CONTROLLER_READINESS_SERVICE_`
 
 </dd>
 
@@ -319,7 +319,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_READINESS_SERVICE_`
 <dd>
 
 ([SentryConfig](#sentry-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_SENTRY_`
+Environment variable prefix: `APERTURE_CONTROLLER_SENTRY_`
 
 </dd>
 
@@ -339,7 +339,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_SENTRY_`
 <dd>
 
 ([GRPCServerConfig](#g-rpc-server-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_GRPC_`
+Environment variable prefix: `APERTURE_CONTROLLER_SERVER_GRPC_`
 
 </dd>
 
@@ -347,7 +347,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_GRPC_`
 <dd>
 
 ([GRPCGatewayConfig](#g-rpc-gateway-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_GRPC_GATEWAY_`
+Environment variable prefix: `APERTURE_CONTROLLER_SERVER_GRPC_GATEWAY_`
 
 </dd>
 
@@ -355,7 +355,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_GRPC_GATEWAY_`
 <dd>
 
 ([HTTPServerConfig](#http-server-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_HTTP_`
+Environment variable prefix: `APERTURE_CONTROLLER_SERVER_HTTP_`
 
 </dd>
 
@@ -363,7 +363,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_HTTP_`
 <dd>
 
 ([ListenerConfig](#listener-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_LISTENER_`
+Environment variable prefix: `APERTURE_CONTROLLER_SERVER_LISTENER_`
 
 </dd>
 
@@ -371,7 +371,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_LISTENER_`
 <dd>
 
 ([ServerTLSConfig](#server-tls-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_TLS_`
+Environment variable prefix: `APERTURE_CONTROLLER_SERVER_TLS_`
 
 </dd>
 
@@ -391,7 +391,7 @@ Env-Var Prefix: `APERTURE_CONTROLLER_SERVER_TLS_`
 <dd>
 
 ([WatchdogConfig](#watchdog-config))
-Env-Var Prefix: `APERTURE_CONTROLLER_WATCHDOG_MEMORY_`
+Environment variable prefix: `APERTURE_CONTROLLER_WATCHDOG_MEMORY_`
 
 </dd>
 
@@ -767,7 +767,7 @@ FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
 
 <!-- vale on -->
 
-API Key for this agent. If this key isn't set, the extension won't be enabled.
+API Key for this agent. If this key is not set, the extension won't be enabled.
 
 </dd>
 <dt>endpoint</dt>
@@ -803,7 +803,7 @@ Interval between each heartbeat.
 
 <!-- vale on -->
 
-Installation mode describes how Agent/Controller is being run.
+Installation mode describes on which underlying platform the Agent or the Controller is being run.
 
 </dd>
 <dt>client</dt>
@@ -1029,7 +1029,7 @@ Idle Connection Timeout. 0 = no timeout.
 
 <!-- vale on -->
 
-SSL key log file (useful for debugging)
+SSL/TLS key log file (useful for debugging)
 
 </dd>
 <dt>max_conns_per_host</dt>
@@ -1113,7 +1113,7 @@ Timeout for making network connection
 
 <!-- vale on -->
 
-Read Buffer Size. 0 = 4KB
+Read Buffer Size. 0 = 4 KB
 
 </dd>
 <dt>response_header_timeout</dt>
@@ -1149,7 +1149,7 @@ TLS Handshake Timeout. 0 = no timeout
 
 <!-- vale on -->
 
-HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
+HTTP client timeout - Timeouts include connection time, redirects, reading the response and so on. 0 = no timeout.
 
 </dd>
 <dt>use_proxy</dt>
@@ -1173,7 +1173,7 @@ Use Proxy
 
 <!-- vale on -->
 
-Write Buffer Size. 0 = 4KB.
+Write Buffer Size. 0 = 4 KB.
 
 </dd>
 <dt>proxy_connect_header</dt>
@@ -1479,7 +1479,7 @@ ListenerConfig holds configuration for socket listeners.
 
 <!-- vale on -->
 
-Address to bind to in the form of [host%zone]:port
+Address to bind to in the form of `[host%zone]:port`
 
 </dd>
 <dt>keep_alive</dt>
@@ -1491,7 +1491,7 @@ Address to bind to in the form of [host%zone]:port
 
 <!-- vale on -->
 
-Keep-alive period - 0 = enabled if supported by protocol or OS. If negative then keep-alive is disabled.
+Keep-alive period - 0 = enabled if supported by protocol or operating system. If negative, then keep-alive is disabled.
 
 </dd>
 <dt>network</dt>
@@ -1772,7 +1772,7 @@ ProfilersConfig holds configuration for profilers.
 
 <!-- vale on -->
 
-Flag to enable CPU profiling on process start and save it to a file. HTTP interface won't work if this is enabled as CPU profile will always be running.
+Flag to enable CPU profiling on process start and save it to a file. The Browser (HTTP) interface won't work if this is enabled, as the CPU profile will always be running.
 
 </dd>
 <dt>profiles_path</dt>
@@ -1927,7 +1927,7 @@ Sentry crash report disabled
 
 <!-- vale on -->
 
-If DSN isn't set, the client is effectively disabled
+If DSN is not set, the client is effectively disabled
 You can set test project's DSN to send log events.
 oss-aperture project DSN is set as default.
 

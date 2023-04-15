@@ -41,7 +41,7 @@ type EntityTrackers struct {
 // RegisterServiceDiscovery registers service discovery for entity cache and
 // returns an EventWriter to push discovery events into.
 //
-// Keys passed to EventWriter shouldn't be prefixed.
+// Keys passed to EventWriter should not be prefixed.
 //
 // Should be called at FX provide/invoke stage.
 func (et *EntityTrackers) RegisterServiceDiscovery(name string) notifiers.EventWriter {
