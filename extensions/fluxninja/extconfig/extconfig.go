@@ -26,7 +26,7 @@ type FluxNinjaExtensionConfig struct {
 	APIKey string `json:"api_key"`
 	// Client configuration.
 	ClientConfig ClientConfig `json:"client"`
-	// Installation mode describes how Agent/Controller is being run.
+	// Installation mode describes on which underlying platform the Agent or the Controller is being run.
 	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL" default:"LINUX_BARE_METAL"`
 }
 

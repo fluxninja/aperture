@@ -114,7 +114,7 @@ definitions:
                 x-go-tag-validate: gte=0s
             installation_mode:
                 default: LINUX_BARE_METAL
-                description: Installation mode describes how Agent/Controller is being run.
+                description: Installation mode describes on which underlying platform the Agent or the Controller is being run.
                 enum:
                     - KUBERNETES_SIDECAR
                     - KUBERNETES_DAEMONSET

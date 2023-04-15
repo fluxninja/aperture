@@ -54,7 +54,7 @@ Classification rules can be written for
 [HTTP requests](concepts/flow-control/resources/classifier.md#live-previewing-requests),
 and scheduler priorities can be defined for
 [Flow Labels](concepts/flow-control/flow-label.md#live-previewing-flow-labels)
-by live previewing them first via introspection APIs.
+by live previewing them first using introspection APIs.
 
 :::
 

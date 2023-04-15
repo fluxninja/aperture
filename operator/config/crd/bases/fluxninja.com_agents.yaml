@@ -1293,8 +1293,8 @@ spec:
                         description: Interval between each heartbeat.
                         type: string
                       installation_mode:
-                        description: Installation mode describes how Agent/Controller
-                          is being run.
+                        description: Installation mode describes on which underlying
+                          platform the Agent or the Controller is being run.
                         type: string
                     type: object
                   kubernetes_client:
@@ -1822,7 +1822,7 @@ spec:
                                   type: string
                                 node_name:
                                   description: Node name of the entity. For example,
-                                    host name.
+                                    Hostname.
                                   type: string
                                 services:
                                   description: Services of the entity.

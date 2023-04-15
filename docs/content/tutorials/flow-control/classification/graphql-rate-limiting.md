@@ -21,7 +21,7 @@ for a GraphQL query.
 ## Policy
 
 This tutorial will demonstrate how to implement a policy that uses
-[_Classifier_][Classifier] to extract the `userID` claim from a JWT token in the
+[_Classifier_][classifier] to extract the `userID` claim from a JWT token in the
 request's Authorization header and then rate limit unique users based on that
 `user_id` [_Flow Label_][flow-label].
 
@@ -31,7 +31,7 @@ You can write classification rules on
 [HTTP requests](concepts/flow-control/resources/classifier.md#live-previewing-requests)
 and define scheduler priorities on
 [Flow Labels](concepts/flow-control/flow-label.md#live-previewing-flow-labels)
-by live previewing them first via introspection APIs.
+by live previewing them first using introspection APIs.
 
 :::
 
@@ -103,15 +103,15 @@ From there on, the Classifier rule assigns the value of the exported variable
 `userID` in Rego source to `user_id` flow label, effectively creating a label
 `user_id:1`. This label is used by the
 [`RateLimiter`](/concepts/flow-control/components/rate-limiter.md) component in
-the policy to limit the `createTodo` mutation query to 10 requests/second for
+the policy to limit the `createTodo` mutation query to `10 requests/second` for
 each `userID`.
 
 ### Playground
 
-The traffic generator for this example is configured to generate 50 requests per
-second for 2 minutes. When the above policy is loaded in the playground, it can
-be observed that no more than 10 requests are accepted at any given time, and
-the rest of the requests are rejected.
+In this example, the traffic generator is configured to generate
+`50 requests/second` for 2-minutes. When loading the above policy in the
+playground, you can observe that it accepts no more than `10 requests/second` at
+any given time, and rejects the rest of the requests.
 
 <Zoom>
 
@@ -121,4 +121,4 @@ the rest of the requests are rejected.
 
 [rego-rules]: /concepts/flow-control/resources/classifier.md#rego
 [flow-label]: /concepts/flow-control/flow-label.md
-[Classifier]: /concepts/flow-control/resources/classifier.md
+[classifier]: /concepts/flow-control/resources/classifier.md

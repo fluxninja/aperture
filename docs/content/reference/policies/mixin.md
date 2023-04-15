@@ -26,8 +26,8 @@ jb install github.com/fluxninja/aperture/blueprints@main
 
 You can use a specific Aperture
 [GitHub repository](https://github.com/fluxninja/aperture) branch instead of
-_main_, for example, _stable/v0.2.x_, or even a specific release tag for
-example, _v0.2.2_ to match your Aperture Controller installation version.
+`main`, for example, `stable/v0.2.x`, or even a specific release tag, for
+example, `v0.2.2` to match your Aperture Controller installation version.
 
 :::
 
@@ -51,7 +51,7 @@ file:
 ```
 
 The generated policy can be applied to the running instance of
-`aperture-controller` via `kubectl` as follows:
+`aperture-controller` using `kubectl` as follows:
 
 ```sh
 kubectl apply --namespace aperture-controller --filename <example_file>.yaml

@@ -59,8 +59,7 @@ func main() {
 				return err
 			}
 			content = []byte(strings.ReplaceAll(string(content), "sub-command", "sub command"))
-			// replace OS's with operating system's
-			content = []byte(strings.ReplaceAll(string(content), "OS's", "operating system's"))
+			content = []byte(strings.ReplaceAll(string(content), "via your OS's", "using your operating system's"))
 			// write the file back
 			err = os.WriteFile(path, content, 0o600)
 			if err != nil {

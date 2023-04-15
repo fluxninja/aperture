@@ -66,8 +66,8 @@ Priority levels are in the range `0 to 255`. `0` is the lowest priority and
 `255` is the highest priority.
 
 Priority levels have a non-linear effect on the scheduler. The following formula
-is used to compute the position in the queue based on the concept of (virtual
-finish times)[https://en.wikipedia.org/wiki/Weighted_fair_queueing#Algorithm]:
+is used to compute the position in the queue based on the concept of
+[virtual finish times](https://en.wikipedia.org/wiki/Weighted_fair_queueing#Algorithm):
 
 `virtual_finish_time = virtual_time + (tokens * (256 - priority))`
 

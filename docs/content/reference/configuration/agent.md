@@ -1260,7 +1260,7 @@ Namespace of the entity. For example, pod namespace.
 
 <!-- vale on -->
 
-Node name of the entity. For example, host name.
+Node name of the entity. For example, Hostname.
 
 </dd>
 <dt>services</dt>
@@ -1439,7 +1439,7 @@ Interval between each heartbeat.
 
 <!-- vale on -->
 
-Installation mode describes how Agent/Controller is being run.
+Installation mode describes on which underlying platform the Agent or the Controller is being run.
 
 </dd>
 <dt>client</dt>

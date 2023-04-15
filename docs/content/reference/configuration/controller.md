@@ -803,7 +803,7 @@ Interval between each heartbeat.
 
 <!-- vale on -->
 
-Installation mode describes how Agent/Controller is being run.
+Installation mode describes on which underlying platform the Agent or the Controller is being run.
 
 </dd>
 <dt>client</dt>

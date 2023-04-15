@@ -4,10 +4,10 @@ title: Latency AIMD Concurrency Limiting Policy
 
 ## Introduction
 
-This policy detects overloads/cascading failures by comparing the real-time
-latency with its exponential moving average. A gradient controller calculates a
-proportional response to limit accepted concurrency, which is increased
-additively when the overload is no longer detected.
+This policy detects traffic overloads and cascading failure build-up by
+comparing the real-time latency with its exponential moving average. A gradient
+controller calculates a proportional response to limit accepted concurrency,
+which is increased additively when the overload is no longer detected.
 
 :::info
 

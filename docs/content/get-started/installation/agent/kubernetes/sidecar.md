@@ -25,19 +25,23 @@ will be attached with the pod.
 The Aperture Agent's Sidecar injection can be enabled by adding namespace labels
 and pod annotations as below:
 
+<!-- vale off -->
+
 | Resource  | Label              | Annotation                      | Enabled Value | Disabled Value |
 | --------- | ------------------ | ------------------------------- | ------------- | -------------- |
 | Namespace | aperture-injection | -                               | enabled       | disabled       |
 | Pod       | -                  | sidecar.fluxninja.com/injection | true          | false          |
+
+<!-- vale on -->
 
 The injector is configured with the following logic:
 
 - If either label or annotation is disabled, the pod is not injected
 - If pod annotation is enabled, but the namespace label is not present, the pod
   is not injected
-- If the label and annotation are unset, then the sidecar is injected if the
-  namespace is listed under `.spec.sidecar.enableNamespacesByDefault`. This is
-  not enabled by default, so this means the sidecar is not injected.
+- If you don't set the label and annotation, the system injects the sidecar if
+  the namespace appears under `.spec.sidecar.enableNamespacesByDefault`. By
+  default, this feature is disabled, so the system doesn't inject the sidecar.
 
 ## Prerequisites
 
@@ -365,8 +369,8 @@ injection will treat any configuration defined here as an override to the
 default injection template.
 
 Care should be taken when customizing these settings, as this allows complete
-customization of the resulting Pod, including making changes that may affect the
-sidecar container's functionality.
+customization of the resulting Pod, including making changes that might affect
+the sidecar container's functionality.
 
 For example, the following configuration customizes a variety of settings,
 including setting the CPU requests, adding a volume mount, and modifying
@@ -406,7 +410,7 @@ certain fields:
   to automatically select the image to use.
 - Some fields in Pod are dependent on related settings. For example, CPU request
   must be less than the CPU limit. If both fields aren't configured together,
-  the pod may fail to start.
+  the pod might fail to start.
 
 Additionally, the `agent-group` field can be configured using the annotation
 like:

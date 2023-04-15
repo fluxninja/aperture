@@ -30,7 +30,7 @@ latency from historically normal values.
 This policy uses the latency-based AIMD (Additive Increase, Multiplicative
 Decrease) concurrency limiting
 [Blueprint](/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md)
-and is instantiated via Jsonnet.
+and is instantiated using Jsonnet.
 
 At a high-level, this policy consists of:
 

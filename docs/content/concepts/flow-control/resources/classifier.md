@@ -188,18 +188,17 @@ cases.
 
 Keys of flow labels created by extractors must be valid [Rego][rego] identifiers
 (alphanumeric characters and underscore are allowed; also, label name cannot be
-a [Rego keyword][rego-kw], like `if` or `default`). This limitation may be
-lifted in the future.
+a [Rego keyword][rego-kw], like `if` or `default`).
 
 :::
 
 :::note
 
-Extracting the value from the header may seem not useful, as the value is
+Extracting the value from the header might not seem useful, as the value is
 already available as _Flow Label_ ([as
 `http.request.header.<header>`][request-labels]), but adding flow label
-explicitly may still be useful, as it enables baggage propagation and telemetry
-for this flow label.
+explicitly might still be useful, as it enables baggage propagation and
+telemetry for this flow label.
 
 :::
 

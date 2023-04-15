@@ -78,7 +78,7 @@ service1-demo-app   uploaded   103s
 ```
 
 The Playground includes a demo application so that you can generate simulated
-traffic and see the policy in action. The demo application can be found in
+traffic and see the policy in action. The demo application can be found in the
 `demoapp` namespace. You can read more about the demo application
 [here](https://github.com/fluxninja/aperture/tree/main/playground/resources/demo-app).
 
@@ -169,7 +169,7 @@ first to stop the automatic runner.
 ## Tools
 
 The Playground environment assumes usage of specific deployment and
-configuration/management tools, which must be installed beforehand.
+configuration management tools, which must be installed beforehand.
 
 To install the required tools, you have two options:
 
@@ -177,7 +177,7 @@ To install the required tools, you have two options:
 - Or, manually install the tools
   [mentioned here](#tools-required-for-kubernetes-deployment).
 
-### Install via `asdf`
+### Install using `asdf`
 
 First,
 [download](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf) and
@@ -293,7 +293,7 @@ Examples:
 - `tilt up agent demoapp aperture-grafana` - you can mix namespace names and
   resource names, as well as specify as many of them as you want.
 
-If you want to manage only explicitly passed resources/namespaces, you should
+If you want to manage only explicitly passed resources or namespaces, you should
 pass the `--only` argument:
 
 - `tilt up -- --only aperture-grafana` - only bring up Grafana, namespace
@@ -331,9 +331,9 @@ When the entire deployment turns green, the load generator can be started with
 the "Start Wavepool Generator" button in the Tilt UI. It will run a 2-minute
 test in a loop, until the "Stop Wavepool Generator" button is not clicked.
 
-There are other playground scenarios under _playground/scenarios/_ and they can
-be loaded during `Tilt` setup by passing a relative path to the scenario, e.g.
-`tilt up -- --scenario scenarios/demo-app`
+There are other playground scenarios under the `playground/scenarios/` directory
+and they can be loaded during `Tilt` setup by passing a relative path to the
+scenario, e.g. `tilt up -- --scenario scenarios/demo-app`
 
 :::note
 
