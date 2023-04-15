@@ -21,7 +21,7 @@ automatically added into them using [Aperture Instrumentation Agent][javaagent].
 <a
 href={`https://search.maven.org/artifact/com.fluxninja.aperture/aperture-java-armeria`}>Aperture
 Java SDK Armeria package</a> contains Armeria decorators that automatically set
-traffic Control Points for decorated services:
+traffic control points for decorated services:
 
 ```java
     public static HttpService createHelloHTTPService() {

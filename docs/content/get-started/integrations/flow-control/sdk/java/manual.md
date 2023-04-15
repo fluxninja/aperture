@@ -18,7 +18,7 @@ description:
 
 <a
 href={`https://search.maven.org/artifact/com.fluxninja.aperture/aperture-java-core`}>Aperture
-Java SDK core library</a> can be used to manually set feature Control Points
+Java SDK core library</a> can be used to manually set feature control points
 within a Java service.
 
 To do so, first create an instance of ApertureSDK:

@@ -6,7 +6,7 @@ golangci-lint 1.20.2
 grpcurl 1.8.7
 mockery 2.24.0
 buf 1.17.0
-nodejs 19.9.0
+nodejs 19.7.0
 python 3.11.3
 shellcheck 0.9.0
 yq 4.33.3
@@ -18,5 +18,5 @@ jb 0.5.1
 tanka 0.24.0
 tilt 0.32.1
 jsonnet 0.19.1
-circleci 0.1.25638
+circleci 0.1.25725
 java corretto-19.0.2.7.1
