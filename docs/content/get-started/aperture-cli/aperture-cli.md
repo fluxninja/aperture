@@ -118,6 +118,7 @@ aperturectl completion powershell | Out-String | Invoke-Expression
 
 ## Uninstall
 
+<!-- vale off -->
 <Tabs groupId="setup" queryString>
 <TabItem value="macOS" label="macOS">
 With Homebrew:
@@ -141,6 +142,8 @@ With rpm:
 sudo rpm -e aperturectl
 </CodeBlock>
 </TabItem></Tabs>
+
+<!-- vale on -->
 
 ---
 

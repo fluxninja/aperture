@@ -118,7 +118,7 @@ the plugin is already installed:
    plugins = bundled,aperture-plugin
    ```
 
-   You can also set this property via its environment variable equivalent:
+   You can also set this property from its environment variable equivalent:
    `KONG_PLUGINS`.
 
 4. Enable the Aperture Custom plugin for all the services and routes by creating

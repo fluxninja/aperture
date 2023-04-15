@@ -55,7 +55,7 @@ Now, press Space to open the Tilt UI in your default browser.
 
 :::note
 
-Make sure nothing else is running on the [ports forwarded](#port-forwards) by
+Verify that nothing else is running on the [ports forwarded](#port-forwards) by
 `Tilt`.
 
 :::
@@ -77,7 +77,7 @@ NAME                STATUS     AGE
 service1-demo-app   uploaded   103s
 ```
 
-The Playground comes with a demo application so that you can generate simulated
+The Playground includes a demo application so that you can generate simulated
 traffic and see the policy in action. The demo application can be found in
 `demoapp` namespace. You can read more about the demo application
 [here](https://github.com/fluxninja/aperture/tree/main/playground/resources/demo-app).
@@ -144,7 +144,7 @@ folder to a bunch of useful panels.
 
 :::info
 
-Grafana's dashboard URL address is
+Grafana's dashboard browser address is
 [localhost:3000/dashboards](http://localhost:3000/dashboards)
 
 :::
@@ -159,8 +159,8 @@ To re-start the traffic, press the `Start Wavepool Generator` button in the
 
 :::note
 
-To manually run the traffic, make sure to press the `Stop Wavepool Generator`
-button first.
+To manually run the traffic, please press the `Stop Wavepool Generator` button
+first to stop the automatic runner.
 
 :::
 

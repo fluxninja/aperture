@@ -30,7 +30,7 @@ Generated File Starts
 
 <!-- vale on -->
 
-High level concurrency control component. Baselines a signal via exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
+High level concurrency control component. Baselines a signal using exponential moving average and applies concurrency limits based on deviation of signal from the baseline. Internally implemented as a nested circuit.
 
 <dl>
 <dt>alerter_parameters</dt>
@@ -463,7 +463,7 @@ Signals are mapped to Boolean values as follows:
   Treating invalid inputs as "unknowns" has a consequence that the result
   might end up being valid even when some inputs are invalid. For example, `unknown && false == false`,
   because the result would end up false no matter if
-  first signal was true or false. On the other hand, `unknown && true == unknown`.
+  first signal was true or false. Conversely, `unknown && true == unknown`.
 
   :::
 
@@ -958,13 +958,13 @@ See also [Circuit overview](/concepts/policy/circuit.md).
 
 :::
 
-Signals flow between components via ports.
-As signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto scale etc.).
+Signals flow between components through ports.
+As signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto scale and so on).
 Circuit is evaluated periodically to respond to changes in signal readings.
 
 :::info Signals
 
-Signals are floating-point values.
+Signals are floating point values.
 
 A signal can also have a special **Invalid** value. It's usually used to
 communicate that signal doesn't have a meaningful value at the moment, for example,
@@ -1104,7 +1104,7 @@ See also [Components overview](/concepts/policy/circuit.md#components).
 
 :::
 
-Signals flow into the components via input ports and results are emitted on output ports.
+Signals flow into the components from input ports and results are emitted on output ports.
 Components are wired to each other based on signal names forming an execution graph of the circuit.
 
 :::note
@@ -1137,7 +1137,7 @@ There are three categories of components:
 
 :::tip
 
-Sometimes you may want to use a constant value as one of component's inputs.
+Sometimes you might want to use a constant value as one of component's inputs.
 You can create an input port containing the constant value instead of being connected to a signal.
 To do so, use the [InPort](#in_port)'s .withConstantSignal(constant_signal) method.
 You can also use it to provide special math values such as NaN and +- Inf.
@@ -1472,7 +1472,7 @@ It's based on the actuation strategy (for example, load actuator) and workload s
 Concurrency is calculated in terms of total tokens which translate to (avg. latency \* in-flight requests) (Little's Law).
 
 ConcurrencyLimiter configuration is split into two parts: An actuation
-strategy and a scheduler. Right now, only `load_actuator` strategy is available.
+strategy and a scheduler. At this time, only `load_actuator` strategy is available.
 
 <dl>
 <dt>flow_selector</dt>
@@ -1583,8 +1583,8 @@ instantaneous.
 
 <!-- vale on -->
 
-Duration of time to wait before a transition to false state.
-If the duration is zero, the transition will happen instantaneously.
+Duration of time to wait before changing to false state.
+If the duration is zero, the change will happen instantaneously.
 
 </dd>
 <dt>in_ports</dt>
@@ -1632,8 +1632,8 @@ Output ports for the Decider component.
 
 <!-- vale on -->
 
-Duration of time to wait before a transition to true state.
-If the duration is zero, the transition will happen instantaneously.
+Duration of time to wait before changing to true state.
+If the duration is zero, the change will happen instantaneously.```
 
 </dd>
 </dl>
@@ -2573,7 +2573,7 @@ The flow labels created by Classifiers can be matched by Flux Meters to create m
 
 Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
-Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+Flux Meter created metrics can be consumed as input to the circuit through the PromQL component.
 
 </dd>
 </dl>
@@ -2626,7 +2626,7 @@ label_matcher:
 
 [Control Point](/concepts/flow-control/flow-selector.md#control-point)
 identifies the location of a Flow within a Service. For an SDK based insertion, a Control Point can represent a particular feature or execution
-block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners
+block within a Service. In case of Service Mesh or Middleware insertion, a Control Point can identify ingress or egress calls or distinct listeners
 or filter chains.
 
 </dd>
@@ -3295,10 +3295,10 @@ for example:
 
 The sign of slope depends on correlation between the signal and control variable:
 
-- Use $\text{slope} < 0$ if signal and control variable are _positively_
-  correlated (for example, Per-pod CPU usage and total concurrency).
-- Use $\text{slope} > 0$ if signal and control variable are _negatively_
-  correlated (for example, Per-pod CPU usage and number of pods).
+- Use $\text{slope} < 0$ if there is a _positive_ correlation between the signal and
+  the control variable (for example, Per-pod CPU usage and total concurrency).
+- Use $\text{slope} > 0$ if there is a _negative_ correlation between the signal and
+  the control variable (for example, Per-pod CPU usage and number of pods).
 
 :::note
 
@@ -3449,7 +3449,7 @@ The output signal.
 
 <!-- vale on -->
 
-Components receive input from other components via InPorts
+Components receive input from other components through InPorts
 
 <dl>
 <dt>constant_signal</dt>
@@ -4119,7 +4119,7 @@ An arbitrary expression to be evaluated on the labels.
 
 <!-- vale on -->
 
-List of k8s-style label matcher requirements.
+List of Kubernetes-style label matcher requirements.
 
 Note: The requirements are combined using the logical AND operator.
 
@@ -4321,7 +4321,7 @@ The expression is true when label with given name exists.
 
 <!-- vale on -->
 
-The expression is true when label matches given regex.
+The expression is true when label matches given regular expression.
 
 </dd>
 <dt>not</dt>
@@ -4346,7 +4346,7 @@ The expression negates the result of sub expression.
 
 <!-- vale on -->
 
-List of MatchExpressions that's used for all/any matching
+List of MatchExpressions that's used for all or any matching
 
 for example, `{any: {of: [expr1, expr2]}}`.
 
@@ -4876,7 +4876,7 @@ Will always be 0 (false), 1 (true) or invalid (unknown).
 
 <!-- vale on -->
 
-Components produce output for other components via OutPorts
+Components produce output for other components through OutPorts
 
 <dl>
 <dt>signal_name</dt>
@@ -5404,7 +5404,7 @@ Defines the control-loop logic of the policy.
 
 <!-- vale on -->
 
-Resources (Flux Meters, Classifiers etc.) to setup.
+Resources (such as Flux Meters, Classifiers) to setup.
 
 </dd>
 </dl>
@@ -5986,8 +5986,6 @@ See also [Resources overview](/concepts/policy/resources.md).
 
 :::
 
-Resources are typically Flux Meters, Classifiers, etc. that can be used to create on-demand metrics or label the flows.
-
 <dl>
 <dt>classifiers</dt>
 <dd>
@@ -6028,7 +6026,7 @@ FlowControlResources are resources that are provided by flow control integration
 
 Flux Meters are installed in the data-plane and form the observability leg of the feedback loop.
 
-Flux Meter created metrics can be consumed as input to the circuit via the PromQL component.
+Flux Meter created metrics can be consumed as input to the circuit through the PromQL component.
 
 Deprecated: v1.5.0. Use `flow_control.flux_meters` instead.
 
@@ -6343,8 +6341,7 @@ Concurrency is a unit less number describing mean number of
 concurrently processed by the system (system = control point).
 Concurrency is calculated as _work_ done per unit of time (so
 work-seconds per world-seconds). Work-seconds are computed based on
-token-weights of flows (which are either estimated via `auto_tokens`
-or specified by `Workload.tokens`).
+token-weights of flows (which are either estimated using the `auto_tokens` feature or specified by `Workload.tokens` setting).
 
 :::
 
@@ -6394,8 +6391,9 @@ Automatically estimate the size of a request in each workload, based on
 historical latency. Each workload's `tokens` will be set to average
 latency of flows in that workload during last few seconds (exact duration
 of this average can change).
-Make sure to not provide `tokens` in workload definitions or in the flow
-if you want to use this feature.
+Verify that the `tokens` in workload definitions
+or the flow aren't set if you want
+to use this feature.
 
 </dd>
 <dt>default_workload_parameters</dt>
@@ -6425,7 +6423,7 @@ timeout for the flow, otherwise it's used as a cap for the timeout.
 
 :::caution
 
-This timeout needs to be strictly less than the timeout set on the
+This timeout needs to be less than the timeout set on the
 client for the whole GRPC call:
 
 - in case of envoy, timeout set on `grpc_service` used in `ext_authz` filter,
@@ -6436,9 +6434,9 @@ fires first, the flow will end up being unconditionally allowed while
 it's still waiting on the scheduler.
 
 To avoid such cases, the end-to-end GRPC timeout should also contain
-some headroom for constant overhead like serialization, etc. Default
-value for GRPC timeouts is 500ms, giving 50ms of headroom, so when
-tweaking this timeout, make sure to adjust the GRPC timeout accordingly.
+some headroom for constant overhead like serialization and other processing delays. Default
+value for GRPC timeouts is 500ms, giving 10ms of headroom, so when
+tweaking this timeout, adjust the GRPC timeout accordingly.
 
 :::
 
@@ -6476,7 +6474,7 @@ allows for load-shedding to be "intelligent" compared to random rejections.
 There are two aspects of this "intelligence":
 
 - Scheduler can more precisely calculate concurrency if it understands
-  that flows belonging to different classes have different weights (for example, insert vs select queries).
+  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).
 - Setting different priorities to different workloads lets the scheduler
   avoid dropping important traffic during overload.
 
@@ -6662,7 +6660,7 @@ To scope policies to services, the `service` should be set to `any` and instead,
 
 :::info
 
-An entity (for example, Kubernetes pod) may belong to multiple services.
+An entity (for example, Kubernetes pod) might belong to multiple services.
 
 :::
 

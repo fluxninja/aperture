@@ -311,11 +311,11 @@ type Decider struct {
 	OutPorts *Decider_Outs `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 	// Comparison operator that computes operation on LHS and RHS input signals.
 	Operator string `protobuf:"bytes,3,opt,name=operator,proto3" json:"operator,omitempty" validate:"oneof=gt lt gte lte eq neq"` // @gotags: validate:"oneof=gt lt gte lte eq neq"
-	// Duration of time to wait before a transition to true state.
-	// If the duration is zero, the transition will happen instantaneously.
+	// Duration of time to wait before changing to true state.
+	// If the duration is zero, the change will happen instantaneously.```
 	TrueFor *durationpb.Duration `protobuf:"bytes,4,opt,name=true_for,json=trueFor,proto3" json:"true_for,omitempty" default:"0s"` // @gotags: default:"0s"
-	// Duration of time to wait before a transition to false state.
-	// If the duration is zero, the transition will happen instantaneously.
+	// Duration of time to wait before changing to false state.
+	// If the duration is zero, the change will happen instantaneously.
 	FalseFor *durationpb.Duration `protobuf:"bytes,5,opt,name=false_for,json=falseFor,proto3" json:"false_for,omitempty" default:"0s"` // @gotags: default:"0s"
 }
 
@@ -825,7 +825,7 @@ func (x *Min) GetOutPorts() *Min_Outs {
 //	Treating invalid inputs as "unknowns" has a consequence that the result
 //	might end up being valid even when some inputs are invalid. For example, `unknown && false == false`,
 //	because the result would end up false no matter if
-//	first signal was true or false. On the other hand, `unknown && true == unknown`.
+//	first signal was true or false. Conversely, `unknown && true == unknown`.
 //
 //	:::
 type And struct {
@@ -1515,10 +1515,10 @@ type GradientController_Parameters struct {
 	// * $\text{slope} = -0.5$: when signal is too high, decrease control variable gradually.
 	//
 	// The sign of slope depends on correlation between the signal and control variable:
-	// * Use $\text{slope} < 0$ if signal and control variable are _positively_
-	// correlated (for example, Per-pod CPU usage and total concurrency).
-	// * Use $\text{slope} > 0$ if signal and control variable are _negatively_
-	// correlated (for example, Per-pod CPU usage and number of pods).
+	// * Use $\text{slope} < 0$ if there is a _positive_ correlation between the signal and
+	// the control variable (for example, Per-pod CPU usage and total concurrency).
+	// * Use $\text{slope} > 0$ if there is a _negative_ correlation between the signal and
+	// the control variable (for example, Per-pod CPU usage and number of pods).
 	//
 	// :::note
 	//

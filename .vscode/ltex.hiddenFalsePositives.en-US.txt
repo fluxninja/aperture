@@ -1,2 +1,1 @@
-{"rule":"EN_COMPOUNDS","sentence":"[Aa]uto [Ss]cal"}
-{"rule":"AUTO_HYPHEN","sentence":"[Aa]uto deploy"}
+{"rule":"EN_COMPOUND_ADJECTIVE_INTERNAL","sentence":"[Oo]pen source"}

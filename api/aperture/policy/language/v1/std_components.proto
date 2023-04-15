@@ -43,10 +43,10 @@ message GradientController {
     // * $\text{slope} = -0.5$: when signal is too high, decrease control variable gradually.
     //
     // The sign of slope depends on correlation between the signal and control variable:
-    // * Use $\text{slope} < 0$ if signal and control variable are _positively_
-    // correlated (for example, Per-pod CPU usage and total concurrency).
-    // * Use $\text{slope} > 0$ if signal and control variable are _negatively_
-    // correlated (for example, Per-pod CPU usage and number of pods).
+    // * Use $\text{slope} < 0$ if there is a _positive_ correlation between the signal and
+    // the control variable (for example, Per-pod CPU usage and total concurrency).
+    // * Use $\text{slope} > 0$ if there is a _negative_ correlation between the signal and
+    // the control variable (for example, Per-pod CPU usage and number of pods).
     //
     // :::note
     //
@@ -285,12 +285,12 @@ message Decider {
   // Comparison operator that computes operation on LHS and RHS input signals.
   string operator = 3; // @gotags: validate:"oneof=gt lt gte lte eq neq"
 
-  // Duration of time to wait before a transition to true state.
-  // If the duration is zero, the transition will happen instantaneously.
+  // Duration of time to wait before changing to true state.
+  // If the duration is zero, the change will happen instantaneously.```
   google.protobuf.Duration true_for = 4; // @gotags: default:"0s"
 
-  // Duration of time to wait before a transition to false state.
-  // If the duration is zero, the transition will happen instantaneously.
+  // Duration of time to wait before changing to false state.
+  // If the duration is zero, the change will happen instantaneously.
   google.protobuf.Duration false_for = 5; // @gotags: default:"0s"
 }
 
@@ -501,7 +501,7 @@ message Min {
 //   Treating invalid inputs as "unknowns" has a consequence that the result
 //   might end up being valid even when some inputs are invalid. For example, `unknown && false == false`,
 //   because the result would end up false no matter if
-//   first signal was true or false. On the other hand, `unknown && true == unknown`.
+//   first signal was true or false. Conversely, `unknown && true == unknown`.
 //
 //   :::
 message And {

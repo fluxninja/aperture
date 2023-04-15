@@ -27,7 +27,7 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 Welcome to the [FluxNinja Aperture](https://github.com/fluxninja/aperture)
-project, an open-source platform designed to empower cloud-native reliability
+project, an open source platform designed to empower cloud-native reliability
 engineering. The platform provides a unified controllability layer that enables
 platform and reliability engineering teams to manage complex microservices-based
 applications with ease.
