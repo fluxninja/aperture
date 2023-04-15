@@ -14,8 +14,8 @@ Aperture Policies & Blueprints can be imported into your Jsonnet project as a
 library. This can also be integrated with other Kubernetes deployment tools like
 [Tanka][tk].
 
-For example, to create a Latency based AIMD Concurrency Limiting Policy that can
-be loaded by the controller, you need to install Aperture Blueprints library
+For example, to create a latency-based AIMD concurrency limiting policy that can
+be loaded by the controller, you need to install Aperture blueprints library
 with Jsonnet Bundler in your project:
 
 ```sh
@@ -40,7 +40,7 @@ You can then create a Policy resource using Jsonnet definitions:
 And then, render it with [Jsonnet][jsonnet]:
 
 ```sh
-jsonnet -J vendor [example_file].jsonnet  | yq -P
+jsonnet -J vendor <example_file>.jsonnet  | yq -P
 ```
 
 After running this command, you should see the following contents in the YAML
@@ -54,7 +54,7 @@ The generated policy can be applied to the running instance of
 `aperture-controller` via `kubectl` as follows:
 
 ```sh
-kubectl apply --namespace aperture-controller --filename [example_file].yaml
+kubectl apply --namespace aperture-controller --filename <example_file>.yaml
 ```
 
 [jsonnet]: https://jsonnet.org/

@@ -13,7 +13,7 @@ keywords:
 ---
 
 <a href={`https://www.npmjs.com/package/aperture-sdk`}>Aperture JavaScript
-SDK</a> can be used to manually set feature Control Points within a JavaScript
+SDK</a> can be used to manually set feature control points within a JavaScript
 service.
 
 To do so, first create an instance of ApertureClient. Agent host and port will
@@ -47,7 +47,7 @@ apertureClient
   });
 ```
 
-For more context on using the Aperture JavaScript SDK to set feature Control
-Points, refer to the [example app][example] available in the repository.
+For more context on using the Aperture JavaScript SDK to set feature control
+points, refer to the [example app][example] available in the repository.
 
 [example]: https://github.com/fluxninja/aperture-js/tree/main/example

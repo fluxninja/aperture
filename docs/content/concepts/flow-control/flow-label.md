@@ -27,7 +27,7 @@ _Flow Labels_ are used in different ways in Aperture:
 ## Sources
 
 Flows are annotated with _Flow Labels_ based on four sources: request labels,
-baggage, Flow Classifiers, and explicit labels from the Aperture SDK call.
+baggage, flow classifiers, and explicit labels from the Aperture SDK call.
 
 ### Request labels
 
@@ -64,8 +64,8 @@ Read more about baggage propagation on:
 ### Classifiers
 
 When the labels you need aren't already present in baggage, nor as request
-labels, you can create a [Classifier][Classifier] to inject new labels into the
-system. Since the Classifier also injects the label into baggage by default,
+labels, you can create a [_Classifier_][Classifier] to inject new labels into
+the system. Since the Classifier also injects the label into baggage by default,
 this means you can set or extract the label in a different place than where it
 is consumed (assuming you have baggage propagation configured throughout your
 system).
@@ -136,7 +136,7 @@ and producing other streams of data from it.
 
 ### Metrics
 
-Prometheus' metrics are generated from the received telemetry data. Along the
+Prometheus metrics are generated from the received telemetry data. Along the
 path of the flows, telemetry data is tagged by the [Flux Meters][flux-meter] and
 [workloads][workload] that matched.
 

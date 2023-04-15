@@ -13,7 +13,7 @@ keywords:
 ---
 
 <a href={`https://pkg.go.dev/github.com/fluxninja/aperture-go`}>Aperture Go
-SDK</a> can be used to manually set feature Control Points within a Go service.
+SDK</a> can be used to manually set feature control points within a Go service.
 
 To do so, first create an instance of ApertureClient:
 
@@ -62,7 +62,7 @@ The created instance can then be used to start a flow:
     }
 ```
 
-For more context on using Aperture Go SDK to set feature Control Points, refer
+For more context on using Aperture Go SDK to set feature control points, refer
 to the [example app][example] available in the repository.
 
 [example]: https://github.com/fluxninja/aperture-go/tree/v1.0.0/example

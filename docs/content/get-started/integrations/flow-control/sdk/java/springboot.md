@@ -16,7 +16,7 @@ keywords:
 
 [Aperture Java SDK servlet package](https://search.maven.org/artifact/com.fluxninja.aperture/aperture-java-servlet)
 contains Aperture Filter that can be registered in Spring Boot application to
-automatically set traffic Control Points for relevant services:
+automatically set traffic control points for relevant services:
 
 ```java
 

@@ -41,10 +41,10 @@ experience, while optimizing resources and reducing costs.
 
 ## Declarative Policy Language
 
-Aperture's policy language allows teams to effortlessly develop and manage
-policies that dictate their applications' behavior under various circumstances.
-This offers a visual depiction of their policies, enabling them to grasp the
-system's behavior and self-correction intuitively.
+Aperture's declarative policy language allows teams to effortlessly develop and
+manage policies that dictate their applications' behavior under various
+circumstances. This offers a visual depiction of their policies, enabling them
+to grasp the system's behavior and self-correction intuitively.
 
 ## Load Management Capabilities
 

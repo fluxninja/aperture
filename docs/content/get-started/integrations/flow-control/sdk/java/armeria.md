@@ -21,7 +21,7 @@ automatically added into them using [Aperture Instrumentation Agent][javaagent].
 <a
 href={`https://search.maven.org/artifact/com.fluxninja.aperture/aperture-java-armeria`}>Aperture
 Java SDK Armeria package</a> contains Armeria decorators that automatically set
-traffic Control Points for decorated services:
+traffic control points for decorated services:
 
 ```java
     public static HttpService createHelloHTTPService() {
@@ -63,7 +63,7 @@ true, like so:
         .setIgnoredPathMatchRegex(true)
 ```
 
-For more context on using Aperture Armeria Decorators to set Control Points,
+For more context on using Aperture Armeria Decorators to set control points,
 refer to the [example app][armeria-example] available in the repository.
 
 [armeria-example]:

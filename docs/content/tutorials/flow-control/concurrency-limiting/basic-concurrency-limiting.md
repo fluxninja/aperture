@@ -27,11 +27,10 @@ latency from historically normal values.
 
 ## Policy
 
-This policy uses the Latency based AIMD (Additive Increase, Multiplicative
-Decrease) Concurrency Limiting
+This policy uses the latency-based AIMD (Additive Increase, Multiplicative
+Decrease) concurrency limiting
 [Blueprint](/reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md)
-and is instantiated via Jsonnet. The Signal Processing tutorials describe
-various building blocks used in the policy separately.
+and is instantiated via Jsonnet.
 
 At a high-level, this policy consists of:
 
@@ -104,12 +103,12 @@ for this policy.
 ### Playground
 
 When the above policy is loaded in Aperture's
-[Playground](/get-started/playground/playground.md), it can be observed that as
+[Playground](/get-started/playground/playground.md), it demonstrates that when
 traffic spikes above the concurrency limit of
 `service1-demo-app.demoapp.svc.cluster.local`, the controller triggers load
-shedding for a proportion of requests matching the Selector. This helps to
-protect the service from becoming unresponsive and keeps the latency within the
-tolerance limit (`1.1`) configured in the circuit.
+shedding for a proportion of requests matching the selector. This approach helps
+protect the service from becoming unresponsive and maintains the latency within
+the tolerance limit (`1.1`) configured in the circuit.
 
 <Zoom>
 
@@ -121,7 +120,7 @@ tolerance limit (`1.1`) configured in the circuit.
 
 You can run this policy in the `Dry Run` mode by setting the
 `defaultConfig.dry_run` option to `true`. In the `Dry Run` mode, the policy
-doesn't actuate (that's traffic is never dropped) while still evaluating the
+doesn't actuate (meaning traffic is never dropped) while still evaluating the
 decision it would take in each cycle. This helps understand how the policy would
 behave as the input signals change.
 

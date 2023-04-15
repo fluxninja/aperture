@@ -95,3 +95,4 @@ Keepalive
 zsh
 powershell
 ConfigMap
+Prometheus

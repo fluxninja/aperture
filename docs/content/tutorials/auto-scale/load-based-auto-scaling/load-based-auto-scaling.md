@@ -16,7 +16,7 @@ import Zoom from 'react-medium-image-zoom';
 
 Load-based auto scaling is a technique used to dynamically adjust the number of
 instances or resources allocated to a service based on workload demands. This
-policy builds upon the _Latency based AIMD Concurrency Limiting_
+policy builds upon the latency-based AIMD concurrency limiting
 [blueprint](reference/policies/bundled-blueprints/policies/latency-aimd-concurrency-limiting.md)
 to add an escalation for auto scaling. While concurrency limiting can protect
 the service from sudden traffic spikes, it's necessary to scale the service in
