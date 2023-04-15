@@ -12,7 +12,7 @@ See also [_Auto Scaler_ reference](/reference/policies/spec.md#auto-scaler)
 
 :::
 
-_Auto Scaler_ is a high-level component in Aperture that performs auto scaling.
+_Auto Scaler_ is a high-level component in Aperture that performs auto-scaling.
 It can interface with infrastructure APIs such as Kubernetes to automatically
 adjust the number of instances or resources allocated to a service to meet
 changing workload demands. _Auto Scaler_ is designed to ensure that the service
@@ -24,13 +24,13 @@ availability.
   Controller) to make scaling decisions. A Controller can be configured for
   either scaling in or out, and defines the criteria that determine when to
   scale. Controllers process one or more input signals to compute a desired
-  scale value. By configuring Controllers, you can fine-tune the auto scaling
+  scale value. By configuring Controllers, you can fine-tune the auto-scaling
   behavior to meet the specific needs of your service. See
   [Gradient Controller](#gradient-controller) for more details.
 - A scale-in Controller is active only when its output is smaller than the
   actual scale value. A scale-out Controller is active only when its output is
   larger than the actual scale value. For example, the actual number of replicas
-  of a Kubernetes Deployment. An inactive Controller doesn't contribute to the
+  of a Kubernetes Deployment. An inactive Controller does not contribute to the
   scaling decision.
 - Scale decisions from multiple active Controllers are combined by the Auto
   Scaler by taking the largest scale value.
@@ -44,8 +44,7 @@ availability.
   scale-in or scale-out.
   - Scale-in cooldown: The _Auto Scaler_ won't scale-in again until the cooldown
     period has elapsed. If there is a scale-out decision, the scale-in cooldown
-    is reset. This is to make sure that excessive scale-in is immediately
-    corrected.
+    is reset. This immediately corrects excessive scale-in.
   - Scale-out cooldown: The _Auto Scaler_ won't scale-out again until the
     cooldown period has elapsed. If there is a scale-out decision which is much
     larger than the current scale value, the scale-out cooldown is reset. This

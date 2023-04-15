@@ -166,8 +166,9 @@ extractors and [Rego][rego] modules. [See examples in reference][rule].
 
 The possibility of extracting values from the request body depends on how
 [External Authorization in Envoy][ext-authz-extension] was configured. The
-Sample [Istio Configuration][install-istio] provided by FluxNinja doesn't enable
-request body buffering by default, as it _might_ break some streaming APIs.
+Sample [Istio Configuration][install-istio] provided by FluxNinja does not
+enable request body buffering by default, as it _might_ break some streaming
+APIs.
 
 :::
 
@@ -186,9 +187,9 @@ cases.
 :::caution
 
 Keys of flow labels created by extractors must be valid [Rego][rego] identifiers
-(alphanumeric characters and underscore are allowed; also, label name can't be a
-[Rego keyword][rego-kw], like `if` or `default`). This limitation may be lifted
-in the future.
+(alphanumeric characters and underscore are allowed; also, label name cannot be
+a [Rego keyword][rego-kw], like `if` or `default`). This limitation may be
+lifted in the future.
 
 :::
 

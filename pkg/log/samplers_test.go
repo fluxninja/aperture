@@ -17,7 +17,7 @@ var _ = Describe("Autosample", func() {
 		Expect(int(count)).To(Equal(1))
 	})
 
-	It("doesn't ratelimit unrelated logs", func() {
+	It("does not ratelimit unrelated logs", func() {
 		var count Count
 		log.Autosample().Hook(&count).Info().Msg("a")
 		log.Autosample().Hook(&count).Info().Msg("a")
@@ -41,7 +41,7 @@ var _ = Describe("logger.Autosample", func() {
 		Expect(int(count)).To(Equal(1))
 	})
 
-	It("doesn't ratelimit unrelated logs", func() {
+	It("does not ratelimit unrelated logs", func() {
 		var count Count
 		logger.Autosample().Hook(&count).Info().Msg("a")
 		logger.Autosample().Hook(&count).Info().Msg("a")
@@ -66,7 +66,7 @@ var _ = Describe("logger.Bug", func() {
 		Expect(int(count)).To(Equal(1))
 	})
 
-	It("doesn't ratelimit unrelated logs", func() {
+	It("does not ratelimit unrelated logs", func() {
 		var count Count
 		logger = logger.Hook(&count)
 		logger.Bug().Msg("a")

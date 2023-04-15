@@ -291,7 +291,7 @@ type heapPolicy struct {
 func newHeapPolicy(config watchdogconfig.HeapConfig) *heapPolicy {
 	hp := heapPolicy{HeapConfig: config}
 
-	// get the initial effective GoGC; guess it's 100 (default), and restore
+	// get the initial effective GoGC; guess it is 100 (default), and restore
 	// it to whatever it actually was. This works because SetGCPercent
 	// returns the previous value.
 	hp.originalGoGC = debug.SetGCPercent(100)

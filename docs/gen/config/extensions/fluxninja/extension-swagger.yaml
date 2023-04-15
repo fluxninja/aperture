@@ -88,7 +88,7 @@ definitions:
     FluxNinjaExtensionConfig:
         properties:
             api_key:
-                description: API Key for this agent. If this key isn't set, the extension won't be enabled.
+                description: API Key for this agent. If this key is not set, the extension won't be enabled.
                 type: string
                 x-go-name: APIKey
                 x-go-tag-json: api_key

@@ -32,12 +32,12 @@ and pod annotations as below:
 
 The injector is configured with the following logic:
 
-- If either label or annotation is disabled, the pod isn't injected
-- If pod annotation is enabled, but the namespace label isn't present, the pod
-  isn't injected
+- If either label or annotation is disabled, the pod is not injected
+- If pod annotation is enabled, but the namespace label is not present, the pod
+  is not injected
 - If the label and annotation are unset, then the sidecar is injected if the
-  namespace is listed under `.spec.sidecar.enableNamespacesByDefault`. This
-  isn't enabled by default, so this means the sidecar isn't injected.
+  namespace is listed under `.spec.sidecar.enableNamespacesByDefault`. This is
+  not enabled by default, so this means the sidecar is not injected.
 
 ## Prerequisites
 
@@ -287,7 +287,7 @@ Kubernetes Objects which will be created by following steps are listed
 
 6. Refer to the steps on the
    [Istio Configuration](/get-started/integrations/flow-control/envoy/istio.md)
-   if you don't have the
+   if you do not have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.
 
@@ -401,7 +401,7 @@ In general, any field in a pod can be set. However, care must be taken in
 certain fields:
 
 - Kubernetes requires the image field to be set before the injection has run.
-  While you can set a specific image to override the default one, it's
+  While you can set a specific image to override the default one, it is
   recommended to set the image to `auto`, which will cause the sidecar injector
   to automatically select the image to use.
 - Some fields in Pod are dependent on related settings. For example, CPU request

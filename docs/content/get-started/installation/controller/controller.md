@@ -24,7 +24,7 @@ set policies. Once determined, these decisions are then exported to all Aperture
 Agents to effectively handle workloads.
 
 The closed feedback loop functions primarily by monitoring the variables
-reflecting stability conditions (that's process variables) and compares them
+reflecting stability conditions (that is process variables) and compares them
 against setpoints. The difference in the variable values against these points is
 referred to as the error signal. The feedback loop then works to minimize these
 error signals by determining and distributing control actions, that adjust these
@@ -91,9 +91,9 @@ Kubernetes Objects which will be created by following steps are listed
    </TabItem>
    </Tabs>
 
-2. By default, Prometheus and etcd instances are installed. If you don't want to
-   install and use your existing instances of Prometheus or etcd, configure the
-   following values in the `values.yaml` file and pass it with the `install`
+2. By default, Prometheus and etcd instances are installed. If you do not want
+   to install and use your existing instances of Prometheus or etcd, configure
+   the following values in the `values.yaml` file and pass it with the `install`
    command:
 
    ```yaml
@@ -132,7 +132,7 @@ Kubernetes Objects which will be created by following steps are listed
    available [here](/reference/configuration/controller.md#prometheus).
 
    **Note**: Please ensure that the flag `web.enable-remote-write-receiver` is
-   enabled on your existing Prometheus instance, as it's required by the
+   enabled on your existing Prometheus instance, as it is required by the
    Aperture Controller.
 
 3. If you want to modify the default parameters or the Aperture Controller

@@ -721,7 +721,7 @@ AutoScaleKubernetesConfig is the configuration for the flow preview service.
 
 <!-- vale on -->
 
-Enables the Kubernetes auto scale capability.
+Enables the Kubernetes auto-scale capability.
 
 </dd>
 </dl>
@@ -1403,7 +1403,7 @@ FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
 
 <!-- vale on -->
 
-API Key for this agent. If this key isn't set, the extension won't be enabled.
+API Key for this agent. If this key is not set, the extension won't be enabled.
 
 </dd>
 <dt>endpoint</dt>
@@ -2613,7 +2613,7 @@ Sentry crash report disabled
 
 <!-- vale on -->
 
-If DSN isn't set, the client is effectively disabled
+If DSN is not set, the client is effectively disabled
 You can set test project's DSN to send log events.
 oss-aperture project DSN is set as default.
 

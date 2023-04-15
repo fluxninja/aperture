@@ -137,7 +137,7 @@ func (constructor ServerConstructor) provideServer(
 			// Ignore already registered error, as this is not harmful. Metrics may
 			// be registered by other running server.
 			if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
-				return nil, nil, nil, fmt.Errorf("couldn't register prometheus metrics: %w", err)
+				return nil, nil, nil, fmt.Errorf("could not register prometheus metrics: %w", err)
 			}
 		}
 	}

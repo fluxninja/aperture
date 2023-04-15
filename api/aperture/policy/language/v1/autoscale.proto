@@ -31,9 +31,9 @@ message AutoScale {
   oneof component {
     // PodScaler provides pod horizontal scaling functionality for scalable Kubernetes resources.
     PodScaler pod_scaler = 1;
-    // _AutoScaler_ provides auto scaling functionality for any scalable resource.
+    // _AutoScaler_ provides auto-scaling functionality for any scalable resource.
     AutoScaler auto_scaler = 2;
-    // _PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource.
+    // _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource.
     PodAutoScaler pod_auto_scaler = 3;
   }
 }
@@ -110,7 +110,7 @@ message IncreasingGradient {
 
   // Gradient parameters for the controller. Defaults and constraints:
   // * `slope` = 1
-  // * `min_gradient` = 1 (can't be changed)
+  // * `min_gradient` = 1 (cannot be changed)
   // * `max_gradient` = +Inf (must be greater than 1)
   Parameters parameters = 2;
 }
@@ -138,7 +138,7 @@ message DecreasingGradient {
   // Gradient parameters for the controller. Defaults and constraints:
   // * `slope` = 1
   // * `min_gradient` = -Inf (must be less than 1)
-  // * `max_gradient` = 1 (can't be changed)
+  // * `max_gradient` = 1 (cannot be changed)
   Parameters parameters = 2;
 }
 
@@ -182,7 +182,7 @@ message KubernetesReplicas {
   PodScaler.ScaleActuator.DynamicConfig default_config = 3;
 }
 
-// _AutoScaler_ provides auto scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto scale.
+// _AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
 message AutoScaler {
   message Scaler {
     oneof scaler {
@@ -234,7 +234,7 @@ message AutoScaler {
   Alerter.Parameters scale_in_alerter_parameters = 13;
 }
 
-// _PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto scale.
+// _PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
 message PodAutoScaler {
   // Outputs for _PodAutoScaler_.
   message Outs {

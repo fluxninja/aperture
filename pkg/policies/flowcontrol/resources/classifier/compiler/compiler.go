@@ -38,7 +38,7 @@ type LabelerWithSelector struct {
 // * a single label – LabelName is non-empty or
 // * multiple labels – LabelName is empty.
 type Labeler struct {
-	// rego query that's prepared to take envoy authz request as an input.
+	// rego query that is prepared to take envoy authz request as an input.
 	// Result expression should be a single value (if LabelName is set) or a
 	// map[string]interface{} otherwise.
 	Query rego.PreparedEvalQuery
@@ -207,7 +207,7 @@ func compileRules(ctx context.Context, labelSelector multimatcher.Expr, classifi
 			).PrepareForEval(ctx)
 			if err != nil {
 				// Note: Not wrapping BadRego error here – the rego returned by
-				// compileExtractors should always be valid, otherwise it's a
+				// compileExtractors should always be valid, otherwise it is a
 				// bug, and not user's fault.
 				log.Trace().Str("src", regoSrc).Msg("Failed to prepare for eval")
 				return nil, fmt.Errorf("(bug) failed to compile classification rules: %w", err)

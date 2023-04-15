@@ -19,7 +19,7 @@ problem in the face of continuously changing service infrastructure. Each new
 version deployed, horizontal scaling, or a change in access patterns can change
 the concurrency limit of a service.
 
-To accurately model the concurrency limit of a service, it's critical to track
+To accurately model the concurrency limit of a service, it is critical to track
 its
 [golden signals](https://sre.google/sre-book/monitoring-distributed-systems/#xref_monitoring_golden-signals).
 For instance, queue buildup can be detected by tracking deviation of current
@@ -55,7 +55,7 @@ At a high-level, this policy consists of:
 - Concurrency Limiting Actuator: The concurrency limits are actuated via a
   [weighted-fair queuing scheduler](/concepts/flow-control/components/concurrency-limiter.md).
   The output of the adjustments to accepted concurrency made by gradient
-  controller and optimizer logic are translated to a load multiplier that's
+  controller and optimizer logic are translated to a load multiplier that is
   synchronized with Aperture Agents via etcd. The load multiplier adjusts
   (increases or decreases) the token bucket fill rates based on the incoming
   concurrency observed at each agent.
@@ -119,8 +119,8 @@ the tolerance limit (`1.1`) configured in the circuit.
 ### Dry Run Mode
 
 You can run this policy in the `Dry Run` mode by setting the
-`defaultConfig.dry_run` option to `true`. In the `Dry Run` mode, the policy
-doesn't actuate (meaning traffic is never dropped) while still evaluating the
+`defaultConfig.dry_run` option to `true`. In the `Dry Run` mode, the policy does
+not actuate (meaning traffic is never dropped) while still evaluating the
 decision it would take in each cycle. This helps understand how the policy would
 behave as the input signals change.
 

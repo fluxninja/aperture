@@ -51,9 +51,9 @@ accuracy.
 :::note
 
 Buckets are needed only for quantile queries, for example, getting the 95th
-percentile of duration across pods in a service. The buckets don't matter if you
-are only interested in the average duration or throughput metrics from a _Flux
-Meter_.
+percentile of duration across pods in a service. The buckets do not matter if
+you are only interested in the average duration or throughput metrics from a
+_Flux Meter_.
 
 :::
 

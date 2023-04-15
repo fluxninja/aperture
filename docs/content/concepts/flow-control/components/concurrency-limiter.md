@@ -40,8 +40,8 @@ Multiplier_ that the scheduler uses to compute the refill rate of
 from the controller.
 
 If the rate of tokens in requests entering the scheduler exceeds the desired
-rate, requests are queued in the scheduler. If a flow can't be scheduled within
-its specified timeout, it's rejected.
+rate, requests are queued in the scheduler. If a flow cannot be scheduled within
+its specified timeout, it is rejected.
 
 The scheduler helps ensure that requests are handled in a fair and efficient
 manner, even during periods of high load or overload. By prioritizing critical

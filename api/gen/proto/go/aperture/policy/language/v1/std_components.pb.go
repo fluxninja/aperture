@@ -625,7 +625,7 @@ func (x *UnaryOperator) GetOperator() string {
 	return ""
 }
 
-// Extrapolates the input signal by repeating the last valid value during the period in which it's invalid
+// Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
 //
 // It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
 type Extrapolator struct {
@@ -1314,7 +1314,7 @@ func (x *PulseGenerator) GetFalseFor() *durationpb.Duration {
 }
 
 // Holds the last valid signal value for the specified duration then waits for next valid value to hold.
-// If it's holding a value that means it ignores both valid and invalid new signals until the `hold_for` duration is finished.
+// If it is holding a value that means it ignores both valid and invalid new signals until the `hold_for` duration is finished.
 type Holder struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1612,7 +1612,7 @@ type GradientController_DynamicConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Decides whether the controller runs in `manual_mode`.
-	// In manual mode, the controller doesn't adjust the control variable It emits the same output as the control variable input.
+	// In manual mode, the controller does not adjust the control variable It emits the same output as the control variable input.
 	ManualMode bool `protobuf:"varint,1,opt,name=manual_mode,json=manualMode,proto3" json:"manual_mode,omitempty" default:"false"` // @gotags: default:"false"
 }
 
@@ -1810,7 +1810,7 @@ type EMA_Ins struct {
 	Input *InPort `protobuf:"bytes,1,opt,name=input,proto3" json:"input,omitempty"`
 	// Upper bound of the moving average.
 	//
-	// When the signal exceeds `max_envelope` it's multiplied by
+	// When the signal exceeds `max_envelope` it is multiplied by
 	// `correction_factor_on_max_envelope_violation` **once per tick**.
 	//
 	// :::note

@@ -18,7 +18,7 @@ const ConfigKey = "auto_scale.kubernetes"
 // swagger:model
 // +kubebuilder:object:generate=true
 type AutoScaleKubernetesConfig struct {
-	// Enables the Kubernetes auto scale capability.
+	// Enables the Kubernetes auto-scale capability.
 	Enabled bool `json:"enabled" default:"true"`
 }
 

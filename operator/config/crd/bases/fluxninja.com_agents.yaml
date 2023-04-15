@@ -1065,7 +1065,7 @@ spec:
                           configuration.
                         properties:
                           enabled:
-                            description: Enables the Kubernetes auto scale capability.
+                            description: Enables the Kubernetes auto-scale capability.
                             type: boolean
                         required:
                         - enabled
@@ -1153,7 +1153,7 @@ spec:
                     description: FluxNinja ARC extension configuration.
                     properties:
                       api_key:
-                        description: API Key for this agent. If this key isn't set,
+                        description: API Key for this agent. If this key is not set,
                           the extension won't be enabled.
                         type: string
                       client:
@@ -1684,9 +1684,9 @@ spec:
                         description: Sentry crash report disabled
                         type: boolean
                       dsn:
-                        description: If DSN isn't set, the client is effectively disabled
-                          You can set test project's DSN to send log events. oss-aperture
-                          project DSN is set as default.
+                        description: If DSN is not set, the client is effectively
+                          disabled You can set test project's DSN to send log events.
+                          oss-aperture project DSN is set as default.
                         type: string
                       environment:
                         description: Environment

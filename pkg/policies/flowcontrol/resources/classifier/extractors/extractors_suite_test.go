@@ -25,7 +25,7 @@ type LabelExtractors struct {
 }
 
 func checkOk(yamlString string, expectedRego string) {
-	// Note: The map[string]Extractor format doesn't occur in policy, but is
+	// Note: The map[string]Extractor format does not occur in policy, but is
 	// helpful to test multiple extractors in a single test
 	var labelExtractors LabelExtractors
 	yamlString = dedent.Dedent(yamlString)
@@ -39,7 +39,7 @@ func checkOk(yamlString string, expectedRego string) {
 	Expect(regoMeat).To(Equal(expectedRego))
 
 	// Also, check if survives serialization roundtrip (we have some custom
-	// marshal/unmarshal so it's worth checking)
+	// marshal/unmarshal so it is worth checking)
 	jsonBytes, err := json.Marshal(labelExtractors)
 	Expect(err).NotTo(HaveOccurred())
 	var labelExtractors2 LabelExtractors

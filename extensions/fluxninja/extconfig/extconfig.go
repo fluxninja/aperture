@@ -22,7 +22,7 @@ type FluxNinjaExtensionConfig struct {
 	HeartbeatInterval config.Duration `json:"heartbeat_interval" validate:"gte=0s" default:"5s"`
 	// Address to GRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`.
 	Endpoint string `json:"endpoint" validate:"omitempty,hostname_port|url|fqdn"`
-	// API Key for this agent. If this key isn't set, the extension won't be enabled.
+	// API Key for this agent. If this key is not set, the extension won't be enabled.
 	APIKey string `json:"api_key"`
 	// Client configuration.
 	ClientConfig ClientConfig `json:"client"`

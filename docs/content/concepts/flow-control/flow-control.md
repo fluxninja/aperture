@@ -32,9 +32,9 @@ Applications are governed by
 the relationship between concurrent requests in the system, arrival rate of
 requests, and response times. For the application to remain stable, the
 concurrent requests in the system must be limited. Indirect techniques to
-stabilize applications such as rate-limiting and auto scaling fall short in
+stabilize applications such as rate-limiting and auto-scaling fall short in
 enabling good user experiences or business outcomes. Rate-limiting individual
-users is insufficient in protecting services. Auto scaling is slow to respond
+users is insufficient in protecting services. Auto-scaling is slow to respond
 and can be cost-prohibitive. As the number of services scales, these techniques
 get harder to deploy.
 

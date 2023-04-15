@@ -447,7 +447,7 @@ func (x *MatchesMatchExpression) GetRegex() string {
 	return ""
 }
 
-// List of MatchExpressions that's used for all or any matching
+// List of MatchExpressions that is used for all or any matching
 //
 // for example, `{any: {of: [expr1, expr2]}}`.
 type MatchExpression_List struct {

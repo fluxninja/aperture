@@ -5,7 +5,7 @@ package config
 // swagger:model
 // +kubebuilder:object:generate=true
 type SentryConfig struct {
-	// If DSN isn't set, the client is effectively disabled
+	// If DSN is not set, the client is effectively disabled
 	// You can set test project's DSN to send log events.
 	// oss-aperture project DSN is set as default.
 	Dsn string `json:"dsn" default:"https://6223f112b0ac4344aa67e94d1631eb85@o574197.ingest.sentry.io/6605877"`

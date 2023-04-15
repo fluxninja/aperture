@@ -151,7 +151,7 @@ func newPodNotifier(pr *prometheus.Registry, electionTrackers notifiers.Trackers
 		// Ignore already registered error, as this is not harmful. Metrics may
 		// be registered by other running server.
 		if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
-			return nil, fmt.Errorf("couldn't register prometheus metrics: %w", err)
+			return nil, fmt.Errorf("could not register prometheus metrics: %w", err)
 		}
 	}
 	pn.podCounter = podCounter

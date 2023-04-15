@@ -47,7 +47,7 @@ func newFlowControlCompositeAndOptions(
 				return retErr(err)
 			}
 
-			// Need a unique ID for sub component since it's used for graph generation
+			// Need a unique ID for sub component since it is used for graph generation
 			schedulerConfComp, err := prepareComponentInCircuit(scheduler, schedulerProto, componentID.ChildID("Scheduler"), parentCircuitID, true)
 			if err != nil {
 				return retErr(err)

@@ -16,7 +16,7 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 Playground is a Kubernetes-based environment for exploring the capabilities of
-Aperture. Additionally, it's used as a development environment for Aperture.
+Aperture. Additionally, it is used as a development environment for Aperture.
 Playground uses [Tilt](https://tilt.dev/) for orchestrating the deployments in
 Kubernetes. Tilt watches for changes to local files and auto deploys any
 resources that change. This is convenient for getting quick feedback during
@@ -200,7 +200,7 @@ Please skip this section in case you already installed the required tools using
 
 Tools required are listed below
 
-- **Helm**: it's a package manager for Kubernetes. To install manually, follow
+- **Helm**: it is a package manager for Kubernetes. To install manually, follow
   instructions [here](https://helm.sh/docs/intro/install/).
 - **Tanka and Jsonnet Bundler**: Grafana Tanka is a robust configuration utility
   for your Kubernetes cluster, powered by the unique Jsonnet language. Jsonnet
@@ -215,7 +215,7 @@ Tools required are listed below
 
 ## Deploying with Tilt
 
-In the case of local deployments and development work, it's nice to be able to
+In the case of local deployments and development work, it is nice to be able to
 automatically rebuild images and services. Aperture Playground uses Tilt to
 achieve this.
 
@@ -329,7 +329,7 @@ application comes with three sets of pods and services. There is also a simple
 latency gradient policy applied to them, and K6 load generator pattern created.
 When the entire deployment turns green, the load generator can be started with
 the "Start Wavepool Generator" button in the Tilt UI. It will run a 2-minute
-test in a loop, until the "Stop Wavepool Generator" button isn't clicked.
+test in a loop, until the "Stop Wavepool Generator" button is not clicked.
 
 There are other playground scenarios under _playground/scenarios/_ and they can
 be loaded during `Tilt` setup by passing a relative path to the scenario, e.g.

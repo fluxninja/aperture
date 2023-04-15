@@ -47,7 +47,7 @@ func configMapForAgentConfig(
 ) (*corev1.ConfigMap, error) {
 	// HACK: auto-inject controller's cert to agent if we detect it connects to local controller.
 	// FIXME: Mounting optional configmap with controller CA would be a better
-	// solution, but right now we don't have a configmap with CA, just a secret
+	// solution, but right now we do not have a configmap with CA, just a secret
 	// that contains also the key.
 	// Also, we should figure out the way so that both CA file from config and
 	// controller's CA can be used simultaneously.

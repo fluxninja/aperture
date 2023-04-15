@@ -193,7 +193,7 @@ func (x *Policy) GetResources() *Resources {
 // :::
 //
 // Signals flow between components through ports.
-// As signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto scale and so on).
+// As signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto-scale and so on).
 // Circuit is evaluated periodically to respond to changes in signal readings.
 //
 // :::info Signals
@@ -201,8 +201,8 @@ func (x *Policy) GetResources() *Resources {
 // Signals are floating point values.
 //
 // A signal can also have a special **Invalid** value. It's usually used to
-// communicate that signal doesn't have a meaningful value at the moment, for example,
-// [PromQL](#prom-q-l) emits such a value if it can't execute a query.
+// communicate that signal does not have a meaningful value at the moment, for example,
+// [PromQL](#prom-q-l) emits such a value if it cannot execute a query.
 // Components know when their input signals are invalid and can act
 // accordingly. They can either propagate the invalid signal, by making their
 // output itself invalid (for example,
@@ -363,7 +363,7 @@ func (x *Resources) GetFlowControl() *FlowControlResources {
 //
 // :::note
 //
-// Loops are broken by the runtime at the earliest component index that's part of the loop.
+// Loops are broken by the runtime at the earliest component index that is part of the loop.
 // The looped signals are saved in the tick they're generated and served in the subsequent tick.
 //
 // :::
@@ -374,7 +374,7 @@ func (x *Resources) GetFlowControl() *FlowControlResources {
 //     a signal based on this input. Example: [PromQL](#prom-q-l). In the UI
 //     they're represented by green color.
 //
-//   - signal processor components: processing components that don't interact with the external systems.
+//   - signal processor components: processing components that do not interact with the external systems.
 //     Examples: [GradientController](#gradient-controller), [Max](#max).
 //
 //     :::note

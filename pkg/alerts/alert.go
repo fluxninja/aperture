@@ -197,7 +197,7 @@ func WithResolveTimeout(t time.Duration) AlertOption {
 
 // AlertsFromLogs gets slice of alerts from OTel Logs.
 func AlertsFromLogs(ld plog.Logs) []*Alert {
-	// We can't preallocate size, as we don't know how many of those log records
+	// We cannot preallocate size, as we do not know how many of those log records
 	// has incorrect data and will be dropped.
 	alerts := []*Alert{}
 	resourceLogsSlice := ld.ResourceLogs()

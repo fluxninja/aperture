@@ -46,7 +46,7 @@ func main() {
 		rabbitMQURL = "amqp://" + rabbitMQUsername + ":" + rabbitMQPassword + "@" + rabbitMQHost + ":" + rabbitMQPort + "/"
 	}
 
-	// We don't necessarily need tracing providers (just propagators), but lets
+	// We do not necessarily need tracing providers (just propagators), but lets
 	// do them anyway to have a "more realistic" otel usage
 	// exporter, err := stdouttrace.New(stdouttrace.WithPrettyPrint())
 	// if err != nil {

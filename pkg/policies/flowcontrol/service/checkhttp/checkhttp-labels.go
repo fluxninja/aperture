@@ -53,8 +53,8 @@ func CheckHTTPRequestToFlowLabels(request *flowcontrolhttpv1.CheckHTTPRequest_Ht
 	}
 	for k, v := range request.GetHeaders() {
 		if strings.HasPrefix(k, ":") {
-			// Headers starting with `:` are pseudoheaders, so we don't add
-			// them.  We don't lose anything, as these values are already
+			// Headers starting with `:` are pseudoheaders, so we do not add
+			// them.  We do not lose anything, as these values are already
 			// available as labels pulled from dedicated fields of
 			// Request.Http.
 			continue

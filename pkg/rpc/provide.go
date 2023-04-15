@@ -19,7 +19,7 @@ var ServerModule = fx.Options(
 
 // ClientModule are components needed for client-side of rpc
 //
-// Note: Not providing StreamClient, as this package is generic and doesn't
+// Note: Not providing StreamClient, as this package is generic and does not
 // know what to connect to.
 var ClientModule = fx.Provide(NewHandlerRegistry)
 

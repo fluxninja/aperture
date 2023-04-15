@@ -17,7 +17,7 @@ by an additive factor while the service is no longer overloaded.
 
 Please see reference for the
 [`AIMDConcurrencyController`](/reference/policies/spec.md#a-i-m-d-concurrency-controller)
-component that's used within this blueprint.
+component that is used within this blueprint.
 
 :::
 

@@ -114,7 +114,7 @@ Input ports for the AIMDConcurrencyController component.
 
 <!-- vale on -->
 
-Linear increment to load multiplier in each execution tick when the system isn't in overloaded state.
+Linear increment to load multiplier in each execution tick when the system is not in overloaded state.
 
 </dd>
 <dt>max_load_multiplier</dt>
@@ -680,7 +680,7 @@ AutoScale components are used to scale a service.
 
 <!-- vale on -->
 
-_AutoScaler_ provides auto scaling functionality for any scalable resource.
+_AutoScaler_ provides auto-scaling functionality for any scalable resource.
 
 </dd>
 <dt>pod_auto_scaler</dt>
@@ -692,7 +692,7 @@ _AutoScaler_ provides auto scaling functionality for any scalable resource.
 
 <!-- vale on -->
 
-_PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource.
+_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource.
 
 </dd>
 <dt>pod_scaler</dt>
@@ -717,7 +717,7 @@ PodScaler provides pod horizontal scaling functionality for scalable Kubernetes 
 
 <!-- vale on -->
 
-_AutoScaler_ provides auto scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto scale.
+_AutoScaler_ provides auto-scaling functionality for any scalable resource. Multiple _Controllers_ can be defined on the _AutoScaler_ for performing scale-out or scale-in. The _AutoScaler_ can interface with infrastructure APIs such as Kubernetes to perform auto-scale.
 
 <dl>
 <dt>cooldown_override_percentage</dt>
@@ -959,7 +959,7 @@ See also [Circuit overview](/concepts/policy/circuit.md).
 :::
 
 Signals flow between components through ports.
-As signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto scale and so on).
+As signals traverse the circuit, they get processed, stored within components or get acted upon (for example, load-shed, rate-limit, auto-scale and so on).
 Circuit is evaluated periodically to respond to changes in signal readings.
 
 :::info Signals
@@ -967,8 +967,8 @@ Circuit is evaluated periodically to respond to changes in signal readings.
 Signals are floating point values.
 
 A signal can also have a special **Invalid** value. It's usually used to
-communicate that signal doesn't have a meaningful value at the moment, for example,
-[PromQL](#prom-q-l) emits such a value if it can't execute a query.
+communicate that signal does not have a meaningful value at the moment, for example,
+[PromQL](#prom-q-l) emits such a value if it cannot execute a query.
 Components know when their input signals are invalid and can act
 accordingly. They can either propagate the invalid signal, by making their
 output itself invalid (for example,
@@ -1109,7 +1109,7 @@ Components are wired to each other based on signal names forming an execution gr
 
 :::note
 
-Loops are broken by the runtime at the earliest component index that's part of the loop.
+Loops are broken by the runtime at the earliest component index that is part of the loop.
 The looped signals are saved in the tick they're generated and served in the subsequent tick.
 
 :::
@@ -1119,7 +1119,7 @@ There are three categories of components:
 - "source" components: they take some sort of input from "the real world" and output
   a signal based on this input. Example: [PromQL](#prom-q-l). In the UI
   they're represented by green color.
-- signal processor components: processing components that don't interact with the external systems.
+- signal processor components: processing components that do not interact with the external systems.
   Examples: [GradientController](#gradient-controller), [Max](#max).
 
   :::note
@@ -1736,7 +1736,7 @@ Gradient parameters for the controller. Defaults and constraints:
 
 - `slope` = 1
 - `min_gradient` = -Inf (must be less than 1)
-- `max_gradient` = 1 (can't be changed)
+- `max_gradient` = 1 (cannot be changed)
 
 </dd>
 </dl>
@@ -2017,7 +2017,7 @@ Input signal to be used for the EMA computation.
 
 Upper bound of the moving average.
 
-When the signal exceeds `max_envelope` it's multiplied by
+When the signal exceeds `max_envelope` it is multiplied by
 `correction_factor_on_max_envelope_violation` **once per tick**.
 
 :::note
@@ -2221,7 +2221,7 @@ Attribute path is a dot-separated path to attribute.
 
 Should be either:
 
-- one of the fields of [Attribute Context][attribute-context], or
+- one of the fields of [Attribute Context](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto), or
 - a special `request.http.bearer` pseudo-attribute.
   For example, `request.http.method` or `request.http.header.user-agent`
 
@@ -2233,8 +2233,6 @@ Example:
 ```yaml
 from: request.http.headers.user-agent
 ```
-
-[attribute-context]: https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/attribute_context.proto
 
 </dd>
 <dt>json</dt>
@@ -2283,7 +2281,7 @@ Match HTTP Path to given path templates.
 
 <!-- vale on -->
 
-Extrapolates the input signal by repeating the last valid value during the period in which it's invalid
+Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
 
 It does so until `maximum_extrapolation_interval` is reached, beyond which it emits invalid signal unless input signal becomes valid again.
 
@@ -2655,7 +2653,7 @@ See also [Label Matcher overview](/concepts/flow-control/flow-selector.md#label-
 classifier, but only if they were created at some previous control point
 (and propagated in baggage).
 
-This limitation doesn't apply to selectors of other entities, like
+This limitation does not apply to selectors of other entities, like
 Flux Meters or Actuators. It's valid to create a flow label on a control
 point using classifier, and immediately use it for matching on the same
 control point.
@@ -2837,7 +2835,7 @@ The selection criteria for the traffic that will be measured.
 
 ExponentialBuckets creates `count` number of buckets where the lowest bucket has an upper bound of `start`
 and each following bucket's upper bound is `factor` times the previous bucket's upper bound. The final +inf
-bucket isn't counted.
+bucket is not counted.
 
 <dl>
 <dt>count</dt>
@@ -2887,7 +2885,7 @@ Upper bound of the lowest bucket.
 <!-- vale on -->
 
 ExponentialBucketsRange creates `count` number of buckets where the lowest bucket is `min` and the highest
-bucket is `max`. The final +inf bucket isn't counted.
+bucket is `max`. The final +inf bucket is not counted.
 
 <dl>
 <dt>count</dt>
@@ -2937,7 +2935,7 @@ Lowest bucket.
 <!-- vale on -->
 
 LinearBuckets creates `count` number of buckets, each `width` wide, where the lowest bucket has an
-upper bound of `start`. The final +inf bucket isn't counted.
+upper bound of `start`. The final +inf bucket is not counted.
 
 <dl>
 <dt>count</dt>
@@ -3120,7 +3118,7 @@ Dynamic Configuration for a Controller
 <!-- vale on -->
 
 Decides whether the controller runs in `manual_mode`.
-In manual mode, the controller doesn't adjust the control variable It emits the same output as the control variable input.
+In manual mode, the controller does not adjust the control variable It emits the same output as the control variable input.
 
 </dd>
 </dl>
@@ -3338,7 +3336,7 @@ so the _slope_ might not fully describe aggressiveness of the controller.
 <!-- vale on -->
 
 Holds the last valid signal value for the specified duration then waits for next valid value to hold.
-If it's holding a value that means it ignores both valid and invalid new signals until the `hold_for` duration is finished.
+If it is holding a value that means it ignores both valid and invalid new signals until the `hold_for` duration is finished.
 
 <dl>
 <dt>hold_for</dt>
@@ -3513,7 +3511,7 @@ Input ports for the Gradient.
 Gradient parameters for the controller. Defaults and constraints:
 
 - `slope` = 1
-- `min_gradient` = 1 (can't be changed)
+- `min_gradient` = 1 (cannot be changed)
 - `max_gradient` = +Inf (must be greater than 1)
 
 </dd>
@@ -3860,7 +3858,7 @@ Parse the attribute as JWT and read the payload
 
 Specify a field to be extracted from payload using `json_pointer`.
 
-Note: The signature isn't verified against the secret (assuming there's some
+Note: The signature is not verified against the secret (assuming there's some
 other part of the system that handles such verification).
 
 Example:
@@ -4346,7 +4344,7 @@ The expression negates the result of sub expression.
 
 <!-- vale on -->
 
-List of MatchExpressions that's used for all or any matching
+List of MatchExpressions that is used for all or any matching
 
 for example, `{any: {of: [expr1, expr2]}}`.
 
@@ -4951,7 +4949,7 @@ Example:
 
 <!-- vale on -->
 
-_PodAutoScaler_ provides auto scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto scale.
+_PodAutoScaler_ provides auto-scaling functionality for scalable Kubernetes resource. Multiple _Controllers_ can be defined on the _PodAutoScaler_ for performing scale-out or scale-in. The _PodAutoScaler_ interfaces with Kubernetes infrastructure APIs to perform auto-scale.
 
 <dl>
 <dt>cooldown_override_percentage</dt>
@@ -5872,7 +5870,7 @@ You can use the [live-preview](/concepts/flow-control/resources/classifier.md#li
 
 Special Rego variables:
 
-- `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it isn't emitted as part of flow labels or telemetry and is solely used while processing the request.
+- `data.<package>.tokens`: Number of tokens for this request. This value is used by rate limiters and concurrency limiters when making decisions. The value provided here will override any value provided in the policy configuration for the workload. When this label is provided, it is not emitted as part of flow labels or telemetry and is solely used while processing the request.
 
 :::
 
@@ -6418,8 +6416,8 @@ Parameters to be used if none of workloads specified in `workloads` match.
 <!-- vale on -->
 
 Max Timeout is the value with which the flow timeout is capped.
-When `auto_tokens` feature isn't enabled, this value is used as the
-timeout for the flow, otherwise it's used as a cap for the timeout.
+When `auto_tokens` feature is not enabled, this value is used as the
+timeout for the flow, otherwise it is used as a cap for the timeout.
 
 :::caution
 
@@ -6431,7 +6429,7 @@ client for the whole GRPC call:
 
 Fail-open logic is use for flow control APIs, so if the GRPC timeout
 fires first, the flow will end up being unconditionally allowed while
-it's still waiting on the scheduler.
+it is still waiting on the scheduler.
 
 To avoid such cases, the end-to-end GRPC timeout should also contain
 some headroom for constant overhead like serialization and other processing delays. Default
@@ -6452,7 +6450,7 @@ tweaking this timeout, adjust the GRPC timeout accordingly.
 
 Timeout as a factor of tokens for a flow in a workload in case `auto_tokens` is set to true.
 
-If a flow isn't able to get tokens within `timeout_factor * tokens` of duration,
+If a flow is not able to get tokens within `timeout_factor * tokens` of duration,
 it will be rejected.
 
 This value impacts the prioritization and fairness because the larger the timeout the higher the chance a request has to get scheduled.
@@ -6478,7 +6476,7 @@ There are two aspects of this "intelligence":
 - Setting different priorities to different workloads lets the scheduler
   avoid dropping important traffic during overload.
 
-Each workload in this list specifies also a matcher that's used to
+Each workload in this list specifies also a matcher that is used to
 determine which flow will be categorized into which workload.
 In case of multiple matching workloads, the first matching one will be used.
 If none of workloads match, `default_workload` will be used.

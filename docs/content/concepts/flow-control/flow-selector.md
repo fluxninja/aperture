@@ -91,7 +91,7 @@ code.
 
 :::note
 
-The _Control Point_ definition doesn't care about which particular entity (like
+The _Control Point_ definition does not care about which particular entity (like
 a pod) is handling a particular flow. A single _Control Point_ covers _all_ the
 entities belonging to the same service.
 
@@ -268,9 +268,9 @@ _Agent Group_ name together with _Service_ name determine the
 
 Liveness and health probes are essential for checking the health of the
 application, and metrics endpoints are necessary for monitoring its performance.
-However, these endpoints don't contribute to the overall latency of the service,
-and if included in latency calculations, they may cause requests to be rejected,
-leading to unnecessary pod restarts.
+However, these endpoints do not contribute to the overall latency of the
+service, and if included in latency calculations, they may cause requests to be
+rejected, leading to unnecessary pod restarts.
 
 To prevent these issues, traffic to these endpoints can be filtered out by
 matching expressions. In the example below, flows with `http.target` starting
@@ -309,7 +309,7 @@ reference][label-matcher].
 
 :::info
 
-Keep in mind that while these endpoints may have a low latency, they shouldn't
+Keep in mind that while these endpoints may have a low latency, they should not
 be included in the overall latency of the service. Filtering them out can help
 improve the accuracy of latency calculations and prevent requests from being
 rejected.

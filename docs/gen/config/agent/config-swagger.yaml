@@ -158,7 +158,7 @@ definitions:
         properties:
             enabled:
                 default: true
-                description: Enables the Kubernetes auto scale capability.
+                description: Enables the Kubernetes auto-scale capability.
                 type: boolean
                 x-go-name: Enabled
                 x-go-tag-default: "true"
