@@ -18,7 +18,7 @@ import Zoom from 'react-medium-image-zoom';
 Playground is a Kubernetes-based environment for exploring the capabilities of
 Aperture. Additionally, it is used as a development environment for Aperture.
 Playground uses [Tilt](https://tilt.dev/) for orchestrating the deployments in
-Kubernetes. Tilt watches for changes to local files and auto deploys any
+Kubernetes. Tilt watches for changes to local files and auto-deploys any
 resources that change. This is convenient for getting quick feedback during
 development of Aperture.
 
@@ -233,8 +233,8 @@ pointed by the `kubectl`.
 
 :::
 
-Create a K8s cluster using Kind with a configuration file by executing the
-following command from aperture home directory:
+Create a Kubernetes cluster using Kind with a configuration file by executing
+the following command from aperture home directory:
 
 ```sh
 kind create cluster --config playground/kind-config.yaml
@@ -325,7 +325,7 @@ Below is the mapping of the ports being forwarded by Tilt:
 ### Running demo applications and designing test scenarios
 
 By default, playground is started with a simple demo scenario loaded. The demo
-application comes with three sets of pods and services. There is also a simple
+application includes three sets of pods and services. There is also a simple
 latency gradient policy applied to them, and K6 load generator pattern created.
 When the entire deployment turns green, the load generator can be started with
 the "Start Wavepool Generator" button in the Tilt UI. It will run a 2-minute
@@ -361,8 +361,8 @@ Each test scenario consists of a few directories, for policies, dashboards and
 load generator configuration:
 
 - `metadata.json` describes the test scenario, what images to build, what Tilt
-  dependencies to add etc. See existing test scenarios, as well as `Tiltfile`,
-  for examples of how to prepare this file.
+  dependencies to add and so on. See existing test scenarios, as well as
+  `Tiltfile`, for examples of how to prepare this file.
 - `policies/service1-demo-app.yaml` is a values.yaml file for the given policy
   listed in `metadata.json` under `aperture_policies` key.
 - `load_generator/test.js` is configuration for the K6 load generator.

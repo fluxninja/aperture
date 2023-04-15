@@ -251,7 +251,7 @@ Generated File Starts
 <dd>{{/* blank lines inside dd are important for correct markdown rendering, don't remove */}}
 
 ({{ template "fnSchemaSimple" . }})
-{{ if $env  }} Env-Var Prefix: `{{ upper (snakize (slice $base 1)) }}_{{ if $path }}{{ (upper (snakize (slice $path 1))) }}_{{ end }}{{ if and .Name (ne .Name ".") }}{{ upper (snakize .Name) }}_{{ end }}`{{ end }}
+{{ if $env  }} Environment variable prefix: `{{ upper (snakize (slice $base 1)) }}_{{ if $path }}{{ (upper (snakize (slice $path 1))) }}_{{ end }}{{ if and .Name (ne .Name ".") }}{{ upper (snakize .Name) }}_{{ end }}`{{ end }}
 
 </dd>
 {{ end }}

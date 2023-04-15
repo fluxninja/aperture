@@ -12,8 +12,7 @@ Uninstall Aperture Controller
 
 ### Synopsis
 
-Use this command to uninstall Aperture Controller and its dependencies from your
-Kubernetes cluster
+Use this command to uninstall Aperture Controller and its dependencies from your Kubernetes cluster
 
 ```
 aperturectl uninstall controller [flags]
@@ -44,5 +43,4 @@ aperturectl uninstall controller --namespace=aperture
 
 ### SEE ALSO
 
-- [aperturectl uninstall](/reference/aperturectl/uninstall/uninstall.md) -
-  Uninstall Aperture components
+- [aperturectl uninstall](/reference/aperturectl/uninstall/uninstall.md) - Uninstall Aperture components

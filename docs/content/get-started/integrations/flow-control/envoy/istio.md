@@ -29,7 +29,7 @@ to be added through the Envoy Filter.
 installed with `DaemonSet` mode and is installed in the `aperture-agent`
 namespace, which makes the target address value
 `aperture-agent.aperture-agent.svc.cluster.local`. If you are running the
-Aperture Agent in Sidecar mode, use `localhost` as the target a ddress.
+Aperture Agent in Sidecar mode, use `localhost` as the target address.
 
 1. The below patch merges the
    [Access Log](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log)
@@ -40,7 +40,7 @@ Aperture Agent in Sidecar mode, use `localhost` as the target a ddress.
    filter for the outbound listener, in the Istio sidecar running with the
    application.
 
-   The Open Telemetry configuration in the following patch has extracted values
+   The Open Telemetry configuration in the following patch has extracted values,
    which are forwarded to the Aperture Agent instance using gRPC.
 
    The prepared log has the request method value as log body and `egress` as the
@@ -120,7 +120,7 @@ Aperture Agent in Sidecar mode, use `localhost` as the target a ddress.
    filter, but for the inbound listener in the Istio sidecar running with the
    application.
 
-   The Open Telemetry configuration in the following patch has extracted values
+   The Open Telemetry configuration in the following patch has extracted values,
    which are forwarded to the Aperture Agent instance using gRPC.
 
    The prepared log has the request method value as log body and `ingress` as

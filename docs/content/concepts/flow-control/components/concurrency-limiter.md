@@ -97,7 +97,7 @@ more details.
 
 ### Token bucket {#token-bucket}
 
-The Aperture Agents utilize a modified version of the
+The Aperture Agents use a modified version of the
 [token bucket algorithm](https://en.wikipedia.org/wiki/Token_bucket) to regulate
 the flow of incoming requests. In this algorithm, every flow is required to
 obtain tokens from the bucket before a specified deadline to gain admission to

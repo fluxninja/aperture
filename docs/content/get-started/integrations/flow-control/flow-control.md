@@ -24,7 +24,8 @@ handle requests and prioritize workloads.
 
 ## Setup
 
-Aperture can interface with service instances via _Service Meshes_ or _SDKs_:
+Aperture can interface with service instances through _Service Meshes_ or
+_SDKs_:
 
 - Service Meshes: Aperture can be deployed with no changes to application code,
   using [Envoy](https://www.envoyproxy.io/). It latches onto Envoy’s
@@ -39,10 +40,10 @@ Aperture can interface with service instances via _Service Meshes_ or _SDKs_:
   such as [Jaeger](https://www.jaegertracing.io/).
 - Aperture SDKs: In addition to service mesh insertion, Aperture provides SDKs
   that can be used by developers to achieve fine-grained flow control at the
-  feature level inside service code. For example, an e-commerce app may
-  prioritize users in the checkout flow over new sessions when the application
-  is experiencing an overload. The Aperture Controller can be programmed to
-  degrade features as an escalated recovery action when basic load shedding is
-  triggered for several minutes.
+  feature level inside service code. For example, an e-commerce app might want
+  to prioritize users in the checkout flow over new sessions when the
+  application is experiencing an overload. The Aperture Controller can be
+  programmed to degrade features as an escalated recovery action when basic load
+  shedding is triggered for several minutes.
 
 <DocCardList />

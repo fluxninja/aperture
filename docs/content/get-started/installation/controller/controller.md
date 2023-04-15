@@ -24,8 +24,8 @@ set policies. Once determined, these decisions are then exported to all Aperture
 Agents to effectively handle workloads.
 
 The closed feedback loop functions primarily by monitoring the variables
-reflecting stability conditions (that is process variables) and compares them
-against setpoints. The difference in the variable values against these points is
+reflecting stability conditions (process variables) and compares them against
+setpoints. The difference in the variable values against these points is
 referred to as the error signal. The feedback loop then works to minimize these
 error signals by determining and distributing control actions, that adjust these
 process variables and maintain their values within the optimal range.
@@ -57,7 +57,7 @@ Install the tool of your choice using the following links:
 
    1. Once the Helm CLI is installed, add the
       [Aperture Controller Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-controller)
-      repository in your environment for install/upgrade:
+      repository in your environment for install or upgrade:
 
       ```bash
       helm repo add aperture https://fluxninja.github.io/aperture/
@@ -271,7 +271,7 @@ of the Kubernetes cluster based on your infrastructure.
    helm install aperture bitnami/contour --namespace projectcontour --create-namespace
    ```
 
-3. It may take a few minutes for the Contour Load Balancer IP to become
+3. It might take a few minutes for the Contour Load Balancer IP to become
    available. You can watch the status by running:
 
    ```bash
@@ -322,8 +322,8 @@ of the Kubernetes cluster based on your infrastructure.
    </TabItem>
    </Tabs>
 
-7. It may take a few minutes for the Ingress resource to get the `ADDRESS`. You
-   can watch the status by running:
+7. It might take a few minutes for the Ingress resource to get the `ADDRESS`.
+   You can watch the status by running:
 
    ```bash
    kubectl get ingress controller-ingress -w
@@ -468,8 +468,8 @@ following these steps:
 
 :::note
 
-Deleting a chart via Helm doesn’t delete the Custom Resource Definitions (Custom
-Resource Definitions) installed via the Helm chart.
+Deleting a chart using Helm doesn’t delete the Custom Resource Definitions
+(Custom Resource Definitions) installed from the Helm chart.
 
 :::
 

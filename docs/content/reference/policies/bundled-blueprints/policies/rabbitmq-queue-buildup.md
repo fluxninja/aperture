@@ -11,7 +11,7 @@ no longer detected.
 
 ## Build Instructions
 
-Make sure that the Aperture binary is
+Verify that the Aperture binary is
 [built](/reference/aperturectl/build/agent/agent.md) with the `rabbitmqreceiver`
 extension enabled.
 

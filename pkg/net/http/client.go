@@ -34,7 +34,7 @@ type HTTPClientConfig struct {
 	NetworkKeepAlive config.Duration `json:"network_keep_alive" validate:"gte=0s" default:"30s"`
 	// Timeout for making network connection
 	NetworkTimeout config.Duration `json:"network_timeout" validate:"gte=0s" default:"30s"`
-	// HTTP client timeout - Timeouts includes connection time, redirects, reading the response etc. 0 = no timeout.
+	// HTTP client timeout - Timeouts include connection time, redirects, reading the response and so on. 0 = no timeout.
 	Timeout config.Duration `json:"timeout" validate:"gte=0s" default:"60s"`
 	// Proxy Connect Header - map[string][]string
 	ProxyConnectHeader http.Header `json:"proxy_connect_header,omitempty" validate:"omitempty"`
@@ -46,7 +46,7 @@ type HTTPClientConfig struct {
 	ResponseHeaderTimeout config.Duration `json:"response_header_timeout" validate:"gte=0s" default:"0s"`
 	// Idle Connection Timeout. 0 = no timeout.
 	IdleConnTimeout config.Duration `json:"idle_connection_timeout" validate:"gte=0s" default:"90s"`
-	// SSL key log file (useful for debugging)
+	// SSL/TLS key log file (useful for debugging)
 	KeyLogWriter string `json:"key_log_file"`
 	// Client TLS configuration
 	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
@@ -58,9 +58,9 @@ type HTTPClientConfig struct {
 	MaxConnsPerHost int `json:"max_conns_per_host" validate:"gte=0" default:"0"`
 	// Max Response Header Bytes. 0 = no limit.
 	MaxResponseHeaderBytes int64 `json:"max_response_header_bytes" validate:"gte=0" default:"0"`
-	// Write Buffer Size. 0 = 4KB.
+	// Write Buffer Size. 0 = 4 KB.
 	WriteBufferSize int `json:"write_buffer_size" validate:"gte=0" default:"0"`
-	// Read Buffer Size. 0 = 4KB
+	// Read Buffer Size. 0 = 4 KB
 	ReadBufferSize int `json:"read_buffer_size" validate:"gte=0" default:"0"`
 	// Disable Compression
 	DisableCompression bool `json:"disable_compression" default:"false"`

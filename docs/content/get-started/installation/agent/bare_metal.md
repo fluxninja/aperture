@@ -90,7 +90,7 @@ sudo systemctl enable --now aperture-agent
 :::caution
 
 Currently, configuration watcher and automatic reload aren't supported. If you
-modify the configuration file, make sure to restart the service:
+modify the configuration file, do restart the service:
 
 ```bash
 sudo systemctl restart aperture-agent

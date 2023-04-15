@@ -48,15 +48,15 @@ At a high-level, this policy consists of:
 - Integral Optimizer: When the service is detected to be in the normal state, an
   integral optimizer is used to additively increase the concurrency of the
   service in each execution cycle of the circuit. This design allows warming-up
-  a service from a cold start state. This also protects applications from sudden
-  spikes in traffic, as it sets an upper bound to the concurrency allowed on a
-  service in each execution cycle of the circuit based on the observed incoming
-  concurrency.
-- Concurrency Limiting Actuator: The concurrency limits are actuated via a
+  a service from an initial inactive state. This also protects applications from
+  sudden spikes in traffic, as it sets an upper bound to the concurrency allowed
+  on a service in each execution cycle of the circuit based on the observed
+  incoming concurrency.
+- Concurrency Limiting Actuator: The concurrency limits are actuated using a
   [weighted-fair queuing scheduler](/concepts/flow-control/components/concurrency-limiter.md).
   The output of the adjustments to accepted concurrency made by gradient
   controller and optimizer logic are translated to a load multiplier that is
-  synchronized with Aperture Agents via etcd. The load multiplier adjusts
+  synchronized with Aperture Agents through etcd. The load multiplier adjusts
   (increases or decreases) the token bucket fill rates based on the incoming
   concurrency observed at each agent.
 

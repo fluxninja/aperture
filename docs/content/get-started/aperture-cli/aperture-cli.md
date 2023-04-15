@@ -64,6 +64,8 @@ steps mentioned above.
 
 :::
 
+<!-- vale off -->
+
 <Tabs groupId="setup" queryString>
 <TabItem value="macOS" label="macOS">
 With Homebrew:
@@ -86,6 +88,8 @@ With rpm:
 </CodeBlock>
 </TabItem>
 </Tabs>
+
+<!-- vale on -->
 
 ## Enable shell autocompletion
 

@@ -96,3 +96,6 @@ zsh
 powershell
 ConfigMap
 Prometheus
+Pub/Sub
+auto-scaler
+Auto-scaler

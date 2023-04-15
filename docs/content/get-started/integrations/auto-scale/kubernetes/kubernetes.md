@@ -12,8 +12,8 @@ keywords:
 To get started with auto-scaling in Kubernetes,
 [install Aperture Agent](get-started/installation/agent/kubernetes/daemonset) on
 your Kubernetes cluster. The Agent needs certain permissions to discover
-scalable resources and perform auto-scale. The default installation mode via the
-Aperture Operator should take care of creating the necessary roles and
+scalable resources and perform auto-scale. The default installation mode using
+the Aperture Operator should take care of creating the necessary roles and
 permissions for Aperture Agent.
 
 ## Preview Discovered Control Points

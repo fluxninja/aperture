@@ -21,7 +21,7 @@ restrict traffic of each user by dynamically adjusting their rate limits.
 To recap, the
 [concurrency limiter](/concepts/flow-control/components/concurrency-limiter.md)
 relies on a weighted fair queuing scheduler to make flow control decisions at
-the workload level. On the other hand, the
+the workload level. Conversely, the
 [rate limiter](/concepts/flow-control/components/rate-limiter.md) uses a
 distributed cache to maintain global counters for each flow label (for example:
 unique users) and restricts traffic when they exceed their allocated quota.

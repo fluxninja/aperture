@@ -1,1 +1,2 @@
 {"rule":"EN_COMPOUND_ADJECTIVE_INTERNAL","sentence":"[Oo]pen source"}
+{"rule":"MISSING_GENITIVE","sentence":"Prometheus metrics"}

@@ -95,7 +95,7 @@ used with SDKs to provide [flow control](/concepts/flow-control/flow-control.md)
 capabilities. Additionally, agents work with auto-scaling APIs for platforms
 such as Kubernetes, to help scale infrastructure when needed.
 
-## Aperture Databases
+## Aperture databases
 
 Aperture uses two databases to store configuration, telemetry, and flow control
 information: [Prometheus](https://prometheus.io) and [etcd](https://etcd.io).
@@ -104,11 +104,11 @@ collected from Aperture Agents. It enables Aperture to monitor the system and
 detect deviations from the service-level objectives (SLOs) defined in the
 declarative policies.
 
-Aperture Controller uses etcd (distributed key/value store) to persist the
+Aperture Controller uses etcd (distributed key-value store) to persist the
 declarative policies that define the control circuits and their components, as
 well as the current system state.
 
 Users can optionally reuse their existing etcd or
 [scalable Prometheus](https://promlabs.com/blog/2021/10/14/promql-vendor-compatibility-round-three)
-installations to minimize operational overhead and leverage their existing
-monitoring infrastructure.
+installations to minimize operational overhead and use their existing monitoring
+infrastructure.

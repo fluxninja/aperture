@@ -52,7 +52,7 @@ type ProfilersConfig struct {
 	ProfilesPath string `json:"profiles_path" default:"default"`
 	// Register routes. Profile types `profile`, `symbol` and `cmdline` will be registered at `/debug/pprof/{profile,symbol,cmdline}`.
 	RegisterHTTPRoutes bool `json:"register_http_routes" default:"true"`
-	// Flag to enable CPU profiling on process start and save it to a file. HTTP interface won't work if this is enabled as CPU profile will always be running.
+	// Flag to enable CPU profiling on process start and save it to a file. The Browser (HTTP) interface won't work if this is enabled, as the CPU profile will always be running.
 	CPUProfile bool `json:"cpu_profiler" default:"false"`
 }
 

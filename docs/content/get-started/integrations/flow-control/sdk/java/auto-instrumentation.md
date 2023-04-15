@@ -23,8 +23,8 @@ Supported technologies:
 | Armeria   | 1.15+              |
 | Netty     | 4.1+               |
 
-Latest version of the Aperture Instrumentation Agent jar file can be downloaded
-[here][download_link].
+The latest version of the Aperture Instrumentation Agent JAR file can be
+downloaded [here][download_link].
 
 ## Running the java agent
 

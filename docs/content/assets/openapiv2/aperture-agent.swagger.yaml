@@ -546,7 +546,7 @@ definitions:
         additionalProperties:
           $ref: '#/definitions/Entity'
   Entity:
-    description: Entity represents a pod, VM, etc.
+    description: Entity represents a pod, VM, and so on.
     type: object
     required:
     - ip_address

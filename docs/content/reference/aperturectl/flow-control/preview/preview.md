@@ -38,5 +38,4 @@ aperturectl flow-control preview [--http] SERVICE CONTROL_POINT [flags]
 
 ### SEE ALSO
 
-- [aperturectl flow-control](/reference/aperturectl/flow-control/flow-control.md) -
-  Flow Control integrations
+- [aperturectl flow-control](/reference/aperturectl/flow-control/flow-control.md) - Flow Control integrations
