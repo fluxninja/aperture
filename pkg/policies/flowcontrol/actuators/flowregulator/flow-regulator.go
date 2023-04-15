@@ -2,11 +2,10 @@ package flowregulator
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/binary"
 	"fmt"
 	"hash/fnv"
 	"math"
+	"math/rand"
 	"path"
 	"sync"
 
@@ -380,15 +379,12 @@ func (fr *flowRegulator) RunLimiter(ctx context.Context, labels map[string]strin
 			limiterDecision.Dropped = true
 		}
 	} else {
-		// If label_key is empty or not found in labels
+		// Else, label_key is empty or not found in labels
 		// Randomly accept only acceptPercentage proportion of requests
-		randomVal := make([]byte, 4)
-		_, err := rand.Read(randomVal)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to generate random value, default to accept all")
-			return limiterDecision
-		}
-		val := float64(binary.BigEndian.Uint32(randomVal)) / float64(math.MaxUint32)
+		// #nosec G404
+		// G404: Use of weak random number generator (math/rand instead of crypto/rand) (gosec)
+		// This is not a security issue as we do not need cryptographic randomness for load management.
+		val := rand.Float64()
 
 		if val <= fr.acceptPercentage/100.0 {
 			limiterDecision.Dropped = false
