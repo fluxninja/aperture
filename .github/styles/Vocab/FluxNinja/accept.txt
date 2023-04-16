@@ -1,3 +1,4 @@
+Tpo
 Kubernetes
 FluxNinja
 fluxninja
@@ -28,7 +29,6 @@ SDKs
 SDK
 etcd
 PromQL
-aperturect
 statefully
 aperturectl
 Istio
