@@ -28,7 +28,6 @@ SDKs
 SDK
 etcd
 PromQL
-aperturect
 statefully
 aperturectl
 Istio

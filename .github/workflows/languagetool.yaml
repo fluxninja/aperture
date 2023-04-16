@@ -19,7 +19,9 @@ jobs:
           reporter: github-pr-review
           level: warning
           filter_mode: changed
+          disabled_categories: "TYPOS,TYPOGRAPHY"
           patterns: "**.md"
+          spelling_file: .github/styles/Vocab/FluxNinja/accept.txt
           custom_api_endpoint: ${{ secrets.LANGTOOL_HTTP_URI }}
           username: ${{ secrets.LANGTOOL_USERNAME }}
           api_key: ${{ secrets.LANGTOOL_API_KEY }}
