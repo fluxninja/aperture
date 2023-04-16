@@ -156,11 +156,11 @@ func (sg *SignalGenerator) processBackwardTick() {
 }
 
 func (sg *SignalGenerator) getStepDuration() int32 {
-	stepDuration := float64(sg.steps[sg.currentStep].Duration.AsDuration())
+	stepDuration := sg.steps[sg.currentStep].Duration.AsDuration()
 	if stepDuration == 0 {
 		return 1
 	}
-	return int32(math.Ceil(stepDuration / float64(sg.evaluationPeriod)))
+	return int32(math.Ceil(float64(stepDuration) / float64(sg.evaluationPeriod)))
 }
 
 // DynamicConfigUpdate is a no-op for SignalGenerator.

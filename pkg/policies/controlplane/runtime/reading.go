@@ -6,7 +6,7 @@ import (
 
 var _ Reading = (*reading)(nil)
 
-// Reading is the interface that reading implements which wraps a float Value which can be valid or invalid.
+// Reading is the interface that reading implements which wraps a float64 value which can be valid or invalid.
 type Reading interface {
 	Value() float64
 	Valid() bool
@@ -16,7 +16,7 @@ type reading struct {
 	value float64
 }
 
-// NewReading creates a reading with the given float value.
+// NewReading creates a reading with the given float64 value.
 func NewReading(value float64) Reading {
 	return &reading{
 		value: value,
