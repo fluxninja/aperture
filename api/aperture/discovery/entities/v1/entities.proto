@@ -61,7 +61,7 @@ message Entity {
   string name = 3;
   // Namespace of the entity. For example, pod namespace.
   string namespace = 4;
-  // Node name of the entity. For example, Hostname.
+  // Node name of the entity. For example, hostname.
   string node_name = 5;
   // Services of the entity.
   repeated string services = 6; // @gotags: validate:"gt=0"

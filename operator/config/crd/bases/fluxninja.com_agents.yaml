@@ -1822,7 +1822,7 @@ spec:
                                   type: string
                                 node_name:
                                   description: Node name of the entity. For example,
-                                    Hostname.
+                                    hostname.
                                   type: string
                                 services:
                                   description: Services of the entity.

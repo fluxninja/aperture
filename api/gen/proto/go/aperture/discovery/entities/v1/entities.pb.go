@@ -187,7 +187,7 @@ type Entity struct {
 	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	// Namespace of the entity. For example, pod namespace.
 	Namespace string `protobuf:"bytes,4,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	// Node name of the entity. For example, Hostname.
+	// Node name of the entity. For example, hostname.
 	NodeName string `protobuf:"bytes,5,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty"`
 	// Services of the entity.
 	Services []string `protobuf:"bytes,6,rep,name=services,proto3" json:"services,omitempty" validate:"gt=0"` // @gotags: validate:"gt=0"
