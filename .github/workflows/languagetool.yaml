@@ -1,0 +1,25 @@
+name: LanguageTool
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request:
+
+jobs:
+  languagetool:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: fluxninja/action-languagetool@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          level: warning
+          filter_mode: changed
+          patterns: "**.md"
+          custom_api_endpoint: ${{ secrets.LANGTOOL_HTTP_URI }}
+          username: ${{ secrets.LANGTOOL_USERNAME }}
+          api_key: ${{ secrets.LANGTOOL_API_KEY }}
